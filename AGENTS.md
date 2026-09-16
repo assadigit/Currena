@@ -8,8 +8,12 @@ Currena is a currency converter focused on Iranian open-market rates (Toman) plu
 international pairs. It is a parallel rebuild of a production Django app that stays
 live at https://aliassadi1993.pythonanywhere.com/ until an explicit human cutover.
 
-- **apps/api** — Hono on Cloudflare Workers. Serves `/api/*` AND the built SPA via
-  Workers static assets (SPA fallback). One deploy, no CORS.
+- **apps/api** — Hono on Cloudflare Workers. Serves `/api/*`, the zero-JS
+  `/admin` ops console (Phase 6: per-source status + manual refresh via
+  REFRESH_SECRET; noindexed), AND the built SPA via Workers static assets
+  (SPA fallback). One deploy, no CORS. `run_worker_first` pins `/admin*`,
+  `/api/*`, `/internal/*` to the Worker (navigation requests to non-asset
+  paths would otherwise be served the SPA shell by the platform).
 - **apps/web** — Vite + React + TS + Tailwind PWA (standalone SPA, never
   server-rendered; will be wrapped in Capacitor later).
 - **packages/core** — zod schemas, conversion math, formatting. Pure. Tested.

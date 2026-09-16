@@ -24,6 +24,7 @@ import type { ConversionResult, RatesError, SnapshotSource } from '@currena/core
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { scrapeFrankfurter, scrapeTgju } from '@currena/scraper';
+import { ADMIN_HEADERS, renderAdminPage, type AdminBanner } from './admin';
 import { KvRateStore } from './adapters/kv-store';
 import { buildMeta } from './meta';
 import { RatesService, RatesServiceError } from './rates-service';
@@ -210,6 +211,86 @@ export function createApp(deps: AppDeps = {}) {
   app.get('/api/status', async (c) => {
     const report = await makeService(c.env).status();
     return c.json(report, 200, NO_STORE);
+  });
+
+  /* ------------------------- admin stub (Phase 6) ------------------------- */
+
+  /** Shared page render: status report + cached snapshots, escaped HTML. */
+  async function renderAdmin(
+    c: Context<{ Bindings: Bindings }>,
+    opts: { refreshed?: 'tgju' | 'frankfurter'; error?: AdminBanner } = {},
+  ) {
+    const service = makeService(c.env);
+    const [report, tgju, frankfurter] = await Promise.all([
+      service.status(),
+      service.snapshot('tgju'),
+      service.snapshot('frankfurter'),
+    ]);
+    const html = renderAdminPage({
+      report,
+      snapshots: { tgju, frankfurter },
+      now: new Date(),
+      ...opts,
+    });
+    return c.html(html, 200, ADMIN_HEADERS);
+  }
+
+  app.get('/admin', async (c) => {
+    // ?refreshed= is set by the POST below (PRG flash) — validated, never trusted.
+    const raw = c.req.query('refreshed');
+    const refreshed = raw === 'tgju' || raw === 'frankfurter' ? raw : undefined;
+    return renderAdmin(c, { refreshed });
+  });
+
+  app.post('/admin', async (c) => {
+    const secret = c.env.REFRESH_SECRET;
+    if (!secret) {
+      return renderAdmin(c, {
+        error: {
+          code: 'refresh_not_configured',
+          message: 'REFRESH_SECRET is not configured for this deployment.',
+        },
+      });
+    }
+
+    // application/x-www-form-urlencoded body (the no-JS form).
+    let form: Record<string, string | undefined> = {};
+    try {
+      const contentType = c.req.header('content-type') ?? '';
+      if (/application\/x-www-form-urlencoded/i.test(contentType)) {
+        const text = await c.req.text();
+        const params = new URLSearchParams(text);
+        form = { source: params.get('source') ?? undefined, secret: params.get('secret') ?? undefined };
+      }
+    } catch {
+      form = {}; // fall through to validation errors below
+    }
+
+    const source = parseSourceParam(form.source);
+    if (!source) {
+      return renderAdmin(c, {
+        error: { message: `Invalid 'source' — must be 'tgju' or 'frankfurter'.` },
+      });
+    }
+
+    const provided = form.secret ?? '';
+    if (provided === '' || !secretMatches(provided, secret)) {
+      // Uniform message for missing/wrong secret; no echo of the input.
+      return renderAdmin(c, {
+        error: { code: 'unauthorized', message: 'Missing or invalid refresh secret.' },
+      });
+    }
+
+    try {
+      await makeService(c.env).getRates(source, { force: true });
+      // PRG: redirect so a browser refresh never re-submits the form.
+      return c.redirect(`/admin?refreshed=${source}`, 303);
+    } catch (err) {
+      if (err instanceof RatesServiceError) {
+        return renderAdmin(c, { error: { code: err.code, message: err.message } });
+      }
+      throw err;
+    }
   });
 
   /* ------------------------- internal refresh ---------------------------- */

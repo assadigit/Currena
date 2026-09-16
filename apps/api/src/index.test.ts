@@ -313,4 +313,143 @@ describe('routes (injected service — no Workers, no live sites)', () => {
     const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('not_found');
   });
+
+  /* ------------------------- admin stub (Phase 6) ------------------------ */
+
+  describe('GET /admin', () => {
+    it('renders the ops console with noindex + no-store + CSP headers', async () => {
+      const res = await makeApp().request('/admin', undefined, env);
+      expect(res.status).toBe(200);
+      expect(res.headers.get('content-type')).toContain('text/html');
+      expect(res.headers.get('cache-control')).toBe('no-store');
+      expect(res.headers.get('x-robots-tag')).toBe('noindex, nofollow');
+      expect(res.headers.get('content-security-policy')).toContain("default-src 'none'");
+      const html = await res.text();
+      expect(html).toContain('noindex, nofollow'); // <meta name="robots">
+      expect(html).toContain('Manual refresh');
+      expect(html).toContain('no snapshot in KV'); // cold store
+    });
+
+    it('shows cached snapshot data (rates table) after a scrape', async () => {
+      const app = makeApp();
+      await app.request('/api/rates', undefined, env); // populates tgju snapshot
+      const res = await app.request('/admin', undefined, env);
+      const html = await res.text();
+      expect(res.status).toBe(200);
+      expect(html).toContain('Iranian Rial');
+      expect(html).toContain('US Dollar');
+      expect(html).toContain('TOMAN');
+      expect(html).toContain('fresh'); // cache pill
+    });
+
+    it('?refreshed=tgju (PRG flash from POST) renders the success banner', async () => {
+      const res = await makeApp().request('/admin?refreshed=tgju', undefined, env);
+      const html = await res.text();
+      expect(html).toContain('banner success');
+      expect(html).toContain('tgju refreshed');
+    });
+
+    it('?refreshed=<injection> is rejected — no banner, no raw markup', async () => {
+      const res = await makeApp().request('/admin?refreshed=%3Cscript%3Ealert(1)%3C%2Fscript%3E', undefined, env);
+      const html = await res.text();
+      expect(html).not.toContain('banner success');
+      expect(html).not.toContain('<script>alert(1)');
+    });
+  });
+
+  describe('POST /admin (form-encoded manual refresh)', () => {
+    const formBody = (fields: Record<string, string>) =>
+      new URLSearchParams(fields).toString();
+
+    const formReq = (body: string) => ({
+      method: 'POST' as const,
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body,
+    });
+
+    it('without REFRESH_SECRET configured → error banner, 200 HTML, no scrape', async () => {
+      const res = await makeApp().request('/admin', formReq(formBody({ source: 'tgju', secret: 'x' })), envNoSecret);
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain('banner error');
+      expect(html).toContain('refresh_not_configured');
+      expect(scrapeCalls).toEqual([]);
+    });
+
+    it('wrong secret → uniform unauthorized banner, no echo of the input, no scrape', async () => {
+      const res = await makeApp().request(
+        '/admin',
+        formReq(formBody({ source: 'tgju', secret: 'wrong-secret' })),
+        env,
+      );
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain('unauthorized');
+      expect(html).not.toContain('wrong-secret'); // never echoed
+      expect(scrapeCalls).toEqual([]);
+    });
+
+    it('missing secret field → unauthorized banner', async () => {
+      const res = await makeApp().request('/admin', formReq(formBody({ source: 'tgju' })), env);
+      const html = await res.text();
+      expect(html).toContain('unauthorized');
+      expect(scrapeCalls).toEqual([]);
+    });
+
+    it('invalid source → validation banner, no scrape', async () => {
+      const res = await makeApp().request(
+        '/admin',
+        formReq(formBody({ source: 'bogus', secret: 'test-secret' })),
+        env,
+      );
+      const html = await res.text();
+      expect(html).toContain('Invalid &#39;source&#39;');
+      expect(scrapeCalls).toEqual([]);
+    });
+
+    it('correct secret → 303 redirect (PRG) to ?refreshed= and a forced scrape', async () => {
+      const app = makeApp();
+      await app.request('/api/rates', undefined, env); // initial scrape
+      clockMs += 5 * 1000; // within min-interval → force must still bypass
+
+      const res = await app.request(
+        '/admin',
+        formReq(formBody({ source: 'tgju', secret: 'test-secret' })),
+        env,
+      );
+      expect(res.status).toBe(303);
+      expect(res.headers.get('location')).toBe('/admin?refreshed=tgju');
+      expect(scrapeCalls).toEqual(['tgju', 'tgju']); // force worked
+
+      // Following the redirect shows the success banner.
+      const follow = await app.request(res.headers.get('location')!, undefined, env);
+      const html = await follow.text();
+      expect(html).toContain('banner success');
+    });
+
+    it('dead upstream → 200 HTML error banner carrying the ladder code (not a 503)', async () => {
+      failures.tgju = new Error('down');
+      const res = await makeApp().request(
+        '/admin',
+        formReq(formBody({ source: 'tgju', secret: 'test-secret' })),
+        env,
+      );
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain('banner error');
+      expect(html).toContain('source_unavailable');
+    });
+
+    it('non-form content type (e.g. JSON body) → unauthorized, no crash', async () => {
+      const res = await makeApp().request(
+        '/admin',
+        { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{"source":"tgju"}' },
+        env,
+      );
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain('unauthorized');
+      expect(scrapeCalls).toEqual([]);
+    });
+  });
 });

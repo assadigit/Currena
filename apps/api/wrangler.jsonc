@@ -16,7 +16,13 @@
   "assets": {
     "directory": "../web/dist",
     "binding": "ASSETS",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    // Phase 6: navigation-style requests (Sec-Fetch-Dest: document) to
+    // non-asset paths are served index.html by the platform WITHOUT running
+    // the Worker — verified live on 2026-09-17. /admin must render from the
+    // Worker, and /api|/internal must answer JSON regardless of how they are
+    // called, so these paths are pinned Worker-first.
+    "run_worker_first": ["/admin", "/admin/*", "/api", "/api/*", "/internal", "/internal/*"]
   }
   // Secrets land via `wrangler secret put REFRESH_SECRET` (never in this file);
   // local dev reads `apps/api/.dev.vars` (gitignored).

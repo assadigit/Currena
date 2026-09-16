@@ -155,6 +155,11 @@ export class RatesService {
     );
   }
 
+  /** Read-only cached-snapshot access (admin page). No ladder, no network. */
+  async snapshot(source: SnapshotSource): Promise<Snapshot | undefined> {
+    return this.store.getSnapshot(source);
+  }
+
   /** /api/status payload: SourceStatus + cache age/freshness per source. */
   async status(): Promise<StatusReport> {
     const now = this.now();

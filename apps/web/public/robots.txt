@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+
+# Currena — the /admin ops page is noindex (meta + X-Robots-Tag + this rule).
