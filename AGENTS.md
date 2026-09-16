@@ -67,7 +67,10 @@ Package manager is **pnpm** (Node ≥ 20).
    TGJU (live scrape → cached + stale banner → 503). International-only pairs →
    Frankfurter (`https://api.frankfurter.dev`) with the same ladder. **Never**
    fall IRR pairs back to the free API (interbank IRR ≠ open-market Toman);
-   never mix sources within one conversion.
+   never mix sources within one conversion. *(Gate 2 decision 2026-09-16:
+   Path A — the Worker scrapes TGJU directly. Path B, a GitHub Actions relay
+   writing snapshots into KV, is the documented additive fallback to adopt only
+   if TGJU ever blocks Workers egress in production — it is not built.)*
 9. **Secrets**: runtime secrets via `wrangler secret put` / `.dev.vars`
    (gitignored). `credentials.md` is read-once and never echoed, logged, or committed.
 10. **Commits**: `phase(N): summary` after each phase; keep `docs/PROGRESS.md`

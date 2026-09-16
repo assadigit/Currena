@@ -62,3 +62,14 @@ Legend: **K** = Keep · **D** = Defer · **C** = Cut. Phase = build phase in the
    locally (rate 1, no network) instead of routing through Frankfurter.
 
 **Verdict tallies after decisions: 19 Keep · 2 Defer · 2 Cut · 1 N/A** (was 20/0/3/1).
+
+## Gate 2 decision (owner answer, 2026-09-16) — GATE 2 PASSED
+
+**Path A — the Worker scrapes TGJU directly** (owner: "A. if A failed, path B.").
+Path B (GitHub Actions relay writing snapshots into Workers KV) is **not built
+now**; it stays the documented additive fallback to adopt only if TGJU ever
+blocks Workers egress IPs in production (per Phase-2 evidence, egress currently
+works from HKG + ATL colos). Temporary Gate-2 diagnostics deleted after the
+decision: `apps/probe`, `.github/workflows/tgju-probe.yml`, and the deployed
+`currena-probe` Worker. Phases 3–7 are unblocked; scraper must include quick
+retries (one transient CF `error 1042` was observed in Phase 2).

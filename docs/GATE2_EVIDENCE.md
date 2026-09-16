@@ -1,9 +1,14 @@
 # GATE 2 — TGJU reachability evidence & routing decision
 
-> Collected 2026-09-16 (Phase 2 spike). **Decision required from the owner:**
-> **Path A** (Worker scrapes TGJU directly) vs **Path B** (GitHub Actions relay).
-> Evidence artifacts: `docs/evidence/phase2-worker-battery.json`,
-> `docs/evidence/phase2-gha-probe.log`.
+> Collected 2026-09-16 (Phase 2 spike). Evidence artifacts:
+> `docs/evidence/phase2-worker-battery.json`, `docs/evidence/phase2-gha-probe.log`.
+>
+> **✅ DECISION (owner, 2026-09-16): "A. if A failed, path B." → GATE 2 PASSED —
+> Path A (Worker scrapes TGJU directly) is approved.** Path B (GitHub Actions
+> relay) is NOT built now; it stays the documented additive fallback to adopt only
+> if TGJU ever blocks Workers egress in production. Temporary diagnostics deleted
+> after the decision: `apps/probe`, `.github/workflows/tgju-probe.yml`, deployed
+> `currena-probe` Worker.
 
 ## TL;DR
 
