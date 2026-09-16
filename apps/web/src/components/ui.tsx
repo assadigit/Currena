@@ -166,3 +166,51 @@ export function OfflineBanner({ source }: { source: Source }) {
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ *
+ * Switch — legacy .toggle-switch pill (splitter / receipt options)
+ * ------------------------------------------------------------------ */
+
+export interface SwitchProps {
+  id: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  label: ReactNode;
+}
+
+export function Switch({ id, checked, onChange, label }: SwitchProps) {
+  return (
+    <label htmlFor={id} className="flex cursor-pointer items-center justify-between gap-3 py-1.5">
+      <span className="text-sm font-semibold text-currena-dark dark:text-white/90">{label}</span>
+      <span className="relative inline-block h-6 w-11 shrink-0">
+        <input
+          id={id}
+          type="checkbox"
+          role="switch"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+          className="peer h-full w-full cursor-pointer appearance-none rounded-full bg-gray-300 transition-colors duration-300 checked:bg-currena-success dark:bg-white/15"
+        />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute top-1 start-1 h-4 w-4 rounded-full bg-white shadow transition-transform duration-300 peer-checked:translate-x-5 rtl:peer-checked:-translate-x-5"
+        />
+      </span>
+    </label>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Toast — transient feedback pill (copied / settled / errors)
+ * ------------------------------------------------------------------ */
+
+export function Toast({ message }: { message: string }) {
+  return (
+    <div
+      role="status"
+      className="fade-in fixed inset-x-4 bottom-4 z-[10001] mx-auto max-w-sm rounded-2xl bg-currena-dark/95 px-4 py-3 text-center text-sm whitespace-pre-line text-white shadow-lg"
+    >
+      {message}
+    </div>
+  );
+}

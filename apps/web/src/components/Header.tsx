@@ -91,10 +91,12 @@ export function Header() {
         />
       ) : null}
 
-      {/* Side menu — slides from the inline-end edge */}
+      {/* Side menu — slides from the inline-end edge (fixed to `end-0` so the
+          closed state is fully off-screen; the static-position default left
+          the translated panel hovering over the page center) */}
       <nav
         aria-label={t('nav.home')}
-        className={`side-menu fixed bottom-0 top-16 z-[999] w-[280px] overflow-y-auto bg-white p-5 shadow-[-5px_0_20px_rgba(0,0,0,0.1)] lg:top-20 lg:w-[320px] dark:bg-currena-bg-dark ${
+        className={`side-menu fixed bottom-0 top-16 end-0 z-[999] w-[280px] overflow-y-auto bg-white p-5 shadow-[-5px_0_20px_rgba(0,0,0,0.1)] lg:top-20 lg:w-[320px] dark:bg-currena-bg-dark ${
           menuOpen ? 'translate-x-0' : 'translate-x-full rtl:-translate-x-full'
         }`}
       >

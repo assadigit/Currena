@@ -6,7 +6,7 @@ Living document. Update with every phase. Humans check this first.
 
 | | |
 |---|---|
-| **Phase** | 5 active — apps/web SPA next (API deployed: https://currena-api.sedanama-ir.workers.dev — GATE 2 Path A in production) |
+| **Phase** | 6 active — admin stub next (SPA 100% shipped: https://currena-api.sedanama-ir.workers.dev — GATE 2 Path A in production) |
 | **Legacy source** | `./legacy/` NOT provided in the environment. Inventory reconstructed from the live site (https://aliassadi1993.pythonanywhere.com/) — fidelity caveats documented in `FEATURE_MAP.md` |
 | **Push to GitHub** | Unblocked — credentials provided 2026-09-16 (stored outside the repo; never committed) |
 | **Live legacy app** | Untouched, healthy (verified 2026-09-16, live conversion exercised end-to-end) |
@@ -20,8 +20,8 @@ Living document. Update with every phase. Humans check this first.
 - [x] **GATE 2 — APPROVED 2026-09-16** — owner: "A. if A failed, path B." → **Path A** (direct scrape); Path B stays the documented fallback
 - [x] Phase 3 — packages/core (schemas, math, normalizers, formatters, Vitest green) ✅ 107 tests / 7 files green; contracts: Rate/Snapshot/RatesResponse/RatesError/SourceConfig; math incl. TOMAN + same-currency short-circuit; settle/calc/batch algorithms; fa/en + Jalali formatting
 - [x] Phase 4 — scraper + api (TGJU/Frankfurter modules, KV RateStore, ladder, endpoints, fixtures, tests) + deploy ✅ 202 tests green (core 107 + scraper 43 + api 52); deployed to https://currena-api.sedanama-ir.workers.dev — live smoke: 100 USD → 23,050,000 IRR(Toman) @ 230,500 (legacy parity), EUR→GBP via Frankfurter, AED international → clean 503, /internal/refresh + secret auth OK, freshness-window cache hit OK
-- [ ] Phase 5 — apps/web (full PWA, every Keep feature, performance budgets) ⏸️ CURRENT — **part 1 shipped & deployed 2026-09-16**: app shell (hash router, menu, theme, fa/en + RTL), snapshot store (once-per-freshness-window + localStorage last-good), converter (§8 state machine, manual rate, copy, share-image lazy chunk, Jalali timestamps), live rates (8 cards, 30s auto-refresh), PWA (real icons, app-shell precache, self-hosted Poppins+Vazirmatn). Initial JS **114.5 KB gzipped** (< 200 KB budget); html2canvas split into a lazy 46.8 KB chunk. Live: https://currena-api.sedanama-ir.workers.dev (SPA + API one deploy; non-API deep links serve index.html via ASSETS binding). Part 2 next: calculator, history, receipt generator, expense splitter, split & settle, batch converter, about
-- [ ] Phase 6 — admin stub (`/admin`, robots noindex, per-source status + manual refresh)
+- [x] Phase 5 — apps/web (full PWA, every Keep feature, performance budgets) ✅ **part 1** (shell/hash router/menu/theme/fa-en RTL, snapshot store, converter §8 state machine, live rates 8 cards, PWA real icons + precache) + **part 2** (calculator w/ safe parser + keypad, history 50/Jalali/source badges, batch w/ tolerant parsing + templates + CSV, expense splitter exact-rounding, split & settle w/ IndexedDB photos + greedy settlements + popstate, receipt generator w/ 7 categories + budget + lazy jsPDF/xlsx/html2canvas exports, about) — all 9 routes live; initial JS **77 KB gz** (routes 1–6 KB each; jspdf 129.7/xlsx 141.3/html2canvas 46.8 KB gz lazy); agent-browser golden paths verified (converter 100 USD → 23,050,000 IRR @ 230,500; calculator 100×2+50 → 57,625,000 IRR; batch 175 TRY → 844,375 IRR; mobile no-overflow; zero console errors)
+- [ ] Phase 6 — admin stub (`/admin`, robots noindex, per-source status + manual refresh) ⏸️ CURRENT
 - [ ] Phase 7 — hardening & docs (ladder simulation, offline PWA check, DEPLOY.md, Vercel portability drill)
 
 ## Decisions log

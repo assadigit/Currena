@@ -2,18 +2,32 @@
  * App shell — providers, hash router, per-route titles.
  * Sticky-footer layout: min-h-screen flex column with the footer pushed to
  * the bottom on short pages (converter) and below long content otherwise.
+ *
+ * Phase 5b: the seven tool routes are code-split via React.lazy — the entry
+ * chunk carries only the shell + converter + live-rates (mission §8 budget;
+ * checklist guardrail "converter route ships first; receipt … lazy"). The
+ * PWA precaches every emitted chunk, so offline loading is unaffected.
  */
 
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Converter } from './routes/Converter';
 import { LiveRates } from './routes/LiveRates';
-import { Stub } from './routes/Stub';
 import { navigate, useRoute } from './router';
 import { useI18n } from './lib/locale';
 import { snapshotStore } from './lib/snapshot-store';
 import type { TranslationKey } from './lib/locale';
+
+const Calculator = lazy(() => import('./routes/Calculator').then((m) => ({ default: m.Calculator })));
+const History = lazy(() => import('./routes/History').then((m) => ({ default: m.History })));
+const BatchConverter = lazy(() =>
+  import('./routes/BatchConverter').then((m) => ({ default: m.BatchConverter })),
+);
+const Splitter = lazy(() => import('./routes/Splitter').then((m) => ({ default: m.Splitter })));
+const Settle = lazy(() => import('./routes/Settle').then((m) => ({ default: m.Settle })));
+const Receipt = lazy(() => import('./routes/Receipt').then((m) => ({ default: m.Receipt })));
+const About = lazy(() => import('./routes/About').then((m) => ({ default: m.About })));
 
 /** <title> per route — legacy pattern "<Page> - Currena". */
 function titleKeyFor(route: string): TranslationKey {
@@ -41,6 +55,20 @@ function titleKeyFor(route: string): TranslationKey {
   }
 }
 
+function RouteFallback(): React.JSX.Element {
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center" role="status">
+      <div className="rounded-[25px] bg-currena-soft/60 px-10 py-8 dark:bg-white/5">
+        <div className="flex justify-center gap-2.5">
+          <span className="loader-dot" />
+          <span className="loader-dot" />
+          <span className="loader-dot" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function App() {
   const route = useRoute();
   const { t, locale } = useI18n();
@@ -57,7 +85,7 @@ export function App() {
     document.title = key === 'converter.title' || key === 'app.name' ? base : `${base} - Currena`;
   }, [route, t, locale]);
 
-  // Close the side menu on route change (belt-and-braces; Header also closes).
+  // Belt-and-braces: land on #/ when no hash is present.
   useEffect(() => {
     if (!window.location.hash) navigate('/');
   }, []);
@@ -68,13 +96,15 @@ export function App() {
       <main className="flex-1 pt-16 lg:pt-20">
         {route === '/' ? <Converter /> : null}
         {route === '/live-rates' ? <LiveRates /> : null}
-        {route === '/calculator' ? <Stub emoji="🧮" titleKey="calculator.title" /> : null}
-        {route === '/history' ? <Stub emoji="📜" titleKey="history.title" /> : null}
-        {route === '/receipt' ? <Stub emoji="📄" titleKey="receipt.title" /> : null}
-        {route === '/splitter' ? <Stub emoji="💰" titleKey="expenseSplitter.title" /> : null}
-        {route === '/settle' ? <Stub emoji="👥" titleKey="splitSettle.title" /> : null}
-        {route === '/batch' ? <Stub emoji="🛒" titleKey="batchConverter.title" /> : null}
-        {route === '/about' ? <Stub emoji="ℹ️" titleKey="about.title" /> : null}
+        <Suspense fallback={<RouteFallback />}>
+          {route === '/calculator' ? <Calculator /> : null}
+          {route === '/history' ? <History /> : null}
+          {route === '/receipt' ? <Receipt /> : null}
+          {route === '/splitter' ? <Splitter /> : null}
+          {route === '/settle' ? <Settle /> : null}
+          {route === '/batch' ? <BatchConverter /> : null}
+          {route === '/about' ? <About /> : null}
+        </Suspense>
       </main>
       <Footer />
     </div>

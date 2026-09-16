@@ -8,7 +8,7 @@ export const en = {
   app: {
     name: 'Currena',
     tagline: 'Real-time rates, easy conversion', // legacy About tagline (fa original: نرخ ارز لحظه‌ای، تبدیل آسان)
-    version: 'Version 1.0.0',
+    versionLabel: 'Version {version}',
     madeBy: 'Made with ❤️ by Ali Assadi',
     createdBy: 'Created by',
     creatorName: 'Ali Assadi',
@@ -69,6 +69,8 @@ export const en = {
     offlineRatesFrom: 'Offline — showing rates from {source}',
     currencyGroupIranian: 'Iranian Toman',
     currencyGroupInternational: 'International Currencies',
+    delete: 'Delete',
+    people: 'People',
   },
 
   sources: {
@@ -135,13 +137,19 @@ export const en = {
 
   calculator: {
     title: 'Calculator',
+    subtitle: 'Calculate and convert currencies',
+    inputCurrency: 'Input Currency',
+    convertTo: 'Convert To',
+    convertInfo: 'Calculations are performed in {from} and converted to {to}',
+    error: 'Error',
+    rateUnavailable: 'Rate unavailable',
   },
 
   history: {
     title: 'Conversion History',
-    noConversionsYet: 'No conversions yet',
-    emptyHint: 'Your conversions will appear here after you use the converter',
-    clearHistory: 'Clear History',
+    noConversionsYet: 'No History Yet',
+    emptyHint: 'Your conversion history will appear here',
+    clearHistory: '🗑️ Clear History',
     clearConfirm: 'Are you sure you want to clear all history?',
   },
 
@@ -160,10 +168,13 @@ export const en = {
     addTimeToItems: '⏰ Add Time to Items',
     budgetTracking: '💳 Budget Tracking',
     dailyBudget: 'Daily Budget',
+    budgetPlaceholder: 'Enter budget amount',
     splitExpenses: '👥 Split Expenses',
     numberOfPeople: 'Number of People',
     expenseItems: '📋 Expense Items',
     addExpense: 'Add Expense',
+    amountPlaceholder: 'Amount',
+    notesPlaceholder: 'Notes (optional)',
     budget: 'Budget',
     remaining: 'Remaining',
     perPerson: 'Per Person',
@@ -172,10 +183,17 @@ export const en = {
     downloadImage: '🖼️ Image',
     downloadExcel: '📊 Excel',
     creating: 'Creating...',
+    pdfCreating: '⏳ Creating PDF...',
+    downloaded: '✅ Downloaded!',
+    exportFailed: '❌ Export failed. Please try again.',
+    clearConfirm: 'Clear all expenses?',
     expenseReceipt: '🧾 EXPENSE RECEIPT',
     generatedAt: 'Generated:',
     receiptId: 'Receipt ID:',
+    convertedAmount: '💱 Converted Amount',
+    totalLabel: 'TOTAL',
     addAtLeastOneExpense: '⚠️ Please add at least one expense',
+    generateFirst: '⚠️ Please generate a receipt first',
     categories: {
       transport: '🚕 Transportation',
       food: '🍔 Food/Meals',
@@ -200,6 +218,12 @@ export const en = {
     totalAmount: 'Total Amount:',
     eachPersonPays: 'Each Person Pays:',
     breakdown: 'Breakdown:',
+    personLabel: 'Person {n}',
+    rateLabel: 'Rate: 1 {from} = {rate} {to}',
+    conversionFailed: 'Conversion failed',
+    networkError: 'Network error',
+    validTotal: 'Please enter a valid total amount',
+    validPeople: 'Please enter a valid number of people',
   },
 
   splitSettle: {
@@ -210,6 +234,8 @@ export const en = {
     createFirstGroup: '➕ Create First Group',
     members: 'Members',
     expenses: 'Expenses',
+    membersCount: '{n} members',
+    expensesCount: '{n} expenses',
     youAreOwed: 'You are owed {n}',
     youOwe: 'You owe {n}',
     allSettledUp: 'All settled up ✅',
@@ -219,6 +245,7 @@ export const en = {
     settleTab: '✅ Settle',
     noExpensesYet: 'No expenses yet. Add your first expense!',
     createNewGroup: 'Create New Group',
+    createGroup: 'Create Group',
     groupName: 'Group Name',
     groupNamePlaceholder: 'e.g., Dubai Trip 2025',
     chooseEmoji: 'Choose an Emoji',
@@ -227,15 +254,21 @@ export const en = {
     youAddedAutomatically: "You'll be added automatically",
     addExpense: 'Add Expense',
     descriptionPlaceholder: 'e.g., Hotel booking',
+    amountPlaceholder: '0.00',
     paidBy: 'Paid by',
     splitBetween: 'Split between',
     receiptPhotoOptional: 'Receipt Photo (Optional)',
     clickToAddPhoto: 'Click to add photo',
+    removePhoto: 'Remove photo',
+    expensePhoto: 'Receipt photo',
     settle: '✓ Settle',
     markSettledConfirm: 'Mark this payment as settled?',
     paymentMarkedSettled: '✅ Payment marked as settled!',
     backToGroups: '← Back to Groups',
     settlementLabel: 'Settlement: {from} → {to}',
+    deleteGroup: 'Delete Group',
+    deleteGroupConfirm: 'Delete this group and all its expenses?',
+    groupDeleted: '🗑️ Group deleted',
     enterGroupName: 'Please enter a group name',
     enterDescription: 'Please enter a description',
     enterValidAmount: 'Please enter a valid amount',
@@ -286,6 +319,8 @@ export const en = {
     withNotes: '📝 With Notes',
     bulkPlaceholder: 'Enter amounts, one per line:',
     bulkHint: '💡 Tip: Just paste prices, one per line. The currency you selected above will be used.',
+    amountFieldPlaceholder: 'Enter amount (e.g., 4556.50)',
+    noteFieldPlaceholder: '📝 Add note (e.g., iPhone 15 Pro, Black, 256GB)',
     addAnotherAmount: '➕ Add Another Amount',
     convertAllPrices: '🔄 Convert All Prices',
     convertedPrices: '📋 Converted Prices',
@@ -298,6 +333,11 @@ export const en = {
     enterAtLeastOne: '⚠️ Please enter at least one amount',
     selectDifferent: '⚠️ Please select different currencies',
     notePlaceholder: 'Note (optional)',
+    invalidLine: '⚠️ Invalid line',
+    invalidLinesSummary: '{n} line(s) skipped',
+    conversionFailed: '❌ Conversion failed. Please check your connection and try again.',
+    copiedToast: '📋 Copied to clipboard! You can paste it anywhere.',
+    downloaded: '✅ Downloaded!',
   },
 
   about: {
@@ -318,11 +358,6 @@ export const en = {
     noInternetNoCache:
       'No internet connection and no cached data available. Please connect to internet at least once.',
     pairNotSupported: 'This currency pair is not supported by the rate source.',
-  },
-
-  stub: {
-    title: 'Coming Soon',
-    text: 'This tool is being rebuilt and will be available in the next release.',
   },
 
   /** Jalali month names — legacy renders English transliterations (jalaali-js) */
