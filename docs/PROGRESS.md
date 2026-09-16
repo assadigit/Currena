@@ -6,7 +6,7 @@ Living document. Update with every phase. Humans check this first.
 
 | | |
 |---|---|
-| **Phase** | 3 active — **GATE 2 APPROVED 2026-09-16** (Path A: direct scrape; Path B = documented fallback only) — evidence: `docs/GATE2_EVIDENCE.md` |
+| **Phase** | 4 active — scraper + api next (GATE 2 APPROVED 2026-09-16: Path A direct scrape; Path B = documented fallback only) |
 | **Legacy source** | `./legacy/` NOT provided in the environment. Inventory reconstructed from the live site (https://aliassadi1993.pythonanywhere.com/) — fidelity caveats documented in `FEATURE_MAP.md` |
 | **Push to GitHub** | Unblocked — credentials provided 2026-09-16 (stored outside the repo; never committed) |
 | **Live legacy app** | Untouched, healthy (verified 2026-09-16, live conversion exercised end-to-end) |
@@ -18,8 +18,8 @@ Living document. Update with every phase. Humans check this first.
 - [x] **GATE 1 — APPROVED 2026-09-16** (5/5 open questions answered — MIGRATION_CHECKLIST "Gate 1 decisions")
 - [x] Phase 2 — Spike: deploy minimal Worker, TGJU block test from Workers + GitHub Actions ✅ **TGJU reachable from Workers** (evidence: `docs/GATE2_EVIDENCE.md`)
 - [x] **GATE 2 — APPROVED 2026-09-16** — owner: "A. if A failed, path B." → **Path A** (direct scrape); Path B stays the documented fallback
-- [ ] Phase 3 — packages/core (schemas, math, normalizers, formatters, Vitest green) ⏸️ CURRENT
-- [ ] Phase 4 — scraper + api (TGJU/Frankfurter modules, KV RateStore, ladder, endpoints, fixtures, tests) + deploy
+- [x] Phase 3 — packages/core (schemas, math, normalizers, formatters, Vitest green) ✅ 107 tests / 7 files green; contracts: Rate/Snapshot/RatesResponse/RatesError/SourceConfig; math incl. TOMAN + same-currency short-circuit; settle/calc/batch algorithms; fa/en + Jalali formatting
+- [ ] Phase 4 — scraper + api (TGJU/Frankfurter modules, KV RateStore, ladder, endpoints, fixtures, tests) + deploy ⏸️ CURRENT
 - [ ] Phase 5 — apps/web (full PWA, every Keep feature, performance budgets)
 - [ ] Phase 6 — admin stub (`/admin`, robots noindex, per-source status + manual refresh)
 - [ ] Phase 7 — hardening & docs (ladder simulation, offline PWA check, DEPLOY.md, Vercel portability drill)

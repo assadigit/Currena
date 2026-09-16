@@ -1,0 +1,164 @@
+/**
+ * Data contracts for the whole Currena monorepo — THE single source of truth
+ * (AGENTS.md rule 3). Import these schemas/types; never redefine them.
+ *
+ * Consumers:
+ *   - apps/api    — validates scraper output + shapes every JSON response
+ *   - apps/web    — parses API responses, drives the UI type system
+ *   - packages/scraper — normalizer output is validated against SnapshotSchema
+ *
+ * Everything crossing a trust boundary is zod-validated; an upstream layout
+ * change must fail loudly, never render garbage.
+ */
+
+import { z } from 'zod';
+
+/* ------------------------------------------------------------------ *
+ * Sources
+ * ------------------------------------------------------------------ */
+
+/**
+ * Where a number can come from.
+ *
+ * - `tgju` / `frankfurter` — live upstream sources (snapshot-level).
+ * - `manual` — user-supplied custom rate (legacy "Manual" source parity).
+ * - `local` — same-currency short-circuit and offline last-good snapshot
+ *   markers (Gate 1 decision #5, 2026-09-16: same-currency conversions
+ *   resolve locally with rate 1, no network).
+ */
+export const SourceSchema = z.enum(['tgju', 'frankfurter', 'manual', 'local']);
+export type Source = z.infer<typeof SourceSchema>;
+
+/** Sources that can back a *Snapshot* (upstream rate providers only). */
+export const SnapshotSourceSchema = z.enum(['tgju', 'frankfurter']);
+export type SnapshotSource = z.infer<typeof SnapshotSourceSchema>;
+
+/* ------------------------------------------------------------------ *
+ * Rate & Snapshot
+ * ------------------------------------------------------------------ */
+
+/**
+ * ISO 4217-style alphabetic code: exactly 3 uppercase letters.
+ *
+ * Deliberately a pattern, not an enum of the 17 supported currencies —
+ * Frankfurter serves ~30 codes and the API surface should accept them;
+ * UI dropdowns are restricted via `currencies.ts` instead.
+ */
+export const CurrencyCodeSchema = z.string().regex(/^[A-Z]{3}$/, {
+  message: 'Currency code must be exactly 3 uppercase letters (ISO 4217)',
+});
+
+/**
+ * The only non-ISO unit tag we carry: TOMAN.
+ *
+ * Canonical Iranian unit is TOMAN under code `IRR` (AGENTS.md §6). TGJU
+ * serves Toman-denominated quotes; any Rial↔Toman conversion happens ONLY
+ * inside the scraper normalizer — never in UI code.
+ */
+export const RateUnitSchema = z.enum(['TOMAN']);
+
+/** One quoted rate inside a snapshot. */
+export const RateSchema = z
+  .object({
+    /** ISO 4217 uppercase code, e.g. 'USD', 'IRR'. */
+    code: CurrencyCodeSchema,
+    /** International common name (ISO 4217 / CLDR en), e.g. 'US Dollar', 'UAE Dirham'. */
+    name: z.string().min(1),
+    /**
+     * Units of `code` per 1 unit of the snapshot `base`.
+     * E.g. base 'USD' → { code: 'IRR', rate: 230500 } means 1 USD = 230,500
+     * Toman (TGJU open-market quote, unit: 'TOMAN').
+     * This matches Frankfurter's native `rates` convention, so the scraper
+     * can pass values through unchanged.
+     */
+    rate: z.number().positive().finite(),
+    /** 'TOMAN' — allowed ONLY on code 'IRR' (enforced below). */
+    unit: RateUnitSchema.optional(),
+    /** Optional display symbol, e.g. '$', '€'. */
+    symbol: z.string().optional(),
+  })
+  .refine((rate) => rate.unit !== 'TOMAN' || rate.code === 'IRR', {
+    message: "unit 'TOMAN' is only valid on code 'IRR' (canonical Iranian unit, AGENTS.md §6)",
+    path: ['unit'],
+  });
+export type Rate = z.infer<typeof RateSchema>;
+
+/**
+ * A coherent set of quotes fetched from ONE source at ONE point in time.
+ * Never mix sources within a snapshot (AGENTS.md rule 8).
+ */
+export const SnapshotSchema = z.object({
+  /** The currency all `rates` are quoted against. */
+  base: CurrencyCodeSchema,
+  /** Upstream provider of this snapshot. */
+  source: SnapshotSourceSchema,
+  /** ISO 8601 datetime (UTC, Z-suffixed — always from `new Date().toISOString()`). */
+  fetchedAt: z.iso.datetime(),
+  /** At least one quoted rate. */
+  rates: z.array(RateSchema).min(1),
+  /** Optional hard-expiry timestamp (cache eviction hint). */
+  expiresAt: z.iso.datetime().optional(),
+});
+export type Snapshot = z.infer<typeof SnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
+ * API envelope
+ * ------------------------------------------------------------------ */
+
+/** Success envelope for `GET /api/rates` (and the SPA's snapshot cache). */
+export const RatesResponseSchema = z.object({
+  snapshot: SnapshotSchema,
+  /**
+   * True when the snapshot was served from cache beyond `freshTtlSec`
+   * (mission §6 semantics) → the SPA shows the stale/notice banner.
+   */
+  stale: z.boolean(),
+  /** Human-oriented English notice, e.g. 'Using cached rates — last updated 5 minutes ago'. */
+  notice: z.string().optional(),
+  /** Where the response physically came from. */
+  servedFrom: z.enum(['live', 'cache']),
+});
+export type RatesResponse = z.infer<typeof RatesResponseSchema>;
+
+/** Error envelope shared by every API route. */
+export const RatesErrorSchema = z.object({
+  error: z.object({
+    /** Machine code, e.g. 'source_unavailable'. */
+    code: z.string().min(1),
+    /** Human-readable English message (localized again in the SPA). */
+    message: z.string().min(1),
+    /** Optional retry hint in seconds. */
+    retryAfterSec: z.number().int().positive().optional(),
+  }),
+});
+export type RatesError = z.infer<typeof RatesErrorSchema>;
+
+/* ------------------------------------------------------------------ *
+ * Source configuration
+ * ------------------------------------------------------------------ */
+
+/** Per-source runtime configuration (apps/api reads its env/vars into this). */
+export const SourceConfigSchema = z.object({
+  source: SnapshotSourceSchema,
+  baseUrl: z.url(),
+  /** Currency codes this source serves. */
+  currencies: z.array(CurrencyCodeSchema).min(1),
+  timeoutMs: z.number().int().positive(),
+  retries: z.number().int().min(0),
+  freshTtlSec: z.number().int().positive(),
+  minIntervalSec: z.number().int().positive(),
+});
+export type SourceConfig = z.infer<typeof SourceConfigSchema>;
+
+/* ------------------------------------------------------------------ *
+ * Timing constants (mission §5/§6 ladder)
+ * ------------------------------------------------------------------ */
+
+/** A snapshot is fresh for 5 minutes; older cache is served with `stale: true`. */
+export const FRESH_TTL_SEC = 300;
+
+/** Minimum spacing between two live scrapes of the same source. */
+export const MIN_SCRAPE_INTERVAL_SEC = 60;
+
+/** Hard eviction age for cached snapshots (7 days) — beyond this, 503. */
+export const CACHE_HARD_TTL_SEC = 7 * 24 * 3600;
