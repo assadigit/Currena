@@ -46,7 +46,10 @@ Package manager is **pnpm** (Node ≥ 20).
    properties only (`ms-/me-/ps-/pe-`, never `ml-/mr-`); every UI string through
    the i18n dictionary (`apps/web/src/i18n/`); numbers formatted only at render
    via `Intl.NumberFormat('fa-IR' | 'en-US')`. Internal numbers are canonical —
-   never store formatted/display digits.
+   never store formatted/display digits. Currency display names use the
+   **international common name** (ISO 4217 / CLDR en — e.g. "UAE Dirham"; Gate 1
+   decision 2026-09-16); the fa locale renders proper Persian names from the
+   i18n dictionary.
 6. **Canonical unit for Iranian rates: TOMAN.**
    The legacy app used the ISO code `IRR`, but every value it served (and every
    TGJU profile behind it: `price_dollar_rl`, `price_eur`, …) is denominated in

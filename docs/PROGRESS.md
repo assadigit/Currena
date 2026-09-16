@@ -6,17 +6,17 @@ Living document. Update with every phase. Humans check this first.
 
 | | |
 |---|---|
-| **Phase** | 1 complete — **GATE 1: awaiting human approval** |
+| **Phase** | Gate 1 **PASSED** (2026-09-16) — Phase 2 spike in progress |
 | **Legacy source** | `./legacy/` NOT provided in the environment. Inventory reconstructed from the live site (https://aliassadi1993.pythonanywhere.com/) — fidelity caveats documented in `FEATURE_MAP.md` |
-| **Push to GitHub** | **BLOCKED** — `credentials.md` absent; `github.com/assadigit/Currena` is private (unauthenticated access refused). All commits are local. |
+| **Push to GitHub** | Unblocked — credentials provided 2026-09-16 (stored outside the repo; never committed) |
 | **Live legacy app** | Untouched, healthy (verified 2026-09-16, live conversion exercised end-to-end) |
 
 ## Phase checklist
 
 - [x] Phase 0 — Safety & scaffold (`.gitignore` first, monorepo, AGENTS.md, PROGRESS.md)
 - [x] Phase 1 — Legacy inventory (FEATURE_MAP.md, MIGRATION_CHECKLIST.md, scraper extraction, i18n dictionaries) — from live site
-- [ ] **GATE 1 — human approval of both docs** ⏸️ CURRENT
-- [ ] Phase 2 — Spike: deploy minimal Worker, TGJU block test from Workers + GitHub Actions
+- [x] **GATE 1 — APPROVED 2026-09-16** (5/5 open questions answered — MIGRATION_CHECKLIST "Gate 1 decisions")
+- [ ] Phase 2 — Spike: deploy minimal Worker, TGJU block test from Workers + GitHub Actions ⏺️ in progress
 - [ ] **GATE 2 — Path A (direct scrape) vs Path B (GH Actions relay) decision**
 - [ ] Phase 3 — packages/core (schemas, math, normalizers, formatters, Vitest green)
 - [ ] Phase 4 — scraper + api (TGJU/Frankfurter modules, KV RateStore, ladder, endpoints, fixtures, tests) + deploy
@@ -33,3 +33,5 @@ Living document. Update with every phase. Humans check this first.
 | 2026-09-16 | Phase 1 inventory reconstructed from the **live site** | `./legacy/` backup missing from environment. The live site is the running production app, so every documented feature is real — but internals (models, views source, management commands, admin config, exact scraper selectors) require the backup to verify. Flagged as the #1 open question at Gate 1. |
 | 2026-09-16 | Canonical Iranian unit = **TOMAN** (kept under code `IRR`) | Live API: `1 USD = 230,500 "IRR"` matches TGJU Toman quotes; UI label "Iranian Toman"; manifest: "live Iranian Toman rates". Normalization documented in AGENTS.md §6. |
 | 2026-09-16 | Stack pinned: pnpm 10, TS 5.9 strict, zod 4, Hono 4, wrangler 4, Vite 8, Tailwind 4, Vitest 5 | Mission-fixed stack; latest stable majors at scaffold time. |
+| 2026-09-16 | **GATE 1 APPROVED** — price-scanner OCR + scanning features deferred (revisit post-cutover); currency names use international common names (AED = "UAE Dirham"); same-currency conversions short-circuit locally; proceed live-site-only | Owner answers in chat; recorded in MIGRATION_CHECKLIST "Gate 1 decisions" |
+| 2026-09-16 | GitHub remote + push unblocked; Cloudflare token available for Phase 2 deploy | Credentials provided by owner; stored outside the repo (never committed, never echoed) |

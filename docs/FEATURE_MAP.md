@@ -180,6 +180,10 @@ some elements — the scraper must normalize ۰-۹ (+ Arabic-Indic variants) reg
 | PHP | Philippine Peso | currency | TGJU `price_php` / Frankfurter |
 | VND | Vietnamese Dong | currency | TGJU `price_vnd` / Frankfurter |
 
+> **Gate 1 decision (2026-09-16):** the rebuild standardizes all display names on
+> **international common names** (ISO 4217 / CLDR en) — AED renders as
+> **"UAE Dirham"**, resolving the legacy inconsistency.
+
 **No crypto, gold, or coin assets exist in the legacy app** (the mission's example
 codes `COIN_EMAMI`/`GOLD_18K` do not apply — noted for the record).
 

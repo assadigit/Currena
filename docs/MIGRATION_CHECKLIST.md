@@ -1,9 +1,10 @@
 # MIGRATION_CHECKLIST — Keep / Defer / Cut (Phase 1 recommendations)
 
-> **Status: DRAFT — awaiting GATE 1 human approval.** Nothing below is cut until you
-> approve. Every legacy feature observed on the live site is accounted for (source:
+> **Status: APPROVED at GATE 1 — 2026-09-16.** The owner answered all five open
+> questions (decisions recorded at the bottom); verdicts below are final for this
+> build. Every legacy feature observed on the live site is accounted for (source:
 > `docs/FEATURE_MAP.md`). Verdicts map features onto the mission's target
-> architecture (§4–§8). Check the box in the "Done" column when rebuilt in Phase 5.
+> architecture (§4–§8). Check the box in the "Done" column when rebuilt.
 
 Legend: **K** = Keep · **D** = Defer · **C** = Cut. Phase = build phase in the new repo.
 
@@ -20,7 +21,7 @@ Legend: **K** = Keep · **D** = Defer · **C** = Cut. Phase = build phase in the
 | 9 | Receipt Generator: item rows w/ 7 categories + notes, date, **multi-day**, **per-item currency**, **item times**, **budget tracking**, **split**, total summary, receipt paper, **PDF/Image/Excel export**, share | **K** | SPA route. jsPDF + html2canvas + xlsx as **route-level lazy chunks** (legacy loaded 3 CDNs upfront — budget killer). Multi-currency items resolve against the one snapshot locally | 5 | ☐ |
 | 10 | Expense Splitter (total, people count, second-currency view, breakdown) | **K** | SPA route; pure local math; second currency from snapshot | 5 | ☐ |
 | 11 | Split & Settle (groups, expenses w/ receipt photos, balances, greedy settlements, mark-settled, emoji groups, Android back handling) | **K** | SPA route; localStorage/IndexedDB typed store (photos → IndexedDB, dataURLs bloat localStorage); greedy settlement algorithm ported to `@currena/core` + tests; `popstate` handling kept (Capacitor-ready) | 5 | ☐ |
-| 12 | Price Scanner (camera/upload → server OCR → convert; currency candidates; scan history w/ CSV/PDF; server image gallery) | **K\*** | SPA route with **client-side OCR (Tesseract.js WASM, lazy chunk)** — keeps the mission §7 API surface intact (no `/api/scan-price` on the Worker) and works offline in Capacitor. *Needs your nod — see Open Questions #2* | 5 | ☐ |
+| 12 | Price Scanner (camera/upload → server OCR → convert; currency candidates; scan history w/ CSV/PDF; server image gallery) | **D** | **Deferred completely at Gate 1** (owner: "defer price-scanner ocr completely"). Revisit post-cutover; when revived, client-side OCR (Tesseract.js WASM, lazy chunk) keeps the mission §7 API surface intact (no `/api/scan-price` on the Worker) and works offline in Capacitor | post-cutover | ☐ |
 | 13 | Batch Converter (bulk textarea w/ tolerant parsing, per-item notes, 3 quick templates, totals, CSV export, copy/share) | **K** | SPA route; single snapshot fetch, all math local; CSV export local | 5 | ☐ |
 | 14 | About page (tagline, 5 feature bullets, creator, version) | **K** | SPA route from i18n dictionary | 5 | ☐ |
 | 15 | Light/dark theme w/ persistence | **K** | Tailwind `dark:` + localStorage (same key `theme`), pre-paint init | 5 | ☐ |
@@ -28,7 +29,7 @@ Legend: **K** = Keep · **D** = Defer · **C** = Cut. Phase = build phase in the
 | 17 | PWA manifest + icons | **K** | vite-plugin-pwa manifest; **icons actually generated** (legacy declared 72–512 icons but they 404 — its installability is broken [L]) | 5 | ☐ |
 | 18 | Persian localization | **K (add)** | Mission-mandated: fa dictionary (translated from the extracted en strings), `dir=rtl`, CSS logical properties, `Intl.NumberFormat('fa-IR')`, Vazirmatn font. Legacy had en-only — this is an intentional addition, not a port | 5 | ☐ |
 | 19 | Jalali calendar display | **K** | Render-time formatting only (no stored formatted dates) | 5 | ☐ |
-| 20 | Server-side scanned-image gallery (`GET /api/scanned-images`, images retained on server) | **C** (see OQ #3) | Client-side gallery (IndexedDB) instead — no user-image storage on the Worker; privacy-positive, zero infra. Server retention not portable to the target architecture | — | ☐ |
+| 20 | Server-side scanned-image gallery (`GET /api/scanned-images`, images retained on server) | **D** | **Deferred at Gate 1** (owner: "defer scanning for now" — deferred, not cut). Revisit post-cutover; when revived, client-side gallery (IndexedDB) — no user-image storage on the Worker; privacy-positive, zero infra | post-cutover | ☐ |
 | 21 | Django admin | **C** | Replaced by Phase 6 `/admin` stub (per-source status + manual refresh + future source toggles; robots noindex; Cloudflare Access later) | 6 | ☐ |
 | 22 | Server-side convert endpoint doing per-conversion math (`POST /api/convert`) | **K\*\*** | `GET /api/convert?from&to&amount` per mission §7 (server math via core), but the SPA converts **locally** from its snapshot; the endpoint remains for external/API use and parity | 4 | ☐ |
 | 23 | Historical charts | **N/A** | **The legacy has NO charts** (verified: no charting library, no chart routes, no chart UI — only html2canvas/jsPDF/xlsx/jalaali as externals). The Gate-1 charts question resolves to *nothing to defer*. If charts are *wanted* later, that's the D1-history work already listed as post-cutover | — | — |
@@ -41,20 +42,23 @@ Legend: **K** = Keep · **D** = Defer · **C** = Cut. Phase = build phase in the
 - Skeletons exactly match final layout; min-700ms fetching shimmer even on cache hits
 - PWA offline shows last good rates with "offline — rates from X" state
 
-## Open questions for Gate 1 (need your decision)
+## Gate 1 decisions (owner answers, 2026-09-16) — GATE 1 PASSED
 
-1. **Missing inputs** — `./legacy/` (Django backup) and `credentials.md` are absent
-   from the environment. Consequences: (a) inventory is live-site-derived — see
-   FEATURE_MAP §10 unknowns; (b) **no `git push` is possible yet** (repo private,
-   no token) — commits are local; (c) Phase 2 deploy needs the Cloudflare token.
-   → Please provide both (or confirm proceeding live-site-only).
-2. **Price Scanner OCR (#12)** — recommend client-side Tesseract.js (keeps API surface
-   pure, offline-capable, no per-scan Worker cost). Alternative: Workers AI vision
-   (adds an endpoint + cost) or Cut the feature. Your call.
-3. **Server-side scan gallery (#20)** — recommend Cut (client-side gallery instead).
-   Alternative: keep server storage via R2 (new binding + cost). Your call.
-4. **AED naming inconsistency** — legacy shows both "Emirati Dirham" and "UAE Dirham"
-   on different pages. Rebuild will standardize on **"UAE Dirham"** unless you prefer
-   the other.
-5. **Same-currency conversions** — legacy routes USD→USD through Frankfurter (rate 1).
-   Rebuild short-circuits locally (rate 1, no network). Cosmetic-only difference.
+1. **Missing inputs** — credentials provided (Cloudflare Workers token + account ID +
+   GitHub PAT) → push and Phase 2 deploy are unblocked. `./legacy/` Django backup is
+   still absent → **confirmed: proceed live-site-only**; FEATURE_MAP §10 unknowns stay
+   flagged for re-verification if the backup ever arrives.
+2. **Price Scanner OCR (#12)** — **"defer price-scanner ocr completely"** → verdict
+   #12 flips K\* → **D**. Revisit post-cutover; Tesseract.js remains the recommended
+   approach at that time.
+3. **Server-side scan gallery (#20)** — **"defer scanning for now"** → verdict #20
+   flips C → **D** (deferred, not cut). Revisit post-cutover; client-side IndexedDB
+   gallery remains the recommended approach at that time.
+4. **AED naming** — **"use international common name"** → standardize on
+   **"UAE Dirham"** (ISO 4217 / CLDR en). General rule added to AGENTS.md §5: currency
+   display names use international common names in English; the fa locale renders
+   proper Persian names from the i18n dictionary.
+5. **Same-currency conversions** — **approved** ("Okay"): rebuild short-circuits
+   locally (rate 1, no network) instead of routing through Frankfurter.
+
+**Verdict tallies after decisions: 19 Keep · 2 Defer · 2 Cut · 1 N/A** (was 20/0/3/1).
