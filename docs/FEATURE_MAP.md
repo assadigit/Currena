@@ -123,8 +123,12 @@ page [C: inline-script.js `currencyUrls`]:
 
 "View on TGJU.org" links point at these profiles (converter popup + live-rates cards).
 
-**Server-side scraping internals (selectors, parser, UA, cache TTL) live in the Django
-code — NOT recoverable from outside.** §10. What IS known:
+**Server-side scraping internals — RESOLVED in Phase 4 (2026-09-16):** primary source is
+`https://call1.tgju.org/ajax.json` (single request, all symbols; shape `{current: {<slug>: {p, …}}}`);
+the fallback scrapes the profile pages for `<span data-col="info.last_trade.PDrCotVal">…</span>`.
+**TGJU `p` values are RIAL-denominated with comma separators — the normalizer strips
+commas and divides by 10 to canonical TOMAN** (verified live: price_dollar_rl p="2,305,000"
+→ 230,500 Toman, matching the legacy API exactly). What else is known:
 - Served values match TGJU Toman quotes (see unit convention below)
 - The server has a cache layer: responses can carry `is_cached: true` + `cache_age`
   (the converter shows a "Using Cached Rates" banner and a CACHED DATA popup indicator)

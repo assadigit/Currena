@@ -6,7 +6,7 @@ Living document. Update with every phase. Humans check this first.
 
 | | |
 |---|---|
-| **Phase** | 4 active — scraper + api next (GATE 2 APPROVED 2026-09-16: Path A direct scrape; Path B = documented fallback only) |
+| **Phase** | 5 active — apps/web SPA next (API deployed: https://currena-api.sedanama-ir.workers.dev — GATE 2 Path A in production) |
 | **Legacy source** | `./legacy/` NOT provided in the environment. Inventory reconstructed from the live site (https://aliassadi1993.pythonanywhere.com/) — fidelity caveats documented in `FEATURE_MAP.md` |
 | **Push to GitHub** | Unblocked — credentials provided 2026-09-16 (stored outside the repo; never committed) |
 | **Live legacy app** | Untouched, healthy (verified 2026-09-16, live conversion exercised end-to-end) |
@@ -19,8 +19,8 @@ Living document. Update with every phase. Humans check this first.
 - [x] Phase 2 — Spike: deploy minimal Worker, TGJU block test from Workers + GitHub Actions ✅ **TGJU reachable from Workers** (evidence: `docs/GATE2_EVIDENCE.md`)
 - [x] **GATE 2 — APPROVED 2026-09-16** — owner: "A. if A failed, path B." → **Path A** (direct scrape); Path B stays the documented fallback
 - [x] Phase 3 — packages/core (schemas, math, normalizers, formatters, Vitest green) ✅ 107 tests / 7 files green; contracts: Rate/Snapshot/RatesResponse/RatesError/SourceConfig; math incl. TOMAN + same-currency short-circuit; settle/calc/batch algorithms; fa/en + Jalali formatting
-- [ ] Phase 4 — scraper + api (TGJU/Frankfurter modules, KV RateStore, ladder, endpoints, fixtures, tests) + deploy ⏸️ CURRENT
-- [ ] Phase 5 — apps/web (full PWA, every Keep feature, performance budgets)
+- [x] Phase 4 — scraper + api (TGJU/Frankfurter modules, KV RateStore, ladder, endpoints, fixtures, tests) + deploy ✅ 202 tests green (core 107 + scraper 43 + api 52); deployed to https://currena-api.sedanama-ir.workers.dev — live smoke: 100 USD → 23,050,000 IRR(Toman) @ 230,500 (legacy parity), EUR→GBP via Frankfurter, AED international → clean 503, /internal/refresh + secret auth OK, freshness-window cache hit OK
+- [ ] Phase 5 — apps/web (full PWA, every Keep feature, performance budgets) ⏸️ CURRENT
 - [ ] Phase 6 — admin stub (`/admin`, robots noindex, per-source status + manual refresh)
 - [ ] Phase 7 — hardening & docs (ladder simulation, offline PWA check, DEPLOY.md, Vercel portability drill)
 
@@ -37,3 +37,6 @@ Living document. Update with every phase. Humans check this first.
 | 2026-09-16 | GitHub remote + push unblocked; Cloudflare token available for Phase 2 deploy | Credentials provided by owner; stored outside the repo (never committed, never echoed) |
 | 2026-09-16 | **Phase 2 evidence: Workers CAN egress to TGJU** — deployed `currena-probe` worker: profile pages 200/html-ok from HKG + ATL colos; `call1.tgju.org/ajax.json` valid JSON; GH Actions runner identical; `api.tgju.org/v1/market/indicator/summary` dead (404); one transient CF `error 1042` → Phase 4 scraper needs quick retries | `docs/GATE2_EVIDENCE.md` + `docs/evidence/` — recommendation: **Path A** (direct scrape); awaiting owner decision |
 | 2026-09-16 | **GATE 2 APPROVED — Path A: the Worker scrapes TGJU directly** (mission §5/§6 ladder verbatim). Path B (GH Actions relay → KV) is **not** built; it remains the documented additive fallback to adopt only if TGJU blocks Workers egress in production. Probe artifacts deleted: `apps/probe`, `.github/workflows/tgju-probe.yml`, deployed `currena-probe` Worker | Owner decision in chat: "A. if A failed, path B." |
+| 2026-09-16 | **TGJU values are RIAL — normalizer ÷10 → TOMAN.** `call1.tgju.org/ajax.json` `current[slug].p` (and profile `PDrCotVal`) are Rial-denominated with comma separators (price_dollar_rl = "2,305,000"); the legacy app served 230,500 Toman → ÷10 confirmed by cross-checks (EUR, AED consistent with USD anchor) | Phase 4 live captures (/home/z/legacy-capture/upstream-samples/) vs legacy live-API evidence |
+| 2026-09-16 | **Primary TGJU source = `call1.tgju.org/ajax.json`** (one request carries all 16 symbols; Phase 2 proved it reachable from Workers) with per-profile HTML scrape (`PDrCotVal`) as fallback; quick retries (2×, ~300/800ms) for transient CF `error 1042` | Phase 4 implementation decision (AGENTS.md §8 ladder unchanged) |
+| 2026-09-16 | **Frankfurter serves no AED/VND** (verified live: 31 currencies, both absent) → international pairs involving AED/VND return a clean `currency_not_supported` 503; their IRR-pairs remain served via TGJU. Documented as a known limitation (the legacy stack had the same Frankfurter dependency) | Phase 4 live smoke test |
