@@ -1,0 +1,55 @@
+# ============================================================
+# Currena — .gitignore (committed FIRST by design: Phase 0)
+# Safety: secrets and the legacy Django backup must never
+# enter git history. Keep this file conservative.
+# ============================================================
+
+# --- credentials & secrets (NEVER commit) ---
+credentials.md
+credentials*.md
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+*.pem
+*.key
+service-account*.json
+
+# --- legacy Django backup (reference only, big, not source) ---
+/legacy/
+/legacy-captures/
+
+# --- dependencies & build output ---
+node_modules/
+dist/
+build/
+.output/
+*.tsbuildinfo
+.rollup.cache/
+
+# --- cloudflare / wrangler ---
+.wrangler/
+.dev.vars*
+wrangler.dev.toml
+
+# --- testing ---
+coverage/
+.vitest-cache/
+
+# --- editors & OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# --- logs ---
+*.log
+npm-debug.log*
+pnpm-debug.log*
+logs/
+
+# --- misc scratch ---
+tmp/
+.cache/
+.turbo/
