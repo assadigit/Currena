@@ -1,0 +1,26 @@
+{
+  "name": "currena",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Currena — currency converter with live Iranian Toman (open-market) and international rates. Hono API on Cloudflare Workers + Vite React SPA (PWA).",
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --stream run dev",
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "typecheck": "pnpm -r run typecheck",
+    "deploy": "pnpm --filter @currena/api run deploy"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "@tailwindcss/oxide",
+      "unrs-resolver",
+      "sharp",
+      "workerd"
+    ]
+  }
+}

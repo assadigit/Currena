@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/*
+ * Legacy Currena palette — ported 1:1 from the Django templates
+ * (Phase 1 extraction, docs/FEATURE_MAP.md §Visual identity).
+ */
+@theme {
+  --color-currena-soft: #E8F4F8;
+  --color-currena-blue: #4A90E2;
+  --color-currena-cyan: #7DD3C0;
+  --color-currena-coral: #F8A978;
+  --color-currena-dark: #2C3E50;
+  --color-currena-muted: #6B7280;
+  --color-currena-warning: #FF6B6B;
+  --color-currena-success: #4CAF50;
+  --color-currena-bg-light: #F8FAFB;
+  --color-currena-bg-dark: #1a1d2e;
+  --color-currena-card-dark: #252941;
+}

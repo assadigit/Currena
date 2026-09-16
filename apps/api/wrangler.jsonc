@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "currena-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "observability": {
+    "enabled": true
+  }
+  // Phase 4 will add:
+  //   "kv_namespaces": [{ "binding": "RATES", "id": "<todo>" }]
+  //   "assets": { "directory": "../web/dist", "not_found_handling": "single-page-application" }
+  // Secrets land via `wrangler secret put REFRESH_SECRET` (never in this file).
+}
