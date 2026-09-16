@@ -28,6 +28,9 @@ export const en = {
     back: 'Back',
     backToHome: 'Back to Home',
     toggleTheme: 'Toggle theme',
+    language: 'Language',
+    toggleLanguage: 'Toggle language',
+    menu: 'Menu',
   },
 
   common: {
@@ -63,6 +66,16 @@ export const en = {
     generatedWith: '✨ Generated with Currena',
     exchangeRate: 'Exchange Rate',
     offline: 'Offline',
+    offlineRatesFrom: 'Offline — showing rates from {source}',
+    currencyGroupIranian: 'Iranian Toman',
+    currencyGroupInternational: 'International Currencies',
+  },
+
+  sources: {
+    tgju: 'TGJU',
+    frankfurter: 'Frankfurter',
+    manual: 'Manual',
+    local: 'Local',
   },
 
   converter: {
@@ -89,6 +102,7 @@ export const en = {
     tryingCachedRates: '📦 Trying to use cached rates...',
     connectOnceHint: 'If this continues, you may need to connect to internet at least once to download rates.',
     checkConnection: 'Please try again or check your connection.',
+    creating: '⏳ Creating...',
   },
 
   currencies: {
@@ -303,6 +317,12 @@ export const en = {
     unableToFetchRate: 'Unable to fetch exchange rate. Please try again.',
     noInternetNoCache:
       'No internet connection and no cached data available. Please connect to internet at least once.',
+    pairNotSupported: 'This currency pair is not supported by the rate source.',
+  },
+
+  stub: {
+    title: 'Coming Soon',
+    text: 'This tool is being rebuilt and will be available in the next release.',
   },
 
   /** Jalali month names — legacy renders English transliterations (jalaali-js) */

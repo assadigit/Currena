@@ -33,6 +33,8 @@ export type Bindings = {
   RATES: KVNamespace;
   /** Shared secret for POST /internal/refresh (wrangler secret / .dev.vars). */
   REFRESH_SECRET?: string;
+  /** Static-assets binding (implicit when wrangler.jsonc has `assets`); serves the SPA. */
+  ASSETS?: Fetcher;
 };
 
 export interface AppDeps {
@@ -251,9 +253,22 @@ export function createApp(deps: AppDeps = {}) {
 
   /* ------------------------- error envelopes ----------------------------- */
 
-  app.notFound((c) =>
-    errorResponse(c, 404, 'not_found', `No such route: ${c.req.method} ${new URL(c.req.url).pathname}`),
-  );
+  app.notFound((c) => {
+    // SPA fallback (Phase 5): non-API paths that miss every route serve the
+    // built index.html via the Workers assets binding, so legacy-style deep
+    // links (/receipt, /live-rates, …) boot the hash-routed SPA. API/internal
+    // paths (and any request without the assets binding, e.g. route tests)
+    // keep the JSON RatesError envelope.
+    const path = new URL(c.req.url).pathname;
+    const isApiPath = path === '/api' || path.startsWith('/api/') || path === '/internal' || path.startsWith('/internal/');
+    const canServeSpa =
+      (c.req.method === 'GET' || c.req.method === 'HEAD') && !isApiPath && typeof c.env.ASSETS?.fetch === 'function';
+    if (canServeSpa) {
+      const indexUrl = new URL('/index.html', c.req.url).toString();
+      return c.env.ASSETS!.fetch(new Request(indexUrl, { method: 'GET' }));
+    }
+    return errorResponse(c, 404, 'not_found', `No such route: ${c.req.method} ${path}`);
+  });
 
   app.onError((err, c) => {
     if (err instanceof RatesServiceError) {

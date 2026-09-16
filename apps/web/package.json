@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "icons": "node scripts/generate-icons.mjs",
+    "prebuild": "node scripts/generate-icons.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
@@ -12,11 +14,15 @@
   },
   "dependencies": {
     "@currena/core": "workspace:*",
+    "@fontsource/poppins": "^5.0.0",
+    "html2canvas": "^1.4.1",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@fontsource/vazirmatn": "^5.3.0",
+    "@resvg/resvg-js": "^2.6.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19",
     "@types/react-dom": "^19",

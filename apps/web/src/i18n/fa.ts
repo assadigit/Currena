@@ -29,6 +29,9 @@ export const fa: Dictionary = {
     back: 'بازگشت',
     backToHome: 'بازگشت به خانه',
     toggleTheme: 'تغییر پوسته',
+    language: 'زبان',
+    toggleLanguage: 'تغییر زبان',
+    menu: 'منو',
   },
 
   common: {
@@ -64,6 +67,16 @@ export const fa: Dictionary = {
     generatedWith: '✨ ساخته شده با کورنا',
     exchangeRate: 'نرخ تبدیل',
     offline: 'آفلاین',
+    offlineRatesFrom: 'آفلاین — نمایش نرخ‌های {source}',
+    currencyGroupIranian: 'تومان ایرانی',
+    currencyGroupInternational: 'ارزهای بین‌المللی',
+  },
+
+  sources: {
+    tgju: 'TGJU',
+    frankfurter: 'Frankfurter',
+    manual: 'دستی',
+    local: 'محلی',
   },
 
   converter: {
@@ -90,6 +103,7 @@ export const fa: Dictionary = {
     tryingCachedRates: '📦 در حال استفاده از نرخ‌های ذخیره‌شده...',
     connectOnceHint: 'اگر ادامه یافت، حداقل یک‌بار برای دریافت نرخ‌ها به اینترنت متصل شوید.',
     checkConnection: 'لطفاً دوباره تلاش کنید یا اتصال خود را بررسی کنید.',
+    creating: '⏳ در حال ساخت...',
   },
 
   currencies: {
@@ -304,6 +318,12 @@ export const fa: Dictionary = {
     unableToFetchRate: 'دریافت نرخ تبدیل ممکن نشد. لطفاً دوباره تلاش کنید.',
     noInternetNoCache:
       'اتصال اینترنت و داده ذخیره‌شده در دسترس نیست. لطفاً حداقل یک‌بار به اینترنت متصل شوید.',
+    pairNotSupported: 'این جفت‌ارز توسط منبع نرخ پشتیبانی نمی‌شود.',
+  },
+
+  stub: {
+    title: 'به‌زودی',
+    text: 'این ابزار در حال بازسازی است و در نسخه بعدی در دسترس قرار می‌گیرد.',
   },
 
   jalaliMonths: [

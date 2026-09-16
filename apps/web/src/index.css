@@ -1,9 +1,19 @@
 @import "tailwindcss";
 
 /*
- * Legacy Currena palette — ported 1:1 from the Django templates
- * (Phase 1 extraction, docs/FEATURE_MAP.md §Visual identity).
+ * Currena SPA styles (Phase 5).
+ *
+ * - Legacy palette ported 1:1 from the Django templates (Phase 1 extraction,
+ *   docs/FEATURE_MAP.md §8).
+ * - Dark mode is class-based: the pre-paint script in index.html + theme.ts
+ *   toggle `.dark` on <html>.
+ * - CSS logical properties only (ms-/me-/ps-/pe-, start/end) — RTL-safe.
+ * - Legacy motion (loader dots, shimmer, popup slide-up, live-dot pulse,
+ *   warning pulse, button shine) ported as plain CSS below.
  */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-currena-soft: #E8F4F8;
   --color-currena-blue: #4A90E2;
@@ -16,4 +26,197 @@
   --color-currena-bg-light: #F8FAFB;
   --color-currena-bg-dark: #1a1d2e;
   --color-currena-card-dark: #252941;
+
+  /* Live-rates board (legacy live-rates.html gold/dark identity) */
+  --color-gold-primary: #D4AF37;
+  --color-gold-vibrant: #FFD700;
+  --color-board-dark: #1a1a2e;
+  --color-board-card: #16213e;
+
+  /* Typography: Poppins for LTR/en (legacy font), Vazirmatn for fa/RTL. */
+  --font-sans: "Poppins", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* fa locale: Vazirmatn leads (Poppins has no Arabic-script glyphs). */
+html[lang="fa"] {
+  --font-sans: "Vazirmatn", "Poppins", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ------------------------------------------------------------------ *
+ * Base
+ * ------------------------------------------------------------------ */
+
+body {
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease;
+}
+
+/* CTA gradient — legacy `linear-gradient(135deg, #667eea, #764ba2)` */
+.cta-gradient {
+  background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Gradient text (legacy .popup-amount) */
+.cta-gradient-text {
+  background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Button shine sweep (legacy .convert-btn:before) */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -100%;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: inset-inline-start 0.5s;
+}
+.btn-shine:hover::before {
+  inset-inline-start: 100%;
+}
+
+/* ------------------------------------------------------------------ *
+ * Motion (legacy ports)
+ * ------------------------------------------------------------------ */
+
+/* 3-dot loader: bounce with staggered delays, blue/cyan/coral */
+@keyframes currena-bounce {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+  40% { transform: scale(1.2); opacity: 1; }
+}
+.loader-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 9999px;
+  animation: currena-bounce 1.4s infinite ease-in-out both;
+}
+.loader-dot:nth-child(1) { animation-delay: -0.32s; background: #667eea; }
+.loader-dot:nth-child(2) { animation-delay: -0.16s; background: #7DD3C0; }
+.loader-dot:nth-child(3) { background: #F8A978; }
+
+/* Skeleton shimmer */
+@keyframes currena-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+.skeleton {
+  border-radius: 0.5rem;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.06) 25%,
+    rgba(0, 0, 0, 0.12) 37%,
+    rgba(0, 0, 0, 0.06) 63%
+  );
+  background-size: 200% 100%;
+  animation: currena-shimmer 1.4s ease infinite;
+}
+.dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.12) 37%,
+    rgba(255, 255, 255, 0.05) 63%
+  );
+  background-size: 200% 100%;
+}
+
+/* Live dot pulse (legacy beepingLive) */
+@keyframes currena-live-pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+  50% { transform: scale(1.2); box-shadow: 0 0 0 8px rgba(76, 175, 80, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: #4CAF50;
+  animation: currena-live-pulse 1.5s infinite;
+}
+
+/* Warning pulse (legacy warningPulse — cache banners) */
+@keyframes currena-warning-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+.warning-pulse {
+  animation: currena-warning-pulse 2s infinite;
+}
+
+/* Result popup slide-up (legacy slideUp 0.4s) */
+@keyframes currena-slide-up {
+  from { opacity: 0; transform: translateY(50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.popup-slide-up {
+  animation: currena-slide-up 0.4s ease;
+}
+
+@keyframes currena-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.fade-in {
+  animation: currena-fade-in 0.3s ease;
+}
+
+/* Banner slide-down (legacy slideDown) */
+@keyframes currena-slide-down {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.slide-down {
+  animation: currena-slide-down 0.3s ease;
+}
+
+/* Live-rates loading value (legacy fadeLoad) */
+@keyframes currena-fade-load {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+.rate-loading {
+  animation: currena-fade-load 1.5s infinite;
+}
+
+/* Refresh FAB spin (legacy .refresh-btn.spinning) */
+@keyframes currena-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.refresh-spinning {
+  animation: currena-spin 1s linear;
+}
+
+/* Side menu slide (logical: from the inline-end edge, like legacy right-side) */
+.side-menu {
+  transition: transform 0.3s ease;
+}
+
+/* ------------------------------------------------------------------ *
+ * Amount input panel — legacy cream/gold gradient
+ * ------------------------------------------------------------------ */
+
+.amount-panel {
+  background: linear-gradient(135deg, #fff9e6 0%, #ffe999 100%);
+  border: 2px solid #ffe066;
+  box-shadow: 0 8px 25px rgba(255, 233, 153, 0.3);
+}
+
+/* Native select arrow color in dark mode */
+.dark select {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Scrollbar (thin, subtle) */
+* {
+  scrollbar-width: thin;
 }

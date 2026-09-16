@@ -11,9 +11,13 @@
       "binding": "RATES",
       "id": "4627ac33a4b148ff9fc2189266b1890e"
     }
-  ]
-  // Phase 5 wires the SPA into this same Worker (one deploy, no CORS):
-  //   "assets": { "directory": "../web/dist", "not_found_handling": "single-page-application" }
+  ],
+  // One deploy, no CORS: the same Worker serves the built SPA (Phase 5).
+  "assets": {
+    "directory": "../web/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  }
   // Secrets land via `wrangler secret put REFRESH_SECRET` (never in this file);
   // local dev reads `apps/api/.dev.vars` (gitignored).
 }

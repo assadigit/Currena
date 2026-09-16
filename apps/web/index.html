@@ -4,13 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#E8F4F8" />
+    <meta
+      name="description"
+      content="Modern currency converter with live Iranian Toman rates"
+    />
     <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>Currena — Currency Converter</title>
     <script>
-      // RTL/LTR from day one: dir on <html> derived from locale, before first paint.
-      // Legacy default locale is English (verified in Phase 1); fa switches to rtl.
+      // Pre-paint init (no flash): theme class + locale dir/lang, BEFORE first
+      // paint. Keys: 'theme' (legacy parity) and 'currena:locale' (mission §8).
+      // Must stay in vanilla JS — runs before the module bundle.
       try {
-        var l = localStorage.getItem('locale') || 'en';
+        var t = localStorage.getItem('theme');
+        if (t === 'dark') document.documentElement.classList.add('dark');
+        var l = localStorage.getItem('currena:locale') || 'en';
+        if (l !== 'en' && l !== 'fa') l = 'en';
         document.documentElement.lang = l;
         document.documentElement.dir = l === 'fa' ? 'rtl' : 'ltr';
       } catch (e) {}
