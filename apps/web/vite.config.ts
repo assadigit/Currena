@@ -47,7 +47,9 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
         navigateFallback: 'index.html',
-        navigateFallbackDenylist: [/^\/api\//, /^\/internal\//],
+        // /admin is the server-rendered ops console (Phase 6) — the SW must
+        // never serve the SPA shell for it. Same for /api and /internal.
+        navigateFallbackDenylist: [/^\/api\//, /^\/internal\//, /^\/admin(?:\/|$|\?)/],
         runtimeCaching: [
           {
             // Fonts only (self-hosted @fontsource woff2 — CacheFirst).
