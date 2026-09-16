@@ -1,0 +1,80 @@
+{
+  "where": {
+    "colo": "HKG",
+    "country": "HK",
+    "city": "Hong Kong"
+  },
+  "time": "2026-09-16T18:33:28.013Z",
+  "results": [
+    {
+      "label": "tgju-profile-dollar",
+      "url": "https://www.tgju.org/profile/price_dollar_rl",
+      "kind": "tgju-html",
+      "ok": true,
+      "status": 200,
+      "ms": 74,
+      "contentType": "text/html; charset=UTF-8",
+      "bodyLength": 1384423,
+      "finalUrl": "https://www.tgju.org/profile/price_dollar_rl",
+      "check": "html-ok",
+      "head": "<!doctype html> <html dir=\"rtl\" data-dir=\"rtl\" lang=\"fa\" data-revision=\"2026091622\"> <head> <title>قیمت دلار آزاد | شبکه اطلاع‌ رسانی طلا و ارز </title> <meta charset=\"utf-8\"> <link rel=\"preconnect\" href=\"https://static.tgju.org\"> <li",
+      "error": null
+    },
+    {
+      "label": "tgju-profile-eur",
+      "url": "https://www.tgju.org/profile/price_eur",
+      "kind": "tgju-html",
+      "ok": true,
+      "status": 200,
+      "ms": 284,
+      "contentType": "text/html; charset=UTF-8",
+      "bodyLength": 1121760,
+      "finalUrl": "https://www.tgju.org/profile/price_eur",
+      "check": "html-ok",
+      "head": "<!doctype html> <html dir=\"rtl\" data-dir=\"rtl\" lang=\"fa\" data-revision=\"2026091622\"> <head> <title>یورو - قیمت ارز آزاد | شبکه اطلاع‌ رسانی طلا و ارز </title> <meta charset=\"utf-8\"> <link rel=\"preconnect\" href=\"https://static.tgju.org\"",
+      "error": null
+    },
+    {
+      "label": "tgju-api-summary",
+      "url": "https://api.tgju.org/v1/market/indicator/summary",
+      "kind": "tgju-json",
+      "ok": false,
+      "status": 404,
+      "ms": 276,
+      "contentType": "text/html; charset=UTF-8",
+      "bodyLength": 6720,
+      "finalUrl": "https://api.tgju.org/v1/market/indicator/summary",
+      "check": "json-fail",
+      "head": "<!DOCTYPE html> <html> <head> <meta charset=\"UTF-8\" /> <meta name=\"robots\" content=\"noindex,nofollow\" /> <style> /* Copyright (c) 2010, Yahoo! Inc. All rights reserved. Code licensed under the BSD Lic",
+      "error": null
+    },
+    {
+      "label": "tgju-call1-ajax",
+      "url": "https://call1.tgju.org/ajax.json",
+      "kind": "tgju-json",
+      "ok": true,
+      "status": 200,
+      "ms": 46,
+      "contentType": "application/json",
+      "bodyLength": 165742,
+      "finalUrl": "https://call1.tgju.org/ajax.json",
+      "check": "json-ok",
+      "head": "{\"current\":{\"zinc\":{\"p\":\"2575.6\",\"h\":\"2575.6\",\"l\":\"2575.6\",\"d\":\"0\",\"dp\":0,\"dt\":\"\",\"t\":\"۷ تیر\",\"t_en\":\"28 Jun\",\"t-g\":\"۷ تیر\",\"ts\":\"2021-06-28 14:00:00\"},\"yemen@kwd-sell\":{\"p\":\"815.6168\",\"h\":\"815.6168\",\"l\":\"815.6168\",\"d\":\"0\",\"dp\":0,\"dt\":\"\",\"t",
+      "error": null
+    },
+    {
+      "label": "frankfurter-latest",
+      "url": "https://api.frankfurter.dev/v1/latest?base=USD&symbols=EUR",
+      "kind": "control-json",
+      "ok": true,
+      "status": 200,
+      "ms": 442,
+      "contentType": "application/json; charset=utf-8",
+      "bodyLength": 71,
+      "finalUrl": "https://api.frankfurter.dev/v1/latest?base=USD&symbols=EUR",
+      "check": "json-ok",
+      "head": "{\"amount\":1.0,\"base\":\"USD\",\"date\":\"2026-09-16\",\"rates\":{\"EUR\":0.86678}}",
+      "error": null
+    }
+  ]
+}
