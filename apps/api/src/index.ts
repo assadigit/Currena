@@ -95,7 +95,7 @@ export function createApp(deps: AppDeps = {}) {
   const app = new Hono<{ Bindings: Bindings }>();
 
   app.get('/api/health', (c) =>
-    c.json({ ok: true, service: 'currena-api', phase: 4, time: new Date().toISOString() }, 200, NO_STORE),
+    c.json({ ok: true, service: 'currena-api', time: new Date().toISOString() }, 200, NO_STORE),
   );
 
   /* ---------------------------- rates ladder ---------------------------- */
