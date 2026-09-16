@@ -19,9 +19,11 @@ import {
   CoreError,
   convert,
   convertWithManualRate,
+  formatNumber,
   formatRelative,
   reverseRate,
   tgjuProfileUrl,
+  thousandSeparateInput,
 } from '@currena/core';
 import type { ConversionResult, CurrencyCode, SnapshotSource } from '@currena/core';
 import { AmountInput, parseInputAmount } from '../components/AmountInput';
@@ -32,6 +34,8 @@ import { Button, Card, LoaderDots, OfflineBanner, StaleBanner } from '../compone
 import { fetchMeta } from '../lib/api';
 import { saveHistoryEntry } from '../lib/history';
 import { useI18n } from '../lib/locale';
+import { addRecentPair, readRecentPairs } from '../lib/recent-pairs';
+import type { RecentPair } from '../lib/recent-pairs';
 import { snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
 import type { TranslationKey } from '../lib/locale';
 
@@ -52,6 +56,10 @@ const sleep = (ms: number): Promise<void> => new Promise((resolve) => window.set
 /** Mission §8: the fetching state is shown for at least 700ms. */
 const MIN_FETCHING_MS = 700;
 
+/** One-tap amounts — international vs IRR-appropriate magnitudes. */
+const QUICK_AMOUNTS_INTL: readonly number[] = [10, 50, 100, 500, 1000];
+const QUICK_AMOUNTS_IRR: readonly number[] = [100_000, 500_000, 1_000_000, 5_000_000, 10_000_000];
+
 export function Converter() {
   const { t, numberLocale } = useI18n();
   const store = useSnapshotStore();
@@ -64,8 +72,11 @@ export function Converter() {
   const [manualOpen, setManualOpen] = useState(false);
   const [manualRate, setManualRate] = useState('');
   const [result, setResult] = useState<ConversionView | null>(null);
+  /** Baseline rate from the previous snapshot generation (▲/▼ in the popup). */
+  const [prevRate, setPrevRate] = useState<number | null>(null);
   const [failure, setFailure] = useState<ConvertFailure | null>(null);
   const [tgjuUrls, setTgjuUrls] = useState<Record<string, string>>({});
+  const [recentPairs, setRecentPairs] = useState<RecentPair[]>([]);
 
   // TGJU profile links from /api/meta (core's static map is the fallback).
   useEffect(() => {
@@ -99,6 +110,14 @@ export function Converter() {
   const showStaleBanner = sourceState.snapshot !== null && (sourceState.stale || sourceState.degraded);
   const showOfflineBanner = !store.online && sourceState.snapshot !== null;
 
+  // Recent pairs — read once on mount (written after each conversion).
+  useEffect(() => {
+    setRecentPairs(readRecentPairs());
+  }, []);
+
+  const quickAmounts = from === 'IRR' ? QUICK_AMOUNTS_IRR : QUICK_AMOUNTS_INTL;
+  const parsedAmount = parseInputAmount(amount);
+
   const fromName = t(`currencies.${from}` as TranslationKey);
   const toName = t(`currencies.${to}` as TranslationKey);
 
@@ -121,11 +140,14 @@ export function Converter() {
     const startedAt = Date.now();
 
     try {
-      const view = await runConversion(parsed);
+      const { view, prevRate: baseline } = await runConversion(parsed);
       const remaining = MIN_FETCHING_MS - (Date.now() - startedAt);
       if (remaining > 0) await sleep(remaining);
       setResult(view);
+      setPrevRate(baseline);
       setPhase('result');
+      addRecentPair(view.from, view.to);
+      setRecentPairs(readRecentPairs());
       saveHistoryEntry({
         amount: parsed,
         from: view.from,
@@ -145,37 +167,43 @@ export function Converter() {
     }
   };
 
-  const runConversion = async (parsedAmount: number): Promise<ConversionView> => {
+  const runConversion = async (parsedAmount: number): Promise<{ view: ConversionView; prevRate: number | null }> => {
     const manual = manualOpen ? parseInputAmount(manualRate) : null;
 
     if (manual !== null && manual > 0) {
       // Legacy parity: manual_rate overrides everything, source "Manual".
       const r = convertWithManualRate(parsedAmount, manual);
       return {
-        amount: parsedAmount,
-        from,
-        to,
-        result: r.amount,
-        rate: r.rate,
-        inverse: reverseRate(r.rate),
-        source: 'manual',
-        fetchedAt: new Date().toISOString(),
-        stale: false,
+        view: {
+          amount: parsedAmount,
+          from,
+          to,
+          result: r.amount,
+          rate: r.rate,
+          inverse: reverseRate(r.rate),
+          source: 'manual',
+          fetchedAt: new Date().toISOString(),
+          stale: false,
+        },
+        prevRate: null,
       };
     }
 
     if (from === to) {
       // Gate 1 decision #5: local short-circuit, rate 1, zero network.
       return {
-        amount: parsedAmount,
-        from,
-        to,
-        result: parsedAmount,
-        rate: 1,
-        inverse: 1,
-        source: 'local',
-        fetchedAt: new Date().toISOString(),
-        stale: false,
+        view: {
+          amount: parsedAmount,
+          from,
+          to,
+          result: parsedAmount,
+          rate: 1,
+          inverse: 1,
+          source: 'local',
+          fetchedAt: new Date().toISOString(),
+          stale: false,
+        },
+        prevRate: null,
       };
     }
 
@@ -196,17 +224,32 @@ export function Converter() {
       throw err;
     }
 
+    // Rate intelligence: baseline from the previous snapshot generation, if
+    // it also knows this pair (hidden otherwise).
+    const previous = snapshotStore.getState()[source].previous;
+    let baseline: number | null = null;
+    if (previous) {
+      try {
+        baseline = convert(previous, from, to, 1).rate;
+      } catch {
+        baseline = null;
+      }
+    }
+
     const state = snapshotStore.getState()[source];
     return {
-      amount: parsedAmount,
-      from,
-      to,
-      result: conversion.amount,
-      rate: conversion.rate,
-      inverse: reverseRate(conversion.rate),
-      source: conversion.source,
-      fetchedAt: conversion.fetchedAt,
-      stale: state.stale || state.servedFrom !== 'live',
+      view: {
+        amount: parsedAmount,
+        from,
+        to,
+        result: conversion.amount,
+        rate: conversion.rate,
+        inverse: reverseRate(conversion.rate),
+        source: conversion.source,
+        fetchedAt: conversion.fetchedAt,
+        stale: state.stale || state.servedFrom !== 'live',
+      },
+      prevRate: baseline,
     };
   };
 
@@ -244,6 +287,50 @@ export function Converter() {
       {showStaleBanner && sourceState.snapshot ? (
         <div className="mb-5">
           <StaleBanner fetchedAt={sourceState.snapshot.fetchedAt} notice={notice} />
+        </div>
+      ) : null}
+
+      {/* Recent pairs — one-tap recall (hidden until the first conversion) */}
+      {recentPairs.length > 0 ? (
+        <div className="mb-5">
+          <p className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-currena-muted">
+            ⚡ {t('converter.recentPairs')}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {recentPairs.map((pair) => {
+              const active = pair.from === from && pair.to === to;
+              return (
+                <button
+                  key={`${pair.from}-${pair.to}`}
+                  type="button"
+                  onClick={() => {
+                    setFrom(pair.from);
+                    setTo(pair.to);
+                  }}
+                  aria-pressed={active}
+                  className={`inline-flex min-h-[38px] cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
+                    active
+                      ? 'border-currena-blue bg-currena-blue/10 text-currena-blue shadow-[0_4px_12px_rgba(74,144,226,0.25)]'
+                      : 'border-black/10 bg-currena-soft text-currena-dark hover:border-currena-blue/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:border-white/10 dark:bg-white/5 dark:text-white/85'
+                  }`}
+                >
+                  <img
+                    src={`/images/flags/${pair.from.toLowerCase()}.png`}
+                    alt=""
+                    className="h-3.5 w-5 rounded-[3px] object-cover"
+                  />
+                  <span dir="ltr">{pair.from}</span>
+                  <span aria-hidden="true" className="opacity-40">→</span>
+                  <img
+                    src={`/images/flags/${pair.to.toLowerCase()}.png`}
+                    alt=""
+                    className="h-3.5 w-5 rounded-[3px] object-cover"
+                  />
+                  <span dir="ltr">{pair.to}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       ) : null}
 
@@ -294,7 +381,7 @@ export function Converter() {
           </div>
 
           {/* Amount panel */}
-          <div className="mb-5">
+          <div className="mb-4">
             <AmountInput
               id="amount"
               value={amount}
@@ -305,6 +392,36 @@ export function Converter() {
               currency={from}
               invalid={amountInvalid}
             />
+          </div>
+
+          {/* Quick amounts — one-tap fill, IRR-appropriate magnitudes */}
+          <div className="mb-5">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-currena-muted">
+              ⚡ {t('converter.quickAmounts')}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {quickAmounts.map((value) => {
+                const active = parsedAmount === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => {
+                      setAmount(thousandSeparateInput(String(value)));
+                      setAmountInvalid(false);
+                    }}
+                    aria-pressed={active}
+                    className={`min-h-[38px] cursor-pointer rounded-full border px-4 py-1.5 text-sm font-bold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
+                      active
+                        ? 'border-transparent cta-gradient text-white shadow-[0_6px_18px_rgba(102,126,234,0.4)]'
+                        : 'border-black/10 bg-currena-soft text-currena-dark hover:border-currena-blue/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:border-white/10 dark:bg-white/5 dark:text-white/85'
+                    }`}
+                  >
+                    {formatNumber(value, numberLocale, { maximumFractionDigits: 0 })}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Custom rate (legacy collapsible) */}
@@ -378,6 +495,7 @@ export function Converter() {
       {phase === 'result' && result ? (
         <ResultPopup
           view={result}
+          prevRate={prevRate}
           tgjuUrl={tgjuUrl}
           onClose={() => setPhase('idle')}
           onNewConversion={() => setPhase('idle')}

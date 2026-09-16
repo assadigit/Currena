@@ -72,6 +72,7 @@ export const fa: Dictionary = {
     currencyGroupInternational: 'ارزهای بین‌المللی',
     delete: 'حذف',
     people: 'نفر',
+    noChange: 'بدون تغییر',
   },
 
   sources: {
@@ -106,6 +107,8 @@ export const fa: Dictionary = {
     connectOnceHint: 'اگر ادامه یافت، حداقل یک‌بار برای دریافت نرخ‌ها به اینترنت متصل شوید.',
     checkConnection: 'لطفاً دوباره تلاش کنید یا اتصال خود را بررسی کنید.',
     creating: '⏳ در حال ساخت...',
+    quickAmounts: 'مبالغ پرکاربرد',
+    recentPairs: 'جفت‌های اخیر',
   },
 
   currencies: {
@@ -134,6 +137,10 @@ export const fa: Dictionary = {
     liveUpdates: 'به‌روزرسانی لحظه‌ای',
     couldNotFetch: '⚠️ دریافت نرخ‌ها ناموفق بود. لطفاً اتصال خود را بررسی کنید.',
     refresh: 'به‌روزرسانی نرخ‌ها',
+    copyRate: 'کپی نرخ',
+    rateCopied: '✅ نرخ کپی شد!',
+    noChangeSincePrevious: 'بدون تغییر از به‌روزرسانی قبلی',
+    changedSincePrevious: 'تغییر از به‌روزرسانی قبلی',
   },
 
   calculator: {

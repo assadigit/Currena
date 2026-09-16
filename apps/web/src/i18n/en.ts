@@ -71,6 +71,7 @@ export const en = {
     currencyGroupInternational: 'International Currencies',
     delete: 'Delete',
     people: 'People',
+    noChange: 'no change',
   },
 
   sources: {
@@ -105,6 +106,8 @@ export const en = {
     connectOnceHint: 'If this continues, you may need to connect to internet at least once to download rates.',
     checkConnection: 'Please try again or check your connection.',
     creating: '⏳ Creating...',
+    quickAmounts: 'Quick amounts',
+    recentPairs: 'Recent pairs',
   },
 
   currencies: {
@@ -133,6 +136,10 @@ export const en = {
     liveUpdates: 'LIVE UPDATES',
     couldNotFetch: '⚠️ Could not fetch rates. Please check your connection.',
     refresh: 'Refresh Rates',
+    copyRate: 'Copy rate',
+    rateCopied: '✅ Rate copied!',
+    noChangeSincePrevious: 'No change since the previous update',
+    changedSincePrevious: 'Change since the previous update',
   },
 
   calculator: {

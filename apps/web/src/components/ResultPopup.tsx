@@ -14,6 +14,7 @@ import { formatDate, formatJalaliDate, formatNumber, formatRelative } from '@cur
 import { useI18n } from '../lib/locale';
 import type { TranslationKey } from '../lib/locale';
 import { Odometer } from './Odometer';
+import { RateDeltaChip } from './RateDeltaChip';
 import { Button, LiveIndicator, SourceBadge } from './ui';
 
 /** Everything the popup renders — produced by the converter's state machine. */
@@ -39,6 +40,8 @@ export interface ResultPopupProps {
   onNewConversion: () => void;
   /** TGJU profile URL for the non-IRR side (null → hide the link). */
   tgjuUrl: string | null;
+  /** Baseline rate from the previous snapshot generation (null → hide ▲/▼). */
+  prevRate?: number | null;
 }
 
 const SOURCE_KEY: Record<Source, TranslationKey> = {
@@ -54,7 +57,7 @@ function rateMaxFractionDigits(rate: number, irrPair: boolean): number {
   return irrPair ? 0 : 4;
 }
 
-export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl }: ResultPopupProps) {
+export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate }: ResultPopupProps) {
   const { t, numberLocale } = useI18n();
   const [copied, setCopied] = useState(false);
   const [sharing, setSharing] = useState(false);
@@ -96,6 +99,12 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl }: ResultP
   const inverseText = formatNumber(view.inverse, numberLocale, {
     maximumFractionDigits: rateMaxFractionDigits(view.inverse, irrPair),
   });
+  // ▲/▼ only for real snapshot sources with a usable baseline.
+  const showDelta =
+    (view.source === 'tgju' || view.source === 'frankfurter') &&
+    typeof prevRate === 'number' &&
+    Number.isFinite(prevRate) &&
+    prevRate > 0;
 
   const shareText = [
     `${t('converter.currencyConversion')}`,
@@ -249,6 +258,15 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl }: ResultP
           <p className="text-sm opacity-90">
             1 {view.to} = {inverseText} {view.from}
           </p>
+          {showDelta ? (
+            <div className="flex justify-center pt-1">
+              <RateDeltaChip
+                delta={{ current: view.rate, previous: prevRate }}
+                decimals={irrPair ? 0 : 4}
+                size="sm"
+              />
+            </div>
+          ) : null}
         </div>
 
         {/* Jalali + Gregorian timestamps — render-time core formatting */}

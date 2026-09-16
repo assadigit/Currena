@@ -220,3 +220,42 @@ body {
 * {
   scrollbar-width: thin;
 }
+
+/* ------------------------------------------------------------------ *
+ * Rate intelligence — flash pulse when a board rate changes
+ * ------------------------------------------------------------------ */
+
+@keyframes currena-rate-flash-up {
+  0% {
+    background-color: rgba(16, 185, 129, 0.28);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.45);
+  }
+  100% {
+    background-color: rgba(30, 33, 51, 1);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0);
+  }
+}
+@keyframes currena-rate-flash-down {
+  0% {
+    background-color: rgba(239, 68, 68, 0.28);
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.45);
+  }
+  100% {
+    background-color: rgba(30, 33, 51, 1);
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0);
+  }
+}
+.rate-flash-up {
+  animation: currena-rate-flash-up 1.6s ease-out;
+}
+.rate-flash-down {
+  animation: currena-rate-flash-down 1.6s ease-out;
+}
+
+/* Respect users who prefer calm (mission §4 a11y). */
+@media (prefers-reduced-motion: reduce) {
+  .rate-flash-up,
+  .rate-flash-down {
+    animation: none;
+  }
+}

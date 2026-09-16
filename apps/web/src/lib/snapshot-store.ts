@@ -15,6 +15,9 @@
  *     source). On 503/no-network: keep serving the last-good snapshot with a
  *     stale/degraded notice. With nothing persisted → hard error state.
  *   - online/offline tracked via navigator.onLine events.
+ *   - Rate intelligence: each source also keeps the PREVIOUS distinct
+ *     snapshot (`currena:prev-snapshot:*`, persisted) so the UI can show
+ *     ▲/▼ rate-change deltas between updates.
  *
  * Numbers and timestamps inside the store stay canonical (raw doubles, ISO
  * strings) — staleness is DERIVED from fetchedAt at render time, never stored.
@@ -28,6 +31,7 @@ import { ApiError, fetchRates } from './api';
 const SOURCES: readonly SnapshotSource[] = ['tgju', 'frankfurter'];
 
 const lsKey = (source: SnapshotSource): string => `currena:snapshot:${source}`;
+const lsPrevKey = (source: SnapshotSource): string => `currena:prev-snapshot:${source}`;
 
 /** Where the currently-served snapshot physically came from. */
 export type ServedFrom = 'live' | 'cache' | 'local-store';
@@ -35,6 +39,8 @@ export type ServedFrom = 'live' | 'cache' | 'local-store';
 export interface SourceState {
   status: 'idle' | 'loading' | 'ready' | 'error';
   snapshot: Snapshot | null;
+  /** The prior DISTINCT snapshot (different fetchedAt) — powers ▲/▼ deltas. */
+  previous: Snapshot | null;
   /** Age of the served snapshot beyond FRESH_TTL_SEC (derived, never stored). */
   stale: boolean;
   servedFrom: ServedFrom | null;
@@ -55,6 +61,7 @@ export interface StoreState {
 const idleSource = (): SourceState => ({
   status: 'idle',
   snapshot: null,
+  previous: null,
   stale: false,
   servedFrom: null,
   notice: null,
@@ -90,6 +97,26 @@ function persist(source: SnapshotSource, snapshot: Snapshot): void {
   } catch (err) {
     // Quota/private-mode: in-memory serving continues; offline boot loses data.
     console.warn(`[snapshot-store] cannot persist snapshot for ${source}:`, err);
+  }
+}
+
+function persistPrevious(source: SnapshotSource, snapshot: Snapshot | null): void {
+  if (snapshot === null) return; // nothing to keep — leave any old value alone
+  try {
+    window.localStorage.setItem(lsPrevKey(source), JSON.stringify(snapshot));
+  } catch {
+    // Best-effort only: deltas simply won't survive a reload.
+  }
+}
+
+function readPrevious(source: SnapshotSource): Snapshot | null {
+  try {
+    const raw = window.localStorage.getItem(lsPrevKey(source));
+    if (!raw) return null;
+    const parsed = SnapshotSchema.safeParse(JSON.parse(raw));
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
   }
 }
 
@@ -130,10 +157,16 @@ class SnapshotStore {
 
     for (const source of SOURCES) {
       const snapshot = readPersisted(source);
+      const previous = readPrevious(source);
       if (snapshot) {
+        // A stale persisted previous (older than the current one, or a
+        // different generation) is still a valid delta baseline — but never
+        // newer than what we serve.
+        const usablePrevious = previous && previous.fetchedAt !== snapshot.fetchedAt ? previous : null;
         this.setSource(source, {
           status: 'ready',
           snapshot,
+          previous: usablePrevious,
           stale: isStale(snapshot),
           servedFrom: 'local-store',
         });
@@ -175,16 +208,34 @@ class SnapshotStore {
       this.setSource(source, { status: 'loading' });
       try {
         const response = await fetchRates(source);
+        const current = this.state[source].snapshot;
+        const isNewGeneration = current === null || current.fetchedAt !== response.snapshot.fetchedAt;
         persist(source, response.snapshot);
-        this.setSource(source, {
-          status: 'ready',
-          snapshot: response.snapshot,
-          stale: response.stale || isStale(response.snapshot),
-          servedFrom: response.servedFrom,
-          notice: response.notice ?? null,
-          error: null,
-          degraded: false,
-        });
+        if (isNewGeneration) {
+          // Keep the replaced snapshot as the delta baseline (persisted so
+          // ▲/▼ chips survive reloads and offline boots).
+          persistPrevious(source, current);
+          this.setSource(source, {
+            status: 'ready',
+            snapshot: response.snapshot,
+            previous: current,
+            stale: response.stale || isStale(response.snapshot),
+            servedFrom: response.servedFrom,
+            notice: response.notice ?? null,
+            error: null,
+            degraded: false,
+          });
+        } else {
+          // Same generation served from cache — keep the existing baseline.
+          this.setSource(source, {
+            status: 'ready',
+            stale: response.stale || isStale(response.snapshot),
+            servedFrom: response.servedFrom,
+            notice: response.notice ?? null,
+            error: null,
+            degraded: false,
+          });
+        }
       } catch (err) {
         if (err instanceof DOMException && err.name === 'AbortError') return;
         const apiError =
