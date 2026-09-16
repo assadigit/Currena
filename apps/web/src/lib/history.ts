@@ -51,3 +51,50 @@ export function saveHistoryEntry(entry: HistoryEntry): void {
     console.warn('[history] cannot persist conversion history:', err);
   }
 }
+
+/**
+ * Remove one entry by its index in the FULL (unfiltered) list. Callers pass
+ * the storage index — the route keeps filtered views aligned to it by
+ * re-reading after every mutation. Best-effort: a stale index simply misses.
+ */
+export function removeHistoryEntry(index: number): HistoryEntry[] {
+  const entries = readHistory();
+  if (index < 0 || index >= entries.length) return entries;
+  const next = entries.filter((_, i) => i !== index);
+  try {
+    window.localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+  } catch (err) {
+    console.warn('[history] cannot persist history deletion:', err);
+  }
+  return next;
+}
+
+/** CSV export (RFC 4180-ish; every field is numeric/code/ISO — no escaping needed). */
+export function historyToCsv(entries: readonly HistoryEntry[]): string {
+  const header = 'timestamp,from,to,amount,result,rate,source,cached';
+  const lines = entries.map((e) =>
+    [
+      e.timestamp,
+      e.from,
+      e.to,
+      String(e.amount),
+      String(e.result),
+      String(e.rate),
+      e.source,
+      e.is_cached ? 'yes' : 'no',
+    ].join(','),
+  );
+  return [header, ...lines].join('\n');
+}
+
+/** Download the CSV as a Blob (no dependency — plain text, BOM for Excel). */
+export function downloadHistoryCsv(entries: readonly HistoryEntry[]): void {
+  const stamp = new Date().toISOString().slice(0, 16).replace(/[:T-]/g, '');
+  const blob = new Blob([`\uFEFF${historyToCsv(entries)}`], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `currena-history-${stamp}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}

@@ -115,6 +115,25 @@ export function Converter() {
     setRecentPairs(readRecentPairs());
   }, []);
 
+  // Deep-link prefill: #/?from=EUR&to=IRR&amount=500 — powers History's
+  // "Repeat" action AND shareable conversion links. Unknown values are
+  // dropped silently; the URL is cleaned so a later remount never re-applies.
+  useEffect(() => {
+    const hash = window.location.hash.replace(/^#/, '');
+    const queryStart = hash.indexOf('?');
+    if (queryStart === -1) return;
+    const params = new URLSearchParams(hash.slice(queryStart + 1));
+    const known = new Set<string>(CURRENCIES.map((c) => c.code));
+    const from = params.get('from')?.trim().toUpperCase();
+    const to = params.get('to')?.trim().toUpperCase();
+    const amount = params.get('amount') ?? '';
+    if (from && known.has(from)) setFrom(from as CurrencyCode);
+    if (to && known.has(to)) setTo(to as CurrencyCode);
+    const parsed = parseInputAmount(amount);
+    if (parsed !== null && parsed > 0) setAmount(thousandSeparateInput(amount));
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#/`);
+  }, []);
+
   const quickAmounts = from === 'IRR' ? QUICK_AMOUNTS_IRR : QUICK_AMOUNTS_INTL;
   const parsedAmount = parseInputAmount(amount);
 
