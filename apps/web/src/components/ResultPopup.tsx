@@ -8,13 +8,15 @@
  * it never lands in the initial chunk (mission §8 budget).
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Source } from '@currena/core';
 import { formatDate, formatJalaliDate, formatNumber, formatRelative } from '@currena/core';
 import { useI18n } from '../lib/locale';
 import type { TranslationKey } from '../lib/locale';
+import { seriesForPair, trendOf, useRateHistory } from '../lib/rate-history';
 import { Odometer } from './Odometer';
 import { RateDeltaChip } from './RateDeltaChip';
+import { Sparkline } from './Sparkline';
 import { Button, LiveIndicator, SourceBadge } from './ui';
 
 /** Everything the popup renders — produced by the converter's state machine. */
@@ -64,6 +66,19 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
   const [toast, setToast] = useState<string | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+
+  // Micro-trend (rate-history sparkline): only for live sources, not manual/local.
+  const historySource = view.source === 'tgju' || view.source === 'frankfurter' ? view.source : null;
+  const generations = useRateHistory(historySource);
+  const trendSeries = useMemo(
+    () => (historySource ? seriesForPair(generations, view.from, view.to) : []),
+    [generations, historySource, view.from, view.to],
+  );
+  const trend = trendOf(trendSeries);
+  const trendPctText =
+    trend === null
+      ? ''
+      : `${trend.pct >= 0 ? '+' : ''}${formatNumber(trend.pct, numberLocale, { maximumFractionDigits: 2 })}%`;
 
   // Escape closes (legacy had X + overlay click; Escape is the a11y twin).
   useEffect(() => {
@@ -281,6 +296,52 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
             {formatDate(view.fetchedAt, numberLocale, { withTime: true })}
           </p>
         </div>
+
+        {/* Micro-trend over recorded snapshot generations (honest: app-seen checks only). */}
+        {trendSeries.length >= 2 && trend ? (
+          <div className="my-2.5 rounded-[10px] border-s-[3px] border-currena-success/60 bg-currena-success/[0.07] px-2.5 py-2">
+            <div className="mb-1 flex items-baseline justify-between gap-2">
+              <p className="text-[0.7rem] font-semibold uppercase tracking-wide text-currena-muted dark:text-white/60">
+                📈 {t('trend.recentChecks', { n: trendSeries.length })}
+              </p>
+              <p
+                className={`text-xs font-bold ${
+                  trend.dir === 'up'
+                    ? 'text-currena-success'
+                    : trend.dir === 'down'
+                      ? 'text-[#dc2626] dark:text-[#ff5252]'
+                      : 'text-currena-muted dark:text-white/60'
+                }`}
+              >
+                {trend.dir === 'flat' ? t('trend.flat') : trendPctText}
+              </p>
+            </div>
+            <Sparkline
+              points={trendSeries}
+              width={280}
+              height={56}
+              ariaLabel={t('trend.summary', {
+                pair: `${view.from} → ${view.to}`,
+                dir: t(`trend.${trend.dir}` as TranslationKey),
+                pct: trendPctText,
+              })}
+              className="h-auto w-full"
+            />
+            <p className="mt-1 flex flex-wrap items-center justify-between gap-1 text-[0.68rem] text-currena-muted dark:text-white/55">
+              <span>
+                {t('trend.range', {
+                  min: formatNumber(Math.min(...trendSeries), numberLocale, {
+                    maximumFractionDigits: rateMaxFractionDigits(Math.min(...trendSeries), irrPair),
+                  }),
+                  max: formatNumber(Math.max(...trendSeries), numberLocale, {
+                    maximumFractionDigits: rateMaxFractionDigits(Math.max(...trendSeries), irrPair),
+                  }),
+                })}
+              </span>
+              <span className="italic">{t('trend.honestNote')}</span>
+            </p>
+          </div>
+        ) : null}
 
         {!live ? (
           <p className="my-3 rounded-[10px] border-s-[3px] border-currena-warning bg-currena-warning/10 px-3 py-2.5 text-sm font-semibold text-currena-warning">

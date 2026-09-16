@@ -142,6 +142,20 @@ export const en = {
     changedSincePrevious: 'Change since the previous update',
   },
 
+  trend: {
+    /** Shown above a sparkline; {n} = number of recorded checks. */
+    recentChecks: 'Trend — last {n} checks',
+    /** Screen-reader summary: {pair} like 'USD → IRR', {dir} up/down/flat, {pct} signed %. */
+    summary: '{pair} trend over recent checks: {dir} {pct}',
+    up: 'up',
+    down: 'down',
+    flat: 'flat',
+    /** Hint under the converter sparkline. */
+    honestNote: 'Only updates your app actually saw — not a full market history.',
+    /** Min/max caption; {min} and {max} are formatted rates. */
+    range: 'low {min} · high {max}',
+  },
+
   calculator: {
     title: 'Calculator',
     subtitle: 'Calculate and convert currencies',

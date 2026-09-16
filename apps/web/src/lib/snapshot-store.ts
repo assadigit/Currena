@@ -27,6 +27,7 @@ import { FRESH_TTL_SEC, SnapshotSchema } from '@currena/core';
 import type { Snapshot, SnapshotSource } from '@currena/core';
 import { useSyncExternalStore } from 'react';
 import { ApiError, fetchRates } from './api';
+import { recordGeneration } from './rate-history';
 
 const SOURCES: readonly SnapshotSource[] = ['tgju', 'frankfurter'];
 
@@ -215,6 +216,8 @@ class SnapshotStore {
           // Keep the replaced snapshot as the delta baseline (persisted so
           // ▲/▼ chips survive reloads and offline boots).
           persistPrevious(source, current);
+          // Rolling trend window for the sparklines (rate-history feature).
+          recordGeneration(source, response.snapshot);
           this.setSource(source, {
             status: 'ready',
             snapshot: response.snapshot,

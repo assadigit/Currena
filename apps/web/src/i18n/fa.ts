@@ -143,6 +143,20 @@ export const fa: Dictionary = {
     changedSincePrevious: 'تغییر از به‌روزرسانی قبلی',
   },
 
+  trend: {
+    /** Shown above a sparkline; {n} = number of recorded checks. */
+    recentChecks: 'روند — {n} بررسی اخیر',
+    /** Screen-reader summary: {pair} like 'USD → IRR', {dir} up/down/flat, {pct} signed %. */
+    summary: 'روند {pair} در بررسی‌های اخیر: {dir} {pct}',
+    up: 'صعودی',
+    down: 'نزولی',
+    flat: 'ثابت',
+    /** Hint under the converter sparkline. */
+    honestNote: 'فقط به‌روزرسانی‌هایی که برنامه دیده — نه تاریخچه کامل بازار.',
+    /** Min/max caption; {min} and {max} are formatted rates. */
+    range: 'کف {min} · سقف {max}',
+  },
+
   calculator: {
     title: 'ماشین‌حساب',
     subtitle: 'محاسبه و تبدیل ارزها',

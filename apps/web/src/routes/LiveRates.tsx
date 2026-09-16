@@ -19,8 +19,10 @@ import { convert, formatDate, formatNumber } from '@currena/core';
 import type { CurrencyCode } from '@currena/core';
 import { RateDeltaChip } from '../components/RateDeltaChip';
 import { Skeleton } from '../components/ui';
+import { Sparkline } from '../components/Sparkline';
 import { fetchMeta } from '../lib/api';
 import { useI18n } from '../lib/locale';
+import { seriesForPair, trendOf, useRateHistory } from '../lib/rate-history';
 import { snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
 import type { TranslationKey } from '../lib/locale';
 
@@ -102,6 +104,15 @@ export function LiveRates() {
     }
     return map;
   }, [previous]);
+
+  /** Trend series per board currency (rate-history sparklines). */
+  const history = useRateHistory('tgju');
+  const trendSeries = useMemo<Map<CurrencyCode, number[]>>(() => {
+    const map = new Map<CurrencyCode, number[]>();
+    if (history.length < 2) return map;
+    for (const code of BOARD) map.set(code, seriesForPair(history, code, 'IRR'));
+    return map;
+  }, [history]);
 
   // Flash green/red when a board rate changes between rendered generations.
   useEffect(() => {
@@ -209,6 +220,8 @@ export function LiveRates() {
                 const prevRate = prevRates.get(code);
                 const flashDir = flash[code];
                 const copied = copiedCode === code;
+                const series = trendSeries.get(code);
+                const trend = series ? trendOf(series) : null;
                 return (
                   <article
                     key={code}
@@ -242,6 +255,46 @@ export function LiveRates() {
                     {card?.ok && rate !== null && prevRate !== undefined ? (
                       <div className="mb-3">
                         <RateDeltaChip delta={{ current: rate, previous: prevRate }} decimals={0} size="sm" />
+                      </div>
+                    ) : null}
+                    {/* Micro-trend over the recorded snapshot generations. */}
+                    {series && series.length >= 2 && trend ? (
+                      <div className="mb-3 flex items-center gap-3 rounded-xl bg-white/[0.04] px-3 py-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[0.65rem] font-semibold uppercase tracking-wider opacity-60">
+                            📈 {t('trend.recentChecks', { n: series.length })}
+                          </p>
+                          <p
+                            className={`text-xs font-bold ${
+                              trend.dir === 'up'
+                                ? 'text-currena-success'
+                                : trend.dir === 'down'
+                                  ? 'text-[#ff5252]'
+                                  : 'opacity-60'
+                            }`}
+                          >
+                            {trend.dir === 'flat'
+                              ? t('trend.flat')
+                              : `${trend.pct >= 0 ? '+' : ''}${formatNumber(trend.pct, numberLocale, { maximumFractionDigits: 2 })}%`}
+                            {' · '}
+                            <span className="font-normal opacity-60">
+                              {t('trend.range', {
+                                min: formatNumber(Math.min(...series), numberLocale, { maximumFractionDigits: 0 }),
+                                max: formatNumber(Math.max(...series), numberLocale, { maximumFractionDigits: 0 }),
+                              })}
+                            </span>
+                          </p>
+                        </div>
+                        <Sparkline
+                          points={series}
+                          width={92}
+                          height={34}
+                          ariaLabel={t('trend.summary', {
+                            pair: `${code} → IRR`,
+                            dir: t(`trend.${trend.dir}` as TranslationKey),
+                            pct: `${trend.pct >= 0 ? '+' : ''}${formatNumber(trend.pct, numberLocale, { maximumFractionDigits: 2 })}%`,
+                          })}
+                        />
                       </div>
                     ) : null}
                     <footer className="flex flex-wrap items-center justify-between gap-2">
