@@ -42,7 +42,8 @@ export function CurrencySelect({ id, value, onChange, ariaLabel, codes }: Curren
     >
       {allowed.includes('IRR') ? (
         <optgroup label={t('common.currencyGroupIranian')}>
-          <option value="IRR">{`IRR — ${nameOf('IRR')}`}</option>
+          {/* Owner rule: the raw code reads "IRR (Toman)" everywhere. */}
+          <option value="IRR">{t('currencies.irrLabel')}</option>
         </optgroup>
       ) : null}
       {international.length > 0 ? (

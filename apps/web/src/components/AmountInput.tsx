@@ -6,6 +6,7 @@
  */
 
 import { parseAmount, thousandSeparateInput } from '@currena/core';
+import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
 
 export interface AmountInputProps {
@@ -19,6 +20,7 @@ export interface AmountInputProps {
 
 export function AmountInput({ id, value, onChange, currency, invalid }: AmountInputProps) {
   const { t } = useI18n();
+  const label = useCodeLabel();
 
   const hintAmount = value === '' ? '0.00' : value;
 
@@ -45,7 +47,7 @@ export function AmountInput({ id, value, onChange, currency, invalid }: AmountIn
           }`}
         />
         <span className="pointer-events-none absolute end-4 bottom-2.5 text-[0.7rem] font-medium text-currena-dark/40">
-          {hintAmount} {currency}
+          {hintAmount} <bdi>{label(currency)}</bdi>
         </span>
       </div>
       {invalid ? <p className="mt-2 text-xs font-semibold text-currena-warning">{t('converter.enterValidAmount')}</p> : null}

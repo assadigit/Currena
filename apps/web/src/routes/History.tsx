@@ -22,6 +22,7 @@ import type { Source } from '@currena/core';
 import { formatDate, formatNumber, formatRelative } from '@currena/core';
 import { Button, Card, SourceBadge, Toast } from '../components/ui';
 import { getDictionary } from '../i18n';
+import { useCodeLabel } from '../lib/display';
 import { downloadHistoryCsv, readHistory, removeHistoryEntry, HISTORY_KEY } from '../lib/history';
 import type { HistoryEntry } from '../lib/history';
 import { useI18n } from '../lib/locale';
@@ -57,6 +58,7 @@ interface IndexedEntry {
 
 export function History() {
   const { t, numberLocale, locale } = useI18n();
+  const label = useCodeLabel();
   const [entries, setEntries] = useState<HistoryEntry[] | null>(null);
   const [filterPair, setFilterPair] = useState<string>('all');
   const [search, setSearch] = useState('');
@@ -215,7 +217,7 @@ export function History() {
                 <img src={`/images/flags/${stats.top.to.toLowerCase()}.png`} alt="" className="h-3 w-4 rounded-[2px] object-cover" />
               </div>
               <div className="text-lg font-black text-currena-blue dark:text-currena-cyan" dir="ltr">
-                {stats.top.from}→{stats.top.to}
+                {label(stats.top.from)}→{label(stats.top.to)}
               </div>
               <div className="text-[0.7rem] font-semibold uppercase tracking-wide text-currena-muted">
                 {t('history.mostUsed')} · {formatNumber(stats.top.count, numberLocale)}×
@@ -279,7 +281,7 @@ export function History() {
                   }`}
                 >
                   <img src={`/images/flags/${from.toLowerCase()}.png`} alt="" className="h-3 w-4 rounded-[2px] object-cover" />
-                  <span dir="ltr">{pair}</span>
+                  <span dir="ltr">{label(from)}→{label(to)}</span>
                   <span className="opacity-60">{formatNumber(count, numberLocale)}</span>
                 </button>
               );
@@ -312,10 +314,10 @@ export function History() {
             <div className="mb-3 flex items-start justify-between gap-3 border-b border-black/5 pb-3 dark:border-white/10">
               <div className="flex items-center gap-2 text-base font-bold text-currena-dark dark:text-white">
                 <img src={`/images/flags/${entry.from.toLowerCase()}.png`} alt="" className="h-4 w-6 rounded-[3px] object-cover" />
-                <span dir="ltr">{entry.from}</span>
+                <span dir="ltr">{label(entry.from)}</span>
                 <span aria-hidden="true" className="opacity-40">→</span>
                 <img src={`/images/flags/${entry.to.toLowerCase()}.png`} alt="" className="h-4 w-6 rounded-[3px] object-cover" />
-                <span dir="ltr">{entry.to}</span>
+                <span dir="ltr">{label(entry.to)}</span>
               </div>
               <div className="text-end text-[0.7rem] leading-snug text-currena-muted">
                 <div className="font-semibold text-currena-blue dark:text-currena-cyan">
@@ -327,16 +329,16 @@ export function History() {
             </div>
             <p className="text-sm text-currena-dark dark:text-white/85">
               {formatNumber(entry.amount, numberLocale, { maximumFractionDigits: decimals })}{' '}
-              {entry.from}
+              <bdi>{label(entry.from)}</bdi>
             </p>
             <p className="text-lg font-bold text-currena-blue dark:text-currena-cyan">
               = {formatNumber(entry.result, numberLocale, { maximumFractionDigits: decimals })}{' '}
-              {entry.to}
+              <bdi>{label(entry.to)}</bdi>
             </p>
             <p className="mt-2 flex flex-wrap items-center gap-2 text-xs text-currena-muted">
-              {t('common.rate')}: 1 {entry.from} ={' '}
+              {t('common.rate')}: 1 <bdi>{label(entry.from)}</bdi> ={' '}
               {formatNumber(entry.rate, numberLocale, { maximumFractionDigits: rateDecimals })}{' '}
-              {entry.to}
+              <bdi>{label(entry.to)}</bdi>
               <SourceBadge source={asSource(entry.source)} />
             </p>
             {/* Per-entry actions: repeat at today's rate / delete */}

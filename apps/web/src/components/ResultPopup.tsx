@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Source } from '@currena/core';
 import { formatDate, formatJalaliDate, formatNumber, formatRelative } from '@currena/core';
+import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
 import type { TranslationKey } from '../lib/locale';
 import { seriesForPair, trendOf, useRateHistory } from '../lib/rate-history';
@@ -61,6 +62,7 @@ function rateMaxFractionDigits(rate: number, irrPair: boolean): number {
 
 export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate }: ResultPopupProps) {
   const { t, numberLocale } = useI18n();
+  const label = useCodeLabel();
   const [copied, setCopied] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -121,13 +123,20 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
     Number.isFinite(prevRate) &&
     prevRate > 0;
 
+  // Owner rule: IRR renders as "IRR (Toman)" in amount/rate/share text.
+  // For name-based share lines, IRR uses the label directly (its full name
+  // already says "Iranian Toman" — "Iranian Toman (IRR (Toman))" would be
+  // noise); other codes keep the "Name (CODE)" shape.
+  const amountLine = (value: number, code: string, name: string): string =>
+    `${fmtAmount(value, code)} ${code === 'IRR' ? label(code) : `${name} (${code})`}`;
+
   const shareText = [
     `${t('converter.currencyConversion')}`,
     '',
-    `${fmtAmount(view.amount, view.from)} ${fromName} (${view.from})`,
-    `= ${fmtAmount(view.result, view.to)} ${toName} (${view.to})`,
+    amountLine(view.amount, view.from, fromName),
+    `= ${amountLine(view.result, view.to, toName)}`,
     '',
-    `📊 ${t('common.exchangeRate')}: 1 ${view.from} = ${rateText} ${view.to}`,
+    `📊 ${t('common.exchangeRate')}: 1 ${label(view.from)} = ${rateText} ${label(view.to)}`,
     `📡 ${t('common.source')}: ${t(SOURCE_KEY[view.source])}`,
     live
       ? `✅ ${t('common.liveUpdate')}`
@@ -140,8 +149,8 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
 
   const onCopy = async (): Promise<void> => {
     const copyLines = [
-      `${fmtAmount(view.amount, view.from)} ${fromName} = ${fmtAmount(view.result, view.to)} ${toName}`,
-      `${t('common.rate')}: ${rateText}`,
+      `${amountLine(view.amount, view.from, fromName)} = ${amountLine(view.result, view.to, toName)}`,
+      `${t('common.rate')}: 1 ${label(view.from)} = ${rateText} ${label(view.to)}`,
       `${t('common.source')}: ${t(SOURCE_KEY[view.source])}`,
     ];
     if (!live) {
@@ -258,20 +267,23 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
 
         <div className="my-2.5">
           <p className="mb-2 text-center text-base font-semibold text-currena-muted dark:text-white/70">
-            {fmtAmount(view.amount, view.from)} {view.from}
+            {fmtAmount(view.amount, view.from)} <bdi>{label(view.from)}</bdi>
           </p>
           <p className="cta-gradient-text break-words text-center text-[2rem] leading-tight font-black">
-            <Odometer value={view.result} format={(n) => `${fmtAmount(n, view.to)} ${view.to}`} />
+            <Odometer value={view.result} format={(n) => fmtAmount(n, view.to)} />{' '}
+            <span className="text-[0.85rem] font-bold">
+              <bdi>{label(view.to)}</bdi>
+            </span>
           </p>
         </div>
 
         <div className="my-2.5 space-y-1 rounded-[10px] bg-currena-blue/10 px-2 py-2 text-center dark:text-white">
           <p className="text-sm">
-            <strong>{t('common.rate')}:</strong> 1 {view.from} = {rateText} {view.to}{' '}
-            <SourceBadge source={view.source} />
+            <strong>{t('common.rate')}:</strong> 1 <bdi>{label(view.from)}</bdi> = {rateText}{' '}
+            <bdi>{label(view.to)}</bdi> <SourceBadge source={view.source} />
           </p>
           <p className="text-sm opacity-90">
-            1 {view.to} = {inverseText} {view.from}
+            1 <bdi>{label(view.to)}</bdi> = {inverseText} <bdi>{label(view.from)}</bdi>
           </p>
           {showDelta ? (
             <div className="flex justify-center pt-1">
@@ -321,7 +333,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
               width={280}
               height={56}
               ariaLabel={t('trend.summary', {
-                pair: `${view.from} → ${view.to}`,
+                pair: `${label(view.from)} → ${label(view.to)}`,
                 dir: t(`trend.${trend.dir}` as TranslationKey),
                 pct: trendPctText,
               })}

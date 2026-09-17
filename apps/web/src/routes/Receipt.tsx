@@ -27,6 +27,7 @@ import {
 import type { CurrencyCode, SnapshotSource } from '@currena/core';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { Button, Card, LoaderDots, Switch, Toast } from '../components/ui';
+import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
 import type { TranslationKey } from '../lib/locale';
 import { snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
@@ -117,6 +118,7 @@ const inputClass =
 
 export function Receipt() {
   const { t, numberLocale } = useI18n();
+  const label = useCodeLabel();
   const store = useSnapshotStore();
 
   const [from, setFrom] = useState<CurrencyCode>('TRY'); // legacy defaults
@@ -314,15 +316,15 @@ export function Receipt() {
       : r.date;
     const lines: string[] = ['🧾 EXPENSE RECEIPT', `📅 ${dateLine}`, ''];
     for (const item of r.items) {
-      lines.push(`${item.emoji} ${item.category}: ${item.amount.toFixed(2)} ${item.currency}`);
+      lines.push(`${item.emoji} ${item.category}: ${item.amount.toFixed(2)} ${label(item.currency)}`);
       if (item.notes) lines.push(`  📝 ${item.notes}`);
     }
-    lines.push('', '━━━━━━━━━━━━━━━━━━━━', `💰 TOTAL: ${r.total.toFixed(2)} ${r.fromCurrency}`, '');
+    lines.push('', '━━━━━━━━━━━━━━━━━━━━', `💰 TOTAL: ${r.total.toFixed(2)} ${label(r.fromCurrency)}`, '');
     if (r.converted !== null) {
-      lines.push(`💱 Converted: ${r.converted.toFixed(r.toCurrency === 'IRR' ? 0 : 2)} ${r.toCurrency}`);
+      lines.push(`💱 Converted: ${r.converted.toFixed(r.toCurrency === 'IRR' ? 0 : 2)} ${label(r.toCurrency)}`);
     }
     if (r.rate !== null) {
-      lines.push(`📊 Rate: 1 ${r.fromCurrency} = ${r.rate.toFixed(r.toCurrency === 'IRR' ? 0 : 4)} ${r.toCurrency}`);
+      lines.push(`📊 Rate: 1 ${label(r.fromCurrency)} = ${r.rate.toFixed(r.toCurrency === 'IRR' ? 0 : 4)} ${label(r.toCurrency)}`);
     }
     lines.push('', '✨ Generated with Currena', `🆔 ${r.id}`);
     return lines.join('\n');
@@ -479,7 +481,7 @@ export function Receipt() {
             <p className="text-base font-bold text-currena-dark dark:text-white">
               {t(`currencies.${from}` as TranslationKey)}
             </p>
-            <p className="text-xs font-semibold text-currena-blue dark:text-currena-cyan">{from}</p>
+            <p className="text-xs font-semibold text-currena-blue dark:text-currena-cyan">{label(from)}</p>
           </div>
 
           <p className="mb-3 text-sm font-bold text-currena-dark dark:text-white">
@@ -686,13 +688,19 @@ export function Receipt() {
             <div className="mb-2 flex items-center justify-between">
               <span className="text-sm opacity-90">{t('common.total')}</span>
               <span className="text-xl font-extrabold" dir="ltr">
-                {fmt(totals.total, from)} {from}
+                {fmt(totals.total, from)} <bdi>{label(from)}</bdi>
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm opacity-90">{t('common.converted')}</span>
               <span className="text-lg font-bold" dir="ltr">
-                {totals.converted !== null ? `${fmt(totals.converted, to)} ${to}` : '—'}
+                {totals.converted !== null ? (
+                  <>
+                    {fmt(totals.converted, to)} <bdi>{label(to)}</bdi>
+                  </>
+                ) : (
+                  '—'
+                )}
               </span>
             </div>
 
@@ -700,12 +708,18 @@ export function Receipt() {
               <div className="mt-3 border-t border-white/30 pt-3">
                 <div className="mb-1 flex items-center justify-between text-sm">
                   <span className="opacity-90">{t('receipt.budget')}</span>
-                  <span dir="ltr">{fmt(budgetValue, from)} {from}</span>
+                  <span dir="ltr">{fmt(budgetValue, from)} <bdi>{label(from)}</bdi></span>
                 </div>
                 <div className="mb-1.5 flex items-center justify-between text-sm">
                   <span className="opacity-90">{t('receipt.remaining')}</span>
                   <span className={`font-bold ${remaining !== null && remaining < 0 ? 'text-[#ffb4b4]' : ''}`} dir="ltr">
-                    {remaining !== null ? `${fmt(remaining, from)} ${from}` : '—'}
+                    {remaining !== null ? (
+                      <>
+                        {fmt(remaining, from)} <bdi>{label(from)}</bdi>
+                      </>
+                    ) : (
+                      '—'
+                    )}
                   </span>
                 </div>
                 {progress !== null ? (
@@ -728,7 +742,7 @@ export function Receipt() {
             {perPerson !== null ? (
               <div className="mt-3 flex items-center justify-between border-t border-white/30 pt-3 text-sm">
                 <span className="opacity-90">👥 {t('receipt.perPerson')}</span>
-                <span dir="ltr">{fmt(perPerson, from)} {from}</span>
+                <span dir="ltr">{fmt(perPerson, from)} <bdi>{label(from)}</bdi></span>
               </div>
             ) : null}
           </div>
@@ -810,7 +824,7 @@ export function Receipt() {
                         <span className="break-words">{item.category}</span>
                       </span>
                       <span className="shrink-0 font-bold" dir="ltr">
-                        {item.amount.toFixed(2)} {item.currency}
+                        {item.amount.toFixed(2)} <bdi>{label(item.currency)}</bdi>
                       </span>
                     </div>
                     {item.time !== '' ? (
@@ -826,7 +840,7 @@ export function Receipt() {
               <div className="mt-4 flex items-center justify-between border-t-2 border-black pt-4 text-lg font-bold">
                 <span>{t('receipt.totalLabel')}</span>
                 <span dir="ltr">
-                  {receipt.total.toFixed(2)} {receipt.fromCurrency}
+                  {receipt.total.toFixed(2)} <bdi>{label(receipt.fromCurrency)}</bdi>
                 </span>
               </div>
 
@@ -835,12 +849,13 @@ export function Receipt() {
                   <p className="mb-2 text-xs text-gray-600">{t('receipt.convertedAmount')}</p>
                   <p className="text-xl font-bold text-currena-blue" dir="ltr">
                     {receipt.converted.toFixed(receipt.toCurrency === 'IRR' ? 0 : 2)}{' '}
-                    {receipt.toCurrency}
+                    <bdi>{label(receipt.toCurrency)}</bdi>
                   </p>
                   {receipt.rate !== null ? (
                     <p className="mt-2 text-[0.7rem] text-gray-500" dir="ltr">
-                      {t('common.rate')}: 1 {receipt.fromCurrency} ={' '}
-                      {receipt.rate.toFixed(receipt.toCurrency === 'IRR' ? 0 : 4)} {receipt.toCurrency}
+                      {t('common.rate')}: 1 <bdi>{label(receipt.fromCurrency)}</bdi> ={' '}
+                      {receipt.rate.toFixed(receipt.toCurrency === 'IRR' ? 0 : 4)}{' '}
+                      <bdi>{label(receipt.toCurrency)}</bdi>
                     </p>
                   ) : null}
                 </div>

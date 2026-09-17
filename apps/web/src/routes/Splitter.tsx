@@ -18,6 +18,7 @@ import { convert, formatNumber, parseAmount, thousandSeparateInput } from '@curr
 import type { CurrencyCode, SnapshotSource } from '@currena/core';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { Button, Card, Switch, Toast } from '../components/ui';
+import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
 import { snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
 
@@ -51,6 +52,7 @@ interface SplitResult {
 
 export function Splitter() {
   const { t, numberLocale } = useI18n();
+  const label = useCodeLabel();
   const store = useSnapshotStore();
 
   const [amount, setAmount] = useState('');
@@ -235,13 +237,16 @@ export function Splitter() {
             <div className="flex items-center justify-between text-sm">
               <span className="text-currena-muted">{t('expenseSplitter.totalAmount')}</span>
               <span className="font-bold text-currena-dark dark:text-white">
-                {fmt(result.total, currency)} {currency}
+                {fmt(result.total, currency)} <bdi>{label(currency)}</bdi>
               </span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-currena-muted">👤 {t('expenseSplitter.eachPersonPays')}</span>
               <span className="text-lg font-bold text-currena-blue dark:text-currena-cyan">
-                {fmt(result.shares[0] ?? 0, currency)} {currency}
+                {fmt(result.shares[0] ?? 0, currency)}{' '}
+                <span className="text-[0.7em] font-bold opacity-80">
+                  <bdi>{label(currency)}</bdi>
+                </span>
               </span>
             </div>
             {/* Second currency view (converted locally, rate labeled) */}
@@ -249,13 +254,13 @@ export function Splitter() {
               <div className="ps-6 text-sm">
                 <span dir="ltr">= </span>
                 <strong>
-                  {fmt(result.perPersonSecond, second)} {second}
+                  {fmt(result.perPersonSecond, second)} <bdi>{label(second)}</bdi>
                 </strong>
                 {result.rate !== null ? (
                   <p className="mt-1 text-xs text-currena-muted">
                     {t('expenseSplitter.rateLabel', {
-                      from: currency,
-                      to: second,
+                      from: label(currency),
+                      to: label(second),
                       rate: formatNumber(result.rate, numberLocale, {
                         maximumFractionDigits: second === 'IRR' ? 0 : 4,
                       }),
@@ -288,7 +293,7 @@ export function Splitter() {
                   {t('expenseSplitter.personLabel', { n: formatNumber(i + 1, numberLocale, { maximumFractionDigits: 0 }) })}
                 </span>
                 <span className="ms-auto font-bold text-currena-dark dark:text-white">
-                  {fmt(share, currency)} {currency}
+                  {fmt(share, currency)} <bdi>{label(currency)}</bdi>
                 </span>
               </div>
             ))}

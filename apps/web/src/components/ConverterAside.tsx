@@ -5,10 +5,13 @@
  * (max 500px, touch-first). From lg up the route becomes a two-column
  * dashboard: the form on the start side, this rail on the end side with
  *
- *   1. "Iranian Toman — at a glance": a compact 5-major mini board (USD EUR
- *      GBP AED TRY → IRR) computed LOCALLY from the already-booted tgju
- *      snapshot (no extra network — mission §8), with ▲/▼ delta chips vs the
- *      previous snapshot generation, plus a link to the full live-rates board.
+ *   1. "Iranian Toman — at a glance": a compact mini board of the five
+ *      owner-priority majors (USD AUD EUR TRY AED → IRR, owner request
+ *      2026-09-17) computed LOCALLY from the already-booted tgju snapshot
+ *      (no extra network — mission §8), with ▲/▼ delta chips vs the
+ *      previous snapshot generation, plus a link to the full live-rates
+ *      board. Theme-aware: warm paper card in light mode (was dark-only),
+ *      legacy navy in dark mode.
  *   2. "Quick tools": a 2×3 grid of one-tap shortcuts into the calculator,
  *      batch converter, receipt generator, splitter, settle and history.
  *
@@ -21,14 +24,15 @@ import { convert, formatNumber } from '@currena/core';
 import type { CurrencyCode } from '@currena/core';
 import { RateDeltaChip } from './RateDeltaChip';
 import { Skeleton } from './ui';
+import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
 import { useSnapshotStore } from '../lib/snapshot-store';
 import { navigate } from '../router';
 import type { RoutePath } from '../router';
 import type { TranslationKey } from '../lib/locale';
 
-/** The five majors shown in the mini board (subset of the 8-card legacy board). */
-const GLANCE: readonly CurrencyCode[] = ['USD', 'EUR', 'GBP', 'AED', 'TRY'];
+/** The five owner-priority majors (request 2026-09-17), in order. */
+const GLANCE: readonly CurrencyCode[] = ['USD', 'AUD', 'EUR', 'TRY', 'AED'];
 
 const TOOLS: readonly { path: RoutePath; emoji: string; labelKey: TranslationKey }[] = [
   { path: '/calculator', emoji: '🧮', labelKey: 'nav.calculator' },
@@ -41,6 +45,7 @@ const TOOLS: readonly { path: RoutePath; emoji: string; labelKey: TranslationKey
 
 export function ConverterAside({ className = '' }: { className?: string }) {
   const { t, numberLocale } = useI18n();
+  const label = useCodeLabel();
   const store = useSnapshotStore();
   const state = store.tgju;
   const snapshot = state.snapshot;
@@ -71,9 +76,9 @@ export function ConverterAside({ className = '' }: { className?: string }) {
   return (
     <aside className={className} aria-label={t('converter.quickTools')}>
       {/* ---------- Mini board ---------- */}
-      <section className="rounded-[25px] bg-gradient-to-br from-[#1a1a2e] to-[#0f0f1e] p-6 text-[#eee] shadow-[0_8px_30px_rgba(0,0,0,0.25)]">
+      <section className="board-page rounded-[25px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.25)]">
         <header className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="text-base font-bold text-gold-vibrant">{t('converter.boardAtAGlance')}</h2>
+          <h2 className="text-base font-bold text-board-gold">{t('converter.boardAtAGlance')}</h2>
           <span className="live-dot !h-2 !w-2 shrink-0" aria-hidden="true" />
         </header>
 
@@ -82,18 +87,18 @@ export function ConverterAside({ className = '' }: { className?: string }) {
             {rows.map(({ code, rate, prevRate }) => (
               <li
                 key={code}
-                className="flex items-center gap-3 rounded-xl bg-white/[0.05] px-3 py-2.5 transition-colors duration-300 hover:bg-white/[0.09]"
+                className="flex items-center gap-3 rounded-xl bg-board-subtle px-3 py-2.5 transition-colors duration-300 hover:bg-black/[0.05] dark:hover:bg-white/[0.09]"
               >
                 <img
                   src={`/images/flags/${code.toLowerCase()}.png`}
                   alt={code}
                   className="h-5 w-7 shrink-0 rounded-[3px] object-cover"
                 />
-                <span className="shrink-0 text-sm font-bold text-gold-vibrant" dir="ltr">
+                <span className="shrink-0 text-sm font-bold text-board-gold" dir="ltr">
                   {code}
                 </span>
                 <span className="min-w-0 flex-1 text-xs opacity-60" dir="ltr">
-                  → IRR
+                  → {label('IRR')}
                 </span>
                 <span className="text-sm font-bold" dir="ltr">
                   {rate !== null
@@ -117,7 +122,7 @@ export function ConverterAside({ className = '' }: { className?: string }) {
         <button
           type="button"
           onClick={() => navigate('/live-rates')}
-          className="w-full cursor-pointer rounded-full border border-gold-primary/40 bg-gold-primary/10 px-4 py-2.5 text-xs font-bold text-gold-vibrant transition-all duration-300 hover:-translate-y-0.5 hover:bg-gold-primary/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-vibrant"
+          className="w-full cursor-pointer rounded-full border border-gold-primary/40 bg-gold-primary/10 px-4 py-2.5 text-xs font-bold text-board-gold transition-all duration-300 hover:-translate-y-0.5 hover:bg-gold-primary/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-board-gold"
         >
           📊 {t('common.viewFullBoard')}
         </button>

@@ -33,6 +33,7 @@ import { ResultPopup } from '../components/ResultPopup';
 import type { ConversionView } from '../components/ResultPopup';
 import { Button, Card, LoaderDots, OfflineBanner, StaleBanner } from '../components/ui';
 import { fetchMeta } from '../lib/api';
+import { useCodeLabel } from '../lib/display';
 import { saveHistoryEntry } from '../lib/history';
 import { useI18n } from '../lib/locale';
 import { addRecentPair, readRecentPairs } from '../lib/recent-pairs';
@@ -63,6 +64,7 @@ const QUICK_AMOUNTS_IRR: readonly number[] = [100_000, 500_000, 1_000_000, 5_000
 
 export function Converter() {
   const { t, numberLocale } = useI18n();
+  const label = useCodeLabel();
   const store = useSnapshotStore();
 
   const [phase, setPhase] = useState<Phase>('idle');
@@ -345,14 +347,14 @@ export function Converter() {
                     alt=""
                     className="h-3.5 w-5 rounded-[3px] object-cover"
                   />
-                  <span dir="ltr">{pair.from}</span>
+                  <span dir="ltr">{label(pair.from)}</span>
                   <span aria-hidden="true" className="opacity-40">→</span>
                   <img
                     src={`/images/flags/${pair.to.toLowerCase()}.png`}
                     alt=""
                     className="h-3.5 w-5 rounded-[3px] object-cover"
                   />
-                  <span dir="ltr">{pair.to}</span>
+                  <span dir="ltr">{label(pair.to)}</span>
                 </button>
               );
             })}

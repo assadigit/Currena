@@ -28,6 +28,7 @@ import {
 import type { CurrencyCode, SnapshotSource, Source } from '@currena/core';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { Button, Card, LoaderDots, Toast } from '../components/ui';
+import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
 import { snapshotStore } from '../lib/snapshot-store';
 
@@ -86,6 +87,7 @@ function downloadBlob(blob: Blob, filename: string): void {
 
 export function BatchConverter() {
   const { t, numberLocale } = useI18n();
+  const label = useCodeLabel();
 
   const [from, setFrom] = useState<CurrencyCode>('TRY'); // legacy defaults
   const [to, setTo] = useState<CurrencyCode>('IRR');
@@ -218,22 +220,22 @@ export function BatchConverter() {
 
   const shareText = useMemo(() => {
     if (!results) return '';
-    const lines: string[] = ['🛒 Batch Currency Conversion', `${results.from} → ${results.to}`];
+    const lines: string[] = ['🛒 Batch Currency Conversion', `${label(results.from)} → ${label(results.to)}`];
     if (results.rate !== null) {
-      lines.push(`Rate: 1 ${results.from} = ${fmtRate(results.rate, results.to)} ${results.to}`);
+      lines.push(`Rate: 1 ${label(results.from)} = ${fmtRate(results.rate, results.to)} ${label(results.to)}`);
     }
     lines.push('', ...(results.rows
       .filter((r): r is BatchRowOk => r.ok)
       .map(
         (r, i) =>
-          `${i + 1}. ${fmtOriginal(r.amount)} ${r.from} = ${fmtConverted(r.result, r.to)} ${r.to}` +
+          `${i + 1}. ${fmtOriginal(r.amount)} ${label(r.from)} = ${fmtConverted(r.result, r.to)} ${label(r.to)}` +
           (r.note ? `\n   📝 ${r.note}` : ''),
       )));
     lines.push(
       '',
       '━━━━━━━━━━━━━━━━━━━━',
-      `Total: ${fmtOriginal(results.totalOriginal)} ${results.from}`,
-      `Converted: ${fmtConverted(results.totalConverted, results.to)} ${results.to}`,
+      `Total: ${fmtOriginal(results.totalOriginal)} ${label(results.from)}`,
+      `Converted: ${fmtConverted(results.totalConverted, results.to)} ${label(results.to)}`,
       '',
       '✨ Converted with Currena',
     );
@@ -449,18 +451,19 @@ export function BatchConverter() {
             <div className="mb-1.5 flex items-center justify-between text-sm">
               <span className="text-currena-muted">{t('batchConverter.totalCost')}</span>
               <span className="font-bold text-currena-dark dark:text-white">
-                {fmtOriginal(results.totalOriginal)} {results.from}
+                {fmtOriginal(results.totalOriginal)} <bdi>{label(results.from)}</bdi>
               </span>
             </div>
             <div className="mb-1.5 flex items-center justify-between text-sm">
               <span className="text-currena-muted">{t('batchConverter.convertedTotal')}</span>
               <span className="font-bold text-currena-blue dark:text-currena-cyan">
-                {fmtConverted(results.totalConverted, results.to)} {results.to}
+                {fmtConverted(results.totalConverted, results.to)} <bdi>{label(results.to)}</bdi>
               </span>
             </div>
             {results.rate !== null ? (
               <p className="text-xs text-currena-muted">
-                {t('common.exchangeRate')}: 1 {results.from} = {fmtRate(results.rate, results.to)} {results.to}
+                {t('common.exchangeRate')}: 1 <bdi>{label(results.from)}</bdi> = {fmtRate(results.rate, results.to)}{' '}
+                <bdi>{label(results.to)}</bdi>
               </p>
             ) : null}
           </div>
@@ -475,13 +478,13 @@ export function BatchConverter() {
                 <div key={i} className="rounded-[12px] bg-currena-soft/60 px-3.5 py-2.5 dark:bg-white/5">
                   <div className="flex items-center justify-between gap-2 text-sm">
                     <span className="text-currena-dark dark:text-white/85">
-                      {fmtOriginal(row.amount)} {row.from}
+                      {fmtOriginal(row.amount)} <bdi>{label(row.from)}</bdi>
                     </span>
                     <span className="text-currena-muted" aria-hidden="true">
                       →
                     </span>
                     <span className="font-bold text-currena-blue dark:text-currena-cyan">
-                      {fmtConverted(row.result, row.to)} {row.to}
+                      {fmtConverted(row.result, row.to)} <bdi>{label(row.to)}</bdi>
                     </span>
                   </div>
                   {row.note ? (

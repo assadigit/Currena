@@ -20,6 +20,7 @@ import { CalcError, evaluateExpression, formatNumber, parseAmount } from '@curre
 import type { CurrencyCode, SnapshotSource } from '@currena/core';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { Card } from '../components/ui';
+import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
 import { snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
 
@@ -84,6 +85,7 @@ function leadingNumber(expr: string): number | null {
 
 export function Calculator() {
   const { t, numberLocale } = useI18n();
+  const label = useCodeLabel();
   const store = useSnapshotStore();
 
   const [expr, setExpr] = useState('0');
@@ -225,15 +227,28 @@ export function Calculator() {
               {/* Live evaluated value (only when the expression isn't already a plain number) */}
               {liveValue !== null && !errorFlash && expr !== String(liveValue) ? (
                 <div className="mt-1 text-sm font-semibold text-currena-muted">
-                  = {formatNumber(liveValue, numberLocale, { maximumFractionDigits: 8 })} {from}
+                  = {formatNumber(liveValue, numberLocale, { maximumFractionDigits: 8 })}{' '}
+                  <bdi>{label(from)}</bdi>
                 </div>
               ) : null}
               <div className="mt-2 text-lg font-semibold text-currena-blue dark:text-currena-cyan">
-                {converted !== null
-                  ? `= ${converted} ${to}`
-                  : state.status === 'error'
-                    ? t('calculator.rateUnavailable')
-                    : `= 0 ${to}`}
+                {converted !== null ? (
+                  <>
+                    = {converted}{' '}
+                    <span className="text-[0.75em] font-bold opacity-80">
+                      <bdi>{label(to)}</bdi>
+                    </span>
+                  </>
+                ) : state.status === 'error' ? (
+                  t('calculator.rateUnavailable')
+                ) : (
+                  <>
+                    = 0{' '}
+                    <span className="text-[0.75em] font-bold opacity-80">
+                      <bdi>{label(to)}</bdi>
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -23,6 +23,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { computeBalances, formatNumber, parseAmount, settleDebts } from '@currena/core';
 import type { CurrencyCode, Transfer } from '@currena/core';
 import { Button, Card, Toast } from '../components/ui';
+import { useCodeLabel } from '../lib/display';
 import { deletePhotos, getPhoto, putPhoto } from '../lib/photo-store';
 import { useI18n } from '../lib/locale';
 import type { TranslationKey } from '../lib/locale';
@@ -185,6 +186,7 @@ const inputClass =
 
 export function Settle() {
   const { t, numberLocale } = useI18n();
+  const label = useCodeLabel();
 
   const [groups, setGroups] = useState<SettleGroup[]>([]);
   const [openGroupId, setOpenGroupId] = useState<string | null>(null);
@@ -589,7 +591,7 @@ export function Settle() {
                           {expense.description}
                         </p>
                         <p className="shrink-0 text-sm font-bold text-currena-blue dark:text-currena-cyan">
-                          {fmt2(expense.amount)} {expense.currency}
+                          {fmt2(expense.amount)} <bdi>{label(expense.currency)}</bdi>
                         </p>
                       </div>
                       <p className="mt-1 text-xs text-currena-muted">
@@ -810,7 +812,7 @@ export function Settle() {
             >
               {EXPENSE_CURRENCIES.map((code) => (
                 <option key={code} value={code}>
-                  {code}
+                  {label(code)}
                 </option>
               ))}
             </select>

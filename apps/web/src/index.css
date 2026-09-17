@@ -27,11 +27,15 @@
   --color-currena-bg-dark: #1a1d2e;
   --color-currena-card-dark: #252941;
 
-  /* Live-rates board (legacy live-rates.html gold/dark identity) */
+  /* Live-rates board (legacy live-rates.html gold/dark identity — dark mode).
+   * Light mode flips these via the runtime vars below: white cards on warm
+   * paper, deepened amber-700 gold ink for contrast on white. */
   --color-gold-primary: #D4AF37;
   --color-gold-vibrant: #FFD700;
   --color-board-dark: #1a1a2e;
-  --color-board-card: #16213e;
+  --color-board-card: var(--currena-board-card);
+  --color-board-gold: var(--currena-board-gold);
+  --color-board-subtle: var(--currena-board-subtle);
 
   /* Typography: Poppins for LTR/en (legacy font), Vazirmatn for fa/RTL. */
   --font-sans: "Poppins", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
@@ -40,6 +44,33 @@
 /* fa locale: Vazirmatn leads (Poppins has no Arabic-script glyphs). */
 html[lang="fa"] {
   --font-sans: "Vazirmatn", "Poppins", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ------------------------------------------------------------------ *
+ * Board runtime palette — flips with .dark on <html> (theme.ts).
+ * The @theme tokens above point at these, so `bg-board-card`,
+ * `text-board-gold` and `bg-board-subtle` utilities are theme-aware.
+ * ------------------------------------------------------------------ */
+:root {
+  --currena-board-card: #ffffff;
+  --currena-board-gold: #b45309; /* amber-700 — FFD700 is illegible on white */
+  --currena-board-subtle: rgba(28, 32, 46, 0.05);
+}
+.dark {
+  --currena-board-card: #16213e;
+  --currena-board-gold: #ffd700;
+  --currena-board-subtle: rgba(255, 255, 255, 0.05);
+}
+
+/* Board page surface — warm paper gradient in light mode, the legacy
+ * navy gradient in dark mode. Sets the board's base text color too. */
+.board-page {
+  background: linear-gradient(135deg, #fdfbf4 0%, #f4efdf 100%);
+  color: #2a3346;
+}
+.dark .board-page {
+  background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+  color: #eee;
 }
 
 /* ------------------------------------------------------------------ *
@@ -231,7 +262,8 @@ body {
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.45);
   }
   100% {
-    background-color: rgba(30, 33, 51, 1);
+    /* Return to the card's own resting surface (theme-aware). */
+    background-color: var(--currena-board-card);
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0);
   }
 }
@@ -241,7 +273,7 @@ body {
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.45);
   }
   100% {
-    background-color: rgba(30, 33, 51, 1);
+    background-color: var(--currena-board-card);
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0);
   }
 }

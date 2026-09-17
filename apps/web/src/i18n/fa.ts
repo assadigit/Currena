@@ -119,6 +119,8 @@ export const fa: Dictionary = {
   },
 
   currencies: {
+    /** قانون مالک: هر «IRR» کاربر-نما باید «IRR (تومان)» نمایش داده شود. */
+    irrLabel: 'IRR (تومان)',
     USD: 'دلار آمریکا',
     IRR: 'تومان ایرانی',
     AUD: 'دلار استرالیا',

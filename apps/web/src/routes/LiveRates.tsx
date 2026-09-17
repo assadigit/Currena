@@ -1,17 +1,23 @@
 /**
  * Live rates route (`#/live-rates`) — the 8 legacy TGJU cards
- * (FEATURE_MAP §2 #3): USD EUR AUD GBP CAD TRY AED CNY → IRR (Toman).
+ * (FEATURE_MAP §2 #3) → IRR (Toman).
+ *
+ * Board order (owner request 2026-09-17): the five owner-priority majors
+ * first — USD AUD EUR TRY AED — then the remaining legacy cards
+ * (GBP CAD CNY).
  *
  * The legacy page fired 8 POST /api/convert calls every 30s; the rebuild
  * reads ONE snapshot (checklist #4) and computes all 8 values locally via
  * @currena/core. Auto-refresh every 30s calls snapshotStore.refresh, which
  * re-fetches only when the freshness window has lapsed — the network stays
- * "once per window". Visual identity is the legacy gold-on-dark board.
+ * "once per window". Visual identity is the legacy gold-on-dark board in
+ * dark mode and a warm paper/white professional board in light mode
+ * (owner request 2026-09-17: the board used to be dark-only).
  *
  * Rate intelligence: each card carries a ▲/▼ delta chip vs the previous
  * snapshot generation (snapshot-store `previous` baseline) and flashes
  * green/red for ~1.6s when its rate changes between updates. A per-card
- * copy button puts "1 USD = 230,500 IRR" on the clipboard.
+ * copy button puts "1 USD = 230,500 IRR (Toman)" on the clipboard.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -21,13 +27,14 @@ import { RateDeltaChip } from '../components/RateDeltaChip';
 import { Skeleton } from '../components/ui';
 import { Sparkline } from '../components/Sparkline';
 import { fetchMeta } from '../lib/api';
+import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
 import { seriesForPair, trendOf, useRateHistory } from '../lib/rate-history';
 import { snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
 import type { TranslationKey } from '../lib/locale';
 
-/** The 8 legacy board currencies, in legacy order. */
-const BOARD: readonly CurrencyCode[] = ['USD', 'EUR', 'AUD', 'GBP', 'CAD', 'TRY', 'AED', 'CNY'];
+/** Board currencies — owner-priority five first, then the legacy rest. */
+const BOARD: readonly CurrencyCode[] = ['USD', 'AUD', 'EUR', 'TRY', 'AED', 'GBP', 'CAD', 'CNY'];
 
 const REFRESH_INTERVAL_MS = 30_000;
 const FLASH_MS = 1600;
@@ -40,6 +47,7 @@ interface BoardCard {
 
 export function LiveRates() {
   const { t, numberLocale } = useI18n();
+  const label = useCodeLabel();
   const store = useSnapshotStore();
   const [tgjuUrls, setTgjuUrls] = useState<Record<string, string>>({});
   const [copiedCode, setCopiedCode] = useState<CurrencyCode | null>(null);
@@ -143,7 +151,7 @@ export function LiveRates() {
   }, [cards]);
 
   const copyRate = async (code: CurrencyCode, rate: number): Promise<void> => {
-    const text = `1 ${code} = ${formatNumber(rate, numberLocale, { maximumFractionDigits: 0 })} IRR`;
+    const text = `1 ${code} = ${formatNumber(rate, numberLocale, { maximumFractionDigits: 0 })} ${label('IRR')}`;
     try {
       await navigator.clipboard.writeText(text);
       setCopiedCode(code);
@@ -154,13 +162,13 @@ export function LiveRates() {
   };
 
   return (
-    // Legacy board identity: gold on dark, always (the legacy page had no
-    // theme toggle and rendered its own dark design).
-    <div className="bg-gradient-to-br from-[#1a1a2e] to-[#0f0f1e] pb-24 text-[#eee]">
+    // Theme-aware board (owner request 2026-09-17): warm paper + white
+    // cards in light mode; the legacy gold-on-navy identity in dark mode.
+    <div className="board-page pb-24">
       <div className="mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-6xl xl:max-w-[1280px] lg:px-8">
         {/* Header */}
         <div className="mb-6 text-center">
-          <h2 className="mb-2.5 text-2xl font-bold text-gold-vibrant lg:text-3xl">{t('liveRates.iranianTomanRates')}</h2>
+          <h2 className="mb-2.5 text-2xl font-bold text-board-gold lg:text-3xl">{t('liveRates.iranianTomanRates')}</h2>
           <div className="inline-flex items-center gap-2 rounded-full bg-currena-success/20 px-4 py-2 text-sm font-semibold text-currena-success">
             <span className="live-dot !h-2.5 !w-2.5" aria-hidden="true" />
             {t('liveRates.liveUpdates')}
@@ -199,7 +207,7 @@ export function LiveRates() {
 
         {/* Error state (legacy .error-message) */}
         {state.status === 'error' && !snapshot ? (
-          <div className="mb-4 rounded-xl bg-red-500/20 px-4 py-4 text-sm text-[#ff5252]">
+          <div className="mb-4 rounded-xl bg-red-500/15 px-4 py-4 text-sm font-semibold text-red-600 dark:bg-red-500/20 dark:text-[#ff5252]">
             {t('liveRates.couldNotFetch')}
           </div>
         ) : null}
@@ -210,9 +218,9 @@ export function LiveRates() {
             ? BOARD.map((code) => {
                 const card = cards.find((c) => c.code === code);
                 const rate = card?.rate ?? null;
-                const rateText =
+                const rateNum =
                   card?.ok && rate !== null
-                    ? `${formatNumber(rate, numberLocale, { maximumFractionDigits: 0 })} IRR`
+                    ? formatNumber(rate, numberLocale, { maximumFractionDigits: 0 })
                     : loading
                       ? '--'
                       : t('common.error');
@@ -225,7 +233,7 @@ export function LiveRates() {
                 return (
                   <article
                     key={code}
-                    className={`h-full rounded-[18px] bg-board-card p-5 shadow-[10px_10px_20px_rgba(0,0,0,0.7),-10px_-10px_20px_rgba(255,255,255,0.05)] transition-all duration-300 hover:-translate-y-1 ${
+                    className={`h-full rounded-[18px] bg-board-card p-5 ring-1 ring-black/[0.06] shadow-[0_10px_28px_rgba(120,110,60,0.14)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(120,110,60,0.22)] dark:ring-white/[0.06] dark:shadow-[10px_10px_20px_rgba(0,0,0,0.7),-10px_-10px_20px_rgba(255,255,255,0.05)] ${
                       flashDir === 'up' ? 'rate-flash-up' : flashDir === 'down' ? 'rate-flash-down' : ''
                     }`}
                   >
@@ -236,19 +244,26 @@ export function LiveRates() {
                         className="h-[35px] w-[50px] rounded-md object-cover"
                       />
                       <div className="min-w-0 flex-1">
-                        <h3 className="truncate text-[1.05rem] font-semibold text-gold-vibrant">
+                        <h3 className="truncate text-[1.05rem] font-semibold text-board-gold">
                           {t(`currencies.${code}` as TranslationKey)}
                         </h3>
-                        <p className="text-xs opacity-70">{code} → IRR</p>
+                        <p className="text-xs opacity-70">
+                          {code} → <bdi>{label('IRR')}</bdi>
+                        </p>
                       </div>
                       {copied ? (
-                        <span className="shrink-0 text-[0.7rem] font-bold text-currena-success">✅</span>
+                        <span className="shrink-0 text-[0.7rem] font-bold text-emerald-700 dark:text-currena-success">✅</span>
                       ) : null}
                     </header>
-                    <div className="mb-3 flex items-center justify-between gap-2 rounded-xl bg-gold-primary/10 p-4">
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 rounded-xl bg-gold-primary/10 p-4">
                       <span className="shrink-0 text-sm opacity-80">1 {code} =</span>
-                      <span className={`text-lg font-bold text-gold-vibrant ${card?.ok ? '' : 'rate-loading'}`}>
-                        {rateText}
+                      <span className={`text-lg font-bold text-board-gold ${card?.ok ? '' : 'rate-loading'}`}>
+                        {rateNum}
+                        {card?.ok && rate !== null ? (
+                          <span className="ms-1.5 text-[0.72rem] font-bold opacity-75" dir="ltr">
+                            {label('IRR')}
+                          </span>
+                        ) : null}
                       </span>
                     </div>
                     {/* ▲/▼ vs the previous snapshot generation */}
@@ -259,7 +274,7 @@ export function LiveRates() {
                     ) : null}
                     {/* Micro-trend over the recorded snapshot generations. */}
                     {series && series.length >= 2 && trend ? (
-                      <div className="mb-3 flex items-center gap-3 rounded-xl bg-white/[0.04] px-3 py-2">
+                      <div className="mb-3 flex items-center gap-3 rounded-xl bg-board-subtle px-3 py-2">
                         <div className="min-w-0 flex-1">
                           <p className="text-[0.65rem] font-semibold uppercase tracking-wider opacity-60">
                             📈 {t('trend.recentChecks', { n: series.length })}
@@ -267,9 +282,9 @@ export function LiveRates() {
                           <p
                             className={`text-xs font-bold ${
                               trend.dir === 'up'
-                                ? 'text-currena-success'
+                                ? 'text-emerald-700 dark:text-currena-success'
                                 : trend.dir === 'down'
-                                  ? 'text-[#ff5252]'
+                                  ? 'text-red-600 dark:text-[#ff5252]'
                                   : 'opacity-60'
                             }`}
                           >
@@ -290,7 +305,7 @@ export function LiveRates() {
                           width={92}
                           height={34}
                           ariaLabel={t('trend.summary', {
-                            pair: `${code} → IRR`,
+                            pair: `${code} → ${label('IRR')}`,
                             dir: t(`trend.${trend.dir}` as TranslationKey),
                             pct: `${trend.pct >= 0 ? '+' : ''}${formatNumber(trend.pct, numberLocale, { maximumFractionDigits: 2 })}%`,
                           })}
@@ -303,7 +318,7 @@ export function LiveRates() {
                           href={profileUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-xs text-[#42a5f5] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500/20"
+                          className="inline-flex items-center gap-1.5 rounded-full border border-currena-blue/30 bg-currena-blue/10 px-4 py-2 text-xs text-currena-blue transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-blue/20 dark:border-blue-400/30 dark:bg-blue-500/10 dark:text-[#42a5f5] dark:hover:bg-blue-500/20"
                         >
                           🔗 {t('common.viewOnTgju')}
                         </a>
@@ -316,10 +331,10 @@ export function LiveRates() {
                           onClick={() => void copyRate(code, rate)}
                           title={t('liveRates.copyRate')}
                           aria-label={t('liveRates.copyRate')}
-                          className={`inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-vibrant ${
+                          className={`inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-board-gold ${
                             copied
-                              ? 'border-currena-success/40 bg-currena-success/15 text-currena-success'
-                              : 'border-white/15 bg-white/5 text-white/75 hover:border-white/30 hover:bg-white/10'
+                              ? 'border-currena-success/40 bg-currena-success/15 text-emerald-700 dark:text-currena-success'
+                              : 'border-black/10 bg-black/[0.03] text-currena-dark/75 hover:border-black/25 hover:bg-black/[0.06] dark:border-white/15 dark:bg-white/5 dark:text-white/75 dark:hover:border-white/30 dark:hover:bg-white/10'
                           }`}
                         >
                           {copied ? t('liveRates.rateCopied') : `📋 ${t('liveRates.copyRate')}`}

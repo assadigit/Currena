@@ -31,7 +31,7 @@ export function RateDeltaChip({ delta, decimals = 0, size = 'md' }: RateDeltaChi
   if (diff === 0) {
     return (
       <span
-        className={`inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 font-semibold text-white/50 ${
+        className={`inline-flex items-center gap-1 rounded-full bg-black/[0.06] px-2 py-0.5 font-semibold text-currena-muted dark:bg-white/10 dark:text-white/50 ${
           size === 'sm' ? 'text-[0.65rem]' : 'text-xs'
         }`}
         title={t('liveRates.noChangeSincePrevious')}
@@ -48,7 +48,9 @@ export function RateDeltaChip({ delta, decimals = 0, size = 'md' }: RateDeltaChi
     <span
       title={t('liveRates.changedSincePrevious')}
       className={`inline-flex items-center gap-1 rounded-full font-bold ${
-        up ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'
+        up
+          ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400'
+          : 'bg-red-500/15 text-red-600 dark:text-red-400'
       } ${size === 'sm' ? 'px-2 py-0.5 text-[0.65rem]' : 'px-2.5 py-1 text-xs'}`}
       dir="ltr"
     >

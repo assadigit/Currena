@@ -118,6 +118,8 @@ export const en = {
   },
 
   currencies: {
+    /** Owner rule (2026-09-17): every user-visible "IRR" reads "IRR (Toman)". */
+    irrLabel: 'IRR (Toman)',
     USD: 'US Dollar',
     IRR: 'Iranian Toman',
     AUD: 'Australian Dollar',
