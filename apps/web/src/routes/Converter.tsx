@@ -318,9 +318,142 @@ export function Converter() {
       <div className="lg:grid lg:grid-cols-[minmax(0,540px)_minmax(0,1fr)] lg:items-start lg:gap-8">
         <div>
 
-      {/* Recent pairs — one-tap recall (hidden until the first conversion) */}
+      {/* ── Converter card — AMOUNT-FIRST (owner request 2026-09-17: the
+          number field must sit inside the first viewport, no scrolling,
+          and carry hero-level visual weight). Order: amount panel (with the
+          quick-amount chips inside it) → compact FROM ⇄ TO row with inline
+          flags → custom rate → CTA. The legacy 65px flags section and the
+          separate quick-amounts block are folded away to reclaim ~200px
+          of vertical space above the fold. ── */}
+      <Card padding="p-5 lg:p-7">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void onSubmit();
+          }}
+        >
+          {/* 1 — Amount hero panel (quick chips live inside the panel so they
+              read as one control: tap a chip, the big field fills) */}
+          <AmountInput
+            id="amount"
+            value={amount}
+            onChange={(v) => {
+              setAmount(v);
+              setAmountInvalid(false);
+            }}
+            currency={from}
+            invalid={amountInvalid}
+            footer={
+              <div className="flex flex-wrap gap-1.5">
+                {quickAmounts.map((value) => {
+                  const active = parsedAmount === value;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => {
+                        setAmount(thousandSeparateInput(String(value)));
+                        setAmountInvalid(false);
+                      }}
+                      aria-pressed={active}
+                      className={`min-h-[34px] cursor-pointer rounded-full border px-3 py-1 text-[0.8rem] font-bold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
+                        active
+                          ? 'border-transparent cta-gradient text-white shadow-[0_6px_18px_rgba(102,126,234,0.4)]'
+                          : 'border-black/10 bg-white text-currena-dark hover:border-currena-blue/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:border-white/10 dark:bg-[#222C3B]'
+                      }`}
+                    >
+                      {formatNumber(value, numberLocale, { maximumFractionDigits: 0 })}
+                    </button>
+                  );
+                })}
+              </div>
+            }
+          />
+
+          {/* 2 — Currency pair: compact row, flags inline inside the selects */}
+          <div className="mb-1.5 mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-center">
+            <span className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-currena-muted">{t('common.from')}</span>
+            <span aria-hidden="true" className="w-11" />
+            <span className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-currena-muted">{t('common.to')}</span>
+          </div>
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+            <div className="relative">
+              <img
+                src={`/images/flags/${from.toLowerCase()}.png`}
+                alt=""
+                aria-hidden="true"
+                className="pointer-events-none absolute start-3 top-1/2 z-10 h-3.5 w-[22px] -translate-y-1/2 rounded-[3px] object-cover shadow-[0_1px_3px_rgba(0,0,0,0.3)] ring-1 ring-white/60"
+              />
+              <CurrencySelect id="fromCurrency" value={from} onChange={setFrom} ariaLabel={t('common.from')} className="ps-10 text-[0.82rem]" />
+            </div>
+            <button
+              type="button"
+              onClick={swap}
+              title={t('converter.swapCurrencies')}
+              aria-label={t('converter.swapCurrencies')}
+              className="h-11 w-11 cursor-pointer rounded-full border-0 bg-currena-blue text-xl font-bold text-white shadow-[0_4px_15px_rgba(74,144,226,0.3)] transition-all duration-300 hover:rotate-180 hover:scale-110 hover:shadow-[0_6px_20px_rgba(74,144,226,0.4)]"
+            >
+              ⇄
+            </button>
+            <div className="relative">
+              <img
+                src={`/images/flags/${to.toLowerCase()}.png`}
+                alt=""
+                aria-hidden="true"
+                className="pointer-events-none absolute start-3 top-1/2 z-10 h-3.5 w-[22px] -translate-y-1/2 rounded-[3px] object-cover shadow-[0_1px_3px_rgba(0,0,0,0.3)] ring-1 ring-white/60"
+              />
+              <CurrencySelect id="toCurrency" value={to} onChange={setTo} ariaLabel={t('common.to')} className="ps-10 text-[0.82rem]" />
+            </div>
+          </div>
+          {/* Full names caption — restores the clarity of the old flags
+              section in one 16px line (the select boxes truncate long names) */}
+          <p className="mt-2.5 text-center text-xs font-medium text-currena-muted">
+            <bdi>{fromName}</bdi>{' '}
+            <span aria-hidden="true" className="inline-block opacity-50 rtl:-scale-x-100">→</span>{' '}
+            <bdi>{toName}</bdi>
+          </p>
+
+          {/* 3 — Custom rate (legacy collapsible) */}
+          <div className="mb-4 mt-4">
+            <button
+              type="button"
+              onClick={() => setManualOpen((open) => !open)}
+              aria-expanded={manualOpen}
+              className="flex w-full cursor-pointer items-center gap-2 rounded-xl border-0 bg-transparent px-3 py-2.5 text-sm font-medium text-currena-muted transition-all duration-300 hover:bg-currena-blue/5"
+            >
+              <span
+                className={`text-xs text-currena-blue transition-transform duration-300 ${manualOpen ? 'rotate-90' : ''}`}
+                aria-hidden="true"
+              >
+                ▶
+              </span>
+              {t('converter.customRate')}
+            </button>
+            {manualOpen ? (
+              <input
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                value={manualRate}
+                onChange={(e) => setManualRate(e.target.value)}
+                placeholder={t('converter.enterCustomRate')}
+                aria-label={t('converter.enterCustomRate')}
+                className="mt-2.5 w-full rounded-[15px] border-2 border-gray-200 bg-white px-3.5 py-3 text-sm text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:bg-[#222C3B]"
+              />
+            ) : null}
+          </div>
+
+          <Button variant="cta" type="submit" className="w-full py-4 text-[1.15rem] sm:py-5 sm:text-[1.25rem]">
+            {t('converter.convertNow')}
+          </Button>
+        </form>
+      </Card>
+
+      {/* Recent pairs — one-tap recall. Lives BELOW the converter now: the
+          amount field owns the first viewport (it used to push the input
+          below the fold on phones). Hidden until the first conversion. */}
       {recentPairs.length > 0 ? (
-        <div className="mb-5">
+        <div className="mt-5">
           <p className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-currena-muted">
             ⚡ {t('converter.recentPairs')}
           </p>
@@ -362,135 +495,9 @@ export function Converter() {
         </div>
       ) : null}
 
-      <Card>
-        {/* Flags row (legacy .flags-section) */}
-        <div className="mb-6 flex items-center justify-between gap-2">
-          <div className="flex-1 text-center">
-            <div className="mx-auto mb-2.5 h-[65px] w-full max-w-[100px] overflow-hidden rounded-[15px] bg-currena-soft shadow-[0_4px_15px_rgba(0,0,0,0.08)]">
-              <img src={`/images/flags/${from.toLowerCase()}.png`} alt={from} className="h-full w-full object-cover" />
-            </div>
-            <p className="text-sm font-semibold text-currena-dark">{fromName}</p>
-          </div>
-          <span className="text-3xl opacity-20" aria-hidden="true">
-            →
-          </span>
-          <div className="flex-1 text-center">
-            <div className="mx-auto mb-2.5 h-[65px] w-full max-w-[100px] overflow-hidden rounded-[15px] bg-currena-soft shadow-[0_4px_15px_rgba(0,0,0,0.08)]">
-              <img src={`/images/flags/${to.toLowerCase()}.png`} alt={to} className="h-full w-full object-cover" />
-            </div>
-            <p className="text-sm font-semibold text-currena-dark">{toName}</p>
-          </div>
-        </div>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void onSubmit();
-          }}
-        >
-          {/* From / swap / To (legacy .currency-selector grid) */}
-          <div className="mb-3 grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-center">
-            <span className="text-xs font-semibold uppercase tracking-wide text-currena-muted">{t('common.from')}</span>
-            <span />
-            <span className="text-xs font-semibold uppercase tracking-wide text-currena-muted">{t('common.to')}</span>
-          </div>
-          <div className="mb-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-            <CurrencySelect id="fromCurrency" value={from} onChange={setFrom} ariaLabel={t('common.from')} />
-            <button
-              type="button"
-              onClick={swap}
-              title={t('converter.swapCurrencies')}
-              aria-label={t('converter.swapCurrencies')}
-              className="h-[50px] w-[50px] cursor-pointer rounded-full border-0 bg-currena-blue text-2xl font-bold text-white shadow-[0_4px_15px_rgba(74,144,226,0.3)] transition-all duration-300 hover:rotate-180 hover:scale-110 hover:shadow-[0_6px_20px_rgba(74,144,226,0.4)]"
-            >
-              ⇄
-            </button>
-            <CurrencySelect id="toCurrency" value={to} onChange={setTo} ariaLabel={t('common.to')} />
-          </div>
-
-          {/* Amount panel */}
-          <div className="mb-4">
-            <AmountInput
-              id="amount"
-              value={amount}
-              onChange={(v) => {
-                setAmount(v);
-                setAmountInvalid(false);
-              }}
-              currency={from}
-              invalid={amountInvalid}
-            />
-          </div>
-
-          {/* Quick amounts — one-tap fill, IRR-appropriate magnitudes */}
-          <div className="mb-5">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-currena-muted">
-              ⚡ {t('converter.quickAmounts')}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {quickAmounts.map((value) => {
-                const active = parsedAmount === value;
-                return (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => {
-                      setAmount(thousandSeparateInput(String(value)));
-                      setAmountInvalid(false);
-                    }}
-                    aria-pressed={active}
-                    className={`min-h-[38px] cursor-pointer rounded-full border px-4 py-1.5 text-sm font-bold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
-                      active
-                        ? 'border-transparent cta-gradient text-white shadow-[0_6px_18px_rgba(102,126,234,0.4)]'
-                        : 'border-black/10 bg-currena-soft text-currena-dark hover:border-currena-blue/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:border-white/10'
-                    }`}
-                  >
-                    {formatNumber(value, numberLocale, { maximumFractionDigits: 0 })}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Custom rate (legacy collapsible) */}
-          <div className="mb-5">
-            <button
-              type="button"
-              onClick={() => setManualOpen((open) => !open)}
-              aria-expanded={manualOpen}
-              className="flex w-full cursor-pointer items-center gap-2 rounded-xl border-0 bg-transparent px-3 py-3 text-sm font-medium text-currena-muted transition-all duration-300 hover:bg-currena-blue/5"
-            >
-              <span
-                className={`text-xs text-currena-blue transition-transform duration-300 ${manualOpen ? 'rotate-90' : ''}`}
-                aria-hidden="true"
-              >
-                ▶
-              </span>
-              {t('converter.customRate')}
-            </button>
-            {manualOpen ? (
-              <input
-                type="text"
-                inputMode="decimal"
-                autoComplete="off"
-                value={manualRate}
-                onChange={(e) => setManualRate(e.target.value)}
-                placeholder={t('converter.enterCustomRate')}
-                aria-label={t('converter.enterCustomRate')}
-                className="mt-2.5 w-full rounded-[15px] border-2 border-gray-200 bg-white px-3.5 py-3.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:bg-[#222C3B]"
-              />
-            ) : null}
-          </div>
-
-          <Button variant="cta" type="submit" className="w-full py-5 text-[1.25rem]">
-            {t('converter.convertNow')}
-          </Button>
-        </form>
-      </Card>
-
       {/* Failure card (legacy alert copy, rendered inline) */}
       {failure && phase === 'idle' ? (
-        <Card className="mt-5 border-s-4 !border-currena-warning">
+        <Card className="mt-5 border-s-4 border-currena-warning!" padding="p-5">
           <h2 className="mb-2 text-sm font-bold text-currena-warning">⚠️ {failure.title}</h2>
           {failure.lines.map((line, i) =>
             line === '' ? (

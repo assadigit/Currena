@@ -40,10 +40,19 @@ export function Button({ variant = 'secondary', className = '', ...rest }: Butto
  * Card — legacy 25px radius + soft shadow
  * ------------------------------------------------------------------ */
 
-export function Card({ className = '', children }: { className?: string; children: ReactNode }) {
+export function Card({
+  className = '',
+  padding = 'p-7',
+  children,
+}: {
+  className?: string;
+  /** Padding override (merged AFTER the base classes win over nothing — dedicated prop avoids Tailwind p-* conflicts). */
+  padding?: string;
+  children: ReactNode;
+}) {
   return (
     <div
-      className={`rounded-[25px] bg-white p-7 shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 dark:bg-[#1A222E] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] ${className}`}
+      className={`rounded-[25px] bg-white shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 dark:bg-[#1A222E] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] ${padding} ${className}`}
     >
       {children}
     </div>

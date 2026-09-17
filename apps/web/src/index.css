@@ -248,21 +248,32 @@ body {
 }
 
 /* ------------------------------------------------------------------ *
- * Amount input panel — harmonized with the site's cards
- * (owner request 2026-09-17: removed the legacy cream/gold gradient so
- * the converter reads as one design with the rest of the app). The dark
- * variant keeps the same panel language on the night surface.
+ * Amount input panel — THE hero of the converter (owner request
+ * 2026-09-17: "give more visual weight to where users have to input
+ * their numbers"). A soft blue-tinted gradient rising from the panel's
+ * top edge + an accent border mark the input zone at a glance, in the
+ * same white/blue family as the rest of the harmonized design (the old
+ * cream/gold stays retired). The dark variant keeps the same panel
+ * language on the night surface.
  * ------------------------------------------------------------------ */
 
 .amount-panel {
-  background: #ffffff;
-  border: 2px solid #e8f4f8;
-  box-shadow: 0 8px 25px rgba(74, 144, 226, 0.1);
+  background:
+    linear-gradient(180deg, rgba(74, 144, 226, 0.10) 0%, rgba(74, 144, 226, 0.035) 42%, rgba(74, 144, 226, 0) 100%),
+    #ffffff;
+  border: 2px solid rgba(74, 144, 226, 0.30);
+  box-shadow:
+    0 10px 30px rgba(74, 144, 226, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 .dark .amount-panel {
-  background: #1A222E;
-  border-color: rgba(111, 174, 236, 0.16);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+  background:
+    linear-gradient(180deg, rgba(111, 174, 236, 0.14) 0%, rgba(111, 174, 236, 0.05) 42%, rgba(111, 174, 236, 0) 100%),
+    #1A222E;
+  border-color: rgba(111, 174, 236, 0.32);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 /* Scrollbar (thin, subtle) */

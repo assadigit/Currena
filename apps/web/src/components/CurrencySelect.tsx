@@ -24,9 +24,12 @@ export interface CurrencySelectProps {
    * to all 17.
    */
   codes?: readonly CurrencyCode[];
+  /** Extra classes appended to the <select> (e.g. start-padding room for the
+   * inline flag on the converter — avoids editing the base classes). */
+  className?: string;
 }
 
-export function CurrencySelect({ id, value, onChange, ariaLabel, codes }: CurrencySelectProps) {
+export function CurrencySelect({ id, value, onChange, ariaLabel, codes, className = '' }: CurrencySelectProps) {
   const { t } = useI18n();
   const nameOf = (code: CurrencyCode): string => t(`currencies.${code}` as TranslationKey);
   const allowed = codes ?? ALL_CODES;
@@ -38,7 +41,7 @@ export function CurrencySelect({ id, value, onChange, ariaLabel, codes }: Curren
       aria-label={ariaLabel}
       value={value}
       onChange={(e) => onChange(e.target.value as CurrencyCode)}
-      className="w-full cursor-pointer rounded-[15px] border-2 border-gray-200 bg-white px-3.5 py-3.5 text-sm font-semibold text-currena-dark transition-all duration-300 focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:bg-[#222C3B]"
+      className={`w-full cursor-pointer rounded-[15px] border-2 border-gray-200 bg-white px-3.5 py-3.5 text-sm font-semibold text-currena-dark transition-all duration-300 focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:bg-[#222C3B] ${className}`}
     >
       {allowed.includes('IRR') ? (
         <optgroup label={t('common.currencyGroupIranian')}>
