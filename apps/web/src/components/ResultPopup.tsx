@@ -242,7 +242,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
     >
       <div
         ref={cardRef}
-        className="popup-slide-up relative w-full max-w-[450px] rounded-[30px] bg-white p-7 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:max-w-[540px] dark:bg-currena-card-dark dark:text-white"
+        className="popup-slide-up relative w-full max-w-[450px] rounded-[30px] bg-white p-7 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:max-w-[540px]"
       >
         <button
           ref={closeRef}
@@ -261,12 +261,12 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
         <div className="mb-2 text-center text-4xl" aria-hidden="true">
           💰
         </div>
-        <h2 className="mb-2 text-center text-base font-bold text-currena-blue dark:text-currena-cyan">
+        <h2 className="mb-2 text-center text-base font-bold text-currena-blue">
           {fromName} → {toName}
         </h2>
 
         <div className="my-2.5">
-          <p className="mb-2 text-center text-base font-semibold text-currena-muted dark:text-white/70">
+          <p className="mb-2 text-center text-base font-semibold text-currena-muted">
             {fmtAmount(view.amount, view.from)} <bdi>{label(view.from)}</bdi>
           </p>
           <p className="cta-gradient-text break-words text-center text-[2rem] leading-tight font-black">
@@ -277,7 +277,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
           </p>
         </div>
 
-        <div className="my-2.5 space-y-1 rounded-[10px] bg-currena-blue/10 px-2 py-2 text-center dark:text-white">
+        <div className="my-2.5 space-y-1 rounded-[10px] bg-currena-blue/10 px-2 py-2 text-center">
           <p className="text-sm">
             <strong>{t('common.rate')}:</strong> 1 <bdi>{label(view.from)}</bdi> = {rateText}{' '}
             <bdi>{label(view.to)}</bdi> <SourceBadge source={view.source} />
@@ -298,13 +298,13 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
 
         {/* Jalali + Gregorian timestamps — render-time core formatting */}
         <div className="my-2.5 rounded-[10px] border-s-[3px] border-currena-cyan bg-currena-cyan/10 px-2.5 py-2">
-          <p className="mb-1 text-[0.7rem] font-semibold uppercase tracking-wide text-currena-muted dark:text-white/60">
+          <p className="mb-1 text-[0.7rem] font-semibold uppercase tracking-wide text-currena-muted">
             {t('common.lastCheckedAt')}
           </p>
-          <p className="text-xs text-currena-dark dark:text-white">
+          <p className="text-xs text-currena-dark">
             {formatJalaliDate(view.fetchedAt, numberLocale)} • {formatDate(view.fetchedAt, numberLocale)}
           </p>
-          <p className="text-sm font-semibold text-currena-dark dark:text-white">
+          <p className="text-sm font-semibold text-currena-dark">
             {formatDate(view.fetchedAt, numberLocale, { withTime: true })}
           </p>
         </div>
@@ -313,7 +313,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
         {trendSeries.length >= 2 && trend ? (
           <div className="my-2.5 rounded-[10px] border-s-[3px] border-currena-success/60 bg-currena-success/[0.07] px-2.5 py-2">
             <div className="mb-1 flex items-baseline justify-between gap-2">
-              <p className="text-[0.7rem] font-semibold uppercase tracking-wide text-currena-muted dark:text-white/60">
+              <p className="text-[0.7rem] font-semibold uppercase tracking-wide text-currena-muted">
                 📈 {t('trend.recentChecks', { n: trendSeries.length })}
               </p>
               <p
@@ -321,8 +321,8 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
                   trend.dir === 'up'
                     ? 'text-currena-success'
                     : trend.dir === 'down'
-                      ? 'text-[#dc2626] dark:text-[#ff5252]'
-                      : 'text-currena-muted dark:text-white/60'
+                      ? 'text-[#dc2626]'
+                      : 'text-currena-muted'
                 }`}
               >
                 {trend.dir === 'flat' ? t('trend.flat') : trendPctText}
@@ -339,7 +339,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
               })}
               className="h-auto w-full"
             />
-            <p className="mt-1 flex flex-wrap items-center justify-between gap-1 text-[0.68rem] text-currena-muted dark:text-white/55">
+            <p className="mt-1 flex flex-wrap items-center justify-between gap-1 text-[0.68rem] text-currena-muted">
               <span>
                 {t('trend.range', {
                   min: formatNumber(Math.min(...trendSeries), numberLocale, {

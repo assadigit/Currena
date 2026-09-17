@@ -31,7 +31,6 @@ export const en = {
     batchShort: 'Batch',
     back: 'Back',
     backToHome: 'Back to Home',
-    toggleTheme: 'Toggle theme',
     language: 'Language',
     toggleLanguage: 'Toggle language',
     menu: 'Menu',

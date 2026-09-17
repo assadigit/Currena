@@ -339,7 +339,7 @@ export function Converter() {
                   className={`inline-flex min-h-[38px] cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
                     active
                       ? 'border-currena-blue bg-currena-blue/10 text-currena-blue shadow-[0_4px_12px_rgba(74,144,226,0.25)]'
-                      : 'border-black/10 bg-currena-soft text-currena-dark hover:border-currena-blue/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:border-white/10 dark:bg-white/5 dark:text-white/85'
+                      : 'border-black/10 bg-currena-soft text-currena-dark hover:border-currena-blue/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]'
                   }`}
                 >
                   <img
@@ -366,19 +366,19 @@ export function Converter() {
         {/* Flags row (legacy .flags-section) */}
         <div className="mb-6 flex items-center justify-between gap-2">
           <div className="flex-1 text-center">
-            <div className="mx-auto mb-2.5 h-[65px] w-full max-w-[100px] overflow-hidden rounded-[15px] bg-currena-soft shadow-[0_4px_15px_rgba(0,0,0,0.08)] dark:bg-white/5">
+            <div className="mx-auto mb-2.5 h-[65px] w-full max-w-[100px] overflow-hidden rounded-[15px] bg-currena-soft shadow-[0_4px_15px_rgba(0,0,0,0.08)]">
               <img src={`/images/flags/${from.toLowerCase()}.png`} alt={from} className="h-full w-full object-cover" />
             </div>
-            <p className="text-sm font-semibold text-currena-dark dark:text-currena-cyan">{fromName}</p>
+            <p className="text-sm font-semibold text-currena-dark">{fromName}</p>
           </div>
           <span className="text-3xl opacity-20" aria-hidden="true">
             →
           </span>
           <div className="flex-1 text-center">
-            <div className="mx-auto mb-2.5 h-[65px] w-full max-w-[100px] overflow-hidden rounded-[15px] bg-currena-soft shadow-[0_4px_15px_rgba(0,0,0,0.08)] dark:bg-white/5">
+            <div className="mx-auto mb-2.5 h-[65px] w-full max-w-[100px] overflow-hidden rounded-[15px] bg-currena-soft shadow-[0_4px_15px_rgba(0,0,0,0.08)]">
               <img src={`/images/flags/${to.toLowerCase()}.png`} alt={to} className="h-full w-full object-cover" />
             </div>
-            <p className="text-sm font-semibold text-currena-dark dark:text-currena-cyan">{toName}</p>
+            <p className="text-sm font-semibold text-currena-dark">{toName}</p>
           </div>
         </div>
 
@@ -442,7 +442,7 @@ export function Converter() {
                     className={`min-h-[38px] cursor-pointer rounded-full border px-4 py-1.5 text-sm font-bold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
                       active
                         ? 'border-transparent cta-gradient text-white shadow-[0_6px_18px_rgba(102,126,234,0.4)]'
-                        : 'border-black/10 bg-currena-soft text-currena-dark hover:border-currena-blue/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:border-white/10 dark:bg-white/5 dark:text-white/85'
+                        : 'border-black/10 bg-currena-soft text-currena-dark hover:border-currena-blue/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]'
                     }`}
                   >
                     {formatNumber(value, numberLocale, { maximumFractionDigits: 0 })}
@@ -458,7 +458,7 @@ export function Converter() {
               type="button"
               onClick={() => setManualOpen((open) => !open)}
               aria-expanded={manualOpen}
-              className="flex w-full cursor-pointer items-center gap-2 rounded-xl border-0 bg-transparent px-3 py-3 text-sm font-medium text-currena-muted transition-all duration-300 hover:bg-currena-blue/5 dark:text-white/70"
+              className="flex w-full cursor-pointer items-center gap-2 rounded-xl border-0 bg-transparent px-3 py-3 text-sm font-medium text-currena-muted transition-all duration-300 hover:bg-currena-blue/5"
             >
               <span
                 className={`text-xs text-currena-blue transition-transform duration-300 ${manualOpen ? 'rotate-90' : ''}`}
@@ -477,7 +477,7 @@ export function Converter() {
                 onChange={(e) => setManualRate(e.target.value)}
                 placeholder={t('converter.enterCustomRate')}
                 aria-label={t('converter.enterCustomRate')}
-                className="mt-2.5 w-full rounded-[15px] border-2 border-gray-200 bg-white px-3.5 py-3.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                className="mt-2.5 w-full rounded-[15px] border-2 border-gray-200 bg-white px-3.5 py-3.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10"
               />
             ) : null}
           </div>
@@ -496,7 +496,7 @@ export function Converter() {
             line === '' ? (
               <div key={i} className="h-2" />
             ) : (
-              <p key={i} className="text-xs text-currena-dark dark:text-white/80">
+              <p key={i} className="text-xs text-currena-dark">
                 {line}
               </p>
             ),

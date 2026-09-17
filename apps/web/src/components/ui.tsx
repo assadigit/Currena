@@ -24,8 +24,8 @@ export function Button({ variant = 'secondary', className = '', ...rest }: Butto
     // Legacy .convert-btn: gradient, shine sweep, uppercase, big shadow.
     cta: 'cta-gradient btn-shine text-white font-extrabold uppercase tracking-[1.5px] rounded-[18px] shadow-[0_12px_35px_rgba(102,126,234,0.4)] hover:-translate-y-0.5 hover:shadow-[0_16px_45px_rgba(102,126,234,0.5)] active:translate-y-0',
     secondary:
-      'bg-currena-soft text-currena-dark dark:bg-white/10 dark:text-white font-semibold rounded-xl hover:-translate-y-0.5',
-    ghost: 'bg-transparent text-currena-dark dark:text-white font-medium',
+      'bg-currena-soft text-currena-dark font-semibold rounded-xl hover:-translate-y-0.5',
+    ghost: 'bg-transparent text-currena-dark font-medium',
   };
   return (
     <button
@@ -43,7 +43,7 @@ export function Button({ variant = 'secondary', className = '', ...rest }: Butto
 export function Card({ className = '', children }: { className?: string; children: ReactNode }) {
   return (
     <div
-      className={`rounded-[25px] bg-white p-7 shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 dark:bg-currena-card-dark dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] ${className}`}
+      className={`rounded-[25px] bg-white p-7 shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ${className}`}
     >
       {children}
     </div>
@@ -110,7 +110,7 @@ const SOURCE_KEY: Record<Source, TranslationKey> = {
 export function SourceBadge({ source }: { source: Source }) {
   const { t } = useI18n();
   return (
-    <span className="rounded-full bg-currena-blue/10 px-2.5 py-0.5 text-xs font-semibold text-currena-blue dark:bg-currena-blue/20">
+    <span className="rounded-full bg-currena-blue/10 px-2.5 py-0.5 text-xs font-semibold text-currena-blue">
       {t(SOURCE_KEY[source])}
     </span>
   );
@@ -181,7 +181,7 @@ export interface SwitchProps {
 export function Switch({ id, checked, onChange, label }: SwitchProps) {
   return (
     <label htmlFor={id} className="flex cursor-pointer items-center justify-between gap-3 py-1.5">
-      <span className="text-sm font-semibold text-currena-dark dark:text-white/90">{label}</span>
+      <span className="text-sm font-semibold text-currena-dark">{label}</span>
       <span className="relative inline-block h-6 w-11 shrink-0">
         <input
           id={id}
@@ -189,7 +189,7 @@ export function Switch({ id, checked, onChange, label }: SwitchProps) {
           role="switch"
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
-          className="peer h-full w-full cursor-pointer appearance-none rounded-full bg-gray-300 transition-colors duration-300 checked:bg-currena-success dark:bg-white/15"
+          className="peer h-full w-full cursor-pointer appearance-none rounded-full bg-gray-300 transition-colors duration-300 checked:bg-currena-success"
         />
         <span
           aria-hidden="true"

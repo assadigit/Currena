@@ -58,7 +58,7 @@ function titleKeyFor(route: string): TranslationKey {
 function RouteFallback(): React.JSX.Element {
   return (
     <div className="flex min-h-[60vh] items-center justify-center" role="status">
-      <div className="rounded-[25px] bg-currena-soft/60 px-10 py-8 dark:bg-white/5">
+      <div className="rounded-[25px] bg-currena-soft/60 px-10 py-8">
         <div className="flex justify-center gap-2.5">
           <span className="loader-dot" />
           <span className="loader-dot" />
@@ -91,7 +91,7 @@ export function App() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col bg-currena-bg-light text-currena-dark transition-colors duration-300 dark:bg-currena-bg-dark dark:text-[#E5E7EB]">
+    <div className="flex min-h-screen flex-col bg-currena-bg-light text-currena-dark transition-colors duration-300">
       <Header />
       <main className="flex-1 pt-16 lg:pt-20">
         {route === '/' ? <Converter /> : null}

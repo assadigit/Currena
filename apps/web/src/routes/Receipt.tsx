@@ -110,7 +110,7 @@ function downloadBlob(blob: Blob, filename: string): void {
 }
 
 const inputClass =
-  'w-full rounded-[12px] border-2 border-gray-200 bg-white px-3 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none dark:border-white/10 dark:bg-white/5 dark:text-white';
+  'w-full rounded-[12px] border-2 border-gray-200 bg-white px-3 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none';
 
 /* ------------------------------------------------------------------ *
  * Route
@@ -460,7 +460,7 @@ export function Receipt() {
 
   return (
     <div className="mx-auto w-full max-w-[500px] px-5 py-5 sm:max-w-[600px] lg:max-w-[1200px] lg:px-10">
-      <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white lg:text-2xl">
+      <h1 className="mb-1 text-xl font-bold text-currena-dark lg:text-2xl">
         📄 {t('receipt.title')}
       </h1>
       <p className="mb-5 text-sm text-currena-muted">{t('receipt.subtitle')}</p>
@@ -469,7 +469,7 @@ export function Receipt() {
         {/* ---------- Left: form ---------- */}
         <Card>
           {/* Travel currency hero (legacy .main-currency-display) */}
-          <div className="mb-6 rounded-[18px] bg-currena-soft px-4 py-5 text-center dark:bg-white/5">
+          <div className="mb-6 rounded-[18px] bg-currena-soft px-4 py-5 text-center">
             <p className="mb-2.5 text-xs font-bold uppercase tracking-wide text-currena-muted">
               {t('receipt.travelCurrency')}
             </p>
@@ -478,13 +478,13 @@ export function Receipt() {
               alt={from}
               className="mx-auto mb-2.5 h-[52px] w-[74px] rounded-[10px] object-cover shadow"
             />
-            <p className="text-base font-bold text-currena-dark dark:text-white">
+            <p className="text-base font-bold text-currena-dark">
               {t(`currencies.${from}` as TranslationKey)}
             </p>
-            <p className="text-xs font-semibold text-currena-blue dark:text-currena-cyan">{label(from)}</p>
+            <p className="text-xs font-semibold text-currena-blue">{label(from)}</p>
           </div>
 
-          <p className="mb-3 text-sm font-bold text-currena-dark dark:text-white">
+          <p className="mb-3 text-sm font-bold text-currena-dark">
             {t('receipt.expenseDetails')}
           </p>
 
@@ -515,7 +515,7 @@ export function Receipt() {
               onChange={(e) => setDate(e.target.value || todayStr())}
               className={inputClass}
             />
-            <p className="mt-1.5 text-xs text-currena-blue dark:text-currena-cyan">
+            <p className="mt-1.5 text-xs text-currena-blue">
               {formatJalaliDate(dateToIso(date), numberLocale)}
             </p>
           </div>
@@ -528,7 +528,7 @@ export function Receipt() {
             label={t('receipt.additionalOptions')}
           />
           {optionsOpen ? (
-            <div className="mt-2 space-y-1 rounded-[15px] bg-currena-soft/50 px-3.5 py-3 dark:bg-white/5">
+            <div className="mt-2 space-y-1 rounded-[15px] bg-currena-soft/50 px-3.5 py-3">
               <Switch id="multiDayToggle" checked={multiDay} onChange={setMultiDay} label={t('receipt.multiDayReceipt')} />
               {multiDay ? (
                 <div className="pb-2 ps-1">
@@ -590,21 +590,21 @@ export function Receipt() {
           ) : null}
 
           {/* Expense items */}
-          <p className="mb-3 mt-6 text-sm font-bold text-currena-dark dark:text-white">
+          <p className="mb-3 mt-6 text-sm font-bold text-currena-dark">
             {t('receipt.expenseItems')}
           </p>
           <div className="space-y-2.5">
             {items.map((item, index) => (
               <div
                 key={item.id}
-                className="rounded-[15px] bg-currena-soft/50 p-3 dark:bg-white/5"
+                className="rounded-[15px] bg-currena-soft/50 p-3"
               >
                 <div className="mb-2 flex items-center gap-2">
                   <select
                     aria-label={`${t('common.description')} ${index + 1}`}
                     value={item.category}
                     onChange={(e) => patchItem(item.id, { category: e.target.value as CategoryId })}
-                    className="min-w-0 flex-1 cursor-pointer rounded-[10px] border-2 border-gray-200 bg-white px-2.5 py-2 text-xs font-semibold text-currena-dark dark:border-white/10 dark:text-white"
+                    className="min-w-0 flex-1 cursor-pointer rounded-[10px] border-2 border-gray-200 bg-white px-2.5 py-2 text-xs font-semibold text-currena-dark"
                   >
                     {CATEGORY_IDS.map((id) => (
                       <option key={id} value={id}>
@@ -644,7 +644,7 @@ export function Receipt() {
                       aria-label={`${t('common.currency')} ${index + 1}`}
                       value={item.currency}
                       onChange={(e) => patchItem(item.id, { currency: e.target.value as CurrencyCode })}
-                      className="w-[74px] cursor-pointer rounded-[10px] border-2 border-gray-200 bg-white px-1.5 py-2 text-xs font-semibold text-currena-dark dark:border-white/10 dark:text-white"
+                      className="w-[74px] cursor-pointer rounded-[10px] border-2 border-gray-200 bg-white px-1.5 py-2 text-xs font-semibold text-currena-dark"
                     >
                       {(['USD', 'IRR', 'AUD', 'EUR', 'TRY', 'AED', 'CNY', 'GBP', 'CAD', 'NZD', 'CHF', 'JPY', 'KRW', 'MYR', 'IDR', 'PHP', 'VND'] as const).map(
                         (code) => (
@@ -661,7 +661,7 @@ export function Receipt() {
                       aria-label={`${t('common.time')} ${index + 1}`}
                       value={item.time}
                       onChange={(e) => patchItem(item.id, { time: e.target.value })}
-                      className="w-[96px] rounded-[10px] border-2 border-gray-200 bg-white px-1.5 py-2 text-xs text-currena-dark dark:border-white/10 dark:text-white"
+                      className="w-[96px] rounded-[10px] border-2 border-gray-200 bg-white px-1.5 py-2 text-xs text-currena-dark"
                     />
                   ) : null}
                 </div>

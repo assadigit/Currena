@@ -32,7 +32,6 @@ export const fa: Dictionary = {
     batchShort: 'گروهی',
     back: 'بازگشت',
     backToHome: 'بازگشت به خانه',
-    toggleTheme: 'تغییر پوسته',
     language: 'زبان',
     toggleLanguage: 'تغییر زبان',
     menu: 'منو',

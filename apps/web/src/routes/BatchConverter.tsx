@@ -288,7 +288,7 @@ export function BatchConverter() {
 
   return (
     <div className="mx-auto w-full max-w-[500px] px-5 py-5 sm:max-w-[600px] lg:max-w-[1080px] lg:px-10">
-      <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white lg:text-2xl">
+      <h1 className="mb-1 text-xl font-bold text-currena-dark lg:text-2xl">
         {t('batchConverter.title')}
       </h1>
       <p className="mb-5 text-sm text-currena-muted">{t('batchConverter.subtitle')}</p>
@@ -299,7 +299,7 @@ export function BatchConverter() {
       <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
       <Card>
         {/* Currency selection + swap */}
-        <p className="mb-2.5 text-sm font-bold text-currena-dark dark:text-white">
+        <p className="mb-2.5 text-sm font-bold text-currena-dark">
           {t('batchConverter.currencySelection')}
         </p>
         <div className="mb-5 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
@@ -344,10 +344,10 @@ export function BatchConverter() {
         </div>
 
         {/* Input mode toggle */}
-        <p className="mb-2.5 text-sm font-bold text-currena-dark dark:text-white">
+        <p className="mb-2.5 text-sm font-bold text-currena-dark">
           {t('batchConverter.enterAmounts')}
         </p>
-        <div className="mb-3 grid grid-cols-2 gap-2 rounded-[12px] bg-currena-soft p-1.5 dark:bg-white/5">
+        <div className="mb-3 grid grid-cols-2 gap-2 rounded-[12px] bg-currena-soft p-1.5">
           {(['bulk', 'notes'] as const).map((m) => (
             <button
               key={m}
@@ -355,8 +355,8 @@ export function BatchConverter() {
               onClick={() => setMode(m)}
               className={`cursor-pointer rounded-[9px] border-0 px-3 py-2.5 text-xs font-semibold transition-all duration-300 ${
                 mode === m
-                  ? 'bg-white text-currena-blue shadow dark:bg-white/15 dark:text-currena-cyan'
-                  : 'text-currena-muted hover:text-currena-dark dark:hover:text-white'
+                  ? 'bg-white text-currena-blue shadow'
+                  : 'text-currena-muted hover:text-currena-dark'
               }`}
             >
               {t(m === 'bulk' ? 'batchConverter.bulkInput' : 'batchConverter.withNotes')}
@@ -374,14 +374,14 @@ export function BatchConverter() {
               dir="ltr"
               placeholder={'Enter amounts, one per line:\n4556\n4545\n3443.50\n2199.99\n\n100 usd eur\n150.99 USD | iPhone 15 Pro'}
               aria-label={t('batchConverter.bulkInput')}
-              className="w-full resize-y rounded-[15px] border-2 border-gray-200 bg-white px-4 py-3 text-sm text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:text-white"
+              className="w-full resize-y rounded-[15px] border-2 border-gray-200 bg-white px-4 py-3 text-sm text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10"
             />
             <p className="mt-2 text-xs text-currena-muted">{t('batchConverter.bulkHint')}</p>
           </div>
         ) : (
           <div className="mb-5 space-y-3">
             {fields.map((field, index) => (
-              <div key={field.id} className="rounded-[15px] bg-currena-soft/60 p-3 dark:bg-white/5">
+              <div key={field.id} className="rounded-[15px] bg-currena-soft/60 p-3">
                 <div className="mb-2 flex items-center gap-2">
                   <input
                     type="text"
@@ -395,7 +395,7 @@ export function BatchConverter() {
                         prev.map((f) => (f.id === field.id ? { ...f, amount: e.target.value } : f)),
                       )
                     }
-                    className="min-w-0 flex-1 rounded-[12px] border-2 border-gray-200 bg-white px-3 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none dark:border-white/10 dark:text-white"
+                    className="min-w-0 flex-1 rounded-[12px] border-2 border-gray-200 bg-white px-3 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none"
                   />
                   <button
                     type="button"
@@ -418,7 +418,7 @@ export function BatchConverter() {
                       prev.map((f) => (f.id === field.id ? { ...f, note: e.target.value } : f)),
                     )
                   }
-                  className="w-full rounded-[12px] border-2 border-gray-200 bg-white px-3 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none dark:border-white/10 dark:text-white"
+                  className="w-full rounded-[12px] border-2 border-gray-200 bg-white px-3 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none"
                 />
               </div>
             ))}
@@ -441,22 +441,22 @@ export function BatchConverter() {
       {results ? (
         <Card className="mt-5 lg:sticky lg:top-24 lg:mt-0">
           {/* Summary (legacy .summary-card) */}
-          <div className="mb-5 rounded-[15px] bg-currena-blue/10 px-4 py-4 dark:bg-white/5">
+          <div className="mb-5 rounded-[15px] bg-currena-blue/10 px-4 py-4">
             <div className="mb-1.5 flex items-center justify-between text-sm">
               <span className="text-currena-muted">{t('batchConverter.totalItems')}</span>
-              <span className="font-bold text-currena-dark dark:text-white">
+              <span className="font-bold text-currena-dark">
                 {formatNumber(results.rows.filter((r) => r.ok).length, numberLocale, { maximumFractionDigits: 0 })}
               </span>
             </div>
             <div className="mb-1.5 flex items-center justify-between text-sm">
               <span className="text-currena-muted">{t('batchConverter.totalCost')}</span>
-              <span className="font-bold text-currena-dark dark:text-white">
+              <span className="font-bold text-currena-dark">
                 {fmtOriginal(results.totalOriginal)} <bdi>{label(results.from)}</bdi>
               </span>
             </div>
             <div className="mb-1.5 flex items-center justify-between text-sm">
               <span className="text-currena-muted">{t('batchConverter.convertedTotal')}</span>
-              <span className="font-bold text-currena-blue dark:text-currena-cyan">
+              <span className="font-bold text-currena-blue">
                 {fmtConverted(results.totalConverted, results.to)} <bdi>{label(results.to)}</bdi>
               </span>
             </div>
@@ -469,21 +469,21 @@ export function BatchConverter() {
           </div>
 
           {/* Rows (invalid lines flagged, others converted) */}
-          <p className="mb-2.5 text-sm font-bold text-currena-dark dark:text-white">
+          <p className="mb-2.5 text-sm font-bold text-currena-dark">
             {t('batchConverter.convertedPrices')}
           </p>
           <div className="mb-5 space-y-2">
             {results.rows.map((row, i) =>
               row.ok ? (
-                <div key={i} className="rounded-[12px] bg-currena-soft/60 px-3.5 py-2.5 dark:bg-white/5">
+                <div key={i} className="rounded-[12px] bg-currena-soft/60 px-3.5 py-2.5">
                   <div className="flex items-center justify-between gap-2 text-sm">
-                    <span className="text-currena-dark dark:text-white/85">
+                    <span className="text-currena-dark">
                       {fmtOriginal(row.amount)} <bdi>{label(row.from)}</bdi>
                     </span>
                     <span className="text-currena-muted" aria-hidden="true">
                       →
                     </span>
-                    <span className="font-bold text-currena-blue dark:text-currena-cyan">
+                    <span className="font-bold text-currena-blue">
                       {fmtConverted(row.result, row.to)} <bdi>{label(row.to)}</bdi>
                     </span>
                   </div>
@@ -530,7 +530,7 @@ export function BatchConverter() {
           <div className="mb-3 text-5xl opacity-30" aria-hidden="true">
             🛒
           </div>
-          <h2 className="mb-2 text-base font-bold text-currena-dark dark:text-white">
+          <h2 className="mb-2 text-base font-bold text-currena-dark">
             {t('batchConverter.convertedPrices')}
           </h2>
           <p className="mx-auto max-w-sm text-sm text-currena-muted">

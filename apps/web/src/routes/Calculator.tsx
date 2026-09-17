@@ -179,7 +179,7 @@ export function Calculator() {
   return (
     <div className="mx-auto w-full max-w-[500px] px-5 py-5 sm:max-w-[600px] lg:max-w-[900px] lg:px-10 lg:py-8">
       <Card>
-        <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white lg:text-2xl">
+        <h1 className="mb-1 text-xl font-bold text-currena-dark lg:text-2xl">
           🧮 {t('calculator.title')}
         </h1>
         <p className="mb-5 text-sm text-currena-muted">{t('calculator.subtitle')}</p>
@@ -217,9 +217,9 @@ export function Calculator() {
             </div>
 
             {/* Display (legacy .display) */}
-            <div className="mb-5 rounded-[18px] bg-currena-soft px-4 py-5 text-center dark:bg-white/5 lg:py-7">
+            <div className="mb-5 rounded-[18px] bg-currena-soft px-4 py-5 text-center lg:py-7">
               <div
-                className="min-h-[2.4rem] overflow-x-auto text-3xl font-bold break-all text-currena-dark dark:text-white lg:text-4xl"
+                className="min-h-[2.4rem] overflow-x-auto text-3xl font-bold break-all text-currena-dark lg:text-4xl"
                 aria-live="polite"
               >
                 {errorFlash ? t('calculator.error') : groupDisplay(expr)}
@@ -231,7 +231,7 @@ export function Calculator() {
                   <bdi>{label(from)}</bdi>
                 </div>
               ) : null}
-              <div className="mt-2 text-lg font-semibold text-currena-blue dark:text-currena-cyan">
+              <div className="mt-2 text-lg font-semibold text-currena-blue">
                 {converted !== null ? (
                   <>
                     = {converted}{' '}
@@ -272,8 +272,8 @@ export function Calculator() {
                       : isClear
                         ? 'bg-currena-warning/15 text-currena-warning hover:bg-currena-warning/25'
                         : isOp
-                          ? 'bg-currena-cyan/20 text-currena-dark hover:bg-currena-cyan/30 dark:text-white'
-                          : 'bg-currena-soft text-currena-dark hover:bg-currena-blue/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20'
+                          ? 'bg-currena-cyan/20 text-currena-dark hover:bg-currena-cyan/30'
+                          : 'bg-currena-soft text-currena-dark hover:bg-currena-blue/10'
                   }`}
                 >
                   {key.label}

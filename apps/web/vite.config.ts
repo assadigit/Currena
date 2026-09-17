@@ -16,12 +16,15 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    // PWA (checklist #17): manifest identity is ported verbatim from the legacy
-    // /static/manifest.json (name/short_name/description/theme/background).
+    // PWA (checklist #17): manifest identity is ported from the legacy
+    // /static/manifest.json — with the light-only decision (owner request
+    // 2026-09-17) the install surface now matches the app: light background,
+    // soft-blue theme color, same as the header/meta theme-color.
     // Icons are REAL generated PNGs (scripts/generate-icons.mjs) — the legacy
-    // site declared icons that 404'd. App shell is precached; runtime caching
-    // covers fonts only. /api + /internal are never touched by the SW — the
-    // snapshot store owns last-good rate caching.
+    // site declared icons that 404'd. App shell + fonts are precached (the
+    // single Vazirmatn variable file included) so the PWA renders Vazir for
+    // Farsi even fully offline. /api + /internal are never touched by the SW —
+    // the snapshot store owns last-good rate caching.
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['images/currena-logo.png'],
@@ -33,8 +36,8 @@ export default defineConfig({
         scope: '/',
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#1a1a2e',
-        theme_color: '#D4AF37',
+        background_color: '#F8FAFB',
+        theme_color: '#E8F4F8',
         lang: 'en',
         categories: ['finance', 'utilities'],
         icons: [

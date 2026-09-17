@@ -5,14 +5,17 @@
  *
  * - Legacy palette ported 1:1 from the Django templates (Phase 1 extraction,
  *   docs/FEATURE_MAP.md §8).
- * - Dark mode is class-based: the pre-paint script in index.html + theme.ts
- *   toggle `.dark` on <html>.
+ * - LIGHT-ONLY (owner request 2026-09-17: "dark mode is problematic, it
+ *   stays light mode"). The old class-based dark mode was removed; the
+ *   pre-paint script actively clears the legacy `dark` class + `theme` key
+ *   so previously-dark devices land on light.
  * - CSS logical properties only (ms-/me-/ps-/pe-, start/end) — RTL-safe.
  * - Legacy motion (loader dots, shimmer, popup slide-up, live-dot pulse,
  *   warning pulse, button shine) ported as plain CSS below.
+ * - Farsi typography: self-hosted Vazirmatn variable font (OFL-1.1, see
+ *   public/fonts/) applied via :lang(fa) — English pages keep the system
+ *   stack and never download the Farsi font (owner request 2026-09-17).
  */
-
-@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-currena-soft: #E8F4F8;
@@ -24,53 +27,29 @@
   --color-currena-warning: #FF6B6B;
   --color-currena-success: #4CAF50;
   --color-currena-bg-light: #F8FAFB;
-  --color-currena-bg-dark: #1a1d2e;
-  --color-currena-card-dark: #252941;
 
-  /* Live-rates board (legacy live-rates.html gold/dark identity — dark mode).
-   * Light mode flips these via the runtime vars below: white cards on warm
-   * paper, deepened amber-700 gold ink for contrast on white. */
-  --color-gold-primary: #D4AF37;
-  --color-gold-vibrant: #FFD700;
-  --color-board-dark: #1a1a2e;
-  --color-board-card: var(--currena-board-card);
-  --color-board-gold: var(--currena-board-gold);
-  --color-board-subtle: var(--currena-board-subtle);
-
-  /* Typography: Poppins for LTR/en (legacy font), Vazirmatn for fa/RTL. */
-  --font-sans: "Poppins", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  /* Typography: system stack for LTR/en; Farsi (lang=fa) switches to the
+   * self-hosted Vazirmatn variable font below. */
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
 }
 
-/* fa locale: Vazirmatn leads (Poppins has no Arabic-script glyphs). */
-html[lang="fa"] {
-  --font-sans: "Vazirmatn", "Poppins", ui-sans-serif, system-ui, sans-serif;
+/* Vazirmatn — the owner-requested Farsi typeface. One variable file covers
+ * every weight (100–900). Only fetched by the browser when the document
+ * (or a nested element) is language-tagged Farsi; font-display: swap keeps
+ * first paint on the fallback. License: public/fonts/Vazirmatn-OFL.txt. */
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("/fonts/vazirmatn-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
 }
 
-/* ------------------------------------------------------------------ *
- * Board runtime palette — flips with .dark on <html> (theme.ts).
- * The @theme tokens above point at these, so `bg-board-card`,
- * `text-board-gold` and `bg-board-subtle` utilities are theme-aware.
- * ------------------------------------------------------------------ */
-:root {
-  --currena-board-card: #ffffff;
-  --currena-board-gold: #b45309; /* amber-700 — FFD700 is illegible on white */
-  --currena-board-subtle: rgba(28, 32, 46, 0.05);
-}
-.dark {
-  --currena-board-card: #16213e;
-  --currena-board-gold: #ffd700;
-  --currena-board-subtle: rgba(255, 255, 255, 0.05);
-}
-
-/* Board page surface — warm paper gradient in light mode, the legacy
- * navy gradient in dark mode. Sets the board's base text color too. */
-.board-page {
-  background: linear-gradient(135deg, #fdfbf4 0%, #f4efdf 100%);
-  color: #2a3346;
-}
-.dark .board-page {
-  background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
-  color: #eee;
+/* Farsi rendering — html[lang="fa"] AND nested lang="fa" islands on English
+ * pages (e.g. the About quote) all pick Vazirmatn, including its Latin
+ * glyphs so fa pages keep one consistent voice for digits and codes. */
+:lang(fa) {
+  font-family: "Vazirmatn", "Poppins", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* ------------------------------------------------------------------ *
@@ -79,7 +58,6 @@ html[lang="fa"] {
 
 body {
   font-family: var(--font-sans);
-  transition: background-color 0.3s ease;
 }
 
 /* CTA gradient — legacy `linear-gradient(135deg, #667eea, #764ba2)` */
@@ -147,15 +125,6 @@ body {
   );
   background-size: 200% 100%;
   animation: currena-shimmer 1.4s ease infinite;
-}
-.dark .skeleton {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.05) 25%,
-    rgba(255, 255, 255, 0.12) 37%,
-    rgba(255, 255, 255, 0.05) 63%
-  );
-  background-size: 200% 100%;
 }
 
 /* Live dot pulse (legacy beepingLive) */
@@ -231,20 +200,15 @@ body {
 }
 
 /* ------------------------------------------------------------------ *
- * Amount input panel — legacy cream/gold gradient
+ * Amount input panel — harmonized with the site's white cards
+ * (owner request 2026-09-17: removed the legacy cream/gold gradient so
+ * the converter reads as one design with the rest of the app).
  * ------------------------------------------------------------------ */
 
 .amount-panel {
-  background: linear-gradient(135deg, #fff9e6 0%, #ffe999 100%);
-  border: 2px solid #ffe066;
-  box-shadow: 0 8px 25px rgba(255, 233, 153, 0.3);
-}
-
-/* Native select arrow color in dark mode */
-.dark select {
-  background-color: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 2px solid #e8f4f8;
+  box-shadow: 0 8px 25px rgba(74, 144, 226, 0.1);
 }
 
 /* Scrollbar (thin, subtle) */
@@ -258,22 +222,22 @@ body {
 
 @keyframes currena-rate-flash-up {
   0% {
-    background-color: rgba(16, 185, 129, 0.28);
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.45);
+    background-color: rgba(16, 185, 129, 0.22);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4);
   }
   100% {
-    /* Return to the card's own resting surface (theme-aware). */
-    background-color: var(--currena-board-card);
+    /* Return to the card's own resting surface (white, light-only). */
+    background-color: #ffffff;
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0);
   }
 }
 @keyframes currena-rate-flash-down {
   0% {
-    background-color: rgba(239, 68, 68, 0.28);
-    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.45);
+    background-color: rgba(239, 68, 68, 0.22);
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.4);
   }
   100% {
-    background-color: var(--currena-board-card);
+    background-color: #ffffff;
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0);
   }
 }

@@ -10,8 +10,9 @@
  *      2026-09-17) computed LOCALLY from the already-booted tgju snapshot
  *      (no extra network — mission §8), with ▲/▼ delta chips vs the
  *      previous snapshot generation, plus a link to the full live-rates
- *      board. Theme-aware: warm paper card in light mode (was dark-only),
- *      legacy navy in dark mode.
+ *      board. Harmonized with the site (owner request 2026-09-17): a plain
+ *      white card with the app's soft-blue accents — the former tinted
+ *      board surface was retired along with dark mode.
  *   2. "Quick tools": a 2×3 grid of one-tap shortcuts into the calculator,
  *      batch converter, receipt generator, splitter, settle and history.
  *
@@ -76,9 +77,9 @@ export function ConverterAside({ className = '' }: { className?: string }) {
   return (
     <aside className={className} aria-label={t('converter.quickTools')}>
       {/* ---------- Mini board ---------- */}
-      <section className="board-page rounded-[25px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.25)]">
+      <section className="rounded-[25px] bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04]">
         <header className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="text-base font-bold text-board-gold">{t('converter.boardAtAGlance')}</h2>
+          <h2 className="text-base font-bold text-currena-dark">{t('converter.boardAtAGlance')}</h2>
           <span className="live-dot !h-2 !w-2 shrink-0" aria-hidden="true" />
         </header>
 
@@ -87,17 +88,17 @@ export function ConverterAside({ className = '' }: { className?: string }) {
             {rows.map(({ code, rate, prevRate }) => (
               <li
                 key={code}
-                className="flex items-center gap-3 rounded-xl bg-board-subtle px-3 py-2.5 transition-colors duration-300 hover:bg-black/[0.05] dark:hover:bg-white/[0.09]"
+                className="flex items-center gap-3 rounded-xl bg-currena-soft/50 px-3 py-2.5 transition-colors duration-300 hover:bg-currena-soft"
               >
                 <img
                   src={`/images/flags/${code.toLowerCase()}.png`}
                   alt={code}
                   className="h-5 w-7 shrink-0 rounded-[3px] object-cover"
                 />
-                <span className="shrink-0 text-sm font-bold text-board-gold" dir="ltr">
+                <span className="shrink-0 text-sm font-bold text-currena-dark" dir="ltr">
                   {code}
                 </span>
-                <span className="min-w-0 flex-1 text-xs opacity-60" dir="ltr">
+                <span className="min-w-0 flex-1 text-xs text-currena-muted" dir="ltr">
                   → {label('IRR')}
                 </span>
                 <span className="text-sm font-bold" dir="ltr">
@@ -122,15 +123,15 @@ export function ConverterAside({ className = '' }: { className?: string }) {
         <button
           type="button"
           onClick={() => navigate('/live-rates')}
-          className="w-full cursor-pointer rounded-full border border-gold-primary/40 bg-gold-primary/10 px-4 py-2.5 text-xs font-bold text-board-gold transition-all duration-300 hover:-translate-y-0.5 hover:bg-gold-primary/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-board-gold"
+          className="w-full cursor-pointer rounded-full border border-currena-blue/30 bg-currena-blue/10 px-4 py-2.5 text-xs font-bold text-currena-blue transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-blue/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
         >
           📊 {t('common.viewFullBoard')}
         </button>
       </section>
 
       {/* ---------- Quick tools ---------- */}
-      <section className="mt-6 rounded-[25px] bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:bg-currena-card-dark dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
-        <h2 className="mb-4 text-base font-bold text-currena-dark dark:text-white">
+      <section className="mt-6 rounded-[25px] bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04]">
+        <h2 className="mb-4 text-base font-bold text-currena-dark">
           ⚡ {t('converter.quickTools')}
         </h2>
         <div className="grid grid-cols-2 gap-2.5 xl:grid-cols-3">
@@ -139,12 +140,12 @@ export function ConverterAside({ className = '' }: { className?: string }) {
               key={path}
               type="button"
               onClick={() => navigate(path)}
-              className="flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-0 bg-currena-soft px-3 py-4 text-center transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-blue/10 hover:shadow-[0_8px_20px_rgba(74,144,226,0.15)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue dark:bg-white/5 dark:hover:bg-currena-cyan/10"
+              className="flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-0 bg-currena-soft px-3 py-4 text-center transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-blue/10 hover:shadow-[0_8px_20px_rgba(74,144,226,0.15)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
             >
               <span className="text-2xl" aria-hidden="true">
                 {emoji}
               </span>
-              <span className="text-xs font-bold leading-snug text-currena-dark dark:text-white/90">
+              <span className="text-xs font-bold leading-snug text-currena-dark">
                 {t(labelKey)}
               </span>
             </button>

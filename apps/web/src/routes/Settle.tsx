@@ -159,7 +159,7 @@ function Modal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="popup-slide-up max-h-[88vh] w-full max-w-[430px] overflow-y-auto rounded-[25px] bg-white p-6 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:max-w-[520px] dark:bg-currena-card-dark dark:text-white">
+      <div className="popup-slide-up max-h-[88vh] w-full max-w-[430px] overflow-y-auto rounded-[25px] bg-white p-6 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:max-w-[520px]">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold">{title}</h2>
           <button
@@ -178,7 +178,7 @@ function Modal({
 }
 
 const inputClass =
-  'w-full rounded-[12px] border-2 border-gray-200 bg-white px-3.5 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none dark:border-white/10 dark:bg-white/5 dark:text-white';
+  'w-full rounded-[12px] border-2 border-gray-200 bg-white px-3.5 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none';
 
 /* ------------------------------------------------------------------ *
  * Route
@@ -409,7 +409,7 @@ export function Settle() {
 
   return (
     <div className="mx-auto w-full max-w-[500px] px-5 pb-24 pt-6 sm:max-w-[620px] lg:max-w-[960px] lg:px-10">
-      <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white lg:text-2xl">
+      <h1 className="mb-1 text-xl font-bold text-currena-dark lg:text-2xl">
         👥 {t('splitSettle.title')}
       </h1>
       <p className="mb-5 text-sm text-currena-muted">{t('splitSettle.subtitle')}</p>
@@ -421,7 +421,7 @@ export function Settle() {
             <div className="mb-3 text-5xl opacity-40" aria-hidden="true">
               👥
             </div>
-            <h2 className="mb-1.5 text-lg font-bold text-currena-dark dark:text-white">
+            <h2 className="mb-1.5 text-lg font-bold text-currena-dark">
               {t('splitSettle.noGroupsYet')}
             </h2>
             <p className="mx-auto mb-6 max-w-xs text-sm text-currena-muted">
@@ -450,7 +450,7 @@ export function Settle() {
                       }}
                     >
                       <div className="mb-2.5 flex items-start justify-between gap-3">
-                        <h2 className="text-base font-bold text-currena-dark dark:text-white">
+                        <h2 className="text-base font-bold text-currena-dark">
                           {group.name}
                         </h2>
                         <span className="text-2xl" aria-hidden="true">
@@ -477,7 +477,7 @@ export function Settle() {
                             : t('splitSettle.allSettledUp')}
                       </p>
                     </div>
-                    <div className="mt-3 border-t border-black/5 pt-3 text-end dark:border-white/10">
+                    <div className="mt-3 border-t border-black/5 pt-3 text-end">
                       <Button
                         variant="ghost"
                         className="!text-currena-warning px-3 py-1.5 text-xs"
@@ -501,31 +501,31 @@ export function Settle() {
             <div className="text-5xl" aria-hidden="true">
               {openGroup.emoji}
             </div>
-            <h2 className="mt-2 text-xl font-bold text-currena-dark dark:text-white">
+            <h2 className="mt-2 text-xl font-bold text-currena-dark">
               {openGroup.name}
             </h2>
             <div className="mt-3 grid grid-cols-3 gap-2.5">
-              <div className="rounded-[12px] bg-currena-soft px-2 py-2.5 text-center dark:bg-white/5">
+              <div className="rounded-[12px] bg-currena-soft px-2 py-2.5 text-center">
                 <p className="text-[0.65rem] font-semibold uppercase text-currena-muted">
                   {t('splitSettle.members')}
                 </p>
-                <p className="text-lg font-bold text-currena-dark dark:text-white">
+                <p className="text-lg font-bold text-currena-dark">
                   {formatNumber(openGroup.members.length, numberLocale, { maximumFractionDigits: 0 })}
                 </p>
               </div>
-              <div className="rounded-[12px] bg-currena-soft px-2 py-2.5 text-center dark:bg-white/5">
+              <div className="rounded-[12px] bg-currena-soft px-2 py-2.5 text-center">
                 <p className="text-[0.65rem] font-semibold uppercase text-currena-muted">
                   {t('splitSettle.expenses')}
                 </p>
-                <p className="text-lg font-bold text-currena-dark dark:text-white">
+                <p className="text-lg font-bold text-currena-dark">
                   {formatNumber(openGroup.expenses.length, numberLocale, { maximumFractionDigits: 0 })}
                 </p>
               </div>
-              <div className="rounded-[12px] bg-currena-soft px-2 py-2.5 text-center dark:bg-white/5">
+              <div className="rounded-[12px] bg-currena-soft px-2 py-2.5 text-center">
                 <p className="text-[0.65rem] font-semibold uppercase text-currena-muted">
                   {t('common.total')}
                 </p>
-                <p className="text-lg font-bold text-currena-dark dark:text-white">
+                <p className="text-lg font-bold text-currena-dark">
                   {fmt2(groupTotal)}
                 </p>
               </div>
@@ -549,7 +549,7 @@ export function Settle() {
 
           <Card>
             {/* Tabs */}
-            <div className="mb-4 grid grid-cols-3 gap-1.5 rounded-[12px] bg-currena-soft p-1.5 dark:bg-white/5">
+            <div className="mb-4 grid grid-cols-3 gap-1.5 rounded-[12px] bg-currena-soft p-1.5">
               {TABS.map(({ id, label }) => (
                 <button
                   key={id}
@@ -557,8 +557,8 @@ export function Settle() {
                   onClick={() => setTab(id)}
                   className={`cursor-pointer rounded-[9px] border-0 px-2 py-2.5 text-xs font-semibold transition-all duration-300 ${
                     tab === id
-                      ? 'bg-white text-currena-blue shadow dark:bg-white/15 dark:text-currena-cyan'
-                      : 'text-currena-muted hover:text-currena-dark dark:hover:text-white'
+                      ? 'bg-white text-currena-blue shadow'
+                      : 'text-currena-muted hover:text-currena-dark'
                   }`}
                 >
                   {t(label)}
@@ -583,14 +583,14 @@ export function Settle() {
                       className={`rounded-[15px] px-3.5 py-3 ${
                         expense.isSettlement
                           ? 'bg-currena-success/10'
-                          : 'bg-currena-soft/60 dark:bg-white/5'
+                          : 'bg-currena-soft/60'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm font-bold text-currena-dark dark:text-white">
+                        <p className="text-sm font-bold text-currena-dark">
                           {expense.description}
                         </p>
-                        <p className="shrink-0 text-sm font-bold text-currena-blue dark:text-currena-cyan">
+                        <p className="shrink-0 text-sm font-bold text-currena-blue">
                           {fmt2(expense.amount)} <bdi>{label(expense.currency)}</bdi>
                         </p>
                       </div>
@@ -620,15 +620,15 @@ export function Settle() {
                   return (
                     <div
                       key={member}
-                      className="flex items-center gap-3 rounded-[12px] bg-currena-soft/60 px-3 py-2.5 dark:bg-white/5"
+                      className="flex items-center gap-3 rounded-[12px] bg-currena-soft/60 px-3 py-2.5"
                     >
                       <span
                         aria-hidden="true"
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-currena-blue/15 text-sm font-bold text-currena-blue dark:bg-currena-cyan/15 dark:text-currena-cyan"
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-currena-blue/15 text-sm font-bold text-currena-blue"
                       >
                         {member.charAt(0).toUpperCase()}
                       </span>
-                      <span className="text-sm font-semibold text-currena-dark dark:text-white">
+                      <span className="text-sm font-semibold text-currena-dark">
                         {member}
                       </span>
                       <span
@@ -668,14 +668,14 @@ export function Settle() {
                   {settlements.map((transfer, index) => (
                     <div
                       key={`${transfer.from}-${transfer.to}-${index}`}
-                      className="flex flex-wrap items-center gap-2 rounded-[12px] bg-currena-soft/60 px-3 py-2.5 text-sm dark:bg-white/5"
+                      className="flex flex-wrap items-center gap-2 rounded-[12px] bg-currena-soft/60 px-3 py-2.5 text-sm"
                     >
-                      <strong className="text-currena-dark dark:text-white">{transfer.from}</strong>
+                      <strong className="text-currena-dark">{transfer.from}</strong>
                       <span className="text-currena-muted" aria-hidden="true">
                         →
                       </span>
-                      <strong className="text-currena-dark dark:text-white">{transfer.to}</strong>
-                      <span className="ms-auto font-bold text-currena-blue dark:text-currena-cyan">
+                      <strong className="text-currena-dark">{transfer.to}</strong>
+                      <span className="ms-auto font-bold text-currena-blue">
                         {fmt2(transfer.amount)}
                       </span>
                       <Button
@@ -743,7 +743,7 @@ export function Settle() {
                 className={`h-11 w-11 cursor-pointer rounded-[12px] border-2 text-xl transition-all duration-300 ${
                   createEmoji === emoji
                     ? 'border-currena-blue bg-currena-blue/10 scale-110'
-                    : 'border-transparent bg-currena-soft dark:bg-white/10'
+                    : 'border-transparent bg-currena-soft'
                 }`}
               >
                 {emoji}
@@ -808,7 +808,7 @@ export function Settle() {
               aria-label={t('common.currency')}
               value={expCurrency}
               onChange={(e) => setExpCurrency(e.target.value as CurrencyCode)}
-              className="cursor-pointer rounded-[12px] border-2 border-gray-200 bg-white px-2.5 text-sm font-semibold text-currena-dark dark:border-white/10 dark:text-white"
+              className="cursor-pointer rounded-[12px] border-2 border-gray-200 bg-white px-2.5 text-sm font-semibold text-currena-dark"
             >
               {EXPENSE_CURRENCIES.map((code) => (
                 <option key={code} value={code}>
@@ -839,7 +839,7 @@ export function Settle() {
             {openGroup.members.map((member) => (
               <label
                 key={member}
-                className="flex cursor-pointer items-center gap-2.5 rounded-[12px] bg-currena-soft/60 px-3 py-2.5 text-sm dark:bg-white/5"
+                className="flex cursor-pointer items-center gap-2.5 rounded-[12px] bg-currena-soft/60 px-3 py-2.5 text-sm"
               >
                 <input
                   type="checkbox"
@@ -863,7 +863,7 @@ export function Settle() {
           <button
             type="button"
             onClick={() => photoInputRef.current?.click()}
-            className="mb-2 flex w-full cursor-pointer flex-col items-center gap-1 rounded-[12px] border-2 border-dashed border-gray-300 px-3 py-5 text-xs text-currena-muted transition-all duration-300 hover:border-currena-blue hover:text-currena-blue dark:border-white/20"
+            className="mb-2 flex w-full cursor-pointer flex-col items-center gap-1 rounded-[12px] border-2 border-dashed border-gray-300 px-3 py-5 text-xs text-currena-muted transition-all duration-300 hover:border-currena-blue hover:text-currena-blue"
           >
             <span className="text-2xl" aria-hidden="true">
               📸

@@ -33,26 +33,26 @@ export function About() {
           alt="Currena"
           className="mx-auto mb-4 h-24 w-auto drop-shadow-[0_6px_18px_rgba(74,144,226,0.25)]"
         />
-        <h1 className="mb-1 text-3xl font-extrabold text-currena-dark dark:text-white">
+        <h1 className="mb-1 text-3xl font-extrabold text-currena-dark">
           {t('app.name')}
         </h1>
         {/* Legacy tagline — Persian on the English page, by design. */}
-        <p dir="rtl" lang="fa" className="text-base font-medium text-currena-blue dark:text-currena-cyan">
+        <p dir="rtl" lang="fa" className="text-base font-medium text-currena-blue">
           {t('app.tagline')}
         </p>
       </div>
 
       <Card>
-        <p className="mb-6 text-sm leading-relaxed text-currena-dark dark:text-white/85">
+        <p className="mb-6 text-sm leading-relaxed text-currena-dark">
           {t('about.aboutText1')}
         </p>
 
         {/* Feature list (legacy .feature-list; 2-up from tablet up) */}
         <ul className="mb-6 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
           {FEATURES.map(({ emoji, key }) => (
-            <li key={key} className="flex items-start gap-3 text-sm text-currena-dark dark:text-white/85">
+            <li key={key} className="flex items-start gap-3 text-sm text-currena-dark">
               <span
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-currena-soft text-lg dark:bg-white/10"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-currena-soft text-lg"
                 aria-hidden="true"
               >
                 {emoji}
@@ -62,16 +62,16 @@ export function About() {
           ))}
         </ul>
 
-        <p className="mb-7 text-sm leading-relaxed text-currena-dark dark:text-white/85">
+        <p className="mb-7 text-sm leading-relaxed text-currena-dark">
           {t('about.aboutText2')}
         </p>
 
         {/* Creator section (legacy .creator-section) */}
-        <div className="rounded-[15px] bg-currena-soft px-5 py-4 text-center dark:bg-white/5">
+        <div className="rounded-[15px] bg-currena-soft px-5 py-4 text-center">
           <p className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-currena-muted">
             {t('app.createdBy')}
           </p>
-          <p className="text-lg font-bold text-currena-blue dark:text-currena-cyan">
+          <p className="text-lg font-bold text-currena-blue">
             {t('app.creatorName')}
           </p>
         </div>

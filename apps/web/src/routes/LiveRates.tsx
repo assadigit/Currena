@@ -10,9 +10,10 @@
  * reads ONE snapshot (checklist #4) and computes all 8 values locally via
  * @currena/core. Auto-refresh every 30s calls snapshotStore.refresh, which
  * re-fetches only when the freshness window has lapsed — the network stays
- * "once per window". Visual identity is the legacy gold-on-dark board in
- * dark mode and a warm paper/white professional board in light mode
- * (owner request 2026-09-17: the board used to be dark-only).
+ * "once per window". Visual identity is harmonized with the rest of the app
+ * (owner request 2026-09-17): the former gold-on-paper board was retired in
+ * favor of the site's own white cards / soft-blue accents / neutral ink,
+ * and the app is light-only.
  *
  * Rate intelligence: each card carries a ▲/▼ delta chip vs the previous
  * snapshot generation (snapshot-store `previous` baseline) and flashes
@@ -162,18 +163,19 @@ export function LiveRates() {
   };
 
   return (
-    // Theme-aware board (owner request 2026-09-17): warm paper + white
-    // cards in light mode; the legacy gold-on-navy identity in dark mode.
-    <div className="board-page pb-24">
+    // Harmonized board (owner request 2026-09-17): the page keeps the app's
+    // own background and every card uses the site's white-card language —
+    // same surface, ring and shadow family as the converter and tools.
+    <div className="pb-24">
       <div className="mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-6xl xl:max-w-[1280px] lg:px-8">
         {/* Header */}
         <div className="mb-6 text-center">
-          <h2 className="mb-2.5 text-2xl font-bold text-board-gold lg:text-3xl">{t('liveRates.iranianTomanRates')}</h2>
+          <h2 className="mb-2.5 text-2xl font-bold text-currena-dark lg:text-3xl">{t('liveRates.iranianTomanRates')}</h2>
           <div className="inline-flex items-center gap-2 rounded-full bg-currena-success/20 px-4 py-2 text-sm font-semibold text-currena-success">
             <span className="live-dot !h-2.5 !w-2.5" aria-hidden="true" />
             {t('liveRates.liveUpdates')}
           </div>
-          <p className="mt-2.5 text-xs opacity-70">
+          <p className="mt-2.5 text-xs text-currena-muted">
             {t('common.lastUpdated')}:{' '}
             {snapshot
               ? formatDate(snapshot.fetchedAt, numberLocale, { withTime: true })
@@ -198,7 +200,7 @@ export function LiveRates() {
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-[0.95rem] font-semibold text-currena-warning">{t('converter.usingCachedRates')}</p>
-              <p className="text-xs opacity-80">
+              <p className="text-xs text-currena-muted">
                 {t('common.lastUpdated')}: {formatDate(snapshot.fetchedAt, numberLocale, { withTime: true })}
               </p>
             </div>
@@ -207,7 +209,7 @@ export function LiveRates() {
 
         {/* Error state (legacy .error-message) */}
         {state.status === 'error' && !snapshot ? (
-          <div className="mb-4 rounded-xl bg-red-500/15 px-4 py-4 text-sm font-semibold text-red-600 dark:bg-red-500/20 dark:text-[#ff5252]">
+          <div className="mb-4 rounded-xl bg-red-500/15 px-4 py-4 text-sm font-semibold text-red-600">
             {t('liveRates.couldNotFetch')}
           </div>
         ) : null}
@@ -233,7 +235,7 @@ export function LiveRates() {
                 return (
                   <article
                     key={code}
-                    className={`h-full rounded-[18px] bg-board-card p-5 ring-1 ring-black/[0.06] shadow-[0_10px_28px_rgba(120,110,60,0.14)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(120,110,60,0.22)] dark:ring-white/[0.06] dark:shadow-[10px_10px_20px_rgba(0,0,0,0.7),-10px_-10px_20px_rgba(255,255,255,0.05)] ${
+                    className={`h-full rounded-[18px] bg-white p-5 ring-1 ring-black/[0.06] shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_36px_rgba(0,0,0,0.14)] ${
                       flashDir === 'up' ? 'rate-flash-up' : flashDir === 'down' ? 'rate-flash-down' : ''
                     }`}
                   >
@@ -244,23 +246,23 @@ export function LiveRates() {
                         className="h-[35px] w-[50px] rounded-md object-cover"
                       />
                       <div className="min-w-0 flex-1">
-                        <h3 className="truncate text-[1.05rem] font-semibold text-board-gold">
+                        <h3 className="truncate text-[1.05rem] font-semibold text-currena-dark">
                           {t(`currencies.${code}` as TranslationKey)}
                         </h3>
-                        <p className="text-xs opacity-70">
+                        <p className="text-xs text-currena-muted">
                           {code} → <bdi>{label('IRR')}</bdi>
                         </p>
                       </div>
                       {copied ? (
-                        <span className="shrink-0 text-[0.7rem] font-bold text-emerald-700 dark:text-currena-success">✅</span>
+                        <span className="shrink-0 text-[0.7rem] font-bold text-emerald-700">✅</span>
                       ) : null}
                     </header>
-                    <div className="mb-3 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 rounded-xl bg-gold-primary/10 p-4">
-                      <span className="shrink-0 text-sm opacity-80">1 {code} =</span>
-                      <span className={`text-lg font-bold text-board-gold ${card?.ok ? '' : 'rate-loading'}`}>
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 rounded-xl bg-currena-soft p-4">
+                      <span className="shrink-0 text-sm text-currena-muted">1 {code} =</span>
+                      <span className={`text-lg font-bold text-currena-dark ${card?.ok ? '' : 'rate-loading'}`}>
                         {rateNum}
                         {card?.ok && rate !== null ? (
-                          <span className="ms-1.5 text-[0.72rem] font-bold opacity-75" dir="ltr">
+                          <span className="ms-1.5 text-[0.72rem] font-bold text-currena-muted" dir="ltr">
                             {label('IRR')}
                           </span>
                         ) : null}
@@ -274,25 +276,25 @@ export function LiveRates() {
                     ) : null}
                     {/* Micro-trend over the recorded snapshot generations. */}
                     {series && series.length >= 2 && trend ? (
-                      <div className="mb-3 flex items-center gap-3 rounded-xl bg-board-subtle px-3 py-2">
+                      <div className="mb-3 flex items-center gap-3 rounded-xl bg-currena-soft/50 px-3 py-2">
                         <div className="min-w-0 flex-1">
-                          <p className="text-[0.65rem] font-semibold uppercase tracking-wider opacity-60">
+                          <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-currena-muted">
                             📈 {t('trend.recentChecks', { n: series.length })}
                           </p>
                           <p
                             className={`text-xs font-bold ${
                               trend.dir === 'up'
-                                ? 'text-emerald-700 dark:text-currena-success'
+                                ? 'text-emerald-700'
                                 : trend.dir === 'down'
-                                  ? 'text-red-600 dark:text-[#ff5252]'
-                                  : 'opacity-60'
+                                  ? 'text-red-600'
+                                  : 'text-currena-muted'
                             }`}
                           >
                             {trend.dir === 'flat'
                               ? t('trend.flat')
                               : `${trend.pct >= 0 ? '+' : ''}${formatNumber(trend.pct, numberLocale, { maximumFractionDigits: 2 })}%`}
                             {' · '}
-                            <span className="font-normal opacity-60">
+                            <span className="font-normal text-currena-muted">
                               {t('trend.range', {
                                 min: formatNumber(Math.min(...series), numberLocale, { maximumFractionDigits: 0 }),
                                 max: formatNumber(Math.max(...series), numberLocale, { maximumFractionDigits: 0 }),
@@ -318,7 +320,7 @@ export function LiveRates() {
                           href={profileUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 rounded-full border border-currena-blue/30 bg-currena-blue/10 px-4 py-2 text-xs text-currena-blue transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-blue/20 dark:border-blue-400/30 dark:bg-blue-500/10 dark:text-[#42a5f5] dark:hover:bg-blue-500/20"
+                          className="inline-flex items-center gap-1.5 rounded-full border border-currena-blue/30 bg-currena-blue/10 px-4 py-2 text-xs text-currena-blue transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-blue/20"
                         >
                           🔗 {t('common.viewOnTgju')}
                         </a>
@@ -331,10 +333,10 @@ export function LiveRates() {
                           onClick={() => void copyRate(code, rate)}
                           title={t('liveRates.copyRate')}
                           aria-label={t('liveRates.copyRate')}
-                          className={`inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-board-gold ${
+                          className={`inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
                             copied
-                              ? 'border-currena-success/40 bg-currena-success/15 text-emerald-700 dark:text-currena-success'
-                              : 'border-black/10 bg-black/[0.03] text-currena-dark/75 hover:border-black/25 hover:bg-black/[0.06] dark:border-white/15 dark:bg-white/5 dark:text-white/75 dark:hover:border-white/30 dark:hover:bg-white/10'
+                              ? 'border-currena-success/40 bg-currena-success/15 text-emerald-700'
+                              : 'border-black/10 bg-black/[0.03] text-currena-dark/75 hover:border-black/25 hover:bg-black/[0.06]'
                           }`}
                         >
                           {copied ? t('liveRates.rateCopied') : `📋 ${t('liveRates.copyRate')}`}
@@ -346,7 +348,7 @@ export function LiveRates() {
               })
             : // First load (no snapshot yet): 8 shimmer skeletons.
               BOARD.map((code) => (
-                <div key={code} className="h-full rounded-[18px] bg-board-card p-5" aria-hidden="true">
+                <div key={code} className="h-full rounded-[18px] bg-white p-5" aria-hidden="true">
                   <header className="mb-4 flex items-center gap-3">
                     <Skeleton className="h-[35px] w-[50px] rounded-md" />
                     <div className="flex-1 space-y-2">
@@ -365,13 +367,13 @@ export function LiveRates() {
 
       </div>
 
-      {/* Manual refresh FAB (legacy gold, spins while fetching) */}
+      {/* Manual refresh FAB — the site's CTA gradient, spins while fetching */}
       <button
         type="button"
         onClick={() => void snapshotStore.refresh('tgju')}
         title={t('liveRates.refresh')}
         aria-label={t('liveRates.refresh')}
-        className={`fixed bottom-5 end-5 z-[999] h-[60px] w-[60px] cursor-pointer rounded-full border-0 bg-gold-vibrant text-2xl text-black shadow-[0_6px_20px_rgba(255,215,0,0.5)] transition-all duration-300 hover:-translate-y-1 hover:rotate-180 ${loading ? 'refresh-spinning' : ''}`}
+        className={`fixed bottom-5 end-5 z-[999] h-[60px] w-[60px] cursor-pointer rounded-full border-0 cta-gradient text-2xl text-white shadow-[0_6px_20px_rgba(102,126,234,0.45)] transition-all duration-300 hover:-translate-y-1 hover:rotate-180 ${loading ? 'refresh-spinning' : ''}`}
       >
         🔄
       </button>

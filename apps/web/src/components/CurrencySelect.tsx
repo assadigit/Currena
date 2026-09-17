@@ -38,7 +38,7 @@ export function CurrencySelect({ id, value, onChange, ariaLabel, codes }: Curren
       aria-label={ariaLabel}
       value={value}
       onChange={(e) => onChange(e.target.value as CurrencyCode)}
-      className="w-full cursor-pointer rounded-[15px] border-2 border-gray-200 bg-white px-3.5 py-3.5 text-sm font-semibold text-currena-dark transition-all duration-300 focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:text-white"
+      className="w-full cursor-pointer rounded-[15px] border-2 border-gray-200 bg-white px-3.5 py-3.5 text-sm font-semibold text-currena-dark transition-all duration-300 focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10"
     >
       {allowed.includes('IRR') ? (
         <optgroup label={t('common.currencyGroupIranian')}>

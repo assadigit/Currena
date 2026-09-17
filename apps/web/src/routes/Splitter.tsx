@@ -124,7 +124,7 @@ export function Splitter() {
 
   return (
     <div className="mx-auto w-full max-w-[500px] px-5 py-6 sm:max-w-[600px] lg:max-w-[920px] lg:px-10">
-      <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white lg:text-2xl">
+      <h1 className="mb-1 text-xl font-bold text-currena-dark lg:text-2xl">
         💰 {t('expenseSplitter.title')}
       </h1>
 
@@ -136,7 +136,7 @@ export function Splitter() {
         {/* Total amount + currency — side by side from sm up */}
         <div className="mb-4 grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="splitTotal" className="mb-1.5 block text-sm font-bold text-currena-dark dark:text-white">
+            <label htmlFor="splitTotal" className="mb-1.5 block text-sm font-bold text-currena-dark">
               {t('expenseSplitter.totalExpenseAmount')}
             </label>
             <input
@@ -148,11 +148,11 @@ export function Splitter() {
               value={amount}
               placeholder={t('expenseSplitter.totalPlaceholder')}
               onChange={(e) => setAmount(thousandSeparateInput(e.target.value))}
-              className="w-full rounded-[15px] border-2 border-gray-200 bg-white px-4 py-3.5 text-lg font-bold text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:text-white"
+              className="w-full rounded-[15px] border-2 border-gray-200 bg-white px-4 py-3.5 text-lg font-bold text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10"
             />
           </div>
           <div>
-            <label htmlFor="splitCurrency" className="mb-1.5 block text-sm font-bold text-currena-dark dark:text-white">
+            <label htmlFor="splitCurrency" className="mb-1.5 block text-sm font-bold text-currena-dark">
               {t('expenseSplitter.amountCurrency')}
             </label>
             <CurrencySelect
@@ -168,7 +168,7 @@ export function Splitter() {
         </div>
 
         {/* People stepper (legacy: number input 1-100) */}
-        <label htmlFor="splitPeople" className="mb-1.5 block text-sm font-bold text-currena-dark dark:text-white">
+        <label htmlFor="splitPeople" className="mb-1.5 block text-sm font-bold text-currena-dark">
           {t('expenseSplitter.numberOfPeople')}
         </label>
         <div className="mb-4 flex items-center gap-3">
@@ -176,14 +176,14 @@ export function Splitter() {
             type="button"
             aria-label="-"
             onClick={() => setPeople((p) => Math.max(1, p - 1))}
-            className="h-11 w-11 cursor-pointer rounded-full border-0 bg-currena-soft text-xl font-bold text-currena-dark transition-all duration-300 hover:bg-currena-blue/15 active:scale-95 dark:bg-white/10 dark:text-white"
+            className="h-11 w-11 cursor-pointer rounded-full border-0 bg-currena-soft text-xl font-bold text-currena-dark transition-all duration-300 hover:bg-currena-blue/15 active:scale-95"
           >
             −
           </button>
           <output
             id="splitPeople"
             aria-live="polite"
-            className="min-w-16 flex-1 rounded-[15px] border-2 border-gray-200 bg-white py-2.5 text-center text-lg font-bold text-currena-dark dark:border-white/10 dark:text-white"
+            className="min-w-16 flex-1 rounded-[15px] border-2 border-gray-200 bg-white py-2.5 text-center text-lg font-bold text-currena-dark"
           >
             {peopleLabel}
           </output>
@@ -191,7 +191,7 @@ export function Splitter() {
             type="button"
             aria-label="+"
             onClick={() => setPeople((p) => Math.min(100, p + 1))}
-            className="h-11 w-11 cursor-pointer rounded-full border-0 bg-currena-soft text-xl font-bold text-currena-dark transition-all duration-300 hover:bg-currena-blue/15 active:scale-95 dark:bg-white/10 dark:text-white"
+            className="h-11 w-11 cursor-pointer rounded-full border-0 bg-currena-soft text-xl font-bold text-currena-dark transition-all duration-300 hover:bg-currena-blue/15 active:scale-95"
           >
             +
           </button>
@@ -229,20 +229,20 @@ export function Splitter() {
       {/* Results */}
       {result ? (
         <Card className="lg:sticky lg:top-24">
-          <h2 className="mb-4 text-base font-bold text-currena-dark dark:text-white">
+          <h2 className="mb-4 text-base font-bold text-currena-dark">
             {t('expenseSplitter.splitResults')}
           </h2>
 
           <div className="mb-4 space-y-1.5">
             <div className="flex items-center justify-between text-sm">
               <span className="text-currena-muted">{t('expenseSplitter.totalAmount')}</span>
-              <span className="font-bold text-currena-dark dark:text-white">
+              <span className="font-bold text-currena-dark">
                 {fmt(result.total, currency)} <bdi>{label(currency)}</bdi>
               </span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-currena-muted">👤 {t('expenseSplitter.eachPersonPays')}</span>
-              <span className="text-lg font-bold text-currena-blue dark:text-currena-cyan">
+              <span className="text-lg font-bold text-currena-blue">
                 {fmt(result.shares[0] ?? 0, currency)}{' '}
                 <span className="text-[0.7em] font-bold opacity-80">
                   <bdi>{label(currency)}</bdi>
@@ -279,20 +279,20 @@ export function Splitter() {
           </div>
 
           {/* Breakdown (legacy list) */}
-          <p className="mb-2 text-sm font-bold text-currena-dark dark:text-white">
+          <p className="mb-2 text-sm font-bold text-currena-dark">
             {t('expenseSplitter.breakdown')}
           </p>
           <div className="space-y-1.5">
             {result.shares.map((share, i) => (
               <div
                 key={i}
-                className="flex items-center gap-2.5 rounded-[10px] bg-currena-soft/70 px-3 py-2 text-sm dark:bg-white/5"
+                className="flex items-center gap-2.5 rounded-[10px] bg-currena-soft/70 px-3 py-2 text-sm"
               >
                 <span aria-hidden="true">👤</span>
                 <span className="text-currena-muted">
                   {t('expenseSplitter.personLabel', { n: formatNumber(i + 1, numberLocale, { maximumFractionDigits: 0 }) })}
                 </span>
-                <span className="ms-auto font-bold text-currena-dark dark:text-white">
+                <span className="ms-auto font-bold text-currena-dark">
                   {fmt(share, currency)} <bdi>{label(currency)}</bdi>
                 </span>
               </div>
