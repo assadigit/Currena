@@ -249,23 +249,74 @@ body {
 
 /* ------------------------------------------------------------------ *
  * Amount input panel — THE hero of the converter (owner request
- * 2026-09-17: "give more visual weight to where users have to input
- * their numbers"). A soft blue-tinted gradient rising from the panel's
- * top edge + an accent border mark the input zone at a glance, in the
- * same white/blue family as the rest of the harmonized design (the old
- * cream/gold stays retired). The dark variant keeps the same panel
- * language on the night surface.
+ * 2026-09-18: "make the input box of number pastel gold (like it used
+ * to be) … an animating css effect eye-grabbing box, so user know what
+ * to do. with proper contrast").
+ *
+ * LIGHT mode returns to the legacy PASTEL GOLD the owner remembers
+ * (legacy .amount-section: linear-gradient(135deg,#FFF9E6,#FFE999),
+ * border #FFE066, gold-tinted shadow) — restyled at today's fidelity.
+ * While the field is IDLE (empty + unfocused) the panel becomes an
+ * eye-grabbing attractor: a warm sheen sweeps the gold gradient and
+ * the border breathes a soft glow, so users know exactly where to type.
+ * The moment they engage (focus or value) the attract animations settle
+ * and focus lands a crisp gold ring — attention without annoyance.
+ * DARK mode keeps the Currena Night family with the same affordance in
+ * blue. All motion is disabled under prefers-reduced-motion.
  * ------------------------------------------------------------------ */
 
 .amount-panel {
-  background:
-    linear-gradient(180deg, rgba(74, 144, 226, 0.10) 0%, rgba(74, 144, 226, 0.035) 42%, rgba(74, 144, 226, 0) 100%),
-    #ffffff;
-  border: 2px solid rgba(74, 144, 226, 0.30);
+  position: relative;
+  /* pastel gold, like it used to be */
+  background: linear-gradient(135deg, #fffbea 0%, #fff3c2 48%, #ffe999 100%);
+  border: 2px solid #ffe066;
   box-shadow:
-    0 10px 30px rgba(74, 144, 226, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    0 10px 30px rgba(255, 213, 79, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transition:
+    box-shadow 0.45s ease,
+    border-color 0.45s ease;
 }
+
+/* Sheen band that sweeps the gold while idle (attract mode only).
+ * Clipped to the rounded panel by its own border-radius — the panel's
+ * outer glows are never cut. */
+.amount-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.65) 50%,
+    transparent 68%
+  );
+  background-size: 250% 100%;
+  background-position: 200% 0;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+/* IDLE attractor: breathing gold glow + sweeping sheen + coin bob. */
+.amount-panel.amount-attract {
+  animation: currena-amount-glow 2.8s ease-in-out infinite;
+}
+.amount-panel.amount-attract::before {
+  opacity: 1;
+  animation: currena-amount-sheen 4.6s ease-in-out infinite;
+}
+
+/* ENGAGED: the panel leans in while you type — warmer, crisper. */
+.amount-panel:focus-within {
+  border-color: #f5bd1f;
+  box-shadow:
+    0 12px 36px rgba(240, 180, 41, 0.38),
+    0 0 0 3px rgba(255, 213, 79, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
 .dark .amount-panel {
   background:
     linear-gradient(180deg, rgba(111, 174, 236, 0.14) 0%, rgba(111, 174, 236, 0.05) 42%, rgba(111, 174, 236, 0) 100%),
@@ -274,6 +325,84 @@ body {
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.dark .amount-panel::before {
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(170, 210, 250, 0.12) 50%,
+    transparent 65%
+  );
+  background-size: 250% 100%;
+  background-position: 200% 0;
+}
+.dark .amount-panel.amount-attract {
+  animation-name: currena-amount-glow-night;
+}
+.dark .amount-panel:focus-within {
+  border-color: rgba(111, 174, 236, 0.55);
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.55),
+    0 0 0 3px rgba(111, 174, 236, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+@keyframes currena-amount-glow {
+  0%, 100% {
+    border-color: #ffe066;
+    box-shadow:
+      0 10px 30px rgba(255, 213, 79, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+  50% {
+    border-color: #ffcf33;
+    box-shadow:
+      0 14px 44px rgba(255, 200, 40, 0.5),
+      0 0 0 4px rgba(255, 213, 79, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+}
+@keyframes currena-amount-glow-night {
+  0%, 100% {
+    border-color: rgba(111, 174, 236, 0.32);
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+  50% {
+    border-color: rgba(111, 174, 236, 0.6);
+    box-shadow:
+      0 14px 44px rgba(0, 0, 0, 0.6),
+      0 0 0 4px rgba(111, 174, 236, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+}
+@keyframes currena-amount-sheen {
+  0% { background-position: 200% 0; }
+  55% { background-position: -200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* 💰 coin bob — a small double-bounce each attract cycle (light+dark). */
+@keyframes currena-amount-coin {
+  0%, 10%, 22%, 100% { transform: translateY(0); }
+  5%, 16% { transform: translateY(-6px); }
+}
+.amount-coin {
+  animation: currena-amount-coin 4.6s ease-in-out infinite;
+}
+
+/* Quick-amount chip — SELECTED state inside the pastel-gold panel: a warm
+ * gold fill with deep-brown text (contrast ≈ 7:1) in light mode; the app's
+ * Currena Night CTA gradient in dark mode (custom classes can't take
+ * Tailwind `dark:` variants, so the theme split lives here). */
+.amount-chip-active {
+  background-image: linear-gradient(135deg, #ffd34d 0%, #f0b429 100%);
+  color: #4a3705;
+}
+.dark .amount-chip-active {
+  background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
 }
 
 /* Scrollbar (thin, subtle) */
@@ -338,6 +467,11 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .rate-flash-up,
   .rate-flash-down {
+    animation: none;
+  }
+  .amount-panel.amount-attract,
+  .amount-panel.amount-attract::before,
+  .amount-coin {
     animation: none;
   }
 }
