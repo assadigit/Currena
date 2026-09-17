@@ -31,7 +31,7 @@ export function About() {
         <img
           src="/images/currena-logo.png"
           alt="Currena"
-          className="mx-auto mb-4 h-24 w-auto drop-shadow-[0_6px_18px_rgba(74,144,226,0.25)]"
+          className="currena-brand-logo mx-auto mb-4 h-24 w-auto drop-shadow-[0_6px_18px_rgba(74,144,226,0.25)]"
         />
         <h1 className="mb-1 text-3xl font-extrabold text-currena-dark">
           {t('app.name')}

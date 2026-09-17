@@ -42,7 +42,7 @@ export function AmountInput({ id, value, onChange, currency, invalid }: AmountIn
           value={value}
           aria-invalid={invalid === true}
           onChange={(e) => onChange(thousandSeparateInput(e.target.value))}
-          className={`w-full rounded-[15px] bg-white px-4 py-4 ps-14 text-2xl font-bold text-currena-dark shadow-[0_4px_15px_rgba(0,0,0,0.08)] placeholder:font-medium placeholder:text-[#bdc3c7] focus:outline-none focus:ring-3 focus:ring-currena-blue/30 ${
+          className={`w-full rounded-[15px] bg-white px-4 py-4 ps-14 text-2xl font-bold text-currena-dark shadow-[0_4px_15px_rgba(0,0,0,0.08)] placeholder:font-medium placeholder:text-[#bdc3c7] focus:outline-none focus:ring-3 focus:ring-currena-blue/30 dark:bg-[#222C3B] dark:shadow-[0_4px_15px_rgba(0,0,0,0.4)] dark:placeholder:text-[#5B6B80] ${
             invalid ? 'ring-3 ring-currena-warning/50' : ''
           }`}
         />

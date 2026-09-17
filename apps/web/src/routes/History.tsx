@@ -249,7 +249,7 @@ export function History() {
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t('history.searchPlaceholder')}
               aria-label={t('history.searchPlaceholder')}
-              className="w-full rounded-full border-2 border-gray-200 bg-white py-3 ps-12 pe-4 text-sm font-medium text-currena-dark transition-all duration-300 placeholder:font-normal placeholder:text-currena-muted/70 focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10"
+              className="w-full rounded-full border-2 border-gray-200 bg-white py-3 ps-12 pe-4 text-sm font-medium text-currena-dark transition-all duration-300 placeholder:font-normal placeholder:text-currena-muted/70 focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:bg-[#222C3B]"
             />
           </div>
           <div className="flex flex-wrap gap-2">
@@ -260,7 +260,7 @@ export function History() {
               className={`min-h-[36px] cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-bold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
                 filterPair === 'all'
                   ? 'border-currena-blue bg-currena-blue/10 text-currena-blue shadow-[0_4px_12px_rgba(74,144,226,0.25)]'
-                  : 'border-black/10 bg-currena-soft text-currena-dark'
+                  : 'border-black/10 bg-currena-soft text-currena-dark dark:border-white/10'
               }`}
             >
               {t('history.filterAll')} ({formatNumber(entries.length, numberLocale)})
@@ -277,7 +277,7 @@ export function History() {
                   className={`inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
                     active
                       ? 'border-currena-blue bg-currena-blue/10 text-currena-blue shadow-[0_4px_12px_rgba(74,144,226,0.25)]'
-                      : 'border-black/10 bg-currena-soft text-currena-dark'
+                      : 'border-black/10 bg-currena-soft text-currena-dark dark:border-white/10'
                   }`}
                 >
                   <img src={`/images/flags/${from.toLowerCase()}.png`} alt="" className="h-3 w-4 rounded-[2px] object-cover" />
@@ -311,7 +311,7 @@ export function History() {
               isDeleting ? 'pointer-events-none scale-95 opacity-0 blur-sm' : 'hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)]'
             }`}
           >
-            <div className="mb-3 flex items-start justify-between gap-3 border-b border-black/5 pb-3">
+            <div className="mb-3 flex items-start justify-between gap-3 border-b border-black/5 pb-3 dark:border-white/10">
               <div className="flex items-center gap-2 text-base font-bold text-currena-dark">
                 <img src={`/images/flags/${entry.from.toLowerCase()}.png`} alt="" className="h-4 w-6 rounded-[3px] object-cover" />
                 <span dir="ltr">{label(entry.from)}</span>
@@ -342,7 +342,7 @@ export function History() {
               <SourceBadge source={asSource(entry.source)} />
             </p>
             {/* Per-entry actions: repeat at today's rate / delete */}
-            <div className="mt-3 flex items-center justify-between gap-2 border-t border-black/5 pt-3">
+            <div className="mt-3 flex items-center justify-between gap-2 border-t border-black/5 pt-3 dark:border-white/10">
               <button
                 type="button"
                 onClick={() => repeat(entry)}

@@ -355,7 +355,7 @@ export function BatchConverter() {
               onClick={() => setMode(m)}
               className={`cursor-pointer rounded-[9px] border-0 px-3 py-2.5 text-xs font-semibold transition-all duration-300 ${
                 mode === m
-                  ? 'bg-white text-currena-blue shadow'
+                  ? 'bg-white text-currena-blue shadow dark:bg-[#2A3648]'
                   : 'text-currena-muted hover:text-currena-dark'
               }`}
             >
@@ -374,7 +374,7 @@ export function BatchConverter() {
               dir="ltr"
               placeholder={'Enter amounts, one per line:\n4556\n4545\n3443.50\n2199.99\n\n100 usd eur\n150.99 USD | iPhone 15 Pro'}
               aria-label={t('batchConverter.bulkInput')}
-              className="w-full resize-y rounded-[15px] border-2 border-gray-200 bg-white px-4 py-3 text-sm text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10"
+              className="w-full resize-y rounded-[15px] border-2 border-gray-200 bg-white px-4 py-3 text-sm text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:bg-[#222C3B]"
             />
             <p className="mt-2 text-xs text-currena-muted">{t('batchConverter.bulkHint')}</p>
           </div>
@@ -395,7 +395,7 @@ export function BatchConverter() {
                         prev.map((f) => (f.id === field.id ? { ...f, amount: e.target.value } : f)),
                       )
                     }
-                    className="min-w-0 flex-1 rounded-[12px] border-2 border-gray-200 bg-white px-3 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none"
+                    className="min-w-0 flex-1 rounded-[12px] border-2 border-gray-200 bg-white px-3 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none dark:border-white/10 dark:bg-[#222C3B]"
                   />
                   <button
                     type="button"
@@ -418,7 +418,7 @@ export function BatchConverter() {
                       prev.map((f) => (f.id === field.id ? { ...f, note: e.target.value } : f)),
                     )
                   }
-                  className="w-full rounded-[12px] border-2 border-gray-200 bg-white px-3 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none"
+                  className="w-full rounded-[12px] border-2 border-gray-200 bg-white px-3 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none dark:border-white/10 dark:bg-[#222C3B]"
                 />
               </div>
             ))}

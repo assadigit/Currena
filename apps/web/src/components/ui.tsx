@@ -43,7 +43,7 @@ export function Button({ variant = 'secondary', className = '', ...rest }: Butto
 export function Card({ className = '', children }: { className?: string; children: ReactNode }) {
   return (
     <div
-      className={`rounded-[25px] bg-white p-7 shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ${className}`}
+      className={`rounded-[25px] bg-white p-7 shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 dark:bg-[#1A222E] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] ${className}`}
     >
       {children}
     </div>
@@ -189,7 +189,7 @@ export function Switch({ id, checked, onChange, label }: SwitchProps) {
           role="switch"
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
-          className="peer h-full w-full cursor-pointer appearance-none rounded-full bg-gray-300 transition-colors duration-300 checked:bg-currena-success"
+          className="peer h-full w-full cursor-pointer appearance-none rounded-full bg-gray-300 transition-colors duration-300 checked:bg-currena-success dark:bg-white/25"
         />
         <span
           aria-hidden="true"
@@ -208,7 +208,7 @@ export function Toast({ message }: { message: string }) {
   return (
     <div
       role="status"
-      className="fade-in fixed inset-x-4 bottom-4 z-[10001] mx-auto max-w-sm rounded-2xl bg-currena-dark/95 px-4 py-3 text-center text-sm whitespace-pre-line text-white shadow-lg"
+      className="fade-in fixed inset-x-4 bottom-4 z-[10001] mx-auto max-w-sm rounded-2xl bg-[#2C3E50]/95 px-4 py-3 text-center text-sm whitespace-pre-line text-white shadow-lg dark:bg-[#2A3A52]/95"
     >
       {message}
     </div>

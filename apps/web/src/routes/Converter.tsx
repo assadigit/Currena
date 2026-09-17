@@ -339,7 +339,7 @@ export function Converter() {
                   className={`inline-flex min-h-[38px] cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
                     active
                       ? 'border-currena-blue bg-currena-blue/10 text-currena-blue shadow-[0_4px_12px_rgba(74,144,226,0.25)]'
-                      : 'border-black/10 bg-currena-soft text-currena-dark hover:border-currena-blue/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]'
+                      : 'border-black/10 bg-currena-soft text-currena-dark hover:border-currena-blue/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:border-white/10'
                   }`}
                 >
                   <img
@@ -442,7 +442,7 @@ export function Converter() {
                     className={`min-h-[38px] cursor-pointer rounded-full border px-4 py-1.5 text-sm font-bold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
                       active
                         ? 'border-transparent cta-gradient text-white shadow-[0_6px_18px_rgba(102,126,234,0.4)]'
-                        : 'border-black/10 bg-currena-soft text-currena-dark hover:border-currena-blue/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]'
+                        : 'border-black/10 bg-currena-soft text-currena-dark hover:border-currena-blue/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:border-white/10'
                     }`}
                   >
                     {formatNumber(value, numberLocale, { maximumFractionDigits: 0 })}
@@ -477,7 +477,7 @@ export function Converter() {
                 onChange={(e) => setManualRate(e.target.value)}
                 placeholder={t('converter.enterCustomRate')}
                 aria-label={t('converter.enterCustomRate')}
-                className="mt-2.5 w-full rounded-[15px] border-2 border-gray-200 bg-white px-3.5 py-3.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10"
+                className="mt-2.5 w-full rounded-[15px] border-2 border-gray-200 bg-white px-3.5 py-3.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:bg-[#222C3B]"
               />
             ) : null}
           </div>

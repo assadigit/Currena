@@ -1,14 +1,24 @@
 @import "tailwindcss";
 
+/* Class-based dark mode (restored by owner request 2026-09-17: "I want both
+ * light mode and dark mode"). The pre-paint script in index.html + the theme
+ * store (lib/theme.ts) toggle the `.dark` class on <html>; light stays the
+ * default and the choice persists under the legacy `theme` key. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * Currena SPA styles (Phase 5).
  *
  * - Legacy palette ported 1:1 from the Django templates (Phase 1 extraction,
  *   docs/FEATURE_MAP.md §8).
- * - LIGHT-ONLY (owner request 2026-09-17: "dark mode is problematic, it
- *   stays light mode"). The old class-based dark mode was removed; the
- *   pre-paint script actively clears the legacy `dark` class + `theme` key
- *   so previously-dark devices land on light.
+ * - DUAL THEME: light is the site's primary identity; dark ("Currena Night")
+ *   is a first-class alternative with the same design language — the brand
+ *   navy ink simply inverts. Dark works by OVERRIDING the @theme CSS
+ *   variables inside `.dark` (Tailwind v4 pattern: utilities reference the
+ *   vars, so `bg-currena-soft`, `text-currena-dark`, … all re-theme
+ *   automatically) plus explicit `dark:` utilities for raw colors
+ *   (bg-white cards, border-gray-200 inputs, black/5 hairlines) in the
+ *   components.
  * - CSS logical properties only (ms-/me-/ps-/pe-, start/end) — RTL-safe.
  * - Legacy motion (loader dots, shimmer, popup slide-up, live-dot pulse,
  *   warning pulse, button shine) ported as plain CSS below.
@@ -31,6 +41,34 @@
   /* Typography: system stack for LTR/en; Farsi (lang=fa) switches to the
    * self-hosted Vazirmatn variable font below. */
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ------------------------------------------------------------------ *
+ * Currena Night — dark theme token overrides
+ *
+ * The brand ink (#2C3E50 navy) inverts into the light slate ink, the page
+ * becomes deep navy, and the soft tint becomes the elevated card tint.
+ * Accent hues are brightened one step so they hold contrast on dark
+ * surfaces. Surfaces that used raw `bg-white` get `dark:bg-[#1A222E]`
+ * utilities in the components (same family as --color-currena-soft here).
+ * ------------------------------------------------------------------ */
+
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --color-currena-soft: #232E40;
+  --color-currena-blue: #6FAEEC;
+  --color-currena-cyan: #8FDCCB;
+  --color-currena-coral: #FBB48C;
+  --color-currena-dark: #E8EDF4;
+  --color-currena-muted: #93A1B5;
+  --color-currena-warning: #FF8080;
+  --color-currena-success: #63C06C;
+  --color-currena-bg-light: #10151D;
 }
 
 /* Vazirmatn — the owner-requested Farsi typeface. One variable file covers
@@ -60,7 +98,8 @@ body {
   font-family: var(--font-sans);
 }
 
-/* CTA gradient — legacy `linear-gradient(135deg, #667eea, #764ba2)` */
+/* CTA gradient — legacy `linear-gradient(135deg, #667eea, #764ba2)`.
+ * Reads equally well on light and dark surfaces — unchanged in dark mode. */
 .cta-gradient {
   background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
@@ -110,7 +149,7 @@ body {
 .loader-dot:nth-child(2) { animation-delay: -0.16s; background: #7DD3C0; }
 .loader-dot:nth-child(3) { background: #F8A978; }
 
-/* Skeleton shimmer */
+/* Skeleton shimmer — light uses dark-on-white, dark uses light-on-navy */
 @keyframes currena-shimmer {
   from { background-position: 200% 0; }
   to { background-position: -200% 0; }
@@ -125,6 +164,15 @@ body {
   );
   background-size: 200% 100%;
   animation: currena-shimmer 1.4s ease infinite;
+}
+.dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.11) 37%,
+    rgba(255, 255, 255, 0.05) 63%
+  );
+  background-size: 200% 100%;
 }
 
 /* Live dot pulse (legacy beepingLive) */
@@ -200,15 +248,21 @@ body {
 }
 
 /* ------------------------------------------------------------------ *
- * Amount input panel — harmonized with the site's white cards
+ * Amount input panel — harmonized with the site's cards
  * (owner request 2026-09-17: removed the legacy cream/gold gradient so
- * the converter reads as one design with the rest of the app).
+ * the converter reads as one design with the rest of the app). The dark
+ * variant keeps the same panel language on the night surface.
  * ------------------------------------------------------------------ */
 
 .amount-panel {
   background: #ffffff;
   border: 2px solid #e8f4f8;
   box-shadow: 0 8px 25px rgba(74, 144, 226, 0.1);
+}
+.dark .amount-panel {
+  background: #1A222E;
+  border-color: rgba(111, 174, 236, 0.16);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
 }
 
 /* Scrollbar (thin, subtle) */
@@ -217,8 +271,30 @@ body {
 }
 
 /* ------------------------------------------------------------------ *
- * Rate intelligence — flash pulse when a board rate changes
+ * Brand logo — the logo file is monochrome navy on transparency (the
+ * light-mode identity). On the night surfaces it would vanish (navy on
+ * navy — the classic dark-mode bug), so it inverts to a clean white
+ * mark via filter. Applied to every <img class="currena-brand-logo">
+ * (header brand + About page logo).
  * ------------------------------------------------------------------ */
+
+.dark img.currena-brand-logo {
+  filter: brightness(0) invert(1);
+}
+
+/* ------------------------------------------------------------------ *
+ * Rate intelligence — flash pulse when a board rate changes.
+ * The resting surface is theme-aware via --flash-rest-bg (the keyframes
+ * must land back on the card's own background, white in light / night
+ * navy in dark — hardcoding #fff was a dark-mode bug).
+ * ------------------------------------------------------------------ */
+
+:root {
+  --flash-rest-bg: #ffffff;
+}
+.dark {
+  --flash-rest-bg: #1A222E;
+}
 
 @keyframes currena-rate-flash-up {
   0% {
@@ -226,8 +302,7 @@ body {
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4);
   }
   100% {
-    /* Return to the card's own resting surface (white, light-only). */
-    background-color: #ffffff;
+    background-color: var(--flash-rest-bg);
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0);
   }
 }
@@ -237,7 +312,7 @@ body {
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.4);
   }
   100% {
-    background-color: #ffffff;
+    background-color: var(--flash-rest-bg);
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0);
   }
 }

@@ -13,7 +13,8 @@
  * "once per window". Visual identity is harmonized with the rest of the app
  * (owner request 2026-09-17): the former gold-on-paper board was retired in
  * favor of the site's own white cards / soft-blue accents / neutral ink,
- * and the app is light-only.
+ * and the board re-themes cleanly between light and dark (night navy
+ * surfaces, same card language).
  *
  * Rate intelligence: each card carries a ▲/▼ delta chip vs the previous
  * snapshot generation (snapshot-store `previous` baseline) and flashes
@@ -209,7 +210,7 @@ export function LiveRates() {
 
         {/* Error state (legacy .error-message) */}
         {state.status === 'error' && !snapshot ? (
-          <div className="mb-4 rounded-xl bg-red-500/15 px-4 py-4 text-sm font-semibold text-red-600">
+          <div className="mb-4 rounded-xl bg-red-500/15 px-4 py-4 text-sm font-semibold text-red-600 dark:text-red-400">
             {t('liveRates.couldNotFetch')}
           </div>
         ) : null}
@@ -235,7 +236,7 @@ export function LiveRates() {
                 return (
                   <article
                     key={code}
-                    className={`h-full rounded-[18px] bg-white p-5 ring-1 ring-black/[0.06] shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_36px_rgba(0,0,0,0.14)] ${
+                    className={`h-full rounded-[18px] bg-white p-5 ring-1 ring-black/[0.06] shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_36px_rgba(0,0,0,0.14)] dark:bg-[#1A222E] dark:ring-white/[0.08] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] dark:hover:shadow-[0_14px_36px_rgba(0,0,0,0.6)] ${
                       flashDir === 'up' ? 'rate-flash-up' : flashDir === 'down' ? 'rate-flash-down' : ''
                     }`}
                   >
@@ -254,7 +255,7 @@ export function LiveRates() {
                         </p>
                       </div>
                       {copied ? (
-                        <span className="shrink-0 text-[0.7rem] font-bold text-emerald-700">✅</span>
+                        <span className="shrink-0 text-[0.7rem] font-bold text-emerald-700 dark:text-emerald-400">✅</span>
                       ) : null}
                     </header>
                     <div className="mb-3 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 rounded-xl bg-currena-soft p-4">
@@ -284,9 +285,9 @@ export function LiveRates() {
                           <p
                             className={`text-xs font-bold ${
                               trend.dir === 'up'
-                                ? 'text-emerald-700'
+                                ? 'text-emerald-700 dark:text-emerald-400'
                                 : trend.dir === 'down'
-                                  ? 'text-red-600'
+                                  ? 'text-red-600 dark:text-red-400'
                                   : 'text-currena-muted'
                             }`}
                           >
@@ -335,8 +336,8 @@ export function LiveRates() {
                           aria-label={t('liveRates.copyRate')}
                           className={`inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
                             copied
-                              ? 'border-currena-success/40 bg-currena-success/15 text-emerald-700'
-                              : 'border-black/10 bg-black/[0.03] text-currena-dark/75 hover:border-black/25 hover:bg-black/[0.06]'
+                              ? 'border-currena-success/40 bg-currena-success/15 text-emerald-700 dark:text-emerald-400'
+                              : 'border-black/10 bg-black/[0.03] text-currena-dark/75 hover:border-black/25 hover:bg-black/[0.06] dark:border-white/15 dark:bg-white/[0.04] dark:hover:border-white/30 dark:hover:bg-white/[0.08]'
                           }`}
                         >
                           {copied ? t('liveRates.rateCopied') : `📋 ${t('liveRates.copyRate')}`}
@@ -348,7 +349,7 @@ export function LiveRates() {
               })
             : // First load (no snapshot yet): 8 shimmer skeletons.
               BOARD.map((code) => (
-                <div key={code} className="h-full rounded-[18px] bg-white p-5" aria-hidden="true">
+                <div key={code} className="h-full rounded-[18px] bg-white p-5 dark:bg-[#1A222E]" aria-hidden="true">
                   <header className="mb-4 flex items-center gap-3">
                     <Skeleton className="h-[35px] w-[50px] rounded-md" />
                     <div className="flex-1 space-y-2">

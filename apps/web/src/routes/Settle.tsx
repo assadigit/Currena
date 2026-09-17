@@ -159,7 +159,7 @@ function Modal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="popup-slide-up max-h-[88vh] w-full max-w-[430px] overflow-y-auto rounded-[25px] bg-white p-6 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:max-w-[520px]">
+      <div className="popup-slide-up max-h-[88vh] w-full max-w-[430px] overflow-y-auto rounded-[25px] bg-white p-6 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:max-w-[520px] dark:bg-[#1A222E]">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold">{title}</h2>
           <button
@@ -178,7 +178,7 @@ function Modal({
 }
 
 const inputClass =
-  'w-full rounded-[12px] border-2 border-gray-200 bg-white px-3.5 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none';
+  'w-full rounded-[12px] border-2 border-gray-200 bg-white px-3.5 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none dark:border-white/10 dark:bg-[#222C3B]';
 
 /* ------------------------------------------------------------------ *
  * Route
@@ -477,7 +477,7 @@ export function Settle() {
                             : t('splitSettle.allSettledUp')}
                       </p>
                     </div>
-                    <div className="mt-3 border-t border-black/5 pt-3 text-end">
+                    <div className="mt-3 border-t border-black/5 pt-3 text-end dark:border-white/10">
                       <Button
                         variant="ghost"
                         className="!text-currena-warning px-3 py-1.5 text-xs"
@@ -557,7 +557,7 @@ export function Settle() {
                   onClick={() => setTab(id)}
                   className={`cursor-pointer rounded-[9px] border-0 px-2 py-2.5 text-xs font-semibold transition-all duration-300 ${
                     tab === id
-                      ? 'bg-white text-currena-blue shadow'
+                      ? 'bg-white text-currena-blue shadow dark:bg-[#2A3648]'
                       : 'text-currena-muted hover:text-currena-dark'
                   }`}
                 >
@@ -808,7 +808,7 @@ export function Settle() {
               aria-label={t('common.currency')}
               value={expCurrency}
               onChange={(e) => setExpCurrency(e.target.value as CurrencyCode)}
-              className="cursor-pointer rounded-[12px] border-2 border-gray-200 bg-white px-2.5 text-sm font-semibold text-currena-dark"
+              className="cursor-pointer rounded-[12px] border-2 border-gray-200 bg-white px-2.5 text-sm font-semibold text-currena-dark dark:border-white/10 dark:bg-[#222C3B]"
             >
               {EXPENSE_CURRENCIES.map((code) => (
                 <option key={code} value={code}>
@@ -863,7 +863,7 @@ export function Settle() {
           <button
             type="button"
             onClick={() => photoInputRef.current?.click()}
-            className="mb-2 flex w-full cursor-pointer flex-col items-center gap-1 rounded-[12px] border-2 border-dashed border-gray-300 px-3 py-5 text-xs text-currena-muted transition-all duration-300 hover:border-currena-blue hover:text-currena-blue"
+            className="mb-2 flex w-full cursor-pointer flex-col items-center gap-1 rounded-[12px] border-2 border-dashed border-gray-300 px-3 py-5 text-xs text-currena-muted transition-all duration-300 hover:border-currena-blue hover:text-currena-blue dark:border-white/15"
           >
             <span className="text-2xl" aria-hidden="true">
               📸

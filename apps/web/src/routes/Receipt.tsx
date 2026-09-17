@@ -110,7 +110,7 @@ function downloadBlob(blob: Blob, filename: string): void {
 }
 
 const inputClass =
-  'w-full rounded-[12px] border-2 border-gray-200 bg-white px-3 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none';
+  'w-full rounded-[12px] border-2 border-gray-200 bg-white px-3 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none dark:border-white/10 dark:bg-[#222C3B]';
 
 /* ------------------------------------------------------------------ *
  * Route
@@ -604,7 +604,7 @@ export function Receipt() {
                     aria-label={`${t('common.description')} ${index + 1}`}
                     value={item.category}
                     onChange={(e) => patchItem(item.id, { category: e.target.value as CategoryId })}
-                    className="min-w-0 flex-1 cursor-pointer rounded-[10px] border-2 border-gray-200 bg-white px-2.5 py-2 text-xs font-semibold text-currena-dark"
+                    className="min-w-0 flex-1 cursor-pointer rounded-[10px] border-2 border-gray-200 bg-white px-2.5 py-2 text-xs font-semibold text-currena-dark dark:border-white/10 dark:bg-[#222C3B]"
                   >
                     {CATEGORY_IDS.map((id) => (
                       <option key={id} value={id}>
@@ -644,7 +644,7 @@ export function Receipt() {
                       aria-label={`${t('common.currency')} ${index + 1}`}
                       value={item.currency}
                       onChange={(e) => patchItem(item.id, { currency: e.target.value as CurrencyCode })}
-                      className="w-[74px] cursor-pointer rounded-[10px] border-2 border-gray-200 bg-white px-1.5 py-2 text-xs font-semibold text-currena-dark"
+                      className="w-[74px] cursor-pointer rounded-[10px] border-2 border-gray-200 bg-white px-1.5 py-2 text-xs font-semibold text-currena-dark dark:border-white/10 dark:bg-[#222C3B]"
                     >
                       {(['USD', 'IRR', 'AUD', 'EUR', 'TRY', 'AED', 'CNY', 'GBP', 'CAD', 'NZD', 'CHF', 'JPY', 'KRW', 'MYR', 'IDR', 'PHP', 'VND'] as const).map(
                         (code) => (
@@ -661,7 +661,7 @@ export function Receipt() {
                       aria-label={`${t('common.time')} ${index + 1}`}
                       value={item.time}
                       onChange={(e) => patchItem(item.id, { time: e.target.value })}
-                      className="w-[96px] rounded-[10px] border-2 border-gray-200 bg-white px-1.5 py-2 text-xs text-currena-dark"
+                      className="w-[96px] rounded-[10px] border-2 border-gray-200 bg-white px-1.5 py-2 text-xs text-currena-dark dark:border-white/10 dark:bg-[#222C3B] dark:[color-scheme:dark]"
                     />
                   ) : null}
                 </div>
@@ -775,7 +775,7 @@ export function Receipt() {
             if (e.target === e.currentTarget) setReceipt(null);
           }}
         >
-          <div className="popup-slide-up max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-[15px] bg-white p-5 shadow-[0_25px_70px_rgba(0,0,0,0.5)] lg:p-7">
+          <div className="popup-slide-up max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-[15px] bg-white p-5 shadow-[0_25px_70px_rgba(0,0,0,0.5)] lg:p-7 dark:bg-[#1A222E]">
             <button
               ref={paperCloseRef}
               type="button"

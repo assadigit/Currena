@@ -176,7 +176,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
         const wasHidden = closeRef.current?.style.display;
         if (closeRef.current) closeRef.current.style.display = 'none';
         canvas = await html2canvas(card, {
-          backgroundColor: document.documentElement.classList.contains('dark') ? '#252941' : '#ffffff',
+          backgroundColor: document.documentElement.classList.contains('dark') ? '#1A222E' : '#ffffff',
           scale: 2,
           logging: false,
           useCORS: true,
@@ -242,7 +242,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
     >
       <div
         ref={cardRef}
-        className="popup-slide-up relative w-full max-w-[450px] rounded-[30px] bg-white p-7 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:max-w-[540px]"
+        className="popup-slide-up relative w-full max-w-[450px] rounded-[30px] bg-white p-7 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:max-w-[540px] dark:bg-[#1A222E]"
       >
         <button
           ref={closeRef}
@@ -321,7 +321,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
                   trend.dir === 'up'
                     ? 'text-currena-success'
                     : trend.dir === 'down'
-                      ? 'text-[#dc2626]'
+                      ? 'text-[#dc2626] dark:text-red-400'
                       : 'text-currena-muted'
                 }`}
               >
@@ -390,7 +390,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
       {toast ? (
         <div
           role="status"
-          className="fade-in fixed inset-x-4 bottom-4 z-[10001] mx-auto max-w-sm rounded-2xl bg-currena-dark/95 px-4 py-3 text-center text-sm whitespace-pre-line text-white shadow-lg"
+          className="fade-in fixed inset-x-4 bottom-4 z-[10001] mx-auto max-w-sm rounded-2xl bg-[#2C3E50]/95 px-4 py-3 text-center text-sm whitespace-pre-line text-white shadow-lg dark:bg-[#2A3A52]/95"
         >
           {toast}
         </div>

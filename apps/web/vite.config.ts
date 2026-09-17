@@ -17,9 +17,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
     // PWA (checklist #17): manifest identity is ported from the legacy
-    // /static/manifest.json — with the light-only decision (owner request
-    // 2026-09-17) the install surface now matches the app: light background,
-    // soft-blue theme color, same as the header/meta theme-color.
+    // /static/manifest.json — the install surface matches the app's DEFAULT
+    // (light) theme: soft-blue theme color, same as the header/meta
+    // theme-color at boot; the theme store swaps the meta theme-color at
+    // runtime when the user switches to dark (restored by owner request
+    // 2026-09-17: both light and dark mode are first-class).
     // Icons are REAL generated PNGs (scripts/generate-icons.mjs) — the legacy
     // site declared icons that 404'd. App shell + fonts are precached (the
     // single Vazirmatn variable file included) so the PWA renders Vazir for

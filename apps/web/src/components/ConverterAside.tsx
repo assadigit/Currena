@@ -12,7 +12,8 @@
  *      previous snapshot generation, plus a link to the full live-rates
  *      board. Harmonized with the site (owner request 2026-09-17): a plain
  *      white card with the app's soft-blue accents — the former tinted
- *      board surface was retired along with dark mode.
+ *      board surface was retired; dark mode is back as a first-class theme
+ *      (night navy surface, same card language).
  *   2. "Quick tools": a 2×3 grid of one-tap shortcuts into the calculator,
  *      batch converter, receipt generator, splitter, settle and history.
  *
@@ -77,7 +78,7 @@ export function ConverterAside({ className = '' }: { className?: string }) {
   return (
     <aside className={className} aria-label={t('converter.quickTools')}>
       {/* ---------- Mini board ---------- */}
-      <section className="rounded-[25px] bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04]">
+      <section className="rounded-[25px] bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04] dark:bg-[#1A222E] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] dark:ring-white/[0.06]">
         <header className="mb-4 flex items-center justify-between gap-3">
           <h2 className="text-base font-bold text-currena-dark">{t('converter.boardAtAGlance')}</h2>
           <span className="live-dot !h-2 !w-2 shrink-0" aria-hidden="true" />
@@ -130,7 +131,7 @@ export function ConverterAside({ className = '' }: { className?: string }) {
       </section>
 
       {/* ---------- Quick tools ---------- */}
-      <section className="mt-6 rounded-[25px] bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04]">
+      <section className="mt-6 rounded-[25px] bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04] dark:bg-[#1A222E] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] dark:ring-white/[0.06]">
         <h2 className="mb-4 text-base font-bold text-currena-dark">
           ⚡ {t('converter.quickTools')}
         </h2>

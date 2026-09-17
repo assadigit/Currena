@@ -148,7 +148,7 @@ export function Splitter() {
               value={amount}
               placeholder={t('expenseSplitter.totalPlaceholder')}
               onChange={(e) => setAmount(thousandSeparateInput(e.target.value))}
-              className="w-full rounded-[15px] border-2 border-gray-200 bg-white px-4 py-3.5 text-lg font-bold text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10"
+              className="w-full rounded-[15px] border-2 border-gray-200 bg-white px-4 py-3.5 text-lg font-bold text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:bg-[#222C3B]"
             />
           </div>
           <div>
@@ -183,7 +183,7 @@ export function Splitter() {
           <output
             id="splitPeople"
             aria-live="polite"
-            className="min-w-16 flex-1 rounded-[15px] border-2 border-gray-200 bg-white py-2.5 text-center text-lg font-bold text-currena-dark"
+            className="min-w-16 flex-1 rounded-[15px] border-2 border-gray-200 bg-white py-2.5 text-center text-lg font-bold text-currena-dark dark:border-white/10 dark:bg-[#222C3B]"
           >
             {peopleLabel}
           </output>

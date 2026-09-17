@@ -34,6 +34,9 @@ export const fa: Dictionary = {
     backToHome: 'بازگشت به خانه',
     language: 'زبان',
     toggleLanguage: 'تغییر زبان',
+    themeLight: 'حالت روشن',
+    themeDark: 'حالت تیره',
+    toggleTheme: 'تغییر پوسته',
     menu: 'منو',
   },
 

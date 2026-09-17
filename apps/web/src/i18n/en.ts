@@ -33,6 +33,9 @@ export const en = {
     backToHome: 'Back to Home',
     language: 'Language',
     toggleLanguage: 'Toggle language',
+    themeLight: 'Light mode',
+    themeDark: 'Dark mode',
+    toggleTheme: 'Toggle theme',
     menu: 'Menu',
   },
 

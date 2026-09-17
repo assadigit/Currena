@@ -7,14 +7,17 @@
  *     the hamburger is hidden. This is the desktop "professional" identity.
  *   - below lg (phones + small tablets): the legacy hamburger opens the
  *     slide-in side menu from the inline-end edge (right in LTR, left in RTL)
- *     with the 9 SPA routes + language toggle (legacy parity, §8).
+ *     with the 9 SPA routes + theme & language toggles (legacy parity, §8).
  *
- * Light-only (owner request 2026-09-17): the theme toggle was removed —
- * the app stays light; the pre-paint script clears legacy dark state.
+ * Dual theme (owner request 2026-09-17: "I want both light mode and dark
+ * mode"): the 🌙/☀️ toggle lives next to the language button in the top bar
+ * (all sizes) AND as a labeled row in the side menu. Light is the default;
+ * the choice persists under the legacy `theme` key.
  */
 
 import { useState } from 'react';
 import { navigate, useRoute, ROUTES } from '../router';
+import { useTheme } from '../lib/theme';
 import { useI18n } from '../lib/locale';
 import type { TranslationKey } from '../lib/locale';
 import type { RoutePath } from '../router';
@@ -40,6 +43,7 @@ const MENU_ITEMS: readonly {
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const route = useRoute();
+  const { theme, toggle } = useTheme();
   const { t, setLocale, locale } = useI18n();
 
   const go = (path: RoutePath): void => {
@@ -49,7 +53,7 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-[1000] flex h-16 items-center justify-between gap-2 px-5 shadow-[0_2px_15px_rgba(0,0,0,0.05)] backdrop-blur-[20px] lg:h-20 lg:px-6 xl:px-10 bg-white/95">
+      <header className="fixed inset-x-0 top-0 z-[1000] flex h-16 items-center justify-between gap-2 px-5 shadow-[0_2px_15px_rgba(0,0,0,0.05)] backdrop-blur-[20px] lg:h-20 lg:px-6 xl:px-10 bg-white/95 dark:bg-[#161D28]/95">
         {/* Brand (legacy: logo image, 50px mobile; slimmer on desktop so the
             inline nav fits at exactly lg=1024 without wrapping) */}
         <button
@@ -58,7 +62,7 @@ export function Header() {
           aria-label={t('nav.home')}
           className="shrink-0 cursor-pointer bg-transparent border-0 p-0"
         >
-          <img src="/images/currena-logo.png" alt="Currena" className="h-[50px] w-auto lg:h-[44px]" />
+          <img src="/images/currena-logo.png" alt="Currena" className="currena-brand-logo h-[50px] w-auto lg:h-[44px]" />
         </button>
 
         {/* Inline desktop nav (lg+): the 9 routes, compact text-only pills
@@ -77,7 +81,7 @@ export function Header() {
                     className={`cursor-pointer whitespace-nowrap rounded-[10px] border-0 bg-transparent px-2.5 py-2 text-[0.8rem] font-semibold transition-all duration-300 xl:px-3 xl:text-[0.85rem] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
                       active
                         ? 'bg-currena-blue/10 text-currena-blue'
-                        : 'text-currena-muted hover:bg-black/5 hover:text-currena-dark'
+                        : 'text-currena-muted hover:bg-black/5 hover:text-currena-dark dark:hover:bg-white/5'
                     }`}
                   >
                     {t(shortKey ?? labelKey)}
@@ -95,9 +99,20 @@ export function Header() {
             onClick={() => setLocale(locale === 'en' ? 'fa' : 'en')}
             title={t('nav.toggleLanguage')}
             aria-label={t('nav.toggleLanguage')}
-            className="h-10 w-10 cursor-pointer rounded-[10px] border-0 bg-transparent text-sm font-bold text-currena-dark transition-all duration-300 hover:bg-black/5"
+            className="h-10 w-10 cursor-pointer rounded-[10px] border-0 bg-transparent text-sm font-bold text-currena-dark transition-all duration-300 hover:bg-black/5 dark:hover:bg-white/5"
           >
             {locale === 'en' ? 'فا' : 'EN'}
+          </button>
+          {/* Theme toggle (legacy 🌙/☀️) — light is the default */}
+          <button
+            type="button"
+            onClick={toggle}
+            title={t('nav.toggleTheme')}
+            aria-label={t('nav.toggleTheme')}
+            aria-pressed={theme === 'dark'}
+            className="h-10 w-10 cursor-pointer rounded-[10px] border-0 bg-transparent text-lg text-currena-dark transition-all duration-300 hover:bg-black/5 dark:hover:bg-white/5"
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
           </button>
           {/* Hamburger — mobile/tablet only (the inline nav takes over at lg) */}
           <button
@@ -105,7 +120,7 @@ export function Header() {
             onClick={() => setMenuOpen((open) => !open)}
             aria-label={t('nav.menu')}
             aria-expanded={menuOpen}
-            className="h-10 w-10 cursor-pointer rounded-[10px] border-0 bg-transparent text-xl text-currena-dark transition-all duration-300 hover:bg-black/5 lg:hidden"
+            className="h-10 w-10 cursor-pointer rounded-[10px] border-0 bg-transparent text-xl text-currena-dark transition-all duration-300 hover:bg-black/5 dark:hover:bg-white/5 lg:hidden"
           >
             ☰
           </button>
@@ -127,7 +142,7 @@ export function Header() {
           the translated panel hovering over the page center) */}
       <nav
         aria-label={t('nav.menu')}
-        className={`side-menu fixed bottom-0 top-16 end-0 z-[999] w-[280px] overflow-y-auto bg-white p-5 shadow-[-5px_0_20px_rgba(0,0,0,0.1)] lg:top-20 lg:w-[320px] ${
+        className={`side-menu fixed bottom-0 top-16 end-0 z-[999] w-[280px] overflow-y-auto bg-white p-5 shadow-[-5px_0_20px_rgba(0,0,0,0.1)] dark:bg-[#161D28] lg:top-20 lg:w-[320px] ${
           menuOpen ? 'translate-x-0' : 'translate-x-full rtl:-translate-x-full'
         }`}
       >
@@ -148,7 +163,19 @@ export function Header() {
           ))}
         </ul>
 
-        <div className="mt-4 border-t border-black/5 pt-4">
+        <div className="mt-4 border-t border-black/5 pt-4 dark:border-white/10">
+          {/* Theme row — shows the mode you would switch TO */}
+          <button
+            type="button"
+            onClick={toggle}
+            title={t('nav.toggleTheme')}
+            className="flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 bg-transparent px-3.5 py-3 text-sm font-medium text-currena-muted transition-all duration-300 hover:bg-currena-blue/5"
+          >
+            <span className="text-lg" aria-hidden="true">
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </span>
+            {theme === 'dark' ? t('nav.themeLight') : t('nav.themeDark')}
+          </button>
           <button
             type="button"
             onClick={() => setLocale(locale === 'en' ? 'fa' : 'en')}

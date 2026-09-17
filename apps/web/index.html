@@ -14,15 +14,16 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>Currena — Currency Converter</title>
     <script>
-      // Pre-paint init (no flash): locale dir/lang, BEFORE first paint.
-      // Key: 'currena:locale' (mission §8). Must stay in vanilla JS — runs
-      // before the module bundle.
-      // Light-only (owner request 2026-09-17): actively clear the legacy
-      // `theme` key and any stale `dark` class so devices that used the old
-      // dark mode (or the legacy Django app) land on light.
+      // Pre-paint init (no flash): locale dir/lang + theme class, BEFORE
+      // first paint. Keys: 'currena:locale' (mission §8) and the LEGACY
+      // 'theme' key (light|dark — light is the default). Must stay in
+      // vanilla JS — runs before the module bundle.
       try {
-        document.documentElement.classList.remove('dark');
-        localStorage.removeItem('theme');
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
         var l = localStorage.getItem('currena:locale') || 'en';
         if (l !== 'en' && l !== 'fa') l = 'en';
         document.documentElement.lang = l;
