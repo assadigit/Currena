@@ -285,12 +285,16 @@ export function BatchConverter() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[500px] px-5 py-5 lg:max-w-[800px] lg:px-10">
-      <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white">
+    <div className="mx-auto w-full max-w-[500px] px-5 py-5 sm:max-w-[600px] lg:max-w-[1080px] lg:px-10">
+      <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white lg:text-2xl">
         {t('batchConverter.title')}
       </h1>
       <p className="mb-5 text-sm text-currena-muted">{t('batchConverter.subtitle')}</p>
 
+      {/* Mobile: stacked form → results. Desktop: two columns — inputs
+          start-side, results (or a placeholder until the first conversion)
+          end-side. */}
+      <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
       <Card>
         {/* Currency selection + swap */}
         <p className="mb-2.5 text-sm font-bold text-currena-dark dark:text-white">
@@ -433,7 +437,7 @@ export function BatchConverter() {
 
       {/* Results */}
       {results ? (
-        <Card className="mt-5">
+        <Card className="mt-5 lg:sticky lg:top-24 lg:mt-0">
           {/* Summary (legacy .summary-card) */}
           <div className="mb-5 rounded-[15px] bg-currena-blue/10 px-4 py-4 dark:bg-white/5">
             <div className="mb-1.5 flex items-center justify-between text-sm">
@@ -515,7 +519,23 @@ export function BatchConverter() {
             </Button>
           </div>
         </Card>
-      ) : null}
+      ) : (
+        // Desktop-only placeholder: keeps the two-column layout balanced
+        // before the first conversion (hidden on phones — results simply
+        // appear below the form there).
+        <Card className="hidden border-2 border-dashed !border-currena-blue/30 py-16 text-center lg:block">
+          <div className="mb-3 text-5xl opacity-30" aria-hidden="true">
+            🛒
+          </div>
+          <h2 className="mb-2 text-base font-bold text-currena-dark dark:text-white">
+            {t('batchConverter.convertedPrices')}
+          </h2>
+          <p className="mx-auto max-w-sm text-sm text-currena-muted">
+            {t('batchConverter.resultsPlaceholder')}
+          </p>
+        </Card>
+      )}
+      </div>
 
       {/* Loading overlay (legacy .loading-overlay) */}
       {converting ? (

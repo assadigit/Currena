@@ -27,6 +27,7 @@ import {
 } from '@currena/core';
 import type { ConversionResult, CurrencyCode, SnapshotSource } from '@currena/core';
 import { AmountInput, parseInputAmount } from '../components/AmountInput';
+import { ConverterAside } from '../components/ConverterAside';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { ResultPopup } from '../components/ResultPopup';
 import type { ConversionView } from '../components/ResultPopup';
@@ -301,13 +302,19 @@ export function Converter() {
   const notice = useMemo(() => sourceState.notice, [sourceState.notice]);
 
   return (
-    <div className="mx-auto w-full max-w-[500px] px-5 py-5 lg:max-w-[1200px] lg:px-10 lg:py-10">
+    // Mobile: the focused legacy converter (≤500px). Desktop (lg+): a
+    // two-column dashboard — the conversion form on the start side and the
+    // ConverterAside rail (mini Toman board + quick tools) on the end side.
+    <div className="mx-auto w-full max-w-[500px] px-5 py-5 lg:max-w-[1160px] lg:px-10 lg:py-10">
       {showOfflineBanner ? <OfflineBanner source={pairSource} /> : null}
       {showStaleBanner && sourceState.snapshot ? (
         <div className="mb-5">
           <StaleBanner fetchedAt={sourceState.snapshot.fetchedAt} notice={notice} />
         </div>
       ) : null}
+
+      <div className="lg:grid lg:grid-cols-[minmax(0,540px)_minmax(0,1fr)] lg:items-start lg:gap-8">
+        <div>
 
       {/* Recent pairs — one-tap recall (hidden until the first conversion) */}
       {recentPairs.length > 0 ? (
@@ -499,6 +506,11 @@ export function Converter() {
           ) : null}
         </Card>
       ) : null}
+        </div>
+
+        {/* Desktop-only companion rail (mini board + quick tools) */}
+        <ConverterAside className="hidden lg:sticky lg:top-24 lg:block lg:self-start" />
+      </div>
 
       {/* Fetching overlay (legacy .loading-overlay) */}
       {phase === 'fetching' ? (

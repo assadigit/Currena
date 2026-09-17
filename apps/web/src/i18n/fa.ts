@@ -26,6 +26,10 @@ export const fa: Dictionary = {
     batchConverter: 'تبدیل گروهی',
     history: 'تاریخچه',
     about: 'درباره',
+    receiptShort: 'رسید',
+    splitterShort: 'تقسیم',
+    settleShort: 'تسویه',
+    batchShort: 'گروهی',
     back: 'بازگشت',
     backToHome: 'بازگشت به خانه',
     toggleTheme: 'تغییر پوسته',
@@ -73,6 +77,7 @@ export const fa: Dictionary = {
     delete: 'حذف',
     people: 'نفر',
     noChange: 'بدون تغییر',
+    viewFullBoard: 'مشاهده همه نرخ‌ها',
   },
 
   sources: {
@@ -109,6 +114,8 @@ export const fa: Dictionary = {
     creating: '⏳ در حال ساخت...',
     quickAmounts: 'مبالغ پرکاربرد',
     recentPairs: 'جفت‌های اخیر',
+    boardAtAGlance: 'تومان ایران — در یک نگاه',
+    quickTools: 'ابزارهای سریع',
   },
 
   currencies: {
@@ -359,6 +366,7 @@ export const fa: Dictionary = {
     addAnotherAmount: '➕ افزودن مبلغ دیگر',
     convertAllPrices: '🔄 تبدیل همه قیمت‌ها',
     convertedPrices: '📋 قیمت‌های تبدیل‌شده',
+    resultsPlaceholder: 'مبلغ‌های خود را وارد کنید و تبدیل بزنید — نتایج کامل همین‌جا نمایش داده می‌شود.',
     totalItems: 'تعداد اقلام',
     totalCost: 'هزینه کل',
     convertedTotal: 'مجموع تبدیل‌شده',

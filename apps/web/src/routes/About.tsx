@@ -25,7 +25,7 @@ export function About() {
   const { t } = useI18n();
 
   return (
-    <div className="mx-auto w-full max-w-[500px] px-5 py-8 lg:max-w-[600px] lg:px-10">
+    <div className="mx-auto w-full max-w-[500px] px-5 py-8 sm:max-w-[600px] lg:max-w-[880px] lg:px-10">
       {/* Logo block (legacy .logo-container) */}
       <div className="mb-7 text-center">
         <img
@@ -47,10 +47,10 @@ export function About() {
           {t('about.aboutText1')}
         </p>
 
-        {/* Feature list (legacy .feature-list) */}
-        <ul className="mb-6 list-none space-y-3 p-0">
+        {/* Feature list (legacy .feature-list; 2-up from tablet up) */}
+        <ul className="mb-6 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
           {FEATURES.map(({ emoji, key }) => (
-            <li key={key} className="flex items-center gap-3 text-sm text-currena-dark dark:text-white/85">
+            <li key={key} className="flex items-start gap-3 text-sm text-currena-dark dark:text-white/85">
               <span
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-currena-soft text-lg dark:bg-white/10"
                 aria-hidden="true"

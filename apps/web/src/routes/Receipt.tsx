@@ -457,13 +457,13 @@ export function Receipt() {
   /* ---------------- Render ---------------- */
 
   return (
-    <div className="mx-auto w-full max-w-[500px] px-5 py-5 lg:max-w-[1000px] lg:px-10">
-      <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white">
+    <div className="mx-auto w-full max-w-[500px] px-5 py-5 sm:max-w-[600px] lg:max-w-[1200px] lg:px-10">
+      <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white lg:text-2xl">
         📄 {t('receipt.title')}
       </h1>
       <p className="mb-5 text-sm text-currena-muted">{t('receipt.subtitle')}</p>
 
-      <div className="lg:grid lg:grid-cols-[1fr_340px] lg:items-start lg:gap-6">
+      <div className="lg:grid lg:grid-cols-[1fr_380px] lg:items-start lg:gap-6">
         {/* ---------- Left: form ---------- */}
         <Card>
           {/* Travel currency hero (legacy .main-currency-display) */}

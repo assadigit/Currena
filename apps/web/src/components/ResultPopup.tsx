@@ -233,7 +233,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
     >
       <div
         ref={cardRef}
-        className="popup-slide-up relative w-full max-w-[450px] rounded-[30px] bg-white p-7 shadow-[0_25px_70px_rgba(0,0,0,0.5)] dark:bg-currena-card-dark dark:text-white"
+        className="popup-slide-up relative w-full max-w-[450px] rounded-[30px] bg-white p-7 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:max-w-[540px] dark:bg-currena-card-dark dark:text-white"
       >
         <button
           ref={closeRef}

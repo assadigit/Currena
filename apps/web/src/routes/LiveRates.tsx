@@ -157,10 +157,10 @@ export function LiveRates() {
     // Legacy board identity: gold on dark, always (the legacy page had no
     // theme toggle and rendered its own dark design).
     <div className="bg-gradient-to-br from-[#1a1a2e] to-[#0f0f1e] pb-24 text-[#eee]">
-      <div className="mx-auto w-full max-w-[480px] px-4 py-5">
+      <div className="mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-6xl xl:max-w-[1280px] lg:px-8">
         {/* Header */}
         <div className="mb-6 text-center">
-          <h2 className="mb-2.5 text-2xl font-bold text-gold-vibrant">{t('liveRates.iranianTomanRates')}</h2>
+          <h2 className="mb-2.5 text-2xl font-bold text-gold-vibrant lg:text-3xl">{t('liveRates.iranianTomanRates')}</h2>
           <div className="inline-flex items-center gap-2 rounded-full bg-currena-success/20 px-4 py-2 text-sm font-semibold text-currena-success">
             <span className="live-dot !h-2.5 !w-2.5" aria-hidden="true" />
             {t('liveRates.liveUpdates')}
@@ -204,8 +204,8 @@ export function LiveRates() {
           </div>
         ) : null}
 
-        {/* Cards */}
-        <div className="grid gap-4 sm:grid-cols-2">
+        {/* Cards — single column on phones, 2 on tablet, 3–4 across on desktop */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {cards
             ? BOARD.map((code) => {
                 const card = cards.find((c) => c.code === code);
@@ -225,7 +225,7 @@ export function LiveRates() {
                 return (
                   <article
                     key={code}
-                    className={`rounded-[18px] bg-board-card p-5 shadow-[10px_10px_20px_rgba(0,0,0,0.7),-10px_-10px_20px_rgba(255,255,255,0.05)] transition-all duration-300 hover:-translate-y-1 ${
+                    className={`h-full rounded-[18px] bg-board-card p-5 shadow-[10px_10px_20px_rgba(0,0,0,0.7),-10px_-10px_20px_rgba(255,255,255,0.05)] transition-all duration-300 hover:-translate-y-1 ${
                       flashDir === 'up' ? 'rate-flash-up' : flashDir === 'down' ? 'rate-flash-down' : ''
                     }`}
                   >
@@ -331,7 +331,7 @@ export function LiveRates() {
               })
             : // First load (no snapshot yet): 8 shimmer skeletons.
               BOARD.map((code) => (
-                <div key={code} className="rounded-[18px] bg-board-card p-5" aria-hidden="true">
+                <div key={code} className="h-full rounded-[18px] bg-board-card p-5" aria-hidden="true">
                   <header className="mb-4 flex items-center gap-3">
                     <Skeleton className="h-[35px] w-[50px] rounded-md" />
                     <div className="flex-1 space-y-2">

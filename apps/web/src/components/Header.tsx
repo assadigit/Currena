@@ -1,31 +1,43 @@
 /**
- * Header + slide-in side menu — legacy parity (FEATURE_MAP §8):
- * fixed 65px (80px desktop) blur navbar, logo start-side, theme toggle +
- * hamburger end-side; the menu slides in from the inline-end edge (right in
- * LTR, left in RTL) with the 9 SPA routes + theme/language toggles.
+ * Header — fixed blur navbar, logo start-side.
+ *
+ * Responsive navigation (PC/tablet/mobile):
+ *   - lg and up: an INLINE horizontal nav renders the 9 routes in the header
+ *     itself (text-only pills, active-route highlighted, whitespace-nowrap) —
+ *     the hamburger is hidden. This is the desktop "professional" identity.
+ *   - below lg (phones + small tablets): the legacy hamburger opens the
+ *     slide-in side menu from the inline-end edge (right in LTR, left in RTL)
+ *     with the 9 SPA routes + theme/language toggles (legacy parity, §8).
  */
 
 import { useState } from 'react';
-import { navigate, ROUTES } from '../router';
+import { navigate, useRoute, ROUTES } from '../router';
 import { useTheme } from '../lib/theme';
 import { useI18n } from '../lib/locale';
 import type { TranslationKey } from '../lib/locale';
 import type { RoutePath } from '../router';
 
-const MENU_ITEMS: readonly { path: RoutePath; emoji: string; labelKey: TranslationKey }[] = [
+const MENU_ITEMS: readonly {
+  path: RoutePath;
+  emoji: string;
+  labelKey: TranslationKey;
+  /** Compact label for the lg+ inline top-bar nav (falls back to labelKey). */
+  shortKey?: TranslationKey;
+}[] = [
   { path: '/', emoji: '🏠', labelKey: 'nav.home' },
   { path: '/live-rates', emoji: '📊', labelKey: 'nav.liveRates' },
   { path: '/calculator', emoji: '🧮', labelKey: 'nav.calculator' },
   { path: '/history', emoji: '📜', labelKey: 'nav.history' },
-  { path: '/receipt', emoji: '📄', labelKey: 'nav.receiptGenerator' },
-  { path: '/splitter', emoji: '💰', labelKey: 'nav.expenseSplitter' },
-  { path: '/settle', emoji: '👥', labelKey: 'nav.splitSettle' },
-  { path: '/batch', emoji: '🛒', labelKey: 'nav.batchConverter' },
+  { path: '/receipt', emoji: '📄', labelKey: 'nav.receiptGenerator', shortKey: 'nav.receiptShort' },
+  { path: '/splitter', emoji: '💰', labelKey: 'nav.expenseSplitter', shortKey: 'nav.splitterShort' },
+  { path: '/settle', emoji: '👥', labelKey: 'nav.splitSettle', shortKey: 'nav.settleShort' },
+  { path: '/batch', emoji: '🛒', labelKey: 'nav.batchConverter', shortKey: 'nav.batchShort' },
   { path: '/about', emoji: 'ℹ️', labelKey: 'nav.about' },
 ];
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const route = useRoute();
   const { theme, toggle } = useTheme();
   const { t, locale, setLocale } = useI18n();
 
@@ -36,18 +48,46 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-[1000] flex h-16 items-center justify-between px-5 shadow-[0_2px_15px_rgba(0,0,0,0.05)] backdrop-blur-[20px] lg:h-20 lg:px-15 bg-white/95 dark:bg-currena-bg-dark/95">
-        {/* Brand (legacy: logo image, 50px mobile / 60px desktop) */}
+      <header className="fixed inset-x-0 top-0 z-[1000] flex h-16 items-center justify-between gap-2 px-5 shadow-[0_2px_15px_rgba(0,0,0,0.05)] backdrop-blur-[20px] lg:h-20 lg:px-6 xl:px-10 bg-white/95 dark:bg-currena-bg-dark/95">
+        {/* Brand (legacy: logo image, 50px mobile; slimmer on desktop so the
+            inline nav fits at exactly lg=1024 without wrapping) */}
         <button
           type="button"
           onClick={() => go('/')}
           aria-label={t('nav.home')}
-          className="cursor-pointer bg-transparent border-0 p-0"
+          className="shrink-0 cursor-pointer bg-transparent border-0 p-0"
         >
-          <img src="/images/currena-logo.png" alt="Currena" className="h-[50px] w-auto lg:h-[60px]" />
+          <img src="/images/currena-logo.png" alt="Currena" className="h-[50px] w-auto lg:h-[44px]" />
         </button>
 
-        <div className="flex items-center gap-3">
+        {/* Inline desktop nav (lg+): the 9 routes, compact text-only pills
+            (short labels for the four long tool names keep the bar on one
+            unwrapped line at exactly lg=1024), active-route highlighted */}
+        <nav aria-label={t('app.name')} className="hidden min-w-0 flex-1 lg:block">
+          <ul className="flex list-none items-center justify-center gap-0.5 p-0 xl:gap-1">
+            {MENU_ITEMS.map(({ path, labelKey, shortKey }) => {
+              const active = route === path;
+              return (
+                <li key={path}>
+                  <button
+                    type="button"
+                    onClick={() => go(path)}
+                    aria-current={active ? 'page' : undefined}
+                    className={`cursor-pointer whitespace-nowrap rounded-[10px] border-0 bg-transparent px-2.5 py-2 text-[0.8rem] font-semibold transition-all duration-300 xl:px-3 xl:text-[0.85rem] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
+                      active
+                        ? 'bg-currena-blue/10 text-currena-blue dark:bg-currena-cyan/15 dark:text-currena-cyan'
+                        : 'text-currena-muted hover:bg-black/5 hover:text-currena-dark dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white'
+                    }`}
+                  >
+                    {t(shortKey ?? labelKey)}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        <div className="flex shrink-0 items-center gap-2 lg:gap-3">
           {/* Language quick-toggle */}
           <button
             type="button"
@@ -68,13 +108,13 @@ export function Header() {
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
-          {/* Hamburger */}
+          {/* Hamburger — mobile/tablet only (the inline nav takes over at lg) */}
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
             aria-label={t('nav.menu')}
             aria-expanded={menuOpen}
-            className="h-10 w-10 cursor-pointer rounded-[10px] border-0 bg-transparent text-xl text-currena-dark transition-all duration-300 hover:bg-black/5 dark:text-white dark:hover:bg-white/10"
+            className="h-10 w-10 cursor-pointer rounded-[10px] border-0 bg-transparent text-xl text-currena-dark transition-all duration-300 hover:bg-black/5 dark:text-white dark:hover:bg-white/10 lg:hidden"
           >
             ☰
           </button>
@@ -95,7 +135,7 @@ export function Header() {
           closed state is fully off-screen; the static-position default left
           the translated panel hovering over the page center) */}
       <nav
-        aria-label={t('nav.home')}
+        aria-label={t('nav.menu')}
         className={`side-menu fixed bottom-0 top-16 end-0 z-[999] w-[280px] overflow-y-auto bg-white p-5 shadow-[-5px_0_20px_rgba(0,0,0,0.1)] lg:top-20 lg:w-[320px] dark:bg-currena-bg-dark ${
           menuOpen ? 'translate-x-0' : 'translate-x-full rtl:-translate-x-full'
         }`}

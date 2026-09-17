@@ -158,7 +158,7 @@ function Modal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="popup-slide-up max-h-[88vh] w-full max-w-[430px] overflow-y-auto rounded-[25px] bg-white p-6 shadow-[0_25px_70px_rgba(0,0,0,0.5)] dark:bg-currena-card-dark dark:text-white">
+      <div className="popup-slide-up max-h-[88vh] w-full max-w-[430px] overflow-y-auto rounded-[25px] bg-white p-6 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:max-w-[520px] dark:bg-currena-card-dark dark:text-white">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold">{title}</h2>
           <button
@@ -406,8 +406,8 @@ export function Settle() {
   /* ---------------- Render ---------------- */
 
   return (
-    <div className="mx-auto w-full max-w-[500px] px-5 pb-24 pt-6 lg:max-w-[700px] lg:px-10">
-      <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white">
+    <div className="mx-auto w-full max-w-[500px] px-5 pb-24 pt-6 sm:max-w-[620px] lg:max-w-[960px] lg:px-10">
+      <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white lg:text-2xl">
         👥 {t('splitSettle.title')}
       </h1>
       <p className="mb-5 text-sm text-currena-muted">{t('splitSettle.subtitle')}</p>
@@ -430,7 +430,7 @@ export function Settle() {
             </Button>
           </Card>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {groups.map((group) => {
               try {
                 const bal = computeBalances(
@@ -493,8 +493,8 @@ export function Settle() {
           </div>
         )
       ) : (
-        /* ---------- Group detail view ---------- */
-        <>
+        /* ---------- Group detail view (constrained column on desktop) ---------- */
+        <div className="lg:mx-auto lg:max-w-[780px]">
           <div className="mb-5 text-center">
             <div className="text-5xl" aria-hidden="true">
               {openGroup.emoji}
@@ -702,7 +702,7 @@ export function Settle() {
               🗑️ {t('splitSettle.deleteGroup')}
             </Button>
           </div>
-        </>
+        </div>
       )}
 
       {/* FAB (legacy: + opens create-group / add-expense) */}

@@ -170,10 +170,10 @@ export function History() {
   const noMatch = entries !== null && entries.length > 0 && filtered?.length === 0;
 
   return (
-    <div className="mx-auto w-full max-w-[500px] px-5 py-6 lg:max-w-[760px] lg:px-10">
+    <div className="mx-auto w-full max-w-[500px] px-5 py-6 sm:max-w-[600px] lg:max-w-[1020px] lg:px-10">
       {/* Title + CSV export */}
       <div className="mb-5 flex items-center justify-between gap-3">
-        <h1 className="text-xl font-bold text-currena-dark dark:text-white">📜 {t('history.title')}</h1>
+        <h1 className="text-xl font-bold text-currena-dark dark:text-white lg:text-2xl">📜 {t('history.title')}</h1>
         {entries !== null && entries.length > 0 ? (
           <Button
             variant="secondary"
@@ -288,7 +288,8 @@ export function History() {
         </div>
       ) : null}
 
-      {/* Entries */}
+      {/* Entries — single column on mobile, 2-up grid on desktop */}
+      <div className="lg:grid lg:grid-cols-2 lg:gap-4">
       {filtered?.map(({ entry, storageIndex }) => {
         const irrPair = entry.from === 'IRR' || entry.to === 'IRR';
         const decimals = irrPair ? 0 : 2;
@@ -304,7 +305,7 @@ export function History() {
         return (
           <Card
             key={`${entry.timestamp}-${storageIndex}`}
-            className={`mb-4 p-5 transition-all duration-250 ${
+            className={`mb-4 p-5 transition-all duration-250 lg:mb-0 ${
               isDeleting ? 'pointer-events-none scale-95 opacity-0 blur-sm' : 'hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)]'
             }`}
           >
@@ -361,6 +362,7 @@ export function History() {
           </Card>
         );
       })}
+      </div>
 
       {/* No search/filter results */}
       {noMatch ? (

@@ -121,42 +121,48 @@ export function Splitter() {
   );
 
   return (
-    <div className="mx-auto w-full max-w-[500px] px-5 py-6 lg:px-10">
-      <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white">
+    <div className="mx-auto w-full max-w-[500px] px-5 py-6 sm:max-w-[600px] lg:max-w-[920px] lg:px-10">
+      <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white lg:text-2xl">
         💰 {t('expenseSplitter.title')}
       </h1>
 
+      {/* Mobile: stacked form → results. Desktop: two columns once a split
+          exists (form start-side, sticky results end-side); before that the
+          form centers at a comfortable width. */}
+      <div className={result ? 'lg:grid lg:grid-cols-2 lg:items-start lg:gap-6' : 'lg:mx-auto lg:max-w-[560px]'}>
       <Card className="mb-5">
-        {/* Total amount */}
-        <label htmlFor="splitTotal" className="mb-1.5 block text-sm font-bold text-currena-dark dark:text-white">
-          {t('expenseSplitter.totalExpenseAmount')}
-        </label>
-        <input
-          id="splitTotal"
-          type="text"
-          inputMode="decimal"
-          autoComplete="off"
-          dir="ltr"
-          value={amount}
-          placeholder={t('expenseSplitter.totalPlaceholder')}
-          onChange={(e) => setAmount(thousandSeparateInput(e.target.value))}
-          className="mb-4 w-full rounded-[15px] border-2 border-gray-200 bg-white px-4 py-3.5 text-lg font-bold text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:text-white"
-        />
-
-        {/* Currency */}
-        <label htmlFor="splitCurrency" className="mb-1.5 block text-sm font-bold text-currena-dark dark:text-white">
-          {t('expenseSplitter.amountCurrency')}
-        </label>
-        <div className="mb-4">
-          <CurrencySelect
-            id="splitCurrency"
-            value={currency}
-            onChange={(v) => {
-              setCurrency(v);
-              setResult(null);
-            }}
-            ariaLabel={t('expenseSplitter.amountCurrency')}
-          />
+        {/* Total amount + currency — side by side from sm up */}
+        <div className="mb-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="splitTotal" className="mb-1.5 block text-sm font-bold text-currena-dark dark:text-white">
+              {t('expenseSplitter.totalExpenseAmount')}
+            </label>
+            <input
+              id="splitTotal"
+              type="text"
+              inputMode="decimal"
+              autoComplete="off"
+              dir="ltr"
+              value={amount}
+              placeholder={t('expenseSplitter.totalPlaceholder')}
+              onChange={(e) => setAmount(thousandSeparateInput(e.target.value))}
+              className="w-full rounded-[15px] border-2 border-gray-200 bg-white px-4 py-3.5 text-lg font-bold text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:text-white"
+            />
+          </div>
+          <div>
+            <label htmlFor="splitCurrency" className="mb-1.5 block text-sm font-bold text-currena-dark dark:text-white">
+              {t('expenseSplitter.amountCurrency')}
+            </label>
+            <CurrencySelect
+              id="splitCurrency"
+              value={currency}
+              onChange={(v) => {
+                setCurrency(v);
+                setResult(null);
+              }}
+              ariaLabel={t('expenseSplitter.amountCurrency')}
+            />
+          </div>
         </div>
 
         {/* People stepper (legacy: number input 1-100) */}
@@ -220,7 +226,7 @@ export function Splitter() {
 
       {/* Results */}
       {result ? (
-        <Card>
+        <Card className="lg:sticky lg:top-24">
           <h2 className="mb-4 text-base font-bold text-currena-dark dark:text-white">
             {t('expenseSplitter.splitResults')}
           </h2>
@@ -289,6 +295,7 @@ export function Splitter() {
           </div>
         </Card>
       ) : null}
+      </div>
 
       {toast ? <Toast message={toast} /> : null}
     </div>

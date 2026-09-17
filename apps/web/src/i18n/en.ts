@@ -25,6 +25,10 @@ export const en = {
     batchConverter: 'Batch Converter',
     history: 'History',
     about: 'About',
+    receiptShort: 'Receipt',
+    splitterShort: 'Splitter',
+    settleShort: 'Settle',
+    batchShort: 'Batch',
     back: 'Back',
     backToHome: 'Back to Home',
     toggleTheme: 'Toggle theme',
@@ -72,6 +76,7 @@ export const en = {
     delete: 'Delete',
     people: 'People',
     noChange: 'no change',
+    viewFullBoard: 'View full board',
   },
 
   sources: {
@@ -108,6 +113,8 @@ export const en = {
     creating: '⏳ Creating...',
     quickAmounts: 'Quick amounts',
     recentPairs: 'Recent pairs',
+    boardAtAGlance: 'Iranian Toman — at a glance',
+    quickTools: 'Quick tools',
   },
 
   currencies: {
@@ -358,6 +365,7 @@ export const en = {
     addAnotherAmount: '➕ Add Another Amount',
     convertAllPrices: '🔄 Convert All Prices',
     convertedPrices: '📋 Converted Prices',
+    resultsPlaceholder: 'Enter your amounts and hit convert — the full price breakdown will appear here.',
     totalItems: 'Total Items',
     totalCost: 'Total Cost',
     convertedTotal: 'Converted Total',

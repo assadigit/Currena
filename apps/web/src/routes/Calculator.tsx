@@ -175,91 +175,97 @@ export function Calculator() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[500px] px-5 py-5 lg:px-10">
+    <div className="mx-auto w-full max-w-[500px] px-5 py-5 sm:max-w-[600px] lg:max-w-[900px] lg:px-10 lg:py-8">
       <Card>
-        <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white">
+        <h1 className="mb-1 text-xl font-bold text-currena-dark dark:text-white lg:text-2xl">
           🧮 {t('calculator.title')}
         </h1>
         <p className="mb-5 text-sm text-currena-muted">{t('calculator.subtitle')}</p>
 
-        {/* Currency selection (legacy .currency-section) */}
-        <div className="mb-5 grid gap-3 sm:grid-cols-2">
+        {/* Desktop (lg+): two columns — currency + display on the start side,
+            keypad on the end side. Mobile keeps the legacy single column. */}
+        <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-8">
           <div>
-            <label htmlFor="calcInputCurrency" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-currena-muted">
-              {t('calculator.inputCurrency')}
-            </label>
-            <CurrencySelect
-              id="calcInputCurrency"
-              value={from}
-              onChange={setFrom}
-              ariaLabel={t('calculator.inputCurrency')}
-              codes={CALC_CURRENCIES}
-            />
-          </div>
-          <div>
-            <label htmlFor="calcOutputCurrency" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-currena-muted">
-              {t('calculator.convertTo')}
-            </label>
-            <CurrencySelect
-              id="calcOutputCurrency"
-              value={to}
-              onChange={setTo}
-              ariaLabel={t('calculator.convertTo')}
-              codes={CALC_CURRENCIES}
-            />
-          </div>
-        </div>
-
-        {/* Display (legacy .display) */}
-        <div className="mb-5 rounded-[18px] bg-currena-soft px-4 py-5 text-center dark:bg-white/5">
-          <div
-            className="min-h-[2.4rem] overflow-x-auto text-3xl font-bold break-all text-currena-dark dark:text-white"
-            aria-live="polite"
-          >
-            {errorFlash ? t('calculator.error') : groupDisplay(expr)}
-          </div>
-          {/* Live evaluated value (only when the expression isn't already a plain number) */}
-          {liveValue !== null && !errorFlash && expr !== String(liveValue) ? (
-            <div className="mt-1 text-sm font-semibold text-currena-muted">
-              = {formatNumber(liveValue, numberLocale, { maximumFractionDigits: 8 })} {from}
+            {/* Currency selection (legacy .currency-section) */}
+            <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
+              <div>
+                <label htmlFor="calcInputCurrency" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-currena-muted">
+                  {t('calculator.inputCurrency')}
+                </label>
+                <CurrencySelect
+                  id="calcInputCurrency"
+                  value={from}
+                  onChange={setFrom}
+                  ariaLabel={t('calculator.inputCurrency')}
+                  codes={CALC_CURRENCIES}
+                />
+              </div>
+              <div>
+                <label htmlFor="calcOutputCurrency" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-currena-muted">
+                  {t('calculator.convertTo')}
+                </label>
+                <CurrencySelect
+                  id="calcOutputCurrency"
+                  value={to}
+                  onChange={setTo}
+                  ariaLabel={t('calculator.convertTo')}
+                  codes={CALC_CURRENCIES}
+                />
+              </div>
             </div>
-          ) : null}
-          <div className="mt-2 text-lg font-semibold text-currena-blue dark:text-currena-cyan">
-            {converted !== null
-              ? `= ${converted} ${to}`
-              : state.status === 'error'
-                ? t('calculator.rateUnavailable')
-                : `= 0 ${to}`}
-          </div>
-        </div>
 
-        {/* Keypad (legacy .calculator-grid) */}
-        <div className="grid grid-cols-4 gap-2.5">
-          {KEYPAD.map((key) => {
-            const isClear = key.kind === 'clear';
-            const isEquals = key.kind === 'equals';
-            const isOp = key.kind === 'op' || key.kind === 'dot';
-            return (
-              <button
-                key={key.label}
-                type="button"
-                onClick={() => press(key)}
-                className={`h-[60px] cursor-pointer rounded-[15px] border-0 text-xl font-bold transition-all duration-300 active:scale-95 ${
-                  key.wide ? 'col-span-2' : ''
-                } ${
-                  isEquals
-                    ? 'bg-currena-blue text-white shadow-[0_4px_15px_rgba(74,144,226,0.35)] hover:-translate-y-0.5'
-                    : isClear
-                      ? 'bg-currena-warning/15 text-currena-warning hover:bg-currena-warning/25'
-                      : isOp
-                        ? 'bg-currena-cyan/20 text-currena-dark hover:bg-currena-cyan/30 dark:text-white'
-                        : 'bg-currena-soft text-currena-dark hover:bg-currena-blue/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20'
-                }`}
+            {/* Display (legacy .display) */}
+            <div className="mb-5 rounded-[18px] bg-currena-soft px-4 py-5 text-center dark:bg-white/5 lg:py-7">
+              <div
+                className="min-h-[2.4rem] overflow-x-auto text-3xl font-bold break-all text-currena-dark dark:text-white lg:text-4xl"
+                aria-live="polite"
               >
-                {key.label}
-              </button>
-            );
-          })}
+                {errorFlash ? t('calculator.error') : groupDisplay(expr)}
+              </div>
+              {/* Live evaluated value (only when the expression isn't already a plain number) */}
+              {liveValue !== null && !errorFlash && expr !== String(liveValue) ? (
+                <div className="mt-1 text-sm font-semibold text-currena-muted">
+                  = {formatNumber(liveValue, numberLocale, { maximumFractionDigits: 8 })} {from}
+                </div>
+              ) : null}
+              <div className="mt-2 text-lg font-semibold text-currena-blue dark:text-currena-cyan">
+                {converted !== null
+                  ? `= ${converted} ${to}`
+                  : state.status === 'error'
+                    ? t('calculator.rateUnavailable')
+                    : `= 0 ${to}`}
+              </div>
+            </div>
+          </div>
+
+          {/* Keypad (legacy .calculator-grid) */}
+          <div className="grid grid-cols-4 gap-2.5 lg:content-center">
+            {KEYPAD.map((key) => {
+              const isClear = key.kind === 'clear';
+              const isEquals = key.kind === 'equals';
+              const isOp = key.kind === 'op' || key.kind === 'dot';
+              return (
+                <button
+                  key={key.label}
+                  type="button"
+                  onClick={() => press(key)}
+                  className={`h-[60px] cursor-pointer rounded-[15px] border-0 text-xl font-bold transition-all duration-300 active:scale-95 lg:h-[68px] ${
+                    key.wide ? 'col-span-2' : ''
+                  } ${
+                    isEquals
+                      ? 'bg-currena-blue text-white shadow-[0_4px_15px_rgba(74,144,226,0.35)] hover:-translate-y-0.5'
+                      : isClear
+                        ? 'bg-currena-warning/15 text-currena-warning hover:bg-currena-warning/25'
+                        : isOp
+                          ? 'bg-currena-cyan/20 text-currena-dark hover:bg-currena-cyan/30 dark:text-white'
+                          : 'bg-currena-soft text-currena-dark hover:bg-currena-blue/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20'
+                  }`}
+                >
+                  {key.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Legacy .convert-info */}
