@@ -133,6 +133,93 @@ describe('settleDebts / computeSettlements (greedy, legacy parity)', () => {
   });
 });
 
+describe('prototype-key hardening (regression: silent ledger corruption)', () => {
+  it("a participant literally named '__proto__' gets a real balance (was silently swallowed)", () => {
+    const balances = computeBalances(
+      ['__proto__', 'Alice'],
+      [{ payer: 'Alice', amount: 100, participants: ['Alice', '__proto__'] }],
+    );
+    expect(Object.keys(balances).sort()).toEqual(['Alice', '__proto__']);
+    expect(balances['Alice']!).toBeCloseTo(50, 10);
+    expect(balances['__proto__']!).toBeCloseTo(-50, 10);
+    // The result is JSON-serializable and enumerable like any record.
+    // (NB: the expected object must be built key-by-key — an object literal
+    // `{ '__proto__': -50 }` would set the prototype, not create a key.)
+    const revived = JSON.parse(JSON.stringify(balances)) as Record<string, number>;
+    expect(Object.keys(revived).sort()).toEqual(['Alice', '__proto__']);
+    expect(revived['Alice']!).toBeCloseTo(50, 10);
+    expect(revived['__proto__']!).toBeCloseTo(-50, 10);
+  });
+
+  it("'__proto__' listed twice is now detected as a duplicate (guard was bypassed before)", () => {
+    expect(() => computeBalances(['__proto__', '__proto__'], [])).toThrowError(CoreError);
+  });
+
+  it("'constructor' and 'toString' participant names are ordinary members", () => {
+    const balances = computeBalances(
+      ['constructor', 'toString', 'Bob'],
+      [{ payer: 'Bob', amount: 90, participants: ['constructor', 'toString', 'Bob'] }],
+    );
+    expect(balances['constructor']!).toBeCloseTo(-30, 10);
+    expect(balances['toString']!).toBeCloseTo(-30, 10);
+    expect(balances['Bob']!).toBeCloseTo(60, 10);
+  });
+
+  it('settleDebts handles a JSON-parsed record carrying an own __proto__ key', () => {
+    // JSON.parse creates an own '__proto__' data property (no setter) — the
+    // pipeline must treat it as a regular member.
+    const balances = JSON.parse('{"__proto__": -50, "Alice": 50}') as Record<string, number>;
+    const transfers = settleDebts(balances);
+    expect(transfers).toEqual([{ from: '__proto__', to: 'Alice', amount: 50 }]);
+  });
+});
+
+describe('settleDebts conservation invariant (regression: silently dropped money)', () => {
+  it('throws on unbalanced input instead of dropping the residue', () => {
+    let caught: CoreError | undefined;
+    try {
+      settleDebts({ A: 100, B: -50 });
+    } catch (err) {
+      caught = err as CoreError;
+    }
+    expect(caught).toBeInstanceOf(CoreError);
+    expect(caught?.code).toBe('unbalanced_balances');
+  });
+
+  it('throws on a one-sided ledger', () => {
+    expect(() => settleDebts({ A: 75 })).toThrowError(CoreError);
+    expect(() => settleDebts({ A: -75 })).toThrowError(CoreError);
+  });
+
+  it('throws on non-finite balance values', () => {
+    let caught: CoreError | undefined;
+    try {
+      settleDebts({ A: Number.NaN, B: 0 });
+    } catch (err) {
+      caught = err as CoreError;
+    }
+    expect(caught?.code).toBe('invalid_balance');
+    expect(() => settleDebts({ A: Number.POSITIVE_INFINITY, B: -1 })).toThrowError(CoreError);
+  });
+
+  it('legitimate float drift at large magnitudes never trips the invariant', () => {
+    // 1e15/3 shares leave ~0.1 of accumulated float noise — far below the
+    // relative tolerance (1e15 × 1e-12 = 1000) and must settle cleanly.
+    const balances = computeBalances(
+      ['P', 'Q', 'R'],
+      [{ payer: 'P', amount: 1e15, participants: ['P', 'Q', 'R'] }],
+    );
+    expect(() => settleDebts(balances)).not.toThrow();
+    const transfers = settleDebts(balances);
+    expect(transfers).toHaveLength(2);
+  });
+
+  it('a real imbalance at large magnitudes is still caught', () => {
+    // 200 of genuinely unclaimed debt among 1e14-scale balances.
+    expect(() => settleDebts({ A: 1e14, B: -5e13, C: -5e13 + 200 })).toThrowError(CoreError);
+  });
+});
+
 describe('buildSettlementExpense (mark-as-settled parity)', () => {
   it('records the payment so balances actually clear (fixes the legacy bug)', () => {
     const participants = ['Alice', 'Bob', 'Carol'];

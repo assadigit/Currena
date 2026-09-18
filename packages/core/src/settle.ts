@@ -49,43 +49,54 @@ export interface Transfer {
  * these via alerts; the rebuild fails loudly instead):
  *   - 'duplicate_participant', 'unknown_payer', 'unknown_participant',
  *     'empty_participants', 'invalid_amount'
+ *
+ * The returned record has a **null prototype**: member names like
+ * `'__proto__'` or `'constructor'` become ordinary own keys instead of
+ * hitting `Object.prototype` setters (which silently corrupted the ledger
+ * before this was fixed — a `__proto__` participant's shares vanished).
  */
 export function computeBalances(
   participants: readonly string[],
   expenses: readonly SplitExpense[],
 ): Record<string, number> {
-  const balances: Record<string, number> = {};
+  const balances = new Map<string, number>();
   for (const participant of participants) {
-    if (Object.prototype.hasOwnProperty.call(balances, participant)) {
+    if (balances.has(participant)) {
       throw new CoreError('duplicate_participant', `participant listed twice: ${participant}`);
     }
-    balances[participant] = 0;
+    balances.set(participant, 0);
   }
 
   for (const expense of expenses) {
     if (typeof expense.amount !== 'number' || !Number.isFinite(expense.amount) || expense.amount <= 0) {
       throw new CoreError('invalid_amount', `expense amount must be a positive finite number, got ${String(expense.amount)}`);
     }
-    if (!(expense.payer in balances)) {
+    if (!balances.has(expense.payer)) {
       throw new CoreError('unknown_payer', `expense payer ${JSON.stringify(expense.payer)} is not a participant`);
     }
     if (expense.participants.length === 0) {
       throw new CoreError('empty_participants', `expense paid by ${JSON.stringify(expense.payer)} has no participants`);
     }
     for (const participant of expense.participants) {
-      if (!(participant in balances)) {
+      if (!balances.has(participant)) {
         throw new CoreError('unknown_participant', `split participant ${JSON.stringify(participant)} is not a participant`);
       }
     }
 
     const share = expense.amount / expense.participants.length;
-    balances[expense.payer] = (balances[expense.payer] ?? 0) + expense.amount;
+    balances.set(expense.payer, (balances.get(expense.payer) ?? 0) + expense.amount);
     for (const participant of expense.participants) {
-      balances[participant] = (balances[participant] ?? 0) - share;
+      balances.set(participant, (balances.get(participant) ?? 0) - share);
     }
   }
 
-  return balances;
+  // Null-prototype container: an own '__proto__' key is a plain data property
+  // here (JSON.stringify / Object.entries / indexing all behave normally).
+  const result: Record<string, number> = Object.create(null);
+  for (const [person, balance] of balances) {
+    result[person] = balance;
+  }
+  return result;
 }
 
 /**
@@ -93,16 +104,30 @@ export function computeBalances(
  * transfers { from, to, amount } that zeroes every balance (largest-debtor →
  * largest-creditor, legacy parity). Balances within ±SETTLE_EPSILON produce
  * no transfers.
+ *
+ * Throws typed errors instead of silently losing money:
+ *   - 'invalid_balance'    — a balance value is not a finite number
+ *   - 'unbalanced_balances' — debts and credits do not cancel (the greedy
+ *     loop used to silently drop the residue; tolerance is
+ *     max(SETTLE_EPSILON, largest amount × 1e-12) so legitimate float
+ *     drift from computeBalances can never trip it).
  */
 export function settleDebts(balances: Record<string, number>): Transfer[] {
   const debts: { person: string; amount: number }[] = [];
   const credits: { person: string; amount: number }[] = [];
+  let maxAmount = 0;
 
   for (const [person, balance] of Object.entries(balances)) {
+    if (typeof balance !== 'number' || !Number.isFinite(balance)) {
+      throw new CoreError('invalid_balance', `balance for ${JSON.stringify(person)} must be a finite number, got ${String(balance)}`);
+    }
     if (balance < -SETTLE_EPSILON) {
-      debts.push({ person, amount: Math.abs(balance) });
+      const amount = Math.abs(balance);
+      debts.push({ person, amount });
+      if (amount > maxAmount) maxAmount = amount;
     } else if (balance > SETTLE_EPSILON) {
       credits.push({ person, amount: balance });
+      if (balance > maxAmount) maxAmount = balance;
     }
   }
 
@@ -124,6 +149,20 @@ export function settleDebts(balances: Record<string, number>): Transfer[] {
     credit.amount -= settleAmount;
     if (debt.amount < SETTLE_EPSILON) i++;
     if (credit.amount < SETTLE_EPSILON) j++;
+  }
+
+  // Conservation invariant: whatever remains in the non-exhausted list is
+  // money the loop would silently drop. Fail loudly instead.
+  let leftoverDebt = 0;
+  for (; i < debts.length; i++) leftoverDebt += debts[i]!.amount;
+  let leftoverCredit = 0;
+  for (; j < credits.length; j++) leftoverCredit += credits[j]!.amount;
+  const tolerance = Math.max(SETTLE_EPSILON, maxAmount * 1e-12);
+  if (leftoverDebt > tolerance || leftoverCredit > tolerance) {
+    throw new CoreError(
+      'unbalanced_balances',
+      `balances must net to ~0 (unclaimed debt ${leftoverDebt}, unclaimed credit ${leftoverCredit})`,
+    );
   }
 
   return transfers;
