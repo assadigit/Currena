@@ -157,6 +157,18 @@ export const fa: Dictionary = {
     rateCopied: '✅ نرخ کپی شد!',
     noChangeSincePrevious: 'بدون تغییر از به‌روزرسانی قبلی',
     changedSincePrevious: 'تغییر از به‌روزرسانی قبلی',
+    /* تابلوی LED (۲۰۲۶-۰۹-۱۸) — پنل تیره‌ای که تجربهٔ تابلو نرخ صرافی را
+     * بازسازی می‌کند. */
+    boardAriaLabel: 'تابلوی نرخ ارز — نرخ‌های لحظه‌ای تومانی هر ارز',
+    boardSell: 'فروش',
+    boardBuy: 'خرید',
+    boardCurrency: 'ارز',
+    boardUnitToman: 'تومان',
+    boardLive: 'زنده',
+    boardCached: 'کش',
+    boardOffline: 'آفلاین',
+    boardFootnote: 'نرخ میانی بازار ± ۰٫۲۵٪ حاشیهٔ صرافی · منبع: TGJU',
+    detailsSection: 'جزئیات و روند',
   },
 
   trend: {

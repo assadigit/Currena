@@ -22,12 +22,20 @@
  *     the same affordance in blue;
  *   - `footer` slot lets the converter drop the quick-amount chips INSIDE
  *     the panel (visually bound to the field they fill).
+ *   - 2026-09-18 (zeroes fix): long Toman values ("70,000,000" and longer)
+ *     used to overflow the fixed-size field and clip mid-number — only the
+ *     leading digits stayed visible, which read like the typed zeroes
+ *     vanished. The font size now AUTO-FITS the content: a hidden measurer
+ *     span (same type styles, base size) is measured against the field's
+ *     usable width and the input's font is scaled down (floor 14px) so the
+ *     FULL value always fits. From 11 characters the decorative 💰 coin
+ *     collapses (padding-inline-start shrinks) to buy the digits more room.
  *
  * Thousand separators as you type via @currena/core thousandSeparateInput
  * (Persian-digit tolerant via parseAmount).
  */
 
-import { useState, type ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { parseAmount, thousandSeparateInput } from '@currena/core';
 import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
@@ -43,10 +51,24 @@ export interface AmountInputProps {
   footer?: ReactNode;
 }
 
+/** Value length (digits + separators) from which the field goes COMPACT:
+ *  the decorative 💰 coin folds away and the inline-start padding shrinks
+ *  so long numbers keep as much font size as possible. */
+const COMPACT_FROM_LEN = 11;
+
+/** Auto-fit floor (px): below this the value would rather scroll than
+ *  become unreadable — 14px still reads clearly on small phones. */
+const MIN_FIT_PX = 14;
+
 export function AmountInput({ id, value, onChange, currency, invalid, footer }: AmountInputProps) {
   const { t } = useI18n();
   const label = useCodeLabel();
   const [focused, setFocused] = useState(false);
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const measureRef = useRef<HTMLSpanElement | null>(null);
+  /** Scaled font size in px, or null = base responsive classes rule. */
+  const [fitPx, setFitPx] = useState<number | null>(null);
 
   // Attract mode: the eye-grabbing gold animation runs ONLY while the field
   // is idle (empty + unfocused + not invalid). First focus or first digit
@@ -60,6 +82,41 @@ export function AmountInput({ id, value, onChange, currency, invalid, footer }: 
   const unit = label(currency);
   const longUnit = unit.length > 5;
 
+  const placeholder = t('converter.amountPlaceholder');
+  const compact = value.length >= COMPACT_FROM_LEN;
+  const measuredText = value === '' ? placeholder : value;
+
+  // Auto-fit: measure the value with the BASE type styles (hidden span) and
+  // scale the input's font down when it would overflow the usable width.
+  // Decisions that change geometry (compact) depend ONLY on value length —
+  // never on the measurement itself — so the loop cannot oscillate.
+  useLayoutEffect(() => {
+    const input = inputRef.current;
+    const measure = measureRef.current;
+    if (!input || !measure) return;
+
+    const recompute = (): void => {
+      const cs = getComputedStyle(input);
+      const available =
+        input.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 2;
+      const natural = measure.scrollWidth;
+      const basePx = parseFloat(getComputedStyle(measure).fontSize);
+      if (!(available > 0) || !(natural > 0) || !(basePx > 0) || natural <= available) {
+        setFitPx(null); // fits at base size — keep the responsive classes
+        return;
+      }
+      setFitPx(Math.max(MIN_FIT_PX, Math.round((basePx * available) / natural)));
+    };
+
+    recompute();
+    // Webfont swap (Vazirmatn for fa) changes glyph metrics after first
+    // paint — re-measure once the fonts settle.
+    void document.fonts?.ready.then(recompute).catch(() => undefined);
+    const ro = new ResizeObserver(recompute);
+    ro.observe(input);
+    return () => ro.disconnect();
+  }, [measuredText, compact]);
+
   return (
     <div className={`amount-panel rounded-[20px] p-4 sm:p-5${attract ? ' amount-attract' : ''}`}>
       <label
@@ -69,28 +126,48 @@ export function AmountInput({ id, value, onChange, currency, invalid, footer }: 
         {t('converter.enterAmount')}
       </label>
       <div className="relative">
+        {/* The 💰 coin folds away in compact mode (long values) so the
+            padding-inline-start it reserves becomes digit room. */}
+        {!compact ? (
+          <span
+            className={`pointer-events-none absolute inset-y-0 start-4 flex items-center text-[1.55rem]${
+              attract ? ' amount-coin' : ''
+            }`}
+            aria-hidden="true"
+          >
+            💰
+          </span>
+        ) : null}
+        {/* Hidden measurer — EXACT base type styles of the field (mirrors the
+            input's classes below); its scrollWidth vs the field's usable
+            width drives the font auto-fit above. */}
         <span
-          className={`pointer-events-none absolute inset-y-0 start-4 flex items-center text-[1.55rem]${attract ? ' amount-coin' : ''}`}
+          ref={measureRef}
           aria-hidden="true"
+          className="invisible pointer-events-none absolute whitespace-pre font-extrabold tabular-nums text-[1.85rem] sm:text-[2.1rem]"
         >
-          💰
+          {measuredText}
         </span>
         <input
           id={id}
+          ref={inputRef}
           type="text"
           inputMode="decimal"
           autoComplete="off"
-          placeholder={t('converter.amountPlaceholder')}
+          placeholder={placeholder}
           value={value}
           aria-invalid={invalid === true}
+          style={fitPx !== null ? { fontSize: `${fitPx}px` } : undefined}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           onChange={(e) => onChange(thousandSeparateInput(e.target.value))}
-          className={`h-16 w-full rounded-2xl border-2 border-[#EBD48A] bg-[#FFFDF2] ps-13 text-[1.85rem] font-extrabold tabular-nums text-currena-dark caret-[#C79100] shadow-[inset_0_1px_3px_rgba(122,90,0,0.05),0_6px_18px_rgba(240,180,41,0.10)] transition-all duration-200 placeholder:font-bold placeholder:text-[#B39B45] focus:border-[#E8A020] focus:shadow-[0_0_0_4px_rgba(240,180,41,0.20),0_8px_24px_rgba(240,180,41,0.22)] focus:outline-none sm:h-[72px] sm:text-[2.1rem] dark:border-white/10 dark:bg-[#222C3B] dark:caret-currena-blue dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] dark:placeholder:text-[#5B6B80] dark:focus:border-currena-blue dark:focus:shadow-[0_0_0_4px_rgba(111,174,236,0.18),0_8px_24px_rgba(0,0,0,0.5)] ${
+          className={`h-16 w-full rounded-2xl border-2 border-[#EBD48A] bg-[#FFFDF2] ${
+            compact ? 'ps-4' : 'ps-13'
+          } font-extrabold tabular-nums text-currena-dark caret-[#C79100] shadow-[inset_0_1px_3px_rgba(122,90,0,0.05),0_6px_18px_rgba(240,180,41,0.10)] transition-all duration-200 placeholder:font-bold placeholder:text-[#B39B45] focus:border-[#E8A020] focus:shadow-[0_0_0_4px_rgba(240,180,41,0.20),0_8px_24px_rgba(240,180,41,0.22)] focus:outline-none sm:h-[72px] dark:border-white/10 dark:bg-[#222C3B] dark:caret-currena-blue dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] dark:placeholder:text-[#5B6B80] dark:focus:border-currena-blue dark:focus:shadow-[0_0_0_4px_rgba(111,174,236,0.18),0_8px_24px_rgba(0,0,0,0.5)] ${
             longUnit ? 'pe-[6.5rem]' : 'pe-[4.6rem]'
           } ${
             invalid ? 'border-currena-warning! shadow-[0_0_0_4px_rgba(255,107,107,0.18)]!' : ''
-          }`}
+          } ${fitPx === null ? 'text-[1.85rem] sm:text-[2.1rem]' : ''}`}
         />
         {/* Unit chip — the from-currency, impossible to miss (gold family in
             light mode to bind it to the pastel-gold panel; Currena Night

@@ -12,7 +12,8 @@ Cloudflare Workers  currena-api  →  https://currena.ir  (Custom Domain, produc
  ├─ GET  /api/health|rates|convert|meta|status     JSON (Hono)
  ├─ POST /internal/refresh                         header-secret scrape
  ├─ GET/POST /admin                                zero-JS ops console (noindex)
- └─ everything else                                built SPA (static assets + SPA fallback)
+ ├─ everything else                                built SPA (static assets + SPA fallback)
+ └─ cron  * * * * *                                scheduled keep-warm (see §Ever-green)
      KV namespace RATES: snapshot:*, status:*, lock:*   (7-day hard TTL)
 ```
 
@@ -105,6 +106,26 @@ pnpm --filter @currena/api exec wrangler deploy
 
 Push the branch + merged `main` first (see SESSION_LOG.md wrap-up), then deploy
 so the dashboard drift alarm reports "in sync".
+
+## Ever-green cron (2026-09-18)
+
+The worker carries a `* * * * *` cron trigger (`wrangler.jsonc` →
+`triggers.crons`). Each tick runs the normal ladder (`getRates`, non-force):
+
+- **tgju** — every minute; the FRESH_TTL_SEC=300 fresh-cache guard means the
+  actual upstream scrape happens only ~every 5 minutes (≈288 TGJU requests/day).
+- **frankfurter** — only on minutes `% 15 == 0` (ECB data updates ~daily).
+
+Before this, the ladder was pull-only: with zero visitors the KV snapshot aged
+until the first request scraped — and a failed scrape served the ≤7-day-old
+cache with the "last updated 3 hours ago" stale notice. Now the first visitor
+always lands on a cache at most ~5–6 minutes old, and `/api/status` freshness
+no longer depends on traffic. TGJU's ajax.json is also fetched with a `?cb=`
+cache-buster: their edge was observed serving HITs 6× past its own max-age.
+
+Cron failures log `[cron] <source> failed: …` (observability) and never
+rethrow; the next tick retries. `wrangler dev` doesn't fire crons — use
+`curl http://localhost:8787/cdn-cgi/local/scheduled` to trigger one manually.
 
 ## Rollback
 

@@ -485,6 +485,53 @@ export function createApp(deps: AppDeps = {}) {
 
 const app = createApp();
 
-export default app;
 /** Hono RPC client type: `const client = hc<AppType>('/');` in apps/web. */
 export type AppType = typeof app;
+
+/* ------------------------------------------------------------------ *
+ * Ever-green cron entrypoint (wrangler.jsonc `triggers.crons`, 1/min).
+ *
+ * The ladder used to be pull-only: with no visitors the KV snapshot aged
+ * unboundedly, and a failed scrape served the stale-cache rung — the
+ * "last updated 3 hours ago" symptom. The cron re-runs the SAME ladder
+ * (not a private path): getRates() honors FRESH_TTL_SEC (fresh cache →
+ * zero scrapes) and MIN_SCRAPE_INTERVAL_SEC, so the effective TGJU
+ * cadence is ~1 scrape / 5 min. Frankfurter is ECB reference data
+ * (updates ~once per business day) and only runs on the quarter hour.
+ * Failures are logged (observability) and never rethrow — a thrown
+ * handler marks the whole cron invocation failed in the CF dashboard.
+ * ------------------------------------------------------------------ */
+
+/** Minutes (UTC) on which the cron also refreshes the Frankfurter source. */
+const FRANKFURTER_CRON_MOD_MIN = 15;
+
+async function runScheduled(env: Bindings, scheduledTimeMs: number): Promise<void> {
+  const service = makeDefaultService(env);
+  const minute = new Date(scheduledTimeMs).getUTCMinutes();
+  const sources: SnapshotSource[] = minute % FRANKFURTER_CRON_MOD_MIN === 0
+    ? ['tgju', 'frankfurter']
+    : ['tgju'];
+  await Promise.all(
+    sources.map(async (source) => {
+      try {
+        const response = await service.getRates(source);
+        console.log(
+          `[cron] ${source} ok — servedFrom=${response.servedFrom} fetchedAt=${response.snapshot.fetchedAt}${response.stale ? ' (STALE)' : ''}`,
+        );
+      } catch (err) {
+        // Ladder bottom rung (no usable cache): logged, retried next tick.
+        console.warn(`[cron] ${source} failed:`, err instanceof Error ? err.message : err);
+      }
+    }),
+  );
+}
+
+export default {
+  fetch: async (request: Request, env: Bindings, ctx: ExecutionContext): Promise<Response> =>
+    app.fetch(request, env, ctx),
+  scheduled: (event: ScheduledController, env: Bindings, ctx: ExecutionContext): Promise<void> => {
+    const work = runScheduled(env, event.scheduledTime);
+    ctx.waitUntil(work);
+    return work;
+  },
+};

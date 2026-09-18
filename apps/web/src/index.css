@@ -475,3 +475,136 @@ body {
     animation: none;
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * LED shopfront rate board (2026-09-18) — recreates a currency-exchange
+ * window display: near-black housing (#0d0d0d), red seven-segment digits
+ * (DSEG7 Classic, OFL-1.1 — public/fonts/dseg/), soft glow bloom, and a
+ * glow-pulse on every rate update so the board reads as a live electronic
+ * sign, not a static table.
+ *
+ * A11y (WCAG 2.3.1 photosensitivity): the update-flash runs ONCE per rate
+ * change (changes arrive at most once per refresh window), lasts ~260ms and
+ * rows are staggered 0-210ms — far below the 3-flashes-per-second general
+ * threshold. The header clock's colon dims at 0.5Hz, never blinks fully
+ * off. Everything is disabled under prefers-reduced-motion.
+ *
+ * RTL: the board uses logical properties throughout (ps-/pe-, text-start);
+ * only the two rate columns keep PHYSICAL right alignment per spec (digits
+ * are LTR runs — a stable numeric column edge in both directions).
+ * ------------------------------------------------------------------ */
+
+@font-face {
+  font-family: "DSEG7 Classic";
+  src: url("/fonts/dseg/DSEG7Classic-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "DSEG7 Classic";
+  src: url("/fonts/dseg/DSEG7Classic-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* The LED signboard housing — near-black, with an inset bezel so it reads
+ * as physical hardware mounted in a window, not a dark card. */
+.led-board {
+  --led-red: #ff1e1e;
+  --led-red-dim: rgba(255, 30, 30, 0.62);
+  --led-glow: 0 0 1px rgba(255, 30, 30, 0.9), 0 0 7px rgba(255, 30, 30, 0.55),
+    0 0 16px rgba(255, 30, 30, 0.28);
+  --led-glow-hot: 0 0 2px rgba(255, 30, 30, 1), 0 0 12px rgba(255, 30, 30, 0.95),
+    0 0 26px rgba(255, 30, 30, 0.62), 0 0 48px rgba(255, 30, 30, 0.32);
+  background: #0d0d0d;
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 2px 18px rgba(0, 0, 0, 0.85), 0 10px 34px rgba(0, 0, 0, 0.28);
+}
+
+/* Seven-segment digits: every NUMBER on the board (rates, clock, date).
+ * Latin digits only — Persian text stays in Vazirmatn. */
+.led-digits {
+  font-family: "DSEG7 Classic", "Vazirmatn", monospace;
+  font-weight: 400;
+  color: var(--led-red);
+  text-shadow: var(--led-glow);
+  line-height: 1;
+  font-variant-ligatures: none;
+  /* Fallback font metrics differ wildly from DSEG7 — tabular keeps the
+   * fallback columns stable while the woff2 swaps in. */
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Clock colon: dims once per second (0.5Hz, amplitude 0.45→1 — soft, not
+ * a hard blink; well under any photosensitivity threshold). */
+.led-colon {
+  animation: currena-led-colon 1s steps(1, end) infinite;
+}
+@keyframes currena-led-colon {
+  0%,
+  49.9% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0.45;
+  }
+}
+
+/* Electronic-refresh pulse: when a rate changes, that digit's glow blooms
+ * for ~260ms then settles — the standard real-time-ticker "just updated"
+ * signal. Rows get a 0-210ms stagger (inline animation-delay) so the board
+ * never flashes in sync. */
+.led-flash {
+  animation: currena-led-pulse 260ms ease-out;
+}
+@keyframes currena-led-pulse {
+  0% {
+    text-shadow: var(--led-glow-hot);
+  }
+  100% {
+    text-shadow: var(--led-glow);
+  }
+}
+
+/* Loading state: all-dashes, like a booting LED module. */
+.led-idle {
+  color: var(--led-red-dim);
+  text-shadow: none;
+}
+
+/* Status LED in the header — a physical indicator dot. */
+.led-status {
+  box-shadow: 0 0 6px currentColor;
+}
+
+/* LIVE state: red LED heartbeat (soft opacity/glow breath, 0.7Hz — never a
+ * hard blink). Amber (cached) / gray (offline) stay steady. */
+.led-status-live {
+  animation: currena-led-status 1.4s ease-in-out infinite;
+}
+@keyframes currena-led-status {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 7px currentColor;
+  }
+  50% {
+    opacity: 0.55;
+    box-shadow: 0 0 3px currentColor;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .led-flash,
+  .led-colon,
+  .led-status,
+  .led-status-live {
+    animation: none;
+  }
+}

@@ -1,0 +1,4 @@
+DSEG: 7-segment / 14-segment display fonts by keshikan.
+License: SIL Open Font License 1.1 (per github.com/keshikan/DSEG — "DSEG is licensed under the SIL Open Font License 1.1").
+Source: https://github.com/keshikan/DSEG (npm package "dseg" 0.46.0)
+Only DSEG7Classic Regular + Bold woff2 are bundled here.

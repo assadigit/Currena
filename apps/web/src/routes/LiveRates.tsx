@@ -25,6 +25,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { convert, formatDate, formatNumber } from '@currena/core';
 import type { CurrencyCode } from '@currena/core';
+import { BOARD, LedRateBoard } from '../components/LedRateBoard';
 import { RateDeltaChip } from '../components/RateDeltaChip';
 import { Skeleton } from '../components/ui';
 import { Sparkline } from '../components/Sparkline';
@@ -34,9 +35,6 @@ import { useI18n } from '../lib/locale';
 import { seriesForPair, trendOf, useRateHistory } from '../lib/rate-history';
 import { snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
 import type { TranslationKey } from '../lib/locale';
-
-/** Board currencies — owner-priority five first, then the legacy rest. */
-const BOARD: readonly CurrencyCode[] = ['USD', 'AUD', 'EUR', 'TRY', 'AED', 'GBP', 'CAD', 'CNY'];
 
 const REFRESH_INTERVAL_MS = 30_000;
 const FLASH_MS = 1600;
@@ -347,6 +345,13 @@ export function LiveRates() {
           </p>
         </div>
 
+        {/* THE board — the shopfront LED panel: dark housing, red
+            seven-segment digits, live clock, one row per currency
+            (flag · name · sell · buy) with a glow-pulse on every update. */}
+        <div className="mb-8">
+          <LedRateBoard />
+        </div>
+
         {/* Banners */}
         {!store.online && snapshot ? (
           <div className="slide-down mb-4 flex items-center gap-3 rounded-[15px] border-s-4 border-currena-muted bg-currena-muted/15 px-4 py-3.5">
@@ -378,7 +383,11 @@ export function LiveRates() {
           </div>
         ) : null}
 
-        {/* Cards — single column on phones, 2 on tablet, 3–4 across on desktop */}
+        {/* Cards — the detail layer under the LED board: per-currency mid
+            rate, ▲/▼ delta, micro-trend sparkline, TGJU link and copy. */}
+        <h3 className="mb-4 text-sm font-extrabold uppercase tracking-[0.1em] text-currena-muted">
+          {t('liveRates.detailsSection')}
+        </h3>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {cards
             ? BOARD.map((code) => {

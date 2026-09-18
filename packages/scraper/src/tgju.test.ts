@@ -151,7 +151,9 @@ describe('parseTgjuProfilePrice (fixture: real 2026-09-16 capture excerpt)', () 
 });
 
 describe('scrapeTgju (fake fetch — never hits live sites)', () => {
-  /** URL-router fake fetch: exact match, '*' default, 404 when nothing matches. */
+  /** URL-router fake fetch: ajax.json matches by PREFIX (the scraper
+   *  cache-busts it with ?cb=<ts> against TGJU's stale edge HITs — see
+   *  scrapeTgju), everything else exact, '*' default, 404 when no match. */
   function makeFetch(routes: Record<string, string | Response>): {
     fetchImpl: typeof fetch;
     urls: string[];
@@ -160,7 +162,10 @@ describe('scrapeTgju (fake fetch — never hits live sites)', () => {
     const fetchImpl: typeof fetch = async (input) => {
       const url = String(input);
       urls.push(url);
-      const body = routes[url] ?? routes['*'];
+      const body =
+        routes[url] ??
+        (url.startsWith(`${TGJU_AJAX_URL}?`) ? routes[TGJU_AJAX_URL] : undefined) ??
+        routes['*'];
       if (body === undefined) return new Response('not found', { status: 404 });
       return body instanceof Response ? body : new Response(body, { status: 200 });
     };
@@ -172,7 +177,9 @@ describe('scrapeTgju (fake fetch — never hits live sites)', () => {
 
     const snapshot = await scrapeTgju({ fetchImpl, retries: 0 });
 
-    expect(urls).toEqual([TGJU_AJAX_URL]);
+    // The ajax call is cache-busted (?cb=<ts>) — one request, prefix-matched.
+    expect(urls).toHaveLength(1);
+    expect(urls[0]!.startsWith(`${TGJU_AJAX_URL}?cb=`)).toBe(true);
     expect(getRate(snapshot, 'USD').rate).toBe(1 / 230_500);
   });
 
@@ -223,7 +230,7 @@ describe('scrapeTgju (fake fetch — never hits live sites)', () => {
 
     const snapshot = await scrapeTgju({ fetchImpl, retries: 0 });
 
-    expect(urls[0]).toBe(TGJU_AJAX_URL);
+    expect(urls[0]!.startsWith(`${TGJU_AJAX_URL}?cb=`)).toBe(true);
     expect(urls).toHaveLength(17); // 1 failed ajax + 16 profile pages
     expect(maxInFlight).toBeLessThanOrEqual(4);
     expect(snapshot.rates).toHaveLength(17);

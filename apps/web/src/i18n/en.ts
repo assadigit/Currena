@@ -156,6 +156,19 @@ export const en = {
     rateCopied: '✅ Rate copied!',
     noChangeSincePrevious: 'No change since the previous update',
     changedSincePrevious: 'Change since the previous update',
+    /* LED shopfront board (2026-09-18) — the dark panel that recreates a
+     * currency-exchange window display. */
+    boardAriaLabel: 'Exchange rate board — live Toman rates per currency',
+    boardSell: 'SELL',
+    boardBuy: 'BUY',
+    boardCurrency: 'CURRENCY',
+    boardUnitToman: 'Toman',
+    boardLive: 'LIVE',
+    boardCached: 'CACHED',
+    boardOffline: 'OFFLINE',
+    /** Per-board honesty footnote: mid-rate ± dealer margin. */
+    boardFootnote: 'Market mid-rate ± 0.25% dealer margin · source: TGJU',
+    detailsSection: 'Details & trends',
   },
 
   trend: {

@@ -188,11 +188,20 @@ export async function scrapeTgjuProfiles(opts: TgjuScrapeOptions = {}): Promise<
  * Scrape TGJU: try ajax.json first (1 request); on ANY failure fall back to the
  * 16 profile pages. Both paths failing throws a typed ScraperError that the
  * API ladder turns into a 503 + status record.
+ *
+ * The ajax URL carries a per-scrape cache-buster: call1.tgju.org sits behind
+ * Cloudflare with `max-age=300`, and its edge was observed serving stale HITs
+ * far past that (measured 2026-09-18: HIT with `age: 1818` — 6× its own TTL).
+ * The `?cb=` param changes the edge cache key → MISS → TGJU's origin, so the
+ * snapshot's fetchedAt stays honest (a fresh scrape of stale upstream data
+ * would otherwise look brand-new). A static JSON file, the query param is
+ * ignored by the origin app.
  */
 export async function scrapeTgju(opts: TgjuScrapeOptions = {}): Promise<Snapshot> {
   let ajaxError: unknown;
   try {
-    const res = await fetchWithRetry(TGJU_AJAX_URL, {}, httpOpts(opts));
+    const bustUrl = `${TGJU_AJAX_URL}?cb=${(opts.now ?? (() => new Date()))().getTime()}`;
+    const res = await fetchWithRetry(bustUrl, {}, httpOpts(opts));
     const json: unknown = await res.json();
     return parseTgjuAjax(json, (opts.now ?? (() => new Date()))());
   } catch (err) {

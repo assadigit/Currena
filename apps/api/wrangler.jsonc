@@ -6,6 +6,17 @@
   "observability": {
     "enabled": true
   },
+  // Ever-green rates (2026-09-18): the ladder used to be pull-only — with zero
+  // visitors the KV snapshot aged until the first request scraped again, and a
+  // failing scrape served the stale-cache rung ("last updated 3 hours ago").
+  // A minute cron now keep-warms both sources through the SAME ladder (the
+  // FRESH_TTL_SEC=300 fresh-cache guard + MIN_SCRAPE_INTERVAL_SEC=60 cap the
+  // actual scrape cadence at ~1 request / 5 min ≈ 288/day per source — polite,
+  // free-tier safe). tgju runs every minute; frankfurter (ECB data, updates
+  // ~daily) every 15th minute only.
+  "triggers": {
+    "crons": ["* * * * *"]
+  },
   "kv_namespaces": [
     {
       "binding": "RATES",
