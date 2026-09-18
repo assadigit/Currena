@@ -133,19 +133,19 @@ export const GoldIdSchema = z.enum([
 export type GoldId = z.infer<typeof GoldIdSchema>;
 
 /**
- * Unit a gold quote is DENOMINATED in — TGJU's own display unit, kept
- * verbatim on purpose (NO Rial→Toman normalization here):
- *   - 'USD'  : the global ounce (انس طلا), e.g. 4,383.45 per troy ounce;
- *   - 'RIAL' : the Tehran market items (gold grams / coins) — the Iranian
- *     gold market quotes in Rial exactly as TGJU prints them (e.g.
- *     طلای ۱۸ عیار = 233,630,000). The currency side of the app stays
- *     TOMAN-canonical (AGENTS.md §6 applies to FX `rates`, not to these
- *     display commodities); the UI labels both units explicitly.
+ * Unit a gold quote is DENOMINATED in:
+ *   - 'USD'   : the global ounce (انس طلا), e.g. 4,383.45 per troy ounce;
+ *   - 'TOMAN' : the Tehran market items (gold grams / coins) — TGJU PRINTS
+ *     these in Rial, but the board reads in Toman (owner request
+ *     2026-09-19: “1000 Rial = 100 Toman — write in Toman”): the scraper
+ *     converts Rial→Toman (÷10) at parse via the same rialToToman the FX
+ *     ladder uses, so the whole app stays TOMAN-canonical (AGENTS.md §6);
+ *     e.g. طلای ۱۸ عیار 233,630,000 Rial → 23,363,000 Toman.
  */
-export const GoldUnitSchema = z.enum(['USD', 'RIAL']);
+export const GoldUnitSchema = z.enum(['USD', 'TOMAN']);
 export type GoldUnit = z.infer<typeof GoldUnitSchema>;
 
-/** One gold/coin quote — TGJU's published value, in its native unit. */
+/** One gold/coin quote — TGJU's published value, normalized to USD / Toman. */
 export const GoldQuoteSchema = z.object({
   id: GoldIdSchema,
   unit: GoldUnitSchema,
@@ -179,9 +179,10 @@ export const SnapshotSchema = z.object({
   rates: z.array(RateSchema).min(1),
   /**
    * Gold & coin quotes (tgju snapshots only) — display commodities in
-   * TGJU's native units; absent on legacy snapshots (pre-2026-09-27 KV
-   * entries, Frankfurter snapshots, the profile-page fallback path) and
-   * the UI degrades to dashes, never guesses.
+   * USD / Toman (Tehran items converted from TGJU's printed Rial);
+   * absent on legacy snapshots (pre-gold KV entries, Frankfurter
+   * snapshots, the profile-page fallback path) and the UI degrades to
+   * dashes, never guesses.
    */
   gold: z.array(GoldQuoteSchema).optional(),
   /** Optional hard-expiry timestamp (cache eviction hint). */

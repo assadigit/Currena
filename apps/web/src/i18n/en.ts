@@ -146,9 +146,10 @@ export const en = {
     VND: 'Vietnamese Dong',
   },
 
-  /* Gold & coins LED panel (2026-09-27) — TGJU's طلا و سکه market items,
-   * quoted in TGJU's own display units (global ounce in USD, Tehran market
-   * in Rial). Keys mirror core's GoldId enum exactly. */
+  /* Gold & coins LED panel (2026-09-27) — TGJU's طلا و سکه market items:
+   * global ounce in USD, Tehran market in Toman (÷10 converted from
+   * TGJU's printed Rial — owner request 2026-09-19). Keys mirror core's
+   * GoldId enum exactly. */
   gold: {
     'gold-ounce': 'Gold Ounce',
     'gold-18k': '18K Gold',
@@ -179,9 +180,6 @@ export const en = {
     boardCurrent: 'CURRENT',
     boardHigh: 'DAY HIGH',
     boardLow: 'DAY LOW',
-    /** Compact column labels for narrow screens (silkscreen style). */
-    boardHighShort: 'HIGH',
-    boardLowShort: 'LOW',
     boardCurrency: 'CURRENCY',
     boardUnitToman: 'Toman',
     boardLive: 'LIVE',
@@ -190,16 +188,16 @@ export const en = {
     /** Per-board footnote: the three columns are TGJU's own daily stats. */
     boardFootnote: 'Current · day high · day low — TGJU open market, Toman',
     /* Gold & coins panel (2026-09-27) — the second LED box: the global
-     * ounce in USD plus the Tehran gold market in Rial, TGJU's own quotes. */
-    goldAriaLabel: 'Gold and coins board — global ounce in USD, Tehran market in Rial',
+     * ounce in USD plus the Tehran gold market in Toman, TGJU's own quotes. */
+    goldAriaLabel: 'Gold and coins board — global ounce in USD, Tehran market in Toman',
     goldBoardTitle: 'Gold & Coins',
     /** Silkscreen column label over the item names (like CURRENCY). */
     goldItem: 'Item',
     /** Divider label marking the Tehran market section + its unit. */
-    goldDomestic: 'Tehran Market · Rial',
+    goldDomestic: 'Tehran Market · Toman',
     goldUnitUsd: 'USD',
-    goldUnitRial: 'Rial',
-    goldFootnote: 'Global ounce in USD, Tehran market in Rial — TGJU real quotes: current · day high · day low · change %',
+    goldUnitToman: 'Toman',
+    goldFootnote: 'Global ounce in USD, Tehran market in Toman — TGJU real quotes: current · day high · day low · change %',
     detailsSection: 'Details & trends',
   },
 

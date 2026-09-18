@@ -546,7 +546,7 @@ body {
   --led-glow: 0 0 1px rgba(255, 30, 30, 0.55), 0 0 6px rgba(255, 30, 30, 0.4),
     0 0 15px rgba(255, 30, 30, 0.22);
 
-  /* Horizontal gap between the four board columns — ONE variable read by
+  /* Horizontal gap between the board columns — ONE variable read by
    * the table grid and every subgrid row (2026-09-27 grid rework). The
    * tiers below grow it with the larger digits so columns keep their
    * breathing room. */
@@ -587,15 +587,20 @@ body {
  * THE shared column grid (2026-09-27 owner spec: one grid-template-
  * columns definition for the header row AND every value row).
  *
- * .led-table owns the four tracks (name · current · high · low). The
- * header row, the <ul> and every <li> opt in via CSS subgrid and span
- * the full row (grid-column: 1 / -1), so every row resolves to the SAME
- * track widths: an `auto` track sizes to the widest module in that
- * column across ALL rows, and each header label stays locked directly
- * above its own column of numbers at any digit size — no eyeballing
- * positions per row. Value columns (headers and digits alike) align to
- * the physical right edge inside the shared grid; digits stack cleanly
- * under their labels regardless of digit count, in both LTR and RTL.
+ * .led-table owns the track ladder, now SHARED by both boards (currency
+ * + gold): below md the table carries TWO tracks (name · CURRENT) — the
+ * single-column mobile layout (owner request 2026-09-19: phones show
+ * only the current price, bigger); from md (768px) up the full four
+ * tracks (name · current · high · low) return, matching their cells'
+ * hidden→md:block wrappers. The header row, the <ul> and every <li> opt
+ * in via CSS subgrid and span the full row (grid-column: 1 / -1), so
+ * every row resolves to the SAME track widths: an `auto` track sizes to
+ * the widest module in that column across ALL rows, and each header
+ * label stays locked directly above its own column of numbers at any
+ * digit size — no eyeballing positions per row. Value columns (headers
+ * and digits alike) align to the physical right edge inside the shared
+ * grid; digits stack cleanly under their labels regardless of digit
+ * count, in both LTR and RTL.
  *
  * Gaps: column-gap is set to the same --led-col-gap at EVERY subgrid
  * level, so tracks can never disagree whether an engine honors a
@@ -608,17 +613,29 @@ body {
 
 .led-row {
   display: grid;
-  /* Fallback track definition — overridden by subgrid when supported. */
-  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  /* Fallback track definition — overridden by subgrid when supported.
+     Two tracks below md (single price column), four from md up. */
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   column-gap: var(--led-col-gap, 3px);
+}
+
+@media (min-width: 768px) {
+  .led-row {
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+  }
 }
 
 @supports (grid-template-columns: subgrid) {
   .led-table {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     column-gap: var(--led-col-gap, 3px);
+  }
+  @media (min-width: 768px) {
+    .led-table {
+      grid-template-columns: minmax(0, 1fr) auto auto auto;
+    }
   }
   /* Header row and the row list each span the full table width. */
   .led-table > * {
@@ -639,35 +656,14 @@ body {
 }
 
 /* ------------------------------------------------------------------ *
- * GOLD & COINS table (2026-09-27) — the second LED panel. Same shared
- * subgrid machinery as the currency board, a different track ladder: the
- * coin values are 13-glyph DSEG7 runs ("2 319 850 000") — nearly twice
- * the currency board's widest module — so below md the table carries ONE
- * price column (CURRENT; the high/low cells are display:none) and md
- * (768px) is the first width where three 13-glyph columns plus a real
- * name track fit. These rules sit AFTER the subgrid @supports block so
- * the gold parent tracks win the cascade over .led-table's 4-track
- * definition; the no-subgrid fallback is wrapped in @supports not (…)
- * so it can never override the subgrid opt-in above.
+ * GOLD & COINS table (2026-09-27) — the second LED panel. Its former
+ * separate track ladder (one price column below md because 13-glyph
+ * RIAL coin values could not fit three columns on phones) merged into
+ * the shared .led-table ladder above when the currency board adopted
+ * the same single-column mobile layout (2026-09-19) AND the Tehran
+ * values became Toman (11-glyph runs, ÷10 from TGJU's printed Rial).
+ * Only the section divider below remains gold-specific.
  * ------------------------------------------------------------------ */
-.led-table-gold {
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-@media (min-width: 768px) {
-  .led-table-gold {
-    grid-template-columns: minmax(0, 1fr) auto auto auto;
-  }
-}
-@supports not (grid-template-columns: subgrid) {
-  .led-table-gold .led-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-  @media (min-width: 768px) {
-    .led-table-gold .led-row {
-      grid-template-columns: minmax(0, 1fr) auto auto auto;
-    }
-  }
-}
 
 /* Tehran-market silkscreen divider between the gold table's two lists —
  * hairlines top and bottom, spanning all tracks (grid-column 1 / -1 via

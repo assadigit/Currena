@@ -25,8 +25,15 @@
  * Real data, never a derived spread; stats ride the snapshot rate entries
  * (core schemas.ts) and render as dashes when unavailable.
  *
- * Layout rules (owner spec, grid rework 2026-09-27):
+ * Layout rules (owner spec, grid rework 2026-09-27; mobile single-column
+ * 2026-09-19):
  *   - Row cells in fixed order: flag · currency name · current · high · low.
+ *   - Below md (phones) the table carries ONE price column — CURRENT only
+ *     (owner request 2026-09-19: in mobile view only show the current
+ *     price, and make it bigger) — the day-high/day-low cells and headers
+ *     are display:none and rejoin at md, exactly like the gold board; the
+ *     CURRENT module grows to 1.25rem on phones (+56%) since it no
+ *     longer shares the width with two more columns.
  *   - The flag+name cell aligns to the row's leading edge via
  *     padding-inline-start (names are Persian; the row must stay RTL-safe).
  *   - The currency NAME is the bold identity label (2026-09-27 owner spec:
@@ -182,7 +189,9 @@ const LedRow = memo(function LedRow({
       </div>
 
       {/* Current — the PRIMARY module: ~20-25% larger digits at sm+/lg+,
-          hotter bulbs + stronger bloom (.led-cell-hot), full power. */}
+          hotter bulbs + stronger bloom (.led-cell-hot), full power. On
+          phones it is the ONLY value column, so it also grows there
+          (0.8 → 1.25rem — the 7-glyph Toman runs leave ample room). */}
       <LedValueCell
         keyId={quote.code}
         stat="cur"
@@ -191,11 +200,12 @@ const LedRow = memo(function LedRow({
         staggerMs={stagger}
         label={currentLabel}
         unitLabel={unitLabel}
-        size="text-[0.8rem] sm:text-[1.35rem] lg:text-[1.6rem]"
+        size="text-[1.25rem] sm:text-[1.35rem] lg:text-[1.6rem]"
         emphasis="primary"
       />
 
-      {/* Day high / day low — TGJU stats, secondary modules at 75% power. */}
+      {/* Day high / day low — TGJU stats, secondary modules at 75% power;
+          hidden below md (single-column mobile, owner request 2026-09-19). */}
       <LedValueCell
         keyId={quote.code}
         stat="high"
@@ -206,6 +216,7 @@ const LedRow = memo(function LedRow({
         unitLabel={unitLabel}
         size="text-[0.72rem] sm:text-[1.14rem] lg:text-[1.38rem]"
         emphasis="secondary"
+        wrapperClass="hidden text-right md:block"
       />
       <LedValueCell
         keyId={quote.code}
@@ -217,6 +228,7 @@ const LedRow = memo(function LedRow({
         unitLabel={unitLabel}
         size="text-[0.72rem] sm:text-[1.14rem] lg:text-[1.38rem]"
         emphasis="secondary"
+        wrapperClass="hidden text-right md:block"
       />
     </li>
   );
@@ -287,14 +299,14 @@ export function LedRateBoard() {
           (index.css), locking each label above its own column of
           numbers. Column headers are silkscreen labels on the housing,
           dot-matrix LED fill at a tight pitch (Tailwind text colors stay
-          as fallback): currency · current · day high · day low. The
-          CURRENCY label pads its inline start like the name
-          cells; the three value labels pad their PHYSICAL right edge by
-          the module-well padding (4/9px) so each sits exactly over its
-          digits' right edge, and keep physical right alignment with the
-          value modules below in both LTR and RTL. Long Persian high/low
-          labels collapse to the short form below sm so headers never
-          dictate column width on phones. */}
+          as fallback): currency · current · day high · day low — with
+          high/low hidden below md together with their columns (mobile is
+          single-column, owner request 2026-09-19). The CURRENCY label
+          pads its inline start like the name cells; the value labels pad
+          their PHYSICAL right edge by the module-well padding (4/9px) so
+          each sits exactly over its digits' right edge, and keep physical
+          right alignment with the value modules below in both LTR and
+          RTL. */}
       <div className="led-table">
         <div className="led-row pb-2.5">
           <p className="led-label led-label-white-dim ps-1 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-white/35 sm:ps-2.5">
@@ -303,13 +315,11 @@ export function LedRateBoard() {
           <p className="led-label led-label-red whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/80 sm:pr-[9px]">
             {currentLabel}
           </p>
-          <p className="led-label led-label-red-dim whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55 sm:pr-[9px]">
-            <span className="sm:hidden">{t('liveRates.boardHighShort')}</span>
-            <span className="hidden sm:inline">{highLabel}</span>
+          <p className="led-label led-label-red-dim hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55 md:block md:pr-[9px]">
+            {highLabel}
           </p>
-          <p className="led-label led-label-red-dim whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55 sm:pr-[9px]">
-            <span className="sm:hidden">{t('liveRates.boardLowShort')}</span>
-            <span className="hidden sm:inline">{lowLabel}</span>
+          <p className="led-label led-label-red-dim hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55 md:block md:pr-[9px]">
+            {lowLabel}
           </p>
         </div>
 

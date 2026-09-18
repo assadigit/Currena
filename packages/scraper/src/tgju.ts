@@ -49,22 +49,22 @@ export const TGJU_PROFILES: readonly { code: string; slug: string }[] = Object.f
  * links on https://www.tgju.org/ 2026-09-27: every `p`/`h`/`l` matched the
  * site's own «طلا و سکه» table exactly.
  *
- * ⚠️ Units are TGJU's own display units, kept VERBATIM (no Rial→Toman
- * normalization): the global ounce is USD (4,383.45 per troy ounce), the
- * Tehran items are RIAL exactly as the Iranian gold market quotes them
- * (core schemas.ts GoldQuoteSchema documents this decision — AGENTS.md §6
- * governs FX `rates`, these are display commodities, never converted).
+ * Units: the global ounce is USD (4,383.45 per troy ounce). The Tehran
+ * items are TOMAN — TGJU PRINTS them in Rial, but the board must read in
+ * Toman (owner request 2026-09-19: 1000 Rial = 100 Toman), so
+ * parseTgjuGold converts via rialToToman (the same ÷10 the FX ladder uses
+ * — the app's canonical Iranian unit, AGENTS.md §6).
  */
 export const TGJU_GOLD_SYMBOLS: readonly { id: GoldId; slug: string; unit: GoldUnit }[] = Object.freeze([
   { id: 'gold-ounce', slug: 'ons', unit: 'USD' }, // انس طلا (global market — the row the owner linked: tgju.org/profile/ons)
-  { id: 'gold-18k', slug: 'geram18', unit: 'RIAL' }, // طلای 18 عیار
-  { id: 'gold-24k', slug: 'geram24', unit: 'RIAL' }, // طلای 24 عیار
-  { id: 'gold-used', slug: 'gold_mini_size', unit: 'RIAL' }, // طلای دست دوم (slug verified by exact p/h/l match)
-  { id: 'coin-emami', slug: 'sekee', unit: 'RIAL' }, // سکه امامی
-  { id: 'coin-bahar', slug: 'sekeb', unit: 'RIAL' }, // سکه بهار آزادی
-  { id: 'coin-half', slug: 'nim', unit: 'RIAL' }, // نیم سکه
-  { id: 'coin-quarter', slug: 'rob', unit: 'RIAL' }, // ربع سکه
-  { id: 'coin-gram', slug: 'gerami', unit: 'RIAL' }, // سکه گرمی
+  { id: 'gold-18k', slug: 'geram18', unit: 'TOMAN' }, // طلای 18 عیار
+  { id: 'gold-24k', slug: 'geram24', unit: 'TOMAN' }, // طلای 24 عیار
+  { id: 'gold-used', slug: 'gold_mini_size', unit: 'TOMAN' }, // طلای دست دوم (slug verified by exact p/h/l match)
+  { id: 'coin-emami', slug: 'sekee', unit: 'TOMAN' }, // سکه امامی
+  { id: 'coin-bahar', slug: 'sekeb', unit: 'TOMAN' }, // سکه بهار آزادی
+  { id: 'coin-half', slug: 'nim', unit: 'TOMAN' }, // نیم سکه
+  { id: 'coin-quarter', slug: 'rob', unit: 'TOMAN' }, // ربع سکه
+  { id: 'coin-gram', slug: 'gerami', unit: 'TOMAN' }, // سکه گرمی
 ]);
 
 export function tgjuProfilePageUrl(slug: string): string {
@@ -170,7 +170,9 @@ const TgjuGoldEntrySchema = z.object({
   dp: z.number().optional(),
 });
 
-/** Day-stat pair in the quote's OWN unit (no Rial→Toman conversion here). */
+/** Day-stat pair parsed in TGJU's PRINT unit (Rial for the Tehran items —
+ *  the Rial→Toman conversion is applied by the caller together with the
+ *  price, so price and stats always scale as one). */
 function goldDayStats(
   entry: { h?: string; l?: string },
   id: GoldId,
@@ -211,11 +213,19 @@ export function parseTgjuGold(payload: unknown): GoldQuote[] {
       continue;
     }
     try {
+      // TGJU prints the Tehran items in RIAL — normalize to the quote's
+      // TOMAN unit here (owner request 2026-09-19: the board reads in
+      // Toman; 1000 Rial = 100 Toman). ÷10 via the same rialToToman the FX
+      // ladder uses; TGJU quotes gold in 10-Rial granularity so values
+      // stay integers (a stray sub-10 Rial value divides honestly).
+      const scale = unit === 'TOMAN' ? rialToToman : (n: number) => n;
+      const stats = goldDayStats(parsed.data, id);
       quotes.push({
         id,
         unit,
-        price: normalizeTgjuNumber(parsed.data.p),
-        ...goldDayStats(parsed.data, id),
+        price: scale(normalizeTgjuNumber(parsed.data.p)),
+        ...(stats.dayHigh !== undefined ? { dayHigh: scale(stats.dayHigh) } : {}),
+        ...(stats.dayLow !== undefined ? { dayLow: scale(stats.dayLow) } : {}),
         ...(parsed.data.dp !== undefined && Number.isFinite(parsed.data.dp) ? { changePct: parsed.data.dp } : {}),
       });
     } catch (err) {

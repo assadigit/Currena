@@ -196,7 +196,7 @@ describe('parseTgjuAjax (fixture: real 2026-09-16 capture)', () => {
 });
 
 describe('parseTgjuGold / snapshot.gold (fixture: real 2026-09-27 capture)', () => {
-  it('GOLDEN: all 9 items, display order, TGJU-published values VERBATIM in their own units', () => {
+  it('GOLDEN: all 9 items, display order, Tehran items converted Rial→Toman (÷10)', () => {
     const snapshot = parseTgjuAjax(ajaxFixture);
     const gold = snapshot.gold;
     expect(gold).toBeDefined();
@@ -211,21 +211,22 @@ describe('parseTgjuGold / snapshot.gold (fixture: real 2026-09-27 capture)', () 
     expect(ounce?.dayHigh).toBe(4383.45);
     expect(ounce?.dayLow).toBe(4377.04);
     expect(ounce?.changePct).toBe(0.05);
-    // The Tehran market: Rial exactly as printed (NO /10 normalization).
+    // The Tehran market: TGJU prints Rial; the quote is TOMAN (÷10) —
+    // owner request 2026-09-19 (1000 Rial = 100 Toman).
     const g18 = gold?.find((g) => g.id === 'gold-18k');
-    expect(g18?.unit).toBe('RIAL');
-    expect(g18?.price).toBe(233_630_000);
-    expect(g18?.dayHigh).toBe(234_995_000);
-    expect(g18?.dayLow).toBe(232_109_000);
+    expect(g18?.unit).toBe('TOMAN');
+    expect(g18?.price).toBe(23_363_000);
+    expect(g18?.dayHigh).toBe(23_499_500);
+    expect(g18?.dayLow).toBe(23_210_900);
     expect(g18?.changePct).toBe(0);
     // طلای دست دوم rides the odd-looking gold_mini_size slug (verified by exact p/h/l).
-    expect(gold?.find((g) => g.id === 'gold-used')?.price).toBe(230_515_180);
-    // سکه امامی = sekee, سکه بهار آزادی = sekeb (both ~2.3B Rial).
-    expect(gold?.find((g) => g.id === 'coin-emami')?.price).toBe(2_319_850_000);
-    expect(gold?.find((g) => g.id === 'coin-bahar')?.price).toBe(2_281_050_000);
-    expect(gold?.find((g) => g.id === 'coin-half')?.price).toBe(1_190_000_000);
-    expect(gold?.find((g) => g.id === 'coin-quarter')?.price).toBe(630_000_000);
-    expect(gold?.find((g) => g.id === 'coin-gram')?.price).toBe(330_000_000);
+    expect(gold?.find((g) => g.id === 'gold-used')?.price).toBe(23_051_518);
+    // سکه امامی = sekee, سکه بهار آزادی = sekeb (both ~232M Toman).
+    expect(gold?.find((g) => g.id === 'coin-emami')?.price).toBe(231_985_000);
+    expect(gold?.find((g) => g.id === 'coin-bahar')?.price).toBe(228_105_000);
+    expect(gold?.find((g) => g.id === 'coin-half')?.price).toBe(119_000_000);
+    expect(gold?.find((g) => g.id === 'coin-quarter')?.price).toBe(63_000_000);
+    expect(gold?.find((g) => g.id === 'coin-gram')?.price).toBe(33_000_000);
   });
 
   it('gold never leaks into the FX ladder: rates stay currency-only and untouched', () => {
@@ -266,7 +267,7 @@ describe('parseTgjuGold / snapshot.gold (fixture: real 2026-09-27 capture)', () 
     g.h = g.l;
     g.l = swap;
     const item = parseTgjuAjax(payload).gold?.find((x) => x.id === 'gold-24k');
-    expect(item?.price).toBe(311_504_000);
+    expect(item?.price).toBe(31_150_400);
     expect(item?.dayHigh).toBeUndefined();
     expect(item?.dayLow).toBeUndefined();
   });
@@ -277,7 +278,7 @@ describe('parseTgjuGold / snapshot.gold (fixture: real 2026-09-27 capture)', () 
     g.h = '';
     delete g.l;
     const item = parseTgjuAjax(payload).gold?.find((x) => x.id === 'coin-half');
-    expect(item?.price).toBe(1_190_000_000);
+    expect(item?.price).toBe(119_000_000);
     expect(item?.dayHigh).toBeUndefined();
     expect(item?.dayLow).toBeUndefined();
   });

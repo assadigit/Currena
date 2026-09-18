@@ -355,9 +355,9 @@ export function LiveRates() {
         </div>
 
         {/* The second LED box — GOLD & COINS: the global ounce (USD) plus
-            the Tehran gold market (Rial), TGJU's own published quotes
-            (current / day high / day low / change %). Same physical panel
-            language as the currency board. */}
+            the Tehran gold market (Toman, ÷10 from TGJU's printed Rial),
+            TGJU's own published quotes (current / day high / day low /
+            change %). Same physical panel language as the currency board. */}
         <div className="mb-8">
           <LedGoldBoard />
         </div>

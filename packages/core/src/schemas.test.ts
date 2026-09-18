@@ -115,8 +115,8 @@ describe('SnapshotSchema', () => {
   it('accepts an optional gold array (TGJU display commodities) and keeps it absent-friendly', () => {
     const gold = [
       { id: 'gold-ounce', unit: 'USD', price: 4383.45, dayHigh: 4383.45, dayLow: 4377.04, changePct: 0.05 },
-      { id: 'gold-18k', unit: 'RIAL', price: 233630000, dayHigh: 234995000, dayLow: 232109000, changePct: 0 },
-      { id: 'coin-emami', unit: 'RIAL', price: 2319850000 },
+      { id: 'gold-18k', unit: 'TOMAN', price: 23363000, dayHigh: 23499500, dayLow: 23210900, changePct: 0 },
+      { id: 'coin-emami', unit: 'TOMAN', price: 231985000 },
     ];
     const withGold = SnapshotSchema.safeParse({ ...validSnapshot, gold });
     expect(withGold.success).toBe(true);
@@ -124,12 +124,12 @@ describe('SnapshotSchema', () => {
     expect(SnapshotSchema.safeParse(validSnapshot).success).toBe(true);
     // Any invalid gold item poisons the snapshot (loud, never garbage).
     expect(SnapshotSchema.safeParse({ ...validSnapshot, gold: [...gold, { id: 'gold-18k', unit: 'EUR', price: 1 }] }).success).toBe(false);
-    expect(SnapshotSchema.safeParse({ ...validSnapshot, gold: [{ id: 'gold-18k', unit: 'RIAL', price: -1 }] }).success).toBe(false);
+    expect(SnapshotSchema.safeParse({ ...validSnapshot, gold: [{ id: 'gold-18k', unit: 'TOMAN', price: -1 }] }).success).toBe(false);
   });
 });
 
 describe('GoldQuoteSchema', () => {
-  it('accepts the real live shapes: USD ounce with decimals, Rial items with 0% change', () => {
+  it('accepts the real live shapes: USD ounce with decimals, Toman items with 0% change', () => {
     const ounce = GoldQuoteSchema.safeParse({
       id: 'gold-ounce',
       unit: 'USD',
@@ -141,31 +141,31 @@ describe('GoldQuoteSchema', () => {
     expect(ounce.success).toBe(true);
     const gram18 = GoldQuoteSchema.safeParse({
       id: 'gold-18k',
-      unit: 'RIAL',
-      price: 233630000,
-      dayHigh: 234995000,
-      dayLow: 232109000,
+      unit: 'TOMAN',
+      price: 23363000,
+      dayHigh: 23499500,
+      dayLow: 23210900,
       changePct: 0,
     });
     expect(gram18.success).toBe(true);
   });
 
   it('allows a NEGATIVE changePct (market down) but non-finite garbage is rejected', () => {
-    expect(GoldQuoteSchema.safeParse({ id: 'coin-bahar', unit: 'RIAL', price: 2281050000, changePct: -0.42 }).success).toBe(true);
-    expect(GoldQuoteSchema.safeParse({ id: 'coin-bahar', unit: 'RIAL', price: 2281050000, changePct: Number.NaN }).success).toBe(false);
+    expect(GoldQuoteSchema.safeParse({ id: 'coin-bahar', unit: 'TOMAN', price: 228105000, changePct: -0.42 }).success).toBe(true);
+    expect(GoldQuoteSchema.safeParse({ id: 'coin-bahar', unit: 'TOMAN', price: 228105000, changePct: Number.NaN }).success).toBe(false);
   });
 
   it('rejects unknown item ids and unknown units', () => {
-    expect(GoldQuoteSchema.safeParse({ id: 'gold-999k', unit: 'RIAL', price: 1 }).success).toBe(false);
-    expect(GoldQuoteSchema.safeParse({ id: 'gold-18k', unit: 'TOMAN', price: 1 }).success).toBe(false);
+    expect(GoldQuoteSchema.safeParse({ id: 'gold-999k', unit: 'TOMAN', price: 1 }).success).toBe(false);
+    expect(GoldQuoteSchema.safeParse({ id: 'gold-18k', unit: 'RIAL', price: 1 }).success).toBe(false);
   });
 
   it('rejects negative / zero / non-finite prices and day stats', () => {
     for (const price of [-1, 0, Number.POSITIVE_INFINITY, Number.NaN]) {
-      expect(GoldQuoteSchema.safeParse({ id: 'coin-gram', unit: 'RIAL', price }).success).toBe(false);
+      expect(GoldQuoteSchema.safeParse({ id: 'coin-gram', unit: 'TOMAN', price }).success).toBe(false);
     }
-    expect(GoldQuoteSchema.safeParse({ id: 'coin-gram', unit: 'RIAL', price: 1, dayHigh: -5 }).success).toBe(false);
-    expect(GoldQuoteSchema.safeParse({ id: 'coin-gram', unit: 'RIAL', price: 1, dayLow: 0 }).success).toBe(false);
+    expect(GoldQuoteSchema.safeParse({ id: 'coin-gram', unit: 'TOMAN', price: 1, dayHigh: -5 }).success).toBe(false);
+    expect(GoldQuoteSchema.safeParse({ id: 'coin-gram', unit: 'TOMAN', price: 1, dayLow: 0 }).success).toBe(false);
   });
 });
 

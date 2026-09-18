@@ -7,23 +7,23 @@
  *   انس طلا (global troy ounce, USD)  — the row the owner linked
  *   (tgju.org/profile/ons): current / day high / day low + change %.
  *   طلای 18/24 عیار، طلای دست دوم، سکه امامی، سکه بهار آزادی،
- *   نیم سکه، ربع سکه، سکه گرمی — the Tehran market, quoted in RIAL
- *   exactly as TGJU prints (values kept VERBATIM — see core GoldQuoteSchema;
- *   the currency side of the app stays Toman-canonical, these display
- *   commodities are never converted, units labeled on the board).
+ *   نیم سکه، ربع سکه، سکه گرمی — the Tehran market, in TOMAN: TGJU
+ *   prints these in Rial, the scraper converts ÷10 (owner request
+ *   2026-09-19: 1000 Rial = 100 Toman) — the app's canonical unit.
+ *   Values stay VERBATIM otherwise (core GoldQuoteSchema).
  *
  * Same hardware language as LedRateBoard (shared LedParts: recessed
  * dot-matrix modules, ghost/glow/lit layers, hot CURRENT column, 260ms
  * flash-on-change, live clock + status LED, silkscreen labels) and the
  * same ONE-SHARED-COLUMN-GRID machinery (index.css .led-table subgrid).
  *
- * Layout differences forced by the DATA (13-glyph coin values like
- * 2,319,850,000 — twice the currency board's widest module):
- *   - below md: the table carries ONE price column (CURRENT) — three
- *     13-glyph columns physically cannot fit a phone; the day range joins
- *     from md (768px) up where the track budget allows it;
+ * Layout differences forced by the DATA (11-glyph coin values like
+ * 231 985 000 Toman — the currency board's modules are 7-glyph):
+ *   - below md: the table carries ONE price column (CURRENT) — the day
+ *     range cannot fit a phone; it joins from md (768px) up where the
+ *     track budget allows it;
  *   - the ounce row rides its own list, then a labeled silkscreen divider
- *     marks the Tehran market section (and its Rial unit);
+ *     marks the Tehran market section (and its Toman unit);
  *   - per-row caption = the real TGJU change % (ajax `dp`), the slot the
  *     currency board uses for the ISO code.
  *
@@ -94,7 +94,7 @@ interface LedGoldRowProps {
   highLabel: string;
   lowLabel: string;
   name: string;
-  /** Locale unit word for the aria label (dollar/Rial), already translated. */
+  /** Locale unit word for the aria label (dollar/Toman), already translated. */
   unitLabel: string;
   /** 'USD' caption tag on the ounce row (null on domestic rows). */
   unitTag: string | null;
@@ -145,7 +145,7 @@ const LedGoldRow = memo(function LedGoldRow({
             {name}
           </p>
           {/* Change % — a dot-matrix LED label (tight pitch); on the ounce row
-              the USD unit rides along (its values are dollars, not Rial). */}
+              the USD unit rides along (its values are dollars, not Toman). */}
           <p className="flex items-center gap-1.5">
             <span
               className="led-label led-label-red-dim text-[0.55rem] font-bold uppercase tracking-[0.18em] text-[#ff1e1e]/60 sm:text-[0.58rem]"
@@ -158,7 +158,10 @@ const LedGoldRow = memo(function LedGoldRow({
       </div>
 
       {/* Current — the PRIMARY module (hot bulbs, full power); 2 decimals on
-          the USD ounce, integers on the Rial items. */}
+          the USD ounce, integers on the Toman items. Owner request
+          2026-09-19: phones show ONLY this column, so it is the board's
+          hero module there too (1.05rem — the 11-glyph Toman runs keep the
+          same physical module width the 13-glyph Rial values had). */}
       <LedValueCell
         keyId={item.id}
         stat="cur"
@@ -167,13 +170,13 @@ const LedGoldRow = memo(function LedGoldRow({
         staggerMs={stagger}
         label={currentLabel}
         unitLabel={unitLabel}
-        size="text-[0.9rem] sm:text-[1.1rem] lg:text-[1.3rem]"
+        size="text-[1.05rem] sm:text-[1.2rem] lg:text-[1.3rem]"
         emphasis="primary"
         decimals={decimals}
       />
 
       {/* Day high / day low — TGJU stats, secondary modules at 75% power;
-          hidden below md (the 13-glyph coin values leave no room for three
+          hidden below md (the 11-glyph coin values leave no room for three
           columns on phones — the divider/footnote keeps the unit honest). */}
       <LedValueCell
         keyId={item.id}
@@ -232,7 +235,7 @@ export function LedGoldBoard() {
   const highLabel = t('liveRates.boardHigh');
   const lowLabel = t('liveRates.boardLow');
   const usdUnit = t('liveRates.goldUnitUsd');
-  const rialUnit = t('liveRates.goldUnitRial');
+  const tomanUnit = t('liveRates.goldUnitToman');
 
   const renderItem = (item: GoldBoardItem, index: number): React.JSX.Element => (
     <LedGoldRow
@@ -243,7 +246,7 @@ export function LedGoldBoard() {
       highLabel={highLabel}
       lowLabel={lowLabel}
       name={t(`gold.${item.id}` as TranslationKey)}
-      unitLabel={item.quote?.unit === 'USD' ? usdUnit : rialUnit}
+      unitLabel={item.quote?.unit === 'USD' ? usdUnit : tomanUnit}
       unitTag={item.id === 'gold-ounce' ? t('liveRates.goldUnitUsd') : null}
     />
   );
@@ -312,7 +315,7 @@ export function LedGoldBoard() {
         {/* Global market — the ounce row (USD), alone in its list. */}
         <ul className="led-table-body">{ounceItem ? renderItem(ounceItem, 0) : null}</ul>
 
-        {/* Silkscreen section divider — the Tehran market + its Rial unit
+        {/* Silkscreen section divider — the Tehran market + its Toman unit
             (spans all tracks; intrinsic width stays far below the module
             columns, so it can never bloat the auto tracks). */}
         <div className="led-gold-divider ps-1 md:ps-2.5">
@@ -325,7 +328,7 @@ export function LedGoldBoard() {
           </span>
         </div>
 
-        {/* Tehran market — gold grams and coins, Rial quotes. */}
+        {/* Tehran market — gold grams and coins, Toman quotes. */}
         <ul className="led-table-body">{domesticItems.map((item, i) => renderItem(item, i + 1))}</ul>
       </div>
 
