@@ -510,18 +510,31 @@ body {
 }
 
 /* =====================================================================
- * LED signboard — physical panel system (dot-matrix rework, 2026-09-26).
+ * LED signboard — physical panel system (dot-matrix rework, 2026-09-26;
+ * bezel-frame rework 2026-09-27).
  *
  * Layers, outermost → innermost:
- *   1. Housing (.led-board): near-black body, raised bevel (light
- *      top/left lip, dark bottom/right bite) + faint perforated grid.
- *   2. Modules (.led-cell): recessed dark wells (inset shadow) holding
- *      one value each — a rate, a clock group, the date.
- *   3. Digits: real seven-segment glyphs (DSEG7) painted as THREE stacked
+ *   1. Bezel frame (.led-frame): the machined metal mount around each
+ *      board — visible thickness via padding, directional metal
+ *      gradient, concentric corner radii, catch-light lips and the
+ *      page-lifting outer drop shadow (neutral graphite for the
+ *      currency board, logo-yellow gold for the GOLD & COINS board).
+ *   2. Housing (.led-board): near-black body RECESSED behind the
+ *      frame's glass — inward-pointing shadows (tight top edge shadow,
+ *      bottom catch-light, glass hairline ring, deep interior) + faint
+ *      perforated grid.
+ *   3. Modules (.led-cell): recessed dark wells (inset shadow) holding
+ *      one value each — a rate.
+ *   4. Digits: real seven-segment glyphs (DSEG7) painted as THREE stacked
  *      layers — ghost "8888…" (all segments faintly visible, dim bulbs),
  *      glow (bloom halo only), lit (bright dot-matrix bulbs). Numbers
- *      share ONE bulb pattern (uniform board-wide pitch); labels reuse
- *      the same technique at a tighter pitch.
+ *      share ONE bulb pattern (uniform board-wide pitch); row captions
+ *      reuse the same technique at a tighter pitch.
+ *
+ * The two depth cues are deliberately split across two elements (owner
+ * spec 2026-09-27): the frame lifts OUTWARD off the page, the board
+ * recesses INWARD behind the glass — two separate boxes, two separate
+ * shadow stacks, never one combined effect.
  *
  * The bulb gradients are defined ONCE here and reused via classes —
  * never re-declared per element — so live updates repaint cheaply.
@@ -558,16 +571,57 @@ body {
     repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.024) 0 1px, transparent 1px 40px),
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.017) 0 1px, transparent 1px 26px);
   border-radius: 16px;
+  /* Recessed behind the bezel frame's glass (owner request 2026-09-27): ALL
+   * of the board's own shadows now point INWARD — a tight edge shadow at
+   * the top, a catch-light at the bottom, a glass hairline ring and a deep
+   * interior — while the outward LIFT moved to the .led-frame wrapper (the
+   * former raised-bevel lips and the outer drop shadow retired with it). */
   box-shadow:
-    /* raised bevel — lighter top/left lip, darker bottom/right */
-    inset 0 1px 0 rgba(255, 255, 255, 0.09),
-    inset 1px 0 0 rgba(255, 255, 255, 0.05),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.95),
-    inset -1px 0 0 rgba(0, 0, 0, 0.55),
-    /* bezel ring + interior depth */
-    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-    inset 0 2px 18px rgba(0, 0, 0, 0.85),
-    0 10px 34px rgba(0, 0, 0, 0.28);
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.04),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 3px 20px rgba(0, 0, 0, 0.75);
+}
+
+/* Bezel frame — the physical metal mount around each shopfront board
+ * (owner request 2026-09-27): visible thickness via padding, a machined
+ * 145° gradient, corner radii kept CONCENTRIC with the board inside
+ * (frame radius = board's 16px + the frame padding, so the gap stays
+ * uniform into the corners), a catch-light lip on the frame's own edges
+ * and the page-lifting outer drop shadow.
+ *
+ * Phones: the bezel thins to 6px AND leans 6px into the page's own
+ * side padding (margin-inline: -6px) — the board inside keeps EXACTLY
+ * its pre-frame width, so the audited mobile name budget (2x flag
+ * sharing the name line) is untouched and no new truncation appears;
+ * the page keeps a 10px visible gap each side. From sm up the full
+ * 12px-thick mount sits squarely inside the page padding. */
+.led-frame {
+  padding: 6px;
+  border-radius: 22px;
+  margin-inline: -6px;
+  /* Neutral graphite metal — the currency board's mount. */
+  background: linear-gradient(145deg, #4a4a4a 0%, #2b2b2b 50%, #1a1a1a 100%);
+  box-shadow:
+    /* machined edge — light top lip, dark bottom bite */
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    /* the whole assembly lifts off the page */
+    0 20px 40px rgba(0, 0, 0, 0.25),
+    0 4px 10px rgba(0, 0, 0, 0.15);
+}
+@media (min-width: 640px) {
+  .led-frame {
+    padding: 12px;
+    border-radius: 28px;
+    margin-inline: 0;
+  }
+}
+
+/* Gold metal variant — the logo's yellow, for the GOLD & COINS board
+ * (same thickness/radii/shadows; only the metal changes). */
+.led-frame-gold {
+  background: linear-gradient(145deg, #d4a017 0%, #8a6a10 50%, #5c4408 100%);
 }
 
 /* Column-gap tiers — the sm/lg digit bumps (+20-25%) come with +17-20%

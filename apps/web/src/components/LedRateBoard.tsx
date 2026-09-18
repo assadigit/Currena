@@ -6,8 +6,13 @@
  * Recreates the physical experience of walking past a currency-exchange
  * shopfront — built as real hardware layers, not a flat graphic:
  *
- *   Housing  — near-black body (#0d0d0d) with a raised outer bevel and a
- *              faint perforated-module grid (index.css .led-board).
+ *   Frame    — the bezel mount (.led-frame, applied by the LiveRates
+ *              route around this board): machined graphite metal,
+ *              visible thickness, concentric radii and the page-lifting
+ *              outer drop shadow (owner request 2026-09-27).
+ *   Housing  — near-black body (#0d0d0d) RECESSED behind the frame's
+ *              glass (inward inset shadows, index.css .led-board) with a
+ *              faint perforated-module grid.
  *   Modules  — every value sits in a recessed dark well (inset shadow,
  *              .led-cell) so the digits sit INTO the panel.
  *   Digits   — real seven-segment glyphs (DSEG7 Bold) painted as THREE

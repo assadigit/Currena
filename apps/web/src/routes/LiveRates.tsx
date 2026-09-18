@@ -346,19 +346,25 @@ export function LiveRates() {
           </p>
         </div>
 
-        {/* THE board — the shopfront LED panel: dark housing, red
-            seven-segment digits, live clock, one row per currency
-            (flag · name · current · day high · day low — TGJU's real
-            daily stats) with a glow-pulse on every update. */}
-        <div className="mb-6">
+        {/* THE board — the shopfront LED panel, now mounted in a bezel
+            frame (owner request 2026-09-27): machined graphite metal with
+            visible thickness, an outer drop shadow lifting the assembly
+            off the page, and the dark board recessed behind the glass
+            (inset shadows — see .led-frame/.led-board in index.css).
+            Inside: red seven-segment price digits, live clock, one row
+            per currency (flag · name · current · day high · day low —
+            TGJU's real daily stats) with a glow-pulse on every update. */}
+        <div className="led-frame mb-6">
           <LedRateBoard />
         </div>
 
         {/* The second LED box — GOLD & COINS: the global ounce (USD) plus
             the Tehran gold market (Toman, ÷10 from TGJU's printed Rial),
             TGJU's own published quotes (current / day high / day low /
-            change %). Same physical panel language as the currency board. */}
-        <div className="mb-8">
+            change %). Same physical panel language as the currency board,
+            mounted in the GOLD metal variant of the same bezel frame
+            (the logo's yellow — .led-frame-gold). */}
+        <div className="led-frame led-frame-gold mb-8">
           <LedGoldBoard />
         </div>
 

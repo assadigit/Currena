@@ -12,11 +12,12 @@
  *   2026-09-19: 1000 Rial = 100 Toman) — the app's canonical unit.
  *   Values stay VERBATIM otherwise (core GoldQuoteSchema).
  *
- * Same hardware language as LedRateBoard (shared LedParts: recessed
- * dot-matrix modules, ghost/glow/lit layers, hot CURRENT column, 260ms
- * flash-on-change, sans clock/date + status LED, readable sans-serif
- * headers — DSEG7 stays on the price digits) and the
- * same ONE-SHARED-COLUMN-GRID machinery (index.css .led-table subgrid).
+ * Same hardware language as LedRateBoard (bezel frame in the GOLD metal
+ * variant — .led-frame.led-frame-gold, applied by the LiveRates route;
+ * shared LedParts: recessed dot-matrix modules, ghost/glow/lit layers,
+ * hot CURRENT column, 260ms flash-on-change, sans clock/date + status
+ * LED, readable sans-serif headers — DSEG7 stays on the price digits) and
+ * the same ONE-SHARED-COLUMN-GRID machinery (index.css .led-table subgrid).
  *
  * Layout differences forced by the DATA (11-glyph coin values like
  * 231 985 000 Toman — the currency board's modules are 7-glyph):
