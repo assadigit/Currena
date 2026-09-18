@@ -3,10 +3,12 @@
  * TGJU directly).
  *
  * PRIMARY: one GET to `https://call1.tgju.org/ajax.json` (1 request instead of
- * 16 profile pages) → `current[<slug>].p` for the 16 legacy profile slugs.
+ * 16 profile pages) → `current[<slug>].p` for the 16 legacy profile slugs,
+ * plus the day stats `h` (high) / `l` (low) the LED board shows.
  * FALLBACK (only when ajax.json fails): the 16 `https://www.tgju.org/profile/<slug>`
- * pages, parsed via `<span data-col="info.last_trade.PDrCotVal">…</span>`
- * (~4 pages in flight at a time).
+ * pages — current price via `<span data-col="info.last_trade.PDrCotVal">…</span>`,
+ * day stats via the «بالاترین قیمت روز / پایین ترین قیمت روز» rows of the
+ * summary table (~4 pages in flight at a time).
  *
  * ⚠️ UNIT FACT (verified 2026-09-16): TGJU `p` values are RIAL-denominated
  * with thousands commas (price_dollar_rl p="2,305,000"). The legacy app served
@@ -80,16 +82,61 @@ export function rialToToman(rial: number): number {
   return rial / 10;
 }
 
-/** zod view of the ajax.json payload — only the fields we consume. */
+/** zod view of the ajax.json payload — only the fields we consume.
+ *  `h`/`l` are the day high/low («بالاترین/پایین ترین قیمت روز») — optional:
+ *  TGJU omits them on quiet symbols / before the first trade of the day. */
 const TgjuAjaxSchema = z.object({
-  current: z.record(z.string(), z.object({ p: z.string() })),
+  current: z.record(
+    z.string(),
+    z.object({ p: z.string(), h: z.string().optional(), l: z.string().optional() }),
+  ),
 });
+
+/** One TGJU symbol quote in RIAL: current price + optional day stats. */
+export interface TgjuRialQuote {
+  /** Current price (ajax.json `p` / profile PDrCotVal), Rial. */
+  p: number;
+  /** Day high (ajax.json `h` / profile «بالاترین قیمت روز»), Rial. */
+  dayHigh?: number;
+  /** Day low (ajax.json `l` / profile «پایین ترین قیمت روز»), Rial. */
+  dayLow?: number;
+}
+
+/** Parse an optional day-stat: absent/blank/'-' → undefined (not published);
+ *  anything else must parse as a positive number or we fail LOUDLY
+ *  (upstream format change — never render garbage). */
+function parseOptionalStat(raw: string | undefined): number | undefined {
+  if (raw === undefined) return undefined;
+  const trimmed = raw.trim();
+  if (trimmed === '' || trimmed === '-') return undefined;
+  return normalizeTgjuNumber(trimmed);
+}
+
+/** Normalize a Rial quote pair into Toman day stats, dropping the pair when
+ *  TGJU publishes an inverted day (low > high — a glitch): the CURRENT price
+ *  must never be held hostage by decorative stats. */
+function tomanDayStats(
+  quote: TgjuRialQuote,
+  code: string,
+): { dayHigh?: number; dayLow?: number } {
+  const dayHigh = quote.dayHigh === undefined ? undefined : rialToToman(quote.dayHigh);
+  const dayLow = quote.dayLow === undefined ? undefined : rialToToman(quote.dayLow);
+  if (dayHigh !== undefined && dayLow !== undefined && dayLow > dayHigh) {
+    console.warn(`[tgju] dropping inverted day stats for ${code} (low ${dayLow} > high ${dayHigh})`);
+    return {};
+  }
+  return dayHigh === undefined && dayLow === undefined ? {} : { dayHigh, dayLow };
+}
 
 /**
  * Build the IRR-base Snapshot from Rial quotes keyed by TGJU slug.
+ * Day stats ride along on each rate entry, quote-side (Toman per unit).
  * zod-validates the result — a malformed build throws a typed error.
  */
-export function buildTgjuSnapshot(rialBySlug: ReadonlyMap<string, number>, now: Date = new Date()): Snapshot {
+export function buildTgjuSnapshot(
+  quotesBySlug: ReadonlyMap<string, TgjuRialQuote>,
+  now: Date = new Date(),
+): Snapshot {
   const irr = getCurrency('IRR');
   if (!irr) throw new ScraperError('tgju_internal', "Core currency table has no 'IRR' entry");
 
@@ -104,19 +151,20 @@ export function buildTgjuSnapshot(rialBySlug: ReadonlyMap<string, number>, now: 
   ];
 
   for (const { code, slug } of TGJU_PROFILES) {
-    const rial = rialBySlug.get(slug);
-    if (rial === undefined) {
+    const quote = quotesBySlug.get(slug);
+    if (quote === undefined) {
       throw new ScraperError('tgju_missing_slug', `No TGJU quote collected for slug '${slug}'`);
     }
     const meta = getCurrency(code);
     if (!meta) throw new ScraperError('tgju_internal', `Core currency table has no '${code}' entry`);
-    const tomanPerUnit = rialToToman(rial);
+    const tomanPerUnit = rialToToman(quote.p);
     rates.push({
       code,
       name: meta.name,
       symbol: meta.symbol,
       // Convention: rate = units of `code` per 1 unit of base (IRR) → invert.
       rate: 1 / tomanPerUnit,
+      ...tomanDayStats(quote, code),
     });
   }
 
@@ -133,19 +181,30 @@ export function parseTgjuAjax(json: unknown, now: Date = new Date()): Snapshot {
     );
   }
 
-  const rialBySlug = new Map<string, number>();
+  const quotesBySlug = new Map<string, TgjuRialQuote>();
   for (const { code, slug } of TGJU_PROFILES) {
     const entry = parsed.data.current[slug];
     if (!entry) {
       throw new ScraperError('tgju_missing_slug', `TGJU ajax.json has no '${slug}' entry (upstream layout change?)`);
     }
-    rialBySlug.set(slug, normalizeTgjuNumber(entry.p));
+    quotesBySlug.set(slug, {
+      p: normalizeTgjuNumber(entry.p),
+      dayHigh: parseOptionalStat(entry.h),
+      dayLow: parseOptionalStat(entry.l),
+    });
   }
-  return buildTgjuSnapshot(rialBySlug, now);
+  return buildTgjuSnapshot(quotesBySlug, now);
 }
 
 /** Value span on profile pages: `<span data-col="info.last_trade.PDrCotVal">2,305,000</span>` (Rial). */
 const PDR_COT_VAL_RE = /data-col="info\.last_trade\.PDrCotVal">\s*([0-9۰-۹٠-٩][0-9۰-۹٠-٩,،٬]*)\s*</;
+
+/** Day-stats rows in the profile summary table (the «مقادیر» table):
+ *  `  <td class="text-right">بالاترین قیمت روز</td>
+ *   <td class="text-left"><span>2,305,200</span></td>` —
+ *  value may be wrapped in a span or bare, and '-' when unpublished. */
+const PROFILE_DAY_STAT_RE =
+  /<td[^>]*>\s*(بالاترین قیمت روز|پایین ترین قیمت روز)\s*<\/td>\s*<td[^>]*>\s*(?:<span[^>]*>)?\s*([^<]*?)\s*(?:<\/span>)?\s*<\/td>/g;
 
 /** Extract the Rial price from a profile page's HTML (pure — fixture-testable). */
 export function parseTgjuProfilePrice(html: string): number {
@@ -157,6 +216,24 @@ export function parseTgjuProfilePrice(html: string): number {
     );
   }
   return normalizeTgjuNumber(match[1]);
+}
+
+/**
+ * Day high/low from the profile summary table (pure — fixture-testable).
+ * Rows absent (layout change / trimmed page) → {} — the ajax.json primary
+ * path carries the stats; a '-' value → not published today → undefined.
+ * A PRESENT-but-unparseable value throws loudly (upstream format change).
+ */
+export function parseTgjuProfileStats(html: string): { dayHigh?: number; dayLow?: number } {
+  const stats: { dayHigh?: number; dayLow?: number } = {};
+  for (const match of html.matchAll(PROFILE_DAY_STAT_RE)) {
+    const label = match[1];
+    const value = parseOptionalStat(match[2]);
+    if (value === undefined) continue;
+    if (label === 'بالاترین قیمت روز') stats.dayHigh = value;
+    else stats.dayLow = value;
+  }
+  return stats;
 }
 
 /* ------------------------------------------------------------------ *
@@ -175,13 +252,13 @@ function httpOpts(opts: TgjuScrapeOptions): FetchRetryOptions {
 
 /** Fetch all 16 profile pages (fallback path) and build the Snapshot. */
 export async function scrapeTgjuProfiles(opts: TgjuScrapeOptions = {}): Promise<Snapshot> {
-  const rialBySlug = new Map<string, number>();
+  const quotesBySlug = new Map<string, TgjuRialQuote>();
   await mapWithConcurrency(TGJU_PROFILES, TGJU_PROFILE_CONCURRENCY, async ({ slug }) => {
     const res = await fetchWithRetry(tgjuProfilePageUrl(slug), {}, httpOpts(opts));
     const html = await res.text();
-    rialBySlug.set(slug, parseTgjuProfilePrice(html));
+    quotesBySlug.set(slug, { p: parseTgjuProfilePrice(html), ...parseTgjuProfileStats(html) });
   });
-  return buildTgjuSnapshot(rialBySlug, (opts.now ?? (() => new Date()))());
+  return buildTgjuSnapshot(quotesBySlug, (opts.now ?? (() => new Date()))());
 }
 
 /**

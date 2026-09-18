@@ -347,7 +347,8 @@ export function LiveRates() {
 
         {/* THE board — the shopfront LED panel: dark housing, red
             seven-segment digits, live clock, one row per currency
-            (flag · name · sell · buy) with a glow-pulse on every update. */}
+            (flag · name · current · day high · day low — TGJU's real
+            daily stats) with a glow-pulse on every update. */}
         <div className="mb-8">
           <LedRateBoard />
         </div>

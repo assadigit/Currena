@@ -9,16 +9,20 @@ import {
   normalizeTgjuNumber,
   parseTgjuAjax,
   parseTgjuProfilePrice,
+  parseTgjuProfileStats,
   rialToToman,
   scrapeTgju,
   TGJU_AJAX_URL,
   TGJU_PROFILES,
   tgjuProfilePageUrl,
 } from './tgju';
+import type { TgjuRialQuote } from './tgju';
 
 /** Deep, mutable copy of the fixture payload for per-test mutation. */
-function fixtureCopy(): { current: Record<string, { p: string }> } {
-  return JSON.parse(JSON.stringify(ajaxFixture)) as { current: Record<string, { p: string }> };
+function fixtureCopy(): { current: Record<string, { p: string; h?: string; l?: string }> } {
+  return JSON.parse(JSON.stringify(ajaxFixture)) as {
+    current: Record<string, { p: string; h?: string; l?: string }>;
+  };
 }
 
 describe('normalizeTgjuNumber', () => {
@@ -107,6 +111,61 @@ describe('parseTgjuAjax (fixture: real 2026-09-16 capture)', () => {
     expect(snapshot.rates.some((r) => !['IRR', ...TGJU_PROFILES.map((p) => p.code)].includes(r.code))).toBe(false);
   });
 
+  it('carries the TGJU day stats, quote-side in Toman (h/l → dayHigh/dayLow)', () => {
+    const snapshot = parseTgjuAjax(ajaxFixture);
+
+    // price_dollar_rl h="2,311,200" l="2,293,600" (Rial) → 231,120 / 229,360 Toman.
+    const usd = getRate(snapshot, 'USD');
+    expect(usd.dayHigh).toBe(231_120);
+    expect(usd.dayLow).toBe(229_360);
+
+    // price_eur h="2,672,900" l="2,649,800" → 267,290 / 264,980 Toman.
+    const eur = getRate(snapshot, 'EUR');
+    expect(eur.dayHigh).toBe(267_290);
+    expect(eur.dayLow).toBe(264_980);
+
+    // Small quotes ride along unchanged: price_krw h=1,691 → 169.1 Toman.
+    expect(getRate(snapshot, 'KRW').dayHigh).toBe(169.1);
+  });
+
+  it('leaves day stats ABSENT when TGJU does not publish them (blank or missing h/l)', () => {
+    const payload = fixtureCopy();
+    delete payload.current['price_dollar_rl']!.h;
+    payload.current['price_dollar_rl']!.l = '';
+
+    const usd = getRate(parseTgjuAjax(payload), 'USD');
+    expect(usd.dayHigh).toBeUndefined();
+    expect(usd.dayLow).toBeUndefined();
+    expect(usd.rate).toBe(1 / 230_500); // current price unaffected
+  });
+
+  it('throws a typed error for a malformed day stat (upstream format change)', () => {
+    const payload = fixtureCopy();
+    payload.current['price_gbp']!.h = 'n/a';
+
+    expect(() => parseTgjuAjax(payload)).toThrowError(ScraperError);
+  });
+
+  it('DROPS an inverted day (low > high — glitch) instead of failing the price', () => {
+    const payload = fixtureCopy();
+    const g = payload.current['price_gbp']!;
+    const high = g.l; // swap: now low > high
+    g.l = g.h;
+    g.h = high;
+
+    const usd = getRate(parseTgjuAjax(payload), 'GBP');
+    expect(usd.dayHigh).toBeUndefined();
+    expect(usd.dayLow).toBeUndefined();
+    expect(usd.rate).toBe(1 / 310_070); // current price still served
+  });
+
+  it('keeps the IRR self-rate free of day stats', () => {
+    const snapshot = parseTgjuAjax(ajaxFixture);
+    const irr = snapshot.rates.find((r) => r.code === 'IRR');
+    expect(irr?.dayHigh).toBeUndefined();
+    expect(irr?.dayLow).toBeUndefined();
+  });
+
   it('tolerates Persian-digit prices from the payload', () => {
     const payload = fixtureCopy();
     payload.current['price_eur']!.p = '۲,۶۶۳,۰۰۰'; // 2,663,000 in Persian digits
@@ -132,6 +191,39 @@ describe('parseTgjuAjax (fixture: real 2026-09-16 capture)', () => {
   it('throws a typed error when the payload shape changes', () => {
     expect(() => parseTgjuAjax({ current: 'nope' })).toThrowError(ScraperError);
     expect(() => parseTgjuAjax({})).toThrowError(ScraperError);
+  });
+});
+
+describe('parseTgjuProfileStats (fixture: real summary-table capture)', () => {
+  it('extracts day high/low Rial values from the «مقادیر» table', () => {
+    expect(parseTgjuProfileStats(profileHtml)).toEqual({ dayHigh: 2_311_200, dayLow: 2_293_600 });
+  });
+
+  it('skips unpublished stats (dash values) and ignores the current-price row', () => {
+    // Only the نرخ فعلی row present (bare td, no span) → no stats consumed.
+    const html = '<table><tbody><tr><td class="text-right">نرخ فعلی</td><td class="text-left">2,279,000</td></tr></tbody></table>';
+    expect(parseTgjuProfileStats(html)).toEqual({});
+  });
+
+  it('returns {} when the summary rows are absent entirely', () => {
+    expect(parseTgjuProfileStats('<html><body>no summary table</body></html>')).toEqual({});
+  });
+
+  it('treats dash values as not published', () => {
+    const html = profileHtml
+      .replaceAll('2,311,200', '-')
+      .replaceAll('2,293,600', '-');
+    expect(parseTgjuProfileStats(html)).toEqual({});
+  });
+
+  it('throws a typed error for a present-but-garbage value', () => {
+    const html = profileHtml.replaceAll('2,311,200', '??');
+    expect(() => parseTgjuProfileStats(html)).toThrowError(ScraperError);
+  });
+
+  it('parses Persian-digit stats', () => {
+    const html = profileHtml.replaceAll('2,311,200', '۲,۳۱۱,۲۰۰');
+    expect(parseTgjuProfileStats(html).dayHigh).toBe(2_311_200);
   });
 });
 
@@ -237,6 +329,10 @@ describe('scrapeTgju (fake fetch — never hits live sites)', () => {
     expect(getRate(snapshot, 'USD').rate).toBe(1 / 230_500);
     expect(getRate(snapshot, 'EUR').rate).toBe(1 / 266_300);
     expect(getRate(snapshot, 'VND').rate).toBe(1 / 7.5);
+
+    // Day stats survive the fallback path too (summary table of every page).
+    expect(getRate(snapshot, 'USD').dayHigh).toBe(231_120);
+    expect(getRate(snapshot, 'USD').dayLow).toBe(229_360);
   });
 
   it('throws a typed combined error when BOTH paths fail', async () => {
@@ -271,19 +367,33 @@ describe('scrapeTgju (fake fetch — never hits live sites)', () => {
 });
 
 describe('buildTgjuSnapshot validation', () => {
-  it('zod-validates the built snapshot (rate must be positive finite)', () => {
-    const rialBySlug = new Map(TGJU_PROFILES.map(({ slug }) => [slug, 2_305_000]));
-    expect(() => buildTgjuSnapshot(rialBySlug)).not.toThrow();
+  /** Fully-populated quotes for every slug (stats included). */
+  function fullQuotes(): Map<string, TgjuRialQuote> {
+    return new Map(
+      TGJU_PROFILES.map(({ slug }) => [slug, { p: 2_305_000, dayHigh: 2_311_200, dayLow: 2_293_600 }]),
+    );
+  }
 
-    const broken = new Map(rialBySlug);
-    broken.set('price_krw', 0); // zero Rial → zero rate → invalid
+  it('zod-validates the built snapshot (rate must be positive finite)', () => {
+    const quotesBySlug = fullQuotes();
+    expect(() => buildTgjuSnapshot(quotesBySlug)).not.toThrow();
+
+    const broken = new Map(quotesBySlug);
+    broken.set('price_krw', { p: 0 }); // zero Rial → zero rate → invalid
     expect(() => buildTgjuSnapshot(broken)).toThrowError(ScraperError);
   });
 
+  it('rejects an invalid day stat at the schema boundary (belt-and-braces)', () => {
+    const glitched = fullQuotes();
+    glitched.set('price_dollar_rl', { p: 2_305_000, dayHigh: Number.NaN });
+    expect(() => buildTgjuSnapshot(glitched)).toThrowError(ScraperError);
+  });
+
   it('produces a snapshot that satisfies the core schema', () => {
-    const rialBySlug = new Map(TGJU_PROFILES.map(({ slug }) => [slug, 2_305_000]));
-    const snapshot: Snapshot = buildTgjuSnapshot(rialBySlug);
+    const snapshot: Snapshot = buildTgjuSnapshot(fullQuotes());
     expect(snapshot.source).toBe('tgju');
     expect(snapshot.rates.every((r) => r.rate > 0 && Number.isFinite(r.rate))).toBe(true);
+    expect(getRate(snapshot, 'USD').dayHigh).toBe(231_120);
+    expect(getRate(snapshot, 'USD').dayLow).toBe(229_360);
   });
 });

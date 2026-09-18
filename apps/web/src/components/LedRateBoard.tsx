@@ -1,34 +1,42 @@
 /**
- * LedRateBoard — the shopfront LED rate board (2026-09-18).
+ * LedRateBoard — the shopfront LED rate board (2026-09-18; columns reworked
+ * 2026-09-26 to TGJU's real daily stats).
  *
  * Recreates the physical experience of walking past a currency-exchange
  * shopfront: a near-black housing (#0d0d0d) with a live time/date header
- * and one row per currency — flag, name, sell rate, buy rate — rendered as
- * red seven-segment digits (DSEG7 Classic, OFL-1.1) with a soft glow bloom.
- * When a rate updates, that digit briefly intensifies its glow (~260ms,
- * staggered per row) so the change reads as an electronic refresh, the way
- * real tickers signal "this value just changed" — NOT an instant swap.
+ * and one row per currency — flag, name, and THREE quote-side values in
+ * Toman — rendered as red seven-segment digits (DSEG7 Classic, OFL-1.1)
+ * with a soft glow bloom. When a value updates, that digit briefly
+ * intensifies its glow (~260ms, staggered per row) so the change reads as
+ * an electronic refresh, the way real tickers signal "this value just
+ * changed" — NOT an instant swap.
+ *
+ * The three columns are TGJU's OWN published daily statistics — the same
+ * «مقادیر» table the profile pages show:
+ *   1. نرخ فعلی — current open-market price (ajax.json `p`)
+ *   2. بالاترین قیمت روز — day high (ajax.json `h`)
+ *   3. پایین ترین قیمت روز — day low (ajax.json `l`)
+ * Real data, not a derived dealer spread (the earlier ±0.25% sell/buy
+ * estimate was retired: it was decorative, not information). Values ride
+ * on each snapshot rate entry as `dayHigh`/`dayLow` (quote-side Toman,
+ * see packages/core schemas.ts); unavailable stats render as dashes.
  *
  * Layout rules (owner spec):
- *   - Row cells in fixed order: flag · currency name · sell · buy.
+ *   - Row cells in fixed order: flag · currency name · current · high · low.
  *   - The flag+name cell aligns to the row's leading edge via
  *     padding-inline-start (names are Persian; the row must stay RTL-safe).
- *   - The two rate cells keep PHYSICAL right alignment (digits are LTR runs —
- *     a stable numeric column edge in both directions).
- *   - Every number — rates, clock, date — is DSEG7; all other text stays in
- *     the site font (Vazirmatn renders the Persian names).
+ *   - The three value cells keep PHYSICAL right alignment (digits are LTR
+ *     runs — a stable numeric column edge in both directions).
+ *   - Every number — values, clock, date — is DSEG7; all other text stays
+ *     in the site font (Vazirmatn renders the Persian names).
  *
- * A11y (WCAG 2.3.1 photosensitivity): the update-flash fires ONCE per rate
- * change (changes arrive at most once per refresh window), lasts 260ms and
- * carries a 0–210ms per-row stagger, so the board never flashes in sync and
- * stays far below the 3-flashes/second threshold. The clock colon dims at
- * 0.5Hz with 0.45–1.0 amplitude (soft dim, never a hard blink). Everything
- * motion-based is disabled under prefers-reduced-motion (see index.css).
- *
- * Honesty: TGJU serves ONE open-market price per currency (a mid/last
- * trade), not a dealer two-way quote. Sell/buy are derived from that mid
- * with a documented ±0.25% dealer margin and stated in the footnote — the
- * board mimics the shopfront FORM without inventing an undisclosed spread.
+ * A11y (WCAG 2.3.1 photosensitivity): the update-flash fires ONCE per
+ * value change (changes arrive at most once per refresh window), lasts
+ * 260ms and carries a 0–210ms per-row stagger, so the board never flashes
+ * in sync and stays far below the 3-flashes/second threshold. The clock
+ * colon dims at 0.5Hz with 0.45–1.0 amplitude (soft dim, never a hard
+ * blink). Everything motion-based is disabled under prefers-reduced-motion
+ * (see index.css).
  */
 
 import { memo, useEffect, useMemo, useState } from 'react';
@@ -42,43 +50,38 @@ import type { TranslationKey } from '../lib/locale';
  *  (order shared with the LiveRates detail cards below the board). */
 export const BOARD: readonly CurrencyCode[] = ['USD', 'AUD', 'EUR', 'TRY', 'AED', 'GBP', 'CAD', 'CNY'];
 
-/** Total two-way dealer spread, ± per side (footnoted on the board). */
-const DEALER_SPREAD_PCT = 0.5;
-
 /** Per-row flash stagger step — 8 rows × 30ms = 0–210ms (WCAG 2.3.1). */
 const FLASH_STAGGER_MS = 30;
 
-/** One LED rate cell: sell (higher) / buy (lower) around the market mid. */
+/** One LED row: TGJU's three daily stats for a currency, Toman per unit. */
 export interface BoardQuote {
   code: CurrencyCode;
-  /** Market mid-rate, Toman per 1 unit (from the TGJU snapshot). */
-  mid: number;
-  sell: number;
-  buy: number;
+  /** Current open-market price, Toman per 1 unit (TGJU `p`). */
+  current: number;
+  /** Day high, Toman per 1 unit (TGJU `h`); NaN when not published. */
+  high: number;
+  /** Day low, Toman per 1 unit (TGJU `l`); NaN when not published. */
+  low: number;
   ok: boolean;
 }
 
-/** Dealer two-way quote around the mid, rounded like a real board
- *  (majors to the nearest 100 Toman, small values to 10/1). */
-function quoteFromMid(mid: number): { sell: number; buy: number } {
-  const half = DEALER_SPREAD_PCT / 200; // 0.25% per side
-  const roundStep = (v: number): number => {
-    const step = v >= 10_000 ? 100 : v >= 1_000 ? 10 : 1;
-    return Math.round(v / step) * step;
-  };
-  return { sell: roundStep(mid * (1 + half)), buy: roundStep(mid * (1 - half)) };
-}
-
-/** Quotes for every board currency off one snapshot (local math only). */
+/** Quotes for every board currency off one snapshot (local math only —
+ *  current via convert(), day stats read straight off the rate entry). */
 export function boardQuotes(snapshot: Snapshot | null): BoardQuote[] | null {
   if (!snapshot) return null;
   return BOARD.map((code) => {
     try {
       const { rate: tomanPerUnit } = convert(snapshot, code, 'IRR', 1);
-      const { sell, buy } = quoteFromMid(tomanPerUnit);
-      return { code, mid: tomanPerUnit, sell, buy, ok: true as const };
+      const entry = snapshot.rates.find((r) => r.code === code);
+      return {
+        code,
+        current: tomanPerUnit,
+        high: entry?.dayHigh ?? Number.NaN,
+        low: entry?.dayLow ?? Number.NaN,
+        ok: true as const,
+      };
     } catch {
-      return { code, mid: Number.NaN, sell: Number.NaN, buy: Number.NaN, ok: false as const };
+      return { code, current: Number.NaN, high: Number.NaN, low: Number.NaN, ok: false as const };
     }
   });
 }
@@ -162,73 +165,130 @@ function LedStatus({ state, label }: { state: 'live' | 'cached' | 'offline'; lab
 interface LedRowProps {
   quote: BoardQuote;
   index: number;
-  sellLabel: string;
-  buyLabel: string;
+  currentLabel: string;
+  highLabel: string;
+  lowLabel: string;
   unitLabel: string;
   name: string;
 }
 
-/** One board row — flag · name · sell · buy (fixed order, logical flow so
- *  RTL mirrors the reading order naturally). Memoized: the clock ticks every
- *  second and must not re-render (nor re-flash) the value spans. */
-const LedRow = memo(function LedRow({ quote, index, sellLabel, buyLabel, unitLabel, name }: LedRowProps) {
-  const dashes = '-------';
-  const stagger = `${index * FLASH_STAGGER_MS}ms`;
-
-  const sellText = quote.ok ? formatLedNumber(quote.sell) : dashes;
-  const buyText = quote.ok ? formatLedNumber(quote.buy) : dashes;
-
+/** One LED value cell — physically right-aligned seven-segment run.
+ *  `key` carries the formatted value: a change remounts the span, which
+ *  replays the 260ms glow pulse (staggered by row) — the electronic-
+ *  refresh flash. The LED glyph span is hidden from AT and replaced by a
+ *  comma-grouped aria-label so screen readers hear "2,279,000 Toman",
+ *  not space-split digit runs. */
+function LedValueCell({
+  code,
+  stat,
+  value,
+  ok,
+  stagger,
+  label,
+  unitLabel,
+  size,
+  dim,
+}: {
+  code: string;
+  stat: 'cur' | 'high' | 'low';
+  value: number;
+  ok: boolean;
+  stagger: string;
+  label: string;
+  unitLabel: string;
+  size: string;
+  dim: boolean;
+}) {
+  const text = ok && Number.isFinite(value) ? formatLedNumber(value) : '-------';
   return (
-    <li className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-2 border-b border-white/[0.04] py-2.5 last:border-b-0 sm:gap-x-5 sm:py-3">
+    <div className="text-right">
+      <span
+        role="img"
+        aria-label={`${label} ${ok && Number.isFinite(value) ? `${text.replace(/ /g, ',')} ${unitLabel}` : '—'}`}
+      >
+        <span
+          key={`${code}-${stat}-${text}`}
+          className={`led-digits led-flash whitespace-nowrap ${size} ${ok && Number.isFinite(value) ? '' : 'led-idle'} ${dim ? 'opacity-75' : ''}`}
+          style={{ animationDelay: stagger }}
+          dir="ltr"
+          aria-hidden="true"
+        >
+          {text}
+        </span>
+      </span>
+    </div>
+  );
+}
+
+/** One board row — flag · name · current · high · low (fixed order, logical
+ *  flow so RTL mirrors the reading order naturally). Memoized: the clock
+ *  ticks every second and must not re-render (nor re-flash) the value spans. */
+const LedRow = memo(function LedRow({
+  quote,
+  index,
+  currentLabel,
+  highLabel,
+  lowLabel,
+  unitLabel,
+  name,
+}: LedRowProps) {
+  const stagger = `${index * FLASH_STAGGER_MS}ms`;
+  return (
+    <li className="grid grid-cols-[minmax(0,1fr)_auto_auto_auto] items-center gap-x-1 border-b border-white/[0.04] py-2.5 last:border-b-0 sm:gap-x-5 sm:py-3 lg:gap-x-6">
       {/* Leading cell: flag + name, aligned via padding-inline-start so the
-          Persian names (RTL) keep the row's leading edge in both directions. */}
-      <div className="flex min-w-0 items-center gap-2.5 ps-1 sm:ps-2.5">
+          Persian names (RTL) keep the row's leading edge in both directions.
+          Mobile: compact flag + tighter gaps so DSEG7's ~0.75em glyphs leave
+          the name real room (DSEG7 has no narrow glyphs — see DSEG metrics). */}
+      <div className="flex min-w-0 items-center gap-2 ps-1 sm:gap-2.5 sm:ps-2.5">
         <img
           src={`/images/flags/${quote.code.toLowerCase()}.png`}
           alt=""
-          className="h-[18px] w-[27px] shrink-0 rounded-[3px] object-cover ring-1 ring-white/15 sm:h-[21px] sm:w-[32px]"
+          className="h-4 w-6 shrink-0 rounded-[3px] object-cover ring-1 ring-white/15 sm:h-[21px] sm:w-[32px]"
         />
         <div className="min-w-0 leading-tight">
-          <p className="truncate text-[0.82rem] font-semibold text-white/90 sm:text-[0.92rem]">{name}</p>
-          <p className="text-[0.58rem] font-bold uppercase tracking-[0.18em] text-[#ff1e1e]/60" dir="ltr">
+          <p className="truncate text-[0.75rem] font-semibold text-white/90 sm:text-[0.92rem]">{name}</p>
+          <p className="text-[0.55rem] font-bold uppercase tracking-[0.18em] text-[#ff1e1e]/60 sm:text-[0.58rem]" dir="ltr">
             {quote.code}
           </p>
         </div>
       </div>
 
-      {/* Sell — physically right-aligned seven-segment cell. `key` carries the
-          value: a change remounts the span, which replays the 260ms glow pulse
-          (staggered by row) — the electronic-refresh flash. The LED glyph span
-          is hidden from AT and replaced by a comma-grouped aria-label so screen
-          readers hear "2,279,000 Toman", not space-split digit runs. */}
-      <div className="text-right">
-        <span role="img" aria-label={`${sellLabel} ${quote.ok ? `${sellText.replace(/ /g, ',')} ${unitLabel}` : '—'}`}>
-          <span
-            key={`${quote.code}-sell-${sellText}`}
-            className={`led-digits led-flash whitespace-nowrap text-[0.95rem] sm:text-[1.12rem] lg:text-[1.25rem] ${quote.ok ? '' : 'led-idle'}`}
-            style={{ animationDelay: stagger }}
-            dir="ltr"
-            aria-hidden="true"
-          >
-            {sellText}
-          </span>
-        </span>
-      </div>
+      {/* Current — the primary module: full glow, slightly larger. */}
+      <LedValueCell
+        code={quote.code}
+        stat="cur"
+        value={quote.current}
+        ok={quote.ok}
+        stagger={stagger}
+        label={currentLabel}
+        unitLabel={unitLabel}
+        size="text-[0.8rem] sm:text-[1.12rem] lg:text-[1.28rem]"
+        dim={false}
+      />
 
-      {/* Buy — same treatment. */}
-      <div className="text-right">
-        <span role="img" aria-label={`${buyLabel} ${quote.ok ? `${buyText.replace(/ /g, ',')} ${unitLabel}` : '—'}`}>
-          <span
-            key={`${quote.code}-buy-${buyText}`}
-            className={`led-digits led-flash whitespace-nowrap text-[0.95rem] sm:text-[1.12rem] lg:text-[1.25rem] ${quote.ok ? '' : 'led-idle'}`}
-            style={{ animationDelay: stagger }}
-            dir="ltr"
-            aria-hidden="true"
-          >
-            {buyText}
-          </span>
-        </span>
-      </div>
+      {/* Day high / day low — TGJU stats, secondary modules at ~75% glow. */}
+      <LedValueCell
+        code={quote.code}
+        stat="high"
+        value={quote.high}
+        ok={quote.ok}
+        stagger={stagger}
+        label={highLabel}
+        unitLabel={unitLabel}
+        size="text-[0.72rem] sm:text-[1rem] lg:text-[1.14rem]"
+        dim
+      />
+      <LedValueCell
+        code={quote.code}
+        stat="low"
+        value={quote.low}
+        ok={quote.ok}
+        stagger={stagger}
+        label={lowLabel}
+        unitLabel={unitLabel}
+        size="text-[0.72rem] sm:text-[1rem] lg:text-[1.14rem]"
+        dim
+      />
     </li>
   );
 });
@@ -256,8 +316,9 @@ export function LedRateBoard() {
       ? 'cached'
       : 'live';
 
-  const sellLabel = t('liveRates.boardSell');
-  const buyLabel = t('liveRates.boardBuy');
+  const currentLabel = t('liveRates.boardCurrent');
+  const highLabel = t('liveRates.boardHigh');
+  const lowLabel = t('liveRates.boardLow');
   const unitLabel = t('liveRates.boardUnitToman');
 
   return (
@@ -291,17 +352,24 @@ export function LedRateBoard() {
       </header>
 
       {/* Column headers — silkscreen labels on the housing (site font, not
-          LED): currency / sell / buy. PHYSICAL right alignment so the labels
-          sit exactly over the digit columns in both LTR and RTL. */}
-      <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] gap-x-2 px-1 pb-2 sm:gap-x-5 sm:ps-2.5">
+          LED): currency · current · day high · day low. PHYSICAL right
+          alignment so the labels sit exactly over the digit columns in both
+          LTR and RTL. Long Persian high/low labels collapse to the short
+          form below sm so the header never dictates column width on phones. */}
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_auto_auto] gap-x-1 px-1 pb-2 sm:gap-x-5 sm:ps-2.5 lg:gap-x-6">
         <p className="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-white/35">
           {t('liveRates.boardCurrency')}
         </p>
-        <p className="whitespace-nowrap text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/70">
-          {sellLabel}
+        <p className="whitespace-nowrap text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/80">
+          {currentLabel}
         </p>
-        <p className="whitespace-nowrap text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/70">
-          {buyLabel}
+        <p className="whitespace-nowrap text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55">
+          <span className="sm:hidden">{t('liveRates.boardHighShort')}</span>
+          <span className="hidden sm:inline">{highLabel}</span>
+        </p>
+        <p className="whitespace-nowrap text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55">
+          <span className="sm:hidden">{t('liveRates.boardLowShort')}</span>
+          <span className="hidden sm:inline">{lowLabel}</span>
         </p>
       </div>
 
@@ -313,8 +381,9 @@ export function LedRateBoard() {
                 key={quote.code}
                 quote={quote}
                 index={index}
-                sellLabel={sellLabel}
-                buyLabel={buyLabel}
+                currentLabel={currentLabel}
+                highLabel={highLabel}
+                lowLabel={lowLabel}
                 unitLabel={unitLabel}
                 name={t(`currencies.${quote.code}` as TranslationKey)}
               />
@@ -323,17 +392,18 @@ export function LedRateBoard() {
             BOARD.map((code, index) => (
               <LedRow
                 key={code}
-                quote={{ code, mid: Number.NaN, sell: Number.NaN, buy: Number.NaN, ok: false }}
+                quote={{ code, current: Number.NaN, high: Number.NaN, low: Number.NaN, ok: false }}
                 index={index}
-                sellLabel={sellLabel}
-                buyLabel={buyLabel}
+                currentLabel={currentLabel}
+                highLabel={highLabel}
+                lowLabel={lowLabel}
                 unitLabel={unitLabel}
                 name={t(`currencies.${code}` as TranslationKey)}
               />
             ))}
       </ul>
 
-      {/* Footnote — the honesty line: derived two-way quote, source. */}
+      {/* Footnote — the honesty line: three REAL TGJU daily stats. */}
       <footer className="mt-3 border-t border-white/[0.06] pt-2.5">
         <p className="text-[0.62rem] font-medium text-white/35">{t('liveRates.boardFootnote')}</p>
       </footer>

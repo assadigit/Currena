@@ -58,6 +58,30 @@ describe('RateSchema', () => {
     expect(RateSchema.safeParse({ code: 'USDD', name: 'US Dollar', rate: 1 }).success).toBe(false);
     expect(RateSchema.safeParse({ code: 'USD', name: '', rate: 1 }).success).toBe(false);
   });
+
+  it('accepts TGJU day stats and strips nothing (quote-side, optional)', () => {
+    const parsed = RateSchema.safeParse({
+      code: 'USD',
+      name: 'US Dollar',
+      rate: 1 / 230_500,
+      dayHigh: 230_520,
+      dayLow: 227_860,
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.dayHigh).toBe(230_520);
+      expect(parsed.data.dayLow).toBe(227_860);
+    }
+  });
+
+  it('rejects negative, zero and non-finite day stats', () => {
+    for (const dayHigh of [-1, 0, Number.POSITIVE_INFINITY, Number.NaN]) {
+      expect(RateSchema.safeParse({ code: 'USD', name: 'US Dollar', rate: 1, dayHigh }).success).toBe(false);
+    }
+    for (const dayLow of [-1, 0, Number.POSITIVE_INFINITY, Number.NaN]) {
+      expect(RateSchema.safeParse({ code: 'USD', name: 'US Dollar', rate: 1, dayLow }).success).toBe(false);
+    }
+  });
 });
 
 describe('SnapshotSchema', () => {

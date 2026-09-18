@@ -83,6 +83,19 @@ export const RateSchema = z
      * can pass values through unchanged.
      */
     rate: z.number().positive().finite(),
+    /**
+     * TGJU daily stats, quote-side (Toman per 1 unit of `code`) — the INVERSE
+     * direction of `rate`. They mirror TGJU's published «نرخ فعلی / بالاترین
+     * قیمت روز / پایین ترین قیمت روز» columns (ajax.json `h`/`l` + profile
+     * summary table) and are display-oriented (the LED board renders them
+     * beside the current price). Rial→Toman normalization happens ONLY in
+     * the scraper (AGENTS.md §6). Absent on: Frankfurter rates, the IRR
+     * self-rate, legacy persisted snapshots, and TGJU entries whose day
+     * stats are not (yet) published — the UI shows dashes, never guesses.
+     */
+    dayHigh: z.number().positive().finite().optional(),
+    /** See `dayHigh` — «پایین ترین قیمت روز», Toman per 1 unit of `code`. */
+    dayLow: z.number().positive().finite().optional(),
     /** 'TOMAN' — allowed ONLY on code 'IRR' (enforced below). */
     unit: RateUnitSchema.optional(),
     /** Optional display symbol, e.g. '$', '€'. */

@@ -157,17 +157,23 @@ export const en = {
     noChangeSincePrevious: 'No change since the previous update',
     changedSincePrevious: 'Change since the previous update',
     /* LED shopfront board (2026-09-18) — the dark panel that recreates a
-     * currency-exchange window display. */
-    boardAriaLabel: 'Exchange rate board — live Toman rates per currency',
-    boardSell: 'SELL',
-    boardBuy: 'BUY',
+     * currency-exchange window display. Columns show TGJU's actual daily
+     * stats (2026-09-26): current price, day high, day low — real data,
+     * never a derived dealer spread. */
+    boardAriaLabel: 'Exchange rate board — current, day-high and day-low Toman rates per currency',
+    boardCurrent: 'CURRENT',
+    boardHigh: 'DAY HIGH',
+    boardLow: 'DAY LOW',
+    /** Compact column labels for narrow screens (silkscreen style). */
+    boardHighShort: 'HIGH',
+    boardLowShort: 'LOW',
     boardCurrency: 'CURRENCY',
     boardUnitToman: 'Toman',
     boardLive: 'LIVE',
     boardCached: 'CACHED',
     boardOffline: 'OFFLINE',
-    /** Per-board honesty footnote: mid-rate ± dealer margin. */
-    boardFootnote: 'Market mid-rate ± 0.25% dealer margin · source: TGJU',
+    /** Per-board footnote: the three columns are TGJU's own daily stats. */
+    boardFootnote: 'Current · day high · day low — TGJU open market, Toman',
     detailsSection: 'Details & trends',
   },
 
