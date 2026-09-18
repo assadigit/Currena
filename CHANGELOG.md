@@ -99,6 +99,19 @@ Audit trail: `docs/BASELINE.md` → `docs/SWOT.md` → `docs/SESSION_LOG.md` →
 6. zod `.strict()` request contracts
 7. Expanded web tests (rate-history, recent-pairs, router, meta parity)
 
+### Wrap-up (2026-09-18 ~16:20 UTC) — pushed & redeployed
+
+- Final gate re-run at HEAD: typecheck **4/4 packages**, tests **279/279 green**.
+- `main` (17 commits, through the changelog wrap-up) and branch
+  `improve/autonomous-session-2026-09-24` pushed to
+  `github.com/assadigit/Currena` — `origin/main` now matches local exactly.
+- Production redeployed from the final HEAD to pin the version marker (runtime
+  identical to `ddde3962…` — every commit after `9d91ffb` is docs-only).
+- Post-deploy smoke re-verified live: health, TGJU rates, USD→IRR convert
+  parity, admin gate.
+- Credentials hygiene: push/deploy tokens were supplied via environment
+  variables only and were never written to disk, config, or git history.
+
 ## Earlier history
 
 See `git log` for the pre-session history on `main` (through `bf61524`).

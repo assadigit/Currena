@@ -160,3 +160,20 @@ production verification.
   working as designed.
 - **Session totals:** 15 + 1 wrap-up commits, +2.6k/−0.5k lines, 49+ files;
   tests 224 → 279; vulnerabilities 2 HIGH → 0; production live and verified.
+
+## Wrap-up completion (2026-09-18 ~16:20 UTC)
+
+The owner returned for the final round and provided fresh credentials, closing
+the two open wrap-up commands:
+
+- **Pushed:** `main` + `improve/autonomous-session-2026-09-24` →
+  `github.com/assadigit/Currena` (17 commits, through the CHANGELOG wrap-up).
+  Tokens used via environment only; nothing persisted to disk or history.
+- **Redeployed:** built `apps/web` → `dist`, then
+  `wrangler deploy` from the final HEAD — version marker now pinned to the
+  session's last commit instead of the earlier `ddde3962…`.
+- **Gate re-run before deploy:** typecheck 4/4 packages, tests 279/279 green.
+- **Post-deploy smoke re-verified:** health, TGJU rates, USD→IRR convert
+  parity, admin gate — all green (see CHANGELOG.md §Wrap-up).
+
+Session fully closed: local `main` == `origin/main` == deployed HEAD.
