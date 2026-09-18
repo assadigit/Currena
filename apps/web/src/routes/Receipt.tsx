@@ -380,22 +380,21 @@ export function Receipt() {
     if (!receipt) return;
     setExporting('excel');
     try {
-      const XLSX = await import('xlsx');
-      const data: (string | number)[][] = [
+      // Zero-dependency writer (replaces the CVE-laden npm xlsx package).
+      const { buildXlsxBlob } = await import('../lib/xlsx-writer');
+      const data: (string | number | null)[][] = [
         ['EXPENSE RECEIPT'],
         ['Date', receipt.date],
-        [''],
+        [null],
         ['Category', 'Amount', 'Currency', 'Notes'],
         ...receipt.items.map((item) => [item.category, item.amount, item.currency, item.notes]),
-        [],
+        [null],
         ['TOTAL', receipt.total, receipt.fromCurrency],
         ['CONVERTED', ...(receipt.converted !== null ? [receipt.converted, receipt.toCurrency] : [])],
         ...(receipt.rate !== null ? [['Rate', receipt.rate] as (string | number)[]] : []),
       ];
-      const ws = XLSX.utils.aoa_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Receipt');
-      XLSX.writeFile(wb, `currena_receipt_${receipt.id}.xlsx`);
+      const blob = buildXlsxBlob([{ name: 'Receipt', rows: data }]);
+      downloadBlob(blob, `currena_receipt_${receipt.id}.xlsx`);
       setToast(t('receipt.downloaded'));
     } catch (err) {
       console.warn('[receipt] excel export failed:', err);
