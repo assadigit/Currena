@@ -101,6 +101,23 @@ describe('routes (injected service — no Workers, no live sites)', () => {
     expect(scrapeCalls).toEqual(['tgju']); // exactly one scrape
   });
 
+  it('GET /api/rates sends a content ETag and answers If-None-Match with 304', async () => {
+    const app = makeApp();
+    const first = await app.request('/api/rates', undefined, env);
+    const etag = first.headers.get('etag');
+    expect(etag).toMatch(/^"tgju:\d{4}-\d{2}-\d{2}T/); // (source, fetchedAt) identity
+
+    // Conditional re-poll of the same generation → tiny 304, no scrape.
+    const conditional = await app.request('/api/rates', { headers: { 'if-none-match': etag! } }, env);
+    expect(conditional.status).toBe(304);
+    expect(conditional.headers.get('etag')).toBe(etag);
+    expect(scrapeCalls).toEqual(['tgju']);
+
+    // A different ETag (stale client) still gets the full 200.
+    const other = await app.request('/api/rates', { headers: { 'if-none-match': '"tgju:old"' } }, env);
+    expect(other.status).toBe(200);
+  });
+
   it('GET /api/rates?source=frankfurter → frankfurter snapshot', async () => {
     const res = await makeApp().request('/api/rates?source=frankfurter', undefined, env);
     expect(res.status).toBe(200);

@@ -222,22 +222,27 @@ export class RatesService {
   /** /api/status payload: SourceStatus + cache age/freshness per source. */
   async status(): Promise<StatusReport> {
     const now = this.now();
-    const sources: StatusReportSource[] = [];
-    for (const source of ['tgju', 'frankfurter'] as const) {
-      const status: SourceStatus | undefined = await this.store.getStatus(source);
-      const snapshot = await this.store.getSnapshot(source);
-      const cacheAgeSec = snapshot ? Math.max(0, ageSec(snapshot.fetchedAt, now)) : undefined;
-      sources.push({
-        source,
-        ...(status ? { status } : {}),
-        cache: {
-          present: snapshot !== undefined,
-          ...(snapshot ? { fetchedAt: snapshot.fetchedAt } : {}),
-          ...(cacheAgeSec !== undefined ? { ageSec: Math.round(cacheAgeSec) } : {}),
-          fresh: cacheAgeSec !== undefined && cacheAgeSec < FRESH_TTL_SEC,
-        },
-      });
-    }
+    // Parallel reads: 4 sequential KV round-trips used to gate this route
+    // (and every /admin view) end to end.
+    const sources = await Promise.all(
+      (['tgju', 'frankfurter'] as const).map(async (source): Promise<StatusReportSource> => {
+        const [status, snapshot] = await Promise.all([
+          this.store.getStatus(source),
+          this.store.getSnapshot(source),
+        ]);
+        const cacheAgeSec = snapshot ? Math.max(0, ageSec(snapshot.fetchedAt, now)) : undefined;
+        return {
+          source,
+          ...(status ? { status } : {}),
+          cache: {
+            present: snapshot !== undefined,
+            ...(snapshot ? { fetchedAt: snapshot.fetchedAt } : {}),
+            ...(cacheAgeSec !== undefined ? { ageSec: Math.round(cacheAgeSec) } : {}),
+            fresh: cacheAgeSec !== undefined && cacheAgeSec < FRESH_TTL_SEC,
+          },
+        };
+      }),
+    );
     return { now: now.toISOString(), sources };
   }
 }

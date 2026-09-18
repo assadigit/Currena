@@ -83,6 +83,13 @@ export function History() {
 
   const months = getDictionary(locale).jalaliMonths;
 
+  // One time-of-day formatter per locale (was: 2 Intl constructions per
+  // entry per render — up to 100 formatters per paint at the 50-entry cap).
+  const timeFmt = useMemo(
+    () => new Intl.DateTimeFormat(numberLocale, { hour: '2-digit', minute: '2-digit' }),
+    [numberLocale],
+  );
+
   /* --------------------------- stats (full list) -------------------------- */
 
   const stats = useMemo(() => {
@@ -301,11 +308,9 @@ export function History() {
         const rateDecimals = irrPair ? 0 : 4;
         const { jy, jm, jd } = jalaliParts(entry.timestamp);
         const monthName = months[(jm - 1 + 12) % 12] ?? '';
-        // Time-of-day (render-time Intl, same locale as the core formatters).
-        const time = new Intl.DateTimeFormat(numberLocale, {
-          hour: '2-digit',
-          minute: '2-digit',
-        }).format(new Date(entry.timestamp));
+        // Time-of-day (render-time Intl, same locale as the core formatters;
+        // hoisted out of the per-entry loop — see timeFmt above).
+        const time = timeFmt.format(new Date(entry.timestamp));
         const isDeleting = deleting.has(historyEntryId(entry));
         return (
           <Card

@@ -20,7 +20,7 @@
  */
 
 import { convert, CoreError, SnapshotSourceSchema } from '@currena/core';
-import type { ConversionResult, RatesError, SnapshotSource } from '@currena/core';
+import type { ConversionResult, RatesError, Snapshot, SnapshotSource } from '@currena/core';
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { getCookie, setCookie } from 'hono/cookie';
@@ -96,9 +96,39 @@ function secretMatches(provided: string, expected: string): boolean {
   return diff === 0;
 }
 
+/*
+ * Isolate-lifetime micro-cache for snapshot reads. Workers reuses isolates
+ * across requests, and every /api/rates request inside the fresh window pays
+ * a KV read for the SAME unchanged snapshot — a 5s memo removes almost all
+ * of those reads (KV reads are billed and eventually consistent). Writes
+ * refresh the memo so a just-scraped snapshot is served immediately.
+ */
+const SNAPSHOT_MEMO_TTL_MS = 5_000;
+const snapshotMemo = new Map<SnapshotSource, { snapshot: Snapshot | undefined; readAtMs: number }>();
+let defaultStore: KvRateStore | undefined;
+
 function makeDefaultService(env: Bindings): RatesService {
+  defaultStore ??= new KvRateStore(env.RATES);
+  const store = {
+    getSnapshot: async (source: SnapshotSource): Promise<Snapshot | undefined> => {
+      const hit = snapshotMemo.get(source);
+      if (hit !== undefined && Date.now() - hit.readAtMs < SNAPSHOT_MEMO_TTL_MS) return hit.snapshot;
+      const snapshot = await defaultStore!.getSnapshot(source);
+      snapshotMemo.set(source, { snapshot, readAtMs: Date.now() });
+      return snapshot;
+    },
+    putSnapshot: async (source: SnapshotSource, snapshot: Snapshot, ttlSec: number): Promise<void> => {
+      snapshotMemo.set(source, { snapshot, readAtMs: Date.now() });
+      await defaultStore!.putSnapshot(source, snapshot, ttlSec);
+    },
+    getStatus: (source: SnapshotSource) => defaultStore!.getStatus(source),
+    putStatus: (source: SnapshotSource, status: Parameters<KvRateStore['putStatus']>[1]) =>
+      defaultStore!.putStatus(source, status),
+    tryAcquireLock: (source: SnapshotSource, ttlSec: number) => defaultStore!.tryAcquireLock(source, ttlSec),
+    releaseLock: (source: SnapshotSource, token: string) => defaultStore!.releaseLock(source, token),
+  };
   return new RatesService({
-    store: new KvRateStore(env.RATES),
+    store,
     scrapers: {
       tgju: () => scrapeTgju(),
       frankfurter: () => scrapeFrankfurter(),
@@ -129,7 +159,14 @@ export function createApp(deps: AppDeps = {}) {
     }
     try {
       const response = await makeService(c.env).getRates(source);
-      return c.json(response, 200, NO_STORE);
+      // Content-addressed ETag: the snapshot identity is (source, fetchedAt),
+      // so a conditional re-poll within the same generation is a tiny 304
+      // instead of a full payload (the SPA polls every 30s per source).
+      const etag = `"${response.snapshot.source}:${response.snapshot.fetchedAt}"`;
+      if (c.req.header('if-none-match') === etag) {
+        return c.body(null, 304, { ...NO_STORE, ETag: etag });
+      }
+      return c.json(response, 200, { ...NO_STORE, ETag: etag });
     } catch (err) {
       if (err instanceof RatesServiceError) {
         return errorResponse(c, 503, err.code, err.message, err.retryAfterSec);

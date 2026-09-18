@@ -22,7 +22,7 @@
  * copy button puts "1 USD = 230,500 IRR (Toman)" on the clipboard.
  */
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { convert, formatDate, formatNumber } from '@currena/core';
 import type { CurrencyCode } from '@currena/core';
 import { RateDeltaChip } from '../components/RateDeltaChip';
@@ -46,6 +46,159 @@ interface BoardCard {
   rate: number | null;
   ok: boolean;
 }
+
+interface BoardCardViewProps {
+  code: CurrencyCode;
+  card: BoardCard;
+  loading: boolean;
+  profileUrl: string | undefined;
+  prevRate: number | undefined;
+  flashDir: 'up' | 'down' | undefined;
+  copied: boolean;
+  series: number[] | undefined;
+  onCopy: (code: CurrencyCode, rate: number) => void;
+}
+
+/**
+ * One board card — memoized so a flash/copy on ONE card or an unrelated
+ * store tick (e.g. a frankfurter refresh) no longer re-renders all eight
+ * sparklines. Rate identity comes from the memoized `cards` array, so a
+ * stable snapshot means zero card re-renders.
+ */
+const BoardCardView = memo(function BoardCardView({
+  code,
+  card,
+  loading,
+  profileUrl,
+  prevRate,
+  flashDir,
+  copied,
+  series,
+  onCopy,
+}: BoardCardViewProps) {
+  const { t, numberLocale } = useI18n();
+  const label = useCodeLabel();
+  const rate = card.rate;
+  const rateNum =
+    card.ok && rate !== null
+      ? formatNumber(rate, numberLocale, { maximumFractionDigits: 0 })
+      : loading
+        ? '--'
+        : t('common.error');
+  const trend = series ? trendOf(series) : null;
+  return (
+    <article
+      className={`h-full rounded-[18px] bg-white p-5 ring-1 ring-black/[0.06] shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_36px_rgba(0,0,0,0.14)] dark:bg-[#1A222E] dark:ring-white/[0.08] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] dark:hover:shadow-[0_14px_36px_rgba(0,0,0,0.6)] ${
+        flashDir === 'up' ? 'rate-flash-up' : flashDir === 'down' ? 'rate-flash-down' : ''
+      }`}
+    >
+      <header className="mb-4 flex items-center gap-3">
+        <img
+          src={`/images/flags/${code.toLowerCase()}.png`}
+          alt={code}
+          className="h-[35px] w-[50px] rounded-md object-cover"
+        />
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate text-[1.05rem] font-semibold text-currena-dark">
+            {t(`currencies.${code}` as TranslationKey)}
+          </h3>
+          <p className="text-xs text-currena-muted">
+            {code} → <bdi>{label('IRR')}</bdi>
+          </p>
+        </div>
+        {copied ? (
+          <span className="shrink-0 text-[0.7rem] font-bold text-emerald-700 dark:text-emerald-400">✅</span>
+        ) : null}
+      </header>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 rounded-xl bg-currena-soft p-4">
+        <span className="shrink-0 text-sm text-currena-muted">1 {code} =</span>
+        <span className={`text-lg font-bold text-currena-dark ${card.ok ? '' : 'rate-loading'}`}>
+          {rateNum}
+          {card.ok && rate !== null ? (
+            <span className="ms-1.5 text-[0.72rem] font-bold text-currena-muted" dir="ltr">
+              {label('IRR')}
+            </span>
+          ) : null}
+        </span>
+      </div>
+      {/* ▲/▼ vs the previous snapshot generation */}
+      {card.ok && rate !== null && prevRate !== undefined ? (
+        <div className="mb-3">
+          <RateDeltaChip delta={{ current: rate, previous: prevRate }} decimals={0} size="sm" />
+        </div>
+      ) : null}
+      {/* Micro-trend over the recorded snapshot generations. */}
+      {series && series.length >= 2 && trend ? (
+        <div className="mb-3 flex items-center gap-3 rounded-xl bg-currena-soft/50 px-3 py-2">
+          <div className="min-w-0 flex-1">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-currena-muted">
+              📈 {t('trend.recentChecks', { n: series.length })}
+            </p>
+            <p
+              className={`text-xs font-bold ${
+                trend.dir === 'up'
+                  ? 'text-emerald-700 dark:text-emerald-400'
+                  : trend.dir === 'down'
+                    ? 'text-red-600 dark:text-red-400'
+                    : 'text-currena-muted'
+              }`}
+            >
+              {trend.dir === 'flat'
+                ? t('trend.flat')
+                : `${trend.pct >= 0 ? '+' : ''}${formatNumber(trend.pct, numberLocale, { maximumFractionDigits: 2 })}%`}
+              {' · '}
+              <span className="font-normal text-currena-muted">
+                {t('trend.range', {
+                  min: formatNumber(Math.min(...series), numberLocale, { maximumFractionDigits: 0 }),
+                  max: formatNumber(Math.max(...series), numberLocale, { maximumFractionDigits: 0 }),
+                })}
+              </span>
+            </p>
+          </div>
+          <Sparkline
+            points={series}
+            width={92}
+            height={34}
+            ariaLabel={t('trend.summary', {
+              pair: `${code} → ${label('IRR')}`,
+              dir: t(`trend.${trend.dir}` as TranslationKey),
+              pct: `${trend.pct >= 0 ? '+' : ''}${formatNumber(trend.pct, numberLocale, { maximumFractionDigits: 2 })}%`,
+            })}
+          />
+        </div>
+      ) : null}
+      <footer className="flex flex-wrap items-center justify-between gap-2">
+        {profileUrl ? (
+          <a
+            href={profileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-full border border-currena-blue/30 bg-currena-blue/10 px-4 py-2 text-xs text-currena-blue transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-blue/20"
+          >
+            🔗 {t('common.viewOnTgju')}
+          </a>
+        ) : (
+          <span />
+        )}
+        {card.ok && rate !== null ? (
+          <button
+            type="button"
+            onClick={() => onCopy(code, rate)}
+            title={t('liveRates.copyRate')}
+            aria-label={t('liveRates.copyRate')}
+            className={`inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
+              copied
+                ? 'border-currena-success/40 bg-currena-success/15 text-emerald-700 dark:text-emerald-400'
+                : 'border-black/10 bg-black/[0.03] text-currena-dark/75 hover:border-black/25 hover:bg-black/[0.06] dark:border-white/15 dark:bg-white/[0.04] dark:hover:border-white/30 dark:hover:bg-white/[0.08]'
+            }`}
+          >
+            {copied ? t('liveRates.rateCopied') : `📋 ${t('liveRates.copyRate')}`}
+          </button>
+        ) : null}
+      </footer>
+    </article>
+  );
+});
 
 export function LiveRates() {
   const { t, numberLocale } = useI18n();
@@ -163,6 +316,16 @@ export function LiveRates() {
     }
   };
 
+  // Stable callback for the memoized cards (t/label change identity per
+  // render — the ref indirection keeps onCopy referentially stable).
+  const copyRateRef = useRef(copyRate);
+  useEffect(() => {
+    copyRateRef.current = copyRate;
+  });
+  const onCopy = useCallback((code: CurrencyCode, rate: number): void => {
+    void copyRateRef.current(code, rate);
+  }, []);
+
   return (
     // Harmonized board (owner request 2026-09-17): the page keeps the app's
     // own background and every card uses the site's white-card language —
@@ -220,131 +383,20 @@ export function LiveRates() {
           {cards
             ? BOARD.map((code) => {
                 const card = cards.find((c) => c.code === code);
-                const rate = card?.rate ?? null;
-                const rateNum =
-                  card?.ok && rate !== null
-                    ? formatNumber(rate, numberLocale, { maximumFractionDigits: 0 })
-                    : loading
-                      ? '--'
-                      : t('common.error');
-                const profileUrl = tgjuUrls[code];
-                const prevRate = prevRates.get(code);
-                const flashDir = flash[code];
-                const copied = copiedCode === code;
-                const series = trendSeries.get(code);
-                const trend = series ? trendOf(series) : null;
+                if (!card) return null;
                 return (
-                  <article
+                  <BoardCardView
                     key={code}
-                    className={`h-full rounded-[18px] bg-white p-5 ring-1 ring-black/[0.06] shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_36px_rgba(0,0,0,0.14)] dark:bg-[#1A222E] dark:ring-white/[0.08] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] dark:hover:shadow-[0_14px_36px_rgba(0,0,0,0.6)] ${
-                      flashDir === 'up' ? 'rate-flash-up' : flashDir === 'down' ? 'rate-flash-down' : ''
-                    }`}
-                  >
-                    <header className="mb-4 flex items-center gap-3">
-                      <img
-                        src={`/images/flags/${code.toLowerCase()}.png`}
-                        alt={code}
-                        className="h-[35px] w-[50px] rounded-md object-cover"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <h3 className="truncate text-[1.05rem] font-semibold text-currena-dark">
-                          {t(`currencies.${code}` as TranslationKey)}
-                        </h3>
-                        <p className="text-xs text-currena-muted">
-                          {code} → <bdi>{label('IRR')}</bdi>
-                        </p>
-                      </div>
-                      {copied ? (
-                        <span className="shrink-0 text-[0.7rem] font-bold text-emerald-700 dark:text-emerald-400">✅</span>
-                      ) : null}
-                    </header>
-                    <div className="mb-3 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 rounded-xl bg-currena-soft p-4">
-                      <span className="shrink-0 text-sm text-currena-muted">1 {code} =</span>
-                      <span className={`text-lg font-bold text-currena-dark ${card?.ok ? '' : 'rate-loading'}`}>
-                        {rateNum}
-                        {card?.ok && rate !== null ? (
-                          <span className="ms-1.5 text-[0.72rem] font-bold text-currena-muted" dir="ltr">
-                            {label('IRR')}
-                          </span>
-                        ) : null}
-                      </span>
-                    </div>
-                    {/* ▲/▼ vs the previous snapshot generation */}
-                    {card?.ok && rate !== null && prevRate !== undefined ? (
-                      <div className="mb-3">
-                        <RateDeltaChip delta={{ current: rate, previous: prevRate }} decimals={0} size="sm" />
-                      </div>
-                    ) : null}
-                    {/* Micro-trend over the recorded snapshot generations. */}
-                    {series && series.length >= 2 && trend ? (
-                      <div className="mb-3 flex items-center gap-3 rounded-xl bg-currena-soft/50 px-3 py-2">
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-currena-muted">
-                            📈 {t('trend.recentChecks', { n: series.length })}
-                          </p>
-                          <p
-                            className={`text-xs font-bold ${
-                              trend.dir === 'up'
-                                ? 'text-emerald-700 dark:text-emerald-400'
-                                : trend.dir === 'down'
-                                  ? 'text-red-600 dark:text-red-400'
-                                  : 'text-currena-muted'
-                            }`}
-                          >
-                            {trend.dir === 'flat'
-                              ? t('trend.flat')
-                              : `${trend.pct >= 0 ? '+' : ''}${formatNumber(trend.pct, numberLocale, { maximumFractionDigits: 2 })}%`}
-                            {' · '}
-                            <span className="font-normal text-currena-muted">
-                              {t('trend.range', {
-                                min: formatNumber(Math.min(...series), numberLocale, { maximumFractionDigits: 0 }),
-                                max: formatNumber(Math.max(...series), numberLocale, { maximumFractionDigits: 0 }),
-                              })}
-                            </span>
-                          </p>
-                        </div>
-                        <Sparkline
-                          points={series}
-                          width={92}
-                          height={34}
-                          ariaLabel={t('trend.summary', {
-                            pair: `${code} → ${label('IRR')}`,
-                            dir: t(`trend.${trend.dir}` as TranslationKey),
-                            pct: `${trend.pct >= 0 ? '+' : ''}${formatNumber(trend.pct, numberLocale, { maximumFractionDigits: 2 })}%`,
-                          })}
-                        />
-                      </div>
-                    ) : null}
-                    <footer className="flex flex-wrap items-center justify-between gap-2">
-                      {profileUrl ? (
-                        <a
-                          href={profileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 rounded-full border border-currena-blue/30 bg-currena-blue/10 px-4 py-2 text-xs text-currena-blue transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-blue/20"
-                        >
-                          🔗 {t('common.viewOnTgju')}
-                        </a>
-                      ) : (
-                        <span />
-                      )}
-                      {card?.ok && rate !== null ? (
-                        <button
-                          type="button"
-                          onClick={() => void copyRate(code, rate)}
-                          title={t('liveRates.copyRate')}
-                          aria-label={t('liveRates.copyRate')}
-                          className={`inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
-                            copied
-                              ? 'border-currena-success/40 bg-currena-success/15 text-emerald-700 dark:text-emerald-400'
-                              : 'border-black/10 bg-black/[0.03] text-currena-dark/75 hover:border-black/25 hover:bg-black/[0.06] dark:border-white/15 dark:bg-white/[0.04] dark:hover:border-white/30 dark:hover:bg-white/[0.08]'
-                          }`}
-                        >
-                          {copied ? t('liveRates.rateCopied') : `📋 ${t('liveRates.copyRate')}`}
-                        </button>
-                      ) : null}
-                    </footer>
-                  </article>
+                    code={code}
+                    card={card}
+                    loading={loading}
+                    profileUrl={tgjuUrls[code]}
+                    prevRate={prevRates.get(code)}
+                    flashDir={flash[code]}
+                    copied={copiedCode === code}
+                    series={trendSeries.get(code)}
+                    onCopy={onCopy}
+                  />
                 );
               })
             : // First load (no snapshot yet): 8 shimmer skeletons.
