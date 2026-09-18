@@ -14,7 +14,8 @@
  *
  * Same hardware language as LedRateBoard (shared LedParts: recessed
  * dot-matrix modules, ghost/glow/lit layers, hot CURRENT column, 260ms
- * flash-on-change, live clock + status LED, silkscreen labels) and the
+ * flash-on-change, sans clock/date + status LED, readable sans-serif
+ * headers — DSEG7 stays on the price digits) and the
  * same ONE-SHARED-COLUMN-GRID machinery (index.css .led-table subgrid).
  *
  * Layout differences forced by the DATA (11-glyph coin values like
@@ -37,7 +38,7 @@
 
 import { memo, useEffect, useMemo, useState } from 'react';
 import type { GoldId, GoldQuote, Snapshot } from '@currena/core';
-import { LedClock, LedDigits, LedStatus, LedValueCell, formatLedDate } from './led/LedParts';
+import { LedClock, LedDate, LedStatus, LedValueCell } from './led/LedParts';
 import { useI18n } from '../lib/locale';
 import { useSnapshotStore } from '../lib/snapshot-store';
 import type { TranslationKey } from '../lib/locale';
@@ -237,6 +238,11 @@ export function LedGoldBoard() {
   const usdUnit = t('liveRates.goldUnitUsd');
   const tomanUnit = t('liveRates.goldUnitToman');
 
+  // Column-header letter-spacing (owner request 2026-09-27: sans-serif
+  // headers, slightly wider tracking) — Latin only (letter-spacing breaks
+  // Persian letter joining); same rule as the panel title below.
+  const headerTrack = locale === 'en' ? 'tracking-[0.2em]' : 'tracking-normal';
+
   const renderItem = (item: GoldBoardItem, index: number): React.JSX.Element => (
     <LedGoldRow
       key={item.id}
@@ -262,16 +268,19 @@ export function LedGoldBoard() {
       role="region"
       aria-label={t('liveRates.goldAriaLabel')}
     >
-      {/* Header strip — live clock + date module, the panel title (a
-          dot-matrix wordmark slot) and the status LED. Persian titles drop
-          the Latin uppercase/letter-spacing (it breaks Arabic-script
-          joining); the label fill itself is script-agnostic. */}
+      {/* Header strip — live clock + date (both plain sans-serif now,
+          owner request 2026-09-27: the seven-segment look is reserved for
+          the price digits), the panel title and the status LED. Persian
+          drops the Latin uppercase/letter-spacing (it breaks Arabic-script
+          joining). */}
       <header className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-[#ff1e1e]/15 pb-3">
         <LedClock now={now} />
-        <LedDigits value={formatLedDate(now, locale)} className="text-[0.8rem] sm:text-[0.95rem]" />
+        <LedDate date={now} locale={locale} />
         <div className="flex items-center gap-3">
+          {/* Panel title — a readable sans-serif heading (owner request
+              2026-09-27: standard font, full-power red). */}
           <span
-            className={`led-label led-label-white-dim text-[0.6rem] font-extrabold text-[#ff1e1e]/55 ${
+            className={`select-none text-[0.6rem] font-extrabold text-[#ff1e1e]/90 ${
               locale === 'en' ? 'uppercase tracking-[0.3em]' : ''
             }`}
           >
@@ -294,20 +303,29 @@ export function LedGoldBoard() {
           column below md, three from md up); the header row, both lists and
           every value row subgrid it, so each label sits directly above its
           own column of numbers at any digit size. Column headers are the
-          same silkscreen labels as the currency board (CURRENT / DAY HIGH /
-          DAY LOW — hidden below md together with their columns). */}
+          same readable sans-serif silkscreen labels as the currency board
+          (owner request 2026-09-27 — CURRENT / DAY HIGH / DAY LOW, hidden
+          below md together with their columns). */}
       <div className="led-table led-table-gold">
         <div className="led-row pb-2.5">
-          <p className="led-label led-label-white-dim ps-1 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-white/35 md:ps-2.5">
+          <p
+            className={`ps-1 text-[0.6rem] font-bold uppercase text-white/75 ${headerTrack} md:ps-2.5`}
+          >
             {t('liveRates.goldItem')}
           </p>
-          <p className="led-label led-label-red whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/80 md:pr-[9px]">
+          <p
+            className={`whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase text-[#ff1e1e] ${headerTrack} md:pr-[9px]`}
+          >
             {currentLabel}
           </p>
-          <p className="led-label led-label-red-dim hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55 md:block md:pr-[9px]">
+          <p
+            className={`hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase text-[#ff1e1e]/90 ${headerTrack} md:block md:pr-[9px]`}
+          >
             {highLabel}
           </p>
-          <p className="led-label led-label-red-dim hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55 md:block md:pr-[9px]">
+          <p
+            className={`hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase text-[#ff1e1e]/90 ${headerTrack} md:block md:pr-[9px]`}
+          >
             {lowLabel}
           </p>
         </div>
@@ -317,11 +335,12 @@ export function LedGoldBoard() {
 
         {/* Silkscreen section divider — the Tehran market + its Toman unit
             (spans all tracks; intrinsic width stays far below the module
-            columns, so it can never bloat the auto tracks). */}
+            columns, so it can never bloat the auto tracks). Readable
+            sans-serif like the headers (owner request 2026-09-27). */}
         <div className="led-gold-divider ps-1 md:ps-2.5">
           <span
-            className={`led-label led-label-white-dim text-[0.6rem] font-bold text-white/35 ${
-              locale === 'en' ? 'uppercase tracking-[0.16em]' : ''
+            className={`select-none text-[0.6rem] font-bold text-white/75 ${
+              locale === 'en' ? 'uppercase tracking-[0.2em]' : ''
             }`}
           >
             {t('liveRates.goldDomestic')}

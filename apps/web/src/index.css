@@ -678,8 +678,11 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Seven-segment font stack — every NUMBER on the board (rates, clock,
- * date). Latin digits only; Persian stays in Vazirmatn. Bold: chunkier
+/* Seven-segment font stack — the PRICE VALUES only (rates, high/low).
+ * Owner request 2026-09-27: the clock, the dates, the column headers and
+ * the board titles/headings left the seven-segment look for a standard
+ * sans-serif (readable at a glance) — DSEG7 is now the price digits'
+ * signature. Latin digits only; Persian stays in Vazirmatn. Bold: chunkier
  * strokes sample the bulb pattern better. */
 .led-digits {
   font-family: "DSEG7 Classic", "Vazirmatn", monospace;
@@ -807,9 +810,11 @@ body {
     background-clip: text;
   }
 
-  /* Labels (column headers, currency codes, wordmark): the same bulb
-   * fill at a tighter pitch. Color comes from --led-label-c per tier;
-   * any Tailwind text color on the element remains as the fallback. */
+  /* Row captions (the currency codes, the gold change %) — the same bulb
+   * fill at a tighter pitch; the ONLY dot-matrix labels left since the
+   * column headers/titles went sans-serif (owner request 2026-09-27).
+   * Color comes from --led-label-c; any Tailwind text color on the element
+   * remains as the fallback. */
   .led-label {
     -webkit-background-clip: text;
     background-clip: text;
@@ -823,19 +828,13 @@ body {
   }
 }
 
-.led-label-red {
-  --led-label-c: rgba(255, 44, 44, 0.9);
-}
 .led-label-red-dim {
   --led-label-c: rgba(255, 44, 44, 0.62);
 }
-.led-label-white-dim {
-  --led-label-c: rgba(255, 255, 255, 0.4);
-}
 
-/* Clock colon (DSEG7 renders it as two segment dots): solid red + soft
- * 0.5Hz dim (amplitude 0.45→1 — well under any photosensitivity
- * threshold; never part of the dot fill). */
+/* Clock colon (sans-serif since 2026-09-27 — the clock left DSEG7): solid
+ * red + soft 0.5Hz dim (amplitude 0.45→1 — well under any photosensitivity
+ * threshold; the one LED habit the sans clock keeps). */
 .led-colon {
   color: var(--led-red);
   text-shadow: var(--led-glow);

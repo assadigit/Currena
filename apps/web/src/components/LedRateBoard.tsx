@@ -14,8 +14,11 @@
  *              stacked layers per module (see LedDigits): a ghost "8888…"
  *              of dim unlit bulbs behind the value, a bloom-halo layer,
  *              and the lit value filled with bright dot-matrix bulbs.
- *   Labels   — headers, currency codes and the wordmark reuse the same
- *              bulb fill at a tighter pitch (.led-label).
+ *              DSEG7 is the PRICE values' signature only (owner request
+ *              2026-09-27) — the clock, dates, column headers and
+ *              headings render in a standard sans-serif at full power.
+ *   Captions — the currency codes reuse the bulb fill at a tighter pitch
+ *              (.led-label) — the one dot-matrix label left.
  *
  * The three columns are TGJU's OWN published daily statistics — the same
  * «مقادیر» table the profile pages show:
@@ -37,11 +40,12 @@
  *   - The flag+name cell aligns to the row's leading edge via
  *     padding-inline-start (names are Persian; the row must stay RTL-safe).
  *   - The currency NAME is the bold identity label (2026-09-27 owner spec:
- *     +40–50% size, weight 700 — "reads clearly at a glance"), with the
- *     currency CODE kept as a small secondary LED label beneath it. Below
- *     md the name owns its own line (flag+code become a quiet caption line)
- *     so the bigger name still fits untruncated; at md+ the flag sits
- *     beside the name/code stack, and rows grow a little taller to breathe.
+ *     +40–50% size, weight 700 — "reads clearly at a glance"). Owner spec
+ *     2026-09-27: the FLAG rides on the name's line, before the name text
+ *     (left of it in LTR, at the row's leading edge in RTL), doubled in
+ *     size (42×28 phones · 64×42 md+ — from 21×14 / 32×21); the currency
+ *     CODE stays a small secondary LED label on its own line beneath —
+ *     one consistent row shape at every breakpoint.
  *   - ONE SHARED COLUMN GRID: .led-table (the wrapper) owns the single
  *     grid-template-columns definition; the header row, the list and
  *     every value row subgrid it (index.css .led-table/.led-row), so
@@ -68,7 +72,7 @@
 import { memo, useEffect, useMemo, useState } from 'react';
 import { convert } from '@currena/core';
 import type { CurrencyCode, Snapshot } from '@currena/core';
-import { LedClock, LedDigits, LedStatus, LedValueCell, formatLedDate } from './led/LedParts';
+import { LedClock, LedDate, LedStatus, LedValueCell } from './led/LedParts';
 import { useI18n } from '../lib/locale';
 import { useSnapshotStore } from '../lib/snapshot-store';
 import type { TranslationKey } from '../lib/locale';
@@ -145,46 +149,36 @@ const LedRow = memo(function LedRow({
       {/* Leading cell — flag · name · code, aligned to the row's leading edge
           via padding-inline-start so the Persian names (RTL) keep the row's
           leading edge in both directions. The NAME is the big bold identity
-          label (2026-09-27 owner spec: +40–50% size, weight 700) with the
-          code kept as a small secondary label — two responsive shapes:
-            <md  the name owns its line, with the flag + code as a quiet
-                 caption line beneath — the name gets the WHOLE track width
-                 (the flag no longer shares its line), so the +40% name still
-                 renders "US Dollar" untruncated at 375px and through the
-                 narrow-tablet zone (640–767px) where the horizontal shape
-                 would not have room for the enlarged name.
-            md+  the classic board row: flag beside the name/code stack —
-                 only from 768px up, where the name track (≥252px) actually
-                 fits the flag plus the full +41% name without truncation.
-          Both shapes paint the same cached flag PNG (two <img>s). */}
+          label (2026-09-27 owner spec: +40–50% size, weight 700); the FLAG
+          rides the name's line, before the name text, doubled in size
+          (42×28 phones · 64×42 md+ — from 21×14 / 32×21); the ISO code stays
+          a small dot-matrix LED caption alone on its own line beneath — one
+          row shape at every breakpoint. dir-aware flex keeps the flag at the
+          row's leading edge (left of the name in LTR, right in RTL); the
+          name truncates against the 2x flag on the narrowest phones instead
+          of pushing the CURRENT module out. */}
       <div className="min-w-0 ps-1 md:ps-2.5">
-        <div className="flex min-w-0 flex-col gap-[3px] md:flex-row md:items-center md:gap-2.5">
-          <img
-            src={`/images/flags/${quote.code.toLowerCase()}.png`}
-            alt=""
-            className="hidden h-[21px] w-[32px] shrink-0 rounded-[3px] object-cover ring-1 ring-white/15 md:block"
-          />
-          <div className="min-w-0 leading-tight">
-            <p className="truncate text-[1.05rem] font-bold text-white/90 sm:text-[1.3rem] lg:text-[1.35rem]">
+        <div className="flex min-w-0 flex-col gap-[3px]">
+          <div className="flex min-w-0 items-center gap-1.5 md:gap-2.5">
+            <img
+              src={`/images/flags/${quote.code.toLowerCase()}.png`}
+              alt=""
+              className="h-[28px] w-[42px] shrink-0 rounded-[4px] object-cover ring-1 ring-white/15 md:h-[42px] md:w-[64px] md:rounded-[6px]"
+            />
+            <p className="min-w-0 truncate text-[1.05rem] font-bold text-white/90 sm:text-[1.3rem] lg:text-[1.35rem]">
               {name}
             </p>
-            {/* Currency code — a dot-matrix LED label (tight pitch); below
-                md it rides beside a compact flag on the caption line
-                (dir-aware flex: flag at the row's leading edge in RTL too). */}
-            <p className="flex items-center gap-1.5">
-              <img
-                src={`/images/flags/${quote.code.toLowerCase()}.png`}
-                alt=""
-                className="h-3.5 w-[21px] shrink-0 rounded-[2px] object-cover ring-1 ring-white/15 md:hidden"
-              />
-              <span
-                className="led-label led-label-red-dim text-[0.55rem] font-bold uppercase tracking-[0.18em] text-[#ff1e1e]/60 sm:text-[0.58rem]"
-                dir="ltr"
-              >
-                {quote.code}
-              </span>
-            </p>
           </div>
+          {/* Currency code — a dot-matrix LED label (tight pitch) alone on
+              its own line beneath the name (owner request 2026-09-27). */}
+          <p className="leading-none">
+            <span
+              className="led-label led-label-red-dim text-[0.55rem] font-bold uppercase tracking-[0.18em] text-[#ff1e1e]/60 sm:text-[0.58rem]"
+              dir="ltr"
+            >
+              {quote.code}
+            </span>
+          </p>
         </div>
       </div>
 
@@ -262,21 +256,29 @@ export function LedRateBoard() {
   const lowLabel = t('liveRates.boardLow');
   const unitLabel = t('liveRates.boardUnitToman');
 
+  // Column-header letter-spacing (owner request 2026-09-27: sans-serif
+  // headers, slightly wider tracking) — Latin only: letter-spacing breaks
+  // Persian letter joining, so fa headers keep tracking-normal (the same
+  // rule the gold board title has always used).
+  const headerTrack = locale === 'en' ? 'tracking-[0.2em]' : 'tracking-normal';
+
   return (
     <section
       className="led-board overflow-hidden px-3 py-3.5 sm:px-6 sm:py-5"
       role="region"
       aria-label={t('liveRates.boardAriaLabel')}
     >
-      {/* Header strip — live clock (three recessed modules) + date module,
-          plus the board's status LED and dot-matrix wordmark. */}
+      {/* Header strip — live clock + date (both plain sans-serif now,
+          owner request 2026-09-27: the seven-segment look is reserved for
+          the price digits), plus the board's status LED and wordmark. */}
       <header className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-[#ff1e1e]/15 pb-3">
         <LedClock now={now} />
-        <LedDigits value={formatLedDate(now, locale)} className="text-[0.8rem] sm:text-[0.95rem]" />
+        <LedDate date={now} locale={locale} />
         <div className="flex items-center gap-3">
-          {/* Wordmark — a tight-pitch white dot-matrix label. */}
+          {/* Wordmark — a small red brand heading, sans-serif (readable at
+              a glance on the dark housing). */}
           <span
-            className="led-label led-label-white-dim text-[0.6rem] font-extrabold uppercase tracking-[0.3em] text-[#ff1e1e]/55"
+            className="select-none text-[0.6rem] font-extrabold uppercase tracking-[0.3em] text-[#ff1e1e]/90"
             dir="ltr"
           >
             CURRENA
@@ -297,28 +299,37 @@ export function LedRateBoard() {
       {/* THE shared column grid — .led-table owns the single track
           definition; header row, list and every row subgrid it
           (index.css), locking each label above its own column of
-          numbers. Column headers are silkscreen labels on the housing,
-          dot-matrix LED fill at a tight pitch (Tailwind text colors stay
-          as fallback): currency · current · day high · day low — with
-          high/low hidden below md together with their columns (mobile is
-          single-column, owner request 2026-09-19). The CURRENCY label
-          pads its inline start like the name cells; the value labels pad
-          their PHYSICAL right edge by the module-well padding (4/9px) so
-          each sits exactly over its digits' right edge, and keep physical
-          right alignment with the value modules below in both LTR and
-          RTL. */}
+          numbers. Column headers are readable sans-serif silkscreen
+          labels on the housing (owner request 2026-09-27: standard font
+          instead of the LED dot fill, full-power color so they read at a
+          glance — the LED look stays on the price digits): currency ·
+          current · day high · day low — with high/low hidden below md
+          together with their columns (mobile is single-column, owner
+          request 2026-09-19). The CURRENCY label pads its inline start
+          like the name cells; the value labels pad their PHYSICAL right
+          edge by the module-well padding (4/9px) so each sits exactly
+          over its digits' right edge, and keep physical right alignment
+          with the value modules below in both LTR and RTL. */}
       <div className="led-table">
         <div className="led-row pb-2.5">
-          <p className="led-label led-label-white-dim ps-1 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-white/35 sm:ps-2.5">
+          <p
+            className={`ps-1 text-[0.6rem] font-bold uppercase text-white/75 ${headerTrack} sm:ps-2.5`}
+          >
             {t('liveRates.boardCurrency')}
           </p>
-          <p className="led-label led-label-red whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/80 sm:pr-[9px]">
+          <p
+            className={`whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase text-[#ff1e1e] ${headerTrack} sm:pr-[9px]`}
+          >
             {currentLabel}
           </p>
-          <p className="led-label led-label-red-dim hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55 md:block md:pr-[9px]">
+          <p
+            className={`hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase text-[#ff1e1e]/90 ${headerTrack} md:block md:pr-[9px]`}
+          >
             {highLabel}
           </p>
-          <p className="led-label led-label-red-dim hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55 md:block md:pr-[9px]">
+          <p
+            className={`hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase text-[#ff1e1e]/90 ${headerTrack} md:block md:pr-[9px]`}
+          >
             {lowLabel}
           </p>
         </div>

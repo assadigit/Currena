@@ -5,13 +5,18 @@
  *
  *   LedDigits   — one recessed module: ghost '8'-shape + bloom halo + the
  *                 lit dot-matrix value (three pixel-identical layers).
- *   LedClock    — HH:MM:SS as three recessed modules with dimming colons.
+ *   LedClock    — HH:MM:SS in a standard sans-serif (owner request
+ *                 2026-09-27: the timer-like strip text left the seven-
+ *                 segment look; the price digits keep it as the board's
+ *                 signature) with tabular-nums and softly dimming colons.
+ *   LedDate     — the board-header date (Jalali for fa) in the same
+ *                 readable sans-serif treatment.
  *   LedStatus   — the LIVE/CACHED/OFFLINE indicator LED.
  *   LedValueCell — one value module + its accessible label, placed in the
  *                 shared column grid, with the primary/secondary emphasis
  *                 tiers and the 260ms flash-on-change.
  *
- * Formatting helpers: formatLedDate (locale-aware LED date, '.' separators,
+ * Formatting helpers: formatLedDate (locale-aware date, '.' separators,
  * Jalali for fa) and formatLedNumber (space-grouped ASCII digits — DSEG7 has
  * no commas — with optional decimals for USD-quoted items).
  *
@@ -117,18 +122,43 @@ export function LedDigits({
 
 /* ------------------------------- clock ------------------------------- */
 
-/** Ticking board clock: HH:MM:SS as three recessed digit modules with
- *  softly dimming colons (the DSEG7 colon glyph is two segment dots). */
+/** Ticking board clock — HH:MM:SS (owner request 2026-09-27): a standard
+ *  sans-serif run with tabular-nums, full-power red for clear glance
+ *  reading on the dark housing, and softly dimming colons (the one LED
+ *  habit kept — 0.5Hz, amplitude 0.45–1, WCAG-safe). The seven-segment
+ *  DSEG7 rendering is reserved for the price digits. */
 export function LedClock({ now }: { now: Date }) {
   const groups = [pad2(now.getHours()), pad2(now.getMinutes()), pad2(now.getSeconds())];
   return (
-    <span className="flex items-center gap-[3px] sm:gap-1.5" dir="ltr" aria-hidden="true">
+    <span
+      className="flex select-none items-center gap-[3px] font-semibold tabular-nums text-base text-[#ff1e1e] sm:gap-1.5 sm:text-xl"
+      dir="ltr"
+      aria-hidden="true"
+    >
       {groups.map((group, i) => (
         <Fragment key={i}>
-          {i > 0 ? <span className="led-digits led-colon text-base sm:text-xl">:</span> : null}
-          <LedDigits value={group} className="text-base sm:text-xl" />
+          {i > 0 ? <span className="led-colon">:</span> : null}
+          <span>{group}</span>
         </Fragment>
       ))}
+    </span>
+  );
+}
+
+/* -------------------------------- date ------------------------------- */
+
+/** Board-header date — the same readable sans-serif treatment as the clock
+ *  (owner request 2026-09-27: dates left the seven-segment look): full-power
+ *  red, tabular-nums, a touch of tracking. Jalali for fa, Latin digits both
+ *  calendars. Unlike the DSEG7 layers it replaced, the text is exposed to
+ *  assistive tech (it is real information, not decoration). */
+export function LedDate({ date, locale }: { date: Date; locale: 'en' | 'fa' }) {
+  return (
+    <span
+      className="select-none font-semibold tracking-[0.08em] tabular-nums text-[0.8rem] text-[#ff1e1e] sm:text-[0.95rem]"
+      dir="ltr"
+    >
+      {formatLedDate(date, locale)}
     </span>
   );
 }
