@@ -25,12 +25,23 @@
  * Real data, never a derived spread; stats ride the snapshot rate entries
  * (core schemas.ts) and render as dashes when unavailable.
  *
- * Layout rules (owner spec):
+ * Layout rules (owner spec, grid rework 2026-09-27):
  *   - Row cells in fixed order: flag · currency name · current · high · low.
  *   - The flag+name cell aligns to the row's leading edge via
  *     padding-inline-start (names are Persian; the row must stay RTL-safe).
- *   - The three value cells keep PHYSICAL right alignment (digits are LTR
- *     runs — a stable numeric column edge in both directions).
+ *   - ONE SHARED COLUMN GRID: .led-table (the wrapper) owns the single
+ *     grid-template-columns definition; the header row, the list and
+ *     every value row subgrid it (index.css .led-table/.led-row), so
+ *     each header label sits directly above its own column of numbers
+ *     at any digit size — track widths come from the widest module per
+ *     column across ALL rows, never eyeballed per row.
+ *   - The three value columns keep PHYSICAL right alignment, headers
+ *     and digits alike (labels pad their right edge by the module-well
+ *     padding so they sit exactly over the digits); digits are LTR
+ *     runs — a stable numeric column edge in both directions.
+ *   - The CURRENT column is the primary module: ~20-25% larger digits
+ *     at sm+/lg+, hotter bulbs + stronger bloom (.led-cell-hot) and
+ *     full power — vs the secondary high/low modules at 75% power.
  *
  * A11y (WCAG 2.3.1 photosensitivity): the update-flash fires ONCE per
  * value change (a 260ms brightness surge of the whole module), rows carry
@@ -230,12 +241,15 @@ interface LedRowProps {
   name: string;
 }
 
-/** One LED value cell — a recessed module + its accessible label. The
- *  `key` on LedDigits carries the formatted value: a change remounts the
- *  module, replaying the 260ms brightness surge (staggered by row) — the
- *  electronic-refresh flash. LED glyph layers are hidden from AT and
- *  replaced by a comma-grouped aria-label so screen readers hear
- *  "2,279,000 Toman", not space-split digit runs. */
+/** One LED value cell — a recessed module + its accessible label, placed
+ *  in the shared column grid (track comes from .led-table, alignment is
+ *  physical right). The `key` on LedDigits carries the formatted value: a
+ *  change remounts the module, replaying the 260ms brightness surge
+ *  (staggered by row) — the electronic-refresh flash. LED glyph layers are
+ *  hidden from AT and replaced by a comma-grouped aria-label so screen
+ *  readers hear "2,279,000 Toman", not space-split digit runs.
+ *  `emphasis` picks the module tier: primary (CURRENT — hot bulbs, full
+ *  power) vs secondary (high/low — standard treatment at 75% power). */
 function LedValueCell({
   code,
   stat,
@@ -245,7 +259,7 @@ function LedValueCell({
   label,
   unitLabel,
   size,
-  dim,
+  emphasis,
 }: {
   code: string;
   stat: 'cur' | 'high' | 'low';
@@ -255,7 +269,7 @@ function LedValueCell({
   label: string;
   unitLabel: string;
   size: string;
-  dim: boolean;
+  emphasis: 'primary' | 'secondary';
 }) {
   const text = ok && Number.isFinite(value) ? formatLedNumber(value) : '-------';
   return (
@@ -270,7 +284,7 @@ function LedValueCell({
           flash={ok}
           idle={!ok}
           staggerMs={staggerMs}
-          className={`${size} ${dim ? 'opacity-75' : ''}`}
+          className={`${size} ${emphasis === 'primary' ? 'led-cell-hot' : 'led-cell-soft opacity-75'}`}
         />
       </span>
     </div>
@@ -278,8 +292,10 @@ function LedValueCell({
 }
 
 /** One board row — flag · name · current · high · low (fixed order, logical
- *  flow so RTL mirrors the reading order naturally). Memoized: the clock
- *  ticks every second and must not re-render (nor re-flash) the modules. */
+ *  flow so RTL mirrors the reading order naturally). The row SUBGRIDS the
+ *  shared .led-table column grid (index.css), so its value modules land in
+ *  the very tracks the header labels sit in. Memoized: the clock ticks
+ *  every second and must not re-render (nor re-flash) the modules. */
 const LedRow = memo(function LedRow({
   quote,
   index,
@@ -291,11 +307,11 @@ const LedRow = memo(function LedRow({
 }: LedRowProps) {
   const stagger = index * FLASH_STAGGER_MS;
   return (
-    <li className="grid grid-cols-[minmax(0,1fr)_auto_auto_auto] items-center gap-x-[3px] border-b border-white/[0.04] py-2.5 last:border-b-0 sm:gap-x-5 sm:py-3 lg:gap-x-6">
+    <li className="led-row border-b border-white/[0.04] py-3 last:border-b-0 sm:py-3.5">
       {/* Leading cell: flag + name, aligned via padding-inline-start so the
           Persian names (RTL) keep the row's leading edge in both directions.
-          Mobile: compact flag + tighter gaps so the wide DSEG7 glyphs and
-          the recessed module wells still leave the name real room. */}
+          Mobile: compact flag + tight gaps so the wide DSEG7 glyphs and the
+          recessed module wells still leave the name real room. */}
       <div className="flex min-w-0 items-center gap-2 ps-1 sm:gap-2.5 sm:ps-2.5">
         <img
           src={`/images/flags/${quote.code.toLowerCase()}.png`}
@@ -314,7 +330,8 @@ const LedRow = memo(function LedRow({
         </div>
       </div>
 
-      {/* Current — the primary module: full-power bulbs, slightly larger. */}
+      {/* Current — the PRIMARY module: ~20-25% larger digits at sm+/lg+,
+          hotter bulbs + stronger bloom (.led-cell-hot), full power. */}
       <LedValueCell
         code={quote.code}
         stat="cur"
@@ -323,8 +340,8 @@ const LedRow = memo(function LedRow({
         staggerMs={stagger}
         label={currentLabel}
         unitLabel={unitLabel}
-        size="text-[0.8rem] sm:text-[1.12rem] lg:text-[1.28rem]"
-        dim={false}
+        size="text-[0.8rem] sm:text-[1.35rem] lg:text-[1.6rem]"
+        emphasis="primary"
       />
 
       {/* Day high / day low — TGJU stats, secondary modules at 75% power. */}
@@ -336,8 +353,8 @@ const LedRow = memo(function LedRow({
         staggerMs={stagger}
         label={highLabel}
         unitLabel={unitLabel}
-        size="text-[0.72rem] sm:text-[1rem] lg:text-[1.14rem]"
-        dim
+        size="text-[0.72rem] sm:text-[1.14rem] lg:text-[1.38rem]"
+        emphasis="secondary"
       />
       <LedValueCell
         code={quote.code}
@@ -347,8 +364,8 @@ const LedRow = memo(function LedRow({
         staggerMs={stagger}
         label={lowLabel}
         unitLabel={unitLabel}
-        size="text-[0.72rem] sm:text-[1rem] lg:text-[1.14rem]"
-        dim
+        size="text-[0.72rem] sm:text-[1.14rem] lg:text-[1.38rem]"
+        emphasis="secondary"
       />
     </li>
   );
@@ -414,31 +431,39 @@ export function LedRateBoard() {
         </div>
       </header>
 
-      {/* Column headers — silkscreen labels on the housing, dot-matrix LED
-          fill at a tight pitch (Tailwind text colors stay as fallback):
-          currency · current · day high · day low. PHYSICAL right alignment
-          so the labels sit exactly over the digit modules in both LTR and
-          RTL. Long Persian high/low labels collapse to the short form
-          below sm so headers never dictate column width on phones. */}
-      <div className="grid grid-cols-[minmax(0,1fr)_auto_auto_auto] gap-x-[3px] px-1 pb-2 sm:gap-x-5 sm:ps-2.5 lg:gap-x-6">
-        <p className="led-label led-label-white-dim text-[0.6rem] font-bold uppercase tracking-[0.16em] text-white/35">
-          {t('liveRates.boardCurrency')}
-        </p>
-        <p className="led-label led-label-red whitespace-nowrap text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/80">
-          {currentLabel}
-        </p>
-        <p className="led-label led-label-red-dim whitespace-nowrap text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55">
-          <span className="sm:hidden">{t('liveRates.boardHighShort')}</span>
-          <span className="hidden sm:inline">{highLabel}</span>
-        </p>
-        <p className="led-label led-label-red-dim whitespace-nowrap text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55">
-          <span className="sm:hidden">{t('liveRates.boardLowShort')}</span>
-          <span className="hidden sm:inline">{lowLabel}</span>
-        </p>
-      </div>
+      {/* THE shared column grid — .led-table owns the single track
+          definition; header row, list and every row subgrid it
+          (index.css), locking each label above its own column of
+          numbers. Column headers are silkscreen labels on the housing,
+          dot-matrix LED fill at a tight pitch (Tailwind text colors stay
+          as fallback): currency · current · day high · day low. The
+          CURRENCY label pads its inline start like the name
+          cells; the three value labels pad their PHYSICAL right edge by
+          the module-well padding (4/9px) so each sits exactly over its
+          digits' right edge, and keep physical right alignment with the
+          value modules below in both LTR and RTL. Long Persian high/low
+          labels collapse to the short form below sm so headers never
+          dictate column width on phones. */}
+      <div className="led-table">
+        <div className="led-row pb-2.5">
+          <p className="led-label led-label-white-dim ps-1 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-white/35 sm:ps-2.5">
+            {t('liveRates.boardCurrency')}
+          </p>
+          <p className="led-label led-label-red whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/80 sm:pr-[9px]">
+            {currentLabel}
+          </p>
+          <p className="led-label led-label-red-dim whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55 sm:pr-[9px]">
+            <span className="sm:hidden">{t('liveRates.boardHighShort')}</span>
+            <span className="hidden sm:inline">{highLabel}</span>
+          </p>
+          <p className="led-label led-label-red-dim whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55 sm:pr-[9px]">
+            <span className="sm:hidden">{t('liveRates.boardLowShort')}</span>
+            <span className="hidden sm:inline">{lowLabel}</span>
+          </p>
+        </div>
 
-      {/* Currency rows. */}
-      <ul>
+        {/* Currency rows — each <li> subgrids the same tracks. */}
+        <ul className="led-table-body">
         {quotes
           ? quotes.map((quote, index) => (
               <LedRow
@@ -465,7 +490,8 @@ export function LedRateBoard() {
                 name={t(`currencies.${code}` as TranslationKey)}
               />
             ))}
-      </ul>
+        </ul>
+      </div>
 
       {/* Footnote — the honesty line: three REAL TGJU daily stats. */}
       <footer className="mt-3 border-t border-white/[0.06] pt-2.5">

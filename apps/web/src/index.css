@@ -546,6 +546,12 @@ body {
   --led-glow: 0 0 1px rgba(255, 30, 30, 0.55), 0 0 6px rgba(255, 30, 30, 0.4),
     0 0 15px rgba(255, 30, 30, 0.22);
 
+  /* Horizontal gap between the four board columns — ONE variable read by
+   * the table grid and every subgrid row (2026-09-27 grid rework). The
+   * tiers below grow it with the larger digits so columns keep their
+   * breathing room. */
+  --led-col-gap: 3px;
+
   background-color: #0d0d0d;
   /* Faint perforated-module grid: thin row/column lines behind the cells. */
   background-image:
@@ -562,6 +568,74 @@ body {
     inset 0 0 0 1px rgba(255, 255, 255, 0.04),
     inset 0 2px 18px rgba(0, 0, 0, 0.85),
     0 10px 34px rgba(0, 0, 0, 0.28);
+}
+
+/* Column-gap tiers — the sm/lg digit bumps (+20-25%) come with +17-20%
+ * proportional air; mobile keeps its tight budget (see .led-row notes). */
+@media (min-width: 640px) {
+  .led-board {
+    --led-col-gap: 20px;
+  }
+}
+@media (min-width: 1024px) {
+  .led-board {
+    --led-col-gap: 28px;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * THE shared column grid (2026-09-27 owner spec: one grid-template-
+ * columns definition for the header row AND every value row).
+ *
+ * .led-table owns the four tracks (name · current · high · low). The
+ * header row, the <ul> and every <li> opt in via CSS subgrid and span
+ * the full row (grid-column: 1 / -1), so every row resolves to the SAME
+ * track widths: an `auto` track sizes to the widest module in that
+ * column across ALL rows, and each header label stays locked directly
+ * above its own column of numbers at any digit size — no eyeballing
+ * positions per row. Value columns (headers and digits alike) align to
+ * the physical right edge inside the shared grid; digits stack cleanly
+ * under their labels regardless of digit count, in both LTR and RTL.
+ *
+ * Gaps: column-gap is set to the same --led-col-gap at EVERY subgrid
+ * level, so tracks can never disagree whether an engine honors a
+ * subgrid's own gap or takes the parent's.
+ *
+ * Browsers without subgrid keep per-row grids with the identical track
+ * definition (the previous approximate alignment) — pure progressive
+ * enhancement.
+ * ------------------------------------------------------------------ */
+
+.led-row {
+  display: grid;
+  /* Fallback track definition — overridden by subgrid when supported. */
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  column-gap: var(--led-col-gap, 3px);
+}
+
+@supports (grid-template-columns: subgrid) {
+  .led-table {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    column-gap: var(--led-col-gap, 3px);
+  }
+  /* Header row and the row list each span the full table width. */
+  .led-table > * {
+    grid-column: 1 / -1;
+  }
+  .led-table > .led-row,
+  .led-table-body {
+    display: grid;
+    grid-template-columns: subgrid;
+    column-gap: var(--led-col-gap, 3px);
+  }
+  /* Rows subgrid through the <ul> (nested subgrid: table → list → row),
+   * so the <ul> keeps its box and list semantics. */
+  .led-table-body > .led-row {
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+  }
 }
 
 /* Seven-segment font stack — every NUMBER on the board (rates, clock,
@@ -581,6 +655,12 @@ body {
  * INTO the panel rather than on top of it. The in-flow lit layer sizes
  * it; ghost/glow are stacked absolutely inside. */
 .led-cell {
+  /* Per-module brightness params — defaults are the "standard" module;
+   * .led-cell-hot (the CURRENT column) overrides them for full visual
+   * weight next to the secondary high/low modules. */
+  --led-lit-core: #ff3232;
+  --led-lit-solid: var(--led-red);
+
   position: relative;
   display: inline-block;
   padding: 2px 4px;
@@ -600,12 +680,35 @@ body {
   }
 }
 
+/* Primary module (the CURRENT column) — the number the window is
+ * actually selling (owner request 2026-09-27: brighter, more visual
+ * weight than high/low). Fatter bulbs (denser lit coverage), hotter
+ * bulb core, stronger bloom halo and a shallower well; the ghost layer
+ * and the no-background-clip fallback pick the same hotter values up
+ * through the CSS vars. Secondary high/low modules stay on the standard
+ * treatment at 75% power. */
+.led-cell-hot {
+  --led-dot-bulb: 1.18px;
+  --led-lit-core: #ff4a4a;
+  --led-lit-solid: #ff2e2e;
+  --led-glow: 0 0 1px rgba(255, 70, 70, 0.85), 0 0 8px rgba(255, 40, 40, 0.6),
+    0 0 22px rgba(255, 30, 30, 0.34);
+  background: rgba(0, 0, 0, 0.22);
+}
+
+/* Secondary modules (day high / day low): a SOFTER halo on top of the
+ * 75% power treatment — the bloom delta against .led-cell-hot is what
+ * makes the CURRENT column read as the bright primary. */
+.led-cell-soft {
+  --led-glow: 0 0 1px rgba(255, 30, 30, 0.35), 0 0 4px rgba(255, 30, 30, 0.22);
+}
+
 /* Fallback for engines without background-clip:text: plain glowing red
  * digits, no ghost/dot layers. */
 .led-lit {
   position: relative;
   white-space: nowrap;
-  color: var(--led-red);
+  color: var(--led-lit-solid, var(--led-red));
   text-shadow: var(--led-glow);
 }
 .led-ghost,
@@ -649,13 +752,14 @@ body {
     text-shadow: var(--led-glow);
   }
 
-  /* Lit layer — the value itself, filled with bright dot-matrix bulbs. */
+  /* Lit layer — the value itself, filled with bright dot-matrix bulbs
+   * (core color via --led-lit-core: hotter on .led-cell-hot modules). */
   .led-lit {
     color: transparent;
     text-shadow: none;
     background-image: radial-gradient(
       circle,
-      #ff3232 0 var(--led-dot-bulb),
+      var(--led-lit-core, #ff3232) 0 var(--led-dot-bulb),
       rgba(255, 50, 50, 0) calc(var(--led-dot-bulb) + var(--led-dot-gap))
     );
     background-size: var(--led-dot-pitch) var(--led-dot-pitch);
