@@ -22,7 +22,7 @@
  */
 
 import { CURRENCIES, getCurrency, SnapshotSchema } from '@currena/core';
-import type { Rate, Snapshot } from '@currena/core';
+import type { GoldId, GoldQuote, GoldUnit, Rate, Snapshot } from '@currena/core';
 import { z } from 'zod';
 import { fetchWithRetry, mapWithConcurrency } from './http';
 import type { FetchRetryOptions } from './http';
@@ -41,6 +41,31 @@ export const TGJU_PROFILE_CONCURRENCY = 4;
 export const TGJU_PROFILES: readonly { code: string; slug: string }[] = Object.freeze(
   CURRENCIES.filter((c) => c.tgjuProfile).map((c) => ({ code: c.code, slug: c.tgjuProfile as string })),
 );
+
+/**
+ * Gold & coin symbols (owner request 2026-09-27) — the 9 items the LED gold
+ * board shows, in DISPLAY order (global ounce first, then the Tehran
+ * market). Slugs verified against the live ajax.json payload AND the row
+ * links on https://www.tgju.org/ 2026-09-27: every `p`/`h`/`l` matched the
+ * site's own «طلا و سکه» table exactly.
+ *
+ * ⚠️ Units are TGJU's own display units, kept VERBATIM (no Rial→Toman
+ * normalization): the global ounce is USD (4,383.45 per troy ounce), the
+ * Tehran items are RIAL exactly as the Iranian gold market quotes them
+ * (core schemas.ts GoldQuoteSchema documents this decision — AGENTS.md §6
+ * governs FX `rates`, these are display commodities, never converted).
+ */
+export const TGJU_GOLD_SYMBOLS: readonly { id: GoldId; slug: string; unit: GoldUnit }[] = Object.freeze([
+  { id: 'gold-ounce', slug: 'ons', unit: 'USD' }, // انس طلا (global market — the row the owner linked: tgju.org/profile/ons)
+  { id: 'gold-18k', slug: 'geram18', unit: 'RIAL' }, // طلای 18 عیار
+  { id: 'gold-24k', slug: 'geram24', unit: 'RIAL' }, // طلای 24 عیار
+  { id: 'gold-used', slug: 'gold_mini_size', unit: 'RIAL' }, // طلای دست دوم (slug verified by exact p/h/l match)
+  { id: 'coin-emami', slug: 'sekee', unit: 'RIAL' }, // سکه امامی
+  { id: 'coin-bahar', slug: 'sekeb', unit: 'RIAL' }, // سکه بهار آزادی
+  { id: 'coin-half', slug: 'nim', unit: 'RIAL' }, // نیم سکه
+  { id: 'coin-quarter', slug: 'rob', unit: 'RIAL' }, // ربع سکه
+  { id: 'coin-gram', slug: 'gerami', unit: 'RIAL' }, // سکه گرمی
+]);
 
 export function tgjuProfilePageUrl(slug: string): string {
   return `${TGJU_PROFILE_BASE}${slug}`;
@@ -128,14 +153,89 @@ function tomanDayStats(
   return dayHigh === undefined && dayLow === undefined ? {} : { dayHigh, dayLow };
 }
 
+/* ------------------------------------------------------------------ *
+ * Gold & coins (owner request 2026-09-27 — the LED gold panel)
+ * ------------------------------------------------------------------ */
+
+/**
+ * Per-symbol gold view of the ajax payload. Parsed SEPARATELY from the FX
+ * record schema (which zod-strips d/dp anyway): a gold oddity must never
+ * shape (or break) the currency ladder's payload validation.
+ */
+const TgjuGoldEntrySchema = z.object({
+  p: z.string(),
+  h: z.string().optional(),
+  l: z.string().optional(),
+  /** Change percent vs previous close, NUMBER in the payload (0.05 = +0.05%). */
+  dp: z.number().optional(),
+});
+
+/** Day-stat pair in the quote's OWN unit (no Rial→Toman conversion here). */
+function goldDayStats(
+  entry: { h?: string; l?: string },
+  id: GoldId,
+): { dayHigh?: number; dayLow?: number } {
+  const dayHigh = parseOptionalStat(entry.h);
+  const dayLow = parseOptionalStat(entry.l);
+  if (dayHigh !== undefined && dayLow !== undefined && dayLow > dayHigh) {
+    console.warn(`[tgju] dropping inverted day stats for gold ${id} (low ${dayLow} > high ${dayHigh})`);
+    return {};
+  }
+  return dayHigh === undefined && dayLow === undefined ? {} : { dayHigh, dayLow };
+}
+
+/**
+ * Parse the gold/coin quotes off a RAW ajax.json payload (pure —
+ * fixture-testable). Per-item GRACEFUL degradation, a deliberate deviation
+ * from the FX ladder's fail-loud bar: the gold panel is decorative
+ * display-only data, so a missing/odd gold symbol is SKIPPED with a warn
+ * (the board shows dashes for that item) instead of poisoning the FX
+ * snapshot — garbage is still never rendered, and the warn keeps the
+ * upstream change observable.
+ */
+export function parseTgjuGold(payload: unknown): GoldQuote[] {
+  const current = (payload as { current?: unknown } | null | undefined)?.current;
+  if (current === null || typeof current !== 'object') return [];
+  const entries = current as Record<string, unknown>;
+
+  const quotes: GoldQuote[] = [];
+  for (const { id, slug, unit } of TGJU_GOLD_SYMBOLS) {
+    const entry = entries[slug];
+    if (entry === undefined) {
+      console.warn(`[tgju] gold symbol '${slug}' (${id}) missing from ajax.json — item shows dashes`);
+      continue;
+    }
+    const parsed = TgjuGoldEntrySchema.safeParse(entry);
+    if (!parsed.success) {
+      console.warn(`[tgju] gold symbol '${slug}' (${id}) has an unexpected shape — item shows dashes`);
+      continue;
+    }
+    try {
+      quotes.push({
+        id,
+        unit,
+        price: normalizeTgjuNumber(parsed.data.p),
+        ...goldDayStats(parsed.data, id),
+        ...(parsed.data.dp !== undefined && Number.isFinite(parsed.data.dp) ? { changePct: parsed.data.dp } : {}),
+      });
+    } catch (err) {
+      console.warn(`[tgju] gold symbol '${slug}' (${id}) price failed to parse — item shows dashes: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  return quotes;
+}
+
 /**
  * Build the IRR-base Snapshot from Rial quotes keyed by TGJU slug.
  * Day stats ride along on each rate entry, quote-side (Toman per unit).
+ * `gold` (the display-commodity panel) rides along when the caller has it —
+ * the profile-page fallback path simply omits it (board dashes).
  * zod-validates the result — a malformed build throws a typed error.
  */
 export function buildTgjuSnapshot(
   quotesBySlug: ReadonlyMap<string, TgjuRialQuote>,
   now: Date = new Date(),
+  gold?: readonly GoldQuote[],
 ): Snapshot {
   const irr = getCurrency('IRR');
   if (!irr) throw new ScraperError('tgju_internal', "Core currency table has no 'IRR' entry");
@@ -168,7 +268,13 @@ export function buildTgjuSnapshot(
     });
   }
 
-  return validateSnapshot({ base: 'IRR', source: 'tgju', fetchedAt: now.toISOString(), rates });
+  return validateSnapshot({
+    base: 'IRR',
+    source: 'tgju',
+    fetchedAt: now.toISOString(),
+    rates,
+    ...(gold !== undefined ? { gold: [...gold] } : {}),
+  });
 }
 
 /** Parse an ajax.json payload into a Snapshot (pure — fixture-testable). */
@@ -193,7 +299,9 @@ export function parseTgjuAjax(json: unknown, now: Date = new Date()): Snapshot {
       dayLow: parseOptionalStat(entry.l),
     });
   }
-  return buildTgjuSnapshot(quotesBySlug, now);
+  // Gold rides the SAME document (parsed off the raw payload so the FX
+  // record schema stays untouched by the extra d/dp fields).
+  return buildTgjuSnapshot(quotesBySlug, now, parseTgjuGold(json));
 }
 
 /** Value span on profile pages: `<span data-col="info.last_trade.PDrCotVal">2,305,000</span>` (Rial). */

@@ -638,6 +638,50 @@ body {
   }
 }
 
+/* ------------------------------------------------------------------ *
+ * GOLD & COINS table (2026-09-27) — the second LED panel. Same shared
+ * subgrid machinery as the currency board, a different track ladder: the
+ * coin values are 13-glyph DSEG7 runs ("2 319 850 000") — nearly twice
+ * the currency board's widest module — so below md the table carries ONE
+ * price column (CURRENT; the high/low cells are display:none) and md
+ * (768px) is the first width where three 13-glyph columns plus a real
+ * name track fit. These rules sit AFTER the subgrid @supports block so
+ * the gold parent tracks win the cascade over .led-table's 4-track
+ * definition; the no-subgrid fallback is wrapped in @supports not (…)
+ * so it can never override the subgrid opt-in above.
+ * ------------------------------------------------------------------ */
+.led-table-gold {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+@media (min-width: 768px) {
+  .led-table-gold {
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+  }
+}
+@supports not (grid-template-columns: subgrid) {
+  .led-table-gold .led-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  @media (min-width: 768px) {
+    .led-table-gold .led-row {
+      grid-template-columns: minmax(0, 1fr) auto auto auto;
+    }
+  }
+}
+
+/* Tehran-market silkscreen divider between the gold table's two lists —
+ * hairlines top and bottom, spanning all tracks (grid-column 1 / -1 via
+ * the .led-table > * rule; its intrinsic width stays far below the module
+ * columns, so it can never bloat the auto tracks). */
+.led-gold-divider {
+  display: flex;
+  align-items: center;
+  margin-top: 2px;
+  padding: 5px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
 /* Seven-segment font stack — every NUMBER on the board (rates, clock,
  * date). Latin digits only; Persian stays in Vazirmatn. Bold: chunkier
  * strokes sample the bulb pattern better. */

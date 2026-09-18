@@ -8,6 +8,7 @@ import {
   buildTgjuSnapshot,
   normalizeTgjuNumber,
   parseTgjuAjax,
+  parseTgjuGold,
   parseTgjuProfilePrice,
   parseTgjuProfileStats,
   rialToToman,
@@ -191,6 +192,116 @@ describe('parseTgjuAjax (fixture: real 2026-09-16 capture)', () => {
   it('throws a typed error when the payload shape changes', () => {
     expect(() => parseTgjuAjax({ current: 'nope' })).toThrowError(ScraperError);
     expect(() => parseTgjuAjax({})).toThrowError(ScraperError);
+  });
+});
+
+describe('parseTgjuGold / snapshot.gold (fixture: real 2026-09-27 capture)', () => {
+  it('GOLDEN: all 9 items, display order, TGJU-published values VERBATIM in their own units', () => {
+    const snapshot = parseTgjuAjax(ajaxFixture);
+    const gold = snapshot.gold;
+    expect(gold).toBeDefined();
+    expect(gold?.map((g) => g.id)).toEqual([
+      'gold-ounce', 'gold-18k', 'gold-24k', 'gold-used',
+      'coin-emami', 'coin-bahar', 'coin-half', 'coin-quarter', 'coin-gram',
+    ]);
+    // The ounce the owner linked (tgju.org/profile/ons): USD with 2 decimals.
+    const ounce = gold?.[0];
+    expect(ounce?.unit).toBe('USD');
+    expect(ounce?.price).toBe(4383.45);
+    expect(ounce?.dayHigh).toBe(4383.45);
+    expect(ounce?.dayLow).toBe(4377.04);
+    expect(ounce?.changePct).toBe(0.05);
+    // The Tehran market: Rial exactly as printed (NO /10 normalization).
+    const g18 = gold?.find((g) => g.id === 'gold-18k');
+    expect(g18?.unit).toBe('RIAL');
+    expect(g18?.price).toBe(233_630_000);
+    expect(g18?.dayHigh).toBe(234_995_000);
+    expect(g18?.dayLow).toBe(232_109_000);
+    expect(g18?.changePct).toBe(0);
+    // طلای دست دوم rides the odd-looking gold_mini_size slug (verified by exact p/h/l).
+    expect(gold?.find((g) => g.id === 'gold-used')?.price).toBe(230_515_180);
+    // سکه امامی = sekee, سکه بهار آزادی = sekeb (both ~2.3B Rial).
+    expect(gold?.find((g) => g.id === 'coin-emami')?.price).toBe(2_319_850_000);
+    expect(gold?.find((g) => g.id === 'coin-bahar')?.price).toBe(2_281_050_000);
+    expect(gold?.find((g) => g.id === 'coin-half')?.price).toBe(1_190_000_000);
+    expect(gold?.find((g) => g.id === 'coin-quarter')?.price).toBe(630_000_000);
+    expect(gold?.find((g) => g.id === 'coin-gram')?.price).toBe(330_000_000);
+  });
+
+  it('gold never leaks into the FX ladder: rates stay currency-only and untouched', () => {
+    const snapshot = parseTgjuAjax(ajaxFixture);
+    expect(getRate(snapshot, 'USD').rate).toBe(1 / 230_500);
+    expect(snapshot.rates.every((r) => /^[A-Z]{3}$/.test(r.code))).toBe(true);
+  });
+
+  it('a MISSING gold symbol degrades to an omitted item — never a failed FX scrape', () => {
+    const payload = JSON.parse(JSON.stringify(ajaxFixture)) as { current: Record<string, unknown> };
+    delete payload.current.sekeb;
+    const snapshot = parseTgjuAjax(payload);
+    expect(snapshot.gold?.some((g) => g.id === 'coin-bahar')).toBe(false);
+    expect(snapshot.gold?.length).toBe(8);
+    expect(getRate(snapshot, 'USD').rate).toBe(1 / 230_500);
+  });
+
+  it('a MALFORMED gold price is skipped with a warn — garbage is never rendered, FX survives', () => {
+    const payload = JSON.parse(JSON.stringify(ajaxFixture)) as { current: Record<string, unknown> };
+    (payload.current.geram18 as { p: string }).p = 'call me maybe';
+    const snapshot = parseTgjuAjax(payload);
+    expect(snapshot.gold?.some((g) => g.id === 'gold-18k')).toBe(false);
+    expect(getRate(snapshot, 'USD').rate).toBe(1 / 230_500);
+  });
+
+  it('an odd dp (string instead of number) skips the whole entry shape — FX still parses', () => {
+    const payload = JSON.parse(JSON.stringify(ajaxFixture)) as { current: Record<string, unknown> };
+    (payload.current.ons as { dp: unknown }).dp = '0.05';
+    const snapshot = parseTgjuAjax(payload);
+    expect(snapshot.gold?.some((g) => g.id === 'gold-ounce')).toBe(false);
+    expect(getRate(snapshot, 'USD').rate).toBe(1 / 230_500);
+  });
+
+  it('drops an inverted gold day (low > high) but keeps the price', () => {
+    const payload = JSON.parse(JSON.stringify(ajaxFixture)) as { current: Record<string, unknown> };
+    const g = payload.current.geram24 as { h?: string; l?: string };
+    const swap = g.h;
+    g.h = g.l;
+    g.l = swap;
+    const item = parseTgjuAjax(payload).gold?.find((x) => x.id === 'gold-24k');
+    expect(item?.price).toBe(311_504_000);
+    expect(item?.dayHigh).toBeUndefined();
+    expect(item?.dayLow).toBeUndefined();
+  });
+
+  it('blank/missing gold h/l → stats absent, price unaffected', () => {
+    const payload = JSON.parse(JSON.stringify(ajaxFixture)) as { current: Record<string, unknown> };
+    const g = payload.current.nim as { h?: string; l?: string };
+    g.h = '';
+    delete g.l;
+    const item = parseTgjuAjax(payload).gold?.find((x) => x.id === 'coin-half');
+    expect(item?.price).toBe(1_190_000_000);
+    expect(item?.dayHigh).toBeUndefined();
+    expect(item?.dayLow).toBeUndefined();
+  });
+
+  it('a legacy payload with NO gold symbols yields gold: [] (board shows dashes, snapshot valid)', () => {
+    const payload = JSON.parse(JSON.stringify(ajaxFixture)) as { current: Record<string, unknown> };
+    for (const slug of ['ons', 'geram18', 'geram24', 'gold_mini_size', 'sekee', 'sekeb', 'nim', 'rob', 'gerami']) {
+      delete payload.current[slug];
+    }
+    const snapshot = parseTgjuAjax(payload);
+    expect(snapshot.gold).toEqual([]);
+    expect(getRate(snapshot, 'USD').rate).toBe(1 / 230_500);
+  });
+
+  it('parseTgjuGold on garbage input → [] (no throw)', () => {
+    expect(parseTgjuGold(null)).toEqual([]);
+    expect(parseTgjuGold({})).toEqual([]);
+    expect(parseTgjuGold({ current: 'nope' })).toEqual([]);
+  });
+
+  it('buildTgjuSnapshot without gold → the key is ABSENT (profile-page fallback path)', () => {
+    const quotes = new Map<string, TgjuRialQuote>(TGJU_PROFILES.map(({ slug }) => [slug, { p: 2_305_000 }]));
+    const snapshot = buildTgjuSnapshot(quotes, new Date('2026-09-27T01:00:00Z'));
+    expect('gold' in snapshot).toBe(false);
   });
 });
 

@@ -146,6 +146,21 @@ export const en = {
     VND: 'Vietnamese Dong',
   },
 
+  /* Gold & coins LED panel (2026-09-27) — TGJU's طلا و سکه market items,
+   * quoted in TGJU's own display units (global ounce in USD, Tehran market
+   * in Rial). Keys mirror core's GoldId enum exactly. */
+  gold: {
+    'gold-ounce': 'Gold Ounce',
+    'gold-18k': '18K Gold',
+    'gold-24k': '24K Gold',
+    'gold-used': 'Used Gold',
+    'coin-emami': 'Emami Coin',
+    'coin-bahar': 'Bahar Azadi',
+    'coin-half': 'Half Coin',
+    'coin-quarter': 'Quarter Coin',
+    'coin-gram': 'Gram Coin',
+  },
+
   liveRates: {
     title: 'Live Rates',
     iranianTomanRates: 'Iranian Toman Rates',
@@ -174,6 +189,17 @@ export const en = {
     boardOffline: 'OFFLINE',
     /** Per-board footnote: the three columns are TGJU's own daily stats. */
     boardFootnote: 'Current · day high · day low — TGJU open market, Toman',
+    /* Gold & coins panel (2026-09-27) — the second LED box: the global
+     * ounce in USD plus the Tehran gold market in Rial, TGJU's own quotes. */
+    goldAriaLabel: 'Gold and coins board — global ounce in USD, Tehran market in Rial',
+    goldBoardTitle: 'Gold & Coins',
+    /** Silkscreen column label over the item names (like CURRENCY). */
+    goldItem: 'Item',
+    /** Divider label marking the Tehran market section + its unit. */
+    goldDomestic: 'Tehran Market · Rial',
+    goldUnitUsd: 'USD',
+    goldUnitRial: 'Rial',
+    goldFootnote: 'Global ounce in USD, Tehran market in Rial — TGJU real quotes: current · day high · day low · change %',
     detailsSection: 'Details & trends',
   },
 

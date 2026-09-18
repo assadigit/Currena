@@ -4,6 +4,7 @@ import {
   CACHE_HARD_TTL_SEC,
   FRESH_TTL_SEC,
   MIN_SCRAPE_INTERVAL_SEC,
+  GoldQuoteSchema,
   RateSchema,
   RatesErrorSchema,
   RatesResponseSchema,
@@ -109,6 +110,62 @@ describe('SnapshotSchema', () => {
         rates: [...validSnapshot.rates, { code: 'gbp', name: 'British Pound', rate: 0.79 }],
       }).success,
     ).toBe(false);
+  });
+
+  it('accepts an optional gold array (TGJU display commodities) and keeps it absent-friendly', () => {
+    const gold = [
+      { id: 'gold-ounce', unit: 'USD', price: 4383.45, dayHigh: 4383.45, dayLow: 4377.04, changePct: 0.05 },
+      { id: 'gold-18k', unit: 'RIAL', price: 233630000, dayHigh: 234995000, dayLow: 232109000, changePct: 0 },
+      { id: 'coin-emami', unit: 'RIAL', price: 2319850000 },
+    ];
+    const withGold = SnapshotSchema.safeParse({ ...validSnapshot, gold });
+    expect(withGold.success).toBe(true);
+    // Legacy snapshots (pre-gold KV entries) stay valid: gold is optional.
+    expect(SnapshotSchema.safeParse(validSnapshot).success).toBe(true);
+    // Any invalid gold item poisons the snapshot (loud, never garbage).
+    expect(SnapshotSchema.safeParse({ ...validSnapshot, gold: [...gold, { id: 'gold-18k', unit: 'EUR', price: 1 }] }).success).toBe(false);
+    expect(SnapshotSchema.safeParse({ ...validSnapshot, gold: [{ id: 'gold-18k', unit: 'RIAL', price: -1 }] }).success).toBe(false);
+  });
+});
+
+describe('GoldQuoteSchema', () => {
+  it('accepts the real live shapes: USD ounce with decimals, Rial items with 0% change', () => {
+    const ounce = GoldQuoteSchema.safeParse({
+      id: 'gold-ounce',
+      unit: 'USD',
+      price: 4383.45,
+      dayHigh: 4383.45,
+      dayLow: 4377.04,
+      changePct: 0.05,
+    });
+    expect(ounce.success).toBe(true);
+    const gram18 = GoldQuoteSchema.safeParse({
+      id: 'gold-18k',
+      unit: 'RIAL',
+      price: 233630000,
+      dayHigh: 234995000,
+      dayLow: 232109000,
+      changePct: 0,
+    });
+    expect(gram18.success).toBe(true);
+  });
+
+  it('allows a NEGATIVE changePct (market down) but non-finite garbage is rejected', () => {
+    expect(GoldQuoteSchema.safeParse({ id: 'coin-bahar', unit: 'RIAL', price: 2281050000, changePct: -0.42 }).success).toBe(true);
+    expect(GoldQuoteSchema.safeParse({ id: 'coin-bahar', unit: 'RIAL', price: 2281050000, changePct: Number.NaN }).success).toBe(false);
+  });
+
+  it('rejects unknown item ids and unknown units', () => {
+    expect(GoldQuoteSchema.safeParse({ id: 'gold-999k', unit: 'RIAL', price: 1 }).success).toBe(false);
+    expect(GoldQuoteSchema.safeParse({ id: 'gold-18k', unit: 'TOMAN', price: 1 }).success).toBe(false);
+  });
+
+  it('rejects negative / zero / non-finite prices and day stats', () => {
+    for (const price of [-1, 0, Number.POSITIVE_INFINITY, Number.NaN]) {
+      expect(GoldQuoteSchema.safeParse({ id: 'coin-gram', unit: 'RIAL', price }).success).toBe(false);
+    }
+    expect(GoldQuoteSchema.safeParse({ id: 'coin-gram', unit: 'RIAL', price: 1, dayHigh: -5 }).success).toBe(false);
+    expect(GoldQuoteSchema.safeParse({ id: 'coin-gram', unit: 'RIAL', price: 1, dayLow: 0 }).success).toBe(false);
   });
 });
 

@@ -107,6 +107,63 @@ export const RateSchema = z
   });
 export type Rate = z.infer<typeof RateSchema>;
 
+/* ------------------------------------------------------------------ *
+ * Gold & coins (TGJU display commodities, 2026-09-27)
+ * ------------------------------------------------------------------ */
+
+/**
+ * The gold & coin items the LED gold board shows — TGJU's own published
+ * quotes, EXACTLY as TGJU prints them (owner request 2026-09-27: "show this
+ * data"). NOT currencies: they never enter `rates`, never feed convert() —
+ * they are display-only commodities riding the tgju snapshot.
+ *
+ * ids are semantic (the TGJU ajax slug mapping lives in the scraper).
+ */
+export const GoldIdSchema = z.enum([
+  'gold-ounce', // انس طلا — global troy ounce, ajax `ons`, USD
+  'gold-18k', // طلای ۱۸ عیار — ajax `geram18`
+  'gold-24k', // طلای ۲۴ عیار — ajax `geram24`
+  'gold-used', // طلای دست دوم — ajax `gold_mini_size`
+  'coin-emami', // سکه امامی — ajax `sekee`
+  'coin-bahar', // سکه بهار آزادی — ajax `sekeb`
+  'coin-half', // نیم سکه — ajax `nim`
+  'coin-quarter', // ربع سکه — ajax `rob`
+  'coin-gram', // سکه گرمی — ajax `gerami`
+]);
+export type GoldId = z.infer<typeof GoldIdSchema>;
+
+/**
+ * Unit a gold quote is DENOMINATED in — TGJU's own display unit, kept
+ * verbatim on purpose (NO Rial→Toman normalization here):
+ *   - 'USD'  : the global ounce (انس طلا), e.g. 4,383.45 per troy ounce;
+ *   - 'RIAL' : the Tehran market items (gold grams / coins) — the Iranian
+ *     gold market quotes in Rial exactly as TGJU prints them (e.g.
+ *     طلای ۱۸ عیار = 233,630,000). The currency side of the app stays
+ *     TOMAN-canonical (AGENTS.md §6 applies to FX `rates`, not to these
+ *     display commodities); the UI labels both units explicitly.
+ */
+export const GoldUnitSchema = z.enum(['USD', 'RIAL']);
+export type GoldUnit = z.infer<typeof GoldUnitSchema>;
+
+/** One gold/coin quote — TGJU's published value, in its native unit. */
+export const GoldQuoteSchema = z.object({
+  id: GoldIdSchema,
+  unit: GoldUnitSchema,
+  /** Current price (TGJU «نرخ فعلی», ajax `p`) in the quote's unit. */
+  price: z.number().positive().finite(),
+  /** Day high («بالاترین قیمت روز», ajax `h`) — same unit; dashes if absent. */
+  dayHigh: z.number().positive().finite().optional(),
+  /** Day low («پایین ترین قیمت روز», ajax `l`) — same unit; dashes if absent. */
+  dayLow: z.number().positive().finite().optional(),
+  /**
+   * Change vs previous close (TGJU ajax `dp`) in PERCENT, e.g. 0.05 = +0.05%.
+   * May be negative (market down) or 0 (closed market). Absent → the board
+   * shows a dash, never a guess.
+   */
+  changePct: z.number().finite().optional(),
+});
+export type GoldQuote = z.infer<typeof GoldQuoteSchema>;
+
 /**
  * A coherent set of quotes fetched from ONE source at ONE point in time.
  * Never mix sources within a snapshot (AGENTS.md rule 8).
@@ -120,6 +177,13 @@ export const SnapshotSchema = z.object({
   fetchedAt: z.iso.datetime(),
   /** At least one quoted rate. */
   rates: z.array(RateSchema).min(1),
+  /**
+   * Gold & coin quotes (tgju snapshots only) — display commodities in
+   * TGJU's native units; absent on legacy snapshots (pre-2026-09-27 KV
+   * entries, Frankfurter snapshots, the profile-page fallback path) and
+   * the UI degrades to dashes, never guesses.
+   */
+  gold: z.array(GoldQuoteSchema).optional(),
   /** Optional hard-expiry timestamp (cache eviction hint). */
   expiresAt: z.iso.datetime().optional(),
 });

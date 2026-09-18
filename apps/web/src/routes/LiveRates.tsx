@@ -26,6 +26,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { convert, formatDate, formatNumber } from '@currena/core';
 import type { CurrencyCode } from '@currena/core';
 import { BOARD, LedRateBoard } from '../components/LedRateBoard';
+import { LedGoldBoard } from '../components/LedGoldBoard';
 import { RateDeltaChip } from '../components/RateDeltaChip';
 import { Skeleton } from '../components/ui';
 import { Sparkline } from '../components/Sparkline';
@@ -349,8 +350,16 @@ export function LiveRates() {
             seven-segment digits, live clock, one row per currency
             (flag · name · current · day high · day low — TGJU's real
             daily stats) with a glow-pulse on every update. */}
-        <div className="mb-8">
+        <div className="mb-6">
           <LedRateBoard />
+        </div>
+
+        {/* The second LED box — GOLD & COINS: the global ounce (USD) plus
+            the Tehran gold market (Rial), TGJU's own published quotes
+            (current / day high / day low / change %). Same physical panel
+            language as the currency board. */}
+        <div className="mb-8">
+          <LedGoldBoard />
         </div>
 
         {/* Banners */}
