@@ -17,7 +17,7 @@
  *   - Tests run against fixtures in ./fixtures — never live sites (rule 7).
  */
 
-export const SCRAPER_VERSION = '0.2.0';
+export const SCRAPER_VERSION = '0.1.0'; // matches package.json — keep in sync
 
 export { ScraperError, errorToCodeMessage } from './errors';
 

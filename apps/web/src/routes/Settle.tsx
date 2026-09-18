@@ -59,6 +59,26 @@ interface SettleGroup {
   createdAt: string;
 }
 
+/**
+ * The group's dominant expense currency. Settlement records are denominated
+ * in it instead of a hardcoded 'IRR' — a USD-ledger group used to label its
+ * settlement transfers "IRR (Toman)" (balances themselves are single-ledger
+ * legacy parity; this only fixes the record's currency label).
+ */
+function groupCurrency(group: SettleGroup): CurrencyCode {
+  const counts = new Map<CurrencyCode, number>();
+  for (const e of group.expenses) counts.set(e.currency, (counts.get(e.currency) ?? 0) + 1);
+  let best: CurrencyCode = 'IRR';
+  let bestCount = -1;
+  for (const [code, count] of counts) {
+    if (count > bestCount) {
+      best = code;
+      bestCount = count;
+    }
+  }
+  return best;
+}
+
 /** The 8 expense currencies the legacy offered (captured markup order). */
 const EXPENSE_CURRENCIES: readonly CurrencyCode[] = [
   'IRR', 'USD', 'EUR', 'AED', 'TRY', 'GBP', 'AUD', 'CAD',
@@ -366,7 +386,7 @@ export function Settle() {
         id: String(uniqueId()),
         description: t('splitSettle.settlementLabel', { from: transfer.from, to: transfer.to }),
         amount: transfer.amount,
-        currency: 'IRR' as CurrencyCode,
+        currency: groupCurrency(openGroup),
         paidBy: transfer.from,
         splitBetween: [transfer.to],
         date: new Date().toISOString(),

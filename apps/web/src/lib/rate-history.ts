@@ -15,7 +15,7 @@
  *
  * Numbers stay raw doubles; timestamps stay ISO strings. The history is
  * append-only via `recordGeneration` (called from the snapshot store when a
- * new distinct generation arrives) and read via `readHistory` /
+ * new distinct generation arrives) and read via
  * `useRateHistory` (useSyncExternalStore over a tiny emitter).
  */
 
@@ -124,9 +124,6 @@ export function recordGeneration(source: SnapshotSource, snapshot: Snapshot): vo
 }
 
 /** Current rolling window for a source (oldest → newest). */
-export function readHistory(source: SnapshotSource): RateGeneration[] {
-  return windowFor(source).slice();
-}
 
 /**
  * The rate for `from → to` at each recorded generation, via the same core
