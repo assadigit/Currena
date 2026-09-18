@@ -189,7 +189,7 @@ describe('toCsv — display-consistent totals + formula-injection guard', () => 
       ],
       { from: 'USD', to: 'EUR', rate: 1 },
     );
-    expect(csv).toContain('0.01,0.01,""');
+    expect(csv).toContain('0.01,0.01,\n');
     expect(csv).toContain('Total,0.02,0.02,'); // matches the displayed rows
   });
 
