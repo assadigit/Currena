@@ -1,25 +1,29 @@
 /**
  * LedRateBoard — the shopfront LED rate board (2026-09-18; columns reworked
- * 2026-09-26 to TGJU's real daily stats).
+ * 2026-09-26 to TGJU's real daily stats; rebuilt 2026-09-26 as a physical
+ * dot-matrix panel).
  *
  * Recreates the physical experience of walking past a currency-exchange
- * shopfront: a near-black housing (#0d0d0d) with a live time/date header
- * and one row per currency — flag, name, and THREE quote-side values in
- * Toman — rendered as red seven-segment digits (DSEG7 Classic, OFL-1.1)
- * with a soft glow bloom. When a value updates, that digit briefly
- * intensifies its glow (~260ms, staggered per row) so the change reads as
- * an electronic refresh, the way real tickers signal "this value just
- * changed" — NOT an instant swap.
+ * shopfront — built as real hardware layers, not a flat graphic:
+ *
+ *   Housing  — near-black body (#0d0d0d) with a raised outer bevel and a
+ *              faint perforated-module grid (index.css .led-board).
+ *   Modules  — every value sits in a recessed dark well (inset shadow,
+ *              .led-cell) so the digits sit INTO the panel.
+ *   Digits   — real seven-segment glyphs (DSEG7 Bold) painted as THREE
+ *              stacked layers per module (see LedDigits): a ghost "8888…"
+ *              of dim unlit bulbs behind the value, a bloom-halo layer,
+ *              and the lit value filled with bright dot-matrix bulbs.
+ *   Labels   — headers, currency codes and the wordmark reuse the same
+ *              bulb fill at a tighter pitch (.led-label).
  *
  * The three columns are TGJU's OWN published daily statistics — the same
  * «مقادیر» table the profile pages show:
  *   1. نرخ فعلی — current open-market price (ajax.json `p`)
  *   2. بالاترین قیمت روز — day high (ajax.json `h`)
  *   3. پایین ترین قیمت روز — day low (ajax.json `l`)
- * Real data, not a derived dealer spread (the earlier ±0.25% sell/buy
- * estimate was retired: it was decorative, not information). Values ride
- * on each snapshot rate entry as `dayHigh`/`dayLow` (quote-side Toman,
- * see packages/core schemas.ts); unavailable stats render as dashes.
+ * Real data, never a derived spread; stats ride the snapshot rate entries
+ * (core schemas.ts) and render as dashes when unavailable.
  *
  * Layout rules (owner spec):
  *   - Row cells in fixed order: flag · currency name · current · high · low.
@@ -27,19 +31,17 @@
  *     padding-inline-start (names are Persian; the row must stay RTL-safe).
  *   - The three value cells keep PHYSICAL right alignment (digits are LTR
  *     runs — a stable numeric column edge in both directions).
- *   - Every number — values, clock, date — is DSEG7; all other text stays
- *     in the site font (Vazirmatn renders the Persian names).
  *
  * A11y (WCAG 2.3.1 photosensitivity): the update-flash fires ONCE per
- * value change (changes arrive at most once per refresh window), lasts
- * 260ms and carries a 0–210ms per-row stagger, so the board never flashes
- * in sync and stays far below the 3-flashes/second threshold. The clock
- * colon dims at 0.5Hz with 0.45–1.0 amplitude (soft dim, never a hard
- * blink). Everything motion-based is disabled under prefers-reduced-motion
- * (see index.css).
+ * value change (a 260ms brightness surge of the whole module), rows carry
+ * a 0–210ms stagger, so the board never flashes in sync and stays far
+ * below 3 flashes/second. The clock colon dims at 0.5Hz with 0.45–1.0
+ * amplitude. Everything motion-based is disabled under
+ * prefers-reduced-motion (index.css). LED glyph layers are aria-hidden;
+ * comma-grouped labels expose the values to screen readers.
  */
 
-import { memo, useEffect, useMemo, useState } from 'react';
+import { Fragment, memo, useEffect, useMemo, useState } from 'react';
 import { convert } from '@currena/core';
 import type { CurrencyCode, Snapshot } from '@currena/core';
 import { useI18n } from '../lib/locale';
@@ -118,20 +120,76 @@ function formatLedDate(date: Date, locale: 'en' | 'fa'): string {
   return `${date.getFullYear()}.${pad2(date.getMonth() + 1)}.${pad2(date.getDate())}`;
 }
 
+/* ----------------------------- digits ------------------------------- */
+
+/**
+ * One physical LED module: a recessed well (.led-cell) carrying three
+ * stacked layers — ghost, glow, lit (index.css).
+ *
+ *   ghost — the FULL unlit seven-segment shape: every digit position is
+ *           replaced by '8' (all segments on) and painted in dim bulbs,
+ *           so "off" segments stay faintly visible behind the value.
+ *   glow  — the value in transparent fill + text-shadow only: the bloom
+ *           halo, which bleeds slightly into neighboring ghost segments
+ *           like real light bleed.
+ *   lit   — the value itself, filled with bright dot-matrix bulbs.
+ *
+ * All layers share identical font metrics, so the absolute stacking is
+ * pixel-perfect. `value` must be a pure ASCII run (digits, spaces, ':',
+ * '.', '-'); the parent supplies the accessible label (role="img").
+ */
+function LedDigits({
+  value,
+  className = '',
+  flash = false,
+  idle = false,
+  staggerMs = 0,
+}: {
+  value: string;
+  className?: string;
+  /** Replay the 260ms module-brightness surge (value just changed). */
+  flash?: boolean;
+  /** Boot state: module at half power. */
+  idle?: boolean;
+  /** Per-row stagger for the flash (WCAG 2.3.1). */
+  staggerMs?: number;
+}) {
+  const ghost = value.replace(/[0-9]/g, '8');
+  return (
+    <span
+      className={`led-cell ${flash ? 'led-flash' : ''} ${idle ? 'led-idle' : ''} ${className}`}
+      style={flash && staggerMs > 0 ? { animationDelay: `${staggerMs}ms` } : undefined}
+      dir="ltr"
+    >
+      <span className="led-digits led-ghost" aria-hidden="true">
+        {ghost}
+      </span>
+      <span className="led-digits led-glow" aria-hidden="true">
+        {value}
+      </span>
+      <span className="led-digits led-lit" aria-hidden="true">
+        {value}
+      </span>
+    </span>
+  );
+}
+
 /* ------------------------------ clock ------------------------------- */
 
-/** Ticking board clock: HH:MM:SS, colons dim once per second. */
+/** Ticking board clock: HH:MM:SS as three recessed digit modules with
+ *  softly dimming colons (the DSEG7 colon glyph is two segment dots). */
 function LedClock({ now }: { now: Date }) {
-  const h = pad2(now.getHours());
-  const m = pad2(now.getMinutes());
-  const s = pad2(now.getSeconds());
+  const groups = [pad2(now.getHours()), pad2(now.getMinutes()), pad2(now.getSeconds())];
   return (
-    <span className="led-digits text-base sm:text-xl" dir="ltr" aria-hidden="true">
-      {h}
-      <span className="led-colon">:</span>
-      {m}
-      <span className="led-colon">:</span>
-      {s}
+    <span className="flex items-center gap-[3px] sm:gap-1.5" dir="ltr" aria-hidden="true">
+      {groups.map((group, i) => (
+        <Fragment key={i}>
+          {i > 0 ? (
+            <span className="led-digits led-colon text-base sm:text-xl">:</span>
+          ) : null}
+          <LedDigits value={group} className="text-base sm:text-xl" />
+        </Fragment>
+      ))}
     </span>
   );
 }
@@ -172,18 +230,18 @@ interface LedRowProps {
   name: string;
 }
 
-/** One LED value cell — physically right-aligned seven-segment run.
- *  `key` carries the formatted value: a change remounts the span, which
- *  replays the 260ms glow pulse (staggered by row) — the electronic-
- *  refresh flash. The LED glyph span is hidden from AT and replaced by a
- *  comma-grouped aria-label so screen readers hear "2,279,000 Toman",
- *  not space-split digit runs. */
+/** One LED value cell — a recessed module + its accessible label. The
+ *  `key` on LedDigits carries the formatted value: a change remounts the
+ *  module, replaying the 260ms brightness surge (staggered by row) — the
+ *  electronic-refresh flash. LED glyph layers are hidden from AT and
+ *  replaced by a comma-grouped aria-label so screen readers hear
+ *  "2,279,000 Toman", not space-split digit runs. */
 function LedValueCell({
   code,
   stat,
   value,
   ok,
-  stagger,
+  staggerMs,
   label,
   unitLabel,
   size,
@@ -193,7 +251,7 @@ function LedValueCell({
   stat: 'cur' | 'high' | 'low';
   value: number;
   ok: boolean;
-  stagger: string;
+  staggerMs: number;
   label: string;
   unitLabel: string;
   size: string;
@@ -206,15 +264,14 @@ function LedValueCell({
         role="img"
         aria-label={`${label} ${ok && Number.isFinite(value) ? `${text.replace(/ /g, ',')} ${unitLabel}` : '—'}`}
       >
-        <span
+        <LedDigits
           key={`${code}-${stat}-${text}`}
-          className={`led-digits led-flash whitespace-nowrap ${size} ${ok && Number.isFinite(value) ? '' : 'led-idle'} ${dim ? 'opacity-75' : ''}`}
-          style={{ animationDelay: stagger }}
-          dir="ltr"
-          aria-hidden="true"
-        >
-          {text}
-        </span>
+          value={text}
+          flash={ok}
+          idle={!ok}
+          staggerMs={staggerMs}
+          className={`${size} ${dim ? 'opacity-75' : ''}`}
+        />
       </span>
     </div>
   );
@@ -222,7 +279,7 @@ function LedValueCell({
 
 /** One board row — flag · name · current · high · low (fixed order, logical
  *  flow so RTL mirrors the reading order naturally). Memoized: the clock
- *  ticks every second and must not re-render (nor re-flash) the value spans. */
+ *  ticks every second and must not re-render (nor re-flash) the modules. */
 const LedRow = memo(function LedRow({
   quote,
   index,
@@ -232,13 +289,13 @@ const LedRow = memo(function LedRow({
   unitLabel,
   name,
 }: LedRowProps) {
-  const stagger = `${index * FLASH_STAGGER_MS}ms`;
+  const stagger = index * FLASH_STAGGER_MS;
   return (
-    <li className="grid grid-cols-[minmax(0,1fr)_auto_auto_auto] items-center gap-x-1 border-b border-white/[0.04] py-2.5 last:border-b-0 sm:gap-x-5 sm:py-3 lg:gap-x-6">
+    <li className="grid grid-cols-[minmax(0,1fr)_auto_auto_auto] items-center gap-x-[3px] border-b border-white/[0.04] py-2.5 last:border-b-0 sm:gap-x-5 sm:py-3 lg:gap-x-6">
       {/* Leading cell: flag + name, aligned via padding-inline-start so the
           Persian names (RTL) keep the row's leading edge in both directions.
-          Mobile: compact flag + tighter gaps so DSEG7's ~0.75em glyphs leave
-          the name real room (DSEG7 has no narrow glyphs — see DSEG metrics). */}
+          Mobile: compact flag + tighter gaps so the wide DSEG7 glyphs and
+          the recessed module wells still leave the name real room. */}
       <div className="flex min-w-0 items-center gap-2 ps-1 sm:gap-2.5 sm:ps-2.5">
         <img
           src={`/images/flags/${quote.code.toLowerCase()}.png`}
@@ -247,32 +304,36 @@ const LedRow = memo(function LedRow({
         />
         <div className="min-w-0 leading-tight">
           <p className="truncate text-[0.75rem] font-semibold text-white/90 sm:text-[0.92rem]">{name}</p>
-          <p className="text-[0.55rem] font-bold uppercase tracking-[0.18em] text-[#ff1e1e]/60 sm:text-[0.58rem]" dir="ltr">
+          {/* Currency code — a dot-matrix LED label (tight pitch). */}
+          <p
+            className="led-label led-label-red-dim text-[0.55rem] font-bold uppercase tracking-[0.18em] text-[#ff1e1e]/60 sm:text-[0.58rem]"
+            dir="ltr"
+          >
             {quote.code}
           </p>
         </div>
       </div>
 
-      {/* Current — the primary module: full glow, slightly larger. */}
+      {/* Current — the primary module: full-power bulbs, slightly larger. */}
       <LedValueCell
         code={quote.code}
         stat="cur"
         value={quote.current}
         ok={quote.ok}
-        stagger={stagger}
+        staggerMs={stagger}
         label={currentLabel}
         unitLabel={unitLabel}
         size="text-[0.8rem] sm:text-[1.12rem] lg:text-[1.28rem]"
         dim={false}
       />
 
-      {/* Day high / day low — TGJU stats, secondary modules at ~75% glow. */}
+      {/* Day high / day low — TGJU stats, secondary modules at 75% power. */}
       <LedValueCell
         code={quote.code}
         stat="high"
         value={quote.high}
         ok={quote.ok}
-        stagger={stagger}
+        staggerMs={stagger}
         label={highLabel}
         unitLabel={unitLabel}
         size="text-[0.72rem] sm:text-[1rem] lg:text-[1.14rem]"
@@ -283,7 +344,7 @@ const LedRow = memo(function LedRow({
         stat="low"
         value={quote.low}
         ok={quote.ok}
-        stagger={stagger}
+        staggerMs={stagger}
         label={lowLabel}
         unitLabel={unitLabel}
         size="text-[0.72rem] sm:text-[1rem] lg:text-[1.14rem]"
@@ -327,15 +388,17 @@ export function LedRateBoard() {
       role="region"
       aria-label={t('liveRates.boardAriaLabel')}
     >
-      {/* Header strip — live time + date in the same seven-segment red,
-          plus the board's status LED. */}
+      {/* Header strip — live clock (three recessed modules) + date module,
+          plus the board's status LED and dot-matrix wordmark. */}
       <header className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-[#ff1e1e]/15 pb-3">
         <LedClock now={now} />
-        <span className="led-digits text-[0.8rem] sm:text-[0.95rem]" dir="ltr" aria-hidden="true">
-          {formatLedDate(now, locale)}
-        </span>
+        <LedDigits value={formatLedDate(now, locale)} className="text-[0.8rem] sm:text-[0.95rem]" />
         <div className="flex items-center gap-3">
-          <span className="text-[0.6rem] font-extrabold uppercase tracking-[0.3em] text-[#ff1e1e]/55" dir="ltr">
+          {/* Wordmark — a tight-pitch white dot-matrix label. */}
+          <span
+            className="led-label led-label-white-dim text-[0.6rem] font-extrabold uppercase tracking-[0.3em] text-[#ff1e1e]/55"
+            dir="ltr"
+          >
             CURRENA
           </span>
           <LedStatus
@@ -351,23 +414,24 @@ export function LedRateBoard() {
         </div>
       </header>
 
-      {/* Column headers — silkscreen labels on the housing (site font, not
-          LED): currency · current · day high · day low. PHYSICAL right
-          alignment so the labels sit exactly over the digit columns in both
-          LTR and RTL. Long Persian high/low labels collapse to the short
-          form below sm so the header never dictates column width on phones. */}
-      <div className="grid grid-cols-[minmax(0,1fr)_auto_auto_auto] gap-x-1 px-1 pb-2 sm:gap-x-5 sm:ps-2.5 lg:gap-x-6">
-        <p className="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-white/35">
+      {/* Column headers — silkscreen labels on the housing, dot-matrix LED
+          fill at a tight pitch (Tailwind text colors stay as fallback):
+          currency · current · day high · day low. PHYSICAL right alignment
+          so the labels sit exactly over the digit modules in both LTR and
+          RTL. Long Persian high/low labels collapse to the short form
+          below sm so headers never dictate column width on phones. */}
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_auto_auto] gap-x-[3px] px-1 pb-2 sm:gap-x-5 sm:ps-2.5 lg:gap-x-6">
+        <p className="led-label led-label-white-dim text-[0.6rem] font-bold uppercase tracking-[0.16em] text-white/35">
           {t('liveRates.boardCurrency')}
         </p>
-        <p className="whitespace-nowrap text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/80">
+        <p className="led-label led-label-red whitespace-nowrap text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/80">
           {currentLabel}
         </p>
-        <p className="whitespace-nowrap text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55">
+        <p className="led-label led-label-red-dim whitespace-nowrap text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55">
           <span className="sm:hidden">{t('liveRates.boardHighShort')}</span>
           <span className="hidden sm:inline">{highLabel}</span>
         </p>
-        <p className="whitespace-nowrap text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55">
+        <p className="led-label led-label-red-dim whitespace-nowrap text-right text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#ff1e1e]/55">
           <span className="sm:hidden">{t('liveRates.boardLowShort')}</span>
           <span className="hidden sm:inline">{lowLabel}</span>
         </p>
@@ -388,7 +452,7 @@ export function LedRateBoard() {
                 name={t(`currencies.${quote.code}` as TranslationKey)}
               />
             ))
-          : // No snapshot yet: boot rows of dashes, like a powering-on module.
+          : // No snapshot yet: boot rows of dashes, like powering-on modules.
             BOARD.map((code, index) => (
               <LedRow
                 key={code}

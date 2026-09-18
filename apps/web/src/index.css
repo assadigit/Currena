@@ -509,40 +509,192 @@ body {
   font-display: swap;
 }
 
-/* The LED signboard housing — near-black, with an inset bezel so it reads
- * as physical hardware mounted in a window, not a dark card. */
+/* =====================================================================
+ * LED signboard — physical panel system (dot-matrix rework, 2026-09-26).
+ *
+ * Layers, outermost → innermost:
+ *   1. Housing (.led-board): near-black body, raised bevel (light
+ *      top/left lip, dark bottom/right bite) + faint perforated grid.
+ *   2. Modules (.led-cell): recessed dark wells (inset shadow) holding
+ *      one value each — a rate, a clock group, the date.
+ *   3. Digits: real seven-segment glyphs (DSEG7) painted as THREE stacked
+ *      layers — ghost "8888…" (all segments faintly visible, dim bulbs),
+ *      glow (bloom halo only), lit (bright dot-matrix bulbs). Numbers
+ *      share ONE bulb pattern (uniform board-wide pitch); labels reuse
+ *      the same technique at a tighter pitch.
+ *
+ * The bulb gradients are defined ONCE here and reused via classes —
+ * never re-declared per element — so live updates repaint cheaply.
+ * ===================================================================== */
+
 .led-board {
   --led-red: #ff1e1e;
-  --led-red-dim: rgba(255, 30, 30, 0.62);
-  --led-glow: 0 0 1px rgba(255, 30, 30, 0.9), 0 0 7px rgba(255, 30, 30, 0.55),
-    0 0 16px rgba(255, 30, 30, 0.28);
-  --led-glow-hot: 0 0 2px rgba(255, 30, 30, 1), 0 0 12px rgba(255, 30, 30, 0.95),
-    0 0 26px rgba(255, 30, 30, 0.62), 0 0 48px rgba(255, 30, 30, 0.32);
-  background: #0d0d0d;
+  /* Ghost-bulb color. Spec's flat-fill example was #2a1414, but bulbs only
+   * cover ~22% of the stroke area on the 4px pitch — the color is lifted
+   * so unlit segments stay FAINTLY visible (≈2:1) through the dot texture. */
+  --led-ghost: #5a2828;
+
+  /* One shared bulb: bright core + soft falloff edge, tiled on a fixed
+   * pitch. Segments use the coarse pitch; labels the tight one. */
+  --led-dot-bulb: 1.05px;
+  --led-dot-gap: 0.45px;
+  --led-dot-pitch: 4px;
+  --led-label-bulb: 0.8px;
+  --led-label-gap: 0.35px;
+  --led-label-pitch: 2.6px;
+
+  --led-glow: 0 0 1px rgba(255, 30, 30, 0.55), 0 0 6px rgba(255, 30, 30, 0.4),
+    0 0 15px rgba(255, 30, 30, 0.22);
+
+  background-color: #0d0d0d;
+  /* Faint perforated-module grid: thin row/column lines behind the cells. */
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.024) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.017) 0 1px, transparent 1px 26px);
   border-radius: 16px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-    inset 0 2px 18px rgba(0, 0, 0, 0.85), 0 10px 34px rgba(0, 0, 0, 0.28);
+  box-shadow:
+    /* raised bevel — lighter top/left lip, darker bottom/right */
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 1px 0 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.95),
+    inset -1px 0 0 rgba(0, 0, 0, 0.55),
+    /* bezel ring + interior depth */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 2px 18px rgba(0, 0, 0, 0.85),
+    0 10px 34px rgba(0, 0, 0, 0.28);
 }
 
-/* Seven-segment digits: every NUMBER on the board (rates, clock, date).
- * Latin digits only — Persian text stays in Vazirmatn. */
+/* Seven-segment font stack — every NUMBER on the board (rates, clock,
+ * date). Latin digits only; Persian stays in Vazirmatn. Bold: chunkier
+ * strokes sample the bulb pattern better. */
 .led-digits {
   font-family: "DSEG7 Classic", "Vazirmatn", monospace;
-  font-weight: 400;
-  color: var(--led-red);
-  text-shadow: var(--led-glow);
+  font-weight: 700;
   line-height: 1;
   font-variant-ligatures: none;
-  /* Fallback font metrics differ wildly from DSEG7 — tabular keeps the
-   * fallback columns stable while the woff2 swaps in. */
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Clock colon: dims once per second (0.5Hz, amplitude 0.45→1 — soft, not
- * a hard blink; well under any photosensitivity threshold). */
+/* A recessed module well: darker pit + inset shadow, so the digits sit
+ * INTO the panel rather than on top of it. The in-flow lit layer sizes
+ * it; ghost/glow are stacked absolutely inside. */
+.led-cell {
+  position: relative;
+  display: inline-block;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.32);
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.8),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.035);
+  line-height: 1;
+  user-select: none;
+  vertical-align: middle;
+}
+@media (min-width: 640px) {
+  .led-cell {
+    padding: 3px 9px;
+    border-radius: 5px;
+  }
+}
+
+/* Fallback for engines without background-clip:text: plain glowing red
+ * digits, no ghost/dot layers. */
+.led-lit {
+  position: relative;
+  white-space: nowrap;
+  color: var(--led-red);
+  text-shadow: var(--led-glow);
+}
+.led-ghost,
+.led-glow {
+  display: none;
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .led-ghost,
+  .led-glow {
+    display: block;
+  }
+
+  /* Ghost layer — the full unlit seven-segment shape ('8' per digit
+   * position) in dim bulbs, faintly visible behind the lit value. */
+  .led-ghost {
+    position: absolute;
+    inset: 0;
+    padding: inherit;
+    white-space: nowrap;
+    color: transparent;
+    background-image: radial-gradient(
+      circle,
+      var(--led-ghost) 0 var(--led-dot-bulb),
+      rgba(0, 0, 0, 0) calc(var(--led-dot-bulb) + var(--led-dot-gap))
+    );
+    background-size: var(--led-dot-pitch) var(--led-dot-pitch);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  /* Glow layer — pure bloom halo (transparent fill, text-shadow only).
+   * It paints over the value's own silhouette and bleeds a few px into
+   * the neighboring ghost segments — light bleed, like real hardware. */
+  .led-glow {
+    position: absolute;
+    inset: 0;
+    padding: inherit;
+    white-space: nowrap;
+    color: transparent;
+    text-shadow: var(--led-glow);
+  }
+
+  /* Lit layer — the value itself, filled with bright dot-matrix bulbs. */
+  .led-lit {
+    color: transparent;
+    text-shadow: none;
+    background-image: radial-gradient(
+      circle,
+      #ff3232 0 var(--led-dot-bulb),
+      rgba(255, 50, 50, 0) calc(var(--led-dot-bulb) + var(--led-dot-gap))
+    );
+    background-size: var(--led-dot-pitch) var(--led-dot-pitch);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  /* Labels (column headers, currency codes, wordmark): the same bulb
+   * fill at a tighter pitch. Color comes from --led-label-c per tier;
+   * any Tailwind text color on the element remains as the fallback. */
+  .led-label {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-image: radial-gradient(
+      circle,
+      var(--led-label-c, rgba(255, 40, 40, 0.85)) 0 var(--led-label-bulb),
+      rgba(0, 0, 0, 0) calc(var(--led-label-bulb) + var(--led-label-gap))
+    );
+    background-size: var(--led-label-pitch) var(--led-label-pitch);
+  }
+}
+
+.led-label-red {
+  --led-label-c: rgba(255, 44, 44, 0.9);
+}
+.led-label-red-dim {
+  --led-label-c: rgba(255, 44, 44, 0.62);
+}
+.led-label-white-dim {
+  --led-label-c: rgba(255, 255, 255, 0.4);
+}
+
+/* Clock colon (DSEG7 renders it as two segment dots): solid red + soft
+ * 0.5Hz dim (amplitude 0.45→1 — well under any photosensitivity
+ * threshold; never part of the dot fill). */
 .led-colon {
+  color: var(--led-red);
+  text-shadow: var(--led-glow);
   animation: currena-led-colon 1s steps(1, end) infinite;
 }
 @keyframes currena-led-colon {
@@ -556,26 +708,27 @@ body {
   }
 }
 
-/* Electronic-refresh pulse: when a rate changes, that digit's glow blooms
- * for ~260ms then settles — the standard real-time-ticker "just updated"
- * signal. Rows get a 0-210ms stagger (inline animation-delay) so the board
- * never flashes in sync. */
+/* Electronic-refresh pulse: a changed value surges its whole module —
+ * bulbs + halo together — for ~260ms (ONE flash per change, rows
+ * staggered 0–210ms; far below the WCAG 2.3.1 3/sec threshold). */
 .led-flash {
   animation: currena-led-pulse 260ms ease-out;
 }
 @keyframes currena-led-pulse {
   0% {
-    text-shadow: var(--led-glow-hot);
+    filter: brightness(1);
+  }
+  15% {
+    filter: brightness(1.55);
   }
   100% {
-    text-shadow: var(--led-glow);
+    filter: brightness(1);
   }
 }
 
-/* Loading state: all-dashes, like a booting LED module. */
+/* Loading state: the whole module at half power, like an off display. */
 .led-idle {
-  color: var(--led-red-dim);
-  text-shadow: none;
+  opacity: 0.5;
 }
 
 /* Status LED in the header — a physical indicator dot. */
