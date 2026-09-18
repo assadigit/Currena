@@ -30,8 +30,8 @@ Cloudflare Workers  currena-api  →  https://currena.ir  (Custom Domain, produc
 - Account ID; both exported for wrangler:
 
 ```sh
-export CLOUDFLARE_API_TOKEN=…   # never commit; this sandbox keeps them in
-export CLOUDFLARE_ACCOUNT_ID=…  # /home/z/.currena-secrets (chmod 600)
+export CLOUDFLARE_API_TOKEN=…   # never commit; pass via environment only
+export CLOUDFLARE_ACCOUNT_ID=…  # (session sandbox: env-only, never persisted to disk)
 ```
 
 ## First-time setup
@@ -89,6 +89,23 @@ curl -s $B/receipt                                      # SPA shell (deep link)
 Then one browser pass: convert 100 USD→IRR, toggle fa/RTL + dark, open
 `/admin`, and (see §Offline) reload with the network off.
 
+## Redeploy the latest HEAD (wrap-up, 2026-09-18)
+
+Production runs version `ddde3962…` (deployed from `9d91ffb`). Everything after
+that commit is docs-only (session log, deployment record, CHANGELOG.md), so the
+running runtime code is already identical to `main` — a redeploy is optional,
+only needed to pin the version marker to the final HEAD:
+
+```sh
+pnpm install
+pnpm -r typecheck && pnpm -r test        # final gate: 279/279 green at HEAD
+pnpm --filter @currena/web build          # SPA → apps/web/dist
+pnpm --filter @currena/api exec wrangler deploy
+```
+
+Push the branch + merged `main` first (see SESSION_LOG.md wrap-up), then deploy
+so the dashboard drift alarm reports "in sync".
+
 ## Rollback
 
 ```sh
@@ -137,5 +154,10 @@ updated: X ago" state. Zero network until connectivity returns.
 3. ⏳ **Legacy decommission** (owner's call, outside this repo): announce + flip
    any remaining links off `aliassadi1993.pythonanywhere.com`, keep it alive for a
    grace period, then decommission from its dashboard.
-4. Post-cutover backlog already documented: scanner OCR (client-side), scan
+4. ✅ **Session wrapped up** (2026-09-18): CHANGELOG.md added; branch merged to
+   `main` locally; commits ready to push and the final-HEAD redeploy documented
+   above (§Redeploy the latest HEAD). Credentials for push/deploy are env-only
+   in the session runner — the owner runs the two commands from §Deploy after
+   exporting tokens.
+5. Post-cutover backlog already documented: scanner OCR (client-side), scan
    gallery, D1 history + charts, Cloudflare Access on `/admin`, source toggles.

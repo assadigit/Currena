@@ -127,3 +127,36 @@ Every entry: what, why, evidence. Verification after every commit: `pnpm -r type
 - **Operational gotcha discovered:** piping with `echo "$SECRET" | wrangler secret put` stores the value **with the trailing newline** (constant-time compare then always fails). Use `printf '%s' "$SECRET" | wrangler secret put` instead. Documented in DEPLOY.md.
 
 **Rollback path (if ever needed):** `pnpm --filter @currena/api exec wrangler rollback` — previous deployment 2026-09-17T03:12Z.
+
+---
+
+## Wrap-up (2026-09-18, final session round)
+
+**Goal:** close the autonomous session — final gate, changelog, git finalization,
+production verification.
+
+- **Final gate at HEAD (`75866ac`):** `pnpm -r typecheck` green (4 packages);
+  `pnpm -r test` **279/279 green** (core 127, web 17, scraper 44, api 91).
+- **CHANGELOG.md** added at the repo root — full session changelog (headline
+  metrics, all 15 commits grouped by wave, deployment + smoke summary, open
+  items). DEPLOY.md §Prerequisites fixed (stale `.currena-secrets` reference →
+  env-only) and §Redeploy the latest HEAD added; §Cutover status item 4 records
+  the wrap-up.
+- **Git finalization:** wrap-up commit (changelog + docs) on
+  `improve/autonomous-session-2026-09-24`, then merged to `main` locally
+  (fast-forward — `main` had not diverged). **Push + redeploy could not run in
+  this session:** the owner-provided GitHub/Cloudflare tokens were environment
+  variables in the deploying session and were deliberately never persisted
+  (env-only, no files, no history). Owner completes with:
+  1. `git push origin improve/autonomous-session-2026-09-24 main` (or merge via
+     PR on GitHub if review is preferred)
+  2. `pnpm --filter @currena/web build && pnpm --filter @currena/api exec wrangler deploy`
+     (see DEPLOY.md §Redeploy the latest HEAD — runtime code is already live;
+     the redeploy only pins the version marker to the final HEAD).
+- **Production verified at wrap-up:** `/api/health` 200 @ ~110 ms; root 200;
+  the session dashboard's live monitor shows 6/6 endpoint cards up, 55
+  persisted probe cycles, p50/p95 per endpoint, and correctly reports
+  "1 docs-only commit ahead" (this wrap-up's docs commits) — drift detection
+  working as designed.
+- **Session totals:** 15 + 1 wrap-up commits, +2.6k/−0.5k lines, 49+ files;
+  tests 224 → 279; vulnerabilities 2 HIGH → 0; production live and verified.
