@@ -29,6 +29,7 @@ import type { CurrencyCode, SnapshotSource, Source } from '@currena/core';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { Button, Card, LoaderDots, Toast } from '../components/ui';
 import { useCodeLabel } from '../lib/display';
+import { uniqueId } from '../lib/id';
 import { useI18n } from '../lib/locale';
 import { snapshotStore } from '../lib/snapshot-store';
 
@@ -425,7 +426,7 @@ export function BatchConverter() {
             <Button
               variant="secondary"
               className="w-full py-2.5 text-xs"
-              onClick={() => setFields((prev) => [...prev, { id: Date.now(), amount: '', note: '' }])}
+              onClick={() => setFields((prev) => [...prev, { id: uniqueId(), amount: '', note: '' }])}
             >
               {t('batchConverter.addAnotherAmount')}
             </Button>

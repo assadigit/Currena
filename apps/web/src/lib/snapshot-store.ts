@@ -188,11 +188,17 @@ class SnapshotStore {
     void this.refresh('frankfurter');
   }
 
-  /** Re-fetch `source` unless a fresh snapshot is already being served. */
-  refresh(source: SnapshotSource): Promise<void> {
+  /**
+   * Re-fetch `source` unless a fresh snapshot is already being served.
+   * `force` bypasses the client freshness guard for explicit user actions
+   * (the manual refresh button) — the SERVER ladder still applies its own
+   * min-interval/fresh-cache rules, so a forced refresh is one cheap request
+   * that surfaces any newer cached generation, never an extra scrape storm.
+   */
+  refresh(source: SnapshotSource, options: { force?: boolean } = {}): Promise<void> {
     const current = this.state[source];
     const usable = current.snapshot !== null && !isStale(current.snapshot) && current.status !== 'error';
-    if (usable) return Promise.resolve();
+    if (usable && !options.force) return Promise.resolve();
     return this.fetch(source);
   }
 

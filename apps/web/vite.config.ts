@@ -28,7 +28,7 @@ export default defineConfig({
     // Farsi even fully offline. /api + /internal are never touched by the SW —
     // the snapshot store owns last-good rate caching.
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['images/currena-logo.png'],
       manifest: {
         name: 'Currency Converter Pro',

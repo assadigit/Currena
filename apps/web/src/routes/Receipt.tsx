@@ -28,6 +28,7 @@ import type { CurrencyCode, SnapshotSource } from '@currena/core';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { Button, Card, LoaderDots, Switch, Toast } from '../components/ui';
 import { useCodeLabel } from '../lib/display';
+import { uniqueId } from '../lib/id';
 import { useI18n } from '../lib/locale';
 import type { TranslationKey } from '../lib/locale';
 import { snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
@@ -237,7 +238,7 @@ export function Receipt() {
   const addItem = (): void => {
     setItems((prev) => [
       ...prev,
-      { id: Date.now(), category: 'food', amount: '', currency: from, time: '', notes: '' },
+      { id: uniqueId(), category: 'food', amount: '', currency: from, time: '', notes: '' },
     ]);
   };
 
@@ -251,7 +252,7 @@ export function Receipt() {
 
   const clearAll = (): void => {
     if (window.confirm(t('receipt.clearConfirm'))) {
-      setItems([{ id: Date.now(), category: 'food', amount: '', currency: from, time: '', notes: '' }]);
+      setItems([{ id: uniqueId(), category: 'food', amount: '', currency: from, time: '', notes: '' }]);
     }
   };
 
@@ -278,7 +279,7 @@ export function Receipt() {
       .filter((i): i is ReceiptItem => i !== null);
 
     setReceipt({
-      id: Date.now(),
+      id: uniqueId(),
       date,
       endDate: multiDay ? endDate : null,
       items: built,

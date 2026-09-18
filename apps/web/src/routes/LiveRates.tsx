@@ -368,10 +368,13 @@ export function LiveRates() {
 
       </div>
 
-      {/* Manual refresh FAB — the site's CTA gradient, spins while fetching */}
+      {/* Manual refresh FAB — the site's CTA gradient, spins while fetching.
+          force: the client freshness window must not turn this button into a
+          silent no-op — the server ladder still guards actual scrapes. */}
       <button
         type="button"
-        onClick={() => void snapshotStore.refresh('tgju')}
+        onClick={() => void snapshotStore.refresh('tgju', { force: true })}
+        disabled={loading}
         title={t('liveRates.refresh')}
         aria-label={t('liveRates.refresh')}
         className={`fixed bottom-5 end-5 z-[999] h-[60px] w-[60px] cursor-pointer rounded-full border-0 cta-gradient text-2xl text-white shadow-[0_6px_20px_rgba(102,126,234,0.45)] transition-all duration-300 hover:-translate-y-1 hover:rotate-180 ${loading ? 'refresh-spinning' : ''}`}

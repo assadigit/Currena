@@ -21,6 +21,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { computeBalances, formatNumber, parseAmount, settleDebts } from '@currena/core';
+import { uniqueId } from '../lib/id';
 import type { CurrencyCode, Transfer } from '@currena/core';
 import { Button, Card, Toast } from '../components/ui';
 import { useCodeLabel } from '../lib/display';
@@ -264,7 +265,7 @@ export function Settle() {
       .map((m) => m.trim())
       .filter((m) => m !== '' && m !== 'You');
     const group: SettleGroup = {
-      id: `${Date.now()}`,
+      id: String(uniqueId()),
       name,
       emoji: createEmoji,
       members: ['You', ...members],
@@ -337,7 +338,7 @@ export function Settle() {
     }
 
     const expense: SettleExpense = {
-      id: `${Date.now()}`,
+      id: String(uniqueId()),
       description,
       amount,
       currency: expCurrency,
@@ -362,7 +363,7 @@ export function Settle() {
       // Core buildSettlementExpense: payer = debtor, participant = creditor —
       // the balances cancel exactly and the suggestion disappears.
       const settlement = {
-        id: `${Date.now()}`,
+        id: String(uniqueId()),
         description: t('splitSettle.settlementLabel', { from: transfer.from, to: transfer.to }),
         amount: transfer.amount,
         currency: 'IRR' as CurrencyCode,

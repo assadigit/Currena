@@ -12,6 +12,12 @@ export const en = {
     madeBy: 'Made with ❤️ by Ali Assadi',
     createdBy: 'Created by',
     creatorName: 'Ali Assadi',
+    errorTitle: 'Something went wrong',
+    errorText: 'This page hit an unexpected error. Your data is safe — try again or head back to the converter.',
+    errorRetry: 'Try again',
+    errorHome: 'Go to converter',
+    updateReady: 'A new version is ready — reload to update',
+    updateReload: 'Reload',
   },
 
   nav: {
