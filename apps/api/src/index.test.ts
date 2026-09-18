@@ -452,4 +452,120 @@ describe('routes (injected service — no Workers, no live sites)', () => {
       expect(scrapeCalls).toEqual([]);
     });
   });
+
+  /* ------------------- admin view gating (ADMIN_VIEW_SECRET) ------------- */
+
+  describe('ADMIN_VIEW_SECRET gating (opt-in)', () => {
+    const envGated: Bindings = {
+      RATES: {} as KVNamespace,
+      REFRESH_SECRET: 'test-secret',
+      ADMIN_VIEW_SECRET: 'view-secret',
+    };
+    const formBody = (fields: Record<string, string>) => new URLSearchParams(fields).toString();
+    const formReq = (body: string) => ({
+      method: 'POST' as const,
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body,
+    });
+
+    it('GET /admin without a session → 401 gate page, no operational data', async () => {
+      const res = await makeApp().request('/admin', undefined, envGated);
+      expect(res.status).toBe(401);
+      const html = await res.text();
+      expect(html).toContain('Sign in');
+      expect(html).not.toContain('Manual refresh'); // console never rendered
+      expect(html).not.toContain('no snapshot in KV');
+      expect(html).not.toContain('banner error">⚠ This console is PUBLIC'); // gated, not public
+    });
+
+    it('POST view login with the correct secret → 303 + HttpOnly session cookie', async () => {
+      const res = await makeApp().request(
+        '/admin',
+        formReq(formBody({ action: 'view', secret: 'view-secret' })),
+        envGated,
+      );
+      expect(res.status).toBe(303);
+      expect(res.headers.get('location')).toBe('/admin');
+      const setCookieHeader = res.headers.get('set-cookie') ?? '';
+      expect(setCookieHeader).toContain('currena_admin_view=');
+      expect(setCookieHeader).toContain('HttpOnly');
+      expect(setCookieHeader).toContain('SameSite=Strict');
+      expect(setCookieHeader).not.toContain('view-secret'); // never the raw secret
+    });
+
+    it('wrong view secret → 401 gate with error, never the console', async () => {
+      const res = await makeApp().request(
+        '/admin',
+        formReq(formBody({ action: 'view', secret: 'nope' })),
+        envGated,
+      );
+      expect(res.status).toBe(401);
+      const html = await res.text();
+      expect(html).toContain('Missing or invalid view secret.');
+      expect(html).not.toContain('Manual refresh');
+      expect(html).not.toContain('nope'); // no echo
+    });
+
+    it('valid refresh secret does NOT bypass the gate (no console leak)', async () => {
+      const res = await makeApp().request(
+        '/admin',
+        formReq(formBody({ source: 'tgju', secret: 'test-secret' })),
+        envGated,
+      );
+      expect(res.status).toBe(401);
+      const html = await res.text();
+      expect(html).not.toContain('Manual refresh');
+      expect(scrapeCalls).toEqual([]); // no forced scrape either
+    });
+
+    it('with a valid session cookie → console renders normally', async () => {
+      const app = makeApp();
+      const login = await app.request(
+        '/admin',
+        formReq(formBody({ action: 'view', secret: 'view-secret' })),
+        envGated,
+      );
+      const cookie = (login.headers.get('set-cookie') ?? '').split(';')[0]!;
+      const res = await app.request('/admin', { headers: { cookie } }, envGated);
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain('Manual refresh');
+    });
+
+    it('unset ADMIN_VIEW_SECRET → public console with the warning banner (legacy behavior)', async () => {
+      const res = await makeApp().request('/admin', undefined, env);
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain('Manual refresh');
+      expect(html).toContain('ADMIN_VIEW_SECRET'); // public-mode notice
+    });
+
+    it('oversized body → 413 notice, no KV reads needed', async () => {
+      const bigBody = `secret=${'a'.repeat(9_000)}`;
+      const res = await makeApp().request(
+        '/admin',
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/x-www-form-urlencoded', 'content-length': String(bigBody.length) },
+          body: bigBody,
+        },
+        env,
+      );
+      expect(res.status).toBe(413);
+      const html = await res.text();
+      expect(html).toContain('size limit');
+    });
+  });
+
+  /* ---------------------------- Retry-After ------------------------------ */
+
+  it('503 responses carry a Retry-After header mirroring retryAfterSec', async () => {
+    failures.tgju = new Error('down');
+    failures.frankfurter = new Error('down');
+    const res = await makeApp().request('/api/rates?source=tgju', undefined, env);
+    expect(res.status).toBe(503);
+    expect(res.headers.get('retry-after')).toBe('60');
+    const body = (await res.json()) as { error: { retryAfterSec?: number } };
+    expect(body.error.retryAfterSec).toBe(60);
+  });
 });

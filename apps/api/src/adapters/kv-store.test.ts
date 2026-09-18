@@ -89,6 +89,38 @@ describe('KvRateStore (over FakeKV)', () => {
     expect(await store(kv).getStatus('frankfurter')).toBeUndefined();
   });
 
+  it('treats a poisoned/invalid status entry as absent (same defense as snapshots)', async () => {
+    const kv = new FakeKV();
+    await kv.put('status:tgju', 'not json at all');
+    expect(await store(kv).getStatus('tgju')).toBeUndefined();
+  });
+
+  it('rejects a structurally invalid status (bad source, negative duration, bad dates)', async () => {
+    const kv = new FakeKV();
+    // Wrong source enum.
+    await kv.put('status:tgju', JSON.stringify({ source: 'bogus' }));
+    expect(await store(kv).getStatus('tgju')).toBeUndefined();
+    // Negative duration — impossible from the ladder, poison if present.
+    await kv.put('status:tgju', JSON.stringify({ source: 'tgju', lastDurationMs: -5 }));
+    expect(await store(kv).getStatus('tgju')).toBeUndefined();
+    // Non-ISO datetime.
+    await kv.put('status:tgju', JSON.stringify({ source: 'tgju', lastScrapeAt: 'yesterday' }));
+    expect(await store(kv).getStatus('tgju')).toBeUndefined();
+    // lastError with a missing field.
+    await kv.put('status:tgju', JSON.stringify({ source: 'tgju', lastError: { code: 'x' } }));
+    expect(await store(kv).getStatus('tgju')).toBeUndefined();
+  });
+
+  it('strips unknown keys from a status entry (strip mode, no passthrough)', async () => {
+    const kv = new FakeKV();
+    await kv.put(
+      'status:tgju',
+      JSON.stringify({ source: 'tgju', lastDurationMs: 42, injected: '<script>' }),
+    );
+    const status = await store(kv).getStatus('tgju');
+    expect(status).toEqual({ source: 'tgju', lastDurationMs: 42 });
+  });
+
   it('best-effort lock: acquire / block / release', async () => {
     const kv = new FakeKV();
     const s = store(kv);

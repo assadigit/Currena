@@ -102,6 +102,39 @@ export const SnapshotSchema = z.object({
 export type Snapshot = z.infer<typeof SnapshotSchema>;
 
 /* ------------------------------------------------------------------ *
+ * Source operational status (persisted in the RateStore)
+ * ------------------------------------------------------------------ */
+
+/** One recorded upstream failure (kept across later successes — history). */
+export const SourceStatusErrorSchema = z.object({
+  /** Machine code from `errorToCodeMessage`, e.g. 'tgju_scrape_failed'. */
+  code: z.string().min(1),
+  /** Human-readable English message. */
+  message: z.string().min(1),
+  /** ISO 8601 datetime (UTC, Z-suffixed) of the failure. */
+  at: z.iso.datetime(),
+});
+export type SourceStatusError = z.infer<typeof SourceStatusErrorSchema>;
+
+/**
+ * Operational status of one upstream source. Crosses the KV trust boundary,
+ * so it is zod-validated on read (rule #3) — a poisoned status entry is
+ * treated as absent, exactly like a poisoned snapshot.
+ */
+export const SourceStatusSchema = z.object({
+  source: SnapshotSourceSchema,
+  /** ISO datetime of the last scrape ATTEMPT (success or failure). */
+  lastScrapeAt: z.iso.datetime().optional(),
+  /** ISO datetime of the last SUCCESSFUL scrape. */
+  lastSuccessAt: z.iso.datetime().optional(),
+  /** Last scrape error, if any (history, not state). */
+  lastError: SourceStatusErrorSchema.optional(),
+  /** Wall-clock duration of the last scrape attempt (ms). */
+  lastDurationMs: z.number().finite().nonnegative().optional(),
+});
+export type SourceStatus = z.infer<typeof SourceStatusSchema>;
+
+/* ------------------------------------------------------------------ *
  * API envelope
  * ------------------------------------------------------------------ */
 

@@ -9,25 +9,11 @@
  * `InMemoryRateStore` is a reference implementation used by tests and local dev.
  */
 
-import type { Snapshot, SnapshotSource } from '@currena/core';
+import type { Snapshot, SnapshotSource, SourceStatus } from '@currena/core';
 
-/** Operational status of one upstream source (persisted between requests). */
-export interface SourceStatus {
-  source: SnapshotSource;
-  /** ISO datetime of the last scrape ATTEMPT (success or failure). */
-  lastScrapeAt?: string;
-  /** ISO datetime of the last SUCCESSFUL scrape. */
-  lastSuccessAt?: string;
-  /** Last scrape error, if any (kept across later successes — it is history, not state). */
-  lastError?: {
-    code: string;
-    message: string;
-    /** ISO datetime of the error. */
-    at: string;
-  };
-  /** Wall-clock duration of the last scrape attempt. */
-  lastDurationMs?: number;
-}
+// The SourceStatus contract lives in @currena/core (rule #3: contracts are
+// zod schemas in core/schemas.ts) so the KV adapter can validate it on read.
+export type { SourceStatus };
 
 /** Storage port for snapshots, statuses and best-effort single-flight locks. */
 export interface RateStore {

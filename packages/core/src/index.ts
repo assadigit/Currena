@@ -33,11 +33,23 @@ export {
   RatesResponseSchema,
   RatesErrorSchema,
   SourceConfigSchema,
+  SourceStatusSchema,
+  SourceStatusErrorSchema,
   FRESH_TTL_SEC,
   MIN_SCRAPE_INTERVAL_SEC,
   CACHE_HARD_TTL_SEC,
 } from './schemas';
-export type { Source, SnapshotSource, Rate, Snapshot, RatesResponse, RatesError, SourceConfig } from './schemas';
+export type {
+  Source,
+  SnapshotSource,
+  Rate,
+  Snapshot,
+  RatesResponse,
+  RatesError,
+  SourceConfig,
+  SourceStatus,
+  SourceStatusError,
+} from './schemas';
 
 export {
   CURRENCIES,

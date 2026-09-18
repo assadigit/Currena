@@ -34,6 +34,8 @@ export interface AdminPageData {
   refreshed?: 'tgju' | 'frankfurter';
   /** POST failure (wrong secret, upstream down, …) → red banner. */
   error?: AdminBanner;
+  /** True when ADMIN_VIEW_SECRET is NOT configured (console is public). */
+  publicMode?: boolean;
 }
 
 /** HTML-escape a string for safe interpolation into the document. */
@@ -103,11 +105,11 @@ function sourceCard(
 
   const cacheLine = !cache?.present
     ? '<dd>no snapshot in KV</dd>'
-    : `<dd>age <span class="mono">${cache.ageSec ?? '?'}s</span> · fetched ${stamp(cache.fetchedAt, data.now)}</dd>`;
+    : `<dd>age <span class="mono">${esc(String(cache.ageSec ?? '?'))}s</span> · fetched ${stamp(cache.fetchedAt, data.now)}</dd>`;
 
   const snapLine = !snapshot
     ? '<dd>—</dd>'
-    : `<dd>base <span class="mono">${esc(snapshot.base)}</span> · <span class="mono">${snapshot.rates.length}</span> rates · ${stamp(snapshot.fetchedAt, data.now)}</dd>`;
+    : `<dd>base <span class="mono">${esc(snapshot.base)}</span> · <span class="mono">${esc(String(snapshot.rates.length))}</span> rates · ${stamp(snapshot.fetchedAt, data.now)}</dd>`;
 
   const errorLine = !status?.lastError
     ? ''
@@ -117,7 +119,7 @@ function sourceCard(
   <h2><span class="mono">${source}</span> <span class="pill ${pillClass}">${pillText}</span></h2>
   <dl>
     <dt>last success</dt><dd>${stamp(status?.lastSuccessAt, data.now)}</dd>
-    <dt>last attempt</dt><dd>${stamp(status?.lastScrapeAt, data.now)}${status?.lastDurationMs !== undefined ? ` <span class="rel">· ${status.lastDurationMs} ms</span>` : ''}</dd>
+    <dt>last attempt</dt><dd>${stamp(status?.lastScrapeAt, data.now)}${status?.lastDurationMs !== undefined ? ` <span class="rel">· ${esc(String(status.lastDurationMs))} ms</span>` : ''}</dd>
     <dt>cache</dt><dd>${cacheLine}</dd>
     <dt>snapshot</dt><dd>${snapLine}</dd>
     ${errorLine}
@@ -186,6 +188,11 @@ footer a:hover{text-decoration:underline}
 /** Render the full /admin document. Pure — no platform APIs. */
 export function renderAdminPage(data: AdminPageData): string {
   const banners: string[] = [];
+  if (data.publicMode) {
+    banners.push(
+      `<div class="banner error">⚠ This console is PUBLIC — set <span class="mono">ADMIN_VIEW_SECRET</span> (wrangler secret) to require a sign-in. See DEPLOY.md.</div>`,
+    );
+  }
   if (data.refreshed) {
     banners.push(
       `<div class="banner success">✓ ${esc(data.refreshed)} refreshed — snapshot served from the live scrape.</div>`,
@@ -265,3 +272,91 @@ export const ADMIN_HEADERS: Readonly<Record<string, string>> = {
   'Content-Security-Policy':
     "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
 };
+
+/* ------------------------------------------------------------------ *
+ * Optional view gating (ADMIN_VIEW_SECRET)
+ *
+ * When the env var is set, GET /admin shows a password gate instead of the
+ * console until the visitor POSTs the correct secret (HttpOnly cookie holds
+ * HMAC-SHA256(secret, label) — the secret itself never leaves the Worker).
+ * Unset → exactly the previous public behavior (opt-in, zero breakage).
+ * ------------------------------------------------------------------ */
+
+/** Cookie carrying the view-session token (HttpOnly, Strict, Path=/admin). */
+export const ADMIN_VIEW_COOKIE = 'currena_admin_view';
+
+/** Deterministic session token: hex(HMAC-SHA256(secret, label)). */
+export async function adminViewToken(secret: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const mac = await crypto.subtle.sign('HMAC', key, encoder.encode('currena-admin-view-v1'));
+  return [...new Uint8Array(mac)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+/** Minimal notice page (errors that must not trigger KV reads, e.g. 413). */
+export function renderAdminNotice(data: { error: AdminBanner }): string {
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Currena Admin</title>
+<style>${STYLE}</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="logo">⇄</span>CURRENA<span class="tag">admin</span></div>
+</header>
+<main>
+  <div class="banner error">✗ ${esc(data.error.message)}</div>
+  <p class="hint"><a href="/admin">← back to the console</a></p>
+</main>
+<footer>Currena admin stub · <span class="mono">noindex, nofollow</span> · <a href="/">← back to the app</a></footer>
+</body>
+</html>`;
+}
+
+/** The gate page: zero KV reads, zero operational data, just the form. */
+export function renderAdminGate(data: { error?: AdminBanner } = {}): string {
+  const banner = data.error
+    ? `<div class="banner error">✗ ${esc(data.error.message)}</div>`
+    : '';
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Currena Admin — sign in</title>
+<style>${STYLE}</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="logo">⇄</span>CURRENA<span class="tag">admin</span></div>
+  <div class="sub">Restricted console — view secret required.</div>
+</header>
+<main>
+  ${banner}
+  <section class="card">
+    <h2>Sign in</h2>
+    <form method="post" action="/admin">
+      <input type="hidden" name="action" value="view">
+      <label>View secret
+        <input type="password" name="secret" autocomplete="off" required placeholder="ADMIN_VIEW_SECRET">
+      </label>
+      <button type="submit">View console</button>
+    </form>
+    <p class="hint">Compared in constant time; never stored, logged, or echoed. The session cookie holds only an HMAC of the secret and expires after 1 hour.</p>
+  </section>
+</main>
+<footer>Currena admin stub · <span class="mono">noindex, nofollow</span> · <a href="/">← back to the app</a></footer>
+</body>
+</html>`;
+}

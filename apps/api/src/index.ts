@@ -23,8 +23,17 @@ import { convert, CoreError, SnapshotSourceSchema } from '@currena/core';
 import type { ConversionResult, RatesError, SnapshotSource } from '@currena/core';
 import { Hono } from 'hono';
 import type { Context } from 'hono';
+import { getCookie, setCookie } from 'hono/cookie';
 import { scrapeFrankfurter, scrapeTgju } from '@currena/scraper';
-import { ADMIN_HEADERS, renderAdminPage, type AdminBanner } from './admin';
+import {
+  ADMIN_HEADERS,
+  ADMIN_VIEW_COOKIE,
+  adminViewToken,
+  renderAdminGate,
+  renderAdminNotice,
+  renderAdminPage,
+  type AdminBanner,
+} from './admin';
 import { KvRateStore } from './adapters/kv-store';
 import { buildMeta } from './meta';
 import { RatesService, RatesServiceError } from './rates-service';
@@ -34,6 +43,8 @@ export type Bindings = {
   RATES: KVNamespace;
   /** Shared secret for POST /internal/refresh (wrangler secret / .dev.vars). */
   REFRESH_SECRET?: string;
+  /** Optional: when set, GET /admin requires a sign-in (HMAC cookie session). */
+  ADMIN_VIEW_SECRET?: string;
   /** Static-assets binding (implicit when wrangler.jsonc has `assets`); serves the SPA. */
   ASSETS?: Fetcher;
 };
@@ -45,10 +56,12 @@ export interface AppDeps {
 
 const NO_STORE: Readonly<Record<string, string>> = { 'Cache-Control': 'no-store' };
 const MAX_AMOUNT = 1e15;
+/** The no-JS admin form is well under 1 KB; 8 KB is a generous cap. */
+const MAX_ADMIN_BODY_BYTES = 8192;
 
-type ErrorStatus = 400 | 401 | 404 | 500 | 501 | 503;
+type ErrorStatus = 400 | 401 | 404 | 413 | 500 | 501 | 503;
 
-/** RatesError envelope with the right status + no-store. */
+/** RatesError envelope with the right status + no-store (+ Retry-After). */
 function errorResponse(
   c: Context<{ Bindings: Bindings }>,
   status: ErrorStatus,
@@ -59,7 +72,11 @@ function errorResponse(
   const body: RatesError = {
     error: { code, message, ...(retryAfterSec !== undefined ? { retryAfterSec } : {}) },
   };
-  return c.json(body, status, NO_STORE);
+  return c.json(body, status, {
+    ...NO_STORE,
+    // Standards-level retry hint mirroring the body's retryAfterSec (503s).
+    ...(retryAfterSec !== undefined ? { 'Retry-After': String(retryAfterSec) } : {}),
+  });
 }
 
 /** Validate the ?source= query param; empty/absent → default 'tgju'. */
@@ -218,7 +235,11 @@ export function createApp(deps: AppDeps = {}) {
   /** Shared page render: status report + cached snapshots, escaped HTML. */
   async function renderAdmin(
     c: Context<{ Bindings: Bindings }>,
-    opts: { refreshed?: 'tgju' | 'frankfurter'; error?: AdminBanner } = {},
+    opts: {
+      refreshed?: 'tgju' | 'frankfurter';
+      error?: AdminBanner;
+      status?: 200 | 401 | 413;
+    } = {},
   ) {
     const service = makeService(c.env);
     const [report, tgju, frankfurter] = await Promise.all([
@@ -230,12 +251,25 @@ export function createApp(deps: AppDeps = {}) {
       report,
       snapshots: { tgju, frankfurter },
       now: new Date(),
+      publicMode: c.env.ADMIN_VIEW_SECRET === undefined,
       ...opts,
     });
-    return c.html(html, 200, ADMIN_HEADERS);
+    return c.html(html, opts.status ?? 200, ADMIN_HEADERS);
+  }
+
+  /** True when the request carries a valid admin view session (or gating is off). */
+  async function hasAdminViewSession(c: Context<{ Bindings: Bindings }>): Promise<boolean> {
+    const viewSecret = c.env.ADMIN_VIEW_SECRET;
+    if (viewSecret === undefined || viewSecret === '') return true; // not gated
+    const token = await adminViewToken(viewSecret);
+    return getCookie(c, ADMIN_VIEW_COOKIE) === token;
   }
 
   app.get('/admin', async (c) => {
+    if (!(await hasAdminViewSession(c))) {
+      // Gate page: zero KV reads, zero operational data.
+      return c.html(renderAdminGate(), 401, ADMIN_HEADERS);
+    }
     // ?refreshed= is set by the POST below (PRG flash) — validated, never trusted.
     const raw = c.req.query('refreshed');
     const refreshed = raw === 'tgju' || raw === 'frankfurter' ? raw : undefined;
@@ -243,6 +277,57 @@ export function createApp(deps: AppDeps = {}) {
   });
 
   app.post('/admin', async (c) => {
+    // Cap the body before buffering it (the no-JS form is < 1 KB).
+    const contentLength = Number(c.req.header('content-length') ?? '0');
+    if (Number.isFinite(contentLength) && contentLength > MAX_ADMIN_BODY_BYTES) {
+      return c.html(
+        renderAdminNotice({ error: { code: 'payload_too_large', message: 'Admin form body exceeds the size limit.' } }),
+        413,
+        ADMIN_HEADERS,
+      );
+    }
+
+    const viewSecret = c.env.ADMIN_VIEW_SECRET;
+    const gated = viewSecret !== undefined && viewSecret !== '';
+    const viewOk = await hasAdminViewSession(c);
+
+    // application/x-www-form-urlencoded body (the no-JS form).
+    let form: Record<string, string | undefined> = {};
+    try {
+      const contentType = c.req.header('content-type') ?? '';
+      if (/application\/x-www-form-urlencoded/i.test(contentType)) {
+        const text = (await c.req.text()).slice(0, MAX_ADMIN_BODY_BYTES);
+        const params = new URLSearchParams(text);
+        form = {
+          action: params.get('action') ?? undefined,
+          source: params.get('source') ?? undefined,
+          secret: params.get('secret') ?? undefined,
+        };
+      }
+    } catch {
+      form = {}; // fall through to validation errors below
+    }
+
+    // View-gated deployments: only the sign-in action is reachable without a
+    // session, and wrong secrets render the gate (never the console).
+    if (gated && !viewOk) {
+      if (form.action === 'view' && form.secret !== undefined && secretMatches(form.secret, viewSecret!)) {
+        setCookie(c, ADMIN_VIEW_COOKIE, await adminViewToken(viewSecret!), {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'Strict',
+          path: '/admin',
+          maxAge: 3600,
+        });
+        return c.redirect('/admin', 303);
+      }
+      return c.html(
+        renderAdminGate({ error: { message: 'Missing or invalid view secret.' } }),
+        401,
+        ADMIN_HEADERS,
+      );
+    }
+
     const secret = c.env.REFRESH_SECRET;
     if (!secret) {
       return renderAdmin(c, {
@@ -251,19 +336,6 @@ export function createApp(deps: AppDeps = {}) {
           message: 'REFRESH_SECRET is not configured for this deployment.',
         },
       });
-    }
-
-    // application/x-www-form-urlencoded body (the no-JS form).
-    let form: Record<string, string | undefined> = {};
-    try {
-      const contentType = c.req.header('content-type') ?? '';
-      if (/application\/x-www-form-urlencoded/i.test(contentType)) {
-        const text = await c.req.text();
-        const params = new URLSearchParams(text);
-        form = { source: params.get('source') ?? undefined, secret: params.get('secret') ?? undefined };
-      }
-    } catch {
-      form = {}; // fall through to validation errors below
     }
 
     const source = parseSourceParam(form.source);

@@ -13,7 +13,7 @@
  * ladder tolerates that (same data, idempotent writes).
  */
 
-import { CACHE_HARD_TTL_SEC, SnapshotSchema } from '@currena/core';
+import { CACHE_HARD_TTL_SEC, SnapshotSchema, SourceStatusSchema } from '@currena/core';
 import type { Snapshot, SnapshotSource } from '@currena/core';
 import type { RateStore, SourceStatus } from '@currena/scraper';
 
@@ -45,9 +45,11 @@ export class KvRateStore implements RateStore {
     const raw = await this.kv.get(`status:${source}`);
     if (raw === null) return undefined;
     try {
-      return JSON.parse(raw) as SourceStatus;
+      // Same poisoned-entry defense as snapshots (rule #3): an invalid
+      // status is treated as absent, never trusted as-is.
+      return SourceStatusSchema.parse(JSON.parse(raw));
     } catch {
-      console.warn(`[kv-store] status:${source} is corrupt — ignoring`);
+      console.warn(`[kv-store] status:${source} failed validation — ignoring cached value`);
       return undefined;
     }
   }

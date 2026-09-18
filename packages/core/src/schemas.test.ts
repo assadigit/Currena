@@ -9,6 +9,7 @@ import {
   RatesResponseSchema,
   SnapshotSchema,
   SourceConfigSchema,
+  SourceStatusSchema,
 } from './schemas';
 
 /** A realistic TGJU-style snapshot (matches the live legacy observation 2026-09-16: 1 USD = 230,500 Toman). */
@@ -161,5 +162,41 @@ describe('timing constants (mission §5/§6 ladder)', () => {
     expect(MIN_SCRAPE_INTERVAL_SEC).toBe(60);
     expect(CACHE_HARD_TTL_SEC).toBe(7 * 24 * 3600);
     expect(CACHE_HARD_TTL_SEC).toBe(604800);
+  });
+});
+
+describe('SourceStatusSchema (KV trust boundary)', () => {
+  const valid = {
+    source: 'tgju',
+    lastScrapeAt: '2026-09-16T12:00:00.000Z',
+    lastSuccessAt: '2026-09-16T12:00:00.000Z',
+    lastError: { code: 'tgju_scrape_failed', message: 'boom', at: '2026-09-16T11:00:00.000Z' },
+    lastDurationMs: 321,
+  };
+
+  it('accepts a fully-populated status', () => {
+    expect(SourceStatusSchema.safeParse(valid).success).toBe(true);
+  });
+
+  it('accepts the minimal shape (source only)', () => {
+    expect(SourceStatusSchema.safeParse({ source: 'frankfurter' }).success).toBe(true);
+  });
+
+  it('rejects non-source enums, bad datetimes, negative/infinite durations', () => {
+    expect(SourceStatusSchema.safeParse({ source: 'manual' }).success).toBe(false);
+    expect(SourceStatusSchema.safeParse({ ...valid, lastScrapeAt: '2026-09-16 12:00' }).success).toBe(false);
+    expect(SourceStatusSchema.safeParse({ ...valid, lastDurationMs: -1 }).success).toBe(false);
+    expect(SourceStatusSchema.safeParse({ ...valid, lastDurationMs: Number.POSITIVE_INFINITY }).success).toBe(false);
+    expect(SourceStatusSchema.safeParse({ ...valid, lastDurationMs: Number.NaN }).success).toBe(false);
+  });
+
+  it('requires complete lastError records', () => {
+    expect(SourceStatusSchema.safeParse({ ...valid, lastError: { code: 'x' } }).success).toBe(false);
+    expect(SourceStatusSchema.safeParse({ ...valid, lastError: { code: 'x', message: '', at: '2026-09-16T11:00:00.000Z' } }).success).toBe(false);
+  });
+
+  it('strips unknown keys (no passthrough, no pollution surface)', () => {
+    const parsed = SourceStatusSchema.parse({ ...valid, injected: '__proto__ pollutant' });
+    expect(parsed).not.toHaveProperty('injected');
   });
 });
