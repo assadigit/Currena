@@ -19,7 +19,7 @@
  * the in-memory RateStore fake + fake scrapers — no Workers, no live sites.
  */
 
-import { convert, CoreError, SnapshotSourceSchema } from '@currena/core';
+import { convert, CoreError, SnapshotSourceSchema, sourceForPair } from '@currena/core';
 import type { ConversionResult, RatesError, Snapshot, SnapshotSource } from '@currena/core';
 import { Hono } from 'hono';
 import type { Context } from 'hono';
@@ -225,8 +225,8 @@ export function createApp(deps: AppDeps = {}) {
       return c.json(result, 200, NO_STORE);
     }
 
-    // Routing rule (AGENTS.md rule 8): either side IRR → TGJU; else Frankfurter.
-    const source: SnapshotSource = from === 'IRR' || to === 'IRR' ? 'tgju' : 'frankfurter';
+    // Routing rule (AGENTS.md rule 8) — shared with the SPA via @currena/core.
+    const source: SnapshotSource = sourceForPair(from, to);
 
     try {
       const rates = await makeService(c.env).getRates(source);

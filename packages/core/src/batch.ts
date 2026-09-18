@@ -166,6 +166,15 @@ export function csvEscapeField(field: string): string {
 }
 
 /**
+ * Neutralize spreadsheet formula injection (OWASP CSV injection): a leading
+ * `= + - @` (or tab/CR) would execute as a formula in Excel/Sheets when the
+ * exported CSV is opened — prefixing a `'` renders it as text instead.
+ */
+export function csvNeutralizeFormula(field: string): string {
+  return /^[=+\-@\t\r]/.test(field) ? `'${field}` : field;
+}
+
+/**
  * CSV in the exact legacy shape (captured exportCSV):
  *
  *     Original Amount (USD),Converted Amount (EUR),Note
@@ -182,15 +191,23 @@ export function toCsv(rows: readonly BatchCsvRow[], opts: BatchCsvOptions): stri
   const rateDecimals = opts.to === 'IRR' ? 0 : 4;
 
   let csv = `Original Amount (${opts.from}),Converted Amount (${opts.to}),Note\n`;
+  // Totals sum the DISPLAYED (rounded) row values, so the column always
+  // adds up exactly — summing raw values could differ from the Total by
+  // cents (classic sum-of-rounded ≠ rounded-sum).
+  let totalOriginal = 0;
+  let totalConverted = 0;
   for (const row of rows) {
     // Legacy parity: notes are ALWAYS quoted (with inner quotes doubled);
-    // absent notes stay an empty field.
-    const note = row.note ? `"${row.note.replace(/"/g, '""')}"` : '';
-    csv += `${row.original.toFixed(2)},${row.converted.toFixed(convertedDecimals)},${note}\n`;
+    // absent notes stay an empty field. Formula-looking notes get a `'`
+    // prefix so Excel/Sheets render them as text instead of executing them.
+    const note = row.note ? `"${csvNeutralizeFormula(row.note).replace(/"/g, '""')}"` : '';
+    const originalDisplay = row.original.toFixed(2);
+    const convertedDisplay = row.converted.toFixed(convertedDecimals);
+    totalOriginal += Number(originalDisplay);
+    totalConverted += Number(convertedDisplay);
+    csv += `${originalDisplay},${convertedDisplay},${note}\n`;
   }
 
-  const totalOriginal = rows.reduce((sum, row) => sum + row.original, 0);
-  const totalConverted = rows.reduce((sum, row) => sum + row.converted, 0);
   csv += `\nTotal,${totalOriginal.toFixed(2)},${totalConverted.toFixed(convertedDecimals)},\n`;
   if (opts.rate !== undefined) {
     csv += `Exchange Rate,1 ${opts.from} = ${opts.rate.toFixed(rateDecimals)} ${opts.to},,\n`;

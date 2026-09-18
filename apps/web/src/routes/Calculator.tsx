@@ -16,7 +16,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { CalcError, evaluateExpression, formatNumber, parseAmount } from '@currena/core';
+import { CalcError, evaluateExpression, formatNumber, parseAmount, sourceForPair } from '@currena/core';
 import type { CurrencyCode, SnapshotSource } from '@currena/core';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { Card } from '../components/ui';
@@ -29,10 +29,6 @@ const CALC_CURRENCIES: readonly CurrencyCode[] = [
   'USD', 'IRR', 'AUD', 'CAD', 'EUR', 'GBP', 'AED', 'CNY', 'NZD', 'TRY', 'CHF', 'JPY', 'KRW',
 ];
 
-/** AGENTS.md rule 8: which snapshot backs a pair. */
-function sourceForPair(from: string, to: string): SnapshotSource {
-  return from === 'IRR' || to === 'IRR' ? 'tgju' : 'frankfurter';
-}
 
 /**
  * Legacy display grouping: the raw expression string had its integer runs

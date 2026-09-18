@@ -48,7 +48,12 @@ export function roundSignificant(value: number, sigDigits: number = COMPUTE_SIGN
   if (decimals > 100) return value; // beyond Number.toFixed's range — keep raw
   if (decimals <= 0) {
     const factor = 10 ** -decimals;
-    return Math.round(value / factor) * factor;
+    const scaled = value / factor;
+    // Round half AWAY FROM ZERO — Math.round alone rounds ties toward +∞,
+    // which rounded negative and positive ties at ≥1e12 in OPPOSITE
+    // directions (off by a whole factor unit in money code).
+    const rounded = scaled >= 0 ? Math.round(scaled) : -Math.round(-scaled);
+    return rounded * factor;
   }
   return Number(value.toFixed(decimals));
 }

@@ -14,17 +14,13 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { convert, formatNumber, parseAmount, thousandSeparateInput } from '@currena/core';
+import { convert, formatNumber, parseAmount, sourceForPair, thousandSeparateInput } from '@currena/core';
 import type { CurrencyCode, SnapshotSource } from '@currena/core';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { Button, Card, Switch, Toast } from '../components/ui';
 import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
 import { snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
-
-function sourceForPair(from: string, to: string): SnapshotSource {
-  return from === 'IRR' || to === 'IRR' ? 'tgju' : 'frankfurter';
-}
 
 /**
  * Largest-remainder split: floor every share at `decimals`, then hand the

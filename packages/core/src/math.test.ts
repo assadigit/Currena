@@ -161,3 +161,20 @@ describe('convertWithManualRate (legacy "Manual" source parity)', () => {
     expect(() => convertWithManualRate(Number.NaN, 2)).toThrow(CoreError);
   });
 });
+
+describe('roundSignificant — symmetric tie rounding (regression: negative ties rounded toward +∞)', () => {
+  it('rounds .5 ties AWAY FROM ZERO for both signs at ≥1e12 magnitudes', () => {
+    // 15000000000150 at 12 sig digits: tie at the 10s place.
+    expect(roundSignificant(15_000_000_000_150, 12)).toBe(15_000_000_000_200);
+    // The pre-fix negative branch rounded this to ...100 (toward +∞) while
+    // the positive branch rounded to ...200 — same magnitude, opposite
+    // directions, a full factor unit apart.
+    expect(roundSignificant(-15_000_000_000_150, 12)).toBe(-15_000_000_000_200);
+  });
+
+  it('non-tie values are unaffected', () => {
+    expect(roundSignificant(-15_000_000_000_160, 12)).toBe(-15_000_000_000_200);
+    expect(roundSignificant(-15_000_000_000_140, 12)).toBe(-15_000_000_000_100);
+    expect(roundSignificant(-123_456_789_012_345, 12)).toBe(-123_456_789_012_000);
+  });
+});

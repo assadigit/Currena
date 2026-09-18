@@ -24,6 +24,7 @@ import {
   parseAmount,
   parseBatchLines,
   toCsv,
+  sourceForPair,
 } from '@currena/core';
 import type { CurrencyCode, SnapshotSource, Source } from '@currena/core';
 import { CurrencySelect } from '../components/CurrencySelect';
@@ -37,10 +38,6 @@ import { snapshotStore } from '../lib/snapshot-store';
 const BATCH_CURRENCIES: readonly CurrencyCode[] = [
   'USD', 'EUR', 'GBP', 'TRY', 'AED', 'AUD', 'CAD', 'CNY', 'JPY', 'KRW', 'IRR',
 ];
-
-function sourceForPair(from: string, to: string): SnapshotSource {
-  return from === 'IRR' || to === 'IRR' ? 'tgju' : 'frankfurter';
-}
 
 interface BatchRowOk {
   ok: true;

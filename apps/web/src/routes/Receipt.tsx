@@ -23,6 +23,7 @@ import {
   formatNumber,
   parseAmount,
   thousandSeparateInput,
+  sourceForPair,
 } from '@currena/core';
 import type { CurrencyCode, SnapshotSource } from '@currena/core';
 import { CurrencySelect } from '../components/CurrencySelect';
@@ -82,9 +83,6 @@ interface GeneratedReceipt {
   timestamp: string;
 }
 
-function sourceForPair(from: string, to: string): SnapshotSource {
-  return from === 'IRR' || to === 'IRR' ? 'tgju' : 'frankfurter';
-}
 
 const pad2 = (n: number): string => String(n).padStart(2, '0');
 

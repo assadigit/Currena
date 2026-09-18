@@ -176,3 +176,44 @@ describe('BATCH_TEMPLATES (exact legacy quick templates)', () => {
     }
   });
 });
+
+describe('toCsv — display-consistent totals + formula-injection guard', () => {
+  it('the Total equals the sum of the DISPLAYED row values (no penny mismatch)', () => {
+    // Two rows of 0.014 each DISPLAY as "0.01" (displayed sum 0.02), but the
+    // raw sum 0.028 rounds to "0.03" — the old raw-sum Total disagreed with
+    // the rows the user could see by a cent.
+    const csv = toCsv(
+      [
+        { original: 0.014, converted: 0.014, note: '' },
+        { original: 0.014, converted: 0.014, note: '' },
+      ],
+      { from: 'USD', to: 'EUR', rate: 1 },
+    );
+    expect(csv).toContain('0.01,0.01,""');
+    expect(csv).toContain('Total,0.02,0.02,'); // matches the displayed rows
+  });
+
+  it('neutralizes spreadsheet formula injection in notes (OWASP CSV injection)', () => {
+    const csv = toCsv(
+      [{ original: 1, converted: 2, note: '=HYPERLINK("http://evil","click")' }],
+      { from: 'USD', to: 'EUR' },
+    );
+    expect(csv).toContain("'=HYPERLINK"); // leading apostrophe → rendered as text
+    expect(csv).not.toMatch(/,"=HYPERLINK/); // never an executable leading =
+    // Plus/minus/at and tab-prefixed notes are neutralized too.
+    const more = toCsv(
+      [
+        { original: 1, converted: 2, note: '+cmd' },
+        { original: 1, converted: 2, note: '-2+2' },
+        { original: 1, converted: 2, note: '@ref' },
+      ],
+      { from: 'USD', to: 'EUR' },
+    );
+    expect(more).toContain("'+cmd");
+    expect(more).toContain("'-2+2");
+    expect(more).toContain("'@ref");
+    // Plain notes are untouched.
+    const plain = toCsv([{ original: 1, converted: 2, note: 'groceries' }], { from: 'USD', to: 'EUR' });
+    expect(plain).toContain('"groceries"');
+  });
+});

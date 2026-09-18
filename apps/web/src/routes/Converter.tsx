@@ -24,6 +24,7 @@ import {
   reverseRate,
   tgjuProfileUrl,
   thousandSeparateInput,
+  sourceForPair,
 } from '@currena/core';
 import type { ConversionResult, CurrencyCode, SnapshotSource } from '@currena/core';
 import { AmountInput, parseInputAmount } from '../components/AmountInput';
@@ -46,11 +47,6 @@ type Phase = 'idle' | 'fetching' | 'result';
 interface ConvertFailure {
   title: string;
   lines: string[];
-}
-
-/** Source that backs a pair (AGENTS.md rule 8 routing). */
-function sourceForPair(from: string, to: string): SnapshotSource {
-  return from === 'IRR' || to === 'IRR' ? 'tgju' : 'frankfurter';
 }
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => window.setTimeout(resolve, ms));

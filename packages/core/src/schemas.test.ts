@@ -10,6 +10,7 @@ import {
   SnapshotSchema,
   SourceConfigSchema,
   SourceStatusSchema,
+  sourceForPair,
 } from './schemas';
 
 /** A realistic TGJU-style snapshot (matches the live legacy observation 2026-09-16: 1 USD = 230,500 Toman). */
@@ -198,5 +199,20 @@ describe('SourceStatusSchema (KV trust boundary)', () => {
   it('strips unknown keys (no passthrough, no pollution surface)', () => {
     const parsed = SourceStatusSchema.parse({ ...valid, injected: '__proto__ pollutant' });
     expect(parsed).not.toHaveProperty('injected');
+  });
+});
+
+describe('sourceForPair (rule-8 routing)', () => {
+  it('routes anything touching IRR to tgju (either side, both orders)', () => {
+    expect(sourceForPair('USD', 'IRR')).toBe('tgju');
+    expect(sourceForPair('IRR', 'USD')).toBe('tgju');
+    expect(sourceForPair('IRR', 'EUR')).toBe('tgju');
+    expect(sourceForPair('AED', 'IRR')).toBe('tgju');
+  });
+
+  it('routes international-only pairs to frankfurter', () => {
+    expect(sourceForPair('USD', 'EUR')).toBe('frankfurter');
+    expect(sourceForPair('EUR', 'GBP')).toBe('frankfurter');
+    expect(sourceForPair('JPY', 'TRY')).toBe('frankfurter');
   });
 });

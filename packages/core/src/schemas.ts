@@ -33,6 +33,17 @@ export type Source = z.infer<typeof SourceSchema>;
 export const SnapshotSourceSchema = z.enum(['tgju', 'frankfurter']);
 export type SnapshotSource = z.infer<typeof SnapshotSourceSchema>;
 
+/**
+ * Source that backs a currency pair (AGENTS.md rule 8 routing): either side
+ * IRR/Toman → TGJU (open-market); international-only → Frankfurter. Never
+ * fall IRR pairs back to the free API (interbank IRR ≠ open-market Toman).
+ *
+ * Lives in core so the API and every SPA route share ONE implementation.
+ */
+export function sourceForPair(from: string, to: string): SnapshotSource {
+  return from === 'IRR' || to === 'IRR' ? 'tgju' : 'frankfurter';
+}
+
 /* ------------------------------------------------------------------ *
  * Rate & Snapshot
  * ------------------------------------------------------------------ */

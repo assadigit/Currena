@@ -26,6 +26,7 @@ export { CoreError } from './errors';
 export {
   SourceSchema,
   SnapshotSourceSchema,
+  sourceForPair,
   CurrencyCodeSchema,
   RateUnitSchema,
   RateSchema,
