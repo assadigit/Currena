@@ -14,6 +14,13 @@
  *   - refresh(source?): re-fetch only when stale/missing (single-flight per
  *     source). On 503/no-network: keep serving the last-good snapshot with a
  *     stale/degraded notice. With nothing persisted → hard error state.
+ *   - GOLD HEAL: a tgju snapshot WITHOUT the gold/coin section (a pre-gold
+ *     legacy snapshot persisted across the gold-board deploy, or a scrape
+ *     where TGJU's gold symbols went missing) is treated as NOT usable —
+ *     the store forces a network re-fetch so the gold board self-heals on
+ *     the very next load/poll instead of waiting out the freshness window
+ *     with a dash-filled panel. The forced attempt is throttled to one per
+ *     freshness window (failed attempts included) so it can never storm.
  *   - online/offline tracked via navigator.onLine events.
  *   - Rate intelligence: each source also keeps the PREVIOUS distinct
  *     snapshot (`currena:prev-snapshot:*`, persisted) so the UI can show
@@ -128,6 +135,11 @@ class SnapshotStore {
     online: typeof navigator === 'undefined' ? true : navigator.onLine,
   };
 
+  /** Epoch ms of the last network attempt made BECAUSE the served tgju
+   *  snapshot lacked the gold section — throttles the forced gold heal to
+   *  one attempt per freshness window (failed attempts included). */
+  private lastGoldlessAttemptAt = 0;
+
   private readonly listeners = new Set<() => void>();
   private readonly pending = new Map<SnapshotSource, Promise<void>>();
   private booted = false;
@@ -194,10 +206,24 @@ class SnapshotStore {
    * (the manual refresh button) — the SERVER ladder still applies its own
    * min-interval/fresh-cache rules, so a forced refresh is one cheap request
    * that surfaces any newer cached generation, never an extra scrape storm.
+   *
+   * The guard also refuses a FRESH-but-gold-less tgju snapshot (see the
+   * GOLD HEAL note in the header): the currency half may be perfectly live
+   * while the gold board sits on dashes because the snapshot predates the
+   * gold field — one throttled re-fetch replaces it with a gold-bearing
+   * generation instead of waiting out the freshness window.
    */
   refresh(source: SnapshotSource, options: { force?: boolean } = {}): Promise<void> {
     const current = this.state[source];
-    const usable = current.snapshot !== null && !isStale(current.snapshot) && current.status !== 'error';
+    const goldHealPending =
+      current.snapshot !== null &&
+      SnapshotStore.isGoldless(source, current.snapshot) &&
+      Date.now() - this.lastGoldlessAttemptAt > FRESH_TTL_SEC * 1000;
+    const usable =
+      current.snapshot !== null &&
+      !isStale(current.snapshot) &&
+      current.status !== 'error' &&
+      !goldHealPending;
     if (usable && !options.force) return Promise.resolve();
     return this.fetch(source);
   }
@@ -207,11 +233,28 @@ class SnapshotStore {
     return Promise.all([this.refresh('tgju'), this.refresh('frankfurter')]).then(() => undefined);
   }
 
+  /** A tgju snapshot without ANY gold/coin quotes — a pre-gold legacy
+   *  snapshot (deploy transition) or a scrape that lost the gold section.
+   *  The gold board honestly degrades to dashes for these; the store
+   *  additionally treats them as heal-pending rather than trusting the
+   *  client freshness window. Per-ITEM absences (TGJU unpublished a single
+   *  symbol) are NOT this — those are TGJU's own honest state. */
+  private static isGoldless(source: SnapshotSource, snapshot: Snapshot): boolean {
+    return source === 'tgju' && (snapshot.gold?.length ?? 0) === 0;
+  }
+
   private fetch(source: SnapshotSource): Promise<void> {
     const existing = this.pending.get(source);
     if (existing) return existing;
 
     const run = (async () => {
+      // Stamp the heal attempt up-front: even a failed attempt (offline,
+      // 5xx) must throttle the forced gold re-fetch to once per window,
+      // so the 30s LiveRates poll can never turn it into a request storm.
+      const preSnapshot = this.state[source].snapshot;
+      if (preSnapshot !== null && SnapshotStore.isGoldless(source, preSnapshot)) {
+        this.lastGoldlessAttemptAt = Date.now();
+      }
       this.setSource(source, { status: 'loading' });
       try {
         const response = await fetchRates(source);
