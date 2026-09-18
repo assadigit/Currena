@@ -23,7 +23,7 @@ import { formatDate, formatNumber, formatRelative } from '@currena/core';
 import { Button, Card, SourceBadge, Toast } from '../components/ui';
 import { getDictionary } from '../i18n';
 import { useCodeLabel } from '../lib/display';
-import { downloadHistoryCsv, readHistory, removeHistoryEntry, HISTORY_KEY } from '../lib/history';
+import { downloadHistoryCsv, historyEntryId, readHistory, removeHistoryEntry, HISTORY_KEY } from '../lib/history';
 import type { HistoryEntry } from '../lib/history';
 import { useI18n } from '../lib/locale';
 import { navigate } from '../router';
@@ -62,7 +62,7 @@ export function History() {
   const [entries, setEntries] = useState<HistoryEntry[] | null>(null);
   const [filterPair, setFilterPair] = useState<string>('all');
   const [search, setSearch] = useState('');
-  const [deleting, setDeleting] = useState<ReadonlySet<number>>(new Set());
+  const [deleting, setDeleting] = useState<ReadonlySet<string>>(new Set());
   const [toast, setToast] = useState<string | null>(null);
 
   // Load once on mount; re-read on storage events (other tabs).
@@ -138,13 +138,16 @@ export function History() {
     navigate(`/?from=${encodeURIComponent(entry.from)}&to=${encodeURIComponent(entry.to)}&amount=${entry.amount}`);
   };
 
-  const removeEntry = (storageIndex: number): void => {
-    setDeleting((prev) => new Set(prev).add(storageIndex));
+  const removeEntry = (entry: IndexedEntry['entry']): void => {
+    // Identity-keyed delete: indices shift while multiple deletes are in
+    // flight, which used to remove the wrong row (or miss entirely).
+    const id = historyEntryId(entry);
+    setDeleting((prev) => new Set(prev).add(id));
     window.setTimeout(() => {
-      setEntries(removeHistoryEntry(storageIndex));
+      setEntries(removeHistoryEntry(entry));
       setDeleting((prev) => {
         const next = new Set(prev);
-        next.delete(storageIndex);
+        next.delete(id);
         return next;
       });
     }, 260);
@@ -303,10 +306,10 @@ export function History() {
           hour: '2-digit',
           minute: '2-digit',
         }).format(new Date(entry.timestamp));
-        const isDeleting = deleting.has(storageIndex);
+        const isDeleting = deleting.has(historyEntryId(entry));
         return (
           <Card
-            key={`${entry.timestamp}-${storageIndex}`}
+            key={historyEntryId(entry)}
             className={`mb-4 p-5 transition-all duration-250 lg:mb-0 ${
               isDeleting ? 'pointer-events-none scale-95 opacity-0 blur-sm' : 'hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)]'
             }`}
@@ -353,7 +356,7 @@ export function History() {
               </button>
               <button
                 type="button"
-                onClick={() => removeEntry(storageIndex)}
+                onClick={() => removeEntry(entry)}
                 title={t('history.deleteEntry')}
                 aria-label={t('history.deleteEntry')}
                 className="inline-flex h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-full text-base text-currena-muted transition-all duration-300 hover:bg-red-500/10 hover:text-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"

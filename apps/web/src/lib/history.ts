@@ -53,13 +53,23 @@ export function saveHistoryEntry(entry: HistoryEntry): void {
 }
 
 /**
- * Remove one entry by its index in the FULL (unfiltered) list. Callers pass
- * the storage index — the route keeps filtered views aligned to it by
- * re-reading after every mutation. Best-effort: a stale index simply misses.
+ * Identity key for one entry — stable across re-reads and array shifts
+ * (timestamp + pair + amount; results are deterministic given those).
  */
-export function removeHistoryEntry(index: number): HistoryEntry[] {
+export function historyEntryId(entry: HistoryEntry): string {
+  return `${entry.timestamp}|${entry.from}|${entry.to}|${entry.amount}`;
+}
+
+/**
+ * Remove one entry, matched by identity (NOT by index — indices shift when
+ * several deletes are in flight, which used to remove the wrong row).
+ * No-op when the entry is already gone (double-fire, other tab).
+ */
+export function removeHistoryEntry(target: HistoryEntry): HistoryEntry[] {
   const entries = readHistory();
-  if (index < 0 || index >= entries.length) return entries;
+  const id = historyEntryId(target);
+  const index = entries.findIndex((entry) => historyEntryId(entry) === id);
+  if (index === -1) return entries;
   const next = entries.filter((_, i) => i !== index);
   try {
     window.localStorage.setItem(HISTORY_KEY, JSON.stringify(next));

@@ -189,6 +189,7 @@ export function Settle() {
   const label = useCodeLabel();
 
   const [groups, setGroups] = useState<SettleGroup[]>([]);
+  const [hydrated, setHydrated] = useState(false);
   const [openGroupId, setOpenGroupId] = useState<string | null>(null);
   const [tab, setTab] = useState<'expenses' | 'balances' | 'settle'>('expenses');
   const [toast, setToast] = useState<string | null>(null);
@@ -210,13 +211,18 @@ export function Settle() {
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
-  // Hydrate once; persist on change.
+  // Hydrate once; persist only AFTER hydration (the mount-run persist used
+  // to write '[]' before the hydrated state landed — a crash or quota error
+  // in that window destroyed every saved group; StrictMode doubled the
+  // exposure in dev).
   useEffect(() => {
     setGroups(readGroups());
+    setHydrated(true);
   }, []);
   useEffect(() => {
+    if (!hydrated) return; // never persist pre-hydration state
     persist(groups);
-  }, [groups]);
+  }, [groups, hydrated]);
 
   useEffect(() => {
     if (!toast) return;
