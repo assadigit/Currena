@@ -37,13 +37,18 @@ export function currencyDisplayName(code: string): string {
   const known = getCurrency(code);
   if (known) return known.name;
   try {
-    const display = new Intl.DisplayNames(['en'], { type: 'currency' }).of(code);
+    // Intl.DisplayNames construction is expensive — memoize the single
+    // instance this helper ever needs (locale + type are constant here).
+    displayNames ??= new Intl.DisplayNames(['en'], { type: 'currency' });
+    const display = displayNames.of(code);
     if (display && display !== code) return display;
   } catch {
     // invalid code for Intl — fall through
   }
   return code;
 }
+
+let displayNames: Intl.DisplayNames | undefined;
 
 /**
  * Build the USD-base Snapshot from a parsed Frankfurter payload (pure —
