@@ -25,12 +25,16 @@ export interface RateStore {
   getStatus(source: SnapshotSource): Promise<SourceStatus | undefined>;
   putStatus(source: SnapshotSource, status: SourceStatus): Promise<void>;
   /**
-   * Best-effort single-flight lock: returns true when the caller now owns the
-   * lock for `ttlSec`, false when another in-flight scrape holds it. The
-   * owner MUST call `releaseLock` when done (a TTL guards against leaked locks).
+   * Best-effort single-flight lock: returns an opaque ownership token when
+   * the caller now owns the lock for `ttlSec`, or false when another
+   * in-flight scrape holds it. The owner MUST call `releaseLock(token)` when
+   * done; release only takes effect while the token still matches (an
+   * overran holder can no longer delete a successor's lock). A TTL guards
+   * against leaked locks.
    */
-  tryAcquireLock(source: SnapshotSource, ttlSec: number): Promise<boolean>;
-  releaseLock(source: SnapshotSource): Promise<void>;
+  tryAcquireLock(source: SnapshotSource, ttlSec: number): Promise<string | false>;
+  /** Release the lock iff the stored marker still equals `token`. */
+  releaseLock(source: SnapshotSource, token: string): Promise<void>;
 }
 
 /**
@@ -40,7 +44,7 @@ export interface RateStore {
 export class InMemoryRateStore implements RateStore {
   private readonly snapshots = new Map<string, { snapshot: Snapshot; expiresAtMs: number }>();
   private readonly statuses = new Map<string, SourceStatus>();
-  private readonly locks = new Map<string, number>();
+  private readonly locks = new Map<string, { token: string; heldUntilMs: number }>();
 
   constructor(private readonly now: () => number = () => Date.now()) {}
 
@@ -69,15 +73,21 @@ export class InMemoryRateStore implements RateStore {
     this.statuses.set(`status:${source}`, status);
   }
 
-  async tryAcquireLock(source: SnapshotSource, ttlSec: number): Promise<boolean> {
+  async tryAcquireLock(source: SnapshotSource, ttlSec: number): Promise<string | false> {
     const key = `lock:${source}`;
-    const heldUntil = this.locks.get(key);
-    if (heldUntil !== undefined && this.now() < heldUntil) return false;
-    this.locks.set(key, this.now() + ttlSec * 1000);
-    return true;
+    const held = this.locks.get(key);
+    if (held !== undefined && this.now() < held.heldUntilMs) return false;
+    const heldUntilMs = this.now() + ttlSec * 1000;
+    const token = `${heldUntilMs}:${Math.random().toString(36).slice(2, 10)}`;
+    this.locks.set(key, { token, heldUntilMs });
+    return token;
   }
 
-  async releaseLock(source: SnapshotSource): Promise<void> {
-    this.locks.delete(`lock:${source}`);
+  async releaseLock(source: SnapshotSource, token: string): Promise<void> {
+    const key = `lock:${source}`;
+    const held = this.locks.get(key);
+    if (held !== undefined && held.token === token) {
+      this.locks.delete(key);
+    }
   }
 }

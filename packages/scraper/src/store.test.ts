@@ -52,19 +52,38 @@ describe('InMemoryRateStore', () => {
     let nowMs = 1_000_000;
     const store = new InMemoryRateStore(() => nowMs);
 
-    expect(await store.tryAcquireLock('tgju', 25)).toBe(true); // acquired
+    const token = await store.tryAcquireLock('tgju', 25);
+    expect(typeof token).toBe('string'); // acquired → ownership token
     expect(await store.tryAcquireLock('tgju', 25)).toBe(false); // held
-    await store.releaseLock('tgju');
-    expect(await store.tryAcquireLock('tgju', 25)).toBe(true); // re-acquired after release
+    await store.releaseLock('tgju', token as string);
+    expect(await store.tryAcquireLock('tgju', 25)).not.toBe(false); // re-acquired after release
 
-    await store.releaseLock('tgju');
+    const again = await store.tryAcquireLock('tgju', 25);
+    await store.releaseLock('tgju', again as string);
     nowMs += 26_000; // past the lock TTL — a leaked lock self-expires
-    expect(await store.tryAcquireLock('tgju', 25)).toBe(true);
+    expect(await store.tryAcquireLock('tgju', 25)).not.toBe(false);
+  });
+
+  it('releaseLock is token-scoped: an overran holder cannot delete a successor lock', async () => {
+    let nowMs = 1_000_000;
+    const store = new InMemoryRateStore(() => nowMs);
+
+    const holderA = (await store.tryAcquireLock('tgju', 25)) as string;
+    nowMs += 26_000; // A overruns its TTL
+    const holderB = (await store.tryAcquireLock('tgju', 25)) as string; // B takes over
+    expect(holderB).not.toBe(holderA);
+
+    // A's late release must NOT delete B's lock (used to admit a 3rd scrape).
+    await store.releaseLock('tgju', holderA);
+    expect(await store.tryAcquireLock('tgju', 25)).toBe(false); // B still holds
+
+    await store.releaseLock('tgju', holderB); // rightful release works
+    expect(await store.tryAcquireLock('tgju', 25)).not.toBe(false);
   });
 
   it('keeps sources isolated (tgju lock does not block frankfurter)', async () => {
     const store = new InMemoryRateStore();
-    expect(await store.tryAcquireLock('tgju', 25)).toBe(true);
-    expect(await store.tryAcquireLock('frankfurter', 25)).toBe(true);
+    expect(await store.tryAcquireLock('tgju', 25)).not.toBe(false);
+    expect(await store.tryAcquireLock('frankfurter', 25)).not.toBe(false);
   });
 });

@@ -192,9 +192,18 @@ export function createApp(deps: AppDeps = {}) {
     const source: SnapshotSource = from === 'IRR' || to === 'IRR' ? 'tgju' : 'frankfurter';
 
     try {
-      const { snapshot } = await makeService(c.env).getRates(source);
-      const result = convert(snapshot, from, to, amount);
-      return c.json(result, 200, NO_STORE);
+      const rates = await makeService(c.env).getRates(source);
+      const result = convert(rates.snapshot, from, to, amount);
+      // Propagate the ladder's staleness so clients can banner stale math
+      // exactly like they do for /api/rates (additive fields).
+      return c.json(
+        {
+          ...result,
+          ...(rates.stale ? { stale: true, notice: rates.notice } : {}),
+        },
+        200,
+        NO_STORE,
+      );
     } catch (err) {
       if (err instanceof RatesServiceError) {
         return errorResponse(c, 503, err.code, err.message, err.retryAfterSec);

@@ -1,5 +1,6 @@
-import type { Snapshot } from '@currena/core';
+import type { RatesResponse, Snapshot } from '@currena/core';
 import { InMemoryRateStore } from '@currena/scraper';
+import type { RateStore } from '@currena/scraper';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { humanizeAge, RatesService, RatesServiceError } from './rates-service';
 
@@ -177,7 +178,7 @@ describe('RatesService ladder (in-memory store + fake scrapers)', () => {
 
   it('single-flight lock — lock held by another request: no double scrape', async () => {
     await store.putSnapshot('tgju', tgjuSnapshot(new Date(T0_MS - 10 * MIN).toISOString()), 7 * 86_400);
-    expect(await store.tryAcquireLock('tgju', 25)).toBe(true); // someone else is scraping
+    expect(await store.tryAcquireLock('tgju', 25)).not.toBe(false); // someone else is scraping
 
     const res = await makeService().getRates('tgju');
     expect(scrapeCalls).toEqual([]); // lock prevented a second in-flight scrape
@@ -186,10 +187,120 @@ describe('RatesService ladder (in-memory store + fake scrapers)', () => {
   });
 
   it('single-flight lock with NO cache — 503 rather than double scrape', async () => {
-    expect(await store.tryAcquireLock('tgju', 25)).toBe(true);
+    expect(await store.tryAcquireLock('tgju', 25)).not.toBe(false);
 
     await expect(makeService().getRates('tgju')).rejects.toMatchObject({ code: 'source_unavailable' });
     expect(scrapeCalls).toEqual([]);
+  });
+
+  it('concurrency stampede — two simultaneous cold getRates deduplicate to ONE scrape', async () => {
+    // Real async interleaving (the exact scenario the lock exists for).
+    let resolveScrape: ((snap: Snapshot) => void) | undefined;
+    const slowService = new RatesService({
+      store,
+      scrapers: {
+        tgju: () =>
+          new Promise<Snapshot>((resolve) => {
+            scrapeCalls.push('tgju');
+            resolveScrape = resolve;
+          }),
+        frankfurter: async () => frankfurterSnapshot(new Date(clockMs).toISOString()),
+      },
+      now: () => new Date(clockMs),
+      scrapeDeadlineMs: 0,
+    });
+
+    const first = slowService.getRates('tgju');
+    const second = slowService.getRates('tgju');
+
+    // Let both requests run through their pre-scrape awaits (getSnapshot →
+    // getStatus → lock) before unblocking the winner's scraper.
+    for (let i = 0; i < 20 && resolveScrape === undefined; i++) {
+      await Promise.resolve();
+    }
+    resolveScrape!(tgjuSnapshot(new Date(clockMs).toISOString()));
+
+    const [a, b] = await Promise.allSettled([first, second]);
+    expect(a.status).toBe('fulfilled');
+    expect((a as PromiseFulfilledResult<RatesResponse>).value.servedFrom).toBe('live');
+    expect(b.status).toBe('rejected'); // cold cache + lock held → 503, never a 2nd scrape
+    expect(scrapeCalls).toEqual(['tgju']); // EXACTLY one scrape
+  });
+
+  it('scrape deadline — a pathological chain falls through to stale cache, not minutes of latency', async () => {
+    await store.putSnapshot('tgju', tgjuSnapshot(new Date(T0_MS - 10 * MIN).toISOString()), 7 * 86_400);
+
+    const hungService = new RatesService({
+      store,
+      scrapers: {
+        tgju: () => new Promise<Snapshot>(() => {}), // never settles
+        frankfurter: async () => frankfurterSnapshot(new Date(clockMs).toISOString()),
+      },
+      now: () => new Date(clockMs),
+      scrapeDeadlineMs: 20, // 20ms budget
+    });
+
+    const res = await hungService.getRates('tgju');
+    expect(res.servedFrom).toBe('cache'); // stale fallback after the deadline
+    expect(res.stale).toBe(true);
+
+    // The failure was recorded in status for the ops console.
+    const status = await store.getStatus('tgju');
+    expect(status?.lastError?.message).toContain('deadline');
+  });
+
+  it('KV persist failure degrades gracefully — live data still served, no 500', async () => {
+    // NB: explicit delegation — spreading a class instance drops prototype methods.
+    const failingStore: RateStore = {
+      getSnapshot: (source) => store.getSnapshot(source),
+      putSnapshot: async () => {
+        throw new Error('KV put failed');
+      },
+      getStatus: (source) => store.getStatus(source),
+      putStatus: async () => {
+        throw new Error('KV put failed');
+      },
+      tryAcquireLock: (source, ttlSec) => store.tryAcquireLock(source, ttlSec),
+      releaseLock: (source, token) => store.releaseLock(source, token),
+    };
+    const service = new RatesService({
+      store: failingStore,
+      scrapers: {
+        tgju: async () => tgjuSnapshot(new Date(clockMs).toISOString()),
+        frankfurter: async () => frankfurterSnapshot(new Date(clockMs).toISOString()),
+      },
+      now: () => new Date(clockMs),
+      scrapeDeadlineMs: 0,
+    });
+
+    const res = await service.getRates('tgju');
+    expect(res.servedFrom).toBe('live'); // fresh data in hand → serve it anyway
+    expect(res.stale).toBe(false);
+  });
+
+  it('lock release failure does not break the response (TTL reclaims)', async () => {
+    const failingRelease: RateStore = {
+      getSnapshot: (source) => store.getSnapshot(source),
+      putSnapshot: (source, snapshot, ttlSec) => store.putSnapshot(source, snapshot, ttlSec),
+      getStatus: (source) => store.getStatus(source),
+      putStatus: (source, status) => store.putStatus(source, status),
+      tryAcquireLock: (source, ttlSec) => store.tryAcquireLock(source, ttlSec),
+      releaseLock: async () => {
+        throw new Error('KV delete failed');
+      },
+    };
+    const service = new RatesService({
+      store: failingRelease,
+      scrapers: {
+        tgju: async () => tgjuSnapshot(new Date(clockMs).toISOString()),
+        frankfurter: async () => frankfurterSnapshot(new Date(clockMs).toISOString()),
+      },
+      now: () => new Date(clockMs),
+      scrapeDeadlineMs: 0,
+    });
+
+    const res = await service.getRates('tgju');
+    expect(res.servedFrom).toBe('live');
   });
 
   it('force=true scrapes even when the cache is FRESH (refresh semantics)', async () => {

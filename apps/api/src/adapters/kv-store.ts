@@ -58,21 +58,33 @@ export class KvRateStore implements RateStore {
     await this.kv.put(`status:${source}`, JSON.stringify(status));
   }
 
-  async tryAcquireLock(source: SnapshotSource, ttlSec: number): Promise<boolean> {
+  async tryAcquireLock(source: SnapshotSource, ttlSec: number): Promise<string | false> {
     const key = `lock:${source}`;
     const raw = await this.kv.get(key);
     if (raw !== null) {
-      const heldUntil = Date.parse(raw);
+      // Expiry is the part before '|' (legacy markers written before the
+      // token-suffix change have no '|' at all — still parseable).
+      const pipeAt = raw.indexOf('|');
+      const heldUntil = Date.parse(pipeAt === -1 ? raw : raw.slice(0, pipeAt));
       if (Number.isFinite(heldUntil) && heldUntil > Date.now()) return false; // held
       // expired marker — fall through and take over
     }
-    await this.kv.put(key, new Date(Date.now() + ttlSec * 1000).toISOString(), {
+    // The stored marker IS the ownership token (expiry + random suffix);
+    // releaseLock only deletes when it still matches, so an overran holder
+    // cannot delete a successor's lock. (KV has no compare-and-delete, so the
+    // release check is read-then-delete — a much narrower race than before.)
+    const token = `${new Date(Date.now() + ttlSec * 1000).toISOString()}|${Math.random().toString(36).slice(2, 10)}`;
+    await this.kv.put(key, token, {
       expirationTtl: Math.max(KV_MIN_TTL_SEC, ttlSec), // KV cleanup ≥ logical TTL
     });
-    return true;
+    return token;
   }
 
-  async releaseLock(source: SnapshotSource): Promise<void> {
-    await this.kv.delete(`lock:${source}`);
+  async releaseLock(source: SnapshotSource, token: string): Promise<void> {
+    const key = `lock:${source}`;
+    const raw = await this.kv.get(key);
+    if (raw === token) {
+      await this.kv.delete(key);
+    }
   }
 }

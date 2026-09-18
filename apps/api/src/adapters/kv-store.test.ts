@@ -121,16 +121,22 @@ describe('KvRateStore (over FakeKV)', () => {
     expect(status).toEqual({ source: 'tgju', lastDurationMs: 42 });
   });
 
-  it('best-effort lock: acquire / block / release', async () => {
+  it('best-effort lock: acquire / block / token-scoped release', async () => {
     const kv = new FakeKV();
     const s = store(kv);
 
-    expect(await s.tryAcquireLock('tgju', 25)).toBe(true);
+    const token = await s.tryAcquireLock('tgju', 25);
+    expect(typeof token).toBe('string');
     expect(await s.tryAcquireLock('tgju', 25)).toBe(false);
-    expect(await s.tryAcquireLock('frankfurter', 25)).toBe(true); // per-source isolation
+    const other = await s.tryAcquireLock('frankfurter', 25); // per-source isolation
+    expect(typeof other).toBe('string');
 
-    await s.releaseLock('tgju');
-    expect(await s.tryAcquireLock('tgju', 25)).toBe(true);
+    // A stale token (from an overran holder) must not release the current lock.
+    await s.releaseLock('tgju', 'stale-token');
+    expect(await s.tryAcquireLock('tgju', 25)).toBe(false); // still held
+
+    await s.releaseLock('tgju', token as string);
+    expect(await s.tryAcquireLock('tgju', 25)).not.toBe(false);
   });
 
   it('lock self-expires after its logical TTL (value timestamp, not the KV TTL)', async () => {
@@ -141,9 +147,28 @@ describe('KvRateStore (over FakeKV)', () => {
       const kv = new FakeKV();
       const s = store(kv);
 
-      expect(await s.tryAcquireLock('tgju', 25)).toBe(true);
+      expect(await s.tryAcquireLock('tgju', 25)).not.toBe(false);
       vi.setSystemTime(t0 + 26_000); // past the 25s logical TTL
-      expect(await s.tryAcquireLock('tgju', 25)).toBe(true); // take over the leaked lock
+      expect(await s.tryAcquireLock('tgju', 25)).not.toBe(false); // take over the leaked lock
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('accepts legacy-format lock markers (no token suffix) and still honors their expiry', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      const t0 = Date.parse('2026-09-16T12:00:00.000Z');
+      vi.setSystemTime(t0);
+      const kv = new FakeKV();
+      const s = store(kv);
+
+      // Marker written by the pre-token KV writer: bare ISO datetime.
+      await kv.put('lock:tgju', new Date(t0 + 25_000).toISOString());
+      expect(await s.tryAcquireLock('tgju', 25)).toBe(false); // still held
+
+      vi.setSystemTime(t0 + 26_000); // expired
+      expect(await s.tryAcquireLock('tgju', 25)).not.toBe(false); // takeover
     } finally {
       vi.useRealTimers();
     }
