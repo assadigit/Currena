@@ -7,7 +7,8 @@ explicit human cutover — nothing here touches it.
 ## Topology (one deployment)
 
 ```
-Cloudflare Workers  currena-api  →  https://currena-api.sedanama-ir.workers.dev
+Cloudflare Workers  currena-api  →  https://currena.ir  (Custom Domain, production)
+                                        https://currena-api.sedanama-ir.workers.dev
  ├─ GET  /api/health|rates|convert|meta|status     JSON (Hono)
  ├─ POST /internal/refresh                         header-secret scrape
  ├─ GET/POST /admin                                zero-JS ops console (noindex)
@@ -43,10 +44,20 @@ export CLOUDFLARE_ACCOUNT_ID=…  # /home/z/.currena-secrets (chmod 600)
 2. **Refresh secret** (once):
    ```sh
    openssl rand -hex 32                          # generate locally
-   pnpm --filter @currena/api exec wrangler secret put REFRESH_SECRET
+   printf '%s' "$REFRESH_SECRET" | pnpm --filter @currena/api exec wrangler secret put REFRESH_SECRET
    # same value into apps/api/.dev.vars for local dev (gitignored)
    ```
-3. Install + verify:
+   > ⚠ Use `printf '%s'`, never `echo` — `echo` appends a newline that becomes
+   > part of the stored secret (constant-time compares then always fail).
+   > Verified the hard way on 2026-09-18 with ADMIN_VIEW_SECRET.
+3. **(Optional, recommended) Admin view gate** — when set, `/admin` requires a
+   sign-in (HMAC cookie session) instead of being public:
+   ```sh
+   openssl rand -hex 24
+   printf '%s' "$ADMIN_VIEW_SECRET" | pnpm --filter @currena/api exec wrangler secret put ADMIN_VIEW_SECRET
+   ```
+   Unset (or `wrangler secret delete ADMIN_VIEW_SECRET`) returns to public mode.
+4. Install + verify:
    ```sh
    pnpm install && pnpm -r typecheck && pnpm -r test
    ```
@@ -115,15 +126,16 @@ updated: X ago" state. Zero network until connectivity returns.
   GitHub Actions runners — GATE2_EVIDENCE.md. A different host must re-verify
   egress + re-run the Rial→Toman cross-checks (AGENTS.md §6).
 
-## Cutover (PENDING human decision — do not run unprompted)
+## Cutover status (updated 2026-09-18)
 
-When the owner calls it:
-
-1. Set up the production domain (Custom Domain on the Worker or `workers.dev`
-   as-is) and update `manifest.webmanifest` / PWA metadata if the origin changes.
-2. Final parity pass against the legacy (converter + live rates + calculator
-   goldens).
-3. Announce + flip links; keep the PythonAnywhere app alive for a grace period,
-   then decommission from its dashboard (outside this repo).
+1. ✅ **Production deploy done** — owner-authorized ("Deploy yourself", credentials
+   provided). Branch `improve/autonomous-session-2026-09-24` @ `9d91ffb` is live
+   on `currena.ir` + `workers.dev` (version `ddde3962…`); full smoke evidence in
+   SESSION_LOG.md. The Custom Domain was already attached (pre-existing).
+2. ✅ **PWA metadata** — manifest is origin-agnostic (`start_url: '/'`), verified
+   against both live URLs.
+3. ⏳ **Legacy decommission** (owner's call, outside this repo): announce + flip
+   any remaining links off `aliassadi1993.pythonanywhere.com`, keep it alive for a
+   grace period, then decommission from its dashboard.
 4. Post-cutover backlog already documented: scanner OCR (client-side), scan
    gallery, D1 history + charts, Cloudflare Access on `/admin`, source toggles.
