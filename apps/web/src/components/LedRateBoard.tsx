@@ -29,6 +29,12 @@
  *   - Row cells in fixed order: flag · currency name · current · high · low.
  *   - The flag+name cell aligns to the row's leading edge via
  *     padding-inline-start (names are Persian; the row must stay RTL-safe).
+ *   - The currency NAME is the bold identity label (2026-09-27 owner spec:
+ *     +40–50% size, weight 700 — "reads clearly at a glance"), with the
+ *     currency CODE kept as a small secondary LED label beneath it. Below
+ *     md the name owns its own line (flag+code become a quiet caption line)
+ *     so the bigger name still fits untruncated; at md+ the flag sits
+ *     beside the name/code stack, and rows grow a little taller to breathe.
  *   - ONE SHARED COLUMN GRID: .led-table (the wrapper) owns the single
  *     grid-template-columns definition; the header row, the list and
  *     every value row subgrid it (index.css .led-table/.led-row), so
@@ -307,26 +313,50 @@ const LedRow = memo(function LedRow({
 }: LedRowProps) {
   const stagger = index * FLASH_STAGGER_MS;
   return (
-    <li className="led-row border-b border-white/[0.04] py-3 last:border-b-0 sm:py-3.5">
-      {/* Leading cell: flag + name, aligned via padding-inline-start so the
-          Persian names (RTL) keep the row's leading edge in both directions.
-          Mobile: compact flag + tight gaps so the wide DSEG7 glyphs and the
-          recessed module wells still leave the name real room. */}
-      <div className="flex min-w-0 items-center gap-2 ps-1 sm:gap-2.5 sm:ps-2.5">
-        <img
-          src={`/images/flags/${quote.code.toLowerCase()}.png`}
-          alt=""
-          className="h-4 w-6 shrink-0 rounded-[3px] object-cover ring-1 ring-white/15 sm:h-[21px] sm:w-[32px]"
-        />
-        <div className="min-w-0 leading-tight">
-          <p className="truncate text-[0.75rem] font-semibold text-white/90 sm:text-[0.92rem]">{name}</p>
-          {/* Currency code — a dot-matrix LED label (tight pitch). */}
-          <p
-            className="led-label led-label-red-dim text-[0.55rem] font-bold uppercase tracking-[0.18em] text-[#ff1e1e]/60 sm:text-[0.58rem]"
-            dir="ltr"
-          >
-            {quote.code}
-          </p>
+    <li className="led-row border-b border-white/[0.04] py-3 last:border-b-0 sm:py-4">
+      {/* Leading cell — flag · name · code, aligned to the row's leading edge
+          via padding-inline-start so the Persian names (RTL) keep the row's
+          leading edge in both directions. The NAME is the big bold identity
+          label (2026-09-27 owner spec: +40–50% size, weight 700) with the
+          code kept as a small secondary label — two responsive shapes:
+            <md  the name owns its line, with the flag + code as a quiet
+                 caption line beneath — the name gets the WHOLE track width
+                 (the flag no longer shares its line), so the +40% name still
+                 renders "US Dollar" untruncated at 375px and through the
+                 narrow-tablet zone (640–767px) where the horizontal shape
+                 would not have room for the enlarged name.
+            md+  the classic board row: flag beside the name/code stack —
+                 only from 768px up, where the name track (≥252px) actually
+                 fits the flag plus the full +41% name without truncation.
+          Both shapes paint the same cached flag PNG (two <img>s). */}
+      <div className="min-w-0 ps-1 md:ps-2.5">
+        <div className="flex min-w-0 flex-col gap-[3px] md:flex-row md:items-center md:gap-2.5">
+          <img
+            src={`/images/flags/${quote.code.toLowerCase()}.png`}
+            alt=""
+            className="hidden h-[21px] w-[32px] shrink-0 rounded-[3px] object-cover ring-1 ring-white/15 md:block"
+          />
+          <div className="min-w-0 leading-tight">
+            <p className="truncate text-[1.05rem] font-bold text-white/90 sm:text-[1.3rem] lg:text-[1.35rem]">
+              {name}
+            </p>
+            {/* Currency code — a dot-matrix LED label (tight pitch); below
+                md it rides beside a compact flag on the caption line
+                (dir-aware flex: flag at the row's leading edge in RTL too). */}
+            <p className="flex items-center gap-1.5">
+              <img
+                src={`/images/flags/${quote.code.toLowerCase()}.png`}
+                alt=""
+                className="h-3.5 w-[21px] shrink-0 rounded-[2px] object-cover ring-1 ring-white/15 md:hidden"
+              />
+              <span
+                className="led-label led-label-red-dim text-[0.55rem] font-bold uppercase tracking-[0.18em] text-[#ff1e1e]/60 sm:text-[0.58rem]"
+                dir="ltr"
+              >
+                {quote.code}
+              </span>
+            </p>
+          </div>
         </div>
       </div>
 
