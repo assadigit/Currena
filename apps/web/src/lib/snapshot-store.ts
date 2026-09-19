@@ -338,3 +338,30 @@ export const snapshotStore = new SnapshotStore();
 export function useSnapshotStore(): StoreState {
   return useSyncExternalStore(snapshotStore.subscribe, snapshotStore.getState);
 }
+
+/**
+ * CONFIRMED staleness — the semantics every "cached data" surface (stale
+ * banners, board status LEDs) must render on.
+ *
+ * `state.stale` alone is DERIVED: at boot, `hydrate()` stamps it from the
+ * persisted snapshot's age, so it is true for every returning visitor whose
+ * last visit is older than the freshness window — even though the boot
+ * fetch is already in flight and (with the every-minute cron keeping the
+ * worker fresh) lands a moment later. Rendering banners/LEDs on that
+ * transient derivation made the "⚠️ Using cached rates" box appear for a
+ * blink of an eye and vanish as soon as fresh data arrived (owner report
+ * 2026-09-19).
+ *
+ * Staleness is only CONFIRMED when a fetch cycle actually SETTLED on
+ * non-fresh data: either the server itself served a stale generation
+ * (`servedFrom: 'cache'` + stale — notice included), or a fetch FAILED and
+ * the store keeps serving the last-good snapshot in degraded mode. The
+ * boot-local derivation (`servedFrom: 'local-store'`, fetch in flight)
+ * never raises a banner on its own.
+ */
+export function isConfirmedStale(state: SourceState): boolean {
+  return (
+    state.snapshot !== null &&
+    (state.degraded || (state.stale && state.servedFrom !== 'local-store'))
+  );
+}

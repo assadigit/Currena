@@ -39,7 +39,7 @@ import { saveHistoryEntry } from '../lib/history';
 import { useI18n } from '../lib/locale';
 import { addRecentPair, readRecentPairs } from '../lib/recent-pairs';
 import type { RecentPair } from '../lib/recent-pairs';
-import { snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
+import { isConfirmedStale, snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
 import type { TranslationKey } from '../lib/locale';
 
 type Phase = 'idle' | 'fetching' | 'result';
@@ -106,7 +106,11 @@ export function Converter() {
 
   const pairSource = sourceForPair(from, to);
   const sourceState = store[pairSource];
-  const showStaleBanner = sourceState.snapshot !== null && (sourceState.stale || sourceState.degraded);
+  // CONFIRMED staleness only (owner report 2026-09-19): the transient
+  // boot-local derivation (`servedFrom: 'local-store'`, fetch already in
+  // flight) must not flash the "Using cached rates" box for a blink before
+  // fresh data lands — see isConfirmedStale in snapshot-store.
+  const showStaleBanner = isConfirmedStale(sourceState);
   const showOfflineBanner = !store.online && sourceState.snapshot !== null;
 
   // Recent pairs — read once on mount (written after each conversion).

@@ -41,7 +41,7 @@ import { memo, useEffect, useMemo, useState } from 'react';
 import type { GoldId, GoldQuote, Snapshot } from '@currena/core';
 import { LedClock, LedDate, LedStatus, LedValueCell } from './led/LedParts';
 import { useI18n } from '../lib/locale';
-import { useSnapshotStore } from '../lib/snapshot-store';
+import { isConfirmedStale, useSnapshotStore } from '../lib/snapshot-store';
 import type { TranslationKey } from '../lib/locale';
 
 /** Board items in DISPLAY order — the global ounce first, then the Tehran
@@ -227,9 +227,12 @@ export function LedGoldBoard() {
 
   const items = useMemo(() => goldBoardItems(snapshot), [snapshot]);
 
+  // Status LED — CONFIRMED staleness only (isConfirmedStale): the boot
+  // hydration's local-store age derivation must not blink "CACHED" →
+  // "LIVE" while the boot fetch is already landing fresh data.
   const status: 'live' | 'cached' | 'offline' = !store.online
     ? 'offline'
-    : state.stale || state.degraded
+    : isConfirmedStale(state)
       ? 'cached'
       : 'live';
 

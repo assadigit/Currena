@@ -79,7 +79,7 @@ import { convert } from '@currena/core';
 import type { CurrencyCode, Snapshot } from '@currena/core';
 import { LedClock, LedDate, LedStatus, LedValueCell } from './led/LedParts';
 import { useI18n } from '../lib/locale';
-import { useSnapshotStore } from '../lib/snapshot-store';
+import { isConfirmedStale, useSnapshotStore } from '../lib/snapshot-store';
 import type { TranslationKey } from '../lib/locale';
 
 /** Board currencies — owner-priority five first, then the legacy rest
@@ -250,9 +250,12 @@ export function LedRateBoard() {
 
   const quotes = useMemo(() => boardQuotes(snapshot), [snapshot]);
 
+  // Status LED — CONFIRMED staleness only (isConfirmedStale): the boot
+  // hydration's local-store age derivation must not blink "CACHED" →
+  // "LIVE" while the boot fetch is already landing fresh data.
   const status: 'live' | 'cached' | 'offline' = !store.online
     ? 'offline'
-    : state.stale || state.degraded
+    : isConfirmedStale(state)
       ? 'cached'
       : 'live';
 

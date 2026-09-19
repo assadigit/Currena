@@ -34,7 +34,7 @@ import { fetchMeta } from '../lib/api';
 import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
 import { seriesForPair, trendOf, useRateHistory } from '../lib/rate-history';
-import { snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
+import { isConfirmedStale, snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
 import type { TranslationKey } from '../lib/locale';
 
 const REFRESH_INTERVAL_MS = 30_000;
@@ -366,15 +366,17 @@ export function LiveRates() {
             (inset shadows — see .led-frame/.led-board in index.css).
             Inside: red seven-segment price digits, live clock, one row
             per currency (flag · name · current · day high · day low —
-            TGJU's real daily stats) with a glow-pulse on every update. */}
-        <div className="led-frame mb-6">
+            TGJU's real daily stats) with a glow-pulse on every update.
+            mb-12: breathing room before the gold section (owner request
+            2026-09-19 — clear white space between the two boards). */}
+        <div className="led-frame mb-12">
           <LedRateBoard />
         </div>
 
         {/* Gold board heading — same per-board structure (owner request
             2026-09-28): coin emoji, "live updates from TGJU" link and the
             shared scrape stamp. */}
-        <div className="mb-4 text-center">
+        <div className="mb-6 text-center">
           <h2 className="mb-2.5 flex items-center justify-center gap-2.5 text-2xl font-bold text-currena-dark lg:text-3xl">
             <span aria-hidden="true">🪙</span>
             {t('liveRates.goldBoardHeading')}
@@ -413,7 +415,7 @@ export function LiveRates() {
             <p className="text-sm font-medium">{t('common.offlineRatesFrom', { source: t('sources.tgju') })}</p>
           </div>
         ) : null}
-        {snapshot && (state.stale || state.degraded) ? (
+        {snapshot && isConfirmedStale(state) ? (
           <div
             role="status"
             className="slide-down mb-4 flex items-center gap-3 rounded-[15px] border-s-4 border-currena-warning bg-currena-warning/15 px-4 py-3.5"
