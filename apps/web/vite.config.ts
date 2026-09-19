@@ -49,6 +49,11 @@ export default defineConfig({
         name: 'Currena — Currency Converter',
         short_name: 'Currena',
         description: 'Modern currency converter with live Iranian Toman rates',
+        // Task 23 (Android packaging prep): stable app identity. Chrome
+        // derives it from start_url when omitted; an explicit id keeps the
+        // installed app identity stable across minor URL changes and is what
+        // PWABuilder keys the generated package off.
+        id: '/',
         start_url: '/',
         scope: '/',
         display: 'standalone',
@@ -57,6 +62,47 @@ export default defineConfig({
         theme_color: '#E8F4F8',
         lang: 'en',
         categories: ['finance', 'utilities'],
+        // Task 23: real store-listing screenshots (captured from the live app
+        // — phone 390×844 converter with a converted result, desktop 1280×720
+        // live-rates LED boards). PWABuilder feeds these to the Play Store
+        // listing; Chrome shows them in the install dialog where supported.
+        // Kept OUT of the SW precache (globIgnores below) — they are listing
+        // assets, not needed offline.
+        screenshots: [
+          {
+            src: '/images/screenshots/narrow-phone.png',
+            sizes: '390x844',
+            type: 'image/png',
+            form_factor: 'narrow',
+            description: 'Convert any amount with live Iranian Toman rates',
+          },
+          {
+            src: '/images/screenshots/wide-desktop.png',
+            sizes: '1280x720',
+            type: 'image/png',
+            form_factor: 'wide',
+            description: 'Live rate and gold boards with LED-style displays',
+          },
+        ],
+        // Task 23: app shortcuts (Android long-press on the launcher icon /
+        // Chrome app-menu). Hash-router URLs — the SPA router picks the route
+        // up on boot. Icons: dedicated 96px tile from generate-icons.mjs.
+        shortcuts: [
+          {
+            name: 'Live Rates',
+            short_name: 'Rates',
+            description: 'Open the live rate and gold boards',
+            url: '/#/live-rates',
+            icons: [{ src: '/icons/icon-96.png', sizes: '96x96', type: 'image/png' }],
+          },
+          {
+            name: 'Calculator',
+            short_name: 'Calc',
+            description: 'Open the calculator',
+            url: '/#/calculator',
+            icons: [{ src: '/icons/icon-96.png', sizes: '96x96', type: 'image/png' }],
+          },
+        ],
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
           { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
@@ -70,6 +116,9 @@ export default defineConfig({
         skipWaiting: true,
         clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
+        // Store-listing screenshots (manifest only — PWABuilder/Play fetch
+        // them over HTTP; the app never needs them offline).
+        globIgnores: ['**/screenshots/**'],
         navigateFallback: 'index.html',
         // /admin is the server-rendered ops console (Phase 6) — the SW must
         // never serve the SPA shell for it. Same for /api and /internal.

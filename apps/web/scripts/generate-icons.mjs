@@ -60,3 +60,6 @@ render(512, 0.72, 'icon-512.png');
 render(192, 0.6, 'icon-maskable-192.png');
 render(512, 0.6, 'icon-maskable-512.png');
 render(180, 0.72, 'apple-touch-icon.png');
+// Task 23: 96px tile for manifest app-shortcut icons (Chrome launcher
+// long-press menu) — same "any" geometry as icon-192.
+render(96, 0.72, 'icon-96.png');

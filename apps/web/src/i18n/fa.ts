@@ -41,6 +41,7 @@ export const fa: Dictionary = {
     themeDark: 'حالت تیره',
     toggleTheme: 'تغییر پوسته',
     menu: 'منو',
+    installApp: 'نصب برنامه',
   },
 
   common: {

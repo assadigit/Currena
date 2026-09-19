@@ -40,6 +40,7 @@ export const en = {
     themeDark: 'Dark mode',
     toggleTheme: 'Toggle theme',
     menu: 'Menu',
+    installApp: 'Install app',
   },
 
   common: {

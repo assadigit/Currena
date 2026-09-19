@@ -19,6 +19,7 @@ import { useState } from 'react';
 import { navigate, useRoute, ROUTES } from '../router';
 import { useTheme } from '../lib/theme';
 import { useI18n } from '../lib/locale';
+import { InstallButton } from './InstallButton';
 import type { TranslationKey } from '../lib/locale';
 import type { RoutePath } from '../router';
 
@@ -93,6 +94,10 @@ export function Header() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2 lg:gap-3">
+          {/* In-app install CTA (Task 23) — renders ONLY when Chrome has a
+              captured beforeinstallprompt and the app isn't already
+              standalone; zero footprint otherwise. */}
+          <InstallButton variant="icon" />
           {/* Language quick-toggle */}
           <button
             type="button"
@@ -186,6 +191,7 @@ export function Header() {
             </span>
             {t('nav.language')}: {locale === 'en' ? 'English' : 'فارسی'}
           </button>
+          <InstallButton variant="row" />
         </div>
       </nav>
     </>
