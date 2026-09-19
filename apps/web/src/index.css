@@ -515,10 +515,13 @@ body {
  *
  * Layers, outermost → innermost:
  *   1. Bezel frame (.led-frame): the machined metal mount around each
- *      board — visible thickness via padding, directional metal
- *      gradient, concentric corner radii, catch-light lips and the
- *      page-lifting outer drop shadow (neutral graphite for the
- *      currency board, logo-yellow gold for the GOLD & COINS board).
+ *      board — visible thickness via padding, a multi-stop REFLECTIVE
+ *      metal gradient (bright catch-light through mid tones into shadow
+ *      and back — value variation, not a flat fill), concentric corner
+ *      radii, a specular inset top highlight, the groove shadow under
+ *      the bottom edge and the page-lifting outer drop shadow (brushed
+ *      steel for the currency board, polished gold with a near-white
+ *      cream highlight for the GOLD & COINS board).
  *   2. Housing (.led-board): near-black body RECESSED behind the
  *      frame's glass — inward-pointing shadows (tight top edge shadow,
  *      bottom catch-light, glass hairline ring, deep interior) + faint
@@ -584,10 +587,26 @@ body {
 }
 
 /* Bezel frame — the physical metal mount around each shopfront board
- * (owner request 2026-09-27): visible thickness via padding, a machined
- * 145° gradient, corner radii kept CONCENTRIC with the board inside
- * (frame radius = board's 16px + the frame padding, so the gap stays
- * uniform into the corners), a catch-light lip on the frame's own edges
+ * (owner request 2026-09-27; material rework 2026-09-28).
+ *
+ * MATERIAL, not paint (owner critique 2026-09-28): a single flat tone
+ * next to the near-black board interior reads as a border/drop shadow,
+ * and nothing brighter than the base color reads as matte. So the fill
+ * is a SIX-stop 135° ramp — light catches the top-left edge, falls
+ * through mid tones into the shadowed bottom-right, brightening again
+ * mid-edge — the undulating value range is what makes a flat shape read
+ * as curved, reflective metal. The 135° diagonal (light from top-left)
+ * wraps corners more physically than an axis-aligned gradient; it is a
+ * LIGHTING effect, not a layout position, so it deliberately does NOT
+ * flip for RTL. On top of the ramp: a thin specular inset along the top
+ * edge (brighter than any gradient stop — the "catch light" where the
+ * surface turns toward the source) and a dark inset under the bottom
+ * edge (the shadow falling into the groove where the frame meets the
+ * page) — light on one edge, shadow on the other, groove between.
+ *
+ * Geometry (2026-09-27, unchanged): visible thickness via padding, corner
+ * radii kept CONCENTRIC with the board inside (frame radius = board's
+ * 16px + the frame padding, so the gap stays uniform into the corners),
  * and the page-lifting outer drop shadow.
  *
  * Phones: the bezel thins to 6px AND leans 6px into the page's own
@@ -600,15 +619,27 @@ body {
   padding: 6px;
   border-radius: 22px;
   margin-inline: -6px;
-  /* Neutral graphite metal — the currency board's mount. */
-  background: linear-gradient(145deg, #4a4a4a 0%, #2b2b2b 50%, #1a1a1a 100%);
+  /* Brushed steel — bright #9a9ea3 catch-light at the top-left corner
+   * falling through alternating mid/dark stops to #1c1d1f at the
+   * bottom-right: the multi-stop ramp simulates a surface reflecting
+   * an off-center light source, NOT one flat gray. */
+  background: linear-gradient(
+    135deg,
+    #9a9ea3 0%,
+    #4a4d52 20%,
+    #6b6e73 38%,
+    #2b2d30 58%,
+    #55585c 78%,
+    #1c1d1f 100%
+  );
   box-shadow:
-    /* machined edge — light top lip, dark bottom bite */
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    /* specular catch-light — the top edge turning toward the light */
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    /* shadow falling into the groove under the bottom edge */
     inset 0 -1px 0 rgba(0, 0, 0, 0.55),
     /* the whole assembly lifts off the page */
-    0 20px 40px rgba(0, 0, 0, 0.25),
-    0 4px 10px rgba(0, 0, 0, 0.15);
+    0 20px 40px rgba(0, 0, 0, 0.35),
+    0 4px 10px rgba(0, 0, 0, 0.2);
 }
 @media (min-width: 640px) {
   .led-frame {
@@ -618,10 +649,33 @@ body {
   }
 }
 
-/* Gold metal variant — the logo's yellow, for the GOLD & COINS board
- * (same thickness/radii/shadows; only the metal changes). */
+/* Polished-gold variant — the GOLD & COINS board's mount (same
+ * thickness/radii; the metal and its specular intensity change).
+ *
+ * The brightest stop (#fff6d8) is a near-white CREAM, not a lighter
+ * gold: a real specular highlight on shiny metal is BRIGHTER than the
+ * base material's brightest tone — that single stop is what separates
+ * "polished gold" from "painted yellow". The top-edge inset runs at
+ * 0.45 white (vs steel's 0.18) because gold's specular is fierce; the
+ * groove shadow and the page lift stay shared with the steel mount. */
 .led-frame-gold {
-  background: linear-gradient(145deg, #d4a017 0%, #8a6a10 50%, #5c4408 100%);
+  background: linear-gradient(
+    135deg,
+    #fff6d8 0%,
+    #f0c94a 18%,
+    #b8860b 38%,
+    #7a5a06 55%,
+    #e8b923 72%,
+    #8a6a10 100%
+  );
+  box-shadow:
+    /* fierce specular catch-light along the top edge */
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    /* shadow falling into the groove under the bottom edge */
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    /* the whole assembly lifts off the page */
+    0 20px 40px rgba(0, 0, 0, 0.35),
+    0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 /* Column-gap tiers — the sm/lg digit bumps (+20-25%) come with +17-20%
