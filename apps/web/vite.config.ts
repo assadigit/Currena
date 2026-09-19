@@ -28,7 +28,18 @@ export default defineConfig({
     // Farsi even fully offline. /api + /internal are never touched by the SW —
     // the snapshot store owns last-good rate caching.
     VitePWA({
-      registerType: 'prompt',
+      // autoUpdate (owner request 2026-09-19: "purge the cache, it still shows
+      // the previous version"): with the earlier 'prompt' mode the new SW
+      // sat in `waiting` until the update toast was clicked — but the owner's
+      // installed SW predated the toast, so NOTHING ever activated the new
+      // worker and every reload kept serving the old precache. autoUpdate +
+      // workbox.skipWaiting makes each new SW activate THE MOMENT it installs
+      // (self.skipWaiting, no page message needed), clientsClaim takes over
+      // open tabs, and the register script auto-reloads on controllerchange.
+      // Net effect for every visitor: one plain reload after a deploy = new
+      // version; long-lived installed PWAs update within the hour (the
+      // periodic r.update() in App.tsx).
+      registerType: 'autoUpdate',
       includeAssets: ['images/currena-logo.png'],
       manifest: {
         name: 'Currency Converter Pro',
@@ -50,6 +61,10 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Self-activation: the new SW claims control during its own install —
+        // no dependence on a prompt-mode page posting SKIP_WAITING.
+        skipWaiting: true,
+        clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
         navigateFallback: 'index.html',
         // /admin is the server-rendered ops console (Phase 6) — the SW must

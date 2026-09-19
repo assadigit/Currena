@@ -9,7 +9,7 @@
  * PWA precaches every emitted chunk, so offline loading is unaffected.
  */
 
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { registerSW } from 'virtual:pwa-register';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -74,14 +74,20 @@ function RouteFallback(): React.JSX.Element {
 export function App() {
   const route = useRoute();
   const { t, locale } = useI18n();
-  const [updateReady, setUpdateReady] = useState(false);
 
-  // PWA updates are user-prompted (registerType: 'prompt'): the old shell
-  // used to keep running until a natural reload — now the user gets a toast
-  // with a Reload action the moment a new build is waiting.
-  const updateSw = registerSW({
-    onNeedRefresh() {
-      setUpdateReady(true);
+  // PWA updates are AUTO (registerType: 'autoUpdate', owner request
+  // 2026-09-19): the new service worker skipWaiting-activates the moment it
+  // installs and the register script reloads the page on controllerchange —
+  // no prompt, no clicking, no visitor stuck on the previous version. The
+  // browser only checks sw.js on navigation, so long-lived tabs (the
+  // installed standalone PWA) get an explicit hourly r.update().
+  registerSW({
+    onRegisteredSW(_swUrl, registration) {
+      if (registration) {
+        window.setInterval(() => {
+          void registration.update().catch(() => undefined);
+        }, 60 * 60 * 1_000);
+      }
     },
   });
 
@@ -120,22 +126,6 @@ export function App() {
           </Suspense>
         </ErrorBoundary>
       </main>
-      {updateReady ? (
-        <div
-          role="status"
-          aria-live="polite"
-          className="fixed inset-x-4 bottom-4 z-[10001] mx-auto flex max-w-md items-center justify-between gap-3 rounded-[18px] border border-white/40 bg-currena-dark/95 px-4 py-3 text-sm text-white shadow-[0_18px_50px_rgba(0,0,0,0.35)] backdrop-blur"
-        >
-          <span className="leading-snug">{t('app.updateReady')}</span>
-          <button
-            type="button"
-            onClick={() => updateSw(true)}
-            className="shrink-0 cursor-pointer rounded-xl bg-white px-4 py-2 text-xs font-bold text-currena-dark transition-all duration-300 hover:-translate-y-0.5"
-          >
-            {t('app.updateReload')}
-          </button>
-        </div>
-      ) : null}
       <Footer />
     </div>
   );
