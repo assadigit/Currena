@@ -284,12 +284,15 @@ export function LedRateBoard() {
         <LedDate date={now} locale={locale} />
         <div className="flex items-center gap-3">
           {/* Wordmark — a small red brand heading, sans-serif (readable at
-              a glance on the dark housing). */}
+              a glance on the dark housing). Owner request 2026-09-20: the
+              board wordmark is TGJU, the data-source brand (like the real
+              shopfront boards that tag their source); the site brand stays
+              Currena in the nav/footer/manifest. */}
           <span
             className="select-none text-[0.6rem] font-extrabold uppercase tracking-[0.3em] text-[#ff1e1e]/90"
             dir="ltr"
           >
-            CURRENA
+            TGJU
           </span>
           <LedStatus
             state={status}

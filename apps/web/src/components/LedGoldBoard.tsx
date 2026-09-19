@@ -125,7 +125,11 @@ const LedGoldRow = memo(function LedGoldRow({
   const stagger = index * FLASH_STAGGER_MS;
   const quote = item.quote;
   const ok = quote !== null;
-  const decimals = quote?.unit === 'USD' ? 2 : 0;
+  const usd = quote?.unit === 'USD';
+  const decimals = usd ? 2 : 0;
+  // Owner request 2026-09-20: the international (USD) price carries a '$'
+  // sign on its modules — current, day high and day low are all dollars.
+  const prefix = usd ? '$' : '';
   const caption = quote
     ? formatChangePct(quote.changePct)
     : '—';
@@ -163,7 +167,8 @@ const LedGoldRow = memo(function LedGoldRow({
           the USD ounce, integers on the Toman items. Owner request
           2026-09-19: phones show ONLY this column, so it is the board's
           hero module there too (1.05rem — the 11-glyph Toman runs keep the
-          same physical module width the 13-glyph Rial values had). */}
+          same physical module width the 13-glyph Rial values had). The USD
+          ounce module carries the '$' sign (owner request 2026-09-20). */}
       <LedValueCell
         keyId={item.id}
         stat="cur"
@@ -175,6 +180,7 @@ const LedGoldRow = memo(function LedGoldRow({
         size="text-[1.05rem] sm:text-[1.2rem] lg:text-[1.3rem]"
         emphasis="primary"
         decimals={decimals}
+        prefix={prefix}
       />
 
       {/* Day high / day low — TGJU stats, secondary modules at 75% power;
@@ -191,6 +197,7 @@ const LedGoldRow = memo(function LedGoldRow({
         size="md:text-[0.8rem] lg:text-[1.05rem]"
         emphasis="secondary"
         decimals={decimals}
+        prefix={prefix}
         wrapperClass="hidden text-right md:block"
       />
       <LedValueCell
@@ -204,6 +211,7 @@ const LedGoldRow = memo(function LedGoldRow({
         size="md:text-[0.8rem] lg:text-[1.05rem]"
         emphasis="secondary"
         decimals={decimals}
+        prefix={prefix}
         wrapperClass="hidden text-right md:block"
       />
     </li>

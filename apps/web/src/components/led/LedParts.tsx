@@ -9,8 +9,8 @@
  *                 2026-09-27: the timer-like strip text left the seven-
  *                 segment look; the price digits keep it as the board's
  *                 signature) with tabular-nums and softly dimming colons.
- *   LedDate     — the board-header date (Jalali with the Persian month
- *                 name for fa) in the same readable sans-serif treatment.
+ *   LedDate     — the board-header date (fa: Jalali with the Persian month
+ *                 name, RTL flow) in the same readable sans-serif treatment.
  *   LedStatus   — the LIVE/CACHED/OFFLINE indicator LED.
  *   LedValueCell — one value module + its accessible label, placed in the
  *                 shared column grid, with the primary/secondary emphasis
@@ -31,33 +31,26 @@ import { Fragment } from 'react';
 /** 2-digit zero-pad — LED clock segments are always fixed-width. */
 const pad2 = (n: number): string => String(n).padStart(2, '0');
 
-/** Locale-aware LED date: fa → Jalali with the Persian month name, day-first
- *  — '28 شهریور 1405' (owner request 2026-09-19; digits stay Latin to match
- *  the board's digit language). en → Gregorian '2026.09.18' ('.' is the
- *  real-board separator). NOTE for the fa rendering: the string alone in a
- *  dir="ltr" element scrambles to '28 1405 شهریور' (bidi: the year is an
- *  Arabic-type number AFTER the month word, so it joins the month's RTL run
- *  and lands left of it) — LedDate therefore renders the month word inside
- *  a <bdi> isolate, which pins the exact visual '28 شهریور 1405'. The Intl
- *  formatter is cached (core's format.ts measures 100–40,000× construction-
- *  vs-format cost). */
+/** Locale-aware LED date: fa → Jalali with the Persian month name as the
+ *  LOGICAL string '28 شهریور 1405' (owner request 2026-09-19; digits stay
+ *  Latin to match the board's digit language) — LedDate renders it dir=rtl,
+ *  so it DISPLAYS [year][month name][day] (year at the left edge, day at
+ *  the right edge — the frame the old numeric 1405.06.28 had, owner request
+ *  2026-09-20) and a Persian reader reads it right-to-left as day, month,
+ *  year. en → Gregorian '2026.09.18' ('.' is the real-board separator),
+ *  dir=ltr. The Intl formatter is cached (core's format.ts measures
+ *  100–40,000× construction-vs-format cost). */
 const ledJalaliFormatter = new Intl.DateTimeFormat('fa-IR-u-nu-latn-ca-persian', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
 });
 
-/** Jalali (day / Persian month name / year) parts of the fa LED date. */
-function jalaliLedParts(date: Date): { day: string; month: string; year: string } {
-  const parts = ledJalaliFormatter.formatToParts(date);
-  const get = (type: string): string => parts.find((p) => p.type === type)?.value ?? '';
-  return { day: get('day'), month: get('month'), year: get('year') };
-}
-
 export function formatLedDate(date: Date, locale: 'en' | 'fa'): string {
   if (locale === 'fa') {
-    const { day, month, year } = jalaliLedParts(date);
-    return `${day} ${month} ${year}`;
+    const parts = ledJalaliFormatter.formatToParts(date);
+    const get = (type: string): string => parts.find((p) => p.type === type)?.value ?? '';
+    return `${get('day')} ${get('month')} ${get('year')}`;
   }
   return `${date.getFullYear()}.${pad2(date.getMonth() + 1)}.${pad2(date.getDate())}`;
 }
@@ -163,33 +156,26 @@ export function LedClock({ now }: { now: Date }) {
  *  (owner request 2026-09-27: dates left the seven-segment look): full-power
  *  red, tabular-nums, a touch of tracking — Latin only: letter-spacing breaks
  *  Persian letter joining in the fa month name, so fa keeps tracking-normal
- *  (the same rule the board column headers follow). Jalali month-name date
- *  for fa, Gregorian for en.
+ *  (the same rule the board column headers follow). Owner request 2026-09-20:
+ *  bigger on desktop — the sm: step now matches the clock's text-xl, so the
+ *  two header strips read as one typographic pair (phones keep 0.8rem).
  *
- * fa is rendered from parts with the month word in a <bdi> isolate: the
- * plain string '28 شهریور 1405' in this dir="ltr" span would bidi-scramble
- * to '28 1405 شهریور' (the year, an Arabic-type number following the month
- * word, is absorbed into the month's RTL run and re-emerges LEFT of it).
- * The isolate breaks the run chain — day and year resolve as plain LTR
- * numbers around the isolated RTL word — so the strip renders visually
- * EXACTLY '28 شهریور 1405', the string the owner asked for, while the
- * accessible textContent stays the logical '28 شهریور 1405'.
+ * fa renders dir=rtl (owner request 2026-09-20, [year][month][day] read
+ * right-to-left): the logical '28 شهریور 1405' flows naturally — bidi puts
+ * the YEAR at the left edge, the month word in the middle, the DAY at the
+ * right edge (the same arrangement the old numeric 1405.06.28 had), and a
+ * Persian reader scans it right-to-left as day, month, year. Natural bidi
+ * in an RTL element needs NO isolates (in an LTR element the year, an
+ * Arabic-type number after the month word, would scramble into the month's
+ * RTL run). textContent stays the logical string for screen readers.
  * Unlike the DSEG7 layers it replaced, the text is exposed to assistive
  *  tech (it is real information, not decoration). */
 export function LedDate({ date, locale }: { date: Date; locale: 'en' | 'fa' }) {
   const className = `select-none font-semibold ${
     locale === 'en' ? 'tracking-[0.08em]' : 'tracking-normal'
-  } tabular-nums text-[0.8rem] text-[#ff1e1e] sm:text-[0.95rem]`;
-  if (locale === 'fa') {
-    const { day, month, year } = jalaliLedParts(date);
-    return (
-      <span className={className} dir="ltr">
-        {day} <bdi>{month}</bdi> {year}
-      </span>
-    );
-  }
+  } tabular-nums text-[0.8rem] text-[#ff1e1e] sm:text-[1.25rem]`;
   return (
-    <span className={className} dir="ltr">
+    <span className={className} dir={locale === 'fa' ? 'rtl' : 'ltr'}>
       {formatLedDate(date, locale)}
     </span>
   );
@@ -241,6 +227,7 @@ export function LedValueCell({
   size,
   emphasis,
   decimals = 0,
+  prefix = '',
   wrapperClass = 'text-right',
 }: {
   /** Identity for the remount key (currency code or gold item id). */
@@ -254,9 +241,13 @@ export function LedValueCell({
   size: string;
   emphasis: 'primary' | 'secondary';
   decimals?: number;
+  /** Currency sign prepended to the lit value (owner request 2026-09-20:
+   *  the '$' on the USD gold-ounce modules). Part of the ghost/glow/lit
+   *  layers and the aria-label; DSEG7 Classic covers the glyph. */
+  prefix?: string;
   wrapperClass?: string;
 }) {
-  const text = ok && Number.isFinite(value) ? formatLedNumber(value, decimals) : '-------';
+  const text = ok && Number.isFinite(value) ? `${prefix}${formatLedNumber(value, decimals)}` : '-------';
   return (
     <div className={wrapperClass}>
       <span
