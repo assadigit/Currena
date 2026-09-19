@@ -42,8 +42,12 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['images/currena-logo.png'],
       manifest: {
-        name: 'Currency Converter Pro',
-        short_name: 'CurrencyPro',
+        // Brand alignment (SWOT fix 2026-09-19): the install surface must say
+        // CURRENA — the app icon/wordmark, document title and share files all
+        // carry the brand; the legacy "Currency Converter Pro / CurrencyPro"
+        // manifest names made the installed PWA look like a different product.
+        name: 'Currena — Currency Converter',
+        short_name: 'Currena',
         description: 'Modern currency converter with live Iranian Toman rates',
         start_url: '/',
         scope: '/',

@@ -269,7 +269,17 @@ export function Converter() {
         inverse: reverseRate(conversion.rate),
         source: conversion.source,
         fetchedAt: conversion.fetchedAt,
-        stale: state.stale || state.servedFrom !== 'live',
+        // Confirmed staleness — the SAME semantics as the banners and the
+        // board status LEDs (SWOT fix 2026-09-19). The old
+        // `state.stale || servedFrom !== 'live'` flagged every fresh
+        // server-cache copy and every fresh local snapshot as ⚠ CACHED in
+        // the result popup, share text and saved history — a false positive:
+        // the ladder's fresh KV generation IS the live data (identical to
+        // what a scrape would return). ensureSnapshot has already resolved
+        // the fetch cycle at this point, so the state read here is the
+        // confirmed outcome: LIVE unless the server itself served stale
+        // data or the fetch failed (degraded last-good).
+        stale: isConfirmedStale(state),
       },
       prevRate: baseline,
     };

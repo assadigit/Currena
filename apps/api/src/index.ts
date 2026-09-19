@@ -141,6 +141,21 @@ export function createApp(deps: AppDeps = {}) {
 
   const app = new Hono<{ Bindings: Bindings }>();
 
+  // Security headers on every Worker-answered response (SWOT hardening
+  // 2026-09-19: /api, /internal, /admin and the SPA fallback this code owns
+  // — platform-served static assets keep Cloudflare's own baseline).
+  // Hand-rolled instead of hono/secure-headers so the set stays explicit:
+  // no HSTS (the zone already forces HTTPS at the edge), no CSP (the admin
+  // console and the pre-paint boot script need inline allowances — a wrong
+  // CSP breaks more than it protects here; revisited with hashes later).
+  app.use('*', async (c, next) => {
+    await next();
+    c.header('X-Content-Type-Options', 'nosniff');
+    c.header('X-Frame-Options', 'DENY');
+    c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+    c.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  });
+
   app.get('/api/health', (c) =>
     c.json({ ok: true, service: 'currena-api', time: new Date().toISOString() }, 200, NO_STORE),
   );
