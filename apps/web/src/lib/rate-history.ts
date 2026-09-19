@@ -4,12 +4,21 @@
  * The snapshot store keeps only the current + previous generation (for ▲/▼
  * deltas). This module extends that into a small rolling window of DISTINCT
  * generations persisted to localStorage, so the Live Rates board and the
- * converter result can draw an honest micro-trend of what the app has seen.
+ * converter result can draw an honest micro-trend.
+ *
+ * Task 24 (sparkline honesty fix): the LOCAL window only records what this
+ * device's app served — 1–5 flat points on a new device, and since TGJU
+ * re-quotes every currency at once, all per-currency sparklines normalized
+ * to the same step shape. `hydrateServerHistory()` now merges the server's
+ * KV-recorded rolling history (GET /api/history — every live scrape the cron
+ * + request ladder recorded, content-deduped) into the window at boot, so
+ * sparklines draw days of genuinely diverging per-currency movement. Offline
+ * or API failure falls back to the local-only behavior silently.
  *
  * Honesty rules (mission §5 limitations):
- *   - Points only exist for snapshots the app actually served — while it was
- *     open and a refresh happened. The sparkline is a "recent checks" view,
- *     NOT a market history. UI labels must say so.
+ *   - Points exist only for DISTINCT generations the SERVER scraped or the
+ *     app served — a "recent updates" view, NOT a full market history. UI
+ *     labels say so.
  *   - Capped (MAX_GENERATIONS) — old points drop off the front.
  *   - Corrupt storage is discarded, never rendered.
  *
@@ -23,8 +32,12 @@ import { convert } from '@currena/core';
 import type { Snapshot, SnapshotSource } from '@currena/core';
 import { useSyncExternalStore } from 'react';
 
-/** How many distinct generations to keep per source (~3h at 5-min windows). */
-export const MAX_GENERATIONS = 36;
+/**
+ * How many distinct generations to keep per source. Task 24: raised from 36
+ * (local-only ~3h) to 240 so the hydrated server history (real re-quotes over
+ * days) fits — ≈85 KB per source in localStorage, well under the 5 MB quota.
+ */
+export const MAX_GENERATIONS = 240;
 
 const LS_KEY = (source: SnapshotSource): string => `currena:rate-history:${source}`;
 
@@ -188,5 +201,69 @@ export function useRateHistory(source: SnapshotSource | null): RateGeneration[] 
     },
     () => (source === null ? EMPTY : windowFor(source)),
     () => EMPTY,
+  );
+}
+
+/* ------------------------- server hydration (Task 24) ------------------ */
+
+/** Server /api/history payload (mirror of the API's HistoryGeneration). */
+interface HistoryResponse {
+  source?: unknown;
+  count?: unknown;
+  generations?: unknown;
+}
+
+/** Server generations that pass the same structural rules as local reads. */
+function validServerGeneration(gen: unknown): gen is RateGeneration {
+  if (typeof gen !== 'object' || gen === null) return false;
+  const g = gen as Partial<RateGeneration>;
+  return (
+    typeof g.at === 'string' &&
+    (g.source === 'tgju' || g.source === 'frankfurter') &&
+    typeof g.base === 'string' &&
+    typeof g.rates === 'object' &&
+    g.rates !== null &&
+    Object.values(g.rates).every((v) => typeof v === 'number' && Number.isFinite(v) && v > 0)
+  );
+}
+
+/** Union-by-`at` merge (server wins conflicts), sorted, capped, persisted. */
+function mergeServerGenerations(source: SnapshotSource, serverGens: RateGeneration[]): void {
+  const local = windowFor(source);
+  const byAt = new Map<string, RateGeneration>();
+  for (const g of local) byAt.set(g.at, g);
+  for (const g of serverGens) byAt.set(g.at, g); // server is authoritative
+  const merged = [...byAt.values()].sort((a, b) => a.at.localeCompare(b.at)).slice(-MAX_GENERATIONS);
+  windows.set(source, merged);
+  write(source, merged);
+  emit();
+}
+
+const hydrated = new Set<SnapshotSource>();
+
+/**
+ * One-shot per session (both sources, parallel): merge the server-recorded
+ * rolling history into the local windows. Silent on any failure — offline or
+ * API error simply keeps the local-only behavior.
+ */
+export async function hydrateServerHistory(): Promise<void> {
+  if (typeof window === 'undefined') return;
+  const sources: SnapshotSource[] = ['tgju', 'frankfurter'];
+  await Promise.all(
+    sources.map(async (source) => {
+      if (hydrated.has(source)) return;
+      hydrated.add(source);
+      try {
+        const res = await fetch(`/api/history?source=${source}`);
+        if (!res.ok) return;
+        const data = (await res.json()) as HistoryResponse;
+        if (!Array.isArray(data.generations)) return;
+        const gens = data.generations.filter(validServerGeneration);
+        if (gens.length === 0) return;
+        mergeServerGenerations(source, gens);
+      } catch {
+        // Offline / API down — local history keeps working.
+      }
+    }),
   );
 }

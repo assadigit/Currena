@@ -242,7 +242,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
     >
       <div
         ref={cardRef}
-        className="popup-slide-up relative w-full max-w-[450px] rounded-[30px] bg-white p-7 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:max-w-[540px] dark:bg-[#1A222E]"
+        className="popup-slide-up relative w-full max-w-[450px] rounded-[30px] bg-white p-4 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:max-w-[540px] sm:p-7 dark:bg-[#1A222E]"
       >
         <button
           ref={closeRef}
@@ -254,39 +254,40 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
           ×
         </button>
 
-        <div className="mb-2 flex justify-center">
+        {/* Task 24 (compact mobile): the header collapsed from three stacked
+            rows (indicator / 💰 / title) into ONE row — indicator + title side
+            by side, emoji only on sm+. Sections below tightened: single-line
+            timestamp, smaller sparkline, reduced paddings/margins. */}
+        <div className="mb-1 flex items-center justify-center gap-2.5 sm:mb-2 sm:gap-3">
           <LiveIndicator live={live} />
+          <h2 className="text-sm font-bold text-currena-blue sm:text-base">{fromName} → {toName}</h2>
         </div>
-
-        <div className="mb-2 text-center text-4xl" aria-hidden="true">
+        <div className="mb-1 hidden text-center text-4xl sm:mb-2 sm:block" aria-hidden="true">
           💰
         </div>
-        <h2 className="mb-2 text-center text-base font-bold text-currena-blue">
-          {fromName} → {toName}
-        </h2>
 
-        <div className="my-2.5">
-          <p className="mb-2 text-center text-base font-semibold text-currena-muted">
+        <div className="my-1.5 sm:my-2.5">
+          <p className="mb-1 text-center text-xs font-semibold text-currena-muted sm:mb-2 sm:text-sm">
             {fmtAmount(view.amount, view.from)} <bdi>{label(view.from)}</bdi>
           </p>
-          <p className="cta-gradient-text break-words text-center text-[2rem] leading-tight font-black">
+          <p className="cta-gradient-text break-words text-center text-[1.6rem] leading-tight font-black sm:text-[2rem]">
             <Odometer value={view.result} format={(n) => fmtAmount(n, view.to)} />{' '}
-            <span className="text-[0.85rem] font-bold">
+            <span className="text-[0.8rem] font-bold sm:text-[0.85rem]">
               <bdi>{label(view.to)}</bdi>
             </span>
           </p>
         </div>
 
-        <div className="my-2.5 space-y-1 rounded-[10px] bg-currena-blue/10 px-2 py-2 text-center">
-          <p className="text-sm">
+        <div className="my-1.5 space-y-0.5 rounded-[10px] bg-currena-blue/10 px-2 py-1.5 text-center sm:my-2.5 sm:space-y-1 sm:py-2">
+          <p className="text-xs sm:text-sm">
             <strong>{t('common.rate')}:</strong> 1 <bdi>{label(view.from)}</bdi> = {rateText}{' '}
             <bdi>{label(view.to)}</bdi> <SourceBadge source={view.source} />
           </p>
-          <p className="text-sm opacity-90">
+          <p className="text-[0.75rem] opacity-90 sm:text-sm">
             1 <bdi>{label(view.to)}</bdi> = {inverseText} <bdi>{label(view.from)}</bdi>
           </p>
           {showDelta ? (
-            <div className="flex justify-center pt-1">
+            <div className="flex justify-center pt-0.5 sm:pt-1">
               <RateDeltaChip
                 delta={{ current: view.rate, previous: prevRate }}
                 decimals={irrPair ? 0 : 4}
@@ -296,28 +297,27 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
           ) : null}
         </div>
 
-        {/* Jalali + Gregorian timestamps — render-time core formatting */}
-        <div className="my-2.5 rounded-[10px] border-s-[3px] border-currena-cyan bg-currena-cyan/10 px-2.5 py-2">
-          <p className="mb-1 text-[0.7rem] font-semibold uppercase tracking-wide text-currena-muted">
-            {t('common.lastCheckedAt')}
-          </p>
-          <p className="text-xs text-currena-dark">
-            {formatJalaliDate(view.fetchedAt, numberLocale)} • {formatDate(view.fetchedAt, numberLocale)}
-          </p>
-          <p className="text-sm font-semibold text-currena-dark">
-            {formatDate(view.fetchedAt, numberLocale, { withTime: true })}
+        {/* Jalali + time in ONE compact line on mobile (was a 3-line block);
+            sm+ adds the Gregorian date on a second line. */}
+        <div className="my-1.5 rounded-[10px] border-s-[3px] border-currena-cyan bg-currena-cyan/10 px-2.5 py-1.5 sm:my-2.5 sm:py-2">
+          <p className="text-[0.7rem] text-currena-dark">
+            <span className="font-semibold" aria-hidden="true">
+              🕐{' '}
+            </span>
+            <bdi>{formatJalaliDate(view.fetchedAt, numberLocale, { withTime: true })}</bdi>
+            <span className="hidden sm:inline"> • <bdi>{formatDate(view.fetchedAt, numberLocale)}</bdi></span>
           </p>
         </div>
 
-        {/* Micro-trend over recorded snapshot generations (honest: app-seen checks only). */}
+        {/* Micro-trend over recorded generations (server + local — Task 24). */}
         {trendSeries.length >= 2 && trend ? (
-          <div className="my-2.5 rounded-[10px] border-s-[3px] border-currena-success/60 bg-currena-success/[0.07] px-2.5 py-2">
-            <div className="mb-1 flex items-baseline justify-between gap-2">
-              <p className="text-[0.7rem] font-semibold uppercase tracking-wide text-currena-muted">
+          <div className="my-1.5 rounded-[10px] border-s-[3px] border-currena-success/60 bg-currena-success/[0.07] px-2.5 py-1.5 sm:my-2.5 sm:py-2">
+            <div className="mb-0.5 flex items-baseline justify-between gap-2 sm:mb-1">
+              <p className="text-[0.65rem] font-semibold uppercase tracking-wide text-currena-muted">
                 📈 {t('trend.recentChecks', { n: trendSeries.length })}
               </p>
               <p
-                className={`text-xs font-bold ${
+                className={`text-[0.7rem] font-bold sm:text-xs ${
                   trend.dir === 'up'
                     ? 'text-currena-success'
                     : trend.dir === 'down'
@@ -331,7 +331,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
             <Sparkline
               points={trendSeries}
               width={280}
-              height={56}
+              height={44}
               ariaLabel={t('trend.summary', {
                 pair: `${label(view.from)} → ${label(view.to)}`,
                 dir: t(`trend.${trend.dir}` as TranslationKey),
@@ -339,7 +339,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
               })}
               className="h-auto w-full"
             />
-            <p className="mt-1 flex flex-wrap items-center justify-between gap-1 text-[0.68rem] text-currena-muted">
+            <p className="mt-0.5 flex flex-wrap items-center justify-between gap-1 text-[0.6rem] text-currena-muted sm:mt-1 sm:text-[0.68rem]">
               <span>
                 {t('trend.range', {
                   min: formatNumber(Math.min(...trendSeries), numberLocale, {
@@ -356,7 +356,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
         ) : null}
 
         {!live ? (
-          <p className="my-3 rounded-[10px] border-s-[3px] border-currena-warning bg-currena-warning/10 px-3 py-2.5 text-sm font-semibold text-currena-warning">
+          <p className="my-2 rounded-[10px] border-s-[3px] border-currena-warning bg-currena-warning/10 px-2.5 py-1.5 text-xs font-semibold text-currena-warning sm:my-3 sm:px-3 sm:py-2.5 sm:text-sm">
             {t('converter.thisRateIsCached')} {formatRelative(view.fetchedAt, numberLocale)}
           </p>
         ) : null}
@@ -367,21 +367,21 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
               href={tgjuUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full border-2 border-currena-blue bg-currena-blue/10 px-4 py-2.5 text-sm font-semibold text-currena-blue transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-blue/20"
+              className="inline-flex items-center gap-1.5 rounded-full border-2 border-currena-blue bg-currena-blue/10 px-3 py-1.5 text-xs font-semibold text-currena-blue transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-blue/20 sm:px-4 sm:py-2.5 sm:text-sm"
             >
               <span aria-hidden="true">🔗</span> {t('common.viewOnTgju')}
             </a>
           </div>
         ) : null}
 
-        <div className="mt-6 grid grid-cols-2 gap-2.5">
-          <Button variant="cta" className="col-span-full py-3.5 text-base" onClick={onNewConversion}>
+        <div className="mt-3 grid grid-cols-2 gap-2.5 sm:mt-6">
+          <Button variant="cta" className="col-span-full py-3 text-sm sm:py-3.5 sm:text-base" onClick={onNewConversion}>
             {t('converter.newConversion')}
           </Button>
-          <Button variant="secondary" className="py-3.5" onClick={() => void onCopy()}>
+          <Button variant="secondary" className="py-3 text-sm sm:py-3.5" onClick={() => void onCopy()}>
             {copied ? `✅ ${t('common.copied')}` : `📋 ${t('common.copy')}`}
           </Button>
-          <Button variant="secondary" className="py-3.5" disabled={sharing} onClick={() => void onShare()}>
+          <Button variant="secondary" className="py-3 text-sm sm:py-3.5" disabled={sharing} onClick={() => void onShare()}>
             {sharing ? t('converter.creating') : `📤 ${t('common.share')}`}
           </Button>
         </div>

@@ -206,15 +206,15 @@ export const en = {
   },
 
   trend: {
-    /** Shown above a sparkline; {n} = number of recorded checks. */
-    recentChecks: 'Trend — last {n} checks',
+    /** Shown above a sparkline; {n} = number of recorded updates. */
+    recentChecks: 'Trend — last {n} updates',
     /** Screen-reader summary: {pair} like 'USD → IRR', {dir} up/down/flat, {pct} signed %. */
-    summary: '{pair} trend over recent checks: {dir} {pct}',
+    summary: '{pair} trend over recent updates: {dir} {pct}',
     up: 'up',
     down: 'down',
     flat: 'flat',
     /** Hint under the converter sparkline. */
-    honestNote: 'Only updates your app actually saw — not a full market history.',
+    honestNote: 'From recorded live-rate updates — recent window, not full market history.',
     /** Min/max caption; {min} and {max} are formatted rates. */
     range: 'low {min} · high {max}',
   },

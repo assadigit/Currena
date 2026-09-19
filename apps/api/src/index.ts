@@ -5,6 +5,7 @@
  *   GET  /api/health                  — liveness
  *   GET  /api/rates?source=           — fallback ladder (mission §6)
  *   GET  /api/convert?from&to&amount  — server-side math via @currena/core
+ *   GET  /api/history?source=         — rolling rate history for sparklines (Task 24)
  *   GET  /api/meta                    — currency asset list + limitations
  *   GET  /api/status                  — per-source SourceStatus + cache age
  *   POST /internal/refresh?source=    — header-secret manual scrape
@@ -35,6 +36,7 @@ import {
   type AdminBanner,
 } from './admin';
 import { KvRateStore } from './adapters/kv-store';
+import { recordHistory, readHistory } from './history';
 import { buildMeta } from './meta';
 import { RatesService, RatesServiceError } from './rates-service';
 
@@ -174,6 +176,18 @@ export function createApp(deps: AppDeps = {}) {
     }
     try {
       const response = await makeService(c.env).getRates(source);
+      // Task 24: a LIVE scrape means fresh market data — record it as a
+      // history generation (content-deduped inside; no-op when unchanged).
+      // A direct await (not waitUntil) keeps this test-safe — Hono's
+      // c.executionCtx throws outside a real Workers context; the write rides
+      // on a response that already paid for the scrape, so latency is fine.
+      if (response.servedFrom === 'live') {
+        try {
+          await recordHistory(c.env.RATES, source, response.snapshot);
+        } catch (err) {
+          console.warn(`[history] record ${source} failed:`, err);
+        }
+      }
       // Content-addressed ETag: the snapshot identity is (source, fetchedAt),
       // so a conditional re-poll within the same generation is a tiny 304
       // instead of a full payload (the SPA polls every 30s per source).
@@ -188,6 +202,36 @@ export function createApp(deps: AppDeps = {}) {
       }
       throw err; // app.onError backstop
     }
+  });
+
+  /* ----------------------------- rate history ---------------------------- */
+
+  // Task 24 (sparkline honesty): the recorded server-side generations feed
+  // the client rate-history hydration so sparklines draw REAL per-currency
+  // movement (days of diverging re-quotes) instead of each device's own
+  // handful of app-seen checks. 60s browser cache — the payload only changes
+  // when a rate actually moves — plus a content-addressed ETag for 304s.
+  app.get('/api/history', async (c) => {
+    const source = parseSourceParam(c.req.query('source'));
+    if (!source) {
+      return errorResponse(
+        c,
+        400,
+        'invalid_source',
+        `Invalid 'source' parameter ${JSON.stringify(c.req.query('source'))} — must be 'tgju' or 'frankfurter'`,
+      );
+    }
+    const generations = await readHistory(c.env.RATES, source);
+    const newest = generations[generations.length - 1];
+    const etag = `"history:${source}:${generations.length}:${newest?.at ?? 'empty'}"`;
+    if (c.req.header('if-none-match') === etag) {
+      return c.body(null, 304, { 'Cache-Control': 'public, max-age=60', ETag: etag });
+    }
+    return c.json(
+      { source, count: generations.length, generations },
+      200,
+      { 'Cache-Control': 'public, max-age=60', ETag: etag },
+    );
   });
 
   /* ------------------------------ convert ------------------------------- */
@@ -530,6 +574,18 @@ async function runScheduled(env: Bindings, scheduledTimeMs: number): Promise<voi
     sources.map(async (source) => {
       try {
         const response = await service.getRates(source);
+        // Task 24: record every live-scraped generation — the content
+        // fingerprint inside recordHistory makes unchanged re-quotes no-ops.
+        if (response.servedFrom === 'live') {
+          try {
+            const recorded = await recordHistory(env.RATES, source, response.snapshot);
+            if (recorded) {
+              console.log(`[history] ${source} recorded generation ${response.snapshot.fetchedAt}`);
+            }
+          } catch (err) {
+            console.warn(`[history] record ${source} failed:`, err instanceof Error ? err.message : err);
+          }
+        }
         console.log(
           `[cron] ${source} ok — servedFrom=${response.servedFrom} fetchedAt=${response.snapshot.fetchedAt}${response.stale ? ' (STALE)' : ''}`,
         );

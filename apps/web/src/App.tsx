@@ -19,6 +19,7 @@ import { LiveRates } from './routes/LiveRates';
 import { navigate, useRoute } from './router';
 import { useI18n } from './lib/locale';
 import { snapshotStore } from './lib/snapshot-store';
+import { hydrateServerHistory } from './lib/rate-history';
 import type { TranslationKey } from './lib/locale';
 
 const Calculator = lazy(() => import('./routes/Calculator').then((m) => ({ default: m.Calculator })));
@@ -93,8 +94,11 @@ export function App() {
 
   // Boot the snapshot layer once: hydrate last-good, fetch stale sources in
   // parallel (mission §8 — network once per freshness window).
+  // Task 24: also pull the server-recorded rate history so sparklines draw
+  // real multi-day per-currency movement (silent no-op offline).
   useEffect(() => {
     snapshotStore.boot();
+    void hydrateServerHistory();
   }, []);
 
   useEffect(() => {
