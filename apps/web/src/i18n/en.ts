@@ -164,8 +164,13 @@ export const en = {
 
   liveRates: {
     title: 'Live Rates',
-    iranianTomanRates: 'Iranian Toman Rates',
-    liveUpdates: 'LIVE UPDATES',
+    /* Per-board headings (owner request 2026-09-28): each LED board now
+     * carries its own emoji-marked title + a live-source pill hyperlinked
+     * to TGJU + the last-updated stamp — replacing the single page
+     * header. */
+    currencyBoardHeading: 'Currency Rate Board — Toman',
+    goldBoardHeading: 'Gold Rate Board — Toman',
+    liveFromTgju: 'Live updates from TGJU',
     couldNotFetch: '⚠️ Could not fetch rates. Please check your connection.',
     refresh: 'Refresh Rates',
     copyRate: 'Copy rate',

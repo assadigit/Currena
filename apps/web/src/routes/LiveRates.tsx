@@ -331,13 +331,26 @@ export function LiveRates() {
     // same surface, ring and shadow family as the converter and tools.
     <div className="pb-24">
       <div className="mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-6xl xl:max-w-[1280px] lg:px-8">
-        {/* Header */}
-        <div className="mb-6 text-center">
-          <h2 className="mb-2.5 text-2xl font-bold text-currena-dark lg:text-3xl">{t('liveRates.iranianTomanRates')}</h2>
-          <div className="inline-flex items-center gap-2 rounded-full bg-currena-success/20 px-4 py-2 text-sm font-semibold text-currena-success">
+        {/* Per-board headings (owner request 2026-09-28): the former single
+            page header ("Iranian Toman Rates" + live badge + stamp) is now
+            TWO headings — each LED board carries its own emoji-marked title,
+            a live-source pill HYPERLINKED to tgju.org (opens in a new tab)
+            and the last-updated stamp. Both boards read the same TGJU
+            snapshot, so both stamps show the same scrape time. */}
+        <div className="mb-4 text-center">
+          <h2 className="mb-2.5 flex items-center justify-center gap-2.5 text-2xl font-bold text-currena-dark lg:text-3xl">
+            <span aria-hidden="true">💵</span>
+            {t('liveRates.currencyBoardHeading')}
+          </h2>
+          <a
+            href="https://www.tgju.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-currena-success/20 px-4 py-2 text-sm font-semibold text-currena-success transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-success/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-success"
+          >
             <span className="live-dot !h-2.5 !w-2.5" aria-hidden="true" />
-            {t('liveRates.liveUpdates')}
-          </div>
+            {t('liveRates.liveFromTgju')}
+          </a>
           <p className="mt-2.5 text-xs text-currena-muted">
             {t('common.lastUpdated')}:{' '}
             {snapshot
@@ -356,6 +369,31 @@ export function LiveRates() {
             TGJU's real daily stats) with a glow-pulse on every update. */}
         <div className="led-frame mb-6">
           <LedRateBoard />
+        </div>
+
+        {/* Gold board heading — same per-board structure (owner request
+            2026-09-28): coin emoji, "live updates from TGJU" link and the
+            shared scrape stamp. */}
+        <div className="mb-4 text-center">
+          <h2 className="mb-2.5 flex items-center justify-center gap-2.5 text-2xl font-bold text-currena-dark lg:text-3xl">
+            <span aria-hidden="true">🪙</span>
+            {t('liveRates.goldBoardHeading')}
+          </h2>
+          <a
+            href="https://www.tgju.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-currena-success/20 px-4 py-2 text-sm font-semibold text-currena-success transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-success/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-success"
+          >
+            <span className="live-dot !h-2.5 !w-2.5" aria-hidden="true" />
+            {t('liveRates.liveFromTgju')}
+          </a>
+          <p className="mt-2.5 text-xs text-currena-muted">
+            {t('common.lastUpdated')}:{' '}
+            {snapshot
+              ? formatDate(snapshot.fetchedAt, numberLocale, { withTime: true })
+              : t('common.loading')}
+          </p>
         </div>
 
         {/* The second LED box — GOLD & COINS: the global ounce (USD) plus
