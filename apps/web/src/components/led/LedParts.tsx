@@ -9,16 +9,16 @@
  *                 2026-09-27: the timer-like strip text left the seven-
  *                 segment look; the price digits keep it as the board's
  *                 signature) with tabular-nums and softly dimming colons.
- *   LedDate     — the board-header date (Jalali for fa) in the same
- *                 readable sans-serif treatment.
+ *   LedDate     — the board-header date (Jalali with the Persian month
+ *                 name for fa) in the same readable sans-serif treatment.
  *   LedStatus   — the LIVE/CACHED/OFFLINE indicator LED.
  *   LedValueCell — one value module + its accessible label, placed in the
  *                 shared column grid, with the primary/secondary emphasis
  *                 tiers and the 260ms flash-on-change.
  *
- * Formatting helpers: formatLedDate (locale-aware date, '.' separators,
- * Jalali for fa) and formatLedNumber (space-grouped ASCII digits — DSEG7 has
- * no commas — with optional decimals for USD-quoted items).
+ * Formatting helpers: formatLedDate (fa → '28 شهریور 1405', en → '2026.09.18')
+ * and formatLedNumber (space-grouped ASCII digits — DSEG7 has no commas —
+ * with optional decimals for USD-quoted items).
  *
  * All styling lives in index.css (.led-cell/.led-digits/.led-label/…); these
  * components are structure only. A11y notes are on LedDigits/LedValueCell.
@@ -31,21 +31,33 @@ import { Fragment } from 'react';
 /** 2-digit zero-pad — LED clock segments are always fixed-width. */
 const pad2 = (n: number): string => String(n).padStart(2, '0');
 
-/** Locale-aware LED date: fa → Jalali (1405.06.27), en → Gregorian
- *  (2026.09.18). '.' is the real-board separator; both calendars render in
- *  Latin digits (DSEG7 has no Persian glyphs). The Intl formatter is cached
- *  (core's format.ts measures 100–40,000× construction-vs-format cost). */
-const ledJalaliFormatter = new Intl.DateTimeFormat('en-u-nu-latn-ca-persian', {
+/** Locale-aware LED date: fa → Jalali with the Persian month name, day-first
+ *  — '28 شهریور 1405' (owner request 2026-09-19; digits stay Latin to match
+ *  the board's digit language). en → Gregorian '2026.09.18' ('.' is the
+ *  real-board separator). NOTE for the fa rendering: the string alone in a
+ *  dir="ltr" element scrambles to '28 1405 شهریور' (bidi: the year is an
+ *  Arabic-type number AFTER the month word, so it joins the month's RTL run
+ *  and lands left of it) — LedDate therefore renders the month word inside
+ *  a <bdi> isolate, which pins the exact visual '28 شهریور 1405'. The Intl
+ *  formatter is cached (core's format.ts measures 100–40,000× construction-
+ *  vs-format cost). */
+const ledJalaliFormatter = new Intl.DateTimeFormat('fa-IR-u-nu-latn-ca-persian', {
   year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
+  month: 'long',
+  day: 'numeric',
 });
+
+/** Jalali (day / Persian month name / year) parts of the fa LED date. */
+function jalaliLedParts(date: Date): { day: string; month: string; year: string } {
+  const parts = ledJalaliFormatter.formatToParts(date);
+  const get = (type: string): string => parts.find((p) => p.type === type)?.value ?? '';
+  return { day: get('day'), month: get('month'), year: get('year') };
+}
 
 export function formatLedDate(date: Date, locale: 'en' | 'fa'): string {
   if (locale === 'fa') {
-    const parts = ledJalaliFormatter.formatToParts(date);
-    const get = (type: string): string => parts.find((p) => p.type === type)?.value ?? '00';
-    return `${get('year')}.${get('month')}.${get('day')}`;
+    const { day, month, year } = jalaliLedParts(date);
+    return `${day} ${month} ${year}`;
   }
   return `${date.getFullYear()}.${pad2(date.getMonth() + 1)}.${pad2(date.getDate())}`;
 }
@@ -149,15 +161,35 @@ export function LedClock({ now }: { now: Date }) {
 
 /** Board-header date — the same readable sans-serif treatment as the clock
  *  (owner request 2026-09-27: dates left the seven-segment look): full-power
- *  red, tabular-nums, a touch of tracking. Jalali for fa, Latin digits both
- *  calendars. Unlike the DSEG7 layers it replaced, the text is exposed to
- *  assistive tech (it is real information, not decoration). */
+ *  red, tabular-nums, a touch of tracking — Latin only: letter-spacing breaks
+ *  Persian letter joining in the fa month name, so fa keeps tracking-normal
+ *  (the same rule the board column headers follow). Jalali month-name date
+ *  for fa, Gregorian for en.
+ *
+ * fa is rendered from parts with the month word in a <bdi> isolate: the
+ * plain string '28 شهریور 1405' in this dir="ltr" span would bidi-scramble
+ * to '28 1405 شهریور' (the year, an Arabic-type number following the month
+ * word, is absorbed into the month's RTL run and re-emerges LEFT of it).
+ * The isolate breaks the run chain — day and year resolve as plain LTR
+ * numbers around the isolated RTL word — so the strip renders visually
+ * EXACTLY '28 شهریور 1405', the string the owner asked for, while the
+ * accessible textContent stays the logical '28 شهریور 1405'.
+ * Unlike the DSEG7 layers it replaced, the text is exposed to assistive
+ *  tech (it is real information, not decoration). */
 export function LedDate({ date, locale }: { date: Date; locale: 'en' | 'fa' }) {
+  const className = `select-none font-semibold ${
+    locale === 'en' ? 'tracking-[0.08em]' : 'tracking-normal'
+  } tabular-nums text-[0.8rem] text-[#ff1e1e] sm:text-[0.95rem]`;
+  if (locale === 'fa') {
+    const { day, month, year } = jalaliLedParts(date);
+    return (
+      <span className={className} dir="ltr">
+        {day} <bdi>{month}</bdi> {year}
+      </span>
+    );
+  }
   return (
-    <span
-      className="select-none font-semibold tracking-[0.08em] tabular-nums text-[0.8rem] text-[#ff1e1e] sm:text-[0.95rem]"
-      dir="ltr"
-    >
+    <span className={className} dir="ltr">
       {formatLedDate(date, locale)}
     </span>
   );
