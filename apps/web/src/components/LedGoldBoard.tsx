@@ -35,6 +35,15 @@
  *
  * A11y (WCAG 2.3.1): identical flash policy to the currency board — one
  * 260ms module surge per value change, rows staggered 0–240ms.
+ *
+ * PLACEMENTS (owner wireframe 2026-09-20): ONE component, two pages —
+ * `/live-rates` renders the full board (CURRENT + DAY HIGH + DAY LOW);
+ * the homepage two-up row renders the SAME component with
+ * `showDayStats={false}`: the day-high/day-low columns are removed from
+ * the DOM entirely and the shared column grid collapses to TWO tracks
+ * (name · CURRENT) at EVERY viewport width via the `.led-current-only`
+ * modifier (index.css). Same rule as LedRateBoard — never duplicate the
+ * markup per page; both placements share this file.
  */
 
 import { memo, useEffect, useMemo, useState } from 'react';
@@ -100,6 +109,9 @@ interface LedGoldRowProps {
   unitLabel: string;
   /** 'USD' caption tag on the ounce row (null on domestic rows). */
   unitTag: string | null;
+  /** false → the day-high/day-low modules are NOT rendered at all
+   *  (homepage CURRENT-only placement — see the file header). */
+  showDayStats: boolean;
 }
 
 /**
@@ -121,6 +133,7 @@ const LedGoldRow = memo(function LedGoldRow({
   name,
   unitLabel,
   unitTag,
+  showDayStats,
 }: LedGoldRowProps) {
   const stagger = index * FLASH_STAGGER_MS;
   const quote = item.quote;
@@ -185,42 +198,55 @@ const LedGoldRow = memo(function LedGoldRow({
 
       {/* Day high / day low — TGJU stats, secondary modules at 75% power;
           hidden below md (the 11-glyph coin values leave no room for three
-          columns on phones — the divider/footnote keeps the unit honest). */}
-      <LedValueCell
-        keyId={item.id}
-        stat="high"
-        value={ok ? (quote as GoldQuote).dayHigh ?? Number.NaN : Number.NaN}
-        ok={ok}
-        staggerMs={stagger}
-        label={highLabel}
-        unitLabel={unitLabel}
-        size="md:text-[0.8rem] lg:text-[1.05rem]"
-        emphasis="secondary"
-        decimals={decimals}
-        prefix={prefix}
-        wrapperClass="hidden text-right md:block"
-      />
-      <LedValueCell
-        keyId={item.id}
-        stat="low"
-        value={ok ? (quote as GoldQuote).dayLow ?? Number.NaN : Number.NaN}
-        ok={ok}
-        staggerMs={stagger}
-        label={lowLabel}
-        unitLabel={unitLabel}
-        size="md:text-[0.8rem] lg:text-[1.05rem]"
-        emphasis="secondary"
-        decimals={decimals}
-        prefix={prefix}
-        wrapperClass="hidden text-right md:block"
-      />
+          columns on phones — the divider/footnote keeps the unit honest),
+          and not rendered AT ALL in the CURRENT-only homepage placement
+          (owner wireframe 2026-09-20: half-width slot, current only). */}
+      {showDayStats ? (
+        <>
+          <LedValueCell
+            keyId={item.id}
+            stat="high"
+            value={ok ? (quote as GoldQuote).dayHigh ?? Number.NaN : Number.NaN}
+            ok={ok}
+            staggerMs={stagger}
+            label={highLabel}
+            unitLabel={unitLabel}
+            size="md:text-[0.8rem] lg:text-[1.05rem]"
+            emphasis="secondary"
+            decimals={decimals}
+            prefix={prefix}
+            wrapperClass="hidden text-right md:block"
+          />
+          <LedValueCell
+            keyId={item.id}
+            stat="low"
+            value={ok ? (quote as GoldQuote).dayLow ?? Number.NaN : Number.NaN}
+            ok={ok}
+            staggerMs={stagger}
+            label={lowLabel}
+            unitLabel={unitLabel}
+            size="md:text-[0.8rem] lg:text-[1.05rem]"
+            emphasis="secondary"
+            decimals={decimals}
+            prefix={prefix}
+            wrapperClass="hidden text-right md:block"
+          />
+        </>
+      ) : null}
     </li>
   );
 });
 
 /* ------------------------------- board ------------------------------ */
 
-export function LedGoldBoard() {
+export interface LedGoldBoardProps {
+  /** Render the DAY HIGH / DAY LOW columns? Default true (the full
+   *  `/live-rates` board). `false` = the homepage CURRENT-only placement:
+   *  two-track grid at every viewport (see the file header). */
+  showDayStats?: boolean;
+}
+
+export function LedGoldBoard({ showDayStats = true }: LedGoldBoardProps) {
   const { t, locale } = useI18n();
   const store = useSnapshotStore();
   const state = store.tgju;
@@ -266,6 +292,7 @@ export function LedGoldBoard() {
       name={t(`gold.${item.id}` as TranslationKey)}
       unitLabel={item.quote?.unit === 'USD' ? usdUnit : tomanUnit}
       unitTag={item.id === 'gold-ounce' ? t('liveRates.goldUnitUsd') : null}
+      showDayStats={showDayStats}
     />
   );
 
@@ -318,7 +345,7 @@ export function LedGoldBoard() {
           same readable sans-serif silkscreen labels as the currency board
           (owner request 2026-09-27 — CURRENT / DAY HIGH / DAY LOW, hidden
           below md together with their columns). */}
-      <div className="led-table led-table-gold">
+      <div className={`led-table led-table-gold${showDayStats ? '' : ' led-current-only'}`}>
         <div className="led-row pb-2.5">
           <p
             className={`ps-1 text-[0.6rem] font-bold uppercase text-white/75 ${headerTrack} md:ps-2.5`}
@@ -330,16 +357,20 @@ export function LedGoldBoard() {
           >
             {currentLabel}
           </p>
-          <p
-            className={`hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase text-[#ff1e1e]/90 ${headerTrack} md:block md:pr-[9px]`}
-          >
-            {highLabel}
-          </p>
-          <p
-            className={`hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase text-[#ff1e1e]/90 ${headerTrack} md:block md:pr-[9px]`}
-          >
-            {lowLabel}
-          </p>
+          {showDayStats ? (
+            <>
+              <p
+                className={`hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase text-[#ff1e1e]/90 ${headerTrack} md:block md:pr-[9px]`}
+              >
+                {highLabel}
+              </p>
+              <p
+                className={`hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase text-[#ff1e1e]/90 ${headerTrack} md:block md:pr-[9px]`}
+              >
+                {lowLabel}
+              </p>
+            </>
+          ) : null}
         </div>
 
         {/* Global market — the ounce row (USD), alone in its list. */}
@@ -363,9 +394,13 @@ export function LedGoldBoard() {
         <ul className="led-table-body">{domesticItems.map((item, i) => renderItem(item, i + 1))}</ul>
       </div>
 
-      {/* Footnote — the honesty line: units and REAL TGJU stats. */}
+      {/* Footnote — the honesty line: units and REAL TGJU stats (three
+          columns on /live-rates, the current price + change % in the
+          homepage placement). */}
       <footer className="mt-3 border-t border-white/[0.06] pt-2.5">
-        <p className="text-[0.62rem] font-medium text-white/35">{t('liveRates.goldFootnote')}</p>
+        <p className="text-[0.62rem] font-medium text-white/35">
+          {t(showDayStats ? 'liveRates.goldFootnote' : 'liveRates.goldFootnoteCurrent')}
+        </p>
       </footer>
     </section>
   );

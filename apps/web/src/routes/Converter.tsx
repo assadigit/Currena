@@ -11,6 +11,14 @@
  *   - international pairs → frankfurter snapshot
  *   - same currency → local short-circuit (Gate 1 decision #5)
  *   - custom rate → convertWithManualRate, source "Manual" (legacy parity)
+ *
+ * LAYOUT (owner wireframe 2026-09-20): a single-column full-width stack —
+ * converting box → GOLD & CURRENCY LED boards two-up row (the compact
+ * CURRENT-only placement of the same shared board components /live-rates
+ * uses — gold on the start side, currency on the end side, replacing the
+ * retired "at a glance" mini-board + desktop sidebar rail) → full-width
+ * Quick tools section. Mobile keeps the focused legacy form; the boards
+ * stack (gold first) and the tools grid reflows 2→3→6 columns.
  */
 
 import { useEffect, useMemo, useState } from 'react';
@@ -28,8 +36,9 @@ import {
 } from '@currena/core';
 import type { ConversionResult, CurrencyCode, SnapshotSource } from '@currena/core';
 import { AmountInput, parseInputAmount } from '../components/AmountInput';
-import { ConverterAside } from '../components/ConverterAside';
 import { CurrencySelect } from '../components/CurrencySelect';
+import { LedGoldBoard } from '../components/LedGoldBoard';
+import { LedRateBoard } from '../components/LedRateBoard';
 import { ResultPopup } from '../components/ResultPopup';
 import type { ConversionView } from '../components/ResultPopup';
 import { Button, Card, LoaderDots, OfflineBanner, StaleBanner } from '../components/ui';
@@ -40,6 +49,8 @@ import { useI18n } from '../lib/locale';
 import { addRecentPair, readRecentPairs } from '../lib/recent-pairs';
 import type { RecentPair } from '../lib/recent-pairs';
 import { isConfirmedStale, snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
+import { navigate } from '../router';
+import type { RoutePath } from '../router';
 import type { TranslationKey } from '../lib/locale';
 
 type Phase = 'idle' | 'fetching' | 'result';
@@ -57,6 +68,18 @@ const MIN_FETCHING_MS = 700;
 /** One-tap amounts — international vs IRR-appropriate magnitudes. */
 const QUICK_AMOUNTS_INTL: readonly number[] = [10, 50, 100, 500, 1000];
 const QUICK_AMOUNTS_IRR: readonly number[] = [100_000, 500_000, 1_000_000, 5_000_000, 10_000_000];
+
+/** Quick tools (owner wireframe 2026-09-20): the six one-tap shortcuts that
+ *  used to live in the desktop sidebar rail — now a full-width homepage
+ *  section below the LED boards. */
+const TOOLS: readonly { path: RoutePath; emoji: string; labelKey: TranslationKey }[] = [
+  { path: '/calculator', emoji: '🧮', labelKey: 'nav.calculator' },
+  { path: '/batch', emoji: '🛒', labelKey: 'nav.batchConverter' },
+  { path: '/receipt', emoji: '📄', labelKey: 'nav.receiptGenerator' },
+  { path: '/splitter', emoji: '💰', labelKey: 'nav.expenseSplitter' },
+  { path: '/settle', emoji: '👥', labelKey: 'nav.splitSettle' },
+  { path: '/history', emoji: '📜', labelKey: 'nav.history' },
+];
 
 export function Converter() {
   const { t, numberLocale } = useI18n();
@@ -314,9 +337,12 @@ export function Converter() {
   const notice = useMemo(() => sourceState.notice, [sourceState.notice]);
 
   return (
-    // Mobile: the focused legacy converter (≤500px). Desktop (lg+): a
-    // two-column dashboard — the conversion form on the start side and the
-    // ConverterAside rail (mini Toman board + quick tools) on the end side.
+    // Owner wireframe 2026-09-20: a single-column full-width stack — the
+    // converting box, then the GOLD & CURRENCY LED boards side by side
+    // (compact CURRENT-only placement), then the full-width quick-tools
+    // section. The former desktop two-column dashboard (form + sidebar
+    // rail with the "at a glance" mini-board) is retired: mobile keeps the
+    // focused legacy form (≤500px) and now gets the boards too.
     <div className="mx-auto w-full max-w-[500px] px-5 py-5 lg:max-w-[1160px] lg:px-10 lg:py-10">
       {showOfflineBanner ? <OfflineBanner source={pairSource} /> : null}
       {showStaleBanner && sourceState.snapshot ? (
@@ -324,9 +350,6 @@ export function Converter() {
           <StaleBanner fetchedAt={sourceState.snapshot.fetchedAt} notice={notice} />
         </div>
       ) : null}
-
-      <div className="lg:grid lg:grid-cols-[minmax(0,540px)_minmax(0,1fr)] lg:items-start lg:gap-8">
-        <div>
 
       {/* ── Converter card — AMOUNT-FIRST (owner request 2026-09-17: the
           number field must sit inside the first viewport, no scrolling,
@@ -525,11 +548,51 @@ export function Converter() {
           ) : null}
         </Card>
       ) : null}
-        </div>
 
-        {/* Desktop-only companion rail (mini board + quick tools) */}
-        <ConverterAside className="hidden lg:sticky lg:top-24 lg:block lg:self-start" />
+      {/* ── LED boards two-up (owner wireframe 2026-09-20) — the SAME two
+          shared board components /live-rates renders, in their compact
+          CURRENT-only placement (showDayStats={false}: no DAY HIGH/DAY LOW
+          columns at any viewport — the row is half the Live Rates width).
+          Wireframe order: GOLD board on the start side, CURRENCY board on
+          the end side; phones stack them in the same order. Both read the
+          already-booted tgju snapshot — zero extra network. The former
+          "at a glance" mini-board this replaces had a color-only live dot;
+          these boards carry a text LIVE/CACHED/OFFLINE label next to the
+          status LED (WCAG 1.4.1 non-color signifier). ── */}
+      <div className="mt-8 grid gap-6 lg:mt-12 lg:grid-cols-2 lg:gap-8">
+        <div className="led-frame led-frame-gold">
+          <LedGoldBoard showDayStats={false} />
+        </div>
+        <div className="led-frame">
+          <LedRateBoard showDayStats={false} />
+        </div>
       </div>
+
+      {/* ── Quick tools (owner wireframe 2026-09-20) — the former sidebar
+          rail's tool grid as a FULL-WIDTH homepage section: 2-up on phones,
+          3-up from sm, all six on one line from lg. ── */}
+      <section className="mt-8 lg:mt-12" aria-label={t('converter.quickTools')}>
+        <h2 className="mb-4 text-base font-bold text-currena-dark">
+          ⚡ {t('converter.quickTools')}
+        </h2>
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
+          {TOOLS.map(({ path, emoji, labelKey }) => (
+            <button
+              key={path}
+              type="button"
+              onClick={() => navigate(path)}
+              className="flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-0 bg-white px-3 py-4 text-center shadow-[0_4px_16px_rgba(0,0,0,0.05)] ring-1 ring-black/[0.04] transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-blue/10 hover:shadow-[0_8px_20px_rgba(74,144,226,0.15)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue dark:bg-[#1A222E] dark:shadow-[0_4px_16px_rgba(0,0,0,0.35)] dark:ring-white/[0.06] dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.5)]"
+            >
+              <span className="text-2xl" aria-hidden="true">
+                {emoji}
+              </span>
+              <span className="text-xs font-bold leading-snug text-currena-dark">
+                {t(labelKey)}
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
 
       {/* Fetching overlay (legacy .loading-overlay) */}
       {phase === 'fetching' ? (

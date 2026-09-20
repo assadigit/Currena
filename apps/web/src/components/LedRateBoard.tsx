@@ -72,6 +72,17 @@
  * amplitude. Everything motion-based is disabled under
  * prefers-reduced-motion (index.css). LED glyph layers are aria-hidden;
  * comma-grouped labels expose the values to screen readers.
+ *
+ * PLACEMENTS (owner wireframe 2026-09-20): ONE component, two pages —
+ * `/live-rates` renders the full board (CURRENT + DAY HIGH + DAY LOW);
+ * the homepage two-up row renders the SAME component with
+ * `showDayStats={false}`: the day-high/day-low columns are removed from
+ * the DOM entirely and the shared column grid collapses to TWO tracks
+ * (name · CURRENT) at EVERY viewport width via the `.led-current-only`
+ * modifier (index.css) — the homepage slot is half the Live Rates width
+ * even on large screens, and the current price is the number that
+ * matters at a glance. Never duplicate the markup per page: both
+ * placements share this file so a board redesign can never drift.
  */
 
 import { memo, useEffect, useMemo, useState } from 'react';
@@ -132,6 +143,9 @@ interface LedRowProps {
   lowLabel: string;
   unitLabel: string;
   name: string;
+  /** false → the day-high/day-low modules are NOT rendered at all
+   *  (homepage CURRENT-only placement — see the file header). */
+  showDayStats: boolean;
 }
 
 /** One board row — flag · name · current · high · low (fixed order, logical
@@ -147,6 +161,7 @@ const LedRow = memo(function LedRow({
   lowLabel,
   unitLabel,
   name,
+  showDayStats,
 }: LedRowProps) {
   const stagger = index * FLASH_STAGGER_MS;
   return (
@@ -204,38 +219,51 @@ const LedRow = memo(function LedRow({
       />
 
       {/* Day high / day low — TGJU stats, secondary modules at 75% power;
-          hidden below md (single-column mobile, owner request 2026-09-19). */}
-      <LedValueCell
-        keyId={quote.code}
-        stat="high"
-        value={quote.high}
-        ok={quote.ok}
-        staggerMs={stagger}
-        label={highLabel}
-        unitLabel={unitLabel}
-        size="text-[0.72rem] sm:text-[1.14rem] lg:text-[1.38rem]"
-        emphasis="secondary"
-        wrapperClass="hidden text-right md:block"
-      />
-      <LedValueCell
-        keyId={quote.code}
-        stat="low"
-        value={quote.low}
-        ok={quote.ok}
-        staggerMs={stagger}
-        label={lowLabel}
-        unitLabel={unitLabel}
-        size="text-[0.72rem] sm:text-[1.14rem] lg:text-[1.38rem]"
-        emphasis="secondary"
-        wrapperClass="hidden text-right md:block"
-      />
+          hidden below md (single-column mobile, owner request 2026-09-19),
+          and not rendered AT ALL in the CURRENT-only homepage placement
+          (owner wireframe 2026-09-20: half-width slot, current only). */}
+      {showDayStats ? (
+        <>
+          <LedValueCell
+            keyId={quote.code}
+            stat="high"
+            value={quote.high}
+            ok={quote.ok}
+            staggerMs={stagger}
+            label={highLabel}
+            unitLabel={unitLabel}
+            size="text-[0.72rem] sm:text-[1.14rem] lg:text-[1.38rem]"
+            emphasis="secondary"
+            wrapperClass="hidden text-right md:block"
+          />
+          <LedValueCell
+            keyId={quote.code}
+            stat="low"
+            value={quote.low}
+            ok={quote.ok}
+            staggerMs={stagger}
+            label={lowLabel}
+            unitLabel={unitLabel}
+            size="text-[0.72rem] sm:text-[1.14rem] lg:text-[1.38rem]"
+            emphasis="secondary"
+            wrapperClass="hidden text-right md:block"
+          />
+        </>
+      ) : null}
     </li>
   );
 });
 
 /* ------------------------------- board ------------------------------ */
 
-export function LedRateBoard() {
+export interface LedRateBoardProps {
+  /** Render the DAY HIGH / DAY LOW columns? Default true (the full
+   *  `/live-rates` board). `false` = the homepage CURRENT-only placement:
+   * two-track grid at every viewport (see the file header). */
+  showDayStats?: boolean;
+}
+
+export function LedRateBoard({ showDayStats = true }: LedRateBoardProps) {
   const { t, locale } = useI18n();
   const store = useSnapshotStore();
   const state = store.tgju;
@@ -321,7 +349,7 @@ export function LedRateBoard() {
           edge by the module-well padding (4/9px) so each sits exactly
           over its digits' right edge, and keep physical right alignment
           with the value modules below in both LTR and RTL. */}
-      <div className="led-table">
+      <div className={`led-table${showDayStats ? '' : ' led-current-only'}`}>
         <div className="led-row pb-2.5">
           <p
             className={`ps-1 text-[0.6rem] font-bold uppercase text-white/75 ${headerTrack} sm:ps-2.5`}
@@ -333,16 +361,20 @@ export function LedRateBoard() {
           >
             {currentLabel}
           </p>
-          <p
-            className={`hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase text-[#ff1e1e]/90 ${headerTrack} md:block md:pr-[9px]`}
-          >
-            {highLabel}
-          </p>
-          <p
-            className={`hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase text-[#ff1e1e]/90 ${headerTrack} md:block md:pr-[9px]`}
-          >
-            {lowLabel}
-          </p>
+          {showDayStats ? (
+            <>
+              <p
+                className={`hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase text-[#ff1e1e]/90 ${headerTrack} md:block md:pr-[9px]`}
+              >
+                {highLabel}
+              </p>
+              <p
+                className={`hidden whitespace-nowrap pr-1 text-right text-[0.6rem] font-bold uppercase text-[#ff1e1e]/90 ${headerTrack} md:block md:pr-[9px]`}
+              >
+                {lowLabel}
+              </p>
+            </>
+          ) : null}
         </div>
 
         {/* Currency rows — each <li> subgrids the same tracks. */}
@@ -358,6 +390,7 @@ export function LedRateBoard() {
                 lowLabel={lowLabel}
                 unitLabel={unitLabel}
                 name={t(`currencies.${quote.code}` as TranslationKey)}
+                showDayStats={showDayStats}
               />
             ))
           : // No snapshot yet: boot rows of dashes, like powering-on modules.
@@ -371,14 +404,18 @@ export function LedRateBoard() {
                 lowLabel={lowLabel}
                 unitLabel={unitLabel}
                 name={t(`currencies.${code}` as TranslationKey)}
+                showDayStats={showDayStats}
               />
             ))}
         </ul>
       </div>
 
-      {/* Footnote — the honesty line: three REAL TGJU daily stats. */}
+      {/* Footnote — the honesty line: real TGJU daily stats (three columns on
+          /live-rates, the current price alone in the homepage placement). */}
       <footer className="mt-3 border-t border-white/[0.06] pt-2.5">
-        <p className="text-[0.62rem] font-medium text-white/35">{t('liveRates.boardFootnote')}</p>
+        <p className="text-[0.62rem] font-medium text-white/35">
+          {t(showDayStats ? 'liveRates.boardFootnote' : 'liveRates.boardFootnoteCurrent')}
+        </p>
       </footer>
     </section>
   );

@@ -1,9 +1,21 @@
-# BACKLOG — Autonomous Session 2026-09-24
+# BACKLOG — Autonomous Session 2026-09-24 (+ 2026-09-20 owner-UI session)
 
-Ranked by impact ÷ effort. Tags: SECURITY / RELIABILITY / PERFORMANCE / BEST-PRACTICES / DX.
+Ranked by impact ÷ effort. Tags: SECURITY / RELIABILITY / PERFORMANCE / BEST-PRACTICES / DX / UI-A11Y.
 Priority: **Must** (data loss, security, correctness) · **Should** (robustness, perf, hygiene) · **Could** (polish).
 
 Status legend: ☐ todo · 🔄 in progress · ✅ done (this session) · ⏸ escalated/deferred (see notes)
+
+## Wave 5 — Owner UI wireframe + a11y session (2026-09-20, from SWOT v2)
+
+| # | Status | Tag | Item | Origin |
+|---|--------|-----|------|--------|
+| 40 | 🔄 | UI-A11Y | "Live" non-color signifier next to the green status dot (at-a-glance card) — superseded by the LED boards' existing LIVE text label once the homepage restructure lands | Owner audit |
+| 41 | 🔄 | UI-A11Y | Contrast ≥4.5:1: amount-input amber placeholder (light+dark) + "no change" delta pill text (light+dark) | Owner audit |
+| 42 | 🔄 | UI | Nav utility group unified (install / فا / theme / hamburger): one bordered icon-button container, equal hit areas | Owner audit |
+| 43 | 🔄 | UI-TRUST | Footer: Privacy Policy + Terms of Service links (About-page sections) + contact method next to the credit line | Owner audit |
+| 44 | 🔄 | UI | Homepage single-column stack: full-width converting box → gold+currency LED two-up row → full-width tools section (at-a-glance mini-board retired) | Owner wireframe |
+| 45 | 🔄 | UI | Shared LED board component with a CURRENT-only variant (compact placement on homepage; Live Rates keeps day high/low) — one component, two pages, zero drift | Owner wireframe |
+| 46 | 🔄 | UI-RTL | Full fa RTL audit: every screen mirrored properly (nav order, form alignment, icon flipping); digit-language decision documented (Persian digits in UI text, Latin in DSEG7 modules) | Owner audit |
 
 ## Wave 1 — Security & data integrity (Must)
 

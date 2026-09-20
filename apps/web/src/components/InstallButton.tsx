@@ -28,6 +28,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useI18n } from '../lib/locale';
+import { HEADER_ICON_BUTTON_CLASS } from './ui';
 
 /** Chrome's non-standard install-prompt event (not in lib.dom). */
 interface BeforeInstallPromptEvent extends Event {
@@ -80,7 +81,7 @@ export function InstallButton({ variant }: { variant: 'icon' | 'row' }): React.J
         onClick={() => void install()}
         title={t('nav.installApp')}
         aria-label={t('nav.installApp')}
-        className="h-10 w-10 cursor-pointer rounded-[10px] border-0 bg-transparent text-lg text-currena-dark transition-all duration-300 hover:bg-black/5 dark:hover:bg-white/5"
+        className={`${HEADER_ICON_BUTTON_CLASS} text-lg`}
       >
         📲
       </button>

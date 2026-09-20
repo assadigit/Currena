@@ -191,6 +191,8 @@ export const en = {
     boardOffline: 'OFFLINE',
     /** Per-board footnote: the three columns are TGJU's own daily stats. */
     boardFootnote: 'Current · day high · day low — TGJU open market, Toman',
+    /** Footnote for the CURRENT-only placement (homepage two-up row). */
+    boardFootnoteCurrent: 'Current price — TGJU open market, Toman',
     /* Gold & coins panel (2026-09-27) — the second LED box: the global
      * ounce in USD plus the Tehran gold market in Toman, TGJU's own quotes. */
     goldAriaLabel: 'Gold and coins board — global ounce in USD, Tehran market in Toman',
@@ -202,6 +204,8 @@ export const en = {
     goldUnitUsd: 'USD',
     goldUnitToman: 'Toman',
     goldFootnote: 'Global ounce in USD, Tehran market in Toman — TGJU real quotes: current · day high · day low · change %',
+    /** Footnote for the CURRENT-only placement (homepage two-up row). */
+    goldFootnoteCurrent: 'Global ounce in USD, Tehran market in Toman — TGJU real quotes: current · change %',
     detailsSection: 'Details & trends',
   },
 
@@ -410,6 +414,22 @@ export const en = {
 
   about: {
     title: 'About Currena',
+    /* Trust & legal sections (owner request 2026-09-20: baseline trust
+     * signals for a financial utility) — linked from the site-wide footer.
+     * Honest and short: client-only app, device-local storage, public rate
+     * sources, no accounts/analytics/cookies. */
+    privacyTitle: '🔒 Privacy Policy',
+    privacyText1:
+      'Currena runs entirely in your browser. Your conversion history, recent pairs, receipts, groups and settings are stored only on your device (browser localStorage) — they never leave it, and clearing your browser data removes them permanently.',
+    privacyText2:
+      'We set no cookies, run no analytics or tracking, and require no account. Exchange rates are fetched from public sources (TGJU and Frankfurter); the app sends them only the minimum needed to serve a quote.',
+    termsTitle: '📜 Terms of Service',
+    termsText1:
+      'Currena provides exchange-rate information for convenience only. Open-market rates change continuously and may differ from the rate you actually get; nothing in the app is financial advice.',
+    termsText2:
+      'Use the app at your own discretion. Generated receipts and expense splits are your own records — verify amounts before relying on them.',
+    contactTitle: '✉️ Contact',
+    contactText: 'Questions, feedback or bug reports are welcome — reach the developer on GitHub:',
     aboutText1:
       'Currena is a currency conversion application designed to help you navigate financial decisions with ease. Built with Iranians in mind, it addresses the challenges of currency volatility, especially for the Iranian Toman.',
     featureTravel: 'Perfect for travel to Turkey, UAE, and beyond',
@@ -426,6 +446,12 @@ export const en = {
     noInternetNoCache:
       'No internet connection and no cached data available. Please connect to internet at least once.',
     pairNotSupported: 'This currency pair is not supported by the rate source.',
+  },
+
+  footer: {
+    privacy: 'Privacy',
+    terms: 'Terms',
+    contact: 'Contact',
   },
 
   /** Jalali month names — legacy renders English transliterations (jalaali-js) */

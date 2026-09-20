@@ -786,6 +786,34 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+/* ------------------------------------------------------------------ *
+ * CURRENT-only variant (owner wireframe 2026-09-20) — the homepage
+ * two-up placement of BOTH boards: the DAY HIGH / DAY LOW cells are
+ * removed from the DOM entirely (showDayStats={false}) and the shared
+ * track ladder collapses to TWO tracks (name · CURRENT) at EVERY
+ * viewport width — the homepage slot is half the /live-rates width even
+ * on large screens, so the day columns must never rejoin there.
+ *
+ * Order/specificity: these rules sit AFTER the shared-ladder block
+ * above, so they win over both the fallback .led-row templates and the
+ * md+ four-track ladder at equal or higher specificity; under subgrid
+ * the rows keep subgridding (re-asserted below) and inherit the
+ * two-track parent, so column widths stay shared across all rows.
+ * ------------------------------------------------------------------ */
+.led-table.led-current-only {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.led-current-only .led-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+@supports (grid-template-columns: subgrid) {
+  .led-table.led-current-only .led-table-body,
+  .led-table.led-current-only .led-table-body > .led-row,
+  .led-table.led-current-only > .led-row {
+    grid-template-columns: subgrid;
+  }
+}
+
 /* Seven-segment font stack — the PRICE VALUES only (rates, high/low).
  * Owner request 2026-09-27: the clock, the dates, the column headers and
  * the board titles/headings left the seven-segment look for a standard

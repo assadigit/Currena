@@ -31,7 +31,12 @@ export function RateDeltaChip({ delta, decimals = 0, size = 'md' }: RateDeltaChi
   if (diff === 0) {
     return (
       <span
-        className={`inline-flex items-center gap-1 rounded-full bg-black/[0.06] px-2 py-0.5 font-semibold text-currena-muted dark:bg-white/10 ${
+        /* WCAG 1.4.3 (owner audit 2026-09-20): the muted "no change" text
+         * was ~4.0:1 on the pill's translucent-gray surface (and ~4.5:1 in
+         * dark mode) — under AA on the lightest placements. Fixed explicit
+         * grays: #374151 ≈ 8.6:1 on the light pill, #D1D5DB ≈ 8.0:1 on the
+         * dark pill, at every placement (the up/down chips already passed). */
+        className={`inline-flex items-center gap-1 rounded-full bg-black/[0.06] px-2 py-0.5 font-semibold text-gray-700 dark:bg-white/10 dark:text-gray-300 ${
           size === 'sm' ? 'text-[0.65rem]' : 'text-xs'
         }`}
         title={t('liveRates.noChangeSincePrevious')}

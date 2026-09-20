@@ -148,6 +148,12 @@ export function AmountInput({ id, value, onChange, currency, invalid, footer }: 
         >
           {measuredText}
         </span>
+        {/* WCAG 1.4.3 (owner audit 2026-09-20): the amber placeholder and the
+            caret must hold ≥4.5:1 / ≥3:1 against the cream field in BOTH
+            themes. #806215 on #FFFDF2 ≈ 5.6:1 (was #B39B45 ≈ 2.7:1);
+            #9CA3AF on #222C3B ≈ 5.5:1 (was #5B6B80 ≈ 2.6:1); caret #8A6D1F
+            ≈ 4.8:1 (was #C79100 ≈ 2.8:1). Typed digits stay the navy ink
+            (#2C3E50 ≈ 12:1). */}
         <input
           id={id}
           ref={inputRef}
@@ -163,7 +169,7 @@ export function AmountInput({ id, value, onChange, currency, invalid, footer }: 
           onChange={(e) => onChange(thousandSeparateInput(e.target.value))}
           className={`h-16 w-full rounded-2xl border-2 border-[#EBD48A] bg-[#FFFDF2] ${
             compact ? 'ps-4' : 'ps-13'
-          } font-extrabold tabular-nums text-currena-dark caret-[#C79100] shadow-[inset_0_1px_3px_rgba(122,90,0,0.05),0_6px_18px_rgba(240,180,41,0.10)] transition-all duration-200 placeholder:font-bold placeholder:text-[#B39B45] focus:border-[#E8A020] focus:shadow-[0_0_0_4px_rgba(240,180,41,0.20),0_8px_24px_rgba(240,180,41,0.22)] focus:outline-none sm:h-[72px] dark:border-white/10 dark:bg-[#222C3B] dark:caret-currena-blue dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] dark:placeholder:text-[#5B6B80] dark:focus:border-currena-blue dark:focus:shadow-[0_0_0_4px_rgba(111,174,236,0.18),0_8px_24px_rgba(0,0,0,0.5)] ${
+          } font-extrabold tabular-nums text-currena-dark caret-[#8A6D1F] shadow-[inset_0_1px_3px_rgba(122,90,0,0.05),0_6px_18px_rgba(240,180,41,0.10)] transition-all duration-200 placeholder:font-bold placeholder:text-[#806215] focus:border-[#E8A020] focus:shadow-[0_0_0_4px_rgba(240,180,41,0.20),0_8px_24px_rgba(240,180,41,0.22)] focus:outline-none sm:h-[72px] dark:border-white/10 dark:bg-[#222C3B] dark:caret-currena-blue dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] dark:placeholder:text-[#9CA3AF] dark:focus:border-currena-blue dark:focus:shadow-[0_0_0_4px_rgba(111,174,236,0.18),0_8px_24px_rgba(0,0,0,0.5)] ${
             longUnit ? 'pe-[6.5rem]' : 'pe-[4.6rem]'
           } ${
             invalid ? 'border-currena-warning! shadow-[0_0_0_4px_rgba(255,107,107,0.18)]!' : ''

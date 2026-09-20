@@ -20,6 +20,7 @@ import { navigate, useRoute, ROUTES } from '../router';
 import { useTheme } from '../lib/theme';
 import { useI18n } from '../lib/locale';
 import { InstallButton } from './InstallButton';
+import { HEADER_ICON_BUTTON_CLASS } from './ui';
 import type { TranslationKey } from '../lib/locale';
 import type { RoutePath } from '../router';
 
@@ -94,6 +95,12 @@ export function Header() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2 lg:gap-3">
+          {/* Utility group (owner request 2026-09-20): install · language ·
+              theme · hamburger — ONE shared bordered icon-button container
+              (HEADER_ICON_BUTTON_CLASS) with equal 40px hit areas, so the
+              group reads as a single consistent settings row in both themes
+              (the former mixed plain-text / plain-emoji / unstyled boxes
+              retired). */}
           {/* In-app install CTA (Task 23) — renders ONLY when Chrome has a
               captured beforeinstallprompt and the app isn't already
               standalone; zero footprint otherwise. */}
@@ -104,7 +111,7 @@ export function Header() {
             onClick={() => setLocale(locale === 'en' ? 'fa' : 'en')}
             title={t('nav.toggleLanguage')}
             aria-label={t('nav.toggleLanguage')}
-            className="h-10 w-10 cursor-pointer rounded-[10px] border-0 bg-transparent text-sm font-bold text-currena-dark transition-all duration-300 hover:bg-black/5 dark:hover:bg-white/5"
+            className={`${HEADER_ICON_BUTTON_CLASS} text-sm font-bold`}
           >
             {locale === 'en' ? 'فا' : 'EN'}
           </button>
@@ -115,7 +122,7 @@ export function Header() {
             title={t('nav.toggleTheme')}
             aria-label={t('nav.toggleTheme')}
             aria-pressed={theme === 'dark'}
-            className="h-10 w-10 cursor-pointer rounded-[10px] border-0 bg-transparent text-lg text-currena-dark transition-all duration-300 hover:bg-black/5 dark:hover:bg-white/5"
+            className={`${HEADER_ICON_BUTTON_CLASS} text-lg`}
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
@@ -125,7 +132,7 @@ export function Header() {
             onClick={() => setMenuOpen((open) => !open)}
             aria-label={t('nav.menu')}
             aria-expanded={menuOpen}
-            className="h-10 w-10 cursor-pointer rounded-[10px] border-0 bg-transparent text-xl text-currena-dark transition-all duration-300 hover:bg-black/5 dark:hover:bg-white/5 lg:hidden"
+            className={`${HEADER_ICON_BUTTON_CLASS} text-xl lg:hidden`}
           >
             ☰
           </button>
