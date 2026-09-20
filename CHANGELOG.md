@@ -5,6 +5,99 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-09-19] — Ever-green rates + LED shopfront boards session
+
+19 commits on `main` (`732d2df` → `d28f57c`), 2026-09-18 evening → 2026-09-19.
+Production live at **https://currena.ir** through Workers versions
+`093aaf72` → … → `982cbc43` (final). Tests **279 → 308 — all green** at every
+gate; every change browser-verified locally (agent-browser DOM audits + VLM)
+and on production, en + fa, desktop + 375 px.
+
+### Ever-green data (fixes the "3-hour-stale rates" report)
+
+- **fix(api):** added the `scheduled` handler + cron `* * * * *` — the same
+  ladder runs every minute regardless of visitor traffic (tgju each tick,
+  frankfurter on 15-min cadence, fresh-guard caps real scrapes at ~1/5 min);
+  measured data age with **zero user traffic: ≤ ~5-6 min** (`732d2df`).
+- **fix(scraper):** TGJU cache-bust — `?cb=<epoch-ms>` on `ajax.json`, since
+  TGJU's own edge served stale HITs (age 30 min on a 5-min max-age).
+- **feat(api):** server-recorded rate history — KV `history:<source>`
+  generations, content-fingerprint dedupe (writes only on real value changes —
+  free-tier safe), capped 240; recorded from cron + live `/api/rates` scrapes;
+  new `GET /api/history` (60 s cache + ETag). Sparklines across the app now
+  draw from a shared server history merged into each client at boot — the
+  "every currency has the same graph shape" report root-caused (identical
+  min-max-normalized local series) and truly fixed (`d28f57c`).
+
+### LED shopfront boards (owner-driven visual identity)
+
+- **feat(web):** dot-matrix LED rate board as the Live Rates hero — DSEG7
+  Classic (OFL-1.1) price digits, ghost segments + bulb gradient + halo,
+  ticking clock, per-value flash (WCAG-safe), honest derived-quote footnote
+  (`732d2df`), then rebuilt as a physical panel: bevel → perforated grid →
+  recessed wells → ghosts → dot-matrix bulbs (`824257f`).
+- **feat(scraper,core,web):** TGJU's real daily stats — current / day-high /
+  day-low ride the snapshot `Rate` entries end-to-end; no invented dealer
+  spread (`17169ea`). Shared **CSS subgrid** column lock (headers + every row
+  share ONE track definition; measured spread 0.0 px per column) + hot CURRENT
+  emphasis (`e8c5837`); currency names +40-50 % / weight 700 with a
+  name-first caption layout below md (`a475058`).
+- **feat(core,scraper,web):** **GOLD & COINS panel** — 9 TGJU gold/coin
+  symbols (ounce in USD, Tehran market), graceful per-item dash degradation,
+  same panel language (`b622cee`); gold-heal guard self-fixes visitors holding
+  pre-gold snapshots (`8ec6842`); Tehran items converted Rial→**Toman** at the
+  one sanctioned place (scraper normalizer) with self-migrating legacy
+  snapshots (`97292b1`); phones show a single big CURRENT column on both boards
+  (`97292b1`).
+- **feat(web):** flags at 2× on the name line; headers/clock/dates in readable
+  sans (LED look reserved for price digits) (`5fe3abf`); metal bezel frames —
+  six-stop 135° steel + gold ramps with specular highlights, glass-recessed
+  boards (`4170a96`, `4eacce9`); per-board headings with emoji, live TGJU
+  link pill and last-updated stamp (`1204cba`).
+- **feat(led):** fa board date as **«28 شهریور 1405»** (Persian month name,
+  day-first logical order) then owner-refined to the RTL `[year][month][day]`
+  frame at clock size; TGJU wordmark; `$` prefix on the USD gold-ounce
+  modules (`2d91461`, `bf08bf8`).
+
+### PWA & honesty fixes
+
+- **fix(web):** "cached rates" banner/LED blink on boot — banners now render
+  only on **confirmed** staleness (server-stale generation or failed fetch),
+  never the transient boot hydration (`d782264`).
+- **fix(web):** PWA `registerType: 'autoUpdate'` + `skipWaiting` +
+  `clientsClaim` + hourly `registration.update()` — every deploy self-applies;
+  the "stuck on the previous version" report root-caused (waiting service
+  worker that a plain reload never activates) and permanently fixed
+  (`6c75ccb`).
+- **fix(web,api):** SWOT audit round — receipt/share/history staleness unified
+  on `isConfirmedStale`; manifest rebranded **Currena** (was installing as
+  "CurrencyPro"); og/twitter share cards; worker security headers (nosniff,
+  X-Frame-Options, Referrer-Policy, Permissions-Policy) (`4bd5a9b`).
+- **feat(pwa):** Android packaging prep — manifest `id`, real store
+  screenshots (narrow 390×844 + wide 1280×720, VLM-verified), app shortcuts
+  (Live Rates / Calculator), in-app 📲 install CTA (header + side menu, en+fa,
+  `beforeinstallprompt`-driven). The site is fully **PWABuilder-ready**:
+  paste currena.ir → Package for Stores → Android → signed APK/AAB
+  (`1a80012`).
+- **fix(web):** mobile result popup compacted — 3 stacked header rows → 1,
+  single Jalali+time line, tightened spacing; measured **378 px** tall at
+  390×844 (was viewport-filling), desktop unchanged (`d28f57c`).
+
+### Known considerations
+
+- TGJU remains a single upstream (inherent) — mitigated by cache-busting, the
+  ladder, honest notices, the gold self-heal guard, and now server-side
+  history (trend data survives upstream hiccups).
+- Rate history began accumulating at deploy (2026-09-19 ~04:00Z); shapes
+  genuinely diverge as TGJU re-quotes over the coming days. Optional future
+  work: seed deeper history from TGJU's own history API (scope-guarded out).
+
+### Open items (next session)
+
+See the hand-off prompt in `docs/BACKLOG.md` lineage — SWOT re-run,
+modularization of `apps/web/src/App.tsx` and the route monoliths, performance
+& reliability optimization, TGJU history backfill, rate-limit on admin POST.
+
 ## [2026-09-18] — Autonomous hardening session
 
 Branch `improve/autonomous-session-2026-09-24` (15 commits, +2,598/−491 lines,

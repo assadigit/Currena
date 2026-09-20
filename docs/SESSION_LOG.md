@@ -177,3 +177,28 @@ the two open wrap-up commands:
   parity, admin gate — all green (see CHANGELOG.md §Wrap-up).
 
 Session fully closed: local `main` == `origin/main` == deployed HEAD.
+
+## LED shopfront boards session (2026-09-18 evening → 2026-09-19)
+
+Owner-report-driven round — 19 commits on `main` (`732d2df` → `d28f57c`),
+tests 279 → 308 green at every gate, production verified end-to-end after each
+deploy (agent-browser DOM audits + VLM, en + fa, desktop + 375 px). Full
+narrative per commit lives in CHANGELOG.md §[2026-09-19]; highlights:
+
+- Ever-green rates: `scheduled` handler + cron `* * * * *` + TGJU cache-bust
+  (`?cb=`) — data age ≤ ~5-6 min with zero traffic.
+- LED shopfront boards: DSEG7 dot-matrix currency panel + GOLD & COINS panel
+  (Toman), subgrid column lock, metal bezel frames, TGJU wordmark, fa Jalali
+  date «۲۸ شهریور ۱۴۰۵» RTL frame.
+- Honesty & PWA: confirmed-staleness banners, autoUpdate service worker
+  (deploys self-apply), Currena-branded manifest + og/twitter cards + API
+  security headers, PWABuilder-ready packaging (id/screenshots/shortcuts +
+  in-app install CTA).
+- Server-side rate history (KV, content-deduped) + `/api/history` — the
+  "identical sparkline shapes" report root-caused and fixed; mobile result
+  popup compacted to 378 px @390×844.
+
+Deploy-blocked gaps (twice, token absent at session end) were each closed on
+fresh owner-supplied credentials; tokens passed via environment only.
+
+Session closed: `origin/main` = `d28f57c`, production = version `982cbc43`.
