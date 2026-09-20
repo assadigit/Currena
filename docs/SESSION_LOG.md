@@ -202,3 +202,30 @@ Deploy-blocked gaps (twice, token absent at session end) were each closed on
 fresh owner-supplied credentials; tokens passed via environment only.
 
 Session closed: `origin/main` = `d28f57c`, production = version `982cbc43`.
+
+## Wrap-up completion (2026-09-20 ~06:23 UTC)
+
+Final round closed the session from a fresh environment (repo re-cloned,
+deps reinstalled):
+
+- **Gate re-run at HEAD:** typecheck 4/4 packages, tests **308/308 green**
+  (134 core + 17 web + 66 scraper + 91 api).
+- **Changelog:** CHANGELOG.md gained the full §[2026-09-19] entry for the
+  19-commit LED shopfront session (`732d2df` → `d28f57c`); PROGRESS.md and
+  SESSION_LOG.md updated.
+- **Pushed:** `main` → `github.com/assadigit/Currena` (`d28f57c` → `ebb458c`
+  → final docs commit). Tokens via environment only; nothing persisted.
+- **Redeployed from the final HEAD:** version `1ca53028-a9c4-49c2-b10a-55b5eddf8eb9`
+  (cron `* * * * *` + KV bindings intact; runtime identical to the session's
+  data-bearing deploys — commits after `d28f57c` are docs-only).
+- **Post-deploy smoke on currena.ir:** `/api/health` 200 + security headers;
+  `/api/rates` LIVE-fresh (17 FX + 9 TOMAN gold); `/api/history` serving
+  **93 recorded generations** (server-side rate history accumulating since
+  the 2026-09-19 deploy); cron proven live (frankfurter 15-min tick);
+  converter golden path (100 USD → 5,810,157 IRR @ 230,275, LIVE UPDATE,
+  trend reading "last 94 updates" with real low/high range); both LED boards
+  render in bezel frames (VLM-verified desktop + 375 px, zero console/page
+  errors, zero horizontal overflow on mobile).
+
+Session fully closed: `origin/main` = final docs HEAD; production =
+version `1ca53028`.
