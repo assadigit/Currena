@@ -2,7 +2,7 @@ import type { Snapshot } from '@currena/core';
 import { convert } from '@currena/core';
 import { InMemoryRateStore } from '@currena/scraper';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createApp, type Bindings } from './index';
+import { createApp, __resetRateLimiterForTests, type Bindings } from './index';
 import { MetaResponseSchema } from './meta';
 import { RatesService } from './rates-service';
 
@@ -42,14 +42,23 @@ describe('routes (injected service — no Workers, no live sites)', () => {
   let scrapeCalls: string[] = [];
   let failures: Partial<Record<'tgju' | 'frankfurter', Error>> = {};
 
-  const env: Bindings = { RATES: {} as KVNamespace, REFRESH_SECRET: 'test-secret' };
-  const envNoSecret: Bindings = { RATES: {} as KVNamespace };
+  const env: Bindings = {
+    RATES: { get: async () => null } as unknown as KVNamespace,
+    REFRESH_SECRET: 'test-secret',
+  };
+  const envNoSecret: Bindings = {
+    RATES: { get: async () => null } as unknown as KVNamespace,
+  };
 
   beforeEach(() => {
     clockMs = T0_MS;
     store = new InMemoryRateStore(() => clockMs);
     scrapeCalls = [];
     failures = {};
+    // The rate limiter is isolate-local module state — reset it so test
+    // order can never leak tokens between cases (BACKLOG #18 tests rely
+    // on a fresh bucket; production has no such reset path).
+    __resetRateLimiterForTests();
   });
 
   function makeApp() {
@@ -74,12 +83,30 @@ describe('routes (injected service — no Workers, no live sites)', () => {
 
   /* ------------------------------- health ------------------------------- */
 
-  it('GET /api/health → 200 ok', async () => {
+  it('GET /api/health → 200 ok + enriched shape (version, KV reachability)', async () => {
     const res = await makeApp().request('/api/health', undefined, env);
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { ok: boolean; service: string };
+    const body = (await res.json()) as { ok: boolean; service: string; version: string; kv: string };
     expect(body.ok).toBe(true);
     expect(body.service).toBe('currena-api');
+    expect(body.version).toMatch(/^\d+\.\d+\.\d+$/);
+    expect(body.kv).toBe('ok');
+  });
+
+  it('GET /api/health → 503 when the KV binding is unreachable (BACKLOG #39)', async () => {
+    const envBrokenKv: Bindings = {
+      RATES: {
+        get: async () => {
+          throw new Error('KV unavailable');
+        },
+      } as unknown as KVNamespace,
+      REFRESH_SECRET: 'test-secret',
+    };
+    const res = await makeApp().request('/api/health', undefined, envBrokenKv);
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { ok: boolean; kv: string };
+    expect(body.ok).toBe(false);
+    expect(body.kv).toBe('error');
   });
 
   /* -------------------------------- rates ------------------------------- */
@@ -320,6 +347,59 @@ describe('routes (injected service — no Workers, no live sites)', () => {
     expect(res.status).toBe(503);
     const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('source_unavailable');
+  });
+
+  /* ----------------------- rate limiting (BACKLOG #18) ------------------ */
+
+  it('POST /internal/refresh: 11 rapid attempts from one IP → 429 + Retry-After', async () => {
+    const app = makeApp();
+    const headers = {
+      'X-Refresh-Secret': 'wrong-secret',
+      'CF-Connecting-IP': '203.0.113.7',
+    };
+    let last: Response | undefined;
+    for (let i = 0; i < 11; i++) {
+      last = await app.request('/internal/refresh', { method: 'POST', headers }, env);
+    }
+    expect(last?.status).toBe(429);
+    const body = (await last!.json()) as { error: { code: string; retryAfterSec?: number } };
+    expect(body.error.code).toBe('rate_limited');
+    expect(body.error.retryAfterSec).toBeGreaterThanOrEqual(1);
+    expect(Number(last!.headers.get('retry-after'))).toBeGreaterThanOrEqual(1);
+  });
+
+  it('POST /admin: 11 rapid attempts from one IP → 429 HTML gate (before any KV work)', async () => {
+    const app = makeApp();
+    const formBody = new URLSearchParams({ action: 'refresh', source: 'tgju', secret: 'wrong' }).toString();
+    const req = {
+      method: 'POST' as const,
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        'CF-Connecting-IP': '203.0.113.8',
+      },
+      body: formBody,
+    };
+    let last: Response | undefined;
+    for (let i = 0; i < 11; i++) {
+      last = await app.request('/admin', req, env);
+    }
+    expect(last?.status).toBe(429);
+    const html = await last!.text();
+    expect(html).toContain('Too many attempts');
+    expect(Number(last!.headers.get('retry-after'))).toBeGreaterThanOrEqual(1);
+    // No scrape was ever attempted while throttled.
+    expect(scrapeCalls).toEqual([]);
+  });
+
+  it('rate limit buckets are per-IP: a different IP is not throttled', async () => {
+    const app = makeApp();
+    const headersA = { 'X-Refresh-Secret': 'wrong', 'CF-Connecting-IP': '198.51.100.1' };
+    const headersB = { 'X-Refresh-Secret': 'wrong', 'CF-Connecting-IP': '198.51.100.2' };
+    for (let i = 0; i < 11; i++) {
+      await app.request('/internal/refresh', { method: 'POST', headers: headersA }, env);
+    }
+    const resB = await app.request('/internal/refresh', { method: 'POST', headers: headersB }, env);
+    expect(resB.status).toBe(401); // wrong secret — but NOT rate limited
   });
 
   /* ------------------------------ fallbacks ------------------------------ */

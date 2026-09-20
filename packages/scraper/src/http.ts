@@ -7,6 +7,10 @@
  * - Quick retries (~300ms / ~800ms backoff) for transient Cloudflare
  *   `error 1042` blips — observed once in the Phase 2 probe battery.
  * - `fetchImpl` is injectable; tests NEVER hit live sites (AGENTS.md rule 7).
+ * - `HttpError` carries a machine-readable `code` (BACKLOG #33, SWOT W24):
+ *   timeout / dns_or_network / rate_limited / blocked / http_4xx / http_5xx —
+ *   the ladder and /api/status can classify failures without parsing
+ *   message strings (flows into errorToCodeMessage automatically).
  */
 
 /** Desktop Chrome on Windows — same fingerprint family the Phase 2 probe used. */
@@ -31,14 +35,47 @@ export interface FetchRetryOptions {
   backoffMs?: readonly number[];
 }
 
+/** Machine-readable failure classification (BACKLOG #33) — stable codes
+ *  for the API ladder, /api/status and admin telemetry. `dns_or_network`
+ *  is honest: the fetch web standard cannot distinguish DNS failure from a
+ *  dropped connection — both surface as TypeError. */
+export type HttpErrorCode =
+  | 'timeout'
+  | 'dns_or_network'
+  | 'rate_limited'
+  | 'blocked'
+  | 'http_4xx'
+  | 'http_5xx';
+
+/** Classify an HTTP status (undefined = the request never got a response). */
+function codeForStatus(status: number | undefined): HttpErrorCode {
+  if (status === undefined) return 'dns_or_network';
+  if (status === 429) return 'rate_limited';
+  if (status === 403 || status === 451) return 'blocked';
+  if (status >= 500) return 'http_5xx';
+  return 'http_4xx';
+}
+
+/** Classify a network-level rejection (AbortSignal.timeout raises a
+ *  DOMException named TimeoutError; a caller-supplied signal aborts with
+ *  AbortError — both mean the attempt never completed). */
+function codeForNetworkError(err: unknown): HttpErrorCode {
+  if (err instanceof Error && (err.name === 'TimeoutError' || err.name === 'AbortError')) {
+    return 'timeout';
+  }
+  return 'dns_or_network';
+}
+
 /** Thrown when every attempt failed (network error or non-2xx after retries). */
 export class HttpError extends Error {
   readonly status: number | undefined;
+  readonly code: HttpErrorCode;
 
-  constructor(message: string, status?: number) {
+  constructor(message: string, status?: number, code?: HttpErrorCode) {
     super(message);
     this.name = 'HttpError';
     this.status = status;
+    this.code = code ?? codeForStatus(status);
   }
 }
 
@@ -115,6 +152,8 @@ export async function fetchWithRetry(
     `GET ${url} failed after ${attempts} attempt(s): ${
       lastError instanceof Error ? lastError.message : String(lastError)
     }`,
+    undefined,
+    codeForNetworkError(lastError),
   );
 }
 

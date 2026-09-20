@@ -67,6 +67,7 @@ describe('fetchWithRetry', () => {
       expect.unreachable('must throw');
     } catch (err) {
       expect((err as HttpError).status).toBe(404);
+      expect((err as HttpError).code).toBe('http_4xx');
     }
     expect(calls).toBe(2); // one per fetchWithRetry call, zero retries inside each
   });
@@ -83,6 +84,69 @@ describe('fetchWithRetry', () => {
     ).rejects.toThrow(/3 attempt/);
 
     expect(calls).toBe(3); // 1 initial + 2 retries
+  });
+
+  it('classifies machine-readable codes (BACKLOG #33)', async () => {
+    // Network-level failure → dns_or_network.
+    await expect(
+      fetchWithRetry(
+        'https://example.test/api',
+        {},
+        {
+          fetchImpl: async () => {
+            throw new TypeError('fetch failed');
+          },
+          retries: 0,
+        },
+      ),
+    ).rejects.toMatchObject({ name: 'HttpError', code: 'dns_or_network' });
+
+    // Timeout abort → timeout.
+    const timeoutFake: typeof fetch = (_input, init) =>
+      new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () =>
+          reject(new DOMException('The operation was aborted due to timeout', 'TimeoutError')),
+        );
+      });
+    await expect(
+      fetchWithRetry('https://example.test/api', {}, { fetchImpl: timeoutFake, timeoutMs: 20, retries: 0 }),
+    ).rejects.toMatchObject({ code: 'timeout' });
+
+    // 429 after retries → rate_limited.
+    await expect(
+      fetchWithRetry(
+        'https://example.test/api',
+        {},
+        {
+          fetchImpl: async () => new Response('slow down', { status: 429 }),
+          retries: 0,
+        },
+      ),
+    ).rejects.toMatchObject({ code: 'rate_limited', status: 429 });
+
+    // 5xx after retries → http_5xx.
+    await expect(
+      fetchWithRetry(
+        'https://example.test/api',
+        {},
+        {
+          fetchImpl: async () => new Response('bad gateway', { status: 502 }),
+          retries: 0,
+        },
+      ),
+    ).rejects.toMatchObject({ code: 'http_5xx', status: 502 });
+
+    // 403 (permanent) → blocked.
+    await expect(
+      fetchWithRetry(
+        'https://example.test/api',
+        {},
+        {
+          fetchImpl: async () => new Response('forbidden', { status: 403 }),
+          retries: 0,
+        },
+      ),
+    ).rejects.toMatchObject({ code: 'blocked', status: 403 });
   });
 
   it('aborts a hanging fetch via the timeout signal', async () => {

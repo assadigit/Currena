@@ -20,7 +20,7 @@
  * the in-memory RateStore fake + fake scrapers — no Workers, no live sites.
  */
 
-import { convert, CoreError, SnapshotSourceSchema, sourceForPair } from '@currena/core';
+import { convert, CoreError, CORE_VERSION, SnapshotSourceSchema, sourceForPair } from '@currena/core';
 import type { ConversionResult, RatesError, Snapshot, SnapshotSource } from '@currena/core';
 import { Hono } from 'hono';
 import type { Context } from 'hono';
@@ -61,7 +61,70 @@ const MAX_AMOUNT = 1e15;
 /** The no-JS admin form is well under 1 KB; 8 KB is a generous cap. */
 const MAX_ADMIN_BODY_BYTES = 8192;
 
-type ErrorStatus = 400 | 401 | 404 | 413 | 500 | 501 | 503;
+/* --------------------------- rate limiting ---------------------------- */
+
+/**
+ * Best-effort in-memory rate limit on the two secret-guessing surfaces
+ * (POST /admin, POST /internal/refresh) — BACKLOG #18 / SWOT T3.
+ *
+ * Token bucket per (IP, surface), PER ISOLATE: Workers isolates are
+ * ephemeral and per-PoP, so a patient attacker rotating PoPs can exceed
+ * this — it is defense-in-depth on top of the real gates (constant-time
+ * secret compare, uniform 401-before-render, body cap), not a hard
+ * guarantee. Zero dependencies, no external state; the map is capped so
+ * a hostile IP spray cannot grow isolate memory unboundedly.
+ */
+const RATE_LIMIT_CAPACITY = 10; // burst size
+const RATE_LIMIT_REFILL_PER_MIN = 5; // sustained attempts/minute
+const RATE_LIMIT_MAP_MAX = 10_000;
+
+interface RateBucket {
+  tokens: number;
+  lastRefillMs: number;
+}
+
+const rateBuckets = new Map<string, RateBucket>();
+
+/** Client IP as seen by the edge (absent in tests/local dev → 'unknown'). */
+function clientIp(c: Context<{ Bindings: Bindings }>): string {
+  return c.req.header('CF-Connecting-IP') ?? 'unknown';
+}
+
+/** Take one token; false = the bucket is empty (429). */
+function rateLimitTake(key: string, nowMs: number): boolean {
+  const bucket = rateBuckets.get(key) ?? { tokens: RATE_LIMIT_CAPACITY, lastRefillMs: nowMs };
+  const elapsedMs = Math.max(0, nowMs - bucket.lastRefillMs);
+  bucket.tokens = Math.min(
+    RATE_LIMIT_CAPACITY,
+    bucket.tokens + (elapsedMs / 60_000) * RATE_LIMIT_REFILL_PER_MIN,
+  );
+  bucket.lastRefillMs = nowMs;
+  const allowed = bucket.tokens >= 1;
+  if (allowed) bucket.tokens -= 1;
+  rateBuckets.set(key, bucket);
+  // Opportunistic eviction: keep the map bounded (oldest-refill first).
+  if (rateBuckets.size > RATE_LIMIT_MAP_MAX) {
+    const entries = [...rateBuckets.entries()].sort((a, b) => a[1].lastRefillMs - b[1].lastRefillMs);
+    for (const [k] of entries.slice(0, Math.floor(RATE_LIMIT_MAP_MAX / 10))) rateBuckets.delete(k);
+  }
+  return allowed;
+}
+
+/** Test-only: reset the isolate-local buckets between test cases. */
+export function __resetRateLimiterForTests(): void {
+  rateBuckets.clear();
+}
+
+/** Seconds until one token is available again (for Retry-After). */
+function rateLimitRetryAfterSec(key: string, nowMs: number): number {
+  const bucket = rateBuckets.get(key);
+  if (!bucket) return 1;
+  const deficit = 1 - bucket.tokens;
+  if (deficit <= 0) return 1;
+  return Math.max(1, Math.ceil((deficit / RATE_LIMIT_REFILL_PER_MIN) * 60));
+}
+
+type ErrorStatus = 400 | 401 | 404 | 413 | 429 | 500 | 501 | 503;
 
 /** RatesError envelope with the right status + no-store (+ Retry-After). */
 function errorResponse(
@@ -158,9 +221,27 @@ export function createApp(deps: AppDeps = {}) {
     c.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   });
 
-  app.get('/api/health', (c) =>
-    c.json({ ok: true, service: 'currena-api', time: new Date().toISOString() }, 200, NO_STORE),
-  );
+  app.get('/api/health', async (c) => {
+    // Deep health (BACKLOG #39, SWOT O8): version + KV reachability. The
+    // binding is exercised with the cheapest possible read (the tgju
+    // status key — one KV GET); a KV failure means the ladder cannot
+    // serve ANY cached snapshot, so the service is genuinely degraded
+    // and the probe reports 503 for monitors to alert on.
+    let kv: 'ok' | 'error' = 'ok';
+    try {
+      await c.env.RATES.get('status:tgju');
+    } catch {
+      kv = 'error';
+    }
+    const body = {
+      ok: kv === 'ok',
+      service: 'currena-api',
+      version: CORE_VERSION,
+      kv,
+      time: new Date().toISOString(),
+    };
+    return c.json(body, kv === 'ok' ? 200 : 503, NO_STORE);
+  });
 
   /* ---------------------------- rates ladder ---------------------------- */
 
@@ -382,6 +463,23 @@ export function createApp(deps: AppDeps = {}) {
   });
 
   app.post('/admin', async (c) => {
+    // Rate limit FIRST (BACKLOG #18): every attempt on this surface costs
+    // edge + KV time, and wrong-secret guesses must not amplify. 429 comes
+    // before any body read or secret work.
+    const rlKey = `${clientIp(c)}#admin`;
+    if (!rateLimitTake(rlKey, Date.now())) {
+      return c.html(
+        renderAdminNotice({
+          error: {
+            code: 'rate_limited',
+            message: 'Too many attempts — wait a minute before trying again.',
+          },
+        }),
+        429,
+        { ...ADMIN_HEADERS, 'Retry-After': String(rateLimitRetryAfterSec(rlKey, Date.now())) },
+      );
+    }
+
     // Cap the body before buffering it (the no-JS form is < 1 KB).
     const contentLength = Number(c.req.header('content-length') ?? '0');
     if (Number.isFinite(contentLength) && contentLength > MAX_ADMIN_BODY_BYTES) {
@@ -473,6 +571,18 @@ export function createApp(deps: AppDeps = {}) {
   /* ------------------------- internal refresh ---------------------------- */
 
   app.post('/internal/refresh', async (c) => {
+    // Rate limit FIRST (BACKLOG #18) — same defense-in-depth as POST /admin.
+    const rlKey = `${clientIp(c)}#internal`;
+    if (!rateLimitTake(rlKey, Date.now())) {
+      return errorResponse(
+        c,
+        429,
+        'rate_limited',
+        'Too many refresh attempts — wait a minute before trying again.',
+        rateLimitRetryAfterSec(rlKey, Date.now()),
+      );
+    }
+
     const secret = c.env.REFRESH_SECRET;
     if (!secret) {
       return errorResponse(
