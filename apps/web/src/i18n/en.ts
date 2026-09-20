@@ -295,6 +295,16 @@ export const en = {
     totalLabel: 'TOTAL',
     addAtLeastOneExpense: '⚠️ Please add at least one expense',
     generateFirst: '⚠️ Please generate a receipt first',
+    /* Share/export copy (BACKLOG #27): these paths had left the dictionary —
+     * fa users got English share text, Excel headers and Latin digits. */
+    shareTitle: 'Expense Receipt',
+    shareTotalLabel: '💰 TOTAL:',
+    shareConvertedLabel: '💱 Converted:',
+    shareRateLabel: '📊 Rate:',
+    excelSheetName: 'Receipt',
+    excelHeading: 'EXPENSE RECEIPT',
+    excelCategory: 'Category',
+    excelNotes: 'Notes',
     categories: {
       transport: '🚕 Transportation',
       food: '🍔 Food/Meals',
@@ -410,6 +420,16 @@ export const en = {
     conversionFailed: '❌ Conversion failed. Please check your connection and try again.',
     copiedToast: '📋 Copied to clipboard! You can paste it anywhere.',
     downloaded: '✅ Downloaded!',
+    /* Share-text labels (BACKLOG #27) — the shared/copyable summary had
+     * left the dictionary (fa users got English labels). */
+    shareHeading: '🛒 Batch Currency Conversion',
+    shareRateLabel: 'Rate:',
+    shareTotalLabel: 'Total:',
+    shareConvertedLabel: 'Converted:',
+    /** Universal example lines for the bulk-input placeholder (digits and
+     *  currency codes are locale-neutral; the label itself is the
+     *  bulkPlaceholder key above). */
+    bulkPlaceholderExamples: '4556\n4545\n3443.50\n2199.99\n\n100 usd eur\n150.99 USD | iPhone 15 Pro',
   },
 
   about: {

@@ -292,6 +292,16 @@ export const fa: Dictionary = {
     totalLabel: 'جمع کل',
     addAtLeastOneExpense: '⚠️ لطفاً حداقل یک هزینه وارد کنید',
     generateFirst: '⚠️ ابتدا یک رسید بسازید',
+    /* متن اشتراک‌گذاری و خروجی‌ها (BACKLOG #27) — این مسیرها از دیکشنری
+     * خارج شده بودند و کاربر فارسی متن انگلیسی و ارقام لاتین می‌دید. */
+    shareTitle: 'رسید هزینه',
+    shareTotalLabel: '💰 جمع کل:',
+    shareConvertedLabel: '💱 معادل:',
+    shareRateLabel: '📊 نرخ:',
+    excelSheetName: 'رسید',
+    excelHeading: 'رسید هزینه',
+    excelCategory: 'دسته‌بندی',
+    excelNotes: 'یادداشت‌ها',
     categories: {
       transport: '🚕 حمل‌ونقل',
       food: '🍔 غذا',
@@ -407,6 +417,15 @@ export const fa: Dictionary = {
     conversionFailed: '❌ تبدیل ناموفق بود. لطفاً اتصال خود را بررسی و دوباره تلاش کنید.',
     copiedToast: '📋 در کلیپ‌بورد کپی شد! می‌توانید هرجا پیست کنید.',
     downloaded: '✅ دانلود شد!',
+    /* برچسب‌های متن اشتراک‌گذاری (BACKLOG #27) — خلاصهٔ قابل کپی/اشتراک از
+     * دیکشنری خارج شده بود و کاربر فارسی برچسب انگلیسی می‌دید. */
+    shareHeading: '🛒 تبدیل گروهی ارز',
+    shareRateLabel: 'نرخ:',
+    shareTotalLabel: 'جمع کل:',
+    shareConvertedLabel: 'معادل:',
+    /** نمونه‌های همگانی جای‌نگهدار ورود گروهی (ارقام و کدهای ارز مستقل از
+     *  زبان‌اند؛ برچسب خودش کلید bulkPlaceholder بالاست). */
+    bulkPlaceholderExamples: '4556\n4545\n3443.50\n2199.99\n\n100 usd eur\n150.99 USD | iPhone 15 Pro',
   },
 
   about: {

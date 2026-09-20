@@ -122,7 +122,9 @@ export function BatchConverter() {
   };
 
   const loadTemplate = (id: 'shopping' | 'comparison' | 'wishlist'): void => {
-    setBulkText(BATCH_TEMPLATES[id].map((n) => n.toFixed(2)).join('\n'));
+    // BACKLOG #27: locale digits in the prefilled template too (parseAmount
+    // is Persian-digit tolerant — the round trip is exact).
+    setBulkText(BATCH_TEMPLATES[id].map((n) => formatNumber(n, numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).join('\n'));
     setMode('bulk');
   };
 
@@ -216,29 +218,33 @@ export function BatchConverter() {
     }
   };
 
+  // BACKLOG #27: the shared summary goes through the dictionary (the
+  // labels were hardcoded English; digits were already formatNumber'd).
   const shareText = useMemo(() => {
     if (!results) return '';
-    const lines: string[] = ['🛒 Batch Currency Conversion', `${label(results.from)} → ${label(results.to)}`];
+    const lines: string[] = [t('batchConverter.shareHeading'), `${label(results.from)} → ${label(results.to)}`];
     if (results.rate !== null) {
-      lines.push(`Rate: 1 ${label(results.from)} = ${fmtRate(results.rate, results.to)} ${label(results.to)}`);
+      lines.push(
+        `${t('batchConverter.shareRateLabel')} 1 ${label(results.from)} = ${fmtRate(results.rate, results.to)} ${label(results.to)}`,
+      );
     }
     lines.push('', ...(results.rows
       .filter((r): r is BatchRowOk => r.ok)
       .map(
         (r, i) =>
-          `${i + 1}. ${fmtOriginal(r.amount)} ${label(r.from)} = ${fmtConverted(r.result, r.to)} ${label(r.to)}` +
+          `${formatNumber(i + 1, numberLocale)}. ${fmtOriginal(r.amount)} ${label(r.from)} = ${fmtConverted(r.result, r.to)} ${label(r.to)}` +
           (r.note ? `\n   📝 ${r.note}` : ''),
       )));
     lines.push(
       '',
       '━━━━━━━━━━━━━━━━━━━━',
-      `Total: ${fmtOriginal(results.totalOriginal)} ${label(results.from)}`,
-      `Converted: ${fmtConverted(results.totalConverted, results.to)} ${label(results.to)}`,
+      `${t('batchConverter.shareTotalLabel')} ${fmtOriginal(results.totalOriginal)} ${label(results.from)}`,
+      `${t('batchConverter.shareConvertedLabel')} ${fmtConverted(results.totalConverted, results.to)} ${label(results.to)}`,
       '',
-      '✨ Converted with Currena',
+      t('converter.convertedWith'),
     );
     return lines.join('\n');
-  }, [results, numberLocale]);
+  }, [results, numberLocale, t, label, fmtOriginal, fmtConverted, fmtRate]);
 
   const onCopyAll = async (): Promise<void> => {
     if (!results) return;
@@ -370,7 +376,7 @@ export function BatchConverter() {
               onChange={(e) => setBulkText(e.target.value)}
               rows={7}
               dir="ltr"
-              placeholder={'Enter amounts, one per line:\n4556\n4545\n3443.50\n2199.99\n\n100 usd eur\n150.99 USD | iPhone 15 Pro'}
+              placeholder={`${t('batchConverter.bulkPlaceholder')}\n${t('batchConverter.bulkPlaceholderExamples')}`}
               aria-label={t('batchConverter.bulkInput')}
               className="w-full resize-y rounded-[15px] border-2 border-gray-200 bg-white px-4 py-3 text-sm text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:bg-[#222C3B]"
             />

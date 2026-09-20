@@ -309,23 +309,34 @@ export function Receipt() {
     }
   };
 
+  // BACKLOG #27: share/copy text goes through the dictionary +
+  // formatNumber(numberLocale) — fa users get Persian labels AND Persian
+  // digits (raw toFixed used to leak Latin digits into shared text).
   const shareText = (r: GeneratedReceipt): string => {
     const dateLine = r.endDate
       ? `${r.date} - ${r.endDate}`
       : r.date;
-    const lines: string[] = ['🧾 EXPENSE RECEIPT', `📅 ${dateLine}`, ''];
+    const fmtAmount = (value: number): string =>
+      formatNumber(value, numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtConverted = (value: number): string =>
+      formatNumber(value, numberLocale, { maximumFractionDigits: r.toCurrency === 'IRR' ? 0 : 2 });
+    const fmtRate = (value: number): string =>
+      formatNumber(value, numberLocale, { maximumFractionDigits: r.toCurrency === 'IRR' ? 0 : 4 });
+    const lines: string[] = [t('receipt.expenseReceipt'), `📅 ${dateLine}`, ''];
     for (const item of r.items) {
-      lines.push(`${item.emoji} ${item.category}: ${item.amount.toFixed(2)} ${label(item.currency)}`);
+      lines.push(`${item.emoji} ${item.category}: ${fmtAmount(item.amount)} ${label(item.currency)}`);
       if (item.notes) lines.push(`  📝 ${item.notes}`);
     }
-    lines.push('', '━━━━━━━━━━━━━━━━━━━━', `💰 TOTAL: ${r.total.toFixed(2)} ${label(r.fromCurrency)}`, '');
+    lines.push('', '━━━━━━━━━━━━━━━━━━━━', `${t('receipt.shareTotalLabel')} ${fmtAmount(r.total)} ${label(r.fromCurrency)}`, '');
     if (r.converted !== null) {
-      lines.push(`💱 Converted: ${r.converted.toFixed(r.toCurrency === 'IRR' ? 0 : 2)} ${label(r.toCurrency)}`);
+      lines.push(`${t('receipt.shareConvertedLabel')} ${fmtConverted(r.converted)} ${label(r.toCurrency)}`);
     }
     if (r.rate !== null) {
-      lines.push(`📊 Rate: 1 ${label(r.fromCurrency)} = ${r.rate.toFixed(r.toCurrency === 'IRR' ? 0 : 4)} ${label(r.toCurrency)}`);
+      lines.push(
+        `${t('receipt.shareRateLabel')} 1 ${label(r.fromCurrency)} = ${fmtRate(r.rate)} ${label(r.toCurrency)}`,
+      );
     }
-    lines.push('', '✨ Generated with Currena', `🆔 ${r.id}`);
+    lines.push('', t('common.generatedWith'), `${t('receipt.receiptId')} ${r.id}`);
     return lines.join('\n');
   };
 
@@ -380,19 +391,22 @@ export function Receipt() {
     setExporting('excel');
     try {
       // Zero-dependency writer (replaces the CVE-laden npm xlsx package).
+      // BACKLOG #27: headers/sheet name go through the dictionary (fa users
+      // get Persian headers); cell NUMBERS stay raw numbers — a spreadsheet
+      // is a data artifact, and the writer types them as numbers.
       const { buildXlsxBlob } = await import('../lib/xlsx-writer');
       const data: (string | number | null)[][] = [
-        ['EXPENSE RECEIPT'],
-        ['Date', receipt.date],
+        [t('receipt.excelHeading')],
+        [t('common.date'), receipt.date],
         [null],
-        ['Category', 'Amount', 'Currency', 'Notes'],
+        [t('receipt.excelCategory'), t('common.amount'), t('common.currency'), t('receipt.excelNotes')],
         ...receipt.items.map((item) => [item.category, item.amount, item.currency, item.notes]),
         [null],
-        ['TOTAL', receipt.total, receipt.fromCurrency],
-        ['CONVERTED', ...(receipt.converted !== null ? [receipt.converted, receipt.toCurrency] : [])],
-        ...(receipt.rate !== null ? [['Rate', receipt.rate] as (string | number)[]] : []),
+        [t('receipt.totalLabel'), receipt.total, receipt.fromCurrency],
+        [t('common.converted'), ...(receipt.converted !== null ? [receipt.converted, receipt.toCurrency] : [])],
+        ...(receipt.rate !== null ? [[t('common.rate'), receipt.rate] as (string | number)[]] : []),
       ];
-      const blob = buildXlsxBlob([{ name: 'Receipt', rows: data }]);
+      const blob = buildXlsxBlob([{ name: t('receipt.excelSheetName'), rows: data }]);
       downloadBlob(blob, `currena_receipt_${receipt.id}.xlsx`);
       setToast(t('receipt.downloaded'));
     } catch (err) {
@@ -434,12 +448,12 @@ export function Receipt() {
         const blob = await new Promise<Blob | null>((resolve) => canvas!.toBlob(resolve, 'image/png'));
         const file = blob ? new File([blob], `currena_receipt_${receipt.id}.png`, { type: 'image/png' }) : null;
         if (file && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ title: 'Expense Receipt', text, files: [file] });
+          await navigator.share({ title: t('receipt.shareTitle'), text, files: [file] });
           return;
         }
       }
       if (navigator.share) {
-        await navigator.share({ title: 'Expense Receipt', text });
+        await navigator.share({ title: t('receipt.shareTitle'), text });
         return;
       }
     } catch (err) {
@@ -822,7 +836,8 @@ export function Receipt() {
                         <span className="break-words">{item.category}</span>
                       </span>
                       <span className="shrink-0 font-bold" dir="ltr">
-                        {item.amount.toFixed(2)} <bdi>{label(item.currency)}</bdi>
+                        {formatNumber(item.amount, numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{' '}
+                        <bdi>{label(item.currency)}</bdi>
                       </span>
                     </div>
                     {item.time !== '' ? (
@@ -838,7 +853,8 @@ export function Receipt() {
               <div className="mt-4 flex items-center justify-between border-t-2 border-black pt-4 text-lg font-bold">
                 <span>{t('receipt.totalLabel')}</span>
                 <span dir="ltr">
-                  {receipt.total.toFixed(2)} <bdi>{label(receipt.fromCurrency)}</bdi>
+                  {formatNumber(receipt.total, numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{' '}
+                  <bdi>{label(receipt.fromCurrency)}</bdi>
                 </span>
               </div>
 
@@ -846,13 +862,13 @@ export function Receipt() {
                 <div className="mt-4 rounded-lg bg-gray-100 p-4 text-center">
                   <p className="mb-2 text-xs text-gray-600">{t('receipt.convertedAmount')}</p>
                   <p className="text-xl font-bold text-currena-blue" dir="ltr">
-                    {receipt.converted.toFixed(receipt.toCurrency === 'IRR' ? 0 : 2)}{' '}
+                    {formatNumber(receipt.converted, numberLocale, { maximumFractionDigits: receipt.toCurrency === 'IRR' ? 0 : 2 })}{' '}
                     <bdi>{label(receipt.toCurrency)}</bdi>
                   </p>
                   {receipt.rate !== null ? (
                     <p className="mt-2 text-[0.7rem] text-gray-500" dir="ltr">
                       {t('common.rate')}: 1 <bdi>{label(receipt.fromCurrency)}</bdi> ={' '}
-                      {receipt.rate.toFixed(receipt.toCurrency === 'IRR' ? 0 : 4)}{' '}
+                      {formatNumber(receipt.rate, numberLocale, { maximumFractionDigits: receipt.toCurrency === 'IRR' ? 0 : 4 })}{' '}
                       <bdi>{label(receipt.toCurrency)}</bdi>
                     </p>
                   ) : null}
