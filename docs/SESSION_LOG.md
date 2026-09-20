@@ -5,6 +5,32 @@ Every entry: what, why, evidence. Verification after every commit: `pnpm -r type
 
 ---
 
+# SESSION_LOG — Owner-UI + SWOT-v2 Session 2026-09-20
+
+Branch `main` · base `e3896ec` · runner: pnpm 9.15.9 / Node 24.21.
+Mission: Phase A SWOT re-run → owner's 8 UI directives → Phase B backlog wave (Phase C modularization + Phase D perf re-queued with gates in SWOT v2 / BACKLOG).
+
+### 1 · docs: SWOT v2 + BACKLOG Wave 5
+**What:** Fresh audit of all 4 packages against today's tree: production probe battery (health/rates/status/history/meta/admin GET+POST/ETag 304), `pnpm audit` (clean), 308/308 + typecheck + bundle baseline re-verified identical, delta read of cron/history/gold/LED/retry/admin-gate changes. Wave 5 (6 owner UI items) added to BACKLOG.
+**Evidence:** `docs/SWOT.md` v2, `docs/BACKLOG.md`.
+
+### 2 · feat(web): owner wireframe homepage — `dbd05e2`
+**What:** Single-column stack (converting box → gold+currency LED two-up → full-width tools); `ConverterAside` retired; `showDayStats` prop on both boards (CURRENT-only homepage placement, `.led-current-only` 2-track ladder, subgrid re-asserted); WCAG contrast fixes (placeholder/caret/no-change pill); unified nav utility group (`HEADER_ICON_BUTTON_CLASS` ×4 controls); footer trust row + About legal sections (en+fa) with sessionStorage deep-link scroll.
+**Evidence:** agent-browser DOM geometry (gold 524px LEFT of currency 524px, same row; 6 tools; footer Privacy·Terms·Contact·About; no overflow at 1280/375), VLM desktop+mobile+dark screenshots, golden path (100 USD → LIVE UPDATE popup), Live Rates full board unchanged (DAY HIGH/DAY LOW present, 0 compact tables), fa RTL mirrored (gold start-side), zero console errors. Bundle 288.38/87.65 kB gz (baseline 290.28/87.77 — no regression).
+
+### 3 · fix(api,scraper,web): reliability wave — `ae6d6d9`
+**What:** BACKLOG #39 health enrich (version + KV probe, 503 on KV failure), #18 rate limit (per-isolate per-IP token bucket on POST /admin + /internal/refresh, 429+Retry-After before any body/secret work), #33 HttpError.code (6 machine-readable codes), #34 Odometer prefers-reduced-motion.
+**Evidence:** 313/313 tests (api 91→95, scraper 66→67); wrangler dev: `/api/health` → `{ok,service,version,kv,time}`, 11th rapid `/internal/refresh` → 429.
+
+### 4 · fix(web,i18n): export/share paths — `58135e6`
+**What:** BACKLOG #27 — Receipt shareText/Excel/paper and Batch shareText through the dictionary + `formatNumber(numberLocale)`; bulk placeholder + template prefill locale-aware; `navigator.share` titles localized.
+**Evidence:** fa receipt flow in agent-browser: paper renders 'رسید هزینه / جمع کل ۲۵٫۵۰ TRY / 💱 مبلغ تبدیل‌شده ۱۲۲٬۸۲۱ IRR (تومان)' — Persian labels AND digits; console clean.
+
+### Deploy + smoke
+Deployed from final HEAD as Workers version `<see PROGRESS>`; production smoke: health enriched, rates fresh, homepage stack + boards + footer verified en+fa. SW two-reload cycle expected on first visit after deploy (documented gotcha).
+
+---
+
 ### 1 · docs: BASELINE — `bfc7240`
 **What:** Pre-change snapshot: 224 tests green (core 107 / scraper 43 / api 74), build 4.5 s, bundle table, 443 lockfile packages, 2 HIGH `pnpm audit` advisories (xlsx), 30 commits.
 **Why:** Mandated baseline for before/after measurement.

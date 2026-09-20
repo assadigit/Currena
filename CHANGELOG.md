@@ -5,6 +5,94 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-09-20] — Owner wireframe homepage + SWOT v2 + reliability wave
+
+4 commits on `main` (`e3896ec` → this session), 2026-09-20.
+Tests **308 → 313 — all green** at every gate; bundle gate held
+(288.38 kB / 87.65 kB gz initial JS vs the 290.28/87.77 baseline — the
+retired sidebar rail more than paid for the new homepage sections);
+precache 59 entries / 2049.25 KiB (+1 entry, +6.4 KiB — About legal
+sections + CSS). Every change browser-verified locally (agent-browser
+DOM geometry + VLM, en + fa, desktop + 375 px, light + dark) and on
+production after deploy.
+
+### Phase A — SWOT v2 (fresh audit against today's code)
+
+- **docs:** `docs/SWOT.md` re-run — production re-probed (health/rates/
+  status/history/meta/admin/ETag 304 round-trip), `pnpm audit` CLEAN
+  (xlsx CVEs long gone), bundle baseline re-measured identical, delta
+  read of everything landed since 2026-09-24 (cron, server history,
+  gold, LED boards, retry policy, admin gate). New weakness set is
+  maintainability-shaped (the monolith files), the old security set is
+  retired. `docs/BACKLOG.md` gained Wave 5 (this session's owner UI
+  items) with statuses.
+
+### Owner wireframe — homepage single-column stack (the 8 UI directives)
+
+- **feat(web):** homepage rebuilt per the owner wireframe — full-width
+  converting box → **GOLD & CURRENCY LED boards two-up** (gold start
+  side; both in the compact CURRENT-only placement) → full-width Quick
+  tools section → footer. The desktop two-column dashboard and the
+  "at a glance" mini-board (`ConverterAside`) are retired; mobile now
+  gets the boards too (`dbd05e2`).
+- **feat(web):** ONE shared board component, two placements —
+  `LedRateBoard`/`LedGoldBoard` take `showDayStats` (default true);
+  `false` removes the DAY HIGH/DAY LOW cells from the DOM and collapses
+  the shared subgrid ladder to two tracks at EVERY viewport
+  (`.led-current-only`, index.css — re-asserts subgrid so column widths
+  stay shared). `/live-rates` untouched: full 3-column board verified.
+- **fix(web,a11y):** WCAG 1.4.1 — the retired mini-board's color-only
+  live dot is superseded by the boards' text LIVE/CACHED/OFFLINE label.
+- **fix(web,a11y):** WCAG 1.4.3 contrast — amount placeholder
+  #B39B45→#806215 (≈2.7→5.6:1), dark #5B6B80→#9CA3AF (≈2.6→5.5:1),
+  caret #C79100→#8A6D1F; "no change" delta pill muted→gray-700/gray-300
+  (≈4.0→8.6:1 light, ≈4.5→8.0:1 dark).
+- **feat(web):** nav utility group unified — install · فا · theme ·
+  hamburger share one bordered icon-button container
+  (`HEADER_ICON_BUTTON_CLASS`), equal 40px hit areas, both themes.
+- **feat(web):** trust signals — footer carries Privacy · Terms ·
+  Contact · About next to the credit line; the About route gains
+  Privacy Policy / Terms of Service / Contact sections (en+fa) with
+  sessionStorage-staged deep-link scroll; contact = GitHub (the only
+  owner-supplied public channel — no email exists in the repo).
+- **rtl:** full fa audit re-run across all 9 routes (en+fa, desktop+
+  375 px, light+dark): boards mirror to the start side, no overflow, no
+  console errors; digit language decision documented — Persian digits
+  (۰۱۲۳) in all standard UI text via `Intl` fa-IR, Latin digits inside
+  the DSEG7 LED modules (hardware font, matching the board-date rule).
+
+### Phase B — reliability & i18n wave (BACKLOG items)
+
+- **fix(api):** `/api/health` enriched (BACKLOG #39) — version +
+  KV reachability probe (cheapest read); KV failure → 503 + `ok:false`
+  for monitors; tests for both shapes (`ae6d6d9`).
+- **fix(api):** rate limiting (BACKLOG #18) — per-isolate, per-IP token
+  bucket (10 burst / 5 per min) on `POST /admin` +
+  `POST /internal/refresh`, checked BEFORE body read or secret work
+  (kills the wrong-secret KV amplification); 429 + Retry-After; bounded
+  map; documented best-effort (per-PoP isolates). 3 tests.
+- **fix(scraper):** `HttpError.code` (BACKLOG #33) — machine-readable
+  classification (timeout / dns_or_network / rate_limited / blocked /
+  http_4xx / http_5xx) derived from status or abort type; flows into
+  `errorToCodeMessage` → status/admin telemetry. All six codes pinned.
+- **fix(web):** Odometer respects `prefers-reduced-motion` (BACKLOG #34)
+  — final value lands immediately, no rAF count-up.
+- **fix(web,i18n):** Receipt/Batch export+share paths through the
+  dictionary + `formatNumber` (BACKLOG #27) — fa users now get Persian
+  labels AND Persian digits in share text, the receipt paper
+  (۲۵٫۵۰ TRY / ۱۲۲٬۸۲۱ IRR (تومان)) and Excel headers; bulk-template
+  prefill locale-aware; `navigator.share` titles localized (`58135e6`).
+
+### Verification summary
+
+308 → 313 tests (core 134 · web 17 · scraper 66→67 · api 91→95),
+typecheck 4/4 at every commit; agent-browser: golden path (100 USD →
+result + LIVE UPDATE), footer deep-links scroll to the About sections,
+fa RTL mirroring (gold board start-side), Live Rates full board
+unchanged (CURRENT + DAY HIGH + DAY LOW, 0 compact tables), zero
+console/page errors everywhere; wrangler dev: enriched health JSON +
+11th rapid `/internal/refresh` → 429.
+
 ## [2026-09-19] — Ever-green rates + LED shopfront boards session
 
 19 commits on `main` (`732d2df` → `d28f57c`), 2026-09-18 evening → 2026-09-19.

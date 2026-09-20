@@ -9,13 +9,13 @@ Status legend: ☐ todo · 🔄 in progress · ✅ done (this session) · ⏸ es
 
 | # | Status | Tag | Item | Origin |
 |---|--------|-----|------|--------|
-| 40 | 🔄 | UI-A11Y | "Live" non-color signifier next to the green status dot (at-a-glance card) — superseded by the LED boards' existing LIVE text label once the homepage restructure lands | Owner audit |
-| 41 | 🔄 | UI-A11Y | Contrast ≥4.5:1: amount-input amber placeholder (light+dark) + "no change" delta pill text (light+dark) | Owner audit |
-| 42 | 🔄 | UI | Nav utility group unified (install / فا / theme / hamburger): one bordered icon-button container, equal hit areas | Owner audit |
-| 43 | 🔄 | UI-TRUST | Footer: Privacy Policy + Terms of Service links (About-page sections) + contact method next to the credit line | Owner audit |
-| 44 | 🔄 | UI | Homepage single-column stack: full-width converting box → gold+currency LED two-up row → full-width tools section (at-a-glance mini-board retired) | Owner wireframe |
-| 45 | 🔄 | UI | Shared LED board component with a CURRENT-only variant (compact placement on homepage; Live Rates keeps day high/low) — one component, two pages, zero drift | Owner wireframe |
-| 46 | 🔄 | UI-RTL | Full fa RTL audit: every screen mirrored properly (nav order, form alignment, icon flipping); digit-language decision documented (Persian digits in UI text, Latin in DSEG7 modules) | Owner audit |
+| 40 | ✅ | UI-A11Y | "Live" non-color signifier next to the green status dot (at-a-glance card) — superseded by the LED boards' existing LIVE text label once the homepage restructure lands | Owner audit |
+| 41 | ✅ | UI-A11Y | Contrast ≥4.5:1: amount-input amber placeholder (light+dark) + "no change" delta pill text (light+dark) | Owner audit |
+| 42 | ✅ | UI | Nav utility group unified (install / فا / theme / hamburger): one bordered icon-button container, equal hit areas | Owner audit |
+| 43 | ✅ | UI-TRUST | Footer: Privacy Policy + Terms of Service links (About-page sections) + contact method next to the credit line | Owner audit |
+| 44 | ✅ | UI | Homepage single-column stack: full-width converting box → gold+currency LED two-up row → full-width tools section (at-a-glance mini-board retired) | Owner wireframe |
+| 45 | ✅ | UI | Shared LED board component with a CURRENT-only variant (compact placement on homepage; Live Rates keeps day high/low) — one component, two pages, zero drift | Owner wireframe |
+| 46 | ✅ | UI-RTL | Full fa RTL audit: every screen mirrored properly (nav order, form alignment, icon flipping); digit-language decision documented (Persian digits in UI text, Latin in DSEG7 modules) | Owner audit |
 
 ## Wave 1 — Security & data integrity (Must)
 
@@ -43,7 +43,7 @@ Status legend: ☐ todo · 🔄 in progress · ✅ done (this session) · ⏸ es
 | 15 | ✅ | RELIABILITY | Route-level error boundary with i18n'd recovery UI | SWOT W17 |
 | 16 | ✅ | RELIABILITY | Refresh FAB: force-refetch (bypass freshness) or honest disable | SWOT W15 |
 | 17 | ✅ | RELIABILITY | PWA: `virtual:pwa-register` + update toast instead of silent stale shell | SWOT T9 |
-| 18 | ☐ | RELIABILITY | In-memory per-isolate rate limit on `POST /admin` + `/internal/refresh` (best-effort, documented) | SWOT T3 |
+| 18 | ✅ | RELIABILITY | In-memory per-isolate rate limit on `POST /admin` + `/internal/refresh` (best-effort, documented) | SWOT T3 |
 
 ## Wave 3 — Performance (Should — measured)
 
@@ -62,16 +62,16 @@ Status legend: ☐ todo · 🔄 in progress · ✅ done (this session) · ⏸ es
 | 24 | ☐ | BEST-PRACTICES | Extract `downloadBlob` to `apps/web/src/lib/`; dedupe 3 copies | SWOT W22 |
 | 25 | ✅ | BEST-PRACTICES | `roundSignificant`: symmetric negative-tie rounding + test | SWOT W19 |
 | 26 | ✅ | BEST-PRACTICES | CSV: total = sum of rounded rows (display consistency) + formula-injection guard (`'` prefix on `=+-@` notes) | SWOT W18 |
-| 27 | ☐ | BEST-PRACTICES | i18n: replace ~15 hardcoded English strings + `toFixed(2)` with dictionary keys + `formatNumber` in Receipt/Batch export paths | SWOT W16 |
+| 27 | ✅ | BEST-PRACTICES | i18n: replace ~15 hardcoded English strings + `toFixed(2)` with dictionary keys + `formatNumber` in Receipt/Batch export paths | SWOT W16 |
 | 28 | ✅ | BEST-PRACTICES | Dead code: remove `readHistory`, `priceScanner` dict block, pointless `useMemo`; sync `SCRAPER_VERSION` | SWOT W21 |
 | 29 | ☐ | DX | First web tests: `history.ts`, `rate-history.ts`, `recent-pairs.ts`, `router.ts`, `display.ts`, meta-schema parity test | SWOT W9/W23 |
 | 30 | ☐ | BEST-PRACTICES | `splitEvenly` → core (+ tests) next to settle | SWOT O2 |
 | 31 | ✅ | BEST-PRACTICES | Settle: use group currency for settlement records (stop hardcoding `'IRR'`) | SWOT T8 |
 | 32 | ☐ | BEST-PRACTICES | `parseBatchLines` bounds (line/char caps) + calc parser: U+00A0/newline whitespace, unary plus, typed `RangeError` guard | SWOT W24 |
-| 33 | ☐ | BEST-PRACTICES | `HttpError` machine-readable code (timeout/dns/blocked/rate_limited) | SWOT W24 |
-| 34 | ☐ | BEST-PRACTICES | Odometer: respect `prefers-reduced-motion`; normalize digits in calc input | SWOT W25/W24 |
+| 33 | ✅ | BEST-PRACTICES | `HttpError` machine-readable code (timeout/dns/blocked/rate_limited) | SWOT W24 |
+| 34 | ✅ | BEST-PRACTICES | Odometer: respect `prefers-reduced-motion`; normalize digits in calc input | SWOT W25/W24 |
 | 35 | ⏸ | RELIABILITY | Cron pre-warmer: ship `scheduled` handler + **commented** `[triggers]` config — enable-on-deploy is an owner decision (upstream load tradeoff) | SWOT O4 |
 | 36 | ⏸ | RELIABILITY | TGJU Path-B relay (GitHub Actions → KV) — architectural, deferred with evidence | SWOT T2 |
 | 37 | ⏸ | BEST-PRACTICES | zod `.strict()` on all schemas — contract change affecting stored-KV compatibility; deferred | SWOT W8(core) |
 | 38 | ☐ | COULD | Settle multi-tab `storage` sync (History has it) | SWOT W12 |
-| 39 | ☐ | COULD | `/api/health` enrich (version + KV reachability) | SWOT O8 |
+| 39 | ✅ | COULD | `/api/health` enrich (version + KV reachability) | SWOT O8 |
