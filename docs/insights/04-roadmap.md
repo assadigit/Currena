@@ -1,0 +1,158 @@
+# 04. Roadmap
+
+## 1. Goal and non-goals
+
+**Goal:** ship `#/insights`, a bilingual page with about 30 indicators, a transparent warning-count summary, trend and 10-year position on every card, a weekly "what changed" list, a key-dates calendar, and plain-language explanations, all using only data that may legally be displayed.
+
+**Non-goals:** buy/sell recommendations, personal advice, price alerts, user accounts, per-indicator share links (later), licensed market data (P3 until decided).
+
+## 2. Architecture
+
+Three data tiers, by how fast the data moves:
+
+| Tier | Examples | Runs where | How often |
+|---|---|---|---|
+| **Live** | Gold ounce (TGJU, already scraped), Frankfurter FX | Existing Worker cron and ladder | Existing cadence |
+| **Daily** | FRED series, RBA CSVs, silver, Bitcoin | Ingestion runner (see below) | Once a day |
+| **Slow** | ABS (monthly and quarterly), World Bank, Shiller CAPE, manual China PMI | Ingestion runner | Weekly check |
+
+### Where ingestion runs (decision at Gate I0)
+
+**Default: a scheduled GitHub Actions job (Node), not the Worker.** Reasons, all from Cloudflare's published limits: on Workers Free a cron gets 10 ms of CPU and 50 subrequests, and the Currena Worker already uses one of only five cron triggers. Parsing large CSV or JSON series will not fit. The repo already documents this pattern ("Path B", a GitHub Actions relay writing into KV) in `AGENTS.md` rule 8.
+
+- The job fetches sources, validates everything with zod, computes percentiles, changes and states, and writes **one snapshot** to KV through the Cloudflare REST API.
+- Secrets (FRED key, a KV-scoped Cloudflare token) live in GitHub Actions secrets. The owner creates them; the agent never sees or stores their values.
+- The Worker only **reads** the precomputed snapshot and serves it (cheap, no heavy CPU).
+
+**Alternative if the Worker is on the Paid plan:** run the same runner code from a second cron trigger inside the Worker (30 s CPU, up to 10,000 subrequests). The runner is written as pure functions behind an interface so this swap is a small change.
+
+### Contracts and storage
+
+- **Contracts** go in `packages/core/src/schemas.ts` as zod schemas (`AGENTS.md` rule 3): `IndicatorId`, `IndicatorDefinition` (static config: id, group, section, source, cadence, rule), `IndicatorReading` (value, asOf, change7d, change30d, percentile10y, status, sourceName, sourceUrl, updatedAt), `InsightsSnapshot` (generatedAt, global and australia summaries, readings, changedThisWeek, calendar), `CalendarEvent`.
+- **Storage** goes behind a new `InsightsStore` interface (like `RateStore`) with a KV adapter, a REST-API writer for the runner, and an in-memory adapter for tests.
+- **KV keys:** `insights:snapshot` (summary plus all card data, small), `insights:hist:<id>` (downsampled 10-year series, loaded when a card expands), `insights:status` (per-source freshness for the admin console).
+- **Write budget:** about 30 history keys plus one snapshot per run is far below the KV daily write limits on the Free plan. Write only when data changed.
+
+### API (Hono, `apps/api`)
+
+- `GET /api/insights` returns the snapshot. ETag and `If-None-Match` support, like `/api/rates`.
+- `GET /api/insights/:id/history` returns the series for one card.
+- Both validated with the shared zod schemas and typed through Hono RPC.
+- The existing `/admin` console gains per-source freshness rows for Insights.
+
+### Package layout
+
+- `packages/insights` (new, `@currena/insights`): source adapters, normalisers, the scoring engine. Pure TypeScript, tested with fixtures, no platform-specific imports.
+- `apps/api/src/routes/insights.ts`: the two read routes.
+- `scripts/insights-ingest.ts` and `.github/workflows/insights-ingest.yml`: the runner and its schedule.
+- `apps/web/src/routes/Insights.tsx` (lazy-loaded) plus `apps/web/src/components/insights/*`.
+- `data/insights-calendar.json` and `data/manual/china-pmi.json`: hand-maintained, zod-validated.
+
+## 3. Phases
+
+Every phase ends with typecheck and tests green, a `phase(I<n>): summary` commit, and an update to `docs/PROGRESS.md`. **✋ means stop and wait for owner approval.** Do not start the next phase without it.
+
+### Phase I0: Preflight and decisions ✋
+
+- [ ] Read `AGENTS.md`, `docs/PROGRESS.md`, `docs/BACKLOG.md`, and this folder.
+- [ ] Confirm the Cloudflare plan (Free or Paid) with the owner and decide the ingestion venue.
+- [ ] Owner creates a free FRED API key (and the GitHub/Cloudflare secrets if Actions is chosen). Agent never reads secret values.
+- [ ] Run the verify-first probe for every source in `03-data-sources.md`; record results there.
+- [ ] Decide the substitutes for the blocked items (credit spread, VIX, S&P 500, breadth).
+- [ ] Decide silver and Bitcoin sources after reading their terms.
+- [ ] Confirm who reviews the disclaimer and copy for Australian financial-services rules.
+- **Exit:** `03-data-sources.md` fully verified, open decisions answered in `docs/PROGRESS.md`.
+
+### Phase I1: Contracts and scoring engine (no network)
+
+- [ ] Add the zod schemas to `packages/core`.
+- [ ] Build `packages/insights` scoring: percentile, 7/30-day change, rule evaluation (all rule types in `01-indicator-spec.md`), summary vote and label, "what changed this week", stale handling.
+- [ ] Table-driven unit tests for every rule type and edge case (empty series, short history, direction, ties).
+- [ ] Recorded historical fixtures for 2008, 2020 and 2022, and a backtest script that writes `docs/insights/BACKTEST.md`.
+- **Exit:** tests green; backtest reviewed ✋ (owner approves or adjusts thresholds).
+
+### Phase I2: Source adapters and fixtures
+
+- [ ] One adapter per provider (FRED, RBA CSV, ABS, World Bank, Shiller, silver, Bitcoin), each validated with zod and returning a canonical series.
+- [ ] Record small fixtures per adapter; tests run only against fixtures.
+- [ ] Failure behaviour: an upstream change fails loudly in the adapter and produces a stale or unavailable reading, never wrong data.
+- [ ] P1 indicators first; P2 adapters after.
+- **Exit:** adapters green on fixtures; a manual one-off live run prints sane values for every P1 indicator.
+
+### Phase I3: Ingestion runner and storage ✋
+
+- [ ] Implement `InsightsStore` and its adapters.
+- [ ] Runner script plus the scheduled workflow (daily, plus a weekly slow-tier check).
+- [ ] 10-year history backfill (World Bank monthly, Bitcoin daily candles in chunks, RBA F11 monthly).
+- [ ] Worker routes `/api/insights` and `/api/insights/:id/history`, ETag, security headers like the rest of the API.
+- [ ] Admin console rows for per-source freshness.
+- **Exit ✋:** dry run in production with real keys; owner reviews the live JSON before any UI work depends on it.
+
+### Phase I4: The page
+
+- [ ] Route `/insights`, nav entry, lazy loading, i18n keys (en and fa), typed.
+- [ ] Components: summary block with explainer, what-changed, key dates, section, indicator card, disclaimer bar, about-the-data.
+- [ ] All states from `02-page-design-spec.md` (loading, stale, error, info-only, quiet week).
+- [ ] Persian digits, Jalali dates with bidi isolation, charts with left-to-right time axes, mirror-correct layout.
+- [ ] Accessibility: icon plus label status, real buttons, chart table alternatives, reduced motion.
+- [ ] Verify with agent-browser in en and fa, light and dark, desktop and 375 px; zero console errors; no horizontal overflow. Check the bundle does not regress.
+- **Exit ✋:** owner visual review on production-like data.
+
+### Phase I5: Content and legal ✋
+
+- [ ] Write the explanation, "tended to mean", "can't tell you" and "what this means for you" text for every card, in both languages (Farsi written natively).
+- [ ] Populate the calendar JSON from official schedules.
+- [ ] Disclaimer text reviewed by an Australian financial-services-qualified person. No "buy/sell" wording anywhere.
+- **Exit ✋:** owner and reviewer sign off on the copy.
+
+### Phase I6: Second wave (P2)
+
+- [ ] Housing, terms of trade, household debt and arrears, CAPE, government interest/revenue, oil, breakevens, China, copper/gold, iron ore, US M2.
+- [ ] Re-run the backtest with the full indicator set.
+- **Exit:** all P2 cards live with sources verified.
+
+### Phase I7: Hardening and launch ✋
+
+- [ ] Stale-feed alerting (admin console and a failed-workflow notification).
+- [ ] Performance budget check and PWA precache impact.
+- [ ] SWOT-style re-check of the feature; update `docs/BACKLOG.md`.
+- [ ] CHANGELOG, PROGRESS, final production smoke test (health, snapshot, each card, en/fa).
+- **Exit ✋:** owner approves launch.
+
+### Later (P3 and v2)
+
+Licensed items (VIX, S&P 500 / Gold, breadth), per-indicator share links, a global-liquidity composite.
+
+## 4. Testing
+
+- Unit tests for scoring and adapters; fixtures only, never live sites.
+- A frozen-clock test for "this week" logic.
+- A snapshot of the zod schemas so contract changes are deliberate.
+- Browser verification in both locales and both themes, with DOM geometry checks for RTL (not screenshots alone).
+
+## 5. Security and secrets
+
+- Secrets only in GitHub Actions secrets or `wrangler secret`. Never in the repo, logs, docs, or commit messages.
+- A KV token for the runner has the minimum scope (KV write on the one namespace).
+- The new endpoints are read-only. Reuse the existing rate limiting and security headers.
+
+## 6. Risks and mitigations
+
+| Risk | Mitigation |
+|---|---|
+| A source changes format or disappears | zod validation, fixtures, stale state, per-source status in `/admin` |
+| Licence problem with a provider | Verify-first rule; blocked items stay out until resolved |
+| Free-plan CPU and subrequest limits | Ingestion runs outside the Worker by default |
+| Thresholds give misleading labels | Backtest gate; equal weights; every threshold shown on the card |
+| Legal exposure from advice-like wording | General-information framing, no buy/sell language, disclaimer review gate |
+| Bundle growth hurts the converter | Lazy-load the route; check bundle size at each phase |
+| Farsi copy reads as translated | Native writing, native review before launch |
+
+## 7. Definition of done
+
+- All P1 and P2 indicators live, each with value, trend, 10-year position, source and update date.
+- Summary line, what-changed, calendar and explainer working in en and fa.
+- Backtest documented; thresholds approved by the owner.
+- Tests green, typecheck clean, no regression in the converter, bundle budget held.
+- Copy and disclaimer reviewed; no advice wording.
+- `CHANGELOG.md`, `docs/PROGRESS.md` and these docs updated.

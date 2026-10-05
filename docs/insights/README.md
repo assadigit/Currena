@@ -1,0 +1,39 @@
+# Insights: documentation set
+
+Insights is a new page on currena.ir (`#/insights`) that explains the state of global and Australian finance through about 30 indicators, in plain language, in Farsi (RTL) and English. It gives **general information about what indicators have historically tended to mean. It never tells anyone to buy or sell.**
+
+Status: **planning complete, no code written.** Everything here was prepared on 2026-10-06.
+
+## Read in this order
+
+| File | What it is |
+|---|---|
+| `01-indicator-spec.md` | The indicators, their warning rules, and how the summary line is calculated |
+| `02-page-design-spec.md` | How the page should look and behave (for the designer, and for the agent building it) |
+| `03-data-sources.md` | Every data source: endpoint, series, access, cadence, licence status, fallback |
+| `04-roadmap.md` | Architecture, phases with approval gates, risks, definition of done |
+| `05-agent-kickoff-prompt.md` | The prompt to paste into the agentic coding session |
+
+## Rules that always apply
+
+1. Read the root `AGENTS.md` first. Its rules are not suspended for this feature (TypeScript strict, zod contracts in `packages/core`, storage behind an interface, RTL-native, tests never hit live sites, secrets never stored).
+2. Work phase by phase and stop at every gate (✋) for owner approval.
+3. Never show invented or guessed data. If a source fails, show the stale value with its date, or "unavailable".
+4. No "buy", "sell" or personal-advice wording anywhere in the UI or copy.
+
+## Decisions already made by the owner
+
+- Page is bilingual (Farsi RTL + English) with the existing language toggle.
+- Main use: learning and understanding (explanations and context), mostly on phones.
+- Look: calmer and more analytical than the rates pages, but clearly Currena.
+- Persian digits in the Farsi UI; Jalali dates always in Farsi; chart time axes keep time running left to right in Farsi.
+- Seven features: summary line, trend + 10-year position on every card, "what changed this week", key-dates calendar, update date + source on every card, "what this means for you" lines, one disclaimer reviewed by an Australian financial-services-qualified person.
+- Per-indicator share links are for a later version.
+- The reader is assumed to be based in Australia, so Australian indicators are highlighted.
+
+## Decisions still open (needed at Gate I0)
+
+1. Is the Worker on Cloudflare **Free** or **Paid**? This decides where data ingestion runs (see `04-roadmap.md` section 2).
+2. Which substitutes to use for the three indicators that rely on third-party copyrighted data (credit spread, VIX, S&P 500).
+3. Where BTC and silver prices come from, after their terms are checked.
+4. Who reviews the disclaimer and copy for Australian financial-services rules.
