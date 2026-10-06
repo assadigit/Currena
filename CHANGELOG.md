@@ -5,6 +5,68 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-06] — Insights Phase I2: source adapters, venue-verified RBA, live-run green
+
+Gate I1 approved ("Continue." — backtest thresholds locked as-is). Phase I2
+builds the feature's data layer — **still no app code; web/api bundles
+unchanged; nothing deployed.** Tests **400 → 441 — all green** (insights 69 →
+110); typecheck clean in all five packages; runner-side gates green from the
+ingestion venue.
+
+### Source adapters (`packages/insights/src/adapters/`, via `@currena/insights/adapters`)
+
+- Import surface SPLIT from the pure root export: the SPA-safe `.` entry
+  stays platform-/fetch-free; the new `./adapters` entry carries the fetch
+  halves (web-standard fetch only — runs identically in the GitHub Actions
+  runner and a Worker). `@currena/insights` gains a `@currena/scraper`
+  dependency (fetchWithRetry + the production TGJU gold parser).
+- fred / frankfurter / abs / worldbank / goldapi / bitstamp / tgju / rba /
+  manual-series loader + `derived.ts` (`buildIndicatorSeries` — the
+  production twin of the backtest SERIES map: ratio joins, yoy derivation,
+  inverse/cross FX, live-point info cards, WB-brent fallback) +
+  `READING_SOURCES` (per-card attribution).
+- `xlsx.ts` — dependency-free XLSX reader (ZIP central directory +
+  `DecompressionStream('deflate-raw')` + shared strings) for the World Bank
+  Pink Sheet; the workbook URL is re-discovered from the commodity-markets
+  page every run because the thedocs.worldbank.org document hash rotates.
+- `parsers.ts` additions: `parseAbsSdmxCsv` (live SDMX response; header-driven
+  columns — order varies by flow; sorts unordered answers; skips blank
+  OBS_VALUE) and `parseRbaTableCsv` (title/header/metadata rows; both RBA
+  date formats; skips pre-scaffolded empty future quarters).
+- Loud-failure everywhere: zod response contracts (gold-api, Bitstamp,
+  manual), table/series/unit identity checks (RBA prefix, WB header+units,
+  ABS DATAFLOW), ascending assertions, ingestion-UA pinned for FRED (its
+  Akamai edge hangs on the Chrome fingerprint).
+
+### RBA venue verification (the I0 blocker, closed)
+
+- Temporary branch `probe/i2-rba-venue` + a branch-only workflow ran the
+  probe from the GitHub Actions runner: F1.1 / F2 / E2 / F11.1 CSVs all
+  **HTTP 200**; the bytes are committed as fixtures. The sandbox stays
+  Akamai-403 (loud-unavailable there — honest by design).
+- `au-household-debt-arrears` resolved to **RBA E2 'Household debt to
+  income'** (the ABS Data API has no household-ratios flow; catalogue
+  searched in full). `au-us-10y-gap` cadence daily → weekly (F2 publishes
+  T+2..4). I0's "4.60% cash rate" reference note retired (F1.1: 4.36).
+
+### Fixtures & tests
+
+- New recorded fixtures: gold-api XAG/BTC, Bitstamp OHLC, Frankfurter small
+  timeseries, ABS SDMX ×5 (live response format), the full real World Bank
+  XLSX, RBA F1.1/F2/E2 (venue bytes). 41 new tests (110 total in the
+  package), all fixture-backed; the XLSX integration test parses the real
+  workbook end-to-end (1960M01 → 2026M09).
+
+### Live run (I2 exit criterion)
+
+- `pnpm --filter @currena/insights live-run` — the one-off manual run that
+  fetches every source, assembles all 28 indicator series and prints the
+  sanity table + summaries. Final venue run: **27/27 fetches OK, every P1
+  indicator printed a sane value (`P1 COMPLETE`)** — Global relaxed 1/8
+  voting, Australia cautious 3/10 (0 excluded); TGJU-gold vs gold-api XAU
+  0.04%, gold-api BTC vs Bitstamp 0.02%. Sandbox runs identical except RBA
+  (403 → unavailable rows, as designed).
+
 ## [2026-10-06] — Insights Phase I1: contracts, scoring engine, backtest
 
 Gate I0 approved same day (D4 answered: no disclaimer for v1). Phase I1 adds

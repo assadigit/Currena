@@ -28,10 +28,13 @@ export type { SeriesPoint } from './series';
 
 export {
   parseAbsPeriodCsv,
+  parseAbsSdmxCsv,
+  parseRbaTableCsv,
   parseFrankfurterTimeseries,
   parseFredCsv,
   parseWorldBankMonthlyCsv,
 } from './parsers';
+export type { RbaParseOptions } from './parsers';
 
 export { DEFINITIONS } from './definitions';
 

@@ -3,17 +3,20 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Insights feature: indicator definitions, scoring engine and fixture parsers. Pure TypeScript, platform-free (AGENTS.md rule 2) — no node:*, no DOM, no fetch. Source adapters that hit the network arrive in Phase I2 and live elsewhere.",
+  "description": "Insights feature: indicator definitions, scoring engine, fixture parsers and (via ./adapters) the Phase I2 source adapters. Root export stays pure/platform-free for the SPA; ./adapters carries the fetch halves (web-standard fetch only) for the runner.",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./adapters": "./src/adapters/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
     "test": "vitest run",
-    "backtest": "tsx scripts/backtest.ts"
+    "backtest": "tsx scripts/backtest.ts",
+    "live-run": "tsx scripts/live-run.ts"
   },
   "dependencies": {
     "@currena/core": "workspace:*",
+    "@currena/scraper": "workspace:*",
     "zod": "^4.6.5"
   },
   "devDependencies": {

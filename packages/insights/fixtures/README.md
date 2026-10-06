@@ -17,6 +17,13 @@ from one; no values are edited or invented. Sources and licences are verified in
 | `abs-cpi-all-groups-quarterly-2004.csv` | ABS Data API `rest/data/CPI/1.10001.10.50.Q` (All groups CPI, original, Australia, index numbers) | quarterly, 2004-Q1 → 2026-Q2 | CC BY 4.0 |
 | `abs-cpi-trimmed-mean-quarterly-2004.csv` | ABS Data API `rest/data/CPI_Q` key `1.999902.20.50.Q` (Trimmed Mean, seasonally adjusted, index numbers) | quarterly, 2004-Q1 → 2026-Q2 | CC BY 4.0 |
 | `abs-unemployment-monthly-2004.csv` | ABS Data API `rest/data/LF/M13.3.1599.20.AUS.M` (Unemployment rate, persons, SA, Australia) | monthly, 2004-01 → 2026-08 | CC BY 4.0 |
+| `goldapi-xag.json`, `goldapi-btc.json` | gold-api.com `https://api.gold-api.com/price/XAG` / `…/BTC` | spot snapshots, 2026-10-06 15:19Z | commercial display explicitly permitted (terms read, Gate I0 D3) |
+| `bitstamp-btcusd-ohlc.json` | Bitstamp `https://www.bitstamp.net/api/v2/ohlc/btcusd/?step=86400&limit=10` | 10 daily candles ending 2026-10-06 | public API |
+| `frankfurter-usd-timeseries-small.json` | `api.frankfurter.dev/v1/2026-09-25..2026-10-06?from=USD&to=JPY,AUD,CNY` | business days 2026-09-25 → 2026-10-06 | ECB reuse policy |
+| `abs-sdmx-cpi.csv` … `abs-sdmx-terms-of-trade.csv` (5 files) | ABS Data API `/rest/data/…?format=csv` small windows (the live SDMX response format — column order varies by flow) | 2025-Q1 → 2026-Q2 windows | CC BY 4.0 |
+| `worldbank-cmo-monthly.xlsx` | World Bank CMO Historical Data Monthly XLSX (the FULL real workbook, current URL from the commodity-markets page) | 1960M01 → 2026M09 | CC BY 4.0 |
+| `rba-f1.1-data.csv`, `rba-f2-data.csv`, `rba-e2-data.csv` | RBA statistical tables `https://www.rba.gov.au/statistics/tables/csv/<t>-data.csv` — fetched from the **GitHub Actions ingestion venue** (probe run 37492764171, branch probe/i2-rba-venue, 2026-10-06; the build sandbox is Akamai-blocked) | F1.1 monthly → 2026-09 · F2 daily 2013-05-20 → 2026-09-30 · E2 quarterly 1988 → 2026-Q2 | CC BY 4.0 |
+
 
 Notes:
 

@@ -115,6 +115,9 @@ importers:
       '@currena/core':
         specifier: workspace:*
         version: link:../core
+      '@currena/scraper':
+        specifier: workspace:*
+        version: link:../scraper
       zod:
         specifier: ^4.6.5
         version: 4.6.5

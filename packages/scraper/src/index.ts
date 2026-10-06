@@ -41,6 +41,7 @@ export {
   buildTgjuSnapshot,
   normalizeTgjuNumber,
   parseTgjuAjax,
+  parseTgjuGold,
   parseTgjuProfilePrice,
   rialToToman,
   scrapeTgju,

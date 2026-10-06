@@ -4,14 +4,17 @@
  * verbatim from docs/insights/01-indicator-spec.md sections 1–2; thresholds
  * are starting points pending the Phase I1 backtest gate.
  *
- * Two cadence notes recorded at Phase I1 (both revisit-able at I2 without a
- * contract change):
- *  - `au-cpi` / `au-trimmed-mean` are `quarterly` because the verified keyless
- *    route is CPI_Q; the fresh monthly indicator needs the keyed ABS Indicator
- *    API (open I2 decision) — if monthly is adopted, only cadence changes.
+ * Cadence notes closed/recorded across I1–I2 (no contract change needed):
+ *  - `au-cpi` / `au-trimmed-mean` stay `quarterly` — the keyless Data API
+ *    route (CPI + CPI_Q flows) is verified current; the fresh monthly
+ *    indicator would need the keyed ABS Indicator API (owner-side key,
+ *    deferred until monthly cadence is actually wanted).
  *  - `gold-silver` history is monthly (World Bank backfill) even though the
  *    live value is daily; cadence says how often the *data* updates, so it is
  *    `daily` and the monthly percentile base is the adapter's concern.
+ *  - `au-us-10y-gap` is `weekly` (Phase I2 venue finding): RBA F2 publishes
+ *    with a 2–4 business-day lag, so a daily cadence would trip the 3-day
+ *    daily stale grace on ordinary publication lags; the value stays daily.
  */
 
 import type { IndicatorDefinition } from '@currena/core';
@@ -226,7 +229,7 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     group: 'interest-inflation',
     name: 'RBA cash rate',
     source: 'rba',
-    sourceRef: 'RBA statistical table F1.1 (cash rate target)',
+    sourceRef: 'RBA statistical table F1.1 (Cash Rate Target, monthly average)',
     cadence: 'per-change',
     changeKind: 'points',
     phase: 'P1',
@@ -288,7 +291,12 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     name: 'Australia vs US 10-year yield gap',
     source: 'derived',
     sourceRef: 'RBA F2 10y − FRED:DGS10',
-    cadence: 'daily',
+    // Weekly cadence (not daily): RBA F2 publishes with a 2–4 business-day
+    // lag, so the joined daily series would trip the 3-day daily stale grace
+    // on ordinary publication lags and be excluded most days. The value
+    // itself stays daily; only the staleness rhythm is weekly (Phase I2
+    // venue finding, docs/insights/03-data-sources.md).
+    cadence: 'weekly',
     changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'threshold', direction: 'below', value: 0 },
@@ -359,8 +367,8 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     section: 'australia',
     group: 'jobs-housing',
     name: 'Australian household finances (debt ratios / arrears)',
-    source: 'abs',
-    sourceRef: 'ABS E2 household finance ratios',
+    source: 'rba',
+    sourceRef: "RBA E2 'Household debt to income' (ABS-calculated ratios republished by the RBA)",
     cadence: 'quarterly',
     changeKind: 'points',
     phase: 'P2',

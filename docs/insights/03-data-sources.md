@@ -13,11 +13,21 @@
 
 Before writing any adapter, the agent probes the endpoint or series ID once with a scratch script (not part of the test suite) and records the result in this file: the date, the HTTP status, a sample of the response shape, the update cadence and the licence terms. A source whose licence cannot be confirmed as allowing public display is not used. Tests never call live sites; they use recorded fixtures (`AGENTS.md` rule 7).
 
+## Phase I2 record (2026-10-06) — adapters built, live runs green
+
+Every I2 adapter (FRED / Frankfurter / ABS / World Bank / gold-api / Bitstamp / TGJU / RBA / manual-series loader / derived assembly) is fixture-tested (110 package tests) and was exercised live twice from the sandbox and twice from the **GitHub Actions ingestion venue** (probe runs 37492764171 and 37493966768, branch `probe/i2-rba-venue`):
+
+- **Final venue live run (exit criterion):** 27/27 source fetches OK; **every P1 indicator printed a sane live value** (`P1 COMPLETE` from `pnpm --filter @currena/insights live-run`); Global summary relaxed 1/8 voting, Australia cautious 3/10 voting, 0 excluded.
+- **Cross-checks:** TGJU gold ounce vs gold-api XAU **0.00–0.05%**; gold-api BTC vs Bitstamp last daily close **0.02–0.09%** across runs.
+- **Sandbox vs venue:** identical results everywhere except RBA — the sandbox is Akamai-403 (loud adapter failure → honest unavailable rows), the venue is HTTP 200.
+- **Runner-side gates:** `pnpm install --frozen-lockfile` + insights typecheck + 110 tests also ran green from the venue (the runner's strict gate caught two live-run typing slips the sandbox check had missed — fixed).
+
 ## 1. Sources by provider
 
 ### FRED (Federal Reserve Bank of St. Louis) — ✅ all series verified, keyless
 
 - **Access (probe 2026-10-06):** every series below is served as CSV **without an API key** from `https://fred.stlouisfed.org/graph/fredgraph.csv?id=<SERIES>` (HTTP 200, current observations; series metadata pages also read). **No FRED API key is needed** for the planned route; the keyed JSON API (`api.stlouisfed.org`) remains an optional fallback (owner-created key, stored as a GitHub secret, only if we ever switch).
+- **Phase I2 header finding (2026-10-06):** FRED's Akamai edge **hangs (connection timeout) on a desktop-Chrome User-Agent** from the build egress — a headerless or descriptive-UA request answers in ~50 ms. The FRED adapter therefore sends `CurrenaInsights/1.0 (…)`, re-verified live from the ingestion venue. All other sources accept the browser fingerprint.
 - **Licence (probe 2026-10-06):** FRED legal page read. Every series used is U.S.-government-sourced (**public domain**); `DCOILBRENTEU` is now sourced from EIA — EIA terms read, also U.S. government / public domain. Third-party copyrighted FRED series (ICE BofA, Cboe, S&P) remain **not used** — see "Blocked sources" below.
 
 | Indicator ID | Series | Cadence | Probe verdict |
@@ -32,20 +42,20 @@ Before writing any adapter, the agent probes the endpoint or series ID once with
 | `govt-interest-revenue` | `A091RC1Q027SBEA` (federal interest payments) ÷ `W006RC1Q027SBEA` (federal receipts) | Quarterly | ✅ both series identified and verified current — fills the "agent to identify" slot from planning |
 | `brent` | `DCOILBRENTEU` | Daily | ✅ current (EIA-sourced) |
 
-### RBA (Reserve Bank of Australia) — licence ✅, access sandbox-blocked
+### RBA (Reserve Bank of Australia) — licence ✅, access venue-verified ✅ (Phase I2)
 
 - **Licence (probe 2026-10-06):** RBA Copyright and Disclaimer Notice read (fetched via alternate egress after the sandbox 403): **CC BY 4.0** — display permitted with attribution ✅.
-- **Access (probe 2026-10-06):** the whole `rba.gov.au` domain answers **403 (Akamai bot gate)** to the build sandbox, including the homepage. The statistical tables index was fetched via alternate egress and the CSV URL scheme is unchanged. **Mandatory venue re-probe before Phase I2** (GitHub Actions runner and Workers have different egress); if the venue is blocked too, a documented manual-CSV fallback is the escape hatch.
+- **Access (Phase I2 venue probe, 2026-10-06, GitHub Actions runner, probe run 37492764171):** `https://www.rba.gov.au/statistics/tables/csv/<table>-data.csv` answers **HTTP 200** with browser headers from the ingestion venue — F1.1 (43,862 B), F2 (201,065 B), E2 (75,585 B), F11.1 (140,337 B) all fetched and their bytes recorded as fixtures. The build sandbox remains Akamai-403 (re-verified from two different sandbox egresses; the alternate-egress page reader also refuses CSV downloads — `application/octet-stream`), so RBA adapters are tested against the venue-recorded fixtures and go loud-unavailable from the sandbox.
+- **Format (verified from the real bytes):** title line + `Title,<series…>` header + 7 metadata rows + date-keyed data rows; **date formats vary by table** (F1.1/E2 day-first `30/09/2026`, F2/F11.1 `30-Sep-2026`); E2 pre-scaffolds future quarters with empty values (skipped). The parser (`parseRbaTableCsv`) validates the table-code prefix and series title loudly.
+- **Calibration finding:** F2 publishes with a 2–4 business-day lag → `au-us-10y-gap` cadence set to `weekly` (definitions.ts) so ordinary publication lags do not trip the 3-day daily stale grace; the value itself stays daily.
+- **Correction of an I0 reference note:** the I0 probe recorded "4.60% after the 29 September 2026 RBA decision" from a statement page; F1.1's own published series shows the cash-rate target at 4.35–4.36 through mid-2026 (Sep monthly average 4.36). F1.1 is authoritative; the 4.60 note is retired. (F1.1's cash-rate column is the *monthly average* — the daily F1 table is a documented one-line upgrade if daily precision is wanted.)
 
 | Indicator ID | Table | Cadence | Status |
 |---|---|---|---|
-| `rba-cash-rate` | F1.1 (cash rate target) | Per change | ◐ licence ✅; CSV bytes not yet reachable from the sandbox — venue re-probe pre-I2 |
-| `audusd`, `audjpy`, `usdcny` (cross-check) | F11.1 (daily) + F11 (monthly from 1983) | Daily / monthly | ◐ same |
-| `au-us-10y-gap` (AU side) | F2 (capital market yields) | Daily | ◐ same |
-| `au-household-debt-arrears` | moved to **ABS E2** (household finance ratios) | Quarterly | ☐ exact E2 dimensions to verify in I2 |
-
-- **Note:** the daily FX table starts only in 2023, so 10-year percentiles need the monthly F11 history combined with the daily series. ◐
-- **Current policy rate (reference):** 4.60% after the 29 September 2026 RBA decision ✅ (RBA statement, read during the probe).
+| `rba-cash-rate` | F1.1 'Cash Rate Target' (monthly average) | Per change | ✅ venue-verified; live through 2026-09 |
+| `au-us-10y-gap` (AU side) | F2 'Australian Government 10 year bond' | Daily (publishes T+2..4) | ✅ venue-verified; live through 2026-09-30 |
+| `au-household-debt-arrears` | **E2 'Household debt to income'** (ABS-calculated ratios republished by RBA) | Quarterly | ✅ venue-verified; live through 2026-Q2 — the "ABS E2" planning slot resolves to this RBA table (the ABS Data API carries no household-finance-ratios dataflow; catalogue searched in full) |
+| `audusd`, `audjpy`, `usdcny` (cross-check) | F11.1 (daily 2023→current) + F11 (monthly from 1983) | Daily / monthly | ◐ available and venue-reachable; **not wired** — FX indicators use Frankfurter (ECB history back to 2004 covers the 10-year percentiles), F11 cross-check documented for a future hardening pass |
 
 ### ABS (Australian Bureau of Statistics) — ✅ Data API keyless works
 
@@ -56,31 +66,31 @@ Before writing any adapter, the agent probes the endpoint or series ID once with
 | Indicator ID | Dataset | Cadence | Probe verdict |
 |---|---|---|---|
 | `au-unemployment` | `LF` (Labour Force) | Monthly | ✅ current |
-| `au-cpi` | `CPI_Q` (quarterly route) / `CPI_M` (monthly) | Quarterly / monthly | `CPI_Q` ✅ current; `CPI_M` on the Data API probed **stale** — the fresh monthly indicator lives on the keyed Indicator API. Phase I2 decision: create the key for monthly cadence, or serve `au-cpi` quarterly from `CPI_Q` |
-| `au-trimmed-mean` | Monthly CPI indicator (Indicator API) | Monthly | ◐ rides the same I2 decision as `au-cpi`; also verify whether a quarterly trimmed-mean dimension exists in `CPI_Q` |
-| `au-home-values` | `RES_DWELL_ST` (Residential dwelling price stats) | Quarterly | ✅ current — **replaces RPPI**, which probed stale |
-| `terms-of-trade` | `ANA_AGG` (national accounts aggregates) | Quarterly | ✅ current |
-| `au-household-debt-arrears` | `E2` (household finance ratios) | Quarterly | ☐ identified during I0; verify dimensions in I2 |
+| `au-cpi` | `CPI_Q` (quarterly route) / `CPI_M` (monthly) | Quarterly / monthly | `CPI_Q` ✅ current; `CPI_M` on the Data API probed **stale** — the fresh monthly indicator lives on the keyed Indicator API. Phase I2 decision: **serve `au-cpi` quarterly from `CPI` flow key `1.10001.10.50.Q`** (headline All groups index, annual change derived); monthly cadence remains a keyed-API upgrade, owner-side key decision deferred until wanted |
+| `au-trimmed-mean` | `CPI_Q` key `1.999902.20.50.Q` | Quarterly | ✅ current (quarterly trimmed-mean dimension confirmed in the Data API — no Indicator-API key needed) |
+| `au-home-values` | `RES_DWELL_ST` key `5.AUS.Q` (mean price of residential dwellings, Australia) | Quarterly | ✅ current — replaces RPPI, which probed stale; live through 2026-Q2 |
+| `terms-of-trade` | `ANA_AGG` key `M5.TTR.20.AUS.Q` (terms of trade index, SA) | Quarterly | ✅ current — dimension key discovered in Phase I2 (DATA_ITEM `TTR`, measure `M5` = index); live through 2026-Q2; note the API returns rows **unordered** (the parser sorts) |
+| `au-household-debt-arrears` | ~~ABS E2~~ → **RBA table E2** 'Household debt to income' | Quarterly | ✅ venue-verified — see the RBA section (the ABS Data API catalogue carries no household-finance-ratios dataflow) |
 
 ### Live and FX data already in the repo — ✅ re-verified
 
 - **TGJU `ajax.json`:** re-probed 2026-10-06 — HTTP 200, 963 symbols, gold ounce (`ons`) fresh ✅. Reused for the numerators of `gold-btc`, `gold-silver`, `gold-aud`. Silver and Bitcoin themselves are not in TGJU — external sources below.
-- **Frankfurter (ECB reference rates):** re-probed 2026-10-06 — HTTP 200, latest rates 2026-10-05 ✅. Daily (per business day) as before. Used for FX indicators; cross-checked **consistent with TGJU** during the probe.
+- **Frankfurter (ECB reference rates):** re-probed 2026-10-06 — HTTP 200, latest rates 2026-10-05 ✅. Daily (per business day) as before. Used for FX indicators; cross-checked **consistent with TGJU** during the probe. Phase I2: the **open-ended timeseries form** `v1/<start>..?from=USD&to=…` verified live (end date auto-fills with the latest business day) — one request covers every FX indicator's 10-year history. Phase I2: the **open-ended timeseries form** `v1/<start>..?from=USD&to=…` verified live (end date auto-fills with the latest business day) — one request covers every FX indicator's 10-year history.
 
-### Silver and Bitcoin — decided at Gate I0 (D3)
+### Silver and Bitcoin — decided at Gate I0 (D3), verified in Phase I2
 
 | Need | Source | Verdict |
 |---|---|---|
-| Silver spot (XAG) | **gold-api.com — PRIMARY** | ✅ probed live (XAG, XAU, BTC, ETH, XPD, XPT, HG + a `/symbols` endpoint); terms read — **commercial display explicitly permitted** |
-| Bitcoin spot | **gold-api.com — PRIMARY** | ✅ same probe |
-| Bitcoin daily history (10-year backfill) | **Bitstamp public OHLC** | ✅ probed live, keyless, works |
-| Silver monthly history (backfill + percentile base) | **World Bank Pink Sheet** | ✅ see below |
+| Silver spot (XAG) | **gold-api.com — PRIMARY** | ✅ probed live (XAG, XAU, BTC, ETH, XPD, XPT, HG + a `/symbols` endpoint); terms read — **commercial display explicitly permitted**; zod contract pinned (price/updatedAt/symbol) |
+| Bitcoin spot | **gold-api.com — PRIMARY** | ✅ same probe; live cross-check vs Bitstamp close: **0.02–0.09%** drift across I2 runs |
+| Bitcoin daily history (10-year backfill) | **Bitstamp public OHLC** | ✅ probed live, keyless; Phase I2 finding: `limit` is REQUIRED together with `start`/`end` and caps at **1000 candles** per request — deep backfills must be chunked (runner concern, Phase I3) |
 
 ### Monthly commodity history — ✅ World Bank Commodity Price Data ("Pink Sheet")
 
 - **Probe 2026-10-06:** monthly XLSX fetched and parsed — coverage **1960M01 → 2026M09**; gold, silver, copper, iron ore and Brent columns all present.
+- **Phase I2 format verification (from the real workbook):** the adapter scrapes the CURRENT monthly-workbook link off the commodity-markets page (the thedocs.worldbank.org document-hash URL rotates with every release — two different hashes already observed), then parses the XLSX with a dependency-free web-standard reader (`DecompressionStream`); column identity is asserted from BOTH the header row and the units row (Brent `($/bbl)` C, iron ore `($/dmtu)` BL, copper `($/mt)` BM, gold/silver `($/troy oz)` BR/BT), and `t="e"` error cells are skipped as missing.
 - **Licence:** **CC BY 4.0** ✅ (verified on the World Bank data catalog and data.worldbank.org terms).
-- Serves `copper-gold`, `iron-ore`, `brent` (P2) and the 10-year metals backfill.
+- Serves `copper-gold`, `iron-ore`, `brent` (P2, FRED-primary fallback) and the 10-year metals backfill.
 
 ### Other
 

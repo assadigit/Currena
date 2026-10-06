@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   parseAbsPeriodCsv,
+  parseAbsSdmxCsv,
   parseFrankfurterTimeseries,
   parseFredCsv,
   parseWorldBankMonthlyCsv,
@@ -81,5 +82,48 @@ describe('parseAbsPeriodCsv', () => {
 
   it('fails loudly on an unknown period shape', () => {
     expect(() => parseAbsPeriodCsv('quarter,index_value\n2004/1,55')).toThrow(/neither/);
+  });
+});
+
+describe('parseAbsSdmxCsv (live Data API format — Phase I2)', () => {
+  const sdmx = [
+    'DATAFLOW,MEASURE,INDEX,TSEST,REGION,FREQ,TIME_PERIOD,OBS_VALUE,UNIT_MEASURE,OBS_STATUS,DECIMALS,OBS_COMMENT,BASE_PERIOD',
+    'ABS:CPI(2.0.0),1,10001,10,50,Q,2026-Q1,101.7,IN,,,,25',
+    'ABS:CPI(2.0.0),1,10001,10,50,Q,2026-Q2,102.31,IN,,,,25',
+    '',
+  ].join('\n');
+
+  it('locates TIME_PERIOD/OBS_VALUE by name regardless of column order', () => {
+    expect(parseAbsSdmxCsv(sdmx)).toEqual([
+      { date: '2026-01-01', value: 101.7 },
+      { date: '2026-04-01', value: 102.31 },
+    ]);
+    const reordered = [
+      'TIME_PERIOD,DATAFLOW,OBS_VALUE,FREQ',
+      '2026-03,ABS:LF(3.0.0),4.1,M',
+      '',
+    ].join('\n');
+    expect(parseAbsSdmxCsv(reordered)).toEqual([{ date: '2026-03-01', value: 4.1 }]);
+  });
+
+  it('sorts out-of-order rows (the ANA_AGG flow answers unordered) and skips blank OBS_VALUE', () => {
+    const unordered = [
+      'DATAFLOW,MEASURE,DATA_ITEM,TSEST,REGION,FREQ,TIME_PERIOD,OBS_VALUE',
+      'ABS:ANA_AGG(1.0.0),M5,TTR,20,AUS,Q,2026-Q2,94.8',
+      'ABS:ANA_AGG(1.0.0),M5,TTR,20,AUS,Q,2026-Q1,96.3',
+      'ABS:ANA_AGG(1.0.0),M5,TTR,20,AUS,Q,2026-Q3,',
+      '',
+    ].join('\n');
+    expect(parseAbsSdmxCsv(unordered)).toEqual([
+      { date: '2026-01-01', value: 96.3 },
+      { date: '2026-04-01', value: 94.8 },
+    ]);
+  });
+
+  it('strips a BOM and fails loudly on wrong shapes', () => {
+    expect(parseAbsSdmxCsv(`\uFEFF${sdmx}`)).toHaveLength(2);
+    expect(() => parseAbsSdmxCsv('TIME_PERIOD,OBS_VALUE\n2026-Q1,101')).toThrow(/no DATAFLOW column/);
+    expect(() => parseAbsSdmxCsv('DATAFLOW,TIME_PERIOD\nABS:X,2026-Q1')).toThrow(/no OBS_VALUE column/);
+    expect(() => parseAbsSdmxCsv('DATAFLOW,TIME_PERIOD,OBS_VALUE\nABS:X,2026-Weird,1')).toThrow(/neither/);
   });
 });

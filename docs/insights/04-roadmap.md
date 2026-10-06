@@ -73,11 +73,11 @@ Every phase ends with typecheck and tests green, a `phase(I<n>): summary` commit
 
 ### Phase I2: Source adapters and fixtures
 
-- [ ] One adapter per provider (FRED, RBA CSV, ABS, World Bank, Shiller, silver, Bitcoin), each validated with zod and returning a canonical series.
-- [ ] Record small fixtures per adapter; tests run only against fixtures.
-- [ ] Failure behaviour: an upstream change fails loudly in the adapter and produces a stale or unavailable reading, never wrong data.
-- [ ] P1 indicators first; P2 adapters after.
-- **Exit:** adapters green on fixtures; a manual one-off live run prints sane values for every P1 indicator.
+- [x] One adapter per provider (FRED, RBA CSV, ABS, World Bank, silver, Bitcoin — Shiller deferred to P3 per Gate I0 D2), each validated with zod and returning a canonical series. **Done 2026-10-06** — `packages/insights/src/adapters/` (fred / frankfurter / abs / worldbank / goldapi / bitstamp / tgju / rba / manual) + the dependency-free web-standard XLSX reader + the derived-series assembly (`buildIndicatorSeries`, the production twin of the backtest SERIES map). Import surface split: package root stays pure for the SPA; `@currena/insights/adapters` carries the fetch halves.
+- [x] Record small fixtures per adapter; tests run only against fixtures. **Done** — gold-api ×2, Bitstamp OHLC, Frankfurter small timeseries, ABS SDMX ×5 (live response format), the full real World Bank XLSX, and the real RBA bytes fetched from the ingestion venue (probe run 37492764171). 110 package tests, all fixture-backed.
+- [x] Failure behaviour: an upstream change fails loudly in the adapter and produces a stale or unavailable reading, never wrong data. **Done** — every adapter throws (zod contracts, header/series/unit identity checks, ascending assertions); the one-off live run prints per-source failures and marks affected indicators unavailable (RBA from the sandbox is the standing example).
+- [x] P1 indicators first; P2 adapters after. **Done** — all P2 adapters with verified sources are in (FRED T5YIFR/M2SL/govt-pair/DCOILBRENTEU, WB copper/iron-ore, ABS TTR/RES_DWELL_ST, RBA E2 debt-to-income); the manual china-pmi loader is fixture-tested, data population is Phase I5/I6 content work.
+- **Exit:** adapters green on fixtures ✅; a manual one-off live run prints sane values for every P1 indicator ✅ — final venue run (GitHub Actions, 2026-10-06): 27/27 fetches OK, `P1 COMPLETE`, Global relaxed 1/8, Australia cautious 3/10 (0 excluded). **Awaiting Gate I2 review.**
 
 ### Phase I3: Ingestion runner and storage ✋
 
