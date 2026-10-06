@@ -6,13 +6,15 @@
   "description": "Insights feature: indicator definitions, scoring engine, fixture parsers and (via ./adapters) the Phase I2 source adapters. Root export stays pure/platform-free for the SPA; ./adapters carries the fetch halves (web-standard fetch only) for the runner.",
   "exports": {
     ".": "./src/index.ts",
-    "./adapters": "./src/adapters/index.ts"
+    "./adapters": "./src/adapters/index.ts",
+    "./store": "./src/store.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
     "test": "vitest run",
     "backtest": "tsx scripts/backtest.ts",
-    "live-run": "tsx scripts/live-run.ts"
+    "live-run": "tsx scripts/live-run.ts",
+    "ingest": "tsx scripts/ingest.ts"
   },
   "dependencies": {
     "@currena/core": "workspace:*",

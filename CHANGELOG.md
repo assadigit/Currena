@@ -5,6 +5,75 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-07] — Insights Phase I3: ingestion runner, storage, API routes, production dry-run
+
+Gate I2 approved ("continue proceed"). Phase I3 builds the feature's serving
+pipeline end to end: the GitHub Actions ingestion runner, the KV storage
+contract, the read-only API routes, and the admin freshness card. **First
+Insights deploy** (new routes on `currena-api`; the SPA bundle is unchanged —
+insights imports are type-only on the worker side). Tests **441 → 479 — all
+green** (+38); typecheck clean in all five packages.
+
+### Ingestion runner (`packages/insights`)
+
+- `scripts/ingest.ts` — the production twin of live-run: collect → assemble →
+  score → write. Loads `data/insights-calendar.json` + `data/manual/*.json`
+  (soft-absent, loudly validated when present), reads the previous snapshot
+  for `changedThisWeek` continuity (fresh events carried, week-window
+  filtered), writes `insights:snapshot` + `insights:status` (critical) and
+  `insights:hist:<id>` only on change (read-compare), prints the source
+  report + readings + KV-op budget. Exit 1 when any P1 indicator is
+  unavailable — a red workflow run is the stale-feed signal.
+- `src/adapters/collect.ts` — the live-run fetch phase extracted verbatim so
+  the diagnostic script and the runner cannot drift (live-run refactored onto
+  it; output unchanged).
+- `src/adapters/snapshot.ts` — pure assembly: `buildInsightsSnapshot`
+  (readings + summaries + changedThisWeek merge + calendar),
+  `buildHistoryFile` (10-year window anchored on the newest observation,
+  downsampled to ≤520 points, `[epochDay, value]` encoding; single-point live
+  cards get no history key), `buildInsightsStatus`.
+
+### Storage contract
+
+- `@currena/insights/store` (new export entry): `InsightsReader` /
+  `InsightsWriter` interfaces + key names + `InMemoryInsightsStore` (tests) +
+  `RestInsightsStore` — the Cloudflare REST KV writer with injected fetch,
+  429/10048 daily-cap retry ladder, and op counters. The SPA-facing root
+  export stays untouched.
+- Core wire contracts: `IndicatorHistory` (strictly-ascending epoch-day
+  pairs), `InsightsStatus` + `InsightsSourceReport` (admin freshness).
+- `apps/api/src/adapters/insights-store.ts` — `KvInsightsReader` (the
+  Worker's read half, poisoned-entry defense like `KvRateStore`). Keys live
+  in the existing RATES namespace under the `insights:` prefix, NO TTLs.
+
+### API + admin
+
+- `GET /api/insights` — the precomputed snapshot; `503 insights_not_ready`
+  before the first run; ETag `"insights:<generatedAt>"` + 304s; 60s public
+  cache; exactly ONE KV read.
+- `GET /api/insights/:id/history` — one indicator's downsampled series;
+  `400 invalid_indicator` / honest `404 history_not_found`; ETag + 304s;
+  300s public cache.
+- `/admin` gains a zero-JS Insights card (last run, mode, per-source ✅/❌
+  rows) fed by `insights:status`; the read is failure-tolerant (a broken KV
+  read omits the card, never breaks the console).
+
+### Workflow + ops findings
+
+- `.github/workflows/insights-ingest.yml` — the repo's first workflow on
+  main: cron **04:20 UTC daily** + `workflow_dispatch` with `dry_run`;
+  pnpm from `packageManager`, frozen lockfile, 15-minute timeout, no
+  overlapping runs.
+- **KV write budget finding (pre-existing)**: the account saturates its
+  1,000 free KV writes/day by ~18:30 UTC (ever-green rates cron ~1,000/day +
+  the second worker ~450/day); all account writes then fail until 00:00 UTC.
+  The ingestion is scheduled into the fresh post-midnight budget and retries
+  capped writes. Owner follow-up recommended (ever-green write-pressure
+  reduction or Workers Paid) — recorded in docs/PROGRESS.md decisions log.
+- Scope cuts recorded: Bitstamp 10-year candle backfill + RBA F11 skipped
+  (no v1 consumer); one daily schedule instead of daily+weekly
+  (change-detected writes).
+
 ## [2026-10-06] — Insights Phase I2: source adapters, venue-verified RBA, live-run green
 
 Gate I1 approved ("Continue." — backtest thresholds locked as-is). Phase I2

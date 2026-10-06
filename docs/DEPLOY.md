@@ -10,11 +10,13 @@ explicit human cutover — nothing here touches it.
 Cloudflare Workers  currena-api  →  https://currena.ir  (Custom Domain, production)
                                         https://currena-api.sedanama-ir.workers.dev
  ├─ GET  /api/health|rates|convert|meta|status     JSON (Hono)
+ ├─ GET  /api/insights(/:id/history)               precomputed Insights snapshot + histories (2026-10-07)
  ├─ POST /internal/refresh                         header-secret scrape
  ├─ GET/POST /admin                                zero-JS ops console (noindex)
  ├─ everything else                                built SPA (static assets + SPA fallback)
  └─ cron  * * * * *                                scheduled keep-warm (see §Ever-green)
      KV namespace RATES: snapshot:*, status:*, lock:*   (7-day hard TTL)
+                        insights:snapshot|hist:<id>|status  (no TTLs; written by Actions)
 ```
 
 - `run_worker_first` pins `/admin*`, `/api/*`, `/internal/*` to the Worker.
@@ -126,6 +128,47 @@ cache-buster: their edge was observed serving HITs 6× past its own max-age.
 Cron failures log `[cron] <source> failed: …` (observability) and never
 rethrow; the next tick retries. `wrangler dev` doesn't fire crons — use
 `curl http://localhost:8787/cdn-cgi/local/scheduled` to trigger one manually.
+
+## Insights ingestion (2026-10-07, Phase I3)
+
+```
+GitHub Actions  insights-ingest (cron 04:20 UTC + manual dispatch)
+ └─ pnpm --filter @currena/insights ingest → fetch all sources → zod-validate
+    → score → write KV via Cloudflare REST API (token: CLOUDFLARE_API_TOKEN secret)
+KV namespace RATES:  insights:snapshot · insights:hist:<id> · insights:status  (no TTLs)
+Worker (read-only):  GET /api/insights · GET /api/insights/:id/history · /admin card
+```
+
+- **Why 04:20 UTC**: the account's 1,000 free KV writes/day are exhausted by
+  ~18:30 UTC through the ever-green rates cron + the second worker on the
+  account (see docs/insights/03-data-sources.md §Phase I3 record). The run
+  lands in the fresh post-midnight budget; capped writes are retried in the
+  runner.
+- **Secrets**: one repo Actions secret, `CLOUDFLARE_API_TOKEN` (KV edit on
+  the RATES namespace — value currently the owner-provided token; the agent
+  cannot mint a narrower one, API 9109). To rotate to a KV-only token:
+  Cloudflare dashboard → My Profile → API Tokens → Create Token → "Edit
+  Cloudflare Workers" template is too broad; instead Custom Token with
+  *Workers KV Storage: Edit* scoped to account `5f123468027e…` /
+  namespace `4627ac33…` (RATES), then
+  `gh secret set CLOUDFLARE_API_TOKEN --repo assadigit/Currena` (or
+  Settings → Secrets and variables → Actions).
+  `CLOUDFLARE_ACCOUNT_ID` and `INSIGHTS_KV_NAMESPACE_ID` are plain env
+  values in the workflow (identifiers, not secrets — the namespace id is
+  already public in wrangler.jsonc within the private repo).
+- **Manual runs**: Actions tab → insights-ingest → Run workflow (tick
+  `dry_run` to fetch+score without writes), or locally
+  `pnpm --filter @currena/insights ingest --dry-run` (RBA rows fail loudly
+  outside the Actions venue — Akamai).
+- **A red run means a P1 indicator is unavailable** (product degraded) —
+  that is the stale-feed signal until Phase I7 alerting. The snapshot is
+  still written; history keys are best-effort and self-heal next run.
+- **Post-run verification**:
+  ```sh
+  curl -s $B/api/insights | head -c 300                       # snapshot JSON
+  curl -s "$B/api/insights/us10y/history" | head -c 200       # one card's history
+  curl -s -H 'Sec-Fetch-Dest: document' $B/admin | grep -o 'Insights <span class="pill[^>]*>[^<]*'  # freshness pill
+  ```
 
 ## Rollback
 

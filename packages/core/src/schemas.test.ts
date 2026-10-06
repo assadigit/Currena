@@ -306,10 +306,13 @@ import {
   CalendarEventSchema,
   ChangedEventSchema,
   IndicatorDefinitionSchema,
+  IndicatorHistorySchema,
   IndicatorIdSchema,
   IndicatorReadingSchema,
   IndicatorReadingStatusSchema,
   InsightsSnapshotSchema,
+  InsightsSourceReportSchema,
+  InsightsStatusSchema,
   SummaryLineSchema,
   WarningRuleSchema,
 } from './schemas';
@@ -512,5 +515,58 @@ describe('Insights: InsightsSnapshotSchema', () => {
   it('strips unknown keys (same pollution defence as the other envelopes)', () => {
     const parsed = InsightsSnapshotSchema.parse({ ...snap, injected: 'pollutant' });
     expect(parsed).not.toHaveProperty('injected');
+  });
+});
+
+describe('Insights: IndicatorHistorySchema (Phase I3 wire format)', () => {
+  it('accepts a coherent epoch-day series and strips pollution', () => {
+    const hist = { v: 1, id: 'us10y', points: [[19723, 3.88], [19730, 3.91], [19737, 3.97]] };
+    const parsed = IndicatorHistorySchema.parse({ ...hist, injected: 'x' });
+    expect(parsed).toEqual(hist);
+    expect(parsed).not.toHaveProperty('injected');
+  });
+
+  it('rejects empty points, duplicate/unordered epoch days, negative days, unknown ids', () => {
+    const bad = [
+      { v: 1, id: 'us10y', points: [] },
+      { v: 1, id: 'us10y', points: [[19730, 1], [19730, 2]] }, // duplicate day
+      { v: 1, id: 'us10y', points: [[19730, 1], [19723, 2]] }, // descending
+      { v: 1, id: 'us10y', points: [[-1, 1]] }, // pre-1970 date
+      { v: 1, id: 'vix', points: [[19723, 1]] }, // not a v1 indicator
+      { v: 2, id: 'us10y', points: [[19723, 1]] }, // future wire version
+    ];
+    for (const input of bad) {
+      expect(IndicatorHistorySchema.safeParse(input).success).toBe(false);
+    }
+  });
+});
+
+describe('Insights: InsightsStatusSchema (admin freshness wire format)', () => {
+  const status = {
+    v: 1,
+    generatedAt: '2026-10-07T04:22:10.000Z',
+    mode: 'scheduled',
+    dryRun: false,
+    sources: [
+      { source: 'fred', ok: true, detail: '10/10 series fetched' },
+      { source: 'rba', ok: false, detail: 'F1.1: HTTP 403' },
+    ],
+  };
+
+  it('accepts a coherent run status', () => {
+    expect(InsightsStatusSchema.safeParse(status).success).toBe(true);
+    expect(InsightsStatusSchema.parse(status).sources).toHaveLength(2);
+  });
+
+  it('rejects unknown modes, missing detail text, bad timestamps', () => {
+    expect(InsightsStatusSchema.safeParse({ ...status, mode: 'cron' }).success).toBe(false);
+    expect(InsightsStatusSchema.safeParse({ ...status, sources: [{ source: 'fred', ok: true, detail: '' }] }).success).toBe(false);
+    expect(InsightsStatusSchema.safeParse({ ...status, generatedAt: '2026-10-07' }).success).toBe(false);
+  });
+
+  it('source report rows are the shared InsightsSourceReport contract', () => {
+    expect(InsightsSourceReportSchema.safeParse({ source: 'abs', ok: true, detail: 'CPI ok' }).success).toBe(true);
+    expect(InsightsSourceReportSchema.safeParse({ source: '', ok: true, detail: 'x' }).success).toBe(false);
+    expect(InsightsSourceReportSchema.safeParse({ source: 'abs', ok: 'yes', detail: 'x' }).success).toBe(false);
   });
 });

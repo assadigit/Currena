@@ -57,6 +57,9 @@ export {
   ChangedEventSchema,
   CalendarEventSchema,
   InsightsSnapshotSchema,
+  IndicatorHistorySchema,
+  InsightsSourceReportSchema,
+  InsightsStatusSchema,
 } from './schemas';
 export type {
   Source,
@@ -86,6 +89,9 @@ export type {
   ChangedEvent,
   CalendarEvent,
   InsightsSnapshot,
+  IndicatorHistory,
+  InsightsSourceReport,
+  InsightsStatus,
 } from './schemas';
 
 export {

@@ -1,0 +1,63 @@
+# Insights ingestion (Phase I3, roadmap §2) — the "Path B" runner from
+# AGENTS.md rule 8: fetches every source, validates with zod, computes the
+# snapshot with the scoring engine and writes it to Workers KV through the
+# Cloudflare REST API. The Worker only reads the precomputed result.
+#
+# Schedule: 04:20 UTC daily. The account's free KV write budget (1,000/day,
+# account-wide) is saturated by the ever-green rates cron by ~18:30 UTC —
+# 04:20 lands inside the fresh post-midnight slice with ~750 writes of
+# headroom (see docs/insights/03-data-sources.md, Phase I3 record).
+#
+# The job exits non-zero when any P1 indicator is unavailable (product
+# degraded) — a red run is the stale-feed signal until Phase I7 alerting.
+name: insights-ingest
+
+on:
+  schedule:
+    - cron: "20 4 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Fetch + score only — no KV writes"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# Never overlap runs: a slow RBA/ABS fetch must not race a second run's writes.
+concurrency:
+  group: insights-ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Identifiers, not secrets (the namespace id also lives in
+      # apps/api/wrangler.jsonc; the repo is private).
+      CLOUDFLARE_ACCOUNT_ID: "5f123468027e4b2094167df1d2f2e852"
+      INSIGHTS_KV_NAMESPACE_ID: "4627ac33a4b148ff9fc2189266b1890e" # RATES namespace
+      INSIGHTS_RUN_MODE: ${{ github.event_name == 'schedule' && 'scheduled' || 'manual' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # pnpm version comes from package.json "packageManager" (root).
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Ingest
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          ARGS=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="--dry-run"; fi
+          pnpm --filter @currena/insights ingest $ARGS

@@ -15,7 +15,7 @@ import {
   FRESH_TTL_SEC,
   MIN_SCRAPE_INTERVAL_SEC,
 } from '@currena/core';
-import type { Snapshot } from '@currena/core';
+import type { InsightsStatus, Snapshot } from '@currena/core';
 import type { StatusReport } from './rates-service';
 import { LOCK_TTL_SEC } from './rates-service';
 
@@ -29,6 +29,8 @@ export interface AdminBanner {
 export interface AdminPageData {
   report: StatusReport;
   snapshots: { tgju?: Snapshot; frankfurter?: Snapshot };
+  /** Phase I3: last insights ingestion run (absent before the first run). */
+  insights?: InsightsStatus;
   now: Date;
   /** Validated ?refreshed= source → green flash banner. */
   refreshed?: 'tgju' | 'frankfurter';
@@ -128,6 +130,38 @@ function sourceCard(
 </section>`;
 }
 
+function insightsCard(data: AdminPageData): string {
+  const status = data.insights;
+  if (!status) {
+    // No run has completed yet (or the key predates this deploy) — the
+    // section stays silent rather than showing a fake state.
+    return '';
+  }
+  const okCount = status.sources.filter((s) => s.ok).length;
+  const total = status.sources.length;
+  const allOk = okCount === total;
+  const pill = allOk ? 'ok' : 'warn';
+  const pillText = allOk ? 'healthy' : `${total - okCount} failing`;
+  const rows = status.sources
+    .map(
+      (s) =>
+        `<tr><td class="mono">${esc(s.source)}</td><td>${s.ok ? '✅' : '❌'}</td><td>${esc(s.detail)}</td></tr>`,
+    )
+    .join('');
+  return `<section class="card">
+  <h2>Insights <span class="pill ${pill}">${pillText}</span></h2>
+  <dl>
+    <dt>last run</dt><dd>${stamp(status.generatedAt, data.now)}</dd>
+    <dt>mode</dt><dd><span class="mono">${esc(status.mode)}</span>${status.dryRun ? ' <span class="pill warn">dry-run</span>' : ''}</dd>
+    <dt>snapshot</dt><dd><a href="/api/insights">/api/insights</a> · history via <span class="mono">/api/insights/:id/history</span></dd>
+  </dl>
+  <details><summary>Show ${okCount}/${total} source rows</summary>
+    <div class="tablewrap"><table><thead><tr><th>source</th><th>ok</th><th>detail</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>
+  </details>
+</section>`;
+}
+
 const STYLE = `
 :root{color-scheme:light;--bg:#f6f8f7;--fg:#0f172a;--muted:#64748b;--card:#ffffff;--border:#e2e8f0;--accent:#059669;--accent-soft:#ecfdf5;--err:#dc2626;--err-soft:#fef2f2;--warn:#b45309;--warn-soft:#fffbeb;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 *{box-sizing:border-box}
@@ -224,6 +258,7 @@ export function renderAdminPage(data: AdminPageData): string {
   ${sourceCard('tgju', data)}
   ${sourceCard('frankfurter', data)}
   </div>
+  ${insightsCard(data)}
   <section class="card">
     <h2>Manual refresh</h2>
     <form method="post" action="/admin">

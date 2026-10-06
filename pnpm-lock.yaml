@@ -13,6 +13,9 @@ importers:
       '@currena/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@currena/insights':
+        specifier: workspace:*
+        version: link:../../packages/insights
       '@currena/scraper':
         specifier: workspace:*
         version: link:../../packages/scraper

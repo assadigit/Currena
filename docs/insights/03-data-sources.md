@@ -128,6 +128,16 @@ Workers limits confirmed from Cloudflare's published limits at planning (2026-10
 
 **No indicator is omitted for tier reasons.** The only dropped items are licence- or source-blocked (see above). GitHub private-repo Actions minutes are free within the published monthly allotment; re-confirm the exact remaining budget when the workflow is created in Phase I3.
 
+### Phase I3 record (2026-10-07) — the live KV write-budget reality
+
+The I0 estimate ("~100–150 writes/day, ≥10× headroom") held for the INGESTION side but missed a pre-existing account condition, discovered by live REST probe + GraphQL analytics (`kvOperationsAdaptiveGroups`, 26h window):
+
+- **The account already saturates the 1,000 writes/day free cap by ~18:30 UTC.** The RATES namespace consumes ~1,000 writes/day + ~330 deletes/day — the ever-green rates cron writes snapshot + status + lock (+ history on change) for every ~5-minute scrape of two sources — and the account's second worker (ucl-notifier, namespace `ucl-notifier-STATE`) adds ~450 writes/day. After the cap trips, ALL account KV writes fail (HTTP 429, CF error 10048 "free usage limit … for today") until 00:00 UTC.
+- **Consequences for Insights**: the runner is scheduled at **04:20 UTC** (fresh post-midnight budget; only ~240 ops consumed by then), `RestInsightsStore` retries capped writes with backoff, `insights:snapshot`/`insights:status` are written first (critical) and history keys are best-effort — a partial history day self-heals on the next run (change-detection rewrites).
+- **Pre-existing production effect (owner-visible)**: between ~18:30 and 24:00 UTC the rates cron's writes fail silently — snapshots age and the ladder re-scrapes; the ≤7-day cache and stale banner keep the app honest. Not caused by Insights (probed before any insights key existed). Follow-up options recorded in `docs/PROGRESS.md`: reduce ever-green write pressure (status-write-on-change, lock-free reads) or Workers Paid.
+- **Token scopes (probed)**: the owner-provided token can read/write KV via REST and deploy Workers, but CANNOT mint narrower tokens (API error 9109, no API Tokens:Edit) — so the workflow secret is the provided token; rotating it to a KV-edit-only token from the Cloudflare dashboard is recommended (recipe in `docs/DEPLOY.md` §Insights).
+- **Venue re-verification (2026-10-06/07)**: all keyless sources re-probed live from the build sandbox (identical to I2); RBA remains Akamai-403 from the sandbox and live from the GitHub Actions venue (the workflow run is the standing venue check).
+
 ## 3. Attribution and display
 
 Every card shows the source name and date (`Updated [date] · Source [name]`). Providers that require attribution (ABS, RBA, World Bank) are credited in the "About the data" section and on the card. Do not remove attribution to save space.

@@ -541,3 +541,61 @@ export const InsightsSnapshotSchema = z
     { message: 'readings must contain each indicator id at most once' },
   );
 export type InsightsSnapshot = z.infer<typeof InsightsSnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
+ * Insights storage wire formats (Phase I3 — runner writes, Worker reads)
+ *
+ * KV layout (inside the existing RATES namespace, domain-separated by
+ * the `insights:` prefix — see @currena/insights/store.ts):
+ *   insights:snapshot   — InsightsSnapshot JSON
+ *   insights:hist:<id>  — IndicatorHistory JSON (downsampled 10-year series)
+ *   insights:status     — InsightsStatus JSON (per-source freshness)
+ * None of these carry an expirationTtl: freshness is carried by the data
+ * (generatedAt/asOf/status vocabulary), and history must never expire.
+ * ------------------------------------------------------------------ */
+
+/**
+ * The downsampled 10-year series stored per indicator under
+ * `insights:hist:<id>` and served by `GET /api/insights/:id/history`.
+ * Points are `[epochDay, value]` pairs — epoch days (days since
+ * 1970-01-01 UTC) keep the payload compact; values are raw numbers
+ * (no fixed-point scaling: ~30 keys × ≤520 points ≈ 300 KB total,
+ * far inside the 1 GB free storage limit).
+ */
+export const IndicatorHistorySchema = z
+  .object({
+    v: z.literal(1),
+    id: IndicatorIdSchema,
+    /** [epochDay, value] pairs, strictly ascending by epochDay. */
+    points: z.array(z.tuple([z.number().int().nonnegative(), z.number().finite()])).min(1),
+  })
+  .refine(
+    (h) => h.points.every((p, i) => i === 0 || p[0]! > h.points[i - 1]![0]!),
+    { message: 'points must be strictly ascending by epochDay' },
+  );
+export type IndicatorHistory = z.infer<typeof IndicatorHistorySchema>;
+
+/** One ingestion source row inside InsightsStatus (fetch outcome, loud detail). */
+export const InsightsSourceReportSchema = z.object({
+  /** Provider slug: fred, rba, abs, world-bank, gold-api, bitstamp, tgju, frankfurter, manual, cross-check. */
+  source: z.string().min(1),
+  ok: z.boolean(),
+  detail: z.string().min(1),
+});
+export type InsightsSourceReport = z.infer<typeof InsightsSourceReportSchema>;
+
+/**
+ * Per-source freshness of the last insights ingestion run, stored under
+ * `insights:status` and rendered on the /admin console (roadmap I3).
+ */
+export const InsightsStatusSchema = z.object({
+  v: z.literal(1),
+  /** When the run finished (ISO 8601 UTC) — the status identity. */
+  generatedAt: z.iso.datetime(),
+  /** How the runner was invoked. */
+  mode: z.enum(['scheduled', 'manual']),
+  /** True for a fetch-and-score pass that wrote nothing to KV. */
+  dryRun: z.boolean(),
+  sources: z.array(InsightsSourceReportSchema),
+});
+export type InsightsStatus = z.infer<typeof InsightsStatusSchema>;

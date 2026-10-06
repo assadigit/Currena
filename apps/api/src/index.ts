@@ -36,6 +36,8 @@ import {
   type AdminBanner,
 } from './admin';
 import { KvRateStore } from './adapters/kv-store';
+import { KvInsightsReader } from './adapters/insights-store';
+import { createInsightsRoutes } from './routes/insights';
 import { recordHistory, readHistory } from './history';
 import { buildMeta } from './meta';
 import { RatesService, RatesServiceError } from './rates-service';
@@ -54,6 +56,8 @@ export type Bindings = {
 export interface AppDeps {
   /** Override service construction (route tests inject a fake ladder). */
   makeService?: (env: Bindings) => RatesService;
+  /** Override the Insights store (route tests inject the in-memory fake). */
+  makeInsightsReader?: (env: Bindings) => import('@currena/insights/store').InsightsReader;
 }
 
 const NO_STORE: Readonly<Record<string, string>> = { 'Cache-Control': 'no-store' };
@@ -204,6 +208,14 @@ function makeDefaultService(env: Bindings): RatesService {
 export function createApp(deps: AppDeps = {}) {
   const makeService = deps.makeService ?? makeDefaultService;
 
+  // Insights serve path: ONE KV read per request (KvInsightsReader is a
+  // lazy singleton — the binding is stable for the isolate's lifetime).
+  let insightsReader: import('@currena/insights/store').InsightsReader | undefined;
+  const getInsightsReader = (env: Bindings): import('@currena/insights/store').InsightsReader => {
+    insightsReader ??= deps.makeInsightsReader ? deps.makeInsightsReader(env) : new KvInsightsReader(env.RATES);
+    return insightsReader;
+  };
+
   const app = new Hono<{ Bindings: Bindings }>();
 
   // Security headers on every Worker-answered response (SWOT hardening
@@ -314,6 +326,12 @@ export function createApp(deps: AppDeps = {}) {
       { 'Cache-Control': 'public, max-age=60', ETag: etag },
     );
   });
+
+  /* ----------------------------- insights ------------------------------- */
+
+  // Phase I3: precomputed snapshot + per-indicator history, both written by
+  // the daily GitHub Actions ingestion runner (roadmap §2). Read-only here.
+  app.route('/api/insights', createInsightsRoutes({ getReader: getInsightsReader }));
 
   /* ------------------------------ convert ------------------------------- */
 
@@ -428,14 +446,21 @@ export function createApp(deps: AppDeps = {}) {
     } = {},
   ) {
     const service = makeService(c.env);
-    const [report, tgju, frankfurter] = await Promise.all([
+    const [report, tgju, frankfurter, insights] = await Promise.all([
       service.status(),
       service.snapshot('tgju'),
       service.snapshot('frankfurter'),
+      // Insights freshness is optional telemetry — a failed read (broken KV
+      // binding, poisoned entry) must never take the whole console down;
+      // the card simply omits itself when the status is absent.
+      getInsightsReader(c.env)
+        .getStatus()
+        .catch(() => undefined),
     ]);
     const html = renderAdminPage({
       report,
       snapshots: { tgju, frankfurter },
+      insights,
       now: new Date(),
       publicMode: c.env.ADMIN_VIEW_SECRET === undefined,
       ...opts,

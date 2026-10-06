@@ -38,3 +38,6 @@ export { buildIndicatorSeries, READING_SOURCES } from './derived';
 export type { SeriesInputs } from './derived';
 export { readXlsxSheet } from './xlsx';
 export type { XlsxCell } from './xlsx';
+export { collectAllSources, DEFAULT_BITSTAMP_CANDLES, DEFAULT_FX_START } from './collect';
+export type { CollectOptions, CollectResult } from './collect';
+export { buildInsightsSnapshot, buildHistoryFile, buildInsightsStatus, downsampleSeries, HISTORY_MAX_POINTS, HISTORY_WINDOW_DAYS } from './snapshot';
