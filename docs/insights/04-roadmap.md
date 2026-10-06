@@ -54,14 +54,14 @@ Every phase ends with typecheck and tests green, a `phase(I<n>): summary` commit
 
 ### Phase I0: Preflight and decisions ✋
 
-- [ ] Read `AGENTS.md`, `docs/PROGRESS.md`, `docs/BACKLOG.md`, and this folder.
-- [ ] Confirm the Cloudflare plan (Free or Paid) with the owner and decide the ingestion venue.
-- [ ] Owner creates a free FRED API key (and the GitHub/Cloudflare secrets if Actions is chosen). Agent never reads secret values.
-- [ ] Run the verify-first probe for every source in `03-data-sources.md`; record results there.
-- [ ] Decide the substitutes for the blocked items (credit spread, VIX, S&P 500, breadth).
-- [ ] Decide silver and Bitcoin sources after reading their terms.
-- [ ] Confirm who reviews the disclaimer and copy for Australian financial-services rules.
-- **Exit:** `03-data-sources.md` fully verified, open decisions answered in `docs/PROGRESS.md`.
+- [x] Read `AGENTS.md`, `docs/PROGRESS.md`, `docs/BACKLOG.md`, and this folder.
+- [x] Confirm the Cloudflare plan (Free or Paid) with the owner and decide the ingestion venue. **DECIDED 2026-10-06: Free, permanently; heavy ingestion via a daily GitHub Actions runner writing compact snapshots to KV; light live sources stay on the existing Worker cron.**
+- [x] ~~Owner creates a free FRED API key~~ **Not needed** — the keyless `fredgraph.csv` route serves every planned series (probe 2026-10-06). GitHub/Cloudflare secrets are deferred to Phase I3 setup (one KV-scoped Cloudflare token as a GitHub secret).
+- [x] Run the verify-first probe for every source in `03-data-sources.md`; record results there. **Done 2026-10-06 — full verdict register, including blocked sources and licence findings.**
+- [x] Decide the substitutes for the blocked items (credit spread, VIX, S&P 500, breadth). **STLFSI4; VIX link-out; S&P/breadth out of v1 (P3); CAPE deferred to P3.**
+- [x] Decide silver and Bitcoin sources after reading their terms. **gold-api.com primary (spot), Bitstamp OHLC (BTC history), World Bank Pink Sheet (silver history).**
+- [ ] Confirm who reviews the disclaimer and copy for Australian financial-services rules. **D4 — open; owner to nominate; not blocking I1–I4.**
+- **Exit:** `03-data-sources.md` fully verified ✅; open decisions answered in `docs/PROGRESS.md` ✅ (D4 recorded as open, non-blocking). **Awaiting Gate I0 approval.**
 
 ### Phase I1: Contracts and scoring engine (no network)
 

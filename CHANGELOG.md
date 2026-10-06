@@ -5,6 +5,59 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-06] — Insights Phase I0: source verification + Gate I0 decisions
+
+Docs-only session (no code, no bundle impact). Planning set from commit
+`240deb1` read in full; the verify-first probe ran against **every** source in
+`docs/insights/03-data-sources.md` with throwaway scripts (nothing committed).
+
+### Data sources — verified register (`docs/insights/03-data-sources.md`)
+
+- **FRED:** 11/11 series live and current, **keyless** via
+  `fredgraph.csv` (including the identified government pair
+  `A091RC1Q027SBEA` ÷ `W006RC1Q027SBEA`) — **no FRED API key needed**.
+  All used series are U.S.-government public domain; `DCOILBRENTEU`
+  is EIA-sourced.
+- **RBA:** licence **CC BY 4.0** confirmed (via alternate egress); the
+  whole domain Akamai-403s the build sandbox — CSV bytes must be
+  re-probed from the ingestion venue before Phase I2.
+- **ABS:** Data API keyless on `/rest/` — `LF`, `CPI_Q`, `ANA_AGG`,
+  `RES_DWELL_ST` current; `CPI_M` stale (keyed Indicator API only if
+  monthly cadence is wanted); stale RPPI **replaced by `RES_DWELL_ST`**;
+  household ratios → `E2` (verify in I2). Licence CC BY 4.0.
+- **Silver / Bitcoin (D3):** gold-api.com primary for both spots (terms
+  explicitly permit commercial display); Bitstamp public OHLC for BTC
+  history; World Bank Pink Sheet (CC BY 4.0, monthly 1960M01→2026M09)
+  for silver history and P2 commodities.
+- **Blocked (licence/terms/access):** Coinbase (display prohibited),
+  CoinGecko free (screenshots-only + 365-day cap), Coin Metrics
+  community (CC BY-NC, 7 points), MetalCharts (nonexistent), Cboe VIX
+  (link-out only), S&P 500 / breadth (P3), Stooq (bot gate),
+  Blockchain.com (API degraded). **Shiller CAPE deferred P2→P3**
+  (Yale data frozen at 2023-09, no licence).
+- **Re-verified:** TGJU `ajax.json` (963 symbols, gold ounce fresh) and
+  Frankfurter (2026-10-05), cross-consistent. China PMI manual-entry
+  plan confirmed (no machine-readable NBS feed).
+
+### Gate I0 decisions (recorded in `docs/PROGRESS.md`)
+
+- **D1 — Cloudflare Free, permanently.** Heavy ingestion via a daily
+  GitHub Actions runner writing one compact snapshot per source to KV
+  through the Cloudflare REST API; the Worker only reads. Compact
+  encoding (consolidated keys, arrays, integer-scaled fixed-point,
+  epoch-day dates, rendered series only) keeps usage at ~100–150 KV
+  writes/day vs the 1,000 free limit — **no indicator is omitted for
+  tier reasons**. KV free limits re-verified live (100k reads/day,
+  1k writes/day, 1 GB, **1 KV operation per Worker invocation** → the
+  single `insights:snapshot` serve path).
+- **D2 — substitutes accepted:** STLFSI4 for stress; VIX link-out;
+  S&P/breadth out of v1; CAPE to P3.
+- **D3 — silver/BTC sources accepted** (gold-api, Bitstamp, World Bank).
+- **D4 — open:** disclaimer reviewer nomination (owner; needed before
+  Phase I5, not blocking I1–I4).
+
+Awaiting Gate I0 approval before Phase I1 (contracts + scoring engine).
+
 ## [2026-09-20] — Owner wireframe homepage + SWOT v2 + reliability wave
 
 4 commits on `main` (`e3896ec` → this session), 2026-09-20.

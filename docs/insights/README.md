@@ -33,7 +33,9 @@ Status: **planning complete, no code written.** Everything here was prepared on 
 
 ## Decisions still open (needed at Gate I0)
 
-1. Is the Worker on Cloudflare **Free** or **Paid**? This decides where data ingestion runs (see `04-roadmap.md` section 2).
-2. Which substitutes to use for the three indicators that rely on third-party copyrighted data (credit spread, VIX, S&P 500).
-3. Where BTC and silver prices come from, after their terms are checked.
-4. Who reviews the disclaimer and copy for Australian financial-services rules.
+Status after Phase I0 (2026-10-06):
+
+1. **Cloudflare plan — DECIDED (D1): Free, permanently.** Ingestion runs outside the Worker (daily GitHub Actions runner for heavy sources; the existing Worker cron keeps light live sources). Compact snapshot encoding keeps everything inside the free limits; no indicator is omitted for tier reasons. Recorded in `docs/PROGRESS.md`.
+2. **Substitutes for blocked indicators — DECIDED (D2):** credit/financial stress → `stress-stlfsi` (STLFSI4); VIX → link-out only; S&P 500 / breadth → out of v1 (P3); Shiller CAPE also deferred to P3 (no current licensed source).
+3. **Silver and Bitcoin sources — DECIDED (D3):** gold-api.com primary for both spots (terms permit commercial display); Bitstamp public OHLC for Bitcoin history; World Bank Pink Sheet for silver monthly history.
+4. **Who reviews the disclaimer and copy for Australian financial-services rules — OPEN (D4).** Needed before the Phase I5 copy gate; does not block Phases I1–I4. The owner will nominate an Australian financial-services-qualified person.
