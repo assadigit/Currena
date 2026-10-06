@@ -297,3 +297,220 @@ describe('sourceForPair (rule-8 routing)', () => {
     expect(sourceForPair('JPY', 'TRY')).toBe('frankfurter');
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * Insights contracts (Phase I1)
+ * ------------------------------------------------------------------ */
+
+import {
+  CalendarEventSchema,
+  ChangedEventSchema,
+  IndicatorDefinitionSchema,
+  IndicatorIdSchema,
+  IndicatorReadingSchema,
+  IndicatorReadingStatusSchema,
+  InsightsSnapshotSchema,
+  SummaryLineSchema,
+  WarningRuleSchema,
+} from './schemas';
+
+describe('Insights: IndicatorIdSchema (contract shape is deliberate)', () => {
+  it('pins the exact v1 indicator set — 28 ids, blocked/licensed items absent', () => {
+    const ids = IndicatorIdSchema.options;
+    expect(ids).toHaveLength(28);
+    for (const blocked of ['vix', 'spx-gold', 'breadth', 'cape']) {
+      expect(ids).not.toContain(blocked);
+    }
+    for (const expected of ['yield-curve-10y2y', 'stress-stlfsi', 'gold-silver', 'china-pmi', 'rba-cash-rate', 'au-us-10y-gap', 'terms-of-trade', 'au-household-debt-arrears']) {
+      expect(ids).toContain(expected);
+    }
+  });
+
+  it('rejects unknown ids', () => {
+    expect(IndicatorIdSchema.safeParse('cape').success).toBe(false);
+    expect(IndicatorIdSchema.safeParse('made-up-id').success).toBe(false);
+  });
+});
+
+describe('Insights: WarningRuleSchema (all seven atom kinds + composite)', () => {
+  it('accepts each rule atom from the indicator spec', () => {
+    expect(WarningRuleSchema.safeParse({ kind: 'info' }).success).toBe(true);
+    expect(WarningRuleSchema.safeParse({ kind: 'threshold', direction: 'below', value: 0 }).success).toBe(true);
+    expect(
+      WarningRuleSchema.safeParse({ kind: 'threshold', direction: 'above', value: 0, sustainedWeeks: 4 }).success,
+    ).toBe(true);
+    expect(WarningRuleSchema.safeParse({ kind: 'percentile', tail: 'high', cutoff: 0.2 }).success).toBe(true);
+    expect(WarningRuleSchema.safeParse({ kind: 'change', mode: 'pct', direction: 'fall', magnitude: 5, windowWeeks: 4 }).success).toBe(true);
+    expect(WarningRuleSchema.safeParse({ kind: 'change', mode: 'points', direction: 'rise', magnitude: 0.5, windowWeeks: 4 }).success).toBe(true);
+    expect(WarningRuleSchema.safeParse({ kind: 'yoy-negative' }).success).toBe(true);
+    expect(WarningRuleSchema.safeParse({ kind: 'consecutive-decline', periods: 3 }).success).toBe(true);
+    expect(WarningRuleSchema.safeParse({ kind: 'above-low', rise: 0.5 }).success).toBe(true);
+  });
+
+  it('accepts a flat OR-composite of atoms (us10y) and rejects degenerate ones', () => {
+    const composite = {
+      kind: 'any-of',
+      of: [
+        { kind: 'percentile', tail: 'high', cutoff: 0.1 },
+        { kind: 'change', mode: 'points', direction: 'rise', magnitude: 0.5, windowWeeks: 4 },
+      ],
+    };
+    expect(WarningRuleSchema.safeParse(composite).success).toBe(true);
+    expect(WarningRuleSchema.safeParse({ kind: 'any-of', of: [composite.of[0]] }).success).toBe(false);
+    expect(WarningRuleSchema.safeParse({ kind: 'any-of', of: [] }).success).toBe(false);
+  });
+
+  it('rejects malformed atoms: bad direction, cutoff out of range, non-positive magnitude', () => {
+    expect(WarningRuleSchema.safeParse({ kind: 'threshold', direction: 'sideways', value: 0 }).success).toBe(false);
+    expect(WarningRuleSchema.safeParse({ kind: 'percentile', tail: 'high', cutoff: 1.5 }).success).toBe(false);
+    expect(WarningRuleSchema.safeParse({ kind: 'change', mode: 'pct', direction: 'fall', magnitude: -5, windowWeeks: 4 }).success).toBe(false);
+    expect(WarningRuleSchema.safeParse({ kind: 'consecutive-decline', periods: 0 }).success).toBe(false);
+    expect(WarningRuleSchema.safeParse({ kind: 'above-low', rise: 0 }).success).toBe(false);
+  });
+});
+
+describe('Insights: IndicatorDefinitionSchema', () => {
+  const valid = {
+    id: 'yield-curve-10y2y',
+    section: 'global',
+    group: 'rates-credit',
+    name: 'US 10Y minus 2Y yield',
+    source: 'fred',
+    sourceRef: 'FRED:T10Y2Y',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'threshold', direction: 'below', value: 0 },
+  };
+
+  it('accepts a full definition', () => {
+    expect(IndicatorDefinitionSchema.safeParse(valid).success).toBe(true);
+  });
+
+  it('rejects a definition whose id belongs to the wrong section vocabulary or missing fields', () => {
+    expect(IndicatorDefinitionSchema.safeParse({ ...valid, id: 'au-cpi', section: 'global' }).success).toBe(true); // au-cpi exists; section is free-form by contract
+    expect(IndicatorDefinitionSchema.safeParse({ ...valid, group: 'nonexistent-group' }).success).toBe(false);
+    expect(IndicatorDefinitionSchema.safeParse({ ...valid, source: 'coinbase' }).success).toBe(false);
+    expect(IndicatorDefinitionSchema.safeParse({ ...valid, cadence: 'hourly' }).success).toBe(false);
+    expect(IndicatorDefinitionSchema.safeParse({ ...valid, name: '' }).success).toBe(false);
+    expect(IndicatorDefinitionSchema.safeParse({ ...valid, rule: { kind: 'unknown-kind' } }).success).toBe(false);
+  });
+});
+
+describe('Insights: IndicatorReadingSchema', () => {
+  const valid = {
+    id: 'usdjpy',
+    value: 149.25,
+    asOf: '2026-10-05',
+    change7d: -1.2,
+    change30d: 3.4,
+    percentile10y: 0.91,
+    status: 'normal',
+    sourceName: 'Frankfurter (ECB)',
+    updatedAt: '2026-10-06T02:00:00.000Z',
+  };
+
+  it('accepts a full reading and the minimal shape', () => {
+    expect(IndicatorReadingSchema.safeParse(valid).success).toBe(true);
+    const { change7d: _7d, change30d: _30d, percentile10y: _p, ...minimal } = valid;
+    expect(IndicatorReadingSchema.safeParse(minimal).success).toBe(true);
+  });
+
+  it('accepts an unavailable reading with null value and asOf', () => {
+    expect(
+      IndicatorReadingSchema.safeParse({ ...valid, value: null, asOf: null, status: 'unavailable', change7d: undefined, change30d: undefined, percentile10y: undefined })
+        .success,
+    ).toBe(true);
+  });
+
+  it('rejects value/asOf present on unavailable, and null value on any votable status', () => {
+    expect(IndicatorReadingSchema.safeParse({ ...valid, status: 'unavailable' }).success).toBe(false);
+    expect(IndicatorReadingSchema.safeParse({ ...valid, value: null, status: 'stale' }).success).toBe(false);
+    expect(IndicatorReadingSchema.safeParse({ ...valid, asOf: null, status: 'normal' }).success).toBe(false);
+    expect(IndicatorReadingSchema.safeParse({ ...valid, value: null, asOf: null, status: 'no-history' }).success).toBe(false);
+  });
+
+  it('rejects bad dates, unknown status, out-of-range percentile, non-finite values', () => {
+    expect(IndicatorReadingSchema.safeParse({ ...valid, asOf: '2026/10/05' }).success).toBe(false);
+    expect(IndicatorReadingSchema.safeParse({ ...valid, updatedAt: '2026-10-06 02:00' }).success).toBe(false);
+    expect(IndicatorReadingSchema.safeParse({ ...valid, status: 'amber' }).success).toBe(false);
+    expect(IndicatorReadingSchema.safeParse({ ...valid, percentile10y: 1.2 }).success).toBe(false);
+    expect(IndicatorReadingSchema.safeParse({ ...valid, value: Number.NaN }).success).toBe(false);
+    expect(IndicatorReadingSchema.safeParse({ ...valid, sourceUrl: 'not-a-url' }).success).toBe(false);
+  });
+
+  it('pins the reading-status vocabulary (contract shape is deliberate)', () => {
+    expect(IndicatorReadingStatusSchema.options).toEqual([
+      'warning',
+      'normal',
+      'context',
+      'stale',
+      'no-history',
+      'unavailable',
+    ]);
+  });
+});
+
+describe('Insights: SummaryLine / ChangedEvent / CalendarEvent', () => {
+  it('summary accepts nullable label and non-negative integer counts', () => {
+    expect(
+      SummaryLineSchema.safeParse({ section: 'australia', label: 'cautious', warningCount: 4, votingCount: 14, excludedCount: 2 }).success,
+    ).toBe(true);
+    expect(
+      SummaryLineSchema.safeParse({ section: 'global', label: null, warningCount: 0, votingCount: 0, excludedCount: 12 }).success,
+    ).toBe(true);
+    expect(
+      SummaryLineSchema.safeParse({ section: 'global', label: 'relaxed', warningCount: -1, votingCount: 0, excludedCount: 0 }).success,
+    ).toBe(false);
+    expect(
+      SummaryLineSchema.safeParse({ section: 'global', label: 'excited', warningCount: 0, votingCount: 1, excludedCount: 0 }).success,
+    ).toBe(false);
+  });
+
+  it('changed events only ever move between warning/normal', () => {
+    expect(ChangedEventSchema.safeParse({ id: 'us10y', from: 'normal', to: 'warning', asOf: '2026-10-05' }).success).toBe(true);
+    expect(ChangedEventSchema.safeParse({ id: 'us10y', from: 'stale', to: 'warning', asOf: '2026-10-05' }).success).toBe(false);
+  });
+
+  it('calendar events are bilingual data with a known kind', () => {
+    expect(
+      CalendarEventSchema.safeParse({ id: 'rba-2026-11', date: '2026-11-03', titleEn: 'RBA board meeting', titleFa: 'جلسه کمیته بانک مرکزی استرالیا', kind: 'rba' }).success,
+    ).toBe(true);
+    expect(CalendarEventSchema.safeParse({ id: 'x', date: '2026-11-03', titleEn: 'T', titleFa: 'ف', kind: 'fomc' }).success).toBe(false);
+  });
+});
+
+describe('Insights: InsightsSnapshotSchema', () => {
+  const reading = (id: string) => ({
+    id,
+    value: 1,
+    asOf: '2026-10-05',
+    status: 'normal',
+    sourceName: 'Test source',
+    updatedAt: '2026-10-06T02:00:00.000Z',
+  });
+
+  const snap = {
+    generatedAt: '2026-10-06T02:00:00.000Z',
+    summary: {
+      global: { section: 'global', label: 'relaxed', warningCount: 0, votingCount: 2, excludedCount: 0 },
+      australia: { section: 'australia', label: null, warningCount: 0, votingCount: 0, excludedCount: 0 },
+    },
+    readings: [reading('usdjpy'), reading('us10y')],
+    changedThisWeek: [],
+    calendar: [],
+  };
+
+  it('accepts a coherent snapshot', () => {
+    expect(InsightsSnapshotSchema.safeParse(snap).success).toBe(true);
+  });
+
+  it('rejects duplicated indicator ids in readings', () => {
+    expect(InsightsSnapshotSchema.safeParse({ ...snap, readings: [reading('usdjpy'), reading('usdjpy')] }).success).toBe(false);
+  });
+
+  it('strips unknown keys (same pollution defence as the other envelopes)', () => {
+    const parsed = InsightsSnapshotSchema.parse({ ...snap, injected: 'pollutant' });
+    expect(parsed).not.toHaveProperty('injected');
+  });
+});

@@ -1,0 +1,25 @@
+{
+  "name": "@currena/insights",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Insights feature: indicator definitions, scoring engine and fixture parsers. Pure TypeScript, platform-free (AGENTS.md rule 2) — no node:*, no DOM, no fetch. Source adapters that hit the network arrive in Phase I2 and live elsewhere.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
+    "test": "vitest run",
+    "backtest": "tsx scripts/backtest.ts"
+  },
+  "dependencies": {
+    "@currena/core": "workspace:*",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.1"
+  }
+}

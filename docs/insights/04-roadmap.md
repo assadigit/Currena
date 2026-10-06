@@ -60,16 +60,16 @@ Every phase ends with typecheck and tests green, a `phase(I<n>): summary` commit
 - [x] Run the verify-first probe for every source in `03-data-sources.md`; record results there. **Done 2026-10-06 — full verdict register, including blocked sources and licence findings.**
 - [x] Decide the substitutes for the blocked items (credit spread, VIX, S&P 500, breadth). **STLFSI4; VIX link-out; S&P/breadth out of v1 (P3); CAPE deferred to P3.**
 - [x] Decide silver and Bitcoin sources after reading their terms. **gold-api.com primary (spot), Bitstamp OHLC (BTC history), World Bank Pink Sheet (silver history).**
-- [ ] Confirm who reviews the disclaimer and copy for Australian financial-services rules. **D4 — open; owner to nominate; not blocking I1–I4.**
-- **Exit:** `03-data-sources.md` fully verified ✅; open decisions answered in `docs/PROGRESS.md` ✅ (D4 recorded as open, non-blocking). **Awaiting Gate I0 approval.**
+- [x] Confirm who reviews the disclaimer and copy for Australian financial-services rules. **D4 — ANSWERED 2026-10-06: no disclaimer for v1 (owner: "I dont need disclaimer for now"); the no-advice-wording rule stays.**
+- **Exit:** `03-data-sources.md` fully verified ✅; open decisions answered in `docs/PROGRESS.md` ✅ (D1–D4 all answered). **Gate I0 APPROVED 2026-10-06 (owner: "Proceed").**
 
 ### Phase I1: Contracts and scoring engine (no network)
 
-- [ ] Add the zod schemas to `packages/core`.
-- [ ] Build `packages/insights` scoring: percentile, 7/30-day change, rule evaluation (all rule types in `01-indicator-spec.md`), summary vote and label, "what changed this week", stale handling.
-- [ ] Table-driven unit tests for every rule type and edge case (empty series, short history, direction, ties).
-- [ ] Recorded historical fixtures for 2008, 2020 and 2022, and a backtest script that writes `docs/insights/BACKTEST.md`.
-- **Exit:** tests green; backtest reviewed ✋ (owner approves or adjusts thresholds).
+- [x] Add the zod schemas to `packages/core`. **Done 2026-10-06** — `IndicatorId`, `WarningRule` (7 atom kinds + flat any-of), `IndicatorDefinition`, `IndicatorReading`, `SummaryLine`, `ChangedEvent`, `CalendarEvent`, `InsightsSnapshot`.
+- [x] Build `packages/insights` scoring: percentile, 7/30-day change, rule evaluation (all rule types in `01-indicator-spec.md`), summary vote and label, "what changed this week", stale handling. **Done 2026-10-06** — plus fixture parsers (the parse halves of the I2 adapters) and the 28-definition table.
+- [x] Table-driven unit tests for every rule type and edge case (empty series, short history, direction, ties). **69 tests** (plus 18 new core contract tests; repo total 400 green).
+- [x] Recorded historical fixtures for 2008, 2020 and 2022, and a backtest script that writes `docs/insights/BACKTEST.md`. **Fixtures: FRED ×10, Frankfurter, World Bank Pink Sheet, ABS CPI ×2 + unemployment (RBA absent — sandbox-blocked).**
+- **Exit:** tests green ✅; backtest written and agent-reviewed ✅ — **awaiting owner review of `docs/insights/BACKTEST.md` (approve or adjust thresholds).**
 
 ### Phase I2: Source adapters and fixtures
 

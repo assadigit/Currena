@@ -5,6 +5,67 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-06] — Insights Phase I1: contracts, scoring engine, backtest
+
+Gate I0 approved same day (D4 answered: no disclaimer for v1). Phase I1 adds
+the feature's computational core — **no app code touched; the web/api bundles
+are unchanged; nothing deployed.** Tests **313 → 400 — all green**; typecheck
+clean in all five workspace packages.
+
+### Contracts (`packages/core/src/schemas.ts`)
+
+- New Insights contracts (rule 3 — single source of truth): `IndicatorId`
+  (28 v1 ids; licence-blocked items excluded), group/section/cadence/phase/
+  source enums, `WarningRule` (the spec's seven atom kinds plus a flat
+  `any-of` OR-composite for us10y), `IndicatorDefinition`, `IndicatorReading`
+  (status vocabulary: warning / normal / context / stale / no-history /
+  unavailable; `value`/`asOf` are null exactly when unavailable — enforced by
+  refine), `SummaryLine` (label is null when nothing votes), `ChangedEvent`,
+  `CalendarEvent`, `InsightsSnapshot` (unique-id refine). All exported from
+  `@currena/core`; contract tests include deliberate shape-pinning.
+
+### New package: `packages/insights` (`@currena/insights`)
+
+- Pure, platform-free (AGENTS.md rule 2): no node:*, DOM, fetch or clock
+  reads — every time reference is an explicit parameter (frozen-clock
+  friendly). zod-validating throughout.
+- `series.ts` — epoch-day date math, binary-search `pointAtOrBefore`,
+  `combineSeries` inner join (ratios/crosses), `yoyPctSeries`.
+- `parsers.ts` — FRED CSV / Frankfurter JSON / World Bank monthly / ABS
+  period parsers; loud failures; missing markers dropped, never zero-filled.
+  These are the parse halves of the Phase I2 adapters.
+- `definitions.ts` — all 28 indicator definitions, rules verbatim from
+  `01-indicator-spec.md`.
+- `scoring.ts` — strict-lower 10-year percentiles; threshold rules incl.
+  sustained-weeks anchored on the latest observation; percentile tails;
+  pct/points change rules with anchor tolerance (sparse series show dashes,
+  never mislabelled windows); yoy-negative; consecutive-decline; above-low;
+  info → context; stale detection; `computeReading`, `summarize`
+  (sections resolved via the definitions table), `changedSince`.
+- **69 tests**: table-driven coverage of every rule type plus edge cases
+  (empty series, short history, direction, ties, boundaries, frozen clock).
+
+### Recorded fixtures + backtest
+
+- `packages/insights/fixtures/` (14 files + provenance README, captured
+  2026-10-06): 10 FRED series (2004+ / full), Frankfurter USD→JPY/AUD/CNY
+  (2004→2026-10-05), World Bank Pink Sheet monthly (2004M01→2026M09), ABS
+  headline CPI + trimmed mean quarterly, ABS unemployment monthly. RBA
+  absent (Akamai-blocked from the sandbox — documented).
+- `pnpm --filter @currena/insights backtest` writes
+  **`docs/insights/BACKTEST.md`**: weekly frozen-clock runs across GFC 2008,
+  COVID 2020, inflation 2022 and calm contrast 2017/2025, plus a today-run.
+  Labels move correctly in every window (2008 global peaks *stressed*
+  Oct-2008 7/12 and Australia *alarmed* Dec-08→Mar-09; 2022 *stressed* for
+  20 of 52 weeks; 2017 *relaxed* 43 of 52; today: global *cautious* 3/11,
+  Australia *stressed* 3/6). Engine constants calibrated against the
+  fixtures during the run and documented there (stale thresholds from real
+  release lags: 3/16/95/190 days by cadence; percentile floor 30 periods;
+  observation-anchored sustained window). Owner-tunable candidates are
+  listed with recommendations — spec thresholds themselves are unchanged.
+
+Awaiting Gate I1 approval (backtest / threshold review) before Phase I2.
+
 ## [2026-10-06] — Insights Phase I0: source verification + Gate I0 decisions
 
 Docs-only session (no code, no bundle impact). Planning set from commit

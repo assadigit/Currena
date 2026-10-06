@@ -284,3 +284,260 @@ export const MIN_SCRAPE_INTERVAL_SEC = 60;
 
 /** Hard eviction age for cached snapshots (7 days) — beyond this, 503. */
 export const CACHE_HARD_TTL_SEC = 7 * 24 * 3600;
+
+/* ------------------------------------------------------------------ *
+ * Insights (docs/insights/01-indicator-spec.md — Gate I0 approved)
+ * ------------------------------------------------------------------ */
+
+/** Stable slugs of every v1 Insights indicator (P1 + P2; blocked/licensed items excluded). */
+export const IndicatorIdSchema = z.enum([
+  // Global — Rates and credit
+  'yield-curve-10y2y',
+  'stress-stlfsi',
+  'real-yield-10y',
+  'us10y',
+  'breakeven-5y5y',
+  'govt-interest-revenue',
+  // Global — Currencies
+  'dollar-broad',
+  'usdjpy',
+  // Global — Metals, crypto and hard assets
+  'gold-silver',
+  'gold-btc',
+  'silver-btc',
+  'copper-gold',
+  'brent',
+  // Global — Stocks, growth and liquidity
+  'm2-us',
+  'china-pmi',
+  'usdcny',
+  // Australia — Interest and inflation
+  'rba-cash-rate',
+  'au-cpi',
+  'au-trimmed-mean',
+  // Australia — Currency and trade
+  'audusd',
+  'audjpy',
+  'au-us-10y-gap',
+  'gold-aud',
+  'iron-ore',
+  'terms-of-trade',
+  // Australia — Jobs and housing
+  'au-unemployment',
+  'au-home-values',
+  'au-household-debt-arrears',
+]);
+export type IndicatorId = z.infer<typeof IndicatorIdSchema>;
+
+/** Card groups (UI section grouping, 01-indicator-spec.md section 1–2). */
+export const IndicatorGroupIdSchema = z.enum([
+  'rates-credit',
+  'currencies',
+  'metals-crypto',
+  'stocks-growth',
+  'interest-inflation',
+  'currency-trade',
+  'jobs-housing',
+]);
+export type IndicatorGroupId = z.infer<typeof IndicatorGroupIdSchema>;
+
+/** The two summary lines: Global and Australia. */
+export const InsightsSectionSchema = z.enum(['global', 'australia']);
+export type InsightsSection = z.infer<typeof InsightsSectionSchema>;
+
+/** How often the indicator's upstream data updates (drives stale detection). */
+export const IndicatorCadenceSchema = z.enum([
+  'daily',
+  'weekly',
+  'monthly',
+  'quarterly',
+  'per-change',
+  'manual',
+]);
+export type IndicatorCadence = z.infer<typeof IndicatorCadenceSchema>;
+
+/** Release wave (roadmap: P1 = first release, P2 = second wave). */
+export const IndicatorPhaseSchema = z.enum(['P1', 'P2']);
+export type IndicatorPhase = z.infer<typeof IndicatorPhaseSchema>;
+
+/** Upstream provider of the indicator's series. */
+export const IndicatorSourceSchema = z.enum([
+  'fred',
+  'rba',
+  'abs',
+  'tgju',
+  'frankfurter',
+  'gold-api',
+  'bitstamp',
+  'world-bank',
+  'manual',
+  'derived',
+]);
+export type IndicatorSource = z.infer<typeof IndicatorSourceSchema>;
+
+/**
+ * Warning rules — the seven rule types of 01-indicator-spec.md section 5
+ * (one non-composite atom kind each), plus a flat OR-composite. Direction
+ * (which tail is "bad") is part of each rule, never inferred.
+ */
+export const WarningRuleAtomSchema = z.discriminatedUnion('kind', [
+  /** No vote — info-only card (shows data, never votes). */
+  z.object({ kind: z.literal('info') }),
+  /** Value above/below a fixed number; optionally sustained for N weeks (STLFSI4). */
+  z.object({
+    kind: z.literal('threshold'),
+    direction: z.enum(['above', 'below']),
+    value: z.number().finite(),
+    sustainedWeeks: z.number().int().positive().optional(),
+  }),
+  /** Value in the high or low tail of its 10-year history (cutoff as a fraction). */
+  z.object({
+    kind: z.literal('percentile'),
+    tail: z.enum(['high', 'low']),
+    cutoff: z.number().min(0).max(1),
+  }),
+  /** Rise/fall of `magnitude` (percent or points) over `windowWeeks`. */
+  z.object({
+    kind: z.literal('change'),
+    mode: z.enum(['pct', 'points']),
+    direction: z.enum(['rise', 'fall']),
+    magnitude: z.number().positive().finite(),
+    windowWeeks: z.number().int().positive(),
+  }),
+  /** Year-on-year change below zero. */
+  z.object({ kind: z.literal('yoy-negative') }),
+  /** N period-over-period declines in a row ending at the current value. */
+  z.object({ kind: z.literal('consecutive-decline'), periods: z.number().int().positive() }),
+  /** Rise of at least `rise` points from the lowest value of the last 12 months. */
+  z.object({ kind: z.literal('above-low'), rise: z.number().positive().finite() }),
+]);
+export type WarningRuleAtom = z.infer<typeof WarningRuleAtomSchema>;
+
+/**
+ * A warning rule: either a single atom or an OR of two or more atoms
+ * (e.g. us10y = highest 10% of 10 years OR up 0.5 point in 4 weeks).
+ * Atoms only — the composite is deliberately flat so the contract stays
+ * inspectable; deeper composition would need a deliberate contract change.
+ */
+export const WarningRuleSchema = z.union([
+  WarningRuleAtomSchema,
+  z.object({ kind: z.literal('any-of'), of: z.array(WarningRuleAtomSchema).min(2) }),
+]);
+export type WarningRule = z.infer<typeof WarningRuleSchema>;
+
+/** Static config for one indicator (the definitions table lives in @currena/insights). */
+export const IndicatorDefinitionSchema = z.object({
+  id: IndicatorIdSchema,
+  section: InsightsSectionSchema,
+  group: IndicatorGroupIdSchema,
+  /** Canonical English name; the SPA renders localized names from the i18n dictionary. */
+  name: z.string().min(1),
+  source: IndicatorSourceSchema,
+  /** Human descriptor of the upstream series or composition, e.g. 'FRED:T10Y2Y' or 'WB gold ÷ WB silver'. */
+  sourceRef: z.string().min(1),
+  cadence: IndicatorCadenceSchema,
+  /** How change7d/change30d are expressed on the card. */
+  changeKind: z.enum(['pct', 'points']),
+  phase: IndicatorPhaseSchema,
+  rule: WarningRuleSchema,
+});
+export type IndicatorDefinition = z.infer<typeof IndicatorDefinitionSchema>;
+
+/**
+ * One indicator's computed state for the snapshot. Status semantics
+ * (02-page-design-spec.md section 6 + Phase I1 refinements):
+ *  - `warning` / `normal` — voted, counts in the summary
+ *  - `context`           — info-only card, never votes
+ *  - `stale`             — data older than cadence + grace; greyed, excluded
+ *  - `no-history`        — fresh value, but too little history to evaluate
+ *                          the rule (excluded; card shows the value, no verdict)
+ *  - `unavailable`       — no data at all (`value`/`asOf` are null)
+ */
+export const IndicatorReadingStatusSchema = z.enum([
+  'warning',
+  'normal',
+  'context',
+  'stale',
+  'no-history',
+  'unavailable',
+]);
+export type IndicatorReadingStatus = z.infer<typeof IndicatorReadingStatusSchema>;
+
+export const IndicatorReadingSchema = z
+  .object({
+    id: IndicatorIdSchema,
+    /** Current value; null iff status is 'unavailable'. */
+    value: z.number().finite().nullable(),
+    /** Observation date of the value (YYYY-MM-DD); null iff status is 'unavailable'. */
+    asOf: z.iso.date().nullable(),
+    /** 7-day change in `changeKind` units (pct or points); absent when not measurable. */
+    change7d: z.number().finite().optional(),
+    /** 30-day change, same units; absent when not measurable. */
+    change30d: z.number().finite().optional(),
+    /** Share of the last 10 years' readings strictly below the current one (0–1); absent when the base is too short. */
+    percentile10y: z.number().min(0).max(1).optional(),
+    status: IndicatorReadingStatusSchema,
+    sourceName: z.string().min(1),
+    sourceUrl: z.url().optional(),
+    /** When the runner produced this reading (ISO 8601 UTC). */
+    updatedAt: z.iso.datetime(),
+  })
+  .refine((r) => (r.value === null) === (r.status === 'unavailable'), {
+    message: "value must be null exactly when status is 'unavailable'",
+    path: ['value'],
+  })
+  .refine((r) => (r.asOf === null) === (r.status === 'unavailable'), {
+    message: "asOf must be null exactly when status is 'unavailable'",
+    path: ['asOf'],
+  });
+export type IndicatorReading = z.infer<typeof IndicatorReadingSchema>;
+
+/**
+ * One summary line ("Global: Cautious · 4 of 14 indicators in warning").
+ * `label` is null when nothing could vote (votingCount 0) — the UI decides
+ * the wording; it must never present a made-up label.
+ */
+export const SummaryLineSchema = z.object({
+  section: InsightsSectionSchema,
+  label: z.enum(['relaxed', 'cautious', 'stressed', 'alarmed']).nullable(),
+  warningCount: z.number().int().nonnegative(),
+  votingCount: z.number().int().nonnegative(),
+  excludedCount: z.number().int().nonnegative(),
+});
+export type SummaryLine = z.infer<typeof SummaryLineSchema>;
+
+/** A voting indicator that changed state within the last week. */
+export const ChangedEventSchema = z.object({
+  id: IndicatorIdSchema,
+  from: z.enum(['warning', 'normal']),
+  to: z.enum(['warning', 'normal']),
+  /** Observation date of the reading that established the new state. */
+  asOf: z.iso.date(),
+});
+export type ChangedEvent = z.infer<typeof ChangedEventSchema>;
+
+/** Hand-maintained calendar entry (data/insights-calendar.json). */
+export const CalendarEventSchema = z.object({
+  id: z.string().min(1),
+  date: z.iso.date(),
+  titleEn: z.string().min(1),
+  titleFa: z.string().min(1),
+  kind: z.enum(['rba', 'abs-cpi', 'fed', 'other']),
+});
+export type CalendarEvent = z.infer<typeof CalendarEventSchema>;
+
+/** The precomputed snapshot the runner writes and `GET /api/insights` serves. */
+export const InsightsSnapshotSchema = z
+  .object({
+    generatedAt: z.iso.datetime(),
+    summary: z.object({ global: SummaryLineSchema, australia: SummaryLineSchema }),
+    /** Exactly one reading per known indicator id (enforced below). */
+    readings: z.array(IndicatorReadingSchema),
+    changedThisWeek: z.array(ChangedEventSchema),
+    calendar: z.array(CalendarEventSchema),
+  })
+  .refine(
+    (snap) => new Set(snap.readings.map((r) => r.id)).size === snap.readings.length,
+    { message: 'readings must contain each indicator id at most once' },
+  );
+export type InsightsSnapshot = z.infer<typeof InsightsSnapshotSchema>;
