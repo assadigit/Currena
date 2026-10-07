@@ -47,11 +47,11 @@ export function PositionBar({
           aria-valuenow={Math.round(pct * 100)}
           aria-valuetext={valueText}
           aria-label={copy.ui.position10y}
-          className="relative block h-2 overflow-hidden rounded-full bg-black/[0.07] dark:bg-white/10"
+          className="relative block h-2.5 overflow-hidden rounded-full bg-black/[0.07] dark:bg-white/10"
         >
           {zone ? (
             <span
-              className="absolute inset-y-0 bg-currena-warning/25"
+              className="absolute inset-y-0 bg-currena-warning/30"
               style={{ left: `${zone.from * 100}%`, width: `${(zone.to - zone.from) * 100}%` }}
               aria-hidden="true"
             />

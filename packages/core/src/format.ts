@@ -70,6 +70,8 @@ export function parseAmount(input: string): number | null {
 export interface NumberFormatOptions {
   minimumFractionDigits?: number;
   maximumFractionDigits?: number;
+  /** false → plain digits, no thousands separators (years, codes). */
+  useGrouping?: boolean;
 }
 
 /* ------------------------------------------------------------------ *
@@ -87,7 +89,7 @@ export interface NumberFormatOptions {
 const numberFormatCache = new Map<string, Intl.NumberFormat>();
 
 function cachedNumberFormat(locale: Locale, options: Intl.NumberFormatOptions): Intl.NumberFormat {
-  const key = `${locale}|${options.minimumFractionDigits ?? '-'}|${options.maximumFractionDigits ?? '-'}`;
+  const key = `${locale}|${options.minimumFractionDigits ?? '-'}|${options.maximumFractionDigits ?? '-'}|${options.useGrouping === false ? 'nog' : 'grp'}`;
   let formatter = numberFormatCache.get(key);
   if (formatter === undefined) {
     formatter = new Intl.NumberFormat(locale, options);

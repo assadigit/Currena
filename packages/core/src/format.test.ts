@@ -62,6 +62,13 @@ describe('formatNumber', () => {
     expect(formatNumber(1234.5, 'fa-IR')).toBe('۱٬۲۳۴٫۵');
   });
 
+  it('useGrouping:false renders plain digits — years are codes, not quantities', () => {
+    // I6 audit F8: chart year labels must not read "2,016"/"۲٬۰۱۶".
+    expect(formatNumber(2016, 'en-US', { maximumFractionDigits: 0, useGrouping: false })).toBe('2016');
+    expect(formatNumber(2026, 'fa-IR', { maximumFractionDigits: 0, useGrouping: false })).toBe('۲۰۲۶');
+    expect(formatNumber(1234567, 'en-US', { maximumFractionDigits: 0, useGrouping: false })).toBe('1234567');
+  });
+
   it('throws a typed error for non-finite values', () => {
     expect(() => formatNumber(Number.NaN, 'en-US')).toThrow(CoreError);
   });

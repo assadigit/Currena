@@ -90,9 +90,13 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
   const minPt = coords[minIdx]!;
   const maxPt = coords[maxIdx]!;
 
+  // I6 audit F8/F12: years are codes, not quantities — no grouping separators
+  // ("2,016"/"۲٬۰۱۶" was wrong in both locales) — and the axis gets a
+  // middle year tick so a 10-year span reads start → mid → end.
   const year = (day: number): string =>
     formatNumber(new Date(day * 86_400_000).getUTCFullYear(), numberLocale, {
       maximumFractionDigits: 0,
+      useGrouping: false,
     });
 
   const ariaLabel = interpolate(copy.ui.chartAria, {
@@ -141,6 +145,17 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
           textAnchor="start"
         >
           {year(dayMin)}
+        </text>
+        {/* Mid-axis year tick — orientation on a decade-long axis (I6 F12). */}
+        <text
+          x={WIDTH / 2}
+          y={HEIGHT - 6}
+          fontSize="12"
+          fill="currentColor"
+          fillOpacity="0.7"
+          textAnchor="middle"
+        >
+          {year(Math.round((dayMin + dayMax) / 2))}
         </text>
         <text
           x={WIDTH - PAD_X}
