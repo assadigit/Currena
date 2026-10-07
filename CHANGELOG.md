@@ -5,6 +5,54 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-08] — I9 feedback & analytical-zoom wave: chart ranges, chip counts, summary jumps, "/"-shortcut
+
+Second stable-state round of the day: re-verified production + local standing
+state (all green), fixed one I8 gap found during review, then four features.
+Tests 528 → 537 → **545 green** (+8 range/count tests). Presentation-layer
+only — no scoring, thresholds, sources or API changes. Still awaiting the
+owner-credentialled deploy (production serves I6 Worker `954f0034`).
+
+### Fixed
+- **focusCard × filter interaction (I8 gap)**: clicking a WhatChanged row
+  (or any focus-card path) while the active filter hides that card used to
+  silently do nothing visible. The reader's "show me THIS card" intent now
+  wins — the filter resets (chips + query), then the card opens, scrolls
+  and receives focus.
+
+### Added
+- **Chart range toggle — 10y / 5y / 1y** (`HistoryChart`): a segmented
+  control in the figcaption (the house pill DNA at chart-local size).
+  `sliceHistoryToRange` / `rangeIsPlottable` are pure, unit-tested helpers
+  in `config.ts`; the window anchors on the series' LAST point (honest even
+  when the feed is days old); ranges that cannot show ≥2 points disable
+  themselves; the mid-axis year tick suppresses itself when it would repeat
+  an end year (1y windows show exactly 2 ticks); the I7 tooltip + keyboard
+  stepping operate on the sliced series; the SR data table follows the
+  visible range. **The 10-year position bar and percentiles never change**
+  — they are the indicator's server-side decade placement. Hidden on paper.
+- **Live counts on the filter chips** — "All (30) / Warning (6) / Normal
+  (15) / Context (7)": the reader sees what a chip does before pressing it
+  (`statusCounts`, pure, tested; Persian digits in fa). Same semantics as
+  the filter: stale/unavailable count only under All.
+- **Summary lines are jump buttons**: the two LED summary lines now scroll
+  to their sections — the summary block doubles as the page's table of
+  contents (hover affordance, direction-neutral ↓ chevron, sr-only "View
+  section", reduced-motion-aware).
+- **"/" focuses the filter search** — Gmail/GitHub/YouTube muscle memory.
+  Ignores modifier combos (never swallows browser shortcuts) and never
+  fires while typing in any field; `aria-keyshortcuts="/"` declared on the
+  input.
+
+### Changed
+- **Insights chunk budget 120/35.5 → 125/37 kB/gz**
+  (`scripts/check-bundle-budget.mjs`): the range control + slicing, chip
+  counts, summary buttons, shortcut wiring and 12 more copy strings × 2
+  locales grow the lazy chunk 117.27/34.83 → 121.30/35.85. The entry chunk
+  is untouched (288.76 kB / 86.95 gz — money-page budget held).
+- Spec §5 (indicator card) now records the range control and §4 the summary
+  jump behaviour (additive documentation).
+
 ## [2026-10-08] — I8 findability wave: filter toolbar, story→card links, hover polish
 
 Stable-state session: full QA pass first (production standing state + every

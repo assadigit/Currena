@@ -33,10 +33,10 @@ Insights explains the state of global and Australian finance through about 30 in
 ## 4. Page structure, top to bottom
 
 1. **Header:** existing Currena header with "Insights" active.
-2. **Summary block:** two lines, Global and Australia, each like "Cautious · 4 of 14 indicators in warning," with a "How this is calculated" link. Directly under it a one-line disclaimer ("General information only, not advice") linking to the full text.
+2. **Summary block:** two lines, Global and Australia, each like "Cautious · 4 of 14 indicators in warning," with a "How this is calculated" link. Each line is a button that jumps to its section (I9) — the summary doubles as the page's table of contents. Directly under it a one-line disclaimer ("General information only, not advice") linking to the full text.
 3. **What changed this week:** indicators that changed state, the five biggest moves, events in the next 7 days.
 4. **Coming up:** the next key dates (RBA, Australian CPI, US Fed). Anything within 7 days is highlighted.
-5. **Card filter toolbar (I8, 2026-10-08):** status chips (All / Warning / Normal / Context) + a text search over names and tickers, directly before the Global section. A view tool only — it hides cards, groups, sections and jump pills that have nothing to show, but every warning-count line keeps describing the full snapshot; hidden on paper.
+5. **Card filter toolbar (I8, 2026-10-08):** status chips (All / Warning / Normal / Context, each with its live count — I9) + a text search over names and tickers, directly before the Global section; "/" focuses the search (I9). A view tool only — it hides cards, groups, sections and jump pills that have nothing to show, but every warning-count line keeps describing the full snapshot; hidden on paper.
 6. **Global:** four groups (Rates and credit; Currencies; Metals, crypto and hard assets; Stocks, growth and liquidity).
 7. **Australia:** three groups (Interest and inflation; Currency and trade; Jobs and housing).
 8. **About the data and full disclaimer:** sources, update schedule, how "warning" is decided.
@@ -60,7 +60,7 @@ Each section header shows a small status line ("2 of 6 in warning"). Add a row o
 - What it has historically tended to mean
 - What it can't tell you
 - What this means for you (general information, Australia-focused)
-- 10-year chart with a data-table alternative for screen readers
+- 10-year chart with a data-table alternative for screen readers. A 10y / 5y / 1y range control (I9, 2026-10-08) zooms the chart's visible window — anchored on the series' last point, ranges that cannot show two points disable themselves; the 10-year position bar and percentiles never change with the range.
 
 Several cards can be open at once on desktop. On mobile, opening one may close the previous one.
 
