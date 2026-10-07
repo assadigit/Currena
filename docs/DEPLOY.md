@@ -172,6 +172,28 @@ Worker (read-only):  GET /api/insights · GET /api/insights/:id/history · /admi
   curl -s -H 'Sec-Fetch-Dest: document' $B/admin | grep -o 'Insights <span class="pill[^>]*>[^<]*'  # freshness pill
   ```
 
+## Insights page deploy (2026-10-07, Phase I4)
+
+The first deploy that changes the SPA bundle since 2026-09-24:
+
+- `pnpm --filter @currena/web build` (fresh `apps/web/dist`), then
+  `pnpm --filter @currena/api deploy` — Worker version
+  `201590d8-89e3-41ce-94b5-295e3e190553`, upload 922.70 KiB (gzip 159.88 KiB).
+- **Edge-cache note (observed, one-off):** the first `GET /` after the deploy
+  returned the PREVIOUS `index.html` (`cf-cache-status: HIT` at HKG) even though
+  the origin already served the new one (a cache-busting query returned the new
+  entry chunk immediately). It self-resolved within ~60 seconds on the next
+  revalidation; `workers.dev` was fresh instantly. If a deploy ever looks
+  "missing", check `curl -sD - https://currena.ir/?v=$RANDOM` before concluding
+  anything — and remember installed PWAs self-update within the hour via the
+  autoUpdate service worker.
+- Post-deploy smoke (all green): `/api/health` 200, `/api/rates?source=tgju`
+  200 fresh, `/api/insights` 200 + the same ETag as the 04:20 UTC ingestion
+  run, the new lazy chunk `/assets/Insights-*.js` 200, `#/insights` renders 28
+  cards in en and fa (agent-browser, zero console errors, no horizontal
+  overflow, card expand → chart + SR table + source link, language switch
+  keeps open cards), and the converter/LED boards render unchanged.
+
 ## Rollback
 
 ```sh
