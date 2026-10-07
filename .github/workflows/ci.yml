@@ -1,0 +1,52 @@
+# CI (BACKLOG #47, I7 hardening) — the gate every push to main must pass:
+# typecheck (TS strict everywhere), the full vitest suite (tests never touch
+# live sites), the SPA build, and the bundle-budget check that keeps the
+# entry chunk (the converter — the money page) from regressing and the
+# Insights route lazy. Numbers + rationale live in scripts/check-bundle-budget.mjs.
+#
+# pnpm comes from corepack (the repo's packageManager pin — setup-node's
+# toolcache node is runner-owned, so `corepack enable` needs no sudo).
+# Official actions only; no dependency cache (install is ~1 min cold).
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Enable pnpm (pinned by the packageManager field)
+        run: |
+          corepack enable
+          pnpm --version
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck (strict, every package)
+        run: pnpm -r typecheck
+
+      - name: Tests (vitest — never hits live sites)
+        run: pnpm -r test
+
+      - name: Build the SPA
+        run: pnpm --filter @currena/web build
+
+      - name: Bundle budget gate
+        run: node scripts/check-bundle-budget.mjs
