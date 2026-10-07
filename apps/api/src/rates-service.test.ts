@@ -137,6 +137,45 @@ describe('RatesService ladder (in-memory store + fake scrapers)', () => {
     expect(scrapeCalls).toEqual(['tgju']); // scrape WAS attempted, failed, fell through
   });
 
+  // I12 (2026-10-07 incident, second measurement): frankfurter's fresh
+  // window is 15 min, aligned with the quarter-hour cron refresh. The
+  // 10.5-min-per-15-min fetch-context 500 windows existed because a
+  // 5-min TTL let the snapshot go stale between cron ticks — every
+  // request in those windows hit the lock path while KV writes were
+  // failing from fetch context. With the aligned TTL, a quarter-hour-old
+  // ECB snapshot is served from the FRESH-cache rung: zero lock, zero
+  // scrape, no window.
+  it('frankfurter fresh window (I12) — 12-min-old ECB snapshot still serves fresh-cache: no lock, no scrape', async () => {
+    await store.putSnapshot(
+      'frankfurter',
+      frankfurterSnapshot(new Date(T0_MS - 12 * MIN).toISOString()),
+      7 * 86_400,
+    );
+
+    const res = await makeService().getRates('frankfurter');
+
+    expect(res.servedFrom).toBe('cache');
+    expect(res.stale).toBe(false);
+    expect(res.notice).toBeUndefined();
+    expect(scrapeCalls).toEqual([]); // ZERO network — the incident window never opens
+  });
+
+  it('frankfurter fresh window boundary — past 15 min the honest stale ladder applies', async () => {
+    await store.putSnapshot(
+      'frankfurter',
+      frankfurterSnapshot(new Date(T0_MS - 16 * MIN).toISOString()),
+      7 * 86_400,
+    );
+    snapshots['frankfurter'] = new Error('ECB down');
+
+    const res = await makeService().getRates('frankfurter');
+
+    expect(res.servedFrom).toBe('cache');
+    expect(res.stale).toBe(true);
+    expect(res.notice).toBeDefined();
+    expect(scrapeCalls).toEqual(['frankfurter']); // stale now — the live rung was honestly attempted
+  });
+
   it('min-interval guard — lastScrapeAt < 60s ago: no scrape attempt', async () => {
     await store.putSnapshot('tgju', tgjuSnapshot(new Date(T0_MS - 400 * SEC).toISOString()), 7 * 86_400);
     await store.putStatus('tgju', {

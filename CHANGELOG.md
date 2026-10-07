@@ -5,6 +5,95 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-08] — I12 freshness & resilience wave
+
+Fifth round of the day. Production QA re-measured the 2026-10-07 incident
+LIVE and got the exact shape: with the I6 Worker still deployed (fix
+pending), `/api/convert` for international pairs (frankfurter) hard-500'd
+from 20:35:30 to 20:46:03 UTC — the cache TTL (5 min) expires 5 min into
+each 15-min cron refresh cycle, so **~10.5 minutes of every 15 (70% of
+all minutes)** every fetch-context request hit the stale path, tried the
+single-flight lock, and (KV writes failing from fetch context) 500'd.
+The incident's own fix (I11's ladder degradation) turns those 500s into
+"Using cached rates" 200s once deployed — this wave closes the windows
+at the ROOT: frankfurter's fresh window is now 15 min, aligned with the
+quarter-hour cron, so fetch-context requests stay on the fresh-cache
+rung between ticks regardless of KV health. And the SPA stops leaving
+first-time visitors dead during any outage window: the snapshot store
+grew a self-healing retry ladder and the converter's failure card became
+honest (server-vs-network copy), actionable (Try again), and alive
+(live countdown + automatic completion when the outage passes). Tests
+575 → **585 green** (+2 api frankfurter-window, +8 web — the FIRST
+snapshot-store unit tests). Production still serves the I6 Worker
+`954f0034` (deploy pending, owner credentials).
+
+### Fixed (incident root-cause mitigation)
+- **Per-source fresh windows** (`@currena/core`): `FRESH_TTL_SEC` (one
+  global 300 s) is now `FRESH_TTL_SEC_BY_SOURCE` + `freshTtlSec(source)`
+  — tgju keeps the 5-min open-market window; **frankfurter gets 15 min**,
+  matching the quarter-hour cron refresh cadence (ECB reference data
+  updates ~once per business day; a 12-min-old snapshot is MORE than
+  fresh). Server (rates-service freshness gate + status fresh flag +
+  admin display) and client (snapshot-store staleness) share the same
+  per-source semantics, so the client also stops re-fetching frankfurter
+  every 5 min. Zero extra KV writes, zero extra scrapes — the stale
+  window between cron ticks simply ceases to exist for frankfurter.
+  +2 api tests (12-min ECB snapshot → fresh-cache rung with zero
+  network; 16-min → honest stale ladder).
+- **Failure-card copy honesty** (converter): the API ANSWERING with an
+  error (500/5xx envelope — the incident's exact user experience) now
+  says "The rate service is temporarily unavailable / Retrying
+  automatically" instead of implying the USER's connection is broken
+  ("check your connection" while their network is fine was misleading).
+  Network-layer failures and offline keep the connection-flavored copy.
+
+### Added
+- **Self-healing retry ladder** (snapshot-store): a source that settles
+  in the error state (nothing to serve — a first visit during an outage
+  window) schedules automatic retries with capped backoff
+  **15 s → 30 s → 60 s (60 s cap)**; any success clears the schedule and
+  resets the ladder; offline settles never schedule (the online event
+  refreshes directly); degraded mode (last-good still serving)
+  intentionally does NOT poll — existing triggers cover it. Steady-state
+  cost while an outage persists: one request per source per minute, the
+  same order as the LiveRates poll. `nextRetryAt` (immutable epoch-ms
+  stamp) exposes the schedule to the UI.
+- **Failure card redesign** (converter, money page): role=alert card
+  with the warning icon in a tinted circle, kind-aware honest copy
+  (above), a localized **Try again** button that re-runs the conversion,
+  a **live countdown** («Retrying in 14s» / «تلاش مجدد تا ۱۴ ثانیه دیگر»,
+  Persian digits in fa, self-ticking every second, aria-live) while the
+  store self-heals, and **automatic completion**: when the failing
+  source recovers (error → ready) while the card is on screen, the
+  interrupted conversion finishes BY ITSELF — the user already asked
+  for it (verified end-to-end in the browser: mock 500s → card +
+  countdown → unmock → result popup appears with no user action).
+- **First snapshot-store unit tests** (web, backlog #29 partially
+  closed): boot hydration + per-source freshness (12-min frankfurter
+  local snapshot not stale, no fetch; 16-min refetches), the full retry
+  ladder (15/30/60 escalation, cap at 60 s, success clears + no zombie
+  retries), degraded no-poll, offline no-schedule + online-event
+  takeover, ensureSnapshot semantics. Fake timers, faked fetchRates,
+  in-memory localStorage.
+
+### Changed
+- **WCAG contrast sweep — raw `text-currena-warning` ink**: every
+  user-facing warning TEXT rendered with the raw coral `#FF6B6B`
+  (≈2.9:1 on light surfaces — fails AA) now uses the I6 `-deep` token
+  (`#B92E2E` light ≈ 6.0:1 / `#FF8080` dark ≈ 6.6:1): the failure-card
+  title + countdown, StaleBanner title (converter + LiveRates), Insights
+  load-error + from-cache banner titles, Splitter network-error line,
+  BatchConverter invalid-line label, AmountInput validation message,
+  Receipt clear button, Insights card history-error. Measured in-browser
+  before/after; dark mode is token-neutral (both map to #FF8080).
+- **Admin runtime-config card**: the fresh-window line now shows the
+  per-source values («300s / 900s») with the rationale hint.
+- **Entry budget bumped 293 → 296 kB raw / 88 → 89.5 kB gz**
+  (scripts/check-bundle-budget.mjs): the retry ladder + failure card +
+  11 copy strings × 2 locales on the money page. gzip +1.49 kB for
+  first-visit-outage recovery — incident-driven resilience, not bloat.
+  Insights chunk untouched (128.42/37.78 vs 132/39).
+
 ## [2026-10-08] — I11 live-rate wave + rates-ladder incident hardening
 
 Fourth round of the day. Production QA surfaced a REAL incident: starting

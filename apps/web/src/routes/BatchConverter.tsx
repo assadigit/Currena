@@ -493,7 +493,7 @@ export function BatchConverter() {
                   key={i}
                   className="rounded-[12px] border-s-4 border-currena-warning bg-currena-warning/10 px-3.5 py-2.5 text-sm"
                 >
-                  <span className="font-semibold text-currena-warning">
+                  <span className="font-semibold text-currena-warning-deep">
                     {t('batchConverter.invalidLine')}
                   </span>
                   {row.line.trim() !== '' ? (

@@ -276,8 +276,33 @@ export type SourceConfig = z.infer<typeof SourceConfigSchema>;
  * Timing constants (mission §5/§6 ladder)
  * ------------------------------------------------------------------ */
 
-/** A snapshot is fresh for 5 minutes; older cache is served with `stale: true`. */
-export const FRESH_TTL_SEC = 300;
+/**
+ * Freshness windows, PER SOURCE. A cached snapshot younger than its window
+ * is served with zero network; older cache is served with `stale: true`
+ * (honest banner) — or 503 at the ladder's bottom rung.
+ *
+ * - `tgju` — 5 min. Iranian open-market quotes move intraday; the every-
+ *   minute cron keeps the snapshot ≤ ~6 min old, so fetch-context requests
+ *   only hit the stale path for seconds at a time.
+ * - `frankfurter` — 15 min. ECB reference data (updates ~once per business
+ *   day); the quarter-hour cron refresh (`FRANKFURTER_CRON_MOD_MIN`) keeps
+ *   the snapshot inside this window, so fetch-context requests virtually
+ *   never reach the stale/lock path. Incident 2026-10-07: with a 5-min TTL
+ *   here, every quarter-hour gap left a ~10-minute window in which
+ *   fetch-context requests hit the stale path and (with KV writes failing
+ *   from fetch context) hard-500'd — 70% of all minutes. Aligning the TTL
+ *   with the cron cadence closes those windows at the root, independent of
+ *   KV write health.
+ */
+export const FRESH_TTL_SEC_BY_SOURCE: Record<SnapshotSource, number> = {
+  tgju: 300,
+  frankfurter: 900,
+};
+
+/** Freshness window (seconds) for a given source. */
+export function freshTtlSec(source: SnapshotSource): number {
+  return FRESH_TTL_SEC_BY_SOURCE[source];
+}
 
 /** Minimum spacing between two live scrapes of the same source. */
 export const MIN_SCRAPE_INTERVAL_SEC = 60;

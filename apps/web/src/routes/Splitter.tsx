@@ -266,7 +266,7 @@ export function Splitter() {
               </div>
             ) : null}
             {secondError ? (
-              <p className="ps-6 text-sm text-currena-warning">
+              <p className="ps-6 text-sm text-currena-warning-deep">
                 {state?.status === 'error'
                   ? t('expenseSplitter.networkError')
                   : t('expenseSplitter.conversionFailed')}

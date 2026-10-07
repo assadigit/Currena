@@ -21,7 +21,7 @@
  * stack (gold first) and the tools grid reflows 2→3→6 columns.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   CURRENCIES,
   CoreError,
@@ -43,7 +43,7 @@ import { LiveRateLine } from '../components/LiveRateLine';
 import { ResultPopup } from '../components/ResultPopup';
 import type { ConversionView } from '../components/ResultPopup';
 import { Button, Card, LoaderDots, OfflineBanner, StaleBanner } from '../components/ui';
-import { fetchMeta } from '../lib/api';
+import { ApiError, fetchMeta } from '../lib/api';
 import { useCodeLabel } from '../lib/display';
 import { saveHistoryEntry } from '../lib/history';
 import { useI18n } from '../lib/locale';
@@ -92,6 +92,33 @@ const POPULAR_PAIRS: readonly RecentPair[] = [
   { from: 'AED', to: 'IRR' },
   { from: 'TRY', to: 'IRR' },
 ];
+
+/**
+ * I12 — live countdown to the store's next automatic retry, rendered under
+ * the failure card. Ticks locally every second (the store state itself
+ * never re-emits — `nextRetryAt` is a single immutable stamp), stops
+ * itself when the moment passes, and renders localized digits.
+ */
+function RetryCountdown({ targetMs }: { targetMs: number }) {
+  const { t, numberLocale } = useI18n();
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, [targetMs]);
+
+  const seconds = Math.ceil((targetMs - now) / 1000);
+  if (seconds <= 0) return null;
+  return (
+    <p className="mt-2.5 flex items-center gap-1.5 text-xs font-semibold text-currena-warning-deep" aria-live="polite">
+      <span className="warning-pulse" aria-hidden="true">
+        ⏳
+      </span>
+      {t('errors.retryingIn', { seconds: formatNumber(seconds, numberLocale) })}
+    </p>
+  );
+}
 
 export function Converter() {
   const { t, numberLocale } = useI18n();
@@ -152,6 +179,23 @@ export function Converter() {
   useEffect(() => {
     setRecentPairs(readRecentPairs());
   }, []);
+
+  // I12 self-heal completion: when the CURRENT pair's source recovers
+  // (error → ready — the store's retry ladder landed data) while a failure
+  // card is on screen, finish the interrupted conversion automatically.
+  // The user already asked for it; the app just needed the outage window
+  // to pass. 'loading' is transitional (error → loading → ready): skipped
+  // so the remembered status stays 'error' until the fetch SETTLES.
+  const prevSourceStatusRef = useRef<'idle' | 'loading' | 'ready' | 'error' | undefined>(undefined);
+  useEffect(() => {
+    const status = store[pairSource].status;
+    if (status === 'loading') return; // transitional — keep the memory
+    const prev = prevSourceStatusRef.current;
+    prevSourceStatusRef.current = status;
+    if (prev === 'error' && status === 'ready' && failure !== null && phase === 'idle') {
+      void onSubmit();
+    }
+  }, [store, pairSource, failure, phase]);
 
   // Deep-link prefill: #/?from=EUR&to=IRR&amount=500 — powers History's
   // "Repeat" action AND shareable conversion links. Unknown values are
@@ -320,7 +364,13 @@ export function Converter() {
     };
   };
 
-  /** Friendly i18n failure card from the typed error (mission: no raw dumps). */
+  /** Friendly i18n failure card from the typed error (mission: no raw
+   *  dumps). I12: HONEST about WHO failed — the API answering with an
+   *  error envelope (ApiError kind 'rates'/'parse', e.g. the 2026-10-07
+   *  incident's 500 windows) is a temporary SERVER issue: never tell the
+   *  user to "check your connection" while their network is fine. Only a
+   *  network-layer failure (fetch threw) or being offline blames the
+   *  connection. */
   const toFailure = (err: unknown, online: boolean): ConvertFailure => {
     if (err instanceof CoreError && err.code === 'currency_not_supported') {
       return { title: t('converter.unableToConvert'), lines: [t('errors.pairNotSupported')] };
@@ -337,9 +387,18 @@ export function Converter() {
         ],
       };
     }
+    if (err instanceof ApiError && err.kind !== 'network') {
+      // The server ANSWERED with an error — self-healing retry is already
+      // scheduled by the store; the card says so and counts down. The title
+      // stays neutral (no "check your connection" — their network is fine).
+      return {
+        title: t('converter.conversionFailedServer'),
+        lines: [t('errors.serverTemporarilyUnavailable'), t('errors.retryingAutomatically')],
+      };
+    }
     return {
       title: t('converter.conversionFailed'),
-      lines: [t('errors.unableToFetchRate'), t('converter.checkConnection')],
+      lines: [t('errors.cantReachServer'), t('converter.checkConnection')],
     };
   };
 
@@ -554,25 +613,57 @@ export function Converter() {
         </div>
       )}
 
-      {/* Failure card (legacy alert copy, rendered inline) */}
+      {/* Failure card (I12 redesign: honest kind-aware copy + Try again +
+          the live auto-retry countdown while the store self-heals). */}
       {failure && phase === 'idle' ? (
-        <Card className="mt-5 border-s-4 border-currena-warning!" padding="p-5">
-          <h2 className="mb-2 text-sm font-bold text-currena-warning">⚠️ {failure.title}</h2>
-          {failure.lines.map((line, i) =>
-            line === '' ? (
-              <div key={i} className="h-2" />
-            ) : (
-              <p key={i} className="text-xs text-currena-dark">
-                {line}
-              </p>
-            ),
-          )}
-          {sourceState.snapshot ? (
-            <p className="mt-2 text-xs text-currena-muted">
-              {t('common.lastUpdated')}: {formatRelative(sourceState.snapshot.fetchedAt, numberLocale)}
-            </p>
-          ) : null}
-        </Card>
+        <div role="alert" data-testid="convert-failure" className="slide-down">
+          <Card className="mt-5 border-s-4 border-currena-warning!" padding="p-5">
+            <div className="flex items-start gap-3.5">
+              <span
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-currena-warning/15 text-xl"
+                aria-hidden="true"
+              >
+                ⚠️
+              </span>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-sm font-bold text-currena-warning-deep">{failure.title}</h2>
+                <div className="mt-1 space-y-0.5">
+                  {failure.lines.map((line, i) =>
+                    line === '' ? (
+                      <div key={i} className="h-2" />
+                    ) : (
+                      <p key={i} className="text-xs leading-relaxed text-currena-dark dark:text-slate-300">
+                        {line}
+                      </p>
+                    ),
+                  )}
+                </div>
+                {/* Self-healing countdown — only while the failing source has
+                    nothing to serve (first-visit during an outage window). */}
+                {sourceState.nextRetryAt && !sourceState.snapshot ? (
+                  <RetryCountdown targetMs={sourceState.nextRetryAt} />
+                ) : null}
+                {sourceState.snapshot ? (
+                  <p className="mt-2 text-xs text-currena-muted">
+                    {t('common.lastUpdated')}: {formatRelative(sourceState.snapshot.fetchedAt, numberLocale)}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <Button
+                variant="secondary"
+                onClick={() => void onSubmit()}
+                className="px-5 py-2.5 text-sm"
+                data-testid="convert-retry"
+              >
+                <span className="flex items-center gap-2">
+                  <span aria-hidden="true">↻</span> {t('converter.tryAgain')}
+                </span>
+              </Button>
+            </div>
+          </Card>
+        </div>
       ) : null}
 
       {/* ── LED boards two-up (owner wireframe 2026-09-20) — the SAME two

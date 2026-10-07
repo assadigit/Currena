@@ -30,13 +30,27 @@
  * strings) — staleness is DERIVED from fetchedAt at render time, never stored.
  */
 
-import { FRESH_TTL_SEC, SnapshotSchema } from '@currena/core';
+import { SnapshotSchema, freshTtlSec } from '@currena/core';
 import type { Snapshot, SnapshotSource } from '@currena/core';
 import { useSyncExternalStore } from 'react';
 import { ApiError, fetchRates } from './api';
 import { recordGeneration } from './rate-history';
 
 const SOURCES: readonly SnapshotSource[] = ['tgju', 'frankfurter'];
+
+/**
+ * Self-healing retry ladder (I12, 2026-10-07 incident): when a source
+ * settles in the ERROR state — nothing served, e.g. a first visit during
+ * an API outage window — the store schedules automatic retries with
+ * capped backoff (15 s → 30 s → 60 s, 60 s cap) instead of leaving the
+ * page dead until a manual reload. Any success clears the schedule and
+ * resets the backoff. Steady-state cost while an outage persists: one
+ * request per source per minute — the same order as the LiveRates poll.
+ * Degraded mode (last-good snapshot still being served) intentionally does
+ * NOT auto-retry: existing triggers already cover it (online events,
+ * conversions via ensureSnapshot, the LiveRates poll).
+ */
+const RETRY_DELAYS_MS: readonly number[] = [15_000, 30_000, 60_000];
 
 const lsKey = (source: SnapshotSource): string => `currena:snapshot:${source}`;
 const lsPrevKey = (source: SnapshotSource): string => `currena:prev-snapshot:${source}`;
@@ -49,7 +63,7 @@ export interface SourceState {
   snapshot: Snapshot | null;
   /** The prior DISTINCT snapshot (different fetchedAt) — powers ▲/▼ deltas. */
   previous: Snapshot | null;
-  /** Age of the served snapshot beyond FRESH_TTL_SEC (derived, never stored). */
+  /** Age of the served snapshot beyond its per-source window (derived, never stored). */
   stale: boolean;
   servedFrom: ServedFrom | null;
   /** API notice string (e.g. 'Using cached rates — last updated …'). */
@@ -58,6 +72,8 @@ export interface SourceState {
   error: ApiError | null;
   /** True when a refresh failed but a last-good snapshot keeps being served. */
   degraded: boolean;
+  /** Epoch ms of the next automatic retry — error state only, else null. */
+  nextRetryAt: number | null;
 }
 
 export interface StoreState {
@@ -75,11 +91,12 @@ const idleSource = (): SourceState => ({
   notice: null,
   error: null,
   degraded: false,
+  nextRetryAt: null,
 });
 
-function isStale(snapshot: Snapshot, now = Date.now()): boolean {
+function isStale(source: SnapshotSource, snapshot: Snapshot, now = Date.now()): boolean {
   const fetchedAt = Date.parse(snapshot.fetchedAt);
-  return Number.isNaN(fetchedAt) || now - fetchedAt > FRESH_TTL_SEC * 1000;
+  return Number.isNaN(fetchedAt) || now - fetchedAt > freshTtlSec(source) * 1000;
 }
 
 function readPersisted(source: SnapshotSource): Snapshot | null {
@@ -128,7 +145,7 @@ function readPrevious(source: SnapshotSource): Snapshot | null {
   }
 }
 
-class SnapshotStore {
+export class SnapshotStore {
   private state: StoreState = {
     tgju: idleSource(),
     frankfurter: idleSource(),
@@ -142,6 +159,8 @@ class SnapshotStore {
 
   private readonly listeners = new Set<() => void>();
   private readonly pending = new Map<SnapshotSource, Promise<void>>();
+  private readonly retryTimers = new Map<SnapshotSource, ReturnType<typeof setTimeout>>();
+  private readonly retryAttempts = new Map<SnapshotSource, number>();
   private booted = false;
 
   readonly subscribe = (listener: () => void): (() => void) => {
@@ -163,6 +182,42 @@ class SnapshotStore {
     }
   }
 
+  /** Cancel any scheduled self-healing retry (success / online event). */
+  private clearRetry(source: SnapshotSource): void {
+    const timer = this.retryTimers.get(source);
+    if (timer !== undefined) {
+      clearTimeout(timer);
+      this.retryTimers.delete(source);
+    }
+    this.retryAttempts.delete(source);
+  }
+
+  /** Schedule the next self-healing retry with capped backoff. */
+  private scheduleRetry(source: SnapshotSource): void {
+    // Offline: pointless — the 'online' listener refreshes directly.
+    if (!this.state.online) return;
+    // Replace a pending TIMER (only ever one per source) WITHOUT resetting
+    // the attempt counter — the counter is what escalates the backoff
+    // across consecutive failures.
+    const pendingTimer = this.retryTimers.get(source);
+    if (pendingTimer !== undefined) {
+      clearTimeout(pendingTimer);
+      this.retryTimers.delete(source);
+    }
+    const attempt = this.retryAttempts.get(source) ?? 0;
+    this.retryAttempts.set(source, attempt + 1);
+    const delay = RETRY_DELAYS_MS[Math.min(attempt, RETRY_DELAYS_MS.length - 1)] ?? 60_000;
+    const timer = setTimeout(
+      () => {
+        this.retryTimers.delete(source);
+        void this.refresh(source);
+      },
+      delay,
+    );
+    this.retryTimers.set(source, timer);
+    this.setSource(source, { nextRetryAt: Date.now() + delay });
+  }
+
   /** App boot: hydrate from localStorage, watch connectivity, fetch the stale. */
   boot(): void {
     if (this.booted || typeof window === 'undefined') return;
@@ -180,7 +235,7 @@ class SnapshotStore {
           status: 'ready',
           snapshot,
           previous: usablePrevious,
-          stale: isStale(snapshot),
+          stale: isStale(source, snapshot),
           servedFrom: 'local-store',
         });
       }
@@ -189,6 +244,8 @@ class SnapshotStore {
     window.addEventListener('online', () => {
       this.setOnline(true);
       // Came back online: catch up anything that went stale while offline.
+      // Scheduled retries are redundant now — the refreshes below supersede.
+      for (const source of SOURCES) this.clearRetry(source);
       void this.refresh('tgju');
       void this.refresh('frankfurter');
     });
@@ -218,10 +275,10 @@ class SnapshotStore {
     const goldHealPending =
       current.snapshot !== null &&
       SnapshotStore.isGoldless(source, current.snapshot) &&
-      Date.now() - this.lastGoldlessAttemptAt > FRESH_TTL_SEC * 1000;
+      Date.now() - this.lastGoldlessAttemptAt > freshTtlSec('tgju') * 1000;
     const usable =
       current.snapshot !== null &&
-      !isStale(current.snapshot) &&
+      !isStale(source, current.snapshot) &&
       current.status !== 'error' &&
       !goldHealPending;
     if (usable && !options.force) return Promise.resolve();
@@ -261,6 +318,7 @@ class SnapshotStore {
         const current = this.state[source].snapshot;
         const isNewGeneration = current === null || current.fetchedAt !== response.snapshot.fetchedAt;
         persist(source, response.snapshot);
+        this.clearRetry(source);
         if (isNewGeneration) {
           // Keep the replaced snapshot as the delta baseline (persisted so
           // ▲/▼ chips survive reloads and offline boots).
@@ -271,21 +329,23 @@ class SnapshotStore {
             status: 'ready',
             snapshot: response.snapshot,
             previous: current,
-            stale: response.stale || isStale(response.snapshot),
+            stale: response.stale || isStale(source, response.snapshot),
             servedFrom: response.servedFrom,
             notice: response.notice ?? null,
             error: null,
             degraded: false,
+            nextRetryAt: null,
           });
         } else {
           // Same generation served from cache — keep the existing baseline.
           this.setSource(source, {
             status: 'ready',
-            stale: response.stale || isStale(response.snapshot),
+            stale: response.stale || isStale(source, response.snapshot),
             servedFrom: response.servedFrom,
             notice: response.notice ?? null,
             error: null,
             degraded: false,
+            nextRetryAt: null,
           });
         }
       } catch (err) {
@@ -297,11 +357,17 @@ class SnapshotStore {
         const snapshot = this.state[source].snapshot;
         if (snapshot) {
           // Ladder bottom rung client-side: serve last-good, flagged.
+          // No auto-retry here — see RETRY_DELAYS_MS: degraded mode is
+          // already covered by online events, conversions, the LiveRates
+          // poll. The scheduled retry (if any) is cancelled: the next
+          // natural trigger re-fetches on demand.
+          this.clearRetry(source);
           this.setSource(source, {
             status: 'ready',
             stale: true,
             degraded: true,
             error: apiError,
+            nextRetryAt: null,
           });
         } else {
           this.setSource(source, {
@@ -312,6 +378,8 @@ class SnapshotStore {
             error: apiError,
             degraded: false,
           });
+          // Nothing to serve: self-heal — retry automatically with backoff.
+          this.scheduleRetry(source);
         }
       }
     })();

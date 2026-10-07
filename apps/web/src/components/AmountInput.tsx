@@ -190,7 +190,7 @@ export function AmountInput({ id, value, onChange, currency, invalid, footer }: 
         </span>
       </div>
       {footer ? <div className="mt-3">{footer}</div> : null}
-      {invalid ? <p className="mt-2 text-xs font-semibold text-currena-warning">{t('converter.enterValidAmount')}</p> : null}
+      {invalid ? <p className="mt-2 text-xs font-semibold text-currena-warning-deep">{t('converter.enterValidAmount')}</p> : null}
     </div>
   );
 }

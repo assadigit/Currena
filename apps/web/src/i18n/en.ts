@@ -128,6 +128,10 @@ export const en = {
     copyRate: 'Copy rate',
     rateCopied: 'Copied!',
     popularPairs: 'Popular pairs',
+    /** I12 — the failure card's retry affordance. */
+    tryAgain: 'Try again',
+    /** I12 — neutral title for SERVER-side failures (no "check your connection"). */
+    conversionFailedServer: 'Conversion failed — hang tight',
   },
 
   currencies: {
@@ -473,6 +477,14 @@ export const en = {
     noInternetNoCache:
       'No internet connection and no cached data available. Please connect to internet at least once.',
     pairNotSupported: 'This currency pair is not supported by the rate source.',
+    /** I12 — honest server-vs-network failure copy (2026-10-07 incident:
+     *  telling users to "check your connection" while the API 500'd was
+     *  misleading — their network was fine). */
+    serverTemporarilyUnavailable: 'The rate service is temporarily unavailable.',
+    retryingAutomatically: 'Retrying automatically — this usually resolves within a minute.',
+    cantReachServer: 'Could not reach the rate service.',
+    /** Live countdown under the failure card; {seconds} is localized digits. */
+    retryingIn: 'Retrying in {seconds}s',
   },
 
   /** Insights page — only the route title lives here; the full copy corpus

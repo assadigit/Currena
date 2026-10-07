@@ -688,10 +688,12 @@ export type AppType = typeof app;
  * The ladder used to be pull-only: with no visitors the KV snapshot aged
  * unboundedly, and a failed scrape served the stale-cache rung — the
  * "last updated 3 hours ago" symptom. The cron re-runs the SAME ladder
- * (not a private path): getRates() honors FRESH_TTL_SEC (fresh cache →
- * zero scrapes) and MIN_SCRAPE_INTERVAL_SEC, so the effective TGJU
- * cadence is ~1 scrape / 5 min. Frankfurter is ECB reference data
- * (updates ~once per business day) and only runs on the quarter hour.
+ * (not a private path): getRates() honors the per-source fresh window
+ * (tgju 300s / frankfurter 900s — fresh cache → zero scrapes) and
+ * MIN_SCRAPE_INTERVAL_SEC, so the effective TGJU cadence is ~1 scrape /
+ * 5 min. Frankfurter is ECB reference data (updates ~once per business
+ * day), runs on the quarter hour, and its 15-min fresh window keeps the
+ * fetch-context requests on the fresh-cache rung between cron ticks.
  * Failures are logged (observability) and never rethrow — a thrown
  * handler marks the whole cron invocation failed in the CF dashboard.
  * ------------------------------------------------------------------ */

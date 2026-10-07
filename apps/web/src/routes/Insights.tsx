@@ -590,7 +590,7 @@ export function Insights() {
       {state.kind === 'error' ? (
         <div className="flex flex-col gap-6">
           <div className="rounded-[18px] bg-currena-warning/10 px-5 py-6 text-center ring-1 ring-currena-warning/30">
-            <p className="m-0 text-base font-bold text-currena-warning">⚠️ {copy.ui.loadError}</p>
+            <p className="m-0 text-base font-bold text-currena-warning-deep">⚠️ {copy.ui.loadError}</p>
             <p className="mt-1 mb-3 text-sm text-currena-muted">{state.message}</p>
             <Button variant="cta" onClick={() => setRetryToken((n) => n + 1)}>
               {copy.ui.retry}
@@ -609,7 +609,7 @@ export function Insights() {
               <span className="text-xl" aria-hidden="true">
                 ⚠️
               </span>
-              <p className="m-0 text-sm font-semibold text-currena-warning">
+              <p className="m-0 text-sm font-semibold text-currena-warning-deep">
                 {/* I10: the cache banner leads with the relative age — the
                     exact timestamp is one line above, in the header. */}
                 {interpolate(copy.ui.dataFrom, {

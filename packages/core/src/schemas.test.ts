@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
   CACHE_HARD_TTL_SEC,
-  FRESH_TTL_SEC,
+  FRESH_TTL_SEC_BY_SOURCE,
   MIN_SCRAPE_INTERVAL_SEC,
+  freshTtlSec,
   GoldQuoteSchema,
   RateSchema,
   RatesErrorSchema,
@@ -240,7 +241,13 @@ describe('SourceConfigSchema', () => {
 
 describe('timing constants (mission §5/§6 ladder)', () => {
   it('are the mission-mandated values', () => {
-    expect(FRESH_TTL_SEC).toBe(300);
+    // Per-source freshness (I12): tgju keeps the 5-min open-market window;
+    // frankfurter gets 15 min aligned with the quarter-hour cron refresh
+    // (2026-10-07 incident — closes the fetch-context stale windows).
+    expect(FRESH_TTL_SEC_BY_SOURCE.tgju).toBe(300);
+    expect(FRESH_TTL_SEC_BY_SOURCE.frankfurter).toBe(900);
+    expect(freshTtlSec('tgju')).toBe(300);
+    expect(freshTtlSec('frankfurter')).toBe(900);
     expect(MIN_SCRAPE_INTERVAL_SEC).toBe(60);
     expect(CACHE_HARD_TTL_SEC).toBe(7 * 24 * 3600);
     expect(CACHE_HARD_TTL_SEC).toBe(604800);

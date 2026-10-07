@@ -32,7 +32,14 @@ const BUDGETS = [
   // money page answering "what's the dollar?" without a conversion is the
   // highest-value entry growth since launch. Justified in CHANGELOG
   // §2026-10-08 (I11).
-  { entry: true, raw: 293_000, gz: 88_000, label: 'entry chunk (converter — the money page)' },
+  // I12 bump (292.57/87.88 → 295.08/89.37): the self-healing retry ladder
+  // in snapshot-store (15/30/60 s backoff + nextRetryAt state) and the
+  // honest failure card on the converter (kind-aware copy, Try again,
+  // live countdown, error→ready auto-completion) + 11 copy strings × 2
+  // locales. Gzip +1.49 kB for first-visit-outage recovery on the money
+  // page — a 2026-10-07-incident-driven resilience feature, not bloat.
+  // Justified in CHANGELOG §2026-10-08 (I12).
+  { entry: true, raw: 296_000, gz: 89_500, label: 'entry chunk (converter — the money page)' },
   // I8 bump (109.36/32.91 → 117.27/34.83): the card-grid filter toolbar
   // (FilterBar + section/jumpnav visibility + WhatChanged focus-card rows +
   // 26 copy strings × 2 locales). Justified in CHANGELOG §2026-10-08.

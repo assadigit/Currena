@@ -168,10 +168,11 @@ describe('renderAdminPage', () => {
   });
 
   it('renders the runtime-config card with the real ladder constants', async () => {
-    const { FRESH_TTL_SEC, MIN_SCRAPE_INTERVAL_SEC, CACHE_HARD_TTL_SEC } = await import('@currena/core');
+    const { freshTtlSec, MIN_SCRAPE_INTERVAL_SEC, CACHE_HARD_TTL_SEC } = await import('@currena/core');
     const html = renderAdminPage(pageData());
     expect(html).toContain('Runtime config');
-    expect(html).toContain(`<b>${FRESH_TTL_SEC}s</b>`);
+    // Per-source fresh window (I12): tgju 300s / frankfurter 900s on one line.
+    expect(html).toContain(`<b>${freshTtlSec('tgju')}s / ${freshTtlSec('frankfurter')}s</b>`);
     expect(html).toContain(`<b>${MIN_SCRAPE_INTERVAL_SEC}s</b>`);
     expect(html).toContain(`<b>${CACHE_HARD_TTL_SEC / 86_400}d</b>`);
     expect(html).toContain('never fall back to Frankfurter');

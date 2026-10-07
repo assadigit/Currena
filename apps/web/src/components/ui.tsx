@@ -160,7 +160,7 @@ export function StaleBanner({ fetchedAt, notice }: StaleBannerProps) {
         ⚠️
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-[0.95rem] font-semibold text-currena-warning">{t('converter.usingCachedRates')}</p>
+        <p className="text-[0.95rem] font-semibold text-currena-warning-deep">{t('converter.usingCachedRates')}</p>
         <p className="text-xs opacity-80">
           {t('common.lastUpdated')}: {formatRelative(fetchedAt, numberLocale)}
         </p>

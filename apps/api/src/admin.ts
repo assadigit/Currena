@@ -12,8 +12,8 @@
 
 import {
   CACHE_HARD_TTL_SEC,
-  FRESH_TTL_SEC,
   MIN_SCRAPE_INTERVAL_SEC,
+  freshTtlSec,
 } from '@currena/core';
 import type { InsightsStatus, Snapshot } from '@currena/core';
 import type { StatusReport } from './rates-service';
@@ -294,7 +294,7 @@ export function renderAdminPage(data: AdminPageData): string {
   <section class="card">
     <h2>Runtime config <span class="rel">(fallback ladder — mission §5/§6)</span></h2>
     <div class="config">
-      <div class="kv"><span>fresh window</span><b>${FRESH_TTL_SEC}s</b><span><i>serve from cache, zero network</i></span></div>
+      <div class="kv"><span>fresh window (tgju / frankfurter)</span><b>${freshTtlSec('tgju')}s / ${freshTtlSec('frankfurter')}s</b><span><i>serve from cache, zero network — per source (frankfurter aligned with the quarter-hour cron)</i></span></div>
       <div class="kv"><span>min scrape interval</span><b>${MIN_SCRAPE_INTERVAL_SEC}s</b><span><i>between live attempts</i></span></div>
       <div class="kv"><span>cache hard TTL</span><b>${CACHE_HARD_TTL_SEC / 86_400}d</b><span><i>stale banner until</i></span></div>
       <div class="kv"><span>scrape lock TTL</span><b>${LOCK_TTL_SEC}s</b><span><i>best-effort single-flight</i></span></div>

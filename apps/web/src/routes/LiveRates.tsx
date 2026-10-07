@@ -424,7 +424,7 @@ export function LiveRates() {
               ⚠️
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-[0.95rem] font-semibold text-currena-warning">{t('converter.usingCachedRates')}</p>
+              <p className="text-[0.95rem] font-semibold text-currena-warning-deep">{t('converter.usingCachedRates')}</p>
               <p className="text-xs text-currena-muted">
                 {t('common.lastUpdated')}: {formatDate(snapshot.fetchedAt, numberLocale, { withTime: true })}
               </p>

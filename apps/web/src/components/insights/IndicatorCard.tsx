@@ -120,7 +120,7 @@ function CardHistory({
     return <p className="mt-2 text-sm text-currena-muted">{copy.ui.historyLoading}</p>;
   }
   if (state.kind === 'error') {
-    return <p className="mt-2 text-sm text-currena-warning">{copy.ui.historyError}</p>;
+    return <p className="mt-2 text-sm text-currena-warning-deep">{copy.ui.historyError}</p>;
   }
   if (state.kind === 'none') {
     return <p className="mt-2 text-sm text-currena-muted">{copy.ui.noHistory}</p>;

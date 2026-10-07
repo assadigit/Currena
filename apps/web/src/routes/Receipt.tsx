@@ -762,7 +762,7 @@ export function Receipt() {
             <Button variant="secondary" className="py-3" onClick={() => void onShare()}>
               📤 {t('common.share')}
             </Button>
-            <Button variant="secondary" className="col-span-full py-3 !text-currena-warning" onClick={clearAll}>
+            <Button variant="secondary" className="col-span-full py-3 !text-currena-warning-deep" onClick={clearAll}>
               🗑️ {t('common.clear')}
             </Button>
           </div>

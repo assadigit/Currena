@@ -364,10 +364,35 @@ Timeline + diagnosis (evidence-corrected over the session):
   promises the stale-cache rung. After the next deploy the same incident
   serves "Using cached rates — last updated N minutes ago" with HTTP 200.
 
+### Second measurement (I12 session, 2026-10-07 20:35–20:46 UTC) — the
+### frankfurter windows are ~10.5 min per 15 (70% of all minutes)
+
+With the I6 Worker still live (fix undeployed), the incident was probed
+end-to-end through a full cycle. The frankfurter snapshot fetched by the
+quarter-hour cron at 20:30:30 crossed FRESH_TTL (5 min) at **20:35:30**;
+every probe from 20:35:31 to **20:46:03** returned 500 (63 consecutive
+failures) until the 20:45:00 cron refresh landed (~60 s KV propagation
+lag). The next cron refresh for frankfurter would only come at 21:00 —
+so the pattern is **TTL expiry → next quarter-hour + ~1 min =
+~10.5 minutes of hard 500s per 15-minute cycle** for international
+pairs, from affected colos. tgju stayed 200 throughout (the every-minute
+cron keeps its snapshot inside the 5-min window — its stale windows are
+seconds, not minutes). `/api/status` confirmed the diagnosis live:
+`frankfurter.cache.fresh: false, ageSec: 750` while `tgju` fresh.
+
+**Root fix shipped locally (I12, undeployed)**: frankfurter's fresh
+window is now 15 min (`FRESH_TTL_SEC_BY_SOURCE` in @currena/core —
+tgju keeps 300 s), aligned with the quarter-hour cron cadence, so
+fetch-context requests stay on the fresh-cache rung between cron ticks
+REGARDLESS of KV write health — the window ceases to exist at the root.
+Combined with the I11 degradation fix, the incident's user-visible
+effect collapses to: worst case, a "Retrying automatically" card in the
+SPA (self-healing 15/30/60 s ladder) and honest stale banners.
+
 Owner follow-ups (beyond the deploy):
 
-1. **Deploy the I11 fix** — it converts this entire incident class into
-   the designed stale-cache degradation.
+1. **Deploy the I11 + I12 fixes together** — they close the 500s AND the
+   windows that trigger them.
 2. **Capture the real error**: during a stale window (~TTL expiry, check
    `/api/status` for `fresh: false`), run
    `pnpm --filter @currena/api exec wrangler tail` and read the

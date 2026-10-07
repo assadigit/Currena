@@ -87,7 +87,7 @@ blocks, stale cron going unnoticed (now visible on /admin; push notification sti
 | 26 | ✅ | BEST-PRACTICES | CSV: total = sum of rounded rows (display consistency) + formula-injection guard (`'` prefix on `=+-@` notes) | SWOT W18 |
 | 27 | ✅ | BEST-PRACTICES | i18n: replace ~15 hardcoded English strings + `toFixed(2)` with dictionary keys + `formatNumber` in Receipt/Batch export paths | SWOT W16 |
 | 28 | ✅ | BEST-PRACTICES | Dead code: remove `readHistory`, `priceScanner` dict block, pointless `useMemo`; sync `SCRAPER_VERSION` | SWOT W21 |
-| 29 | ☐ | DX | First web tests: `history.ts`, `rate-history.ts`, `recent-pairs.ts`, `router.ts`, `display.ts`, meta-schema parity test | SWOT W9/W23 |
+| 29 | 🔄 | DX | First web tests: `history.ts`, `rate-history.ts`, `recent-pairs.ts`, `router.ts`, `display.ts`, meta-schema parity test | SWOT W9/W23 — `history.ts`/`router.ts` covered; **snapshot-store.ts covered by the I12 wave** (first store tests: boot/freshness/retry-ladder/degraded/ensureSnapshot, 8 tests); rate-history + recent-pairs + display + parity still open |
 | 30 | ☐ | BEST-PRACTICES | `splitEvenly` → core (+ tests) next to settle | SWOT O2 |
 | 31 | ✅ | BEST-PRACTICES | Settle: use group currency for settlement records (stop hardcoding `'IRR'`) | SWOT T8 |
 | 32 | ☐ | BEST-PRACTICES | `parseBatchLines` bounds (line/char caps) + calc parser: U+00A0/newline whitespace, unary plus, typed `RangeError` guard | SWOT W24 |

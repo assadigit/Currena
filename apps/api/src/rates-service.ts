@@ -1,7 +1,8 @@
 /**
  * RatesService — the fallback ladder (mission §5/§6, verbatim semantics):
  *
- *  1. Cached snapshot exists && age < FRESH_TTL_SEC (300s)
+ *  1. Cached snapshot exists && age < freshTtlSec(source) (tgju 300s /
+ *     frankfurter 900s — per-source, see @currena/core)
  *     → serve {snapshot, stale: false, servedFrom: 'cache'} — ZERO network.
  *  2. Else, if lock free && status.lastScrapeAt older than
  *     MIN_SCRAPE_INTERVAL_SEC (60s) → best-effort single-flight lock
@@ -31,9 +32,9 @@
 
 import {
   CACHE_HARD_TTL_SEC,
-  FRESH_TTL_SEC,
   MIN_SCRAPE_INTERVAL_SEC,
   SnapshotSchema,
+  freshTtlSec,
 } from '@currena/core';
 import type { RatesResponse, Snapshot, SnapshotSource } from '@currena/core';
 import { errorToCodeMessage, type RateStore, type SourceStatus } from '@currena/scraper';
@@ -142,7 +143,7 @@ export class RatesService {
     } catch (readErr) {
       console.warn(`[rates] snapshot read failed for ${source} — continuing without cache:`, readErr);
     }
-    if (!options.force && cached && ageSec(cached.fetchedAt, this.now()) < FRESH_TTL_SEC) {
+    if (!options.force && cached && ageSec(cached.fetchedAt, this.now()) < freshTtlSec(source)) {
       return { snapshot: cached, stale: false, servedFrom: 'cache' };
     }
 
@@ -272,7 +273,7 @@ export class RatesService {
             present: snapshot !== undefined,
             ...(snapshot ? { fetchedAt: snapshot.fetchedAt } : {}),
             ...(cacheAgeSec !== undefined ? { ageSec: Math.round(cacheAgeSec) } : {}),
-            fresh: cacheAgeSec !== undefined && cacheAgeSec < FRESH_TTL_SEC,
+            fresh: cacheAgeSec !== undefined && cacheAgeSec < freshTtlSec(source),
           },
         };
       }),
