@@ -5,6 +5,55 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-07] — BACKLOG Wave 6 closed: CI gate, chart tooltip, print, share links, ingest alerting
+
+Owner direction ("Proceed based on your phases") → the ranked Wave 6 backlog
+from the I6 session, completed end-to-end. Tests 521 → **528 green**; every
+commit CI-verified on GitHub (the new gate itself, green on each push).
+
+### Added
+- **CI workflow** (`.github/workflows/ci.yml`, BACKLOG #47): every push to
+  main + PRs runs typecheck, the full test suite, the SPA build, and a
+  **bundle-budget gate** (`scripts/check-bundle-budget.mjs`) — entry chunk
+  ≤ 289 kB / 88 kB gz, Insights lazy chunk ≤ 110 / 33; budgets are the
+  documented numbers and bumps require a changelog justification.
+- **Chart hover/focus reading** (#48, audit F16): pointermove tracks the
+  nearest point on the 10-year chart (dashed guide line + highlighted dot +
+  date/value tooltip — Jalali + Persian digits in fa); the chart is
+  keyboard-focusable with ←/→/Home/End stepping; `touch-pan-y` keeps mobile
+  scrolling intact; the SR data table remains the text path.
+- **Per-indicator share links** (#50, spec §10 "later"): the hash router is
+  now query-tolerant (`parseRouteAndQuery`, pure + 7 new unit tests);
+  `#/insights?card=<id>` opens exactly that card and scrolls to it once per
+  mount (single-open discipline on phones; unknown ids ignored); each
+  expanded card carries a "Share this card" pill (en / «اشتراک این کارت»
+  fa) that copies the deep URL with inline "Link copied" feedback.
+
+### Changed
+- **Print stylesheet** (#49, audit F16): `@media print` in index.css — dark
+  mode prints the light palette, header chrome/nav pills hidden (logo kept),
+  cards/sections/figures never break across pages, external links spell out
+  their URL, SVG/LED colors kept exact. Verified via PDF export + VLM
+  review.
+- **Jump targets land below the fixed header**: Insights sections + the card
+  anchor get `scroll-mt-24` (the About route's existing convention) —
+  JumpNav jumps and share deep links no longer hide their target's title
+  behind the navbar.
+- **Failed-ingest alerting** (#46): a `if: failure()` Telegram step in
+  `insights-ingest.yml` — posts run/sha/URL to the owner when
+  `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` secrets exist, a clean no-op until
+  then (red run + the 36 h /admin staleness pill remain the standing
+  signals).
+
+### Verified
+- Local: every feature agent-browser-verified en+fa × desktop/375px (tooltip
+  values + keyboard stepping, deep links desktop + mobile single-open,
+  clipboard flow with stubbed API, print PDF URL spelling, zero console
+  errors, no overflow). CI: **5/5 runs green** on GitHub.
+- Bundle: entry 288.76 kB / 86.95 gz (≤ budgets); Insights chunk
+  109.36 kB / 32.91 gz after tooltip + share (inside the 110/33 gate —
+  growth justified above).
+
 ## [2026-10-07] — Insights UI/UX pass (Phase I6) + completeness sweep (I6 backtest re-run + I7 hardening)
 
 Owner agenda ("Improving UI/UX of the Insights page, and making sure nothing is
