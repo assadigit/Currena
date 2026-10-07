@@ -5,6 +5,71 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-08] — I10 personal & portable wave: watchlist pins, .ics export, reading progress, relative freshness
+
+Third round of the day, autonomously scoped after a clean QA sweep (production
++ local all green; API 30 readings / 0 unavailable / 14 events). Four features
+close the loop on "a page readers return to": personalisation, portability and
+orientation. Tests 545 → **555 green** (+10: 4 pinned-storage, 6 RFC 5545).
+Presentation-layer only — no scoring, thresholds, sources, KV keys or API
+changes. Production still serves the I6 Worker `954f0034` (deploy pending,
+owner credentials).
+
+### Added
+- **Personal watchlist ("My watchlist" / «دیده‌بان من»)**: every card's
+  expanded action row gains an aria-pressed pin pill (☆/★, house pill DNA);
+  pinned cards MOVE into a dedicated section above the groups — "stay on
+  top" — with its own warning-count line (the pinned set's own status,
+  group headers keep describing full data). Persisted in localStorage
+  (`currena.insights.pinned.v1`; `parsePinnedIds` degrades any malformed
+  value to "nothing pinned", unknown ids drop silently) and synced across
+  tabs via the `storage` event. The collapsed card shows a ★ badge (in the
+  expand button's accessible name via sr-only text) so pin state reads
+  without expanding. Play-nice with everything that locates cards by DOM
+  id: share deep links (`?card=` opens + scrolls to a pinned card),
+  WhatChanged rows, focusCard's filter-reset (a hidden pinned card is
+  found after the filter clears), JumpNav gains the watchlist pill, the
+  section hides under the no-match state. Pure helpers unit-tested.
+- **Calendar export (.ics)**: the Coming up header gains a "Download
+  calendar (.ics)" pill exporting exactly the events listed (upcoming,
+  localized titles). `buildInsightsIcs` in `components/insights/ics.ts` is
+  a pure RFC 5545 builder — CRLF endings, TEXT escaping (ASCII `;` `,` `\`
+  and newlines; the Persian ؛/، code points correctly untouched), octet-safe
+  75-octet folding (never splits a UTF-8 sequence — Persian titles are the
+  point), all-day `DTSTART;VALUE=DATE` with the exclusive `DTEND` (+1 day,
+  month-boundary verified), stable `<event>-<date>@currena.ir` UIDs so
+  re-imports update instead of duplicating, deterministic `DTSTAMP` (now
+  passed in tests). Downloads via the shared `lib/download.ts`.
+- **Shared download helper** (BACKLOG #24): `downloadBlob` extracted from
+  its two route-local copies (Receipt PNG/XLSX, BatchConverter CSV) into
+  `apps/web/src/lib/download.ts`; the Insights export is its third consumer.
+- **Reading progress bar**: a 3px `role="progressbar"` pinned above the app
+  header (z-1001), filling from the inline-start edge in both directions
+  (RTL grows from the right — native block flow). rAF-throttled passive
+  listeners (the JumpNav scrollspy pattern); `aria-valuemin/max/now` keep it
+  honest; hidden on paper.
+- **Relative freshness**: the header's generated line now reads
+  "Updated {ago} · {exact datetime}" ("3 hours ago", «۳ ساعت پیش») via the
+  existing core `formatRelative` (zero entry-bundle growth — it was already
+  there); the from-cache banner leads with the relative age too (the exact
+  timestamp stays one line above).
+
+### Fixed
+- **Persian-digit sweep (fa prose numbers)**: section headers, group headers
+  and the days-away counter rendered Latin digits («3 از 6 شاخص», «21 روز
+  دیگر») while values, charts and chips used Persian digits. All prose
+  numbers now render through `formatNumber(numberLocale)` — «۳ از ۶ شاخص
+  در وضعیت هشدار», «۲۱ روز دیگر», the excluded-note count, and the new
+  watchlist count line. The LED seven-segment values stay Latin by the
+  documented Wave-5 #46 decision.
+
+### Budget
+- Insights chunk 121.30/35.85 → **128.36/37.78 kB/gz** — gate consciously
+  bumped 125/37 → 132/39 with this entry as justification (watchlist UI +
+  section + persistence, ics builder, progress bar, digit sweep, 9 new copy
+  strings × 2 locales). Entry untouched: 288.80/86.98 vs 289/88.
+  Precache 61 entries.
+
 ## [2026-10-08] — I9 feedback & analytical-zoom wave: chart ranges, chip counts, summary jumps, "/"-shortcut
 
 Second stable-state round of the day: re-verified production + local standing

@@ -37,11 +37,12 @@ Insights explains the state of global and Australian finance through about 30 in
 3. **What changed this week:** indicators that changed state, the five biggest moves, events in the next 7 days.
 4. **Coming up:** the next key dates (RBA, Australian CPI, US Fed). Anything within 7 days is highlighted.
 5. **Card filter toolbar (I8, 2026-10-08):** status chips (All / Warning / Normal / Context, each with its live count — I9) + a text search over names and tickers, directly before the Global section; "/" focuses the search (I9). A view tool only — it hides cards, groups, sections and jump pills that have nothing to show, but every warning-count line keeps describing the full snapshot; hidden on paper.
-6. **Global:** four groups (Rates and credit; Currencies; Metals, crypto and hard assets; Stocks, growth and liquidity).
-7. **Australia:** three groups (Interest and inflation; Currency and trade; Jobs and housing).
-8. **About the data and full disclaimer:** sources, update schedule, how "warning" is decided.
+6. **My watchlist (I10, 2026-10-08):** pinned cards MOVE here from their groups — "stay on top" — in snapshot order, with the watchlist's own warning-count line. Pin/unpin is an aria-pressed pill in each card's expanded action row (☆/★); the collapsed card carries a ★ badge. Persisted in localStorage (`currena.insights.pinned.v1`) and synced across tabs. Same view-tool semantics as the filter: group count lines keep describing full data; the section hides when empty or fully filtered out; the jump row gains the watchlist pill while it exists.
+7. **Global:** four groups (Rates and credit; Currencies; Metals, crypto and hard assets; Stocks, growth and liquidity).
+8. **Australia:** three groups (Interest and inflation; Currency and trade; Jobs and housing).
+9. **About the data and full disclaimer:** sources, update schedule, how "warning" is decided.
 
-Each section header shows a small status line ("2 of 6 in warning"). Add a row of jump links to the sections; it scrolls sideways on mobile and must mirror correctly in Farsi. Global comes before Australia (owner decision, Gate I4 review 2026-10-07 — the original "reader is in Australia" ordering was reversed: the global picture sets the frame, then the local section lands). The summary block's two lines follow the same order.
+Each section header shows a small status line ("2 of 6 in warning" — locale digits, I10). Add a row of jump links to the sections; it scrolls sideways on mobile and must mirror correctly in Farsi. Global comes before Australia (owner decision, Gate I4 review 2026-10-07 — the original "reader is in Australia" ordering was reversed: the global picture sets the frame, then the local section lands). The summary block's two lines follow the same order. A thin reading-progress bar (I10) sits above the app header on the long page; the generated line under the title leads with the relative freshness ("Updated 3 hours ago · {exact}", I10). The Coming-up header carries a "Download calendar (.ics)" export of exactly the listed events (I10 — RFC 5545, localized titles, stable UIDs).
 
 ## 5. Indicator card
 
@@ -61,6 +62,7 @@ Each section header shows a small status line ("2 of 6 in warning"). Add a row o
 - What it can't tell you
 - What this means for you (general information, Australia-focused)
 - 10-year chart with a data-table alternative for screen readers. A 10y / 5y / 1y range control (I9, 2026-10-08) zooms the chart's visible window — anchored on the series' last point, ranges that cannot show two points disable themselves; the 10-year position bar and percentiles never change with the range.
+- Action row (I10, 2026-10-08): linked source pill, then the watchlist pin (aria-pressed, ☆/★) and the share-this-card pills — both print-hidden (paper keeps the spelled-out source URL).
 
 Several cards can be open at once on desktop. On mobile, opening one may close the previous one.
 

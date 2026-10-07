@@ -82,7 +82,7 @@ blocks, stale cron going unnoticed (now visible on /admin; push notification sti
 | # | Status | Tag | Item | Origin |
 |---|--------|-----|------|--------|
 | 23 | ✅ | BEST-PRACTICES | Move `sourceForPair` to `@currena/core` (+ tests); dedupe 5 copies in web routes | SWOT W10 |
-| 24 | ☐ | BEST-PRACTICES | Extract `downloadBlob` to `apps/web/src/lib/`; dedupe 3 copies | SWOT W22 |
+| 24 | ✅ | BEST-PRACTICES | Extract `downloadBlob` to `apps/web/src/lib/`; dedupe 3 copies | SWOT W22 — done in the I10 wave (lib/download.ts; Receipt + BatchConverter deduped; the Insights .ics export is the third consumer) |
 | 25 | ✅ | BEST-PRACTICES | `roundSignificant`: symmetric negative-tie rounding + test | SWOT W19 |
 | 26 | ✅ | BEST-PRACTICES | CSV: total = sum of rounded rows (display consistency) + formula-injection guard (`'` prefix on `=+-@` notes) | SWOT W18 |
 | 27 | ✅ | BEST-PRACTICES | i18n: replace ~15 hardcoded English strings + `toFixed(2)` with dictionary keys + `formatNumber` in Receipt/Batch export paths | SWOT W16 |
