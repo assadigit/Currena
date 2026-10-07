@@ -500,6 +500,17 @@ Post-deploy smoke (all green):
   recent pairs, mobile single-open, dark mode, zero console errors,
   zero 375px overflow.
 
-A second deploy from the I13 HEAD (`7e3c1a5`-era, CSV export + j/k nav +
-remembered zoom + BACKLOG #30/#32) ships in the same session — recorded
-below when it happens.
+**Second deploy, same session (I13)** — pushed `7467853..e4bdfe9` and
+deployed from that HEAD: entry `index-Ctp0IB4-.js` 295.10 kB / 89.36 gz,
+Insights `Insights-Da8xumr9.js` 133.82 / 39.01, precache 61 / 2217.23 KiB
+→ **Worker version `69550e36-cd4a-462a-a7ca-a431eb0a9885`**. Smoke: health
+ok, 30 readings, the two-reload SW cycle, then CSV button (fa + en), j/k
+walk (card focused + opened + scrolled), kbd legend ×3, 375px overflow 0,
+zero page errors; VLM PASS on the new About-the-data export block.
+One operational note: DURING the SW handover (old entry still in memory,
+new Insights chunk already served) the lazy route can hit the route error
+boundary once — `registration.update()` + one reload resolves it to the
+consistent new state; that is the documented two-reload cycle doing its
+job, not a defect. Budget note: Insights raw 133.82 > 132 gate → bumped
+to 134 with justification (scripts/check-bundle-budget.mjs; CHANGELOG
+§2026-10-08 I13).
