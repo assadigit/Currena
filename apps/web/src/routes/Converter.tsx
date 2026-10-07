@@ -39,6 +39,7 @@ import { AmountInput, parseInputAmount } from '../components/AmountInput';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { LedGoldBoard } from '../components/LedGoldBoard';
 import { LedRateBoard } from '../components/LedRateBoard';
+import { LiveRateLine } from '../components/LiveRateLine';
 import { ResultPopup } from '../components/ResultPopup';
 import type { ConversionView } from '../components/ResultPopup';
 import { Button, Card, LoaderDots, OfflineBanner, StaleBanner } from '../components/ui';
@@ -79,6 +80,17 @@ const TOOLS: readonly { path: RoutePath; emoji: string; labelKey: TranslationKey
   { path: '/splitter', emoji: '💰', labelKey: 'nav.expenseSplitter' },
   { path: '/settle', emoji: '👥', labelKey: 'nav.splitSettle' },
   { path: '/history', emoji: '📜', labelKey: 'nav.history' },
+];
+
+/** I11 — first-run pair suggestions until the first conversion exists.
+ *  All IRR-side (TGJU open-market — the app's core use case), matching the
+ *  default USD→IRR direction so the chips read as "this is what people do". */
+const POPULAR_PAIRS: readonly RecentPair[] = [
+  { from: 'USD', to: 'IRR' },
+  { from: 'EUR', to: 'IRR' },
+  { from: 'GBP', to: 'IRR' },
+  { from: 'AED', to: 'IRR' },
+  { from: 'TRY', to: 'IRR' },
 ];
 
 export function Converter() {
@@ -389,7 +401,7 @@ export function Converter() {
                         setAmountInvalid(false);
                       }}
                       aria-pressed={active}
-                      className={`min-h-[34px] cursor-pointer rounded-full border px-3 py-1 text-[0.8rem] font-bold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
+                      className={`min-h-[34px] cursor-pointer rounded-full border px-3 py-1 text-[0.8rem] font-bold transition-all duration-300 motion-safe:hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
                         active
                           ? 'amount-chip-active border-transparent shadow-[0_6px_18px_rgba(240,180,41,0.45)] dark:shadow-[0_6px_18px_rgba(102,126,234,0.4)]'
                           : 'border-[#EBD48A] bg-white text-currena-dark hover:border-[#E8B923] hover:shadow-[0_4px_12px_rgba(240,180,41,0.18)] dark:border-white/10 dark:bg-[#222C3B] dark:hover:border-currena-blue/40 dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)]'
@@ -446,6 +458,18 @@ export function Converter() {
             <bdi>{toName}</bdi>
           </p>
 
+          {/* I11 — the pair's live rate, always on (previously only visible
+              inside the result popup). Local math over the booted snapshot;
+              hidden for same-currency pairs, unresolvable pairs and while a
+              custom rate overrides the market. */}
+          <LiveRateLine
+            from={from}
+            to={to}
+            snapshot={sourceState.snapshot}
+            stale={showStaleBanner}
+            hidden={manualOpen}
+          />
+
           {/* 3 — Custom rate (legacy collapsible) */}
           <div className="mb-4 mt-4">
             <button
@@ -482,16 +506,18 @@ export function Converter() {
         </form>
       </Card>
 
-      {/* Recent pairs — one-tap recall. Lives BELOW the converter now: the
+      {/* Pair chips — one-tap recall. Lives BELOW the converter now: the
           amount field owns the first viewport (it used to push the input
-          below the fold on phones). Hidden until the first conversion. */}
-      {recentPairs.length > 0 ? (
-        <div className="mt-5">
+          below the fold on phones). First-run visitors (no conversions yet)
+          get POPULAR pairs instead of an empty section; after the first
+          conversion their own recents take over. */}
+      {(recentPairs.length > 0 || POPULAR_PAIRS.length > 0) && (
+        <div className="no-print mt-5">
           <p className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-currena-muted">
-            ⚡ {t('converter.recentPairs')}
+            {recentPairs.length > 0 ? `⚡ ${t('converter.recentPairs')}` : `🔥 ${t('converter.popularPairs')}`}
           </p>
           <div className="flex flex-wrap gap-2">
-            {recentPairs.map((pair) => {
+            {(recentPairs.length > 0 ? recentPairs : POPULAR_PAIRS).map((pair) => {
               const active = pair.from === from && pair.to === to;
               return (
                 <button
@@ -502,7 +528,7 @@ export function Converter() {
                     setTo(pair.to);
                   }}
                   aria-pressed={active}
-                  className={`inline-flex min-h-[38px] cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
+                  className={`inline-flex min-h-[38px] cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300 motion-safe:hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
                     active
                       ? 'border-currena-blue bg-currena-blue/10 text-currena-blue shadow-[0_4px_12px_rgba(74,144,226,0.25)]'
                       : 'border-black/10 bg-currena-soft text-currena-dark hover:border-currena-blue/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:border-white/10'
@@ -526,7 +552,7 @@ export function Converter() {
             })}
           </div>
         </div>
-      ) : null}
+      )}
 
       {/* Failure card (legacy alert copy, rendered inline) */}
       {failure && phase === 'idle' ? (
@@ -571,7 +597,7 @@ export function Converter() {
       {/* ── Quick tools (owner wireframe 2026-09-20) — the former sidebar
           rail's tool grid as a FULL-WIDTH homepage section: 2-up on phones,
           3-up from sm, all six on one line from lg. ── */}
-      <section className="mt-8 lg:mt-12" aria-label={t('converter.quickTools')}>
+      <section className="no-print mt-8 lg:mt-12" aria-label={t('converter.quickTools')}>
         <h2 className="mb-4 text-base font-bold text-currena-dark">
           ⚡ {t('converter.quickTools')}
         </h2>

@@ -24,7 +24,15 @@ const kB = (n) => `${(n / 1000).toFixed(2)} kB`;
 
 /** [file pattern, raw budget bytes, gzip budget bytes, label] */
 const BUDGETS = [
-  { entry: true, raw: 289_000, gz: 88_000, label: 'entry chunk (converter — the money page)' },
+  // I11 bump (288.80/86.98 → 292.57/87.88): the always-on LiveRateLine on
+  // the converter homepage (rate + source badge + freshness + RateDeltaChip
+  // + Sparkline reuse + copy-to-clipboard) and the first-run popular-pairs
+  // row. Raw +3.77 kB but gzip-NEUTRAL (87.88 vs 88.00 budget — the new
+  // code is highly compressible; users download ~zero extra bytes). The
+  // money page answering "what's the dollar?" without a conversion is the
+  // highest-value entry growth since launch. Justified in CHANGELOG
+  // §2026-10-08 (I11).
+  { entry: true, raw: 293_000, gz: 88_000, label: 'entry chunk (converter — the money page)' },
   // I8 bump (109.36/32.91 → 117.27/34.83): the card-grid filter toolbar
   // (FilterBar + section/jumpnav visibility + WhatChanged focus-card rows +
   // 26 copy strings × 2 locales). Justified in CHANGELOG §2026-10-08.

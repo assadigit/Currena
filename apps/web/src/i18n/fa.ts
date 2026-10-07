@@ -123,6 +123,12 @@ export const fa: Dictionary = {
     recentPairs: 'جفت‌های اخیر',
     boardAtAGlance: 'تومان ایران — در یک نگاه',
     quickTools: 'ابزارهای سریع',
+    /** I11 — نرخ لحظه‌ای همیشه‌نمایان زیر ردیف ارزها. */
+    liveRate: 'نرخ لحظه‌ای',
+    updatedAgo: 'به‌روزرسانی {ago}',
+    copyRate: 'کپی نرخ',
+    rateCopied: 'کپی شد!',
+    popularPairs: 'جفت‌ارزهای پرطرفدار',
   },
 
   currencies: {

@@ -122,6 +122,12 @@ export const en = {
     recentPairs: 'Recent pairs',
     boardAtAGlance: 'Iranian Toman — at a glance',
     quickTools: 'Quick tools',
+    /** I11 — the always-on rate line under the currency row. */
+    liveRate: 'Live rate',
+    updatedAgo: 'Updated {ago}',
+    copyRate: 'Copy rate',
+    rateCopied: 'Copied!',
+    popularPairs: 'Popular pairs',
   },
 
   currencies: {
