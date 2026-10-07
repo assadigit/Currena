@@ -33,12 +33,15 @@ const TONE_DOT: Record<SummaryTone, string> = {
   coral: 'bg-currena-coral',
 };
 
+/* I6 audit F1/F4: the label WORDS are small text — ink-grade -deep tokens
+ * (light: ≥4.5:1 on the page bg; dark: remapped bright hues). The dot is
+ * decoration (aria-hidden) and keeps the bright accent. */
 const TONE_TEXT: Record<SummaryTone, string> = {
-  success: 'text-currena-success',
-  info: 'text-currena-blue',
+  success: 'text-currena-success-deep',
+  info: 'text-currena-blue-deep',
   muted: 'text-currena-muted',
-  danger: 'text-currena-warning',
-  coral: 'text-currena-coral',
+  danger: 'text-currena-warning-deep',
+  coral: 'text-currena-coral-deep',
 };
 
 function SummaryLineRow({

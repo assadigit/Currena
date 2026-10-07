@@ -118,9 +118,9 @@ function SectionBlock({
           return (
             <div key={group}>
               <header className="mb-2.5 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                <h3 className="m-0 text-[0.9rem] font-bold text-currena-blue">{copy.groups[group]}</h3>
+                <h3 className="m-0 text-[0.9rem] font-bold text-currena-blue-deep">{copy.groups[group]}</h3>
                 {counts.votingCount > 0 ? (
-                  <p className="m-0 text-[0.68rem] font-semibold text-currena-muted">
+                  <p className="m-0 text-[0.7rem] font-semibold text-currena-muted">
                     {interpolate(copy.ui.inWarning, {
                       warnings: counts.warningCount,
                       voting: counts.votingCount,
@@ -243,7 +243,7 @@ export function Insights() {
         <h1 className="m-0 text-2xl font-extrabold tracking-tight">{t('insights.title')}</h1>
         <p className="mt-1 mb-0 text-sm text-currena-muted">{copy.ui.subtitle}</p>
         {generatedLine ? (
-          <p className="mt-1 mb-0 text-[0.68rem] text-currena-muted">
+          <p className="mt-1 mb-0 text-[0.7rem] text-currena-muted">
             <bdi>{generatedLine}</bdi>
           </p>
         ) : null}

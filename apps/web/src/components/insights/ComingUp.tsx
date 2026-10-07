@@ -95,7 +95,7 @@ export function ComingUp({
                 <span className="text-xs text-currena-muted">
                   <bdi>{dateText}</bdi>
                   <span className="mx-1.5 opacity-50">·</span>
-                  <bdi className={soon ? 'font-bold text-currena-coral' : 'font-semibold'}>{when}</bdi>
+                  <bdi className={soon ? 'font-bold text-currena-coral-deep' : 'font-semibold'}>{when}</bdi>
                 </span>
               </li>
             );

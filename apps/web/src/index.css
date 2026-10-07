@@ -38,6 +38,19 @@
   --color-currena-success: #4CAF50;
   --color-currena-bg-light: #F8FAFB;
 
+  /* "Deep" text-safe accents (Insights UI/UX pass, docs/insights/05-ux-audit-I6.md
+   * F1–F5): the brand accents above are decorative/large-fill hues — as SMALL
+   * TEXT on light surfaces they fail WCAG AA (blue 3.14:1, success 2.78:1,
+   * warning 2.78:1, coral 1.92:1 on white). These ink-grade siblings keep the
+   * same hue family while holding ≥4.5:1 on white, on --color-currena-bg-light,
+   * and on each colour's own /10–/15 tint (chips, status rows). Dark mode
+   * remaps them to the existing bright accents below — components use the
+   * -deep names unconditionally. */
+  --color-currena-blue-deep: #245E9F;
+  --color-currena-success-deep: #256D29;
+  --color-currena-warning-deep: #B92E2E;
+  --color-currena-coral-deep: #9C5019;
+
   /* Typography: system stack for LTR/en; Farsi (lang=fa) switches to the
    * self-hosted Vazirmatn variable font below. */
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
@@ -69,6 +82,13 @@
   --color-currena-warning: #FF8080;
   --color-currena-success: #63C06C;
   --color-currena-bg-light: #10151D;
+
+  /* Deep accents → the bright dark-mode hues (all ≥6.5:1 on #1A222E cards,
+   * verified in the I6 audit) — one class name works in both themes. */
+  --color-currena-blue-deep: #6FAEEC;
+  --color-currena-success-deep: #63C06C;
+  --color-currena-warning-deep: #FF8080;
+  --color-currena-coral-deep: #FBB48C;
 }
 
 /* Vazirmatn — the owner-requested Farsi typeface. One variable file covers

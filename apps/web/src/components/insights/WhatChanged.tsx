@@ -46,8 +46,8 @@ export function WhatChanged({
                 key={event.id}
                 className={`rounded-[18px] px-4 py-3 text-sm font-medium ${
                   event.to === 'warning'
-                    ? 'bg-currena-warning/10 text-currena-warning'
-                    : 'bg-currena-success/10 text-currena-success'
+                    ? 'bg-currena-warning/10 text-currena-warning-deep'
+                    : 'bg-currena-success/10 text-currena-success-deep'
                 }`}
               >
                 <span aria-hidden="true" className="me-1.5">
@@ -82,7 +82,7 @@ export function WhatChanged({
               );
             })}
           </ul>
-          <p className="mt-1.5 mb-0 text-[0.68rem] text-currena-muted">{copy.ui.moversUnitNote}</p>
+          <p className="mt-1.5 mb-0 text-[0.7rem] text-currena-muted">{copy.ui.moversUnitNote}</p>
         </div>
       ) : null}
     </section>

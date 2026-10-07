@@ -123,7 +123,8 @@ function CardHistory({
 function CopySection({ title, body }: { title: string; body: string }) {
   return (
     <div>
-      <h5 className="m-0 text-[0.72rem] font-bold uppercase tracking-wide text-currena-blue">{title}</h5>
+      {/* I6 audit F2: blue-deep — the brand blue failed AA (3.3:1) at this size. */}
+      <h5 className="m-0 text-[0.72rem] font-bold uppercase tracking-wide text-currena-blue-deep">{title}</h5>
       <p className="mt-0.5 mb-0 text-sm leading-relaxed text-currena-dark/90 dark:text-currena-dark/90">{body}</p>
     </div>
   );
@@ -146,7 +147,14 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
 
   return (
     <article
-      className={`rounded-[18px] bg-white p-4 ring-1 ring-black/[0.06] shadow-[0_4px_18px_rgba(0,0,0,0.05)] transition-opacity duration-300 dark:bg-[#1A222E] dark:ring-white/[0.08] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] ${greyed ? 'opacity-60' : ''}`}
+      className={`rounded-[18px] p-4 ring-1 shadow-[0_4px_18px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] ${
+        greyed
+          ? // I6 audit F5: the old blanket opacity-60 sank body text to 2.3:1
+            // (light) / 2.0:1 (dark). Grey-out now = softened surface + muted
+            // value colour; every string stays ≥4.5:1.
+            'bg-currena-soft/40 ring-black/[0.06] dark:bg-white/[0.03] dark:ring-white/[0.08]'
+          : 'bg-white ring-black/[0.06] dark:bg-[#1A222E] dark:ring-white/[0.08]'
+      }`}
       data-status={reading.status}
     >
       <h4 className="m-0 text-[0.95rem] font-bold leading-snug">
@@ -173,7 +181,7 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
             <span className="mt-2 block text-sm text-currena-muted">{copy.ui.unavailableCard}</span>
           ) : (
             <span className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <bdi className="text-xl font-extrabold tabular-nums">{valueText}</bdi>
+              <bdi className={`text-xl font-extrabold tabular-nums ${greyed ? 'text-currena-muted' : ''}`}>{valueText}</bdi>
               <ChangeRun
                 change={reading.change7d}
                 changeKind={def.changeKind}
@@ -204,7 +212,7 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
             />
           ) : null}
 
-          <span className="mt-3 flex items-center justify-between gap-2 text-[0.68rem] text-currena-muted">
+          <span className="mt-3 flex items-center justify-between gap-2 text-[0.7rem] text-currena-muted">
             <span>
               {reading.asOf ? interpolate(copy.ui.updatedOn, { date: formatAsOf(reading.asOf, locale) }) : '—'}
               <span className="mx-1.5 opacity-50">·</span>
@@ -245,7 +253,7 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
             <p className="m-0 mb-3 text-xs font-semibold text-currena-muted">{copy.ui.noHistoryStatus}</p>
           ) : null}
           {def.rule.kind === 'info' ? (
-            <p className="m-0 mb-3 text-xs font-semibold text-currena-blue">{copy.ui.infoOnly}</p>
+            <p className="m-0 mb-3 text-xs font-semibold text-currena-blue-deep">{copy.ui.infoOnly}</p>
           ) : null}
 
           <div className="flex flex-col gap-3">
@@ -266,7 +274,7 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
                 href={reading.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 rounded-full bg-currena-blue/10 px-3 py-1 font-semibold text-currena-blue transition-colors duration-300 hover:bg-currena-blue/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
+                className="inline-flex items-center gap-1 rounded-full bg-currena-blue/10 px-3 py-1 font-semibold text-currena-blue-deep transition-colors duration-300 hover:bg-currena-blue/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
               >
                 {reading.sourceName}
                 <span aria-hidden="true">↗</span>

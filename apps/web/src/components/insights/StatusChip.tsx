@@ -8,10 +8,13 @@ import type { IndicatorReading } from '@currena/core';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { STATUS_META, type StatusTone } from './config';
 
+// I6 audit F1: the brand accents fail WCAG AA as small text on light cards
+// (2.78–3.29:1) — text uses the ink-grade `-deep` tokens (≥4.5:1 on the tinted
+// pill in BOTH themes; dark remaps them to the bright hues).
 const TONE_CLASSES: Record<StatusTone, string> = {
-  danger: 'bg-currena-warning/15 text-currena-warning',
-  success: 'bg-currena-success/15 text-currena-success',
-  info: 'bg-currena-blue/10 text-currena-blue',
+  danger: 'bg-currena-warning/15 text-currena-warning-deep',
+  success: 'bg-currena-success/15 text-currena-success-deep',
+  info: 'bg-currena-blue/10 text-currena-blue-deep',
   muted: 'bg-currena-muted/15 text-currena-muted',
 };
 
