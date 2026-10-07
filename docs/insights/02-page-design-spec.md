@@ -36,9 +36,10 @@ Insights explains the state of global and Australian finance through about 30 in
 2. **Summary block:** two lines, Global and Australia, each like "Cautious · 4 of 14 indicators in warning," with a "How this is calculated" link. Directly under it a one-line disclaimer ("General information only, not advice") linking to the full text.
 3. **What changed this week:** indicators that changed state, the five biggest moves, events in the next 7 days.
 4. **Coming up:** the next key dates (RBA, Australian CPI, US Fed). Anything within 7 days is highlighted.
-5. **Global:** four groups (Rates and credit; Currencies; Metals, crypto and hard assets; Stocks, growth and liquidity).
-6. **Australia:** three groups (Interest and inflation; Currency and trade; Jobs and housing).
-7. **About the data and full disclaimer:** sources, update schedule, how "warning" is decided.
+5. **Card filter toolbar (I8, 2026-10-08):** status chips (All / Warning / Normal / Context) + a text search over names and tickers, directly before the Global section. A view tool only — it hides cards, groups, sections and jump pills that have nothing to show, but every warning-count line keeps describing the full snapshot; hidden on paper.
+6. **Global:** four groups (Rates and credit; Currencies; Metals, crypto and hard assets; Stocks, growth and liquidity).
+7. **Australia:** three groups (Interest and inflation; Currency and trade; Jobs and housing).
+8. **About the data and full disclaimer:** sources, update schedule, how "warning" is decided.
 
 Each section header shows a small status line ("2 of 6 in warning"). Add a row of jump links to the sections; it scrolls sideways on mobile and must mirror correctly in Farsi. Global comes before Australia (owner decision, Gate I4 review 2026-10-07 — the original "reader is in Australia" ordering was reversed: the global picture sets the frame, then the local section lands). The summary block's two lines follow the same order.
 

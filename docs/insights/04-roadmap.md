@@ -108,17 +108,17 @@ Every phase ends with typecheck and tests green, a `phase(I<n>): summary` commit
 
 ### Phase I6: Second wave (P2)
 
-- [ ] Housing, terms of trade, household debt and arrears, CAPE, government interest/revenue, oil, breakevens, China, copper/gold, iron ore, US M2.
-- [ ] Re-run the backtest with the full indicator set.
-- **Exit:** all P2 cards live with sources verified.
+- [x] Housing, terms of trade, household debt and arrears, CAPE, government interest/revenue, oil, breakevens, China, copper/gold, iron ore, US M2. **Done 2026-10-07** — all P2 cards live with verified sources (CAPE deferred to P3 per Gate I0 D2); the 30-indicator set incl. gold-usd/silver-usd deployed 2026-10-07.
+- [x] Re-run the backtest with the full indicator set. **Done 2026-10-07** (`docs/insights/BACKTEST.md`, commit `fb768bc`) — NOT_BACKTESTED reasons made honest for the two info-only ounce cards + the 10-observation china-pmi series; zero numbers changed.
+- **Exit:** all P2 cards live with sources verified. ✅
 
 ### Phase I7: Hardening and launch ✋
 
-- [ ] Stale-feed alerting (admin console and a failed-workflow notification).
-- [ ] Performance budget check and PWA precache impact.
-- [ ] SWOT-style re-check of the feature; update `docs/BACKLOG.md`.
-- [ ] CHANGELOG, PROGRESS, final production smoke test (health, snapshot, each card, en/fa).
-- **Exit ✋:** owner approves launch.
+- [x] Stale-feed alerting (admin console and a failed-workflow notification). **Done** — /admin staleness pill (36 h, role=alert, `51fdc04`) + optional Telegram step in the ingest workflow (`5d8d6b3`, clean no-op until the owner adds the secrets).
+- [x] Performance budget check and PWA precache impact. **Done** — `scripts/check-bundle-budget.mjs` + CI gate (`0bb2610`); precache 60 / ~2189 KiB; I8 bumped the Insights budget 110/33 → 120/35.5 with changelog justification.
+- [x] SWOT-style re-check of the feature; update `docs/BACKLOG.md`. **Done** — Wave 6 SWOT + items #45–#50 all closed.
+- [x] CHANGELOG, PROGRESS, final production smoke test (health, snapshot, each card, en/fa). **Done 2026-10-07 evening** (Worker `954f0034` smoke) — re-verified 2026-10-08: health ok, 30 readings fresh, 14 calendar, en/fa × desktop/375 × light/dark clean. Wave 6 + I8 code awaits the next owner-credentialled deploy.
+- **Exit ✋:** owner approves launch. *(Pending owner review of the deployed end-state.)*
 
 ### Later (P3 and v2)
 

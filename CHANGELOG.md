@@ -5,6 +5,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-08] — I8 findability wave: filter toolbar, story→card links, hover polish
+
+Stable-state session: full QA pass first (production standing state + every
+Wave 6 feature re-verified locally with agent-browser — share links, chart
+tooltip/keyboard, print, zero errors), then the next coherent improvement.
+30 cards across two sections is a lot to scan; three presentation-layer
+changes, no scoring/threshold/API contract changes. Tests 528 → **537 green**
+(+9 filter tests). Not yet deployed — ships with the Wave 6+ work at the next
+owner-credentialled deploy (production still serves I6 Worker `954f0034`).
+
+### Added
+- **Card-grid filter toolbar** (`FilterBar.tsx`, new): status chips
+  (All / Warning / Normal / Context — 44px pills, `aria-pressed`, the I6
+  deep-ink active tones) plus text search over name + ticker. Persian
+  search is normalised like a native would expect: Arabic-keyboard
+  yeh/kaf map to Persian, ZWNJ acts as a word separator, bidi marks are
+  stripped — «بیت کوین», «بیت‌کوین» and «بيكاري» all match their cards.
+  The result count line is `aria-live` with a Clear-filters reset;
+  fully-filtered-out sections, groups and JumpNav pills hide; a no-match
+  panel replaces the grid; the toolbar is hidden on paper (`.no-print`).
+  Filtering is a VIEW tool only — section/group warning-count lines keep
+  describing the full snapshot, and stale/unavailable cards only appear
+  under All.
+- **Story blocks now link into the grid**: every WhatChanged row (state
+  changes + the five biggest 30-day moves) is a button that opens and
+  scrolls to its indicator card through the shared `focusCard` path (the
+  I7 share-link behaviour, extracted); the chevron mirrors per locale and
+  the accessible name carries "View card".
+- **Pure filter helpers** in `config.ts` (`indicatorMatchesFilter`,
+  `filterVisibleIds`) with 9 unit tests incl. the Persian-normalisation
+  cases.
+
+### Changed
+- **Insights chunk budget 110/33 → 120/35.5 kB/gz**
+  (`scripts/check-bundle-budget.mjs`): the toolbar + visibility wiring +
+  26 copy strings × 2 locales grow the lazy chunk 109.36/32.91 →
+  117.27/34.83 — a conscious, justified bump; the entry chunk is
+  untouched (288.76 kB / 86.96 gz, money-page budget held).
+- **Card hover polish**: desktop-only, `motion-safe` 2px lift + deeper
+  shadow on indicator cards (reduced-motion and touch unaffected).
+- Spec §4 (page structure) now records the toolbar row between "Coming
+  up" and the sections (additive documentation of the I8 change).
+
 ## [2026-10-07] — BACKLOG Wave 6 closed: CI gate, chart tooltip, print, share links, ingest alerting
 
 Owner direction ("Proceed based on your phases") → the ranked Wave 6 backlog
