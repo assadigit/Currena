@@ -53,7 +53,7 @@ export function ComingUp({
   const upcoming = sorted.filter((e) => daysUntil(e.date) >= 0);
 
   return (
-    <section id="insights-coming-up" aria-labelledby="insights-coming-up-title">
+    <section id="insights-coming-up" aria-labelledby="insights-coming-up-title" className="scroll-mt-24">
       <h2 id="insights-coming-up-title" className="m-0 mb-3 text-lg font-extrabold">
         {copy.ui.comingUpTitle}
       </h2>

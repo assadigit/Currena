@@ -475,6 +475,8 @@ export const insightsCopyEn = {
     updatedOn: 'Updated {date}',
     sourceLabel: 'Source',
     viewSource: 'View source',
+    shareCard: 'Share this card',
+    shareCopied: 'Link copied',
     chartTitle: 'The last 10 years',
     chartTable: 'Chart data',
     chartColDate: 'Date',

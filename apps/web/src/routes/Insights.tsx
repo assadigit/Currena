@@ -24,6 +24,7 @@ import type { IndicatorId, InsightsSnapshot, InsightsSection, IndicatorGroupId }
 import { formatJalaliDate, formatDate } from '@currena/core';
 import { interpolate } from '../i18n';
 import { useI18n } from '../lib/locale';
+import { routeQuery } from '../router';
 import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../lib/insights';
 import { AboutTheData } from '../components/insights/AboutTheData';
 import { ComingUp } from '../components/insights/ComingUp';
@@ -37,6 +38,7 @@ import { useInsightsCopy } from '../components/insights/useInsightsCopy';
 import {
   GROUP_ORDER,
   SECTION_ORDER,
+  definitionFor,
   definitionsForGroup,
   groupCounts,
 } from '../components/insights/config';
@@ -97,7 +99,7 @@ function SectionBlock({
   const line = snapshot.summary[section];
   const sectionId = `insights-section-${section}`;
   return (
-    <section id={sectionId} aria-labelledby={`${sectionId}-title`}>
+    <section id={sectionId} aria-labelledby={`${sectionId}-title`} className="scroll-mt-24">
       <header className="mb-3 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 id={`${sectionId}-title`} className="m-0 text-lg font-extrabold">
           {copy.sections[section]}
@@ -161,6 +163,9 @@ export function Insights() {
   const [openCards, setOpenCards] = useState<ReadonlySet<IndicatorId>>(new Set());
   const isPhone = useIsPhone();
   const hadCache = useRef(false);
+  // I7 #50: a share link ('#/insights?card=<id>') opens + scrolls to that
+  // card once, when the first snapshot is on screen (cached or fresh).
+  const shareLinkHandled = useRef(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -206,6 +211,32 @@ export function Insights() {
     },
     [isPhone],
   );
+
+  // Share-link deep link (I7 #50, spec §10): '?card=<id>' opens exactly
+  // that card (single-open discipline on phones) and scrolls to it. Unknown
+  // or missing ids are ignored — the page just loads normally.
+  useEffect(() => {
+    if (state.kind !== 'ready' || shareLinkHandled.current) return;
+    shareLinkHandled.current = true;
+    const cardParam = routeQuery().get('card');
+    if (!cardParam) return;
+    let id: IndicatorId;
+    try {
+      id = definitionFor(cardParam as IndicatorId).id;
+    } catch {
+      return; // not a known indicator id — ignore the param
+    }
+    if (!state.snapshot.readings.some((r) => r.id === id)) return;
+    setOpenCards((prev) => (isPhone ? new Set([id]) : new Set([...prev, id])));
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`insights-card-${id}`);
+      if (!el) return;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+      el.setAttribute('tabindex', '-1');
+      el.focus({ preventScroll: true });
+    });
+  }, [state, isPhone]);
 
   const jumpAbout = useCallback(() => {
     const el = document.getElementById('insights-about');

@@ -16,7 +16,7 @@
  * Mobile closes the previous card (handled by the route's open-state).
  */
 
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import type { IndicatorReading } from '@currena/core';
 import { interpolate } from '../../i18n';
 import { fetchIndicatorHistory, ApiError } from '../../lib/insights';
@@ -136,6 +136,9 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
   const autoId = useId();
   const headingId = `${autoId}-heading`;
   const panelId = `${autoId}-panel`;
+  // Share-link anchor (I7 #50): stable, locale-independent DOM id so
+  // '#/insights?card=<id>' can open + scroll to exactly this card.
+  const cardAnchorId = `insights-card-${reading.id}`;
   // I6 audit F10: the expand button's accessible name used to be the ENTIRE
   // collapsed card (~33 words — name, value, changes, chip, one-liner, footer).
   // Both the heading and the button are now labelled by name (+ticker) + status
@@ -154,9 +157,33 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
       ? formatIndicatorValue(reading.id, reading.value, numberLocale, copy.units)
       : null;
 
+  // Share this card (I7 #50): copies #/insights?card=<id>; inline feedback.
+  const [copied, setCopied] = useState(false);
+  const copiedTimer = useRef<number | null>(null);
+  useEffect(() => {
+    return () => {
+      if (copiedTimer.current !== null) window.clearTimeout(copiedTimer.current);
+    };
+  }, []);
+  const shareCard = (): void => {
+    const url = `${window.location.origin}${window.location.pathname}#/insights?card=${reading.id}`;
+    void navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        setCopied(true);
+        if (copiedTimer.current !== null) window.clearTimeout(copiedTimer.current);
+        copiedTimer.current = window.setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(() => {
+        // Clipboard unavailable (insecure context / old WebView) — no-op;
+        // the URL stays visible in the address bar on failure paths.
+      });
+  };
+
   return (
     <article
-      className={`rounded-[18px] p-4 ring-1 shadow-[0_4px_18px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] ${
+      id={cardAnchorId}
+      className={`scroll-mt-24 rounded-[18px] p-4 ring-1 shadow-[0_4px_18px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] ${
         greyed
           ? // I6 audit F5: the old blanket opacity-60 sank body text to 2.3:1
             // (light) / 2.0:1 (dark). Grey-out now = softened surface + muted
@@ -280,20 +307,29 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
             <CardHistory id={reading.id} copy={copy} locale={locale} numberLocale={numberLocale} />
           ) : null}
 
-          {reading.sourceUrl ? (
-            <p className="mb-0 mt-3 text-xs">
+          {/* Source pill + share link (I7 #50) — the expanded panel's footer. */}
+          <p className="mb-0 mt-3 flex flex-wrap items-center gap-2 text-xs">
+            {reading.sourceUrl ? (
               <a
                 href={reading.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 rounded-full bg-currena-blue/10 px-3 py-1 font-semibold text-currena-blue-deep transition-colors duration-300 hover:bg-currena-blue/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
+                className="inline-flex items-center gap-1 rounded-full bg-currena-blue/10 px-3 py-1.5 font-semibold text-currena-blue-deep transition-colors duration-300 hover:bg-currena-blue/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
               >
                 {reading.sourceName}
                 <span aria-hidden="true">↗</span>
                 <span className="sr-only">{copy.ui.viewSource}</span>
               </a>
-            </p>
-          ) : null}
+            ) : null}
+            <button
+              type="button"
+              onClick={shareCard}
+              className="inline-flex min-h-[36px] cursor-pointer items-center gap-1 rounded-full border border-currena-blue/25 bg-transparent px-3 py-1.5 font-semibold text-currena-blue-deep transition-colors duration-300 hover:bg-currena-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
+            >
+              <span aria-hidden="true">🔗</span>
+              {copied ? copy.ui.shareCopied : copy.ui.shareCard}
+            </button>
+          </p>
         </div>
       ) : null}
     </article>

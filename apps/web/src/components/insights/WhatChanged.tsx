@@ -23,7 +23,7 @@ export function WhatChanged({
   const movers = bigMovers(snapshot.readings, 5);
 
   return (
-    <section id="insights-what-changed" aria-labelledby="insights-what-changed-title">
+    <section id="insights-what-changed" aria-labelledby="insights-what-changed-title" className="scroll-mt-24">
       <h2 id="insights-what-changed-title" className="m-0 mb-3 text-lg font-extrabold">
         {copy.ui.whatChangedTitle}
       </h2>

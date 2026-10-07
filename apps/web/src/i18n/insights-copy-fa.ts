@@ -64,6 +64,8 @@ export const insightsCopyFa: InsightsCopy = {
     updatedOn: 'به‌روزرسانی {date}',
     sourceLabel: 'منبع',
     viewSource: 'مشاهدهٔ منبع',
+    shareCard: 'اشتراک این کارت',
+    shareCopied: 'پیوند کپی شد',
     chartTitle: '۱۰ سال گذشته',
     chartTable: 'داده‌های نمودار',
     chartColDate: 'تاریخ',

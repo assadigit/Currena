@@ -33,13 +33,32 @@ export function isRoutePath(path: string): path is RoutePath {
 
 function parseHash(hash: string): RoutePath {
   // '#/live-rates' → '/live-rates'; '', '#', '#' → '/'
-  const path = hash.replace(/^#/, '');
-  if (path === '' || path === '/') return '/';
-  return isRoutePath(path) ? path : '/';
+  return parseRouteAndQuery(hash).path;
+}
+
+/**
+ * Parse a hash URL into its route + query params. Query-tolerant since the
+ * per-indicator share links (spec §10, I7 #50): '#/insights?card=us10y' is
+ * the /insights route with params.card === 'us10y'. Unknown paths still
+ * normalize to '/'. Pure — unit-tested without a DOM.
+ */
+export function parseRouteAndQuery(hash: string): { path: RoutePath; params: URLSearchParams } {
+  const raw = hash.replace(/^#/, '');
+  const qAt = raw.indexOf('?');
+  const pathPart = qAt === -1 ? raw : raw.slice(0, qAt);
+  const queryPart = qAt === -1 ? '' : raw.slice(qAt + 1);
+  const path: RoutePath =
+    pathPart === '' || pathPart === '/' ? '/' : isRoutePath(pathPart) ? pathPart : '/';
+  return { path, params: new URLSearchParams(queryPart) };
 }
 
 export function currentRoute(): RoutePath {
   return parseHash(window.location.hash);
+}
+
+/** Query params of the current hash URL (I7 #50 share links read `card`). */
+export function routeQuery(): URLSearchParams {
+  return parseRouteAndQuery(window.location.hash).params;
 }
 
 /** Programmatic navigation. Same-path navigation is a no-op. */

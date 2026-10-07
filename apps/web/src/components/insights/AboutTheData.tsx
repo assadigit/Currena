@@ -8,7 +8,7 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 
 export function AboutTheData({ copy }: { copy: InsightsCopy }) {
   return (
-    <section id="insights-about" aria-labelledby="insights-about-title">
+    <section id="insights-about" aria-labelledby="insights-about-title" className="scroll-mt-24">
       <h2 id="insights-about-title" className="m-0 mb-3 text-lg font-extrabold">
         {copy.ui.aboutTitle}
       </h2>
