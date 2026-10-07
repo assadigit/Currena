@@ -139,10 +139,12 @@ KV namespace RATES:  insights:snapshot · insights:hist:<id> · insights:status 
 Worker (read-only):  GET /api/insights · GET /api/insights/:id/history · /admin card
 ```
 
-- **Why 04:20 UTC**: the account's 1,000 free KV writes/day are exhausted by
-  ~18:30 UTC through the ever-green rates cron + the second worker on the
-  account (see docs/insights/03-data-sources.md §Phase I3 record). The run
-  lands in the fresh post-midnight budget; capped writes are retried in the
+- **Why 04:20 UTC**: the account's KV write counter crosses the 1,000/day
+  free cap around ~19:00 UTC (ever-green rates cron + the second worker on
+  the account; see docs/insights/03-data-sources.md §Phase I3 record). The
+  cap is enforced on the KV REST API — the runner's exact path (Workers
+  binding writes, e.g. the rates cron, are not blocked by it). The run lands
+  in the fresh post-midnight counter; capped writes are retried in the
   runner.
 - **Secrets**: one repo Actions secret, `CLOUDFLARE_API_TOKEN` (KV edit on
   the RATES namespace — value currently the owner-provided token; the agent

@@ -5,14 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
-## [2026-10-07] — Insights Phase I3: ingestion runner, storage, API routes, production dry-run
+## [2026-10-07] — Insights Phase I3: ingestion runner, storage, API routes, production write-run green
 
 Gate I2 approved ("continue proceed"). Phase I3 builds the feature's serving
 pipeline end to end: the GitHub Actions ingestion runner, the KV storage
 contract, the read-only API routes, and the admin freshness card. **First
-Insights deploy** (new routes on `currena-api`; the SPA bundle is unchanged —
-insights imports are type-only on the worker side). Tests **441 → 479 — all
-green** (+38); typecheck clean in all five packages.
+Insights deploy** (new routes on `currena-api`, Worker version `3ab1a97a`;
+the SPA bundle is unchanged — insights imports are type-only on the worker
+side). Tests **441 → 479 — all green** (+38); typecheck clean in all five
+packages. Production evidence: venue dry-run (Actions run 37518740313)
+27/27 sources OK; real write-run (Actions run 37550035289) wrote 24 history
+keys + snapshot + status in 26 KV writes with `P1 COMPLETE`; live JSON
+verified at `/api/insights` on workers.dev and currena.ir.
 
 ### Ingestion runner (`packages/insights`)
 
@@ -64,12 +68,15 @@ green** (+38); typecheck clean in all five packages.
   main: cron **04:20 UTC daily** + `workflow_dispatch` with `dry_run`;
   pnpm from `packageManager`, frozen lockfile, 15-minute timeout, no
   overlapping runs.
-- **KV write budget finding (pre-existing)**: the account saturates its
-  1,000 free KV writes/day by ~18:30 UTC (ever-green rates cron ~1,000/day +
-  the second worker ~450/day); all account writes then fail until 00:00 UTC.
-  The ingestion is scheduled into the fresh post-midnight budget and retries
-  capped writes. Owner follow-up recommended (ever-green write-pressure
-  reduction or Workers Paid) — recorded in docs/PROGRESS.md decisions log.
+- **KV write-budget finding (pre-existing, refined by live observation)**: the
+  account's write counter crosses the 1,000 free writes/day around ~19:00 UTC
+  (ever-green rates cron ~1,000/day + the second worker ~450/day). The cap's
+  enforcement was observed on the **KV REST API** (429/10048) — the exact
+  path the ingestion runner uses; Workers **binding writes are not blocked**
+  (the rates app kept writing fresh snapshots after the trip, so production
+  is unaffected). The ingestion is therefore scheduled at 04:20 UTC into the
+  fresh post-midnight counter and retries capped writes. Recorded in
+  docs/PROGRESS.md decisions log + docs/insights/03-data-sources.md §Phase I3.
 - Scope cuts recorded: Bitstamp 10-year candle backfill + RBA F11 skipped
   (no v1 consumer); one daily schedule instead of daily+weekly
   (change-detected writes).
