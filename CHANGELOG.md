@@ -5,6 +5,81 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-07] — Insights UI/UX pass (Phase I6) + completeness sweep (I6 backtest re-run + I7 hardening)
+
+Owner agenda ("Improving UI/UX of the Insights page, and making sure nothing is
+left behind"). Presentation-layer only — no scoring, thresholds, sources, KV
+keys or API contracts touched. Evidence-first audit
+(`docs/insights/05-ux-audit-I6.md`) → five implementation commits → backtest
+re-run → I7 hardening → production smoke.
+
+### Fixed — Accessibility (audit F1–F5, F7, F10)
+- **WCAG AA in light theme** (was failing on all 30 cards): status chips
+  2.78–3.29:1, group h3s 3.14:1, panel h5s + source pill ~3.3:1, latent
+  what-changed rows 2.78:1, coming-up "soon" coral 1.92:1. Four ink-grade
+  `-deep` accent tokens added to the theme (blue #245E9F, success #256D29,
+  warning #B92E2E, coral #9C5019 — ≥4.5:1 on white, page bg, and their own
+  /10–/15 tints); dark mode remaps them to the existing bright hues
+  (≥6.5:1). Both themes re-measured programmatically: 4.62–10.47:1.
+- **Stale-card grey-out no longer sinks text below AA** (was 2.33:1 light /
+  1.96:1 dark through a blanket opacity-60): grey-out is now a softened
+  surface tint + muted value colour with every string ≥4.5:1.
+- **Tap targets**: JumpNav pills 30→44px; chart-data `<summary>` 16px→a
+  full-width 44px row; "How this is calculated" + disclaimer links get
+  padded hit areas (layout unchanged).
+- **Accessible names**: the card expand button's name was the entire
+  collapsed card (~33 words); heading + button are now labelled
+  "name (+ticker), status" via `aria-labelledby`.
+- **Summary block landmark** was labelled "Global" (duplicate of the real
+  Global section) with no heading — now `ui.summaryTitle` (en "Market
+  summary" / native fa «خلاصهٔ وضعیت بازار») + a visually-hidden h2.
+
+### Fixed — UX (audit F6, F8, F9, F11–F15)
+- **JumpNav scrollspy**: active-section awareness while scrolling (passive
+  rAF listener, `aria-current="true"`, tinted active pill; bottom-of-page
+  pins the last section).
+- **Chart year labels** no longer carry thousands separators ("2,016" /
+  "۲٬۰۱۶" → "2016" / "۲۰۱۶" — `formatNumber` learns `useGrouping:false`,
+  formatter-cache key extended); a **mid-axis year tick** orients the
+  decade span; position bar 8→10px with a 30% warning-zone tint.
+- **Expanded panel readability**: rule sentence text-xs→text-sm, section
+  titles 0.72→0.75rem with more lead-in, sections gap-3→gap-4 — the five
+  blocks scan as anchors instead of a wall of text.
+- **fa typography**: Jalali date+time joined with the Persian comma «،» in
+  core `formatJalaliDate` (ICU emitted a Latin ", ") — also fixes the
+  converter ResultPopup timestamp.
+- Card footer/group status/meta lines 0.68→0.7rem; disclaimer bar softened
+  to read as a footnote, not a system alert.
+
+### Changed
+- `docs/insights/BACKTEST.md` regenerated against the full 30-indicator
+  definition set: `gold-usd`/`silver-usd` reported honestly as info-only
+  never-votes (was "undefined"), `china-pmi`'s note reflects its populated
+  10-observation manual series; zero numbers changed, I1 findings
+  re-affirmed with an I6 re-run verdict. No threshold changes proposed.
+- `/admin` Insights card (I7): pill flips to "stale — no run for N h" with
+  a `role=alert` action line past 36 h without a run — previously a dead
+  cron kept the card "healthy" while the snapshot aged. Live-verified
+  fresh + stale paths on local wrangler.
+- `docs/BACKLOG.md` Wave 6: post-I6 SWOT re-check + explicit backlog
+  (failed-ingest push notification, performance-budget CI gate, chart
+  hover tooltip, print stylesheet, per-indicator share links).
+
+### Verified
+- Every commit: typecheck 5/5, tests green **516 → 521** (core +2 useGrouping/
+  Jalali-comma, admin +3 staleness), bundle budget held — entry 288.75 kB /
+  87.77 kB gz unchanged, Insights lazy chunk 104.54 → 105.98 kB (31.49 →
+  31.94 kB gz, +0.45 gz for scrollspy + labels), precache 60 / ~2172 KiB.
+- agent-browser en/fa × desktop/375px × light/dark: contrast sweep
+  re-measured, RTL geometry intact, Persian digits + Jalali dates, chart
+  LTR-in-fa, mobile single-open, language switch keeps scroll + open
+  cards, zero console errors, no horizontal overflow.
+- Production standing state: `/api/health` ok; `/api/insights` 30 readings,
+  fresh `generatedAt`, 14 calendar events, quiet week, Global-first order
+  (first Australia id at index 18); history endpoints 200 + 404-for-single-
+  point + 400-unknown + ETag 304; today's scheduled (04:20 UTC) and
+  dispatched ingest runs green on the Actions tab.
+
 ## [2026-10-07] — Session wrap-up: shipped state re-verified + next-session brief
 
 Owner direction ("Proceed to next phase if anything is remaining and wrap up
