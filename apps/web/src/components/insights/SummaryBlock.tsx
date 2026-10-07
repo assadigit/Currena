@@ -102,8 +102,8 @@ export function SummaryBlock({
   return (
     <section aria-label={copy.sections.global} className="m-0">
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-        <SummaryLineRow line={australia} copy={copy} />
         <SummaryLineRow line={global} copy={copy} />
+        <SummaryLineRow line={australia} copy={copy} />
       </div>
 
       {(australia.excludedCount > 0 || global.excludedCount > 0) && (

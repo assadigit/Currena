@@ -3,9 +3,10 @@
  *
  * Structure top to bottom: title/subtitle + snapshot date → summary block
  * (two LED-count lines + explainer + disclaimer bar) → jump links → what
- * changed this week → coming up → AUSTRALIA section (3 groups) → GLOBAL
- * section (4 groups) → about the data + full disclaimer. Australia comes
- * before Global — the assumed reader is there (spec §4).
+ * changed this week → coming up → GLOBAL section (4 groups) → AUSTRALIA
+ * section (3 groups) → about the data + full disclaimer. Global comes
+ * before Australia (owner Gate I4 feedback, 2026-10-07 — overrides the
+ * original spec §4 reader-location ordering).
  *
  * Data: GET /api/insights (zod-validated in lib/insights.ts), last-good
  * localStorage snapshot first for instant/offline paint, fresh fetch
@@ -219,8 +220,8 @@ export function Insights() {
     () => [
       { id: 'insights-what-changed', label: copy.ui.whatChangedTitle },
       { id: 'insights-coming-up', label: copy.ui.comingUpTitle },
-      { id: 'insights-section-australia', label: copy.sections.australia },
       { id: 'insights-section-global', label: copy.sections.global },
+      { id: 'insights-section-australia', label: copy.sections.australia },
       { id: 'insights-about', label: copy.ui.aboutTitle },
     ],
     [copy],

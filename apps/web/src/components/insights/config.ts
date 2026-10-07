@@ -27,8 +27,8 @@ import { interpolate } from '../../i18n';
  * Section / group layout (02-page-design-spec.md §4)
  * ------------------------------------------------------------------ */
 
-/** Page order: Australia BEFORE Global (the assumed reader is in Australia). */
-export const SECTION_ORDER: readonly InsightsSection[] = ['australia', 'global'];
+/** Page order: Global BEFORE Australia (owner Gate I4 feedback, 2026-10-07). */
+export const SECTION_ORDER: readonly InsightsSection[] = ['global', 'australia'];
 
 /** Group order within each section (01-indicator-spec.md group order). */
 export const GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGroupId[]>> = {
