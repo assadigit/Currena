@@ -191,12 +191,16 @@ export function formatDate(iso: string, locale: Locale, opts: DateFormatOptions 
  */
 export function formatJalaliDate(iso: string, locale: Locale, opts: DateFormatOptions = {}): string {
   const resolved = locale === 'fa-IR' ? 'fa-IR-u-ca-persian' : 'en-US-u-ca-persian';
-  return cachedDateTimeFormat(resolved, {
+  const formatted = cachedDateTimeFormat(resolved, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     ...(opts.withTime ? { hour: '2-digit', minute: '2-digit', second: '2-digit' } : {}),
   }).format(parseIso(iso));
+  // ICU joins a fa-IR persian date and time with a LATIN comma + space
+  // ("۱۴۰۵/۰۷/۱۵, ۱۵:۴۶") — Persian typography uses «،» (I6 audit F14).
+  // Date-only strings never contain the pattern, so this is a no-op there.
+  return locale === 'fa-IR' ? formatted.replace(', ', '، ') : formatted;
 }
 
 /* ------------------------------------------------------------------ *

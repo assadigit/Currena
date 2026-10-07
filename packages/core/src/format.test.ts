@@ -123,6 +123,13 @@ describe('formatJalaliDate (Intl persian calendar — no jalaali dependency)', (
   it('roundtrips a Nowruz boundary date: 1405 Farvardin 1 = 2026-03-21', () => {
     expect(formatJalaliDate('2026-03-21T12:00:00', 'fa-IR')).toBe('۱۴۰۵/۰۱/۰۱');
   });
+
+  it('withTime joins date and time with the PERSIAN comma in fa (I6 F14)', () => {
+    // ICU emits a Latin ", " here; Persian typography is «،».
+    expect(formatJalaliDate('2026-10-07T15:46:25.777Z', 'fa-IR', { withTime: true })).toBe(
+      '۱۴۰۵/۰۷/۱۵، ۱۵:۴۶:۲۵',
+    );
+  });
 });
 
 describe('formatRelative (legacy getTimeAgo parity + fa)', () => {
