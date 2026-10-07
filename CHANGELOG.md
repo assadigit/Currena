@@ -5,6 +5,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-07] — Session wrap-up: shipped state re-verified + next-session brief
+
+Owner direction ("Proceed to next phase if anything is remaining and wrap up
+this session… The new session agenda: Improving UI/UX of Insights page, and
+making sure nothing is left behind"). No runtime changes — the evening
+re-verified the 2026-10-07 feature set end-to-end and closed the session.
+
+### Verified
+- Gates re-run: typecheck 5/5, tests **516/516 green** (core 157 · scraper
+  67 · insights 132 · web 52 · api 108).
+- Production smoke (`currena.ir`): `/api/health` ok; `/api/insights` 30
+  readings — `gold-usd` 4107.7 / `silver-usd` 60.109 at the top of the
+  metals group, all 18 global ids before the first Australia id, 14 calendar
+  events, fresh `generatedAt`, zero unavailable indicators.
+- Redeploy from the final HEAD (version of record in
+  `docs/DEPLOY.md` §"Session wrap-up, 2026-10-07 evening") — runtime
+  identical to the deployed `b69375c` build; docs-only commits around it.
+
+### Changed
+- `docs/NEXT_SESSION_PROMPT.md` rewritten as the hand-off brief for the next
+  agenda: **Insights UI/UX pass + completeness sweep** (Phase A audit against
+  `02-page-design-spec.md`, Phase B presentation-layer improvements, Phase C
+  = the I6 backtest re-run + I7 hardening checklist + standing-state
+  verification).
+- `docs/PROGRESS.md` status row + decisions log: owner direction recorded
+  (I5 effectively closed; next phase reframed as the UI/UX agenda).
+
 ## [2026-10-07] — Insights: gold and silver ounce prices in the precious-metals group
 
 Owner request ("I want the ounce price of Gold and ounce price of Silver to be
