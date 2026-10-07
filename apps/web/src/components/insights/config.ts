@@ -387,6 +387,63 @@ export function filterVisibleIds(
   return ids;
 }
 
+/**
+ * Live per-status counts for the FilterBar chips (I9): All = every reading,
+ * Warning/Normal/Context = exactly that status. Stale/unavailable/no-history
+ * count only under All — the same semantics as the filter itself.
+ */
+export function statusCounts(
+  readings: readonly IndicatorReading[],
+): { all: number; warning: number; normal: number; context: number } {
+  const counts = { all: readings.length, warning: 0, normal: 0, context: 0 };
+  for (const r of readings) {
+    if (r.status === 'warning') counts.warning += 1;
+    else if (r.status === 'normal') counts.normal += 1;
+    else if (r.status === 'context') counts.context += 1;
+  }
+  return counts;
+}
+
+/* ------------------------------------------------------------------ *
+ * Chart range (I9) — view-level zoom of the 10-year chart
+ * ------------------------------------------------------------------ */
+
+export type ChartRange = '10y' | '5y' | '1y';
+
+/** Days per range (calendar years, from the series' LAST point — the
+ *  honest window even when the feed itself is a few days old). */
+const RANGE_DAYS: Readonly<Record<ChartRange, number>> = {
+  '10y': 3653, // 10 years + leap-day slack
+  '5y': 1827,
+  '1y': 366,
+};
+
+/**
+ * Slice a (ascending, epoch-day) series to the last `range` years. Pure and
+ * unit-tested. The 10-year POSITION bar and percentiles are untouched —
+ * those are the indicator's decade placement (server-side); this is purely
+ * how much of the line the reader sees. If a range cannot show ≥2 points,
+ * the full series is returned (the caller disables that range via
+ * rangeIsPlottable so the fallback never surprises anyone).
+ */
+export function sliceHistoryToRange(
+  points: readonly [number, number][],
+  range: ChartRange,
+): readonly [number, number][] {
+  if (!rangeIsPlottable(points, range)) return points.length >= 2 ? points : [];
+  const lastDay = points[points.length - 1]![0];
+  const cutoff = lastDay - RANGE_DAYS[range];
+  return points.filter((p) => p[0] >= cutoff);
+}
+
+/** Would this range show at least 2 points? (Drives the disabled state.) */
+export function rangeIsPlottable(points: readonly [number, number][], range: ChartRange): boolean {
+  if (points.length === 0) return false;
+  const lastDay = points[points.length - 1]![0];
+  const cutoff = lastDay - RANGE_DAYS[range];
+  return points.filter((p) => p[0] >= cutoff).length >= 2;
+}
+
 /* ------------------------------------------------------------------ *
  * History helpers (epoch-day math for the 10-year chart)
  * ------------------------------------------------------------------ */

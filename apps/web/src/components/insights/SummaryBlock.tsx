@@ -47,9 +47,12 @@ const TONE_TEXT: Record<SummaryTone, string> = {
 function SummaryLineRow({
   line,
   copy,
+  onJump,
 }: {
   line: SummaryLine;
   copy: InsightsCopy;
+  /** I9: the line jumps to its section — the summary is the page's table of contents. */
+  onJump: () => void;
 }) {
   const ledValue = String(line.warningCount);
   const ledLabel = interpolate(copy.ui.inWarning, {
@@ -57,7 +60,11 @@ function SummaryLineRow({
     voting: line.votingCount,
   });
   return (
-    <div className="flex items-center gap-3">
+    <button
+      type="button"
+      onClick={onJump}
+      className="flex w-full cursor-pointer items-center gap-3 rounded-[18px] border border-transparent bg-transparent p-2 text-start transition-colors duration-200 hover:border-currena-blue/25 hover:bg-currena-blue/[0.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue dark:hover:border-currena-blue/25 dark:hover:bg-currena-blue/[0.08]"
+    >
       <span
         role="img"
         aria-label={ledLabel}
@@ -65,11 +72,11 @@ function SummaryLineRow({
       >
         <LedDigits value={ledValue} className="text-2xl led-cell-hot sm:text-3xl" />
       </span>
-      <div className="min-w-0 flex-1">
-        <p className="m-0 text-[0.95rem] font-bold leading-tight">
+      <span className="min-w-0 flex-1">
+        <span className="block text-[0.95rem] font-bold leading-tight">
           {copy.sections[line.section]}
-        </p>
-        <p className="m-0 text-sm text-currena-muted">
+        </span>
+        <span className="block text-sm text-currena-muted">
           {ledLabel}
           {line.label ? (
             <span className="ms-2 inline-flex items-center gap-1.5 align-middle">
@@ -82,9 +89,16 @@ function SummaryLineRow({
               </span>
             </span>
           ) : null}
-        </p>
-      </div>
-    </div>
+        </span>
+      </span>
+      {/* I9: the affordance — a direction-neutral down-chevron (reads the
+          same in LTR and RTL). The accessible name ends with the sr-only
+          "View section" so the button announces what it does. */}
+      <span aria-hidden="true" className="shrink-0 self-center text-sm text-currena-muted opacity-50">
+        ↓
+      </span>
+      <span className="sr-only">{copy.ui.viewSection}</span>
+    </button>
   );
 }
 
@@ -92,11 +106,14 @@ export function SummaryBlock({
   summary,
   copy,
   onJumpAbout,
+  onJumpSection,
 }: {
   summary: { global: SummaryLine; australia: SummaryLine };
   copy: InsightsCopy;
   /** Scroll to the About-the-data section (full disclaimer lives there). */
   onJumpAbout: () => void;
+  /** I9: scroll to a section — wired per summary line. */
+  onJumpSection: (section: 'global' | 'australia') => void;
 }) {
   const [explainerOpen, setExplainerOpen] = useState(false);
   const global = summary.global;
@@ -109,8 +126,8 @@ export function SummaryBlock({
        * landmarks list) and had no heading, so heading navigation skipped it. */}
       <h2 className="sr-only">{copy.ui.summaryTitle}</h2>
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-        <SummaryLineRow line={global} copy={copy} />
-        <SummaryLineRow line={australia} copy={copy} />
+        <SummaryLineRow line={global} copy={copy} onJump={() => onJumpSection('global')} />
+        <SummaryLineRow line={australia} copy={copy} onJump={() => onJumpSection('australia')} />
       </div>
 
       {(australia.excludedCount > 0 || global.excludedCount > 0) && (

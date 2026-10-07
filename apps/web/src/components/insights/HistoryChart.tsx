@@ -19,6 +19,11 @@
  * the exact value under inspection is readable without a mouse. The
  * tooltip is visual (aria-hidden) — the SR table remains the text path.
  *
+ * I9: a 10y/5y/1y range segmented control in the figcaption — a view-level
+ * zoom. Ranges that cannot show ≥2 points of the series disable themselves;
+ * the 10-year position bar + percentiles (the decade placement) are
+ * server-side facts and never change with the range.
+ *
  * Label values are rendered with plain Intl digits (no long unit words) so
  * every SVG <text> run stays a single bidi-safe numeric run.
  */
@@ -29,13 +34,22 @@ import { formatNumber, formatDate, formatJalaliDate } from '@currena/core';
 import type { IndicatorId } from '@currena/core';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { interpolate } from '../../i18n';
-import { sampleHistoryRows, epochDayToIso } from './config';
+import {
+  sampleHistoryRows,
+  epochDayToIso,
+  sliceHistoryToRange,
+  rangeIsPlottable,
+  type ChartRange,
+} from './config';
 
 const WIDTH = 640;
 const HEIGHT = 200;
 const PAD_X = 10;
 const PAD_TOP = 26; // room for the max label above its point
 const PAD_BOTTOM = 24; // room for the year axis labels
+
+/** I9: the three reader-facing ranges, in order. */
+const RANGES: readonly ChartRange[] = ['10y', '5y', '1y'];
 
 export interface HistoryChartProps {
   id: IndicatorId;
@@ -65,7 +79,13 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
   const svgRef = useRef<SVGSVGElement>(null);
   // I7 (#48): the point under inspection — set by pointermove or arrow keys.
   const [focusIdx, setFocusIdx] = useState<number | null>(null);
+  // I9: the visible time range — a view-level zoom; the 10-year POSITION
+  // bar and percentiles are the indicator's decade placement and stay put.
+  const [range, setRange] = useState<ChartRange>('10y');
   const clean = points.filter((p) => Number.isFinite(p[1]));
+  // Slicing happens on the finite series; a range that cannot show ≥2
+  // points falls back to the full series (its button is disabled).
+  const series = sliceHistoryToRange(clean, range);
   const ind = copy.indicators[id];
 
   if (clean.length < 2) {
@@ -74,8 +94,8 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
     );
   }
 
-  const days = clean.map((p) => p[0]);
-  const values = clean.map((p) => p[1]);
+  const days = series.map((p) => p[0]);
+  const values = series.map((p) => p[1]);
   const dayMin = days[0]!;
   const dayMax = days[days.length - 1]!;
   const vMin = Math.min(...values);
@@ -84,7 +104,7 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
     if (dayMax === dayMin) return WIDTH / 2;
     return PAD_X + ((day - dayMin) / (dayMax - dayMin)) * (WIDTH - 2 * PAD_X);
   };
-  const coords = clean.map((p) => ({ x: scaleX(p[0]), y: scaleY(p[1], vMin, vMax), v: p[1] }));
+  const coords = series.map((p) => ({ x: scaleX(p[0]), y: scaleY(p[1], vMin, vMax), v: p[1] }));
   const line = coords.map((c, i) => `${i === 0 ? 'M' : 'L'}${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
   const firstPt = coords[0]!;
   const lastPt = coords[coords.length - 1]!;
@@ -116,11 +136,11 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
     latest: num(lastPt.v, numberLocale),
   });
 
-  const tableRows = sampleHistoryRows(clean);
+  const tableRows = sampleHistoryRows(series);
 
   /* Focus-reading plumbing (I7 #48) ------------------------------------- */
 
-  /** clientX → nearest clean point index (viewBox → day → scan). */
+  /** clientX → nearest visible point index (viewBox → day → scan). */
   const pointerToIdx = (clientX: number): number | null => {
     const svg = svgRef.current;
     if (!svg) return null;
@@ -133,7 +153,7 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
         : dayMin + ((xView - PAD_X) / (WIDTH - 2 * PAD_X)) * (dayMax - dayMin);
     let best = 0;
     let bestDist = Number.POSITIVE_INFINITY;
-    clean.forEach((p, i) => {
+    series.forEach((p, i) => {
       const dist = Math.abs(p[0] - day);
       if (dist < bestDist) {
         bestDist = dist;
@@ -148,7 +168,7 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
   };
 
   const onKeyDown = (e: ReactKeyboardEvent<SVGSVGElement>): void => {
-    const last = clean.length - 1;
+    const last = series.length - 1;
     const step = (dir: 1 | -1): void => {
       e.preventDefault();
       setFocusIdx((prev) => Math.min(last, Math.max(0, (prev ?? last) + dir)));
@@ -165,12 +185,55 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
   };
 
   const focusPt = focusIdx !== null ? coords[focusIdx] : undefined;
-  const focusIso = focusIdx !== null ? epochDayToIso(clean[focusIdx]![0]) : '';
+  const focusIso = focusIdx !== null ? epochDayToIso(series[focusIdx]![0]) : '';
+
+  // I9: the figcaption interpolates the visible range; each button disables
+  // itself when its window cannot show ≥2 points of THIS series.
+  const rangeCopyKey: Record<ChartRange, 'range10y' | 'range5y' | 'range1y'> = {
+    '10y': 'range10y',
+    '5y': 'range5y',
+    '1y': 'range1y',
+  };
+  const title = interpolate(copy.ui.chartTitle, { range: copy.ui[rangeCopyKey[range]] });
 
   return (
     <figure className="mt-3 m-0">
-      <figcaption className="mb-1 text-[0.72rem] font-semibold uppercase tracking-wide text-currena-muted">
-        {copy.ui.chartTitle}
+      <figcaption className="mb-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+        <span className="text-[0.72rem] font-semibold uppercase tracking-wide text-currena-muted">
+          {title}
+        </span>
+        {/* I9: the range segmented control — same pill DNA as JumpNav/FilterBar,
+            smaller (chart-local, not page-level navigation); hidden on paper. */}
+        <span
+          role="group"
+          aria-label={copy.ui.chartRangeLabel}
+          className="no-print flex items-center gap-1 rounded-full bg-currena-soft/70 p-0.5 dark:bg-white/[0.06]"
+        >
+          {RANGES.map((r) => {
+            const active = r === range;
+            const plottable = rangeIsPlottable(clean, r);
+            return (
+              <button
+                key={r}
+                type="button"
+                aria-pressed={active}
+                disabled={!plottable}
+                onClick={() => {
+                  if (r === range) return;
+                  setRange(r);
+                  setFocusIdx(null); // indices shift with the window
+                }}
+                className={`inline-flex min-h-[28px] cursor-pointer items-center rounded-full px-2.5 text-[0.65rem] font-bold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-currena-blue disabled:cursor-not-allowed disabled:opacity-40 ${
+                  active
+                    ? 'bg-white text-currena-blue-deep shadow-sm ring-1 ring-black/[0.06] dark:bg-[#243040] dark:text-currena-blue dark:ring-white/[0.1]'
+                    : 'bg-transparent text-currena-muted hover:text-currena-dark dark:hover:text-currena-dark'
+                }`}
+              >
+                {copy.ui[rangeCopyKey[r]]}
+              </button>
+            );
+          })}
+        </span>
       </figcaption>
       <span dir="ltr" className="relative block text-currena-blue">
         <svg
@@ -184,7 +247,7 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
           onPointerLeave={() => setFocusIdx(null)}
           onPointerCancel={() => setFocusIdx(null)}
           onKeyDown={onKeyDown}
-          onFocus={() => setFocusIdx((prev) => prev ?? clean.length - 1)}
+          onFocus={() => setFocusIdx((prev) => prev ?? series.length - 1)}
           onBlur={() => setFocusIdx(null)}
         >
         <defs>
@@ -213,17 +276,26 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
         >
           {year(dayMin)}
         </text>
-        {/* Mid-axis year tick — orientation on a decade-long axis (I6 F12). */}
-        <text
-          x={WIDTH / 2}
-          y={HEIGHT - 6}
-          fontSize="12"
-          fill="currentColor"
-          fillOpacity="0.7"
-          textAnchor="middle"
-        >
-          {year(Math.round((dayMin + dayMax) / 2))}
-        </text>
+        {/* Mid-axis year tick — orientation on a decade-long axis (I6 F12).
+            Suppressed on short ranges when it would repeat an end year (I9). */}
+        {(() => {
+          const startYear = new Date(dayMin * 86_400_000).getUTCFullYear();
+          const endYear = new Date(dayMax * 86_400_000).getUTCFullYear();
+          const midYear = new Date(Math.round((dayMin + dayMax) / 2) * 86_400_000).getUTCFullYear();
+          if (midYear === startYear || midYear === endYear) return null;
+          return (
+            <text
+              x={WIDTH / 2}
+              y={HEIGHT - 6}
+              fontSize="12"
+              fill="currentColor"
+              fillOpacity="0.7"
+              textAnchor="middle"
+            >
+              {year(Math.round((dayMin + dayMax) / 2))}
+            </text>
+          );
+        })()}
         <text
           x={WIDTH - PAD_X}
           y={HEIGHT - 6}

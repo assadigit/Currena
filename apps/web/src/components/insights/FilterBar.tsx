@@ -16,10 +16,15 @@
  *    «سرمایه‌گذاری».
  *  - The result count is aria-live="polite" so screen-reader users hear the
  *    effect of a filter, and carries a "Clear filters" reset.
+ *  - I9: every chip shows its live count — "Warning (6)" — so the reader
+ *    sees what a chip does before pressing it (same semantics as the
+ *    filter: stale/unavailable only count under All); the search input is
+ *    wired to the route's "/" focus shortcut (aria-keyshortcuts declared).
  *  - Hidden on paper (`.no-print`, index.css @media print).
  */
 
 import { formatNumber } from '@currena/core';
+import type { RefObject } from 'react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import type { StatusFilter } from './config';
@@ -32,6 +37,14 @@ const CHIP_ACTIVE: Readonly<Record<StatusFilter, string>> = {
   context: 'border-currena-blue/40 bg-currena-blue/15 text-currena-blue-deep',
 };
 
+/** Chip value → the count line that belongs to it (I9 live counts). */
+const CHIP_COUNT: Readonly<Record<StatusFilter, 'all' | 'warning' | 'normal' | 'context'>> = {
+  all: 'all',
+  warning: 'warning',
+  normal: 'normal',
+  context: 'context',
+};
+
 export interface FilterBarProps {
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
@@ -39,10 +52,14 @@ export interface FilterBarProps {
   total: number;
   /** Cards currently visible under the filter. */
   shown: number;
+  /** Live per-status counts for the chips (I9) — same semantics as the filter. */
+  counts: { all: number; warning: number; normal: number; context: number };
   status: StatusFilter;
   onStatusChange: (status: StatusFilter) => void;
   query: string;
   onQueryChange: (query: string) => void;
+  /** I9: the route wires the "/" focus-shortcut to this input. */
+  searchInputRef?: RefObject<HTMLInputElement | null>;
 }
 
 export function FilterBar({
@@ -50,10 +67,12 @@ export function FilterBar({
   numberLocale,
   total,
   shown,
+  counts,
   status,
   onStatusChange,
   query,
   onQueryChange,
+  searchInputRef,
 }: FilterBarProps) {
   const filtering = status !== 'all' || query.trim() !== '';
   const chips: readonly { value: StatusFilter; label: string }[] = [
@@ -89,6 +108,14 @@ export function FilterBar({
                 }`}
               >
                 {chip.label}
+                {/* I9: the live count — what the chip will show, before it's clicked. */}
+                <span
+                  className={`ms-1.5 tabular-nums font-bold ${
+                    active ? 'opacity-70' : 'text-currena-muted'
+                  }`}
+                >
+                  ({formatNumber(counts[CHIP_COUNT[chip.value]], numberLocale, { maximumFractionDigits: 0 })})
+                </span>
               </button>
             );
           })}
@@ -103,7 +130,9 @@ export function FilterBar({
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
             aria-label={copy.ui.searchLabel}
+            aria-keyshortcuts="/"
             placeholder={placeholder}
+            ref={searchInputRef}
             className="h-11 w-full rounded-full border border-black/10 bg-white ps-10 pe-11 text-sm text-currena-dark placeholder:text-currena-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue dark:border-white/15 dark:bg-[#1A222E] dark:text-currena-dark"
           />
           {query !== '' ? (

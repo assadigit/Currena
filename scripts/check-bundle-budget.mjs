@@ -25,12 +25,15 @@ const kB = (n) => `${(n / 1000).toFixed(2)} kB`;
 /** [file pattern, raw budget bytes, gzip budget bytes, label] */
 const BUDGETS = [
   { entry: true, raw: 289_000, gz: 88_000, label: 'entry chunk (converter — the money page)' },
-  // I8 bump (109.36/32.91 → 117.24/34.92): the card-grid filter toolbar
+  // I8 bump (109.36/32.91 → 117.27/34.83): the card-grid filter toolbar
   // (FilterBar + section/jumpnav visibility + WhatChanged focus-card rows +
-  // 26 copy strings × 2 locales). Justified in CHANGELOG §2026-10-08. The
-  // entry chunk is untouched — Insights stays lazy. Headroom stays tight so
-  // the NEXT growth bumps consciously again.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 120_000, gz: 35_500, label: 'Insights lazy chunk' },
+  // 26 copy strings × 2 locales). Justified in CHANGELOG §2026-10-08.
+  // I9 bump (117.27/34.83 → 121.12/35.81): the range segmented control +
+  // slicing in HistoryChart, live chip counts, summary jump buttons, the
+  // "/" search shortcut and 12 more copy strings × 2 locales. Justified in
+  // CHANGELOG §2026-10-08 (I9). The entry chunk is untouched — Insights
+  // stays lazy. Headroom stays tight so the NEXT growth bumps consciously.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 125_000, gz: 37_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

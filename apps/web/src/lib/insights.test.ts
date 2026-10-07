@@ -25,7 +25,10 @@ import {
   groupCounts,
   indicatorMatchesFilter,
   filterVisibleIds,
+  rangeIsPlottable,
   sampleHistoryRows,
+  sliceHistoryToRange,
+  statusCounts,
   warningZone,
 } from '../components/insights/config';
 import { insightsCopyEn } from '../i18n/insights-copy-en';
@@ -437,6 +440,75 @@ describe('card filter (I8)', () => {
     const r = SNAPSHOT.readings[0]!;
     expect(indicatorMatchesFilter(r, { status: 'all', query: '\u200Fyield' }, nameOfEn)).toBe(true);
     expect(indicatorMatchesFilter(r, { status: 'all', query: 'yield\u200E' }, nameOfEn)).toBe(true);
+  });
+});
+
+describe('statusCounts (I9)', () => {
+  it('counts All as every reading; Warning/Normal/Context exactly', () => {
+    expect(statusCounts(SNAPSHOT.readings)).toEqual({
+      all: 8,
+      warning: 2,
+      normal: 2,
+      context: 2,
+    });
+  });
+
+  it('stale/unavailable count only under All', () => {
+    const counts = statusCounts(SNAPSHOT.readings);
+    expect(counts.warning + counts.normal + counts.context).toBe(6);
+    expect(counts.all - 6).toBe(2); // dollar-broad (stale) + china-pmi (unavailable)
+  });
+});
+
+describe('chart range slicing (I9)', () => {
+  // 11 points, one per 365 days: epoch days 0..3650 (1970 → 1980).
+  const DECADE: [number, number][] = Array.from({ length: 11 }, (_, i) => [i * 365, i]);
+
+  it('10y keeps the whole (≤11-year) series', () => {
+    expect(sliceHistoryToRange(DECADE, '10y')).toHaveLength(11);
+  });
+
+  it('5y keeps the last ~5 years of points', () => {
+    const sliced = sliceHistoryToRange(DECADE, '5y');
+    expect(sliced.length).toBe(6); // days 1825..3650 (slack: 1827 → day 1825 in)
+    expect(sliced[0]![0]).toBe(1825);
+    expect(sliced[sliced.length - 1]![0]).toBe(3650);
+  });
+
+  it('1y keeps the last two points (day 3285..3650)', () => {
+    const sliced = sliceHistoryToRange(DECADE, '1y');
+    expect(sliced.map((p) => p[0])).toEqual([3285, 3650]);
+  });
+
+  it('the window is anchored on the series’ last point, not today', () => {
+    // A series that ended in ~2015: 1y must still show its own last year —
+    // points 500d apart, so the 366d window back from 16500 keeps the last two.
+    const ended: [number, number][] = [
+      [16000, 1],
+      [16300, 2],
+      [16500, 3],
+    ];
+    const sliced = sliceHistoryToRange(ended, '1y');
+    expect(sliced.map((p) => p[0])).toEqual([16300, 16500]);
+  });
+
+  it('a range that cannot show ≥2 points is not plottable; slice falls back to the full series', () => {
+    const short: [number, number][] = [
+      [0, 1],
+      [300, 2],
+    ]; // 300d apart — inside one 366d window anchored at 300
+    expect(rangeIsPlottable(short, '1y')).toBe(true);
+    const far: [number, number][] = [
+      [0, 1],
+      [1000, 2],
+    ]; // 1000d apart: the 1y window back from 1000 holds only the last point → not plottable
+    expect(rangeIsPlottable(far, '1y')).toBe(false);
+    expect(sliceHistoryToRange(far, '1y')).toEqual(far); // honest fallback
+  });
+
+  it('empty series stays empty and nothing is plottable', () => {
+    expect(sliceHistoryToRange([], '1y')).toEqual([]);
+    expect(rangeIsPlottable([], '10y')).toBe(false);
   });
 });
 

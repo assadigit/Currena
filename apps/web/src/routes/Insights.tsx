@@ -43,6 +43,7 @@ import {
   definitionsForGroup,
   filterVisibleIds,
   groupCounts,
+  statusCounts,
   type StatusFilter,
 } from '../components/insights/config';
 
@@ -183,6 +184,8 @@ export function Insights() {
   // I7 #50: a share link ('#/insights?card=<id>') opens + scrolls to that
   // card once, when the first snapshot is on screen (cached or fresh).
   const shareLinkHandled = useRef(false);
+  // I9: the "/" key focuses the filter search (see the keydown effect below).
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -231,12 +234,29 @@ export function Insights() {
 
   // Shared "go look at this card" behaviour (I7 share links + I8 WhatChanged
   // rows): open the card (single-open on phones) then scroll + focus it.
+  // I9 fix: if the active filter hides the target card, the reader's intent
+  // ("show me THIS card") wins — the filter resets before scrolling, so a
+  // WhatChanged row never silently does nothing.
   const focusCard = useCallback(
     (id: IndicatorId) => {
       setOpenCards((prev) => (isPhone ? new Set([id]) : new Set([...prev, id])));
       requestAnimationFrame(() => {
         const el = document.getElementById(`insights-card-${id}`);
-        if (!el) return; // filtered out of view right now — safe no-op
+        if (!el) {
+          // Hidden by the current filter — clear it and retry once (the
+          // reader asked for this card; the view filter must not eat it).
+          setStatusFilter('all');
+          setQuery('');
+          requestAnimationFrame(() => {
+            const retry = document.getElementById(`insights-card-${id}`);
+            if (!retry) return;
+            const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            retry.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+            retry.setAttribute('tabindex', '-1');
+            retry.focus({ preventScroll: true });
+          });
+          return;
+        }
         const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
         el.setAttribute('tabindex', '-1');
@@ -273,6 +293,39 @@ export function Insights() {
     el.focus({ preventScroll: true });
   }, []);
 
+  // I9: the summary lines jump to their sections (reuses the JumpNav pattern).
+  const jumpToSection = useCallback((section: 'global' | 'australia') => {
+    const el = document.getElementById(`insights-section-${section}`);
+    if (!el) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    el.setAttribute('tabindex', '-1');
+    el.focus({ preventScroll: true });
+  }, []);
+
+  // I9: "/" focuses the filter search (desktop muscle memory — Gmail,
+  // GitHub, YouTube). Never fires while typing in any field, and ignores
+  // modifier combos so it never swallows browser shortcuts (Cmd+/ etc.).
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent): void => {
+      if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+      const active = document.activeElement;
+      if (
+        active instanceof HTMLElement &&
+        (active.tagName === 'INPUT' ||
+          active.tagName === 'TEXTAREA' ||
+          active.tagName === 'SELECT' ||
+          active.isContentEditable)
+      ) {
+        return;
+      }
+      e.preventDefault();
+      searchInputRef.current?.focus();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+
   // I8: ids surviving the current filter (null = no filtering active).
   const visibleIds = useMemo(() => {
     if (state.kind !== 'ready') return null;
@@ -281,6 +334,13 @@ export function Insights() {
       ticker: copy.indicators[id].ticker,
     }));
   }, [state, statusFilter, query, copy]);
+
+  // I9: live per-status counts for the FilterBar chips (full snapshot —
+  // same semantics as the filter itself).
+  const chipCounts = useMemo(() => {
+    if (state.kind !== 'ready') return { all: 0, warning: 0, normal: 0, context: 0 };
+    return statusCounts(state.snapshot.readings);
+  }, [state]);
 
   // Sections with at least one visible card (drives hiding + JumpNav pills).
   const sectionVisible = useMemo<Record<InsightsSection, boolean>>(() => {
@@ -370,7 +430,12 @@ export function Insights() {
             </div>
           ) : null}
 
-          <SummaryBlock summary={state.snapshot.summary} copy={copy} onJumpAbout={jumpAbout} />
+          <SummaryBlock
+            summary={state.snapshot.summary}
+            copy={copy}
+            onJumpAbout={jumpAbout}
+            onJumpSection={jumpToSection}
+          />
           <JumpNav targets={jumpTargets} copy={copy} />
           <WhatChanged
             snapshot={state.snapshot}
@@ -387,10 +452,12 @@ export function Insights() {
             numberLocale={numberLocale}
             total={state.snapshot.readings.length}
             shown={visibleIds !== null ? visibleIds.size : state.snapshot.readings.length}
+            counts={chipCounts}
             status={statusFilter}
             onStatusChange={setStatusFilter}
             query={query}
             onQueryChange={setQuery}
+            searchInputRef={searchInputRef}
           />
           {visibleIds !== null && visibleIds.size === 0 ? (
             <div className="rounded-[18px] bg-currena-soft/60 px-5 py-8 text-center ring-1 ring-black/[0.05] dark:bg-white/[0.04] dark:ring-white/[0.07]">
