@@ -23,6 +23,7 @@ export const en = {
     receiptGenerator: 'Receipt Generator',
     calculator: 'Calculator',
     liveRates: 'Live Rates',
+    insights: 'Insights',
     expenseSplitter: 'Expense Splitter',
     splitSettle: 'Split & Settle',
     batchConverter: 'Batch Converter',
@@ -466,6 +467,14 @@ export const en = {
     noInternetNoCache:
       'No internet connection and no cached data available. Please connect to internet at least once.',
     pairNotSupported: 'This currency pair is not supported by the rate source.',
+  },
+
+  /** Insights page — only the route title lives here; the full copy corpus
+   * (28 indicators × 6 fields, both locales) is code-split with the lazy
+   * /insights route chunk in i18n/insights-copy-en.ts / -fa.ts so the entry
+   * bundle does not regress (roadmap Phase I4 perf constraint). */
+  insights: {
+    title: 'Insights',
   },
 
   footer: {

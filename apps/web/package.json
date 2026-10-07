@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@currena/core": "workspace:*",
+    "@currena/insights": "workspace:*",
     "@fontsource/poppins": "^5.0.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",

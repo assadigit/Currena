@@ -44,6 +44,9 @@ importers:
       '@currena/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@currena/insights':
+        specifier: workspace:*
+        version: link:../../packages/insights
       '@fontsource/poppins':
         specifier: ^5.0.0
         version: 5.3.0

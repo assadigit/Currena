@@ -24,6 +24,7 @@ export const fa: Dictionary = {
     receiptGenerator: 'ساخت رسید',
     calculator: 'ماشین‌حساب',
     liveRates: 'نرخ‌های لحظه‌ای',
+    insights: 'شاخص‌ها',
     expenseSplitter: 'تقسیم هزینه',
     splitSettle: 'تسویه گروهی',
     batchConverter: 'تبدیل گروهی',
@@ -458,6 +459,13 @@ export const fa: Dictionary = {
     noInternetNoCache:
       'اتصال اینترنت و داده ذخیره‌شده در دسترس نیست. لطفاً حداقل یک‌بار به اینترنت متصل شوید.',
     pairNotSupported: 'این جفت‌ارز توسط منبع نرخ پشتیبانی نمی‌شود.',
+  },
+
+  /** صفحهٔ شاخص‌ها — فقط عنوان مسیر اینجاست؛ متن کامل (۲۸ شاخص × ۶ بخش،
+   * دو زبان) همراه چانک تنبل مسیر /insights در i18n/insights-copy-en.ts/-fa.ts
+   * می‌ماند تا باندل اولیه رشد نکند (قید عملکرد فاز I4). */
+  insights: {
+    title: 'شاخص‌های اقتصادی',
   },
 
   footer: {

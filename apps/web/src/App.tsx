@@ -31,6 +31,7 @@ const Splitter = lazy(() => import('./routes/Splitter').then((m) => ({ default: 
 const Settle = lazy(() => import('./routes/Settle').then((m) => ({ default: m.Settle })));
 const Receipt = lazy(() => import('./routes/Receipt').then((m) => ({ default: m.Receipt })));
 const About = lazy(() => import('./routes/About').then((m) => ({ default: m.About })));
+const Insights = lazy(() => import('./routes/Insights').then((m) => ({ default: m.Insights })));
 
 /** <title> per route — legacy pattern "<Page> - Currena". */
 function titleKeyFor(route: string): TranslationKey {
@@ -39,6 +40,8 @@ function titleKeyFor(route: string): TranslationKey {
       return 'converter.title';
     case '/live-rates':
       return 'liveRates.title';
+    case '/insights':
+      return 'insights.title';
     case '/calculator':
       return 'calculator.title';
     case '/history':
@@ -127,6 +130,7 @@ export function App() {
             {route === '/settle' ? <Settle /> : null}
             {route === '/batch' ? <BatchConverter /> : null}
             {route === '/about' ? <About /> : null}
+            {route === '/insights' ? <Insights /> : null}
           </Suspense>
         </ErrorBoundary>
       </main>

@@ -14,6 +14,7 @@ import { useSyncExternalStore } from 'react';
 export const ROUTES = [
   '/',
   '/live-rates',
+  '/insights',
   '/calculator',
   '/history',
   '/receipt',

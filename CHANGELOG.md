@@ -5,6 +5,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-07] — Insights Phase I4: the page
+
+Gate I3 approved (owner: "Approved." with the live `/api/insights` JSON
+pasted for review). Phase I4 builds the reader-facing page: `#/insights`,
+28 expandable indicator cards, both languages, both themes, every state in
+the design spec. **Entry bundle +0.10 kB gzip** (288.75 kB / 87.78 kB gzip
+vs the 288.45 / 87.68 baseline) — the whole feature, including the ~600-line
+bilingual copy corpus, lives in the lazy route chunk (100 kB / 30.4 kB gzip).
+Tests **479 → 514 — all green** (+35 web); typecheck clean in all five
+packages. Browser-verified in en/fa × light/dark × desktop/375px against
+the exact production snapshot: zero console errors, no horizontal overflow
+(one overflow defect found and fixed during verification), offline fallback
+through the last-good localStorage snapshot, mobile single-open cards.
+Deployed and smoke-verified on currena.ir — awaiting the owner's visual
+review (Gate I4).
+
+### Added
+- `apps/web/src/routes/Insights.tsx` — lazy `/insights` route (ROUTES, nav
+  entry, per-route title). Australia before Global, jump links, about-the-data
+  + full disclaimer.
+- `apps/web/src/lib/insights.ts` — typed API client (zod-validated snapshot +
+  per-card history with expected-404 → null), localStorage last-good fallback.
+- `apps/web/src/i18n/insights-copy-en.ts` / `insights-copy-fa.ts` — the copy
+  corpus (28 indicators × 6 fields + structural strings per locale), lazy in
+  the route chunk, fa compile-time shape-checked against en.
+- `apps/web/src/components/insights/` — SummaryBlock (LED warning counts +
+  explainer + disclaimer bar), WhatChanged, ComingUp, JumpNav, IndicatorCard,
+  HistoryChart (+ screen-reader table), PositionBar, StatusChip, AboutTheData,
+  display config + pure helpers.
+- 35 web tests: client contract/error/cache paths, value/change/rule
+  formatting (en + fa), warning zones, movers ranking, group counts, history
+  sampling, copy coverage.
+
 ## [2026-10-07] — Insights Phase I3: ingestion runner, storage, API routes, production write-run green
 
 Gate I2 approved ("continue proceed"). Phase I3 builds the feature's serving

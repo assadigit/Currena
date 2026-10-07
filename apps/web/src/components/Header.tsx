@@ -33,6 +33,7 @@ const MENU_ITEMS: readonly {
 }[] = [
   { path: '/', emoji: '🏠', labelKey: 'nav.home' },
   { path: '/live-rates', emoji: '📊', labelKey: 'nav.liveRates' },
+  { path: '/insights', emoji: '📈', labelKey: 'nav.insights' },
   { path: '/calculator', emoji: '🧮', labelKey: 'nav.calculator' },
   { path: '/history', emoji: '📜', labelKey: 'nav.history' },
   { path: '/receipt', emoji: '📄', labelKey: 'nav.receiptGenerator', shortKey: 'nav.receiptShort' },
