@@ -294,6 +294,36 @@ so this was a verification + docs close-out.
 - Token-rotation reminder: both tokens (GitHub + Cloudflare) transited chat
   again this session — rotate after use.
 
+## Insights UI/UX pass deploy (2026-10-07, Phase I6)
+
+`docs(I6) 6374631` final HEAD (runtime commits `7cbd319` I6-UX contrast →
+`f7145a3` charts → `ef1be56` nav → `2ce2759` panel → `8c780e5` fa →
+`fb768bc` backtest → `51fdc04` I7 admin staleness). Standard two commands:
+web build (entry `index-v0FTqpU8.js` 288.75 kB / 87.77 kB gz — byte-stable
+with the I5 baseline; Insights chunk `Insights-CgMP2Bfh.js` 105.98 kB /
+31.94 kB gz, +1.44 kB raw / +0.45 kB gz for the scrollspy + accessible-name
+ids; precache 60 entries / 2171.95 KiB) + `wrangler deploy` → **Worker
+version `954f0034-508f-48fb-8dcf-7ad653c1666f`**, 923.27 KiB upload
+(gzip 160.10 KiB), 16 new assets (48 already uploaded), KV + `* * * * *`
+cron bindings intact, live on currena.ir + workers.dev.
+
+- No ingestion dispatch needed — the UI/UX pass is presentation-layer only;
+  the production snapshot (`generatedAt 2026-10-07T15:46:25.777Z`, 30
+  readings, quiet week, 14 calendar events) is unchanged and the 04:20 UTC
+  cron remains the steady state (today's scheduled + dispatched runs green).
+- Production smoke (agent-browser, after the normal two-reload SW cycle —
+  autoUpdate claimed the new precache on the second load): 30 cards; light
+  chips now the deep inks (success chip computed `rgb(37, 109, 41)` =
+  #256D29 ≥4.5:1); JumpNav pills 44px with scrollspy (active "Global" after
+  jump); summary block sr-only "Market summary" h2 present; expand →
+  accessible-name-labelled button, rule line 14px, chart years
+  2016/2021/2026 (no grouping separator), 44px chart-data row; fa —
+  generated line «به‌روزرسانی: ۱۴۰۵/۰۷/۱۵، ۱۵:۴۶:۲۵» (Persian comma live),
+  chart years ۲۰۱۶/۲۰۲۱/۲۰۲۶; dark theme + 375px fa/en — no horizontal
+  overflow, 30 cards, zero console/page errors.
+- Session gates: typecheck 5/5, tests **521/521** (core 159 · scraper 67 ·
+  insights 132 · web 52 · api 111), bundle budget held.
+
 ## Rollback
 
 ```sh
