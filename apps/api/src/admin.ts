@@ -140,8 +140,23 @@ function insightsCard(data: AdminPageData): string {
   const okCount = status.sources.filter((s) => s.ok).length;
   const total = status.sources.length;
   const allOk = okCount === total;
-  const pill = allOk ? 'ok' : 'warn';
-  const pillText = allOk ? 'healthy' : `${total - okCount} failing`;
+  // I7 hardening (docs/insights/05-ux-audit-I6.md wrap-up): the pill used to
+  // reflect only the last SUCCESSFUL run's source health — a cron that stops
+  // running kept the card "healthy" while the snapshot aged. The ingestion
+  // writes daily at 04:20 UTC; past 36 h the feed is stale no matter what the
+  // source rows say (36 h = one missed run + slack, still inside the
+  // public /api/insights cache's honesty window).
+  const generatedMs = Date.parse(status.generatedAt);
+  const ageH = Number.isFinite(generatedMs) ? Math.floor((data.now.getTime() - generatedMs) / 3_600_000) : null;
+  const stale = ageH === null || ageH > 36;
+  const pill = stale ? 'none' : allOk ? 'ok' : 'warn';
+  const pillText = stale
+    ? ageH === null
+      ? 'stale — no run recorded'
+      : `stale — no run for ${ageH} h`
+    : allOk
+      ? 'healthy'
+      : `${total - okCount} failing`;
   const rows = status.sources
     .map(
       (s) =>
@@ -155,6 +170,7 @@ function insightsCard(data: AdminPageData): string {
     <dt>mode</dt><dd><span class="mono">${esc(status.mode)}</span>${status.dryRun ? ' <span class="pill warn">dry-run</span>' : ''}</dd>
     <dt>snapshot</dt><dd><a href="/api/insights">/api/insights</a> · history via <span class="mono">/api/insights/:id/history</span></dd>
   </dl>
+  ${stale ? '<p class="err" role="alert">Feed is stale — the daily 04:20 UTC ingestion has not completed in over 36 h. Check the <span class="mono">insights-ingest</span> workflow run and, if needed, dispatch it manually.</p>' : ''}
   <details><summary>Show ${okCount}/${total} source rows</summary>
     <div class="tablewrap"><table><thead><tr><th>source</th><th>ok</th><th>detail</th></tr></thead>
     <tbody>${rows}</tbody></table></div>

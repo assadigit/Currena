@@ -1,9 +1,32 @@
-# BACKLOG — Autonomous Session 2026-09-24 (+ 2026-09-20 owner-UI session)
+# BACKLOG — Autonomous Session 2026-09-24 (+ 2026-09-20 owner-UI session, + Insights I6 2026-10-07)
 
 Ranked by impact ÷ effort. Tags: SECURITY / RELIABILITY / PERFORMANCE / BEST-PRACTICES / DX / UI-A11Y.
 Priority: **Must** (data loss, security, correctness) · **Should** (robustness, perf, hygiene) · **Could** (polish).
 
 Status legend: ☐ todo · 🔄 in progress · ✅ done (this session) · ⏸ escalated/deferred (see notes)
+
+## Wave 6 — Insights SWOT re-check + I7 hardening (2026-10-07, I6 session)
+
+Post-UI/UX-pass SWOT of the Insights feature (audit doc: `docs/insights/05-ux-audit-I6.md`).
+Done this session: ✅ I7 item 1 below (admin staleness alerting, 3 tests) and the
+performance-budget + precache re-measure (documented in the audit doc — entry 288.75 kB /
+87.77 gz unchanged, Insights chunk 105.98 kB / 31.94 gz, precache 60 / ~2172 KiB).
+
+**SWOT verdict:** Strengths — bilingual honest data page, all states designed, a11y bar
+now WCAG-AA-verified in both themes, lazy chunk within budget. Weaknesses — KV daily-write
+cap limits re-ingest flexibility; five indicators still un-backtestable (RBA venue block,
+short manual series). Opportunities — per-indicator share links (spec §10), chart hover
+tooltips, print stylesheet. Threats — GitHub git-write 500s (runbook exists), TGJU venue
+blocks, stale cron going unnoticed (now visible on /admin; push notification still owner-side).
+
+| # | Status | Tag | Item | Origin |
+|---|--------|-----|------|--------|
+| 45 | ✅ | RELIABILITY | /admin Insights card: staleness alerting — pill flips to "stale — no run for N h" + role=alert past 36 h (was healthy-looking while the snapshot aged); tests admin 108→111 | I7 / NEXT_SESSION_PROMPT |
+| 46 | ☐ | RELIABILITY | Failed-ingest push notification (GitHub Actions failure → email/Telegram to owner) — needs owner-side secret setup; the /admin alert is the in-app stopgap | I7 |
+| 47 | ☐ | DX | Performance-budget CI gate: fail the workflow if the entry chunk exceeds 289 kB / 88 kB gz (numbers live in docs; wire into build step) | I7 |
+| 48 | ☐ | UI-A11Y | Insights chart hover/focus tooltip (last value + date on hover; keyboard-focusable) — static SVG today, SR table is the a11y fallback | I6 audit F16 |
+| 49 | ☐ | UI | Print stylesheet for /#/insights (cards as plain sections, charts kept) | I6 audit F16 |
+| 50 | ☐ | UI | Per-indicator share links (spec §10 "later") | spec |
 
 ## Wave 5 — Owner UI wireframe + a11y session (2026-09-20, from SWOT v2)
 

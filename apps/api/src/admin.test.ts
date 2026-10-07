@@ -185,6 +185,53 @@ describe('renderAdminPage', () => {
   });
 });
 
+describe('Insights freshness card (I7 staleness alerting)', () => {
+  function insightsStatus(generatedAt: string) {
+    return {
+      v: 1 as const,
+      generatedAt,
+      mode: 'scheduled' as const,
+      dryRun: false,
+      sources: [
+        { source: 'fred', ok: true, detail: 'T10Y2Y' },
+        { source: 'frankfurter', ok: true, detail: 'usd-jpy' },
+      ],
+    };
+  }
+
+  it('a run younger than 36 h renders the healthy pill, no stale alert', () => {
+    const html = renderAdminPage(
+      pageData({ insights: insightsStatus('2026-09-17T04:20:00.000Z') }), // 1.7 h before NOW
+    );
+    expect(html).toContain('<span class="pill ok">healthy</span>');
+    expect(html).not.toContain('role="alert"');
+    expect(html).not.toContain('stale — no run');
+  });
+
+  it('a run older than 36 h flips the pill to stale and raises the alert', () => {
+    const html = renderAdminPage(
+      pageData({ insights: insightsStatus('2026-09-15T04:20:00.000Z') }), // ~49.7 h before NOW
+    );
+    expect(html).toContain('pill none');
+    expect(html).toContain('stale — no run for 49 h');
+    expect(html).toContain('role="alert"');
+    expect(html).toContain('insights-ingest');
+  });
+
+  it('source failures still warn while the run itself is fresh', () => {
+    const withFailure = {
+      ...insightsStatus('2026-09-17T04:20:00.000Z'),
+      sources: [
+        { source: 'fred', ok: true, detail: 'T10Y2Y' },
+        { source: 'rba', ok: false, detail: 'HTTP 403' },
+      ],
+    };
+    const html = renderAdminPage(pageData({ insights: withFailure }));
+    expect(html).toContain('<span class="pill warn">1 failing</span>');
+    expect(html).not.toContain('role="alert"');
+  });
+});
+
 describe('ADMIN_HEADERS', () => {
   beforeEach(() => {});
 
