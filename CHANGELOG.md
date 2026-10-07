@@ -33,6 +33,18 @@ Tests 514 → **516 green**; typecheck 5/5.
 - Count-pinning tests updated (core id set 30; definitions 19/11; snapshot 30
   readings; fa copy coverage 30 keys).
 
+### Deployed
+- Worker version `b1a5e80e-b61e-4f21-994d-4342557de5ba` (922.73 KiB upload,
+  gzip 159.88 KiB, 15 new assets) — live on currena.ir + workers.dev; entry
+  bundle byte-identical to the I5 baseline.
+- Ingestion dispatched manually (Actions run 37646617580, `success` on
+  `b69375c`): production snapshot `generatedAt 2026-10-07T15:46:25.777Z`,
+  30 readings — `gold-usd` 4107.7 and `silver-usd` 60.109, both `context`
+  with ≈92% 10-year position; new `insights:hist:gold-usd|silver-usd` keys
+  (120 points each); voting counts unchanged (global 3/11, australia 3/10).
+  Browser-verified en+fa, desktop+375px: cards lead the metals group, charts
+  + SR tables + source links render, zero console errors, no overflow.
+
 ## [2026-10-07] — Insights Phase I5: content (calendar, china-pmi) + Gate I4 ordering fix
 
 Gate I4 approved (owner: "Approved." + the live `/api/insights` JSON) with

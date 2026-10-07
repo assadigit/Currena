@@ -229,6 +229,33 @@ grepping the deployed chunk; the reverse order appears nowhere).
   byte-identical). Retry plain `git push` first; it usually recovers within
   minutes. Token discipline unchanged: env-only per command, never in files.
 
+## Gold + silver ounce-price cards deploy (2026-10-07)
+
+`feat(insights) b69375c` — `gold-usd` / `silver-usd` added at the top of the
+metals group (info-only cards; TGJU + gold-api live points over World Bank
+monthly history; owner request). The standard two commands: web build (entry
+bundle byte-identical 288.75 kB / 87.78 kB gz; Insights chunk
+`Insights-BEY6E9sZ.js` 104.54 kB / 31.49 kB gz, +1 kB for the two cards) +
+`wrangler deploy` → **Worker version `b1a5e80e-b61e-4f21-994d-4342557de5ba`**,
+922.73 KiB upload (gzip 159.88 KiB), 15 new assets, KV + cron bindings intact.
+
+- Ingestion dispatched manually again right after the push (Actions run
+  37646617580, `success` on `b69375c`, 15:46 UTC — inside the safe
+  pre-~18:30 write-budget window): snapshot `generatedAt
+  2026-10-07T15:46:25.777Z` with **30 readings** — `gold-usd` 4107.7 and
+  `silver-usd` 60.109, both `context` @ 2026-10-07 with 10-year position
+  ≈ 92%; two new `insights:hist:` keys (120 points each, 2016-11 → today);
+  voting counts unchanged (global 3/11 cautious, australia 3/10).
+- Post-deploy smoke (all green): `/api/health`, `/api/rates?source=tgju`
+  fresh, `/api/insights` 30 readings with global ids preceding australia in
+  reading order, both new history endpoints 200, single-point cards still
+  404. Real-browser pass on `currena.ir/#/insights`: en (`US$4,108` /
+  `US$60.11`, Context chips, position bars, expand → SVG chart + 12-row SR
+  table + linked sources, "Warning when: info only — never votes") and fa
+  (`۴٬۱۰۸ دلار آمریکا`, RTL, Persian position-bar wording), 375px
+  `scrollW=clientW`, zero console/page errors; VLM visual QA clean on
+  desktop-en and mobile-fa screenshots.
+
 ## Rollback
 
 ```sh
