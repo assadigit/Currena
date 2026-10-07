@@ -256,6 +256,44 @@ bundle byte-identical 288.75 kB / 87.78 kB gz; Insights chunk
   `scrollW=clientW`, zero console/page errors; VLM visual QA clean on
   desktop-en and mobile-fa screenshots.
 
+## Session wrap-up (2026-10-07 evening)
+
+Owner direction: "Proceed to next phase if anything is remaining and wrap up
+this session… Push, commit, update changelogs, deploy." Nothing remained in
+the code (the ounce-price feature + Global-first ordering were already live),
+so this was a verification + docs close-out.
+
+- Gates re-run at `8ec66dc` (clean tree): typecheck 5/5, tests **516/516
+  green** (core 157 · scraper 67 · insights 132 · web 52 · api 108).
+- Docs commit `adc3fd5` (`docs(wrap-up)`): CHANGELOG wrap-up entry,
+  `docs/NEXT_SESSION_PROMPT.md` rewritten as the hand-off brief for the next
+  agenda (**Insights UI/UX pass + completeness sweep** — I6 backtest re-run
+  and I7 hardening folded in), PROGRESS.md status row + decisions row +
+  checklist row. Pushed `8ec66dc..adc3fd5` (inline token, sed-redacted;
+  tracking ref resynced via ls-remote).
+- Redeploy from the final HEAD (`pnpm --filter @currena/web build` →
+  `wrangler deploy`): web build deterministic — **"No updated asset files to
+  upload"** (byte-identical to the deployed `b69375c` artifacts; precache 60
+  entries / 2169.10 KiB) → **Worker version
+  `01de796a-aad6-4573-922c-48aa7bf1f6c7`** (922.73 KiB / gzip 159.88 KiB;
+  RATES KV + ASSETS + `* * * * *` cron intact). Runtime identical to
+  `b1a5e80e`; the version bump exists only so production provably matches
+  the final HEAD.
+- Post-deploy smoke (all green): `/api/health` ok (kv ok); `/api/insights`
+  200 — 30 readings, `gold-usd` 4107.7 @ idx 8 + `silver-usd` 60.109 @ idx 9
+  (top of the metals group), first australia id @ 18, 14 calendar events,
+  ETag `"insights:2026-10-07T15:46:25.777Z"`; `/api/insights/gold-usd/history`
+  200; `/api/rates?source=tgju` 200; SPA 200.
+- agent-browser on `currena.ir/#/insights` (desktop + 375px): en — h2 order
+  What changed → Coming up → **Global → Australia** → About, 30 cards,
+  `US$4,108` / `US$60.11` Context cards, gold-card expand → SVG chart +
+  13-row SR table + "Warning when: info only — never votes" +
+  "TGJU (gold ounce)↗" source link; fa — `dir=rtl`, `lang=fa`, جهانی before
+  استرالیا, «قیمت طلا (اونس)» ۴٬۱۰۸ دلار آمریکا; **zero console/page
+  errors; 375px `scrollW=clientW`** (screenshot /tmp/insights-wrapup-fa.png).
+- Token-rotation reminder: both tokens (GitHub + Cloudflare) transited chat
+  again this session — rotate after use.
+
 ## Rollback
 
 ```sh
