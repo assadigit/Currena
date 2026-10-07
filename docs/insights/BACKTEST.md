@@ -1,6 +1,6 @@
-# Insights backtest — Phase I1
+# Insights backtest — Phase I1 (re-run for the 30-indicator set, Phase I6)
 
-Generated 2026-10-06 by `pnpm --filter @currena/insights backtest` from the recorded fixtures (`packages/insights/fixtures/`, captured 2026-10-06 — see the fixtures README). No live sites are touched. Thresholds are the spec starting points from `01-indicator-spec.md`; nothing here changes them — this report is the evidence the owner reviews at the Gate I1 exit.
+Generated 2026-10-07 by `pnpm --filter @currena/insights backtest` from the recorded fixtures (`packages/insights/fixtures/`, captured 2026-10-06 — see the fixtures README). No live sites are touched. Thresholds are the spec starting points from `01-indicator-spec.md`; nothing here changes them — this report is the evidence the owner reviews at the Gate I1 exit. Re-run 2026-10-07 (I6 completeness sweep) against the full 30-indicator definition set: the two owner-added ounce cards (`gold-usd`, `silver-usd`) appear in the coverage table honestly as info-only/never-votes, and `china-pmi`'s coverage note reflects its populated-but-short manual series.
 
 ## Method
 
@@ -23,13 +23,15 @@ Generated 2026-10-06 by `pnpm --filter @currena/insights backtest` from the reco
 | `govt-interest-revenue` | P2 | FRED (A091RC1Q027SBEA ÷ W006RC1Q027SBEA) | 1947-01-01 → 2026-04-01 | 318 | yes |
 | `dollar-broad` | P1 | FRED (DTWEXBGS) | 2006-01-02 → 2026-10-02 | 5203 | yes |
 | `usdjpy` | P1 | Frankfurter (ECB) | 2003-12-31 → 2026-10-05 | 5830 | yes |
+| `gold-usd` | P1 | — | — | — | no — info-only (owner-added 2026-10-07): live TGJU ounce point over World Bank monthly gold backfill — never votes |
+| `silver-usd` | P1 | — | — | — | no — info-only (owner-added 2026-10-07): live gold-api XAG point over World Bank monthly silver backfill — never votes |
 | `gold-silver` | P1 | World Bank Pink Sheet (gold ÷ silver) | 2004-01-01 → 2026-09-01 | 273 | yes |
 | `gold-btc` | P1 | — | — | — | no — live sources are I2 adapters (gold-api.com BTC); info-only, never votes |
 | `silver-btc` | P1 | — | — | — | no — live sources are I2 adapters; info-only, never votes |
 | `copper-gold` | P2 | World Bank Pink Sheet (copper ÷ gold) | 2004-01-01 → 2026-09-01 | 273 | yes |
 | `brent` | P2 | FRED (DCOILBRENTEU) | 2004-01-06 → 2026-09-29 | 5670 | yes |
 | `m2-us` | P2 | FRED (M2SL) | 1959-01-01 → 2026-08-01 | 812 | yes |
-| `china-pmi` | P2 | — | — | — | no — manual-entry series (data/manual/china-pmi.json) — populated from Phase I5 |
+| `china-pmi` | P2 | — | — | — | no — manual series (data/manual/china-pmi.json) populated since Phase I5 but starts 2025-12 — 10 observations, too short for any backtest window or the percentile floor; votes in production (threshold < 50) once history accrues |
 | `usdcny` | P2 | Frankfurter (ECB) | 2003-12-31 → 2026-10-05 | 5830 | yes |
 | `rba-cash-rate` | P1 | — | — | — | no — rba.gov.au Akamai-blocked from the sandbox (03-data-sources.md); info-only, never votes |
 | `au-cpi` | P1 | ABS (CPI All groups) | 2005-01-01 → 2026-04-01 | 86 | yes |
@@ -422,7 +424,8 @@ Share of weeks each voting indicator spent in warning:
 - See the tables above: any indicator that spends ~0% or ~100% of a stress window in warning is a threshold the owner may want to re-tune at this gate.
 - Info-only cards (gold-btc, silver-btc, gold-aud, rba-cash-rate, usdcny) never vote by construction.
 
-## Findings and recommendations (agent-reviewed 2026-10-06)
+
+## Findings and recommendations (agent-reviewed 2026-10-06; re-affirmed on the 2026-10-07 I6 re-run)
 
 **Do the labels move sensibly? Yes — direction and timing are right in every window.**
 
@@ -435,12 +438,11 @@ Share of weeks each voting indicator spent in warning:
 **Threshold observations for the owner (nothing changed unilaterally — all spec-verbatim):**
 
 1. **`brent` fires on sharp recoveries too.** The "up 25% in 3 months" rule warned in July 2020 on the +250% rebound off the April COVID low, when oil was still historically cheap. A momentum rule cannot tell recovery from shock. Options: keep as-is (big commodity moves are noteworthy either way), or gate it with a level condition (e.g. only above its 10-year median). **Recommendation: keep as-is for v1** — the card explains *why* it fired, and the copy can say "a large move in either direction".
-2. **The 2008 global peak is "stressed", not "alarmed"** (58% of 12). Australia did reach "alarmed". Partly a small-denominator effect (only 12 voters backtested; five voters are P2/info-blocked), partly correct economics (the dollar and gold-silver spiked *up* = warnings, but the curve steepened and yields crashed = not warnings). No change recommended; adding the P2 voters in I6 shifts the denominator.
+2. **The 2008 global peak is "stressed", not "alarmed"** (58% of 12). Australia did reach "alarmed". Partly a small-denominator effect (only 12 voters backtested; five voters are P2/info-blocked), partly correct economics (the dollar and gold-silver spiked *up* = warnings, but the curve steepened and yields crashed = not warnings). No change recommended; adding the P2 voters shifts the denominator.
 3. **`au-cpi` / `au-trimmed-mean` at exactly 3.0%** are normal (strict `>`). Both sit at 3.94/3.65 today → warning; both were 7.86/… in 2022. Threshold behaves as specified.
 4. **`dollar-broad` at the 79th percentile today** is one basis point-region from warning. Borderline proximity is inherent to percentile rules; no change recommended.
-5. **Stale calibration mattered and was fixed during this run** (recorded for transparency): monthly grace 45→95 days, quarterly 100→190 days (real release lags: ABS unemployment is ~50 days old at publication in the worst case, quarterly BEA/ABS up to ~6 months from observation date); the STLFSI4 sustained-weeks window is now anchored on the latest *observation* rather than the run date so release lag cannot shrink it; the percentile floor is 30 periods (a quarterly series only carries ~40 periods per decade — a 120 floor would have made every quarterly percentile rule permanently unevaluable). `brent` shows `stale` in the today-run purely because the FRED fixture's last Brent print is 2026-09-29 (a capture-time lag); production EIA data normally updates within the 3-day grace.
+5. **Stale calibration mattered and was fixed during the I1 run** (recorded for transparency): monthly grace 45→95 days, quarterly 100→190 days (real release lags: ABS unemployment is ~50 days old at publication in the worst case, quarterly BEA/ABS up to ~6 months from observation date); the STLFSI4 sustained-weeks window is now anchored on the latest *observation* rather than the run date so release lag cannot shrink it; the percentile floor is 30 periods (a quarterly series only carries ~40 periods per decade — a 120 floor would have made every quarterly percentile rule permanently unevaluable). `brent` shows `stale` in the today-run purely because the FRED fixture's last Brent print is 2026-09-29 (a capture-time lag); production EIA data normally updates within the 3-day grace.
 
-**What could not be backtested (and why):** `au-us-10y-gap` and `rba-cash-rate` need RBA tables the sandbox cannot reach (Akamai 403; venue re-probe at Phase I2); `china-pmi` awaits the manual-entry series (Phase I5); `terms-of-trade`, `au-home-values`, `au-household-debt-arrears` are Phase I2 adapter work; `gold-btc` / `silver-btc` / `gold-aud` are live-source composites and never vote. The backtest denominators state this explicitly (12 global / 6 Australian voters of the eventual 14 / 8 P1 voters).
+**What could not be backtested (and why):** `au-us-10y-gap` and `rba-cash-rate` need RBA tables the sandbox cannot reach (Akamai 403; venue re-probe at Phase I2); `china-pmi`'s manual series is populated (Phase I5) but starts 2025-12 — 10 observations, too short for any backtest window or the percentile floor (it votes in production today via its threshold rule); `terms-of-trade`, `au-home-values`, `au-household-debt-arrears` are Phase I2 adapter work; `gold-btc` / `silver-btc` / `gold-aud` / `gold-usd` / `silver-usd` are live-source composites or info-only and never vote. The backtest denominators state this explicitly (11 global / 6 Australian voters of the eventual 14 / 8 P1 voters).
 
-**Recommendation:** proceed to Phase I2 with the spec thresholds as-is. The two candidate tunings (`brent` recovery gating; nothing else) can be decided at this gate or revisited after P2 lands — the definitions table makes any later change a one-line, test-pinned edit.
-
+**I6 re-run verdict (2026-10-07):** the full 30-indicator definition set regenerates this report without touching a single number — the ounce cards and short manual series are excluded by construction and reported honestly in the coverage table. No threshold changes are proposed; the I1 recommendation stands (spec thresholds as-is; `brent` recovery gating is the one candidate tuning, owner's call).

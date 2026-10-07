@@ -56,7 +56,32 @@ error state; skeleton.
 | F15 | **P3 polish** | Trivial | Card footer meta at 0.68rem (10.9px) is very small; position bar 8px tall is thin; warning-zone tint 25% barely perceptible (non-text contrast). | review |
 | F16 | Could | — | Chart hover/focus tooltip, print stylesheet — stretch items, backlogged. | — |
 
-## Fix plan (Phase B — presentation layer only)
+## Fix plan (Phase B — presentation layer only) — STATUS: SHIPPED
+
+Commits `7cbd319` (a11y contrast), `f7145a3` (charts), `ef1be56` (nav +
+summary + tap targets), `2ce2759` (accessible names + panel readability),
+`8c780e5` (fa polish) — all pushed; every commit verified with typecheck
+5/5 + tests green (516 → **518**), agent-browser en/fa × desktop/375px ×
+light/dark, zero console errors, no horizontal overflow.
+
+| Finding | Status |
+|---|---|
+| F1 chips / F2 accents / F3 what-changed / F4 coral-soon / F5 stale opacity | **Fixed** — `-deep` ink tokens both themes (re-measured 4.62–10.47:1); stale grey-out = surface tint + muted value |
+| F6 JumpNav scrollspy + 30px pills | **Fixed** — active section via rAF scroll listener, `aria-current`, 44px pills |
+| F7 sub-44px targets | **Fixed** — chart-table summary full-width 44px row; both text links padded hit areas |
+| F8 year separators | **Fixed** — `useGrouping:false` (2016 / ۲۰۱۶) + core test |
+| F9 summary landmark | **Fixed** — own label + sr-only h2 (`ui.summaryTitle`, en+fa) |
+| F10 33-word button names | **Fixed** — button + h4 labelled by name(+ticker)+status |
+| F11 panel wall-of-text | **Fixed** — rule line text-sm, titles 0.75rem, gap-4 |
+| F12 chart ticks | **Fixed** — start/mid/end year labels |
+| F13 disclaimer + how-calc link | **Fixed** — softened bar; padded link target |
+| F14 Jalali datetime comma | **Fixed** — «،» in fa (+ core test; also fixes ResultPopup) |
+| F15 footer size / bar depth / zone tint | **Fixed** — 0.7rem footer, 10px bar, 30% zone |
+| F16 chart tooltip / print | **Backlogged** (docs/BACKLOG.md) — stretch items |
+
+Bundle budget held: entry 288.75 kB / 87.77 kB gz (unchanged); Insights
+chunk 104.54 → 105.98 kB (31.49 → 31.94 kB gz, +0.45 gz — scrollspy +
+labels, justified); precache 60 entries / 2172 KiB.
 
 1. **I6-UX contrast**: add *deep* accent tokens to the theme (light values
    ≥4.5:1 on white/tints; dark overrides keep the current bright tokens),
@@ -76,6 +101,6 @@ error state; skeleton.
 5. **I6-UX fa polish**: Persian comma for Jalali date-time runs in core
    `formatJalaliDate` (fa only) + unit test.
 
-Every change: typecheck 5/5 + 516 tests green (update pure-logic tests),
-bundle budget (entry ≈ ≤289 kB / ≤88 kB gz; Insights chunk growth justified),
-agent-browser verify en/fa × desktop/375 × light/dark, zero console errors.
+Every change: typecheck 5/5 + 518 tests green, bundle budget (entry ≈
+≤289 kB / ≤88 kB gz; Insights chunk growth justified), agent-browser
+verify en/fa × desktop/375 × light/dark, zero console errors.

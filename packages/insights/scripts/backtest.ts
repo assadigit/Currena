@@ -102,12 +102,15 @@ const SOURCE_NAMES: Partial<Record<IndicatorId, string>> = {
 };
 
 const NOT_BACKTESTED: Readonly<Partial<Record<IndicatorId, string>>> = {
+  'gold-usd': 'info-only (owner-added 2026-10-07): live TGJU ounce point over World Bank monthly gold backfill — never votes',
+  'silver-usd': 'info-only (owner-added 2026-10-07): live gold-api XAG point over World Bank monthly silver backfill — never votes',
   'gold-btc': 'live sources are I2 adapters (gold-api.com BTC); info-only, never votes',
   'silver-btc': 'live sources are I2 adapters; info-only, never votes',
   'gold-aud': 'composed from live TGJU gold + Frankfurter AUD (I2); info-only, never votes',
   'rba-cash-rate': 'rba.gov.au Akamai-blocked from the sandbox (03-data-sources.md); info-only, never votes',
   'au-us-10y-gap': 'RBA F2 unreachable from the sandbox — pending the Phase I2 venue re-probe',
-  'china-pmi': 'manual-entry series (data/manual/china-pmi.json) — populated from Phase I5',
+  'china-pmi':
+    'manual series (data/manual/china-pmi.json) populated since Phase I5 but starts 2025-12 — 10 observations, too short for any backtest window or the percentile floor; votes in production (threshold < 50) once history accrues',
   'terms-of-trade': 'ABS ANA_AGG adapter is Phase I2 work (P2 indicator)',
   'au-home-values': 'ABS RES_DWELL_ST adapter is Phase I2 work (P2 indicator)',
   'au-household-debt-arrears': 'ABS E2 adapter is Phase I2 work (P2 indicator)',
