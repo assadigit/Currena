@@ -217,6 +217,18 @@ grepping the deployed chunk; the reverse order appears nowhere).
   Global→Australia, summary rows, jump nav, card expand, 375px no overflow,
   zero console errors).
 
+- Push-path fallback (observed 2026-10-07 15:08–15:13 UTC): `git push` can
+  fail repo-wide with `remote: Internal Server Error` while reads
+  (`ls-remote`/fetch) and the REST API stay healthy (a GitHub-side write-path
+  hiccup; the status page may still say "operational"). Workaround that
+  landed the docs commit: create blob → tree → commit via
+  `POST /repos/{owner}/{repo}/git/blobs|trees|commits`, then fast-forward
+  the ref with `PATCH /repos/{owner}/{repo}/git/refs/heads/main`, replaying
+  the local commit's exact author/committer/message — the API reproduces the
+  SAME commit SHA, so local and remote stay identical (verified
+  byte-identical). Retry plain `git push` first; it usually recovers within
+  minutes. Token discipline unchanged: env-only per command, never in files.
+
 ## Rollback
 
 ```sh
