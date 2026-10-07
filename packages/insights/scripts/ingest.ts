@@ -1,6 +1,6 @@
 /**
  * Phase I3 ingestion runner — the production twin of live-run: fetches every
- * source (src/adapters/collect.ts), assembles the 28 indicator series,
+ * source (src/adapters/collect.ts), assembles the 30 indicator series,
  * computes the snapshot with the scoring engine and WRITES it to Workers KV
  * through the Cloudflare REST API (RestInsightsStore).
  *

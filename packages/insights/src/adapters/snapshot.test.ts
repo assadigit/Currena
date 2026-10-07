@@ -90,8 +90,8 @@ describe('buildInsightsSnapshot', () => {
       calendar: [],
       now: NOW,
     });
-    expect(snap.readings).toHaveLength(28);
-    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(28);
+    expect(snap.readings).toHaveLength(30);
+    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(30);
     expect(snap.readings.find((r) => r.id === 'us10y')!.status).not.toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.status).toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.value).toBeNull();

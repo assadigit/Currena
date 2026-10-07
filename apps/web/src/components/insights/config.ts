@@ -108,6 +108,8 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'govt-interest-revenue': { decimals: 1, unit: 'percent', scale: 100 },
   'dollar-broad': { decimals: 2, unit: 'none' },
   usdjpy: { decimals: 2, unit: 'none' },
+  'gold-usd': { decimals: 0, unit: 'usd' },
+  'silver-usd': { decimals: 2, unit: 'usd' },
   'gold-silver': { decimals: 1, unit: 'none' },
   'gold-btc': { decimals: 4, unit: 'none' },
   'silver-btc': { decimals: 5, unit: 'none' },

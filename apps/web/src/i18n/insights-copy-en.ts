@@ -2,7 +2,7 @@
  * Insights copy dictionary — ENGLISH (source of truth, Phase I4).
  *
  * The Insights page carries by far the largest string corpus in the app
- * (28 indicators × 6 copy fields + structural strings, both languages) —
+ * (30 indicators × 6 copy fields + structural strings, both languages) —
  * ~2× the whole existing main dictionary. Loading it through the eager
  * en.ts/fa.ts dictionaries would grow the ENTRY bundle the roadmap
  * explicitly protects ("the Insights route must be lazy-loaded so initial
@@ -150,6 +150,34 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'The pair reflects two economies and intervention rumours at once; direction alone is not a signal.',
     forYou:
       'A watched proxy for global risk appetite: yen strength usually means investors are de-risking.',
+  },
+  'gold-usd': {
+    name: 'Gold price (ounce)',
+    ticker: 'XAU',
+    oneLiner: 'The world gold price — what one troy ounce costs in US dollars.',
+    whatItIs:
+      'The spot price of one troy ounce of gold, quoted in US dollars; the history chart shows World Bank monthly averages.',
+    whyItMatters:
+      'Gold is the classic hedge: its price tends to draw bid when investors fear inflation, crisis or currency debasement.',
+    tendedToMean:
+      'Long run-ups marked the inflationary 1970s, the 2000s commodity boom and the post-2020 era; the sharpest falls came when real interest rates spiked.',
+    cantTell:
+      'Real yields, the dollar, central-bank buying and fear all pull at once — the level alone is not a forecast of anything.',
+    forYou: 'The headline hard-asset price the other precious-metal cards on this page are built on.',
+  },
+  'silver-usd': {
+    name: 'Silver price (ounce)',
+    ticker: 'XAG',
+    oneLiner: 'The world silver price — what one troy ounce costs in US dollars.',
+    whatItIs:
+      'The spot price of one troy ounce of silver, quoted in US dollars; the history chart shows World Bank monthly averages.',
+    whyItMatters:
+      'Silver is half precious metal, half industrial input — investment demand and factory demand (electronics, solar panels) pull on the same price.',
+    tendedToMean:
+      'Its famous spikes (1980, 2011) came when investment fever met tight supply; long quiet stretches followed as the memory faded.',
+    cantTell:
+      'Far more volatile than gold, and its industrial and investment sides can pull in opposite directions at once.',
+    forYou: 'Gold’s industrial cousin — the other leg of the Gold / Silver ratio card.',
   },
   'gold-silver': {
     name: 'Gold / Silver',

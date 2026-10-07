@@ -318,13 +318,13 @@ import {
 } from './schemas';
 
 describe('Insights: IndicatorIdSchema (contract shape is deliberate)', () => {
-  it('pins the exact v1 indicator set — 28 ids, blocked/licensed items absent', () => {
+  it('pins the exact v1 indicator set — 30 ids (28 + the 2026-10-07 ounce-price amendment), blocked/licensed items absent', () => {
     const ids = IndicatorIdSchema.options;
-    expect(ids).toHaveLength(28);
+    expect(ids).toHaveLength(30);
     for (const blocked of ['vix', 'spx-gold', 'breadth', 'cape']) {
       expect(ids).not.toContain(blocked);
     }
-    for (const expected of ['yield-curve-10y2y', 'stress-stlfsi', 'gold-silver', 'china-pmi', 'rba-cash-rate', 'au-us-10y-gap', 'terms-of-trade', 'au-household-debt-arrears']) {
+    for (const expected of ['yield-curve-10y2y', 'stress-stlfsi', 'gold-usd', 'silver-usd', 'gold-silver', 'china-pmi', 'rba-cash-rate', 'au-us-10y-gap', 'terms-of-trade', 'au-household-debt-arrears']) {
       expect(ids).toContain(expected);
     }
   });

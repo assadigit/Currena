@@ -17,7 +17,11 @@
  *    sources, so no change/percentile is invented;
  *  - gold-silver = World Bank monthly history + today's live point
  *    (TGJU gold ÷ gold-api XAG) appended — the monthly percentile base is
- *    the adapter's concern by design (definitions.ts cadence note).
+ *    the adapter's concern by design (definitions.ts cadence note);
+ *  - gold-usd / silver-usd follow the same recipe with the raw ounce
+ *    prices themselves (TGJU gold; gold-api XAG) as the live point —
+ *    info-only price cards (owner request 2026-10-07: "the ounce price of
+ *    Gold and ounce price of Silver … in the precious metals part").
  *
  * Total function: whatever provider input is MISSING simply omits the
  * affected indicators (the runner renders those unavailable). Failures
@@ -107,6 +111,26 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   put('usdcny', fx.CNY);
 
   /* ---------------- Global — Metals, crypto and hard assets ---------------- */
+  // Ounce price cards (owner request 2026-10-07): World Bank monthly history
+  // + today's live point, exactly the gold-silver recipe. Without the World
+  // Bank leg they degrade to single-point live cards (no percentile); without
+  // the live leg they fall back to the monthly history (reads stale — honest).
+  if (inputs.tgjuGoldOunceUsd !== undefined) {
+    put(
+      'gold-usd',
+      wb ? withLivePoint(wb.gold, today, inputs.tgjuGoldOunceUsd) : singlePoint(today, inputs.tgjuGoldOunceUsd),
+    );
+  } else if (wb) {
+    put('gold-usd', wb.gold);
+  }
+  if (inputs.xagSpot) {
+    put(
+      'silver-usd',
+      wb ? withLivePoint(wb.silver, today, inputs.xagSpot.price) : singlePoint(today, inputs.xagSpot.price),
+    );
+  } else if (wb) {
+    put('silver-usd', wb.silver);
+  }
   if (wb && inputs.tgjuGoldOunceUsd !== undefined && inputs.xagSpot) {
     const history = combineSeries(wb.gold, wb.silver, (g, s) => g / s);
     put(
@@ -178,6 +202,8 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'dollar-broad': { name: 'FRED (DTWEXBGS)', url: 'https://fred.stlouisfed.org/series/DTWEXBGS' },
   usdjpy: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   usdcny: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
+  'gold-usd': { name: 'TGJU (gold ounce)', url: 'https://www.tgju.org/profile/ons' },
+  'silver-usd': { name: 'gold-api.com', url: 'https://www.gold-api.com' },
   'gold-silver': { name: 'TGJU ÷ gold-api.com (history: World Bank)', url: 'https://www.gold-api.com' },
   'gold-btc': { name: 'TGJU ÷ gold-api.com', url: 'https://www.gold-api.com' },
   'silver-btc': { name: 'gold-api.com', url: 'https://www.gold-api.com' },

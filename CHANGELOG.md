@@ -5,6 +5,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-07] — Insights: gold and silver ounce prices in the precious-metals group
+
+Owner request ("I want the ounce price of Gold and ounce price of Silver to be
+added in the precious metals part"): two new info-only cards at the top of
+**Metals, crypto and hard assets** — `gold-usd` and `silver-usd`. They render
+first in the group (prices before the ratios built from them), never vote, and
+so leave every summary count unchanged. 30 indicators total (19 P1 / 11 P2).
+Tests 514 → **516 green**; typecheck 5/5.
+
+### Added
+- `gold-usd` — Gold price (ounce), US$ per troy ounce: live TGJU world-market
+  ounce quote with World Bank Pink Sheet monthly history backfill (the exact
+  `gold-silver` recipe with the raw price as the live point). Displayed as
+  `US$4,104`-style whole dollars; carries the 10-year position bar and chart.
+- `silver-usd` — Silver price (ounce), US$ per troy ounce: live gold-api.com
+  XAG spot with the same World Bank monthly backfill. Displayed to 2 decimals
+  (`US$60.13`).
+- Bilingual copy corpus entries (en + native fa) for both cards; spec table
+  amendment in `docs/insights/01-indicator-spec.md`.
+
+### Changed
+- `IndicatorIdSchema` (core contract), `DEFINITIONS`, `buildIndicatorSeries`
+  and `READING_SOURCES` (@currena/insights), `DISPLAY` (apps/web) — the two
+  ids wired through every layer; degradation ladders tested (no World Bank →
+  single live point; no live source → monthly history reads stale, honest).
+- Count-pinning tests updated (core id set 30; definitions 19/11; snapshot 30
+  readings; fa copy coverage 30 keys).
+
 ## [2026-10-07] — Insights Phase I5: content (calendar, china-pmi) + Gate I4 ordering fix
 
 Gate I4 approved (owner: "Approved." + the live `/api/insights` JSON) with

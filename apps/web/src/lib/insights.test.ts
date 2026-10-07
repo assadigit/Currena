@@ -379,6 +379,6 @@ describe('copy dictionaries', () => {
       expect(insightsCopyFa.indicators[id]).toBeDefined();
       expect(insightsCopyFa.indicators[id]?.name.length).toBeGreaterThan(0);
     }
-    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(28);
+    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(30);
   });
 });

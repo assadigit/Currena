@@ -9,9 +9,10 @@
  *    route (CPI + CPI_Q flows) is verified current; the fresh monthly
  *    indicator would need the keyed ABS Indicator API (owner-side key,
  *    deferred until monthly cadence is actually wanted).
- *  - `gold-silver` history is monthly (World Bank backfill) even though the
- *    live value is daily; cadence says how often the *data* updates, so it is
- *    `daily` and the monthly percentile base is the adapter's concern.
+ *  - `gold-silver`, `gold-usd`, `silver-usd` history is monthly (World Bank
+ *    backfill) even though the live value is daily; cadence says how often
+ *    the *data* updates, so they are `daily` and the monthly percentile base
+ *    is the adapter's concern.
  *  - `au-us-10y-gap` is `weekly` (Phase I2 venue finding): RBA F2 publishes
  *    with a 2–4 business-day lag, so a daily cadence would trip the 3-day
  *    daily stale grace on ordinary publication lags; the value stays daily.
@@ -125,6 +126,30 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     rule: { kind: 'change', mode: 'pct', direction: 'fall', magnitude: 5, windowWeeks: 4 },
   },
   /* ---------------- Global — Metals, crypto and hard assets ---------------- */
+  {
+    id: 'gold-usd',
+    section: 'global',
+    group: 'metals-crypto',
+    name: 'Gold price (ounce)',
+    source: 'derived',
+    sourceRef: 'TGJU gold ounce (history: World Bank Pink Sheet gold, monthly)',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+  },
+  {
+    id: 'silver-usd',
+    section: 'global',
+    group: 'metals-crypto',
+    name: 'Silver price (ounce)',
+    source: 'derived',
+    sourceRef: 'gold-api.com XAG spot (history: World Bank Pink Sheet silver, monthly)',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+  },
   {
     id: 'gold-silver',
     section: 'global',

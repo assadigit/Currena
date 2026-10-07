@@ -302,6 +302,8 @@ export const IndicatorIdSchema = z.enum([
   'dollar-broad',
   'usdjpy',
   // Global — Metals, crypto and hard assets
+  'gold-usd',
+  'silver-usd',
   'gold-silver',
   'gold-btc',
   'silver-btc',

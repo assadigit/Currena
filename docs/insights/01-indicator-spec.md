@@ -20,6 +20,8 @@
 | `govt-interest-revenue` | US government interest payments / tax revenue | Rates and credit | Highest 20% of 10 years | P2 |
 | `dollar-broad` | Broad US dollar index | Currencies | Highest 20% of 10 years | P1 |
 | `usdjpy` | USD/JPY | Currencies | Falls more than 5% in 4 weeks | P1 |
+| `gold-usd` | Gold price (ounce, US$) | Metals, crypto, hard assets | Info only | P1 |
+| `silver-usd` | Silver price (ounce, US$) | Metals, crypto, hard assets | Info only | P1 |
 | `gold-silver` | Gold / Silver | Metals, crypto, hard assets | Above 80th percentile | P1 |
 | `gold-btc` | Gold / Bitcoin | Metals, crypto, hard assets | Info only | P1 |
 | `silver-btc` | Silver / Bitcoin | Metals, crypto, hard assets | Info only | P1 |
@@ -34,6 +36,12 @@
 | `breadth` | Market breadth (equal-weight vs regular S&P 500) | Stocks, growth, liquidity | Lowest 20% | **P3 (blocked)** |
 
 Group labels in the UI: Rates and credit; Currencies; Metals, crypto and hard assets; Stocks, growth and liquidity.
+
+> **Amendment 2026-10-07 (owner request):** `gold-usd` and `silver-usd` added to
+> the metals group — the ounce prices of gold (TGJU) and silver (gold-api.com)
+> in US dollars, with World Bank monthly history backfill. Info-only cards: they
+> display the price, 7/30-day changes and the 10-year position but never vote,
+> so the summary counts are unchanged.
 
 ## 2. Australian indicators
 

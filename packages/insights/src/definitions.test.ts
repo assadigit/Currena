@@ -12,15 +12,15 @@ describe('DEFINITIONS (the v1 indicator table)', () => {
     }
   });
 
-  it('covers every v1 indicator id exactly once (28, blocked ids absent)', () => {
+  it('covers every v1 indicator id exactly once (30, blocked ids absent)', () => {
     const ids = DEFINITIONS.map((d) => d.id);
     expect(new Set(ids).size).toBe(ids.length);
     expect(ids).toHaveLength(IndicatorIdSchema.options.length);
     expect([...ids].sort()).toEqual([...IndicatorIdSchema.options].sort());
   });
 
-  it('splits 17 P1 / 11 P2 as the roadmap promises', () => {
-    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(17);
+  it('splits 19 P1 / 11 P2 (the roadmap 17/11 plus the two owner-requested ounce-price cards)', () => {
+    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(19);
     expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(11);
   });
 
@@ -49,9 +49,17 @@ describe('DEFINITIONS (the v1 indicator table)', () => {
     }
   });
 
-  it('info-only cards never vote: exactly the five info rules the spec lists', () => {
+  it('info-only cards never vote: exactly the seven info rules (spec + the two ounce-price cards)', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
-    expect(info).toEqual(['gold-aud', 'gold-btc', 'rba-cash-rate', 'silver-btc', 'usdcny']);
+    expect(info).toEqual([
+      'gold-aud',
+      'gold-btc',
+      'gold-usd',
+      'rba-cash-rate',
+      'silver-btc',
+      'silver-usd',
+      'usdcny',
+    ]);
   });
 
   it('key thresholds are spec-verbatim (backtest may propose changes, never silently)', () => {

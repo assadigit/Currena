@@ -470,7 +470,7 @@ export const en = {
   },
 
   /** Insights page — only the route title lives here; the full copy corpus
-   * (28 indicators × 6 fields, both locales) is code-split with the lazy
+   * (30 indicators × 6 fields, both locales) is code-split with the lazy
    * /insights route chunk in i18n/insights-copy-en.ts / -fa.ts so the entry
    * bundle does not regress (roadmap Phase I4 perf constraint). */
   insights: {

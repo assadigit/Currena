@@ -135,6 +135,13 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
     expect(out['gold-btc']).toEqual([{ date: today, value: 4162.6 / 86625 }]);
     expect(out['silver-btc']).toEqual([{ date: today, value: 61.28 / 86625 }]);
     expect(out['gold-aud']).toEqual([{ date: today, value: 4162.6 * 1.4322 }]);
+    // ounce price cards: monthly history + today's live point appended
+    expect(out['gold-usd']).toHaveLength(3);
+    expect(out['gold-usd']!.at(-1)).toEqual({ date: today, value: 4162.6 });
+    expect(out['gold-usd']!.at(-2)).toEqual({ date: '2026-09-01', value: 4319 });
+    expect(out['silver-usd']).toHaveLength(3);
+    expect(out['silver-usd']!.at(-1)).toEqual({ date: today, value: 61.28 });
+    expect(out['silver-usd']!.at(-2)).toEqual({ date: '2026-09-01', value: 64.6 });
     // gold-silver: monthly history + today's live point appended
     expect(out['gold-silver']).toHaveLength(3);
     expect(out['gold-silver']!.at(-1)).toEqual({ date: today, value: 4162.6 / 61.28 });
@@ -163,6 +170,24 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
     const out = buildIndicatorSeries(staleLive);
     expect(out['gold-silver']).toHaveLength(2);
     expect(out['gold-silver']!.at(-1)!.date).toBe('2026-09-01');
+    expect(out['gold-usd']).toHaveLength(2);
+    expect(out['gold-usd']!.at(-1)).toEqual({ date: '2026-09-01', value: 4319 });
+    expect(out['silver-usd']).toHaveLength(2);
+    expect(out['silver-usd']!.at(-1)).toEqual({ date: '2026-09-01', value: 64.6 });
+  });
+
+  it('degrades the ounce price cards to single live points without the World Bank leg', () => {
+    const noWb = { ...inputs, wb: undefined };
+    const out = buildIndicatorSeries(noWb);
+    expect(out['gold-usd']).toEqual([{ date: today, value: 4162.6 }]);
+    expect(out['silver-usd']).toEqual([{ date: today, value: 61.28 }]);
+  });
+
+  it('falls back to World Bank monthly history when the live ounce sources are down', () => {
+    const noLive = { ...inputs, tgjuGoldOunceUsd: undefined, xagSpot: undefined };
+    const out = buildIndicatorSeries(noLive);
+    expect(out['gold-usd']).toEqual(inputs.wb.gold);
+    expect(out['silver-usd']).toEqual(inputs.wb.silver);
   });
 
   it('covers a reading source for every id it can emit', () => {
