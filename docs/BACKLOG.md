@@ -25,7 +25,7 @@ blocks, stale cron going unnoticed (now visible on /admin; push notification sti
 | 46 | ☐ | RELIABILITY | Failed-ingest push notification (GitHub Actions failure → email/Telegram to owner) — needs owner-side secret setup; the /admin alert is the in-app stopgap | I7 |
 | 47 | ✅ | DX | Performance-budget CI gate — `.github/workflows/ci.yml` (push/PR: typecheck + tests + build + budget) + `scripts/check-bundle-budget.mjs` (entry 289 kB / 88 kB gz, Insights 110 / 33) | I7 |
 | 48 | ✅ | UI-A11Y | Insights chart hover/focus tooltip — pointermove tracks the nearest point (guide line + dot + date/value tooltip), ← → Home End keyboard stepping, touch-pan-y keeps mobile scrolling; SR table stays the text path | I6 audit F16 |
-| 49 | ☐ | UI | Print stylesheet for /#/insights (cards as plain sections, charts kept) | I6 audit F16 |
+| 49 | ✅ | UI | Print stylesheet — @media print in index.css: theme forced to the light palette, header chrome + nav buttons hidden (logo kept), cards/sections/figures break-inside: avoid, external links spell out their URL, SVG/LED colors kept exact; verified via PDF export + VLM | I6 audit F16 |
 | 50 | ☐ | UI | Per-indicator share links (spec §10 "later") | spec |
 
 ## Wave 5 — Owner UI wireframe + a11y session (2026-09-20, from SWOT v2)

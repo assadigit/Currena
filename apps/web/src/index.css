@@ -1060,3 +1060,93 @@ body {
     animation: none;
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * Print (I7, BACKLOG #49 — Insights-first, app-wide hygiene)
+ *
+ * Printing the page (or "Save as PDF") should produce a clean light
+ * document regardless of the active theme: the fixed blur header and the
+ * floating nav utilities are chrome, cards avoid page-break tears, and
+ * off-site links spell out their URL (paper can't click). Dark-mode
+ * tokens are overridden back to the light palette inside the print box.
+ * ------------------------------------------------------------------ */
+
+@media print {
+  /* Theme → light palette even when printing from Currena Night. */
+  :root {
+    color-scheme: light;
+  }
+  .dark {
+    --color-currena-soft: #E8F4F8;
+    --color-currena-blue: #4A90E2;
+    --color-currena-cyan: #7DD3C0;
+    --color-currena-coral: #F8A978;
+    --color-currena-dark: #2C3E50;
+    --color-currena-muted: #6B7280;
+    --color-currena-warning: #FF6B6B;
+    --color-currena-success: #4CAF50;
+    --color-currena-bg-light: #F8FAFB;
+    --color-currena-blue-deep: #245E9F;
+    --color-currena-success-deep: #256D29;
+    --color-currena-warning-deep: #B92E2E;
+    --color-currena-coral-deep: #9C5019;
+    color-scheme: light;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  /* App chrome that has no meaning on paper: the header's nav links +
+   * utility toggles (logo stays for the brand), and every on-page
+   * navigation button row (JumpNav pills, footer link buttons). */
+  header > nav,
+  header > div,
+  nav[aria-label] button,
+  .no-print {
+    display: none !important;
+  }
+
+  /* The fixed header stops eating the first printed inch. */
+  header {
+    position: static !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    background: #fff !important;
+  }
+
+  main {
+    padding-top: 0 !important;
+  }
+
+  /* Cards and rows stay whole across page breaks. */
+  article,
+  section,
+  li,
+  figure,
+  details {
+    break-inside: avoid;
+  }
+
+  /* Paper can't click — spell external destinations out (source pills,
+   * About links). Internal hash links are left alone. */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #6B7280;
+    word-break: break-all;
+  }
+
+  /* Charts and LED-style accents keep their exact colours on paper. */
+  svg,
+  .led-cell {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Comfortable margins are the browser's job; stop horizontal overflow
+   * from tints/rings at the page edge. */
+  * {
+    overflow-x: visible !important;
+  }
+}
