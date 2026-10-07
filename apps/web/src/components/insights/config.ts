@@ -445,6 +445,45 @@ export function rangeIsPlottable(points: readonly [number, number][], range: Cha
 }
 
 /* ------------------------------------------------------------------ *
+ * Pinned watchlist (I10) — view-level personalization, localStorage only
+ * ------------------------------------------------------------------ */
+
+/** localStorage key (versioned so a future shape change can migrate). */
+export const PINNED_STORAGE_KEY = 'currena.insights.pinned.v1';
+
+/**
+ * Parse a stored pinned list. Unknown ids (indicator retired / different
+ * app) drop silently, duplicates merge, first-seen order is kept. Any
+ * malformed value degrades to "nothing pinned" — never a render error.
+ * Pure and unit-tested.
+ */
+export function parsePinnedIds(json: string): IndicatorId[] {
+  let raw: unknown = null;
+  if (json.trim() !== '') {
+    try {
+      raw = JSON.parse(json);
+    } catch {
+      raw = null;
+    }
+  }
+  if (!Array.isArray(raw)) return [];
+  const known = new Set(DEFINITIONS.map((d) => d.id));
+  const out: IndicatorId[] = [];
+  for (const v of raw) {
+    if (typeof v !== 'string') continue;
+    const id = v as IndicatorId;
+    if (!known.has(id) || out.includes(id)) continue;
+    out.push(id);
+  }
+  return out;
+}
+
+/** Serialize pinned ids for storage (inverse of parsePinnedIds). */
+export function formatPinnedStorage(ids: readonly IndicatorId[]): string {
+  return JSON.stringify([...ids]);
+}
+
+/* ------------------------------------------------------------------ *
  * History helpers (epoch-day math for the 10-year chart)
  * ------------------------------------------------------------------ */
 

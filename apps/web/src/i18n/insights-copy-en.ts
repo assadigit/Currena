@@ -433,6 +433,8 @@ export const insightsCopyEn = {
   ui: {
     subtitle: 'What global and Australian money indicators are saying, in plain language.',
     updated: 'Updated',
+    // I10: freshness at a glance — relative first, exact datetime second.
+    updatedAgo: 'Updated {ago} · {date}',
     summaryTitle: 'Market summary',
     dataFrom: 'Showing saved data from {date} — it could not be refreshed.',
     loadError: 'Insights could not be loaded.',
@@ -453,6 +455,8 @@ export const insightsCopyEn = {
     excludedNote: '{n} excluded — stale or missing data',
     noSummary: 'Not enough voting data to summarise yet.',
     jumpTo: 'Jump to:',
+    // I10: the scroll-progress bar pinned above the app header.
+    progressLabel: 'Reading progress',
     whatChangedTitle: 'What changed this week',
     quietWeek: 'No indicator changed state this week.',
     quietWeekHint: 'Quiet stretches are normal — Coming up below lists the next scheduled updates.',
@@ -472,11 +476,19 @@ export const insightsCopyEn = {
     resultsShown: '{shown} of {total} cards shown',
     clearFilters: 'Clear filters',
     noMatches: 'No indicator matches these filters.',
+    // I10: the personal watchlist — pinned cards render in their own
+    // section above the groups; pins persist across visits.
+    pinnedTitle: 'My watchlist',
+    pinnedBadge: 'Pinned',
+    pinAction: 'Add to watchlist',
+    unpinAction: 'Remove from watchlist',
     comingUpTitle: 'Coming up',
     noEvents: 'No key dates recorded yet — this calendar is maintained by hand.',
     daysAway: '{n} days away',
     today: 'Today',
     withinDays: 'Within {n} days',
+    // I10: RFC 5545 calendar export of the upcoming key dates.
+    icsDownload: 'Download calendar (.ics)',
     expand: 'Show details',
     collapse: 'Hide details',
     position10y: '10-year position',

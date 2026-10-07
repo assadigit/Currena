@@ -29,6 +29,7 @@ import type { CurrencyCode, SnapshotSource } from '@currena/core';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { Button, Card, LoaderDots, Switch, Toast } from '../components/ui';
 import { useCodeLabel } from '../lib/display';
+import { downloadBlob } from '../lib/download';
 import { uniqueId } from '../lib/id';
 import { useI18n } from '../lib/locale';
 import type { TranslationKey } from '../lib/locale';
@@ -98,15 +99,7 @@ function dateToIso(dateStr: string): string {
   return new Date(y, m - 1, d).toISOString();
 }
 
-/** Trigger a browser download for a Blob. */
-function downloadBlob(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
-}
+/** (moved to lib/download.ts — BACKLOG #24 dedupe.) */
 
 const inputClass =
   'w-full rounded-[12px] border-2 border-gray-200 bg-white px-3 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none dark:border-white/10 dark:bg-[#222C3B]';

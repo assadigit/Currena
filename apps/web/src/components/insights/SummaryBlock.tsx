@@ -12,9 +12,16 @@
 
 import { useState } from 'react';
 import type { SummaryLine } from '@currena/core';
+import { formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { LedDigits } from '../led/LedParts';
+
+/** Small integers in prose — Persian digits in fa (I10 digit sweep; the
+ * LED value itself stays Latin — documented DSEG7 decision, Wave 5 #46). */
+function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
+  return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
+}
 
 type SummaryTone = 'success' | 'info' | 'muted' | 'danger' | 'coral';
 
@@ -47,17 +54,19 @@ const TONE_TEXT: Record<SummaryTone, string> = {
 function SummaryLineRow({
   line,
   copy,
+  numberLocale,
   onJump,
 }: {
   line: SummaryLine;
   copy: InsightsCopy;
+  numberLocale: 'en-US' | 'fa-IR';
   /** I9: the line jumps to its section — the summary is the page's table of contents. */
   onJump: () => void;
 }) {
   const ledValue = String(line.warningCount);
   const ledLabel = interpolate(copy.ui.inWarning, {
-    warnings: line.warningCount,
-    voting: line.votingCount,
+    warnings: num(line.warningCount, numberLocale),
+    voting: num(line.votingCount, numberLocale),
   });
   return (
     <button
@@ -105,11 +114,14 @@ function SummaryLineRow({
 export function SummaryBlock({
   summary,
   copy,
+  numberLocale,
   onJumpAbout,
   onJumpSection,
 }: {
   summary: { global: SummaryLine; australia: SummaryLine };
   copy: InsightsCopy;
+  /** I10 digit sweep: prose numbers render with locale digits. */
+  numberLocale: 'en-US' | 'fa-IR';
   /** Scroll to the About-the-data section (full disclaimer lives there). */
   onJumpAbout: () => void;
   /** I9: scroll to a section — wired per summary line. */
@@ -126,14 +138,14 @@ export function SummaryBlock({
        * landmarks list) and had no heading, so heading navigation skipped it. */}
       <h2 className="sr-only">{copy.ui.summaryTitle}</h2>
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-        <SummaryLineRow line={global} copy={copy} onJump={() => onJumpSection('global')} />
-        <SummaryLineRow line={australia} copy={copy} onJump={() => onJumpSection('australia')} />
+        <SummaryLineRow line={global} copy={copy} numberLocale={numberLocale} onJump={() => onJumpSection('global')} />
+        <SummaryLineRow line={australia} copy={copy} numberLocale={numberLocale} onJump={() => onJumpSection('australia')} />
       </div>
 
       {(australia.excludedCount > 0 || global.excludedCount > 0) && (
         <p className="mt-2 mb-0 text-xs text-currena-muted">
           {interpolate(copy.ui.excludedNote, {
-            n: australia.excludedCount + global.excludedCount,
+            n: num(australia.excludedCount + global.excludedCount, numberLocale),
           })}
         </p>
       )}

@@ -21,10 +21,12 @@ import {
   epochDayToIso,
   formatChange,
   formatIndicatorValue,
+  formatPinnedStorage,
   formatRuleText,
   groupCounts,
   indicatorMatchesFilter,
   filterVisibleIds,
+  parsePinnedIds,
   rangeIsPlottable,
   sampleHistoryRows,
   sliceHistoryToRange,
@@ -541,5 +543,29 @@ describe('copy dictionaries', () => {
       expect(insightsCopyFa.indicators[id]?.name.length).toBeGreaterThan(0);
     }
     expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(30);
+  });
+});
+
+describe('pinned watchlist (I10)', () => {
+  it('parses a valid stored list, keeping first-seen order', () => {
+    expect(parsePinnedIds('["us10y","gold-usd","us10y"]')).toEqual(['us10y', 'gold-usd']);
+  });
+
+  it('drops unknown ids silently (indicator retired / foreign app data)', () => {
+    expect(parsePinnedIds('["us10y","not-a-real-id","gold-usd"]')).toEqual(['us10y', 'gold-usd']);
+  });
+
+  it('degrades malformed storage to nothing pinned — never throws', () => {
+    expect(parsePinnedIds('')).toEqual([]);
+    expect(parsePinnedIds('   ')).toEqual([]);
+    expect(parsePinnedIds('{"oops"')).toEqual([]);
+    expect(parsePinnedIds('42')).toEqual([]);
+    expect(parsePinnedIds('[1,true,null,"us10y"]')).toEqual(['us10y']);
+  });
+
+  it('round-trips through formatPinnedStorage', () => {
+    const ids = ['us10y', 'au-cpi'] as const;
+    expect(parsePinnedIds(formatPinnedStorage([...ids]))).toEqual([...ids]);
+    expect(formatPinnedStorage([])).toBe('[]');
   });
 });

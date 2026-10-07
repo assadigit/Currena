@@ -21,7 +21,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSyncExternalStore } from 'react';
 import type { IndicatorId, InsightsSnapshot, InsightsSection, IndicatorGroupId } from '@currena/core';
-import { formatJalaliDate, formatDate } from '@currena/core';
+import type { IndicatorReading } from '@currena/core';
+import { formatJalaliDate, formatDate, formatNumber, formatRelative } from '@currena/core';
 import { interpolate } from '../i18n';
 import { useI18n } from '../lib/locale';
 import { routeQuery } from '../router';
@@ -38,11 +39,14 @@ import { Button } from '../components/ui';
 import { useInsightsCopy } from '../components/insights/useInsightsCopy';
 import {
   GROUP_ORDER,
+  PINNED_STORAGE_KEY,
   SECTION_ORDER,
   definitionFor,
   definitionsForGroup,
   filterVisibleIds,
+  formatPinnedStorage,
   groupCounts,
+  parsePinnedIds,
   statusCounts,
   type StatusFilter,
 } from '../components/insights/config';
@@ -51,6 +55,11 @@ type LoadState =
   | { kind: 'loading' }
   | { kind: 'ready'; snapshot: InsightsSnapshot; fromCache: boolean }
   | { kind: 'error'; message: string; cached: InsightsSnapshot | null };
+
+/** Small integers in prose — Persian digits in fa (I10 digit sweep). */
+function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
+  return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
+}
 
 /** Phones: opening a card closes the previous one (spec §5). */
 function useIsPhone(): boolean {
@@ -91,7 +100,8 @@ function SectionBlock({
   copy,
   locale,
   numberLocale,
-  visibleIds,
+  onPinChange,
+  renderableIds,
 }: {
   section: InsightsSection;
   snapshot: InsightsSnapshot;
@@ -100,15 +110,21 @@ function SectionBlock({
   copy: ReturnType<typeof useInsightsCopy>['copy'];
   locale: 'en' | 'fa';
   numberLocale: 'en-US' | 'fa-IR';
-  /** I8: ids surviving the FilterBar (null = no filtering). Empty sections hide. */
-  visibleIds: ReadonlySet<IndicatorId> | null;
+  onPinChange: (id: IndicatorId, next: boolean) => void;
+  /** I8+I10: ids surviving the FilterBar AND not pinned to the watchlist
+   * (null = everything renders here). Empty sections hide. Count lines
+   * still describe the FULL group data — the filter is a view tool and
+   * pinned cards belong to the same group, they just render elsewhere. */
+  renderableIds: ReadonlySet<IndicatorId> | null;
 }) {
   const line = snapshot.summary[section];
   const sectionId = `insights-section-${section}`;
-  // Warning-count lines describe the FULL data (the filter is a view tool).
-  const visible = (id: IndicatorId): boolean => visibleIds === null || visibleIds.has(id);
-  const hasVisible = snapshot.readings.some((r) => visible(r.id) && definitionFor(r.id).section === section);
-  if (!hasVisible) return null;
+  const renderable = (id: IndicatorId): boolean =>
+    renderableIds === null || renderableIds.has(id);
+  const hasRenderable = snapshot.readings.some(
+    (r) => renderable(r.id) && definitionFor(r.id).section === section,
+  );
+  if (!hasRenderable) return null;
   return (
     <section id={sectionId} aria-labelledby={`${sectionId}-title`} className="scroll-mt-24">
       <header className="mb-3 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -117,8 +133,8 @@ function SectionBlock({
         </h2>
         <p className="m-0 text-xs font-semibold text-currena-muted">
           {interpolate(copy.ui.inWarning, {
-            warnings: line.warningCount,
-            voting: line.votingCount,
+            warnings: num(line.warningCount, numberLocale),
+            voting: num(line.votingCount, numberLocale),
           })}
         </p>
       </header>
@@ -127,7 +143,7 @@ function SectionBlock({
           const defs = definitionsForGroup(section, group);
           const counts = groupCounts(snapshot.readings, section, group);
           const readings = snapshot.readings.filter(
-            (r) => defs.some((d) => d.id === r.id) && visible(r.id),
+            (r) => defs.some((d) => d.id === r.id) && renderable(r.id),
           );
           if (readings.length === 0) return null;
           return (
@@ -137,15 +153,15 @@ function SectionBlock({
                 {counts.votingCount > 0 ? (
                   <p className="m-0 text-[0.7rem] font-semibold text-currena-muted">
                     {interpolate(copy.ui.inWarning, {
-                      warnings: counts.warningCount,
-                      voting: counts.votingCount,
+                      warnings: num(counts.warningCount, numberLocale),
+                      voting: num(counts.votingCount, numberLocale),
                     })}
                   </p>
                 ) : null}
               </header>
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
                 {defs.map((def) => {
-                  if (!visible(def.id)) return null;
+                  if (!renderable(def.id)) return null;
                   const reading = snapshot.readings.find((r) => r.id === def.id);
                   if (!reading) return null;
                   return (
@@ -157,6 +173,8 @@ function SectionBlock({
                       numberLocale={numberLocale}
                       open={openCards.has(def.id)}
                       onToggle={onToggle}
+                      pinned={false}
+                      onPinChange={onPinChange}
                     />
                   );
                 })}
@@ -166,6 +184,108 @@ function SectionBlock({
         })}
       </div>
     </section>
+  );
+}
+
+/**
+ * I10: the personal watchlist — pinned cards render in their own section
+ * above the groups ("stay on top"), in snapshot order. The count line
+ * describes the pinned set itself (same semantics as a group header —
+ * the status of the cards you actually see here).
+ */
+function PinnedSection({
+  readings,
+  openCards,
+  onToggle,
+  copy,
+  locale,
+  numberLocale,
+  onPinChange,
+}: {
+  readings: readonly IndicatorReading[];
+  openCards: ReadonlySet<IndicatorId>;
+  onToggle: (id: IndicatorId) => void;
+  copy: ReturnType<typeof useInsightsCopy>['copy'];
+  locale: 'en' | 'fa';
+  numberLocale: 'en-US' | 'fa-IR';
+  onPinChange: (id: IndicatorId, next: boolean) => void;
+}) {
+  const voting = readings.filter((r) => r.status === 'warning' || r.status === 'normal');
+  const warnings = voting.filter((r) => r.status === 'warning');
+  return (
+    <section id="insights-pinned" aria-labelledby="insights-pinned-title" className="scroll-mt-24">
+      <header className="mb-3 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h2 id="insights-pinned-title" className="m-0 text-lg font-extrabold">
+          <span aria-hidden="true">★ </span>
+          {copy.ui.pinnedTitle}
+        </h2>
+        {voting.length > 0 ? (
+          <p className="m-0 text-xs font-semibold text-currena-muted">
+            {interpolate(copy.ui.inWarning, {
+              warnings: num(warnings.length, numberLocale),
+              voting: num(voting.length, numberLocale),
+            })}
+          </p>
+        ) : null}
+      </header>
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+        {readings.map((r) => (
+          <IndicatorCard
+            key={r.id}
+            reading={r}
+            copy={copy}
+            locale={locale}
+            numberLocale={numberLocale}
+            open={openCards.has(r.id)}
+            onToggle={onToggle}
+            pinned
+            onPinChange={onPinChange}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * I10: a thin reading-progress bar pinned above the app header — on a page
+ * this long, "how far through am I?" is orientation, not decoration.
+ * rAF-throttled passive listeners (the JumpNav scrollspy pattern); fills
+ * from the inline-start edge in both directions (RTL grows it from the
+ * right — block flow handles that natively); hidden on paper.
+ */
+function ReadingProgress({ label }: { label: string }) {
+  const [pct, setPct] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    const measure = () => {
+      raf = 0;
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      setPct(scrollable > 0 ? Math.min(100, Math.max(0, (window.scrollY / scrollable) * 100)) : 0);
+    };
+    const onScroll = () => {
+      if (raf === 0) raf = requestAnimationFrame(measure);
+    };
+    measure();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      if (raf !== 0) cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
+  return (
+    <div
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(pct)}
+      className="no-print fixed inset-x-0 top-0 z-[1001] h-[3px]"
+    >
+      <div className="h-full bg-currena-blue" style={{ width: `${pct}%` }} />
+    </div>
   );
 }
 
@@ -179,6 +299,17 @@ export function Insights() {
   // describing the full snapshot). Survives language switches (same mount).
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [query, setQuery] = useState('');
+  // I10: the personal watchlist — pinned cards render in their own section
+  // above the groups. Pins persist across visits (localStorage) and sync
+  // across tabs (the storage event); like the filter, this is a VIEW tool —
+  // group count lines keep describing the full data.
+  const [pinned, setPinned] = useState<ReadonlySet<IndicatorId>>(() => {
+    try {
+      return new Set(parsePinnedIds(window.localStorage.getItem(PINNED_STORAGE_KEY) ?? ''));
+    } catch {
+      return new Set(); // storage unavailable (privacy mode) — session-only
+    }
+  });
   const isPhone = useIsPhone();
   const hadCache = useRef(false);
   // I7 #50: a share link ('#/insights?card=<id>') opens + scrolls to that
@@ -231,6 +362,31 @@ export function Insights() {
     },
     [isPhone],
   );
+
+  // I10: pin/unpin — persisted below, synced across tabs via 'storage'.
+  const togglePin = useCallback((id: IndicatorId, next: boolean): void => {
+    setPinned((prev) => {
+      const s = new Set(prev);
+      if (next) s.add(id);
+      else s.delete(id);
+      return s;
+    });
+  }, []);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(PINNED_STORAGE_KEY, formatPinnedStorage([...pinned]));
+    } catch {
+      // Quota / privacy mode — the pins still work for this session.
+    }
+  }, [pinned]);
+  useEffect(() => {
+    const onStorage = (e: StorageEvent): void => {
+      if (e.key !== PINNED_STORAGE_KEY) return;
+      setPinned(new Set(parsePinnedIds(e.newValue ?? '')));
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
 
   // Shared "go look at this card" behaviour (I7 share links + I8 WhatChanged
   // rows): open the card (single-open on phones) then scroll + focus it.
@@ -342,17 +498,42 @@ export function Insights() {
     return statusCounts(state.snapshot.readings);
   }, [state]);
 
+  // I10: cards rendering inside their GROUP sections — visible under the
+  // filter AND not pinned (pinned cards render in the watchlist section
+  // above). null = nothing to exclude (fast path, same as I8's null).
+  const sectionIds = useMemo<ReadonlySet<IndicatorId> | null>(() => {
+    if (state.kind !== 'ready') return null;
+    if (visibleIds === null && pinned.size === 0) return null;
+    const s = new Set<IndicatorId>();
+    for (const r of state.snapshot.readings) {
+      if (pinned.has(r.id)) continue;
+      if (visibleIds !== null && !visibleIds.has(r.id)) continue;
+      s.add(r.id);
+    }
+    return s;
+  }, [state, visibleIds, pinned]);
+
+  // I10: pinned cards that survive the current filter (the watchlist respects
+  // the view — a hidden card is hidden everywhere, and focusCard clears the
+  // filter when a reader asks for a hidden one, pins included).
+  const pinnedReadings = useMemo<readonly IndicatorReading[]>(() => {
+    if (state.kind !== 'ready') return [];
+    return state.snapshot.readings.filter(
+      (r) => pinned.has(r.id) && (visibleIds === null || visibleIds.has(r.id)),
+    );
+  }, [state, pinned, visibleIds]);
+
   // Sections with at least one visible card (drives hiding + JumpNav pills).
   const sectionVisible = useMemo<Record<InsightsSection, boolean>>(() => {
     const out: Record<InsightsSection, boolean> = { global: false, australia: false };
     if (state.kind === 'ready') {
       for (const r of state.snapshot.readings) {
-        if (visibleIds !== null && !visibleIds.has(r.id)) continue;
+        if (sectionIds !== null && !sectionIds.has(r.id)) continue;
         out[definitionFor(r.id).section] = true;
       }
     }
     return out;
-  }, [state, visibleIds]);
+  }, [state, sectionIds]);
 
   const jumpTargets = useMemo<JumpTarget[]>(() => {
     const targets: JumpTarget[] = [
@@ -360,6 +541,10 @@ export function Insights() {
       { id: 'insights-coming-up', label: copy.ui.comingUpTitle },
     ];
     // I8: a pill whose section is fully filtered out would jump nowhere.
+    // I10: the watchlist pill mirrors its section's place in the page.
+    if (pinnedReadings.length > 0) {
+      targets.push({ id: 'insights-pinned', label: copy.ui.pinnedTitle });
+    }
     if (sectionVisible.global) targets.push({ id: 'insights-section-global', label: copy.sections.global });
     if (sectionVisible.australia) {
       targets.push({ id: 'insights-section-australia', label: copy.sections.australia });
@@ -375,11 +560,16 @@ export function Insights() {
       locale === 'fa'
         ? formatJalaliDate(iso, 'fa-IR', { withTime: true })
         : formatDate(iso, 'en-US', { withTime: true });
-    return `${copy.ui.updated}: ${dateText}`;
-  }, [state, locale, copy.ui.updated]);
+    // I10: freshness at a glance — relative first ("3 hours ago"), exact
+    // datetime second; formatted at render only, never stored.
+    const ago = formatRelative(iso, locale === 'fa' ? 'fa-IR' : 'en-US');
+    return interpolate(copy.ui.updatedAgo, { ago, date: dateText });
+  }, [state, locale, copy.ui.updatedAgo]);
 
   return (
     <div className="mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-6xl lg:px-8">
+      {/* I10: reading progress — fixed above the app header, print-hidden. */}
+      <ReadingProgress label={copy.ui.progressLabel} />
       <header className="mb-4">
         <h1 className="m-0 text-2xl font-extrabold tracking-tight">{t('insights.title')}</h1>
         <p className="mt-1 mb-0 text-sm text-currena-muted">{copy.ui.subtitle}</p>
@@ -420,11 +610,13 @@ export function Insights() {
                 ⚠️
               </span>
               <p className="m-0 text-sm font-semibold text-currena-warning">
+                {/* I10: the cache banner leads with the relative age — the
+                    exact timestamp is one line above, in the header. */}
                 {interpolate(copy.ui.dataFrom, {
-                  date:
-                    locale === 'fa'
-                      ? formatJalaliDate(state.snapshot.generatedAt, 'fa-IR', { withTime: true })
-                      : formatDate(state.snapshot.generatedAt, 'en-US', { withTime: true }),
+                  date: formatRelative(
+                    state.snapshot.generatedAt,
+                    locale === 'fa' ? 'fa-IR' : 'en-US',
+                  ),
                 })}
               </p>
             </div>
@@ -433,6 +625,7 @@ export function Insights() {
           <SummaryBlock
             summary={state.snapshot.summary}
             copy={copy}
+            numberLocale={numberLocale}
             onJumpAbout={jumpAbout}
             onJumpSection={jumpToSection}
           />
@@ -444,7 +637,12 @@ export function Insights() {
             locale={locale}
             onFocusCard={focusCard}
           />
-          <ComingUp events={state.snapshot.calendar} copy={copy} locale={locale} />
+          <ComingUp
+            events={state.snapshot.calendar}
+            copy={copy}
+            locale={locale}
+            numberLocale={numberLocale}
+          />
           {/* I8: the card-grid toolbar — after the story blocks, right where
               the grid begins. View tool only (see FilterBar.tsx). */}
           <FilterBar
@@ -477,19 +675,35 @@ export function Insights() {
               </button>
             </div>
           ) : (
-            SECTION_ORDER.map((section) => (
-              <SectionBlock
-                key={section}
-                section={section}
-                snapshot={state.snapshot}
-                openCards={openCards}
-                onToggle={onToggle}
-                copy={copy}
-                locale={locale}
-                numberLocale={numberLocale}
-                visibleIds={visibleIds}
-              />
-            ))
+            <>
+              {/* I10: the personal watchlist — pinned cards, right where the
+                  grid begins (self-hides when empty or fully filtered out). */}
+              {pinnedReadings.length > 0 ? (
+                <PinnedSection
+                  readings={pinnedReadings}
+                  openCards={openCards}
+                  onToggle={onToggle}
+                  copy={copy}
+                  locale={locale}
+                  numberLocale={numberLocale}
+                  onPinChange={togglePin}
+                />
+              ) : null}
+              {SECTION_ORDER.map((section) => (
+                <SectionBlock
+                  key={section}
+                  section={section}
+                  snapshot={state.snapshot}
+                  openCards={openCards}
+                  onToggle={onToggle}
+                  copy={copy}
+                  locale={locale}
+                  numberLocale={numberLocale}
+                  onPinChange={togglePin}
+                  renderableIds={sectionIds}
+                />
+              ))}
+            </>
           )}
           <AboutTheData copy={copy} />
         </div>

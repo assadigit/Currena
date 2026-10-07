@@ -14,6 +14,10 @@
  * (APG accordion pattern) with aria-expanded + aria-controls; the panel is
  * a labelled region. Stale/unavailable cards grey out and never mislead.
  * Mobile closes the previous card (handled by the route's open-state).
+ *
+ * I10: the watchlist pin — an aria-pressed pill in the expanded action row
+ * (next to Share), with a small ★ badge on the collapsed card (in the
+ * accessible name via sr-only text) so the state reads without expanding.
  */
 
 import { useEffect, useId, useRef, useState } from 'react';
@@ -40,6 +44,10 @@ export interface IndicatorCardProps {
   numberLocale: 'en-US' | 'fa-IR';
   open: boolean;
   onToggle: (id: IndicatorReading['id']) => void;
+  /** I10: is this card pinned to the personal watchlist? */
+  pinned: boolean;
+  /** I10: pin/unpin (route-level state, persisted by the route). */
+  onPinChange: (id: IndicatorReading['id'], next: boolean) => void;
 }
 
 /** One signed change run — dir="ltr" so ± never scrambles inside RTL text. */
@@ -132,7 +140,7 @@ function CopySection({ title, body }: { title: string; body: string }) {
   );
 }
 
-export function IndicatorCard({ reading, copy, locale, numberLocale, open, onToggle }: IndicatorCardProps) {
+export function IndicatorCard({ reading, copy, locale, numberLocale, open, onToggle, pinned, onPinChange }: IndicatorCardProps) {
   const autoId = useId();
   const headingId = `${autoId}-heading`;
   const panelId = `${autoId}-panel`;
@@ -210,8 +218,17 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
                   {ind.ticker}
                 </span>
               ) : null}
+              {/* I10: the pin state reads from the button's accessible name
+                  too — a screen-reader user browsing collapsed cards knows
+                  which ones are on their watchlist. */}
+              {pinned ? <span className="sr-only"> · {copy.ui.pinnedBadge}</span> : null}
             </span>
-            <span id={chipId}>
+            <span id={chipId} className="flex shrink-0 items-center gap-1">
+              {pinned ? (
+                <span aria-hidden="true" className="text-sm text-currena-blue-deep">
+                  ★
+                </span>
+              ) : null}
               <StatusChip status={reading.status} copy={copy} />
             </span>
           </span>
@@ -307,7 +324,9 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
             <CardHistory id={reading.id} copy={copy} locale={locale} numberLocale={numberLocale} />
           ) : null}
 
-          {/* Source pill + share link (I7 #50) — the expanded panel's footer. */}
+          {/* Source pill + watchlist pin + share link (I7 #50, I10) — the
+              expanded panel's footer. The two actions are print-hidden
+              (paper keeps the spelled-out source URL, not buttons). */}
           <p className="mb-0 mt-3 flex flex-wrap items-center gap-2 text-xs">
             {reading.sourceUrl ? (
               <a
@@ -323,8 +342,21 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
             ) : null}
             <button
               type="button"
+              onClick={() => onPinChange(reading.id, !pinned)}
+              aria-pressed={pinned}
+              className={`no-print inline-flex min-h-[36px] cursor-pointer items-center gap-1 rounded-full border px-3 py-1.5 font-semibold transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
+                pinned
+                  ? 'border-currena-blue/40 bg-currena-blue/15 text-currena-blue-deep'
+                  : 'border-currena-blue/25 bg-transparent text-currena-blue-deep hover:bg-currena-blue/10'
+              }`}
+            >
+              <span aria-hidden="true">{pinned ? '★' : '☆'}</span>
+              {copy.ui.pinAction}
+            </button>
+            <button
+              type="button"
               onClick={shareCard}
-              className="inline-flex min-h-[36px] cursor-pointer items-center gap-1 rounded-full border border-currena-blue/25 bg-transparent px-3 py-1.5 font-semibold text-currena-blue-deep transition-colors duration-300 hover:bg-currena-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
+              className="no-print inline-flex min-h-[36px] cursor-pointer items-center gap-1 rounded-full border border-currena-blue/25 bg-transparent px-3 py-1.5 font-semibold text-currena-blue-deep transition-colors duration-300 hover:bg-currena-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
             >
               <span aria-hidden="true">🔗</span>
               {copied ? copy.ui.shareCopied : copy.ui.shareCard}

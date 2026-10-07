@@ -33,7 +33,15 @@ const BUDGETS = [
   // "/" search shortcut and 12 more copy strings × 2 locales. Justified in
   // CHANGELOG §2026-10-08 (I9). The entry chunk is untouched — Insights
   // stays lazy. Headroom stays tight so the NEXT growth bumps consciously.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 125_000, gz: 37_000, label: 'Insights lazy chunk' },
+  // I10 bump (121.12/35.85 → 128.36/37.78): the personal watchlist (pin
+  // pills + ★ badges + the Pinned section + localStorage persistence +
+  // cross-tab sync), the RFC 5545 .ics calendar export (+ the shared
+  // downloadBlob lib, BACKLOG #24), the reading-progress bar, relative
+  // freshness timestamps, and the Persian-digit sweep over every prose
+  // number (summary/group/count lines + days-away) — 9 new copy strings
+  // × 2 locales. Justified in CHANGELOG §2026-10-08 (I10). Entry chunk
+  // untouched (288.80/86.98 vs 289/88): Insights stays lazy.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 132_000, gz: 39_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {
