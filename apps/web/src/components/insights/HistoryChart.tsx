@@ -110,7 +110,7 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
 
   return (
     <figure className="mt-3 m-0">
-      <figcaption className="mb-1 text-[0.7rem] font-semibold uppercase tracking-wide text-currena-muted">
+      <figcaption className="mb-1 text-[0.72rem] font-semibold uppercase tracking-wide text-currena-muted">
         {copy.ui.chartTitle}
       </figcaption>
       <span dir="ltr" className="block text-currena-blue">

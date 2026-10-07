@@ -145,10 +145,12 @@ export function SummaryBlock({
         ) : null}
       </div>
 
-      {/* One-line disclaimer bar — links to the full text below. */}
+      {/* One-line disclaimer bar — links to the full text below. I6 audit F13:
+          softened (2px start rule, lighter tint) so it reads as a footnote,
+          not a system alert. */}
       <div
         role="note"
-        className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-[15px] border-s-4 border-currena-muted/60 bg-currena-muted/10 px-3.5 py-2.5 text-xs font-medium text-currena-muted"
+        className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-[15px] border-s-2 border-currena-muted/50 bg-currena-muted/[0.07] px-3.5 py-2.5 text-xs font-medium text-currena-muted"
       >
         <span aria-hidden="true">ⓘ</span>
         <span>{copy.ui.disclaimerBar}</span>

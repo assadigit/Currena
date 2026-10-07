@@ -123,9 +123,11 @@ function CardHistory({
 function CopySection({ title, body }: { title: string; body: string }) {
   return (
     <div>
-      {/* I6 audit F2: blue-deep — the brand blue failed AA (3.3:1) at this size. */}
-      <h5 className="m-0 text-[0.72rem] font-bold uppercase tracking-wide text-currena-blue-deep">{title}</h5>
-      <p className="mt-0.5 mb-0 text-sm leading-relaxed text-currena-dark/90 dark:text-currena-dark/90">{body}</p>
+      {/* I6 audit F2: blue-deep — the brand blue failed AA (3.3:1) at this size.
+       * F11: 0.75rem + a touch more lead-in so the five titles scan as
+       * anchors rather than a wall of text. */}
+      <h5 className="m-0 text-[0.75rem] font-bold uppercase tracking-wide text-currena-blue-deep">{title}</h5>
+      <p className="mt-1 mb-0 text-sm leading-relaxed text-currena-dark/90 dark:text-currena-dark/90">{body}</p>
     </div>
   );
 }
@@ -134,6 +136,13 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
   const autoId = useId();
   const headingId = `${autoId}-heading`;
   const panelId = `${autoId}-panel`;
+  // I6 audit F10: the expand button's accessible name used to be the ENTIRE
+  // collapsed card (~33 words — name, value, changes, chip, one-liner, footer).
+  // Both the heading and the button are now labelled by name (+ticker) + status
+  // word — e.g. "US 10Y minus 2Y yield, Normal" — so heading lists and the tab
+  // order stay scannable; value/changes are still read inside the button.
+  const nameId = `${autoId}-name`;
+  const chipId = `${autoId}-chip`;
   const def = definitionFor(reading.id);
   const ind = copy.indicators[reading.id];
   const isUnavailable = reading.status === 'unavailable';
@@ -157,16 +166,17 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
       }`}
       data-status={reading.status}
     >
-      <h4 className="m-0 text-[0.95rem] font-bold leading-snug">
+      <h4 className="m-0 text-[0.95rem] font-bold leading-snug" aria-labelledby={`${nameId} ${chipId}`}>
         <button
           type="button"
           aria-expanded={open}
           aria-controls={panelId}
+          aria-labelledby={`${nameId} ${chipId}`}
           onClick={() => onToggle(reading.id)}
           className="block w-full cursor-pointer border-0 bg-transparent p-0 text-start focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
         >
           <span className="flex items-start justify-between gap-2">
-            <span>
+            <span id={nameId}>
               {ind.name}
               {ind.ticker ? (
                 <span className="ms-1.5 text-[0.7rem] font-semibold text-currena-muted" dir="ltr">
@@ -174,7 +184,9 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
                 </span>
               ) : null}
             </span>
-            <StatusChip status={reading.status} copy={copy} />
+            <span id={chipId}>
+              <StatusChip status={reading.status} copy={copy} />
+            </span>
           </span>
 
           {isUnavailable ? (
@@ -239,13 +251,13 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
             {ind.name}
           </h4>
 
-          <p className="m-0 mb-3 rounded-xl bg-currena-soft/70 px-3 py-2 text-xs font-medium text-currena-dark dark:bg-white/[0.05]">
+          <p className="m-0 mb-3 rounded-xl bg-currena-soft/70 px-3 py-2.5 text-sm font-medium text-currena-dark dark:bg-white/[0.05]">
             <span className="font-bold">{copy.ui.ruleTitle}: </span>
             <span>{formatRuleText(def.rule, reading.id, copy.rule, copy.units, numberLocale)}</span>
           </p>
 
           {isStale && reading.asOf ? (
-            <p className="m-0 mb-3 text-xs font-semibold text-currena-warning">
+            <p className="m-0 mb-3 text-xs font-semibold text-currena-warning-deep">
               {interpolate(copy.ui.staleSince, { date: formatAsOf(reading.asOf, locale) })}
             </p>
           ) : null}
@@ -256,7 +268,7 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
             <p className="m-0 mb-3 text-xs font-semibold text-currena-blue-deep">{copy.ui.infoOnly}</p>
           ) : null}
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             <CopySection title={copy.ui.whatItIs} body={ind.whatItIs} />
             <CopySection title={copy.ui.whyItMatters} body={ind.whyItMatters} />
             <CopySection title={copy.ui.tendedToMean} body={ind.tendedToMean} />
