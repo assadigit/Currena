@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import {
   BATCH_TEMPLATES,
+  BatchError,
   csvEscapeField,
   isBatchTemplateId,
+  MAX_BATCH_LINE_CHARS,
+  MAX_BATCH_LINES,
   parseBatchLine,
   parseBatchLines,
   toCsv,
@@ -215,5 +218,33 @@ describe('toCsv — display-consistent totals + formula-injection guard', () => 
     // Plain notes are untouched.
     const plain = toCsv([{ original: 1, converted: 2, note: 'groceries' }], { from: 'USD', to: 'EUR' });
     expect(plain).toContain('"groceries"');
+  });
+});
+
+describe('parseBatchLines input bounds (BACKLOG #32)', () => {
+  it('accepts exactly MAX_BATCH_LINES non-blank lines (blank lines never count)', () => {
+    const edge = Array.from({ length: MAX_BATCH_LINES }, () => '1').join('\n');
+    expect(parseBatchLines(edge)).toHaveLength(MAX_BATCH_LINES);
+    const padded = '\n\n' + edge + '\n  \n';
+    expect(parseBatchLines(padded)).toHaveLength(MAX_BATCH_LINES);
+  });
+
+  it('throws typed batch_too_many_lines past the cap', () => {
+    const over = Array.from({ length: MAX_BATCH_LINES + 1 }, () => '1').join('\n');
+    expect(() => parseBatchLines(over)).toThrow(BatchError);
+    try {
+      parseBatchLines(over);
+    } catch (err) {
+      expect(err instanceof BatchError && err.code).toBe('batch_too_many_lines');
+    }
+  });
+
+  it('throws typed batch_line_too_long on a mega-line, before any parsing', () => {
+    const mega = '9'.repeat(MAX_BATCH_LINE_CHARS + 1);
+    expect(() => parseBatchLines(mega)).toThrow(BatchError);
+    // A line exactly at the cap parses normally (amount validation still
+    // per-line — bounds are about INPUT size, not validity).
+    const atCap = '1' + ' '.repeat(MAX_BATCH_LINE_CHARS - 1);
+    expect(parseBatchLines(atCap)).toHaveLength(1);
   });
 });

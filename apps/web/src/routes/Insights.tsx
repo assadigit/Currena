@@ -491,6 +491,58 @@ export function Insights() {
     }));
   }, [state, statusFilter, query, copy]);
 
+  // I13: j/k walks the card grid (Gmail/GitHub muscle memory, pairing with
+  // "/"). j opens + scrolls to the NEXT visible card, k the previous —
+  // the walk respects the current filter and starts from the card nearest
+  // the viewport top, so it also works as "take me to the grid" from the
+  // story blocks above. Same typing/modifier guards as "/".
+  const lastNavIdRef = useRef<IndicatorId | null>(null);
+  useEffect(() => {
+    if (state.kind !== 'ready') return;
+    const onKeyDown = (e: KeyboardEvent): void => {
+      if ((e.key !== 'j' && e.key !== 'k') || e.ctrlKey || e.metaKey || e.altKey) return;
+      const active = document.activeElement;
+      if (
+        active instanceof HTMLElement &&
+        (active.tagName === 'INPUT' ||
+          active.tagName === 'TEXTAREA' ||
+          active.tagName === 'SELECT' ||
+          active.isContentEditable)
+      ) {
+        return;
+      }
+      // The walk order = the grid's DOM order = snapshot order filtered by
+      // the view (pinned cards render above their sections — walk the whole
+      // visible set the same way focusCard's filter-clearing would find it).
+      const order: IndicatorId[] = state.snapshot.readings
+        .map((r) => r.id)
+        .filter((id) => visibleIds === null || visibleIds.has(id));
+      if (order.length === 0) return;
+      e.preventDefault();
+      // Anchor: the last card j/k opened, else the topmost card element
+      // currently within/above the viewport, else the first card.
+      let anchor = lastNavIdRef.current !== null && order.includes(lastNavIdRef.current)
+        ? order.indexOf(lastNavIdRef.current)
+        : -1;
+      if (anchor === -1) {
+        for (let i = 0; i < order.length; i++) {
+          const el = document.getElementById(`insights-card-${order[i]}`);
+          if (el && el.getBoundingClientRect().bottom > 96) {
+            anchor = i;
+            break;
+          }
+        }
+      }
+      const next = e.key === 'j' ? Math.min(anchor + 1, order.length - 1) : Math.max(anchor - 1, 0);
+      const id = order[next];
+      if (id === undefined) return;
+      lastNavIdRef.current = id;
+      focusCard(id);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [state, visibleIds, focusCard]);
+
   // I9: live per-status counts for the FilterBar chips (full snapshot —
   // same semantics as the filter itself).
   const chipCounts = useMemo(() => {
@@ -705,7 +757,7 @@ export function Insights() {
               ))}
             </>
           )}
-          <AboutTheData copy={copy} />
+          <AboutTheData copy={copy} snapshot={state.snapshot} />
         </div>
       ) : null}
     </div>

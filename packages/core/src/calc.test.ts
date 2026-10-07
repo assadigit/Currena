@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { CalcError, evaluateExpression, normalizeCalcExpression } from './calc';
+import { CalcError, evaluateExpression, normalizeCalcExpression, MAX_NESTING_DEPTH } from './calc';
 
 describe('evaluateExpression — arithmetic (legacy calculator parity)', () => {
   it('evaluates plain arithmetic the legacy eval() handled', () => {
@@ -87,5 +87,40 @@ describe('normalizeCalcExpression', () => {
     expect(normalizeCalcExpression('8×7÷2−1')).toBe('8*7/2-1');
     expect(normalizeCalcExpression('1+2')).toBe('1+2');
     expect(normalizeCalcExpression('×÷−')).toHaveLength(3);
+  });
+});
+
+describe('evaluateExpression — BACKLOG #32 hardening (paste reality + depth guard)', () => {
+  const expectCalcError = (expr: string, code: string): void => {
+    try {
+      evaluateExpression(expr);
+      expect.fail(`expected CalcError('${code}') for ${JSON.stringify(expr)}`);
+    } catch (err) {
+      expect(err).toBeInstanceOf(CalcError);
+      expect((err as CalcError).code).toBe(code);
+    }
+  };
+
+  it('skips NBSP (U+00A0) from HTML copies as plain whitespace', () => {
+    expect(evaluateExpression('1\u00A0+\u00A02')).toBe(3);
+    expect(evaluateExpression('\u00A01.5*2\u00A0')).toBe(3);
+  });
+
+  it('skips CR/LF from multi-line pastes as plain whitespace', () => {
+    expect(evaluateExpression('1+\r\n2')).toBe(3);
+    expect(evaluateExpression('2*\n3')).toBe(6);
+  });
+
+  it('accepts unary plus (legacy eval parity: "2*+3" worked)', () => {
+    expect(evaluateExpression('2*+3')).toBe(6);
+    expect(evaluateExpression('+5')).toBe(5);
+    expect(evaluateExpression('1++2')).toBe(3);
+    expect(evaluateExpression('2*-+3')).toBe(-6); // alternating unaries
+  });
+
+  it('throws typed too_deep instead of a bare native RangeError on pathological nesting', () => {
+    expectCalcError('('.repeat(MAX_NESTING_DEPTH + 1) + '1' + ')'.repeat(MAX_NESTING_DEPTH + 1), 'too_deep');
+    // Exactly at the cap is still fine.
+    expect(evaluateExpression('('.repeat(MAX_NESTING_DEPTH) + '1' + ')'.repeat(MAX_NESTING_DEPTH))).toBe(1);
   });
 });

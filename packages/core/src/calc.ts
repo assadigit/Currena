@@ -34,7 +34,8 @@ export type CalcErrorCode =
   | 'unexpected_token'
   | 'unexpected_end'
   | 'division_by_zero'
-  | 'non_finite_result';
+  | 'non_finite_result'
+  | 'too_deep';
 
 /** Typed error thrown by evaluateExpression (code + 0-based char position). */
 export class CalcError extends CoreError {
@@ -47,6 +48,9 @@ export class CalcError extends CoreError {
     this.position = position;
   }
 }
+
+/** Maximum parenthesis nesting the parser accepts (BACKLOG #32). */
+export const MAX_NESTING_DEPTH = 128;
 
 /* ------------------------------------------------------------------ *
  * Tokenizer
@@ -72,7 +76,10 @@ function tokenize(expr: string): Token[] {
   let i = 0;
   while (i < expr.length) {
     const ch = expr[i]!;
-    if (ch === ' ' || ch === '\t') {
+    // Whitespace: space/tab (legacy) plus the characters real keyboards and
+    // paste pipelines actually produce — NBSP (U+00A0) from HTML copies,
+    // CR/LF from multi-line paste (BACKLOG #32). All are silently skipped.
+    if (ch === ' ' || ch === '\t' || ch === '\u00A0' || ch === '\r' || ch === '\n') {
       i++;
       continue;
     }
@@ -122,13 +129,22 @@ function tokenize(expr: string): Token[] {
  *
  *   expression := term (('+' | '-') term)*
  *   term       := unary (('*' | '/') unary)*
- *   unary      := '-' unary | primary
+ *   unary      := ('-' | '+') unary | primary   (BACKLOG #32: unary plus
+ *                                                  joins minus — the
+ *                                                  legacy eval accepted
+ *                                                  "2*+3"; now parity)
  *   primary    := NUMBER | '(' expression ')'
  * ------------------------------------------------------------------ */
 
 class Parser {
   private readonly tokens: readonly Token[];
   private index = 0;
+  // BACKLOG #32: nesting depth guard — a pathological paste of thousands
+  // of '(' would otherwise recurse until the ENGINE throws a bare native
+  // RangeError ("Maximum call stack size exceeded") from deep inside the
+  // parser. The guard converts that into the SAME typed CalcError surface
+  // every other failure uses, with a position the UI can point at.
+  private depth = 0;
 
   constructor(tokens: readonly Token[]) {
     this.tokens = tokens;
@@ -201,9 +217,10 @@ class Parser {
 
   private parseUnary(): number {
     const token = this.peek();
-    if (token?.type === 'op' && token.op === '-') {
+    if (token?.type === 'op' && (token.op === '-' || token.op === '+')) {
       this.index++;
-      return -this.parseUnary();
+      const operand = this.parseUnary();
+      return token.op === '-' ? -operand : operand;
     }
     return this.parsePrimary();
   }
@@ -212,7 +229,11 @@ class Parser {
     const token = this.next();
     if (token.type === 'number') return token.value;
     if (token.type === 'lparen') {
+      if (++this.depth > MAX_NESTING_DEPTH) {
+        throw new CalcError('too_deep', `more than ${MAX_NESTING_DEPTH} nested parentheses at position ${token.pos}`, token.pos);
+      }
       const value = this.parseExpression();
+      this.depth--;
       const closing = this.next();
       if (closing.type !== 'rparen') {
         throw new CalcError('unexpected_end', "missing closing ')'", this.tokens.length);

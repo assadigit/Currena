@@ -465,3 +465,41 @@ updated: X ago" state. Zero network until connectivity returns.
    exporting tokens.
 5. Post-cutover backlog already documented: scanner OCR (client-side), scan
    gallery, D1 history + charts, Cloudflare Access on `/admin`, source toggles.
+
+## The seven-wave deploy (2026-10-08, I7→I12 stack + I13)
+
+Owner directive "Push commit deploy" with fresh credentials. First action:
+`git push` of the **26-commit stack** `2803932..7467853` (I7 Wave 6 + I8 +
+I9 + I10 + I11 + I12 — the I6 session's claimed pushes had never landed;
+verified post-push via the GitHub API: origin/main HEAD = `7467853`).
+Then the standard §"Deploy" procedure from that HEAD:
+
+- `pnpm --filter @currena/web build` — entry `index-HpOGzRzk.js`
+  295.08 kB / 89.37 kB gz, Insights chunk `Insights-EvsQupwH.js`
+  128.42 / 37.90, precache 61 entries / 2209.80 KiB (byte-matches the I12
+  session record).
+- `wrangler deploy` → **Worker version `dbccaed3-5fa8-4c9c-af4c-9280ef63049c`**
+  (17 new assets, 924.12 KiB upload / 160.35 KiB gz, cron `* * * * *` +
+  RATES KV bindings intact).
+
+Post-deploy smoke (all green):
+
+- `/api/health` ok; `/api/insights` **30 readings** (gold-usd 4107.7 /
+  silver-usd 60.109 at the metals top, all 18 global ids before the first
+  Australia id, 14 calendar events, 6 warnings = 3 global + 3 Australia).
+- **The incident fix verified live**: `/api/status` frankfurter cache
+  `ageSec: 523, fresh: true` (the I6-era 300 s window would have read
+  stale → the 500 windows); `GET /api/rates?source=frankfurter` → 3× fast
+  200s (51–310 ms) serving 30 currencies from cache.
+- SW two-reload cycle on currena.ir → the new precache confirmed
+  (`Insights-EvsQupwH.js` + `index-HpOGzRzk.js` present in
+  `workbox-precache-v2`); full browser QA of every I7–I12 feature
+  followed (worklog + CHANGELOG §2026-10-08 I13 for the checklist):
+  share deep-links, chart tooltip + keyboard stepping, zoom ranges,
+  watchlist pins, reading progress + JumpNav scrollspy, LiveRateLine +
+  recent pairs, mobile single-open, dark mode, zero console errors,
+  zero 375px overflow.
+
+A second deploy from the I13 HEAD (`7e3c1a5`-era, CSV export + j/k nav +
+remembered zoom + BACKLOG #30/#32) ships in the same session — recorded
+below when it happens.

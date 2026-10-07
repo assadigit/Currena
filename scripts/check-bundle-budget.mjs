@@ -56,7 +56,16 @@ const BUDGETS = [
   // number (summary/group/count lines + days-away) — 9 new copy strings
   // × 2 locales. Justified in CHANGELOG §2026-10-08 (I10). Entry chunk
   // untouched (288.80/86.98 vs 289/88): Insights stays lazy.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 132_000, gz: 39_000, label: 'Insights lazy chunk' },
+  // I13 bump (128.42/37.90 → 133.82/38.87): the data-portability + power-
+  // reader wave — the snapshot CSV export (insights-csv builder + the
+  // AboutTheData download button), j/k card-walk keyboard navigation, the
+  // remembered chart zoom (chart-range store), the FilterBar shortcut
+  // legend, and 17 copy strings × 2 locales. Raw +5.40 kB but gzip +0.97 kB
+  // (the export path is mostly localized header words — highly
+  // compressible); the raw overage is the CSV column wording, not logic.
+  // Justified in CHANGELOG §2026-10-08 (I13). Entry chunk untouched
+  // (295.11/88.55 vs 296/89.5): Insights stays lazy.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 134_000, gz: 39_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

@@ -88,9 +88,9 @@ blocks, stale cron going unnoticed (now visible on /admin; push notification sti
 | 27 | ✅ | BEST-PRACTICES | i18n: replace ~15 hardcoded English strings + `toFixed(2)` with dictionary keys + `formatNumber` in Receipt/Batch export paths | SWOT W16 |
 | 28 | ✅ | BEST-PRACTICES | Dead code: remove `readHistory`, `priceScanner` dict block, pointless `useMemo`; sync `SCRAPER_VERSION` | SWOT W21 |
 | 29 | 🔄 | DX | First web tests: `history.ts`, `rate-history.ts`, `recent-pairs.ts`, `router.ts`, `display.ts`, meta-schema parity test | SWOT W9/W23 — `history.ts`/`router.ts` covered; **snapshot-store.ts covered by the I12 wave** (first store tests: boot/freshness/retry-ladder/degraded/ensureSnapshot, 8 tests); rate-history + recent-pairs + display + parity still open |
-| 30 | ☐ | BEST-PRACTICES | `splitEvenly` → core (+ tests) next to settle | SWOT O2 |
+| 30 | ✅ | BEST-PRACTICES | `splitEvenly` → core (+ tests) next to settle — done in the I13 wave (packages/core/src/split.ts: typed `SplitError`, input validation, exact-sum largest-remainder, +7 tests; Splitter imports from core) | SWOT O2 |
 | 31 | ✅ | BEST-PRACTICES | Settle: use group currency for settlement records (stop hardcoding `'IRR'`) | SWOT T8 |
-| 32 | ☐ | BEST-PRACTICES | `parseBatchLines` bounds (line/char caps) + calc parser: U+00A0/newline whitespace, unary plus, typed `RangeError` guard | SWOT W24 |
+| 32 | ✅ | BEST-PRACTICES | `parseBatchLines` bounds (line/char caps) + calc parser: U+00A0/newline whitespace, unary plus, typed `RangeError` guard — done in the I13 wave (500-line/500-char caps → typed `BatchError` + localized toasts; NBSP/CR/LF whitespace; unary plus; `CalcError('too_deep')` at 128 nesting; +7 tests) | SWOT W24 |
 | 33 | ✅ | BEST-PRACTICES | `HttpError` machine-readable code (timeout/dns/blocked/rate_limited) | SWOT W24 |
 | 34 | ✅ | BEST-PRACTICES | Odometer: respect `prefers-reduced-motion`; normalize digits in calc input | SWOT W25/W24 |
 | 35 | ⏸ | RELIABILITY | Cron pre-warmer: ship `scheduled` handler + **commented** `[triggers]` config — enable-on-deploy is an owner decision (upstream load tradeoff) | SWOT O4 |

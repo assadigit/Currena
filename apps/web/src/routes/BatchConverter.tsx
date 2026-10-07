@@ -23,6 +23,7 @@ import {
   formatNumber,
   parseAmount,
   parseBatchLines,
+  BatchError,
   toCsv,
   sourceForPair,
 } from '@currena/core';
@@ -131,20 +132,34 @@ export function BatchConverter() {
   const convertAll = async (): Promise<void> => {
     if (converting) return;
 
-    // Gather parse results (line errors kept, not dropped).
-    const parsed =
-      mode === 'bulk'
-        ? parseBatchLines(bulkText, { from, to })
-        : fields.map((f) => {
-            const amount = parseAmount(f.amount);
-            if (amount === null || amount <= 0) {
-              return { ok: false as const, error: { code: 'invalid_amount' as const, message: '', line: f.amount } };
-            }
-            return {
-              ok: true as const,
-              value: { amount, from, to, ...(f.note.trim() !== '' && { note: f.note.trim() }) },
-            };
-          });
+    // Gather parse results (line errors kept, not dropped). The bulk path
+    // can hit the input bounds (BACKLOG #32) — one friendly localized toast
+    // instead of a per-line wall or an unhandled throw.
+    let parsed;
+    if (mode === 'bulk') {
+      try {
+        parsed = parseBatchLines(bulkText, { from, to });
+      } catch (err) {
+        if (err instanceof BatchError) {
+          setToast(
+            err.code === 'batch_too_many_lines' ? t('batchConverter.tooManyLines') : t('batchConverter.lineTooLong'),
+          );
+          return;
+        }
+        throw err;
+      }
+    } else {
+      parsed = fields.map((f) => {
+        const amount = parseAmount(f.amount);
+        if (amount === null || amount <= 0) {
+          return { ok: false as const, error: { code: 'invalid_amount' as const, message: '', line: f.amount } };
+        }
+        return {
+          ok: true as const,
+          value: { amount, from, to, ...(f.note.trim() !== '' && { note: f.note.trim() }) },
+        };
+      });
+    }
 
     const valid = parsed.filter(
       (p): p is { ok: true; value: { amount: number; from: CurrencyCode; to: CurrencyCode; note?: string } } =>

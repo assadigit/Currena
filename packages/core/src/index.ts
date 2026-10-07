@@ -138,16 +138,27 @@ export {
   CalcError,
   normalizeCalcExpression,
   evaluateExpression,
+  MAX_NESTING_DEPTH,
 } from './calc';
 export type { CalcErrorCode } from './calc';
+
+export {
+  splitEvenly,
+  SplitError,
+} from './split';
+export type { SplitErrorCode } from './split';
 
 export {
   parseBatchLine,
   parseBatchLines,
   csvEscapeField,
+  csvNeutralizeFormula,
   toCsv,
   BATCH_TEMPLATES,
   isBatchTemplateId,
+  BatchError,
+  MAX_BATCH_LINES,
+  MAX_BATCH_LINE_CHARS,
 } from './batch';
 export type {
   ParsedBatchLine,
@@ -158,4 +169,5 @@ export type {
   BatchCsvRow,
   BatchCsvOptions,
   BatchTemplateId,
+  BatchErrorCode,
 } from './batch';

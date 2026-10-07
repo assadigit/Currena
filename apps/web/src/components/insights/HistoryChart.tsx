@@ -41,6 +41,7 @@ import {
   rangeIsPlottable,
   type ChartRange,
 } from './config';
+import { readChartRange, writeChartRange } from './chart-range';
 
 const WIDTH = 640;
 const HEIGHT = 200;
@@ -81,7 +82,10 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
   const [focusIdx, setFocusIdx] = useState<number | null>(null);
   // I9: the visible time range — a view-level zoom; the 10-year POSITION
   // bar and percentiles are the indicator's decade placement and stay put.
-  const [range, setRange] = useState<ChartRange>('10y');
+  // I13: the range is remembered across visits (chart-range.ts) — readers
+  // who always zoom to 5 years stop re-clicking; plottability still wins
+  // per series (a 1y-only series keeps disabling 10y regardless).
+  const [range, setRange] = useState<ChartRange>(readChartRange);
   const clean = points.filter((p) => Number.isFinite(p[1]));
   // Slicing happens on the finite series; a range that cannot show ≥2
   // points falls back to the full series (its button is disabled).
@@ -221,6 +225,7 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
                 onClick={() => {
                   if (r === range) return;
                   setRange(r);
+                  writeChartRange(r); // I13: remember the reader's zoom
                   setFocusIdx(null); // indices shift with the window
                 }}
                 className={`inline-flex min-h-[28px] cursor-pointer items-center rounded-full px-2.5 text-[0.65rem] font-bold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-currena-blue disabled:cursor-not-allowed disabled:opacity-40 ${

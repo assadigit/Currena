@@ -422,6 +422,9 @@ export const fa: Dictionary = {
     convertingPrices: 'در حال تبدیل قیمت‌ها...',
     enterAtLeastOne: '⚠️ لطفاً حداقل یک مبلغ وارد کنید',
     selectDifferent: '⚠️ لطفاً ارزهای متفاوت انتخاب کنید',
+    // I13 (BACKLOG #32): پیام‌های محدودیت ورودی برای چسباندن‌های غیرعادی.
+    tooManyLines: '⚠️ تعداد سطرها زیاد است — لطفاً کمتر از ۵۰۰ سطر باشد',
+    lineTooLong: '⚠️ یکی از سطرها بلند است — هر سطر کمتر از ۵۰۰ نویسه باشد',
     notePlaceholder: 'یادداشت (اختیاری)',
     invalidLine: '⚠️ خط نامعتبر',
     invalidLinesSummary: '{n} خط نادیده گرفته شد',

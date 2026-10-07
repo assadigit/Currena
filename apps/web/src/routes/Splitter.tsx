@@ -14,30 +14,13 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { convert, formatNumber, parseAmount, sourceForPair, thousandSeparateInput } from '@currena/core';
+import { convert, formatNumber, parseAmount, sourceForPair, splitEvenly, thousandSeparateInput } from '@currena/core';
 import type { CurrencyCode, SnapshotSource } from '@currena/core';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { Button, Card, Switch, Toast } from '../components/ui';
 import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
 import { snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
-
-/**
- * Largest-remainder split: floor every share at `decimals`, then hand the
- * leftover units to the earliest people — the shares sum to EXACTLY total
- * (rounded to `decimals`), no drift.
- */
-function splitEvenly(total: number, people: number, decimals: number): number[] {
-  const scale = 10 ** decimals;
-  const totalUnits = Math.round(total * scale);
-  const base = Math.floor(totalUnits / people);
-  let remainder = totalUnits - base * people;
-  const shares = Array.from({ length: people }, () => base);
-  for (let i = 0; remainder > 0; i = (i + 1) % people, remainder--) {
-    shares[i] = (shares[i] ?? 0) + 1;
-  }
-  return shares.map((units) => units / scale);
-}
 
 interface SplitResult {
   total: number;

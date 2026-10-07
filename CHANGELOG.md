@@ -5,6 +5,73 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-08] — I13 data-portability & power-reader wave
+
+Sixth round of the day — and the deploy round: the owner pushed the
+**26-commit stack** (I7 share/print/chart/CI/alerting + I8 findability +
+I9 zoom + I10 personal + I11 live-rate + I12 resilience, `2803932..7467853`)
+and the Worker went out at version `dbccaed3` — production smoke green
+(health ok, 30 readings, frankfurter cache age 523 s reports **fresh:
+true**, the incident window is closed at the root). Post-deploy QA walked
+every I7–I12 feature live in the full matrix (fa/en × desktop/375 ×
+light/dark): share deep-links open+scroll+focus, chart tooltip + keyboard
+stepping, zoom ranges, watchlist pins, reading progress, LiveRateLine
+always-on rate, popular/recent pairs, VLM PASS ×2, zero console errors,
+zero 375px overflow. This wave then adds the Insights power-reader set:
+the snapshot **CSV export** (data portability — localized headers over
+ASCII machine-readable values, OWASP formula-injection guard), **j/k
+keyboard card-walking** (Gmail muscle memory, pairs with I9's "/" search,
+respects the active filter), the **remembered chart zoom** (a chosen
+10y/5y/1y range persists across visits — plottability still rules per
+series), and a **shortcut legend** in the filter bar (kbd pills,
+desktop-only). Plus two BACKLOG hygiene closes: #30 `splitEvenly` →
+core (typed `SplitError`, exact-sum largest-remainder, +7 tests) and
+#32 parser hardening (batch line/char bounds with typed `BatchError` +
+localized toasts; calc accepts NBSP/CR/LF whitespace + unary plus;
+typed `too_deep` guard replaces the bare native RangeError on
+pathological nesting). Tests 585 → **611 green** (+15 core, +11 web).
+Insights chunk 128.42 → 133.82 kB raw / 38.87 kB gz — budget consciously
+bumped 132 → 134 kB (gzip still under 39; the growth is the export's
+localized column wording, not logic). Entry chunk untouched at
+295.11/88.55.
+
+### Added
+- **Insights snapshot CSV export** (`apps/web` insights-csv.ts +
+  AboutTheData): "Download the data (CSV)" — 12 stable columns (id,
+  indicator, ticker, value, unit, status, 7d/30d change, 10-year
+  position, as-of, snapshot time, source) in snapshot order; values are
+  plain ASCII numbers (period decimal, no separators — parses as numbers
+  in ANY spreadsheet locale) while headers/status words localize (en/fa);
+  name/ticker/source columns carry the OWASP formula-injection guard
+  (same `csvNeutralizeFormula` as the batch export); RFC 4180 CRLF;
+  filename `currena-insights-YYYY-MM-DD.csv` stamped from the snapshot.
+  8 unit tests.
+- **j/k card navigation** (Insights route): `j` opens+scrolls to the next
+  visible card, `k` the previous — anchor is the last walked card, else
+  the topmost card in view; respects the active filter; same
+  typing/modifier guards as "/"; desktop keeps multi-open while walking.
+- **Remembered chart zoom** (HistoryChart + chart-range.ts): the chosen
+  10y/5y/1y persists in localStorage (`currena:insights:chart-range`),
+  every chart opens there on the next visit; strict parsing falls back
+  to 10y; storage failures fail OPEN (default, never an error); 5 tests.
+- **Shortcut legend** (FilterBar): `/ search · J next card · K previous`
+  as kbd pills — desktop-only (`hidden md:flex`), hidden on paper.
+
+### Changed (BACKLOG #30, #32 — hygiene closes)
+- `splitEvenly` moved from the Splitter route into `@currena/core`
+  (split.ts) with typed `SplitError` (invalid_people / invalid_decimals /
+  invalid_total) and input validation; the exact-sum largest-remainder
+  arithmetic is unchanged. +7 tests incl. float-noise (0.1+0.2 style)
+  and remainder-distribution cases.
+- `parseBatchLines` now enforces input bounds — ≤500 non-blank lines and
+  ≤500 chars/line — throwing typed `BatchError` codes the BatchConverter
+  catches into one localized toast (fa/en copy added) instead of an
+  unhandled throw or a per-line wall. +3 tests.
+- `evaluateExpression` hardening: NBSP (U+00A0) and CR/LF are skipped as
+  whitespace (HTML-copy/multi-line paste reality); unary plus accepted
+  (`2*+3`, legacy-eval parity); nesting beyond 128 parens throws typed
+  `CalcError('too_deep')` instead of the bare native RangeError. +4 tests.
+
 ## [2026-10-08] — I12 freshness & resilience wave
 
 Fifth round of the day. Production QA re-measured the 2026-10-07 incident

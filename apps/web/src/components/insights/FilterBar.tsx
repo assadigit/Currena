@@ -164,6 +164,25 @@ export function FilterBar({
           </button>
         </p>
       ) : null}
+      {/* I13: the shortcut legend — "/" search (I9) + j/k card walking.
+          Desktop-only: there is no keyboard to discover on touch, and the
+          row would compete with the chips for 375px space. kbd pills match
+          the chip DNA at rest weight. */}
+      <p className="m-0 hidden items-center gap-x-3 gap-y-1 text-[0.7rem] font-semibold text-currena-muted md:flex">
+        <span>{copy.ui.keyboardHints}</span>
+        <span className="flex items-center gap-1.5">
+          <kbd className="inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-white px-1.5 font-sans text-[0.65rem] font-bold text-currena-dark ring-1 ring-black/[0.08] dark:bg-[#243040] dark:text-currena-dark dark:ring-white/[0.12]">/</kbd>
+          <span>{copy.ui.keyboardSearch}</span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          <kbd className="inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-white px-1.5 font-sans text-[0.65rem] font-bold text-currena-dark ring-1 ring-black/[0.08] dark:bg-[#243040] dark:text-currena-dark dark:ring-white/[0.12]">J</kbd>
+          <span>{copy.ui.keyboardNext}</span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          <kbd className="inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-white px-1.5 font-sans text-[0.65rem] font-bold text-currena-dark ring-1 ring-black/[0.08] dark:bg-[#243040] dark:text-currena-dark dark:ring-white/[0.12]">K</kbd>
+          <span>{copy.ui.keyboardPrev}</span>
+        </span>
+      </p>
     </div>
   );
 }

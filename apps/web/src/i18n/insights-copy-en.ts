@@ -543,6 +543,27 @@ export const insightsCopyEn = {
       'Insights is general information about economic and market indicators. It is not financial advice, and nothing here is a recommendation to buy, sell or hold anything.',
     disclaimerBody2:
       'Indicators describe the past and present, not the future. Data can be delayed, revised or wrong. Before acting on money decisions, check primary sources and consider qualified advice — Currena is not licensed to provide it.',
+    // I13: the snapshot CSV export (About this data → download button).
+    downloadCsv: 'Download the data (CSV)',
+    csvHint:
+      'Every indicator on this page with its value, changes and source — plain numbers, ready for any spreadsheet.',
+    csvColId: 'ID',
+    csvColName: 'Indicator',
+    csvColTicker: 'Ticker',
+    csvColValue: 'Value',
+    csvColUnit: 'Unit',
+    csvColStatus: 'Status',
+    csvColChange7d: '7-day change',
+    csvColChange30d: '30-day change',
+    csvColPosition10y: '10-year position',
+    csvColAsOf: 'As of',
+    csvColUpdated: 'Snapshot time',
+    csvColSource: 'Source',
+    // I13: j/k card navigation hints (FilterBar, desktop only).
+    keyboardHints: 'Keyboard:',
+    keyboardSearch: 'search',
+    keyboardNext: 'next card',
+    keyboardPrev: 'previous card',
   },
 
   sections: {

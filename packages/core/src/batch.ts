@@ -18,6 +18,7 @@
 
 import { isCurrencyCode, type CurrencyCode } from './currencies';
 import { normalizeDigits, parseAmount } from './format';
+import { CoreError } from './errors';
 
 /* ------------------------------------------------------------------ *
  * Line parsing
@@ -115,18 +116,62 @@ export interface BatchLineDefaults {
   to?: CurrencyCode;
 }
 
+/* ------------------------------------------------------------------ *
+ * Input bounds (BACKLOG #32)
+ *
+ * A textarea is unbounded user memory; the parser + converter loop is
+ * not. Two hard caps keep a pathological paste (a 50 MB "line", ten
+ * thousand rows) from freezing the main thread or exploding the results
+ * grid: on total lines and on characters per line. Both throw typed
+ * BatchError('batch_too_many_lines' | 'batch_line_too_long') BEFORE any
+ * parsing work — the UI catches the code and shows one localized toast
+ * (apps/web BatchConverter), instead of per-line noise.
+ * ------------------------------------------------------------------ */
+
+/** Max non-blank lines parseBatchLines will process. */
+export const MAX_BATCH_LINES = 500;
+/** Max characters per line (longer = the line is rejected, not truncated —
+ *  truncating an amount mid-digit would silently change its value). */
+export const MAX_BATCH_LINE_CHARS = 500;
+
+/** Machine-readable failure codes for the batch bounds errors. */
+export type BatchErrorCode = 'batch_too_many_lines' | 'batch_line_too_long';
+
+/** Typed bounds error thrown by parseBatchLines (BACKLOG #32). */
+export class BatchError extends CoreError {
+  constructor(code: BatchErrorCode, message: string) {
+    super(code, message);
+    this.name = 'BatchError';
+  }
+}
+
 /**
  * Parse a whole textarea: skips blank lines, applies the page-level
  * from/to defaults to lines that don't carry their own codes, and returns
- * per-line results (never throws on content — surface errors in the UI).
+ * per-line results (never throws on CONTENT — surface errors in the UI).
+ * Input-LEVEL bounds violations (line count / line length) throw the typed
+ * BatchError before any parsing — see the bounds block above.
  */
 export function parseBatchLines(text: string, defaults: BatchLineDefaults = {}): BatchParseResult[] {
+  const lines = text.split(/\r?\n/);
+  const nonBlank = lines.filter((line) => line.trim() !== '');
+  if (nonBlank.length > MAX_BATCH_LINES) {
+    throw new BatchError(
+      'batch_too_many_lines',
+      `${nonBlank.length} non-blank lines exceeds the ${MAX_BATCH_LINES}-line limit`,
+    );
+  }
+  for (const line of nonBlank) {
+    if (line.length > MAX_BATCH_LINE_CHARS) {
+      throw new BatchError(
+        'batch_line_too_long',
+        `a ${line.length}-character line exceeds the ${MAX_BATCH_LINE_CHARS}-character limit`,
+      );
+    }
+  }
   const hasDefaultFrom = defaults.from !== undefined;
   const hasDefaultTo = defaults.to !== undefined;
-  return text
-    .split(/\r?\n/)
-    .filter((line) => line.trim() !== '')
-    .map((line) => {
+  return nonBlank.map((line) => {
       const result = parseBatchLine(line);
       if (result.ok) {
         const from = result.value.from ?? (hasDefaultFrom ? defaults.from : undefined);

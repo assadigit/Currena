@@ -425,6 +425,9 @@ export const en = {
     convertingPrices: 'Converting prices...',
     enterAtLeastOne: '⚠️ Please enter at least one amount',
     selectDifferent: '⚠️ Please select different currencies',
+    // I13 (BACKLOG #32): input-bound toasts for pathological pastes.
+    tooManyLines: '⚠️ Too many lines — please keep it under 500',
+    lineTooLong: '⚠️ One line is too long — please keep lines under 500 characters',
     notePlaceholder: 'Note (optional)',
     invalidLine: '⚠️ Invalid line',
     invalidLinesSummary: '{n} line(s) skipped',
