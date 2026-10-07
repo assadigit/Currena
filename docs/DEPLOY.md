@@ -194,6 +194,29 @@ The first deploy that changes the SPA bundle since 2026-09-24:
   overflow, card expand → chart + SR table + source link, language switch
   keeps open cards), and the converter/LED boards render unchanged.
 
+## Insights reorder + I5 content deploy (2026-10-07)
+
+The standard two commands (`pnpm --filter @currena/web build` +
+`pnpm --filter @currena/api exec wrangler deploy`) — Worker version
+`bef6f65b-e5b6-4655-8d14-25f7945b2e19`, upload 922.70 KiB (gzip 159.88 KiB),
+13 new assets. The reordered Insights chunk is `Insights-oh-TxMJf.js` — the
+compiled bundle carries `SECTION_ORDER=["global","australia"]` (verified by
+grepping the deployed chunk; the reverse order appears nowhere).
+
+- The calendar + china-pmi data did NOT wait for the 04:20 UTC cron: the run
+  was dispatched manually right after the push (Actions run 37641720806,
+  `success` on `f77bdd4`, snapshot `generatedAt 2026-10-07T15:02:48Z`, ETag
+  `"insights:2026-10-07T15:02:48.875Z"`). A mid-day dispatch is safe while
+  the account's KV write budget has headroom (it saturates ~18:30 UTC);
+  from mid-afternoon UTC on, let the 04:20 cron do it instead.
+- Post-deploy smoke (all green): `/api/health`, `/api/rates?source=tgju`,
+  `/api/insights` — 14 calendar events, china-pmi 50.1/normal, **zero
+  unavailable indicators**; `workers.dev` + `currena.ir` both fresh (no
+  edge-cache staleness observed this time, unlike the I4 deploy); and a
+  real-browser pass en+fa on `currena.ir/#/insights` (sections
+  Global→Australia, summary rows, jump nav, card expand, 375px no overflow,
+  zero console errors).
+
 ## Rollback
 
 ```sh

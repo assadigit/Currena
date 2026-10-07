@@ -47,6 +47,18 @@ the reorder is render-order only (no bundle-gated code changed).
   declined at D4; china-pmi seeded as an added I5 item).
 - `data/manual/README.md` — china-pmi provenance table + growth rule.
 
+### Deployed
+- Pushed `f3a8101..f77bdd4` to `main` and redeployed the Worker (version
+  `bef6f65b-e5b6-4655-8d14-25f7945b2e19`, 922.70 KiB upload, 13 new assets —
+  the reordered `Insights-oh-TxMJf.js`). A manually dispatched
+  `insights-ingest` run (Actions run 37641720806, success) wrote the first
+  production snapshot carrying the calendar (14 events) and the live
+  china-pmi reading (50.1, normal) — zero unavailable indicators. Verified
+  on `currena.ir/#/insights` in en and fa: Global before Australia in
+  sections, jump nav, and summary rows; card expand → chart + table +
+  source link; 375px no overflow; zero console errors. Deploy record in
+  `docs/DEPLOY.md` §Insights reorder + I5 content deploy.
+
 ## [2026-10-07] — Insights Phase I4: the page
 
 Gate I3 approved (owner: "Approved." with the live `/api/insights` JSON
