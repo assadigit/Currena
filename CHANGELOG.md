@@ -5,6 +5,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-07] — Insights Phase I5: content (calendar, china-pmi) + Gate I4 ordering fix
+
+Gate I4 approved (owner: "Approved." + the live `/api/insights` JSON) with
+one requested change, applied first: **the Global section now renders
+before Australia** — section order (`SECTION_ORDER`), jump-nav target
+order, and the summary block's two LED lines all flipped; the design spec
+§4 records the owner decision (the original "reader is in Australia"
+rationale is retired). Then Phase I5's content work: the key-dates calendar
+populated from official schedules and the China-PMI manual series seeded
+from documented official releases. Tests stay **514 green**; typecheck 5/5;
+the reorder is render-order only (no bundle-gated code changed).
+
+### Added
+- `data/insights-calendar.json` — 14 events (2026-10-28 → 2027-05-04):
+  RBA cash-rate decisions (2026: 3 Nov, 8 Dec; 2027: 9 Feb, 23 Mar, 4 May —
+  from the RBA Board Meeting Schedules page, decision = second day), FOMC
+  decisions (2026: 28 Oct, 9 Dec; 2027: 27 Jan, 17 Mar, 28 Apr — from
+  federalreserve.gov), ABS CPI releases (Sep quarter 28 Oct, Oct 25 Nov,
+  Dec 27 Jan, Jan 24 Feb — from abs.gov.au, cross-checked against the RBA
+  homepage "Next update"). Bilingual titles; events within 7 days highlight
+  client-side; past events drop off.
+- `data/manual/china-pmi.json` — 10 NBS manufacturing-PMI observations
+  (2025-12 → 2026-09), every value the official headline cross-checked
+  against ≥2 independent reports of the release with month-over-month
+  arithmetic reconciled; full provenance table in `data/manual/README.md`.
+  The china-pmi card goes live (50.1, normal, +0.30 pts 30-day change);
+  its position bar stays hidden until the 30-observation percentile floor.
+
+### Changed
+- `apps/web/src/components/insights/config.ts`, `routes/Insights.tsx`,
+  `components/insights/SummaryBlock.tsx` — Global before Australia
+  (section order, jump nav, summary rows).
+- `docs/insights/02-page-design-spec.md` §4 — page structure reordered to
+  match the owner's decision; rationale line rewritten.
+
+### Documentation
+- Roadmap: I4 exit records Gate I4 approval + the ordering change; the I5
+  checklist closed out (copy corpus delivered in I4 + re-reviewed with a
+  mechanical no-buy/sell check; calendar populated; disclaimer reviewer
+  declined at D4; china-pmi seeded as an added I5 item).
+- `data/manual/README.md` — china-pmi provenance table + growth rule.
+
 ## [2026-10-07] — Insights Phase I4: the page
 
 Gate I3 approved (owner: "Approved." with the live `/api/insights` JSON

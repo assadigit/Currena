@@ -1,1 +1,100 @@
-[]
+[
+  {
+    "id": "fomc-2026-10",
+    "date": "2026-10-28",
+    "titleEn": "US Fed interest rate decision (FOMC)",
+    "titleFa": "تصمیم نرخ بهره فدرال رزرو آمریکا",
+    "kind": "fed"
+  },
+  {
+    "id": "abs-cpi-2026-q3",
+    "date": "2026-10-28",
+    "titleEn": "ABS consumer price index — September quarter",
+    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا — سه‌ماهه سوم",
+    "kind": "abs-cpi"
+  },
+  {
+    "id": "rba-2026-11",
+    "date": "2026-11-03",
+    "titleEn": "RBA cash rate decision",
+    "titleFa": "تصمیم نرخ بهره رسمی استرالیا",
+    "kind": "rba"
+  },
+  {
+    "id": "abs-cpi-2026-10",
+    "date": "2026-11-25",
+    "titleEn": "ABS consumer price index — October",
+    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا — اکتبر",
+    "kind": "abs-cpi"
+  },
+  {
+    "id": "rba-2026-12",
+    "date": "2026-12-08",
+    "titleEn": "RBA cash rate decision",
+    "titleFa": "تصمیم نرخ بهره رسمی استرالیا",
+    "kind": "rba"
+  },
+  {
+    "id": "fomc-2026-12",
+    "date": "2026-12-09",
+    "titleEn": "US Fed interest rate decision (FOMC)",
+    "titleFa": "تصمیم نرخ بهره فدرال رزرو آمریکا",
+    "kind": "fed"
+  },
+  {
+    "id": "fomc-2027-01",
+    "date": "2027-01-27",
+    "titleEn": "US Fed interest rate decision (FOMC)",
+    "titleFa": "تصمیم نرخ بهره فدرال رزرو آمریکا",
+    "kind": "fed"
+  },
+  {
+    "id": "abs-cpi-2026-q4",
+    "date": "2027-01-27",
+    "titleEn": "ABS consumer price index — December quarter",
+    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا — سه‌ماهه چهارم",
+    "kind": "abs-cpi"
+  },
+  {
+    "id": "rba-2027-02",
+    "date": "2027-02-09",
+    "titleEn": "RBA cash rate decision",
+    "titleFa": "تصمیم نرخ بهره رسمی استرالیا",
+    "kind": "rba"
+  },
+  {
+    "id": "abs-cpi-2027-01",
+    "date": "2027-02-24",
+    "titleEn": "ABS consumer price index — January",
+    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا — ژانویه",
+    "kind": "abs-cpi"
+  },
+  {
+    "id": "fomc-2027-03",
+    "date": "2027-03-17",
+    "titleEn": "US Fed interest rate decision (FOMC)",
+    "titleFa": "تصمیم نرخ بهره فدرال رزرو آمریکا",
+    "kind": "fed"
+  },
+  {
+    "id": "rba-2027-03",
+    "date": "2027-03-23",
+    "titleEn": "RBA cash rate decision",
+    "titleFa": "تصمیم نرخ بهره رسمی استرالیا",
+    "kind": "rba"
+  },
+  {
+    "id": "fomc-2027-04",
+    "date": "2027-04-28",
+    "titleEn": "US Fed interest rate decision (FOMC)",
+    "titleFa": "تصمیم نرخ بهره فدرال رزرو آمریکا",
+    "kind": "fed"
+  },
+  {
+    "id": "rba-2027-05",
+    "date": "2027-05-04",
+    "titleEn": "RBA cash rate decision",
+    "titleFa": "تصمیم نرخ بهره رسمی استرالیا",
+    "kind": "rba"
+  }
+]
