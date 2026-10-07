@@ -363,6 +363,144 @@ describe('RatesService ladder (in-memory store + fake scrapers)', () => {
     expect(scrapeCalls).toEqual([]);
   });
 
+  // 2026-10-07 production incident: KV writes (lock puts) started failing
+  // mid-afternoon — reads stayed healthy, a good 7-day snapshot sat in KV,
+  // yet every stale-path /api/rates + /api/convert request escaped the
+  // ladder as a raw 500. The ladder must degrade to its cached rungs.
+  describe('store-failure degradation (2026-10-07 incident: KV writes dead, reads healthy)', () => {
+    /** Explicit delegation — spreading a class instance drops prototype methods. */
+    function makeStoreWith(overrides: Partial<RateStore>): RateStore {
+      return {
+        getSnapshot: (source) => store.getSnapshot(source),
+        putSnapshot: (source, snapshot, ttlSec) => store.putSnapshot(source, snapshot, ttlSec),
+        getStatus: (source) => store.getStatus(source),
+        putStatus: (source, status) => store.putStatus(source, status),
+        tryAcquireLock: (source, ttlSec) => store.tryAcquireLock(source, ttlSec),
+        releaseLock: (source, token) => store.releaseLock(source, token),
+        ...overrides,
+      };
+    }
+    function makeServiceWith(storeOverride: RateStore): RatesService {
+      return new RatesService({
+        store: storeOverride,
+        scrapers: {
+          tgju: async () => {
+            scrapeCalls.push('tgju');
+            const snap = snapshots['tgju']!;
+            if (snap instanceof Error) throw snap;
+            return snap;
+          },
+          frankfurter: async () => {
+            scrapeCalls.push('frankfurter');
+            const snap = snapshots['frankfurter']!;
+            if (snap instanceof Error) throw snap;
+            return snap;
+          },
+        },
+        now: () => new Date(clockMs),
+        scrapeDeadlineMs: 0,
+      });
+    }
+
+    it('lock-acquire failure (KV writes dead) → stale cache with notice, never a 500', async () => {
+      await store.putSnapshot('tgju', tgjuSnapshot(new Date(T0_MS - 400 * SEC).toISOString()), 7 * 86_400);
+      const noWrites = makeStoreWith({
+        tryAcquireLock: async () => {
+          throw new Error('KV put failed (write budget exhausted)');
+        },
+      });
+
+      const res = await makeServiceWith(noWrites).getRates('tgju');
+
+      expect(res.servedFrom).toBe('cache');
+      expect(res.stale).toBe(true);
+      expect(res.notice).toMatch(/^Using cached rates — last updated \d+ minutes? ago$/);
+      expect(scrapeCalls).toEqual([]); // single-flight is a store guarantee — no lock, no scrape
+    });
+
+    it('status-read failure → skips the live rung, serves stale cache', async () => {
+      await store.putSnapshot('tgju', tgjuSnapshot(new Date(T0_MS - 400 * SEC).toISOString()), 7 * 86_400);
+      const noStatusReads = makeStoreWith({
+        getStatus: async () => {
+          throw new Error('KV get failed');
+        },
+      });
+
+      const res = await makeServiceWith(noStatusReads).getRates('tgju');
+
+      expect(res.servedFrom).toBe('cache');
+      expect(res.stale).toBe(true);
+      expect(scrapeCalls).toEqual([]);
+    });
+
+    it('snapshot-read failure with a working scraper → ladder continues and serves live', async () => {
+      const noSnapshotReads = makeStoreWith({
+        getSnapshot: async () => {
+          throw new Error('KV get failed');
+        },
+      });
+
+      const res = await makeServiceWith(noSnapshotReads).getRates('tgju');
+
+      expect(res.servedFrom).toBe('live'); // cache treated as absent, scrape succeeded
+      expect(scrapeCalls).toEqual(['tgju']);
+    });
+
+    it('snapshot-read failure + scrape failure + no cache → honest 503 RatesServiceError, not a raw store error', async () => {
+      snapshots['tgju'] = new Error('upstream down');
+      const noSnapshotReads = makeStoreWith({
+        getSnapshot: async () => {
+          throw new Error('KV get failed');
+        },
+      });
+
+      await expect(makeServiceWith(noSnapshotReads).getRates('tgju')).rejects.toBeInstanceOf(
+        RatesServiceError,
+      );
+    });
+
+    it('forced refresh still scrapes when only the status read fails', async () => {
+      const noStatusReads = makeStoreWith({
+        getStatus: async () => {
+          throw new Error('KV get failed');
+        },
+      });
+
+      const res = await makeServiceWith(noStatusReads).getRates('tgju', { force: true });
+
+      expect(res.servedFrom).toBe('live');
+      expect(scrapeCalls).toEqual(['tgju']);
+    });
+
+    it('incident replay — writes dead + fresh-cache miss → stale-cache rung (the exact 19:57 UTC sequence)', async () => {
+      // Snapshot 5+ min old (fresh TTL expired), status says a scrape is due,
+      // but every KV write fails: the cache must still be served.
+      await store.putSnapshot('tgju', tgjuSnapshot(new Date(T0_MS - 400 * SEC).toISOString()), 7 * 86_400);
+      await store.putStatus('tgju', {
+        source: 'tgju',
+        lastScrapeAt: new Date(T0_MS - 10 * MIN).toISOString(),
+      });
+      const writesDead = makeStoreWith({
+        tryAcquireLock: async () => {
+          throw new Error('KV put failed');
+        },
+        putStatus: async () => {
+          throw new Error('KV put failed');
+        },
+        putSnapshot: async () => {
+          throw new Error('KV put failed');
+        },
+      });
+
+      const res = await makeServiceWith(writesDead).getRates('tgju');
+
+      expect(res.servedFrom).toBe('cache');
+      expect(res.stale).toBe(true);
+      expect(res.notice).toBeDefined();
+      expect(scrapeCalls).toEqual([]);
+    });
+  });
+
   it('status() reports per-source status + cache age/freshness', async () => {
     const service = makeService();
     await service.getRates('tgju'); // populates cache + status

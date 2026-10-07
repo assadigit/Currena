@@ -14,6 +14,16 @@
  *  4. Nothing usable → RatesServiceError('source_unavailable', retryAfterSec 60)
  *     → HTTP 503 RatesError at the route layer.
  *
+ * Store-failure degradation (2026-10-07 production incident — KV writes
+ * started failing mid-afternoon, e.g. free-tier daily write-budget
+ * exhaustion, while a perfectly good 7-day snapshot sat in KV): the ladder
+ * never lets a RateStore error escape as a 500. A snapshot READ failure
+ * treats the cache as absent (the rungs continue); a status-read or
+ * lock-acquire failure SKIPS the live rung entirely — single-flight is a
+ * store guarantee, so when the store cannot provide it we do not scrape —
+ * and falls to the cached rungs (stale-with-notice, or the honest 503 of
+ * rung 4 when nothing is cached). Only RatesServiceError ever leaves here.
+ *
  * Platform-free (AGENTS.md rule 2): RateStore + scraper functions are
  * injected, so the whole ladder is unit-testable with the in-memory store
  * fake and fake scrapers — no Workers, no live sites.
@@ -123,20 +133,44 @@ export class RatesService {
 
   /** Run the ladder for one source. */
   async getRates(source: SnapshotSource, options: GetRatesOptions = {}): Promise<RatesResponse> {
-    // Step 1 — fresh cache, zero network (force skips it: refresh must scrape).
-    const cached = await this.store.getSnapshot(source);
+    // Step 1 — fresh cache, zero network (force skips it: refresh must
+    // scrape). A snapshot READ failure is a degraded store, not a 500: treat
+    // the cache as absent and continue down the ladder (2026-10-07 incident).
+    let cached: Snapshot | undefined;
+    try {
+      cached = await this.store.getSnapshot(source);
+    } catch (readErr) {
+      console.warn(`[rates] snapshot read failed for ${source} — continuing without cache:`, readErr);
+    }
     if (!options.force && cached && ageSec(cached.fetchedAt, this.now()) < FRESH_TTL_SEC) {
       return { snapshot: cached, stale: false, servedFrom: 'cache' };
     }
 
-    // Step 2 — live scrape (guarded by min-interval + best-effort single-flight).
-    const previousStatus = await this.store.getStatus(source);
+    // Step 2 — live scrape (guarded by min-interval + best-effort
+    // single-flight). The live rung is strictly best-effort: a status-read
+    // or lock-acquire failure skips it and falls to the cached rungs — the
+    // single-flight lock is a STORE guarantee, so when the store cannot
+    // provide it we do NOT scrape (2026-10-07 incident: failing lock puts
+    // escaped as 500s while a good 7-day snapshot sat in KV).
+    let statusReadOk = true;
+    let previousStatus: SourceStatus | undefined;
+    try {
+      previousStatus = await this.store.getStatus(source);
+    } catch (statusErr) {
+      statusReadOk = false;
+      console.warn(`[rates] status read failed for ${source} — skipping the live rung:`, statusErr);
+    }
     const lastScrapeMs = previousStatus?.lastScrapeAt ? Date.parse(previousStatus.lastScrapeAt) : Number.NaN;
     const intervalElapsed =
       Number.isFinite(lastScrapeMs) === false ||
       (this.now().getTime() - lastScrapeMs) / 1000 >= MIN_SCRAPE_INTERVAL_SEC;
-    if (options.force || intervalElapsed) {
-      const lockToken = await this.store.tryAcquireLock(source, this.lockTtlSec);
+    if (options.force || (statusReadOk && intervalElapsed)) {
+      let lockToken: string | false = false;
+      try {
+        lockToken = await this.store.tryAcquireLock(source, this.lockTtlSec);
+      } catch (lockErr) {
+        console.warn(`[rates] lock acquire failed for ${source} — skipping the live rung:`, lockErr);
+      }
       if (lockToken !== false) {
         const startedAt = this.now();
         let snapshot: Snapshot | undefined;
