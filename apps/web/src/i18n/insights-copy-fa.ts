@@ -23,6 +23,7 @@ export const insightsCopyFa: InsightsCopy = {
   ui: {
     subtitle: 'شاخص‌های پول و اقتصاد در سطح جهان و استرالیا، به زبان ساده.',
     updated: 'به‌روزرسانی',
+    summaryTitle: 'خلاصهٔ وضعیت بازار',
     dataFrom: 'نمایش داده‌های ذخیره‌شده از {date} — تازه‌سازی ممکن نشد.',
     loadError: 'بارگذاری شاخص‌ها ممکن نشد.',
     retry: 'تلاش دوباره',

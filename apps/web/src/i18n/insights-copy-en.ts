@@ -433,6 +433,7 @@ export const insightsCopyEn = {
   ui: {
     subtitle: 'What global and Australian money indicators are saying, in plain language.',
     updated: 'Updated',
+    summaryTitle: 'Market summary',
     dataFrom: 'Showing saved data from {date} — it could not be refreshed.',
     loadError: 'Insights could not be loaded.',
     retry: 'Try again',

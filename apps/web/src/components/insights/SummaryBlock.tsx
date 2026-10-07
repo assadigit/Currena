@@ -103,7 +103,11 @@ export function SummaryBlock({
   const australia = summary.australia;
 
   return (
-    <section aria-label={copy.sections.global} className="m-0">
+    <section aria-label={copy.ui.summaryTitle} className="m-0">
+      {/* I6 audit F9: the summary block is its own landmark — it used to borrow
+       * the label "Global" (duplicate of the real Global section in the
+       * landmarks list) and had no heading, so heading navigation skipped it. */}
+      <h2 className="sr-only">{copy.ui.summaryTitle}</h2>
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
         <SummaryLineRow line={global} copy={copy} />
         <SummaryLineRow line={australia} copy={copy} />
@@ -126,7 +130,7 @@ export function SummaryBlock({
           type="button"
           aria-expanded={explainerOpen}
           onClick={() => setExplainerOpen((open) => !open)}
-          className="cursor-pointer rounded-full border-0 bg-transparent px-0 text-sm font-semibold text-currena-blue underline decoration-currena-blue/40 underline-offset-4 transition-colors duration-300 hover:decoration-currena-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
+          className="-my-2 inline-block cursor-pointer rounded-lg border-0 bg-transparent px-1.5 py-2.5 text-sm font-semibold text-currena-blue-deep underline decoration-currena-blue/40 underline-offset-4 transition-colors duration-300 hover:decoration-currena-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
         >
           {explainerOpen ? copy.ui.howCalculatedHide : copy.ui.howCalculated}
         </button>
@@ -151,7 +155,7 @@ export function SummaryBlock({
         <button
           type="button"
           onClick={onJumpAbout}
-          className="cursor-pointer border-0 bg-transparent px-0 py-0 font-semibold text-currena-blue underline decoration-currena-blue/40 underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
+          className="-my-1.5 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-2 font-semibold text-currena-blue-deep underline decoration-currena-blue/40 underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
         >
           {copy.ui.aboutTitle} ↧
         </button>

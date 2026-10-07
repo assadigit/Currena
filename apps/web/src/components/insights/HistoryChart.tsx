@@ -203,9 +203,10 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
         <circle cx={lastPt.x} cy={lastPt.y} r="4" fill="currentColor" stroke="rgba(0,0,0,0.25)" strokeWidth="1" />
       </svg>
       </span>
-      {/* Data-table alternative (spec §9) — real table, collapsed by default. */}
-      <details className="mt-2 rounded-xl bg-currena-soft/60 px-3 py-2 dark:bg-white/[0.04]">
-        <summary className="cursor-pointer text-xs font-semibold text-currena-muted select-none">
+      {/* Data-table alternative (spec §9) — real table, collapsed by default.
+          I6 audit F7: the summary is a full-width row with a 44px hit area. */}
+      <details className="mt-2 rounded-xl bg-currena-soft/60 px-3 py-1 dark:bg-white/[0.04]">
+        <summary className="-mx-3 flex min-h-[44px] cursor-pointer select-none items-center px-3 text-xs font-semibold text-currena-muted">
           {copy.ui.chartTable}
         </summary>
         <table className="mt-2 w-full text-xs tabular-nums">
