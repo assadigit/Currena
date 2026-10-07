@@ -23,6 +23,8 @@ import {
   formatIndicatorValue,
   formatRuleText,
   groupCounts,
+  indicatorMatchesFilter,
+  filterVisibleIds,
   sampleHistoryRows,
   warningZone,
 } from '../components/insights/config';
@@ -348,6 +350,93 @@ describe('groupCounts', () => {
       votingCount: 1,
       excludedCount: 0,
     });
+  });
+});
+
+describe('card filter (I8)', () => {
+  const nameOfEn = (id: IndicatorReading['id']): { name: string; ticker?: string } => ({
+    name: insightsCopyEn.indicators[id].name,
+    ticker: insightsCopyEn.indicators[id].ticker,
+  });
+  const nameOfFa = (id: IndicatorReading['id']): { name: string; ticker?: string } => ({
+    name: insightsCopyFa.indicators[id].name,
+    ticker: insightsCopyFa.indicators[id].ticker,
+  });
+
+  it('an inactive filter means "no filtering" (null), whitespace query included', () => {
+    expect(filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: '' }, nameOfEn)).toBeNull();
+    expect(filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: '   ' }, nameOfEn)).toBeNull();
+  });
+
+  it('status chips narrow to exactly that status, snapshot order preserved', () => {
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'warning', query: '' }, nameOfEn)!]).toEqual([
+      'us10y',
+      'au-cpi',
+    ]);
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'normal', query: '' }, nameOfEn)!]).toEqual([
+      'yield-curve-10y2y',
+      'au-unemployment',
+    ]);
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'context', query: '' }, nameOfEn)!]).toEqual([
+      'gold-btc',
+      'rba-cash-rate',
+    ]);
+  });
+
+  it('stale and unavailable cards only ever appear under All', () => {
+    for (const status of ['warning', 'normal', 'context'] as const) {
+      const ids = filterVisibleIds(SNAPSHOT.readings, { status, query: '' }, nameOfEn)!;
+      expect(ids.has('dollar-broad')).toBe(false); // stale
+      expect(ids.has('china-pmi')).toBe(false); // unavailable
+    }
+  });
+
+  it('search matches names case-insensitively and tickers; spacing is irrelevant', () => {
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'unemployment' }, nameOfEn)!]).toEqual([
+      'au-unemployment',
+    ]);
+    // Multi-word Latin query vs the name's own spacing («Australian unemployment rate»).
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'au unemployment' }, nameOfEn)!]).toEqual([
+      'au-unemployment',
+    ]);
+    // Ticker match, both cases (gold-btc carries the XAU/BTC ticker).
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'XAU/BTC' }, nameOfEn)!]).toEqual([
+      'gold-btc',
+    ]);
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'xau/btc' }, nameOfEn)!]).toEqual([
+      'gold-btc',
+    ]);
+  });
+
+  it('search and status combine with AND semantics', () => {
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'warning', query: 'cpi' }, nameOfEn)!]).toEqual([
+      'au-cpi',
+    ]);
+    expect(filterVisibleIds(SNAPSHOT.readings, { status: 'normal', query: 'cpi' }, nameOfEn)!.size).toBe(0);
+  });
+
+  it('a query that matches nothing yields an empty set (the no-match state)', () => {
+    expect(filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'zzzz-nothing' }, nameOfEn)!.size).toBe(0);
+  });
+
+  it('Persian search: a plain space still matches ZWNJ compounds', () => {
+    // gold-btc's Farsi name is «طلا / بیت‌کوین» (ZWNJ inside بیت‌کوین).
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'بیت کوین' }, nameOfFa)!]).toEqual([
+      'gold-btc',
+    ]);
+  });
+
+  it('Persian search: Arabic-keyboard yeh/kaf are normalised to Persian', () => {
+    // «بيكاري» = بیکاری typed with Arabic ي (U+064A) and ك (U+0643).
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'بيكاري' }, nameOfFa)!]).toEqual([
+      'au-unemployment',
+    ]);
+  });
+
+  it('indicatorMatchesFilter: bidi marks never leak into comparisons', () => {
+    const r = SNAPSHOT.readings[0]!;
+    expect(indicatorMatchesFilter(r, { status: 'all', query: '\u200Fyield' }, nameOfEn)).toBe(true);
+    expect(indicatorMatchesFilter(r, { status: 'all', query: 'yield\u200E' }, nameOfEn)).toBe(true);
   });
 });
 

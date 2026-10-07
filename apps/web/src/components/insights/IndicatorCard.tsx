@@ -183,7 +183,7 @@ export function IndicatorCard({ reading, copy, locale, numberLocale, open, onTog
   return (
     <article
       id={cardAnchorId}
-      className={`scroll-mt-24 rounded-[18px] p-4 ring-1 shadow-[0_4px_18px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] ${
+      className={`scroll-mt-24 rounded-[18px] p-4 ring-1 shadow-[0_4px_18px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] motion-safe:transition-[box-shadow,transform] motion-safe:duration-200 md:motion-safe:hover:-translate-y-0.5 md:motion-safe:hover:shadow-[0_10px_30px_rgba(0,0,0,0.10)] dark:md:motion-safe:hover:shadow-[0_12px_36px_rgba(0,0,0,0.6)] ${
         greyed
           ? // I6 audit F5: the old blanket opacity-60 sank body text to 2.3:1
             // (light) / 2.0:1 (dark). Grey-out now = softened surface + muted

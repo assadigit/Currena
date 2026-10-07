@@ -28,6 +28,7 @@ import { routeQuery } from '../router';
 import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../lib/insights';
 import { AboutTheData } from '../components/insights/AboutTheData';
 import { ComingUp } from '../components/insights/ComingUp';
+import { FilterBar } from '../components/insights/FilterBar';
 import { IndicatorCard } from '../components/insights/IndicatorCard';
 import { JumpNav, type JumpTarget } from '../components/insights/JumpNav';
 import { SummaryBlock } from '../components/insights/SummaryBlock';
@@ -40,7 +41,9 @@ import {
   SECTION_ORDER,
   definitionFor,
   definitionsForGroup,
+  filterVisibleIds,
   groupCounts,
+  type StatusFilter,
 } from '../components/insights/config';
 
 type LoadState =
@@ -87,6 +90,7 @@ function SectionBlock({
   copy,
   locale,
   numberLocale,
+  visibleIds,
 }: {
   section: InsightsSection;
   snapshot: InsightsSnapshot;
@@ -95,9 +99,15 @@ function SectionBlock({
   copy: ReturnType<typeof useInsightsCopy>['copy'];
   locale: 'en' | 'fa';
   numberLocale: 'en-US' | 'fa-IR';
+  /** I8: ids surviving the FilterBar (null = no filtering). Empty sections hide. */
+  visibleIds: ReadonlySet<IndicatorId> | null;
 }) {
   const line = snapshot.summary[section];
   const sectionId = `insights-section-${section}`;
+  // Warning-count lines describe the FULL data (the filter is a view tool).
+  const visible = (id: IndicatorId): boolean => visibleIds === null || visibleIds.has(id);
+  const hasVisible = snapshot.readings.some((r) => visible(r.id) && definitionFor(r.id).section === section);
+  if (!hasVisible) return null;
   return (
     <section id={sectionId} aria-labelledby={`${sectionId}-title`} className="scroll-mt-24">
       <header className="mb-3 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -115,7 +125,9 @@ function SectionBlock({
         {GROUP_ORDER[section].map((group: IndicatorGroupId) => {
           const defs = definitionsForGroup(section, group);
           const counts = groupCounts(snapshot.readings, section, group);
-          const readings = snapshot.readings.filter((r) => defs.some((d) => d.id === r.id));
+          const readings = snapshot.readings.filter(
+            (r) => defs.some((d) => d.id === r.id) && visible(r.id),
+          );
           if (readings.length === 0) return null;
           return (
             <div key={group}>
@@ -132,6 +144,7 @@ function SectionBlock({
               </header>
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
                 {defs.map((def) => {
+                  if (!visible(def.id)) return null;
                   const reading = snapshot.readings.find((r) => r.id === def.id);
                   if (!reading) return null;
                   return (
@@ -161,6 +174,10 @@ export function Insights() {
   const [state, setState] = useState<LoadState>({ kind: 'loading' });
   const [retryToken, setRetryToken] = useState(0);
   const [openCards, setOpenCards] = useState<ReadonlySet<IndicatorId>>(new Set());
+  // I8: card-grid filter (view tool only — counts and summaries keep
+  // describing the full snapshot). Survives language switches (same mount).
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [query, setQuery] = useState('');
   const isPhone = useIsPhone();
   const hadCache = useRef(false);
   // I7 #50: a share link ('#/insights?card=<id>') opens + scrolls to that
@@ -212,6 +229,23 @@ export function Insights() {
     [isPhone],
   );
 
+  // Shared "go look at this card" behaviour (I7 share links + I8 WhatChanged
+  // rows): open the card (single-open on phones) then scroll + focus it.
+  const focusCard = useCallback(
+    (id: IndicatorId) => {
+      setOpenCards((prev) => (isPhone ? new Set([id]) : new Set([...prev, id])));
+      requestAnimationFrame(() => {
+        const el = document.getElementById(`insights-card-${id}`);
+        if (!el) return; // filtered out of view right now — safe no-op
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+        el.setAttribute('tabindex', '-1');
+        el.focus({ preventScroll: true });
+      });
+    },
+    [isPhone],
+  );
+
   // Share-link deep link (I7 #50, spec §10): '?card=<id>' opens exactly
   // that card (single-open discipline on phones) and scrolls to it. Unknown
   // or missing ids are ignored — the page just loads normally.
@@ -227,16 +261,8 @@ export function Insights() {
       return; // not a known indicator id — ignore the param
     }
     if (!state.snapshot.readings.some((r) => r.id === id)) return;
-    setOpenCards((prev) => (isPhone ? new Set([id]) : new Set([...prev, id])));
-    requestAnimationFrame(() => {
-      const el = document.getElementById(`insights-card-${id}`);
-      if (!el) return;
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
-      el.setAttribute('tabindex', '-1');
-      el.focus({ preventScroll: true });
-    });
-  }, [state, isPhone]);
+    focusCard(id);
+  }, [state, focusCard]);
 
   const jumpAbout = useCallback(() => {
     const el = document.getElementById('insights-about');
@@ -247,16 +273,40 @@ export function Insights() {
     el.focus({ preventScroll: true });
   }, []);
 
-  const jumpTargets = useMemo<JumpTarget[]>(
-    () => [
+  // I8: ids surviving the current filter (null = no filtering active).
+  const visibleIds = useMemo(() => {
+    if (state.kind !== 'ready') return null;
+    return filterVisibleIds(state.snapshot.readings, { status: statusFilter, query }, (id) => ({
+      name: copy.indicators[id].name,
+      ticker: copy.indicators[id].ticker,
+    }));
+  }, [state, statusFilter, query, copy]);
+
+  // Sections with at least one visible card (drives hiding + JumpNav pills).
+  const sectionVisible = useMemo<Record<InsightsSection, boolean>>(() => {
+    const out: Record<InsightsSection, boolean> = { global: false, australia: false };
+    if (state.kind === 'ready') {
+      for (const r of state.snapshot.readings) {
+        if (visibleIds !== null && !visibleIds.has(r.id)) continue;
+        out[definitionFor(r.id).section] = true;
+      }
+    }
+    return out;
+  }, [state, visibleIds]);
+
+  const jumpTargets = useMemo<JumpTarget[]>(() => {
+    const targets: JumpTarget[] = [
       { id: 'insights-what-changed', label: copy.ui.whatChangedTitle },
       { id: 'insights-coming-up', label: copy.ui.comingUpTitle },
-      { id: 'insights-section-global', label: copy.sections.global },
-      { id: 'insights-section-australia', label: copy.sections.australia },
-      { id: 'insights-about', label: copy.ui.aboutTitle },
-    ],
-    [copy],
-  );
+    ];
+    // I8: a pill whose section is fully filtered out would jump nowhere.
+    if (sectionVisible.global) targets.push({ id: 'insights-section-global', label: copy.sections.global });
+    if (sectionVisible.australia) {
+      targets.push({ id: 'insights-section-australia', label: copy.sections.australia });
+    }
+    targets.push({ id: 'insights-about', label: copy.ui.aboutTitle });
+    return targets;
+  }, [copy, sectionVisible]);
 
   const generatedLine = useMemo(() => {
     if (state.kind !== 'ready') return null;
@@ -322,20 +372,58 @@ export function Insights() {
 
           <SummaryBlock summary={state.snapshot.summary} copy={copy} onJumpAbout={jumpAbout} />
           <JumpNav targets={jumpTargets} copy={copy} />
-          <WhatChanged snapshot={state.snapshot} copy={copy} numberLocale={numberLocale} />
+          <WhatChanged
+            snapshot={state.snapshot}
+            copy={copy}
+            numberLocale={numberLocale}
+            locale={locale}
+            onFocusCard={focusCard}
+          />
           <ComingUp events={state.snapshot.calendar} copy={copy} locale={locale} />
-          {SECTION_ORDER.map((section) => (
-            <SectionBlock
-              key={section}
-              section={section}
-              snapshot={state.snapshot}
-              openCards={openCards}
-              onToggle={onToggle}
-              copy={copy}
-              locale={locale}
-              numberLocale={numberLocale}
-            />
-          ))}
+          {/* I8: the card-grid toolbar — after the story blocks, right where
+              the grid begins. View tool only (see FilterBar.tsx). */}
+          <FilterBar
+            copy={copy}
+            numberLocale={numberLocale}
+            total={state.snapshot.readings.length}
+            shown={visibleIds !== null ? visibleIds.size : state.snapshot.readings.length}
+            status={statusFilter}
+            onStatusChange={setStatusFilter}
+            query={query}
+            onQueryChange={setQuery}
+          />
+          {visibleIds !== null && visibleIds.size === 0 ? (
+            <div className="rounded-[18px] bg-currena-soft/60 px-5 py-8 text-center ring-1 ring-black/[0.05] dark:bg-white/[0.04] dark:ring-white/[0.07]">
+              <p className="m-0 text-base" aria-hidden="true">
+                🔍
+              </p>
+              <p className="mt-1 mb-0 text-sm font-semibold text-currena-dark">{copy.ui.noMatches}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setStatusFilter('all');
+                  setQuery('');
+                }}
+                className="mt-3 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-currena-blue/40 bg-currena-blue/15 px-5 text-xs font-bold text-currena-blue-deep transition-colors hover:bg-currena-blue/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
+              >
+                {copy.ui.clearFilters}
+              </button>
+            </div>
+          ) : (
+            SECTION_ORDER.map((section) => (
+              <SectionBlock
+                key={section}
+                section={section}
+                snapshot={state.snapshot}
+                openCards={openCards}
+                onToggle={onToggle}
+                copy={copy}
+                locale={locale}
+                numberLocale={numberLocale}
+                visibleIds={visibleIds}
+              />
+            ))
+          )}
           <AboutTheData copy={copy} />
         </div>
       ) : null}

@@ -327,6 +327,67 @@ export function bigMovers(readings: readonly IndicatorReading[], limit = 5): Mov
 }
 
 /* ------------------------------------------------------------------ *
+ * Card filter (I8) — view-level narrowing of the 30-card grid
+ * ------------------------------------------------------------------ */
+
+export type StatusFilter = 'all' | 'warning' | 'normal' | 'context';
+
+export interface CardFilter {
+  status: StatusFilter;
+  query: string;
+}
+
+/**
+ * Search normalisation for the filter box. Persian keyboards are assumed
+ * (the fa UI); the two mappings rescue queries typed on Arabic-keyboard
+ * layouts (Arabic yeh/kaf vs Persian yeh/kaf), and bidi/zero-width marks
+ * never leak into comparisons. ZWNJ acts as a word separator, so every
+ * query token matches the name either as typed (space-separated) or as the
+ * fused compound — «بیت کوین», «بیت‌کوین» and «بیتکوین» all hit
+ * «طلا / بیت‌کوین», and Latin multi-word queries work word-wise (AND).
+ */
+/** ZWNJ → word separator (first!), other zero-widths/bidi stripped, whitespace collapsed. */
+function spacedNorm(s: string): string {
+  return s
+    .replace(/\u064A/g, '\u06CC')
+    .replace(/\u0643/g, '\u06A9')
+    .replace(/\u200C/g, ' ')
+    .replace(/[\u200B\u200D-\u200F\u202A-\u202E\u2066-\u2069]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Does one reading pass the status chips + text query? (Pure, unit-tested.) */
+export function indicatorMatchesFilter(
+  reading: IndicatorReading,
+  filter: CardFilter,
+  nameOf: (id: IndicatorId) => { name: string; ticker?: string },
+): boolean {
+  if (filter.status !== 'all' && reading.status !== filter.status) return false;
+  const tokens = spacedNorm(filter.query).split(' ').filter((t) => t.length > 0);
+  if (tokens.length === 0) return true;
+  const entry = nameOf(reading.id);
+  const hayA = spacedNorm(`${entry.name} ${entry.ticker ?? ''}`);
+  const hayB = hayA.replace(/ /g, ''); // fused compounds (ZWNJ neighbours)
+  return tokens.every((t) => hayA.includes(t) || hayB.includes(t));
+}
+
+/** Ids that survive the filter, in snapshot order. Empty query + 'all' → null (no filtering). */
+export function filterVisibleIds(
+  readings: readonly IndicatorReading[],
+  filter: CardFilter,
+  nameOf: (id: IndicatorId) => { name: string; ticker?: string },
+): Set<IndicatorId> | null {
+  if (filter.status === 'all' && filter.query.trim() === '') return null;
+  const ids = new Set<IndicatorId>();
+  for (const r of readings) {
+    if (indicatorMatchesFilter(r, filter, nameOf)) ids.add(r.id);
+  }
+  return ids;
+}
+
+/* ------------------------------------------------------------------ *
  * History helpers (epoch-day math for the 10-year chart)
  * ------------------------------------------------------------------ */
 
