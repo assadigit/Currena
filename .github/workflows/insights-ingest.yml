@@ -9,7 +9,11 @@
 # headroom (see docs/insights/03-data-sources.md, Phase I3 record).
 #
 # The job exits non-zero when any P1 indicator is unavailable (product
-# degraded) — a red run is the stale-feed signal until Phase I7 alerting.
+# degraded). Failure signals (Phase I7 alerting): this red run (GitHub's
+# own Actions notification email), the /admin Insights staleness pill
+# (flips past 36 h without a run), and an optional Telegram push to the
+# owner — active as soon as TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID secrets
+# exist (see the final step; a clean no-op until then).
 name: insights-ingest
 
 on:
@@ -61,3 +65,30 @@ jobs:
           ARGS=""
           if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="--dry-run"; fi
           pnpm --filter @currena/insights ingest $ARGS
+
+      # I7 alerting (BACKLOG #46): push a failure notice to the owner's
+      # Telegram when the bot secrets exist; otherwise a clean no-op — the
+      # red run + the /admin staleness pill are the signals. No owner setup
+      # is required for this workflow to keep working as before.
+      - name: Notify owner on failure (Telegram, optional)
+        if: failure()
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TG_BOT_TOKEN" ] || [ -z "$TG_CHAT_ID" ]; then
+            echo "TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID not configured — skipping the push notification."
+            echo "Still firing: this red run (GitHub Actions notifications) + the /admin Insights staleness pill past 36 h."
+            exit 0
+          fi
+          MSG="❌ Currena insights-ingest FAILED — ${{ github.event_name }} run on ${{ github.sha }} — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          HTTP=$(curl -sS -X POST "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage" \
+            -d chat_id="$TG_CHAT_ID" --data-urlencode "text=$MSG" \
+            -o /dev/null -w '%{http_code}')
+          echo "telegram HTTP $HTTP"
+          # The run is already failed — a notification hiccup must not mask
+          # the original conclusion, so log and move on unless Telegram
+          # rejected the request outright (bad token/chat is worth seeing).
+          if [ "$HTTP" != "200" ] && [ "$HTTP" != "429" ]; then
+            echo "::warning::Telegram notification failed (HTTP $HTTP) — check TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID."
+          fi
