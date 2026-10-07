@@ -7,19 +7,24 @@ than a semver tag.
 
 ## [2026-10-08] — I11 live-rate wave + rates-ladder incident hardening
 
-Fourth round of the day. Production QA surfaced a REAL incident: since
-19:52:30 UTC every KV write on the RATES namespace has been failing (reads
-healthy) — the free-tier daily write budget (`1,000/day`, likely accelerated
-by today's dispatched ingest runs) — so `/api/rates` and `/api/convert`
-hard-500'd on every stale-path request while a perfectly good snapshot sat
-in KV, and the cron silently stopped refreshing. The SPA masked it locally
-via SW cache (tgju served 200 from Cache API; frankfurter visibly failed).
-Two answers shipped: the ladder now degrades exactly as its spec promises
-(stale-cache rung instead of a 500), and the converter homepage gains the
-one thing every rate site answers instantly — the pair's live rate, always
-on. Tests 555 → **575 green** (+6 api incident-degradation, +14 web
-LiveRateLine helpers). Production still serves the I6 Worker `954f0034`
-(deploy pending, owner credentials).
+Fourth round of the day. Production QA surfaced a REAL incident: starting
+19:52:30 UTC, KV writes on the RATES namespace failed — first totally
+(19:52–~20:10, cron included: status/history froze, the SPA masked tgju
+via SW cache while frankfurter visibly 500'd), then selectively (the
+cron's writes recovered while HTTP-context writes — by elimination the
+single-flight lock PUT — still failed from at least the HKG colo, so
+`/api/rates` + `/api/convert` 500'd instantly during every TTL-expiry
+window with a good snapshot sitting in KV). Root cause beyond "KV
+writes failing from fetch context" needs `wrangler tail` (owner —
+DEPLOY.md incident note has the runbook); the daily-budget hypothesis
+was tested against the evidence and DISPROVEN. The code answer shipped
+regardless: the ladder now degrades exactly as its spec promises
+(stale-cache rung instead of a 500) — turning this entire incident class
+into a "Using cached rates" notice. And the converter homepage gains
+the one thing every rate site answers instantly — the pair's live rate,
+always on. Tests 555 → **575 green** (+6 api incident-degradation, +14
+web LiveRateLine helpers). Production still serves the I6 Worker
+`954f0034` (deploy pending, owner credentials).
 
 ### Fixed (production incident 2026-10-07 19:52 UTC)
 - **`RatesService.getRates` store-failure degradation**: a snapshot READ

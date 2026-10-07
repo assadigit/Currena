@@ -324,7 +324,7 @@ cron bindings intact, live on currena.ir + workers.dev.
 - Session gates: typecheck 5/5, tests **521/521** (core 159 · scraper 67 ·
   insights 132 · web 52 · api 111), bundle budget held.
 
-## Production incident — KV write-budget exhaustion (2026-10-07, 19:52 UTC)
+## Production incident — KV write failures (2026-10-07, 19:52 UTC → ongoing at session close)
 
 Discovered by routine QA (I11 session). Symptom: `/api/rates` and
 `/api/convert` returned **500 `internal_error`** on every request that
@@ -333,39 +333,57 @@ needed the scrape path, while `/api/health`, `/api/status`, `/api/meta`,
 failure locally (SW served its Cache API copy — the network panel showed a
 real 500 for frankfurter); `curl` exposed it.
 
-Timeline + diagnosis:
+Timeline + diagnosis (evidence-corrected over the session):
 
-- Last successful KV write: **19:52:29 UTC** (tgju cron scrape). Every
-  write after that failed; reads stayed healthy. `/api/status` froze at
-  `lastScrapeAt 19:52:29`, `/api/history` froze at 240 generations, and
-  the 500s began the moment the tgju snapshot crossed FRESH_TTL (19:52:29
-  + 300 s → 200→500 flip observed live at 19:57:29/30).
-- Root cause: the account's **free-tier KV write budget (1,000/day)**
-  was exhausted. Steady-state burn (tgju cron scrape ≈ every 5–6 min ≈
-  4 writes/scrape ≈ 1,000+/day alone, + frankfurter quarter-hourly,
-  + history generations, + the insights ingestion's ~31 writes/run) —
-  today's dispatched ingest runs tipped it over ~19:52. The budget resets
-  at **midnight UTC**.
-- Code bug exposed: `RatesService.getRates` let store errors from
-  `getStatus`/`tryAcquireLock` escape as unhandled 500s — the ladder's
-  own spec promises the stale-cache rung. **Fixed in I11** (commit
-  `fix(rates)`): store failures now degrade to the cached rungs; only
-  `RatesServiceError` (503) can leave the service. After the next deploy,
-  the same incident serves "Using cached rates — last updated N minutes
-  ago" with HTTP 200 instead of 500.
+- **Phase 1 — total write freeze, 19:52:30–~20:10:29 UTC**: every KV
+  write failed, cron included (`/api/status` frozen at
+  `lastScrapeAt 19:52:29`, `/api/history` frozen at 240 generations).
+  The 500s began the moment the tgju snapshot crossed FRESH_TTL
+  (200→500 flip observed live at 19:57:29/30). Reads healthy throughout.
+- **Phase 2 — cron writes recovered, HTTP writes still failing** (from
+  this sandbox's colo, cf-ray `-HKG`): the cron scraped+persisted
+  successfully at 20:10:29 (tgju), 20:15:29 (frankfurter), 20:16:29
+  (tgju) — while HTTP stale-path requests in the SAME minutes 500'd
+  instantly (fast KV error, not a scrape timeout). Fresh-path and
+  read-only endpoints stayed 200. By elimination (every other operation
+  is proven working by another endpoint), the failing HTTP operation is
+  the single-flight **lock PUT** in `tryAcquireLock`.
+- **Root cause: NOT the daily write budget** (initial hypothesis,
+  disproven): a 1,000/day account cap would block the cron's writes too
+  — they work. The observed pattern is KV writes failing from the FETCH
+  context (at least via the HKG colo) while the cron's location writes
+  fine — consistent with a Cloudflare-side regional KV incident or an
+  isolate/binding-level write failure. The definitive error string needs
+  `wrangler tail` (observability is enabled) during a stale window.
+- User impact: 500s during the TTL-expiry windows (typically <60 s every
+  ~5–6 min per source) for affected colos; the SPA masks tgju via SW
+  cache.
+- Code bug exposed + FIXED (I11, commit `fix(rates)`):
+  `RatesService.getRates` let store errors from `getStatus`/
+  `tryAcquireLock` escape as unhandled 500s — the ladder's own spec
+  promises the stale-cache rung. After the next deploy the same incident
+  serves "Using cached rates — last updated N minutes ago" with HTTP 200.
 
 Owner follow-ups (beyond the deploy):
 
-1. **Verify recovery after midnight UTC**: `/api/status` → tgju
-   `lastScrapeAt` advancing again; `/api/rates?source=tgju` 200.
-2. **Reduce the write burn** (any subset, owner's call — product
-   tradeoff): raise FRESH_TTL_SEC (300 → 900 cuts tgju snapshot/status
-   writes ~3×, rates up to 15 min old), or skip identical-snapshot
-   putSnapshot writes in the cron, or move to Workers Paid (unlimited KV
-   writes). Current design burns ~1,150+ writes/day against a 1,000/day
-   budget — this WILL recur every day until one of these changes.
-3. The `/admin` Insights freshness card (I7) and the ingest workflow's
-   exit-1-on-P1-unavailable both remain the stale-feed signals.
+1. **Deploy the I11 fix** — it converts this entire incident class into
+   the designed stale-cache degradation.
+2. **Capture the real error**: during a stale window (~TTL expiry, check
+   `/api/status` for `fresh: false`), run
+   `pnpm --filter @currena/api exec wrangler tail` and read the
+   `[rates] …` / `[api] unhandled error:` lines; check the Cloudflare
+   status page + dashboard → Workers Logs (observability enabled) for
+   the KV error code.
+3. **If persistent**: CF support ticket (KV writes failing from fetch
+   context in some colos), and/or exercise the documented RateStore
+   port (AGENTS.md rule 2) — a KV→D1 migration is a swap of the adapter
+   file.
+4. Write-budget hygiene (secondary, still true): steady-state burn is
+   ~1,150+ writes/day (tgju cron ~4 writes per ~5–6 min scrape +
+   frankfurter quarter-hourly + history generations + insights
+   ingestion ~31/run) against the free tier's 1,000/day — raise
+   FRESH_TTL_SEC, skip identical-snapshot writes, or move to Workers
+   Paid before the budget becomes a REAL daily outage at midnight+peak.
 
 ## Rollback
 
