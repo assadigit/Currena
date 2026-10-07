@@ -324,6 +324,49 @@ cron bindings intact, live on currena.ir + workers.dev.
 - Session gates: typecheck 5/5, tests **521/521** (core 159 · scraper 67 ·
   insights 132 · web 52 · api 111), bundle budget held.
 
+## Production incident — KV write-budget exhaustion (2026-10-07, 19:52 UTC)
+
+Discovered by routine QA (I11 session). Symptom: `/api/rates` and
+`/api/convert` returned **500 `internal_error`** on every request that
+needed the scrape path, while `/api/health`, `/api/status`, `/api/meta`,
+`/api/history` and `/api/insights` stayed 200. The SPA masked the tgju
+failure locally (SW served its Cache API copy — the network panel showed a
+real 500 for frankfurter); `curl` exposed it.
+
+Timeline + diagnosis:
+
+- Last successful KV write: **19:52:29 UTC** (tgju cron scrape). Every
+  write after that failed; reads stayed healthy. `/api/status` froze at
+  `lastScrapeAt 19:52:29`, `/api/history` froze at 240 generations, and
+  the 500s began the moment the tgju snapshot crossed FRESH_TTL (19:52:29
+  + 300 s → 200→500 flip observed live at 19:57:29/30).
+- Root cause: the account's **free-tier KV write budget (1,000/day)**
+  was exhausted. Steady-state burn (tgju cron scrape ≈ every 5–6 min ≈
+  4 writes/scrape ≈ 1,000+/day alone, + frankfurter quarter-hourly,
+  + history generations, + the insights ingestion's ~31 writes/run) —
+  today's dispatched ingest runs tipped it over ~19:52. The budget resets
+  at **midnight UTC**.
+- Code bug exposed: `RatesService.getRates` let store errors from
+  `getStatus`/`tryAcquireLock` escape as unhandled 500s — the ladder's
+  own spec promises the stale-cache rung. **Fixed in I11** (commit
+  `fix(rates)`): store failures now degrade to the cached rungs; only
+  `RatesServiceError` (503) can leave the service. After the next deploy,
+  the same incident serves "Using cached rates — last updated N minutes
+  ago" with HTTP 200 instead of 500.
+
+Owner follow-ups (beyond the deploy):
+
+1. **Verify recovery after midnight UTC**: `/api/status` → tgju
+   `lastScrapeAt` advancing again; `/api/rates?source=tgju` 200.
+2. **Reduce the write burn** (any subset, owner's call — product
+   tradeoff): raise FRESH_TTL_SEC (300 → 900 cuts tgju snapshot/status
+   writes ~3×, rates up to 15 min old), or skip identical-snapshot
+   putSnapshot writes in the cron, or move to Workers Paid (unlimited KV
+   writes). Current design burns ~1,150+ writes/day against a 1,000/day
+   budget — this WILL recur every day until one of these changes.
+3. The `/admin` Insights freshness card (I7) and the ingest workflow's
+   exit-1-on-P1-unavailable both remain the stale-feed signals.
+
 ## Rollback
 
 ```sh

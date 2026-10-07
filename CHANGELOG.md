@@ -5,6 +5,79 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-08] — I11 live-rate wave + rates-ladder incident hardening
+
+Fourth round of the day. Production QA surfaced a REAL incident: since
+19:52:30 UTC every KV write on the RATES namespace has been failing (reads
+healthy) — the free-tier daily write budget (`1,000/day`, likely accelerated
+by today's dispatched ingest runs) — so `/api/rates` and `/api/convert`
+hard-500'd on every stale-path request while a perfectly good snapshot sat
+in KV, and the cron silently stopped refreshing. The SPA masked it locally
+via SW cache (tgju served 200 from Cache API; frankfurter visibly failed).
+Two answers shipped: the ladder now degrades exactly as its spec promises
+(stale-cache rung instead of a 500), and the converter homepage gains the
+one thing every rate site answers instantly — the pair's live rate, always
+on. Tests 555 → **575 green** (+6 api incident-degradation, +14 web
+LiveRateLine helpers). Production still serves the I6 Worker `954f0034`
+(deploy pending, owner credentials).
+
+### Fixed (production incident 2026-10-07 19:52 UTC)
+- **`RatesService.getRates` store-failure degradation**: a snapshot READ
+  failure now treats the cache as absent and continues down the ladder; a
+  status-read or lock-acquire failure SKIPS the live rung entirely (the
+  single-flight lock is a store guarantee — no lock, no scrape) and falls
+  to the cached rungs — stale-with-notice when a ≤7-day snapshot exists,
+  the honest 503 `source_unavailable` otherwise. Only `RatesServiceError`
+  ever escapes the service now; the route's 500 backstop becomes
+  unreachable for store errors. +6 unit tests replaying the incident
+  (writes-dead + fresh-TTL-expired → stale cache with notice, status-read
+  failure, snapshot-read failure with a working scraper, forced refresh
+  semantics, and the exact 19:57 UTC sequence). Docs: DEPLOY.md incident
+  note with the write-budget math and owner recommendations.
+
+### Added
+- **LiveRateLine (converter homepage)**: the selected pair's mid-market
+  rate is always visible between the currency row and the CTA — previously
+  it only existed inside the result popup, so "what's the dollar?" needed
+  an amount + a tap. Pure local math over the already-booted snapshot
+  (swap/currency changes re-render instantly, zero network): rate +
+  inverse display (legacy precision rules — Toman integers, 4 decimals,
+  8 for sub-1), `SourceBadge` (TGJU/Frankfurter), relative freshness
+  («Updated 2 minutes ago» / «به‌روزرسانی ۲ دقیقه پیش»), ▲/▼ delta vs
+  the previous recorded generation (`RateDeltaChip`), a 40-point
+  `Sparkline` from the same rate-history the ResultPopup micro-trend uses
+  (LTR axis in fa — documented analytical-axis decision), and a copy
+  button producing a localized share line
+  (`1 Euro = 295,260 Iranian Toman · Currena — currena.ir` /
+  «۱ دلار آمریکا = ۲۳۰٬۵۰۰ تومان ایرانی · کورنا — currena.ir») with a
+  2-second "Copied!" acknowledgment (clipboard failures no-op, same
+  pattern as the Insights share pill). Honest states: hidden for
+  same-currency pairs, pairs unresolvable from the pair's snapshot (the
+  conversion itself would fail identically), no snapshot yet, and while a
+  custom rate overrides the market; a confirmed-stale snapshot tints the
+  line warning-amber with a ⚠ freshness line instead of hiding it. Pure
+  helpers (`liveRateView`, `sparklineWindow`, `rateDecimals`,
+  `rateShareText`) unit-tested in `lib/live-rate.test.ts` (+14 web tests).
+- **Popular pairs (first-run)**: until the first conversion exists the
+  pair-chips section shows five TGJU open-market suggestions (USD/EUR/
+  GBP/AED/TRY → IRR) instead of nothing — first-time visitors see what
+  the app is for; after the first conversion their own recents take over
+  (existing behavior). Same chip DNA, 🔥 label («جفت‌ارزهای پرطرفدار»).
+
+### Changed
+- **Print polish (converter)**: the rate line PRINTS (it is the headline
+  number on paper — verified in the PDF text layer); the interactive
+  chrome around it (pair chips, quick tools grid, copy button) gains
+  `.no-print`. Reduced-motion discipline: the quick-amount and pair-chip
+  hover lifts are now `motion-safe:`-prefixed.
+- **Entry budget bumped 289 → 293 kB raw** (scripts/check-bundle-budget.mjs,
+  gz unchanged at 88): the LiveRateLine + popular pairs grow the entry
+  288.80/86.98 → 292.57/87.88 — raw +3.77 kB but gzip-NEUTRAL (under the
+  88 kB gz budget), i.e. users download ~zero extra bytes. The money page
+  answering "what's the dollar?" without a conversion is the
+  highest-value entry growth since launch. Insights chunk untouched
+  (128.41/37.79 vs 132/39 budget).
+
 ## [2026-10-08] — I10 personal & portable wave: watchlist pins, .ics export, reading progress, relative freshness
 
 Third round of the day, autonomously scoped after a clean QA sweep (production
