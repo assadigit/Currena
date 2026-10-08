@@ -13,6 +13,9 @@ Status: **planning complete, no code written.** Everything here was prepared on 
 | `03-data-sources.md` | Every data source: endpoint, series, access, cadence, licence status, fallback |
 | `04-roadmap.md` | Architecture, phases with approval gates, risks, definition of done |
 | `05-agent-kickoff-prompt.md` | The prompt to paste into the agentic coding session |
+| `06-ux-round-2-spec.md` | **Round 2 work order** (2026-10-08): signal-first density pass, owner decisions D1 to D9, blocks R1 to R23, acceptance list |
+| `07-agent-loop-prompt.md` | The self-looping agent prompt for round 2 (implement, test, verify, ship; no questions) |
+| `mentor-specs/` | Round-1 UI/UX instructions, the new-indicator data spec, and a dollar-basket reference script, kept with provenance banners; file 06 wins on conflicts |
 
 ## Rules that always apply
 
@@ -39,3 +42,7 @@ Status after Phase I0 (2026-10-06):
 2. **Substitutes for blocked indicators — DECIDED (D2):** credit/financial stress → `stress-stlfsi` (STLFSI4); VIX → link-out only; S&P 500 / breadth → out of v1 (P3); Shiller CAPE also deferred to P3 (no current licensed source).
 3. **Silver and Bitcoin sources — DECIDED (D3):** gold-api.com primary for both spots (terms permit commercial display); Bitstamp public OHLC for Bitcoin history; World Bank Pink Sheet for silver monthly history.
 4. **Disclaimer review — ANSWERED (2026-10-06): not needed for v1.** Owner: "I dont need disclaimer for now." No reviewed disclaimer in v1; the no-buy/sell/no-advice wording rule remains in force regardless.
+
+## Round 2 (2026-10-08): owner decisions
+
+A UX roast and a design review of the built page led to a second round. Decisions, all final: attention order is verdict, named alerts with numbers, prices, what it means for my money, calendar; default view is signals first with normal items collapsed; two tiers ("Needs attention", "Unusual"); hero shows gauges with a one-line reason; search, keyboard hints, filter, calendar download and CSV move behind a Tools menu; the "what it means for my money" panel ships slim (max 4 lines); Global first, Australia second; the proposed alert thresholds for the new indicators and the Persian wording are approved. Details and acceptance tests: `06-ux-round-2-spec.md`.
