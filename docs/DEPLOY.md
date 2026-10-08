@@ -535,4 +535,43 @@ above-100,000 alert CREATED ON PRODUCTION fired instantly («فعال شد در
 ۲۶۳٬۲۰۰ · همین حالا» + toast «🔔 نرخ دلار آمریکا → تومان ایرانی به
 ۱۰۰٬۰۰۰ رسید»), the test alert deleted (empty state verified), 375px
 overflow 0, zero console errors. Budget: held WITHOUT a bump — entry
-290.12/87.00 vs gates 296/89.5.
+290.12/87.00 vs gates 296/89.5.## Session record — 2026-10-08 I15 (the owner-spec wave)
+
+**Deploy order mattered this round:** the indicator-set change (41 ids,
+`dollar-broad` retired) makes the NEW Worker's zod read-side validation
+reject the OLD KV snapshot — and vice versa. So the sequence was:
+1. Push `0fca0e2..5f15b7b` (I15).
+2. **Dispatch the ingest FIRST** (run 37727566021, green, "P1 COMPLETE") —
+   it read the old snapshot (validation-failed as a stored value, ignored),
+   fetched F6 FLRHOOTA successfully from the venue (the Series-ID parser's
+   first real-file pass: 6.2% @ 2026-08-31), and wrote the NEW-format
+   snapshot + the new histories into KV. During the gap, `/api/insights`
+   correctly answered `insights_not_ready` (the old Worker refusing the
+   new format — the honest degraded state, not garbage).
+3. `pnpm --filter @currena/web build && CLOUDFLARE_API_TOKEN=…
+   CLOUDFLARE_ACCOUNT_ID=… pnpm --filter @currena/api exec wrangler deploy`.
+
+**Worker version of record: `3e03c039-5849-4771-80c5-4e374c26df10`** from
+HEAD `5f15b7b`. Entry `index-RBMy43ic.js` 290.12/87.76; Insights
+`Insights-m_YS4gpt.js` 235.80/61.92 (budget 240/64, bumped with
+justification in CHANGELOG §I15 Budget).
+
+**Post-deploy production smoke (2026-10-08 04:30–04:40 UTC):**
+- `/api/health` ok; `/api/insights` **41 readings**, all 12 new ids, **zero
+  stale / zero unavailable**; gauge summary Global *stressed* 4/16 ·
+  Australia *cautious* 5/13; 14 calendar events; big movers present
+  (real-yield z=9.8, us10y 9.1, ecb-dfr 8.7 — the rate-cut regime is the
+  decade's unusual move, per the spec formula).
+- New history endpoints live: `dollar-basket/history` 200 (458 pts),
+  `au-wage-growth/history` 200 (below-aux fires live: 3.2% wages < 3.35%
+  CPI → alert).
+- Page QA (agent-browser): en/fa × desktop/375px — hero meters with the
+  Australia-first swap, 6 price rows (gold USD+A$ line, BTC context
+  ratios), lane switch remembered, panels, sticky nav, FRED notice, no
+  buy/sell wording, `scrollW=clientW`, zero console errors. The converter
+  (money page) verified intact.
+- Honest first-run notes: btc/copper daily-history accumulation started
+  with this run (7/30-day changes appear from tomorrow's snapshot);
+  gold/silver seeded 120 accumulated points from the previous KV history.
+
+
