@@ -612,3 +612,44 @@ and the route/UI treat it as the honest "no chart yet" state).
   crosses 1,000/day around 18:30–19:00 UTC), so the schedule stays
   as-is; documented here so a future "why did the run fire at 11?"
   question has its answer.
+
+## Session record — 2026-10-08 I17 (the v2 wave: Together + signals)
+
+**Worker deployed: `54998eb8-f149-4e0c-bf35-542e0d5dc869`** from HEAD
+`12d76b2` (I17). The change set is web-side only (the two new sections +
+the Together nav pill + the bilingual corpus) plus pure logic in
+`packages/insights` (connections.ts, signals.ts) that the SPA imports
+lazily — **no ingest change, no snapshot-format change**, so the
+ingest-then-deploy ORDER rule did not bind this round (the read-side
+zod contract is untouched; a plain Worker deploy suffices). The ingest
+workflow was still dispatched after the push as a smoke: run
+`37775748411` @ `12d76b2` — **green** ("P1 COMPLETE", 7 writes, snapshot
+`2026-10-08T12:17:12Z`).
+
+**Deploy sequence (web-change-only):**
+1. `pnpm --filter @currena/web build` — Insights chunk 270.01 kB /
+   69.50 kB gz (budget bumped 240/64 → 280/72 with the itemised
+   justification in `scripts/check-bundle-budget.mjs`; entry untouched
+   at 290.12/87.76 vs 296/89.5).
+2. `CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=…
+   pnpm --filter @currena/api exec wrangler deploy` → version
+   `54998eb8-f149-4e0c-bf35-542e0d5dc869`, 13 of 13 assets uploaded.
+3. Dispatch the ingest (smoke) + production browser QA.
+
+**Post-deploy production state (verified this session):**
+- `/api/health` ok; `/api/insights` 41 readings, zero stale/unavailable,
+  generated 12:17 UTC.
+- `https://currena.ir/#/insights`: 6 connection cards (states
+  disagree · disagree · active · active · partly · disagree — the
+  pinned 2026-10-08 live reading), 2 signals cards (gold "2 of 5
+  conditions met" mixed · silver "3 of 6" mixed), 5 nav pills
+  (Status · Prices · Together · Indicators · About), both
+  before-you-act boxes visible.
+- en + fa (RTL) × 1280/375: zero console/page errors, no bare
+  buy/sell wording (EN word-boundary regex + the fa
+  خرید/فروش pattern), no horizontal overflow.
+- The converter (money page) intact — boots, input present, zero
+  errors.
+- `SIGNALS_ENABLED = true` (apps/web/src/components/insights/config.ts)
+  — the spec's flag, enabled with the owner's full approval this round;
+  one flip to false hides the signals section.
