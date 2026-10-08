@@ -5,6 +5,19 @@ Priority: **Must** (data loss, security, correctness) · **Should** (robustness,
 
 Status legend: ☐ todo · 🔄 in progress · ✅ done (this session) · ⏸ escalated/deferred (see notes)
 
+## Wave 10 — I17 the v2 wave (2026-10-08, fourth round)
+
+The owner granted full approval ("nothing from spec must remain, finish all
+tasks"), lifting the v2/v2-gated deferral. Tests 711 → 747 green; Insights
+chunk 270.01/69.50 vs the justified 280/72 budget (entry untouched).
+
+| # | Status | Tag | Item | Origin |
+|---|--------|-----|------|--------|
+| 59 | ✅ | UI-TRUST | T1 "Together" connection cards — six relationships (see-saw, dollar/commodities, the oil chain, the growth mix, the export chain, the household rate chain) with leg leans (per-leg change30d thresholds + F3 level bands), a polarity-aware uniform state rule (active/partly/inactive/disagree/unknown), live-value leg chips that open the details panel, RTL-mirroring relation arrows, the computed right-now line, and "evidence: to verify" tags per the spec note | 2026-10-08 UI spec Part 6 (T1) |
+| 60 | ✅ | COMPLIANCE | S1–S3 "What the signals say" cards — five gold conditions + silver's industrial sixth (tagged mixed), lean + "n of m conditions met", the three plain checks, the two-sides checklist, and the always-visible "before you act" box; `SIGNALS_ENABLED` flag shipped true (the wording-review gate satisfied by the owner's full approval; one flip from off); no green/red for supportive/against (icons + words); no bare buy/sell wording in EN or FA | 2026-10-08 UI spec Part 6 (S1–S3) |
+| 61 | ✅ | UI-A11Y | The Together pill joins the sticky section nav (P1's v2 five-pill list completed); scroll-spy keeps it active through the signals block | 2026-10-08 UI spec P1 |
+| 62 | ✅ | BEST-PRACTICES | Bilingual copy corpus for both sections (en + native fa, compile-checked parity + token-set/wording tests); telegraphic leg phrases so no verb agreement breaks across languages | 2026-10-08 UI spec T1/S1 + house i18n rules |
+
 ## Wave 9 — I16 the daily-accumulation fix (2026-10-08, third round)
 
 Found by the post-I15 production verification pass (NEXT_SESSION_PROMPT
@@ -46,7 +59,7 @@ blocks, stale cron going unnoticed (now visible on /admin; push notification sti
 | 53 | ✅ | BEST-PRACTICES | Currena dollar basket — dollar_basket.py's recipe ported to TS (weights/scaling/selftest), computed at ingest from the Frankfurter fetch; dollar-broad retired | 2026-10-08 data spec §3 |
 | 54 | ✅ | UI-A11Y | The I15 v1 UI blocks: hero verdict meters (LED retired), alert chips by name, big-mover callout, next-up strip, prices board, lane switch, alert cards + compact rows, details side-panel/bottom sheet with focus discipline, sticky scroll-spy nav, SVG status icons, position-word bars, design tokens + type roles + 7:1 secondary ink, FRED notice + attributions, one disclaimer | 2026-10-08 UI spec Parts 0–7 (v1) |
 | 55 | ✅ | BEST-PRACTICES | Question gauges + 11 new indicators (fed-target, ecb-dfr, us-cpi-yoy, nfci, dollar-basket, eur-usd, au-home-loan, au-wage-growth, au-rent-yoy, au-petrol-yoy, btc-usd, copper-usd) + below-aux rule + moveScore + bilingual consequence-line corpus | 2026-10-08 data spec §3/§4/§6 |
-| 56 | ⏸ | COMPLIANCE | v2/v2-gated blocks NOT built: T1 connection cards, S1–S3 signals cards (need the owner's wording review + a legal reading of the FRED "professional services" clause before any signals section) | 2026-10-08 UI spec Part 6 (explicitly "wait") |
+| 56 | ✅ | COMPLIANCE | v2/v2-gated blocks BUILT AND SHIPPED as I17 (Wave 10: #59–#62) with the owner's full approval — the wording-review gate satisfied in chat ("you have full approval… nothing from spec must remain"); the S3-note legal read (a qualified Australian financial-services review) stays a standing owner-side reminder, and `SIGNALS_ENABLED` is the one-flip off-switch | 2026-10-08 UI spec Part 6 |
 
 ## Wave 7 — I14 rate-alerts (2026-10-08, post-sandbox-reset round)
 

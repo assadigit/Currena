@@ -1,0 +1,141 @@
+/**
+ * together-signals.test.ts — the I17 web-side pure helpers + copy parity
+ * for the "Together" (T1) and "What the signals say" (S1–S3) sections.
+ *
+ * The fa copy module satisfies InsightsCopy at compile time (the type IS
+ * the EN module's shape) — these tests guard the runtime parity the
+ * compiler cannot: matching token sets on every interpolated string,
+ * the same connection/condition key coverage, and the buy/sell-wording
+ * discipline on the new corpus (acceptance test 6 — inflected forms like
+ * "buying"/"buyers" pass by design; the S3 wording mandate is honoured
+ * without ever rendering a bare "buy"/"sell").
+ */
+
+import { describe, expect, it } from 'vitest';
+import type { IndicatorId, IndicatorReading } from '@currena/core';
+import type { LegEval } from '@currena/insights';
+import { legPhrase, SIGNALS_ENABLED } from './config';
+import { insightsCopyEn } from '../../i18n/insights-copy-en';
+import { insightsCopyFa } from '../../i18n/insights-copy-fa';
+import { CONNECTIONS, evaluateConnections } from '@currena/insights';
+
+const leg = (fields: Partial<LegEval>): LegEval => ({
+  id: 'gold-usd',
+  direction: null,
+  level: null,
+  lean: 0,
+  ...fields,
+});
+
+describe('legPhrase (T1 right-now line assembly)', () => {
+  const copy = insightsCopyEn;
+
+  it('level + direction → "gold: high and rising"', () => {
+    expect(legPhrase(leg({ level: 'high', direction: 'rising', lean: 1 }), 'gold', copy)).toBe(
+      'gold: high and rising',
+    );
+  });
+
+  it('level only / direction only / neither', () => {
+    expect(legPhrase(leg({ level: 'typical' }), 'real yields', copy)).toBe('real yields: mid-range');
+    expect(legPhrase(leg({ direction: 'falling' }), 'the dollar', copy)).toBe('the dollar: falling');
+    expect(legPhrase(leg({}), 'gold', copy)).toBe('gold: no fresh reading');
+  });
+
+  it('fa phrases render the Persian template with the same inputs', () => {
+    const fa = insightsCopyFa;
+    expect(legPhrase(leg({ level: 'high', direction: 'steady' }), 'طلا', fa)).toBe('طلا: بالا و ثابت');
+    expect(legPhrase(leg({}), 'طلا', fa)).toBe('طلا: دادهٔ تازه‌ای نیست');
+  });
+});
+
+describe('I17 copy parity (en ↔ fa)', () => {
+  const tokens = (s: string): string[] => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]!);
+  const sorted = (xs: readonly string[]): string[] => [...xs].sort();
+
+  it('covers the same connection ids, legs and state keys', () => {
+    const en = insightsCopyEn.together.connections;
+    const fa = insightsCopyFa.together.connections;
+    expect(sorted(Object.keys(fa))).toEqual(sorted(Object.keys(en)));
+    for (const id of Object.keys(en) as (keyof typeof en)[]) {
+      expect(sorted(Object.keys(fa[id]!.legs))).toEqual(sorted(Object.keys(en[id]!.legs)));
+      expect(sorted(Object.keys(fa[id]!.rightNow))).toEqual(
+        sorted(Object.keys(en[id]!.rightNow) as (keyof typeof fa[typeof id]['rightNow'])[]),
+      );
+    }
+  });
+
+  it('every right-now line carries the same interpolation tokens', () => {
+    const en = insightsCopyEn.together.connections;
+    const fa = insightsCopyFa.together.connections;
+    for (const id of Object.keys(en) as (keyof typeof en)[]) {
+      for (const state of ['active', 'partly', 'inactive', 'disagree', 'unknown'] as const) {
+        expect(sorted(tokens(fa[id]!.rightNow[state]))).toEqual(sorted(tokens(en[id]!.rightNow[state])));
+      }
+    }
+  });
+
+  it('covers the same signals condition keys with the same token sets', () => {
+    const en = insightsCopyEn.signals;
+    const fa = insightsCopyFa.signals;
+    expect(sorted(Object.keys(fa.conditions))).toEqual(sorted(Object.keys(en.conditions)));
+    expect(fa.conditions.industrial!.tag).toBeTypeOf('string');
+    expect(sorted(tokens(fa.conditionsMet))).toEqual(sorted(tokens(en.conditionsMet)));
+    expect(sorted(tokens(fa.sideSupportive))).toEqual(sorted(tokens(en.sideSupportive)));
+    expect(sorted(tokens(fa.sideAgainst))).toEqual(sorted(tokens(en.sideAgainst)));
+  });
+
+  it('the before-you-act box has the same four points in both languages', () => {
+    expect(insightsCopyFa.signals.beforeYouAct).toHaveLength(
+      insightsCopyEn.signals.beforeYouAct.length,
+    );
+  });
+});
+
+describe('I17 wording discipline (acceptance test 6)', () => {
+  const NO_BARE = /\b(buy|sell)\b/i;
+  const corpus = (obj: unknown): string[] => {
+    if (typeof obj === 'string') return [obj];
+    if (Array.isArray(obj)) return obj.flatMap(corpus);
+    if (obj !== null && typeof obj === 'object') {
+      return Object.values(obj as Record<string, unknown>).flatMap(corpus);
+    }
+    return [];
+  };
+
+  it('no bare "buy"/"sell" word in the new EN + FA sections (inflected forms pass by design)', () => {
+    for (const text of corpus(insightsCopyEn.together)) expect(NO_BARE.test(text)).toBe(false);
+    for (const text of corpus(insightsCopyEn.signals)) expect(NO_BARE.test(text)).toBe(false);
+    for (const text of corpus(insightsCopyFa.together)) expect(NO_BARE.test(text)).toBe(false);
+    for (const text of corpus(insightsCopyFa.signals)) expect(NO_BARE.test(text)).toBe(false);
+  });
+
+  it('no bare Persian خرید/فروش as a standalone word in the new sections', () => {
+    const bare = /(?:^|[\s\u200c«»()\[\]:;،؛])\s*(خرید|فروش)\s*(?=$|[\s\u200c«»()\[\]:;،؛.])/;
+    for (const text of corpus(insightsCopyFa.together)) expect(bare.test(text)).toBe(false);
+    for (const text of corpus(insightsCopyFa.signals)) expect(bare.test(text)).toBe(false);
+  });
+});
+
+describe('the I17 wiring', () => {
+  it('SIGNALS_ENABLED ships true (I17 owner approval; one-flip off-switch)', () => {
+    expect(SIGNALS_ENABLED).toBe(true);
+  });
+
+  it('every connection renders against a minimal live-like snapshot (smoke through the pure layer)', () => {
+    const reading = (id: IndicatorId, fields: Partial<IndicatorReading> = {}): IndicatorReading =>
+      ({ id, value: 1, asOf: '2026-10-07', status: 'normal', sourceName: 't', updatedAt: '2026-10-08T00:00:00Z', ...fields }) as IndicatorReading;
+    const readings = CONNECTIONS.flatMap((c) =>
+      c.legs.map((id) =>
+        reading(id, { percentile10y: 0.5, change30d: id === 'terms-of-trade' ? undefined : 0.01 }),
+      ),
+    );
+    const evaluated = evaluateConnections(readings);
+    expect(evaluated).toHaveLength(6);
+    // every leg present, every state a valid vocabulary word
+    for (const c of evaluated) {
+      expect(['active', 'partly', 'inactive', 'disagree', 'unknown']).toContain(c.state);
+      expect(c.legs).toHaveLength(CONNECTIONS.find((d) => d.id === c.connection)!.legs.length);
+    }
+  });
+});

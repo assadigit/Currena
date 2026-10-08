@@ -1274,6 +1274,22 @@ html[dir='rtl'] .insights-panel {
   border-block-end: 0;
 }
 
+/* Together connection cards (T1, I17): the relation arrow between leg
+ * chips points along the reading flow — in fa the flow mirrors, so the
+ * glyph mirrors with it (G1: logical direction, physical flip in one rule,
+ * never one-at-a-time). */
+.connection-arrow {
+  display: inline-block;
+}
+[dir='rtl'] .connection-arrow {
+  transform: scaleX(-1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .connection-arrow {
+    transition: none;
+  }
+}
+
 /* Focus outlines (G6): every interactive control keeps a visible ring. */
 .insights-focusable:focus-visible {
   outline: 2px solid var(--color-accent-brand);

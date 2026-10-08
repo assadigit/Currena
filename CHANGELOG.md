@@ -5,6 +5,106 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-08] — I17 the v2 wave: "Together" connection cards + "What the signals say"
+
+Tenth round — the owner granted full approval ("nothing from spec must
+remain"), so the two deliberately-deferred spec surfaces ship now: **T1**
+(the "Together" connection cards, UI spec Part 6 v2) and **S1–S3** (the
+"What the signals say" cards, v2-gated — the wording-review gate is
+satisfied by the owner's approval; the `SIGNALS_ENABLED` flag the spec
+mandates exists in `config.ts` and ships **true**, one flip from off).
+
+Everything computes from the snapshot the page already holds — no ingest
+change, no snapshot-format change, so the Worker read-side contract and the
+ingest-then-deploy order rule are untouched (a plain Worker deploy
+suffices; a dispatch still ran as smoke).
+
+### Added
+
+- **`packages/insights/src/connections.ts`** — the six T1 connections in
+  spec order (real-yields/gold see-saw, dollar/gold/oil, oil → expectations
+  → 10y costs, copper-gold/China-PMI/M2, iron-ore/terms-of-trade/AUD,
+  RBA-rate/home-loan/household-debt). Each leg gets a direction (per-leg
+  change30d thresholds in the definition's own units) + a level (the F3
+  position bands), and a uniform state rule over polarity-adjusted leans:
+  `active` (every leg in the relation's configuration) · `partly` (some
+  lean, none oppose) · `inactive` (too quiet) · `disagree` (leans point
+  both ways — the live see-saw: real yields 99.8th pct AND gold 92.5th pct)
+  · `unknown` (a stale/absent leg — the ST2 honesty discipline). Inverse
+  connections carry a `polarity: 'inverse'` marker (the first leg vs the
+  rest) so the see-saw reading is correct in both directions.
+- **`packages/insights/src/signals.ts`** — the S1/S2 card logic: five gold
+  conditions (real yields, 5y5y expectations, stress STLFSI+NFCI, the
+  dollar basket, the metal's own footing: position + 30-day speed with the
+  honest position fallback while the daily history accrues), silver's sixth
+  industrial-demand condition (China PMI + copper-to-gold, always tagged
+  "mixed"), the lean (`≥4 supportive → mostly supportive`, `≥4 against →
+  mostly unsupportive`, else `mixed` — the count line reads "n of m
+  conditions met"), and the three plain checks. Live at ship time: gold
+  2/5 mixed, silver 3/6 mixed.
+- **Web: `Together` + `ConnectionCard`** — the section below the prices
+  board: state chip (SVG icon + word, neutral inks — pattern presence is
+  information, never advice), leg chips with live values that open the
+  details panel (44px targets, focus discipline inherited), relation
+  arrows that mirror in RTL (one CSS flip rule), the plain relation
+  sentence, the computed right-now line, and the spec-mandated "evidence:
+  to verify" tag on every card (the owner confirms evidence per card —
+  none confirmed yet, so no card claims reliable/mixed/weak).
+- **Web: `Signals` + SignalsCard (S1–S3)** — the "What the signals say"
+  section below Together (scroll region under the Together pill): lean
+  chip + count line, the three plain checks (10-year position, usual
+  drivers, 30-day speed with the honest "Measuring" line), the checklist
+  grouped into the two sides ("Usually supports {metal}" / "Usually works
+  against {metal}" / a muted neutral tail), and the fixed **before you
+  act** box (S3) always visible, never behind a click. No green for
+  supportive, no red for unsupportive — icons + words, per the S1 note.
+  The S3 dealing-costs point uses inflected forms ("buying", "selling",
+  "buyers") so the acceptance-test regex `\b(buy|sell)\b` still passes
+  while keeping the spec's mandated meaning; the Persian copy avoids bare
+  «خرید/فروش» the same way.
+- **Copy: bilingual corpus for both sections** — six connections × (name +
+  relation + 5 state lines + leg labels) and both signals cards (6
+  conditions + the before-you-act box + the checks) in EN + native FA
+  (nav pill «ارتباط‌ها»; telegraphic leg phrases — `{name}: {level} and
+  {direction}` — so no verb agreement can break across languages).
+- **`SIGNALS_ENABLED`** in `config.ts` — the spec's feature flag, shipped
+  `true` with the I17 approval note; `false` hides the whole section.
+
+### Changed
+
+- The sticky section nav (P1) gains the **Together** pill — five sections
+  now (Status · Prices · Together · Indicators · About), the spec's v2
+  list completed.
+- Insights lazy-chunk budget 240/64 → **280/72 kB** (measured 270.01/69.50):
+  the v2 corpus + components + the connections/signals logic joining the
+  lazy route. Entry chunk untouched (290.12/87.76 vs 296/89.5). The bump
+  is itemised in `scripts/check-bundle-budget.mjs`.
+
+### Verified
+
+- Gates: typecheck 5/5 · tests **747/747** (core 183 · scraper 67 ·
+  insights 193 = 168+25 · api 119 · web 185 = 174+11) · budgets held.
+- The shipped live states are pinned in tests (the 2026-10-08 snapshot:
+  disagree/disagree/active/active/partly/disagree; gold 2/5 mixed, silver
+  3/6 mixed).
+- Browser QA (agent-browser + VLM, en/fa × 1280/375): both sections render,
+  leg chips open the details panel with focus trapped, Escape closes, the
+  Together pill scrolls, arrows mirror in RTL, zero console/page errors,
+  no buy/sell wording (EN regex + FA pattern), no horizontal overflow.
+- Production: Worker deployed from the I17 HEAD, dispatch smoke green,
+  `/api/insights` unchanged (41 readings), the two new sections verified
+  on https://currena.ir (see docs/DEPLOY.md §I17).
+
+### Compliance notes for the owner (standing)
+
+- The signals cards describe conditions and leave every decision to the
+  reader; the before-you-act box is fixed copy per the spec. The S3 note's
+  "qualified Australian financial-services review before launch" remains a
+  standing owner-side item — the wording shipped is the spec's own.
+- Evidence tags stay "to verify" until the owner confirms each
+  connection's evidence (spec T1 note) — no tag claims reliability today.
+- Reminder: rotate the GitHub + Cloudflare tokens that transited chat.
+
 ## [2026-10-08] — I16 the daily-accumulation fix: same-day live refresh + the btc bootstrap
 
 Ninth round — a post-I15 production verification pass (the NEXT_SESSION_PROMPT

@@ -23,8 +23,9 @@ import type {
   WarningRuleAtom,
 } from '@currena/core';
 import { DEFINITIONS, GAUGES } from '@currena/insights';
+import type { LegEval } from '@currena/insights';
 import { interpolate } from '../../i18n';
-import type { IndicatorCopyEntry, ConsequenceLines } from '../../i18n/insights-copy-en';
+import type { IndicatorCopyEntry, ConsequenceLines, InsightsCopy } from '../../i18n/insights-copy-en';
 
 /* ------------------------------------------------------------------ *
  * Section / group layout (the I15 question-group restructure)
@@ -654,7 +655,35 @@ export function sampleHistoryRows(
     .map((i) => at(i));
 }
 
-export type { IndicatorReading } from '@currena/core';
+/* ------------------------------------------------------------------ *
+ * I17 (v2): the "Together" connection cards + the signals cards
+ * ------------------------------------------------------------------ */
+
+/**
+ * The SIGNALS_ENABLED feature flag (UI spec Block S1 note). The signals
+ * cards are fully built; the flag is the one-flip off-switch for the whole
+ * section. Set true at I17 with the owner's full approval of the wording
+ * review gate — flip to false to hide the section instantly.
+ */
+export const SIGNALS_ENABLED = true;
+
+/** One leg's phrase for a connection's right-now line (telegraphic,
+ * bilingual-safe): "real yields: high and rising" / «طلا: بالا و ثابت». */
+export function legPhrase(
+  leg: LegEval,
+  shortName: string,
+  copy: Pick<InsightsCopy, 'together'>,
+): string {
+  const t = copy.together;
+  const level = leg.level !== null ? t.level[leg.level] : null;
+  const direction = leg.direction !== null ? t.direction[leg.direction] : null;
+  if (level !== null && direction !== null) {
+    return interpolate(t.phrases.levelDir, { name: shortName, level, direction });
+  }
+  if (level !== null) return interpolate(t.phrases.levelOnly, { name: shortName, level });
+  if (direction !== null) return interpolate(t.phrases.dirOnly, { name: shortName, direction });
+  return interpolate(t.phrases.none, { name: shortName });
+}
 
 /* ------------------------------------------------------------------ *
  * Status metadata — tone (icons live in StatusChip; never colour alone)

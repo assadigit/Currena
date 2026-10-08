@@ -1092,6 +1092,8 @@ export const insightsCopyEn = {
     // P1: the sticky section nav.
     navStatus: 'Status',
     navPrices: 'Prices',
+    // I17 (v2): the Together pill joins the row with the connection cards.
+    navTogether: 'Together',
     navIndicators: 'Indicators',
     navAbout: 'About',
     navLabel: 'Sections',
@@ -1218,6 +1220,199 @@ export const insightsCopyEn = {
     aboveLow: 'up {rise} from its 12-month low',
     belowAux: 'below its paired comparison (wage growth below inflation)',
     or: 'or',
+  },
+
+  /* ---------------------------------------------------------------- *
+   * I17 (v2, Block T1) — the "Together" connection cards.
+   * Copy rules: hedged ("usually", "tends to"), never advice, no
+   * buy/sell wording. Every evidence tag stays "to verify" until the
+   * owner confirms the evidence (spec note) — one string, one place.
+   * ---------------------------------------------------------------- */
+  together: {
+    title: 'Together',
+    subtitle:
+      'How the indicators usually relate. Each card checks whether the usual pattern is showing today.',
+    state: {
+      active: 'Active',
+      partly: 'Partly active',
+      inactive: 'Not active',
+      disagree: 'Signals disagree',
+      unknown: 'Not enough fresh data',
+    },
+    evidenceToVerify: 'Evidence: to verify',
+    viewLegCard: 'View this indicator',
+    // Leg phrase assembly (telegraphic — bilingual-safe, no verb agreement).
+    phrases: {
+      levelDir: '{name}: {level} and {direction}',
+      levelOnly: '{name}: {level}',
+      dirOnly: '{name}: {direction}',
+      none: '{name}: no fresh reading',
+    },
+    level: { high: 'high', typical: 'mid-range', low: 'low' },
+    direction: { rising: 'rising', falling: 'falling', steady: 'steady' },
+    connections: {
+      'real-yields-gold': {
+        name: 'Real yields and gold',
+        legs: { 'real-yield-10y': 'real yields', 'gold-usd': 'gold' },
+        relation:
+          'Real yields and gold usually move in opposite directions — when “safe” money pays more after inflation, gold tends to lose shine, and the other way round.',
+        rightNow: {
+          active: 'Right now {a} while {b} — the usual see-saw is working.',
+          partly: 'Right now {a}; {b} — only part of the see-saw is showing.',
+          inactive: 'Right now {a} and {b} — both too quiet to read.',
+          disagree: 'Right now {a} and {b} — both stretched the same way, so the usual see-saw is not in place.',
+          unknown: 'One side of this connection has no fresh data right now.',
+        },
+      },
+      'dollar-gold-oil': {
+        name: 'The dollar, gold and oil',
+        legs: { 'dollar-basket': 'the dollar', 'gold-usd': 'gold', brent: 'oil' },
+        relation:
+          'Gold and oil are priced in US dollars, so a strong dollar tends to weigh on them, and a weak one tends to lift them.',
+        rightNow: {
+          active: 'Right now {a}, with {b} and {c} — the usual dollar pressure is showing.',
+          partly: 'Right now {a}; {b}, {c} — only part of the pattern is showing.',
+          inactive: 'Right now {a}, {b}, {c} — all too quiet to read.',
+          disagree: 'Right now {a}, yet {b} and {c} — the usual dollar pressure is not showing.',
+          unknown: 'One side of this connection has no fresh data right now.',
+        },
+      },
+      'oil-expectations-costs': {
+        name: 'Oil, inflation expectations and borrowing costs',
+        legs: { brent: 'oil', 'breakeven-5y5y': 'inflation expectations', us10y: '10-year borrowing costs' },
+        relation:
+          'When oil jumps, markets tend to expect more inflation, and long-term borrowing costs tend to rise with it.',
+        rightNow: {
+          active: 'Right now {a}, {b}, {c} — the chain is in place.',
+          partly: 'Right now {a}, {b}, {c} — the chain is only partly engaged.',
+          inactive: 'Right now {a}, {b}, {c} — the chain is quiet.',
+          disagree: 'Right now {a}, {b}, {c} — the links point against each other.',
+          unknown: 'One link in this chain has no fresh data right now.',
+        },
+      },
+      'copper-china-growth': {
+        name: 'Copper demand, Chinese factories and money',
+        legs: {
+          'copper-gold': 'the copper-to-gold ratio',
+          'china-pmi': 'Chinese factory activity',
+          'm2-us': 'US money supply',
+        },
+        relation:
+          'Copper is wired into industry, so a firm copper-to-gold ratio tends to come with busy factories and growing money — and the mix tends to soften together too.',
+        rightNow: {
+          active: 'Right now {a}, {b}, {c} — the growth mix is in place.',
+          partly: 'Right now {a}, {b}, {c} — the growth mix is only partly showing.',
+          inactive: 'Right now {a}, {b}, {c} — the growth mix is quiet.',
+          disagree: 'Right now {a}, {b}, {c} — the pieces point against each other.',
+          unknown: 'One piece of this mix has no fresh data right now.',
+        },
+      },
+      'iron-terms-aud': {
+        name: 'Iron ore, the terms of trade and the Australian dollar',
+        legs: {
+          'iron-ore': 'iron ore',
+          'terms-of-trade': 'the terms of trade',
+          audusd: 'the Australian dollar',
+        },
+        relation:
+          'Iron ore is one of Australia’s biggest exports, so firm export prices tend to lift the terms of trade and, over time, the Australian dollar.',
+        rightNow: {
+          active: 'Right now {a}, {b}, {c} — the export chain is in place.',
+          partly: 'Right now {a}, {b}, {c} — only part of the export chain is showing.',
+          inactive: 'Right now {a}, {b}, {c} — the export chain is quiet.',
+          disagree: 'Right now {a}, {b}, {c} — the links point against each other.',
+          unknown: 'One link in this chain has no fresh data right now.',
+        },
+      },
+      'rba-loan-debt': {
+        name: 'The RBA rate, home loans and household debt',
+        legs: {
+          'rba-cash-rate': 'the RBA cash rate',
+          'au-home-loan': 'the home-loan rate people pay',
+          'au-household-debt-arrears': 'household debt ratios',
+        },
+        relation:
+          'When the RBA lifts the cash rate, the home-loan rates people actually pay tend to follow, and debt servicing tends to get heavier.',
+        rightNow: {
+          active: 'Right now {a}, {b}, {c} — the household rate chain is engaged.',
+          partly: 'Right now {a}, {b}, {c} — the household rate chain is partly engaged.',
+          inactive: 'Right now {a}, {b}, {c} — the household rate chain is quiet.',
+          disagree: 'Right now {a}, {b}, {c} — the links point against each other.',
+          unknown: 'One link in this chain has no fresh data right now.',
+        },
+      },
+    },
+  },
+
+  /* ---------------------------------------------------------------- *
+   * I17 (v2-gated, Blocks S1–S3) — "What the signals say".
+   * Conditions, never advice: no green/red for supportive/against,
+   * icons + words only; the "before you act" box is always visible.
+   * The lean words describe conditions — they never recommend action.
+   * ---------------------------------------------------------------- */
+  signals: {
+    title: 'What the signals say',
+    subtitle:
+      'The conditions that usually surround each metal, in plain words — conditions, not forecasts, and not advice.',
+    conditionsMet: '{met} of {total} conditions met',
+    lean: {
+      'mostly-supportive': 'Mostly supportive',
+      mixed: 'Mixed',
+      'mostly-unsupportive': 'Mostly unsupportive',
+    },
+    sideSupportive: 'Usually supports {metal}',
+    sideAgainst: 'Usually works against {metal}',
+    sideNeutral: 'Sitting neutral',
+    sideUnknown: 'Cannot read right now',
+    conditionState: {
+      supportive: 'in place',
+      against: 'working against',
+      neutral: 'sitting neutral',
+      unknown: 'cannot read',
+    },
+    metals: { gold: 'gold', silver: 'silver' },
+    conditions: {
+      'real-yield': {
+        name: 'Real yields',
+        how: 'Low or falling real yields usually support gold; high or rising ones usually work against it.',
+      },
+      expectations: {
+        name: 'Inflation expectations',
+        how: 'Elevated long-run inflation expectations usually support gold as an inflation hedge.',
+      },
+      stress: {
+        name: 'Market stress',
+        how: 'Above-average stress in US money markets usually supports safe-haven demand for metals.',
+      },
+      dollar: {
+        name: 'The US dollar',
+        how: 'A weak or falling dollar usually supports metals, which are priced in dollars.',
+      },
+      footing: {
+        name: 'Price footing',
+        how: 'A price holding or rising in its 10-year range is firm footing; a falling one is not.',
+      },
+      industrial: {
+        name: 'Industrial demand',
+        how: 'Busy Chinese factories and a firm copper-to-gold ratio usually support industrial demand for silver.',
+        // S2 note: the industrial condition is always tagged "mixed".
+        tag: 'mixed',
+      },
+    },
+    // The three plain checks (S1).
+    checkPosition: '10-year position',
+    checkDrivers: 'Usual drivers',
+    checkSpeed: '30-day speed',
+    speedMeasuring: 'Measuring — the daily history is still building.',
+    notEnoughData: 'Not enough fresh data to read this card yet.',
+    // S3: the fixed "before you act" box — never behind a click.
+    beforeYouActTitle: 'Before you act',
+    beforeYouAct: [
+      'Signals cannot predict prices.',
+      'Prices can fall even when conditions look supportive.',
+      'These logics play out over months and years, not days.',
+      'Dealing costs — the gap between a dealer’s buying and selling prices — can matter more to small buyers than timing.',
+    ],
   },
 
   indicators: INDICATORS,

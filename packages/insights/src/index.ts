@@ -15,6 +15,12 @@
  *                      summary lines (the flat-share summary's successor).
  *   - scoring.ts     — rule evaluation, readings (incl. move scores),
  *                      changes; per-series freshness overrides.
+ *   - connections.ts — the "Together" connection cards (I17, UI spec T1):
+ *                      leg leans + the uniform active/partly/inactive/
+ *                      disagree/unknown state over snapshot readings.
+ *   - signals.ts     — the "What the signals say" cards (I17, UI spec S1–S3):
+ *                      five/six-condition checklists + lean, purely
+ *                      descriptive, never advice.
  */
 
 export {
@@ -77,3 +83,30 @@ export {
   staleAfterDaysFor,
 } from './scoring';
 export type { AuxSeries, ReadingSource, RuleVerdict } from './scoring';
+
+export {
+  CONNECTIONS,
+  evalLeg,
+  evaluateConnection,
+  evaluateConnections,
+} from './connections';
+export type {
+  ConnectionDef,
+  ConnectionId,
+  ConnectionLeg,
+  ConnectionReading,
+  ConnectionState,
+  LegDirection,
+  LegEval,
+  LegLevel,
+} from './connections';
+
+export { evaluateSignal, evaluateSignals } from './signals';
+export type {
+  SignalConditionKey,
+  SignalConditionReading,
+  SignalConditionState,
+  SignalLean,
+  SignalMetal,
+  SignalReading,
+} from './signals';

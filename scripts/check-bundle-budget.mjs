@@ -75,7 +75,20 @@ const BUDGETS = [
   // money page) is untouched at 290.12/87.00 — under its own budget. The
   // gzip cost (+23 kB) is the honest price of the bilingual plain-language
   // corpus the spec demanded. Justified in CHANGELOG §2026-10-08 (I15).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 240_000, gz: 64_000, label: 'Insights lazy chunk' },
+  // I17 bump (235.80/61.92 → 270.01/69.57, budget 240/64 → 280/72): the
+  // v2 wave of the same owner spec — the "Together" connection cards (T1)
+  // and the "What the signals say" cards (S1–S3) with the owner's full
+  // approval. Growth, itemised: (1) the bilingual corpus for six
+  // connections (name + relation + 5 state lines + leg labels) and both
+  // signals cards (6 conditions + the fixed "before you act" box + three
+  // plain checks) × two languages; (2) the ConnectionCard + Signals
+  // components (chips, icons, the two-sides checklist, RTL-mirroring
+  // arrows); (3) the connections.ts + signals.ts logic from
+  // @currena/insights joining the lazy chunk. The ENTRY chunk stays
+  // untouched (290.12/87.76 vs 296/89.5) — the v2 surface rides the lazy
+  // route exactly as the roadmap demands. Gzip +7.65 kB for the whole v2
+  // feature set. Justified in CHANGELOG §2026-10-08 (I17).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 280_000, gz: 72_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

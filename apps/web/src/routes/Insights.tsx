@@ -38,12 +38,15 @@ import { JumpNav, type JumpTarget } from '../components/insights/JumpNav';
 import { LaneSwitch } from '../components/insights/LaneSwitch';
 import { NextUpStrip } from '../components/insights/NextUpStrip';
 import { PricesBoard } from '../components/insights/PricesBoard';
+import { Signals } from '../components/insights/Signals';
+import { Together } from '../components/insights/Together';
 import { Skeleton } from '../components/ui';
 import { Button } from '../components/ui';
 import { useInsightsCopy } from '../components/insights/useInsightsCopy';
 import {
   GROUP_ORDER,
   PINNED_STORAGE_KEY,
+  SIGNALS_ENABLED,
   definitionFor,
   definitionsForGroup,
   filterVisibleIds,
@@ -527,11 +530,14 @@ export function Insights() {
     return { date: dateText, tooltip: copy.ui.dataAsOfTooltip };
   }, [state, locale, copy.ui.dataAsOfTooltip]);
 
-  // P1: the four sticky-nav pills.
+  // P1: the sticky section nav — Together joins the row with the v2 wave
+  // (I17); the Signals block sits between Together and the lanes, so its
+  // scroll region stays under the Together pill.
   const jumpTargets = useMemo<JumpTarget[]>(
     () => [
       { id: 'insights-hero', label: copy.ui.navStatus },
       { id: 'insights-prices', label: copy.ui.navPrices },
+      { id: 'insights-together', label: copy.ui.navTogether },
       { id: 'insights-section-lane', label: copy.ui.navIndicators },
       { id: 'insights-about', label: copy.ui.navAbout },
     ],
@@ -640,6 +646,24 @@ export function Insights() {
             numberLocale={numberLocale}
             onFocusCard={focusCard}
           />
+
+          {/* T1 (v2): the "Together" connection cards. */}
+          <Together
+            readings={state.snapshot.readings}
+            copy={copy}
+            numberLocale={numberLocale}
+            onFocusCard={focusCard}
+          />
+
+          {/* S1–S3 (v2-gated, I17): "What the signals say" — behind the
+           * SIGNALS_ENABLED one-flip flag (config.ts). */}
+          {SIGNALS_ENABLED ? (
+            <Signals
+              readings={state.snapshot.readings}
+              copy={copy}
+              numberLocale={numberLocale}
+            />
+          ) : null}
 
           {/* L1–L4: the indicator lanes. */}
           <div id="insights-section-lane" className="scroll-mt-24 flex flex-col gap-5">
