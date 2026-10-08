@@ -1,10 +1,12 @@
-# Currena — Next Session Brief (post-I17 wrap-up)
+# Currena — Next Session Brief (post-I18 wrap-up)
 
-Hand-off date: 2026-10-08 (the I17 v2 wave — Together connection cards +
-"What the signals say"). · Production: https://currena.ir · Repo:
-`origin/main` = the I17 record `12d76b2` + the deploy doc commit. The
-Worker version of record is **I17's `54998eb8`** (docs/DEPLOY.md §I17 has
-the session record + the ingest smoke run).
+Hand-off date: 2026-10-08 (the I18 wrap-up audit fix — the 375px
+horizontal-scroll bleed removed from the Insights answer lines). ·
+Production: https://currena.ir · Repo: `origin/main` = `eb59365` (I18).
+The Worker version of record is **I18's `e4c8cdb6`** (docs/DEPLOY.md
+§I18 has the session record + the ingest smoke run). The 2026-10-08
+owner specs are fully shipped: v1 = I15, integrity = I16, v2 = I17,
+the audit fix = I18 — nothing remains.
 
 ---
 
@@ -56,11 +58,11 @@ sites, secrets never persisted.
   `docs/BACKLOG.md` (Waves 6–10 closed; NOTHING from the 2026-10-08
   owner specs remains).
 
-## 3. Current verified state (I17)
+## 3. Current verified state (I18)
 
 - Gates: typecheck 5/5, tests **747/747** green (core 183 · scraper 67 ·
-  insights 193 · api 119 · web 185). Budgets held (entry 290.12/87.00 vs
-  296/89.5; Insights 270.01/69.50 vs 280/72).
+  insights 193 · api 119 · web 185). Budgets held (entry 290.12/86.99 vs
+  296/89.5; Insights 270.00/69.49 vs 280/72).
 - Production verified this round: health ok; `/api/insights` 41 readings,
   zero stale/unavailable; the dispatched ingest run `37775748411` green;
   the v2 sections live on https://currena.ir (states disagree · disagree
@@ -74,7 +76,7 @@ sites, secrets never persisted.
 ## 4. This session's likely mission
 
 The 2026-10-08 owner specs are FULLY implemented (v1 as I15, the fixes
-as I16, v2 as I17). Before anything:
+as I16, v2 as I17, the wrap-up audit fix as I18). Before anything:
 
 1. **Check the daily ingest run is green** and `/api/insights` carries
    the 41 readings (the scheduled runs fire ~11 UTC — DEPLOY.md §I16).

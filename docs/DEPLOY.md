@@ -653,3 +653,50 @@ workflow was still dispatched after the push as a smoke: run
 - `SIGNALS_ENABLED = true` (apps/web/src/components/insights/config.ts)
   — the spec's flag, enabled with the owner's full approval this round;
   one flip to false hides the signals section.
+
+## Session record — 2026-10-08 I18 (the mobile answer-line fix)
+
+**Worker deployed: `e4c8cdb6-3947-4c1c-a64a-bcb09af2bef0`** from HEAD
+`eb59365` (I18). Web-only change set (one utility class on the L2
+answer span + docs) — **no ingest change, no snapshot-format change**,
+so the ingest-then-deploy ORDER rule did not bind; a plain Worker
+deploy sufficed. The ingest workflow was still dispatched after the
+push as a smoke (run `37789134410` @ `eb59365`).
+
+**What the fix was:** the wrap-up audit of the live I17 deploy found
+~37px of scrollable horizontal overflow on `#/insights` at 375px in
+en/LTR (the page could be swiped sideways). Root cause: the
+group-header answer span was `min-w-0 flex-1` — `min-w-0` let it
+shrink below its longest word (~81–90px at caption size in a ~38px
+box), and the word bled out as *scrollable* overflow up to `<html>`
+(section 386/396 → route 412 → 37px pan). fa/RTL never showed it
+because left-edge overflow in RTL does not extend `scrollWidth` —
+which is also how the I17 QA (fa-first) honestly missed it. Fix:
+removed `min-w-0` — the answer now wraps to its own full-width line
+on phones; desktop unchanged.
+
+**Deploy sequence (web-change-only):**
+1. `pnpm --filter @currena/web build` — Insights chunk 270.00 /
+   69.49 gz (budgets 280/72; entry 290.12/86.99 vs 296/89.5 —
+   `scripts/check-bundle-budget.mjs` all green).
+2. `CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=…
+   pnpm --filter @currena/api exec wrangler deploy` → version
+   `e4c8cdb6-3947-4c1c-a64a-bcb09af2bef0`.
+3. Dispatch the ingest (smoke) + production browser QA.
+
+**Post-deploy production state (verified this session):**
+- `/api/health` ok; `/api/insights` 41 readings, zero
+  stale/unavailable, generated 12:17 UTC (the I17 snapshot — the
+  data side is untouched by I18).
+- `https://currena.ir/#/insights` serves the new chunk
+  (`Insights-CuZyVYmz.js`): en/375 `scrollWidth = clientWidth = 375`,
+  horizontal pannability 0 (was 37px); fa/RTL 375 clean; desktop
+  1280 clean; the v2 sections (Together + signals, 5 pills) intact.
+- Details panel opens via a card button at 375px in fa (RTL bottom
+  sheet) and Escape-closes; zero console/page errors throughout.
+- Wording discipline re-verified: EN `\b(buy|sell)\b` = 0; FA bare
+  خرید/فروش = 0 (the two «خریداران» inflections are the documented
+  S3 dealing-costs pattern, same as EN "buyers").
+- All other routes spot-checked at 375 (`/`, `/history`,
+  `/calculator`, `/receipt`, `/settle`, `/about`): 375/375.
+- Gates at HEAD `eb59365`: typecheck 5/5, tests 747/747, CI green.
