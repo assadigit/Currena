@@ -514,3 +514,25 @@ consistent new state; that is the documented two-reload cycle doing its
 job, not a defect. Budget note: Insights raw 133.82 > 132 gate → bumped
 to 134 with justification (scripts/check-bundle-budget.mjs; CHANGELOG
 §2026-10-08 I13).
+
+**I14 deploy (2026-10-08, post-sandbox-reset round)** — the sandbox lost
+`/home/z/currena` between rounds; re-cloned at `a6df82c` with a fresh
+owner token (remote scrubbed), baseline re-verified (typecheck 5/5, tests
+611/611, origin/main = a6df82c via ls-remote), the local replay env
+rebuilt (35 production KV values read via the REST API read-only and
+seeded into local miniflare; `pnpm --parallel dev` via the double-fork
+detach). The rate-alerts wave landed as `5ccaaaf` (code + docs in one
+commit), pushed `a6df82c..5ccaaaf`, then deployed: entry
+`index-CPY3qmXQ.js` 290.12 kB / 87.00 gz (BELOW the I13 record 295.11/
+88.55 — the AlertsDialog is a lazy 7.00 kB / 2.59 gz chunk), Insights
+`Insights-CP_PBvhh.js` 133.85 / 38.88, precache 64 / 2236.04 KiB →
+**Worker version `0195910c-9c8e-42c5-b292-c56e936194fd`** (upload 924.13
+KiB / gzip 160.47; KV + minute-cron bindings intact). Production smoke:
+health ok, 30 readings, entry hash byte-matched on currena.ir, the SW
+handover needed two reloads (old `index-Ctp0IB4-.js` once, then
+`index-CPY3qmXQ.js`), the alerts row live in fa; dialog opened, an
+above-100,000 alert CREATED ON PRODUCTION fired instantly («فعال شد در
+۲۶۳٬۲۰۰ · همین حالا» + toast «🔔 نرخ دلار آمریکا → تومان ایرانی به
+۱۰۰٬۰۰۰ رسید»), the test alert deleted (empty state verified), 375px
+overflow 0, zero console errors. Budget: held WITHOUT a bump — entry
+290.12/87.00 vs gates 296/89.5.
