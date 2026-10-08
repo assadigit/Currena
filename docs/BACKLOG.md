@@ -28,6 +28,12 @@ blocks, stale cron going unnoticed (now visible on /admin; push notification sti
 | 49 | ✅ | UI | Print stylesheet — @media print in index.css: theme forced to the light palette, header chrome + nav buttons hidden (logo kept), cards/sections/figures break-inside: avoid, external links spell out their URL, SVG/LED colors kept exact; verified via PDF export + VLM | I6 audit F16 |
 | 50 | ✅ | UI | Per-indicator share links — query-tolerant hash router (`parseRouteAndQuery`, +7 tests), `?card=<id>` deep links open + scroll to the card once per mount, share pill copies the URL with inline feedback, jump targets get scroll-mt-24 | spec §10 |
 
+## Wave 7 — I14 rate-alerts (2026-10-08, post-sandbox-reset round)
+
+| # | Status | Tag | Item | Origin |
+|---|--------|-----|------|--------|
+| 51 | ✅ | UI-TRUST | Rate alerts (user-facing): core alerts module (strict parse, inclusive boundary, one-way trigger stamps, cap 20; +11 tests), web store with cross-tab storage-event sync (+12 tests incl. the storage suite — the #38 pattern proven), app-wide evaluation on every snapshot generation via the liveRateView honesty gate, converter section row (unseen-triggered badge with seenAt stamp, A shortcut, live counts), lazy AlertsDialog (create/review/delete, Persian-digit input, honest open-app footer), 26 copy strings × en/fa, two measured contrast fixes (radio 2.35→8.94:1, badge 2.78→6.59:1); budgets held WITHOUT a bump (lazy dialog) | I13 hand-off "strongest remaining user-facing candidate" |
+
 ## Wave 5 — Owner UI wireframe + a11y session (2026-09-20, from SWOT v2)
 
 | # | Status | Tag | Item | Origin |

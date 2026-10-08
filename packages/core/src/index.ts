@@ -23,6 +23,9 @@ export { CORE_VERSION } from './version';
 
 export { CoreError } from './errors';
 
+export { ALERTS_CAP, crossesAlert, markTriggered, parseRateAlerts, serializeRateAlerts } from './alerts';
+export type { AlertDirection, RateAlert } from './alerts';
+
 export {
   SourceSchema,
   SnapshotSourceSchema,

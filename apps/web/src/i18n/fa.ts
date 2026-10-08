@@ -135,6 +135,35 @@ export const fa: Dictionary = {
     conversionFailedServer: 'تبدیل موقتاً انجام نشد',
   },
 
+  /** I14 — هشدار نرخ: یک جفت‌ارز را رصد کن و از عبور از نرخ هدف باخبر شو. */
+  alerts: {
+    sectionTitle: 'هشدار نرخ',
+    sectionHint: 'رصد نرخ هدف',
+    openDialog: 'هشدارهای نرخ',
+    title: 'هشدار نرخ',
+    shortcut: 'A',
+    direction: 'شرط',
+    above: 'بالاتر برود از',
+    below: 'پایین‌تر بیاید از',
+    threshold: 'نرخ هدف',
+    currentRateLabel: 'نرخ فعلی:',
+    add: 'افزودن هشدار',
+    remove: 'حذف هشدار',
+    empty: 'هنوز هشداری ندارید — یک جفت‌ارز انتخاب کنید و نرخ هدف تعیین کنید تا کورنا بازار را برایتان رصد کند.',
+    capReached: 'حداکثر {max} هشدار می‌توانید داشته باشید. برای افزودن، یکی را حذف کنید.',
+    waiting: 'در انتظار · نرخ فعلی {rate}',
+    triggered: 'فعال شد در {rate}',
+    firedToast: '🔔 نرخ {pair} به {threshold} رسید',
+    firedMore: '‏{count} هشدار دیگر هم فعال شد',
+    honestNote: 'هشدارها فقط زمانی بررسی می‌شوند که کورنا باز باشد — اعلان پس‌زمینه ارسال نمی‌شود.',
+    invalidThreshold: 'یک نرخ هدف بزرگ‌تر از صفر وارد کنید',
+    sameCurrency: 'دو ارز متفاوت انتخاب کنید',
+    badge: '{count} فعال‌شده',
+    waitingCount: '{count} در انتظار',
+    from: 'از',
+    to: 'به',
+  },
+
   currencies: {
     /** قانون مالک: هر «IRR» کاربر-نما باید «IRR (تومان)» نمایش داده شود. */
     irrLabel: 'IRR (تومان)',

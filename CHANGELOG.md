@@ -5,6 +5,70 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-08] — I14 rate-alerts wave
+
+Seventh round of the day — the sandbox was RESET between rounds (the whole
+`/home/z/currena` working copy wiped; re-cloned at `a6df82c` with a fresh
+owner token, remote scrubbed). A full production QA matrix ran FIRST
+against the live I13 Worker `69550e36` (entry asset byte-matched the last
+recorded build): 30 insight cards, conversion 100 USD → 26,320,000 IRR,
+CSV/ics/filter/shortcuts/deep-link all verified en/fa × desktop/375 ×
+light/dark, zero console errors, zero overflow — one VLM contrast flag on
+the converter's «از/به» labels REFUTED by measurement (6.1:1 AA). This
+wave then ships the strongest remaining user-facing feature from the
+I13 hand-off: **rate alerts**.
+
+- **`@currena/core` alerts module** — the persisted alert shape (pair,
+  direction, threshold, one-way `triggeredAt`/`triggeredRate` stamps),
+  strict `parseRateAlerts` (unknown entries dropped, cap 20 — recent-pairs
+  fail-open discipline), and the pure `crossesAlert` test: inclusive at the
+  boundary (">= 280,000" fires AT 280,000), never re-fires once stamped.
+  Platform-free like settle/split; +11 core tests.
+- **Web alerts store** (`lib/alerts.ts`) — the browser side in
+  snapshot-store's external-store shape (`useSyncExternalStore`): every
+  surface (section row badge, dialog list, evaluation engine) reads ONE
+  live state; `currena:rate-alerts` + `currena:rate-alerts-seen` in
+  localStorage; **cross-tab `storage`-event sync** (the pattern BACKLOG #38
+  wants for Settle, proven here first); +12 web tests including the
+  storage-event suite.
+- **App-wide evaluation** (`useAlertEvaluation`) — mounted in the App
+  shell so alerts are checked on EVERY route, not just the converter:
+  each snapshot-store emission (boot hydration, fresh fetch, degraded
+  rung) re-evaluates every waiting alert through the same
+  `liveRateView` honesty gate (unresolvable pairs never false-fire).
+  Crossings stamp + persist (reload keeps the ✅ state, no re-fire —
+  verified live) and feed a 6s toast (pair + threshold, "+N more" tail).
+- **Converter section row + `A` shortcut** — the one-tap door between the
+  converter card and the pair chips: 🔔 title, live waiting/triggered
+  counts (Persian digits in fa), an unseen-triggered badge with the
+  one-way seenAt stamp (a reload never re-nags), and the `A` kbd pill
+  (desktop-only, the same guard family as Insights' / J K — typing,
+  modifiers and open dialogs all opt out).
+- **AlertsDialog (lazy chunk, 7.00 kB / 2.59 kB gz)** — create + review +
+  delete in one overlay (ResultPopup a11y pattern: role=dialog,
+  aria-modal, Escape, backdrop click, initial focus). The create form
+  pre-fills the converter's current pair, mirrors the current live rate
+  under the target input, parses Persian digits + thousands separators
+  (AmountInput's parser), and an above/below segmented control (radiogroup).
+  List rows are honest per alert: ⏳ waiting (with the live rate) or
+  ✅ triggered (rate + relative time). The footer says what alerts ARE:
+  "Checked while Currena is open — no background notifications" (fa:
+  «هشدارها فقط زمانی بررسی می‌شوند که کورنا باز باشد»).
+- **26 new copy strings × en/fa** (native Farsi, «نرخ هدف», «بالاتر برود
+  از», «فعال شد در ۲۶۳٬۲۰۰», «۱ دقیقه پیش» …).
+- **Contrast fixes found by measurement during QA** — the first selected-
+  radio styling (white on `currena-blue`) measured **2.35:1** dark and the
+  first badge pill (white on `currena-warning`) 2.78:1; both now follow the
+  I6-audited pattern (tinted surface + `-deep` ink token, dark badge
+  `#1A222E` on `#FF8080`): re-measured **8.94:1** and **6.59:1**. VLM
+  PASS ×2 (fa 375 dark dialog + section row); converter + insights
+  regressions green, zero console errors, zero 375px overflow.
+- **Bundle budget: held WITHOUT a bump** — the dialog is a lazy chunk, so
+  the entry actually DROPPED to 290.12 kB / 87.00 gz (I13: 295.11/88.55,
+  budgets 296/89.5); Insights untouched 133.85/38.88 (budgets 134/39).
+  Tests **611 → 634 green** (core 183 · scraper 67 · insights 132 ·
+  api 119 · web 133).
+
 ## [2026-10-08] — I13 data-portability & power-reader wave
 
 Sixth round of the day — and the deploy round: the owner pushed the

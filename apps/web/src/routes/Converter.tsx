@@ -21,7 +21,7 @@
  * stack (gold first) and the tools grid reflows 2→3→6 columns.
  */
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import {
   CURRENCIES,
   CoreError,
@@ -44,6 +44,7 @@ import { ResultPopup } from '../components/ResultPopup';
 import type { ConversionView } from '../components/ResultPopup';
 import { Button, Card, LoaderDots, OfflineBanner, StaleBanner } from '../components/ui';
 import { ApiError, fetchMeta } from '../lib/api';
+import { alertsStore, useAlerts } from '../lib/alerts';
 import { useCodeLabel } from '../lib/display';
 import { saveHistoryEntry } from '../lib/history';
 import { useI18n } from '../lib/locale';
@@ -53,6 +54,12 @@ import { isConfirmedStale, snapshotStore, useSnapshotStore } from '../lib/snapsh
 import { navigate } from '../router';
 import type { RoutePath } from '../router';
 import type { TranslationKey } from '../lib/locale';
+
+// I14 — the alerts dialog is LAZY (bundle budget: the money page's entry
+// chunk carries the section row + badge + evaluation engine; the dialog's
+// form + list only download when the user actually opens it — same rule
+// as the seven tool routes in App.tsx).
+const AlertsDialog = lazy(() => import('../components/AlertsDialog').then((m) => ({ default: m.AlertsDialog })));
 
 type Phase = 'idle' | 'fetching' | 'result';
 
@@ -124,6 +131,9 @@ export function Converter() {
   const { t, numberLocale } = useI18n();
   const label = useCodeLabel();
   const store = useSnapshotStore();
+  // I14 — rate alerts: the section row's badge/dialog wiring.
+  const { alerts, seenAt } = useAlerts();
+  const [alertsOpen, setAlertsOpen] = useState(false);
 
   const [phase, setPhase] = useState<Phase>('idle');
   const [amount, setAmount] = useState('');
@@ -179,6 +189,39 @@ export function Converter() {
   useEffect(() => {
     setRecentPairs(readRecentPairs());
   }, []);
+
+  // I14 — `A` opens the alerts dialog (desktop keyboards; the same guard
+  // family as Insights' / J K: skip while typing, with modifiers, or when
+  // a dialog is already open). Live in THIS route only — Insights keeps
+  // its own key namespace.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent): void => {
+      if (alertsOpen) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key.toLowerCase() !== 'a') return;
+      const target = e.target;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLSelectElement ||
+        target instanceof HTMLTextAreaElement ||
+        (target instanceof HTMLElement && target.isContentEditable)
+      ) {
+        return;
+      }
+      e.preventDefault();
+      alertsStore.ackAll();
+      setAlertsOpen(true);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [alertsOpen]);
+
+  // I14 — badge: triggered-but-unseen alerts (one-way seenAt stamp; a
+  // reload never re-nags). The sub-line summarizes the list when it has
+  // entries (waiting/triggered counts, Persian digits in fa).
+  const unseenTriggered = alerts.filter((a) => a.triggeredAt !== undefined && (seenAt === null || a.triggeredAt > seenAt)).length;
+  const waitingCount = alerts.filter((a) => a.triggeredAt === undefined).length;
+  const triggeredCount = alerts.length - waitingCount;
 
   // I12 self-heal completion: when the CURRENT pair's source recovers
   // (error → ready — the store's retry ladder landed data) while a failure
@@ -565,6 +608,52 @@ export function Converter() {
         </form>
       </Card>
 
+      {/* I14 — Rate alerts section row: the one-tap door to the alerts
+          dialog (A key on desktop too). Badge = triggered-but-unseen; the
+          sub-line summarizes the list once entries exist. */}
+      <div className="no-print mt-5">
+        <button
+          type="button"
+          onClick={() => {
+            alertsStore.ackAll();
+            setAlertsOpen(true);
+          }}
+          aria-haspopup="dialog"
+          className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl border border-currena-cyan/30 bg-currena-cyan/[0.06] px-4 py-3 text-start transition-all duration-300 hover:border-currena-cyan/60 hover:bg-currena-cyan/[0.1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue motion-safe:hover:-translate-y-0.5 dark:border-currena-cyan/25 dark:bg-currena-cyan/[0.07]"
+        >
+          <span className="flex min-w-0 items-center gap-2.5">
+            <span
+              aria-hidden="true"
+              className={unseenTriggered > 0 ? 'warning-pulse text-lg' : 'text-lg'}
+            >
+              🔔
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-bold text-currena-dark">{t('alerts.sectionTitle')}</span>
+              <span className="block truncate text-xs text-currena-muted">
+                {alerts.length === 0
+                  ? t('alerts.sectionHint')
+                  : waitingCount > 0 && triggeredCount > 0
+                    ? `${t('alerts.waitingCount', { count: formatNumber(waitingCount, numberLocale) })} · ${t('alerts.badge', { count: formatNumber(triggeredCount, numberLocale) })}`
+                    : waitingCount > 0
+                      ? t('alerts.waitingCount', { count: formatNumber(waitingCount, numberLocale) })
+                      : t('alerts.badge', { count: formatNumber(triggeredCount, numberLocale) })}
+              </span>
+            </span>
+          </span>
+          <span className="flex shrink-0 items-center gap-2">
+            {unseenTriggered > 0 ? (
+              <span className="grid h-6 min-w-6 place-items-center rounded-full bg-currena-warning-deep px-1.5 text-[0.7rem] font-black text-white shadow-[0_2px_8px_rgba(185,46,46,0.35)] dark:text-[#1A222E] dark:shadow-[0_2px_8px_rgba(255,128,128,0.25)]">
+                {formatNumber(unseenTriggered, numberLocale)}
+              </span>
+            ) : null}
+            <kbd className="hidden md:inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-white px-1.5 font-sans text-[0.65rem] font-bold text-currena-dark ring-1 ring-black/[0.08] dark:bg-[#243040] dark:text-currena-dark dark:ring-white/[0.12]">
+              A
+            </kbd>
+          </span>
+        </button>
+      </div>
+
       {/* Pair chips — one-tap recall. Lives BELOW the converter now: the
           amount field owns the first viewport (it used to push the input
           below the fold on phones). First-run visitors (no conversions yet)
@@ -730,6 +819,13 @@ export function Converter() {
           onClose={() => setPhase('idle')}
           onNewConversion={() => setPhase('idle')}
         />
+      ) : null}
+
+      {/* I14 — Rate alerts dialog (A key or the section row; lazy chunk) */}
+      {alertsOpen ? (
+        <Suspense fallback={null}>
+          <AlertsDialog defaultBase={from} defaultQuote={to} onClose={() => setAlertsOpen(false)} />
+        </Suspense>
       ) : null}
     </div>
   );

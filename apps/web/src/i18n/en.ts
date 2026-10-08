@@ -134,6 +134,35 @@ export const en = {
     conversionFailedServer: 'Conversion failed — hang tight',
   },
 
+  /** I14 — rate alerts: watch a pair, get told when it crosses a target. */
+  alerts: {
+    sectionTitle: 'Rate alerts',
+    sectionHint: 'Watch a target rate',
+    openDialog: 'Rate alerts',
+    title: 'Rate alerts',
+    shortcut: 'A',
+    direction: 'Direction',
+    above: 'Rises above',
+    below: 'Falls below',
+    threshold: 'Target rate',
+    currentRateLabel: 'Current rate:',
+    add: 'Add alert',
+    remove: 'Delete alert',
+    empty: 'No alerts yet — pick a pair, set a target rate, and Currena will watch the market for you.',
+    capReached: 'You can keep up to {max} alerts. Delete one to add another.',
+    waiting: 'Waiting · now {rate}',
+    triggered: 'Triggered at {rate}',
+    firedToast: '🔔 {pair} just crossed {threshold}',
+    firedMore: '+{count} more alert(s) fired',
+    honestNote: 'Checked while Currena is open — no background notifications.',
+    invalidThreshold: 'Enter a target rate above 0',
+    sameCurrency: 'Pick two different currencies',
+    badge: '{count} triggered',
+    waitingCount: '{count} waiting',
+    from: 'From',
+    to: 'To',
+  },
+
   currencies: {
     /** Owner rule (2026-09-17): every user-visible "IRR" reads "IRR (Toman)". */
     irrLabel: 'IRR (Toman)',

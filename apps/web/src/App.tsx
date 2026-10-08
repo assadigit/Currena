@@ -14,12 +14,15 @@ import { registerSW } from 'virtual:pwa-register';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { Toast } from './components/ui';
 import { Converter } from './routes/Converter';
 import { LiveRates } from './routes/LiveRates';
 import { navigate, useRoute } from './router';
 import { useI18n } from './lib/locale';
 import { snapshotStore } from './lib/snapshot-store';
 import { hydrateServerHistory } from './lib/rate-history';
+import { alertsStore } from './lib/alerts';
+import { useAlertEvaluation } from './lib/use-alert-evaluation';
 import type { TranslationKey } from './lib/locale';
 
 const Calculator = lazy(() => import('./routes/Calculator').then((m) => ({ default: m.Calculator })));
@@ -78,6 +81,9 @@ function RouteFallback(): React.JSX.Element {
 export function App() {
   const route = useRoute();
   const { t, locale } = useI18n();
+  // I14 — rate alerts: evaluate crossings on every snapshot generation
+  // (app-wide, not converter-local) and surface the fired toast.
+  const { firedToast } = useAlertEvaluation();
 
   // PWA updates are AUTO (registerType: 'autoUpdate', owner request
   // 2026-09-19): the new service worker skipWaiting-activates the moment it
@@ -102,6 +108,7 @@ export function App() {
   useEffect(() => {
     snapshotStore.boot();
     void hydrateServerHistory();
+    alertsStore.getState(); // boot the alerts store (hydration + storage listener)
   }, []);
 
   useEffect(() => {
@@ -135,6 +142,8 @@ export function App() {
         </ErrorBoundary>
       </main>
       <Footer />
+      {/* I14 — fired-alert toast (auto-dismisses; dialog open clears it) */}
+      {firedToast ? <Toast message={firedToast} /> : null}
     </div>
   );
 }
