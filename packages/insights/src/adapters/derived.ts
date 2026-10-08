@@ -112,10 +112,23 @@ function mergeSeries(a: SeriesPoint[], b: SeriesPoint[]): SeriesPoint[] {
   return [...byDate.values()].sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
 }
 
-/** Append a live point dated `today` (refused when it would break order). */
+/**
+ * Append a live point dated `today`. Order rules:
+ *  - history strictly newer than `today` → keep history (a lagging live
+ *    source must never rewind the series);
+ *  - history dated exactly `today` → REPLACE the value: this run's live
+ *    fetch is the day's freshest observation, and the stored same-day
+ *    point came from an earlier run of the same day. Production evidence
+ *    (2026-10-08): the seeded price rows kept the first-of-day price
+ *    while the unseeded gold-silver ratio carried the live one, so cards
+ *    stamped the same date disagreed — 4136.20 / 60.17 on the board vs a
+ *    69.97 ratio (68.74 implied);
+ *  - otherwise append.
+ */
 function withLivePoint(series: SeriesPoint[], today: string, value: number): SeriesPoint[] {
   const last = series[series.length - 1];
-  if (last && last.date >= today) return series; // stale live source vs fresher history — keep history
+  if (last && last.date > today) return series; // stale live source vs fresher history — keep history
+  if (last && last.date === today) return [...series.slice(0, -1), { date: today, value }];
   return [...series, { date: today, value }];
 }
 

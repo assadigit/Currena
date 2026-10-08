@@ -575,3 +575,40 @@ justification in CHANGELOG §I15 Budget).
   gold/silver seeded 120 accumulated points from the previous KV history.
 
 
+
+## Session record — 2026-10-08 I16 (the daily-accumulation fix)
+
+**No Worker deploy this round.** The I16 fixes
+(`withLivePoint` same-day replacement, `buildHistoryFile` `minPoints`
+bootstrap, gold-silver in SEED_IDS) live entirely in the ingest-runner
+half of `@currena/insights` — the code GitHub Actions executes. The
+Worker and the SPA import only definitions/gauges/store types, so the
+deployed Worker `3e03c039` (I15) stays the version of record; the KV
+snapshot format is unchanged (same 41 ids, same schemas — a 1-point
+`insights:hist:btc-usd` passes `IndicatorHistorySchema.points.min(1)`
+and the route/UI treat it as the honest "no chart yet" state).
+
+**Deployment sequence (runner-only):**
+1. Commit + push `eda76ea..<I16 sha>` to `origin/main`.
+2. Dispatch the ingest workflow (Actions picks up the pushed code):
+   `gh api /repos/assadigit/Currena/actions/workflows/insights-ingest.yml/dispatches`
+   or the GitHub UI — run record below.
+3. Production smoke on the EXISTING Worker.
+
+**Post-fix production state (verified this session):**
+- The pre-fix snapshot showed the mismatch live: gold 4136.20 ÷ silver
+  60.17 = 68.74 implied vs the gold-silver reading 69.97 (both stamped
+  2026-10-08) — seeded rows carried the 04:27 price, the unseeded ratio
+  carried the 11:27 live one.
+- After the dispatched I16 ingest run: all same-date price rows and the
+  ratio agree (verify `gold-usd / silver-usd ≈ gold-silver` within
+  float dust); `insights:hist:btc-usd` exists (1+ accumulated points);
+  `GET /api/insights/btc-usd/history` 200. The btc/copper 7/30-day
+  changes become measurable from 2026-10-15 (7 daily points) /
+  2026-11-07 (30) — honest accrual, per data spec §3.
+- Operational note: GitHub Actions executes the 04:20 UTC cron ~7 h
+  late (~11:10–11:30 UTC observed on 2026-10-07 and 2026-10-08) —
+  still inside the fresh KV write-budget window (the account counter
+  crosses 1,000/day around 18:30–19:00 UTC), so the schedule stays
+  as-is; documented here so a future "why did the run fire at 11?"
+  question has its answer.

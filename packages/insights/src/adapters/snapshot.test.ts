@@ -53,6 +53,15 @@ describe('buildHistoryFile', () => {
     expect(buildHistoryFile('gold-btc', [{ date: '2026-10-07', value: 42 }])).toBeUndefined();
   });
 
+  it('minPoints 1 bootstraps the accumulated-daily rows (the btc-usd lesson)', () => {
+    // A row with no monthly base must persist its FIRST daily point, or the
+    // accumulation can never start (every run rebuilds a single live point —
+    // 2026-10-08 production evidence). The default stays 2 for live cards.
+    const one = buildHistoryFile('btc-usd', [{ date: '2026-10-07', value: 86625 }], { minPoints: 1 })!;
+    expect(one.id).toBe('btc-usd');
+    expect(one.points).toEqual([[epochDay('2026-10-07'), 86625]]);
+  });
+
   it('encodes a short series verbatim as [epochDay, value] pairs', () => {
     const series: SeriesPoint[] = [
       { date: '2026-10-01', value: 3.88 },

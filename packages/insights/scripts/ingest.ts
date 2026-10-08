@@ -14,7 +14,11 @@
  *   - insights:snapshot and insights:status — always written (2 writes);
  *   - insights:hist:<id> — written ONLY when the payload actually changed
  *     (read-compare) or the key is absent; single-point series never get a
- *     history key;
+ *     history key, EXCEPT the accumulated-daily rows (SEED_IDS) whose first
+ *     point IS the bootstrap of the accumulation (minPoints 1 — the
+ *     btc-usd 2026-10-08 lesson: a row with no monthly base otherwise
+ *     rebuilds a single live point every run and the 7/30-day changes can
+ *     never appear);
  *   - writes that bounce off the daily cap (429/10048) retry with backoff.
  *
  * Exit code: 1 when any P1 indicator is unavailable (the product degraded —
@@ -56,6 +60,15 @@ function historiesEqual(a: IndicatorHistory, b: IndicatorHistory): boolean {
     a.points.every((p, i) => p[0] === b.points[i]![0] && p[1] === b.points[i]![1])
   );
 }
+
+/**
+ * The accumulated-daily rows (data spec §3): the runner re-reads their stored
+ * history before deriving, so each run's live spot joins the previously
+ * accumulated daily points — that is what makes 7/30-day changes measurable
+ * on those rows. gold-silver rides the same mechanism (derived.ts already
+ * merges its seedHistory; its daily points accumulate like the price rows').
+ */
+const SEED_IDS: IndicatorId[] = ['gold-usd', 'silver-usd', 'copper-usd', 'btc-usd', 'gold-silver'];
 
 const dryRun = process.argv.includes('--dry-run');
 
@@ -150,7 +163,6 @@ const store = dryRun
  * ------------------------------------------------------------------ */
 
 if (store) {
-  const SEED_IDS: IndicatorId[] = ['gold-usd', 'silver-usd', 'copper-usd', 'btc-usd'];
   const seedHistory: Partial<Record<IndicatorId, SeriesPoint[]>> = {};
   for (const id of SEED_IDS) {
     try {
@@ -234,7 +246,11 @@ if (!store) {
   let failed = 0;
   for (const def of DEFINITIONS) {
     const indicatorSeries = series[def.id];
-    const history = indicatorSeries ? buildHistoryFile(def.id, indicatorSeries) : undefined;
+    // SEED_IDS bootstrap at minPoints 1: the accumulated-daily rows persist
+    // their FIRST point so the accumulation can start (see SEED_IDS note).
+    const history = indicatorSeries
+      ? buildHistoryFile(def.id, indicatorSeries, SEED_IDS.includes(def.id) ? { minPoints: 1 } : undefined)
+      : undefined;
     if (!history) {
       if (indicatorSeries) singlePoint++;
       continue; // no series (unavailable) or a single live point — no history key

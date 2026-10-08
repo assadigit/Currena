@@ -61,7 +61,7 @@ Not-backtested items are info-only (never vote) or P2 indicators whose adapters 
 
 ## "Today" run (latest fixture data, 2026-10-05)
 
-- **Global:** stressed — 3 of 12 voting indicators in warning (3 excluded).
+- **Global:** stressed — 4 of 13 voting indicators in warning (2 excluded).
 - **Australia:** stressed — 4 of 7 in warning (0 excluded).
 
 | Indicator | Value | As of | 10y percentile | 7d | 30d | Status |
@@ -72,7 +72,7 @@ Not-backtested items are info-only (never vote) or P2 indicators whose adapters 
 | Federal funds target rate (midpoint) | 3.88 | 2026-10-05 | 68% | 0.0 | 0.3 | normal |
 | ECB deposit facility rate | -0.30 | 2016-03-11 | — | — | 0.0 | stale |
 | US government interest payments / receipts | 0.34 | 2026-04-01 | 73% | — | — | normal |
-| US inflation (yearly) | 3.35 | 2026-08-01 | 72% | — | 1.5 | stale |
+| US inflation (yearly) | 3.35 | 2026-08-01 | 72% | — | 1.5 | warning |
 | Inflation expectations (5y5y forward) | 2.36 | 2026-10-05 | 91% | 0.0 | 0.0 | warning |
 | St. Louis Fed Financial Stress Index | -0.81 | 2026-09-25 | 7% | -0.1 | 0.0 | normal |
 | Chicago Fed National Financial Conditions Index | -0.49 | 2026-10-02 | 53% | 0.0 | 0.1 | normal |

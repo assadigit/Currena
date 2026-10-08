@@ -120,15 +120,35 @@ export function downsampleSeries(series: readonly SeriesPoint[], maxPoints = HIS
 }
 
 /**
+ * Options for {@link buildHistoryFile}.
+ */
+export interface BuildHistoryFileOptions {
+  /**
+   * Minimum observation count that still emits a file — 2 by default
+   * (single-point "live" cards like gold-btc/silver-btc/gold-aud get no
+   * history key and the endpoint answers 404, the honest "no chart"
+   * state). The ingest runner passes 1 for the accumulated-daily rows:
+   * a row with no monthly base (btc-usd) must persist its FIRST daily
+   * point or the accumulation can never bootstrap — every run would
+   * rebuild a single live point and the 7/30-day changes the data spec
+   * §3 promises would never appear (2026-10-08 production evidence).
+   */
+  minPoints?: number;
+}
+
+/**
  * One indicator's stored history: the last 10 years (anchored on the newest
  * observation, mirroring the scoring percentile base), downsampled to
  * HISTORY_MAX_POINTS, encoded as [epochDay, value] pairs. Returns undefined
- * for series with fewer than two observations — single-point "live" cards
- * (gold-btc, silver-btc, gold-aud) get no history key and the endpoint
- * answers 404, which is the honest "no chart" state.
+ * for series below the `minPoints` floor (2 by default).
  */
-export function buildHistoryFile(id: IndicatorId, series: readonly SeriesPoint[]): IndicatorHistory | undefined {
-  if (series.length < 2) return undefined;
+export function buildHistoryFile(
+  id: IndicatorId,
+  series: readonly SeriesPoint[],
+  opts: BuildHistoryFileOptions = {},
+): IndicatorHistory | undefined {
+  const minPoints = opts.minPoints ?? 2;
+  if (series.length < minPoints) return undefined;
   const last = series[series.length - 1]!;
   const windowStart = addDays(last.date, -HISTORY_WINDOW_DAYS);
   const windowed = series.filter((p) => p.date >= windowStart);

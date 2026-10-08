@@ -5,6 +5,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-08] — I16 the daily-accumulation fix: same-day live refresh + the btc bootstrap
+
+Ninth round — a post-I15 production verification pass (the NEXT_SESSION_PROMPT
+mission: ingest green ✅, 41 readings ✅, backtest re-run ✅) found the I15
+accumulated-daily mechanism broken in two ways, both now fixed at the root:
+
+- **Cross-card price inconsistency (live in production):** the seeded price
+  rows kept the FIRST-of-day price while the unseeded gold-silver ratio
+  carried the LIVE one — same-date cards disagreed (gold 4136.20 ÷ silver
+  60.17 = 68.74 on the board vs a 69.97 ratio reading, both stamped
+  2026-10-08). Root cause: `withLivePoint` refused ANY same-date live point,
+  conflating "lagging live source" (history strictly newer — keep history,
+  correct) with "same day, earlier run" (this run's fetch is the day's
+  FRESHEST observation — must replace). Same-date points are now replaced,
+  so every card stamped a date agrees on one price set.
+- **The btc-usd accumulation could never start:** `buildHistoryFile`
+  refused single-point series, so a row with no monthly base (btc has none
+  by design) never persisted its first daily point — every run rebuilt a
+  single live point, the seed stayed empty forever, and the data spec §3's
+  "7/30-day changes from your own stored daily snapshots" would never
+  appear on the Bitcoin row. New `minPoints` option (default 2 — the
+  live-point cards gold-btc/silver-btc/gold-aud keep their honest no-key
+  404); the ingest passes 1 for the accumulated-daily rows so the first
+  point IS the bootstrap.
+- **gold-silver now rides the accumulation too** (SEED_IDS gains it —
+  derived.ts already merged its seedHistory; the ingest's read list was the
+  missing half).
+
+Verified end to end with a 3-run/2-day simulation against
+`InMemoryInsightsStore` (the ingest write-loop semantics verbatim): day-1
+bootstrap writes btc's 1-point key, the same-day re-run replaces the moved
+prices and the board/ratio agree exactly, day 8 shows btc change7d = +1.84%.
+A worker deploy is NOT needed — the fixes live in the ingest runner
+(`@currena/insights/adapters`), which only GitHub Actions executes; the
+Worker/SPA import only definitions/gauges/store types. Tests 708 → **711
+green** (+3: same-day replace ×2, minPoints bootstrap).
+
+Also noted: GitHub Actions schedules the 04:20 UTC cron ~7 h late (the
+runs execute ~11:10–11:30 UTC) — still inside the fresh write-budget window
+(the counter crosses 1,000 around 18:30–19:00 UTC), so no action beyond
+documentation. `docs/insights/BACKTEST.md` regenerated at this round: the
+I15 freshness fix visible in the diff (us-cpi-yoy `stale` → `warning`).
+
 ## [2026-10-08] — I15 the owner-spec wave: question gauges, the prices board, and the details panel
 
 Eighth round — the uploaded 2026-10-08 owner specs (`01-insights-ui-ux-instructions.md`

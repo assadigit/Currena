@@ -5,6 +5,16 @@ Priority: **Must** (data loss, security, correctness) · **Should** (robustness,
 
 Status legend: ☐ todo · 🔄 in progress · ✅ done (this session) · ⏸ escalated/deferred (see notes)
 
+## Wave 9 — I16 the daily-accumulation fix (2026-10-08, third round)
+
+Found by the post-I15 production verification pass (NEXT_SESSION_PROMPT
+mission list); both bugs live in the I15 accumulated-daily mechanism.
+
+| # | Status | Tag | Item | Origin |
+|---|--------|-----|------|--------|
+| 57 | ✅ | RELIABILITY | Same-day live refresh in `withLivePoint` — the seeded price rows kept the first-of-day price while the unseeded gold-silver ratio carried the live one, so same-date cards disagreed in production (68.74 implied vs 69.97 shown); same-date points now replaced by the run's live observation, strictly-newer history still guarded; +2 tests | I15 follow-up verification |
+| 58 | ✅ | RELIABILITY | The btc-usd accumulation bootstrap — `buildHistoryFile` `minPoints` option (default 2; ingest passes 1 for the accumulated-daily rows) so a row with no monthly base persists its first daily point; gold-silver joins SEED_IDS (derived.ts already plumbed its seed); +1 test; 3-run/2-day simulation proof | I15 follow-up verification |
+
 ## Wave 6 — Insights SWOT re-check + I7 hardening (2026-10-07, I6 session)
 
 Post-UI/UX-pass SWOT of the Insights feature (audit doc: `docs/insights/05-ux-audit-I6.md`).

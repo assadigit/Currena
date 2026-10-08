@@ -206,9 +206,11 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
     expect(out2['au-us-10y-gap']).toBeUndefined();
   });
 
-  it('keeps history intact when the live point is not newer than the last observation', () => {
-    const staleLive = { ...inputs, today: '2026-09-01' };
-    const out = buildIndicatorSeries(staleLive);
+  it('keeps history intact when the live source is strictly behind the last observation', () => {
+    // A lagging live source (spot dated before the newest stored point) must
+    // never rewind the series.
+    const laggingLive = { ...inputs, today: '2026-08-15' };
+    const out = buildIndicatorSeries(laggingLive);
     expect(out['gold-silver']).toHaveLength(2);
     expect(out['gold-silver']!.at(-1)!.date).toBe('2026-09-01');
     expect(out['gold-usd']).toHaveLength(2);
@@ -216,6 +218,20 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
     expect(out['silver-usd']).toHaveLength(2);
     expect(out['silver-usd']!.at(-1)).toEqual({ date: '2026-09-01', value: 64.6 });
     expect(out['copper-usd']).toHaveLength(1); // WB only — live point not newer
+  });
+
+  it('replaces a same-day point with the live observation (the day’s freshest price wins)', () => {
+    // Production evidence 2026-10-08: the seeded rows kept the first-of-day
+    // price while the unseeded gold-silver ratio carried the live one —
+    // same-date cards disagreed. Same-date → the latest live fetch wins.
+    const sameDay = { ...inputs, today: '2026-09-01' };
+    const out = buildIndicatorSeries(sameDay);
+    expect(out['gold-usd']).toHaveLength(2);
+    expect(out['gold-usd']!.at(-1)).toEqual({ date: '2026-09-01', value: 4162.6 });
+    expect(out['silver-usd']!.at(-1)).toEqual({ date: '2026-09-01', value: 61.28 });
+    expect(out['copper-usd']!.at(-1)).toEqual({ date: '2026-09-01', value: 6.66 * 2204.62262 });
+    // all same-date cards now agree on one price set
+    expect(out['gold-silver']!.at(-1)).toEqual({ date: '2026-09-01', value: 4162.6 / 61.28 });
   });
 
   it('degrades the ounce price cards to single live points without the World Bank leg', () => {
@@ -254,6 +270,23 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
       { date: '2026-10-05', value: 86000 },
       { date: today, value: 86625 },
     ]);
+  });
+
+  it('I15: a same-day seed point is REPLACED by the newer live observation (intraday refresh)', () => {
+    // The stored same-day point came from an earlier run of the same day —
+    // this run's live fetch is the freshest observation of that date.
+    const seeded = {
+      ...inputs,
+      seedHistory: {
+        'gold-usd': pts([['2026-10-05', 4155.5], ['2026-10-06', 4160]]),
+        'btc-usd': pts([['2026-10-05', 86000], ['2026-10-06', 86500]]),
+      },
+    };
+    const out = buildIndicatorSeries(seeded);
+    expect(out['gold-usd']!.at(-2)).toEqual({ date: '2026-10-05', value: 4155.5 });
+    expect(out['gold-usd']!.at(-1)).toEqual({ date: today, value: 4162.6 }); // replaced 4160
+    expect(out['btc-usd']!.at(-1)).toEqual({ date: today, value: 86625 }); // replaced 86500
+    expect(out['btc-usd']).toHaveLength(2); // 10-05 + 10-06 (replaced in place, not appended)
   });
 
   it('I15: seed-only rows (no WB base) build from the accumulated history alone', () => {
