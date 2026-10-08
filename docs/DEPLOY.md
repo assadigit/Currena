@@ -700,3 +700,44 @@ on phones; desktop unchanged.
 - All other routes spot-checked at 375 (`/`, `/history`,
   `/calculator`, `/receipt`, `/settle`, `/about`): 375/375.
 - Gates at HEAD `eb59365`: typecheck 5/5, tests 747/747, CI green.
+
+## Session record — 2026-10-08 final wrap-up (deploy from the round-2-prep HEAD)
+
+**Worker deployed: `60b41387-0c1f-44b5-80e1-3c773463bf0e`** from HEAD
+`f173b65` — the owner's docs-only round-2-prep commit (the new
+`docs/insights/06-ux-round-2-spec.md` + `07-agent-loop-prompt.md` +
+`mentor-specs/` provenance copies; zero code changes, so the built
+chunks are byte-identical to the I18 deploy — same
+`Insights-CuZyVYmz.js` / `index-CjtI_gxE.js` hashes). This was the
+session-close-out deploy requested by the owner: latest HEAD →
+Cloudflare, then the deploy record committed and pushed.
+
+**Gates re-run at `f173b65`** (fresh clone, `pnpm install
+--frozen-lockfile`): typecheck 5/5, tests 747/747 (core 183 ·
+scraper 67 · insights 193 · api 119 · web 185), build + budget check
+all green (entry 290.12/86.99 vs 296/89.5; Insights 270.00/69.49 vs
+280/72). CI on `f173b65`: green.
+
+**Production verified after the deploy:** `/api/health` ok;
+`#/insights` serves the I18 chunk with the fix intact — en/375
+`scrollWidth = clientWidth = 375` (pan 0), desktop 1280 clean, the v2
+sections (Together + signals) live, no buy/sell wording, zero
+console/page errors.
+
+**Ingest smoke — honest incident note:** the dispatch run
+`37835315742` @ `f173b65` computed all 41 readings correctly but
+**exited 1** on the final `PUT insights:snapshot`: HTTP 429, Cloudflare
+KV free-tier **daily write cap for the account** (code 10048,
+"free usage limit for this operation for today"). The account's
+minute-cron rates ladder + today's earlier ingest runs had consumed
+the day's quota by ~19:54 UTC. This is an account-level quota event,
+not a code regression: the ingest retried (60s/120s), then failed
+loudly per design. **No data impact** — the write was rejected before
+touching KV, so the live snapshot remains the 14:02 UTC one (41
+readings, zero stale/unavailable, gauges Global stressed 4/16 ·
+Australia cautious 5/13; verified after the incident). The daily KV
+quota resets at 00:00 UTC and the scheduled ~11 UTC run (see §I16
+timing) recovers automatically; nothing to hand-fix. If this recurs
+on smoke dispatches, prefer dispatching them before the evening UTC
+hours, or skip the smoke when the scheduled run of the day is already
+green.
