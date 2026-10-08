@@ -168,7 +168,11 @@ function QuestionGroup({
           </span>
           <span className="font-bold text-[var(--color-text-primary)]">{stepWord}</span>
           <span className="font-semibold">{countText}</span>
-          <span className="min-w-0 flex-1">{answer}</span>
+          {/* L2 answer: no min-w-0 — the flex item keeps its min-content width
+           * (the longest word) so the flex-wrap row moves it to its own line on
+           * narrow phones instead of squeezing it below word width, which bled
+           * ~50px of horizontal scroll onto the whole page at 375px (I18). */}
+          <span className="flex-1">{answer}</span>
         </p>
       </header>
       {/* L3/L4: alert cards in a responsive auto-fit grid (never stretching

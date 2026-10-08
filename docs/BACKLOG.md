@@ -5,6 +5,19 @@ Priority: **Must** (data loss, security, correctness) · **Should** (robustness,
 
 Status legend: ☐ todo · 🔄 in progress · ✅ done (this session) · ⏸ escalated/deferred (see notes)
 
+## Wave 11 — I18 the wrap-up audit fix (2026-10-08, fifth round)
+
+A full wrap-up audit of the live I17 deploy (remote state, Worker
+version, CI, spec cross-check, production browser QA at 375px) found
+exactly one defect: ~37px of scrollable horizontal overflow on
+`#/insights` at phone widths in en/LTR. Fixed, redeployed, re-verified.
+Tests stayed 747/747 (one utility class changed; no behavioural test
+touched).
+
+| # | Status | Tag | Item | Origin |
+|---|--------|-----|------|--------|
+| 63 | ✅ | UI-A11Y | The L2 group-header answer line (`min-w-0 flex-1`) could shrink below its longest word at 320–414px, bleeding 43–53px of scrollable overflow up to `<html>` (37px page pan at 375px). `min-w-0` removed — the answer wraps to its own full-width line on phones; desktop unchanged. The I17 QA missed it because RTL overflow at the left edge does not extend `scrollWidth` (fa checked first, honestly clean). All other routes + fa re-verified 375/375 | I17 post-deploy audit |
+
 ## Wave 10 — I17 the v2 wave (2026-10-08, fourth round)
 
 The owner granted full approval ("nothing from spec must remain, finish all

@@ -5,6 +5,50 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-08] — I18 the mobile answer-line fix: 375px horizontal scroll removed
+
+Eleventh round — a wrap-up audit of the live I17 deploy caught one real
+defect the I17 QA pass had missed: on the Insights page at 375px (and
+every width where the L2 header row runs out of room, 320–414px), the
+whole document gained ~37px of scrollable horizontal overflow. The
+page could be swiped sideways into blank space.
+
+Root cause (found by bisecting the live DOM): the group-header answer
+line in `routes/Insights.tsx` was `<span className="min-w-0 flex-1">`.
+`min-w-0` lets the flex item shrink *below the min-content width of its
+own text* — on a 343px content column the verdict meter (120px) + step
+word + count text left the answer only ~38px, and its longest word
+(81–90px at caption size) bled out as *scrollable* overflow that
+propagated through every `overflow: visible` ancestor up to
+`<html>`. The measured chain matched exactly: span overflow 43/53px →
+section 386/396 → route container 412 → 37px of page scroll. (RTL/fa
+never showed it because right-to-left overflow at the left edge does
+not extend `scrollWidth` — which is also why the I17 QA, run in fa
+first, could honestly record "no overflow" and miss the en/LTR case.)
+
+### Fixed
+
+- **`apps/web/src/routes/Insights.tsx`** — dropped `min-w-0` from the
+  answer span. With the default `min-width: auto` the flex item keeps
+  its longest word as its floor, so `flex-wrap` moves the answer to
+  its own full-width line on narrow phones (readable, no squeeze) and
+  keeps it inline on desktop exactly as before. Desktop layout is
+  unchanged (the row has ≥ 81px spare there). Verified live by
+  toggling the class off in the production DOM: `scrollWidth`
+  412 → 375, horizontal scrollability 37px → 0.
+
+### Verified
+
+- Web typecheck clean; web tests 185/185 (total 747/747 unchanged —
+  no behavioural test touched; the change is one utility class).
+- Production re-check after deploy: en/375 `scrollWidth = clientWidth`
+  (0 scrollable), fa/375 clean, all other routes (`/`, `/history`,
+  `/calculator`, `/receipt`, `/settle`, `/about`) 375/375, zero
+  console/page errors, the v2 sections (Together + signals) untouched.
+- Other `min-w-0` usages audited: CompactRow truncates (clips, safe);
+  AlertCard / DetailsPanel / NextUpStrip sit in ≥260px boxes where the
+  longest word fits; none of them measured as overflow sources.
+
 ## [2026-10-08] — I17 the v2 wave: "Together" connection cards + "What the signals say"
 
 Tenth round — the owner granted full approval ("nothing from spec must
