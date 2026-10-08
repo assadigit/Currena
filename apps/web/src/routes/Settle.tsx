@@ -17,6 +17,10 @@
  *     recorded the payment against the payer (a bug that left the suggestion
  *     visible forever); the core port clears the balances as intended.
  *   - group deletion (not in legacy) with confirm + photo cleanup.
+ *   - multi-tab sync (BACKLOG #38): a `storage` event from another tab
+ *     writing `splitSettleGroups` re-hydrates this tab's groups — same
+ *     semantics as History. The persistence layer (read/persist/subscribe)
+ *     lives in lib/settle-storage.ts.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -25,39 +29,19 @@ import { uniqueId } from '../lib/id';
 import type { CurrencyCode, Transfer } from '@currena/core';
 import { Button, Card, Toast } from '../components/ui';
 import { useCodeLabel } from '../lib/display';
+import {
+  persistSettleGroups,
+  readSettleGroups,
+  subscribeSettleGroups,
+} from '../lib/settle-storage';
+import type { SettleGroup, SettleExpense } from '../lib/settle-storage';
 import { deletePhotos, getPhoto, putPhoto } from '../lib/photo-store';
 import { useI18n } from '../lib/locale';
 import type { TranslationKey } from '../lib/locale';
 
 /* ------------------------------------------------------------------ *
- * Data model (localStorage `splitSettleGroups`, legacy-ish shape)
+ * Data model — localStorage `splitSettleGroups` (lib/settle-storage.ts)
  * ------------------------------------------------------------------ */
-
-const STORAGE_KEY = 'splitSettleGroups';
-
-interface SettleExpense {
-  id: string;
-  description: string;
-  amount: number;
-  currency: CurrencyCode;
-  paidBy: string;
-  splitBetween: string[];
-  /** ISO datetime. */
-  date: string;
-  /** Photo blob lives in IndexedDB under this expense's id. */
-  hasPhoto: boolean;
-  isSettlement: boolean;
-}
-
-interface SettleGroup {
-  id: string;
-  name: string;
-  emoji: string;
-  members: string[];
-  expenses: SettleExpense[];
-  settlements: [];
-  createdAt: string;
-}
 
 /**
  * The group's dominant expense currency. Settlement records are denominated
@@ -86,36 +70,6 @@ const EXPENSE_CURRENCIES: readonly CurrencyCode[] = [
 
 /** Legacy emoji picker options. */
 const EMOJIS = ['✈️', '🏠', '👨‍👩‍👧‍👦', '🍕', '🎉', '💼', '🏖️', '🎓'] as const;
-
-function readGroups(): SettleGroup[] {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((g): g is SettleGroup => {
-      if (!(g instanceof Object)) return false;
-      const group = g as Partial<SettleGroup>;
-      return (
-        typeof group.id === 'string' &&
-        typeof group.name === 'string' &&
-        typeof group.emoji === 'string' &&
-        Array.isArray(group.members) &&
-        Array.isArray(group.expenses)
-      );
-    });
-  } catch {
-    return [];
-  }
-}
-
-function persist(groups: SettleGroup[]): void {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
-  } catch (err) {
-    console.warn('[settle] cannot persist groups:', err);
-  }
-}
 
 /* ------------------------------------------------------------------ *
  * Photo thumbnail (blob → objectURL, from IndexedDB)
@@ -237,12 +191,22 @@ export function Settle() {
   // in that window destroyed every saved group; StrictMode doubled the
   // exposure in dev).
   useEffect(() => {
-    setGroups(readGroups());
+    setGroups(readSettleGroups());
     setHydrated(true);
+    // Cross-tab (BACKLOG #38, History semantics): another tab writing the
+    // settle key (or clearing storage) re-hydrates this tab. The equality
+    // guard returns `prev` for value-identical writes — no re-render, so
+    // the persist effect below never echoes a no-op write back.
+    return subscribeSettleGroups(() => {
+      setGroups((prev) => {
+        const next = readSettleGroups();
+        return JSON.stringify(prev) === JSON.stringify(next) ? prev : next;
+      });
+    });
   }, []);
   useEffect(() => {
     if (!hydrated) return; // never persist pre-hydration state
-    persist(groups);
+    persistSettleGroups(groups);
   }, [groups, hydrated]);
 
   useEffect(() => {

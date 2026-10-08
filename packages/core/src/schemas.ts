@@ -316,55 +316,76 @@ export const CACHE_HARD_TTL_SEC = 7 * 24 * 3600;
 
 /** Stable slugs of every v1 Insights indicator (P1 + P2; blocked/licensed items excluded). */
 export const IndicatorIdSchema = z.enum([
-  // Global — Rates and credit
+  // Global — Is borrowing getting costlier?
   'yield-curve-10y2y',
-  'stress-stlfsi',
   'real-yield-10y',
   'us10y',
-  'breakeven-5y5y',
+  'fed-target',
+  'ecb-dfr',
   'govt-interest-revenue',
-  // Global — Currencies
-  'dollar-broad',
+  // Global — Are prices heating up?
+  'us-cpi-yoy',
+  'breakeven-5y5y',
+  // Global — Are markets nervous?
+  'stress-stlfsi',
+  'nfci',
+  'gold-silver',
+  // Global — Is the dollar strong?
+  'dollar-basket',
   'usdjpy',
-  // Global — Metals, crypto and hard assets
+  'eur-usd',
+  // Global — Is growth healthy?
+  'china-pmi',
+  'm2-us',
+  'copper-gold',
+  'usdcny',
+  // Global — Prices board (price rows + context ratios; never a gauge member)
+  'brent',
   'gold-usd',
   'silver-usd',
-  'gold-silver',
+  'copper-usd',
+  'btc-usd',
   'gold-btc',
   'silver-btc',
-  'copper-gold',
-  'brent',
-  // Global — Stocks, growth and liquidity
-  'm2-us',
-  'china-pmi',
-  'usdcny',
-  // Australia — Interest and inflation
-  'rba-cash-rate',
+  // Australia — Are inflation and rates a problem?
   'au-cpi',
   'au-trimmed-mean',
-  // Australia — Currency and trade
-  'audusd',
-  'audjpy',
   'au-us-10y-gap',
-  'gold-aud',
-  'iron-ore',
-  'terms-of-trade',
-  // Australia — Jobs and housing
+  'rba-cash-rate',
+  'au-petrol-yoy',
+  // Australia — Are households under pressure?
+  'au-home-loan',
+  'au-wage-growth',
+  'au-rent-yoy',
   'au-unemployment',
   'au-home-values',
   'au-household-debt-arrears',
+  // Australia — How is trade and the currency?
+  'audusd',
+  'audjpy',
+  'terms-of-trade',
+  'iron-ore',
+  'gold-aud',
 ]);
 export type IndicatorId = z.infer<typeof IndicatorIdSchema>;
 
-/** Card groups (UI section grouping, 01-indicator-spec.md section 1–2). */
+/**
+ * Card groups (UI section grouping). The I15 question-group restructure
+ * (2026-10-08 owner spec): readers ask questions, not asset classes. Each
+ * lane group maps 1:1 onto a gauge except `prices-board`, which holds the
+ * price rows and context ratios rendered by the Prices section (never in
+ * a lane, never a gauge member).
+ */
 export const IndicatorGroupIdSchema = z.enum([
-  'rates-credit',
-  'currencies',
-  'metals-crypto',
-  'stocks-growth',
-  'interest-inflation',
-  'currency-trade',
-  'jobs-housing',
+  'borrowing-costs',
+  'prices-heat',
+  'market-stress',
+  'dollar-strength',
+  'growth-health',
+  'prices-board',
+  'au-inflation-rates',
+  'au-households',
+  'au-trade-currency',
 ]);
 export type IndicatorGroupId = z.infer<typeof IndicatorGroupIdSchema>;
 
@@ -399,13 +420,18 @@ export const IndicatorSourceSchema = z.enum([
   'world-bank',
   'manual',
   'derived',
+  'ecb',
 ]);
 export type IndicatorSource = z.infer<typeof IndicatorSourceSchema>;
 
 /**
- * Warning rules — the seven rule types of 01-indicator-spec.md section 5
- * (one non-composite atom kind each), plus a flat OR-composite. Direction
+ * Warning rules — the rule types of 01-indicator-spec.md section 5 (one
+ * non-composite atom kind each), plus a flat OR-composite. Direction
  * (which tail is "bad") is part of each rule, never inferred.
+ * I15 additions (2026-10-08 data spec §4): `below-aux` compares the value
+ * with a second series supplied by the runner (wage growth vs yearly
+ * inflation). `staleAfterDays` on the definition (below) carries the
+ * per-series freshness limits of data-spec §3.
  */
 export const WarningRuleAtomSchema = z.discriminatedUnion('kind', [
   /** No vote — info-only card (shows data, never votes). */
@@ -437,6 +463,13 @@ export const WarningRuleAtomSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('consecutive-decline'), periods: z.number().int().positive() }),
   /** Rise of at least `rise` points from the lowest value of the last 12 months. */
   z.object({ kind: z.literal('above-low'), rise: z.number().positive().finite() }),
+  /**
+   * I15: value below the paired aux series at (or before) the same
+   * observation date — e.g. wage growth below yearly inflation ("pay is
+   * not keeping up with prices"). The runner supplies the aux series;
+   * without it the rule is honestly unevaluable, never guessed.
+   */
+  z.object({ kind: z.literal('below-aux') }),
 ]);
 export type WarningRuleAtom = z.infer<typeof WarningRuleAtomSchema>;
 
@@ -467,6 +500,13 @@ export const IndicatorDefinitionSchema = z.object({
   changeKind: z.enum(['pct', 'points']),
   phase: IndicatorPhaseSchema,
   rule: WarningRuleSchema,
+  /**
+   * I15 per-series freshness limit (days) — the 2026-10-08 data spec §3
+   * "stale after" column. Overrides the cadence-based grace so that
+   * weekly-batched dailies (Brent/EIA, 12 days) and monthly ABS CPI items
+   * (70 days) stop tripping false staleness. Absent → GRACE_DAYS.
+   */
+  staleAfterDays: z.number().int().positive().optional(),
 });
 export type IndicatorDefinition = z.infer<typeof IndicatorDefinitionSchema>;
 
@@ -503,6 +543,13 @@ export const IndicatorReadingSchema = z
     change30d: z.number().finite().optional(),
     /** Share of the last 10 years' readings strictly below the current one (0–1); absent when the base is too short. */
     percentile10y: z.number().min(0).max(1).optional(),
+    /**
+     * I15 big-mover score (2026-10-08 data spec §4): (latest change − mean)
+     * ÷ std of the same change over the 10-year window — the 30-day change
+     * for daily series, the previous-period change for slower ones. Absent
+     * when the change history is too short to standardise.
+     */
+    moveScore: z.number().finite().optional(),
     status: IndicatorReadingStatusSchema,
     sourceName: z.string().min(1),
     sourceUrl: z.url().optional(),

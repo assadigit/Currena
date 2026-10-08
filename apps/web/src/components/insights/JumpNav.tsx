@@ -1,17 +1,12 @@
 /**
- * JumpNav — the sideways-scrolling row of jump links to the page sections
- * (02-page-design-spec.md §4: "it scrolls sideways on mobile and must
- * mirror correctly in Farsi"). Buttons + scrollIntoView, not <a href="#…">:
- * the app is a HASH router, so in-page anchors would fight the route.
- * Reduced motion gets instant jumps.
- *
- * I6 audit F6: the pills now carry an active-section state — a passive
- * scroll listener (rAF-throttled) marks the section whose top edge passed
- * the scan line, so the row answers "where am I?" while reading. Buttons
- * also meet the 44px touch-target minimum (they were 30px).
+ * JumpNav — Block P1: the pill row is now STICKY below the site navigation,
+ * renamed to the owner's five sections (Status, Prices, Indicators, About —
+ * "Together" waits for v2), and highlights the section in view (scroll
+ * spy). Horizontal scroll on phones stays (I4), safe-area aware, and the
+ * active pill mirrors.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 
 export interface JumpTarget {
@@ -19,75 +14,76 @@ export interface JumpTarget {
   label: string;
 }
 
-/** Pixels below the viewport top that count as "reached" (sticky header + context). */
-const SCAN_LINE_OFFSET = 140;
-
-export function JumpNav({ targets, copy }: { targets: readonly JumpTarget[]; copy: InsightsCopy }) {
-  const [activeId, setActiveId] = useState<string | null>(null);
-
+/** Scroll-spy: which target's section currently holds the viewport top? */
+function useActiveTarget(targets: readonly JumpTarget[]): string | null {
+  const [active, setActive] = useState<string | null>(null);
+  const raf = useRef(0);
   useEffect(() => {
-    let raf = 0;
     const measure = () => {
-      raf = 0;
-      const line = window.scrollY + SCAN_LINE_OFFSET;
+      raf.current = 0;
+      // The sticky bar occupies the first ~110px below the site header —
+      // the section under that line is the one being read.
+      const probe = window.scrollY + 140;
       let current: string | null = null;
-      for (const target of targets) {
-        const el = document.getElementById(target.id);
-        if (el && el.getBoundingClientRect().top + window.scrollY <= line) current = target.id;
+      for (const t of targets) {
+        const el = document.getElementById(t.id);
+        if (!el) continue;
+        if (el.offsetTop <= probe) current = t.id;
       }
-      // Parked at the very bottom → the last section (About) is the truth
-      // even if its header never crosses the scan line.
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
-        current = targets.length > 0 ? targets[targets.length - 1]!.id : current;
-      }
-      setActiveId(current);
+      setActive(current);
     };
     const onScroll = () => {
-      if (raf === 0) raf = requestAnimationFrame(measure);
+      if (raf.current === 0) raf.current = requestAnimationFrame(measure);
     };
     measure();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
     return () => {
-      if (raf !== 0) cancelAnimationFrame(raf);
+      if (raf.current !== 0) cancelAnimationFrame(raf.current);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
   }, [targets]);
+  return active;
+}
 
-  const jump = useCallback((id: string) => {
+export function JumpNav({ targets, copy }: { targets: readonly JumpTarget[]; copy: InsightsCopy }) {
+  const active = useActiveTarget(targets);
+  if (targets.length === 0) return null;
+  const jump = (id: string): void => {
     const el = document.getElementById(id);
     if (!el) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
-    // Focus the section so keyboard users land somewhere meaningful.
     el.setAttribute('tabindex', '-1');
     el.focus({ preventScroll: true });
-  }, []);
-
+  };
   return (
-    <nav aria-label={copy.ui.jumpTo.replace(/:$/, '')} className="-mx-1 px-1">
-      <ul className="m-0 flex list-none gap-2 overflow-x-auto p-1 [scrollbar-width:thin]">
-        {targets.map((target) => {
-          const active = target.id === activeId;
+    <nav aria-label={copy.ui.navLabel} className="insights-sticky-nav -mx-4 mt-4 px-4 lg:-mx-8 lg:px-8">
+      <span
+        role="list"
+        className="no-print flex list-none items-center gap-1.5 overflow-x-auto py-2"
+        style={{ scrollbarWidth: 'thin' }}
+      >
+        {targets.map((t) => {
+          const isActive = t.id === active;
           return (
-            <li key={target.id} className="shrink-0">
-              <button
-                type="button"
-                onClick={() => jump(target.id)}
-                aria-current={active ? 'true' : undefined}
-                className={`inline-flex min-h-[44px] cursor-pointer items-center whitespace-nowrap rounded-full border px-4 text-xs font-semibold transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
-                  active
-                    ? 'border-currena-blue/40 bg-currena-blue/15 text-currena-blue-deep'
-                    : 'border-black/10 bg-white text-currena-dark hover:border-currena-blue/40 hover:bg-currena-blue/10 dark:border-white/15 dark:bg-[#1A222E] dark:text-currena-dark'
-                }`}
-              >
-                {target.label}
-              </button>
-            </li>
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => jump(t.id)}
+              aria-current={isActive ? 'true' : undefined}
+              className={`insights-focusable inline-flex min-h-[36px] shrink-0 cursor-pointer items-center rounded-full px-3.5 text-[var(--type-caption)] font-bold transition-colors duration-200 ${
+                isActive
+                  ? 'bg-currena-blue text-white shadow-sm ring-1 ring-currena-blue/40'
+                  : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] hover:text-[var(--color-status-context)]'
+              }`}
+            >
+              {t.label}
+            </button>
           );
         })}
-      </ul>
+      </span>
     </nav>
   );
 }

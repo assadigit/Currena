@@ -18,11 +18,9 @@ import type {
   ChangedEvent,
   IndicatorDefinition,
   IndicatorReading,
-  SummaryLine,
   WarningRuleAtom,
 } from '@currena/core';
 import { IndicatorDefinitionSchema } from '@currena/core';
-import { DEFINITIONS } from './definitions';
 import {
   addDays,
   daysBetween,
@@ -43,6 +41,10 @@ import {
  * quarterly series observed at quarter-start can legitimately be ~6 months
  * old between releases (obs lag + release lag + one full period of margin).
  * `per-change` (cash rate) is a level and never goes stale by age.
+ *
+ * I15 (2026-10-08 data spec §3): a definition's `staleAfterDays` OVERRIDES
+ * its cadence grace — the per-series freshness limits (Brent 12, NFCI 14,
+ * ECB DFR 7, Fed target 5, ABS CPI items 70, WPI 130 …). See definitions.ts.
  */
 export const GRACE_DAYS: Readonly<Record<IndicatorDefinition['cadence'], number | null>> = {
   daily: 3,
@@ -52,6 +54,11 @@ export const GRACE_DAYS: Readonly<Record<IndicatorDefinition['cadence'], number 
   'per-change': null,
   manual: 45,
 };
+
+/** The effective stale threshold for one definition (override → cadence). */
+export function staleAfterDaysFor(def: IndicatorDefinition): number | null {
+  return def.staleAfterDays ?? GRACE_DAYS[def.cadence];
+}
 
 /** Percentile window: the "last 10 years" of readings (3650 days ≈ 10y + 2 leap days). */
 export const PERCENTILE_WINDOW_DAYS = 3650;
@@ -111,7 +118,12 @@ function percentileBase(series: readonly SeriesPoint[], asOf: string): SeriesPoi
   return sliceBetween(series, from, current.date).filter((p) => p.date !== current.date);
 }
 
-function evaluateAtom(rule: WarningRuleAtom, series: readonly SeriesPoint[], asOf: string): RuleVerdict {
+function evaluateAtom(
+  rule: WarningRuleAtom,
+  series: readonly SeriesPoint[],
+  asOf: string,
+  aux?: AuxSeries,
+): RuleVerdict {
   switch (rule.kind) {
     case 'info':
       return { status: 'normal' };
@@ -211,6 +223,23 @@ function evaluateAtom(rule: WarningRuleAtom, series: readonly SeriesPoint[], asO
       for (const p of window) if (p.value < low) low = p.value;
       return current.value - low >= rule.rise ? { status: 'warning' } : { status: 'normal' };
     }
+
+    case 'below-aux': {
+      const current = pointAtOrBefore(series, asOf);
+      if (!current) return { status: 'unevaluable', reason: 'no observation at or before asOf' };
+      if (!aux || aux.series.length === 0) {
+        return { status: 'unevaluable', reason: 'no aux series supplied for the comparison' };
+      }
+      const other = pointAtOrBefore(aux.series, current.date);
+      if (!other) {
+        return { status: 'unevaluable', reason: 'aux series has no observation at or before the reading date' };
+      }
+      // Warning iff the value sits strictly below the paired series — ties
+      // count as keeping up (same strictness convention as thresholds).
+      return current.value < other.value
+        ? { status: 'warning' }
+        : { status: 'normal' };
+    }
   }
 }
 
@@ -219,27 +248,101 @@ export function evaluateRule(
   def: IndicatorDefinition,
   series: readonly SeriesPoint[],
   asOf: string,
+  aux?: AuxSeries,
 ): RuleVerdict {
   const rule = def.rule;
   if (rule.kind === 'any-of') {
     let sawNormal = false;
     for (const atom of rule.of) {
-      const v = evaluateAtom(atom, series, asOf);
+      const v = evaluateAtom(atom, series, asOf, aux);
       if (v.status === 'warning') return { status: 'warning' };
       if (v.status === 'normal') sawNormal = true;
     }
     return sawNormal ? { status: 'normal' } : { status: 'unevaluable', reason: 'no composite arm could be evaluated' };
   }
-  return evaluateAtom(rule, series, asOf);
+  return evaluateAtom(rule, series, asOf, aux);
 }
 
 /* ------------------------------------------------------------------ *
  * Reading computation
  * ------------------------------------------------------------------ */
 
+/**
+ * The move-score change basis (2026-10-08 data spec §4): the 30-day change
+ * for daily series, the previous-period change for slower cadences. In the
+ * definition's changeKind units — the z-score normalises them anyway.
+ */
+function moveBasisChange(
+  series: readonly SeriesPoint[],
+  current: SeriesPoint,
+  def: IndicatorDefinition,
+): number | undefined {
+  if (def.cadence === 'daily') {
+    // Same calendar-window semantics as windowChange(30d), point-based.
+    const target = addDays(current.date, -30);
+    const then = pointAtOrBefore(series, target);
+    if (!then || then.date === current.date) return undefined;
+    if (def.changeKind === 'points') return current.value - then.value;
+    if (then.value <= 0) return undefined;
+    return ((current.value - then.value) / then.value) * 100;
+  }
+  // Previous period: the last observation strictly before the current one.
+  const idx = series.findIndex((p) => p.date === current.date);
+  if (idx <= 0) return undefined;
+  const then = series[idx - 1]!;
+  if (def.changeKind === 'points') return current.value - then.value;
+  if (then.value <= 0) return undefined;
+  return ((current.value - then.value) / then.value) * 100;
+}
+
+/** Minimum change observations before a move score exists (degenerate base guard). */
+export const MIN_MOVE_OBS = 30;
+
+/**
+ * The big-mover z-score (data spec §4): (latest change − mean) ÷ std of the
+ * same change series over the 10-year percentile window. Undefined when the
+ * base is too short or the std is zero (a perfectly flat change series).
+ * Pure — the runner and any backtest can freeze the clock via the series.
+ */
+export function moveScoreOf(
+  def: IndicatorDefinition,
+  series: readonly SeriesPoint[],
+  current: SeriesPoint,
+): number | undefined {
+  const windowStart = addDays(current.date, -PERCENTILE_WINDOW_DAYS);
+  const window = sliceBetween(series, windowStart, current.date);
+  const changes: number[] = [];
+  for (let i = 1; i < window.length; i++) {
+    const a = window[i - 1]!;
+    const b = window[i]!;
+    if (def.changeKind === 'points') changes.push(b.value - a.value);
+    else if (a.value > 0) changes.push(((b.value - a.value) / a.value) * 100);
+  }
+  // Guard: enough history AND the CURRENT change must be measurable.
+  if (changes.length < MIN_MOVE_OBS) return undefined;
+  const latest = moveBasisChange(series, current, def);
+  if (latest === undefined || !Number.isFinite(latest)) return undefined;
+  const mean = changes.reduce((s, v) => s + v, 0) / changes.length;
+  const variance = changes.reduce((s, v) => s + (v - mean) ** 2, 0) / changes.length;
+  const std = Math.sqrt(variance);
+  if (!Number.isFinite(std) || std < 1e-12) return undefined;
+  const z = (latest - mean) / std;
+  return Number.isFinite(z) ? z : undefined;
+}
+
 export interface ReadingSource {
   name: string;
   url?: string;
+}
+
+/**
+ * I15: the paired comparison series for a `below-aux` rule (e.g. wage
+ * growth vs yearly CPI). Supplied by the runner from the SAME run's series
+ * map — see adapters/snapshot.ts for the wiring.
+ */
+export interface AuxSeries {
+  /** The other series to compare against, sampled at or before the reading's date. */
+  series: readonly SeriesPoint[];
 }
 
 /** 7/30-day change in the definition's units; undefined when not measurable. */
@@ -263,15 +366,17 @@ function windowChange(
 
 /**
  * Compute one indicator's reading as of `now` (ISO datetime from the runner —
- * frozen-clock friendly). Order of checks: no data → `unavailable`; too old →
- * `stale` (a stale vote never counts); info rule → `context`; otherwise the
- * rule votes, and an unevaluable rule is an honest `no-history`.
+ * frozen-clock friendly). Order of checks: no data → `unavailable`; too old
+ * (per-series freshness limit when present, else cadence grace) → `stale` (a
+ * stale vote never counts); info rule → `context`; otherwise the rule votes,
+ * and an unevaluable rule is an honest `no-history`.
  */
 export function computeReading(
   def: IndicatorDefinition,
   series: readonly SeriesPoint[],
   now: string,
   source: ReadingSource,
+  aux?: AuxSeries,
 ): IndicatorReading {
   const parsed = IndicatorDefinitionSchema.parse(def); // loud, never garbage
   const nowDay = now.slice(0, 10);
@@ -302,11 +407,11 @@ export function computeReading(
     reading.percentile10y = percentileOf(pBase.map((p) => p.value), current.value);
   }
 
-  const grace = GRACE_DAYS[parsed.cadence];
+  const grace = staleAfterDaysFor(parsed);
   const age = daysBetween(current.date, nowDay);
   if (grace !== null && age > grace) {
     reading.status = 'stale';
-    return reading;
+    return reading; // stale items never carry a move score (data spec §4)
   }
 
   if (parsed.rule.kind === 'info') {
@@ -314,69 +419,15 @@ export function computeReading(
     return reading;
   }
 
-  const verdict = evaluateRule(parsed, series, nowDay);
+  const verdict = evaluateRule(parsed, series, nowDay, aux);
   if (verdict.status === 'unevaluable') {
     reading.status = 'no-history';
     return reading;
   }
   reading.status = verdict.status;
+  const move = moveScoreOf(parsed, series, current);
+  if (move !== undefined) reading.moveScore = move;
   return reading;
-}
-
-/* ------------------------------------------------------------------ *
- * Summary line
- * ------------------------------------------------------------------ */
-
-export type SummaryLabel = NonNullable<SummaryLine['label']>;
-
-/** Label from a 0–1 score; null when nothing voted (never an invented label). */
-export function labelForScore(score: number): SummaryLabel | null {
-  if (score < 0.2) return 'relaxed';
-  if (score < 0.4) return 'cautious';
-  if (score < 0.6) return 'stressed';
-  return 'alarmed';
-}
-
-function summarizeSection(
-  readings: readonly IndicatorReading[],
-  section: 'global' | 'australia',
-  sectionOfId: ReadonlyMap<string, IndicatorDefinition['section']>,
-): SummaryLine {
-  let warningCount = 0;
-  let votingCount = 0;
-  let excludedCount = 0;
-  for (const r of readings) {
-    if (sectionOfId.get(r.id) !== section) continue; // readings carry ids only; the definitions table owns sections
-    if (r.status === 'warning' || r.status === 'normal') {
-      votingCount++;
-      if (r.status === 'warning') warningCount++;
-    } else if (r.status === 'stale' || r.status === 'no-history' || r.status === 'unavailable') {
-      excludedCount++; // context cards are info-only by design, not "excluded"
-    }
-  }
-  const score = votingCount === 0 ? null : warningCount / votingCount;
-  return {
-    section,
-    label: score === null ? null : labelForScore(score),
-    warningCount,
-    votingCount,
-    excludedCount,
-  };
-}
-
-/** Both summary lines from one run's readings (sections come from the definitions table). */
-export function summarize(
-  readings: readonly IndicatorReading[],
-  definitions: readonly IndicatorDefinition[] = DEFINITIONS,
-): {
-  global: SummaryLine;
-  australia: SummaryLine;
-} {
-  const sectionOfId = new Map(definitions.map((d) => [d.id as string, d.section]));
-  return {
-    global: summarizeSection(readings, 'global', sectionOfId),
-    australia: summarizeSection(readings, 'australia', sectionOfId),
-  };
 }
 
 /* ------------------------------------------------------------------ *

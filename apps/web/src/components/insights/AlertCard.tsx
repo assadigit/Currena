@@ -1,0 +1,175 @@
+/**
+ * AlertCard — Block F1: the anatomy of an indicator card in the "alert"
+ * state. "Show these parts, in this order: status chip, plain name, small
+ * technical tag, value with unit, 7-day and 30-day change, position word
+ * with a labeled range bar, consequence line, small sparkline, source and
+ * date. Add an accent border on the inline-start edge. Add a light tint to
+ * the surface." The long technical description lives in the details panel
+ * (F5) — the card face carries the news, fast.
+ *
+ * The sparkline loads lazily (IntersectionObserver + the module-cached
+ * history fetch — the same cache the details panel shares).
+ */
+
+import { useEffect, useRef, useState } from 'react';
+import type { IndicatorId, IndicatorReading } from '@currena/core';
+import { interpolate } from '../../i18n';
+import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { fetchIndicatorHistory } from '../../lib/insights';
+import { Sparkline } from '../Sparkline';
+import {
+  consequenceLine,
+  definitionFor,
+  formatChange,
+  formatIndicatorValue,
+  warningZone,
+} from './config';
+import { PositionBar } from './PositionBar';
+import { StatusChip } from './StatusChip';
+import { formatAsOf } from './HistoryChart';
+
+/** Lazy mini-sparkline: fetches on (near-)visibility, caches module-wide. */
+function LazySparkline({ id }: { id: IndicatorId }) {
+  const ref = useRef<HTMLSpanElement | null>(null);
+  const [points, setPoints] = useState<number[] | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    const el = ref.current;
+    if (!el || points !== null) return;
+    if (typeof IntersectionObserver === 'undefined') return; // old WebView — no sparkline, no crash
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        void fetchIndicatorHistory(id)
+          .then((history) => {
+            if (cancelled || !history) return;
+            const values = history.points.map((p) => p[1]!);
+            setPoints(values.length >= 2 ? values : null);
+          })
+          .catch(() => {
+            /* no sparkline on fetch failure — the row stays honest */
+          });
+      },
+      { rootMargin: '120px' },
+    );
+    io.observe(el);
+    return () => {
+      cancelled = true;
+      io.disconnect();
+    };
+  }, [id, points]);
+  return (
+    <span ref={ref} className="block h-7" aria-hidden="true">
+      {points ? <Sparkline points={points} width={240} height={28} ariaLabel="" /> : null}
+    </span>
+  );
+}
+
+export function AlertCard({
+  reading,
+  copy,
+  numberLocale,
+  onOpenDetails,
+  pinned,
+}: {
+  reading: IndicatorReading;
+  copy: InsightsCopy;
+  numberLocale: 'en-US' | 'fa-IR';
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+  /** I10: the pin badge stays visible on the card face. */
+  pinned: boolean;
+}) {
+  const def = definitionFor(reading.id);
+  const entry = copy.indicators[reading.id];
+  const isUnavailable = reading.status === 'unavailable';
+  const valueText =
+    reading.value !== null ? formatIndicatorValue(reading.id, reading.value, numberLocale, copy.units) : null;
+
+  return (
+    <article
+      id={`insights-card-${reading.id}`}
+      data-status={reading.status}
+      className={`alert-card scroll-mt-24 rounded-[var(--radius-lg)] p-4 shadow-[0_4px_18px_rgba(0,0,0,0.05)] ring-1 ring-[var(--color-border)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] motion-safe:transition-[box-shadow,transform] motion-safe:duration-200 md:motion-safe:hover:-translate-y-0.5 ${pinned ? 'ring-currena-blue/30' : ''}`}
+    >
+      <button
+        type="button"
+        onClick={(e) => onOpenDetails(reading.id, e.currentTarget)}
+        className="insights-focusable block w-full cursor-pointer border-0 bg-transparent p-0 text-start"
+        aria-haspopup="dialog"
+      >
+        <span className="flex items-start justify-between gap-2">
+          <span className="min-w-0">
+            <span className="block text-[var(--type-label)] font-bold leading-snug text-[var(--color-text-primary)]">
+              {entry.name}
+              {entry.ticker ? (
+                <span dir="ltr" className="ms-1.5 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+                  {entry.ticker}
+                </span>
+              ) : null}
+            </span>
+          </span>
+          <span className="flex shrink-0 items-center gap-1">
+            {pinned ? <span aria-hidden="true" className="text-sm text-[var(--color-status-context)]">★</span> : null}
+            <StatusChip status={reading.status} copy={copy} />
+          </span>
+        </span>
+
+        {isUnavailable ? (
+          <span className="mt-2 block text-[var(--type-label)] text-[var(--color-text-secondary)]">
+            {copy.ui.unavailableCard}
+          </span>
+        ) : (
+          <>
+            <span className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              {valueText !== null ? (
+                <bdi dir="ltr" className="type-number text-[var(--color-text-primary)]">
+                  {valueText}
+                </bdi>
+              ) : null}
+              {reading.change7d !== undefined ? (
+                <bdi dir="ltr" className="text-[var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
+                  {formatChange(reading.change7d, def.changeKind, numberLocale, copy.units)}
+                  <span className="ms-1 opacity-80">{copy.ui.days7}</span>
+                </bdi>
+              ) : null}
+              {reading.change30d !== undefined ? (
+                <bdi dir="ltr" className="text-[var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
+                  {formatChange(reading.change30d, def.changeKind, numberLocale, copy.units)}
+                  <span className="ms-1 opacity-80">{copy.ui.days30}</span>
+                </bdi>
+              ) : null}
+            </span>
+
+            {/* F1: consequence line — state-keyed, hedged, life-first. */}
+            <span className="mt-2 block text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+              {consequenceLine(reading, entry, false)}
+            </span>
+
+            {reading.percentile10y !== undefined ? (
+              <PositionBar
+                percentile={reading.percentile10y}
+                zone={warningZone(def.rule)}
+                copy={copy}
+                numberLocale={numberLocale}
+              />
+            ) : null}
+
+            <span className="mt-2 block">
+              <LazySparkline id={reading.id} />
+            </span>
+          </>
+        )}
+
+        <span className="mt-2 flex items-baseline justify-between gap-2 text-[var(--type-caption)] text-[var(--color-text-secondary)]">
+          <span>
+            {reading.asOf ? interpolate(copy.ui.updatedOn, { date: formatAsOf(reading.asOf, 'en') }) : '—'}
+            <span className="mx-1.5 opacity-50">·</span>
+            {reading.sourceName}
+          </span>
+          <span className="font-semibold text-[var(--color-status-context)]">{copy.ui.detailsButton} ›</span>
+        </span>
+      </button>
+    </article>
+  );
+}

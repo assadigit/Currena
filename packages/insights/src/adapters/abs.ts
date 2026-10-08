@@ -23,6 +23,13 @@ export const ABS_DATA_BASE = 'https://data.api.abs.gov.au/rest/data';
  *  - LF unemployment rate, persons, SA, Australia, monthly
  *  - RES_DWELL_ST mean price of residential dwellings, Australia, quarterly
  *  - ANA_AGG terms of trade index, seasonally adjusted, quarterly
+ *  - I15: CPI Rents index, original, Australia, MONTHLY (verified against
+ *    the published "rose 3.6% in the 12 months to August 2026" figure)
+ *  - I15: CPI Automotive fuel index, original, Australia, MONTHLY (exact
+ *    +13.5% match; COVID -22.5% / 2022 +35.1% signature identification)
+ *  - I15: WPI total hourly rates of pay excluding bonuses, all sectors,
+ *    all industries, original, quarterly (OHRPEB = Ordinary Hourly Rates
+ *    of Pay, Excluding Bonuses)
  */
 export const ABS_SERIES = {
   cpiIndex: 'CPI/1.10001.10.50.Q',
@@ -30,6 +37,9 @@ export const ABS_SERIES = {
   unemployment: 'LF/M13.3.1599.20.AUS.M',
   resDwellMeanPrice: 'RES_DWELL_ST/5.AUS.Q',
   termsOfTrade: 'ANA_AGG/M5.TTR.20.AUS.Q',
+  rentIndex: 'CPI/1.115522.10.50.M',
+  automotiveFuelIndex: 'CPI/1.40081.10.50.M',
+  wageIndex: 'WPI/1.OHRPEB.7.TOT.10.AUS.Q',
 } as const;
 
 /** URL of one ABS series' full-history CSV. */

@@ -28,6 +28,16 @@ blocks, stale cron going unnoticed (now visible on /admin; push notification sti
 | 49 | ✅ | UI | Print stylesheet — @media print in index.css: theme forced to the light palette, header chrome + nav buttons hidden (logo kept), cards/sections/figures break-inside: avoid, external links spell out their URL, SVG/LED colors kept exact; verified via PDF export + VLM | I6 audit F16 |
 | 50 | ✅ | UI | Per-indicator share links — query-tolerant hash router (`parseRouteAndQuery`, +7 tests), `?card=<id>` deep links open + scroll to the card once per mount, share pill copies the URL with inline feedback, jump targets get scroll-mt-24 | spec §10 |
 
+## Wave 8 — I15 the owner-spec wave (2026-10-08, second round)
+
+| # | Status | Tag | Item | Origin |
+|---|--------|-----|------|--------|
+| 52 | ✅ | RELIABILITY | Per-series freshness limits (`staleAfterDays`) — Brent's EIA weekly-batch false alarm fixed at the root (12d), NFCI 14, ECB 7, Fed 5, ABS items 95–215; spec release-date numbers adjusted to obs-date aging with documented reasons | 2026-10-08 data spec §3 + ST1 |
+| 53 | ✅ | BEST-PRACTICES | Currena dollar basket — dollar_basket.py's recipe ported to TS (weights/scaling/selftest), computed at ingest from the Frankfurter fetch; dollar-broad retired | 2026-10-08 data spec §3 |
+| 54 | ✅ | UI-A11Y | The I15 v1 UI blocks: hero verdict meters (LED retired), alert chips by name, big-mover callout, next-up strip, prices board, lane switch, alert cards + compact rows, details side-panel/bottom sheet with focus discipline, sticky scroll-spy nav, SVG status icons, position-word bars, design tokens + type roles + 7:1 secondary ink, FRED notice + attributions, one disclaimer | 2026-10-08 UI spec Parts 0–7 (v1) |
+| 55 | ✅ | BEST-PRACTICES | Question gauges + 11 new indicators (fed-target, ecb-dfr, us-cpi-yoy, nfci, dollar-basket, eur-usd, au-home-loan, au-wage-growth, au-rent-yoy, au-petrol-yoy, btc-usd, copper-usd) + below-aux rule + moveScore + bilingual consequence-line corpus | 2026-10-08 data spec §3/§4/§6 |
+| 56 | ⏸ | COMPLIANCE | v2/v2-gated blocks NOT built: T1 connection cards, S1–S3 signals cards (need the owner's wording review + a legal reading of the FRED "professional services" clause before any signals section) | 2026-10-08 UI spec Part 6 (explicitly "wait") |
+
 ## Wave 7 — I14 rate-alerts (2026-10-08, post-sandbox-reset round)
 
 | # | Status | Tag | Item | Origin |
@@ -93,7 +103,7 @@ blocks, stale cron going unnoticed (now visible on /admin; push notification sti
 | 26 | ✅ | BEST-PRACTICES | CSV: total = sum of rounded rows (display consistency) + formula-injection guard (`'` prefix on `=+-@` notes) | SWOT W18 |
 | 27 | ✅ | BEST-PRACTICES | i18n: replace ~15 hardcoded English strings + `toFixed(2)` with dictionary keys + `formatNumber` in Receipt/Batch export paths | SWOT W16 |
 | 28 | ✅ | BEST-PRACTICES | Dead code: remove `readHistory`, `priceScanner` dict block, pointless `useMemo`; sync `SCRAPER_VERSION` | SWOT W21 |
-| 29 | 🔄 | DX | First web tests: `history.ts`, `rate-history.ts`, `recent-pairs.ts`, `router.ts`, `display.ts`, meta-schema parity test | SWOT W9/W23 — `history.ts`/`router.ts` covered; **snapshot-store.ts covered by the I12 wave** (first store tests: boot/freshness/retry-ladder/degraded/ensureSnapshot, 8 tests); rate-history + recent-pairs + display + parity still open |
+| 29 | ✅ | DX | First web tests: `history.ts`, `rate-history.ts`, `recent-pairs.ts`, `router.ts`, `display.ts`, meta-schema parity test | SWOT W9/W23 — `history.ts`/`router.ts` covered; **snapshot-store.ts covered by the I12 wave** (first store tests: boot/freshness/retry-ladder/degraded/ensureSnapshot, 8 tests); closed out 2026-10-08: rate-history (17 — window append/dedupe-by-`at`/cap/quota survival/corrupt-file degradation, seriesForPair core math + unresolvable-pair skips, trendOf, hydrateServerHistory merge/one-shot/silent-failure with stubbed fetch), recent-pairs (9 — corrupt input, unknown-code drops, direction dedupe + move-to-front, cap, quota), display (6 — codeLabel IRR (Toman) rule + en/fa dictionary parity vs core CURRENCIES, no orphans either way); web tests 133→174 |
 | 30 | ✅ | BEST-PRACTICES | `splitEvenly` → core (+ tests) next to settle — done in the I13 wave (packages/core/src/split.ts: typed `SplitError`, input validation, exact-sum largest-remainder, +7 tests; Splitter imports from core) | SWOT O2 |
 | 31 | ✅ | BEST-PRACTICES | Settle: use group currency for settlement records (stop hardcoding `'IRR'`) | SWOT T8 |
 | 32 | ✅ | BEST-PRACTICES | `parseBatchLines` bounds (line/char caps) + calc parser: U+00A0/newline whitespace, unary plus, typed `RangeError` guard — done in the I13 wave (500-line/500-char caps → typed `BatchError` + localized toasts; NBSP/CR/LF whitespace; unary plus; `CalcError('too_deep')` at 128 nesting; +7 tests) | SWOT W24 |
@@ -102,5 +112,5 @@ blocks, stale cron going unnoticed (now visible on /admin; push notification sti
 | 35 | ⏸ | RELIABILITY | Cron pre-warmer: ship `scheduled` handler + **commented** `[triggers]` config — enable-on-deploy is an owner decision (upstream load tradeoff) | SWOT O4 |
 | 36 | ⏸ | RELIABILITY | TGJU Path-B relay (GitHub Actions → KV) — architectural, deferred with evidence | SWOT T2 |
 | 37 | ⏸ | BEST-PRACTICES | zod `.strict()` on all schemas — contract change affecting stored-KV compatibility; deferred | SWOT W8(core) |
-| 38 | ☐ | COULD | Settle multi-tab `storage` sync (History has it) | SWOT W12 |
+| 38 | ✅ | COULD | Settle multi-tab `storage` sync (History has it) | SWOT W12 — done 2026-10-08: Settle's persistence layer extracted to `lib/settle-storage.ts` (same `splitSettleGroups` shape) with `subscribeSettleGroups`; the route re-hydrates on foreign writes incl. `key === null` (clear), with an equality guard so a value-identical write-back never echoes; +9 tests (corrupt-input fail-soft, quota best-effort, storage-event suite) |
 | 39 | ✅ | COULD | `/api/health` enrich (version + KV reachability) | SWOT O8 |

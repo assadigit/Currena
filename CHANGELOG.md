@@ -5,6 +5,127 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-08] — I15 the owner-spec wave: question gauges, the prices board, and the details panel
+
+Eighth round — the uploaded 2026-10-08 owner specs (`01-insights-ui-ux-instructions.md`
++ `02-insights-data-api-spec.md` + `dollar_basket.py`) implemented end to end:
+the data/API spec's new indicators, the Currena dollar basket, per-series
+freshness limits and question gauges; the UI spec's v1 blocks (hero verdict
+meters, prices board, indicator lanes, compact rows + alert cards, the
+side-panel/bottom-sheet details, states, notices). The v2/v2-gated blocks
+(T1 connection cards, S1–S3 signals) deliberately NOT built — the spec says
+wait. Leftover backlog closed first: #38 Settle multi-tab storage sync +
+#29 web-test remainder (rate-history/recent-pairs/display/parity).
+Tests 634 → **708 green** (core 183 · scraper 67 · insights 165 · api 119 ·
+web 174).
+
+### Added
+
+- **New indicators (11)** — `fed-target` (FRED DFEDTARL/U midpoint, shown as
+  the 25bp corridor "3.50–3.75%"), `ecb-dfr` (ECB Data Portal DFR), `us-cpi-yoy`
+  (CPIAUCSL 12-month change), `nfci` (Chicago Fed NFCI), `dollar-basket`
+  (the Currena dollar basket — `dollar_basket.py`'s recipe ported to
+  `src/basket.ts`: DXY weights, 50.14348112 scaling, selftest transplanted),
+  `eur-usd`, `au-home-loan` (RBA F6 FLRHOOTA by Series ID — the stable
+  identifier; venue-verified 6.21%), `au-wage-growth` (ABS WPI + the new
+  **below-aux rule** comparing wage growth with CPI), `au-rent-yoy` +
+  `au-petrol-yoy` (ABS monthly CPI Rents/Automotive-fuel — series identified
+  by data signature + published-figure cross-checks), `btc-usd` +
+  `copper-usd` (gold-api BTC/HG live prices; HG converted to USD/mt to join
+  the World Bank history). **`dollar-broad` retired** (DTWEXBGS lags ~5d
+  upstream; the basket replaces it). TGJU retired from Insights (unverified
+  licence) — gold now from gold-api XAU like silver; the TGJU cross-check
+  row retired with it (Bitstamp remains the BTC check).
+- **Question gauges** (`src/gauges.ts`) — the spec §4 regime: each lane
+  group IS a gauge (share of members in alert → steps 1–4), a region's
+  verdict = rounded average of gauge steps escalated when any gauge sits at
+  step 4; `summarizeByGauges` writes the same wire shape the old flat-share
+  summary did, so /admin and the CSV export agree with the hero by
+  construction. 16 global + 13 Australian voting members, exactly the
+  spec's v1 lists.
+- **Per-series freshness limits** (`staleAfterDays` on definitions, data
+  spec §3) — Brent 12 (the EIA weekly-batch false alarm, fixed at the
+  root), NFCI 14, ECB 7, Fed 5, basket/EUR 4, metals/BTC/copper 2, F6 70.
+  Spec numbers that assumed RELEASE-date aging were adjusted to the
+  engine's OBS-date aging with documented reasons (us-cpi 75, ABS monthly
+  95, WPI 200, ABS quarter-start items 215 — the latent Oct-8→28 window
+  the 190d quarterly grace false-alarms in).
+- **moveScore (Block H3)** — the big-mover z-score at ingest ((latest
+  change − mean)/std over the 10y window; 30d basis for dailies, 1-period
+  for slower series; ≥30-change floor; stale items never carry it) + the
+  ONE hero callout replacing the "biggest 30-day changes" list.
+- **I15 UI blocks** — `HeroBlock`/`VerdictMeter` (H1: four-step segmented
+  meters + verdict word + plain sentence + "n of m in alert" + alert-chips
+  by name H2 + the Australia-first order with the swap setting),
+  `NextUpStrip` (H6: next-3 events + full calendar grouped by month with
+  merged duplicate titles + Gregorian hover), `PricesBoard` (PB1–3: six
+  price rows with units, position words, as-of dates, gold's USD+AUD line,
+  the Bitcoin context ratios), `LaneSwitch` (L1: remembered
+  Global|Australia, thumb-reachable sticky bar on phones), `AlertCard`
+  (F1: accent border + tint, sparkline) + `CompactRow` (F2), `DetailsPanel`
+  (F5: side sheet on wide screens, bottom sheet on phones, focus trap +
+  Escape + focus return + scroll lock + deep links), the sticky section
+  nav (P1: Status/Prices/Indicators/About with scroll-spy), SVG status
+  icons (G5), the position-word bar with end labels + alert-zone tick
+  (G9/F3), design tokens + four type roles + 7:1 secondary ink (G2/G3/G4),
+  the FRED® notice + attribution lines (N1), ONE disclaimer line (N2), and
+  `Data as of {date}` with the daily-snapshot tooltip (H4).
+- **Consequence lines (F4 + data spec §6)** — state-keyed
+  (`highRising/highEasing/typical/low/jumping`) plain-language lines with
+  hedged wording, stated positions, ≤15 words: 39 indicators × 2 languages
+  in the copy corpus; `consequenceLine()` picks by position band + 30-day
+  direction with oneLiner fallback.
+- **Backlog closes** — #38 Settle multi-tab `storage` sync
+  (lib/settle-storage.ts, the alerts-store pattern; +9 tests) and #29's
+  remainder (rate-history +17, recent-pairs +9, display/parity +6).
+
+### Changed
+
+- **Groups are questions now** (I15 restructure): borrowing-costs,
+  prices-heat, market-stress, dollar-strength, growth-health,
+  prices-board (not a gauge), au-inflation-rates, au-households,
+  au-trade-currency — replacing the asset-class groups; brent/gold/silver/
+  copper/btc/gold-btc/silver-btc live on the prices board (Brent keeps its
+  25%/13w rule for its own row but is not a gauge member), iron-ore stays
+  a trade-gauge member AND rides the prices board.
+- **Copy corpus rewrite** — plain names first (F6: "What the US government
+  pays to borrow for 10 years"), technical tags as small `ticker` labels
+  (G8, isolated dir="ltr"), the old five-section detail panel reordered
+  life-effects-first (F5), status word Warning→Alert (en) / هشدار (fa,
+  kept), and every ui string for the new sections — en source of truth,
+  fa native + shape-checked (1044 ZWNJ, Persian digits, no buy/sell
+  wording per acceptance test 6 — the disclaimer reworded to match).
+- **Ingest seeds accumulated daily history** for the live-priced rows
+  (gold/silver/btc/copper) from the stored KV histories so 7/30-day
+  changes are measurable (data spec §3 note); first runs degrade honestly
+  (no changes until history accrues).
+- **RBA parsing by Series ID** (parseRbaTableCsv seriesId option) — F6's
+  FLRHOOTA matched the way external parsers do it; the title-match path
+  stays for F1.1/F2/E2.
+
+### Fixed
+
+- **The Brent false-alarm** (production showed it stale at 2026-09-29 with
+  data 8 days old): the 12-day freshness limit replaces the 3-day daily
+  grace — EIA publishes daily Brent in weekly batches, "as of {date}" says
+  so on the row (PB3).
+- The ABSENT FRED notice (spec Block N1: "Check that the notice is present
+  today. The screenshot shows no such notice") — now prominent in
+  About-the-data with the terms link.
+- Chart tick labels raised to caption size (F5) and the SR data table with
+  them; the tooltip renders at the caption role too (G3: no visible text
+  below the caption).
+
+### Budget
+
+- **Insights lazy chunk 133.85/38.88 → 235.80/61.92, budget 134/39 →
+  240/64** — the bilingual corpus doubled (41 indicators × plain names +
+  detail fields + state-keyed consequence lines × 2 languages), the
+  side-panel/bottom-sheet architecture, the prices board + meters + lane
+  switch, and the GAUGES table joining the chunk. ENTRY chunk untouched
+  (290.12/87.76 vs 296/89.5) — the money page is protected. Justified
+  above; the gate stays enforced in CI.
+
 ## [2026-10-08] — I14 rate-alerts wave
 
 Seventh round of the day — the sandbox was RESET between rounds (the whole

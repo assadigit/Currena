@@ -1062,6 +1062,226 @@ body {
 }
 
 /* ------------------------------------------------------------------ *
+ * Insights I15 (2026-10-08 owner UI/UX spec) — design tokens (G2), type
+ * roles (G3), ink-grade secondary text (G4), sticky section nav (P1),
+ * verdict meters (H1), the details side-panel / bottom sheet (F5), the
+ * prices board (PB1) and the lane switch (L1).
+ *
+ * Token rules: each token maps to the CURRENT value (G2 — the palette step
+ * changes values later, in ONE place). Only rules the I15 pass touched use
+ * the tokens; untouched components keep their existing utilities.
+ * ------------------------------------------------------------------ */
+
+:root {
+  /* Text (G4: secondary ink ≥7:1 on card + page surfaces, measured) */
+  --color-text-primary: #2C3E50;   /* = currena-dark light */
+  --color-text-secondary: #46505C; /* 8.2:1 on white, 7.8:1 on page bg */
+  /* Surfaces */
+  --color-surface: #FFFFFF;
+  --color-surface-raised: #FFFFFF;
+  --color-surface-alert-tint: rgba(185, 46, 46, 0.05);
+  --color-border: rgba(44, 62, 80, 0.14);
+  /* Status inks (icon + word chips — never colour alone, G5) */
+  --color-accent-brand: #4A90E2;
+  --color-status-alert: #B92E2E;
+  --color-status-normal: #256D29;
+  --color-status-context: #245E9F;
+  --color-status-stale: #46505C;
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  /* Radii */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.125rem;
+  /* Type roles (G3: verdict > number > label > caption; caption floor ~12.5px) */
+  --type-verdict: 1.6rem;
+  --type-verdict-leading: 2rem;
+  --type-number: 1.3rem;
+  --type-label: 0.875rem;
+  --type-caption: 0.78rem;
+}
+
+.dark {
+  --color-text-primary: #E8EDF4;     /* = currena-dark dark */
+  --color-text-secondary: #9AA8BC;   /* 7.5:1 on #10151D, 6.9:1 on #1A222E cards */
+  --color-surface: #1A222E;
+  --color-surface-raised: #202A38;
+  --color-surface-alert-tint: rgba(255, 128, 128, 0.07);
+  --color-border: rgba(232, 237, 244, 0.16);
+  --color-accent-brand: #6FAEEC;
+  --color-status-alert: #FF8080;
+  --color-status-normal: #63C06C;
+  --color-status-context: #6FAEEC;
+  --color-status-stale: #9AA8BC;
+}
+
+/* Type-role utilities (G3) — the four sizes the page is allowed to speak in. */
+.type-verdict {
+  font-size: var(--type-verdict);
+  line-height: var(--type-verdict-leading);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.type-number {
+  font-size: var(--type-number);
+  line-height: 1.35;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.type-label {
+  font-size: var(--type-label);
+  font-weight: 600;
+}
+.type-caption {
+  font-size: var(--type-caption);
+  font-weight: 500;
+}
+.text-secondary-ink {
+  color: var(--color-text-secondary);
+}
+
+/* Sticky section nav (P1): pins below the app header, blurs like it. */
+.insights-sticky-nav {
+  position: sticky;
+  top: calc(64px + env(safe-area-inset-top, 0px));
+  z-index: 40;
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-block-end: 1px solid var(--color-border);
+}
+@media (max-width: 767px) {
+  .insights-sticky-nav {
+    top: calc(56px + env(safe-area-inset-top, 0px));
+  }
+}
+
+/* Verdict meter (H1): four segments + a marker on the current step. */
+.verdict-meter {
+  display: flex;
+  gap: 3px;
+  direction: ltr; /* analytical axis — low→high reads LTR even in fa (G9 family) */
+}
+.verdict-meter-seg {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-border);
+}
+.verdict-meter-seg.on-1 { background: var(--color-status-normal); }
+.verdict-meter-seg.on-2 { background: var(--color-status-normal); }
+.verdict-meter-seg.on-3 { background: #D98E32; }
+.verdict-meter-seg.on-4 { background: var(--color-status-alert); }
+@media (prefers-reduced-motion: reduce) {
+  .verdict-meter-seg { transition: none; }
+}
+
+/* Alert-card accent (F1): inline-start border + light tint, never colour alone. */
+.alert-card {
+  border-inline-start-width: 4px;
+  border-inline-start-style: solid;
+  border-inline-start-color: var(--color-status-alert);
+  background: linear-gradient(
+    to var(--dir-gradient, right),
+    var(--color-surface-alert-tint),
+    var(--color-surface) 55%
+  );
+}
+
+/* The details side panel (F5) — desktop right sheet, mobile bottom sheet. */
+.insights-panel-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(10, 15, 23, 0.45);
+  animation: currena-fade-in 0.18s ease;
+}
+.insights-panel {
+  position: fixed;
+  z-index: 61;
+  background: var(--color-surface);
+  box-shadow: 0 24px 60px rgba(10, 15, 23, 0.3);
+  display: flex;
+  flex-direction: column;
+  overscroll-behavior: contain;
+  /* Wide screens: a right-side sheet. */
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: min(440px, 92vw);
+  border-inline-start: 1px solid var(--color-border);
+  animation: currena-panel-in-end 0.22s ease;
+}
+[dir='rtl'] .insights-panel,
+html[dir='rtl'] .insights-panel {
+  /* RTL: the sheet slides from the inline-end (left side) instead. */
+  animation: currena-panel-in-start 0.22s ease;
+}
+@media (max-width: 767px) {
+  .insights-panel {
+    /* Phones: a bottom sheet (M1). */
+    inset-inline: 0;
+    inset-block: auto 0;
+    width: auto;
+    max-height: 88dvh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border-inline-start: 0;
+    border-block-start: 1px solid var(--color-border);
+    animation: currena-panel-in-up 0.24s ease;
+    padding-block-end: env(safe-area-inset-bottom, 0px);
+  }
+  .insights-panel-scrim {
+    z-index: 62;
+  }
+}
+@keyframes currena-panel-in-end {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes currena-panel-in-start {
+  from { transform: translateX(-24px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes currena-panel-in-up {
+  from { transform: translateY(32px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .insights-panel, .insights-panel-scrim { animation: none; }
+}
+
+/* Lane switch (L1): thumb-reachable sticky bar on phones (M1). */
+.insights-lane-mobile-bar {
+  position: sticky;
+  bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  z-index: 45;
+}
+
+/* Prices board rows (PB1): scannable table-ish rows, comfortable rhythm. */
+.price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--space-3);
+  row-gap: 2px;
+  padding: var(--space-3) var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+}
+.price-row:last-child {
+  border-block-end: 0;
+}
+
+/* Focus outlines (G6): every interactive control keeps a visible ring. */
+.insights-focusable:focus-visible {
+  outline: 2px solid var(--color-accent-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ------------------------------------------------------------------ *
  * Print (I7, BACKLOG #49 — Insights-first, app-wide hygiene)
  *
  * Printing the page (or "Save as PDF") should produce a clean light

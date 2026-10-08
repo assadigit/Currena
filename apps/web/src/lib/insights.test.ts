@@ -63,7 +63,7 @@ const SNAPSHOT: InsightsSnapshot = {
   readings: [
     reading({ id: 'yield-curve-10y2y', value: 0.48, change7d: 0.11, change30d: 0.07, percentile10y: 0.56, status: 'normal' }),
     reading({ id: 'us10y', value: 5.31, change7d: 0.07, change30d: 0.53, percentile10y: 1, status: 'warning' }),
-    reading({ id: 'dollar-broad', value: 121.38, change7d: 1.05, change30d: 2.86, percentile10y: 0.79, status: 'stale' }),
+    reading({ id: 'dollar-basket', value: 102.4, change7d: 1.05, change30d: 2.86, percentile10y: 0.79, status: 'stale' }),
     reading({ id: 'gold-btc', value: 0.0492, status: 'context' }),
     reading({ id: 'china-pmi', value: null, asOf: null, status: 'unavailable' }),
     reading({ id: 'rba-cash-rate', value: 4.36, status: 'context' }),
@@ -313,45 +313,44 @@ describe('warningZone', () => {
   });
 });
 
-describe('bigMovers', () => {
-  it('ranks by relative 30-day magnitude, mixing pct and point changes fairly', () => {
-    const movers = bigMovers(SNAPSHOT.readings);
-    // yield-curve: +0.07 pts on 0.48 ≈ 14.6% relative beats us10y's +0.53 on 5.31 ≈ 10%.
-    expect(movers[0]?.id).toBe('yield-curve-10y2y');
-    expect(movers[1]?.id).toBe('us10y');
-    // Context cards never appear.
-    expect(movers.some((m) => m.id === 'gold-btc')).toBe(false);
-    // Stale card with change data may appear (its move is real, its vote is not).
-    expect(movers.some((m) => m.id === 'dollar-broad')).toBe(true);
+describe('bigMovers (I15: |z| ≥ 2 only)', () => {
+  it('clears only readings whose moveScore crosses the threshold, ranked by |z|', () => {
+    const readings = [
+      ...SNAPSHOT.readings.filter((r) => r.id !== 'yield-curve-10y2y' && r.id !== 'us10y'),
+      { ...SNAPSHOT.readings.find((r) => r.id === 'yield-curve-10y2y')!, moveScore: 2.4 },
+      { ...SNAPSHOT.readings.find((r) => r.id === 'us10y')!, moveScore: 3.1 },
+      { ...SNAPSHOT.readings.find((r) => r.id === 'gold-btc')!, moveScore: 5 }, // context card: no headline
+    ];
+    const movers = bigMovers(readings);
+    expect(movers.map((m) => m.id)).toEqual(['us10y', 'yield-curve-10y2y']);
+    expect(movers.every((m) => Math.abs(m.moveScore) >= 2)).toBe(true);
   });
 
-  it('respects the limit and skips readings without change30d', () => {
-    const movers = bigMovers(SNAPSHOT.readings, 2);
-    expect(movers).toHaveLength(2);
-    expect(movers.every((m) => Number.isFinite(m.change30d))).toBe(true);
+  it('readings without moveScore never appear (the callout hides honestly)', () => {
+    expect(bigMovers(SNAPSHOT.readings)).toEqual([]);
   });
 });
 
 describe('groupCounts', () => {
   it('counts voters, warnings and excluded within one group', () => {
-    // rates-credit in the fixture: yield-curve normal, us10y warning — dollar-broad is a CURRENCIES card.
-    expect(groupCounts(SNAPSHOT.readings, 'global', 'rates-credit')).toEqual({
-      warningCount: 1,
+    // borrowing-costs in the fixture: yield-curve normal, us10y warning.
+    expect(groupCounts(SNAPSHOT.readings, 'global', 'borrowing-costs')).toEqual({
+      alertCount: 1,
       votingCount: 2,
       excludedCount: 0,
     });
-    // currencies: only the stale dollar-broad exists in the fixture.
-    expect(groupCounts(SNAPSHOT.readings, 'global', 'currencies')).toEqual({
-      warningCount: 0,
+    // dollar-strength: only the stale dollar-basket exists in the fixture.
+    expect(groupCounts(SNAPSHOT.readings, 'global', 'dollar-strength')).toEqual({
+      alertCount: 0,
       votingCount: 0,
       excludedCount: 1,
     });
   });
 
   it('treats context cards as neither voters nor excluded', () => {
-    // interest-inflation: rba-cash-rate context, au-cpi warning.
-    expect(groupCounts(SNAPSHOT.readings, 'australia', 'interest-inflation')).toEqual({
-      warningCount: 1,
+    // au-inflation-rates: rba-cash-rate context, au-cpi warning.
+    expect(groupCounts(SNAPSHOT.readings, 'australia', 'au-inflation-rates')).toEqual({
+      alertCount: 1,
       votingCount: 1,
       excludedCount: 0,
     });
@@ -391,33 +390,30 @@ describe('card filter (I8)', () => {
   it('stale and unavailable cards only ever appear under All', () => {
     for (const status of ['warning', 'normal', 'context'] as const) {
       const ids = filterVisibleIds(SNAPSHOT.readings, { status, query: '' }, nameOfEn)!;
-      expect(ids.has('dollar-broad')).toBe(false); // stale
+      expect(ids.has('dollar-basket')).toBe(false); // stale
       expect(ids.has('china-pmi')).toBe(false); // unavailable
     }
   });
 
   it('search matches names case-insensitively and tickers; spacing is irrelevant', () => {
-    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'unemployment' }, nameOfEn)!]).toEqual([
+    // I15 plain names: «The share of Australians without work».
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'without work' }, nameOfEn)!]).toEqual([
       'au-unemployment',
     ]);
-    // Multi-word Latin query vs the name's own spacing («Australian unemployment rate»).
-    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'au unemployment' }, nameOfEn)!]).toEqual([
+    // Multi-word Latin query vs the name's own spacing.
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'Australians without' }, nameOfEn)!]).toEqual([
       'au-unemployment',
     ]);
-    // Ticker match, both cases (gold-btc carries the XAU/BTC ticker).
-    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'XAU/BTC' }, nameOfEn)!]).toEqual([
-      'gold-btc',
-    ]);
-    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'xau/btc' }, nameOfEn)!]).toEqual([
-      'gold-btc',
-    ]);
+    // Ticker match, both cases (gold-btc carries the XAU÷BTC ticker).
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'XAU' }, nameOfEn)!]).toEqual(['gold-btc']);
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'xau' }, nameOfEn)!]).toEqual(['gold-btc']);
   });
 
   it('search and status combine with AND semantics', () => {
-    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'warning', query: 'cpi' }, nameOfEn)!]).toEqual([
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'warning', query: 'prices vs a year' }, nameOfEn)!]).toEqual([
       'au-cpi',
     ]);
-    expect(filterVisibleIds(SNAPSHOT.readings, { status: 'normal', query: 'cpi' }, nameOfEn)!.size).toBe(0);
+    expect(filterVisibleIds(SNAPSHOT.readings, { status: 'normal', query: 'prices vs a year' }, nameOfEn)!.size).toBe(0);
   });
 
   it('a query that matches nothing yields an empty set (the no-match state)', () => {
@@ -425,23 +421,25 @@ describe('card filter (I8)', () => {
   });
 
   it('Persian search: a plain space still matches ZWNJ compounds', () => {
-    // gold-btc's Farsi name is «طلا / بیت‌کوین» (ZWNJ inside بیت‌کوین).
+    // gold-btc's Farsi name is «طلا در برابر بیت‌کوین» (ZWNJ inside بیت‌کوین).
     expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'بیت کوین' }, nameOfFa)!]).toEqual([
       'gold-btc',
     ]);
   });
 
   it('Persian search: Arabic-keyboard yeh/kaf are normalised to Persian', () => {
-    // «بيكاري» = بیکاری typed with Arabic ي (U+064A) and ك (U+0643).
-    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'بيكاري' }, nameOfFa)!]).toEqual([
+    // «بيكاري» = بیکاری... the I15 fa name is «سهم استرالیایی‌های بدون کار» —
+    // the normalisation is exercised through the ZWNJ compound «استرالیایی‌های»
+    // typed with Arabic ي: «استراليايي‌ها».
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'استراليايي بدون' }, nameOfFa)!]).toEqual([
       'au-unemployment',
     ]);
   });
 
   it('indicatorMatchesFilter: bidi marks never leak into comparisons', () => {
     const r = SNAPSHOT.readings[0]!;
-    expect(indicatorMatchesFilter(r, { status: 'all', query: '\u200Fyield' }, nameOfEn)).toBe(true);
-    expect(indicatorMatchesFilter(r, { status: 'all', query: 'yield\u200E' }, nameOfEn)).toBe(true);
+    expect(indicatorMatchesFilter(r, { status: 'all', query: '\u200Fgap' }, nameOfEn)).toBe(true);
+    expect(indicatorMatchesFilter(r, { status: 'all', query: 'gap\u200E' }, nameOfEn)).toBe(true);
   });
 });
 
@@ -542,7 +540,7 @@ describe('copy dictionaries', () => {
       expect(insightsCopyFa.indicators[id]).toBeDefined();
       expect(insightsCopyFa.indicators[id]?.name.length).toBeGreaterThan(0);
     }
-    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(30);
+    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(41);
   });
 });
 

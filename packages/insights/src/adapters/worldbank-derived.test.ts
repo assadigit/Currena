@@ -80,14 +80,25 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
       T5YIFR: pts([['2026-10-05', 2.3]]),
       A091RC1Q027SBEA: pts([['2026-04-01', 100]]),
       W006RC1Q027SBEA: pts([['2026-04-01', 800]]),
-      DTWEXBGS: pts([['2026-10-05', 120]]),
       DCOILBRENTEU: pts([['2026-10-05', 82.5]]),
       M2SL: pts([['2026-08-01', 23342]]),
+      CPIAUCSL: pts([['2025-09-01', 300], ['2026-09-01', 309]]),
+      DFEDTARL: pts([['2026-10-05', 3.5]]),
+      DFEDTARU: pts([['2026-10-05', 3.75]]),
+      NFCI: pts([['2026-10-02', -0.4]]),
+    },
+    ecb: {
+      dfr: pts([['2026-10-06', 2.0]]),
     },
     fx: {
       JPY: pts([['2026-10-05', 158.0], ['2026-10-06', 158.1]]),
       AUD: pts([['2026-10-05', 1.43], ['2026-10-06', 1.4322]]),
       CNY: pts([['2026-10-06', 6.7046]]),
+      EUR: pts([['2026-10-05', 0.86], ['2026-10-06', 0.8605]]),
+      GBP: pts([['2026-10-05', 0.75], ['2026-10-06', 0.7502]]),
+      CAD: pts([['2026-10-05', 1.38], ['2026-10-06', 1.3801]]),
+      SEK: pts([['2026-10-05', 9.4], ['2026-10-06', 9.404]]),
+      CHF: pts([['2026-10-05', 0.8], ['2026-10-06', 0.8003]]),
     },
     wb: {
       gold: pts([['2026-08-01', 4411], ['2026-09-01', 4319]]),
@@ -96,19 +107,24 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
       ironOre: pts([['2026-09-01', 97.7]]),
       brent: pts([['2026-09-01', 116.8]]),
     },
-    tgjuGoldOunceUsd: 4162.6,
+    xauSpot: { symbol: 'XAU', price: 4162.6, updatedAt: '2026-10-06T15:03:10Z' },
     xagSpot: { symbol: 'XAG', price: 61.28, updatedAt: '2026-10-06T15:03:10Z' },
     btcSpot: { symbol: 'BTC', price: 86625, updatedAt: '2026-10-06T15:03:10Z' },
+    hgSpot: { symbol: 'HG', price: 6.66, updatedAt: '2026-10-06T15:03:10Z' },
     abs: {
       cpiIndex: pts([['2025-06-01', 100], ['2026-06-01', 104]]),
       trimmedMeanIndex: pts([['2025-06-01', 100], ['2026-06-01', 103]]),
       unemployment: pts([['2026-08-01', 4.2]]),
       resDwellMeanPrice: pts([['2026-06-01', 1100]]),
       termsOfTrade: pts([['2026-06-01', 96.1]]),
+      rentIndex: pts([['2025-08-01', 96.1], ['2026-08-01', 99.5]]),
+      automotiveFuelIndex: pts([['2025-08-01', 100], ['2026-08-01', 113.5]]),
+      wageIndex: pts([['2025-06-01', 100], ['2026-06-01', 103.2]]),
     },
     rba: {
       cashRate: pts([['2026-09-29', 4.6]]),
       au10y: pts([['2026-10-05', 4.3]]),
+      homeLoanOutstanding: pts([['2026-08-31', 6.21]]),
     },
   };
 
@@ -131,6 +147,31 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
     expect(out['au-us-10y-gap']).toHaveLength(1);
     expect(out['au-us-10y-gap']![0]!.date).toBe('2026-10-05');
     expect(out['au-us-10y-gap']![0]!.value).toBeCloseTo(0.2, 10);
+    // I15 new compositions:
+    // fed-target = midpoint of (DFEDTARL + DFEDTARU)
+    expect(out['fed-target']).toEqual([{ date: '2026-10-05', value: (3.5 + 3.75) / 2 }]);
+    // ecb-dfr passes through
+    expect(out['ecb-dfr']).toEqual(inputs.ecb.dfr);
+    // us-cpi-yoy = 12-month pct change of the CPI index
+    expect(out['us-cpi-yoy']).toEqual([{ date: '2026-09-01', value: 3 }]);
+    // dollar-basket: one value per day where all six currencies align (both days here)
+    expect(out['dollar-basket']).toHaveLength(2);
+    expect(out['dollar-basket']!.at(-1)).toMatchObject({ date: '2026-10-06' });
+    // eur-usd = the USD→EUR quote side directly
+    expect(out['eur-usd']).toEqual(inputs.fx.EUR);
+    // ABS yoy cards
+    expect(out['au-rent-yoy']!.length).toBe(1);
+    expect(out['au-rent-yoy']![0]!.value).toBeCloseTo((99.5 / 96.1 - 1) * 100, 10);
+    expect(out['au-petrol-yoy']).toEqual([{ date: '2026-08-01', value: 13.5 }]);
+    expect(out['au-wage-growth']![0]).toMatchObject({ date: '2026-06-01' });
+    expect(out['au-wage-growth']![0]!.value).toBeCloseTo(3.2, 10);
+    // RBA F6 passes through
+    expect(out['au-home-loan']).toEqual(inputs.rba.homeLoanOutstanding);
+    // copper: HG 6.66 USD/lb → 6.66 × 2204.62262 USD/mt, then live point on WB history
+    expect(out['copper-usd']).toHaveLength(2);
+    expect(out['copper-usd']!.at(-1)).toEqual({ date: today, value: 6.66 * 2204.62262 });
+    // btc: single live point (no stored history yet)
+    expect(out['btc-usd']).toEqual([{ date: today, value: 86625 }]);
     // live-point info cards
     expect(out['gold-btc']).toEqual([{ date: today, value: 4162.6 / 86625 }]);
     expect(out['silver-btc']).toEqual([{ date: today, value: 61.28 / 86625 }]);
@@ -174,6 +215,7 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
     expect(out['gold-usd']!.at(-1)).toEqual({ date: '2026-09-01', value: 4319 });
     expect(out['silver-usd']).toHaveLength(2);
     expect(out['silver-usd']!.at(-1)).toEqual({ date: '2026-09-01', value: 64.6 });
+    expect(out['copper-usd']).toHaveLength(1); // WB only — live point not newer
   });
 
   it('degrades the ounce price cards to single live points without the World Bank leg', () => {
@@ -181,13 +223,50 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
     const out = buildIndicatorSeries(noWb);
     expect(out['gold-usd']).toEqual([{ date: today, value: 4162.6 }]);
     expect(out['silver-usd']).toEqual([{ date: today, value: 61.28 }]);
+    expect(out['copper-gold']).toBeUndefined();
+    expect(out['iron-ore']).toBeUndefined();
   });
 
   it('falls back to World Bank monthly history when the live ounce sources are down', () => {
-    const noLive = { ...inputs, tgjuGoldOunceUsd: undefined, xagSpot: undefined };
+    const noLive = { ...inputs, xauSpot: undefined, xagSpot: undefined, hgSpot: undefined };
     const out = buildIndicatorSeries(noLive);
     expect(out['gold-usd']).toEqual(inputs.wb.gold);
     expect(out['silver-usd']).toEqual(inputs.wb.silver);
+    expect(out['copper-usd']).toEqual(inputs.wb.copper);
+    expect(out['gold-aud']).toBeUndefined();
+  });
+
+  it('I15: seedHistory accumulates onto the monthly base and the live point still wins the day', () => {
+    const seeded = {
+      ...inputs,
+      seedHistory: {
+        'gold-usd': pts([['2026-10-04', 4150], ['2026-10-05', 4155.5]]),
+        'btc-usd': pts([['2026-10-05', 86000]]),
+      },
+    };
+    const out = buildIndicatorSeries(seeded);
+    // WB Aug/Sep + accumulated 10-04/10-05 + today's live point
+    expect(out['gold-usd']).toHaveLength(5);
+    expect(out['gold-usd']!.at(-2)).toEqual({ date: '2026-10-05', value: 4155.5 });
+    expect(out['gold-usd']!.at(-1)).toEqual({ date: today, value: 4162.6 });
+    // btc now has a 30-day-changeable daily history
+    expect(out['btc-usd']).toEqual([
+      { date: '2026-10-05', value: 86000 },
+      { date: today, value: 86625 },
+    ]);
+  });
+
+  it('I15: seed-only rows (no WB base) build from the accumulated history alone', () => {
+    const seeded = { ...inputs, wb: undefined, seedHistory: { 'btc-usd': pts([['2026-10-05', 86000]]) } };
+    const out = buildIndicatorSeries(seeded);
+    expect(out['btc-usd']).toEqual([{ date: '2026-10-05', value: 86000 }, { date: today, value: 86625 }]);
+  });
+
+  it('I15: the basket needs every currency — one missing leg omits the indicator, never guesses', () => {
+    const missingSek = { ...inputs, fx: { ...inputs.fx, SEK: undefined } };
+    const out = buildIndicatorSeries(missingSek);
+    expect(out['dollar-basket']).toBeUndefined();
+    expect(out.usdjpy).toBeDefined(); // other FX cards unaffected
   });
 
   it('covers a reading source for every id it can emit', () => {

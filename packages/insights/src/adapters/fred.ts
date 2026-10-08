@@ -38,7 +38,7 @@ export async function fetchFredSeries(seriesId: string, deps: FetchDeps = {}): P
   return parseFredCsv(text);
 }
 
-/** The FRED series ids the Insights indicators consume (I2 route, keyless). */
+/** The FRED series ids the Insights indicators consume (I2 route + I15 additions, keyless). */
 export const FRED_SERIES = {
   yieldCurve10y2y: 'T10Y2Y',
   stressStlfsi: 'STLFSI4',
@@ -47,7 +47,13 @@ export const FRED_SERIES = {
   breakeven5y5y: 'T5YIFR',
   govtInterest: 'A091RC1Q027SBEA',
   govtReceipts: 'W006RC1Q027SBEA',
-  dollarBroad: 'DTWEXBGS',
   brent: 'DCOILBRENTEU',
   m2Us: 'M2SL',
+  // I15 (2026-10-08 data spec §3):
+  usCpiIndex: 'CPIAUCSL', // us-cpi-yoy: 12-month % change, computed
+  fedTargetLower: 'DFEDTARL', // fed-target: (L + U) / 2 midpoint series
+  fedTargetUpper: 'DFEDTARU',
+  nfci: 'NFCI', // Chicago Fed National Financial Conditions, weekly
+  // dollar-broad (DTWEXBGS) retired: the series now lags ~5 days upstream
+  // and the Currena dollar basket replaces it (data spec §3, basket.ts).
 } as const;

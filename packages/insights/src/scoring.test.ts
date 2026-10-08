@@ -6,13 +6,14 @@ import { addDays, type SeriesPoint } from './series';
 import {
   GRACE_DAYS,
   MIN_ABOVE_LOW_OBS,
+  MIN_MOVE_OBS,
   MIN_PERCENTILE_OBS,
   computeReading,
   changedSince,
   evaluateRule,
-  labelForScore,
+  moveScoreOf,
   percentileOf,
-  summarize,
+  staleAfterDaysFor,
 } from './scoring';
 
 /* ------------------------------------------------------------------ *
@@ -42,7 +43,7 @@ function makeDef(over: Partial<IndicatorDefinition> & { rule: IndicatorDefinitio
   return {
     id: 'usdjpy',
     section: 'global',
-    group: 'currencies',
+    group: 'dollar-strength',
     name: 'test indicator',
     source: 'fred',
     sourceRef: 'test',
@@ -353,7 +354,17 @@ describe('computeReading', () => {
     const lastObs = addDays(NOW_DAY, -(1 + GRACE_DAYS.daily! + 1)); // 5 days old
     const r = readingOf(def, [{ date: lastObs, value: 10 }]);
     expect(r.status).toBe('stale');
-    expect(summarize([r]).global).toMatchObject({ votingCount: 0, warningCount: 0, excludedCount: 1, label: null });
+  });
+
+  it("I15: staleAfterDays overrides the cadence grace (Brent's 12-day limit beats the 3-day daily grace)", () => {
+    const def = makeDef({ rule: { kind: 'info' }, staleAfterDays: 12 });
+    expect(staleAfterDaysFor(def)).toBe(12);
+    // 5 days old — daily grace would call it stale, the override keeps it fresh.
+    const r = readingOf(def, [{ date: addDays(NOW_DAY, -5), value: 82 }]);
+    expect(r.status).toBe('context'); // info rule → context once fresh
+    // 13 days old — past the limit → stale.
+    const r2 = readingOf(def, [{ date: addDays(NOW_DAY, -13), value: 82 }]);
+    expect(r2.status).toBe('stale');
   });
 
   it('per-change cadence never goes stale (cash rate is a level)', () => {
@@ -387,64 +398,83 @@ describe('computeReading', () => {
 });
 
 /* ------------------------------------------------------------------ *
- * summarize — labels, boundaries, exclusion counting
+ * Rule: below-aux (I15 — wage growth vs yearly inflation)
  * ------------------------------------------------------------------ */
 
-describe('summarize', () => {
-  function reading(id: IndicatorDefinition['id'], status: IndicatorReading['status']): IndicatorReading {
-    const unavailable = status === 'unavailable';
-    return {
-      id,
-      value: unavailable ? null : 1,
-      asOf: unavailable ? null : NOW_DAY,
-      status,
-      sourceName: 't',
-      updatedAt: NOW,
-    };
-  }
+describe('rule: below-aux', () => {
+  const wage = [3.4, 3.4].map((v, i) => ({ date: addDays('2024-01-01', i * 90), value: v }));
+  const cpiAbove = [3.9, 3.9].map((v, i) => ({ date: addDays('2024-01-01', i * 90), value: v }));
+  const cpiBelow = [2.5, 2.5].map((v, i) => ({ date: addDays('2024-01-01', i * 90), value: v }));
+  const cpiLater = [3.4, 3.9].map((v, i) => ({ date: addDays('2024-03-30', i * 90), value: v }));
 
-  it.each([
-    ['0 of 5 → relaxed', 0, 5, 'relaxed'],
-    ['1 of 5 (0.2) → cautious (boundary inclusive)', 1, 5, 'cautious'],
-    ['1 of 6 (<0.2) → relaxed', 1, 6, 'relaxed'],
-    ['2 of 5 (0.4) → stressed', 2, 5, 'stressed'],
-    ['3 of 5 (0.6) → alarmed', 3, 5, 'alarmed'],
-  ] as const)('%s', (_label, warnings, voters, expected) => {
-    const readings: IndicatorReading[] = [];
-    for (let i = 0; i < warnings; i++) readings.push(reading('usdjpy', 'warning'));
-    for (let i = 0; i < voters - warnings; i++) readings.push(reading('us10y', 'normal'));
-    expect(summarize(readings).global.label).toBe(expected);
+  it('value below the paired series at the same date → warning', () => {
+    const def = makeDef({ rule: { kind: 'below-aux' } });
+    expect(evaluateRule(def, wage, '2024-03-29', { series: cpiAbove }).status).toBe('warning');
   });
-
-  it('labelForScore boundaries', () => {
-    expect(labelForScore(0)).toBe('relaxed');
-    expect(labelForScore(0.199999)).toBe('relaxed');
-    expect(labelForScore(0.2)).toBe('cautious');
-    expect(labelForScore(0.399999)).toBe('cautious');
-    expect(labelForScore(0.4)).toBe('stressed');
-    expect(labelForScore(0.599999)).toBe('stressed');
-    expect(labelForScore(0.6)).toBe('alarmed');
-    expect(labelForScore(1)).toBe('alarmed');
+  it('value at or above the paired series → normal (ties keep up)', () => {
+    const def = makeDef({ rule: { kind: 'below-aux' } });
+    expect(evaluateRule(def, wage, '2024-03-29', { series: cpiBelow }).status).toBe('normal');
+    const equalCpi = [3.4, 3.4].map((v, i) => ({ date: addDays('2024-01-01', i * 90), value: v }));
+    expect(evaluateRule(def, wage, '2024-03-29', { series: equalCpi }).status).toBe('normal');
   });
-
-  it('sections are summarised independently; context cards are not "excluded"', () => {
-    const readings: IndicatorReading[] = [
-      reading('usdjpy', 'warning'),
-      reading('us10y', 'normal'),
-      reading('gold-btc', 'context'),
-      reading('audusd', 'stale'),
-      reading('au-unemployment', 'unavailable'),
-      reading('audjpy', 'no-history'),
-    ];
-    const s = summarize(readings);
-    expect(s.global).toEqual({ section: 'global', label: 'stressed', warningCount: 1, votingCount: 2, excludedCount: 0 });
-    expect(s.australia).toEqual({ section: 'australia', label: null, warningCount: 0, votingCount: 0, excludedCount: 3 });
+  it('the aux series is sampled at or BEFORE the reading date (a later aux point never leaks back)', () => {
+    const def = makeDef({ rule: { kind: 'below-aux' } });
+    // cpiLater starts 2024-03-30 — after the wage reading's date (2024-03-29)
+    // — so there is no aux point at or before it → unevaluable.
+    expect(evaluateRule(def, wage, '2024-03-29', { series: cpiLater }).status).toBe('unevaluable');
   });
+  it('no aux supplied → honestly unevaluable, never guessed', () => {
+    const def = makeDef({ rule: { kind: 'below-aux' } });
+    expect(evaluateRule(def, wage, '2024-03-29').status).toBe('unevaluable');
+    expect(evaluateRule(def, wage, '2024-03-29', { series: [] }).status).toBe('unevaluable');
+  });
+  it('computeReading marks an un-supplied aux rule no-history (value still shown)', () => {
+    const def = makeDef({ rule: { kind: 'below-aux' }, cadence: 'quarterly' });
+    const r = readingOf(def, wage, '2024-06-28T02:00:00.000Z');
+    expect(r).toMatchObject({ status: 'no-history', value: 3.4 });
+  });
+});
 
-  it('nothing can vote → null label, never an invented one', () => {
-    const s = summarize([reading('gold-btc', 'context')]);
-    expect(s.global.label).toBeNull();
-    expect(s.australia.label).toBeNull();
+/* ------------------------------------------------------------------ *
+ * moveScoreOf (I15 big-mover z-score)
+ * ------------------------------------------------------------------ */
+
+describe('moveScoreOf', () => {
+  it('standardises the latest change against the window mean/std', () => {
+    // ~400 daily points with a stable change series, then one outlier move.
+    const base = dailySeries(400, (i) => 100 + Math.sin(i / 20) * 2, '2023-01-02');
+    const last = base[base.length - 1]!;
+    const spiked = [...base.slice(0, -1), { date: last.date, value: last.value + 30 }];
+    const def = makeDef({ rule: { kind: 'info' }, changeKind: 'pct' });
+    const z = moveScoreOf(def, spiked, spiked[spiked.length - 1]!);
+    expect(z).toBeDefined();
+    expect(Math.abs(z!)).toBeGreaterThan(2); // a 30-point spike on a ±2 band is a big mover
+  });
+  it('too few change observations → undefined (degenerate base guard)', () => {
+    const short = dailySeries(10, (i) => 100 + i);
+    const def = makeDef({ rule: { kind: 'info' }, changeKind: 'pct' });
+    expect(moveScoreOf(def, short, short[short.length - 1]!)).toBeUndefined();
+    expect(MIN_MOVE_OBS).toBe(30);
+  });
+  it('perfectly flat change series (zero std) → undefined', () => {
+    // Strictly linear points: every change identical → std = 0.
+    const linear = dailySeries(100, (i) => 100 + i);
+    const def = makeDef({ rule: { kind: 'info' }, changeKind: 'points' });
+    expect(moveScoreOf(def, linear, linear[linear.length - 1]!)).toBeUndefined();
+  });
+  it('computeReading carries moveScore on votable fresh readings, never on stale ones', () => {
+    // 400 daily points ENDING at NOW_DAY so the reading is fresh.
+    const base = dailySeries(400, (i) => 100 + Math.sin(i / 20) * 2, addDays(NOW_DAY, -399));
+    const def = makeDef({ rule: { kind: 'threshold', direction: 'above', value: 0 } });
+    const fresh = readingOf(def, base);
+    expect(['normal', 'warning']).toContain(fresh.status); // votable — that's what matters
+    expect(typeof fresh.moveScore).toBe('number');
+    // The same series truncated 10 days before NOW → past the daily grace →
+    // stale, and stale items never carry a move score (data spec §4).
+    const old = base.slice(0, 390);
+    const stale = readingOf(def, old);
+    expect(stale.status).toBe('stale');
+    expect(stale.moveScore).toBeUndefined();
   });
 });
 

@@ -325,13 +325,14 @@ import {
 } from './schemas';
 
 describe('Insights: IndicatorIdSchema (contract shape is deliberate)', () => {
-  it('pins the exact v1 indicator set — 30 ids (28 + the 2026-10-07 ounce-price amendment), blocked/licensed items absent', () => {
+  it('pins the exact v2 indicator set — 41 ids (the I15 restructure: +11 new, dollar-broad retired), blocked/licensed items absent', () => {
     const ids = IndicatorIdSchema.options;
-    expect(ids).toHaveLength(30);
+    expect(ids).toHaveLength(41);
     for (const blocked of ['vix', 'spx-gold', 'breadth', 'cape']) {
       expect(ids).not.toContain(blocked);
     }
-    for (const expected of ['yield-curve-10y2y', 'stress-stlfsi', 'gold-usd', 'silver-usd', 'gold-silver', 'china-pmi', 'rba-cash-rate', 'au-us-10y-gap', 'terms-of-trade', 'au-household-debt-arrears']) {
+    expect(ids).not.toContain('dollar-broad'); // replaced by the Currena dollar basket (I15)
+    for (const expected of ['yield-curve-10y2y', 'stress-stlfsi', 'nfci', 'fed-target', 'ecb-dfr', 'us-cpi-yoy', 'dollar-basket', 'au-home-loan', 'au-wage-growth', 'au-rent-yoy', 'au-petrol-yoy', 'btc-usd', 'copper-usd', 'eur-usd', 'gold-usd', 'silver-usd', 'gold-silver', 'china-pmi', 'rba-cash-rate', 'au-us-10y-gap', 'terms-of-trade', 'au-household-debt-arrears']) {
       expect(ids).toContain(expected);
     }
   });
@@ -342,7 +343,7 @@ describe('Insights: IndicatorIdSchema (contract shape is deliberate)', () => {
   });
 });
 
-describe('Insights: WarningRuleSchema (all seven atom kinds + composite)', () => {
+describe('Insights: WarningRuleSchema (all atom kinds + composite)', () => {
   it('accepts each rule atom from the indicator spec', () => {
     expect(WarningRuleSchema.safeParse({ kind: 'info' }).success).toBe(true);
     expect(WarningRuleSchema.safeParse({ kind: 'threshold', direction: 'below', value: 0 }).success).toBe(true);
@@ -383,7 +384,7 @@ describe('Insights: IndicatorDefinitionSchema', () => {
   const valid = {
     id: 'yield-curve-10y2y',
     section: 'global',
-    group: 'rates-credit',
+    group: 'borrowing-costs',
     name: 'US 10Y minus 2Y yield',
     source: 'fred',
     sourceRef: 'FRED:T10Y2Y',

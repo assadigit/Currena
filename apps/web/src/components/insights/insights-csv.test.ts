@@ -85,7 +85,7 @@ describe('buildInsightsCsv', () => {
 
   it('renders the localized status word and the indicator name', () => {
     const rows = buildInsightsCsv(snapshot, insightsCopyEn).split('\r\n');
-    expect(rows[2]!).toContain('Warning');
+    expect(rows[2]!).toContain('Alert');
     expect(rows[2]!).toContain(insightsCopyEn.indicators.us10y.name);
   });
 

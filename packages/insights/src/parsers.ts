@@ -192,6 +192,40 @@ export function parseAbsPeriodCsv(text: string): SeriesPoint[] {
 }
 
 /* ------------------------------------------------------------------ *
+ * ECB Data Portal CSV (`format=csvdata`) — the FM DFR series the ecb-dfr
+ * indicator consumes (I15, data spec §3). Wide CSV: many SDMX columns,
+ * but the two we need are header-located: TIME_PERIOD (YYYY-MM-DD) and
+ * OBS_VALUE. Rows are unordered (checked live 2026-10-08) — sorted here.
+ * ------------------------------------------------------------------ */
+
+export function parseEcbDfrCsv(text: string): SeriesPoint[] {
+  const lines = text.split(/\r?\n/).filter((l) => l.trim() !== '');
+  if (lines.length < 2) throw new Error('ECB CSV: fewer than 2 lines — not a data response');
+  const header = (lines[0] ?? '').split(',').map((h) => h.trim());
+  const dateCol = header.indexOf('TIME_PERIOD');
+  const valueCol = header.indexOf('OBS_VALUE');
+  if (dateCol < 0 || valueCol < 0) {
+    throw new Error(
+      `ECB CSV: header has no TIME_PERIOD/OBS_VALUE (found ${header.slice(0, 8).join(',')}…) — format change?`,
+    );
+  }
+  const out: SeriesPoint[] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = lines[i]!.split(',');
+    const date = (cells[dateCol] ?? '').trim();
+    const raw = (cells[valueCol] ?? '').trim();
+    if (date === '' || raw === '') continue;
+    assertIsoDate(date, `ECB CSV line ${i + 1}`);
+    if (isMissing(raw)) continue;
+    out.push({ date, value: parseNumber(raw, `ECB CSV line ${i + 1}`) });
+  }
+  if (out.length === 0) throw new Error('ECB CSV: zero observations parsed (series key wrong?)');
+  out.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  assertAscending(out);
+  return out;
+}
+
+/* ------------------------------------------------------------------ *
  * RBA statistical-table CSV — the format verified from the ingestion
  * venue 2026-10-06 (GitHub Actions runner; the sandbox is Akamai-blocked,
  * see 03-data-sources.md):
@@ -202,6 +236,10 @@ export function parseAbsPeriodCsv(text: string): SeriesPoint[] {
  *   then date-keyed data rows. Date formats VARY BY TABLE: "30/09/2026"
  *   (day-first, F1.1/E2) and "30-Sep-2026" (F2/F11.1). Future quarters are
  *   pre-scaffolded with empty values (E2) — skipped like any missing marker.
+ *
+ * I15: series selection now also accepts a Series ID (the "Series ID"
+ * metadata row) — the stable identifier (RBA rewords titles over time; F6's
+ * owner-occupier outstanding column is matched by FLRHOOTA, data spec §3).
  * ------------------------------------------------------------------ */
 
 const MONTHS_3: ReadonlyMap<string, number> = new Map([
@@ -242,7 +280,13 @@ export interface RbaParseOptions {
   /** Expected table-code prefix of the title line (loud identity check). */
   tablePrefix: string;
   /** Exact series title from the "Title" header row (e.g. 'Cash Rate Target'). */
-  seriesTitle: string;
+  seriesTitle?: string;
+  /**
+   * I15: exact Series ID from the "Series ID" metadata row (e.g. F6's
+   * FLRHOOTA) — preferred over titles: the RBA rewords titles over time
+   * but keeps ids stable (external parsers rely on the same convention).
+   */
+  seriesId?: string;
 }
 
 /** Parse one RBA statistical-table CSV into a canonical series. */
@@ -258,10 +302,32 @@ export function parseRbaTableCsv(text: string, opts: RbaParseOptions): SeriesPoi
   if (!header.startsWith('Title,')) {
     throw new Error('RBA CSV line 2: expected the "Title,<series…>" header row');
   }
-  const titles = header.split(',').map((h) => h.trim());
-  const col = titles.indexOf(opts.seriesTitle);
-  if (col < 0) {
-    throw new Error(`RBA CSV: no series titled "${opts.seriesTitle}" (header has ${titles.length - 1} series)`);
+  let col: number;
+  if (opts.seriesId !== undefined) {
+    // Locate the Series ID metadata row and match the exact id in it.
+    let idRow: string[] | undefined;
+    for (const line of lines) {
+      const cells = line.split(',');
+      if ((cells[0] ?? '').trim() === 'Series ID') {
+        idRow = cells.map((c) => c.trim());
+        break;
+      }
+    }
+    if (!idRow) throw new Error('RBA CSV: no "Series ID" metadata row (format change?)');
+    col = idRow.indexOf(opts.seriesId);
+    if (col < 0) {
+      throw new Error(
+        `RBA CSV: no series id "${opts.seriesId}" (ids on file: ${idRow.filter(Boolean).slice(1, 6).join(', ')}…)`,
+      );
+    }
+  } else if (opts.seriesTitle !== undefined) {
+    const titles = header.split(',').map((h) => h.trim());
+    col = titles.indexOf(opts.seriesTitle);
+    if (col < 0) {
+      throw new Error(`RBA CSV: no series titled "${opts.seriesTitle}" (header has ${titles.length - 1} series)`);
+    }
+  } else {
+    throw new Error('RBA CSV: parser needs seriesTitle or seriesId');
   }
 
   const out: SeriesPoint[] = [];

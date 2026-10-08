@@ -7,16 +7,22 @@
  * Hits live sites BY DESIGN (runner surface — never part of the test suite).
  * A failing source is recorded and simply omits its series; the affected
  * indicators then read `unavailable`/`stale` — never wrong data.
+ *
+ * I15 (2026-10-08 data spec): + ECB Data Portal (ecb-dfr), + gold-api HG
+ * (copper price row), + RBA F6 (home-loan rate), the Frankfurter fetch now
+ * carries the six basket currencies, and TGJU is RETIRED from Insights
+ * (unverified licence — the gold cross-check that used TGJU is gone with
+ * it; Bitstamp remains the BTC cross-check).
  */
 
 import type { InsightsSourceReport } from '@currena/core';
 import { ABS_SERIES, fetchAbsSeries } from './abs';
 import { fetchBitstampCloses } from './bitstamp';
+import { fetchEcbDfrSeries } from './ecb';
 import { fetchFrankfurterSeries } from './frankfurter';
 import { FRED_SERIES, fetchFredSeries } from './fred';
 import { fetchGoldApiSpot } from './goldapi';
 import { fetchRbaSeries } from './rba';
-import { fetchTgjuGoldOunce } from './tgju';
 import { fetchWorldBankMonthly } from './worldbank';
 import type { SeriesInputs } from './derived';
 import type { SeriesPoint } from '../series';
@@ -63,30 +69,31 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     }
   }
 
-  // FRED (10 series, keyless fredgraph.csv, full history) — keyed by series id.
+  // FRED (14 series, keyless fredgraph.csv, full history) — keyed by series id.
   const fred: Partial<Record<string, SeriesPoint[]>> = {};
   for (const seriesId of Object.values(FRED_SERIES)) {
     const series = await fetchLogged('fred', seriesId, () => fetchFredSeries(seriesId));
     if (series) fred[seriesId] = series;
   }
 
-  // Frankfurter (USD→JPY/AUD/CNY, 10y window).
-  const fx = await fetchLogged('frankfurter', `USD→JPY,AUD,CNY since ${fxStart}`, () =>
+  // ECB Data Portal (deposit facility rate, full history).
+  const ecbDfr = await fetchLogged('ecb', 'FM/D.U2.EUR.4F.KR.DFR.LEV', () => fetchEcbDfrSeries());
+
+  // Frankfurter (USD→JPY/AUD/CNY + the six basket currencies, 10y window).
+  const fx = await fetchLogged('frankfurter', `USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF since ${fxStart}`, () =>
     fetchFrankfurterSeries(fxStart),
   );
 
   // World Bank Pink Sheet monthly.
   const wb = await fetchLogged('world-bank', 'Pink Sheet monthly workbook', () => fetchWorldBankMonthly());
 
-  // gold-api.com spots.
+  // gold-api.com spots (XAU is the primary gold source — TGJU retired I15).
+  const xauSpot = await fetchLogged('gold-api', 'XAU spot', () => fetchGoldApiSpot('XAU'));
   const xagSpot = await fetchLogged('gold-api', 'XAG spot', () => fetchGoldApiSpot('XAG'));
   const btcSpot = await fetchLogged('gold-api', 'BTC spot', () => fetchGoldApiSpot('BTC'));
-  const xauSpot = await fetchLogged('gold-api', 'XAU spot (cross-check)', () => fetchGoldApiSpot('XAU'));
+  const hgSpot = await fetchLogged('gold-api', 'HG (copper) spot', () => fetchGoldApiSpot('HG'));
 
-  // TGJU gold ounce (USD).
-  const tgjuGold = await fetchLogged('tgju', "gold ounce 'ons' (USD)", () => fetchTgjuGoldOunce());
-
-  // ABS (5 series, keyless SDMX CSV).
+  // ABS (8 series, keyless SDMX CSV).
   const absSeries: NonNullable<SeriesInputs['abs']> = {};
   for (const [name, key] of Object.entries(ABS_SERIES) as [keyof typeof ABS_SERIES, string][]) {
     const series = await fetchLogged('abs', key, () => fetchAbsSeries(key));
@@ -105,16 +112,11 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
   const rbaHouseholdDebt = await fetchLogged('rba', 'E2 Household debt to income', () =>
     fetchRbaSeries('householdDebtToIncome'),
   );
+  const rbaHomeLoan = await fetchLogged('rba', 'F6 FLRHOOTA owner-occupier outstanding home-loan rate', () =>
+    fetchRbaSeries('homeLoanOutstanding'),
+  );
 
   // Cross-checks (03-data-sources.md): independent sources must agree.
-  if (tgjuGold && xauSpot) {
-    const drift = ((tgjuGold.price - xauSpot.price) / xauSpot.price) * 100;
-    report(
-      'cross-check',
-      Math.abs(drift) < 2,
-      `TGJU gold ounce ${tgjuGold.price.toFixed(2)} vs gold-api XAU ${xauSpot.price.toFixed(2)} → ${drift.toFixed(2)}%`,
-    );
-  }
   if (bitstamp && btcSpot) {
     const last = bitstamp.at(-1)!;
     const drift = ((btcSpot.price - last.value) / last.value) * 100;
@@ -129,13 +131,29 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     inputs: {
       today,
       fred,
-      fx: { JPY: fx?.JPY, AUD: fx?.AUD, CNY: fx?.CNY },
+      ecb: { dfr: ecbDfr },
+      fx: {
+        JPY: fx?.JPY,
+        AUD: fx?.AUD,
+        CNY: fx?.CNY,
+        EUR: fx?.EUR,
+        GBP: fx?.GBP,
+        CAD: fx?.CAD,
+        SEK: fx?.SEK,
+        CHF: fx?.CHF,
+      },
       wb,
-      tgjuGoldOunceUsd: tgjuGold?.price,
+      xauSpot,
       xagSpot,
       btcSpot,
+      hgSpot,
       abs: absSeries,
-      rba: { cashRate: rbaCashRate, au10y: rbaAu10y, householdDebtRatio: rbaHouseholdDebt },
+      rba: {
+        cashRate: rbaCashRate,
+        au10y: rbaAu10y,
+        householdDebtRatio: rbaHouseholdDebt,
+        homeLoanOutstanding: rbaHomeLoan,
+      },
     },
     reports,
   };

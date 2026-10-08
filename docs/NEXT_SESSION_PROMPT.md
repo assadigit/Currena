@@ -1,41 +1,41 @@
-# Currena — Next Session Brief (Insights UI/UX pass + completeness sweep)
+# Currena — Next Session Brief (post-I15 wrap-up + backtest)
 
-Hand-off date: 2026-10-07 (evening wrap-up) · Production: https://currena.ir ·
-Repo: `origin/main` = `8ec66dc` + the evening wrap-up docs commits (runtime
-unchanged; the exact final SHAs + Workers version of record are in
-`docs/DEPLOY.md` §"Session wrap-up, 2026-10-07 evening").
+Hand-off date: 2026-10-08 (the I15 owner-spec wave). · Production:
+https://currena.ir · Repo: `origin/main` = the I14 record + the I15 commits
+(exact SHAs + the Workers version of record in `docs/DEPLOY.md`
+§"Session wrap-up, 2026-10-08 I15").
 
 ---
 
 ## 1. What this project is
 
-**Currena** — a currency-converter PWA focused on Iranian open-market **Toman**
-rates plus international pairs, at **https://currena.ir**. The current feature
-wave is **Insights** (`#/insights`): a bilingual (en/fa) macro-indicator page —
-**30 indicators** (19 P1 / 11 P2) in a **GLOBAL section that renders before
-AUSTRALIA** (owner decision), with a warning-count summary, 10-year position
-bars, expandable plain-language cards, a weekly what-changed list, and a
-key-dates calendar. Newest cards: `gold-usd` + `silver-usd` (ounce prices at
-the top of the metals group — owner request, deployed 2026-10-07).
+**Currena** — a currency-converter PWA focused on Iranian open-market
+**Toman** rates plus international pairs, at **https://currena.ir**. The
+Insights feature (`#/insights`) is now the **I15** page: question gauges
+(Is borrowing getting costlier? …), a prices board (oil, gold, silver,
+copper, iron ore, Bitcoin), two verdict meters in the hero (Australia
+first, swap setting), alert cards + compact rows in Global|Australia lanes,
+and a details side panel / bottom sheet. 41 indicators (29 voting gauge
+members + prices-board rows + context), 11 added in I15 (fed-target,
+ecb-dfr, us-cpi-yoy, nfci, the **Currena dollar basket**, eur-usd,
+au-home-loan, au-wage-growth, au-rent-yoy, au-petrol-yoy, btc-usd,
+copper-usd); `dollar-broad` retired, TGJU out of insights (licence).
 
 - `apps/api` — Hono on **Cloudflare Workers** (`/api/*`, zero-JS `/admin`,
   serves the built SPA). Cron `* * * * *` keep-warms rates.
 - `apps/web` — Vite + React + TS + Tailwind **PWA** (hash router, 10 routes,
-  en/fa RTL). Insights is a lazy route: `routes/Insights.tsx` (313 lines) +
-  `components/insights/*` (SummaryBlock, WhatChanged, ComingUp, JumpNav,
-  IndicatorCard, HistoryChart, PositionBar, StatusChip, AboutTheData,
-  `config.ts` display helpers — all unit-tested) + the lazy copy corpus
-  `i18n/insights-copy-{en,fa}.ts` (30 indicators × 6 fields, en source of
-  truth, fa compile-time shape-checked).
-- `packages/core` — zod contracts (incl. `IndicatorId` ×30, readings,
-  snapshot). `packages/insights` — scoring engine + source adapters
-  (FRED / Frankfurter / TGJU / gold-api / World Bank / ABS / RBA / manual) +
-  derived series (`derived.ts`).
+  en/fa RTL). The Insights lazy chunk carries the bilingual corpus
+  (~240 kB budget, justified in CHANGELOG §I15).
+- `packages/core` — zod contracts (incl. `IndicatorId` ×41, readings with
+  optional `moveScore`, `below-aux` rule atom). `packages/insights` —
+  scoring engine + `gauges.ts` (steps/verdicts) + `basket.ts` (the dollar
+  basket math) + source adapters (FRED / ECB Data Portal / Frankfurter /
+  gold-api / World Bank / ABS / RBA / manual) + derived series.
 - **Ingestion:** GitHub Actions `insights-ingest` — cron **04:20 UTC daily**
-  (+ `workflow_dispatch` with `dry_run`), writes one snapshot + ≤30 history
-  keys into the existing RATES KV via Cloudflare REST. Exit 1 if any P1
-  indicator is unavailable (that red run IS the stale-feed signal until I7
-  alerting exists).
+  (+ `workflow_dispatch` with `dry_run`), writes the snapshot + ≤41 history
+  keys into RATES KV via Cloudflare REST, seeds the accumulated daily
+  history for gold/silver/btc/copper rows, and evaluates below-aux with the
+  au-cpi series. Exit 1 if any P1 indicator is unavailable.
 
 **Read before touching anything:** `AGENTS.md` (root) — TS strict, zod at
 every boundary, RTL/LTR native, **TOMAN canonical**, tests never hit live
@@ -43,145 +43,73 @@ sites, secrets never persisted.
 
 ## 2. Where the knowledge lives
 
-- **Session-by-session narrative:** `/home/z/my-project/worklog.md` — read the
-  LAST sections first (I5-deploy, I5-ounce-prices, evening wrap-up).
-- `CHANGELOG.md` — §2026-10-07 ounce prices (+ the wrap-up note).
-- `docs/insights/` — **`02-page-design-spec.md` is the UI/UX ground truth
-  (read it FIRST)**; `01-indicator-spec.md` (definitions/thresholds);
-  `03-data-sources.md` (licence verdicts + KV budget findings);
-  `04-roadmap.md` (phase state); `BACKTEST.md` (threshold calibration).
-- `docs/PROGRESS.md` (status row + decisions log + phase checklist),
-  `docs/DEPLOY.md` (every deploy + the git-push-500 fallback runbook),
-  `docs/BACKLOG.md` (no Insights items open).
+- `CHANGELOG.md` — §2026-10-08 I15 (the owner-spec wave).
+- `docs/insights/` — `02-page-design-spec.md` (original UI ground truth),
+  the uploaded specs' v1 status: `01-indicator-spec.md` is now SUPERSEDED
+  by definitions.ts + gauges.ts for membership/rules (keep as history);
+  `BACKTEST.md` regenerated with the 41-id set.
+- `docs/PROGRESS.md` (status row + I15 decisions), `docs/DEPLOY.md`
+  (every deploy + the ingest-then-deploy ORDER note), `docs/BACKLOG.md`
+  (Wave 8 closed; v2 items deferred).
 
-## 3. Current verified state (2026-10-07 evening wrap-up smoke)
+## 3. Current verified state (I15)
 
-- Gates re-run at wrap-up: **typecheck 5/5, tests 516/516 green**
-  (core 157 · scraper 67 · insights 132 · web 52 · api 108).
-- Production `/api/insights`: **30 readings** — `gold-usd` 4107.7 (US$/oz,
-  context) + `silver-usd` 60.109 at the top of metals, **all 18 global ids
-  before the first Australia id** (index 18), 14 calendar events
-  (2026-10-28 → 2027-05-04), zero unavailable indicators; `generatedAt`
-  fresh (daily cron + dispatched run 37646617580). `/api/health` ok.
-- Page verified en/fa × desktop/375px: Global-first sections, Persian digits +
-  Jalali dates in fa, LED warning counts, position bars, expandable cards with
-  SVG chart + SR table; zero console errors; no 375px overflow
-  (`scrollW=clientW`).
-- Layout today: mobile 1-col → `md:2` → `xl:3` card grids, `max-w-6xl`
-  desktop container, `max-w-[480px]` mobile; mobile cards single-open,
-  desktop multi-open; entry bundle 288.75 kB / 87.78 kB gz; Insights lazy
-  chunk 104.54 kB / 31.49 kB gz; precache 60 entries / ~2165 KiB.
+- Gates: typecheck 5/5, tests **708/708** green (core 183 · scraper 67 ·
+  insights 165 · api 119 · web 174). Budgets: entry 290.12/87.76 (vs
+  296/89.5), Insights 235.80/61.92 (vs 240/64 — bumped with justification).
+- Local verification: en/fa × desktop/375px × light/dark — hero meters,
+  alert chips, prices board (gold USD+AUD, BTC ratios), lane switch with
+  persistence, details panel (focus trap/Escape/return/scroll-lock, deep
+  links), sticky scroll-spy nav, FRED notice, no buy/sell wording, zero
+  console errors, no 375px overflow.
+- Known honest edges: the first ingest after deploy starts the btc/copper
+  daily-history accumulation (7/30d changes appear from the second day);
+  RBA F6 parsing is fixture-verified + venue-pending (Series ID FLRHOOTA —
+  the match is loud if the venue file differs).
 
-## 4. This session's mission (owner agenda, in order)
+## 4. This session's likely mission
 
-> "Improving UI/UX of Insights page. and making sure nothing is left behind."
+The owner's standing agenda: verify I15 in production after the deploy,
+then the v2 blocks when the wording review lands. Before anything:
 
-### Phase A — UI/UX audit (evidence, not taste)
-
-Re-review the live page against `02-page-design-spec.md` with fresh eyes.
-agent-browser (DOM + geometry) + VLM screenshots, en + fa × desktop + 375px ×
-light + dark. Produce a **ranked findings list (severity × effort)** covering
-at least:
-
-- **Scannability of 30 cards / hierarchy:** is the page's story readable in
-  ~10 s (summary → what-changed → coming-up → sections)? Section headers'
-  "x of y in warning" lines; group headers; JumpNav discoverability and
-  active-section awareness while scrolling.
-- **Card design:** value prominence, status chip + position-bar legibility,
-  expanded-content length (five sections can read as a wall of text),
-  tap-target sizes, the rule-in-plain-language line.
-- **Charts:** tick density, hover/focus affordances, min/max annotation,
-  clarity of the LTR-time-axis-in-RTL decision for fa readers.
-- **States:** skeletons, stale/unavailable greying, quiet-week, offline
-  banner, empty calendar.
-- **Craft:** spacing/typography rhythm vs the rest of the app, WCAG contrast
-  in both themes, reduced-motion, print/share niceties (stretch).
-- **fa quality:** RTL mirroring by DOM geometry (not screenshots alone),
-  bidi isolation, Persian digits, Jalali dates, native tone of the copy.
-
-### Phase B — Implement the improvements
-
-Ground rules (non-negotiable):
-
-- **Presentation-layer only.** No changes to scoring, thresholds, sources, KV
-  keys or API contracts unless a finding demands it — then document why in
-  the decisions log.
-- All copy through the copy modules (en source of truth, fa native +
-  shape-checked). No hardcoded strings. CSS logical properties only; numbers
-  via `Intl` at render; charts' time axis stays LTR in fa (documented
-  decision).
-- Every change: typecheck + 516 tests green (update tests for any touched
-  pure logic — `config.ts` is unit-tested), **bundle budget held** (entry
-  ≈ ≤289 kB / ≤88 kB gz; Insights chunk growth justified in the changelog),
-  zero console errors, agent-browser verification en/fa × desktop/375px,
-  VLM-assisted visual QA, no horizontal overflow at 375px.
-- Accessibility bar stays or rises: icon+word status, real buttons,
-  `aria-expanded`, chart table alternatives, reduced-motion, heading order.
-- Commit per coherent improvement (`I6-UX` prefix), push regularly.
-
-### Phase C — "Nothing left behind" completeness sweep
-
-- **Phase I6 leftover (roadmap):** re-run the backtest with the full
-  30-indicator set → update `docs/insights/BACKTEST.md`
-  (`pnpm --filter @currena/insights backtest`; the two new context cards
-  never vote — include them honestly).
-- **Phase I7 hardening checklist:** stale-feed alerting (admin console +
-  failed-workflow notification), performance budget + PWA precache impact,
-  SWOT-style re-check of the feature (update `docs/BACKLOG.md`), final
-  production smoke (health, snapshot, each card, en/fa). Do what fits the
-  session; backlog the rest explicitly.
-- **Standing-state verification:** all 30 cards, sample
-  `/api/insights/:id/history` (200 + 404-for-single-point),
-  `changedThisWeek`, calendar, offline fallback, `/admin` Insights freshness
-  card, last Actions ingest run green (04:20 UTC cron).
-
-### Wrap-up (same discipline as every session)
-
-CHANGELOG + PROGRESS + worklog entries; final commit + push; deploy from
-final HEAD; production smoke; remind the owner to rotate tokens if they
-transited chat again.
+1. **Check the 04:20 ingest run is green** and `/api/insights` carries the
+   41 readings (the deploy order in DEPLOY.md ran the ingest BEFORE the
+   worker deploy for read-side validation reasons — confirm it happened).
+2. **Backtest gate**: `pnpm --filter @currena/insights backtest` — the
+   owner approves thresholds from BACKTEST.md (I15 regenerated it).
+3. v2 blocks (T1 connection cards, S1–S3 signals) ONLY after the owner's
+   wording review + a legal read of the FRED "professional services" clause
+   (data spec §10 flags it). S1 needs `SIGNALS_ENABLED=false` per the spec.
+4. Open owner questions from the data spec §11 (optional F5 advertised
+   rate, natural gas, food prices; S&P/VIX permissions).
 
 ## 5. Workflow (per AGENTS.md, enforced)
 
-1. `pnpm install --frozen-lockfile` → `pnpm -r typecheck` → `pnpm -r test`
-   (never red before commit).
+1. `pnpm install --frozen-lockfile` → `pnpm -r typecheck` → `pnpm -r test`.
 2. Local dev: `pnpm --parallel dev` (api :8787, web :5173). Verify with
-   agent-browser + VLM (en/fa, desktop/375px, zero console errors). To test
-   against production-shaped data: fetch the live snapshot from currena.ir
-   and serve it through the seeded-miniflare replay shim used in I4/I5
-   (pattern in the worklog).
-3. Tests never hit live sites; adapters tested against fixtures.
-4. Commits conventional + phase prefix; push to `origin/main` regularly.
-5. Deploy: `pnpm --filter @currena/web build && CLOUDFLARE_API_TOKEN=…
-   CLOUDFLARE_ACCOUNT_ID=… pnpm --filter @currena/api run deploy` (owner
-   supplies session tokens; env-only, inline per command, never persisted,
-   never echoed).
-6. Wrap-up: changelog, final commit+push, deploy from final HEAD, production
-   smoke, worklog entry.
+   agent-browser + VLM (en/fa, desktop/375px, zero console errors).
+3. Commits conventional + phase prefix; push to `origin/main` regularly.
+4. Deploy: web build + `CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=…
+   pnpm --filter @currena/api exec wrangler deploy` — and for
+   indicator-set changes, DISPATCH THE INGEST FIRST so the KV snapshot is
+   the new format before the Worker's read-side validation sees it.
+5. Wrap-up: changelog, final commit+push, deploy from final HEAD,
+   production smoke, worklog entry, remind the owner to rotate tokens.
 
-## 6. Gotchas learned the hard way (don't re-learn them)
+## 6. Gotchas learned the hard way (I15 additions)
 
-- pnpm on PATH via corepack (`corepack enable --install-directory
-  /home/z/.local/bin`); non-interactive shells don't read .bashrc exports.
-- `pnpm --filter @currena/api run deploy` (bare `deploy` collides with the
-  pnpm builtin).
-- GitHub git-write can 500 repo-wide while reads + REST stay healthy →
-  byte-identical commit replay via the REST API (runbook in DEPLOY.md).
-- **KV write budget:** dispatch extra ingest runs only before ~18:30 UTC; a
-  run needs ~26 writes of the 1,000/day account cap.
-- **RBA fetches 403 from this build sandbox** (venue block) — the Actions
-  venue is fine; never "fix" this locally. FRED needs the ingestion
-  User-Agent, not the Chrome fingerprint.
-- VLM misreads: Persian digits hallucinated, seven-segment '1' looks
-  clipped, RTL order needs DOM Range geometry checks as ground truth.
-- BIDI: Persian month + Latin year in one span scrambles — isolate with
-  `<bdi>`/`dir`.
-- Charts + position bars keep LTR axes in fa (documented decision —
-  analytical axes).
-- SW auto-update: first load after deploy may serve the old precache; a
-  two-reload verify cycle is normal.
-- KV eventual consistency: cache-bust + retry before concluding failure.
-- Mobile grids: implicit `auto` tracks caused horizontal overflow once —
-  keep explicit `grid-cols-*` / flex stacks.
-- Bundle: the converter is the money page; Insights must stay lazy and
-  within budget.
+- The engine ages freshness from the OBS date, not the release date — the
+  data spec's monthly/quarterly "stale after" numbers were written the
+  other way and false-alarm (us-cpi 75, ABS monthly 95, WPI 200, ABS
+  quarter-start 215; see definitions.ts notes).
+- KV snapshot read-side validation: an old-format KV snapshot (retired ids)
+  FAILS the new zod enum — dispatch the ingest BEFORE deploying a
+  definitions change.
+- ABS monthly CPI series ids were identified by data signature +
+  published-figure matching (Rents 115522, Automotive fuel 40081, WPI
+  OHRPEB.7.TOT) — 03-data-sources.md carries the evidence.
+- The Fed target is stored as the range midpoint; the 25bp corridor renders
+  at display time (binary-exact quarters — no float dust).
+- VLM misreads persist (it hallucinated HTML on some screenshots) — DOM
+  checks are ground truth; verify buy/sell wording with
+  `/\b(buy|sell)\b/i.test(document.body.textContent)`.

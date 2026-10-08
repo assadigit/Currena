@@ -19,15 +19,18 @@ import type { IndicatorDefinition, IndicatorId, IndicatorReading } from '@curren
 import {
   DEFINITIONS,
   combineSeries,
+  computeBasketValue,
   computeReading,
   parseAbsPeriodCsv,
+  parseEcbDfrCsv,
   parseFrankfurterTimeseries,
   parseFredCsv,
+  parseRbaTableCsv,
   parseWorldBankMonthlyCsv,
-  summarize,
   yoyPctSeries,
   type SeriesPoint,
 } from '../src/index';
+import { summarizeByGauges } from '../src/gauges';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const FIXTURES = join(HERE, '..', 'fixtures');
@@ -52,9 +55,38 @@ const usdCny = fx('CNY');
 const wbGold = wb('gold_usd_toz');
 const wbSilver = wb('silver_usd_toz');
 
-const goldOunceUsd = wbGold; // history stand-in for the TGJU live numerator (03-data-sources.md)
+const goldOunceUsd = wbGold; // history stand-in for the live XAU numerator (gold-api now, 03-data-sources.md)
 const cpiIndex = parseAbsPeriodCsv(fixture('abs-cpi-all-groups-quarterly-2004.csv'));
 const trimmedIndex = parseAbsPeriodCsv(fixture('abs-cpi-trimmed-mean-quarterly-2004.csv'));
+
+// I15 fixture legs (recorded 2026-10-08): the six basket currencies (ECB
+// reference rates through the last decade) and the new FRED/ECB/RBA series.
+const basketFx = parseFrankfurterTimeseries(fixture('frankfurter-usd-basket-2016.json'), 'EUR');
+const basketCcy = (c: string) => parseFrankfurterTimeseries(fixture('frankfurter-usd-basket-2016.json'), c);
+const usCpi = fred('CPIAUCSL');
+const fedTarget = combineSeries(fred('DFEDTARL'), fred('DFEDTARU'), (l, u) => (l + u) / 2);
+const ecbDfr = parseEcbDfrCsv(fixture('ecb-dfr.csv'));
+const nfciSeries = fred('NFCI');
+const rbaHomeLoan = parseRbaTableCsv(fixture('rba-f6-data.csv'), { tablePrefix: 'F6', seriesId: 'FLRHOOTA' });
+
+/** The basket series from the six-currency fixture (exact-date inner join). */
+function basketFromFixture(): SeriesPoint[] {
+  const byDate = new Map<string, Record<string, number>>();
+  for (const c of ['EUR', 'JPY', 'GBP', 'CAD', 'SEK', 'CHF']) {
+    for (const p of basketCcy(c)) {
+      const row = byDate.get(p.date) ?? {};
+      row[c] = p.value;
+      byDate.set(p.date, row);
+    }
+  }
+  const out: SeriesPoint[] = [];
+  for (const [date, row] of byDate) {
+    if (Object.keys(row).length !== 6) continue;
+    out.push({ date, value: computeBasketValue(row) });
+  }
+  return out.sort((a, b) => (a.date < b.date ? -1 : 1));
+}
+const dollarBasket = basketFromFixture();
 
 /** Series per backtested indicator (composed exactly as the I2 adapters will). */
 const SERIES: Partial<Record<IndicatorId, SeriesPoint[]>> = {
@@ -64,7 +96,11 @@ const SERIES: Partial<Record<IndicatorId, SeriesPoint[]>> = {
   us10y: fred('DGS10'),
   'breakeven-5y5y': fred('T5YIFR'),
   'govt-interest-revenue': combineSeries(fred('A091RC1Q027SBEA'), fred('W006RC1Q027SBEA'), (a, w) => a / w),
-  'dollar-broad': fred('DTWEXBGS'),
+  'us-cpi-yoy': yoyPctSeries(usCpi),
+  'fed-target': fedTarget,
+  'ecb-dfr': ecbDfr,
+  nfci: nfciSeries,
+  'dollar-basket': dollarBasket,
   usdjpy: usdJpy,
   'gold-silver': combineSeries(goldOunceUsd, wbSilver, (g, s) => g / s),
   'copper-gold': combineSeries(wb('copper_usd_mt'), wbGold, (c, g) => c / g),
@@ -77,6 +113,7 @@ const SERIES: Partial<Record<IndicatorId, SeriesPoint[]>> = {
   'au-cpi': yoyPctSeries(cpiIndex),
   'au-trimmed-mean': yoyPctSeries(trimmedIndex),
   'au-unemployment': parseAbsPeriodCsv(fixture('abs-unemployment-monthly-2004.csv')),
+  'au-home-loan': rbaHomeLoan,
 };
 
 const SOURCE_NAMES: Partial<Record<IndicatorId, string>> = {
@@ -86,7 +123,12 @@ const SOURCE_NAMES: Partial<Record<IndicatorId, string>> = {
   us10y: 'FRED (DGS10)',
   'breakeven-5y5y': 'FRED (T5YIFR)',
   'govt-interest-revenue': 'FRED (A091RC1Q027SBEA ÷ W006RC1Q027SBEA)',
-  'dollar-broad': 'FRED (DTWEXBGS)',
+  'us-cpi-yoy': 'FRED (CPIAUCSL, 12-month change)',
+  'fed-target': 'FRED (DFEDTARL/U midpoint)',
+  'ecb-dfr': 'ECB Data Portal (DFR)',
+  nfci: 'FRED (NFCI)',
+  'dollar-basket': 'Currena basket (Frankfurter fixture)',
+  'au-home-loan': 'RBA F6 (FLRHOOTA)',
   usdjpy: 'Frankfurter (ECB)',
   'gold-silver': 'World Bank Pink Sheet (gold ÷ silver)',
   'copper-gold': 'World Bank Pink Sheet (copper ÷ gold)',
@@ -102,18 +144,24 @@ const SOURCE_NAMES: Partial<Record<IndicatorId, string>> = {
 };
 
 const NOT_BACKTESTED: Readonly<Partial<Record<IndicatorId, string>>> = {
-  'gold-usd': 'info-only (owner-added 2026-10-07): live TGJU ounce point over World Bank monthly gold backfill — never votes',
-  'silver-usd': 'info-only (owner-added 2026-10-07): live gold-api XAG point over World Bank monthly silver backfill — never votes',
-  'gold-btc': 'live sources are I2 adapters (gold-api.com BTC); info-only, never votes',
-  'silver-btc': 'live sources are I2 adapters; info-only, never votes',
-  'gold-aud': 'composed from live TGJU gold + Frankfurter AUD (I2); info-only, never votes',
+  'gold-usd': 'info-only: live gold-api XAU point over World Bank monthly backfill — never votes (prices-board row)',
+  'silver-usd': 'info-only: live gold-api XAG point over World Bank monthly backfill — never votes (prices-board row)',
+  'copper-usd': 'info-only: live gold-api HG point over World Bank monthly backfill — never votes (prices-board row)',
+  'btc-usd': 'info-only: live gold-api BTC point, no 10y history by design — never votes (prices-board row)',
+  'gold-btc': 'context-only ratio under the Bitcoin price row (PB2); never votes',
+  'silver-btc': 'context-only ratio under the Bitcoin price row (PB2); never votes',
+  'gold-aud': 'composed from live gold-api XAU + Frankfurter AUD; info-only, never votes',
+  'eur-usd': 'info-only context card in the dollar lane; never votes',
   'rba-cash-rate': 'rba.gov.au Akamai-blocked from the sandbox (03-data-sources.md); info-only, never votes',
+  'au-petrol-yoy': 'info-only context card (ABS monthly CPI Automotive fuel — no recorded fixture yet); never votes',
   'au-us-10y-gap': 'RBA F2 unreachable from the sandbox — pending the Phase I2 venue re-probe',
   'china-pmi':
     'manual series (data/manual/china-pmi.json) populated since Phase I5 but starts 2025-12 — 10 observations, too short for any backtest window or the percentile floor; votes in production (threshold < 50) once history accrues',
-  'terms-of-trade': 'ABS ANA_AGG adapter is Phase I2 work (P2 indicator)',
-  'au-home-values': 'ABS RES_DWELL_ST adapter is Phase I2 work (P2 indicator)',
-  'au-household-debt-arrears': 'ABS E2 adapter is Phase I2 work (P2 indicator)',
+  'terms-of-trade': 'ABS ANA_AGG fixture not recorded (P2 indicator); votes in production from the live adapter',
+  'au-home-values': 'ABS RES_DWELL_ST fixture not recorded (P2 indicator); votes in production from the live adapter',
+  'au-household-debt-arrears': 'RBA E2 fixture not recorded (P2 indicator); votes in production from the live adapter',
+  'au-wage-growth': 'ABS WPI fixture not recorded + below-aux needs the au-cpi yoy pairing — votes in production from the live adapters',
+  'au-rent-yoy': 'ABS monthly CPI Rents fixture not recorded — votes in production from the live adapter',
 };
 
 /**
@@ -133,8 +181,8 @@ const BACKTEST_DEF_OVERRIDES: Readonly<Partial<Record<IndicatorId, Partial<Indic
 interface WeekResult {
   date: string;
   readings: IndicatorReading[];
-  global: ReturnType<typeof summarize>['global'];
-  australia: ReturnType<typeof summarize>['australia'];
+  global: ReturnType<typeof summarizeByGauges>['global'];
+  australia: ReturnType<typeof summarizeByGauges>['australia'];
 }
 
 function runAt(day: string): WeekResult {
@@ -146,7 +194,7 @@ function runAt(day: string): WeekResult {
     const def: IndicatorDefinition = { ...base, ...BACKTEST_DEF_OVERRIDES[base.id] };
     readings.push(computeReading(def, series, now, { name: SOURCE_NAMES[def.id] ?? 'fixture' }));
   }
-  const s = summarize(readings);
+  const s = summarizeByGauges(readings);
   return { date: day, readings, global: s.global, australia: s.australia };
 }
 
@@ -196,8 +244,8 @@ emit();
 emit('- Engine: `@currena/insights` scoring (rule evaluation, percentiles, stale handling) — identical code path to the future ingestion runner.');
 emit('- Frozen clock: each weekly run passes its own date; nothing reads the wall clock.');
 emit('- Percentile: share of the last 10 years\u2019 readings strictly below the current one; minimum 120 base observations before a percentile exists.');
-emit('- Labels: score = warnings ÷ voters; <20% Relaxed · 20–39% Cautious · 40–59% Stressed · ≥60% Alarmed; no voters → no label.');
-emit('- Stale exclusion: max age of the freshest observation per cadence (daily 3d, weekly 16d, monthly 95d, quarterly 190d, per-change never — release lags included, calibrated against the fixtures in this run).');
+emit("- Labels (I15): each gauge's share of members in alert maps to steps 1–4 (0, ≤⅓, ≤⅔, >⅔); a region's verdict = rounded average of its gauges' steps, escalated to ≥3 when any gauge sits at step 4. The four label words are unchanged: Relaxed · Cautious · Stressed · Alarmed; no readable gauges → no label.");
+emit('- Stale exclusion: per-series `staleAfterDays` override first (I15: Brent 12d, NFCI 14d, ECB 7d, Fed 5d, ABS CPI items 70d, WPI 130d), else the cadence grace (daily 3d, weekly 16d, monthly 95d, quarterly 190d, per-change never).');
 emit('- Windows: weekly Mondays across the 2008 GFC, 2020 COVID and 2022 inflation shocks, plus 2017 and 2025 as calm contrast.');
 emit();
 
@@ -312,7 +360,7 @@ for (const w of WINDOWS) {
 emit('## Calibration observations (auto-generated)');
 emit();
 emit('- See the tables above: any indicator that spends ~0% or ~100% of a stress window in warning is a threshold the owner may want to re-tune at this gate.');
-emit('- Info-only cards (gold-btc, silver-btc, gold-aud, rba-cash-rate, usdcny) never vote by construction.');
+emit('- Info-only/price rows (gold-usd, silver-usd, copper-usd, btc-usd, gold-btc, silver-btc, gold-aud, eur-usd, usdcny, rba-cash-rate, au-petrol-yoy) never vote by construction; Brent votes by rule but is not a gauge member (feeds the big-mover callout).');
 emit();
 
 /* Write -------------------------------------------------------------------- */

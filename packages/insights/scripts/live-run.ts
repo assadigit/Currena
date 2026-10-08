@@ -22,7 +22,8 @@
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 
-import { DEFINITIONS, computeReading, summarize } from '../src/index';
+import { DEFINITIONS, computeReading } from '../src/index';
+import { summarizeByGauges } from '../src/gauges';
 import {
   buildIndicatorSeries,
   collectAllSources,
@@ -68,7 +69,7 @@ for (const def of DEFINITIONS) {
   readings.push(computeReading(def, s, nowIso, src));
 }
 
-const summary = summarize(readings);
+const summary = summarizeByGauges(readings);
 
 /* ------------------------------------------------------------------ *
  * Report

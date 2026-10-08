@@ -35,6 +35,7 @@ import { CalendarEventSchema, type CalendarEvent, type IndicatorHistory } from '
 import { z } from 'zod';
 
 import { DEFINITIONS } from '../src/index';
+import type { IndicatorId } from '@currena/core';
 import type { SeriesPoint } from '../src/series';
 import {
   buildHistoryFile,
@@ -42,6 +43,7 @@ import {
   buildInsightsSnapshot,
   buildInsightsStatus,
   collectAllSources,
+  historyToSeries,
   parseManualSeries,
 } from '../src/adapters/index';
 import { RestInsightsStore } from '../src/store';
@@ -140,6 +142,31 @@ const series = buildIndicatorSeries({ ...inputs, chinaPmi });
 const store = dryRun
   ? undefined
   : new RestInsightsStore({ apiToken: apiToken!, accountId: accountId!, namespaceId: namespaceId! });
+
+/* ------------------------------------------------------------------ *
+ * I15: seed the accumulated-daily series for the live-priced rows
+ * (gold/silver/copper/bitcoin) from the stored history — this is what
+ * makes 7/30-day changes measurable on those rows (data spec §3 note).
+ * ------------------------------------------------------------------ */
+
+if (store) {
+  const SEED_IDS: IndicatorId[] = ['gold-usd', 'silver-usd', 'copper-usd', 'btc-usd'];
+  const seedHistory: Partial<Record<IndicatorId, SeriesPoint[]>> = {};
+  for (const id of SEED_IDS) {
+    try {
+      const stored = await store.getHistory(id);
+      if (stored) seedHistory[id] = historyToSeries(stored);
+    } catch (err) {
+      console.warn(`[ingest] seed read failed for ${id}: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  if (Object.keys(seedHistory).length > 0) {
+    for (const id of SEED_IDS) {
+      if (seedHistory[id]) console.log(`[ingest] seed: ${id} ${seedHistory[id]!.length} accumulated points`);
+    }
+    Object.assign(series, buildIndicatorSeries({ ...inputs, chinaPmi, seedHistory }));
+  }
+}
 
 const previous = store ? await store.getSnapshot() : undefined; // undefined on first run / 404
 if (previous) {

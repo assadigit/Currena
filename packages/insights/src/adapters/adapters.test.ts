@@ -8,8 +8,9 @@ import { fetchFrankfurterSeries, frankfurterTimeseriesUrl } from './frankfurter'
 import { absDataUrl, ABS_SERIES, fetchAbsSeries } from './abs';
 import { fetchGoldApiSpot, goldApiPriceUrl } from './goldapi';
 import { bitstampOhlcUrl, fetchBitstampCloses } from './bitstamp';
-import { fetchTgjuGoldOunce } from './tgju';
 import { parseManualSeries } from './manual';
+import { fetchEcbDfrSeries, ECB_DFR_SERIES_KEY } from './ecb';
+import { fetchRbaSeries, RBA_TABLES, rbaTableUrl } from './rba';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const FIXTURES = join(HERE, '..', '..', 'fixtures');
@@ -81,14 +82,18 @@ describe('fred adapter', () => {
 
   it('carries every series id the definitions table consumes', () => {
     expect(Object.values(FRED_SERIES)).toContain('STLFSI4');
-    expect(Object.values(FRED_SERIES)).toHaveLength(10);
+    expect(Object.values(FRED_SERIES)).toHaveLength(13);
   });
 });
 
 describe('frankfurter adapter', () => {
   it('builds the open-ended timeseries URL', () => {
     expect(frankfurterTimeseriesUrl('2016-01-04')).toBe(
-      'https://api.frankfurter.dev/v1/2016-01-04..?from=USD&to=JPY,AUD,CNY',
+      'https://api.frankfurter.dev/v1/2016-01-04..?from=USD&to=JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF',
+    );
+    // Narrow currency lists still build their own URL.
+    expect(frankfurterTimeseriesUrl('2016-01-04', ['JPY'])).toBe(
+      'https://api.frankfurter.dev/v1/2016-01-04..?from=USD&to=JPY',
     );
     expect(() => frankfurterTimeseriesUrl('2016/01/04')).toThrow(/not an ISO date/);
   });
@@ -210,24 +215,56 @@ describe('bitstamp adapter', () => {
   });
 });
 
-describe('tgju adapter', () => {
-  it("extracts the 'ons' gold ounce in USD from a recorded ajax.json payload", async () => {
-    const payload = JSON.parse(readFileSync(join(HERE, '..', '..', '..', 'scraper', 'fixtures', 'tgju-ajax.trimmed.json'), 'utf-8'));
-    const fixedNow = () => new Date('2026-10-06T12:00:00Z');
-    const ounce = await fetchTgjuGoldOunce(
-      { fetchImpl: fixtureFetch({ 'https://call1.tgju.org/ajax.json': () => JSON.stringify(payload) }) },
-      fixedNow,
-    );
-    expect(ounce.price).toBeCloseTo(4383.45, 2);
-    expect(ounce.fetchedAt).toBe('2026-10-06T12:00:00.000Z');
+describe('ecb adapter (I15 — deposit facility rate)', () => {
+  it('parses the recorded wide-SDMX CSV into a sorted canonical series', async () => {
+    const series = await fetchEcbDfrSeries({
+      fetchImpl: fixtureFetch({ 'https://data-api.ecb.europa.eu/service/data/': () => fixtureText('ecb-dfr.csv') }),
+    });
+    expect(series.length).toBeGreaterThan(20);
+    expect(series[0]).toEqual({ date: '2015-01-01', value: -0.2 });
+    // Ascending and unique (the live API returns unordered rows).
+    for (let i = 1; i < series.length; i++) {
+      expect(series[i]!.date > series[i - 1]!.date).toBe(true);
+    }
   });
 
-  it('fails loudly when the gold ounce symbol is absent', async () => {
+  it('fails loudly when TIME_PERIOD/OBS_VALUE columns are absent (format change)', async () => {
     await expect(
-      fetchTgjuGoldOunce({
-        fetchImpl: fixtureFetch({ 'https://call1.tgju.org/ajax.json': () => '{"current":{}}' }),
+      fetchEcbDfrSeries({
+        fetchImpl: fixtureFetch({ 'https://data-api.ecb.europa.eu/service/data/': () => 'KEY,FREQ\nX,D\n' }),
       }),
-    ).rejects.toThrow(/gold ounce.*missing/);
+    ).rejects.toThrow(/TIME_PERIOD\/OBS_VALUE/);
+  });
+
+  it('the series key is the confirmed FM dataflow key', () => {
+    expect(ECB_DFR_SERIES_KEY).toBe('FM/D.U2.EUR.4F.KR.DFR.LEV');
+  });
+});
+
+describe('rba F6 adapter (I15 — home-loan rate by Series ID)', () => {
+  it('extracts FLRHOOTA (owner-occupier outstanding) from the recorded F6 table', async () => {
+    const series = await fetchRbaSeries('homeLoanOutstanding', {
+      fetchImpl: fixtureFetch({ [rbaTableUrl(RBA_TABLES.homeLoanOutstanding)]: () => fixtureText('rba-f6-data.csv') }),
+    });
+    // 86 monthly observations, venue-verified (DB.NOMICS FLRHOOTA, 2019-07 → 2026-08).
+    expect(series).toHaveLength(86);
+    expect(series[0]).toEqual({ date: '2019-07-31', value: 3.84 });
+    expect(series.at(-1)).toEqual({ date: '2026-08-31', value: 6.21 });
+  });
+
+  it('fails loudly when the Series ID is absent from the table (E2 has no FLRHOOTA)', async () => {
+    await expect(
+      fetchRbaSeries('homeLoanOutstanding', {
+        fetchImpl: fixtureFetch({ [rbaTableUrl(RBA_TABLES.homeLoanOutstanding)]: () => fixtureText('rba-e2-data.csv') }),
+      }),
+    ).rejects.toThrow(/does not start with "F6"/); // wrong-table identity check fires first
+    // Same table, id that is genuinely absent → the Series-ID miss is loud.
+    const f6NoId = fixtureText('rba-f6-data.csv').replace('FLRHOOTA', 'FLRNOPE');
+    await expect(
+      fetchRbaSeries('homeLoanOutstanding', {
+        fetchImpl: fixtureFetch({ [rbaTableUrl(RBA_TABLES.homeLoanOutstanding)]: () => f6NoId }),
+      }),
+    ).rejects.toThrow(/no series id "FLRHOOTA"/); // the adapter still asks for the real id
   });
 });
 

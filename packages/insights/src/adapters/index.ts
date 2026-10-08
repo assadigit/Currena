@@ -27,11 +27,11 @@ export {
   parseWorldBankMonthlySheet,
 } from './worldbank';
 export { GOLDAPI_SYMBOLS, fetchGoldApiSpot, goldApiPriceUrl, GOLDAPI_BASE } from './goldapi';
+export { ECB_DFR_SERIES_KEY, ecbDfrUrl, fetchEcbDfrSeries, ECB_DATA_BASE } from './ecb';
 export { bitstampOhlcUrl, fetchBitstampCloses } from './bitstamp';
 export type { BitstampWindow } from './bitstamp';
 export { RBA_TABLES, fetchRbaSeries, rbaTableUrl, RBA_CSV_BASE } from './rba';
 export type { RbaTableKey, RbaTableSpec } from './rba';
-export { fetchTgjuGoldOunce } from './tgju';
 export { ManualSeriesFileSchema, parseManualSeries } from './manual';
 export type { ManualSeriesFile } from './manual';
 export { buildIndicatorSeries, READING_SOURCES } from './derived';
@@ -40,4 +40,12 @@ export { readXlsxSheet } from './xlsx';
 export type { XlsxCell } from './xlsx';
 export { collectAllSources, DEFAULT_BITSTAMP_CANDLES, DEFAULT_FX_START } from './collect';
 export type { CollectOptions, CollectResult } from './collect';
-export { buildInsightsSnapshot, buildHistoryFile, buildInsightsStatus, downsampleSeries, HISTORY_MAX_POINTS, HISTORY_WINDOW_DAYS } from './snapshot';
+export {
+  buildInsightsSnapshot,
+  buildHistoryFile,
+  buildInsightsStatus,
+  downsampleSeries,
+  historyToSeries,
+  HISTORY_MAX_POINTS,
+  HISTORY_WINDOW_DAYS,
+} from './snapshot';

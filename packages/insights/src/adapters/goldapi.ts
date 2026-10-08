@@ -19,11 +19,12 @@ const GoldApiPriceSchema = z.object({
   updatedAt: z.iso.datetime(),
 });
 
-/** Symbols the Insights indicators consume. */
+/** Symbols the Insights indicators consume (I15: + HG copper per pound). */
 export const GOLDAPI_SYMBOLS = {
   silver: 'XAG',
   bitcoin: 'BTC',
   gold: 'XAU',
+  copper: 'HG',
 } as const;
 
 export function goldApiPriceUrl(symbol: string): string {

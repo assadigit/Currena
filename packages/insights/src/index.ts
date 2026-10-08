@@ -7,10 +7,14 @@
  * Modules:
  *   - series.ts      — SeriesPoint + date/lookup helpers (binary search).
  *   - parsers.ts     — fixture-format parsers (FRED CSV, Frankfurter JSON,
- *                      World Bank monthly, ABS period) — the parse halves of
- *                      the future I2 adapters.
- *   - definitions.ts — the 28 v1 indicator definitions (spec verbatim).
- *   - scoring.ts     — rule evaluation, readings, summary lines, changes.
+ *                      World Bank monthly, ABS period, RBA tables) — the
+ *                      parse halves of the adapters.
+ *   - definitions.ts — the v2 indicator definitions (spec verbatim, I15).
+ *   - basket.ts      — the Currena dollar basket math (DXY-style weights).
+ *   - gauges.ts      — question gauges: membership, steps, region verdicts,
+ *                      summary lines (the flat-share summary's successor).
+ *   - scoring.ts     — rule evaluation, readings (incl. move scores),
+ *                      changes; per-series freshness overrides.
  */
 
 export {
@@ -29,6 +33,7 @@ export type { SeriesPoint } from './series';
 export {
   parseAbsPeriodCsv,
   parseAbsSdmxCsv,
+  parseEcbDfrCsv,
   parseRbaTableCsv,
   parseFrankfurterTimeseries,
   parseFredCsv,
@@ -39,8 +44,27 @@ export type { RbaParseOptions } from './parsers';
 export { DEFINITIONS } from './definitions';
 
 export {
+  BASKET_CURRENCIES,
+  BASKET_SCALING_CONSTANT,
+  BASKET_WEIGHTS,
+  computeBasketValue,
+} from './basket';
+
+export {
+  GAUGES,
+  gaugeReading,
+  gaugesForSection,
+  labelForVerdictStep,
+  sectionVerdictStep,
+  summarizeByGauges,
+  summarizeSectionByGauges,
+} from './gauges';
+export type { GaugeDef, GaugeReading } from './gauges';
+
+export {
   GRACE_DAYS,
   MIN_ABOVE_LOW_OBS,
+  MIN_MOVE_OBS,
   MIN_PERCENTILE_OBS,
   PERCENTILE_WINDOW_DAYS,
   YOY_MAX_DAYS_BACK,
@@ -48,8 +72,8 @@ export {
   computeReading,
   changedSince,
   evaluateRule,
-  labelForScore,
+  moveScoreOf,
   percentileOf,
-  summarize,
+  staleAfterDaysFor,
 } from './scoring';
-export type { ReadingSource, RuleVerdict, SummaryLabel } from './scoring';
+export type { AuxSeries, ReadingSource, RuleVerdict } from './scoring';

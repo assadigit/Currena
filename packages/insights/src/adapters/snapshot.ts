@@ -14,10 +14,11 @@
 
 import type { CalendarEvent, IndicatorHistory, IndicatorId, InsightsSnapshot, InsightsSourceReport, InsightsStatus, IndicatorReading } from '@currena/core';
 import { InsightsSnapshotSchema, IndicatorHistorySchema, InsightsStatusSchema } from '@currena/core';
-import { changedSince, computeReading, summarize, PERCENTILE_WINDOW_DAYS, type ReadingSource } from '../scoring';
+import { changedSince, computeReading, PERCENTILE_WINDOW_DAYS, type AuxSeries, type ReadingSource } from '../scoring';
+import { summarizeByGauges } from '../gauges';
 import { DEFINITIONS } from '../definitions';
-import { addDays, epochDay, type SeriesPoint } from '../series';
-import { READING_SOURCES } from './derived';
+import { addDays, epochDay, fromEpochDay, type SeriesPoint } from '../series';
+import { AUX_RULE_WIRING, READING_SOURCES } from './derived';
 
 export interface SnapshotBuildInputs {
   /** Assembled indicator series (buildIndicatorSeries output). */
@@ -58,10 +59,14 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
       });
       continue;
     }
-    readings.push(computeReading(def, series, inputs.now, source));
+    // I15: below-aux rules get their paired series (wage growth vs CPI).
+    const auxOf = AUX_RULE_WIRING[def.id];
+    const auxSeries = auxOf ? auxOf(inputs.series) : undefined;
+    const aux: AuxSeries | undefined = auxSeries ? { series: auxSeries } : undefined;
+    readings.push(computeReading(def, series, inputs.now, source, aux));
   }
 
-  const summary = summarize(readings);
+  const summary = summarizeByGauges(readings);
 
   // "What changed this week": today's vote flips (vs the previous snapshot's
   // readings) MERGED with the still-fresh events the previous snapshot had
@@ -133,6 +138,15 @@ export function buildHistoryFile(id: IndicatorId, series: readonly SeriesPoint[]
     id,
     points: kept.map((p) => [epochDay(p.date), p.value] as [number, number]),
   });
+}
+
+/**
+ * I15: decode a stored IndicatorHistory back into dated points so the next
+ * run can seed the accumulated-daily series (see SeriesInputs.seedHistory).
+ * Pure — the runner calls it right after store.getHistory().
+ */
+export function historyToSeries(history: IndicatorHistory): SeriesPoint[] {
+  return history.points.map(([day, value]) => ({ date: fromEpochDay(day), value }));
 }
 
 /* ------------------------------------------------------------------ *

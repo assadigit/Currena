@@ -14,6 +14,12 @@
  *  - E2  'Household debt to income' — quarterly ABS-calculated ratios
  *    republished by the RBA; future quarters arrive pre-scaffolded empty
  *    and are skipped by the parser.
+ *  - F6  Series ID FLRHOOTA (I15, 2026-10-08 data spec §3) — the average
+ *    rate on OUTSTANDING owner-occupier housing loans, all loans, all
+ *    institutions: "the home-loan rate people actually pay". Matched by
+ *    Series ID, not title — the RBA rewords titles over time (external
+ *    parsers use the same convention). Latest venue-verified value: 6.21%
+ *    (2026-08, cross-checked against the RBA's published F6 page).
  */
 
 import { fetchWithRetry } from '@currena/scraper';
@@ -28,14 +34,17 @@ export interface RbaTableSpec {
   file: string;
   /** Title-line prefix, e.g. 'F1.1' (loud identity check). */
   prefix: string;
-  /** Exact series title in the 'Title' header row. */
-  series: string;
+  /** Exact series title in the 'Title' header row (mutually exclusive with seriesId). */
+  series?: string;
+  /** Exact Series ID in the 'Series ID' metadata row (I15 — the stable identifier). */
+  seriesId?: string;
 }
 
 export const RBA_TABLES = {
   cashRate: { file: 'f1.1', prefix: 'F1.1', series: 'Cash Rate Target' },
   au10y: { file: 'f2', prefix: 'F2', series: 'Australian Government 10 year bond' },
   householdDebtToIncome: { file: 'e2', prefix: 'E2', series: 'Household debt to income' },
+  homeLoanOutstanding: { file: 'f6', prefix: 'F6', seriesId: 'FLRHOOTA' },
 } as const satisfies Record<string, RbaTableSpec>;
 
 export type RbaTableKey = keyof typeof RBA_TABLES;
@@ -46,11 +55,15 @@ export function rbaTableUrl(spec: RbaTableSpec): string {
 
 /** Fetch and parse one RBA table series (full history). */
 export async function fetchRbaSeries(key: RbaTableKey, deps: FetchDeps = {}): Promise<SeriesPoint[]> {
-  const spec = RBA_TABLES[key];
+  const spec: RbaTableSpec = RBA_TABLES[key];
   // RBA tables are a few hundred KB and Akamai-throttled — a wider timeout
   // than the 12s default, still overridable.
   const { timeoutMs, ...rest } = deps;
   const res = await fetchWithRetry(rbaTableUrl(spec), {}, { ...rest, timeoutMs: timeoutMs ?? 45_000 });
   const text = await res.text();
-  return parseRbaTableCsv(text, { tablePrefix: spec.prefix, seriesTitle: spec.series });
+  const opts: import('../parsers').RbaParseOptions =
+    spec.seriesId !== undefined
+      ? { tablePrefix: spec.prefix, seriesId: spec.seriesId }
+      : { tablePrefix: spec.prefix, seriesTitle: spec.series };
+  return parseRbaTableCsv(text, opts);
 }

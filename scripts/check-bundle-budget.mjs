@@ -65,7 +65,17 @@ const BUDGETS = [
   // compressible); the raw overage is the CSV column wording, not logic.
   // Justified in CHANGELOG §2026-10-08 (I13). Entry chunk untouched
   // (295.11/88.55 vs 296/89.5): Insights stays lazy.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 134_000, gz: 39_000, label: 'Insights lazy chunk' },
+  // I15 bump (133.85/38.88 → 235.78/61.93, budget 240/64): the 2026-10-08
+  // owner restructure grew the chunk in three documented ways — (1) the copy
+  // corpus doubled: 41 indicators × (plain name + 6 detail fields + 4-5
+  // state-keyed consequence lines + unit notes) × TWO languages; (2) the
+  // details side-panel/bottom-sheet architecture (F5) with its focus-trap +
+  // lazy chart; (3) the prices board + verdict meters + lane switch + the
+  // @currena/insights GAUGES table joining the chunk. The ENTRY chunk (the
+  // money page) is untouched at 290.12/87.00 — under its own budget. The
+  // gzip cost (+23 kB) is the honest price of the bilingual plain-language
+  // corpus the spec demanded. Justified in CHANGELOG §2026-10-08 (I15).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 240_000, gz: 64_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

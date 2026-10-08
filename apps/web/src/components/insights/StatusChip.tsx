@@ -1,22 +1,81 @@
 /**
- * StatusChip — icon + word, never colour alone (02-page-design-spec.md §9).
- * Tones map onto the existing theme tokens; the icon is decoration
- * (aria-hidden) because the word carries the meaning.
+ * StatusChip — SVG icon + word, never colour alone (spec §9 + Block G5).
+ * Emoji glyphs are gone (G5: "Emoji glyphs look different on each operating
+ * system"): four inline SVG icons, 16px, stroke-currentColor, aria-hidden
+ * (the word carries the meaning). Tones map onto the I15 status ink tokens.
  */
 
 import type { IndicatorReading } from '@currena/core';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { STATUS_META, type StatusTone } from './config';
+import type { StatusTone } from './config';
 
-// I6 audit F1: the brand accents fail WCAG AA as small text on light cards
-// (2.78–3.29:1) — text uses the ink-grade `-deep` tokens (≥4.5:1 on the tinted
-// pill in BOTH themes; dark remaps them to the bright hues).
+// Ink-grade tokens (G4): ≥4.5:1 on each chip's own tint in BOTH themes.
 const TONE_CLASSES: Record<StatusTone, string> = {
-  danger: 'bg-currena-warning/15 text-currena-warning-deep',
-  success: 'bg-currena-success/15 text-currena-success-deep',
-  info: 'bg-currena-blue/10 text-currena-blue-deep',
-  muted: 'bg-currena-muted/15 text-currena-muted',
+  danger: 'bg-currena-warning/15 text-[var(--color-status-alert)]',
+  success: 'bg-currena-success/15 text-[var(--color-status-normal)]',
+  info: 'bg-currena-blue/10 text-[var(--color-status-context)]',
+  muted: 'bg-currena-muted/15 text-[var(--color-status-stale)]',
 };
+
+/** Inline SVG icons (16×16, stroke = currentColor). */
+function StatusIcon({ kind }: { kind: IndicatorReading['status'] }) {
+  const common = {
+    width: 16,
+    height: 16,
+    viewBox: '0 0 16 16',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.8,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true,
+    focusable: false,
+  };
+  switch (kind) {
+    case 'warning':
+      return (
+        <svg {...common}>
+          <path d="M8 1.8 14.6 13.4H1.4L8 1.8Z" />
+          <path d="M8 6.2v3.4" />
+          <path d="M8 11.7h.01" />
+        </svg>
+      );
+    case 'normal':
+      return (
+        <svg {...common}>
+          <path d="M2.8 8.4l3.4 3.4L13.2 4.4" />
+        </svg>
+      );
+    case 'context':
+      return (
+        <svg {...common}>
+          <circle cx="8" cy="8" r="6.2" />
+          <path d="M8 7.4v4" />
+          <path d="M8 4.6h.01" />
+        </svg>
+      );
+    case 'stale':
+      return (
+        <svg {...common}>
+          <circle cx="8" cy="8" r="6.2" />
+          <path d="M8 4.6V8l2.4 1.6" />
+        </svg>
+      );
+    case 'no-history':
+      return (
+        <svg {...common}>
+          <path d="M2.4 12.6 6 9l2.4 2 5.2-5" />
+          <path d="M10.4 6h3.2v3.2" />
+        </svg>
+      );
+    case 'unavailable':
+      return (
+        <svg {...common}>
+          <path d="M4 4l8 8M12 4l-8 8" />
+        </svg>
+      );
+  }
+}
 
 export function StatusChip({
   status,
@@ -25,13 +84,22 @@ export function StatusChip({
   status: IndicatorReading['status'];
   copy: InsightsCopy;
 }) {
-  const meta = STATUS_META[status];
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-[0.7rem] font-bold ${TONE_CLASSES[meta.tone]}`}
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-[0.72rem] font-bold ${TONE_CLASSES[STATUS_TONE[status]]}`}
     >
-      <span aria-hidden="true">{meta.icon}</span>
+      <StatusIcon kind={status} />
       {copy.status[status]}
     </span>
   );
 }
+
+/** Tone per status (kept next to the icons so the mapping is visible). */
+const STATUS_TONE: Record<IndicatorReading['status'], StatusTone> = {
+  warning: 'danger',
+  normal: 'success',
+  context: 'info',
+  stale: 'muted',
+  'no-history': 'muted',
+  unavailable: 'muted',
+};

@@ -76,6 +76,8 @@ export function formatAsOf(iso: string, locale: 'en' | 'fa'): string {
 }
 
 export function HistoryChart({ id, points, copy, locale, numberLocale }: HistoryChartProps) {
+  // (F5's `zone` prop lives on the position bar; the chart's Y axis is a
+  // value axis, so a percentile band has no honest place here.)
   const gradId = useId();
   const svgRef = useRef<SVGSVGElement>(null);
   // I7 (#48): the point under inspection — set by pointermove or arrow keys.
@@ -94,7 +96,7 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
 
   if (clean.length < 2) {
     return (
-      <p className="mt-2 text-sm text-currena-muted">{copy.ui.noHistory}</p>
+      <p className="mt-2 text-[var(--type-label)] text-[var(--color-text-secondary)]">{copy.ui.noHistory}</p>
     );
   }
 
@@ -203,7 +205,7 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
   return (
     <figure className="mt-3 m-0">
       <figcaption className="mb-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-        <span className="text-[0.72rem] font-semibold uppercase tracking-wide text-currena-muted">
+        <span className="text-[var(--type-caption)] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
           {title}
         </span>
         {/* I9: the range segmented control — same pill DNA as JumpNav/FilterBar,
@@ -228,7 +230,7 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
                   writeChartRange(r); // I13: remember the reader's zoom
                   setFocusIdx(null); // indices shift with the window
                 }}
-                className={`inline-flex min-h-[28px] cursor-pointer items-center rounded-full px-2.5 text-[0.65rem] font-bold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-currena-blue disabled:cursor-not-allowed disabled:opacity-40 ${
+                className={`inline-flex min-h-[28px] cursor-pointer items-center rounded-full px-2.5 text-[var(--type-caption)] font-bold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-currena-blue disabled:cursor-not-allowed disabled:opacity-40 ${
                   active
                     ? 'bg-white text-currena-blue-deep shadow-sm ring-1 ring-black/[0.06] dark:bg-[#243040] dark:text-currena-blue dark:ring-white/[0.1]'
                     : 'bg-transparent text-currena-muted hover:text-currena-dark dark:hover:text-currena-dark'
@@ -274,9 +276,9 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
         <text
           x={PAD_X}
           y={HEIGHT - 6}
-          fontSize="12"
+          fontSize="16"
           fill="currentColor"
-          fillOpacity="0.7"
+          fillOpacity="0.75"
           textAnchor="start"
         >
           {year(dayMin)}
@@ -292,9 +294,9 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
             <text
               x={WIDTH / 2}
               y={HEIGHT - 6}
-              fontSize="12"
+              fontSize="16"
               fill="currentColor"
-              fillOpacity="0.7"
+              fillOpacity="0.75"
               textAnchor="middle"
             >
               {year(Math.round((dayMin + dayMax) / 2))}
@@ -304,9 +306,9 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
         <text
           x={WIDTH - PAD_X}
           y={HEIGHT - 6}
-          fontSize="12"
+          fontSize="16"
           fill="currentColor"
-          fillOpacity="0.7"
+          fillOpacity="0.75"
           textAnchor="end"
         >
           {year(dayMax)}
@@ -325,10 +327,10 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
         <circle cx={minPt.x} cy={minPt.y} r="3" fill="currentColor" fillOpacity="0.55" />
         <text
           x={Math.min(Math.max(minPt.x, PAD_X + 24), WIDTH - PAD_X - 24)}
-          y={Math.min(minPt.y + 16, HEIGHT - PAD_BOTTOM - 4)}
-          fontSize="11"
+          y={Math.min(minPt.y + 18, HEIGHT - PAD_BOTTOM - 4)}
+          fontSize="14"
           fill="currentColor"
-          fillOpacity="0.75"
+          fillOpacity="0.8"
           textAnchor="middle"
         >
           {num(vMin, numberLocale)}
@@ -336,10 +338,10 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
         <circle cx={maxPt.x} cy={maxPt.y} r="3" fill="currentColor" fillOpacity="0.55" />
         <text
           x={Math.min(Math.max(maxPt.x, PAD_X + 24), WIDTH - PAD_X - 24)}
-          y={Math.max(maxPt.y - 10, PAD_TOP - 8)}
-          fontSize="11"
+          y={Math.max(maxPt.y - 11, PAD_TOP - 8)}
+          fontSize="14"
           fill="currentColor"
-          fillOpacity="0.75"
+          fillOpacity="0.8"
           textAnchor="middle"
         >
           {num(vMax, numberLocale)}
@@ -372,7 +374,7 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
         {focusPt ? (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[135%] whitespace-nowrap rounded-lg bg-currena-dark px-2 py-1 text-[0.7rem] font-bold text-white shadow-md dark:bg-white dark:text-currena-dark"
+            className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[135%] whitespace-nowrap rounded-lg bg-currena-dark px-2 py-1 text-[var(--type-caption)] font-bold text-white shadow-md dark:bg-white dark:text-currena-dark"
             style={{
               left: `${Math.min(88, Math.max(12, (focusPt.x / WIDTH) * 100))}%`,
               top: `${(focusPt.y / HEIGHT) * 100}%`,
@@ -387,12 +389,12 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
       {/* Data-table alternative (spec §9) — real table, collapsed by default.
           I6 audit F7: the summary is a full-width row with a 44px hit area. */}
       <details className="mt-2 rounded-xl bg-currena-soft/60 px-3 py-1 dark:bg-white/[0.04]">
-        <summary className="-mx-3 flex min-h-[44px] cursor-pointer select-none items-center px-3 text-xs font-semibold text-currena-muted">
+        <summary className="-mx-3 flex min-h-[44px] cursor-pointer select-none items-center px-3 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
           {copy.ui.chartTable}
         </summary>
-        <table className="mt-2 w-full text-xs tabular-nums">
+        <table className="mt-2 w-full text-[var(--type-caption)] tabular-nums">
           <thead>
-            <tr className="text-currena-muted">
+            <tr className="text-[var(--color-text-secondary)]">
               <th scope="col" className="py-1 text-start font-semibold">
                 {copy.ui.chartColDate}
               </th>
