@@ -741,3 +741,53 @@ timing) recovers automatically; nothing to hand-fix. If this recurs
 on smoke dispatches, prefer dispatching them before the evening UTC
 hours, or skip the smoke when the scheduled run of the day is already
 green.
+
+## Session record — 2026-10-10 I19 (the staleness false-alarm fix)
+
+**Worker deployed: `093e51e6-5524-413d-a178-32ba4a0d493f`** from HEAD
+`0b71e0b` (I19). Data-definitions change set (`definitions.ts` +
+its test + docs) — the snapshot FORMAT is unchanged, but the computed
+`status` values change, so the documented **ingest-then-deploy ORDER**
+was followed: the ingest dispatched first (run `38010201689` @ `0b71e0b`,
+**success**, 00:42:30→00:44 UTC), the Worker deployed second.
+
+**What the fix was:** the post-I18 verification pass found the live
+snapshot carrying one stale reading — `govt-interest-revenue`, asOf
+2026-04-01, aged 192d, one day past the 190d quarterly grace. FRED
+confirmed the Q2 obs is the freshest that exists (BEA publishes the Q2
+obs with the advance estimate ~Jul 30 and it stays latest until the Q3
+advance ~Oct 29-30), so the 190d cadence grace was the defect — the same
+obs-date-vs-release-date gap I15 closed for the ABS quarter-start items.
+Fix: `staleAfterDays: 215` (BEA NIPA obs ages up to ~212d between
+advances; mirrors the ABS discipline), asserted verbatim in the I15
+freshness-overrides test.
+
+**Post-deploy production state (verified this session):**
+- `/api/health` ok; `/api/insights` 41 readings — `normal 20 · warning
+  10 · context 11`, **zero stale/unavailable**, `generatedAt
+  2026-10-10T00:42:52Z` (the I19 re-ingest). The govt-interest-revenue
+  reading: `normal`, same value 33.6% / percentile 72.97 — only the
+  status was ever wrong.
+- `#/insights` (en, 1280): zero console/page errors, no overflow
+  (1280/1280), the word "stale" appears nowhere; Global lane (via the
+  Australia|Global switch) renders all five question groups with
+  "The US government's interest bill vs its income — 33.6% — Normal";
+  Together + signals sections intact; no buy/sell wording.
+- `#/insights` (fa, 375): `scrollWidth = clientWidth = 375` (pan 0),
+  dir=rtl, zero stale wording, the Global meter reads ۴ از ۱۶ شاخص در
+  هشدار; homepage fa RTL clean, converter live (1 USD = ۲۶۶٬۲۰۰ تومان,
+  TGJU, updated 3 min ago), amount input accepts input.
+- Gates at HEAD `0b71e0b`: typecheck 5/5, tests 747/747, build +
+  budget all green (entry 290.12/86.99 vs 296/89.5; Insights
+  270.02/69.50 vs 280/72).
+- Scheduled ingest runs Oct-8 (run 7) and Oct-9 (run 12) green; the
+  failed run-11 dispatch was the known KV daily-write-cap 429/10048 —
+  auto-recovered at 00:00 UTC, no data impact.
+- Daily accrual verified: Oct-8 AND Oct-9 points present for
+  btc/copper/gold/silver (btc 2 points post-bootstrap; the others
+  monthly base + daily rows) — the 2026-10-15 seven-day-change
+  milestone stays on track.
+- `/admin` note: unauthenticated GET now 401s to the sign-in page
+  (ADMIN_VIEW_SECRET is set in production — the opt-in gate from the
+  security wave working as designed; robots.txt still carries
+  `Disallow: /admin`).
