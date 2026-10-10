@@ -115,10 +115,10 @@ export function AlertCard({
       >
         <span className="flex items-start justify-between gap-2">
           <span className="min-w-0">
-            <span className="block text-[var(--type-label)] font-bold leading-snug text-[var(--color-text-primary)]">
+            <span className="block text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-primary)]">
               {entry.name}
               {entry.ticker ? (
-                <span dir="ltr" className="ms-1.5 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+                <span dir="ltr" className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
                   {entry.ticker}
                 </span>
               ) : null}
@@ -131,7 +131,7 @@ export function AlertCard({
         </span>
 
         {isUnavailable ? (
-          <span className="mt-2 block text-[var(--type-label)] text-[var(--color-text-secondary)]">
+          <span className="mt-2 block text-[length:var(--type-label)] text-[var(--color-text-secondary)]">
             {copy.ui.unavailableCard}
           </span>
         ) : (
@@ -143,13 +143,13 @@ export function AlertCard({
                 </bdi>
               ) : null}
               {reading.change7d !== undefined ? (
-                <bdi dir="ltr" className="text-[var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
+                <bdi dir="ltr" className="text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
                   {formatChange(reading.change7d, def.changeKind, numberLocale, copy.units)}
                   <span className="ms-1 opacity-80">{copy.ui.days7}</span>
                 </bdi>
               ) : null}
               {reading.change30d !== undefined ? (
-                <bdi dir="ltr" className="text-[var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
+                <bdi dir="ltr" className="text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
                   {formatChange(reading.change30d, def.changeKind, numberLocale, copy.units)}
                   <span className="ms-1 opacity-80">{copy.ui.days30}</span>
                 </bdi>
@@ -158,13 +158,13 @@ export function AlertCard({
 
             {/* R6: the needs-attention face line — rule + live value. */}
             {ruleLine !== null ? (
-              <span className="mt-2 block rounded-[var(--radius-sm)] bg-currena-warning/10 px-2.5 py-1.5 text-[var(--type-caption)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
+              <span className="mt-2 block rounded-[var(--radius-sm)] bg-currena-warning/10 px-2.5 py-1.5 text-[length:var(--type-caption)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
                 <bdi>{ruleLine}</bdi>
               </span>
             ) : null}
 
             {/* F1: consequence line — state-keyed, hedged, life-first. */}
-            <span className="mt-2 block text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+            <span className="mt-2 block text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
               {consequenceLine(reading, entry, false, bandWordsOf(copy))}
             </span>
 
@@ -185,7 +185,7 @@ export function AlertCard({
           </>
         )}
 
-        <span className="mt-2 flex items-baseline justify-between gap-2 text-[var(--type-caption)] text-[var(--color-text-secondary)]">
+        <span className="mt-2 flex items-baseline justify-between gap-2 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
           <span>
             {reading.asOf ? interpolate(copy.ui.updatedOn, { date: formatAsOf(reading.asOf, 'en') }) : '—'}
             <span className="mx-1.5 opacity-50">·</span>

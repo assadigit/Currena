@@ -19,7 +19,7 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import type { ConsequenceLines } from '../../i18n/insights-copy-en';
 import { formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
-import { positionBand, type PositionBand } from './config';
+import { positionBand, bandToneClass, type PositionBand } from './config';
 
 export function PositionBar({
   percentile,
@@ -50,12 +50,15 @@ export function PositionBar({
     : copy.ui[`position${band[0]!.toUpperCase()}${band.slice(1)}` as 'positionLow' | 'positionTypical' | 'positionHigh'];
   return (
     <span className="mt-3 block">
-      <span className="flex items-baseline justify-between gap-2 text-[var(--type-caption)] text-[var(--color-text-secondary)]">
+      <span className="flex items-baseline justify-between gap-2 text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
         <span>{copy.ui.position10y}</span>
         {/* F3: the position WORD rides beside the value, not the far end. */}
         <span className="flex items-baseline gap-2">
           <bdi className="font-semibold tabular-nums">{`${pctLabel}${copy.units.percent}`}</bdi>
-          <span className="font-bold text-[var(--color-text-primary)]">{word}</span>
+          {/* R29: the WORD speaks in status ink on price rows (cheap/green ·
+           * expensive/red); indicator rows stay neutral (R5 — notable, not
+           * good or bad). Still never colour alone: the bar + tick ride beside. */}
+          <span className={`font-bold ${isPrice ? bandToneClass(band) : ''}`}>{word}</span>
         </span>
       </span>
       <span dir="ltr" className="mt-1 block">
@@ -95,7 +98,7 @@ export function PositionBar({
           />
         </span>
         {/* G9: both ends labelled — LTR axis with localized end captions. */}
-        <span className="mt-1 flex justify-between text-[var(--type-caption)] text-[var(--color-text-secondary)]">
+        <span className="mt-1 flex justify-between text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
           <span>{copy.ui.rangeEndLow}</span>
           <span>{zone ? copy.ui.alertZoneLabel : ''}</span>
           <span>{copy.ui.rangeEndHigh}</span>

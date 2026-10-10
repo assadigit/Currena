@@ -47,7 +47,7 @@ export function LaneSwitch({
               type="button"
               aria-pressed={active}
               onClick={() => pick(value)}
-              className={`insights-focusable inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-5 text-[var(--type-label)] font-bold transition-colors duration-200 ${
+              className={`insights-focusable inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-5 text-[length:var(--type-label)] font-bold transition-colors duration-200 ${
                 active
                   ? 'bg-currena-blue text-white shadow-sm'
                   : 'text-[var(--color-text-secondary)] hover:bg-currena-soft/60 dark:hover:bg-white/[0.06]'

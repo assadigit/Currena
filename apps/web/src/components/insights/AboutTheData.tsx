@@ -60,7 +60,7 @@ export function AboutTheData({
   return (
     <section id="insights-about" aria-labelledby="insights-about-title" className="scroll-mt-24 border-t border-[var(--color-border)] pt-4">
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-        <h2 id="insights-about-title" className="m-0 text-[var(--type-label)] font-bold text-[var(--color-text-primary)]">
+        <h2 id="insights-about-title" className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
           {copy.ui.aboutTitle}
         </h2>
         <button
@@ -68,7 +68,7 @@ export function AboutTheData({
           aria-expanded={open}
           aria-controls="insights-about-body"
           onClick={() => setOpen(!open)}
-          className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1 rounded-lg px-1.5 py-1 text-[var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+          className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1 rounded-lg px-1.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
         >
           <span aria-hidden="true">
             <ChevronDown
@@ -83,7 +83,7 @@ export function AboutTheData({
 
       {/* Always visible (caption size, secondary ink, no boxes): FRED notice,
        * one credits line, one general-information line. */}
-      <div className="mt-2 flex flex-col gap-1 text-[var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]" data-about-always>
+      <div className="mt-2 flex flex-col gap-1 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]" data-about-always>
         <p className="m-0">
           <bdi dir="ltr">{copy.ui.fredNotice}</bdi>{' '}
           <a
@@ -106,9 +106,9 @@ export function AboutTheData({
         id="insights-about-body"
         className={`${open ? '' : 'hidden'} print:block`}
       >
-        <div className="mt-3 flex flex-col gap-3 text-[var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+        <div className="mt-3 flex flex-col gap-3 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]">
           <div>
-            <h3 className="m-0 mb-0.5 text-[var(--type-caption)] font-bold text-[var(--color-text-primary)]">
+            <h3 className="m-0 mb-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-primary)]">
               {copy.ui.aboutSourcesTitle}
             </h3>
             <p className="m-0">{copy.ui.aboutSourcesBody}</p>
@@ -122,20 +122,20 @@ export function AboutTheData({
             </ul>
           </div>
           <div>
-            <h3 className="m-0 mb-0.5 text-[var(--type-caption)] font-bold text-[var(--color-text-primary)]">
+            <h3 className="m-0 mb-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-primary)]">
               {copy.ui.aboutScheduleTitle}
             </h3>
             <p className="m-0">{copy.ui.aboutScheduleBody}</p>
           </div>
           <div>
-            <h3 className="m-0 mb-0.5 text-[var(--type-caption)] font-bold text-[var(--color-text-primary)]">
+            <h3 className="m-0 mb-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-primary)]">
               {copy.ui.aboutRulesTitle}
             </h3>
             <p className="m-0">{copy.ui.aboutRulesBody}</p>
             <p className="m-0">{copy.ui.explainerBacktest}</p>
           </div>
           <div>
-            <h3 className="m-0 mb-0.5 text-[var(--type-caption)] font-bold text-[var(--color-text-primary)]">
+            <h3 className="m-0 mb-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-primary)]">
               {copy.ui.disclaimerTitle}
             </h3>
             <p className="m-0">{copy.ui.disclaimerBody1}</p>

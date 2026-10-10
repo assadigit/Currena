@@ -24,10 +24,10 @@ import { definitionFor, formatRuleText } from './config';
 function Section({ title, body }: { title: string; body: string }) {
   return (
     <div>
-      <h4 className="m-0 text-[var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
+      <h4 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
         {title}
       </h4>
-      <p className="mt-1 mb-0 text-[var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
+      <p className="mt-1 mb-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
         {body}
       </p>
     </div>
@@ -72,13 +72,13 @@ function PanelHistory({
   }, [id]);
 
   if (state.kind === 'loading') {
-    return <p className="m-0 text-[var(--type-label)] text-[var(--color-text-secondary)]">{copy.ui.historyLoading}</p>;
+    return <p className="m-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.ui.historyLoading}</p>;
   }
   if (state.kind === 'error') {
-    return <p className="m-0 text-[var(--type-label)] text-[var(--color-status-alert)]">{copy.ui.historyError}</p>;
+    return <p className="m-0 text-[length:var(--type-label)] text-[var(--color-status-alert)]">{copy.ui.historyError}</p>;
   }
   if (state.kind === 'none') {
-    return <p className="m-0 text-[var(--type-label)] text-[var(--color-text-secondary)]">{copy.ui.noHistory}</p>;
+    return <p className="m-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.ui.noHistory}</p>;
   }
   return <HistoryChart id={id} points={state.points} copy={copy} locale={locale} numberLocale={numberLocale} />;
 }
@@ -171,11 +171,11 @@ export function DetailsPanel({
               id={headingId}
               data-panel-heading=""
               tabIndex={-1}
-              className="m-0 text-lg font-extrabold leading-snug text-[var(--color-text-primary)] outline-none"
+              className="type-section m-0 leading-snug text-[var(--color-text-primary)] outline-none"
             >
               {entry.name}
               {entry.ticker ? (
-                <span dir="ltr" className="ms-1.5 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+                <span dir="ltr" className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
                   {entry.ticker}
                 </span>
               ) : null}
@@ -184,7 +184,7 @@ export function DetailsPanel({
           <button
             type="button"
             onClick={onClose}
-            className="insights-focusable inline-flex min-h-[44px] shrink-0 cursor-pointer items-center gap-1 rounded-full border border-[var(--color-border)] px-3 text-[var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-status-alert)]/50 hover:text-[var(--color-status-alert)]"
+            className="insights-focusable inline-flex min-h-[44px] shrink-0 cursor-pointer items-center gap-1 rounded-full border border-[var(--color-border)] px-3 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-status-alert)]/50 hover:text-[var(--color-status-alert)]"
           >
             <X aria-hidden size={17} strokeWidth={2} />
             <span className="sr-only">{copy.ui.panelClose}</span>
@@ -194,23 +194,23 @@ export function DetailsPanel({
         {/* Scrollable body. */}
         <div className="flex-1 overflow-y-auto p-4">
           {/* The rule, in plain language (01 spec: every threshold shown). */}
-          <p className="m-0 mb-4 rounded-[var(--radius-md)] bg-currena-soft/70 px-3 py-2.5 text-[var(--type-label)] font-medium text-[var(--color-text-primary)] dark:bg-white/[0.05]">
+          <p className="m-0 mb-4 rounded-[var(--radius-md)] bg-currena-soft/70 px-3 py-2.5 text-[length:var(--type-label)] font-medium text-[var(--color-text-primary)] dark:bg-white/[0.05]">
             <span className="font-bold">{copy.ui.ruleTitle}: </span>
             <span>{formatRuleText(indicatorDef.rule, reading.id, copy.rule, copy.units, numberLocale)}</span>
           </p>
 
           {reading.status === 'stale' && reading.asOf ? (
-            <p className="m-0 mb-4 text-[var(--type-caption)] font-semibold text-[var(--color-status-alert)]">
+            <p className="m-0 mb-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-alert)]">
               <bdi>{interpolate(copy.ui.staleSince, { date: formatAsOf(reading.asOf, locale) })}</bdi>
             </p>
           ) : null}
           {reading.status === 'no-history' ? (
-            <p className="m-0 mb-4 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+            <p className="m-0 mb-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
               {copy.ui.noHistoryStatus}
             </p>
           ) : null}
           {indicatorDef.rule.kind === 'info' ? (
-            <p className="m-0 mb-4 text-[var(--type-caption)] font-semibold text-[var(--color-status-context)]">
+            <p className="m-0 mb-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)]">
               {copy.ui.infoOnly}
             </p>
           ) : null}
@@ -240,17 +240,17 @@ export function DetailsPanel({
               href={reading.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="insights-focusable inline-flex items-center gap-1 rounded-full bg-currena-blue/10 px-3 py-1.5 text-[var(--type-caption)] font-semibold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/20"
+              className="insights-focusable inline-flex items-center gap-1 rounded-full bg-currena-blue/10 px-3 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/20"
             >
               {reading.sourceName}
               <span aria-hidden="true">↗</span>
               <span className="sr-only">{copy.ui.viewSource}</span>
             </a>
           ) : (
-            <span className="text-[var(--type-caption)] text-[var(--color-text-secondary)]">{reading.sourceName}</span>
+            <span className="text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">{reading.sourceName}</span>
           )}
           {reading.asOf ? (
-            <bdi className="text-[var(--type-caption)] text-[var(--color-text-secondary)]">
+            <bdi className="text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
               {interpolate(copy.ui.updatedOn, { date: formatAsOf(reading.asOf, locale) })}
             </bdi>
           ) : null}
@@ -258,7 +258,7 @@ export function DetailsPanel({
             type="button"
             onClick={() => onPinChange(reading.id, !pinned)}
             aria-pressed={pinned}
-            className={`insights-focusable ms-auto inline-flex min-h-[36px] cursor-pointer items-center gap-1 rounded-full border px-3 py-1.5 text-[var(--type-caption)] font-semibold transition-colors ${
+            className={`insights-focusable ms-auto inline-flex min-h-[36px] cursor-pointer items-center gap-1 rounded-full border px-3 py-1.5 text-[length:var(--type-caption)] font-semibold transition-colors ${
               pinned
                 ? 'border-currena-blue/40 bg-currena-blue/15 text-[var(--color-status-context)]'
                 : 'border-[var(--color-border)] bg-transparent text-[var(--color-status-context)] hover:bg-currena-blue/10'

@@ -86,7 +86,7 @@ export function JumpNav({
               type="button"
               onClick={() => jump(t.id)}
               aria-current={isActive ? 'true' : undefined}
-              className={`insights-focusable inline-flex min-h-[36px] shrink-0 cursor-pointer items-center rounded-full px-3.5 text-[var(--type-caption)] font-bold transition-colors duration-200 ${
+              className={`insights-focusable inline-flex min-h-[36px] shrink-0 cursor-pointer items-center rounded-full px-3.5 text-[length:var(--type-caption)] font-bold transition-colors duration-200 ${
                 isActive
                   ? 'bg-currena-blue text-white shadow-sm ring-1 ring-currena-blue/40'
                   : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] hover:text-[var(--color-status-context)]'

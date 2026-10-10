@@ -101,7 +101,7 @@ export function ToolsMenu({
         aria-expanded={open}
         aria-controls="insights-tools-panel"
         onClick={() => onOpenChange(!open)}
-        className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-[var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-currena-blue/50 hover:text-[var(--color-status-context)]"
+        className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-currena-blue/50 hover:text-[var(--color-status-context)]"
       >
         <Wrench aria-hidden size={17} strokeWidth={1.9} className="shrink-0" />
         {copy.ui.toolsLabel}
@@ -124,7 +124,7 @@ export function ToolsMenu({
         >
           {/* Search. */}
           <div>
-            <p className="m-0 mb-1 text-[var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
+            <p className="type-kicker m-0 mb-1 text-[var(--color-text-tertiary)]">
               {copy.ui.toolsSearch}
             </p>
             <div className="relative">
@@ -147,7 +147,7 @@ export function ToolsMenu({
 
           {/* The tier filter — counts describe the current lane only. */}
           <div>
-            <p className="m-0 mb-1 text-[var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
+            <p className="type-kicker m-0 mb-1 text-[var(--color-text-tertiary)]">
               {copy.ui.toolsFilter}
             </p>
             <div role="group" aria-label={copy.ui.filterLabel} className="flex flex-wrap gap-1.5">
@@ -189,14 +189,14 @@ export function ToolsMenu({
 
           {/* Downloads. */}
           <div>
-            <p className="m-0 mb-1 text-[var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
+            <p className="type-kicker m-0 mb-1 text-[var(--color-text-tertiary)]">
               {copy.ui.toolsDownload}
             </p>
             <div className="flex flex-wrap gap-1.5">
               <button
                 type="button"
                 onClick={onDownloadIcs}
-                className="insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-currena-blue/40 bg-currena-blue/15 px-3 text-[var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
+                className="insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-currena-blue/40 bg-currena-blue/15 px-3 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
               >
                 <CalendarDays aria-hidden size={16} strokeWidth={1.9} className="shrink-0" />
                 {copy.ui.icsDownload}
@@ -204,7 +204,7 @@ export function ToolsMenu({
               <button
                 type="button"
                 onClick={onDownloadCsv}
-                className="insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-currena-blue/40 bg-currena-blue/15 px-3 text-[var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
+                className="insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-currena-blue/40 bg-currena-blue/15 px-3 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
               >
                 <Download aria-hidden size={16} strokeWidth={1.9} className="shrink-0" />
                 {copy.ui.downloadCsv}
@@ -214,7 +214,7 @@ export function ToolsMenu({
 
           {/* The shortcuts help (kept — was the inline hint line). */}
           <div>
-            <p className="m-0 mb-1 text-[var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
+            <p className="m-0 mb-1 text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
               {copy.ui.toolsShortcuts}
             </p>
             <p className="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.7rem] font-semibold text-currena-muted">

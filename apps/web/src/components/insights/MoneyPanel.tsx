@@ -91,15 +91,15 @@ export function MoneyPanel({
 
   return (
     <section id="insights-money" aria-labelledby="insights-money-title" className="scroll-mt-24">
-      <h2 id="insights-money-title" className="m-0 mb-1 text-lg font-extrabold">
+      <h2 id="insights-money-title" className="type-section m-0 mb-1">
         {copy.money.title}
       </h2>
-      <p className="m-0 mb-2 text-[var(--type-label)] text-[var(--color-text-secondary)]">
+      <p className="m-0 mb-2 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">
         {copy.money.subtitle}
       </p>
 
       {rows.length === 0 ? (
-        <p className="m-0 rounded-[var(--radius-lg)] bg-[var(--color-surface)] px-4 py-3 text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
+        <p className="m-0 rounded-[var(--radius-lg)] bg-[var(--color-surface)] px-4 py-3 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
           {copy.money.calmLine}
         </p>
       ) : (
@@ -115,7 +115,7 @@ export function MoneyPanel({
                 className="flex flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-3.5 py-2.5 ring-1 ring-[var(--color-border)] sm:flex-row sm:items-center sm:gap-3"
               >
                 <span
-                  className={`inline-flex shrink-0 items-center gap-1.5 text-[var(--type-label)] font-bold ${
+                  className={`inline-flex shrink-0 items-center gap-1.5 text-[length:var(--type-label)] font-bold ${
                     state === 'attention' ? 'text-[var(--color-status-alert)]' : 'text-[var(--color-text-primary)]'
                   }`}
                 >
@@ -124,7 +124,7 @@ export function MoneyPanel({
                   </span>
                   {areaCopy.name}
                 </span>
-                <span className="min-w-0 flex-1 text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+                <span className="min-w-0 flex-1 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
                   {sentence}
                 </span>
                 {chipIds.length > 0 ? (
@@ -138,7 +138,7 @@ export function MoneyPanel({
                           key={id}
                           type="button"
                           onClick={(e) => onFocusCard(id, e.currentTarget)}
-                          className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center gap-1.5 rounded-full bg-currena-soft/80 px-2.5 py-0.5 text-[var(--type-caption)] font-semibold text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)] transition-colors hover:bg-currena-blue/15 dark:bg-white/[0.06]"
+                          className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center gap-1.5 rounded-full bg-currena-soft/80 px-2.5 py-0.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)] transition-colors hover:bg-currena-blue/15 dark:bg-white/[0.06]"
                         >
                           {copy.indicators[id].name}
                           {valueText !== null ? (

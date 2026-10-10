@@ -5,6 +5,58 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-10] — Insights UI/UX audit: ink ramp, status-ink words, type hierarchy (R29, owner request)
+
+Sixteenth round — the owner reported "everything is written with black
+color" and "low typographic hierarchy, every heading is screaming". The
+audit (docs/insights/08-uiux-audit-2026-10-10.md) found a REAL bug under
+the first symptom, then fixed both.
+
+### Fixed
+
+- **ROOT CAUSE (A0/A1):** Tailwind 4 resolves ambiguous arbitrary values
+  `text-[var(--type-label)]` / `text-[var(--type-caption)]` as **colour**
+  utilities, not font sizes — `.text-\[var\(--type-caption\)\]
+  {color:var(--type-caption)}` is invalid at computed-value time and, since
+  it sorts after the colour utilities, it cancelled them and fell back to
+  inherited primary ink. Net effect since I15: the type scale never applied
+  (everything ~16px) and labels/captions rendered primary-dark — the
+  owner's "everything is black". Fixed with explicit length hints,
+  `text-[length:var(--type-label)]` / `text-[length:var(--type-caption)]`
+  (128 occurrences across 18 files). The intended scale (label 14px,
+  caption 12.5px) finally computes.
+
+### Changed
+
+- **Ink ramp (A2):** secondary ink #46505C → **#56616E** (6.3:1 — a step
+  the eye can see); NEW tertiary grade **#6B7683** light / **#8291A5** dark
+  for captions, timestamps, sources, disclaimers, kickers.
+- **Status words speak in status ink (A3):** new `--color-status-watch`
+  (#9C5019 light / #FBB48C dark) plus `stepToneClass` /
+  `attentionToneClass` / `bandToneClass` helpers. Verdict words
+  (Relaxed green · Cautious watch · Stressed/Alarmed red), hero gauge step
+  words, "n of m need attention" counts (red while n>0, green when clear),
+  and PRICE position words (expensive red · cheap green · typical neutral;
+  indicator positions stay neutral per R5) now carry their status colour —
+  always beside an icon, meter or number (G5, never colour alone). The
+  7-day/30-day deltas stay deliberately neutral (R5/R9).
+- **Typographic hierarchy (A4):** 800 weight reserved for numbers. New
+  roles: `.type-section` 17px/700 (five section h2s + details-panel title,
+  was 18px/800), `.type-question` 15px/600 (group questions, connection
+  cards, pinned strip, was 14px/800), `.type-kicker` 11.5px/600 uppercase
+  tertiary (GLOBAL/AUSTRALIA, NEEDING ATTENTION NOW, SEARCH/FILTER/
+  DOWNLOAD, HISTORY, signals footing labels) with letter-spacing scoped to
+  `html:not(:lang(fa))`; page h1 24px 800 → 700.
+- Icon sizes from the previous round unchanged (23/17/16/18/22/24 set).
+
+### Verification
+
+- Gates: typecheck 5/5 · tests 784/784 · budgets entry 290.32/296,
+  Insights 301.21/302 (length hints +0.9 kB, under the cap).
+- Browser: computed styles (tertiary @ 12.48px; "expensive" red @ 12.48/700;
+  "Stressed" red @ 25.6/800; kickers 11.52/600); en/fa × light/dark ×
+  1280/375 screenshot pass; 375px overflow clean; console silent.
+
 ## [2026-10-10] — Insights imagery: lucide-react icon language (owner request)
 
 Fifteenth round — the owner asked for real iconography on the Insights

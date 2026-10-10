@@ -105,7 +105,7 @@ export function Together({
   return (
     <section id="insights-together" aria-labelledby="insights-together-title" className="scroll-mt-24">
       <header className="mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 id="insights-together-title" className="m-0 text-lg font-extrabold">
+        <h2 id="insights-together-title" className="type-section m-0">
           {copy.together.title}
         </h2>
         <button
@@ -113,7 +113,7 @@ export function Together({
           aria-expanded={open}
           aria-controls="insights-together-body"
           onClick={() => setOpen(!open)}
-          className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[var(--type-caption)] font-bold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+          className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
         >
           <span aria-hidden="true">
             <ChevronDown
@@ -125,13 +125,13 @@ export function Together({
           {open ? copy.ui.showFewer : copy.ui.aboutShowDetails}
         </button>
       </header>
-      <p className="m-0 mb-2 text-[var(--type-label)] text-[var(--color-text-secondary)]">
+      <p className="m-0 mb-2 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">
         {copy.together.subtitle}
       </p>
 
       {/* R27: the quiet section-level note — replaces the per-card
        * "Evidence: to verify" placeholder. */}
-      <p className="m-0 mb-2 text-[var(--type-caption)] text-[var(--color-text-secondary)]" data-together-note>
+      <p className="m-0 mb-2 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]" data-together-note>
         {copy.together.evidenceNote}
       </p>
 
@@ -155,7 +155,7 @@ export function Together({
               <button
                 type="button"
                 onClick={() => setShowAll(true)}
-                className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-currena-blue/40 bg-currena-blue/15 px-5 text-[var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
+                className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-currena-blue/40 bg-currena-blue/15 px-5 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
               >
                 {interpolate(copy.together.seeAllConnections, { n: formatNumber(ordered.length, numberLocale, { maximumFractionDigits: 0 }) })}
               </button>
@@ -164,7 +164,7 @@ export function Together({
         ) : (
           /* Collapsed: the one-line summary + one small chip per connection. */
           <div className="flex flex-col gap-1.5">
-            <p className="m-0 text-[var(--type-label)] font-semibold text-[var(--color-text-secondary)]" data-together-summary>
+            <p className="m-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)]" data-together-summary>
               {summary.line}
             </p>
             <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
@@ -173,7 +173,7 @@ export function Together({
                   <button
                     type="button"
                     onClick={() => expandTo(chip.connection)}
-                    className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center gap-1.5 rounded-full bg-[var(--color-surface)] px-2.5 py-1 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] transition-colors hover:text-[var(--color-status-context)]"
+                    className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center gap-1.5 rounded-full bg-[var(--color-surface)] px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] transition-colors hover:text-[var(--color-status-context)]"
                   >
                     {chip.name}
                     <span className="font-bold text-[var(--color-text-secondary)] opacity-80">

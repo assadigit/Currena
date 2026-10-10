@@ -19,11 +19,13 @@ import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { GAUGES, gaugesForSection, labelForVerdictStep, sectionVerdictStep } from '@currena/insights';
 import {
+  attentionToneClass,
   attentionTiles,
   definitionFor,
   formatIndicatorValue,
   formatRuleText,
   heroReason,
+  stepToneClass,
 } from './config';
 
 function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
@@ -119,22 +121,21 @@ export function VerdictBlock({
       } bg-[var(--color-surface)]`}
     >
       <header className="flex items-baseline justify-between gap-3">
-        <h3 className="m-0 text-[var(--type-label)] font-bold text-[var(--color-text-secondary)]">
-          {sectionLabel}
-        </h3>
+        <h3 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{sectionLabel}</h3>
         <button
           type="button"
           onClick={() => onJumpSection(section)}
-          className="insights-focusable -my-1 cursor-pointer rounded-lg border-0 bg-transparent px-1.5 py-1 text-[var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-4 transition-colors hover:decoration-[var(--color-accent-brand)]"
+          className="insights-focusable -my-1 cursor-pointer rounded-lg border-0 bg-transparent px-1.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-4 transition-colors hover:decoration-[var(--color-accent-brand)]"
         >
           {copy.ui.viewSection}
           <span className="sr-only"> — {sectionLabel}</span>
         </button>
       </header>
 
-      {/* H1: verdict word — the page's LARGEST type role. */}
+      {/* H1: verdict word — the page's LARGEST type role; the word speaks
+       * in status ink (R29) beside its meter (never colour alone). */}
       <p className="m-0 flex items-center gap-3">
-        <span className="type-verdict text-[var(--color-text-primary)]">{verdictLabel}</span>
+        <span className={`type-verdict ${stepToneClass(step)}`}>{verdictLabel}</span>
         <VerdictMeter step={step} label={verdictLabel} ariaLabel={ariaLabel} />
       </p>
 
@@ -152,21 +153,24 @@ export function VerdictBlock({
                     ? copy.label.stressed
                     : copy.label.alarmed;
           return (
-            <li key={g.gauge} className="text-[var(--type-caption)] text-[var(--color-text-secondary)]">
+            <li key={g.gauge} className="text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
               <span className="font-semibold text-[var(--color-text-primary)]">
                 {copy.groups[g.gauge]}
               </span>{' '}
-              · {gWord}
+              · <span className={`font-semibold ${stepToneClass(g.step)}`}>{gWord}</span>
             </li>
           );
         })}
       </ul>
 
       {/* R2: the one reason line — from the fixed table, gauge-agreeing. */}
-      <p className="m-0 text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+      <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
         {reason}
       </p>
-      <p className="m-0 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+      <p
+        className={`m-0 text-[length:var(--type-caption)] font-semibold ${attentionToneClass(tiles.length)}`}
+        data-attention-count
+      >
         {interpolate(copy.ui.inAlert, {
           warnings: num(tiles.length, numberLocale),
           voting: num(voting, numberLocale),
@@ -176,7 +180,7 @@ export function VerdictBlock({
       {/* R3: needs-attention tiles WITH NUMBERS (largest text in the tile). */}
       {shown.length > 0 ? (
         <div>
-          <p className="m-0 mb-1 text-[var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
+          <p className="type-kicker m-0 mb-1 text-[var(--color-text-tertiary)]">
             {copy.ui.attentionTilesLabel}
           </p>
           <ul className="m-0 grid list-none grid-cols-1 gap-1.5 p-0 sm:grid-cols-3" aria-label={copy.ui.attentionTilesLabel}>
@@ -194,7 +198,7 @@ export function VerdictBlock({
                     onClick={() => onFocusCard(id)}
                     className="insights-focusable flex h-full w-full cursor-pointer flex-col items-start gap-0.5 rounded-[var(--radius-md)] bg-currena-warning/10 px-3 py-2 text-start ring-1 ring-currena-warning/25 transition-colors hover:bg-currena-warning/20"
                   >
-                    <span className="text-[var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
+                    <span className="text-[length:var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
                       {copy.indicators[id].name}
                     </span>
                     {valueText !== null ? (
@@ -202,7 +206,7 @@ export function VerdictBlock({
                         {valueText}
                       </bdi>
                     ) : null}
-                    <span className="text-[var(--type-caption)] leading-snug text-[var(--color-text-secondary)]">
+                    <span className="text-[length:var(--type-caption)] leading-snug text-[var(--color-text-secondary)]">
                       {ruleText}
                     </span>
                     <span className="sr-only"> — {copy.ui.viewCard}</span>
@@ -215,7 +219,7 @@ export function VerdictBlock({
             <button
               type="button"
               onClick={() => onJumpSection(section)}
-              className="insights-focusable mt-1.5 inline-flex min-h-[24px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-2.5 py-1 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
+              className="insights-focusable mt-1.5 inline-flex min-h-[24px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
             >
               {interpolate(copy.ui.attentionTileMore, { n: num(tiles.length - 3, numberLocale) })}
             </button>
@@ -227,7 +231,7 @@ export function VerdictBlock({
       <button
         type="button"
         onClick={onJumpAbout}
-        className="insights-focusable -ms-1.5 w-fit cursor-pointer rounded-lg border-0 bg-transparent px-1.5 py-1 text-[var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+        className="insights-focusable -ms-1.5 w-fit cursor-pointer rounded-lg border-0 bg-transparent px-1.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
       >
         {copy.ui.howCalculated}
       </button>

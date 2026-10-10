@@ -137,7 +137,7 @@ function ValuesLine({
   return (
     <span className="flex flex-wrap items-baseline gap-x-2" dir="ltr">
       {parts.map((p, i) => (
-        <bdi key={i} className="text-[var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
+        <bdi key={i} className="text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
           {p}
         </bdi>
       ))}
@@ -171,7 +171,7 @@ function ConditionRow({
         <span className="inline-flex shrink-0 items-center gap-1 text-[var(--color-status-context)]">
           <ConditionIcon state={condition.state} />
           <span
-            className={`text-[var(--type-caption)] font-bold ${
+            className={`text-[length:var(--type-caption)] font-bold ${
               condition.state === 'supportive' || condition.state === 'against'
                 ? 'text-[var(--color-status-context)]'
                 : 'text-[var(--color-status-stale)]'
@@ -180,8 +180,8 @@ function ConditionRow({
             {s.conditionStateShort[condition.state]}
           </span>
         </span>
-        <span className="text-[var(--type-label)] font-bold text-[var(--color-text-primary)]">{entry.name}</span>
-        <span className="text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">{stateWord}</span>
+        <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">{entry.name}</span>
+        <span className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">{stateWord}</span>
         {mixedTag !== undefined ? (
           <span className="inline-flex shrink-0 items-center rounded-full bg-currena-muted/15 px-2 py-0.5 text-[0.72rem] font-semibold text-[var(--color-status-stale)]">
             {mixedTag}
@@ -191,7 +191,7 @@ function ConditionRow({
           <ValuesLine ids={condition.inputs} readings={readings} copy={copy} numberLocale={numberLocale} />
         </span>
       </span>
-      <span className="text-[var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+      <span className="text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
         {entry.how}
       </span>
     </li>
@@ -254,7 +254,7 @@ function MergedSignalsCard({
           <span className="inline-flex shrink-0 items-center gap-1 text-[var(--color-status-context)]">
             <ConditionIcon state={state as SignalConditionReading['state']} />
             <span
-              className={`text-[var(--type-caption)] font-bold ${
+              className={`text-[length:var(--type-caption)] font-bold ${
                 state === 'supportive' || state === 'against'
                   ? 'text-[var(--color-status-context)]'
                   : 'text-[var(--color-status-stale)]'
@@ -263,21 +263,21 @@ function MergedSignalsCard({
               {s.conditionStateShort[state as SignalConditionReading['state']] ?? s.notEnoughData}
             </span>
           </span>
-          <span className="text-[var(--type-label)] font-bold text-[var(--color-text-primary)]">
+          <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
             {s.metals[metal]}
           </span>
           {valueText !== null ? (
-            <bdi dir="ltr" className="text-[var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
+            <bdi dir="ltr" className="text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
               {valueText}
             </bdi>
           ) : null}
           {positionWord !== null && positionPercentile !== null ? (
-            <span className="text-[var(--type-caption)] text-[var(--color-text-secondary)]">
+            <span className="text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
               {interpolate(s.footingPosition, { band: positionWord })}
             </span>
           ) : null}
           {speed !== null ? (
-            <span className="ms-auto flex items-baseline gap-1 text-[var(--type-caption)] text-[var(--color-text-secondary)]">
+            <span className="ms-auto flex items-baseline gap-1 text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
               {s.speedLabel}:
               <bdi dir="ltr" className="font-semibold tabular-nums">
                 {speed}
@@ -285,7 +285,7 @@ function MergedSignalsCard({
             </span>
           ) : null}
         </span>
-        <span className="text-[var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+        <span className="text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
           {s.conditions.footing.how}
         </span>
       </li>
@@ -298,14 +298,14 @@ function MergedSignalsCard({
       className="flex flex-col gap-3 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)]"
     >
       <header className="flex flex-wrap items-center gap-2">
-        <h3 className="m-0 text-[var(--type-label)] font-extrabold text-[var(--color-text-primary)]">
+        <h3 className="type-question m-0 text-[var(--color-text-primary)]">
           {s.mergedTitle}
         </h3>
         <span className="ms-auto flex flex-col items-end gap-0.5">
           {[gold, silver].map((reading) => (
             <span
               key={reading.metal}
-              className="inline-flex items-center gap-1 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)]"
+              className="inline-flex items-center gap-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]"
               data-signal-metal={reading.metal}
             >
               {reading.lean !== null ? <LeanIcon lean={reading.lean} /> : null}
@@ -317,7 +317,7 @@ function MergedSignalsCard({
 
       {/* The shared conditions, listed ONCE (identical states by construction). */}
       <div className="flex flex-col gap-2">
-        <h4 className="m-0 text-[var(--type-caption)] font-extrabold text-[var(--color-status-context)]">
+        <h4 className="m-0 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)]">
           {s.sideSupportive}
         </h4>
         <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
@@ -333,7 +333,7 @@ function MergedSignalsCard({
               />
             ))}
         </ul>
-        <h4 className="m-0 text-[var(--type-caption)] font-extrabold text-[var(--color-text-secondary)]">
+        <h4 className="m-0 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)]">
           {s.sideAgainst}
         </h4>
         <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
@@ -351,7 +351,7 @@ function MergedSignalsCard({
         </ul>
         {merged.shared.some((c) => c.state === 'neutral' || c.state === 'unknown') ? (
           <>
-            <h4 className="m-0 text-[var(--type-caption)] font-extrabold text-[var(--color-status-stale)]">
+            <h4 className="m-0 text-[length:var(--type-caption)] font-bold text-[var(--color-status-stale)]">
               {s.sideNeutral}
             </h4>
             <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
@@ -371,7 +371,7 @@ function MergedSignalsCard({
       {/* Per-metal footing rows (position + speed ride here, speed only
        * when the data exists — no "Measuring…" placeholder). */}
       <div className="flex flex-col gap-2">
-        <h4 className="m-0 text-[var(--type-caption)] font-extrabold text-[var(--color-text-secondary)]">
+        <h4 className="type-kicker m-0 text-[var(--color-text-tertiary)]">
           {s.footingTitle}
         </h4>
         <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
@@ -382,7 +382,7 @@ function MergedSignalsCard({
       {/* The silver-only condition (R26: separate short list). */}
       {merged.silverOnly.length > 0 ? (
         <div className="flex flex-col gap-2">
-          <h4 className="m-0 text-[var(--type-caption)] font-extrabold text-[var(--color-text-secondary)]">
+          <h4 className="type-kicker m-0 text-[var(--color-text-tertiary)]">
             {s.silverOnly}
           </h4>
           <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
@@ -474,7 +474,7 @@ export function Signals({
   return (
     <section id="insights-signals" aria-labelledby="insights-signals-title" className="scroll-mt-24">
       <header className="mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 id="insights-signals-title" className="m-0 text-lg font-extrabold">
+        <h2 id="insights-signals-title" className="type-section m-0">
           <span className="inline-flex items-center gap-1.5">
             <Activity aria-hidden size={23} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
             {copy.signals.title}
@@ -486,7 +486,7 @@ export function Signals({
             aria-expanded={open}
             aria-controls="insights-signals-body"
             onClick={() => setOpen(!open)}
-            className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[var(--type-caption)] font-bold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+            className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
           >
             <span aria-hidden="true">
               <ChevronDown
@@ -499,7 +499,7 @@ export function Signals({
           </button>
         </span>
       </header>
-      <p className="m-0 mb-2 text-[var(--type-label)] text-[var(--color-text-secondary)]">
+      <p className="m-0 mb-2 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">
         {copy.signals.subtitle}
       </p>
 
@@ -512,7 +512,7 @@ export function Signals({
             {[gold, silver].map((reading) => (
               <li
                 key={reading.metal}
-                className="text-[var(--type-label)] font-semibold text-[var(--color-text-secondary)]"
+                className="text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)]"
                 data-signal-metal={reading.metal}
               >
                 {collapsedLine(reading)}

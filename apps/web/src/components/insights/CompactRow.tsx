@@ -104,7 +104,7 @@ export function CompactRow({
             <span className="shrink-0">
               <StatusChip status={reading.status} copy={copy} tier={tier} />
             </span>
-            <span className="min-w-0 text-[var(--type-label)] font-semibold text-[var(--color-text-primary)]">
+            <span className="min-w-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-primary)]">
               {entry.name}
               {pinned ? <span className="sr-only"> · {copy.ui.pinnedBadge}</span> : null}
             </span>
@@ -113,32 +113,32 @@ export function CompactRow({
                 {valueText}
               </bdi>
             ) : isUnavailable ? (
-              <span className="text-[var(--type-caption)] text-[var(--color-text-secondary)]">{copy.ui.unavailableCard}</span>
+              <span className="text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">{copy.ui.unavailableCard}</span>
             ) : null}
             {reading.change30d !== undefined ? (
-              <bdi dir="ltr" className="shrink-0 text-[var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
+              <bdi dir="ltr" className="shrink-0 text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
                 {formatChange(reading.change30d, def.changeKind, numberLocale, copy.units)}
                 <span className="ms-1 opacity-80">{copy.ui.days30}</span>
               </bdi>
             ) : null}
             <TinySparkline id={reading.id} />
             {showMixedTag ? (
-              <span className="shrink-0 rounded-full bg-currena-muted/15 px-2 py-0.5 text-[var(--type-caption)] font-bold text-[var(--color-text-secondary)]">
+              <span className="shrink-0 rounded-full bg-currena-muted/15 px-2 py-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)]">
                 {copy.ui.mixedEvidenceTag}
               </span>
             ) : null}
-            <span className="ms-auto shrink-0 whitespace-nowrap text-[var(--type-caption)] font-semibold text-[var(--color-status-context)]">
+            <span className="ms-auto shrink-0 whitespace-nowrap text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)]">
               {copy.ui.detailsButton} ›
             </span>
           </span>
           {/* R6: the rule line on needs-attention rows. */}
           {ruleLine !== null ? (
-            <span className="block text-[var(--type-caption)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
+            <span className="block text-[length:var(--type-caption)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
               <bdi>{ruleLine}</bdi>
             </span>
           ) : null}
           {!isUnavailable ? (
-            <span className="block text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+            <span className="block text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
               {consequenceLine(reading, entry, false, bandWordsOf(copy))}
             </span>
           ) : null}

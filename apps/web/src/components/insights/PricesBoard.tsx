@@ -21,6 +21,7 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import {
   BTC_RATIO_IDS,
   PRICE_ROWS,
+  bandToneClass,
   bandWordsOf,
   consequenceLine,
   definitionFor,
@@ -55,13 +56,13 @@ export function PricesBoard({
 
   return (
     <section id="insights-prices" aria-labelledby="insights-prices-title" className="scroll-mt-24">
-      <h2 id="insights-prices-title" className="m-0 mb-1 text-lg font-extrabold">
+      <h2 id="insights-prices-title" className="type-section m-0 mb-1">
         <span className="inline-flex items-center gap-1.5">
           <Coins aria-hidden size={23} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
           {copy.ui.pricesTitle}
         </span>
       </h2>
-      <p className="m-0 mb-2 text-[var(--type-label)] text-[var(--color-text-secondary)]">
+      <p className="m-0 mb-2 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">
         {copy.ui.pricesSubtitle}
       </p>
       {/* R10: four tiles, one grid, identical anatomy. items-start so no
@@ -104,7 +105,7 @@ export function PricesBoard({
               >
                 <span className="flex w-full flex-col items-start gap-1">
                   {/* Plain name — no tickers, no series ids (R14). */}
-                  <span className="text-[var(--type-label)] font-bold text-[var(--color-text-secondary)]">
+                  <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-secondary)]">
                     {entry.name}
                   </span>
                   {/* The large price with unit — the largest text in the tile. */}
@@ -116,13 +117,13 @@ export function PricesBoard({
                     <span className="type-number text-[var(--color-text-secondary)]">—</span>
                   )}
                   {reading.status === 'unavailable' ? (
-                    <span className="text-[var(--type-caption)] text-[var(--color-text-secondary)]">
+                    <span className="text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
                       {copy.ui.unavailableCard}
                     </span>
                   ) : null}
                   {/* PB1: gold shows USD and AUD in the same tile. */}
                   {id === 'gold-usd' && goldAud && goldAud.value !== null ? (
-                    <bdi className="text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+                    <bdi className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
                       {interpolate(copy.ui.goldAudLine, {
                         value: formatIndicatorValue('gold-aud', goldAud.value, numberLocale, copy.units),
                       })}
@@ -130,7 +131,7 @@ export function PricesBoard({
                   ) : null}
                   {/* Changes — whichever exist, rendered the same way. */}
                   {reading.change7d !== undefined || reading.change30d !== undefined ? (
-                    <span className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
+                    <span className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
                       {reading.change7d !== undefined ? (
                         <bdi dir="ltr">
                           {formatChange(reading.change7d, def.changeKind, numberLocale, copy.units)}
@@ -146,18 +147,18 @@ export function PricesBoard({
                     </span>
                   ) : null}
                   {band && positionWord ? (
-                    <span className="text-[var(--type-caption)] font-bold text-[var(--color-text-secondary)]">
+                    <span className={`text-[length:var(--type-caption)] font-bold ${bandToneClass(band)}`}>
                       {positionWord}
                     </span>
                   ) : null}
                   {/* One hedged practical consequence line. */}
                   {reading.status !== 'unavailable' ? (
-                    <span className="block text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+                    <span className="block text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
                       {consequenceLine(reading, entry, true, bandWordsOf(copy))}
                     </span>
                   ) : null}
                   {/* PB3: "as of {date}"; stale chips only past the limit. */}
-                  <span className="flex flex-wrap items-baseline gap-x-2 text-[var(--type-caption)] text-[var(--color-text-secondary)]">
+                  <span className="flex flex-wrap items-baseline gap-x-2 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
                     {reading.asOf ? <bdi>{interpolate(copy.ui.pricesAsOf, { date: formatAsOf(reading.asOf, locale) })}</bdi> : null}
                     {reading.status === 'stale' && reading.asOf ? (
                       <bdi className="font-semibold">{interpolate(copy.ui.staleSince, { date: formatAsOf(reading.asOf, locale) })}</bdi>
@@ -166,7 +167,7 @@ export function PricesBoard({
                   {/* The ratios: ONE small context line, BELOW the anatomy —
                    * it can never overlap the tile's price (R17a). */}
                   {id === 'btc-usd' && (goldPerBtc || silverPerBtc) ? (
-                    <span className="block text-[var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]" data-btc-ratios>
+                    <span className="block text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]" data-btc-ratios>
                       <span className="font-bold">{copy.ui.btcRatiosLabel}</span>
                       {goldPerBtc && goldPerBtc.value !== null ? (
                         <span className="block">

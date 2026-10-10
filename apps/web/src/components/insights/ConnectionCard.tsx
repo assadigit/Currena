@@ -121,18 +121,18 @@ function LegChip({
       aria-expanded={false}
       className="insights-focusable inline-flex min-h-[44px] cursor-pointer flex-col items-start gap-0 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2.5 py-1.5 text-start transition-colors hover:border-currena-blue/50"
     >
-      <span className="text-[var(--type-caption)] font-bold text-[var(--color-text-primary)]">{shortName}</span>
+      <span className="text-[length:var(--type-caption)] font-bold text-[var(--color-text-primary)]">{shortName}</span>
       <span className="flex flex-wrap items-baseline gap-x-2">
         {valueText !== null ? (
           <bdi dir="ltr" className="type-number font-semibold tabular-nums text-[var(--color-text-primary)]">
             {valueText}
           </bdi>
         ) : (
-          <span className="text-[var(--type-caption)]">—</span>
+          <span className="text-[length:var(--type-caption)]">—</span>
         )}
         {stateWord !== null ? (
           <span
-            className={`text-[var(--type-caption)] font-bold ${
+            className={`text-[length:var(--type-caption)] font-bold ${
               unreadable ? 'text-[var(--color-status-stale)]' : 'text-[var(--color-status-context)]'
             }`}
           >
@@ -189,7 +189,7 @@ export function ConnectionCard({
           <ConnectionStateIcon state={reading.state} />
           {copy.together.state[reading.state]}
         </span>
-        <h3 className="m-0 text-[var(--type-label)] font-extrabold text-[var(--color-text-primary)]">
+        <h3 className="type-question m-0 text-[var(--color-text-primary)]">
           {entry.name}
         </h3>
       </header>
@@ -211,12 +211,12 @@ export function ConnectionCard({
       </div>
 
       {/* How they usually relate — hedged, one plain sentence (unchanged). */}
-      <p className="m-0 text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+      <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
         {entry.relation}
       </p>
 
       {/* R27: the one-clause right-now line. */}
-      <p className="m-0 text-[var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]">
+      <p className="m-0 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]">
         {rightNow}
       </p>
     </article>

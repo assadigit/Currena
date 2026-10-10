@@ -364,6 +364,44 @@ export function positionBand(percentile10y: number): PositionBand {
   return 'typical';
 }
 
+/* ---------------------------------------------------------------- *
+ * R29 (owner UI/UX audit): status WORDS speak in status ink. The
+ * chips already carried red/green — now the verdict word, the gauge
+ * step words, the attention counts and the price position words do
+ * too. Never colour alone (G5): every tinted word also sits beside
+ * an icon, a meter segment, or a number.
+ * ---------------------------------------------------------------- */
+
+/** WordTone → the status ink token (empty = inherit — neutral words). */
+const WORD_TONE_CLASS: Record<'alert' | 'watch' | 'normal' | 'neutral', string> = {
+  alert: 'text-[var(--color-status-alert)]',
+  watch: 'text-[var(--color-status-watch)]',
+  normal: 'text-[var(--color-status-normal)]',
+  neutral: '',
+};
+
+/** Verdict/gauge step (0 none · 1 relaxed · 2 cautious · 3 stressed ·
+ * 4 alarmed) → the step word's tone class. */
+export function stepToneClass(step: number): string {
+  const tone = step <= 0 ? 'neutral' : step === 1 ? 'normal' : step === 2 ? 'watch' : 'alert';
+  return WORD_TONE_CLASS[tone];
+}
+
+/** Price position band (low = cheap … high = expensive) → the position
+ * word's tone class. Indicator position words stay NEUTRAL by R5
+ * ("unusual" is notable, not good or bad) — only the price wording
+ * carries the cheap/green · expensive/red semantics. */
+export function bandToneClass(band: PositionBand): string {
+  const tone = band === 'low' ? 'normal' : band === 'high' ? 'alert' : 'neutral';
+  return WORD_TONE_CLASS[tone];
+}
+
+/** Attention-count tone (R29): red while anything needs attention,
+ * green only when the gauge is clear. */
+export function attentionToneClass(warnings: number): string {
+  return warnings > 0 ? WORD_TONE_CLASS.alert : WORD_TONE_CLASS.normal;
+}
+
 /** The state key for consequence-line selection (data spec §6 + F4). */
 export type ConsequenceState = keyof ConsequenceLines; // 'highRising' | 'highEasing' | 'typical' | 'low' | 'jumping'
 

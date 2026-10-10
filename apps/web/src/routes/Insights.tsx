@@ -53,6 +53,7 @@ import {
   GROUP_ORDER,
   PINNED_STORAGE_KEY,
   SIGNALS_ENABLED,
+  attentionToneClass,
   definitionFor,
   definitionsForGroup,
   filterVisibleIds,
@@ -61,6 +62,7 @@ import {
   parsePinnedIds,
   readStoredLane,
   statusCounts,
+  stepToneClass,
   tierIsCard,
   tierOf,
   type StatusFilter,
@@ -187,10 +189,10 @@ function QuestionGroup({
   return (
     <section id={`insights-group-${group}`} aria-labelledby={`insights-group-${group}-title`} className="scroll-mt-24">
       <header className="mb-2.5">
-        <h3 id={`insights-group-${group}-title`} className="m-0 text-[var(--type-label)] font-extrabold text-[var(--color-text-primary)]">
+        <h3 id={`insights-group-${group}-title`} className="type-question m-0 text-[var(--color-text-primary)]">
           {question}
         </h3>
-        <p className="m-0 mt-0.5 flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[var(--type-caption)] text-[var(--color-text-secondary)]">
+        <p className="m-0 mt-0.5 flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
           {/* L2: the gauge reading + count. */}
           <span
             className="verdict-meter !h-1.5 max-w-[120px]"
@@ -201,8 +203,8 @@ function QuestionGroup({
               <span key={i} className={`verdict-meter-seg ${step >= i ? `on-${i}` : ''}`} />
             ))}
           </span>
-          <span className="font-bold text-[var(--color-text-primary)]">{stepWord}</span>
-          <span className="font-semibold">{countText}</span>
+          <span className={`font-bold ${stepToneClass(step)}`}>{stepWord}</span>
+          <span className={`font-semibold ${attentionToneClass(gauge?.warningCount ?? 0)}`}>{countText}</span>
           {/* L2 answer: no min-w-0 — the flex item keeps its min-content width
            * (the longest word) so the flex-wrap row moves it to its own line on
            * narrow phones instead of squeezing it below word width, which bled
@@ -246,7 +248,7 @@ function QuestionGroup({
         <button
           type="button"
           onClick={() => setShowAll(true)}
-          className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-currena-blue/40 bg-currena-blue/15 px-5 text-[var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
+          className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-currena-blue/40 bg-currena-blue/15 px-5 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
         >
           {interpolate(copy.ui.seeAll, { n: num(hidden.length, numberLocale) })}
         </button>
@@ -255,7 +257,7 @@ function QuestionGroup({
         <button
           type="button"
           onClick={() => setShowAll(false)}
-          className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-4 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:text-[var(--color-status-context)]"
+          className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:text-[var(--color-status-context)]"
         >
           {copy.ui.showFewer}
         </button>
@@ -292,12 +294,12 @@ function PinnedSection({
   return (
     <section id="insights-pinned" aria-labelledby="insights-pinned-title" className="scroll-mt-24">
       <header className="mb-2.5 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 id="insights-pinned-title" className="m-0 text-[var(--type-label)] font-extrabold text-[var(--color-text-primary)]">
+        <h2 id="insights-pinned-title" className="type-question m-0 text-[var(--color-text-primary)]">
           <span aria-hidden="true">★ </span>
           {copy.ui.pinnedTitle}
         </h2>
         {voting.length > 0 ? (
-          <p className="m-0 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+          <p className={`m-0 text-[length:var(--type-caption)] font-semibold ${attentionToneClass(attention.length)}`}>
             {interpolate(copy.ui.inAlert, {
               warnings: num(attention.length, numberLocale),
               voting: num(voting.length, numberLocale),
@@ -666,10 +668,10 @@ export function Insights() {
       <header className="mb-3">
         <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
           <div className="min-w-0">
-            <h1 className="m-0 text-2xl font-extrabold tracking-tight">{t('insights.title')}</h1>
-            <p className="mt-1 mb-0 text-[var(--type-label)] text-[var(--color-text-secondary)]">{copy.ui.subtitle}</p>
+            <h1 className="m-0 text-2xl font-bold tracking-tight">{t('insights.title')}</h1>
+            <p className="mt-1 mb-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.ui.subtitle}</p>
             {dataAsOfLine ? (
-              <p className="mt-1 mb-0 text-[var(--type-caption)] text-[var(--color-text-secondary)]" title={dataAsOfLine.tooltip}>
+              <p className="mt-1 mb-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]" title={dataAsOfLine.tooltip}>
                 <bdi>
                   {interpolate(copy.ui.dataAsOf, { date: dataAsOfLine.date })}
                   <span aria-hidden="true"> ⓘ</span>
@@ -713,11 +715,11 @@ export function Insights() {
       {state.kind === 'error' ? (
         <div className="flex flex-col gap-6">
           <div className="rounded-[var(--radius-lg)] bg-currena-warning/10 px-5 py-6 text-center ring-1 ring-currena-warning/30">
-            <p className="m-0 text-[var(--type-label)] font-bold text-[var(--color-status-alert)]">
+            <p className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-status-alert)]">
               <TriangleAlert aria-hidden size={18} strokeWidth={1.9} className="me-1 inline-block align-[-4px]" />
               {copy.ui.loadError}
             </p>
-            <p className="mt-1 mb-3 text-[var(--type-label)] text-[var(--color-text-secondary)]">{state.message}</p>
+            <p className="mt-1 mb-3 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{state.message}</p>
             <Button variant="cta" onClick={() => setRetryToken((n) => n + 1)}>
               {copy.ui.retry}
             </Button>
@@ -733,7 +735,7 @@ export function Insights() {
               className="slide-down flex items-center gap-3 rounded-[var(--radius-md)] border-s-4 border-currena-warning bg-currena-warning/15 px-4 py-3"
             >
               <TriangleAlert aria-hidden size={22} strokeWidth={1.9} className="shrink-0 text-[var(--color-status-alert)]" />
-              <p className="m-0 text-[var(--type-label)] font-semibold text-[var(--color-status-alert)]">
+              <p className="m-0 text-[length:var(--type-label)] font-semibold text-[var(--color-status-alert)]">
                 {interpolate(copy.ui.dataFrom, {
                   date: formatRelative(state.snapshot.generatedAt, locale === 'fa' ? 'fa-IR' : 'en-US'),
                 })}
@@ -807,7 +809,7 @@ export function Insights() {
                 >
                   <Search size={24} strokeWidth={1.8} />
                 </div>
-                <p className="mt-1 mb-0 text-[var(--type-label)] font-semibold text-[var(--color-text-primary)]">
+                <p className="mt-1 mb-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-primary)]">
                   {copy.ui.noMatches}
                 </p>
                 <button
@@ -816,7 +818,7 @@ export function Insights() {
                     setStatusFilter('all');
                     setQuery('');
                   }}
-                  className="insights-focusable mt-3 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-currena-blue/40 bg-currena-blue/15 px-5 text-[var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
+                  className="insights-focusable mt-3 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-currena-blue/40 bg-currena-blue/15 px-5 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
                 >
                   {copy.ui.clearFilters}
                 </button>
@@ -829,7 +831,7 @@ export function Insights() {
                 aria-labelledby={`insights-section-${lane}-title`}
                 className="scroll-mt-24 flex flex-col gap-6"
               >
-                <h2 id={`insights-section-${lane}-title`} className="m-0 text-lg font-extrabold">
+                <h2 id={`insights-section-${lane}-title`} className="type-section m-0">
                   {copy.sections[lane]}
                 </h2>
                 {pinnedReadings.length > 0 ? (

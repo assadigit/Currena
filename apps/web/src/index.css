@@ -1073,18 +1073,22 @@ body {
  * ------------------------------------------------------------------ */
 
 :root {
-  /* Text (G4: secondary ink ≥7:1 on card + page surfaces, measured) */
+  /* Text (G4 + owner audit A1: the ink ramp must be a VISIBLE ramp —
+   * secondary steps clearly below primary, tertiary carries meta only) */
   --color-text-primary: #2C3E50;   /* = currena-dark light */
-  --color-text-secondary: #46505C; /* 8.2:1 on white, 7.8:1 on page bg */
+  --color-text-secondary: #56616E; /* 6.3:1 on white, 5.9:1 on page bg — body/labels */
+  --color-text-tertiary: #6B7683;  /* 4.7:1 on white — captions, timestamps, sources */
   /* Surfaces */
   --color-surface: #FFFFFF;
   --color-surface-raised: #FFFFFF;
   --color-surface-alert-tint: rgba(185, 46, 46, 0.05);
   --color-border: rgba(44, 62, 80, 0.14);
-  /* Status inks (icon + word chips — never colour alone, G5) */
+  /* Status inks (icon + word chips — never colour alone, G5). R29 adds
+   * status-watch: the cautious/middle step word gets its own ink. */
   --color-accent-brand: #4A90E2;
   --color-status-alert: #B92E2E;
   --color-status-normal: #256D29;
+  --color-status-watch: #9C5019;   /* 5.9:1 on white — cautious/watch words */
   --color-status-context: #245E9F;
   --color-status-stale: #46505C;
   /* Spacing scale */
@@ -1110,6 +1114,7 @@ body {
 .dark {
   --color-text-primary: #E8EDF4;     /* = currena-dark dark */
   --color-text-secondary: #9AA8BC;   /* 7.5:1 on #10151D, 6.9:1 on #1A222E cards */
+  --color-text-tertiary: #8291A5;    /* 5.0:1 on #1A222E cards — meta only */
   --color-surface: #1A222E;
   --color-surface-raised: #202A38;
   --color-surface-alert-tint: rgba(255, 128, 128, 0.07);
@@ -1117,6 +1122,7 @@ body {
   --color-accent-brand: #6FAEEC;
   --color-status-alert: #FF8080;
   --color-status-normal: #63C06C;
+  --color-status-watch: #FBB48C;     /* 9.1:1 on #1A222E — cautious/watch words */
   --color-status-context: #6FAEEC;
   --color-status-stale: #9AA8BC;
 }
@@ -1141,6 +1147,29 @@ body {
 .type-caption {
   font-size: var(--type-caption);
   font-weight: 500;
+}
+/* Owner-audit type roles (R29): headings stop screaming. Section titles sit
+ * at 17/700 (was text-lg/800), in-card questions at 15/600 (was 14/800),
+ * and kickers become tiny tertiary uppercases. 800 stays with NUMBERS. */
+.type-section {
+  font-size: 1.0625rem;   /* 17px */
+  line-height: 1.4;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.type-question {
+  font-size: 0.9375rem;   /* 15px */
+  line-height: 1.45;
+  font-weight: 600;
+}
+.type-kicker {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+/* Persian (Arabic script) joins letters — never letter-space it. */
+html:not(:lang(fa)) .type-kicker {
+  letter-spacing: 0.05em;
 }
 .text-secondary-ink {
   color: var(--color-text-secondary);

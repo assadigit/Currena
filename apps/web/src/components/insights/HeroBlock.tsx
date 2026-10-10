@@ -85,7 +85,7 @@ export function HeroBlock({
 
       {/* R4: the biggest move — one line, always with its reason. */}
       {mover && moverReading && moverEntry ? (
-        <p className="mt-3 mb-0 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+        <p className="mt-3 mb-0 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
           <span className="font-bold text-[var(--color-text-secondary)]">{copy.ui.bigMoverTitle}:</span>
           <button
             type="button"
@@ -96,7 +96,7 @@ export function HeroBlock({
           </button>
           <bdi dir="ltr" className="type-number shrink-0 font-bold text-[var(--color-text-primary)]">
             {formatChange(mover.change30d, mover.changeKind, numberLocale, copy.units)}
-            <span className="ms-1.5 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+            <span className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
               {copy.ui.days30}
             </span>
           </bdi>
@@ -106,17 +106,17 @@ export function HeroBlock({
       ) : null}
 
       {/* H5: what changed — one line under the hero (or the calm line). */}
-      <p className="mt-3 mb-0 text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+      <p className="mt-3 mb-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
         <bdi>{changedLine}</bdi>
       </p>
 
       {/* N2: ONE short disclaimer line — links to the full text below. */}
       <div role="note" className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span className="text-[var(--type-caption)] text-[var(--color-text-secondary)]">{copy.ui.disclaimerBar}</span>
+        <span className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{copy.ui.disclaimerBar}</span>
         <button
           type="button"
           onClick={onJumpAbout}
-          className="insights-focusable -my-1.5 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-1.5 text-[var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
+          className="insights-focusable -my-1.5 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
         >
           {copy.ui.aboutTitle} ↧
         </button>
