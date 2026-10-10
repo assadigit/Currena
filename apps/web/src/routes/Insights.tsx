@@ -12,12 +12,11 @@
  *   → prices strip: four identical tiles (R10)
  *   → "What it means for my money": at most 4 lines (R11)
  *   → "Together" (collapsed by default, R7b) → "What the signals say"
- *     (collapsed, merged card R26; before-you-act pointer R24)
+ *     (collapsed, merged card R26)
  *   → indicators: visible Global|Australia switch (Global default, R1),
  *     signals-first groups (R7), rows without truncation (R8)
  *   → "Next up" calendar (once, below the indicators, R16)
- *   → footer: the "Before you act" box once (R24) → "About this data"
- *     (quiet, collapsible, R25)
+ *   → footer: "About this data" (quiet, collapsible, R25)
  *
  * Data: GET /api/insights (zod-validated in lib/insights.ts), last-good
  * localStorage snapshot first for instant/offline paint, fresh fetch
@@ -660,19 +659,6 @@ export function Insights() {
     return state.snapshot.readings.find((r) => r.id === panel.id) ?? null;
   }, [panel, state]);
 
-  /** R24: the footer pointer from the Signals header — scroll + focus +
-   * brief highlight (reduced-motion aware). */
-  const jumpBeforeYouAct = useCallback(() => {
-    const el = document.getElementById('before-you-act');
-    if (!el) return;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
-    el.setAttribute('tabindex', '-1');
-    el.focus({ preventScroll: true });
-    el.classList.add('ring-2', 'ring-currena-blue/60');
-    window.setTimeout(() => el.classList.remove('ring-2', 'ring-currena-blue/60'), 1600);
-  }, []);
-
   return (
     <div className="mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-6xl lg:px-8">
       <ReadingProgress label={copy.ui.progressLabel} />
@@ -799,7 +785,7 @@ export function Insights() {
           />
 
           {/* S1–S3 + R26: "What the signals say" — the merged card, collapsed
-           * default; the header carries the before-you-act pointer (R24). */}
+           * default. */}
           {SIGNALS_ENABLED ? (
             <section id="insights-signals-wrap" className="scroll-mt-24">
               <Signals
@@ -807,7 +793,6 @@ export function Insights() {
                 copy={copy}
                 numberLocale={numberLocale}
                 expandToken={signalsToken}
-                onBeforeYouAct={jumpBeforeYouAct}
               />
             </section>
           ) : null}
@@ -882,25 +867,6 @@ export function Insights() {
             onFocusCard={focusCard}
             eventTargets={EVENT_TARGETS}
           />
-
-          {/* R24: the "Before you act" box — ONCE, in the footer, outside any
-           * collapsible, always visible. */}
-          <aside
-            id="before-you-act"
-            aria-label={copy.signals.beforeYouActTitle}
-            className="scroll-mt-24 rounded-[var(--radius-md)] bg-currena-soft/70 px-4 py-3 ring-1 ring-[var(--color-border)] transition-shadow dark:bg-white/[0.05]"
-          >
-            <h2 className="m-0 mb-1 text-[var(--type-label)] font-extrabold text-[var(--color-text-primary)]">
-              {copy.signals.beforeYouActTitle}
-            </h2>
-            <ul className="m-0 flex list-none flex-col gap-1 p-0">
-              {copy.signals.beforeYouAct.map((point) => (
-                <li key={point} className="text-[var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
-                  {point}
-                </li>
-              ))}
-            </ul>
-          </aside>
 
           {/* R25: "About this data" — quiet and collapsible. */}
           <AboutTheData copy={copy} expandToken={aboutToken} />

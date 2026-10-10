@@ -1,5 +1,5 @@
 /**
- * Signals — UI spec Blocks S1–S3 (I17), restructured by round-2 R26 + R24.
+ * Signals — UI spec Blocks S1–S3 (I17), restructured by round-2 R26.
  *
  * ONE merged gold-and-silver card (R26): the four global conditions the
  * metals share are listed once (identical by construction — the evaluators
@@ -9,8 +9,9 @@
  * (no pass/fail look, no green/red). The 30-day speed rides the footing row
  * ONLY when the data exists — no more "Measuring…" tile.
  *
- * The "before you act" box (S3) left this section entirely (R24): it renders
- * ONCE in the footer — the Signals header carries the pointer link.
+ * The "before you act" box (S3) was removed entirely (2026-10-10 owner
+ * request) — the collapsed summary and the merged card carry the honesty
+ * framing instead.
  *
  * Compliance by construction: no green for "supportive", no red for
  * "against" — icon + word in neutral inks only; conditions, never advice.
@@ -411,15 +412,12 @@ export function Signals({
   copy,
   numberLocale,
   expandToken,
-  onBeforeYouAct,
 }: {
   readings: readonly IndicatorReading[];
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
   /** Bumped by the route when a pill/hash/hero link targets this section. */
   expandToken: number;
-  /** R24: footer pointer — scroll + focus + highlight #before-you-act. */
-  onBeforeYouAct: () => void;
 }) {
   const gold = useMemo(() => evaluateSignal('gold', readings), [readings]);
   const silver = useMemo(() => evaluateSignal('silver', readings), [readings]);
@@ -479,14 +477,6 @@ export function Signals({
           {copy.signals.title}
         </h2>
         <span className="inline-flex flex-wrap items-center gap-2">
-          {/* R24: the pointer keeps the warning one tap from the signals. */}
-          <button
-            type="button"
-            onClick={onBeforeYouAct}
-            className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[var(--type-caption)] font-bold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
-          >
-            {copy.signals.beforeYouActPointer}
-          </button>
           <button
             type="button"
             aria-expanded={open}

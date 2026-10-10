@@ -5,6 +5,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-10] — Insights: remove the "Before you act" box (owner request)
+
+Fourteenth round — a direct owner request to drop the "Before you act"
+caution aside (the R24 footer box shipped earlier the same day) entirely.
+
+### Removed
+
+- The footer "Before you act" `<aside id="before-you-act">` from the
+  Insights page (en + fa), the "Before you act ↓" pointer button from the
+  Signals header, the `jumpBeforeYouAct` scroll/focus/highlight handler,
+  and the `beforeYouActTitle` / `beforeYouActPointer` / `beforeYouAct`
+  copy keys from both locales. The Signals disclosure, the merged card,
+  the collapsed summaries and "About this data" are untouched — the page
+  now flows "Next up" → "About this data" → site footer.
+
+### Verification
+
+- typecheck 5/5; tests 784/784 (the removed en/fa four-points parity test
+  no longer applies); bundle budget green (entry 290.32/87.06 vs 296/89.5,
+  Insights 293.77/74.81 vs 300/78 — the box removal shrank the chunk).
+- Browser QA on a local Worker (production snapshot seeded) + vite dev:
+  en/1280 and fa/375 — zero console/page errors, no horizontal overflow
+  (scrollWidth == clientWidth), `#before-you-act` absent from the DOM,
+  no pointer button anywhere, Signals expand/collapse still works, RTL
+  and dark/light unaffected. Web-only change (copy + components); the
+  snapshot computation is untouched, so no ingest-then-deploy ordering
+  applies.
+
 ## [2026-10-10] — Insights UX round 2: the signal-first density pass (R1–R28)
 
 Thirteenth round — the owner's second UX spec

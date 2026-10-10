@@ -88,12 +88,6 @@ describe('I17 copy parity (en ↔ fa)', () => {
     expect(sorted(tokens(fa.bandTop!))).toEqual(sorted(tokens(en.bandTop!)));
     expect(sorted(tokens(fa.bandBottom!))).toEqual(sorted(tokens(en.bandBottom!)));
   });
-
-  it('the before-you-act box has the same four points in both languages', () => {
-    expect(insightsCopyFa.signals.beforeYouAct).toHaveLength(
-      insightsCopyEn.signals.beforeYouAct.length,
-    );
-  });
 });
 
 describe('I17 wording discipline (acceptance test 6)', () => {

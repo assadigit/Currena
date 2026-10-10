@@ -1452,16 +1452,6 @@ export const insightsCopyEn = {
     bandTop: 'top {p}%',
     bandBottom: 'bottom {p}%',
     bandMid: 'the middle',
-    // S3 (R24): the fixed "before you act" box — rendered ONCE, in the
-    // footer. The Signals header carries the pointer link.
-    beforeYouActTitle: 'Before you act',
-    beforeYouActPointer: 'Before you act ↓',
-    beforeYouAct: [
-      'Signals cannot predict prices.',
-      'Prices can fall even when conditions look supportive.',
-      'These logics play out over months and years, not days.',
-      'Dealing costs — the gap between a dealer’s buying and selling prices — can matter more to small buyers than timing.',
-    ],
   },
 
   /* ---------------------------------------------------------------- *
