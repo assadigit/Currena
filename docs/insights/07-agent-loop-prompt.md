@@ -26,7 +26,7 @@ You are the lead engineer on **Currena** (pnpm monorepo: Hono API on Cloudflare 
 
 ## The work loop (repeat until every block is done)
 
-Create `docs/insights/ROUND2-LEDGER.md` with one row per block R1 to R23 plus R7b (status: todo, doing, done, blocked; plus evidence).
+Create `docs/insights/ROUND2-LEDGER.md` with one row per block R1 to R28, where R7b is the revised collapsed-by-default block and R24 to R28 were added on 2026-10-10 (status: todo, doing, done, blocked; plus evidence).
 
 LOOP:
 1. Take the next block that is not done.
@@ -55,7 +55,7 @@ LOOP:
 
 ## Product rules (never break)
 
-- Never use "buy", "sell" or personal-advice wording. Use "has historically tended to…" framing. The "Together" and "What the signals say" sections already exist (I17): do not change their content or wording, only apply the shared rules in `06` (including R7b).
+- Never use "buy", "sell" or personal-advice wording. Use "has historically tended to…" framing. The "Together" and "What the signals say" sections already exist (I17). Their relationship sentences and signal conditions keep their meaning and owner-approved wording; `06` changes their structure, density and presentation (R7b, R24, R26, R27, R28). Generated "Right now" lines may be shortened to one clause but must stay truthful.
 - Never invent or guess data. Stale or unavailable data shows the last value with its date, or "unavailable".
 - RTL native: CSS logical properties only; every string through the i18n corpus (English is the source of truth; Persian is written natively and shape-checked); numbers and dates formatted at render with `Intl`; Persian digits and Jalali dates in Persian; chart time axes stay left to right.
 - zod contracts live in `packages/core`; tests never hit live sites; the Insights route stays lazy; storage stays behind its interfaces.

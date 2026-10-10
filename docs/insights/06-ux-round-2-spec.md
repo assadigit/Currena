@@ -24,8 +24,12 @@ This round makes a few signals large and the rest quiet, and fixes every contrad
 | D7 | **Global comes first, Australia second** (hero and lane default). Remove the "Show Global first" toggle. |
 | D8 | The proposed alert thresholds for the new indicators are **approved.** |
 | D9 | Persian wording is approved. Write all new Persian strings natively, in the same register as the existing corpus. |
+| D10 | **Together and What the signals say stay above the indicators, collapsed by default** (revision of 2026-10-10; see R7b). |
+| D11 | The "Before you act" box leaves the signals cards and appears **once, in the footer** (always visible), with a pointer link in the Signals header (R24). |
+| D12 | "About this data" becomes **small, low-weight and hideable by a toggle**; the notices the sources require stay visible outside the toggle (R25). |
+| D13 | Added after a second roast of the current build (2026-10-10): merge gold and silver into one signals card, redraw the connection cards, hide placeholder evidence tags, and add a sentence-versus-number consistency guard (R26 to R28). |
 
-Not part of this round: new connection or signal content (the I17 sections already exist; see section 10 and R7b).
+Not part of this round: new connection or signal content (the I17 sections already exist; see section 11 and R7b).
 
 ## 3. Target page order
 
@@ -34,10 +38,10 @@ Not part of this round: new connection or signal content (the I17 sections alrea
 3. Section pills (sticky): Status, Prices, Together, Signals (when enabled), Indicators, About.
 4. Prices strip: oil (Brent), gold, silver, Bitcoin.
 5. "What it means for my money": slim panel, at most 4 lines.
-6. "Together" (connection cards) and "What the signals say" (gold, silver): already built (I17). Keep them below the money panel and above the indicators, but apply the density rules in R7b below so they do not bury the signals.
+6. "Together" (connection cards) and "What the signals say" (gold and silver): already built (I17). Keep them below the money panel and above the indicators, **collapsed by default** with a one-line summary each (R7b, R26, R27).
 7. Indicators: visible lane switch (Global | Australia), then question groups. Needs-attention and unusual items visible, the rest collapsed.
 8. Next up (calendar): last content block before About.
-9. About this data (one copy).
+9. Footer: the "Before you act" box (always visible, once; R24), then "About this data" (quiet and collapsible; R25).
 
 ## 4. Definitions used below
 
@@ -155,7 +159,7 @@ Choose the areas to show by the worst tier among their indicators (needs attenti
 **Accept:** A test compares the hero count with the group totals for both regions.
 
 ### R19. Sticky section pills
-**Do:** Keep the pills (Status, Prices, Together, Signals when enabled, Indicators, About). Align the sticky band to the content width, keep the scrollspy, and keep targets at least 44px.
+**Do:** Keep the pills (Status, Prices, Together, Signals when enabled, Indicators, About). The built page showed no Signals pill even though the section exists: add it. Selecting a pill expands its section if it is collapsed. Align the sticky band to the content width, keep the scrollspy, and keep targets at least 44px.
 **Accept:** Pills never extend wider than the content column.
 
 ### R20. Type scale: numbers lead
@@ -210,15 +214,73 @@ Measure, do not guess: no horizontal overflow (`scrollWidth == clientWidth`), no
 12. Persian build passes the same checks (RTL, Persian digits, Jalali dates).
 13. `pnpm -r typecheck`, `pnpm -r test`, the web build and the bundle-budget script are all green; CI is green on the pushed branch.
 14. Zero console errors in every matrix combination.
-15. "Together" shows at most 3 cards by default and the Signals cards start compact (R7b); no lean depends on color alone.
+15. Together and Signals start collapsed with a one-line summary each; the section above Indicators takes no more than about one viewport height (R7b).
+16. "Before you act" appears once, in the footer, visible without a toggle, with a working pointer link from the Signals header (R24).
+17. "About this data" is collapsed by default, small and flat; the FRED notice, the source credits and the short disclaimer stay visible; one Sources block (R25).
+18. One merged gold-and-silver signals card with no duplicated rows and no check or cross marks (R26).
+19. Connection cards show no arrows, every chip has a unit, and no "to verify" text appears in the default state (R27).
+20. The sentence-versus-number test passes, and fails on the known bad pair (R28).
 
-## 10. Out of scope here
+## 10. Added and revised blocks (2026-10-10)
 
-- New connection or signal content. The I17 sections stay as built; this round only applies the shared rules to them (R5 tier words and counts, R8 no truncation, R9 neutral colors, R12 dates, R13 units, R14 plain names, R21 accessibility, R22 Persian parity) and R7b.
+These blocks come from a second roast of the current build and the owner's decisions D10 to D13. Build them together with R1 to R23, in the same loop. R7b replaces the earlier density rule.
+
+### R7b. Together and Signals: collapsed by default (revised 2026-10-10, decision D10)
+**Do:** Both sections stay above "Indicators". Each section has a header row with its title, a one-line summary, and a Show/Hide toggle (`aria-expanded`, `aria-controls`, target at least 24 by 24 CSS px). Both start collapsed. Remember each choice in local storage inside a try/catch block; fail open to collapsed. Selecting the section pill, a hash link, or a link from the hero expands the section.
+- **Collapsed Together** shows its summary ("2 connections active, 3 show signals that disagree, 1 partly active") and one small chip per connection (short title plus state word). A chip click expands the section and scrolls to that card.
+- **Collapsed Signals** shows one line per metal ("Gold: mixed, 2 of 5 conditions met, price in the top 7% of the last 10 years").
+- **Expanded Together** shows 3 cards (active first, then partly active, then signals disagree, then not active) and "See all {n} connections".
+**Why:** The built page grew from about 4,900px to 7,600px, and the first indicator sat about 60% down. Collapsed headers bring the evidence lanes back to the first two screens while keeping the summary visible.
+**Accept:** At 1280×800 with both sections collapsed, the section above "Indicators" takes no more than about one viewport height. Both toggles are keyboard operable and announce their state.
+
+### R24. Move "Before you act" to the footer, once (decision D11)
+**Do:**
+1. Remove the "Before you act" `<aside>` from each signals card.
+2. Render it **once** in the footer, directly above the "About this data" bar and outside any collapsible. Reuse the aside as it exists (same classes, same four lines, same i18n keys). Give it `id="before-you-act"`.
+3. In the Signals section header add a link "Before you act ↓". It scrolls to `#before-you-act`, moves keyboard focus there (`tabindex="-1"`), and highlights the box briefly (respect reduced motion).
+**Why:** The text was repeated twice (once per card). The pointer keeps the warning one tap from the signals; a warning works best near the thing it warns about.
+**Accept:** The text appears exactly once in the DOM (per locale). The pointer link works with keyboard and pointer, and the box is visible without any toggle.
+
+### R25. "About this data": quiet and collapsible (decision D12)
+**Do:**
+1. Remove the white bordered card and the inner colored boxes (the blue Attribution box and the gray Disclaimer box). Use a flat section with one hairline divider above (`--color-border`).
+2. Header row: a small heading "About this data" and a text button "Show details" / "Hide details" with a chevron (`aria-expanded`, `aria-controls`, hit area at least 24 by 24 CSS px).
+3. Start collapsed. Remember the choice in local storage inside a try/catch block; fail open to collapsed.
+4. **Always visible, outside the collapsible**, in caption size and secondary text color: (a) the FRED notice with its terms link, (b) one line of source credits (RBA, ABS CC BY 4.0, ECB reference rates via Frankfurter, other sources by name), (c) one line "General information only — not financial advice."
+5. **Inside the collapsible:** the full sources paragraph, the update schedule, "How a status is decided" (rewrite it for "Needs attention" and "Unusual"), the full disclaimer, and the backtest note. Remove the CSV button from this section (it lives in the Tools menu, R15).
+6. Typography: caption size for the whole section (never below about 12px), semi-bold headings (not extra-bold), secondary text color at 7:1 contrast or better, no inner colored boxes.
+7. Auto-expand when targeted by the "About" pill, the hero's "About this data" link, "How is this calculated?" links, or the `#about` hash. Expand for print.
+8. Render the Sources block exactly once. The built page showed a second copy overlapping the first.
+**Why:** Reference text should have low visual weight. The FRED API terms ask for the notice to be shown prominently, so it stays visible; the attribution credits stay visible for the same reason.
+**Accept:** Collapsed height is small (about three short lines plus the "Before you act" box). The FRED notice is visible in the default state. One Sources block in the DOM.
+
+### R26. Gold and silver as one signals card
+**Do:** Merge the two signals cards into one card with a lean per metal (in words, with the count of conditions met). List the conditions that gold and silver share once. Add silver-only conditions (for example industrial demand) in a separate short list. Remove duplicated rows. Remove the "30-day speed" tile while its value is only "Measuring…"; show it again when data exists. Replace the check and cross marks with neutral wording and icons: "Supports" and "Works against" (no pass/fail look, no green or red).
+**Why:** The two cards were near-copies and added about 1,300px. Check and cross marks read as a buy-or-avoid checklist.
+**Accept:** No condition row appears twice. No check or cross glyph in the signals markup. A copy test rejects "buy", "sell", "avoid" and imperatives.
+
+### R27. Connection cards: stat chips, not a flowchart
+**Do:**
+1. Remove the arrows between indicators (they imply cause and effect). Show each indicator as a small stat chip: plain name, value **with unit**, and the state word (rising, steady, falling; high, mid-range, low) at caption size or larger, not tiny text.
+2. Keep the chips in one wrapping row with equal heights, so cards do not zigzag.
+3. Shorten the "Right now" line to one clause that says whether the usual pattern is showing ("Usual pattern not showing: real yields and gold are both high").
+4. Keep the existing relationship sentence (the "usually" sentence) as it is.
+5. **Do not show "Evidence: to verify" to readers.** Show an evidence tag only when it was verified. Otherwise show one quiet note at the section level ("Relationships are general tendencies, not forecasts") and keep the unverified tag in the data and in Details only.
+6. Equal card heights per row, no holes.
+**Why:** On the built page the arrows chained copper-to-gold → Chinese factory activity → US money supply as if one caused the next. The "to verify" tag appeared six times as an unfinished placeholder.
+**Accept:** No arrow glyph between chips. Every chip value has a unit. No visible "to verify" text in the default state, in either locale.
+
+### R28. Sentence-versus-number guard
+**Do:** Add a consistency test over every indicator and every state. Each consequence line and each hero or group sentence must agree with the numbers and the tier beside it. Cover at least these checks:
+- If a card quotes a band or a goal (for example "the Fed's 2% goal" or "the RBA's 2–3% band"), the sentence must match the value against that band: inside, above or below, computed from the live value.
+- A needs-attention card must never say "usual range", "inside the band", or "near or below" (unless the value really is).
+- A group label (Relaxed to Alarmed) and the hero sentence must not contradict each other.
+Prefer building these sentences from the rule and the live value, not from static text.
+**Why:** The built page showed 3.4% US inflation described as "near or below the Fed's 2% goal" on a card in alert, under a group labelled "Alarmed". Nothing damages trust faster.
+**Accept:** The test fails on the known bad pair (3.4% against a 2% goal, and 3.9% against a 2–3% band). The test runs for en and fa.
+
+## 11. Out of scope here
+
+- New connection or signal content. The I17 sections keep their relationship sentences and signal conditions; this round changes their structure, density and presentation (R7b, R24, R26, R27, R28) and applies the shared rules (R5, R8, R9, R12, R13, R14, R21, R22).
 - Share-link UI beyond what already exists.
-- Any change to the signals wording itself. Never add "buy" or "sell" wording to those sections.
-
-### R7b. Density rules for Together and Signals (added after the I17 build)
-**Do:** Show "Together" with at most 3 connection cards by default, ordered by state (active first, then partly active, then signals disagree, then not active), and a "See all {n} connections" control for the rest. Keep the Signals cards and their "before you act" box exactly as built, but start each card in a compact state (lean in words, the count, the three plain checks) with the condition checklist one tap away. Do not use green or red for any lean.
-**Why:** The reviewed page asked for fewer, clearer signals. These two sections add about two screens of content.
-**Accept:** At 1280×800 the section above "Indicators" takes no more than about two viewport heights in its default state, and every lean is readable without color.
+- Any buy or sell wording, anywhere.
