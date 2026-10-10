@@ -791,3 +791,52 @@ freshness-overrides test.
   (ADMIN_VIEW_SECRET is set in production — the opt-in gate from the
   security wave working as designed; robots.txt still carries
   `Disallow: /admin`).
+
+## Session record — 2026-10-10 UX round 2 (the signal-first density pass)
+
+**Worker deployed from round-2 HEAD.** The round-2 spec
+(`docs/insights/06-ux-round-2-spec.md`, D1–D13 + the 2026-10-10 revision)
+was implemented across the whole Insights surface (R1–R28) — the build
+ledger with per-block evidence is `docs/insights/ROUND2-LEDGER.md`, the
+change inventory is CHANGELOG §2026-10-10 (round 2). Committed as
+`3f03323` (feat(insights): UX round 2) on top of the spec-revision commit
+`38e146f`; pushed to origin/main.
+
+- **Gates at HEAD `3f03323`:** typecheck 5/5; tests **785/785** (web 185 →
+  223 — the 38-test round-2 guard suite `round2.test.ts`); build green;
+  bundle budgets green — entry untouched (290.32/87.05 vs 296/89.5),
+  Insights consciously bumped 280/72 → **300/78** (296.12/75.40 measured,
+  itemised justification in `scripts/check-bundle-budget.mjs`).
+- **No ingest-then-deploy needed:** the only definitions change
+  (`copper-usd` group `prices-board` → `growth-health`) is render-time —
+  the snapshot computation, the contract and the stored payload are
+  unchanged; the deployed Worker serves the SAME snapshot
+  (41 readings, `generatedAt 2026-10-10T10:40:40Z`).
+- **Deploy:** `wrangler deploy` → Version **`3eb5e030-b89d-4645-b6c7-55a089a43b51`**
+  (assets = the freshly built web dist; cron unchanged).
+- **Pre-deploy QA** (local: wrangler dev KV seeded from the production
+  snapshot + the built SPA): en/fa × 1280×800 / 375×812 × light/dark —
+  zero console errors; `scrollWidth == clientWidth` at every width; both
+  evidence lanes collapsed by default with correct summaries; the merged
+  signals card with zero ✓/✗; the footer "Before you act" exactly once with
+  a working pointer (scroll + focus + ring highlight); Tools keyboard pass
+  (open, Escape, focus return); pill-expand; group "See all" expansion; lane
+  switch + persistence; R20 computed value/title ratio 1.45; fa renders
+  Persian digits in every count (۲ از ۵) and Persian commas. Two real bugs
+  found by QA and fixed pre-deploy: the fa band-position words rendered in
+  English (the `{bandPos}` token got the EN defaults) and every count
+  interpolation rendered Latin digits in the fa build; plus the R28 guard
+  caught the two-sided-band "below" fallthrough and the R10-banned
+  "calm is returning" claim in the gold lines of both locales.
+- **Post-deploy production smoke (2026-10-10 15:51 UTC):** `/api/health` ok;
+  `/api/insights` 41 readings; SPA 200; robots 200; `/admin` 401 (gated).
+  `#/insights` en/1280: hero Global first, both lanes collapsed, zero
+  "Alert" words, 4 needs-attention cards with rule lines, no overflow, zero
+  console errors; fa/375: dir=rtl, no overflow, the signals summary reads
+  «طلا: آمیخته، ۲ از ۵ شرایط برقرار — قیمت در ۷٪ بالای ۱۰ سال گذشته».
+  Homepage (money page): converter live — 100 USD → ۲۶٬۴۹۶٬۴۰۰ IRR (Toman)
+  at the Oct-10 TGJU rate, board + at-a-glance intact.
+- **Returning visitors:** the SPA service worker precaches — existing
+  visitors get the new shell on their next visit and the new lazy Insights
+  chunk after the standard two-reload SW update cycle (same as every
+  previous wave).
