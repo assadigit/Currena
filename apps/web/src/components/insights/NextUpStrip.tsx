@@ -9,7 +9,7 @@
 
 import { useMemo, useState } from 'react';
 import type { CalendarEvent, IndicatorId } from '@currena/core';
-import { formatJalaliDate, formatDate, formatNumber } from '@currena/core';
+import { formatJalaliDate, formatDateWords, formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { downloadBlob } from '../../lib/download';
@@ -137,7 +137,7 @@ export function NextUpStrip({
       <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-3">
         {strip.map((event) => {
           const days = daysUntil(event.date);
-          const dateText = locale === 'fa' ? formatJalaliDate(event.date, 'fa-IR') : formatDate(event.date, 'en-US');
+          const dateText = locale === 'fa' ? formatJalaliDate(event.date, 'fa-IR') : formatDateWords(event.date, 'en-US');
           const target = eventTargets[event.kind];
           return (
             <li
@@ -213,7 +213,7 @@ export function NextUpStrip({
                   {[...byTitle.values()].map(({ event, count }) => {
                     const days = daysUntil(event.date);
                     const dateText =
-                      locale === 'fa' ? formatJalaliDate(event.date, 'fa-IR') : formatDate(event.date, 'en-US');
+                      locale === 'fa' ? formatJalaliDate(event.date, 'fa-IR') : formatDateWords(event.date, 'en-US');
                     return (
                       <li
                         key={`${event.id}-${event.date}`}

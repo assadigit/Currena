@@ -30,7 +30,7 @@
 
 import { useId, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
-import { formatNumber, formatDate, formatJalaliDate } from '@currena/core';
+import { formatNumber, formatDateWords, formatJalaliDate } from '@currena/core';
 import type { IndicatorId } from '@currena/core';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { interpolate } from '../../i18n';
@@ -72,7 +72,7 @@ function num(value: number, numberLocale: 'en-US' | 'fa-IR'): string {
 
 /** Card-local ISO date rendering: Gregorian in en, Jalali in fa (spec §7). */
 export function formatAsOf(iso: string, locale: 'en' | 'fa'): string {
-  return locale === 'fa' ? formatJalaliDate(iso, 'fa-IR') : formatDate(iso, 'en-US');
+  return locale === 'fa' ? formatJalaliDate(iso, 'fa-IR') : formatDateWords(iso, 'en-US');
 }
 
 export function HistoryChart({ id, points, copy, locale, numberLocale }: HistoryChartProps) {

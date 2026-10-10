@@ -185,6 +185,21 @@ export function formatDate(iso: string, locale: Locale, opts: DateFormatOptions 
 }
 
 /**
+ * Round-2 (Insights R12): unambiguous English dates — "3 Nov 2026"
+ * (day, ABBREVIATED month name, year). "11/03/2026" reads as 11 March to
+ * Australians but 3 November to the RBA; a month NAME kills the ambiguity.
+ * Persian keeps its Jalali rendering via formatJalaliDate.
+ */
+export function formatDateWords(iso: string, locale: Locale): string {
+  const resolved = locale === 'fa-IR' ? 'fa-IR-u-ca-gregory' : 'en-US-u-ca-gregory';
+  return cachedDateTimeFormat(resolved, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  }).format(parseIso(iso));
+}
+
+/**
  * Jalali (Solar Hijri) date via Intl's persian calendar — no jalaali-js
  * dependency. 'fa-IR' → Persian digits + Persian month names;
  * 'en-US' → "06/25/1405 AP" style (checklist #8/#19).

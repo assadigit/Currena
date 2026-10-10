@@ -1,9 +1,9 @@
 /**
- * JumpNav — Block P1: the pill row is now STICKY below the site navigation,
- * renamed to the owner's five sections (Status, Prices, Indicators, About —
- * "Together" waits for v2), and highlights the section in view (scroll
- * spy). Horizontal scroll on phones stays (I4), safe-area aware, and the
- * active pill mirrors.
+ * JumpNav — Block P1, round-2 R19: the STICKY section pills (Status, Prices,
+ * Together, Signals when enabled, Indicators, About), aligned to the content
+ * width (the old full-bleed negative margins are gone), scroll-spy kept,
+ * targets ≥44px. Selecting a pill also EXPANDS its section when it is
+ * collapsed (R19/R7b) — the route does that via onWillNavigate.
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -47,19 +47,32 @@ function useActiveTarget(targets: readonly JumpTarget[]): string | null {
   return active;
 }
 
-export function JumpNav({ targets, copy }: { targets: readonly JumpTarget[]; copy: InsightsCopy }) {
+export function JumpNav({
+  targets,
+  copy,
+  onWillNavigate,
+}: {
+  targets: readonly JumpTarget[];
+  copy: InsightsCopy;
+  /** R19: fires BEFORE the scroll so the route can expand collapsed
+   *  sections (Together/Signals/About) first. */
+  onWillNavigate?: (id: string) => void;
+}) {
   const active = useActiveTarget(targets);
   if (targets.length === 0) return null;
   const jump = (id: string): void => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
-    el.setAttribute('tabindex', '-1');
-    el.focus({ preventScroll: true });
+    onWillNavigate?.(id);
+    requestAnimationFrame(() => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+      el.setAttribute('tabindex', '-1');
+      el.focus({ preventScroll: true });
+    });
   };
   return (
-    <nav aria-label={copy.ui.navLabel} className="insights-sticky-nav -mx-4 mt-4 px-4 lg:-mx-8 lg:px-8">
+    <nav aria-label={copy.ui.navLabel} className="insights-sticky-nav mt-4">
       <span
         role="list"
         className="no-print flex list-none items-center gap-1.5 overflow-x-auto py-2"

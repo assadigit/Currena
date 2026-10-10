@@ -32,6 +32,25 @@ Insights explains the state of global and Australian finance through about 30 in
 
 ## 4. Page structure, top to bottom
 
+> **Round-2 revision (2026-10-10, R1–R28 — see `06-ux-round-2-spec.md` and
+> `ROUND2-LEDGER.md` for the per-block evidence).** The structure is now:
+> header (title, subtitle, "Data as of", ONE Tools disclosure) → hero (Global
+> verdict first, then Australia; meters + gauges + a fixed-table reason line
+> + up to three needs-attention tiles with unit-ful numbers each; one
+> biggest-move line) → sticky section pills (Status, Prices, Together,
+> Signals, Indicators, About) → the four-tile prices strip → the slim "what
+> it means for my money" panel (≤4 lines) → Together + Signals COLLAPSED by
+> default with one-line summaries → the indicator lanes (Global default,
+> visible Global|Australia switch, per-group signals-first collapse behind
+> "See all {n}") → Next up → the footer "Before you act" box (exactly once)
+> → the quiet collapsible "About this data" (FRED notice + credits +
+> general-information always visible outside the toggle). Status words are
+> the two tiers "Needs attention" / "Unusual" (internal ids unchanged); the
+> "Alert" word is retired from the UI. The filter toolbar of item 5 below
+> moved into the Tools menu (search, filter, shortcuts, .ics, CSV); dates
+> render as month names in English; every number carries a unit.
+
+
 1. **Header:** existing Currena header with "Insights" active.
 2. **Summary block:** two lines, Global and Australia, each like "Cautious · 4 of 14 indicators in warning," with a "How this is calculated" link. Each line is a button that jumps to its section (I9) — the summary doubles as the page's table of contents. Directly under it a one-line disclaimer ("General information only, not advice") linking to the full text.
 3. **What changed this week:** indicators that changed state, the five biggest moves, events in the next 7 days.

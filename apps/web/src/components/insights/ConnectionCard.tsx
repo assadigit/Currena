@@ -1,17 +1,17 @@
 /**
- * ConnectionCard — UI spec Block T1 (I17, the v2 wave): one card per
- * relationship. Shows two or three indicators with live values, a short
- * arrow between them, one plain sentence of how they usually relate, and a
- * computed "right now" line. One state: active, partly active, not active,
- * or signals disagree (plus the honest unknown when a leg is stale).
+ * ConnectionCard — UI spec Block T1 (I17), restructured by round-2 R27.
  *
- * Evidence tags: "to verify" on every card until the owner confirms the
- * evidence (spec note) — a fixed chip, never a computed judgement.
+ * Each indicator renders as a small STAT CHIP in one wrapping row with equal
+ * heights (no arrows between chips — arrows implied cause and effect): plain
+ * name, value WITH UNIT, and the state word (rising/steady/falling; high/
+ * mid-range/low) at caption size. The relation sentence keeps its
+ * owner-approved wording; the "right now" line is ONE truthful clause.
  *
- * Discipline inherited from the page: state shows as icon + word, never
- * colour alone (G5 family) and never green/red judgement colours; the leg
- * chips are 24px+ targets (G6) that open the indicator's details panel;
- * arrows mirror in RTL (G1 logical properties, the SVG flips via CSS).
+ * The "Evidence: to verify" tag never renders (R27) — the section-level
+ * quiet note replaces it; the tag stays in the data attributes only.
+ *
+ * State shows as icon + word, never colour alone (G5 family); the leg chips
+ * are 24px+ targets (G6) that open the indicator's details panel.
  */
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
@@ -84,29 +84,8 @@ const STATE_TONE: Record<ConnectionState, string> = {
   unknown: 'bg-currena-muted/15 text-[var(--color-status-stale)]',
 };
 
-/** The relation arrow between leg chips — mirrors in RTL (CSS flip). */
-function RelationArrow() {
-  return (
-    <svg
-      className="connection-arrow shrink-0 text-[var(--color-text-secondary)]"
-      width="18"
-      height="12"
-      viewBox="0 0 18 12"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M1.5 6h13" />
-      <path d="M11.5 2.8 15 6l-3.5 3.2" />
-    </svg>
-  );
-}
-
-/** One leg chip: short name, live value, lean word — opens the details panel. */
+/** One leg STAT CHIP: short name, live value WITH UNIT, the state word at
+ * caption size — opens the details panel. Equal height per row. */
 function LegChip({
   leg,
   reading,
@@ -128,8 +107,8 @@ function LegChip({
     reading !== undefined && reading.value !== null
       ? formatIndicatorValue(leg.id, reading.value, numberLocale, copy.units)
       : null;
-  // One plain lean word: the direction when measurable, else the level.
-  const leanWord =
+  // One plain state word: the direction when measurable, else the level.
+  const stateWord =
     leg.direction !== null
       ? t.direction[leg.direction]
       : leg.level !== null
@@ -142,22 +121,24 @@ function LegChip({
       aria-expanded={false}
       className="insights-focusable inline-flex min-h-[44px] cursor-pointer flex-col items-start gap-0 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2.5 py-1.5 text-start transition-colors hover:border-currena-blue/50"
     >
+      <span className="text-[var(--type-caption)] font-bold text-[var(--color-text-primary)]">{shortName}</span>
       <span className="flex flex-wrap items-baseline gap-x-2">
-        <span className="text-[var(--type-label)] font-bold text-[var(--color-text-primary)]">{shortName}</span>
-        {leanWord !== null ? (
-          <span className={`text-[0.72rem] font-bold ${unreadable ? 'text-[var(--color-status-stale)]' : 'text-[var(--color-status-context)]'}`}>
-            {leanWord}
-          </span>
-        ) : null}
-      </span>
-      <span className="flex items-baseline gap-2 text-[var(--type-caption)] text-[var(--color-text-secondary)]">
         {valueText !== null ? (
-          <bdi dir="ltr" className="type-number font-semibold tabular-nums">
+          <bdi dir="ltr" className="type-number font-semibold tabular-nums text-[var(--color-text-primary)]">
             {valueText}
           </bdi>
         ) : (
-          <span>—</span>
+          <span className="text-[var(--type-caption)]">—</span>
         )}
+        {stateWord !== null ? (
+          <span
+            className={`text-[var(--type-caption)] font-bold ${
+              unreadable ? 'text-[var(--color-status-stale)]' : 'text-[var(--color-status-context)]'
+            }`}
+          >
+            {stateWord}
+          </span>
+        ) : null}
       </span>
       <span className="sr-only"> — {t.viewLegCard}</span>
     </button>
@@ -170,30 +151,36 @@ export function ConnectionCard({
   copy,
   numberLocale,
   onFocusCard,
+  autoFocus,
 }: {
   reading: ConnectionReading;
   readings: readonly IndicatorReading[];
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
   onFocusCard: (id: IndicatorId, opener?: HTMLElement | null) => void;
+  /** R7b: a collapsed-section chip click lands here — scroll + ring once. */
+  autoFocus?: boolean;
 }) {
   const entry = copy.together.connections[reading.connection];
   const byId = new Map(readings.map((r) => [r.id as string, r]));
   const phrases = reading.legs.map((leg) =>
     legPhrase(leg, entry.legs[leg.id as keyof typeof entry.legs] ?? leg.id, copy),
   );
-  const rightNowTemplate = entry.rightNow[reading.state];
-  const rightNow = interpolate(rightNowTemplate, {
-    a: phrases[0] ?? '',
-    b: phrases[1] ?? '',
-    c: phrases[2] ?? '',
-  });
+  // R27: the right-now line — ONE truthful clause keyed by state; the
+  // disagree case names the concrete leg phrases.
+  const rightNowTemplate = copy.together.rightNowShort[reading.state];
+  const rightNow =
+    reading.state === 'disagree'
+      ? interpolate(rightNowTemplate, { a: phrases[0] ?? '', b: phrases[1] ?? '' })
+      : rightNowTemplate;
 
   return (
     <article
       data-connection={reading.connection}
       data-connection-state={reading.state}
-      className="flex flex-col gap-2.5 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)]"
+      // R27: the evidence tag stays in the DATA, never on the face.
+      data-evidence="to-verify"
+      className={`flex flex-col gap-2.5 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)] ${autoFocus ? 'motion-safe:animate-pulse ring-currena-blue/50' : ''}`}
     >
       <header className="flex flex-wrap items-center gap-2">
         <span
@@ -205,37 +192,30 @@ export function ConnectionCard({
         <h3 className="m-0 text-[var(--type-label)] font-extrabold text-[var(--color-text-primary)]">
           {entry.name}
         </h3>
-        {/* Evidence tag: "to verify" on every card until the owner confirms. */}
-        <span className="ms-auto inline-flex shrink-0 items-center gap-1 rounded-full bg-currena-muted/15 px-2.5 py-0.5 text-[0.72rem] font-semibold text-[var(--color-status-stale)]">
-          {copy.together.evidenceToVerify}
-        </span>
       </header>
 
-      {/* The legs with live values and the relation arrows between them
-       * (flow direction follows the document; the SVG arrows mirror via
-       * the [dir='rtl'] CSS flip). */}
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
-        {reading.legs.map((leg, i) => (
-          <span key={leg.id} className="flex items-center gap-2">
-            {i > 0 ? <RelationArrow /> : null}
-            <LegChip
-              leg={leg}
-              reading={byId.get(leg.id)}
-              shortName={entry.legs[leg.id as keyof typeof entry.legs] ?? leg.id}
-              copy={copy}
-              numberLocale={numberLocale}
-              onFocusCard={onFocusCard}
-            />
-          </span>
+      {/* R27: the legs as STAT CHIPS in one wrapping row with equal heights
+       * (items-stretch, h-full on the chip) — no arrows between them. */}
+      <div className="flex flex-wrap items-stretch gap-2">
+        {reading.legs.map((leg) => (
+          <LegChip
+            key={leg.id}
+            leg={leg}
+            reading={byId.get(leg.id)}
+            shortName={entry.legs[leg.id as keyof typeof entry.legs] ?? leg.id}
+            copy={copy}
+            numberLocale={numberLocale}
+            onFocusCard={onFocusCard}
+          />
         ))}
       </div>
 
-      {/* How they usually relate — hedged, one plain sentence. */}
+      {/* How they usually relate — hedged, one plain sentence (unchanged). */}
       <p className="m-0 text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
         {entry.relation}
       </p>
 
-      {/* The computed right-now line. */}
+      {/* R27: the one-clause right-now line. */}
       <p className="m-0 text-[var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]">
         {rightNow}
       </p>

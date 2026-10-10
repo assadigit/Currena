@@ -2,10 +2,10 @@
  * Sparkline — a zero-dependency SVG micro-trend chart (rate-history feature).
  *
  * Renders a normalized polyline with a soft gradient area fill and an end
- * dot. Colors follow the trend direction (first → last):
- *   rising  → success green
- *   falling → red
- *   flat / < 2 points → muted placeholder dashes
+ * dot. Round-2 R9: Insights sparklines pass tone="neutral" — ONE neutral
+ * stroke token for every sparkline, direction shown by the number + arrow
+ * beside it, never by colour. LiveRates (outside the round-2 scope) keeps
+ * the direction colours by default.
  *
  * Static SVG only — nothing animates, so it is inherently reduced-motion
  * safe. RTL-agnostic (charts read left→right in both app locales, matching
@@ -28,12 +28,15 @@ export interface SparklineProps {
   className?: string;
   /** Override the direction color (defaults to computed trend). */
   direction?: 'up' | 'down' | 'flat';
+  /** R9: one neutral stroke token for ALL Insights sparklines. */
+  tone?: 'direction' | 'neutral';
 }
 
 const COLORS = {
   up: { stroke: '#22c55e', dot: '#4ade80', fillFrom: 'rgba(34,197,94,0.28)' },
   down: { stroke: '#ef4444', dot: '#f87171', fillFrom: 'rgba(239,68,68,0.24)' },
   flat: { stroke: 'currentColor', dot: 'currentColor', fillFrom: 'rgba(148,163,184,0.15)' },
+  neutral: { stroke: 'currentColor', dot: 'currentColor', fillFrom: 'rgba(148,163,184,0.10)' },
 } as const;
 
 /** Map a value in [min, max] to y in [pad, height - pad] (inverted: up = high). */
@@ -50,6 +53,7 @@ export function Sparkline({
   ariaLabel,
   className = '',
   direction,
+  tone = 'direction',
 }: SparklineProps) {
   const gradId = useId();
   const clean = points.filter((p) => Number.isFinite(p));
@@ -84,7 +88,7 @@ export function Sparkline({
   const firstVal = clean[0];
   const lastVal = clean[clean.length - 1];
   if (firstVal === undefined || lastVal === undefined) return null; // unreachable (clean.length ≥ 2)
-  const trendDir = direction ?? (lastVal > firstVal ? 'up' : lastVal < firstVal ? 'down' : 'flat');
+  const trendDir = tone === 'neutral' ? 'neutral' : (direction ?? (lastVal > firstVal ? 'up' : lastVal < firstVal ? 'down' : 'flat'));
   const colors = COLORS[trendDir];
 
   const pad = 4;

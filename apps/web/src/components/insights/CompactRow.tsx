@@ -9,11 +9,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
+import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { fetchIndicatorHistory } from '../../lib/insights';
 import { Sparkline } from '../Sparkline';
 import { StatusChip } from './StatusChip';
-import { consequenceLine, definitionFor, formatChange, formatIndicatorValue } from './config';
+import { bandWordsOf, consequenceLine, definitionFor, formatChange, formatIndicatorValue, formatRuleText, tierOf } from './config';
 
 /** F2's tiny sparkline — same lazy pattern as the alert card's. */
 function TinySparkline({ id }: { id: IndicatorId }) {
@@ -48,7 +49,7 @@ function TinySparkline({ id }: { id: IndicatorId }) {
   }, [id, points]);
   return (
     <span ref={ref} className="hidden h-5 w-16 shrink-0 sm:block" aria-hidden="true">
-      {points ? <Sparkline points={points} width={64} height={20} ariaLabel="" /> : null}
+      {points ? <Sparkline points={points} width={64} height={20} ariaLabel="" tone="neutral" className="text-currena-muted" /> : null}
     </span>
   );
 }
@@ -72,8 +73,18 @@ export function CompactRow({
   const def = definitionFor(reading.id);
   const entry = copy.indicators[reading.id];
   const isUnavailable = reading.status === 'unavailable';
+  const tier = tierOf(reading);
   const valueText =
     reading.value !== null ? formatIndicatorValue(reading.id, reading.value, numberLocale, copy.units) : null;
+  // R6: the needs-attention rule line also rides compact rows when a
+  // needs-attention row renders without a card (never hidden by R7).
+  const ruleLine =
+    tier === 'needs-attention'
+      ? interpolate(copy.ui.attentionTileRule, {
+          rule: formatRuleText(def.rule, reading.id, copy.rule, copy.units, numberLocale),
+          value: valueText ?? '—',
+        })
+      : null;
 
   return (
     <article
@@ -86,13 +97,14 @@ export function CompactRow({
         onClick={(e) => onOpenDetails(reading.id, e.currentTarget)}
         className="insights-focusable flex w-full cursor-pointer items-center gap-x-3 border-0 bg-transparent p-0 text-start"
         aria-haspopup="dialog"
+        aria-label={`${copy.ui.detailsButton}: ${entry.name}`}
       >
         <span className="flex w-full min-w-0 flex-col gap-0.5">
           <span className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0">
             <span className="shrink-0">
-              <StatusChip status={reading.status} copy={copy} />
+              <StatusChip status={reading.status} copy={copy} tier={tier} />
             </span>
-            <span className="min-w-0 truncate text-[var(--type-label)] font-semibold text-[var(--color-text-primary)]">
+            <span className="min-w-0 text-[var(--type-label)] font-semibold text-[var(--color-text-primary)]">
               {entry.name}
               {pinned ? <span className="sr-only"> · {copy.ui.pinnedBadge}</span> : null}
             </span>
@@ -115,13 +127,19 @@ export function CompactRow({
                 {copy.ui.mixedEvidenceTag}
               </span>
             ) : null}
-            <span className="ms-auto shrink-0 text-[var(--type-caption)] font-semibold text-[var(--color-status-context)]">
+            <span className="ms-auto shrink-0 whitespace-nowrap text-[var(--type-caption)] font-semibold text-[var(--color-status-context)]">
               {copy.ui.detailsButton} ›
             </span>
           </span>
+          {/* R6: the rule line on needs-attention rows. */}
+          {ruleLine !== null ? (
+            <span className="block text-[var(--type-caption)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
+              <bdi>{ruleLine}</bdi>
+            </span>
+          ) : null}
           {!isUnavailable ? (
-            <span className="block truncate text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-              {consequenceLine(reading, entry, false)}
+            <span className="block text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+              {consequenceLine(reading, entry, false, bandWordsOf(copy))}
             </span>
           ) : null}
         </span>

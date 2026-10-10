@@ -5,6 +5,124 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-10] — Insights UX round 2: the signal-first density pass (R1–R28)
+
+Thirteenth round — the owner's second UX spec
+(`docs/insights/06-ux-round-2-spec.md`, decisions D1–D13 incl. the
+2026-10-10 revision) built end-to-end: a few signals large, the rest quiet,
+and every sentence-versus-number contradiction eliminated. Build ledger with
+per-block evidence: `docs/insights/ROUND2-LEDGER.md`.
+
+### Added
+
+- **R5 two-tier status model** — `tierOf` pure function: needs-attention
+  (a published rule fired; internal id stays `warning`) > unusual (top/bottom
+  10% of the indicator's own 10-year range, 30-obs percentile floor) >
+  normal; context/stale/unavailable unchanged. The user-facing word "Alert"
+  is retired everywhere (chips, filters, counts, hero, CSV); fa gets
+  نیازمند توجه / غیرعادی.
+- **R11 "What it means for my money" (slim)** — ≤4 lines chosen by the worst
+  tier among six life areas (petrol, home loan, savings, shop prices,
+  overseas money, jobs), hedged sentences keyed area×state, 1–2 value chips
+  linking the cards, calm fallback line. No advice wording, both locales.
+- **R15 Tools menu** — one disclosure in the page header holding search,
+  status filter, keyboard-shortcuts help, .ics and CSV download; the inline
+  FilterBar is deleted and the "Keyboard: / j k" hint line removed; the menu
+  closes on Escape/outside click and returns focus; counts describe the
+  current lane only.
+- **R7b collapsed evidence lanes** — Together and Signals start collapsed
+  with a one-line summary each (per-connection chips / per-metal lines),
+  Show/Hide disclosures with aria state, localStorage remember (fail-open to
+  collapsed), pill/hash/hero links expand via `expandToken`. Signals ships
+  the R24 "Before you act ↓" pointer in its header.
+- **R24 footer "Before you act"** — rendered exactly once in the footer
+  (`id="before-you-act"`, always visible, outside any collapsible); the
+  Signals header pointer scrolls + focuses + briefly highlights it
+  (reduced-motion aware).
+- **R25 quiet "About this data"** — flat section, collapsed by default, with
+  the FRED notice, the source credits and the general-information line always
+  visible outside the toggle; CSV button moved to Tools; print auto-expand;
+  exactly ONE Sources block.
+- **R26 merged signals card** — the two near-copy cards become one: the four
+  shared conditions listed once, per-metal footing rows, silver-only
+  industrial condition separate, neutral "Supports / Works against" icons and
+  words (no ✓/✗, no green/red), 30-day speed only when data exists.
+- **R27 stat-chip connection cards** — arrows removed; each leg renders as a
+  stat chip (name, value WITH unit, state word); the right-now line is one
+  truthful clause; the "Evidence: to verify" placeholder never renders (data
+  attribute + the section-level quiet note instead); dead `evidenceToVerify`
+  copy key deleted.
+- **R28 sentence-versus-number guard** — band-quoting lines are computed from
+  the rule + live value (`bandPositionOf`/`consequenceLine` with
+  `{bandPos}/{bandLabel}` tokens); the R28 known bad pairs (3.4% vs the Fed's
+  2% goal, 3.9% vs the RBA 2–3% band) are regression-tested to fail; fa band
+  words render natively (درون/بالای/زیر). Fixed a real bug found by the
+  guard: a two-sided band value fell through to the one-sided branch and
+  read "below" while sitting INSIDE the band.
+- **38 round-2 guard tests** (`apps/web/src/components/insights/round2.test.ts`)
+  over the pure layer: hero-reason full step matrix + contradiction guard,
+  tier precedence/floor/stale, attention-tile ordering, group visibility,
+  money-panel selection + advice-word ban, date formats, units coverage,
+  code-pattern scan, counts consistency, mergeSignals duplication, evidence
+  discipline, band-position math. Suite 747 → **785**.
+
+### Changed
+
+- **R1/R7/R16/R19 page order & defaults** — Global lane first (hero + default,
+  swap toggle removed); per-group signals-first collapse ("See all {n}"
+  behind needs-attention + unusual + top-up-to-3); Next up moved below the
+  indicators; Signals pill added to the sticky band; pills expand their
+  collapsed section.
+- **R2/R3/R4 hero** — verdicts keep meters with text alternatives
+  ("Global: Stressed, step 3 of 4"), gauges, a fixed-table reason line that
+  cannot contradict the gauges, up to 3 needs-attention tiles with large
+  unit-ful numbers per region, and one biggest-move line that always carries
+  its "unusually large for this indicator" reason (the beige callout box is
+  gone; stale items hard-excluded).
+- **R6 needs-attention face** — every needs-attention card shows
+  "Rule: … · now …" on the face; the 10-year position bar shows only on
+  unusual cards.
+- **R8/R9/R10 anatomy** — consequence lines never truncate; sparklines render
+  one neutral tone on Insights (LiveRates untouched); the prices strip is
+  four identical tiles (Brent, gold +A$, silver, Bitcoin) with the BTC
+  ratios as one small context line — copper and iron-ore move into the
+  indicator lanes (`copper-usd` definition group `prices-board` →
+  `growth-health`; the R10 "calm is returning" claim is scrubbed from the
+  gold lines in both locales and regression-banned).
+- **R12/R13/R14/R20 polish** — English dates become month-name form
+  ("Oct 10, 2026") with no seconds in "Data as of"; every displayed number
+  carries a unit (audusd US$ per A$, home values "index" after verifying the
+  ABS series, terms-of-trade "index"); opaque names replaced
+  ("Underlying inflation") and source codes audited out; `--type-number`
+  raised 1.3rem → 1.45rem so tile/price values compute 1.45× the label role
+  (spec floor 1.4×).
+- **R21/R22 a11y & Persian parity** — unique "Details: {name}" accessible
+  names on every card control; all count interpolations render locale digits
+  (fa shows ۲ از ۵, not 2 از 5) including the new collapsed summaries;
+  Persian commas in the Together summary; logical properties only in new CSS.
+- **R23 budgets** — entry untouched (290.32/87.05 vs 296/89.5); the Insights
+  lazy chunk consciously bumps 280/72 → **300/78** (296.12/75.40 measured)
+  with the itemised justification in `scripts/check-bundle-budget.mjs`: the
+  tier model + money panel + Tools menu + the bilingual corpus growth minus
+  the deleted FilterBar.
+
+### Verification
+
+- Gates: `pnpm -r typecheck` 5/5; `pnpm -r test` **785/785**; web build green;
+  bundle budgets green.
+- Browser QA (agent-browser against the built SPA + wrangler dev seeded with
+  the production snapshot): en/fa × 1280×800 / 375×812 × light/dark —
+  `scrollWidth == clientWidth` everywhere (the only inner "overflows" are the
+  scrollable pill row and the position-bar fill, both by design), zero
+  console errors, zero "Alert" words, 4 rule lines on 4 needs-attention
+  cards, both evidence lanes collapsed by default with correct summaries,
+  the merged signals card with zero ✓/✗, one footer "Before you act" with a
+  working pointer, one Sources block, Tools keyboard pass (open, Escape,
+  focus return), pill-expand verified, R20 computed ratio 1.45.
+- Data note: `copper-usd`'s definition group change is render-time only —
+  the snapshot computation is untouched, so this deploy does NOT require an
+  ingest-then-deploy ordering.
+
 ## [2026-10-10] — I19 the staleness false-alarm fix: govt-interest-revenue's BEA release lag
 
 Twelfth round — the scheduled post-I18 verification pass (per

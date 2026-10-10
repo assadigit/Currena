@@ -1,21 +1,30 @@
 /**
- * VerdictMeter — Block H1: "Remove the 7-segment LED digit boxes. For each
- * region, show the region name, a segmented meter with four steps, a marker
- * on the current step, and the verdict word." One plain sentence under the
- * meter, "n of m indicators in alert", the how-is-this-computed link, and a
- * text alternative ("Australia: cautious, step 2 of 4").
+ * VerdictMeter — Block H1, rebuilt by round-2 Blocks R2 + R3.
  *
- * The 7-segment LED module (the old "one recognisable Currena element")
- * retired here per the owner's spec — the meter carries the same at-a-
- * glance job without the alarm-only red digits.
+ * For each region: region name; the verdict word; the four-step segmented
+ * meter (role="img" with a text alternative); THE GAUGES as small readings
+ * (gauge name + its step word); and ONE reason line computed from a fixed
+ * table over the gauge steps (heroReason in config.ts — never free text,
+ * never a static per-label sentence, never a reassurance while any gauge
+ * sits at step 3+). Under it: up to three needs-attention tiles WITH NUMBERS
+ * (plain name, large value with unit, the rule in short form, opens the
+ * card) and a "+n more" tile (R3).
+ *
+ * Round-2 D7: Global renders first (no swap setting — retired).
  */
 
 import type { IndicatorReading, InsightsSection, IndicatorId } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { GAUGES, labelForVerdictStep, sectionVerdictStep } from '@currena/insights';
-import { alertingIndicators } from './config';
+import { GAUGES, gaugesForSection, labelForVerdictStep, sectionVerdictStep } from '@currena/insights';
+import {
+  attentionTiles,
+  definitionFor,
+  formatIndicatorValue,
+  formatRuleText,
+  heroReason,
+} from './config';
 
 function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
   return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
@@ -41,10 +50,9 @@ export function VerdictMeter({ step, label, ariaLabel }: { step: number; label: 
 }
 
 /**
- * One region's verdict block: name, meter, verdict word, plain sentence,
- * "n of m in alert" + up to three alerting-indicator name chips (H2) with
- * a "+n more" chip. The whole header is a button jumping to the region's
- * lane (I9 semantics, kept).
+ * One region's verdict block (R2): name, meter, verdict word, the gauges as
+ * small readings, the computed reason line, the count line, and the R3
+ * needs-attention tiles with numbers.
  */
 export function VerdictBlock({
   section,
@@ -67,16 +75,8 @@ export function VerdictBlock({
 }) {
   const step = sectionVerdictStep(section, readings);
   const labelWord = labelForVerdictStep(step) ?? null;
-  const alerts = alertingIndicators(readings, section);
-  const alertCount = alerts.length;
-  // Voting members = the section's gauge members with a votable status
-  // (warnings + normals — the same denominator summarizeByGauges writes).
-  const gaugeMemberIds = new Set(
-    GAUGES.filter((g) => g.section === section).flatMap((g) => [...g.members]),
-  );
-  const voting = readings.filter(
-    (r) => gaugeMemberIds.has(r.id) && (r.status === 'warning' || r.status === 'normal'),
-  ).length;
+  const sectionGauges = GAUGES.filter((g) => g.section === section);
+  const gaugeRows = gaugesForSection(section, readings);
 
   const verdictLabel = labelWord ? copy.label[labelWord] : copy.ui.gaugeNoReading;
   const ariaLabel = interpolate(copy.ui.verdictStepAria, {
@@ -84,14 +84,31 @@ export function VerdictBlock({
     label: verdictLabel,
     step: num(step || 0, numberLocale),
   });
-  const inAlert = interpolate(copy.ui.inAlert, {
-    warnings: num(alertCount, numberLocale),
-    voting: num(voting, numberLocale),
+
+  // R2: the reason line — computed from the fixed table over gauge steps.
+  const reason = heroReason({
+    gauges: gaugeRows,
+    words: { 1: copy.label.relaxed, 2: copy.label.cautious, 3: copy.label.stressed, 4: copy.label.alarmed },
+    calm: copy.ui.heroReasonCalm,
+    top: copy.ui.heroReasonTop,
+    others: copy.ui.heroReasonOthers,
+    othersOne: copy.ui.heroReasonOthersOne,
+    is: copy.ui.heroReasonIs,
+    are: copy.ui.heroReasonAre,
+    notEnough: copy.ui.noSummary,
+    nameOf: (gauge) => copy.groups[gauge as keyof typeof copy.groups] ?? gauge,
+    fmt: (n) => num(n, numberLocale),
   });
-  const sentence =
-    labelWord !== null
-      ? copy.ui.verdictSentence[labelWord]
-      : copy.ui.gaugeNoReading;
+
+  // R3: the needs-attention tiles (extremity-sorted, up to 3 + "+n more").
+  const tiles = attentionTiles(readings, section);
+  const shown = tiles.slice(0, 3);
+
+  // Gauge member count for the "n of m" line (same denominator as before).
+  const gaugeMemberIds = new Set(sectionGauges.flatMap((g) => [...g.members]));
+  const voting = readings.filter(
+    (r) => gaugeMemberIds.has(r.id) && (r.status === 'warning' || r.status === 'normal'),
+  ).length;
 
   return (
     <article
@@ -121,42 +138,89 @@ export function VerdictBlock({
         <VerdictMeter step={step} label={verdictLabel} ariaLabel={ariaLabel} />
       </p>
 
-      {/* H1: one plain sentence under the meter. */}
+      {/* R2: the gauges as small readings (name + step word). */}
+      <ul className="m-0 flex list-none flex-wrap gap-x-3 gap-y-0.5 p-0" aria-label={copy.ui.heroGaugesLabel}>
+        {gaugeRows.map((g) => {
+          const gWord =
+            g.step === 0
+              ? copy.ui.gaugeNoReading
+              : g.step === 1
+                ? copy.label.relaxed
+                : g.step === 2
+                  ? copy.label.cautious
+                  : g.step === 3
+                    ? copy.label.stressed
+                    : copy.label.alarmed;
+          return (
+            <li key={g.gauge} className="text-[var(--type-caption)] text-[var(--color-text-secondary)]">
+              <span className="font-semibold text-[var(--color-text-primary)]">
+                {copy.groups[g.gauge]}
+              </span>{' '}
+              · {gWord}
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* R2: the one reason line — from the fixed table, gauge-agreeing. */}
       <p className="m-0 text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-        {sentence}
+        {reason}
       </p>
       <p className="m-0 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
-        {inAlert}
+        {interpolate(copy.ui.inAlert, {
+          warnings: num(tiles.length, numberLocale),
+          voting: num(voting, numberLocale),
+        })}
       </p>
 
-      {/* H2: alerting indicators BY NAME (up to three, sorted by 10-year
-       * range height — alertingIndicators() did the sorting). */}
-      {alerts.length > 0 ? (
-        <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0" aria-label={copy.ui.alertChipsTitle}>
-          {alerts.slice(0, 3).map(({ id }) => (
-            <li key={id}>
-              <button
-                type="button"
-                onClick={() => onFocusCard(id)}
-                className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center rounded-full bg-currena-warning/12 px-2.5 py-1 text-[var(--type-caption)] font-semibold text-[var(--color-status-alert)] transition-colors hover:bg-currena-warning/20"
-              >
-                {copy.indicators[id].name}
-                <span className="sr-only"> — {copy.ui.viewCard}</span>
-              </button>
-            </li>
-          ))}
-          {alerts.length > 3 ? (
-            <li>
-              <button
-                type="button"
-                onClick={() => onJumpSection(section)}
-                className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-2.5 py-1 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
-              >
-                {interpolate(copy.ui.alertChipMore, { n: num(alerts.length - 3, numberLocale) })}
-              </button>
-            </li>
+      {/* R3: needs-attention tiles WITH NUMBERS (largest text in the tile). */}
+      {shown.length > 0 ? (
+        <div>
+          <p className="m-0 mb-1 text-[var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
+            {copy.ui.attentionTilesLabel}
+          </p>
+          <ul className="m-0 grid list-none grid-cols-1 gap-1.5 p-0 sm:grid-cols-3" aria-label={copy.ui.attentionTilesLabel}>
+            {shown.map(({ id }) => {
+              const r = readings.find((x) => x.id === id);
+              if (!r) return null;
+              const def = definitionFor(id);
+              const ruleText = formatRuleText(def.rule, id, copy.rule, copy.units, numberLocale);
+              const valueText =
+                r.value !== null ? formatIndicatorValue(id, r.value, numberLocale, copy.units) : null;
+              return (
+                <li key={id}>
+                  <button
+                    type="button"
+                    onClick={() => onFocusCard(id)}
+                    className="insights-focusable flex h-full w-full cursor-pointer flex-col items-start gap-0.5 rounded-[var(--radius-md)] bg-currena-warning/10 px-3 py-2 text-start ring-1 ring-currena-warning/25 transition-colors hover:bg-currena-warning/20"
+                  >
+                    <span className="text-[var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
+                      {copy.indicators[id].name}
+                    </span>
+                    {valueText !== null ? (
+                      <bdi dir="ltr" className="type-number text-[var(--color-text-primary)]">
+                        {valueText}
+                      </bdi>
+                    ) : null}
+                    <span className="text-[var(--type-caption)] leading-snug text-[var(--color-text-secondary)]">
+                      {ruleText}
+                    </span>
+                    <span className="sr-only"> — {copy.ui.viewCard}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          {tiles.length > 3 ? (
+            <button
+              type="button"
+              onClick={() => onJumpSection(section)}
+              className="insights-focusable mt-1.5 inline-flex min-h-[24px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-2.5 py-1 text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
+            >
+              {interpolate(copy.ui.attentionTileMore, { n: num(tiles.length - 3, numberLocale) })}
+            </button>
           ) : null}
-        </ul>
+        </div>
       ) : null}
 
       {/* H1: keep the "how is this computed?" link. */}

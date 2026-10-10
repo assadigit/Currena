@@ -1097,10 +1097,12 @@ body {
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1.125rem;
-  /* Type roles (G3: verdict > number > label > caption; caption floor ~12.5px) */
+  /* Type roles (G3: verdict > number > label > caption; caption floor ~12.5px)
+   * R20: the number role must compute ≥ 1.4× the 16px label role on tiles and
+   * prices — 1.45rem = 23.2px → ratio 1.45 (was 1.3rem = 20.8px → 1.30). */
   --type-verdict: 1.6rem;
   --type-verdict-leading: 2rem;
-  --type-number: 1.3rem;
+  --type-number: 1.45rem;
   --type-label: 0.875rem;
   --type-caption: 0.78rem;
 }

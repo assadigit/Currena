@@ -88,7 +88,20 @@ const BUDGETS = [
   // untouched (290.12/87.76 vs 296/89.5) — the v2 surface rides the lazy
   // route exactly as the roadmap demands. Gzip +7.65 kB for the whole v2
   // feature set. Justified in CHANGELOG §2026-10-08 (I17).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 280_000, gz: 72_000, label: 'Insights lazy chunk' },
+  // Round-2 bump (270.02/69.50 → 295.80/75.34, budget 280/72 → 300/78): the
+  // signal-first density pass (docs/insights/06-ux-round-2-spec.md, R1–R28).
+  // Growth, itemised: (1) the R5 two-tier model + R2 fixed reason table +
+  // R11 money-panel area map and the R27/R7b summary builders in config.ts
+  // (+447 lines of pure logic); (2) the bilingual corpus expansion — money
+  // area×state sentences, tier renames (Alert→Needs attention, +Unusual),
+  // About rewrite, merged-signals and collapsed-summary strings, ×2
+  // locales; (3) the new MoneyPanel + ToolsMenu components and the R25
+  // AboutTheData restructure; (4) FilterBar deleted (−188 lines) but the
+  // Tools menu absorbs search/filter/shortcuts/.ics/CSV plumbing. The
+  // ENTRY chunk stays untouched (290.32/87.05 vs 296/89.5). Gzip +5.84 kB
+  // for the whole round — the honest price of the tier model plus its
+  // bilingual sentences. Justified in CHANGELOG §2026-10-10 (round-2).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 300_000, gz: 78_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

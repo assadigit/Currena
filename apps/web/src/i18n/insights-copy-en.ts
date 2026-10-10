@@ -50,12 +50,17 @@ export interface ConsequenceLines {
 export interface IndicatorCopyEntry {
   /** Plain-language title (F6) — the reader-facing name. */
   name: string;
-  /** Small technical tag shown beside the name (G8, isolated dir="ltr"). */
+  /** Small technical tag shown beside the name (G8, isolated dir="ltr").
+   *  Round-2 R14: helpful technical terms only ("CPI") — never source codes. */
   ticker?: string;
   /** The default consequence line + detail-panel opener (fallback when `lines` lacks a state). */
   oneLiner: string;
   /** State-keyed consequence lines (F4) — see ConsequenceLines. */
   lines?: ConsequenceLines;
+  /** Round-2 R28: the published band/goal this series is judged against.
+   *  Lines that quote it carry the {bandPos} token, interpolated at render
+   *  from the LIVE value (inside/above/below) — never static text. */
+  band?: { min?: number; max?: number; label: string };
   /** For prices-board rows: the unit note spelled out under the price (G7). */
   unitNote?: string;
   whatItIs: string;
@@ -68,7 +73,6 @@ export interface IndicatorCopyEntry {
 const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   'yield-curve-10y2y': {
     name: 'The gap between 10-year and 2-year US borrowing',
-    ticker: 'T10Y2Y',
     oneLiner:
       'The gap between long and short-term US government borrowing — negative values, an “inverted curve”, are the classic recession warning.',
     lines: {
@@ -90,7 +94,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'real-yield-10y': {
     name: 'US 10-year interest after inflation',
-    ticker: 'DFII10',
     oneLiner:
       'What 10-year US government bonds pay after inflation — the “real” return the world’s biggest debt market demands.',
     lines: {
@@ -112,7 +115,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   us10y: {
     name: 'What the US government pays to borrow for 10 years',
-    ticker: 'DGS10',
     oneLiner:
       'The interest rate on 10-year US government debt — often called the world’s most important number.',
     lines: {
@@ -134,7 +136,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'fed-target': {
     name: 'The US central bank’s policy rate',
-    ticker: 'DFEDTARL/U',
     oneLiner:
       'The US Federal Reserve’s target for its overnight interest rate — the base of the US rate system.',
     lines: {
@@ -156,7 +157,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'ecb-dfr': {
     name: 'The euro area’s policy rate',
-    ticker: 'DFR',
     oneLiner:
       'The European Central Bank’s rate on bank deposits — the euro area’s main policy dial.',
     lines: {
@@ -178,7 +178,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'govt-interest-revenue': {
     name: 'The US government’s interest bill vs its income',
-    ticker: 'A091 ÷ W006',
     oneLiner:
       'How big the US federal government’s interest bill has become relative to its income.',
     lines: {
@@ -199,13 +198,14 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'us-cpi-yoy': {
     name: 'US prices vs a year ago',
-    ticker: 'CPIAUCSL',
+    ticker: 'CPI',
     oneLiner:
       'How fast US consumer prices are rising, compared with a year ago.',
+    band: { min: 2, label: 'the Fed’s 2% goal' },
     lines: {
       highRising: 'US prices are rising faster than usual — pressure that tends to keep world rates high.',
       highEasing: 'US inflation is high but easing — the pressure on world rates slowly lifting.',
-      typical: 'US inflation sits in its usual range — near or below the Fed’s 2% goal.',
+      typical: 'US inflation is {bandPos} {bandLabel}.',
       low: 'US inflation is low — the rare setting that usually lets central banks ease.',
     },
     whatItIs:
@@ -221,7 +221,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'breakeven-5y5y': {
     name: 'Expected US inflation, five to ten years ahead',
-    ticker: 'T5YIFR',
     oneLiner:
       'The annual inflation rate markets expect, on average, five to ten years from now.',
     lines: {
@@ -243,7 +242,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'stress-stlfsi': {
     name: 'Stress in US money markets',
-    ticker: 'STLFSI4',
     oneLiner:
       'The St. Louis Fed’s single gauge of stress across US money and credit markets — zero is average, above zero is above-average stress.',
     lines: {
@@ -265,7 +263,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   nfci: {
     name: 'US financial conditions',
-    ticker: 'NFCI',
     oneLiner:
       'The Chicago Fed’s broad gauge of how easily money moves through the US financial system — zero is average.',
     lines: {
@@ -287,7 +284,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'gold-silver': {
     name: 'Gold’s price versus silver',
-    ticker: 'XAU/XAG',
     oneLiner:
       'How many ounces of silver one ounce of gold buys — the classic hard-asset ratio.',
     lines: {
@@ -309,7 +305,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'dollar-basket': {
     name: 'The dollar vs six big currencies',
-    ticker: 'CURRENA BASKET',
     oneLiner:
       'The Currena dollar basket — the US dollar’s average value against the euro, yen, pound, Canadian dollar, krona and franc.',
     lines: {
@@ -375,7 +370,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'china-pmi': {
     name: 'Chinese factory activity',
-    ticker: 'NBS PMI',
     oneLiner:
       'A monthly survey of Chinese factory activity — above 50 means expansion.',
     lines: {
@@ -396,7 +390,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'm2-us': {
     name: 'The amount of money in the US economy',
-    ticker: 'M2',
+    ticker: 'M2 money',
     oneLiner:
       'The amount of money in the US economy — cash, current accounts and most savings.',
     lines: {
@@ -417,7 +411,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'copper-gold': {
     name: 'Copper’s price versus gold',
-    ticker: 'Cu ÷ Au',
     oneLiner:
       'Copper’s price relative to gold — growth versus safety in one ratio.',
     lines: {
@@ -458,7 +451,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   brent: {
     name: 'Oil price (Brent)',
-    ticker: 'DCOILBRENTEU',
     oneLiner:
       'The world’s benchmark oil price — what a barrel of Brent crude costs.',
     lines: {
@@ -481,11 +473,10 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'gold-usd': {
     name: 'Gold price (ounce)',
-    ticker: 'XAU',
     oneLiner: 'The world price of one troy ounce of gold, in US dollars.',
     lines: {
       highRising: 'Gold is expensive and rising — jewellery and coin buyers usually pay more, and some savers treat it as a stress signal.',
-      highEasing: 'Gold is expensive but easing from its highs — often a sign calm is returning to markets.',
+      highEasing: 'Gold is expensive but easing off its highs — jewellery and coin buyers usually pay a little less.',
       typical: 'Gold is trading in its usual range for the decade.',
       low: 'Gold is cheap versus recent history — the occasional buyer’s friend, the seller’s patience test.',
       jumping: 'Gold has jumped unusually fast — moves like this often accompany stress or big news; wait before reading a trend into it.',
@@ -504,7 +495,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'silver-usd': {
     name: 'Silver price (ounce)',
-    ticker: 'XAG',
     oneLiner: 'The world price of one troy ounce of silver, in US dollars.',
     lines: {
       highRising: 'Silver is expensive and rising — jewellery and electronics tend to cost more with it.',
@@ -527,7 +517,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'copper-usd': {
     name: 'Copper price',
-    ticker: 'HG',
     oneLiner:
       'The world price of copper — the metal that wires homes, grids and machines.',
     lines: {
@@ -575,7 +564,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'gold-btc': {
     name: 'Gold versus Bitcoin',
-    ticker: 'XAU/BTC',
     oneLiner: 'How many bitcoins one ounce of gold buys — old money priced in new money.',
     whatItIs:
       'The gold price in US dollars divided by the bitcoin price, both from a live metals feed (gold-api.com).',
@@ -589,7 +577,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'silver-btc': {
     name: 'Silver versus Bitcoin',
-    ticker: 'XAG/BTC',
     oneLiner: 'Silver’s price expressed in bitcoin terms.',
     whatItIs:
       'The silver price divided by the bitcoin price, both from a live metals feed (gold-api.com).',
@@ -601,13 +588,14 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'au-cpi': {
     name: 'Australian prices vs a year ago',
-    ticker: 'ABS CPI',
+    ticker: 'CPI',
     oneLiner:
       'How fast Australian consumer prices are rising, compared with a year ago.',
+    band: { min: 2, max: 3, label: 'the RBA’s 2–3% band' },
     lines: {
-      highRising: 'Prices are rising faster than the RBA’s 2–3% band — the setting that invites rate hikes.',
-      highEasing: 'Inflation is above the band but easing — pressure on rates slowly lifting.',
-      typical: 'Inflation sits inside or near the RBA’s usual 2–3% band.',
+      highRising: 'Prices are {bandPos} {bandLabel} and rising — historically the setting that invites rate hikes.',
+      highEasing: 'Prices are {bandPos} {bandLabel} but easing — the pressure cooling.',
+      typical: 'Inflation is {bandPos} {bandLabel}.',
       low: 'Inflation is low — the setting that usually lets the RBA consider cuts.',
     },
     whatItIs: 'The ABS headline CPI (all groups) annual change, quarterly.',
@@ -620,14 +608,14 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou: 'The broad cost-of-living gauge behind rate headlines.',
   },
   'au-trimmed-mean': {
-    name: 'The steady middle of Australian price rises',
-    ticker: 'ABS trimmed mean',
+    name: 'Underlying inflation',
     oneLiner:
       'The RBA’s preferred core inflation measure — the steady middle of price changes.',
+    band: { min: 2, max: 3, label: 'the RBA’s 2–3% band' },
     lines: {
-      highRising: 'Underlying inflation is above target and rising — the reading that usually keeps rates high.',
-      highEasing: 'Underlying inflation is above target but easing — the pressure cooling from within.',
-      typical: 'Underlying inflation sits near the RBA’s 2–3% band.',
+      highRising: 'Underlying inflation is {bandPos} {bandLabel} and rising — the reading that usually keeps rates high.',
+      highEasing: 'Underlying inflation is {bandPos} {bandLabel} but easing — the pressure cooling from within.',
+      typical: 'Underlying inflation is {bandPos} {bandLabel}.',
       low: 'Underlying inflation is low — the setting that usually opens the door to rate cuts.',
     },
     whatItIs:
@@ -641,7 +629,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'au-us-10y-gap': {
     name: 'The gap between Australian and US 10-year borrowing',
-    ticker: 'F2 − DGS10',
     oneLiner:
       'Whether Australian 10-year yields sit above or below US ones.',
     lines: {
@@ -661,7 +648,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'rba-cash-rate': {
     name: 'Australia’s official interest rate',
-    ticker: 'RBA F1.1',
     oneLiner:
       'Australia’s official interest rate — the Reserve Bank’s single policy dial.',
     lines: {
@@ -682,7 +668,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'au-petrol-yoy': {
     name: 'Petrol prices vs a year ago',
-    ticker: 'ABS CPI: Fuel',
+    ticker: 'CPI: fuel',
     oneLiner:
       'How much more (or less) fuel costs than a year ago, as the ABS measures it.',
     lines: {
@@ -704,7 +690,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'au-home-loan': {
     name: 'The home-loan rate people actually pay',
-    ticker: 'RBA F6',
     oneLiner:
       'The average interest rate on outstanding owner-occupier home loans — what Australian households actually pay.',
     lines: {
@@ -726,7 +711,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'au-wage-growth': {
     name: 'Wage growth vs a year ago',
-    ticker: 'WPI',
     oneLiner:
       'How fast Australian wages are rising, compared with a year ago, by the ABS wage price index.',
     lines: {
@@ -748,7 +732,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'au-rent-yoy': {
     name: 'Rent growth vs a year ago',
-    ticker: 'ABS CPI: Rents',
+    ticker: 'CPI: rents',
     oneLiner:
       'How fast Australian rents are rising, compared with a year ago.',
     lines: {
@@ -770,7 +754,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'au-unemployment': {
     name: 'The share of Australians without work',
-    ticker: 'ABS M13',
     oneLiner:
       'The share of Australians looking for work who cannot find it.',
     lines: {
@@ -790,7 +773,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'au-home-values': {
     name: 'Australian home prices',
-    ticker: 'ABS RPPI',
     oneLiner:
       'The average price of Australian homes, as an index.',
     lines: {
@@ -811,7 +793,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'au-household-debt-arrears': {
     name: 'Australian household debt versus income',
-    ticker: 'RBA E2',
     oneLiner:
       'How large Australian household debt is relative to income — among the world’s highest.',
     lines: {
@@ -875,7 +856,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'terms-of-trade': {
     name: 'Australia’s export prices vs import prices',
-    ticker: 'ABS ToT',
     oneLiner: 'Australia’s export prices versus its import prices.',
     lines: {
       highRising: 'Export prices are outrunning import prices — the country getting richer without shipping more.',
@@ -895,7 +875,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'iron-ore': {
     name: 'Iron ore price',
-    ticker: 'World Bank',
     oneLiner:
       'The price of iron ore — Australia’s single biggest export.',
     lines: {
@@ -918,7 +897,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'gold-aud': {
     name: 'Gold price in Australian dollars',
-    ticker: 'XAU/AUD',
+    ticker: 'gold in A$',
     oneLiner: 'The world gold price in Australian dollars.',
     lines: {
       highRising: 'Gold is expensive in Australian dollars and rising — coins, jewellery and local metal cost more.',
@@ -957,31 +936,53 @@ export const insightsCopyEn = {
     searchPlaceholder: 'Search {n} indicators…',
     searchLabel: 'Search indicators',
     searchClear: 'Clear search',
+    // Round-2 R5: the retired word "Alert" — the tier words are Needs
+    // attention / Unusual; internal status ids unchanged.
     filterAll: 'All',
-    filterLabel: 'Filter by status',
-    filterWarning: 'Alert',
+    filterLabel: 'Filter by tier',
+    filterWarning: 'Needs attention',
+    filterUnusual: 'Unusual',
     filterNormal: 'Normal',
     filterContext: 'Context',
+    unusualWord: 'Unusual',
+    unusualAria: 'in the top or bottom 10% of its own 10-year range',
+    // R28: the band-position words (the {bandPos} token's rendered form).
+    bandPosInside: 'inside',
+    bandPosAbove: 'above',
+    bandPosBelow: 'below',
     resultsShown: '{shown} of {total} shown',
     clearFilters: 'Clear filters',
     noMatches: 'No indicator matches these filters.',
+    // Round-2 R7: the per-group collapse.
+    seeAll: 'See all {n} indicators',
+    showFewer: 'Show fewer',
+    // Round-2 R15: the Tools disclosure.
+    toolsLabel: 'Tools',
+    toolsOpen: 'Open tools',
+    toolsClose: 'Close tools',
+    toolsShortcuts: 'Keyboard shortcuts',
+    toolsSearch: 'Search',
+    toolsFilter: 'Filter',
+    toolsDownload: 'Download',
     // I10: the personal watchlist — pinned items render in their own
     // section above the groups; pins persist across visits.
     pinnedTitle: 'My watchlist',
     pinnedBadge: 'Pinned',
     pinAction: 'Add to watchlist',
     unpinAction: 'Remove from watchlist',
-    // H1: verdict meters.
+    // H1: verdict meters. Round-2 R2: the reason line is COMPUTED from the
+    // gauge steps (fixed table) — never a static per-label sentence.
     heroTitle: 'Where things stand',
     verdictStepAria: '{section}: {label}, step {step} of 4',
     verdictMeterLabel: 'Reading on a four-step scale',
-    verdictSentence: {
-      relaxed: 'Conditions are calm across the board — nothing needs your attention today.',
-      cautious: 'A few gauges are elevated — worth knowing about, not worth worrying about.',
-      stressed: 'Several gauges are stretched at once — the kind of backdrop that makes finance headlines.',
-      alarmed: 'Most gauges are flashing at once — the historical company this keeps is rough.',
-    },
-    inAlert: '{warnings} of {voting} indicators in alert',
+    heroReasonCalm: 'Conditions are calm across the board — nothing needs your attention today.',
+    heroReasonTop: '{k} of {n} areas {isAre} {word}: {names}.',
+    heroReasonOthers: 'The rest are {word}.',
+    heroReasonOthersOne: 'The other one is {word}.',
+    heroReasonIs: 'is',
+    heroReasonAre: 'are',
+    heroGaugesLabel: 'The gauges behind this verdict',
+    inAlert: '{warnings} of {voting} indicators need attention',
     noSummary: 'Not enough voting data to read the gauges yet.',
     excludedNote: '{n} items set aside — stale or missing (see “How this is calculated”).',
     howCalculated: 'How is this calculated?',
@@ -994,18 +995,20 @@ export const insightsCopyEn = {
     explainerStale: 'Stale or missing items are excluded from every gauge and count, and shown greyed with their last date.',
     explainerBacktest: 'Thresholds were backtested against 2008, 2020 and 2022 — the tables live in the project docs.',
     // H1 note: the Australia-first reading order with a swap setting.
-    orderSwap: 'Show {other} first',
-    // H2: alerting-indicator chips under each verdict meter.
-    alertChipsTitle: 'Alerting now',
-    alertChipMore: '+{n} more',
-    // H3: the big-mover callout.
+    // Round-2 D7: the swap is RETIRED — Global is always first.
+    // H2 → R3: needs-attention tiles with numbers under each verdict.
+    attentionTilesLabel: 'Needing attention now',
+    attentionTileMore: '+{n} more',
+    attentionTileRule: 'Rule: {rule} · now {value}',
+    // H3 → R4: the biggest move — one line, always with its reason.
     bigMoverTitle: 'The biggest move right now',
+    bigMoverReason: 'unusually large for this indicator',
     bigMoverMove: '{change} over 30 days',
     bigMoverView: 'View this indicator',
-    // H5: what changed — one line.
+    // H5: what changed — one line. (Round-2 R16: the hero no longer names
+    // the next scheduled event — “Next up” lives once, below the indicators.)
     whatChangedLine: 'This week: {changes}',
     quietWeekLine: 'A quiet week — no indicator changed state.',
-    quietWeekNext: 'Next up: {event} on {date}',
     // H6: the next-up strip.
     comingUpTitle: 'Next up',
     noEvents: 'No key dates recorded yet — this calendar is maintained by hand.',
@@ -1049,7 +1052,7 @@ export const insightsCopyEn = {
     positionLow: 'low',
     positionTypical: 'typical',
     positionHigh: 'high',
-    alertZoneLabel: 'Alert zone',
+    alertZoneLabel: 'Rule zone',
     rangeEndLow: 'lowest in 10 years',
     rangeEndHigh: 'highest in 10 years',
     days7: '7-day',
@@ -1081,7 +1084,7 @@ export const insightsCopyEn = {
     lastKnownValue: 'Last known: {value} on {date}',
     staleSince: 'Last value on {date} — shown greyed and excluded from all gauges.',
     noHistoryStatus: 'Too little history to score this indicator yet.',
-    ruleTitle: 'Alert when',
+    ruleTitle: 'Needs attention when',
     infoOnly: 'Info only — shown for context, never votes.',
     whatItIs: 'What it is',
     whyItMatters: 'Why it matters',
@@ -1100,6 +1103,12 @@ export const insightsCopyEn = {
     // N1/N2: notices + the single disclaimer line.
     disclaimerBar: 'General information only — not advice.',
     aboutTitle: 'About this data',
+    // R25: the quiet, collapsible About section.
+    aboutShowDetails: 'Show details',
+    aboutHideDetails: 'Hide details',
+    aboutCreditsLine:
+      'Sources: the US Federal Reserve (FRED), the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics (CC BY 4.0), the World Bank, Frankfurter and gold-api.com.',
+    aboutGeneralInfo: 'General information only — not financial advice.',
     aboutSourcesTitle: 'Sources',
     aboutSourcesBody:
       'Official and public sources only: the US Federal Reserve (FRED), the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics, the World Bank, Frankfurter and gold-api.com. Each card names and links its own source.',
@@ -1115,9 +1124,9 @@ export const insightsCopyEn = {
     aboutScheduleTitle: 'Update schedule',
     aboutScheduleBody:
       'A scheduled job refreshes every source once a day (04:20 UTC) and writes one precomputed snapshot; the page you are reading serves that snapshot. Daily series update daily, monthly and quarterly ones when their publisher releases.',
-    aboutRulesTitle: 'How “alert” is decided',
+    aboutRulesTitle: 'How the tiers are decided',
     aboutRulesBody:
-      'Each indicator has one fixed, published rule (shown on its card). When the rule fires, the card is in alert and adds one vote to its gauge. Thresholds were backtested against 2008, 2020 and 2022.',
+      'Needs attention: the indicator’s one fixed, published rule has fired (the rule is shown on its card). Unusual: no rule fired, but the latest value sits in the top or bottom 10% of its own 10-year range. Both tiers add context to the gauges; thresholds were backtested against 2008, 2020 and 2022.',
     disclaimerTitle: 'Full disclaimer',
     disclaimerBody1:
       'Insights is general information about economic and market indicators. It is not financial advice, and nothing here recommends any action on any asset.',
@@ -1178,7 +1187,8 @@ export const insightsCopyEn = {
   },
 
   status: {
-    warning: 'Alert',
+    warning: 'Needs attention',
+    unusual: 'Unusual',
     normal: 'Normal',
     context: 'Context',
     stale: 'Stale',
@@ -1200,7 +1210,10 @@ export const insightsCopyEn = {
     usd: 'US$',
     aud: 'A$',
     'usd-bn': 'bn',
-    index: '',
+    index: 'index',
+    jpy: '¥',
+    cny: 'CN¥',
+    ratio: 'ratio',
   },
 
   rule: {
@@ -1232,6 +1245,8 @@ export const insightsCopyEn = {
     title: 'Together',
     subtitle:
       'How the indicators usually relate. Each card checks whether the usual pattern is showing today.',
+    // R27: the quiet section-level note replaces the per-card placeholder tag.
+    evidenceNote: 'Relationships are general tendencies, not forecasts.',
     state: {
       active: 'Active',
       partly: 'Partly active',
@@ -1239,8 +1254,22 @@ export const insightsCopyEn = {
       disagree: 'Signals disagree',
       unknown: 'Not enough fresh data',
     },
-    evidenceToVerify: 'Evidence: to verify',
+    // R7b: the collapsed section’s one-line summary.
+    summaryActive: '{n} active',
+    summaryPartly: '{n} partly active',
+    summaryInactive: '{n} not active',
+    summaryDisagree: '{n} show signals that disagree',
+    summaryUnknown: '{n} unreadable',
+    seeAllConnections: 'See all {n} connections',
     viewLegCard: 'View this indicator',
+    // R27: the one-clause “right now” line (truthful by state).
+    rightNowShort: {
+      active: 'Usual pattern showing right now.',
+      partly: 'Part of the usual pattern showing right now.',
+      inactive: 'Too quiet to read right now.',
+      disagree: 'Usual pattern not showing: {a}, {b}.',
+      unknown: 'Not enough fresh data right now.',
+    },
     // Leg phrase assembly (telegraphic — bilingual-safe, no verb agreement).
     phrases: {
       levelDir: '{name}: {level} and {direction}',
@@ -1354,23 +1383,38 @@ export const insightsCopyEn = {
     title: 'What the signals say',
     subtitle:
       'The conditions that usually surround each metal, in plain words — conditions, not forecasts, and not advice.',
+    // R26: one merged gold-and-silver card.
+    mergedTitle: 'Gold and silver',
+    mergedSubtitle: 'The two precious metals share most of their drivers — shared conditions are listed once.',
     conditionsMet: '{met} of {total} conditions met',
+    metalLean: '{metal}: {lean}, {met} of {total} conditions met',
     lean: {
-      'mostly-supportive': 'Mostly supportive',
-      mixed: 'Mixed',
-      'mostly-unsupportive': 'Mostly unsupportive',
+      'mostly-supportive': 'mostly supportive',
+      mixed: 'mixed',
+      'mostly-unsupportive': 'mostly unsupportive',
     },
-    sideSupportive: 'Usually supports {metal}',
-    sideAgainst: 'Usually works against {metal}',
+    metals: { gold: 'gold', silver: 'silver' },
+    // R26: neutral side words (no check/cross marks, no green/red).
+    sideSupportive: 'Supports',
+    sideAgainst: 'Works against',
     sideNeutral: 'Sitting neutral',
     sideUnknown: 'Cannot read right now',
+    silverOnly: 'Silver only',
+    footingTitle: 'Price footing',
+    footingRow: '{metal}: {state}',
+    footingPosition: '{band} of the last 10 years',
     conditionState: {
       supportive: 'in place',
       against: 'working against',
       neutral: 'sitting neutral',
       unknown: 'cannot read',
     },
-    metals: { gold: 'gold', silver: 'silver' },
+    conditionStateShort: {
+      supportive: 'Supports',
+      against: 'Works against',
+      neutral: 'Sitting neutral',
+      unknown: 'Cannot read',
+    },
     conditions: {
       'real-yield': {
         name: 'Real yields',
@@ -1399,20 +1443,74 @@ export const insightsCopyEn = {
         tag: 'mixed',
       },
     },
-    // The three plain checks (S1).
-    checkPosition: '10-year position',
-    checkDrivers: 'Usual drivers',
-    checkSpeed: '30-day speed',
-    speedMeasuring: 'Measuring — the daily history is still building.',
+    // R26: the 30-day speed rides the footing row only when the data exists.
+    speedLabel: '30-day speed',
     notEnoughData: 'Not enough fresh data to read this card yet.',
-    // S3: the fixed "before you act" box — never behind a click.
+    // R7b: the collapsed summary — one line per metal ("Gold: mixed, 2 of
+    // 5 conditions met — price in the top 7% of the last 10 years").
+    collapsedFooting: 'price in the {band} of the last 10 years',
+    bandTop: 'top {p}%',
+    bandBottom: 'bottom {p}%',
+    bandMid: 'the middle',
+    // S3 (R24): the fixed "before you act" box — rendered ONCE, in the
+    // footer. The Signals header carries the pointer link.
     beforeYouActTitle: 'Before you act',
+    beforeYouActPointer: 'Before you act ↓',
     beforeYouAct: [
       'Signals cannot predict prices.',
       'Prices can fall even when conditions look supportive.',
       'These logics play out over months and years, not days.',
       'Dealing costs — the gap between a dealer’s buying and selling prices — can matter more to small buyers than timing.',
     ],
+  },
+
+  /* ---------------------------------------------------------------- *
+   * Round-2 R11: "What it means for my money" — at most 4 lines, one
+   * per life area, chosen by the worst tier among the area's
+   * indicators. Hedged sentences, no advice, no buy/sell, no "will".
+   * ---------------------------------------------------------------- */
+  money: {
+    title: 'What it means for my money',
+    subtitle: 'The day-to-day areas the indicators usually touch.',
+    calmLine: 'No money area is standing out right now — a calm background for household budgets.',
+    areas: {
+      petrol: {
+        name: 'Petrol and transport',
+        attention: 'Fuel costs are unusually prominent — pump prices and delivery costs have tended to follow within weeks.',
+        unusual: 'Fuel costs sit at an unusual point of their range — pump prices can move more than usual for a while.',
+        calm: 'Fuel costs are doing nothing unusual for your area’s prices.',
+      },
+      homeLoan: {
+        name: 'Home loan and rent',
+        attention: 'Rate and rent pressure is prominent — loan interest and rents have usually stayed elevated for months after.',
+        unusual: 'Loan or rent numbers sit at an unusual point of their range — budget room can shift.',
+        calm: 'Loan and rent settings look unremarkable for now.',
+      },
+      savings: {
+        name: 'Savings and interest',
+        attention: 'Rates and inflation are prominent — savings interest and price rises have tended to move together.',
+        unusual: 'Savings-relevant rates sit at an unusual point of their range.',
+        calm: 'Savings interest settings look unremarkable for now.',
+      },
+      shop: {
+        name: 'Shop prices and bills',
+        attention: 'Price growth is prominent — grocery and bill inflation has usually stayed elevated for a few quarters.',
+        unusual: 'Price growth sits at an unusual point of its range — bills can surprise for a while.',
+        calm: 'Shop prices and bills are doing nothing unusual.',
+      },
+      overseas: {
+        name: 'Overseas money',
+        attention: 'The Australian dollar is prominent — overseas purchases and travel money have usually felt it quickly.',
+        unusual: 'The exchange rate sits at an unusual point of its range — overseas money can stretch further, or less, for a while.',
+        calm: 'Exchange rates are doing nothing unusual for overseas money.',
+      },
+      jobs: {
+        name: 'Jobs and pay',
+        attention: 'Jobs and pay numbers are prominent — hiring and wage growth have usually stayed in their direction for quarters.',
+        unusual: 'Jobs or pay numbers sit at an unusual point of their range.',
+        calm: 'Jobs and pay settings look unremarkable for now.',
+      },
+    },
   },
 
   indicators: INDICATORS,

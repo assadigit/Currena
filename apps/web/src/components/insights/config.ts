@@ -23,7 +23,7 @@ import type {
   WarningRuleAtom,
 } from '@currena/core';
 import { DEFINITIONS, GAUGES } from '@currena/insights';
-import type { LegEval } from '@currena/insights';
+import type { ConnectionReading, ConnectionState, GaugeReading, LegEval } from '@currena/insights';
 import { interpolate } from '../../i18n';
 import type { IndicatorCopyEntry, ConsequenceLines, InsightsCopy } from '../../i18n/insights-copy-en';
 
@@ -31,8 +31,8 @@ import type { IndicatorCopyEntry, ConsequenceLines, InsightsCopy } from '../../i
  * Section / group layout (the I15 question-group restructure)
  * ------------------------------------------------------------------ */
 
-/** Page order: Global BEFORE Australia in the LANES (owner Gate I4 kept);
- * the HERO is Australia-first by default with a swap setting (Block H1). */
+/** Page order: Global BEFORE Australia everywhere (round-2 decision D7/R1 —
+ * the old Australia-first hero + swap setting retired). */
 export const SECTION_ORDER: readonly InsightsSection[] = ['global', 'australia'];
 
 /** Group order within each section (the gauge/lane order, GAUGES-first). */
@@ -41,13 +41,13 @@ export const GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGro
   australia: ['au-inflation-rates', 'au-households', 'au-trade-currency'],
 };
 
-/** The prices board (Block PB1): fixed row order — not a gauge, never votes. */
+/** The prices strip (round-2 R10): FOUR tiles — oil, gold, silver, Bitcoin.
+ * Copper and iron ore move into the indicator lanes (copper's definition
+ * group is 'growth-health'; iron-ore was always an au-trade-currency row). */
 export const PRICE_ROWS: readonly IndicatorId[] = [
   'brent',
   'gold-usd',
   'silver-usd',
-  'copper-usd',
-  'iron-ore',
   'btc-usd',
 ];
 
@@ -98,7 +98,17 @@ export function isGaugeMember(id: IndicatorId): boolean {
  * Value formatting — canonical numbers, formatted ONLY at render
  * ------------------------------------------------------------------ */
 
-export type UnitToken = 'none' | 'percent' | 'points' | 'usd' | 'aud' | 'usd-bn' | 'index';
+export type UnitToken =
+  | 'none'
+  | 'percent'
+  | 'points'
+  | 'usd'
+  | 'aud'
+  | 'usd-bn'
+  | 'index'
+  | 'jpy'
+  | 'cny'
+  | 'ratio';
 
 /** Locale-dependent unit labels (from the copy dictionaries). */
 export interface UnitLabels {
@@ -109,6 +119,9 @@ export interface UnitLabels {
   aud: string;
   'usd-bn': string;
   index: string;
+  jpy: string;
+  cny: string;
+  ratio: string;
 }
 
 interface DisplayConfig {
@@ -123,7 +136,7 @@ interface DisplayConfig {
 }
 
 /** Units rendered as a prefix in English (suffix everywhere in Farsi). */
-const PREFIXED_UNITS: ReadonlySet<UnitToken> = new Set(['usd', 'aud', 'usd-bn']);
+const PREFIXED_UNITS: ReadonlySet<UnitToken> = new Set(['usd', 'aud', 'usd-bn', 'jpy', 'cny']);
 
 export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'yield-curve-10y2y': { decimals: 2, unit: 'points' },
@@ -134,23 +147,23 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'govt-interest-revenue': { decimals: 1, unit: 'percent', scale: 100 },
   'us-cpi-yoy': { decimals: 1, unit: 'percent' },
   'breakeven-5y5y': { decimals: 2, unit: 'percent' },
-  'stress-stlfsi': { decimals: 2, unit: 'none' },
-  nfci: { decimals: 2, unit: 'none' },
-  'gold-silver': { decimals: 1, unit: 'none' },
+  'stress-stlfsi': { decimals: 2, unit: 'index' },
+  nfci: { decimals: 2, unit: 'index' },
+  'gold-silver': { decimals: 1, unit: 'ratio' },
   'dollar-basket': { decimals: 2, unit: 'index' },
-  usdjpy: { decimals: 2, unit: 'none' },
-  'eur-usd': { decimals: 4, unit: 'none' },
-  'china-pmi': { decimals: 1, unit: 'none' },
+  usdjpy: { decimals: 2, unit: 'jpy' },
+  'eur-usd': { decimals: 4, unit: 'usd' },
+  'china-pmi': { decimals: 1, unit: 'index' },
   'm2-us': { decimals: 0, unit: 'usd-bn' },
-  'copper-gold': { decimals: 2, unit: 'none' },
-  usdcny: { decimals: 4, unit: 'none' },
+  'copper-gold': { decimals: 2, unit: 'ratio' },
+  usdcny: { decimals: 4, unit: 'cny' },
   brent: { decimals: 2, unit: 'usd' },
   'gold-usd': { decimals: 0, unit: 'usd' },
   'silver-usd': { decimals: 2, unit: 'usd' },
   'copper-usd': { decimals: 0, unit: 'usd' },
   'btc-usd': { decimals: 0, unit: 'usd' },
-  'gold-btc': { decimals: 4, unit: 'none' },
-  'silver-btc': { decimals: 5, unit: 'none' },
+  'gold-btc': { decimals: 4, unit: 'ratio' },
+  'silver-btc': { decimals: 5, unit: 'ratio' },
   'au-cpi': { decimals: 1, unit: 'percent' },
   'au-trimmed-mean': { decimals: 1, unit: 'percent' },
   'au-us-10y-gap': { decimals: 2, unit: 'points' },
@@ -160,10 +173,12 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'au-wage-growth': { decimals: 1, unit: 'percent' },
   'au-rent-yoy': { decimals: 1, unit: 'percent' },
   'au-unemployment': { decimals: 1, unit: 'percent' },
-  'au-home-values': { decimals: 1, unit: 'none' },
+  // R13: the ABS series is a price INDEX (not a dollar amount) — the word
+  // "index" is the honest unit; a dollar figure would be fabricated.
+  'au-home-values': { decimals: 1, unit: 'index' },
   'au-household-debt-arrears': { decimals: 1, unit: 'percent' },
-  audusd: { decimals: 4, unit: 'none' },
-  audjpy: { decimals: 2, unit: 'none' },
+  audusd: { decimals: 4, unit: 'usd' },
+  audjpy: { decimals: 2, unit: 'jpy' },
   'terms-of-trade': { decimals: 1, unit: 'index' },
   'iron-ore': { decimals: 1, unit: 'usd' },
   'gold-aud': { decimals: 0, unit: 'aud' },
@@ -374,18 +389,58 @@ export function consequenceState(reading: IndicatorReading, isPriceRow: boolean)
   return band; // 'typical' | 'low'
 }
 
-/** The consequence line for a reading (F4): state line → oneLiner fallback. */
+/** The consequence line for a reading (F4): state line → oneLiner fallback.
+ *  R28: lines quoting a published band carry {bandPos}/{bandLabel} tokens,
+ *  interpolated here from the LIVE value — the sentence can never contradict
+ *  the number beside it. `words` localises the position word (R22). */
 export function consequenceLine(
   reading: IndicatorReading,
   entry: IndicatorCopyEntry,
   isPriceRow: boolean,
+  words: { inside: string; above: string; below: string } = BAND_WORDS_EN,
 ): string {
   const state = consequenceState(reading, isPriceRow);
-  if (state) {
-    const line = entry.lines?.[state];
-    if (line) return line;
-  }
-  return entry.oneLiner;
+  const raw = (state && entry.lines?.[state]) || entry.oneLiner;
+  if (!raw.includes('{bandPos}') && !raw.includes('{bandLabel}')) return raw;
+  const band = entry.band;
+  const value = reading.value;
+  if (!band || value === null) return raw.replace(/\{bandPos\}/g, '').replace(/\{bandLabel\}/g, band?.label ?? '');
+  return interpolate(raw, { bandPos: bandPositionWord(value, band, words), bandLabel: band.label });
+}
+
+/** Band position words keyed by locale (the R28 tokens' rendered form). */
+export type BandPosition = 'inside' | 'above' | 'below';
+
+export function bandPositionOf(value: number, band: { min?: number; max?: number }): BandPosition {
+  if (band.min !== undefined && value < band.min) return 'below';
+  if (band.max !== undefined && value > band.max) return 'above';
+  // Two-sided band (e.g. the RBA's 2–3%): neither below nor above → inside.
+  if (band.min !== undefined && band.max !== undefined) return 'inside';
+  if (band.min === undefined && band.max === undefined) return 'inside';
+  // One-sided: the goal is a ceiling (min-only → above/inside is the claim).
+  if (band.max === undefined) return value > (band.min ?? 0) ? 'above' : 'inside';
+  return value < (band.max ?? 0) ? 'below' : 'inside';
+}
+
+/** The rendered band-position word for a locale's copy. */
+export function bandPositionWord(
+  value: number,
+  band: { min?: number; max?: number; label: string },
+  words: { inside: string; above: string; below: string } = BAND_WORDS_EN,
+): string {
+  return words[bandPositionOf(value, band)];
+}
+
+export const BAND_WORDS_EN: { inside: string; above: string; below: string } = {
+  inside: 'inside',
+  above: 'above',
+  below: 'below',
+};
+
+/** The locale's band-position words from the copy corpus (R22: fa renders
+ * درون/بالای/زیر — never the English defaults). */
+export function bandWordsOf(copy: InsightsCopy): { inside: string; above: string; below: string } {
+  return { inside: copy.ui.bandPosInside, above: copy.ui.bandPosAbove, below: copy.ui.bandPosBelow };
 }
 
 /* ------------------------------------------------------------------ *
@@ -400,10 +455,13 @@ export interface BigMoverRow {
   moveScore: number;
 }
 
-/** All readings whose |moveScore| clears the threshold, freshest data only. */
+/** All readings whose |moveScore| clears the threshold, freshest data only.
+ * Stale/unavailable rows never headline (R4): the engine omits moveScore for
+ * them, and this guard keeps an old payload from resurrecting one. */
 export function bigMovers(readings: readonly IndicatorReading[], limit = 3): BigMoverRow[] {
   const rows: BigMoverRow[] = [];
   for (const r of readings) {
+    if (r.status === 'stale' || r.status === 'unavailable') continue;
     if (r.moveScore === undefined || !Number.isFinite(r.moveScore)) continue;
     if (Math.abs(r.moveScore) < MOVE_SCORE_THRESHOLD) continue;
     if (r.change30d === undefined || !Number.isFinite(r.change30d)) continue;
@@ -449,10 +507,59 @@ export function alertingIndicators(
 }
 
 /* ------------------------------------------------------------------ *
+ * R5: the two-tier status model (round-2 spec §4 + Block R5)
+ *                     only the user-facing word changes)
+ *   unusual         — no rule fired, but the value sits in the top/bottom
+ *                     10% of its own 10-year range (percentile ≤ 0.10 or
+ *                     ≥ 0.90). percentile10y is only computed when the
+ *                     base carries the engine's 30-observation floor
+ *                     (MIN_PERCENTILE_OBS), so its presence IS the
+ *                     history floor — no extra check needed.
+ *   normal          — neither of the above
+ *   context / stale / unavailable — unchanged
+ *
+ * ONE tier per card: needs-attention wins over unusual (details may add
+ * "also unusual"). Internal ids and internal statuses stay unchanged.
+ * ------------------------------------------------------------------ */
+
+export type IndicatorTier =
+  | 'needs-attention'
+  | 'unusual'
+  | 'normal'
+  | 'context'
+  | 'stale'
+  | 'unavailable';
+
+/** The unusual band: top or bottom 10% of the indicator's own 10y range. */
+export const UNUSUAL_CUTOFF = 0.1;
+
+/** Is this reading in the unusual band? (Normal-status readings only.) */
+export function isUnusual(reading: IndicatorReading): boolean {
+  if (reading.status !== 'normal') return false;
+  if (reading.percentile10y === undefined) return false;
+  return reading.percentile10y <= UNUSUAL_CUTOFF || reading.percentile10y >= 1 - UNUSUAL_CUTOFF;
+}
+
+/** The one display tier for a reading (precedence: needs-attention wins). */
+export function tierOf(reading: IndicatorReading): IndicatorTier {
+  if (reading.status === 'warning') return 'needs-attention';
+  if (reading.status === 'context') return 'context';
+  if (reading.status === 'unavailable') return 'unavailable';
+  if (reading.status === 'stale' || reading.status === 'no-history') return 'stale';
+  return isUnusual(reading) ? 'unusual' : 'normal';
+}
+
+/** Card layout per tier: needs-attention AND unusual get the full card; the
+ * rest are compact rows (R7: both tiers are the visible face of a group). */
+export function tierIsCard(tier: IndicatorTier): boolean {
+  return tier === 'needs-attention' || tier === 'unusual';
+}
+
+/* ------------------------------------------------------------------ *
  * Card filter (I8) — view-level narrowing of the rows/cards grid
  * ------------------------------------------------------------------ */
 
-export type StatusFilter = 'all' | 'warning' | 'normal' | 'context';
+export type StatusFilter = 'all' | 'warning' | 'unusual' | 'normal' | 'context';
 
 export interface CardFilter {
   status: StatusFilter;
@@ -471,13 +578,20 @@ function spacedNorm(s: string): string {
     .trim();
 }
 
-/** Does one reading pass the status chips + text query? (Pure, unit-tested.) */
+/** Does one reading pass the status chips + text query? (Pure, unit-tested.)
+ * The 'unusual' chip filters on the R5 tier, not the internal status. */
 export function indicatorMatchesFilter(
   reading: IndicatorReading,
   filter: CardFilter,
   nameOf: (id: IndicatorId) => { name: string; ticker?: string },
 ): boolean {
-  if (filter.status !== 'all' && reading.status !== filter.status) return false;
+  if (filter.status !== 'all') {
+    if (filter.status === 'unusual') {
+      if (tierOf(reading) !== 'unusual') return false;
+    } else if (reading.status !== filter.status) {
+      return false;
+    }
+  }
   const tokens = spacedNorm(filter.query).split(' ').filter((t) => t.length > 0);
   if (tokens.length === 0) return true;
   const entry = nameOf(reading.id);
@@ -500,15 +614,17 @@ export function filterVisibleIds(
   return ids;
 }
 
-/** Live per-status counts for the FilterBar chips (I9). */
+/** Live per-status counts for the filter chips (I9) — tier-aware. */
 export function statusCounts(
   readings: readonly IndicatorReading[],
-): { all: number; warning: number; normal: number; context: number } {
-  const counts = { all: readings.length, warning: 0, normal: 0, context: 0 };
+): { all: number; warning: number; unusual: number; normal: number; context: number } {
+  const counts = { all: readings.length, warning: 0, unusual: 0, normal: 0, context: 0 };
   for (const r of readings) {
-    if (r.status === 'warning') counts.warning += 1;
-    else if (r.status === 'normal') counts.normal += 1;
-    else if (r.status === 'context') counts.context += 1;
+    const tier = tierOf(r);
+    if (tier === 'needs-attention') counts.warning += 1;
+    else if (tier === 'unusual') counts.unusual += 1;
+    else if (tier === 'normal') counts.normal += 1;
+    else if (tier === 'context') counts.context += 1;
   }
   return counts;
 }
@@ -578,29 +694,20 @@ export function formatPinnedStorage(ids: readonly IndicatorId[]): string {
 }
 
 /* ------------------------------------------------------------------ *
- * Lane + hero-order settings (Blocks L1/H1) — localStorage, fail-open
+ * Lane setting (Block L1 → round-2 R1) — localStorage, fail-open.
+ * The old hero-order swap setting is retired (decision D7: Global first,
+ * no toggle).
  * ------------------------------------------------------------------ */
 
 export const LANE_STORAGE_KEY = 'currena.insights.lane.v1';
-export const HERO_ORDER_STORAGE_KEY = 'currena.insights.hero-order.v1';
 
-/** Read the remembered lane (Block L1: default Australia, try/catch per spec). */
+/** Read the remembered lane (R1: default GLOBAL, try/catch per spec). */
 export function readStoredLane(): InsightsSection {
   try {
     const v = window.localStorage.getItem(LANE_STORAGE_KEY);
-    return v === 'global' || v === 'australia' ? v : 'australia';
+    return v === 'global' || v === 'australia' ? v : 'global';
   } catch {
-    return 'australia'; // storage unavailable — the default
-  }
-}
-
-/** Read the hero order ('australia-first' | 'global-first'; H1 note: swap setting). */
-export function readStoredHeroOrder(): 'australia' | 'global' {
-  try {
-    const v = window.localStorage.getItem(HERO_ORDER_STORAGE_KEY);
-    return v === 'global' ? 'global' : 'australia';
-  } catch {
-    return 'australia';
+    return 'global'; // storage unavailable — the default
   }
 }
 
@@ -690,3 +797,261 @@ export function legPhrase(
  * ------------------------------------------------------------------ */
 
 export type StatusTone = 'danger' | 'success' | 'info' | 'muted';
+
+/* ------------------------------------------------------------------ *
+ * Round-2 R2: the hero reason line — a FIXED TABLE computed from the
+ * gauge steps, never free text. The sentence can never contradict the
+ * gauges: the top step's word names its gauges, and no reassurance
+ * phrase exists in the table (the calm line only fires when EVERY
+ * readable gauge sits at step 1).
+ * ------------------------------------------------------------------ */
+
+export interface HeroReasonInput {
+  /** The section's gauge readings (gaugeReading rows). */
+  gauges: readonly GaugeReading[];
+  /** The step words, keyed 1–4 (copy.label). */
+  words: Readonly<Record<number, string>>;
+  calm: string;
+  top: string; // '{k} of {n} areas {isAre} {word}: {names}.'
+  others: string; // 'The rest are {word}.'
+  othersOne: string; // 'The other one is {word}.'
+  is: string;
+  are: string;
+  notEnough: string;
+  /** The gauge display names, keyed by gauge id (copy.groups). */
+  nameOf: (gauge: string) => string;
+  /** Locale digit renderer (R22: fa renders ۵, not 5). Defaults to String. */
+  fmt?: (n: number) => string;
+}
+
+export function heroReason(input: HeroReasonInput): string {
+  const fmtN = input.fmt ?? String;
+  const readable = input.gauges.filter((g) => g.step >= 1);
+  if (readable.length === 0) return input.notEnough;
+  if (readable.every((g) => g.step === 1)) return input.calm;
+  const maxStep = Math.max(...readable.map((g) => g.step));
+  const top = readable.filter((g) => g.step === maxStep);
+  const word = input.words[maxStep] ?? '';
+  const names = top.map((g) => input.nameOf(g.gauge)).join(', ');
+  const line1 = interpolate(input.top, {
+    k: fmtN(top.length),
+    n: fmtN(readable.length),
+    isAre: top.length === 1 ? input.is : input.are,
+    word,
+    names,
+  });
+  const rest = readable.filter((g) => g.step < maxStep);
+  if (rest.length === 0) return line1;
+  // The "calmer word": the highest step among the rest (the most notable
+  // calmer state — one word for the whole tail, per the fixed table).
+  const restStep = Math.max(...rest.map((g) => g.step));
+  const restWord = input.words[restStep] ?? '';
+  const restLine = interpolate(
+    rest.length === 1 ? input.othersOne : input.others,
+    { word: restWord },
+  );
+  return `${line1} ${restLine}`;
+}
+
+/** The R2 guard: does a hero sentence contradict its gauges? (Test-only
+ * helper.) The fixed table names every gauge AT THE TOP STEP and words the
+ * tail ("The rest are Stressed") — so the guard checks: (1) every max-step
+ * gauge is named; (2) no reassurance phrase while ANY gauge sits at step 3
+ * or 4. A step-3 tail is described by its word, never reassured away. */
+export function heroReasonIsConsistent(
+  sentence: string,
+  gauges: readonly GaugeReading[],
+  nameOf: (gauge: string) => string,
+): boolean {
+  const readable = gauges.filter((g) => g.step >= 1);
+  const maxStep = readable.length > 0 ? Math.max(...readable.map((g) => g.step)) : 0;
+  for (const g of readable.filter((g) => g.step === maxStep && maxStep >= 1)) {
+    if (!sentence.includes(nameOf(g.gauge))) return false;
+  }
+  if (maxStep >= 3) {
+    const reassurance = /(not worth worrying|nothing needs your attention|no need to worry)/i;
+    if (reassurance.test(sentence)) return false;
+  }
+  return true;
+}
+
+/* ------------------------------------------------------------------ *
+ * Round-2 R3: the needs-attention tiles — sorted by how far the value
+ * sits into its own 10-year range (rule-tail aware).
+ * ------------------------------------------------------------------ */
+
+export interface AttentionTileRow {
+  id: IndicatorId;
+  /** 0..1 — how deep into the watched tail the value sits. */
+  extremity: number;
+}
+
+/** The warning members of one section, extremity-sorted (R3 tile order). */
+export function attentionTiles(
+  readings: readonly IndicatorReading[],
+  section: InsightsSection,
+): AttentionTileRow[] {
+  const sectionIds = new Set(DEFINITIONS.filter((d) => d.section === section).map((d) => d.id));
+  const rows: AttentionTileRow[] = [];
+  for (const r of readings) {
+    if (r.status !== 'warning' || !sectionIds.has(r.id)) continue;
+    const def = definitionFor(r.id);
+    const zone = warningZone(def.rule);
+    let extremity = r.percentile10y ?? 0.5;
+    if (zone && r.percentile10y !== undefined) {
+      extremity = zone.to >= 1 ? r.percentile10y : 1 - r.percentile10y;
+    }
+    rows.push({ id: r.id, extremity });
+  }
+  return rows.sort((a, b) => b.extremity - a.extremity);
+}
+
+/* ------------------------------------------------------------------ *
+ * Round-2 R7: the signals-first default view — per-group split.
+ * ------------------------------------------------------------------ */
+
+export interface GroupVisibility {
+  /** Needs-attention + unusual + enough normal rows to reach MIN_VISIBLE. */
+  visible: readonly IndicatorReading[];
+  /** The rest — collapsed behind "See all {n} indicators". */
+  collapsed: readonly IndicatorReading[];
+}
+
+/** At least this many items visible per group (spec R7). */
+export const GROUP_MIN_VISIBLE = 3;
+
+export function groupVisibility(readings: readonly IndicatorReading[]): GroupVisibility {
+  const cards: IndicatorReading[] = [];
+  const rows: IndicatorReading[] = [];
+  for (const r of readings) {
+    const tier = tierOf(r);
+    if (tier === 'needs-attention' || tier === 'unusual') cards.push(r);
+    else rows.push(r);
+  }
+  const visible = [...cards];
+  for (const r of rows) {
+    if (visible.length >= GROUP_MIN_VISIBLE) break;
+    visible.push(r);
+  }
+  const visibleSet = new Set(visible.map((r) => r.id));
+  return { visible, collapsed: rows.filter((r) => !visibleSet.has(r.id)) };
+}
+
+/* ------------------------------------------------------------------ *
+ * Round-2 R7b: the collapsed Together/Signals summaries.
+ * ------------------------------------------------------------------ */
+
+const TOGETHER_STATE_ORDER: readonly ConnectionState[] = ['active', 'partly', 'disagree', 'inactive', 'unknown'];
+
+export interface TogetherSummary {
+  /** One line: "2 active, 3 show signals that disagree, 1 partly active". */
+  line: string;
+  /** One chip per connection (short title + state). */
+  chips: readonly { connection: string; name: string; state: ConnectionState }[];
+}
+
+export function togetherSummary(
+  connections: readonly ConnectionReading[],
+  nameOf: (connection: string) => string,
+  templates: { active: string; partly: string; inactive: string; disagree: string; unknown: string },
+  fmt: (n: number) => string = String,
+  joiner = ', ',
+): TogetherSummary {
+  const counts = new Map<ConnectionState, number>();
+  for (const c of connections) counts.set(c.state, (counts.get(c.state) ?? 0) + 1);
+  const parts: string[] = [];
+  for (const state of TOGETHER_STATE_ORDER) {
+    const n = counts.get(state) ?? 0;
+    if (n > 0) parts.push(interpolate(templates[state], { n: fmt(n) }));
+  }
+  return {
+    line: parts.join(joiner),
+    chips: connections.map((c) => ({ connection: c.connection, name: nameOf(c.connection), state: c.state })),
+  };
+}
+
+/** Expanded-Together card order (spec R7b): active → partly → disagree →
+ * not active → unreadable. */
+export const TOGETHER_CARD_ORDER: readonly ConnectionState[] = TOGETHER_STATE_ORDER;
+
+/** Collapsed-Signals line per metal: position top/bottom percent or ''. */
+export function signalSummaryPosition(percentile: number | null): { word: 'top' | 'bottom'; pct: number } | null {
+  if (percentile === null || !Number.isFinite(percentile)) return null;
+  if (percentile >= 0.9) return { word: 'top', pct: Math.round((1 - percentile) * 100) };
+  if (percentile <= 0.1) return { word: 'bottom', pct: Math.round(percentile * 100) };
+  return null;
+}
+
+/* ------------------------------------------------------------------ *
+ * Round-2 R26: the merged gold-and-silver signals card.
+ * ------------------------------------------------------------------ */
+
+export interface MergedSignals {
+  /** The four global conditions (identical for both metals by construction). */
+  shared: readonly { key: string; state: string }[];
+  /** Per-metal footing rows. */
+  footing: readonly { metal: 'gold' | 'silver'; state: string; priceId: IndicatorId }[];
+  /** The silver-only condition rows. */
+  silverOnly: readonly { key: string; state: string }[];
+}
+
+export function mergeSignals(gold: { conditions: readonly { key: string; state: string }[]; priceId: IndicatorId }, silver: { conditions: readonly { key: string; state: string }[]; priceId: IndicatorId }): MergedSignals {
+  const shared = gold.conditions.filter((c) => c.key !== 'footing' && c.key !== 'industrial');
+  const goldFooting = gold.conditions.find((c) => c.key === 'footing');
+  const silverFooting = silver.conditions.find((c) => c.key === 'footing');
+  const footing: { metal: 'gold' | 'silver'; state: string; priceId: IndicatorId }[] = [];
+  if (goldFooting) footing.push({ metal: 'gold', state: goldFooting.state, priceId: gold.priceId });
+  if (silverFooting) footing.push({ metal: 'silver', state: silverFooting.state, priceId: silver.priceId });
+  return {
+    shared,
+    footing,
+    silverOnly: silver.conditions.filter((c) => c.key === 'industrial'),
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * Round-2 R11: "What it means for my money" — area map + worst-state
+ * selection (at most 4 lines, calm fallback).
+ * ------------------------------------------------------------------ */
+
+export type MoneyAreaId = 'petrol' | 'homeLoan' | 'savings' | 'shop' | 'overseas' | 'jobs';
+export type MoneyAreaState = 'attention' | 'unusual' | 'calm';
+
+export const MONEY_AREAS: Readonly<Record<MoneyAreaId, readonly IndicatorId[]>> = {
+  petrol: ['brent', 'au-petrol-yoy', 'audusd'],
+  homeLoan: ['rba-cash-rate', 'au-home-loan', 'au-rent-yoy', 'au-household-debt-arrears'],
+  savings: ['rba-cash-rate', 'au-cpi'],
+  shop: ['au-cpi', 'au-trimmed-mean'],
+  overseas: ['audusd', 'audjpy', 'dollar-basket'],
+  jobs: ['au-unemployment', 'au-wage-growth'],
+};
+
+export interface MoneyAreaRow {
+  area: MoneyAreaId;
+  state: MoneyAreaState;
+  /** The indicators driving the state (up to two chips). */
+  chipIds: readonly IndicatorId[];
+}
+
+export function moneyAreaRow(area: MoneyAreaId, readings: readonly IndicatorReading[]): MoneyAreaRow {
+  const byId = new Map(readings.map((r) => [r.id as string, r]));
+  const rows = MONEY_AREAS[area].map((id) => byId.get(id)).filter((r): r is IndicatorReading => r !== undefined);
+  const attention = rows.filter((r) => tierOf(r) === 'needs-attention');
+  const unusual = rows.filter((r) => tierOf(r) === 'unusual');
+  if (attention.length > 0) {
+    return { area, state: 'attention', chipIds: attention.slice(0, 2).map((r) => r.id) };
+  }
+  if (unusual.length > 0) {
+    return { area, state: 'unusual', chipIds: unusual.slice(0, 2).map((r) => r.id) };
+  }
+  return { area, state: 'calm', chipIds: [] };
+}
+
+/** The ≤4 lines for the panel: attention areas first, then unusual, map
+ * order within a tier. Empty → the calm fallback line (component-side). */
+export function moneyPanel(readings: readonly IndicatorReading[]): MoneyAreaRow[] {
+  const rows = (Object.keys(MONEY_AREAS) as MoneyAreaId[]).map((area) => moneyAreaRow(area, readings));
+  const attention = rows.filter((r) => r.state === 'attention');
+  const unusual = rows.filter((r) => r.state === 'unusual');
+  return [...attention, ...unusual].slice(0, 4);
+}

@@ -1,15 +1,17 @@
 /**
- * PricesBoard — Block PB1: "one compact row for each price. Show the plain
- * name, the price with unit, the 7-day and 30-day change, a position word
- * (low, typical, high versus the last 10 years), one consequence line, and
- * the 'as of' date." Order: oil (Brent), gold, silver, copper, iron ore,
- * Bitcoin. Gold shows USD and AUD in the same row (PB1). Bitcoin carries
- * the gold/silver-per-BTC ratios as context lines, "context only, not used
- * in signals" (PB2). Every row shows "as of {date}" (PB3) — the grey stale
- * chip appears only past the per-series freshness limit, which is where it
- * belongs (weekly EIA batches are normal, not stale).
+ * PricesBoard — round-2 Block R10: the prices STRIP.
  *
- * Prices are NOT scored cards (PB1 note) — plain rows, no vote framing.
+ * FOUR tiles with ONE identical anatomy: plain name, LARGE price with unit,
+ * the 7-day and 30-day change (whichever exist, shown the same way for all),
+ * a position word, one hedged practical consequence line, and "as of {date}".
+ * Order: oil (Brent), gold (US$ with the A$ beside it), silver, Bitcoin.
+ * No raw tickers or series ids anywhere. Copper and iron ore moved into the
+ * indicator lanes (copper's definition group is growth-health; iron-ore was
+ * always an au-trade-currency row).
+ *
+ * The Bitcoin ratios render as ONE small context line, labelled "context
+ * only", placed BELOW the tile's anatomy so it can never overlap the price
+ * (R17a — the old clipping bug dies with the tile grid).
  */
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
@@ -18,6 +20,7 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import {
   BTC_RATIO_IDS,
   PRICE_ROWS,
+  bandWordsOf,
   consequenceLine,
   definitionFor,
   formatChange,
@@ -25,36 +28,6 @@ import {
   positionBand,
 } from './config';
 import { formatAsOf } from './HistoryChart';
-
-function ChangeRuns({
-  reading,
-  def,
-  copy,
-  numberLocale,
-}: {
-  reading: IndicatorReading;
-  def: ReturnType<typeof definitionFor>;
-  copy: InsightsCopy;
-  numberLocale: 'en-US' | 'fa-IR';
-}) {
-  if (reading.change7d === undefined && reading.change30d === undefined) return null;
-  return (
-    <span className="flex items-baseline gap-2 text-[var(--type-caption)] text-[var(--color-text-secondary)]">
-      {reading.change7d !== undefined ? (
-        <bdi dir="ltr" className="font-semibold tabular-nums">
-          {formatChange(reading.change7d, def.changeKind, numberLocale, copy.units)}
-          <span className="ms-1 opacity-80">{copy.ui.days7}</span>
-        </bdi>
-      ) : null}
-      {reading.change30d !== undefined ? (
-        <bdi dir="ltr" className="font-semibold tabular-nums">
-          {formatChange(reading.change30d, def.changeKind, numberLocale, copy.units)}
-          <span className="ms-1 opacity-80">{copy.ui.days30}</span>
-        </bdi>
-      ) : null}
-    </span>
-  );
-}
 
 export function PricesBoard({
   readings,
@@ -87,7 +60,9 @@ export function PricesBoard({
       <p className="m-0 mb-2 text-[var(--type-label)] text-[var(--color-text-secondary)]">
         {copy.ui.pricesSubtitle}
       </p>
-      <div className="overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface)] ring-1 ring-[var(--color-border)]">
+      {/* R10: four tiles, one grid, identical anatomy. items-start so no
+       * open item stretches its neighbours. */}
+      <div className="grid grid-cols-1 items-start gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
         {rows.map(({ id, reading }) => {
           const def = definitionFor(id);
           const entry = copy.indicators[id];
@@ -106,7 +81,7 @@ export function PricesBoard({
           const valueText =
             reading.value !== null ? formatIndicatorValue(id, reading.value, numberLocale, copy.units) : null;
 
-          // PB2: the Bitcoin row's context ratios.
+          // PB2 → R10: the Bitcoin tile's context ratios — one small line.
           const goldPerBtc = id === 'btc-usd' ? ratioRow('gold-btc') : undefined;
           const silverPerBtc = id === 'btc-usd' ? ratioRow('silver-btc') : undefined;
 
@@ -114,7 +89,7 @@ export function PricesBoard({
             <article
               key={id}
               id={`insights-card-${id}`}
-              className={`price-row scroll-mt-24 ${isStale ? 'opacity-80' : ''}`}
+              className={`price-row scroll-mt-24 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)] ${isStale ? 'opacity-80' : ''}`}
               data-status={reading.status}
             >
               <button
@@ -123,20 +98,14 @@ export function PricesBoard({
                 aria-expanded={false}
                 className="insights-focusable block w-full cursor-pointer border-0 bg-transparent p-0 text-start"
               >
-                <span className="flex w-full flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                  <span className="text-[var(--type-label)] font-bold text-[var(--color-text-primary)]">
+                <span className="flex w-full flex-col items-start gap-1">
+                  {/* Plain name — no tickers, no series ids (R14). */}
+                  <span className="text-[var(--type-label)] font-bold text-[var(--color-text-secondary)]">
                     {entry.name}
                   </span>
-                  {entry.ticker ? (
-                    <span dir="ltr" className="text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
-                      {entry.ticker}
-                    </span>
-                  ) : null}
+                  {/* The large price with unit — the largest text in the tile. */}
                   {valueText !== null ? (
-                    <bdi
-                      dir={entry.ticker && copy.units.usd && numberLocale === 'en-US' ? 'ltr' : undefined}
-                      className={`type-number ${isStale ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-primary)]'}`}
-                    >
+                    <bdi dir="ltr" className={`type-number text-[var(--color-text-primary)] ${isStale ? 'text-[var(--color-text-secondary)]' : ''}`}>
                       {valueText}
                     </bdi>
                   ) : (
@@ -147,56 +116,68 @@ export function PricesBoard({
                       {copy.ui.unavailableCard}
                     </span>
                   ) : null}
-                  {/* PB1: gold shows USD and AUD in the same row. */}
+                  {/* PB1: gold shows USD and AUD in the same tile. */}
                   {id === 'gold-usd' && goldAud && goldAud.value !== null ? (
-                    <bdi className="text-[var(--type-label)] font-semibold text-[var(--color-text-secondary)]">
+                    <bdi className="text-[var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
                       {interpolate(copy.ui.goldAudLine, {
                         value: formatIndicatorValue('gold-aud', goldAud.value, numberLocale, copy.units),
                       })}
                     </bdi>
+                  ) : null}
+                  {/* Changes — whichever exist, rendered the same way. */}
+                  {reading.change7d !== undefined || reading.change30d !== undefined ? (
+                    <span className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
+                      {reading.change7d !== undefined ? (
+                        <bdi dir="ltr">
+                          {formatChange(reading.change7d, def.changeKind, numberLocale, copy.units)}
+                          <span className="ms-1 opacity-80">{copy.ui.days7}</span>
+                        </bdi>
+                      ) : null}
+                      {reading.change30d !== undefined ? (
+                        <bdi dir="ltr">
+                          {formatChange(reading.change30d, def.changeKind, numberLocale, copy.units)}
+                          <span className="ms-1 opacity-80">{copy.ui.days30}</span>
+                        </bdi>
+                      ) : null}
+                    </span>
                   ) : null}
                   {band && positionWord ? (
                     <span className="text-[var(--type-caption)] font-bold text-[var(--color-text-secondary)]">
                       {positionWord}
                     </span>
                   ) : null}
-                  <span className="ms-auto">
-                    <ChangeRuns reading={reading} def={def} copy={copy} numberLocale={numberLocale} />
-                  </span>
-                </span>
-                {/* PB1: the one consequence line + as-of. PB3: "as of {date}"
-                 * — stale chips appear only past the freshness limit. */}
-                {reading.status !== 'unavailable' ? (
-                  <span className="mt-0.5 block text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-                    {consequenceLine(reading, entry, true)}
-                  </span>
-                ) : null}
-                <span className="mt-0.5 flex items-baseline gap-x-2 text-[var(--type-caption)] text-[var(--color-text-secondary)]">
-                  {reading.asOf ? <bdi>{interpolate(copy.ui.pricesAsOf, { date: formatAsOf(reading.asOf, locale) })}</bdi> : null}
-                  {reading.status === 'stale' && reading.asOf ? (
-                    <bdi className="font-semibold">{interpolate(copy.ui.staleSince, { date: formatAsOf(reading.asOf, locale) })}</bdi>
-                  ) : null}
-                  {entry.unitNote ? <span aria-hidden="true">· {entry.unitNote}</span> : null}
-                </span>
-                {/* PB2: gold-per-Bitcoin + silver-per-Bitcoin context lines. */}
-                {id === 'btc-usd' && (goldPerBtc || silverPerBtc) ? (
-                  <span className="mt-1 block rounded-[var(--radius-sm)] bg-currena-soft/70 px-2.5 py-1.5 dark:bg-white/[0.05]">
-                    <span className="block text-[var(--type-caption)] font-bold text-[var(--color-text-secondary)]">
-                      {copy.ui.btcRatiosLabel}
+                  {/* One hedged practical consequence line. */}
+                  {reading.status !== 'unavailable' ? (
+                    <span className="block text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+                      {consequenceLine(reading, entry, true, bandWordsOf(copy))}
                     </span>
-                    {goldPerBtc && goldPerBtc.value !== null ? (
-                      <span className="block text-[var(--type-caption)] text-[var(--color-text-secondary)]">
-                        <bdi>{interpolate(copy.ui.goldPerBtc, { value: formatIndicatorValue('gold-btc', goldPerBtc.value, numberLocale, copy.units) })}</bdi>
-                      </span>
-                    ) : null}
-                    {silverPerBtc && silverPerBtc.value !== null ? (
-                      <span className="block text-[var(--type-caption)] text-[var(--color-text-secondary)]">
-                        <bdi>{interpolate(copy.ui.silverPerBtc, { value: formatIndicatorValue('silver-btc', silverPerBtc.value, numberLocale, copy.units) })}</bdi>
-                      </span>
+                  ) : null}
+                  {/* PB3: "as of {date}"; stale chips only past the limit. */}
+                  <span className="flex flex-wrap items-baseline gap-x-2 text-[var(--type-caption)] text-[var(--color-text-secondary)]">
+                    {reading.asOf ? <bdi>{interpolate(copy.ui.pricesAsOf, { date: formatAsOf(reading.asOf, locale) })}</bdi> : null}
+                    {reading.status === 'stale' && reading.asOf ? (
+                      <bdi className="font-semibold">{interpolate(copy.ui.staleSince, { date: formatAsOf(reading.asOf, locale) })}</bdi>
                     ) : null}
                   </span>
-                ) : null}
-                <span className="sr-only"> — {copy.ui.viewCard}</span>
+                  {/* The ratios: ONE small context line, BELOW the anatomy —
+                   * it can never overlap the tile's price (R17a). */}
+                  {id === 'btc-usd' && (goldPerBtc || silverPerBtc) ? (
+                    <span className="block text-[var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]" data-btc-ratios>
+                      <span className="font-bold">{copy.ui.btcRatiosLabel}</span>
+                      {goldPerBtc && goldPerBtc.value !== null ? (
+                        <span className="block">
+                          <bdi>{interpolate(copy.ui.goldPerBtc, { value: formatIndicatorValue('gold-btc', goldPerBtc.value, numberLocale, copy.units) })}</bdi>
+                        </span>
+                      ) : null}
+                      {silverPerBtc && silverPerBtc.value !== null ? (
+                        <span className="block">
+                          <bdi>{interpolate(copy.ui.silverPerBtc, { value: formatIndicatorValue('silver-btc', silverPerBtc.value, numberLocale, copy.units) })}</bdi>
+                        </span>
+                      ) : null}
+                    </span>
+                  ) : null}
+                  <span className="sr-only"> — {copy.ui.viewCard}</span>
+                </span>
               </button>
             </article>
           );

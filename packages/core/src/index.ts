@@ -122,6 +122,7 @@ export {
   formatNumber,
   formatCurrencyAmount,
   formatDate,
+  formatDateWords,
   formatJalaliDate,
   formatRelative,
   thousandSeparateInput,

@@ -339,9 +339,12 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // Live face value from gold-api HG (USD per pound) converted to per
     // metric tonne (× 2204.62262) so the series joins the World Bank monthly
     // history (USD/mt) for the 10-year position (data spec §3 note).
+    // Round-2 R10: copper left the prices strip for the indicator lanes —
+    // it rides the growth-health group next to copper-gold (its economic
+    // story: Chinese factories + industrial demand). Info rule: never votes.
     id: 'copper-usd',
     section: 'global',
-    group: 'prices-board',
+    group: 'growth-health',
     name: 'Copper price',
     source: 'gold-api',
     sourceRef: 'gold-api.com HG spot × 2204.62262 (history: World Bank Pink Sheet copper, monthly)',

@@ -18,10 +18,14 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { fetchIndicatorHistory } from '../../lib/insights';
 import { Sparkline } from '../Sparkline';
 import {
+  bandWordsOf,
   consequenceLine,
   definitionFor,
   formatChange,
   formatIndicatorValue,
+  formatRuleText,
+  tierOf,
+  type IndicatorTier,
   warningZone,
 } from './config';
 import { PositionBar } from './PositionBar';
@@ -61,7 +65,7 @@ function LazySparkline({ id }: { id: IndicatorId }) {
   }, [id, points]);
   return (
     <span ref={ref} className="block h-7" aria-hidden="true">
-      {points ? <Sparkline points={points} width={240} height={28} ariaLabel="" /> : null}
+      {points ? <Sparkline points={points} width={240} height={28} ariaLabel="" tone="neutral" className="text-currena-muted" /> : null}
     </span>
   );
 }
@@ -83,8 +87,18 @@ export function AlertCard({
   const def = definitionFor(reading.id);
   const entry = copy.indicators[reading.id];
   const isUnavailable = reading.status === 'unavailable';
+  const tier: IndicatorTier = tierOf(reading);
+  const isNeedsAttention = tier === 'needs-attention';
   const valueText =
     reading.value !== null ? formatIndicatorValue(reading.id, reading.value, numberLocale, copy.units) : null;
+  // R6: the needs-attention face line — the rule in plain language + today's
+  // value. (The 10-year position moves to Details on needs-attention cards.)
+  const ruleLine = isNeedsAttention
+    ? interpolate(copy.ui.attentionTileRule, {
+        rule: formatRuleText(def.rule, reading.id, copy.rule, copy.units, numberLocale),
+        value: valueText ?? '—',
+      })
+    : null;
 
   return (
     <article
@@ -97,6 +111,7 @@ export function AlertCard({
         onClick={(e) => onOpenDetails(reading.id, e.currentTarget)}
         className="insights-focusable block w-full cursor-pointer border-0 bg-transparent p-0 text-start"
         aria-haspopup="dialog"
+        aria-label={`${copy.ui.detailsButton}: ${entry.name}`}
       >
         <span className="flex items-start justify-between gap-2">
           <span className="min-w-0">
@@ -111,7 +126,7 @@ export function AlertCard({
           </span>
           <span className="flex shrink-0 items-center gap-1">
             {pinned ? <span aria-hidden="true" className="text-sm text-[var(--color-status-context)]">★</span> : null}
-            <StatusChip status={reading.status} copy={copy} />
+            <StatusChip status={reading.status} copy={copy} tier={tier} />
           </span>
         </span>
 
@@ -141,12 +156,21 @@ export function AlertCard({
               ) : null}
             </span>
 
+            {/* R6: the needs-attention face line — rule + live value. */}
+            {ruleLine !== null ? (
+              <span className="mt-2 block rounded-[var(--radius-sm)] bg-currena-warning/10 px-2.5 py-1.5 text-[var(--type-caption)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
+                <bdi>{ruleLine}</bdi>
+              </span>
+            ) : null}
+
             {/* F1: consequence line — state-keyed, hedged, life-first. */}
             <span className="mt-2 block text-[var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-              {consequenceLine(reading, entry, false)}
+              {consequenceLine(reading, entry, false, bandWordsOf(copy))}
             </span>
 
-            {reading.percentile10y !== undefined ? (
+            {/* R6: the 10-year position shows on UNUSUAL cards (word + bar,
+             * with end labels); needs-attention cards keep it in Details. */}
+            {tier === 'unusual' && reading.percentile10y !== undefined ? (
               <PositionBar
                 percentile={reading.percentile10y}
                 zone={warningZone(def.rule)}
@@ -167,7 +191,7 @@ export function AlertCard({
             <span className="mx-1.5 opacity-50">·</span>
             {reading.sourceName}
           </span>
-          <span className="font-semibold text-[var(--color-status-context)]">{copy.ui.detailsButton} ›</span>
+          <span className="whitespace-nowrap font-semibold text-[var(--color-status-context)]">{copy.ui.detailsButton} ›</span>
         </span>
       </button>
     </article>

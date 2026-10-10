@@ -7,7 +7,7 @@
 
 import type { IndicatorReading } from '@currena/core';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import type { StatusTone } from './config';
+import type { IndicatorTier, StatusTone } from './config';
 
 // Ink-grade tokens (G4): ≥4.5:1 on each chip's own tint in BOTH themes.
 const TONE_CLASSES: Record<StatusTone, string> = {
@@ -18,7 +18,7 @@ const TONE_CLASSES: Record<StatusTone, string> = {
 };
 
 /** Inline SVG icons (16×16, stroke = currentColor). */
-function StatusIcon({ kind }: { kind: IndicatorReading['status'] }) {
+function StatusIcon({ kind }: { kind: IndicatorReading['status'] | 'unusual' }) {
   const common = {
     width: 16,
     height: 16,
@@ -38,6 +38,14 @@ function StatusIcon({ kind }: { kind: IndicatorReading['status'] }) {
           <path d="M8 1.8 14.6 13.4H1.4L8 1.8Z" />
           <path d="M8 6.2v3.4" />
           <path d="M8 11.7h.01" />
+        </svg>
+      );
+    case 'unusual':
+      // R5: a diamond — "notable", not good or bad (icon + word, no colour
+      // judgement).
+      return (
+        <svg {...common}>
+          <path d="M8 1.8 14.2 8 8 14.2 1.8 8 8 1.8Z" />
         </svg>
       );
     case 'normal':
@@ -80,16 +88,24 @@ function StatusIcon({ kind }: { kind: IndicatorReading['status'] }) {
 export function StatusChip({
   status,
   copy,
+  tier,
 }: {
   status: IndicatorReading['status'];
   copy: InsightsCopy;
+  /** R5: when the display TIER differs from the internal status (unusual),
+   *  the chip shows the tier word + icon instead. */
+  tier?: IndicatorTier;
 }) {
+  const isUnusual = tier === 'unusual';
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-[0.72rem] font-bold ${TONE_CLASSES[STATUS_TONE[status]]}`}
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-[0.72rem] font-bold ${
+        isUnusual ? TONE_CLASSES.info : TONE_CLASSES[STATUS_TONE[status]]
+      }`}
+      title={isUnusual ? copy.ui.unusualAria : undefined}
     >
-      <StatusIcon kind={status} />
-      {copy.status[status]}
+      <StatusIcon kind={isUnusual ? 'unusual' : status} />
+      {isUnusual ? copy.ui.unusualWord : copy.status[status]}
     </span>
   );
 }

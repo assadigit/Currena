@@ -232,7 +232,8 @@ describe('formatIndicatorValue', () => {
   });
 
   it('honours per-indicator decimals', () => {
-    expect(formatIndicatorValue('audusd', 0.6982, 'en-US', insightsCopyEn.units)).toBe('0.6982');
+    // R13: every number carries its unit — AUD/USD reads "US$ per A$".
+    expect(formatIndicatorValue('audusd', 0.6982, 'en-US', insightsCopyEn.units)).toBe('US$0.6982');
     expect(formatIndicatorValue('gold-aud', 5900.19, 'en-US', insightsCopyEn.units)).toBe('A$5,900');
   });
 });
@@ -404,9 +405,10 @@ describe('card filter (I8)', () => {
     expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'Australians without' }, nameOfEn)!]).toEqual([
       'au-unemployment',
     ]);
-    // Ticker match, both cases (gold-btc carries the XAU÷BTC ticker).
-    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'XAU' }, nameOfEn)!]).toEqual(['gold-btc']);
-    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'xau' }, nameOfEn)!]).toEqual(['gold-btc']);
+    // R14: source-code tickers (XAU÷BTC, DCOILBRENTEU…) left the copy;
+    // helpful tags stay searchable ('CPI' on the CPI rows).
+    expect(filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'XAU' }, nameOfEn)!.size).toBe(0);
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'CPI' }, nameOfEn)!]).toEqual(['au-cpi']);
   });
 
   it('search and status combine with AND semantics', () => {
@@ -443,11 +445,12 @@ describe('card filter (I8)', () => {
   });
 });
 
-describe('statusCounts (I9)', () => {
-  it('counts All as every reading; Warning/Normal/Context exactly', () => {
+describe('statusCounts (I9, R5 tier-aware)', () => {
+  it('counts All as every reading; Warning/Unusual/Normal/Context exactly', () => {
     expect(statusCounts(SNAPSHOT.readings)).toEqual({
       all: 8,
       warning: 2,
+      unusual: 0,
       normal: 2,
       context: 2,
     });
@@ -455,8 +458,8 @@ describe('statusCounts (I9)', () => {
 
   it('stale/unavailable count only under All', () => {
     const counts = statusCounts(SNAPSHOT.readings);
-    expect(counts.warning + counts.normal + counts.context).toBe(6);
-    expect(counts.all - 6).toBe(2); // dollar-broad (stale) + china-pmi (unavailable)
+    expect(counts.warning + counts.unusual + counts.normal + counts.context).toBe(6);
+    expect(counts.all - 6).toBe(2); // dollar-basket (stale) + china-pmi (unavailable)
   });
 });
 

@@ -85,7 +85,9 @@ describe('buildInsightsCsv', () => {
 
   it('renders the localized status word and the indicator name', () => {
     const rows = buildInsightsCsv(snapshot, insightsCopyEn).split('\r\n');
-    expect(rows[2]!).toContain('Alert');
+    // R5: the user-facing word is "Needs attention" (internal id stays warning).
+    expect(rows[2]!).toContain('Needs attention');
+    expect(rows[2]!).not.toContain('Alert');
     expect(rows[2]!).toContain(insightsCopyEn.indicators.us10y.name);
   });
 

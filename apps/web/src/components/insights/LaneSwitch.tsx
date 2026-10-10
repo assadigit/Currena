@@ -20,8 +20,9 @@ export function LaneSwitch({
   copy: InsightsCopy;
 }) {
   const options: readonly { value: InsightsSection; label: string }[] = [
-    { value: 'australia', label: copy.ui.laneAustralia },
+    // R1: Global first, Australia second (decision D7).
     { value: 'global', label: copy.ui.laneGlobal },
+    { value: 'australia', label: copy.ui.laneAustralia },
   ];
   const pick = (value: InsightsSection): void => {
     onLaneChange(value);

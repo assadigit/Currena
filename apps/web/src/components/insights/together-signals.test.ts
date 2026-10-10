@@ -83,6 +83,10 @@ describe('I17 copy parity (en ↔ fa)', () => {
     expect(sorted(tokens(fa.conditionsMet))).toEqual(sorted(tokens(en.conditionsMet)));
     expect(sorted(tokens(fa.sideSupportive))).toEqual(sorted(tokens(en.sideSupportive)));
     expect(sorted(tokens(fa.sideAgainst))).toEqual(sorted(tokens(en.sideAgainst)));
+    // R7b: the collapsed per-metal summary carries the same tokens.
+    expect(sorted(tokens(fa.collapsedFooting!))).toEqual(sorted(tokens(en.collapsedFooting!)));
+    expect(sorted(tokens(fa.bandTop!))).toEqual(sorted(tokens(en.bandTop!)));
+    expect(sorted(tokens(fa.bandBottom!))).toEqual(sorted(tokens(en.bandBottom!)));
   });
 
   it('the before-you-act box has the same four points in both languages', () => {
