@@ -103,7 +103,7 @@ export function ToolsMenu({
         onClick={() => onOpenChange(!open)}
         className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-[var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-currena-blue/50 hover:text-[var(--color-status-context)]"
       >
-        <Wrench aria-hidden size={15} strokeWidth={1.9} className="shrink-0" />
+        <Wrench aria-hidden size={17} strokeWidth={1.9} className="shrink-0" />
         {copy.ui.toolsLabel}
         {filtering ? (
           <span
@@ -129,7 +129,7 @@ export function ToolsMenu({
             </p>
             <div className="relative">
               <span aria-hidden="true" className="absolute start-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)]">
-                <Search size={15} strokeWidth={1.9} />
+                <Search size={18} strokeWidth={1.9} />
               </span>
               <input
                 type="text"
@@ -198,7 +198,7 @@ export function ToolsMenu({
                 onClick={onDownloadIcs}
                 className="insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-currena-blue/40 bg-currena-blue/15 px-3 text-[var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
               >
-                <CalendarDays aria-hidden size={15} strokeWidth={1.9} className="shrink-0" />
+                <CalendarDays aria-hidden size={16} strokeWidth={1.9} className="shrink-0" />
                 {copy.ui.icsDownload}
               </button>
               <button
@@ -206,7 +206,7 @@ export function ToolsMenu({
                 onClick={onDownloadCsv}
                 className="insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-currena-blue/40 bg-currena-blue/15 px-3 text-[var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
               >
-                <Download aria-hidden size={15} strokeWidth={1.9} className="shrink-0" />
+                <Download aria-hidden size={16} strokeWidth={1.9} className="shrink-0" />
                 {copy.ui.downloadCsv}
               </button>
             </div>

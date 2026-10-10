@@ -57,7 +57,7 @@ export function PricesBoard({
     <section id="insights-prices" aria-labelledby="insights-prices-title" className="scroll-mt-24">
       <h2 id="insights-prices-title" className="m-0 mb-1 text-lg font-extrabold">
         <span className="inline-flex items-center gap-1.5">
-          <Coins aria-hidden size={19} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
+          <Coins aria-hidden size={23} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
           {copy.ui.pricesTitle}
         </span>
       </h2>

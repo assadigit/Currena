@@ -476,7 +476,7 @@ export function Signals({
       <header className="mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 id="insights-signals-title" className="m-0 text-lg font-extrabold">
           <span className="inline-flex items-center gap-1.5">
-            <Activity aria-hidden size={19} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
+            <Activity aria-hidden size={23} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
             {copy.signals.title}
           </span>
         </h2>
@@ -490,7 +490,7 @@ export function Signals({
           >
             <span aria-hidden="true">
               <ChevronDown
-                size={15}
+                size={16}
                 strokeWidth={2}
                 className={`shrink-0 transition-transform duration-200 motion-reduce:transition-none ${open ? '' : '-rotate-90 rtl:rotate-90'}`}
               />

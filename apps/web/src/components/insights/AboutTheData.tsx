@@ -72,7 +72,7 @@ export function AboutTheData({
         >
           <span aria-hidden="true">
             <ChevronDown
-              size={14}
+              size={16}
               strokeWidth={2}
               className={`shrink-0 transition-transform duration-200 motion-reduce:transition-none ${open ? '' : '-rotate-90 rtl:rotate-90'}`}
             />

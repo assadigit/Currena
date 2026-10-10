@@ -128,7 +128,7 @@ export function NextUpStrip({
             onClick={downloadIcs}
             className="no-print insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-[var(--type-caption)] font-semibold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/10"
           >
-            <CalendarDays aria-hidden size={15} strokeWidth={1.9} className="shrink-0" />
+            <CalendarDays aria-hidden size={16} strokeWidth={1.9} className="shrink-0" />
             {copy.ui.icsDownload}
           </button>
         ) : null}
