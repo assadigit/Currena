@@ -17,6 +17,7 @@ import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { ApiError, fetchIndicatorHistory } from '../../lib/insights';
+import { Star, X } from 'lucide-react';
 import { HistoryChart, formatAsOf } from './HistoryChart';
 import { definitionFor, formatRuleText } from './config';
 
@@ -185,7 +186,7 @@ export function DetailsPanel({
             onClick={onClose}
             className="insights-focusable inline-flex min-h-[44px] shrink-0 cursor-pointer items-center gap-1 rounded-full border border-[var(--color-border)] px-3 text-[var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-status-alert)]/50 hover:text-[var(--color-status-alert)]"
           >
-            <span aria-hidden="true">✕</span>
+            <X aria-hidden size={15} strokeWidth={2} />
             <span className="sr-only">{copy.ui.panelClose}</span>
           </button>
         </header>
@@ -263,7 +264,12 @@ export function DetailsPanel({
                 : 'border-[var(--color-border)] bg-transparent text-[var(--color-status-context)] hover:bg-currena-blue/10'
             }`}
           >
-            <span aria-hidden="true">{pinned ? '★' : '☆'}</span>
+            <Star
+              aria-hidden
+              size={15}
+              strokeWidth={1.9}
+              className={`shrink-0 ${pinned ? 'fill-current' : ''}`}
+            />
             {pinned ? copy.ui.unpinAction : copy.ui.pinAction}
           </button>
         </footer>

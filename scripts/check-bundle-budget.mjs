@@ -101,7 +101,19 @@ const BUDGETS = [
   // ENTRY chunk stays untouched (290.32/87.05 vs 296/89.5). Gzip +5.84 kB
   // for the whole round — the honest price of the tier model plus its
   // bilingual sentences. Justified in CHANGELOG §2026-10-10 (round-2).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 300_000, gz: 78_000, label: 'Insights lazy chunk' },
+  // Imagery bump (293.77/74.81 → 300.54/77.51, budget 300/78 → 302/78):
+  // the owner asked for real iconography on the Insights page. lucide-react
+  // (ISC) added, TEN named, tree-shaken icons — Wrench/Search/CalendarDays/
+  // Download (Tools menu), Coins (prices strip mark), Activity (signals
+  // mark), ChevronDown (3 disclosures, RTL-aware rotation), X + Star
+  // (details close/pin), TriangleAlert (2 banners) — replacing 13 text
+  // glyphs (🛠 🔍 📅 ⬇ ▾ ▸ ✕ ★ ☆ ⚠️) for a consistent 24px-grid stroke
+  // language. Three header marks were consciously SKIPPED (Money rows
+  // already carry icons; Together/About are quiet collapsed sections) and
+  // the ↗ ↧ ⓘ glyphs kept, to hold the cost to +6.7 kB raw / +2.7 kB gz
+  // on the lazy chunk. ENTRY untouched. Justified in CHANGELOG §2026-10-10
+  // (imagery).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 302_000, gz: 78_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

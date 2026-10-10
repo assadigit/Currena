@@ -10,6 +10,7 @@
 import { useMemo, useState } from 'react';
 import type { CalendarEvent, IndicatorId } from '@currena/core';
 import { formatJalaliDate, formatDateWords, formatNumber } from '@currena/core';
+import { CalendarDays } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { downloadBlob } from '../../lib/download';
@@ -127,7 +128,7 @@ export function NextUpStrip({
             onClick={downloadIcs}
             className="no-print insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-[var(--type-caption)] font-semibold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/10"
           >
-            <span aria-hidden="true">📅</span>
+            <CalendarDays aria-hidden size={15} strokeWidth={1.9} className="shrink-0" />
             {copy.ui.icsDownload}
           </button>
         ) : null}

@@ -15,6 +15,7 @@
  */
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
+import { Coins } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import {
@@ -55,7 +56,10 @@ export function PricesBoard({
   return (
     <section id="insights-prices" aria-labelledby="insights-prices-title" className="scroll-mt-24">
       <h2 id="insights-prices-title" className="m-0 mb-1 text-lg font-extrabold">
-        {copy.ui.pricesTitle}
+        <span className="inline-flex items-center gap-1.5">
+          <Coins aria-hidden size={19} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
+          {copy.ui.pricesTitle}
+        </span>
       </h2>
       <p className="m-0 mb-2 text-[var(--type-label)] text-[var(--color-text-secondary)]">
         {copy.ui.pricesSubtitle}

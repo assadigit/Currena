@@ -28,6 +28,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { IndicatorId, InsightsSnapshot, InsightsSection, IndicatorGroupId } from '@currena/core';
 import type { IndicatorReading } from '@currena/core';
 import { formatJalaliDate, formatDateWords, formatNumber, formatRelative } from '@currena/core';
+import { Search, TriangleAlert } from 'lucide-react';
 import { interpolate } from '../i18n';
 import { useI18n } from '../lib/locale';
 import { routeQuery } from '../router';
@@ -713,7 +714,7 @@ export function Insights() {
         <div className="flex flex-col gap-6">
           <div className="rounded-[var(--radius-lg)] bg-currena-warning/10 px-5 py-6 text-center ring-1 ring-currena-warning/30">
             <p className="m-0 text-[var(--type-label)] font-bold text-[var(--color-status-alert)]">
-              <span aria-hidden="true">⚠️ </span>
+              <TriangleAlert aria-hidden size={16} strokeWidth={1.9} className="me-1 inline-block align-[-3px]" />
               {copy.ui.loadError}
             </p>
             <p className="mt-1 mb-3 text-[var(--type-label)] text-[var(--color-text-secondary)]">{state.message}</p>
@@ -731,9 +732,7 @@ export function Insights() {
               role="status"
               className="slide-down flex items-center gap-3 rounded-[var(--radius-md)] border-s-4 border-currena-warning bg-currena-warning/15 px-4 py-3"
             >
-              <span className="text-xl" aria-hidden="true">
-                ⚠️
-              </span>
+              <TriangleAlert aria-hidden size={20} strokeWidth={1.9} className="shrink-0 text-[var(--color-status-alert)]" />
               <p className="m-0 text-[var(--type-label)] font-semibold text-[var(--color-status-alert)]">
                 {interpolate(copy.ui.dataFrom, {
                   date: formatRelative(state.snapshot.generatedAt, locale === 'fa' ? 'fa-IR' : 'en-US'),
@@ -802,9 +801,12 @@ export function Insights() {
             <LaneSwitch lane={lane} onLaneChange={setLane} copy={copy} />
             {visibleIds !== null && visibleIds.size === 0 ? (
               <div className="rounded-[var(--radius-lg)] bg-currena-soft/60 px-5 py-8 text-center ring-1 ring-[var(--color-border)]">
-                <p className="m-0 text-[var(--type-label)]" aria-hidden="true">
-                  🔍
-                </p>
+                <div
+                  aria-hidden="true"
+                  className="mx-auto mb-1 flex h-11 w-11 items-center justify-center rounded-full bg-currena-blue/10 text-[var(--color-status-context)]"
+                >
+                  <Search size={22} strokeWidth={1.8} />
+                </div>
                 <p className="mt-1 mb-0 text-[var(--type-label)] font-semibold text-[var(--color-text-primary)]">
                   {copy.ui.noMatches}
                 </p>

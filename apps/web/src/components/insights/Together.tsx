@@ -21,6 +21,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { formatNumber } from '@currena/core';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { evaluateConnections } from '@currena/insights';
+import { ChevronDown } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { ConnectionCard } from './ConnectionCard';
@@ -114,7 +115,13 @@ export function Together({
           onClick={() => setOpen(!open)}
           className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[var(--type-caption)] font-bold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
         >
-          <span aria-hidden="true">{open ? '▾' : '▸'}</span>
+          <span aria-hidden="true">
+            <ChevronDown
+              size={15}
+              strokeWidth={2}
+              className={`shrink-0 transition-transform duration-200 motion-reduce:transition-none ${open ? '' : '-rotate-90 rtl:rotate-90'}`}
+            />
+          </span>
           {open ? copy.ui.showFewer : copy.ui.aboutShowDetails}
         </button>
       </header>

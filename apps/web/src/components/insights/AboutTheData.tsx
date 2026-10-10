@@ -21,6 +21,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 
 /** The FRED API terms-of-use URL (Block N1: link to the terms). */
@@ -69,7 +70,13 @@ export function AboutTheData({
           onClick={() => setOpen(!open)}
           className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1 rounded-lg px-1.5 py-1 text-[var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
         >
-          <span aria-hidden="true">{open ? '▾' : '▸'}</span>
+          <span aria-hidden="true">
+            <ChevronDown
+              size={14}
+              strokeWidth={2}
+              className={`shrink-0 transition-transform duration-200 motion-reduce:transition-none ${open ? '' : '-rotate-90 rtl:rotate-90'}`}
+            />
+          </span>
           {open ? copy.ui.aboutHideDetails : copy.ui.aboutShowDetails}
         </button>
       </div>

@@ -5,6 +5,52 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-10] — Insights imagery: lucide-react icon language (owner request)
+
+Fifteenth round — the owner asked for real iconography on the Insights
+page. **Lucide** (`lucide-react`, ISC licence — free for commercial use)
+chosen: it tree-shakes to per-icon ESM modules, and its 24-grid stroke
+style matches the page's existing hand-drawn AreaIcon/StatusChip language
+exactly (16px stroke icons, `currentColor`, aria-hidden).
+
+### Added
+
+- Ten named, tree-shaken lucide icons replace thirteen text glyphs:
+  `Wrench` (was 🛠 Tools button), `Search` (was 🔍, in the Tools search
+  field AND the no-matches empty state — now inside a soft circle),
+  `CalendarDays` (was 📅, both .ics buttons), `Download` (was ⬇ CSV),
+  `Coins` (new section mark on the prices strip), `Activity` (new section
+  mark on "What the signals say"), `ChevronDown` (was ▾/▸ on all three
+  disclosures — rotates -90°/90° when closed so it points along the
+  reading direction in BOTH LTR and RTL, with
+  `motion-reduce:transition-none`), `X` (was ✕ panel close), `Star` (was
+  ★/☆ watchlist pin — `fill-current` when pinned), `TriangleAlert` (was
+  ⚠️ in the error and from-cache banners).
+- The Money-panel rows keep their hand-drawn area icons and the ↗ ↧ ⓘ
+  glyphs stay as text: three candidate header marks (Money/Together/
+  About) were consciously SKIPPED so the icon set stays at ten and the
+  cost small — Money rows already carry icons; Together and About are
+  quiet collapsed sections (R25/R7b).
+
+### Changed
+
+- Bundle budget: Insights lazy chunk 300/78 → **302/78** raw kB
+  (293.77/74.81 → 300.54/77.51 measured; +6.7 kB raw / +2.7 kB gz for
+  the ten icons, itemised in `scripts/check-bundle-budget.mjs`). The
+  ENTRY chunk is untouched (290.32/87.05 vs 296/89.5) — every icon lives
+  in the lazy Insights route.
+
+### Verification
+
+- typecheck 5/5; tests 784/784; budget green at the documented numbers.
+- Browser QA (local Worker seeded from the production snapshot + vite
+  dev): en/1280 light — 7 lucide SVGs in the default view, zero emoji
+  glyphs left, Tools menu icons verified visually; signals disclosure
+  chevron measured `rotate: -90deg` closed → `none` open, card opens;
+  fa/375 RTL + dark — chevron measured `rotate: 90deg` when closed
+  (points along RTL reading order), Activity mark geometrically at the
+  RTL start of the title, no horizontal overflow, zero console errors.
+
 ## [2026-10-10] — Insights: remove the "Before you act" box (owner request)
 
 Fourteenth round — a direct owner request to drop the "Before you act"

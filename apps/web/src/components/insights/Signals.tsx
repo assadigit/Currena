@@ -21,6 +21,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { evaluateSignal, type SignalConditionReading, type SignalLean, type SignalReading } from '@currena/insights';
+import { Activity, ChevronDown } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { SIGNALS_ENABLED, formatChange, formatIndicatorValue, mergeSignals } from './config';
@@ -474,7 +475,10 @@ export function Signals({
     <section id="insights-signals" aria-labelledby="insights-signals-title" className="scroll-mt-24">
       <header className="mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 id="insights-signals-title" className="m-0 text-lg font-extrabold">
-          {copy.signals.title}
+          <span className="inline-flex items-center gap-1.5">
+            <Activity aria-hidden size={19} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
+            {copy.signals.title}
+          </span>
         </h2>
         <span className="inline-flex flex-wrap items-center gap-2">
           <button
@@ -484,7 +488,13 @@ export function Signals({
             onClick={() => setOpen(!open)}
             className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[var(--type-caption)] font-bold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
           >
-            <span aria-hidden="true">{open ? '▾' : '▸'}</span>
+            <span aria-hidden="true">
+              <ChevronDown
+                size={15}
+                strokeWidth={2}
+                className={`shrink-0 transition-transform duration-200 motion-reduce:transition-none ${open ? '' : '-rotate-90 rtl:rotate-90'}`}
+              />
+            </span>
             {open ? copy.ui.showFewer : copy.ui.aboutShowDetails}
           </button>
         </span>
