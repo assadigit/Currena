@@ -5,6 +5,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-10] — I19 the staleness false-alarm fix: govt-interest-revenue's BEA release lag
+
+Twelfth round — the scheduled post-I18 verification pass (per
+NEXT_SESSION_PROMPT §4) found the live snapshot carrying **one stale
+reading**: `govt-interest-revenue` (US federal interest paid ÷ receipts),
+`asOf 2026-04-01`, aged 192 days — one day past the 190-day quarterly
+grace (`GRACE_DAYS.quarterly`).
+
+Verification showed the data is NOT late: FRED itself still lists the
+**2026-04-01 (Q2) observation as the latest that exists** for both
+`A091RC1Q027SBEA` and `W006RC1Q027SBEA` — BEA publishes the Q2 obs with
+the advance estimate (~Jul 30) and it stays latest until the Q3 advance
+(~Oct 29-30) adds the Jul-1 obs. The 190-day quarterly grace assumed
+quarter data arrives faster than BEA's release calendar actually delivers,
+so every October this series would honestly-but-falsely read `stale` —
+the same obs-date-vs-release-date reality the I15 wave fixed for the ABS
+quarter-start items (215d) and Brent (12d).
+
+### Fixed
+
+- **`packages/insights/src/definitions.ts`** — `govt-interest-revenue`
+  gets `staleAfterDays: 215` (BEA NIPA obs date from Q-01; ages up to
+  ~212d between advances; 215 mirrors the ABS quarter-start discipline).
+  The reading returns to `normal` (the value and 10-year percentile are
+  unchanged) once a re-ingest recomputes the snapshot.
+- **`packages/insights/src/definitions.test.ts`** — the I15
+  freshness-overrides test asserts the new override verbatim alongside
+  the other obs-date-reality adjustments.
+
+### Verified
+
+- Gates at HEAD: typecheck 5/5, tests **747/747** (core 183 · scraper 67 ·
+  insights 193 · api 119 · web 185 — the new assertion lives inside the
+  existing I15 overrides test).
+- Web build + budget: entry 290.12/86.99 vs 296/89.5; Insights chunk
+  270.02/69.50 vs 280/72 — held without a bump.
+- Production health + 41 readings before the fix; scheduled ingest runs
+  green (run 7 Oct-8, run 12 Oct-9; the failed run 11 dispatch was the
+  known KV daily-write-cap 429/10048 — auto-recovered, no data impact);
+  daily accrual points present for Oct-8 AND Oct-9 (btc bootstrapped 2
+  points, copper/gold/silver carrying their monthly base + daily rows) —
+  the 2026-10-15 seven-day-change milestone stays on track.
+
 ## [2026-10-08] — I18 the mobile answer-line fix: 375px horizontal scroll removed
 
 Eleventh round — a wrap-up audit of the live I17 deploy caught one real

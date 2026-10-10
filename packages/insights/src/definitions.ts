@@ -121,6 +121,13 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'pct',
     phase: 'P2',
     rule: { kind: 'percentile', tail: 'high', cutoff: 0.2 },
+    // I19: BEA NIPA obs date from Q-01 and the obs first appears with the
+    // advance estimate ~30d after quarter end, staying latest until the
+    // next advance — ages up to ~212d between releases (the latent Oct
+    // window the 190d quarterly grace false-alarms in: verified live
+    // 2026-10-10, obs 2026-04-01 at 192d while FRED confirmed it is the
+    // freshest data that exists). 215 covers it — same ABS discipline.
+    staleAfterDays: 215,
   },
   /* ---------------- Global — Are prices heating up? ---------------- */
   {

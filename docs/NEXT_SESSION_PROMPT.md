@@ -1,12 +1,9 @@
-# Currena — Next Session Brief (post-I18 wrap-up)
+# Currena — Next Session Brief (post-I19)
 
-Hand-off date: 2026-10-08 (the I18 wrap-up audit fix — the 375px
-horizontal-scroll bleed removed from the Insights answer lines). ·
-Production: https://currena.ir · Repo: `origin/main` = `eb59365` (I18).
-The Worker version of record is **I18's `e4c8cdb6`** (docs/DEPLOY.md
-§I18 has the session record + the ingest smoke run). The 2026-10-08
-owner specs are fully shipped: v1 = I15, integrity = I16, v2 = I17,
-the audit fix = I18 — nothing remains.
+Hand-off date: 2026-10-10 (the I19 staleness false-alarm fix —
+`govt-interest-revenue` gets its BEA release-lag `staleAfterDays: 215`).
+· Production: https://currena.ir · Repo: `origin/main` = I19's commit (see
+docs/DEPLOY.md §I19 for the session record + Workers version).
 
 ---
 
@@ -17,22 +14,19 @@ the audit fix = I18 — nothing remains.
 Insights feature (`#/insights`) is the I17 page: question gauges, a
 prices board (oil, gold, silver, copper, iron ore, Bitcoin), two verdict
 meters in the hero, alert cards + compact rows in Global|Australia lanes,
-a details side panel / bottom sheet — and since I17 the **v2 surface**:
-the "Together" connection cards (six relationships with leg leans and a
+a details side panel / bottom sheet — and the **v2 surface**: the
+"Together" connection cards (six relationships with leg leans and a
 polarity-aware state rule) and the "What the signals say" cards for gold
-+ silver (five/six conditions, the lean, the three plain checks, the
-always-visible "before you act" box). 41 indicators (29 voting gauge
-members + prices-board rows + context). `SIGNALS_ENABLED` in
-`apps/web/src/components/insights/config.ts` is the spec's feature flag —
-shipped **true** with the owner's full approval; one flip to false hides
-the section.
++ silver. 41 indicators (29 voting gauge members + prices-board rows +
+context). `SIGNALS_ENABLED` in `apps/web/src/components/insights/config.ts`
+is the spec's feature flag — shipped **true** with the owner's full
+approval; one flip to false hides the section.
 
 - `apps/api` — Hono on **Cloudflare Workers** (`/api/*`, zero-JS `/admin`,
   serves the built SPA). Cron `* * * * *` keep-warms rates.
 - `apps/web` — Vite + React + TS + Tailwind **PWA** (hash router, 10
   routes, en/fa RTL). The Insights lazy chunk carries the bilingual
-  corpus (270 kB / 69.5 kB gz vs the 280/72 budget — the I17 bump is
-  itemised in `scripts/check-bundle-budget.mjs`).
+  corpus (270 kB / 69.5 kB gz vs the 280/72 budget).
 - `packages/core` — zod contracts (incl. `IndicatorId` ×41).
   `packages/insights` — scoring engine + `gauges.ts` + `basket.ts` +
   `connections.ts` + `signals.ts` + source adapters + derived series.
@@ -48,47 +42,50 @@ sites, secrets never persisted.
 
 ## 2. Where the knowledge lives
 
-- `CHANGELOG.md` — §2026-10-08 I17 (the v2 wave) + §I16 (the fix round) +
-  §I15 (the owner-spec v1 wave).
+- `CHANGELOG.md` — §2026-10-10 I19 (the staleness false-alarm fix) +
+  §I18 (the 375px audit fix) + §I17 (the v2 wave) + §I16 + §I15.
 - `docs/insights/` — `02-page-design-spec.md` + the uploaded 2026-10-08
-  owner specs (the repo copy + `upload/` in the sandbox);
-  `BACKTEST.md` regenerated 2026-10-08.
+  owner specs; `BACKTEST.md` regenerated 2026-10-08.
 - `docs/PROGRESS.md` (status row + decisions), `docs/DEPLOY.md` (every
-  deploy + the ingest-then-deploy ORDER note + the I17 record),
-  `docs/BACKLOG.md` (Waves 6–10 closed; NOTHING from the 2026-10-08
-  owner specs remains).
+  deploy + the ingest-then-deploy ORDER note), `docs/BACKLOG.md`
+  (Waves 6–12 closed; NOTHING from the 2026-10-08 owner specs remains).
 
-## 3. Current verified state (I18)
+## 3. Current verified state (I19)
 
 - Gates: typecheck 5/5, tests **747/747** green (core 183 · scraper 67 ·
   insights 193 · api 119 · web 185). Budgets held (entry 290.12/86.99 vs
-  296/89.5; Insights 270.00/69.49 vs 280/72).
-- Production verified this round: health ok; `/api/insights` 41 readings,
-  zero stale/unavailable; the dispatched ingest run `37775748411` green;
-  the v2 sections live on https://currena.ir (states disagree · disagree
-  · active · active · partly · disagree; gold 2/5 mixed, silver 3/6
-  mixed) in en + fa, zero console errors, no buy/sell wording, no
-  overflow at 1280/375.
-- Honest accrual timeline: btc/copper 7-day changes measurable from
-  **2026-10-15**, 30d from **2026-11-07** (one accumulated point per day;
-  gold/silver same dates).
+  296/89.5; Insights 270.02/69.50 vs 280/72).
+- Scheduled ingest runs green (run 7 Oct-8, run 12 Oct-9); the failed
+  run-11 dispatch was the known KV daily-write cap (429/10048) —
+  auto-recovers at 00:00 UTC, no data impact.
+- Daily accrual verified: Oct-8 AND Oct-9 points present for
+  btc/copper/gold/silver (btc bootstrapped 2 points; the others carry the
+  World Bank monthly base + daily rows).
+- `govt-interest-revenue` false staleness: the 190d quarterly grace
+  tripped while FRED confirmed the Q2 obs (2026-04-01) is the freshest
+  that exists — I19 gives the series `staleAfterDays: 215` (same ABS
+  quarter-start discipline). After the I19 ingest+deploy the reading
+  returns to `normal`; the value/percentile were never wrong.
 
 ## 4. This session's likely mission
 
-The 2026-10-08 owner specs are FULLY implemented (v1 as I15, the fixes
-as I16, v2 as I17, the wrap-up audit fix as I18). Before anything:
-
 1. **Check the daily ingest run is green** and `/api/insights` carries
-   the 41 readings (the scheduled runs fire ~11 UTC — DEPLOY.md §I16).
+   the 41 readings with **zero stale** (I19's override holds; the
+   `govt-interest-revenue` reading must be `normal` until the Q3 advance
+   lands ~Oct 29-30, then `asOf` jumps to 2026-07-01).
 2. **Accrual check (from 2026-10-15):** btc/copper/gold/silver 7-day
    changes should appear; the gold/silver *footing* condition then
    switches from the position fallback to the real 30-day speed.
-3. Owner-side standing items (none of them block the site): Telegram
+3. Watch the I19+1 scheduled runs: if the KV daily-write cap ever bites a
+   *scheduled* run (it has only hit same-day manual dispatches so far),
+   the run retries nothing — investigate the write budget (the Worker's
+   minute-cron owns ~400 writes/day on the free tier).
+4. Owner-side standing items (none of them block the site): Telegram
    ingest-alert secrets, the I7 launch-approval exit gate (BACKTEST.md
    is the evidence), the S3-note legal read of the signals wording, the
    per-connection evidence confirmations (tags stay "to verify"),
-   **token rotation** (GitHub + Cloudflare — both transited chat).
-4. If the owner wants the signals section hidden at any point: set
+   **token rotation** (GitHub + Cloudflare — both transited chat again).
+5. If the owner wants the signals section hidden at any point: set
    `SIGNALS_ENABLED = false` in `apps/web/src/components/insights/
    config.ts`, build, deploy. No other change needed.
 
@@ -105,13 +102,19 @@ as I16, v2 as I17, the wrap-up audit fix as I18). Before anything:
    pnpm --filter @currena/api exec wrangler deploy` — and for
    indicator-set/snapshot-format changes, DISPATCH THE INGEST FIRST so
    the KV snapshot is the new format before the Worker's read-side
-   validation sees it. Web-only changes (like I17) deploy directly.
+   validation sees it. Web-only changes deploy directly.
 5. Wrap-up: changelog, final commit+push, deploy from final HEAD when
    the Worker changed, production smoke, worklog entry, remind the
    owner to rotate tokens.
 
-## 6. Gotchas learned the hard way (I17 additions)
+## 6. Gotchas learned the hard way (I19 additions)
 
+- Quarterly staleness is calibrated per SOURCE, not per cadence: BEA
+  NIPA and ABS quarter-start items need 215 (obs ages ~209–212d between
+  releases); the 190d quarterly grace is only honest for series whose
+  next obs arrives earlier (RBA E2 ~161d). When adding a quarterly
+  indicator, derive its limit from the release calendar, never the
+  cadence alone.
 - Connection polarity matters: an INVERSE relation (real-yield/gold,
   dollar/commodities) reads `active` when legs lean AGAINST each other —
   the uniform state rule compares polarity-adjusted leans, never the raw
@@ -120,8 +123,7 @@ as I16, v2 as I17, the wrap-up audit fix as I18). Before anything:
 - A steady direction at a decade-extreme level still LEANS (flat-at-
   extreme ≠ neutral); pure neutrality needs steady AND mid-range.
 - Monthly/quarterly legs carry no change30d — their lean comes from the
-  F3 level bands (gold's own 30d speed accrues from 2026-10-15; until
-  then the footing condition uses the honest position fallback).
+  F3 level bands (gold's own 30d speed accrues from 2026-10-15).
 - Bilingual template assembly: telegraphic leg phrases
   ("{name}: {level} and {direction}") avoid verb agreement entirely;
   never re-introduce "is/are" phrasing across locales.

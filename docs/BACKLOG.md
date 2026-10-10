@@ -5,6 +5,21 @@ Priority: **Must** (data loss, security, correctness) · **Should** (robustness,
 
 Status legend: ☐ todo · 🔄 in progress · ✅ done (this session) · ⏸ escalated/deferred (see notes)
 
+## Wave 12 — I19 the staleness false-alarm fix (2026-10-10, sixth round)
+
+The scheduled post-I18 verification pass (NEXT_SESSION_PROMPT §4) found the
+live snapshot carrying one stale reading — `govt-interest-revenue`, aged
+192d, one day past the 190d quarterly grace. FRED confirmed the Q2 obs
+(2026-04-01) is the freshest that exists (BEA's Q3 advance lands ~Oct 29-30),
+so this is the obs-date-vs-release-date gap, not a data failure — the same
+latent-October-window pattern the I15 wave closed for the ABS quarter-start
+items. Tests stayed 747/747 (one assertion added to the existing I15
+overrides test); budgets held without a bump.
+
+| # | Status | Tag | Item | Origin |
+|---|--------|-----|------|--------|
+| 64 | ✅ | RELIABILITY | `govt-interest-revenue` gets `staleAfterDays: 215` (BEA NIPA obs date from Q-01, first release ~30d after quarter end, stays latest until the next advance — ages up to ~212d between releases; 215 mirrors the ABS discipline). Every October it would otherwise read honestly-but-falsely stale from ~Oct 8 until the Q3 advance lands | Post-I18 verification pass |
+
 ## Wave 11 — I18 the wrap-up audit fix (2026-10-08, fifth round)
 
 A full wrap-up audit of the live I17 deploy (remote state, Worker

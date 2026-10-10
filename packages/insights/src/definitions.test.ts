@@ -119,6 +119,10 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expectStale('au-trimmed-mean', 215);
     expectStale('terms-of-trade', 215);
     expectStale('au-home-values', 215);
+    // I19: the BEA NIPA ratio shares the quarter-start dating — 215, not the
+    // 190d quarterly grace (which false-alarmed Oct 8–30 in the live I18
+    // snapshot while FRED confirmed the Q2 obs was the freshest that exists).
+    expectStale('govt-interest-revenue', 215);
   });
 
   it('key thresholds are spec-verbatim (backtest may propose changes, never silently)', () => {
