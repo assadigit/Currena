@@ -1320,19 +1320,12 @@ html[dir='rtl'] .insights-panel {
   z-index: 45;
 }
 
-/* Prices board rows (PB1): scannable table-ish rows, comfortable rhythm. */
-.price-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: var(--space-3);
-  row-gap: 2px;
-  padding: var(--space-3) var(--space-4);
-  border-block-end: 1px solid var(--color-border);
-}
-.price-row:last-child {
-  border-block-end: 0;
-}
+/* Prices board (PB1 → R30): the old table-row rules are retired — the
+ * tiles are now ring-bordered CARDS whose padding/border come from their
+ * own utilities (p-4 + ring-1). Keeping these unlayered rules would
+ * silently override that (12px vertical padding + a stray bottom border
+ * inside every card). The .price-row class name stays on the tile as a
+ * stable test/DOM hook only. */
 
 /* Together connection cards (T1, I17): the relation arrow between leg
  * chips points along the reading flow — in fa the flow mirrors, so the

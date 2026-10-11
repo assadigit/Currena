@@ -5,6 +5,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — Prices tiles: one box size (owner follow-up)
+
+Eighteenth round — the owner's screenshot of the new prices board showed
+the four tiles with ragged bottoms (Silver 24px shorter than Gold) and
+asked for "containers same width and height".
+
+### Fixed
+
+- **Equal-width, equal-height tiles:** the grid carried `items-start`
+  (a left-over of the R10 row design where an open row must not stretch
+  its neighbours), so every tile shrank to its own content height.
+  Removed — grid stretch plus `h-full` on the tile and its button now
+  gives the four containers identical boxes (the button still covers the
+  whole tile for the click-to-details affordance). Widths were already
+  equal (measured 264.5px ×4 at 1280) — the ragged BOTTOMS were the
+  defect.
+- **Retired the PB1 table-row CSS:** `.price-row` was the OLD anatomy
+  (flex row, 12/16px padding, bottom divider). The R30 rewrite turned the
+  class into a card hook but the unlayered rules kept WINNING over the
+  card utilities — measured on production: `padding: 12px 16px`
+  overriding `p-4`, plus a stray 1px bottom border inside every tile.
+  Rules deleted; the class name stays as a stable DOM/test hook.
+
 ## [2026-10-11] — Insights roast fixes: colour roles, hero generator, card grid, copy (R30)
 
 Seventeenth round — a third-party roast of the 11 Oct build (English,

@@ -125,9 +125,11 @@ export function PricesBoard({
       <p className="m-0 mb-2 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">
         {copy.ui.pricesSubtitle}
       </p>
-      {/* R10: four tiles, one grid, ONE anatomy (R30). items-start so no
-       * open item stretches its neighbours. */}
-      <div className="grid grid-cols-1 items-start gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
+      {/* R10: four tiles, one grid, ONE anatomy (R30). Default stretch so
+       * the four containers are the SAME width and height — the owner's
+       * 11 Oct follow-up: ragged tile bottoms read as a layout bug.
+       * h-full on the tile + button keeps the whole box clickable. */}
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
         {rows.map(({ id, reading }) => {
           const def = definitionFor(id);
           const entry = copy.indicators[id];
@@ -178,14 +180,14 @@ export function PricesBoard({
             <article
               key={id}
               id={`insights-card-${id}`}
-              className={`price-row scroll-mt-24 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)] ${isStale ? 'opacity-80' : ''}`}
+              className={`price-row scroll-mt-24 h-full rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)] ${isStale ? 'opacity-80' : ''}`}
               data-status={reading.status}
             >
               <button
                 type="button"
                 onClick={(e) => onFocusCard(id, e.currentTarget)}
                 aria-expanded={false}
-                className="insights-focusable block w-full cursor-pointer border-0 bg-transparent p-0 text-start"
+                className="insights-focusable block h-full w-full cursor-pointer border-0 bg-transparent p-0 text-start"
               >
                 <span className="flex w-full flex-col items-start gap-1">
                   {/* Plain name — no tickers, no series ids (R14). */}
