@@ -183,17 +183,25 @@ export function VerdictBlock({
         <VerdictMeter step={step} label={verdictLabel} ariaLabel={ariaLabel} size="lg" />
       </p>
 
-      {/* R2 → R30 → round 24 (roast): the gauges as ONE LINE PER GAUGE —
-       * short name, its own mini meter, its step word — but ONLY the
-       * non-calm ones (the roast: the hero repeated itself; calm rows
-       * duplicated what the meter and the sentence already say). Unreadable
-       * rows (step 0) stay: they are the honest "cannot read" signal. */}
+      {/* R2 → R30 → round 24 (roast) → round 36 (owner): the gauges as ONE
+       * LINE PER GAUGE — short name, its own mini meter, its step word —
+       * but ONLY the non-calm ones (the roast: the hero repeated itself;
+       * calm rows duplicated what the meter and the sentence already say).
+       * Unreadable rows (step 0) stay: they are the honest "cannot read"
+       * signal. Round 36 (owner): "align this 6 boxes — too visual noise"
+       * → every row is EXACTLY ONE LINE HIGH: the name owns the flex room
+       * and truncates with its full text on hover (the old wrap made
+       * "Borrowing costs" rows 42px while single-line neighbours sat at
+       * 21px — the six boxes zig-zagged). And the small meters + their
+       * words are NOT colour-coded any more (see the sm CSS + the word's
+       * normal ink): the colour rainbow on six small rows was the noise;
+       * the colour coding stays on the hero's BIG meter and word only. */}
       {(() => {
         const shownGauges = gaugeRows.filter((g) => g.step !== 1);
         if (shownGauges.length === 0) return null;
         return (
           <ul
-            className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-1 p-0 sm:grid-cols-2"
+            className="m-0 grid list-none grid-cols-1 gap-x-5 gap-y-1 p-0 sm:grid-cols-2"
             aria-label={copy.ui.heroGaugesLabel}
           >
             {shownGauges.map((g) => {
@@ -207,23 +215,34 @@ export function VerdictBlock({
                       : g.step === 3
                         ? copy.label.stressed
                         : copy.label.alarmed;
+              const gaugeName = copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge];
               return (
-                <li key={g.gauge} className="flex items-center justify-between gap-2 text-[length:var(--type-label)]">
-                  <span className="min-w-0 font-semibold text-[var(--color-text-primary)]">
-                    {copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge]}
+                <li key={g.gauge} className="flex items-center gap-1.5 text-[length:var(--type-label)]">
+                  {/* Round 36: the name owns the row's free width and NEVER
+                   * wraps (truncate) — every box is one line high, so the
+                   * meters and words sit on the same baselines across all
+                   * six boxes BY STRUCTURE (the alignment decree). The full
+                   * name stays on hover (title) and in the meter's aria. */}
+                  <span
+                    title={gaugeName}
+                    className="min-w-0 flex-1 truncate font-semibold text-[var(--color-text-primary)]"
+                  >
+                    {gaugeName}
                   </span>
-                  <span className="flex shrink-0 items-center gap-2">
+                  <span className="flex shrink-0 items-center gap-1.5">
                     <VerdictMeter
                       step={g.step}
                       label={gWord}
                       ariaLabel={interpolate(copy.ui.gaugeStepAria, {
-                        question: copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge],
+                        question: gaugeName,
                         label: gWord,
                         step: num(g.step, numberLocale),
                       })}
                       size="sm"
                     />
-                    <span className={`w-16 text-end font-semibold ${stepToneClass(g.step)}`}>{gWord}</span>
+                    {/* Round 36: normal ink, not the step's status colour —
+                     * the word still names the step (never colour alone). */}
+                    <span className="w-16 shrink-0 text-end font-semibold text-[var(--color-text-secondary)]">{gWord}</span>
                   </span>
                 </li>
               );

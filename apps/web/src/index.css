@@ -1247,6 +1247,17 @@ html:not(:lang(fa)) .type-kicker {
 .verdict-meter-lg .verdict-meter-seg { height: 12px; border-radius: 4px; }
 .verdict-meter-sm { width: 52px; }
 .verdict-meter-sm .verdict-meter-seg { height: 6px; }
+/* Round 36 (owner): "for the smaller grades … use normal color not color
+ * coding" — the six small per-gauge meters lose the status rainbow: a
+ * filled step is ONE normal ink (same as the step word's normal ink),
+ * an unfilled step stays the border grey. The colour coding lives on
+ * the hero's BIG meter only. */
+.verdict-meter-sm .verdict-meter-seg.on-1,
+.verdict-meter-sm .verdict-meter-seg.on-2,
+.verdict-meter-sm .verdict-meter-seg.on-3,
+.verdict-meter-sm .verdict-meter-seg.on-4 {
+  background: var(--color-text-secondary);
+}
 @media (prefers-reduced-motion: reduce) {
   .verdict-meter-seg { transition: none; }
 }

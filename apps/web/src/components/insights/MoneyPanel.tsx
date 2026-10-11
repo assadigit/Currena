@@ -169,6 +169,17 @@ export function MoneyPanel({
 }) {
   const rows = moneyPanel(readings);
   const byId = new Map(readings.map((r) => [r.id as string, r]));
+  /* Round 36 (owner): each supporting number shows ONCE across the panel.
+   * The owner's question — "why do both boxes show «قیمت‌های استرالیا
+   * نسبت به سال قبل», is this correct?" — the answer: savings AND shop
+   * both legitimately read Australia CPI (config MONEY_AREAS lists it for
+   * both), so when CPI leaves its usual range BOTH rows pick it as their
+   * first driver. Correct per the data, but the same chip twice read as
+   * duplication. The fix is display-level: the later row falls through to
+   * its NEXT driver (shop → underlying inflation). If every chip was
+   * already shown, the row re-shows its own — a row never loses its
+   * number or its chart. */
+  const shownChipIds = new Set<string>();
 
   return (
     /* Round 29 (owner): "what it means for my money … this is one of the
@@ -210,6 +221,13 @@ export function MoneyPanel({
             const directionWord =
               direction === 'up' ? words.up : direction === 'down' ? words.down : words.flat;
             const directionTone = moneyDirectionToneClass(area, direction);
+            // Round 36 (owner): dedupe across rows (see the shownChipIds
+            // note above) — the row's lines ride its first NOT-yet-shown
+            // chip, and the chart follows the SAME number (picture and
+            // number can never disagree).
+            const freshChips = chipIds.filter((id) => !shownChipIds.has(id));
+            const lineChips = freshChips.length > 0 ? freshChips : chipIds;
+            lineChips.forEach((id) => shownChipIds.add(id));
             return (
               /* Round 35 (owner): "graphs too big — must only contain 50%
                * of the card width, 50% other data and context" → the row
@@ -232,7 +250,7 @@ export function MoneyPanel({
                 }`}
               >
                 {/* The DATA half — 50%: icon + name/direction on the first
-                 * line, the sentence and the chips stacked under them.
+                 * line, then the ROUND-36 VALUE LINES, then the sentence.
                  * Owner follow-up (11 Oct): the icon is a VISIBLE
                  * instrument, not a 16px squiggle — round 29 (owner): the
                  * box grows to 64px on mobile / 96px on desktop with the
@@ -270,12 +288,21 @@ export function MoneyPanel({
                       </span>
                     </span>
                   </div>
-                  <span className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-                    {sentence}
-                  </span>
-                  {chipIds.length > 0 ? (
-                    <span className="flex shrink-0 flex-wrap gap-1.5">
-                      {chipIds.map((id) => {
+                  {/* Round 36 (owner): the supporting numbers move UP (above
+                   * the sentence) and OUT of the pill chip into plain text —
+                   * "first write the percent in bigger and bolder text, then
+                   * write the explanation of it smaller with regular text,
+                   * delete the chip like alternative". The VALUE speaks in
+                   * the page's number role (type-number: 23px / 800 weight /
+                   * tabular — the same role as the attention tiles' numbers,
+                   * "800 stays with NUMBERS"); the indicator name sits
+                   * smaller (label size) at REGULAR weight. Value FIRST in
+                   * the DOM → rightmost in fa (the owner's mockup), leftmost
+                   * in en. The line still opens the indicator's card — the
+                   * pill's one job survives, its look is gone. */}
+                  {lineChips.length > 0 ? (
+                    <span className="flex flex-col items-start gap-1">
+                      {lineChips.map((id) => {
                         const r = byId.get(id);
                         const valueText =
                           r && r.value !== null ? formatIndicatorValue(id, r.value, numberLocale, copy.units) : null;
@@ -284,32 +311,36 @@ export function MoneyPanel({
                             key={id}
                             type="button"
                             onClick={(e) => onFocusCard(id, e.currentTarget)}
-                            className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center gap-1.5 rounded-full bg-currena-soft/80 px-2.5 py-0.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)] transition-colors hover:bg-currena-blue/15 dark:bg-white/[0.06]"
+                            className="insights-focusable inline-flex min-h-[24px] cursor-pointer flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-sm border-0 bg-transparent p-0 text-start underline-offset-4 transition-colors hover:underline"
                           >
-                            {copy.indicators[id].name}
                             {valueText !== null ? (
-                              <bdi className="font-bold tabular-nums text-[var(--color-text-secondary)]">
-                                {valueText}
-                              </bdi>
+                              <bdi className="type-number whitespace-nowrap text-[var(--color-text-primary)]">{valueText}</bdi>
                             ) : null}
+                            <span className="text-[length:var(--type-label)] font-normal text-[var(--color-text-secondary)]">
+                              {copy.indicators[id].name}
+                            </span>
                           </button>
                         );
                       })}
                     </span>
                   ) : null}
+                  <span className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+                    {sentence}
+                  </span>
                 </div>
                 {/* The CHART half — the other 50%: the row's mini chart on
-                 * the grid's second column, vertically centred like the
-                 * metals' chart columns, separated by a vertical hairline
-                 * (border-s faces the data half in BOTH directions).
-                 * Mobile keeps the old stacked order: hairline above,
-                 * full width under the data. */}
-                {chipIds.length > 0 ? (
+                 * the grid's second column, riding the row's first SHOWN
+                 * number (round 36 — the same indicator the value lines
+                 * display), vertically centred like the metals' chart
+                 * columns, separated by a vertical hairline (border-s faces
+                 * the data half in BOTH directions). Mobile keeps the old
+                 * stacked order: hairline above, full width under the data. */}
+                {lineChips.length > 0 ? (
                   <div
                     data-money-chart={area}
                     className="flex min-w-0 flex-col justify-center border-t border-[var(--color-border)] pt-2.5 sm:border-s sm:border-t-0 sm:ps-4 sm:pt-0"
                   >
-                    <MoneyTrend id={chipIds[0]!} copy={copy} numberLocale={numberLocale} />
+                    <MoneyTrend id={lineChips[0]!} copy={copy} numberLocale={numberLocale} />
                   </div>
                 ) : null}
               </li>

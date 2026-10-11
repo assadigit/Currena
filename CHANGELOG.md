@@ -5,6 +5,59 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — The numbers lose the pill; the small grades lose the rainbow (owner round 36)
+
+Thirty-sixth round — three owner points with screenshots: the money rows'
+supporting chips should move and change shape ("first write the percent in
+bigger and bolder text, then write the explanation of it smaller with
+regular text … delete the chip like alternative"); "find it why those both
+boxes show «قیمت‌های استرالیا نسبت به سال قبل» — is this correct?"; and
+the hero's small grade meters: "Align this 6 boxes. also it's too visual
+noise … use normal color not color coding."
+
+### Changed
+
+- **The money rows' numbers are plain text, not pills** — the supporting
+  chip row is gone from the bottom of the data half. Each supporting
+  number now sits BETWEEN the name/direction line and the sentence,
+  spoken the owner's way: the VALUE in the page's number role
+  (`type-number` — 23px / 800 / tabular, the same role as the attention
+  tiles' numbers) and the indicator name after it smaller (label size)
+  at REGULAR weight. Value first in the DOM → rightmost in fa (the
+  owner's mockup), leftmost in en. The line still opens the indicator's
+  card — the pill's one job survives, its look is gone. The value never
+  breaks mid-text (`whitespace-nowrap`); on phones a long name wraps
+  below the value instead.
+- **Each supporting number shows ONCE** — the owner's duplication
+  question, answered: savings AND shop both legitimately read Australia
+  CPI (config lists it for both), so when CPI left its usual range BOTH
+  rows picked it as their first driver — correct per the data, but the
+  same «قیمت‌های استرالیا نسبت به سال قبل» twice read as duplication.
+  Display-level dedupe: the later row falls through to its NEXT driver
+  (shop → underlying inflation, «تورم زیرین ۳٫۶٪»), and the row's chart
+  follows the number it actually shows (shop's mini chart is now the
+  trimmed-mean series — arguably the better chart for shop prices
+  anyway). If every chip was already shown, a row re-shows its own — a
+  row never loses its number or its chart.
+- **The hero's grade boxes align BY STRUCTURE** — the wrap is gone: the
+  gauge name owns the row's free width and truncates with the full text
+  on hover (title) and in the meter's aria (the old wrap made
+  "Borrowing costs" rows 42px while single-line neighbours sat at 21px —
+  the boxes zig-zagged). Every row is exactly one line high; tightened
+  the column/element gaps (gap-x-5, gap-1.5) so even the longest short
+  names ("Borrowing costs", "Inflation & rates") fit without
+  truncating at card width.
+- **The small grade meters are NOT colour-coded** — "use normal color
+  not color coding": the six small meters' filled segments render in one
+  normal ink (text-secondary) in light and dark, and the step words sit
+  in the same normal ink instead of the status palette. The colour
+  coding stays where it belongs — the hero's BIG meter and verdict word.
+
+### Housekeeping
+
+- No bundle movement that matters: Insights 331.50/85.14 vs budgets
+  334.00/86.00; entry untouched 290.33/87.06.
+
 ## [2026-10-11] — The money rows' mini graphs shrink to half the card (owner round 35)
 
 Thirty-fifth round — one owner point on the round-34 money charts, with a
