@@ -124,9 +124,10 @@ export function AlertCard({
             <span className="flex items-center gap-1.5 text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-primary)]">
               {/* Round 28 (owner): the indicator wears its own artwork when
                * one exists (oil barrel, gold bar, bills, housing, the US
-               * 10Y…). Decorative — the name carries the meaning. */}
+               * 10Y…). Decorative — the name carries the meaning. Round 29
+               * (owner): 26/34px — the artwork reads at the title's scale. */}
               {indicatorIconUrl(reading.id) !== null ? (
-                <IconImg src={indicatorIconUrl(reading.id)!} size={20} />
+                <IconImg src={indicatorIconUrl(reading.id)!} size={26} desktopSize={34} />
               ) : null}
               {entry.name}
             </span>

@@ -174,7 +174,9 @@ export function DetailsPanel({
               tabIndex={-1}
               className="type-section m-0 flex items-center gap-2 leading-snug text-[var(--color-text-primary)] outline-none"
             >
-              {indicatorIconUrl(reading.id) !== null ? <IconImg src={indicatorIconUrl(reading.id)!} size={24} /> : null}
+              {/* Round 29 (owner): the panel's subject mark grows to 32/44px
+               * — it identifies the card at a glance and deserves real size. */}
+              {indicatorIconUrl(reading.id) !== null ? <IconImg src={indicatorIconUrl(reading.id)!} size={32} desktopSize={44} /> : null}
               <span>
                 {entry.name}
               {entry.ticker ? (

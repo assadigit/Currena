@@ -19,6 +19,7 @@
  * round-25 block comment in config.ts.
  */
 
+import type { CSSProperties } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
@@ -32,21 +33,29 @@ import {
   type MoneyDirection,
 } from './config';
 
-/** The area icons — rendered INSIDE a 64×64 tinted box (owner follow-up
- * 11 Oct: "increase the icon size, something visible like 64×64").
- * Round 28 (owner): the stroke pictograms give way to the owner's own
- * artwork wherever one exists — fuel nozzle, bills, housing, the rising
- * exchange chart, the globe. "Jobs" has no artwork yet and keeps its
- * stroke briefcase. The box stays the neutral context tint — the icons
- * are NOT colour-coded (red belongs to the needs-attention word). */
+/** The area icons — rendered INSIDE a large tinted box. Owner follow-up
+ * 11 Oct: "increase the icon size, something visible like 64×64" → round
+ * 29 (owner): "the icons are too small — a few times larger on desktop,
+ * relatively larger on mobile." The box is now 64px on mobile and 96px
+ * on ≥640px screens (the artwork inside 52px → 80px — twice the old
+ * desktop size; this is the panel the owner calls the app's most
+ * important). Round 28 (owner): the stroke pictograms give way to the
+ * owner's own artwork wherever one exists — fuel nozzle, bills, housing,
+ * the rising exchange chart, the globe. "Jobs" has no artwork yet and
+ * keeps its stroke briefcase. The box stays the neutral context tint —
+ * the icons are NOT colour-coded (red belongs to the needs-attention
+ * word). */
 function AreaIcon({ area }: { area: MoneyAreaId }) {
   const icon = moneyAreaIconUrl(area);
-  if (icon !== null) return <IconImg src={icon} size={40} />;
+  if (icon !== null) return <IconImg src={icon} size={52} desktopSize={80} />;
   // jobs — the one area without artwork (round 28): the stroke briefcase.
   return (
     <svg
-      width={40}
-      height={40}
+      className="currena-icon shrink-0"
+      style={{
+        '--icon-size': '52px',
+        '--icon-size-sm': '80px',
+      } as CSSProperties}
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
@@ -63,16 +72,22 @@ function AreaIcon({ area }: { area: MoneyAreaId }) {
 }
 
 /** The estimation arrows — same glyphs as the metals VerdictStrip
- * (round 23) at 16px: up, down, and the flat dash. aria-hidden — the
- * word beside it carries the meaning (never colour alone, G5). */
+ * (round 23): up, down, and the flat dash. Round 29 (owner): the
+ * estimation is the panel's headline answer — the arrow grows from a
+ * 16px squiggle to 20px mobile / 24px desktop so the word + arrow read
+ * at the row's own scale. aria-hidden — the word beside it carries the
+ * meaning (never colour alone, G5). */
 function DirectionIcon({ direction }: { direction: MoneyDirection }) {
   const common = {
-    width: 16,
-    height: 16,
+    className: 'currena-icon shrink-0',
+    style: {
+      '--icon-size': '20px',
+      '--icon-size-sm': '24px',
+    } as CSSProperties,
     viewBox: '0 0 16 16',
     fill: 'none',
     stroke: 'currentColor',
-    strokeWidth: 2,
+    strokeWidth: 2.2,
     strokeLinecap: 'round' as const,
     strokeLinejoin: 'round' as const,
     'aria-hidden': true,
@@ -116,11 +131,25 @@ export function MoneyPanel({
   const byId = new Map(readings.map((r) => [r.id as string, r]));
 
   return (
-    <section id="insights-money" aria-labelledby="insights-money-title" className="scroll-mt-24">
+    /* Round 29 (owner): "what it means for my money … this is one of the
+     * most important sections — needs more contrast and visual weight.
+     * Different bg, color, shadow or anything else." → the panel gets the
+     * app's FOCAL treatment: the brand-gold gradient field (round 24 made
+     * gold the one focal accent), a 2px gold ring, a soft gold-tinted
+     * shadow, and its own padding so the white rows inside sit ON the
+     * tinted field — the wrapper vs the rows IS the contrast. Dark mode
+     * keeps the same gradient logic with a deeper shadow. The white rows
+     * and their plain rings stay untouched — the wrapper carries the
+     * weight, the rows keep the readable surface. */
+    <section
+      id="insights-money"
+      aria-labelledby="insights-money-title"
+      className="scroll-mt-24 rounded-[var(--radius-lg)] bg-gradient-to-b from-[var(--color-accent-gold)]/[0.16] via-[var(--color-accent-gold)]/[0.07] to-transparent p-3.5 shadow-[0_10px_34px_rgba(168,126,28,0.15)] ring-2 ring-[var(--color-accent-gold)]/45 sm:p-4 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
+    >
       <h2 id="insights-money-title" className="type-section m-0 mb-1">
         {copy.money.title}
       </h2>
-      <p className="m-0 mb-2 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">
+      <p className="m-0 mb-3 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">
         {copy.money.subtitle}
       </p>
 
@@ -129,7 +158,7 @@ export function MoneyPanel({
           {copy.money.calmLine}
         </p>
       ) : (
-        <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
+        <ul className="m-0 flex list-none flex-col gap-2 p-0">
           {rows.map(({ area, state, chipIds }) => {
             const areaCopy = copy.money.areas[area];
             const sentence = state === 'attention' ? areaCopy.attention : state === 'unusual' ? areaCopy.unusual : areaCopy.calm;
@@ -146,14 +175,16 @@ export function MoneyPanel({
                 key={area}
                 data-money-area={area}
                 data-money-state={state}
-                className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-3.5 py-3 ring-1 ring-[var(--color-border)] sm:flex-row sm:items-start sm:gap-3"
+                className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-4 py-3.5 ring-1 ring-[var(--color-border)] sm:flex-row sm:items-start sm:gap-3"
               >
-                {/* Owner follow-up (11 Oct): the icon is a VISIBLE 64×64
-                 * instrument (48 on mobile), not a 16px squiggle — a tinted
-                 * square keeps it designed, not decorative. */}
+                {/* Owner follow-up (11 Oct): the icon is a VISIBLE
+                 * instrument, not a 16px squiggle — round 29 (owner): the
+                 * box grows to 64px on mobile / 96px on desktop with the
+                 * artwork at 52/80 inside it. A tinted square keeps it
+                 * designed, not decorative. */}
                 <span
                   aria-hidden="true"
-                  className="grid h-12 w-12 shrink-0 place-items-center rounded-[var(--radius-md)] bg-currena-soft/70 ring-1 ring-[var(--color-border)] sm:h-16 sm:w-16"
+                  className="grid h-16 w-16 shrink-0 place-items-center rounded-[var(--radius-md)] bg-currena-soft/70 ring-1 ring-[var(--color-border)] sm:h-24 sm:w-24"
                 >
                   <span className={moneyAreaIconUrl(area) !== null ? '' : 'text-[var(--color-status-context)]'}>
                     <AreaIcon area={area} />

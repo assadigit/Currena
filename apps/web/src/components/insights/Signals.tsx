@@ -45,6 +45,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
+import type { CSSProperties } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { evaluateSignal, type SignalConditionReading, type SignalLean, type SignalReading } from '@currena/insights';
@@ -71,16 +72,29 @@ function verdictOf(reading: SignalReading): SignalVerdict | null {
   return 'flat';
 }
 
-function VerdictIcon({ verdict, size = 18 }: { verdict: SignalVerdict; size?: number }) {
+function VerdictIcon({
+  verdict,
+  size = 28,
+  desktopSize = 36,
+}: {
+  verdict: SignalVerdict;
+  size?: number;
+  desktopSize?: number;
+}) {
   /* Round 28 (owner artwork): the metals' up/down arrows wear the owner's
    * green zigzag / red zigzag PNGs — their fixed colours match this card's
    * valence by construction (up = the holder's gain). The flat dash stays
-   * a stroke glyph in the neutral ink (there is no "flat" artwork). */
-  if (verdict === 'up') return <IconImg src={DIRECTION_UP_URL} size={size} />;
-  if (verdict === 'down') return <IconImg src={DIRECTION_DOWN_URL} size={size} />;
+   * a stroke glyph in the neutral ink (there is no "flat" artwork).
+   * Round 29 (owner): both grow to the strip's new scale (28 mobile /
+   * 36 desktop) — the estimation is this card's answer. */
+  if (verdict === 'up') return <IconImg src={DIRECTION_UP_URL} size={size} desktopSize={desktopSize} />;
+  if (verdict === 'down') return <IconImg src={DIRECTION_DOWN_URL} size={size} desktopSize={desktopSize} />;
   const common = {
-    width: size,
-    height: size,
+    className: 'currena-icon shrink-0',
+    style: {
+      '--icon-size': `${size}px`,
+      '--icon-size-sm': `${desktopSize}px`,
+    } as CSSProperties,
     viewBox: '0 0 16 16',
     fill: 'none',
     stroke: 'currentColor',
@@ -98,10 +112,20 @@ function VerdictIcon({ verdict, size = 18 }: { verdict: SignalVerdict; size?: nu
 }
 
 /** The metal's own artwork beside its name (round 28) — gold bar, silver
- * bar; unmapped metals (none today) fall back to no icon. */
-function MetalIcon({ metal, size = 20 }: { metal: 'gold' | 'silver'; size?: number }) {
+ * bar; unmapped metals (none today) fall back to no icon. Round 29
+ * (owner): the strip's chips render the art at 28px mobile / 36px
+ * desktop — the answer row is the card's headline, not a footnote. */
+function MetalIcon({
+  metal,
+  size = 28,
+  desktopSize = 36,
+}: {
+  metal: 'gold' | 'silver';
+  size?: number;
+  desktopSize?: number;
+}) {
   const icon = indicatorIconUrl(metal === 'gold' ? 'gold-usd' : 'silver-usd');
-  return icon !== null ? <IconImg src={icon} size={size} /> : null;
+  return icon !== null ? <IconImg src={icon} size={size} desktopSize={desktopSize} /> : null;
 }
 
 const verdictTone: Record<SignalVerdict, string> = {
@@ -393,7 +417,7 @@ function MergedSignalsCard({
       >
         <span className="flex flex-wrap items-baseline gap-x-2">
           <span className="inline-flex shrink-0 items-center gap-1.5">
-            <MetalIcon metal={metal} size={18} />
+            <MetalIcon metal={metal} size={24} desktopSize={30} />
             <span className={`inline-flex shrink-0 items-center gap-1 ${stateToneClass(state as SignalConditionReading['state'])}`}>
               <ConditionIcon state={state as SignalConditionReading['state']} />
               <span className="text-[length:var(--type-label)] font-bold">
@@ -446,7 +470,7 @@ function MergedSignalsCard({
               className="inline-flex items-center gap-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]"
               data-signal-metal={reading.metal}
             >
-              <MetalIcon metal={reading.metal} size={16} />
+              <MetalIcon metal={reading.metal} size={18} desktopSize={22} />
               {reading.lean !== null ? <LeanIcon lean={reading.lean} /> : null}
               {metalLeanLine(reading)}
             </span>
@@ -564,7 +588,7 @@ function CollapsedVerdict({ reading, copy }: { reading: SignalReading; copy: Ins
       className={`ms-1.5 inline-flex items-center gap-1 font-bold ${verdictTone[verdict]}`}
       data-collapsed-verdict={verdict}
     >
-      <VerdictIcon verdict={verdict} size={14} />
+      <VerdictIcon verdict={verdict} size={16} desktopSize={20} />
       {interpolate(s.collapsedVerdict, { verdict: word })}
     </span>
   );

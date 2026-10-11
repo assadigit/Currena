@@ -140,8 +140,9 @@ export function VerdictBlock({
       <header className="flex items-baseline justify-between gap-3">
         <h3 className="type-kicker m-0 flex items-center gap-1.5 text-[var(--color-text-tertiary)]">
           {/* Round 28 (owner): each region wears its own mark — the globe
-           * for Global, the map for Australia. */}
-          <IconImg src={sectionIconUrl(section)} size={18} />
+           * for Global, the map for Australia. Round 29 (owner): the mark
+           * grows to 22/28px — the kicker is the card's first read. */}
+          <IconImg src={sectionIconUrl(section)} size={22} desktopSize={28} />
           {sectionLabel}
         </h3>
         <button
@@ -160,10 +161,13 @@ export function VerdictBlock({
        * (owner): the state's own artwork rides beside the word — drawn in
  * the SAME colour coding the app already speaks (green stable, amber
        * cautious, orange stressed, red critical); the word carries the
-       * meaning, the artwork the warmth. No reading (step 0) → no icon. */}
+       * meaning, the artwork the warmth. No reading (step 0) → no icon.
+ * Round 29 (owner): the artwork steps up to 44px mobile / 60px
+ * desktop — the page's single largest state moment, twice the old
+ * desktop size. */}
       <p className="m-0 flex items-center gap-3">
         <span className={`type-verdict ${stepToneClass(step)}`}>{verdictLabel}</span>
-        {stateIconUrl(step) !== null ? <IconImg src={stateIconUrl(step)!} size={30} className="drop-shadow-sm" /> : null}
+        {stateIconUrl(step) !== null ? <IconImg src={stateIconUrl(step)!} size={44} desktopSize={60} className="drop-shadow-sm" /> : null}
         <VerdictMeter step={step} label={verdictLabel} ariaLabel={ariaLabel} size="lg" />
       </p>
 
@@ -261,9 +265,10 @@ export function VerdictBlock({
                   >
                     <span className="line-clamp-2 min-h-[2.75em] text-[length:var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
                       {/* Round 28: the tile's indicator wears its artwork when
-                       * one exists — inline so the clamped name stays tidy. */}
+                       * one exists — inline so the clamped name stays tidy.
+                       * Round 29: 20/24px, visible at the tile's scale. */}
                       {indicatorIconUrl(id) !== null ? (
-                        <IconImg src={indicatorIconUrl(id)!} size={16} className="me-1 inline-block align-text-bottom" />
+                        <IconImg src={indicatorIconUrl(id)!} size={20} desktopSize={24} className="me-1 inline-block align-text-bottom" />
                       ) : null}
                       {copy.indicators[id].name}
                     </span>

@@ -5,6 +5,77 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — Icons at full voice, and the money panel becomes the page's focal section (owner round 29)
+
+Twenty-ninth round — three owner points at once: "the icons are too small —
+I expect them to be a few times larger on desktop, and relatively larger on
+mobile"; a list of which icons/subjects are still missing; and "what it means
+for my money needs more contrast and visual weight — different bg, color,
+shadow, anything — it is one of the most important sections".
+
+### Changed
+
+- **Responsive artwork sizing (`IconImg` + `.currena-icon`)** — the fixed
+  inline `size` px became two CSS custom properties set per image: the
+  MOBILE box (`--icon-size`) and the ≥640px box (`--icon-size-sm`,
+  Tailwind's `sm:` breakpoint — the same one every money/price row already
+  turns at). One media query in index.css drives every artwork surface;
+  `object-fit: contain` keeps the 256px sources clean at every size.
+- **Every surface grew (mobile → desktop, old desktop in brackets):**
+  money-panel area icons 52 → 80px in a 64 → 96px box (40 in 64), price
+  tiles 32 → 44px in a 44 → 56px box (26 in 36), the hero's state artwork
+  44 → 60px (30), the gold-and-silver estimation strip's metal chips +
+  direction zigzags 28 → 36px (20/18), its footing rows 24 → 30px (18) and
+  header lean lines 18 → 22px (16), hero region marks 22 → 28px (18),
+  hero attention tiles 20 → 24px (16), alert-card titles 26 → 34px (20),
+  details-panel headings 32 → 44px (24), and the money rows' estimation
+  arrows 20 → 24px (16). The money panel's estimation arrow and word now
+  read at the row's own scale, not as a footnote.
+- **The money panel is the focal section** — the app's focal accent
+  (brand gold, round 24's decision) now wraps "What it means for my
+  money": a gold gradient field (16% → 7% → transparent), a 2px gold
+  ring, and a soft gold-tinted shadow, with its own padding so the white
+  rows sit ON the tinted field — the wrapper-vs-rows contrast carries the
+  weight, the rows keep their plain readable surface. Dark mode keeps the
+  same gradient logic with a deeper shadow. Row rhythm opened one step
+  (gap-2, py-3.5, px-4) to match the larger icons.
+
+### The missing-icon audit (owner question 2)
+
+Subjects that exist in the app but have NO artwork yet, by priority:
+
+1. **Jobs / worker / briefcase** — the money panel's one icon-less area
+   ("jobs" still wears the old stroke briefcase) + `au-unemployment`.
+2. **Wages / pay packet** — `au-wage-growth`.
+3. **Central bank building** — `fed-target`, `ecb-dfr`
+   (`rba-cash-rate` currently borrows the housing art; a bank of its own
+   would let policy rates read as policy).
+4. **Government / treasury** — `govt-interest-revenue`.
+5. **Strong dollar (a $ with directional arrows)** — `dollar-basket`.
+6. **Flags: US, Japan, EU, China, Australia** — the five FX pairs
+   (`usdjpy`, `eur-usd`, `usdcny`, `audusd`, `audjpy`); the converter
+   already speaks flags, the Insights lanes don't yet.
+7. **China factory** — `china-pmi`.
+8. **Money supply (banknotes stack)** — `m2-us`.
+9. **Nervous-market gauge (distinct from the four state gauges)** —
+   `stress-stlfsi`, `nfci`.
+10. **Inflation expectations (a coin + a clock)** — `breakeven-5y5y`.
+11. **Container ship / trade** — `terms-of-trade`.
+12. **Iron ore (rock / mine cart)** — `iron-ore`.
+13. **A wallet/purse for the money-panel header** — optional, the section
+    currently relies on the gold field alone.
+Not needed: `gold-silver` (the two bars already ride the ratio row),
+`gold-btc`/`silver-btc` (context ratios, tiny), `au-us-10y-gap` (covered
+by the US-10Y family art).
+
+### Housekeeping
+
+- No copy, engine or API changes; the estimation engine (round 25) and
+  the copy corpus are untouched. Insights chunk 320.69/82.87 kB raw/gz
+  against the 322.50/84.00 budget (no bump — the responsive sizing is
+  ~0.8 kB of JS + 21 lines of CSS). No new assets, so the PWA precache
+  is unchanged (85 entries).
+
 ## [2026-10-11] — The owner's icon set: the app wears its own artwork (owner round 28)
 
 Twenty-eighth round — the owner shipped "Currena PNG Icons.zip" (18 pieces,

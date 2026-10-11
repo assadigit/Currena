@@ -1251,6 +1251,26 @@ html:not(:lang(fa)) .type-kicker {
   .verdict-meter-seg { transition: none; }
 }
 
+/* Round 29 (owner): the owner's PNG artwork no longer whispers — one
+ * class drives every artwork surface from two custom properties set
+ * inline by IconImg: the MOBILE box (--icon-size) and the ≥640px box
+ * (--icon-size-sm; Tailwind's `sm:` breakpoint, the same one every
+ * money/price row turns at). Desktop boxes are a few× the old sizes;
+ * mobile boxes stay proportionally large so the art keeps its warmth
+ * on a phone. width/height attributes are carried by the inline vars,
+ * so the layout cannot shift before the media query evaluates. */
+.currena-icon {
+  width: var(--icon-size, 20px);
+  height: var(--icon-size, 20px);
+  object-fit: contain;
+}
+@media (min-width: 640px) {
+  .currena-icon {
+    width: var(--icon-size-sm, var(--icon-size, 20px));
+    height: var(--icon-size-sm, var(--icon-size, 20px));
+  }
+}
+
 /* Alert-card accent (F1): inline-start border + light tint, never colour alone.
  * R30 colour roles: RED = needs attention only. The Unusual tier gets the
  * amber watch ink (border + tint) so the two tiers stop looking alike —

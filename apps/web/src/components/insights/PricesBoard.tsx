@@ -55,16 +55,18 @@ function PriceIconBox({ id }: { id: IndicatorId }) {
   const isGold = id === 'gold-usd';
   const icon = indicatorIconUrl(id);
   return (
+    /* Round 29 (owner): the box grows to 44px mobile / 56px desktop with
+     * the artwork at 32/44 inside — a few× the old 26px squint. */
     <span
       aria-hidden="true"
-      className={`grid h-9 w-9 shrink-0 place-items-center rounded-[var(--radius-sm)] ring-1 ring-[var(--color-border)] ${
+      className={`grid h-11 w-11 shrink-0 place-items-center rounded-[var(--radius-sm)] ring-1 ring-[var(--color-border)] sm:h-14 sm:w-14 ${
         isGold ? 'bg-[var(--color-accent-gold)]/25' : 'bg-currena-soft/70'
       }`}
     >
       {icon !== null ? (
-        <IconImg src={icon} size={26} />
+        <IconImg src={icon} size={32} desktopSize={44} />
       ) : (
-        <Coins aria-hidden size={20} strokeWidth={1.2} className="text-[var(--color-status-context)]" />
+        <Coins aria-hidden size={26} strokeWidth={1.2} className="text-[var(--color-status-context)]" />
       )}
     </span>
   );
@@ -149,7 +151,7 @@ export function PricesBoard({
     <section id="insights-prices" aria-labelledby="insights-prices-title" className="scroll-mt-24">
       <h2 id="insights-prices-title" className="type-section m-0 mb-1">
         <span className="inline-flex items-center gap-1.5">
-          <Coins aria-hidden size={23} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
+          <Coins aria-hidden size={26} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
           {copy.ui.pricesTitle}
         </span>
       </h2>

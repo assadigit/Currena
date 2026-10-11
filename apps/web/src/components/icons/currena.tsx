@@ -26,6 +26,7 @@
  * carries the meaning (the icons add warmth, not information).
  */
 
+import type { CSSProperties } from 'react';
 import type { InsightsSection } from '@currena/core';
 
 const BASE = '/assets/icons';
@@ -108,16 +109,28 @@ export const DIRECTION_DOWN_URL = urlOf('down-work-against-decrease');
 
 /* ------------------------------------------------------------------ *
  * The <img> — one shape everywhere
- * ------------------------------------------------------------------ */
+ * ------------------------------------------------------------------ *
+ * Round 29 (owner): "the icons are too small — a few times larger on
+ * desktop, relatively larger on mobile." Sizing moved from fixed inline
+ * px to two CSS custom properties: --icon-size (the MOBILE box) and
+ * --icon-size-sm (the ≥640px box, Tailwind's `sm:` breakpoint — the
+ * same breakpoint every money/price row already turns at). The CSS
+ * class lives in index.css (.currena-icon) so one media query drives
+ * every artwork surface; a surface that wants NO jump passes the same
+ * number twice (or omits desktopSize). */
 
 export function IconImg({
   src,
   size = 20,
+  desktopSize,
   className = '',
 }: {
   src: string;
-  /** Rendered box in px — the 256px source downscales cleanly. */
+  /** Rendered box in px on <640px viewports — the 256px source
+   * downscales cleanly to any of these sizes. */
   size?: number;
+  /** Rendered box in px on ≥640px viewports. Omitted → same as size. */
+  desktopSize?: number;
   className?: string;
 }) {
   return (
@@ -127,10 +140,13 @@ export function IconImg({
       aria-hidden="true"
       draggable={false}
       decoding="async"
-      width={size}
-      height={size}
-      className={`shrink-0 select-none ${className}`}
-      style={{ width: size, height: size }}
+      className={`currena-icon shrink-0 select-none ${className}`}
+      style={
+        {
+          '--icon-size': `${size}px`,
+          ...(desktopSize !== undefined ? { '--icon-size-sm': `${desktopSize}px` } : null),
+        } as CSSProperties
+      }
     />
   );
 }
