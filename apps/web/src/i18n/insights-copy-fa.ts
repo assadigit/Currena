@@ -683,6 +683,9 @@ export const insightsCopyFa: InsightsCopy = {
     title: 'برای پول من یعنی چه',
     subtitle: 'حوزه‌های روزمره‌ای که شاخص‌ها معمولاً به آن‌ها می‌رسند.',
     calmLine: 'الان هیچ حوزهٔ پولی سر و صدا ندارد: پس‌زمینه‌ای آرام برای بودجهٔ خانه.',
+    directionUp: 'بالا می‌رود',
+    directionDown: 'پایین می‌آید',
+    directionFlat: 'جهت روشنی ندارد',
     areas: {
       petrol: {
         name: 'بنزین و حمل‌ونقل',

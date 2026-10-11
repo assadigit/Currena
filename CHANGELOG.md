@@ -5,6 +5,66 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — The money rows speak: a stated estimation under every "What it means for my money" item (owner round 25)
+
+Twenty-fifth round — the owner, pointing at the money panel: a very simple,
+short estimation under EACH item ("Petrol and transport, will go up, with an
+arrow to up — showing that it will be more expensive"), and it must be based
+on calculations and data, not decoration. The same language the gold-and-
+silver card earned in round 23, now computed from each area's own drivers.
+
+### Added
+
+- **A stated estimation under every money row**: arrow + "Will go up /
+  Will go down / No clear direction" («بالا می‌رود / پایین می‌آید /
+  جهت روشنی ندارد»), sitting directly under the area name — the exact
+  spot the owner sketched. It is a mechanical tally, not a vibe: each
+  area's driver readings vote, majority wins, tie or silence → flat.
+- **The vote engine** (`config.moneyDriverVote` / `moneyAreaDirection`),
+  one vote per driver, first match wins:
+  1. a published band breach (CPI above the RBA's 2–3% band) — the
+     strongest causal claim the corpus itself makes;
+  2. a statistically big move (|moveScore| ≥ 2, the jumping threshold) —
+     the change tends to feed through ("pump prices follow within weeks");
+  3. a 10-year extreme level (position band high/low).
+  Votes pass through per-driver semantics (`MONEY_DRIVER_KIND`):
+  `direct` (brent, the cash rate, the paid mortgage rate — the driver IS
+  the area's number), `inverse` (FX: a FALLING AUD makes imports and
+  travel dearer), `growth` (CPI/rent/petrol yoy — votes up on breach,
+  extreme or acceleration but NEVER down: a growth series below its range
+  still means costs RISING, just slower — rent growth at its 10-year low
+  is not "rents will get cheaper"), `none` (debt arrears, jobs/pay —
+  consequences and mixed semantics don't vote).
+- **Valence ink, not direction ink**: the metals card colours by direction
+  because the owner HOLDS metal (up = good, green). The money panel is the
+  household PAYS side: green = good for your money, red = pressure on it —
+  "Petrol will go up" warns in alert red while "Savings interest will go
+  up" reassures in green (rising interest is the good case; today it is
+  the only green row: cash rate at its 10-year high, CPI above the band).
+  The arrow always matches the word — never colour alone (G5).
+
+### Why today's panel reads the way it does (all four rows up — the data, not a bug)
+
+Brent sits at the 99th percentile of its decade and jumped +7.2σ in 30 days,
+while the AUD fell −5.5σ (imports dearer) → petrol up. Both inflation
+gauges print above the RBA's own 2–3% band → shop prices up. The cash rate
+and the paid mortgage rate sit at their 10-year extremes (1.00 / 0.95) with
+rents still rising 3.6% yoy → home loan up. Savings ride the same two
+readings upward → the green row. In a cutting regime the same engine flips
+the rows to "will go down" — the arrow follows the data.
+
+### Housekeeping
+
+- Bundle budget bumped 318.5/82.5 → 322.5/84.0 kB (raw/gz) WITH justification
+  (Insights 317.60/81.93 → 319.80/82.41: the vote engine, the 16px arrow
+  set and 3 copy strings × 2 locales; entry untouched at 290.33/87.06).
+- The R11 "no will" guard now exempts the three estimation keys (owner
+  override, same precedent as round 23's verdict strip); buy/sell stays
+  banned everywhere and the hedged sentences stay "will"-free.
+- New guard file `money-direction.test.ts` (20 tests): vote priority,
+  growth-silence (no fake "cheaper"), inverse FX sign, tally/tie → flat,
+  valence ink matrix, and a live-shaped regression of today's four rows.
+
 ## [2026-10-11] — The roast round: meaning on every warning card, a quieter hero, Jalali everywhere, red discipline, and brand gold (owner round 24)
 
 Twenty-fourth round — a full design roast of the Persian build scored the

@@ -1584,11 +1584,19 @@ export const insightsCopyEn = {
    * Round-2 R11: "What it means for my money": at most 4 lines, one
    * per life area, chosen by the worst tier among the area's
    * indicators. Hedged sentences, no advice, no buy/sell, no "will".
+   * Round 25 (owner override): each row ALSO carries a stated
+   * estimation — "Will go up / Will go down / No clear direction" —
+   * computed from the driver readings (config.moneyAreaDirection);
+   * the owner asked for it in so many words, so the old "no will"
+   * note no longer covers the estimation line.
    * ---------------------------------------------------------------- */
   money: {
     title: 'What it means for my money',
     subtitle: 'The day-to-day areas the indicators usually touch.',
     calmLine: 'No money area is standing out right now: a calm background for household budgets.',
+    directionUp: 'Will go up',
+    directionDown: 'Will go down',
+    directionFlat: 'No clear direction',
     areas: {
       petrol: {
         name: 'Petrol and transport',

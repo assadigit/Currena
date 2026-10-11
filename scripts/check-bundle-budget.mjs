@@ -142,7 +142,14 @@ const BUDGETS = [
   // pictograms and the FRED footer split. Almost all localized strings —
   // compressible. ENTRY untouched. Justified in CHANGELOG §2026-10-11
   // (roast round 24).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 318_500, gz: 82_500, label: 'Insights lazy chunk' },
+  // Money-estimation bump (317.60/81.93 → 319.80/82.74, budget 318.5/82.5
+  // → 322.5/84.0): round 25 (owner) — every "What it means for my money"
+  // row now carries a stated estimation (arrow + "Will go up / Will go
+  // down / No clear direction") computed from the driver readings:
+  // moneyDriverVote/moneyAreaDirection/moneyDirectionToneClass in config,
+  // a 16px arrow icon set in MoneyPanel and 3 copy strings × 2 locales.
+  // ENTRY untouched. Justified in CHANGELOG §2026-10-11 (round 25).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 322_500, gz: 84_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

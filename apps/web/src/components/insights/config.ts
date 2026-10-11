@@ -1155,3 +1155,124 @@ export function moneyPanel(readings: readonly IndicatorReading[]): MoneyAreaRow[
   const unusual = rows.filter((r) => r.state === 'unusual');
   return [...attention, ...unusual].slice(0, 4);
 }
+
+/* ------------------------------------------------------------------ *
+ * Round 25 (owner): a stated estimation under every money row — the
+ * same "will go up / will go down" language the gold-and-silver card
+ * earned in round 23, but computed from the area's own driver
+ * readings (the owner: "it must be based on calculations and data").
+ *
+ * One vote per driver, first match wins:
+ *   1. a published band breach (e.g. CPI above the RBA's 2–3% band) —
+ *      the strongest causal claim the corpus itself makes;
+ *   2. a statistically big move (|moveScore| ≥ the jumping threshold)
+ *      — the change tends to feed through ("pump prices follow");
+ *   3. a 10-year extreme level (position band high/low).
+ * The vote then passes through the driver's semantic sign:
+ *   direct  — the driver IS the area's number or its input level
+ *             (brent, the cash rate, the paid mortgage rate);
+ *   inverse — FX (a FALLING AUD makes imports and travel dearer);
+ *   growth  — the driver is a growth RATE of the area's cost (CPI,
+ *             rent yoy, petrol yoy): it votes up on a breach, an
+ *             extreme or a big acceleration but NEVER down — a growth
+ *             series below its range still means costs RISING, just
+ *             slower (rent growth at its 10-year low is not "rents
+ *             will get cheaper"), so a "cheaper" claim must come from
+ *             a level series actually falling (oil down, AUD up, the
+ *             cash rate being cut);
+ *   none    — consequence or mixed-semantics indicators (debt
+ *             arrears, jobs/pay) don't vote.
+ * Tally = majority of votes; tie or silence → 'flat' ("no clear
+ * direction" — the honest answer when nothing unusual is readable).
+ *
+ * Colour is VALENCE-coded, not direction-coded: the round-22 owner
+ * override made the METALS card direction-coded because the owner
+ * HOLDS metal (up = good). Here the household PAYS: green = good for
+ * your money, red = pressure on it — "petrol will go up" warns in
+ * alert red while "savings interest will go up" reassures in green.
+ * The arrow always matches the word — never colour alone (G5).
+ * ---------------------------------------------------------------- */
+
+export type MoneyDriverKind = 'direct' | 'inverse' | 'growth' | 'none';
+export type MoneyDirection = 'up' | 'down' | 'flat';
+
+/** Only the 13 money-area drivers need semantics; every other id
+ * defaults to 'none'. */
+export const MONEY_DRIVER_KIND: Partial<Record<IndicatorId, MoneyDriverKind>> = {
+  brent: 'direct',
+  'au-petrol-yoy': 'growth',
+  audusd: 'inverse',
+  'rba-cash-rate': 'direct',
+  'au-home-loan': 'direct',
+  'au-rent-yoy': 'growth',
+  'au-household-debt-arrears': 'none',
+  'au-cpi': 'growth',
+  'au-trimmed-mean': 'growth',
+  audjpy: 'inverse',
+  'dollar-basket': 'direct',
+  'au-unemployment': 'none',
+  'au-wage-growth': 'none',
+};
+
+/** One driver's directional vote (null = abstain). */
+export function moneyDriverVote(
+  kind: MoneyDriverKind | undefined,
+  reading: IndicatorReading,
+  band?: { min?: number; max?: number },
+): 'up' | 'down' | null {
+  if (kind === undefined || kind === 'none' || reading.value === null) return null;
+  const inverse = kind === 'inverse';
+  // 1. published band breach
+  if (band && (band.min !== undefined || band.max !== undefined)) {
+    const pos = bandPositionOf(reading.value, band);
+    if (pos === 'above') return inverse ? 'down' : 'up';
+    if (pos === 'below') return inverse ? 'up' : 'down';
+  }
+  // 2. statistically big move — the change tends to feed through
+  if (reading.moveScore !== undefined && Math.abs(reading.moveScore) >= MOVE_SCORE_THRESHOLD) {
+    const rising = reading.moveScore > 0;
+    if (kind === 'growth') return rising ? 'up' : null; // growth never claims "cheaper"
+    return rising !== inverse ? 'up' : 'down'; // XOR: direct+rising / inverse+falling → up
+  }
+  // 3. 10-year extreme level
+  if (reading.percentile10y !== undefined) {
+    if (reading.percentile10y > 0.8) return inverse ? 'down' : 'up';
+    if (reading.percentile10y < 0.2 && kind !== 'growth') return inverse ? 'up' : 'down';
+  }
+  return null;
+}
+
+/** The money row's stated estimation: the majority of its drivers'
+ * votes. Every area can answer; 'flat' is the no-signal verdict. */
+export function moneyAreaDirection(
+  area: MoneyAreaId,
+  readings: readonly IndicatorReading[],
+  copy: Pick<InsightsCopy, 'indicators'>,
+): MoneyDirection {
+  const byId = new Map(readings.map((r) => [r.id as string, r]));
+  let up = 0;
+  let down = 0;
+  for (const id of MONEY_AREAS[area]) {
+    const r = byId.get(id as string);
+    if (!r) continue;
+    const vote = moneyDriverVote(MONEY_DRIVER_KIND[id], r, copy.indicators[id]?.band);
+    if (vote === 'up') up += 1;
+    else if (vote === 'down') down += 1;
+  }
+  if (up > down) return 'up';
+  if (down > up) return 'down';
+  return 'flat';
+}
+
+/** The areas where a rising number RELIEVES the household (more
+ * interest earned) — every other area's rises are a squeeze. */
+const UP_IS_RELIEF_AREAS: ReadonlySet<MoneyAreaId> = new Set<MoneyAreaId>(['savings']);
+
+/** Valence ink (block comment above): cost areas warn in alert red when
+ * their costs rise and reassure in green when they ease; savings flips;
+ * flat is always the neutral stale ink. */
+export function moneyDirectionToneClass(area: MoneyAreaId, direction: MoneyDirection): string {
+  if (direction === 'flat') return WORD_TONE_CLASS.neutral;
+  const relief = direction === 'down' ? !UP_IS_RELIEF_AREAS.has(area) : UP_IS_RELIEF_AREAS.has(area);
+  return relief ? WORD_TONE_CLASS.normal : WORD_TONE_CLASS.alert;
+}

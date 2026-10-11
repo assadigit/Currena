@@ -267,15 +267,28 @@ describe('R11 moneyPanel (≤4 lines, worst-state selection)', () => {
   });
 
   it('the money corpus carries no advice wording in either locale', () => {
+    // Round 25 (owner override): the three estimation keys MAY say "will"
+    // — the owner asked for a stated "Will go up / Will go down" under
+    // every money row, the same language the metals card earned in round
+    // 23. Buy/sell stays banned everywhere; the hedged sentences stay
+    // "will"-free (only the estimation line speaks in futures).
     const banned = /\b(buy|sell|will)\b/i;
-    const corpus = (obj: unknown): string[] => {
-      if (typeof obj === 'string') return [obj];
-      if (Array.isArray(obj)) return obj.flatMap(corpus);
-      if (obj !== null && typeof obj === 'object') return Object.values(obj as Record<string, unknown>).flatMap(corpus);
+    const ADVICE_ONLY = /\b(buy|sell)\b/i;
+    const ESTIMATION_KEYS = new Set(['directionUp', 'directionDown', 'directionFlat']);
+    const corpus = (obj: unknown, key?: string): { key?: string; text: string }[] => {
+      if (typeof obj === 'string') return [{ key, text: obj }];
+      if (Array.isArray(obj)) return obj.flatMap((v) => corpus(v));
+      if (obj !== null && typeof obj === 'object')
+        return Object.entries(obj as Record<string, unknown>).flatMap(([k, v]) => corpus(v, k));
       return [];
     };
-    for (const text of corpus((insightsCopyEn as InsightsCopy).money)) expect(banned.test(text)).toBe(false);
-    for (const text of corpus((insightsCopyFa as InsightsCopy).money)) expect(/\bخرید|فروش\b/.test(text)).toBe(false);
+    const en = corpus((insightsCopyEn as InsightsCopy).money);
+    const fa = corpus((insightsCopyFa as InsightsCopy).money);
+    for (const { key, text } of en) {
+      if (key && ESTIMATION_KEYS.has(key)) expect(ADVICE_ONLY.test(text)).toBe(false);
+      else expect(banned.test(text)).toBe(false);
+    }
+    for (const { text } of fa) expect(/\bخرید|فروش\b/.test(text)).toBe(false);
   });
 });
 

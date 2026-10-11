@@ -5,13 +5,28 @@
  * area's indicators (needs attention first, then unusual). Each line: icon,
  * area name, one hedged sentence from the copy corpus keyed by area × state,
  * and one or two supporting chips with live values that open the cards.
- * No signal anywhere → one calm line. No advice, no buy/sell, no "will".
+ * No signal anywhere → one calm line. No advice, no buy/sell.
+ *
+ * Round 25 (owner): under every area name sits a STATED ESTIMATION —
+ * arrow + "Will go up / Will go down / No clear direction" — computed
+ * from the driver readings by config.moneyAreaDirection (band breaches,
+ * big moves, 10-year extremes through per-driver semantics). The ink
+ * is VALENCE-coded (green = good for your money, red = pressure on it;
+ * savings flips because rising interest is the good case) — see the
+ * round-25 block comment in config.ts.
  */
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { formatIndicatorValue, moneyPanel, type MoneyAreaId } from './config';
+import {
+  formatIndicatorValue,
+  moneyAreaDirection,
+  moneyDirectionToneClass,
+  moneyPanel,
+  type MoneyAreaId,
+  type MoneyDirection,
+} from './config';
 
 /** The area icons — rendered INSIDE a 64×64 tinted box (owner follow-up
  * 11 Oct: "increase the icon size, something visible like 64×64").
@@ -77,6 +92,45 @@ function AreaIcon({ area }: { area: MoneyAreaId }) {
   }
 }
 
+/** The estimation arrows — same glyphs as the metals VerdictStrip
+ * (round 23) at 16px: up, down, and the flat dash. aria-hidden — the
+ * word beside it carries the meaning (never colour alone, G5). */
+function DirectionIcon({ direction }: { direction: MoneyDirection }) {
+  const common = {
+    width: 16,
+    height: 16,
+    viewBox: '0 0 16 16',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 2,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true,
+    focusable: false,
+  };
+  if (direction === 'up') {
+    return (
+      <svg {...common}>
+        <path d="M8 13V3.5" />
+        <path d="M3.5 8 8 3.5 12.5 8" />
+      </svg>
+    );
+  }
+  if (direction === 'down') {
+    return (
+      <svg {...common}>
+        <path d="M8 3v9.5" />
+        <path d="M3.5 8 8 12.5 12.5 8" />
+      </svg>
+    );
+  }
+  return (
+    <svg {...common}>
+      <path d="M3 8h10" />
+    </svg>
+  );
+}
+
 export function MoneyPanel({
   readings,
   copy,
@@ -109,6 +163,11 @@ export function MoneyPanel({
           {rows.map(({ area, state, chipIds }) => {
             const areaCopy = copy.money.areas[area];
             const sentence = state === 'attention' ? areaCopy.attention : state === 'unusual' ? areaCopy.unusual : areaCopy.calm;
+            const m = copy.money;
+            const direction = moneyAreaDirection(area, readings, copy);
+            const directionWord =
+              direction === 'up' ? m.directionUp : direction === 'down' ? m.directionDown : m.directionFlat;
+            const directionTone = moneyDirectionToneClass(area, direction);
             return (
               <li
                 key={area}
@@ -140,6 +199,16 @@ export function MoneyPanel({
                  * in the sentence and the chips. */}
                 <span className="shrink-0 text-[length:var(--type-label)] font-bold leading-relaxed text-[var(--color-text-primary)] sm:w-40">
                   {areaCopy.name}
+                  {/* Round 25 (owner): the stated estimation, directly under
+                   * the area name — arrow + word in valence ink, computed
+                   * from the driver readings (moneyAreaDirection). */}
+                  <span
+                    data-money-direction={direction}
+                    className={`mt-1 flex items-center gap-1.5 leading-snug ${directionTone}`}
+                  >
+                    <DirectionIcon direction={direction} />
+                    <span className="text-[length:var(--type-label)] font-bold">{directionWord}</span>
+                  </span>
                 </span>
                 <span className="min-w-0 flex-1 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
                   {sentence}
