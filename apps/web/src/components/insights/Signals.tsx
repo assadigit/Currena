@@ -36,6 +36,12 @@
  * misleading. The holder-view value words say what the colour means:
  * "gaining value" wears green, "losing value" wears red; the collapsed
  * summary line now carries the same direction icon as the strip.
+ *
+ * Round 27 (owner): the card OPENS by default on every visit — the
+ * condition rows, live values and footing rows ARE the section; a
+ * persisted "collapsed" made them look deleted. "Show details" keeps
+ * working (and any targeted pill/hash link still expands), but the
+ * choice is session-only — a fresh load always shows the full card.
  */
 
 import { useEffect, useMemo, useState } from 'react';
@@ -542,8 +548,6 @@ function MergedSignalsCard({
  * The section
  * ---------------------------------------------------------------- */
 
-const STORAGE_KEY = 'currena.insights.signals-open.v1';
-
 /** Round 24: the collapsed per-metal line's takeaway — the estimation
  * (round 23's verdictOf), icon + word + ink (round 26: the icon joined
  * the line); unreadable metals stay silent. */
@@ -577,30 +581,20 @@ export function Signals({
 }) {
   const gold = useMemo(() => evaluateSignal('gold', readings), [readings]);
   const silver = useMemo(() => evaluateSignal('silver', readings), [readings]);
-  const [open, setOpen] = useState<boolean>(() => {
-    try {
-      return window.localStorage.getItem(STORAGE_KEY) === 'open';
-    } catch {
-      return false; // fail open to collapsed (spec R7b)
-    }
-  });
+  /* Round 27 (owner): open by default — the detail is the content.
+   * No persistence: collapsing is a per-session choice (spec R7b's
+   * remembered default made the card look removed). */
+  const [open, setOpen] = useState(true);
 
   useEffect(() => {
     if (expandToken > 0) setOpen(true);
   }, [expandToken]);
 
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, open ? 'open' : 'closed');
-    } catch {
-      /* privacy mode — session-only */
-    }
-  }, [open]);
-
   if (!SIGNALS_ENABLED) return null;
 
-  // R7b collapsed summary: one line per metal — "Gold: mixed, 2 of 5
-  // conditions met — price in the top 7% of the last 10 years".
+  // Collapsed summary (R7b, now session-only): one line per metal —
+  // "Gold: mixed, 2 of 5 conditions met — price in the top 7% of the
+  // last 10 years".
   const collapsedLine = (reading: SignalReading): string => {
     const s = copy.signals;
     const leanWord = reading.lean !== null ? s.lean[reading.lean] : s.notEnoughData;

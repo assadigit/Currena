@@ -5,6 +5,46 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — The signals card opens by default — the detail is the content (owner round 27)
+
+Twenty-seventh round — the owner, alarmed: the gold-and-silver "What the
+signals say" section had lost its information. It had not: since the UX
+round-2 density pass (R7b) the card defaults to COLLAPSED and remembers
+that choice in localStorage, so every visit opened to a two-line summary
+and a small "Show details" toggle nobody connects with five condition
+rows, live values and footing rows. "Collapsed" read as "deleted".
+
+### Changed
+
+- **The gold-and-silver card OPENS by default on every visit.** The
+  estimation strip, the Supports / Works-against / Neutral condition
+  rows (with their live values and one-line "how" explanations), the
+  per-metal footing rows and the silver-only condition render
+  immediately — no click, no remembered state.
+- **The collapse is session-only now.** "Show details / Show fewer"
+  keeps working (and pill/hash links that target the section still
+  expand it), but the choice is no longer persisted to localStorage —
+  a fresh load always shows the full card. The localStorage key
+  `currena.insights.signals-open.v1` is retired; existing visitors who
+  had it "closed" stop being stuck collapsed (and stale keys simply
+  rot in place, unread).
+- The collapsed two-line summary keeps its round-24/26 takeaway
+  (direction icon + value word) for anyone who does fold the card away.
+
+### Why not just flip the stored default
+
+Remembering "open" would have fixed the owner's browser but kept the
+trap: one accidental "Show fewer" and the information is gone again for
+that visitor, forever. The card's whole point is the conditions behind
+the estimation — they now show up the way the owner expects, every time.
+
+### Housekeeping
+
+- No copy, type or engine changes — verdictOf, the vote engine and both
+  locales are untouched; the Insights chunk SHRANK slightly (localStorage
+  read/write effects removed): 319.94/82.52 kB raw/gz against the
+  round-25 budget 322.50/84.00. No bump.
+
 ## [2026-10-11] — The estimations speak in value and cost, not bare directions (owner round 26)
 
 Twenty-sixth round — the owner, pointing at the red-and-green "will go up":
