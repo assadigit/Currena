@@ -992,7 +992,7 @@ export const insightsCopyEn = {
     explainerIntro:
       'Each question group is a gauge: the share of its voting indicators currently in their alert zone sets the gauge’s step (0 → step 1, up to ⅓ → 2, up to ⅔ → 3, more → 4).',
     explainerScore:
-      'A region’s verdict is the rounded average of its gauge steps: escalated when any single gauge sits at step 4. The four words (Low, Moderate, Elevated, Severe) describe how much pressure an area is under, never actions.',
+      'A region’s verdict is the rounded average of its gauge steps: escalated when any single gauge sits at step 4. The four words (Stable, Cautious, Stressed, Critical) describe how much pressure an area is under, never actions.',
     explainerLabels: 'The labels describe conditions, not advice: Currena never recommends actions.',
     explainerStale: 'Stale or missing items are excluded from every gauge and count, and shown greyed with their last date.',
     explainerBacktest: 'Thresholds were backtested against 2008, 2020 and 2022: the tables live in the project docs.',
@@ -1215,10 +1215,10 @@ export const insightsCopyEn = {
   },
 
   label: {
-    relaxed: 'Low',
-    cautious: 'Moderate',
-    stressed: 'Elevated',
-    alarmed: 'Severe',
+    relaxed: 'Stable',
+    cautious: 'Cautious',
+    stressed: 'Stressed',
+    alarmed: 'Critical',
   },
 
   units: {

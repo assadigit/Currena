@@ -5,6 +5,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — Vocabulary: Stable · Cautious · Stressed · Critical (owner wording)
+
+Twentieth round — the owner picked the final verdict ladder. The Task-9
+proposal (Low · Moderate · Elevated · Severe) is replaced by the owner's
+own four words, which keep the intensity reading and add the familiar
+risk-dashboard tone.
+
+### Changed
+
+- **Verdict words (en):** Low → **Stable**, Moderate → **Cautious**,
+  Elevated → **Stressed**, Severe → **Critical**. Same plumbing as
+  before: display words only — machine keys
+  (`relaxed/cautious/stressed/alarmed`), API contract, meter segments
+  and colours untouched.
+- **Verdict words (fa):** کم → **پایدار**، متوسط → **محتاط**،
+  بالا → **پرتنش**، شدید → **بحرانی** — natural inside the existing
+  sentence templates ("۱ از ۵ حوزه در وضعیت بحرانی است: قیمت‌ها.
+  بقیه در وضعیت پایدار هستند.").
+- The About-dictionary entry for the four words (dead key kept for
+  type parity) and the FA header wording note were updated to match.
+- Test fixture: heroReason word table + inline assertions moved to the
+  new words.
+
+### Verification
+
+- Gates: typecheck 5/5; tests 784/784; build ✓; budgets held —
+  Insights chunk 302.23/304.20 kB raw, 78.33/78.60 gz.
+- Local QA (wrangler :8787 + vite :4174): en + fa hero sentences, region
+  cards, gauge words and meter aria ("Global: Stressed, step 3 of 4")
+  all carry the new words; light/dark, 375/1280 widths, zero console
+  errors, zero horizontal overflow.
+
 ## [2026-10-11] — Vocabulary: Low · Moderate · Elevated · Severe, and zero em dashes (owner request)
 
 Nineteenth round — two owner directives: the verdict words

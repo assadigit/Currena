@@ -73,7 +73,7 @@ const gauge = (id: string, step: number, section: InsightsSection = 'global'): G
     warningCount: step >= 3 ? 1 : 0,
   }) as GaugeReading;
 
-const REASON_WORDS: Record<number, string> = { 1: 'Low', 2: 'Moderate', 3: 'Elevated', 4: 'Severe' };
+const REASON_WORDS: Record<number, string> = { 1: 'Stable', 2: 'Cautious', 3: 'Stressed', 4: 'Critical' };
 
 /* ------------------------------------------------------------------ *
  * R2 — the hero reason fixed table
@@ -108,8 +108,8 @@ describe('R2 heroReason (fixed table, never contradicts the gauges)', () => {
   it('a step-3 gauge is NAMED; the tail gets the calmer word', () => {
     const line = build([gauge('borrowing-costs', 3), gauge('prices-heat', 1)]);
     expect(line).toContain('Borrowing costs');
-    expect(line).toContain('Elevated');
-    expect(line).toContain('Low');
+    expect(line).toContain('Stressed');
+    expect(line).toContain('Stable');
     expect(heroReasonIsConsistent(line, [gauge('borrowing-costs', 3), gauge('prices-heat', 1)], nameOf)).toBe(true);
   });
 
@@ -139,7 +139,7 @@ describe('R2 heroReason (fixed table, never contradicts the gauges)', () => {
   it('the guard FAILS the known bad shape: reassurance while a gauge is stressed', () => {
     expect(
       heroReasonIsConsistent(
-        'Borrowing costs are Elevated, but it is not worth worrying about.',
+        'Borrowing costs are Stressed, but it is not worth worrying about.',
         [gauge('borrowing-costs', 3)],
         nameOf,
       ),
