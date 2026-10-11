@@ -1084,7 +1084,7 @@ body {
   /* Surfaces */
   --color-surface: #FFFFFF;
   --color-surface-raised: #FFFFFF;
-  --color-surface-alert-tint: rgba(206, 42, 42, 0.05);
+  --color-surface-alert-tint: rgba(218, 30, 40, 0.05);
   --color-border: rgba(44, 62, 80, 0.14);
   /* Status inks (icon + word chips — never colour alone, G5). R29 adds
    * status-watch: the cautious/middle step word gets its own ink.
@@ -1095,12 +1095,17 @@ body {
    * Round 22 (owner): the R30 inks read "dark saturated" — retuned to the
    * fresh traffic-light hues the owner asked for (green · yellow · orange ·
    * red) while holding ≥4.5:1 on white, on --color-currena-bg-light AND on
-   * each status chip's own tint (verified by script, see CHANGELOG). */
+   * each status chip's own tint (verified by script, see CHANGELOG).
+   * Round 23 (owner, again): round 22's retunes STILL read dark — the owner
+   * pinned the exact palette: IBM Carbon's signature state hues, verbatim —
+   * Green 50 #24a148 · Yellow 30 #f1c21b · Orange 40 #ff832b · Red 60
+   * #da1e28 (image in chat, "use the given colors for states"). Light mode
+   * uses the four hexes EXACTLY as given. */
   --color-accent-brand: #4A90E2;
-  --color-status-alert: #CE2A2A;   /* 5.26:1 white · 5.03 bgLight · 4.53 on the /15 chip tint */
-  --color-status-stressed: #C94908; /* 4.73:1 white · 4.52 bgLight — the step-3 word (plain surfaces only) */
-  --color-status-normal: #137A39;  /* 5.43:1 white · 4.72 on the success chip tint */
-  --color-status-watch: #9C5D07;   /* 5.27:1 white · 4.76 on the unusual chip tint — cautious/watch words */
+  --color-status-alert: #da1e28;   /* owner palette: Carbon Red 60, verbatim */
+  --color-status-stressed: #ff832b; /* owner palette: Carbon Orange 40, verbatim — the Stressed word */
+  --color-status-normal: #24a148;  /* owner palette: Carbon Green 50, verbatim — the Stable word / supports */
+  --color-status-watch: #f1c21b;   /* owner palette: Carbon Yellow 30, verbatim — the Cautious word */
   --color-status-context: #245E9F;
   --color-status-stale: #46505C;
   /* Spacing scale */
@@ -1129,13 +1134,13 @@ body {
   --color-text-tertiary: #A2AEBC;    /* 7.1:1 on #1A222E cards — meta only */
   --color-surface: #1A222E;
   --color-surface-raised: #202A38;
-  --color-surface-alert-tint: rgba(248, 113, 113, 0.07);
+  --color-surface-alert-tint: rgba(250, 77, 86, 0.07);
   --color-border: rgba(232, 237, 244, 0.16);
   --color-accent-brand: #6FAEEC;
-  --color-status-alert: #F87171;   /* 5.8:1 on #1A222E · 4.53 on the /15 chip tint */
-  --color-status-stressed: #FB923C; /* 7.1:1 on #1A222E — the step-3 word */
-  --color-status-normal: #4ADE80;  /* 9.2:1 on #1A222E */
-  --color-status-watch: #FBBF24;   /* 9.6:1 on #1A222E — cautious/watch words */
+  --color-status-alert: #fa4d56;   /* Carbon Red 50 — Red 60's own dark-surface sibling (Carbon pairs 60/50 across themes); #da1e28 verbatim is 3.2:1 on #1A222E, this holds 4.8:1 */
+  --color-status-stressed: #ff832b; /* Carbon Orange 40 verbatim — 6.5:1 on #1A222E */
+  --color-status-normal: #24a148;  /* Carbon Green 50 verbatim — 4.8:1 on #1A222E */
+  --color-status-watch: #f1c21b;   /* Carbon Yellow 30 verbatim — 9.5:1 on #1A222E */
   --color-status-context: #6FAEEC;
   --color-status-stale: #9AA8BC;
 }

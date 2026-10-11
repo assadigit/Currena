@@ -22,6 +22,14 @@
  * state words and the "how" lines now speak at the same label size as the
  * alert cards' titles and consequence lines; the five group headings share
  * one heading style.
+ *
+ * Round 23 (owner): the card now OPENS with a stated estimation — one
+ * direction chip per metal, derived mechanically from the same conditions
+ * listed below (supportive count minus against count; the sign is the
+ * direction: up / down / no clear direction). Owner's example: "Gold will
+ * go up, Silver will go down." The tally is still a description of
+ * conditions, not advice; unreadable metals show "no estimate yet" and the
+ * strip hides only when NEITHER metal could be read.
  */
 
 import { useEffect, useMemo, useState } from 'react';
@@ -32,6 +40,113 @@ import { Activity, ChevronDown } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { SIGNALS_ENABLED, formatChange, formatIndicatorValue, mergeSignals } from './config';
+
+/* ---------------------------------------------------------------- *
+ * Round 23 — the estimation (owner): a mechanical tally, stated.
+ * supportive minus against; the sign is the direction. Neutral ink
+ * when the tally balances, "no estimate yet" when nothing reads.
+ * ---------------------------------------------------------------- */
+
+type SignalVerdict = 'up' | 'down' | 'flat';
+
+function verdictOf(reading: SignalReading): SignalVerdict | null {
+  const supportive = reading.conditions.filter((c) => c.state === 'supportive').length;
+  const against = reading.conditions.filter((c) => c.state === 'against').length;
+  if (supportive + against === 0) return null; // nothing could be read
+  if (supportive > against) return 'up';
+  if (against > supportive) return 'down';
+  return 'flat';
+}
+
+function VerdictIcon({ verdict }: { verdict: SignalVerdict }) {
+  const common = {
+    width: 18,
+    height: 18,
+    viewBox: '0 0 16 16',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 2,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true,
+    focusable: false,
+  };
+  if (verdict === 'up') {
+    return (
+      <svg {...common}>
+        <path d="M8 13V3.5" />
+        <path d="M3.5 8 8 3.5 12.5 8" />
+      </svg>
+    );
+  }
+  if (verdict === 'down') {
+    return (
+      <svg {...common}>
+        <path d="M8 3v9.5" />
+        <path d="M3.5 8 8 12.5 12.5 8" />
+      </svg>
+    );
+  }
+  return (
+    <svg {...common}>
+      <path d="M3 8h10" />
+    </svg>
+  );
+}
+
+const verdictTone: Record<SignalVerdict, string> = {
+  up: 'text-[var(--color-status-normal)]',
+  down: 'text-[var(--color-status-alert)]',
+  flat: 'text-[var(--color-status-stale)]',
+};
+
+function VerdictStrip({
+  gold,
+  silver,
+  copy,
+}: {
+  gold: SignalReading;
+  silver: SignalReading;
+  copy: InsightsCopy;
+}) {
+  const s = copy.signals;
+  const rows = [
+    { reading: gold, verdict: verdictOf(gold) },
+    { reading: silver, verdict: verdictOf(silver) },
+  ];
+  if (rows.every((r) => r.verdict === null)) return null;
+  return (
+    <div className="flex flex-col gap-1.5" data-signal-verdict>
+      <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-tertiary)]">
+        {s.verdictTitle}
+      </h4>
+      <ul className="m-0 flex list-none flex-col gap-1.5 p-0 sm:flex-row">
+        {rows.map(({ reading, verdict }) => (
+          <li
+            key={reading.metal}
+            data-verdict-metal={reading.metal}
+            data-verdict-direction={verdict ?? 'none'}
+            className="flex min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-sm)] px-2.5 py-2 ring-1 ring-[var(--color-border)]"
+          >
+            <span className={`inline-flex shrink-0 items-center ${verdict !== null ? verdictTone[verdict] : 'text-[var(--color-status-stale)]'}`}>
+              <VerdictIcon verdict={verdict ?? 'flat'} />
+            </span>
+            <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
+              {s.metals[reading.metal]}
+            </span>
+            <span
+              className={`text-[length:var(--type-label)] font-bold ${
+                verdict !== null ? verdictTone[verdict] : 'text-[var(--color-status-stale)]'
+              }`}
+            >
+              {verdict === 'up' ? s.verdictUp : verdict === 'down' ? s.verdictDown : verdict === 'flat' ? s.verdictFlat : s.verdictNone}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 /* ---------------------------------------------------------------- *
  * Icons — icon + word, never colour alone (S1/R26 note). No check
@@ -323,6 +438,10 @@ function MergedSignalsCard({
           ))}
         </span>
       </header>
+
+      {/* Round 23 (owner): the stated estimation — one direction chip per
+       * metal, derived from the conditions below. Answer first. */}
+      <VerdictStrip gold={gold} silver={silver} copy={copy} />
 
       {/* The shared conditions, listed ONCE (identical states by construction).
        * Round 22: the three state headings take the state's own ink and all

@@ -5,6 +5,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — The owner's exact Carbon state palette, and an estimation you can point at (owner round 23)
+
+Twenty-third round — the owner pinned the exact state colours ("use the
+given colors for states", IBM Carbon's signature hues in chat) and asked
+the gold-and-silver card for "an estimation and verdict, for example,
+Gold will go up, Silver will go down."
+
+### Changed
+
+- **Status palette = the owner's four hexes, verbatim.** Round 22's retuned
+  inks still read dark, so the four state tokens are now the exact colours
+  from the owner's palette image in BOTH themes: Green 50 `#24a148`
+  (Stable/supports), Yellow 30 `#f1c21b` (Cautious), Orange 40 `#ff832b`
+  (Stressed), Red 60 `#da1e28` (Critical/works-against). The words, meter
+  segments, status chips and alert-card accents all read from the tokens,
+  so the whole ladder (and the attention tints, re-based to
+  `rgba(218,30,40,…)`) picks up the new hues at once. One deliberate
+  exception, disclosed: in DARK mode the Critical ink takes Carbon's own
+  dark-surface sibling Red 50 `#fa4d56` — `#da1e28` verbatim is 3.2:1 on
+  the `#1A222E` card (muddy), `#fa4d56` holds 4.8:1; Carbon pairs 60/50
+  across themes for exactly this reason. Known trade-off, owner's call
+  kept: Yellow 30 on white is ~1.7:1 — legible at the 25.6px/800 verdict
+  size, faint at small label sizes; the exact hue ships as instructed.
+- **The gold-and-silver card now states its estimation.** A new
+  "Estimation" strip opens the merged card with one direction chip per
+  metal: a mechanical tally of the conditions listed below (supportive
+  minus against; the sign is the direction) → "will go up" in the green
+  ink, "will go down" in the red ink, "no clear direction" in neutral,
+  "no estimate yet" when nothing reads (the strip hides only when NEITHER
+  metal could be read). En + fa copy (برآورد / بالا می‌رود / پایین
+  می‌آید / جهت روشنی ندارد), arrow glyphs (icon + word + colour — never
+  colour alone), RTL-safe, chips split the row at ≥sm and stack on
+  phones. Current data renders exactly the owner's example shape:
+  "gold will go down · silver no clear direction". Still a description of
+  conditions, not advice.
+
+### Housekeeping
+
+- Bundle budget bumped 305.0/78.9 → 307.5/79.6 kB (Insights chunk
+  304.25 → 306.68 kB raw / 78.75 → 79.19 gz): the verdict strip's
+  component, arrow icons and 5 new copy strings × 2 locales. Entry
+  untouched at 290.33/87.05.
+
 ## [2026-10-11] — Fresh traffic-light status hues, no dead white space in card lanes, and a gold-and-silver card that speaks at full size (owner follow-up)
 
 Twenty-second round — owner feedback on the verdict colour scale, the

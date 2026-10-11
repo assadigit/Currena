@@ -1427,6 +1427,14 @@ export const insightsCopyEn = {
       'mostly-unsupportive': 'mostly unsupportive',
     },
     metals: { gold: 'gold', silver: 'silver' },
+    // Round 23 (owner): the card states its estimation — a mechanical tally
+    // of the conditions above (supportive minus against; the sign is the
+    // direction). Describes the tally, still not advice.
+    verdictTitle: 'Estimation',
+    verdictUp: 'will go up',
+    verdictDown: 'will go down',
+    verdictFlat: 'no clear direction',
+    verdictNone: 'no estimate yet',
     // R26: neutral side words (no check/cross marks, no green/red).
     sideSupportive: 'Supports',
     sideAgainst: 'Works against',

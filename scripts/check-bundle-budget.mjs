@@ -128,7 +128,13 @@ const BUDGETS = [
   // TrendingUp kicker, the 64×64 money-area icon boxes, and the aligned
   // price-tile change cells. Mostly localized strings (compressible). ENTRY
   // untouched. Justified in CHANGELOG §2026-10-11 (owner alignment).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 305_000, gz: 78_900, label: 'Insights lazy chunk' },
+  // Verdict-strip bump (304.25/78.75 → 306.68/79.19, budget 305.0/78.9 →
+  // 307.5/79.6): round 23 (owner) — the merged gold-and-silver card now
+  // OPENS with a stated estimation: per-metal direction chips (up / down /
+  // no clear direction) derived mechanically from the conditions tally,
+  // with 5 new copy strings × 2 locales, the arrow icon set and the chip
+  // layout. ENTRY untouched. Justified in CHANGELOG §2026-10-11 (round 23).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 307_500, gz: 79_600, label: 'Insights lazy chunk' },
 ];
 
 function main() {

@@ -530,6 +530,13 @@ export const insightsCopyFa: InsightsCopy = {
       'mostly-unsupportive': 'عمدتاً غیرحمایتی',
     },
     metals: { gold: 'طلا', silver: 'نقره' },
+    // Round 23 (owner): برآوردِ کارت — شمارشِ مکانیکیِ شرایط بالا
+    // (حمایتی منهای مخالف؛ علامتش جهت است). اوضاع را توصیف می‌کند، نه توصیه.
+    verdictTitle: 'برآورد',
+    verdictUp: 'بالا می‌رود',
+    verdictDown: 'پایین می‌آید',
+    verdictFlat: 'جهت روشنی ندارد',
+    verdictNone: 'هنوز برآوردی نیست',
     // R26: واژه‌های بی‌طرف (بدون علامت درست/غلط، بدون سبز/قرمز).
     sideSupportive: 'حمایت می‌کند',
     sideAgainst: 'علیه کار می‌کند',
