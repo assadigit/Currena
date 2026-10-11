@@ -745,14 +745,6 @@ export function formatPinnedStorage(ids: readonly IndicatorId[]): string {
   return JSON.stringify([...ids]);
 }
 
-/* ------------------------------------------------------------------ *
- * Lane setting (Block L1 → round-2 R1) — localStorage, fail-open.
- * The old hero-order swap setting is retired (decision D7: Global first,
- * no toggle).
- * ------------------------------------------------------------------ */
-
-export const LANE_STORAGE_KEY = 'currena.insights.lane.v1';
-
 /* ---------------------------------------------------------------- *
  * R30 (roast 11 Oct): "Source codes still show in footers" — the
  * snapshot's sourceName carries publisher + raw series ids
@@ -774,16 +766,6 @@ export function friendlySource(raw: string): string {
   // "ABS (…)", "FRED (…)" — the parenthetical is a series id, strip it.
   const m = raw.match(/^([A-Za-z .-]+?)\s*\(/);
   return (m?.[1] ? m[1] : raw).trim() || raw;
-}
-
-/** Read the remembered lane (R1: default GLOBAL, try/catch per spec). */
-export function readStoredLane(): InsightsSection {
-  try {
-    const v = window.localStorage.getItem(LANE_STORAGE_KEY);
-    return v === 'global' || v === 'australia' ? v : 'global';
-  } catch {
-    return 'global'; // storage unavailable — the default
-  }
 }
 
 /* ------------------------------------------------------------------ *

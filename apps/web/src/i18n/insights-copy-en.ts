@@ -1077,6 +1077,12 @@ export const insightsCopyEn = {
     range10y: '10 years',
     range5y: '5 years',
     range1y: '1 year',
+    // Round 33: the Estimation strip's own per-metal trend chart — the
+    // quarter window joins the reader-facing zooms; the chips sit under
+    // the chart that fills the chip's white space.
+    rangeQuarter: 'Quarter',
+    stripChartAria: 'Price history for {metal}, the last {range}',
+    stripChartLabel: 'Price history',
     chartRangeLabel: 'Chart time range',
     chartTable: 'Chart data',
     chartColDate: 'Date',

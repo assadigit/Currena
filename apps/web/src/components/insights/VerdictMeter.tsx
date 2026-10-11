@@ -8,11 +8,17 @@
  * never a static per-label sentence, never a reassurance while any gauge
  * sits at step 3+). Under it: up to three needs-attention tiles WITH NUMBERS
  * (plain name, large value with unit, the rule in short form, opens the
- * card) and a "+n more" tile (R3).
+ * card) and a "+n more" tile (R3) that reveals the remaining tiles IN PLACE
+ * (round 33 — the old jump-to-section read as a dead click).
+ *
+ * Round 33 (owner): the hero region mark steps back DOWN to 48/64 — the
+ * 128px artwork here was visual noise; the BIG icons belong to the
+ * dedicated Global/Australia sections mid-page.
  *
  * Round-2 D7: Global renders first (no swap setting — retired).
  */
 
+import { useState } from 'react';
 import type { IndicatorReading, InsightsSection, IndicatorId } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
@@ -120,8 +126,12 @@ export function VerdictBlock({
   });
 
   // R3: the needs-attention tiles (extremity-sorted, up to 3 + "+n more").
+  // Round 33: "+n more" reveals the rest IN PLACE (local state) — the old
+  // jump-to-lane behaviour read as a dead click (the owner: "doesn't show
+  // other indicators").
   const tiles = attentionTiles(readings, section);
-  const shown = tiles.slice(0, 3);
+  const [revealAllTiles, setRevealAllTiles] = useState(false);
+  const shown = revealAllTiles ? tiles : tiles.slice(0, 3);
 
   // Gauge member count for the "n of m" line (same denominator as before).
   const gaugeMemberIds = new Set(sectionGauges.flatMap((g) => [...g.members]));
@@ -139,12 +149,11 @@ export function VerdictBlock({
     >
       <header className="flex items-center justify-between gap-3">
         {/* Round 28 (owner): each region wears its own mark — the globe for
-         * Global, the map for Australia. Round 29: the mark grew to 22/28.
-         * Round 32 (owner): the region's DEDICATED section wears its BIG
-         * icon — the same face the price tiles and the Estimation chips
-         * speak with (96px mobile / 128×128 desktop); the label and the
-         * view link sit beside it, vertically centred on the artwork. */}
-        <IconImg src={sectionIconUrl(section)} size={96} desktopSize={128} />
+         * Global, the map for Australia. Round 33 (owner): back to a QUIET
+         * mark (48/64, 64px the hard ceiling) — the 128px hero artwork was
+         * visual noise; the big 128px icons now live ONLY on the dedicated
+         * sections mid-page (round 33, Insights.tsx). */}
+        <IconImg src={sectionIconUrl(section)} size={48} desktopSize={64} />
         <h3 className="type-kicker m-0 min-w-0 flex-1 text-[var(--color-text-tertiary)]">
           {sectionLabel}
         </h3>
@@ -289,10 +298,11 @@ export function VerdictBlock({
               );
             })}
           </ul>
-          {tiles.length > 3 ? (
+          {tiles.length > 3 && !revealAllTiles ? (
             <button
               type="button"
-              onClick={() => onJumpSection(section)}
+              aria-expanded={false}
+              onClick={() => setRevealAllTiles(true)}
               className="insights-focusable mt-1.5 inline-flex min-h-[24px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
             >
               {interpolate(copy.ui.attentionTileMore, { n: num(tiles.length - 3, numberLocale) })}

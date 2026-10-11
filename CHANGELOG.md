@@ -5,6 +5,65 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — The big icons move to the dedicated sections; the Estimation chips wear the metals' own charts (owner round 33)
+
+Thirty-third round — five owner points: the 128px world/australia maps in
+the HERO are "visual noise" (max 64×64 up there; the big icons belong
+"here in the middle of page of global and australia" — the screenshot
+points at the dedicated `Global` section heading); the Estimation chips'
+white space should carry "gold and silver chart … quarter, one year,
+five year time frame by clickable chips"; the Global | Australia switch
+bar must go from the top of the page ("also it doesnt work"); and the
+"+2 more" tile "doesnt show other indicators".
+
+### Changed
+
+- **The switcher is retired — both regions render, stacked** — the
+  Global | Australia pill bar is gone from the page entirely (it sat
+  above the fold flipping a state the reader could not see: clicking it
+  re-rendered a section below the fold and read as dead). The dedicated
+  sections now render TOGETHER mid-page — Global first (D7), then
+  Australia — each headed by its own name; `insights-section-global` /
+  `insights-section-australia` are static anchors, so the hero's "View
+  section" links and the Tools counts behave honestly (counts describe
+  everything on screen again). LaneSwitch.tsx + the lane storage key are
+  deleted.
+- **The big region icons live on the section headings** — each dedicated
+  section's h2 leads with its artwork at the price tiles' scale (96px
+  mobile / **128×128 desktop**) beside the name: the globe for Global,
+  the map for Australia. This is where the owner wanted the big icons —
+  the screenshot's heading — not the hero.
+- **The hero mark steps back down** — the verdict blocks' region icon is
+  a quiet 48px mobile / **64×64 desktop** (the owner's hard ceiling),
+  silencing the visual noise the 128px artwork made at the top of the
+  page.
+- **The Estimation chips' white space is now the metals' own history** —
+  each verdict chip pairs its 128px artwork (left column: artwork, name,
+  verdict word) with a compact zero-dependency SVG trend chart (the
+  house Sparkline pattern, dir="ltr" in both locales) that fills the
+  former white space on desktop and sits under the artwork on phones.
+  Under the chart: CLICKABLE range chips — **Quarter · 1 year · 5 years**
+  (en) / «سه‌ماهه · ۱ سال · ۵ سال» (fa) — default Quarter, disabled when
+  the window cannot show ≥2 points, plus one signed window delta
+  («+130.3%», quiet ink — the verdict word beside it already speaks in
+  colour). Data rides the same module-cached `/api/insights/:id/history`
+  fetch the details panel uses; a 404 degrades to the honest "no chart
+  history" line.
+- **"+n more" now shows the indicators** — the hero's needs-attention
+  overflow tile used to jump to the (removed) switcher's lane, which
+  read as a dead click. It now reveals the remaining tiles IN PLACE
+  (the grid wraps; the button disappears once everything is shown).
+
+### Housekeeping
+
+- Insights chunk 326.09/84.00 kB raw/gz against the previous 322.50/84.00
+  budget — OVER by 3.59 kB raw (gzip grew ~1 kB), so the budget bumps to
+  **330.00/85.50** with this note (the R32 entry pre-announced the first
+  additive bump). The growth is the strip charts + chips, the dual
+  sections and the reveal state — logic and JSX, not strings. ENTRY
+  chunk untouched (290.33/87.05 vs 296.00/89.50). PWA precache unchanged
+  (85 entries).
+
 ## [2026-10-11] — Plain direction words, no stuttered rows, big region marks, and the connections' focal verdict field (owner round 32)
 
 Thirty-second round — five owner points: "instead of 'ارزش می‌بازد' say

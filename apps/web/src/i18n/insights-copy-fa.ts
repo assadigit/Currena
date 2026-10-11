@@ -184,6 +184,11 @@ export const insightsCopyFa: InsightsCopy = {
     range10y: '۱۰ سال',
     range5y: '۵ سال',
     range1y: '۱ سال',
+    // Round 33: نمودار روند هر فلز در نوار برآورد — بازهٔ سه‌ماهه به
+    // بازه‌های قابل انتخاب اضافه شد؛ چیپ‌ها زیر نمودار می‌نشینند.
+    rangeQuarter: 'سه‌ماهه',
+    stripChartAria: 'روند قیمت {metal}، {range} گذشته',
+    stripChartLabel: 'روند قیمت',
     chartRangeLabel: 'بازهٔ زمانی نمودار',
     chartTable: 'داده‌های نمودار',
     chartColDate: 'تاریخ',

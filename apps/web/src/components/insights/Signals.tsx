@@ -51,7 +51,7 @@
  * choice is session-only — a fresh load always shows the full card.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import type { CSSProperties } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
@@ -59,6 +59,7 @@ import { evaluateSignal, type SignalConditionReading, type SignalLean, type Sign
 import { Activity, ChevronDown } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { ApiError, fetchIndicatorHistory } from '../../lib/insights';
 import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg, indicatorIconUrl } from '../icons/currena';
 import { SIGNALS_ENABLED, formatChange, formatIndicatorValue, mergeSignals } from './config';
 
@@ -142,14 +143,222 @@ const verdictTone: Record<SignalVerdict, string> = {
   flat: 'text-[var(--color-status-stale)]',
 };
 
+/* ---------------------------------------------------------------- *
+ * Round 33 (owner): the Estimation chip's white space is now the
+ * metal's own price history — a compact zero-dependency chart (the
+ * house Sparkline/HistoryChart pattern) with CLICKABLE range chips
+ * (Quarter · One year · Five years). Data rides the same module-
+ * cached /api/insights/:id/history fetch the details panel uses, so
+ * opening a card later never re-downloads. The chart fills the space
+ * right of the 128px artwork on desktop and sits under it on phones.
+ * ---------------------------------------------------------------- */
+
+type StripRange = 'quarter' | '1y' | '5y';
+
+const STRIP_RANGES: readonly StripRange[] = ['quarter', '1y', '5y'];
+
+const STRIP_RANGE_DAYS: Readonly<Record<StripRange, number>> = {
+  quarter: 92,
+  '1y': 366,
+  '5y': 1827,
+};
+
+function stripSeries(
+  points: readonly [number, number][],
+  range: StripRange,
+): readonly [number, number][] {
+  if (points.length === 0) return [];
+  const lastDay = points[points.length - 1]![0];
+  const cutoff = lastDay - STRIP_RANGE_DAYS[range];
+  return points.filter((p) => p[0] >= cutoff);
+}
+
+function stripPlottable(points: readonly [number, number][], range: StripRange): boolean {
+  return stripSeries(points, range).length >= 2;
+}
+
+const STRIP_W = 320;
+const STRIP_H = 96;
+const STRIP_PAD = 6;
+
+const stripRangeCopyKey: Record<StripRange, 'rangeQuarter' | 'range1y' | 'range5y'> = {
+  quarter: 'rangeQuarter',
+  '1y': 'range1y',
+  '5y': 'range5y',
+};
+
+/** The per-metal trend chart inside an Estimation chip (round 33). */
+function MetalTrendChart({
+  metal,
+  copy,
+  numberLocale,
+}: {
+  metal: 'gold' | 'silver';
+  copy: InsightsCopy;
+  numberLocale: 'en-US' | 'fa-IR';
+}) {
+  const s = copy.signals;
+  const gradId = useId();
+  const [state, setState] = useState<
+    { kind: 'loading' } | { kind: 'ready'; points: [number, number][] } | { kind: 'error' } | { kind: 'none' }
+  >({ kind: 'loading' });
+  const [range, setRange] = useState<StripRange>('quarter');
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchIndicatorHistory(metal === 'gold' ? 'gold-usd' : 'silver-usd')
+      .then((history) => {
+        if (cancelled) return;
+        setState(
+          history && history.points.length > 0 ? { kind: 'ready', points: history.points } : { kind: 'none' },
+        );
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        // A 404 history_not_found is the expected "no series" answer.
+        if (err instanceof ApiError && err.code === 'history_not_found') {
+          setState({ kind: 'none' });
+          return;
+        }
+        setState({ kind: 'error' });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [metal]);
+
+  if (state.kind === 'loading') {
+    return <p className="m-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{copy.ui.historyLoading}</p>;
+  }
+  if (state.kind === 'error') {
+    return <p className="m-0 text-[length:var(--type-caption)] text-[var(--color-status-alert)]">{copy.ui.historyError}</p>;
+  }
+  if (state.kind === 'none') {
+    return <p className="m-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{copy.ui.noHistory}</p>;
+  }
+
+  const clean = state.points.filter((p) => Number.isFinite(p[1]));
+  const series = stripSeries(clean, range);
+  if (series.length < 2) {
+    return <p className="m-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{copy.ui.noHistory}</p>;
+  }
+
+  const values = series.map((p) => p[1]);
+  const vMin = Math.min(...values);
+  const vMax = Math.max(...values);
+  const stepX = (STRIP_W - 2 * STRIP_PAD) / (series.length - 1);
+  const scaleY = (v: number): number => {
+    if (vMax === vMin) return STRIP_H / 2;
+    const t = (v - vMin) / (vMax - vMin);
+    return STRIP_H - STRIP_PAD - t * (STRIP_H - 2 * STRIP_PAD);
+  };
+  const coords = series.map((p, i) => ({ x: STRIP_PAD + i * stepX, y: scaleY(p[1]) }));
+  const line = coords.map((c, i) => `${i === 0 ? 'M' : 'L'}${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
+  const firstPt = coords[0]!;
+  const lastPt = coords[coords.length - 1]!;
+  const area = `${line} L${lastPt.x.toFixed(1)},${STRIP_H - STRIP_PAD} L${firstPt.x.toFixed(1)},${STRIP_H - STRIP_PAD} Z`;
+
+  // The window's move, in the metal's own units — one signed percent,
+  // quiet ink (the verdict word beside it already speaks in colour).
+  const firstVal = series[0]![1];
+  const lastVal = series[series.length - 1]![1];
+  const deltaPct = firstVal !== 0 ? ((lastVal - firstVal) / firstVal) * 100 : null;
+  const deltaText =
+    deltaPct !== null
+      ? deltaPct > 0
+        ? `+${formatNumber(deltaPct, numberLocale, { maximumFractionDigits: 1 })}` // sign rides with the number (never colour alone)
+        : formatNumber(deltaPct, numberLocale, { maximumFractionDigits: 1 })
+      : null;
+
+  const ariaLabel = interpolate(copy.ui.stripChartAria, {
+    metal: s.metals[metal],
+    range: copy.ui[stripRangeCopyKey[range]],
+  });
+
+  return (
+    <div className="flex min-w-0 flex-col gap-1.5">
+      <span dir="ltr" className="relative block text-currena-blue">
+        <svg
+          viewBox={`0 0 ${STRIP_W} ${STRIP_H}`}
+          className="h-auto w-full"
+          preserveAspectRatio="none"
+          role="img"
+          aria-label={ariaLabel}
+        >
+          <defs>
+            <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="currentColor" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="currentColor" stopOpacity="0.02" />
+            </linearGradient>
+          </defs>
+          <path d={area} fill={`url(#${gradId})`} />
+          <path
+            d={line}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+          />
+          <circle cx={lastPt.x} cy={lastPt.y} r="3.5" fill="currentColor" stroke="rgba(0,0,0,0.25)" strokeWidth="1" />
+        </svg>
+      </span>
+      <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+        <span
+          role="group"
+          aria-label={copy.ui.chartRangeLabel}
+          className="no-print flex items-center gap-1 rounded-full bg-currena-soft/70 p-0.5 dark:bg-white/[0.06]"
+          data-verdict-chart-range={metal}
+        >
+          {STRIP_RANGES.map((r) => {
+            const active = r === range;
+            const plottable = stripPlottable(clean, r);
+            return (
+              <button
+                key={r}
+                type="button"
+                aria-pressed={active}
+                disabled={!plottable}
+                onClick={() => {
+                  if (r === range) return;
+                  setRange(r);
+                }}
+                className={`inline-flex min-h-[28px] cursor-pointer items-center rounded-full px-2.5 text-[length:var(--type-caption)] font-bold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-currena-blue disabled:cursor-not-allowed disabled:opacity-40 ${
+                  active
+                    ? 'bg-white text-currena-blue-deep shadow-sm ring-1 ring-black/[0.06] dark:bg-[#243040] dark:text-currena-blue dark:ring-white/[0.1]'
+                    : 'bg-transparent text-currena-muted hover:text-currena-dark dark:hover:text-currena-dark'
+                }`}
+              >
+                {copy.ui[stripRangeCopyKey[r]]}
+              </button>
+            );
+          })}
+        </span>
+        {deltaText !== null ? (
+          <span
+            className="text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]"
+            data-verdict-chart-delta={metal}
+          >
+            <bdi dir="ltr">{deltaText}%</bdi>
+            <span className="sr-only">, {copy.ui[stripRangeCopyKey[range]]}</span>
+          </span>
+        ) : null}
+      </span>
+    </div>
+  );
+}
+
 function VerdictStrip({
   gold,
   silver,
   copy,
+  numberLocale,
 }: {
   gold: SignalReading;
   silver: SignalReading;
   copy: InsightsCopy;
+  numberLocale: 'en-US' | 'fa-IR';
 }) {
   const s = copy.signals;
   const rows = [
@@ -165,7 +374,11 @@ function VerdictStrip({
    * artwork leads each chip at the price tiles' scale (96px mobile /
    * 128×128 desktop) with the metal name under it, and the verdict word
    * speaks at the price's own size in the verdict ink (icon + word,
-   * never colour alone). */
+   * never colour alone).
+   * Round 33 (owner): the chip's white space is no longer empty — the
+   * metal's own price history (compact chart + clickable Quarter /
+   * 1 year / 5 years chips) fills the space right of the artwork on
+   * desktop and sits under it on phones. */
   return (
     <div
       className="flex flex-col gap-2 rounded-[var(--radius-lg)] bg-gradient-to-b from-[var(--color-accent-gold)]/[0.16] via-[var(--color-accent-gold)]/[0.07] to-transparent p-3.5 shadow-[0_10px_34px_rgba(168,126,28,0.15)] ring-2 ring-[var(--color-accent-gold)]/45 sm:p-4 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
@@ -180,22 +393,30 @@ function VerdictStrip({
             key={reading.metal}
             data-verdict-metal={reading.metal}
             data-verdict-direction={verdict ?? 'none'}
-            className="flex min-w-0 flex-1 flex-col items-start gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)]"
+            className="flex min-w-0 flex-1 flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] sm:flex-row sm:items-center sm:gap-4"
           >
-            <MetalIcon metal={reading.metal} size={96} desktopSize={128} />
-            <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-secondary)]">
-              {s.metals[reading.metal]}
-            </span>
-            <span
-              className={`inline-flex items-center gap-1.5 ${
-                verdict !== null ? verdictTone[verdict] : 'text-[var(--color-status-stale)]'
-              }`}
-            >
-              <VerdictIcon verdict={verdict ?? 'flat'} />
-              <span className="text-[length:var(--type-number)] font-bold leading-tight">
-                {verdict === 'up' ? s.verdictUp : verdict === 'down' ? s.verdictDown : verdict === 'flat' ? s.verdictFlat : s.verdictNone}
+            <div className="flex shrink-0 flex-col items-start gap-1 sm:w-40">
+              <MetalIcon metal={reading.metal} size={96} desktopSize={128} />
+              <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-secondary)]">
+                {s.metals[reading.metal]}
               </span>
-            </span>
+              <span
+                className={`inline-flex items-center gap-1.5 ${
+                  verdict !== null ? verdictTone[verdict] : 'text-[var(--color-status-stale)]'
+                }`}
+              >
+                <VerdictIcon verdict={verdict ?? 'flat'} />
+                <span className="text-[length:var(--type-number)] font-bold leading-tight">
+                  {verdict === 'up' ? s.verdictUp : verdict === 'down' ? s.verdictDown : verdict === 'flat' ? s.verdictFlat : s.verdictNone}
+                </span>
+              </span>
+            </div>
+            <div
+              data-verdict-chart={reading.metal}
+              className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 sm:border-s sm:border-[var(--color-border)] sm:ps-4"
+            >
+              <MetalTrendChart metal={reading.metal} copy={copy} numberLocale={numberLocale} />
+            </div>
           </li>
         ))}
       </ul>
@@ -501,7 +722,7 @@ function MergedSignalsCard({
 
       {/* Round 23 (owner): the stated estimation — one direction chip per
        * metal, derived from the conditions below. Answer first. */}
-      <VerdictStrip gold={gold} silver={silver} copy={copy} />
+      <VerdictStrip gold={gold} silver={silver} copy={copy} numberLocale={numberLocale} />
 
       {/* The shared conditions, listed ONCE (identical states by construction).
        * Round 22: the three state headings take the state's own ink and all

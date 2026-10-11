@@ -13,8 +13,8 @@
  *   → "What it means for my money": at most 4 lines (R11)
  *   → "Together" (collapsed by default, R7b) → "What the signals say"
  *     (collapsed, merged card R26)
- *   → indicators: visible Global|Australia switch (Global default, R1),
- *     signals-first groups (R7), rows without truncation (R8)
+ *   → indicators: BOTH dedicated sections stacked (round 33 — the
+ *     Global|Australia switcher is retired), each with its big region icon
  *   → "Next up" calendar (once, below the indicators, R16)
  *   → footer: "About this data" (quiet, collapsible, R25)
  *
@@ -39,7 +39,6 @@ import { CompactRow } from '../components/insights/CompactRow';
 import { DetailsPanel } from '../components/insights/DetailsPanel';
 import { HeroBlock } from '../components/insights/HeroBlock';
 import { JumpNav, type JumpTarget } from '../components/insights/JumpNav';
-import { LaneSwitch } from '../components/insights/LaneSwitch';
 import { MoneyPanel } from '../components/insights/MoneyPanel';
 import { NextUpStrip } from '../components/insights/NextUpStrip';
 import { PricesBoard } from '../components/insights/PricesBoard';
@@ -49,9 +48,11 @@ import { ToolsMenu } from '../components/insights/ToolsMenu';
 import { Skeleton } from '../components/ui';
 import { Button } from '../components/ui';
 import { useInsightsCopy } from '../components/insights/useInsightsCopy';
+import { IconImg, sectionIconUrl } from '../components/icons/currena';
 import {
   GROUP_ORDER,
   PINNED_STORAGE_KEY,
+  SECTION_ORDER,
   SIGNALS_ENABLED,
   attentionToneClass,
   definitionFor,
@@ -60,7 +61,6 @@ import {
   formatPinnedStorage,
   groupVisibility,
   parsePinnedIds,
-  readStoredLane,
   statusCounts,
   stepToneClass,
   tierIsCard,
@@ -393,8 +393,6 @@ export function Insights() {
       return new Set(); // storage unavailable (privacy mode) — session-only
     }
   });
-  // R1: the lane switch — remembered, GLOBAL default (D7), fail-open.
-  const [lane, setLane] = useState<InsightsSection>(() => readStoredLane());
   // R7b/R25: the collapsible sections — the route bumps their tokens when a
   // pill/hash/hero link targets them (R19: selecting a pill expands).
   const [togetherToken, setTogetherToken] = useState(0);
@@ -507,12 +505,14 @@ export function Insights() {
   }, []);
 
   const jumpToSection = useCallback((section: InsightsSection) => {
-    // Jumping to a region's lane also selects that lane (R1 synergy).
-    setLane(section);
-    try {
-      window.localStorage.setItem('currena.insights.lane.v1', section);
-    } catch {
-      /* session-only */
+    // Round 33: BOTH dedicated sections render stacked mid-page — a jump
+    // SCROLLS to the region's own heading (the old click only flipped the
+    // lane switch, which read as a dead click — owner round 33). The
+    // section anchors are static now: insights-section-global / -australia.
+    const el = document.getElementById(`insights-section-${section}`);
+    if (el) {
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
     }
   }, []);
 
@@ -582,16 +582,13 @@ export function Insights() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [state, visibleIds, focusCard]);
 
-  // R15: the Tools counts describe ONLY the current lane (the old row
-  // described the whole snapshot while one lane was on screen).
+  // R15 → round 33: BOTH dedicated sections render on the page now, so the
+  // Tools counts describe everything on screen (the whole snapshot again —
+  // the old lane-scoped counts belonged to the removed switcher).
   const laneCounts = useMemo(() => {
     if (state.kind !== 'ready') return { all: 0, warning: 0, unusual: 0, normal: 0, context: 0 };
-    const laneReadings = state.snapshot.readings.filter((r) => {
-      const def = definitionFor(r.id);
-      return def.section === lane;
-    });
-    return statusCounts(laneReadings);
-  }, [state, lane]);
+    return statusCounts(state.snapshot.readings);
+  }, [state]);
 
   // I10: items rendering inside the lanes — visible under the filter and
   // not pinned (pinned items render in the watchlist strip).
@@ -711,12 +708,10 @@ export function Insights() {
         </div>
       </header>
 
-      {/* R30 (roast 11 Oct): the Global | Australia switch was buried below
-       * the fold ("no visible switch") — it now rides the FIRST screen too.
-       * The lane-section instance stays for context; both share one state. */}
-      <div className="mb-4 flex justify-center sm:justify-start">
-        <LaneSwitch lane={lane} onLaneChange={setLane} copy={copy} />
-      </div>
+      {/* Round 33 (owner): the Global | Australia switch is GONE — it sat
+       * above the fold doing invisible work (and read as broken). Both
+       * dedicated sections render stacked mid-page instead, each with its
+       * own big icon; the hero's "View section" links scroll to them. */}
 
       {state.kind === 'loading' ? (
         <div className="flex flex-col gap-6" role="status" aria-live="polite">
@@ -815,9 +810,12 @@ export function Insights() {
             </section>
           ) : null}
 
-          {/* L1–L4 + R7: the indicator lanes (Global default, R1). */}
-          <div id="insights-section-lane" className="scroll-mt-24 flex flex-col gap-5">
-            <LaneSwitch lane={lane} onLaneChange={setLane} copy={copy} />
+          {/* L1–L4 + R7 → round 33 (owner): both dedicated sections render
+           * stacked — Global first (D7), then Australia — each wearing its
+           * own BIG icon (96px mobile / 128×128 desktop) beside its heading:
+           * the big region artwork's one rightful home (the hero keeps a
+           * quiet 48/64 mark). The old switcher is gone. */}
+          <div id="insights-section-lane" className="scroll-mt-24 flex flex-col gap-10">
             {visibleIds !== null && visibleIds.size === 0 ? (
               <div className="rounded-[var(--radius-lg)] bg-currena-soft/60 px-5 py-8 text-center ring-1 ring-[var(--color-border)]">
                 <div
@@ -841,16 +839,7 @@ export function Insights() {
                 </button>
               </div>
             ) : (
-              /* L1: only the chosen lane renders; the section anchor switches
-               * with it so jump links stay honest. */
-              <section
-                id={`insights-section-${lane}`}
-                aria-labelledby={`insights-section-${lane}-title`}
-                className="scroll-mt-24 flex flex-col gap-6"
-              >
-                <h2 id={`insights-section-${lane}-title`} className="type-section m-0">
-                  {copy.sections[lane]}
-                </h2>
+              <>
                 {pinnedReadings.length > 0 ? (
                   <PinnedSection
                     readings={pinnedReadings}
@@ -860,22 +849,38 @@ export function Insights() {
                     pinned={pinned}
                   />
                 ) : null}
-                {GROUP_ORDER[lane].map((group: IndicatorGroupId) => (
-                  <QuestionGroup
-                    key={group}
-                    group={group}
-                    section={lane}
-                    snapshot={state.snapshot}
-                    copy={copy}
-                    numberLocale={numberLocale}
-                    onOpenDetails={openDetails}
-                    pinned={pinned}
-                    renderableIds={sectionIds}
-                    revealIds={revealIds}
-                    searchActive={searchActive}
-                  />
+                {SECTION_ORDER.map((sec) => (
+                  <section
+                    key={sec}
+                    id={`insights-section-${sec}`}
+                    aria-labelledby={`insights-section-${sec}-title`}
+                    className="scroll-mt-24 flex flex-col gap-6"
+                  >
+                    <h2
+                      id={`insights-section-${sec}-title`}
+                      className="type-section m-0 flex items-center gap-4"
+                    >
+                      <IconImg src={sectionIconUrl(sec)} size={96} desktopSize={128} className="shrink-0" />
+                      <span className="min-w-0">{copy.sections[sec]}</span>
+                    </h2>
+                    {GROUP_ORDER[sec].map((group: IndicatorGroupId) => (
+                      <QuestionGroup
+                        key={group}
+                        group={group}
+                        section={sec}
+                        snapshot={state.snapshot}
+                        copy={copy}
+                        numberLocale={numberLocale}
+                        onOpenDetails={openDetails}
+                        pinned={pinned}
+                        renderableIds={sectionIds}
+                        revealIds={revealIds}
+                        searchActive={searchActive}
+                      />
+                    ))}
+                  </section>
                 ))}
-              </section>
+              </>
             )}
           </div>
 

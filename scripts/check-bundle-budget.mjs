@@ -149,7 +149,16 @@ const BUDGETS = [
   // moneyDriverVote/moneyAreaDirection/moneyDirectionToneClass in config,
   // a 16px arrow icon set in MoneyPanel and 3 copy strings × 2 locales.
   // ENTRY untouched. Justified in CHANGELOG §2026-10-11 (round 25).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 322_500, gz: 84_000, label: 'Insights lazy chunk' },
+  // Strip-chart bump (322.43/83.03 → 326.09/84.00, budget 322.5/84.0 →
+  // 330/85.5): round 33 (owner) — the Estimation chips' white space now
+  // carries each metal's price history: a zero-dependency SVG trend chart
+  // per metal with clickable Quarter/1y/5y chips and a signed window
+  // delta, the dual dedicated Global+Australia sections (switcher
+  // retired) with 128px region marks on the mid-page headings, and the
+  // hero's "+n more" revealing tiles in place. Mostly logic + JSX; gzip
+  // grew ~1 kB. ENTRY untouched. Justified in CHANGELOG §2026-10-11
+  // (round 33).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 330_000, gz: 85_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {
