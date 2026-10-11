@@ -5,6 +5,86 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — Real axes and a hover inspector on every chart; the money rows wear the same mini graphs; alignment by structure (owner round 34)
+
+Thirty-fourth round — the owner's follow-up on round 33's charts: "the gold
+and silver graphs must have X and Y axis, also when you hover mouse on
+graph, it must show price points during the times"; "add graphs with same
+structure" to the "What it means for my money" rows as mini graphs; the
+copper move chip «نسبت مس به طلا بالا می‌رود» is "somehow vague — write
+more intuitive and practical text like: قیمت مس نسبت به طلا رشد می‌کند";
+and the standing decree: "Always comply alignment rules, so such incidents
+must never happen."
+
+### Added
+
+- **X and Y axes on every trend chart** — the round-33 sparklines grew a
+  real frame: three dashed horizontal gridlines (top/mid/bottom) with Y
+  tick labels at the line's max / mid / min (compact by magnitude —
+  "4,411" / "65.4" / "3.95"; Persian digits in fa), and X tick labels at
+  the window's first / middle / last point (en "Aug 2026 → Oct 2026",
+  fa Jalali «مرداد ۱۴۰۵ → مهر ۱۴۰۵»). The gridlines and labels are
+  positioned from the SAME scaleY geometry that draws the line, so a
+  gridline always sits exactly on the value its label names, and every
+  label renders as HTML (never stretched-glyph SVG text).
+- **A hover price inspector** — moving the mouse over a plot (or tapping
+  it) snaps a crosshair + dot to the nearest point and floats a tooltip
+  with the exact price point and its date ("US$4,108 · Oct 7, 2026";
+  fa «۴٬۱۲۸ دلار آمریکا · ۱۶ مهر ۱۴۰۵», units from the indicator's own
+  formatter). The plot is also focusable and keyboard-walkable
+  (←/→ step, Home/End jump, Esc clears), so the numbers are reachable
+  without a mouse. Tooltips clamp inside the plot edges.
+- **Mini graphs on the money rows** — every "What it means for my
+  money" row now carries the EXACT same structure as the metals'
+  Estimation charts (shared TrendPanel: axes + hover inspector + the
+  Quarter / 1 year / 5 years chips + the signed window delta), rendered
+  as a full-width mini chart on its own hairline-separated line under
+  the row. It charts the row's FIRST chip — the indicator actually
+  making the row speak (petrol → Brent +64% quarter, home loan → the
+  paid rate, savings & shop → CPI) — so the picture and the sentence
+  can never disagree. No-series rows keep the honest "no chart history"
+  line; a Quarter chip disables itself when the window holds <2 points
+  (quarterly CPI).
+- **TrendChart.tsx** — the shared module behind all of it (chart + axes
+  + inspector + chips + delta + the module-cached history hook), so the
+  two sections stay aligned by construction.
+
+### Changed
+
+- **Alignment is structural, never lucky (the decree)** — three fixes:
+  (1) the Estimation strip's verdict words own a fixed two-line slot
+  (silver's «جهت روشنی ندارد» wraps, gold's «پایین می‌آید» doesn't — the
+  slot keeps both tiles' verdicts, chips and deltas on the same
+  baselines; verified chipsTop/deltaTop identical across tiles); (2) the
+  chart column owns a reserved height so loading/empty states can't pull
+  one tile's rows above the other's; (3) the connection cards' focal
+  verdict fields anchor to the card's BOTTOM (mt-auto) — cards in a row
+  stretch to equal heights, so all three gold fields finish on the same
+  baseline instead of floating where the upper content happens to end.
+- **Charts hold their time direction in RTL** — the whole TrendPanel
+  block lays out dir="ltr" (the house chart convention): Y labels left
+  of the plot, X ticks running left→right matching the SVG line — the
+  first date's label sits under the line's FIRST point in fa too, not
+  mirrored onto its end. The card layout around the chart still mirrors.
+- **The copper move chip speaks plainly** — «نسبت مس به طلا» →
+  «قیمت مس نسبت به طلا» (chip now reads «قیمت مس نسبت به طلا بالا
+  می‌رود», the owner's own example shape; the page-wide بالا می‌رود /
+  پایین می‌آید vocabulary stays). en "the copper-to-gold ratio" →
+  "the copper price vs gold" (chip: "the copper price vs gold rising").
+  The details panel's typical line joins ("The copper price vs gold
+  sits in its usual range." / «قیمت مس نسبت به طلا در محدودهٔ همیشگی
+  است.»). The prose explanations keep the ratio wording (that's what
+  prose is for). One new shared aria key, `trendChartAria` («روند قیمت
+  {name}، {range} گذشته»), × 2 locales.
+
+### Housekeeping
+
+- Budget bump 330.00/85.50 → **334.00/86.00 kB gz** (Insights
+  331.29/85.09): the shared chart engine (axes + inspector + the money
+  minis) is exactly the growth the owner asked for on TWO sections;
+  gzip +1.09 kB. The R33 entry pre-announced the bump. Entry chunk
+  untouched (290.33/87.06 vs 296.00/89.50).
+
 ## [2026-10-11] — The big icons move to the dedicated sections; the Estimation chips wear the metals' own charts (owner round 33)
 
 Thirty-third round — five owner points: the 128px world/australia maps in

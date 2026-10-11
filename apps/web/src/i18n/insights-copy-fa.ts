@@ -189,6 +189,8 @@ export const insightsCopyFa: InsightsCopy = {
     rangeQuarter: 'سه‌ماهه',
     stripChartAria: 'روند قیمت {metal}، {range} گذشته',
     stripChartLabel: 'روند قیمت',
+    // Round 34: نمودارهای مینی سطرهای پول — همان ساختار، با نامِ شاخص.
+    trendChartAria: 'روند قیمت {name}، {range} گذشته',
     chartRangeLabel: 'بازهٔ زمانی نمودار',
     chartTable: 'داده‌های نمودار',
     chartColDate: 'تاریخ',
@@ -541,7 +543,7 @@ export const insightsCopyFa: InsightsCopy = {
       'copper-china-growth': {
         name: 'مس، کارخانه‌های چین و پول',
         legs: {
-          'copper-gold': 'نسبت مس به طلا',
+          'copper-gold': 'قیمت مس نسبت به طلا',
           'china-pmi': 'فعالیت کارخانه‌های چین',
           'm2-us': 'حجم پول آمریکا',
         },
@@ -1061,7 +1063,7 @@ export const insightsCopyFa: InsightsCopy = {
       lines: {
         highRising: 'مس در برابر طلا گران می‌رود: سیگنالی که معمولاً با قدرت صنعتی می‌آید.',
         highEasing: 'مس هنوز در برابر طلا گران است، اما برتری‌اش کم می‌شود.',
-        typical: 'نسبت مس به طلا در محدودهٔ همیشگی است.',
+        typical: 'قیمت مس نسبت به طلا در محدودهٔ همیشگی است.',
         low: 'مس در برابر طلا ارزان است: همان ترکیب ترس از رشد که معمولاً با کندی دنیا می‌آید.',
       },
       whatItIs: 'قیمت مس بانک جهانی تقسیم بر قیمت طلا (میانگین‌های ماهانه).',

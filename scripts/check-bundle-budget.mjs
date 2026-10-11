@@ -158,7 +158,17 @@ const BUDGETS = [
   // hero's "+n more" revealing tiles in place. Mostly logic + JSX; gzip
   // grew ~1 kB. ENTRY untouched. Justified in CHANGELOG §2026-10-11
   // (round 33).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 330_000, gz: 85_500, label: 'Insights lazy chunk' },
+  // Axes-and-minis bump (326.09/84.00 → 331.28/85.08, budget 330/85.5 →
+  // 334/86.0): round 34 (owner) — the shared TrendChart module: the
+  // metals' charts grew real X/Y axes (gridlines + tick labels from the
+  // same scaleY geometry) and a hover/tap/keyboard value-date inspector,
+  // and every "What it means for my money" row now wears the SAME
+  // structure as a full-width mini chart (its own chips + delta), plus
+  // the alignment slots on the Estimation strip and 2 copy strings × 2
+  // locales. Gzip +1.08 kB for a chart engine the owner asked for on TWO
+  // sections. ENTRY untouched. Justified in CHANGELOG §2026-10-11
+  // (round 34).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 334_000, gz: 86_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

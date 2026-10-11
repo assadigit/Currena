@@ -21,6 +21,7 @@
 
 import type { CSSProperties } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
+import { formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { IconImg, moneyAreaIconUrl } from '../icons/currena';
@@ -32,6 +33,7 @@ import {
   type MoneyAreaId,
   type MoneyDirection,
 } from './config';
+import { TREND_RANGE_COPY_KEY, TrendPanel, trendTickFormatter } from './TrendChart';
 
 /** The area icons — rendered INSIDE a large tinted box. Owner follow-up
  * 11 Oct: "increase the icon size, something visible like 64×64" → round
@@ -116,6 +118,42 @@ function DirectionIcon({ direction }: { direction: MoneyDirection }) {
   );
 }
 
+/** Round 34 (owner): the money row's own MINI chart — the exact same
+ * structure as the metals' Estimation charts (shared TrendPanel: X/Y
+ * axes, hover value/date inspector, quarter · 1 year · 5 years chips,
+ * signed window delta), just shorter (plot h-16) and full-width under
+ * the row. It charts the row's FIRST chip — the indicator actually
+ * making this row speak — so the picture and the sentence can never
+ * disagree. */
+function MoneyTrend({
+  id,
+  copy,
+  numberLocale,
+}: {
+  id: IndicatorId;
+  copy: InsightsCopy;
+  numberLocale: 'en-US' | 'fa-IR';
+}) {
+  return (
+    <TrendPanel
+      id={id}
+      copy={copy}
+      numberLocale={numberLocale}
+      ariaLabelFor={(range) =>
+        interpolate(copy.ui.trendChartAria, {
+          name: copy.indicators[id].name,
+          range: copy.ui[TREND_RANGE_COPY_KEY[range]],
+        })
+      }
+      formatValue={(v) => formatIndicatorValue(id, v, numberLocale, copy.units)}
+      formatTickValue={trendTickFormatter(numberLocale)}
+      plotHeightClass="h-16"
+      rangeGroupData={{ 'data-money-chart-range': id }}
+      deltaData={{ 'data-money-chart-delta': id }}
+    />
+  );
+}
+
 export function MoneyPanel({
   readings,
   copy,
@@ -175,7 +213,7 @@ export function MoneyPanel({
                 key={area}
                 data-money-area={area}
                 data-money-state={state}
-                className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-4 py-3.5 ring-1 ring-[var(--color-border)] sm:flex-row sm:items-start sm:gap-3"
+                className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-4 py-3.5 ring-1 ring-[var(--color-border)] sm:flex-row sm:flex-wrap sm:items-start sm:gap-3"
               >
                 {/* Owner follow-up (11 Oct): the icon is a VISIBLE
                  * instrument, not a 16px squiggle — round 29 (owner): the
@@ -218,28 +256,40 @@ export function MoneyPanel({
                   {sentence}
                 </span>
                 {chipIds.length > 0 ? (
-                  <span className="flex shrink-0 flex-wrap gap-1.5">
-                    {chipIds.map((id) => {
-                      const r = byId.get(id);
-                      const valueText =
-                        r && r.value !== null ? formatIndicatorValue(id, r.value, numberLocale, copy.units) : null;
-                      return (
-                        <button
-                          key={id}
-                          type="button"
-                          onClick={(e) => onFocusCard(id, e.currentTarget)}
-                          className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center gap-1.5 rounded-full bg-currena-soft/80 px-2.5 py-0.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)] transition-colors hover:bg-currena-blue/15 dark:bg-white/[0.06]"
-                        >
-                          {copy.indicators[id].name}
-                          {valueText !== null ? (
-                            <bdi className="font-bold tabular-nums text-[var(--color-text-secondary)]">
-                              {valueText}
-                            </bdi>
-                          ) : null}
-                        </button>
-                      );
-                    })}
-                  </span>
+                  <>
+                    <span className="flex shrink-0 flex-wrap gap-1.5">
+                      {chipIds.map((id) => {
+                        const r = byId.get(id);
+                        const valueText =
+                          r && r.value !== null ? formatIndicatorValue(id, r.value, numberLocale, copy.units) : null;
+                        return (
+                          <button
+                            key={id}
+                            type="button"
+                            onClick={(e) => onFocusCard(id, e.currentTarget)}
+                            className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center gap-1.5 rounded-full bg-currena-soft/80 px-2.5 py-0.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)] transition-colors hover:bg-currena-blue/15 dark:bg-white/[0.06]"
+                          >
+                            {copy.indicators[id].name}
+                            {valueText !== null ? (
+                              <bdi className="font-bold tabular-nums text-[var(--color-text-secondary)]">
+                                {valueText}
+                              </bdi>
+                            ) : null}
+                          </button>
+                        );
+                      })}
+                    </span>
+                    {/* Round 34 (owner): the row's mini chart — same
+                     * structure as the metals' charts, full width on its
+                     * own wrapped line (basis-full), separated by the row's
+                     * hairline so the four columns above stay untouched. */}
+                    <div
+                      data-money-chart={area}
+                      className="order-last w-full border-t border-[var(--color-border)] pt-2.5 sm:basis-full sm:pt-3"
+                    >
+                      <MoneyTrend id={chipIds[0]!} copy={copy} numberLocale={numberLocale} />
+                    </div>
+                  </>
                 ) : null}
               </li>
             );

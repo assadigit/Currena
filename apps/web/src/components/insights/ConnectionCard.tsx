@@ -311,10 +311,15 @@ export function ConnectionCard({
        * chips share the app's FOCAL recipe (the money panel's / the
        * Estimation strip's): the card holds a brand-gold field, the field
        * holds white chips — the moves finally grab the eye. Quiet states
-       * keep the plain one-line verdict. */}
+       * keep the plain one-line verdict.
+       * Round 34 (owner, alignment rule): the field is anchored to the
+       * card's BOTTOM (mt-auto) — the cards in a row stretch to equal
+       * heights, so all three focal fields finish on the same baseline
+       * instead of floating at whatever height the card's upper content
+       * happens to end at. */}
       {moves.length > 0 ? (
         <div
-          className="flex flex-col gap-2 rounded-[var(--radius-lg)] bg-gradient-to-b from-[var(--color-accent-gold)]/[0.16] via-[var(--color-accent-gold)]/[0.07] to-transparent p-3 shadow-[0_10px_34px_rgba(168,126,28,0.15)] ring-2 ring-[var(--color-accent-gold)]/45 sm:p-3.5 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
+          className="mt-auto flex flex-col gap-2 rounded-[var(--radius-lg)] bg-gradient-to-b from-[var(--color-accent-gold)]/[0.16] via-[var(--color-accent-gold)]/[0.07] to-transparent p-3 shadow-[0_10px_34px_rgba(168,126,28,0.15)] ring-2 ring-[var(--color-accent-gold)]/45 sm:p-3.5 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
           data-connection-verdict
         >
           <p className="m-0 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]">
@@ -333,7 +338,7 @@ export function ConnectionCard({
           </ul>
         </div>
       ) : (
-        <p className="m-0 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]">
+        <p className="m-0 mt-auto text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]">
           {rightNow}
         </p>
       )}

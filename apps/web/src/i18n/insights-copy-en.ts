@@ -416,7 +416,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     lines: {
       highRising: 'Copper is running dear against gold: a signal that tends to come with industrial strength.',
       highEasing: 'Copper remains dear against gold, but the edge is easing.',
-      typical: 'The copper-to-gold ratio sits in its usual range.',
+      typical: 'The copper price vs gold sits in its usual range.',
       low: 'Copper is cheap against gold: the growth-scare mix that tends to accompany world slowdowns.',
     },
     whatItIs:
@@ -1083,6 +1083,9 @@ export const insightsCopyEn = {
     rangeQuarter: 'Quarter',
     stripChartAria: 'Price history for {metal}, the last {range}',
     stripChartLabel: 'Price history',
+    // Round 34: the money rows' mini charts — the same structure, keyed
+    // by the indicator's own name.
+    trendChartAria: 'Price history for {name}, the last {range}',
     chartRangeLabel: 'Chart time range',
     chartTable: 'Chart data',
     chartColDate: 'Date',
@@ -1443,7 +1446,7 @@ export const insightsCopyEn = {
       'copper-china-growth': {
         name: 'Copper demand, Chinese factories and money',
         legs: {
-          'copper-gold': 'the copper-to-gold ratio',
+          'copper-gold': 'the copper price vs gold',
           'china-pmi': 'Chinese factory activity',
           'm2-us': 'US money supply',
         },
