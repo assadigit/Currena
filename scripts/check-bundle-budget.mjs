@@ -120,7 +120,15 @@ const BUDGETS = [
   // friendlySource publisher cleanup, groupShort bilingual corpus (9
   // gauges × 2 locales), seeAllOne plural, and the rewritten money-area
   // lines. ENTRY untouched. Justified in CHANGELOG §2026-10-11 (roast).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 304_200, gz: 78_600, label: 'Insights lazy chunk' },
+  // Owner-alignment bump (302.23/78.33 → 304.45/78.77, budget 304.2/78.6 →
+  // 305.0/78.9): the owner's 11 Oct alignment follow-up — the per-leg
+  // directional "moves" clauses on connection cards (12 template strings ×
+  // 2 locales + the direction→colour logic; green rises / red falls by
+  // explicit owner instruction), the biggest-move CARD container with the
+  // TrendingUp kicker, the 64×64 money-area icon boxes, and the aligned
+  // price-tile change cells. Mostly localized strings (compressible). ENTRY
+  // untouched. Justified in CHANGELOG §2026-10-11 (owner alignment).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 305_000, gz: 78_900, label: 'Insights lazy chunk' },
 ];
 
 function main() {

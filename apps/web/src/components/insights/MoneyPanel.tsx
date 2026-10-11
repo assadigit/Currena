@@ -13,16 +13,18 @@ import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { formatIndicatorValue, moneyPanel, type MoneyAreaId } from './config';
 
-/** The line icons (16×16, stroke = currentColor, aria-hidden — the area
- * name carries the meaning; icons are NOT colour-coded). */
+/** The area icons — rendered INSIDE a 64×64 tinted box (owner follow-up
+ * 11 Oct: "increase the icon size, something visible like 64×64").
+ * stroke = currentColor, aria-hidden — the area name carries the meaning;
+ * icons are NOT colour-coded. */
 function AreaIcon({ area }: { area: MoneyAreaId }) {
   const common = {
-    width: 18,
-    height: 18,
+    width: 40,
+    height: 40,
     viewBox: '0 0 16 16',
     fill: 'none',
     stroke: 'currentColor',
-    strokeWidth: 1.6,
+    strokeWidth: 1.2,
     strokeLinecap: 'round' as const,
     strokeLinejoin: 'round' as const,
     'aria-hidden': true,
@@ -112,21 +114,30 @@ export function MoneyPanel({
                 key={area}
                 data-money-area={area}
                 data-money-state={state}
-                className="flex flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-3.5 py-2.5 ring-1 ring-[var(--color-border)] sm:flex-row sm:items-center sm:gap-3"
+                className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-3.5 py-3 ring-1 ring-[var(--color-border)] sm:flex-row sm:items-start sm:gap-3"
               >
-                {/* R30: the area label owns a FIXED column (sm:w-44) — the
-                 * roast: "label widths differ, so sentences start at
-                 * different positions". The icon is always the neutral
-                 * context ink — red belongs to the needs-attention WORD
-                 * only (colour roles, one definition). */}
+                {/* Owner follow-up (11 Oct): the icon is a VISIBLE 64×64
+                 * instrument (48 on mobile), not a 16px squiggle — a tinted
+                 * square keeps it designed, not decorative. */}
                 <span
-                  className={`inline-flex w-fit shrink-0 items-center gap-1.5 text-[length:var(--type-label)] font-bold sm:w-44 ${
-                    state === 'attention' ? 'text-[var(--color-status-alert)]' : 'text-[var(--color-text-primary)]'
-                  }`}
+                  aria-hidden="true"
+                  className="grid h-12 w-12 shrink-0 place-items-center rounded-[var(--radius-md)] bg-currena-soft/70 ring-1 ring-[var(--color-border)] sm:h-16 sm:w-16"
                 >
                   <span className="text-[var(--color-status-context)]">
                     <AreaIcon area={area} />
                   </span>
+                </span>
+                {/* R30: the area label owns a FIXED column (sm:w-40) — the
+                 * roast: "label widths differ, so sentences start at
+                 * different positions". Top-aligned (items-start) so every
+                 * heading, sentence and chip row starts on the same line.
+                 * The icon box is always the neutral context ink — red
+                 * belongs to the needs-attention WORD only. */}
+                <span
+                  className={`shrink-0 text-[length:var(--type-label)] font-bold leading-relaxed sm:w-40 ${
+                    state === 'attention' ? 'text-[var(--color-status-alert)]' : 'text-[var(--color-text-primary)]'
+                  }`}
+                >
                   {areaCopy.name}
                 </span>
                 <span className="min-w-0 flex-1 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
@@ -147,7 +158,7 @@ export function MoneyPanel({
                         >
                           {copy.indicators[id].name}
                           {valueText !== null ? (
-                            <bdi dir="ltr" className="font-bold tabular-nums text-[var(--color-text-secondary)]">
+                            <bdi className="font-bold tabular-nums text-[var(--color-text-secondary)]">
                               {valueText}
                             </bdi>
                           ) : null}

@@ -5,6 +5,58 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — Alignment sweep: one grid for headings and numbers, visible icons, a card for the biggest move, and predictions on the pattern line (owner follow-up)
+
+Twenty-first round — four owner directives from annotated screenshots.
+
+### Fixed
+
+- **Price tiles (en + fa): every heading on one line, every number aligned.**
+  Two root causes: (1) `<button>` vertically CENTRES short content (UA
+  behaviour) — the tile's inner column floated down by (button height −
+  content height)/2, so the name/price/change rows started at a different y
+  per tile (oil/silver +12 px, bitcoin +1 px, gold 0). The column now fills
+  the button (`h-full`), pinning all rows to the top in all four tiles.
+  (2) The price was rendered inside `<bdi dir="ltr">`, which flipped the fa
+  unit word ("۱۲۵٫۴۴ دلار" → "دلار ۱۲۵٫۴۴") inconsistently per tile; the
+  price is now a plain `<bdi>` (auto direction) so the unit lands on the
+  same side of the digits everywhere. The 7d/30d row became two cells —
+  value slot (reserved width, tabular) then the day label OUTSIDE the ltr
+  bdi — so the fa label order finally matches the n/a case and the numbers
+  align across tiles. Needs-attention tile names got a fixed two-line slot
+  (`line-clamp-2` + `min-h-[2.75em]`) so their big numbers align in a row.
+- **Money panel: visible 64×64 icons.** The 16–18 px line icons are now
+  40 px strokes inside a 64×64 tinted rounded box (48 px on phones),
+  top-aligned rows, fixed 160 px label column; chip values moved to plain
+  `<bdi>` (same unit-flip fix).
+- **Biggest move has a proper container.** The stray hero line is now a
+  card (surface + ring) with a kicker header (TrendingUp icon + title);
+  the 30-day label sits OUTSIDE the ltr bdi (no more "نقطه۳۰ روز" squish).
+- **The pattern line now predicts.** Under "الگوی همیشگی الان پیداست." /
+  "Usual pattern showing right now." every active/partly connection card
+  lists one clause per leg: fa «{name} بالا می‌رود» / «پایین می‌آید» /
+  «ثابت است» (motion verbs; all leg names are singular) — en stays
+  telegraphic "{name} rising / falling / steady" (no verb agreement, the
+  phrases-corpus rule). Colour carries DIRECTION here by explicit owner
+  instruction — the one sanctioned exception to "colour carries status":
+  green `--color-status-normal` rises, red `--color-status-alert` falls,
+  neutral for steady/level-only. Disagree/inactive cards stay honest and
+  show no prediction. New `together.moves` copy block × 2 locales.
+
+### Verification
+
+- Gates: typecheck 5/5; tests 784/784; build ✓; budget bump
+  304.2/78.6 → 305.0/78.9 (documented in the gate script): Insights chunk
+  304.44/305.00 raw, 78.76/78.90 gz — the moves corpus (12 strings × 2
+  locales) plus the mover card and icon boxes. ENTRY untouched
+  (290.33/296).
+- Local QA (wrangler :8787 + vite :4174): measured nameY/priceY/change-row
+  identical across all four tiles (1101/1126/1162); attention-tile numbers
+  aligned in both region cards; money icons 64×64 (48 on mobile); moves
+  clauses verified green/red/neutral in both locales; fa price text
+  "۱۲۵٫۴۴ دلار آمریکا" one line in every tile; 375 px zero overflow;
+  light + dark; console silent. Screenshots in the session uploads.
+
 ## [2026-10-11] — Vocabulary: Stable · Cautious · Stressed · Critical (owner wording)
 
 Twentieth round — the owner picked the final verdict ladder. The Task-9

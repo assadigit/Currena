@@ -189,14 +189,23 @@ export function PricesBoard({
                 aria-expanded={false}
                 className="insights-focusable block h-full w-full cursor-pointer border-0 bg-transparent p-0 text-start"
               >
-                <span className="flex w-full flex-col items-start gap-1">
+                {/* h-full: buttons vertically centre short content (UA
+                 * behaviour) — without it the name/price/change rows start
+                 * at a DIFFERENT y per tile (owner: every heading on the
+                 * same line, every number aligned). Filling the button
+                 * pins the column to the top in all four tiles. */}
+                <span className="flex h-full w-full flex-col items-start gap-1">
                   {/* Plain name — no tickers, no series ids (R14). */}
                   <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-secondary)]">
                     {entry.name}
                   </span>
-                  {/* The large price with unit — the largest text in the tile. */}
+                  {/* The large price with unit — the largest text in the tile.
+                   * Plain <bdi> (auto direction): the fa unit word lands on
+                   * the same side of the digits in EVERY tile — the old
+                   * dir="ltr" flipped "۱۲۵٫۴۴ دلار" to "دلار ۱۲۵٫۴۴" in
+                   * some tiles and not others (owner: numbers must align). */}
                   {valueText !== null ? (
-                    <bdi dir="ltr" className={`type-number text-[var(--color-text-primary)] ${isStale ? 'text-[var(--color-text-secondary)]' : ''}`}>
+                    <bdi className={`type-number tabular-nums text-[var(--color-text-primary)] ${isStale ? 'text-[var(--color-text-secondary)]' : ''}`}>
                       {valueText}
                     </bdi>
                   ) : (
@@ -209,18 +218,25 @@ export function PricesBoard({
                   ) : null}
                   {/* R30: the change row ALWAYS renders — same anatomy for
                    * all four tiles; "—" marks a change that doesn't exist.
-                   * The position word rides INLINE at the row's end (the
-                   * roast: "the 'expensive' label floats alone") and stays
-                   * NEUTRAL ink — colour carries status, not direction. */}
-                  <span className="flex w-full flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
-                    <bdi dir="ltr">
-                      {c7 !== undefined ? formatChange(c7, def.changeKind, numberLocale, copy.units) : copy.ui.na}
-                      <span className="ms-1 opacity-80">{copy.ui.days7}</span>
-                    </bdi>
-                    <bdi dir="ltr">
-                      {c30 !== undefined ? formatChange(c30, def.changeKind, numberLocale, copy.units) : copy.ui.na}
-                      <span className="ms-1 opacity-80">{copy.ui.days30}</span>
-                    </bdi>
+                   * Owner follow-up: each window is ONE cell — value slot
+                   * (reserved width, tabular) then the day label OUTSIDE
+                   * the ltr bdi — so the fa label order matches the n/a
+                   * case and the numbers align across the four tiles.
+                   * The position word rides at the row's end, NEUTRAL ink
+                   * (colour carries status, not direction). */}
+                  <span className="flex w-full flex-wrap items-baseline gap-x-4 gap-y-0.5 text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
+                    <span className="inline-flex items-baseline gap-1">
+                      <bdi dir="ltr" className="min-w-[4.75rem]">
+                        {c7 !== undefined ? formatChange(c7, def.changeKind, numberLocale, copy.units) : copy.ui.na}
+                      </bdi>
+                      <span className="opacity-80">{copy.ui.days7}</span>
+                    </span>
+                    <span className="inline-flex items-baseline gap-1">
+                      <bdi dir="ltr" className="min-w-[4.75rem]">
+                        {c30 !== undefined ? formatChange(c30, def.changeKind, numberLocale, copy.units) : copy.ui.na}
+                      </bdi>
+                      <span className="opacity-80">{copy.ui.days30}</span>
+                    </span>
                     {band && positionWord ? (
                       <span className="ms-auto font-bold text-[var(--color-text-primary)]">{positionWord}</span>
                     ) : null}

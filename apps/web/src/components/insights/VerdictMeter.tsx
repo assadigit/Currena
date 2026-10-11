@@ -230,11 +230,11 @@ export function VerdictBlock({
                     onClick={() => onFocusCard(id)}
                     className="insights-focusable flex h-full w-full cursor-pointer flex-col items-start gap-0.5 rounded-[var(--radius-md)] bg-currena-warning/10 px-3 py-2 text-start ring-1 ring-currena-warning/25 transition-colors hover:bg-currena-warning/20"
                   >
-                    <span className="text-[length:var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
+                    <span className="line-clamp-2 min-h-[2.75em] text-[length:var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
                       {copy.indicators[id].name}
                     </span>
                     {valueText !== null ? (
-                      <bdi dir="ltr" className="type-number text-[var(--color-text-primary)]">
+                      <bdi className="type-number tabular-nums text-[var(--color-text-primary)]">
                         {valueText}
                       </bdi>
                     ) : null}

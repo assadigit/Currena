@@ -174,6 +174,34 @@ export function ConnectionCard({
       ? interpolate(rightNowTemplate, { a: phrases[0] ?? '', b: phrases[1] ?? '' })
       : rightNowTemplate;
 
+  // Owner follow-up (11 Oct): the pattern line must ALSO say what moves
+  // and which way — one plain clause per leg. Colour carries DIRECTION
+  // here by explicit owner instruction (green rises, red falls) — this
+  // slot is the one sanctioned exception to "colour carries status":
+  // motion verbs for the 30-day direction, state verbs for level-only
+  // legs. Rendered for active/partly only; inactive/unknown stay quiet.
+  const moves =
+    reading.state === 'active' || reading.state === 'partly'
+      ? reading.legs
+          .map((leg) => {
+            const name = entry.legs[leg.id as keyof typeof entry.legs] ?? leg.id;
+            if (leg.direction === 'rising')
+              return { text: interpolate(copy.together.moves.up, { name }), cls: 'text-[var(--color-status-normal)]' };
+            if (leg.direction === 'falling')
+              return { text: interpolate(copy.together.moves.down, { name }), cls: 'text-[var(--color-status-alert)]' };
+            if (leg.direction === 'steady')
+              return { text: interpolate(copy.together.moves.flat, { name }), cls: 'text-[var(--color-text-secondary)]' };
+            if (leg.level === 'high')
+              return { text: interpolate(copy.together.moves.high, { name }), cls: 'text-[var(--color-text-secondary)]' };
+            if (leg.level === 'low')
+              return { text: interpolate(copy.together.moves.low, { name }), cls: 'text-[var(--color-text-secondary)]' };
+            if (leg.level === 'typical')
+              return { text: interpolate(copy.together.moves.mid, { name }), cls: 'text-[var(--color-text-secondary)]' };
+            return null;
+          })
+          .filter((m): m is { text: string; cls: string } => m !== null)
+      : [];
+
   return (
     <article
       data-connection={reading.connection}
@@ -219,6 +247,21 @@ export function ConnectionCard({
       <p className="m-0 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]">
         {rightNow}
       </p>
+
+      {/* Owner follow-up: the concrete per-leg movements — green rises,
+       * red falls (owner instruction), neutral for steady/level-only. */}
+      {moves.length > 0 ? (
+        <p
+          className="m-0 flex flex-wrap items-baseline gap-x-4 gap-y-0.5 text-[length:var(--type-label)] font-bold leading-relaxed"
+          data-connection-moves
+        >
+          {moves.map((m) => (
+            <span key={m.text} className={m.cls}>
+              {m.text}
+            </span>
+          ))}
+        </p>
+      ) : null}
     </article>
   );
 }

@@ -1288,6 +1288,21 @@ export const insightsCopyEn = {
       disagree: 'Usual pattern not showing: {a}, {b}.',
       unknown: 'Not enough fresh data right now.',
     },
+    // The owner's 11 Oct follow-up: the pattern line must also say WHAT
+    // moves and WHICH way — one clause per leg, colour carries the
+    // direction here by explicit owner instruction (green rises, red
+    // falls). EN stays TELEGRAPHIC (the phrases corpus is bilingual-safe:
+    // no verb agreement — "borrowing costs rising", never "costs is");
+    // fa carries the motion verbs («بالا می‌رود») — its leg names are all
+    // singular, so the verb agrees everywhere.
+    moves: {
+      up: '{name} rising',
+      down: '{name} falling',
+      flat: '{name} steady',
+      high: '{name} high',
+      low: '{name} low',
+      mid: '{name} mid-range',
+    },
     // Leg phrase assembly (telegraphic: bilingual-safe, no verb agreement).
     phrases: {
       levelDir: '{name}: {level} and {direction}',

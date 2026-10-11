@@ -2,16 +2,18 @@
  * HeroBlock — the page's first screen (round-2 Blocks R1/R2/R3/R4 + H5/N2).
  *
  * Top to bottom: the two verdict blocks (GLOBAL first — decision D7, the old
- * Australia-first swap setting is retired), ONE biggest-move line (R4 — the
- * large beige callout box is gone; the line always carries its "unusually
- * large for this indicator" reason), the what-changed one-liner (H5 — the
- * hero no longer names the next scheduled event; "Next up" lives once,
- * below the indicators, R16), and the single disclaimer line (N2).
+ * Australia-first swap setting is retired), ONE biggest-move CARD (R4 — the
+ * line always carries its "unusually large for this indicator" reason; the
+ * owner's 11 Oct follow-up puts it back in a proper container), the
+ * what-changed one-liner (H5 — the hero no longer names the next scheduled
+ * event; "Next up" lives once, below the indicators, R16), and the single
+ * disclaimer line (N2).
  */
 
 import { useMemo } from 'react';
 import type { IndicatorId, IndicatorReading, InsightsSection } from '@currena/core';
 import { formatNumber } from '@currena/core';
+import { TrendingUp } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { bandWordsOf, bigMovers, consequenceLine, formatChange } from './config';
@@ -86,26 +88,36 @@ export function HeroBlock({
         />
       </div>
 
-      {/* R4: the biggest move — one line, always with its reason. */}
+      {/* R4 → owner follow-up (11 Oct): the biggest move is IMPORTANT,
+       * not stray — it gets a proper card container (surface + ring) with
+       * a kicker header (icon + title) and the move line inside. The
+       * 30-day label sits OUTSIDE the ltr bdi so it never collides with
+       * the value ("نقطه۳۰ روز" squish). */}
       {mover && moverReading && moverEntry ? (
-        <p className="mt-3 mb-0 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-          <span className="font-bold text-[var(--color-text-secondary)]">{copy.ui.bigMoverTitle}:</span>
-          <button
-            type="button"
-            onClick={() => onFocusCard(mover.id)}
-            className="insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 font-bold text-[var(--color-text-primary)] underline decoration-currena-coral/50 underline-offset-4 transition-colors hover:decoration-currena-coral"
-          >
-            {moverEntry.name}
-          </button>
-          <bdi dir="ltr" className="type-number shrink-0 font-bold text-[var(--color-text-primary)]">
-            {formatChange(mover.change30d, mover.changeKind, numberLocale, copy.units)}
-            <span className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
-              {copy.ui.days30}
-            </span>
-          </bdi>
-          <span>{copy.ui.bigMoverReason}</span>
-          <span className="sr-only">{consequenceLine(moverReading, moverEntry, false, bandWordsOf(copy))}</span>
-        </p>
+        <div
+          className="mt-3 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)]"
+          data-biggest-move
+        >
+          <p className="m-0 mb-1 flex items-center gap-1.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-tertiary)]">
+            <TrendingUp aria-hidden="true" size={16} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
+            {copy.ui.bigMoverTitle}
+          </p>
+          <p className="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+            <button
+              type="button"
+              onClick={() => onFocusCard(mover.id)}
+              className="insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 font-bold text-[var(--color-text-primary)] underline decoration-currena-coral/50 underline-offset-4 transition-colors hover:decoration-currena-coral"
+            >
+              {moverEntry.name}
+            </button>
+            <bdi dir="ltr" className="type-number shrink-0 font-bold tabular-nums text-[var(--color-text-primary)]">
+              {formatChange(mover.change30d, mover.changeKind, numberLocale, copy.units)}
+            </bdi>
+            <span className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">{copy.ui.days30}</span>
+            <span>{copy.ui.bigMoverReason}</span>
+            <span className="sr-only">{consequenceLine(moverReading, moverEntry, false, bandWordsOf(copy))}</span>
+          </p>
+        </div>
       ) : null}
 
       {/* H5: what changed — one line under the hero (or the calm line). */}
