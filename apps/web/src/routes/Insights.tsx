@@ -681,7 +681,7 @@ export function Insights() {
                   {interpolate(copy.ui.dataAsOf, { date: dataAsOfLine.date })}
                   <span aria-hidden="true"> ⓘ</span>
                 </bdi>
-                <span className="sr-only"> — {dataAsOfLine.tooltip}</span>
+                <span className="sr-only">, {dataAsOfLine.tooltip}</span>
               </p>
             ) : null}
           </div>

@@ -9,8 +9,8 @@
   {
     "id": "abs-cpi-2026-q3",
     "date": "2026-10-28",
-    "titleEn": "ABS consumer price index — September quarter",
-    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا — سه‌ماهه سوم",
+    "titleEn": "ABS consumer price index: September quarter",
+    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا: سه‌ماهه سوم",
     "kind": "abs-cpi"
   },
   {
@@ -23,8 +23,8 @@
   {
     "id": "abs-cpi-2026-10",
     "date": "2026-11-25",
-    "titleEn": "ABS consumer price index — October",
-    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا — اکتبر",
+    "titleEn": "ABS consumer price index: October",
+    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا: اکتبر",
     "kind": "abs-cpi"
   },
   {
@@ -51,8 +51,8 @@
   {
     "id": "abs-cpi-2026-q4",
     "date": "2027-01-27",
-    "titleEn": "ABS consumer price index — December quarter",
-    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا — سه‌ماهه چهارم",
+    "titleEn": "ABS consumer price index: December quarter",
+    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا: سه‌ماهه چهارم",
     "kind": "abs-cpi"
   },
   {
@@ -65,8 +65,8 @@
   {
     "id": "abs-cpi-2027-01",
     "date": "2027-02-24",
-    "titleEn": "ABS consumer price index — January",
-    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا — ژانویه",
+    "titleEn": "ABS consumer price index: January",
+    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا: ژانویه",
     "kind": "abs-cpi"
   },
   {

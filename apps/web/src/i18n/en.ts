@@ -1,5 +1,5 @@
 /**
- * English dictionary — SOURCE OF TRUTH.
+ * English dictionary: SOURCE OF TRUTH.
  * Every string extracted verbatim from the legacy Django templates
  * (Phase 1, docs/FEATURE_MAP.md §9). fa.ts must satisfy this shape.
  * New strings are added HERE first, then translated.
@@ -13,7 +13,7 @@ export const en = {
     createdBy: 'Created by',
     creatorName: 'Ali Assadi',
     errorTitle: 'Something went wrong',
-    errorText: 'This page hit an unexpected error. Your data is safe — try again or head back to the converter.',
+    errorText: 'This page hit an unexpected error. Your data is safe: try again or head back to the converter.',
     errorRetry: 'Try again',
     errorHome: 'Go to converter',
   },
@@ -77,12 +77,13 @@ export const en = {
     generatedWith: '✨ Generated with Currena',
     exchangeRate: 'Exchange Rate',
     offline: 'Offline',
-    offlineRatesFrom: 'Offline — showing rates from {source}',
+    offlineRatesFrom: 'Offline: showing rates from {source}',
     currencyGroupIranian: 'Iranian Toman',
     currencyGroupInternational: 'International Currencies',
     delete: 'Delete',
     people: 'People',
     noChange: 'no change',
+    na: 'n/a',
     viewFullBoard: 'View full board',
   },
 
@@ -120,21 +121,21 @@ export const en = {
     creating: '⏳ Creating...',
     quickAmounts: 'Quick amounts',
     recentPairs: 'Recent pairs',
-    boardAtAGlance: 'Iranian Toman — at a glance',
+    boardAtAGlance: 'Iranian Toman: at a glance',
     quickTools: 'Quick tools',
-    /** I11 — the always-on rate line under the currency row. */
+    /** I11: the always-on rate line under the currency row. */
     liveRate: 'Live rate',
     updatedAgo: 'Updated {ago}',
     copyRate: 'Copy rate',
     rateCopied: 'Copied!',
     popularPairs: 'Popular pairs',
-    /** I12 — the failure card's retry affordance. */
+    /** I12: the failure card's retry affordance. */
     tryAgain: 'Try again',
-    /** I12 — neutral title for SERVER-side failures (no "check your connection"). */
-    conversionFailedServer: 'Conversion failed — hang tight',
+    /** I12: neutral title for SERVER-side failures (no "check your connection"). */
+    conversionFailedServer: 'Conversion failed: hang tight',
   },
 
-  /** I14 — rate alerts: watch a pair, get told when it crosses a target. */
+  /** I14: rate alerts: watch a pair, get told when it crosses a target. */
   alerts: {
     sectionTitle: 'Rate alerts',
     sectionHint: 'Watch a target rate',
@@ -148,13 +149,13 @@ export const en = {
     currentRateLabel: 'Current rate:',
     add: 'Add alert',
     remove: 'Delete alert',
-    empty: 'No alerts yet — pick a pair, set a target rate, and Currena will watch the market for you.',
+    empty: 'No alerts yet: pick a pair, set a target rate, and Currena will watch the market for you.',
     capReached: 'You can keep up to {max} alerts. Delete one to add another.',
     waiting: 'Waiting · now {rate}',
     triggered: 'Triggered at {rate}',
     firedToast: '🔔 {pair} just crossed {threshold}',
     firedMore: '+{count} more alert(s) fired',
-    honestNote: 'Checked while Currena is open — no background notifications.',
+    honestNote: 'Checked while Currena is open: no background notifications.',
     invalidThreshold: 'Enter a target rate above 0',
     sameCurrency: 'Pick two different currencies',
     badge: '{count} triggered',
@@ -185,9 +186,9 @@ export const en = {
     VND: 'Vietnamese Dong',
   },
 
-  /* Gold & coins LED panel (2026-09-27) — TGJU's طلا و سکه market items:
+  /* Gold & coins LED panel (2026-09-27): TGJU's طلا و سکه market items:
    * global ounce in USD, Tehran market in Toman (÷10 converted from
-   * TGJU's printed Rial — owner request 2026-09-19). Keys mirror core's
+   * TGJU's printed Rial: owner request 2026-09-19). Keys mirror core's
    * GoldId enum exactly. */
   gold: {
     'gold-ounce': 'Gold Ounce',
@@ -205,10 +206,10 @@ export const en = {
     title: 'Live Rates',
     /* Per-board headings (owner request 2026-09-28): each LED board now
      * carries its own emoji-marked title + a live-source pill hyperlinked
-     * to TGJU + the last-updated stamp — replacing the single page
+     * to TGJU + the last-updated stamp: replacing the single page
      * header. */
-    currencyBoardHeading: 'Currency Rate Board — Toman',
-    goldBoardHeading: 'Gold Rate Board — Toman',
+    currencyBoardHeading: 'Currency Rate Board: Toman',
+    goldBoardHeading: 'Gold Rate Board: Toman',
     liveFromTgju: 'Live updates from TGJU',
     couldNotFetch: '⚠️ Could not fetch rates. Please check your connection.',
     refresh: 'Refresh Rates',
@@ -216,11 +217,11 @@ export const en = {
     rateCopied: '✅ Rate copied!',
     noChangeSincePrevious: 'No change since the previous update',
     changedSincePrevious: 'Change since the previous update',
-    /* LED shopfront board (2026-09-18) — the dark panel that recreates a
+    /* LED shopfront board (2026-09-18): the dark panel that recreates a
      * currency-exchange window display. Columns show TGJU's actual daily
-     * stats (2026-09-26): current price, day high, day low — real data,
+     * stats (2026-09-26): current price, day high, day low: real data,
      * never a derived dealer spread. */
-    boardAriaLabel: 'Exchange rate board — current, day-high and day-low Toman rates per currency',
+    boardAriaLabel: 'Exchange rate board: current, day-high and day-low Toman rates per currency',
     boardCurrent: 'CURRENT',
     boardHigh: 'DAY HIGH',
     boardLow: 'DAY LOW',
@@ -230,12 +231,12 @@ export const en = {
     boardCached: 'CACHED',
     boardOffline: 'OFFLINE',
     /** Per-board footnote: the three columns are TGJU's own daily stats. */
-    boardFootnote: 'Current · day high · day low — TGJU open market, Toman',
+    boardFootnote: 'Current · day high · day low: TGJU open market, Toman',
     /** Footnote for the CURRENT-only placement (homepage two-up row). */
-    boardFootnoteCurrent: 'Current price — TGJU open market, Toman',
-    /* Gold & coins panel (2026-09-27) — the second LED box: the global
+    boardFootnoteCurrent: 'Current price: TGJU open market, Toman',
+    /* Gold & coins panel (2026-09-27): the second LED box: the global
      * ounce in USD plus the Tehran gold market in Toman, TGJU's own quotes. */
-    goldAriaLabel: 'Gold and coins board — global ounce in USD, Tehran market in Toman',
+    goldAriaLabel: 'Gold and coins board: global ounce in USD, Tehran market in Toman',
     goldBoardTitle: 'Gold & Coins',
     /** Silkscreen column label over the item names (like CURRENCY). */
     goldItem: 'Item',
@@ -243,22 +244,22 @@ export const en = {
     goldDomestic: 'Tehran Market · Toman',
     goldUnitUsd: 'USD',
     goldUnitToman: 'Toman',
-    goldFootnote: 'Global ounce in USD, Tehran market in Toman — TGJU real quotes: current · day high · day low · change %',
+    goldFootnote: 'Global ounce in USD, Tehran market in Toman: TGJU real quotes: current · day high · day low · change %',
     /** Footnote for the CURRENT-only placement (homepage two-up row). */
-    goldFootnoteCurrent: 'Global ounce in USD, Tehran market in Toman — TGJU real quotes: current · change %',
+    goldFootnoteCurrent: 'Global ounce in USD, Tehran market in Toman: TGJU real quotes: current · change %',
     detailsSection: 'Details & trends',
   },
 
   trend: {
     /** Shown above a sparkline; {n} = number of recorded updates. */
-    recentChecks: 'Trend — last {n} updates',
+    recentChecks: 'Trend: last {n} updates',
     /** Screen-reader summary: {pair} like 'USD → IRR', {dir} up/down/flat, {pct} signed %. */
     summary: '{pair} trend over recent updates: {dir} {pct}',
     up: 'up',
     down: 'down',
     flat: 'flat',
     /** Hint under the converter sparkline. */
-    honestNote: 'From recorded live-rate updates — recent window, not full market history.',
+    honestNote: 'From recorded live-rate updates: recent window, not full market history.',
     /** Min/max caption; {min} and {max} are formatted rates. */
     range: 'low {min} · high {max}',
   },
@@ -335,7 +336,7 @@ export const en = {
     totalLabel: 'TOTAL',
     addAtLeastOneExpense: '⚠️ Please add at least one expense',
     generateFirst: '⚠️ Please generate a receipt first',
-    /* Share/export copy (BACKLOG #27): these paths had left the dictionary —
+    /* Share/export copy (BACKLOG #27): these paths had left the dictionary :
      * fa users got English share text, Excel headers and Latin digits. */
     shareTitle: 'Expense Receipt',
     shareTotalLabel: '💰 TOTAL:',
@@ -445,7 +446,7 @@ export const en = {
     addAnotherAmount: '➕ Add Another Amount',
     convertAllPrices: '🔄 Convert All Prices',
     convertedPrices: '📋 Converted Prices',
-    resultsPlaceholder: 'Enter your amounts and hit convert — the full price breakdown will appear here.',
+    resultsPlaceholder: 'Enter your amounts and hit convert: the full price breakdown will appear here.',
     totalItems: 'Total Items',
     totalCost: 'Total Cost',
     convertedTotal: 'Converted Total',
@@ -455,15 +456,15 @@ export const en = {
     enterAtLeastOne: '⚠️ Please enter at least one amount',
     selectDifferent: '⚠️ Please select different currencies',
     // I13 (BACKLOG #32): input-bound toasts for pathological pastes.
-    tooManyLines: '⚠️ Too many lines — please keep it under 500',
-    lineTooLong: '⚠️ One line is too long — please keep lines under 500 characters',
+    tooManyLines: '⚠️ Too many lines: please keep it under 500',
+    lineTooLong: '⚠️ One line is too long: please keep lines under 500 characters',
     notePlaceholder: 'Note (optional)',
     invalidLine: '⚠️ Invalid line',
     invalidLinesSummary: '{n} line(s) skipped',
     conversionFailed: '❌ Conversion failed. Please check your connection and try again.',
     copiedToast: '📋 Copied to clipboard! You can paste it anywhere.',
     downloaded: '✅ Downloaded!',
-    /* Share-text labels (BACKLOG #27) — the shared/copyable summary had
+    /* Share-text labels (BACKLOG #27): the shared/copyable summary had
      * left the dictionary (fa users got English labels). */
     shareHeading: '🛒 Batch Currency Conversion',
     shareRateLabel: 'Rate:',
@@ -478,21 +479,21 @@ export const en = {
   about: {
     title: 'About Currena',
     /* Trust & legal sections (owner request 2026-09-20: baseline trust
-     * signals for a financial utility) — linked from the site-wide footer.
+     * signals for a financial utility): linked from the site-wide footer.
      * Honest and short: client-only app, device-local storage, public rate
      * sources, no accounts/analytics/cookies. */
     privacyTitle: '🔒 Privacy Policy',
     privacyText1:
-      'Currena runs entirely in your browser. Your conversion history, recent pairs, receipts, groups and settings are stored only on your device (browser localStorage) — they never leave it, and clearing your browser data removes them permanently.',
+      'Currena runs entirely in your browser. Your conversion history, recent pairs, receipts, groups and settings are stored only on your device (browser localStorage): they never leave it, and clearing your browser data removes them permanently.',
     privacyText2:
       'We set no cookies, run no analytics or tracking, and require no account. Exchange rates are fetched from public sources (TGJU and Frankfurter); the app sends them only the minimum needed to serve a quote.',
     termsTitle: '📜 Terms of Service',
     termsText1:
       'Currena provides exchange-rate information for convenience only. Open-market rates change continuously and may differ from the rate you actually get; nothing in the app is financial advice.',
     termsText2:
-      'Use the app at your own discretion. Generated receipts and expense splits are your own records — verify amounts before relying on them.',
+      'Use the app at your own discretion. Generated receipts and expense splits are your own records: verify amounts before relying on them.',
     contactTitle: '✉️ Contact',
-    contactText: 'Questions, feedback or bug reports are welcome — reach the developer on GitHub:',
+    contactText: 'Questions, feedback or bug reports are welcome: reach the developer on GitHub:',
     aboutText1:
       'Currena is a currency conversion application designed to help you navigate financial decisions with ease. Built with Iranians in mind, it addresses the challenges of currency volatility, especially for the Iranian Toman.',
     featureTravel: 'Perfect for travel to Turkey, UAE, and beyond',
@@ -509,17 +510,17 @@ export const en = {
     noInternetNoCache:
       'No internet connection and no cached data available. Please connect to internet at least once.',
     pairNotSupported: 'This currency pair is not supported by the rate source.',
-    /** I12 — honest server-vs-network failure copy (2026-10-07 incident:
+    /** I12: honest server-vs-network failure copy (2026-10-07 incident:
      *  telling users to "check your connection" while the API 500'd was
-     *  misleading — their network was fine). */
+     *  misleading: their network was fine). */
     serverTemporarilyUnavailable: 'The rate service is temporarily unavailable.',
-    retryingAutomatically: 'Retrying automatically — this usually resolves within a minute.',
+    retryingAutomatically: 'Retrying automatically: this usually resolves within a minute.',
     cantReachServer: 'Could not reach the rate service.',
     /** Live countdown under the failure card; {seconds} is localized digits. */
     retryingIn: 'Retrying in {seconds}s',
   },
 
-  /** Insights page — only the route title lives here; the full copy corpus
+  /** Insights page: only the route title lives here; the full copy corpus
    * (30 indicators × 6 fields, both locales) is code-split with the lazy
    * /insights route chunk in i18n/insights-copy-en.ts / -fa.ts so the entry
    * bundle does not regress (roadmap Phase I4 perf constraint). */
@@ -533,7 +534,7 @@ export const en = {
     contact: 'Contact',
   },
 
-  /** Jalali month names — legacy renders English transliterations (jalaali-js) */
+  /** Jalali month names: legacy renders English transliterations (jalaali-js) */
   jalaliMonths: [
     'Farvardin', 'Ordibehesht', 'Khordad', 'Tir', 'Mordad', 'Shahrivar',
     'Mehr', 'Aban', 'Azar', 'Dey', 'Bahman', 'Esfand',

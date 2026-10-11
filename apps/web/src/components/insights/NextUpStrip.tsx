@@ -171,7 +171,7 @@ export function NextUpStrip({
                   className="insights-focusable -ms-1 mt-1 w-fit cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
                 >
                   {copy.indicators[target].name}
-                  <span className="sr-only"> — {copy.ui.viewCard}</span>
+                  <span className="sr-only">, {copy.ui.viewCard}</span>
                 </button>
               ) : null}
             </li>

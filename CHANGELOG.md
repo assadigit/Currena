@@ -5,6 +5,51 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — Vocabulary: Low · Moderate · Elevated · Severe, and zero em dashes (owner request)
+
+Nineteenth round — two owner directives: the verdict words
+(relaxed/cautious/stressed/alarmed) should be more intuitive ("relaxed is
+a bit off in this context"), and every em dash comes out of the copy.
+
+### Changed
+
+- **Verdict words (en):** Relaxed → **Low**, Cautious → **Moderate**,
+  Stressed → **Elevated**, Alarmed → **Severe** — the standard
+  intensity ladder (the same shape health/weather/risk dashboards use),
+  grammatical in every sentence the generator builds ("1 of 5 areas is
+  Severe: Prices. The rest are Low."). The machine keys
+  (`relaxed/cautious/stressed/alarmed`) and the API contract are
+  untouched: only display words changed.
+- **Verdict words (fa):** آرام → **کم**، محتاطانه → **متوسط**،
+  تحت فشار → **بالا**، نگران‌کننده → **شدید** — written natively into
+  the existing sentence templates ("۱ از ۵ حوزه در وضعیت شدید است:
+  قیمت‌ها. بقیه در وضعیت کم هستند.").
+- **Em dashes retired from ALL user-facing copy:** 717 replacements
+  across the four dictionaries (EN insights 324, FA insights 319, main
+  EN 40, main FA 34). Mid-sentence "X — Y" became "X: Y" (colon, the
+  natural elaboration mark); paired asides became parentheses; the
+  missing-value dash became the locale word **n/a / ناموجود** (new
+  `ui.na` + `common.na` keys). Numeric ranges keep their en dashes
+  (2023–26) and minus signs keep U+2212 — those are typography, not the
+  AI-tell dash.
+- **Component sites:** price tiles, connection legs, alert rows and
+  details ("Rule: … · now n/a"), the sr-only separators (", "), the
+  Signals collapsed footing ("; "), the biggest-move line (dash
+  dropped, flex gap already separates), currency options ("USD · name"),
+  share text ("Currena (currena.ir)"), the calendar export name, the
+  LED gold board's missing change % (locale n/a, threaded as a prop),
+  RateDeltaChip and the index.html share cards (og/twitter/title).
+- **Calendar data:** `data/insights-calendar.json` titles carried
+  "ABS consumer price index — September quarter" (etc., 8 strings ×
+  en+fa) — now colons; the fix reaches production KV at the next
+  snapshot ingest, until then the LIVE page keeps the old data-side
+  titles.
+
+### Budgets
+
+- Insights lazy chunk 304.01 → 302.20 kB (78.52 → 78.33 gz) — the copy
+  pass shrank strings. Entry 290.33/296, 87.06/89.50 gz. Budgets held.
+
 ## [2026-10-11] — Prices tiles: one box size (owner follow-up)
 
 Eighteenth round — the owner's screenshot of the new prices board showed

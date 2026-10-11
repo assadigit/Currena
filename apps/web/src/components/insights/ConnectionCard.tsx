@@ -128,7 +128,7 @@ function LegChip({
             {valueText}
           </bdi>
         ) : (
-          <span className="text-[length:var(--type-caption)]">—</span>
+          <span className="text-[length:var(--type-caption)]">{copy.ui.na}</span>
         )}
         {stateWord !== null ? (
           <span
@@ -140,7 +140,7 @@ function LegChip({
           </span>
         ) : null}
       </span>
-      <span className="sr-only"> — {t.viewLegCard}</span>
+      <span className="sr-only">, {t.viewLegCard}</span>
     </button>
   );
 }

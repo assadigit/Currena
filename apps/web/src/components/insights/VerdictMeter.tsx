@@ -142,7 +142,7 @@ export function VerdictBlock({
           className="insights-focusable -my-1 cursor-pointer rounded-lg border-0 bg-transparent px-1.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-4 transition-colors hover:decoration-[var(--color-accent-brand)]"
         >
           {copy.ui.viewSection}
-          <span className="sr-only"> — {sectionLabel}</span>
+          <span className="sr-only">, {sectionLabel}</span>
         </button>
       </header>
 
@@ -241,7 +241,7 @@ export function VerdictBlock({
                     <span className="text-[length:var(--type-caption)] leading-snug text-[var(--color-text-secondary)]">
                       {ruleText}
                     </span>
-                    <span className="sr-only"> — {copy.ui.viewCard}</span>
+                    <span className="sr-only">, {copy.ui.viewCard}</span>
                   </button>
                 </li>
               );

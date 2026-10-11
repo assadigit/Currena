@@ -87,10 +87,10 @@ export function goldBoardItems(snapshot: Snapshot | null): GoldBoardItem[] | nul
 
 /**
  * Change % caption — the real TGJU `dp`: "+0.05%" / "−0.12%" / "0.00%".
- * Undefined (not published) → an em dash, never a guess.
+ * Undefined (not published) → the locale n/a word, never a guess.
  */
-function formatChangePct(pct: number | undefined): string {
-  if (pct === undefined || !Number.isFinite(pct)) return '—';
+function formatChangePct(pct: number | undefined, missing: string): string {
+  if (pct === undefined || !Number.isFinite(pct)) return missing;
   if (pct > 0) return `+${pct.toFixed(2)}%`;
   if (pct < 0) return `${pct.toFixed(2)}%`;
   return '0.00%';
@@ -107,6 +107,8 @@ interface LedGoldRowProps {
   name: string;
   /** Locale unit word for the aria label (dollar/Toman), already translated. */
   unitLabel: string;
+  /** Locale n/a word for a module whose quote is missing, already translated. */
+  naLabel: string;
   /** 'USD' caption tag on the ounce row (null on domestic rows). */
   unitTag: string | null;
   /** false → the day-high/day-low modules are NOT rendered at all
@@ -132,6 +134,7 @@ const LedGoldRow = memo(function LedGoldRow({
   lowLabel,
   name,
   unitLabel,
+  naLabel,
   unitTag,
   showDayStats,
 }: LedGoldRowProps) {
@@ -144,8 +147,8 @@ const LedGoldRow = memo(function LedGoldRow({
   // sign on its modules — current, day high and day low are all dollars.
   const prefix = usd ? '$' : '';
   const caption = quote
-    ? formatChangePct(quote.changePct)
-    : '—';
+    ? formatChangePct(quote.changePct, naLabel)
+    : naLabel;
 
   return (
     <li className="led-row border-b border-white/[0.04] py-3 last:border-b-0 sm:py-4">
@@ -291,6 +294,7 @@ export function LedGoldBoard({ showDayStats = true }: LedGoldBoardProps) {
       lowLabel={lowLabel}
       name={t(`gold.${item.id}` as TranslationKey)}
       unitLabel={item.quote?.unit === 'USD' ? usdUnit : tomanUnit}
+      naLabel={t('common.na')}
       unitTag={item.id === 'gold-ounce' ? t('liveRates.goldUnitUsd') : null}
       showDayStats={showDayStats}
     />

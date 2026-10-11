@@ -82,5 +82,5 @@ export function rateShareText(
   const rate = formatNumber(view.rate, numberLocale, {
     maximumFractionDigits: rateDecimals(view.rate, irrPair),
   });
-  return `${one} ${fromLabel} = ${rate} ${toLabel} · ${brand} — currena.ir`;
+  return `${one} ${fromLabel} = ${rate} ${toLabel} · ${brand} (currena.ir)`;
 }

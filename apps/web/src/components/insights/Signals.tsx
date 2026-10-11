@@ -468,7 +468,7 @@ export function Signals({
         : position.band === 'low'
           ? interpolate(s.bandBottom, { p })
           : s.bandMid;
-    return `${base} — ${interpolate(s.collapsedFooting, { band })}`;
+    return `${base}; ${interpolate(s.collapsedFooting, { band })}`;
   };
 
   return (

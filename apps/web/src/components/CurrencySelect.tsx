@@ -52,7 +52,7 @@ export function CurrencySelect({ id, value, onChange, ariaLabel, codes, classNam
       {international.length > 0 ? (
         <optgroup label={t('common.currencyGroupInternational')}>
           {international.map((code) => (
-            <option key={code} value={code}>{`${code} — ${nameOf(code)}`}</option>
+            <option key={code} value={code}>{`${code} · ${nameOf(code)}`}</option>
           ))}
         </optgroup>
       ) : null}

@@ -97,7 +97,7 @@ export function AlertCard({
   const ruleLine = isNeedsAttention
     ? interpolate(copy.ui.attentionTileRule, {
         rule: formatRuleText(def.rule, reading.id, copy.rule, copy.units, numberLocale),
-        value: valueText ?? '—',
+        value: valueText ?? copy.ui.na,
       })
     : null;
   // R30 (roast 11 Oct) — the sentence-versus-number guard: a card that
@@ -194,7 +194,7 @@ export function AlertCard({
 
         <span className="mt-2 flex items-baseline justify-between gap-2 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
           <span>
-            {reading.asOf ? interpolate(copy.ui.updatedOn, { date: formatAsOf(reading.asOf, 'en') }) : '—'}
+            {reading.asOf ? interpolate(copy.ui.updatedOn, { date: formatAsOf(reading.asOf, 'en') }) : copy.ui.na}
             <span className="mx-1.5 opacity-50">·</span>
             {/* R30: publisher only — raw series ids ("ABS (RES_DWELL_ST)")
              * never reach the card face. */}

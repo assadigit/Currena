@@ -200,7 +200,7 @@ export function PricesBoard({
                       {valueText}
                     </bdi>
                   ) : (
-                    <span className="type-number text-[var(--color-text-secondary)]">—</span>
+                    <span className="type-number text-[var(--color-text-secondary)]">{copy.ui.na}</span>
                   )}
                   {reading.status === 'unavailable' ? (
                     <span className="text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
@@ -214,11 +214,11 @@ export function PricesBoard({
                    * NEUTRAL ink — colour carries status, not direction. */}
                   <span className="flex w-full flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
                     <bdi dir="ltr">
-                      {c7 !== undefined ? formatChange(c7, def.changeKind, numberLocale, copy.units) : '—'}
+                      {c7 !== undefined ? formatChange(c7, def.changeKind, numberLocale, copy.units) : copy.ui.na}
                       <span className="ms-1 opacity-80">{copy.ui.days7}</span>
                     </bdi>
                     <bdi dir="ltr">
-                      {c30 !== undefined ? formatChange(c30, def.changeKind, numberLocale, copy.units) : '—'}
+                      {c30 !== undefined ? formatChange(c30, def.changeKind, numberLocale, copy.units) : copy.ui.na}
                       <span className="ms-1 opacity-80">{copy.ui.days30}</span>
                     </bdi>
                     {band && positionWord ? (
@@ -248,7 +248,7 @@ export function PricesBoard({
                       <bdi className="font-semibold">{interpolate(copy.ui.staleSince, { date: formatAsOf(reading.asOf, locale) })}</bdi>
                     ) : null}
                   </span>
-                  <span className="sr-only"> — {copy.ui.viewCard}</span>
+                  <span className="sr-only">, {copy.ui.viewCard}</span>
                 </span>
               </button>
             </article>

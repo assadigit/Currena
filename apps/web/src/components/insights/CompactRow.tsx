@@ -82,7 +82,7 @@ export function CompactRow({
     tier === 'needs-attention'
       ? interpolate(copy.ui.attentionTileRule, {
           rule: formatRuleText(def.rule, reading.id, copy.rule, copy.units, numberLocale),
-          value: valueText ?? '—',
+          value: valueText ?? copy.ui.na,
         })
       : null;
   // R30: the sentence-versus-number guard (see AlertCard) — a

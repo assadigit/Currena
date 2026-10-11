@@ -88,7 +88,7 @@ export function buildInsightsIcs(
 ): string {
   const stamp = icsStamp(now);
   const calName =
-    locale === 'fa' ? 'رویدادهای اقتصادی کورنا' : 'Currena — market key dates';
+    locale === 'fa' ? 'رویدادهای اقتصادی کورنا' : 'Currena: market key dates';
   const lines: string[] = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',

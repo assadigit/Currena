@@ -94,20 +94,20 @@ describe('rateShareText', () => {
 
   it('builds the localized share line (en)', () => {
     expect(rateShareText(view, 'US Dollar', 'Iranian Toman', 'Currena', 'en-US', true)).toBe(
-      '1 US Dollar = 230,500 Iranian Toman · Currena — currena.ir',
+      '1 US Dollar = 230,500 Iranian Toman · Currena (currena.ir)',
     );
   });
 
   it('builds the localized share line (fa — Persian digits, native brand)', () => {
     expect(rateShareText(view, 'دلار آمریکا', 'تومان ایرانی', 'کورنا', 'fa-IR', true)).toBe(
-      '۱ دلار آمریکا = ۲۳۰٬۵۰۰ تومان ایرانی · کورنا — currena.ir',
+      '۱ دلار آمریکا = ۲۳۰٬۵۰۰ تومان ایرانی · کورنا (currena.ir)',
     );
   });
 
   it('international pairs keep their decimals (sub-1 rates use the 8-decimal rule)', () => {
     const fx = liveRateView(frankfurterSnapshot('2026-10-07T12:00:00.000Z'), 'USD', 'EUR')!;
     expect(rateShareText(fx, 'US Dollar', 'Euro', 'Currena', 'en-US', false)).toBe(
-      '1 US Dollar = 0.86678 Euro · Currena — currena.ir',
+      '1 US Dollar = 0.86678 Euro · Currena (currena.ir)',
     );
   });
 });

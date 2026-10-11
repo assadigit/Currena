@@ -87,7 +87,7 @@ export function AlertsDialog({ defaultBase, defaultQuote, onClose }: AlertsDialo
           formatNumber(v.rate, numberLocale, { maximumFractionDigits: rateDecimals(v.rate, pairIrr) }),
         );
       } else {
-        map.set(key, '—');
+        map.set(key, t('common.na'));
       }
     }
     return map;
@@ -246,7 +246,7 @@ export function AlertsDialog({ defaultBase, defaultQuote, onClose }: AlertsDialo
           <ul className="mt-5 space-y-2">
             {alerts.map((a) => {
               const key = `${a.base}/${a.quote}`;
-              const rateText = listRates.get(key) ?? '—';
+              const rateText = listRates.get(key) ?? t('common.na');
               const triggered = a.triggeredAt !== undefined;
               const triggeredRateText =
                 a.triggeredRate !== undefined
@@ -290,7 +290,7 @@ export function AlertsDialog({ defaultBase, defaultQuote, onClose }: AlertsDialo
                   <button
                     type="button"
                     onClick={() => alertsStore.remove(a.id)}
-                    aria-label={`${t('alerts.remove')} — ${pairLabel(a.base, a.quote)}`}
+                    aria-label={`${t('alerts.remove')}: ${pairLabel(a.base, a.quote)}`}
                     className="grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-currena-warning/10 text-base text-currena-warning-deep transition-all duration-300 hover:bg-currena-warning/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
                   >
                     🗑

@@ -252,7 +252,7 @@ export function LedValueCell({
     <div className={wrapperClass}>
       <span
         role="img"
-        aria-label={`${label} ${ok && Number.isFinite(value) ? `${text.replace(/ /g, ',')} ${unitLabel}` : '—'}`}
+        aria-label={`${label} ${ok && Number.isFinite(value) ? `${text.replace(/ /g, ',')} ${unitLabel}` : 'n/a'}`}
       >
         <LedDigits
           key={`${keyId}-${stat}-${text}`}

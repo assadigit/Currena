@@ -41,7 +41,7 @@ export function RateDeltaChip({ delta, decimals = 0, size = 'md' }: RateDeltaChi
         }`}
         title={t('liveRates.noChangeSincePrevious')}
       >
-        — {t('common.noChange')}
+        {t('common.noChange')}
       </span>
     );
   }

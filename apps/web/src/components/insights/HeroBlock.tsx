@@ -103,7 +103,7 @@ export function HeroBlock({
               {copy.ui.days30}
             </span>
           </bdi>
-          <span>— {copy.ui.bigMoverReason}</span>
+          <span>{copy.ui.bigMoverReason}</span>
           <span className="sr-only">{consequenceLine(moverReading, moverEntry, false, bandWordsOf(copy))}</span>
         </p>
       ) : null}
