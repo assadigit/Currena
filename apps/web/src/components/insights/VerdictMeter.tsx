@@ -32,11 +32,23 @@ function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
   return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
 }
 
-/** The four-step segmented meter with a marker on the current step. */
-export function VerdictMeter({ step, label, ariaLabel }: { step: number; label: string; ariaLabel: string }) {
+/** The four-step segmented meter with a marker on the current step.
+ *  R30: `large` is the hero's status instrument (taller segments);
+ *  `sm` is the compact per-gauge row meter. */
+export function VerdictMeter({
+  step,
+  label,
+  ariaLabel,
+  size,
+}: {
+  step: number;
+  label: string;
+  ariaLabel: string;
+  size?: 'lg' | 'sm';
+}) {
   return (
     <span
-      className="verdict-meter"
+      className={`verdict-meter ${size === 'lg' ? 'verdict-meter-lg' : size === 'sm' ? 'verdict-meter-sm' : ''}`}
       role="img"
       aria-label={ariaLabel}
       title={ariaLabel}
@@ -88,6 +100,8 @@ export function VerdictBlock({
   });
 
   // R2: the reason line — computed from the fixed table over gauge steps.
+  // R30: names are the SHORT gauge names (the old full questions read as
+  // punctuation errors: "…Alarmed: Are prices heating up?.").
   const reason = heroReason({
     gauges: gaugeRows,
     words: { 1: copy.label.relaxed, 2: copy.label.cautious, 3: copy.label.stressed, 4: copy.label.alarmed },
@@ -98,7 +112,7 @@ export function VerdictBlock({
     is: copy.ui.heroReasonIs,
     are: copy.ui.heroReasonAre,
     notEnough: copy.ui.noSummary,
-    nameOf: (gauge) => copy.groups[gauge as keyof typeof copy.groups] ?? gauge,
+    nameOf: (gauge) => copy.groupShort[gauge as keyof typeof copy.groupShort] ?? copy.groups[gauge as keyof typeof copy.groups] ?? gauge,
     fmt: (n) => num(n, numberLocale),
   });
 
@@ -114,7 +128,7 @@ export function VerdictBlock({
 
   return (
     <article
-      className={`flex flex-col gap-2 rounded-[var(--radius-lg)] p-4 ring-1 ${
+      className={`flex h-full flex-col gap-2 rounded-[var(--radius-lg)] p-4 ring-1 ${
         step >= 4
           ? 'ring-[var(--color-status-alert)]/30'
           : 'ring-[var(--color-border)]'
@@ -133,14 +147,20 @@ export function VerdictBlock({
       </header>
 
       {/* H1: verdict word — the page's LARGEST type role; the word speaks
-       * in status ink (R29) beside its meter (never colour alone). */}
+       * in status ink (R29) beside its meter (never colour alone). R30:
+       * the meter is the hero's instrument — the LARGE size. */}
       <p className="m-0 flex items-center gap-3">
         <span className={`type-verdict ${stepToneClass(step)}`}>{verdictLabel}</span>
-        <VerdictMeter step={step} label={verdictLabel} ariaLabel={ariaLabel} />
+        <VerdictMeter step={step} label={verdictLabel} ariaLabel={ariaLabel} size="lg" />
       </p>
 
-      {/* R2: the gauges as small readings (name + step word). */}
-      <ul className="m-0 flex list-none flex-wrap gap-x-3 gap-y-0.5 p-0" aria-label={copy.ui.heroGaugesLabel}>
+      {/* R2 → R30: the gauges as ONE LINE PER GAUGE — short name, its own
+       * mini meter, its step word (the old inline chips wrapped two per
+       * line in Global and one per line in Australia). */}
+      <ul
+        className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-1 p-0 sm:grid-cols-2"
+        aria-label={copy.ui.heroGaugesLabel}
+      >
         {gaugeRows.map((g) => {
           const gWord =
             g.step === 0
@@ -153,11 +173,23 @@ export function VerdictBlock({
                     ? copy.label.stressed
                     : copy.label.alarmed;
           return (
-            <li key={g.gauge} className="text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
-              <span className="font-semibold text-[var(--color-text-primary)]">
-                {copy.groups[g.gauge]}
-              </span>{' '}
-              · <span className={`font-semibold ${stepToneClass(g.step)}`}>{gWord}</span>
+            <li key={g.gauge} className="flex items-center justify-between gap-2 text-[length:var(--type-caption)]">
+              <span className="min-w-0 font-semibold text-[var(--color-text-primary)]">
+                {copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge]}
+              </span>
+              <span className="flex shrink-0 items-center gap-2">
+                <VerdictMeter
+                  step={g.step}
+                  label={gWord}
+                  ariaLabel={interpolate(copy.ui.gaugeStepAria, {
+                    question: copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge],
+                    label: gWord,
+                    step: num(g.step, numberLocale),
+                  })}
+                  size="sm"
+                />
+                <span className={`w-16 text-end font-semibold ${stepToneClass(g.step)}`}>{gWord}</span>
+              </span>
             </li>
           );
         })}
@@ -227,11 +259,12 @@ export function VerdictBlock({
         </div>
       ) : null}
 
-      {/* H1: keep the "how is this computed?" link. */}
+      {/* H1: keep the "how is this computed?" link — pinned to the card's
+       * bottom edge so the shorter card carries no floating void. */}
       <button
         type="button"
         onClick={onJumpAbout}
-        className="insights-focusable -ms-1.5 w-fit cursor-pointer rounded-lg border-0 bg-transparent px-1.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+        className="insights-focusable -ms-1.5 mt-auto w-fit cursor-pointer rounded-lg border-0 bg-transparent px-1.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
       >
         {copy.ui.howCalculated}
       </button>

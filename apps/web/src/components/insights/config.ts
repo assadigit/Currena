@@ -366,34 +366,42 @@ export function positionBand(percentile10y: number): PositionBand {
 
 /* ---------------------------------------------------------------- *
  * R29 (owner UI/UX audit): status WORDS speak in status ink. The
- * chips already carried red/green — now the verdict word, the gauge
- * step words, the attention counts and the price position words do
- * too. Never colour alone (G5): every tinted word also sits beside
- * an icon, a meter segment, or a number.
+ * chips already carried red/green — now the verdict word and the
+ * gauge step words do too. Never colour alone (G5): every tinted
+ * word also sits beside an icon, a meter segment, or a number.
+ *
+ * R30 (roast 11 Oct): colour roles are defined ONCE —
+ *   red = needs attention ONLY (the alert tier + its counts),
+ *   the verdict scale is a FOUR-STEP ink scale (relaxed green →
+ *   cautious amber → stressed orange → alarmed red; the old
+ *   stressed-red made steps 3 and 4 read as one hue),
+ *   and colour carries STATUS, never DIRECTION — price words
+ *   ("expensive"/"cheap") are neutral ink again.
  * ---------------------------------------------------------------- */
 
 /** WordTone → the status ink token (empty = inherit — neutral words). */
-const WORD_TONE_CLASS: Record<'alert' | 'watch' | 'normal' | 'neutral', string> = {
+const WORD_TONE_CLASS: Record<'alert' | 'stressed' | 'watch' | 'normal' | 'neutral', string> = {
   alert: 'text-[var(--color-status-alert)]',
+  stressed: 'text-[var(--color-status-stressed)]',
   watch: 'text-[var(--color-status-watch)]',
   normal: 'text-[var(--color-status-normal)]',
   neutral: '',
 };
 
 /** Verdict/gauge step (0 none · 1 relaxed · 2 cautious · 3 stressed ·
- * 4 alarmed) → the step word's tone class. */
+ * 4 alarmed) → the step word's tone class. Four DISTINCT hues — the
+ * roast: "Stressed and Alarmed are close hues". */
 export function stepToneClass(step: number): string {
-  const tone = step <= 0 ? 'neutral' : step === 1 ? 'normal' : step === 2 ? 'watch' : 'alert';
+  const tone = step <= 0 ? 'neutral' : step === 1 ? 'normal' : step === 2 ? 'watch' : step === 3 ? 'stressed' : 'alert';
   return WORD_TONE_CLASS[tone];
 }
 
-/** Price position band (low = cheap … high = expensive) → the position
- * word's tone class. Indicator position words stay NEUTRAL by R5
- * ("unusual" is notable, not good or bad) — only the price wording
- * carries the cheap/green · expensive/red semantics. */
-export function bandToneClass(band: PositionBand): string {
-  const tone = band === 'low' ? 'normal' : band === 'high' ? 'alert' : 'neutral';
-  return WORD_TONE_CLASS[tone];
+/** Price position band (low = cheap … high = expensive) → NEUTRAL ink
+ * (R30: colour carries status, not direction — an "expensive" gold
+ * price is not a warning; the roast flags red price labels as the
+ * very leak that made three tiles read as alerts). */
+export function bandToneClass(_band: PositionBand): string {
+  return WORD_TONE_CLASS.neutral;
 }
 
 /** Attention-count tone (R29): red while anything needs attention,
@@ -739,6 +747,29 @@ export function formatPinnedStorage(ids: readonly IndicatorId[]): string {
 
 export const LANE_STORAGE_KEY = 'currena.insights.lane.v1';
 
+/* ---------------------------------------------------------------- *
+ * R30 (roast 11 Oct): "Source codes still show in footers" — the
+ * snapshot's sourceName carries publisher + raw series ids
+ * ("ABS (CPI_Q Trimmed Mean)", "RBA F6 (owner-occupier …)"). The
+ * card face shows the PUBLISHER only; full ids stay in the details
+ * panel.
+ * ---------------------------------------------------------------- */
+
+/** Publisher-only label for a snapshot sourceName. */
+export function friendlySource(raw: string): string {
+  if (/^RBA F[\d.]+/.test(raw)) {
+    // "RBA F2 − FRED (DGS10)" keeps its second publisher.
+    return raw.includes('FRED') ? 'RBA · FRED' : 'RBA';
+  }
+  if (raw.startsWith('RBA E2')) return 'RBA';
+  if (raw.startsWith('gold-api.com')) return 'GoldAPI';
+  if (raw.startsWith('Currena basket')) return 'Currena basket';
+  if (raw.startsWith('China NBS')) return 'China NBS';
+  // "ABS (…)", "FRED (…)" — the parenthetical is a series id, strip it.
+  const m = raw.match(/^([A-Za-z .-]+?)\s*\(/);
+  return (m?.[1] ? m[1] : raw).trim() || raw;
+}
+
 /** Read the remembered lane (R1: default GLOBAL, try/catch per spec). */
 export function readStoredLane(): InsightsSection {
   try {
@@ -880,9 +911,12 @@ export function heroReason(input: HeroReasonInput): string {
   });
   const rest = readable.filter((g) => g.step < maxStep);
   if (rest.length === 0) return line1;
-  // The "calmer word": the highest step among the rest (the most notable
-  // calmer state — one word for the whole tail, per the fixed table).
-  const restStep = Math.max(...rest.map((g) => g.step));
+  // The tail word = the MODE (most common step) of the rest — R30: the old
+  // max() said "the rest are Cautious" when three of four were Relaxed.
+  // Ties resolve UP (the more notable state wins a tie).
+  const tally = new Map<number, number>();
+  for (const g of rest) tally.set(g.step, (tally.get(g.step) ?? 0) + 1);
+  const restStep = [...tally.entries()].sort((a, b) => (b[1] !== a[1] ? b[1] - a[1] : b[0] - a[0]))[0]![0];
   const restWord = input.words[restStep] ?? '';
   const restLine = interpolate(
     rest.length === 1 ? input.othersOne : input.others,

@@ -59,7 +59,10 @@ export function HeroBlock({
   return (
     <section aria-label={copy.ui.heroTitle} className="m-0">
       <h2 className="sr-only">{copy.ui.heroTitle}</h2>
-      <div className="grid gap-4 grid-cols-1 items-start sm:grid-cols-2">
+      {/* R30: items-STRETCH (was items-start) — the two verdict cards share
+       * one height, so the shorter one carries no floating void beside the
+       * taller one (the roast: "a void under Australia"). */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
         {/* D7/R1: Global first, always — the blocks array is fixed order. */}
         <VerdictBlock
           section="global"

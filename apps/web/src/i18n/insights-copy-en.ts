@@ -953,8 +953,10 @@ export const insightsCopyEn = {
     resultsShown: '{shown} of {total} shown',
     clearFilters: 'Clear filters',
     noMatches: 'No indicator matches these filters.',
-    // Round-2 R7: the per-group collapse.
-    seeAll: 'See all {n} indicators',
+    // Round-2 R7: the per-group collapse. R30: honest plurals ("See all
+    // 1 indicators" was wrong) and what the button actually does.
+    seeAll: 'Show all {n} hidden indicators',
+    seeAllOne: 'Show 1 hidden indicator',
     showFewer: 'Show fewer',
     // Round-2 R15: the Tools disclosure.
     toolsLabel: 'Tools',
@@ -1171,6 +1173,21 @@ export const insightsCopyEn = {
     'au-inflation-rates': 'Are inflation and rates a problem?',
     'au-households': 'Are households under pressure?',
     'au-trade-currency': 'How is trade and the currency?',
+  },
+
+  /** R30: SHORT gauge names for the hero — the reason line once embedded
+   * the full question ("…Alarmed: Are prices heating up?."), which read
+   * as a punctuation error. One compact name per gauge, no "?". */
+  groupShort: {
+    'borrowing-costs': 'Borrowing costs',
+    'prices-heat': 'Prices',
+    'market-stress': 'Market stress',
+    'dollar-strength': 'The US dollar',
+    'growth-health': 'Growth',
+    'prices-board': 'Prices',
+    'au-inflation-rates': 'Inflation & rates',
+    'au-households': 'Households',
+    'au-trade-currency': 'Trade & currency',
   },
 
   /** The one-line answer under each gauge heading (L2). */
@@ -1466,38 +1483,38 @@ export const insightsCopyEn = {
     areas: {
       petrol: {
         name: 'Petrol and transport',
-        attention: 'Fuel costs are unusually prominent — pump prices and delivery costs have tended to follow within weeks.',
-        unusual: 'Fuel costs sit at an unusual point of their range — pump prices can move more than usual for a while.',
+        attention: 'Oil has left its usual range — pump prices tend to follow within weeks, so fill-up budgets can wobble for a while.',
+        unusual: 'Oil sits at an unusual point of its 10-year range — pump prices can move more than usual for a while.',
         calm: 'Fuel costs are doing nothing unusual for your area’s prices.',
       },
       homeLoan: {
         name: 'Home loan and rent',
-        attention: 'Rate and rent pressure is prominent — loan interest and rents have usually stayed elevated for months after.',
-        unusual: 'Loan or rent numbers sit at an unusual point of their range — budget room can shift.',
+        attention: 'A rate or rent number has left its usual range — loan interest and rents have usually stayed elevated for months after.',
+        unusual: 'A loan or rent number sits at an unusual point of its 10-year range — budget room can shift.',
         calm: 'Loan and rent settings look unremarkable for now.',
       },
       savings: {
         name: 'Savings and interest',
-        attention: 'Rates and inflation are prominent — savings interest and price rises have tended to move together.',
-        unusual: 'Savings-relevant rates sit at an unusual point of their range.',
+        attention: 'A rate or inflation number has left its usual range — savings interest and price rises have tended to move together.',
+        unusual: 'A savings-relevant rate sits at an unusual point of its 10-year range.',
         calm: 'Savings interest settings look unremarkable for now.',
       },
       shop: {
         name: 'Shop prices and bills',
-        attention: 'Price growth is prominent — grocery and bill inflation has usually stayed elevated for a few quarters.',
-        unusual: 'Price growth sits at an unusual point of its range — bills can surprise for a while.',
+        attention: 'An inflation gauge has left its usual range — grocery and bill inflation has usually stayed elevated for a few quarters.',
+        unusual: 'An inflation gauge sits at an unusual point of its 10-year range — bills can surprise for a while.',
         calm: 'Shop prices and bills are doing nothing unusual.',
       },
       overseas: {
         name: 'Overseas money',
-        attention: 'The Australian dollar is prominent — overseas purchases and travel money have usually felt it quickly.',
-        unusual: 'The exchange rate sits at an unusual point of its range — overseas money can stretch further, or less, for a while.',
+        attention: 'The Australian dollar is at an unusual point of its range — overseas purchases and travel money usually feel it quickly.',
+        unusual: 'The exchange rate sits at an unusual point of its 10-year range — overseas money can stretch further, or less, for a while.',
         calm: 'Exchange rates are doing nothing unusual for overseas money.',
       },
       jobs: {
         name: 'Jobs and pay',
-        attention: 'Jobs and pay numbers are prominent — hiring and wage growth have usually stayed in their direction for quarters.',
-        unusual: 'Jobs or pay numbers sit at an unusual point of their range.',
+        attention: 'A jobs or pay number has left its usual range — hiring and wage growth have usually held their direction for quarters.',
+        unusual: 'A jobs or pay number sits at an unusual point of its 10-year range.',
         calm: 'Jobs and pay settings look unremarkable for now.',
       },
     },

@@ -14,7 +14,7 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { fetchIndicatorHistory } from '../../lib/insights';
 import { Sparkline } from '../Sparkline';
 import { StatusChip } from './StatusChip';
-import { bandWordsOf, consequenceLine, definitionFor, formatChange, formatIndicatorValue, formatRuleText, tierOf } from './config';
+import { bandWordsOf, consequenceLine, consequenceState, definitionFor, formatChange, formatIndicatorValue, formatRuleText, tierOf } from './config';
 
 /** F2's tiny sparkline — same lazy pattern as the alert card's. */
 function TinySparkline({ id }: { id: IndicatorId }) {
@@ -85,6 +85,10 @@ export function CompactRow({
           value: valueText ?? '—',
         })
       : null;
+  // R30: the sentence-versus-number guard (see AlertCard) — a
+  // needs-attention row never says "usual range" beside its rule line.
+  const cs = consequenceState(reading, false);
+  const showConsequence = !(tier === 'needs-attention' && cs === 'typical');
 
   return (
     <article
@@ -137,7 +141,7 @@ export function CompactRow({
               <bdi>{ruleLine}</bdi>
             </span>
           ) : null}
-          {!isUnavailable ? (
+          {!isUnavailable && showConsequence ? (
             <span className="block text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
               {consequenceLine(reading, entry, false, bandWordsOf(copy))}
             </span>

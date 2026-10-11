@@ -20,13 +20,14 @@ import { Sparkline } from '../Sparkline';
 import {
   bandWordsOf,
   consequenceLine,
+  consequenceState,
   definitionFor,
   formatChange,
   formatIndicatorValue,
   formatRuleText,
+  friendlySource,
   tierOf,
   type IndicatorTier,
-  warningZone,
 } from './config';
 import { PositionBar } from './PositionBar';
 import { StatusChip } from './StatusChip';
@@ -99,11 +100,19 @@ export function AlertCard({
         value: valueText ?? '—',
       })
     : null;
+  // R30 (roast 11 Oct) — the sentence-versus-number guard: a card that
+  // NEEDS ATTENTION must never tell you its value "sits in its usual
+  // range". When the rule fired but the percentile state reads 'typical'
+  // (paired-comparison rules can fire anywhere in the range), the
+  // consequence line is DROPPED — the rule line above it carries the news.
+  const cs = consequenceState(reading, false);
+  const showConsequence = !(isNeedsAttention && cs === 'typical');
 
   return (
     <article
       id={`insights-card-${reading.id}`}
       data-status={reading.status}
+      data-tier={tier}
       className={`alert-card scroll-mt-24 rounded-[var(--radius-lg)] p-4 shadow-[0_4px_18px_rgba(0,0,0,0.05)] ring-1 ring-[var(--color-border)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] motion-safe:transition-[box-shadow,transform] motion-safe:duration-200 md:motion-safe:hover:-translate-y-0.5 ${pinned ? 'ring-currena-blue/30' : ''}`}
     >
       <button
@@ -117,11 +126,8 @@ export function AlertCard({
           <span className="min-w-0">
             <span className="block text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-primary)]">
               {entry.name}
-              {entry.ticker ? (
-                <span dir="ltr" className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
-                  {entry.ticker}
-                </span>
-              ) : null}
+              {/* R30: the raw series tag ("CPI: rents", "RES_DWELL_ST") left
+               * the card face — it lives in the details panel now. */}
             </span>
           </span>
           <span className="flex shrink-0 items-center gap-1">
@@ -163,20 +169,21 @@ export function AlertCard({
               </span>
             ) : null}
 
-            {/* F1: consequence line — state-keyed, hedged, life-first. */}
-            <span className="mt-2 block text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-              {consequenceLine(reading, entry, false, bandWordsOf(copy))}
-            </span>
+            {/* F1: consequence line — state-keyed, hedged, life-first
+             * (R30: never on a needs-attention card whose numbers say
+             * "typical" — see the guard above). */}
+            {showConsequence ? (
+              <span className="mt-2 block text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+                {consequenceLine(reading, entry, false, bandWordsOf(copy))}
+              </span>
+            ) : null}
 
-            {/* R6: the 10-year position shows on UNUSUAL cards (word + bar,
-             * with end labels); needs-attention cards keep it in Details. */}
+            {/* R6 → R30: the 10-year position shows on UNUSUAL cards (word
+             * + bar); needs-attention cards keep it in Details. NO rule
+             * zone here — no rule fired on this tier, so the zone tick
+             * opposite the marker was a lie the roast caught. */}
             {tier === 'unusual' && reading.percentile10y !== undefined ? (
-              <PositionBar
-                percentile={reading.percentile10y}
-                zone={warningZone(def.rule)}
-                copy={copy}
-                numberLocale={numberLocale}
-              />
+              <PositionBar percentile={reading.percentile10y} zone={null} copy={copy} numberLocale={numberLocale} />
             ) : null}
 
             <span className="mt-2 block">
@@ -189,7 +196,9 @@ export function AlertCard({
           <span>
             {reading.asOf ? interpolate(copy.ui.updatedOn, { date: formatAsOf(reading.asOf, 'en') }) : '—'}
             <span className="mx-1.5 opacity-50">·</span>
-            {reading.sourceName}
+            {/* R30: publisher only — raw series ids ("ABS (RES_DWELL_ST)")
+             * never reach the card face. */}
+            {friendlySource(reading.sourceName)}
           </span>
           <span className="whitespace-nowrap font-semibold text-[var(--color-status-context)]">{copy.ui.detailsButton} ›</span>
         </span>

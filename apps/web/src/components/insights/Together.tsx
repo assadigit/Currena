@@ -29,6 +29,18 @@ import { TOGETHER_CARD_ORDER, togetherSummary } from './config';
 
 const STORAGE_KEY = 'currena.insights.together-open.v1';
 
+/** R30: the collapsed chips' state words speak in status ink (the roast:
+ * "gray state words" carried none of the card's meaning). Icon + word
+ * stays — colour is never alone: every chip is also a button with the
+ * state word itself. */
+const CHIP_STATE_TONE: Record<string, string> = {
+  active: 'text-[var(--color-status-normal)]',
+  partly: 'text-[var(--color-status-context)]',
+  disagree: 'text-[var(--color-status-watch)]',
+  inactive: 'text-[var(--color-text-tertiary)]',
+  unknown: 'text-[var(--color-text-tertiary)]',
+};
+
 /** Expanded shows 3 cards first (spec R7b). */
 const EXPANDED_LIMIT = 3;
 
@@ -138,7 +150,7 @@ export function Together({
       <div id="insights-together-body">
         {open ? (
           <>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] items-start gap-2.5">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] items-start gap-2.5">
               {shown.map((reading) => (
                 <ConnectionCard
                   key={reading.connection}
@@ -155,7 +167,7 @@ export function Together({
               <button
                 type="button"
                 onClick={() => setShowAll(true)}
-                className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-currena-blue/40 bg-currena-blue/15 px-5 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
+                className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:decoration-[var(--color-status-context)]"
               >
                 {interpolate(copy.together.seeAllConnections, { n: formatNumber(ordered.length, numberLocale, { maximumFractionDigits: 0 }) })}
               </button>
@@ -176,7 +188,7 @@ export function Together({
                     className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center gap-1.5 rounded-full bg-[var(--color-surface)] px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] transition-colors hover:text-[var(--color-status-context)]"
                   >
                     {chip.name}
-                    <span className="font-bold text-[var(--color-text-secondary)] opacity-80">
+                    <span className={`font-bold ${CHIP_STATE_TONE[chip.state] ?? 'text-[var(--color-text-tertiary)]'}`}>
                       {copy.together.state[chip.state]}
                     </span>
                   </button>

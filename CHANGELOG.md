@@ -5,6 +5,82 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — Insights roast fixes: colour roles, hero generator, card grid, copy (R30)
+
+Seventeenth round — a third-party roast of the 11 Oct build (English,
+desktop, light) graded the page B- with a ranked fix list. Six fixes
+shipped; the two flagged "render defects" were reproduced in a real
+browser at several widths and shown to be screenshot artifacts (no
+`content-visibility` in the codebase; the Signals header and the yen card
+render exactly once — the lone card now keeps its siblings' width instead
+of stretching full-width, which is what the reviewer read as a duplicate).
+
+### Fixed
+
+- **Hero sentence generator (R30):** the reason line embedded the full
+  gauge QUESTION — "1 of 5 areas is Alarmed: Are prices heating up?."
+  (the reviewer's "?." punctuation error) — and summarised the tail with
+  `Math.max`, claiming "The rest are Cautious" when three of four were
+  Relaxed. New `groupShort` corpus (9 gauges × en/fa) feeds short names
+  ("Prices"), and the tail word is the MODE of the remaining steps
+  (ties resolve up): "1 of 5 areas is Alarmed: Prices. The rest are
+  Relaxed."
+- **Verdict meter:** the four-step scale now has four DISTINCT hues —
+  relaxed green · cautious amber · stressed orange (NEW
+  `--color-status-stressed` #C2410C/#F0A04B) · alarmed red; the meter's
+  segments mirror the words exactly and the hero meter is visibly larger
+  (`.verdict-meter-lg`). The hero gauges render ONE LINE PER GAUGE
+  (short name → mini meter → step word) instead of inline chips that
+  wrapped differently per region, and both verdict cards stretch to one
+  height (no void under Australia).
+- **Colour roles defined once:** red = needs attention ONLY. The Unusual
+  tier owns amber (`--color-status-watch`): chip, card accent border and
+  tint. Price position words ("expensive"/"cheap") are neutral ink again
+  — colour carries STATUS, not direction (the roast: red "expensive" made
+  gold, silver and oil all read as warnings). Money-panel icons are
+  always the neutral context ink; red stays on the needs-attention word.
+  Brand-adjacent captions/labels: the ink ramp compresses so EVERY ink
+  is ≥ 7:1 (secondary #47525D light/#A9B5C5 dark, tertiary #4F5A66/#A2AEBC
+  — captions measured 4.3:1 before).
+- **Visible Global | Australia switch:** the lane switch rode below the
+  fold; a second instance now sits on the first screen (both share one
+  state; Global default per D7).
+- **Card grid:** `auto-fill minmax(300px, 1fr)` (was auto-fit 260px) —
+  no four-column five-line titles, lone cards keep sibling width, prices
+  tiles share ONE anatomy (always-present 7d/30d row with the position
+  word INLINE; gold/silver/Bitcoin changes derived client-side from the
+  cached 10-year histories — the feed carries them for oil only; missing
+  data renders "—"), Bitcoin's ratios collapsed into the one context
+  line every tile uses.
+- **Copy gaps:** the sentence-versus-number guard DROPS the consequence
+  line when a needs-attention card's numbers read "typical" (wage growth
+  and unemployment no longer say "sits in its usual range" under a fired
+  rule); the Unusual cards no longer show a "Rule zone" no rule fired
+  (zone ticks live on needs-attention cards and the details panel);
+  "See all 1 indicators" → honest plurals ("Show 1 hidden indicator");
+  heavy blue pills became quiet text buttons; money-panel lines name the
+  actual driver ("Oil has left its usual range…" — no more templated
+  "unusually prominent") with a fixed 176px label column so sentences
+  align; footers show PUBLISHERS ONLY (`friendlySource`: "ABS", "RBA",
+  "FRED", "GoldAPI") — raw series ids ("CPI_Q Trimmed Mean",
+  "RES_DWELL_ST", "RBA F6") left the card faces and tags (they remain in
+  the details panel).
+- **Type hierarchy:** section headings step up to 19/700 (cards speak at
+  14) — the roast: "section headings are the same size as card titles".
+  Together chips' state words speak in status ink.
+
+### Deliberately NOT restored
+
+- The roast flags the missing "Before you act" box (R24) as unfinished —
+  it was removed on the owner's explicit request earlier this build cycle
+  and stays removed.
+
+### Budgets
+
+- Insights lazy chunk 301.21/78.06 → 303.98/78.50 kB gz; budget 302/78 →
+  304/78.6 with the itemised justification in
+  `scripts/check-bundle-budget.mjs`. Entry untouched (290.32/87.04).
+
 ## [2026-10-10] — Insights UI/UX audit: ink ramp, status-ink words, type hierarchy (R29, owner request)
 
 Sixteenth round — the owner reported "everything is written with black

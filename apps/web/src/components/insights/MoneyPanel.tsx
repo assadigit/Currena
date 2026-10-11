@@ -114,12 +114,17 @@ export function MoneyPanel({
                 data-money-state={state}
                 className="flex flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-3.5 py-2.5 ring-1 ring-[var(--color-border)] sm:flex-row sm:items-center sm:gap-3"
               >
+                {/* R30: the area label owns a FIXED column (sm:w-44) — the
+                 * roast: "label widths differ, so sentences start at
+                 * different positions". The icon is always the neutral
+                 * context ink — red belongs to the needs-attention WORD
+                 * only (colour roles, one definition). */}
                 <span
-                  className={`inline-flex shrink-0 items-center gap-1.5 text-[length:var(--type-label)] font-bold ${
+                  className={`inline-flex w-fit shrink-0 items-center gap-1.5 text-[length:var(--type-label)] font-bold sm:w-44 ${
                     state === 'attention' ? 'text-[var(--color-status-alert)]' : 'text-[var(--color-text-primary)]'
                   }`}
                 >
-                  <span className={state === 'attention' ? 'text-[var(--color-status-alert)]' : 'text-[var(--color-status-context)]'}>
+                  <span className="text-[var(--color-status-context)]">
                     <AreaIcon area={area} />
                   </span>
                   {areaCopy.name}

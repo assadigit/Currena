@@ -10,12 +10,18 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import type { IndicatorTier, StatusTone } from './config';
 
 // Ink-grade tokens (G4): ≥4.5:1 on each chip's own tint in BOTH themes.
+// R30 colour roles: needs-attention = red (danger); UNUSUAL = the amber
+// watch ink (was blue-info, then indistinct from the alert tier's border).
 const TONE_CLASSES: Record<StatusTone, string> = {
   danger: 'bg-currena-warning/15 text-[var(--color-status-alert)]',
   success: 'bg-currena-success/15 text-[var(--color-status-normal)]',
   info: 'bg-currena-blue/10 text-[var(--color-status-context)]',
   muted: 'bg-currena-muted/15 text-[var(--color-status-stale)]',
 };
+
+/** R30: the Unusual tier's own chip tone — amber, so the two card tiers
+ * (needs-attention red border vs unusual amber border) stop looking alike. */
+const UNUSUAL_CLASS = 'bg-currena-warning/10 text-[var(--color-status-watch)]';
 
 /** Inline SVG icons (16×16, stroke = currentColor). */
 function StatusIcon({ kind }: { kind: IndicatorReading['status'] | 'unusual' }) {
@@ -100,7 +106,7 @@ export function StatusChip({
   return (
     <span
       className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-[0.72rem] font-bold ${
-        isUnusual ? TONE_CLASSES.info : TONE_CLASSES[STATUS_TONE[status]]
+        isUnusual ? UNUSUAL_CLASS : TONE_CLASSES[STATUS_TONE[status]]
       }`}
       title={isUnusual ? copy.ui.unusualAria : undefined}
     >

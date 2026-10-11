@@ -212,10 +212,13 @@ function QuestionGroup({
           <span className="flex-1">{answer}</span>
         </p>
       </header>
-      {/* R5/R7: needs-attention AND unusual cards in a responsive auto-fit
-       * grid (never stretching neighbours). */}
+      {/* R5/R7: needs-attention AND unusual cards in a responsive auto-fill
+       * grid — R30: min 300px (the 4-column 260px grid wrapped titles to
+       * five lines) and auto-FILL so a lone card keeps the SAME width as
+       * its siblings instead of stretching full-width (the roast: "the yen
+       * card is full width while others are narrow"). */}
       {cardList.length > 0 ? (
-        <div className="mb-2 grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] items-start gap-2.5">
+        <div className="mb-2 grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] items-start gap-2.5">
           {cardList.map((r) => (
             <AlertCard
               key={r.id}
@@ -243,14 +246,16 @@ function QuestionGroup({
           ))}
         </div>
       ) : null}
-      {/* R7: the "See all {n} indicators" collapse — per session state. */}
+      {/* R7: the "See all {n}" collapse — per session state. R30: honest
+       * plural ("See all 1 indicators" was wrong) and a QUIET text button
+       * (the heavy blue pill competed with the cards). */}
       {collapsed ? (
         <button
           type="button"
           onClick={() => setShowAll(true)}
-          className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-currena-blue/40 bg-currena-blue/15 px-5 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
+          className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:decoration-[var(--color-status-context)]"
         >
-          {interpolate(copy.ui.seeAll, { n: num(hidden.length, numberLocale) })}
+          {hidden.length === 1 ? copy.ui.seeAllOne : interpolate(copy.ui.seeAll, { n: num(hidden.length, numberLocale) })}
         </button>
       ) : null}
       {!collapsed && showAll && hidden.length > 0 ? (
@@ -701,10 +706,17 @@ export function Insights() {
         </div>
       </header>
 
+      {/* R30 (roast 11 Oct): the Global | Australia switch was buried below
+       * the fold ("no visible switch") — it now rides the FIRST screen too.
+       * The lane-section instance stays for context; both share one state. */}
+      <div className="mb-4 flex justify-center sm:justify-start">
+        <LaneSwitch lane={lane} onLaneChange={setLane} copy={copy} />
+      </div>
+
       {state.kind === 'loading' ? (
         <div className="flex flex-col gap-6" role="status" aria-live="polite">
           <SummarySkeleton />
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-2.5" aria-hidden="true">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2.5" aria-hidden="true">
             {Array.from({ length: 6 }, (_, i) => (
               <Skeleton key={i} className="h-28 rounded-[18px]" />
             ))}

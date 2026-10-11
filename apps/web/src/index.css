@@ -1074,19 +1074,27 @@ body {
 
 :root {
   /* Text (G4 + owner audit A1: the ink ramp must be a VISIBLE ramp —
-   * secondary steps clearly below primary, tertiary carries meta only) */
+   * secondary steps clearly below primary, tertiary carries meta only)
+   * R30 (roast 11 Oct): captions measured ~4.3:1 — below the 7:1 target.
+   * The ramp compresses to keep EVERY ink ≥ 7:1 on white: primary 10.9,
+   * secondary 7.98, tertiary 7.03. */
   --color-text-primary: #2C3E50;   /* = currena-dark light */
-  --color-text-secondary: #56616E; /* 6.3:1 on white, 5.9:1 on page bg — body/labels */
-  --color-text-tertiary: #6B7683;  /* 4.7:1 on white — captions, timestamps, sources */
+  --color-text-secondary: #47525D; /* 7.98:1 on white — body/labels */
+  --color-text-tertiary: #4F5A66;  /* 7.03:1 on white — captions, timestamps, sources */
   /* Surfaces */
   --color-surface: #FFFFFF;
   --color-surface-raised: #FFFFFF;
   --color-surface-alert-tint: rgba(185, 46, 46, 0.05);
   --color-border: rgba(44, 62, 80, 0.14);
   /* Status inks (icon + word chips — never colour alone, G5). R29 adds
-   * status-watch: the cautious/middle step word gets its own ink. */
+   * status-watch: the cautious/middle step word gets its own ink.
+   * R30 adds status-stressed: the FOUR-STEP verdict scale gets four
+   * DISTINCT hues — relaxed green · cautious amber · stressed orange ·
+   * alarmed red (the roast: "Stressed and Alarmed are close hues").
+   * Red now means needs-attention ONLY. */
   --color-accent-brand: #4A90E2;
   --color-status-alert: #B92E2E;
+  --color-status-stressed: #C2410C; /* 5.2:1 on white — the step-3 word */
   --color-status-normal: #256D29;
   --color-status-watch: #9C5019;   /* 5.9:1 on white — cautious/watch words */
   --color-status-context: #245E9F;
@@ -1113,14 +1121,15 @@ body {
 
 .dark {
   --color-text-primary: #E8EDF4;     /* = currena-dark dark */
-  --color-text-secondary: #9AA8BC;   /* 7.5:1 on #10151D, 6.9:1 on #1A222E cards */
-  --color-text-tertiary: #8291A5;    /* 5.0:1 on #1A222E cards — meta only */
+  --color-text-secondary: #A9B5C5;   /* 7.7:1 on #1A222E cards */
+  --color-text-tertiary: #A2AEBC;    /* 7.1:1 on #1A222E cards — meta only */
   --color-surface: #1A222E;
   --color-surface-raised: #202A38;
   --color-surface-alert-tint: rgba(255, 128, 128, 0.07);
   --color-border: rgba(232, 237, 244, 0.16);
   --color-accent-brand: #6FAEEC;
   --color-status-alert: #FF8080;
+  --color-status-stressed: #F0A04B;  /* 7.5:1 on #1A222E — the step-3 word */
   --color-status-normal: #63C06C;
   --color-status-watch: #FBB48C;     /* 9.1:1 on #1A222E — cautious/watch words */
   --color-status-context: #6FAEEC;
@@ -1148,11 +1157,12 @@ body {
   font-size: var(--type-caption);
   font-weight: 500;
 }
-/* Owner-audit type roles (R29): headings stop screaming. Section titles sit
- * at 17/700 (was text-lg/800), in-card questions at 15/600 (was 14/800),
- * and kickers become tiny tertiary uppercases. 800 stays with NUMBERS. */
+/* Owner-audit type roles (R29): headings stop screaming. R30: section
+ * titles step UP to 19/700 — the roast: "section headings are the same
+ * size as card titles" (cards speak at 14). In-card questions stay at
+ * 15/600, kickers tiny tertiary uppercases. 800 stays with NUMBERS. */
 .type-section {
-  font-size: 1.0625rem;   /* 17px */
+  font-size: 1.1875rem;   /* 19px */
   line-height: 1.4;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -1191,7 +1201,9 @@ html:not(:lang(fa)) .type-kicker {
   }
 }
 
-/* Verdict meter (H1): four segments + a marker on the current step. */
+/* Verdict meter (H1): four segments + a marker on the current step.
+ * R30: segment inks mirror the FOUR-STEP word scale exactly (the word
+ * and its meter share one hue — never colour alone). */
 .verdict-meter {
   display: flex;
   gap: 3px;
@@ -1204,14 +1216,23 @@ html:not(:lang(fa)) .type-kicker {
   background: var(--color-border);
 }
 .verdict-meter-seg.on-1 { background: var(--color-status-normal); }
-.verdict-meter-seg.on-2 { background: var(--color-status-normal); }
-.verdict-meter-seg.on-3 { background: #D98E32; }
+.verdict-meter-seg.on-2 { background: var(--color-status-watch); }
+.verdict-meter-seg.on-3 { background: var(--color-status-stressed); }
 .verdict-meter-seg.on-4 { background: var(--color-status-alert); }
+/* The hero's meter is the page's status instrument — bigger there.
+ * The compact one rides each per-gauge hero row (fixed 44px track). */
+.verdict-meter-lg { flex: 1 1 auto; max-width: 150px; min-width: 90px; }
+.verdict-meter-lg .verdict-meter-seg { height: 12px; border-radius: 4px; }
+.verdict-meter-sm { width: 44px; }
+.verdict-meter-sm .verdict-meter-seg { height: 5px; }
 @media (prefers-reduced-motion: reduce) {
   .verdict-meter-seg { transition: none; }
 }
 
-/* Alert-card accent (F1): inline-start border + light tint, never colour alone. */
+/* Alert-card accent (F1): inline-start border + light tint, never colour alone.
+ * R30 colour roles: RED = needs attention only. The Unusual tier gets the
+ * amber watch ink (border + tint) so the two tiers stop looking alike —
+ * the roast: "the left accent border is red on Unusual cards as well". */
 .alert-card {
   border-inline-start-width: 4px;
   border-inline-start-style: solid;
@@ -1219,6 +1240,14 @@ html:not(:lang(fa)) .type-kicker {
   background: linear-gradient(
     to var(--dir-gradient, right),
     var(--color-surface-alert-tint),
+    var(--color-surface) 55%
+  );
+}
+.alert-card[data-tier='unusual'] {
+  border-inline-start-color: var(--color-status-watch);
+  background: linear-gradient(
+    to var(--dir-gradient, right),
+    color-mix(in srgb, var(--color-status-watch) 7%, transparent),
     var(--color-surface) 55%
   );
 }
