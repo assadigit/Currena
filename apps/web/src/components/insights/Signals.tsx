@@ -538,6 +538,20 @@ function MergedSignalsCard({
 
 const STORAGE_KEY = 'currena.insights.signals-open.v1';
 
+/** Round 24: the collapsed per-metal line's takeaway — the estimation
+ * (round 23's verdictOf), word + ink; unreadable metals stay silent. */
+function CollapsedVerdict({ reading, copy }: { reading: SignalReading; copy: InsightsCopy }) {
+  const s = copy.signals;
+  const verdict = verdictOf(reading);
+  if (verdict === null) return null;
+  const word = verdict === 'up' ? s.verdictUp : verdict === 'down' ? s.verdictDown : s.verdictFlat;
+  return (
+    <span className={`ms-1.5 font-bold ${verdictTone[verdict]}`} data-collapsed-verdict={verdict}>
+      {interpolate(s.collapsedVerdict, { verdict: word })}
+    </span>
+  );
+}
+
 export function Signals({
   readings,
   copy,
@@ -646,6 +660,9 @@ export function Signals({
                 data-signal-metal={reading.metal}
               >
                 {collapsedLine(reading)}
+                {/* Round 24 (roast #4): the collapsed line now ends with
+                 * its takeaway — the round-23 estimation, in the ink. */}
+                <CollapsedVerdict reading={reading} copy={copy} />
               </li>
             ))}
           </ul>

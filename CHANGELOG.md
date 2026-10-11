@@ -5,6 +5,70 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — The roast round: meaning on every warning card, a quieter hero, Jalali everywhere, red discipline, and brand gold (owner round 24)
+
+Twenty-fourth round — a full design roast of the Persian build scored the
+page B- with a ranked fix list. All seven "fix this first" items shipped.
+
+### Changed
+
+- **Every needs-attention card and hero tile now carries a one-line
+  MEANING** (roast #1: "a rule but no meaning"). A new authored corpus —
+  30 indicators × 2 locales (`copy.meaning`) — says what the fired rule
+  actually means for the reader ("دستمزد از قیمت‌ها عقب مانده است:
+  افزایش حقوقِ هر سال، کمتر از سال قبل می‌خرد."), replacing the
+  "قاعده: …" jargon on the hero tiles, alert cards and compact rows. The
+  technical rule text stays in the details panel. The line sits in a
+  SOFTENED tint (`/10 → /[0.07]`, ring `/25 → /20`) — red belongs to
+  words, not walls of pink.
+- **The hero says it once** (roast #2). Gauge rows now show only the
+  non-calm gauges (unreadable rows stay — they are the honest "cannot
+  read" signal); the separate "الان نیازمند توجه" kicker is gone (the
+  count line above the tiles already says it); and the tail clause can
+  no longer lie — the old mode-based "بقیه در وضعیت پایدار هستند" sat
+  beside a Cautious gauge row, so when the remaining gauges disagree the
+  sentence now enumerates their DISTINCT words ("The rest are Cautious
+  and Stable." / «بقیه در وضعیت محتاط و پایدار هستند.»). New
+  `heroReasonOthersMixed` + `heroReasonAndWord` keys; the mode fallback
+  stays for call sites without the mixed template.
+- **Jalali on every card footer in Persian, through the one formatter**
+  (roast #3): the alert card hardcoded `'en'` into `formatAsOf` — Latin
+  dates on a Persian page. It now derives the locale from
+  `numberLocale`; every other card already used the shared formatter.
+- **Red discipline** (roast #4): the four money-panel area labels are
+  neutral ink (state still shows in the sentence + chips); hero tile
+  tints softened; red remains on "needs attention" words, counts and
+  card accents only.
+- **Price tiles** (roast #5): a missing change renders a quiet em-dash
+  instead of two «ناموجود» labels per tile (six empty labels in a strip
+  that should be clean), the position word holds its line
+  (`whitespace-nowrap`), and each commodity wears a small pictogram —
+  droplet, ingots, coins, ₿ — in the money-panel's tinted-box language,
+  with the GOLD tile wearing the brand gold.
+- **Footer bidi fixed** (roast 🔴): the official English FRED notice now
+  sits on its OWN `dir="ltr"` line, with the Persian explanation on the
+  next line in the page's direction (`fredLocalNote` key; en renders no
+  second line). No more stray colon or ".(" at a line start.
+- **Brand gold is the ONE accent** (roast #7): new tokens
+  `--color-accent-gold` (#F3B13F fill) / `-ink` (#2A1F04 text on gold) /
+  `-deep` (gold-family ink for highlights: #A87E1C light, #E8B54A dark).
+  The lane switch and section pills' selected state is now gold with
+  dark ink (was blue/white), and the biggest-move card — the page's
+  focal moment — carries a gold ring and gold kicker icon.
+- **Smaller findings**: gauge rows and their step words bumped
+  caption → label size (the roast measured ~11px words), the compact
+  meter grew 44 → 52px wide with 6px segments, and the collapsed
+  gold-and-silver summary now ends with its takeaway — the round-23
+  estimation, in the direction's ink («برآورد: پایین می‌آید») —
+  fixing "jargon with no takeaway".
+
+### Housekeeping
+
+- Bundle budget bumped 307.5/79.6 → 318.5/82.5 kB (Insights chunk
+  306.68 → 317.60 kB raw / 79.19 → 81.93 gz): the roast's #1 fix is
+  content — 30 meaning lines × 2 locales — plus the mixed-rest keys,
+  collapsed verdicts and pictograms. Entry untouched at 290.33/87.06.
+
 ## [2026-10-11] — The owner's exact Carbon state palette, and an estimation you can point at (owner round 23)
 
 Twenty-third round — the owner pinned the exact state colours ("use the

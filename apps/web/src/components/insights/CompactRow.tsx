@@ -14,7 +14,7 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { fetchIndicatorHistory } from '../../lib/insights';
 import { Sparkline } from '../Sparkline';
 import { StatusChip } from './StatusChip';
-import { bandWordsOf, consequenceLine, consequenceState, definitionFor, formatChange, formatIndicatorValue, formatRuleText, tierOf } from './config';
+import { bandWordsOf, consequenceLine, consequenceState, definitionFor, formatChange, formatIndicatorValue, tierOf } from './config';
 
 /** F2's tiny sparkline — same lazy pattern as the alert card's. */
 function TinySparkline({ id }: { id: IndicatorId }) {
@@ -76,15 +76,10 @@ export function CompactRow({
   const tier = tierOf(reading);
   const valueText =
     reading.value !== null ? formatIndicatorValue(reading.id, reading.value, numberLocale, copy.units) : null;
-  // R6: the needs-attention rule line also rides compact rows when a
-  // needs-attention row renders without a card (never hidden by R7).
-  const ruleLine =
-    tier === 'needs-attention'
-      ? interpolate(copy.ui.attentionTileRule, {
-          rule: formatRuleText(def.rule, reading.id, copy.rule, copy.units, numberLocale),
-          value: valueText ?? copy.ui.na,
-        })
-      : null;
+  // R6 → round 24: the needs-attention MEANING line also rides compact
+  // rows when a needs-attention row renders without a card (never hidden
+  // by R7) — the meaning, not the "Rule: …" jargon (see AlertCard).
+  const meaningLine = tier === 'needs-attention' ? copy.meaning[reading.id] : undefined;
   // R30: the sentence-versus-number guard (see AlertCard) — a
   // needs-attention row never says "usual range" beside its rule line.
   const cs = consequenceState(reading, false);
@@ -135,10 +130,10 @@ export function CompactRow({
               {copy.ui.detailsButton} ›
             </span>
           </span>
-          {/* R6: the rule line on needs-attention rows. */}
-          {ruleLine !== null ? (
-            <span className="block text-[length:var(--type-caption)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
-              <bdi>{ruleLine}</bdi>
+          {/* R6 → round 24: the meaning line on needs-attention rows. */}
+          {meaningLine !== undefined ? (
+            <span className="block text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
+              <bdi>{meaningLine}</bdi>
             </span>
           ) : null}
           {!isUnavailable && showConsequence ? (

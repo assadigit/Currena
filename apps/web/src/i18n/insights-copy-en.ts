@@ -981,6 +981,12 @@ export const insightsCopyEn = {
     heroReasonTop: '{k} of {n} areas {isAre} {word}: {names}.',
     heroReasonOthers: 'The rest are {word}.',
     heroReasonOthersOne: 'The other one is {word}.',
+    // Round 24 (roast): the tail clause used the MODE of the remaining
+    // gauges — "The rest are Stable" while one sat Cautious. When the rest
+    // disagree, enumerate their DISTINCT words instead (never a false
+    // single word); {words} is pre-joined with andWord.
+    heroReasonOthersMixed: 'The rest are {words}.',
+    heroReasonAndWord: 'and',
     heroReasonIs: 'is',
     heroReasonAre: 'are',
     heroGaugesLabel: 'The gauges behind this verdict',
@@ -1117,6 +1123,10 @@ export const insightsCopyEn = {
       'Official and public sources only: the US Federal Reserve (FRED), the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics, the World Bank, Frankfurter and gold-api.com. Each card names and links its own source.',
     fredNotice:
       'This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank of St. Louis.',
+    // Round 24 (roast): the English notice sits on its OWN dir=ltr line.
+    // fa carries the Persian explanation on the next line; en needs no
+    // second line (empty string renders nothing).
+    fredLocalNote: '',
     fredTerms: 'FRED API terms',
     attributionTitle: 'Attribution',
     attributionRba: 'Source: Reserve Bank of Australia, 2026.',
@@ -1252,6 +1262,78 @@ export const insightsCopyEn = {
     belowAux: 'below its paired comparison (wage growth below inflation)',
     or: 'or',
   },
+
+  /* ---------------------------------------------------------------- *
+   * Round 24 (roast, "fix this first" #1): every needs-attention card
+   * and hero tile carries a ONE-LINE MEANING — what the fired rule
+   * actually means for the reader, authored per indicator (the roast:
+   * "a rule but no meaning"). One line, state-describing, hedged where
+   * a tendency is claimed; the technical rule text stays in Details.
+   * Typed as a Partial so the components can index any IndicatorId;
+   * en and fa carry the same key set by hand.
+   * ---------------------------------------------------------------- */
+  meaning: {
+    'yield-curve-10y2y':
+      'The 10-year yield sits below the 2-year: the inverted curve that has usually flagged a late cycle.',
+    'real-yield-10y':
+      'Safe money pays near a decade high after inflation: the headwind that usually weighs on gold and property.',
+    us10y:
+      'US 10-year borrowing costs are at a decade high or have jumped: loans everywhere price off this number.',
+    'fed-target':
+      'The US policy rate is at a decade high: new loans and card debt cost more.',
+    'ecb-dfr':
+      'The euro area’s policy rate is at a decade high: euro loans cost more.',
+    'govt-interest-revenue':
+      'Interest takes a historically large share of US government income: less room to spend or cut taxes.',
+    'us-cpi-yoy':
+      'US prices are rising faster than the 2% target: each dollar buys a little less every month.',
+    'breakeven-5y5y':
+      'Markets expect US inflation to stay elevated over the next five to ten years.',
+    'stress-stlfsi':
+      'US money markets are more stressed than usual: funding gets tighter and pricier.',
+    nfci:
+      'US financial conditions are tighter than usual: credit is harder to get.',
+    'gold-silver':
+      'Gold is historically expensive against silver: silver is the cheap side of the pair.',
+    'dollar-basket':
+      'The dollar is at a decade high against major currencies: imports cost more outside the US.',
+    usdjpy:
+      'The dollar has dropped fast against the yen: Japanese goods and travel got cheaper for dollar wallets.',
+    'china-pmi':
+      'Chinese factories are contracting: the world’s biggest raw-material buyer is pulling back.',
+    'm2-us':
+      'The US money supply is shrinking year-on-year: a rare squeeze that has usually preceded slowdowns.',
+    'copper-gold':
+      'Copper is historically cheap against gold: factory demand is running cold.',
+    brent:
+      'Oil has jumped more than 25% in a quarter: petrol, power and transport costs follow with a lag.',
+    'au-cpi':
+      'Australian prices are rising above the 2–3% target band: the scoreboard the RBA watches.',
+    'au-trimmed-mean':
+      'Underlying inflation is above the target band: the rise isn’t just one volatile item.',
+    'au-us-10y-gap':
+      'US 10-year money now costs more than Australia’s: the setting that has usually weighed on the Aussie dollar.',
+    'au-home-loan':
+      'The rate people actually pay on home loans is at a decade high: mortgages bite hardest here.',
+    'au-wage-growth':
+      'Wages are trailing prices: each year’s pay rise buys less than the year before.',
+    'au-rent-yoy':
+      'Rents are rising at a decade-high pace: housing takes a bigger slice of the budget.',
+    'au-unemployment':
+      'Unemployment has climbed off its low: finding work is taking longer.',
+    'au-home-values':
+      'Home values have fallen several periods in a row: owners’ equity is shrinking.',
+    'au-household-debt-arrears':
+      'A historically large share of households is behind on loan payments: stress is showing in credit.',
+    audusd:
+      'The Aussie dollar sits at a decade low against the US dollar: imports and overseas travel cost more.',
+    audjpy:
+      'The Aussie dollar has dropped fast against the yen: trips to Japan cost more.',
+    'terms-of-trade':
+      'Export prices are slipping against import prices: national income feels the squeeze.',
+    'iron-ore':
+      'Iron ore sits at a decade low: Australia’s biggest export earner is weak.',
+  } as Partial<Record<IndicatorId, string>>,
 
   /* ---------------------------------------------------------------- *
    * I17 (v2, Block T1): the "Together" connection cards.
@@ -1490,6 +1572,9 @@ export const insightsCopyEn = {
     // R7b: the collapsed summary: one line per metal ("Gold: mixed, 2 of
     // 5 conditions met: price in the top 7% of the last 10 years").
     collapsedFooting: 'price in the {band} of the last 10 years',
+    // Round 24: the collapsed line gets its takeaway — the round-23
+    // estimation rides the collapsed summary too.
+    collapsedVerdict: 'estimation: {verdict}',
     bandTop: 'top {p}%',
     bandBottom: 'bottom {p}%',
     bandMid: 'the middle',

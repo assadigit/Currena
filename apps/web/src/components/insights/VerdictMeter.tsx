@@ -109,6 +109,8 @@ export function VerdictBlock({
     top: copy.ui.heroReasonTop,
     others: copy.ui.heroReasonOthers,
     othersOne: copy.ui.heroReasonOthersOne,
+    othersMixed: copy.ui.heroReasonOthersMixed,
+    andWord: copy.ui.heroReasonAndWord,
     is: copy.ui.heroReasonIs,
     are: copy.ui.heroReasonAre,
     notEnough: copy.ui.noSummary,
@@ -154,46 +156,54 @@ export function VerdictBlock({
         <VerdictMeter step={step} label={verdictLabel} ariaLabel={ariaLabel} size="lg" />
       </p>
 
-      {/* R2 → R30: the gauges as ONE LINE PER GAUGE — short name, its own
-       * mini meter, its step word (the old inline chips wrapped two per
-       * line in Global and one per line in Australia). */}
-      <ul
-        className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-1 p-0 sm:grid-cols-2"
-        aria-label={copy.ui.heroGaugesLabel}
-      >
-        {gaugeRows.map((g) => {
-          const gWord =
-            g.step === 0
-              ? copy.ui.gaugeNoReading
-              : g.step === 1
-                ? copy.label.relaxed
-                : g.step === 2
-                  ? copy.label.cautious
-                  : g.step === 3
-                    ? copy.label.stressed
-                    : copy.label.alarmed;
-          return (
-            <li key={g.gauge} className="flex items-center justify-between gap-2 text-[length:var(--type-caption)]">
-              <span className="min-w-0 font-semibold text-[var(--color-text-primary)]">
-                {copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge]}
-              </span>
-              <span className="flex shrink-0 items-center gap-2">
-                <VerdictMeter
-                  step={g.step}
-                  label={gWord}
-                  ariaLabel={interpolate(copy.ui.gaugeStepAria, {
-                    question: copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge],
-                    label: gWord,
-                    step: num(g.step, numberLocale),
-                  })}
-                  size="sm"
-                />
-                <span className={`w-16 text-end font-semibold ${stepToneClass(g.step)}`}>{gWord}</span>
-              </span>
-            </li>
-          );
-        })}
-      </ul>
+      {/* R2 → R30 → round 24 (roast): the gauges as ONE LINE PER GAUGE —
+       * short name, its own mini meter, its step word — but ONLY the
+       * non-calm ones (the roast: the hero repeated itself; calm rows
+       * duplicated what the meter and the sentence already say). Unreadable
+       * rows (step 0) stay: they are the honest "cannot read" signal. */}
+      {(() => {
+        const shownGauges = gaugeRows.filter((g) => g.step !== 1);
+        if (shownGauges.length === 0) return null;
+        return (
+          <ul
+            className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-1 p-0 sm:grid-cols-2"
+            aria-label={copy.ui.heroGaugesLabel}
+          >
+            {shownGauges.map((g) => {
+              const gWord =
+                g.step === 0
+                  ? copy.ui.gaugeNoReading
+                  : g.step === 1
+                    ? copy.label.relaxed
+                    : g.step === 2
+                      ? copy.label.cautious
+                      : g.step === 3
+                        ? copy.label.stressed
+                        : copy.label.alarmed;
+              return (
+                <li key={g.gauge} className="flex items-center justify-between gap-2 text-[length:var(--type-label)]">
+                  <span className="min-w-0 font-semibold text-[var(--color-text-primary)]">
+                    {copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge]}
+                  </span>
+                  <span className="flex shrink-0 items-center gap-2">
+                    <VerdictMeter
+                      step={g.step}
+                      label={gWord}
+                      ariaLabel={interpolate(copy.ui.gaugeStepAria, {
+                        question: copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge],
+                        label: gWord,
+                        step: num(g.step, numberLocale),
+                      })}
+                      size="sm"
+                    />
+                    <span className={`w-16 text-end font-semibold ${stepToneClass(g.step)}`}>{gWord}</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        );
+      })()}
 
       {/* R2: the one reason line — from the fixed table, gauge-agreeing. */}
       <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
@@ -209,18 +219,26 @@ export function VerdictBlock({
         })}
       </p>
 
-      {/* R3: needs-attention tiles WITH NUMBERS (largest text in the tile). */}
+      {/* R3 → round 24: the needs-attention tiles WITH NUMBERS (largest
+       * text in the tile). The count line above IS the section label now —
+       * the old separate kicker repeated it verbatim (the roast). Each
+       * tile carries its MEANING line (what the fired rule means), not
+       * the raw rule ("fix this first" #1); the rule lives in Details.
+       * The tint is softened — red is reserved for the words and the
+       * count, not a wall of pink (the roast: "soften the hero tiles"). */}
       {shown.length > 0 ? (
         <div>
-          <p className="type-kicker m-0 mb-1 text-[var(--color-text-tertiary)]">
-            {copy.ui.attentionTilesLabel}
-          </p>
           <ul className="m-0 grid list-none grid-cols-1 gap-1.5 p-0 sm:grid-cols-3" aria-label={copy.ui.attentionTilesLabel}>
             {shown.map(({ id }) => {
               const r = readings.find((x) => x.id === id);
               if (!r) return null;
-              const def = definitionFor(id);
-              const ruleText = formatRuleText(def.rule, id, copy.rule, copy.units, numberLocale);
+              const meaning = copy.meaning[id];
+              const meaningText =
+                meaning ??
+                interpolate(copy.ui.attentionTileRule, {
+                  rule: formatRuleText(definitionFor(id).rule, id, copy.rule, copy.units, numberLocale),
+                  value: r.value !== null ? formatIndicatorValue(id, r.value, numberLocale, copy.units) : copy.ui.na,
+                });
               const valueText =
                 r.value !== null ? formatIndicatorValue(id, r.value, numberLocale, copy.units) : null;
               return (
@@ -228,7 +246,7 @@ export function VerdictBlock({
                   <button
                     type="button"
                     onClick={() => onFocusCard(id)}
-                    className="insights-focusable flex h-full w-full cursor-pointer flex-col items-start gap-0.5 rounded-[var(--radius-md)] bg-currena-warning/10 px-3 py-2 text-start ring-1 ring-currena-warning/25 transition-colors hover:bg-currena-warning/20"
+                    className="insights-focusable flex h-full w-full cursor-pointer flex-col items-start gap-0.5 rounded-[var(--radius-md)] bg-currena-warning/[0.07] px-3 py-2 text-start ring-1 ring-currena-warning/20 transition-colors hover:bg-currena-warning/[0.13]"
                   >
                     <span className="line-clamp-2 min-h-[2.75em] text-[length:var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
                       {copy.indicators[id].name}
@@ -239,7 +257,7 @@ export function VerdictBlock({
                       </bdi>
                     ) : null}
                     <span className="text-[length:var(--type-caption)] leading-snug text-[var(--color-text-secondary)]">
-                      {ruleText}
+                      {meaningText}
                     </span>
                     <span className="sr-only">, {copy.ui.viewCard}</span>
                   </button>

@@ -22,6 +22,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { Coins } from 'lucide-react';
 import { interpolate } from '../../i18n';
@@ -38,6 +39,86 @@ import {
   positionBand,
 } from './config';
 import { formatAsOf } from './HistoryChart';
+
+/* ------------------------------------------------------------------ *
+ * Round 24 (roast #5): a small PICTOGRAM per commodity — the price
+ * lane was the last icon-less strip (the roast: "add warmth via small
+ * commodity pictograms"). Same design language as the money panel:
+ * stroke = currentColor in a tinted rounded box, aria-hidden — the
+ * name carries the meaning. Gold wears the brand gold (the ONE
+ * accent); the others stay in the quiet context ink.
+ * ------------------------------------------------------------------ */
+function PriceIcon({ id }: { id: IndicatorId }) {
+  const common = {
+    width: 20,
+    height: 20,
+    viewBox: '0 0 16 16',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.2,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true,
+    focusable: false,
+  };
+  const glyph = (): ReactNode => {
+    switch (id) {
+      case 'brent':
+        // A droplet — oil.
+        return (
+          <>
+            <path d="M8 2.2c2.3 3.2 3.9 5.3 3.9 7.4a3.9 3.9 0 0 1-7.8 0C4.1 7.5 5.7 5.4 8 2.2Z" />
+            <path d="M6.4 9.8a1.7 1.7 0 0 0 1.5 1.8" opacity="0.6" />
+          </>
+        );
+      case 'gold-usd':
+        // Three ingots — gold.
+        return (
+          <>
+            <path d="M2.6 12.8h3.9l.9-2.4H3.5l-.9 2.4Z" />
+            <path d="M9.5 12.8h3.9l-.9-2.4H10.4l-.9 2.4Z" />
+            <path d="M6 9.2h4l.9-2.4H6.9L6 9.2Z" />
+          </>
+        );
+      case 'silver-usd':
+        // Two round coins — silver.
+        return (
+          <>
+            <circle cx="6.2" cy="9.8" r="3.4" />
+            <circle cx="10.6" cy="5.8" r="2.4" opacity="0.6" />
+          </>
+        );
+      case 'btc-usd':
+        // The ₿ — bitcoin.
+        return (
+          <>
+            <circle cx="8" cy="8" r="6" />
+            <path d="M6.4 5.2h2.5a1.3 1.3 0 0 1 0 2.6H6.4h2.9a1.3 1.3 0 0 1 0 2.6H6.4Z" />
+            <path d="M7.2 3.6v1.6M9.2 3.6v1.6M7.2 10.4v1.6M9.2 10.4v1.6" />
+          </>
+        );
+      default:
+        return <circle cx="8" cy="8" r="6" />;
+    }
+  };
+  return <svg {...common}>{glyph()}</svg>;
+}
+
+/** The tile's icon box — gold wears the brand-gold accent (round 24),
+ * the rest stay in the neutral context ink (money-panel language). */
+function PriceIconBox({ id }: { id: IndicatorId }) {
+  const isGold = id === 'gold-usd';
+  return (
+    <span
+      aria-hidden="true"
+      className={`grid h-9 w-9 shrink-0 place-items-center rounded-[var(--radius-sm)] ring-1 ring-[var(--color-border)] ${
+        isGold ? 'bg-[var(--color-accent-gold)]/25 text-[var(--color-accent-gold-deep)]' : 'bg-currena-soft/70 text-[var(--color-status-context)]'
+      }`}
+    >
+      <PriceIcon id={id} />
+    </span>
+  );
+}
 
 /** Client-side 7d/30d change for tiles whose feed reading lacks them. */
 function useDerivedChanges(ids: readonly IndicatorId[]): Partial<Record<string, { c7?: number; c30?: number }>> {
@@ -195,9 +276,13 @@ export function PricesBoard({
                  * same line, every number aligned). Filling the button
                  * pins the column to the top in all four tiles. */}
                 <span className="flex h-full w-full flex-col items-start gap-1">
-                  {/* Plain name — no tickers, no series ids (R14). */}
-                  <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-secondary)]">
-                    {entry.name}
+                  {/* Plain name — no tickers, no series ids (R14) — now with
+                   * its commodity pictogram (round 24, roast #5). */}
+                  <span className="flex items-center gap-2">
+                    <PriceIconBox id={id} />
+                    <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-secondary)]">
+                      {entry.name}
+                    </span>
                   </span>
                   {/* The large price with unit — the largest text in the tile.
                    * Plain <bdi> (auto direction): the fa unit word lands on
@@ -216,29 +301,25 @@ export function PricesBoard({
                       {copy.ui.unavailableCard}
                     </span>
                   ) : null}
-                  {/* R30: the change row ALWAYS renders — same anatomy for
-                   * all four tiles; "—" marks a change that doesn't exist.
-                   * Owner follow-up: each window is ONE cell — value slot
-                   * (reserved width, tabular) then the day label OUTSIDE
-                   * the ltr bdi — so the fa label order matches the n/a
-                   * case and the numbers align across the four tiles.
-                   * The position word rides at the row's end, NEUTRAL ink
-                   * (colour carries status, not direction). */}
+                  {/* R30 → round 24 (roast #5): the change row keeps ONE
+                   * anatomy, but a missing change renders a QUIET em-dash —
+                   * the old "ناموجود / n/a" twice per tile read as six empty
+                   * labels in a strip that should be clean. */}
                   <span className="flex w-full flex-wrap items-baseline gap-x-4 gap-y-0.5 text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
                     <span className="inline-flex items-baseline gap-1">
                       <bdi dir="ltr" className="min-w-[4.75rem]">
-                        {c7 !== undefined ? formatChange(c7, def.changeKind, numberLocale, copy.units) : copy.ui.na}
+                        {c7 !== undefined ? formatChange(c7, def.changeKind, numberLocale, copy.units) : '—'}
                       </bdi>
                       <span className="opacity-80">{copy.ui.days7}</span>
                     </span>
                     <span className="inline-flex items-baseline gap-1">
                       <bdi dir="ltr" className="min-w-[4.75rem]">
-                        {c30 !== undefined ? formatChange(c30, def.changeKind, numberLocale, copy.units) : copy.ui.na}
+                        {c30 !== undefined ? formatChange(c30, def.changeKind, numberLocale, copy.units) : '—'}
                       </bdi>
                       <span className="opacity-80">{copy.ui.days30}</span>
                     </span>
                     {band && positionWord ? (
-                      <span className="ms-auto font-bold text-[var(--color-text-primary)]">{positionWord}</span>
+                      <span className="ms-auto whitespace-nowrap font-bold text-[var(--color-text-primary)]">{positionWord}</span>
                     ) : null}
                   </span>
                   {/* One hedged practical consequence line. */}

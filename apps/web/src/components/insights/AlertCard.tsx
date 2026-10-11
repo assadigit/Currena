@@ -24,7 +24,6 @@ import {
   definitionFor,
   formatChange,
   formatIndicatorValue,
-  formatRuleText,
   friendlySource,
   tierOf,
   type IndicatorTier,
@@ -92,14 +91,11 @@ export function AlertCard({
   const isNeedsAttention = tier === 'needs-attention';
   const valueText =
     reading.value !== null ? formatIndicatorValue(reading.id, reading.value, numberLocale, copy.units) : null;
-  // R6: the needs-attention face line — the rule in plain language + today's
-  // value. (The 10-year position moves to Details on needs-attention cards.)
-  const ruleLine = isNeedsAttention
-    ? interpolate(copy.ui.attentionTileRule, {
-        rule: formatRuleText(def.rule, reading.id, copy.rule, copy.units, numberLocale),
-        value: valueText ?? copy.ui.na,
-      })
-    : null;
+  // R6 → round 24 (roast "fix this first" #1): the needs-attention face
+  // line is the indicator's MEANING — what the fired rule actually means
+  // for the reader — not the "Rule: …" jargon (the roast: "a rule but no
+  // meaning"). The technical rule text stays in the details panel.
+  const meaningLine = isNeedsAttention ? copy.meaning[reading.id] : undefined;
   // R30 (roast 11 Oct) — the sentence-versus-number guard: a card that
   // NEEDS ATTENTION must never tell you its value "sits in its usual
   // range". When the rule fired but the percentile state reads 'typical'
@@ -162,10 +158,11 @@ export function AlertCard({
               ) : null}
             </span>
 
-            {/* R6: the needs-attention face line — rule + live value. */}
-            {ruleLine !== null ? (
-              <span className="mt-2 block rounded-[var(--radius-sm)] bg-currena-warning/10 px-2.5 py-1.5 text-[length:var(--type-caption)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
-                <bdi>{ruleLine}</bdi>
+            {/* R6 → round 24: the needs-attention face line — the one-line
+             * meaning (softened tint; red belongs to the words). */}
+            {meaningLine !== undefined ? (
+              <span className="mt-2 block rounded-[var(--radius-sm)] bg-currena-warning/[0.07] px-2.5 py-1.5 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
+                <bdi>{meaningLine}</bdi>
               </span>
             ) : null}
 
@@ -194,7 +191,11 @@ export function AlertCard({
 
         <span className="mt-2 flex items-baseline justify-between gap-2 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
           <span>
-            {reading.asOf ? interpolate(copy.ui.updatedOn, { date: formatAsOf(reading.asOf, 'en') }) : copy.ui.na}
+            {reading.asOf
+              ? interpolate(copy.ui.updatedOn, {
+                  date: formatAsOf(reading.asOf, numberLocale === 'fa-IR' ? 'fa' : 'en'),
+                })
+              : copy.ui.na}
             <span className="mx-1.5 opacity-50">·</span>
             {/* R30: publisher only — raw series ids ("ABS (RES_DWELL_ST)")
              * never reach the card face. */}

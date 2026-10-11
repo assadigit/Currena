@@ -82,10 +82,15 @@ export function AboutTheData({
       </div>
 
       {/* Always visible (caption size, secondary ink, no boxes): FRED notice,
-       * one credits line, one general-information line. */}
+       * one credits line, one general-information line.
+       * Round 24 (roast): the official ENGLISH notice sits on its OWN
+       * dir="ltr" line — embedding it inside a Persian sentence scrambled
+       * the punctuation (stray colon, ".(" at a line start). The optional
+       * local-language note renders on the NEXT line, in the page's own
+       * direction. */}
       <div className="mt-2 flex flex-col gap-1 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]" data-about-always>
-        <p className="m-0">
-          <bdi dir="ltr">{copy.ui.fredNotice}</bdi>{' '}
+        <p className="m-0" dir="ltr">
+          <span>{copy.ui.fredNotice}</span>{' '}
           <a
             href={FRED_TERMS_URL}
             target="_blank"
@@ -95,6 +100,7 @@ export function AboutTheData({
             {copy.ui.fredTerms} ↗
           </a>
         </p>
+        {copy.ui.fredLocalNote ? <p className="m-0"><bdi>{copy.ui.fredLocalNote}</bdi></p> : null}
         <p className="m-0">{copy.ui.aboutCreditsLine}</p>
         <p className="m-0 font-semibold" data-general-info>
           {copy.ui.aboutGeneralInfo}

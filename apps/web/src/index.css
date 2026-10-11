@@ -1102,6 +1102,16 @@ body {
    * #da1e28 (image in chat, "use the given colors for states"). Light mode
    * uses the four hexes EXACTLY as given. */
   --color-accent-brand: #4A90E2;
+  /* Round 24 (roast): brand gold — the ONE accent for selected states and
+   * key highlights (the roast: the page had no focal moment and never
+   * used the brand's own gold). -gold is the FILL (pill selected states,
+   * dark ink on top), -ink is the text/icon colour ON that fill,
+   * -deep is the gold-family ink for highlights on the page surface
+   * (light mode needs the darker sibling for contrast; dark mode takes
+   * the brighter one). */
+  --color-accent-gold: #F3B13F;
+  --color-accent-gold-ink: #2A1F04;
+  --color-accent-gold-deep: #A87E1C;
   --color-status-alert: #da1e28;   /* owner palette: Carbon Red 60, verbatim */
   --color-status-stressed: #ff832b; /* owner palette: Carbon Orange 40, verbatim — the Stressed word */
   --color-status-normal: #24a148;  /* owner palette: Carbon Green 50, verbatim — the Stable word / supports */
@@ -1137,6 +1147,9 @@ body {
   --color-surface-alert-tint: rgba(250, 77, 86, 0.07);
   --color-border: rgba(232, 237, 244, 0.16);
   --color-accent-brand: #6FAEEC;
+  --color-accent-gold: #F3B13F;
+  --color-accent-gold-ink: #2A1F04;
+  --color-accent-gold-deep: #E8B54A;
   --color-status-alert: #fa4d56;   /* Carbon Red 50 — Red 60's own dark-surface sibling (Carbon pairs 60/50 across themes); #da1e28 verbatim is 3.2:1 on #1A222E, this holds 4.8:1 */
   --color-status-stressed: #ff832b; /* Carbon Orange 40 verbatim — 6.5:1 on #1A222E */
   --color-status-normal: #24a148;  /* Carbon Green 50 verbatim — 4.8:1 on #1A222E */
@@ -1232,8 +1245,8 @@ html:not(:lang(fa)) .type-kicker {
  * The compact one rides each per-gauge hero row (fixed 44px track). */
 .verdict-meter-lg { flex: 1 1 auto; max-width: 150px; min-width: 90px; }
 .verdict-meter-lg .verdict-meter-seg { height: 12px; border-radius: 4px; }
-.verdict-meter-sm { width: 44px; }
-.verdict-meter-sm .verdict-meter-seg { height: 5px; }
+.verdict-meter-sm { width: 52px; }
+.verdict-meter-sm .verdict-meter-seg { height: 6px; }
 @media (prefers-reduced-motion: reduce) {
   .verdict-meter-seg { transition: none; }
 }

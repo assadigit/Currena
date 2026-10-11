@@ -134,7 +134,15 @@ const BUDGETS = [
   // no clear direction) derived mechanically from the conditions tally,
   // with 5 new copy strings × 2 locales, the arrow icon set and the chip
   // layout. ENTRY untouched. Justified in CHANGELOG §2026-10-11 (round 23).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 307_500, gz: 79_600, label: 'Insights lazy chunk' },
+  // Roast-round bump (306.68/79.19 → 317.60/81.93, budget 307.5/79.6 →
+  // 318.5/82.5): round 24 — the roast's "fix this first" #1, a one-line
+  // MEANING for every needs-attention card and hero tile: 30 authored
+  // strings × 2 locales (the bulk), plus the hero simplification
+  // (mixed-rest enumeration keys), collapsed-signal verdicts, price-tile
+  // pictograms and the FRED footer split. Almost all localized strings —
+  // compressible. ENTRY untouched. Justified in CHANGELOG §2026-10-11
+  // (roast round 24).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 318_500, gz: 82_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {

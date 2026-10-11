@@ -884,6 +884,12 @@ export interface HeroReasonInput {
   top: string; // '{k} of {n} areas {isAre} {word}: {names}.'
   others: string; // 'The rest are {word}.'
   othersOne: string; // 'The other one is {word}.'
+  /** Round 24: used when the remaining gauges DISAGREE — {words} is the
+   * distinct step words, pre-joined with andWord (the old mode-based tail
+   * said "The rest are Stable" while one sat Cautious — the roast caught
+   * the hero contradicting its own gauge rows). */
+  othersMixed?: string; // 'The rest are {words}.'
+  andWord?: string; // 'and' / «و»
   is: string;
   are: string;
   notEnough: string;
@@ -911,9 +917,31 @@ export function heroReason(input: HeroReasonInput): string {
   });
   const rest = readable.filter((g) => g.step < maxStep);
   if (rest.length === 0) return line1;
-  // The tail word = the MODE (most common step) of the rest — R30: the old
-  // max() said "the rest are Cautious" when three of four were Relaxed.
-  // Ties resolve UP (the more notable state wins a tie).
+  // Round 24 (roast): the tail used the MODE (most common step) of the
+  // rest, which lied whenever the rest disagreed ("The rest are Stable"
+  // beside a Cautious gauge row). When they share one step, the single
+  // word is honest. When they DISAGREE, enumerate the DISTINCT words
+  // (most notable first) if the locale provides the mixed template —
+  // otherwise fall back to the mode (older call sites/tests).
+  const restSteps = new Set(rest.map((g) => g.step));
+  if (restSteps.size > 1 && input.othersMixed && input.andWord) {
+    const wordsList = [...restSteps]
+      .sort((a, b) => b - a)
+      .map((s) => input.words[s] ?? '')
+      .filter(Boolean)
+      .join(` ${input.andWord} `);
+    return `${line1} ${interpolate(input.othersMixed, { words: wordsList })}`;
+  }
+  if (restSteps.size === 1) {
+    const restWord = input.words[[...restSteps][0]!] ?? '';
+    const restLine = interpolate(
+      rest.length === 1 ? input.othersOne : input.others,
+      { word: restWord },
+    );
+    return `${line1} ${restLine}`;
+  }
+  // Mixed rest, no mixed template: the mode, ties resolving UP (the more
+  // notable state wins a tie) — the R30 behaviour, kept as fallback.
   const tally = new Map<number, number>();
   for (const g of rest) tally.set(g.step, (tally.get(g.step) ?? 0) + 1);
   const restStep = [...tally.entries()].sort((a, b) => (b[1] !== a[1] ? b[1] - a[1] : b[0] - a[0]))[0]![0];

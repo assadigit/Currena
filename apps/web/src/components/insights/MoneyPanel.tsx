@@ -133,11 +133,12 @@ export function MoneyPanel({
                  * heading, sentence and chip row starts on the same line.
                  * The icon box is always the neutral context ink — red
                  * belongs to the needs-attention WORD only. */}
-                <span
-                  className={`shrink-0 text-[length:var(--type-label)] font-bold leading-relaxed sm:w-40 ${
-                    state === 'attention' ? 'text-[var(--color-status-alert)]' : 'text-[var(--color-text-primary)]'
-                  }`}
-                >
+                {/* R30 → round 24 (roast #4): the area label is NEUTRAL —
+                 * red is reserved for "needs attention" words, and the
+                 * roast called the four red money labels a leak ("when
+                 * everything is red, nothing is"). The state still shows
+                 * in the sentence and the chips. */}
+                <span className="shrink-0 text-[length:var(--type-label)] font-bold leading-relaxed text-[var(--color-text-primary)] sm:w-40">
                   {areaCopy.name}
                 </span>
                 <span className="min-w-0 flex-1 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">

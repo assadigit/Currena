@@ -88,18 +88,18 @@ export function HeroBlock({
         />
       </div>
 
-      {/* R4 → owner follow-up (11 Oct): the biggest move is IMPORTANT,
-       * not stray — it gets a proper card container (surface + ring) with
-       * a kicker header (icon + title) and the move line inside. The
-       * 30-day label sits OUTSIDE the ltr bdi so it never collides with
+      {/* R4 → owner follow-up (11 Oct) → round 24 (roast #7): the biggest
+       * move is the page's FOCAL MOMENT — it now carries the brand gold
+       * (the one accent): a gold ring on the card and a gold kicker icon.
+       * The 30-day label sits OUTSIDE the ltr bdi so it never collides with
        * the value ("نقطه۳۰ روز" squish). */}
       {mover && moverReading && moverEntry ? (
         <div
-          className="mt-3 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)]"
+          className="mt-3 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-accent-gold)]/45"
           data-biggest-move
         >
           <p className="m-0 mb-1 flex items-center gap-1.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-tertiary)]">
-            <TrendingUp aria-hidden="true" size={16} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
+            <TrendingUp aria-hidden="true" size={16} strokeWidth={1.8} className="shrink-0 text-[var(--color-accent-gold-deep)]" />
             {copy.ui.bigMoverTitle}
           </p>
           <p className="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
