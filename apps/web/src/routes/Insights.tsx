@@ -854,7 +854,21 @@ export function Insights() {
                     key={sec}
                     id={`insights-section-${sec}`}
                     aria-labelledby={`insights-section-${sec}-title`}
-                    className="scroll-mt-24 flex flex-col gap-6"
+                    /* Round 39 (owner): "put all of global metrics inside a
+                     * mother container, currently the heading of global looks
+                     * stray, it needs depth and container" + "australia must
+                     * have separate mother container" → EACH region section
+                     * IS its own mother container now: the soft family tint
+                     * (the same currena-soft field the no-match box wears),
+                     * a hairline ring and a quiet shadow for depth — the
+                     * heading + its 96/128 artwork and every metric group
+                     * live INSIDE it. Gold stays the money panel's focal
+                     * accent; the regions get the neutral depth. Separate
+                     * containers by structure — the map renders one <section>
+                     * per region, so global and australia can never share
+                     * or fuse their boxes. The anchors, aria and scroll
+                     * margins are untouched. */
+                    className="scroll-mt-24 flex flex-col gap-6 rounded-[var(--radius-lg)] bg-currena-soft/60 p-4 shadow-[0_10px_34px_rgba(15,23,42,0.07)] ring-1 ring-[var(--color-border)] sm:p-6 dark:shadow-[0_14px_44px_rgba(0,0,0,0.4)]"
                   >
                     <h2
                       id={`insights-section-${sec}-title`}

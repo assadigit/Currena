@@ -5,6 +5,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — Each region's metrics move into their own mother container (owner round 39)
+
+Thirty-ninth round — an owner note with a screenshot of the Global section:
+"put all of global metrics inside a mother container, currently the heading
+of global looks stray, it needs depth and container", followed by "australia
+must have separate mother container."
+
+### Changed
+
+- **Each region section is its own mother container** — the Global heading
+  (and its 96/128px artwork) no longer floats on the page background with
+  the metric cards scattered under it. The whole section — heading +
+  artwork + every question group, alert/connection cards and the
+  "show all" affordances — lives INSIDE one rounded container: the soft
+  family tint (`currena-soft/60`, the same field the no-match box wears),
+  a hairline ring and a quiet shadow for depth. Three visual layers now:
+  page background < tinted mother container < white metric cards.
+- **Australia gets a SEPARATE container** — by structure, not luck: the
+  section map renders one `<section>` per region, so the two boxes can
+  never fuse; measured 40px of page between Global's bottom edge and
+  Australia's top edge, both the same width and column edge in both
+  locales.
+- Gold stays reserved for the money panel's focal treatment — the regions
+  take the neutral depth. Anchors (`insights-section-*`), aria labelling,
+  scroll margins and everything inside the containers are untouched.
+
+### Verified
+
+- Gates: typecheck 5/5; tests 804/804; build ✓; bundle budgets held
+  (Insights 331.78/85.21 vs 334.00/86.00; entry 290.33/87.05).
+- Local QA (wrangler :8787, KV from prod): en light + dark at 1280 — both
+  containers render with tint/ring/shadow, heading + artwork inside each
+  (Global 10 groups, Australia 6), separate boxes with a 40px gap, same
+  width 1088 and left edge 96; fa RTL — both containers right-aligned at
+  the same edge (1184), boundary screenshot shows the two boxes stacked;
+  375: docW = clientW = 375, container 343px with 16px inner padding; zero
+  page errors, zero console errors. Screenshots r39-local-*.png.
+
 ## [2026-10-11] — The money rows' type steps down to proportional (owner round 38)
 
 Thirty-eighth round — one owner note on the round-37 sizes, with a
