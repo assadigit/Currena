@@ -121,10 +121,12 @@ function DirectionIcon({ direction }: { direction: MoneyDirection }) {
 /** Round 34 (owner): the money row's own MINI chart — the exact same
  * structure as the metals' Estimation charts (shared TrendPanel: X/Y
  * axes, hover value/date inspector, quarter · 1 year · 5 years chips,
- * signed window delta), just shorter (plot h-16) and full-width under
- * the row. It charts the row's FIRST chip — the indicator actually
- * making this row speak — so the picture and the sentence can never
- * disagree. */
+ * signed window delta), just shorter (plot h-16). Round 35 (owner):
+ * "graphs too big — only 50% of the card width, 50% other data and
+ * context" → the chart owns HALF the row (the grid's second column,
+ * next to the data half, never full-width again). It charts the row's
+ * FIRST chip — the indicator actually making this row speak — so the
+ * picture and the sentence can never disagree. */
 function MoneyTrend({
   id,
   copy,
@@ -209,54 +211,69 @@ export function MoneyPanel({
               direction === 'up' ? words.up : direction === 'down' ? words.down : words.flat;
             const directionTone = moneyDirectionToneClass(area, direction);
             return (
+              /* Round 35 (owner): "graphs too big — must only contain 50%
+               * of the card width, 50% other data and context" → the row
+               * is a 50/50 GRID: column 1 (inline-start) = the data half
+               * (icon + name/direction, sentence, chips), column 2 = the
+               * chart half. sm:grid-cols-2 makes the split EXACT and
+               * equal in every row — the divider and the chart's left
+               * edge sit at the same x in all four rows BY STRUCTURE
+               * (the alignment decree), not by luck. In fa/RTL the data
+               * half lands on the right and the chart on the left (the
+               * owner's [graph | data] sketch); in en it mirrors — the
+               * same label-start/chart-end pattern the metals' strip
+               * already uses. Stacked full-width on phones (<sm). */
               <li
                 key={area}
                 data-money-area={area}
                 data-money-state={state}
-                className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-4 py-3.5 ring-1 ring-[var(--color-border)] sm:flex-row sm:flex-wrap sm:items-start sm:gap-3"
+                className={`flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-4 py-3.5 ring-1 ring-[var(--color-border)]${
+                  chipIds.length > 0 ? ' sm:grid sm:grid-cols-2 sm:gap-4' : ''
+                }`}
               >
-                {/* Owner follow-up (11 Oct): the icon is a VISIBLE
+                {/* The DATA half — 50%: icon + name/direction on the first
+                 * line, the sentence and the chips stacked under them.
+                 * Owner follow-up (11 Oct): the icon is a VISIBLE
                  * instrument, not a 16px squiggle — round 29 (owner): the
                  * box grows to 64px on mobile / 96px on desktop with the
                  * artwork at 52/80 inside it. A tinted square keeps it
                  * designed, not decorative. */}
-                <span
-                  aria-hidden="true"
-                  className="grid h-16 w-16 shrink-0 place-items-center rounded-[var(--radius-md)] bg-currena-soft/70 ring-1 ring-[var(--color-border)] sm:h-24 sm:w-24"
-                >
-                  <span className={moneyAreaIconUrl(area) !== null ? '' : 'text-[var(--color-status-context)]'}>
-                    <AreaIcon area={area} />
+                <div className="flex min-w-0 flex-col gap-2.5">
+                  <div className="flex items-start gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="grid h-16 w-16 shrink-0 place-items-center rounded-[var(--radius-md)] bg-currena-soft/70 ring-1 ring-[var(--color-border)] sm:h-24 sm:w-24"
+                    >
+                      <span className={moneyAreaIconUrl(area) !== null ? '' : 'text-[var(--color-status-context)]'}>
+                        <AreaIcon area={area} />
+                      </span>
+                    </span>
+                    {/* R30 alignment, kept: the label + estimation sit in
+                     * their own line beside the FIXED icon box, so the
+                     * name and the direction word start at the same x in
+                     * every row; the sentence and chips below start at the
+                     * half's edge — also the same in every row. The icon
+                     * box is always the neutral context ink — red belongs
+                     * to the needs-attention WORD only (round 24, roast
+                     * #4: the area label is NEUTRAL). */}
+                    <span className="min-w-0 flex-1 text-[length:var(--type-label)] font-bold leading-relaxed text-[var(--color-text-primary)]">
+                      {areaCopy.name}
+                      {/* Round 25 (owner): the stated estimation, directly under
+                       * the area name — arrow + word in valence ink, computed
+                       * from the driver readings (moneyAreaDirection). */}
+                      <span
+                        data-money-direction={direction}
+                        className={`mt-1 flex items-center gap-1.5 leading-snug ${directionTone}`}
+                      >
+                        <DirectionIcon direction={direction} />
+                        <span className="text-[length:var(--type-label)] font-bold">{directionWord}</span>
+                      </span>
+                    </span>
+                  </div>
+                  <span className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+                    {sentence}
                   </span>
-                </span>
-                {/* R30: the area label owns a FIXED column (sm:w-40) — the
-                 * roast: "label widths differ, so sentences start at
-                 * different positions". Top-aligned (items-start) so every
-                 * heading, sentence and chip row starts on the same line.
-                 * The icon box is always the neutral context ink — red
-                 * belongs to the needs-attention WORD only. */}
-                {/* R30 → round 24 (roast #4): the area label is NEUTRAL —
-                 * red is reserved for "needs attention" words, and the
-                 * roast called the four red money labels a leak ("when
-                 * everything is red, nothing is"). The state still shows
-                 * in the sentence and the chips. */}
-                <span className="shrink-0 text-[length:var(--type-label)] font-bold leading-relaxed text-[var(--color-text-primary)] sm:w-40">
-                  {areaCopy.name}
-                  {/* Round 25 (owner): the stated estimation, directly under
-                   * the area name — arrow + word in valence ink, computed
-                   * from the driver readings (moneyAreaDirection). */}
-                  <span
-                    data-money-direction={direction}
-                    className={`mt-1 flex items-center gap-1.5 leading-snug ${directionTone}`}
-                  >
-                    <DirectionIcon direction={direction} />
-                    <span className="text-[length:var(--type-label)] font-bold">{directionWord}</span>
-                  </span>
-                </span>
-                <span className="min-w-0 flex-1 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-                  {sentence}
-                </span>
-                {chipIds.length > 0 ? (
-                  <>
+                  {chipIds.length > 0 ? (
                     <span className="flex shrink-0 flex-wrap gap-1.5">
                       {chipIds.map((id) => {
                         const r = byId.get(id);
@@ -279,17 +296,21 @@ export function MoneyPanel({
                         );
                       })}
                     </span>
-                    {/* Round 34 (owner): the row's mini chart — same
-                     * structure as the metals' charts, full width on its
-                     * own wrapped line (basis-full), separated by the row's
-                     * hairline so the four columns above stay untouched. */}
-                    <div
-                      data-money-chart={area}
-                      className="order-last w-full border-t border-[var(--color-border)] pt-2.5 sm:basis-full sm:pt-3"
-                    >
-                      <MoneyTrend id={chipIds[0]!} copy={copy} numberLocale={numberLocale} />
-                    </div>
-                  </>
+                  ) : null}
+                </div>
+                {/* The CHART half — the other 50%: the row's mini chart on
+                 * the grid's second column, vertically centred like the
+                 * metals' chart columns, separated by a vertical hairline
+                 * (border-s faces the data half in BOTH directions).
+                 * Mobile keeps the old stacked order: hairline above,
+                 * full width under the data. */}
+                {chipIds.length > 0 ? (
+                  <div
+                    data-money-chart={area}
+                    className="flex min-w-0 flex-col justify-center border-t border-[var(--color-border)] pt-2.5 sm:border-s sm:border-t-0 sm:ps-4 sm:pt-0"
+                  >
+                    <MoneyTrend id={chipIds[0]!} copy={copy} numberLocale={numberLocale} />
+                  </div>
                 ) : null}
               </li>
             );

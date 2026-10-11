@@ -7,9 +7,10 @@
  * One shared panel, two callers:
  *   - Signals.tsx VerdictStrip — the metals' own price history inside each
  *     Estimation chip (gold-usd / silver-usd), plot h-20.
- *   - MoneyPanel.tsx — a full-width mini chart per money row, driven by the
- *     row's first chip (the indicator actually making the row speak),
- *     plot h-16.
+ *   - MoneyPanel.tsx — a mini chart per money row, driven by the row's
+ *     first chip (the indicator actually making the row speak), plot h-16.
+ *     Round 35 (owner): the mini chart owns HALF the row's card — a 50/50
+ *     grid with the row's data beside it — never full-width again.
  *
  * Structure (identical everywhere — the alignment rule):
  *   [ Y tick labels ] [ plot: gridlines + area/line svg + crosshair +

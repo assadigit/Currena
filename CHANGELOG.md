@@ -5,6 +5,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — The money rows' mini graphs shrink to half the card (owner round 35)
+
+Thirty-fifth round — one owner point on the round-34 money charts, with a
+sketch: "This graphs are too big, it must only contain 50% of the card
+width, 50% other data and context like this [ graph       data]".
+
+### Changed
+
+- **The money rows are a 50/50 grid** — the mini chart no longer spans
+  the full card on its own wrapped line. Each row is now
+  `sm:grid-cols-2`: column 1 (inline-start) is the DATA half — icon +
+  name/direction on the first line, the sentence and the supporting
+  chips stacked under them — and column 2 is the CHART half, the same
+  TrendPanel (axes + hover inspector + Quarter/1y/5y chips + delta,
+  plot h-16) vertically centred in its half like the metals' chart
+  columns, separated by a vertical hairline (`border-s` faces the data
+  half in both directions). In fa/RTL the chart lands on the LEFT and
+  the data on the RIGHT — exactly the owner's sketch; en mirrors it,
+  the same label-start/chart-end pattern the Estimation strip already
+  uses. Phones (<sm) keep the round-34 stack: hairline above, chart
+  full-width under the data.
+- **The divider is aligned BY STRUCTURE (the decree)** — `grid-cols-2`
+  makes the split exact and equal in every row: verified chartLeft =
+  648 / dataLeft = 128 / chartRight = 1152 across ALL FOUR rows
+  (petrol, homeLoan, savings, shop), each half exactly 504px at 1280,
+  and each row's two halves stretch to the same height (186 = 186).
+  The sentence starts at the half's edge in every row, so the R30
+  "sentences start at different positions" roast stays fixed.
+
+### Housekeeping
+
+- No bundle movement that matters (class strings only): Insights
+  331.44/85.10 vs budgets 334.00/86.00; entry untouched 290.33/87.05.
+
 ## [2026-10-11] — Real axes and a hover inspector on every chart; the money rows wear the same mini graphs; alignment by structure (owner round 34)
 
 Thirty-fourth round — the owner's follow-up on round 33's charts: "the gold
