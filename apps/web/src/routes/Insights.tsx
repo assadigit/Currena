@@ -212,13 +212,15 @@ function QuestionGroup({
           <span className="flex-1">{answer}</span>
         </p>
       </header>
-      {/* R5/R7: needs-attention AND unusual cards in a responsive auto-fill
-       * grid — R30: min 300px (the 4-column 260px grid wrapped titles to
-       * five lines) and auto-FILL so a lone card keeps the SAME width as
-       * its siblings instead of stretching full-width (the roast: "the yen
-       * card is full width while others are narrow"). */}
+      {/* R5/R7: needs-attention AND unusual cards in a responsive lane —
+       * R30: min 300px (the 4-column 260px grid wrapped titles to five
+       * lines). Round 22 (owner): "such gaps must never happen" — the old
+       * auto-fill grid reserved a dead track whenever fewer cards than
+       * tracks existed (two attention cards + a dead third column of
+       * white). .lane-fill makes every line fill edge to edge: 2 cards
+       * split the row, 1 card takes it whole. */}
       {cardList.length > 0 ? (
-        <div className="mb-2 grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] items-start gap-2.5">
+        <div className="lane-fill mb-2 gap-2.5">
           {cardList.map((r) => (
             <AlertCard
               key={r.id}
@@ -232,7 +234,9 @@ function QuestionGroup({
         </div>
       ) : null}
       {rowList.length > 0 ? (
-        <div className="grid grid-cols-1 items-start gap-1.5 lg:grid-cols-2">
+        /* Round 22: .lane-fill — a lone compact row spans the lane instead
+         * of leaving a dead half-column beside it (owner: gaps never). */
+        <div className="lane-fill lane-fill-rows gap-1.5">
           {rowList.map((r) => (
             <CompactRow
               key={r.id}
@@ -312,7 +316,8 @@ function PinnedSection({
           </p>
         ) : null}
       </header>
-      <div className="grid grid-cols-1 items-start gap-1.5 lg:grid-cols-2">
+      {/* Round 22: .lane-fill here too — one pinned row fills the lane. */}
+      <div className="lane-fill lane-fill-rows gap-1.5">
         {readings.map((r) => (
           <CompactRow
             key={r.id}

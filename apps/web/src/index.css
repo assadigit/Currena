@@ -1084,19 +1084,23 @@ body {
   /* Surfaces */
   --color-surface: #FFFFFF;
   --color-surface-raised: #FFFFFF;
-  --color-surface-alert-tint: rgba(185, 46, 46, 0.05);
+  --color-surface-alert-tint: rgba(206, 42, 42, 0.05);
   --color-border: rgba(44, 62, 80, 0.14);
   /* Status inks (icon + word chips — never colour alone, G5). R29 adds
    * status-watch: the cautious/middle step word gets its own ink.
    * R30 adds status-stressed: the FOUR-STEP verdict scale gets four
    * DISTINCT hues — relaxed green · cautious amber · stressed orange ·
    * alarmed red (the roast: "Stressed and Alarmed are close hues").
-   * Red now means needs-attention ONLY. */
+   * Red now means needs-attention ONLY.
+   * Round 22 (owner): the R30 inks read "dark saturated" — retuned to the
+   * fresh traffic-light hues the owner asked for (green · yellow · orange ·
+   * red) while holding ≥4.5:1 on white, on --color-currena-bg-light AND on
+   * each status chip's own tint (verified by script, see CHANGELOG). */
   --color-accent-brand: #4A90E2;
-  --color-status-alert: #B92E2E;
-  --color-status-stressed: #C2410C; /* 5.2:1 on white — the step-3 word */
-  --color-status-normal: #256D29;
-  --color-status-watch: #9C5019;   /* 5.9:1 on white — cautious/watch words */
+  --color-status-alert: #CE2A2A;   /* 5.26:1 white · 5.03 bgLight · 4.53 on the /15 chip tint */
+  --color-status-stressed: #C94908; /* 4.73:1 white · 4.52 bgLight — the step-3 word (plain surfaces only) */
+  --color-status-normal: #137A39;  /* 5.43:1 white · 4.72 on the success chip tint */
+  --color-status-watch: #9C5D07;   /* 5.27:1 white · 4.76 on the unusual chip tint — cautious/watch words */
   --color-status-context: #245E9F;
   --color-status-stale: #46505C;
   /* Spacing scale */
@@ -1125,13 +1129,13 @@ body {
   --color-text-tertiary: #A2AEBC;    /* 7.1:1 on #1A222E cards — meta only */
   --color-surface: #1A222E;
   --color-surface-raised: #202A38;
-  --color-surface-alert-tint: rgba(255, 128, 128, 0.07);
+  --color-surface-alert-tint: rgba(248, 113, 113, 0.07);
   --color-border: rgba(232, 237, 244, 0.16);
   --color-accent-brand: #6FAEEC;
-  --color-status-alert: #FF8080;
-  --color-status-stressed: #F0A04B;  /* 7.5:1 on #1A222E — the step-3 word */
-  --color-status-normal: #63C06C;
-  --color-status-watch: #FBB48C;     /* 9.1:1 on #1A222E — cautious/watch words */
+  --color-status-alert: #F87171;   /* 5.8:1 on #1A222E · 4.53 on the /15 chip tint */
+  --color-status-stressed: #FB923C; /* 7.1:1 on #1A222E — the step-3 word */
+  --color-status-normal: #4ADE80;  /* 9.2:1 on #1A222E */
+  --color-status-watch: #FBBF24;   /* 9.6:1 on #1A222E — cautious/watch words */
   --color-status-context: #6FAEEC;
   --color-status-stale: #9AA8BC;
 }
@@ -1251,6 +1255,19 @@ html:not(:lang(fa)) .type-kicker {
     var(--color-surface) 55%
   );
 }
+
+/* Card lanes (round 22, owner: "such gaps must never happen"): flex-wrap
+ * rows whose items GROW, so every line — including the last — is filled
+ * edge to edge: two cards split it, a lone card takes it whole. CSS grid
+ * (auto-fill/auto-fit) could only collapse EMPTY tracks, never stretch a
+ * short last row, which still left dead white space beside a card. */
+.lane-fill {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+.lane-fill > * { flex: 1 1 300px; }
+.lane-fill-rows > * { flex-basis: 420px; }
 
 /* The details side panel (F5) — desktop right sheet, mobile bottom sheet. */
 .insights-panel-scrim {

@@ -150,7 +150,11 @@ export function Together({
       <div id="insights-together-body">
         {open ? (
           <>
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] items-start gap-2.5">
+            {/* Round 22 (owner): "such gaps must never happen" — the old
+             * auto-fill grid reserved dead tracks whenever fewer cards than
+             * tracks existed. .lane-fill grows the shown cards so every line
+             * fills the lane edge to edge. */}
+            <div className="lane-fill gap-2.5">
               {shown.map((reading) => (
                 <ConnectionCard
                   key={reading.connection}

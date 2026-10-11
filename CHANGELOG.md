@@ -5,6 +5,65 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — Fresh traffic-light status hues, no dead white space in card lanes, and a gold-and-silver card that speaks at full size (owner follow-up)
+
+Twenty-second round — owner feedback on the verdict colour scale, the
+gold-and-silver card's typography, and a hard rule: "such gaps must never
+happen".
+
+### Changed
+
+- **The verdict scale is now a proper traffic light.** The R30 status inks
+  read as dark and saturated on light surfaces (near-black green, brown
+  amber, burnt orange, maroon). All four retuned to fresh hues in BOTH
+  themes, chosen by contrast script so every ink holds ≥4.5:1 on white, on
+  `--color-currena-bg-light`, AND on each status chip's own tint:
+  Stable/green `#256D29 → #137A39` (dark `#63C06C → #4ADE80`),
+  Cautious/yellow `#9C5019 → #9C5D07` (dark `#FBB48C → #FBBF24` — a true
+  yellow instead of peach), Stressed/orange `#C2410C → #C94908` (dark
+  `#F0A04B → #FB923C`), Critical/red `#B92E2E → #CE2A2A` (dark
+  `#FF8080 → #F87171`). The words, the meter segments, the status chips
+  and the alert-card accents all share the tokens, so the ladder now reads
+  green → yellow → orange → red at a glance; Stressed (orange) and
+  Critical (red) are finally distinct hues at the group header too. The
+  legacy `currena-*-deep` converter accents are untouched.
+- **Gold and silver card: full-size voice + owner colour coding.** The
+  card whispered at caption size — the "Supports / Works against" state
+  words and every "how" description now speak at the same label size (14 px)
+  as the alert cards' titles and consequence lines, and all five group
+  headings share one heading style. The I17 "no green/red for
+  supportive/against" rule is OVERRIDDEN here by owner instruction (the
+  same sanctioned exception as the pattern lines): supportive rows take the
+  green status ink, works-against rows the red, neutral/unknown stay stale —
+  on the state words, the icons and the three group headings (never colour
+  alone; the words stay).
+- **Card lanes can no longer leave dead white space.** The owner: "there is
+  a strange gap in right of the boxes … such gaps must never happen, either
+  by expanding the two cards (if there are only two), or other methods."
+  Root cause: `repeat(auto-fill, minmax(300px, 1fr))` reserves every track
+  that FITS, not every track that's USED — two attention cards in a
+  three-track row left a ~360 px dead column; auto-fit only collapses empty
+  tracks and still can't stretch a short LAST row (the lone "Gold's price
+  versus silver" row kept a dead half-lane beside it). New `.lane-fill`
+  utility (flex-wrap + grow, 300 px basis for cards / 420 px for compact
+  rows): every line — including the last — fills edge to edge, two cards
+  split the row equally, a lone card takes it whole, and same-line cards
+  equalise height (stretch). Applied to the indicator-card lane, both
+  compact-row lanes (groups + pinned) and the Together connection lane.
+  Verified measured 0 px right-gap on all eight lanes at 1280 px; 375 px
+  stacks one per line with zero horizontal scroll.
+
+### Verification
+
+- Gates: typecheck 5/5; tests 784/784; build ✓; budgets held with no bump
+  needed (Insights chunk 304.25/305.00 raw, 78.75/78.90 gz — the lane
+  classes replaced longer grid utilities). Entry untouched (290.33/296).
+- Local QA (wrangler :8787 + vite :4174): hero words + meters read the new
+  ramp in fa/en × light/dark; the two-card attention row measures
+  539 px + 539 px = full lane; the three-row markets group ends with a
+  full-width row; signals card greens/reds verified both locales; console
+  and page errors silent. Screenshots in the session uploads.
+
 ## [2026-10-11] — Alignment sweep: one grid for headings and numbers, visible icons, a card for the biggest move, and predictions on the pattern line (owner follow-up)
 
 Twenty-first round — four owner directives from annotated screenshots.

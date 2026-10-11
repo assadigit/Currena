@@ -4,17 +4,24 @@
  * ONE merged gold-and-silver card (R26): the four global conditions the
  * metals share are listed once (identical by construction — the evaluators
  * read the same global series); each metal gets its own footing row; the
- * silver-only industrial condition sits in a separate short list. Neutral
- * "Supports / Works against" words and icons replace the check/cross marks
- * (no pass/fail look, no green/red). The 30-day speed rides the footing row
- * ONLY when the data exists — no more "Measuring…" tile.
+ * silver-only industrial condition sits in a separate short list. The
+ * 30-day speed rides the footing row ONLY when the data exists — no more
+ * "Measuring…" tile.
  *
  * The "before you act" box (S3) was removed entirely (2026-10-10 owner
  * request) — the collapsed summary and the merged card carry the honesty
  * framing instead.
  *
- * Compliance by construction: no green for "supportive", no red for
- * "against" — icon + word in neutral inks only; conditions, never advice.
+ * Colour: the I17 rule was "no green for supportive, no red for against".
+ * Round 22 (owner) OVERRIDES that for this card — the same sanctioned
+ * exception as the pattern lines: supports = the green status ink,
+ * works-against = the red status ink, neutral/unknown = stale. Icon + word
+ * stay (never colour alone), and the words describe conditions, not advice.
+ *
+ * Type rhythm (round 22): the card previously whispered at caption size —
+ * state words and the "how" lines now speak at the same label size as the
+ * alert cards' titles and consequence lines; the five group headings share
+ * one heading style.
  */
 
 import { useEffect, useMemo, useState } from 'react';
@@ -27,9 +34,23 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { SIGNALS_ENABLED, formatChange, formatIndicatorValue, mergeSignals } from './config';
 
 /* ---------------------------------------------------------------- *
- * Icons — neutral, icon + word, never colour judgement (S1/R26 note)
- * No check or cross glyphs anywhere (R26).
+ * Icons — icon + word, never colour alone (S1/R26 note). No check
+ * or cross glyphs anywhere (R26). Round 22: the word takes the
+ * state's status ink (owner green/red coding).
  * ---------------------------------------------------------------- */
+
+/** Round 22 (owner): supportive = green ink, against = red ink,
+ * neutral/unknown = stale. The icon inherits via currentColor. */
+function stateToneClass(state: SignalConditionReading['state']): string {
+  switch (state) {
+    case 'supportive':
+      return 'text-[var(--color-status-normal)]';
+    case 'against':
+      return 'text-[var(--color-status-alert)]';
+    default:
+      return 'text-[var(--color-status-stale)]';
+  }
+}
 
 function ConditionIcon({ state }: { state: SignalConditionReading['state'] }) {
   const common = {
@@ -168,15 +189,9 @@ function ConditionRow({
       data-condition-state={condition.state}
     >
       <span className="flex flex-wrap items-baseline gap-x-2">
-        <span className="inline-flex shrink-0 items-center gap-1 text-[var(--color-status-context)]">
+        <span className={`inline-flex shrink-0 items-center gap-1 ${stateToneClass(condition.state)}`}>
           <ConditionIcon state={condition.state} />
-          <span
-            className={`text-[length:var(--type-caption)] font-bold ${
-              condition.state === 'supportive' || condition.state === 'against'
-                ? 'text-[var(--color-status-context)]'
-                : 'text-[var(--color-status-stale)]'
-            }`}
-          >
+          <span className="text-[length:var(--type-label)] font-bold">
             {s.conditionStateShort[condition.state]}
           </span>
         </span>
@@ -191,7 +206,7 @@ function ConditionRow({
           <ValuesLine ids={condition.inputs} readings={readings} copy={copy} numberLocale={numberLocale} />
         </span>
       </span>
-      <span className="text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+      <span className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
         {entry.how}
       </span>
     </li>
@@ -251,15 +266,9 @@ function MergedSignalsCard({
         data-footing-state={state}
       >
         <span className="flex flex-wrap items-baseline gap-x-2">
-          <span className="inline-flex shrink-0 items-center gap-1 text-[var(--color-status-context)]">
+          <span className={`inline-flex shrink-0 items-center gap-1 ${stateToneClass(state as SignalConditionReading['state'])}`}>
             <ConditionIcon state={state as SignalConditionReading['state']} />
-            <span
-              className={`text-[length:var(--type-caption)] font-bold ${
-                state === 'supportive' || state === 'against'
-                  ? 'text-[var(--color-status-context)]'
-                  : 'text-[var(--color-status-stale)]'
-              }`}
-            >
+            <span className="text-[length:var(--type-label)] font-bold">
               {s.conditionStateShort[state as SignalConditionReading['state']] ?? s.notEnoughData}
             </span>
           </span>
@@ -285,7 +294,7 @@ function MergedSignalsCard({
             </span>
           ) : null}
         </span>
-        <span className="text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+        <span className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
           {s.conditions.footing.how}
         </span>
       </li>
@@ -315,9 +324,11 @@ function MergedSignalsCard({
         </span>
       </header>
 
-      {/* The shared conditions, listed ONCE (identical states by construction). */}
+      {/* The shared conditions, listed ONCE (identical states by construction).
+       * Round 22: the three state headings take the state's own ink and all
+       * five group headings share one label-size style (hierarchy + rhythm). */}
       <div className="flex flex-col gap-2">
-        <h4 className="m-0 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)]">
+        <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-status-normal)]">
           {s.sideSupportive}
         </h4>
         <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
@@ -333,7 +344,7 @@ function MergedSignalsCard({
               />
             ))}
         </ul>
-        <h4 className="m-0 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)]">
+        <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-status-alert)]">
           {s.sideAgainst}
         </h4>
         <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
@@ -351,7 +362,7 @@ function MergedSignalsCard({
         </ul>
         {merged.shared.some((c) => c.state === 'neutral' || c.state === 'unknown') ? (
           <>
-            <h4 className="m-0 text-[length:var(--type-caption)] font-bold text-[var(--color-status-stale)]">
+            <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-status-stale)]">
               {s.sideNeutral}
             </h4>
             <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
@@ -371,7 +382,7 @@ function MergedSignalsCard({
       {/* Per-metal footing rows (position + speed ride here, speed only
        * when the data exists — no "Measuring…" placeholder). */}
       <div className="flex flex-col gap-2">
-        <h4 className="type-kicker m-0 text-[var(--color-text-tertiary)]">
+        <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-tertiary)]">
           {s.footingTitle}
         </h4>
         <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
@@ -382,7 +393,7 @@ function MergedSignalsCard({
       {/* The silver-only condition (R26: separate short list). */}
       {merged.silverOnly.length > 0 ? (
         <div className="flex flex-col gap-2">
-          <h4 className="type-kicker m-0 text-[var(--color-text-tertiary)]">
+          <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-tertiary)]">
             {s.silverOnly}
           </h4>
           <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
