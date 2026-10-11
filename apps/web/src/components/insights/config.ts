@@ -396,12 +396,18 @@ export function stepToneClass(step: number): string {
   return WORD_TONE_CLASS[tone];
 }
 
-/** Price position band (low = cheap … high = expensive) → NEUTRAL ink
- * (R30: colour carries status, not direction — an "expensive" gold
- * price is not a warning; the roast flags red price labels as the
- * very leak that made three tiles read as alerts). */
-export function bandToneClass(_band: PositionBand): string {
-  return WORD_TONE_CLASS.neutral;
+/** Price position band (low = cheap … high = expensive) → status ink.
+ * Round 31 (owner): "everywhere which is marked 'expensive' use red
+ * color" — the consumer-cost valence is the owner's decree and
+ * overrides R30's neutral: expensive = the alert red, cheap = the
+ * supportive green, typical stays neutral. Never colour alone (G5):
+ * the word always rides beside the change numbers / the 10-year bar. */
+export function bandToneClass(band: PositionBand): string {
+  return band === 'high'
+    ? WORD_TONE_CLASS.alert
+    : band === 'low'
+      ? WORD_TONE_CLASS.normal
+      : WORD_TONE_CLASS.neutral;
 }
 
 /** Attention-count tone (R29): red while anything needs attention,

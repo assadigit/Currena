@@ -9,9 +9,11 @@
  * same style, one line) → "as of".
  *
  * R30 changes:
- *  - Position words are NEUTRAL ink — colour carries status, not
- *    direction (the roast: red "expensive" made gold, silver and oil all
- *    read as warnings).
+ *  - Position words follow the price position band's status ink —
+ *    expensive = the alert red, cheap = the supportive green, typical
+ *    stays neutral (R31 owner decree, restoring the pre-R30 valence:
+ *    "everywhere which is marked 'expensive' use red color"). Never
+ *    colour alone: the word rides beside the change numbers.
  *  - Gold, silver and Bitcoin changes are derived CLIENT-SIDE from the
  *    same 10-year history the sparklines fetch (module-cached) — the
  *    feed currently carries change fields for oil only, which is why
@@ -32,6 +34,7 @@ import { IconImg, indicatorIconUrl } from '../icons/currena';
 import {
   BTC_RATIO_IDS,
   PRICE_ROWS,
+  bandToneClass,
   bandWordsOf,
   consequenceLine,
   definitionFor,
@@ -288,7 +291,14 @@ export function PricesBoard({
                       <span className="opacity-80">{copy.ui.days30}</span>
                     </span>
                     {band && positionWord ? (
-                      <span className="ms-auto whitespace-nowrap font-bold text-[var(--color-text-primary)]">{positionWord}</span>
+                      <span
+                        className={`ms-auto whitespace-nowrap font-bold ${
+                          bandToneClass(band) || 'text-[var(--color-text-primary)]'
+                        }`}
+                        data-price-position={band}
+                      >
+                        {positionWord}
+                      </span>
                     ) : null}
                   </span>
                   {/* One hedged practical consequence line. */}

@@ -5,6 +5,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — The Estimation strip becomes the card's verdict; "expensive" speaks in red (owner round 31)
+
+Thirty-first round — two owner points: the gold-and-silver card's verdict
+strip must be "contrasted with more visual weight against its section,
+because it's the verdict and estimation of the whole section", with its
+icons at 128×128 on desktop; and "everywhere which is marked 'expensive'
+use red color".
+
+### Changed
+
+- **The Estimation strip is the focal takeaway** — the app's focal-section
+  recipe (the money panel's, round 29) now wraps the strip: a brand-gold
+  gradient field (16% → 7% → transparent), a 2px gold ring, and a
+  gold-tinted shadow (dark mode keeps the gradient with a deeper shadow),
+  so the white verdict chips pop against the card they summarise. The
+  strip's title lifts to secondary ink for the tinted field.
+- **Verdict chips restacked around the artwork** — each chip is now a
+  small stacked card: the metal artwork leads at the price tiles' scale
+  (96px mobile / **128×128 desktop**), the metal name rides under it, and
+  the verdict word ("losing value" / "no clear direction" / «ارزش
+  می‌بازد»…) speaks at the price's own size (type-number) in the verdict
+  ink — icon + word, never colour alone. The direction zigzag grows with
+  the strip (28/36) beside the big word. Header lean lines, footing rows
+  and the collapsed summary keep their own smaller scales.
+- **"expensive" is red (owner decree, R31 restores the pre-R30
+  valence)** — `bandToneClass` maps the price position band to status
+  ink again: expensive (top of the 10-year range) = the alert red, cheap
+  (bottom) = the supportive green, typical stays neutral. It colours the
+  price tiles' change-row word AND the details panel's 10-year position
+  word (price rows). Never colour alone: the word always rides beside
+  the change numbers / the position bar.
+
+### Housekeeping
+
+- No copy, engine or API changes. Insights chunk 321.10/82.94 kB raw/gz
+  against the 322.50/84.00 budget (no bump). No new assets — PWA precache
+  unchanged (85 entries).
+
 ## [2026-10-11] — Price tiles: the artwork IS the card, at 128×128 on desktop (owner round 30)
 
 Thirtieth round — the owner checked production, found it still serving the

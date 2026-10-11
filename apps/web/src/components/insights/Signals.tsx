@@ -113,8 +113,9 @@ function VerdictIcon({
 
 /** The metal's own artwork beside its name (round 28) — gold bar, silver
  * bar; unmapped metals (none today) fall back to no icon. Round 29
- * (owner): the strip's chips render the art at 28px mobile / 36px
- * desktop — the answer row is the card's headline, not a footnote. */
+ * (owner): 28/36 defaults; round 31: the verdict strip calls it at the
+ * price tiles' scale — 96px mobile / 128×128 desktop — the artwork IS
+ * the verdict chip's face. */
 function MetalIcon({
   metal,
   size = 28,
@@ -149,32 +150,44 @@ function VerdictStrip({
     { reading: silver, verdict: verdictOf(silver) },
   ];
   if (rows.every((r) => r.verdict === null)) return null;
+  /* Round 31 (owner): the strip is THE answer of the whole card — "it's
+   * the verdict and estimation of the whole section" — so it now carries
+   * the app's focal-section recipe (the money panel's, round 29): a
+   * brand-gold gradient field with a 2px gold ring and a gold-tinted
+   * shadow, so the white verdict chips pop against the card. The metal
+   * artwork leads each chip at the price tiles' scale (96px mobile /
+   * 128×128 desktop) with the metal name under it, and the verdict word
+   * speaks at the price's own size in the verdict ink (icon + word,
+   * never colour alone). */
   return (
-    <div className="flex flex-col gap-1.5" data-signal-verdict>
-      <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-tertiary)]">
+    <div
+      className="flex flex-col gap-2 rounded-[var(--radius-lg)] bg-gradient-to-b from-[var(--color-accent-gold)]/[0.16] via-[var(--color-accent-gold)]/[0.07] to-transparent p-3.5 shadow-[0_10px_34px_rgba(168,126,28,0.15)] ring-2 ring-[var(--color-accent-gold)]/45 sm:p-4 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
+      data-signal-verdict
+    >
+      <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-secondary)]">
         {s.verdictTitle}
       </h4>
-      <ul className="m-0 flex list-none flex-col gap-1.5 p-0 sm:flex-row">
+      <ul className="m-0 flex list-none flex-col gap-2 p-0 sm:flex-row">
         {rows.map(({ reading, verdict }) => (
           <li
             key={reading.metal}
             data-verdict-metal={reading.metal}
             data-verdict-direction={verdict ?? 'none'}
-            className="flex min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-sm)] px-2.5 py-2 ring-1 ring-[var(--color-border)]"
+            className="flex min-w-0 flex-1 flex-col items-start gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)]"
           >
-            <MetalIcon metal={reading.metal} />
-            <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
+            <MetalIcon metal={reading.metal} size={96} desktopSize={128} />
+            <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-secondary)]">
               {s.metals[reading.metal]}
             </span>
-            <span className={`inline-flex shrink-0 items-center ${verdict !== null ? verdictTone[verdict] : 'text-[var(--color-status-stale)]'}`}>
-              <VerdictIcon verdict={verdict ?? 'flat'} />
-            </span>
             <span
-              className={`text-[length:var(--type-label)] font-bold ${
+              className={`inline-flex items-center gap-1.5 ${
                 verdict !== null ? verdictTone[verdict] : 'text-[var(--color-status-stale)]'
               }`}
             >
-              {verdict === 'up' ? s.verdictUp : verdict === 'down' ? s.verdictDown : verdict === 'flat' ? s.verdictFlat : s.verdictNone}
+              <VerdictIcon verdict={verdict ?? 'flat'} />
+              <span className="text-[length:var(--type-number)] font-bold leading-tight">
+                {verdict === 'up' ? s.verdictUp : verdict === 'down' ? s.verdictDown : verdict === 'flat' ? s.verdictFlat : s.verdictNone}
+              </span>
             </span>
           </li>
         ))}
