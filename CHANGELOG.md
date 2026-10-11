@@ -5,6 +5,46 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — The value moves up beside the icon; the numbers and headings grow (owner round 37)
+
+Thirty-seventh round — three owner refinements to the money rows, each with
+a mockup: "move the text to inside the approx red rectangle i drawn" (the
+empty band under the direction word, beside the tall icon box); "also make
+the percentage text size 25% bigger"; and "also make the headings such as
+«پس‌انداز و بهره» 100% bigger — for example if it's 12px make it 24px".
+
+### Changed
+
+- **The value lines move INTO the name/direction column** — the supporting
+  number lines no longer sit in their own row under the icon box; they are
+  the third line of the column beside it (name → direction word → value),
+  exactly where the owner drew the red rectangle. The dead vertical band
+  that used to sit under the direction word is filled: the value's top now
+  lands INSIDE the icon box's band in every row (verified 4/4 in both
+  locales), and the sentence still starts at the half's edge below.
+  Alignment gets STRONGER, not weaker — the name, the direction word AND
+  the value now share one column start edge per row (left 236 ×4 in en,
+  right 1044 ×4 in fa), by structure.
+- **The value grows 25%** — 23.2px → 29px via
+  `calc(var(--type-number) * 1.25)`: a token ratio, not a magic px, so the
+  number role scales if the type scale ever moves. Weight stays 800 with
+  the NUMBERS, tabular digits, one line (never breaks mid-text).
+- **The area name is a real heading** — 2× the label role
+  (`calc(var(--type-label) * 2)`, 14px → 28px, still bold, snug leading
+  for the Persian ascenders). The row now reads heading → estimation →
+  number → sentence, the owner's mockup order, in both locales.
+
+### Verified
+
+- Gates: typecheck 5/5; tests 804/804; build ✓; bundle budgets held
+  (Insights 331.68/85.16 vs 334.00/86.00 — class strings only; entry
+  untouched 290.33/87.05).
+- Local QA (wrangler :8787, KV from prod): en/fa × light/dark × 1280/375
+  — name/dir/value on one column edge ×4 rows, value inside the icon
+  band, name 28px/700, value 29px/800, explanation 14px/400; fa chart
+  half still left of the data half; 375 stacks with docW = clientW = 375
+  and the value unbroken; zero page errors, zero console errors.
+
 ## [2026-10-11] — The numbers lose the pill; the small grades lose the rainbow (owner round 36)
 
 Thirty-sixth round — three owner points with screenshots: the money rows'

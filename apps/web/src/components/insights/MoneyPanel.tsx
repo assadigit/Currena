@@ -266,64 +266,74 @@ export function MoneyPanel({
                         <AreaIcon area={area} />
                       </span>
                     </span>
-                    {/* R30 alignment, kept: the label + estimation sit in
-                     * their own line beside the FIXED icon box, so the
-                     * name and the direction word start at the same x in
-                     * every row; the sentence and chips below start at the
-                     * half's edge — also the same in every row. The icon
-                     * box is always the neutral context ink — red belongs
-                     * to the needs-attention WORD only (round 24, roast
-                     * #4: the area label is NEUTRAL). */}
-                    <span className="min-w-0 flex-1 text-[length:var(--type-label)] font-bold leading-relaxed text-[var(--color-text-primary)]">
-                      {areaCopy.name}
+                    {/* R30 alignment, kept + round 37 (owner): the whole
+                     * supporting stack now lives in ONE column beside the
+                     * FIXED icon box — name, direction word, then the value
+                     * lines — so the name, the direction word AND the value
+                     * start at the same x in every row, and the value fills
+                     * the space that used to sit empty under the direction
+                     * word (the owner drew a red rectangle exactly there:
+                     * "move the text to inside the approx red rectangle").
+                     * The sentence below still starts at the half's edge in
+                     * every row. The icon box is always the neutral context
+                     * ink — red belongs to the needs-attention WORD only
+                     * (round 24, roast #4: the area label is NEUTRAL). */}
+                    <span className="flex min-w-0 flex-1 flex-col gap-1.5 text-[var(--color-text-primary)]">
+                      {/* Round 37 (owner): the area name is the row's HEADING —
+                       * "make the headings such as «پس‌انداز و بهره» 100%
+                       * bigger — if it's 12px make it 24px" → 2× the label
+                       * role (14px → 28px), still bold. */}
+                      <span className="text-[length:calc(var(--type-label)*2)] font-bold leading-snug">
+                        {areaCopy.name}
+                      </span>
                       {/* Round 25 (owner): the stated estimation, directly under
                        * the area name — arrow + word in valence ink, computed
                        * from the driver readings (moneyAreaDirection). */}
                       <span
                         data-money-direction={direction}
-                        className={`mt-1 flex items-center gap-1.5 leading-snug ${directionTone}`}
+                        className={`flex items-center gap-1.5 leading-snug ${directionTone}`}
                       >
                         <DirectionIcon direction={direction} />
                         <span className="text-[length:var(--type-label)] font-bold">{directionWord}</span>
                       </span>
+                      {/* Round 36 (owner): the supporting numbers moved out of
+                       * the pill chip into plain text — value first, big and
+                       * bold; indicator name after it, smaller and regular.
+                       * Round 37 (owner): the line moves UP into the name/
+                       * direction column (the red-rectangle space beside the
+                       * icon) and the VALUE grows another 25% — 23.2px → 29px
+                       * (calc over the number role, so the ratio is a token,
+                       * not a magic px; weight stays 800 with the NUMBERS).
+                       * Value FIRST in the DOM → rightmost in fa, leftmost in
+                       * en. The line still opens the indicator's card. */}
+                      {lineChips.length > 0 ? (
+                        <span className="flex flex-col items-start gap-1">
+                          {lineChips.map((id) => {
+                            const r = byId.get(id);
+                            const valueText =
+                              r && r.value !== null ? formatIndicatorValue(id, r.value, numberLocale, copy.units) : null;
+                            return (
+                              <button
+                                key={id}
+                                type="button"
+                                onClick={(e) => onFocusCard(id, e.currentTarget)}
+                                className="insights-focusable inline-flex min-h-[24px] cursor-pointer flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-sm border-0 bg-transparent p-0 text-start underline-offset-4 transition-colors hover:underline"
+                              >
+                                {valueText !== null ? (
+                                  <bdi className="whitespace-nowrap text-[length:calc(var(--type-number)*1.25)] font-extrabold leading-[1.2] tabular-nums text-[var(--color-text-primary)]">
+                                    {valueText}
+                                  </bdi>
+                                ) : null}
+                                <span className="text-[length:var(--type-label)] font-normal text-[var(--color-text-secondary)]">
+                                  {copy.indicators[id].name}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </span>
+                      ) : null}
                     </span>
                   </div>
-                  {/* Round 36 (owner): the supporting numbers move UP (above
-                   * the sentence) and OUT of the pill chip into plain text —
-                   * "first write the percent in bigger and bolder text, then
-                   * write the explanation of it smaller with regular text,
-                   * delete the chip like alternative". The VALUE speaks in
-                   * the page's number role (type-number: 23px / 800 weight /
-                   * tabular — the same role as the attention tiles' numbers,
-                   * "800 stays with NUMBERS"); the indicator name sits
-                   * smaller (label size) at REGULAR weight. Value FIRST in
-                   * the DOM → rightmost in fa (the owner's mockup), leftmost
-                   * in en. The line still opens the indicator's card — the
-                   * pill's one job survives, its look is gone. */}
-                  {lineChips.length > 0 ? (
-                    <span className="flex flex-col items-start gap-1">
-                      {lineChips.map((id) => {
-                        const r = byId.get(id);
-                        const valueText =
-                          r && r.value !== null ? formatIndicatorValue(id, r.value, numberLocale, copy.units) : null;
-                        return (
-                          <button
-                            key={id}
-                            type="button"
-                            onClick={(e) => onFocusCard(id, e.currentTarget)}
-                            className="insights-focusable inline-flex min-h-[24px] cursor-pointer flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-sm border-0 bg-transparent p-0 text-start underline-offset-4 transition-colors hover:underline"
-                          >
-                            {valueText !== null ? (
-                              <bdi className="type-number whitespace-nowrap text-[var(--color-text-primary)]">{valueText}</bdi>
-                            ) : null}
-                            <span className="text-[length:var(--type-label)] font-normal text-[var(--color-text-secondary)]">
-                              {copy.indicators[id].name}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </span>
-                  ) : null}
                   <span className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
                     {sentence}
                   </span>
