@@ -1511,10 +1511,13 @@ export const insightsCopyEn = {
     metals: { gold: 'gold', silver: 'silver' },
     // Round 23 (owner): the card states its estimation — a mechanical tally
     // of the conditions above (supportive minus against; the sign is the
-    // direction). Describes the tally, still not advice.
+    // direction). Describes the tally, still not advice. Round 26 (owner):
+    // the words dropped the bare "will go up/down" — "will" next to green/
+    // red read misleading. The holder-view value words say what the colour
+    // means: gaining value wears green, losing value wears red.
     verdictTitle: 'Estimation',
-    verdictUp: 'will go up',
-    verdictDown: 'will go down',
+    verdictUp: 'gaining value',
+    verdictDown: 'losing value',
     verdictFlat: 'no clear direction',
     verdictNone: 'no estimate yet',
     // R26: neutral side words (no check/cross marks, no green/red).
@@ -1585,18 +1588,22 @@ export const insightsCopyEn = {
    * per life area, chosen by the worst tier among the area's
    * indicators. Hedged sentences, no advice, no buy/sell, no "will".
    * Round 25 (owner override): each row ALSO carries a stated
-   * estimation — "Will go up / Will go down / No clear direction" —
-   * computed from the driver readings (config.moneyAreaDirection);
-   * the owner asked for it in so many words, so the old "no will"
-   * note no longer covers the estimation line.
+   * estimation computed from the driver readings
+   * (config.moneyAreaDirection). Round 26 (owner wording): the words
+   * describe the COST, not the bare direction — "will go up" next to
+   * red ink read misleading. Cost areas speak in prices ("Becoming
+   * more expensive / Getting cheaper"); savings speaks in its own
+   * valence, where up is the GOOD case ("Earning more interest /
+   * Earning less"). The whole corpus is "will"-free again.
    * ---------------------------------------------------------------- */
   money: {
     title: 'What it means for my money',
     subtitle: 'The day-to-day areas the indicators usually touch.',
     calmLine: 'No money area is standing out right now: a calm background for household budgets.',
-    directionUp: 'Will go up',
-    directionDown: 'Will go down',
-    directionFlat: 'No clear direction',
+    direction: {
+      cost: { up: 'Becoming more expensive', down: 'Getting cheaper', flat: 'No clear direction' },
+      savings: { up: 'Earning more interest', down: 'Earning less', flat: 'No clear direction' },
+    },
     areas: {
       petrol: {
         name: 'Petrol and transport',

@@ -1158,8 +1158,9 @@ export function moneyPanel(readings: readonly IndicatorReading[]): MoneyAreaRow[
 
 /* ------------------------------------------------------------------ *
  * Round 25 (owner): a stated estimation under every money row — the
- * same "will go up / will go down" language the gold-and-silver card
- * earned in round 23, but computed from the area's own driver
+ * gold-and-silver card's estimation language (round 23), cost-worded
+ * per the owner's round-26 follow-up ("Becoming more expensive", not
+ * a bare "will go up"), computed from the area's own driver
  * readings (the owner: "it must be based on calculations and data").
  *
  * One vote per driver, first match wins:
@@ -1188,9 +1189,11 @@ export function moneyPanel(readings: readonly IndicatorReading[]): MoneyAreaRow[
  * Colour is VALENCE-coded, not direction-coded: the round-22 owner
  * override made the METALS card direction-coded because the owner
  * HOLDS metal (up = good). Here the household PAYS: green = good for
- * your money, red = pressure on it — "petrol will go up" warns in
- * alert red while "savings interest will go up" reassures in green.
- * The arrow always matches the word — never colour alone (G5).
+ * your money, red = pressure on it — "petrol — becoming more
+ * expensive" warns in alert red while "savings — earning more
+ * interest" reassures in green (the words follow the same valence,
+ * round 26). The arrow always matches the word — never colour alone
+ * (G5).
  * ---------------------------------------------------------------- */
 
 export type MoneyDriverKind = 'direct' | 'inverse' | 'growth' | 'none';

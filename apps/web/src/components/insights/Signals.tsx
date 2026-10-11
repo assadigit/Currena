@@ -30,6 +30,12 @@
  * go up, Silver will go down." The tally is still a description of
  * conditions, not advice; unreadable metals show "no estimate yet" and the
  * strip hides only when NEITHER metal could be read.
+ *
+ * Round 26 (owner wording): the chips dropped the bare "will go up /
+ * will go down" — next to the green/red ink that phrasing read
+ * misleading. The holder-view value words say what the colour means:
+ * "gaining value" wears green, "losing value" wears red; the collapsed
+ * summary line now carries the same direction icon as the strip.
  */
 
 import { useEffect, useMemo, useState } from 'react';
@@ -58,10 +64,10 @@ function verdictOf(reading: SignalReading): SignalVerdict | null {
   return 'flat';
 }
 
-function VerdictIcon({ verdict }: { verdict: SignalVerdict }) {
+function VerdictIcon({ verdict, size = 18 }: { verdict: SignalVerdict; size?: number }) {
   const common = {
-    width: 18,
-    height: 18,
+    width: size,
+    height: size,
     viewBox: '0 0 16 16',
     fill: 'none',
     stroke: 'currentColor',
@@ -539,14 +545,19 @@ function MergedSignalsCard({
 const STORAGE_KEY = 'currena.insights.signals-open.v1';
 
 /** Round 24: the collapsed per-metal line's takeaway — the estimation
- * (round 23's verdictOf), word + ink; unreadable metals stay silent. */
+ * (round 23's verdictOf), icon + word + ink (round 26: the icon joined
+ * the line); unreadable metals stay silent. */
 function CollapsedVerdict({ reading, copy }: { reading: SignalReading; copy: InsightsCopy }) {
   const s = copy.signals;
   const verdict = verdictOf(reading);
   if (verdict === null) return null;
   const word = verdict === 'up' ? s.verdictUp : verdict === 'down' ? s.verdictDown : s.verdictFlat;
   return (
-    <span className={`ms-1.5 font-bold ${verdictTone[verdict]}`} data-collapsed-verdict={verdict}>
+    <span
+      className={`ms-1.5 inline-flex items-center gap-1 font-bold ${verdictTone[verdict]}`}
+      data-collapsed-verdict={verdict}
+    >
+      <VerdictIcon verdict={verdict} size={14} />
       {interpolate(s.collapsedVerdict, { verdict: word })}
     </span>
   );

@@ -8,11 +8,14 @@
  * No signal anywhere → one calm line. No advice, no buy/sell.
  *
  * Round 25 (owner): under every area name sits a STATED ESTIMATION —
- * arrow + "Will go up / Will go down / No clear direction" — computed
- * from the driver readings by config.moneyAreaDirection (band breaches,
- * big moves, 10-year extremes through per-driver semantics). The ink
- * is VALENCE-coded (green = good for your money, red = pressure on it;
- * savings flips because rising interest is the good case) — see the
+ * arrow + word — computed from the driver readings by
+ * config.moneyAreaDirection (band breaches, big moves, 10-year extremes
+ * through per-driver semantics). Round 26 (owner wording): the words
+ * describe the COST, not the bare direction — "will go up" next to red
+ * ink read misleading. Cost areas say "Becoming more expensive /
+ * Getting cheaper"; savings says "Earning more interest / Earning
+ * less" (up is the good case there). The ink stays VALENCE-coded
+ * (green = good for your money, red = pressure on it) — see the
  * round-25 block comment in config.ts.
  */
 
@@ -165,8 +168,11 @@ export function MoneyPanel({
             const sentence = state === 'attention' ? areaCopy.attention : state === 'unusual' ? areaCopy.unusual : areaCopy.calm;
             const m = copy.money;
             const direction = moneyAreaDirection(area, readings, copy);
+            // Round 26: the words follow the area's valence — cost areas
+            // speak in prices, savings speaks in the interest it earns.
+            const words = area === 'savings' ? m.direction.savings : m.direction.cost;
             const directionWord =
-              direction === 'up' ? m.directionUp : direction === 'down' ? m.directionDown : m.directionFlat;
+              direction === 'up' ? words.up : direction === 'down' ? words.down : words.flat;
             const directionTone = moneyDirectionToneClass(area, direction);
             return (
               <li

@@ -1,7 +1,8 @@
 /**
  * money-direction.test.ts — round 25: the stated estimation under every
- * "What it means for my money" row (owner request: a short "will go up /
- * will go down" line, computed from data). The guards:
+ * "What it means for my money" row (owner request: a short cost-worded
+ * line — "Becoming more expensive / Getting cheaper" since round 26 —
+ * computed from data). The guards:
  *
  *   - vote priority: published band breach > big move (|moveScore| ≥ 2)
  *     > 10-year extreme level;

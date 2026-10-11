@@ -267,28 +267,25 @@ describe('R11 moneyPanel (≤4 lines, worst-state selection)', () => {
   });
 
   it('the money corpus carries no advice wording in either locale', () => {
-    // Round 25 (owner override): the three estimation keys MAY say "will"
-    // — the owner asked for a stated "Will go up / Will go down" under
-    // every money row, the same language the metals card earned in round
-    // 23. Buy/sell stays banned everywhere; the hedged sentences stay
-    // "will"-free (only the estimation line speaks in futures).
+    // Round 26 (owner wording): the estimation words describe the cost —
+    // "Becoming more expensive / Getting cheaper" (cost areas) and
+    // "Earning more interest / Earning less" (savings) — so the round-25
+    // "will" exemption is GONE: the whole money corpus is will-free and
+    // buy/sell-free again, in both locales.
     const banned = /\b(buy|sell|will)\b/i;
-    const ADVICE_ONLY = /\b(buy|sell)\b/i;
-    const ESTIMATION_KEYS = new Set(['directionUp', 'directionDown', 'directionFlat']);
-    const corpus = (obj: unknown, key?: string): { key?: string; text: string }[] => {
-      if (typeof obj === 'string') return [{ key, text: obj }];
+    const corpus = (obj: unknown): string[] => {
+      if (typeof obj === 'string') return [obj];
       if (Array.isArray(obj)) return obj.flatMap((v) => corpus(v));
       if (obj !== null && typeof obj === 'object')
-        return Object.entries(obj as Record<string, unknown>).flatMap(([k, v]) => corpus(v, k));
+        return Object.values(obj as Record<string, unknown>).flatMap((v) => corpus(v));
       return [];
     };
     const en = corpus((insightsCopyEn as InsightsCopy).money);
     const fa = corpus((insightsCopyFa as InsightsCopy).money);
-    for (const { key, text } of en) {
-      if (key && ESTIMATION_KEYS.has(key)) expect(ADVICE_ONLY.test(text)).toBe(false);
-      else expect(banned.test(text)).toBe(false);
-    }
-    for (const { text } of fa) expect(/\bخرید|فروش\b/.test(text)).toBe(false);
+    for (const { text } of en.map((text) => ({ text })))
+      expect(banned.test(text)).toBe(false);
+    for (const { text } of fa.map((text) => ({ text })))
+      expect(/\bخرید|فروش\b/.test(text)).toBe(false);
   });
 });
 

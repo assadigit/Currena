@@ -5,6 +5,57 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — The estimations speak in value and cost, not bare directions (owner round 26)
+
+Twenty-sixth round — the owner, pointing at the red-and-green "will go up":
+misleading — it needs supportive words that match the ink ("Growing
+Positively"-shaped value words for the metals; "Becoming More Expensive"-
+shaped cost words for the money rows) and a direction icon everywhere the
+estimation appears.
+
+### Changed
+
+- **Metals estimation chips — value words**: "will go up / will go down"
+  → "gaining value / losing value" («ارزش می‌گیرد / ارزش می‌بازد»); flat
+  and none unchanged. The words now explain the ink: green means the metal
+  is worth more, red means it is worth less — a holder-view sentence, not
+  a bare futures claim.
+- **The collapsed per-metal summary carries the direction icon now** —
+  round 24's takeaway line was word + ink only; the same 14px arrow the
+  strip uses rides the line (icon + word + ink, never colour alone, G5).
+- **Money estimation words — cost words, valence-matched**: the generic
+  "Will go up / Will go down" split into two word-sets that follow each
+  area's valence: cost areas (petrol, home loan, shop, overseas) say
+  "Becoming more expensive / Getting cheaper" («گران‌تر می‌شود /
+  ارزان‌تر می‌شود»); savings says "Earning more interest / Earning less"
+  («سود بیشتری می‌گیرید / سود کمتری می‌گیرید») — savings-up is the GOOD
+  case (green), and "becoming more expensive" in green would have been
+  nonsense. The direction word now always agrees with its colour.
+
+### Why the words changed and the engine did not
+
+The round-25 vote engine is untouched — band breaches, big moves and
+10-year extremes still decide every arrow; the tally is still a
+description of conditions, not advice. Round 26 only changed what the
+arrow SAYS. Today's live data still reads every money row "up" — petrol,
+home loan and shop prices "Becoming more expensive" in warning red while
+savings "Earns more interest" in calm green — and the metals card split:
+gold "losing value" (red), silver "no clear direction" (neutral). The
+engine still flips by itself when the regime turns; the words now keep
+making sense when it does.
+
+### Housekeeping
+
+- The R11 "no will" corpus guard is strict again: the round-25 exemption
+  for the estimation keys is gone — the new words carry no "will", so the
+  whole money corpus (both locales) is will-free and buy/sell-free as
+  before. The type-lock (InsightsCopy = typeof insightsCopyEn) forced the
+  fa mirror in the same commit, as designed.
+- No bundle-budget movement: the Insights chunk measures 320.14/82.52 kB
+  raw/gz against 322.50/84.00 — the words swapped, the arrows were already
+  shipped, and the one new icon (collapsed line) fits inside the round-25
+  budget without a bump.
+
 ## [2026-10-11] — The money rows speak: a stated estimation under every "What it means for my money" item (owner round 25)
 
 Twenty-fifth round — the owner, pointing at the money panel: a very simple,
