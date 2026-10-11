@@ -12,8 +12,13 @@
  *
  * State shows as icon + word, never colour alone (G5 family); the leg chips
  * are 24px+ targets (G6) that open the indicator's details panel.
+ *
+ * Round 32 (owner): the right-now verdict + the per-leg moves moved into
+ * a FOCAL container inside the card (the money panel's gold-field recipe)
+ * with the moves as white chips riding a direction glyph each.
  */
 
+import type { CSSProperties } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import type { ConnectionReading, ConnectionState, LegEval } from '@currena/insights';
 import { interpolate } from '../../i18n';
@@ -83,6 +88,60 @@ const STATE_TONE: Record<ConnectionState, string> = {
   disagree: 'bg-currena-muted/15 text-[var(--color-status-stale)]',
   unknown: 'bg-currena-muted/15 text-[var(--color-status-stale)]',
 };
+
+/** Round 32 (owner): the move chips' direction glyph — the money panel's
+ * stroke arrows (up/down/dash) at the chip's own scale; level-only legs
+ * (high/low/mid) get a position DOT, not a motion arrow — a level is not
+ * a movement. aria-hidden — the word beside it carries the meaning. */
+function MoveIcon({ kind }: { kind: MoveKind }) {
+  const common = {
+    className: 'currena-icon shrink-0',
+    style: {
+      '--icon-size': '18px',
+      '--icon-size-sm': '20px',
+    } as CSSProperties,
+    viewBox: '0 0 16 16',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 2.2,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true,
+    focusable: false,
+  };
+  if (kind === 'up') {
+    return (
+      <svg {...common}>
+        <path d="M8 13V3.5" />
+        <path d="M3.5 8 8 3.5 12.5 8" />
+      </svg>
+    );
+  }
+  if (kind === 'down') {
+    return (
+      <svg {...common}>
+        <path d="M8 3v9.5" />
+        <path d="M3.5 8 8 12.5 12.5 8" />
+      </svg>
+    );
+  }
+  if (kind === 'flat') {
+    return (
+      <svg {...common}>
+        <path d="M3 8h10" />
+      </svg>
+    );
+  }
+  return (
+    <svg {...common} strokeWidth={1.6}>
+      <circle cx="8" cy="8" r="3.2" />
+      <circle cx="8" cy="8" r="0.8" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+type MoveKind = 'up' | 'down' | 'flat' | 'level';
+type Move = { text: string; cls: string; kind: MoveKind };
 
 /** One leg STAT CHIP: short name, live value WITH UNIT, the state word at
  * caption size — opens the details panel. Equal height per row. */
@@ -180,26 +239,28 @@ export function ConnectionCard({
   // slot is the one sanctioned exception to "colour carries status":
   // motion verbs for the 30-day direction, state verbs for level-only
   // legs. Rendered for active/partly only; inactive/unknown stay quiet.
-  const moves =
+  // Round 32 (owner): each clause rides its own glyph (arrow/dash/dot)
+  // inside a white chip on the focal field — see the render below.
+  const moves: Move[] =
     reading.state === 'active' || reading.state === 'partly'
       ? reading.legs
-          .map((leg) => {
+          .map((leg): Move | null => {
             const name = entry.legs[leg.id as keyof typeof entry.legs] ?? leg.id;
             if (leg.direction === 'rising')
-              return { text: interpolate(copy.together.moves.up, { name }), cls: 'text-[var(--color-status-normal)]' };
+              return { text: interpolate(copy.together.moves.up, { name }), cls: 'text-[var(--color-status-normal)]', kind: 'up' };
             if (leg.direction === 'falling')
-              return { text: interpolate(copy.together.moves.down, { name }), cls: 'text-[var(--color-status-alert)]' };
+              return { text: interpolate(copy.together.moves.down, { name }), cls: 'text-[var(--color-status-alert)]', kind: 'down' };
             if (leg.direction === 'steady')
-              return { text: interpolate(copy.together.moves.flat, { name }), cls: 'text-[var(--color-text-secondary)]' };
+              return { text: interpolate(copy.together.moves.flat, { name }), cls: 'text-[var(--color-text-secondary)]', kind: 'flat' };
             if (leg.level === 'high')
-              return { text: interpolate(copy.together.moves.high, { name }), cls: 'text-[var(--color-text-secondary)]' };
+              return { text: interpolate(copy.together.moves.high, { name }), cls: 'text-[var(--color-text-secondary)]', kind: 'level' };
             if (leg.level === 'low')
-              return { text: interpolate(copy.together.moves.low, { name }), cls: 'text-[var(--color-text-secondary)]' };
+              return { text: interpolate(copy.together.moves.low, { name }), cls: 'text-[var(--color-text-secondary)]', kind: 'level' };
             if (leg.level === 'typical')
-              return { text: interpolate(copy.together.moves.mid, { name }), cls: 'text-[var(--color-text-secondary)]' };
+              return { text: interpolate(copy.together.moves.mid, { name }), cls: 'text-[var(--color-text-secondary)]', kind: 'level' };
             return null;
           })
-          .filter((m): m is { text: string; cls: string } => m !== null)
+          .filter((m): m is Move => m !== null)
       : [];
 
   return (
@@ -243,25 +304,39 @@ export function ConnectionCard({
         {entry.relation}
       </p>
 
-      {/* R27: the one-clause right-now line. */}
-      <p className="m-0 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]">
-        {rightNow}
-      </p>
-
-      {/* Owner follow-up: the concrete per-leg movements — green rises,
-       * red falls (owner instruction), neutral for steady/level-only. */}
+      {/* R27: the one-clause right-now line. Round 32 (owner): "create a
+       * container inside a container as the focal point for the verdicts
+       * and estimations of these connections" — when the card HAS
+       * estimations (active/partly), the right-now verdict and the move
+       * chips share the app's FOCAL recipe (the money panel's / the
+       * Estimation strip's): the card holds a brand-gold field, the field
+       * holds white chips — the moves finally grab the eye. Quiet states
+       * keep the plain one-line verdict. */}
       {moves.length > 0 ? (
-        <p
-          className="m-0 flex flex-wrap items-baseline gap-x-4 gap-y-0.5 text-[length:var(--type-label)] font-bold leading-relaxed"
-          data-connection-moves
+        <div
+          className="flex flex-col gap-2 rounded-[var(--radius-lg)] bg-gradient-to-b from-[var(--color-accent-gold)]/[0.16] via-[var(--color-accent-gold)]/[0.07] to-transparent p-3 shadow-[0_10px_34px_rgba(168,126,28,0.15)] ring-2 ring-[var(--color-accent-gold)]/45 sm:p-3.5 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
+          data-connection-verdict
         >
-          {moves.map((m) => (
-            <span key={m.text} className={m.cls}>
-              {m.text}
-            </span>
-          ))}
+          <p className="m-0 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]">
+            {rightNow}
+          </p>
+          <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0" data-connection-moves>
+            {moves.map((m) => (
+              <li
+                key={m.text}
+                className={`inline-flex items-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)] ${m.cls}`}
+              >
+                <MoveIcon kind={m.kind} />
+                <span className="text-[length:var(--type-label)] font-bold leading-snug">{m.text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <p className="m-0 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]">
+          {rightNow}
         </p>
-      ) : null}
+      )}
     </article>
   );
 }

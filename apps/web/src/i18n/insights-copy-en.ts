@@ -1511,13 +1511,13 @@ export const insightsCopyEn = {
     metals: { gold: 'gold', silver: 'silver' },
     // Round 23 (owner): the card states its estimation — a mechanical tally
     // of the conditions above (supportive minus against; the sign is the
-    // direction). Describes the tally, still not advice. Round 26 (owner):
-    // the words dropped the bare "will go up/down" — "will" next to green/
-    // red read misleading. The holder-view value words say what the colour
-    // means: gaining value wears green, losing value wears red.
+    // direction). Describes the tally, still not advice. Round 32 (owner):
+    // the owner's own plain phrasing is back — "will go up" wears green,
+    // "will go down" wears red (R26's value words are retired); fa matches
+    // with the moves vocabulary (بالا می‌رود / پایین می‌آید).
     verdictTitle: 'Estimation',
-    verdictUp: 'gaining value',
-    verdictDown: 'losing value',
+    verdictUp: 'will go up',
+    verdictDown: 'will go down',
     verdictFlat: 'no clear direction',
     verdictNone: 'no estimate yet',
     // R26: neutral side words (no check/cross marks, no green/red).

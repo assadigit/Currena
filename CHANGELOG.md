@@ -5,6 +5,60 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — Plain direction words, no stuttered rows, big region marks, and the connections' focal verdict field (owner round 32)
+
+Thirty-second round — five owner points: "instead of 'ارزش می‌بازد' say
+'پایین می‌آید' or will go down"; the condition rows' duplicated state word
+("علیه کار می‌کند / دلار آمریکا / علیه کار می‌کند"); "علیه کار می‌کند is not
+a good translation — use در تضاد است or در جهت مخالف است"; the dedicated
+Australia and Global sections should wear their big icons; and the
+connections' moves ("نسبت مس به طلا بالا می‌رود…") need "a container inside
+a container as focal point for the verdicts and estimations".
+
+### Changed
+
+- **The Estimation speaks plainly again** — the verdict words are back to
+  the owner's own R23 phrasing: "will go up" wears green, "will go down"
+  wears red (fa: «بالا می‌رود» / «پایین می‌آید») — R26's "gaining/losing
+  value" («ارزش می‌گیرد/می‌بازد») are retired. The page now speaks ONE
+  direction vocabulary: the verdict chips, the collapsed summary takeaway
+  and the connections' move lines all use the same words. Colour still
+  never rides alone: the zigzag/flat icon leads every word.
+- **The condition rows lost their stutter** — each row used to render the
+  state word twice (icon + short word at the start, then the full word
+  again after the name; in fa the two strings for "against" were
+  IDENTICAL, so every against-row read «علیه کار می‌کند / دلار آمریکا /
+  علیه کار می‌کند»). The trailing echo is gone — the icon + word at the
+  row's start IS the state. Verified: exactly one occurrence per row in
+  both locales.
+- **"works against" is now «در تضاد است»** — the fa wording the owner
+  rejected is replaced across the signals copy (group heading, state
+  words, and the real-yield "how" sentence's closing clause → «در تضاد
+  با آن است»). English "Works against" is untouched.
+- **The Global and Australia blocks wear their big icons** — the hero's
+  region verdict cards (the dedicated sections) now lead with their own
+  artwork at the price tiles' scale (96px mobile / **128×128 desktop**),
+  the section label and the view link sitting beside it, vertically
+  centred — the same face the Estimation chips and the price tiles speak
+  with.
+- **The connections have their focal verdict field** — when a connection
+  card has estimations to show (active/partly), the right-now verdict and
+  the per-leg moves move INTO the app's focal container-inside-container
+  recipe (the money panel's / the Estimation strip's): the card holds a
+  brand-gold gradient field with a 2px gold ring and gold-tinted shadow;
+  the field holds the verdict line and the moves as WHITE CHIPS, each
+  riding a direction glyph — up/down arrows for rising/falling, the dash
+  for steady, and a position dot for level-only legs (high/low/mid — a
+  level is not a movement). Quiet states (inactive/unknown) keep the
+  plain one-line verdict.
+
+### Housekeeping
+
+- Copy-only + presentation change; no engine, API or asset changes.
+  Insights chunk 322.43/83.03 kB raw/gz against the 322.50/84.00 budget —
+  HELD with 0.07 kB to spare (the next additive round likely bumps; noted
+  here so the bump is never silent). PWA precache unchanged (85 entries).
+
 ## [2026-10-11] — The Estimation strip becomes the card's verdict; "expensive" speaks in red (owner round 31)
 
 Thirty-first round — two owner points: the gold-and-silver card's verdict

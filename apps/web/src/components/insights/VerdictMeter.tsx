@@ -137,12 +137,15 @@ export function VerdictBlock({
           : 'ring-[var(--color-border)]'
       } bg-[var(--color-surface)]`}
     >
-      <header className="flex items-baseline justify-between gap-3">
-        <h3 className="type-kicker m-0 flex items-center gap-1.5 text-[var(--color-text-tertiary)]">
-          {/* Round 28 (owner): each region wears its own mark — the globe
-           * for Global, the map for Australia. Round 29 (owner): the mark
-           * grows to 22/28px — the kicker is the card's first read. */}
-          <IconImg src={sectionIconUrl(section)} size={22} desktopSize={28} />
+      <header className="flex items-center justify-between gap-3">
+        {/* Round 28 (owner): each region wears its own mark — the globe for
+         * Global, the map for Australia. Round 29: the mark grew to 22/28.
+         * Round 32 (owner): the region's DEDICATED section wears its BIG
+         * icon — the same face the price tiles and the Estimation chips
+         * speak with (96px mobile / 128×128 desktop); the label and the
+         * view link sit beside it, vertically centred on the artwork. */}
+        <IconImg src={sectionIconUrl(section)} size={96} desktopSize={128} />
+        <h3 className="type-kicker m-0 min-w-0 flex-1 text-[var(--color-text-tertiary)]">
           {sectionLabel}
         </h3>
         <button

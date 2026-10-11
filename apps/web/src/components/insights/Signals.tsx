@@ -33,9 +33,16 @@
  *
  * Round 26 (owner wording): the chips dropped the bare "will go up /
  * will go down" — next to the green/red ink that phrasing read
- * misleading. The holder-view value words say what the colour means:
- * "gaining value" wears green, "losing value" wears red; the collapsed
- * summary line now carries the same direction icon as the strip.
+ * misleading. The holder-view value words said what the colour means.
+ *
+ * Round 32 (owner): the owner's plain phrasing is BACK — "will go up"
+ * wears green, "will go down" wears red (fa: بالا می‌رود / پایین می‌آید,
+ * the same words the moves lines speak); R26's value words are retired.
+ * The same round: the condition rows lost their duplicated state word —
+ * the icon + short word at the row's start already carries the state
+ * (fa's short and full words for "against" were identical, so every
+ * row read «علیه کار می‌کند / دلار آمریکا / علیه کار می‌کند»), and the
+ * fa wording for "works against" is now «در تضاد است».
  *
  * Round 27 (owner): the card OPENS by default on every visit — the
  * condition rows, live values and footing rows ARE the section; a
@@ -342,7 +349,9 @@ function ConditionRow({
 }) {
   const s = copy.signals;
   const entry = s.conditions[condition.key];
-  const stateWord = s.conditionState[condition.state];
+  // Round 32 (owner): no trailing echo of the state word — the icon +
+  // short word at the row's start IS the state; a second copy after the
+  // name read as a stutter (and in fa the two were the same string).
   // S2: only the industrial condition carries the fixed "mixed" tag.
   const mixedTag = 'tag' in entry ? entry.tag : undefined;
   return (
@@ -359,7 +368,6 @@ function ConditionRow({
           </span>
         </span>
         <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">{entry.name}</span>
-        <span className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">{stateWord}</span>
         {mixedTag !== undefined ? (
           <span className="inline-flex shrink-0 items-center rounded-full bg-currena-muted/15 px-2 py-0.5 text-[0.72rem] font-semibold text-[var(--color-status-stale)]">
             {mixedTag}
