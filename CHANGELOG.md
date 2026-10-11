@@ -5,6 +5,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — Price tiles: the artwork IS the card, at 128×128 on desktop (owner round 30)
+
+Thirtieth round — the owner checked production, found it still serving the
+round-28 markup (the round-29 commit had not left the sandbox), and set the
+next bar: "The icons look like before… The main prices … must have at least
+128×128 icon in pc." Two jobs: actually ship what is committed, and make the
+price tiles' artwork a true 128×128 face on desktop.
+
+### Shipped (the round-29 backlog)
+
+- Commit `0225cc0` (round 29) had been gated, browser-verified and committed
+  locally, but NEVER pushed or deployed — the sandbox had no GitHub token and
+  no Cloudflare token, and the remote URL is tokenless by design. The owner
+  supplied both credentials this round; the release record below covers the
+  combined round-29 + round-30 push and deploy.
+
+### Changed
+
+- **Price tiles restacked around the artwork** — the icon box grew to
+  96px on mobile / **128×128 on ≥640px screens** (owner's explicit floor;
+  the 256px sources downscale cleanly), and the tile turned into a stacked
+  product card: artwork on top as the face, then the name, then the big
+  price, then the change rows. The old side-by-side arrangement could not
+  survive a 128px neighbour: at the 4-across desktop grid only ~100px
+  remained beside the icon, and in fa the price («۴٬۱۹۶ دلار») wrapped to
+  THREE lines while names wrapped to two — rows started at different
+  heights per tile, exactly what the owner's "numbers must align" rule
+  forbids.
+- **Alignment is now structural, not lucky** — the name rides in a fixed
+  two-line slot (`min-height: 2 × leading-snug`), so the price and every
+  row under it start at the same y in all four tiles whether a neighbour's
+  name wraps or not. Verified programmatically in en and fa at 1280:
+  name/price/change tops are pixel-identical across all four tiles.
+- The fallback `Coins` glyph (only shown if artwork is ever missing) joins
+  the responsive `.currena-icon` mechanism at the same 96/128 sizes.
+
+### Housekeeping
+
+- No copy, engine or API changes. Insights chunk 320.73/82.91 kB raw/gz
+  against the 322.50/84.00 budget (no bump). No new assets — PWA precache
+  unchanged (85 entries).
+
 ## [2026-10-11] — Icons at full voice, and the money panel becomes the page's focal section (owner round 29)
 
 Twenty-ninth round — three owner points at once: "the icons are too small —

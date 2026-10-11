@@ -22,6 +22,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
+import type { CSSProperties } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { Coins } from 'lucide-react';
 import { interpolate } from '../../i18n';
@@ -50,23 +51,33 @@ import { formatAsOf } from './HistoryChart';
  * context tint. aria-hidden — the name carries the meaning.
  * ------------------------------------------------------------------ */
 /** The tile's icon box — gold wears the brand-gold accent (round 24),
- * the rest stay in the neutral context tint (money-panel language). */
+ * the rest stay in the neutral context tint (money-panel language).
+ * Round 29r2 (owner): "the main prices … must have at least 128×128 icon
+ * in pc." The artwork IS the tile's face now — 96px on mobile, 128px on
+ * ≥640px screens (the 256px sources downscale cleanly), filling the
+ * tinted box edge to edge like a framed plate. The box sits ABOVE the
+ * name/price (stacked card) — beside a 128px artwork the 4-across grid
+ * left only ~100px for the largest number on the page, and in fa the
+ * price wrapped to three lines (owner: numbers must align). */
 function PriceIconBox({ id }: { id: IndicatorId }) {
   const isGold = id === 'gold-usd';
   const icon = indicatorIconUrl(id);
   return (
-    /* Round 29 (owner): the box grows to 44px mobile / 56px desktop with
-     * the artwork at 32/44 inside — a few× the old 26px squint. */
     <span
       aria-hidden="true"
-      className={`grid h-11 w-11 shrink-0 place-items-center rounded-[var(--radius-sm)] ring-1 ring-[var(--color-border)] sm:h-14 sm:w-14 ${
+      className={`grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-md)] ring-1 ring-[var(--color-border)] sm:h-32 sm:w-32 ${
         isGold ? 'bg-[var(--color-accent-gold)]/25' : 'bg-currena-soft/70'
       }`}
     >
       {icon !== null ? (
-        <IconImg src={icon} size={32} desktopSize={44} />
+        <IconImg src={icon} size={96} desktopSize={128} />
       ) : (
-        <Coins aria-hidden size={26} strokeWidth={1.2} className="text-[var(--color-status-context)]" />
+        <Coins
+          aria-hidden
+          strokeWidth={1.2}
+          className="currena-icon text-[var(--color-status-context)]"
+          style={{ '--icon-size': '96px', '--icon-size-sm': '128px' } as CSSProperties}
+        />
       )}
     </span>
   );
@@ -226,15 +237,21 @@ export function PricesBoard({
                  * behaviour) — without it the name/price/change rows start
                  * at a DIFFERENT y per tile (owner: every heading on the
                  * same line, every number aligned). Filling the button
-                 * pins the column to the top in all four tiles. */}
+                 * pins the column to the top in all four tiles.
+                 * Round 29r2 (owner): the 128px artwork leads the tile as
+                 * its face; the name and the big price stack UNDER it at
+                 * full tile width (beside it they wrapped fa prices to
+                 * three lines). The name rides in a fixed two-line slot so
+                 * the price — and everything under it — starts at the SAME
+                 * y in every tile, wrapped or not. */}
                 <span className="flex h-full w-full flex-col items-start gap-1">
-                  {/* Plain name — no tickers, no series ids (R14) — now with
-                   * its commodity pictogram (round 24, roast #5). */}
-                  <span className="flex items-center gap-2">
-                    <PriceIconBox id={id} />
-                    <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-secondary)]">
-                      {entry.name}
-                    </span>
+                  <PriceIconBox id={id} />
+                  {/* Plain name — no tickers, no series ids (R14). The
+                   * two-line min-height (2 × leading-snug) keeps the price
+                   * rows aligned across tiles even when a neighbour's name
+                   * wraps (round 24, roast #5). */}
+                  <span className="min-h-[2.75em] text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-secondary)]">
+                    {entry.name}
                   </span>
                   {/* The large price with unit — the largest text in the tile.
                    * Plain <bdi> (auto direction): the fa unit word lands on
