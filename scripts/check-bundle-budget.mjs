@@ -113,14 +113,14 @@ const BUDGETS = [
   // the ↗ ↧ ⓘ glyphs kept, to hold the cost to +6.7 kB raw / +2.7 kB gz
   // on the lazy chunk. ENTRY untouched. Justified in CHANGELOG §2026-10-10
   // (imagery).
-  // Roast bump (301.21/78.06 → 303.98/78.50, budget 302/78 → 304/78.6):
+  // Roast bump (301.21/78.06 → 303.98/78.50, budget 302/78 → 304.2/78.6):
   // the 11 Oct roast fixes — uniform price-tile anatomy with a client-side
   // 7d/30d derivation from the cached 10-year histories (useDerivedChanges),
   // the sentence-versus-number guard on needs-attention cards/rows,
   // friendlySource publisher cleanup, groupShort bilingual corpus (9
   // gauges × 2 locales), seeAllOne plural, and the rewritten money-area
   // lines. ENTRY untouched. Justified in CHANGELOG §2026-10-11 (roast).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 304_000, gz: 78_600, label: 'Insights lazy chunk' },
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 304_200, gz: 78_600, label: 'Insights lazy chunk' },
 ];
 
 function main() {

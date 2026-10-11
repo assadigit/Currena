@@ -53,13 +53,16 @@ function useDerivedChanges(ids: readonly IndicatorId[]): Partial<Record<string, 
           const pts = history.points.filter((p): p is [number, number] => typeof p[1] === 'number');
           if (pts.length < 2) return;
           const last = pts[pts.length - 1]!;
+          // The nearest point to N days back — but only if it is really
+          // NEAR (≤3 days): a sparse series (early Bitcoin accumulation)
+          // must yield "—", never one number repeated for both windows.
           const pick = (back: number): [number, number] | null => {
             const target = last[0] - back;
             let best: [number, number] | null = null;
             for (const p of pts) {
               if (best === null || Math.abs(p[0] - target) < Math.abs(best[0] - target)) best = p;
             }
-            return best;
+            return best !== null && Math.abs(best[0] - target) <= 3 ? best : null;
           };
           const kind = definitionFor(id as IndicatorId).changeKind;
           const conv = (then: [number, number] | null): number | undefined => {
