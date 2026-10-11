@@ -5,6 +5,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — The money rows' type steps down to proportional (owner round 38)
+
+Thirty-eighth round — one owner note on the round-37 sizes, with a
+screenshot: "Now they're too big, make them proportional."
+
+### Changed
+
+- **The heading and the number return to proportional steps** — the
+  round-37 scale (28px heading / 29px value) shouted against the 14px
+  sentence. The area name steps down to 1.5× the body
+  (`calc(var(--type-label) * 1.5)` = 21px, still bold) and the value
+  returns to the page's number role (`type-number` = 23.2px / 800 /
+  tabular — the attention tiles' role, and the size the owner approved
+  in round 36). The column reads heading (21) → estimation word (14
+  bold) → value (23.2, still the biggest line) → sentence (14), every
+  step a token or an existing role — no arbitrary px. A side effect the
+  owner gets for free: value + explanation now fit ONE line again in
+  most rows (the 29px forced the explanation to wrap).
+- Nothing else moves — the one-column-beside-the-icon layout, the
+  shared column edge per row, the 50/50 data|chart split and the dedupe
+  are all untouched.
+
+### Verified
+
+- Gates: typecheck 5/5; tests 804/804; build ✓; bundle budgets held
+  (Insights 331.61/85.14 vs 334.00/86.00; entry hash moved with the
+  chunk rename, size identical 290.33/87.05).
+- Local QA (wrangler :8787, KV from prod): en + fa at 1280 — name
+  21px/700, value 23.2px/800, name/dir/value on one column edge ×4 rows
+  (en left 236, fa right 1044), value inside the icon band ×8, fa chart
+  half still left of the data half; 375: docW = clientW = 375, value on
+  one line (189px wide); zero page errors, zero console errors.
+  Screenshots r38-local-*.png.
+
 ## [2026-10-11] — The value moves up beside the icon; the numbers and headings grow (owner round 37)
 
 Thirty-seventh round — three owner refinements to the money rows, each with
