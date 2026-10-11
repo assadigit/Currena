@@ -22,12 +22,12 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { Coins } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { fetchIndicatorHistory } from '../../lib/insights';
+import { IconImg, indicatorIconUrl } from '../icons/currena';
 import {
   BTC_RATIO_IDS,
   PRICE_ROWS,
@@ -43,79 +43,29 @@ import { formatAsOf } from './HistoryChart';
 /* ------------------------------------------------------------------ *
  * Round 24 (roast #5): a small PICTOGRAM per commodity — the price
  * lane was the last icon-less strip (the roast: "add warmth via small
- * commodity pictograms"). Same design language as the money panel:
- * stroke = currentColor in a tinted rounded box, aria-hidden — the
- * name carries the meaning. Gold wears the brand gold (the ONE
- * accent); the others stay in the quiet context ink.
+ * commodity pictograms"). Round 28 (owner): the stroke glyphs are GONE
+ * — every tile now wears the owner's own artwork (oil barrel, gold
+ * bar, silver bar, bitcoin) at its natural colours inside the same
+ * tinted box; gold keeps the brand-gold box, the others the quiet
+ * context tint. aria-hidden — the name carries the meaning.
  * ------------------------------------------------------------------ */
-function PriceIcon({ id }: { id: IndicatorId }) {
-  const common = {
-    width: 20,
-    height: 20,
-    viewBox: '0 0 16 16',
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: 1.2,
-    strokeLinecap: 'round' as const,
-    strokeLinejoin: 'round' as const,
-    'aria-hidden': true,
-    focusable: false,
-  };
-  const glyph = (): ReactNode => {
-    switch (id) {
-      case 'brent':
-        // A droplet — oil.
-        return (
-          <>
-            <path d="M8 2.2c2.3 3.2 3.9 5.3 3.9 7.4a3.9 3.9 0 0 1-7.8 0C4.1 7.5 5.7 5.4 8 2.2Z" />
-            <path d="M6.4 9.8a1.7 1.7 0 0 0 1.5 1.8" opacity="0.6" />
-          </>
-        );
-      case 'gold-usd':
-        // Three ingots — gold.
-        return (
-          <>
-            <path d="M2.6 12.8h3.9l.9-2.4H3.5l-.9 2.4Z" />
-            <path d="M9.5 12.8h3.9l-.9-2.4H10.4l-.9 2.4Z" />
-            <path d="M6 9.2h4l.9-2.4H6.9L6 9.2Z" />
-          </>
-        );
-      case 'silver-usd':
-        // Two round coins — silver.
-        return (
-          <>
-            <circle cx="6.2" cy="9.8" r="3.4" />
-            <circle cx="10.6" cy="5.8" r="2.4" opacity="0.6" />
-          </>
-        );
-      case 'btc-usd':
-        // The ₿ — bitcoin.
-        return (
-          <>
-            <circle cx="8" cy="8" r="6" />
-            <path d="M6.4 5.2h2.5a1.3 1.3 0 0 1 0 2.6H6.4h2.9a1.3 1.3 0 0 1 0 2.6H6.4Z" />
-            <path d="M7.2 3.6v1.6M9.2 3.6v1.6M7.2 10.4v1.6M9.2 10.4v1.6" />
-          </>
-        );
-      default:
-        return <circle cx="8" cy="8" r="6" />;
-    }
-  };
-  return <svg {...common}>{glyph()}</svg>;
-}
-
 /** The tile's icon box — gold wears the brand-gold accent (round 24),
- * the rest stay in the neutral context ink (money-panel language). */
+ * the rest stay in the neutral context tint (money-panel language). */
 function PriceIconBox({ id }: { id: IndicatorId }) {
   const isGold = id === 'gold-usd';
+  const icon = indicatorIconUrl(id);
   return (
     <span
       aria-hidden="true"
       className={`grid h-9 w-9 shrink-0 place-items-center rounded-[var(--radius-sm)] ring-1 ring-[var(--color-border)] ${
-        isGold ? 'bg-[var(--color-accent-gold)]/25 text-[var(--color-accent-gold-deep)]' : 'bg-currena-soft/70 text-[var(--color-status-context)]'
+        isGold ? 'bg-[var(--color-accent-gold)]/25' : 'bg-currena-soft/70'
       }`}
     >
-      <PriceIcon id={id} />
+      {icon !== null ? (
+        <IconImg src={icon} size={26} />
+      ) : (
+        <Coins aria-hidden size={20} strokeWidth={1.2} className="text-[var(--color-status-context)]" />
+      )}
     </span>
   );
 }

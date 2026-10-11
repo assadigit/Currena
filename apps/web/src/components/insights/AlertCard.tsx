@@ -16,6 +16,7 @@ import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { fetchIndicatorHistory } from '../../lib/insights';
+import { IconImg, indicatorIconUrl } from '../icons/currena';
 import { Sparkline } from '../Sparkline';
 import {
   bandWordsOf,
@@ -120,11 +121,17 @@ export function AlertCard({
       >
         <span className="flex items-start justify-between gap-2">
           <span className="min-w-0">
-            <span className="block text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-primary)]">
+            <span className="flex items-center gap-1.5 text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-primary)]">
+              {/* Round 28 (owner): the indicator wears its own artwork when
+               * one exists (oil barrel, gold bar, bills, housing, the US
+               * 10Y…). Decorative — the name carries the meaning. */}
+              {indicatorIconUrl(reading.id) !== null ? (
+                <IconImg src={indicatorIconUrl(reading.id)!} size={20} />
+              ) : null}
               {entry.name}
-              {/* R30: the raw series tag ("CPI: rents", "RES_DWELL_ST") left
-               * the card face — it lives in the details panel now. */}
             </span>
+            {/* R30: the raw series tag ("CPI: rents", "RES_DWELL_ST") left
+             * the card face — it lives in the details panel now. */}
           </span>
           <span className="flex shrink-0 items-center gap-1">
             {pinned ? <span aria-hidden="true" className="text-sm text-[var(--color-status-context)]">★</span> : null}

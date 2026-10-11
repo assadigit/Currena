@@ -51,6 +51,7 @@ import { evaluateSignal, type SignalConditionReading, type SignalLean, type Sign
 import { Activity, ChevronDown } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg, indicatorIconUrl } from '../icons/currena';
 import { SIGNALS_ENABLED, formatChange, formatIndicatorValue, mergeSignals } from './config';
 
 /* ---------------------------------------------------------------- *
@@ -71,6 +72,12 @@ function verdictOf(reading: SignalReading): SignalVerdict | null {
 }
 
 function VerdictIcon({ verdict, size = 18 }: { verdict: SignalVerdict; size?: number }) {
+  /* Round 28 (owner artwork): the metals' up/down arrows wear the owner's
+   * green zigzag / red zigzag PNGs — their fixed colours match this card's
+   * valence by construction (up = the holder's gain). The flat dash stays
+   * a stroke glyph in the neutral ink (there is no "flat" artwork). */
+  if (verdict === 'up') return <IconImg src={DIRECTION_UP_URL} size={size} />;
+  if (verdict === 'down') return <IconImg src={DIRECTION_DOWN_URL} size={size} />;
   const common = {
     width: size,
     height: size,
@@ -83,27 +90,18 @@ function VerdictIcon({ verdict, size = 18 }: { verdict: SignalVerdict; size?: nu
     'aria-hidden': true,
     focusable: false,
   };
-  if (verdict === 'up') {
-    return (
-      <svg {...common}>
-        <path d="M8 13V3.5" />
-        <path d="M3.5 8 8 3.5 12.5 8" />
-      </svg>
-    );
-  }
-  if (verdict === 'down') {
-    return (
-      <svg {...common}>
-        <path d="M8 3v9.5" />
-        <path d="M3.5 8 8 12.5 12.5 8" />
-      </svg>
-    );
-  }
   return (
     <svg {...common}>
       <path d="M3 8h10" />
     </svg>
   );
+}
+
+/** The metal's own artwork beside its name (round 28) — gold bar, silver
+ * bar; unmapped metals (none today) fall back to no icon. */
+function MetalIcon({ metal, size = 20 }: { metal: 'gold' | 'silver'; size?: number }) {
+  const icon = indicatorIconUrl(metal === 'gold' ? 'gold-usd' : 'silver-usd');
+  return icon !== null ? <IconImg src={icon} size={size} /> : null;
 }
 
 const verdictTone: Record<SignalVerdict, string> = {
@@ -140,11 +138,12 @@ function VerdictStrip({
             data-verdict-direction={verdict ?? 'none'}
             className="flex min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-sm)] px-2.5 py-2 ring-1 ring-[var(--color-border)]"
           >
-            <span className={`inline-flex shrink-0 items-center ${verdict !== null ? verdictTone[verdict] : 'text-[var(--color-status-stale)]'}`}>
-              <VerdictIcon verdict={verdict ?? 'flat'} />
-            </span>
+            <MetalIcon metal={reading.metal} />
             <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
               {s.metals[reading.metal]}
+            </span>
+            <span className={`inline-flex shrink-0 items-center ${verdict !== null ? verdictTone[verdict] : 'text-[var(--color-status-stale)]'}`}>
+              <VerdictIcon verdict={verdict ?? 'flat'} />
             </span>
             <span
               className={`text-[length:var(--type-label)] font-bold ${
@@ -393,10 +392,13 @@ function MergedSignalsCard({
         data-footing-state={state}
       >
         <span className="flex flex-wrap items-baseline gap-x-2">
-          <span className={`inline-flex shrink-0 items-center gap-1 ${stateToneClass(state as SignalConditionReading['state'])}`}>
-            <ConditionIcon state={state as SignalConditionReading['state']} />
-            <span className="text-[length:var(--type-label)] font-bold">
-              {s.conditionStateShort[state as SignalConditionReading['state']] ?? s.notEnoughData}
+          <span className="inline-flex shrink-0 items-center gap-1.5">
+            <MetalIcon metal={metal} size={18} />
+            <span className={`inline-flex shrink-0 items-center gap-1 ${stateToneClass(state as SignalConditionReading['state'])}`}>
+              <ConditionIcon state={state as SignalConditionReading['state']} />
+              <span className="text-[length:var(--type-label)] font-bold">
+                {s.conditionStateShort[state as SignalConditionReading['state']] ?? s.notEnoughData}
+              </span>
             </span>
           </span>
           <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
@@ -444,6 +446,7 @@ function MergedSignalsCard({
               className="inline-flex items-center gap-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]"
               data-signal-metal={reading.metal}
             >
+              <MetalIcon metal={reading.metal} size={16} />
               {reading.lean !== null ? <LeanIcon lean={reading.lean} /> : null}
               {metalLeanLine(reading)}
             </span>

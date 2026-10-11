@@ -17,6 +17,7 @@ import type { IndicatorReading, InsightsSection, IndicatorId } from '@currena/co
 import { formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { IconImg, indicatorIconUrl, sectionIconUrl, stateIconUrl } from '../icons/currena';
 import { GAUGES, gaugesForSection, labelForVerdictStep, sectionVerdictStep } from '@currena/insights';
 import {
   attentionToneClass,
@@ -137,7 +138,12 @@ export function VerdictBlock({
       } bg-[var(--color-surface)]`}
     >
       <header className="flex items-baseline justify-between gap-3">
-        <h3 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{sectionLabel}</h3>
+        <h3 className="type-kicker m-0 flex items-center gap-1.5 text-[var(--color-text-tertiary)]">
+          {/* Round 28 (owner): each region wears its own mark — the globe
+           * for Global, the map for Australia. */}
+          <IconImg src={sectionIconUrl(section)} size={18} />
+          {sectionLabel}
+        </h3>
         <button
           type="button"
           onClick={() => onJumpSection(section)}
@@ -150,9 +156,14 @@ export function VerdictBlock({
 
       {/* H1: verdict word — the page's LARGEST type role; the word speaks
        * in status ink (R29) beside its meter (never colour alone). R30:
-       * the meter is the hero's instrument — the LARGE size. */}
+ * the meter is the hero's instrument — the LARGE size. Round 28
+       * (owner): the state's own artwork rides beside the word — drawn in
+ * the SAME colour coding the app already speaks (green stable, amber
+       * cautious, orange stressed, red critical); the word carries the
+       * meaning, the artwork the warmth. No reading (step 0) → no icon. */}
       <p className="m-0 flex items-center gap-3">
         <span className={`type-verdict ${stepToneClass(step)}`}>{verdictLabel}</span>
+        {stateIconUrl(step) !== null ? <IconImg src={stateIconUrl(step)!} size={30} className="drop-shadow-sm" /> : null}
         <VerdictMeter step={step} label={verdictLabel} ariaLabel={ariaLabel} size="lg" />
       </p>
 
@@ -249,6 +260,11 @@ export function VerdictBlock({
                     className="insights-focusable flex h-full w-full cursor-pointer flex-col items-start gap-0.5 rounded-[var(--radius-md)] bg-currena-warning/[0.07] px-3 py-2 text-start ring-1 ring-currena-warning/20 transition-colors hover:bg-currena-warning/[0.13]"
                   >
                     <span className="line-clamp-2 min-h-[2.75em] text-[length:var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
+                      {/* Round 28: the tile's indicator wears its artwork when
+                       * one exists — inline so the clamped name stays tidy. */}
+                      {indicatorIconUrl(id) !== null ? (
+                        <IconImg src={indicatorIconUrl(id)!} size={16} className="me-1 inline-block align-text-bottom" />
+                      ) : null}
                       {copy.indicators[id].name}
                     </span>
                     {valueText !== null ? (

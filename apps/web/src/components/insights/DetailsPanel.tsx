@@ -18,6 +18,7 @@ import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { ApiError, fetchIndicatorHistory } from '../../lib/insights';
 import { Star, X } from 'lucide-react';
+import { IconImg, indicatorIconUrl } from '../icons/currena';
 import { HistoryChart, formatAsOf } from './HistoryChart';
 import { definitionFor, formatRuleText } from './config';
 
@@ -171,14 +172,17 @@ export function DetailsPanel({
               id={headingId}
               data-panel-heading=""
               tabIndex={-1}
-              className="type-section m-0 leading-snug text-[var(--color-text-primary)] outline-none"
+              className="type-section m-0 flex items-center gap-2 leading-snug text-[var(--color-text-primary)] outline-none"
             >
-              {entry.name}
+              {indicatorIconUrl(reading.id) !== null ? <IconImg src={indicatorIconUrl(reading.id)!} size={24} /> : null}
+              <span>
+                {entry.name}
               {entry.ticker ? (
                 <span dir="ltr" className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
                   {entry.ticker}
                 </span>
               ) : null}
+              </span>
             </h3>
           </div>
           <button

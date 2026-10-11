@@ -22,6 +22,7 @@
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { IconImg, moneyAreaIconUrl } from '../icons/currena';
 import {
   formatIndicatorValue,
   moneyAreaDirection,
@@ -33,66 +34,32 @@ import {
 
 /** The area icons — rendered INSIDE a 64×64 tinted box (owner follow-up
  * 11 Oct: "increase the icon size, something visible like 64×64").
- * stroke = currentColor, aria-hidden — the area name carries the meaning;
- * icons are NOT colour-coded. */
+ * Round 28 (owner): the stroke pictograms give way to the owner's own
+ * artwork wherever one exists — fuel nozzle, bills, housing, the rising
+ * exchange chart, the globe. "Jobs" has no artwork yet and keeps its
+ * stroke briefcase. The box stays the neutral context tint — the icons
+ * are NOT colour-coded (red belongs to the needs-attention word). */
 function AreaIcon({ area }: { area: MoneyAreaId }) {
-  const common = {
-    width: 40,
-    height: 40,
-    viewBox: '0 0 16 16',
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: 1.2,
-    strokeLinecap: 'round' as const,
-    strokeLinejoin: 'round' as const,
-    'aria-hidden': true,
-    focusable: false,
-  };
-  switch (area) {
-    case 'petrol':
-      return (
-        <svg {...common}>
-          <path d="M3 13.5h10" />
-          <path d="M5 13.5V4.2a1.2 1.2 0 0 1 1.2-1.2h2.6A1.2 1.2 0 0 1 10 4.2v9.3" />
-          <path d="M5 7.5h5" />
-        </svg>
-      );
-    case 'homeLoan':
-      return (
-        <svg {...common}>
-          <path d="M2.5 7.5 8 3l5.5 4.5" />
-          <path d="M4 7v6h8V7" />
-        </svg>
-      );
-    case 'savings':
-      return (
-        <svg {...common}>
-          <circle cx="8" cy="8" r="5.5" />
-          <path d="M8 5v6M6.2 6.6h3a1.2 1.2 0 0 1 0 2.4h-2.4a1.2 1.2 0 0 0 0 2.4h3" />
-        </svg>
-      );
-    case 'shop':
-      return (
-        <svg {...common}>
-          <path d="M3.5 5.5h9l-.8 8h-7.4l-.8-8Z" />
-          <path d="M5.8 5.5V4a2.2 2.2 0 0 1 4.4 0v1.5" />
-        </svg>
-      );
-    case 'overseas':
-      return (
-        <svg {...common}>
-          <circle cx="8" cy="8" r="5.5" />
-          <path d="M2.5 8h11M8 2.5c1.6 1.5 2.4 3.4 2.4 5.5S9.6 12 8 13.5C6.4 12 5.6 10.1 5.6 8S6.4 4 8 2.5Z" />
-        </svg>
-      );
-    case 'jobs':
-      return (
-        <svg {...common}>
-          <rect x="3" y="6" width="10" height="7" rx="1.2" />
-          <path d="M6 6V4.6A1.6 1.6 0 0 1 7.6 3h.8A1.6 1.6 0 0 1 10 4.6V6" />
-        </svg>
-      );
-  }
+  const icon = moneyAreaIconUrl(area);
+  if (icon !== null) return <IconImg src={icon} size={40} />;
+  // jobs — the one area without artwork (round 28): the stroke briefcase.
+  return (
+    <svg
+      width={40}
+      height={40}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      focusable={false}
+    >
+      <rect x="3" y="6" width="10" height="7" rx="1.2" />
+      <path d="M6 6V4.6A1.6 1.6 0 0 1 7.6 3h.8A1.6 1.6 0 0 1 10 4.6V6" />
+    </svg>
+  );
 }
 
 /** The estimation arrows — same glyphs as the metals VerdictStrip
@@ -188,7 +155,7 @@ export function MoneyPanel({
                   aria-hidden="true"
                   className="grid h-12 w-12 shrink-0 place-items-center rounded-[var(--radius-md)] bg-currena-soft/70 ring-1 ring-[var(--color-border)] sm:h-16 sm:w-16"
                 >
-                  <span className="text-[var(--color-status-context)]">
+                  <span className={moneyAreaIconUrl(area) !== null ? '' : 'text-[var(--color-status-context)]'}>
                     <AreaIcon area={area} />
                   </span>
                 </span>

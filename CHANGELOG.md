@@ -5,6 +5,64 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — The owner's icon set: the app wears its own artwork (owner round 28)
+
+Twenty-eighth round — the owner shipped "Currena PNG Icons.zip" (18 pieces,
+256×256, carefully named) with the instruction: create a proper assets
+folder, move them under it, use them everywhere possible ("everywhere you
+see gold use gold.png"), keep sizes flexible (sources support up to
+256×256), and keep the SAME colour coding the finance states already speak
+(cautious etc.).
+
+### Added
+
+- **`apps/web/public/assets/icons/`** — the 18 pieces with web-friendly
+  lowercase-kebab names (gold.png, silver.png, oil.png, bitcoin.png,
+  copper.png, fuel-price.png, bills-shop-prices.png,
+  home-loan-rent-interest.png, stock-exchange-index.png,
+  us-10-year-interest.png, global-finance.png, australia-map.png,
+  stable/cautious/stressed/critical-state.png,
+  up-support-growth-increase.png, down-work-against-decrease.png). The
+  original zip is archived at `docs/icon-source/`.
+- **`components/icons/currena.tsx`** — one shared module: the URL maps
+  (indicator → subject, money-area → subject, section → region mark,
+  verdict step → state) and the one decorative `<img>` shape
+  (alt="" + aria-hidden — the adjacent word always carries the meaning).
+
+### Changed
+
+- **Price tiles**: the round-24 stroke pictograms are gone — oil barrel,
+  gold bar, silver bar and bitcoin wear their own artwork in the same
+  tinted boxes (gold keeps the brand-gold box).
+- **Money panel**: five of six areas wear artwork (fuel nozzle, housing,
+  the rising chart for savings, bills, the globe for overseas); "jobs"
+  has no artwork yet and keeps its stroke briefcase.
+- **Gold-and-silver card**: the metal chips, the header lean lines and
+  the footing rows show the gold/silver bars; the metals' up/down
+  estimation arrows are the owner's green/red zigzag artwork (their fixed
+  colours match this card's holder-view valence by construction — up =
+  gain). The flat dash stays a stroke glyph; the money panel keeps its
+  stroke arrows (there "up" can be the BAD case and must follow the
+  area's valence ink).
+- **Hero verdict cards**: each region wears its mark (globe = Global,
+  map = Australia), and the big verdict word is beside its state's
+  artwork — drawn in the SAME colour coding the app already speaks
+  (green Stable ↔ the normal ink, amber Cautious ↔ the watch ink, orange
+  Stressed ↔ the stressed ink, red Critical ↔ the alert ink). Icon +
+  word + ink, never colour alone.
+- **Alert cards, hero attention tiles and the details panel**: every
+  mapped indicator (oil, gold, silver, bitcoin, copper, the US-10Y
+  family, the CPI/bills family, the housing family, petrol) names itself
+  with its artwork.
+
+### Housekeeping
+
+- No copy, type, engine or API changes. The icons are static public
+  assets — no JS cost; the Insights chunk moved 319.87/82.62 kB raw/gz
+  against the 322.50/84.00 budget (no bump). The PWA precache now
+  includes the 18 PNGs (85 entries, ~2.7 MB) — same mechanism the flag
+  images already used.
+
 ## [2026-10-11] — The signals card opens by default — the detail is the content (owner round 27)
 
 Twenty-seventh round — the owner, alarmed: the gold-and-silver "What the
