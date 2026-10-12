@@ -5,6 +5,61 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-11] — The hero attention tiles align into one row; unit labels read small (owner round 40)
+
+Fortieth round — an owner note with a screenshot of the two hero verdict
+blocks side by side: "This boxes need alignment, all must be in a same row"
+(example: the Global Brent tile vs the Australia home-loan tile), followed by
+"also read آمریکا (unit currency) smaller so it doesnt go to second row."
+
+### Changed
+
+- **The two regions' attention-tile rows share one horizontal band** — the
+  count line + tiles + "+n more" + the "how is this computed?" link are now
+  ONE bottom-anchored module inside each verdict block (a single `mt-auto`
+  pins its top edge). The old free-floating tile block sat lower in the
+  Australia panel (its gauge rows and reason sentence are taller) and the
+  two rows zig-zagged; the free space now lives ABOVE the module, so both
+  panels' tile rows start at the same y BY STRUCTURE (the alignment
+  decree), measured pixel-equal in both locales.
+- **Tile faces are geometry-fixed** — the name row is EXACTLY two lines
+  (`h-[2.75em]`) with the indicator's artwork moved out of the text flow
+  (a flex sibling can no longer inflate the line box — the old inline 24px
+  icon made two-line titles 41px vs 34px and pushed that tile's value 7px
+  below its neighbours); the meaning line is clamped to three lines with
+  the same three-line reserve, so every tile is the same height across
+  both regions and the meanings' edges align.
+- **Unit labels read small** — value rendering gains `indicatorValueParts`
+  (number/unit split; `formatIndicatorValue` is now the exact join of the
+  parts, outputs byte-identical everywhere). In the tiles the number keeps
+  the 23.2px number role while word-units ('دلار آمریکا', 'pts') render at
+  caption size on the number's baseline — '۱۲۵٫۴۴ دلار آمریکا' stays on
+  ONE row at every desktop width from ~1110px up (the old full-size unit
+  wrapped it to two rows). Percent signs and prefixed 'US$' stay glued to
+  the number as before. Below ~1110px the unit wraps as a whole word-block
+  under the number (the 3-across tile band 768–1130px physically cannot
+  fit a 90px number plus a word-unit — pre-existing geometry, and the
+  tile faces stay tidy when it happens).
+- Tiles tighten half a step to make the row fit (`px-3`→`px-2`, tile grid
+  gap 6→4px, value gap 6→4px, unit weight 700→600) — the owner's ~1136px
+  viewport now carries ~5px of slack instead of a knife edge.
+
+### Verified
+
+- Gates: typecheck 5/5; tests 804/804; build ✓; bundle budgets held
+  (Insights 332.35/85.76 vs 334.00/86.00; entry 290.33/87.83).
+- Local QA (wrangler :8787, KV from prod): en + fa, light + dark, at 1280 —
+  both panels' tile rows pixel-equal (ul top 457 = 457, tile heights
+  137 = 137, values all at y 501, one line 31px each); the fa Brent tile's
+  'دلار آمریکا' reads small on the number's baseline (top 511 vs 501 —
+  same row); 1136 — rows still pixel-equal, oil value one line with ~5px
+  slack; 375 — single-column tiles, no horizontal overflow; "+n more"
+  reveal works in place (3→5 tiles); how-link pinned 16px off the panel
+  bottom in both blocks; zero page errors, zero console errors.
+- Release: commit + staged-diff token scan clean, pushed via one-shot PAT
+  URL, wrangler deploy, production verified (health, chunk byte-compare,
+  live browser pass).
+
 ## [2026-10-11] — Each region's metrics move into their own mother container (owner round 39)
 
 Thirty-ninth round — an owner note with a screenshot of the Global section:

@@ -187,20 +187,30 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
 /** The Fed target corridor's half-width (the FOMC has used 25bp since 2008). */
 const FED_CORRIDOR_HALF = 0.125;
 
-/** Current-value rendering, e.g. '5.31%', 'US$23,343bn', '۰٫۴۸'. */
-export function formatIndicatorValue(
+/** R40: value/unit split for renderers that style the unit separately —
+ * the hero attention tiles read the unit SMALL so a long word-unit label
+ * ('۱۲۵٫۴۴ دلار آمریکا') never pushes the value onto a second row.
+ * `unit` is null when the unit binds tight (percent, prefixed US$/¥/CN¥,
+ * the fed corridor) or is absent. `formatIndicatorValue` below is the
+ * exact join of these parts — outputs stay byte-identical everywhere. */
+export interface IndicatorValueParts {
+  value: string;
+  unit: string | null;
+}
+
+export function indicatorValueParts(
   id: IndicatorId,
   value: number,
   numberLocale: 'en-US' | 'fa-IR',
   units: UnitLabels,
-): string {
+): IndicatorValueParts {
   const cfg = DISPLAY[id];
   const num = formatNumber(value * (cfg.scale ?? 1), numberLocale, {
     minimumFractionDigits: cfg.decimals,
     maximumFractionDigits: cfg.decimals,
   });
   const unit = units[cfg.unit];
-  if (!unit) return num;
+  if (!unit) return { value: num, unit: null };
   if (cfg.range) {
     // '3.50–3.75%' — the corridor around the stored midpoint (definitions
     // note: exact binary-representable quarters, no float dust).
@@ -208,11 +218,22 @@ export function formatIndicatorValue(
       minimumFractionDigits: cfg.decimals,
       maximumFractionDigits: cfg.decimals,
     });
-    return `${lo}–${num}${unit}`;
+    return { value: `${lo}–${num}${unit}`, unit: null };
   }
-  if (cfg.unit === 'percent') return `${num}${unit}`; // '5.31%' / '۵٫۳۱٪' — no space, both locales.
-  if (numberLocale === 'en-US' && PREFIXED_UNITS.has(cfg.unit)) return `${unit}${num}`; // 'US$113.96'
-  return `${num} ${unit}`; // '۱۱۳٫۹۶ دلار آمریکا' / '0.48 pts'
+  if (cfg.unit === 'percent') return { value: `${num}${unit}`, unit: null }; // '5.31%' / '۵٫۳۱٪' — no space, both locales.
+  if (numberLocale === 'en-US' && PREFIXED_UNITS.has(cfg.unit)) return { value: `${unit}${num}`, unit: null }; // 'US$113.96'
+  return { value: num, unit }; // '۱۱۳٫۹۶ دلار آمریکا' / '0.48 pts'
+}
+
+/** Current-value rendering, e.g. '5.31%', 'US$23,343bn', '۰٫۴۸'. */
+export function formatIndicatorValue(
+  id: IndicatorId,
+  value: number,
+  numberLocale: 'en-US' | 'fa-IR',
+  units: UnitLabels,
+): string {
+  const parts = indicatorValueParts(id, value, numberLocale, units);
+  return parts.unit === null ? parts.value : `${parts.value} ${parts.unit}`;
 }
 
 /** Signed 7/30-day change rendering ('+0.62%' / '+۰٫۱۱ نقطه'). Render inside dir="ltr". */

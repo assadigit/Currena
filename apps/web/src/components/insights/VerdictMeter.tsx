@@ -15,6 +15,13 @@
  * 128px artwork here was visual noise; the BIG icons belong to the
  * dedicated Global/Australia sections mid-page.
  *
+ * Round 40 (owner): the two regions' attention-tile ROWS align — the
+ * count line + tiles + "+n more" + how-link are ONE bottom-anchored
+ * module (single mt-auto), and each tile face is geometry-fixed (2-line
+ * clamped name / one-line value / 3-line clamped meaning) so the row's
+ * height is identical across regions. The value's unit reads SMALL so a
+ * long currency label ('۱۲۵٫۴۴ دلار آمریکا') keeps the number's row.
+ *
  * Round-2 D7: Global renders first (no swap setting — retired).
  */
 
@@ -32,6 +39,7 @@ import {
   formatIndicatorValue,
   formatRuleText,
   heroReason,
+  indicatorValueParts,
   stepToneClass,
 } from './config';
 
@@ -255,90 +263,108 @@ export function VerdictBlock({
       <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
         {reason}
       </p>
-      <p
-        className={`m-0 text-[length:var(--type-caption)] font-semibold ${attentionToneClass(tiles.length)}`}
-        data-attention-count
-      >
-        {interpolate(copy.ui.inAlert, {
-          warnings: num(tiles.length, numberLocale),
-          voting: num(voting, numberLocale),
-        })}
-      </p>
+      {/* R3 → round 24 → R40 (owner): the count line, the needs-attention
+       * tiles WITH NUMBERS (largest text in the tile), the "+n more"
+       * reveal and the how-link are ONE bottom-anchored module — a single
+       * mt-auto pins its top edge, so the tile ROW starts at the same y in
+       * BOTH hero panels by structure (the alignment decree): Australia's
+       * taller gauge/reason block used to push its row lower and the two
+       * rows zig-zagged; the free space now lives above the module. Each
+       * tile face is geometry-fixed — 2-line clamped name, one-line value
+       * with the unit read SMALL (R40: '۱۲۵٫۴۴ دلار آمریکا' keeps the
+       * number's row), 3-line clamped meaning — so the row height is
+       * identical across regions. The tint is softened — red is reserved
+       * for the words and the count, not a wall of pink. */}
+      <div className="mt-auto" data-attention-module>
+        <p
+          className={`m-0 text-[length:var(--type-caption)] font-semibold ${attentionToneClass(tiles.length)}`}
+          data-attention-count
+        >
+          {interpolate(copy.ui.inAlert, {
+            warnings: num(tiles.length, numberLocale),
+            voting: num(voting, numberLocale),
+          })}
+        </p>
 
-      {/* R3 → round 24: the needs-attention tiles WITH NUMBERS (largest
-       * text in the tile). The count line above IS the section label now —
-       * the old separate kicker repeated it verbatim (the roast). Each
-       * tile carries its MEANING line (what the fired rule means), not
-       * the raw rule ("fix this first" #1); the rule lives in Details.
-       * The tint is softened — red is reserved for the words and the
-       * count, not a wall of pink (the roast: "soften the hero tiles"). */}
-      {shown.length > 0 ? (
-        <div>
-          <ul className="m-0 grid list-none grid-cols-1 gap-1.5 p-0 sm:grid-cols-3" aria-label={copy.ui.attentionTilesLabel}>
-            {shown.map(({ id }) => {
-              const r = readings.find((x) => x.id === id);
-              if (!r) return null;
-              const meaning = copy.meaning[id];
-              const meaningText =
-                meaning ??
-                interpolate(copy.ui.attentionTileRule, {
-                  rule: formatRuleText(definitionFor(id).rule, id, copy.rule, copy.units, numberLocale),
-                  value: r.value !== null ? formatIndicatorValue(id, r.value, numberLocale, copy.units) : copy.ui.na,
-                });
-              const valueText =
-                r.value !== null ? formatIndicatorValue(id, r.value, numberLocale, copy.units) : null;
-              return (
-                <li key={id}>
-                  <button
-                    type="button"
-                    onClick={() => onFocusCard(id)}
-                    className="insights-focusable flex h-full w-full cursor-pointer flex-col items-start gap-0.5 rounded-[var(--radius-md)] bg-currena-warning/[0.07] px-3 py-2 text-start ring-1 ring-currena-warning/20 transition-colors hover:bg-currena-warning/[0.13]"
-                  >
-                    <span className="line-clamp-2 min-h-[2.75em] text-[length:var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
-                      {/* Round 28: the tile's indicator wears its artwork when
-                       * one exists — inline so the clamped name stays tidy.
-                       * Round 29: 20/24px, visible at the tile's scale. */}
-                      {indicatorIconUrl(id) !== null ? (
-                        <IconImg src={indicatorIconUrl(id)!} size={20} desktopSize={24} className="me-1 inline-block align-text-bottom" />
+        {shown.length > 0 ? (
+          <div className="mt-2">
+            <ul className="m-0 grid list-none grid-cols-1 gap-1 p-0 sm:grid-cols-3" aria-label={copy.ui.attentionTilesLabel}>
+              {shown.map(({ id }) => {
+                const r = readings.find((x) => x.id === id);
+                if (!r) return null;
+                const meaning = copy.meaning[id];
+                const meaningText =
+                  meaning ??
+                  interpolate(copy.ui.attentionTileRule, {
+                    rule: formatRuleText(definitionFor(id).rule, id, copy.rule, copy.units, numberLocale),
+                    value: r.value !== null ? formatIndicatorValue(id, r.value, numberLocale, copy.units) : copy.ui.na,
+                  });
+                const valueParts =
+                  r.value !== null ? indicatorValueParts(id, r.value, numberLocale, copy.units) : null;
+                return (
+                  <li key={id}>
+                    <button
+                      type="button"
+                      onClick={() => onFocusCard(id)}
+                      className="insights-focusable flex h-full w-full cursor-pointer flex-col items-start gap-0.5 rounded-[var(--radius-md)] bg-currena-warning/[0.07] px-2 py-2 text-start ring-1 ring-currena-warning/20 transition-colors hover:bg-currena-warning/[0.13]"
+                    >
+                      <span className="flex h-[2.75em] w-full items-start gap-1 text-[length:var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
+                        {/* Round 28: the tile's indicator wears its artwork when
+                         * one exists. R40: the artwork leaves the text flow — a
+                         * flex sibling beside the clamped name, so a 24px icon
+                         * can no longer inflate the line box (the old inline
+                         * icon made 2-line titles 41px vs 34px and pushed that
+                         * tile's value 7px below its neighbours); the title row
+                         * is now EXACTLY 2.75em in every tile (the alignment
+                         * decree). Round 29: 20/24px, visible at tile scale. */}
+                        {indicatorIconUrl(id) !== null ? (
+                          <IconImg src={indicatorIconUrl(id)!} size={20} desktopSize={24} />
+                        ) : null}
+                        <span className="line-clamp-2 min-w-0 flex-1">{copy.indicators[id].name}</span>
+                      </span>
+                      {valueParts !== null ? (
+                        <bdi className="type-number inline-flex flex-wrap items-baseline gap-x-1 text-[var(--color-text-primary)]">
+                          <span>{valueParts.value}</span>
+                          {valueParts.unit !== null ? (
+                            <span className="whitespace-nowrap text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+                              {valueParts.unit}
+                            </span>
+                          ) : null}
+                        </bdi>
                       ) : null}
-                      {copy.indicators[id].name}
-                    </span>
-                    {valueText !== null ? (
-                      <bdi className="type-number tabular-nums text-[var(--color-text-primary)]">
-                        {valueText}
-                      </bdi>
-                    ) : null}
-                    <span className="text-[length:var(--type-caption)] leading-snug text-[var(--color-text-secondary)]">
-                      {meaningText}
-                    </span>
-                    <span className="sr-only">, {copy.ui.viewCard}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-          {tiles.length > 3 && !revealAllTiles ? (
-            <button
-              type="button"
-              aria-expanded={false}
-              onClick={() => setRevealAllTiles(true)}
-              className="insights-focusable mt-1.5 inline-flex min-h-[24px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
-            >
-              {interpolate(copy.ui.attentionTileMore, { n: num(tiles.length - 3, numberLocale) })}
-            </button>
-          ) : null}
-        </div>
-      ) : null}
+                      <span className="mt-auto line-clamp-3 min-h-[4.125em] text-[length:var(--type-caption)] leading-snug text-[var(--color-text-secondary)]">
+                        {meaningText}
+                      </span>
+                      <span className="sr-only">, {copy.ui.viewCard}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            {tiles.length > 3 && !revealAllTiles ? (
+              <button
+                type="button"
+                aria-expanded={false}
+                onClick={() => setRevealAllTiles(true)}
+                className="insights-focusable mt-1.5 inline-flex min-h-[24px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
+              >
+                {interpolate(copy.ui.attentionTileMore, { n: num(tiles.length - 3, numberLocale) })}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
 
-      {/* H1: keep the "how is this computed?" link — pinned to the card's
-       * bottom edge so the shorter card carries no floating void. */}
-      <button
-        type="button"
-        onClick={onJumpAbout}
-        className="insights-focusable -ms-1.5 mt-auto w-fit cursor-pointer rounded-lg border-0 bg-transparent px-1.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
-      >
-        {copy.ui.howCalculated}
-      </button>
+        {/* H1 → R40: the "how is this computed?" link rides INSIDE the
+         * anchored module — it keeps its place at the tiles' bottom edge
+         * without owning the card's free space any more. */}
+        <button
+          type="button"
+          onClick={onJumpAbout}
+          className="insights-focusable -ms-1.5 mt-1.5 w-fit cursor-pointer rounded-lg border-0 bg-transparent px-1.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+        >
+          {copy.ui.howCalculated}
+        </button>
+      </div>
     </article>
   );
 }
