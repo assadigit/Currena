@@ -4,7 +4,7 @@
  * the SPA-facing root export (".") never pulls the provider fetch halves,
  * exactly like "./adapters" vs "." before it.
  *
- *   definitions — the 14 markets + the owner-editable CONFIG block
+ *   definitions — the 16 markets + the owner-editable CONFIG block
  *   providers   — EODHD + Yahoo adapters, one common series shape
  *   compute     — validation R1–R7, derived numbers, status, signal, hash
  *   job         — the §3.4 fetch chain (main + retry runs)

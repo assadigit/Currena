@@ -24,6 +24,17 @@ Raw provider answers are cached (gitignored) under `packages/insights/fixtures/m
 
 **Summary:** 13 of 14 markets answered by both providers; 7 agree to the cent on the same date, 3 more within the 0.5% agreement rule (R5). Fresh calls this run: 0 EODHD + 0 Yahoo (the rest served from the local cache).
 
+## Round 44 (2026-10-12): the Dow Jones and CAC 40 join the list
+
+Owner ask: cover every globally important exchange. The two gaps worth closing — the world's most headline-famous index (Dow Jones) and the eurozone's #2 economy (CAC 40) — were verified live on both providers (2 EODHD + 2 Yahoo calls at ~11:58 UTC):
+
+| Market | Group | EODHD code | EODHD last close · date | Yahoo symbol | Yahoo last close · date | Agreement |
+|---|---|---|---|---|---|---|
+| Dow Jones | Americas | DJI.INDX | 51179.87 · 2026-10-07 | ^DJI | 51179.87 · 2026-10-07 | exact (to the cent, several dates) |
+| CAC 40 | Europe | FCHI.INDX | 7769.21 · 2026-10-07 | ^FCHI | 7769.21 · 2026-10-07 | exact (to the cent, several dates) |
+
+Both INDX codes answer on the free key with one year of history (the usual free-plan warning row rides along, as with the other 13). The list is now 16 markets: Asia-Pacific 7 · Europe 4 · Americas 5 — still no group above 7 tiles (§6.3).
+
 The four ⚠ rows were fetched while those Asian markets were still LIVE in their Monday session (the check ran at ~02:00 UTC): Yahoo's last point was Monday's intraday snapshot while EODHD had only settled closes. The production runs sit at 23:30 / 01:30 UTC, when every market has closed and both providers agree on final values — the check below (run against settled dates) shows what that looks like.
 
 ## EODHD code verification (spec §2's "VERIFY" column)
@@ -46,11 +57,11 @@ Reading the DAX row: EODHD and Yahoo both report the 17:30 CET Xetra closing auc
 
 ## Budget notes for the first production day
 
-The data-check calls above spend part of the EODHD free quota's UTC day. The first scheduled 23:30 UTC run after deploy may therefore see a few 429s; those markets simply arrive via the Yahoo fallback that day (the chain is designed for it), and from the next UTC day the steady state is ~13 EODHD calls per main run, within the 20/day free plan with the retry run's quota guard (see `src/markets/job.ts`).
+The data-check calls above spend part of the EODHD free quota's UTC day. The first scheduled 23:30 UTC run after deploy may therefore see a few 429s; those markets simply arrive via the Yahoo fallback that day (the chain is designed for it), and from the next UTC day the steady state is ~15 EODHD calls per main run (16 markets, FTSE via Yahoo), within the 20/day free plan with the retry run's quota guard (see `src/markets/job.ts`).
 
 ## KV usage after one week live (§4 rule 9 — to be recorded)
 
 To fill in after the first week live:
 - Daily KV writes attributable to `insights:markets:v1` (target: ≤1 per day, zero on weekends/holidays).
 - Daily KV reads for the markets route (target: comfortably under 1% of the 100,000/day free limit).
-- Provider calls per run (target: ≤14 EODHD, subrequests ≤28 of 50).
+- Provider calls per run (target: ≤15 EODHD + 1 Yahoo, subrequests ≤17 of 50).

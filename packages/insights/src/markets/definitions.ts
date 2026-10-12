@@ -33,6 +33,13 @@ export const SHOCK_DAY_FALL = -2;
 /** Markets that must fall that much on the same day for the shock-day line. */
 export const SHOCK_DAY_COUNT = 5;
 
+/**
+ * The section's NORMAL timeframe (owner round 44, spec v1.2): the second
+ * lens and the table/CSV column show the change over the last ~three
+ * months — the window providers are asked about, in calendar days.
+ */
+export const CHG_WINDOW_DAYS = 90;
+
 /** Trend rule: moving-average length in trading days (spec §5.1). */
 export const TREND_MA_DAYS = 50;
 /** Trend rule: band around the average, in percent (up above +1, down below −1). */
@@ -70,7 +77,8 @@ export const YAHOO_USER_AGENT =
 export const MARKETS_KV_KEY = 'insights:markets:v1';
 
 /* ------------------------------------------------------------------ *
- * The 14 markets (spec §2 — order follows the trading day, east to west)
+ * The 16 markets (spec §2 as amended by owner round 44 — order follows
+ * the trading day, east to west)
  * ------------------------------------------------------------------ */
 
 export interface MarketDefinition {
@@ -87,7 +95,9 @@ export interface MarketDefinition {
   yahooSymbol: string;
 }
 
-/** Fixed for v1 (spec §2): no additions, no removals. */
+/** Fixed for v1 (spec §2 + owner round 44: the Dow Jones and CAC 40 joined
+ * the original 14 after live provider verification — see
+ * docs/specs/insights-world-markets-data-check.md). */
 export const MARKETS: readonly MarketDefinition[] = [
   { id: 'n225', group: 'asia', eodhdCode: 'N225.INDX', yahooSymbol: '^N225' },
   { id: 'asx200', group: 'asia', eodhdCode: 'AXJO.INDX', yahooSymbol: '^AXJO' },
@@ -98,9 +108,11 @@ export const MARKETS: readonly MarketDefinition[] = [
   { id: 'nifty50', group: 'asia', eodhdCode: 'NSEI.INDX', yahooSymbol: '^NSEI' },
   { id: 'stoxx50', group: 'europe', eodhdCode: 'STOXX50E.INDX', yahooSymbol: '^STOXX50E' },
   { id: 'dax', group: 'europe', eodhdCode: 'GDAXI.INDX', yahooSymbol: '^GDAXI' },
+  { id: 'cac', group: 'europe', eodhdCode: 'FCHI.INDX', yahooSymbol: '^FCHI' },
   { id: 'ftse', group: 'europe', eodhdCode: null, yahooSymbol: '^FTSE' },
   { id: 'sp500', group: 'americas', eodhdCode: 'GSPC.INDX', yahooSymbol: '^GSPC' },
   { id: 'ndx', group: 'americas', eodhdCode: 'NDX.INDX', yahooSymbol: '^NDX' },
+  { id: 'dow', group: 'americas', eodhdCode: 'DJI.INDX', yahooSymbol: '^DJI' },
   { id: 'tsx', group: 'americas', eodhdCode: 'GSPTSE.INDX', yahooSymbol: '^GSPTSE' },
   { id: 'ibov', group: 'americas', eodhdCode: 'BVSP.INDX', yahooSymbol: '^BVSP' },
 ];

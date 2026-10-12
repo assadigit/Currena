@@ -94,7 +94,7 @@ export interface MarketsAlert {
   signal: 'attention' | 'unusual';
   /** Markets in Correction or Bear market. */
   n: number;
-  /** Total market rows (14 once populated). */
+  /** Total market rows (16 once populated). */
   count: number;
 }
 

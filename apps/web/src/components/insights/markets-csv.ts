@@ -33,7 +33,7 @@ export function marketsCsvHeaders(copy: InsightsCopy): string[] {
   return [
     copy.markets.csvColMarket,
     copy.markets.csvColToday,
-    copy.markets.csvCol1m,
+    copy.markets.csvCol3m,
     copy.markets.csvColFromHigh,
     copy.markets.csvColTrend,
     copy.markets.csvColStatus,
@@ -61,7 +61,7 @@ export function buildMarketsCsv(snapshot: MarketsSnapshot, copy: InsightsCopy): 
       [
         csvText(copy.markets.entries[m.id].name),
         csvNumber(m.chg1d),
-        csvNumber(m.chg1m),
+        csvNumber(m.chg3m),
         csvNumber(m.fromHigh),
         csvText(trendWord(m, copy)),
         csvText(statusWord(m, copy)),

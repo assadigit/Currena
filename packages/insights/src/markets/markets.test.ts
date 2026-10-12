@@ -68,7 +68,7 @@ function storedEntry(id: MarketId, fields: Partial<MarketEntry> = {}): MarketEnt
     asOf: '2026-10-09',
     close: 100,
     chg1d: 0.5,
-    chg1m: 1.5,
+    chg3m: 1.5,
     high52w: 120,
     low52w: 90,
     fromHigh: -16.7,
@@ -230,7 +230,7 @@ describe('fetchEodhdSeries / fetchYahooSeries', () => {
 describe('trendOf', () => {
   it('is up above +1% of the 50-day average, down below −1%, flat inside', () => {
     // 60 flat points at 100, then the final point moves.
-    const flat = (last: number) => series('sp500', 'eodhd', '2026-10-09', 60, () => 100).points.slice(0, 59).concat([{ date: '2026-10-09', value: last }]);
+    const flat = (last: number) => series('sp500', 'eodhd', '2026-10-09', 140, () => 100).points.slice(0, 59).concat([{ date: '2026-10-09', value: last }]);
     expect(trendOf(flat(101.5))).toBe('up'); // +1.5%
     expect(trendOf(flat(100.5))).toBe('flat'); // +0.5%
     expect(trendOf(flat(99.5))).toBe('flat'); // −0.5%
@@ -262,7 +262,7 @@ describe('statusOf — the 2-point exit buffer (§5.2)', () => {
 describe('weeklySeries — delta encoding', () => {
   it('keeps the LAST close of each calendar week, ≤52 points, decodes back to real dates', () => {
     // Two weeks: Mon–Fri then Mon–Wed (dates chosen as real weekdays).
-    const pts = series('dax', 'eodhd', '2026-10-09', 60).points;
+    const pts = series('dax', 'eodhd', '2026-10-09', 140).points;
     const weekly = weeklySeries(pts);
     expect(weekly.length).toBeLessThanOrEqual(52);
     const decoded = decodeWeeklySeries(weekly);
@@ -295,14 +295,14 @@ describe('resolveMarket — validation rules', () => {
 
   it('same-date stability: an agreeing re-fetch keeps the stored row (no write churn)', () => {
     const prev = storedEntry('sp500', { asOf: '2026-10-09', close: 100 });
-    const fresh = { ...series('sp500', 'eodhd', '2026-10-09', 60), points: series('sp500', 'eodhd', '2026-10-09', 60).points.slice(0, -1).concat([{ date: '2026-10-09', value: 100.2 }]) };
+    const fresh = { ...series('sp500', 'eodhd', '2026-10-09', 140), points: series('sp500', 'eodhd', '2026-10-09', 140).points.slice(0, -1).concat([{ date: '2026-10-09', value: 100.2 }]) };
     const r = resolveMarket({ id: 'sp500', primary: fresh }, prev, RUN_DATE);
     expect(r.held).toBe(true); // 0.2% apart → the same data
   });
 
   it('same-date revision beyond 0.5% is accepted (a genuine provider revision)', () => {
     const prev = storedEntry('sp500', { asOf: '2026-10-09', close: 100 });
-    const base = series('sp500', 'eodhd', '2026-10-09', 60);
+    const base = series('sp500', 'eodhd', '2026-10-09', 140);
     const revised = { ...base, points: base.points.slice(0, -1).concat([{ date: '2026-10-09', value: 103 }]) };
     const r = resolveMarket({ id: 'sp500', primary: revised }, prev, RUN_DATE);
     expect(r.held).toBe(false);
@@ -312,8 +312,8 @@ describe('resolveMarket — validation rules', () => {
   it('R3: a fake 20% jump is held when the second provider disagrees', () => {
     const prev = storedEntry('sp500', { asOf: '2026-10-08' });
     // 59 calm days at 100, then 120 — a +20% "move".
-    const jump = { ...series('sp500', 'eodhd', '2026-10-09', 60), points: series('sp500', 'eodhd', '2026-10-08', 59).points.concat([{ date: '2026-10-09', value: 120 }]) };
-    const calm = series('sp500', 'yahoo', '2026-10-09', 60); // says 100.x
+    const jump = { ...series('sp500', 'eodhd', '2026-10-09', 140), points: series('sp500', 'eodhd', '2026-10-08', 139).points.concat([{ date: '2026-10-09', value: 120 }]) };
+    const calm = series('sp500', 'yahoo', '2026-10-09', 140); // says 100.x
     const r = resolveMarket({ id: 'sp500', primary: jump, secondary: calm }, prev, RUN_DATE);
     expect(r.held).toBe(true);
     expect(r.notes.join(' ')).toMatch(/R3.*disagree/);
@@ -322,8 +322,8 @@ describe('resolveMarket — validation rules', () => {
   it('R3: a real 20% fall is accepted when both providers agree (a genuine crash)', () => {
     const prev = storedEntry('sp500', { asOf: '2026-10-08' });
     const falling = (src: 'eodhd' | 'yahoo') => ({
-      ...series('sp500', src, '2026-10-08', 59),
-      points: series('sp500', src, '2026-10-08', 59).points.concat([{ date: '2026-10-09', value: 80 }]),
+      ...series('sp500', src, '2026-10-08', 139),
+      points: series('sp500', src, '2026-10-08', 139).points.concat([{ date: '2026-10-09', value: 80 }]),
     });
     const r = resolveMarket({ id: 'sp500', primary: falling('eodhd'), secondary: falling('yahoo') }, prev, RUN_DATE);
     expect(r.held).toBe(false);
@@ -334,8 +334,8 @@ describe('resolveMarket — validation rules', () => {
   it('R3: a suspicious move without any second voice is held', () => {
     const prev = storedEntry('sp500', { asOf: '2026-10-08' });
     const jump = {
-      ...series('sp500', 'eodhd', '2026-10-09', 60),
-      points: series('sp500', 'eodhd', '2026-10-08', 59).points.concat([{ date: '2026-10-09', value: 130 }]),
+      ...series('sp500', 'eodhd', '2026-10-09', 140),
+      points: series('sp500', 'eodhd', '2026-10-08', 139).points.concat([{ date: '2026-10-09', value: 130 }]),
     };
     const r = resolveMarket({ id: 'sp500', primary: jump }, prev, RUN_DATE);
     expect(r.held).toBe(true);
@@ -343,24 +343,24 @@ describe('resolveMarket — validation rules', () => {
 
   it('R5: disagreement between providers is logged as a note while the winner serves', () => {
     const prev = storedEntry('sp500', { asOf: '2026-10-08' });
-    const a = series('sp500', 'eodhd', '2026-10-09', 60);
-    const b = { ...series('sp500', 'yahoo', '2026-10-09', 60), points: series('sp500', 'yahoo', '2026-10-09', 60).points.slice(0, -1).concat([{ date: '2026-10-09', value: 95 }]) };
+    const a = series('sp500', 'eodhd', '2026-10-09', 140);
+    const b = { ...series('sp500', 'yahoo', '2026-10-09', 140), points: series('sp500', 'yahoo', '2026-10-09', 140).points.slice(0, -1).concat([{ date: '2026-10-09', value: 95 }]) };
     const r = resolveMarket({ id: 'sp500', primary: a, secondary: b }, prev, RUN_DATE);
     expect(r.held).toBe(false);
     expect(r.notes.join(' ')).toMatch(/R5/);
   });
 
   it('R6: a last close older than 5 calendar days is marked stale', () => {
-    const r = resolveMarket({ id: 'sp500', primary: series('sp500', 'eodhd', '2026-10-02', 60) }, undefined, RUN_DATE);
+    const r = resolveMarket({ id: 'sp500', primary: series('sp500', 'eodhd', '2026-10-02', 140) }, undefined, RUN_DATE);
     expect(r.entry?.stale).toBe(true); // 10 days old
-    const fresh = resolveMarket({ id: 'sp500', primary: series('sp500', 'eodhd', '2026-10-09', 60) }, undefined, RUN_DATE);
+    const fresh = resolveMarket({ id: 'sp500', primary: series('sp500', 'eodhd', '2026-10-09', 140) }, undefined, RUN_DATE);
     expect(fresh.entry?.stale).toBe(false);
   });
 
   it('R7: a first-ever suspicious move is accepted with a note (nothing to hold)', () => {
     const jump = {
-      ...series('sp500', 'eodhd', '2026-10-09', 60),
-      points: series('sp500', 'eodhd', '2026-10-08', 59).points.concat([{ date: '2026-10-09', value: 125 }]),
+      ...series('sp500', 'eodhd', '2026-10-09', 140),
+      points: series('sp500', 'eodhd', '2026-10-08', 139).points.concat([{ date: '2026-10-09', value: 125 }]),
     };
     const r = resolveMarket({ id: 'sp500', primary: jump }, undefined, RUN_DATE);
     expect(r.held).toBe(false);
@@ -537,7 +537,7 @@ describe('lastExpectedCloseDate / marketsNeedingData / retryRunOptions', () => {
   });
 
   it('no stored snapshot → the first run covers everything', () => {
-    expect(retryRunOptions(undefined, '2026-10-13').onlyIds?.length).toBe(14);
+    expect(retryRunOptions(undefined, '2026-10-13').onlyIds?.length).toBe(16);
   });
 });
 
@@ -553,7 +553,7 @@ describe('runMarketsJob — the §3.4 chain with injected fetchers', () => {
       },
     };
     const res = await runMarketsJob(fetchers, { kind: 'main', providerOrder: 'eodhd-first' }, undefined, RUN_DATE);
-    expect(res.providerCalls.eodhd).toBe(14);
+    expect(res.providerCalls.eodhd).toBe(16);
     expect(res.providerCalls.yahoo).toBe(0);
     expect(res.resolutions.every((r) => !r.held)).toBe(true);
   });
@@ -568,7 +568,7 @@ describe('runMarketsJob — the §3.4 chain with injected fetchers', () => {
     const ftse = res.reports.find((r) => r.id === 'ftse')!;
     expect(ftse.usedSource).toBe('yahoo');
     expect(ftse.called).toEqual(['eodhd', 'yahoo']);
-    expect(res.providerCalls.eodhd).toBe(14);
+    expect(res.providerCalls.eodhd).toBe(16);
     expect(res.providerCalls.yahoo).toBe(1);
   });
 

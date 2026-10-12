@@ -1,23 +1,34 @@
 /**
  * WorldMarkets — the "World stock markets" section
- * (insights-world-markets-spec.md §6, blocks 6.2–6.9).
+ * (insights-world-markets-spec.md §6, blocks 6.2–6.9, as amended by owner
+ * round 44 / spec v1.2).
  *
  * Where: directly after the commodity prices (PricesBoard) — both answer
  * "what is moving"; never above the verdict or alerts (§6.2).
  *
- * Anatomy (§6.3): header row (title + as-of date) → takeaway line → the
- * Today | 1 month | From 52-week-high view switch → a strip of three
- * labelled groups (Asia-Pacific · Europe · Americas, the world waking up
- * east to west — in Farsi the DOM order renders Asia-Pacific at the right,
- * exactly the reading direction) → "Show full table" disclosure → the
- * source footer line.
+ * MOTHER CONTAINER (owner round 44, mirroring the regions' round 39): the
+ * whole section — heading, verdict, tiles, panels, table — lives inside ONE
+ * soft-tinted container with a hairline ring and a quiet shadow, so the
+ * heading never reads stray and the white cards inside (the verdict box,
+ * the tiles) sit as a LAYER on the field: depth by structure.
+ *
+ * Anatomy: header row (the owner's exchange-chart artwork at the regions'
+ * 96/128 scale + title + as-of date) → the focal VERDICT BOX — a white
+ * surface card wearing the same [state artwork][verdict word][meter]
+ * anatomy as the page's other verdicts, with the market words Bullish /
+ * Mixed / Correcting / Bearish and the takeaway as its reason line → the
+ * Today | 3 months | From 52-week-high view switch (3 months is the NORMAL
+ * timeframe — owner round 44) → a strip of three labelled groups
+ * (Asia-Pacific · Europe · Americas, the world waking up east to west) →
+ * "Show full table" disclosure. The source line moved to the page footer
+ * (About this data) with the other credits — owner round 44.
  *
  * Quiet by default (§6.3): only Correction/Bear markets carry an extra
- * tag; Normal tiles stay plain so problems stand out without colour
- * tricks. Direction is never colour alone — the signed number, the arrow
- * glyph and text chips carry the meaning (§6.8); the page's warning inks
- * appear only on Correction (needs-attention tier) and Bear (unusual
- * tier), matching StatusChip's tone mapping.
+ * tag; Normal tiles stay plain so problems stand out. Direction is never
+ * colour alone (§6.8) — the signed number, the owner's up/down artwork
+ * and text chips all carry it together (round 44: the PNG arrows join
+ * the number, they don't replace it); the page's warning inks appear only
+ * on Correction (needs-attention tier) and Bear (unusual tier).
  *
  * States (§6.6): loading skeletons; the calm "being prepared" line; a
  * single old market keeps its last good value with an "Old data · date"
@@ -32,7 +43,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { MarketEntry, MarketId, MarketsSnapshot } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { Globe } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import {
@@ -44,6 +54,15 @@ import {
   decodeWeeklySeries,
 } from '@currena/insights/markets/definitions';
 import { MarketsChart } from './MarketsChart';
+import { VerdictMeter } from './VerdictMeter';
+import { stepToneClass } from './config';
+import {
+  DIRECTION_DOWN_URL,
+  DIRECTION_UP_URL,
+  IconImg,
+  MARKETS_SECTION_ICON_URL,
+  stateIconUrl,
+} from '../icons/currena';
 import { Skeleton } from '../ui';
 import { formatAsOf } from './HistoryChart';
 
@@ -53,7 +72,9 @@ export type MarketsLoadState =
   | { kind: 'empty' }
   | { kind: 'ready'; snapshot: MarketsSnapshot };
 
-type MarketsView = 'today' | '1m' | 'high';
+/** The section's lenses: today, the NORMAL 3-month window, or the distance
+ * from the 52-week high (spec §6.3 as amended by owner round 44). */
+type MarketsView = 'today' | '3m' | 'high';
 
 /* ------------------------------------------------------------------ *
  * Pure display helpers
@@ -70,19 +91,34 @@ function signedPct(n: number, numberLocale: 'en-US' | 'fa-IR', locale: 'en' | 'f
   return `${sign}${num}${locale === 'fa' ? '٪' : '%'}`;
 }
 
-function arrowOf(n: number): '↑' | '→' | '↓' {
-  if (n > 0) return '↑';
-  if (n < 0) return '↓';
-  return '→';
+function arrowOf(n: number): 'up' | 'flat' | 'down' {
+  if (n > 0) return 'up';
+  if (n < 0) return 'down';
+  return 'flat';
 }
 
 /** The number + direction the current view shows for one market. */
-function viewValue(m: MarketEntry, view: MarketsView): { pct: number; arrow: '↑' | '→' | '↓' } {
+function viewValue(m: MarketEntry, view: MarketsView): { pct: number; arrow: 'up' | 'flat' | 'down' } {
   if (view === 'high') {
-    return { pct: m.fromHigh, arrow: m.fromHigh <= -1 ? '↓' : '→' };
+    return { pct: m.fromHigh, arrow: m.fromHigh <= -1 ? 'down' : 'flat' };
   }
-  const pct = view === 'today' ? m.chg1d : m.chg1m;
+  const pct = view === 'today' ? m.chg1d : m.chg3m;
   return { pct, arrow: arrowOf(pct) };
+}
+
+/** The owner's green up / red down artwork beside a signed percentage
+ * (owner round 44). The flat case keeps a stroke-ish text glyph — there is
+ * no "flat" artwork (the same rule as Signals.tsx' estimation strip). The
+ * icons are decorative: the signed number beside them carries the meaning,
+ * so colour is never alone (§6.8). */
+function DirectionGlyph({ arrow, size = 14, desktopSize = 16 }: { arrow: 'up' | 'flat' | 'down'; size?: number; desktopSize?: number }) {
+  if (arrow === 'up') return <IconImg src={DIRECTION_UP_URL} size={size} desktopSize={desktopSize} />;
+  if (arrow === 'down') return <IconImg src={DIRECTION_DOWN_URL} size={size} desktopSize={desktopSize} />;
+  return (
+    <span aria-hidden="true" className="text-[0.8em] leading-none text-[var(--color-text-secondary)]">
+      →
+    </span>
+  );
 }
 
 /** Client-side R6 (§6.6): the honest old-data evaluation, whatever the stored flag says. */
@@ -114,16 +150,18 @@ const TREND_WORD: Record<MarketEntry['trend'], 'trendUp' | 'trendFlat' | 'trendD
   down: 'trendDown',
 };
 
-const TREND_ARROW: Record<MarketEntry['trend'], string> = { up: '↑', flat: '→', down: '↓' };
+const TREND_ARROW: Record<MarketEntry['trend'], 'up' | 'flat' | 'down'> = { up: 'up', flat: 'flat', down: 'down' };
 
 /* ------------------------------------------------------------------ *
- * The view switch (§6.3): a real radiogroup, arrow keys work
+ * The view switch (§6.3): a real radiogroup, arrow keys work. The NORMAL
+ * timeframe is 3 months — it is the lens the section opens on (owner
+ * round 44; Today stays one tap away).
  * ------------------------------------------------------------------ */
 
-const VIEWS: readonly MarketsView[] = ['today', '1m', 'high'];
-const VIEW_LABEL: Record<MarketsView, 'viewToday' | 'view1m' | 'viewFromHigh'> = {
+const VIEWS: readonly MarketsView[] = ['today', '3m', 'high'];
+const VIEW_LABEL: Record<MarketsView, 'viewToday' | 'view3m' | 'viewFromHigh'> = {
   today: 'viewToday',
-  '1m': 'view1m',
+  '3m': 'view3m',
   high: 'viewFromHigh',
 };
 
@@ -232,15 +270,14 @@ function MarketTile({
       <span className="w-full text-[length:var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
         {marketCopy.name}
       </span>
-      {/* The number + arrow: neutral ink — direction rides on the signed
-       * number and the glyph, never on colour (§6.8). */}
-      <span className="inline-flex items-baseline gap-0.5 font-semibold text-[var(--color-text-primary)]">
+      {/* The number + the owner's up/down artwork: the signed number
+       * carries the meaning, the green/red zigzags ride beside it (round
+       * 44) — direction is never colour alone (§6.8). */}
+      <span className="inline-flex items-center gap-1 font-semibold text-[var(--color-text-primary)]">
         <bdi dir="ltr" className="type-number tabular-nums">
           {signedPct(pct, numberLocale, locale)}
         </bdi>
-        <span aria-hidden="true" className="text-[0.8em] leading-none">
-          {arrow}
-        </span>
+        <DirectionGlyph arrow={arrow} />
       </span>
       {showTag ? (
         <span
@@ -287,7 +324,7 @@ function MarketDetail({
   return (
     <div
       id={`insights-market-detail-${entry.id}`}
-      className="rounded-[var(--radius-md)] bg-currena-soft/40 p-3 ring-1 ring-[var(--color-border)]"
+      className="rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)]"
     >
       <p className="m-0 mb-1 flex flex-wrap items-baseline gap-x-2 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
         {marketCopy.name}
@@ -359,27 +396,91 @@ function MarketDetail({
 }
 
 /* ------------------------------------------------------------------ *
+ * The section verdict (owner round 44) — the focal box's word, computed
+ * from the numbers like every other verdict on this page: the §5.3
+ * signal sets the band (unusual → 4 Bearish, attention → 3 Correcting),
+ * and a calm signal splits on 3-month BREADTH — most markets up → 1
+ * Bullish, otherwise 2 Mixed. Pure and exported: the test drives it
+ * directly (markets-verdict.test.ts).
+ * ------------------------------------------------------------------ */
+
+export type MarketsVerdictStep = 1 | 2 | 3 | 4;
+
+export function marketsVerdictStep(snapshot: Pick<MarketsSnapshot, 'markets' | 'summary'>): MarketsVerdictStep {
+  const { summary, markets } = snapshot;
+  if (summary.signal === 'unusual') return 4;
+  if (summary.signal === 'attention') return 3;
+  if (markets.length === 0) return 2;
+  const up = markets.filter((m) => m.chg3m > 0).length;
+  return up > markets.length / 2 ? 1 : 2;
+}
+
+const VERDICT_WORD: Record<MarketsVerdictStep, 'verdictBullish' | 'verdictMixed' | 'verdictCorrecting' | 'verdictBearish'> = {
+  1: 'verdictBullish',
+  2: 'verdictMixed',
+  3: 'verdictCorrecting',
+  4: 'verdictBearish',
+};
+
+/** The verdict box — the section's focal point, wearing the page's verdict
+ * anatomy ([state artwork][word][meter], round 41 order: the artwork LEADS)
+ * on a white surface card LAYERED on the mother container's soft field.
+ * The takeaway line rides inside as its computed reason — one box answers
+ * "calm or stressed" before any tile is read. */
+function MarketsVerdictBox({
+  snapshot,
+  copy,
+  numberLocale,
+}: {
+  snapshot: MarketsSnapshot;
+  copy: InsightsCopy;
+  numberLocale: 'en-US' | 'fa-IR';
+}) {
+  const step = marketsVerdictStep(snapshot);
+  const word = copy.markets[VERDICT_WORD[step]];
+  const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
+  const ariaLabel = interpolate(copy.markets.verdictAria, { label: word, step: num(step) });
+  return (
+    <div className="rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-4">
+      <p className="m-0 flex flex-wrap items-center gap-x-3 gap-y-2">
+        {stateIconUrl(step) !== null ? (
+          <IconImg src={stateIconUrl(step)!} size={44} desktopSize={60} className="drop-shadow-sm" />
+        ) : null}
+        <span className={`type-verdict ${stepToneClass(step)}`}>{word}</span>
+        <VerdictMeter step={step} label={word} ariaLabel={ariaLabel} size="lg" />
+      </p>
+      {/* §8.3, generated from the numbers — never free text. */}
+      <p className="m-0 mt-2 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+        <bdi>{marketsTakeaway(snapshot, copy, numberLocale)}</bdi>
+      </p>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
  * The takeaway line (§8.3): generated from the numbers, never free text
  * ------------------------------------------------------------------ */
 
 export function marketsTakeaway(
-  snapshot: MarketsSnapshot,
+  snapshot: Pick<MarketsSnapshot, 'markets' | 'summary'>,
   copy: InsightsCopy,
   numberLocale: 'en-US' | 'fa-IR',
 ): string {
   const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
   const { summary, markets } = snapshot;
   const stressed = summary.nAttention + summary.nUnusual;
+  const count = num(markets.length);
   let line: string;
   if (summary.signal === 'normal') {
-    line = interpolate(copy.markets.takeawayCalm, { up: num(summary.roseToday) });
+    line = interpolate(copy.markets.takeawayCalm, { up: num(summary.roseToday), count });
   } else if (summary.signal === 'attention') {
     line = interpolate(copy.markets.takeawaySome, {
       n: num(stressed),
+      count,
       group: summary.worstGroup !== null ? copy.markets.groups[summary.worstGroup] : copy.markets.groups.asia,
     });
   } else {
-    line = interpolate(copy.markets.takeawayHeavy, { n: num(stressed) });
+    line = interpolate(copy.markets.takeawayHeavy, { n: num(stressed), count });
   }
   // The shock-day line (§5.3): takeaway text only, never part of the count.
   const shocks = markets.filter((m) => m.chg1d <= SHOCK_DAY_FALL).length;
@@ -411,7 +512,7 @@ function MarketsTable({
   // sort keeps the trading-day order inside equal distances.
   const rows = [...snapshot.markets].sort((a, b) => a.fromHigh - b.fromHigh);
   const trendCell = (m: MarketEntry): string => copy.markets[TREND_WORD[m.trend]];
-  const arrow = (m: MarketEntry): string => TREND_ARROW[m.trend];
+  const arrow = (m: MarketEntry): 'up' | 'flat' | 'down' => TREND_ARROW[m.trend];
 
   return (
     <>
@@ -423,7 +524,7 @@ function MarketsTable({
             <tr className="border-b border-[var(--color-border)]">
               <th scope="col" className="px-2 py-1.5 text-start font-bold text-[var(--color-text-secondary)]">{copy.markets.thMarket}</th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thToday}</th>
-              <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.th1m}</th>
+              <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.th3m}</th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thFromHigh}</th>
               <th scope="col" className="px-2 py-1.5 text-start font-bold text-[var(--color-text-secondary)]">{copy.markets.thTrend}</th>
               <th scope="col" className="px-2 py-1.5 text-start font-bold text-[var(--color-text-secondary)]">{copy.markets.thStatus}</th>
@@ -444,13 +545,15 @@ function MarketsTable({
                   <bdi dir="ltr" className="font-semibold">{signedPct(m.chg1d, numberLocale, locale)}</bdi>
                 </td>
                 <td className="px-2 py-1.5 text-end tabular-nums">
-                  <bdi dir="ltr" className="font-semibold">{signedPct(m.chg1m, numberLocale, locale)}</bdi>
+                  <bdi dir="ltr" className="font-semibold">{signedPct(m.chg3m, numberLocale, locale)}</bdi>
                 </td>
                 <td className="px-2 py-1.5 text-end tabular-nums">
                   <bdi dir="ltr" className="font-semibold">{signedPct(m.fromHigh, numberLocale, locale)}</bdi>
                 </td>
                 <td className="px-2 py-1.5 whitespace-nowrap text-[var(--color-text-secondary)]">
-                  <span aria-hidden="true" className="me-1">{arrow(m)}</span>
+                  <span aria-hidden="true" className="me-1 inline-flex align-[-2px]">
+                    <DirectionGlyph arrow={arrow(m)} size={13} desktopSize={14} />
+                  </span>
                   {trendCell(m)}
                 </td>
                 <td className="px-2 py-1.5">
@@ -481,7 +584,7 @@ function MarketsTable({
               </span>
               <span className="inline-flex items-baseline gap-3 text-[length:var(--type-caption)] font-semibold tabular-nums">
                 <bdi dir="ltr">{signedPct(m.chg1d, numberLocale, locale)}</bdi>
-                <bdi dir="ltr">{signedPct(m.chg1m, numberLocale, locale)}</bdi>
+                <bdi dir="ltr">{signedPct(m.chg3m, numberLocale, locale)}</bdi>
                 <bdi dir="ltr">{signedPct(m.fromHigh, numberLocale, locale)}</bdi>
               </span>
               <span className="sr-only">{copy.markets[TREND_WORD[m.trend]]}, {copy.markets[STATUS_WORD[m.status]]}</span>
@@ -508,7 +611,8 @@ export function WorldMarkets({
   locale: 'en' | 'fa';
   numberLocale: 'en-US' | 'fa-IR';
 }) {
-  const [view, setView] = useState<MarketsView>('today');
+  // The NORMAL timeframe opens the section (owner round 44): 3 months.
+  const [view, setView] = useState<MarketsView>('3m');
   const [openId, setOpenId] = useState<MarketId | null>(null);
   const [tableOpen, setTableOpen] = useState(false);
   const todayIso = new Date().toISOString().slice(0, 10);
@@ -532,18 +636,39 @@ export function WorldMarkets({
     });
   }, []);
 
+  /* The mother container (owner round 44, the regions' round-39 pattern):
+   * the soft family tint, a hairline ring and a quiet shadow — the heading,
+   * the verdict box, the tiles, the panels and the table ALL live inside it,
+   * so nothing reads stray and the white cards layer on the field. */
+  const shell =
+    'scroll-mt-24 flex flex-col gap-4 rounded-[var(--radius-lg)] bg-currena-soft/60 p-4 shadow-[0_10px_34px_rgba(15,23,42,0.07)] ring-1 ring-[var(--color-border)] sm:gap-5 sm:p-6 dark:shadow-[0_14px_44px_rgba(0,0,0,0.4)]';
+
+  /** The header row: the owner's exchange-chart artwork at the regions'
+   * 96/128 scale, the title, and the as-of date on the far side. */
+  const heading = (
+    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+      <h2 id="insights-markets-title" className="type-section m-0 flex items-center gap-4">
+        <IconImg src={MARKETS_SECTION_ICON_URL} size={96} desktopSize={128} className="shrink-0" />
+        <span className="min-w-0">{copy.markets.title}</span>
+      </h2>
+      {asOf ? (
+        <bdi className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
+          {interpolate(copy.markets.asOf, { date: formatDateShort(asOf, locale) })}
+        </bdi>
+      ) : null}
+    </div>
+  );
+
   if (state.kind === 'loading') {
     return (
-      <section id="insights-markets" aria-labelledby="insights-markets-title" className="scroll-mt-24">
-        <h2 id="insights-markets-title" className="type-section m-0 mb-1">
-          <span className="inline-flex items-center gap-1.5">
-            <Globe aria-hidden size={26} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
-            {copy.markets.title}
-          </span>
-        </h2>
-        {/* §6.6 Loading: 14 grey skeleton tiles with the group labels in place. */}
+      <section id="insights-markets" aria-labelledby="insights-markets-title" className={shell}>
+        {heading}
+        <p className="m-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.markets.subtitle}</p>
+        {/* The verdict box's skeleton keeps the layout honest while loading. */}
+        <Skeleton className="h-28 rounded-[var(--radius-md)]" />
+        {/* §6.6 Loading: grey skeleton tiles with the group labels in place. */}
         {MARKET_GROUP_ORDER.map((group) => (
-          <div key={group} className="mt-2">
+          <div key={group}>
             <p className="m-0 mb-1 text-[length:var(--type-caption)] font-bold text-[var(--color-text-tertiary)]">
               {copy.markets.groups[group]} ({MARKETS.filter((m) => m.group === group).length})
             </p>
@@ -560,18 +685,13 @@ export function WorldMarkets({
 
   if (state.kind === 'empty') {
     return (
-      <section id="insights-markets" aria-labelledby="insights-markets-title" className="scroll-mt-24">
-        <h2 id="insights-markets-title" className="type-section m-0 mb-1">
-          <span className="inline-flex items-center gap-1.5">
-            <Globe aria-hidden size={26} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
-            {copy.markets.title}
-          </span>
-        </h2>
+      <section id="insights-markets" aria-labelledby="insights-markets-title" className={shell}>
+        {heading}
+        <p className="m-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.markets.subtitle}</p>
         {/* §6.6 Never populated: ONE calm line — no zeros, no empty tiles. */}
-        <p className="m-0 rounded-[var(--radius-md)] bg-currena-soft/50 px-4 py-3 text-[length:var(--type-label)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
+        <p className="m-0 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-4 py-3 text-[length:var(--type-label)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
           {copy.markets.empty}
         </p>
-        <p className="m-0 mt-1 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{copy.markets.footer}</p>
       </section>
     );
   }
@@ -583,14 +703,9 @@ export function WorldMarkets({
     snapshot.markets.length > 0 && snapshot.markets.every((m) => isOld(m, todayIso));
   if (everythingOld) {
     return (
-      <section id="insights-markets" aria-labelledby="insights-markets-title" className="scroll-mt-24">
-        <h2 id="insights-markets-title" className="type-section m-0 mb-1">
-          <span className="inline-flex items-center gap-1.5">
-            <Globe aria-hidden size={26} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
-            {copy.markets.title}
-          </span>
-        </h2>
-        <p className="m-0 rounded-[var(--radius-md)] bg-currena-soft/50 px-4 py-3 text-[length:var(--type-label)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
+      <section id="insights-markets" aria-labelledby="insights-markets-title" className={shell}>
+        {heading}
+        <p className="m-0 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-4 py-3 text-[length:var(--type-label)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
           {interpolate(copy.markets.collapsedStale, {
             date: formatRelativeShort(snapshot.generatedAt, locale),
           })}
@@ -600,30 +715,16 @@ export function WorldMarkets({
   }
 
   return (
-    <section id="insights-markets" aria-labelledby="insights-markets-title" className="scroll-mt-24">
-      {/* §6.3 Header row: title, and the as-of date on the far side. */}
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 id="insights-markets-title" className="type-section m-0">
-          <span className="inline-flex items-center gap-1.5">
-            <Globe aria-hidden size={26} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
-            {copy.markets.title}
-          </span>
-        </h2>
-        {asOf ? (
-          <bdi className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
-            {interpolate(copy.markets.asOf, { date: formatDateShort(asOf, locale) })}
-          </bdi>
-        ) : null}
-      </div>
-      <p className="m-0 mb-2 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.markets.subtitle}</p>
+    <section id="insights-markets" aria-labelledby="insights-markets-title" className={shell}>
+      {heading}
+      <p className="m-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.markets.subtitle}</p>
 
-      {/* The takeaway line (§8.3), generated from the numbers. */}
-      <p className="m-0 mb-2 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
-        <bdi>{marketsTakeaway(snapshot, copy, numberLocale)}</bdi>
-      </p>
+      {/* The focal verdict box (owner round 44): the market verdict word in
+       * the page's verdict anatomy, with the takeaway as its reason line. */}
+      <MarketsVerdictBox snapshot={snapshot} copy={copy} numberLocale={numberLocale} />
 
-      {/* The view switch (§6.3). Default Today. */}
-      <div className="mb-2">
+      {/* The view switch (§6.3). Default: the NORMAL 3-month timeframe. */}
+      <div>
         <ViewSwitch view={view} copy={copy} onChange={setView} />
       </div>
 
@@ -674,24 +775,26 @@ export function WorldMarkets({
       </div>
 
       {/* The "Show full table" disclosure (§6.3, closed by default). */}
-      <button
-        type="button"
-        aria-expanded={tableOpen}
-        aria-controls="insights-markets-table"
-        onClick={() => setTableOpen((v) => !v)}
-        className="insights-focusable mt-3 inline-flex min-h-[36px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-3 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
-      >
-        {tableOpen ? copy.markets.hideTable : copy.markets.showTable}
-        <span aria-hidden="true" className="ms-1">{tableOpen ? '▴' : '▾'}</span>
-      </button>
-      {tableOpen ? (
-        <div id="insights-markets-table" className="mt-2">
-          <MarketsTable snapshot={snapshot} copy={copy} locale={locale} numberLocale={numberLocale} onOpenRow={onOpenRow} />
-        </div>
-      ) : null}
+      <div>
+        <button
+          type="button"
+          aria-expanded={tableOpen}
+          aria-controls="insights-markets-table"
+          onClick={() => setTableOpen((v) => !v)}
+          className="insights-focusable inline-flex min-h-[36px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-3 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
+        >
+          {tableOpen ? copy.markets.hideTable : copy.markets.showTable}
+          <span aria-hidden="true" className="ms-1">{tableOpen ? '▴' : '▾'}</span>
+        </button>
+        {tableOpen ? (
+          <div id="insights-markets-table" className="mt-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2 ring-1 ring-[var(--color-border)] sm:p-3">
+            <MarketsTable snapshot={snapshot} copy={copy} locale={locale} numberLocale={numberLocale} onOpenRow={onOpenRow} />
+          </div>
+        ) : null}
+      </div>
 
-      {/* The footer line (§6.3): source, end-of-day, local currency. */}
-      <p className="m-0 mt-2 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{copy.markets.footer}</p>
+      {/* The source line lives in the page footer now (About this data,
+       * owner round 44) — beside every other source credit on the page. */}
     </section>
   );
 }

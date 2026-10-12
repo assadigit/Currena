@@ -10,7 +10,7 @@
   // its OWN two cron triggers, separate from every other scheduled job, so
   // each invocation stays far under the 50-subrequest cap and the account's
   // 5-cron limit is respected (3 were in use; these are the last 2).
-  //   main  23:30 UTC Mon–Fri — all 14 markets have closed; EODHD first.
+  //   main  23:30 UTC Mon–Fri — all 16 markets have closed; EODHD first.
   //   retry 01:30 UTC Tue–Sat — re-fetches failed/old markets; when the
   //         whole snapshot is old (the main run's write bounced off the
   //         saturated daily KV budget ~18:30 UTC), it re-fetches through

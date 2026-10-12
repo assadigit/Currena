@@ -125,6 +125,9 @@ export function AboutTheData({
               <li>{copy.ui.attributionAbs}</li>
               <li>{copy.ui.attributionEcb}</li>
               <li>{copy.ui.attributionBasket}</li>
+              {/* Round 44 (owner): the world-markets source line lives HERE
+               * now — with every other attribution — not under the section. */}
+              <li>{copy.ui.attributionEodhd}</li>
             </ul>
           </div>
           <div>

@@ -133,9 +133,11 @@ const nameOf: Record<MarketId, string> = {
   nifty50: 'Nifty 50',
   stoxx50: 'Euro Stoxx 50',
   dax: 'DAX',
+  cac: 'CAC 40',
   ftse: 'FTSE 100',
   sp500: 'S&P 500',
   ndx: 'Nasdaq 100',
+  dow: 'Dow Jones',
   tsx: 'S&P/TSX Composite',
   ibov: 'Ibovespa',
 };
@@ -143,8 +145,8 @@ const nameOf: Record<MarketId, string> = {
 const groupOf: Record<MarketId, string> = {
   n225: 'Asia-Pacific', asx200: 'Asia-Pacific', kospi: 'Asia-Pacific', hsi: 'Asia-Pacific',
   ssec: 'Asia-Pacific', taiex: 'Asia-Pacific', nifty50: 'Asia-Pacific',
-  stoxx50: 'Europe', dax: 'Europe', ftse: 'Europe',
-  sp500: 'Americas', ndx: 'Americas', tsx: 'Americas', ibov: 'Americas',
+  stoxx50: 'Europe', dax: 'Europe', cac: 'Europe', ftse: 'Europe',
+  sp500: 'Americas', ndx: 'Americas', dow: 'Americas', tsx: 'Americas', ibov: 'Americas',
 };
 
 let okBoth = 0;

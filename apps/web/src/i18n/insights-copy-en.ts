@@ -1125,7 +1125,7 @@ export const insightsCopyEn = {
     aboutShowDetails: 'Show details',
     aboutHideDetails: 'Hide details',
     aboutCreditsLine:
-      'Sources: the US Federal Reserve (FRED), the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics (CC BY 4.0), the World Bank, Frankfurter and gold-api.com.',
+      'Sources: the US Federal Reserve (FRED), the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics (CC BY 4.0), the World Bank, Frankfurter, gold-api.com, and EODHD with Yahoo Finance for the world stock markets.',
     aboutGeneralInfo: 'General information only: not financial advice.',
     aboutSourcesTitle: 'Sources',
     aboutSourcesBody:
@@ -1143,9 +1143,13 @@ export const insightsCopyEn = {
     attributionEcb: 'ECB reference rates, served by Frankfurter. Source: European Central Bank.',
     attributionBasket:
       'The Currena dollar basket is computed from ECB reference rates: it is not the official DXY index.',
+    // Round 44 (owner): the world-markets section's source line, relocated
+    // from the section itself to the page footer with the other credits.
+    attributionEodhd:
+      'Source: EODHD (Yahoo Finance as backup). End-of-day values in each market’s local currency.',
     aboutScheduleTitle: 'Update schedule',
     aboutScheduleBody:
-      'A scheduled job refreshes every source once a day (04:20 UTC) and writes one precomputed snapshot; the page you are reading serves that snapshot. Daily series update daily, monthly and quarterly ones when their publisher releases.',
+      'A scheduled job refreshes every source once a day (04:20 UTC) and writes one precomputed snapshot; the page you are reading serves that snapshot. Daily series update daily, monthly and quarterly ones when their publisher releases. The world stock market values refresh on their own weekday-evening schedule (23:30 UTC).',
     aboutRulesTitle: 'How the tiers are decided',
     aboutRulesBody:
       'Needs attention: the indicator’s one fixed, published rule has fired (the rule is shown on its card). Unusual: no rule fired, but the latest value sits in the top or bottom 10% of its own 10-year range. Both tiers add context to the gauges; thresholds were backtested against 2008, 2020 and 2022.',
@@ -1186,11 +1190,21 @@ export const insightsCopyEn = {
     asOf: 'as of {date}',
     /** Regional groups, east to west (the trading day's order). */
     groups: { asia: 'Asia-Pacific', europe: 'Europe', americas: 'Americas' },
-    /** The segmented view switch (§6.3). Default Today. */
+    /** The segmented view switch (§6.3, round 44): the NORMAL timeframe is
+     * 3 months — the lens the section opens on; Today stays one tap away. */
     viewSwitchAria: 'Choose the number every market tile shows',
     viewToday: 'Today',
-    view1m: '1 month',
+    view3m: '3 months',
     viewFromHigh: 'From 52-week high',
+    /** The focal verdict box's words (owner round 44) — market-speak on the
+     * page's four-step instrument: step 1 Bullish (calm, most markets up
+     * over 3 months), 2 Mixed (calm, no clear direction), 3 Correcting (the
+     * needs-attention signal), 4 Bearish (the unusual signal). */
+    verdictBullish: 'Bullish',
+    verdictMixed: 'Mixed',
+    verdictCorrecting: 'Correcting',
+    verdictBearish: 'Bearish',
+    verdictAria: 'World stock markets verdict: {label}, step {step} of 4',
     /** Quiet-by-default tile tag (§6.3): correction/bear markets only. */
     tileTagBelow: '{x}% below 52-week high',
     /** Status words (§8.2) — correction maps to Needs attention, bear to Unusual. */
@@ -1209,7 +1223,7 @@ export const insightsCopyEn = {
     tableLabel: 'All world stock markets',
     thMarket: 'Market',
     thToday: 'Today',
-    th1m: '1 month',
+    th3m: '3 months',
     thFromHigh: 'From 52-week high',
     thTrend: 'Trend',
     thStatus: 'Status',
@@ -1218,8 +1232,8 @@ export const insightsCopyEn = {
     empty: 'Market data is being prepared. Check back after the next daily update.',
     collapsedStale:
       'World stock market data is old — last update {date}. It will return after the next daily update.',
-    footer:
-      'Source: EODHD (Yahoo Finance as backup). End-of-day values in each market’s local currency.',
+    // Round 44 (owner): the source line moved to the page footer (About this
+    // data → the attribution list) beside every other source credit.
     /** Detail panel headings (§6.5) + numbers. */
     detailWhat: 'What it is',
     detailWhy: 'Why it matters to the world',
@@ -1230,10 +1244,11 @@ export const insightsCopyEn = {
     chartLabel: '52-week chart',
     chartAria: 'Closing values over the last 52 weeks',
     chartValueAria: '{date}: {value}',
-    /** Takeaway templates (§8.3) — generated from the numbers, never free text. */
-    takeawayCalm: '{up} of 14 markets rose today. None is far below its 52-week high.',
-    takeawaySome: '{n} of 14 markets are 10% or more below their 52-week high, mostly in {group}.',
-    takeawayHeavy: '{n} of 14 markets are 10% or more below their 52-week high. The fall is widespread.',
+    /** Takeaway templates (§8.3) — generated from the numbers, never free
+     * text. {count} is the live row count (16 once populated). */
+    takeawayCalm: '{up} of {count} markets rose today. None is far below its 52-week high.',
+    takeawaySome: '{n} of {count} markets are 10% or more below their 52-week high, mostly in {group}.',
+    takeawayHeavy: '{n} of {count} markets are 10% or more below their 52-week high. The fall is widespread.',
     takeawayShock: 'A sharp one-day fall hit {k} markets.',
     /** Hero integration (§5.3): the section signal joins the Global verdict's
      * attention module when raised. */
@@ -1244,7 +1259,7 @@ export const insightsCopyEn = {
     /** CSV export columns (the Tools menu, §6.4). */
     csvColMarket: 'Market',
     csvColToday: 'Today %',
-    csvCol1m: '1 month %',
+    csvCol3m: '3 months %',
     csvColFromHigh: 'From 52-week high %',
     csvColTrend: 'Trend',
     csvColStatus: 'Status',
@@ -1319,6 +1334,13 @@ export const insightsCopyEn = {
         why: 'Germany sells goods worldwide, so the DAX is a good read on global trade and on demand from China.',
         you: 'Weakness can signal slowing world trade, which tends to cool growth and commodity prices.',
       },
+      cac: {
+        name: 'CAC 40',
+        latin: 'CAC 40',
+        what: 'The 40 largest companies on the Paris exchange — luxury goods, energy, banks and aerospace.',
+        why: 'France is the eurozone’s second-largest economy; alongside the DAX and Euro Stoxx 50 it shows how Europe’s blue chips are faring.',
+        you: 'It moves with the euro and European interest rates, which shape the cost of travel and goods imported from Europe.',
+      },
       ftse: {
         name: 'FTSE 100',
         latin: 'FTSE 100',
@@ -1339,6 +1361,13 @@ export const insightsCopyEn = {
         what: 'The 100 largest non-financial companies on the Nasdaq exchange, led by big technology and AI firms.',
         why: 'Shows the mood for technology and growth stocks. It usually swings harder than the S&P 500.',
         you: 'Falls here often mean investors are pulling back from risk, which can ripple into crypto and growth funds.',
+      },
+      dow: {
+        name: 'Dow Jones',
+        latin: 'Dow Jones',
+        what: 'The 30 biggest and best-known US companies — the index the evening news quotes.',
+        why: 'The world’s most famous market number: a big drop in the Dow leads the news everywhere and can set the mood for every market that opens after New York.',
+        you: 'It weights companies by price and holds only 30 of them, so the S&P 500 above is the better measure — but the Dow still moves sentiment, including the US shares inside many super funds.',
       },
       tsx: {
         name: 'S&P/TSX Composite',

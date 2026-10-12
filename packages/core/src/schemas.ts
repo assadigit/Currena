@@ -686,8 +686,9 @@ export type InsightsStatus = z.infer<typeof InsightsStatusSchema>;
  * (camelCase here to match every other contract in this file):
  *   asOf     — the market's own last-close date (its calendar, not UTC's)
  *   chg1d    — last close vs previous close, percent
- *   chg1m    — last close vs the last close on/before the same date one
- *              month earlier, percent
+ *   chg3m    — last close vs the last close on/before the same date three
+ *              months earlier, percent (the section's NORMAL timeframe —
+ *              owner round 44, spec v1.2)
  *   fromHigh — last close vs high52w, percent (always ≤ 0)
  *   rangePos — (last − low) ÷ (high − low) × 100
  *   trend    — vs the 50-day average: up > +1%, down < −1%, else flat
@@ -695,7 +696,11 @@ export type InsightsStatus = z.infer<typeof InsightsStatusSchema>;
  *   weekly   — ≤52 [epochDay, close] pairs for the detail panel's chart
  * ------------------------------------------------------------------ */
 
-/** The 14 world indices (spec §2, fixed for v1 — no additions). */
+/**
+ * The world indices (spec §2 as amended by owner round 44, v1.2 — the
+ * Dow Jones and CAC 40 joined the original 14). Groups stay ≤ 7 tiles
+ * (spec §6.3): Asia-Pacific 7 · Europe 4 · Americas 5.
+ */
 export const MarketIdSchema = z.enum([
   'n225',
   'asx200',
@@ -706,9 +711,11 @@ export const MarketIdSchema = z.enum([
   'nifty50',
   'stoxx50',
   'dax',
+  'cac',
   'ftse',
   'sp500',
   'ndx',
+  'dow',
   'tsx',
   'ibov',
 ]);
@@ -742,8 +749,8 @@ export const MarketEntrySchema = z.object({
   close: z.number().finite().positive(),
   /** Last close vs previous close, percent. */
   chg1d: z.number().finite(),
-  /** Last close vs ~one month earlier, percent. */
-  chg1m: z.number().finite(),
+  /** Last close vs ~three months earlier (the normal timeframe), percent. */
+  chg3m: z.number().finite(),
   /** Highest daily close in the last 365 days. */
   high52w: z.number().finite().positive(),
   /** Lowest daily close in the last 365 days. */
@@ -779,7 +786,7 @@ export type MarketEntry = z.infer<typeof MarketEntrySchema>;
 
 /** Section rollup (spec §5.3) — feeds the hero count and the takeaway line. */
 export const MarketsSummarySchema = z.object({
-  /** Rows in this snapshot (14 once every market has spoken once). */
+  /** Rows in this snapshot (16 once every market has spoken once). */
   count: z.number().int().positive(),
   /** Markets whose chg1d is above zero (mixed as-of dates are expected). */
   roseToday: z.number().int().nonnegative(),

@@ -186,7 +186,7 @@ import {
 } from '@currena/insights/markets';
 import type { MarketsSnapshot } from '@currena/core';
 
-/** A REAL-shaped snapshot: the full 14-market pipeline over synthetic series. */
+/** A REAL-shaped snapshot: the full 16-market pipeline over synthetic series. */
 async function realisticSnapshot(): Promise<MarketsSnapshot> {
   const job = await runMarketsJob(
     {
@@ -267,9 +267,9 @@ describe('GET /api/insights/markets', () => {
     expect(res.headers.get('cache-control')).toBe('no-store');
   });
 
-  it('keeps the full 14-market response under the 12 KB budget (spec §9 step 4)', async () => {
+  it('keeps the full 16-market response under the 12 KB budget (spec §9 step 4)', async () => {
     const snap = await realisticSnapshot();
-    expect(snap.markets.length).toBe(14);
+    expect(snap.markets.length).toBe(16);
     expect(snap.markets.every((m) => m.weekly.length === 52)).toBe(true);
     const bytes = JSON.stringify(snap).length;
     expect(bytes).toBeLessThan(12 * 1024);

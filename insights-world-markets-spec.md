@@ -1,6 +1,6 @@
 # Currena Insights — "World stock markets" section
 
-**Status:** v1.1 · decisions D1, D4, D5, D6 answered by Ali on 2026-10-11 (see section 1)
+**Status:** v1.2 · decisions D1, D4, D5, D6 answered by Ali on 2026-10-11 (see section 1); round-44 amendments by Ali on 2026-10-12: the Dow Jones and CAC 40 join the list (16 markets), the normal timeframe becomes 3 months, the section gains a mother container + the exchange-chart icon + a focal verdict box, and the source line moves to the page footer
 **Repo:** assadigit/Currena (Cloudflare Workers) · suggested path: `docs/specs/insights-world-markets.md`
 **Audience for this file:** Ali (decisions) and the agentic coding session (build).
 
@@ -18,12 +18,13 @@ How to read: **DECIDE** = needs Ali's answer before build. **VERIFY** = the buil
 | D4 | Feed a world-markets signal into the hero count | **Yes.** Thresholds are set in section 5.3 as starting values, and the build agent back-tests them on the last year of data. |
 | D5 | History depth | **One year of data is enough for v1.** The 10-year position is dropped from v1 (section 5.4). |
 | D6 | Persian wording | **Use terms Iranian users already know from Iranian stock websites** (section 8.1). |
+| D7 | Round 44 (2026-10-12) | **Cover every globally important exchange** → the Dow Jones (DJI) and CAC 40 (FCHI) join the original 14 (live-verified on both providers); the **normal timeframe is 3 months** (chg_3m replaces chg_1m, default view); the section wears the **mother container + stock-exchange artwork + a focal verdict box** (Bullish / Mixed / Correcting / Bearish, section 6.3); the **source line moves to the page footer** with the other credits. |
 
 ---
 
-## 2. The 14 markets
+## 2. The 16 markets
 
-Order inside each group follows the trading day, so the section shows the world "waking up" from east to west.
+Order inside each group follows the trading day, so the section shows the world "waking up" from east to west. Rows `cac` and `dow` joined in round 44 (2026-10-12), live-verified on both providers.
 
 | id | English name | Persian name | Country | Group | Yahoo symbol | EODHD code (VERIFY) |
 |---|---|---|---|---|---|---|
@@ -36,9 +37,11 @@ Order inside each group follows the trading day, so the section shows the world 
 | nifty50 | Nifty 50 | نیفتی ۵۰ | India | Asia-Pacific | ^NSEI | NSEI.INDX |
 | stoxx50 | Euro Stoxx 50 | یورو استوکس ۵۰ | Eurozone | Europe | ^STOXX50E | STOXX50E.INDX |
 | dax | DAX | داکس | Germany | Europe | ^GDAXI | GDAXI.INDX |
+| cac | CAC 40 | کاک ۴۰ | France | Europe | ^FCHI | FCHI.INDX |
 | ftse | FTSE 100 | فوتسی ۱۰۰ | United Kingdom | Europe | ^FTSE | FTSE.INDX |
 | sp500 | S&P 500 | اس‌اندپی ۵۰۰ | United States | Americas | ^GSPC | GSPC.INDX |
 | ndx | Nasdaq 100 | نزدک ۱۰۰ | United States | Americas | ^NDX | NDX.INDX |
+| dow | Dow Jones | داو جونز | United States | Americas | ^DJI | DJI.INDX |
 | tsx | S&P/TSX Composite | تی‌اس‌ایکس کانادا | Canada | Americas | ^GSPTSE | GSPTSE.INDX |
 | ibov | Ibovespa | بووسپا | Brazil | Americas | ^BVSP | BVSP.INDX |
 
@@ -60,7 +63,7 @@ Notes
 
 | Role | Provider | How | Limits and terms (checked October 2026) |
 |---|---|---|---|
-| **Primary** | EODHD, free key | End-of-day endpoint, one call per index, asking for the last ~400 days: `https://eodhd.com/api/eod/{CODE}?api_token={KEY}&fmt=json&period=d&from={YYYY-MM-DD}` | Free plan: 20 calls per day, one year of history, personal use only. One call returns a full year, so every number in the table comes from that single call. 14 calls per run leaves 6 spare per day. |
+| **Primary** | EODHD, free key | End-of-day endpoint, one call per index, asking for the last ~400 days: `https://eodhd.com/api/eod/{CODE}?api_token={KEY}&fmt=json&period=d&from={YYYY-MM-DD}` | Free plan: 20 calls per day, one year of history, personal use only. One call returns a full year, so every number in the table comes from that single call. 16 calls per run (15 EODHD — FTSE has no free INDX code — plus its Yahoo fallback) leaves 4 spare per day. |
 | **Fallback** | Yahoo Finance chart endpoint | `https://query1.finance.yahoo.com/v8/finance/chart/{SYMBOL}?range=1y&interval=1d` | No key, but unofficial: it can return 429 or change without notice, and it is personal use only. The older quote endpoint (v7) returns 401 since January 2026, do not use it. |
 | Plan B | EODHD "EOD Historical Data – All World" | Same endpoint as above | About $19.99 per month, 100,000 calls per day. Still a personal-use licence; business use needs a custom plan. |
 
@@ -109,7 +112,7 @@ Limits (Cloudflare documentation, October 2026): KV reads 100,000 per day · KV 
 |---|---|---|---|
 | KV writes per day | 1 normal write + at most 2 retries = **3 or fewer** (only when data changed, so usually 1) | 1,000 | about 0.3% |
 | KV reads per day | 1 key. Edge cache of 1 hour in front, so typically a few dozen per day, worst case a few hundred | 100,000 | under 1% |
-| Provider calls per run | 14 (EODHD) plus fallback calls only for failed markets | 50 per invocation, 20 per day on EODHD | within both |
+| Provider calls per run | 16 (15 EODHD + FTSE's Yahoo fallback) plus fallback calls only for failed markets | 50 per invocation, 20 per day on EODHD | within both |
 | Cron triggers | 2 (main and retry) | 5 per account, shared with your other jobs | check how many are already used |
 
 ### Rules
@@ -119,7 +122,7 @@ Limits (Cloudflare documentation, October 2026): KV reads 100,000 per day · KV 
 4. **No provider calls on page requests.** The public route only reads KV.
 5. **Cache the public route:** `Cache-Control: public, max-age=300, s-maxage=3600`, and use the Cache API in the Worker. KV reads use `cacheTtl: 3600`.
 6. **Keep CPU low:** ask providers only for the last ~400 days, compute the numbers, keep only the results. If a CPU-limit error ever appears, split into two runs of 7 markets (same total calls).
-7. **Weekly 52-point series** per market for the detail chart (not the daily history). Whole object stays around 7 to 9 KB.
+7. **Weekly 52-point series** per market for the detail chart (not the daily history). Whole object stays around 8 to 12 KB with 16 markets (route budget: under 12 KB).
 8. **Escape hatch:** if KV ever gets tight, move this one key to D1 or R2. Both have much larger free write allowances than KV.
 9. **After the first week,** check the KV metrics in the Cloudflare dashboard. Target: this section stays under 1% of reads and 1% of writes. Record the numbers in the data-check file.
 
@@ -134,7 +137,7 @@ Limits (Cloudflare documentation, October 2026): KV reads 100,000 per day · KV 
       "as_of": "2026-10-09",
       "close": 0,
       "chg_1d": 0.0,
-      "chg_1m": 0.0,
+      "chg_3m": 0.0,
       "high_52w": 0,
       "low_52w": 0,
       "from_high": 0.0,
@@ -164,7 +167,7 @@ Limits (Cloudflare documentation, October 2026): KV reads 100,000 per day · KV 
 
 ### 5.1 Per market
 - `chg_1d` = last close vs the previous close, in percent.
-- `chg_1m` = last close vs the last close on or before the same date one month earlier.
+- `chg_3m` = last close vs the last close on or before the same date three months earlier (round 44: the section's normal timeframe).
 - `high_52w` / `low_52w` = highest and lowest daily close in the last 365 days.
 - `from_high` = last close vs `high_52w`, in percent (zero or negative).
 - `range_pos` = (last − low) ÷ (high − low) × 100.
@@ -182,7 +185,7 @@ Based on `from_high`. The 10% and 20% lines are the same ones Iranian stock site
 The 2-point buffer on the way back stops a tile from flipping every day when a market hovers near a line. The previous status is kept inside the stored object, so this costs no extra KV keys.
 
 ### 5.3 Section signal (feeds the hero count) — thresholds set (D4)
-Let **n** = how many of the 14 markets are in Correction or Bear market. The signal is the **highest** of the rows that match.
+Let **n** = how many of the 16 markets are in Correction or Bear market. The signal is the **highest** of the rows that match.
 
 | Signal | Matches when |
 |---|---|
@@ -192,7 +195,7 @@ Let **n** = how many of the 14 markets are in Correction or Bear market. The sig
 
 Why these numbers
 - **3 is tolerated** because a few markets (Hang Seng, Shanghai, Ibovespa) can sit far below their yearly highs for long stretches for local reasons. That alone should not make the world look stressed.
-- **8 of 14** means more than half the world is hurting, so stress is clearly global.
+- **8 of 16** means half the world is hurting, so stress is clearly global.
 - **The US override** exists because the rest of the world follows the S&P 500 and Nasdaq 100. A fall there matters even when many other markets are fine.
 
 Keep all numbers in one config block at the top of the code, so Ali can change them without touching logic:
@@ -232,18 +235,18 @@ Decided: one year of data is enough to start. The detail panel shows the 52-week
 Attention order stays: verdict, named alerts, prices, **world stock markets (new)**, what it means for my money, calendar. It sits right after the commodity prices, because both answer "what is moving". It is **never above** the verdict or alerts.
 
 ### 6.3 Anatomy (top to bottom)
-1. **Header row:** title, and the "as of" date on the far side (Jalali date in Farsi).
-2. **Takeaway line:** one sentence generated from the numbers (section 8).
-3. **View switch:** one segmented control **Today | 1 month | From 52-week high**. Default Today.
-4. **Strip:** three labelled groups, **Asia-Pacific (7) · Europe (3) · Americas (4)**. No group has more than 7 tiles.
+1. **Mother container (round 44):** the whole section — heading, verdict, tiles, panels, table — sits inside one soft-tinted container with a hairline ring and a quiet shadow, matching the Global/Australia sections (round 39). The heading wears the owner's **stock-exchange-index artwork** at the regions' 96/128 scale.
+2. **Focal verdict box (round 44):** a white surface card on the container's field with the page's verdict anatomy — state artwork, the verdict word, the four-step meter — speaking market words: **Bullish** (calm, most markets up over 3 months) / **Mixed** (calm, no clear direction) / **Correcting** (the needs-attention signal) / **Bearish** (the unusual signal). The takeaway line rides inside as its computed reason.
+3. **View switch:** one segmented control **Today | 3 months | From 52-week high**. Default: **3 months** — the section's normal timeframe (round 44).
+4. **Strip:** three labelled groups, **Asia-Pacific (7) · Europe (4) · Americas (5)**. No group has more than 7 tiles. Tiles show the owner's green up / red down artwork beside the signed percentage (round 44) — the number keeps the meaning, colour is never alone.
    - **Tile:** short name, percentage, arrow glyph. Two lines at most.
    - **Quiet by default:** only a market in Correction or Bear market gets an extra tag, for example "−12% below 52-week high" (Persian: «۱۲٪ زیر سقف یک‌ساله»). Normal markets stay plain, so problems stand out without colour tricks.
    - Tapping a tile opens its detail panel under that group. Only one panel is open at a time.
 5. **"Show full table"** disclosure (closed by default).
-6. **Footer line:** source, "end-of-day", "local currency". The page footer keeps the single shared disclaimer and "Before you act" box, as already decided.
+6. **Source line (round 44):** lives in the PAGE footer (About this data → the attribution list) with every other source credit — not inside the section. The page footer keeps the single shared disclaimer and "Before you act" box, as already decided.
 
 ### 6.4 Full table (desktop, 900 px and wider)
-Columns: Market · Today · 1 month · From 52-week high · Trend · Status · Last close.
+Columns: Market · Today · 3 months · From 52-week high · Trend · Status · Last close.
 Fixed group order. One sort only: "From 52-week high" (worst first). Row click opens the same detail panel. CSV of this table goes into the existing Tools menu.
 On mobile there is no table; the disclosure shows a vertical list of rows with the same three numbers.
 
@@ -273,7 +276,7 @@ Live "open / closed" dots are **not** in v1, because they would be wrong on holi
 - Colour choices go to **color-palette-advisor**. The strategic rule for it: up/down use neutral ink with the glyph; the page's existing warning tokens are used only for Correction and Bear market. No red/green pair as the only signal (colour-blind readers, and some cultures reverse the meaning).
 
 ### 6.9 Not in v1
-Live open/closed dots, mini-charts inside tiles, index levels inside the strip, market-vs-market comparison charts, per-market alerts, extra markets (Dow Jones, Russell, Saudi, Tehran).
+Live open/closed dots, mini-charts inside tiles, index levels inside the strip, market-vs-market comparison charts, per-market alerts, extra markets beyond the 16 (Russell, Saudi, Tehran). The Dow Jones moved INTO the list by round 44 after live provider verification.
 
 ### 6.10 Metrics this should move
 First-glance test passes for a new visitor within 5 seconds. Secondary: share of visitors who open at least one detail panel (shows learning), and share who open the table.
@@ -357,6 +360,14 @@ Keep these lines as written unless the build agent finds a factual error.
 - FA why: آلمان کالا به سراسر جهان می‌فروشد؛ پس داکس نشانهٔ خوبی از تجارت جهانی و تقاضای چین است.
 - FA you: ضعف آن می‌تواند نشانهٔ کند شدن تجارت جهانی باشد که رشد و قیمت کالاها را خنک می‌کند.
 
+### cac · CAC 40 · کاک ۴۰ (round 44)
+- EN what: The 40 largest companies on the Paris exchange — luxury goods, energy, banks and aerospace.
+- EN why: France is the eurozone's second-largest economy; alongside the DAX and Euro Stoxx 50 it shows how Europe's blue chips are faring.
+- EN you: It moves with the euro and European interest rates, which shape the cost of travel and goods imported from Europe.
+- FA what: ۴۰ شرکت بزرگ بورس پاریس — کالاهای لوکس، انرژی، بانک و هوافضا.
+- FA why: فرانسه دومین اقتصاد بزرگ منطقهٔ یوروست؛ کاک ۴۰ در کنار داکس و یورو استوکس ۵۰ نشان می‌دهد سهام بزرگ اروپا چه حالی دارند.
+- FA you: با یورو و نرخ بهرهٔ اروپا حرکت می‌کند که هزینهٔ سفر و کالاهای وارداتی از اروپا را شکل می‌دهد.
+
 ### ftse · FTSE 100 · فوتسی ۱۰۰
 - EN what: The 100 largest companies on the London Stock Exchange.
 - EN why: Full of global miners, oil companies and banks that earn most of their money abroad, so it works more like a gauge of commodities and world growth than of the UK itself.
@@ -380,6 +391,14 @@ Keep these lines as written unless the build agent finds a factual error.
 - FA what: ۱۰۰ شرکت بزرگ غیرمالی بورس نزدک، با تمرکز روی فناوری و هوش مصنوعی.
 - FA why: حال‌وهوای سهام فناوری و رشد را نشان می‌دهد و معمولاً بیشتر از اس‌اندپی ۵۰۰ نوسان دارد.
 - FA you: افت آن اغلب یعنی سرمایه‌گذاران از ریسک فاصله می‌گیرند؛ اثرش می‌تواند به ارز دیجیتال و صندوق‌های رشد هم برسد.
+
+### dow · Dow Jones · داو جونز (round 44)
+- EN what: The 30 biggest and best-known US companies — the index the evening news quotes.
+- EN why: The world's most famous market number: a big drop in the Dow leads the news everywhere and can set the mood for every market that opens after New York.
+- EN you: It weights companies by price and holds only 30 of them, so the S&P 500 above is the better measure — but the Dow still moves sentiment, including the US shares inside many super funds.
+- FA what: ۳۰ شرکت بزرگ و شناخته‌شدهٔ آمریکا — همان شاخصی که اخبار شبانه نقل می‌کنند.
+- FA why: معروف‌ترین عدد بازار سهام جهان: افت بزرگ داو جونز همه‌جا تیتر می‌شود و می‌تواند حال‌وهوای هر بازاری را که بعد از نیویورک باز می‌شود تعیین کند.
+- FA you: وزن‌دهی آن بر اساس قیمت است و فقط ۳۰ شرکت دارد؛ پس اس‌اندپی ۵۰۰ بالاتر معیار بهتری است — اما داو جونز همچنان بر احساس بازار اثر می‌گذارد، از جمله سهام آمریکایی داخل صندوق‌های بازنشستگی.
 
 ### tsx · S&P/TSX Composite · تی‌اس‌ایکس کانادا
 - EN what: Canada's main stock index, heavy in energy, banks and mining.
@@ -409,7 +428,8 @@ The market terms below are the ones Iranian stock education and news sites use (
 | 52-week high | سقف یک‌ساله (short form: سقف قیمتی) | 52-week high |
 | 52-week low | کف یک‌ساله | 52-week low |
 | Distance from the 52-week high | فاصله از سقف یک‌ساله | From 52-week high |
-| Return today / 1 month | بازدهی امروز / بازدهی یک‌ماهه | Today / 1 month |
+| Return today / 3 months | بازدهی امروز / بازدهی سه‌ماهه | Today / 3 months |
+| Section verdict (round 44) | صعودی / مختلط / در حال اصلاح / نزولی | Bullish / Mixed / Correcting / Bearish |
 | Stock index | شاخص | Index |
 | Latest closing value | آخرین مقدار پایانی | Last close |
 | 10–20% below the high | اصلاح قیمتی | Correction |
@@ -430,15 +450,16 @@ Two cautions
 |---|---|---|
 | Section title | World stock markets | بازارهای سهام جهان |
 | Subtitle | Last close · end-of-day data | آخرین مقدار پایانی · داده‌های پایان روز |
-| View switch | Today · 1 month · From 52-week high | امروز · یک ماه · فاصله از سقف یک‌ساله |
+| View switch | Today · 3 months · From 52-week high | امروز · سه ماه · فاصله از سقف یک‌ساله |
+| Verdict box (round 44) | Bullish · Mixed · Correcting · Bearish | صعودی · مختلط · در حال اصلاح · نزولی |
 | Groups | Asia-Pacific · Europe · Americas | آسیا و اقیانوسیه · اروپا · قاره آمریکا |
 | Tile tag | {x}% below 52-week high | {x}٪ زیر سقف یک‌ساله |
 | Status labels | Normal · Correction · Bear market | عادی · اصلاح قیمتی · بازار خرسی |
 | Old-data chip | Old data · {date} | داده قدیمی · {date} |
 | Table disclosure | Show full table / Hide table | نمایش جدول کامل / پنهان کردن جدول |
-| Table headers | Market · Today · 1 month · From 52-week high · Trend · Status · Last close | بازار · بازدهی امروز · بازدهی یک‌ماهه · فاصله از سقف یک‌ساله · روند · وضعیت · آخرین مقدار پایانی |
+| Table headers | Market · Today · 3 months · From 52-week high · Trend · Status · Last close | بازار · بازدهی امروز · بازدهی سه‌ماهه · فاصله از سقف یک‌ساله · روند · وضعیت · آخرین مقدار پایانی |
 | Empty state | Market data is being prepared. Check back after the next daily update. | داده‌های بازار در حال آماده‌سازی است. پس از به‌روزرسانی روزانهٔ بعدی دوباره سر بزنید. |
-| Footer line | Source: EODHD (Yahoo Finance as backup). End-of-day values in each market's local currency. | منبع: EODHD (با پشتیبان Yahoo Finance). مقادیر پایان روز، به ارز محلی هر بازار. |
+| Source line (round 44: moved to the page footer's attribution list) | Source: EODHD (Yahoo Finance as backup). End-of-day values in each market's local currency. | منبع: EODHD (با پشتیبان Yahoo Finance). مقادیر پایان روز، به ارز محلی هر بازار. |
 
 How the status labels connect to the rest of the page: Correction uses the page's "Needs attention" tier and Bear market uses the "Unusual" tier, so colours, counts and alerts stay consistent. The section signal itself (Normal / Needs attention / Unusual) uses the chip wording already on the page.
 
@@ -449,9 +470,9 @@ The build agent generates these from the numbers. No AI call at runtime.
 
 | Situation | English | Persian |
 |---|---|---|
-| Calm (signal Normal) | {up} of 14 markets rose today. None is far below its 52-week high. | امروز {up} بازار از ۱۴ بازار رشد کردند و هیچ‌کدام فاصلهٔ زیادی با سقف یک‌ساله ندارند. |
-| Some stress | {n} of 14 markets are 10% or more below their 52-week high, mostly in {group}. | {n} بازار از ۱۴ بازار دست‌کم ۱۰ درصد زیر سقف یک‌ساله‌اند، بیشترشان در {group}. |
-| Heavy stress | {n} of 14 markets are 10% or more below their 52-week high. The fall is widespread. | {n} بازار از ۱۴ بازار دست‌کم ۱۰ درصد زیر سقف یک‌ساله‌اند. ریزش گسترده است. |
+| Calm (signal Normal) | {up} of {count} markets rose today. None is far below its 52-week high. | امروز {up} بازار از {count} بازار رشد کردند و هیچ‌کدام فاصلهٔ زیادی با سقف یک‌ساله ندارند. |
+| Some stress | {n} of {count} markets are 10% or more below their 52-week high, mostly in {group}. | {n} بازار از {count} بازار دست‌کم ۱۰ درصد زیر سقف یک‌ساله‌اند، بیشترشان در {group}. |
+| Heavy stress | {n} of {count} markets are 10% or more below their 52-week high. The fall is widespread. | {n} بازار از {count} بازار دست‌کم ۱۰ درصد زیر سقف یک‌ساله‌اند. ریزش گسترده است. |
 | Shock day (added to any line above) | A sharp one-day fall hit {k} markets. | امروز در {k} بازار ریزش تند ثبت شد. |
 
 The one shared disclaimer stays in the page footer. Its final wording still needs the review by someone qualified in Australian financial-services rules, as already decided.
@@ -480,5 +501,5 @@ Work in this order. Loop on each step until its test passes, then continue. Matc
 ## 10. Risks to keep in mind
 - **Provider drift:** Yahoo can change or block at any time. That is why it is only the fallback, and why stale data is labelled instead of hidden.
 - **Licence:** both free sources are personal-use. Fine for today's non-commercial site with credit given; revisit before Currena earns money (D1).
-- **Thin free quota:** EODHD free has 6 spare calls per day. The retry job only re-fetches failed markets to protect it.
+- **Thin free quota:** EODHD free has 4 spare calls per day (16-market runs). The retry job only re-fetches failed markets to protect it.
 - **Holidays:** a market can be closed for days. Each tile shows its own last-close date, so this is never a bug.

@@ -15,7 +15,7 @@
  * lands the day's single write. The data itself never changes between the
  * two runs (the closes are immutable), which is why the retry may re-fetch
  * through Yahoo: it protects the thin EODHD free quota (20 calls/day — the
- * main run already spent ~13 of them) while returning identical numbers.
+ * main run already spent ~15 of them) while returning identical numbers.
  * When only a FEW markets need data (a genuine provider hiccup), the retry
  * keeps the spec's EODHD-first order.
  *
@@ -69,7 +69,7 @@ export function marketsNeedingData(
 }
 
 /**
- * The newest close date ANY of the 14 markets could carry by now: the most
+ * The newest close date ANY of the 16 markets could carry by now: the most
  * recent Monday–Friday strictly before today's UTC date. (By 01:30 UTC the
  * whole prior trading day has closed everywhere — Asia first, the US last
  * at ~21:00 UTC.) A market still behind this date either failed a fetch or

@@ -103,6 +103,12 @@ export function stateIconUrl(step: number): string | null {
   return STATE_ICONS[step] ? urlOf(STATE_ICONS[step]!) : null;
 }
 
+/** The world-markets section's own mark (owner round 44): the exchange
+ * chart artwork — the section is not an InsightsSection (it lives on its
+ * own feed), so it gets its own named export. The money panel's "savings"
+ * area reuses the same artwork — one drawing, two homes, by design. */
+export const MARKETS_SECTION_ICON_URL = urlOf('stock-exchange-index');
+
 /** The metals' estimation arrows — green up / red down (fixed colours). */
 export const DIRECTION_UP_URL = urlOf('up-support-growth-increase');
 export const DIRECTION_DOWN_URL = urlOf('down-work-against-decrease');

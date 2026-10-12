@@ -2,6 +2,8 @@
 
 **Run:** 2026-10-12T02:17:15.714Z · spec §5.3 (D4): the starting thresholds replayed over the last year of daily closes for all 14 markets, through the exact production rules (2-point status buffer carried day to day, the n-count thresholds, the US override).
 
+**Round-44 note (2026-10-12):** the list is now 16 markets (Dow Jones + CAC 40 joined). The replay above predates them; both newcomers are typically-normal large-cap indices, so the stressed-market share the thresholds see can only dilute slightly (4→attention, 8→unusual stay the owner-tunable starting values in `definitions.ts`). The Dow is NOT a US-override index — the S&P 500 and Nasdaq 100 keep that role (the S&P 500 is the better measure of the US market; the spec's §5.3 reasoning is unchanged).
+
 Data: the step-0 provider cache (EODHD for 13 markets, Yahoo for FTSE), one full year. The replay calendar is every weekday; each market votes with its own last close as of that day, exactly like a production run.
 
 ## Section signal over the year (233 trading days)

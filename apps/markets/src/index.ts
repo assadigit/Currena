@@ -8,7 +8,7 @@
  * invocation far under the 50-subrequest cap:
  *
  *   "30 23 * * 1-5"  main  — every market has closed by 23:30 UTC; fetch
- *                            all 14, EODHD first, Yahoo as fallback.
+ *                            all 16, EODHD first, Yahoo as fallback.
  *   "30 1 * * 2-6"   retry — re-fetch only failed/old markets; when the
  *                            whole snapshot is old (the main run's write
  *                            bounced off the saturated daily KV budget),

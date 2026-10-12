@@ -6,7 +6,7 @@
  *
  *   - KV writes: at most 3 per day (in practice 1 — the retry's landing
  *     write; weekends/holidays cost zero);
- *   - provider calls: the main run stays within its ~14 calls and the
+ *   - provider calls: the main run stays within its ~16 calls and the
  *     EODHD free plan's 20/day (the retry's quota guard re-fetches through
  *     Yahoo when the whole snapshot is old);
  *   - subrequests per invocation (every provider call is one): ≤ 50;
@@ -102,7 +102,7 @@ const env = (kv: FakeKV): { RATES: KVLike; EODHD_API_TOKEN?: string } => ({
 });
 
 describe('runScheduledMarkets — the 24-hour budget', () => {
-  it('main run: first-ever population writes once, ~14 provider calls, ≤50 subrequests', async () => {
+  it('main run: first-ever population writes once, ~16 provider calls, ≤50 subrequests', async () => {
     const kv = new FakeKV();
     const world = makeWorld();
     const result = await runScheduledMarkets(env(kv), 'main', {
@@ -111,9 +111,9 @@ describe('runScheduledMarkets — the 24-hour budget', () => {
     });
     expect(result.wroteSnapshot).toBe(true);
     expect(result.nothingToStore).toBe(false);
-    // 13 EODHD markets + FTSE's guaranteed Yahoo fallback.
-    expect(world.calls.length).toBe(14);
-    expect(world.calls.filter((c) => c.provider === 'eodhd').length).toBe(13);
+    // 15 EODHD markets + FTSE's guaranteed Yahoo fallback.
+    expect(world.calls.length).toBe(16);
+    expect(world.calls.filter((c) => c.provider === 'eodhd').length).toBe(15);
     expect(kv.ops.writes).toBe(1);
     // Subrequest ceiling: every provider call is one subrequest.
     expect(world.calls.length).toBeLessThanOrEqual(50);
@@ -169,24 +169,24 @@ describe('runScheduledMarkets — the 24-hour budget', () => {
     expect(landed.wroteSnapshot).toBe(true);
     expect(landed.providerOrder).toBe('yahoo-first');
     const retryCalls = world.calls.length - wednesdayCallsBefore;
-    expect(retryCalls).toBe(14);
-    expect(world.calls.slice(-14).every((c) => c.provider === 'yahoo')).toBe(true);
+    expect(retryCalls).toBe(16);
+    expect(world.calls.slice(-16).every((c) => c.provider === 'yahoo')).toBe(true);
 
     // The stored snapshot now carries Tuesday's closes for every market.
     const stored = JSON.parse(kv.map.get('insights:markets:v1')!) as MarketsSnapshot;
     expect(stored.markets.every((m) => m.asOf === '2026-10-13')).toBe(true);
-    expect(stored.markets.length).toBe(14);
+    expect(stored.markets.length).toBe(16);
 
     // The budget verdict over the simulated 3 days: 2 writes landed (+1
-    // bounced attempt) — comfortably ≤3/day; EODHD spent 13+13+0 calls
+    // bounced attempt) — comfortably ≤3/day; EODHD spent 15+15+0 calls
     // across the three UTC days (≤20 every day); every invocation stayed
     // far below the 50-subrequest cap.
     expect(kv.ops.writes).toBe(3);
     const eodhdMon = world.callsOn('2026-10-12').filter((c) => c.provider === 'eodhd').length;
     const eodhdTue = world.callsOn('2026-10-13').filter((c) => c.provider === 'eodhd').length;
     const eodhdWed = world.callsOn('2026-10-14').filter((c) => c.provider === 'eodhd').length;
-    expect(eodhdMon).toBe(13);
-    expect(eodhdTue).toBe(13);
+    expect(eodhdMon).toBe(15);
+    expect(eodhdTue).toBe(15);
     expect(eodhdWed).toBe(0);
   });
 
@@ -198,7 +198,7 @@ describe('runScheduledMarkets — the 24-hour budget', () => {
       now: MONDAY_MAIN,
     });
     expect(result.providerOrder).toBe('yahoo-first'); // the explicit missing-secret order
-    expect(world.calls.length).toBe(14);
+    expect(world.calls.length).toBe(16);
     expect(world.calls.every((c) => c.provider === 'yahoo')).toBe(true);
     expect(result.wroteSnapshot).toBe(true);
     expect(kv.ops.writes).toBe(1);
