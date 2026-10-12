@@ -23,6 +23,7 @@ import { fetchFrankfurterSeries } from './frankfurter';
 import { FRED_SERIES, fetchFredSeries } from './fred';
 import { fetchGoldApiSpot } from './goldapi';
 import { fetchRbaSeries } from './rba';
+import { fetchYahooQuote } from './yahoo';
 import { fetchWorldBankMonthly } from './worldbank';
 import type { SeriesInputs } from './derived';
 import type { SeriesPoint } from '../series';
@@ -75,6 +76,16 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     const series = await fetchLogged('fred', seriesId, () => fetchFredSeries(seriesId));
     if (series) fred[seriesId] = series;
   }
+
+  // Yahoo Brent futures (2026-10-12, the stale-oil fix): EIA's DCOILBRENTEU
+  // stopped publishing on 2026-10-06 while the market kept moving — Yahoo's
+  // BZ=F daily closes extend the Brent series past FRED's last date so the
+  // stored history, percentiles and 7/30-day changes never rot (derived.ts
+  // keeps FRED authoritative on every overlapping date, so the series
+  // self-corrects back to pure EIA spot when FRED catches up).
+  const brentYahooQuote = await fetchLogged('yahoo', 'BZ=F daily closes (Brent gap-fill)', () =>
+    fetchYahooQuote('BZ=F', '40d'),
+  );
 
   // ECB Data Portal (deposit facility rate, full history).
   const ecbDfr = await fetchLogged('ecb', 'FM/D.U2.EUR.4F.KR.DFR.LEV', () => fetchEcbDfrSeries());
@@ -131,6 +142,7 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     inputs: {
       today,
       fred,
+      brentYahoo: brentYahooQuote?.points,
       ecb: { dfr: ecbDfr },
       fx: {
         JPY: fx?.JPY,

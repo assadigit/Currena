@@ -42,6 +42,15 @@ export const COPPER_LB_PER_TONNE = 2204.62262;
 export interface SeriesInputs {
   /** FRED series outputs keyed by FRED_SERIES name. */
   fred: Partial<Record<string, SeriesPoint[]>>;
+  /**
+   * Yahoo BZ=F daily closes (2026-10-12 stale-oil fix): EIA's Brent spot
+   * on FRED can lag by days or weeks (it stopped publishing 2026-10-06
+   * while the market kept moving). These closes EXTEND the Brent series
+   * past FRED's last date — FRED stays authoritative on every overlapping
+   * date, so the series self-corrects when EIA catches up. Optional: an
+   * absent/failed fetch simply leaves the FRED series as-is.
+   */
+  brentYahoo?: SeriesPoint[];
   /** ECB Data Portal series (I15). */
   ecb?: { dfr?: SeriesPoint[] };
   /** Frankfurter USD→currency series (USD quote side, USD base). */
@@ -110,6 +119,21 @@ function mergeSeries(a: SeriesPoint[], b: SeriesPoint[]): SeriesPoint[] {
   for (const p of a) byDate.set(p.date, p);
   for (const p of b) byDate.set(p.date, p);
   return [...byDate.values()].sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
+}
+
+/**
+ * The Brent gap-fill (2026-10-12): FRED's EIA spot series stays verbatim and
+ * Yahoo's daily closes extend it STRICTLY past FRED's last date — a lagging
+ * EIA batch never overwrites fresher market truth, and Yahoo never rewinds
+ * or rewrites the official spot prints (when FRED later publishes those
+ * dates, FRED wins again on the overlap and the series self-corrects).
+ */
+export function fillBrentGap(fred: SeriesPoint[], yahoo: SeriesPoint[] | undefined): SeriesPoint[] {
+  if (yahoo === undefined || yahoo.length === 0) return fred;
+  const lastFredDate = fred[fred.length - 1]?.date;
+  if (lastFredDate === undefined) return yahoo;
+  const extension = yahoo.filter((p) => p.date > lastFredDate);
+  return extension.length === 0 ? fred : [...fred, ...extension];
 }
 
 /**
@@ -242,9 +266,13 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   put('usdcny', fx.CNY);
 
   /* ------------- Global — Prices board (not a gauge) ------------- */
-  put('brent', fred.DCOILBRENTEU);
-  // Fallback when the FRED route is down: the World Bank monthly Brent
-  // (03-data-sources.md lists the Pink Sheet as serving Brent too).
+  // Brent: EIA spot (FRED) extended past its last published date by Yahoo's
+  // BZ=F daily closes (the 2026-10-12 stale-oil fix — see fillBrentGap). The
+  // Yahoo-alone rung covers a total FRED outage; the World Bank monthly
+  // stays the last resort (03-data-sources.md lists the Pink Sheet as
+  // serving Brent too).
+  put('brent', fred.DCOILBRENTEU !== undefined ? fillBrentGap(fred.DCOILBRENTEU, inputs.brentYahoo) : undefined);
+  if (out.brent === undefined && inputs.brentYahoo !== undefined) put('brent', inputs.brentYahoo);
   if (out.brent === undefined && wb) put('brent', wb.brent);
 
   // Gold: gold-api XAU live + (WB monthly ∪ accumulated daily) history.
@@ -389,7 +417,10 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'm2-us': { name: 'FRED (M2SL)', url: 'https://fred.stlouisfed.org/series/M2SL' },
   'copper-gold': { name: 'World Bank Pink Sheet', url: 'https://www.worldbank.org/en/research/commodity-markets' },
   usdcny: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
-  brent: { name: 'FRED (DCOILBRENTEU)', url: 'https://fred.stlouisfed.org/series/DCOILBRENTEU' },
+  brent: {
+    name: 'FRED (EIA Brent) + Yahoo Finance (BZ=F)',
+    url: 'https://fred.stlouisfed.org/series/DCOILBRENTEU',
+  },
   'gold-usd': { name: 'gold-api.com (XAU)', url: 'https://www.gold-api.com' },
   'silver-usd': { name: 'gold-api.com (XAG)', url: 'https://www.gold-api.com' },
   'copper-usd': { name: 'gold-api.com (HG, history: World Bank)', url: 'https://www.gold-api.com' },

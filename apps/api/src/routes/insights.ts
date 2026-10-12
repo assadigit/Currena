@@ -16,11 +16,13 @@
  */
 
 import { IndicatorIdSchema } from '@currena/core';
-import type { IndicatorId, RatesError } from '@currena/core';
+import type { IndicatorId, LivePricesSnapshot, RatesError } from '@currena/core';
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import type { InsightsReader } from '@currena/insights/store';
 import type { MarketsReader } from '@currena/insights/markets';
+import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
+import type { PricesReader } from '@currena/insights/prices';
 import type { Bindings } from '../index';
 
 export interface InsightsRouteDeps {
@@ -28,6 +30,8 @@ export interface InsightsRouteDeps {
   getReader: (env: Bindings) => InsightsReader;
   /** Markets store construction (route tests inject the in-memory fake). */
   getMarketsReader: (env: Bindings) => MarketsReader;
+  /** Live-prices store construction (route tests inject the in-memory fake). */
+  getPricesReader: (env: Bindings) => PricesReader;
 }
 
 /** Mirrors index.ts's errorResponse (private there) — same envelope, no import cycle. */
@@ -54,11 +58,25 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
         'No Insights snapshot stored yet — the daily ingestion run has not completed.',
       );
     }
-    const etag = `"insights:${snapshot.generatedAt}"`;
+    // Live-prices overlay (2026-10-12): the hourly :13 cron rung stores
+    // Yahoo quotes under insights:prices-live:v1; the serve path merges
+    // them into the four Prices-board tiles + companions. A missing,
+    // poisoned or unreadable key degrades CALMLY to the plain snapshot —
+    // the daily EOD backbone answers alone, never an error.
+    let live: LivePricesSnapshot | undefined;
+    try {
+      live = await deps.getPricesReader(c.env).getLivePrices();
+    } catch (err) {
+      console.warn('[insights] live-prices read failed — serving the EOD snapshot:', err instanceof Error ? err.message : err);
+    }
+    const served = mergeLivePricesIntoSnapshot(snapshot, live);
+    // The ETag covers BOTH generations — a new hourly quote busts caches the
+    // same way a new daily snapshot does.
+    const etag = `"insights:${snapshot.generatedAt}+prices:${live?.generatedAt ?? 'none'}"`;
     if (c.req.header('if-none-match') === etag) {
       return c.body(null, 304, { 'Cache-Control': 'public, max-age=60', ETag: etag });
     }
-    return c.json(snapshot, 200, { 'Cache-Control': 'public, max-age=60', ETag: etag });
+    return c.json(served, 200, { 'Cache-Control': 'public, max-age=60', ETag: etag });
   });
 
   // World stock markets (insights-world-markets-spec.md §4 rule 5): the

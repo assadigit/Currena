@@ -293,13 +293,17 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
   /* ------------- Global — Prices board (not a gauge) ------------- */
   {
     // EIA publishes daily Brent in weekly batches — 12-day freshness limit
-    // (data spec §3) replaces the false-alarm 3-day daily grace.
+    // (data spec §3) replaces the false-alarm 3-day daily grace. The series
+    // now carries a Yahoo BZ=F gap-fill past FRED's last published date
+    // (2026-10-12 stale-oil fix — see derived.ts fillBrentGap) and the SERVED
+    // value is refreshed hourly from the live-prices key (prices/merge.ts),
+    // so a lagging EIA batch can never freeze the board's oil price again.
     id: 'brent',
     section: 'global',
     group: 'prices-board',
     name: 'Brent oil',
     source: 'fred',
-    sourceRef: 'FRED:DCOILBRENTEU',
+    sourceRef: 'FRED:DCOILBRENTEU + Yahoo Finance BZ=F (gap-fill + live refresh)',
     cadence: 'daily',
     changeKind: 'pct',
     phase: 'P2',

@@ -827,3 +827,58 @@ export const MarketsSnapshotSchema = z
     { message: 'each close must sit inside its own 52-week range' },
   );
 export type MarketsSnapshot = z.infer<typeof MarketsSnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
+ * Live prices (the volatility-scaled refresh — 2026-10-12)
+ *
+ * The Prices board's four assets (Brent, gold, silver, Bitcoin) plus their
+ * companion ratios are the page's most volatile numbers, but their daily
+ * backbone sources are end-of-day and can lag: EIA's Brent spot on FRED
+ * stopped publishing on 2026-10-06 while the real market kept moving (the
+ * stale-$125-oil incident — live Brent was ~$107). This ONE KV key
+ * (`insights:prices-live:v1`) carries intraday quotes fetched from Yahoo
+ * Finance (keyless) by the hourly :13 rung of the currena-api minute cron
+ * and merged into `GET /api/insights` at serve time.
+ *
+ *   asOf          — the date of the quote's daily bar (the market's own
+ *                   calendar, matching IndicatorReading.asOf semantics)
+ *   change7d/30d  — the live value vs the daily close ~7/30 days back
+ *                   (percent, the tile rows' changeKind), rounded 2 dp
+ *   sourceSymbol  — the Yahoo symbol the quote came from (e.g. 'BZ=F')
+ *   updatedAt     — when the fetch that produced this entry succeeded
+ * ------------------------------------------------------------------ */
+
+/** The Prices-board assets the live refresh covers (see prices/definitions). */
+export const PriceAssetIdSchema = z.enum(['brent', 'gold-usd', 'silver-usd', 'btc-usd']);
+export type PriceAssetId = z.infer<typeof PriceAssetIdSchema>;
+
+/** One asset's live quote inside the stored snapshot. */
+export const LivePriceEntrySchema = z.object({
+  /** Live quote (last trade / spot), rounded to 2 dp at write time. */
+  value: z.number().finite().positive(),
+  /** Date of the latest daily bar the quote belongs to (YYYY-MM-DD). */
+  asOf: z.iso.date(),
+  /** Live value vs the daily close ~7 days back, percent; absent when the window is too short. */
+  change7d: z.number().finite().optional(),
+  /** Live value vs the daily close ~30 days back, percent; absent when the window is too short. */
+  change30d: z.number().finite().optional(),
+  /** Yahoo symbol the quote came from (attribution + debugging). */
+  sourceSymbol: z.string().min(1),
+  /** When the successful fetch ran (ISO 8601 UTC) — NOT part of content equality. */
+  updatedAt: z.iso.datetime(),
+});
+export type LivePriceEntry = z.infer<typeof LivePriceEntrySchema>;
+
+/** The value of `insights:prices-live:v1`, verbatim over the wire. */
+export const LivePricesSnapshotSchema = z.object({
+  v: z.literal(1),
+  /** When the writing run finished (ISO 8601 UTC). */
+  generatedAt: z.iso.datetime(),
+  /**
+   * Partial by design: an asset whose fetch failed (and was never stored) is
+   * simply absent — z.partialRecord, because a plain z.record over an enum
+   * key would demand every asset on every parse.
+   */
+  assets: z.partialRecord(PriceAssetIdSchema, LivePriceEntrySchema),
+});
+export type LivePricesSnapshot = z.infer<typeof LivePricesSnapshotSchema>;

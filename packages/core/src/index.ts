@@ -72,6 +72,9 @@ export {
   MarketEntrySchema,
   MarketsSummarySchema,
   MarketsSnapshotSchema,
+  PriceAssetIdSchema,
+  LivePriceEntrySchema,
+  LivePricesSnapshotSchema,
 } from './schemas';
 export type {
   Source,
@@ -112,6 +115,9 @@ export type {
   MarketEntry,
   MarketsSummary,
   MarketsSnapshot,
+  PriceAssetId,
+  LivePriceEntry,
+  LivePricesSnapshot,
 } from './schemas';
 
 export {

@@ -168,7 +168,20 @@ const BUDGETS = [
   // locales. Gzip +1.08 kB for a chart engine the owner asked for on TWO
   // sections. ENTRY untouched. Justified in CHANGELOG §2026-10-11
   // (round 34).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 334_000, gz: 86_000, label: 'Insights lazy chunk' },
+  // World-markets bump (331.28/85.08 → 377.70/97.20, budget 334/86.0 →
+  // 380/98.0): owner round 44 — the World stock markets section's restyle
+  // and expansion. Growth, itemised: (1) the mother container with the
+  // focal verdict box (MarketsVerdictBox + marketsVerdictStep mapping +
+  // VerdictMeter reuse) and the up/down PNG arrows riding tiles and the
+  // table; (2) the Dow Jones and CAC 40 joining (16 markets) with their
+  // full bilingual what/why/you context copy; (3) the 3-month normal
+  // timeframe (chg3m lens + table column + CSV) and the 52-week MarketsChart
+  // with the Jalali LTR axis; (4) the view-switch radiogroup + old-data
+  // chips + the section/takeaway corpus × 2 locales. The ENTRY chunk stays
+  // untouched (290.36/87.06 vs 296/89.5) — the section rides the lazy route.
+  // Gzip +11.2 kB for a whole new bilingual section. Justified in CHANGELOG
+  // §2026-10-12 (world markets, round 44).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 380_000, gz: 98_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

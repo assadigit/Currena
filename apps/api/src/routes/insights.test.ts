@@ -1,5 +1,6 @@
-import type { IndicatorReading, InsightsSnapshot, InsightsStatus, IndicatorHistory, IndicatorId } from '@currena/core';
+import type { IndicatorReading, InsightsSnapshot, InsightsStatus, IndicatorHistory, IndicatorId, LivePriceEntry, LivePricesSnapshot, PriceAssetId } from '@currena/core';
 import { InMemoryInsightsStore } from '@currena/insights/store';
+import { InMemoryPricesStore } from '@currena/insights/prices';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createApp, type Bindings } from '../index';
 
@@ -56,7 +57,7 @@ describe('GET /api/insights (injected in-memory store)', () => {
     await store.putSnapshot(snapshot);
     const res = await makeApp().request('/api/insights', undefined, env);
     expect(res.status).toBe(200);
-    expect(res.headers.get('etag')).toBe('"insights:2026-10-07T04:20:00.000Z"');
+    expect(res.headers.get('etag')).toBe('"insights:2026-10-07T04:20:00.000Z+prices:none"');
     expect(res.headers.get('cache-control')).toBe('public, max-age=60');
     expect(await res.json()).toEqual(snapshot);
   });
@@ -64,7 +65,7 @@ describe('GET /api/insights (injected in-memory store)', () => {
   it('answers 304 on a matching If-None-Match', async () => {
     await store.putSnapshot(snapshot);
     const res = await makeApp().request('/api/insights', {
-      headers: { 'if-none-match': '"insights:2026-10-07T04:20:00.000Z"' },
+      headers: { 'if-none-match': '"insights:2026-10-07T04:20:00.000Z+prices:none"' },
     }, env);
     expect(res.status).toBe(304);
   });
@@ -125,6 +126,126 @@ describe('GET /api/insights/:id/history', () => {
     expect(res.status).toBe(404);
     const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('history_not_found');
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Live-prices overlay (2026-10-12 — the volatility refresh)
+ * ------------------------------------------------------------------ */
+
+const liveEntry = (value: number, overrides: Partial<LivePriceEntry> = {}): LivePriceEntry => ({
+  value,
+  asOf: '2026-10-12',
+  change7d: -4.35,
+  change30d: 5.0,
+  sourceSymbol: 'BZ=F',
+  updatedAt: '2026-10-12T12:13:00.000Z',
+  ...overrides,
+});
+
+describe('GET /api/insights — live-prices merge', () => {
+  let insightsStore: InMemoryInsightsStore;
+  let pricesStore: InMemoryPricesStore;
+
+  beforeEach(() => {
+    insightsStore = new InMemoryInsightsStore();
+    pricesStore = new InMemoryPricesStore();
+  });
+
+  /** The stale-oil fixture: brent 125.44 @ 2026-10-06 in the EOD snapshot. */
+  const staleOilSnapshot: InsightsSnapshot = {
+    ...snapshot,
+    readings: [reading('brent'), reading('us10y')],
+  };
+
+  function makeApp() {
+    return createApp({
+      makeInsightsReader: () => insightsStore,
+      makePricesReader: () => pricesStore,
+    });
+  }
+
+  it('merges a fresher live quote over the EOD reading (the stale-oil fix)', async () => {
+    await insightsStore.putSnapshot(staleOilSnapshot);
+    await pricesStore.putLivePricesIfChanged({
+      v: 1,
+      generatedAt: '2026-10-12T12:13:00.000Z',
+      assets: { brent: liveEntry(107.14) },
+    });
+    const res = await makeApp().request('/api/insights', undefined, env);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as InsightsSnapshot;
+    const brent = body.readings.find((r) => r.id === 'brent')!;
+    expect(brent.value).toBe(107.14);
+    expect(brent.asOf).toBe('2026-10-12');
+    expect(brent.sourceName).toContain('Yahoo Finance');
+    expect(brent.updatedAt).toBe('2026-10-12T12:13:00.000Z');
+    // The other reading is untouched.
+    expect(body.readings.find((r) => r.id === 'us10y')!.value).toBe(3.9);
+  });
+
+  it('the ETag covers BOTH generations — a new hourly quote busts caches', async () => {
+    await insightsStore.putSnapshot(staleOilSnapshot);
+    await pricesStore.putLivePricesIfChanged({
+      v: 1,
+      generatedAt: '2026-10-12T12:13:00.000Z',
+      assets: { brent: liveEntry(107.14) },
+    });
+    const res = await makeApp().request('/api/insights', undefined, env);
+    expect(res.headers.get('etag')).toBe('"insights:2026-10-07T04:20:00.000Z+prices:2026-10-12T12:13:00.000Z"');
+    const revalidate = await makeApp().request('/api/insights', {
+      headers: { 'if-none-match': '"insights:2026-10-07T04:20:00.000Z+prices:2026-10-12T12:13:00.000Z"' },
+    }, env);
+    expect(revalidate.status).toBe(304);
+    // The next hourly rung writes a new generation → the old ETag no longer matches.
+    await pricesStore.putLivePricesIfChanged({
+      v: 1,
+      generatedAt: '2026-10-12T13:13:00.000Z',
+      assets: { brent: liveEntry(107.9) },
+    });
+    const fresh = await makeApp().request('/api/insights', {
+      headers: { 'if-none-match': '"insights:2026-10-07T04:20:00.000Z+prices:2026-10-12T12:13:00.000Z"' },
+    }, env);
+    expect(fresh.status).toBe(200);
+  });
+
+  it('a poisoned live-prices key degrades calmly to the plain EOD snapshot', async () => {
+    await insightsStore.putSnapshot(staleOilSnapshot);
+    const poisoned = {
+      getLivePrices: async (): Promise<LivePricesSnapshot | undefined> => {
+        throw new Error('KV unreachable');
+      },
+    };
+    const app = createApp({ makeInsightsReader: () => insightsStore, makePricesReader: () => poisoned });
+    const res = await app.request('/api/insights', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('etag')).toBe('"insights:2026-10-07T04:20:00.000Z+prices:none"');
+    expect(await res.json()).toEqual(staleOilSnapshot);
+  });
+
+  it('an empty live key serves the plain snapshot (prices:none)', async () => {
+    await insightsStore.putSnapshot(staleOilSnapshot);
+    const res = await makeApp().request('/api/insights', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('etag')).toBe('"insights:2026-10-07T04:20:00.000Z+prices:none"');
+    expect(await res.json()).toEqual(staleOilSnapshot);
+  });
+
+  it('an older live quote never rewinds a fresher EOD reading', async () => {
+    await insightsStore.putSnapshot({
+      ...snapshot,
+      readings: [reading('brent'), reading('us10y')],
+    });
+    await pricesStore.putLivePricesIfChanged({
+      v: 1,
+      generatedAt: '2026-10-12T12:13:00.000Z',
+      assets: { brent: liveEntry(120, { asOf: '2026-10-05' }) },
+    });
+    const res = await makeApp().request('/api/insights', undefined, env);
+    const body = (await res.json()) as InsightsSnapshot;
+    expect(body.readings.find((r) => r.id === 'brent')!.value).toBe(3.9); // the EOD reading untouched
+    // The stored quotes' generation still rides the ETag (the key exists).
+    expect(res.headers.get('etag')).toContain('prices:2026-10-12T12:13:00.000Z');
   });
 });
 

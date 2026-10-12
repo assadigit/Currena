@@ -5,6 +5,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-12] — Live prices: the volatility-scaled refresh (the stale-oil fix)
+
+The Prices board showed Brent at $125.44 "as of 2026-10-06" for four-plus
+business days while the real market traded near $107 — EIA's Brent spot on
+FRED (the board's ONLY oil source) stopped publishing, the ingestion runs
+once daily, and the 12-day stale grace meant nothing flagged it. Full story
+and budget math: `docs/insights/09-live-prices.md`.
+
+### Added
+
+- **Hourly live quotes for the Prices board** — Brent `BZ=F`, gold `GC=F`,
+  silver `SI=F`, Bitcoin `BTC-USD` from Yahoo Finance (keyless), stored
+  under ONE new KV key `insights:prices-live:v1` (write-only-if-changed) by
+  a new :13 minute rung of the currena-api minute cron. No new cron trigger
+  (the account's free 5-cron limit is full). Per-asset refresh intervals in
+  an owner-editable CONFIG block (`intervalMinutes`) — oil at 60 min is 24×
+  the "at least once a day" bar. New module
+  `packages/insights/src/prices/` (definitions/providers/job/store/merge) +
+  a generic Yahoo chart adapter (`adapters/yahoo.ts`) + a manual
+  `prices-run` seeder script.
+- **Serve-time merge in `GET /api/insights`** — the four tiles + their
+  companion ratios (`gold-btc`, `silver-btc`, `gold-aud`) carry the live
+  values, asOf dates, 7/30-day changes and honest live attribution; a
+  `stale`/`unavailable` reading heals to its natural status. The ETag
+  covers both generations. A missing/poisoned quotes key degrades calmly to
+  the plain EOD snapshot. The stored snapshot itself is never touched.
+- **Ingestion gap-fill for Brent** — Yahoo's `BZ=F` daily closes extend the
+  FRED series strictly past EIA's last published date (FRED stays
+  authoritative on overlaps, so the series self-corrects when EIA catches
+  up; a total FRED outage degrades to the Yahoo series). The stored
+  history, percentiles and change windows can never rot behind a lagging
+  EIA batch again.
+- 53 new tests (46 insights + 7 api): parser, interval gating,
+  hold-on-failure, write-if-changed, REST daily-cap retry, merge rules
+  (never-rewind, status healing, schema validity), route merge + combined
+  ETag, the :13 rung writing the KV key.
+
+### Changed
+
+- brent's attribution now reads `FRED (EIA Brent) + Yahoo Finance (BZ=F)`;
+  the insights snapshot ETag format is
+  `"insights:<generatedAt>+prices:<liveGeneratedAt|none>"`.
+
 ## [2026-10-12] — Money section: fa title verbatim + annual default window (owner round 43)
 
 Forty-third round — two owner notes: "for part what it means for my money,

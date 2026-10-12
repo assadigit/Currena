@@ -27,6 +27,14 @@ export {
   parseWorldBankMonthlySheet,
 } from './worldbank';
 export { GOLDAPI_SYMBOLS, fetchGoldApiSpot, goldApiPriceUrl, GOLDAPI_BASE } from './goldapi';
+export {
+  YAHOO_CHART_BASE,
+  YAHOO_CHART_USER_AGENT,
+  YahooQuoteError,
+  fetchYahooQuote,
+  parseYahooQuoteResponse,
+} from './yahoo';
+export type { YahooQuote, YahooQuoteOptions } from './yahoo';
 export { ECB_DFR_SERIES_KEY, ecbDfrUrl, fetchEcbDfrSeries, ECB_DATA_BASE } from './ecb';
 export { bitstampOhlcUrl, fetchBitstampCloses } from './bitstamp';
 export type { BitstampWindow } from './bitstamp';

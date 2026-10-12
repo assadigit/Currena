@@ -25,6 +25,7 @@ import type {
   InsightsStatus,
   IndicatorId,
   MarketsSnapshot,
+  LivePricesSnapshot,
 } from '@currena/core';
 import {
   INSIGHTS_SNAPSHOT_KEY,
@@ -35,6 +36,8 @@ import {
 } from '@currena/insights/store';
 import { MARKETS_KV_KEY, parseStoredMarkets } from '@currena/insights/markets';
 import type { MarketsReader } from '@currena/insights/markets';
+import { PRICES_KV_KEY, parseStoredLivePrices } from '@currena/insights/prices';
+import type { PricesReader } from '@currena/insights/prices';
 
 export class KvInsightsReader implements InsightsReader {
   constructor(private readonly kv: KVNamespace) {}
@@ -73,5 +76,21 @@ export class KvMarketsReader implements MarketsReader {
 
   async getMarkets(): Promise<MarketsSnapshot | undefined> {
     return parseStoredMarkets(await this.kv.get(MARKETS_KV_KEY, { cacheTtl: 3600 }));
+  }
+}
+
+/**
+ * Live-prices serve path (the 2026-10-12 volatility refresh): ONE KV read
+ * for the quotes key, with a 60-second KV edge cache matching the route's
+ * `max-age=60` — page traffic never re-reads KV more than once a minute
+ * while the quotes themselves turn hourly. The value is written by the
+ * currena-api Worker's own :13 minute rung (KvPricesStore) — read-only
+ * here, and a page request can never reach a provider.
+ */
+export class KvPricesReader implements PricesReader {
+  constructor(private readonly kv: KVNamespace) {}
+
+  async getLivePrices(): Promise<LivePricesSnapshot | undefined> {
+    return parseStoredLivePrices(await this.kv.get(PRICES_KV_KEY, { cacheTtl: 60 }));
   }
 }

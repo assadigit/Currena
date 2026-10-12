@@ -1,8 +1,9 @@
-import type { Snapshot } from '@currena/core';
+import type { LivePriceEntry, PriceAssetId, Snapshot } from '@currena/core';
 import { convert } from '@currena/core';
 import { InMemoryRateStore } from '@currena/scraper';
+import type { PricesJobFetchers } from '@currena/insights/prices';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createApp, __resetRateLimiterForTests, type Bindings } from './index';
+import { createApp, __resetRateLimiterForTests, PRICES_CRON_MINUTE, runScheduledPricesRefresh, type Bindings } from './index';
 import { MetaResponseSchema } from './meta';
 import { RatesService } from './rates-service';
 
@@ -664,5 +665,55 @@ describe('routes (injected service — no Workers, no live sites)', () => {
     expect(res.headers.get('retry-after')).toBe('60');
     const body = (await res.json()) as { error: { retryAfterSec?: number } };
     expect(body.error.retryAfterSec).toBe(60);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Scheduled live-prices rung (2026-10-12 — the volatility refresh)
+ * ------------------------------------------------------------------ */
+
+describe('runScheduledPricesRefresh (the :13 minute rung)', () => {
+  const entry = (value: number, symbol: string): LivePriceEntry => ({
+    value,
+    asOf: '2026-10-12',
+    change7d: -4.35,
+    change30d: 5.0,
+    sourceSymbol: symbol,
+    updatedAt: '2026-10-12T12:13:00.000Z',
+  });
+
+  function fakeFetchers(): PricesJobFetchers {
+    return {
+      fetchAsset: async (assetId: PriceAssetId) => {
+        if (assetId === 'brent') return entry(107.14, 'BZ=F');
+        if (assetId === 'gold-usd') return entry(4190.6, 'GC=F');
+        if (assetId === 'silver-usd') return entry(60.67, 'SI=F');
+        return entry(82510.08, 'BTC-USD');
+      },
+    };
+  }
+
+  it('writes the live-prices snapshot to the RATES KV binding (ONE key, one write)', async () => {
+    const puts: Array<{ key: string; value: string }> = [];
+    const kvEnv: Bindings = {
+      RATES: {
+        get: async () => null,
+        put: async (key: string, value: string) => {
+          puts.push({ key, value });
+        },
+      } as unknown as KVNamespace,
+    };
+    await runScheduledPricesRefresh(kvEnv, { fetchers: fakeFetchers() });
+    expect(puts).toHaveLength(1);
+    expect(puts[0]!.key).toBe('insights:prices-live:v1');
+    const stored = JSON.parse(puts[0]!.value) as { v: number; assets: Record<string, LivePriceEntry | undefined> };
+    expect(stored.v).toBe(1);
+    expect(stored.assets.brent!.value).toBe(107.14);
+    expect(Object.keys(stored.assets)).toHaveLength(4);
+  });
+
+  it('the rung minute is :13 (off the Frankfurter quarter-hours, hourly cadence)', () => {
+    expect(PRICES_CRON_MINUTE).toBe(13);
+    expect(PRICES_CRON_MINUTE % 15).not.toBe(0);
   });
 });

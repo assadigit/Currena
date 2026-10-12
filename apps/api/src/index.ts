@@ -36,9 +36,12 @@ import {
   type AdminBanner,
 } from './admin';
 import { KvRateStore } from './adapters/kv-store';
-import { KvInsightsReader, KvMarketsReader } from './adapters/insights-store';
+import { KvInsightsReader, KvMarketsReader, KvPricesReader } from './adapters/insights-store';
 import type { MarketsReader } from '@currena/insights/markets';
 import { createInsightsRoutes } from './routes/insights';
+import { runPricesUpdate, formatPricesReport, defaultPricesFetchers } from '@currena/insights/prices';
+import type { PricesJobFetchers } from '@currena/insights/prices';
+import { KvPricesStore } from '@currena/insights/prices';
 import { recordHistory, readHistory } from './history';
 import { buildMeta } from './meta';
 import { RatesService, RatesServiceError } from './rates-service';
@@ -61,6 +64,8 @@ export interface AppDeps {
   makeInsightsReader?: (env: Bindings) => import('@currena/insights/store').InsightsReader;
   /** Override the world-markets store (route tests inject the in-memory fake). */
   makeMarketsReader?: (env: Bindings) => MarketsReader;
+  /** Override the live-prices store (route tests inject the in-memory fake). */
+  makePricesReader?: (env: Bindings) => import('@currena/insights/prices').PricesReader;
 }
 
 const NO_STORE: Readonly<Record<string, string>> = { 'Cache-Control': 'no-store' };
@@ -227,6 +232,14 @@ export function createApp(deps: AppDeps = {}) {
     return marketsReader;
   };
 
+  // Live-prices serve path: the quotes key behind a 60-second KV edge cache
+  // (KvPricesReader — same lazy-singleton pattern).
+  let pricesReader: import('@currena/insights/prices').PricesReader | undefined;
+  const getPricesReader = (env: Bindings): import('@currena/insights/prices').PricesReader => {
+    pricesReader ??= deps.makePricesReader ? deps.makePricesReader(env) : new KvPricesReader(env.RATES);
+    return pricesReader;
+  };
+
   const app = new Hono<{ Bindings: Bindings }>();
 
   // Security headers on every Worker-answered response (SWOT hardening
@@ -342,7 +355,7 @@ export function createApp(deps: AppDeps = {}) {
 
   // Phase I3: precomputed snapshot + per-indicator history, both written by
   // the daily GitHub Actions ingestion runner (roadmap §2). Read-only here.
-  app.route('/api/insights', createInsightsRoutes({ getReader: getInsightsReader, getMarketsReader }));
+  app.route('/api/insights', createInsightsRoutes({ getReader: getInsightsReader, getMarketsReader, getPricesReader }));
 
   /* ------------------------------ convert ------------------------------- */
 
@@ -712,14 +725,41 @@ export type AppType = typeof app;
 /** Minutes (UTC) on which the cron also refreshes the Frankfurter source. */
 const FRANKFURTER_CRON_MOD_MIN = 15;
 
+/**
+ * The minute (UTC) on which the cron refreshes the Insights live prices
+ * (2026-10-12, the stale-oil fix): ONE hourly rung that fetches Yahoo
+ * quotes for the Prices board (Brent BZ=F, gold GC=F, silver SI=F, Bitcoin
+ * BTC-USD) and writes them to the insights:prices-live:v1 KV key —
+ * write-only-if-changed, so a quiet market costs ZERO writes. GET
+ * /api/insights merges the quotes over the daily EOD snapshot at serve
+ * time. Per-asset refresh intervals (volatility scaling) live in
+ * @currena/insights/prices definitions — oil at 60 min is 24× the owner's
+ * "at least once a day" bar. :13 avoids the Frankfurter quarter-hours.
+ */
+export const PRICES_CRON_MINUTE = 13;
+
+/** The hourly live-prices refresh (exported for tests; the cron calls it). */
+export async function runScheduledPricesRefresh(
+  env: Bindings,
+  deps: { fetchers?: PricesJobFetchers; now?: Date } = {},
+): Promise<void> {
+  const store = new KvPricesStore(env.RATES);
+  const result = await runPricesUpdate({
+    store,
+    fetchers: deps.fetchers ?? defaultPricesFetchers(),
+    ...(deps.now !== undefined ? { now: deps.now } : {}),
+  });
+  console.log(formatPricesReport(result));
+}
+
 async function runScheduled(env: Bindings, scheduledTimeMs: number): Promise<void> {
   const service = makeDefaultService(env);
   const minute = new Date(scheduledTimeMs).getUTCMinutes();
   const sources: SnapshotSource[] = minute % FRANKFURTER_CRON_MOD_MIN === 0
     ? ['tgju', 'frankfurter']
     : ['tgju'];
-  await Promise.all(
-    sources.map(async (source) => {
+  await Promise.all([
+    ...sources.map(async (source) => {
       try {
         const response = await service.getRates(source);
         // Task 24: record every live-scraped generation — the content
@@ -742,7 +782,17 @@ async function runScheduled(env: Bindings, scheduledTimeMs: number): Promise<voi
         console.warn(`[cron] ${source} failed:`, err instanceof Error ? err.message : err);
       }
     }),
-  );
+    // The hourly live-prices rung — fault-isolated inside runPricesUpdate
+    // (one asset failing never fails the run); this catch is belt-and-braces
+    // so a prices hiccup can never mark the whole cron invocation failed.
+    ...(minute === PRICES_CRON_MINUTE
+      ? [
+          runScheduledPricesRefresh(env).catch((err: unknown) => {
+            console.warn('[cron] prices refresh failed:', err instanceof Error ? err.message : err);
+          }),
+        ]
+      : []),
+  ]);
 }
 
 export default {

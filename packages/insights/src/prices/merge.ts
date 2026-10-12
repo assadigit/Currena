@@ -1,0 +1,169 @@
+/**
+ * Live prices — the serve-time merge (pure, no fetch, no KV).
+ *
+ * `GET /api/insights` reads the daily ingestion's snapshot and overlays the
+ * live quotes on top BEFORE serving, so the Prices board's tiles carry the
+ * market's current numbers instead of the backbone's last EOD print. The
+ * stored snapshot is never touched — the daily run recomputes everything
+ * from the official EOD sources on its own schedule.
+ *
+ * OVERRIDDEN READINGS (exactly the numbers the board renders):
+ *   brent, gold-usd, silver-usd, btc-usd — the four tiles:
+ *     value, asOf, change7d/change30d (from the live series), live source
+ *     attribution, updatedAt = the live run's generatedAt;
+ *     status healed when the live quote is fresher: 'stale'/'unavailable'
+ *     become the row's natural non-voting status ('context' for info-rule
+ *     rows, 'normal' for voting rows) — the stale-$125-oil symptom never
+ *     renders as fresh-looking data again.
+ *   gold-btc, silver-btc, gold-aud — the tiles' companion context lines,
+ *     recomputed from the live bases (gold-aud keeps the snapshot's daily
+ *     ECB audusd — FX reference rates are daily by definition).
+ *
+ * NEVER touched: the summary/verdict (EOD analytics, recomputed only by the
+ * daily run), percentile10y (a 10-year statistic on the EOD series — a
+ * day's drift is noise), every other reading, changedThisWeek, calendar.
+ *
+ * Guard rails: a live quote NEVER rewinds the reading (applies only when
+ * its asOf is ≥ the reading's own asOf); a companion recomputes only when
+ * EVERY constituent is available; a missing/short-window change keeps the
+ * reading's existing one (never removes information).
+ */
+
+import type { IndicatorId, IndicatorReading, InsightsSnapshot, LivePricesSnapshot, PriceAssetId } from '@currena/core';
+import { DEFINITIONS } from '../definitions';
+import { LIVE_PRICE_ASSETS, LIVE_RATIO_SOURCE } from './definitions';
+
+/** The reading's natural non-voting status once fresh data exists. */
+function naturalStatus(id: IndicatorId): 'context' | 'normal' {
+  const def = DEFINITIONS.find((d) => d.id === id);
+  return def !== undefined && def.rule.kind === 'info' ? 'context' : 'normal';
+}
+
+function round4(value: number): number {
+  return Math.round(value * 10_000) / 10_000;
+}
+
+/** ISO date compare — `null` reading dates (unavailable) always lose to a live date. */
+function asOfAtLeast(liveAsOf: string, readingAsOf: string | null): boolean {
+  return readingAsOf === null || liveAsOf >= readingAsOf;
+}
+
+/** The later of two ISO dates (for companion asOf stamps). */
+function laterDate(a: string, b: string): string {
+  return a >= b ? a : b;
+}
+
+interface ReadingPatch {
+  value: number;
+  asOf: string;
+  change7d?: number;
+  change30d?: number;
+  sourceName: string;
+  sourceUrl: string;
+  updatedAt: string;
+}
+
+/** Apply a patch to a reading copy, healing stale/unavailable statuses. */
+function patchReading(reading: IndicatorReading, patch: ReadingPatch): IndicatorReading {
+  return {
+    ...reading,
+    value: patch.value,
+    asOf: patch.asOf,
+    ...(patch.change7d !== undefined ? { change7d: patch.change7d } : {}),
+    ...(patch.change30d !== undefined ? { change30d: patch.change30d } : {}),
+    sourceName: patch.sourceName,
+    sourceUrl: patch.sourceUrl,
+    updatedAt: patch.updatedAt,
+    status: reading.status === 'stale' || reading.status === 'unavailable' ? naturalStatus(reading.id) : reading.status,
+  };
+}
+
+/** Keep the existing change fields when the live entry lacks its own (never removes information). */
+function mergedChanges(reading: IndicatorReading, live: { change7d?: number; change30d?: number }): { change7d?: number; change30d?: number } {
+  const out: { change7d?: number; change30d?: number } = {};
+  const c7 = live.change7d ?? reading.change7d;
+  const c30 = live.change30d ?? reading.change30d;
+  if (c7 !== undefined) out.change7d = c7;
+  if (c30 !== undefined) out.change30d = c30;
+  return out;
+}
+
+/**
+ * Overlay the live quotes onto the snapshot. Returns a NEW snapshot object
+ * (the input is never mutated); when the live snapshot carries no assets
+ * the input comes back unchanged (identity).
+ */
+export function mergeLivePricesIntoSnapshot(
+  snapshot: InsightsSnapshot,
+  live: LivePricesSnapshot | undefined,
+): InsightsSnapshot {
+  if (live === undefined || Object.keys(live.assets).length === 0) return snapshot;
+  const byId = new Map(snapshot.readings.map((r) => [r.id as string, r]));
+  const out = new Map(snapshot.readings.map((r) => [r.id as string, r]));
+  const generatedAt = live.generatedAt;
+
+  // 1. The four tiles.
+  for (const assetId of Object.keys(live.assets) as PriceAssetId[]) {
+    const entry = live.assets[assetId];
+    const reading = byId.get(assetId);
+    if (entry === undefined || reading === undefined) continue; // no quote / no such row — never invent rows
+    if (!asOfAtLeast(entry.asOf, reading.asOf)) continue; // never rewind a fresher EOD print
+    out.set(assetId, patchReading(reading, {
+      value: entry.value,
+      asOf: entry.asOf,
+      ...mergedChanges(reading, entry),
+      sourceName: LIVE_PRICE_ASSETS[assetId].sourceName,
+      sourceUrl: LIVE_PRICE_ASSETS[assetId].sourceUrl,
+      updatedAt: generatedAt,
+    }));
+  }
+
+  const liveGold = live.assets['gold-usd'];
+  const liveSilver = live.assets['silver-usd'];
+  const liveBtc = live.assets['btc-usd'];
+
+  // 2. The Bitcoin tile's context ratios — only when BOTH bases are live.
+  if (liveGold !== undefined && liveBtc !== undefined) {
+    const reading = byId.get('gold-btc');
+    if (reading !== undefined) {
+      out.set('gold-btc', patchReading(reading, {
+        value: round4(liveGold.value / liveBtc.value),
+        asOf: laterDate(liveGold.asOf, liveBtc.asOf),
+        sourceName: LIVE_RATIO_SOURCE.goldBtc.name,
+        sourceUrl: LIVE_RATIO_SOURCE.goldBtc.url,
+        updatedAt: generatedAt,
+      }));
+    }
+  }
+  if (liveSilver !== undefined && liveBtc !== undefined) {
+    const reading = byId.get('silver-btc');
+    if (reading !== undefined) {
+      out.set('silver-btc', patchReading(reading, {
+        value: round4(liveSilver.value / liveBtc.value),
+        asOf: laterDate(liveSilver.asOf, liveBtc.asOf),
+        sourceName: LIVE_RATIO_SOURCE.silverBtc.name,
+        sourceUrl: LIVE_RATIO_SOURCE.silverBtc.url,
+        updatedAt: generatedAt,
+      }));
+    }
+  }
+
+  // 3. The gold tile's A$ companion — live gold over the snapshot's daily
+  //    ECB audusd (gold-aud = gold-usd ÷ audusd; derived.ts uses the
+  //    USD→AUD quote, its inverse is the audusd reading).
+  if (liveGold !== undefined) {
+    const goldAud = byId.get('gold-aud');
+    const audusd = byId.get('audusd');
+    if (goldAud !== undefined && audusd !== undefined && audusd.value !== null && audusd.value > 0) {
+      out.set('gold-aud', patchReading(goldAud, {
+        value: round4(liveGold.value / audusd.value),
+        asOf: liveGold.asOf,
+        sourceName: LIVE_RATIO_SOURCE.goldAud.name,
+        sourceUrl: LIVE_RATIO_SOURCE.goldAud.url,
+        updatedAt: generatedAt,
+      }));
+    }
+  }
+
+  return { ...snapshot, readings: snapshot.readings.map((r) => out.get(r.id as string) ?? r) };
+}

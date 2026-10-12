@@ -14,6 +14,11 @@
   // actual scrape cadence at ~1 request / 5 min ≈ 288/day per source — polite,
   // free-tier safe). tgju runs every minute; frankfurter (ECB data, updates
   // ~daily) every 15th minute only.
+  //
+  // 2026-10-12 — the :13 minute of every hour additionally refreshes the
+  // Insights live prices (Yahoo quotes for the Prices board, write-only-
+  // if-changed to insights:prices-live:v1; see src/index.ts PRICES_CRON_MINUTE).
+  // No new cron trigger: the account's free 5-cron limit is full.
   "triggers": {
     "crons": ["* * * * *"]
   },
