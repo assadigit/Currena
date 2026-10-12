@@ -17,6 +17,11 @@
  *   hover dot + value/date tooltip + X tick labels ]
  *   [ range chips (quarter · 1 year · 5 years) … signed window delta ]
  *
+ * Round 43 (owner): the DEFAULT range is per-caller — `defaultRange`
+ * (quarter everywhere by default; the money panel passes '1y' — "the
+ * default time frame for this section must be annual"). An explicit
+ * click still wins for the session; plottability still gates the chips.
+ *
  * Zero dependencies (the house Sparkline/HistoryChart pattern): the plot
  * is one stretched SVG (preserveAspectRatio="none" + non-scaling stroke)
  * for the line/area, while EVERY text — axis ticks and tooltip — renders
@@ -165,6 +170,7 @@ export function TrendPanel({
   rangeGroupData,
   deltaData,
   plotData,
+  defaultRange = 'quarter',
 }: {
   id: IndicatorId;
   copy: InsightsCopy;
@@ -179,11 +185,14 @@ export function TrendPanel({
   rangeGroupData?: Record<string, string>;
   deltaData?: Record<string, string>;
   plotData?: Record<string, string>;
+  /** R43: the range the chips open on — quarter by default; the money
+   *  panel's rows open on the annual window (owner round 43). */
+  defaultRange?: TrendRange;
 }) {
   const { ui } = copy;
   const gradId = useId();
   const state = useIndicatorHistory(id);
-  const [range, setRange] = useState<TrendRange>('quarter');
+  const [range, setRange] = useState<TrendRange>(defaultRange);
   const [hover, setHover] = useState<number | null>(null);
   const plotRef = useRef<HTMLDivElement | null>(null);
 

@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-12] — Money section: fa title verbatim + annual default window (owner round 43)
+
+Forty-third round — two owner notes: "for part what it means for my money,
+the farsi translation must be: رو هزینه‌های من چه تاثیری داره؟" and "also
+the default time frame for this section must be annual."
+
+### Changed
+
+- **The money section's Farsi title is now the owner's exact wording** —
+  «رو هزینه‌های من چه تاثیری داره؟» (was «برای پول من یعنی چه»). The EN
+  title ('What it means for my money') is untouched.
+- **The money rows' charts open on the ANNUAL window** — the shared trend
+  panel gains a per-caller `defaultRange` (quarter remains the default
+  everywhere else), and the money panel passes '1y': the «۱ سال» chip is
+  pressed on load and the signed delta reads the 12-month move. The
+  metals' Estimation charts keep their quarter default, and an explicit
+  chip click still wins for the session.
+
 ## [2026-10-12] — fa verdict word: «محتاط» → «احتیاط» (owner round 42)
 
 Forty-second round — a one-line owner note: "Instead of محتاط use احتیاط

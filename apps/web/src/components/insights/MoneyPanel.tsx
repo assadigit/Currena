@@ -141,6 +141,10 @@ function MoneyTrend({
       id={id}
       copy={copy}
       numberLocale={numberLocale}
+      /* Round 43 (owner): "the default time frame for this section must
+       * be annual" — the money rows' charts open on the 1-year window
+       * (the metals' Estimation charts keep their quarter default). */
+      defaultRange="1y"
       ariaLabelFor={(range) =>
         interpolate(copy.ui.trendChartAria, {
           name: copy.indicators[id].name,
