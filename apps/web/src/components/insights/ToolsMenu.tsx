@@ -44,6 +44,8 @@ export interface ToolsMenuProps {
   buttonRef: React.RefObject<HTMLButtonElement | null>;
   onDownloadCsv: () => void;
   onDownloadIcs: () => void;
+  /** World markets table export (spec §6.4) — rendered only when provided. */
+  onDownloadMarketsCsv?: () => void;
 }
 
 export function ToolsMenu({
@@ -60,6 +62,7 @@ export function ToolsMenu({
   buttonRef,
   onDownloadCsv,
   onDownloadIcs,
+  onDownloadMarketsCsv,
 }: ToolsMenuProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const filtering = status !== 'all' || query.trim() !== '';
@@ -209,6 +212,16 @@ export function ToolsMenu({
                 <Download aria-hidden size={16} strokeWidth={1.9} className="shrink-0" />
                 {copy.ui.downloadCsv}
               </button>
+              {onDownloadMarketsCsv ? (
+                <button
+                  type="button"
+                  onClick={onDownloadMarketsCsv}
+                  className="insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-currena-blue/40 bg-currena-blue/15 px-3 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
+                >
+                  <Download aria-hidden size={16} strokeWidth={1.9} className="shrink-0" />
+                  {copy.markets.csvDownload}
+                </button>
+              ) : null}
             </div>
           </div>
 

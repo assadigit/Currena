@@ -1,0 +1,32 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "currena-markets",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "observability": {
+    "enabled": true
+  },
+  // The world stock markets section (insights-world-markets-spec.md §3.4):
+  // its OWN two cron triggers, separate from every other scheduled job, so
+  // each invocation stays far under the 50-subrequest cap and the account's
+  // 5-cron limit is respected (3 were in use; these are the last 2).
+  //   main  23:30 UTC Mon–Fri — all 14 markets have closed; EODHD first.
+  //   retry 01:30 UTC Tue–Sat — re-fetches failed/old markets; when the
+  //         whole snapshot is old (the main run's write bounced off the
+  //         saturated daily KV budget ~18:30 UTC), it re-fetches through
+  //         Yahoo and lands the day's single write in the fresh
+  //         post-midnight budget slice.
+  "triggers": {
+    "crons": ["30 23 * * 1-5", "30 1 * * 2-6"]
+  },
+  "kv_namespaces": [
+    {
+      "binding": "RATES",
+      "id": "4627ac33a4b148ff9fc2189266b1890e"
+    }
+  ]
+  // The EODHD free key lands via `wrangler secret put EODHD_API_TOKEN`
+  // (never in this file); local dev reads `apps/markets/.dev.vars`
+  // (gitignored). Without the secret the worker still runs: every EODHD
+  // call fails fast and Yahoo serves the data (the designed fallback).
+}

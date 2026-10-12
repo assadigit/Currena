@@ -1177,6 +1177,186 @@ export const insightsCopyEn = {
     keyboardPrev: 'previous card',
   },
 
+  /* ------------------------------------------------------------------ *
+   * World stock markets (insights-world-markets-spec.md §7 + §8, verbatim)
+   * ------------------------------------------------------------------ */
+  markets: {
+    title: 'World stock markets',
+    subtitle: 'Last close · end-of-day data',
+    asOf: 'as of {date}',
+    /** Regional groups, east to west (the trading day's order). */
+    groups: { asia: 'Asia-Pacific', europe: 'Europe', americas: 'Americas' },
+    /** The segmented view switch (§6.3). Default Today. */
+    viewSwitchAria: 'Choose the number every market tile shows',
+    viewToday: 'Today',
+    view1m: '1 month',
+    viewFromHigh: 'From 52-week high',
+    /** Quiet-by-default tile tag (§6.3): correction/bear markets only. */
+    tileTagBelow: '{x}% below 52-week high',
+    /** Status words (§8.2) — correction maps to Needs attention, bear to Unusual. */
+    statusNormal: 'Normal',
+    statusCorrection: 'Correction',
+    statusBear: 'Bear market',
+    /** Trend words (§8.1). */
+    trendUp: 'Up',
+    trendFlat: 'Flat',
+    trendDown: 'Down',
+    /** Old-data chip (§8.2). */
+    oldData: 'Old data · {date}',
+    /** Table disclosure (§8.2). */
+    showTable: 'Show full table',
+    hideTable: 'Hide table',
+    tableLabel: 'All world stock markets',
+    thMarket: 'Market',
+    thToday: 'Today',
+    th1m: '1 month',
+    thFromHigh: 'From 52-week high',
+    thTrend: 'Trend',
+    thStatus: 'Status',
+    thClose: 'Last close',
+    /** States (§6.6). */
+    empty: 'Market data is being prepared. Check back after the next daily update.',
+    collapsedStale:
+      'World stock market data is old — last update {date}. It will return after the next daily update.',
+    footer:
+      'Source: EODHD (Yahoo Finance as backup). End-of-day values in each market’s local currency.',
+    /** Detail panel headings (§6.5) + numbers. */
+    detailWhat: 'What it is',
+    detailWhy: 'Why it matters to the world',
+    detailYou: 'What it means for you',
+    lastCloseLabel: 'Last close',
+    high52wLabel: '52-week high',
+    low52wLabel: '52-week low',
+    chartLabel: '52-week chart',
+    chartAria: 'Closing values over the last 52 weeks',
+    chartValueAria: '{date}: {value}',
+    /** Takeaway templates (§8.3) — generated from the numbers, never free text. */
+    takeawayCalm: '{up} of 14 markets rose today. None is far below its 52-week high.',
+    takeawaySome: '{n} of 14 markets are 10% or more below their 52-week high, mostly in {group}.',
+    takeawayHeavy: '{n} of 14 markets are 10% or more below their 52-week high. The fall is widespread.',
+    takeawayShock: 'A sharp one-day fall hit {k} markets.',
+    /** Hero integration (§5.3): the section signal joins the Global verdict's
+     * attention module when raised. */
+    heroAlertAttention:
+      'World stock markets · Needs attention — {n} of {count} markets are 10% or more below their 52-week high.',
+    heroAlertUnusual:
+      'World stock markets · Unusual — {n} of {count} markets are 10% or more below their 52-week high.',
+    /** CSV export columns (the Tools menu, §6.4). */
+    csvColMarket: 'Market',
+    csvColToday: 'Today %',
+    csvCol1m: '1 month %',
+    csvColFromHigh: 'From 52-week high %',
+    csvColTrend: 'Trend',
+    csvColStatus: 'Status',
+    csvColClose: 'Last close',
+    csvColAsOf: 'As of',
+    csvColSource: 'Source',
+    csvColHigh52w: '52-week high',
+    csvColLow52w: '52-week low',
+    csvDownload: 'World markets CSV',
+    /** Per-market context content (§7, verbatim). */
+    entries: {
+      n225: {
+        name: 'Nikkei 225',
+        latin: 'Nikkei 225',
+        what: '225 large Japanese companies, many of them exporters.',
+        why: 'It moves with the yen (you already track USD/JPY): a weak yen usually helps exporters, and a sudden yen jump can hit this index hard.',
+        you: 'Big yen swings can shake global markets, as happened in August 2024.',
+      },
+      asx200: {
+        name: 'ASX 200',
+        latin: 'ASX 200',
+        what: 'The 200 largest companies on the Australian Securities Exchange, led by banks and miners.',
+        why: 'Your home market. It follows iron ore, China’s demand and the big banks.',
+        you: 'Most Australian super funds hold a large slice of these companies, so it affects your retirement savings.',
+      },
+      kospi: {
+        name: 'KOSPI',
+        latin: 'KOSPI',
+        what: 'South Korea’s main stock index, led by Samsung Electronics and SK Hynix.',
+        why: 'A bellwether for the world’s computer-chip cycle and for AI hardware demand.',
+        you: 'Chip demand shapes the cost and availability of phones, cars and AI services.',
+      },
+      hsi: {
+        name: 'Hang Seng',
+        latin: 'Hang Seng',
+        what: 'Hong Kong’s biggest companies, including many Chinese technology and finance firms.',
+        why: 'The main door through which foreign investors buy into China, so it reacts fast to China news.',
+        you: 'Sharp moves here are an early hint of how global investors feel about China.',
+      },
+      ssec: {
+        name: 'Shanghai Composite',
+        latin: 'Shanghai Composite',
+        what: 'All stocks listed on the Shanghai Stock Exchange.',
+        why: 'A read on China’s domestic economy, which drives demand for oil, iron ore and copper.',
+        you: 'China buys a large share of Australia’s iron ore, so a weak China market can mean weaker Australian exports and a softer Australian dollar.',
+      },
+      taiex: {
+        name: 'TAIEX',
+        latin: 'TAIEX',
+        what: 'Taiwan’s main stock index. TSMC, which makes most of the world’s most advanced chips, carries a huge weight.',
+        why: 'Shows the health of the AI-chip supply chain, and carries geopolitical risk around Taiwan.',
+        you: 'Trouble in Taiwan would ripple through every technology and AI company.',
+      },
+      nifty50: {
+        name: 'Nifty 50',
+        latin: 'Nifty 50',
+        what: 'The 50 largest companies on India’s National Stock Exchange.',
+        why: 'India is one of the fastest-growing big economies and competes with China for global investor money.',
+        you: 'Money moving into or out of India can shift emerging-market funds and demand for oil and gold.',
+      },
+      stoxx50: {
+        name: 'Euro Stoxx 50',
+        latin: 'Euro Stoxx 50',
+        what: 'The 50 biggest companies in the eurozone.',
+        why: 'One number for the health of the euro area, one of the world’s largest economic blocs.',
+        you: 'It affects the euro and European interest rates, which matter for imports, travel and global funds.',
+      },
+      dax: {
+        name: 'DAX',
+        latin: 'DAX',
+        what: 'The 40 largest German companies, heavy in cars, chemicals and machinery.',
+        why: 'Germany sells goods worldwide, so the DAX is a good read on global trade and on demand from China.',
+        you: 'Weakness can signal slowing world trade, which tends to cool growth and commodity prices.',
+      },
+      ftse: {
+        name: 'FTSE 100',
+        latin: 'FTSE 100',
+        what: 'The 100 largest companies on the London Stock Exchange.',
+        why: 'Full of global miners, oil companies and banks that earn most of their money abroad, so it works more like a gauge of commodities and world growth than of the UK itself.',
+        you: 'It often rises when oil and metal prices rise, even if the UK economy is weak.',
+      },
+      sp500: {
+        name: 'S&P 500',
+        latin: 'S&P 500',
+        what: 'The 500 biggest companies listed in the United States.',
+        why: 'It is the world’s main stock-market benchmark; when it falls sharply, markets almost everywhere follow.',
+        you: 'Many super and index funds hold US shares, so its moves reach your retirement savings.',
+      },
+      ndx: {
+        name: 'Nasdaq 100',
+        latin: 'Nasdaq 100',
+        what: 'The 100 largest non-financial companies on the Nasdaq exchange, led by big technology and AI firms.',
+        why: 'Shows the mood for technology and growth stocks. It usually swings harder than the S&P 500.',
+        you: 'Falls here often mean investors are pulling back from risk, which can ripple into crypto and growth funds.',
+      },
+      tsx: {
+        name: 'S&P/TSX Composite',
+        latin: 'S&P/TSX',
+        what: 'Canada’s main stock index, heavy in energy, banks and mining.',
+        why: 'A read on oil and metal prices, and Canada is the US’s closest trading partner.',
+        you: 'It often moves with oil prices, which affect what you pay for petrol.',
+      },
+      ibov: {
+        name: 'Ibovespa',
+        latin: 'Ibovespa',
+        what: 'Brazil’s main stock index, with large oil, mining and bank companies.',
+        why: 'The usual stand-in for emerging markets and commodity exporters. It drops when investors flee riskier countries.',
+        you: 'A sharp fall often goes with a stronger US dollar and weaker emerging-market currencies.',
+      },
+    },
+  },
+
   sections: {
     global: 'Global',
     australia: 'Australia',

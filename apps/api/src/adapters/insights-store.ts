@@ -19,7 +19,13 @@ import {
   InsightsSnapshotSchema,
   InsightsStatusSchema,
 } from '@currena/core';
-import type { IndicatorHistory, InsightsSnapshot, InsightsStatus, IndicatorId } from '@currena/core';
+import type {
+  IndicatorHistory,
+  InsightsSnapshot,
+  InsightsStatus,
+  IndicatorId,
+  MarketsSnapshot,
+} from '@currena/core';
 import {
   INSIGHTS_SNAPSHOT_KEY,
   INSIGHTS_STATUS_KEY,
@@ -27,6 +33,8 @@ import {
   parseStoredValue,
   type InsightsReader,
 } from '@currena/insights/store';
+import { MARKETS_KV_KEY, parseStoredMarkets } from '@currena/insights/markets';
+import type { MarketsReader } from '@currena/insights/markets';
 
 export class KvInsightsReader implements InsightsReader {
   constructor(private readonly kv: KVNamespace) {}
@@ -50,5 +58,20 @@ export class KvInsightsReader implements InsightsReader {
       (v) => InsightsStatusSchema.parse(v),
       INSIGHTS_STATUS_KEY,
     );
+  }
+}
+
+/**
+ * World stock markets serve path (insights-world-markets-spec.md §4 rule 5):
+ * ONE KV read for the section's ONE key, with the spec's 1-hour KV edge
+ * cache so page traffic never re-reads KV more than hourly. The value is
+ * written by the dedicated currena-markets Worker cron — read-only here,
+ * and a page request can never reach a provider.
+ */
+export class KvMarketsReader implements MarketsReader {
+  constructor(private readonly kv: KVNamespace) {}
+
+  async getMarkets(): Promise<MarketsSnapshot | undefined> {
+    return parseStoredMarkets(await this.kv.get(MARKETS_KV_KEY, { cacheTtl: 3600 }));
   }
 }

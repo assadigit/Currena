@@ -1,0 +1,26 @@
+[
+  {
+    "market": "n225",
+    "source": "Nikkei Official Indexes (indexes.nikkei.co.jp daily archives)",
+    "url": "https://indexes.nikkei.co.jp/en/nkave/archives/data",
+    "checkedAt": "2026-10-12T02:10:00Z",
+    "officialClose": 69030.92,
+    "officialDate": "2026-10-09"
+  },
+  {
+    "market": "dax",
+    "source": "Deutsche Börse (live.deutsche-boerse.com DAX detail)",
+    "url": "https://live.deutsche-boerse.com/indices/dax",
+    "checkedAt": "2026-10-12T02:10:00Z",
+    "officialClose": 25170.31,
+    "officialDate": "2026-10-09"
+  },
+  {
+    "market": "sp500",
+    "source": "Deutsche Börse live ticker (S&P 500 quote)",
+    "url": "https://live.deutsche-boerse.com",
+    "checkedAt": "2026-10-12T02:10:00Z",
+    "officialClose": 7810.16,
+    "officialDate": "2026-10-09"
+  }
+]

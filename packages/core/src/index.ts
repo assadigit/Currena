@@ -64,6 +64,14 @@ export {
   IndicatorHistorySchema,
   InsightsSourceReportSchema,
   InsightsStatusSchema,
+  MarketIdSchema,
+  MarketGroupIdSchema,
+  MarketTrendSchema,
+  MarketStatusSchema,
+  MarketSourceSchema,
+  MarketEntrySchema,
+  MarketsSummarySchema,
+  MarketsSnapshotSchema,
 } from './schemas';
 export type {
   Source,
@@ -96,6 +104,14 @@ export type {
   IndicatorHistory,
   InsightsSourceReport,
   InsightsStatus,
+  MarketId,
+  MarketGroupId,
+  MarketTrend,
+  MarketStatus,
+  MarketSource,
+  MarketEntry,
+  MarketsSummary,
+  MarketsSnapshot,
 } from './schemas';
 
 export {

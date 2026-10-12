@@ -36,7 +36,8 @@ import {
   type AdminBanner,
 } from './admin';
 import { KvRateStore } from './adapters/kv-store';
-import { KvInsightsReader } from './adapters/insights-store';
+import { KvInsightsReader, KvMarketsReader } from './adapters/insights-store';
+import type { MarketsReader } from '@currena/insights/markets';
 import { createInsightsRoutes } from './routes/insights';
 import { recordHistory, readHistory } from './history';
 import { buildMeta } from './meta';
@@ -58,6 +59,8 @@ export interface AppDeps {
   makeService?: (env: Bindings) => RatesService;
   /** Override the Insights store (route tests inject the in-memory fake). */
   makeInsightsReader?: (env: Bindings) => import('@currena/insights/store').InsightsReader;
+  /** Override the world-markets store (route tests inject the in-memory fake). */
+  makeMarketsReader?: (env: Bindings) => MarketsReader;
 }
 
 const NO_STORE: Readonly<Record<string, string>> = { 'Cache-Control': 'no-store' };
@@ -216,6 +219,14 @@ export function createApp(deps: AppDeps = {}) {
     return insightsReader;
   };
 
+  // World stock markets serve path: the section's ONE key behind the spec's
+  // 1-hour KV edge cache (KvMarketsReader — same lazy-singleton pattern).
+  let marketsReader: MarketsReader | undefined;
+  const getMarketsReader = (env: Bindings): MarketsReader => {
+    marketsReader ??= deps.makeMarketsReader ? deps.makeMarketsReader(env) : new KvMarketsReader(env.RATES);
+    return marketsReader;
+  };
+
   const app = new Hono<{ Bindings: Bindings }>();
 
   // Security headers on every Worker-answered response (SWOT hardening
@@ -331,7 +342,7 @@ export function createApp(deps: AppDeps = {}) {
 
   // Phase I3: precomputed snapshot + per-indicator history, both written by
   // the daily GitHub Actions ingestion runner (roadmap §2). Read-only here.
-  app.route('/api/insights', createInsightsRoutes({ getReader: getInsightsReader }));
+  app.route('/api/insights', createInsightsRoutes({ getReader: getInsightsReader, getMarketsReader }));
 
   /* ------------------------------ convert ------------------------------- */
 

@@ -33,6 +33,7 @@ import { interpolate } from '../i18n';
 import { useI18n } from '../lib/locale';
 import { routeQuery } from '../router';
 import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../lib/insights';
+import { fetchMarketsSnapshot, readCachedMarkets } from '../lib/markets';
 import { AboutTheData } from '../components/insights/AboutTheData';
 import { AlertCard } from '../components/insights/AlertCard';
 import { CompactRow } from '../components/insights/CompactRow';
@@ -45,6 +46,8 @@ import { PricesBoard } from '../components/insights/PricesBoard';
 import { Signals } from '../components/insights/Signals';
 import { Together } from '../components/insights/Together';
 import { ToolsMenu } from '../components/insights/ToolsMenu';
+import { WorldMarkets, type MarketsLoadState } from '../components/insights/WorldMarkets';
+import type { MarketsAlert } from '../components/insights/VerdictMeter';
 import { Skeleton } from '../components/ui';
 import { Button } from '../components/ui';
 import { useInsightsCopy } from '../components/insights/useInsightsCopy';
@@ -431,6 +434,45 @@ export function Insights() {
     return () => controller.abort();
   }, [retryToken]);
 
+  // World stock markets (insights-world-markets-spec.md): an independent
+  // feed with its own last-good cache. It NEVER surfaces an error — the
+  // designed fallbacks are the loading skeletons and the calm "being
+  // prepared" line (§6.6) — so a missing/unready feed cannot break the
+  // page, and a page request never reaches a provider (§4 rule 4).
+  const [marketsState, setMarketsState] = useState<MarketsLoadState>(() => {
+    try {
+      const cachedMarkets = readCachedMarkets();
+      return cachedMarkets ? { kind: 'ready', snapshot: cachedMarkets } : { kind: 'loading' };
+    } catch {
+      return { kind: 'loading' };
+    }
+  });
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetchMarketsSnapshot(controller.signal).then((snapshot) => {
+      if (controller.signal.aborted) return;
+      setMarketsState(snapshot !== null ? { kind: 'ready', snapshot } : { kind: 'empty' });
+    });
+    return () => controller.abort();
+  }, []);
+
+  // §5.3 (build step 9): the raised section signal joins the GLOBAL hero
+  // verdict's attention module; undefined when calm or not yet populated.
+  const marketsAlert = useMemo<MarketsAlert | undefined>(() => {
+    if (marketsState.kind !== 'ready') return undefined;
+    const { summary } = marketsState.snapshot;
+    if (summary.signal === 'normal') return undefined;
+    return {
+      signal: summary.signal,
+      n: summary.nAttention + summary.nUnusual,
+      count: summary.count,
+    };
+  }, [marketsState]);
+
+  const jumpToMarkets = useCallback(() => {
+    document.getElementById('insights-markets')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }, []);
+
   const togglePin = useCallback((id: IndicatorId, next: boolean): void => {
     setPinned((prev) => {
       const s = new Set(prev);
@@ -641,6 +683,21 @@ export function Insights() {
     );
   }, [state, locale]);
 
+  // The world-markets table export (spec §6.4: the table's CSV lives in the
+  // existing Tools menu). Only offered while a markets snapshot is in hand.
+  const downloadMarketsCsv = useCallback(() => {
+    if (marketsState.kind !== 'ready') return;
+    void import('../components/insights/markets-csv').then(({ buildMarketsCsv, marketsCsvFilename }) => {
+      const csv = buildMarketsCsv(marketsState.snapshot, copy);
+      void import('../lib/download').then(({ downloadBlob }) => {
+        downloadBlob(
+          new Blob([csv], { type: 'text/csv;charset=utf-8' }),
+          marketsCsvFilename(marketsState.snapshot.generatedAt),
+        );
+      });
+    });
+  }, [marketsState, copy]);
+
   // P1/R19: the sticky section nav — the Signals pill joins the row (the
   // built page had the section but no pill) and every pill expands its
   // section if collapsed (R7b/R25).
@@ -703,6 +760,7 @@ export function Insights() {
               buttonRef={toolsButtonRef}
               onDownloadCsv={downloadCsv}
               onDownloadIcs={downloadIcs}
+              onDownloadMarketsCsv={marketsState.kind === 'ready' ? downloadMarketsCsv : undefined}
             />
           ) : null}
         </div>
@@ -765,6 +823,8 @@ export function Insights() {
               onJumpSection={jumpToSection}
               onJumpAbout={jumpAbout}
               onFocusCard={focusCard}
+              marketsAlert={marketsAlert}
+              onJumpMarkets={jumpToMarkets}
             />
           </div>
 
@@ -779,6 +839,12 @@ export function Insights() {
             numberLocale={numberLocale}
             onFocusCard={focusCard}
           />
+
+          {/* World stock markets (insights-world-markets-spec.md §6.2):
+           * right after the commodity prices — both answer "what is moving";
+           * never above the verdict or alerts. Self-contained feed: its own
+           * loading/empty states, never an error surface for the page. */}
+          <WorldMarkets state={marketsState} copy={copy} locale={locale} numberLocale={numberLocale} />
 
           {/* R11: "What it means for my money" — at most 4 lines. */}
           <MoneyPanel

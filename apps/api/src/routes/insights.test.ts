@@ -174,3 +174,112 @@ describe('admin console insights card', () => {
     expect(html).not.toContain('<h2>Insights');
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * World stock markets route (insights-world-markets-spec.md §4/§9 step 4)
+ * ------------------------------------------------------------------ */
+
+import { InMemoryMarketsStore } from '@currena/insights/markets';
+import {
+  buildMarketsSnapshot,
+  runMarketsJob,
+} from '@currena/insights/markets';
+import type { MarketsSnapshot } from '@currena/core';
+
+/** A REAL-shaped snapshot: the full 14-market pipeline over synthetic series. */
+async function realisticSnapshot(): Promise<MarketsSnapshot> {
+  const job = await runMarketsJob(
+    {
+      fetchEodhd: async (id) => {
+        const points: { date: string; value: number }[] = [];
+        let t = new Date('2026-10-09T00:00:00Z').getTime();
+        let made = 0;
+        while (made < 260) {
+          const date = new Date(t).toISOString().slice(0, 10);
+          const dow = new Date(t).getUTCDay();
+          if (dow !== 0 && dow !== 6) {
+            points.push({ date, value: 20000 + made * 7 + (made % 5) });
+            made++;
+          }
+          t -= 86_400_000;
+        }
+        points.reverse();
+        return { id, source: 'eodhd', points };
+      },
+      fetchYahoo: async (id) => {
+        throw new Error('yahoo not needed in this fixture');
+      },
+    },
+    { kind: 'main', providerOrder: 'eodhd-first' },
+    undefined,
+    '2026-10-12',
+  );
+  const snap = buildMarketsSnapshot({
+    resolutions: job.resolutions,
+    prev: undefined,
+    runDate: '2026-10-12',
+    generatedAt: '2026-10-12T23:31:00Z',
+  });
+  if (snap === undefined) throw new Error('fixture snapshot failed to build');
+  return snap;
+}
+
+describe('GET /api/insights/markets', () => {
+  let store: InMemoryMarketsStore;
+
+  beforeEach(() => {
+    store = new InMemoryMarketsStore();
+  });
+
+  function makeApp() {
+    return createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeMarketsReader: () => store,
+    });
+  }
+
+  it('serves the stored snapshot with ETag + the spec §4 rule 5 cache headers', async () => {
+    const snap = await realisticSnapshot();
+    await store.putMarketsIfChanged(snap);
+    const res = await makeApp().request('/api/insights/markets', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('etag')).toBe('"insights-markets:2026-10-12T23:31:00Z"');
+    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=3600');
+    expect(await res.json()).toEqual(snap);
+  });
+
+  it('answers 304 on a matching If-None-Match', async () => {
+    const snap = await realisticSnapshot();
+    await store.putMarketsIfChanged(snap);
+    const res = await makeApp().request(
+      '/api/insights/markets',
+      { headers: { 'if-none-match': '"insights-markets:2026-10-12T23:31:00Z"' } },
+      env,
+    );
+    expect(res.status).toBe(304);
+  });
+
+  it('answers 503 markets_not_ready (calm, no-store) when KV is empty', async () => {
+    const res = await makeApp().request('/api/insights/markets', undefined, env);
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { error: { code: string; message: string } };
+    expect(body.error.code).toBe('markets_not_ready');
+    expect(res.headers.get('cache-control')).toBe('no-store');
+  });
+
+  it('keeps the full 14-market response under the 12 KB budget (spec §9 step 4)', async () => {
+    const snap = await realisticSnapshot();
+    expect(snap.markets.length).toBe(14);
+    expect(snap.markets.every((m) => m.weekly.length === 52)).toBe(true);
+    const bytes = JSON.stringify(snap).length;
+    expect(bytes).toBeLessThan(12 * 1024);
+  });
+
+  it('one KV read per request (the store counts its own ops)', async () => {
+    const snap = await realisticSnapshot();
+    await store.putMarketsIfChanged(snap);
+    const readsBefore = store.ops.reads;
+    await makeApp().request('/api/insights/markets', undefined, env);
+    expect(store.ops.reads - readsBefore).toBe(1);
+  });
+});

@@ -7,14 +7,19 @@
   "exports": {
     ".": "./src/index.ts",
     "./adapters": "./src/adapters/index.ts",
-    "./store": "./src/store.ts"
+    "./store": "./src/store.ts",
+    "./markets": "./src/markets/index.ts",
+    "./markets/definitions": "./src/markets/definitions.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
     "test": "vitest run",
     "backtest": "tsx scripts/backtest.ts",
     "live-run": "tsx scripts/live-run.ts",
-    "ingest": "tsx scripts/ingest.ts"
+    "ingest": "tsx scripts/ingest.ts",
+    "markets-data-check": "tsx scripts/markets-data-check.ts",
+    "markets-run": "tsx scripts/markets-run.ts",
+    "markets-backtest": "tsx scripts/markets-backtest.ts"
   },
   "dependencies": {
     "@currena/core": "workspace:*",

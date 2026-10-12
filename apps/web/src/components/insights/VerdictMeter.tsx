@@ -84,6 +84,21 @@ export function VerdictMeter({
 }
 
 /**
+ * The world-markets section signal joining the hero's attention module
+ * (insights-world-markets-spec.md §5.3 / build step 9): raised signals
+ * appear with their numbers inside the named-alerts module — the existing
+ * mechanism, no new card.
+ */
+export interface MarketsAlert {
+  /** The raised signal ('attention' | 'unusual'; 'normal' never alerts). */
+  signal: 'attention' | 'unusual';
+  /** Markets in Correction or Bear market. */
+  n: number;
+  /** Total market rows (14 once populated). */
+  count: number;
+}
+
+/**
  * One region's verdict block (R2): name, meter, verdict word, the gauges as
  * small readings, the computed reason line, the count line, and the R3
  * needs-attention tiles with numbers.
@@ -97,6 +112,8 @@ export function VerdictBlock({
   onJumpSection,
   onJumpAbout,
   onFocusCard,
+  marketsAlert,
+  onJumpMarkets,
 }: {
   section: InsightsSection;
   sectionLabel: string;
@@ -106,6 +123,10 @@ export function VerdictBlock({
   onJumpSection: (section: InsightsSection) => void;
   onJumpAbout: () => void;
   onFocusCard: (id: IndicatorId) => void;
+  /** §5.3: the raised world-markets signal (Global block only). */
+  marketsAlert?: MarketsAlert;
+  /** Scroll to the world-markets section when the alert line is used. */
+  onJumpMarkets?: () => void;
 }) {
   const step = sectionVerdictStep(section, readings);
   const labelWord = labelForVerdictStep(step) ?? null;
@@ -284,6 +305,35 @@ export function VerdictBlock({
        * identical across regions. The tint is softened — red is reserved
        * for the words and the count, not a wall of pink. */}
       <div className="mt-auto" data-attention-module>
+        {/* §5.3 hero integration: the raised world-markets signal appears
+         * in the named-alerts module WITH ITS NUMBERS, using the module's
+         * own tone language (attention = the alert red, unusual = the amber
+         * watch ink — the same tiers the tiles speak). Clicking jumps to the
+         * world-markets section. */}
+        {marketsAlert ? (
+          <button
+            type="button"
+            onClick={() => onJumpMarkets?.()}
+            className={`insights-focusable -my-0.5 mb-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold underline decoration-current/40 underline-offset-4 transition-opacity hover:opacity-80 ${
+              marketsAlert.signal === 'unusual'
+                ? 'text-[var(--color-status-watch)]'
+                : 'text-[var(--color-status-alert)]'
+            }`}
+            data-markets-signal={marketsAlert.signal}
+          >
+            <bdi>
+              {interpolate(
+                marketsAlert.signal === 'unusual'
+                  ? copy.markets.heroAlertUnusual
+                  : copy.markets.heroAlertAttention,
+                {
+                  n: num(marketsAlert.n, numberLocale),
+                  count: num(marketsAlert.count, numberLocale),
+                },
+              )}
+            </bdi>
+          </button>
+        ) : null}
         <p
           className={`m-0 text-[length:var(--type-caption)] font-semibold ${attentionToneClass(tiles.length)}`}
           data-attention-count

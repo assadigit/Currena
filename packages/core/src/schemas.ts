@@ -673,3 +673,150 @@ export const InsightsStatusSchema = z.object({
   sources: z.array(InsightsSourceReportSchema),
 });
 export type InsightsStatus = z.infer<typeof InsightsStatusSchema>;
+
+/* ------------------------------------------------------------------ *
+ * World stock markets (insights-world-markets-spec.md)
+ *
+ * The whole section is ONE KV key — `insights:markets:v1` — written by the
+ * dedicated currena-markets Worker cron (its own 2 cron triggers, so each
+ * invocation stays well under the 50-subrequest cap) and served read-only
+ * by GET /api/insights/markets. Page requests never touch a provider.
+ *
+ * Field semantics come from spec §4 "Stored object" + §5 "Derived numbers"
+ * (camelCase here to match every other contract in this file):
+ *   asOf     — the market's own last-close date (its calendar, not UTC's)
+ *   chg1d    — last close vs previous close, percent
+ *   chg1m    — last close vs the last close on/before the same date one
+ *              month earlier, percent
+ *   fromHigh — last close vs high52w, percent (always ≤ 0)
+ *   rangePos — (last − low) ÷ (high − low) × 100
+ *   trend    — vs the 50-day average: up > +1%, down < −1%, else flat
+ *   status   — distance-from-52w-high band with a 2-point exit buffer
+ *   weekly   — ≤52 [epochDay, close] pairs for the detail panel's chart
+ * ------------------------------------------------------------------ */
+
+/** The 14 world indices (spec §2, fixed for v1 — no additions). */
+export const MarketIdSchema = z.enum([
+  'n225',
+  'asx200',
+  'kospi',
+  'hsi',
+  'ssec',
+  'taiex',
+  'nifty50',
+  'stoxx50',
+  'dax',
+  'ftse',
+  'sp500',
+  'ndx',
+  'tsx',
+  'ibov',
+]);
+export type MarketId = z.infer<typeof MarketIdSchema>;
+
+/** Regional group; the section renders the groups east to west. */
+export const MarketGroupIdSchema = z.enum(['asia', 'europe', 'americas']);
+export type MarketGroupId = z.infer<typeof MarketGroupIdSchema>;
+
+/** Trend vs the 50-day average (spec §5.1). */
+export const MarketTrendSchema = z.enum(['up', 'flat', 'down']);
+export type MarketTrend = z.infer<typeof MarketTrendSchema>;
+
+/**
+ * Distance-from-52-week-high status (spec §5.2). `correction` maps onto the
+ * page's needs-attention tier, `bear` onto the unusual tier (spec §8.2).
+ */
+export const MarketStatusSchema = z.enum(['normal', 'correction', 'bear']);
+export type MarketStatus = z.infer<typeof MarketStatusSchema>;
+
+/** Which provider produced the row (spec §3.2: EODHD primary, Yahoo fallback). */
+export const MarketSourceSchema = z.enum(['eodhd', 'yahoo']);
+export type MarketSource = z.infer<typeof MarketSourceSchema>;
+
+/** One market's row inside the stored snapshot. */
+export const MarketEntrySchema = z.object({
+  id: MarketIdSchema,
+  /** Last close date, YYYY-MM-DD on the market's own calendar. */
+  asOf: z.iso.date(),
+  /** Last close level in the market's local currency (> 0 — rule R1). */
+  close: z.number().finite().positive(),
+  /** Last close vs previous close, percent. */
+  chg1d: z.number().finite(),
+  /** Last close vs ~one month earlier, percent. */
+  chg1m: z.number().finite(),
+  /** Highest daily close in the last 365 days. */
+  high52w: z.number().finite().positive(),
+  /** Lowest daily close in the last 365 days. */
+  low52w: z.number().finite().positive(),
+  /** Last close vs high52w, percent — zero or negative by construction. */
+  fromHigh: z.number().finite().max(0),
+  /** Position inside the 52-week range, 0–100. */
+  rangePos: z.number().min(0).max(100),
+  trend: MarketTrendSchema,
+  status: MarketStatusSchema,
+  source: MarketSourceSchema,
+  /** True when asOf is more than 5 calendar days old (rule R6). */
+  stale: z.boolean(),
+  /**
+   * ≤52 weekly closes for the detail chart, delta-encoded to keep the ONE
+   * stored object under the route's 12 KB budget (spec §4): each entry is
+   * [dayDelta, close] where dayDelta counts days from the previous entry
+   * (the first from the WEEKLY_EPOCH_BASE of 2020-01-01, exported from
+   * @currena/insights/markets/definitions) and close is rounded to integer
+   * chart precision. Consecutive calendar weeks are 7 apart; a gap (a
+   * market's holiday week) simply carries a larger delta — never a
+   * fabricated value.
+   */
+  weekly: z
+    .array(z.tuple([z.number().int().nonnegative(), z.number().finite().positive()]))
+    .min(1)
+    .max(52)
+    .refine((w) => w.every((p, i) => i === 0 || p[0] > 0), {
+      message: 'weekly day deltas must be positive after the first entry',
+    }),
+});
+export type MarketEntry = z.infer<typeof MarketEntrySchema>;
+
+/** Section rollup (spec §5.3) — feeds the hero count and the takeaway line. */
+export const MarketsSummarySchema = z.object({
+  /** Rows in this snapshot (14 once every market has spoken once). */
+  count: z.number().int().positive(),
+  /** Markets whose chg1d is above zero (mixed as-of dates are expected). */
+  roseToday: z.number().int().nonnegative(),
+  /** Markets in `correction` — the needs-attention tier. */
+  nAttention: z.number().int().nonnegative(),
+  /** Markets in `bear` — the unusual tier. */
+  nUnusual: z.number().int().nonnegative(),
+  /** The section signal: highest matching row of the §5.3 table. */
+  signal: z.enum(['normal', 'attention', 'unusual']),
+  /** Group holding the most correction+bear markets; null when all normal. */
+  worstGroup: MarketGroupIdSchema.nullable(),
+});
+export type MarketsSummary = z.infer<typeof MarketsSummarySchema>;
+
+/** The value of `insights:markets:v1`, verbatim over the wire. */
+export const MarketsSnapshotSchema = z
+  .object({
+    v: z.literal(1),
+    /** When the writing run finished (ISO 8601 UTC). */
+    generatedAt: z.iso.datetime(),
+    markets: z.array(MarketEntrySchema),
+    summary: MarketsSummarySchema,
+  })
+  .refine((s) => new Set(s.markets.map((m) => m.id)).size === s.markets.length, {
+    message: 'markets must contain each market id at most once',
+  })
+  .refine((s) => s.summary.count === s.markets.length, {
+    message: 'summary.count must equal the number of market rows',
+  })
+  .refine((s) => s.summary.nAttention + s.summary.nUnusual <= s.markets.length, {
+    message: 'summary attention+unusual counts cannot exceed the row count',
+  })
+  .refine((s) => s.summary.roseToday <= s.markets.length, {
+    message: 'summary.roseToday cannot exceed the row count',
+  })
+  .refine(
+    (s) => s.markets.every((m) => m.low52w <= m.close && m.close <= m.high52w && m.high52w > 0),
+    { message: 'each close must sit inside its own 52-week range' },
+  );
+export type MarketsSnapshot = z.infer<typeof MarketsSnapshotSchema>;

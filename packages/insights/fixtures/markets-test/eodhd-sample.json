@@ -1,0 +1,129 @@
+[
+ {
+  "date": "2026-09-24",
+  "open": 7666.99,
+  "high": 7719.01,
+  "low": 7662.57,
+  "close": 7704.1336,
+  "adjusted_close": 7704.1336,
+  "volume": 5316396200
+ },
+ {
+  "date": "2026-09-25",
+  "open": 7709.86,
+  "high": 7752.07,
+  "low": 7693.08,
+  "close": 7743.4119,
+  "adjusted_close": 7743.4119,
+  "volume": 4499186867
+ },
+ {
+  "date": "2026-09-28",
+  "open": 7721.7,
+  "high": 7724.15,
+  "low": 7666.6,
+  "close": 7683.6926,
+  "adjusted_close": 7683.6926,
+  "volume": 5129719571
+ },
+ {
+  "date": "2026-09-29",
+  "open": 7699.6,
+  "high": 7699.6,
+  "low": 7653.55,
+  "close": 7670.84,
+  "adjusted_close": 7670.84,
+  "volume": 5023592636
+ },
+ {
+  "date": "2026-09-30",
+  "open": 7688.99,
+  "high": 7722.88,
+  "low": 7651.5398,
+  "close": 7651.5398,
+  "adjusted_close": 7651.5398,
+  "volume": 4276559789
+ },
+ {
+  "date": "2026-10-01",
+  "open": 7666.47,
+  "high": 7684.75,
+  "low": 7616.78,
+  "close": 7666.4527,
+  "adjusted_close": 7666.4527,
+  "volume": 5783800353
+ },
+ {
+  "date": "2026-10-02",
+  "open": 7726.24,
+  "high": 7754.67,
+  "low": 7700.51,
+  "close": 7722.716,
+  "adjusted_close": 7722.716,
+  "volume": 5277434400
+ },
+ {
+  "date": "2026-10-05",
+  "open": 7730.86,
+  "high": 7794.35,
+  "low": 7727.59,
+  "close": 7773.954,
+  "adjusted_close": 7773.954,
+  "volume": 5840901730
+ },
+ {
+  "date": "2026-10-06",
+  "open": 7805.96,
+  "high": 7844.52,
+  "low": 7805.96,
+  "close": 7818.9261,
+  "adjusted_close": 7818.9261,
+  "volume": 5019651277
+ },
+ {
+  "date": "2026-10-07",
+  "open": 7792.98,
+  "high": 7807.02,
+  "low": 7763.34,
+  "close": 7801.7696,
+  "adjusted_close": 7801.7696,
+  "volume": 5111151551
+ },
+ {
+  "date": "2026-10-08",
+  "open": 7778.45,
+  "high": 7797.79,
+  "low": 7731.26,
+  "close": 7765.357,
+  "adjusted_close": 7765.357,
+  "volume": 6082078112
+ },
+ {
+  "date": "2026-10-09",
+  "open": 7786.36,
+  "high": 7820.57,
+  "low": 7779.34,
+  "close": 7811.54,
+  "adjusted_close": 7811.54,
+  "volume": 4782648171,
+  "warning": "Data is limited by one year as you have free subscription"
+ },
+ {
+  "date": "2026-10-10",
+  "open": 7800,
+  "high": 7810,
+  "low": 7790,
+  "close": 0,
+  "adjusted_close": 0,
+  "volume": 0
+ },
+ {
+  "date": "2026-10-11",
+  "open": 7800,
+  "high": 7810,
+  "low": 7790,
+  "close": null,
+  "adjusted_close": null,
+  "volume": 0
+ }
+]

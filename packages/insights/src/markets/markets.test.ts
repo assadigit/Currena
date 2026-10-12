@@ -1,0 +1,625 @@
+/**
+ * markets.test.ts — the world stock markets domain (build steps 1–2,
+ * insights-world-markets-spec.md §3.5, §5): provider parsers, the R1–R7
+ * validation rules (including a fake 20% jump and a fake stale date), the
+ * 2-point status buffer, the US override, the same-date stability rule,
+ * the retry gating, and the write-only-if-changed gate. Synthetic series
+ * only (AGENTS.md rule 7); saved sample provider responses cover the
+ * parser shapes (fixtures/markets-test/).
+ */
+
+import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import type { MarketEntry, MarketId, MarketsSnapshot } from '@currena/core';
+import { parseEodhdEodResponse, parseYahooChartResponse, ProviderError } from './providers';
+import { fetchEodhdSeries, fetchYahooSeries } from './providers';
+import type { MarketSeries } from './providers';
+import {
+  buildMarketsSnapshot,
+  marketsContentEqual,
+  marketsContentHash,
+  resolveMarket,
+  statusOf,
+  summarizeMarkets,
+  trendOf,
+  weeklySeries,
+} from './compute';
+import type { MarketResolution } from './compute';
+import { lastExpectedCloseDate, marketsNeedingData, retryRunOptions, runMarketsJob } from './job';
+import type { MarketJobFetchers } from './job';
+import { InMemoryMarketsStore } from './store';
+import { decodeWeeklySeries, MIN_CLOSES, MARKETS, MARKET_IDS } from './definitions';
+
+/* ------------------------------------------------------------------ *
+ * Synthetic series helpers
+ * ------------------------------------------------------------------ */
+
+const FIXTURES = new URL('./../../fixtures/markets-test/', import.meta.url);
+
+/** Deterministic daily series: `days` trading days ending at `endDate`. */
+function series(
+  id: MarketId,
+  source: 'eodhd' | 'yahoo',
+  endDate: string,
+  days: number,
+  gen: (i: number) => number = (i) => 100 + i * 0.1,
+): MarketSeries {
+  const points: { date: string; value: number }[] = [];
+  let d = new Date(`${endDate}T00:00:00Z`).getTime();
+  let made = 0;
+  while (made < days) {
+    const date = new Date(d).toISOString().slice(0, 10);
+    const dow = new Date(d).getUTCDay();
+    if (dow !== 0 && dow !== 6) {
+      points.push({ date, value: gen(made) });
+      made++;
+    }
+    d -= 86_400_000;
+  }
+  points.reverse();
+  return { id, source, points };
+}
+
+/** A stored row shaped for snapshot inputs (only the fields the code reads). */
+function storedEntry(id: MarketId, fields: Partial<MarketEntry> = {}): MarketEntry {
+  const weekly = weeklySeries(series(id, 'eodhd', fields.asOf ?? '2026-10-09', 300).points);
+  return {
+    id,
+    asOf: '2026-10-09',
+    close: 100,
+    chg1d: 0.5,
+    chg1m: 1.5,
+    high52w: 120,
+    low52w: 90,
+    fromHigh: -16.7,
+    rangePos: 33,
+    trend: 'flat',
+    status: 'correction',
+    source: 'eodhd',
+    stale: false,
+    weekly,
+    ...fields,
+  } as MarketEntry;
+}
+
+function fakeSnapshot(markets: readonly MarketEntry[], generatedAt = '2026-10-10T23:31:00Z'): MarketsSnapshot {
+  return {
+    v: 1,
+    generatedAt,
+    markets: [...markets],
+    summary: summarizeMarkets(markets),
+  };
+}
+
+const RUN_DATE = '2026-10-12';
+
+/* ------------------------------------------------------------------ *
+ * Providers — parsers over saved sample responses
+ * ------------------------------------------------------------------ */
+
+describe('parseEodhdEodResponse', () => {
+  it('parses the saved sample, tolerating the free-plan warning row', () => {
+    const json = JSON.parse(readFileSync(new URL('eodhd-sample.json', FIXTURES), 'utf8'));
+    const points = parseEodhdEodResponse(json, 'sp500');
+    expect(points.length).toBeGreaterThan(0);
+    expect(points.every((p) => /^\d{4}-\d{2}-\d{2}$/.test(p.date))).toBe(true);
+    expect(points.every((p) => p.value > 0)).toBe(true);
+    for (let i = 1; i < points.length; i++) expect(points[i]!.date > points[i - 1]!.date).toBe(true);
+  });
+
+  it('drops rows without a positive finite close (R1)', () => {
+    const points = parseEodhdEodResponse(
+      [
+        { date: '2026-10-08', close: 100 },
+        { date: '2026-10-09', close: 0 },
+        { date: '2026-10-10', close: null },
+        { date: '2026-10-11', close: -5 },
+        { date: '2026-10-12', close: 101, warning: 'Data is limited by one year as you have free subscription' },
+      ],
+      'sp500',
+    );
+    expect(points.map((p) => p.date)).toEqual(['2026-10-08', '2026-10-12']);
+  });
+
+  it('rejects an empty array (the FTSE case) and non-array answers', () => {
+    expect(() => parseEodhdEodResponse([], 'ftse')).toThrow(ProviderError);
+    expect(() => parseEodhdEodResponse({ error: 'x' }, 'ftse')).toThrow(ProviderError);
+    expect(() => parseEodhdEodResponse([{ date: '2026-10-08', close: 0 }], 'ftse')).toThrow(ProviderError);
+  });
+});
+
+describe('parseYahooChartResponse', () => {
+  it('parses the saved sample, dropping null closes (R1)', () => {
+    const json = JSON.parse(readFileSync(new URL('yahoo-sample.json', FIXTURES), 'utf8'));
+    const points = parseYahooChartResponse(json, 'ftse');
+    expect(points.length).toBeGreaterThan(0);
+    expect(points.every((p) => p.value > 0)).toBe(true);
+    for (let i = 1; i < points.length; i++) expect(points[i]!.date >= points[i - 1]!.date).toBe(true);
+  });
+
+  it('falls back to quote.close when adjclose is absent', () => {
+    const json = {
+      chart: {
+        result: [
+          {
+            timestamp: [1791552600, 1791639000],
+            indicators: { quote: [{ close: [7800.5, 7811.54] }] },
+          },
+        ],
+      },
+    };
+    const points = parseYahooChartResponse(json, 'sp500');
+    expect(points.map((p) => p.value)).toEqual([7800.5, 7811.54]);
+    expect(points[1]!.date).toBe('2026-10-10'); // UTC rendering of the epoch seconds (+1 day)
+  });
+
+  it('rejects missing/empty answers loudly', () => {
+    expect(() => parseYahooChartResponse({}, 'ftse')).toThrow(ProviderError);
+    expect(() => parseYahooChartResponse({ chart: { result: [] } }, 'ftse')).toThrow(ProviderError);
+    expect(() =>
+      parseYahooChartResponse({ chart: { result: [{ timestamp: [], indicators: {} }] } }, 'ftse'),
+    ).toThrow(ProviderError);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Providers — fetch halves with injected fetch (URL shape, errors)
+ * ------------------------------------------------------------------ */
+
+describe('fetchEodhdSeries / fetchYahooSeries', () => {
+  const eodhdBody = JSON.stringify([
+    ...Array.from({ length: 5 }, (_, i) => ({ date: `2026-10-0${i + 1}`, close: 100 + i })),
+  ]);
+
+  it('builds the spec §3.2 URLs (token and symbol encoded) and parses the answer', async () => {
+    const calls: string[] = [];
+    const fetchImpl = (async (input: RequestInfo | URL) => {
+      calls.push(String(input));
+      return new Response(eodhdBody, { status: 200 });
+    }) as typeof fetch;
+    const s = await fetchEodhdSeries('sp500', {
+      apiToken: 'abc/def+gh',
+      fetchImpl,
+      baseUrl: 'https://eodhd.test/api',
+      from: '2025-09-08',
+    });
+    expect(s.source).toBe('eodhd');
+    expect(calls[0]).toBe('https://eodhd.test/api/eod/GSPC.INDX?api_token=abc%2Fdef%2Bgh&fmt=json&period=d&from=2025-09-08');
+    expect(s.points.length).toBe(5);
+  });
+
+  it('maps a non-OK answer to a ProviderError without leaking the token', async () => {
+    const fetchImpl = (async () =>
+      new Response('{"error":{"message":"limit exceeded"}}', { status: 429 })) as typeof fetch;
+    await expect(
+      fetchEodhdSeries('sp500', { apiToken: 'SECRET-TOKEN', fetchImpl, baseUrl: 'https://eodhd.test' }),
+    ).rejects.toThrow(/429/);
+    try {
+      await fetchEodhdSeries('sp500', { apiToken: 'SECRET-TOKEN', fetchImpl, baseUrl: 'https://eodhd.test' });
+    } catch (err) {
+      expect((err as Error).message).not.toContain('SECRET-TOKEN');
+    }
+  });
+
+  it('rejects markets without an EODHD code (FTSE) without any call', async () => {
+    const fetchImpl = (async () => {
+      throw new Error('must not be called');
+    }) as typeof fetch;
+    await expect(fetchEodhdSeries('ftse', { apiToken: 'k', fetchImpl })).rejects.toThrow(/no EODHD code/);
+  });
+
+  it('sends a browser-like User-Agent to Yahoo and encodes the symbol', async () => {
+    const calls: Array<{ url: string; headers: HeadersInit }> = [];
+    const yahooBody = JSON.stringify({
+      chart: { result: [{ timestamp: [1791552600], indicators: { quote: [{ close: [7811.54] }] } }] },
+    });
+    const fetchImpl = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      calls.push({ url: String(input), headers: init?.headers ?? {} });
+      return new Response(yahooBody, { status: 200 });
+    }) as typeof fetch;
+    await fetchYahooSeries('n225', { fetchImpl, baseUrl: 'https://yahoo.test/chart' });
+    expect(calls[0]!.url).toBe('https://yahoo.test/chart/%5EN225?range=1y&interval=1d');
+    expect((calls[0]!.headers as Record<string, string>)['user-agent']).toMatch(/Mozilla/);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Derived numbers (§5.1)
+ * ------------------------------------------------------------------ */
+
+describe('trendOf', () => {
+  it('is up above +1% of the 50-day average, down below −1%, flat inside', () => {
+    // 60 flat points at 100, then the final point moves.
+    const flat = (last: number) => series('sp500', 'eodhd', '2026-10-09', 60, () => 100).points.slice(0, 59).concat([{ date: '2026-10-09', value: last }]);
+    expect(trendOf(flat(101.5))).toBe('up'); // +1.5%
+    expect(trendOf(flat(100.5))).toBe('flat'); // +0.5%
+    expect(trendOf(flat(99.5))).toBe('flat'); // −0.5%
+    expect(trendOf(flat(98.5))).toBe('down'); // −1.5%
+  });
+});
+
+describe('statusOf — the 2-point exit buffer (§5.2)', () => {
+  it('enters a harsher band immediately', () => {
+    expect(statusOf(-9.9, undefined)).toBe('normal');
+    expect(statusOf(-10, undefined)).toBe('correction');
+    expect(statusOf(-19.9, 'correction')).toBe('correction');
+    expect(statusOf(-20, 'correction')).toBe('bear');
+    expect(statusOf(-25, undefined)).toBe('bear');
+  });
+  it('softens only above the line plus the buffer', () => {
+    expect(statusOf(-18, 'bear')).toBe('bear'); // −18 is AT the exit line → held
+    expect(statusOf(-17.9, 'bear')).toBe('correction'); // above −18 → correction (still ≤ −10)
+    expect(statusOf(-8, 'correction')).toBe('correction'); // −8 at the line → held
+    expect(statusOf(-7.9, 'correction')).toBe('normal');
+    expect(statusOf(-5, 'normal')).toBe('normal');
+  });
+  it('deepening from normal through correction needs the full line', () => {
+    expect(statusOf(-19, 'normal')).toBe('correction'); // not yet −20
+    expect(statusOf(-20.1, 'normal')).toBe('bear');
+  });
+});
+
+describe('weeklySeries — delta encoding', () => {
+  it('keeps the LAST close of each calendar week, ≤52 points, decodes back to real dates', () => {
+    // Two weeks: Mon–Fri then Mon–Wed (dates chosen as real weekdays).
+    const pts = series('dax', 'eodhd', '2026-10-09', 60).points;
+    const weekly = weeklySeries(pts);
+    expect(weekly.length).toBeLessThanOrEqual(52);
+    const decoded = decodeWeeklySeries(weekly);
+    // Ascending decoded days, each mapping to a real source close (rounded).
+    const byDay = new Map(
+      pts.map((p) => [Math.round(Date.parse(`${p.date}T00:00:00Z`) / 86_400_000), Math.round(p.value)]),
+    );
+    for (const [day, value] of decoded) {
+      expect(byDay.get(day)).toBe(value);
+    }
+    for (let i = 1; i < decoded.length; i++) expect(decoded[i]![0]).toBeGreaterThan(decoded[i - 1]![0]);
+    // Consecutive calendar weeks are 7 days apart; a gap week carries a larger delta.
+    const deltas = weekly.slice(1).map((p) => p[0]);
+    expect(deltas.every((d) => d >= 7 && d % 7 === 0)).toBe(true);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * resolveMarket — R2, same-date stability, R3, R5 (§3.5)
+ * ------------------------------------------------------------------ */
+
+describe('resolveMarket — validation rules', () => {
+  it('R2: a series older than the stored date is rejected', () => {
+    const prev = storedEntry('sp500', { asOf: '2026-10-09' });
+    const old = series('sp500', 'eodhd', '2026-10-08', 60);
+    const r = resolveMarket({ id: 'sp500', primary: old }, prev, RUN_DATE);
+    expect(r.held).toBe(true);
+    expect(r.notes.join(' ')).toMatch(/R2/);
+  });
+
+  it('same-date stability: an agreeing re-fetch keeps the stored row (no write churn)', () => {
+    const prev = storedEntry('sp500', { asOf: '2026-10-09', close: 100 });
+    const fresh = { ...series('sp500', 'eodhd', '2026-10-09', 60), points: series('sp500', 'eodhd', '2026-10-09', 60).points.slice(0, -1).concat([{ date: '2026-10-09', value: 100.2 }]) };
+    const r = resolveMarket({ id: 'sp500', primary: fresh }, prev, RUN_DATE);
+    expect(r.held).toBe(true); // 0.2% apart → the same data
+  });
+
+  it('same-date revision beyond 0.5% is accepted (a genuine provider revision)', () => {
+    const prev = storedEntry('sp500', { asOf: '2026-10-09', close: 100 });
+    const base = series('sp500', 'eodhd', '2026-10-09', 60);
+    const revised = { ...base, points: base.points.slice(0, -1).concat([{ date: '2026-10-09', value: 103 }]) };
+    const r = resolveMarket({ id: 'sp500', primary: revised }, prev, RUN_DATE);
+    expect(r.held).toBe(false);
+    expect(r.entry?.close).toBe(103);
+  });
+
+  it('R3: a fake 20% jump is held when the second provider disagrees', () => {
+    const prev = storedEntry('sp500', { asOf: '2026-10-08' });
+    // 59 calm days at 100, then 120 — a +20% "move".
+    const jump = { ...series('sp500', 'eodhd', '2026-10-09', 60), points: series('sp500', 'eodhd', '2026-10-08', 59).points.concat([{ date: '2026-10-09', value: 120 }]) };
+    const calm = series('sp500', 'yahoo', '2026-10-09', 60); // says 100.x
+    const r = resolveMarket({ id: 'sp500', primary: jump, secondary: calm }, prev, RUN_DATE);
+    expect(r.held).toBe(true);
+    expect(r.notes.join(' ')).toMatch(/R3.*disagree/);
+  });
+
+  it('R3: a real 20% fall is accepted when both providers agree (a genuine crash)', () => {
+    const prev = storedEntry('sp500', { asOf: '2026-10-08' });
+    const falling = (src: 'eodhd' | 'yahoo') => ({
+      ...series('sp500', src, '2026-10-08', 59),
+      points: series('sp500', src, '2026-10-08', 59).points.concat([{ date: '2026-10-09', value: 80 }]),
+    });
+    const r = resolveMarket({ id: 'sp500', primary: falling('eodhd'), secondary: falling('yahoo') }, prev, RUN_DATE);
+    expect(r.held).toBe(false);
+    expect(r.entry?.close).toBe(80);
+    expect(r.entry?.chg1d).toBeLessThan(-19);
+  });
+
+  it('R3: a suspicious move without any second voice is held', () => {
+    const prev = storedEntry('sp500', { asOf: '2026-10-08' });
+    const jump = {
+      ...series('sp500', 'eodhd', '2026-10-09', 60),
+      points: series('sp500', 'eodhd', '2026-10-08', 59).points.concat([{ date: '2026-10-09', value: 130 }]),
+    };
+    const r = resolveMarket({ id: 'sp500', primary: jump }, prev, RUN_DATE);
+    expect(r.held).toBe(true);
+  });
+
+  it('R5: disagreement between providers is logged as a note while the winner serves', () => {
+    const prev = storedEntry('sp500', { asOf: '2026-10-08' });
+    const a = series('sp500', 'eodhd', '2026-10-09', 60);
+    const b = { ...series('sp500', 'yahoo', '2026-10-09', 60), points: series('sp500', 'yahoo', '2026-10-09', 60).points.slice(0, -1).concat([{ date: '2026-10-09', value: 95 }]) };
+    const r = resolveMarket({ id: 'sp500', primary: a, secondary: b }, prev, RUN_DATE);
+    expect(r.held).toBe(false);
+    expect(r.notes.join(' ')).toMatch(/R5/);
+  });
+
+  it('R6: a last close older than 5 calendar days is marked stale', () => {
+    const r = resolveMarket({ id: 'sp500', primary: series('sp500', 'eodhd', '2026-10-02', 60) }, undefined, RUN_DATE);
+    expect(r.entry?.stale).toBe(true); // 10 days old
+    const fresh = resolveMarket({ id: 'sp500', primary: series('sp500', 'eodhd', '2026-10-09', 60) }, undefined, RUN_DATE);
+    expect(fresh.entry?.stale).toBe(false);
+  });
+
+  it('R7: a first-ever suspicious move is accepted with a note (nothing to hold)', () => {
+    const jump = {
+      ...series('sp500', 'eodhd', '2026-10-09', 60),
+      points: series('sp500', 'eodhd', '2026-10-08', 59).points.concat([{ date: '2026-10-09', value: 125 }]),
+    };
+    const r = resolveMarket({ id: 'sp500', primary: jump }, undefined, RUN_DATE);
+    expect(r.held).toBe(false);
+    expect(r.notes.join(' ')).toMatch(/first-ever/);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Snapshot assembly + the section signal (§5.3)
+ * ------------------------------------------------------------------ */
+
+describe('summarizeMarkets — the signal thresholds', () => {
+  const row = (id: MarketId, status: MarketEntry['status']): MarketEntry =>
+    storedEntry(id, { status, fromHigh: status === 'bear' ? -25 : status === 'correction' ? -12 : -3 });
+
+  it('Normal: n ≤ 3 and no US correction', () => {
+    const s = summarizeMarkets([row('hsi', 'correction'), row('ssec', 'correction'), row('ibov', 'bear'), row('dax', 'normal')]);
+    expect(s.signal).toBe('normal');
+    expect(s.worstGroup).toBe('asia'); // hsi+ssec
+    expect(s.nAttention).toBe(2);
+    expect(s.nUnusual).toBe(1);
+  });
+
+  it('Needs attention: n reaches 4', () => {
+    const s = summarizeMarkets([
+      row('hsi', 'correction'), row('ssec', 'correction'), row('ibov', 'bear'), row('dax', 'correction'), row('ftse', 'normal'),
+    ]);
+    expect(s.signal).toBe('attention');
+  });
+
+  it('Needs attention: the US override (S&P 500 alone in correction)', () => {
+    const s = summarizeMarkets([row('sp500', 'correction'), row('dax', 'normal'), row('n225', 'normal')]);
+    expect(s.signal).toBe('attention');
+  });
+
+  it('Needs attention: the US override (Nasdaq 100 alone in correction)', () => {
+    const s = summarizeMarkets([row('ndx', 'correction'), row('dax', 'normal'), row('n225', 'normal')]);
+    expect(s.signal).toBe('attention');
+  });
+
+  it('Unusual: n ≥ 8', () => {
+    const ids = MARKET_IDS.slice(0, 8);
+    const s = summarizeMarkets(ids.map((id) => row(id, 'correction')));
+    expect(s.signal).toBe('unusual');
+  });
+
+  it('Unusual: the US override (S&P 500 in bear)', () => {
+    const s = summarizeMarkets([row('sp500', 'bear'), row('dax', 'normal'), row('n225', 'normal')]);
+    expect(s.signal).toBe('unusual');
+  });
+
+  it('worstGroup is null when every market is normal', () => {
+    const s = summarizeMarkets([row('dax', 'normal'), row('n225', 'normal')]);
+    expect(s.worstGroup).toBeNull();
+  });
+});
+
+describe('buildMarketsSnapshot — merge + R7', () => {
+  it('keeps a failed/held market row verbatim, only re-evaluating staleness', () => {
+    const prev = fakeSnapshot([
+      storedEntry('sp500', { asOf: '2026-10-09', stale: false }),
+      storedEntry('n225', { asOf: '2026-09-28', stale: false }), // 14 days old at RUN_DATE
+    ]);
+    const ok: MarketResolution = {
+      id: 'sp500',
+      held: false,
+      notes: [],
+      entry: storedEntry('sp500', { asOf: '2026-10-09', close: 100 }),
+    };
+    const failed: MarketResolution = { id: 'n225', held: true, notes: ['both providers failed — row held (R7)'] };
+    const snap = buildMarketsSnapshot({ resolutions: [ok, failed], prev, runDate: RUN_DATE, generatedAt: '2026-10-12T23:31:00Z' });
+    expect(snap).toBeDefined();
+    const n225 = snap!.markets.find((m) => m.id === 'n225')!;
+    expect(n225.asOf).toBe('2026-09-28');
+    expect(n225.stale).toBe(true); // honestly re-flagged
+    expect(snap!.markets.find((m) => m.id === 'sp500')!.close).toBe(100);
+    expect(snap!.summary.count).toBe(2);
+  });
+
+  it('omits a market that never produced data (never zero, never fabricated); an all-failure first run stores nothing at all', () => {
+    const snap = buildMarketsSnapshot({ resolutions: [], prev: undefined, runDate: RUN_DATE, generatedAt: '2026-10-12T23:31:00Z' });
+    expect(snap).toBeUndefined(); // nothing honest to store — no KV write
+  });
+
+  it('validates against the wire schema (poisoned shapes never survive)', () => {
+    const good = buildMarketsSnapshot({
+      resolutions: [{ id: 'dax', held: false, notes: [], entry: storedEntry('dax') }],
+      prev: undefined,
+      runDate: RUN_DATE,
+      generatedAt: '2026-10-12T23:31:00Z',
+    });
+    expect(good).toBeDefined();
+    expect(good!.v).toBe(1);
+    expect(good!.markets.length).toBe(1);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Write-only-if-changed (§4 rule 2)
+ * ------------------------------------------------------------------ */
+
+describe('marketsContentHash / marketsContentEqual', () => {
+  const base = fakeSnapshot([storedEntry('dax')]);
+
+  it('ignores generatedAt — identical content hashes identically', () => {
+    const a = fakeSnapshot([storedEntry('dax')], '2026-10-10T23:31:00Z');
+    const b = fakeSnapshot([storedEntry('dax')], '2026-10-11T01:31:00Z');
+    expect(marketsContentHash(a)).toBe(marketsContentHash(b));
+    expect(marketsContentEqual(a, b)).toBe(true);
+  });
+
+  it('changes when a value changes', () => {
+    const a = fakeSnapshot([storedEntry('dax', { close: 100 })]);
+    const b = fakeSnapshot([storedEntry('dax', { close: 101 })]);
+    expect(marketsContentEqual(a, b)).toBe(false);
+  });
+
+  it('undefined stored is never equal (the first run always writes)', () => {
+    expect(marketsContentEqual(undefined, base)).toBe(false);
+  });
+});
+
+describe('InMemoryMarketsStore — write gate (build step 3)', () => {
+  it('running the job twice with the same data causes exactly one write', async () => {
+    const store = new InMemoryMarketsStore();
+    const snap = fakeSnapshot([storedEntry('dax')]);
+    expect(await store.putMarketsIfChanged(snap)).toBe('written');
+    const sameData = fakeSnapshot([storedEntry('dax')], '2026-10-11T01:31:00Z'); // new timestamp, same content
+    expect(await store.putMarketsIfChanged(sameData)).toBe('unchanged');
+    expect(await store.putMarketsIfChanged(sameData)).toBe('unchanged');
+    expect(store.ops.writes).toBe(1);
+    await expect(store.getMarkets()).resolves.toMatchObject({ v: 1 });
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Retry gating + the job chain (§3.4)
+ * ------------------------------------------------------------------ */
+
+describe('lastExpectedCloseDate / marketsNeedingData / retryRunOptions', () => {
+  it('walks back to the most recent weekday strictly before today', () => {
+    expect(lastExpectedCloseDate('2026-10-13')).toBe('2026-10-12'); // Tue → Mon
+    expect(lastExpectedCloseDate('2026-10-17')).toBe('2026-10-16'); // Sat → Fri
+    expect(lastExpectedCloseDate('2026-10-12')).toBe('2026-10-09'); // Mon → Fri
+  });
+
+  it('marks markets whose stored asOf is behind the expected close', () => {
+    const prev = fakeSnapshot([
+      storedEntry('sp500', { asOf: '2026-10-12' }), // fresh
+      storedEntry('n225', { asOf: '2026-10-09' }), // behind Monday
+      storedEntry('hsi', { asOf: '2026-10-12', stale: true }), // stale → re-fetch
+    ]);
+    const ids = marketsNeedingData(prev, '2026-10-13');
+    expect(ids).toContain('n225');
+    expect(ids).toContain('hsi');
+    expect(ids).not.toContain('sp500');
+  });
+
+  it('includes markets with no stored row at all', () => {
+    const prev = fakeSnapshot([storedEntry('dax', { asOf: '2026-10-12' })]);
+    const ids = marketsNeedingData(prev, '2026-10-13');
+    expect(ids).toContain('sp500'); // absent → needs data
+    expect(ids).not.toContain('dax');
+  });
+
+  it('the whole snapshot old → yahoo-first (quota guard); a few → eodhd-first', () => {
+    const allOld = fakeSnapshot(MARKET_IDS.map((id) => storedEntry(id, { asOf: '2026-10-09' })));
+    expect(retryRunOptions(allOld, '2026-10-13').providerOrder).toBe('yahoo-first');
+    const oneOld = fakeSnapshot([
+      ...MARKET_IDS.slice(1).map((id) => storedEntry(id, { asOf: '2026-10-12' })),
+      storedEntry(MARKET_IDS[0]!, { asOf: '2026-10-09' }),
+    ]);
+    expect(retryRunOptions(oneOld, '2026-10-13').providerOrder).toBe('eodhd-first');
+  });
+
+  it('no stored snapshot → the first run covers everything', () => {
+    expect(retryRunOptions(undefined, '2026-10-13').onlyIds?.length).toBe(14);
+  });
+});
+
+describe('runMarketsJob — the §3.4 chain with injected fetchers', () => {
+  const good = (id: MarketId): MarketSeries => series(id, 'eodhd', '2026-10-12', MIN_CLOSES + 5);
+  const goodYahoo = (id: MarketId): MarketSeries => series(id, 'yahoo', '2026-10-12', MIN_CLOSES + 5);
+
+  it('happy path: one EODHD call per market, no Yahoo calls', async () => {
+    const fetchers: MarketJobFetchers = {
+      fetchEodhd: async (id) => good(id),
+      fetchYahoo: async (id) => {
+        throw new Error(`yahoo must not be called for ${id}`);
+      },
+    };
+    const res = await runMarketsJob(fetchers, { kind: 'main', providerOrder: 'eodhd-first' }, undefined, RUN_DATE);
+    expect(res.providerCalls.eodhd).toBe(14);
+    expect(res.providerCalls.yahoo).toBe(0);
+    expect(res.resolutions.every((r) => !r.held)).toBe(true);
+  });
+
+  it('fallback: EODHD failing for one market is served by Yahoo (R4 too)', async () => {
+    const short = series('ftse', 'eodhd', '2026-10-12', 50); // under MIN_CLOSES → R4 rejection
+    const fetchers: MarketJobFetchers = {
+      fetchEodhd: async (id) => (id === 'ftse' ? short : good(id)),
+      fetchYahoo: async (id) => goodYahoo(id),
+    };
+    const res = await runMarketsJob(fetchers, { kind: 'main', providerOrder: 'eodhd-first' }, undefined, RUN_DATE);
+    const ftse = res.reports.find((r) => r.id === 'ftse')!;
+    expect(ftse.usedSource).toBe('yahoo');
+    expect(ftse.called).toEqual(['eodhd', 'yahoo']);
+    expect(res.providerCalls.eodhd).toBe(14);
+    expect(res.providerCalls.yahoo).toBe(1);
+  });
+
+  it('total failure keeps the market held with honest notes (R7)', async () => {
+    const fetchers: MarketJobFetchers = {
+      fetchEodhd: async () => {
+        throw new ProviderError('eodhd', 'sp500', 'HTTP 429: limit');
+      },
+      fetchYahoo: async () => {
+        throw new ProviderError('yahoo', 'sp500', 'HTTP 999');
+      },
+    };
+    const prev = fakeSnapshot([storedEntry('sp500', { asOf: '2026-10-09' })]);
+    const res = await runMarketsJob(fetchers, { kind: 'retry', providerOrder: 'eodhd-first', onlyIds: ['sp500'] }, prev, RUN_DATE);
+    const r = res.reports[0]!;
+    expect(r.usedSource).toBe('none');
+    expect(r.held).toBe(true);
+    expect(r.notes.join(' ')).toMatch(/both providers failed/);
+  });
+
+  it('a suspicious day move pulls the second provider in (R3 cross-check)', async () => {
+    const calm = series('sp500', 'eodhd', '2026-10-09', MIN_CLOSES);
+    const jumping = {
+      ...calm,
+      points: calm.points.slice(0, -1).concat([{ date: '2026-10-12', value: calm.points[calm.points.length - 1]!.value * 1.2 }]),
+    };
+    let yahooCalls = 0;
+    const fetchers: MarketJobFetchers = {
+      fetchEodhd: async () => jumping,
+      fetchYahoo: async (id) => {
+        yahooCalls++;
+        return { ...goodYahoo(id), points: goodYahoo(id).points }; // disagrees (calm values)
+      },
+    };
+    const prev = fakeSnapshot([storedEntry('sp500', { asOf: '2026-10-09', close: 100 })]);
+    const res = await runMarketsJob(fetchers, { kind: 'main', providerOrder: 'eodhd-first', onlyIds: ['sp500'] }, prev, RUN_DATE);
+    expect(yahooCalls).toBe(1);
+    expect(res.reports[0]!.held).toBe(true); // disagreement → held
+  });
+
+  it('onlyIds restricts the run (the retry shape)', async () => {
+    let eodhdCalls = 0;
+    const fetchers: MarketJobFetchers = {
+      fetchEodhd: async (id) => {
+        eodhdCalls++;
+        return good(id);
+      },
+      fetchYahoo: async (id) => goodYahoo(id),
+    };
+    const res = await runMarketsJob(fetchers, { kind: 'retry', providerOrder: 'eodhd-first', onlyIds: ['n225', 'hsi'] }, undefined, RUN_DATE);
+    expect(eodhdCalls).toBe(2);
+    expect(res.resolutions.map((r) => r.id).sort()).toEqual(['hsi', 'n225']);
+  });
+});

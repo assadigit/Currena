@@ -17,7 +17,7 @@ import { TrendingUp } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { bandWordsOf, bigMovers, consequenceLine, formatChange } from './config';
-import { VerdictBlock } from './VerdictMeter';
+import { VerdictBlock, type MarketsAlert } from './VerdictMeter';
 
 function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
   return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
@@ -31,6 +31,8 @@ export function HeroBlock({
   onJumpSection,
   onJumpAbout,
   onFocusCard,
+  marketsAlert,
+  onJumpMarkets,
 }: {
   readings: readonly IndicatorReading[];
   changedThisWeek: readonly { id: IndicatorId; to: string }[];
@@ -39,6 +41,11 @@ export function HeroBlock({
   onJumpSection: (section: InsightsSection) => void;
   onJumpAbout: () => void;
   onFocusCard: (id: IndicatorId) => void;
+  /** §5.3 (build step 9): the world-markets signal when raised — joins the
+   * GLOBAL verdict's attention module; undefined when calm or unpopulated. */
+  marketsAlert?: MarketsAlert;
+  /** Scroll to the world-markets section (the alert line's destination). */
+  onJumpMarkets?: () => void;
 }) {
   // R4: ONE mover line — |z| ≥ 2 only, stale items already excluded by the
   // engine (stale readings never carry a move score — test below pins it).
@@ -65,7 +72,9 @@ export function HeroBlock({
        * one height, so the shorter one carries no floating void beside the
        * taller one (the roast: "a void under Australia"). */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-        {/* D7/R1: Global first, always — the blocks array is fixed order. */}
+        {/* D7/R1: Global first, always — the blocks array is fixed order. The
+         * world-markets alert (when raised) lives in the GLOBAL block: world
+         * stock markets are a global question (§5.3). */}
         <VerdictBlock
           section="global"
           sectionLabel={copy.sections.global}
@@ -75,6 +84,8 @@ export function HeroBlock({
           onJumpSection={onJumpSection}
           onJumpAbout={onJumpAbout}
           onFocusCard={onFocusCard}
+          marketsAlert={marketsAlert}
+          onJumpMarkets={onJumpMarkets}
         />
         <VerdictBlock
           section="australia"

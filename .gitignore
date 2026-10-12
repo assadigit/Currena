@@ -53,3 +53,9 @@ logs/
 tmp/
 .cache/
 .turbo/
+
+# --- world markets provider cache (manual data-check / seed runs) ---
+# Raw EODHD/Yahoo answers saved by scripts/markets-data-check.ts so re-runs
+# never re-spend the 20-calls/day EODHD free quota. Never committed: they
+# are provider data refreshes, not fixtures.
+packages/insights/fixtures/markets-live/
