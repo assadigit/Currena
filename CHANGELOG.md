@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-12] — fa verdict word: «محتاط» → «احتیاط» (owner round 42)
+
+Forty-second round — a one-line owner note: "Instead of محتاط use احتیاط
+for farsi."
+
+### Changed
+
+- **The Farsi *Cautious* verdict word is now «احتیاط»** — the label, the
+  gauge rows' step word, the computed reason line and the four-word
+  explainer sentence («چهار واژهٔ «پایدار»، «احتیاط»، «پرتنش» و
+  «بحرانی»…») all read the new word, since every one of them flows from
+  the single `label.cautious` copy string. EN ('Cautious') unchanged;
+  historical changelog/PROGRESS mentions keep the old word as history.
+
 ## [2026-10-12] — The state's artwork leads the verdict row: [icon][word] (owner round 41)
 
 Forty-first round — a one-line owner note: "the icons must before the state
