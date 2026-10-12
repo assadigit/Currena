@@ -991,6 +991,11 @@ export const insightsCopyEn = {
     heroReasonAre: 'are',
     heroGaugesLabel: 'The gauges behind this verdict',
     inAlert: '{warnings} of {voting} indicators need attention',
+    /** The count line's variant when the world-markets signal is raised
+     * (world-markets spec §5.3 / build step 9: the section signal appears
+     * in the transparent count AND in alerts) — the markets join the count
+     * as one more attention item, named in plain words. */
+    inAlertWithMarkets: '{warnings} of {voting} indicators need attention · plus world stock markets',
     noSummary: 'Not enough voting data to read the gauges yet.',
     excludedNote: '{n} items set aside: stale or missing (see “How this is calculated”).',
     howCalculated: 'How is this calculated?',

@@ -540,6 +540,13 @@ function MarketsTable({
               >
                 <th scope="row" className="px-2 py-1.5 text-start font-semibold text-[var(--color-text-primary)]">
                   {copy.markets.entries[m.id].name}
+                  {/* §6.7: the English index name in small Latin text beside
+                   * the Persian name — same rule as the detail panel. */}
+                  {locale === 'fa' ? (
+                    <span dir="ltr" className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
+                      {copy.markets.entries[m.id].latin}
+                    </span>
+                  ) : null}
                 </th>
                 <td className="px-2 py-1.5 text-end tabular-nums">
                   <bdi dir="ltr" className="font-semibold">{signedPct(m.chg1d, numberLocale, locale)}</bdi>
@@ -581,6 +588,13 @@ function MarketsTable({
             >
               <span className="min-w-0 flex-1 truncate font-semibold text-[var(--color-text-primary)]">
                 {copy.markets.entries[m.id].name}
+                {/* §6.7: the small Latin name rides the mobile row list too
+                 * (the table's mobile form — same three numbers, same names). */}
+                {locale === 'fa' ? (
+                  <span dir="ltr" className="ms-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
+                    {copy.markets.entries[m.id].latin}
+                  </span>
+                ) : null}
               </span>
               <span className="inline-flex items-baseline gap-3 text-[length:var(--type-caption)] font-semibold tabular-nums">
                 <bdi dir="ltr">{signedPct(m.chg1d, numberLocale, locale)}</bdi>

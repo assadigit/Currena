@@ -335,13 +335,19 @@ export function VerdictBlock({
           </button>
         ) : null}
         <p
-          className={`m-0 text-[length:var(--type-caption)] font-semibold ${attentionToneClass(tiles.length)}`}
+          className={`m-0 text-[length:var(--type-caption)] font-semibold ${attentionToneClass(
+            tiles.length + (marketsAlert ? 1 : 0),
+          )}`}
           data-attention-count
+          data-markets-in-count={marketsAlert ? 'true' : undefined}
         >
-          {interpolate(copy.ui.inAlert, {
-            warnings: num(tiles.length, numberLocale),
-            voting: num(voting, numberLocale),
-          })}
+          {interpolate(
+            marketsAlert ? copy.ui.inAlertWithMarkets : copy.ui.inAlert,
+            {
+              warnings: num(tiles.length, numberLocale),
+              voting: num(voting, numberLocale),
+            },
+          )}
         </p>
 
         {shown.length > 0 ? (
