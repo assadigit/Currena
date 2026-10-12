@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-12] — The state's artwork leads the verdict row: [icon][word] (owner round 41)
+
+Forty-first round — a one-line owner note: "the icons must before the state
+like this [icon][stressed] — currently it's after the state."
+
+### Changed
+
+- **The hero verdict row reads [state-icon][state-word][meter]** — the
+  state's artwork moves IN FRONT of the verdict word in both regions'
+  verdict blocks (the old order rendered the word first, so the row read
+  `[stressed][icon]`). The mark now opens the state moment in the same
+  reading order as every other chip in the app — the status chips have
+  always been icon-then-word. The meter stays last as the row's
+  instrument. In fa the icon leads from the right edge (RTL reading
+  order); in en from the left.
+
 ## [2026-10-11] — The hero attention tiles align into one row; unit labels read small (owner round 40)
 
 Fortieth round — an owner note with a screenshot of the two hero verdict

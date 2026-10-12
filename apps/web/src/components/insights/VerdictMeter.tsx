@@ -22,6 +22,11 @@
  * height is identical across regions. The value's unit reads SMALL so a
  * long currency label ('۱۲۵٫۴۴ دلار آمریکا') keeps the number's row.
  *
+ * Round 41 (owner): the state's artwork LEADS the row — [icon][word] —
+ * the old word-first order read as [stressed][icon]; the mark now opens
+ * the state moment exactly like every other chip in the app (StatusChip
+ * has always been icon-then-word). The meter stays last.
+ *
  * Round-2 D7: Global renders first (no swap setting — retired).
  */
 
@@ -184,10 +189,13 @@ export function VerdictBlock({
        * meaning, the artwork the warmth. No reading (step 0) → no icon.
  * Round 29 (owner): the artwork steps up to 44px mobile / 60px
  * desktop — the page's single largest state moment, twice the old
- * desktop size. */}
+ * desktop size. Round 41 (owner): the artwork moves IN FRONT of the
+ * word — [icon][word] — the state's mark LEADS the row (the old
+ * word-first order read as [stressed][icon]); same reading order as
+ * every other chip in the app. The meter stays last. */}
       <p className="m-0 flex items-center gap-3">
-        <span className={`type-verdict ${stepToneClass(step)}`}>{verdictLabel}</span>
         {stateIconUrl(step) !== null ? <IconImg src={stateIconUrl(step)!} size={44} desktopSize={60} className="drop-shadow-sm" /> : null}
+        <span className={`type-verdict ${stepToneClass(step)}`}>{verdictLabel}</span>
         <VerdictMeter step={step} label={verdictLabel} ariaLabel={ariaLabel} size="lg" />
       </p>
 
