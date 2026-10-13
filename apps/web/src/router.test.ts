@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { isRoutePath, parseRouteAndQuery, ROUTES } from './router';
+import { canonicalHashFor, isRoutePath, parseRouteAndQuery, ROUTES } from './router';
 
 describe('parseRouteAndQuery', () => {
   it('parses bare routes', () => {
@@ -50,5 +50,39 @@ describe('isRoutePath', () => {
     for (const route of ROUTES) expect(isRoutePath(route)).toBe(true);
     expect(isRoutePath('/insights?card=us10y')).toBe(false);
     expect(isRoutePath('/admin')).toBe(false);
+  });
+});
+
+describe('canonicalHashFor (path visits — the /insights#/ fix)', () => {
+  it('a known path route is adopted verbatim', () => {
+    expect(canonicalHashFor('/insights', '')).toBe('#/insights');
+    expect(canonicalHashFor('/live-rates', '')).toBe('#/live-rates');
+    expect(canonicalHashFor('/about', '')).toBe('#/about');
+  });
+
+  it('the query of a typed/shared path url rides along (share + deep links)', () => {
+    expect(canonicalHashFor('/insights', '?card=us10y')).toBe('#/insights?card=us10y');
+    // Converter deep links from the address bar now work too
+    expect(canonicalHashFor('/', '?from=EUR&to=IRR&amount=500')).toBe('#/?from=EUR&to=IRR&amount=500');
+    // A search without the leading ? is normalised, not doubled
+    expect(canonicalHashFor('/insights', 'card=us10y')).toBe('#/insights?card=us10y');
+  });
+
+  it('trailing slashes are tolerated', () => {
+    expect(canonicalHashFor('/insights/', '')).toBe('#/insights');
+    expect(canonicalHashFor('/live-rates/', '?x=1')).toBe('#/live-rates?x=1');
+  });
+
+  it('unknown paths and the bare root land on the converter', () => {
+    expect(canonicalHashFor('/nope', '')).toBe('#/');
+    expect(canonicalHashFor('/admin', '')).toBe('#/');
+    expect(canonicalHashFor('/', '')).toBe('#/');
+    expect(canonicalHashFor('/insights?card=us10y', '')).toBe('#/'); // query without a route path is NOT a route
+  });
+
+  it('every canonical output round-trips through the parser to the same route', () => {
+    for (const route of ROUTES) {
+      expect(parseRouteAndQuery(canonicalHashFor(route, '')).path).toBe(route === '/' ? '/' : route);
+    }
   });
 });

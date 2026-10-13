@@ -5,6 +5,60 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-13b] — Always-live serving + path-URL routing (the /insights#/ fix)
+
+Owner report 2026-10-13: "I didn't see those [Step-2] fixes — and why does
+`https://currena.ir/insights#/` happen? The server seems to show a cached,
+stale page to outside visitors (firecrawl mirrors are pre-fix). Currena must
+ALWAYS show the live version; only show cached when there is no internet."
+
+Diagnosis first (the deployed state was audited BEFORE any change): GitHub
+main was current (31b3d3d), currena-api was the Step-2 deployment
+(cebc12de), and the live edge was serving the Step-2 chunks (Insights
+491.81 kB with sahm/vix/deposit/unemployment inside) — nothing was actually
+un-deployed. Two CLIENT-side defects made it LOOK stale:
+
+1. **Path URLs booted the wrong page.** Visiting `https://currena.ir/insights`
+   (typed, shared, crawled — no `#`) hit the SPA-fallback, and the boot's
+   belt-and-braces `navigate('/')` APPENDED a stray `#/` — URL
+   `/insights#/`, content: the converter. Every crawler that renders the
+   path URL (firecrawl web-to-md) extracted the CONVERTER, which reads as
+   "a cached pre-fix mirror".
+2. **Service-worker navigations were precache-first.** workbox's
+   `navigateFallback: 'index.html'` answered every navigation from the SW's
+   precached copy, so a visitor (or installed PWA) kept seeing the PREVIOUS
+   deploy until their SW rotated — the stale-page trap this project already
+   lived through in its prompt-mode variant on 2026-09-19.
+
+### Fixes
+
+- **Path visits adopt their route** (`apps/web/src/router.ts` +
+  `App.tsx`): `/insights` is rewritten IN PLACE to `/#/insights`
+  (`history.replaceState` — no reload, no history entry, no stray `#/`) and
+  renders the Insights page; `/insights?card=us10y` share links and
+  `/?from=EUR&to=IRR&amount=500` converter deep links work from the address
+  bar for the first time; trailing slashes tolerated; unknown paths land on
+  the converter as before. Pure core (`canonicalHashFor`) unit-tested —
+  router tests 7→12.
+- **Navigations are network-first** (`apps/web/vite.config.ts`): the
+  navigateFallback is GONE (the explicit `navigateFallback: undefined` is
+  load-bearing — vite-plugin-pwa defaults it back to `'index.html'` and
+  workbox registers its precache-first NavigationRoute BEFORE runtime
+  routes); a `NetworkFirst` runtime route (`currena-documents`, 5 s
+  network timeout) now answers every same-origin navigation — the network
+  is always asked first and the cache answers ONLY when offline, exactly
+  the owner's rule. /api, /internal and /admin never reach it. Hashed
+  assets stay precache-first (immutable per deploy — a new build changes
+  every hash, so the precache can never serve an asset the live HTML
+  doesn't reference).
+- **`_headers` for the assets platform** (`apps/web/public/_headers`):
+  `/assets/*` are `max-age=31536000, immutable` (content-hashed — always
+  correct, one revalidation round trip cheaper); `index.html` and `sw.js`
+  revalidate on every request.
+
+Gates: typecheck 6/6, tests 1020/1020 (web 288→293), bundle budgets held
+(entry 290.36/87.08, Insights 491.82/120.65).
+
 ## [2026-10-13] — Insights Step-2 add list (the missing indicators)
 
 The owner's three-step plan continues: **Step 2 — add the few missing

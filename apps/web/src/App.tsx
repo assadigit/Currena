@@ -17,7 +17,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { Toast } from './components/ui';
 import { Converter } from './routes/Converter';
 import { LiveRates } from './routes/LiveRates';
-import { navigate, useRoute } from './router';
+import { useRoute, canonicalizePathVisit } from './router';
 import { useI18n } from './lib/locale';
 import { snapshotStore } from './lib/snapshot-store';
 import { hydrateServerHistory } from './lib/rate-history';
@@ -117,9 +117,14 @@ export function App() {
     document.title = key === 'converter.title' || key === 'app.name' ? base : `${base} - Currena`;
   }, [route, t, locale]);
 
-  // Belt-and-braces: land on #/ when no hash is present.
+  // Path visits (owner report 2026-10-13: "why does /insights#/ happen?"):
+  // a hash-less visit to a PATH url — /insights, /insights?card=us10y,
+  // /live-rates — adopts that route in place (URL becomes /#/insights, the
+  // Insights page renders, no reload, no history entry, no stray '#/'
+  // appended). Unknown paths still land on the converter. No-op once a
+  // hash exists (every internal navigation).
   useEffect(() => {
-    if (!window.location.hash) navigate('/');
+    canonicalizePathVisit();
   }, []);
 
   return (

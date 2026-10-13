@@ -119,11 +119,44 @@ export default defineConfig({
         // Store-listing screenshots (manifest only — PWABuilder/Play fetch
         // them over HTTP; the app never needs them offline).
         globIgnores: ['**/screenshots/**'],
-        navigateFallback: 'index.html',
-        // /admin is the server-rendered ops console (Phase 6) — the SW must
-        // never serve the SPA shell for it. Same for /api and /internal.
-        navigateFallbackDenylist: [/^\/api\//, /^\/internal\//, /^\/admin(?:\/|$|\?)/],
+        // NO navigateFallback (owner rule 2026-10-13: "currena must always
+        // show the live and updated version — only show cached version where
+        // there is no internet connection"). The old precache-first
+        // navigateFallback answered every navigation from the SW's precached
+        // index.html, so visitors kept seeing the PREVIOUS deploy until the
+        // SW rotated (the exact "stale page" trap the owner reported again
+        // 2026-10-13, after living through its prompt-mode variant on
+        // 2026-09-19). NOTE: vite-plugin-pwa defaults navigateFallback to
+        // 'index.html' — the EXPLICIT undefined here is load-bearing
+        // (Object.assign keeps it, workbox's template skips the falsy
+        // value): without it the plugin silently re-registers the
+        // precache-first NavigationRoute BEFORE the network-first route
+        // below, and route order would win it back. Navigations are
+        // NETWORK-FIRST — see the runtime route below — and hashed assets
+        // stay precache-first (immutable per deploy: a new build changes
+        // every hash, so the precache can never serve an asset the live
+        // HTML doesn't reference).
+        navigateFallback: undefined,
         runtimeCaching: [
+          {
+            // Navigations (the HTML document): always ask the network first;
+            // the cache answers ONLY when the network fails (offline) — the
+            // last-served document is kept under 'currena-documents'.
+            // networkTimeoutSeconds bounds the wait on dead-but-connected
+            // networks. /admin (server-rendered console), /api and /internal
+            // never reach the SW's document handler.
+            urlPattern: ({ request, url, sameOrigin }: { request: Request; url: URL; sameOrigin: boolean }) =>
+              sameOrigin &&
+              request.mode === 'navigate' &&
+              !/^\/(api|internal)\//.test(url.pathname) &&
+              !/^\/admin(?:\/|$|\?)/.test(url.pathname),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'currena-documents',
+              networkTimeoutSeconds: 5,
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
           {
             // Fonts only (self-hosted @fontsource woff2 — CacheFirst).
             urlPattern: /\.(?:woff2?)$/,
