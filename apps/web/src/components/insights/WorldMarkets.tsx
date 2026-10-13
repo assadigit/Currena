@@ -64,6 +64,7 @@ import {
   stateIconUrl,
 } from '../icons/currena';
 import { Skeleton } from '../ui';
+import { SectionVerdictLine } from './SectionVerdictLine';
 import { formatAsOf } from './HistoryChart';
 
 /** The page-level feed state (owned by Insights.tsx, passed down). */
@@ -449,8 +450,24 @@ function MarketsVerdictBox({
         <span className={`type-verdict ${stepToneClass(step)}`}>{word}</span>
         <VerdictMeter step={step} label={word} ariaLabel={ariaLabel} size="lg" />
       </p>
+      {/* §6.11: the verdict line — the MEASURE LABEL plus the page's
+       * severity chip, ABOVE the takeaway. Every section verdict names
+       * what it measures (shared with the currencies section). */}
+      <div className="mt-2">
+        <SectionVerdictLine
+          label={
+            snapshot.summary.signal === 'unusual'
+              ? copy.markets.measureUnusual
+              : snapshot.summary.signal === 'attention'
+                ? copy.markets.measureAttention
+                : copy.markets.measureNormal
+          }
+          chip={snapshot.summary.signal}
+          copy={copy}
+        />
+      </div>
       {/* §8.3, generated from the numbers — never free text. */}
-      <p className="m-0 mt-2 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+      <p className="m-0 mt-1.5 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
         <bdi>{marketsTakeaway(snapshot, copy, numberLocale)}</bdi>
       </p>
     </div>

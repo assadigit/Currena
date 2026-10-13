@@ -209,3 +209,151 @@ describe('runScheduledMarkets — the 24-hour budget', () => {
     expect(RETRY_CRON).toBe('30 1 * * 2-6');
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * The fx job rides the same two triggers (insights-world-currencies-
+ * spec.md §4.4's fallback: the account's 5-cron free limit is full) —
+ * the COMBINED 24-hour budget (currencies §9 build step 10):
+ *   - one Frankfurter call per fx run (Yahoo's 8 only on fallback);
+ *   - KV writes ≤3/day across BOTH sections (in practice: the markets
+ *     retry's landing write + the fx write);
+ *   - subrequests per invocation ≤50 even in the worst case (every
+ *     markets fetch bouncing to Yahoo AND the fx fallback firing).
+ * ------------------------------------------------------------------ */
+
+import { runFxUpdate } from '@currena/insights/fx';
+import { InMemoryFxStore } from '@currena/insights/fx';
+import type { FxJobFetchers } from '@currena/insights/fx';
+
+/** A synthetic ECB world: 8 currencies × 420 working days, gentle drift. */
+function fxQuotesFixture(): Record<string, { date: string; value: number }[]> {
+  const base: Record<string, number> = {
+    EUR: 0.9, JPY: 150, GBP: 0.76, CHF: 0.88, CNY: 7.1, AUD: 1.52, CAD: 1.37, SEK: 9.5,
+  };
+  const dates: string[] = [];
+  let t = new Date('2026-10-12T00:00:00Z').getTime();
+  while (dates.length < 420) {
+    const date = new Date(t).toISOString().slice(0, 10);
+    const dow = new Date(t).getUTCDay();
+    if (dow !== 0 && dow !== 6) dates.push(date);
+    t -= 86_400_000;
+  }
+  dates.reverse();
+  return Object.fromEntries(
+    Object.entries(base).map(([code, start]) => [
+      code,
+      dates.map((date, i) => ({ date, value: start * (1.0002) ** i })),
+    ]),
+  );
+}
+
+describe('the combined markets + fx 24-hour budget', () => {
+  it('a full day: both sections land their writes; every invocation stays ≤50 subrequests', async () => {
+    const kv = new FakeKV();
+    const world = makeWorld();
+    const quotes = fxQuotesFixture();
+    let fxCalls = { frankfurter: 0, yahoo: 0 };
+    const fxFetchers: FxJobFetchers = {
+      fetchFrankfurter: async () => {
+        fxCalls.frankfurter++;
+        return { source: 'frankfurter', quotes: quotes as never };
+      },
+      fetchYahoo: async () => {
+        fxCalls.yahoo++;
+        return { source: 'yahoo', quotes: quotes as never };
+      },
+    };
+    const fxStore = new InMemoryFxStore();
+    const cross = {
+      getMarkets: async () => JSON.parse(kv.map.get('insights:markets:v1') ?? 'null') ?? undefined,
+      getGoldHistory: async () => undefined,
+      getInsightsSnapshot: async () => undefined,
+    };
+
+    // Monday 23:30 — the markets main run (16 provider calls)…
+    const marketsMain = await runScheduledMarkets(env(kv), 'main', {
+      fetchers: world.fetchers,
+      now: MONDAY_MAIN,
+    });
+    expect(marketsMain.wroteSnapshot).toBe(true);
+    // …followed by the fx run on the same invocation (1 Frankfurter call).
+    const fx1 = await runFxUpdate({
+      store: fxStore,
+      cross,
+      fetchers: fxFetchers,
+      now: MONDAY_MAIN,
+    });
+    expect(fx1.wroteSnapshot).toBe(true);
+    expect(fx1.report.providerCalls).toEqual({ frankfurter: 1, yahoo: 0 });
+    // Worst-case subrequests for the combined invocation: 16 + 1 + a
+    // handful of KV ops — far below the 50 cap.
+    expect(world.calls.length + fxCalls.frankfurter + fxCalls.yahoo).toBeLessThanOrEqual(50);
+    expect(kv.ops.writes).toBe(1); // the markets write
+    expect(fxStore.ops.writes).toBe(1); // the fx write
+
+    // Tuesday 01:30 — the retry finds fresh stored data on both sides:
+    // zero provider calls, zero writes (both gates stay closed).
+    const marketsRetry = await runScheduledMarkets(env(kv), 'retry', {
+      fetchers: world.fetchers,
+      now: TUESDAY_RETRY,
+    });
+    expect(marketsRetry.unchanged).toBe(true);
+    const fx2 = await runFxUpdate({
+      store: fxStore,
+      cross,
+      fetchers: fxFetchers,
+      now: TUESDAY_RETRY,
+    });
+    expect(fx2.unchanged).toBe(true);
+    expect(fxStore.ops.writes).toBe(1); // still exactly one
+    expect(fxCalls).toEqual({ frankfurter: 2, yahoo: 0 }); // one call per run, no more
+
+    // The 3-day verdict across BOTH sections: ≤3 KV writes/day, one fx
+    // provider call per run, every invocation ≤50 subrequests.
+    expect(kv.ops.writes + fxStore.ops.writes).toBeLessThanOrEqual(6); // 3 days × 2 sections
+  });
+
+  it('the worst case: every markets fetch bounces to Yahoo AND the fx fallback fires — still ≤50', async () => {
+    const kv = new FakeKV();
+    // Markets: EODHD always fails → 16 EODHD attempts + 16 Yahoo answers.
+    const world = makeWorld();
+    const failingThenYahoo: typeof world.fetchers = {
+      fetchEodhd: async (id) => {
+        world.calls.push({ provider: 'eodhd', day: 'x' });
+        if (id === 'ftse') throw new ProviderError('eodhd', id, 'no EODHD code for this market');
+        throw new ProviderError('eodhd', id, 'provider down in this fixture');
+      },
+      fetchYahoo: async (id) => {
+        world.calls.push({ provider: 'yahoo', day: 'x' });
+        return worldSeries(id, 'yahoo', '2026-10-12');
+      },
+    };
+    await runScheduledMarkets(env(kv), 'main', { fetchers: failingThenYahoo, now: MONDAY_MAIN });
+    const marketsCalls = world.calls.length; // 16 EODHD attempts + 16 Yahoo answers = 32
+    expect(marketsCalls).toBe(32);
+
+    // Fx: Frankfurter fails → Yahoo's 8 currency calls fire.
+    const quotes = fxQuotesFixture();
+    const fxCalls = { frankfurter: 0, yahoo: 0 };
+    const fxStore = new InMemoryFxStore();
+    await runFxUpdate({
+      store: fxStore,
+      cross: { getMarkets: async () => undefined, getGoldHistory: async () => undefined, getInsightsSnapshot: async () => undefined },
+      fetchers: {
+        fetchFrankfurter: async () => {
+          fxCalls.frankfurter++;
+          throw new Error('primary down in this fixture');
+        },
+        fetchYahoo: async () => {
+          fxCalls.yahoo += 8; // one chart call per currency (8)
+          return { source: 'yahoo', quotes: quotes as never };
+        },
+      },
+      now: MONDAY_MAIN,
+    });
+    expect(fxCalls).toEqual({ frankfurter: 1, yahoo: 8 });
+    // THE combined ceiling: 32 + 9 = 41 provider subrequests (+ a handful
+    // of KV ops) — comfortably under the 50-per-invocation cap.
+    expect(marketsCalls + fxCalls.frankfurter + fxCalls.yahoo).toBeLessThanOrEqual(50);
+  });
+});

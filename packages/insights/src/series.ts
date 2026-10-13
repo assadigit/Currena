@@ -29,6 +29,28 @@ export function addDays(date: string, days: number): string {
   return fromEpochDay(epochDay(date) + days);
 }
 
+/**
+ * `date` shifted by `months` CALENDAR months (may be negative): the same
+ * day-of-month, clamped to the target month's length when it does not exist
+ * (Jan 31 − 1 month = Dec 31). The "on or before the same date one period
+ * earlier" anchors in the fx changes (currencies spec §6.1) and the market
+ * rows' chg1m ride this rule.
+ */
+export function addMonths(date: string, months: number): string {
+  const t = Date.parse(`${date}T00:00:00Z`);
+  if (Number.isNaN(t)) throw new Error(`Not an ISO calendar date: ${date}`);
+  const d = new Date(t);
+  const year = d.getUTCFullYear();
+  const month = d.getUTCMonth() + months;
+  const target = new Date(Date.UTC(year, month, 1));
+  const targetYear = target.getUTCFullYear();
+  const targetMonth = target.getUTCMonth();
+  // Days in the target month (0 = last day of previous month → +1).
+  const daysInMonth = new Date(Date.UTC(targetYear, targetMonth + 1, 0)).getUTCDate();
+  const day = Math.min(d.getUTCDate(), daysInMonth);
+  return new Date(Date.UTC(targetYear, targetMonth, day)).toISOString().slice(0, 10);
+}
+
 /** Whole days from `a` to `b` (negative when b precedes a). */
 export function daysBetween(a: string, b: string): number {
   return epochDay(b) - epochDay(a);

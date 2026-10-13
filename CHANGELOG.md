@@ -5,6 +5,91 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-13] — World currencies: the patterns section (direction B)
+
+The Insights page's sixth dedicated section (insights-world-currencies-spec.md
+v1.2, layout direction B chosen by Ali 2026-10-12): what the big currencies
+are TELLING us — seven named patterns with two-part verdict sentences, the
+pair numbers inside each pattern, and one table of all 10 pairs behind a
+button. Verdicts first, numbers support them; no tile strip, no period
+switch. Rebuilt end-to-end after the original build session's branch was
+lost before it was ever pushed (the engine recovered verbatim from that
+session's logs; everything else rebuilt from the spec).
+
+### Added
+
+- **The fx analysis engine** (`packages/insights/src/fx/compute.ts`) — pair
+  derivation (crosses are code, never a call), the four period changes,
+  `move_rank` (the "Unusually large move" tag), the reused Currena dollar
+  basket as the "Dollar vs the world" measure (decision D-06: the repo's
+  existing DXY-recipe basket, CAD+SEK join the provider call for it), the
+  13-week pattern checks, the seven rules R1–R7 with the §6.4 downgrade
+  pass (a Warning whose pattern is Not holding lately becomes a Watch and
+  does not count), the distance-to-warning `progress` bars, and the §6.5
+  section signal (0 counted = normal, 1–2 = attention, 3+ or the R4
+  "confidence wobble" = unusual). Everything PURE and linear-time.
+- **Provider adapters** (`fx/providers.ts`) — Frankfurter v1 (the frozen
+  ECB-only API, ONE whole-currency timeseries call per run) with the Yahoo
+  Finance chart fallback (8 currency calls, inverted where Yahoo quotes
+  USD-per-currency); V1–V7 validation (a >5% one-day move needs both
+  providers' agreement within 0.5% before it is believed).
+- **The fx job + storage** — `insights:fx:v1`, ONE KV key, write-only-if-
+  changed (content hash, never generatedAt); the cross-section reads (the
+  stock legs from `insights:markets:v1`, gold from its history key, R1's
+  fear leg from the stored market-stress gauges — decision D-05: no VIX
+  exists in the repo). The job rides the currena-markets Worker's two
+  existing cron triggers (spec §4.4's fallback: the account's 5-cron free
+  limit is full), fault-isolated from the markets job. A `fx-run` manual
+  seeder script (the REST "Path B") for initial population.
+- **Market rows gain `chg1m`** — the 1-month change the currency rules read
+  (S&P 500, Nikkei 225, Euro Stoxx 50). OPTIONAL in the contract: a stored
+  snapshot written before this change simply lacks it, and the fx engine
+  treats its absence as "input missing" (a nodata rule row), never a guess.
+- **`GET /api/insights/fx`** — the stored snapshot read-only behind the
+  spec's cache discipline (edge cache + `max-age=300, s-maxage=3600` +
+  content-addressed ETag + 304s + the calm 503 `fx_not_ready` "being
+  prepared" answer). One KV read per request; the full 10-pair payload
+  stays well under the 20 KB budget.
+- **The WorldCurrencies section** (§9 anatomy, direction B) — the §9.10
+  measure-label verdict line + one §10.3 headline sentence; pattern cards
+  (Level 1 collapsed rows, Level 2 opened: the 26-week two-line rebased
+  chart + the warning line + the 13 dots with their end labels, Level 3 one
+  tap deeper: why/seen-before/for-you + "Pairs used in this pattern" with
+  the four periods); the quiet area (always one closest-to-warning row with
+  a thin distance bar); Dollar at a glance; the 10-pair table behind
+  "Show all currency pairs" (three group blocks, the big-move tag, old-data
+  chips, the ▲ legend, a mobile row list) + the §9.4 pair detail panel with
+  its 1-year chart. All §9.5 states (loading skeletons, the calm
+  "being prepared" line, nodata rows, stale collapse). Time runs LEFT TO
+  RIGHT in every chart and in the dots strip, even in Farsi (§9.6).
+- **The §6.11 hero rebuild** — the stock section and the currency section
+  are TWO SEPARATE indicators in the transparent count, each with its own
+  measure label and chip (never merged: a calm stock section beside a
+  warning currency pattern is the designed state — they measure different
+  things). Raised currency signals join the named-alerts module with their
+  PATTERN NAMES. Both world sections wear the shared SectionVerdictLine
+  (measure label + the page's severity chip above the takeaway).
+- **EN + FA copy** — the full §7 rule corpus (every outcome's two-part
+  sentence), the §8 pair corpus (10 pairs + the dollar measure), §9.10's
+  measure labels, §10.2's interface wording and §10.3's headline templates,
+  spec-verbatim in both locales; Persian digits and the Iranian currency
+  terms (جفت ارز، تقویت/تضعیف، پناهگاه امن…) per §10.1.
+- **CSV export** — the pairs table's CSV joins the Tools menu (same
+  discipline: ASCII values, localized headers, injection guard, CRLF).
+
+### Budgets
+
+- KV: ONE new key (`insights:fx:v1`); ≤3 writes/day (in practice 1 — the
+  write gate skips unchanged days); page traffic rides the 1-hour edge
+  cache in front of ONE KV read.
+- Provider calls: ONE Frankfurter call per run; the 8-call Yahoo fallback
+  only when the primary fails or a V3 second voice is needed. The combined
+  markets+fx worst case is 41 subrequests per invocation (cap 50).
+- Cron triggers: ZERO new (the fx job rides the markets Worker's two).
+- Bundle: the Insights lazy chunk 377.70 → 450.10 kB raw / 97.20 →
+  110.38 kB gz (budget 380/98 → 462/113, justified above); the entry
+  chunk untouched.
+
 ## [2026-10-12] — Live prices: the volatility-scaled refresh (the stale-oil fix)
 
 The Prices board showed Brent at $125.44 "as of 2026-10-06" for four-plus

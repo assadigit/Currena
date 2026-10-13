@@ -404,3 +404,109 @@ describe('GET /api/insights/markets', () => {
     expect(store.ops.reads - readsBefore).toBe(1);
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * World currencies route (insights-world-currencies-spec.md §5 rules
+ * 3–4 / §9 build step 6)
+ * ------------------------------------------------------------------ */
+
+import { runFxJob } from '@currena/insights/fx';
+import { InMemoryFxStore } from '@currena/insights/fx';
+import type { FxJobFetchers } from '@currena/insights/fx';
+import type { FxSnapshot } from '@currena/core';
+
+/** A REAL-shaped fx snapshot: the full 10-pair pipeline over a synthetic
+ * ECB world (8 currencies × 420 working days, gentle drift). */
+async function realisticFxSnapshot(): Promise<FxSnapshot> {
+  const base: Record<string, number> = {
+    EUR: 0.9, JPY: 150, GBP: 0.76, CHF: 0.88, CNY: 7.1, AUD: 1.52, CAD: 1.37, SEK: 9.5,
+  };
+  const dates: string[] = [];
+  let t = new Date('2026-10-12T00:00:00Z').getTime();
+  while (dates.length < 420) {
+    const date = new Date(t).toISOString().slice(0, 10);
+    const dow = new Date(t).getUTCDay();
+    if (dow !== 0 && dow !== 6) dates.push(date);
+    t -= 86_400_000;
+  }
+  dates.reverse();
+  const quotes: Record<string, { date: string; value: number }[]> = Object.fromEntries(
+    Object.entries(base).map(([code, start]) => [
+      code,
+      dates.map((date, i) => ({ date, value: start * (1.0002) ** i })),
+    ]),
+  );
+  const fetchers: FxJobFetchers = {
+    fetchFrankfurter: async () => ({ source: 'frankfurter', quotes: quotes as never }),
+    fetchYahoo: async () => {
+      throw new Error('yahoo not needed in this fixture');
+    },
+  };
+  const cross = {
+    getMarkets: async () => undefined,
+    getGoldHistory: async () => undefined,
+    getInsightsSnapshot: async () => undefined,
+  };
+  const job = await runFxJob(fetchers, undefined, cross, '2026-10-13', '2026-10-13T17:01:00Z');
+  if (job.snapshot === undefined) throw new Error('fixture fx snapshot failed to build');
+  return job.snapshot;
+}
+
+describe('GET /api/insights/fx', () => {
+  let store: InMemoryFxStore;
+
+  beforeEach(() => {
+    store = new InMemoryFxStore();
+  });
+
+  function makeApp() {
+    return createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeFxReader: () => store,
+    });
+  }
+
+  it('serves the stored snapshot with ETag + the spec §5 rule 4 cache headers', async () => {
+    const snap = await realisticFxSnapshot();
+    await store.putFxIfChanged(snap);
+    const res = await makeApp().request('/api/insights/fx', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('etag')).toBe('"insights-fx:2026-10-13T17:01:00Z"');
+    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=3600');
+    expect(await res.json()).toEqual(snap);
+  });
+
+  it('answers 304 on a matching If-None-Match', async () => {
+    const snap = await realisticFxSnapshot();
+    await store.putFxIfChanged(snap);
+    const res = await makeApp().request(
+      '/api/insights/fx',
+      { headers: { 'if-none-match': '"insights-fx:2026-10-13T17:01:00Z"' } },
+      env,
+    );
+    expect(res.status).toBe(304);
+  });
+
+  it('answers 503 fx_not_ready (calm, no-store) when KV is empty', async () => {
+    const res = await makeApp().request('/api/insights/fx', undefined, env);
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { error: { code: string; message: string } };
+    expect(body.error.code).toBe('fx_not_ready');
+    expect(res.headers.get('cache-control')).toBe('no-store');
+  });
+
+  it('keeps the full 10-pair response under the 20 KB budget (spec §5 rule 5)', async () => {
+    const snap = await realisticFxSnapshot();
+    expect(snap.pairs.length).toBe(10);
+    const bytes = JSON.stringify(snap).length;
+    expect(bytes).toBeLessThan(20 * 1024);
+  });
+
+  it('one KV read per request (the store counts its own ops)', async () => {
+    const snap = await realisticFxSnapshot();
+    await store.putFxIfChanged(snap);
+    const readsBefore = store.ops.reads;
+    await makeApp().request('/api/insights/fx', undefined, env);
+    expect(store.ops.reads - readsBefore).toBe(1);
+  });
+});

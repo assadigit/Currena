@@ -181,7 +181,23 @@ const BUDGETS = [
   // untouched (290.36/87.06 vs 296/89.5) — the section rides the lazy route.
   // Gzip +11.2 kB for a whole new bilingual section. Justified in CHANGELOG
   // §2026-10-12 (world markets, round 44).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 380_000, gz: 98_000, label: 'Insights lazy chunk' },
+  // World-currencies bump (377.70/97.20 → 450.10/110.38, budget 380/98.0 →
+  // 462/113.0): the World currencies section (insights-world-currencies-
+  // spec.md, direction B). Growth, itemised: (1) WorldCurrencies.tsx — the
+  // full §9 anatomy (verdict line, pattern cards with the two-line rebased
+  // chart + the 13-dots strip + Level-3 meaning lines, the quiet area with
+  // distance bars, the dollar row, the 10-pair table + pair detail panel
+  // with its 1-year chart); (2) the §7 rule corpus — all 7 rules × every
+  // outcome's two-part sentences — plus the §8 pair corpus (10 pairs + the
+  // dollar measure) × 2 locales; (3) fx-presentation.ts (the status
+  // mapping, card ordering, §10.3 headline templates, §7 sentence
+  // builder) + lib/fx.ts + fx-csv.ts; (4) the §6.11 hero rebuild (two
+  // separate section indicators with measure labels) + the shared
+  // SectionVerdictLine on both world sections. The ENTRY chunk stays
+  // untouched (290.38/87.07 vs 296/89.5) — the section rides the lazy
+  // route. Gzip +13.2 kB for a whole second bilingual section. Justified
+  // in CHANGELOG §2026-10-13 (world currencies).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 462_000, gz: 113_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

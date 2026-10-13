@@ -99,6 +99,33 @@ export interface MarketsAlert {
 }
 
 /**
+ * The world-currencies section signal joining the same module
+ * (insights-world-currencies-spec.md §6.5 / build step 11): raised
+ * signals appear with their PATTERN NAMES — the existing mechanism,
+ * no new card.
+ */
+export interface FxAlert {
+  /** The raised signal ('attention' | 'unusual'; 'normal' never alerts). */
+  signal: 'attention' | 'unusual';
+  /** The active patterns' names (the cards below carry the detail). */
+  patterns: string[];
+}
+
+/**
+ * §6.11/§9.10 — the two world sections as SEPARATE indicators in the
+ * transparent count: each shown with its own measure label and chip,
+ * never merged (a calm stock section and a warning currency pattern are
+ * both true, because they measure different things).
+ */
+export interface SectionIndicatorState {
+  signal: 'normal' | 'attention' | 'unusual';
+  /** The §6.11/§9.10 measure label for the current signal. */
+  label: string;
+  /** Scroll to the section when its indicator is used (raised signals). */
+  onJump?: () => void;
+}
+
+/**
  * One region's verdict block (R2): name, meter, verdict word, the gauges as
  * small readings, the computed reason line, the count line, and the R3
  * needs-attention tiles with numbers.
@@ -114,6 +141,9 @@ export function VerdictBlock({
   onFocusCard,
   marketsAlert,
   onJumpMarkets,
+  fxAlert,
+  onJumpFx,
+  sectionIndicators,
 }: {
   section: InsightsSection;
   sectionLabel: string;
@@ -127,6 +157,12 @@ export function VerdictBlock({
   marketsAlert?: MarketsAlert;
   /** Scroll to the world-markets section when the alert line is used. */
   onJumpMarkets?: () => void;
+  /** §6.5: the raised world-currencies signal (Global block only). */
+  fxAlert?: FxAlert;
+  /** Scroll to the world-currencies section when the alert line is used. */
+  onJumpFx?: () => void;
+  /** §6.11/§9.10: the two world sections as separate indicators (Global block only). */
+  sectionIndicators?: readonly SectionIndicatorState[];
 }) {
   const step = sectionVerdictStep(section, readings);
   const labelWord = labelForVerdictStep(step) ?? null;
@@ -334,21 +370,74 @@ export function VerdictBlock({
             </bdi>
           </button>
         ) : null}
+        {/* §6.5 hero integration (currencies build step 11): the raised
+         * currency signal appears in the SAME named-alerts module, with its
+         * PATTERN NAMES (the cards carry the detail) — no new card. */}
+        {fxAlert ? (
+          <button
+            type="button"
+            onClick={() => onJumpFx?.()}
+            className={`insights-focusable -my-0.5 mb-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold underline decoration-current/40 underline-offset-4 transition-opacity hover:opacity-80 ${
+              fxAlert.signal === 'unusual'
+                ? 'text-[var(--color-status-watch)]'
+                : 'text-[var(--color-status-alert)]'
+            }`}
+            data-fx-signal={fxAlert.signal}
+          >
+            <bdi>
+              {interpolate(
+                fxAlert.signal === 'unusual' ? copy.fx.heroAlertUnusual : copy.fx.heroAlertAttention,
+                { patterns: fxAlert.patterns.join(' · ') },
+              )}
+            </bdi>
+          </button>
+        ) : null}
         <p
           className={`m-0 text-[length:var(--type-caption)] font-semibold ${attentionToneClass(
-            tiles.length + (marketsAlert ? 1 : 0),
+            tiles.length + (marketsAlert ? 1 : 0) + (fxAlert ? 1 : 0),
           )}`}
           data-attention-count
           data-markets-in-count={marketsAlert ? 'true' : undefined}
+          data-fx-in-count={fxAlert ? 'true' : undefined}
         >
-          {interpolate(
-            marketsAlert ? copy.ui.inAlertWithMarkets : copy.ui.inAlert,
-            {
-              warnings: num(tiles.length, numberLocale),
-              voting: num(voting, numberLocale),
-            },
-          )}
+          {interpolate(copy.ui.inAlert, {
+            warnings: num(tiles.length, numberLocale),
+            voting: num(voting, numberLocale),
+          })}
         </p>
+
+        {/* §6.11/§9.10: the two world sections as SEPARATE indicators —
+         * each with its own measure label and chip, never merged. A calm
+         * stock section beside a warning currency pattern is the designed
+         * state (they measure different things); the labels say so. */}
+        {sectionIndicators !== undefined && sectionIndicators.length > 0 ? (
+          <p className="m-0 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[length:var(--type-caption)] font-semibold" data-section-indicators>
+            {sectionIndicators.map((ind, i) => (
+              <span key={i} className="inline-flex flex-wrap items-center gap-1">
+                {ind.signal !== 'normal' && ind.onJump !== undefined ? (
+                  <button
+                    type="button"
+                    onClick={ind.onJump}
+                    data-section-indicator={ind.signal}
+                    className={`insights-focusable cursor-pointer rounded-md border-0 bg-transparent px-1 py-0.5 font-bold underline decoration-current/40 underline-offset-4 transition-opacity hover:opacity-80 ${
+                      ind.signal === 'unusual'
+                        ? 'text-[var(--color-status-watch)]'
+                        : 'text-[var(--color-status-alert)]'
+                    }`}
+                  >
+                    {ind.label}
+                    <span className="ms-1 font-bold">· {ind.signal === 'unusual' ? copy.fx.chipUnusual : copy.fx.chipAttention}</span>
+                  </button>
+                ) : (
+                  <span className="px-1 py-0.5 text-[var(--color-text-tertiary)]" data-section-indicator="normal">
+                    {ind.label}
+                    <span className="ms-1">· {copy.fx.chipNormal}</span>
+                  </span>
+                )}
+              </span>
+            ))}
+          </p>
+        ) : null}
 
         {shown.length > 0 ? (
           <div className="mt-2">

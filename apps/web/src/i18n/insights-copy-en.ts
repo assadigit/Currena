@@ -995,7 +995,6 @@ export const insightsCopyEn = {
      * (world-markets spec §5.3 / build step 9: the section signal appears
      * in the transparent count AND in alerts) — the markets join the count
      * as one more attention item, named in plain words. */
-    inAlertWithMarkets: '{warnings} of {voting} indicators need attention · plus world stock markets',
     noSummary: 'Not enough voting data to read the gauges yet.',
     excludedNote: '{n} items set aside: stale or missing (see “How this is calculated”).',
     howCalculated: 'How is this calculated?',
@@ -1387,6 +1386,287 @@ export const insightsCopyEn = {
         what: 'Brazil’s main stock index, with large oil, mining and bank companies.',
         why: 'The usual stand-in for emerging markets and commodity exporters. It drops when investors flee riskier countries.',
         you: 'A sharp fall often goes with a stronger US dollar and weaker emerging-market currencies.',
+      },
+    },
+    /** §6.11 verdict labels — every section verdict names what it measures. */
+    measureNormal: 'Stock markets: near their yearly highs',
+    measureAttention: 'Stock markets: several well below their highs',
+    measureUnusual: 'Stock markets: far below their highs',
+    /** §9.10: the hero's transparent count shows the section as its own
+     * indicator, with its measure label — never merged with currencies. */
+    heroIndicatorNormal: 'Stock markets: calm',
+  },
+
+  fx: {
+    /** §10.2 — the section's own wording, spec-verbatim. */
+    title: 'World currencies',
+    subtitle: 'What the big currencies are telling us',
+    asOf: 'As of {date}',
+    groups: { dollarWorld: 'Dollar vs the world', warningLights: 'Warning lights', chinaLink: 'Australia–China' },
+    /** Status words (V1): patterns show only Active, Watching or Quiet. */
+    statusActive: 'Active',
+    statusWatching: 'Watching',
+    statusQuiet: 'Quiet',
+    /** Severity rides the page's own chips (§9.3) — the same wording as
+     * everywhere: Normal / Needs attention / Unusual. */
+    chipNormal: 'Normal',
+    chipAttention: 'Needs attention',
+    chipUnusual: 'Unusual',
+    /** §9.10 measure labels — the verdict line always names what it measures. */
+    measureNormal: 'Currency patterns: calm',
+    measureAttention: 'Currency patterns: worry signs',
+    measureUnusual: 'Currency patterns: several warnings at once',
+    /** §9.10: the hero's transparent count shows this section as its own
+     * indicator with its measure label, never merged with the stock one. */
+    heroIndicatorNormal: 'Currency patterns: calm',
+    /** §10.2 reliability detail (under the dots). */
+    reliabilityDetail: 'Held in {k} of the last 13 weeks',
+    /** Table tag (§6.2) — the only extra tag in the section. */
+    bigMoveTag: 'Unusually large move',
+    /** Quiet area (§9.3 item 4). */
+    quietPatternsLine: '{n} patterns are quiet',
+    closestToWarning: 'Closest to warning',
+    distanceBarText: '{name} {value} (warning at {threshold})',
+    /** Pattern cards (§9.3 item 3). */
+    morePatterns: '{n} more patterns',
+    chartCaptionTogether: 'Usually move together',
+    chartCaptionOpposite: 'Usually move in opposite directions',
+    dotsTitle: 'How the pattern held in the last 13 weeks',
+    dotsLegendHeld: 'Held',
+    dotsLegendNotHeld: 'Did not hold',
+    dotsLegendNoChange: 'No change',
+    dotsEndStart: '13 weeks ago',
+    dotsEndNow: 'now',
+    pairsUsed: 'Pairs used in this pattern',
+    dollarRowTitle: 'Dollar vs the world',
+    warningLine: '{pair} {value} · warning line {threshold}',
+    downgradeCaution: 'The usual pattern has not been reliable lately.',
+    level3Toggle: 'Why it works, and the numbers',
+    /** The three meaning-line labels (§9.3 Level 3). */
+    labelWhy: 'Why it works',
+    labelSeenBefore: 'Seen before',
+    labelForYou: 'What it means for you',
+    noDataRow: 'Not enough data right now',
+    /** Small labels for the two-part sentences (§10.2, optional on screen). */
+    labelSee: 'We see',
+    labelMeans: 'Usually means',
+    /** Pairs table (§9.3 item 6). */
+    showTable: 'Show all currency pairs',
+    hideTable: 'Hide pairs',
+    tableLabel: 'All world currency pairs',
+    thPair: 'Pair',
+    thToday: 'Today',
+    thM1: '1 month',
+    thM3: '3 months',
+    thY1: '1 year',
+    thTrend: 'Trend',
+    trendUp: 'Up',
+    trendFlat: 'Flat',
+    trendDown: 'Down',
+    directionLegend: '▲ = first currency stronger',
+    oldData: 'Old data · {date}',
+    /** States (§9.5). */
+    empty: 'Currency data is being prepared. Check back after the next daily update.',
+    collapsedStale: 'Currency data is old — last update {date}. It will return after the next daily update.',
+    /** Footer line (§9.3 item 7). */
+    footerLine: 'ECB reference rates, once a day. A pattern is a tendency, not a prediction.',
+    /** §10.3 headline templates — generated from the numbers, no AI call. */
+    headlineCalm: 'No pattern is active. Closest to a warning: “{name}”.',
+    headlineActive: '“{top}” is active.',
+    headlineActiveMore: '“{top}” is active, plus {n} more.',
+    headlineUnusual: 'Several patterns are active at once, led by “{top}”.',
+    headlineWobble: 'Money is leaving stocks and the dollar together, which is unusual.',
+    /** Hero integration (§6.5): raised currency signals appear in the
+     * named-alerts block with the pattern names. */
+    heroAlertAttention: 'World currencies · Needs attention — {patterns}.',
+    heroAlertUnusual: 'World currencies · Unusual — {patterns}.',
+    /** CSV export columns (the Tools menu, §9.3 item 6). */
+    csvColPair: 'Pair',
+    csvColToday: 'Today %',
+    csvColM1: '1 month %',
+    csvColM3: '3 months %',
+    csvColY1: '1 year %',
+    csvColTrend: 'Trend',
+    csvColRate: 'Rate',
+    csvColAsOf: 'As of',
+    csvColSource: 'Source',
+    csvDownload: 'World currencies CSV',
+    /** Chart + aria (§9.7: every chart has a text summary). */
+    chartAria: 'Two lines rebased to 100 over the last 26 weeks',
+    chartValueAria: 'week {i}: {value}',
+    chartSummary: 'The two lines moved {relation} in {k} of the last 13 weeks',
+    chartRelationTogether: 'together',
+    chartRelationOpposite: 'in opposite directions',
+    dollarChartAria: 'The dollar measure over the last year',
+    /** §8 — per-pair context content (spec-verbatim). */
+    entries: {
+      eurusd: {
+        name: 'Euro vs US dollar',
+        what: 'The world’s busiest pair, about a fifth of all currency trading. It follows the interest-rate gap between the US Fed and the European central bank.',
+        you: 'A falling euro means a stronger dollar, which usually weighs on gold.',
+      },
+      usdjpy: {
+        name: 'US dollar vs yen',
+        what: 'The yen is the world’s main cheap-borrowing currency and a safe haven. The pair follows the interest-rate gap between the US and Japan.',
+        you: 'A sudden yen jump can shake share markets worldwide.',
+      },
+      gbpusd: {
+        name: 'Pound vs US dollar',
+        what: 'The pound is the fourth most traded currency and London is the world’s biggest trading hub. Mostly context for the dollar measure.',
+        you: 'A pound-only move is usually a UK story, not a world one.',
+      },
+      usdchf: {
+        name: 'US dollar vs Swiss franc',
+        what: 'The Swiss franc is a classic safe haven. The pair shows whether worried investors prefer the franc or the dollar.',
+        you: 'A franc rising against the dollar can mean worry about the US specifically.',
+      },
+      usdcny: {
+        name: 'US dollar vs yuan',
+        what: 'One of the three busiest currency pairs. The yuan is steered by China’s central bank, so big moves are deliberate signals about China’s economy and trade.',
+        you: 'A weaker yuan can mean weaker Chinese demand for oil, metals and Australian exports.',
+      },
+      audusd: {
+        name: 'Australian dollar vs US dollar',
+        what: 'Your home pair. It follows China’s demand, commodity prices and the world’s appetite for risk.',
+        you: 'A falling Australian dollar makes imports and overseas travel dearer.',
+      },
+      audjpy: {
+        name: 'Australian dollar vs yen',
+        what: 'The classic “risk-measuring pair”: a growth currency against the safe-haven yen.',
+        you: 'A sharp fall usually means investors are getting nervous.',
+      },
+      eurjpy: {
+        name: 'Euro vs yen',
+        what: 'A second opinion on world mood: Europe’s money against the safe-haven yen.',
+        you: 'If it falls with AUD/JPY, the nervous signal is stronger.',
+      },
+      eurchf: {
+        name: 'Euro vs Swiss franc',
+        what: 'Europe’s safe-haven pair: it falls when worry about Europe rises.',
+        you: 'A fall alongside falling European shares is a warning.',
+      },
+      audcny: {
+        name: 'Australian dollar vs yuan',
+        what: 'The Australian dollar against its biggest customer’s currency.',
+        you: 'Shows the China link in one number.',
+      },
+    },
+    /** The dollar measure's own row (§8's last line). */
+    dollarEntry: {
+      name: 'Dollar vs the world',
+      what: 'The US dollar against six big currencies (euro, yen, pound, yuan, franc, Australian dollar), by Currena’s own weights. Not the official DXY.',
+      you: 'A strong dollar usually pressures gold and the Australian dollar.',
+    },
+    /** §7 — rule content (spec-verbatim, both parts of every sentence). */
+    rules: {
+      r1: {
+        name: 'Nervous or relaxed?',
+        warning: {
+          see: 'The Australian dollar is down {x}% against the yen over the past month, while {stocks}.',
+          means: 'This usually goes with nervous investors.',
+        },
+        supportive: {
+          see: 'The Australian dollar is up {x}% against the yen over the past month, and the S&P 500 is up {y}%.',
+          means: 'This usually goes with relaxed investors who are willing to take risk.',
+        },
+        watch: {
+          see: 'The Australian dollar is down {x}% against the yen over the past month, but stocks have not followed yet.',
+          means: 'If stocks join in, it would point to nervous investors.',
+        },
+        stocksSp500: 'the S&P 500 is down {y}%',
+        stocksFear: 'market fear (the VIX) is elevated',
+        why: 'Investors borrow cheap yen to buy higher-paying assets like the Australian dollar. When fear rises they sell those assets and buy yen back, so the pair falls.',
+        seenBefore: '2008, August 2024, April 2025.',
+        forYou: 'Nervous periods often come with falling share prices and retirement balances. A weaker Australian dollar also makes imports and overseas travel dearer.',
+        confirmLine: 'Confirmed by the euro against the yen.',
+      },
+      r2: {
+        name: 'Yen carry trade',
+        warning: {
+          see: 'The yen is up {x}% against the US dollar over the past month, while Japanese stocks (Nikkei 225) are down {y}%.',
+          means: 'This often means carry trades are being unwound, as in August 2024.',
+        },
+        watch: {
+          see: 'The yen is down {x}% against the US dollar over the past three months.',
+          means: 'Japan has stepped in to support the yen after sharp falls before (2022, 2024), and a sudden reversal can shake markets.',
+        },
+        why: 'Japan’s very low interest rates make the yen the cheapest money to borrow. When the yen jumps, borrowers rush to repay, which forces sales of shares and other assets worldwide.',
+        seenBefore: '2008, August 2024.',
+        forYou: 'A yen jump can pull down share markets and crypto at the same time, even when nothing is wrong locally.',
+      },
+      r3: {
+        name: 'Strong or weak dollar',
+        warning: {
+          see: 'The US dollar is up {x}% against the big currencies over the past three months.',
+          means: 'A strong dollar usually makes money harder to get around the world.',
+        },
+        supportive: {
+          see: 'The US dollar is down {x}% against the big currencies over the past three months.',
+          means: 'A weaker dollar usually makes money easier to get around the world.',
+        },
+        why: 'Oil, gold and much of the world’s debt are priced or borrowed in dollars. When the dollar rises they cost more for everyone else, which usually pressures gold, commodities and emerging markets.',
+        seenBefore: '2022 (strong dollar), 2017 (weak dollar).',
+        forYou: 'A strong US dollar usually means a weaker Australian dollar, so imports and overseas travel cost more.',
+      },
+      r4: {
+        name: 'Where does money hide?',
+        flight: {
+          see: 'The S&P 500 is down {y}% over the past month, while the US dollar is up {x}%.',
+          means: 'In a scare, money usually runs to the dollar.',
+        },
+        wobble: {
+          see: 'Over the past month the S&P 500 is down {y}%, the US dollar is down {x}% and gold is up {g}%.',
+          means: 'Money is leaving the dollar as well as stocks, which is unusual (seen in April 2025).',
+        },
+        why: 'In a fright the dollar is normally the safe place to be. When it fails at that job, investors are doubting something deeper, such as US policy or US debt.',
+        seenBefore: 'March 2020 and 2022 (usual pattern), April 2025 (unusual).',
+        forYou: 'When money leaves stocks and the dollar together, gold often rises.',
+      },
+      r5: {
+        name: 'China link',
+        warning: {
+          see: 'Over the past three months the yuan is down {x}% and the Australian dollar is down {y}% against the US dollar.',
+          means: 'This often points to worry about China’s demand.',
+        },
+        supportive: {
+          see: 'Over the past three months the yuan is up {x}% and the Australian dollar is up {y}% against the US dollar.',
+          means: 'China’s demand looks supportive.',
+        },
+        watch: {
+          see: 'Only one of the two has moved so far: {leg}.',
+          means: 'If both move together, it often points to China’s demand.',
+        },
+        legCny: 'the yuan is down {x}% against the US dollar',
+        legAud: 'the Australian dollar is down {y}% against the US dollar',
+        why: 'China buys much of Australia’s iron ore, so the Australian dollar tends to follow China’s economy. The yuan is steered by China’s central bank, so a big move is a deliberate signal.',
+        seenBefore: '2015 (yuan devaluation), 2018–2019 (trade war).',
+        forYou: 'Weaker Chinese demand hurts Australian mining incomes, and a weaker Australian dollar raises import prices.',
+      },
+      r6: {
+        name: 'Europe worry',
+        warning: {
+          see: 'The euro is down {x}% against the Swiss franc over the past month, and the Euro Stoxx 50 is down {y}%.',
+          means: 'Money often moves to the franc when investors worry about Europe.',
+        },
+        watch: {
+          see: 'The euro is down {x}% against the Swiss franc over the past month, but European shares have not followed.',
+          means: 'Moves by the Swiss central bank can also cause this.',
+        },
+        why: 'The Swiss franc is a classic safe haven. When Europeans get nervous they buy francs, so the euro-franc pair falls.',
+        seenBefore: 'the euro crisis of 2010–2012, 2015.',
+        forYou: 'Trouble in Europe can spill into world share markets and weaken the euro, which matters for travel and global funds.',
+      },
+      r7: {
+        name: 'Dollar or euro?',
+        dollarLed: {
+          see: 'The euro moved {x}% against the US dollar over the past month, and the dollar moved {d}% against all the big currencies in the same direction.',
+          means: 'That points to the dollar, which makes it a world story.',
+        },
+        euroLed: {
+          see: 'The euro moved {x}% against the US dollar over the past month, while the dollar barely moved ({d}%) against the other big currencies.',
+          means: 'That points to something in Europe, such as interest rates, growth or politics.',
+        },
+        why: 'Telling the two apart shows whether the cause is global or local.',
       },
     },
   },

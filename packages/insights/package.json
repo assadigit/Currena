@@ -10,6 +10,8 @@
     "./store": "./src/store.ts",
     "./markets": "./src/markets/index.ts",
     "./markets/definitions": "./src/markets/definitions.ts",
+    "./fx": "./src/fx/index.ts",
+    "./fx/definitions": "./src/fx/definitions.ts",
     "./prices": "./src/prices/index.ts"
   },
   "scripts": {
@@ -20,6 +22,7 @@
     "ingest": "tsx scripts/ingest.ts",
     "markets-data-check": "tsx scripts/markets-data-check.ts",
     "markets-run": "tsx scripts/markets-run.ts",
+    "fx-run": "tsx scripts/fx-run.ts",
     "markets-backtest": "tsx scripts/markets-backtest.ts",
     "prices-run": "tsx scripts/prices-run.ts"
   },

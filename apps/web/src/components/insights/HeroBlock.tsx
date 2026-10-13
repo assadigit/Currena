@@ -17,7 +17,7 @@ import { TrendingUp } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { bandWordsOf, bigMovers, consequenceLine, formatChange } from './config';
-import { VerdictBlock, type MarketsAlert } from './VerdictMeter';
+import { VerdictBlock, type MarketsAlert, type FxAlert, type SectionIndicatorState } from './VerdictMeter';
 
 function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
   return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
@@ -33,6 +33,9 @@ export function HeroBlock({
   onFocusCard,
   marketsAlert,
   onJumpMarkets,
+  fxAlert,
+  onJumpFx,
+  sectionIndicators,
 }: {
   readings: readonly IndicatorReading[];
   changedThisWeek: readonly { id: IndicatorId; to: string }[];
@@ -46,6 +49,14 @@ export function HeroBlock({
   marketsAlert?: MarketsAlert;
   /** Scroll to the world-markets section (the alert line's destination). */
   onJumpMarkets?: () => void;
+  /** §6.5 (currencies build step 11): the world-currencies signal when
+   * raised — joins the same attention module with its pattern names. */
+  fxAlert?: FxAlert;
+  /** Scroll to the world-currencies section (the alert line's destination). */
+  onJumpFx?: () => void;
+  /** §6.11/§9.10: the two world sections as separate indicators in the
+   * transparent count — each with its own measure label and chip. */
+  sectionIndicators?: readonly SectionIndicatorState[];
 }) {
   // R4: ONE mover line — |z| ≥ 2 only, stale items already excluded by the
   // engine (stale readings never carry a move score — test below pins it).
@@ -86,6 +97,9 @@ export function HeroBlock({
           onFocusCard={onFocusCard}
           marketsAlert={marketsAlert}
           onJumpMarkets={onJumpMarkets}
+          fxAlert={fxAlert}
+          onJumpFx={onJumpFx}
+          sectionIndicators={sectionIndicators}
         />
         <VerdictBlock
           section="australia"

@@ -36,7 +36,7 @@ import {
   type AdminBanner,
 } from './admin';
 import { KvRateStore } from './adapters/kv-store';
-import { KvInsightsReader, KvMarketsReader, KvPricesReader } from './adapters/insights-store';
+import { KvInsightsReader, KvMarketsReader, KvFxReader, KvPricesReader } from './adapters/insights-store';
 import type { MarketsReader } from '@currena/insights/markets';
 import { createInsightsRoutes } from './routes/insights';
 import { runPricesUpdate, formatPricesReport, defaultPricesFetchers } from '@currena/insights/prices';
@@ -64,6 +64,8 @@ export interface AppDeps {
   makeInsightsReader?: (env: Bindings) => import('@currena/insights/store').InsightsReader;
   /** Override the world-markets store (route tests inject the in-memory fake). */
   makeMarketsReader?: (env: Bindings) => MarketsReader;
+  /** Override the world-currencies store (route tests inject the in-memory fake). */
+  makeFxReader?: (env: Bindings) => import('@currena/insights/fx').FxReader;
   /** Override the live-prices store (route tests inject the in-memory fake). */
   makePricesReader?: (env: Bindings) => import('@currena/insights/prices').PricesReader;
 }
@@ -232,6 +234,14 @@ export function createApp(deps: AppDeps = {}) {
     return marketsReader;
   };
 
+  // World currencies serve path: the section's ONE key behind the same
+  // 1-hour KV edge cache (KvFxReader — same lazy-singleton pattern).
+  let fxReader: import('@currena/insights/fx').FxReader | undefined;
+  const getFxReader = (env: Bindings): import('@currena/insights/fx').FxReader => {
+    fxReader ??= deps.makeFxReader ? deps.makeFxReader(env) : new KvFxReader(env.RATES);
+    return fxReader;
+  };
+
   // Live-prices serve path: the quotes key behind a 60-second KV edge cache
   // (KvPricesReader — same lazy-singleton pattern).
   let pricesReader: import('@currena/insights/prices').PricesReader | undefined;
@@ -355,7 +365,10 @@ export function createApp(deps: AppDeps = {}) {
 
   // Phase I3: precomputed snapshot + per-indicator history, both written by
   // the daily GitHub Actions ingestion runner (roadmap §2). Read-only here.
-  app.route('/api/insights', createInsightsRoutes({ getReader: getInsightsReader, getMarketsReader, getPricesReader }));
+  app.route(
+    '/api/insights',
+    createInsightsRoutes({ getReader: getInsightsReader, getMarketsReader, getFxReader, getPricesReader }),
+  );
 
   /* ------------------------------ convert ------------------------------- */
 

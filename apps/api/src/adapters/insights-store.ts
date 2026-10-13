@@ -26,6 +26,7 @@ import type {
   IndicatorId,
   MarketsSnapshot,
   LivePricesSnapshot,
+  FxSnapshot,
 } from '@currena/core';
 import {
   INSIGHTS_SNAPSHOT_KEY,
@@ -36,6 +37,8 @@ import {
 } from '@currena/insights/store';
 import { MARKETS_KV_KEY, parseStoredMarkets } from '@currena/insights/markets';
 import type { MarketsReader } from '@currena/insights/markets';
+import { FX_KV_KEY, parseStoredFx } from '@currena/insights/fx';
+import type { FxReader } from '@currena/insights/fx';
 import { PRICES_KV_KEY, parseStoredLivePrices } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
 
@@ -76,6 +79,21 @@ export class KvMarketsReader implements MarketsReader {
 
   async getMarkets(): Promise<MarketsSnapshot | undefined> {
     return parseStoredMarkets(await this.kv.get(MARKETS_KV_KEY, { cacheTtl: 3600 }));
+  }
+}
+
+/**
+ * World currencies serve path (insights-world-currencies-spec.md §5 rules
+ * 3–4): ONE KV read for the section's ONE key, with the spec's 1-hour KV
+ * edge cache — exactly the markets twin. The value is written by the fx
+ * job riding the currena-markets Worker cron — read-only here, and a page
+ * request can never reach a provider.
+ */
+export class KvFxReader implements FxReader {
+  constructor(private readonly kv: KVNamespace) {}
+
+  async getFx(): Promise<FxSnapshot | undefined> {
+    return parseStoredFx(await this.kv.get(FX_KV_KEY, { cacheTtl: 3600 }));
   }
 }
 

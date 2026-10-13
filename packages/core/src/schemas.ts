@@ -749,6 +749,15 @@ export const MarketEntrySchema = z.object({
   close: z.number().finite().positive(),
   /** Last close vs previous close, percent. */
   chg1d: z.number().finite(),
+  /**
+   * Last close vs the last close on/before the same date one month earlier,
+   * percent — the leg the currency section's rules read (currencies spec
+   * §6.3: S&P 500, Nikkei 225, Euro Stoxx 50 1-month changes). OPTIONAL for
+   * one honest reason: a snapshot written before 2026-10-13 does not carry
+   * it, and the fx engine treats its absence as "input missing" (a nodata
+   * rule row), never a guess. The next markets run rewrites every row with it.
+   */
+  chg1m: z.number().finite().optional(),
   /** Last close vs ~three months earlier (the normal timeframe), percent. */
   chg3m: z.number().finite(),
   /** Highest daily close in the last 365 days. */
@@ -827,6 +836,198 @@ export const MarketsSnapshotSchema = z
     { message: 'each close must sit inside its own 52-week range' },
   );
 export type MarketsSnapshot = z.infer<typeof MarketsSnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
+ * World currencies (insights-world-currencies-spec.md)
+ *
+ * The whole section is ONE KV key — `insights:fx:v1` — written by the fx
+ * job (riding the currena-markets Worker's two cron triggers: the account's
+ * 5-cron free limit is full, spec §4.4's fallback) and served read-only by
+ * GET /api/insights/fx. Page requests never touch a provider, and no AI is
+ * called at runtime — every sentence on screen comes from fixed templates
+ * filled with the numbers below.
+ *
+ * Field semantics come from spec §4 "Stored object" + §6 "The analysis
+ * engine" (camelCase to match every other contract here):
+ *   chg       — d1/m1/m3/y1 percent changes, positive = first currency
+ *               (or the dollar) got stronger
+ *   moveRank  — share (0–100) of the last 365 days' rolling one-month
+ *               moves smaller than today's (direction ignored)
+ *   weekly    — ≤52 [dayDelta, close] pairs, delta-encoded exactly like
+ *               the markets section (base day 2020-01-01)
+ *   legs      — the warning-line rows (name, value, the line, met)
+ *   pattern   — the 13-week health check (holding ≥9 · mixed 7–8 · not
+ *               holding ≤6 · nodata), each week true/held, false/not held,
+ *               null/skipped (no change)
+ *   chart     — per rule, 2–3 rebased-to-100 weekly series (26 points)
+ *   summary   — the section signal: 0 counted warnings = normal, 1–2 =
+ *               attention, 3+ or the R4 confidence-wobble = unusual
+ * ------------------------------------------------------------------ */
+
+/** The 10 pairs (spec §3.1) — 6 direct/inverse + 4 crosses derived in code. */
+export const FxPairIdSchema = z.enum([
+  'eurusd',
+  'usdjpy',
+  'gbpusd',
+  'usdchf',
+  'usdcny',
+  'audusd',
+  'audjpy',
+  'eurjpy',
+  'eurchf',
+  'audcny',
+]);
+export type FxPairId = z.infer<typeof FxPairIdSchema>;
+
+/** The 6 non-USD currencies the provider must serve (spec §2). */
+export const FxCurrencySchema = z.enum(['EUR', 'JPY', 'GBP', 'CHF', 'CNY', 'AUD']);
+export type FxCurrency = z.infer<typeof FxCurrencySchema>;
+
+/** The four period changes, percent (spec §6.1). */
+export const FxChgSchema = z.object({
+  d1: z.number().finite(),
+  m1: z.number().finite(),
+  m3: z.number().finite(),
+  y1: z.number().finite(),
+});
+export type FxChg = z.infer<typeof FxChgSchema>;
+
+/** Which provider produced the pair (spec §4.2: Frankfurter primary, Yahoo fallback). */
+export const FxSourceSchema = z.enum(['frankfurter', 'yahoo']);
+export type FxSource = z.infer<typeof FxSourceSchema>;
+
+/** One pair's row inside the stored snapshot (spec §4 "Stored object"). */
+export const FxPairEntrySchema = z.object({
+  id: FxPairIdSchema,
+  /** The pair's own last-rate date, YYYY-MM-DD. */
+  asOf: z.iso.date(),
+  /** Latest rate, quote units per 1 base (> 0 — rule V1). */
+  rate: z.number().finite().positive(),
+  chg: FxChgSchema,
+  /** 0–100 (spec §6.2). */
+  moveRank: z.number().min(0).max(100),
+  /** True when moveRank ≥ 90 — the "Unusually large move" tag. */
+  bigMove: z.boolean(),
+  source: FxSourceSchema,
+  /** True when asOf is more than 5 calendar days old (rule V6). */
+  stale: z.boolean(),
+  /** ≤52 weekly closes, delta-encoded like the markets rows. */
+  weekly: z
+    .array(z.tuple([z.number().int().nonnegative(), z.number().finite().positive()]))
+    .min(1)
+    .max(52)
+    .refine((w) => w.every((p, i) => i === 0 || p[0] > 0), {
+      message: 'weekly day deltas must be positive after the first entry',
+    }),
+});
+export type FxPairEntry = z.infer<typeof FxPairEntrySchema>;
+
+/** "Dollar vs the world" — Currena's own weighted measure (spec §3.2). */
+export const FxDollarMeasureSchema = z.object({
+  asOf: z.iso.date(),
+  /** The basket's index level (not an exchange rate; base constant inside). */
+  value: z.number().finite().positive(),
+  chg: FxChgSchema,
+  weekly: FxPairEntrySchema.shape.weekly,
+});
+export type FxDollarMeasure = z.infer<typeof FxDollarMeasureSchema>;
+
+/** The 13-week pattern check (spec §6.4). */
+export const FxPatternCheckSchema = z.object({
+  status: z.enum(['holding', 'mixed', 'not_holding', 'nodata']),
+  agreeWeeks: z.number().int().min(0).max(13),
+  ofWeeks: z.literal(13),
+  /** 13 entries: true = held, false = did not, null = skipped (no change). Empty when nodata / the rule has no check. */
+  weeks: z.array(z.boolean().nullable()).max(13),
+});
+export type FxPatternCheck = z.infer<typeof FxPatternCheckSchema>;
+
+/** One warning-line row: "AUD/JPY −4.1% · warning line −3.0%" (spec §9.3). */
+export const FxLegSchema = z.object({
+  name: z.string().min(1),
+  value: z.number().finite(),
+  line: z.number().finite(),
+  met: z.boolean(),
+});
+export type FxLeg = z.infer<typeof FxLegSchema>;
+
+/** One rebased chart line (spec §9.3 Level 2: 26 weeks, both start at 100). */
+export const FxChartSeriesSchema = z.object({
+  id: z.string().min(1),
+  points: z.array(z.number().finite()).min(2),
+});
+export type FxChartSeries = z.infer<typeof FxChartSeriesSchema>;
+
+/** The seven rules (spec §6.3). */
+export const FxRuleIdSchema = z.enum([
+  'r1_risk_mood',
+  'r2_carry_trade',
+  'r3_dollar_strength',
+  'r4_money_hiding',
+  'r5_china_link',
+  'r6_europe_worry',
+  'r7_dollar_or_euro',
+]);
+export type FxRuleId = z.infer<typeof FxRuleIdSchema>;
+
+/**
+ * One rule's state. `outcome` names are the ENGINE's (spec §6.3); on screen
+ * they map to Active / Watching / Quiet plus the page's severity chips
+ * (spec §9.3). `downgraded` marks the §6.4 pass: a Warning whose pattern is
+ * Not holding lately becomes a Watch and does not count.
+ */
+export const FxRuleStateSchema = z.object({
+  id: FxRuleIdSchema,
+  outcome: z.enum(['warning', 'watch', 'supportive', 'quiet', 'context', 'nodata']),
+  /** True when this row counts toward the section signal. */
+  counted: z.boolean(),
+  /** The numbers behind the sentence (only inputs that exist — never a guess). */
+  numbers: z.record(z.string(), z.number().finite()),
+  /** Cross-pair confirmations (R1: EUR/JPY). */
+  confirmedBy: z.array(z.string()),
+  /** 0–100: how far the main leg moved toward its warning line (spec §6.7). */
+  progress: z.number().min(0).max(100),
+  /** R4's two shapes and R7's two leads. */
+  variant: z.enum(['flight', 'wobble', 'dollar-led', 'euro-led']).optional(),
+  legs: z.array(FxLegSchema),
+  pattern: FxPatternCheckSchema,
+  chart: z.object({
+    expect: z.enum(['together', 'opposite']),
+    series: z.array(FxChartSeriesSchema),
+  }),
+  /** True when §6.4's downgrade pass demoted a Warning to Watch. */
+  downgraded: z.boolean().optional(),
+});
+export type FxRuleState = z.infer<typeof FxRuleStateSchema>;
+
+/** Section rollup (spec §6.5) — feeds the hero count, like the stock section. */
+export const FxSummarySchema = z.object({
+  signal: z.enum(['normal', 'attention', 'unusual']),
+  /** Counted Warnings (after the downgrade pass). */
+  countedWarnings: z.number().int().nonnegative(),
+  /** The most serious active rule (the R4 wobble wins); null when none. */
+  headlineRule: FxRuleIdSchema.nullable(),
+});
+export type FxSummary = z.infer<typeof FxSummarySchema>;
+
+/** The value of `insights:fx:v1`, verbatim over the wire (spec §4). */
+export const FxSnapshotSchema = z
+  .object({
+    v: z.literal(1),
+    /** When the writing run finished (ISO 8601 UTC). */
+    generatedAt: z.iso.datetime(),
+    dollarMeasure: FxDollarMeasureSchema,
+    pairs: z.array(FxPairEntrySchema),
+    rules: z.array(FxRuleStateSchema),
+    summary: FxSummarySchema,
+  })
+  .refine((s) => new Set(s.pairs.map((p) => p.id)).size === s.pairs.length, {
+    message: 'fx pairs must contain each pair id at most once',
+  })
+  .refine((s) => new Set(s.rules.map((r) => r.id)).size === s.rules.length, {
+    message: 'fx rules must contain each rule id at most once',
+  });
+export type FxSnapshot = z.infer<typeof FxSnapshotSchema>;
 
 /* ------------------------------------------------------------------ *
  * Live prices (the volatility-scaled refresh — 2026-10-12)

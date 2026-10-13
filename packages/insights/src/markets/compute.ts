@@ -183,6 +183,14 @@ export function buildEntry(
   const chg3m = pctChange(last.value, windowAgo?.value);
   if (chg3m === null) throw new Error(`[markets] ${id}: no close on/before three months back for chg3m`);
 
+  // chg1m: vs the last close on or before the same date one month earlier —
+  // the leg the currency section's rules read (currencies spec §6.3). A
+  // ~400-day provider window always carries an anchor; if it somehow does
+  // not, the row simply omits the field (the fx engine treats it as a
+  // missing input, never a guess).
+  const monthAgo = pointAtOrBefore(points, addDays(last.date, -30));
+  const chg1m = pctChange(last.value, monthAgo?.value);
+
   // 52-week window: closes within the last 365 calendar days.
   const windowStart = addDays(last.date, -365);
   const window = points.filter((p) => p.date >= windowStart);
@@ -199,6 +207,7 @@ export function buildEntry(
     asOf: last.date,
     close: round2(last.value),
     chg1d: round2(chg1d),
+    ...(chg1m !== null ? { chg1m: round2(chg1m) } : {}),
     chg3m: round2(chg3m),
     high52w: round2(high),
     low52w: round2(low),

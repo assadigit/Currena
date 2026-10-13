@@ -34,6 +34,7 @@ import { useI18n } from '../lib/locale';
 import { routeQuery } from '../router';
 import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../lib/insights';
 import { fetchMarketsSnapshot, readCachedMarkets } from '../lib/markets';
+import { fetchFxSnapshot, readCachedFx } from '../lib/fx';
 import { AboutTheData } from '../components/insights/AboutTheData';
 import { AlertCard } from '../components/insights/AlertCard';
 import { CompactRow } from '../components/insights/CompactRow';
@@ -47,7 +48,8 @@ import { Signals } from '../components/insights/Signals';
 import { Together } from '../components/insights/Together';
 import { ToolsMenu } from '../components/insights/ToolsMenu';
 import { WorldMarkets, type MarketsLoadState } from '../components/insights/WorldMarkets';
-import type { MarketsAlert } from '../components/insights/VerdictMeter';
+import { WorldCurrencies, type FxLoadState } from '../components/insights/WorldCurrencies';
+import type { FxAlert, MarketsAlert, SectionIndicatorState } from '../components/insights/VerdictMeter';
 import { Skeleton } from '../components/ui';
 import { Button } from '../components/ui';
 import { useInsightsCopy } from '../components/insights/useInsightsCopy';
@@ -469,9 +471,79 @@ export function Insights() {
     };
   }, [marketsState]);
 
+  // World currencies (insights-world-currencies-spec.md): the same
+  // independent-feed discipline — own last-good cache, never an error
+  // surface; loading skeletons and the calm "being prepared" line (§9.5).
+  const [fxState, setFxState] = useState<FxLoadState>(() => {
+    try {
+      const cachedFx = readCachedFx();
+      return cachedFx ? { kind: 'ready', snapshot: cachedFx } : { kind: 'loading' };
+    } catch {
+      return { kind: 'loading' };
+    }
+  });
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetchFxSnapshot(controller.signal).then((snapshot) => {
+      if (controller.signal.aborted) return;
+      setFxState(snapshot !== null ? { kind: 'ready', snapshot } : { kind: 'empty' });
+    });
+    return () => controller.abort();
+  }, []);
+
+  // §6.5 (currencies build step 11): the raised currency signal joins the
+  // hero's attention module WITH ITS PATTERN NAMES — the existing mechanism.
+  const fxAlert = useMemo<FxAlert | undefined>(() => {
+    if (fxState.kind !== 'ready') return undefined;
+    const { summary, rules } = fxState.snapshot;
+    if (summary.signal === 'normal') return undefined;
+    const names = rules
+      .filter((r) => r.outcome === 'warning' && r.counted)
+      .map((r) => copy.fx.rules[r.id.slice(0, 2) as 'r1'].name);
+    return { signal: summary.signal, patterns: names };
+  }, [fxState, copy]);
+
   const jumpToMarkets = useCallback(() => {
     document.getElementById('insights-markets')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
   }, []);
+
+  const jumpToFxCurrencies = useCallback(() => {
+    document.getElementById('insights-fx')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }, []);
+
+  // §6.11/§9.10: the two world sections as SEPARATE indicators in the
+  // transparent count — each with its own measure label and chip, never
+  // merged (they measure different things; both can be true at once).
+  const sectionIndicators = useMemo<SectionIndicatorState[] | undefined>(() => {
+    const out: SectionIndicatorState[] = [];
+    if (marketsState.kind === 'ready') {
+      const signal = marketsState.snapshot.summary.signal;
+      out.push({
+        signal,
+        label:
+          signal === 'unusual'
+            ? copy.markets.measureUnusual
+            : signal === 'attention'
+              ? copy.markets.measureAttention
+              : copy.markets.measureNormal,
+        onJump: jumpToMarkets,
+      });
+    }
+    if (fxState.kind === 'ready') {
+      const signal = fxState.snapshot.summary.signal;
+      out.push({
+        signal,
+        label:
+          signal === 'unusual'
+            ? copy.fx.measureUnusual
+            : signal === 'attention'
+              ? copy.fx.measureAttention
+              : copy.fx.measureNormal,
+        onJump: jumpToFxCurrencies,
+      });
+    }
+    return out.length > 0 ? out : undefined;
+  }, [marketsState, fxState, copy, jumpToMarkets, jumpToFxCurrencies]);
 
   const togglePin = useCallback((id: IndicatorId, next: boolean): void => {
     setPinned((prev) => {
@@ -698,6 +770,21 @@ export function Insights() {
     });
   }, [marketsState, copy]);
 
+  // The world-currencies pairs export (spec §9.3 item 6: the CSV goes in
+  // the same Tools menu). Only offered while an fx snapshot is in hand.
+  const downloadFxCsv = useCallback(() => {
+    if (fxState.kind !== 'ready') return;
+    void import('../components/insights/fx-csv').then(({ buildFxCsv, fxCsvFilename }) => {
+      const csv = buildFxCsv(fxState.snapshot, copy);
+      void import('../lib/download').then(({ downloadBlob }) => {
+        downloadBlob(
+          new Blob([csv], { type: 'text/csv;charset=utf-8' }),
+          fxCsvFilename(fxState.snapshot.generatedAt),
+        );
+      });
+    });
+  }, [fxState, copy]);
+
   // P1/R19: the sticky section nav — the Signals pill joins the row (the
   // built page had the section but no pill) and every pill expands its
   // section if collapsed (R7b/R25).
@@ -761,6 +848,7 @@ export function Insights() {
               onDownloadCsv={downloadCsv}
               onDownloadIcs={downloadIcs}
               onDownloadMarketsCsv={marketsState.kind === 'ready' ? downloadMarketsCsv : undefined}
+              onDownloadFxCsv={fxState.kind === 'ready' ? downloadFxCsv : undefined}
             />
           ) : null}
         </div>
@@ -825,6 +913,9 @@ export function Insights() {
               onFocusCard={focusCard}
               marketsAlert={marketsAlert}
               onJumpMarkets={jumpToMarkets}
+              fxAlert={fxAlert}
+              onJumpFx={jumpToFxCurrencies}
+              sectionIndicators={sectionIndicators}
             />
           </div>
 
@@ -845,6 +936,14 @@ export function Insights() {
            * never above the verdict or alerts. Self-contained feed: its own
            * loading/empty states, never an error surface for the page. */}
           <WorldMarkets state={marketsState} copy={copy} locale={locale} numberLocale={numberLocale} />
+
+          {/* World currencies (insights-world-currencies-spec.md §9.2):
+           * right after the world stock markets — the two sections explain
+           * each other, and each verdict names what it measures (§9.10), so
+           * a calm stock section beside a warning currency pattern can never
+           * read as one contradiction. Self-contained feed: its own
+           * loading/empty states, never an error surface for the page. */}
+          <WorldCurrencies state={fxState} copy={copy} locale={locale} numberLocale={numberLocale} />
 
           {/* R11: "What it means for my money" — at most 4 lines. */}
           <MoneyPanel

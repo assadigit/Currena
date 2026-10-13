@@ -3,6 +3,7 @@
  *
  *   GET /api/insights                — the precomputed snapshot
  *   GET /api/insights/markets        — the world stock markets snapshot
+ *   GET /api/insights/fx             — the world currencies snapshot
  *   GET /api/insights/:id/history    — one indicator's downsampled 10-year series
  *
  * The Worker only READS what a scheduled job wrote (cheap: exactly one KV
@@ -21,6 +22,7 @@ import { Hono } from 'hono';
 import type { Context } from 'hono';
 import type { InsightsReader } from '@currena/insights/store';
 import type { MarketsReader } from '@currena/insights/markets';
+import type { FxReader } from '@currena/insights/fx';
 import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
 import type { Bindings } from '../index';
@@ -30,6 +32,8 @@ export interface InsightsRouteDeps {
   getReader: (env: Bindings) => InsightsReader;
   /** Markets store construction (route tests inject the in-memory fake). */
   getMarketsReader: (env: Bindings) => MarketsReader;
+  /** Fx store construction (route tests inject the in-memory fake). */
+  getFxReader: (env: Bindings) => FxReader;
   /** Live-prices store construction (route tests inject the in-memory fake). */
   getPricesReader: (env: Bindings) => PricesReader;
 }
@@ -100,6 +104,47 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
       );
     }
     const etag = `"insights-markets:${snapshot.generatedAt}"`;
+    if (c.req.header('if-none-match') === etag) {
+      return c.body(null, 304, { 'Cache-Control': 'public, max-age=300, s-maxage=3600', ETag: etag });
+    }
+    const response = c.json(snapshot, 200, {
+      'Cache-Control': 'public, max-age=300, s-maxage=3600',
+      ETag: etag,
+    });
+    if (typeof caches !== 'undefined') {
+      // Best-effort warm of the Worker's edge cache; the response is
+      // already on its way to the client.
+      try {
+        await caches.default.put(c.req.raw, response.clone());
+      } catch {
+        /* cache warm failures never fail the request */
+      }
+    }
+    return response;
+  });
+
+  // World currencies (insights-world-currencies-spec.md §5 rules 3–4): the
+  // ONE-key snapshot, served read-only behind the same cache discipline as
+  // /markets (edge cache + ETag + the calm 503 "being prepared" answer).
+  // Registered BEFORE /:id/history so the literal path wins.
+  app.get('/fx', async (c) => {
+    // The Worker's own edge cache — absent in plain test runtimes.
+    if (typeof caches !== 'undefined') {
+      const edgeCached = await caches.default.match(c.req.raw);
+      if (edgeCached !== undefined) return edgeCached;
+    }
+    const snapshot = await deps.getFxReader(c.env).getFx();
+    if (!snapshot) {
+      // The calm "being prepared" answer: the section has never been
+      // populated (fresh deploy, or the scheduled job has not landed yet).
+      return errorResponse(
+        c,
+        503,
+        'fx_not_ready',
+        'No world-currencies snapshot stored yet — the scheduled job has not completed.',
+      );
+    }
+    const etag = `"insights-fx:${snapshot.generatedAt}"`;
     if (c.req.header('if-none-match') === etag) {
       return c.body(null, 304, { 'Cache-Control': 'public, max-age=300, s-maxage=3600', ETag: etag });
     }
