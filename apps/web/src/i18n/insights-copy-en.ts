@@ -624,8 +624,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   'btc-usd': {
     name: 'Bitcoin price',
     ticker: 'BTC',
-    oneLiner:
-      'The world price of one bitcoin, in US dollars: an hourly quote from Yahoo Finance’s spot index on a daily gold-api.com backbone.',
+    oneLiner: 'The world price of one bitcoin, in US dollars.',
     lines: {
       highRising: 'Bitcoin is expensive and rising: a mood that tends to accompany easy money and risk appetite.',
       highEasing: 'Bitcoin is expensive but easing off its highs.',
@@ -635,7 +634,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     },
     unitNote: 'US dollars per bitcoin',
     whatItIs:
-      'The live price of one bitcoin in US dollars, from gold-api.com. By design there is no 10-year position here (the feed carries no multi-year history) so the 7- and 30-day changes come from stored daily snapshots.',
+      'The live price of one bitcoin in US dollars: an hourly quote from Yahoo Finance’s spot index on a daily gold-api.com backbone. By design there is no 10-year position here (the feed carries no multi-year history) so the 7- and 30-day changes come from stored daily snapshots.',
     whyItMatters:
       'Bitcoin is the flagship of the crypto world: its mood tends to set the tone for a whole family of digital assets.',
     tendedToMean:
@@ -773,8 +772,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   'au-petrol-yoy': {
     name: 'Petrol prices vs a year ago',
     ticker: 'CPI: fuel',
-    oneLiner:
-      'How much more (or less) fuel costs than a year ago, as the ABS measures it.',
+    oneLiner: 'How much more (or less) fuel costs than a year ago.',
     lines: {
       highRising: 'Petrol is climbing faster than a year ago: pressure on family budgets and freight prices.',
       highEasing: 'Petrol inflation is high but easing: pressure at the bowser slowly lifting.',
@@ -838,7 +836,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   'au-wage-growth': {
     name: 'Wage growth vs a year ago',
     oneLiner:
-      'How fast Australian wages are rising, compared with a year ago, by the ABS wage price index.',
+      'How fast Australian wages are rising, compared with a year ago, by the wage price index.',
     lines: {
       highRising: 'Wages are growing faster than usual: the reading that usually means pay packets catching up.',
       highEasing: 'Wage growth is high but easing.',

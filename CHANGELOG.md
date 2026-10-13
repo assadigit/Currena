@@ -29,6 +29,16 @@ Sources section at the foot of the page.
   details panel and in the Sources section, never on the cards. The unused
   `sourceLabel` key was removed from both dictionaries (fa is typed against
   en, so the removal is structurally guaranteed to stay in sync).
+- **Card-face copy de-sourced (en/fa)**: the oneLiner lines that render on
+  card faces via the consequence fallback dropped their data-provider
+  mentions, moving them into `whatItIs` (details panel) where they belong:
+  btc-usd ("an hourly quote from Yahoo Finance's spot index on a daily
+  gold-api.com backbone" now lives in whatItIs; the oneLiner is simply "The
+  world price of one bitcoin, in US dollars."), au-petrol-yoy ("as the ABS
+  measures it" dropped) and au-wage-growth ("by the ABS wage price index" →
+  "by the wage price index"). Subject naming stays on faces by design: "the
+  RBA's 2–3% band", "The St. Louis Fed's single gauge", "the ECB's deposit
+  facility rate" name WHAT is measured, not who supplied the data.
 - **packages/insights definitions.ts**: comment-only touch (the A9 note now
   says the details panel, not the tile, carries the attribution).
 
