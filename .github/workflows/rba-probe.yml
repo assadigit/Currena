@@ -4,18 +4,11 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: F4.1 + F6 data rows
+      - name: Dump full F4.1 CSV base64
         run: |
           UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36"
           curl -s --max-time 60 -A "$UA" "https://www.rba.gov.au/statistics/tables/csv/f4.1-data.csv" -o /tmp/f41.csv
-          echo "=== f4.1 last 5 NON-EMPTY rows ==="
-          grep -v '^[[:space:]]*$' /tmp/f41.csv | tail -5
-          echo "=== f4.1 row count: $(grep -cv '^[[:space:]]*$' /tmp/f41.csv)"
-          curl -s --max-time 60 -A "$UA" "https://www.rba.gov.au/statistics/tables/csv/f6-data.csv" -o /tmp/f6.csv
-          echo "=== f6 Publication date + Series ID rows ==="
-          grep -E '^(Publication date|Series ID)' /tmp/f6.csv | cut -c1-200
-          echo "=== f6 last 2 non-empty rows ==="
-          grep -v '^[[:space:]]*$' /tmp/f6.csv | tail -2
-          curl -s --max-time 60 -A "$UA" "https://www.rba.gov.au/statistics/tables/csv/f2-data.csv" -o /tmp/f2.csv
-          echo "=== f2 last 2 non-empty rows ==="
-          grep -v '^[[:space:]]*$' /tmp/f2.csv | tail -2 | cut -c1-80
+          echo "SIZE $(wc -c < /tmp/f41.csv)"
+          echo "B64START"
+          base64 -w 200 /tmp/f41.csv
+          echo "B64END"
