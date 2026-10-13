@@ -840,3 +840,57 @@ change inventory is CHANGELOG §2026-10-10 (round 2). Committed as
   visitors get the new shell on their next visit and the new lazy Insights
   chunk after the standard two-reload SW update cycle (same as every
   previous wave).
+
+## Session record — 2026-10-13 (Insights Step-1 fix list + fx evidence artifacts)
+
+**The 12 Oct external audit's Step-1 wave** (currena-insights-step1-fix-list.md,
+committed by the owner): wrong/outdated numbers, date handling, calculation and
+label errors, contradictions, hero mapping, stock-row presentation, forecast
+wording, trust items and the pipeline — plus the world-currencies spec's
+finish-line artifacts (the evidence run + the fx data check).
+
+- **Engine**: Fed target = the TRUE DFEDTARL/DFEDTARU corridor (reading value
+  = lower bound + `rangeHigh`); au-cpi/au-trimmed-mean → the ABS MONTHLY CPI
+  (live-verified Aug-2026: 4.0% / 3.6%); core CPI (CPILFESL) as the US card's
+  context companion; RBA cash rate → the DAILY F1 table (venue-verified:
+  4.60% from the Sep-29 hike's effective date); breakeven-5y5y re-backtested
+  (threshold above 2.4% sustained 4 weeks — fires once/decade); points-not-%
+  on every rate series; monthly/quarterly changes = "since previous release";
+  percentile on YoY growth for M2/home values; fromPeak10y on every reading;
+  hold-last-good on failed fetches (stale-marked, original asOf); daily grace
+  3→5 days (the DGS10/DFII10 false-stale); release dates from
+  data/insights-release-schedule.json; ONE count rule for the region verdict
+  words (displayed on the page).
+- **Web**: UTC date-only formatting (the one-day calendar shift); data-date +
+  stale tags + release dates on every card; "One bitcoin buys X oz";
+  gold-silver recomputed from the live tiles' snapshot; € per USD;
+  US$23.3 trillion; the policy-rate "Recent move" lines; stock tiles' 52-week
+  distance everywhere + Delayed tags + the local-currency note + one ±1% flat
+  band for trend words; "Mixed: N of M markets in correction"; calm-area
+  lists in the heroes; "Conditions for gold and silver" (Supports / Works
+  against — no forecast wording, both locales swept); the accurate sources
+  list; the backtest sentence once + its small sample; "prices updated HH:MM"
+  in the header (serve-time pricesAsOf); the savings money-row leads with the
+  cash rate + a new piggy-bank artwork; the petrol row derives from the oil
+  rule; the gold-near-decade-high-while-real-yields-high warning.
+- **Artifacts**: docs/specs/insights-world-currencies-evidence.md (522-week
+  replay: R1 7.5% · R2 2.9% · R3 11.7% · R4 6.5% · R5 15.3% · R6 4.0% of
+  weeks; the known episodes caught), fx-data-check (10/10 pairs within 0.5%),
+  the markets data-check KV-usage record, BACKTEST.md regenerated.
+- **Gates**: typecheck 6/6; 1,000 tests green; Insights chunk 465.70/113.98
+  (budget 469/115.5, itemised); entry untouched 290.38/87.07.
+- **Deploy**: ingest dry-run verified the F1 daily parse from the Actions
+  venue (rba-cash-rate 4.6), then the real ingest wrote the new-format
+  snapshot (generatedAt 2026-10-13T04:09:47Z; Global cautious 3/16 ·
+  Australia stressed 5/13 · 0 excluded); currena-api **6a95f91e** (assets =
+  the rebuilt SPA, after the live-QA M2 fix) + currena-markets **8ab1a8cc**.
+- **Live QA** (agent-browser, currena.ir): 40+ audit-item assertions pass —
+  the Fed corridor 3.75–4.00%, AU CPI "data for August 2026 · released 30
+  Sep", core 2.4% beside headline 3.4%, the cash-rate card 4.60%, "One
+  bitcoin buys 19.8 oz of gold", "€0.8944", the calendar's decision days
+  (14 Oct US CPI · 28 Oct FOMC + ABS monthly CPI · 3 Nov RBA), zero
+  "Correcting"/"Estimation"/"will go"/«خواهد بود», zero "not enough fresh
+  data", "prices updated 04:13", the verdict rule + calm lists in both
+  heroes, 5 of 16 in correction with 2 Delayed tags, mobile 375px no
+  overflow (en + fa RTL). Screenshots for the second audit:
+  docs/evidence/step1-audit/.
