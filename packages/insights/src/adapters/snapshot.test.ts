@@ -21,6 +21,19 @@ function daily(start: string, n: number, v: number, jitter: (i: number) => numbe
   return out;
 }
 
+/** Weekday-only series from `start` to `end` inclusive (business-day dailies
+ * like VIXCLS/DGS10/F2 — one point per Mon–Fri). */
+function businessDays(start: string, end: string): SeriesPoint[] {
+  const out: SeriesPoint[] = [];
+  const msPerDay = 86_400_000;
+  for (let t = Date.parse(`${start}T00:00:00Z`); t <= Date.parse(`${end}T00:00:00Z`); t += msPerDay) {
+    const day = new Date(t).getUTCDay();
+    if (day === 0 || day === 6) continue;
+    out.push({ date: new Date(t).toISOString().slice(0, 10), value: 100 + out.length });
+  }
+  return out;
+}
+
 describe('downsampleSeries', () => {
   it('returns an unchanged copy when already within the cap', () => {
     const series = daily('2026-09-01', 10, 3);
@@ -51,6 +64,32 @@ describe('downsampleSeries', () => {
 describe('buildHistoryFile', () => {
   it('returns undefined for single-point live cards (no history key)', () => {
     expect(buildHistoryFile('gold-btc', [{ date: '2026-10-07', value: 42 }])).toBeUndefined();
+  });
+
+  it('Step-2 §A: a 10-year DAILY series stores its FULL window — no weekly stride', () => {
+    // ~2,600 business-day points over 10 years (weekdays only, like VIXCLS
+    // / DGS10 / F2). The raised cap (2,700) keeps every one: the stored
+    // history satisfies "at least 2 years of daily data (10 years if the
+    // source allows)" for the Step-3 verdict rules.
+    // Anchor safely INSIDE the 10-year window (the window trims anything
+    // older than 3,650 days before the newest observation).
+    const weekdays = businessDays('2016-11-01', '2026-10-02');
+    expect(weekdays.length).toBeGreaterThan(2500);
+    expect(weekdays.length).toBeLessThanOrEqual(HISTORY_MAX_POINTS);
+    const file = buildHistoryFile('vix', weekdays)!;
+    expect(file.points.length).toBe(weekdays.length);
+    expect(file.points[0]).toEqual([epochDay(weekdays[0]!.date), weekdays[0]!.value]);
+    expect(file.points.at(-1)).toEqual([epochDay(weekdays.at(-1)!.date), weekdays.at(-1)!.value]);
+  });
+
+  it('Step-2 §A: the stride still guards a pathological future series', () => {
+    // 5,200 daily points (20 years) — beyond the cap: strided, ending on
+    // the last observation.
+    const long = businessDays('2006-10-03', '2026-10-02');
+    expect(long.length).toBeGreaterThan(HISTORY_MAX_POINTS);
+    const file = buildHistoryFile('us10y', long)!;
+    expect(file.points.length).toBeLessThanOrEqual(HISTORY_MAX_POINTS + 1);
+    expect(file.points.at(-1)).toEqual([epochDay(long.at(-1)!.date), long.at(-1)!.value]);
   });
 
   it('minPoints 1 bootstraps the accumulated-daily rows (the btc-usd lesson)', () => {
@@ -99,8 +138,8 @@ describe('buildInsightsSnapshot', () => {
       calendar: [],
       now: NOW,
     });
-    expect(snap.readings).toHaveLength(42);
-    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(42);
+    expect(snap.readings).toHaveLength(47);
+    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(47);
     expect(snap.readings.find((r) => r.id === 'us10y')!.status).not.toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.status).toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.value).toBeNull();

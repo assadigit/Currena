@@ -404,6 +404,52 @@ describe('computeReading', () => {
     const long = dailySeries(200, (i) => i);
     expect(readingOf(makeDef({ rule: { kind: 'info' } }), long).percentile10y).toBeCloseTo(1, 6);
   });
+
+  /* Step-2 add-list §B1: the last step change (date + size) — the exact
+   * policy decision, not a rolling 30-day window. */
+  it('lastChange: the most recent observation whose value differs from the one before it', () => {
+    // A policy-rate ladder: flat, then a +0.25 step on 2024-06-05, flat since.
+    const ladder: SeriesPoint[] = [
+      { date: '2024-01-02', value: 4.35 },
+      { date: '2024-01-03', value: 4.35 },
+      { date: '2024-06-05', value: 4.6 },
+      { date: '2024-06-06', value: 4.6 },
+    ];
+    const r = readingOf(
+      makeDef({ id: 'rba-cash-rate', cadence: 'per-change', changeKind: 'points', rule: { kind: 'info' } }),
+      ladder,
+    );
+    expect(r.lastChange).toEqual({ date: '2024-06-05', points: 0.25 });
+  });
+
+  it('lastChange: a cut is negative; a one-observation series has none', () => {
+    const cut: SeriesPoint[] = [
+      { date: '2024-01-02', value: 4.35 },
+      { date: '2024-03-20', value: 4.1 },
+    ];
+    const r = readingOf(
+      makeDef({ id: 'rba-cash-rate', cadence: 'per-change', changeKind: 'points', rule: { kind: 'info' } }),
+      cut,
+    );
+    expect(r.lastChange).toEqual({ date: '2024-03-20', points: -0.25 });
+    const only = readingOf(
+      makeDef({ id: 'rba-cash-rate', cadence: 'per-change', changeKind: 'points', rule: { kind: 'info' } }),
+      [cut[0]!],
+    );
+    expect(only.lastChange).toBeUndefined();
+  });
+
+  it('lastChange: survives staleness — a stale reading still states its last decision', () => {
+    const oldLadder: SeriesPoint[] = [
+      { date: '2024-01-02', value: 4.35 },
+      { date: '2024-01-03', value: 4.6 },
+    ];
+    // per-change cadence never goes stale; force staleness with a daily def.
+    const dailyDef = makeDef({ id: 'us10y', cadence: 'daily', changeKind: 'points', rule: { kind: 'info' }, staleAfterDays: 1 });
+    const stale = readingOf(dailyDef, oldLadder, '2024-07-10T00:00:00Z');
+    expect(stale.status).toBe('stale');
+    expect(stale.lastChange).toEqual({ date: '2024-01-03', points: 0.25 });
+  });
 });
 
 /* ------------------------------------------------------------------ *

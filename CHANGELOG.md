@@ -5,6 +5,105 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-13] — Insights Step-2 add list (the missing indicators)
+
+The owner's three-step plan continues: **Step 2 — add the few missing
+indicators that matter to a regular Australian saver-investor**, per the
+uploaded `currena-insights-step2-add-list (1).md`. Every new card follows the
+file's §A card spec (source + data date + stale tag + condition wording +
+stored history); nothing from the §F "do not add" list is built. Phase-1 audit
+first: every Step-1 fix re-verified live (nothing left behind — see
+docs/evidence/step1-audit/ and the worklog).
+
+### B. The seven required additions
+
+- **RBA cash rate card finished (§B1).** The card moved into
+  `au-households` NEXT TO the home-loan card (both render from the same
+  snapshot), states the LAST CHANGE as its exact step (the new engine
+  `lastChange` field: date + size, e.g. "+0.25 pts on 29 Sep 2026" — not a
+  30-day window that loses a six-week-old decision) and the NEXT RBA
+  decision date from the calendar ("Next RBA decision: Nov 3, 2026").
+  Context-only, as the file specifies.
+- **Australian 10-year government bond yield (§B2).** RBA statistical
+  table F2, series FCMYGBAG10D (venue-verified: published 09-Oct-2026,
+  daily; the same series the au-us-10y-gap card already subtracts). Scored
+  on its 10-year position; the US 10-year yield rides INSIDE the card as a
+  comparison companion ("shown for comparison") via the new COMPANIONS map.
+- **US unemployment (§B3).** FRED UNRATE (live-verified: Sep 2026 = 4.2).
+  Scored on its own 10-year level — the "rising fast" signal belongs to
+  the Sahm card beside it, so the pair never duplicates.
+- **Recession alarm — the Sahm rule (§B4).** FRED SAHMREALTIME
+  (live-verified: Sep 2026 = 0.00). Threshold above 0.50, the standard
+  signal, with the rule explained in one plain line on the card.
+- **Market fear gauge — VIX (§B5).** FRED VIXCLS (live-verified: Oct 9 =
+  14.84; Cboe data redistributed through FRED, © Cboe noted on the card +
+  About + the commercial-licence review list). Scored on its 10-year
+  position; the card ALWAYS shows the value + its 10-year position, and
+  the details panel states that the calm/nervous word thresholds arrive
+  with the Step-3 verdict rules (computed from the stored history).
+- **Iron ore — context only (§B6).** The World Bank Pink Sheet stays the
+  source (FRED's PIORECRUSDM mirror of the same series LAGS ~2 months —
+  verified: WB carries Sep 2026 = 97.7 while FRED ends Jul 2026; the card
+  names the WB source). The rule flipped from percentile to info: iron ore
+  never votes, removing it from the au-trade-currency gauge; the
+  iron-terms-aud relationship card reads the same reading (always has).
+- **"Savings and interest" finished with a real deposit rate (§B7).** RBA
+  F4.1 "Paid Deposit Rates", series PDRNTH — the weighted-average rate
+  banks actually pay on NEW household term deposits (venue-verified:
+  August 2026 = 4.8% per annum, table published 08-Oct-2026; the old F5
+  layout no longer exists). The savings money-row now leads with THIS
+  number + its data month + the piggy-bank artwork, the cash rate stays
+  as context, and the row's state/votes read from the same readings.
+
+### A. The card spec, applied to every new card
+
+- Source name + series ID + link (details panel); how often the source
+  updates; how old data may get before the "stale" tag (the details
+  panel's new facts block: "Updates monthly · shows 'Stale' after 70 days
+  · Fetched … · Scored/Context only"); units in percentage points for
+  rates; data-for + released + fetched dates; condition wording only.
+- **History storage raised to the spec's minimum**: the per-indicator
+  history cap moved from 520 (weekly-ish stride) to 2,700 points — a
+  10-year DAILY series now stores its full daily window (VIXCLS, DGS10,
+  F2, F1…), monthly series keep their full 10 years, and the au-deposit
+  series keeps its whole 2019–extent (the table's full history). Step 3's
+  verdict rules compute from exactly these stores.
+- KV write budget: ~5 new history keys/day on top of the ~750-write
+  headroom at the 04:20 UTC ingest slot — no scheduling change needed.
+- The FRED release-dates API needs an API key the project does not hold
+  (noted for §D): US calendar dates are hand-maintained in the data file
+  after verification.
+
+### D. Calendar — the six events that move Australian money
+
+- Two new event kinds join RBA/ABS-CPI/Fed/US-CPI: **abs-jobs** (ABS
+  Labour Force: Oct 15, Nov 19, Dec 17 2026 — verified from abs.gov.au)
+  and **us-jobs** (US Employment Situation: Nov 6, Dec 4 2026 — verified
+  via the Forex Factory aggregated calendar after bls.gov and archive.org
+  proved unreachable; the Oct 14 US CPI date cross-checks with the same
+  source and the owner's own audit file). US CPI extended (Nov 10, Dec
+  10). Release-schedule entries added so us-unemployment/sahm-rule/
+  au-deposit-rate/au-unemployment cards state their release dates.
+- All events stay plain dates + their own timezone (the Step-1 rule).
+
+### E/F. Placement + scope
+
+- au-10y joins au-inflation-rates; rba-cash-rate + au-deposit-rate join
+  au-households around the home-loan card; us-unemployment + sahm-rule
+  join growth-health; vix joins market-stress; iron ore stays in
+  au-trade-currency as context. The hero counts follow automatically from
+  the SAME E1 verdict rule (no new mapping). Voters: 32 (19 global +
+  13 AU). Nothing from the "do not add" list was built; the two §C
+  optional items (AIP petrol, AUD/CNY) were NOT approved and were not
+  built.
+
+### Tests + gates
+
+- 1,015 tests green (core 183 · scraper 67 · insights 334 · markets 7 ·
+  api 136 · web 288), typecheck 6/6 clean, bundle budgets held (Insights
+  chunk 465.61→491.81 kB raw / 114.56→120.66 gz — budget bumped to
+  493/121.5 with this justification; entry chunk untouched).
+
 ## [2026-10-13] — Insights Step-1 fix list (the 12 Oct audit) + the fx evidence artifacts
 
 The owner's external audit of https://currena.ir/#/insights (snapshot dated

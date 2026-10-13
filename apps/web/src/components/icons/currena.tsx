@@ -58,6 +58,10 @@ const INDICATOR_ICONS: Readonly<Record<string, string>> = {
   'au-home-values': 'home-loan-rent-interest',
   'au-household-debt-arrears': 'home-loan-rent-interest',
   'au-petrol-yoy': 'fuel-price',
+  // Step-2 add-list: the fear gauge wears the stock-exchange artwork; the
+  // deposit rate wears the savings jar (the savings subject).
+  vix: 'stock-exchange-index',
+  'au-deposit-rate': 'savings-jar',
 };
 
 /** The money-panel life areas (jobs has no artwork — the stroke briefcase

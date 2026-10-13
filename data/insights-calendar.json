@@ -7,6 +7,13 @@
     "kind": "us-cpi"
   },
   {
+    "id": "abs-jobs-2026-09",
+    "date": "2026-10-15",
+    "titleEn": "ABS jobs report (Labour Force): September 2026",
+    "titleFa": "گزارش نیروی کار استرالیا: سپتامبر ۲۰۲۶",
+    "kind": "abs-jobs"
+  },
+  {
     "id": "fomc-2026-10",
     "date": "2026-10-28",
     "titleEn": "US Fed interest rate decision (FOMC)",
@@ -28,11 +35,39 @@
     "kind": "rba"
   },
   {
+    "id": "us-jobs-2026-10",
+    "date": "2026-11-06",
+    "titleEn": "US jobs report (Employment Situation): October 2026",
+    "titleFa": "گزارش اشتغال آمریکا: اکتبر ۲۰۲۶",
+    "kind": "us-jobs"
+  },
+  {
+    "id": "us-cpi-2026-10",
+    "date": "2026-11-10",
+    "titleEn": "US consumer price index: October 2026",
+    "titleFa": "شاخص قیمت مصرف‌کننده آمریکا: اکتبر ۲۰۲۶",
+    "kind": "us-cpi"
+  },
+  {
+    "id": "abs-jobs-2026-10",
+    "date": "2026-11-19",
+    "titleEn": "ABS jobs report (Labour Force): October 2026",
+    "titleFa": "گزارش نیروی کار استرالیا: اکتبر ۲۰۲۶",
+    "kind": "abs-jobs"
+  },
+  {
     "id": "abs-cpi-2026-10",
     "date": "2026-11-25",
     "titleEn": "ABS monthly CPI: October 2026",
     "titleFa": "شاخص قیمت مصرف‌کننده ماهانه استرالیا: اکتبر ۲۰۲۶",
     "kind": "abs-cpi"
+  },
+  {
+    "id": "us-jobs-2026-11",
+    "date": "2026-12-04",
+    "titleEn": "US jobs report (Employment Situation): November 2026",
+    "titleFa": "گزارش اشتغال آمریکا: نوامبر ۲۰۲۶",
+    "kind": "us-jobs"
   },
   {
     "id": "rba-2026-12",
@@ -47,6 +82,20 @@
     "titleEn": "US Fed interest rate decision (FOMC)",
     "titleFa": "تصمیم نرخ بهره فدرال رزرو آمریکا",
     "kind": "fed"
+  },
+  {
+    "id": "us-cpi-2026-11",
+    "date": "2026-12-10",
+    "titleEn": "US consumer price index: November 2026",
+    "titleFa": "شاخص قیمت مصرف‌کننده آمریکا: نوامبر ۲۰۲۶",
+    "kind": "us-cpi"
+  },
+  {
+    "id": "abs-jobs-2026-11",
+    "date": "2026-12-17",
+    "titleEn": "ABS jobs report (Labour Force): November 2026",
+    "titleFa": "گزارش نیروی کار استرالیا: نوامبر ۲۰۲۶",
+    "kind": "abs-jobs"
   },
   {
     "id": "fomc-2027-01",

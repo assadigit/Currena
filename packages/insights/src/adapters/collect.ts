@@ -129,6 +129,11 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
   const rbaHomeLoan = await fetchLogged('rba', 'F6 FLRHOOTA owner-occupier outstanding home-loan rate', () =>
     fetchRbaSeries('homeLoanOutstanding'),
   );
+  // Step-2 add-list §B7: F4.1 PDRNTH — the paid rate on new household term
+  // deposits (the "Savings and interest" card's real number).
+  const rbaDepositRate = await fetchLogged('rba', 'F4.1 PDRNTH new household term-deposit rate', () =>
+    fetchRbaSeries('depositRateNewTermHouseholds'),
+  );
 
   // Cross-checks (03-data-sources.md): independent sources must agree.
   if (bitstamp && btcSpot) {
@@ -169,6 +174,7 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
         au10y: rbaAu10y,
         householdDebtRatio: rbaHouseholdDebt,
         homeLoanOutstanding: rbaHomeLoan,
+        depositRateNewTermHouseholds: rbaDepositRate,
       },
     },
     reports,

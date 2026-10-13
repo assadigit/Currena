@@ -15,6 +15,7 @@ import { fetchIndicatorHistory } from '../../lib/insights';
 import { Sparkline } from '../Sparkline';
 import { StatusChip } from './StatusChip';
 import {
+  ALWAYS_POSITION_IDS,
   bandWordsOf,
   changeScaleOf,
   changeWindowLabel,
@@ -25,8 +26,11 @@ import {
   formatChange,
   formatFromPeak,
   formatReadingValue,
+  policyLastChangeOf,
   tierOf,
 } from './config';
+import { PositionBar } from './PositionBar';
+import { formatAsOf } from './HistoryChart';
 
 /** F2's tiny sparkline — same lazy pattern as the alert card's. */
 function TinySparkline({ id }: { id: IndicatorId }) {
@@ -73,6 +77,9 @@ export function CompactRow({
   onOpenDetails,
   pinned,
   showMixedTag,
+  companionReadings = [],
+  companionNote,
+  nextRbaDecision,
 }: {
   reading: IndicatorReading;
   copy: InsightsCopy;
@@ -81,6 +88,12 @@ export function CompactRow({
   pinned: boolean;
   /** The gold-silver ratio carries the gauge's "mixed evidence" tag. */
   showMixedTag?: boolean;
+  /** Step-2 §B2: companion context rendered inside this row (the US 10-year
+   * beside the AU 10-year when it renders as a row). */
+  companionReadings?: readonly IndicatorReading[];
+  companionNote?: string;
+  /** Step-2 §B1: the next RBA decision date (cash-rate row). */
+  nextRbaDecision?: string;
 }) {
   const def = definitionFor(reading.id);
   const entry = copy.indicators[reading.id];
@@ -102,6 +115,21 @@ export function CompactRow({
   // needs-attention row never says "usual range" beside its rule line.
   const cs = consequenceState(reading, false);
   const showConsequence = !(tier === 'needs-attention' && cs === 'typical');
+  // Step-2 §B1: the exact last decision (date + size) on the policy rows,
+  // and the next RBA decision date on the cash-rate row.
+  const locale = numberLocale === 'fa-IR' ? 'fa' : 'en';
+  const lastChange = policyLastChangeOf(reading);
+  const lastChangeText =
+    lastChange !== null
+      ? interpolate(copy.ui.lastChangeLine, {
+          change: formatChange(lastChange.points, def.changeKind, numberLocale, copy.units, changeScaleOf(reading.id)),
+          date: formatAsOf(lastChange.date, locale),
+        })
+      : null;
+  const nextDecisionText =
+    reading.id === 'rba-cash-rate' && nextRbaDecision !== undefined
+      ? interpolate(copy.ui.nextDecisionLine, { date: formatAsOf(nextRbaDecision, locale) })
+      : null;
 
   return (
     <article
@@ -173,6 +201,35 @@ export function CompactRow({
             <span className="block text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
               <bdi>{meaningLine}</bdi>
             </span>
+          ) : null}
+          {/* Step-2 §B1: the policy rows' exact last decision + the RBA's
+           * next decision date — one line, date and size, no 30-day window. */}
+          {lastChangeText !== null || nextDecisionText !== null ? (
+            <span className="block text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-secondary)]">
+              {lastChangeText !== null ? <bdi>{lastChangeText}</bdi> : null}
+              {lastChangeText !== null && nextDecisionText !== null ? <span aria-hidden="true"> · </span> : null}
+              {nextDecisionText !== null ? <bdi>{nextDecisionText}</bdi> : null}
+            </span>
+          ) : null}
+          {/* Step-2 §B2: the companion line rides rows too (US 10-year
+           * beside the AU 10-year). */}
+          {companionReadings.length > 0 ? (
+            <span className="block text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+              {companionReadings.map((companion) =>
+                companion.value !== null ? (
+                  <span key={companion.id} className="me-2 inline-flex items-baseline gap-1">
+                    <span className="font-semibold text-[var(--color-text-primary)]">{copy.indicators[companion.id]?.name ?? companion.id}</span>
+                    <bdi dir="ltr">{formatReadingValue(companion, numberLocale, copy.units)}</bdi>
+                  </span>
+                ) : null,
+              )}
+              {companionNote !== undefined ? <span>{companionNote}</span> : null}
+            </span>
+          ) : null}
+          {/* Step-2 §B5: the VIX row always carries its 10-year position
+           * (the card spec's interim presentation). */}
+          {ALWAYS_POSITION_IDS.has(reading.id) && reading.percentile10y !== undefined ? (
+            <PositionBar percentile={reading.percentile10y} zone={null} copy={copy} numberLocale={numberLocale} />
           ) : null}
           {!isUnavailable && showConsequence ? (
             <span className="block text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">

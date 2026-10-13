@@ -4,19 +4,55 @@
     "affects": ["us-cpi-yoy", "us-cpi-core-yoy"]
   },
   {
+    "date": "2026-09-30",
+    "affects": ["au-cpi", "au-trimmed-mean", "au-rent-yoy", "au-petrol-yoy"]
+  },
+  {
+    "date": "2026-10-02",
+    "affects": ["us-unemployment", "sahm-rule"]
+  },
+  {
+    "date": "2026-10-08",
+    "affects": ["au-deposit-rate"]
+  },
+  {
     "date": "2026-10-14",
     "affects": ["us-cpi-yoy", "us-cpi-core-yoy"]
   },
   {
-    "date": "2026-09-30",
-    "affects": ["au-cpi", "au-trimmed-mean", "au-rent-yoy", "au-petrol-yoy"]
+    "date": "2026-10-15",
+    "affects": ["au-unemployment"]
   },
   {
     "date": "2026-10-28",
     "affects": ["au-cpi", "au-trimmed-mean", "au-rent-yoy", "au-petrol-yoy"]
   },
   {
+    "date": "2026-11-06",
+    "affects": ["us-unemployment", "sahm-rule"]
+  },
+  {
+    "date": "2026-11-10",
+    "affects": ["us-cpi-yoy", "us-cpi-core-yoy"]
+  },
+  {
+    "date": "2026-11-19",
+    "affects": ["au-unemployment"]
+  },
+  {
     "date": "2026-11-25",
     "affects": ["au-cpi", "au-trimmed-mean", "au-rent-yoy", "au-petrol-yoy"]
+  },
+  {
+    "date": "2026-12-04",
+    "affects": ["us-unemployment", "sahm-rule"]
+  },
+  {
+    "date": "2026-12-10",
+    "affects": ["us-cpi-yoy", "us-cpi-core-yoy"]
+  },
+  {
+    "date": "2026-12-17",
+    "affects": ["au-unemployment"]
   }
 ]

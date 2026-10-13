@@ -178,11 +178,17 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
  * ------------------------------------------------------------------ */
 
 /**
- * Cap on stored points per indicator. ~10 years of DAILY data is ~2,600
- * points; 520 keeps every payload ≤ ~10 KB (weekly-ish resolution for
- * dailies; monthly and quarterly series never reach the cap).
+ * Cap on stored points per indicator. Step-2 add-list §A: every new series
+ * keeps "at least 10 years of monthly data and at least 2 years of daily
+ * data (10 years if the source allows)". 10 years of DAILY data is ~2,600
+ * business-day points, so the old 520 cap (weekly-ish resolution) is raised
+ * to 2,700 — dailies now store their FULL 10-year daily window (VIXCLS,
+ * DGS10, F2, F1 …), monthly/quarterly series never approach the cap, and
+ * each key stays ≈40 KB (KV's per-value limit is 25 MB; the whole Insights
+ * history set is well under 2 MB of the 1 GB free tier). The stride only
+ * guards a pathological future series denser than ~2,700 points per decade.
  */
-export const HISTORY_MAX_POINTS = 520;
+export const HISTORY_MAX_POINTS = 2700;
 
 /** Same 10-year window the scoring engine's percentiles use. */
 export const HISTORY_WINDOW_DAYS = PERCENTILE_WINDOW_DAYS;

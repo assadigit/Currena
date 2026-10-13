@@ -14,6 +14,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
+import { formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { ApiError, fetchIndicatorHistory } from '../../lib/insights';
@@ -21,6 +22,7 @@ import { Star, X } from 'lucide-react';
 import { IconImg, indicatorIconUrl } from '../icons/currena';
 import { HistoryChart, formatAsOf } from './HistoryChart';
 import { definitionFor, formatRuleText } from './config';
+import { staleAfterDaysFor } from '@currena/insights';
 
 function Section({ title, body }: { title: string; body: string }) {
   return (
@@ -32,6 +34,49 @@ function Section({ title, body }: { title: string; body: string }) {
         {body}
       </p>
     </div>
+  );
+}
+
+/**
+ * Step-2 add-list §A (the card spec): every card's facts, shown on the
+ * panel — how often the source updates, how old the data may get before the
+ * card wears its "stale" tag, when this reading was fetched, and whether
+ * the indicator is scored (votes toward its area verdict) or context only.
+ */
+function CardFacts({
+  reading,
+  copy,
+  numberLocale,
+}: {
+  reading: IndicatorReading;
+  copy: InsightsCopy;
+  numberLocale: 'en-US' | 'fa-IR';
+}) {
+  const def = definitionFor(reading.id);
+  const cadence = copy.ui.cadence[def.cadence];
+  const staleAfter = staleAfterDaysFor(def);
+  const staleText =
+    staleAfter === null
+      ? copy.ui.staleNever
+      : interpolate(copy.ui.staleAfterLine, {
+          n: formatNumber(staleAfter, numberLocale, { maximumFractionDigits: 0 }),
+        });
+  return (
+    <p className="m-0 mb-4 flex flex-wrap gap-x-2 gap-y-1 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+      <span>
+        <span className="font-semibold">{copy.ui.updatesLabel}:</span> {cadence}
+      </span>
+      <span aria-hidden="true" className="opacity-50">·</span>
+      <span>{staleText}</span>
+      <span aria-hidden="true" className="opacity-50">·</span>
+      <span>
+        {copy.ui.fetchedLabel}: {formatAsOf(reading.updatedAt.slice(0, 10), numberLocale === 'fa-IR' ? 'fa' : 'en')}
+      </span>
+      <span aria-hidden="true" className="opacity-50">·</span>
+      <span className={def.rule.kind === 'info' ? '' : 'font-semibold'}>
+        {def.rule.kind === 'info' ? copy.ui.contextOnlyFact : copy.ui.scoredFact}
+      </span>
+    </p>
   );
 }
 
@@ -204,6 +249,19 @@ export function DetailsPanel({
             <span className="font-bold">{copy.ui.ruleTitle}: </span>
             <span>{formatRuleText(indicatorDef.rule, reading.id, copy.rule, copy.units, numberLocale)}</span>
           </p>
+
+          {/* Step-2 §A: the card-spec facts (updates · stale age · fetched ·
+           * scored/context). */}
+          <CardFacts reading={reading} copy={copy} numberLocale={numberLocale} />
+
+          {/* Step-2 §B5: the VIX card's interim-presentation note (the
+           * calm/nervous words are a Step-3 deliverable computed from the
+           * stored history — stated, never faked). */}
+          {reading.id === 'vix' ? (
+            <p className="m-0 mb-4 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+              {copy.ui.vixNote}
+            </p>
+          ) : null}
 
           {reading.status === 'stale' && reading.asOf ? (
             <p className="m-0 mb-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-alert)]">

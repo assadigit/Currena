@@ -41,13 +41,19 @@ export const GAUGES: readonly GaugeDef[] = [
     members: ['yield-curve-10y2y', 'real-yield-10y', 'us10y', 'fed-target', 'ecb-dfr', 'govt-interest-revenue'],
   },
   { id: 'prices-heat', section: 'global', members: ['us-cpi-yoy', 'breakeven-5y5y'] },
-  { id: 'market-stress', section: 'global', members: ['stress-stlfsi', 'nfci', 'gold-silver'] },
+  // Step-2 add-list §B5: VIX joins the market-stress voters (scored on its
+  // 10-year position; the calm/nervous word thresholds arrive with Step 3).
+  { id: 'market-stress', section: 'global', members: ['stress-stlfsi', 'nfci', 'vix', 'gold-silver'] },
   { id: 'dollar-strength', section: 'global', members: ['dollar-basket', 'usdjpy'] },
-  { id: 'growth-health', section: 'global', members: ['china-pmi', 'm2-us', 'copper-gold'] },
+  // Step-2 add-list §B3/§B4: US unemployment and the Sahm rule join the
+  // growth-health voters, next to the US macro series already there.
+  { id: 'growth-health', section: 'global', members: ['china-pmi', 'm2-us', 'us-unemployment', 'sahm-rule', 'copper-gold'] },
   {
     id: 'au-inflation-rates',
     section: 'australia',
-    members: ['au-cpi', 'au-trimmed-mean', 'au-us-10y-gap'],
+    // Step-2 add-list §B2: the AU 10-year yield is a scored rate (its
+    // 10-year position), joining the CPI and gap voters.
+    members: ['au-cpi', 'au-trimmed-mean', 'au-10y', 'au-us-10y-gap'],
   },
   {
     id: 'au-households',
@@ -64,7 +70,10 @@ export const GAUGES: readonly GaugeDef[] = [
   {
     id: 'au-trade-currency',
     section: 'australia',
-    members: ['audusd', 'audjpy', 'terms-of-trade', 'iron-ore'],
+    // Step-2 add-list §B6: iron ore left the voters — it is context only
+    // now (the card says so; the au-trade gauge counts only the FX and
+    // terms-of-trade members).
+    members: ['audusd', 'audjpy', 'terms-of-trade'],
   },
 ];
 

@@ -396,6 +396,29 @@ export function cadenceUsesPreviousRelease(cadence: IndicatorDefinition['cadence
 }
 
 /**
+ * Step-2 add-list §B1: the series' LAST STEP CHANGE — the most recent
+ * observation whose value differs from the one before it. Policy rates
+ * move in steps (the RBA's 29-Sep-2026 hike reads +0.25 pts from its
+ * effective date), so "the last change (date and size)" is this walk-back,
+ * NOT a 30-day window (a decision 40 days old would vanish from a
+ * change30d line). Computed generically for every series; rendered on the
+ * policy-rate cards. Undefined when the current observation is the series'
+ * first (no earlier point to differ from).
+ */
+export function lastStepChange(
+  series: readonly SeriesPoint[],
+  current: SeriesPoint,
+): { date: string; points: number } | undefined {
+  const idx = series.findIndex((p) => p.date === current.date);
+  for (let i = idx; i > 0; i--) {
+    const cur = series[i]!;
+    const prev = series[i - 1]!;
+    if (cur.value !== prev.value) return { date: cur.date, points: cur.value - prev.value };
+  }
+  return undefined;
+}
+
+/**
  * Compute one indicator's reading as of `now` (ISO datetime from the runner —
  * frozen-clock friendly). Order of checks: no data → `unavailable`; too old
  * (per-series freshness limit when present, else cadence grace) → `stale` (a
@@ -440,6 +463,12 @@ export function computeReading(
       : windowChange(series, current, 30, parsed.changeKind),
     status: 'normal',
   };
+
+  // Step-2 add-list §B1: the last step change (date + size), attached for
+  // every series — the policy-rate cards render it as "Last change:
+  // +0.25 pts on 29 Sep" (the exact decision, not a rolling 30-day window).
+  const step = lastStepChange(series, current);
+  if (step !== undefined) reading.lastChange = step;
 
   // Step-1 audit item C10: trending totals (M2, home values) measure their
   // 10-year position on the year-on-year GROWTH series, not the level —

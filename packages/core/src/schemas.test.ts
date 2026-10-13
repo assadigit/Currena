@@ -325,14 +325,16 @@ import {
 } from './schemas';
 
 describe('Insights: IndicatorIdSchema (contract shape is deliberate)', () => {
-  it('pins the exact v2 indicator set — 42 ids (I15 restructure +11, Step-1 +us-cpi-core-yoy), blocked/licensed items absent', () => {
+  it('pins the exact v2 indicator set — 47 ids (I15 restructure +11, Step-1 +us-cpi-core-yoy, Step-2 +au-10y/us-unemployment/sahm-rule/vix/au-deposit-rate), blocked/licensed items absent', () => {
     const ids = IndicatorIdSchema.options;
-    expect(ids).toHaveLength(42);
-    for (const blocked of ['vix', 'spx-gold', 'breadth', 'cape']) {
+    expect(ids).toHaveLength(47);
+    // Step-2 add-list §B5: VIX is IN (FRED VIXCLS, licence noted); the rest
+    // of the v1 blocked list stays blocked.
+    for (const blocked of ['spx-gold', 'breadth', 'cape']) {
       expect(ids).not.toContain(blocked);
     }
     expect(ids).not.toContain('dollar-broad'); // replaced by the Currena dollar basket (I15)
-    for (const expected of ['yield-curve-10y2y', 'stress-stlfsi', 'nfci', 'fed-target', 'ecb-dfr', 'us-cpi-yoy', 'us-cpi-core-yoy', 'dollar-basket', 'au-home-loan', 'au-wage-growth', 'au-rent-yoy', 'au-petrol-yoy', 'btc-usd', 'copper-usd', 'eur-usd', 'gold-usd', 'silver-usd', 'gold-silver', 'china-pmi', 'rba-cash-rate', 'au-us-10y-gap', 'terms-of-trade', 'au-household-debt-arrears']) {
+    for (const expected of ['yield-curve-10y2y', 'stress-stlfsi', 'nfci', 'fed-target', 'ecb-dfr', 'us-cpi-yoy', 'us-cpi-core-yoy', 'dollar-basket', 'au-home-loan', 'au-wage-growth', 'au-rent-yoy', 'au-petrol-yoy', 'btc-usd', 'copper-usd', 'eur-usd', 'gold-usd', 'silver-usd', 'gold-silver', 'china-pmi', 'rba-cash-rate', 'au-us-10y-gap', 'terms-of-trade', 'au-household-debt-arrears', 'au-10y', 'us-unemployment', 'sahm-rule', 'vix', 'au-deposit-rate']) {
       expect(ids).toContain(expected);
     }
   });
@@ -540,7 +542,7 @@ describe('Insights: IndicatorHistorySchema (Phase I3 wire format)', () => {
       { v: 1, id: 'us10y', points: [[19730, 1], [19730, 2]] }, // duplicate day
       { v: 1, id: 'us10y', points: [[19730, 1], [19723, 2]] }, // descending
       { v: 1, id: 'us10y', points: [[-1, 1]] }, // pre-1970 date
-      { v: 1, id: 'vix', points: [[19723, 1]] }, // not a v1 indicator
+      { v: 1, id: 'cape', points: [[19723, 1]] }, // not an indicator id (vix joined the set in Step 2)
       { v: 2, id: 'us10y', points: [[19723, 1]] }, // future wire version
     ];
     for (const input of bad) {

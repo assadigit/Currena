@@ -330,6 +330,7 @@ export const IndicatorIdSchema = z.enum([
   // Global — Are markets nervous?
   'stress-stlfsi',
   'nfci',
+  'vix',
   'gold-silver',
   // Global — Is the dollar strong?
   'dollar-basket',
@@ -338,6 +339,8 @@ export const IndicatorIdSchema = z.enum([
   // Global — Is growth healthy?
   'china-pmi',
   'm2-us',
+  'us-unemployment',
+  'sahm-rule',
   'copper-gold',
   'usdcny',
   // Global — Prices board (price rows + context ratios; never a gauge member)
@@ -351,11 +354,13 @@ export const IndicatorIdSchema = z.enum([
   // Australia — Are inflation and rates a problem?
   'au-cpi',
   'au-trimmed-mean',
+  'au-10y',
   'au-us-10y-gap',
-  'rba-cash-rate',
   'au-petrol-yoy',
   // Australia — Are households under pressure?
+  'rba-cash-rate',
   'au-home-loan',
+  'au-deposit-rate',
   'au-wage-growth',
   'au-rent-yoy',
   'au-unemployment',
@@ -578,6 +583,21 @@ export const IndicatorReadingSchema = z
      */
     rangeLow: z.number().finite().optional(),
     rangeHigh: z.number().finite().optional(),
+    /**
+     * Step-2 add-list §B1: the series' LAST STEP CHANGE — the most recent
+     * observation whose value differs from the one before it (policy rates
+     * move in steps; the card shows "last change: +0.25 pts on 29 Sep").
+     * Absent when the series has no earlier observation. Computed generically
+     * by the engine for every series; rendered on the policy-rate cards.
+     */
+    lastChange: z
+      .object({
+        /** Observation date of the FIRST value in the new regime (the move's effective date). */
+        date: z.iso.date(),
+        /** The step's size in the series' own units (percentage points for rates). */
+        points: z.number().finite(),
+      })
+      .optional(),
     status: IndicatorReadingStatusSchema,
     sourceName: z.string().min(1),
     sourceUrl: z.url().optional(),
@@ -624,7 +644,10 @@ export const CalendarEventSchema = z.object({
   date: z.iso.date(),
   titleEn: z.string().min(1),
   titleFa: z.string().min(1),
-  kind: z.enum(['rba', 'abs-cpi', 'fed', 'us-cpi', 'other']),
+  // Step-2 add-list §D: the six event kinds that move Australian money —
+  // RBA and Fed decisions, ABS CPI + the ABS jobs report, US CPI + the US
+  // jobs report (Employment Situation).
+  kind: z.enum(['rba', 'abs-cpi', 'abs-jobs', 'fed', 'us-cpi', 'us-jobs', 'other']),
 });
 export type CalendarEvent = z.infer<typeof CalendarEventSchema>;
 

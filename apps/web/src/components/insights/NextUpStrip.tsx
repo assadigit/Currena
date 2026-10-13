@@ -19,16 +19,21 @@ import { buildInsightsIcs } from './ics';
 const KIND_CLASS: Record<CalendarEvent['kind'], string> = {
   rba: 'bg-currena-coral/20 text-[var(--color-text-secondary)]',
   'abs-cpi': 'bg-currena-success/15 text-[var(--color-text-secondary)]',
+  // Step-2 add-list §D: the two jobs-report kinds wear their region's tint.
+  'abs-jobs': 'bg-currena-success/15 text-[var(--color-text-secondary)]',
   fed: 'bg-currena-blue/15 text-[var(--color-status-context)]',
   'us-cpi': 'bg-currena-blue/15 text-[var(--color-status-context)]',
+  'us-jobs': 'bg-currena-blue/15 text-[var(--color-status-context)]',
   other: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
 };
 
 const KIND_BADGE: Record<CalendarEvent['kind'], string> = {
   rba: 'RBA',
   'abs-cpi': 'CPI',
+  'abs-jobs': 'JOBS',
   fed: 'FED',
   'us-cpi': 'CPI',
+  'us-jobs': 'JOBS',
   other: '',
 };
 

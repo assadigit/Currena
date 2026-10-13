@@ -19,6 +19,7 @@ import { fetchIndicatorHistory } from '../../lib/insights';
 import { IconImg, indicatorIconUrl } from '../icons/currena';
 import { Sparkline } from '../Sparkline';
 import {
+  ALWAYS_POSITION_IDS,
   bandWordsOf,
   changeScaleOf,
   changeWindowLabel,
@@ -30,7 +31,7 @@ import {
   formatFromPeak,
   formatReadingValue,
   friendlySource,
-  policyMoveOf,
+  policyLastChangeOf,
   tierOf,
   type IndicatorTier,
 } from './config';
@@ -84,6 +85,8 @@ export function AlertCard({
   onOpenDetails,
   pinned,
   companionReadings = [],
+  companionNote,
+  nextRbaDecision,
 }: {
   reading: IndicatorReading;
   copy: InsightsCopy;
@@ -94,6 +97,12 @@ export function AlertCard({
   /** Step-1 A3: companion context readings rendered inside this card
    * (core CPI on the US inflation card) — never their own row. */
   companionReadings?: readonly Reading[];
+  /** Step-2 §B2: the companion block's note line, per parent card
+   * ("the gap is mainly energy" / "shown for comparison"). */
+  companionNote?: string;
+  /** Step-2 §B1: the next RBA decision date (calendar, kind 'rba') —
+   * rendered on the cash-rate card. */
+  nextRbaDecision?: string;
 }) {
   const def = definitionFor(reading.id);
   const entry = copy.indicators[reading.id];
@@ -123,6 +132,20 @@ export function AlertCard({
   // consequence line is DROPPED — the rule line above it carries the news.
   const cs = consequenceState(reading, false);
   const showConsequence = !(isNeedsAttention && cs === 'typical');
+  // Step-2 §B1: the exact last decision (date + size) on the policy cards,
+  // and the next RBA decision date on the cash-rate card.
+  const lastChange = policyLastChangeOf(reading);
+  const lastChangeText =
+    lastChange !== null
+      ? interpolate(copy.ui.lastChangeLine, {
+          change: formatChange(lastChange.points, def.changeKind, numberLocale, copy.units, changeScaleOf(reading.id)),
+          date: formatAsOf(lastChange.date, locale),
+        })
+      : null;
+  const nextDecisionText =
+    reading.id === 'rba-cash-rate' && nextRbaDecision !== undefined
+      ? interpolate(copy.ui.nextDecisionLine, { date: formatAsOf(nextRbaDecision, locale) })
+      : null;
 
   return (
     <article
@@ -194,7 +217,8 @@ export function AlertCard({
             </span>
 
             {/* Step-1 A3: companion context values ride inside this card —
-             * core CPI next to headline ("the gap is mainly energy"). */}
+             * core CPI next to headline ("the gap is mainly energy"), the US
+             * 10-year beside the AU 10-year (Step-2 §B2, "for comparison"). */}
             {companionReadings.length > 0 ? (
               <span className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
                 {companionReadings.map((companion) =>
@@ -205,16 +229,21 @@ export function AlertCard({
                     </span>
                   ) : null,
                 )}
-                <span>{copy.ui.coreGapNote}</span>
+                {companionNote !== undefined ? <span>{companionNote}</span> : null}
               </span>
             ) : null}
 
-            {/* Step-1 audit item D3: the policy-rate cards state the SIZE
-             * OF THE MOVE as its own labelled line, beside the level — the
-             * level line below can never again read as the move's twin. */}
-            {policyMoveOf(reading) !== null ? (
+            {/* Step-2 §B1: the exact last decision (date + size) and — on the
+             * RBA cash-rate card — the next decision date, each its own line
+             * beside the level (the Step-1 D3 two-line discipline). */}
+            {lastChangeText !== null ? (
               <span className="mt-1.5 block text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)]">
-                <bdi>{interpolate(copy.ui.recentMoveLine, { change: formatChange(policyMoveOf(reading)!, def.changeKind, numberLocale, copy.units, changeScaleOf(reading.id)) })}</bdi>
+                <bdi>{lastChangeText}</bdi>
+                {nextDecisionText !== null ? <bdi> · {nextDecisionText}</bdi> : null}
+              </span>
+            ) : nextDecisionText !== null ? (
+              <span className="mt-1.5 block text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)]">
+                <bdi>{nextDecisionText}</bdi>
               </span>
             ) : null}
 
@@ -238,8 +267,10 @@ export function AlertCard({
             {/* R6 → R30: the 10-year position shows on UNUSUAL cards (word
              * + bar); needs-attention cards keep it in Details. NO rule
              * zone here — no rule fired on this tier, so the zone tick
-             * opposite the marker was a lie the roast caught. */}
-            {tier === 'unusual' && reading.percentile10y !== undefined ? (
+             * opposite the marker was a lie the roast caught. Step-2 §B5:
+             * the VIX card ALWAYS shows its 10-year position (the card
+             * spec's interim presentation before the Step-3 words). */}
+            {(tier === 'unusual' || ALWAYS_POSITION_IDS.has(reading.id)) && reading.percentile10y !== undefined ? (
               <PositionBar percentile={reading.percentile10y} zone={null} copy={copy} numberLocale={numberLocale} />
             ) : null}
 

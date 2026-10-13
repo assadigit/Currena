@@ -543,7 +543,9 @@ describe('copy dictionaries', () => {
       expect(insightsCopyFa.indicators[id]).toBeDefined();
       expect(insightsCopyFa.indicators[id]?.name.length).toBeGreaterThan(0);
     }
-    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(42);
+    // Step-2: the corpus grew to 47 (au-10y, us-unemployment, sahm-rule, vix,
+      // au-deposit-rate) and fa must carry every one of them.
+      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(47);
   });
 });
 

@@ -299,6 +299,28 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou:
       'A second opinion on the stress gauges: tight US conditions tend to spread to world lending, including the offshore funding Australian banks use.',
   },
+  vix: {
+    name: 'Market fear gauge',
+    ticker: 'VIX',
+    oneLiner:
+      'How nervous US stock-market investors are: low means calm, high means fear.',
+    lines: {
+      highRising: 'US share-market fear is high and rising for its decade: the setting that usually comes with sharp swings in world markets.',
+      highEasing: 'Market fear is elevated for its decade but easing.',
+      typical: 'Market fear sits in its usual range for the decade.',
+      low: 'Market fear is low: the calm setting for share markets.',
+    },
+    whatItIs:
+      'The Cboe Volatility Index (VIX): the market’s own measure of how big the next month’s S&P 500 swings are expected to be. Daily close from FRED (VIXCLS), © Cboe.',
+    whyItMatters:
+      'It is the market’s own fear thermometer: readings in the teens mean calm, the 20s mean nerves, and the rare spikes above 30 have marked panics.',
+    tendedToMean:
+      'The decade’s spikes (2015 China wobble, 2018 “Volmageddon”, 2020 COVID) each lined up with sharp share-market falls; calm stretches sit in the low teens.',
+    cantTell:
+      'It measures expected swings, not direction: a calm VIX says nothing about whether shares rise or fall, and it can jump overnight.',
+    forYou:
+      'The one-glance answer to “how jumpy are world share markets today?” — background for super and share investments.',
+  },
   'gold-silver': {
     name: 'Gold’s price versus silver',
     oneLiner:
@@ -427,6 +449,48 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     cantTell:
       'How fast money changes hands matters as much as how much of it exists; supply alone doesn’t set prices.',
     forYou: 'Background that makes inflation debates easier to follow.',
+  },
+  'us-unemployment': {
+    name: 'US unemployment',
+    ticker: 'BLS: UNRATE',
+    oneLiner:
+      'The share of the US workforce without a job: a steady rise is usually the first sign of a slowing US economy.',
+    lines: {
+      highRising: 'US unemployment is high for its decade and rising: the classic early signal of a slowing US economy.',
+      highEasing: 'US unemployment is high for its decade but easing.',
+      typical: 'US unemployment sits in its usual range for the decade.',
+      low: 'US unemployment is low: the setting that usually comes with a strong jobs market.',
+    },
+    whatItIs:
+      'The US unemployment rate from the Bureau of Labor Statistics’ monthly Employment Situation report (FRED series UNRATE), published on the first Friday of the month.',
+    whyItMatters:
+      'The US is the world’s largest economy: its jobs numbers move global markets and the “risk-on, risk-off” mood that reaches Australian shares and the dollar.',
+    tendedToMean:
+      'Rises of half a point or more from the cycle low have lined up with the start of US recessions — the pattern the Sahm rule next to this card formalises.',
+    cantTell:
+      'Monthly and an average across the whole workforce; individual industries and states can move very differently.',
+    forYou: 'The first number to check when asking whether the US economy is slowing.',
+  },
+  'sahm-rule': {
+    name: 'US recession alarm (Sahm rule)',
+    ticker: 'Sahm rule',
+    oneLiner:
+      'Flags when US unemployment is rising fast enough that a recession has usually already started — the signal is 0.50 or more.',
+    lines: {
+      highRising: 'The Sahm rule has fired: US unemployment has risen 0.50+ points from its recent low, the pattern that has coincided with the start of past US recessions.',
+      highEasing: 'The Sahm reading is elevated but easing.',
+      typical: 'The Sahm rule is silent: no recession signal.',
+      low: 'The Sahm reading is well below the signal.',
+    },
+    whatItIs:
+      'The Sahm rule compares the 3-month average US unemployment rate with its lowest point over the past year. A reading of 0.50 or more is the standard recession signal — it has flagged every US recession since 1970, usually as they began.',
+    whyItMatters:
+      'It turns one familiar number (unemployment) into a simple, rules-based recession alarm — no forecasts, just arithmetic on published data.',
+    tendedToMean:
+      'Half-point rises from a cycle low are how US recessions have started in the jobs data since 1970.',
+    cantTell:
+      'It lags by construction (it needs a low to rise from) and says nothing about depth or length — only that a downturn has usually begun.',
+    forYou: 'A single glance at “is the US in recession territory?” before reading anything else.',
   },
   'copper-gold': {
     name: 'Copper’s price versus gold',
@@ -646,6 +710,27 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     cantTell: 'Smoother means slower: it lags turning points by design.',
     forYou: 'The number that most directly moves the RBA’s hand.',
   },
+  'au-10y': {
+    name: 'What Australia pays to borrow for 10 years',
+    ticker: 'RBA F2: 10y',
+    oneLiner:
+      'What the Australian government pays to borrow for 10 years — it influences fixed home-loan rates and term deposits.',
+    lines: {
+      highRising: 'Australian 10-year borrowing costs are high for their decade and rising: fixed home-loan rates and term deposits tend to sit higher in this setting.',
+      highEasing: 'Australian 10-year borrowing costs are high for their decade but easing.',
+      typical: 'The Australian 10-year yield sits in its usual range for the decade.',
+      low: 'Australian 10-year borrowing costs are low: the setting that usually means cheaper fixed home-loan rates.',
+    },
+    whatItIs:
+      'The yield on Australian Government 10-year bonds, daily from the RBA’s F2 statistical table (published with a 2–4 business-day lag). The US 10-year rides beside it for comparison.',
+    whyItMatters:
+      'Long-term rates set the price of multi-year money: fixed-rate home loans, term deposits and business borrowing price off this curve, not just the RBA’s cash rate.',
+    tendedToMean:
+      'The 2022–24 global rate reset pushed it from near 1% to multi-year highs; the decade before sat far lower after 2020’s emergency setting.',
+    cantTell:
+      'It moves with world bond markets — US yields, global growth news — so it can shift with no Australian news at all.',
+    forYou: 'Background for fixed home-loan and term-deposit pricing.',
+  },
   'au-us-10y-gap': {
     name: 'The gap between Australian and US 10-year borrowing',
     oneLiner:
@@ -727,6 +812,28 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'Monthly, published about a month late, and an average: your own rate depends on your loan, lender and fixed or variable mix.',
     forYou:
       'If you hold a variable loan, this is the crowd you travel with; if fixed, it is the rate your loan eventually resets toward.',
+  },
+  'au-deposit-rate': {
+    name: 'Savings rates (new term deposits)',
+    ticker: 'RBA F4.1',
+    oneLiner:
+      'The average rate banks pay on new household term deposits — the rate a saver shopping today can get.',
+    lines: {
+      highRising: 'New term-deposit rates are high and rising: the setting that usually means more interest for savers.',
+      highEasing: 'Term-deposit rates are high but easing.',
+      typical: 'New term-deposit rates sit in their usual range.',
+      low: 'New term-deposit rates are low: thin returns for cash savers.',
+    },
+    whatItIs:
+      'The weighted-average paid rate on new household term deposits, monthly from the RBA’s F4.1 table (the series starts July 2019 — the table’s full extent).',
+    whyItMatters:
+      'It follows the RBA cash rate: term deposits and savings rates usually pay more after RBA hikes and less after cuts.',
+    tendedToMean:
+      'Term-deposit rates went from near zero in 2020–21 to multi-year highs through the 2022–24 hiking cycle, tracking the cash rate with a short lag.',
+    cantTell:
+      'An average across banks and terms: the best advertised rates (often online savings accounts and smaller lenders) sit above it, and it says nothing about locking money away.',
+    forYou:
+      'The savings twin of the home-loan card: what the crowd earns on new term deposits while borrowers pay the loan card’s rate.',
   },
   'au-wage-growth': {
     name: 'Wage growth vs a year ago',
@@ -1080,13 +1187,39 @@ export const insightsCopyEn = {
     dataForStale: 'data for {date} — not updated since',
     releasedOn: 'released {date}',
     sincePreviousRelease: 'since previous release',
-    // Step-1 audit item D3: the policy-rate cards' own move line.
-    recentMoveLine: 'Recent move: {change}',
+    // Step-2 add-list §B1: the policy cards' LAST DECISION (exact date +
+    // size, the engine's `lastChange` — not a 30-day window) and the RBA
+    // card's next decision date from the calendar.
+    lastChangeLine: 'Last change: {change} on {date}',
+    nextDecisionLine: 'Next RBA decision: {date}',
     staleTag: 'Stale',
     belowPeak: '{pct}% below its 10-year peak',
     pricesUpdated: 'prices updated {time}',
-    // Step-1 A3: the core-CPI companion note on the US inflation card.
-    coreGapNote: 'The gap between them is mainly energy.',
+    // Step-1 A3 + Step-2 §B2: the companion note line per parent card —
+    // core CPI beside the headline, the US 10-year beside the AU one.
+    companionNotes: {
+      'us-cpi-yoy': 'The gap between them is mainly energy.',
+      'au-10y': 'shown for comparison — the US card carries its own story',
+    } as Partial<Record<string, string>>,
+    // Step-2 §B5: the VIX card's interim presentation note (calm/nervous
+    // words are the Step-3 verdict rules' deliverable).
+    vixNote:
+      'The calm/nervous word thresholds are computed from this series’ own history and arrive with the next update; today the value and its 10-year position tell the story.',
+    // Step-2 §A (the card spec): the facts block on the details panel.
+    updatesLabel: 'Updates',
+    cadence: {
+      daily: 'daily',
+      weekly: 'weekly',
+      monthly: 'monthly',
+      quarterly: 'quarterly',
+      'per-change': 'after each decision',
+      manual: 'as released (manual entry)',
+    },
+    staleAfterLine: 'shows “Stale” after {n} days',
+    staleNever: 'never goes stale by age (it changes only on decisions)',
+    fetchedLabel: 'Fetched',
+    scoredFact: 'Scored — counts toward its area’s verdict',
+    contextOnlyFact: 'Context only — never counts toward a verdict',
     // L1: the lane switch.
     laneLabel: 'Region',
     laneAustralia: 'Australia',
@@ -1180,11 +1313,12 @@ export const insightsCopyEn = {
       'Sources: the US Federal Reserve (FRED), the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics (CC BY 4.0), the World Bank, Frankfurter, gold-api.com, and EODHD with Yahoo Finance for the world stock markets.',
     aboutGeneralInfo: 'General information only: not financial advice.',
     aboutSourcesTitle: 'Sources',
-    // Step-1 audit item G3: the accurate list — EODHD, Yahoo Finance and
-    // gold-api ride beside the official publishers ("official and public
-    // sources only" was not true).
+    // Step-1 audit item G3 + Step-2: the accurate list — EODHD, Yahoo
+    // Finance and gold-api ride beside the official publishers; the VIX is
+    // Cboe data redistributed through FRED (© Cboe); the iron-ore price is
+    // context only and never votes.
     aboutSourcesBody:
-      'Sources: official publishers — the US Federal Reserve (FRED) and the US Bureau of Labor Statistics via FRED, the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics (CC BY 4.0) and the World Bank — plus market-data providers Frankfurter (ECB reference rates), gold-api.com, EODHD and Yahoo Finance (world stock markets, live commodity quotes, currencies). Each card names and links its own source. Free-tier licences are personal use; they are being reviewed before any commercial use.',
+      'Sources: official publishers — the US Federal Reserve (FRED) and the US Bureau of Labor Statistics via FRED, the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics (CC BY 4.0) and the World Bank — plus market-data providers Frankfurter (ECB reference rates), gold-api.com, EODHD and Yahoo Finance (world stock markets, live commodity quotes, currencies). The VIX fear gauge is Cboe data redistributed through FRED (© Cboe). Iron ore is shown for context and never counts toward the verdicts. Each card names and links its own source. Free-tier licences are personal use; they are being reviewed before any commercial use.',
     fredNotice:
       'This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank of St. Louis.',
     // Round 24 (roast): the English notice sits on its OWN dir=ltr line.
@@ -1874,6 +2008,13 @@ export const insightsCopyEn = {
       'Chinese factories are contracting: the world’s biggest raw-material buyer is pulling back.',
     'm2-us':
       'The US money supply is shrinking year-on-year: a rare squeeze that has usually preceded slowdowns.',
+    // Step-2 add-list §B3/§B4/§B5: the new scored cards' needs-attention
+    // lines (one per warning rule).
+    'us-unemployment':
+      'US unemployment is high for its decade: a steady rise is usually the first sign of a slowing US economy.',
+    'sahm-rule':
+      'The recession alarm has fired: US unemployment has risen 0.50+ points from its recent low — the pattern that has coincided with the start of past US recessions.',
+    vix: 'Market fear is in the top of its decade range: world share markets are jumpy.',
     'copper-gold':
       'Copper is historically cheap against gold: factory demand is running cold.',
     brent:
@@ -1882,6 +2023,8 @@ export const insightsCopyEn = {
       'Australian prices are rising above the 2–3% target band: the scoreboard the RBA watches.',
     'au-trimmed-mean':
       'Underlying inflation is above the target band: the rise isn’t just one volatile item.',
+    'au-10y':
+      'Australian 10-year borrowing costs are high for their decade: fixed home-loan rates and term deposits tend to sit higher in this setting.',
     'au-us-10y-gap':
       'US 10-year money now costs more than Australia’s: the setting that has usually weighed on the Aussie dollar.',
     'au-home-loan':
@@ -2194,11 +2337,11 @@ export const insightsCopyEn = {
       },
       savings: {
         name: 'Savings and interest',
-        // Step-1 audit item C8: the row speaks about the CASH RATE (the
-        // number it shows) — deposit rates follow the target closely.
-        attention: 'The cash rate is high and inflation has left its usual range: deposit rates have usually tracked the cash rate closely, while prices keep rising.',
-        unusual: 'The cash rate sits at an unusual point of its 10-year range: savings interest usually follows it.',
-        calm: 'The cash rate and inflation sit in unremarkable settings: savings interest roughly tracks the cash rate.',
+        // Step-2 add-list §B7: the row speaks about the REAL deposit rate
+        // (RBA F4.1, the number it shows) with the cash rate as context.
+        attention: 'Deposit rates and inflation have left their usual ranges: new term deposits pay well when the RBA holds rates high, while prices keep rising.',
+        unusual: 'Savings rates sit at an unusual point of their range: the interest a new term deposit pays moves with it.',
+        calm: 'Savings rates and inflation sit in unremarkable settings: the interest on new term deposits roughly tracks the RBA cash rate.',
       },
       shop: {
         name: 'Shop prices and bills',

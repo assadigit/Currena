@@ -59,4 +59,8 @@ export const FRED_SERIES = {
   nfci: 'NFCI', // Chicago Fed National Financial Conditions, weekly
   // dollar-broad (DTWEXBGS) retired: the series now lags ~5 days upstream
   // and the Currena dollar basket replaces it (data spec §3, basket.ts).
+  // Step-2 add-list §B3/§B4/§B5 (all verified current 2026-10-13):
+  usUnemployment: 'UNRATE', // us-unemployment: the US unemployment rate, monthly BLS
+  sahmRealtime: 'SAHMREALTIME', // sahm-rule: the real-time Sahm recession indicator, monthly
+  vix: 'VIXCLS', // vix: the Cboe Volatility Index close, daily (Cboe data via FRED)
 } as const;

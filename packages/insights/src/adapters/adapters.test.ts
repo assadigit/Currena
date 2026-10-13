@@ -82,7 +82,11 @@ describe('fred adapter', () => {
 
   it('carries every series id the definitions table consumes', () => {
     expect(Object.values(FRED_SERIES)).toContain('STLFSI4');
-    expect(Object.values(FRED_SERIES)).toHaveLength(14);
+    // Step-2 add-list §B3/§B4/§B5: UNRATE + SAHMREALTIME + VIXCLS joined.
+    expect(Object.values(FRED_SERIES)).toContain('UNRATE');
+    expect(Object.values(FRED_SERIES)).toContain('SAHMREALTIME');
+    expect(Object.values(FRED_SERIES)).toContain('VIXCLS');
+    expect(Object.values(FRED_SERIES)).toHaveLength(17);
   });
 });
 

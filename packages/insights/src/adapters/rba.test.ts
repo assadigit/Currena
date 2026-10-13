@@ -43,6 +43,20 @@ describe('parseRbaTableCsv', () => {
     expect(series[0]!.date).toBe('2013-05-20');
   });
 
+  it('parses F4.1 (Step-2 §B7) — PDRNTH, the paid rate on new household term deposits', () => {
+    const series = parseRbaTableCsv(fixtureText('rba-f4.1-data.csv'), {
+      tablePrefix: 'F4.1',
+      seriesId: 'PDRNTH',
+    });
+    // The table's full extent: monthly since Jul-2019 (no 10-year history
+    // exists — the definition records this honestly).
+    expect(series[0]!.date).toBe('2019-07-31');
+    // Venue-verified 2026-10-13: the Aug-2026 observation is 4.8% per annum
+    // (table published 08-Oct-2026).
+    expect(series.at(-1)).toEqual({ date: '2026-08-31', value: 4.8 });
+    expect(series.length).toBe(86); // Jul-2019 → Aug-2026 inclusive
+  });
+
   it('parses E2 (quarterly ratios) — future pre-scaffolded empty quarters skipped', () => {
     const series = parseRbaTableCsv(fixtureText('rba-e2-data.csv'), {
       tablePrefix: 'E2',

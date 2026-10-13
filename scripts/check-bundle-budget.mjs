@@ -210,7 +210,21 @@ const BUDGETS = [
   // verdict words, recent-move line, etc.). The ENTRY chunk stays
   // untouched (290.37/87.83 vs 296/89.5). Justified in CHANGELOG
   // §2026-10-13 (Insights Step-1 fix list).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 469_000, gz: 115_500, label: 'Insights lazy chunk' },
+  // Step-2 add-list bump (465.61/114.56 → 491.81/121.04, budget 469/115.5 →
+  // 493/121.5): the seven Step-2 additions — (1) FIVE new bilingual
+  // indicator entries × full copy (name/lines/whatItIs/whyItMatters/
+  // tendedToMean/cantTell/forYou + meaning lines, en+fa): the AU 10-year
+  // yield, US unemployment, the Sahm recession alarm, the VIX fear gauge,
+  // and the deposit-rate card that finishes the savings row; (2) the
+  // companion-comparison wiring (COMPANIONS + per-parent notes, both card
+  // and row anatomy); (3) the policy cards' exact lastChange line + the
+  // RBA next-decision line; (4) the details panel's card-spec facts block
+  // (updates/stale-after/fetched/scored × 2 locales); (5) the VIX
+  // always-position presentation. Gzip +6.5 kB for five fully-specified
+  // bilingual cards + the card-spec discipline. The ENTRY chunk stays
+  // untouched — Insights remains lazy. Justified in CHANGELOG §2026-10-13
+  // (Insights Step-2 add list).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 493_000, gz: 121_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {

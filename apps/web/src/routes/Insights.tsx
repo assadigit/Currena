@@ -61,11 +61,13 @@ import {
   SIGNALS_ENABLED,
   COMPANION_ONLY_IDS,
   attentionToneClass,
+  companionParentOf,
   definitionFor,
   definitionsForGroup,
   filterVisibleIds,
   formatPinnedStorage,
   groupVisibility,
+  nextEventDate,
   parsePinnedIds,
   statusCounts,
   stepToneClass,
@@ -87,7 +89,12 @@ type LoadState =
 const EVENT_TARGETS: Readonly<Record<string, IndicatorId | undefined>> = {
   rba: 'rba-cash-rate',
   'abs-cpi': 'au-cpi',
+  // Step-2 add-list §D: the two new jobs kinds link to their cards
+  // (abs-cpi keeps no us-cpi target — the CPI events target the CPI cards).
+  'abs-jobs': 'au-unemployment',
   fed: 'fed-target',
+  'us-cpi': 'us-cpi-yoy',
+  'us-jobs': 'us-unemployment',
 };
 
 function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
@@ -150,21 +157,35 @@ function QuestionGroup({
     );
   }, [snapshot, section, group, renderableIds]);
 
-  // Step-1 A3: the companion readings rendered inside this group's cards
-  // (the US inflation card carries core CPI beside the headline).
+  // Step-1 A3 + Step-2 §B2: the companion readings rendered inside this
+  // group's cards (core CPI on the US inflation card; the US 10-year beside
+  // the AU 10-year). Parents live in this group; companions may be any
+  // reading in the snapshot (us10y keeps its own card elsewhere).
   const companionsByParent = useMemo(() => {
     const defs = definitionsForGroup(section, group);
-    const companionIds = new Set(defs.map((d) => d.id));
+    const parentIds = new Set(defs.map((d) => d.id));
     const byParent = new Map<IndicatorId, IndicatorReading[]>();
     for (const r of snapshot.readings) {
-      if (!COMPANION_ONLY_IDS.has(r.id)) continue;
-      const parent = r.id === 'us-cpi-core-yoy' ? 'us-cpi-yoy' : null;
-      if (parent !== null && companionIds.has(parent)) {
+      const parent = companionParentOf(r.id);
+      if (parent !== null && parentIds.has(parent)) {
         byParent.set(parent, [...(byParent.get(parent) ?? []), r]);
       }
     }
     return byParent;
   }, [snapshot, section, group]);
+
+  // Step-2 §B1: the next RBA decision date, threaded to the cash-rate card
+  // (computed once per group from the snapshot's calendar — plain dates,
+  // the Step-1 rule: no UTC conversion, computed at render).
+  const nextRbaDecision = useMemo(
+    () => nextEventDate(snapshot.calendar, 'rba', new Date().toISOString().slice(0, 10)),
+    [snapshot.calendar],
+  );
+
+  // Step-2 §B2: the companion note line per parent ("the gap is mainly
+  // energy" for the CPI card, "shown for comparison" for the AU 10-year).
+  const companionNoteOf = (parent: IndicatorId): string | undefined =>
+    copy.ui.companionNotes[parent];
 
   const gauge = useMemo(() => {
     return gaugesForSectionCached(section, snapshot.readings).find((g) => g.gauge === group);
@@ -259,6 +280,8 @@ function QuestionGroup({
               onOpenDetails={onOpenDetails}
               pinned={pinned.has(r.id)}
               companionReadings={companionsByParent.get(r.id) ?? []}
+              companionNote={companionNoteOf(r.id)}
+              nextRbaDecision={nextRbaDecision}
             />
           ))}
         </div>
@@ -276,6 +299,9 @@ function QuestionGroup({
               onOpenDetails={onOpenDetails}
               pinned={pinned.has(r.id)}
               showMixedTag={r.id === 'gold-silver'}
+              companionReadings={companionsByParent.get(r.id) ?? []}
+              companionNote={companionNoteOf(r.id)}
+              nextRbaDecision={nextRbaDecision}
             />
           ))}
         </div>

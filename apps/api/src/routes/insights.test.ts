@@ -115,7 +115,8 @@ describe('GET /api/insights/:id/history', () => {
   });
 
   it('rejects unknown indicator ids with 400 invalid_indicator', async () => {
-    const res = await makeApp().request('/api/insights/vix/history', undefined, env);
+    // 'vix' joined the indicator set in Step 2 — an actually-unknown id rejects.
+    const res = await makeApp().request('/api/insights/cape/history', undefined, env);
     expect(res.status).toBe(400);
     const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('invalid_indicator');

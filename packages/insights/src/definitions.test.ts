@@ -22,9 +22,9 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 25 P1 / 17 P2', () => {
-    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(25);
-    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(17);
+  it('splits 29 P1 / 18 P2 (Step-2: +au-10y/us-unemployment/sahm-rule/vix P1, +au-deposit-rate P2)', () => {
+    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(29);
+    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(18);
   });
 
   it('groups are the question groups (global 5 + prices-board, australia 3)', () => {
@@ -54,9 +54,10 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('info-only cards never vote: exactly the twelve info rules', () => {
+  it('info-only cards never vote: exactly the fourteen info rules (Step-2: +au-deposit-rate, iron-ore went context)', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
     expect(info).toEqual([
+      'au-deposit-rate',
       'au-petrol-yoy',
       'btc-usd',
       'copper-usd',
@@ -64,6 +65,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'gold-aud',
       'gold-btc',
       'gold-usd',
+      'iron-ore',
       'rba-cash-rate',
       'silver-btc',
       'silver-usd',
@@ -72,10 +74,10 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     ]);
   });
 
-  it('GAUGE membership is exactly the scored ids in gauged groups (29 voters, data spec §4)', () => {
+  it('GAUGE membership is exactly the scored ids in gauged groups (32 voters, Step-2: +vix/us-unemployment/sahm-rule/au-10y, −iron-ore)', () => {
     const gaugedGroups = new Set(GAUGES.map((g) => g.id));
     const memberIds = new Set(GAUGES.flatMap((g) => g.members));
-    expect(memberIds.size).toBe(29);
+    expect(memberIds.size).toBe(32);
     // Every gauge member is a scored (non-info) definition in that gauge's group.
     for (const g of GAUGES) {
       for (const id of g.members) {
@@ -114,6 +116,11 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expectStale('copper-usd', 2);
     expectStale('eur-usd', 4);
     expectStale('us10y', undefined); // cadence grace applies
+    // Step-2 add-list cards (§B): the new series' freshness limits.
+    expectStale('vix', 4); // daily card spec (VIXCLS prints every US trading day)
+    expectStale('us-unemployment', 75); // monthly BLS obs (M-01) ages up to ~73d
+    expectStale('sahm-rule', 75);
+    expectStale('au-deposit-rate', 70); // RBA F4.1 month-end obs, same as F6
     // Obs-date-reality adjustments (the spec's numbers assumed release-date
     // aging — see definitions.ts notes): ABS quarter-start items get 215.
     // Step-1 (2026-10-13): au-cpi/au-trimmed-mean moved to the MONTHLY CPI —
@@ -162,6 +169,16 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       windowWeeks: 13,
     });
     expect(byId.get('au-unemployment')!.rule).toEqual({ kind: 'above-low', rise: 0.5 });
+    // Step-2 add-list §B4: the Sahm rule's standard signal, verbatim.
+    expect(byId.get('sahm-rule')!.rule).toEqual({ kind: 'threshold', direction: 'above', value: 0.5 });
+    // §B3/§B5: the US unemployment level and the VIX read their own 10-year
+    // position (the card spec's "10-year position" — the standard percentile
+    // machinery, no invented word thresholds before Step 3).
+    expect(byId.get('us-unemployment')!.rule).toEqual({ kind: 'percentile', tail: 'high', cutoff: 0.2 });
+    expect(byId.get('vix')!.rule).toEqual({ kind: 'percentile', tail: 'high', cutoff: 0.2 });
+    // §B2: the AU 10-year yield scores its 10-year position like us10y's
+    // percentile arm.
+    expect(byId.get('au-10y')!.rule).toEqual({ kind: 'percentile', tail: 'high', cutoff: 0.1 });
     expect(byId.get('terms-of-trade')!.rule).toEqual({ kind: 'consecutive-decline', periods: 2 });
     expect(byId.get('au-home-values')!.rule).toEqual({ kind: 'consecutive-decline', periods: 3 });
     expect(byId.get('m2-us')!.rule).toEqual({ kind: 'yoy-negative' });

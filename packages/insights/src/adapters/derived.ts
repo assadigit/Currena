@@ -94,6 +94,8 @@ export interface SeriesInputs {
     au10y?: SeriesPoint[];
     householdDebtRatio?: SeriesPoint[];
     homeLoanOutstanding?: SeriesPoint[];
+    /** Step-2 §B7: F4.1 PDRNTH — the paid rate on new household term deposits. */
+    depositRateNewTermHouseholds?: SeriesPoint[];
   };
   /** Manual china-pmi observations (data/manual/china-pmi.json). */
   chinaPmi?: SeriesPoint[];
@@ -237,6 +239,10 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   /* ---------------- Global — Are markets nervous? ---------------- */
   put('stress-stlfsi', fred.STLFSI4);
   put('nfci', fred.NFCI);
+  // Step-2 add-list §B5: the Cboe VIX close (daily, full history — the
+  // stored history keeps the 10-year daily window the Step-3 verdicts
+  // will compute their calm/nervous thresholds from).
+  put('vix', fred.VIXCLS);
   if (inputs.xauSpot && inputs.xagSpot) {
     if (wb) {
       const history = combineSeries(wb.gold, wb.silver, (g, s) => g / s);
@@ -263,6 +269,11 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   /* ---------------- Global — Is growth healthy? ---------------- */
   put('china-pmi', inputs.chinaPmi);
   put('m2-us', fred.M2SL);
+  // Step-2 add-list §B3/§B4: the US labour-market pair — the unemployment
+  // LEVEL and the Sahm recession alarm, both straight from FRED (monthly,
+  // full history) so their stored histories cover the 10-year window.
+  put('us-unemployment', fred.UNRATE);
+  put('sahm-rule', fred.SAHMREALTIME);
   if (wb) put('copper-gold', combineSeries(wb.copper, wb.gold, (c, g) => c / g));
   put('usdcny', fx.CNY);
 
@@ -345,6 +356,9 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   /* -------- Australia — Are inflation and rates a problem? -------- */
   if (abs?.cpiIndex) put('au-cpi', yoyPctSeries(abs.cpiIndex));
   if (abs?.trimmedMeanIndex) put('au-trimmed-mean', yoyPctSeries(abs.trimmedMeanIndex));
+  // Step-2 add-list §B2: the AU 10-year yield card (RBA F2 FCMYGBAG10D —
+  // the same series the gap card subtracts, now also its own scored card).
+  put('au-10y', rba?.au10y);
   if (rba?.au10y && fred.DGS10) {
     put('au-us-10y-gap', combineSeries(rba.au10y, fred.DGS10, (au, us) => au - us));
   }
@@ -353,6 +367,8 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // its effective date); collect.ts already falls back to the F1.1 monthly
   // average when the daily table fails to parse.
   put('rba-cash-rate', rba?.cashRate);
+  // Step-2 add-list §B7: the real savings rate (F4.1 PDRNTH).
+  put('au-deposit-rate', rba?.depositRateNewTermHouseholds);
   if (abs?.automotiveFuelIndex) put('au-petrol-yoy', yoyPctSeries(abs.automotiveFuelIndex));
 
   /* -------- Australia — Are households under pressure? -------- */
@@ -412,6 +428,10 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'breakeven-5y5y': { name: 'FRED (T5YIFR)', url: 'https://fred.stlouisfed.org/series/T5YIFR' },
   'stress-stlfsi': { name: 'FRED (STLFSI4)', url: 'https://fred.stlouisfed.org/series/STLFSI4' },
   nfci: { name: 'FRED (NFCI)', url: 'https://fred.stlouisfed.org/series/NFCI' },
+  vix: {
+    name: 'FRED (VIXCLS), © Cboe',
+    url: 'https://fred.stlouisfed.org/series/VIXCLS',
+  },
   'gold-silver': { name: 'gold-api.com (history: World Bank)', url: 'https://www.gold-api.com' },
   'dollar-basket': {
     name: 'Currena basket (ECB rates via Frankfurter)',
@@ -421,6 +441,11 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'eur-usd': { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   'china-pmi': { name: 'China NBS (manual entry)', url: 'https://www.stats.gov.cn/english/' },
   'm2-us': { name: 'FRED (M2SL)', url: 'https://fred.stlouisfed.org/series/M2SL' },
+  'us-unemployment': { name: 'FRED (UNRATE), US BLS', url: 'https://fred.stlouisfed.org/series/UNRATE' },
+  'sahm-rule': {
+    name: 'FRED (SAHMREALTIME)',
+    url: 'https://fred.stlouisfed.org/series/SAHMREALTIME',
+  },
   'copper-gold': { name: 'World Bank Pink Sheet', url: 'https://www.worldbank.org/en/research/commodity-markets' },
   usdcny: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   brent: {
@@ -434,6 +459,14 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'gold-btc': { name: 'gold-api.com (XAU ÷ BTC)', url: 'https://www.gold-api.com' },
   'silver-btc': { name: 'gold-api.com (XAG ÷ BTC)', url: 'https://www.gold-api.com' },
   'rba-cash-rate': { name: 'RBA F1 (Cash Rate Target)', url: 'https://www.rba.gov.au/statistics/cash-rate/' },
+  'au-10y': {
+    name: 'RBA F2 (10-year bond yield)',
+    url: 'https://www.rba.gov.au/statistics/tables/#f2',
+  },
+  'au-deposit-rate': {
+    name: 'RBA F4.1 (new term deposits)',
+    url: 'https://www.rba.gov.au/statistics/tables/#f4-1',
+  },
   'au-cpi': { name: 'ABS (monthly CPI All groups)', url: 'https://data.api.abs.gov.au/rest/data/CPI/1.10001.10.50.M' },
   'au-trimmed-mean': { name: 'ABS (monthly CPI Trimmed Mean)', url: 'https://data.api.abs.gov.au/rest/data/CPI/1.999902.20.50.M' },
   'au-petrol-yoy': {
@@ -450,7 +483,10 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   audjpy: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   'au-us-10y-gap': { name: 'RBA F2 − FRED (DGS10)', url: 'https://www.rba.gov.au/statistics/tables/' },
   'gold-aud': { name: 'gold-api.com × Frankfurter (ECB)', url: 'https://www.gold-api.com' },
-  'iron-ore': { name: 'World Bank Pink Sheet', url: 'https://www.worldbank.org/en/research/commodity-markets' },
+  'iron-ore': {
+    name: 'World Bank Pink Sheet',
+    url: 'https://www.worldbank.org/en/research/commodity-markets',
+  },
   'terms-of-trade': { name: 'ABS (ANA_AGG terms of trade)', url: 'https://data.api.abs.gov.au/rest/data/ANA_AGG/M5.TTR.20.AUS.Q' },
   'au-unemployment': { name: 'ABS (Labour Force)', url: 'https://data.api.abs.gov.au/rest/data/LF/M13.3.1599.20.AUS.M' },
   'au-home-values': { name: 'ABS (RES_DWELL_ST)', url: 'https://data.api.abs.gov.au/rest/data/RES_DWELL_ST/5.AUS.Q' },

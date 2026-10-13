@@ -61,6 +61,34 @@ export const BTC_RATIO_IDS: readonly IndicatorId[] = ['gold-btc', 'silver-btc'];
  */
 export const COMPANION_ONLY_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>(['us-cpi-core-yoy']);
 
+/**
+ * Step-2 add-list §B2: companion lines rendered INSIDE a parent card — a
+ * full card of its own in another group can still ride along for comparison
+ * (the AU 10-year card carries the US 10-year yield beside it; the US number
+ * keeps its own card in borrowing-costs — one reading, two surfaces, no
+ * possible disagreement). Companion-ONLY ids (COMPANION_ONLY_IDS) render
+ * nowhere else; shared ids keep their own card too.
+ */
+export const COMPANIONS: Readonly<Partial<Record<IndicatorId, readonly IndicatorId[]>>> = {
+  'us-cpi-yoy': ['us-cpi-core-yoy'],
+  'au-10y': ['us10y'],
+};
+
+/** The parent card a companion belongs to, or null when it rides nowhere. */
+export function companionParentOf(id: IndicatorId): IndicatorId | null {
+  for (const [parent, companions] of Object.entries(COMPANIONS) as [IndicatorId, readonly IndicatorId[]][]) {
+    if (companions.includes(id)) return parent;
+  }
+  return null;
+}
+
+/**
+ * Step-2 add-list §B5: ids whose card ALWAYS shows the 10-year position bar
+ * (the VIX card's interim presentation — "the value and its 10-year
+ * position" — before the Step-3 verdict rules fix the calm/nervous words).
+ */
+export const ALWAYS_POSITION_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>(['vix']);
+
 export function definitionsForGroup(
   section: InsightsSection,
   group: IndicatorGroupId,
@@ -163,6 +191,9 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'breakeven-5y5y': { decimals: 2, unit: 'percent' },
   'stress-stlfsi': { decimals: 2, unit: 'index' },
   nfci: { decimals: 2, unit: 'index' },
+  // Step-2 add-list §B5: the VIX prints to two decimals like the other
+  // market-stress indices (14.84).
+  vix: { decimals: 2, unit: 'index' },
   'gold-silver': { decimals: 1, unit: 'ratio' },
   'dollar-basket': { decimals: 2, unit: 'index' },
   usdjpy: { decimals: 2, unit: 'jpy' },
@@ -171,6 +202,10 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'china-pmi': { decimals: 1, unit: 'index' },
   // Step-1 audit item C7: "US$23.3 trillion", not "bn23,343".
   'm2-us': { decimals: 1, unit: 'usd-tr', scale: 0.001 },
+  // Step-2 add-list §B3/§B4: the US labour-market pair (both in percentage
+  // points — a rate and a points gap, never percent-of-percent).
+  'us-unemployment': { decimals: 1, unit: 'percent' },
+  'sahm-rule': { decimals: 2, unit: 'points' },
   'copper-gold': { decimals: 2, unit: 'ratio' },
   usdcny: { decimals: 4, unit: 'cny' },
   brent: { decimals: 2, unit: 'usd' },
@@ -182,8 +217,12 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'silver-btc': { decimals: 5, unit: 'ratio' },
   'au-cpi': { decimals: 1, unit: 'percent' },
   'au-trimmed-mean': { decimals: 1, unit: 'percent' },
+  // Step-2 add-list §B2: the AU 10-year yield, rendered like the US one.
+  'au-10y': { decimals: 2, unit: 'percent' },
   'au-us-10y-gap': { decimals: 2, unit: 'points' },
   'rba-cash-rate': { decimals: 2, unit: 'percent' },
+  // Step-2 add-list §B7: the real savings rate (new household term deposits).
+  'au-deposit-rate': { decimals: 2, unit: 'percent' },
   'au-petrol-yoy': { decimals: 1, unit: 'percent' },
   'au-home-loan': { decimals: 2, unit: 'percent' },
   'au-wage-growth': { decimals: 1, unit: 'percent' },
@@ -1251,7 +1290,10 @@ export type MoneyAreaState = 'attention' | 'unusual' | 'calm';
 export const MONEY_AREAS: Readonly<Record<MoneyAreaId, readonly IndicatorId[]>> = {
   petrol: ['brent', 'au-petrol-yoy', 'audusd'],
   homeLoan: ['rba-cash-rate', 'au-home-loan', 'au-rent-yoy', 'au-household-debt-arrears'],
-  savings: ['rba-cash-rate', 'au-cpi'],
+  // Step-2 add-list §B7: the savings row leads with the REAL deposit rate
+  // (RBA F4.1 new household term deposits); the cash rate and CPI stay as
+  // its state drivers beside it.
+  savings: ['au-deposit-rate', 'rba-cash-rate', 'au-cpi'],
   shop: ['au-cpi', 'au-trimmed-mean'],
   overseas: ['audusd', 'audjpy', 'dollar-basket'],
   jobs: ['au-unemployment', 'au-wage-growth'],
@@ -1270,19 +1312,22 @@ export function moneyAreaRow(area: MoneyAreaId, readings: readonly IndicatorRead
   const attention = rows.filter((r) => tierOf(r) === 'needs-attention');
   const unusual = rows.filter((r) => tierOf(r) === 'unusual');
   if (attention.length > 0) {
-    // Step-1 audit item C8: the SAVINGS row leads with the cash rate — the
-    // real savings-linked number — even when inflation drives its state
-    // (the old card showed the inflation rate under a stock-market icon
-    // and called it "Earning more interest").
+    // Step-1 audit item C8 → Step-2 add-list §B7: the SAVINGS row leads with
+    // the real deposit rate (RBA F4.1) — the number the row actually shows
+    // — falling back to the cash rate when the deposit series is absent.
     const chips = attention.slice(0, 2).map((r) => r.id);
-    if (area === 'savings' && !chips.includes('rba-cash-rate')) chips.unshift('rba-cash-rate');
+    if (area === 'savings' && !chips.includes('au-deposit-rate')) {
+      chips.unshift(byId.has('au-deposit-rate') ? 'au-deposit-rate' : 'rba-cash-rate');
+    }
     return { area, state: 'attention', chipIds: chips.slice(0, 2) };
   }
   if (unusual.length > 0) {
     return { area, state: 'unusual', chipIds: unusual.slice(0, 2).map((r) => r.id) };
   }
-  // Calm savings still shows the cash rate (a real deposit-linked rate).
-  if (area === 'savings') return { area, state: 'calm', chipIds: ['rba-cash-rate'] };
+  // Calm savings still shows the real deposit rate (the number it renders).
+  if (area === 'savings') {
+    return { area, state: 'calm', chipIds: [byId.has('au-deposit-rate') ? 'au-deposit-rate' : 'rba-cash-rate'] };
+  }
   return { area, state: 'calm', chipIds: [] };
 }
 
@@ -1338,13 +1383,14 @@ export function moneyPanel(readings: readonly IndicatorReading[]): MoneyAreaRow[
 export type MoneyDriverKind = 'direct' | 'inverse' | 'growth' | 'none';
 export type MoneyDirection = 'up' | 'down' | 'flat';
 
-/** Only the 13 money-area drivers need semantics; every other id
+/** Only the money-area drivers need semantics; every other id
  * defaults to 'none'. */
 export const MONEY_DRIVER_KIND: Partial<Record<IndicatorId, MoneyDriverKind>> = {
   brent: 'direct',
   'au-petrol-yoy': 'growth',
   audusd: 'inverse',
   'rba-cash-rate': 'direct',
+  'au-deposit-rate': 'direct',
   'au-home-loan': 'direct',
   'au-rent-yoy': 'growth',
   'au-household-debt-arrears': 'none',
@@ -1408,6 +1454,35 @@ export function policyMoveOf(reading: IndicatorReading): number | null {
   if (!POLICY_RATE_IDS.has(reading.id)) return null;
   if (reading.change30d === undefined || Math.abs(reading.change30d) < 0.05) return null;
   return reading.change30d;
+}
+
+/**
+ * Step-2 add-list §B1: the policy cards' LAST DECISION — the engine's
+ * `lastChange` (the exact step: date + size), which unlike a 30-day window
+ * still names a decision taken six weeks ago. Rendered on the RBA cash-rate
+ * card (and the ECB/Fed cards, same anatomy) as "Last change: +0.25 pts on
+ * 29 Sep 2026".
+ */
+export function policyLastChangeOf(
+  reading: IndicatorReading,
+): { date: string; points: number } | null {
+  if (!POLICY_RATE_IDS.has(reading.id)) return null;
+  if (reading.status === 'unavailable') return null;
+  return reading.lastChange ?? null;
+}
+
+/**
+ * Step-2 add-list §B1: the next RBA decision date from the calendar — the
+ * first `kind` event dated today or later (plain dates, no UTC conversion —
+ * the Step-1 date rule). Undefined when the calendar carries none.
+ */
+export function nextEventDate(
+  calendar: readonly { date: string; kind: string }[],
+  kind: 'rba' | 'fed',
+  todayIso: string,
+): string | undefined {
+  const ofKind = calendar.filter((e) => e.kind === kind && e.date >= todayIso);
+  return ofKind.length > 0 ? ofKind.reduce((a, b) => (a.date <= b.date ? a : b)).date : undefined;
 }
 
 /** The money row's stated estimation: the majority of its drivers'

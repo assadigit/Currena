@@ -217,6 +217,29 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 14,
   },
   {
+    // Step-2 add-list §B5: the market fear gauge (Cboe VIX via FRED VIXCLS,
+    // daily, licence noted on the card/About — Cboe data redistributed
+    // through FRED with attribution). Scored through the engine's standard
+    // percentile machinery (= the card's "10-year position"); the explicit
+    // calm/nervous/fearful word thresholds are a Step-3 deliverable computed
+    // from the stored history — the card says so, and invents no verdict
+    // words before then.
+    id: 'vix',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Market fear gauge (VIX)',
+    source: 'fred',
+    sourceRef: 'FRED:VIXCLS (Cboe Volatility Index, close)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'percentile', tail: 'high', cutoff: 0.2 },
+    // Step-2 card spec: daily series go stale after 4 days. VIXCLS prints
+    // every US trading day (verified live 2026-10-13: latest obs Oct 9), so
+    // the only >4-day gaps are multi-day US market closures.
+    staleAfterDays: 4,
+  },
+  {
     id: 'gold-silver',
     section: 'global',
     group: 'market-stress',
@@ -300,6 +323,39 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // measured on the year-on-year GROWTH, not the level, so it is not
     // permanently pinned near 100% just for existing.
     percentileBasis: 'yoy',
+  },
+  {
+    // Step-2 add-list §B3: US unemployment (FRED UNRATE, monthly, verified
+    // live 2026-10-13: Sep 2026 = 4.2). Scored on its own 10-year level
+    // ("high unemployment for the decade") — the "rising fast" signal is
+    // the Sahm rule card's job next to it, so the two never duplicate.
+    id: 'us-unemployment',
+    section: 'global',
+    group: 'growth-health',
+    name: 'US unemployment rate',
+    source: 'fred',
+    sourceRef: 'FRED:UNRATE (US Bureau of Labor Statistics)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'percentile', tail: 'high', cutoff: 0.2 },
+    staleAfterDays: 75, // monthly BLS obs (M-01) ages up to ~73d between releases
+  },
+  {
+    // Step-2 add-list §B4: the Sahm recession alarm (FRED SAHMREALTIME,
+    // monthly, verified live 2026-10-13: Sep 2026 = 0.00). The standard
+    // signal is 0.50 or more — the rule the card explains in one line.
+    id: 'sahm-rule',
+    section: 'global',
+    group: 'growth-health',
+    name: 'US recession alarm (Sahm rule)',
+    source: 'fred',
+    sourceRef: 'FRED:SAHMREALTIME (real-time vintage)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'threshold', direction: 'above', value: 0.5 },
+    staleAfterDays: 75,
   },
   {
     id: 'copper-gold',
@@ -466,6 +522,27 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 95, // same monthly cadence as au-cpi
   },
   {
+    // Step-2 add-list §B2: the Australian 10-year government bond yield —
+    // RBA statistical table F2, series FCMYGBAG10D ("Australian Government
+    // 10 year bond", daily, venue-verified 2026-10-13: published 09-Oct,
+    // the same series the au-us-10y-gap card already subtracts DGS10 from).
+    // Scored on its 10-year position (a rate, like us10y); the US 10-year
+    // rides along as the card's comparison companion (the same companion
+    // pattern as core CPI on the US inflation card).
+    id: 'au-10y',
+    section: 'australia',
+    group: 'au-inflation-rates',
+    name: 'Australian 10-year government bond yield',
+    source: 'rba',
+    sourceRef: 'RBA F2 FCMYGBAG10D (Australian Government 10 year bond)',
+    // Weekly cadence (not daily): RBA F2 publishes with a 2–4 business-day
+    // lag — the same venue finding the gap card's cadence records.
+    cadence: 'weekly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
+  },
+  {
     id: 'au-us-10y-gap',
     section: 'australia',
     group: 'au-inflation-rates',
@@ -478,18 +555,6 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'threshold', direction: 'below', value: 0 },
-  },
-  {
-    id: 'rba-cash-rate',
-    section: 'australia',
-    group: 'au-inflation-rates',
-    name: 'RBA cash rate',
-    source: 'rba',
-    sourceRef: 'RBA statistical table F1 (Cash Rate Target, daily)',
-    cadence: 'per-change',
-    changeKind: 'points',
-    phase: 'P1',
-    rule: { kind: 'info' },
   },
   {
     // An index, not a pump price (data spec §3 note) — context item.
@@ -509,9 +574,28 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
   },
   /* -------- Australia — Are households under pressure? -------- */
   {
-    // What borrowers actually pay: F6 series ID FLRHOOTA (outstanding,
-    // owner-occupier, all loans, all institutions) — the runner matches by
-    // Series ID because RBA rewords column titles over time (data spec §3).
+    // Step-1 audit item A4 + Step-2 add-list §B1: the RBA's official policy
+    // rate (F1 daily Cash Rate Target — a decision-day move shows at once).
+    // CONTEXT ONLY (the policy rate itself; verdict logic arrives in Step 3)
+    // and placed in au-households NEXT TO the home-loan card so the two
+    // always render from the same snapshot — the card also states the last
+    // change (date + size, `lastChange`) and the next RBA decision date
+    // (from the calendar, kind 'rba').
+    id: 'rba-cash-rate',
+    section: 'australia',
+    group: 'au-households',
+    name: 'RBA cash rate',
+    source: 'rba',
+    sourceRef: 'RBA statistical table F1 (Cash Rate Target, daily)',
+    cadence: 'per-change',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+  },
+  {
+    // I15, 2026-10-08 data spec §3: what borrowers actually pay — F6 series
+    // ID FLRHOOTA (outstanding, owner-occupier, all loans, all institutions),
+    // matched by Series ID because RBA rewords column titles over time.
     id: 'au-home-loan',
     section: 'australia',
     group: 'au-households',
@@ -523,6 +607,29 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     phase: 'P1',
     rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
     staleAfterDays: 70, // RBA F6 dates obs at month END — the spec number works as-is
+  },
+  {
+    // Step-2 add-list §B7 — finishes the Step-1 C8 item: a REAL savings
+    // rate, not the inflation number under a savings icon. RBA F4.1 "Paid
+    // Deposit Rates", series PDRNTH — the weighted-average rate banks
+    // actually pay on NEW household term deposits (the rate a saver
+    // shopping today can get; venue-verified 2026-10-13, table published
+    // 08-Oct-2026). The series starts Jul-2019 (the table's full extent —
+    // the 10-year history the Step-2 spec asks for "if the source allows"
+    // does not exist; the card says so honestly). CONTEXT ONLY: it feeds
+    // the money panel's savings row, which leads with this number, its data
+    // month and the piggy-bank artwork.
+    id: 'au-deposit-rate',
+    section: 'australia',
+    group: 'au-households',
+    name: 'Savings rates (new term deposits)',
+    source: 'rba',
+    sourceRef: 'RBA F4.1 PDRNTH (paid rate, new household term deposits)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 70, // RBA F4.1 dates obs at month END, same as F6
   },
   {
     // Below-aux rule: wage growth below yearly CPI ("pay is not keeping up
@@ -635,19 +742,26 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 215, // ABS quarter-start dating
   },
   {
-    // Also rendered as a price row on the Prices board (data spec PB1) —
-    // the price answers "what does it cost", the gauge answers "is trade
-    // healthy". One series, two presentations.
+    // Step-2 add-list §B6: iron ore is CONTEXT ONLY — the price answers
+    // "what does it cost / how is trade", and the page says so explicitly
+    // (the Step-1 D5 oil-scoring contradiction, avoided by design: iron ore
+    // never votes, so the hero counts can never contradict a "context"
+    // label). Source note: the World Bank Pink Sheet is the primary source
+    // and is FRESHER than FRED's PIORECRUSDM mirror of the same series
+    // (verified 2026-10-13: WB carries Sep 2026 = 97.7 while FRED ends
+    // Jul 2026) — the direct WB fetch stays, and the card names it.
+    // The iron-terms-aud relationship card reads THIS card's reading (the
+    // same series object), so the two can never disagree.
     id: 'iron-ore',
     section: 'australia',
     group: 'au-trade-currency',
     name: 'Iron ore price',
     source: 'world-bank',
-    sourceRef: 'World Bank Pink Sheet iron ore, cfr spot',
+    sourceRef: 'World Bank Pink Sheet iron ore, cfr spot (FRED mirror PIORECRUSDM lags ~2 months)',
     cadence: 'monthly',
     changeKind: 'pct',
     phase: 'P2',
-    rule: { kind: 'percentile', tail: 'low', cutoff: 0.2 },
+    rule: { kind: 'info' },
   },
   {
     id: 'gold-aud',

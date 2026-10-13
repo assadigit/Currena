@@ -154,13 +154,15 @@ describe('labelForVerdictStep (the existing four label words, Block H1)', () => 
 describe('summarizeByGauges (the summary wire shape)', () => {
   it('counts describe GAUGE members only; label comes from the verdict step', () => {
     const readings = [
-      ...readingsFor('au-inflation-rates', 1, 2, 0), // step 2
+      ...readingsFor('au-inflation-rates', 1, 2, 0), // step 2 (4 members, 3 voting: 1 warning)
       ...readingsFor('au-households', 0, 5, 1), // step 1
-      ...readingsFor('au-trade-currency', 0, 4, 0), // step 1
+      ...readingsFor('au-trade-currency', 0, 4, 0), // step 1 (3 members since iron-ore went context)
       // Non-member readings must not leak into the counts:
       reading('gold-usd', 'context'),
       reading('brent', 'warning'),
       reading('rba-cash-rate', 'context'),
+      reading('iron-ore', 'context'),
+      reading('au-deposit-rate', 'context'),
     ];
     const s = summarizeByGauges(readings);
     // Steps [2,1,1]: any area ≥ 2 → cautious (the E1 count rule).
@@ -168,7 +170,7 @@ describe('summarizeByGauges (the summary wire shape)', () => {
       section: 'australia',
       label: 'cautious',
       warningCount: 1,
-      votingCount: 12,
+      votingCount: 11,
       excludedCount: 1,
     });
     // Global has no votable readings here → honest null label.
@@ -198,8 +200,8 @@ describe('GAUGES table shape (v1 membership, data spec §4)', () => {
     expect(GAUGES.filter((g) => g.section === 'australia')).toHaveLength(3);
   });
 
-  it('16 global scored + 13 australia scored = 29 voting members', () => {
-    expect(GAUGES.filter((g) => g.section === 'global').flatMap((g) => g.members)).toHaveLength(16);
+  it('19 global scored + 13 australia scored = 32 voting members (Step-2: +vix/us-unemployment/sahm-rule global, +au-10y −iron-ore australia)', () => {
+    expect(GAUGES.filter((g) => g.section === 'global').flatMap((g) => g.members)).toHaveLength(19);
     expect(GAUGES.filter((g) => g.section === 'australia').flatMap((g) => g.members)).toHaveLength(13);
   });
 

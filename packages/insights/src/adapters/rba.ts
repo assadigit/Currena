@@ -23,6 +23,10 @@
  *    Series ID, not title — the RBA rewords titles over time (external
  *    parsers use the same convention). Latest venue-verified value: 6.21%
  *    (2026-08, cross-checked against the RBA's published F6 page).
+ *  - F4.1 Series ID PDRNTH (Step-2 add-list §B7) — the weighted-average
+ *    PAID rate on new household term deposits, monthly since Jul-2019
+ *    (the table's full extent). Venue-verified 2026-10-13; matched by
+ *    Series ID like F6.
  */
 
 import { fetchWithRetry } from '@currena/scraper';
@@ -49,6 +53,13 @@ export const RBA_TABLES = {
   au10y: { file: 'f2', prefix: 'F2', series: 'Australian Government 10 year bond' },
   householdDebtToIncome: { file: 'e2', prefix: 'E2', series: 'Household debt to income' },
   homeLoanOutstanding: { file: 'f6', prefix: 'F6', seriesId: 'FLRHOOTA' },
+  // Step-2 add-list §B7: F4.1 "Paid Deposit Rates" (the RBA's monthly table
+  // of the rates banks actually PAY, replacing the retired F5 layout —
+  // venue-verified 2026-10-13, table published 08-Oct-2026). PDRNTH = the
+  // weighted-average rate on NEW household term deposits — the number a
+  // saver shopping today can get, and the savings twin of F6's
+  // "what borrowers actually pay".
+  depositRateNewTermHouseholds: { file: 'f4.1', prefix: 'F4.1', seriesId: 'PDRNTH' },
 } as const satisfies Record<string, RbaTableSpec>;
 
 export type RbaTableKey = keyof typeof RBA_TABLES;
