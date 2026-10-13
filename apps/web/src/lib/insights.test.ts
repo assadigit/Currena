@@ -431,10 +431,10 @@ describe('card filter (I8)', () => {
   });
 
   it('Persian search: Arabic-keyboard yeh/kaf are normalised to Persian', () => {
-    // «بيكاري» = بیکاری... the I15 fa name is «سهم استرالیایی‌های بدون کار» —
-    // the normalisation is exercised through the ZWNJ compound «استرالیایی‌های»
-    // typed with Arabic ي: «استراليايي‌ها».
-    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'استراليايي بدون' }, nameOfFa)!]).toEqual([
+    // «بيكار» = بیکار... the I15 fa name is «سهم افراد بیکار در استرالیا» —
+    // the normalisation is exercised through «بیکار»
+    // typed with Arabic ي and ك: «بيكار».
+    expect([...filterVisibleIds(SNAPSHOT.readings, { status: 'all', query: 'بيكار' }, nameOfFa)!]).toEqual([
       'au-unemployment',
     ]);
   });

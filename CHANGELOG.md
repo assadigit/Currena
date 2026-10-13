@@ -5,6 +5,108 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-13e] — Revised Persian website copy applied (persian_site_copy_edited.md)
+
+The owner uploaded `persian_site_copy_edited.md` (an editorially revised
+Persian snapshot of the Insights page) as the authoritative reference. Its
+revised wording is now applied to the live Persian dictionary
+(`apps/web/src/i18n/insights-copy-fa.ts`), the shared Farsi terminology is
+standardized wherever the same financial concepts appear, and the calendar's
+Persian event titles follow the same wording. Values only — keys, tokens
+(`{date}`, `{n}`, `{count}`, `{bandPos}`, …), the English dictionary and the
+localization architecture are untouched, and no em dash was introduced.
+
+### Changed (fa dictionary)
+
+- **Hero/header**: subtitle, data-as-of line + snapshot tooltip, the
+  prices-updated line, inAlert count sentence, the full verdict-rule
+  methodology paragraph, hero-reason templates (now "از {n} حوزه، {k} حوزه
+  یعنی «{names}» در وضعیت {word} قرار دارد" + "سایر حوزه‌ها …"), calm-list
+  label, the biggest-move title/reason, the what-changed kicker, coming-up
+  title, and the price-board intro.
+- **Position vocabulary**: position10y → «جایگاه در بازه ده‌ساله»; the
+  position words → «در سطح بالا / در محدوده معمول / در سطح پایین»; the
+  price-tile status word → «بالا»; range-end labels → «کمترین/بیشترین مقدار
+  در ۱۰ سال»; rangePast* window labels shortened («در سه‌ماهه», «در یک سال»,
+  «در پنج سال») and the range chips «یک سال / پنج سال».
+- **Indicator renames** (the reference's plain-language set): real yields and
+  bond yields as «بازده واقعی اوراق قرضه ۱۰ساله آمریکا» / «بازده اوراق قرضه
+  ۱۰ساله دولت آمریکا» / «… استرالیا», the yield curve as «فاصله بازده اوراق
+  قرضه ۱۰ساله و ۲ساله دولت آمریکا», CPI-style cards as «تغییر قیمت‌ها در
+  … نسبت به سال قبل», «شاخص ترس بازار», «شاخص دلار آمریکا در برابر شش ارز
+  بزرگ», «دلار آمریکا/استرالیا در برابر ین ژاپن», «حجم پول در اقتصاد
+  آمریکا», «نرخ بیکاری آمریکا», «سهم افراد بیکار در استرالیا», «رشد
+  اجاره‌بها نسبت به سال قبل», «قیمت صادرات استرالیا در مقایسه با واردات»,
+  «نرخ بهره وام مسکن پرداختی خانوارها», «نرخ سود سپرده‌های مدت‌دار جدید»,
+  «قیمت طلا/نقره، هر اونس», «قیمت نفت برنت», «یورو در برابر دلار آمریکا».
+- **Meaning one-liners** for every warning tile/card in the reference, now
+  two-sentence plain paragraphs (real yields, US 10Y, brent, au-10y, home
+  loan, wage growth, US CPI, trimmed mean, unemployment, au-cpi) plus the
+  state lines the reference showed (highRising for real-yield/us10y/au-10y,
+  jumping for brent, highEasing for gold/silver/breakeven, typical for
+  yield-curve/stress/nfci/vix/dollar-basket/audusd/terms-of-trade, low for
+  rent) and the definitional one-liners (au-trimmed-mean, au-cpi, au-home-
+  loan, china-pmi, btc-usd).
+- **Groups + gauge answers**: all nine group questions and answers rewritten
+  («آیا هزینه وام‌گیری بیشتر می‌شود؟», «آیا بازارها نگران‌اند؟», «وضعیت
+  تجارت و دلار استرالیا چگونه است؟», …); groupShort «هزینه وام‌گیری», «رشد
+  اقتصادی».
+- **Prices board**: gold-A$ line, below-peak wording («پایین‌تر از سقف ده‌ساله
+  خود»), the bitcoin ratio sentence («با قیمت فعلی، یک بیت‌کوین معادل …»),
+  price captions («داده‌ها تا تاریخ …»), companion notes for US CPI (energy
+  gap) and au-10y (for comparison).
+- **World markets**: subtitle, as-of caption («تاریخ داده‌ها: …»), the
+  in-correction count, tile tags («پایین‌تر از سقف یک‌ساله», «در سقف
+  یک‌ساله»), the local-currency note, takeaway/hero-alert templates, the
+  measure label «بازارهای سهام: چند بازار با فاصله از سقف یک‌ساله».
+- **World currencies**: subtitle with «؟», as-of caption, warning-line and
+  distance-bar formats («{pair}: {value}؛ آستانه هشدار: {threshold}»), the
+  dots/reliability lines, level-3 toggle («چرا این الگو کار می‌کند و اعداد
+  چه می‌گویند؟»), closest-to-warning label, quiet-patterns line, the
+  dollar-row title («دلار در برابر ارزهای جهان») + its "you" line, r6's
+  name («نگرانی درباره اروپا»), the r7 euro-led see/means pair, the opposite
+  chart caption, the ECB-rates footer line, and fx units («به‌صورت شاخص»,
+  «به‌صورت نسبت»).
+- **Money panel**: section title/subtitle, the direction words («احتمال
+  افزایش هزینه‌ها» / «احتمال دریافت سود بیشتر»), the savings + shop row
+  names, and all four attention sentences.
+- **Signals**: title with «؟», subtitle, merged title («شرایط مؤثر بر طلا و
+  نقره»), the lean wording + metal-lean template, verdict title («شرایط
+  فعلی») and the down verdict sentence, the against wording («در تضاد با
+  الگوی معمول»), the gold-high-yields warning, all six condition names/how
+  lines, silver-only heading («فقط برای نقره»), the footing block
+  («سطح قیمت» + «جایگاه قیمت در بازه ده‌ساله: {band}») and the 30-day
+  speed label («تغییر ۳۰روزه»).
+- **Together**: section title («ارتباط میان شاخص‌ها») + subtitle + evidence
+  note, the right-now active line, the per-leg move verbs («افزایش می‌یابد» /
+  «کاهش می‌یابد»), and the three revised connections (names, leg labels,
+  relations).
+- **About the data**: credits line, sources body, FRED local note, the
+  RBA/ABS/ECB/basket/EODHD attribution lines, schedule + rules + disclaimer
+  rewrites, the FRED notice heading, and the backtest line.
+- **Shared terminology sweep** (same concepts, consistent wording):
+  borrowing costs «هزینه وام‌گیری» through the us10y state lines/forYou and
+  the au-us-10y-gap name, real-yield lines and one-liner «بازده واقعی»,
+  au-10y's highEasing/low «بازده اوراق قرضه ۱۰ساله استرالیا», M2 «حجم پول»
+  (name, one-liner, meaning), and the yield-curve one-liner «فاصله بازده».
+
+### Changed (data)
+
+- `data/insights-calendar.json`: all abs-jobs Persian titles now read
+  «گزارش وضعیت بازار کار استرالیا: …» and all Fed titles «تصمیم فدرال رزرو
+  آمریکا درباره نرخ بهره» (the reference's event-strip wording).
+
+### Tests / budgets
+
+- `markets-verdict.test.ts`: the attributionEodhd pin follows the revised
+  line; `insights.test.ts`: the Arabic-keyboard normalization test now rides
+  the revised au-unemployment name («بيكار» → «سهم افراد بیکار در استرالیا»).
+- Insights chunk 493.99 → 501.96 kB raw / 120.95 → 122.69 kB gzip; budget
+  bumped to 505/123.5 with this note. All localized strings, no logic; the
+  entry chunk untouched. `pnpm -r typecheck` clean, 1,020/1,020 tests pass,
+  `pnpm build` clean.
+
+
 ## [2026-10-13d] — Sources off the cards (attribution lives in the footer and the Sources section only)
 
 Owner request 2026-10-13: the price tiles and indicator cards must NOT carry

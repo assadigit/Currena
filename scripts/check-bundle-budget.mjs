@@ -234,7 +234,19 @@ const BUDGETS = [
   // Persian is a few bytes longer per sentence; gzip actually FELL
   // (120.95 vs 121.04). The ENTRY chunk stays untouched. Justified in
   // CHANGELOG §2026-10-13 (bilingual content audit).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 495_000, gz: 121_500, label: 'Insights lazy chunk' },
+  // Persian-site-copy bump (493.99/120.95 → 501.96/122.69, budget
+  // 495/121.5 → 505/123.5): the 2026-10-13 application of the owner's
+  // editorially revised Persian reference (persian_site_copy_edited.md) —
+  // ~120 strings replaced in fa with longer, fuller sentences (the
+  // verdict-rule methodology paragraph, the sources/schedule/disclaimer
+  // rewrites, the meaning one-liners as two-sentence paragraphs, the
+  // renamed indicator set (real yields/bond yields as بازده اوراق قرضه),
+  // the r7 euro-led sentence pair and the unit words به‌صورت شاخص/نسبت).
+  // Same class as the previous copy-edit bump: natural, explicit Persian
+  // prose is a few bytes longer per sentence (raw +7.97 kB, gzip +1.74 kB);
+  // all of it localized strings, none of it logic. The ENTRY chunk stays
+  // untouched. Justified in CHANGELOG §2026-10-13e (persian_site_copy_edited).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 505_000, gz: 123_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {

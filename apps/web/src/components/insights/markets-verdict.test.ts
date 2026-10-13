@@ -121,7 +121,7 @@ describe('markets copy parity (en/fa)', () => {
     expect('footer' in insightsCopyFa.markets).toBe(false);
     // The owner-quoted Persian line, verbatim, in the footer's attribution list.
     expect(insightsCopyFa.ui.attributionEodhd).toBe(
-      'منبع: EODHD (با پشتیبان Yahoo Finance). مقادیر پایان روز، به ارز محلی هر بازار.',
+      'منبع: EODHD با پشتیبانی Yahoo Finance. ارقام بازارها، قیمت پایانی روز و بر اساس ارز محلی هر بازار هستند.',
     );
     expect(insightsCopyEn.ui.attributionEodhd).toBe(
       'Source: EODHD (Yahoo Finance as backup). End-of-day values in each market’s local currency.',

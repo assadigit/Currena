@@ -10,14 +10,14 @@
     "id": "abs-jobs-2026-09",
     "date": "2026-10-15",
     "titleEn": "ABS jobs report (Labour Force): September 2026",
-    "titleFa": "گزارش نیروی کار استرالیا: سپتامبر ۲۰۲۶",
+    "titleFa": "گزارش وضعیت بازار کار استرالیا: سپتامبر ۲۰۲۶",
     "kind": "abs-jobs"
   },
   {
     "id": "fomc-2026-10",
     "date": "2026-10-28",
     "titleEn": "US Fed interest rate decision (FOMC)",
-    "titleFa": "تصمیم نرخ بهره فدرال رزرو آمریکا",
+    "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
     "kind": "fed"
   },
   {
@@ -52,7 +52,7 @@
     "id": "abs-jobs-2026-10",
     "date": "2026-11-19",
     "titleEn": "ABS jobs report (Labour Force): October 2026",
-    "titleFa": "گزارش نیروی کار استرالیا: اکتبر ۲۰۲۶",
+    "titleFa": "گزارش وضعیت بازار کار استرالیا: اکتبر ۲۰۲۶",
     "kind": "abs-jobs"
   },
   {
@@ -80,7 +80,7 @@
     "id": "fomc-2026-12",
     "date": "2026-12-09",
     "titleEn": "US Fed interest rate decision (FOMC)",
-    "titleFa": "تصمیم نرخ بهره فدرال رزرو آمریکا",
+    "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
     "kind": "fed"
   },
   {
@@ -94,14 +94,14 @@
     "id": "abs-jobs-2026-11",
     "date": "2026-12-17",
     "titleEn": "ABS jobs report (Labour Force): November 2026",
-    "titleFa": "گزارش نیروی کار استرالیا: نوامبر ۲۰۲۶",
+    "titleFa": "گزارش وضعیت بازار کار استرالیا: نوامبر ۲۰۲۶",
     "kind": "abs-jobs"
   },
   {
     "id": "fomc-2027-01",
     "date": "2027-01-27",
     "titleEn": "US Fed interest rate decision (FOMC)",
-    "titleFa": "تصمیم نرخ بهره فدرال رزرو آمریکا",
+    "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
     "kind": "fed"
   },
   {
@@ -129,7 +129,7 @@
     "id": "fomc-2027-03",
     "date": "2027-03-17",
     "titleEn": "US Fed interest rate decision (FOMC)",
-    "titleFa": "تصمیم نرخ بهره فدرال رزرو آمریکا",
+    "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
     "kind": "fed"
   },
   {
@@ -143,7 +143,7 @@
     "id": "fomc-2027-04",
     "date": "2027-04-28",
     "titleEn": "US Fed interest rate decision (FOMC)",
-    "titleFa": "تصمیم نرخ بهره فدرال رزرو آمریکا",
+    "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
     "kind": "fed"
   },
   {
