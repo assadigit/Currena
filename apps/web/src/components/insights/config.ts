@@ -256,6 +256,12 @@ export function indicatorValueParts(
     return { value: `${lo}–${num}${unit}`, unit: null };
   }
   if (cfg.unit === 'percent') return { value: `${num}${unit}`, unit: null }; // '5.31%' / '۵٫۳۱٪' — no space, both locales.
+  // Step-1 C7: "US$23.3 trillion" — the EN render prefixes the currency and
+  // suffixes the magnitude word; fa keeps its suffix-only form.
+  if (cfg.unit === 'usd-tr') {
+    if (numberLocale === 'en-US') return { value: `${units.usd}${num} ${unit}`, unit: null };
+    return { value: num, unit };
+  }
   if (numberLocale === 'en-US' && PREFIXED_UNITS.has(cfg.unit)) return { value: `${unit}${num}`, unit: null }; // 'US$113.96'
   return { value: num, unit }; // '۱۱۳٫۹۶ دلار آمریکا' / '0.48 pts'
 }
