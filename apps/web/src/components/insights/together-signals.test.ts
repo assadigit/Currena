@@ -44,8 +44,8 @@ describe('legPhrase (T1 right-now line assembly)', () => {
 
   it('fa phrases render the Persian template with the same inputs', () => {
     const fa = insightsCopyFa;
-    expect(legPhrase(leg({ level: 'high', direction: 'steady' }), 'طلا', fa)).toBe('طلا: بالا و ثابت');
-    expect(legPhrase(leg({}), 'طلا', fa)).toBe('طلا: دادهٔ تازه‌ای نیست');
+    expect(legPhrase(leg({ level: 'high', direction: 'steady' }), 'طلا', fa)).toBe('طلا: بالا و بدون تغییر محسوس');
+    expect(legPhrase(leg({}), 'طلا', fa)).toBe('طلا: دادهٔ به‌روز در دسترس نیست');
   });
 });
 

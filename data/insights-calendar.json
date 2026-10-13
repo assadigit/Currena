@@ -3,7 +3,7 @@
     "id": "us-cpi-2026-09",
     "date": "2026-10-14",
     "titleEn": "US consumer price index: September 2026",
-    "titleFa": "شاخص قیمت مصرف‌کننده آمریکا: سپتامبر ۲۰۲۶",
+    "titleFa": "شاخص قیمت مصرف‌کنندهٔ آمریکا، سپتامبر ۲۰۲۶",
     "kind": "us-cpi"
   },
   {
@@ -24,28 +24,28 @@
     "id": "abs-cpi-2026-09",
     "date": "2026-10-28",
     "titleEn": "ABS monthly CPI: September 2026",
-    "titleFa": "شاخص قیمت مصرف‌کننده ماهانه استرالیا: سپتامبر ۲۰۲۶",
+    "titleFa": "شاخص ماهانهٔ قیمت مصرف‌کنندهٔ استرالیا، سپتامبر ۲۰۲۶",
     "kind": "abs-cpi"
   },
   {
     "id": "rba-2026-11",
     "date": "2026-11-03",
     "titleEn": "RBA cash rate decision",
-    "titleFa": "تصمیم نرخ بهره رسمی استرالیا",
+    "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
     "kind": "rba"
   },
   {
     "id": "us-jobs-2026-10",
     "date": "2026-11-06",
     "titleEn": "US jobs report (Employment Situation): October 2026",
-    "titleFa": "گزارش اشتغال آمریکا: اکتبر ۲۰۲۶",
+    "titleFa": "گزارش اشتغال آمریکا، اکتبر ۲۰۲۶",
     "kind": "us-jobs"
   },
   {
     "id": "us-cpi-2026-10",
     "date": "2026-11-10",
     "titleEn": "US consumer price index: October 2026",
-    "titleFa": "شاخص قیمت مصرف‌کننده آمریکا: اکتبر ۲۰۲۶",
+    "titleFa": "شاخص قیمت مصرف‌کنندهٔ آمریکا، اکتبر ۲۰۲۶",
     "kind": "us-cpi"
   },
   {
@@ -59,21 +59,21 @@
     "id": "abs-cpi-2026-10",
     "date": "2026-11-25",
     "titleEn": "ABS monthly CPI: October 2026",
-    "titleFa": "شاخص قیمت مصرف‌کننده ماهانه استرالیا: اکتبر ۲۰۲۶",
+    "titleFa": "شاخص ماهانهٔ قیمت مصرف‌کنندهٔ استرالیا، اکتبر ۲۰۲۶",
     "kind": "abs-cpi"
   },
   {
     "id": "us-jobs-2026-11",
     "date": "2026-12-04",
     "titleEn": "US jobs report (Employment Situation): November 2026",
-    "titleFa": "گزارش اشتغال آمریکا: نوامبر ۲۰۲۶",
+    "titleFa": "گزارش اشتغال آمریکا، نوامبر ۲۰۲۶",
     "kind": "us-jobs"
   },
   {
     "id": "rba-2026-12",
     "date": "2026-12-08",
     "titleEn": "RBA cash rate decision",
-    "titleFa": "تصمیم نرخ بهره رسمی استرالیا",
+    "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
     "kind": "rba"
   },
   {
@@ -87,7 +87,7 @@
     "id": "us-cpi-2026-11",
     "date": "2026-12-10",
     "titleEn": "US consumer price index: November 2026",
-    "titleFa": "شاخص قیمت مصرف‌کننده آمریکا: نوامبر ۲۰۲۶",
+    "titleFa": "شاخص قیمت مصرف‌کنندهٔ آمریکا، نوامبر ۲۰۲۶",
     "kind": "us-cpi"
   },
   {
@@ -108,21 +108,21 @@
     "id": "abs-cpi-2026-12",
     "date": "2027-01-27",
     "titleEn": "ABS monthly CPI: December 2026",
-    "titleFa": "شاخص قیمت مصرف‌کننده ماهانه استرالیا: دسامبر ۲۰۲۶",
+    "titleFa": "شاخص ماهانهٔ قیمت مصرف‌کنندهٔ استرالیا، دسامبر ۲۰۲۶",
     "kind": "abs-cpi"
   },
   {
     "id": "rba-2027-02",
     "date": "2027-02-09",
     "titleEn": "RBA cash rate decision",
-    "titleFa": "تصمیم نرخ بهره رسمی استرالیا",
+    "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
     "kind": "rba"
   },
   {
     "id": "abs-cpi-2027-01",
     "date": "2027-02-24",
     "titleEn": "ABS monthly CPI: January 2027",
-    "titleFa": "شاخص قیمت مصرف‌کننده ماهانه استرالیا: ژانویه ۲۰۲۷",
+    "titleFa": "شاخص ماهانهٔ قیمت مصرف‌کنندهٔ استرالیا، ژانویهٔ ۲۰۲۷",
     "kind": "abs-cpi"
   },
   {
@@ -136,7 +136,7 @@
     "id": "rba-2027-03",
     "date": "2027-03-23",
     "titleEn": "RBA cash rate decision",
-    "titleFa": "تصمیم نرخ بهره رسمی استرالیا",
+    "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
     "kind": "rba"
   },
   {
@@ -150,7 +150,7 @@
     "id": "rba-2027-05",
     "date": "2027-05-04",
     "titleEn": "RBA cash rate decision",
-    "titleFa": "تصمیم نرخ بهره رسمی استرالیا",
+    "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
     "kind": "rba"
   }
 ]

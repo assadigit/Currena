@@ -531,8 +531,8 @@ describe('R28 sentence-versus-number (band words computed from live values)', ()
       false,
       bandWordsOf(insightsCopyFa),
     );
-    expect(line).toContain('بالای');
-    expect(line).toContain('نوار ۲ تا ۳٪ بانک مرکزی استرالیا');
+    expect(line).toContain('بالاتر از');
+    expect(line).toContain('بازهٔ هدف تورمی ۲ تا ۳ درصدی بانک مرکزی استرالیا');
   });
 
   it('needs-attention lines never say "usual range" or "inside the band" (static scan, both locales)', () => {

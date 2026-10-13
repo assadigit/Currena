@@ -12,7 +12,9 @@
     "build": "pnpm -r run build",
     "test": "pnpm -r run test",
     "typecheck": "pnpm -r run typecheck",
-    "deploy": "pnpm --filter @currena/api run deploy"
+    "deploy": "pnpm --filter @currena/api run deploy",
+    "copy:audit": "node scripts/audit-persian-copy.mjs",
+    "copy:audit:update": "node scripts/update-persian-copy-manifest.mjs"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

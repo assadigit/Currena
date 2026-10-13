@@ -126,7 +126,7 @@ describe('the §9.10 measure labels + §10.3 headlines', () => {
     expect(en.fx.measureNormal).toBe('Currency patterns: calm');
     expect(fa.fx.measureNormal).toBe('الگوهای ارزی: آرام');
     expect(en.fx.measureAttention).toBe('Currency patterns: worry signs');
-    expect(fa.fx.measureAttention).toBe('الگوهای ارزی: نشانه‌های نگرانی');
+    expect(fa.fx.measureAttention).toBe('الگوهای ارزی: نشانه‌هایی از نگرانی');
   });
 
   it('calm headline names the closest-to-warning pattern', () => {
@@ -138,7 +138,7 @@ describe('the §9.10 measure labels + §10.3 headlines', () => {
       'rules' | 'summary'
     >;
     expect(fxHeadline(snap, en.fx)).toBe('No pattern is active. Closest to a warning: “Nervous or relaxed?”.');
-    expect(fxHeadline(snap, fa.fx)).toContain('نگران یا آرام؟');
+    expect(fxHeadline(snap, fa.fx)).toContain('بازار نگران است یا آرام؟');
   });
 
   it('one active pattern: the active headline; plus-n-more rides the second template', () => {
@@ -222,7 +222,7 @@ describe('fxSentence — the two-part sentences (§7), EN + FA', () => {
       numbers: { dollar_m3: 4.25 },
     });
     const sentence = fxSentence(rule, fa.fx, 'fa-IR');
-    expect(sentence?.see).toBe('دلار آمریکا در سه ماه گذشته ۴٫۳ درصد در برابر ارزهای بزرگ تقویت شده است.');
+    expect(sentence?.see).toBe('دلار آمریکا در سه ماه گذشته ۴٫۳ درصد در برابر ارزهای بزرگ جهان تقویت شده است.');
     // No Latin digit may leak into the Farsi sentence.
     expect(sentence?.see).not.toMatch(/[0-9]/);
   });

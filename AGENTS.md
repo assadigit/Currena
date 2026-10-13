@@ -54,6 +54,13 @@ Package manager is **pnpm** (Node ≥ 20).
    **international common name** (ISO 4217 / CLDR en — e.g. "UAE Dirham"; Gate 1
    decision 2026-09-16); the fa locale renders proper Persian names from the
    i18n dictionary.
+   **Persian copy is audit-gated**: every user-facing fa string (both
+   dictionaries, calendar `titleFa`, hardcoded literals incl. the `format.ts`
+   time-ago mirrors) is fingerprinted in
+   `docs/localization/persian-copy-manifest.json`. Adding or changing one makes
+   `pnpm copy:audit` (CI gate) fail until the wording is reviewed and recorded —
+   see `docs/localization/persian-copy-workflow.md`; terminology lives in
+   `docs/localization/persian-terminology.md`. No em dashes in fa copy.
 6. **Canonical unit for Iranian rates: TOMAN.**
    The legacy app used the ISO code `IRR`, but every value it served (and every
    TGJU profile behind it: `price_dollar_rl`, `price_eur`, …) is denominated in

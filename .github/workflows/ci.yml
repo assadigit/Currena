@@ -1,8 +1,11 @@
 # CI (BACKLOG #47, I7 hardening) — the gate every push to main must pass:
 # typecheck (TS strict everywhere), the full vitest suite (tests never touch
-# live sites), the SPA build, and the bundle-budget check that keeps the
+# live sites), the SPA build, the bundle-budget check that keeps the
 # entry chunk (the converter — the money page) from regressing and the
 # Insights route lazy. Numbers + rationale live in scripts/check-bundle-budget.mjs.
+# Since round 2 of the Persian copy edit, the copy audit gate also runs: every
+# new or changed user-facing fa string must be triaged in the manifest
+# (docs/localization/persian-copy-workflow.md).
 #
 # pnpm comes from corepack (the repo's packageManager pin — setup-node's
 # toolcache node is runner-owned, so `corepack enable` needs no sudo).
@@ -50,3 +53,6 @@ jobs:
 
       - name: Bundle budget gate
         run: node scripts/check-bundle-budget.mjs
+
+      - name: Persian copy audit gate
+        run: pnpm copy:audit

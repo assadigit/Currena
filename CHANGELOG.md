@@ -5,6 +5,53 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-13f] — Persian copy round 2 applied + permanent localization audit system
+
+The owner returned all seven polished round-2 reference parts
+(`persian_site_copy_round2_part1..7_*_polished-translated.md` — 1,522 entries,
+every remaining fa string after round 1). The approved wording is applied
+across the whole Persian surface, and the repo now carries a permanent audit
+system so review status is never lost again.
+
+### Applied (values only — keys, tokens, EN dictionary, logic untouched)
+
+- **Insights dictionary** (`insights-copy-fa.ts`): 886 strings replaced
+  (dashboard UI, markets/fx sections, money/signals/together panels, the
+  47 indicator cards, the meaning one-liners behind `as Partial` casts).
+- **App dictionary** (`fa.ts`): 225 strings replaced (converter core, tools,
+  navigation, errors, accessibility labels); `currencies.irrLabel` is now
+  «تومان (IRR)».
+- **Calendar** (`data/insights-calendar.json`): all 14 remaining `titleFa`
+  titles (RBA decisions now «تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره»).
+- **Inline strings** (ICS calendar name, header language chip/menu) and the
+  four `format.ts` time-ago mirrors were reviewed and confirmed unchanged.
+- No em dashes introduced; every `{placeholder}` preserved (verified
+  programmatically); 7 test pins updated to the new approved wording;
+  full suite green (1,020 tests).
+
+### The audit system (docs/localization/)
+
+- `persian-copy-manifest.json` — 1,842 entries: every user-facing fa string
+  (1,802 dictionary keys, 22 calendar titles, 18 hardcoded literals) with its
+  final text, a conservative sha256 fingerprint (NFC only), source location,
+  round and reference. Statuses: processed / unreviewed / needs-review.
+- `scripts/audit-persian-copy.mjs` (`pnpm copy:audit`) — AST-based checker:
+  new dictionary keys, new hardcoded Persian literals (comments/tests never
+  scanned), changed reviewed text, removed entries, en↔fa key parity, and
+  time-ago mirror sync. Wired into CI as a gate next to the bundle budget.
+- `scripts/update-persian-copy-manifest.mjs` (`pnpm copy:audit:update`) —
+  records review decisions (snapshots current text; `processed` requires
+  round+reference).
+- `persian-copy-workflow.md` — the six-step workflow for future copy changes.
+- `persian-terminology.md` — the approved financial glossary with fixed
+  status/level vocabulary and context-sensitive pairs that must not unify.
+
+### Budget
+
+- Insights lazy chunk 501.96/122.69 → 543.31/127.75 kB (budget 505/123.5 →
+  545/128.5): 1,087 insights strings replaced with the approved natural
+  Persian — localized strings only, zero logic; entry chunk untouched.
+
 ## [2026-10-13e] — Revised Persian website copy applied (persian_site_copy_edited.md)
 
 The owner uploaded `persian_site_copy_edited.md` (an editorially revised

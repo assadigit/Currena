@@ -246,7 +246,17 @@ const BUDGETS = [
   // prose is a few bytes longer per sentence (raw +7.97 kB, gzip +1.74 kB);
   // all of it localized strings, none of it logic. The ENTRY chunk stays
   // untouched. Justified in CHANGELOG §2026-10-13e (persian_site_copy_edited).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 505_000, gz: 123_500, label: 'Insights lazy chunk' },
+  // Persian-copy round-2 bump (501.96/122.69 → 543.31/127.75, budget
+  // 505/123.5 → 545/128.5): the 2026-10-13 application of the owner's
+  // seven polished round-2 reference parts (1,522 entries — the complete
+  // remaining fa corpus: dashboard UI, markets/fx, money/signals/together
+  // panels, 47 indicator cards, converter core, tools, calendar titles).
+  // Same class as every copy-edit bump: 1,087 insights strings replaced
+  // with the approved natural-Persian wording (raw +41.35 kB, gzip +5.06 kB),
+  // all localized strings, zero logic. The ENTRY chunk stays untouched
+  // (290.36/87.07 vs 296/89.5). Justified in CHANGELOG §2026-10-13f
+  // (persian copy round 2 + the docs/localization audit system).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 545_000, gz: 128_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {

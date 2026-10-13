@@ -276,7 +276,7 @@ describe('formatRuleText', () => {
   it('renders the Farsi rule text with Persian digits', () => {
     const def = definitionFor('au-cpi');
     expect(formatRuleText(def.rule, 'au-cpi', insightsCopyFa.rule, insightsCopyFa.units, 'fa-IR')).toBe(
-      'بالاتر از ۳٪',
+      'بیشتر از ۳٪',
     );
   });
 

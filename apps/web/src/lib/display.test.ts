@@ -55,8 +55,8 @@ describe('currencies metadata parity — web display ↔ @currena/core', () => {
     }
   });
 
-  it('the IRR label keeps the owner rule shape in both locales (2026-09-17)', () => {
+  it('the IRR label in both locales (fa order polished in round 2)', () => {
     expect(en.currencies.irrLabel).toBe('IRR (Toman)');
-    expect(fa.currencies.irrLabel).toBe('IRR (تومان)');
+    expect(fa.currencies.irrLabel).toBe('تومان (IRR)');
   });
 });
