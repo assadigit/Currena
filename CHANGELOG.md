@@ -5,6 +5,90 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-13c] — The bilingual content audit (Persian + English editorial pass)
+
+Owner request 2026-10-13: a comprehensive audit and rewrite of ALL Persian
+and English user-facing text, edited as a bilingual financial desk would:
+natural, idiomatic, accurate, plain enough for non-economists, no em dashes,
+no literal translation artifacts. Scope: the full Insights corpus
+(insights-copy-en/fa: 41 indicators × 6 fields, consequence lines, meaning
+lines, markets + fx sections, together/signals/money), the main dictionary
+(en.ts/fa.ts: converter, alerts, boards, receipt, splitter, settle, batch,
+about, errors), and the PWA manifest name. Code, keys, interpolation tokens,
+units logic and all tests' semantic guarantees are untouched; every pinned
+string stayed pinned (fx headlines, attribution lines, leg phrases, band
+labels).
+
+### Persian (the bulk of the work: ~440 strings rewritten)
+
+- **Broken grammar repaired**: «فشار دلاریِ همیشگی پیداست نیست» → «دیده
+  نمی‌شود»; «پس یک ماجرای جهانی است» → «پس ماجرایی جهانی است»;
+  «فرانسه دومین اقتصاد بزرگ منطقهٔ یوروست» → «یورو است»;
+  «رکورد دلاری، رکوردِ قدرت خرچ نیست» → «خرج» (typo); «دلار آمریکای
+  قوی» → «دلار قوی آمریکا»; «میانگین است: پنهان می‌کند بدهی...» →
+  «و پنهان می‌کند که...».
+- **Calques replaced with natural Persian**: چرخ‌فلک (Ferris wheel!) →
+  الاکلنگ for the see-saw; لوله‌کشی بازار (market plumbing) → سازوکار
+  بازار; قرائت‌های نوجوانی/دههٔ بیستی (VIX "teens/20s") → ارقام نوجوان
+  (زیر ۲۰) / حدود ۲۰ تا ۳۰; سوپر (superannuation) → صندوق بازنشستگی;
+  قبض بهره (interest bill) → هزینهٔ بهره; لکه‌های ۲۰۱۷ (pockets) →
+  افت‌های موضعی; ترس از رشد (growth-scare) → نگرانی از رشد; کاشی →
+  کارت (view-switch aria); جفت کارری → جفت کری ترید (media usage);
+  «هدف نرخ اسکناس» (wrong term for the RBA cash rate) → «هدف نرخ
+  بین‌بانکی شبانه»; هم‌زادیِ پس‌اندازی → قرینِ پس‌اندازی; آینه‌عقب →
+  reworded; فشارسنج زیرِ نظر بازارها → بارومتر ریسک.
+- **Terminology unified across the corpus**: headline inflation → تورم کلی
+  (was تورم سرنویس); percentage points → واحد درصد (was نقطه; test
+  updated to the new term); safe haven → پناهگاه امن (was ارز امن in two
+  places); tight/tightening policy → سخت‌گیرانه (was سفت, in six lines);
+  loose → آسان (was شل); Works against → در تضاد است everywhere (verdict
+  words now match the Round-32 owner decision); Mixed → مختلط (was the
+  odd آمیخته); Unusual → غیرعادی (fx chip was غیرمعمول); demand deposits
+  → حساب‌های دیداری (was the ambiguous حساب جاری); preferred measure →
+  ترجیحی (was محبوب); gold "Used Gold" → طلای کارکرده (the Tehran market
+  term; also نیم‌سکه/ربع‌سکه half-spaces).
+- **Half-spaces, ezafe and punctuation**: به‌روزرسانی لحظه‌ای (was به
+  روزرسانی لحظه ای), ساخته‌شده, تولیدشده, جست‌وجوی, دادهٔ قدیمی,
+  هزینه‌های روزانهٔ خود, عادی‌سازی of the "jumping" lines (پیش از
+  برداشتِ روند کمی صبر کنید), and the double-colon footnotes (gold
+  boards) restructured in both locales.
+- **Semantic fixes**: fed-target whatItIs said «نقطهٔ میانی بازهٔ هدف»
+  while the card (per the Step-1 audit) shows the FULL RANGE — now
+  «بازهٔ هدف»; au-home-loan "outstanding" → وام‌های جاری (was باز, which
+  reads as "variable"); savings "overseas money can stretch further" was
+  mistranslated as «دوام بیاورد» — now «خرج بردارد»; fa aboutRulesBody
+  carried an extra backtest sentence the EN lacks — dropped for parity.
+- **Em dashes**: all 30 user-facing — removed (parentheses, semicolons or
+  colons as fits each sentence); code comments untouched.
+
+### English (~80 strings)
+
+- All user-facing em dashes removed (Sahm rule cluster, dataForStale,
+  collapsedStale ×2, hero alert lines, scoredFact/contextOnlyFact, the
+  CAC/Dow entries, goldHighYieldsWarning, attribution body, backtest note).
+- Plain-language fixes: "the 20s" → "those in the twenties" (VIX);
+  "dollar wallets" → "anyone holding dollars"; "approximates the bowser" →
+  "only approximates the pump" (bowser is Australian-only); "hang tight" →
+  "give it a moment"; "ONE count rule" → "a single count rule";
+  "Aussie dollar" → "Australian dollar" (register consistency);
+  "sat at historic highs through 2023–26" → "have sat at historic highs
+  since 2023"; the muddled au-10y "the decade before sat far lower after
+  2020's emergency setting" untangled.
+- Main dictionary: error-text punctuation, the honest alerts note expanded,
+  no-internet copy gets its article, the About intro de-jargoned, the batch
+  subtitle hyphen, gold-board footnotes' double colon.
+
+### Housekeeping
+
+- PWA manifest name: "Currena — Currency Converter" → "Currena | Currency
+  Converter" (matches the document title; em-dash rule).
+- Bundle budget: Insights lazy chunk 493/121.5 → **495/121.5 kB** (raw
+  +2.18 kB from longer-but-natural Persian; gzip actually fell to 120.95).
+  The entry chunk is untouched (290.36/87.08).
+- One test expectation updated with the terminology change
+  (formatChange fa points unit: نقطه → واحد درصد). All 293 web + 136 api
+  tests pass; typecheck clean.
+
 ## [2026-10-13b] — Always-live serving + path-URL routing (the /insights#/ fix)
 
 Owner report 2026-10-13: "I didn't see those [Step-2] fixes — and why does

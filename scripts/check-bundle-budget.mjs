@@ -224,7 +224,17 @@ const BUDGETS = [
   // bilingual cards + the card-spec discipline. The ENTRY chunk stays
   // untouched — Insights remains lazy. Justified in CHANGELOG §2026-10-13
   // (Insights Step-2 add list).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 493_000, gz: 121_500, label: 'Insights lazy chunk' },
+  // Bilingual copy-edit bump (491.81/121.04 → 493.99/120.95, budget
+  // 493/121.5 → 495/121.5): the 2026-10-13 full Persian+English editorial
+  // pass over the whole Insights corpus (~440 strings improved in fa, ~80
+  // in en: broken grammar repaired, calques rewritten as natural Persian,
+  // em dashes removed, terminology unified — headline CPI → تورم کلی, pts →
+  // واحد درصد, safe haven → پناهگاه امن, verdict words aligned with the
+  // Round-32 owner decision, and plainer jumping-line phrasings). Natural
+  // Persian is a few bytes longer per sentence; gzip actually FELL
+  // (120.95 vs 121.04). The ENTRY chunk stays untouched. Justified in
+  // CHANGELOG §2026-10-13 (bilingual content audit).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 495_000, gz: 121_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {

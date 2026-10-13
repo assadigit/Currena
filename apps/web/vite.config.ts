@@ -46,7 +46,7 @@ export default defineConfig({
         // CURRENA — the app icon/wordmark, document title and share files all
         // carry the brand; the legacy "Currency Converter Pro / CurrencyPro"
         // manifest names made the installed PWA look like a different product.
-        name: 'Currena — Currency Converter',
+        name: 'Currena | Currency Converter',
         short_name: 'Currena',
         description: 'Modern currency converter with live Iranian Toman rates',
         // Task 23 (Android packaging prep): stable app identity. Chrome

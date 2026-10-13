@@ -246,7 +246,8 @@ describe('formatChange', () => {
 
   it('renders signed point changes with the points unit', () => {
     expect(formatChange(0.11, 'points', 'en-US', insightsCopyEn.units)).toBe('+0.11 pts');
-    expect(formatChange(-0.11, 'points', 'fa-IR', insightsCopyFa.units)).toBe('−۰٫۱۱ نقطه');
+    // Persian percentage points read «واحد درصد» (the standard financial term).
+    expect(formatChange(-0.11, 'points', 'fa-IR', insightsCopyFa.units)).toBe('−۰٫۱۱ واحد درصد');
   });
 });
 

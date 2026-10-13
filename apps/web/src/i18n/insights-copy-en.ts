@@ -105,7 +105,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whatItIs:
       'The market yield on 10-year US inflation-protected Treasuries: the return lenders demand after inflation, from FRED.',
     whyItMatters:
-      'Real yields anchor the pricing of everything (homes, shares, currencies) and sat at historic highs through 2023–26.',
+      'Real yields anchor the pricing of everything (homes, shares, currencies) and have sat at historic highs since 2023.',
     tendedToMean:
       'High real yields make cash and bonds compete harder against riskier assets; the negative real yields of the 2010s did the opposite.',
     cantTell:
@@ -149,7 +149,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whyItMatters:
       'It is the anchor of the US rate system: mortgages, savings, business loans and global dollar borrowing all reprice around it.',
     tendedToMean:
-      'The near-zero setting after 2008 lasted seven years; the 2022 hikes were the fastest in four decades: settings this big take years to work through.',
+      'The near-zero setting after 2008 lasted seven years; the 2022 hikes were the fastest in four decades; settings this big take years to work through.',
     cantTell:
       'The setting says nothing about the next decision (markets reprice that constantly) and its effects arrive with long, uneven lags.',
     forYou:
@@ -313,13 +313,13 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whatItIs:
       'The Cboe Volatility Index (VIX): the market’s own measure of how big the next month’s S&P 500 swings are expected to be. Daily close from FRED (VIXCLS), © Cboe.',
     whyItMatters:
-      'It is the market’s own fear thermometer: readings in the teens mean calm, the 20s mean nerves, and the rare spikes above 30 have marked panics.',
+      'It is the market’s own fear thermometer: readings in the teens mean calm, those in the twenties mean nerves, and the rare spikes above 30 have marked panics.',
     tendedToMean:
       'The decade’s spikes (2015 China wobble, 2018 “Volmageddon”, 2020 COVID) each lined up with sharp share-market falls; calm stretches sit in the low teens.',
     cantTell:
       'It measures expected swings, not direction: a calm VIX says nothing about whether shares rise or fall, and it can jump overnight.',
     forYou:
-      'The one-glance answer to “how jumpy are world share markets today?” — background for super and share investments.',
+      'The one-glance answer to “how jumpy are world share markets today?”, and useful background for super and share investments.',
   },
   'gold-silver': {
     name: 'Gold’s price versus silver',
@@ -347,7 +347,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     // Step-1 audit item G4: "not the official DXY" rides the CARD, not
     // only the footer's attribution line.
     oneLiner:
-      'The Currena dollar basket — our own measure, not the official DXY index: the US dollar’s average value against the euro, yen, pound, Canadian dollar, krona and franc.',
+      'The Currena dollar basket (our own measure, not the official DXY index): the US dollar’s average value against the euro, yen, pound, Canadian dollar, krona and franc.',
     lines: {
       highRising: 'The dollar is strong and strengthening: a mix that tends to pressure world prices and debts.',
       highEasing: 'The dollar is strong but easing: pressure on world markets slowly lifting.',
@@ -466,7 +466,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whyItMatters:
       'The US is the world’s largest economy: its jobs numbers move global markets and the “risk-on, risk-off” mood that reaches Australian shares and the dollar.',
     tendedToMean:
-      'Rises of half a point or more from the cycle low have lined up with the start of US recessions — the pattern the Sahm rule next to this card formalises.',
+      'Rises of half a point or more from the cycle low have lined up with the start of US recessions. That pattern is what the Sahm rule next to this card formalises.',
     cantTell:
       'Monthly and an average across the whole workforce; individual industries and states can move very differently.',
     forYou: 'The first number to check when asking whether the US economy is slowing.',
@@ -475,7 +475,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     name: 'US recession alarm (Sahm rule)',
     ticker: 'Sahm rule',
     oneLiner:
-      'Flags when US unemployment is rising fast enough that a recession has usually already started — the signal is 0.50 or more.',
+      'Flags when US unemployment is rising fast enough that a recession has usually already started. The signal is a reading of 0.50 or more.',
     lines: {
       highRising: 'The Sahm rule has fired: US unemployment has risen 0.50+ points from its recent low, the pattern that has coincided with the start of past US recessions.',
       highEasing: 'The Sahm reading is elevated but easing.',
@@ -483,13 +483,13 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       low: 'The Sahm reading is well below the signal.',
     },
     whatItIs:
-      'The Sahm rule compares the 3-month average US unemployment rate with its lowest point over the past year. A reading of 0.50 or more is the standard recession signal — it has flagged every US recession since 1970, usually as they began.',
+      'The Sahm rule compares the 3-month average US unemployment rate with its lowest point over the past year. A reading of 0.50 or more is the standard recession signal; it has flagged every US recession since 1970, usually as they began.',
     whyItMatters:
-      'It turns one familiar number (unemployment) into a simple, rules-based recession alarm — no forecasts, just arithmetic on published data.',
+      'It turns one familiar number (unemployment) into a simple, rules-based recession alarm: no forecasts, just arithmetic on published data.',
     tendedToMean:
       'Half-point rises from a cycle low are how US recessions have started in the jobs data since 1970.',
     cantTell:
-      'It lags by construction (it needs a low to rise from) and says nothing about depth or length — only that a downturn has usually begun.',
+      'It lags by construction (it needs a low to rise from) and says nothing about depth or length, only that a downturn has usually begun.',
     forYou: 'A single glance at “is the US in recession territory?” before reading anything else.',
   },
   'copper-gold': {
@@ -566,7 +566,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     },
     unitNote: 'US dollars per troy ounce',
     whatItIs:
-      'The spot price of gold per troy ounce — an hourly quote from COMEX gold futures (GC=F) on top of a daily gold-api.com spot and a decade of monthly World Bank prices.',
+      'The spot price of gold per troy ounce: an hourly quote from COMEX gold futures (GC=F) on top of a daily gold-api.com spot and a decade of monthly World Bank prices.',
     whyItMatters:
       'Gold is the classic “fear + inflation” asset: it tends to rise when real rates fall or uncertainty spikes, and it anchors jewellery and savings prices in many countries.',
     tendedToMean:
@@ -588,7 +588,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     },
     unitNote: 'US dollars per troy ounce',
     whatItIs:
-      'The spot price of silver per troy ounce — an hourly quote from COMEX silver futures (SI=F) on top of a daily gold-api.com spot and a decade of monthly World Bank prices.',
+      'The spot price of silver per troy ounce: an hourly quote from COMEX silver futures (SI=F) on top of a daily gold-api.com spot and a decade of monthly World Bank prices.',
     whyItMatters:
       'Silver is half precious metal, half industrial input: investment demand and factory demand (electronics, solar panels) pull on the same price.',
     tendedToMean:
@@ -625,7 +625,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     name: 'Bitcoin price',
     ticker: 'BTC',
     oneLiner:
-      'The world price of one bitcoin, in US dollars — an hourly quote from Yahoo Finance’s spot index, on a daily gold-api.com backbone.',
+      'The world price of one bitcoin, in US dollars: an hourly quote from Yahoo Finance’s spot index on a daily gold-api.com backbone.',
     lines: {
       highRising: 'Bitcoin is expensive and rising: a mood that tends to accompany easy money and risk appetite.',
       highEasing: 'Bitcoin is expensive but easing off its highs.',
@@ -714,7 +714,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     name: 'What Australia pays to borrow for 10 years',
     ticker: 'RBA F2: 10y',
     oneLiner:
-      'What the Australian government pays to borrow for 10 years — it influences fixed home-loan rates and term deposits.',
+      'What the Australian government pays to borrow for 10 years; it influences fixed home-loan rates and term deposits.',
     lines: {
       highRising: 'Australian 10-year borrowing costs are high for their decade and rising: fixed home-loan rates and term deposits tend to sit higher in this setting.',
       highEasing: 'Australian 10-year borrowing costs are high for their decade but easing.',
@@ -726,9 +726,9 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whyItMatters:
       'Long-term rates set the price of multi-year money: fixed-rate home loans, term deposits and business borrowing price off this curve, not just the RBA’s cash rate.',
     tendedToMean:
-      'The 2022–24 global rate reset pushed it from near 1% to multi-year highs; the decade before sat far lower after 2020’s emergency setting.',
+      'The 2022–24 global rate reset pushed it from near 1% to multi-year highs; through the decade before, and especially after 2020’s emergency setting, it sat far lower.',
     cantTell:
-      'It moves with world bond markets — US yields, global growth news — so it can shift with no Australian news at all.',
+      'It moves with world bond markets (US yields, global growth news), so it can shift with no Australian news at all.',
     forYou: 'Background for fixed home-loan and term-deposit pricing.',
   },
   'au-us-10y-gap': {
@@ -786,9 +786,9 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whyItMatters:
       'Fuel is one of the most visible prices households meet: it feeds budgets, freight costs and headline inflation.',
     tendedToMean:
-      'Big swings came with oil shocks: fuel inflation hit 35% in 2022 and fell hard in 2020: petrol usually leads headline CPI’s turning points.',
+      'Big swings came with oil shocks: fuel inflation hit 35% in 2022 and fell hard in 2020; petrol usually leads headline CPI’s turning points.',
     cantTell:
-      'Monthly and about a month behind: pump prices move daily and differ by city, so the index approximates the bowser.',
+      'Monthly and about a month behind: pump prices move daily and differ by city, so the index only approximates the pump.',
     forYou:
       'A read on the fuel part of the cost of living: when this is high, the weekly tank fill and delivery prices usually feel it.',
   },
@@ -817,7 +817,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     name: 'Savings rates (new term deposits)',
     ticker: 'RBA F4.1',
     oneLiner:
-      'The average rate banks pay on new household term deposits — the rate a saver shopping today can get.',
+      'The average rate banks pay on new household term deposits: the rate a saver shopping today can get.',
     lines: {
       highRising: 'New term-deposit rates are high and rising: the setting that usually means more interest for savers.',
       highEasing: 'Term-deposit rates are high but easing.',
@@ -825,7 +825,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       low: 'New term-deposit rates are low: thin returns for cash savers.',
     },
     whatItIs:
-      'The weighted-average paid rate on new household term deposits, monthly from the RBA’s F4.1 table (the series starts July 2019 — the table’s full extent).',
+      'The weighted-average paid rate on new household term deposits, monthly from the RBA’s F4.1 table (the series starts July 2019, the table’s full extent).',
     whyItMatters:
       'It follows the RBA cash rate: term deposits and savings rates usually pay more after RBA hikes and less after cuts.',
     tendedToMean:
@@ -1133,13 +1133,13 @@ export const insightsCopyEn = {
       'How the verdict word is chosen: each area’s gauge steps 1–4 from how many of its scored indicators need attention. Critical: at least two areas critical, or every area stressed or worse. Stressed: at least two areas stressed or worse, or most areas cautious or worse. Cautious: any area cautious or worse. Stable: every area calm.',
     heroCalmList: 'Calm: {names}.',
     explainerScore:
-      'A region’s verdict word comes from ONE count rule (shown above this line), the same for both regions: the word can never disagree with the areas it names.',
+      'A region’s verdict word comes from a single count rule (shown above this line), the same for both regions: the word can never disagree with the areas it names.',
     explainerLabels: 'The labels describe conditions, not advice: Currena never recommends actions.',
     explainerStale: 'Stale or missing items are excluded from every gauge and count, and shown greyed with their last date.',
     // Step-1 audit item G5: the backtest sentence appears ONCE and states
     // its small sample ("only three crises" — the reader deserves the N).
     explainerBacktest:
-      'Thresholds were backtested against three crises — 2008, 2020 and 2022 — a small sample; the tables live in the project docs.',
+      'Thresholds were backtested against three crises (2008, 2020 and 2022), a small sample; the tables live in the project docs.',
     // H1 note: the Australia-first reading order with a swap setting.
     // Round-2 D7: the swap is RETIRED: Global is always first.
     // H2 → R3: needs-attention tiles with numbers under each verdict.
@@ -1184,7 +1184,7 @@ export const insightsCopyEn = {
     pricesAsOf: 'as of {date}',
     // Step-1 B5/C6: the card's data-date + change-window vocabulary.
     dataFor: 'data for {date}',
-    dataForStale: 'data for {date} — not updated since',
+    dataForStale: 'data for {date}, not updated since',
     releasedOn: 'released {date}',
     sincePreviousRelease: 'since previous release',
     // Step-2 add-list §B1: the policy cards' LAST DECISION (exact date +
@@ -1199,7 +1199,7 @@ export const insightsCopyEn = {
     // core CPI beside the headline, the US 10-year beside the AU one.
     companionNotes: {
       'us-cpi-yoy': 'The gap between them is mainly energy.',
-      'au-10y': 'shown for comparison — the US card carries its own story',
+      'au-10y': 'shown for comparison; the US card carries its own story',
     } as Partial<Record<string, string>>,
     // Step-2 §B5: the VIX card's interim presentation note (calm/nervous
     // words are the Step-3 verdict rules' deliverable).
@@ -1218,8 +1218,8 @@ export const insightsCopyEn = {
     staleAfterLine: 'shows “Stale” after {n} days',
     staleNever: 'never goes stale by age (it changes only on decisions)',
     fetchedLabel: 'Fetched',
-    scoredFact: 'Scored — counts toward its area’s verdict',
-    contextOnlyFact: 'Context only — never counts toward a verdict',
+    scoredFact: 'Scored: counts toward its area’s verdict',
+    contextOnlyFact: 'Context only: never counts toward a verdict',
     // L1: the lane switch.
     laneLabel: 'Region',
     laneAustralia: 'Australia',
@@ -1318,7 +1318,7 @@ export const insightsCopyEn = {
     // Cboe data redistributed through FRED (© Cboe); the iron-ore price is
     // context only and never votes.
     aboutSourcesBody:
-      'Sources: official publishers — the US Federal Reserve (FRED) and the US Bureau of Labor Statistics via FRED, the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics (CC BY 4.0) and the World Bank — plus market-data providers Frankfurter (ECB reference rates), gold-api.com, EODHD and Yahoo Finance (world stock markets, live commodity quotes, currencies). The VIX fear gauge is Cboe data redistributed through FRED (© Cboe). Iron ore is shown for context and never counts toward the verdicts. Each card names and links its own source. Free-tier licences are personal use; they are being reviewed before any commercial use.',
+      'Sources: official publishers, namely the US Federal Reserve (FRED) and the US Bureau of Labor Statistics via FRED, the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics (CC BY 4.0) and the World Bank, plus market-data providers Frankfurter (ECB reference rates), gold-api.com, EODHD and Yahoo Finance (world stock markets, live commodity quotes, currencies). The VIX fear gauge is Cboe data redistributed through FRED (© Cboe). Iron ore is shown for context and never counts toward the verdicts. Each card names and links its own source. Free-tier licences are personal use; they are being reviewed before any commercial use.',
     fredNotice:
       'This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank of St. Louis.',
     // Round 24 (roast): the English notice sits on its OWN dir=ltr line.
@@ -1432,7 +1432,7 @@ export const insightsCopyEn = {
     /** States (§6.6). */
     empty: 'Market data is being prepared. Check back after the next daily update.',
     collapsedStale:
-      'World stock market data is old — last update {date}. It returns after the next daily update.',
+      'World stock market data is old; last update {date}. It returns after the next daily update.',
     // Round 44 (owner): the source line moved to the page footer (About this
     // data → the attribution list) beside every other source credit.
     /** Detail panel headings (§6.5) + numbers. */
@@ -1454,9 +1454,9 @@ export const insightsCopyEn = {
     /** Hero integration (§5.3): the section signal joins the Global verdict's
      * attention module when raised. */
     heroAlertAttention:
-      'World stock markets · Needs attention — {n} of {count} markets are 10% or more below their 52-week high.',
+      'World stock markets · Needs attention: {n} of {count} markets are 10% or more below their 52-week high.',
     heroAlertUnusual:
-      'World stock markets · Unusual — {n} of {count} markets are 10% or more below their 52-week high.',
+      'World stock markets · Unusual: {n} of {count} markets are 10% or more below their 52-week high.',
     /** CSV export columns (the Tools menu, §6.4). */
     csvColMarket: 'Market',
     csvColToday: 'Today %',
@@ -1538,7 +1538,7 @@ export const insightsCopyEn = {
       cac: {
         name: 'CAC 40',
         latin: 'CAC 40',
-        what: 'The 40 largest companies on the Paris exchange — luxury goods, energy, banks and aerospace.',
+        what: 'The 40 largest companies on the Paris exchange: luxury goods, energy, banks and aerospace.',
         why: 'France is the eurozone’s second-largest economy; alongside the DAX and Euro Stoxx 50 it shows how Europe’s blue chips are faring.',
         you: 'It moves with the euro and European interest rates, which shape the cost of travel and goods imported from Europe.',
       },
@@ -1566,9 +1566,9 @@ export const insightsCopyEn = {
       dow: {
         name: 'Dow Jones',
         latin: 'Dow Jones',
-        what: 'The 30 biggest and best-known US companies — the index the evening news quotes.',
+        what: 'The 30 biggest and best-known US companies, the index the evening news quotes.',
         why: 'The world’s most famous market number: a big drop in the Dow leads the news everywhere and can set the mood for every market that opens after New York.',
-        you: 'It weights companies by price and holds only 30 of them, so the S&P 500 above is the better measure — but the Dow still moves sentiment, including the US shares inside many super funds.',
+        you: 'It weights companies by price and holds only 30 of them, so the S&P 500 above is the better measure, but the Dow still moves sentiment, including the US shares inside many super funds.',
       },
       tsx: {
         name: 'S&P/TSX Composite',
@@ -1664,7 +1664,7 @@ export const insightsCopyEn = {
     oldData: 'Old data · {date}',
     /** States (§9.5). */
     empty: 'Currency data is being prepared. Check back after the next daily update.',
-    collapsedStale: 'Currency data is old — last update {date}. It returns after the next daily update.',
+    collapsedStale: 'Currency data is old; last update {date}. It returns after the next daily update.',
     /** Footer line (§9.3 item 7). */
     footerLine: 'ECB reference rates, once a day. A pattern is a tendency, not a prediction.',
     /** §10.3 headline templates — generated from the numbers, no AI call. */
@@ -1675,8 +1675,8 @@ export const insightsCopyEn = {
     headlineWobble: 'Money is leaving stocks and the dollar together, which is unusual.',
     /** Hero integration (§6.5): raised currency signals appear in the
      * named-alerts block with the pattern names. */
-    heroAlertAttention: 'World currencies · Needs attention — {patterns}.',
-    heroAlertUnusual: 'World currencies · Unusual — {patterns}.',
+    heroAlertAttention: 'World currencies · Needs attention: {patterns}.',
+    heroAlertUnusual: 'World currencies · Unusual: {patterns}.',
     /** CSV export columns (the Tools menu, §9.3 item 6). */
     csvColPair: 'Pair',
     csvColToday: 'Today %',
@@ -2003,7 +2003,7 @@ export const insightsCopyEn = {
     'dollar-basket':
       'The dollar is at a decade high against major currencies: imports cost more outside the US.',
     usdjpy:
-      'The dollar has dropped fast against the yen: Japanese goods and travel got cheaper for dollar wallets.',
+      'The dollar has dropped fast against the yen: Japanese goods and travel got cheaper for anyone holding dollars.',
     'china-pmi':
       'Chinese factories are contracting: the world’s biggest raw-material buyer is pulling back.',
     'm2-us':
@@ -2013,7 +2013,7 @@ export const insightsCopyEn = {
     'us-unemployment':
       'US unemployment is high for its decade: a steady rise is usually the first sign of a slowing US economy.',
     'sahm-rule':
-      'The recession alarm has fired: US unemployment has risen 0.50+ points from its recent low — the pattern that has coincided with the start of past US recessions.',
+      'The recession alarm has fired: US unemployment has risen 0.50+ points from its recent low, the pattern that has coincided with the start of past US recessions.',
     vix: 'Market fear is in the top of its decade range: world share markets are jumpy.',
     'copper-gold':
       'Copper is historically cheap against gold: factory demand is running cold.',
@@ -2026,7 +2026,7 @@ export const insightsCopyEn = {
     'au-10y':
       'Australian 10-year borrowing costs are high for their decade: fixed home-loan rates and term deposits tend to sit higher in this setting.',
     'au-us-10y-gap':
-      'US 10-year money now costs more than Australia’s: the setting that has usually weighed on the Aussie dollar.',
+      'US 10-year money now costs more than Australia’s: the setting that has usually weighed on the Australian dollar.',
     'au-home-loan':
       'The rate people actually pay on home loans is at a decade high: mortgages bite hardest here.',
     'au-wage-growth':
@@ -2040,9 +2040,9 @@ export const insightsCopyEn = {
     'au-household-debt-arrears':
       'A historically large share of households is behind on loan payments: stress is showing in credit.',
     audusd:
-      'The Aussie dollar sits at a decade low against the US dollar: imports and overseas travel cost more.',
+      'The Australian dollar sits at a decade low against the US dollar: imports and overseas travel cost more.',
     audjpy:
-      'The Aussie dollar has dropped fast against the yen: trips to Japan cost more.',
+      'The Australian dollar has dropped fast against the yen: trips to Japan cost more.',
     'terms-of-trade':
       'Export prices are slipping against import prices: national income feels the squeeze.',
     'iron-ore':
@@ -2236,7 +2236,7 @@ export const insightsCopyEn = {
     // separate lines cannot say — gold at its decade high WHILE real
     // yields sit high too.
     goldHighYieldsWarning:
-      'Gold is near its 10-year high while real yields are also high: this combination has historically been difficult for gold — the conditions work against it even at a record price.',
+      'Gold is near its 10-year high while real yields are also high: this combination has historically been difficult for gold. The conditions work against it even at a record price.',
     // R26: neutral side words (no check/cross marks, no green/red).
     sideSupportive: 'Supports',
     sideAgainst: 'Works against',

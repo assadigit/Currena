@@ -13,7 +13,7 @@ export const en = {
     createdBy: 'Created by',
     creatorName: 'Ali Assadi',
     errorTitle: 'Something went wrong',
-    errorText: 'This page hit an unexpected error. Your data is safe: try again or head back to the converter.',
+    errorText: 'This page hit an unexpected error. Your data is safe. Try again, or head back to the converter.',
     errorRetry: 'Try again',
     errorHome: 'Go to converter',
   },
@@ -132,7 +132,7 @@ export const en = {
     /** I12: the failure card's retry affordance. */
     tryAgain: 'Try again',
     /** I12: neutral title for SERVER-side failures (no "check your connection"). */
-    conversionFailedServer: 'Conversion failed: hang tight',
+    conversionFailedServer: 'Conversion failed: give it a moment',
   },
 
   /** I14: rate alerts: watch a pair, get told when it crosses a target. */
@@ -155,7 +155,7 @@ export const en = {
     triggered: 'Triggered at {rate}',
     firedToast: '🔔 {pair} just crossed {threshold}',
     firedMore: '+{count} more alert(s) fired',
-    honestNote: 'Checked while Currena is open: no background notifications.',
+    honestNote: 'Alerts are checked only while Currena is open; there are no background notifications.',
     invalidThreshold: 'Enter a target rate above 0',
     sameCurrency: 'Pick two different currencies',
     badge: '{count} triggered',
@@ -244,9 +244,9 @@ export const en = {
     goldDomestic: 'Tehran Market · Toman',
     goldUnitUsd: 'USD',
     goldUnitToman: 'Toman',
-    goldFootnote: 'Global ounce in USD, Tehran market in Toman: TGJU real quotes: current · day high · day low · change %',
+    goldFootnote: 'Global ounce in USD, Tehran market in Toman. TGJU real quotes: current · day high · day low · change %',
     /** Footnote for the CURRENT-only placement (homepage two-up row). */
-    goldFootnoteCurrent: 'Global ounce in USD, Tehran market in Toman: TGJU real quotes: current · change %',
+    goldFootnoteCurrent: 'Global ounce in USD, Tehran market in Toman. TGJU real quotes: current · change %',
     detailsSection: 'Details & trends',
   },
 
@@ -430,7 +430,7 @@ export const en = {
 
   batchConverter: {
     title: '🛒 Batch Converter',
-    subtitle: 'Convert multiple prices at once - perfect for online shopping!',
+    subtitle: 'Convert multiple prices at once, perfect for online shopping!',
     currencySelection: '💱 Currency Selection',
     quickTemplates: '📋 Quick Templates:',
     templateShopping: '🛍️ Shopping Cart (5 items)',
@@ -495,7 +495,7 @@ export const en = {
     contactTitle: '✉️ Contact',
     contactText: 'Questions, feedback or bug reports are welcome: reach the developer on GitHub:',
     aboutText1:
-      'Currena is a currency conversion application designed to help you navigate financial decisions with ease. Built with Iranians in mind, it addresses the challenges of currency volatility, especially for the Iranian Toman.',
+      'Currena is a currency converter built to make everyday money decisions easier. Designed with Iranians in mind, it addresses the challenge of currency volatility, especially for the Iranian Toman.',
     featureTravel: 'Perfect for travel to Turkey, UAE, and beyond',
     featureImmigration: 'Plan your immigration to Australia, Canada, and other destinations',
     featureRates: 'Real-time exchange rates from trusted sources',
@@ -508,7 +508,7 @@ export const en = {
   errors: {
     unableToFetchRate: 'Unable to fetch exchange rate. Please try again.',
     noInternetNoCache:
-      'No internet connection and no cached data available. Please connect to internet at least once.',
+      'No internet connection and no cached data available. Please connect to the internet at least once.',
     pairNotSupported: 'This currency pair is not supported by the rate source.',
     /** I12: honest server-vs-network failure copy (2026-10-07 incident:
      *  telling users to "check your connection" while the API 500'd was
