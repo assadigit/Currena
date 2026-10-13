@@ -1,0 +1,19 @@
+name: rba-probe
+on: [workflow_dispatch]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe RBA tables
+        run: |
+          UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36"
+          for f in f5.1 f5.2 f2 f1; do
+            echo "=================== $f-data.csv ==================="
+            curl -s --max-time 60 -A "$UA" "https://www.rba.gov.au/statistics/tables/csv/${f}-data.csv" -o /tmp/${f}.csv
+            echo "--- size: $(wc -c < /tmp/${f}.csv) bytes"
+            echo "--- first 12 lines:"
+            head -12 /tmp/${f}.csv
+            echo "--- last 3 lines:"
+            tail -3 /tmp/${f}.csv
+            echo
+          done
