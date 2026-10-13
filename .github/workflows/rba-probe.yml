@@ -4,23 +4,28 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe RBA F4 CSVs + BLS schedule
+      - name: Probe BLS + FRED release dates
         run: |
           UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36"
-          for f in f4-data f4.1-data f04-data f04-1-data f4-hist f4.1-hist f04hist f04-1-hist; do
-            echo "=================== ${f}.csv ==================="
-            curl -s --max-time 60 -A "$UA" "https://www.rba.gov.au/statistics/tables/csv/${f}.csv" -o /tmp/t.csv
-            sz=$(wc -c < /tmp/t.csv)
-            echo "size: $sz"
-            if [ "$sz" -lt 20000 ]; then head -3 /tmp/t.csv; else head -14 /tmp/t.csv; echo "--- last 3:"; tail -3 /tmp/t.csv; fi
-            echo
+          echo "=== BLS empsit raw (first 600 chars) ==="
+          curl -s --max-time 60 -A "$UA" "https://www.bls.gov/schedule/news_release/empsit.htm" | head -c 600
+          echo; echo "=== BLS 2026-11 month schedule ==="
+          curl -s --max-time 60 -A "$UA" "https://www.bls.gov/schedule/2026/11.htm" -o /tmp/nov.html -w "HTTP %{http_code} size %{size_download}\n"
+          grep -oiE "(Employment Situation|Consumer Price Index)[^<]{0,60}" /tmp/nov.html | head -6
+          echo "=== BLS 2026-12 month schedule ==="
+          curl -s --max-time 60 -A "$UA" "https://www.bls.gov/schedule/2026/12.htm" -o /tmp/dec.html -w "HTTP %{http_code} size %{size_download}\n"
+          grep -oiE "(Employment Situation|Consumer Price Index)[^<]{0,60}" /tmp/dec.html | head -6
+          echo "=== BLS 2026-10 month schedule ==="
+          curl -s --max-time 60 -A "$UA" "https://www.bls.gov/schedule/2026/10.htm" -o /tmp/oct.html -w "HTTP %{http_code} size %{size_download}\n"
+          grep -oiE "(Employment Situation|Consumer Price Index)[^<]{0,60}" /tmp/oct.html | head -6
+          echo "=== FRED release dates URL variants ==="
+          for u in "https://fred.stlouisfed.org/release/dates/10" "https://fred.stlouisfed.org/release/dates?rid=10&realtime_start=2026-10-01" "https://fred.stlouisfed.org/releases/dates?rid=10"; do
+            code=$(curl -s -o /tmp/f.html -w "%{http_code}" --max-time 30 -A "Mozilla/5.0" "$u")
+            echo "$u -> $code ($(wc -c < /tmp/f.html) bytes)"
+            grep -oE '[A-Z][a-z]{2} \d{1,2}, 202[67]' /tmp/f.html | head -4
           done
-          echo "=== BLS empsit schedule raw text ==="
-          curl -s --max-time 60 -A "$UA" "https://www.bls.gov/schedule/news_release/empsit.htm" -o /tmp/empsit.html
-          echo "size: $(wc -c < /tmp/empsit.html)"
-          sed 's/<[^>]*>/|/g' /tmp/empsit.html | tr -s '|' ' ' | grep -oE "[A-Z][a-z]+ [0-9]{1,2}, 2026[^0-9]" | head -20
-          echo
-          echo "=== BLS cpi schedule raw text ==="
-          curl -s --max-time 60 -A "$UA" "https://www.bls.gov/schedule/news_release/cpi.htm" -o /tmp/cpi.html
-          echo "size: $(wc -c < /tmp/cpi.html)"
-          sed 's/<[^>]*>/|/g' /tmp/cpi.html | tr -s '|' ' ' | grep -oE "[A-Z][a-z]+ [0-9]{1,2}, 2026[^0-9]" | head -20
+          echo "=== RBA f4.1 full head+tail ==="
+          curl -s --max-time 60 -A "$UA" "https://www.rba.gov.au/statistics/tables/csv/f4.1-data.csv" -o /tmp/f41.csv
+          head -13 /tmp/f41.csv
+          echo "--- tail 4:"
+          tail -4 /tmp/f41.csv
