@@ -28,17 +28,23 @@ Every I2 adapter (FRED / Frankfurter / ABS / World Bank / gold-api / Bitstamp / 
 
 - **Access (probe 2026-10-06):** every series below is served as CSV **without an API key** from `https://fred.stlouisfed.org/graph/fredgraph.csv?id=<SERIES>` (HTTP 200, current observations; series metadata pages also read). **No FRED API key is needed** for the planned route; the keyed JSON API (`api.stlouisfed.org`) remains an optional fallback (owner-created key, stored as a GitHub secret, only if we ever switch).
 - **Phase I2 header finding (2026-10-06):** FRED's Akamai edge **hangs (connection timeout) on a desktop-Chrome User-Agent** from the build egress — a headerless or descriptive-UA request answers in ~50 ms. The FRED adapter therefore sends `CurrenaInsights/1.0 (…)`, re-verified live from the ingestion venue. All other sources accept the browser fingerprint.
-- **Licence (probe 2026-10-06):** FRED legal page read. Every series used is U.S.-government-sourced (**public domain**); `DCOILBRENTEU` is now sourced from EIA — EIA terms read, also U.S. government / public domain. Third-party copyrighted FRED series (ICE BofA, Cboe, S&P) remain **not used** — see "Blocked sources" below.
+- **Licence (probe 2026-10-06):** FRED legal page read. Every series used is U.S.-government-sourced (**public domain**); `DCOILBRENTEU` is now sourced from EIA — EIA terms read, also U.S. government / public domain. Third-party copyrighted FRED series (ICE BofA, S&P) remain **not used**. **Step-2 §B5 exception (2026-10-13):** `VIXCLS` (Cboe) joined by the owner's explicit add-list instruction, "check its licence" — carried with attribution ("FRED (VIXCLS), © Cboe" on the card + About) and parked on the same commercial-use review list as EODHD/Yahoo/gold-api; the other Cboe/S&P series stay out.
 
 | Indicator ID | Series | Cadence | Probe verdict |
 |---|---|---|---|
 | `yield-curve-10y2y` | `T10Y2Y` | Daily | ✅ current |
 | `real-yield-10y` | `DFII10` | Daily | ✅ current |
-| `us10y` / `au-us-10y-gap` (US side) | `DGS10` | Daily | ✅ current |
+| `us10y` / `au-us-10y-gap` (US side) / **`au-10y` comparison companion (Step-2 §B2)** | `DGS10` | Daily | ✅ current |
 | `breakeven-5y5y` | `T5YIFR` | Daily | ✅ current |
-| `dollar-broad` | `DTWEXBGS` | Daily | ✅ current |
+| `dollar-broad` | `DTWEXBGS` | Daily | ✅ current (retired I15 — replaced by the Currena basket) |
 | `stress-stlfsi` | `STLFSI4` | Weekly | ✅ current — **Gate I0 D2: confirmed as the stress indicator** (the Chicago Fed `NFCI` alternative is not needed) |
+| `nfci` (I15) | `NFCI` | Weekly | ✅ current |
 | `m2-us` | `M2SL` | Monthly | ✅ current |
+| **`us-unemployment` (Step-2 §B3)** | `UNRATE` | Monthly | ✅ current — re-verified 2026-10-13: Sep 2026 = 4.2 |
+| **`sahm-rule` (Step-2 §B4)** | `SAHMREALTIME` | Monthly | ✅ current — re-verified 2026-10-13: Sep 2026 = 0.00 |
+| **`vix` (Step-2 §B5)** | `VIXCLS` (© Cboe — see the licence note above) | Daily | ✅ current — re-verified 2026-10-13: Oct 9 = 14.84 |
+| `us-cpi-yoy` / `us-cpi-core-yoy` | `CPIAUCSL` / `CPILFESL` | Monthly | ✅ current (12-month change derived) |
+| `fed-target` | `DFEDTARL` + `DFEDTARU` | Daily | ✅ current (Step-1 A1: the true published corridor) |
 | `govt-interest-revenue` | `A091RC1Q027SBEA` (federal interest payments) ÷ `W006RC1Q027SBEA` (federal receipts) | Quarterly | ✅ both series identified and verified current — fills the "agent to identify" slot from planning |
 | `brent` | `DCOILBRENTEU` | Daily | ✅ current (EIA-sourced) |
 
@@ -52,8 +58,9 @@ Every I2 adapter (FRED / Frankfurter / ABS / World Bank / gold-api / Bitstamp / 
 
 | Indicator ID | Table | Cadence | Status |
 |---|---|---|---|
-| `rba-cash-rate` | F1.1 'Cash Rate Target' (monthly average) | Per change | ✅ venue-verified; live through 2026-09 |
-| `au-us-10y-gap` (AU side) | F2 'Australian Government 10 year bond' | Daily (publishes T+2..4) | ✅ venue-verified; live through 2026-09-30 |
+| `rba-cash-rate` | F1 'Cash Rate Target' (DAILY — Step-1 A4 upgrade) with F1.1 (monthly average) as fallback | Per change | ✅ venue-verified; the Sep-2026 hike reads 4.60% from its effective date |
+| `au-10y` (Step-2 §B2) + `au-us-10y-gap` (AU side) | F2 'Australian Government 10 year bond' (series ID FCMYGBAG10D) | Daily (publishes T+2..4) | ✅ venue-verified; re-probed 2026-10-13 — published 09-Oct, live through 2026-10-07 |
+| `au-deposit-rate` (Step-2 §B7) | **F4.1 'Paid Deposit Rates', series ID PDRNTH** (weighted-average paid rate on NEW household term deposits) | Monthly (month-end obs) | ✅ venue-verified 2026-10-13 — table published 08-Oct-2026, Aug-2026 obs = 4.8% per annum; **the old F5 retail-deposit layout no longer exists** (the RBA's current deposit tables are F4 advertised / F4.1 paid); series starts Jul-2019 (the table's full extent — no 10-year history exists, noted on the card) |
 | `au-household-debt-arrears` | **E2 'Household debt to income'** (ABS-calculated ratios republished by RBA) | Quarterly | ✅ venue-verified; live through 2026-Q2 — the "ABS E2" planning slot resolves to this RBA table (the ABS Data API carries no household-finance-ratios dataflow; catalogue searched in full) |
 | `audusd`, `audjpy`, `usdcny` (cross-check) | F11.1 (daily 2023→current) + F11 (monthly from 1983) | Daily / monthly | ◐ available and venue-reachable; **not wired** — FX indicators use Frankfurter (ECB history back to 2004 covers the 10-year percentiles), F11 cross-check documented for a future hardening pass |
 
@@ -98,8 +105,8 @@ Every I2 adapter (FRED / Frankfurter / ABS / World Bank / gold-api / Bitstamp / 
 |---|---|---|
 | `cape` | Robert Shiller's dataset (Yale) | ❌ **deferred to P3** (Gate I0 accepted): Yale `ie_data.xls` frozen at 2023-09 (HTTP Last-Modified 2023-10-17); shillerdata.com download links 404; the workbook's disclaimer sheet carries no licence. No current, licensed source exists. |
 | `china-pmi` | China NBS official PMI | ✅ plan confirmed: english site reachable, **no machine-readable feed** → manual monthly entry in `data/manual/china-pmi.json` (zod-validated) until a reliable feed appears |
-| Calendar (RBA, ABS CPI, Fed meetings) | Official published schedules | ☐ hand-entered once or twice a year into `data/insights-calendar.json` (zod-validated) — unchanged from planning |
-| `vix` | Cboe | ❌ display prohibited → **link-out only** (Gate I0 D2): a labelled external link on the page, no data stored or displayed |
+| Calendar (RBA, ABS CPI, Fed meetings) | Official published schedules | ☐ hand-entered once or twice a year into `data/insights-calendar.json` (zod-validated) — unchanged from planning. **Step-2 §D:** + ABS Labour Force (15 Oct / 19 Nov / 17 Dec 2026, verified from abs.gov.au) and US Employment Situation (6 Nov / 4 Dec 2026 + US CPI 10 Nov / 10 Dec, verified via the Forex Factory aggregated calendar — bls.gov is Akamai-blocked from both the sandbox AND the Actions runner, archive.org was offline; the FRED release-dates API needs an API key the project does not hold — a key is the documented future upgrade) |
+| `vix` | **FRED VIXCLS (Step-2 §B5)** — Cboe data redistributed through FRED | ✅ owner-approved via the Step-2 add list (supersedes the Gate I0 D2 link-out decision): daily close fetched keyless like every other FRED series, attributed "FRED (VIXCLS), © Cboe" on the card + About; **commercial-use review pending** with the other provider licences. Direct Cboe display (the old D2 concern) remains not used |
 | `spx-gold`, `breadth` | licensed index data | ❌ out of v1 (P3) — Gate I0 D2 |
 
 ### Blocked sources (do not use) — all probed 2026-10-06
