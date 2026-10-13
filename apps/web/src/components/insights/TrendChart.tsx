@@ -476,8 +476,11 @@ export function TrendPanel({
             data-trend-delta={id}
             {...deltaData}
           >
-            <bdi dir="ltr">{deltaText}%</bdi>
-            <span className="sr-only">, {ui[TREND_RANGE_COPY_KEY[range]]}</span>
+            {/* Step-1 audit item C11: the range word is VISIBLE — "−5.5%"
+             * alone (with "Quarter" hidden in sr-only) read as a forecast;
+             * it is the PAST window's measured change. */}
+            <bdi dir="ltr">{deltaText}%</bdi>{' '}
+            <span className="opacity-80">{ui[TREND_RANGE_COPY_KEY[range]]}</span>
           </span>
         ) : null}
       </span>

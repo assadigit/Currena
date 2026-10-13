@@ -63,25 +63,27 @@ export const LIVE_PRICE_ASSETS: Readonly<Record<PriceAssetId, LivePriceAssetConf
   brent: {
     yahooSymbol: 'BZ=F',
     intervalMinutes: 60,
-    sourceName: 'Yahoo Finance (Brent futures, live)',
+    // Step-1 audit item A9: the attribution names the CONTRACT, not just the
+    // venue — the tile shows exactly which price it carries.
+    sourceName: 'Yahoo Finance — Brent front-month futures (BZ=F)',
     sourceUrl: 'https://finance.yahoo.com/quote/BZ=F',
   },
   'gold-usd': {
     yahooSymbol: 'GC=F',
     intervalMinutes: 60,
-    sourceName: 'Yahoo Finance (gold futures, live)',
+    sourceName: 'Yahoo Finance — COMEX gold futures (GC=F)',
     sourceUrl: 'https://finance.yahoo.com/quote/GC=F',
   },
   'silver-usd': {
     yahooSymbol: 'SI=F',
     intervalMinutes: 60,
-    sourceName: 'Yahoo Finance (silver futures, live)',
+    sourceName: 'Yahoo Finance — COMEX silver futures (SI=F)',
     sourceUrl: 'https://finance.yahoo.com/quote/SI=F',
   },
   'btc-usd': {
     yahooSymbol: 'BTC-USD',
     intervalMinutes: 60,
-    sourceName: 'Yahoo Finance (Bitcoin spot, live)',
+    sourceName: 'Yahoo Finance — Bitcoin spot index (BTC-USD)',
     sourceUrl: 'https://finance.yahoo.com/quote/BTC-USD',
   },
 };
@@ -97,17 +99,20 @@ export const INTERVAL_SLACK_MINUTES = 2;
 
 /**
  * Companion ratios recomputed at serve time from the live bases (merge.ts):
- * the Bitcoin tile's context line (gold and silver per BTC) and the gold
- * tile's A$ companion. copper-usd and copper-gold deliberately stay on the
- * daily cadence — Yahoo's HG quote is USD per pound while the stored series
- * is USD per tonne, and a unit-bridging live override is not worth the risk
- * on a context row.
+ * the Bitcoin tile's context line (gold and silver per BTC), the gold
+ * tile's A$ companion, and the gold/silver ratio — Step-1 audit item C3:
+ * every derived number on the page comes from the SAME snapshot as the
+ * prices shown beside it. copper-usd and copper-gold deliberately stay on
+ * the daily cadence — Yahoo's HG quote is USD per pound while the stored
+ * series is USD per tonne, and a unit-bridging live override is not worth
+ * the risk on a context row.
  */
-export const LIVE_RATIO_SOURCES: Readonly<Record<'gold-btc' | 'silver-btc' | 'gold-aud', PriceAssetId[]>> = {
+export const LIVE_RATIO_SOURCES: Readonly<Record<'gold-btc' | 'silver-btc' | 'gold-aud' | 'gold-silver', PriceAssetId[]>> = {
   'gold-btc': ['gold-usd', 'btc-usd'],
   'silver-btc': ['silver-usd', 'btc-usd'],
   // gold-aud also needs the snapshot's audusd reading — merge.ts handles it.
   'gold-aud': ['gold-usd'],
+  'gold-silver': ['gold-usd', 'silver-usd'],
 };
 
 /** Shared attribution for the recomputed companion ratios. */
@@ -118,4 +123,5 @@ export const LIVE_RATIO_SOURCE = {
     name: 'Yahoo Finance (gold, live) × Frankfurter (AUD)',
     url: 'https://finance.yahoo.com',
   },
+  goldSilver: { name: 'Yahoo Finance (live ratio)', url: 'https://finance.yahoo.com' },
 } as const;

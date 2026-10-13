@@ -373,7 +373,7 @@ describe('computeReading', () => {
     expect(r.status).toBe('context');
   });
 
-  it('change7d/change30d: pct and points conversions; sparse anchors show undefined', () => {
+  it('change7d/change30d: pct and points conversions; monthly/quarterly speak "since the previous release"', () => {
     const daily = dailySeries(40, (i) => 100 + i); // current 139 at 2023-02-10
     const pct = readingOf(makeDef({ rule: { kind: 'info' }, changeKind: 'pct' }), daily);
     expect(pct.change7d).toBeCloseTo(((139 - 132) / 132) * 100, 6);
@@ -382,11 +382,20 @@ describe('computeReading', () => {
     expect(pts.change7d).toBe(7);
     expect(pts.change30d).toBe(30);
 
-    // Quarterly series: 7d/30d anchors are far away → undefined, never mislabelled
+    // Step-1 audit item C6: quarterly series — the change is vs the PREVIOUS
+    // OBSERVATION (the previous release), and there is no 7-day change.
     const quarterly = [0, 90, 180].map((d) => ({ date: addDays('2024-01-01', d), value: 100 + d }));
     const q = readingOf(makeDef({ rule: { kind: 'info' }, changeKind: 'pct', cadence: 'quarterly' }), quarterly, '2024-07-05T00:00:00Z');
     expect(q.change7d).toBeUndefined();
-    expect(q.change30d).toBeUndefined();
+    // current 280 (2024-06-29) vs previous 190 (2024-03-31) → +47.37%
+    expect(q.change30d).toBeCloseTo(((280 - 190) / 190) * 100, 6);
+    const qPts = readingOf(makeDef({ rule: { kind: 'info' }, changeKind: 'points', cadence: 'quarterly' }), quarterly, '2024-07-05T00:00:00Z');
+    expect(qPts.change30d).toBe(90); // 280 − 190: percentage points vs previous release
+    // Monthly cadence behaves the same way.
+    const monthly = [0, 31, 59].map((d) => ({ date: addDays('2024-01-01', d), value: 3.0 + d / 100 }));
+    const m = readingOf(makeDef({ rule: { kind: 'info' }, changeKind: 'points', cadence: 'monthly' }), monthly, '2024-03-15T00:00:00Z');
+    expect(m.change7d).toBeUndefined();
+    expect(m.change30d).toBeCloseTo((3.59 - 3.31), 6); // points vs previous release
   });
 
   it('percentile10y appears once the base clears the floor, else absent', () => {

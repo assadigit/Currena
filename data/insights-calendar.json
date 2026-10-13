@@ -1,5 +1,12 @@
 [
   {
+    "id": "us-cpi-2026-09",
+    "date": "2026-10-14",
+    "titleEn": "US consumer price index: September 2026",
+    "titleFa": "شاخص قیمت مصرف‌کننده آمریکا: سپتامبر ۲۰۲۶",
+    "kind": "us-cpi"
+  },
+  {
     "id": "fomc-2026-10",
     "date": "2026-10-28",
     "titleEn": "US Fed interest rate decision (FOMC)",
@@ -7,10 +14,10 @@
     "kind": "fed"
   },
   {
-    "id": "abs-cpi-2026-q3",
+    "id": "abs-cpi-2026-09",
     "date": "2026-10-28",
-    "titleEn": "ABS consumer price index: September quarter",
-    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا: سه‌ماهه سوم",
+    "titleEn": "ABS monthly CPI: September 2026",
+    "titleFa": "شاخص قیمت مصرف‌کننده ماهانه استرالیا: سپتامبر ۲۰۲۶",
     "kind": "abs-cpi"
   },
   {
@@ -23,8 +30,8 @@
   {
     "id": "abs-cpi-2026-10",
     "date": "2026-11-25",
-    "titleEn": "ABS consumer price index: October",
-    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا: اکتبر",
+    "titleEn": "ABS monthly CPI: October 2026",
+    "titleFa": "شاخص قیمت مصرف‌کننده ماهانه استرالیا: اکتبر ۲۰۲۶",
     "kind": "abs-cpi"
   },
   {
@@ -49,10 +56,10 @@
     "kind": "fed"
   },
   {
-    "id": "abs-cpi-2026-q4",
+    "id": "abs-cpi-2026-12",
     "date": "2027-01-27",
-    "titleEn": "ABS consumer price index: December quarter",
-    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا: سه‌ماهه چهارم",
+    "titleEn": "ABS monthly CPI: December 2026",
+    "titleFa": "شاخص قیمت مصرف‌کننده ماهانه استرالیا: دسامبر ۲۰۲۶",
     "kind": "abs-cpi"
   },
   {
@@ -65,8 +72,8 @@
   {
     "id": "abs-cpi-2027-01",
     "date": "2027-02-24",
-    "titleEn": "ABS consumer price index: January",
-    "titleFa": "شاخص قیمت مصرف‌کننده استرالیا: ژانویه",
+    "titleEn": "ABS monthly CPI: January 2027",
+    "titleFa": "شاخص قیمت مصرف‌کننده ماهانه استرالیا: ژانویه ۲۰۲۷",
     "kind": "abs-cpi"
   },
   {

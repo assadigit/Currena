@@ -20,18 +20,24 @@ import { IconImg, indicatorIconUrl } from '../icons/currena';
 import { Sparkline } from '../Sparkline';
 import {
   bandWordsOf,
+  changeScaleOf,
+  changeWindowLabel,
   consequenceLine,
   consequenceState,
+  dataPeriodText,
   definitionFor,
   formatChange,
-  formatIndicatorValue,
+  formatFromPeak,
+  formatReadingValue,
   friendlySource,
+  policyMoveOf,
   tierOf,
   type IndicatorTier,
 } from './config';
 import { PositionBar } from './PositionBar';
 import { StatusChip } from './StatusChip';
 import { formatAsOf } from './HistoryChart';
+import type { IndicatorReading as Reading } from '@currena/core';
 
 /** Lazy mini-sparkline: fetches on (near-)visibility, caches module-wide. */
 function LazySparkline({ id }: { id: IndicatorId }) {
@@ -77,6 +83,7 @@ export function AlertCard({
   numberLocale,
   onOpenDetails,
   pinned,
+  companionReadings = [],
 }: {
   reading: IndicatorReading;
   copy: InsightsCopy;
@@ -84,14 +91,26 @@ export function AlertCard({
   onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
   /** I10: the pin badge stays visible on the card face. */
   pinned: boolean;
+  /** Step-1 A3: companion context readings rendered inside this card
+   * (core CPI on the US inflation card) — never their own row. */
+  companionReadings?: readonly Reading[];
 }) {
   const def = definitionFor(reading.id);
   const entry = copy.indicators[reading.id];
   const isUnavailable = reading.status === 'unavailable';
   const tier: IndicatorTier = tierOf(reading);
   const isNeedsAttention = tier === 'needs-attention';
-  const valueText =
-    reading.value !== null ? formatIndicatorValue(reading.id, reading.value, numberLocale, copy.units) : null;
+  const valueText = formatReadingValue(reading, numberLocale, copy.units);
+  // Step-1 B5: the data date speaks the data PERIOD ("August 2026"), the
+  // official release date follows when the schedule knows it, and a stale
+  // reading wears its tag — never a fetch-date "Updated Jul 31".
+  const locale = numberLocale === 'fa-IR' ? 'fa' : 'en';
+  const dataDate = reading.asOf !== null ? dataPeriodText(reading.id, reading.asOf, locale, numberLocale) : null;
+  const releaseText =
+    reading.releaseDate !== undefined
+      ? formatAsOf(reading.releaseDate, locale)
+      : null;
+  const changeLabel = changeWindowLabel(reading.id) === 'since-previous' ? copy.ui.sincePreviousRelease : copy.ui.days30;
   // R6 → round 24 (roast "fix this first" #1): the needs-attention face
   // line is the indicator's MEANING — what the fired rule actually means
   // for the reader — not the "Rule: …" jargon (the roast: "a rule but no
@@ -154,17 +173,50 @@ export function AlertCard({
               ) : null}
               {reading.change7d !== undefined ? (
                 <bdi dir="ltr" className="text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
-                  {formatChange(reading.change7d, def.changeKind, numberLocale, copy.units)}
+                  {formatChange(reading.change7d, def.changeKind, numberLocale, copy.units, changeScaleOf(reading.id))}
                   <span className="ms-1 opacity-80">{copy.ui.days7}</span>
                 </bdi>
               ) : null}
               {reading.change30d !== undefined ? (
                 <bdi dir="ltr" className="text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
-                  {formatChange(reading.change30d, def.changeKind, numberLocale, copy.units)}
-                  <span className="ms-1 opacity-80">{copy.ui.days30}</span>
+                  {formatChange(reading.change30d, def.changeKind, numberLocale, copy.units, changeScaleOf(reading.id))}
+                  <span className="ms-1 opacity-80">{changeLabel}</span>
                 </bdi>
               ) : null}
+              {/* Step-1 C9: distance from the 10-year peak on the price rows
+               * ("the same way stocks show distance from the 52-week high"). */}
+              {reading.fromPeak10y !== undefined && reading.fromPeak10y < -0.05 &&
+                (reading.id === 'gold-usd' || reading.id === 'silver-usd' || reading.id === 'brent' || reading.id === 'btc-usd') ? (
+                <span className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
+                  {formatFromPeak(reading.fromPeak10y, numberLocale, (pct) => interpolate(copy.ui.belowPeak, { pct }))}
+                </span>
+              ) : null}
             </span>
+
+            {/* Step-1 A3: companion context values ride inside this card —
+             * core CPI next to headline ("the gap is mainly energy"). */}
+            {companionReadings.length > 0 ? (
+              <span className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
+                {companionReadings.map((companion) =>
+                  companion.value !== null ? (
+                    <span key={companion.id} className="flex items-baseline gap-1">
+                      <span className="font-semibold text-[var(--color-text-primary)]">{copy.indicators[companion.id]?.name ?? companion.id}</span>
+                      <bdi dir="ltr">{formatReadingValue(companion, numberLocale, copy.units)}</bdi>
+                    </span>
+                  ) : null,
+                )}
+                <span>{copy.ui.coreGapNote}</span>
+              </span>
+            ) : null}
+
+            {/* Step-1 audit item D3: the policy-rate cards state the SIZE
+             * OF THE MOVE as its own labelled line, beside the level — the
+             * level line below can never again read as the move's twin. */}
+            {policyMoveOf(reading) !== null ? (
+              <span className="mt-1.5 block text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)]">
+                <bdi>{interpolate(copy.ui.recentMoveLine, { change: formatChange(policyMoveOf(reading)!, def.changeKind, numberLocale, copy.units, changeScaleOf(reading.id)) })}</bdi>
+              </span>
+            ) : null}
 
             {/* R6 → round 24: the needs-attention face line — the one-line
              * meaning (softened tint; red belongs to the words). */}
@@ -199,11 +251,22 @@ export function AlertCard({
 
         <span className="mt-2 flex items-baseline justify-between gap-2 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
           <span>
-            {reading.asOf
-              ? interpolate(copy.ui.updatedOn, {
-                  date: formatAsOf(reading.asOf, numberLocale === 'fa-IR' ? 'fa' : 'en'),
-                })
-              : copy.ui.na}
+            {reading.status === 'stale' ? (
+              <span className="me-1 rounded-full bg-currena-muted/20 px-1.5 py-0.5 font-bold text-[var(--color-text-secondary)]">
+                {copy.ui.staleTag}
+              </span>
+            ) : null}
+            {dataDate !== null
+              ? interpolate(copy.ui.dataFor, { date: dataDate })
+              : reading.asOf
+                ? interpolate(copy.ui.updatedOn, { date: formatAsOf(reading.asOf, numberLocale === 'fa-IR' ? 'fa' : 'en') })
+                : copy.ui.na}
+            {releaseText !== null ? (
+              <>
+                <span className="mx-1.5 opacity-50">·</span>
+                {interpolate(copy.ui.releasedOn, { date: releaseText })}
+              </>
+            ) : null}
             <span className="mx-1.5 opacity-50">·</span>
             {/* R30: publisher only — raw series ids ("ABS (RES_DWELL_ST)")
              * never reach the card face. */}

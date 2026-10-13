@@ -81,16 +81,18 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     },
   },
   {
-    // The Fed target range's midpoint ((lower+upper)/2 of DFEDTARL/DFEDTARU).
-    // The card renders the 25bp corridor around this midpoint at display
-    // time ("3.50–3.75%") — the corridor width is constant since 2008, and
-    // the percentile/change math on the midpoint is exact.
+    // Step-1 audit item A1: the value is the range's LOWER bound
+    // (DFEDTARL); the runner attaches the upper bound (DFEDTARU) as
+    // `rangeHigh`, so the card renders the true corridor "3.75–4.00%"
+    // straight from the two published series. Percentile/change math runs
+    // on the lower bound — post-2008 it is the midpoint shifted by a
+    // constant 12.5bp, so the verdicts are identical.
     id: 'fed-target',
     section: 'global',
     group: 'borrowing-costs',
-    name: 'Federal funds target rate (midpoint)',
+    name: 'Federal funds target rate',
     source: 'fred',
-    sourceRef: 'FRED:(DFEDTARL + DFEDTARU) / 2',
+    sourceRef: 'FRED:DFEDTARL (lower bound) + DFEDTARU (upper bound)',
     cadence: 'daily',
     changeKind: 'points',
     phase: 'P1',
@@ -118,7 +120,8 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     source: 'derived',
     sourceRef: 'FRED:A091RC1Q027SBEA ÷ FRED:W006RC1Q027SBEA',
     cadence: 'quarterly',
-    changeKind: 'pct',
+    // Step-1 audit item C5: a share — its changes speak in percentage points.
+    changeKind: 'points',
     phase: 'P2',
     rule: { kind: 'percentile', tail: 'high', cutoff: 0.2 },
     // I19: BEA NIPA obs date from Q-01 and the obs first appears with the
@@ -138,12 +141,31 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     source: 'fred',
     sourceRef: 'FRED:CPIAUCSL (12-month % change)',
     cadence: 'monthly',
-    changeKind: 'pct',
+    // Step-1 audit item C5: a yearly RATE — its changes are expressed in
+    // percentage points, never as a percent-of-percent.
+    changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'threshold', direction: 'above', value: 3 },
     // Spec said 50 (release-date aging); the engine ages from the OBS date
     // (M-01), which is up to ~73d old just before the next release — 75
     // keeps the monthly cadence honest instead of false-alarming.
+    staleAfterDays: 75,
+  },
+  {
+    // Step-1 audit item A3: core CPI (ex food & energy) — a CONTEXT
+    // companion to the headline card ("Core CPI: 2.4% next to headline
+    // 3.4%, the gap is mainly energy"). Never its own card, never a gauge
+    // member; the UI renders it inside the us-cpi-yoy card only.
+    id: 'us-cpi-core-yoy',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'US core inflation (yearly)',
+    source: 'fred',
+    sourceRef: 'FRED:CPILFESL (12-month % change)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
     staleAfterDays: 75,
   },
   {
@@ -156,7 +178,16 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     cadence: 'daily',
     changeKind: 'points',
     phase: 'P2',
-    rule: { kind: 'percentile', tail: 'high', cutoff: 0.2 },
+    // Step-1 audit item D4, re-backtested 2026-10-13 against the full FRED
+    // history: the old top-20%-of-decade rule flagged 2.32% as "Needs
+    // attention" even though 2.32 sits near the 2024–26 regime (median 2.26)
+    // and the text said pressure was easing — a contradiction. The decade's
+    // distribution: p50 2.18 · p80 2.30 · p95 2.40; episodes above 2.4%
+    // cluster in the 2022 spike and autumn 2023 (longest run 41 days);
+    // above 2.5% is single-day noise only. The evidence rule: above 2.4%
+    // SUSTAINED 4 weeks — it fired exactly once in the decade (autumn 2023)
+    // and never on noise. The card shows the rule verbatim.
+    rule: { kind: 'threshold', direction: 'above', value: 2.4, sustainedWeeks: 4 },
   },
   /* ---------------- Global — Are markets nervous? ---------------- */
   {
@@ -265,6 +296,10 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'pct',
     phase: 'P2',
     rule: { kind: 'yoy-negative' },
+    // Step-1 audit item C10: M2 trends upward — the 10-year position is
+    // measured on the year-on-year GROWTH, not the level, so it is not
+    // permanently pinned near 100% just for existing.
+    percentileBasis: 'yoy',
   },
   {
     id: 'copper-gold',
@@ -399,20 +434,23 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
   },
   /* -------- Australia — Are inflation and rates a problem? -------- */
   {
+    // Step-1 audit item A2: switched from the retired quarterly key to the
+    // ABS monthly CPI (all groups) — the full monthly measure the ABS now
+    // publishes. asOf is the data month (M-01); the card also carries the
+    // official release date from data/insights-release-schedule.json.
     id: 'au-cpi',
     section: 'australia',
     group: 'au-inflation-rates',
     name: 'Australian CPI (annual change)',
     source: 'abs',
-    sourceRef: 'ABS CPI All groups CPI index (annual change derived)',
-    cadence: 'quarterly',
-    changeKind: 'pct',
+    sourceRef: 'ABS monthly CPI All groups index (annual change derived)',
+    cadence: 'monthly',
+    changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'threshold', direction: 'above', value: 3 },
-    // ABS CPI quarters date from Q-01 and release ~4w after quarter END —
-    // the obs ages up to ~209d between releases (the latent Oct-8→28 window
-    // the 190d quarterly grace false-alarms in). 215 covers it.
-    staleAfterDays: 215,
+    // Monthly obs (M-01) ages up to ~62d between releases (released ~4w
+    // after month end) — 95 matches the monthly cadence grace.
+    staleAfterDays: 95,
   },
   {
     id: 'au-trimmed-mean',
@@ -420,12 +458,12 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     group: 'au-inflation-rates',
     name: 'Australian trimmed-mean inflation',
     source: 'abs',
-    sourceRef: 'ABS CPI_Q Trimmed Mean index (annual change derived)',
-    cadence: 'quarterly',
-    changeKind: 'pct',
+    sourceRef: 'ABS monthly CPI Trimmed Mean index (annual change derived)',
+    cadence: 'monthly',
+    changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'threshold', direction: 'above', value: 3 },
-    staleAfterDays: 215, // same ABS quarter-start dating as au-cpi
+    staleAfterDays: 95, // same monthly cadence as au-cpi
   },
   {
     id: 'au-us-10y-gap',
@@ -447,7 +485,7 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     group: 'au-inflation-rates',
     name: 'RBA cash rate',
     source: 'rba',
-    sourceRef: 'RBA statistical table F1.1 (Cash Rate Target, monthly average)',
+    sourceRef: 'RBA statistical table F1 (Cash Rate Target, daily)',
     cadence: 'per-change',
     changeKind: 'points',
     phase: 'P1',
@@ -462,7 +500,7 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     source: 'abs',
     sourceRef: 'ABS CPI Automotive fuel index (12-month % change)',
     cadence: 'monthly',
-    changeKind: 'pct',
+    changeKind: 'points',
     phase: 'P2',
     rule: { kind: 'info' },
     // Spec said 70 (release-date aging); ABS monthly obs (M-01) ages ~87d
@@ -496,7 +534,7 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     source: 'abs',
     sourceRef: 'ABS WPI total hourly rates excluding bonuses (12-month % change)',
     cadence: 'quarterly',
-    changeKind: 'pct',
+    changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'below-aux' },
     // Spec said 130 (release-date aging); ABS WPI obs (Q-01) ages up to
@@ -511,7 +549,7 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     source: 'abs',
     sourceRef: 'ABS CPI Rents index, monthly (12-month % change)',
     cadence: 'monthly',
-    changeKind: 'pct',
+    changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
     // Spec said 70 (release-date aging); ABS monthly obs (M-01) ages ~87d
@@ -541,6 +579,9 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'pct',
     phase: 'P2',
     rule: { kind: 'consecutive-decline', periods: 3 },
+    // Step-1 audit item C10: home values trend upward — the 10-year
+    // position is measured on year-on-year growth, not the index level.
+    percentileBasis: 'yoy',
     staleAfterDays: 215, // ABS quarter-start dating
   },
   {

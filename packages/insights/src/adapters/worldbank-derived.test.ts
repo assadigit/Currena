@@ -148,8 +148,9 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
     expect(out['au-us-10y-gap']![0]!.date).toBe('2026-10-05');
     expect(out['au-us-10y-gap']![0]!.value).toBeCloseTo(0.2, 10);
     // I15 new compositions:
-    // fed-target = midpoint of (DFEDTARL + DFEDTARU)
-    expect(out['fed-target']).toEqual([{ date: '2026-10-05', value: (3.5 + 3.75) / 2 }]);
+    // Step-1 A1: fed-target = the range's LOWER bound (DFEDTARL) — the
+    // snapshot builder attaches DFEDTARU as rangeHigh.
+    expect(out['fed-target']).toEqual([{ date: '2026-10-05', value: 3.5 }]);
     // ecb-dfr passes through
     expect(out['ecb-dfr']).toEqual(inputs.ecb.dfr);
     // us-cpi-yoy = 12-month pct change of the CPI index

@@ -59,6 +59,7 @@ import {
   PINNED_STORAGE_KEY,
   SECTION_ORDER,
   SIGNALS_ENABLED,
+  COMPANION_ONLY_IDS,
   attentionToneClass,
   definitionFor,
   definitionsForGroup,
@@ -139,8 +140,31 @@ function QuestionGroup({
   const [showAll, setShowAll] = useState(false);
   const readings = useMemo(() => {
     const defs = definitionsForGroup(section, group);
-    return snapshot.readings.filter((r) => defs.some((d) => d.id === r.id) && (renderableIds === null || renderableIds.has(r.id)));
+    return snapshot.readings.filter(
+      (r) =>
+        defs.some((d) => d.id === r.id) &&
+        // Step-1 A3: companion-only readings (core CPI) render INSIDE their
+        // parent card, never as their own row.
+        !COMPANION_ONLY_IDS.has(r.id) &&
+        (renderableIds === null || renderableIds.has(r.id)),
+    );
   }, [snapshot, section, group, renderableIds]);
+
+  // Step-1 A3: the companion readings rendered inside this group's cards
+  // (the US inflation card carries core CPI beside the headline).
+  const companionsByParent = useMemo(() => {
+    const defs = definitionsForGroup(section, group);
+    const companionIds = new Set(defs.map((d) => d.id));
+    const byParent = new Map<IndicatorId, IndicatorReading[]>();
+    for (const r of snapshot.readings) {
+      if (!COMPANION_ONLY_IDS.has(r.id)) continue;
+      const parent = r.id === 'us-cpi-core-yoy' ? 'us-cpi-yoy' : null;
+      if (parent !== null && companionIds.has(parent)) {
+        byParent.set(parent, [...(byParent.get(parent) ?? []), r]);
+      }
+    }
+    return byParent;
+  }, [snapshot, section, group]);
 
   const gauge = useMemo(() => {
     return gaugesForSectionCached(section, snapshot.readings).find((g) => g.gauge === group);
@@ -234,6 +258,7 @@ function QuestionGroup({
               numberLocale={numberLocale}
               onOpenDetails={onOpenDetails}
               pinned={pinned.has(r.id)}
+              companionReadings={companionsByParent.get(r.id) ?? []}
             />
           ))}
         </div>
@@ -724,12 +749,26 @@ export function Insights() {
   }, [state, pinned, visibleIds]);
 
   // H4/R12: "Data as of {date}" — the unambiguous word-date (no seconds:
-  // a daily snapshot) with the relative age beside it.
+  // a daily snapshot) with the relative age beside it. Step-1 G7: the live
+  // prices' own clock rides beside it when the serve-time overlay stamped
+  // one ("prices updated HH:MM") — the honest "daily snapshot + hourly
+  // prices" story in one line.
   const dataAsOfLine = useMemo(() => {
     if (state.kind !== 'ready') return null;
     const iso = state.snapshot.generatedAt;
     const dateText = locale === 'fa' ? formatJalaliDate(iso, 'fa-IR') : formatDateWords(iso, 'en-US');
-    return { date: dateText, tooltip: copy.ui.dataAsOfTooltip };
+    const pricesIso = state.snapshot.pricesAsOf;
+    const pricesText =
+      pricesIso !== undefined
+        ? locale === 'fa'
+          ? formatJalaliDate(pricesIso, 'fa-IR', { withTime: true })
+          : new Intl.DateTimeFormat('en-AU', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }).format(new Date(pricesIso))
+        : null;
+    return {
+      date: dateText,
+      prices: pricesText,
+      tooltip: copy.ui.dataAsOfTooltip,
+    };
   }, [state, locale, copy.ui.dataAsOfTooltip]);
 
   const searchActive = statusFilter !== 'all' || query.trim() !== '';
@@ -825,6 +864,9 @@ export function Insights() {
               <p className="mt-1 mb-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]" title={dataAsOfLine.tooltip}>
                 <bdi>
                   {interpolate(copy.ui.dataAsOf, { date: dataAsOfLine.date })}
+                  {dataAsOfLine.prices !== null ? (
+                    <span className="opacity-80"> · {interpolate(copy.ui.pricesUpdated, { time: dataAsOfLine.prices })}</span>
+                  ) : null}
                   <span aria-hidden="true"> ⓘ</span>
                 </bdi>
                 <span className="sr-only">, {dataAsOfLine.tooltip}</span>

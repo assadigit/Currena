@@ -6,9 +6,12 @@
  * run against the venue-recorded fixtures only.
  *
  * Series served (docs/insights/03-data-sources.md):
- *  - F1.1 'Cash Rate Target'  — monthly average (per-change indicator;
- *    F1.1 is the table the planning docs chose; the daily F1 table is a
- *    documented one-line upgrade if daily precision is ever wanted).
+ *  - F1  'Cash Rate Target'  — DAILY (Step-1 audit item A4: the actual
+ *    target, so a decision-day move shows at once — the September-2026
+ *    hike reads 4.60% from its effective date, not the month's average).
+ *    F1.1 (monthly average) stays fetched as the fallback: derived.ts
+ *    prefers the daily series and falls back to F1.1 if the daily table
+ *    ever fails to parse.
  *  - F2  'Australian Government 10 year bond' — daily, publishes with a
  *    2–4 business-day lag (drives the au-us-10y-gap cadence decision).
  *  - E2  'Household debt to income' — quarterly ABS-calculated ratios
@@ -41,6 +44,7 @@ export interface RbaTableSpec {
 }
 
 export const RBA_TABLES = {
+  cashRateDaily: { file: 'f1', prefix: 'F1', series: 'Cash Rate Target' },
   cashRate: { file: 'f1.1', prefix: 'F1.1', series: 'Cash Rate Target' },
   au10y: { file: 'f2', prefix: 'F2', series: 'Australian Government 10 year bond' },
   householdDebtToIncome: { file: 'e2', prefix: 'E2', series: 'Household debt to income' },

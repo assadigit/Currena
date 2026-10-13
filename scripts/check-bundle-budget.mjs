@@ -197,7 +197,20 @@ const BUDGETS = [
   // untouched (290.38/87.07 vs 296/89.5) — the section rides the lazy
   // route. Gzip +13.2 kB for a whole second bilingual section. Justified
   // in CHANGELOG §2026-10-13 (world currencies).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 462_000, gz: 113_000, label: 'Insights lazy chunk' },
+  // Step-1 fix-list bump (450.10/110.38 → 465.61/114.56, budget 462/113.0 →
+  // 469/115.5): the 2026-10-13 audit fixes — (1) every card now carries
+  // its data-date line ("data for August 2026 · released 11 Sep") + stale
+  // tags + the fromPeak distance (config helpers + per-row render);
+  // (2) the core-CPI companion (a new bilingual indicator entry + the
+  // in-card companion rendering); (3) the policy-rate "Recent move" lines;
+  // (4) the stock tiles' fromHigh/delayed/at-high tags + the mobile label
+  // header + the local-currency note; (5) the verdict-rule + calm-list
+  // lines in both heroes × 2 locales; (6) the gold-high-yields warning;
+  // (7) the whole bilingual copy additions (sources body, conditions
+  // verdict words, recent-move line, etc.). The ENTRY chunk stays
+  // untouched (290.37/87.83 vs 296/89.5). Justified in CHANGELOG
+  // §2026-10-13 (Insights Step-1 fix list).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 469_000, gz: 115_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {

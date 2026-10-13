@@ -515,7 +515,7 @@ describe('R28 sentence-versus-number (band words computed from live values)', ()
 
   it('the rebuilt au-cpi line at 3.9% says "above the RBA’s 2–3% band" in en', () => {
     const line = consequenceLine(
-      reading({ id: 'au-cpi', value: 3.9, status: 'warning', percentile10y: 0.9 }),
+      reading({ id: 'au-cpi', value: 3.9, status: 'warning', percentile10y: 0.9, change30d: -0.1 }),
       insightsCopyEn.indicators['au-cpi']!,
       false,
     );
@@ -526,7 +526,7 @@ describe('R28 sentence-versus-number (band words computed from live values)', ()
 
   it('the rebuilt fa line at 3.9% renders the Persian position word', () => {
     const line = consequenceLine(
-      reading({ id: 'au-cpi', value: 3.9, status: 'warning', percentile10y: 0.9 }),
+      reading({ id: 'au-cpi', value: 3.9, status: 'warning', percentile10y: 0.9, change30d: -0.1 }),
       insightsCopyFa.indicators['au-cpi']!,
       false,
       bandWordsOf(insightsCopyFa),

@@ -87,7 +87,10 @@ export interface SeriesInputs {
   };
   /** RBA series outputs (venue-dependent — see docs/insights/03-data-sources.md). */
   rba?: {
+    /** 'Cash Rate Target' — the DAILY F1 series when it parsed, else the F1.1 monthly average. */
     cashRate?: SeriesPoint[];
+    /** The F1.1 monthly-average series (kept separately for diagnostics). */
+    cashRateMonthly?: SeriesPoint[];
     au10y?: SeriesPoint[];
     householdDebtRatio?: SeriesPoint[];
     homeLoanOutstanding?: SeriesPoint[];
@@ -214,13 +217,10 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   put('yield-curve-10y2y', fred.T10Y2Y);
   put('real-yield-10y', fred.DFII10);
   put('us10y', fred.DGS10);
-  if (fred.DFEDTARL && fred.DFEDTARU) {
-    // The target-range midpoint — the card renders the 25bp corridor around
-    // it at display time (definitions.ts fed-target note).
-    put('fed-target', combineSeries(fred.DFEDTARL, fred.DFEDTARU, (l, u) => (l + u) / 2));
-  } else if (fred.DFEDTARL) {
-    put('fed-target', fred.DFEDTARL);
-  }
+  // Step-1 audit item A1: the fed-target series is the range's LOWER bound
+  // (DFEDTARL); the snapshot builder attaches the upper bound (DFEDTARU)
+  // as `rangeHigh` so the card renders the true "3.75–4.00%" corridor.
+  put('fed-target', fred.DFEDTARL);
   put('ecb-dfr', ecb?.dfr);
   if (fred.A091RC1Q027SBEA && fred.W006RC1Q027SBEA) {
     put(
@@ -231,6 +231,7 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
 
   /* ---------------- Global — Are prices heating up? ---------------- */
   if (fred.CPIAUCSL) put('us-cpi-yoy', yoyPctSeries(fred.CPIAUCSL));
+  if (fred.CPILFESL) put('us-cpi-core-yoy', yoyPctSeries(fred.CPILFESL));
   put('breakeven-5y5y', fred.T5YIFR);
 
   /* ---------------- Global — Are markets nervous? ---------------- */
@@ -347,6 +348,10 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   if (rba?.au10y && fred.DGS10) {
     put('au-us-10y-gap', combineSeries(rba.au10y, fred.DGS10, (au, us) => au - us));
   }
+  // Step-1 audit item A4: `cashRate` prefers the DAILY F1 target (a
+  // decision-day move shows at once — the Sep-2026 hike reads 4.60% from
+  // its effective date); collect.ts already falls back to the F1.1 monthly
+  // average when the daily table fails to parse.
   put('rba-cash-rate', rba?.cashRate);
   if (abs?.automotiveFuelIndex) put('au-petrol-yoy', yoyPctSeries(abs.automotiveFuelIndex));
 
@@ -403,6 +408,7 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   },
   'govt-interest-revenue': { name: 'FRED (BEA series, derived)', url: 'https://fred.stlouisfed.org/series/A091RC1Q027SBEA' },
   'us-cpi-yoy': { name: 'FRED (CPIAUCSL)', url: 'https://fred.stlouisfed.org/series/CPIAUCSL' },
+  'us-cpi-core-yoy': { name: 'FRED (CPILFESL)', url: 'https://fred.stlouisfed.org/series/CPILFESL' },
   'breakeven-5y5y': { name: 'FRED (T5YIFR)', url: 'https://fred.stlouisfed.org/series/T5YIFR' },
   'stress-stlfsi': { name: 'FRED (STLFSI4)', url: 'https://fred.stlouisfed.org/series/STLFSI4' },
   nfci: { name: 'FRED (NFCI)', url: 'https://fred.stlouisfed.org/series/NFCI' },
@@ -427,9 +433,9 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'btc-usd': { name: 'gold-api.com (BTC)', url: 'https://www.gold-api.com' },
   'gold-btc': { name: 'gold-api.com (XAU ÷ BTC)', url: 'https://www.gold-api.com' },
   'silver-btc': { name: 'gold-api.com (XAG ÷ BTC)', url: 'https://www.gold-api.com' },
-  'rba-cash-rate': { name: 'RBA F1.1', url: 'https://www.rba.gov.au/statistics/cash-rate/' },
-  'au-cpi': { name: 'ABS (CPI All groups)', url: 'https://data.api.abs.gov.au/rest/data/CPI/1.10001.10.50.Q' },
-  'au-trimmed-mean': { name: 'ABS (CPI_Q Trimmed Mean)', url: 'https://data.api.abs.gov.au/rest/data/CPI_Q/1.999902.20.50.Q' },
+  'rba-cash-rate': { name: 'RBA F1 (Cash Rate Target)', url: 'https://www.rba.gov.au/statistics/cash-rate/' },
+  'au-cpi': { name: 'ABS (monthly CPI All groups)', url: 'https://data.api.abs.gov.au/rest/data/CPI/1.10001.10.50.M' },
+  'au-trimmed-mean': { name: 'ABS (monthly CPI Trimmed Mean)', url: 'https://data.api.abs.gov.au/rest/data/CPI/1.999902.20.50.M' },
   'au-petrol-yoy': {
     name: 'ABS (CPI Automotive fuel)',
     url: 'https://data.api.abs.gov.au/rest/data/CPI/1.40081.10.50.M',

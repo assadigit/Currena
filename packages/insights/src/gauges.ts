@@ -13,8 +13,7 @@
  * Step mapping (data spec §4 "Gauges"):
  *   share of scored, non-stale members in alert → step
  *   0 → 1 · up to ⅓ → 2 · up to ⅔ → 3 · above ⅔ → 4
- * Verdict per region: rounded average of its gauges' steps; if any gauge is
- * at step 4, the verdict is at least step 3.
+ * Verdict per region: see sectionVerdictStep (the E1 count rule).
  * Only GAUGE members vote — prices-board items and context cards never do.
  */
 
@@ -116,11 +115,19 @@ export function gaugesForSection(
 }
 
 /**
- * A region's verdict step from its gauges: the rounded average of the
- * gauge steps, escalated to at least 3 when any gauge sits at step 4.
- * Gauges that cannot read (step 0, no voters) are EXCLUDED from the
- * average — they lower nothing; a region with no readable gauges at all
- * returns step 0 (the honest "cannot read" the UI renders as no label).
+ * A region's verdict step from its gauges — Step-1 audit item E1: ONE
+ * count-based mapping, used by BOTH regions (the ingest's summary and the
+ * SPA's hero render the same function, so the word can never disagree with
+ * the areas it names). Gauges that cannot read (step 0, no voters) are
+ * EXCLUDED from every count; a region with no readable gauges returns
+ * step 0 (the honest "cannot read" the UI renders as no label).
+ *
+ * The rule, in one breath (displayed verbatim in the hero's "How is this
+ * calculated?" panel):
+ *   alarmed  — at least two areas at step 4, or every area at step ≥ 3;
+ *   stressed — at least two areas at step ≥ 3, or most areas at step ≥ 2;
+ *   cautious — any area at step ≥ 2;
+ *   relaxed  — every area at step 1.
  */
 export function sectionVerdictStep(
   section: InsightsSection,
@@ -129,10 +136,14 @@ export function sectionVerdictStep(
   const gauges = gaugesForSection(section, readings);
   const readable = gauges.filter((g) => g.step > 0);
   if (readable.length === 0) return 0;
-  const avg = readable.reduce((sum, g) => sum + g.step, 0) / readable.length;
-  let verdict = Math.round(avg);
-  if (gauges.some((g) => g.step === 4)) verdict = Math.max(verdict, 3);
-  return Math.min(4, Math.max(1, verdict));
+  const atLeast = (step: number): number => readable.filter((g) => g.step >= step).length;
+  // alarmed: two critical areas, or every area stressed-or-worse
+  if (atLeast(4) >= 2 || atLeast(3) === readable.length) return 4;
+  // stressed: two areas stressed-or-worse, or a majority cautious-or-worse
+  if (atLeast(3) >= 2 || atLeast(2) > readable.length / 2) return 3;
+  // cautious: anything above calm
+  if (atLeast(2) >= 1) return 2;
+  return 1;
 }
 
 /**

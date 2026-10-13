@@ -51,8 +51,11 @@ export const FRED_SERIES = {
   m2Us: 'M2SL',
   // I15 (2026-10-08 data spec §3):
   usCpiIndex: 'CPIAUCSL', // us-cpi-yoy: 12-month % change, computed
-  fedTargetLower: 'DFEDTARL', // fed-target: (L + U) / 2 midpoint series
-  fedTargetUpper: 'DFEDTARU',
+  // Step-1 audit item A3: core CPI (ex food & energy) — the context
+  // companion shown on the US inflation card.
+  usCpiCoreIndex: 'CPILFESL', // us-cpi-core-yoy: 12-month % change, computed
+  fedTargetLower: 'DFEDTARL', // fed-target: the lower bound of the target range
+  fedTargetUpper: 'DFEDTARU', // …and its upper bound (rangeHigh on the reading)
   nfci: 'NFCI', // Chicago Fed National Financial Conditions, weekly
   // dollar-broad (DTWEXBGS) retired: the series now lags ~5 days upstream
   // and the Currena dollar basket replaces it (data spec §3, basket.ts).

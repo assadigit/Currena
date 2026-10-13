@@ -27,6 +27,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { CSSProperties } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { Coins } from 'lucide-react';
+import { formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { fetchIndicatorHistory } from '../../lib/insights';
@@ -39,7 +40,9 @@ import {
   consequenceLine,
   definitionFor,
   formatChange,
+  formatFromPeak,
   formatIndicatorValue,
+  friendlySource,
   positionBand,
 } from './config';
 import { formatAsOf } from './HistoryChart';
@@ -212,14 +215,29 @@ export function PricesBoard({
               }),
             );
           }
-          if (goldPerBtc && goldPerBtc.value !== null) {
-            contextParts.push(
-              interpolate(copy.ui.goldPerBtc, { value: formatIndicatorValue('gold-btc', goldPerBtc.value, numberLocale, copy.units) }),
-            );
+          // Step-1 audit item C2: the ratios are INVERTED for display —
+          // "One bitcoin buys 19.6 oz of gold" / "about 1,368 oz of silver"
+          // (the stored gold-btc/silver-btc are oz-per-₿ fractions; the old
+          // "Gold per Bitcoin: 0.0509" label read as the inverse of itself).
+          if (goldPerBtc && goldPerBtc.value !== null && goldPerBtc.value > 0) {
+            const ozGold = formatNumber(1 / goldPerBtc.value, numberLocale, {
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 1,
+            });
+            contextParts.push(interpolate(copy.ui.btcBuysGold, { value: ozGold }));
           }
-          if (silverPerBtc && silverPerBtc.value !== null) {
+          if (silverPerBtc && silverPerBtc.value !== null && silverPerBtc.value > 0) {
+            const ozSilver = formatNumber(1 / silverPerBtc.value, numberLocale, {
+              maximumFractionDigits: 0,
+            });
+            contextParts.push(interpolate(copy.ui.btcBuysSilver, { value: ozSilver }));
+          }
+          // Step-1 audit item C9: distance from the 10-year peak — the same
+          // honesty the stock tiles carry ("easing from highs" now says HOW far).
+          const fromPeak = reading.fromPeak10y;
+          if (fromPeak !== undefined && fromPeak < -0.05) {
             contextParts.push(
-              interpolate(copy.ui.silverPerBtc, { value: formatIndicatorValue('silver-btc', silverPerBtc.value, numberLocale, copy.units) }),
+              formatFromPeak(fromPeak, numberLocale, (pct) => interpolate(copy.ui.belowPeak, { pct })),
             );
           }
 
@@ -317,12 +335,17 @@ export function PricesBoard({
                       <bdi>{contextParts.join(' · ')}</bdi>
                     </span>
                   ) : null}
-                  {/* PB3: "as of {date}"; stale chips only past the limit. */}
+                  {/* PB3: "as of {date}"; stale chips only past the limit.
+                   * Step-1 audit item A9: the tile names its SOURCE AND
+                   * CONTRACT (Brent futures BZ=F vs the EIA spot base; the
+                   * metals' live futures vs the EOD spot backbone) — the
+                   * reader can tell exactly which price this is. */}
                   <span className="flex flex-wrap items-baseline gap-x-2 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
                     {reading.asOf ? <bdi>{interpolate(copy.ui.pricesAsOf, { date: formatAsOf(reading.asOf, locale) })}</bdi> : null}
                     {reading.status === 'stale' && reading.asOf ? (
                       <bdi className="font-semibold">{interpolate(copy.ui.staleSince, { date: formatAsOf(reading.asOf, locale) })}</bdi>
                     ) : null}
+                    <bdi className="opacity-80">· {friendlySource(reading.sourceName)}</bdi>
                   </span>
                   <span className="sr-only">, {copy.ui.viewCard}</span>
                 </span>

@@ -170,6 +170,21 @@ function parseIso(iso: string): Date {
 }
 
 /**
+ * Step-1 audit item B2: a DATE-ONLY ISO string ("2026-10-28", no time
+ * component) denotes a calendar day, not a UTC-midnight instant —
+ * `new Date('2026-10-28')` parses it as UTC midnight and formatting in a
+ * timezone behind UTC shifted every printed date one day early (the
+ * calendar showed the FOMC decision on 27 Oct and the RBA on 2 Nov).
+ * Date-only inputs therefore ALWAYS format in UTC; datetimes with a time
+ * component keep their existing local rendering.
+ */
+const DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function isDateOnly(iso: string): boolean {
+  return DATE_ONLY_RE.test(iso);
+}
+
+/**
  * Gregorian date. NB: plain 'fa-IR' defaults to the PERSIAN calendar in
  * Intl, so the Gregorian rendering must force `-u-ca-gregory` — a raw
  * `Intl.DateTimeFormat('fa-IR')` would silently produce a Jalali date.
@@ -181,6 +196,7 @@ export function formatDate(iso: string, locale: Locale, opts: DateFormatOptions 
     month: '2-digit',
     day: '2-digit',
     ...(opts.withTime ? { hour: '2-digit', minute: '2-digit', second: '2-digit' } : {}),
+    ...(isDateOnly(iso) ? { timeZone: 'UTC' } : {}),
   }).format(parseIso(iso));
 }
 
@@ -196,6 +212,7 @@ export function formatDateWords(iso: string, locale: Locale): string {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+    ...(isDateOnly(iso) ? { timeZone: 'UTC' } : {}),
   }).format(parseIso(iso));
 }
 
@@ -211,6 +228,7 @@ export function formatJalaliDate(iso: string, locale: Locale, opts: DateFormatOp
     month: '2-digit',
     day: '2-digit',
     ...(opts.withTime ? { hour: '2-digit', minute: '2-digit', second: '2-digit' } : {}),
+    ...(isDateOnly(iso) ? { timeZone: 'UTC' } : {}),
   }).format(parseIso(iso));
   // ICU joins a fa-IR persian date and time with a LATIN comma + space
   // ("۱۴۰۵/۰۷/۱۵, ۱۵:۴۶") — Persian typography uses «،» (I6 audit F14).

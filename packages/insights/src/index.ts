@@ -75,6 +75,7 @@ export {
   PERCENTILE_WINDOW_DAYS,
   YOY_MAX_DAYS_BACK,
   YOY_MIN_DAYS_BACK,
+  cadenceUsesPreviousRelease,
   computeReading,
   changedSince,
   evaluateRule,

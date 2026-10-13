@@ -14,7 +14,19 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { fetchIndicatorHistory } from '../../lib/insights';
 import { Sparkline } from '../Sparkline';
 import { StatusChip } from './StatusChip';
-import { bandWordsOf, consequenceLine, consequenceState, definitionFor, formatChange, formatIndicatorValue, tierOf } from './config';
+import {
+  bandWordsOf,
+  changeScaleOf,
+  changeWindowLabel,
+  consequenceLine,
+  consequenceState,
+  dataPeriodText,
+  definitionFor,
+  formatChange,
+  formatFromPeak,
+  formatReadingValue,
+  tierOf,
+} from './config';
 
 /** F2's tiny sparkline — same lazy pattern as the alert card's. */
 function TinySparkline({ id }: { id: IndicatorId }) {
@@ -74,8 +86,14 @@ export function CompactRow({
   const entry = copy.indicators[reading.id];
   const isUnavailable = reading.status === 'unavailable';
   const tier = tierOf(reading);
-  const valueText =
-    reading.value !== null ? formatIndicatorValue(reading.id, reading.value, numberLocale, copy.units) : null;
+  const valueText = formatReadingValue(reading, numberLocale, copy.units);
+  // Step-1 B5: every row carries its data date ("August 2026" / "9 Oct
+  // 2026") — never hidden to the details panel, including Normal cards.
+  const dataDate =
+    reading.asOf !== null
+      ? dataPeriodText(reading.id, reading.asOf, numberLocale === 'fa-IR' ? 'fa' : 'en', numberLocale)
+      : null;
+  const changeLabel = changeWindowLabel(reading.id) === 'since-previous' ? copy.ui.sincePreviousRelease : copy.ui.days30;
   // R6 → round 24: the needs-attention MEANING line also rides compact
   // rows when a needs-attention row renders without a card (never hidden
   // by R7) — the meaning, not the "Rule: …" jargon (see AlertCard).
@@ -116,9 +134,29 @@ export function CompactRow({
             ) : null}
             {reading.change30d !== undefined ? (
               <bdi dir="ltr" className="shrink-0 text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
-                {formatChange(reading.change30d, def.changeKind, numberLocale, copy.units)}
-                <span className="ms-1 opacity-80">{copy.ui.days30}</span>
+                {formatChange(reading.change30d, def.changeKind, numberLocale, copy.units, changeScaleOf(reading.id))}
+                <span className="ms-1 opacity-80">{changeLabel}</span>
               </bdi>
+            ) : null}
+            {/* Step-1 B5: the data date rides every row (never the fetch
+                date); Step-1 H1: a visible stale tag when the reading is
+                past its release schedule. */}
+            {dataDate !== null ? (
+              <span className="shrink-0 whitespace-nowrap text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
+                {reading.status === 'stale' ? (
+                  <span className="me-1 rounded-full bg-currena-muted/20 px-1.5 py-0.5 font-bold text-[var(--color-text-secondary)]">
+                    {copy.ui.staleTag}
+                  </span>
+                ) : null}
+                {interpolate(reading.status === 'stale' ? copy.ui.dataForStale : copy.ui.dataFor, { date: dataDate })}
+              </span>
+            ) : null}
+            {/* Step-1 C9: distance from the 10-year peak (prices/gold-silver
+                rows) — the same honesty the stock tiles carry. */}
+            {reading.fromPeak10y !== undefined && reading.fromPeak10y < -0.05 && reading.id !== 'rba-cash-rate' && (reading.id === 'gold-usd' || reading.id === 'silver-usd' || reading.id === 'brent' || reading.id === 'btc-usd') ? (
+              <span className="shrink-0 whitespace-nowrap text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
+                {formatFromPeak(reading.fromPeak10y, numberLocale, (pct) => interpolate(copy.ui.belowPeak, { pct }))}
+              </span>
             ) : null}
             <TinySparkline id={reading.id} />
             {showMixedTag ? (

@@ -70,7 +70,7 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     }
   }
 
-  // FRED (14 series, keyless fredgraph.csv, full history) — keyed by series id.
+  // FRED (15 series, keyless fredgraph.csv, full history) — keyed by series id.
   const fred: Partial<Record<string, SeriesPoint[]>> = {};
   for (const seriesId of Object.values(FRED_SERIES)) {
     const series = await fetchLogged('fred', seriesId, () => fetchFredSeries(seriesId));
@@ -118,6 +118,9 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
 
   // RBA (venue-dependent: rba.gov.au is Akamai-blocked from the build sandbox
   // but verified HTTP 200 from the GitHub Actions runner — 03-data-sources.md).
+  // Step-1 audit item A4: the DAILY F1 'Cash Rate Target' is fetched first;
+  // F1.1 (monthly average) stays as the fallback when the daily table fails.
+  const rbaCashRateDaily = await fetchLogged('rba', 'F1 Cash Rate Target (daily)', () => fetchRbaSeries('cashRateDaily'));
   const rbaCashRate = await fetchLogged('rba', 'F1.1 Cash Rate Target', () => fetchRbaSeries('cashRate'));
   const rbaAu10y = await fetchLogged('rba', 'F2 Australian Government 10 year bond', () => fetchRbaSeries('au10y'));
   const rbaHouseholdDebt = await fetchLogged('rba', 'E2 Household debt to income', () =>
@@ -161,7 +164,8 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
       hgSpot,
       abs: absSeries,
       rba: {
-        cashRate: rbaCashRate,
+        cashRate: rbaCashRateDaily ?? rbaCashRate,
+        cashRateMonthly: rbaCashRate,
         au10y: rbaAu10y,
         householdDebtRatio: rbaHouseholdDebt,
         homeLoanOutstanding: rbaHomeLoan,

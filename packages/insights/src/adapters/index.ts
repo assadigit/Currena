@@ -54,6 +54,8 @@ export {
   buildInsightsStatus,
   downsampleSeries,
   historyToSeries,
+  parseReleaseSchedule,
   HISTORY_MAX_POINTS,
   HISTORY_WINDOW_DAYS,
 } from './snapshot';
+export type { ReleaseScheduleEntry, SnapshotBuildInputs } from './snapshot';

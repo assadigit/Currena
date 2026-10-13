@@ -22,9 +22,9 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 25 P1 / 16 P2', () => {
+  it('splits 25 P1 / 17 P2', () => {
     expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(25);
-    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(16);
+    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(17);
   });
 
   it('groups are the question groups (global 5 + prices-board, australia 3)', () => {
@@ -54,7 +54,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('info-only cards never vote: exactly the eleven info rules', () => {
+  it('info-only cards never vote: exactly the twelve info rules', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
     expect(info).toEqual([
       'au-petrol-yoy',
@@ -67,6 +67,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'rba-cash-rate',
       'silver-btc',
       'silver-usd',
+      'us-cpi-core-yoy',
       'usdcny',
     ]);
   });
@@ -115,8 +116,10 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expectStale('us10y', undefined); // cadence grace applies
     // Obs-date-reality adjustments (the spec's numbers assumed release-date
     // aging — see definitions.ts notes): ABS quarter-start items get 215.
-    expectStale('au-cpi', 215);
-    expectStale('au-trimmed-mean', 215);
+    // Step-1 (2026-10-13): au-cpi/au-trimmed-mean moved to the MONTHLY CPI —
+    // monthly cadence, 95 days.
+    expectStale('au-cpi', 95);
+    expectStale('au-trimmed-mean', 95);
     expectStale('terms-of-trade', 215);
     expectStale('au-home-values', 215);
     // I19: the BEA NIPA ratio shares the quarter-start dating — 215, not the

@@ -325,14 +325,14 @@ import {
 } from './schemas';
 
 describe('Insights: IndicatorIdSchema (contract shape is deliberate)', () => {
-  it('pins the exact v2 indicator set — 41 ids (the I15 restructure: +11 new, dollar-broad retired), blocked/licensed items absent', () => {
+  it('pins the exact v2 indicator set — 42 ids (I15 restructure +11, Step-1 +us-cpi-core-yoy), blocked/licensed items absent', () => {
     const ids = IndicatorIdSchema.options;
-    expect(ids).toHaveLength(41);
+    expect(ids).toHaveLength(42);
     for (const blocked of ['vix', 'spx-gold', 'breadth', 'cape']) {
       expect(ids).not.toContain(blocked);
     }
     expect(ids).not.toContain('dollar-broad'); // replaced by the Currena dollar basket (I15)
-    for (const expected of ['yield-curve-10y2y', 'stress-stlfsi', 'nfci', 'fed-target', 'ecb-dfr', 'us-cpi-yoy', 'dollar-basket', 'au-home-loan', 'au-wage-growth', 'au-rent-yoy', 'au-petrol-yoy', 'btc-usd', 'copper-usd', 'eur-usd', 'gold-usd', 'silver-usd', 'gold-silver', 'china-pmi', 'rba-cash-rate', 'au-us-10y-gap', 'terms-of-trade', 'au-household-debt-arrears']) {
+    for (const expected of ['yield-curve-10y2y', 'stress-stlfsi', 'nfci', 'fed-target', 'ecb-dfr', 'us-cpi-yoy', 'us-cpi-core-yoy', 'dollar-basket', 'au-home-loan', 'au-wage-growth', 'au-rent-yoy', 'au-petrol-yoy', 'btc-usd', 'copper-usd', 'eur-usd', 'gold-usd', 'silver-usd', 'gold-silver', 'china-pmi', 'rba-cash-rate', 'au-us-10y-gap', 'terms-of-trade', 'au-household-debt-arrears']) {
       expect(ids).toContain(expected);
     }
   });

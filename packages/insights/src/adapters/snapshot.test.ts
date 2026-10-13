@@ -99,13 +99,76 @@ describe('buildInsightsSnapshot', () => {
       calendar: [],
       now: NOW,
     });
-    expect(snap.readings).toHaveLength(41);
-    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(41);
+    expect(snap.readings).toHaveLength(42);
+    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(42);
     expect(snap.readings.find((r) => r.id === 'us10y')!.status).not.toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.status).toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.value).toBeNull();
     expect(snap.generatedAt).toBe(NOW);
     expect(snap.calendar).toEqual([]);
+  });
+
+  it('Step-1 H3: a missing series HOLDS the previous reading marked stale (never today\'s date)', () => {
+    const previous = buildInsightsSnapshot({
+      series: { us10y: daily('2026-08-29', 40, 3) },
+      calendar: [],
+      now: '2026-10-01T00:00:00Z',
+    });
+    // Simulate the stored previous snapshot carrying a good us10y reading.
+    const withUs10y = {
+      ...previous,
+      readings: previous.readings.map((r) =>
+        r.id === 'us10y' ? { ...r, value: 4.25, asOf: '2026-09-30', status: 'normal' } : r,
+      ),
+    } satisfies import('@currena/core').InsightsSnapshot;
+    const snap = buildInsightsSnapshot({ series: {}, calendar: [], previous: withUs10y, now: NOW });
+    const held = snap.readings.find((r) => r.id === 'us10y')!;
+    expect(held.status).toBe('stale');
+    expect(held.value).toBe(4.25); // last good value kept
+    expect(held.asOf).toBe('2026-09-30'); // original observation date, never today
+    // No previous reading → still honestly unavailable.
+    expect(snap.readings.find((r) => r.id === 'china-pmi')!.status).toBe('unavailable');
+  });
+
+  it('Step-1 A1: fed-target carries the true corridor bounds from DFEDTARL/DFEDTARU', () => {
+    const snap = buildInsightsSnapshot({
+      series: {
+        'fed-target': [
+          { date: '2026-09-15', value: 3.5 },
+          { date: '2026-09-29', value: 3.75 },
+        ],
+      },
+      fedTargetUpper: [
+        { date: '2026-09-15', value: 3.75 },
+        { date: '2026-09-29', value: 4.0 },
+      ],
+      calendar: [],
+      now: NOW,
+    });
+    const fed = snap.readings.find((r) => r.id === 'fed-target')!;
+    expect(fed.value).toBe(3.75); // the LOWER bound is the value
+    expect(fed.rangeLow).toBe(3.75);
+    expect(fed.rangeHigh).toBe(4.0); // "3.75% to 4.00%" — the audit's reference range
+  });
+
+  it('Step-1 A2/A3: release schedule stamps the official release date on scheduled readings', () => {
+    const snap = buildInsightsSnapshot({
+      series: {
+        'us-cpi-yoy': [{ date: '2026-08-01', value: 3.35 }],
+        'au-cpi': [{ date: '2026-08-01', value: 3.97 }],
+      },
+      calendar: [],
+      releaseSchedule: [
+        { date: '2026-09-11', affects: ['us-cpi-yoy'] },
+        { date: '2026-09-30', affects: ['au-cpi'] },
+        { date: '2026-10-14', affects: ['us-cpi-yoy'] }, // future release — not stamped
+      ],
+      now: '2026-10-12T00:00:00Z',
+    });
+    expect(snap.readings.find((r) => r.id === 'us-cpi-yoy')!.releaseDate).toBe('2026-09-11');
+    expect(snap.readings.find((r) => r.id === 'au-cpi')!.releaseDate).toBe('2026-09-30');
+    // Unscheduled indicators carry no releaseDate.
+    expect(snap.readings.find((r) => r.id === 'us10y')!.releaseDate).toBeUndefined();
   });
 
   it('stamps source attribution from READING_SOURCES on every reading', () => {

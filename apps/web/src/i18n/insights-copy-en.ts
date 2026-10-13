@@ -145,7 +145,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       low: 'US policy is loose by recent standards: usually supportive for borrowing and asset prices.',
     },
     whatItIs:
-      'The midpoint of the Federal Reserve’s target range for the overnight rate (FRED’s DFEDTARL and DFEDTARU): the card shows the full range, set at eight scheduled meetings a year.',
+      'The Federal Reserve’s target range for the overnight rate (FRED’s DFEDTARL and DFEDTARU): the card shows the full range, set at eight scheduled meetings a year.',
     whyItMatters:
       'It is the anchor of the US rate system: mortgages, savings, business loans and global dollar borrowing all reprice around it.',
     tendedToMean:
@@ -218,6 +218,23 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'It is one country’s prices in one month: a single reading sets no trend, and the mix of goods inside it shifts.',
     forYou:
       'The number behind world rate headlines: high US inflation usually means global borrowing stays dearer for longer.',
+  },
+  // Step-1 audit item A3: the core-CPI companion — rendered INSIDE the
+  // headline card ("Core inflation 2.4% · The gap between them is mainly
+  // energy"), never its own row.
+  'us-cpi-core-yoy': {
+    name: 'Core inflation',
+    ticker: 'Core CPI',
+    oneLiner: 'US prices excluding food and energy, compared with a year ago.',
+    lines: {},
+    whatItIs:
+      'The 12-month change in the US core consumer price index (FRED’s CPILFESL): the steady underlying measure the Fed watches most.',
+    whyItMatters:
+      'Core strips the volatile food and energy swings: it is the cleaner read on where inflation is heading.',
+    tendedToMean:
+      'Core runs steadier than headline inflation: it moved far less during the 2022 energy spike.',
+    cantTell: 'It is still one month of one country’s prices: not a trend on its own.',
+    forYou: 'A cross-check on the headline: when the two disagree, energy is usually why.',
   },
   'breakeven-5y5y': {
     name: 'Expected US inflation, five to ten years ahead',
@@ -305,8 +322,10 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   },
   'dollar-basket': {
     name: 'The dollar vs six big currencies',
+    // Step-1 audit item G4: "not the official DXY" rides the CARD, not
+    // only the footer's attribution line.
     oneLiner:
-      'The Currena dollar basket: the US dollar’s average value against the euro, yen, pound, Canadian dollar, krona and franc.',
+      'The Currena dollar basket — our own measure, not the official DXY index: the US dollar’s average value against the euro, yen, pound, Canadian dollar, krona and franc.',
     lines: {
       highRising: 'The dollar is strong and strengthening: a mix that tends to pressure world prices and debts.',
       highEasing: 'The dollar is strong but easing: pressure on world markets slowly lifting.',
@@ -458,11 +477,11 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       highEasing: 'Oil is expensive but easing: relief for petrol prices, if it lasts.',
       typical: 'Oil is in its usual range for the decade: no unusual pressure on fuel costs.',
       low: 'Oil is cheap versus recent history: usually good news for fuel and transport costs.',
-      jumping: 'Oil has jumped unusually fast: often war or supply shocks; wait before reading a trend.',
+      jumping: 'Oil has jumped unusually fast: usually war or supply shocks; wait before reading a trend.',
     },
     unitNote: 'US dollars per barrel',
     whatItIs:
-      'Brent crude: the price of a barrel of North Sea oil, the benchmark for most of the world’s traded oil, from the US Energy Information Administration via FRED. Daily values arrive in weekly batches, so the figure is normally about a week old.',
+      'Brent crude: the price of a barrel of North Sea oil, the benchmark for most of the world’s traded oil. The backbone series is the spot price from the US Energy Information Administration via FRED; the live tile refreshes hourly from Brent front-month futures (BZ=F) on Yahoo Finance, which also fills any EIA gap.',
     whyItMatters:
       'Oil feeds fuel, transport and electricity costs everywhere, and energy is a swing factor in inflation.',
     tendedToMean:
@@ -483,7 +502,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     },
     unitNote: 'US dollars per troy ounce',
     whatItIs:
-      'The spot price of gold per troy ounce, from a live metals feed (gold-api.com), on top of a decade of monthly World Bank prices.',
+      'The spot price of gold per troy ounce — an hourly quote from COMEX gold futures (GC=F) on top of a daily gold-api.com spot and a decade of monthly World Bank prices.',
     whyItMatters:
       'Gold is the classic “fear + inflation” asset: it tends to rise when real rates fall or uncertainty spikes, and it anchors jewellery and savings prices in many countries.',
     tendedToMean:
@@ -505,7 +524,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     },
     unitNote: 'US dollars per troy ounce',
     whatItIs:
-      'The spot price of silver per troy ounce, from a live metals feed (gold-api.com), on top of a decade of monthly World Bank prices.',
+      'The spot price of silver per troy ounce — an hourly quote from COMEX silver futures (SI=F) on top of a daily gold-api.com spot and a decade of monthly World Bank prices.',
     whyItMatters:
       'Silver is half precious metal, half industrial input: investment demand and factory demand (electronics, solar panels) pull on the same price.',
     tendedToMean:
@@ -542,7 +561,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     name: 'Bitcoin price',
     ticker: 'BTC',
     oneLiner:
-      'The world price of one bitcoin, in US dollars, from a live feed.',
+      'The world price of one bitcoin, in US dollars — an hourly quote from Yahoo Finance’s spot index, on a daily gold-api.com backbone.',
     lines: {
       highRising: 'Bitcoin is expensive and rising: a mood that tends to accompany easy money and risk appetite.',
       highEasing: 'Bitcoin is expensive but easing off its highs.',
@@ -566,7 +585,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     name: 'Gold versus Bitcoin',
     oneLiner: 'How many bitcoins one ounce of gold buys: old money priced in new money.',
     whatItIs:
-      'The gold price in US dollars divided by the bitcoin price, both from a live metals feed (gold-api.com).',
+      'The gold price in US dollars divided by the bitcoin price, both from the same hourly snapshot (Yahoo Finance quotes on the gold-api backbone).',
     whyItMatters:
       'A shorthand for how the market values the two flagship “hard” assets against each other.',
     tendedToMean:
@@ -579,7 +598,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     name: 'Silver versus Bitcoin',
     oneLiner: 'Silver’s price expressed in bitcoin terms.',
     whatItIs:
-      'The silver price divided by the bitcoin price, both from a live metals feed (gold-api.com).',
+      'The silver price divided by the bitcoin price, both from the same hourly snapshot (Yahoo Finance quotes on the gold-api backbone).',
     whyItMatters:
       'Tracks the industrial precious metal against the flagship crypto asset in one number.',
     tendedToMean: 'Its history is dominated almost entirely by the bitcoin side of the fraction.',
@@ -598,7 +617,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       typical: 'Inflation is {bandPos} {bandLabel}.',
       low: 'Inflation is low: the setting that usually lets the RBA consider cuts.',
     },
-    whatItIs: 'The ABS headline CPI (all groups) annual change, quarterly.',
+    whatItIs: 'The ABS monthly CPI (all groups) annual change: the full monthly measure the ABS now publishes.',
     whyItMatters:
       'The RBA’s 2–3% inflation target drives its rate decisions: this is the scoreboard.',
     tendedToMean:
@@ -619,7 +638,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       low: 'Underlying inflation is low: the setting that usually opens the door to rate cuts.',
     },
     whatItIs:
-      'The ABS trimmed mean, which drops the wildest price rises and falls each quarter before averaging.',
+      'The ABS monthly trimmed mean, which drops the wildest price rises and falls each month before averaging.',
     whyItMatters:
       'This is the gauge the RBA actually targets: steadier and more persistent than headline CPI.',
     tendedToMean:
@@ -1001,11 +1020,19 @@ export const insightsCopyEn = {
     howCalculatedHide: 'Hide how this is calculated',
     explainerIntro:
       'Each question group is a gauge: the share of its voting indicators currently in their alert zone sets the gauge’s step (0 → step 1, up to ⅓ → 2, up to ⅔ → 3, more → 4).',
+    // Step-1 audit item E1: the verdict rule, displayed — the SAME count
+    // mapping for both regions (the code: gauges.ts sectionVerdictStep).
+    verdictRule:
+      'How the verdict word is chosen: each area’s gauge steps 1–4 from how many of its scored indicators need attention. Critical: at least two areas critical, or every area stressed or worse. Stressed: at least two areas stressed or worse, or most areas cautious or worse. Cautious: any area cautious or worse. Stable: every area calm.',
+    heroCalmList: 'Calm: {names}.',
     explainerScore:
-      'A region’s verdict is the rounded average of its gauge steps: escalated when any single gauge sits at step 4. The four words (Stable, Cautious, Stressed, Critical) describe how much pressure an area is under, never actions.',
+      'A region’s verdict word comes from ONE count rule (shown above this line), the same for both regions: the word can never disagree with the areas it names.',
     explainerLabels: 'The labels describe conditions, not advice: Currena never recommends actions.',
     explainerStale: 'Stale or missing items are excluded from every gauge and count, and shown greyed with their last date.',
-    explainerBacktest: 'Thresholds were backtested against 2008, 2020 and 2022: the tables live in the project docs.',
+    // Step-1 audit item G5: the backtest sentence appears ONCE and states
+    // its small sample ("only three crises" — the reader deserves the N).
+    explainerBacktest:
+      'Thresholds were backtested against three crises — 2008, 2020 and 2022 — a small sample; the tables live in the project docs.',
     // H1 note: the Australia-first reading order with a swap setting.
     // Round-2 D7: the swap is RETIRED: Global is always first.
     // H2 → R3: needs-attention tiles with numbers under each verdict.
@@ -1040,11 +1067,26 @@ export const insightsCopyEn = {
     pricePositionTypical: 'normal',
     pricePositionHigh: 'expensive',
     btcRatiosLabel: 'Context only, not used in signals',
-    goldPerBtc: 'Gold per Bitcoin: {value}',
-    silverPerBtc: 'Silver per Bitcoin: {value}',
+    // Step-1 audit item C2: the ratios inverted for display — "One bitcoin
+    // buys 19.6 oz of gold" (the stored fraction is oz-per-bitcoin; the old
+    // "Gold per Bitcoin: 0.0509" label read as its own inverse).
+    btcBuysGold: 'One bitcoin buys {value} oz of gold',
+    btcBuysSilver: 'One bitcoin buys about {value} oz of silver',
     goldAudLine: 'In Australian dollars: {value}',
     copperUnitNote: 'converted from the live US price',
     pricesAsOf: 'as of {date}',
+    // Step-1 B5/C6: the card's data-date + change-window vocabulary.
+    dataFor: 'data for {date}',
+    dataForStale: 'data for {date} — not updated since',
+    releasedOn: 'released {date}',
+    sincePreviousRelease: 'since previous release',
+    // Step-1 audit item D3: the policy-rate cards' own move line.
+    recentMoveLine: 'Recent move: {change}',
+    staleTag: 'Stale',
+    belowPeak: '{pct}% below its 10-year peak',
+    pricesUpdated: 'prices updated {time}',
+    // Step-1 A3: the core-CPI companion note on the US inflation card.
+    coreGapNote: 'The gap between them is mainly energy.',
     // L1: the lane switch.
     laneLabel: 'Region',
     laneAustralia: 'Australia',
@@ -1081,10 +1123,16 @@ export const insightsCopyEn = {
     range10y: '10 years',
     range5y: '5 years',
     range1y: '1 year',
-    // Round 33: the Estimation strip's own per-metal trend chart — the
+    // Round 33: the Conditions strip's own per-metal trend chart — the
     // quarter window joins the reader-facing zooms; the chips sit under
     // the chart that fills the chip's white space.
     rangeQuarter: 'Quarter',
+    // Step-1 audit item C11: the delta's VISIBLE window word — "−5.5% over
+    // the past quarter" is clearly a measured, past change ("−5.5%
+    // Quarter" read like a forecast).
+    rangePastQuarter: 'over the past quarter',
+    rangePast1y: 'over the past year',
+    rangePast5y: 'over the past 5 years',
     stripChartAria: 'Price history for {metal}, the last {range}',
     stripChartLabel: 'Price history',
     // Round 34: the money rows' mini charts — the same structure, keyed
@@ -1132,8 +1180,11 @@ export const insightsCopyEn = {
       'Sources: the US Federal Reserve (FRED), the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics (CC BY 4.0), the World Bank, Frankfurter, gold-api.com, and EODHD with Yahoo Finance for the world stock markets.',
     aboutGeneralInfo: 'General information only: not financial advice.',
     aboutSourcesTitle: 'Sources',
+    // Step-1 audit item G3: the accurate list — EODHD, Yahoo Finance and
+    // gold-api ride beside the official publishers ("official and public
+    // sources only" was not true).
     aboutSourcesBody:
-      'Official and public sources only: the US Federal Reserve (FRED), the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics, the World Bank, Frankfurter and gold-api.com. Each card names and links its own source.',
+      'Sources: official publishers — the US Federal Reserve (FRED) and the US Bureau of Labor Statistics via FRED, the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics (CC BY 4.0) and the World Bank — plus market-data providers Frankfurter (ECB reference rates), gold-api.com, EODHD and Yahoo Finance (world stock markets, live commodity quotes, currencies). Each card names and links its own source. Free-tier licences are personal use; they are being reviewed before any commercial use.',
     fredNotice:
       'This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank of St. Louis.',
     // Round 24 (roast): the English notice sits on its OWN dir=ltr line.
@@ -1156,7 +1207,7 @@ export const insightsCopyEn = {
       'A scheduled job refreshes every source once a day (04:20 UTC) and writes one precomputed snapshot; the page you are reading serves that snapshot. Daily series update daily, monthly and quarterly ones when their publisher releases. The world stock market values refresh on their own weekday-evening schedule (23:30 UTC).',
     aboutRulesTitle: 'How the tiers are decided',
     aboutRulesBody:
-      'Needs attention: the indicator’s one fixed, published rule has fired (the rule is shown on its card). Unusual: no rule fired, but the latest value sits in the top or bottom 10% of its own 10-year range. Both tiers add context to the gauges; thresholds were backtested against 2008, 2020 and 2022.',
+      'Needs attention: the indicator’s one fixed, published rule has fired (the rule is shown on its card). Unusual: no rule fired, but the latest value sits in the top or bottom 10% of its own 10-year range. Both tiers add context to the gauges.',
     disclaimerTitle: 'Full disclaimer',
     disclaimerBody1:
       'Insights is general information about economic and market indicators. It is not financial advice, and nothing here recommends any action on any asset.',
@@ -1202,15 +1253,27 @@ export const insightsCopyEn = {
     viewFromHigh: 'From 52-week high',
     /** The focal verdict box's words (owner round 44) — market-speak on the
      * page's four-step instrument: step 1 Bullish (calm, most markets up
-     * over 3 months), 2 Mixed (calm, no clear direction), 3 Correcting (the
-     * needs-attention signal), 4 Bearish (the unusual signal). */
+     * over 3 months), 2 Mixed (calm, no clear direction), 3 Mixed with the
+     * in-correction count (the needs-attention signal — Step-1 audit E2:
+     * never a section-wide "Correcting" while most markets are calm; the
+     * dedicated word returns with the Step-3 verdict rules), 4 Bearish
+     * (the unusual signal). */
     verdictBullish: 'Bullish',
     verdictMixed: 'Mixed',
     verdictCorrecting: 'Correcting',
     verdictBearish: 'Bearish',
     verdictAria: 'World stock markets verdict: {label}, step {step} of 4',
+    /** Step-1 E2: the attention tier's count line beside the word. */
+    inCorrectionCount: '{n} of {count} markets in correction',
     /** Quiet-by-default tile tag (§6.3): correction/bear markets only. */
     tileTagBelow: '{x}% below 52-week high',
+    /** Step-1 F5: the at-high tag — every tile carries its 52-week distance. */
+    atHighTag: 'At its 52-week high',
+    /** Step-1 A7: a market more than one trading day behind the freshest
+     * close wears this tag (provider lag, honestly named). */
+    delayedTag: 'Delayed',
+    /** Step-1 F4: returns are in each market's own currency. */
+    localCurrencyNote: 'Returns in each market’s local currency.',
     /** Status words (§8.2) — correction maps to Needs attention, bear to Unusual. */
     statusNormal: 'Normal',
     statusCorrection: 'Correction',
@@ -1235,7 +1298,7 @@ export const insightsCopyEn = {
     /** States (§6.6). */
     empty: 'Market data is being prepared. Check back after the next daily update.',
     collapsedStale:
-      'World stock market data is old — last update {date}. It will return after the next daily update.',
+      'World stock market data is old — last update {date}. It returns after the next daily update.',
     // Round 44 (owner): the source line moved to the page footer (About this
     // data → the attribution list) beside every other source credit.
     /** Detail panel headings (§6.5) + numbers. */
@@ -1467,7 +1530,7 @@ export const insightsCopyEn = {
     oldData: 'Old data · {date}',
     /** States (§9.5). */
     empty: 'Currency data is being prepared. Check back after the next daily update.',
-    collapsedStale: 'Currency data is old — last update {date}. It will return after the next daily update.',
+    collapsedStale: 'Currency data is old — last update {date}. It returns after the next daily update.',
     /** Footer line (§9.3 item 7). */
     footerLine: 'ECB reference rates, once a day. A pattern is a tendency, not a prediction.',
     /** §10.3 headline templates — generated from the numbers, no AI call. */
@@ -1741,6 +1804,11 @@ export const insightsCopyEn = {
     usd: 'US$',
     aud: 'A$',
     'usd-bn': 'bn',
+    // Step-1 C7: "US$23.3 trillion" — the EN render prefixes US$ and
+    // suffixes the word; fa keeps its suffix form.
+    'usd-tr': 'trillion',
+    // Step-1 C4: EUR per USD renders with the € symbol.
+    eur: '€',
     index: 'index',
     jpy: '¥',
     cny: 'CN¥',
@@ -2001,8 +2069,9 @@ export const insightsCopyEn = {
     title: 'What the signals say',
     subtitle:
       'The conditions that usually surround each metal, in plain words: conditions, not forecasts, and not advice.',
-    // R26: one merged gold-and-silver card.
-    mergedTitle: 'Gold and silver',
+    // R26: one merged gold-and-silver card. Step-1 audit item G1: the card
+    // is named for its CONDITIONS, never an estimation.
+    mergedTitle: 'Conditions for gold and silver',
     mergedSubtitle: 'The two precious metals share most of their drivers: shared conditions are listed once.',
     conditionsMet: '{met} of {total} conditions met',
     metalLean: '{metal}: {lean}, {met} of {total} conditions met',
@@ -2012,17 +2081,19 @@ export const insightsCopyEn = {
       'mostly-unsupportive': 'mostly unsupportive',
     },
     metals: { gold: 'gold', silver: 'silver' },
-    // Round 23 (owner): the card states its estimation — a mechanical tally
-    // of the conditions above (supportive minus against; the sign is the
-    // direction). Describes the tally, still not advice. Round 32 (owner):
-    // the owner's own plain phrasing is back — "will go up" wears green,
-    // "will go down" wears red (R26's value words are retired); fa matches
-    // with the moves vocabulary (بالا می‌رود / پایین می‌آید).
-    verdictTitle: 'Estimation',
-    verdictUp: 'will go up',
-    verdictDown: 'will go down',
-    verdictFlat: 'no clear direction',
-    verdictNone: 'no estimate yet',
+    // Step-1 audit item G1: the strip states the CONDITION tally — "will
+    // go up / will go down" was a forecast and contradicted the page's own
+    // "conditions, not forecasts" line. Supports / Works against only.
+    verdictTitle: 'Conditions right now',
+    verdictUp: 'Supports',
+    verdictDown: 'Works against',
+    verdictFlat: 'Mixed',
+    verdictNone: 'Cannot read yet',
+    // Step-1 audit item C12: the one named interaction the checklist's
+    // separate lines cannot say — gold at its decade high WHILE real
+    // yields sit high too.
+    goldHighYieldsWarning:
+      'Gold is near its 10-year high while real yields are also high: this combination has historically been difficult for gold — the conditions work against it even at a record price.',
     // R26: neutral side words (no check/cross marks, no green/red).
     sideSupportive: 'Supports',
     sideAgainst: 'Works against',
@@ -2078,9 +2149,10 @@ export const insightsCopyEn = {
     // R7b: the collapsed summary: one line per metal ("Gold: mixed, 2 of
     // 5 conditions met: price in the top 7% of the last 10 years").
     collapsedFooting: 'price in the {band} of the last 10 years',
-    // Round 24: the collapsed line gets its takeaway — the round-23
-    // estimation rides the collapsed summary too.
-    collapsedVerdict: 'estimation: {verdict}',
+    // Round 24: the collapsed line gets its takeaway — the conditions
+    // tally rides the collapsed summary too (Step-1 G1: "conditions",
+    // never "estimation").
+    collapsedVerdict: 'conditions: {verdict}',
     bandTop: 'top {p}%',
     bandBottom: 'bottom {p}%',
     bandMid: 'the middle',
@@ -2122,9 +2194,11 @@ export const insightsCopyEn = {
       },
       savings: {
         name: 'Savings and interest',
-        attention: 'A rate or inflation number has left its usual range: savings interest and price rises have tended to move together.',
-        unusual: 'A savings-relevant rate sits at an unusual point of its 10-year range.',
-        calm: 'Savings interest settings look unremarkable for now.',
+        // Step-1 audit item C8: the row speaks about the CASH RATE (the
+        // number it shows) — deposit rates follow the target closely.
+        attention: 'The cash rate is high and inflation has left its usual range: deposit rates have usually tracked the cash rate closely, while prices keep rising.',
+        unusual: 'The cash rate sits at an unusual point of its 10-year range: savings interest usually follows it.',
+        calm: 'The cash rate and inflation sit in unremarkable settings: savings interest roughly tracks the cash rate.',
       },
       shop: {
         name: 'Shop prices and bills',

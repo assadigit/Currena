@@ -328,6 +328,28 @@ export function VerdictBlock({
       <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
         {reason}
       </p>
+      {/* Step-1 audit item E3: the CALM areas ride beside the stressed ones
+       * ("Financial stress and the yield curve are normal, so the stress is
+       * in prices, not in markets") — one quiet line naming what is calm,
+       * shown only when calm and non-calm coexist. */}
+      {(() => {
+        const calmGauges = gaugeRows.filter((g) => g.step === 1);
+        const nonCalm = gaugeRows.filter((g) => g.step !== 1);
+        if (calmGauges.length === 0 || nonCalm.length === 0) return null;
+        const calmNames = calmGauges
+          .map((g) => copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge as keyof typeof copy.groups] ?? g.gauge)
+          .join(', ');
+        return (
+          <p className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]">
+            <bdi>{interpolate(copy.ui.heroCalmList, { names: calmNames })}</bdi>
+          </p>
+        );
+      })()}
+      {/* Step-1 audit item E1: the count rule for the verdict word, displayed
+       * beside the word it produced — the SAME rule for both regions. */}
+      <p className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]">
+        <bdi>{copy.ui.verdictRule}</bdi>
+      </p>
       {/* R3 → round 24 → R40 (owner): the count line, the needs-attention
        * tiles WITH NUMBERS (largest text in the tile), the "+n more"
        * reveal and the how-link are ONE bottom-anchored module — a single

@@ -98,13 +98,53 @@ function arrowOf(n: number): 'up' | 'flat' | 'down' {
   return 'flat';
 }
 
+/**
+ * Step-1 audit item F2/F3: ONE flat threshold for every market and every
+ * view — |change| < 1% is "flat" (the old code derived the trend word from
+ * each market's own 50-day moving average, so ASX at −0.3% said "Down"
+ * while FTSE at +1.1% said "Flat", and DAX showed +0.6% with an up arrow
+ * labelled "Down"). The trend WORD and its ARROW now come from the same
+ * number the row shows.
+ */
+export const MARKETS_FLAT_BAND_PCT = 1;
+
+function bandedArrow(pct: number): 'up' | 'flat' | 'down' {
+  if (pct > MARKETS_FLAT_BAND_PCT) return 'up';
+  if (pct < -MARKETS_FLAT_BAND_PCT) return 'down';
+  return 'flat';
+}
+
+/** The Trend column's word source: the 3-month change (the default lens). */
+export function trendOf(m: Pick<MarketEntry, 'chg3m'>): 'up' | 'flat' | 'down' {
+  return bandedArrow(m.chg3m);
+}
+
 /** The number + direction the current view shows for one market. */
 function viewValue(m: MarketEntry, view: MarketsView): { pct: number; arrow: 'up' | 'flat' | 'down' } {
   if (view === 'high') {
-    return { pct: m.fromHigh, arrow: m.fromHigh <= -1 ? 'down' : 'flat' };
+    return { pct: m.fromHigh, arrow: bandedArrow(m.fromHigh) };
   }
   const pct = view === 'today' ? m.chg1d : m.chg3m;
-  return { pct, arrow: arrowOf(pct) };
+  return { pct, arrow: bandedArrow(pct) };
+}
+
+/**
+ * Step-1 audit item A7: how many TRADING days this market's last close sits
+ * behind the snapshot's freshest close (weekends never count — "a Saturday
+ * or Sunday must never appear as a trading date"). More than one trading
+ * day behind → the "Delayed" tag (the provider lag the audit caught on
+ * TSX/Ibovespa, honestly named instead of invisible).
+ */
+export function tradingDaysBehind(asOf: string, freshest: string): number {
+  if (asOf >= freshest) return 0;
+  const from = Date.parse(`${asOf}T00:00:00Z`);
+  const to = Date.parse(`${freshest}T00:00:00Z`);
+  let days = 0;
+  for (let t = from + 86_400_000; t <= to; t += 86_400_000) {
+    const dow = new Date(t).getUTCDay();
+    if (dow !== 0 && dow !== 6) days += 1;
+  }
+  return days;
 }
 
 /** The owner's green up / red down artwork beside a signed percentage
@@ -152,6 +192,13 @@ const TREND_WORD: Record<MarketEntry['trend'], 'trendUp' | 'trendFlat' | 'trendD
 };
 
 const TREND_ARROW: Record<MarketEntry['trend'], 'up' | 'flat' | 'down'> = { up: 'up', flat: 'flat', down: 'down' };
+
+/** Step-1 F2: the trend WORD key for trendOf's result (chg3m-sourced). */
+const TREND_WORD_OF: Record<'up' | 'flat' | 'down', 'trendUp' | 'trendFlat' | 'trendDown'> = {
+  up: 'trendUp',
+  flat: 'trendFlat',
+  down: 'trendDown',
+};
 
 /* ------------------------------------------------------------------ *
  * The view switch (§6.3): a real radiogroup, arrow keys work. The NORMAL
@@ -232,6 +279,7 @@ function MarketTile({
   locale,
   numberLocale,
   todayIso,
+  freshestIso,
   onToggle,
 }: {
   entry: MarketEntry;
@@ -241,16 +289,19 @@ function MarketTile({
   locale: 'en' | 'fa';
   numberLocale: 'en-US' | 'fa-IR';
   todayIso: string;
+  /** Step-1 A7: the snapshot's freshest close — the delayed tag's baseline. */
+  freshestIso: string;
   onToggle: (id: MarketId, opener: HTMLElement | null) => void;
 }) {
   const marketCopy = copy.markets.entries[entry.id];
   const { pct, arrow } = viewValue(entry, view);
   const old = isOld(entry, todayIso);
-  // Quiet by default: the tag rides ONLY on correction/bear tiles, and only
-  // when the view doesn't already show the distance itself.
-  const showTag = entry.status !== 'normal' && view !== 'high';
+  const delayed = !old && tradingDaysBehind(entry.asOf, freshestIso) > 1;
+  // Step-1 F5: EVERY tile shows its distance from the 52-week high
+  // (S&P 500 and Nasdaq included — not only the correcting markets).
   const tagX = formatNumber(Math.abs(entry.fromHigh), numberLocale, { maximumFractionDigits: 0 });
   const oldDate = formatAsOf(entry.asOf, locale);
+  const trendWord = copy.markets[TREND_WORD_OF[trendOf(entry)]];
 
   return (
     <button
@@ -280,11 +331,24 @@ function MarketTile({
         </bdi>
         <DirectionGlyph arrow={arrow} />
       </span>
-      {showTag ? (
+      {/* Step-1 F5: the 52-week distance rides EVERY tile — the correcting
+       * markets keep their warning tone; a market at its high says so. */}
+      {entry.fromHigh > -0.5 ? (
+        <span className="inline-flex items-center rounded-full bg-currena-success/10 px-2 py-0.5 text-[0.68rem] font-bold text-[var(--color-status-normal)]">
+          {copy.markets.atHighTag}
+        </span>
+      ) : (
         <span
-          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.68rem] font-bold ${STATUS_TONE[entry.status]}`}
+          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.68rem] font-bold ${
+            entry.status === 'normal' ? 'bg-currena-muted/15 text-[var(--color-text-secondary)]' : STATUS_TONE[entry.status]
+          }`}
         >
           {interpolate(copy.markets.tileTagBelow, { x: tagX })}
+        </span>
+      )}
+      {delayed ? (
+        <span className="inline-flex items-center rounded-full bg-currena-muted/15 px-2 py-0.5 text-[0.68rem] font-semibold text-[var(--color-text-secondary)]">
+          {copy.markets.delayedTag}
         </span>
       ) : null}
       {old ? (
@@ -293,7 +357,7 @@ function MarketTile({
         </span>
       ) : null}
       <span className="sr-only">
-        {copy.markets[TREND_WORD[entry.trend]]}, {copy.markets[STATUS_WORD[entry.status]]}, {interpolate(copy.markets.asOf, { date: oldDate })}
+        {trendWord}, {copy.markets[STATUS_WORD[entry.status]]}, {interpolate(copy.markets.asOf, { date: oldDate })}
       </span>
     </button>
   );
@@ -416,10 +480,19 @@ export function marketsVerdictStep(snapshot: Pick<MarketsSnapshot, 'markets' | '
   return up > markets.length / 2 ? 1 : 2;
 }
 
+/** How many of the snapshot's markets sit in correction or a bear market. */
+export function marketsInCorrectionCount(markets: readonly MarketEntry[]): number {
+  return markets.filter((m) => m.status === 'correction' || m.status === 'bear').length;
+}
+
 const VERDICT_WORD: Record<MarketsVerdictStep, 'verdictBullish' | 'verdictMixed' | 'verdictCorrecting' | 'verdictBearish'> = {
   1: 'verdictBullish',
   2: 'verdictMixed',
-  3: 'verdictCorrecting',
+  // Step-1 audit item E2: the attention tier says "Mixed" with the count
+  // ("Mixed: 5 of 16 in correction"), NOT a section-wide "Correcting" —
+  // 11 calm markets are not a correction. The dedicated word returns with
+  // the Step-3 verdict rules.
+  3: 'verdictMixed',
   4: 'verdictBearish',
 };
 
@@ -441,6 +514,10 @@ function MarketsVerdictBox({
   const word = copy.markets[VERDICT_WORD[step]];
   const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
   const ariaLabel = interpolate(copy.markets.verdictAria, { label: word, step: num(step) });
+  // Step-1 E2: the attention tier's concrete count — "5 of 16 in correction"
+  // beside the Mixed word (never a bare section-wide "Correcting").
+  const inCorrection = marketsInCorrectionCount(snapshot.markets);
+  const showCorrectionCount = step === 3 && inCorrection > 0;
   return (
     <div className="rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-4">
       <p className="m-0 flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -448,6 +525,16 @@ function MarketsVerdictBox({
           <IconImg src={stateIconUrl(step)!} size={44} desktopSize={60} className="drop-shadow-sm" />
         ) : null}
         <span className={`type-verdict ${stepToneClass(step)}`}>{word}</span>
+        {showCorrectionCount ? (
+          <span className="text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)]">
+            <bdi>
+              {interpolate(copy.markets.inCorrectionCount, {
+                n: num(inCorrection),
+                count: num(snapshot.markets.length),
+              })}
+            </bdi>
+          </span>
+        ) : null}
         <VerdictMeter step={step} label={word} ariaLabel={ariaLabel} size="lg" />
       </p>
       {/* §6.11: the verdict line — the MEASURE LABEL plus the page's
@@ -528,8 +615,12 @@ function MarketsTable({
   // One sort only (§6.4): from the 52-week high, worst first — a stable
   // sort keeps the trading-day order inside equal distances.
   const rows = [...snapshot.markets].sort((a, b) => a.fromHigh - b.fromHigh);
-  const trendCell = (m: MarketEntry): string => copy.markets[TREND_WORD[m.trend]];
-  const arrow = (m: MarketEntry): 'up' | 'flat' | 'down' => TREND_ARROW[m.trend];
+  // Step-1 F2: the trend word AND arrow come from the same 3-month number
+  // the row shows (the old 50-day-MA word contradicted the row beside it).
+  const trendCell = (m: MarketEntry): string => copy.markets[TREND_WORD_OF[trendOf(m)]];
+  const arrow = (m: MarketEntry): 'up' | 'flat' | 'down' => trendOf(m);
+  // Step-1 A7: the delayed tag's baseline — the freshest close in the payload.
+  const freshestIso = snapshot.markets.reduce((max, m) => (m.asOf > max ? m.asOf : max), snapshot.markets[0]?.asOf ?? '');
 
   return (
     <>
@@ -588,13 +679,28 @@ function MarketsTable({
                 <td className="px-2 py-1.5 text-end tabular-nums">
                   <bdi dir="ltr" className="font-semibold">{fmtClose(m.close, numberLocale)}</bdi>
                   <span className="ms-1 text-[var(--color-text-tertiary)]">({formatAsOf(m.asOf, locale)})</span>
+                  {tradingDaysBehind(m.asOf, freshestIso) > 1 ? (
+                    <span className="ms-1.5 rounded-full bg-currena-muted/15 px-1.5 py-0.5 text-[0.68rem] font-semibold text-[var(--color-text-secondary)]">
+                      {copy.markets.delayedTag}
+                    </span>
+                  ) : null}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      {/* Mobile (<900px): the same three numbers as vertical rows. */}
+      {/* Mobile (<900px): the same three numbers as vertical rows. Step-1
+       * F1: a one-time label header states which number is which (the
+       * desktop table has <th>; the list never did). */}
+      <p className="m-0 mb-1 flex items-baseline justify-between px-2.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)] min-[900px]:hidden">
+        <span>{copy.markets.thMarket}</span>
+        <span dir="ltr" className="inline-flex gap-3">
+          <span>{copy.markets.thToday}</span>
+          <span>{copy.markets.th3m}</span>
+          <span>{copy.markets.thFromHigh}</span>
+        </span>
+      </p>
       <ul className="m-0 grid list-none gap-1 p-0 min-[900px]:hidden">
         {rows.map((m) => (
           <li key={m.id}>
@@ -614,11 +720,25 @@ function MarketsTable({
                 ) : null}
               </span>
               <span className="inline-flex items-baseline gap-3 text-[length:var(--type-caption)] font-semibold tabular-nums">
-                <bdi dir="ltr">{signedPct(m.chg1d, numberLocale, locale)}</bdi>
-                <bdi dir="ltr">{signedPct(m.chg3m, numberLocale, locale)}</bdi>
-                <bdi dir="ltr">{signedPct(m.fromHigh, numberLocale, locale)}</bdi>
+                <bdi dir="ltr">
+                  {signedPct(m.chg1d, numberLocale, locale)}
+                  <span className="sr-only"> {copy.markets.thToday}</span>
+                </bdi>
+                <bdi dir="ltr">
+                  {signedPct(m.chg3m, numberLocale, locale)}
+                  <span className="sr-only"> {copy.markets.th3m}</span>
+                </bdi>
+                <bdi dir="ltr">
+                  {signedPct(m.fromHigh, numberLocale, locale)}
+                  <span className="sr-only"> {copy.markets.thFromHigh}</span>
+                </bdi>
               </span>
-              <span className="sr-only">{copy.markets[TREND_WORD[m.trend]]}, {copy.markets[STATUS_WORD[m.status]]}</span>
+              <span className="sr-only">{copy.markets[TREND_WORD_OF[trendOf(m)]]}, {copy.markets[STATUS_WORD[m.status]]}</span>
+              {tradingDaysBehind(m.asOf, freshestIso) > 1 ? (
+                <span className="rounded-full bg-currena-muted/15 px-1.5 py-0.5 text-[0.68rem] font-semibold text-[var(--color-text-secondary)]">
+                  {copy.markets.delayedTag}
+                </span>
+              ) : null}
             </button>
           </li>
         ))}
@@ -754,9 +874,13 @@ export function WorldMarkets({
        * the page's verdict anatomy, with the takeaway as its reason line. */}
       <MarketsVerdictBox snapshot={snapshot} copy={copy} numberLocale={numberLocale} />
 
-      {/* The view switch (§6.3). Default: the NORMAL 3-month timeframe. */}
-      <div>
+      {/* The view switch (§6.3). Default: the NORMAL 3-month timeframe.
+       * Step-1 F4: the local-currency note rides right beside it — returns
+       * are in each market's own currency (Ibovespa's +17.5% is not
+       * comparable with the others' USD terms). */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <ViewSwitch view={view} copy={copy} onChange={setView} />
+        <span className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{copy.markets.localCurrencyNote}</span>
       </div>
 
       {/* The strip: three labelled groups, the world waking up east to west
@@ -784,6 +908,7 @@ export function WorldMarkets({
                     locale={locale}
                     numberLocale={numberLocale}
                     todayIso={todayIso}
+                    freshestIso={asOf ?? todayIso}
                     onToggle={onToggleTile}
                   />
                 ))}

@@ -20,6 +20,7 @@ const KIND_CLASS: Record<CalendarEvent['kind'], string> = {
   rba: 'bg-currena-coral/20 text-[var(--color-text-secondary)]',
   'abs-cpi': 'bg-currena-success/15 text-[var(--color-text-secondary)]',
   fed: 'bg-currena-blue/15 text-[var(--color-status-context)]',
+  'us-cpi': 'bg-currena-blue/15 text-[var(--color-status-context)]',
   other: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
 };
 
@@ -27,6 +28,7 @@ const KIND_BADGE: Record<CalendarEvent['kind'], string> = {
   rba: 'RBA',
   'abs-cpi': 'CPI',
   fed: 'FED',
+  'us-cpi': 'CPI',
   other: '',
 };
 

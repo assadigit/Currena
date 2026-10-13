@@ -15,9 +15,11 @@
  *     become the row's natural non-voting status ('context' for info-rule
  *     rows, 'normal' for voting rows) — the stale-$125-oil symptom never
  *     renders as fresh-looking data again.
- *   gold-btc, silver-btc, gold-aud — the tiles' companion context lines,
- *     recomputed from the live bases (gold-aud keeps the snapshot's daily
- *     ECB audusd — FX reference rates are daily by definition).
+ *   gold-btc, silver-btc, gold-aud, gold-silver — the tiles' companion
+ *     context lines, recomputed from the live bases (gold-aud keeps the
+ *     snapshot's daily ECB audusd — FX reference rates are daily by
+ *     definition). Step-1 audit item C3: the gold/silver ratio now joins
+ *     them, so the ratio always matches the two prices shown beside it.
  *
  * NEVER touched: the summary/verdict (EOD analytics, recomputed only by the
  * daily run), percentile10y (a 10-year statistic on the EOD series — a
@@ -165,5 +167,31 @@ export function mergeLivePricesIntoSnapshot(
     }
   }
 
-  return { ...snapshot, readings: snapshot.readings.map((r) => out.get(r.id as string) ?? r) };
+  // 4. The gold/silver ratio — Step-1 audit item C3: recomputed from the
+  //    SAME live bases the two tiles show, so the ratio can never disagree
+  //    with the prices beside it (the old snapshot-only ratio was one
+  //    generation behind the live tiles). Only when BOTH metals are live;
+  //    changes ride the gold tile's live change fields (the ratio's own
+  //    change windows come from the EOD history and stay untouched).
+  if (liveGold !== undefined && liveSilver !== undefined && liveSilver.value > 0) {
+    const goldSilver = byId.get('gold-silver');
+    if (goldSilver !== undefined) {
+      out.set('gold-silver', patchReading(goldSilver, {
+        value: Math.round((liveGold.value / liveSilver.value) * 10) / 10,
+        asOf: laterDate(liveGold.asOf, liveSilver.asOf),
+        sourceName: LIVE_RATIO_SOURCE.goldSilver.name,
+        sourceUrl: LIVE_RATIO_SOURCE.goldSilver.url,
+        updatedAt: generatedAt,
+      }));
+    }
+  }
+
+  // Step-1 audit item G7: expose the live run's clock so the page can say
+  // "prices updated {time}" — the snapshot's generatedAt stays the analytics'
+  // date (EOD backbone), pricesAsOf names the hourly quotes' generation.
+  return {
+    ...snapshot,
+    pricesAsOf: generatedAt,
+    readings: snapshot.readings.map((r) => out.get(r.id as string) ?? r),
+  };
 }

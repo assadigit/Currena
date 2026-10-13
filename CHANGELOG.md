@@ -5,6 +5,230 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-13] — Insights Step-1 fix list (the 12 Oct audit) + the fx evidence artifacts
+
+The owner's external audit of https://currena.ir/#/insights (snapshot dated
+8–11 Oct 2026) produced a three-step fix list; this wave is **Step 1: fix
+everything that is wrong on the existing page** — wrong or outdated numbers,
+date handling, calculation and label errors, contradictions, hero verdict
+mapping, stock-row presentation, forecast wording, trust/compliance items
+and the data pipeline. No new indicators (except the core-CPI companion
+line, which the audit itself asked for on the US inflation card); Step 2
+(missing indicators) and Step 3 (live verdicts) stay future work.
+
+### A. Wrong or outdated numbers — Fixed
+
+- **Fed target range (A1).** The card now shows the TRUE published corridor
+  from FRED's DFEDTARL/DFEDTARU ("3.75%–4.00%"), not a midpoint with a
+  hard-coded 25bp skirt (the old render mixed the lower bound with the
+  midpoint: "3.75% to 3.88%"). `value` carries the lower bound; the upper
+  bound rides the new `rangeHigh` field.
+- **Australian inflation (A2).** au-cpi/au-trimmed-mean switched from the
+  retired quarterly keys to the **ABS monthly CPI** (CPI/1.10001.10.50.M +
+  CPI/1.999902.20.50.M — live-verified: August 2026 annual **4.0% headline /
+  3.6% trimmed mean**, exactly the audit's reference values). Cadence
+  monthly; the card shows the DATA MONTH and the official release date.
+- **US inflation (A3).** Core CPI (CPILFESL) joins the payload as a
+  context companion rendered INSIDE the headline card — "Core inflation
+  2.4% · The gap between them is mainly energy." — never its own row.
+  The card's date speaks the data month + release date, never "Updated Jul 31".
+- **RBA cash rate (A4).** The engine now reads the DAILY F1 "Cash Rate
+  Target" (a decision-day move shows at once — the Sep-2026 hike reads
+  4.60% from its effective date), with F1.1 monthly kept as the fallback.
+  The savings money-row leads with the cash rate and wears a new
+  piggy-bank artwork (the old row showed the inflation rate under a
+  stock-exchange icon).
+- **Other AU/US series (A5/A6, verify).** Verified against the live
+  sources: wages/home-values/terms-of-trade already sit at 2026-Q2 (the
+  audit snapshot predated the Q2 release), unemployment at August, M2 at
+  August, US CPI at August (3.35% → 3.4%), govt-interest-revenue at the
+  freshest BEA quarter FRED carries. The data-check evidence is in this
+  wave's live verification.
+- **Stock market dates (A7).** Every row and tile already shows its own
+  last trading date; a market **more than one trading day behind the
+  freshest close now wears a "Delayed" tag** (the honest name for the
+  provider lag the audit caught on TSX/Ibovespa), and the weekend rule is
+  pinned by a trading-day counter (never a Saturday/Sunday date).
+- **Brent (A8) + Bitcoin (A9).** The tiles name their source AND contract:
+  Brent's backbone is the EIA spot series (FRED), the live tile is
+  front-month futures (BZ=F) on Yahoo Finance; gold/silver name their
+  futures (GC=F/SI=F) over the gold-api spot backbone; Bitcoin names its
+  Yahoo spot index. The live-merge attributions carry the same wording.
+
+### B. Dates and calendar — Fixed
+
+- **Decision days (B1).** The calendar dates were already decision days in
+  the data; the one-day shift was a RENDERING bug — date-only ISO strings
+  were parsed as UTC midnight and formatted in the browser's local
+  timezone (behind-UTC viewers saw the FOMC on 27 Oct and the RBA on
+  2 Nov). Date-only strings now format in UTC everywhere (core format.ts).
+- **ABS CPI labels (B1).** "September quarter" → "ABS monthly CPI:
+  September 2026" (all entries re-titled; the quarterly ids renamed).
+- **US CPI calendar event (B4).** Added: 14 Oct 2026 (kind `us-cpi`), wired
+  to the US inflation card.
+- **Days away (B3).** Already computed at page load from today's date —
+  the printed date was the bug (fixed above).
+- **A date on EVERY card (B5).** Every card and row now carries its data
+  date — "data for August 2026" for monthlies/quarterlies (the observation
+  month, never the fetch date), "as of 9 Oct 2026" for dailies — plus the
+  official release date when the new hand-maintained
+  `data/insights-release-schedule.json` knows it (US CPI 11 Sep / 14 Oct;
+  ABS monthly CPI 30 Sep / 28 Oct / 25 Nov), including Normal-state cards
+  (the audit: terms of trade showed none).
+
+### C. Calculation and label errors — Fixed
+
+- **Gold/Silver per Bitcoin (C1/C2).** The old labels were inverted ("Gold
+  per Bitcoin: 0.0509" is oz-per-bitcoin). Now: **"One bitcoin buys 19.6
+  oz of gold"** / **"One bitcoin buys about 1,368 oz of silver"** — the
+  display inverts the stored fraction, so the number always matches the
+  sentence.
+- **Gold/silver ratio (C3).** The ratio is recomputed at serve time from
+  the SAME live snapshot the two tiles show (it was one generation behind
+  and disagreed with the prices beside it).
+- **Euro per US dollar (C4).** "US$0.8944" → **"€0.8944"** (fa: یورو).
+- **Percentage points (C5).** Every rate-type series (US/AU CPI, trimmed
+  mean, petrol, rent, wages, home-loan, govt-interest share) now expresses
+  changes in POINTS; % stays for prices and indexes. The +88.1%/+35.6%/+12.7%
+  relative-of-a-rate artifacts are gone.
+- **"30-day" on monthly series (C6).** Monthly/quarterly changes are now
+  computed vs the PREVIOUS RELEASE and labelled "since previous release".
+- **M2 (C7).** "bn23,343" → **"US$23.3 trillion"** (+ its data month).
+- **Savings row (C8).** See A4 — a real deposit-linked rate (the cash
+  rate) with the right icon.
+- **10-year position on trending totals (C10).** M2 and home values
+  measure their 10-year position on YEAR-ON-YEAR GROWTH (the level-based
+  percentile was permanently pinned near 100% just for rising); the cards
+  say so.
+- **Distance from the peak (C9).** Gold, silver, Brent and Bitcoin carry
+  "x.x% below its 10-year peak" — the same honesty the stock tiles have.
+- **Estimation chart (C11).** The delta now reads "−5.5% over the past
+  quarter" — the window word is visible, clearly a past change.
+- **Real yields (C12).** The daily staleness grace was tightened to stop
+  the false "Stale/Cannot read" (FRED's H.15 series publish a day late);
+  the gold card gained the audit's requested warning when gold sits near
+  its decade high WHILE real yields are also high.
+
+### D. Contradictions — Fixed
+
+- **Status is the single source of truth (D1).** Consequence lines never
+  claim a direction without a measured change (a high band + no measurable
+  move now falls back to the neutral oneLiner — the old code called every
+  unmeasured case "easing", contradicting the money panel's "becoming
+  more expensive" on the same number).
+- **Petrol (D6).** The money row's direction reads from the SAME rule that
+  fired (brent's out-of-range rise rule ⇒ "Becoming more expensive", never
+  "No clear direction" beside an oil warning).
+- **ECB card (D3).** The policy-rate cards (ECB, Fed, RBA) state the SIZE
+  OF THE MOVE as its own labelled line ("Recent move: +0.25 pts") beside
+  the level line.
+- **Inflation expectations (D4).** Re-backtested against the full FRED
+  T5YIFR history (p50 2.18 · p80 2.30 · p95 2.40): the old top-20%-of-
+  decade rule flagged 2.32% as "Needs attention" while the 2024–26 regime
+  median sits at 2.26. New evidence rule: **above 2.4% sustained 4 weeks**
+  — it fired exactly once in the decade (autumn 2023) and never on noise;
+  the rule is shown on the card.
+- **Oil in the hero count (D5).** Oil IS scored and the About section says
+  so plainly (the copy no longer claims "prices are context, not scored").
+- **Oil cause claims (D8).** "often war or supply shocks" → "usually war
+  or supply shocks" (both locales).
+
+### E. Hero summary and verdict words — Fixed
+
+- **One mapping (E1).** The region verdict word comes from ONE count rule
+  (in gauges.ts, used by both regions and displayed on the page):
+  Critical = ≥2 areas critical or every area stressed-or-worse; Stressed =
+  ≥2 areas stressed-or-worse or most areas cautious-or-worse; Cautious =
+  any area above calm; Stable = all calm. The audit's exact snapshot now
+  reads Australia [3,3,1] → Stressed (was "Cautious") and Global
+  [4,1,1,1,1] → Cautious (was "Stressed").
+- **Stock headline (E2).** The attention tier says **"Mixed: 5 of 16
+  markets in correction"** — never a section-wide "Correcting" while 11
+  markets are calm (the dedicated word returns with Step 3).
+- **Calm areas named (E3).** Each hero lists its calm areas ("Calm:
+  borrowing costs, market stress…") beside the stressed ones.
+
+### F. Stock rows — Fixed
+
+- **Column headers (F1).** The mobile row list gained the label header
+  (Market · Today · 3 months · From 52-week high) + per-number sr-only
+  labels; the desktop table always had them.
+- **Trend word and number (F2/F3).** ONE flat threshold (±1%) for every
+  market and view; the trend WORD and its ARROW both come from the number
+  the row shows (3-month by default) — the DAX "+0.6% up-arrow labelled
+  Down" mismatch is gone (the old word came from each market's 50-day MA).
+- **Local currency (F4).** "Returns in each market's local currency" sits
+  beside the view switch (and in About).
+- **52-week distance everywhere (F5).** Every tile shows it — including
+  S&P 500 and Nasdaq; a market at its high says "At its 52-week high".
+
+### G. Wording, compliance and trust — Fixed
+
+- **The forecast rename (G1/G2).** The card is **"Conditions for gold and
+  silver"**, the strip says **"Conditions right now"**, and the verdict
+  words are **"Supports / Works against / Mixed / Cannot read yet"** —
+  "will go up / will go down" was a forecast and contradicted the page's
+  own "conditions, not forecasts" line. The whole corpus was swept for
+  "will / should / time to / expected to" (EN + FA) and the remaining hits
+  rewritten as conditions.
+- **Sources line (G3).** The accurate list: official publishers (Fed/FRED,
+  BLS via FRED, ECB, RBA, ABS, World Bank) PLUS the market-data providers
+  (Frankfurter, gold-api, EODHD, Yahoo Finance), with the licence-review
+  note for commercial use.
+- **Dollar basket (G4).** "Not the official DXY" rides the CARD itself
+  (the oneLiner), not only the footer.
+- **Backtest sentence (G5).** Appears once, and states its sample: "three
+  crises — 2008, 2020 and 2022 — a small sample".
+- **"Live" wording (G7).** The tiles' copy names hourly futures quotes on
+  a daily backbone, and the page header shows **"prices updated HH:MM"**
+  beside "Data as of {date}" (the live-prices clock is now served in the
+  payload as `pricesAsOf`).
+- **Disclaimer (G6).** Unchanged in content — the audit's ask (an
+  Australian professional review before commercial use) is recorded in the
+  About section's licence note and the docs.
+
+### H. Data pipeline — Fixed
+
+- **Stale tags (H1).** The daily grace moved 3 → 5 days (FRED's H.15
+  series publish a day late; a Friday obs is legitimately 3 days old by
+  the next ingest — production evidence: DGS10 obs 2026-10-08 reading
+  `stale` on Oct 12 while FRED confirmed it was the freshest print that
+  existed). Every card shows its stale tag when past its release schedule.
+- **Relationship cards (H2).** The two "not enough fresh data" cards
+  (incl. oil→expectations→borrowing costs) read again — their legs were
+  the false-stale DGS10/DFII10 rows.
+- **Fetch failures (H3).** A failed source now HOLDS the last good value —
+  carried forward with its ORIGINAL asOf (never today's date) and marked
+  `stale`; the ingest still exits red for P1 fetch failures (the operator
+  keeps the signal, the reader keeps the number).
+
+### Spec finish-line artifacts (world currencies)
+
+- **The evidence run (§6.6, step 3)** — `pnpm --filter @currena/insights
+  fx-evidence` replays 522 weeks (2016-10 → 2026-10) through the
+  production rule engine: R1 7.5% of weeks / R2 2.9% / R3 11.7% / R4 6.5%
+  / R5 15.3% / R6 4.0% (all under the 15% usefulness bar except R5,
+  marginal — flagged for Ali), the known episodes (2018–19, March 2020,
+  2022, Aug 2024, Apr 2025) all caught, and the pattern check tallies
+  Holding/Mixed/Not-holding. Committed as
+  `docs/specs/insights-world-currencies-evidence.md`.
+- **The fx data check (step 0)** — both providers side by side for all 10
+  pairs (10/10 within 0.5%, 4 exact). Committed as
+  `docs/specs/insights-world-currencies-data-check.md`.
+- The markets data-check gained its KV-usage record (§4 rule 9: ≤1
+  write/day confirmed over the first five live days).
+
+### Contract + budget
+
+- `IndicatorReading` gains optional `rangeLow/rangeHigh/fromPeak10y/
+  releaseDate`; the snapshot gains serve-time `pricesAsOf`; the calendar
+  gains the `us-cpi` kind; `IndicatorDefinition` gains `percentileBasis`;
+  +1 indicator id (`us-cpi-core-yoy`, context-only — the card companion).
+- Insights lazy chunk 450.10/110.38 → **465.61/114.56** (budget bumped to
+  469/115.5, itemised in scripts/check-bundle-budget.mjs; the entry chunk
+  untouched at 290.37/87.83). 1,000 tests green across the monorepo
+  (183 core + 67 scraper + 328 insights + 7 markets + 136 api + 279 web).
+
 ## [2026-10-13] — World currencies: the patterns section (direction B)
 
 The Insights page's sixth dedicated section (insights-world-currencies-spec.md

@@ -49,6 +49,7 @@ import {
   collectAllSources,
   historyToSeries,
   parseManualSeries,
+  parseReleaseSchedule,
 } from '../src/adapters/index';
 import { RestInsightsStore } from '../src/store';
 
@@ -146,6 +147,19 @@ reports.push({
       : `china-pmi: ${chinaPmi?.length ?? 0} observations`,
 });
 
+// Step-1 audit items A2/A3: the hand-maintained release schedule (official
+// publication dates for the monthly series). Absence is soft (cards then
+// show the data month only); a PRESENT file must validate loudly.
+const scheduleUrl = new URL('data/insights-release-schedule.json', repoRoot);
+const scheduleRaw = loadJsonFile(scheduleUrl);
+const releaseSchedule =
+  scheduleRaw === undefined ? undefined : parseReleaseSchedule(scheduleRaw);
+console.log(
+  scheduleRaw === undefined
+    ? '[ingest] data/insights-release-schedule.json: absent — cards show the data month only'
+    : `[ingest] release schedule: ${releaseSchedule!.length} entries`,
+);
+
 const series = buildIndicatorSeries({ ...inputs, chinaPmi });
 
 /* ------------------------------------------------------------------ *
@@ -189,7 +203,14 @@ if (previous) {
   console.log('\n[ingest] no previous snapshot — first run (changedThisWeek starts empty)');
 }
 
-const snapshot = buildInsightsSnapshot({ series, previous, calendar, now: nowIso });
+const snapshot = buildInsightsSnapshot({
+  series,
+  previous,
+  calendar,
+  releaseSchedule,
+  fedTargetUpper: inputs.fred.DFEDTARU,
+  now: nowIso,
+});
 const status = buildInsightsStatus({ reports, generatedAt: nowIso, mode, dryRun });
 
 /* ------------------------------------------------------------------ *
@@ -286,8 +307,20 @@ const p1Unavailable = DEFINITIONS.filter(
   (d) => d.phase === 'P1' && snapshot.readings.find((r) => r.id === d.id)?.status === 'unavailable',
 ).map((d) => d.id);
 
+// Step-1 audit item H3 companion: a held-stale P1 reading (last good value
+// carried forward after a failed fetch) must still light the red run — the
+// page degrades gracefully, the operator still gets the signal.
+const heldP1 = DEFINITIONS.filter((d) => {
+  if (d.phase !== 'P1') return false;
+  const r = snapshot.readings.find((x) => x.id === d.id);
+  return r?.status === 'stale' && !series[d.id];
+}).map((d) => d.id);
+
 if (p1Unavailable.length > 0) {
   fail(`P1 indicators unavailable (product degraded): ${p1Unavailable.join(', ')}`);
+}
+if (heldP1.length > 0) {
+  fail(`P1 fetch failures held on last good values (marked stale): ${heldP1.join(', ')}`);
 }
 if (failedSources.length > 0) {
   console.warn(`\n[ingest] WARNING — failing sources: ${failedSources.map((s) => s.source).join(', ')}`);

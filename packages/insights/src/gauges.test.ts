@@ -60,26 +60,63 @@ describe('gauge step mapping (data spec §4)', () => {
   });
 });
 
-describe('sectionVerdictStep (rounded average + escalation)', () => {
-  it('is the rounded average of readable gauge steps', () => {
-    // Australia: 3 gauges at steps (readings drive them) — build mixed statuses.
+describe('sectionVerdictStep (the Step-1 E1 count rule — one mapping, both regions)', () => {
+  it('a majority of areas at step ≥ 2 → stressed (was a rounded average)', () => {
     const readings = [
       ...readingsFor('au-inflation-rates', 2, 1, 0), // 2/3 → step 3
       ...readingsFor('au-households', 0, 6, 0), // 0 → step 1
       ...readingsFor('au-trade-currency', 1, 3, 0), // 1/4 = 0.25 → step 2
     ];
-    // Average = 2.0 → verdict 2.
-    expect(sectionVerdictStep('australia', readings)).toBe(2);
+    // Steps [3,1,2]: not two areas ≥ 3, but a majority (2 of 3) ≥ 2 → 3.
+    expect(sectionVerdictStep('australia', readings)).toBe(3);
   });
 
-  it('escalates to at least 3 when any gauge sits at step 4', () => {
+  it('ONE critical area with the rest calm → cautious (the audit\'s Global case)', () => {
     const readings = [
       ...readingsFor('au-inflation-rates', 3, 0, 0), // 3/3 → step 4
       ...readingsFor('au-households', 0, 6, 0), // step 1
       ...readingsFor('au-trade-currency', 0, 4, 0), // step 1
     ];
-    // Average 2 → but the step-4 gauge escalates to 3.
-    expect(sectionVerdictStep('australia', readings)).toBe(3);
+    // Steps [4,1,1]: only one area ≥ 3 and not a majority ≥ 2 → 2. The
+    // reason line still names the critical area; the word no longer
+    // overstates one hot gauge into a region-wide "stressed".
+    expect(sectionVerdictStep('australia', readings)).toBe(2);
+  });
+
+  it('the audit\'s exact snapshot words: Australia [3,3,1] → stressed, Global [4,1,1,1,1] → cautious', () => {
+    // Australia 2026-10-12: au-inflation 2/3 warning → 3, au-households 3/6 → 3,
+    // au-trade 0/4 → 1. Two areas ≥ 3 → STRESSED (the page said Cautious).
+    const au = [
+      ...readingsFor('au-inflation-rates', 2, 1, 0), // step 3
+      ...readingsFor('au-households', 3, 3, 0), // 0.5 → step 3
+      ...readingsFor('au-trade-currency', 0, 4, 0), // step 1
+    ];
+    expect(sectionVerdictStep('australia', au)).toBe(3);
+    // Global 2026-10-12: prices-heat 2/2 → 4, everything else calm → CAUTIOUS
+    // (the page said Stressed — one critical area is not a region-wide stress).
+    const global = [
+      ...readingsFor('borrowing-costs', 0, 4, 2), // step 1
+      ...readingsFor('prices-heat', 2, 0, 0), // step 4
+      ...readingsFor('market-stress', 0, 3, 0), // step 1
+      ...readingsFor('dollar-strength', 0, 2, 0), // step 1
+      ...readingsFor('growth-health', 0, 3, 0), // step 1
+    ];
+    expect(sectionVerdictStep('global', global)).toBe(2);
+  });
+
+  it('alarmed only for two critical areas, or every area stressed-or-worse', () => {
+    const twoCritical = [
+      ...readingsFor('au-inflation-rates', 3, 0, 0), // step 4
+      ...readingsFor('au-households', 5, 1, 0), // 5/6 > 2/3 → step 4
+      ...readingsFor('au-trade-currency', 0, 4, 0), // step 1
+    ];
+    expect(sectionVerdictStep('australia', twoCritical)).toBe(4);
+    const allStressed = [
+      ...readingsFor('au-inflation-rates', 2, 1, 0), // step 3
+      ...readingsFor('au-households', 4, 2, 0), // 4/6 → step 3
+      ...readingsFor('au-trade-currency', 2, 2, 0), // 0.5 → step 3
+    ];
+    expect(sectionVerdictStep('australia', allStressed)).toBe(4);
   });
 
   it('unreadable gauges lower nothing; nothing readable → 0', () => {
@@ -126,10 +163,10 @@ describe('summarizeByGauges (the summary wire shape)', () => {
       reading('rba-cash-rate', 'context'),
     ];
     const s = summarizeByGauges(readings);
-    // Average (2+1+1)/3 = 1.33 → round 1 → relaxed.
+    // Steps [2,1,1]: any area ≥ 2 → cautious (the E1 count rule).
     expect(s.australia).toEqual({
       section: 'australia',
-      label: 'relaxed',
+      label: 'cautious',
       warningCount: 1,
       votingCount: 12,
       excludedCount: 1,

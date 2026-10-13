@@ -17,20 +17,62 @@ import { InsightsSnapshotSchema, IndicatorHistorySchema, InsightsStatusSchema } 
 import { changedSince, computeReading, PERCENTILE_WINDOW_DAYS, type AuxSeries, type ReadingSource } from '../scoring';
 import { summarizeByGauges } from '../gauges';
 import { DEFINITIONS } from '../definitions';
-import { addDays, epochDay, fromEpochDay, type SeriesPoint } from '../series';
+import { addDays, epochDay, fromEpochDay, pointAtOrBefore, type SeriesPoint } from '../series';
 import { AUX_RULE_WIRING, READING_SOURCES } from './derived';
+
+/**
+ * Step-1 audit items A2/A3: a hand-maintained release event (official
+ * publication dates for the monthly/quarterly series — data/
+ * insights-release-schedule.json). The ingest stamps the matching readings
+ * with `releaseDate` so cards can say "data for August 2026 · released
+ * 11 September 2026".
+ */
+export interface ReleaseScheduleEntry {
+  /** The official release (publication) date. */
+  date: string;
+  /** The indicator ids this release published for. */
+  affects: readonly IndicatorId[];
+}
+
+/** Validate the raw JSON of data/insights-release-schedule.json (loud, never garbage). */
+export function parseReleaseSchedule(raw: unknown): readonly ReleaseScheduleEntry[] {
+  if (!Array.isArray(raw)) throw new Error('release schedule: expected a JSON array');
+  const out: ReleaseScheduleEntry[] = [];
+  for (const entry of raw) {
+    if (typeof entry !== 'object' || entry === null) throw new Error('release schedule: entry is not an object');
+    const { date, affects } = entry as { date?: unknown; affects?: unknown };
+    if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      throw new Error(`release schedule: bad date "${String(date)}"`);
+    }
+    if (!Array.isArray(affects) || affects.some((id) => typeof id !== 'string')) {
+      throw new Error(`release schedule: bad affects list at ${date}`);
+    }
+    out.push({ date, affects: affects as readonly IndicatorId[] });
+  }
+  out.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  return out;
+}
 
 export interface SnapshotBuildInputs {
   /** Assembled indicator series (buildIndicatorSeries output). */
   series: Partial<Record<IndicatorId, SeriesPoint[]>>;
   /**
    * The previously STORED snapshot, when one exists — its readings feed the
-   * "what changed this week" diff and its accumulated events are carried
-   * forward (a daily runner only remembers yesterday otherwise).
+   * "what changed this week" diff, its accumulated events are carried
+   * forward (a daily runner only remembers yesterday otherwise), and (Step-1
+   * audit item H3) a MISSING series now holds its last good reading marked
+   * `stale` instead of collapsing to `unavailable`.
    */
   previous?: InsightsSnapshot | undefined;
   /** Hand-maintained calendar entries (data/insights-calendar.json). */
   calendar: readonly CalendarEvent[];
+  /** Hand-maintained release schedule (data/insights-release-schedule.json). */
+  releaseSchedule?: readonly ReleaseScheduleEntry[];
+  /**
+   * Step-1 audit item A1: the DFEDTARU series (upper bound of the Fed
+   * target range) — attached to the fed-target reading as `rangeHigh`.
+   */
+  fedTargetUpper?: SeriesPoint[];
   /** The run's clock (ISO 8601 UTC) — generatedAt and every reading's updatedAt. */
   now: string;
 }
@@ -44,26 +86,67 @@ export interface SnapshotBuildInputs {
  */
 export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnapshot {
   const readings: IndicatorReading[] = [];
+  const nowDayIso = inputs.now.slice(0, 10);
+  // The latest release event at or before today, per indicator id.
+  const releaseBy = new Map<IndicatorId, string>();
+  for (const entry of inputs.releaseSchedule ?? []) {
+    if (entry.date > nowDayIso) continue;
+    for (const id of entry.affects) releaseBy.set(id, entry.date);
+  }
   for (const def of DEFINITIONS) {
     const series = inputs.series[def.id];
     const source: ReadingSource = READING_SOURCES[def.id] ?? { name: def.sourceRef };
     if (!series) {
-      readings.push({
-        id: def.id,
-        value: null,
-        asOf: null,
-        status: 'unavailable',
-        sourceName: source.name,
-        sourceUrl: source.url,
-        updatedAt: inputs.now,
-      });
+      // Step-1 audit item H3: a failed fetch HOLDS the last good value —
+      // carried forward with its ORIGINAL asOf (never today's date) and
+      // status `stale` (visible honesty, excluded from every count).
+      const held = inputs.previous?.readings.find((r) => r.id === def.id);
+      if (held && held.value !== null && held.asOf !== null) {
+        readings.push({
+          id: def.id,
+          value: held.value,
+          asOf: held.asOf,
+          status: 'stale',
+          sourceName: source.name,
+          sourceUrl: source.url,
+          updatedAt: inputs.now,
+        });
+      } else {
+        readings.push({
+          id: def.id,
+          value: null,
+          asOf: null,
+          status: 'unavailable',
+          sourceName: source.name,
+          sourceUrl: source.url,
+          updatedAt: inputs.now,
+        });
+      }
       continue;
     }
     // I15: below-aux rules get their paired series (wage growth vs CPI).
     const auxOf = AUX_RULE_WIRING[def.id];
     const auxSeries = auxOf ? auxOf(inputs.series) : undefined;
     const aux: AuxSeries | undefined = auxSeries ? { series: auxSeries } : undefined;
-    readings.push(computeReading(def, series, inputs.now, source, aux));
+    const reading = computeReading(def, series, inputs.now, source, aux);
+    // Step-1 audit items A2/A3: stamp the official release date when the
+    // schedule knows it (only meaningful once the observation exists).
+    const releaseDate = reading.asOf !== null ? releaseBy.get(def.id) : undefined;
+    if (releaseDate !== undefined && reading.asOf !== null && releaseDate >= reading.asOf) {
+      reading.releaseDate = releaseDate;
+    }
+    readings.push(reading);
+  }
+
+  // Step-1 audit item A1: the Fed corridor's true bounds. The reading's
+  // value IS the lower bound (DFEDTARL); the upper bound rides alongside.
+  const fedReading = readings.find((r) => r.id === 'fed-target');
+  if (fedReading && fedReading.value !== null && inputs.fedTargetUpper && inputs.fedTargetUpper.length > 0) {
+    const upper = pointAtOrBefore(inputs.fedTargetUpper, nowDayIso);
+    if (upper && upper.value >= fedReading.value) {
+      fedReading.rangeLow = fedReading.value;
+      fedReading.rangeHigh = upper.value;
+    }
   }
 
   const summary = summarizeByGauges(readings);
@@ -74,7 +157,7 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
   // last day. Today's event wins per id (a double flip shows the latest leg).
   const flipsToday = inputs.previous ? changedSince(inputs.previous.readings, readings, inputs.now) : [];
   const windowDays = 7;
-  const nowDay = epochDay(inputs.now.slice(0, 10));
+  const nowDay = epochDay(nowDayIso);
   const carried = (inputs.previous?.changedThisWeek ?? []).filter((e) => nowDay - epochDay(e.asOf) <= windowDays);
   const byId = new Map<string, (typeof carried)[number]>();
   for (const event of carried) byId.set(event.id, event);

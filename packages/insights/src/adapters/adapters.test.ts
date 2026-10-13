@@ -82,7 +82,7 @@ describe('fred adapter', () => {
 
   it('carries every series id the definitions table consumes', () => {
     expect(Object.values(FRED_SERIES)).toContain('STLFSI4');
-    expect(Object.values(FRED_SERIES)).toHaveLength(13);
+    expect(Object.values(FRED_SERIES)).toHaveLength(14);
   });
 });
 
@@ -120,23 +120,24 @@ describe('frankfurter adapter', () => {
 
 describe('abs adapter', () => {
   it('builds keyless /rest/data CSV URLs and validates the key shape', () => {
-    expect(absDataUrl(ABS_SERIES.cpiIndex)).toBe('https://data.api.abs.gov.au/rest/data/CPI/1.10001.10.50.Q?format=csv');
+    expect(absDataUrl(ABS_SERIES.cpiIndex)).toBe('https://data.api.abs.gov.au/rest/data/CPI/1.10001.10.50.M?format=csv');
     expect(() => absDataUrl('CPI 1.10001')).toThrow(/malformed/);
     expect(() => absDataUrl('https://evil.example/rest/data/CPI')).toThrow(/malformed/);
   });
 
-  it('parses the live SDMX CSV shape from the recorded fixture', async () => {
+  it('parses the live monthly-SDMX CSV shape from the recorded fixture (Step-1: monthly CPI)', async () => {
     const series = await fetchAbsSeries(ABS_SERIES.cpiIndex, {
       fetchImpl: fixtureFetch({
-        'https://data.api.abs.gov.au/rest/data/CPI/1.10001.10.50.Q?format=csv': () =>
-          fixtureText('abs-sdmx-cpi.csv'),
+        'https://data.api.abs.gov.au/rest/data/CPI/1.10001.10.50.M?format=csv': () =>
+          fixtureText('abs-sdmx-cpi-monthly.csv'),
       }),
     });
     expect(series.length).toBeGreaterThan(4);
     expect(series[0]!.date).toMatch(/^\d{4}-\d{2}-01$/);
     // The API answers newest-first (unordered) — the parser sorts; the fixture
-    // covers 2025-Q1 → 2026-Q2.
-    expect(series.at(-1)!.date).toBe('2026-04-01');
+    // covers 2024-06 → 2026-08 monthly.
+    expect(series.at(-1)!.date).toBe('2026-08-01');
+    expect(series.at(-1)!.value).toBe(103.5); // the live-verified August 2026 print
   });
 
   it('fails loudly on NoRecordsFound (key or flow changed upstream)', async () => {

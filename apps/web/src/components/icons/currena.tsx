@@ -61,11 +61,13 @@ const INDICATOR_ICONS: Readonly<Record<string, string>> = {
 };
 
 /** The money-panel life areas (jobs has no artwork — the stroke briefcase
- * stays). "Savings" wears the rising chart with its dollar coin. */
+ * stays). Step-1 audit item C8: "Savings" wears its OWN piggy-bank
+ * artwork — the old stock-exchange chart icon contradicted the row's
+ * savings-and-interest content. */
 const MONEY_AREA_ICONS: Readonly<Record<string, string>> = {
   petrol: 'fuel-price',
   homeLoan: 'home-loan-rent-interest',
-  savings: 'stock-exchange-index',
+  savings: 'savings-jar',
   shop: 'bills-shop-prices',
   overseas: 'global-finance',
 };

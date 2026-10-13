@@ -325,6 +325,7 @@ export const IndicatorIdSchema = z.enum([
   'govt-interest-revenue',
   // Global — Are prices heating up?
   'us-cpi-yoy',
+  'us-cpi-core-yoy',
   'breakeven-5y5y',
   // Global — Are markets nervous?
   'stress-stlfsi',
@@ -498,6 +499,13 @@ export const IndicatorDefinitionSchema = z.object({
   cadence: IndicatorCadenceSchema,
   /** How change7d/change30d are expressed on the card. */
   changeKind: z.enum(['pct', 'points']),
+  /**
+   * Which series the 10-year percentile describes (Step-1 audit item C10):
+   * 'level' (default) — the reading's own series; 'yoy' — the year-on-year
+   * growth of the series, so trending totals (M2, home values) are not
+   * permanently pinned at the top of their range just for rising.
+   */
+  percentileBasis: z.enum(['level', 'yoy']).optional(),
   phase: IndicatorPhaseSchema,
   rule: WarningRuleSchema,
   /**
@@ -550,6 +558,26 @@ export const IndicatorReadingSchema = z
      * when the change history is too short to standardise.
      */
     moveScore: z.number().finite().optional(),
+    /**
+     * Step-1 audit item C10: distance from the 10-year peak, in percent
+     * (≤ 0; 0 = sitting at the peak). Computed from the same series as the
+     * reading; absent when the series is too short or not positive.
+     */
+    fromPeak10y: z.number().finite().optional(),
+    /**
+     * Step-1 audit items A2/A3: the official RELEASE (publication) date of
+     * the observation, when known — from the hand-maintained release
+     * schedule (data/insights-release-schedule.json). Monthly/quarterly
+     * cards show "data for {asOf month} · released {releaseDate}".
+     */
+    releaseDate: z.iso.date().optional(),
+    /**
+     * Step-1 audit item A1: the Fed target range's bounds (DFEDTARL/DFEDTARU).
+     * `value` carries the lower bound; rangeHigh the upper. Other
+     * indicators leave both absent.
+     */
+    rangeLow: z.number().finite().optional(),
+    rangeHigh: z.number().finite().optional(),
     status: IndicatorReadingStatusSchema,
     sourceName: z.string().min(1),
     sourceUrl: z.url().optional(),
@@ -596,7 +624,7 @@ export const CalendarEventSchema = z.object({
   date: z.iso.date(),
   titleEn: z.string().min(1),
   titleFa: z.string().min(1),
-  kind: z.enum(['rba', 'abs-cpi', 'fed', 'other']),
+  kind: z.enum(['rba', 'abs-cpi', 'fed', 'us-cpi', 'other']),
 });
 export type CalendarEvent = z.infer<typeof CalendarEventSchema>;
 
@@ -604,6 +632,13 @@ export type CalendarEvent = z.infer<typeof CalendarEventSchema>;
 export const InsightsSnapshotSchema = z
   .object({
     generatedAt: z.iso.datetime(),
+    /**
+     * Step-1 audit item G7: when the live-prices overlay refreshed the
+     * board (the hourly quotes key's clock). Absent on the stored snapshot;
+     * `GET /api/insights` stamps it at serve time so the page can say
+     * "prices updated {time}" honestly.
+     */
+    pricesAsOf: z.iso.datetime().optional(),
     summary: z.object({ global: SummaryLineSchema, australia: SummaryLineSchema }),
     /** Exactly one reading per known indicator id (enforced below). */
     readings: z.array(IndicatorReadingSchema),

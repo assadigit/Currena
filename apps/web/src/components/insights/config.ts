@@ -13,7 +13,7 @@
  * only defines the structural interfaces those dictionaries satisfy.
  */
 
-import { formatNumber } from '@currena/core';
+import { formatNumber, formatDateWords } from '@currena/core';
 import type {
   IndicatorId,
   IndicatorReading,
@@ -22,7 +22,7 @@ import type {
   WarningRule,
   WarningRuleAtom,
 } from '@currena/core';
-import { DEFINITIONS, GAUGES } from '@currena/insights';
+import { DEFINITIONS, GAUGES, cadenceUsesPreviousRelease } from '@currena/insights';
 import type { ConnectionReading, ConnectionState, GaugeReading, LegEval } from '@currena/insights';
 import { interpolate } from '../../i18n';
 import type { IndicatorCopyEntry, ConsequenceLines, InsightsCopy } from '../../i18n/insights-copy-en';
@@ -53,6 +53,13 @@ export const PRICE_ROWS: readonly IndicatorId[] = [
 
 /** The Bitcoin context ratios (Block PB2) + the gold row's AUD companion. */
 export const BTC_RATIO_IDS: readonly IndicatorId[] = ['gold-btc', 'silver-btc'];
+
+/**
+ * Step-1 audit item A3: companion-only readings — carried in the payload and
+ * rendered INSIDE another card (core CPI on the US inflation card), never as
+ * their own row. The question-group filter skips them.
+ */
+export const COMPANION_ONLY_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>(['us-cpi-core-yoy']);
 
 export function definitionsForGroup(
   section: InsightsSection,
@@ -105,6 +112,8 @@ export type UnitToken =
   | 'usd'
   | 'aud'
   | 'usd-bn'
+  | 'usd-tr'
+  | 'eur'
   | 'index'
   | 'jpy'
   | 'cny'
@@ -118,6 +127,8 @@ export interface UnitLabels {
   usd: string;
   aud: string;
   'usd-bn': string;
+  'usd-tr': string;
+  eur: string;
   index: string;
   jpy: string;
   cny: string;
@@ -136,7 +147,7 @@ interface DisplayConfig {
 }
 
 /** Units rendered as a prefix in English (suffix everywhere in Farsi). */
-const PREFIXED_UNITS: ReadonlySet<UnitToken> = new Set(['usd', 'aud', 'usd-bn', 'jpy', 'cny']);
+const PREFIXED_UNITS: ReadonlySet<UnitToken> = new Set(['usd', 'aud', 'usd-bn', 'usd-tr', 'eur', 'jpy', 'cny']);
 
 export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'yield-curve-10y2y': { decimals: 2, unit: 'points' },
@@ -146,15 +157,20 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'ecb-dfr': { decimals: 2, unit: 'percent' },
   'govt-interest-revenue': { decimals: 1, unit: 'percent', scale: 100 },
   'us-cpi-yoy': { decimals: 1, unit: 'percent' },
+  // Step-1 audit item A3: the core-CPI companion (rendered INSIDE the
+  // us-cpi-yoy card, never as its own row).
+  'us-cpi-core-yoy': { decimals: 1, unit: 'percent' },
   'breakeven-5y5y': { decimals: 2, unit: 'percent' },
   'stress-stlfsi': { decimals: 2, unit: 'index' },
   nfci: { decimals: 2, unit: 'index' },
   'gold-silver': { decimals: 1, unit: 'ratio' },
   'dollar-basket': { decimals: 2, unit: 'index' },
   usdjpy: { decimals: 2, unit: 'jpy' },
-  'eur-usd': { decimals: 4, unit: 'usd' },
+  // Step-1 audit item C4: EUR per USD — the € symbol, not "US$".
+  'eur-usd': { decimals: 4, unit: 'eur' },
   'china-pmi': { decimals: 1, unit: 'index' },
-  'm2-us': { decimals: 0, unit: 'usd-bn' },
+  // Step-1 audit item C7: "US$23.3 trillion", not "bn23,343".
+  'm2-us': { decimals: 1, unit: 'usd-tr', scale: 0.001 },
   'copper-gold': { decimals: 2, unit: 'ratio' },
   usdcny: { decimals: 4, unit: 'cny' },
   brent: { decimals: 2, unit: 'usd' },
@@ -198,11 +214,18 @@ export interface IndicatorValueParts {
   unit: string | null;
 }
 
+/** Optional true bounds for a range-rendered value (fed-target). */
+export interface ValueRangeBounds {
+  low: number;
+  high: number;
+}
+
 export function indicatorValueParts(
   id: IndicatorId,
   value: number,
   numberLocale: 'en-US' | 'fa-IR',
   units: UnitLabels,
+  bounds?: ValueRangeBounds,
 ): IndicatorValueParts {
   const cfg = DISPLAY[id];
   const num = formatNumber(value * (cfg.scale ?? 1), numberLocale, {
@@ -212,8 +235,20 @@ export function indicatorValueParts(
   const unit = units[cfg.unit];
   if (!unit) return { value: num, unit: null };
   if (cfg.range) {
-    // '3.50–3.75%' — the corridor around the stored midpoint (definitions
-    // note: exact binary-representable quarters, no float dust).
+    // Step-1 audit item A1: prefer the TRUE published bounds
+    // (DFEDTARL/DFEDTARU → "3.75–4.00%"); the 25bp-corridor fallback
+    // only renders for old payloads without rangeLow/rangeHigh.
+    if (bounds) {
+      const lo = formatNumber(bounds.low, numberLocale, {
+        minimumFractionDigits: cfg.decimals,
+        maximumFractionDigits: cfg.decimals,
+      });
+      const hi = formatNumber(bounds.high, numberLocale, {
+        minimumFractionDigits: cfg.decimals,
+        maximumFractionDigits: cfg.decimals,
+      });
+      return { value: `${lo}–${hi}${unit}`, unit: null };
+    }
     const lo = formatNumber(value - FED_CORRIDOR_HALF, numberLocale, {
       minimumFractionDigits: cfg.decimals,
       maximumFractionDigits: cfg.decimals,
@@ -231,19 +266,40 @@ export function formatIndicatorValue(
   value: number,
   numberLocale: 'en-US' | 'fa-IR',
   units: UnitLabels,
+  bounds?: ValueRangeBounds,
 ): string {
-  const parts = indicatorValueParts(id, value, numberLocale, units);
+  const parts = indicatorValueParts(id, value, numberLocale, units, bounds);
   return parts.unit === null ? parts.value : `${parts.value} ${parts.unit}`;
 }
 
-/** Signed 7/30-day change rendering ('+0.62%' / '+۰٫۱۱ نقطه'). Render inside dir="ltr". */
+/**
+ * Step-1: render a READING's value (the reading's own range bounds ride
+ * along when present — fed-target). Null-safe for unavailable rows.
+ */
+export function formatReadingValue(
+  reading: IndicatorReading,
+  numberLocale: 'en-US' | 'fa-IR',
+  units: UnitLabels,
+): string | null {
+  if (reading.value === null) return null;
+  const bounds =
+    reading.rangeLow !== undefined && reading.rangeHigh !== undefined
+      ? { low: reading.rangeLow, high: reading.rangeHigh }
+      : undefined;
+  return formatIndicatorValue(reading.id, reading.value, numberLocale, units, bounds);
+}
+
+/** Signed 7/30-day change rendering ('+0.62%' / '+۰٫۱۱ نقطه'). Render inside dir="ltr".
+ * Step-1 audit item C5: `scale` lets percentage-point changes of fraction-
+ * valued series (govt-interest-revenue) render in their displayed units. */
 export function formatChange(
   change: number,
   changeKind: 'pct' | 'points',
   numberLocale: 'en-US' | 'fa-IR',
   units: UnitLabels,
+  scale = 1,
 ): string {
-  const num = formatNumber(Math.abs(change), numberLocale, {
+  const num = formatNumber(Math.abs(change) * scale, numberLocale, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
@@ -251,6 +307,61 @@ export function formatChange(
   const unit = changeKind === 'pct' ? units.percent : units.points;
   // Percent binds tight ('+0.62%'); word-like units take a space ('+0.11 pts').
   return changeKind === 'pct' ? `${sign}${num}${unit}` : `${sign}${num} ${unit}`;
+}
+
+/** The display scale of one indicator's changes (fraction series ×100). */
+export function changeScaleOf(id: IndicatorId): number {
+  return DISPLAY[id].scale ?? 1;
+}
+
+/* ------------------------------------------------------------------ *
+ * Step-1 audit items B5/C6: the card's data-date line and the change
+ * label — every card shows WHEN its data is from, and monthly/quarterly
+ * changes say "since the previous release", never "30-day".
+ * ------------------------------------------------------------------ */
+
+/** Which change window label a reading's cadence demands. */
+export type ChangeWindowLabel = '7d' | '30d' | 'since-previous';
+
+export function changeWindowLabel(id: IndicatorId): ChangeWindowLabel {
+  const def = definitionFor(id);
+  if (cadenceUsesPreviousRelease(def.cadence)) return 'since-previous';
+  return '30d';
+}
+
+/**
+ * "Data for August 2026" for monthly/quarterly observations (the asOf
+ * month/quarter), "as of {date}" for daily ones. Locale-aware, UTC-safe
+ * (formatDateWords' date-only fix).
+ */
+export function dataPeriodText(
+  id: IndicatorId,
+  asOf: string,
+  locale: 'en' | 'fa',
+  numberLocale: 'en-US' | 'fa-IR',
+): string {
+  const def = definitionFor(id);
+  const month = new Intl.DateTimeFormat(
+    locale === 'fa' ? 'fa-IR-u-ca-gregory' : 'en-US-u-ca-gregory',
+    { month: 'long', year: 'numeric', timeZone: 'UTC' },
+  ).format(new Date(`${asOf}T00:00:00Z`));
+  if (def.cadence === 'monthly' || def.cadence === 'quarterly' || def.cadence === 'manual') {
+    return month;
+  }
+  return formatDateWords(asOf, numberLocale === 'fa-IR' ? 'fa-IR' : 'en-US');
+}
+
+/** "X.X% below its 10-year peak" — the C9 distance line (≤ 0, 1 decimal). */
+export function formatFromPeak(
+  fromPeak10y: number,
+  numberLocale: 'en-US' | 'fa-IR',
+  template: (pct: string) => string,
+): string {
+  const pct = formatNumber(Math.abs(fromPeak10y), numberLocale, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  return template(pct);
 }
 
 /* ------------------------------------------------------------------ *
@@ -443,7 +554,11 @@ export type ConsequenceState = keyof ConsequenceLines; // 'highRising' | 'highEa
 /**
  * Pick the consequence-line state for one reading:
  *  - price rows (PB ids) with |moveScore| ≥ threshold → 'jumping'
- *  - high band + 30d rise → 'highRising'; high band otherwise → 'highEasing'
+ *  - high band + 30d rise → 'highRising'; high band + 30d fall → 'highEasing'
+ *  - Step-1 audit item D2: a high band with NO measurable change never
+ *    claims a direction — the line falls back to the oneLiner (the old
+ *    code called every unmeasured case "easing", which contradicted the
+ *    money panel's "becoming more expensive" on the same number).
  *  - low band → 'low'; else 'typical'
  * Stale/unavailable/no-percentile items have no state (oneLiner fallback).
  */
@@ -456,8 +571,9 @@ export function consequenceState(reading: IndicatorReading, isPriceRow: boolean)
   }
   const band = positionBand(reading.percentile10y);
   if (band === 'high') {
-    const rising = reading.change30d !== undefined && reading.change30d > 0;
-    return rising ? 'highRising' : 'highEasing';
+    if (reading.change30d !== undefined && reading.change30d > 0) return 'highRising';
+    if (reading.change30d !== undefined && reading.change30d < 0) return 'highEasing';
+    return null; // high, but no measurable move — no direction claim (D2)
   }
   return band; // 'typical' | 'low'
 }
@@ -1148,11 +1264,19 @@ export function moneyAreaRow(area: MoneyAreaId, readings: readonly IndicatorRead
   const attention = rows.filter((r) => tierOf(r) === 'needs-attention');
   const unusual = rows.filter((r) => tierOf(r) === 'unusual');
   if (attention.length > 0) {
-    return { area, state: 'attention', chipIds: attention.slice(0, 2).map((r) => r.id) };
+    // Step-1 audit item C8: the SAVINGS row leads with the cash rate — the
+    // real savings-linked number — even when inflation drives its state
+    // (the old card showed the inflation rate under a stock-market icon
+    // and called it "Earning more interest").
+    const chips = attention.slice(0, 2).map((r) => r.id);
+    if (area === 'savings' && !chips.includes('rba-cash-rate')) chips.unshift('rba-cash-rate');
+    return { area, state: 'attention', chipIds: chips.slice(0, 2) };
   }
   if (unusual.length > 0) {
     return { area, state: 'unusual', chipIds: unusual.slice(0, 2).map((r) => r.id) };
   }
+  // Calm savings still shows the cash rate (a real deposit-linked rate).
+  if (area === 'savings') return { area, state: 'calm', chipIds: ['rba-cash-rate'] };
   return { area, state: 'calm', chipIds: [] };
 }
 
@@ -1234,6 +1358,17 @@ export function moneyDriverVote(
 ): 'up' | 'down' | null {
   if (kind === undefined || kind === 'none' || reading.value === null) return null;
   const inverse = kind === 'inverse';
+  // Step-1 audit item D6: a FIRED rule with a direction votes by that
+  // direction FIRST — the money label reads from the same rule the card
+  // shows (brent's rise rule out of its usual range ⇒ petrol "becoming
+  // more expensive", never "no clear direction" beside an oil warning).
+  if (reading.status === 'warning') {
+    const def = definitionFor(reading.id);
+    if (def.rule.kind === 'change') {
+      if (def.rule.direction === 'rise') return inverse ? 'down' : 'up';
+      return inverse ? 'up' : 'down';
+    }
+  }
   // 1. published band breach
   if (band && (band.min !== undefined || band.max !== undefined)) {
     const pos = bandPositionOf(reading.value, band);
@@ -1252,6 +1387,21 @@ export function moneyDriverVote(
     if (reading.percentile10y < 0.2 && kind !== 'growth') return inverse ? 'up' : 'down';
   }
   return null;
+}
+
+/**
+ * Step-1 audit item D3: the policy-rate cards (ECB, Fed, RBA) state the
+ * SIZE OF THE MOVE as its own labelled line, beside the level — "Recent
+ * move: +0.25 pts" and "Level: 2.50%, usual range for the decade" can
+ * never collapse into one confusing sentence again.
+ */
+export const POLICY_RATE_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>(['ecb-dfr', 'fed-target', 'rba-cash-rate']);
+
+/** The move worth naming: ≥ 5bp on a policy rate. */
+export function policyMoveOf(reading: IndicatorReading): number | null {
+  if (!POLICY_RATE_IDS.has(reading.id)) return null;
+  if (reading.change30d === undefined || Math.abs(reading.change30d) < 0.05) return null;
+  return reading.change30d;
 }
 
 /** The money row's stated estimation: the majority of its drivers'

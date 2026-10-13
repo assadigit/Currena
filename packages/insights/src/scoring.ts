@@ -27,6 +27,7 @@ import {
   epochDay,
   pointAtOrBefore,
   sliceBetween,
+  yoyPctSeries,
   type SeriesPoint,
 } from './series';
 
@@ -47,7 +48,13 @@ import {
  * ECB DFR 7, Fed target 5, ABS CPI items 70, WPI 130 …). See definitions.ts.
  */
 export const GRACE_DAYS: Readonly<Record<IndicatorDefinition['cadence'], number | null>> = {
-  daily: 3,
+  // Step-1 audit item H1: 5 calendar days for dailies — FRED's H.15 series
+  // (DGS10/DFII10) publish with a 1-day lag and a Friday observation is
+  // legitimately 3 days old by the next ingest; 3 days false-alarmed every
+  // long weekend (production evidence 2026-10-13: DGS10 obs 2026-10-08
+  // reading `stale` on Oct 12 while FRED confirmed it was the freshest
+  // print that existed).
+  daily: 5,
   weekly: 16,
   monthly: 95,
   quarterly: 190,
@@ -365,6 +372,30 @@ function windowChange(
 }
 
 /**
+ * Step-1 audit item C6: for monthly/quarterly/manual cadences the displayed
+ * change is the CHANGE SINCE THE PREVIOUS RELEASE (the previous observation),
+ * never a "30-day" window — and there is no 7-day change to show at all.
+ * The UI labels these "since the previous release" (cadence-aware copy).
+ */
+function previousReleaseChange(
+  series: readonly SeriesPoint[],
+  current: SeriesPoint,
+  kind: 'pct' | 'points',
+): number | undefined {
+  const idx = series.findIndex((p) => p.date === current.date);
+  if (idx <= 0) return undefined;
+  const then = series[idx - 1]!;
+  if (kind === 'points') return current.value - then.value;
+  if (then.value <= 0) return undefined;
+  return ((current.value - then.value) / then.value) * 100;
+}
+
+/** Does this cadence express changes as "since the previous release"? */
+export function cadenceUsesPreviousRelease(cadence: IndicatorDefinition['cadence']): boolean {
+  return cadence === 'monthly' || cadence === 'quarterly' || cadence === 'manual';
+}
+
+/**
  * Compute one indicator's reading as of `now` (ISO datetime from the runner —
  * frozen-clock friendly). Order of checks: no data → `unavailable`; too old
  * (per-series freshness limit when present, else cadence grace) → `stale` (a
@@ -393,18 +424,41 @@ export function computeReading(
     return { ...base, value: null, asOf: null, status: 'unavailable' };
   }
 
+  // Step-1 audit item C6: monthly/quarterly/manual series show the change
+  // since the PREVIOUS RELEASE (previous observation); daily/weekly keep the
+  // 7/30-day windows.
+  const usesPreviousRelease = cadenceUsesPreviousRelease(parsed.cadence);
   const reading: IndicatorReading = {
     ...base,
     value: current.value,
     asOf: current.date,
-    change7d: windowChange(series, current, 7, parsed.changeKind),
-    change30d: windowChange(series, current, 30, parsed.changeKind),
+    ...(usesPreviousRelease
+      ? {}
+      : { change7d: windowChange(series, current, 7, parsed.changeKind) }),
+    change30d: usesPreviousRelease
+      ? previousReleaseChange(series, current, parsed.changeKind)
+      : windowChange(series, current, 30, parsed.changeKind),
     status: 'normal',
   };
 
-  const pBase = percentileBase(series, nowDay);
+  // Step-1 audit item C10: trending totals (M2, home values) measure their
+  // 10-year position on the year-on-year GROWTH series, not the level —
+  // otherwise an ever-rising total sits permanently near 100%.
+  const percentileSeries = parsed.percentileBasis === 'yoy' ? yoyPctSeries(series) : series;
+  const pBase = percentileBase(percentileSeries, nowDay);
   if (pBase.length >= MIN_PERCENTILE_OBS) {
-    reading.percentile10y = percentileOf(pBase.map((p) => p.value), current.value);
+    const pCurrent = pointAtOrBefore(percentileSeries, nowDay);
+    if (pCurrent) reading.percentile10y = percentileOf(pBase.map((p) => p.value), pCurrent.value);
+  }
+
+  // Step-1 audit item C9: distance from the 10-year peak, in percent
+  // (≤ 0; 0 = at the peak) — computed from the reading's own series so it
+  // always matches the value shown on the card.
+  const peakWindow = sliceBetween(series, addDays(current.date, -PERCENTILE_WINDOW_DAYS), current.date);
+  let peak = Number.NEGATIVE_INFINITY;
+  for (const p of peakWindow) if (p.value > peak) peak = p.value;
+  if (Number.isFinite(peak) && peak > 0 && current.value > 0) {
+    reading.fromPeak10y = ((current.value - peak) / peak) * 100;
   }
 
   const grace = staleAfterDaysFor(parsed);

@@ -3,9 +3,12 @@
  * Series keys verified live 2026-10-06; every key's response is parsed by
  * the header-driven SDMX parser (column order varies by flow).
  *
- * The quarterly stale grace (190d) in the scoring engine absorbs ABS
- * release lags; nothing here retries on "NoRecordsFound" — that is an
- * upstream/key change and must fail loudly.
+ * Step-1 audit item A2 (2026-10-13): au-cpi / au-trimmed-mean switched to
+ * the ABS MONTHLY CPI (the full monthly measure the ABS now publishes —
+ * headline annual 4.0% / trimmed mean 3.6% for August 2026, both verified
+ * live against the series). The quarterly stale grace in the scoring
+ * engine absorbs ABS release lags; nothing here retries on
+ * "NoRecordsFound" — that is an upstream/key change and must fail loudly.
  */
 
 import { fetchWithRetry } from '@currena/scraper';
@@ -18,8 +21,10 @@ export const ABS_DATA_BASE = 'https://data.api.abs.gov.au/rest/data';
 /**
  * The ABS series keys the Insights indicators consume (verified live
  * 2026-10-06; flow/dimension meanings recorded in docs/insights/03-data-sources.md):
- *  - CPI All groups index, original, Australia, quarterly (17th-series base)
- *  - CPI_Q Trimmed Mean index, seasonally adjusted, quarterly (2011-12 base)
+ *  - CPI All groups index, original, Australia, MONTHLY (Step-1: the full
+ *    monthly CPI; August 2026 annual change 3.97% verified live)
+ *  - CPI Trimmed Mean index, seasonally adjusted, MONTHLY (Step-1: August
+ *    2026 annual change 3.57% verified live — matches the published 3.6%)
  *  - LF unemployment rate, persons, SA, Australia, monthly
  *  - RES_DWELL_ST mean price of residential dwellings, Australia, quarterly
  *  - ANA_AGG terms of trade index, seasonally adjusted, quarterly
@@ -32,8 +37,8 @@ export const ABS_DATA_BASE = 'https://data.api.abs.gov.au/rest/data';
  *    of Pay, Excluding Bonuses)
  */
 export const ABS_SERIES = {
-  cpiIndex: 'CPI/1.10001.10.50.Q',
-  trimmedMeanIndex: 'CPI_Q/1.999902.20.50.Q',
+  cpiIndex: 'CPI/1.10001.10.50.M',
+  trimmedMeanIndex: 'CPI/1.999902.20.50.M',
   unemployment: 'LF/M13.3.1599.20.AUS.M',
   resDwellMeanPrice: 'RES_DWELL_ST/5.AUS.Q',
   termsOfTrade: 'ANA_AGG/M5.TTR.20.AUS.Q',

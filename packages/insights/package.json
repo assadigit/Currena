@@ -24,7 +24,9 @@
     "markets-run": "tsx scripts/markets-run.ts",
     "fx-run": "tsx scripts/fx-run.ts",
     "markets-backtest": "tsx scripts/markets-backtest.ts",
-    "prices-run": "tsx scripts/prices-run.ts"
+    "prices-run": "tsx scripts/prices-run.ts",
+    "fx-data-check": "tsx scripts/fx-data-check.ts",
+    "fx-evidence": "tsx scripts/fx-evidence.ts"
   },
   "dependencies": {
     "@currena/core": "workspace:*",

@@ -1,0 +1,22 @@
+[
+  {
+    "date": "2026-09-11",
+    "affects": ["us-cpi-yoy", "us-cpi-core-yoy"]
+  },
+  {
+    "date": "2026-10-14",
+    "affects": ["us-cpi-yoy", "us-cpi-core-yoy"]
+  },
+  {
+    "date": "2026-09-30",
+    "affects": ["au-cpi", "au-trimmed-mean", "au-rent-yoy", "au-petrol-yoy"]
+  },
+  {
+    "date": "2026-10-28",
+    "affects": ["au-cpi", "au-trimmed-mean", "au-rent-yoy", "au-petrol-yoy"]
+  },
+  {
+    "date": "2026-11-25",
+    "affects": ["au-cpi", "au-trimmed-mean", "au-rent-yoy", "au-petrol-yoy"]
+  }
+]

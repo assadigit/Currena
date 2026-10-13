@@ -569,6 +569,26 @@ function MergedSignalsCard({
        * metal, derived from the conditions below. Answer first. */}
       <VerdictStrip gold={gold} silver={silver} copy={copy} numberLocale={numberLocale} />
 
+      {/* Step-1 audit item C12: gold near its DECADE high while real yields
+       * are also high — the one combination the checklist's separate lines
+       * cannot say by construction. Computed from the same readings (no
+       * new claim, a named interaction the backtested relationships
+       * support: high real yields raise the opportunity cost of holding
+       * gold, and buying the decade's peak price while they do has
+       * historically been difficult). */}
+      {(() => {
+        const goldReading = byId.get('gold-usd');
+        const realYield = byId.get('real-yield-10y');
+        const goldHigh = goldReading !== undefined && (goldReading.percentile10y ?? 0) >= 0.9;
+        const yieldsHigh = realYield !== undefined && (realYield.percentile10y ?? 0) >= 0.8 && realYield.value !== null && realYield.value > 0;
+        if (!goldHigh || !yieldsHigh) return null;
+        return (
+          <p className="m-0 rounded-[var(--radius-sm)] bg-currena-warning/[0.08] px-2.5 py-2 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-gold-yields-warning>
+            <bdi>{copy.signals.goldHighYieldsWarning}</bdi>
+          </p>
+        );
+      })()}
+
       {/* The shared conditions, listed ONCE (identical states by construction).
        * Round 22: the three state headings take the state's own ink and all
        * five group headings share one label-size style (hierarchy + rhythm). */}
