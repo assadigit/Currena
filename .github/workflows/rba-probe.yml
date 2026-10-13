@@ -4,17 +4,23 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe RBA table index + BLS schedule
+      - name: Probe RBA F4 CSVs + BLS schedule
         run: |
           UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36"
-          echo "=== RBA statistics tables index: lines mentioning deposit ==="
-          curl -s --max-time 60 -A "$UA" "https://www.rba.gov.au/statistics/tables/" | grep -oiE 'href="[^"]*"[^>]*>[^<]*deposit[^<]*|>[^<]*deposit[^<]*' | head -20
+          for f in f4-data f4.1-data f04-data f04-1-data f4-hist f4.1-hist f04hist f04-1-hist; do
+            echo "=================== ${f}.csv ==================="
+            curl -s --max-time 60 -A "$UA" "https://www.rba.gov.au/statistics/tables/csv/${f}.csv" -o /tmp/t.csv
+            sz=$(wc -c < /tmp/t.csv)
+            echo "size: $sz"
+            if [ "$sz" -lt 20000 ]; then head -3 /tmp/t.csv; else head -14 /tmp/t.csv; echo "--- last 3:"; tail -3 /tmp/t.csv; fi
+            echo
+          done
+          echo "=== BLS empsit schedule raw text ==="
+          curl -s --max-time 60 -A "$UA" "https://www.bls.gov/schedule/news_release/empsit.htm" -o /tmp/empsit.html
+          echo "size: $(wc -c < /tmp/empsit.html)"
+          sed 's/<[^>]*>/|/g' /tmp/empsit.html | tr -s '|' ' ' | grep -oE "[A-Z][a-z]+ [0-9]{1,2}, 2026[^0-9]" | head -20
           echo
-          echo "=== RBA tables index: F-table filenames ==="
-          curl -s --max-time 60 -A "$UA" "https://www.rba.gov.au/statistics/tables/" | grep -oE 'href="[^"]*csv[^"]*"' | head -40
-          echo
-          echo "=== BLS employment situation schedule (upcoming 2026) ==="
-          curl -s --max-time 60 -A "$UA" "https://www.bls.gov/schedule/news_release/empsit.htm" | sed 's/<[^>]*>/ /g' | tr -s ' \n' ' ' | grep -oE "(January|February|March|April|May|June|July|August|September|October|November|December) [0-9]{1,2}, 2026" | head -20
-          echo
-          echo "=== BLS CPI schedule (upcoming 2026) ==="
-          curl -s --max-time 60 -A "$UA" "https://www.bls.gov/schedule/news_release/cpi.htm" | sed 's/<[^>]*>/ /g' | tr -s ' \n' ' ' | grep -oE "(January|February|March|April|May|June|July|August|September|October|November|December) [0-9]{1,2}, 2026" | head -20
+          echo "=== BLS cpi schedule raw text ==="
+          curl -s --max-time 60 -A "$UA" "https://www.bls.gov/schedule/news_release/cpi.htm" -o /tmp/cpi.html
+          echo "size: $(wc -c < /tmp/cpi.html)"
+          sed 's/<[^>]*>/|/g' /tmp/cpi.html | tr -s '|' ' ' | grep -oE "[A-Z][a-z]+ [0-9]{1,2}, 2026[^0-9]" | head -20
