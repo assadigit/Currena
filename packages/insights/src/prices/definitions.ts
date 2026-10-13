@@ -64,7 +64,8 @@ export const LIVE_PRICE_ASSETS: Readonly<Record<PriceAssetId, LivePriceAssetConf
     yahooSymbol: 'BZ=F',
     intervalMinutes: 60,
     // Step-1 audit item A9: the attribution names the CONTRACT, not just the
-    // venue — the tile shows exactly which price it carries.
+    // venue — the details panel (owner request: sources off the card faces)
+    // shows exactly which price the board carries.
     sourceName: 'Yahoo Finance: Brent front-month futures (BZ=F)',
     sourceUrl: 'https://finance.yahoo.com/quote/BZ=F',
   },

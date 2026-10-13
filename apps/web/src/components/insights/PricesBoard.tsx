@@ -42,7 +42,6 @@ import {
   formatChange,
   formatFromPeak,
   formatIndicatorValue,
-  friendlySource,
   positionBand,
 } from './config';
 import { formatAsOf } from './HistoryChart';
@@ -336,16 +335,16 @@ export function PricesBoard({
                     </span>
                   ) : null}
                   {/* PB3: "as of {date}"; stale chips only past the limit.
-                   * Step-1 audit item A9: the tile names its SOURCE AND
-                   * CONTRACT (Brent futures BZ=F vs the EIA spot base; the
-                   * metals' live futures vs the EOD spot backbone) — the
-                   * reader can tell exactly which price this is. */}
+                   * Owner request (sources off the cards): the tile no longer
+                   * names its source — which price this tile carries (Brent
+                   * futures BZ=F vs the EIA spot base, the metals' live
+                   * futures vs the EOD spot backbone) lives in the details
+                   * panel footer and the About/sources section now. */}
                   <span className="flex flex-wrap items-baseline gap-x-2 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
                     {reading.asOf ? <bdi>{interpolate(copy.ui.pricesAsOf, { date: formatAsOf(reading.asOf, locale) })}</bdi> : null}
                     {reading.status === 'stale' && reading.asOf ? (
                       <bdi className="font-semibold">{interpolate(copy.ui.staleSince, { date: formatAsOf(reading.asOf, locale) })}</bdi>
                     ) : null}
-                    <bdi className="opacity-80">· {friendlySource(reading.sourceName)}</bdi>
                   </span>
                   <span className="sr-only">, {copy.ui.viewCard}</span>
                 </span>

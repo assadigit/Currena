@@ -928,27 +928,13 @@ export function formatPinnedStorage(ids: readonly IndicatorId[]): string {
 }
 
 /* ---------------------------------------------------------------- *
- * R30 (roast 11 Oct): "Source codes still show in footers" — the
- * snapshot's sourceName carries publisher + raw series ids
- * ("ABS (CPI_Q Trimmed Mean)", "RBA F6 (owner-occupier …)"). The
- * card face shows the PUBLISHER only; full ids stay in the details
- * panel.
+ * Owner request (sources off the cards): the card faces no longer
+ * show ANY source label. Sources are named and linked in exactly two
+ * places — the details panel footer (full sourceName, raw series ids
+ * and all) and the About/sources section at the foot of the page.
+ * The old publisher-only `friendlySource` trimmer died with the card
+ * labels; nothing else needed it.
  * ---------------------------------------------------------------- */
-
-/** Publisher-only label for a snapshot sourceName. */
-export function friendlySource(raw: string): string {
-  if (/^RBA F[\d.]+/.test(raw)) {
-    // "RBA F2 − FRED (DGS10)" keeps its second publisher.
-    return raw.includes('FRED') ? 'RBA · FRED' : 'RBA';
-  }
-  if (raw.startsWith('RBA E2')) return 'RBA';
-  if (raw.startsWith('gold-api.com')) return 'GoldAPI';
-  if (raw.startsWith('Currena basket')) return 'Currena basket';
-  if (raw.startsWith('China NBS')) return 'China NBS';
-  // "ABS (…)", "FRED (…)" — the parenthetical is a series id, strip it.
-  const m = raw.match(/^([A-Za-z .-]+?)\s*\(/);
-  return (m?.[1] ? m[1] : raw).trim() || raw;
-}
 
 /* ------------------------------------------------------------------ *
  * History helpers (epoch-day math for the 10-year chart)

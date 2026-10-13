@@ -7,6 +7,10 @@
  * the surface." The long technical description lives in the details panel
  * (F5) — the card face carries the news, fast.
  *
+ * Owner request (sources off the cards): the source no longer rides the
+ * card face; it is named and linked in the details panel footer and in the
+ * About/sources section. The date row stays.
+ *
  * The sparkline loads lazily (IntersectionObserver + the module-cached
  * history fetch — the same cache the details panel shares).
  */
@@ -30,7 +34,6 @@ import {
   formatChange,
   formatFromPeak,
   formatReadingValue,
-  friendlySource,
   policyLastChangeOf,
   tierOf,
   type IndicatorTier,
@@ -298,10 +301,6 @@ export function AlertCard({
                 {interpolate(copy.ui.releasedOn, { date: releaseText })}
               </>
             ) : null}
-            <span className="mx-1.5 opacity-50">·</span>
-            {/* R30: publisher only — raw series ids ("ABS (RES_DWELL_ST)")
-             * never reach the card face. */}
-            {friendlySource(reading.sourceName)}
           </span>
           <span className="whitespace-nowrap font-semibold text-[var(--color-status-context)]">{copy.ui.detailsButton} ›</span>
         </span>

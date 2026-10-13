@@ -1245,7 +1245,9 @@ export const insightsCopyEn = {
     days7: '7-day',
     days30: '30-day',
     updatedOn: 'Updated {date}',
-    sourceLabel: 'Source',
+    // Owner request (sources off the cards): the unused `sourceLabel` died
+    // with the card-face source labels; `viewSource` stays for the details
+    // panel footer link.
     viewSource: 'View source',
     shareCard: 'Share this card',
     shareCopied: 'Link copied',
@@ -1316,9 +1318,11 @@ export const insightsCopyEn = {
     // Step-1 audit item G3 + Step-2: the accurate list — EODHD, Yahoo
     // Finance and gold-api ride beside the official publishers; the VIX is
     // Cboe data redistributed through FRED (© Cboe); the iron-ore price is
-    // context only and never votes.
+    // context only and never votes. Owner request (sources off the cards):
+    // every source is named and linked HERE and in the details panel —
+    // never on the card faces.
     aboutSourcesBody:
-      'Sources: official publishers, namely the US Federal Reserve (FRED) and the US Bureau of Labor Statistics via FRED, the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics (CC BY 4.0) and the World Bank, plus market-data providers Frankfurter (ECB reference rates), gold-api.com, EODHD and Yahoo Finance (world stock markets, live commodity quotes, currencies). The VIX fear gauge is Cboe data redistributed through FRED (© Cboe). Iron ore is shown for context and never counts toward the verdicts. Each card names and links its own source. Free-tier licences are personal use; they are being reviewed before any commercial use.',
+      'Sources: official publishers, namely the US Federal Reserve (FRED) and the US Bureau of Labor Statistics via FRED, the European Central Bank, the Reserve Bank of Australia, the Australian Bureau of Statistics (CC BY 4.0) and the World Bank, plus market-data providers Frankfurter (ECB reference rates), gold-api.com, EODHD and Yahoo Finance (world stock markets, live commodity quotes, currencies). The VIX fear gauge is Cboe data redistributed through FRED (© Cboe). Iron ore is shown for context and never counts toward the verdicts. Each source is named and linked in the details panel and in this section, never on the cards. Free-tier licences are personal use; they are being reviewed before any commercial use.',
     fredNotice:
       'This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank of St. Louis.',
     // Round 24 (roast): the English notice sits on its OWN dir=ltr line.

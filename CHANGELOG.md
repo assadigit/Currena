@@ -5,6 +5,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-13d] — Sources off the cards (attribution lives in the footer and the Sources section only)
+
+Owner request 2026-10-13: the price tiles and indicator cards must NOT carry
+source labels ("· Yahoo Finance: COMEX gold futures (GC=F)", "· FRED", …).
+Every source is named and linked in exactly two places now: the details panel
+footer (full sourceName with series ids, linked) and the About this data →
+Sources section at the foot of the page.
+
+### Changed
+
+- **PricesBoard**: the tile's caption row drops the "· {source}" bdi; it keeps
+  the as-of date and the stale chip. The comment trail (Step-1 A9) now points
+  to the details panel for the contract attribution (BZ=F futures vs the EIA
+  spot base).
+- **AlertCard**: the bottom caption row drops the "· publisher" segment; the
+  data date, released-on date and stale tag stay.
+- **config.ts**: the `friendlySource` publisher-trimmer (R30) died with the
+  card labels — removed with its comment block replaced by the new rule
+  (sources live in the details panel footer + About/sources, never on faces).
+- **Copy (en/fa)**: `aboutSourcesBody` no longer claims "Each card names and
+  links its own source" — it now says each source is named and linked in the
+  details panel and in the Sources section, never on the cards. The unused
+  `sourceLabel` key was removed from both dictionaries (fa is typed against
+  en, so the removal is structurally guaranteed to stay in sync).
+- **packages/insights definitions.ts**: comment-only touch (the A9 note now
+  says the details panel, not the tile, carries the attribution).
+
+### Untouched on purpose
+
+- The details panel footer (the linked source + as-of date) — it IS a footer.
+- The About this data → Sources section and the always-visible credits line.
+- The calendar badges (RBA / CPI / JOBS / FED): they name the EVENT, not a
+  data source. The converter app's SourceBadge (TGJU/Frankfurter) is a
+  different feature and was not part of the request.
+- CSV exports still carry per-row source names (a data export, not a card).
+- Data layer: `sourceName`/`sourceUrl` still flow through the API and the
+  Step-1 G3 attribution rules; only the card-face renders changed.
+
+Checks: `pnpm typecheck` clean, `pnpm test` 1,020/1,020 (core 183, scraper
+67, insights 334, markets 7, api 136, web 293), `pnpm build` clean,
+`check-bundle-budget` held (Insights chunk 493.65 kB / 120.80 gz — smaller
+without the trimmer).
+
 ## [2026-10-13c] — The bilingual content audit (Persian + English editorial pass)
 
 Owner request 2026-10-13: a comprehensive audit and rewrite of ALL Persian
