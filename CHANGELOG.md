@@ -82,12 +82,15 @@ labels).
 
 - PWA manifest name: "Currena — Currency Converter" → "Currena | Currency
   Converter" (matches the document title; em-dash rule).
+- Price-tile attribution (the data layer): the four live-quote source names
+  "Yahoo Finance — …" → "Yahoo Finance: …" (brent/gold/silver/bitcoin);
+  the stored snapshot picks the new names on the next hourly refresh.
 - Bundle budget: Insights lazy chunk 493/121.5 → **495/121.5 kB** (raw
   +2.18 kB from longer-but-natural Persian; gzip actually fell to 120.95).
   The entry chunk is untouched (290.36/87.08).
 - One test expectation updated with the terminology change
   (formatChange fa points unit: نقطه → واحد درصد). All 293 web + 136 api
-  tests pass; typecheck clean.
+  + 334 insights tests pass; typecheck clean.
 
 ## [2026-10-13b] — Always-live serving + path-URL routing (the /insights#/ fix)
 

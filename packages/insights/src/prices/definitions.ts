@@ -65,25 +65,25 @@ export const LIVE_PRICE_ASSETS: Readonly<Record<PriceAssetId, LivePriceAssetConf
     intervalMinutes: 60,
     // Step-1 audit item A9: the attribution names the CONTRACT, not just the
     // venue — the tile shows exactly which price it carries.
-    sourceName: 'Yahoo Finance — Brent front-month futures (BZ=F)',
+    sourceName: 'Yahoo Finance: Brent front-month futures (BZ=F)',
     sourceUrl: 'https://finance.yahoo.com/quote/BZ=F',
   },
   'gold-usd': {
     yahooSymbol: 'GC=F',
     intervalMinutes: 60,
-    sourceName: 'Yahoo Finance — COMEX gold futures (GC=F)',
+    sourceName: 'Yahoo Finance: COMEX gold futures (GC=F)',
     sourceUrl: 'https://finance.yahoo.com/quote/GC=F',
   },
   'silver-usd': {
     yahooSymbol: 'SI=F',
     intervalMinutes: 60,
-    sourceName: 'Yahoo Finance — COMEX silver futures (SI=F)',
+    sourceName: 'Yahoo Finance: COMEX silver futures (SI=F)',
     sourceUrl: 'https://finance.yahoo.com/quote/SI=F',
   },
   'btc-usd': {
     yahooSymbol: 'BTC-USD',
     intervalMinutes: 60,
-    sourceName: 'Yahoo Finance — Bitcoin spot index (BTC-USD)',
+    sourceName: 'Yahoo Finance: Bitcoin spot index (BTC-USD)',
     sourceUrl: 'https://finance.yahoo.com/quote/BTC-USD',
   },
 };
