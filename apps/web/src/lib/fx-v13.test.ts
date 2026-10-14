@@ -627,3 +627,48 @@ describe('S5 — what it means in money (CR §4.2)', () => {
     expect(fxMoneyLine(faFlat, fa.fx, 'fa-IR')).toContain('امروز تقریباً همان مقدار می‌گیرید.');
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * Extra — a downgraded warning keeps its warning headline (§6.4 + §4.3)
+ * ------------------------------------------------------------------ */
+
+describe('the downgrade and the headline verdict', () => {
+  it('a downgraded R3 (Watching, not counted) still says "The dollar is getting much stronger"', () => {
+    const snap = screenshotSnapshot({ dollarM1: 3.9, r3NotHolding: true });
+    const r3 = byId(snap.rules, 'r3_dollar_strength');
+    expect(r3.outcome).toBe('watch');
+    expect(r3.downgraded).toBe(true);
+    expect(fxHeadlineVerdict(r3, en.fx)).toBe('The dollar is getting much stronger');
+    // A plain (non-downgraded) watch keeps its own watch headline (R1).
+    const r1watch = { ...byId(snap.rules, 'r1_risk_mood'), outcome: 'watch' as const, downgraded: undefined };
+    expect(fxHeadlineVerdict(r1watch, en.fx)).toBe('An early hint of nervousness');
+  });
+});
+
+describe('the downgrade and the two-part sentence', () => {
+  it('a downgraded R3 keeps its factual warning sentence (the numbers are facts)', () => {
+    const snap = screenshotSnapshot({ dollarM1: 3.9, r3NotHolding: true });
+    const r3 = byId(snap.rules, 'r3_dollar_strength');
+    expect(r3.outcome).toBe('watch');
+    expect(r3.downgraded).toBe(true);
+    const sentence = fxSentence(r3, en.fx, 'en-US');
+    expect(sentence?.see).toBe(
+      'The US dollar is up 3.9% against the big currencies over the past month.',
+    );
+    expect(sentence?.means).toBe('A strong dollar usually makes money harder to get around the world.');
+  });
+});
+
+describe('the quiet list count (fix B6 companion)', () => {
+  it('a quiet R7 never inflates the "{n} more quiet patterns" count', () => {
+    // Quiet world: R1-R6 quiet + R7 quiet (EUR/USD back under its 2.5% gate).
+    const snap = screenshotSnapshot({ dollarM1: 0.4, dollarM3: 0.5, eurusdM1: -1.2 });
+    expect(byId(snap.rules, 'r7_dollar_or_euro').outcome).toBe('quiet');
+    const closest = snap.rules.find((r) => r.id === 'r6_europe_worry')!;
+    const list = fxQuietRules(snap.rules, closest.id);
+    // Every counted row must render (fxQuietView non-null).
+    expect(list.map((r) => r.id)).not.toContain('r7_dollar_or_euro');
+    for (const r of list) expect(fxQuietView(r, en.fx, 'en-US')).not.toBeNull();
+    expect(list).toHaveLength(5); // R1, R2, R3, R4, R5 — Europe worry excluded as closest
+  });
+});

@@ -457,15 +457,13 @@ function PatternCard({
             <span className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{copy.fx.noDataRow}</span>
           ) : null}
         </span>
+        {verdict !== null ? (
+          <span className="text-[length:var(--type-label)] font-bold leading-relaxed text-[var(--color-text-primary)]">
+            <bdi>{verdict}</bdi>
+          </span>
+        ) : null}
         {rule.outcome !== 'nodata' && sentence !== null ? (
           <span className="flex flex-col gap-0.5">
-            {/* v1.3 (CR §4.3): Level 1 starts with the short headline
-             * verdict, then the two-part sentence. */}
-            {verdict !== null ? (
-              <span className="text-[length:var(--type-label)] font-bold leading-relaxed text-[var(--color-text-primary)]">
-                <bdi>{verdict}</bdi>
-              </span>
-            ) : null}
             {/* The two-part sentence on two short lines (§9.3 Level 1). */}
             <span className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
               <bdi>{sentence.see}</bdi>

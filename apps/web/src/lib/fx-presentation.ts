@@ -119,11 +119,13 @@ export function fxPatternOrder(rules: readonly FxRuleState[]): FxRuleState[] {
 
 /** The quiet rules (§9.3 item 4): Quiet AND Nodata rows are left out of
  * the closest-to-warning choice; the quiet list holds only true Quiets.
- * v1.3 fix B6: pass the closest pattern's id and it is LEFT OUT of the
- * list — the closest row and the "more quiet patterns" list must never
- * repeat the same pattern. */
+ * R7 never rides the list — it is a context rule: it either shows its card
+ * or stays away entirely (a "quiet" R7 renders no row, so counting it
+ * would break the "{n} more" number). v1.3 fix B6: pass the closest
+ * pattern's id and it is LEFT OUT of the list — the closest row and the
+ * "more quiet patterns" list must never repeat the same pattern. */
 export function fxQuietRules(rules: readonly FxRuleState[], excludeId?: FxRuleId): FxRuleState[] {
-  return rules.filter((r) => r.outcome === 'quiet' && r.id !== excludeId);
+  return rules.filter((r) => r.outcome === 'quiet' && r.id !== 'r7_dollar_or_euro' && r.id !== excludeId);
 }
 
 /** The quiet pattern closest to its warning (highest progress; §6.7).
@@ -317,12 +319,17 @@ function abs1(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
   });
 }
 
-/** The §7 sentence pair for a rule state, numbers formatted per locale. */
+/** The §7 sentence pair for a rule state, numbers formatted per locale.
+ * A DOWNGRADED warning (§6.4: fired but not holding lately) keeps its
+ * WARNING sentence — the numbers are facts; the Watching status word and
+ * the caution line carry the reliability caveat. */
 export function fxSentence(
   rule: FxRuleState,
   copy: InsightsCopy['fx'],
   numberLocale: 'en-US' | 'fa-IR',
 ): FxSentence | null {
+  const state: FxRuleState =
+    rule.outcome === 'watch' && rule.downgraded === true ? { ...rule, outcome: 'warning' } : rule;
   const n = (key: string): number | undefined => {
     const v = rule.numbers[key];
     return v === undefined ? undefined : v;
@@ -335,7 +342,7 @@ export function fxSentence(
     interpolate(template, params);
   const c = copy.rules;
 
-  switch (rule.id) {
+  switch (state.id) {
     case 'r1_risk_mood': {
       const audjpy = fmt('audjpy_m1');
       if (audjpy === undefined) return null;
@@ -349,13 +356,13 @@ export function fxSentence(
           : fear
             ? c.r1.stocksFear
             : c.r1.stocksSp500; // nodata guard — the row never renders as a sentence
-      if (rule.outcome === 'warning') {
+      if (state.outcome === 'warning') {
         return {
           see: fill(c.r1.warning.see, { x: audjpy, stocks }),
           means: c.r1.warning.means,
         };
       }
-      if (rule.outcome === 'supportive') {
+      if (state.outcome === 'supportive') {
         return {
           see: fill(c.r1.supportive.see, {
             x: audjpy,
@@ -364,7 +371,7 @@ export function fxSentence(
           means: c.r1.supportive.means,
         };
       }
-      if (rule.outcome === 'watch') {
+      if (state.outcome === 'watch') {
         return { see: fill(c.r1.watch.see, { x: audjpy }), means: c.r1.watch.means };
       }
       return null;
@@ -372,7 +379,7 @@ export function fxSentence(
     case 'r2_carry_trade': {
       const usdjpy = rule.numbers.usdjpy_m1;
       if (usdjpy === undefined) return null;
-      if (rule.outcome === 'warning') {
+      if (state.outcome === 'warning') {
         const nikkei = rule.numbers.nikkei_m1;
         return {
           see: fill(c.r2.warning.see, {
@@ -382,7 +389,7 @@ export function fxSentence(
           means: c.r2.warning.means,
         };
       }
-      if (rule.outcome === 'watch') {
+      if (state.outcome === 'watch') {
         const m3 = rule.numbers.usdjpy_m3;
         return {
           see: fill(c.r2.watch.see, { x: m3 !== undefined ? abs1(m3, numberLocale) : '—' }),
@@ -394,7 +401,7 @@ export function fxSentence(
     case 'r3_dollar_strength': {
       const m1 = rule.numbers.dollar_m1;
       const m3 = rule.numbers.dollar_m3;
-      if (rule.outcome === 'warning') {
+      if (state.outcome === 'warning') {
         // v1.3 (CR §3.1): the variant names the leg that fired, so the
         // sentence says "over the past month" or "over the past three
         // months" honestly.
@@ -406,7 +413,7 @@ export function fxSentence(
           means: c.r3.warning.means,
         };
       }
-      if (rule.outcome === 'supportive') {
+      if (state.outcome === 'supportive') {
         const useM1 = rule.variant === 'm1';
         const v = useM1 ? m1 : m3;
         if (v === undefined) return null;
@@ -431,7 +438,7 @@ export function fxSentence(
           means: c.r4.wobble.means,
         };
       }
-      if (rule.outcome === 'warning') {
+      if (state.outcome === 'warning') {
         return {
           see: fill(c.r4.flight.see, {
             y: sp !== undefined ? abs1(sp, numberLocale) : '—',
@@ -445,21 +452,21 @@ export function fxSentence(
     case 'r5_china_link': {
       const cny = rule.numbers.usdcny_m3;
       const aud = rule.numbers.audusd_m3;
-      if (rule.outcome === 'warning') {
+      if (state.outcome === 'warning') {
         if (cny === undefined || aud === undefined) return null;
         return {
           see: fill(c.r5.warning.see, { x: abs1(cny, numberLocale), y: abs1(aud, numberLocale) }),
           means: c.r5.warning.means,
         };
       }
-      if (rule.outcome === 'supportive') {
+      if (state.outcome === 'supportive') {
         if (cny === undefined || aud === undefined) return null;
         return {
           see: fill(c.r5.supportive.see, { x: abs1(cny, numberLocale), y: abs1(aud, numberLocale) }),
           means: c.r5.supportive.means,
         };
       }
-      if (rule.outcome === 'watch') {
+      if (state.outcome === 'watch') {
         // {leg}: whichever of the two moved (§7's {leg} rule).
         const leg =
           cny !== undefined
@@ -474,7 +481,7 @@ export function fxSentence(
     case 'r6_europe_worry': {
       const eurchf = rule.numbers.eurchf_m1;
       if (eurchf === undefined) return null;
-      if (rule.outcome === 'warning') {
+      if (state.outcome === 'warning') {
         const stoxx = rule.numbers.stoxx50_m1;
         return {
           see: fill(c.r6.warning.see, {
@@ -484,7 +491,7 @@ export function fxSentence(
           means: c.r6.warning.means,
         };
       }
-      if (rule.outcome === 'watch') {
+      if (state.outcome === 'watch') {
         return { see: fill(c.r6.watch.see, { x: abs1(eurchf, numberLocale) }), means: c.r6.watch.means };
       }
       return null;
@@ -661,50 +668,54 @@ export function fxPlainWords(
 
 /** The card's Level-1 HEADLINE VERDICT (CR §4.3): one short line per
  * outcome — "Investors look nervous". Null for nodata rows (they show the
- * no-data line instead). */
+ * no-data line instead). A DOWNGRADED warning (§6.4: fired but the pattern
+ * is not holding lately) keeps its WARNING headline — the move did happen;
+ * the caution line below carries the honesty. */
 export function fxHeadlineVerdict(rule: FxRuleState, copy: InsightsCopy['fx']): string | null {
   if (rule.outcome === 'nodata') return null;
+  const downgradedWarning = rule.outcome === 'watch' && rule.downgraded === true;
+  const asWarning: FxRuleState = downgradedWarning ? { ...rule, outcome: 'warning' } : rule;
   switch (rule.id) {
     case 'r1_risk_mood': {
       const c = copy.rules.r1;
-      return rule.outcome === 'warning'
+      return asWarning.outcome === 'warning'
         ? c.headlineWarning
-        : rule.outcome === 'supportive'
+        : asWarning.outcome === 'supportive'
           ? c.headlineSupportive
-          : rule.outcome === 'watch'
+          : asWarning.outcome === 'watch'
             ? c.headlineWatch
             : c.headlineQuiet;
     }
     case 'r2_carry_trade': {
       const c = copy.rules.r2;
-      return rule.outcome === 'warning' ? c.headlineWarning : rule.outcome === 'watch' ? c.headlineWatch : c.headlineQuiet;
+      return asWarning.outcome === 'warning' ? c.headlineWarning : asWarning.outcome === 'watch' ? c.headlineWatch : c.headlineQuiet;
     }
     case 'r3_dollar_strength': {
       const c = copy.rules.r3;
-      return rule.outcome === 'warning'
+      return asWarning.outcome === 'warning'
         ? c.headlineWarning
-        : rule.outcome === 'supportive'
+        : asWarning.outcome === 'supportive'
           ? c.headlineSupportive
           : c.headlineQuiet;
     }
     case 'r4_money_hiding': {
       const c = copy.rules.r4;
-      if (rule.outcome === 'warning') return rule.variant === 'wobble' ? c.headlineWobble : c.headlineFlight;
+      if (asWarning.outcome === 'warning') return asWarning.variant === 'wobble' ? c.headlineWobble : c.headlineFlight;
       return c.headlineQuiet;
     }
     case 'r5_china_link': {
       const c = copy.rules.r5;
-      return rule.outcome === 'warning'
+      return asWarning.outcome === 'warning'
         ? c.headlineWarning
-        : rule.outcome === 'supportive'
+        : asWarning.outcome === 'supportive'
           ? c.headlineSupportive
-          : rule.outcome === 'watch'
+          : asWarning.outcome === 'watch'
             ? c.headlineWatch
             : c.headlineQuiet;
     }
     case 'r6_europe_worry': {
       const c = copy.rules.r6;
-      return rule.outcome === 'warning' ? c.headlineWarning : rule.outcome === 'watch' ? c.headlineWatch : c.headlineQuiet;
+      return asWarning.outcome === 'warning' ? c.headlineWarning : asWarning.outcome === 'watch' ? c.headlineWatch : c.headlineQuiet;
     }
     case 'r7_dollar_or_euro': {
       const c = copy.rules.r7;

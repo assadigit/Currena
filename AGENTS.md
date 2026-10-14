@@ -19,6 +19,12 @@ live at https://aliassadi1993.pythonanywhere.com/ until an explicit human cutove
 - **packages/core** — zod schemas, conversion math, formatting. Pure. Tested.
 - **packages/scraper** — source modules + normalizers. Tested against fixtures.
 - **docs/** — FEATURE_MAP, MIGRATION_CHECKLIST, PROGRESS, DEPLOY.
+- **docs/specs/** — the governing specs (world currencies: base v1.2 +
+  the v1.3 change request, which wins where they disagree; see
+  `docs/specs/traceability.md` for the requirement → code → test map;
+  superseded drafts live in `docs/specs/archive/`).
+- **docs/localization/** — Persian copy workflow, terminology, manifest, and
+  the persian-site-copy working documents (moved from the root 2026-10-14).
 - **legacy/** — (gitignored) Django backup — the ONLY source of truth for features.
 - **legacy-captures/** — (gitignored) raw captures from the live site (Phase 1 evidence).
 

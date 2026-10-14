@@ -265,7 +265,9 @@ lines.push('# World currencies — the evidence run (spec §6.6, build step 3)')
 lines.push('');
 lines.push(`**Run:** ${new Date().toISOString()} · one-off history (Frankfurter currencies, Yahoo stocks/gold, FRED STLFSI4 — nothing from the EODHD free quota). Replayed **${replay.length} weeks** (${grid[0]} → ${grid[grid.length - 1]}) through the production rule engine (R1–R7 incl. the §6.4 downgrade pass).`);
 lines.push('');
-lines.push('Thresholds below are the spec §6.3 starting values. Ali approves or adjusts them; nothing on the page shows these counts.');
+lines.push('**v1.3 changes under test** (change request §3): R3 now fires on a one-month move of ±3.0% OR a three-month move of ±4.0% (the M1/M3 columns below split the two legs), and R7 works in dollar strength (dollar-led / euro-led / no card). The replay grid is WEEKLY, so shares are shares of weeks — the closest honest proxy for the change request\'s "share of days".');
+lines.push('');
+lines.push('Thresholds below are the spec §6.3 starting values + the v1.3 additions (`R3_DOLLAR_M1_STRONG = +3.0`, `R3_DOLLAR_M1_WEAK = −3.0` in src/fx/definitions.ts). Ali approves or adjusts them; nothing on the page shows these counts.');
 lines.push('');
 lines.push('| Rule | Warning episodes | Weeks in Warning | Share of weeks | S&P next month after a Warning start (n · median) | Known episodes it caught |');
 lines.push('|---|---|---|---|---|---|');
@@ -305,8 +307,23 @@ for (const rid of RULE_IDS) {
   const defined = forwardReturns.filter((v): v is number => v !== undefined).sort((a, b) => a - b);
   const median = defined.length > 0 ? defined[Math.floor(defined.length / 2)] : undefined;
   const lower = defined.filter((v) => v < 0).length;
+  // v1.3 (CR §3.1/§3.3): report WHICH leg/variant fired — R3's new one-month
+  // trigger and R7's corrected leads each get their own share.
+  let variantNote = '';
+  if (rid === 'r3_dollar_strength') {
+    const viaM1 = states.filter((s) => s.rule.variant === 'm1').length;
+    const viaM3 = states.filter((s) => s.rule.variant === 'm3').length;
+    const supportive = states.filter((s) => s.rule.outcome === 'supportive').length;
+    variantNote = ` · M1-leg ${viaM1}w (${((viaM1 / states.length) * 100).toFixed(1)}%) · M3-leg ${viaM3}w · supportive ${supportive}w`;
+  }
+  if (rid === 'r7_dollar_or_euro') {
+    const dollarLed = states.filter((s) => s.rule.variant === 'dollar-led').length;
+    const euroLed = states.filter((s) => s.rule.variant === 'euro-led').length;
+    const moved = states.filter((s) => Math.abs(s.rule.numbers.eurusd_m1 ?? 0) >= 2.5).length;
+    variantNote = ` · dollar-led ${dollarLed}w (${((dollarLed / states.length) * 100).toFixed(1)}%) · euro-led ${euroLed}w · EUR/USD ≥2.5% in ${moved}w`;
+  }
   lines.push(
-    `| ${RULE_LABELS[rid]} | ${episodes.length} | ${warnWeeks} | ${((warnWeeks / states.length) * 100).toFixed(1)}% | ${defined.length} reads · median ${median !== undefined ? median.toFixed(1) + '%' : '—'} · lower in ${lower} | ${[...caught].join(', ') || '—'} |`,
+    `| ${RULE_LABELS[rid]}${variantNote ? ` **(v1.3)**` : ''} | ${episodes.length} | ${warnWeeks} | ${((warnWeeks / states.length) * 100).toFixed(1)}%${variantNote} | ${defined.length} reads · median ${median !== undefined ? median.toFixed(1) + '%' : '—'} · lower in ${lower} | ${[...caught].join(', ') || '—'} |`,
   );
   reportRows.push(rid);
 }
@@ -337,6 +354,10 @@ lines.push('');
 lines.push('## Verdict for Ali (thresholds)');
 lines.push('');
 lines.push('The spec §6.3 starting values (verbatim above, in src/fx/definitions.ts) are the ones now live. Adjustments belong in that ONE config block.');
+lines.push('');
+lines.push('## The v1.3 decision rule (change request §3.1/§4)');
+lines.push('');
+lines.push('Keep the starting thresholds unless a rule fires on more than 25% of days or never fires despite known episodes. The M1/M3 and dollar-led/euro-led splits above are the evidence for the two new behaviours; any change is recorded in docs/DECISIONS_FOR_ALI.md.');
 lines.push('');
 
 writeFileSync(outPath, lines.join('\n'));
