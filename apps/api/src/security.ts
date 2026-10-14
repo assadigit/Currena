@@ -51,7 +51,7 @@ export function rateLimitTake(key: string, nowMs: number): boolean {
 }
 
 /** Seconds until one token is available again (for Retry-After). */
-export function rateLimitRetryAfterSec(key: string, nowMs: number): number {
+export function rateLimitRetryAfterSec(key: string): number {
   const bucket = rateBuckets.get(key);
   if (!bucket) return 1;
   const deficit = 1 - bucket.tokens;

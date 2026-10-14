@@ -16,7 +16,7 @@
 
 import { describe, expect, it } from 'vitest';
 import type { MarketId, MarketsSnapshot } from '@currena/core';
-import { MARKETS, ProviderError } from '@currena/insights/markets';
+import { ProviderError } from '@currena/insights/markets';
 import type { MarketJobFetchers, MarketSeries, KVLike } from '@currena/insights/markets';
 import { runScheduledMarkets } from './index';
 import { MAIN_CRON, RETRY_CRON } from './crons';
@@ -252,7 +252,7 @@ describe('the combined markets + fx 24-hour budget', () => {
     const kv = new FakeKV();
     const world = makeWorld();
     const quotes = fxQuotesFixture();
-    let fxCalls = { frankfurter: 0, yahoo: 0 };
+    const fxCalls = { frankfurter: 0, yahoo: 0 };
     const fxFetchers: FxJobFetchers = {
       fetchFrankfurter: async () => {
         fxCalls.frankfurter++;

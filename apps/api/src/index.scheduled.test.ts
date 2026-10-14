@@ -19,7 +19,7 @@ const errorToCodeMessage = vi.hoisted(() => vi.fn(() => ({ code: 'scrape_failed'
 const runPricesUpdate = vi.hoisted(() => vi.fn());
 const formatPricesReport = vi.hoisted(() => vi.fn(() => 'prices report'));
 const defaultPricesFetchers = vi.hoisted(() => vi.fn(() => ({ fetchBrent: () => {} })));
-const KvPricesStore = vi.hoisted(() => class { constructor(_kv: unknown) {} });
+const KvPricesStore = vi.hoisted(() => class {});
 
 vi.mock('@currena/scraper', () => ({
   scrapeTgju,

@@ -14,8 +14,7 @@ import { fa } from './fa';
  * via Intl.NumberFormat('fa-IR' | 'en-US') in @currena/core.
  */
 
-const locales = ['en', 'fa'] as const;
-export type Locale = (typeof locales)[number];
+export type Locale = 'en' | 'fa';
 const defaultLocale: Locale = 'en';
 
 const dictionaries: Record<Locale, Dictionary> = { en, fa };

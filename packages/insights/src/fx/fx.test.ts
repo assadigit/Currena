@@ -21,9 +21,6 @@ import { FxSnapshotSchema } from '@currena/core';
 import type { SeriesPoint } from '../series';
 import {
   buildDollarMeasure,
-  buildFxPairEntry,
-  buildFxPlain,
-  buildFxSnapshot,
   changesOf,
   evaluateFxRules,
   fxContentEqual,
@@ -39,7 +36,7 @@ import {
   type FxRuleInputs,
 } from './compute';
 import { FX_MIN_POINTS, FX_PAIR_IDS, PATTERN_WEEKS } from './definitions';
-import type { FxQuoteSet, FxQuotes } from './providers';
+import type { FxQuoteSet } from './providers';
 import { fetchYahooQuotes, parseFrankfurterResponse, parseYahooFxResponse } from './providers';
 import { runFxJob, fearInputFromSnapshot, type FxJobFetchers } from './job';
 import { InMemoryFxStore, RestFxStore, parseStoredFx } from './store';
@@ -271,8 +268,6 @@ describe('step 2 — changes, move_rank, dollar measure, weekly, V-rules', () =>
 /* ------------------------------------------------------------------ *
  * Step 4 — the rule engine: every outcome of every rule
  * ------------------------------------------------------------------ */
-
-type PairsInput = FxRuleInputs['pairs'];
 
 /** Pattern-fixture shapes: a risk-on factor rising through 20 weeks.
  * Risk-shaped series rise with it; haven-shaped series fall — exactly the

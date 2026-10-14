@@ -61,7 +61,6 @@ const trimmedIndex = parseAbsPeriodCsv(fixture('abs-cpi-trimmed-mean-quarterly-2
 
 // I15 fixture legs (recorded 2026-10-08): the six basket currencies (ECB
 // reference rates through the last decade) and the new FRED/ECB/RBA series.
-const basketFx = parseFrankfurterTimeseries(fixture('frankfurter-usd-basket-2016.json'), 'EUR');
 const basketCcy = (c: string) => parseFrankfurterTimeseries(fixture('frankfurter-usd-basket-2016.json'), c);
 const usCpi = fred('CPIAUCSL');
 const fedTarget = combineSeries(fred('DFEDTARL'), fred('DFEDTARU'), (l, u) => (l + u) / 2);

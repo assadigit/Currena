@@ -34,7 +34,7 @@ import {
   thousandSeparateInput,
   sourceForPair,
 } from '@currena/core';
-import type { ConversionResult, CurrencyCode, SnapshotSource } from '@currena/core';
+import type { ConversionResult, CurrencyCode } from '@currena/core';
 import { AmountInput, parseInputAmount } from '../components/AmountInput';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { LedGoldBoard } from '../components/LedGoldBoard';
@@ -832,7 +832,7 @@ export function Converter() {
           tgjuUrl={tgjuUrl}
           onClose={() => setPhase('idle')}
           onNewConversion={() => setPhase('idle')}
-          returnFocusTo={resultOpenerRef.current}
+          returnFocusToRef={resultOpenerRef}
         />
       ) : null}
 

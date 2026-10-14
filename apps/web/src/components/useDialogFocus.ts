@@ -22,8 +22,13 @@ const FOCUSABLE_SELECTOR =
 interface UseDialogFocusOptions {
   /** Closes the dialog (Escape key and the discipline's contract). */
   onClose: () => void;
-  /** The element that opened the dialog — focus returns here on close. */
-  returnFocusTo: HTMLElement | null;
+  /**
+   * REF to the element that opened the dialog — focus returns there on
+   * close. Pass the ref itself, never `.current` (reading a ref during
+   * render violates react-hooks/refs; the hook reads it in its effect,
+   * where it is legal).
+   */
+  returnFocusToRef?: Readonly<RefObject<HTMLElement | null>>;
   /**
    * Focus target on open; defaults to the `[data-dialog-heading]` element
    * inside the container (give the dialog's heading that data attribute),
@@ -37,7 +42,7 @@ interface UseDialogFocusOptions {
 }
 
 export function useDialogFocus(opts: UseDialogFocusOptions) {
-  const { onClose, returnFocusTo, initialFocusRef, active = true, lockScroll = true } = opts;
+  const { onClose, returnFocusToRef, initialFocusRef, active = true, lockScroll = true } = opts;
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Focus trap + Escape (the DetailsPanel discipline).
@@ -82,9 +87,11 @@ export function useDialogFocus(opts: UseDialogFocusOptions) {
     if (lockScroll) document.body.style.overflow = 'hidden'; // scroll lock while open
     return () => {
       if (lockScroll) document.body.style.overflow = previousOverflow;
-      // Focus returns to the control that opened the dialog.
-      if (returnFocusTo && document.contains(returnFocusTo)) {
-        returnFocusTo.focus({ preventScroll: true });
+      // Focus returns to the control that opened the dialog (the ref is
+      // read HERE, in the effect — never during render).
+      const opener = returnFocusToRef?.current;
+      if (opener && document.contains(opener)) {
+        opener.focus({ preventScroll: true });
       }
     };
     // Deliberately NOT re-running on returnFocusTo identity changes: the

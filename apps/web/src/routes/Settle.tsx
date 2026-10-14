@@ -129,7 +129,7 @@ function Modal({
   // scroll locks — replacing the Escape-only handling.
   const { containerRef, onKeyDown } = useDialogFocus({
     onClose,
-    returnFocusTo: openerRef.current,
+    returnFocusToRef: openerRef,
   });
 
   return (

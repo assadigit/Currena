@@ -72,22 +72,6 @@ function buildZip(files: { name: string; contents: string }[]): Uint8Array {
     offset += bytes.length;
   };
 
-  const u16 = (value: number): Uint8Array => {
-    const out = new Uint8Array(2);
-    out[0] = value & 0xff;
-    out[1] = (value >>> 8) & 0xff;
-    return out;
-  };
-
-  const u32 = (value: number): Uint8Array => {
-    const out = new Uint8Array(4);
-    out[0] = value & 0xff;
-    out[1] = (value >>> 8) & 0xff;
-    out[2] = (value >>> 16) & 0xff;
-    out[3] = (value >>> 24) & 0xff;
-    return out;
-  };
-
   // Local file headers + contents.
   for (const entry of entries) {
     const nameBytes = encoder.encode(entry.name);
@@ -284,7 +268,7 @@ export const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsh
 export function buildXlsxBlob(sheets: XlsxSheet[]): Blob {
   if (sheets.length === 0) throw new Error('xlsx-writer: at least one sheet is required');
   for (const sheet of sheets) {
-    if (!/^[^\\\/\?\*\[\]:]{1,31}$/.test(sheet.name)) {
+    if (!/^[^\\/?*[\]:]{1,31}$/.test(sheet.name)) {
       throw new Error(`xlsx-writer: invalid sheet name ${JSON.stringify(sheet.name)}`);
     }
   }

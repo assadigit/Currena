@@ -5,7 +5,6 @@
  */
 
 import { useState } from 'react';
-import { formatNumber } from '@currena/core';
 import type { FxPairEntry, FxPairId, FxRuleState, FxSnapshot } from '@currena/core';
 import { fxRuleHasPatternCheck } from '@currena/insights/fx/definitions';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
@@ -52,7 +51,6 @@ export function PatternCard({
   const changeLine = fxChangeLine(rule, copy.fx, numberLocale);
   const statusWord =
     view.status === 'active' ? copy.fx.statusActive : view.status === 'watching' ? copy.fx.statusWatching : copy.fx.statusQuiet;
-  const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
 
   // §9.3: "Pairs used in this pattern" — the four periods for the pairs
   // this rule reads (from the chart series keys).

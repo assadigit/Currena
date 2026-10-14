@@ -109,7 +109,7 @@ describe('I17 wording discipline (acceptance test 6)', () => {
   });
 
   it('no bare Persian خرید/فروش as a standalone word in the new sections', () => {
-    const bare = /(?:^|[\s\u200c«»()\[\]:;،؛])\s*(خرید|فروش)\s*(?=$|[\s\u200c«»()\[\]:;،؛.])/;
+    const bare = /(?:^|[\s\u200c«»()[\]:;،؛])\s*(خرید|فروش)\s*(?=$|[\s\u200c«»()[\]:;،؛.])/;
     for (const text of corpus(insightsCopyFa.together)) expect(bare.test(text)).toBe(false);
     for (const text of corpus(insightsCopyFa.signals)) expect(bare.test(text)).toBe(false);
   });

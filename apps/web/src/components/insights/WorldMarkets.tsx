@@ -92,12 +92,6 @@ function signedPct(n: number, numberLocale: 'en-US' | 'fa-IR', locale: 'en' | 'f
   return `${sign}${num}${locale === 'fa' ? '٪' : '%'}`;
 }
 
-function arrowOf(n: number): 'up' | 'flat' | 'down' {
-  if (n > 0) return 'up';
-  if (n < 0) return 'down';
-  return 'flat';
-}
-
 /**
  * Step-1 audit item F2/F3: ONE flat threshold for every market and every
  * view — |change| < 1% is "flat" (the old code derived the trend word from
@@ -185,14 +179,6 @@ const STATUS_WORD: Record<MarketEntry['status'], 'statusNormal' | 'statusCorrect
   bear: 'statusBear',
 };
 
-const TREND_WORD: Record<MarketEntry['trend'], 'trendUp' | 'trendFlat' | 'trendDown'> = {
-  up: 'trendUp',
-  flat: 'trendFlat',
-  down: 'trendDown',
-};
-
-const TREND_ARROW: Record<MarketEntry['trend'], 'up' | 'flat' | 'down'> = { up: 'up', flat: 'flat', down: 'down' };
-
 /** Step-1 F2: the trend WORD key for trendOf's result (chg3m-sourced). */
 const TREND_WORD_OF: Record<'up' | 'flat' | 'down', 'trendUp' | 'trendFlat' | 'trendDown'> = {
   up: 'trendUp',
@@ -224,7 +210,7 @@ function ViewSwitch({
 }) {
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
   const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
-    let next = -1;
+    let next: number;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (index + 1) % VIEWS.length;
     else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (index - 1 + VIEWS.length) % VIEWS.length;
     else return;
@@ -786,7 +772,7 @@ export function WorldMarkets({
     return state.snapshot.markets.reduce((max, m) => (m.asOf > max ? m.asOf : max), state.snapshot.markets[0]?.asOf ?? '');
   }, [state]);
 
-  const onToggleTile = useCallback((id: MarketId, _opener: HTMLElement | null) => {
+  const onToggleTile = useCallback((id: MarketId) => {
     setOpenId((prev) => (prev === id ? null : id)); // one panel open at a time (§6.3)
   }, []);
 

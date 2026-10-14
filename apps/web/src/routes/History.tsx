@@ -302,7 +302,7 @@ export function History() {
 
       {/* Entries — single column on mobile, 2-up grid on desktop */}
       <div className="lg:grid lg:grid-cols-2 lg:gap-4">
-      {filtered?.map(({ entry, storageIndex }) => {
+      {filtered?.map(({ entry }) => {
         const irrPair = entry.from === 'IRR' || entry.to === 'IRR';
         const decimals = irrPair ? 0 : 2;
         const rateDecimals = irrPair ? 0 : 4;

@@ -1,4 +1,4 @@
-import type { IndicatorReading, InsightsSnapshot, InsightsStatus, IndicatorHistory, IndicatorId, LivePriceEntry, LivePricesSnapshot, PriceAssetId } from '@currena/core';
+import type { IndicatorReading, InsightsSnapshot, InsightsStatus, IndicatorHistory, IndicatorId, LivePriceEntry, LivePricesSnapshot } from '@currena/core';
 import { InMemoryInsightsStore } from '@currena/insights/store';
 import { InMemoryPricesStore } from '@currena/insights/prices';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -328,7 +328,7 @@ async function realisticSnapshot(): Promise<MarketsSnapshot> {
         points.reverse();
         return { id, source: 'eodhd', points };
       },
-      fetchYahoo: async (id) => {
+      fetchYahoo: async () => {
         throw new Error('yahoo not needed in this fixture');
       },
     },

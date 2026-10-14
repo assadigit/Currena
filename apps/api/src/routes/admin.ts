@@ -103,7 +103,7 @@ export function createAdminRoutes(deps: AdminRouteDeps): Hono<{ Bindings: Bindin
           },
         }),
         429,
-        { ...ADMIN_HEADERS, 'Retry-After': String(rateLimitRetryAfterSec(rlKey, Date.now())) },
+        { ...ADMIN_HEADERS, 'Retry-After': String(rateLimitRetryAfterSec(rlKey)) },
       );
     }
 

@@ -33,7 +33,6 @@ import {
 
 const now = new Date();
 const nowIso = now.toISOString();
-const today = nowIso.slice(0, 10);
 
 /* ------------------------------------------------------------------ *
  * Fetch phase — collect.ts (shared with the ingestion runner)

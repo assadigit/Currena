@@ -24,8 +24,8 @@ import { useEffect, useState } from 'react';
 import { crossesAlert, formatNumber, sourceForPair } from '@currena/core';
 import type { RateAlert } from '@currena/core';
 import { alertsStore, useAlerts } from './alerts';
-import { liveRateView, rateDecimals } from './live-rate';
-import { snapshotStore, useSnapshotStore } from './snapshot-store';
+import { liveRateView } from './live-rate';
+import { snapshotStore } from './snapshot-store';
 import { useI18n } from './locale';
 import type { TranslationKey } from './locale';
 
@@ -35,7 +35,6 @@ const TOAST_MS = 6000;
 export function useAlertEvaluation(): { firedToast: string | null } {
   const { t, numberLocale } = useI18n();
   const { alerts, fired } = useAlerts();
-  const store = useSnapshotStore();
   const [toast, setToast] = useState<string | null>(null);
 
   // Evaluate on every store emission. Runs in the App shell — both

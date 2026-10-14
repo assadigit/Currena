@@ -298,7 +298,7 @@ export function parseTgjuAjax(json: unknown, now: Date = new Date()): Snapshot {
   }
 
   const quotesBySlug = new Map<string, TgjuRialQuote>();
-  for (const { code, slug } of TGJU_PROFILES) {
+  for (const { slug } of TGJU_PROFILES) {
     const entry = parsed.data.current[slug];
     if (!entry) {
       throw new ScraperError('tgju_missing_slug', `TGJU ajax.json has no '${slug}' entry (upstream layout change?)`);

@@ -17,7 +17,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { CalcError, evaluateExpression, formatNumber, parseAmount, sourceForPair } from '@currena/core';
-import type { CurrencyCode, SnapshotSource } from '@currena/core';
+import type { CurrencyCode } from '@currena/core';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { Card } from '../components/ui';
 import { useCodeLabel } from '../lib/display';

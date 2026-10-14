@@ -14,7 +14,7 @@
  * /insights route chunk, never the entry graph.
  */
 
-import { MarketsSnapshotSchema, RatesErrorSchema } from '@currena/core';
+import { MarketsSnapshotSchema } from '@currena/core';
 import type { MarketsSnapshot } from '@currena/core';
 
 const TIMEOUT_MS = 20_000;

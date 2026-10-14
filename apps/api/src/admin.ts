@@ -50,10 +50,6 @@ export function esc(value: string): string {
     .replace(/'/g, '&#39;');
 }
 
-function escOpt(value: string | undefined): string {
-  return value === undefined ? '—' : esc(value);
-}
-
 /** 'just now' / '42 s ago' / '3 min ago' / '2 h ago' / '4 d ago'. */
 export function relTime(iso: string | undefined, now: Date): string {
   if (iso === undefined) return '—';

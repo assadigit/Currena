@@ -65,7 +65,7 @@ export function parseFrankfurterTimeseries(text: string, currency: string): Seri
   try {
     parsed = JSON.parse(text) as FrankfurterSeries;
   } catch (e) {
-    throw new Error(`Frankfurter: response is not JSON (${(e as Error).message})`);
+    throw new Error(`Frankfurter: response is not JSON (${(e as Error).message})`, { cause: e });
   }
   if (parsed.rates === null || typeof parsed.rates !== 'object') {
     throw new Error('Frankfurter: no "rates" object in response');

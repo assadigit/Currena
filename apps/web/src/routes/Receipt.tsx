@@ -153,7 +153,7 @@ export function Receipt() {
     onKeyDown: receiptDialogKeyDown,
   } = useDialogFocus({
     onClose: () => setReceipt(null),
-    returnFocusTo: receiptOpenerRef.current,
+    returnFocusToRef: receiptOpenerRef,
     active: receipt !== null,
     initialFocusRef: paperCloseRef,
   });

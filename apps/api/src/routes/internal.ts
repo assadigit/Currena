@@ -27,7 +27,7 @@ export function createInternalRoutes(deps: InternalRouteDeps): Hono<{ Bindings: 
         429,
         'rate_limited',
         'Too many refresh attempts — wait a minute before trying again.',
-        rateLimitRetryAfterSec(rlKey, Date.now()),
+        rateLimitRetryAfterSec(rlKey),
       );
     }
 

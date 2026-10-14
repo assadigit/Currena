@@ -45,6 +45,9 @@ jobs:
       - name: Typecheck (strict, every package)
         run: pnpm -r typecheck
 
+      - name: Lint (flat eslint, zero errors allowed)
+        run: pnpm lint
+
       - name: Tests (vitest — never hits live sites)
         run: pnpm -r test
 

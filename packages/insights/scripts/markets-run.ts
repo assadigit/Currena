@@ -24,7 +24,6 @@
 
 import { readFileSync, existsSync } from 'node:fs';
 import { parseEodhdEodResponse, parseYahooChartResponse, ProviderError } from '../src/markets/providers';
-import type { MarketSeries } from '../src/markets/providers';
 import { defaultFetchers } from '../src/markets/job';
 import type { MarketJobFetchers } from '../src/markets/job';
 import { runMarketsUpdate, formatRunReport } from '../src/markets/run';

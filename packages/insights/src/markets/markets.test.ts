@@ -28,7 +28,7 @@ import type { MarketResolution } from './compute';
 import { lastExpectedCloseDate, marketsNeedingData, retryRunOptions, runMarketsJob } from './job';
 import type { MarketJobFetchers } from './job';
 import { InMemoryMarketsStore, RestMarketsStore, parseStoredMarkets } from './store';
-import { decodeWeeklySeries, MIN_CLOSES, MARKETS, MARKET_IDS } from './definitions';
+import { decodeWeeklySeries, MIN_CLOSES, MARKET_IDS } from './definitions';
 
 /* ------------------------------------------------------------------ *
  * Synthetic series helpers

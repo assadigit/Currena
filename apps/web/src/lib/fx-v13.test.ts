@@ -39,7 +39,6 @@ import {
   fxRuleView,
   fxSentence,
   fxBigMoverOf,
-  type FxBigMover,
 } from './fx-presentation';
 
 const en = insightsCopyEn;

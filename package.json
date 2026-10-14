@@ -14,7 +14,8 @@
     "typecheck": "pnpm -r run typecheck",
     "deploy": "pnpm --filter @currena/api run deploy",
     "copy:audit": "node scripts/audit-persian-copy.mjs",
-    "copy:audit:update": "node scripts/update-persian-copy-manifest.mjs"
+    "copy:audit:update": "node scripts/update-persian-copy-manifest.mjs",
+    "lint": "eslint ."
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -23,6 +24,18 @@
       "unrs-resolver",
       "sharp",
       "workerd"
-    ]
+    ],
+    "overrides": {
+      "dompurify": ">=3.4.16",
+      "source-map-js": ">=1.2.2",
+      "serialize-javascript": ">=7.1.2"
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "typescript-eslint": "^8.71.2"
   }
 }

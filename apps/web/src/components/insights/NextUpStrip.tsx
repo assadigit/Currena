@@ -81,6 +81,21 @@ export function NextUpStrip({
     downloadBlob(new Blob([ics], { type: 'text/calendar;charset=utf-8' }), 'currena-insights-calendar.ics');
   };
 
+  // H6 full list: group by month, merge duplicate titles (Fed's 8 rows).
+  // NOTE (QA Phase 4-d): this useMemo MUST stay above the empty-upcoming
+  // early return — a hook after a conditional return breaks the rules of
+  // hooks (eslint-plugin-react-hooks caught the latent crash: an
+  // upcoming→empty transition would render fewer hooks than the previous
+  // render). Computing an empty group list is free.
+  const grouped = useMemo(() => {
+    const byMonth = new Map<string, CalendarEvent[]>();
+    for (const e of upcoming) {
+      const key = monthKey(e.date);
+      byMonth.set(key, [...(byMonth.get(key) ?? []), e]);
+    }
+    return [...byMonth.entries()];
+  }, [upcoming]);
+
   if (upcoming.length === 0) {
     return (
       <section id="insights-coming-up" aria-labelledby="insights-coming-up-title" className="scroll-mt-24">
@@ -99,16 +114,6 @@ export function NextUpStrip({
     if (days === 1) return copy.ui.tomorrow;
     return interpolate(copy.ui.daysAway, { n: formatNumber(days, numberLocale, { maximumFractionDigits: 0 }) });
   };
-
-  // H6 full list: group by month, merge duplicate titles (Fed's 8 rows).
-  const grouped = useMemo(() => {
-    const byMonth = new Map<string, CalendarEvent[]>();
-    for (const e of upcoming) {
-      const key = monthKey(e.date);
-      byMonth.set(key, [...(byMonth.get(key) ?? []), e]);
-    }
-    return [...byMonth.entries()];
-  }, [upcoming]);
 
   const monthLabel = (key: string): string => {
     const [y, m] = key.split('-');

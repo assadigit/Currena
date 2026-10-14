@@ -54,7 +54,7 @@ export interface LegEval {
   lean: 1 | 0 | -1;
 }
 
-export interface ConnectionLeg extends LegEval {}
+export type ConnectionLeg = LegEval;
 
 export interface ConnectionDef {
   id: ConnectionId;

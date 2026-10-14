@@ -91,7 +91,7 @@ function writeSeenAt(at: number): void {
 function boot(): void {
   if (booted || typeof window === 'undefined') return;
   booted = true;
-  let raw: string | null = null;
+  let raw: string | null;
   try {
     raw = window.localStorage.getItem(ALERTS_KEY);
   } catch {

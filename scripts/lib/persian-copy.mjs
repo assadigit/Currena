@@ -208,7 +208,6 @@ function listSourceFiles(rootRel, out) {
   const root = path.join(REPO_ROOT, rootRel);
   if (!fs.existsSync(root)) return;
   for (const ent of fs.readdirSync(root, { withFileTypes: true })) {
-    const p = path.join(root, ent.name);
     if (ent.isDirectory()) listSourceFiles(path.join(rootRel, ent.name), out);
     else if (/\.(ts|tsx)$/.test(ent.name) && !/\.test\./.test(ent.name)) out.push(path.join(rootRel, ent.name));
   }
@@ -295,7 +294,6 @@ export function audit(manifest, state) {
     queued: [], divergentDuplicates: [], manifestSelfErrors: [],
   };
 
-  const byId = new Map(manifest.entries.map((e) => [e.id, e]));
   for (const e of manifest.entries) {
     if (!entryOk(e)) result.manifestSelfErrors.push({ id: e.id, reason: 'text/sha256 mismatch or missing' });
   }

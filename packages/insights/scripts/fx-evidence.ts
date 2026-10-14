@@ -32,8 +32,7 @@ import {
   pairSeriesFromQuotes,
   type FxRuleInputs,
 } from '../src/fx/compute';
-import type { FxCurrency } from '@currena/core';
-import { fetchFrankfurterQuotes, fetchYahooQuotes } from '../src/fx/providers';
+import { fetchFrankfurterQuotes } from '../src/fx/providers';
 import { FX_PAIRS, FX_STALE_DAYS } from '../src/fx/definitions';
 import { pointAtOrBefore, daysBetween, addDays, type SeriesPoint } from '../src/series';
 

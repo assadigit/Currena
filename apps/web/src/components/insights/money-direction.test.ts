@@ -22,7 +22,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import type { IndicatorId, IndicatorReading } from '@currena/core';
+import type { IndicatorReading } from '@currena/core';
 import { insightsCopyEn } from '../../i18n/insights-copy-en';
 import {
   moneyAreaDirection,

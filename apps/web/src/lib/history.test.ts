@@ -167,7 +167,7 @@ describe('downloadHistoryCsv', () => {
     let createdObjectUrl = '';
     let clicked: HTMLAnchorElement | null = null;
     vi.stubGlobal('URL', {
-      createObjectURL: (blob: Blob) => {
+      createObjectURL: () => {
         createdObjectUrl = `blob:fake-${urls.length}`;
         urls.push(createdObjectUrl);
         return createdObjectUrl;

@@ -15,7 +15,6 @@
 import { useEffect, useRef } from 'react';
 import { formatNumber } from '@currena/core';
 import { CalendarDays, Download, Search, Wrench } from 'lucide-react';
-import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import type { StatusFilter } from './config';
 

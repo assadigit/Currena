@@ -46,8 +46,8 @@ interface ResultPopupProps {
   tgjuUrl: string | null;
   /** Baseline rate from the previous snapshot generation (null → hide ▲/▼). */
   prevRate?: number | null;
-  /** The control that opened the popup (the convert button) — focus returns there on close. */
-  returnFocusTo?: HTMLElement | null;
+  /** REF to the control that opened the popup — focus returns there on close. */
+  returnFocusToRef?: Readonly<React.RefObject<HTMLElement | null>>;
 }
 
 const SOURCE_KEY: Record<Source, TranslationKey> = {
@@ -63,7 +63,7 @@ function rateMaxFractionDigits(rate: number, irrPair: boolean): number {
   return irrPair ? 0 : 4;
 }
 
-export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate, returnFocusTo = null }: ResultPopupProps) {
+export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate, returnFocusToRef }: ResultPopupProps) {
   const { t, numberLocale } = useI18n();
   const label = useCodeLabel();
   const [copied, setCopied] = useState(false);
@@ -76,7 +76,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate,
   // pair heading, announced by role=dialog), Tab is trapped inside,
   // Escape closes, focus returns to the convert button on close, and body
   // scroll locks while open — the DetailsPanel-proven pattern, shared.
-  const { containerRef, onKeyDown } = useDialogFocus({ onClose, returnFocusTo });
+  const { containerRef, onKeyDown } = useDialogFocus({ onClose, returnFocusToRef });
 
   // Micro-trend (rate-history sparkline): only for live sources, not manual/local.
   const historySource = view.source === 'tgju' || view.source === 'frankfurter' ? view.source : null;

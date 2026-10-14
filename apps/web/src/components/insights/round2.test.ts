@@ -19,7 +19,6 @@
 
 import { describe, expect, it } from 'vitest';
 import type { IndicatorId, IndicatorReading, InsightsSection } from '@currena/core';
-import { DEFINITIONS, GAUGES } from '@currena/insights';
 import type { GaugeReading } from '@currena/insights';
 import { formatDateWords, formatJalaliDate } from '@currena/core';
 import {
@@ -36,7 +35,6 @@ import {
   heroReason,
   heroReasonIsConsistent,
   mergeSignals,
-  moneyAreaRow,
   moneyPanel,
   MONEY_AREAS,
   statusCounts,
@@ -212,7 +210,7 @@ describe('R5 tierOf (precedence, history floor, stale handling)', () => {
  * ------------------------------------------------------------------ */
 
 describe('R7 groupVisibility (needs-attention never hidden)', () => {
-  const many: IndicatorReading[] = Array.from({ length: 8 }, (_, i) =>
+  const many: IndicatorReading[] = Array.from({ length: 8 }, () =>
     reading({ id: 'us10y', status: 'normal', percentile10y: 0.5 }),
   ).map((r, i) => ({ ...r, id: (i === 0 ? 'us10y' : 'real-yield-10y') as IndicatorId }));
 
@@ -354,7 +352,7 @@ describe('R14 code-pattern scan (names + tags, both locales)', () => {
   // Source-code shapes: letter+digit codes (M13), 4+-cap codes
   // (DCOILBRENTEU, WPI). Helpful tags stay: CPI, BTC, 'M2 money',
   // 'USD/JPY' (the slash keeps FX pairs out of the code shape).
-  const CODE_LIKE = /^(?!CPI$|BTC$)([A-Z]\d{1,3}|[A-Z][A-Z0-9&.\-]{3,})$/;
+  const CODE_LIKE = /^(?!CPI$|BTC$)([A-Z]\d{1,3}|[A-Z][A-Z0-9&.-]{3,})$/;
 
   const entries = (copy: InsightsCopy): { id: string; name: string; ticker?: string }[] =>
     (Object.entries(copy.indicators) as [string, { name: string; ticker?: string }][]).map(

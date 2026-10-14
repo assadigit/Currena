@@ -57,7 +57,6 @@ function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
  *  `sm` is the compact per-gauge row meter. */
 export function VerdictMeter({
   step,
-  label,
   ariaLabel,
   size,
 }: {

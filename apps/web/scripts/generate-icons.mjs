@@ -14,6 +14,7 @@
  * Run: pnpm --filter @currena/web icons   (also runs via prebuild — idempotent)
  */
 
+/* global console */ // Node build script (apps/web/scripts is outside the config's node-globals block).
 import { Resvg } from '@resvg/resvg-js';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

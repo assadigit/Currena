@@ -59,7 +59,7 @@ export function Header() {
   // drawer is a peek-in overlay, not a modal dialog.
   const { containerRef: drawerRef, onKeyDown: drawerKeyDown } = useDialogFocus({
     onClose: () => setMenuOpen(false),
-    returnFocusTo: hamburgerRef.current,
+    returnFocusToRef: hamburgerRef,
     active: menuOpen,
     lockScroll: false,
   });

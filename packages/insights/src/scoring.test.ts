@@ -69,8 +69,6 @@ function readingOf(def: IndicatorDefinition, series: SeriesPoint[], now = NOW) {
  * ------------------------------------------------------------------ */
 
 describe('rule: threshold', () => {
-  const series = dailySeries(10, () => 1);
-
   it.each([
     ['above triggered', { kind: 'threshold', direction: 'above', value: 0 } as const, 1, 'warning'],
     ['above not triggered', { kind: 'threshold', direction: 'above', value: 2 } as const, 1, 'normal'],

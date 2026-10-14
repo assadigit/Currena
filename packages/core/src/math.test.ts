@@ -32,7 +32,7 @@ describe('roundSignificant (precision strategy)', () => {
     expect(roundSignificant(0.1 + 0.2)).toBe(0.3);
     expect(roundSignificant(100 * (1 / 230500) * 230500)).toBe(100);
     expect(roundSignificant(230500)).toBe(230500);
-    expect(roundSignificant(230500.123456789012345)).toBe(230500.123457); // 12 sig digits
+    expect(roundSignificant(230500.123456789)).toBe(230500.123457); // 12 sig digits
   });
 
   it('passes through zero and non-finite values untouched', () => {

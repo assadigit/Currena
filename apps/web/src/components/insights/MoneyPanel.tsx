@@ -21,7 +21,6 @@
 
 import type { CSSProperties } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import { formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { IconImg, moneyAreaIconUrl } from '../icons/currena';

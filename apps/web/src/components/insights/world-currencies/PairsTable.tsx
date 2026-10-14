@@ -186,7 +186,6 @@ export function PairsTable({
   onOpenPair: (id: FxPairId) => void;
 }) {
   const rows = useMemo(() => fxPairRows(snapshot.pairs, 'group'), [snapshot.pairs]);
-  const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
   const trendWord = { up: copy.fx.trendUp, flat: copy.fx.trendFlat, down: copy.fx.trendDown } as const;
   const trendGlyph = { up: '▲', flat: '→', down: '▼' } as const;
   let lastGroup: string | null = null;
