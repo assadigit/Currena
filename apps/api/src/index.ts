@@ -129,6 +129,17 @@ export function __resetRateLimiterForTests(): void {
   rateBuckets.clear();
 }
 
+/**
+ * Test-only: reset the isolate-local snapshot memo + store singleton
+ * (the scheduled-handler tests drive `runScheduled` per case with their own
+ * fake KV bindings — both singletons would otherwise leak the first case's
+ * store into every later one, exactly like the rate limiter above).
+ */
+export function __resetSnapshotMemoForTests(): void {
+  snapshotMemo.clear();
+  defaultStore = undefined;
+}
+
 /** Seconds until one token is available again (for Retry-After). */
 function rateLimitRetryAfterSec(key: string, nowMs: number): number {
   const bucket = rateBuckets.get(key);
