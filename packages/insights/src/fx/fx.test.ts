@@ -800,7 +800,7 @@ describe('RestFxStore — daily-cap retry + read failures (audit C-5)', () => {
       return new Response('404 not found', { status: 404 }); // GET: key absent
     });
     const store = new RestFxStore({ apiToken: 'tok', accountId: 'acc', namespaceId: 'ns', fetchImpl, retryDelaysMs: [1] });
-    await store.putFxIfChanged(snap);
+    await store.putFxIfChanged(snap, undefined);
     expect(putAttempts).toBe(2);
     expect(store.ops.retriedWrites).toBe(1);
     expect(store.ops.writes).toBe(2);
@@ -815,7 +815,7 @@ describe('RestFxStore — daily-cap retry + read failures (audit C-5)', () => {
       return new Response('404', { status: 404 });
     });
     const store = new RestFxStore({ apiToken: 'secret-token', accountId: 'acc', namespaceId: 'ns', fetchImpl, retryDelaysMs: [1] });
-    await expect(store.putFxIfChanged(snap)).rejects.toThrow(/HTTP 403/);
+    await expect(store.putFxIfChanged(snap, undefined)).rejects.toThrow(/HTTP 403/);
     expect(store.ops.writes).toBe(1); // no retry burned
   });
 

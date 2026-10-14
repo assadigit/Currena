@@ -487,10 +487,13 @@ describe('InMemoryMarketsStore — write gate (build step 3)', () => {
   it('running the job twice with the same data causes exactly one write', async () => {
     const store = new InMemoryMarketsStore();
     const snap = fakeSnapshot([storedEntry('dax')]);
-    expect(await store.putMarketsIfChanged(snap)).toBe('written');
+    // A-6: the caller passes its own start-of-run read (undefined = nothing
+    // stored) — the gate compares against it instead of re-reading.
+    expect(await store.putMarketsIfChanged(snap, undefined)).toBe('written');
     const sameData = fakeSnapshot([storedEntry('dax')], '2026-10-11T01:31:00Z'); // new timestamp, same content
-    expect(await store.putMarketsIfChanged(sameData)).toBe('unchanged');
-    expect(await store.putMarketsIfChanged(sameData)).toBe('unchanged');
+    const prev = await store.getMarkets();
+    expect(await store.putMarketsIfChanged(sameData, prev)).toBe('unchanged');
+    expect(await store.putMarketsIfChanged(sameData, prev)).toBe('unchanged');
     expect(store.ops.writes).toBe(1);
     await expect(store.getMarkets()).resolves.toMatchObject({ v: 1 });
   });
@@ -651,7 +654,7 @@ describe('RestMarketsStore — daily-cap retry + read failures (audit C-5)', () 
       return new Response('404 not found', { status: 404 }); // GET: key absent
     });
     const store = new RestMarketsStore({ apiToken: 'tok', accountId: 'acc', namespaceId: 'ns', fetchImpl, retryDelaysMs: [1] });
-    await store.putMarketsIfChanged(snap!);
+    await store.putMarketsIfChanged(snap!, undefined);
     expect(putAttempts).toBe(2);
     expect(store.ops.retriedWrites).toBe(1);
   });
@@ -670,7 +673,7 @@ describe('RestMarketsStore — daily-cap retry + read failures (audit C-5)', () 
       return new Response('404', { status: 404 });
     });
     const storeA = new RestMarketsStore({ apiToken: 'tok', accountId: 'acc', namespaceId: 'ns', fetchImpl: denied, retryDelaysMs: [1] });
-    await expect(storeA.putMarketsIfChanged(snap!)).rejects.toThrow(/HTTP 403/);
+    await expect(storeA.putMarketsIfChanged(snap!, undefined)).rejects.toThrow(/HTTP 403/);
     expect(storeA.ops.writes).toBe(1);
 
     const broken = vi.fn(async () => new Response('boom', { status: 500 }));

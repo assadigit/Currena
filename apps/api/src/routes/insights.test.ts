@@ -362,7 +362,7 @@ describe('GET /api/insights/markets', () => {
 
   it('serves the stored snapshot with ETag + the spec §4 rule 5 cache headers', async () => {
     const snap = await realisticSnapshot();
-    await store.putMarketsIfChanged(snap);
+    await store.putMarketsIfChanged(snap, undefined);
     const res = await makeApp().request('/api/insights/markets', undefined, env);
     expect(res.status).toBe(200);
     expect(res.headers.get('etag')).toBe('"insights-markets:2026-10-12T23:31:00Z"');
@@ -372,7 +372,7 @@ describe('GET /api/insights/markets', () => {
 
   it('answers 304 on a matching If-None-Match', async () => {
     const snap = await realisticSnapshot();
-    await store.putMarketsIfChanged(snap);
+    await store.putMarketsIfChanged(snap, undefined);
     const res = await makeApp().request(
       '/api/insights/markets',
       { headers: { 'if-none-match': '"insights-markets:2026-10-12T23:31:00Z"' } },
@@ -399,7 +399,7 @@ describe('GET /api/insights/markets', () => {
 
   it('one KV read per request (the store counts its own ops)', async () => {
     const snap = await realisticSnapshot();
-    await store.putMarketsIfChanged(snap);
+    await store.putMarketsIfChanged(snap, undefined);
     const readsBefore = store.ops.reads;
     await makeApp().request('/api/insights/markets', undefined, env);
     expect(store.ops.reads - readsBefore).toBe(1);
@@ -469,7 +469,7 @@ describe('GET /api/insights/fx', () => {
 
   it('serves the stored snapshot with ETag + the spec §5 rule 4 cache headers', async () => {
     const snap = await realisticFxSnapshot();
-    await store.putFxIfChanged(snap);
+    await store.putFxIfChanged(snap, undefined);
     const res = await makeApp().request('/api/insights/fx', undefined, env);
     expect(res.status).toBe(200);
     expect(res.headers.get('etag')).toBe('"insights-fx:2026-10-13T17:01:00Z"');
@@ -479,7 +479,7 @@ describe('GET /api/insights/fx', () => {
 
   it('answers 304 on a matching If-None-Match', async () => {
     const snap = await realisticFxSnapshot();
-    await store.putFxIfChanged(snap);
+    await store.putFxIfChanged(snap, undefined);
     const res = await makeApp().request(
       '/api/insights/fx',
       { headers: { 'if-none-match': '"insights-fx:2026-10-13T17:01:00Z"' } },
@@ -505,7 +505,7 @@ describe('GET /api/insights/fx', () => {
 
   it('one KV read per request (the store counts its own ops)', async () => {
     const snap = await realisticFxSnapshot();
-    await store.putFxIfChanged(snap);
+    await store.putFxIfChanged(snap, undefined);
     const readsBefore = store.ops.reads;
     await makeApp().request('/api/insights/fx', undefined, env);
     expect(store.ops.reads - readsBefore).toBe(1);

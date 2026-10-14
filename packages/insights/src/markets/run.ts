@@ -95,7 +95,11 @@ export async function runMarketsUpdate(
   }
 
   try {
-    const outcome = await deps.store.putMarketsIfChanged(snapshot);
+    // A-6: the run passes its own start-of-run read as the write gate's
+    // comparison base — one fewer same-invocation KV op (the worst-case
+    // subrequest budget drops 50 → 48, including KV ops). The run is the
+    // only writer inside this invocation, so prev cannot be stale.
+    const outcome = await deps.store.putMarketsIfChanged(snapshot, prev);
     return {
       ...base,
       wroteSnapshot: outcome === 'written',

@@ -31,12 +31,25 @@ export interface MarketsReader {
 export interface MarketsWriter {
   /**
    * Write the snapshot only when its content differs from the stored one.
+   *
+   * `prev` is the value the caller read via `getMarkets()` at the start of
+   * THIS run (undefined = nothing was stored) — the gate compares against
+   * it instead of re-reading, saving one same-invocation KV op (audit A-6:
+   * the combined worst case sat exactly at the 50-subrequest free-plan
+   * cap; the header budget is now ≤48 including KV ops). Within one cron
+   * invocation the run is the only writer, so `prev` cannot disagree with
+   * the stored truth; a caller that cannot attest to a fresh read must
+   * read first and pass the result (the run orchestrations always do).
+   *
    * Resolves 'written' | 'unchanged'; rejections carry the failure verbatim
    * (the caller decides whether a bounced write is fatal — for the markets
    * job it is NOT: the 01:30 retry run lands the day's write in the fresh
    * post-midnight budget slice).
    */
-  putMarketsIfChanged(next: MarketsSnapshot): Promise<'written' | 'unchanged'>;
+  putMarketsIfChanged(
+    next: MarketsSnapshot,
+    prev: MarketsSnapshot | undefined,
+  ): Promise<'written' | 'unchanged'>;
 }
 
 /** Parse a stored JSON value with the poisoned-entry defense (rule #3). */
@@ -64,10 +77,11 @@ export class InMemoryMarketsStore implements MarketsReader, MarketsWriter {
     return parseStoredMarkets(this.value);
   }
 
-  async putMarketsIfChanged(next: MarketsSnapshot): Promise<'written' | 'unchanged'> {
-    this.ops.reads++; // the write gate itself needs the stored value
-    const stored = parseStoredMarkets(this.value);
-    if (marketsContentEqual(stored, next)) return 'unchanged';
+  async putMarketsIfChanged(
+    next: MarketsSnapshot,
+    prev: MarketsSnapshot | undefined,
+  ): Promise<'written' | 'unchanged'> {
+    if (marketsContentEqual(prev, next)) return 'unchanged';
     this.ops.writes++;
     this.value = JSON.stringify(next);
     return 'written';
@@ -90,8 +104,9 @@ export interface KVLike {
 
 /**
  * The markets Worker's store over the RATES namespace binding. Reads are
- * uncached (the write gate must compare against the truth); the SERVE path
- * (currena-api's route) applies its own cacheTtl per spec §4 rule 5.
+ * uncached (the write gate must compare against the truth — the run passes
+ * its own start-of-run read as `prev`); the SERVE path (currena-api's
+ * route) applies its own cacheTtl per spec §4 rule 5.
  * putMarketsIfChanged rejections propagate to runMarketsUpdate, which
  * treats a bounced write as non-fatal (the 01:30 retry lands it).
  */
@@ -102,9 +117,11 @@ export class KvMarketsStore implements MarketsReader, MarketsWriter {
     return parseStoredMarkets(await this.kv.get(MARKETS_KV_KEY));
   }
 
-  async putMarketsIfChanged(next: MarketsSnapshot): Promise<'written' | 'unchanged'> {
-    const stored = await this.getMarkets();
-    if (marketsContentEqual(stored, next)) return 'unchanged';
+  async putMarketsIfChanged(
+    next: MarketsSnapshot,
+    prev: MarketsSnapshot | undefined,
+  ): Promise<'written' | 'unchanged'> {
+    if (marketsContentEqual(prev, next)) return 'unchanged';
     await this.kv.put(MARKETS_KV_KEY, JSON.stringify(next));
     return 'written';
   }
@@ -205,9 +222,11 @@ export class RestMarketsStore implements MarketsReader, MarketsWriter {
     return parseStoredMarkets(await this.getText());
   }
 
-  async putMarketsIfChanged(next: MarketsSnapshot): Promise<'written' | 'unchanged'> {
-    const stored = await this.getMarkets();
-    if (marketsContentEqual(stored, next)) return 'unchanged';
+  async putMarketsIfChanged(
+    next: MarketsSnapshot,
+    prev: MarketsSnapshot | undefined,
+  ): Promise<'written' | 'unchanged'> {
+    if (marketsContentEqual(prev, next)) return 'unchanged';
     await this.put(JSON.stringify(next));
     return 'written';
   }

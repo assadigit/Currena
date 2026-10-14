@@ -47,11 +47,20 @@ export interface FxReader {
 export interface FxWriter {
   /**
    * Write the snapshot only when its content differs from the stored one.
+   *
+   * `prev` is the value the caller read via `getFx()` at the start of THIS
+   * run (undefined = nothing was stored) — the gate compares against it
+   * instead of re-reading, saving one same-invocation KV op (audit A-6: the
+   * combined worst case sat exactly at the 50-subrequest free-plan cap).
+   * Within one cron invocation the run is the only writer, so `prev`
+   * cannot disagree with the stored truth; a caller that cannot attest to
+   * a fresh read must read first and pass the result.
+   *
    * Resolves 'written' | 'unchanged'; rejections carry the failure verbatim
    * (the caller decides whether a bounced write is fatal — for the fx job
    * it is NOT: the markets retry run lands it two hours later).
    */
-  putFxIfChanged(next: FxSnapshot): Promise<'written' | 'unchanged'>;
+  putFxIfChanged(next: FxSnapshot, prev: FxSnapshot | undefined): Promise<'written' | 'unchanged'>;
 }
 
 /**
@@ -93,10 +102,11 @@ export class InMemoryFxStore implements FxReader, FxWriter {
     return parseStoredFx(this.value);
   }
 
-  async putFxIfChanged(next: FxSnapshot): Promise<'written' | 'unchanged'> {
-    this.ops.reads++; // the write gate itself needs the stored value
-    const stored = parseStoredFx(this.value);
-    if (fxContentEqual(stored, next)) return 'unchanged';
+  async putFxIfChanged(
+    next: FxSnapshot,
+    prev: FxSnapshot | undefined,
+  ): Promise<'written' | 'unchanged'> {
+    if (fxContentEqual(prev, next)) return 'unchanged';
     this.ops.writes++;
     this.value = JSON.stringify(next);
     return 'written';
@@ -126,9 +136,11 @@ export class KvFxStore implements FxReader, FxWriter, FxCrossReader {
     return parseStoredFx(await this.kv.get(FX_KV_KEY));
   }
 
-  async putFxIfChanged(next: FxSnapshot): Promise<'written' | 'unchanged'> {
-    const stored = await this.getFx();
-    if (fxContentEqual(stored, next)) return 'unchanged';
+  async putFxIfChanged(
+    next: FxSnapshot,
+    prev: FxSnapshot | undefined,
+  ): Promise<'written' | 'unchanged'> {
+    if (fxContentEqual(prev, next)) return 'unchanged';
     await this.kv.put(FX_KV_KEY, JSON.stringify(next));
     return 'written';
   }
@@ -262,9 +274,11 @@ export class RestFxStore implements FxReader, FxWriter, FxCrossReader {
     return parseStoredFx(await this.getText(FX_KV_KEY));
   }
 
-  async putFxIfChanged(next: FxSnapshot): Promise<'written' | 'unchanged'> {
-    const stored = await this.getFx();
-    if (fxContentEqual(stored, next)) return 'unchanged';
+  async putFxIfChanged(
+    next: FxSnapshot,
+    prev: FxSnapshot | undefined,
+  ): Promise<'written' | 'unchanged'> {
+    if (fxContentEqual(prev, next)) return 'unchanged';
     await this.put(FX_KV_KEY, JSON.stringify(next));
     return 'written';
   }

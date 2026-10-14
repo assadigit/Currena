@@ -217,12 +217,13 @@ describe('runScheduledMarkets — the 24-hour budget', () => {
  *   - one Frankfurter call per fx run (Yahoo's 8 only on fallback);
  *   - KV writes ≤3/day across BOTH sections (in practice: the markets
  *     retry's landing write + the fx write);
- *   - subrequests per invocation ≤50 even in the worst case (every
- *     markets fetch bouncing to Yahoo AND the fx fallback firing).
+ *   - subrequests per invocation ≤48 INCLUDING the same-invocation KV ops
+ *     (audit A-6) even in the worst case (every markets fetch bouncing to
+ *     Yahoo AND the fx fallback firing).
  * ------------------------------------------------------------------ */
 
 import { runFxUpdate } from '@currena/insights/fx';
-import { InMemoryFxStore } from '@currena/insights/fx';
+import { InMemoryFxStore, KvFxStore } from '@currena/insights/fx';
 import type { FxJobFetchers } from '@currena/insights/fx';
 
 /** A synthetic ECB world: 8 currencies × 420 working days, gentle drift. */
@@ -313,7 +314,7 @@ describe('the combined markets + fx 24-hour budget', () => {
     expect(kv.ops.writes + fxStore.ops.writes).toBeLessThanOrEqual(6); // 3 days × 2 sections
   });
 
-  it('the worst case: every markets fetch bounces to Yahoo AND the fx fallback fires — still ≤50', async () => {
+  it('the worst case: every markets fetch bounces to Yahoo AND the fx fallback fires — total ≤48 including KV ops (A-6)', async () => {
     const kv = new FakeKV();
     // Markets: EODHD always fails → 16 EODHD attempts + 16 Yahoo answers.
     const world = makeWorld();
@@ -332,13 +333,15 @@ describe('the combined markets + fx 24-hour budget', () => {
     const marketsCalls = world.calls.length; // 16 EODHD attempts + 16 Yahoo answers = 32
     expect(marketsCalls).toBe(32);
 
-    // Fx: Frankfurter fails → Yahoo's 8 currency calls fire.
+    // Fx: Frankfurter fails → Yahoo's 8 currency calls fire. The fx run
+    // rides the PRODUCTION store (KvFxStore over the same KV binding) so
+    // the budget below counts its real KV ops, not an in-memory fake's.
     const quotes = fxQuotesFixture();
     const fxCalls = { frankfurter: 0, yahoo: 0 };
-    const fxStore = new InMemoryFxStore();
+    const fxStore = new KvFxStore(kv);
     await runFxUpdate({
       store: fxStore,
-      cross: { getMarkets: async () => undefined, getGoldHistory: async () => undefined, getInsightsSnapshot: async () => undefined },
+      cross: fxStore,
       fetchers: {
         fetchFrankfurter: async () => {
           fxCalls.frankfurter++;
@@ -352,8 +355,17 @@ describe('the combined markets + fx 24-hour budget', () => {
       now: MONDAY_MAIN,
     });
     expect(fxCalls).toEqual({ frankfurter: 1, yahoo: 8 });
-    // THE combined ceiling: 32 + 9 = 41 provider subrequests (+ a handful
-    // of KV ops) — comfortably under the 50-per-invocation cap.
-    expect(marketsCalls + fxCalls.frankfurter + fxCalls.yahoo).toBeLessThanOrEqual(50);
+    // THE combined ceiling (audit A-6): 41 provider subrequests + the
+    // same-invocation KV ops (markets: 1 read + 1 write · fx: 4 reads +
+    // 1 write — the write gates compare against the runs' own start-of-run
+    // reads instead of re-reading) = 48, comfortably under the
+    // 50-per-invocation free-plan cap. Before A-6 the two put-gate
+    // re-reads put the worst case at exactly 50.
+    const providerSubrequests = marketsCalls + fxCalls.frankfurter + fxCalls.yahoo;
+    const kvOps = kv.ops.reads + kv.ops.writes;
+    expect(providerSubrequests).toBe(41);
+    expect(kvOps).toBe(7);
+    expect(providerSubrequests + kvOps).toBe(48);
+    expect(providerSubrequests + kvOps).toBeLessThanOrEqual(48);
   });
 });

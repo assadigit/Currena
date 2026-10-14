@@ -11,8 +11,10 @@
  * handler, so a page request can NEVER reach a provider. The two cron
  * triggers are the stock section's own (spec §4 rule 3), keeping each
  * invocation far under the 50-subrequest cap (the combined worst case —
- * every market fetch bouncing to Yahoo AND the fx fallback firing — stays
- * at ≤48 subrequests; see index.test.ts's combined budget test):
+ * every market fetch bouncing to Yahoo AND the fx fallback firing — is
+ * ≤48 subrequests INCLUDING the same-invocation KV ops, audit A-6: the
+ * write gates compare against the runs' own start-of-run reads instead
+ * of re-reading; see index.test.ts's combined budget test):
  *
  *   "30 23 * * 1-5"  main  — every market has closed by 23:30 UTC; fetch
  *                            all 16, EODHD first, Yahoo as fallback; then

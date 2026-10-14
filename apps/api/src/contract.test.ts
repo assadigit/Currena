@@ -195,7 +195,7 @@ describe('golden bodies validate against the packages/core contracts', () => {
   });
 
   it('GET /api/insights/markets → MarketsSnapshotSchema', async () => {
-    await marketsStore.putMarketsIfChanged(marketsSnapshot);
+    await marketsStore.putMarketsIfChanged(marketsSnapshot, undefined);
     const res = await makeApp().request('/api/insights/markets', undefined, env);
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -203,7 +203,7 @@ describe('golden bodies validate against the packages/core contracts', () => {
   });
 
   it('GET /api/insights/fx → FxSnapshotSchema', async () => {
-    await fxStore.putFxIfChanged(fxSnapshot);
+    await fxStore.putFxIfChanged(fxSnapshot, undefined);
     const res = await makeApp().request('/api/insights/fx', undefined, env);
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -325,8 +325,8 @@ describe('cache-chain matrix (spec rules + D-13; every layer pinned)', () => {
   ] as const)(
     '$route: public,max-age=300,s-maxage=300 + ETag on 200 AND 304 (spec rules, D-13)',
     async ({ route, store: which }) => {
-      if (which === 'markets') await marketsStore.putMarketsIfChanged(marketsSnapshot);
-      else await fxStore.putFxIfChanged(fxSnapshot);
+      if (which === 'markets') await marketsStore.putMarketsIfChanged(marketsSnapshot, undefined);
+      else await fxStore.putFxIfChanged(fxSnapshot, undefined);
       const app = makeApp();
 
       const first = await app.request(route, undefined, env);
