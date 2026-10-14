@@ -130,15 +130,32 @@ let metaPromise: Promise<MetaResponse> | null = null;
  * GET /api/meta — static payload, fetched once per session and memoized.
  * Throws ApiError loudly so callers can degrade to core's static currency
  * metadata (currencies.ts carries the same TGJU profile slugs).
+ *
+ * Retry-after-failure (QA audit C-2): a rejected memo must not poison the
+ * whole session — one transient /api/meta failure at boot used to make
+ * every later call return the same dead promise. The memo resets on
+ * rejection so the next natural trigger (route change, converter mount)
+ * refetches; successful memoization is unchanged.
  */
 export function fetchMeta(): Promise<MetaResponse> {
-  metaPromise ??= (async () => {
-    const body = await requestJson('/api/meta');
-    const parsed = MetaResponseSchema.safeParse(body);
-    if (!parsed.success) {
-      throw new ApiError('parse', `Invalid meta payload: ${parsed.error.message}`, { status: 200 });
-    }
-    return parsed.data;
-  })();
+  if (metaPromise === null) {
+    const promise = (async () => {
+      const body = await requestJson('/api/meta');
+      const parsed = MetaResponseSchema.safeParse(body);
+      if (!parsed.success) {
+        throw new ApiError('parse', `Invalid meta payload: ${parsed.error.message}`, { status: 200 });
+      }
+      return parsed.data;
+    })();
+    void promise.catch(() => {
+      if (metaPromise === promise) metaPromise = null;
+    });
+    metaPromise = promise;
+  }
   return metaPromise;
+}
+
+/** Test-only: reset the meta memo between test cases (module state). */
+export function __resetMetaMemoForTests(): void {
+  metaPromise = null;
 }
