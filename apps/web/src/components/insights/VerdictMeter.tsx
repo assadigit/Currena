@@ -518,7 +518,6 @@ export function VerdictBlock({
             {tiles.length > 3 && !revealAllTiles ? (
               <button
                 type="button"
-                aria-expanded={false}
                 onClick={() => setRevealAllTiles(true)}
                 className="insights-focusable mt-1.5 inline-flex min-h-[24px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
               >

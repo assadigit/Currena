@@ -10,20 +10,18 @@
  * flex column layout.
  */
 
-import { navigate } from '../router';
 import { useI18n } from '../lib/locale';
 
 /** SessionStorage key staging the About section to scroll to. */
 export const ABOUT_SCROLL_TARGET = 'currena:about-scroll';
 
-/** Navigate to /about and stage a section id for About to scroll to. */
-function navigateToAboutSection(sectionId: string): void {
+/** Stage a section id for About to scroll to after the hash navigation. */
+function stageAboutSection(sectionId: string): void {
   try {
     window.sessionStorage.setItem(ABOUT_SCROLL_TARGET, sectionId);
   } catch {
     // Private mode: plain navigation, no scroll stage.
   }
-  navigate('/about');
 }
 
 export function Footer() {
@@ -38,13 +36,16 @@ export function Footer() {
       {/* Trust row — privacy · terms · contact · about (financial-utility
           credibility; owner request 2026-09-20). */}
       <nav aria-label={t('nav.about')} className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1">
-        <button type="button" onClick={() => navigateToAboutSection('privacy')} className={linkClass}>
+        {/* REAL links (audit WS-3 #6): href semantics for AT; the click
+            stages About's scroll target and the hash change IS the
+            navigation (the router listens to hashchange — exactly once). */}
+        <a href="#/about" onClick={() => stageAboutSection('privacy')} className={linkClass}>
           {t('footer.privacy')}
-        </button>
+        </a>
         <span aria-hidden="true">·</span>
-        <button type="button" onClick={() => navigateToAboutSection('terms')} className={linkClass}>
+        <a href="#/about" onClick={() => stageAboutSection('terms')} className={linkClass}>
           {t('footer.terms')}
-        </button>
+        </a>
         <span aria-hidden="true">·</span>
         <a
           href="https://github.com/assadigit"
@@ -55,9 +56,9 @@ export function Footer() {
           {t('footer.contact')}
         </a>
         <span aria-hidden="true">·</span>
-        <button type="button" onClick={() => navigate('/about')} className={linkClass}>
+        <a href="#/about" className={linkClass}>
           {t('nav.about')}
-        </button>
+        </a>
       </nav>
     </footer>
   );

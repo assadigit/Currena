@@ -250,7 +250,6 @@ export function PricesBoard({
               <button
                 type="button"
                 onClick={(e) => onFocusCard(id, e.currentTarget)}
-                aria-expanded={false}
                 className="insights-focusable block h-full w-full cursor-pointer border-0 bg-transparent p-0 text-start"
               >
                 {/* h-full: buttons vertically centre short content (UA

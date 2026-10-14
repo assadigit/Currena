@@ -34,6 +34,7 @@ import { alertsStore, useAlerts } from '../lib/alerts';
 import { liveRateView, rateDecimals } from '../lib/live-rate';
 import { useSnapshotStore } from '../lib/snapshot-store';
 import { useI18n } from '../lib/locale';
+import { useRovingKeys } from './use-roving-keys';
 import type { TranslationKey } from '../lib/locale';
 
 interface AlertsDialogProps {
@@ -44,13 +45,24 @@ interface AlertsDialogProps {
 }
 
 export function AlertsDialog({ defaultBase, defaultQuote, onClose }: AlertsDialogProps) {
-  const { t, numberLocale } = useI18n();
+  const { t, numberLocale, locale } = useI18n();
   const { alerts } = useAlerts();
   const store = useSnapshotStore();
 
   const [base, setBase] = useState<CurrencyCode>(defaultBase);
   const [quote, setQuote] = useState<CurrencyCode>(defaultQuote);
   const [direction, setDirection] = useState<AlertDirection>('above');
+
+  // Radio-group arrows (audit WS-3 #2): the direction segmented control
+  // gains the WAI-ARIA radio pattern's keyboard behavior — arrows MOVE
+  // (and select, per the pattern), Tab leaves the group. Roving tabindex:
+  // only the checked radio is tabbable.
+  const { containerRef: directionGroupRef, onKeyDown: directionKeyDown } = useRovingKeys({
+    selector: '[role="radio"]',
+    activeIndex: direction === 'above' ? 0 : 1,
+    onMove: (index) => setDirection(index === 0 ? 'above' : 'below'),
+    rtl: locale === 'fa',
+  });
   const [threshold, setThreshold] = useState('');
   const [error, setError] = useState<string | null>(null);
   const closeRef = useRef<HTMLButtonElement | null>(null);
@@ -169,6 +181,8 @@ export function AlertsDialog({ defaultBase, defaultQuote, onClose }: AlertsDialo
               <div
                 role="radiogroup"
                 aria-label={t('alerts.direction')}
+                ref={directionGroupRef}
+                onKeyDown={directionKeyDown}
                 className="flex h-11 items-center gap-1 rounded-[15px] bg-currena-soft p-1 dark:bg-[#222C3B]"
               >
                 {(['above', 'below'] as const).map((dir) => (
@@ -177,6 +191,7 @@ export function AlertsDialog({ defaultBase, defaultQuote, onClose }: AlertsDialo
                     type="button"
                     role="radio"
                     aria-checked={direction === dir}
+                    tabIndex={direction === dir ? 0 : -1}
                     onClick={() => setDirection(dir)}
                     className={`h-full flex-1 cursor-pointer rounded-xl border-0 px-2 text-[0.72rem] font-bold transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
                       direction === dir

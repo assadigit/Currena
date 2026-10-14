@@ -51,7 +51,6 @@ import { useI18n } from '../lib/locale';
 import { addRecentPair, readRecentPairs } from '../lib/recent-pairs';
 import type { RecentPair } from '../lib/recent-pairs';
 import { isConfirmedStale, snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
-import { navigate } from '../router';
 import type { RoutePath } from '../router';
 import type { TranslationKey } from '../lib/locale';
 
@@ -797,11 +796,13 @@ export function Converter() {
         </h2>
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
           {TOOLS.map(({ path, emoji, labelKey }) => (
-            <button
+            /* REAL links (audit WS-3 #6): href semantics for AT (link
+               lists, open-in-tab, status bar) + the browser's own
+               activation — the hash router picks the change up natively. */
+            <a
               key={path}
-              type="button"
-              onClick={() => navigate(path)}
-              className="flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-0 bg-white px-3 py-4 text-center shadow-[0_4px_16px_rgba(0,0,0,0.05)] ring-1 ring-black/[0.04] transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-blue/10 hover:shadow-[0_8px_20px_rgba(74,144,226,0.15)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue dark:bg-[#1A222E] dark:shadow-[0_4px_16px_rgba(0,0,0,0.35)] dark:ring-white/[0.06] dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.5)]"
+              href={`#${path}`}
+              className="flex flex-col items-center gap-2 rounded-2xl bg-white px-3 py-4 text-center no-underline shadow-[0_4px_16px_rgba(0,0,0,0.05)] ring-1 ring-black/[0.04] transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-blue/10 hover:shadow-[0_8px_20px_rgba(74,144,226,0.15)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue dark:bg-[#1A222E] dark:shadow-[0_4px_16px_rgba(0,0,0,0.35)] dark:ring-white/[0.06] dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.5)]"
             >
               <span className="text-2xl" aria-hidden="true">
                 {emoji}
@@ -809,7 +810,7 @@ export function Converter() {
               <span className="text-xs font-bold leading-snug text-currena-dark">
                 {t(labelKey)}
               </span>
-            </button>
+            </a>
           ))}
         </div>
       </section>

@@ -34,6 +34,7 @@ import { useCodeLabel } from '../lib/display';
 import { downloadBlob } from '../lib/download';
 import { uniqueId } from '../lib/id';
 import { useI18n } from '../lib/locale';
+import { useRovingKeys } from '../components/use-roving-keys';
 import { snapshotStore } from '../lib/snapshot-store';
 
 /** The 11 currencies the legacy batch page offered (captured markup order). */
@@ -78,12 +79,21 @@ interface NoteField {
 /** (moved to lib/download.ts — BACKLOG #24 dedupe.) */
 
 export function BatchConverter() {
-  const { t, numberLocale } = useI18n();
+  const { t, numberLocale, locale } = useI18n();
   const label = useCodeLabel();
 
   const [from, setFrom] = useState<CurrencyCode>('TRY'); // legacy defaults
   const [to, setTo] = useState<CurrencyCode>('IRR');
   const [mode, setMode] = useState<'bulk' | 'notes'>('bulk');
+
+  // Mode tabs as REAL tabs (audit WS-3 #1) — arrow-key walking,
+  // RTL-aware; automatic activation (arrow = select).
+  const { containerRef: modeTabsRef, onKeyDown: modeTabsKeyDown } = useRovingKeys({
+    selector: '[role="tab"]',
+    activeIndex: mode === 'bulk' ? 0 : 1,
+    onMove: (index) => setMode(index === 0 ? 'bulk' : 'notes'),
+    rtl: locale === 'fa',
+  });
   const [bulkText, setBulkText] = useState('');
   const [fields, setFields] = useState<NoteField[]>([{ id: 1, amount: '', note: '' }]);
   const [results, setResults] = useState<BatchResults | null>(null);
@@ -269,7 +279,7 @@ export function BatchConverter() {
     if (!results) return;
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'Batch Currency Conversion', text: shareText });
+        await navigator.share({ title: t('batchConverter.shareTitle'), text: shareText });
         return;
       } catch (err) {
         if (err instanceof DOMException && err.name === 'AbortError') return;
@@ -359,11 +369,25 @@ export function BatchConverter() {
         <p className="mb-2.5 text-sm font-bold text-currena-dark">
           {t('batchConverter.enterAmounts')}
         </p>
-        <div className="mb-3 grid grid-cols-2 gap-2 rounded-[12px] bg-currena-soft p-1.5">
+        {/* Mode toggle as REAL tabs (audit WS-3 #1): tablist/tab,
+            aria-selected, roving tabindex + arrow-key walking (RTL-aware);
+            the panel below is the single region the two modes control. */}
+        <div
+          role="tablist"
+          aria-label={t('batchConverter.enterAmounts')}
+          ref={modeTabsRef}
+          onKeyDown={modeTabsKeyDown}
+          className="mb-3 grid grid-cols-2 gap-2 rounded-[12px] bg-currena-soft p-1.5"
+        >
           {(['bulk', 'notes'] as const).map((m) => (
             <button
               key={m}
               type="button"
+              role="tab"
+              id={`batch-mode-tab-${m}`}
+              aria-selected={mode === m}
+              aria-controls="batch-mode-panel"
+              tabIndex={mode === m ? 0 : -1}
               onClick={() => setMode(m)}
               className={`cursor-pointer rounded-[9px] border-0 px-3 py-2.5 text-xs font-semibold transition-all duration-300 ${
                 mode === m
@@ -376,6 +400,8 @@ export function BatchConverter() {
           ))}
         </div>
 
+        {/* The tab PANEL — the single region both mode tabs control. */}
+        <div id="batch-mode-panel" role="tabpanel" aria-labelledby={`batch-mode-tab-${mode}`}>
         {/* Bulk textarea */}
         {mode === 'bulk' ? (
           <div className="mb-5">
@@ -443,6 +469,7 @@ export function BatchConverter() {
             </Button>
           </div>
         )}
+        </div>
 
         <Button variant="cta" className="w-full py-4" disabled={converting} onClick={() => void convertAll()}>
           {t('batchConverter.convertAllPrices')}

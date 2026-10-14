@@ -38,6 +38,7 @@ import type { SettleGroup, SettleExpense } from '../lib/settle-storage';
 import { deletePhotos, getPhoto, putPhoto } from '../lib/photo-store';
 import { useI18n } from '../lib/locale';
 import { useDialogFocus } from '../components/useDialogFocus';
+import { useRovingKeys } from '../components/use-roving-keys';
 import type { TranslationKey } from '../lib/locale';
 
 /* ------------------------------------------------------------------ *
@@ -174,7 +175,7 @@ const inputClass =
  * ------------------------------------------------------------------ */
 
 export function Settle() {
-  const { t, numberLocale } = useI18n();
+  const { t, numberLocale, locale } = useI18n();
   const label = useCodeLabel();
 
   const [groups, setGroups] = useState<SettleGroup[]>([]);
@@ -410,6 +411,18 @@ export function Settle() {
     { id: 'settle', label: 'splitSettle.settleTab' },
   ];
 
+  // Tabs as REAL tabs (audit WS-3 #1): role=tablist/tab, aria-selected, a
+  // roving tabindex (Tab leaves the group; arrows walk it — direction
+  // mirrors the writing direction) and the panel container the tabs
+  // control. Keyboard activation is automatic (arrow = select), the APG
+  // reading these compact segmented bars expect.
+  const { containerRef: tabsRef, onKeyDown: tabsKeyDown } = useRovingKeys({
+    selector: '[role="tab"]',
+    activeIndex: TABS.findIndex((x) => x.id === tab),
+    onMove: (index) => setTab(TABS[index]!.id),
+    rtl: locale === 'fa',
+  });
+
   /* ---------------- Render ---------------- */
 
   return (
@@ -553,12 +566,26 @@ export function Settle() {
           </div>
 
           <Card>
-            {/* Tabs */}
-            <div className="mb-4 grid grid-cols-3 gap-1.5 rounded-[12px] bg-currena-soft p-1.5">
+            {/* Tabs — REAL tab semantics (audit WS-3 #1): tablist/tab,
+                aria-selected, a roving tabindex and arrow-key walking
+                (RTL-aware); aria-controls points at the panel container
+                below, the single region the tabs swap content in. */}
+            <div
+              role="tablist"
+              aria-label={t('splitSettle.title')}
+              ref={tabsRef}
+              onKeyDown={tabsKeyDown}
+              className="mb-4 grid grid-cols-3 gap-1.5 rounded-[12px] bg-currena-soft p-1.5"
+            >
               {TABS.map(({ id, label }) => (
                 <button
                   key={id}
                   type="button"
+                  role="tab"
+                  id={`settle-tab-${id}`}
+                  aria-selected={tab === id}
+                  aria-controls="settle-tab-panel"
+                  tabIndex={tab === id ? 0 : -1}
                   onClick={() => setTab(id)}
                   className={`cursor-pointer rounded-[9px] border-0 px-2 py-2.5 text-xs font-semibold transition-all duration-300 ${
                     tab === id
@@ -571,6 +598,9 @@ export function Settle() {
               ))}
             </div>
 
+            {/* The tab PANEL — one region the three tabs control (content
+                swaps per aria-selected; the container itself is stable). */}
+            <div id="settle-tab-panel" role="tabpanel" aria-labelledby={`settle-tab-${tab}`}>
             {/* Expenses tab */}
             {tab === 'expenses' ? (
               openGroup.expenses.length === 0 ? (
@@ -695,6 +725,7 @@ export function Settle() {
                 </div>
               )
             ) : null}
+            </div>
           </Card>
 
           <div className="mt-5 grid gap-2.5 sm:grid-cols-2">

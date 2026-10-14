@@ -16,7 +16,7 @@
  */
 
 import { useRef, useState } from 'react';
-import { navigate, useRoute } from '../router';
+import { useRoute } from '../router';
 import { useTheme } from '../lib/theme';
 import { useI18n } from '../lib/locale';
 import { InstallButton } from './InstallButton';
@@ -64,24 +64,20 @@ export function Header() {
     lockScroll: false,
   });
 
-  const go = (path: RoutePath): void => {
-    setMenuOpen(false);
-    navigate(path);
-  };
-
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-[1000] flex h-16 items-center justify-between gap-2 px-5 shadow-[0_2px_15px_rgba(0,0,0,0.05)] backdrop-blur-[20px] lg:h-20 lg:px-6 xl:px-10 bg-white/95 dark:bg-[#161D28]/95">
         {/* Brand (legacy: logo image, 50px mobile; slimmer on desktop so the
-            inline nav fits at exactly lg=1024 without wrapping) */}
-        <button
-          type="button"
-          onClick={() => go('/')}
+            inline nav fits at exactly lg=1024 without wrapping). A REAL
+            anchor (audit WS-3 #6): hash navigation is the browser's own —
+            the router already listens to hashchange, no double-navigation. */}
+        <a
+          href="#/"
           aria-label={t('nav.home')}
-          className="shrink-0 cursor-pointer bg-transparent border-0 p-0"
+          className="shrink-0"
         >
           <img src="/images/currena-logo.png" alt="Currena" className="currena-brand-logo h-[50px] w-auto lg:h-[44px]" />
-        </button>
+        </a>
 
         {/* Inline desktop nav (lg+): the 9 routes, compact text-only pills
             (short labels for the four long tool names keep the bar on one
@@ -92,18 +88,21 @@ export function Header() {
               const active = route === path;
               return (
                 <li key={path}>
-                  <button
-                    type="button"
-                    onClick={() => go(path)}
+                  {/* REAL links (audit WS-3 #6): AT users get href semantics
+                      (open-in-new-tab, link lists, status bar) and the
+                      browser's own Enter/Space activation; the hash router
+                      picks the change up natively. */}
+                  <a
+                    href={`#${path}`}
                     aria-current={active ? 'page' : undefined}
-                    className={`cursor-pointer whitespace-nowrap rounded-[10px] border-0 bg-transparent px-2.5 py-2 text-[0.8rem] font-semibold transition-all duration-300 xl:px-3 xl:text-[0.85rem] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
+                    className={`whitespace-nowrap rounded-[10px] px-2.5 py-2 text-[0.8rem] font-semibold no-underline transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue xl:px-3 xl:text-[0.85rem] ${
                       active
                         ? 'bg-currena-blue/10 text-currena-blue'
                         : 'text-currena-muted hover:bg-black/5 hover:text-currena-dark dark:hover:bg-white/5'
                     }`}
                   >
                     {t(shortKey ?? labelKey)}
-                  </button>
+                  </a>
                 </li>
               );
             })}
@@ -183,11 +182,14 @@ export function Header() {
         <ul className="list-none p-0">
           {MENU_ITEMS.map(({ path, emoji, labelKey }) => (
             <li key={path}>
-              <button
-                type="button"
-                onClick={() => go(path)}
+              {/* REAL links (audit WS-3 #6): href semantics + native
+                  activation; the click just closes the drawer — the hash
+                  change IS the navigation, exactly once. */}
+              <a
+                href={`#${path}`}
+                onClick={() => setMenuOpen(false)}
                 aria-current={route === path ? 'page' : undefined}
-                className={`mb-2 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-3.5 py-3.5 text-[0.95rem] font-medium transition-all duration-300 ${
+                className={`mb-2 flex w-full items-center gap-3 rounded-xl px-3.5 py-3.5 text-[0.95rem] font-medium no-underline transition-all duration-300 ${
                   route === path
                     ? 'bg-currena-blue text-white'
                     : 'bg-currena-soft text-currena-dark hover:bg-currena-blue hover:text-white'
@@ -197,7 +199,7 @@ export function Header() {
                   {emoji}
                 </span>
                 {t(labelKey)}
-              </button>
+              </a>
             </li>
           ))}
         </ul>

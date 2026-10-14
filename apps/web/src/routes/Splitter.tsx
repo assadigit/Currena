@@ -155,7 +155,7 @@ export function Splitter() {
         <div className="mb-4 flex items-center gap-3">
           <button
             type="button"
-            aria-label="-"
+            aria-label={t('expenseSplitter.removePerson')}
             onClick={() => setPeople((p) => Math.max(1, p - 1))}
             className="h-11 w-11 cursor-pointer rounded-full border-0 bg-currena-soft text-xl font-bold text-currena-dark transition-all duration-300 hover:bg-currena-blue/15 active:scale-95"
           >
@@ -171,7 +171,7 @@ export function Splitter() {
           </output>
           <button
             type="button"
-            aria-label="+"
+            aria-label={t('expenseSplitter.addPerson')}
             onClick={() => setPeople((p) => Math.min(100, p + 1))}
             className="h-11 w-11 cursor-pointer rounded-full border-0 bg-currena-soft text-xl font-bold text-currena-dark transition-all duration-300 hover:bg-currena-blue/15 active:scale-95"
           >

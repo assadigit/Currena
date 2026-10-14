@@ -177,7 +177,6 @@ function LegChip({
     <button
       type="button"
       onClick={(e) => onFocusCard(leg.id, e.currentTarget)}
-      aria-expanded={false}
       className="insights-focusable inline-flex min-h-[44px] cursor-pointer flex-col items-start gap-0 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2.5 py-1.5 text-start transition-colors hover:border-currena-blue/50"
     >
       <span className="text-[length:var(--type-caption)] font-bold text-[var(--color-text-primary)]">{shortName}</span>

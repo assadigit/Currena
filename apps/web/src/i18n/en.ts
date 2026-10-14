@@ -364,6 +364,10 @@ export const en = {
     totalPlaceholder: 'e.g., 300',
     amountCurrency: 'Amount Currency',
     numberOfPeople: 'Number of People',
+    /** A11y (audit WS-3 #3): the stepper's − button — a real verb, not a glyph. */
+    removePerson: 'Remove one person',
+    /** A11y (audit WS-3 #3): the stepper's + button. */
+    addPerson: 'Add one person',
     showInSecondCurrency: 'Show in Second Currency',
     secondCurrency: 'Second Currency',
     splitExpense: '💸 Split Expense',
@@ -453,6 +457,8 @@ export const en = {
     convertedTotal: 'Converted Total',
     copyAll: '📋 Copy All',
     exportCsv: '📊 Export CSV',
+    /** A11y (audit WS-3 #4): the Web Share sheet's title (was hardcoded EN). */
+    shareTitle: 'Batch Currency Conversion',
     convertingPrices: 'Converting prices...',
     enterAtLeastOne: '⚠️ Please enter at least one amount',
     selectDifferent: '⚠️ Please select different currencies',
