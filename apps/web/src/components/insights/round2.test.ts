@@ -45,6 +45,9 @@ import { evaluateConnections } from '@currena/insights';
 import { insightsCopyEn, type InsightsCopy } from '../../i18n/insights-copy-en';
 import { insightsCopyFa } from '../../i18n/insights-copy-fa';
 import signalsSrc from './Signals.tsx?raw';
+import signalsIconsSrc from './signals/icons.tsx?raw';
+import signalsVerdictSrc from './signals/verdict.tsx?raw';
+import signalsCardSrc from './signals/MergedCard.tsx?raw';
 import connectionCardSrc from './ConnectionCard.tsx?raw';
 
 /* ------------------------------------------------------------------ *
@@ -450,7 +453,12 @@ describe('R26 mergeSignals (shared listed once, silver-only split)', () => {
   });
 
   it('no check or cross glyph anywhere in the Signals markup source', () => {
+    // The WS-4 split moved the markup into the signals/ module tree —
+    // the guard now covers the whole tree (same intent, wider surface).
     expect(signalsSrc).not.toMatch(/[✓✔✗✘]/);
+    expect(signalsIconsSrc).not.toMatch(/[✓✔✗✘]/);
+    expect(signalsVerdictSrc).not.toMatch(/[✓✔✗✘]/);
+    expect(signalsCardSrc).not.toMatch(/[✓✔✗✘]/);
   });
 });
 
