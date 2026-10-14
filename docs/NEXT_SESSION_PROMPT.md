@@ -8,6 +8,10 @@ docs-only commits after it — runtime identical).
 · The 2026-10-14/15 owner-commissioned QA long-run is **COMPLETE**: audit →
   reliability hardening → de-monolith-ing → dead code/a11y/lint → deployed +
   live-verified. This brief hands off the post-QA state.
+· **THE NEXT SESSION'S WORK ORDER IS `REMAINING_WORK.md` (repo root)** —
+  the owner-commissioned spec of every remaining/deferred item, verified
+  open as of `976d154`, with fix plans and acceptance criteria. Read and
+  implement that file; this brief is the surrounding context.
 
 ---
 
@@ -101,12 +105,16 @@ history), `docs/DECISIONS_FOR_ALI.md` (D-01…D-18), `docs/DEPLOY.md`
    evidence confirmations, **token rotation** (all three tokens transited
    chat again on 2026-10-14/15).
 
-## 4. Suggested next-session work (if the owner has no specific ask)
+## 4. Next-session work
 
+**`REMAINING_WORK.md` (repo root) is the work order** — WS-1 reliability
+minors (A-5/A-6/A-8), WS-2 test closers (C-6/C-8/C-9), WS-3 a11y
+leftovers, WS-4 module splits round 2 + MetaResponse consolidation,
+WS-5 the 34-advisory lint worklist, WS-6 owner-decision papers. Work it
+in the recommended order (WS-1 → … → WS-6); decline any item with a
+D-entry rather than forcing it.
 - Rotate the three tokens first (GitHub / Cloudflare / EODHD) — they have
   transited chat in ≥4 sessions.
-- The QA follow-ups above are ordered by value: lint-advisory worklist →
-  the two insights component splits → owner-wording items.
 - Otherwise: the standing feature backlog lives in `docs/BACKLOG.md`;
   `docs/specs/traceability.md` maps every shipped requirement.
 
