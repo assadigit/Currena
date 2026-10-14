@@ -1,0 +1,164 @@
+/**
+ * Insights display config + pure rendering helpers (Phase I4 → I15).
+ *
+ * Everything here is platform-free pure TypeScript (AGENTS.md rule 2) so it
+ * unit-tests without a DOM: the question-group/gauge layout, per-indicator
+ * value formatting (decimals, unit, scale, the Fed target's 25bp corridor),
+ * plain-language rule text, 10-year-position warning zones + position
+ * WORDS (Block F3), state-keyed consequence-line selection (Block F4 +
+ * data spec §6), the big-mover callout (Block H3), the prices-board row
+ * list (Block PB1), and the lane/hero ordering settings (Blocks H1/L1).
+ *
+ * Copy lives in the i18n copy modules (insights-copy-en/fa.ts); this module
+ * only defines the structural interfaces those dictionaries satisfy.
+ *
+ * Since the Phase 3-c split this module is the PUBLIC BARREL of the former
+ * 1,507-line config.ts monolith: the implementation lives in cohesive
+ * domain modules and everything is re-exported unchanged so the ~20
+ * importers ('./config', '../config', '../components/insights/config')
+ * keep their existing surface untouched:
+ *
+ *   sections.ts       — section/group order, price rows, companions,
+ *                       definitions + group-count helpers
+ *   display.ts        — UnitToken/UnitLabels/DISPLAY + value/change
+ *                       formatting (indicatorValueParts & friends)
+ *   labels.ts         — change-window/data-period/from-peak labels +
+ *                       the plain-language RuleCopy/formatRuleText machinery
+ *   bands.ts          — 10y warning zones, position bands, tone classes,
+ *                       consequence-line state selection, band-position words
+ *   movers.ts         — big movers, alerting chips, the two-tier status
+ *                       model, the card filter
+ *   history-config.ts — chart range zoom, pinned watchlist, epoch-day
+ *                       history rows
+ *   signals.ts        — SIGNALS_ENABLED, leg phrases, StatusTone, the
+ *                       collapsed Together/Signals summaries, mergeSignals
+ *   hero.ts           — the hero reason line, attention tiles, per-group
+ *                       visibility
+ *   money.ts          — the money area map, driver votes, policy-rate
+ *                       card helpers
+ *
+ * Domain modules import each other directly (never through this barrel —
+ * no cycles) and module-private helpers (DisplayConfig, PREFIXED_UNITS,
+ * FED_CORRIDOR_HALF, fmt, ruleAtomText, WORD_TONE_CLASS, spacedNorm,
+ * RANGE_DAYS, TOGETHER_STATE_ORDER, UP_IS_RELIEF_AREAS) stay private to
+ * their domain. The re-export list below is EXACTLY the former config.ts
+ * export list — nothing new joins the public surface.
+ */
+
+export {
+  SECTION_ORDER,
+  GROUP_ORDER,
+  PRICE_ROWS,
+  BTC_RATIO_IDS,
+  COMPANION_ONLY_IDS,
+  COMPANIONS,
+  companionParentOf,
+  ALWAYS_POSITION_IDS,
+  definitionsForGroup,
+  definitionFor,
+  groupCounts,
+  isGaugeMember,
+} from './sections';
+
+export {
+  DISPLAY,
+  indicatorValueParts,
+  formatIndicatorValue,
+  formatReadingValue,
+  formatChange,
+  changeScaleOf,
+} from './display';
+export type {
+  UnitToken,
+  UnitLabels,
+  IndicatorValueParts,
+  ValueRangeBounds,
+} from './display';
+
+export {
+  changeWindowLabel,
+  dataPeriodText,
+  formatFromPeak,
+  formatRuleText,
+} from './labels';
+export type { ChangeWindowLabel, RuleCopy } from './labels';
+
+export {
+  warningZone,
+  positionBand,
+  stepToneClass,
+  bandToneClass,
+  attentionToneClass,
+  MOVE_SCORE_THRESHOLD,
+  consequenceState,
+  consequenceLine,
+  bandPositionOf,
+  bandPositionWord,
+  BAND_WORDS_EN,
+  bandWordsOf,
+} from './bands';
+export type { PositionBand, ConsequenceState, BandPosition } from './bands';
+
+export {
+  bigMovers,
+  alertingIndicators,
+  UNUSUAL_CUTOFF,
+  isUnusual,
+  tierOf,
+  tierIsCard,
+  indicatorMatchesFilter,
+  filterVisibleIds,
+  statusCounts,
+} from './movers';
+export type { IndicatorTier, StatusFilter, CardFilter, BigMoverRow, AlertChipRow } from './movers';
+
+export {
+  sliceHistoryToRange,
+  rangeIsPlottable,
+  PINNED_STORAGE_KEY,
+  parsePinnedIds,
+  formatPinnedStorage,
+  epochDayToIso,
+  sampleHistoryRows,
+} from './history-config';
+export type { ChartRange, HistoryRow } from './history-config';
+
+export {
+  SIGNALS_ENABLED,
+  legPhrase,
+  togetherSummary,
+  TOGETHER_CARD_ORDER,
+  signalSummaryPosition,
+  mergeSignals,
+} from './signals';
+export type { StatusTone, TogetherSummary, MergedSignals } from './signals';
+
+export {
+  heroReason,
+  heroReasonIsConsistent,
+  attentionTiles,
+  GROUP_MIN_VISIBLE,
+  groupVisibility,
+} from './hero';
+export type { HeroReasonInput, AttentionTileRow, GroupVisibility } from './hero';
+
+export {
+  MONEY_AREAS,
+  moneyAreaRow,
+  moneyPanel,
+  MONEY_DRIVER_KIND,
+  moneyDriverVote,
+  POLICY_RATE_IDS,
+  policyMoveOf,
+  policyLastChangeOf,
+  nextEventDate,
+  moneyAreaDirection,
+  moneyDirectionToneClass,
+} from './money';
+export type {
+  MoneyAreaId,
+  MoneyAreaState,
+  MoneyAreaRow,
+  MoneyDriverKind,
+  MoneyDirection,
+} from './money';
