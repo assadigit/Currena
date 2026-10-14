@@ -63,8 +63,13 @@ import { groupCurrency } from './settle/shared';
 export function Settle() {
   const { t, numberLocale } = useI18n();
 
-  const [groups, setGroups] = useState<SettleGroup[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  // Hydrate ONCE via the lazy initializer (WS-5: the mount effect's
+  // set-state was the D-17-accepted shape; the lazy read is the lint-clean
+  // equivalent — same first paint, one fewer render pass). The old
+  // `hydrated` guard existed because the mount-run persist could write
+  // '[]' before the hydrated state landed — with the lazy initializer
+  // there IS no pre-hydration state, so the guard is structurally gone.
+  const [groups, setGroups] = useState<SettleGroup[]>(() => readSettleGroups());
   const [openGroupId, setOpenGroupId] = useState<string | null>(null);
   const [tab, setTab] = useState<'expenses' | 'balances' | 'settle'>('expenses');
   const [toast, setToast] = useState<string | null>(null);
@@ -86,28 +91,25 @@ export function Settle() {
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
-  // Hydrate once; persist only AFTER hydration (the mount-run persist used
-  // to write '[]' before the hydrated state landed — a crash or quota error
-  // in that window destroyed every saved group; StrictMode doubled the
-  // exposure in dev).
+  // Cross-tab sync ONLY (BACKLOG #38, History semantics): another tab
+  // writing the settle key (or clearing storage) re-hydrates this tab.
+  // The equality guard returns `prev` for value-identical writes — no
+  // re-render, so the persist effect below never echoes a no-op write
+  // back. (WS-5: setState rides the subscription callback, the
+  // compiler-blessed shape.)
+  useEffect(
+    () =>
+      subscribeSettleGroups(() => {
+        setGroups((prev) => {
+          const next = readSettleGroups();
+          return JSON.stringify(prev) === JSON.stringify(next) ? prev : next;
+        });
+      }),
+    [],
+  );
   useEffect(() => {
-    setGroups(readSettleGroups());
-    setHydrated(true);
-    // Cross-tab (BACKLOG #38, History semantics): another tab writing the
-    // settle key (or clearing storage) re-hydrates this tab. The equality
-    // guard returns `prev` for value-identical writes — no re-render, so
-    // the persist effect below never echoes a no-op write back.
-    return subscribeSettleGroups(() => {
-      setGroups((prev) => {
-        const next = readSettleGroups();
-        return JSON.stringify(prev) === JSON.stringify(next) ? prev : next;
-      });
-    });
-  }, []);
-  useEffect(() => {
-    if (!hydrated) return; // never persist pre-hydration state
     persistSettleGroups(groups);
-  }, [groups, hydrated]);
+  }, [groups]);
 
   useEffect(() => {
     if (!toast) return;
@@ -116,6 +118,16 @@ export function Settle() {
   }, [toast]);
 
   const openGroup = groups.find((g) => g.id === openGroupId) ?? null;
+
+  const closeExpenseModal = (): void => {
+    setExpenseOpen(false);
+    setExpPhoto(null);
+    if (photoUrl) {
+      URL.revokeObjectURL(photoUrl);
+      setPhotoUrl(null);
+    }
+  };
+
 
   // Android back (legacy parity): popstate closes the topmost layer —
   // expense modal → create modal → group detail — before the app exits.
@@ -189,14 +201,6 @@ export function Settle() {
     setExpenseOpen(true);
   };
 
-  const closeExpenseModal = (): void => {
-    setExpenseOpen(false);
-    setExpPhoto(null);
-    if (photoUrl) {
-      URL.revokeObjectURL(photoUrl);
-      setPhotoUrl(null);
-    }
-  };
 
   const onPhotoSelected = (file: File | null): void => {
     if (photoUrl) URL.revokeObjectURL(photoUrl);
