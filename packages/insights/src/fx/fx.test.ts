@@ -15,7 +15,7 @@
  *            Yahoo fallback fires only when the primary fails.
  */
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { FxPairId, FxRuleState, FxSnapshot } from '@currena/core';
 import { FxSnapshotSchema } from '@currena/core';
 import type { SeriesPoint } from '../series';
@@ -42,7 +42,7 @@ import { FX_MIN_POINTS, FX_PAIR_IDS, PATTERN_WEEKS } from './definitions';
 import type { FxQuoteSet, FxQuotes } from './providers';
 import { fetchYahooQuotes, parseFrankfurterResponse, parseYahooFxResponse } from './providers';
 import { runFxJob, fearInputFromSnapshot, type FxJobFetchers } from './job';
-import { InMemoryFxStore } from './store';
+import { InMemoryFxStore, RestFxStore, parseStoredFx } from './store';
 import type { FxCrossReader } from './store';
 import { runFxUpdate } from './run';
 
@@ -723,5 +723,74 @@ describe('step 5 — the job, the store, the write gate', () => {
     expect(fxContentEqual(a, b)).toBe(true);
     const c = { ...a, pairs: a.pairs.map((p) => ({ ...p, rate: p.rate * 1.01 })) };
     expect(fxContentEqual(a, c)).toBe(false);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * RestFxStore + parseStoredFx (QA audit C-5 — the manual-runner REST
+ * twin had zero tests; the 429/10048 daily-cap ladder is the recovery
+ * path documented in DEPLOY.md).
+ * ------------------------------------------------------------------ */
+
+describe('RestFxStore — daily-cap retry + read failures (audit C-5)', () => {
+  it('a 429/10048 write retries the ladder then succeeds (the documented recovery)', async () => {
+    const snap = await pipelineSnapshot(fxWorld({}));
+    let putAttempts = 0;
+    const fetchImpl = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+      if (init?.method === 'PUT') {
+        putAttempts++;
+        if (putAttempts === 1) {
+          return new Response('{"errors":[{"code":10048,"message":"free usage limit"}]}', { status: 429 });
+        }
+        return new Response('{"success":true}', { status: 200 });
+      }
+      return new Response('404 not found', { status: 404 }); // GET: key absent
+    });
+    const store = new RestFxStore({ apiToken: 'tok', accountId: 'acc', namespaceId: 'ns', fetchImpl, retryDelaysMs: [1] });
+    await store.putFxIfChanged(snap);
+    expect(putAttempts).toBe(2);
+    expect(store.ops.retriedWrites).toBe(1);
+    expect(store.ops.writes).toBe(2);
+  });
+
+  it('a non-cap PUT failure never retries and throws loudly (token never in the message)', async () => {
+    const snap = await pipelineSnapshot(fxWorld({}));
+    const fetchImpl = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+      if (init?.method === 'PUT') {
+        return new Response('{"errors":[{"code":10000,"message":"authentication error"}]}', { status: 403 });
+      }
+      return new Response('404', { status: 404 });
+    });
+    const store = new RestFxStore({ apiToken: 'secret-token', accountId: 'acc', namespaceId: 'ns', fetchImpl, retryDelaysMs: [1] });
+    await expect(store.putFxIfChanged(snap)).rejects.toThrow(/HTTP 403/);
+    expect(store.ops.writes).toBe(1); // no retry burned
+  });
+
+  it('a non-404 GET failure throws; the Authorization header carries the token', async () => {
+    const seen: Array<{ auth?: string; method?: string }> = [];
+    const fetchImpl = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+      seen.push({ auth: (init?.headers as Record<string, string>)?.Authorization, method: init?.method });
+      return new Response('boom', { status: 500 });
+    });
+    const store = new RestFxStore({ apiToken: 'tok', accountId: 'acc', namespaceId: 'ns', fetchImpl });
+    await expect(store.getFx()).rejects.toThrow(/HTTP 500/);
+    expect(seen[0]!.auth).toBe('Bearer tok');
+  });
+});
+
+describe('parseStoredFx — poisoned-entry defense (audit C-5)', () => {
+  it('round-trips a valid snapshot through the stored-string boundary', async () => {
+    const snap = await pipelineSnapshot(fxWorld({}));
+    expect(parseStoredFx(JSON.stringify(snap))).toEqual(snap);
+  });
+
+  it('malformed JSON and wrong-shape values read as absent (never rendered)', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(parseStoredFx('not json')).toBeUndefined();
+    expect(parseStoredFx(JSON.stringify({ v: 2, pairs: [] }))).toBeUndefined();
+    expect(parseStoredFx(null)).toBeUndefined();
+    expect(parseStoredFx(undefined)).toBeUndefined();
+    expect(warn).toHaveBeenCalledTimes(2);
+    warn.mockRestore();
   });
 });

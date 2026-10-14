@@ -8,7 +8,7 @@
  * parser shapes (fixtures/markets-test/).
  */
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import type { MarketEntry, MarketId, MarketsSnapshot } from '@currena/core';
 import { parseEodhdEodResponse, parseYahooChartResponse, ProviderError } from './providers';
@@ -27,7 +27,7 @@ import {
 import type { MarketResolution } from './compute';
 import { lastExpectedCloseDate, marketsNeedingData, retryRunOptions, runMarketsJob } from './job';
 import type { MarketJobFetchers } from './job';
-import { InMemoryMarketsStore } from './store';
+import { InMemoryMarketsStore, RestMarketsStore, parseStoredMarkets } from './store';
 import { decodeWeeklySeries, MIN_CLOSES, MARKETS, MARKET_IDS } from './definitions';
 
 /* ------------------------------------------------------------------ *
@@ -621,5 +621,82 @@ describe('runMarketsJob — the §3.4 chain with injected fetchers', () => {
     const res = await runMarketsJob(fetchers, { kind: 'retry', providerOrder: 'eodhd-first', onlyIds: ['n225', 'hsi'] }, undefined, RUN_DATE);
     expect(eodhdCalls).toBe(2);
     expect(res.resolutions.map((r) => r.id).sort()).toEqual(['hsi', 'n225']);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * RestMarketsStore + parseStoredMarkets (QA audit C-5 — the manual-
+ * runner REST twin had zero tests; the 429/10048 daily-cap ladder is
+ * the documented recovery path).
+ * ------------------------------------------------------------------ */
+
+describe('RestMarketsStore — daily-cap retry + read failures (audit C-5)', () => {
+  it('a 429/10048 write retries the ladder then succeeds', async () => {
+    const snap = buildMarketsSnapshot({
+      resolutions: [{ id: 'dax', held: false, notes: [], entry: storedEntry('dax') }],
+      prev: undefined,
+      runDate: RUN_DATE,
+      generatedAt: '2026-10-12T23:31:00Z',
+    });
+    expect(snap).toBeDefined();
+    let putAttempts = 0;
+    const fetchImpl = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+      if (init?.method === 'PUT') {
+        putAttempts++;
+        if (putAttempts === 1) {
+          return new Response('{"errors":[{"code":10048,"message":"free usage limit"}]}', { status: 429 });
+        }
+        return new Response('{"success":true}', { status: 200 });
+      }
+      return new Response('404 not found', { status: 404 }); // GET: key absent
+    });
+    const store = new RestMarketsStore({ apiToken: 'tok', accountId: 'acc', namespaceId: 'ns', fetchImpl, retryDelaysMs: [1] });
+    await store.putMarketsIfChanged(snap!);
+    expect(putAttempts).toBe(2);
+    expect(store.ops.retriedWrites).toBe(1);
+  });
+
+  it('a non-cap PUT failure never retries; a non-404 GET failure throws loudly', async () => {
+    const snap = buildMarketsSnapshot({
+      resolutions: [{ id: 'dax', held: false, notes: [], entry: storedEntry('dax') }],
+      prev: undefined,
+      runDate: RUN_DATE,
+      generatedAt: '2026-10-12T23:31:00Z',
+    });
+    const denied = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+      if (init?.method === 'PUT') {
+        return new Response('{"errors":[{"code":10000}]}', { status: 403 });
+      }
+      return new Response('404', { status: 404 });
+    });
+    const storeA = new RestMarketsStore({ apiToken: 'tok', accountId: 'acc', namespaceId: 'ns', fetchImpl: denied, retryDelaysMs: [1] });
+    await expect(storeA.putMarketsIfChanged(snap!)).rejects.toThrow(/HTTP 403/);
+    expect(storeA.ops.writes).toBe(1);
+
+    const broken = vi.fn(async () => new Response('boom', { status: 500 }));
+    const storeB = new RestMarketsStore({ apiToken: 'tok', accountId: 'acc', namespaceId: 'ns', fetchImpl: broken });
+    await expect(storeB.getMarkets()).rejects.toThrow(/HTTP 500/);
+  });
+});
+
+describe('parseStoredMarkets — poisoned-entry defense (audit C-5)', () => {
+  it('round-trips a valid snapshot through the stored-string boundary', async () => {
+    const snap = buildMarketsSnapshot({
+      resolutions: [{ id: 'dax', held: false, notes: [], entry: storedEntry('dax') }],
+      prev: undefined,
+      runDate: RUN_DATE,
+      generatedAt: '2026-10-12T23:31:00Z',
+    });
+    expect(parseStoredMarkets(JSON.stringify(snap))).toEqual(snap);
+  });
+
+  it('malformed JSON and wrong-shape values read as absent (never rendered)', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(parseStoredMarkets('not json')).toBeUndefined();
+    expect(parseStoredMarkets(JSON.stringify({ v: 1, markets: [], summary: { count: 9 } }))).toBeUndefined();
+    expect(parseStoredMarkets(null)).toBeUndefined();
+    expect(parseStoredMarkets(undefined)).toBeUndefined();
+    expect(warn).toHaveBeenCalledTimes(2);
+    warn.mockRestore();
   });
 });
