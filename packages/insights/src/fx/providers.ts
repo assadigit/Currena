@@ -224,8 +224,14 @@ export async function fetchYahooQuotes(opts: YahooFxFetchOptions = {}): Promise<
   for (const code of wanted) {
     const def = YAHOO_SYMBOLS[code];
     if (def === undefined) continue; // not a quote currency — skip honestly
+    // range=2y (D-14, was 1y): the y1 change needs a point on/before
+    // last.date − 12 months; a 1y window has ~zero margin for that anchor
+    // (a leap-year 12-month span or a post-weekend first bar leaves it
+    // missing → the pair is held exactly when Frankfurter is down — the
+    // fallback's whole purpose). 2y gives ~125 days of margin for the same
+    // 8 calls; the primary's own window stays 400 days (FX_HISTORY_DAYS).
     const url =
-      `${opts.baseUrl ?? YAHOO_BASE_URL}/${encodeURIComponent(def.symbol)}` + `?range=1y&interval=1d`;
+      `${opts.baseUrl ?? YAHOO_BASE_URL}/${encodeURIComponent(def.symbol)}` + `?range=2y&interval=1d`;
     try {
       let response: Response;
       try {

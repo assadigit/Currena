@@ -40,7 +40,7 @@ import {
 } from './compute';
 import { FX_MIN_POINTS, FX_PAIR_IDS, PATTERN_WEEKS } from './definitions';
 import type { FxQuoteSet, FxQuotes } from './providers';
-import { parseFrankfurterResponse, parseYahooFxResponse } from './providers';
+import { fetchYahooQuotes, parseFrankfurterResponse, parseYahooFxResponse } from './providers';
 import { runFxJob, fearInputFromSnapshot, type FxJobFetchers } from './job';
 import { InMemoryFxStore } from './store';
 import type { FxCrossReader } from './store';
@@ -165,6 +165,24 @@ describe('step 1 — providers + cross derivation', () => {
     const points = parseYahooFxResponse(json, 'EURUSD=X');
     expect(points.length).toBe(1); // the null close dropped (V1)
     expect(points[0]!.value).toBe(0.9);
+  });
+
+  it('the Yahoo fallback asks for a 2y window (D-14 — the y1 anchor needs margin)', async () => {
+    const urls: string[] = [];
+    const ts = Date.parse('2026-10-09T00:00:00Z') / 1000;
+    const json = JSON.stringify({
+      chart: { result: [{ timestamp: [ts], indicators: { quote: [{ close: [0.9] }] } }] },
+    });
+    const quotes = await fetchYahooQuotes({
+      only: ['EUR'],
+      baseUrl: 'https://yahoo.test/chart',
+      fetchImpl: (async (input: RequestInfo | URL) => {
+        urls.push(String(input));
+        return new Response(json, { status: 200 });
+      }) as typeof fetch,
+    });
+    expect(urls).toEqual(['https://yahoo.test/chart/EURUSD%3DX?range=2y&interval=1d']);
+    expect(quotes.quotes.EUR!.length).toBe(1);
   });
 });
 

@@ -127,3 +127,22 @@ describe('parseAbsSdmxCsv (live Data API format — Phase I2)', () => {
     expect(() => parseAbsSdmxCsv('DATAFLOW,TIME_PERIOD,OBS_VALUE\nABS:X,2026-Weird,1')).toThrow(/neither/);
   });
 });
+
+describe('parseFrankfurterTimeseries V1 parity (audit A-9)', () => {
+  it('drops non-positive rates like the fx twin — garbage never rides into a series', () => {
+    const json = JSON.stringify({
+      amount: 1,
+      base: 'USD',
+      rates: {
+        '2026-10-10': { AUD: 1.5 },
+        '2026-10-11': { AUD: 0 }, // zero — garbage
+        '2026-10-12': { AUD: -0.3 }, // negative — garbage
+        '2026-10-13': { AUD: 1.51 },
+      },
+    });
+    expect(parseFrankfurterTimeseries(json, 'AUD')).toEqual([
+      { date: '2026-10-10', value: 1.5 },
+      { date: '2026-10-13', value: 1.51 },
+    ]);
+  });
+});

@@ -81,6 +81,11 @@ export function parseFrankfurterTimeseries(text: string, currency: string): Seri
     if (typeof value !== 'number' || !Number.isFinite(value)) {
       throw new Error(`Frankfurter ${date}: ${currency} value is not a finite number`);
     }
+    // V1 parity with the fx twin (fx/providers.ts drops value <= 0): a
+    // non-positive FX rate is garbage data — DROP it, never let it ride
+    // into an indicator series where it would distort percentiles/scoring
+    // (QA audit A-9; IndicatorHistorySchema values are finite-only).
+    if (value <= 0) continue;
     out.push({ date, value });
   }
   out.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));

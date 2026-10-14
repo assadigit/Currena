@@ -43,7 +43,7 @@ import type { RunMarketsUpdateResult } from '@currena/insights/markets';
 import { KvMarketsStore } from '@currena/insights/markets';
 import { defaultFxFetchers, formatFxRunReport, runFxUpdate } from '@currena/insights/fx';
 import { KvFxStore } from '@currena/insights/fx';
-import { MAIN_CRON } from './crons';
+import { MAIN_CRON, RETRY_CRON } from './crons';
 
 /**
  * The Worker's bindings. RATES is typed as the structural KV surface the
@@ -105,7 +105,20 @@ export default {
     env: MarketsEnv,
     ctx: ExecutionContext,
   ): Promise<void> {
-    const kind = event.cron === MAIN_CRON ? 'main' : 'retry';
+    // Cron-kind selection is explicit (QA audit A-7): an unknown trigger
+    // expression logs loudly and skips — never silently treated as 'retry'
+    // (the old string-inequality fallback ran ANY unexpected cron as the
+    // retry pass, which re-fetches through Yahoo and could burn quota on a
+    // misconfigured trigger).
+    const kind: 'main' | 'retry' | undefined =
+      event.cron === MAIN_CRON ? 'main' : event.cron === RETRY_CRON ? 'retry' : undefined;
+    if (kind === undefined) {
+      console.error(
+        `[markets] unknown cron expression ${JSON.stringify(event.cron)} — skipping ` +
+          `(expected ${JSON.stringify(MAIN_CRON)} or ${JSON.stringify(RETRY_CRON)})`,
+      );
+      return;
+    }
     const marketsWork = runScheduledMarkets(env, kind).then(
       () => undefined,
       (err: unknown) => {
