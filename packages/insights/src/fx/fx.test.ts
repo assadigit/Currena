@@ -673,14 +673,13 @@ describe('step 5 — the job, the store, the write gate', () => {
   });
 
   it('held rows survive a partial failure verbatim (V7 — never zero, never NaN)', async () => {
-    const good = fxWorld({});
+    const good = fxWorld({ lastDate: '2026-10-09' });
     const first = await pipelineSnapshot(good);
-    // Now a run where the EUR leg vanished (a cross without its leg keeps
-    // the stored row; direct EUR pairs keep theirs too).
+    // Now a run where the EUR leg vanished: A-5's per-currency validation
+    // accepts the remaining 5/6 required currencies — the pairs over EUR
+    // keep their stored rows verbatim (V7), the rest compute fresh.
     const broken: FxQuoteSet = { ...fxWorld({}) };
     delete broken.EUR;
-    // Re-add enough days on the others so V4 passes for the 6 fx currencies?
-    // EUR is one of the 6 — V4 rejects the whole run, so the fallback fires.
     const fetchers: FxJobFetchers = {
       fetchFrankfurter: async () => ({ source: 'frankfurter', quotes: broken }),
       fetchYahoo: async () => {
@@ -688,7 +687,66 @@ describe('step 5 — the job, the store, the write gate', () => {
       },
     };
     const job = await runFxJob(fetchers, first, emptyCross, RUN_DATE, GENERATED_AT);
-    expect(job.snapshot).toBeUndefined(); // nothing honest to store
+    expect(job.snapshot).toBeDefined();
+    // The stored-day rows ride untouched on their old date…
+    const eurLegs = ['eurusd', 'eurjpy', 'eurchf'] as const;
+    for (const id of eurLegs) {
+      const row = job.snapshot!.pairs.find((p) => p.id === id)!;
+      const stored = first.pairs.find((p) => p.id === id)!;
+      expect(row).toEqual(stored);
+      expect(job.report.held).toContain(id);
+    }
+    // …the other seven pairs compute fresh off the partial answer.
+    for (const p of job.snapshot!.pairs) {
+      if ((eurLegs as readonly string[]).includes(p.id)) continue;
+      expect(p.asOf).toBe('2026-10-12');
+    }
+    // The dollar basket needs EUR: the previous measure rides (noted).
+    expect(job.snapshot!.dollarMeasure).toEqual(first.dollarMeasure);
+    expect(job.report.notes.join(' ')).toMatch(/V4: EUR: absent/);
+  });
+
+  it('A-5: a partial Yahoo fallback (5 of 6 required currencies) computes per-currency, not all-or-nothing', async () => {
+    // The acceptance fixture from the work order: Frankfurter is down and
+    // Yahoo answers with one required currency missing (one chart call
+    // failed). Before A-5 this rejected the whole fallback set and held
+    // EVERY pair exactly when the fallback was the only source.
+    const prev = await pipelineSnapshot(fxWorld({ lastDate: '2026-10-09' }));
+    const partial: FxQuoteSet = { ...fxWorld({}) };
+    delete partial.JPY; // usdjpy, audjpy, eurjpy lose their leg
+    const job = await runFxJob(
+      {
+        fetchFrankfurter: async () => {
+          throw new Error('primary down in this fixture');
+        },
+        fetchYahoo: async () => ({ source: 'yahoo', quotes: partial }),
+      },
+      prev,
+      emptyCross,
+      RUN_DATE,
+      GENERATED_AT,
+    );
+    expect(job.snapshot).toBeDefined();
+    expect(job.report.usedSource).toBe('yahoo');
+    // Absent-leg pairs: stored rows verbatim, held with notes.
+    const jpyLegs = ['usdjpy', 'audjpy', 'eurjpy'] as const;
+    for (const id of jpyLegs) {
+      const row = job.snapshot!.pairs.find((p) => p.id === id)!;
+      const stored = prev.pairs.find((p) => p.id === id)!;
+      expect(row).toEqual(stored);
+      expect(job.report.held).toContain(id);
+    }
+    // Present-leg pairs: fresh off the Yahoo answer (V2's date guard lets
+    // 2026-10-12 through against the stored 2026-10-09).
+    for (const p of job.snapshot!.pairs) {
+      if ((jpyLegs as readonly string[]).includes(p.id)) continue;
+      expect(p.asOf).toBe('2026-10-12');
+      expect(p.source).toBe('yahoo');
+    }
+    // The dollar basket needs JPY: the previous measure rides (noted).
+    expect(job.snapshot!.dollarMeasure).toEqual(prev.dollarMeasure);
+    // The validation note names the missing currency and its consequence.
+    expect(job.report.notes.join(' ')).toMatch(/V4: JPY: absent \(V4 needs 200\) — pairs over it keep their stored rows/);
   });
 
   it('the fear leg reads the stored stress gauges (D-05)', () => {

@@ -112,22 +112,51 @@ export interface FxJobResult {
   report: FxJobReport;
 }
 
-/** V4 at the fetch level: an answer must carry ≥200 points per fx currency. */
+/**
+ * V4 at the fetch level, per-currency (audit A-5): an absent or short
+ * currency fails only ITS OWN legs — the pairs over the remaining
+ * currencies still compute, exactly as the CAD/SEK basket note below has
+ * always degraded. Before this, ANY missing required currency rejected the
+ * whole quote set, so a Yahoo fallback that answered 5 of 6 (one chart
+ * call failing) held every pair — during a Frankfurter outage, when the
+ * fallback is the only source (the opposite of spec §2/§4's V4 intent:
+ * "at least 200 daily points … for every currency" — per-currency
+ * honesty, not all-or-nothing). A quote set where NO required currency is
+ * usable is still a whole-provider failure, so the other provider gets
+ * asked.
+ */
 function validateQuoteSet(quotes: FxQuoteSet, notes: string[]): FxQuoteSet {
+  const usable: FxQuoteSet = {};
+  const rejected: string[] = [];
   for (const code of FX_CURRENCIES) {
     const points = quotes[code];
     if (points === undefined || points.length < FX_MIN_POINTS) {
-      throw new Error(
+      rejected.push(
         `${code}: ${points === undefined ? 'absent' : `only ${points.length} points`} (V4 needs ${FX_MIN_POINTS})`,
       );
+      continue;
+    }
+    usable[code] = points;
+  }
+  if (rejected.length === FX_CURRENCIES.length) {
+    // No usable required currency → the whole answer is a provider failure
+    // (the fallback chain must fire).
+    throw new Error(`no usable currency (${rejected.join('; ')})`);
+  }
+  for (const reason of rejected) {
+    notes.push(`V4: ${reason} — pairs over it keep their stored rows`);
+  }
+  // CAD/SEK are only needed by the reused dollar basket; they ride through
+  // verbatim (a miss degrades to the previous dollar row, noted), never a
+  // failure of the whole run.
+  for (const code of FX_BASKET_CURRENCIES) {
+    if (quotes[code] === undefined) {
+      notes.push(`V4 note: ${code} absent — the dollar basket may ride the previous row`);
+    } else {
+      usable[code] = quotes[code];
     }
   }
-  // CAD/SEK are only needed by the reused dollar basket; a miss degrades to
-  // the previous dollar row (noted), never a failure of the whole run.
-  for (const code of FX_BASKET_CURRENCIES) {
-    if (quotes[code] === undefined) notes.push(`V4 note: ${code} absent — the dollar basket may ride the previous row`);
-  }
-  return quotes;
+  return usable;
 }
 
 /**

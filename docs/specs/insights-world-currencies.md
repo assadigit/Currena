@@ -113,7 +113,7 @@ Pairs are shown in market-standard order. A **positive change means the first cu
 | V1. Rate is a number greater than 0 | Reject, use the fallback |
 | V2. New date is not older than the stored date | Reject |
 | V3. A one-day move of more than 5% in any pair | Hold the old value and ask the fallback. Accept only if both agree within 0.5% (real moves of that size are very rare) |
-| V4. At least 200 daily points returned for every currency | Reject, use the fallback |
+| V4. At least 200 daily points returned for every currency | Per-currency (audit A-5, D-19): an absent/short currency holds only ITS pairs (stored rows, noted); the rest compute. No usable currency at all → reject, use the fallback |
 | V5. If both providers were used the same day, latest values agree within 0.5% | Show the primary value, log a warning |
 | V6. Last date is more than 5 calendar days old | Mark `stale = true` (the UI shows "Old data") |
 | V7. Never show zero, blank or NaN | Show the last good value with its date |
