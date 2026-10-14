@@ -188,7 +188,18 @@ export function PairsTable({
   const rows = useMemo(() => fxPairRows(snapshot.pairs, 'group'), [snapshot.pairs]);
   const trendWord = { up: copy.fx.trendUp, flat: copy.fx.trendFlat, down: copy.fx.trendDown } as const;
   const trendGlyph = { up: '▲', flat: '→', down: '▼' } as const;
-  let lastGroup: string | null = null;
+  // The first row of each group block (WS-5: precomputed BEFORE the map —
+  // the old loop-carried `lastGroup` mutated a variable during render,
+  // the advisory the compiler flagged; identical headers, pure derivation).
+  const firstOfGroup = useMemo(() => {
+    const first = new Set<string>();
+    let prev: string | null = null;
+    for (const { entry, group } of rows) {
+      if (group !== prev) first.add(entry.id);
+      prev = group;
+    }
+    return first;
+  }, [rows]);
 
   return (
     <>
@@ -219,8 +230,7 @@ export function PairsTable({
           </thead>
           <tbody>
             {rows.map(({ entry, group }) => {
-              const groupHeader = group !== lastGroup ? copy.fx.groups[group] : null;
-              lastGroup = group;
+              const groupHeader = firstOfGroup.has(entry.id) ? copy.fx.groups[group] : null;
               const trend = fxTrendOf(entry);
               const old = isOld(entry, todayIso);
               return (

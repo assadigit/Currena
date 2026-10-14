@@ -59,15 +59,16 @@ interface IndexedEntry {
 export function History() {
   const { t, numberLocale, locale } = useI18n();
   const label = useCodeLabel();
-  const [entries, setEntries] = useState<HistoryEntry[] | null>(null);
+  const [entries, setEntries] = useState<HistoryEntry[] | null>(() => readHistory());
   const [filterPair, setFilterPair] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [deleting, setDeleting] = useState<ReadonlySet<string>>(new Set());
   const [toast, setToast] = useState<string | null>(null);
 
-  // Load once on mount; re-read on storage events (other tabs).
+  // Re-read on storage events (other tabs) — the subscription-only
+  // effect (WS-5: the mount-time hydrate moved to the lazy initializer
+  // above; setState rides the event callback, the compiler-blessed shape).
   useEffect(() => {
-    setEntries(readHistory());
     const onStorage = (e: StorageEvent): void => {
       if (e.key === null || e.key === HISTORY_KEY) setEntries(readHistory());
     };

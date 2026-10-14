@@ -117,7 +117,7 @@ export function QuestionGroup({
 
   const gauge = useMemo(() => {
     return gaugesForSectionCached(section, snapshot.readings).find((g) => g.gauge === group);
-  }, [section, snapshot]);
+  }, [section, snapshot, group]);
 
   if (readings.length === 0) return null;
 

@@ -93,7 +93,7 @@ export function Together({
         disagree: copy.together.summaryDisagree,
         unknown: copy.together.summaryUnknown,
       }, (n) => formatNumber(n, numberLocale, { maximumFractionDigits: 0 }), numberLocale === 'fa-IR' ? '، ' : ', '),
-    [connections, copy],
+    [connections, copy, numberLocale],
   );
 
   if (connections.length === 0) return null;

@@ -42,6 +42,16 @@ const BATCH_CURRENCIES: readonly CurrencyCode[] = [
   'USD', 'EUR', 'GBP', 'TRY', 'AED', 'AUD', 'CAD', 'CNY', 'JPY', 'KRW', 'IRR',
 ];
 
+/** The three money formatters, module-scope and pure (WS-5: component-scope
+ *  arrows change identity every render and defeated the shareText
+ *  memoization — same bodies, one extra numberLocale param). */
+const fmtOriginalOf = (value: number, numberLocale: 'en-US' | 'fa-IR'): string =>
+  formatNumber(value, numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmtConvertedOf = (value: number, code: string, numberLocale: 'en-US' | 'fa-IR'): string =>
+  formatNumber(value, numberLocale, { maximumFractionDigits: code === 'IRR' ? 0 : 2 });
+const fmtRateOf = (value: number, code: string, numberLocale: 'en-US' | 'fa-IR'): string =>
+  formatNumber(value, numberLocale, { maximumFractionDigits: code === 'IRR' ? 0 : 4 });
+
 interface BatchRowOk {
   ok: true;
   line: string;
@@ -132,12 +142,12 @@ export function BatchConverter() {
     setMode('bulk');
   };
 
-  const fmtOriginal = (value: number): string =>
-    formatNumber(value, numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const fmtConverted = (value: number, code: string): string =>
-    formatNumber(value, numberLocale, { maximumFractionDigits: code === 'IRR' ? 0 : 2 });
-  const fmtRate = (value: number, code: string): string =>
-    formatNumber(value, numberLocale, { maximumFractionDigits: code === 'IRR' ? 0 : 4 });
+  // (WS-5: the three money formatters are MODULE-scope pure functions —
+  // component-scope arrows change identity every render and defeated the
+  // shareText memoization. Same bodies, one extra numberLocale param.)
+  const fmtOriginal = (value: number): string => fmtOriginalOf(value, numberLocale);
+  const fmtConverted = (value: number, code: string): string => fmtConvertedOf(value, code, numberLocale);
+  const fmtRate = (value: number, code: string): string => fmtRateOf(value, code, numberLocale);
 
   const convertAll = async (): Promise<void> => {
     if (converting) return;
@@ -243,26 +253,26 @@ export function BatchConverter() {
     const lines: string[] = [t('batchConverter.shareHeading'), `${label(results.from)} → ${label(results.to)}`];
     if (results.rate !== null) {
       lines.push(
-        `${t('batchConverter.shareRateLabel')} 1 ${label(results.from)} = ${fmtRate(results.rate, results.to)} ${label(results.to)}`,
+        `${t('batchConverter.shareRateLabel')} 1 ${label(results.from)} = ${fmtRateOf(results.rate, results.to, numberLocale)} ${label(results.to)}`,
       );
     }
     lines.push('', ...(results.rows
       .filter((r): r is BatchRowOk => r.ok)
       .map(
         (r, i) =>
-          `${formatNumber(i + 1, numberLocale)}. ${fmtOriginal(r.amount)} ${label(r.from)} = ${fmtConverted(r.result, r.to)} ${label(r.to)}` +
+          `${formatNumber(i + 1, numberLocale)}. ${fmtOriginalOf(r.amount, numberLocale)} ${label(r.from)} = ${fmtConvertedOf(r.result, r.to, numberLocale)} ${label(r.to)}` +
           (r.note ? `\n   📝 ${r.note}` : ''),
       )));
     lines.push(
       '',
       '━━━━━━━━━━━━━━━━━━━━',
-      `${t('batchConverter.shareTotalLabel')} ${fmtOriginal(results.totalOriginal)} ${label(results.from)}`,
-      `${t('batchConverter.shareConvertedLabel')} ${fmtConverted(results.totalConverted, results.to)} ${label(results.to)}`,
+      `${t('batchConverter.shareTotalLabel')} ${fmtOriginalOf(results.totalOriginal, numberLocale)} ${label(results.from)}`,
+      `${t('batchConverter.shareConvertedLabel')} ${fmtConvertedOf(results.totalConverted, results.to, numberLocale)} ${label(results.to)}`,
       '',
       t('converter.convertedWith'),
     );
     return lines.join('\n');
-  }, [results, numberLocale, t, label, fmtOriginal, fmtConverted, fmtRate]);
+  }, [results, numberLocale, t, label]);
 
   const onCopyAll = async (): Promise<void> => {
     if (!results) return;

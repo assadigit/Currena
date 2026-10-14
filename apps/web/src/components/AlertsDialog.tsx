@@ -86,6 +86,10 @@ export function AlertsDialog({ defaultBase, defaultQuote, onClose }: AlertsDialo
     : null;
 
   // Live "waiting" rates for each distinct list pair (one shared lookup map).
+  // (WS-5: the N/A label is extracted OUTSIDE the memo — `t` is a fresh
+  // function identity every render, so depending on it directly would
+  // defeat the memoization; the string is stable per locale.)
+  const naLabel = t('common.na');
   const listRates = useMemo(() => {
     const map = new Map<string, string>();
     for (const a of alerts) {
@@ -99,11 +103,11 @@ export function AlertsDialog({ defaultBase, defaultQuote, onClose }: AlertsDialo
           formatNumber(v.rate, numberLocale, { maximumFractionDigits: rateDecimals(v.rate, pairIrr) }),
         );
       } else {
-        map.set(key, t('common.na'));
+        map.set(key, naLabel);
       }
     }
     return map;
-  }, [alerts, store, numberLocale]);
+  }, [alerts, store, numberLocale, naLabel]);
 
   const addAlert = (): void => {
     const parsed = parseInputAmount(threshold);
