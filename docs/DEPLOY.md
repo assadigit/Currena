@@ -15,8 +15,16 @@ Cloudflare Workers  currena-api  →  https://currena.ir  (Custom Domain, produc
  ├─ GET/POST /admin                                zero-JS ops console (noindex)
  ├─ everything else                                built SPA (static assets + SPA fallback)
  └─ cron  * * * * *                                scheduled keep-warm (see §Ever-green)
-     KV namespace RATES: snapshot:*, status:*, lock:*   (7-day hard TTL)
-                        insights:snapshot|hist:<id>|status  (no TTLs; written by Actions)
+     KV namespace RATES: snapshot:*, status:*, lock:*, history:<source>
+                                                   (7-day hard TTL; history no TTL —
+                                                    every live-scraped generation, content-deduped)
+                        insights:snapshot|hist:<id>|status  (no TTLs; written by the
+                                                    daily GitHub Actions ingestion)
+                        insights:markets:v1 | insights:fx:v1
+                                                   (no TTLs; written by currena-markets
+                                                    crons 23:30/01:30 UTC)
+                        insights:prices-live:v1     (no TTL; written by currena-api's
+                                                    own hourly :13 cron rung)
 ```
 
 - `run_worker_first` pins `/admin*`, `/api/*`, `/internal/*` to the Worker.

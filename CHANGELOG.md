@@ -5,6 +5,96 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-15] — Codebase QA session: reliability hardening, contract suites, de-monolith-ing, a11y majors, ESLint
+
+The owner-commissioned autonomous QA session (docs/NEXT_SESSION_PROMPT.md
+brief; the full read-only audit with 38 numbered findings lives at
+docs/QA/audit-2026-10-14.md). Every critical/major finding is fixed or
+documented-with-reason; D-14…D-16 recorded in docs/DECISIONS_FOR_ALI.md.
+
+### Fixed — reliability (the display must ALWAYS degrade honestly)
+
+- **KV-failure honesty (A-1/A-2/A-3, D-15):** `/api/history` answers the
+  calm 503 `history_unavailable` (was a raw 500); all four insights serve
+  routes guard their KV reads with distinct 503 codes; `/api/status` and
+  `/admin` degrade per-row via `Promise.allSettled` (a dead status read no
+  longer hides a readable snapshot, and vice versa). The ops console can
+  never be the thing that goes down.
+- **fx fallback window (A-4, D-14):** the Yahoo fallback asks `range=2y`
+  (was `1y`) — the y1 change anchor needs a quote on/before "last date −
+  12 months" and a 1-year window has ~zero calendar margin for it, so the
+  designed fallback could fail wholesale exactly when Frankfurter was
+  down. Spec table updated in place.
+- **Cron-kind selection (A-7):** unknown trigger expressions on
+  currena-markets log and skip instead of silently running as the retry
+  pass.
+- **Parser V1 parity (A-9):** `parseFrankfurterTimeseries` drops
+  non-positive rates like the fx twin — garbage never rides into
+  indicator histories.
+- **SPA `fetchMeta` retry (C-2):** a rejected memo no longer pins a dead
+  promise for the whole session.
+- **rules-of-hooks crash (found by the new ESLint gate):** NextUpStrip
+  called `useMemo` after a conditional early return — a latent crash on
+  an upcoming→empty transition. Hoisted.
+
+### Added — the contract suites (+113 tests, 1,058 → 1,171)
+
+- `apps/api/src/contract.test.ts` — golden bodies validated against THE
+  zod contracts from packages/core for every public route, the exact
+  cache-chain matrix (200/304/ETag/`max-age`/`s-maxage` per route per the
+  spec rules + D-13), and the /api/convert amount-form pinning.
+- `history.test.ts` (the module's first tests), insights reader poison +
+  cacheTtl-300/60 contracts, scheduled-wrapper coverage on BOTH workers,
+  web `api.test.ts` (the SPA trust boundary), the snapshot-store
+  honest-stale/gold-heal/persistence contracts, and the REST-store
+  429/10048 retry ladders.
+
+### Changed — de-monolith-ing (behavior-preserving, one module per commit)
+
+- `apps/api/src/index.ts` 850 → 186 lines (routes/, http, security,
+  default-service, cron; the insights routes' private errorResponse copy
+  deduplicated — audit B-1).
+- `packages/insights/src/fx/compute.ts` 984 → a 33-line barrel over
+  maths/pairs/weekly/entries/cross-inputs/rules/summary/content.
+- web insights `config.ts` 1,507 → `config/` (10 domain modules; the
+  99-symbol public surface byte-identical).
+- `WorldCurrencies.tsx` 1,291 → 283-line shell + `world-currencies/` (8
+  modules). `routes/Insights.tsx` 1,164 → 465-line shell +
+  `insights-sections/` (6 modules; **D-16**: the Insights lazy raw budget
+  documentedly bumped 580.00 → 582.00 kB for the prop plumbing — gz stays
+  inside 137; entry untouched).
+- Deliberately left: the i18n copy corpora (single-purpose data files —
+  a split would churn ~900 reviewed manifest entries for zero gain) and
+  `core/schemas.ts` (the sacred KV-contract file).
+
+### Fixed — accessibility (audit D-1…D-6 + the minor batch)
+
+- A shared `useDialogFocus` hook (the DetailsPanel-proven discipline) now
+  gives every dialog focus-in, Tab trap, Escape, opener focus-return and
+  scroll-lock: the converter result popup, the receipt modal, the Settle
+  modal (whose close button also lost its literal `×` aria-label), and
+  the header drawer (which additionally becomes `inert` while closed and
+  gains `aria-current`).
+- Skip-to-content link on every route (button form — a hash link would
+  navigate the hash router away); h1s on the money page (sr-only) and
+  LiveRates (promoted board heading); live-region roles, localized LED
+  'n/a' labels, `aria-describedby` on the amount field,
+  `aria-controls` on the custom-rate disclosure, keyboard-activable
+  WorldMarkets rows, `lang` on mixed-direction runs, `<noscript>`, and
+  woff2 preloads for the fonts the first viewport actually fetches.
+
+### Changed — hygiene
+
+- **ESLint gate (E-3):** flat config + `pnpm lint` wired into CI after
+  typecheck. Zero errors; 34 advisory warnings remain (documented —
+  promoting the v6 compiler-grade rules to errors is follow-up work).
+- **Dead code (E-1):** knip-verified sweep — 6 deletions, 20 barrel
+  trims, 137 exports made module-private across 51 files. Post-sweep
+  knip: zero real findings.
+- **Dependencies (E-2):** wrangler 4.132 → 4.151; pnpm overrides for
+  dompurify / source-map-js / serialize-javascript — `pnpm audit` now
+  reports **zero** known vulnerabilities (was 15, all transitive).
+
 ## [2026-10-14] — Freshness: the daily update becomes visible in ~5 minutes
 
 Owner-approved pair of changes (D-12 + D-13) closing the gap between the

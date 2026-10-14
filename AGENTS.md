@@ -14,6 +14,18 @@ live at https://aliassadi1993.pythonanywhere.com/ until an explicit human cutove
   (SPA fallback). One deploy, no CORS. `run_worker_first` pins `/admin*`,
   `/api/*`, `/internal/*` to the Worker (navigation requests to non-asset
   paths would otherwise be served the SPA shell by the platform).
+  Structure since the 2026-10-15 QA split: `src/index.ts` is the
+  composition root only; the routes live in `src/routes/`
+  (rates/ops/admin/internal/insights), shared HTTP plumbing in
+  `src/http.ts`, the rate limiter + secret compare in `src/security.ts`,
+  the default service + snapshot memo in `src/default-service.ts`, and
+  the ever-green cron body in `src/cron.ts`.
+- **apps/markets** — the markets worker (currena-markets): source scrapers'
+  twin of the fx engine + the daily snapshot crons `30 23 * * 1-5` +
+  `30 1 * * 2-6` UTC (main + retry) writing `insights:markets:v1` /
+  `insights:fx:v1` into the shared RATES KV; carries the EODHD stock
+  ingestion. Scheduled-only surface — a page request can never reach a
+  provider.
 - **apps/web** — Vite + React + TS + Tailwind PWA (standalone SPA, never
   server-rendered; will be wrapped in Capacitor later).
 - **packages/core** — zod schemas, conversion math, formatting. Pure. Tested.
@@ -34,6 +46,7 @@ Package manager is **pnpm** (Node ≥ 20).
 
     pnpm install
     pnpm -r typecheck
+    pnpm lint                                     # eslint (flat config; 0 errors in CI)
     pnpm -r test                                  # vitest — never hits live sites
     pnpm --parallel dev                           # api: wrangler dev (:8787) · web: vite (:5173)
     pnpm --filter @currena/web build              # SPA dist → served by the Worker
