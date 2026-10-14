@@ -19,6 +19,10 @@
  *   - batch.ts      — batch-converter parsing, CSV, quick templates (#13).
  */
 
+// /api/meta contract (B-4 consolidation: was duplicated api↔web).
+export { buildMeta, MetaCurrencySchema, MetaResponseSchema } from './meta';
+export type { MetaCurrency, MetaResponse } from './meta';
+
 export { CORE_VERSION } from './version';
 
 export { CoreError } from './errors';

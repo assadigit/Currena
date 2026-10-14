@@ -1,11 +1,17 @@
 /**
- * /api/meta — static-ish discovery payload for UI dropdowns: the 17 legacy
- * currencies (code/name/symbol/minorUnits/tgjuProfileUrl from core), the
- * per-source served-currency lists, and documented limitations. Output is
- * zod-validated before it is served (everything crossing a trust boundary).
+ * /api/meta contract — the discovery payload for UI dropdowns: the legacy
+ * currencies (code/name/symbol/minorUnits/tgjuProfileUrl), the per-source
+ * served-currency lists, and the documented limitations.
+ *
+ * Single source since B-4 (audit WS-4): this schema was previously
+ * duplicated in apps/api/src/meta.ts and apps/web/src/lib/api.ts with only
+ * comments and discipline keeping them in sync. Pure zod + pure data over
+ * core's own CURRENCIES — no platform deps — so core is its natural home;
+ * the api (serve side) and web (client side) both import from here.
  */
 
-import { CURRENCIES, CurrencyCodeSchema, tgjuProfileUrl } from '@currena/core';
+import { CURRENCIES, tgjuProfileUrl } from './currencies';
+import { CurrencyCodeSchema } from './schemas';
 import { z } from 'zod';
 
 /**
@@ -19,7 +25,7 @@ const FRANKFURTER_CURRENCIES: readonly string[] = [
   'NZD', 'PHP', 'PLN', 'RON', 'SEK', 'SGD', 'THB', 'TRY', 'ZAR',
 ];
 
-const MetaCurrencySchema = z.object({
+export const MetaCurrencySchema = z.object({
   code: CurrencyCodeSchema,
   name: z.string().min(1),
   symbol: z.string(),
@@ -42,8 +48,10 @@ export const MetaResponseSchema = z.object({
   limitations: z.array(z.string().min(1)),
 });
 
-type MetaResponse = z.infer<typeof MetaResponseSchema>;
+export type MetaCurrency = z.infer<typeof MetaCurrencySchema>;
+export type MetaResponse = z.infer<typeof MetaResponseSchema>;
 
+/** Build the /api/meta payload (static-ish; zod-validated before serving). */
 export function buildMeta(): MetaResponse {
   const currencies = CURRENCIES.map((c) => {
     const profileUrl = tgjuProfileUrl(c.code);

@@ -36,7 +36,7 @@ import { InMemoryFxStore } from '@currena/insights/fx';
 import { InMemoryPricesStore } from '@currena/insights/prices';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createApp, type Bindings } from './index';
-import { MetaResponseSchema } from './meta';
+import { MetaResponseSchema } from '@currena/core';
 import { RatesService } from './rates-service';
 
 /* ------------------------------- fixtures ------------------------------- */

@@ -9,9 +9,8 @@
  * RatesError envelope — has a machine code), 'parse' (2xx but invalid body).
  */
 
-import { RatesErrorSchema, RatesResponseSchema } from '@currena/core';
-import type { RatesResponse, SnapshotSource } from '@currena/core';
-import { z } from 'zod';
+import { MetaResponseSchema, RatesErrorSchema, RatesResponseSchema } from '@currena/core';
+import type { MetaResponse, RatesResponse, SnapshotSource } from '@currena/core';
 
 type ApiErrorKind = 'network' | 'rates' | 'parse';
 
@@ -94,35 +93,11 @@ export async function fetchRates(
 }
 
 /* ------------------------------------------------------------------ *
- * /api/meta — mirrors apps/api/src/meta.ts (MetaResponseSchema).
- * The schema is duplicated here (not imported) so the web bundle never
- * depends on the Hono app package; the API's own tests keep both in sync.
+ * /api/meta — the contract lives in @currena/core (B-4 consolidation:
+ * the schema was previously duplicated here and in apps/api/src/meta.ts
+ * with only comments keeping them in sync; both sides now import THE one
+ * definition — parity by construction, not discipline).
  * ------------------------------------------------------------------ */
-
-const MetaCurrencySchema = z.object({
-  code: z.string().regex(/^[A-Z]{3}$/),
-  name: z.string().min(1),
-  symbol: z.string(),
-  minorUnits: z.number().int().min(0),
-  tgjuProfileUrl: z.url().optional(),
-});
-
-const MetaResponseSchema = z.object({
-  currencies: z.array(MetaCurrencySchema).min(1),
-  sources: z.object({
-    tgju: z.object({
-      base: z.string().regex(/^[A-Z]{3}$/),
-      currencies: z.array(z.string().regex(/^[A-Z]{3}$/)).min(1),
-    }),
-    frankfurter: z.object({
-      base: z.string().regex(/^[A-Z]{3}$/),
-      currencies: z.array(z.string().regex(/^[A-Z]{3}$/)).min(1),
-    }),
-  }),
-  limitations: z.array(z.string().min(1)),
-});
-
-type MetaResponse = z.infer<typeof MetaResponseSchema>;
 
 let metaPromise: Promise<MetaResponse> | null = null;
 

@@ -4,7 +4,7 @@ import { InMemoryRateStore } from '@currena/scraper';
 import type { PricesJobFetchers } from '@currena/insights/prices';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createApp, __resetRateLimiterForTests, PRICES_CRON_MINUTE, runScheduledPricesRefresh, type Bindings } from './index';
-import { MetaResponseSchema } from './meta';
+import { MetaResponseSchema } from '@currena/core';
 import { RatesService } from './rates-service';
 
 const T0_MS = Date.parse('2026-09-16T12:00:00.000Z');

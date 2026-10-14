@@ -8,7 +8,7 @@
 
 import { CORE_VERSION } from '@currena/core';
 import { Hono } from 'hono';
-import { buildMeta } from '../meta';
+import { buildMeta } from '@currena/core';
 import { NO_STORE } from '../http';
 import { RatesService } from '../rates-service';
 import type { Bindings } from '../index';
