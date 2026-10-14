@@ -301,6 +301,109 @@ describe('routes (injected service — no Workers, no live sites)', () => {
     expect(frankfurter?.cache.present).toBe(false);
   });
 
+  /* ------------------------------ history ------------------------------- */
+
+  // Stateful in-memory KV fake for the /api/history route tests (the route
+  // reads c.env.RATES directly — the injected service is not involved).
+  function historyEnv(initial?: Record<string, string>): { env: Bindings; map: Map<string, string> } {
+    const map = new Map<string, string>(Object.entries(initial ?? {}));
+    const kv = {
+      get: async (key: string): Promise<string | null> => map.get(key) ?? null,
+      put: async (key: string, value: string): Promise<void> => {
+        map.set(key, value);
+      },
+      delete: async (key: string): Promise<void> => {
+        map.delete(key);
+      },
+    } as unknown as KVNamespace;
+    return { env: { RATES: kv, REFRESH_SECRET: 'test-secret' }, map };
+  }
+
+  it('GET /api/history invalid source → 400 invalid_source', async () => {
+    const res = await makeApp().request('/api/history?source=nope', undefined, historyEnv().env);
+    expect(res.status).toBe(400);
+    const body = (await res.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('invalid_source');
+  });
+
+  it('GET /api/history (empty) → 200 shape + public,max-age=60 + content ETag', async () => {
+    const { env } = historyEnv();
+    const res = await makeApp().request('/api/history', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('public, max-age=60');
+    expect(res.headers.get('etag')).toBe('"history:tgju:0:empty"');
+    const body = (await res.json()) as { source: string; count: number; generations: unknown[] };
+    expect(body.source).toBe('tgju');
+    expect(body.count).toBe(0);
+    expect(body.generations).toEqual([]);
+  });
+
+  it('GET /api/history serves stored generations; If-None-Match → 304 + max-age=60', async () => {
+    const { env } = historyEnv({
+      'history:tgju': JSON.stringify({
+        v: 1,
+        gens: [
+          { at: '2026-10-13T10:00:00Z', source: 'tgju', base: 'IRR', rates: { USD: 1 / 230_500 } },
+          { at: '2026-10-14T10:00:00Z', source: 'tgju', base: 'IRR', rates: { USD: 1 / 231_000 } },
+        ],
+      }),
+    });
+    const app = makeApp();
+    const first = await app.request('/api/history?source=tgju', undefined, env);
+    expect(first.status).toBe(200);
+    const body = (await first.json()) as { count: number };
+    expect(body.count).toBe(2);
+    const etag = first.headers.get('etag');
+    expect(etag).toBe('"history:tgju:2:2026-10-14T10:00:00Z"');
+
+    const revalidated = await app.request('/api/history?source=tgju', {
+      headers: { 'if-none-match': etag! },
+    }, env);
+    expect(revalidated.status).toBe(304);
+    expect(revalidated.headers.get('cache-control')).toBe('public, max-age=60');
+    expect(revalidated.headers.get('etag')).toBe(etag);
+  });
+
+  it('GET /api/history poisoned KV entries are dropped, valid ones served (never a 500)', async () => {
+    const { env } = historyEnv({
+      'history:tgju': JSON.stringify({
+        v: 1,
+        gens: [
+          { at: '2026-10-14T10:00:00Z', source: 'tgju', base: 'IRR', rates: { USD: 1 / 230_500 } },
+          { at: '2026-10-14T11:00:00Z', source: 'bad', base: 'IRR', rates: { USD: 1 } },
+        ],
+      }),
+    });
+    const res = await makeApp().request('/api/history?source=tgju', undefined, env);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { count: number };
+    expect(body.count).toBe(1);
+  });
+
+  it('GET /api/history KV read failure → calm 503 history_unavailable, no-store (audit A-1)', async () => {
+    const envBroken: Bindings = {
+      RATES: {
+        get: async () => {
+          throw new Error('KV unavailable');
+        },
+      } as unknown as KVNamespace,
+      REFRESH_SECRET: 'test-secret',
+    };
+    const res = await makeApp().request('/api/history?source=tgju', undefined, envBroken);
+    expect(res.status).toBe(503);
+    expect(res.headers.get('cache-control')).toBe('no-store');
+    const body = (await res.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('history_unavailable');
+  });
+
+  it('GET /api/history malformed JSON in KV → empty history, still 200 (poisoned-entry rule)', async () => {
+    const { env } = historyEnv({ 'history:tgju': 'not json' });
+    const res = await makeApp().request('/api/history?source=tgju', undefined, env);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { count: number };
+    expect(body.count).toBe(0);
+  });
+
   /* --------------------------- internal refresh -------------------------- */
 
   it('POST /internal/refresh without REFRESH_SECRET → 501', async () => {

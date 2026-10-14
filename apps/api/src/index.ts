@@ -348,7 +348,22 @@ export function createApp(deps: AppDeps = {}) {
         `Invalid 'source' parameter ${JSON.stringify(c.req.query('source'))} — must be 'tgju' or 'frankfurter'`,
       );
     }
-    const generations = await readHistory(c.env.RATES, source);
+    // KV-failure honesty (QA audit A-1): a read failure here surfaces as the
+    // calm 503 "temporarily unavailable" — the SPA's hydrateServerHistory()
+    // is already silent on any failure and keeps serving the local-only
+    // window, so sparklines degrade to fewer-but-real points, never lies.
+    let generations: Awaited<ReturnType<typeof readHistory>>;
+    try {
+      generations = await readHistory(c.env.RATES, source);
+    } catch (err) {
+      console.warn(`[history] read ${source} failed:`, err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'history_unavailable',
+        'Rate history is temporarily unavailable — please retry shortly.',
+      );
+    }
     const newest = generations[generations.length - 1];
     const etag = `"history:${source}:${generations.length}:${newest?.at ?? 'empty'}"`;
     if (c.req.header('if-none-match') === etag) {
