@@ -7,6 +7,21 @@
  * with progress, split-expenses preview, live total summary, the 🧾 paper
  * modal, and PDF / Image / Excel exports + share.
  *
+ * Since the WS-4 module split this file is the SHELL ONLY (the Phase-3
+ * recipe, zero behavior change — the code moved verbatim):
+ *
+ *   receipt/shared.ts           — pure types/constants/date helpers +
+ *                                 computeTotals (the LOCAL math)
+ *   receipt/ExpenseItemRow.tsx  — one expense draft's editable row
+ *   receipt/OptionsPanel.tsx    — the collapsible options block
+ *   receipt/SummaryPanel.tsx    — the sticky summary + action row
+ *   receipt/ReceiptModal.tsx    — the 🧾 paper modal + export buttons
+ *
+ * The shell keeps: all state, the dialog-focus wiring (useDialogFocus),
+ * the snapshot ensure effect, the live totals memo (over shared's
+ * computeTotals), generate, and ALL export implementations (jsPDF /
+ * html2canvas / xlsx-writer stay LAZY here next to the refs they read).
+ *
  * Rebuild deltas (mission §8 + budget guardrails):
  *   - jsPDF, xlsx AND html2canvas are route-level LAZY dynamic imports —
  *     none of them touch the initial bundle (legacy loaded 3 CDNs upfront);
@@ -18,11 +33,9 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  convert,
   formatJalaliDate,
   formatNumber,
   parseAmount,
-  thousandSeparateInput,
   sourceForPair,
 } from '@currena/core';
 import type { CurrencyCode, SnapshotSource } from '@currena/core';
@@ -35,82 +48,24 @@ import { uniqueId } from '../lib/id';
 import { useI18n } from '../lib/locale';
 import type { TranslationKey } from '../lib/locale';
 import { snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
-
-/* ------------------------------------------------------------------ *
- * Types & constants
- * ------------------------------------------------------------------ */
-
-const CATEGORY_IDS = ['transport', 'food', 'groceries', 'tickets', 'snacks', 'drinks', 'custom'] as const;
-type CategoryId = (typeof CATEGORY_IDS)[number];
-
-const CATEGORY_EMOJI: Record<CategoryId, string> = {
-  transport: '🚕',
-  food: '🍔',
-  groceries: '🛒',
-  tickets: '🎫',
-  snacks: '🍿',
-  drinks: '🥤',
-  custom: '✏️',
-};
-
-interface ItemDraft {
-  id: number;
-  category: CategoryId;
-  amount: string;
-  currency: CurrencyCode;
-  time: string;
-  notes: string;
-}
-
-/** A generated receipt item — amounts are raw numbers, formatting at render. */
-interface ReceiptItem {
-  category: string;
-  emoji: string;
-  amount: number;
-  currency: CurrencyCode;
-  notes: string;
-  time: string;
-}
-
-interface GeneratedReceipt {
-  id: number;
-  date: string;
-  endDate: string | null;
-  items: ReceiptItem[];
-  total: number;
-  fromCurrency: CurrencyCode;
-  toCurrency: CurrencyCode;
-  converted: number | null;
-  rate: number | null;
-  timestamp: string;
-}
-
-
-const pad2 = (n: number): string => String(n).padStart(2, '0');
-
-function todayStr(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
-}
-
-/** 'YYYY-MM-DD' → local-midnight ISO (timezone-safe for date rendering). */
-function dateToIso(dateStr: string): string {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  if (y === undefined || m === undefined || d === undefined) return new Date().toISOString();
-  return new Date(y, m - 1, d).toISOString();
-}
-
-/** (moved to lib/download.ts — BACKLOG #24 dedupe.) */
-
-const inputClass =
-  'w-full rounded-[12px] border-2 border-gray-200 bg-white px-3 py-2.5 text-sm text-currena-dark focus:border-currena-blue focus:outline-none dark:border-white/10 dark:bg-[#222C3B]';
-
-/* ------------------------------------------------------------------ *
- * Route
- * ------------------------------------------------------------------ */
+import { ExpenseItemRow } from './receipt/ExpenseItemRow';
+import { OptionsPanel } from './receipt/OptionsPanel';
+import { ReceiptModal } from './receipt/ReceiptModal';
+import { SummaryPanel } from './receipt/SummaryPanel';
+import {
+  CATEGORY_EMOJI,
+  computeTotals,
+  dateToIso,
+  inputClass,
+  todayStr,
+  type CategoryId,
+  type GeneratedReceipt,
+  type ItemDraft,
+  type ReceiptItem,
+} from './receipt/shared';
 
 export function Receipt() {
-  const { t, numberLocale, locale } = useI18n();
+  const { t, numberLocale } = useI18n();
   const label = useCodeLabel();
   const store = useSnapshotStore();
 
@@ -180,50 +135,10 @@ export function Receipt() {
 
   /* ---------------- Live totals (local math over snapshots) ---------------- */
 
-  const totals = useMemo(() => {
-    const storeNow = store;
-    const parsed = items
-      .map((item) => ({ item, value: parseAmount(item.amount) }))
-      .filter((p): p is { item: ItemDraft; value: number } => p.value !== null && p.value > 0);
-
-    let total = 0;
-    for (const { item, value } of parsed) {
-      const currency = perItemCurrency ? item.currency : from;
-      if (currency === from) {
-        total += value;
-        continue;
-      }
-      const snapshot = storeNow[sourceForPair(currency, from)].snapshot;
-      if (!snapshot) {
-        total += value; // degrade to legacy behavior (raw sum) when offline
-        continue;
-      }
-      try {
-        total += convert(snapshot, currency, from, value).amount;
-      } catch {
-        total += value;
-      }
-    }
-
-    let converted: number | null = null;
-    let rate: number | null = null;
-    if (from === to) {
-      converted = total;
-      rate = 1;
-    } else {
-      const snapshot = storeNow[sourceForPair(from, to)].snapshot;
-      if (snapshot) {
-        try {
-          converted = convert(snapshot, from, to, total).amount;
-          rate = convert(snapshot, from, to, 1).rate;
-        } catch {
-          converted = null;
-        }
-      }
-    }
-
-    return { count: parsed.length, total, converted, rate };
-  }, [items, perItemCurrency, from, to, store]);
+  const totals = useMemo(
+    () => computeTotals(items, perItemCurrency, from, to, store),
+    [items, perItemCurrency, from, to, store],
+  );
 
   const budgetValue = parseAmount(budgetAmount);
   const remaining = budgetOn && budgetValue !== null ? budgetValue - totals.total : null;
@@ -234,12 +149,6 @@ export function Receipt() {
       : null;
 
   /* ---------------- Helpers ---------------- */
-
-  const fmt = (value: number, code: string): string =>
-    formatNumber(value, numberLocale, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: code === 'IRR' ? 0 : 2,
-    });
 
   const categoryLabel = (id: CategoryId): string =>
     t(`receipt.categories.${id}` as TranslationKey).replace(/^\S+\s+/, ''); // strip the emoji
@@ -553,65 +462,24 @@ export function Receipt() {
             label={t('receipt.additionalOptions')}
           />
           {optionsOpen ? (
-            <div className="mt-2 space-y-1 rounded-[15px] bg-currena-soft/50 px-3.5 py-3">
-              <Switch id="multiDayToggle" checked={multiDay} onChange={setMultiDay} label={t('receipt.multiDayReceipt')} />
-              {multiDay ? (
-                <div className="pb-2 ps-1">
-                  <label htmlFor="receiptEndDate" className="mb-1 block text-xs font-semibold text-currena-muted">
-                    {t('receipt.endDate')}
-                  </label>
-                  <input
-                    id="receiptEndDate"
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value || todayStr())}
-                    className={inputClass}
-                  />
-                </div>
-              ) : null}
-              <Switch
-                id="perItemCurrencyToggle"
-                checked={perItemCurrency}
-                onChange={setPerItemCurrency}
-                label={t('receipt.differentCurrencyPerItem')}
-              />
-              <Switch id="timeToggle" checked={withTime} onChange={setWithTime} label={t('receipt.addTimeToItems')} />
-              <Switch id="budgetToggle" checked={budgetOn} onChange={setBudgetOn} label={t('receipt.budgetTracking')} />
-              {budgetOn ? (
-                <div className="pb-2 ps-1">
-                  <label htmlFor="budgetAmount" className="mb-1 block text-xs font-semibold text-currena-muted">
-                    {t('receipt.dailyBudget')}
-                  </label>
-                  <input
-                    id="budgetAmount"
-                    type="text"
-                    inputMode="decimal"
-                    dir="ltr"
-                    placeholder={t('receipt.budgetPlaceholder')}
-                    value={budgetAmount}
-                    onChange={(e) => setBudgetAmount(thousandSeparateInput(e.target.value))}
-                    className={inputClass}
-                  />
-                </div>
-              ) : null}
-              <Switch id="splitToggle" checked={splitOn} onChange={setSplitOn} label={t('receipt.splitExpenses')} />
-              {splitOn ? (
-                <div className="pb-2 ps-1">
-                  <label htmlFor="splitPeople" className="mb-1 block text-xs font-semibold text-currena-muted">
-                    {t('receipt.numberOfPeople')}
-                  </label>
-                  <input
-                    id="splitPeople"
-                    type="number"
-                    min={2}
-                    max={10}
-                    value={splitPeople}
-                    onChange={(e) => setSplitPeople(Math.max(2, Math.min(10, Number(e.target.value) || 2)))}
-                    className={inputClass}
-                  />
-                </div>
-              ) : null}
-            </div>
+            <OptionsPanel
+              multiDay={multiDay}
+              setMultiDay={setMultiDay}
+              endDate={endDate}
+              setEndDate={setEndDate}
+              perItemCurrency={perItemCurrency}
+              setPerItemCurrency={setPerItemCurrency}
+              withTime={withTime}
+              setWithTime={setWithTime}
+              budgetOn={budgetOn}
+              setBudgetOn={setBudgetOn}
+              budgetAmount={budgetAmount}
+              setBudgetAmount={setBudgetAmount}
+              splitOn={splitOn}
+              setSplitOn={setSplitOn}
+              splitPeople={splitPeople}
+              setSplitPeople={setSplitPeople}
+            />
           ) : null}
 
           {/* Expense items */}
@@ -620,85 +488,15 @@ export function Receipt() {
           </p>
           <div className="space-y-2.5">
             {items.map((item, index) => (
-              <div
+              <ExpenseItemRow
                 key={item.id}
-                className="rounded-[15px] bg-currena-soft/50 p-3"
-              >
-                <div className="mb-2 flex items-center gap-2">
-                  <select
-                    aria-label={`${t('common.description')} ${index + 1}`}
-                    value={item.category}
-                    onChange={(e) => patchItem(item.id, { category: e.target.value as CategoryId })}
-                    className="min-w-0 flex-1 cursor-pointer rounded-[10px] border-2 border-gray-200 bg-white px-2.5 py-2 text-xs font-semibold text-currena-dark dark:border-white/10 dark:bg-[#222C3B]"
-                  >
-                    {CATEGORY_IDS.map((id) => (
-                      <option key={id} value={id}>
-                        {t(`receipt.categories.${id}` as const)}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    onClick={() => removeItem(item.id)}
-                    aria-label={t('common.delete')}
-                    className="h-8 w-8 shrink-0 cursor-pointer rounded-full border-0 bg-currena-warning/15 text-base font-bold text-currena-warning transition-all duration-300 hover:bg-currena-warning/25"
-                  >
-                    ×
-                  </button>
-                </div>
-                <div
-                  className="grid gap-2"
-                  style={{
-                    gridTemplateColumns: ['1fr', perItemCurrency ? 'auto' : null, withTime ? 'auto' : null]
-                      .filter(Boolean)
-                      .join(' '),
-                  }}
-                >
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    dir="ltr"
-                    placeholder={t('receipt.amountPlaceholder')}
-                    aria-label={`${t('common.amount')} ${index + 1}`}
-                    value={item.amount}
-                    onChange={(e) => patchItem(item.id, { amount: thousandSeparateInput(e.target.value) })}
-                    className={`${inputClass} !py-2`}
-                  />
-                  {perItemCurrency ? (
-                    <select
-                      aria-label={`${t('common.currency')} ${index + 1}`}
-                      value={item.currency}
-                      onChange={(e) => patchItem(item.id, { currency: e.target.value as CurrencyCode })}
-                      className="w-[74px] cursor-pointer rounded-[10px] border-2 border-gray-200 bg-white px-1.5 py-2 text-xs font-semibold text-currena-dark dark:border-white/10 dark:bg-[#222C3B]"
-                    >
-                      {(['USD', 'IRR', 'AUD', 'EUR', 'TRY', 'AED', 'CNY', 'GBP', 'CAD', 'NZD', 'CHF', 'JPY', 'KRW', 'MYR', 'IDR', 'PHP', 'VND'] as const).map(
-                        (code) => (
-                          <option key={code} value={code}>
-                            {code}
-                          </option>
-                        ),
-                      )}
-                    </select>
-                  ) : null}
-                  {withTime ? (
-                    <input
-                      type="time"
-                      aria-label={`${t('common.time')} ${index + 1}`}
-                      value={item.time}
-                      onChange={(e) => patchItem(item.id, { time: e.target.value })}
-                      className="w-[96px] rounded-[10px] border-2 border-gray-200 bg-white px-1.5 py-2 text-xs text-currena-dark dark:border-white/10 dark:bg-[#222C3B] dark:[color-scheme:dark]"
-                    />
-                  ) : null}
-                </div>
-                <input
-                  type="text"
-                  placeholder={t('receipt.notesPlaceholder')}
-                  aria-label={`${t('common.description')} ${index + 1}`}
-                  value={item.notes}
-                  onChange={(e) => patchItem(item.id, { notes: e.target.value })}
-                  className={`${inputClass} mt-2 !py-2`}
-                />
-              </div>
+                item={item}
+                index={index}
+                perItemCurrency={perItemCurrency}
+                withTime={withTime}
+                onPatch={patchItem}
+                onRemove={removeItem}
+              />
             ))}
           </div>
 
@@ -708,231 +506,38 @@ export function Receipt() {
         </Card>
 
         {/* ---------- Right: summary + actions (sticky on desktop) ---------- */}
-        <div className="mt-5 lg:mt-0 lg:sticky lg:top-24">
-          <div className="rounded-[20px] cta-gradient p-5 text-white shadow-[0_12px_35px_rgba(102,126,234,0.4)]">
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-sm opacity-90">{t('common.total')}</span>
-              <span className="text-xl font-extrabold" dir="ltr">
-                {fmt(totals.total, from)} <bdi>{label(from)}</bdi>
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm opacity-90">{t('common.converted')}</span>
-              <span className="text-lg font-bold" dir="ltr">
-                {totals.converted !== null ? (
-                  <>
-                    {fmt(totals.converted, to)} <bdi>{label(to)}</bdi>
-                  </>
-                ) : (
-                  '—'
-                )}
-              </span>
-            </div>
-
-            {budgetOn && budgetValue !== null ? (
-              <div className="mt-3 border-t border-white/30 pt-3">
-                <div className="mb-1 flex items-center justify-between text-sm">
-                  <span className="opacity-90">{t('receipt.budget')}</span>
-                  <span dir="ltr">{fmt(budgetValue, from)} <bdi>{label(from)}</bdi></span>
-                </div>
-                <div className="mb-1.5 flex items-center justify-between text-sm">
-                  <span className="opacity-90">{t('receipt.remaining')}</span>
-                  <span className={`font-bold ${remaining !== null && remaining < 0 ? 'text-[#ffb4b4]' : ''}`} dir="ltr">
-                    {remaining !== null ? (
-                      <>
-                        {fmt(remaining, from)} <bdi>{label(from)}</bdi>
-                      </>
-                    ) : (
-                      '—'
-                    )}
-                  </span>
-                </div>
-                {progress !== null ? (
-                  <div
-                    role="progressbar"
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-valuenow={Math.round(progress)}
-                    className="h-2 overflow-hidden rounded-full bg-white/25"
-                  >
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${progress >= 100 ? 'bg-[#FF6B6B]' : 'bg-white'}`}
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                ) : null}
-              </div>
-            ) : null}
-
-            {perPerson !== null ? (
-              <div className="mt-3 flex items-center justify-between border-t border-white/30 pt-3 text-sm">
-                <span className="opacity-90">👥 {t('receipt.perPerson')}</span>
-                <span dir="ltr">{fmt(perPerson, from)} <bdi>{label(from)}</bdi></span>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="mt-4 grid grid-cols-2 gap-2.5">
-            <Button variant="cta" className="col-span-full py-3.5" onClick={generate}>
-              {t('receipt.generate')}
-            </Button>
-            <Button variant="secondary" className="py-3" onClick={() => void onCopy()}>
-              {copied ? `✅ ${t('common.copied')}` : `📋 ${t('common.copy')}`}
-            </Button>
-            <Button variant="secondary" className="py-3" onClick={() => void onShare()}>
-              📤 {t('common.share')}
-            </Button>
-            <Button variant="secondary" className="col-span-full py-3 !text-currena-warning-deep" onClick={clearAll}>
-              🗑️ {t('common.clear')}
-            </Button>
-          </div>
-        </div>
+        <SummaryPanel
+          from={from}
+          to={to}
+          totals={totals}
+          budgetOn={budgetOn}
+          budgetValue={budgetValue}
+          remaining={remaining}
+          perPerson={perPerson}
+          progress={progress}
+          copied={copied}
+          onGenerate={generate}
+          onCopy={() => void onCopy()}
+          onShare={() => void onShare()}
+          onClearAll={clearAll}
+        />
       </div>
 
       {/* ---------- Receipt modal ---------- */}
       {receipt ? (
-        <div
-          ref={receiptDialogRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label={t('receipt.expenseReceipt')}
-          className="fade-in fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 p-4 backdrop-blur-[10px]"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setReceipt(null);
-          }}
-          onKeyDown={receiptDialogKeyDown}
-        >
-          <div className="popup-slide-up max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-[15px] bg-white p-5 shadow-[0_25px_70px_rgba(0,0,0,0.5)] lg:p-7 dark:bg-[#1A222E]">
-            <button
-              ref={paperCloseRef}
-              type="button"
-              onClick={() => setReceipt(null)}
-              aria-label={t('common.close')}
-              className="float-end mb-2 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-0 bg-currena-warning/10 text-2xl text-currena-warning transition-all duration-300 hover:rotate-90"
-            >
-              ×
-            </button>
-
-            {/* Receipt paper (legacy: Courier, dashed border, always light).
-                dir=ltr with the CURRENT app locale's lang so localized (fa)
-                strings inside keep their pronunciation/braille rules. */}
-            <div
-              ref={paperRef}
-              dir="ltr"
-              lang={locale}
-              className="clear-both rounded-[4px] border-2 border-dashed border-gray-300 bg-white px-5 py-6 font-mono text-[#2C3E50]"
-            >
-              <div className="mb-5 border-b-2 border-black pb-4 text-center">
-                <p className="mb-2 text-xl font-bold">{t('receipt.expenseReceipt')}</p>
-                <p className="text-xs text-gray-600">
-                  {receipt.endDate ? `${receipt.date} - ${receipt.endDate}` : receipt.date}
-                </p>
-                <p className="mt-0.5 text-xs text-gray-600">
-                  {formatJalaliDate(dateToIso(receipt.date), 'en-US')}
-                  {receipt.endDate ? ` - ${formatJalaliDate(dateToIso(receipt.endDate), 'en-US')}` : ''}
-                </p>
-                <p className="mt-1 text-[0.7rem] text-gray-500">
-                  {t('receipt.generatedAt')}{' '}
-                  {new Intl.DateTimeFormat('en-US', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: true,
-                  }).format(new Date(receipt.timestamp))}
-                </p>
-              </div>
-
-              <div className="mb-4 space-y-1">
-                {receipt.items.map((item, i) => (
-                  <div key={i} className="border-b border-dotted border-gray-300 py-2.5">
-                    <div className="flex items-start justify-between gap-2.5">
-                      <span className="flex min-w-0 items-center gap-2 text-sm">
-                        <span className="shrink-0">{item.emoji}</span>
-                        <span className="break-words">{item.category}</span>
-                      </span>
-                      <span className="shrink-0 font-bold" dir="ltr">
-                        {formatNumber(item.amount, numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{' '}
-                        <bdi>{label(item.currency)}</bdi>
-                      </span>
-                    </div>
-                    {item.time !== '' ? (
-                      <p className="mt-0.5 ps-6 text-[0.7rem] text-gray-500">🕒 {item.time}</p>
-                    ) : null}
-                    {item.notes ? (
-                      <p className="mt-0.5 ps-6 text-xs text-gray-600">📝 {item.notes}</p>
-                    ) : null}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 flex items-center justify-between border-t-2 border-black pt-4 text-lg font-bold">
-                <span>{t('receipt.totalLabel')}</span>
-                <span dir="ltr">
-                  {formatNumber(receipt.total, numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{' '}
-                  <bdi>{label(receipt.fromCurrency)}</bdi>
-                </span>
-              </div>
-
-              {receipt.converted !== null ? (
-                <div className="mt-4 rounded-lg bg-gray-100 p-4 text-center">
-                  <p className="mb-2 text-xs text-gray-600">{t('receipt.convertedAmount')}</p>
-                  <p className="text-xl font-bold text-currena-blue" dir="ltr">
-                    {formatNumber(receipt.converted, numberLocale, { maximumFractionDigits: receipt.toCurrency === 'IRR' ? 0 : 2 })}{' '}
-                    <bdi>{label(receipt.toCurrency)}</bdi>
-                  </p>
-                  {receipt.rate !== null ? (
-                    <p className="mt-2 text-[0.7rem] text-gray-500" dir="ltr">
-                      {t('common.rate')}: 1 <bdi>{label(receipt.fromCurrency)}</bdi> ={' '}
-                      {formatNumber(receipt.rate, numberLocale, { maximumFractionDigits: receipt.toCurrency === 'IRR' ? 0 : 4 })}{' '}
-                      <bdi>{label(receipt.toCurrency)}</bdi>
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-
-              <div className="mt-5 border-t-2 border-black pt-4 text-center text-xs text-gray-600">
-                <p>{t('common.generatedWith')}</p>
-                <p className="mt-1 text-[0.7rem]">
-                  {t('receipt.receiptId')} {receipt.id}
-                </p>
-              </div>
-            </div>
-
-            {/* Export buttons */}
-            <div className="mt-5 grid grid-cols-2 gap-2.5">
-              <Button
-                variant="cta"
-                className="col-span-full py-3.5"
-                disabled={exporting !== null}
-                onClick={() => void exportPdf()}
-              >
-                {exporting === 'pdf' ? t('receipt.pdfCreating') : t('receipt.downloadPdf')}
-              </Button>
-              <Button
-                variant="secondary"
-                className="py-3"
-                disabled={exporting !== null}
-                onClick={() => void exportImage()}
-              >
-                {exporting === 'image' ? t('receipt.creating') : t('receipt.downloadImage')}
-              </Button>
-              <Button
-                variant="secondary"
-                className="py-3"
-                disabled={exporting !== null}
-                onClick={() => void exportExcel()}
-              >
-                {exporting === 'excel' ? t('receipt.creating') : t('receipt.downloadExcel')}
-              </Button>
-              <Button variant="secondary" className="col-span-full py-3" onClick={() => void onShare()}>
-                📤 {t('common.share')}
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ReceiptModal
+          receipt={receipt}
+          onClose={() => setReceipt(null)}
+          dialogRef={receiptDialogRef}
+          onDialogKeyDown={receiptDialogKeyDown}
+          paperRef={paperRef}
+          paperCloseRef={paperCloseRef}
+          exporting={exporting}
+          onExportPdf={() => void exportPdf()}
+          onExportImage={() => void exportImage()}
+          onExportExcel={() => void exportExcel()}
+          onShare={() => void onShare()}
+        />
       ) : null}
 
       {/* Export overlay */}
