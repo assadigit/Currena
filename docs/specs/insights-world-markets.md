@@ -117,7 +117,7 @@ Limits (Cloudflare documentation, October 2026): KV reads 100,000 per day · KV 
 2. **Write only if changed.** Compare a hash of the new content to the stored one. Weekends and holidays then cost zero writes.
 3. **Own cron triggers**, separate from the jobs that fetch your other dozen APIs. This keeps each invocation under the 50-subrequest cap.
 4. **No provider calls on page requests.** The public route only reads KV.
-5. **Cache the public route:** `Cache-Control: public, max-age=300, s-maxage=3600`, and use the Cache API in the Worker. KV reads use `cacheTtl: 3600`.
+5. **Cache the public route:** `Cache-Control: public, max-age=300, s-maxage=300` (edge TTL tightened from 3600 on 2026-10-14, owner-approved — a daily update becomes visible within ~5 minutes), and use the Cache API in the Worker. KV reads use `cacheTtl: 300`.
 6. **Keep CPU low:** ask providers only for the last ~400 days, compute the numbers, keep only the results. If a CPU-limit error ever appears, split into two runs of 7 markets (same total calls).
 7. **Weekly 52-point series** per market for the detail chart (not the daily history). Whole object stays around 7 to 9 KB.
 8. **Escape hatch:** if KV ever gets tight, move this one key to D1 or R2. Both have much larger free write allowances than KV.

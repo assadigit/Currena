@@ -8,12 +8,18 @@
  *
  * The Worker only READS what a scheduled job wrote (cheap: exactly one KV
  * read per request, no scoring at the edge — for the markets route the
- * read rides the spec's 1-hour KV edge cache, and the response itself is
+ * read rides the spec's 5-minute KV edge cache, and the response itself is
  * double-cached: browser/CDN via Cache-Control and the Worker's own
  * caches.default). All routes carry content-addressed ETags +
  * If-None-Match 304s like /api/rates and /api/history, and a short public
  * cache (the payloads change at most once a day). Errors use the
  * RatesError envelope, same as the rest of /api.
+ *
+ * 2026-10-14 (owner-approved, D-13): the /markets and /fx edge TTL was
+ * tightened from 1 hour to 5 minutes (s-maxage 3600 → 300, KV read
+ * cacheTtl ditto) so a daily update becomes visible within ~5 minutes.
+ * Paired with the zone-side Browser Cache TTL fix (D-12) that had been
+ * rewriting the browser's max-age to 4 hours on edge-cache HITs.
  */
 
 import { IndicatorIdSchema } from '@currena/core';
@@ -105,10 +111,10 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
     }
     const etag = `"insights-markets:${snapshot.generatedAt}"`;
     if (c.req.header('if-none-match') === etag) {
-      return c.body(null, 304, { 'Cache-Control': 'public, max-age=300, s-maxage=3600', ETag: etag });
+      return c.body(null, 304, { 'Cache-Control': 'public, max-age=300, s-maxage=300', ETag: etag });
     }
     const response = c.json(snapshot, 200, {
-      'Cache-Control': 'public, max-age=300, s-maxage=3600',
+      'Cache-Control': 'public, max-age=300, s-maxage=300',
       ETag: etag,
     });
     if (typeof caches !== 'undefined') {
@@ -146,10 +152,10 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
     }
     const etag = `"insights-fx:${snapshot.generatedAt}"`;
     if (c.req.header('if-none-match') === etag) {
-      return c.body(null, 304, { 'Cache-Control': 'public, max-age=300, s-maxage=3600', ETag: etag });
+      return c.body(null, 304, { 'Cache-Control': 'public, max-age=300, s-maxage=300', ETag: etag });
     }
     const response = c.json(snapshot, 200, {
-      'Cache-Control': 'public, max-age=300, s-maxage=3600',
+      'Cache-Control': 'public, max-age=300, s-maxage=300',
       ETag: etag,
     });
     if (typeof caches !== 'undefined') {

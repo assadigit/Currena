@@ -5,6 +5,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-14] — Freshness: the daily update becomes visible in ~5 minutes
+
+Owner-approved pair of changes (D-12 + D-13) closing the gap between the
+23:30/01:30 UTC snapshot runs and what a returning visitor sees. Before:
+after a daily fx/markets update, a returning visitor could see yesterday's
+currencies for up to **4–5 hours** (browser cache 4 h + edge cache 1 h).
+After: **~5 minutes**, end to end.
+
+### Fixed
+
+- **D-12 (zone-side, no code):** the currena.ir zone's legacy *Browser Cache
+  TTL* setting was `14400` (4 hours — Cloudflare's old default), silently
+  rewriting the origin's `max-age=300` to 14400 on every edge-cache HIT.
+  Verified live in a real browser (`cf-cache-status: HIT` served
+  `max-age=14400`); fixed via the Cloudflare API to **0 = "Respect Existing
+  Headers"**, and verified again — HITs now serve `max-age=300`. Only the
+  two edge-cached insights routes were affected; HTML/assets/rates were not.
+
+### Changed
+
+- **D-13 (code + spec):** the `/api/insights/markets` and `/api/insights/fx`
+  edge TTL tightened from 1 hour to 5 minutes — `s-maxage` 3600 → 300 on
+  both the 200 and 304 responses, and the serve-path KV read `cacheTtl`
+  3600 → 300 (`KvMarketsReader`/`KvFxReader`). Specs updated in place
+  (world-markets §4 rule 5, world-currencies §5 rule 4) with the change
+  note. Read budget: at most one KV read per 5 minutes per active colo per
+  route (~288/day/colo) — comfortably inside the free tier, and the account
+  is now dedicated to Currena (the owner migrated the other projects off).
+
 ## [2026-10-14] — World currencies v1.3: bugs B1–B8, R3 one-month trigger, corrected R7, the plain-language layer
 
 Implements the owner's change request

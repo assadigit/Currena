@@ -29,7 +29,7 @@ export async function fetchFxSnapshot(signal?: AbortSignal): Promise<FxSnapshot 
     const response = await fetch(url, {
       signal: combined,
       headers: { accept: 'application/json' },
-      // The route answers public, max-age=300 s-maxage=3600 + ETag — the
+      // The route answers public, max-age=300 s-maxage=300 + ETag — the
       // browser's HTTP cache does revalidation for us.
       cache: 'default',
     });

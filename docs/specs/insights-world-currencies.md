@@ -143,7 +143,7 @@ Limits (Cloudflare documentation, October 2026): KV reads 100,000 per day · KV 
 1. **One KV key for the section** (`insights:fx:v1`). No per-pair keys, no `list()`.
 2. **Write only if the content changed** (compare a hash).
 3. **All analysis is done in the scheduled job.** The page route just returns the stored result. It never reads the other indicator keys.
-4. **Cache the public route:** `Cache-Control: public, max-age=300, s-maxage=3600`.
+4. **Cache the public route:** `Cache-Control: public, max-age=300, s-maxage=300` (edge TTL tightened from 3600 on 2026-10-14, owner-approved — a daily update becomes visible within ~5 minutes).
 5. **Weekly closes only** (52 points per pair) are stored for charts and pattern checks, not daily history. Each pattern also stores 26 weekly points per chart line (rebased to 100) and its 13 weekly agree/not-agree flags. The whole object should stay around 14 KB.
 6. **Escape hatch:** if KV ever gets tight, move this key to D1 or R2 (much larger free write allowances).
 7. After one week live, check the KV metrics in the Cloudflare dashboard. Target: this section stays under 1% of reads and 1% of writes. Record the numbers in the data-check file.

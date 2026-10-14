@@ -366,7 +366,7 @@ describe('GET /api/insights/markets', () => {
     const res = await makeApp().request('/api/insights/markets', undefined, env);
     expect(res.status).toBe(200);
     expect(res.headers.get('etag')).toBe('"insights-markets:2026-10-12T23:31:00Z"');
-    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=3600');
+    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
     expect(await res.json()).toEqual(snap);
   });
 
@@ -473,7 +473,7 @@ describe('GET /api/insights/fx', () => {
     const res = await makeApp().request('/api/insights/fx', undefined, env);
     expect(res.status).toBe(200);
     expect(res.headers.get('etag')).toBe('"insights-fx:2026-10-13T17:01:00Z"');
-    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=3600');
+    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
     expect(await res.json()).toEqual(snap);
   });
 

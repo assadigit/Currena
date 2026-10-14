@@ -69,31 +69,33 @@ export class KvInsightsReader implements InsightsReader {
 
 /**
  * World stock markets serve path (insights-world-markets-spec.md §4 rule 5):
- * ONE KV read for the section's ONE key, with the spec's 1-hour KV edge
- * cache so page traffic never re-reads KV more than hourly. The value is
- * written by the dedicated currena-markets Worker cron — read-only here,
- * and a page request can never reach a provider.
+ * ONE KV read for the section's ONE key, with the spec's 5-minute KV edge
+ * cache (the 2026-10-14 tightening, D-13 — was 1 hour) so page traffic
+ * never re-reads KV more than once per 5 minutes. The value is written by
+ * the dedicated currena-markets Worker cron — read-only here, and a page
+ * request can never reach a provider.
  */
 export class KvMarketsReader implements MarketsReader {
   constructor(private readonly kv: KVNamespace) {}
 
   async getMarkets(): Promise<MarketsSnapshot | undefined> {
-    return parseStoredMarkets(await this.kv.get(MARKETS_KV_KEY, { cacheTtl: 3600 }));
+    return parseStoredMarkets(await this.kv.get(MARKETS_KV_KEY, { cacheTtl: 300 }));
   }
 }
 
 /**
  * World currencies serve path (insights-world-currencies-spec.md §5 rules
- * 3–4): ONE KV read for the section's ONE key, with the spec's 1-hour KV
- * edge cache — exactly the markets twin. The value is written by the fx
- * job riding the currena-markets Worker cron — read-only here, and a page
- * request can never reach a provider.
+ * 3–4): ONE KV read for the section's ONE key, with the spec's 5-minute
+ * KV edge cache (the 2026-10-14 tightening, D-13 — was 1 hour) — exactly
+ * the markets twin. The value is written by the fx job riding the
+ * currena-markets Worker cron — read-only here, and a page request can
+ * never reach a provider.
  */
 export class KvFxReader implements FxReader {
   constructor(private readonly kv: KVNamespace) {}
 
   async getFx(): Promise<FxSnapshot | undefined> {
-    return parseStoredFx(await this.kv.get(FX_KV_KEY, { cacheTtl: 3600 }));
+    return parseStoredFx(await this.kv.get(FX_KV_KEY, { cacheTtl: 300 }));
   }
 }
 
