@@ -22,22 +22,26 @@
  * localStorage snapshot first for instant/offline paint, fresh fetch
  * revalidating behind it. Deep links ('#/insights?card=<id>') open the
  * details panel for that indicator.
+ *
+ * Phase 3-e (2026-10-15) route split: this file stays the slim page shell
+ * (the lazy route entry — named export `Insights` for App.tsx) and the
+ * page-level section compositions moved to routes/insights-sections/, all
+ * verbatim (no JSX, hook, handler or copy change):
+ *   InsightsHeader.tsx        — header + Tools disclosure + data-as-of + CSV/.ics
+ *   InsightsStatusBlocks.tsx  — LoadState + reading progress + loading/error/stale shells
+ *   QuestionGroup.tsx         — one question group of the lane (+ the shared `num`)
+ *   SectionLane.tsx           — the indicator lane (watchlist strip + region sections)
+ *   world-feeds.ts            — the markets/fx section fetch hooks + hero indicators
+ *   useInsightsToolsNav.ts    — Tools state + "/" and j/k shortcuts + filtering
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { IndicatorId, InsightsSnapshot, InsightsSection, IndicatorGroupId } from '@currena/core';
+import type { IndicatorId, InsightsSection } from '@currena/core';
 import type { IndicatorReading } from '@currena/core';
-import { formatJalaliDate, formatDateWords, formatNumber, formatRelative } from '@currena/core';
-import { Search, TriangleAlert } from 'lucide-react';
-import { interpolate } from '../i18n';
 import { useI18n } from '../lib/locale';
 import { routeQuery } from '../router';
 import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../lib/insights';
-import { fetchMarketsSnapshot, readCachedMarkets } from '../lib/markets';
-import { fetchFxSnapshot, readCachedFx } from '../lib/fx';
 import { AboutTheData } from '../components/insights/AboutTheData';
-import { AlertCard } from '../components/insights/AlertCard';
-import { CompactRow } from '../components/insights/CompactRow';
 import { DetailsPanel } from '../components/insights/DetailsPanel';
 import { HeroBlock } from '../components/insights/HeroBlock';
 import { JumpNav, type JumpTarget } from '../components/insights/JumpNav';
@@ -46,40 +50,31 @@ import { NextUpStrip } from '../components/insights/NextUpStrip';
 import { PricesBoard } from '../components/insights/PricesBoard';
 import { Signals } from '../components/insights/Signals';
 import { Together } from '../components/insights/Together';
-import { ToolsMenu } from '../components/insights/ToolsMenu';
-import { WorldMarkets, type MarketsLoadState } from '../components/insights/WorldMarkets';
-import { WorldCurrencies, type FxLoadState } from '../components/insights/WorldCurrencies';
-import type { FxAlert, MarketsAlert, SectionIndicatorState } from '../components/insights/VerdictMeter';
-import { Skeleton } from '../components/ui';
-import { Button } from '../components/ui';
+import { WorldMarkets } from '../components/insights/WorldMarkets';
+import { WorldCurrencies } from '../components/insights/WorldCurrencies';
 import { useInsightsCopy } from '../components/insights/useInsightsCopy';
-import { IconImg, sectionIconUrl } from '../components/icons/currena';
 import {
-  GROUP_ORDER,
   PINNED_STORAGE_KEY,
-  SECTION_ORDER,
   SIGNALS_ENABLED,
-  COMPANION_ONLY_IDS,
-  attentionToneClass,
-  companionParentOf,
   definitionFor,
-  definitionsForGroup,
-  filterVisibleIds,
   formatPinnedStorage,
-  groupVisibility,
-  nextEventDate,
   parsePinnedIds,
-  statusCounts,
-  stepToneClass,
-  tierIsCard,
-  tierOf,
-  type StatusFilter,
 } from '../components/insights/config';
-
-type LoadState =
-  | { kind: 'loading' }
-  | { kind: 'ready'; snapshot: InsightsSnapshot; fromCache: boolean }
-  | { kind: 'error'; message: string; cached: InsightsSnapshot | null };
+import { InsightsHeader } from './insights-sections/InsightsHeader';
+import {
+  InsightsErrorState,
+  InsightsLoadingState,
+  ReadingProgress,
+  StaleCacheNotice,
+  type LoadState,
+} from './insights-sections/InsightsStatusBlocks';
+import { SectionLane } from './insights-sections/SectionLane';
+import {
+  useWorldCurrenciesSection,
+  useWorldMarketsSection,
+  useWorldSectionIndicators,
+} from './insights-sections/world-feeds';
+import { useInsightsToolsNav } from './insights-sections/useInsightsToolsNav';
 
 /**
  * The calendar's event-kind → indicator mapping (H6: link events to the
@@ -97,348 +92,11 @@ const EVENT_TARGETS: Readonly<Record<string, IndicatorId | undefined>> = {
   'us-jobs': 'us-unemployment',
 };
 
-function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
-  return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
-}
-
-function SummarySkeleton() {
-  return (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2" aria-hidden="true">
-      <Skeleton className="h-44 rounded-[18px]" />
-      <Skeleton className="h-44 rounded-[18px]" />
-    </div>
-  );
-}
-
-/**
- * L2/L3/R5/R7: one question group — the question heading, the gauge reading
- * (step + word + count), the one-line answer, then the items: needs-attention
- * AND unusual cards first (L3, extremity-sorted), then normal rows — with
- * the R7 signals-first collapse: everything not in the first GROUP_MIN_VISIBLE
- * items hides behind "See all {n} indicators" (needs-attention is never
- * hidden). Deep links, tile clicks and Tools search reveal hidden items
- * (revealIds / searchActive).
- */
-function QuestionGroup({
-  group,
-  section,
-  snapshot,
-  copy,
-  numberLocale,
-  onOpenDetails,
-  pinned,
-  renderableIds,
-  revealIds,
-  searchActive,
-}: {
-  group: IndicatorGroupId;
-  section: InsightsSection;
-  snapshot: InsightsSnapshot;
-  copy: ReturnType<typeof useInsightsCopy>['copy'];
-  numberLocale: 'en-US' | 'fa-IR';
-  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
-  pinned: ReadonlySet<IndicatorId>;
-  renderableIds: ReadonlySet<IndicatorId> | null;
-  /** R7: ids explicitly opened (deep link, tile click) — always visible. */
-  revealIds: ReadonlySet<IndicatorId>;
-  /** R7: while the Tools search is active, nothing collapses. */
-  searchActive: boolean;
-}) {
-  const [showAll, setShowAll] = useState(false);
-  const readings = useMemo(() => {
-    const defs = definitionsForGroup(section, group);
-    return snapshot.readings.filter(
-      (r) =>
-        defs.some((d) => d.id === r.id) &&
-        // Step-1 A3: companion-only readings (core CPI) render INSIDE their
-        // parent card, never as their own row.
-        !COMPANION_ONLY_IDS.has(r.id) &&
-        (renderableIds === null || renderableIds.has(r.id)),
-    );
-  }, [snapshot, section, group, renderableIds]);
-
-  // Step-1 A3 + Step-2 §B2: the companion readings rendered inside this
-  // group's cards (core CPI on the US inflation card; the US 10-year beside
-  // the AU 10-year). Parents live in this group; companions may be any
-  // reading in the snapshot (us10y keeps its own card elsewhere).
-  const companionsByParent = useMemo(() => {
-    const defs = definitionsForGroup(section, group);
-    const parentIds = new Set(defs.map((d) => d.id));
-    const byParent = new Map<IndicatorId, IndicatorReading[]>();
-    for (const r of snapshot.readings) {
-      const parent = companionParentOf(r.id);
-      if (parent !== null && parentIds.has(parent)) {
-        byParent.set(parent, [...(byParent.get(parent) ?? []), r]);
-      }
-    }
-    return byParent;
-  }, [snapshot, section, group]);
-
-  // Step-2 §B1: the next RBA decision date, threaded to the cash-rate card
-  // (computed once per group from the snapshot's calendar — plain dates,
-  // the Step-1 rule: no UTC conversion, computed at render).
-  const nextRbaDecision = useMemo(
-    () => nextEventDate(snapshot.calendar, 'rba', new Date().toISOString().slice(0, 10)),
-    [snapshot.calendar],
-  );
-
-  // Step-2 §B2: the companion note line per parent ("the gap is mainly
-  // energy" for the CPI card, "shown for comparison" for the AU 10-year).
-  const companionNoteOf = (parent: IndicatorId): string | undefined =>
-    copy.ui.companionNotes[parent];
-
-  const gauge = useMemo(() => {
-    return gaugesForSectionCached(section, snapshot.readings).find((g) => g.gauge === group);
-  }, [section, snapshot]);
-
-  if (readings.length === 0) return null;
-
-  const question = copy.groups[group];
-  const answer = copy.gaugeAnswers[group];
-  // L2: the gauge reading (this group IS a gauge).
-  const step = gauge?.step ?? 0;
-  const stepWord =
-    step === 0 ? copy.ui.gaugeNoReading : step === 1 ? copy.label.relaxed : step === 2 ? copy.label.cautious : step === 3 ? copy.label.stressed : copy.label.alarmed;
-  const countText = interpolate(copy.ui.inAlert, {
-    warnings: num(gauge?.warningCount ?? 0, numberLocale),
-    voting: num(gauge?.votingCount ?? 0, numberLocale),
-  });
-
-  // R5 ordering: needs-attention cards first (extremity-sorted), unusual
-  // cards next, then the compact rows (normal, context, stale) in snapshot
-  // order — one tier per card, the tier decides the layout.
-  const sorted = [...readings].sort((a, b) => {
-    const rank = (r: IndicatorReading): number => {
-      const tier = tierOf(r);
-      return tier === 'needs-attention' ? 0 : tier === 'unusual' ? 1 : tier === 'normal' || tier === 'context' ? 2 : 3;
-    };
-    const ra = rank(a);
-    const rb = rank(b);
-    if (ra !== rb) return ra - rb;
-    if (ra === 0) {
-      // Both needs-attention: deeper into the watched tail first.
-      const pa = a.percentile10y ?? 0;
-      const pb = b.percentile10y ?? 0;
-      return pb - pa;
-    }
-    return 0; // stable — snapshot order within tiers
-  });
-
-  // R7: the signals-first split — needs-attention + unusual always visible,
-  // normal rows fill up to the minimum, the rest collapse behind "See all".
-  const visibility = groupVisibility(sorted);
-  const hidden = visibility.collapsed.filter(
-    (r) => !revealIds.has(r.id) && !pinned.has(r.id),
-  );
-  const hiddenIds = new Set(hidden.map((r) => r.id));
-  const collapsed = !searchActive && !showAll && hidden.length > 0;
-  const visibleList = collapsed ? sorted.filter((r) => !hiddenIds.has(r.id)) : sorted;
-  const cardList = visibleList.filter((r) => tierIsCard(tierOf(r)));
-  const rowList = visibleList.filter((r) => !tierIsCard(tierOf(r)));
-
-  return (
-    <section id={`insights-group-${group}`} aria-labelledby={`insights-group-${group}-title`} className="scroll-mt-24">
-      <header className="mb-2.5">
-        <h3 id={`insights-group-${group}-title`} className="type-question m-0 text-[var(--color-text-primary)]">
-          {question}
-        </h3>
-        <p className="m-0 mt-0.5 flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
-          {/* L2: the gauge reading + count. */}
-          <span
-            className="verdict-meter !h-1.5 max-w-[120px]"
-            role="img"
-            aria-label={interpolate(copy.ui.gaugeStepAria, { question, label: stepWord, step: num(step, numberLocale) })}
-          >
-            {[1, 2, 3, 4].map((i) => (
-              <span key={i} className={`verdict-meter-seg ${step >= i ? `on-${i}` : ''}`} />
-            ))}
-          </span>
-          <span className={`font-bold ${stepToneClass(step)}`}>{stepWord}</span>
-          <span className={`font-semibold ${attentionToneClass(gauge?.warningCount ?? 0)}`}>{countText}</span>
-          {/* L2 answer: no min-w-0 — the flex item keeps its min-content width
-           * (the longest word) so the flex-wrap row moves it to its own line on
-           * narrow phones instead of squeezing it below word width, which bled
-           * ~50px of horizontal scroll onto the whole page at 375px (I18). */}
-          <span className="flex-1">{answer}</span>
-        </p>
-      </header>
-      {/* R5/R7: needs-attention AND unusual cards in a responsive lane —
-       * R30: min 300px (the 4-column 260px grid wrapped titles to five
-       * lines). Round 22 (owner): "such gaps must never happen" — the old
-       * auto-fill grid reserved a dead track whenever fewer cards than
-       * tracks existed (two attention cards + a dead third column of
-       * white). .lane-fill makes every line fill edge to edge: 2 cards
-       * split the row, 1 card takes it whole. */}
-      {cardList.length > 0 ? (
-        <div className="lane-fill mb-2 gap-2.5">
-          {cardList.map((r) => (
-            <AlertCard
-              key={r.id}
-              reading={r}
-              copy={copy}
-              numberLocale={numberLocale}
-              onOpenDetails={onOpenDetails}
-              pinned={pinned.has(r.id)}
-              companionReadings={companionsByParent.get(r.id) ?? []}
-              companionNote={companionNoteOf(r.id)}
-              nextRbaDecision={nextRbaDecision}
-            />
-          ))}
-        </div>
-      ) : null}
-      {rowList.length > 0 ? (
-        /* Round 22: .lane-fill — a lone compact row spans the lane instead
-         * of leaving a dead half-column beside it (owner: gaps never). */
-        <div className="lane-fill lane-fill-rows gap-1.5">
-          {rowList.map((r) => (
-            <CompactRow
-              key={r.id}
-              reading={r}
-              copy={copy}
-              numberLocale={numberLocale}
-              onOpenDetails={onOpenDetails}
-              pinned={pinned.has(r.id)}
-              showMixedTag={r.id === 'gold-silver'}
-              companionReadings={companionsByParent.get(r.id) ?? []}
-              companionNote={companionNoteOf(r.id)}
-              nextRbaDecision={nextRbaDecision}
-            />
-          ))}
-        </div>
-      ) : null}
-      {/* R7: the "See all {n}" collapse — per session state. R30: honest
-       * plural ("See all 1 indicators" was wrong) and a QUIET text button
-       * (the heavy blue pill competed with the cards). */}
-      {collapsed ? (
-        <button
-          type="button"
-          onClick={() => setShowAll(true)}
-          className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:decoration-[var(--color-status-context)]"
-        >
-          {hidden.length === 1 ? copy.ui.seeAllOne : interpolate(copy.ui.seeAll, { n: num(hidden.length, numberLocale) })}
-        </button>
-      ) : null}
-      {!collapsed && showAll && hidden.length > 0 ? (
-        <button
-          type="button"
-          onClick={() => setShowAll(false)}
-          className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:text-[var(--color-status-context)]"
-        >
-          {copy.ui.showFewer}
-        </button>
-      ) : null}
-    </section>
-  );
-}
-
-/** Cached per-call gauges helper (the package function is pure). */
-import { gaugesForSection } from '@currena/insights';
-function gaugesForSectionCached(
-  section: InsightsSection,
-  readings: readonly IndicatorReading[],
-) {
-  return gaugesForSection(section, readings);
-}
-
-/** The I10 watchlist strip (pinned items, snapshot order) — inside the lane. */
-function PinnedSection({
-  readings,
-  copy,
-  numberLocale,
-  onOpenDetails,
-  pinned,
-}: {
-  readings: readonly IndicatorReading[];
-  copy: ReturnType<typeof useInsightsCopy>['copy'];
-  numberLocale: 'en-US' | 'fa-IR';
-  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
-  pinned: ReadonlySet<IndicatorId>;
-}) {
-  const voting = readings.filter((r) => r.status === 'warning' || r.status === 'normal');
-  const attention = voting.filter((r) => r.status === 'warning');
-  return (
-    <section id="insights-pinned" aria-labelledby="insights-pinned-title" className="scroll-mt-24">
-      <header className="mb-2.5 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 id="insights-pinned-title" className="type-question m-0 text-[var(--color-text-primary)]">
-          <span aria-hidden="true">★ </span>
-          {copy.ui.pinnedTitle}
-        </h2>
-        {voting.length > 0 ? (
-          <p className={`m-0 text-[length:var(--type-caption)] font-semibold ${attentionToneClass(attention.length)}`}>
-            {interpolate(copy.ui.inAlert, {
-              warnings: num(attention.length, numberLocale),
-              voting: num(voting.length, numberLocale),
-            })}
-          </p>
-        ) : null}
-      </header>
-      {/* Round 22: .lane-fill here too — one pinned row fills the lane. */}
-      <div className="lane-fill lane-fill-rows gap-1.5">
-        {readings.map((r) => (
-          <CompactRow
-            key={r.id}
-            reading={r}
-            copy={copy}
-            numberLocale={numberLocale}
-            onOpenDetails={onOpenDetails}
-            pinned={pinned.has(r.id)}
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/**
- * I10: a thin reading-progress bar pinned above the app header — on a page
- * this long, "how far through am I?" is orientation, not decoration.
- * rAF-throttled passive listeners; fills from the inline-start edge in
- * both directions; hidden on paper.
- */
-function ReadingProgress({ label }: { label: string }) {
-  const [pct, setPct] = useState(0);
-  useEffect(() => {
-    let raf = 0;
-    const measure = () => {
-      raf = 0;
-      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-      setPct(scrollable > 0 ? Math.min(100, Math.max(0, (window.scrollY / scrollable) * 100)) : 0);
-    };
-    const onScroll = () => {
-      if (raf === 0) raf = requestAnimationFrame(measure);
-    };
-    measure();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-    return () => {
-      if (raf !== 0) cancelAnimationFrame(raf);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-    };
-  }, []);
-  return (
-    <div
-      role="progressbar"
-      aria-label={label}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={Math.round(pct)}
-      className="no-print fixed inset-x-0 top-0 z-[1001] h-[3px]"
-    >
-      <div className="h-full bg-currena-blue" style={{ width: `${pct}%` }} />
-    </div>
-  );
-}
-
 export function Insights() {
   const { t, locale } = useI18n();
   const { copy, numberLocale } = useInsightsCopy();
   const [state, setState] = useState<LoadState>({ kind: 'loading' });
   const [retryToken, setRetryToken] = useState(0);
-  // I8/R15: the tier filter + search now live inside the Tools disclosure.
-  const [toolsOpen, setToolsOpen] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [query, setQuery] = useState('');
   // I10: the personal watchlist — pinned items render in their own strip
   // inside the lane. Pins persist across visits (localStorage) and sync
   // across tabs (the storage event).
@@ -462,8 +120,6 @@ export function Insights() {
   const [panel, setPanel] = useState<{ id: IndicatorId; opener: HTMLElement | null } | null>(null);
   const hadCache = useRef(false);
   const shareLinkHandled = useRef(false);
-  const searchInputRef = useRef<HTMLInputElement | null>(null);
-  const toolsButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -487,114 +143,11 @@ export function Insights() {
     return () => controller.abort();
   }, [retryToken]);
 
-  // World stock markets (insights-world-markets-spec.md): an independent
-  // feed with its own last-good cache. It NEVER surfaces an error — the
-  // designed fallbacks are the loading skeletons and the calm "being
-  // prepared" line (§6.6) — so a missing/unready feed cannot break the
-  // page, and a page request never reaches a provider (§4 rule 4).
-  const [marketsState, setMarketsState] = useState<MarketsLoadState>(() => {
-    try {
-      const cachedMarkets = readCachedMarkets();
-      return cachedMarkets ? { kind: 'ready', snapshot: cachedMarkets } : { kind: 'loading' };
-    } catch {
-      return { kind: 'loading' };
-    }
-  });
-  useEffect(() => {
-    const controller = new AbortController();
-    void fetchMarketsSnapshot(controller.signal).then((snapshot) => {
-      if (controller.signal.aborted) return;
-      setMarketsState(snapshot !== null ? { kind: 'ready', snapshot } : { kind: 'empty' });
-    });
-    return () => controller.abort();
-  }, []);
-
-  // §5.3 (build step 9): the raised section signal joins the GLOBAL hero
-  // verdict's attention module; undefined when calm or not yet populated.
-  const marketsAlert = useMemo<MarketsAlert | undefined>(() => {
-    if (marketsState.kind !== 'ready') return undefined;
-    const { summary } = marketsState.snapshot;
-    if (summary.signal === 'normal') return undefined;
-    return {
-      signal: summary.signal,
-      n: summary.nAttention + summary.nUnusual,
-      count: summary.count,
-    };
-  }, [marketsState]);
-
-  // World currencies (insights-world-currencies-spec.md): the same
-  // independent-feed discipline — own last-good cache, never an error
-  // surface; loading skeletons and the calm "being prepared" line (§9.5).
-  const [fxState, setFxState] = useState<FxLoadState>(() => {
-    try {
-      const cachedFx = readCachedFx();
-      return cachedFx ? { kind: 'ready', snapshot: cachedFx } : { kind: 'loading' };
-    } catch {
-      return { kind: 'loading' };
-    }
-  });
-  useEffect(() => {
-    const controller = new AbortController();
-    void fetchFxSnapshot(controller.signal).then((snapshot) => {
-      if (controller.signal.aborted) return;
-      setFxState(snapshot !== null ? { kind: 'ready', snapshot } : { kind: 'empty' });
-    });
-    return () => controller.abort();
-  }, []);
-
-  // §6.5 (currencies build step 11): the raised currency signal joins the
-  // hero's attention module WITH ITS PATTERN NAMES — the existing mechanism.
-  const fxAlert = useMemo<FxAlert | undefined>(() => {
-    if (fxState.kind !== 'ready') return undefined;
-    const { summary, rules } = fxState.snapshot;
-    if (summary.signal === 'normal') return undefined;
-    const names = rules
-      .filter((r) => r.outcome === 'warning' && r.counted)
-      .map((r) => copy.fx.rules[r.id.slice(0, 2) as 'r1'].name);
-    return { signal: summary.signal, patterns: names };
-  }, [fxState, copy]);
-
-  const jumpToMarkets = useCallback(() => {
-    document.getElementById('insights-markets')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-  }, []);
-
-  const jumpToFxCurrencies = useCallback(() => {
-    document.getElementById('insights-fx')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-  }, []);
-
-  // §6.11/§9.10: the two world sections as SEPARATE indicators in the
-  // transparent count — each with its own measure label and chip, never
-  // merged (they measure different things; both can be true at once).
-  const sectionIndicators = useMemo<SectionIndicatorState[] | undefined>(() => {
-    const out: SectionIndicatorState[] = [];
-    if (marketsState.kind === 'ready') {
-      const signal = marketsState.snapshot.summary.signal;
-      out.push({
-        signal,
-        label:
-          signal === 'unusual'
-            ? copy.markets.measureUnusual
-            : signal === 'attention'
-              ? copy.markets.measureAttention
-              : copy.markets.measureNormal,
-        onJump: jumpToMarkets,
-      });
-    }
-    if (fxState.kind === 'ready') {
-      const signal = fxState.snapshot.summary.signal;
-      out.push({
-        signal,
-        label:
-          signal === 'unusual'
-            ? copy.fx.measureUnusual
-            : signal === 'attention'
-              ? copy.fx.measureAttention
-              : copy.fx.measureNormal,
-        onJump: jumpToFxCurrencies,
-      });
-    }
-    return out.length > 0 ? out : undefined;
-  }, [marketsState, fxState, copy, jumpToMarkets, jumpToFxCurrencies]);
+  // The two world-section feeds + the hero's section indicators — moved
+  // verbatim to insights-sections/world-feeds.ts (Phase 3-e).
+  const { marketsState, marketsAlert, jumpToMarkets, downloadMarketsCsv } = useWorldMarketsSection(copy);
+  const { fxState, fxAlert, jumpToFxCurrencies, downloadFxCsv } = useWorldCurrenciesSection(copy);
+  const sectionIndicators = useWorldSectionIndicators(marketsState, fxState, copy, jumpToMarkets, jumpToFxCurrencies);
 
   const togglePin = useCallback((id: IndicatorId, next: boolean): void => {
     setPinned((prev) => {
@@ -665,6 +218,22 @@ export function Insights() {
     focusCard(id);
   }, [state, focusCard]);
 
+  // The Tools disclosure + the "/" and j/k shortcuts + the I13 filter
+  // model — moved verbatim to insights-sections/useInsightsToolsNav.ts
+  // (Phase 3-e).
+  const {
+    toolsOpen,
+    setToolsOpen,
+    statusFilter,
+    setStatusFilter,
+    query,
+    setQuery,
+    visibleIds,
+    searchActive,
+    searchInputRef,
+    toolsButtonRef,
+  } = useInsightsToolsNav({ state, copy, focusCard });
+
   const jumpAbout = useCallback(() => {
     setAboutToken((n) => n + 1);
   }, []);
@@ -680,80 +249,6 @@ export function Insights() {
       el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
     }
   }, []);
-
-  // I9/R15: "/" opens Tools and focuses the search (the old inline focus).
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent): void => {
-      if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
-      const active = document.activeElement;
-      if (
-        active instanceof HTMLElement &&
-        (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT' || active.isContentEditable)
-      ) {
-        return;
-      }
-      e.preventDefault();
-      setToolsOpen(true);
-      requestAnimationFrame(() => searchInputRef.current?.focus());
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, []);
-
-  // I13: j/k walks the visible items (rows + cards, lane order).
-  const visibleIds = useMemo(() => {
-    if (state.kind !== 'ready') return null;
-    return filterVisibleIds(state.snapshot.readings, { status: statusFilter, query }, (id) => ({
-      name: copy.indicators[id].name,
-      ticker: copy.indicators[id].ticker,
-    }));
-  }, [state, statusFilter, query, copy]);
-
-  const lastNavIdRef = useRef<IndicatorId | null>(null);
-  useEffect(() => {
-    if (state.kind !== 'ready') return;
-    const onKeyDown = (e: KeyboardEvent): void => {
-      if ((e.key !== 'j' && e.key !== 'k') || e.ctrlKey || e.metaKey || e.altKey) return;
-      const active = document.activeElement;
-      if (
-        active instanceof HTMLElement &&
-        (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT' || active.isContentEditable)
-      ) {
-        return;
-      }
-      // Walk the CURRENT lane's items (prices-board ids ride along).
-      const order: IndicatorId[] = state.snapshot.readings
-        .map((r) => r.id)
-        .filter((id) => (visibleIds === null || visibleIds.has(id)));
-      if (order.length === 0) return;
-      e.preventDefault();
-      let anchor = lastNavIdRef.current !== null && order.includes(lastNavIdRef.current) ? order.indexOf(lastNavIdRef.current) : -1;
-      if (anchor === -1) {
-        for (let i = 0; i < order.length; i++) {
-          const el = document.getElementById(`insights-card-${order[i]}`);
-          if (el && el.getBoundingClientRect().bottom > 96) {
-            anchor = i;
-            break;
-          }
-        }
-      }
-      const next = e.key === 'j' ? Math.min(anchor + 1, order.length - 1) : Math.max(anchor - 1, 0);
-      const id = order[next];
-      if (id === undefined) return;
-      lastNavIdRef.current = id;
-      focusCard(id);
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [state, visibleIds, focusCard]);
-
-  // R15 → round 33: BOTH dedicated sections render on the page now, so the
-  // Tools counts describe everything on screen (the whole snapshot again —
-  // the old lane-scoped counts belonged to the removed switcher).
-  const laneCounts = useMemo(() => {
-    if (state.kind !== 'ready') return { all: 0, warning: 0, unusual: 0, normal: 0, context: 0 };
-    return statusCounts(state.snapshot.readings);
-  }, [state]);
 
   // I10: items rendering inside the lanes — visible under the filter and
   // not pinned (pinned items render in the watchlist strip).
@@ -773,82 +268,6 @@ export function Insights() {
     if (state.kind !== 'ready') return [];
     return state.snapshot.readings.filter((r) => pinned.has(r.id) && (visibleIds === null || visibleIds.has(r.id)));
   }, [state, pinned, visibleIds]);
-
-  // H4/R12: "Data as of {date}" — the unambiguous word-date (no seconds:
-  // a daily snapshot) with the relative age beside it. Step-1 G7: the live
-  // prices' own clock rides beside it when the serve-time overlay stamped
-  // one ("prices updated HH:MM") — the honest "daily snapshot + hourly
-  // prices" story in one line.
-  const dataAsOfLine = useMemo(() => {
-    if (state.kind !== 'ready') return null;
-    const iso = state.snapshot.generatedAt;
-    const dateText = locale === 'fa' ? formatJalaliDate(iso, 'fa-IR') : formatDateWords(iso, 'en-US');
-    const pricesIso = state.snapshot.pricesAsOf;
-    const pricesText =
-      pricesIso !== undefined
-        ? locale === 'fa'
-          ? formatJalaliDate(pricesIso, 'fa-IR', { withTime: true })
-          : new Intl.DateTimeFormat('en-AU', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }).format(new Date(pricesIso))
-        : null;
-    return {
-      date: dateText,
-      prices: pricesText,
-      tooltip: copy.ui.dataAsOfTooltip,
-    };
-  }, [state, locale, copy.ui.dataAsOfTooltip]);
-
-  const searchActive = statusFilter !== 'all' || query.trim() !== '';
-
-  // Downloads (R15: they live in Tools now).
-  const downloadCsv = useCallback(() => {
-    if (state.kind !== 'ready') return;
-    void import('../components/insights/insights-csv').then(({ buildInsightsCsv, insightsCsvFilename }) => {
-      const csv = buildInsightsCsv(state.snapshot, copy);
-      void import('../lib/download').then(({ downloadBlob }) => {
-        downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }), insightsCsvFilename(state.snapshot.generatedAt));
-      });
-    });
-  }, [state, copy]);
-
-  const downloadIcs = useCallback(() => {
-    if (state.kind !== 'ready') return;
-    void Promise.all([import('../components/insights/ics'), import('../lib/download')]).then(
-      ([{ buildInsightsIcs }, { downloadBlob }]) => {
-        const ics = buildInsightsIcs(state.snapshot.calendar, locale);
-        downloadBlob(new Blob([ics], { type: 'text/calendar;charset=utf-8' }), 'currena-insights-calendar.ics');
-      },
-    );
-  }, [state, locale]);
-
-  // The world-markets table export (spec §6.4: the table's CSV lives in the
-  // existing Tools menu). Only offered while a markets snapshot is in hand.
-  const downloadMarketsCsv = useCallback(() => {
-    if (marketsState.kind !== 'ready') return;
-    void import('../components/insights/markets-csv').then(({ buildMarketsCsv, marketsCsvFilename }) => {
-      const csv = buildMarketsCsv(marketsState.snapshot, copy);
-      void import('../lib/download').then(({ downloadBlob }) => {
-        downloadBlob(
-          new Blob([csv], { type: 'text/csv;charset=utf-8' }),
-          marketsCsvFilename(marketsState.snapshot.generatedAt),
-        );
-      });
-    });
-  }, [marketsState, copy]);
-
-  // The world-currencies pairs export (spec §9.3 item 6: the CSV goes in
-  // the same Tools menu). Only offered while an fx snapshot is in hand.
-  const downloadFxCsv = useCallback(() => {
-    if (fxState.kind !== 'ready') return;
-    void import('../components/insights/fx-csv').then(({ buildFxCsv, fxCsvFilename }) => {
-      const csv = buildFxCsv(fxState.snapshot, copy);
-      void import('../lib/download').then(({ downloadBlob }) => {
-        downloadBlob(
-          new Blob([csv], { type: 'text/csv;charset=utf-8' }),
-          fxCsvFilename(fxState.snapshot.generatedAt),
-        );
-      });
-    });
-  }, [fxState, copy]);
 
   // P1/R19: the sticky section nav — the Signals pill joins the row (the
   // built page had the section but no pill) and every pill expands its
@@ -881,92 +300,41 @@ export function Insights() {
   return (
     <div className="mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-6xl lg:px-8">
       <ReadingProgress label={copy.ui.progressLabel} />
-      <header className="mb-3">
-        <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
-          <div className="min-w-0">
-            <h1 className="m-0 text-2xl font-bold tracking-tight">{t('insights.title')}</h1>
-            <p className="mt-1 mb-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.ui.subtitle}</p>
-            {dataAsOfLine ? (
-              <p className="mt-1 mb-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]" title={dataAsOfLine.tooltip}>
-                <bdi>
-                  {interpolate(copy.ui.dataAsOf, { date: dataAsOfLine.date })}
-                  {dataAsOfLine.prices !== null ? (
-                    <span className="opacity-80"> · {interpolate(copy.ui.pricesUpdated, { time: dataAsOfLine.prices })}</span>
-                  ) : null}
-                  <span aria-hidden="true"> ⓘ</span>
-                </bdi>
-                <span className="sr-only">, {dataAsOfLine.tooltip}</span>
-              </p>
-            ) : null}
-          </div>
-          {/* R15: ONE Tools disclosure — search, filter, shortcuts, .ics, CSV. */}
-          {state.kind === 'ready' ? (
-            <ToolsMenu
-              copy={copy}
-              numberLocale={numberLocale}
-              open={toolsOpen}
-              onOpenChange={setToolsOpen}
-              counts={laneCounts}
-              status={statusFilter}
-              onStatusChange={setStatusFilter}
-              query={query}
-              onQueryChange={setQuery}
-              searchInputRef={searchInputRef}
-              buttonRef={toolsButtonRef}
-              onDownloadCsv={downloadCsv}
-              onDownloadIcs={downloadIcs}
-              onDownloadMarketsCsv={marketsState.kind === 'ready' ? downloadMarketsCsv : undefined}
-              onDownloadFxCsv={fxState.kind === 'ready' ? downloadFxCsv : undefined}
-            />
-          ) : null}
-        </div>
-      </header>
+      <InsightsHeader
+        t={t}
+        copy={copy}
+        locale={locale}
+        numberLocale={numberLocale}
+        state={state}
+        toolsOpen={toolsOpen}
+        setToolsOpen={setToolsOpen}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        query={query}
+        setQuery={setQuery}
+        searchInputRef={searchInputRef}
+        toolsButtonRef={toolsButtonRef}
+        marketsState={marketsState}
+        downloadMarketsCsv={downloadMarketsCsv}
+        fxState={fxState}
+        downloadFxCsv={downloadFxCsv}
+      />
 
       {/* Round 33 (owner): the Global | Australia switch is GONE — it sat
        * above the fold doing invisible work (and read as broken). Both
        * dedicated sections render stacked mid-page instead, each with its
        * own big icon; the hero's "View section" links scroll to them. */}
 
-      {state.kind === 'loading' ? (
-        <div className="flex flex-col gap-6" role="status" aria-live="polite">
-          <SummarySkeleton />
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2.5" aria-hidden="true">
-            {Array.from({ length: 6 }, (_, i) => (
-              <Skeleton key={i} className="h-28 rounded-[18px]" />
-            ))}
-          </div>
-        </div>
-      ) : null}
+      {state.kind === 'loading' ? <InsightsLoadingState /> : null}
 
       {state.kind === 'error' ? (
-        <div className="flex flex-col gap-6">
-          <div className="rounded-[var(--radius-lg)] bg-currena-warning/10 px-5 py-6 text-center ring-1 ring-currena-warning/30">
-            <p className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-status-alert)]">
-              <TriangleAlert aria-hidden size={18} strokeWidth={1.9} className="me-1 inline-block align-[-4px]" />
-              {copy.ui.loadError}
-            </p>
-            <p className="mt-1 mb-3 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{state.message}</p>
-            <Button variant="cta" onClick={() => setRetryToken((n) => n + 1)}>
-              {copy.ui.retry}
-            </Button>
-          </div>
-        </div>
+        <InsightsErrorState copy={copy} message={state.message} onRetry={() => setRetryToken((n) => n + 1)} />
       ) : null}
 
       {state.kind === 'ready' ? (
         <div className="flex flex-col gap-7">
           {state.fromCache ? (
-            <div
-              role="status"
-              className="slide-down flex items-center gap-3 rounded-[var(--radius-md)] border-s-4 border-currena-warning bg-currena-warning/15 px-4 py-3"
-            >
-              <TriangleAlert aria-hidden size={22} strokeWidth={1.9} className="shrink-0 text-[var(--color-status-alert)]" />
-              <p className="m-0 text-[length:var(--type-label)] font-semibold text-[var(--color-status-alert)]">
-                {interpolate(copy.ui.dataFrom, {
-                  date: formatRelative(state.snapshot.generatedAt, locale === 'fa' ? 'fa-IR' : 'en-US'),
-                })}
-              </p>
-            </div>
+            <StaleCacheNotice copy={copy} locale={locale} generatedAt={state.snapshot.generatedAt} />
           ) : null}
 
           {/* The hero (R1–R4) — Global first, both verdicts above the fold. */}
@@ -1048,88 +416,20 @@ export function Insights() {
            * own BIG icon (96px mobile / 128×128 desktop) beside its heading:
            * the big region artwork's one rightful home (the hero keeps a
            * quiet 48/64 mark). The old switcher is gone. */}
-          <div id="insights-section-lane" className="scroll-mt-24 flex flex-col gap-10">
-            {visibleIds !== null && visibleIds.size === 0 ? (
-              <div className="rounded-[var(--radius-lg)] bg-currena-soft/60 px-5 py-8 text-center ring-1 ring-[var(--color-border)]">
-                <div
-                  aria-hidden="true"
-                  className="mx-auto mb-1 flex h-11 w-11 items-center justify-center rounded-full bg-currena-blue/10 text-[var(--color-status-context)]"
-                >
-                  <Search size={24} strokeWidth={1.8} />
-                </div>
-                <p className="mt-1 mb-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-primary)]">
-                  {copy.ui.noMatches}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStatusFilter('all');
-                    setQuery('');
-                  }}
-                  className="insights-focusable mt-3 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-currena-blue/40 bg-currena-blue/15 px-5 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
-                >
-                  {copy.ui.clearFilters}
-                </button>
-              </div>
-            ) : (
-              <>
-                {pinnedReadings.length > 0 ? (
-                  <PinnedSection
-                    readings={pinnedReadings}
-                    copy={copy}
-                    numberLocale={numberLocale}
-                    onOpenDetails={openDetails}
-                    pinned={pinned}
-                  />
-                ) : null}
-                {SECTION_ORDER.map((sec) => (
-                  <section
-                    key={sec}
-                    id={`insights-section-${sec}`}
-                    aria-labelledby={`insights-section-${sec}-title`}
-                    /* Round 39 (owner): "put all of global metrics inside a
-                     * mother container, currently the heading of global looks
-                     * stray, it needs depth and container" + "australia must
-                     * have separate mother container" → EACH region section
-                     * IS its own mother container now: the soft family tint
-                     * (the same currena-soft field the no-match box wears),
-                     * a hairline ring and a quiet shadow for depth — the
-                     * heading + its 96/128 artwork and every metric group
-                     * live INSIDE it. Gold stays the money panel's focal
-                     * accent; the regions get the neutral depth. Separate
-                     * containers by structure — the map renders one <section>
-                     * per region, so global and australia can never share
-                     * or fuse their boxes. The anchors, aria and scroll
-                     * margins are untouched. */
-                    className="scroll-mt-24 flex flex-col gap-6 rounded-[var(--radius-lg)] bg-currena-soft/60 p-4 shadow-[0_10px_34px_rgba(15,23,42,0.07)] ring-1 ring-[var(--color-border)] sm:p-6 dark:shadow-[0_14px_44px_rgba(0,0,0,0.4)]"
-                  >
-                    <h2
-                      id={`insights-section-${sec}-title`}
-                      className="type-section m-0 flex items-center gap-4"
-                    >
-                      <IconImg src={sectionIconUrl(sec)} size={96} desktopSize={128} className="shrink-0" />
-                      <span className="min-w-0">{copy.sections[sec]}</span>
-                    </h2>
-                    {GROUP_ORDER[sec].map((group: IndicatorGroupId) => (
-                      <QuestionGroup
-                        key={group}
-                        group={group}
-                        section={sec}
-                        snapshot={state.snapshot}
-                        copy={copy}
-                        numberLocale={numberLocale}
-                        onOpenDetails={openDetails}
-                        pinned={pinned}
-                        renderableIds={sectionIds}
-                        revealIds={revealIds}
-                        searchActive={searchActive}
-                      />
-                    ))}
-                  </section>
-                ))}
-              </>
-            )}
-          </div>
+          <SectionLane
+            snapshot={state.snapshot}
+            copy={copy}
+            numberLocale={numberLocale}
+            visibleIds={visibleIds}
+            pinnedReadings={pinnedReadings}
+            openDetails={openDetails}
+            pinned={pinned}
+            sectionIds={sectionIds}
+            revealIds={revealIds}
+            searchActive={searchActive}
+            setStatusFilter={setStatusFilter}
+            setQuery={setQuery}
+          />
 
           {/* R16: the calendar — once, below the indicators, before About. */}
           <NextUpStrip

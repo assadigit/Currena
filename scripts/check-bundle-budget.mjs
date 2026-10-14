@@ -270,7 +270,18 @@ const BUDGETS = [
   // The ENTRY chunk stays untouched (290.36/87.08 vs 296/89.5) — the
   // section remains lazy. Justified in CHANGELOG §2026-10-14
   // (world currencies v1.3).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 580_000, gz: 137_000, label: 'Insights lazy chunk' },
+  // Phase 3-e route-split bump (579.62/136.48 → 581.31/136.72, budget
+  // 580/137 → 582/137): the /insights route monolith (1,164 lines) was
+  // split into section modules (insights-sections/: header, status
+  // chrome, question groups, section lane, world feeds, tools nav) with
+  // ZERO behavior change — the +1.69 kB raw is purely the prop plumbing
+  // of the new component boundaries (repeated prop names at call sites);
+  // gzip stays +0.24 kB and INSIDE the unchanged 137 budget. The ENTRY
+  // chunk is untouched (290.36/87.08 vs 296/89.5). Maintainability
+  // (route halves; every section independently navigable) for a 0.23%
+  // raw cost on a lazy chunk. Justified in CHANGELOG §2026-10-15
+  // (Phase 3-e) + D-16 in docs/DECISIONS_FOR_ALI.md.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 582_000, gz: 137_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {
