@@ -1,5 +1,14 @@
 # Currena — Remaining & Deferred Work (the follow-up work order)
 
+> **STATUS: CLOSED — 2026-10-15.** Every item is either DONE or DECLINED
+> with a recorded reason: WS-1 (D-19/D-20/D-21) · WS-2 (D-22) · WS-3
+> (D-23: 1–6 implemented, 7–9 declined) · WS-4 (all six splits + B-4) ·
+> WS-5 (D-24: 34 → 14 advisories, declines reasoned) · WS-6 (D-25/D-26/
+> D-27 awaiting Ali). The disposition record: CHANGELOG §2026-10-15b,
+> PROGRESS row 2026-10-15b, DEPLOY.md's last session record, and
+> docs/DECISIONS_FOR_ALI.md D-19…D-27. The owner-side checklist below
+> (token rotation first) remains open by design — it is owner work.
+
 Commissioned **2026-10-15** by the owner after the QA long-run
 (audit → reliability hardening → de-monolith-ing → dead code/a11y/lint →
 deploy + live-verify — see `docs/PROGRESS.md` 2026-10-15 row,
