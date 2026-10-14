@@ -4,6 +4,24 @@
  *   idle → fetching (loader ≥700ms, even on an instant cache hit)
  *        → result (popup + ~800ms odometer)
  *
+ * Since the WS-4 module split this file is the SHELL ONLY (the Phase-3
+ * recipe, zero behavior change — the code moved verbatim):
+ *
+ *   converter/shared.ts           — pure constants/types (quick amounts,
+ *                                   TOOLS, POPULAR_PAIRS, sleep, failure)
+ *   converter/RetryCountdown.tsx  — I12's live auto-retry countdown
+ *   converter/ConvertForm.tsx     — the amount-first converting card
+ *   converter/AlertsSectionRow.tsx — the I14 alerts section row
+ *   converter/PairChips.tsx       — recent/popular pair chips
+ *   converter/FailureCard.tsx     — the I12 honest failure card
+ *   converter/QuickTools.tsx      — the quick-tools anchor grid
+ *
+ * The shell keeps the conversion STATE MACHINE (phase, onSubmit,
+ * runConversion, toFailure), every effect (meta fetch, recents hydration,
+ * the A-key shortcut, I12 self-heal, deep-link prefill), the LED boards
+ * row, the overlays and the dialog wiring — the machine's hook wiring is
+ * the route's behavior-sensitive core (D-17's documented patterns).
+ *
  * Network happens ONCE per freshness window (snapshot-store). Amount edits,
  * swap, currency changes and reverse conversions NEVER touch the network —
  * all math is local `@currena/core` over the in-memory snapshot:
@@ -27,32 +45,31 @@ import {
   CoreError,
   convert,
   convertWithManualRate,
-  formatNumber,
-  formatRelative,
   reverseRate,
   tgjuProfileUrl,
   thousandSeparateInput,
   sourceForPair,
 } from '@currena/core';
 import type { ConversionResult, CurrencyCode } from '@currena/core';
-import { AmountInput, parseInputAmount } from '../components/AmountInput';
-import { CurrencySelect } from '../components/CurrencySelect';
+import { parseInputAmount } from '../components/AmountInput';
 import { LedGoldBoard } from '../components/LedGoldBoard';
 import { LedRateBoard } from '../components/LedRateBoard';
-import { LiveRateLine } from '../components/LiveRateLine';
 import { ResultPopup } from '../components/ResultPopup';
 import type { ConversionView } from '../components/ResultPopup';
-import { Button, Card, LoaderDots, OfflineBanner, StaleBanner } from '../components/ui';
+import { LoaderDots, OfflineBanner, StaleBanner } from '../components/ui';
 import { ApiError, fetchMeta } from '../lib/api';
 import { alertsStore, useAlerts } from '../lib/alerts';
-import { useCodeLabel } from '../lib/display';
 import { saveHistoryEntry } from '../lib/history';
 import { useI18n } from '../lib/locale';
 import { addRecentPair, readRecentPairs } from '../lib/recent-pairs';
 import type { RecentPair } from '../lib/recent-pairs';
 import { isConfirmedStale, snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
-import type { RoutePath } from '../router';
-import type { TranslationKey } from '../lib/locale';
+import { AlertsSectionRow } from './converter/AlertsSectionRow';
+import { ConvertForm } from './converter/ConvertForm';
+import { FailureCard } from './converter/FailureCard';
+import { PairChips } from './converter/PairChips';
+import { QuickTools } from './converter/QuickTools';
+import { MIN_FETCHING_MS, sleep, type ConvertFailure } from './converter/shared';
 
 // I14 — the alerts dialog is LAZY (bundle budget: the money page's entry
 // chunk carries the section row + badge + evaluation engine; the dialog's
@@ -62,73 +79,8 @@ const AlertsDialog = lazy(() => import('../components/AlertsDialog').then((m) =>
 
 type Phase = 'idle' | 'fetching' | 'result';
 
-interface ConvertFailure {
-  title: string;
-  lines: string[];
-}
-
-const sleep = (ms: number): Promise<void> => new Promise((resolve) => window.setTimeout(resolve, ms));
-
-/** Mission §8: the fetching state is shown for at least 700ms. */
-const MIN_FETCHING_MS = 700;
-
-/** One-tap amounts — international vs IRR-appropriate magnitudes. */
-const QUICK_AMOUNTS_INTL: readonly number[] = [10, 50, 100, 500, 1000];
-const QUICK_AMOUNTS_IRR: readonly number[] = [100_000, 500_000, 1_000_000, 5_000_000, 10_000_000];
-
-/** Quick tools (owner wireframe 2026-09-20): the six one-tap shortcuts that
- *  used to live in the desktop sidebar rail — now a full-width homepage
- *  section below the LED boards. */
-const TOOLS: readonly { path: RoutePath; emoji: string; labelKey: TranslationKey }[] = [
-  { path: '/calculator', emoji: '🧮', labelKey: 'nav.calculator' },
-  { path: '/batch', emoji: '🛒', labelKey: 'nav.batchConverter' },
-  { path: '/receipt', emoji: '📄', labelKey: 'nav.receiptGenerator' },
-  { path: '/splitter', emoji: '💰', labelKey: 'nav.expenseSplitter' },
-  { path: '/settle', emoji: '👥', labelKey: 'nav.splitSettle' },
-  { path: '/history', emoji: '📜', labelKey: 'nav.history' },
-];
-
-/** I11 — first-run pair suggestions until the first conversion exists.
- *  All IRR-side (TGJU open-market — the app's core use case), matching the
- *  default USD→IRR direction so the chips read as "this is what people do". */
-const POPULAR_PAIRS: readonly RecentPair[] = [
-  { from: 'USD', to: 'IRR' },
-  { from: 'EUR', to: 'IRR' },
-  { from: 'GBP', to: 'IRR' },
-  { from: 'AED', to: 'IRR' },
-  { from: 'TRY', to: 'IRR' },
-];
-
-/**
- * I12 — live countdown to the store's next automatic retry, rendered under
- * the failure card. Ticks locally every second (the store state itself
- * never re-emits — `nextRetryAt` is a single immutable stamp), stops
- * itself when the moment passes, and renders localized digits.
- */
-function RetryCountdown({ targetMs }: { targetMs: number }) {
-  const { t, numberLocale } = useI18n();
-  const [now, setNow] = useState(() => Date.now());
-
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, [targetMs]);
-
-  const seconds = Math.ceil((targetMs - now) / 1000);
-  if (seconds <= 0) return null;
-  return (
-    <p className="mt-2.5 flex items-center gap-1.5 text-xs font-semibold text-currena-warning-deep" aria-live="polite">
-      <span className="warning-pulse" aria-hidden="true">
-        ⏳
-      </span>
-      {t('errors.retryingIn', { seconds: formatNumber(seconds, numberLocale) })}
-    </p>
-  );
-}
-
 export function Converter() {
-  const { t, numberLocale } = useI18n();
-  const label = useCodeLabel();
+  const { t } = useI18n();
   const store = useSnapshotStore();
   // I14 — rate alerts: the section row's badge/dialog wiring.
   const { alerts, seenAt } = useAlerts();
@@ -263,11 +215,7 @@ export function Converter() {
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#/`);
   }, []);
 
-  const quickAmounts = from === 'IRR' ? QUICK_AMOUNTS_IRR : QUICK_AMOUNTS_INTL;
   const parsedAmount = parseInputAmount(amount);
-
-  const fromName = t(`currencies.${from}` as TranslationKey);
-  const toName = t(`currencies.${to}` as TranslationKey);
 
   const swap = (): void => {
     setFrom(to);
@@ -476,296 +424,66 @@ export function Converter() {
         </div>
       ) : null}
 
-      {/* ── Converter card — AMOUNT-FIRST (owner request 2026-09-17: the
-          number field must sit inside the first viewport, no scrolling,
-          and carry hero-level visual weight). Order: amount panel (with the
-          quick-amount chips inside it) → compact FROM ⇄ TO row with inline
-          flags → custom rate → CTA. The legacy 65px flags section and the
-          separate quick-amounts block are folded away to reclaim ~200px
-          of vertical space above the fold. ── */}
-      <Card padding="p-5 lg:p-7">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void onSubmit();
-          }}
-        >
-          {/* 1 — Amount hero panel (quick chips live inside the panel so they
-              read as one control: tap a chip, the big field fills) */}
-          <AmountInput
-            id="amount"
-            value={amount}
-            onChange={(v) => {
-              setAmount(v);
-              setAmountInvalid(false);
-            }}
-            currency={from}
-            invalid={amountInvalid}
-            footer={
-              <div className="flex flex-wrap gap-1.5">
-                {quickAmounts.map((value) => {
-                  const active = parsedAmount === value;
-                  return (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => {
-                        setAmount(thousandSeparateInput(String(value)));
-                        setAmountInvalid(false);
-                      }}
-                      aria-pressed={active}
-                      className={`min-h-[34px] cursor-pointer rounded-full border px-3 py-1 text-[0.8rem] font-bold transition-all duration-300 motion-safe:hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
-                        active
-                          ? 'amount-chip-active border-transparent shadow-[0_6px_18px_rgba(240,180,41,0.45)] dark:shadow-[0_6px_18px_rgba(102,126,234,0.4)]'
-                          : 'border-[#EBD48A] bg-white text-currena-dark hover:border-[#E8B923] hover:shadow-[0_4px_12px_rgba(240,180,41,0.18)] dark:border-white/10 dark:bg-[#222C3B] dark:hover:border-currena-blue/40 dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)]'
-                      }`}
-                    >
-                      {formatNumber(value, numberLocale, { maximumFractionDigits: 0 })}
-                    </button>
-                  );
-                })}
-              </div>
-            }
-          />
-
-          {/* 2 — Currency pair: compact row, flags inline inside the selects */}
-          <div className="mb-1.5 mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-center">
-            <span className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-currena-muted">{t('common.from')}</span>
-            <span aria-hidden="true" className="w-11" />
-            <span className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-currena-muted">{t('common.to')}</span>
-          </div>
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-            <div className="relative">
-              <img
-                src={`/images/flags/${from.toLowerCase()}.png`}
-                alt=""
-                aria-hidden="true"
-                className="pointer-events-none absolute start-3 top-1/2 z-10 h-3.5 w-[22px] -translate-y-1/2 rounded-[3px] object-cover shadow-[0_1px_3px_rgba(0,0,0,0.3)] ring-1 ring-white/60"
-              />
-              <CurrencySelect id="fromCurrency" value={from} onChange={setFrom} ariaLabel={t('common.from')} className="ps-10 text-[0.82rem]" />
-            </div>
-            <button
-              type="button"
-              onClick={swap}
-              title={t('converter.swapCurrencies')}
-              aria-label={t('converter.swapCurrencies')}
-              className="h-11 w-11 cursor-pointer rounded-full border-0 bg-currena-blue text-xl font-bold text-white shadow-[0_4px_15px_rgba(74,144,226,0.3)] transition-all duration-300 hover:rotate-180 hover:scale-110 hover:shadow-[0_6px_20px_rgba(74,144,226,0.4)]"
-            >
-              ⇄
-            </button>
-            <div className="relative">
-              <img
-                src={`/images/flags/${to.toLowerCase()}.png`}
-                alt=""
-                aria-hidden="true"
-                className="pointer-events-none absolute start-3 top-1/2 z-10 h-3.5 w-[22px] -translate-y-1/2 rounded-[3px] object-cover shadow-[0_1px_3px_rgba(0,0,0,0.3)] ring-1 ring-white/60"
-              />
-              <CurrencySelect id="toCurrency" value={to} onChange={setTo} ariaLabel={t('common.to')} className="ps-10 text-[0.82rem]" />
-            </div>
-          </div>
-          {/* Full names caption — restores the clarity of the old flags
-              section in one 16px line (the select boxes truncate long names) */}
-          <p className="mt-2.5 text-center text-xs font-medium text-currena-muted">
-            <bdi>{fromName}</bdi>{' '}
-            <span aria-hidden="true" className="inline-block opacity-50 rtl:-scale-x-100">→</span>{' '}
-            <bdi>{toName}</bdi>
-          </p>
-
-          {/* I11 — the pair's live rate, always on (previously only visible
-              inside the result popup). Local math over the booted snapshot;
-              hidden for same-currency pairs, unresolvable pairs and while a
-              custom rate overrides the market. */}
-          <LiveRateLine
-            from={from}
-            to={to}
-            snapshot={sourceState.snapshot}
-            stale={showStaleBanner}
-            hidden={manualOpen}
-          />
-
-          {/* 3 — Custom rate (legacy collapsible) */}
-          <div className="mb-4 mt-4">
-            <button
-              type="button"
-              onClick={() => setManualOpen((open) => !open)}
-              aria-expanded={manualOpen}
-              aria-controls={manualRateId}
-              className="flex w-full cursor-pointer items-center gap-2 rounded-xl border-0 bg-transparent px-3 py-2.5 text-sm font-medium text-currena-muted transition-all duration-300 hover:bg-currena-blue/5"
-            >
-              <span
-                className={`text-xs text-currena-blue transition-transform duration-300 ${manualOpen ? 'rotate-90' : ''}`}
-                aria-hidden="true"
-              >
-                ▶
-              </span>
-              {t('converter.customRate')}
-            </button>
-            {manualOpen ? (
-              <input
-                id={manualRateId}
-                type="text"
-                inputMode="decimal"
-                autoComplete="off"
-                value={manualRate}
-                onChange={(e) => setManualRate(e.target.value)}
-                placeholder={t('converter.enterCustomRate')}
-                aria-label={t('converter.enterCustomRate')}
-                className="mt-2.5 w-full rounded-[15px] border-2 border-gray-200 bg-white px-3.5 py-3 text-sm text-currena-dark focus:border-currena-blue focus:outline-none focus:ring-3 focus:ring-currena-blue/10 dark:border-white/10 dark:bg-[#222C3B]"
-              />
-            ) : null}
-          </div>
-
-          <Button variant="cta" type="submit" className="w-full py-4 text-[1.15rem] sm:py-5 sm:text-[1.25rem]">
-            {t('converter.convertNow')}
-          </Button>
-        </form>
-      </Card>
+      {/* ── Converter card — AMOUNT-FIRST (owner request 2026-09-17) ── */}
+      <ConvertForm
+        amount={amount}
+        setAmount={setAmount}
+        amountInvalid={amountInvalid}
+        setAmountInvalid={setAmountInvalid}
+        from={from}
+        setFrom={setFrom}
+        to={to}
+        setTo={setTo}
+        swap={swap}
+        parsedAmount={parsedAmount}
+        manualOpen={manualOpen}
+        setManualOpen={setManualOpen}
+        manualRate={manualRate}
+        setManualRate={setManualRate}
+        manualRateId={manualRateId}
+        pairSnapshot={sourceState.snapshot}
+        showStaleBanner={showStaleBanner}
+        onSubmit={() => void onSubmit()}
+      />
 
       {/* I14 — Rate alerts section row: the one-tap door to the alerts
           dialog (A key on desktop too). Badge = triggered-but-unseen; the
           sub-line summarizes the list once entries exist. */}
-      <div className="no-print mt-5">
-        <button
-          type="button"
-          onClick={() => {
-            alertsStore.ackAll();
-            setAlertsOpen(true);
-          }}
-          aria-haspopup="dialog"
-          className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl border border-currena-cyan/30 bg-currena-cyan/[0.06] px-4 py-3 text-start transition-all duration-300 hover:border-currena-cyan/60 hover:bg-currena-cyan/[0.1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue motion-safe:hover:-translate-y-0.5 dark:border-currena-cyan/25 dark:bg-currena-cyan/[0.07]"
-        >
-          <span className="flex min-w-0 items-center gap-2.5">
-            <span
-              aria-hidden="true"
-              className={unseenTriggered > 0 ? 'warning-pulse text-lg' : 'text-lg'}
-            >
-              🔔
-            </span>
-            <span className="min-w-0">
-              <span className="block text-sm font-bold text-currena-dark">{t('alerts.sectionTitle')}</span>
-              <span className="block truncate text-xs text-currena-muted">
-                {alerts.length === 0
-                  ? t('alerts.sectionHint')
-                  : waitingCount > 0 && triggeredCount > 0
-                    ? `${t('alerts.waitingCount', { count: formatNumber(waitingCount, numberLocale) })} · ${t('alerts.badge', { count: formatNumber(triggeredCount, numberLocale) })}`
-                    : waitingCount > 0
-                      ? t('alerts.waitingCount', { count: formatNumber(waitingCount, numberLocale) })
-                      : t('alerts.badge', { count: formatNumber(triggeredCount, numberLocale) })}
-              </span>
-            </span>
-          </span>
-          <span className="flex shrink-0 items-center gap-2">
-            {unseenTriggered > 0 ? (
-              <span className="grid h-6 min-w-6 place-items-center rounded-full bg-currena-warning-deep px-1.5 text-[0.7rem] font-black text-white shadow-[0_2px_8px_rgba(185,46,46,0.35)] dark:text-[#1A222E] dark:shadow-[0_2px_8px_rgba(255,128,128,0.25)]">
-                {formatNumber(unseenTriggered, numberLocale)}
-              </span>
-            ) : null}
-            <kbd className="hidden md:inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-white px-1.5 font-sans text-[0.65rem] font-bold text-currena-dark ring-1 ring-black/[0.08] dark:bg-[#243040] dark:text-currena-dark dark:ring-white/[0.12]">
-              A
-            </kbd>
-          </span>
-        </button>
-      </div>
+      <AlertsSectionRow
+        alertsLength={alerts.length}
+        waitingCount={waitingCount}
+        triggeredCount={triggeredCount}
+        unseenTriggered={unseenTriggered}
+        onOpen={() => {
+          alertsStore.ackAll();
+          setAlertsOpen(true);
+        }}
+      />
 
       {/* Pair chips — one-tap recall. Lives BELOW the converter now: the
           amount field owns the first viewport (it used to push the input
           below the fold on phones). First-run visitors (no conversions yet)
           get POPULAR pairs instead of an empty section; after the first
           conversion their own recents take over. */}
-      {(recentPairs.length > 0 || POPULAR_PAIRS.length > 0) && (
-        <div className="no-print mt-5">
-          <p className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-currena-muted">
-            {recentPairs.length > 0 ? `⚡ ${t('converter.recentPairs')}` : `🔥 ${t('converter.popularPairs')}`}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {(recentPairs.length > 0 ? recentPairs : POPULAR_PAIRS).map((pair) => {
-              const active = pair.from === from && pair.to === to;
-              return (
-                <button
-                  key={`${pair.from}-${pair.to}`}
-                  type="button"
-                  onClick={() => {
-                    setFrom(pair.from);
-                    setTo(pair.to);
-                  }}
-                  aria-pressed={active}
-                  className={`inline-flex min-h-[38px] cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300 motion-safe:hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
-                    active
-                      ? 'border-currena-blue bg-currena-blue/10 text-currena-blue shadow-[0_4px_12px_rgba(74,144,226,0.25)]'
-                      : 'border-black/10 bg-currena-soft text-currena-dark hover:border-currena-blue/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:border-white/10'
-                  }`}
-                >
-                  <img
-                    src={`/images/flags/${pair.from.toLowerCase()}.png`}
-                    alt=""
-                    className="h-3.5 w-5 rounded-[3px] object-cover"
-                  />
-                  <span dir="ltr">{label(pair.from)}</span>
-                  <span aria-hidden="true" className="opacity-40">→</span>
-                  <img
-                    src={`/images/flags/${pair.to.toLowerCase()}.png`}
-                    alt=""
-                    className="h-3.5 w-5 rounded-[3px] object-cover"
-                  />
-                  <span dir="ltr">{label(pair.to)}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      <PairChips
+        recentPairs={recentPairs}
+        from={from}
+        to={to}
+        onPick={(pair) => {
+          setFrom(pair.from);
+          setTo(pair.to);
+        }}
+      />
 
       {/* Failure card (I12 redesign: honest kind-aware copy + Try again +
           the live auto-retry countdown while the store self-heals). */}
       {failure && phase === 'idle' ? (
-        <div role="alert" data-testid="convert-failure" className="slide-down">
-          <Card className="mt-5 border-s-4 border-currena-warning!" padding="p-5">
-            <div className="flex items-start gap-3.5">
-              <span
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-currena-warning/15 text-xl"
-                aria-hidden="true"
-              >
-                ⚠️
-              </span>
-              <div className="min-w-0 flex-1">
-                <h2 className="text-sm font-bold text-currena-warning-deep">{failure.title}</h2>
-                <div className="mt-1 space-y-0.5">
-                  {failure.lines.map((line, i) =>
-                    line === '' ? (
-                      <div key={i} className="h-2" />
-                    ) : (
-                      <p key={i} className="text-xs leading-relaxed text-currena-dark dark:text-slate-300">
-                        {line}
-                      </p>
-                    ),
-                  )}
-                </div>
-                {/* Self-healing countdown — only while the failing source has
-                    nothing to serve (first-visit during an outage window). */}
-                {sourceState.nextRetryAt && !sourceState.snapshot ? (
-                  <RetryCountdown targetMs={sourceState.nextRetryAt} />
-                ) : null}
-                {sourceState.snapshot ? (
-                  <p className="mt-2 text-xs text-currena-muted">
-                    {t('common.lastUpdated')}: {formatRelative(sourceState.snapshot.fetchedAt, numberLocale)}
-                  </p>
-                ) : null}
-              </div>
-            </div>
-            <div className="mt-4 flex justify-end">
-              <Button
-                variant="secondary"
-                onClick={() => void onSubmit()}
-                className="px-5 py-2.5 text-sm"
-                data-testid="convert-retry"
-              >
-                <span className="flex items-center gap-2">
-                  <span aria-hidden="true">↻</span> {t('converter.tryAgain')}
-                </span>
-              </Button>
-            </div>
-          </Card>
-        </div>
+        <FailureCard
+          failure={failure}
+          nextRetryAt={sourceState.nextRetryAt}
+          snapshotFetchedAt={sourceState.snapshot?.fetchedAt ?? null}
+          onRetry={() => void onSubmit()}
+        />
       ) : null}
 
       {/* ── LED boards two-up (owner wireframe 2026-09-20) — the SAME two
@@ -787,33 +505,7 @@ export function Converter() {
         </div>
       </div>
 
-      {/* ── Quick tools (owner wireframe 2026-09-20) — the former sidebar
-          rail's tool grid as a FULL-WIDTH homepage section: 2-up on phones,
-          3-up from sm, all six on one line from lg. ── */}
-      <section className="no-print mt-8 lg:mt-12" aria-label={t('converter.quickTools')}>
-        <h2 className="mb-4 text-base font-bold text-currena-dark">
-          ⚡ {t('converter.quickTools')}
-        </h2>
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
-          {TOOLS.map(({ path, emoji, labelKey }) => (
-            /* REAL links (audit WS-3 #6): href semantics for AT (link
-               lists, open-in-tab, status bar) + the browser's own
-               activation — the hash router picks the change up natively. */
-            <a
-              key={path}
-              href={`#${path}`}
-              className="flex flex-col items-center gap-2 rounded-2xl bg-white px-3 py-4 text-center no-underline shadow-[0_4px_16px_rgba(0,0,0,0.05)] ring-1 ring-black/[0.04] transition-all duration-300 hover:-translate-y-0.5 hover:bg-currena-blue/10 hover:shadow-[0_8px_20px_rgba(74,144,226,0.15)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue dark:bg-[#1A222E] dark:shadow-[0_4px_16px_rgba(0,0,0,0.35)] dark:ring-white/[0.06] dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.5)]"
-            >
-              <span className="text-2xl" aria-hidden="true">
-                {emoji}
-              </span>
-              <span className="text-xs font-bold leading-snug text-currena-dark">
-                {t(labelKey)}
-              </span>
-            </a>
-          ))}
-        </div>
-      </section>
+      <QuickTools />
 
       {/* Fetching overlay (legacy .loading-overlay) */}
       {phase === 'fetching' ? (
