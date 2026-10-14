@@ -404,6 +404,82 @@ describe('routes (injected service — no Workers, no live sites)', () => {
     expect(body.count).toBe(0);
   });
 
+  it('GET /api/status with a dead store → 200 with degraded rows, never a 500 (audit A-3)', async () => {
+    const deadStore: import('@currena/scraper').RateStore = {
+      getSnapshot: async () => {
+        throw new Error('KV get failed');
+      },
+      putSnapshot: async () => {},
+      getStatus: async () => {
+        throw new Error('KV get failed');
+      },
+      putStatus: async () => {},
+      tryAcquireLock: async () => false,
+      releaseLock: async () => {},
+    };
+    const app = createApp({
+      makeService: () =>
+        new RatesService({
+          store: deadStore,
+          scrapers: {
+            tgju: async () => tgjuSnapshot(new Date(clockMs).toISOString()),
+            frankfurter: async () => frankfurterSnapshot(new Date(clockMs).toISOString()),
+          },
+          now: () => new Date(clockMs),
+        }),
+    });
+    const res = await app.request('/api/status', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('no-store');
+    const body = (await res.json()) as {
+      sources: Array<{ source: string; cache: { present: boolean; fresh: boolean } }>;
+    };
+    expect(body.sources).toHaveLength(2);
+    for (const row of body.sources) {
+      expect(row.cache.present).toBe(false);
+      expect(row.cache.fresh).toBe(false);
+    }
+  });
+
+  it('GET /admin with a dead KV binding → the console still renders (200 HTML, audit A-3)', async () => {
+    const deadStore: import('@currena/scraper').RateStore = {
+      getSnapshot: async () => {
+        throw new Error('KV get failed');
+      },
+      putSnapshot: async () => {},
+      getStatus: async () => {
+        throw new Error('KV get failed');
+      },
+      putStatus: async () => {},
+      tryAcquireLock: async () => false,
+      releaseLock: async () => {},
+    };
+    const envBrokenKv: Bindings = {
+      RATES: {
+        get: async () => {
+          throw new Error('KV unavailable');
+        },
+      } as unknown as KVNamespace,
+      REFRESH_SECRET: 'test-secret',
+    };
+    const app = createApp({
+      makeService: () =>
+        new RatesService({
+          store: deadStore,
+          scrapers: {
+            tgju: async () => tgjuSnapshot(new Date(clockMs).toISOString()),
+            frankfurter: async () => frankfurterSnapshot(new Date(clockMs).toISOString()),
+          },
+          now: () => new Date(clockMs),
+        }),
+    });
+    const res = await app.request('/admin', undefined, envBrokenKv);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain('text/html');
+    const html = await res.text();
+    expect(html).toContain('Currena'); // the console skeleton rendered
+  });
+
   /* --------------------------- internal refresh -------------------------- */
 
   it('POST /internal/refresh without REFRESH_SECRET → 501', async () => {

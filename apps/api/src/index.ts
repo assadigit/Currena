@@ -498,10 +498,14 @@ export function createApp(deps: AppDeps = {}) {
     } = {},
   ) {
     const service = makeService(c.env);
+    // Store-failure honesty (QA audit A-3): every read here degrades
+    // independently — a KV failure must never take the whole ops console
+    // down (the console is the tool you reach for BECAUSE something is
+    // wrong). Snapshot cards simply render as "no snapshot".
     const [report, tgju, frankfurter, insights] = await Promise.all([
       service.status(),
-      service.snapshot('tgju'),
-      service.snapshot('frankfurter'),
+      service.snapshot('tgju').catch(() => undefined),
+      service.snapshot('frankfurter').catch(() => undefined),
       // Insights freshness is optional telemetry — a failed read (broken KV
       // binding, poisoned entry) must never take the whole console down;
       // the card simply omits itself when the status is absent.

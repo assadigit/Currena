@@ -259,12 +259,25 @@ export class RatesService {
     const now = this.now();
     // Parallel reads: 4 sequential KV round-trips used to gate this route
     // (and every /admin view) end to end.
+    // Store-failure honesty (QA audit A-3): a read failure degrades the
+    // ROW, never the whole report — /api/status and /admin must survive
+    // partial KV trouble exactly like the ladder does. allSettled keeps
+    // the reads parallel while isolating each side's failure (a dead
+    // status read must not also hide a perfectly readable snapshot).
     const sources = await Promise.all(
       (['tgju', 'frankfurter'] as const).map(async (source): Promise<StatusReportSource> => {
-        const [status, snapshot] = await Promise.all([
+        const [statusRes, snapshotRes] = await Promise.allSettled([
           this.store.getStatus(source),
           this.store.getSnapshot(source),
         ]);
+        const status = statusRes.status === 'fulfilled' ? statusRes.value : undefined;
+        const snapshot = snapshotRes.status === 'fulfilled' ? snapshotRes.value : undefined;
+        if (statusRes.status === 'rejected') {
+          console.warn(`[rates] status read failed for ${source}:`, statusRes.reason);
+        }
+        if (snapshotRes.status === 'rejected') {
+          console.warn(`[rates] snapshot read failed for ${source}:`, snapshotRes.reason);
+        }
         const cacheAgeSec = snapshot ? Math.max(0, ageSec(snapshot.fetchedAt, now)) : undefined;
         return {
           source,

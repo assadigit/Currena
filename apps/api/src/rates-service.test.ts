@@ -559,6 +559,97 @@ describe('RatesService ladder (in-memory store + fake scrapers)', () => {
     expect(frankfurter?.cache.fresh).toBe(false);
     expect(frankfurter?.status).toBeUndefined();
   });
+
+  it('status() degrades per-row when EVERY store read fails (audit A-3) — never throws', async () => {
+    const deadStore: RateStore = {
+      getSnapshot: async () => {
+        throw new Error('KV get failed');
+      },
+      putSnapshot: async () => {},
+      getStatus: async () => {
+        throw new Error('KV get failed');
+      },
+      putStatus: async () => {},
+      tryAcquireLock: async () => false,
+      releaseLock: async () => {},
+    };
+    const service = new RatesService({
+      store: deadStore,
+      scrapers: {
+        tgju: async () => snapshots['tgju'] as Snapshot,
+        frankfurter: async () => snapshots['frankfurter'] as Snapshot,
+      },
+      now: () => new Date(clockMs),
+    });
+
+    const report = await service.status();
+    expect(report.sources).toHaveLength(2);
+    for (const row of report.sources) {
+      expect(row.status).toBeUndefined();
+      expect(row.cache.present).toBe(false);
+      expect(row.cache.fresh).toBe(false);
+    }
+  });
+
+  it('status() isolates sides: a dead STATUS read must not hide a readable snapshot (allSettled)', async () => {
+    await store.putSnapshot('tgju', tgjuSnapshot(new Date(clockMs).toISOString()), 7 * 86_400);
+    const statusReadsDead: RateStore = {
+      getSnapshot: (source) => store.getSnapshot(source),
+      putSnapshot: (source, snapshot, ttlSec) => store.putSnapshot(source, snapshot, ttlSec),
+      getStatus: async () => {
+        throw new Error('KV get failed');
+      },
+      putStatus: (source, status) => store.putStatus(source, status),
+      tryAcquireLock: (source, ttlSec) => store.tryAcquireLock(source, ttlSec),
+      releaseLock: (source, token) => store.releaseLock(source, token),
+    };
+    const service = new RatesService({
+      store: statusReadsDead,
+      scrapers: {
+        tgju: async () => snapshots['tgju'] as Snapshot,
+        frankfurter: async () => snapshots['frankfurter'] as Snapshot,
+      },
+      now: () => new Date(clockMs),
+    });
+
+    const report = await service.status();
+    const tgju = report.sources.find((s) => s.source === 'tgju');
+    expect(tgju?.status).toBeUndefined(); // that read failed
+    expect(tgju?.cache.present).toBe(true); // but the snapshot is still reported
+    expect(tgju?.cache.fresh).toBe(true);
+  });
+
+  it('status() isolates sides: a dead SNAPSHOT read must not hide a readable status', async () => {
+    await store.putStatus('tgju', {
+      source: 'tgju',
+      lastScrapeAt: new Date(clockMs).toISOString(),
+      lastSuccessAt: new Date(clockMs).toISOString(),
+      lastDurationMs: 100,
+    });
+    const snapshotReadsDead: RateStore = {
+      getSnapshot: async () => {
+        throw new Error('KV get failed');
+      },
+      putSnapshot: (source, snapshot, ttlSec) => store.putSnapshot(source, snapshot, ttlSec),
+      getStatus: (source) => store.getStatus(source),
+      putStatus: (source, status) => store.putStatus(source, status),
+      tryAcquireLock: (source, ttlSec) => store.tryAcquireLock(source, ttlSec),
+      releaseLock: (source, token) => store.releaseLock(source, token),
+    };
+    const service = new RatesService({
+      store: snapshotReadsDead,
+      scrapers: {
+        tgju: async () => snapshots['tgju'] as Snapshot,
+        frankfurter: async () => snapshots['frankfurter'] as Snapshot,
+      },
+      now: () => new Date(clockMs),
+    });
+
+    const report = await service.status();
+    const tgju = report.sources.find((s) => s.source === 'tgju');
+    expect(tgju?.status?.lastSuccessAt).toBeDefined(); // that read succeeded
+    expect(tgju?.cache.present).toBe(false); // the snapshot read failed
+  });
 });
 
 describe('humanizeAge', () => {
