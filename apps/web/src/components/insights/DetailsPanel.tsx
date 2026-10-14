@@ -22,7 +22,7 @@ import { Star, X } from 'lucide-react';
 import { IconImg, indicatorIconUrl } from '../icons/currena';
 import { HistoryChart, formatAsOf } from './HistoryChart';
 import { definitionFor, formatRuleText } from './config';
-import { staleAfterDaysFor } from '@currena/insights';
+import { staleAfterDaysFor, RULE_CHANGELOG, RULE_VERSION } from '@currena/insights';
 
 function Section({ title, body }: { title: string; body: string }) {
   return (
@@ -75,6 +75,15 @@ function CardFacts({
       <span aria-hidden="true" className="opacity-50">·</span>
       <span className={def.rule.kind === 'info' ? '' : 'font-semibold'}>
         {def.rule.kind === 'info' ? copy.ui.contextOnlyFact : copy.ui.scoredFact}
+      </span>
+      {/* Fix spec A-07 (2026-10-14): the scoring-rule version, visible in
+       * "How is this calculated?" — every threshold change is dated. */}
+      <span aria-hidden="true" className="opacity-50">·</span>
+      <span>
+        {interpolate(copy.ui.ruleVersionLine, {
+          v: formatNumber(RULE_VERSION, numberLocale, { maximumFractionDigits: 0 }),
+          date: formatAsOf(RULE_CHANGELOG[RULE_CHANGELOG.length - 1]!.date, numberLocale === 'fa-IR' ? 'fa' : 'en'),
+        })}
       </span>
     </p>
   );
@@ -271,6 +280,23 @@ export function DetailsPanel({
           {reading.status === 'no-history' ? (
             <p className="m-0 mb-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
               {copy.ui.noHistoryStatus}
+            </p>
+          ) : null}
+          {/* Fix spec A-03/A-04: why the reading sits in check-pending — the
+           * validation test that flagged it, in plain words. */}
+          {reading.status === 'check-pending' && reading.flag ? (
+            <p className="m-0 mb-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+              <bdi>{interpolate(copy.ui.checkPendingLine, { reason: reading.flag.reason })}</bdi>
+            </p>
+          ) : null}
+          {/* Fix spec A-06: a dated, expiring human-written context note (off
+           * by default — only shows when one exists and has not expired). */}
+          {reading.note ? (
+            <p className="m-0 mb-4 rounded-[var(--radius-sm)] bg-currena-soft/70 px-3 py-2 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+              <bdi>{reading.note.text}</bdi>
+              <span className="mt-1 block opacity-80">
+                {formatAsOf(reading.note.authored, locale)} — {formatAsOf(reading.note.expires, locale)}
+              </span>
             </p>
           ) : null}
           {indicatorDef.rule.kind === 'info' ? (

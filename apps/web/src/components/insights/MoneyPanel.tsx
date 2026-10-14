@@ -21,6 +21,7 @@
 
 import type { CSSProperties } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
+import { formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { IconImg, moneyAreaIconUrl } from '../icons/currena';
@@ -30,8 +31,7 @@ import {
   moneyDirectionToneClass,
   moneyPanel,
   type MoneyAreaId,
-  type MoneyDirection,
-} from './config';
+  type MoneyDirection, definitionFor } from './config';
 import { TREND_RANGE_COPY_KEY, TrendPanel, trendTickFormatter } from './TrendChart';
 
 /** The area icons — rendered INSIDE a large tinted box. Owner follow-up
@@ -140,6 +140,9 @@ function MoneyTrend({
       id={id}
       copy={copy}
       numberLocale={numberLocale}
+      /* Fix spec B-17: rate charts speak in points — a home-loan chart never
+       * shows "+12.7%" for a 0.8-point move. */
+      deltaKind={definitionFor(id).changeKind}
       /* Round 43 (owner): "the default time frame for this section must
        * be annual" — the money rows' charts open on the 1-year window
        * (the metals' Estimation charts keep their quarter default). */
@@ -216,6 +219,34 @@ export function MoneyPanel({
           {rows.map(({ area, state, chipIds }) => {
             const areaCopy = copy.money.areas[area];
             const sentence = state === 'attention' ? areaCopy.attention : state === 'unusual' ? areaCopy.unusual : areaCopy.calm;
+            // Fix spec B-18 (2026-10-14): the savings row carries the REAL
+            // return — the new term-deposit rate minus yearly inflation
+            // (a condition, before tax; never advice).
+            const realReturn =
+              area === 'savings'
+                ? (() => {
+                    const deposit = byId.get('au-deposit-rate');
+                    const cpi = byId.get('au-cpi');
+                    if (
+                      deposit !== undefined &&
+                      deposit.value !== null &&
+                      cpi !== undefined &&
+                      cpi.value !== null
+                    ) {
+                      const points = deposit.value - cpi.value;
+                      const realText = `${points > 0 ? '+' : ''}${formatNumber(points, numberLocale, {
+                        minimumFractionDigits: 1,
+                        maximumFractionDigits: 1,
+                      })}`;
+                      return interpolate(copy.money.realReturn, {
+                        deposit: formatIndicatorValue('au-deposit-rate', deposit.value, numberLocale, copy.units),
+                        inflation: formatIndicatorValue('au-cpi', cpi.value, numberLocale, copy.units),
+                        real: realText,
+                      });
+                    }
+                    return null;
+                  })()
+                : null;
             const m = copy.money;
             const direction = moneyAreaDirection(area, readings, copy);
             // Round 26: the words follow the area's valence — cost areas
@@ -350,6 +381,11 @@ export function MoneyPanel({
                   <span className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
                     {sentence}
                   </span>
+                  {realReturn !== null ? (
+                    <span className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+                      <bdi>{realReturn}</bdi>
+                    </span>
+                  ) : null}
                 </div>
                 {/* The CHART half — the other 50%: the row's mini chart on
                  * the grid's second column, riding the row's first SHOWN

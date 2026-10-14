@@ -22,6 +22,8 @@ const KIND_CLASS: Record<CalendarEvent['kind'], string> = {
   // Step-2 add-list §D: the two jobs-report kinds wear their region's tint.
   'abs-jobs': 'bg-currena-success/15 text-[var(--color-text-secondary)]',
   fed: 'bg-currena-blue/15 text-[var(--color-status-context)]',
+  // Fix spec C-07: the ECB decision joins the calendar kinds.
+  ecb: 'bg-currena-blue/15 text-[var(--color-status-context)]',
   'us-cpi': 'bg-currena-blue/15 text-[var(--color-status-context)]',
   'us-jobs': 'bg-currena-blue/15 text-[var(--color-status-context)]',
   other: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
@@ -32,6 +34,7 @@ const KIND_BADGE: Record<CalendarEvent['kind'], string> = {
   'abs-cpi': 'CPI',
   'abs-jobs': 'JOBS',
   fed: 'FED',
+  ecb: 'ECB',
   'us-cpi': 'CPI',
   'us-jobs': 'JOBS',
   other: '',

@@ -37,6 +37,21 @@ import type { IndicatorHistory, InsightsSnapshot, InsightsStatus, IndicatorId } 
 export const INSIGHTS_SNAPSHOT_KEY = 'insights:snapshot';
 export const INSIGHTS_STATUS_KEY = 'insights:status';
 
+/**
+ * Fix spec A-05 (2026-10-14): the daily snapshot archive — one dated file
+ * per day (`insights:archive:v1:<YYYY-MM-DD>`), the exact snapshot the page
+ * showed that day (values, statuses, calendar and rule version). The
+ * ingest writes today's archive once per run; two years of daily files
+ * keep the history the spec asks for (the per-indicator history keys keep
+ * the 10-year series). Read via GET /api/insights/archive/:date.
+ */
+export const INSIGHTS_ARCHIVE_PREFIX = 'insights:archive:v1:';
+
+/** `insights:archive:v1:<date>` — the archived snapshot of that day. */
+export function insightsArchiveKey(date: string): string {
+  return `${INSIGHTS_ARCHIVE_PREFIX}${date}`;
+}
+
 /** `insights:hist:<id>` — one history file per indicator. */
 export function insightsHistoryKey(id: IndicatorId): string {
   return `insights:hist:${id}`;
@@ -47,6 +62,8 @@ export interface InsightsReader {
   getSnapshot(): Promise<InsightsSnapshot | undefined>;
   getHistory(id: IndicatorId): Promise<IndicatorHistory | undefined>;
   getStatus(): Promise<InsightsStatus | undefined>;
+  /** Fix spec A-05: a past day's archived snapshot (404-ish undefined when absent). */
+  getArchive(date: string): Promise<InsightsSnapshot | undefined>;
 }
 
 /** Write halves — what the runner's REST adapter implements. */
@@ -54,6 +71,8 @@ export interface InsightsWriter {
   putSnapshot(snapshot: InsightsSnapshot): Promise<void>;
   putHistory(history: IndicatorHistory): Promise<void>;
   putStatus(status: InsightsStatus): Promise<void>;
+  /** Fix spec A-05: archive one day's snapshot under its dated key. */
+  putArchive(date: string, snapshot: InsightsSnapshot): Promise<void>;
 }
 
 export interface InsightsStore extends InsightsReader, InsightsWriter {}
@@ -108,6 +127,15 @@ export class InMemoryInsightsStore implements InsightsStore {
 
   async putStatus(status: InsightsStatus): Promise<void> {
     this.entries.set(INSIGHTS_STATUS_KEY, JSON.stringify(status));
+  }
+
+  async getArchive(date: string): Promise<InsightsSnapshot | undefined> {
+    const key = insightsArchiveKey(date);
+    return parseStoredValue(this.entries.get(key), (v) => InsightsSnapshotSchema.parse(v), key);
+  }
+
+  async putArchive(date: string, snapshot: InsightsSnapshot): Promise<void> {
+    this.entries.set(insightsArchiveKey(date), JSON.stringify(snapshot));
   }
 }
 
@@ -241,5 +269,14 @@ export class RestInsightsStore implements InsightsStore {
 
   async putStatus(status: InsightsStatus): Promise<void> {
     await this.put(INSIGHTS_STATUS_KEY, JSON.stringify(status));
+  }
+
+  async getArchive(date: string): Promise<InsightsSnapshot | undefined> {
+    const key = insightsArchiveKey(date);
+    return parseStoredValue(await this.getText(key), (v) => InsightsSnapshotSchema.parse(v), key);
+  }
+
+  async putArchive(date: string, snapshot: InsightsSnapshot): Promise<void> {
+    await this.put(insightsArchiveKey(date), JSON.stringify(snapshot));
   }
 }

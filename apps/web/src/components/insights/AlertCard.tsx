@@ -32,12 +32,11 @@ import {
   dataPeriodText,
   definitionFor,
   formatChange,
-  formatFromPeak,
   formatReadingValue,
   policyLastChangeOf,
   tierOf,
   type IndicatorTier,
-} from './config';
+ attentionLineOf, formatPeakDistance, formatIndicatorValue } from './config';
 import { PositionBar } from './PositionBar';
 import { StatusChip } from './StatusChip';
 import { formatAsOf } from './HistoryChart';
@@ -123,11 +122,11 @@ export function AlertCard({
       ? formatAsOf(reading.releaseDate, locale)
       : null;
   const changeLabel = changeWindowLabel(reading.id) === 'since-previous' ? copy.ui.sincePreviousRelease : copy.ui.days30;
-  // R6 → round 24 (roast "fix this first" #1): the needs-attention face
-  // line is the indicator's MEANING — what the fired rule actually means
-  // for the reader — not the "Rule: …" jargon (the roast: "a rule but no
-  // meaning"). The technical rule text stays in the details panel.
-  const meaningLine = isNeedsAttention ? copy.meaning[reading.id] : undefined;
+  // Fix spec A-02 (2026-10-14): the needs-attention face line is GENERATED
+  // from the reading's own rule and value — the hand-written meanings are
+  // gone (they could contradict the card's numbers). The technical rule
+  // text stays in the details panel.
+  const meaningLine = attentionLineOf(reading, copy, numberLocale);
   // R30 (roast 11 Oct) — the sentence-versus-number guard: a card that
   // NEEDS ATTENTION must never tell you its value "sits in its usual
   // range". When the rule fired but the percentile state reads 'typical'
@@ -148,6 +147,16 @@ export function AlertCard({
   const nextDecisionText =
     reading.id === 'rba-cash-rate' && nextRbaDecision !== undefined
       ? interpolate(copy.ui.nextDecisionLine, { date: formatAsOf(nextRbaDecision, locale) })
+      : null;
+  // Fix spec B-06 (2026-10-14): the policy cards show BOTH dates —
+  // "decided 16 Sep 2026 · effective 17 Sep 2026" (the series' step is the
+  // effective date; the decision date comes from data/policy-decisions.json).
+  const decidedEffectiveText =
+    reading.decidedDate !== undefined && reading.lastChange !== undefined
+      ? interpolate(copy.ui.decidedEffectiveLine, {
+          decided: formatAsOf(reading.decidedDate, locale),
+          effective: formatAsOf(reading.lastChange.date, locale),
+        })
       : null;
 
   return (
@@ -211,10 +220,24 @@ export function AlertCard({
               ) : null}
               {/* Step-1 C9: distance from the 10-year peak on the price rows
                * ("the same way stocks show distance from the 52-week high"). */}
-              {reading.fromPeak10y !== undefined && reading.fromPeak10y < -0.05 &&
-                (reading.id === 'gold-usd' || reading.id === 'silver-usd' || reading.id === 'brent' || reading.id === 'btc-usd') ? (
+              {/* Fix spec B-01: the record distance names the peak, its date
+               * and its basis, computed from the full stored history. */}
+              {reading.id === 'gold-usd' || reading.id === 'silver-usd' || reading.id === 'brent' || reading.id === 'btc-usd' ? (
                 <span className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
-                  {formatFromPeak(reading.fromPeak10y, numberLocale, (pct) => interpolate(copy.ui.belowPeak, { pct }))}
+                  {formatPeakDistance(
+                    reading,
+                    numberLocale,
+                    copy.ui,
+                    (iso: string) => formatAsOf(iso, locale),
+                    (value: number) => formatIndicatorValue(reading.id, value, numberLocale, copy.units),
+                  )}
+                </span>
+              ) : null}
+              {/* Fix spec B-19: yields carry "highest since {year}" from the
+               * full stored history — a 10-year window cannot say 2002. */}
+              {reading.highestSinceYear !== undefined ? (
+                <span className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
+                  {interpolate(copy.ui.highestSince, { year: String(reading.highestSinceYear) })}
                 </span>
               ) : null}
             </span>
@@ -242,6 +265,7 @@ export function AlertCard({
             {lastChangeText !== null ? (
               <span className="mt-1.5 block text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)]">
                 <bdi>{lastChangeText}</bdi>
+                {decidedEffectiveText !== null ? <bdi> · {decidedEffectiveText}</bdi> : null}
                 {nextDecisionText !== null ? <bdi> · {nextDecisionText}</bdi> : null}
               </span>
             ) : nextDecisionText !== null ? (
@@ -290,6 +314,11 @@ export function AlertCard({
                 {copy.ui.staleTag}
               </span>
             ) : null}
+            {reading.status === 'check-pending' ? (
+              <span className="me-1 rounded-full bg-currena-muted/20 px-1.5 py-0.5 font-bold text-[var(--color-text-secondary)]">
+                {copy.ui.checkPendingTag}
+              </span>
+            ) : null}
             {dataDate !== null
               ? interpolate(copy.ui.dataFor, { date: dataDate })
               : reading.asOf
@@ -299,6 +328,37 @@ export function AlertCard({
               <>
                 <span className="mx-1.5 opacity-50">·</span>
                 {interpolate(copy.ui.releasedOn, { date: releaseText })}
+              </>
+            ) : null}
+            {/* Fix spec B-10: the gap card shows both legs' dates and the
+             * "dates differ" tag when the freshest AU and US prints disagree —
+             * the gap VALUE is always same-date (exact join). */}
+            {reading.id === 'au-us-10y-gap' && reading.gapLegs !== undefined && reading.gapLegs.a.asOf !== reading.gapLegs.b.asOf ? (
+              <>
+                <span className="mx-1.5 opacity-50">·</span>
+                <span className="font-semibold text-[var(--color-status-watch)]">{copy.ui.datesDiffer}</span>
+                <span className="ms-1 opacity-80">
+                  {interpolate(copy.ui.gapLegDates, {
+                    a: copy.indicators[reading.gapLegs.a.id]?.name ?? reading.gapLegs.a.id,
+                    aDate: formatAsOf(reading.gapLegs.a.asOf, locale),
+                    b: copy.indicators[reading.gapLegs.b.id]?.name ?? reading.gapLegs.b.id,
+                    bDate: formatAsOf(reading.gapLegs.b.asOf, locale),
+                  })}
+                </span>
+              </>
+            ) : null}
+            {/* Fix spec B-15: the copper/gold card's value is the monthly
+             * average, not a live price. */}
+            {reading.id === 'copper-gold' ? (
+              <>
+                <span className="mx-1.5 opacity-50">·</span>
+                {copy.ui.monthlyAverageNote}
+              </>
+            ) : null}
+            {reading.nextReleaseToday === true ? (
+              <>
+                <span className="mx-1.5 opacity-50">·</span>
+                {copy.ui.nextReleaseToday}
               </>
             ) : null}
           </span>

@@ -75,6 +75,7 @@ export {
   changeWindowLabel,
   dataPeriodText,
   formatFromPeak,
+  formatPeakDistance,
   formatRuleText,
 } from './labels';
 
@@ -88,6 +89,7 @@ export {
   consequenceLine,
   bandPositionOf,
   bandWordsOf,
+  attentionLineOf,
 } from './bands';
 export type { PositionBand } from './bands';
 

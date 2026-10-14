@@ -79,7 +79,9 @@ export function tierOf(reading: IndicatorReading): IndicatorTier {
   if (reading.status === 'warning') return 'needs-attention';
   if (reading.status === 'context') return 'context';
   if (reading.status === 'unavailable') return 'unavailable';
-  if (reading.status === 'stale' || reading.status === 'no-history') return 'stale';
+  // Fix spec A-03/A-04: a validation-flagged reading renders like a stale
+  // row (muted, compact, never counted) with its own word: Check pending.
+  if (reading.status === 'stale' || reading.status === 'no-history' || reading.status === 'check-pending') return 'stale';
   return isUnusual(reading) ? 'unusual' : 'normal';
 }
 

@@ -492,6 +492,7 @@ describe('R27 evidence discipline (no visible placeholder)', () => {
     const summary = togetherSummary(readings, (c) => c, {
       active: '{n} active',
       partly: '{n} partly',
+      pending: '{n} pending',
       inactive: '{n} not active',
       disagree: '{n} disagree',
       unknown: '{n} unreadable',

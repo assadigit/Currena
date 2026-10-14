@@ -14,7 +14,8 @@
  *   share of scored, non-stale members in alert → step
  *   0 → 1 · up to ⅓ → 2 · up to ⅔ → 3 · above ⅔ → 4
  * Verdict per region: see sectionVerdictStep (the E1 count rule).
- * Only GAUGE members vote — prices-board items and context cards never do.
+ * Gauge members are the SCORED indicators of an area (fix B-14: oil is
+ * scored and sits in prices-heat); context cards (info rules) never do.
  */
 
 import type { IndicatorGroupId, IndicatorId, IndicatorReading, InsightsSection, SummaryLine } from '@currena/core';
@@ -40,7 +41,15 @@ export const GAUGES: readonly GaugeDef[] = [
     section: 'global',
     members: ['yield-curve-10y2y', 'real-yield-10y', 'us10y', 'fed-target', 'ecb-dfr', 'govt-interest-revenue'],
   },
-  { id: 'prices-heat', section: 'global', members: ['us-cpi-yoy', 'breakeven-5y5y'] },
+  {
+    // Fix spec B-14 (2026-10-14): oil IS scored (its change rule votes) and
+    // now sits in the prices area it belongs to — the hero count, the area
+    // count and the prices strip all count the same scored list. The card
+    // still renders on the Prices board; only the count membership moved.
+    id: 'prices-heat',
+    section: 'global',
+    members: ['us-cpi-yoy', 'breakeven-5y5y', 'brent'],
+  },
   // Step-2 add-list §B5: VIX joins the market-stress voters (scored on its
   // 10-year position; the calm/nervous word thresholds arrive with Step 3).
   { id: 'market-stress', section: 'global', members: ['stress-stlfsi', 'nfci', 'vix', 'gold-silver'] },

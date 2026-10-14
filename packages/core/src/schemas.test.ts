@@ -458,6 +458,8 @@ describe('Insights: IndicatorReadingSchema', () => {
       'normal',
       'context',
       'stale',
+      // Fix spec A-03/A-04 (2026-10-14): the validation-flagged hold state.
+      'check-pending',
       'no-history',
       'unavailable',
     ]);

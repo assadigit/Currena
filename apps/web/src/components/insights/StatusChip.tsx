@@ -75,6 +75,16 @@ function StatusIcon({ kind }: { kind: IndicatorReading['status'] | 'unusual' }) 
           <path d="M8 4.6V8l2.4 1.6" />
         </svg>
       );
+    // Fix spec A-03/A-04: the held-value state — a clock with a question
+    // mark's pause, same muted tone as stale (the last good value shows).
+    case 'check-pending':
+      return (
+        <svg {...common}>
+          <circle cx="8" cy="8" r="6.2" />
+          <path d="M6.4 6.2a1.8 1.8 0 1 1 2.6 1.7c-.6.3-1 .7-1 1.4" />
+          <path d="M8 11.6h.01" />
+        </svg>
+      );
     case 'no-history':
       return (
         <svg {...common}>
@@ -122,6 +132,7 @@ const STATUS_TONE: Record<IndicatorReading['status'], StatusTone> = {
   normal: 'success',
   context: 'info',
   stale: 'muted',
+  'check-pending': 'muted',
   'no-history': 'muted',
   unavailable: 'muted',
 };

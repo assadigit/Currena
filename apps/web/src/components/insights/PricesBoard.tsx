@@ -33,17 +33,14 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { fetchIndicatorHistory } from '../../lib/insights';
 import { IconImg, indicatorIconUrl } from '../icons/currena';
 import {
-  BTC_RATIO_IDS,
   PRICE_ROWS,
   bandToneClass,
   bandWordsOf,
   consequenceLine,
   definitionFor,
   formatChange,
-  formatFromPeak,
   formatIndicatorValue,
-  positionBand,
-} from './config';
+  positionBand, formatPeakDistance } from './config';
 import { formatAsOf } from './HistoryChart';
 
 /* ------------------------------------------------------------------ *
@@ -159,8 +156,6 @@ export function PricesBoard({
   const derived = useDerivedChanges(PRICE_ROWS);
   if (rows.length === 0) return null;
 
-  const ratioRow = (id: IndicatorId): IndicatorReading | undefined =>
-    BTC_RATIO_IDS.includes(id) ? byId.get(id) : undefined;
   const goldAud = byId.get('gold-aud');
 
   return (
@@ -204,8 +199,6 @@ export function PricesBoard({
           // R30: ONE context line per tile, same slot, same style — gold's
           // A$ companion and Bitcoin's two ratios (the roast: "the Bitcoin
           // tile is structured differently").
-          const goldPerBtc = id === 'btc-usd' ? ratioRow('gold-btc') : undefined;
-          const silverPerBtc = id === 'btc-usd' ? ratioRow('silver-btc') : undefined;
           const contextParts: string[] = [];
           if (id === 'gold-usd' && goldAud && goldAud.value !== null) {
             contextParts.push(
@@ -214,30 +207,38 @@ export function PricesBoard({
               }),
             );
           }
-          // Step-1 audit item C2: the ratios are INVERTED for display —
-          // "One bitcoin buys 19.6 oz of gold" / "about 1,368 oz of silver"
-          // (the stored gold-btc/silver-btc are oz-per-₿ fractions; the old
-          // "Gold per Bitcoin: 0.0509" label read as the inverse of itself).
-          if (goldPerBtc && goldPerBtc.value !== null && goldPerBtc.value > 0) {
-            const ozGold = formatNumber(1 / goldPerBtc.value, numberLocale, {
+          // Step-1 audit item C2 + fix spec B-16 (2026-10-14): the ratios
+          // are computed FROM THE SAME DISPLAYED PRICES (btc ÷ gold, btc ÷
+          // silver — one snapshot, no stored rounding in between), so the
+          // "one bitcoin buys X oz" line always matches the prices shown.
+          const goldReading = byId.get('gold-usd');
+          const silverReading = byId.get('silver-usd');
+          const btcReading = byId.get('btc-usd');
+          if (btcReading?.value != null && goldReading?.value != null && goldReading.value > 0) {
+            const ozGold = formatNumber(btcReading.value / goldReading.value, numberLocale, {
               minimumFractionDigits: 1,
               maximumFractionDigits: 1,
             });
             contextParts.push(interpolate(copy.ui.btcBuysGold, { value: ozGold }));
           }
-          if (silverPerBtc && silverPerBtc.value !== null && silverPerBtc.value > 0) {
-            const ozSilver = formatNumber(1 / silverPerBtc.value, numberLocale, {
+          if (btcReading?.value != null && silverReading?.value != null && silverReading.value > 0) {
+            const ozSilver = formatNumber(btcReading.value / silverReading.value, numberLocale, {
               maximumFractionDigits: 0,
             });
             contextParts.push(interpolate(copy.ui.btcBuysSilver, { value: ozSilver }));
           }
-          // Step-1 audit item C9: distance from the 10-year peak — the same
-          // honesty the stock tiles carry ("easing from highs" now says HOW far).
-          const fromPeak = reading.fromPeak10y;
-          if (fromPeak !== undefined && fromPeak < -0.05) {
-            contextParts.push(
-              formatFromPeak(fromPeak, numberLocale, (pct) => interpolate(copy.ui.belowPeak, { pct })),
-            );
+          // Step-1 audit item C9 + fix spec B-01: distance from the record —
+          // the peak, its date and its basis are named (the full stored
+          // history, one basis; never a silent 10-year window).
+          const peakLine = formatPeakDistance(
+            reading,
+            numberLocale,
+            copy.ui,
+            (iso: string) => formatAsOf(iso, numberLocale === 'fa-IR' ? 'fa' : 'en'),
+            (value: number) => formatIndicatorValue(id, value, numberLocale, copy.units),
+          );
+          if (peakLine !== null) {
+            contextParts.push(peakLine);
           }
 
           return (

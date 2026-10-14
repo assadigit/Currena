@@ -73,7 +73,7 @@ const METAL_PRICE: Readonly<Record<SignalMetal, IndicatorId>> = {
 };
 
 const readable = (r: IndicatorReading | undefined): r is IndicatorReading =>
-  r !== undefined && r.status !== 'stale' && r.status !== 'unavailable';
+  r !== undefined && r.status !== 'stale' && r.status !== 'check-pending' && r.status !== 'unavailable';
 
 function byIdMap(readings: readonly IndicatorReading[]): Map<string, IndicatorReading> {
   return new Map(readings.map((r) => [r.id as string, r]));
@@ -93,14 +93,18 @@ function conditionRealYield(byId: Map<string, IndicatorReading>): SignalConditio
   return 'neutral';
 }
 
-/** 2. Inflation expectations (5y5y): elevated/rising usually supports gold. */
+/**
+ * 2. Inflation expectations (5y5y). Fix spec B-12 (2026-10-14): the gold
+ * card reads the SAME status the indicator card shows — the breakeven's
+ * scored rule (above 2.4% sustained 4 weeks). Supportive only when that
+ * card is in warning; never "Elevated long-run inflation expectations"
+ * beside a card reading Normal.
+ */
 function conditionExpectations(byId: Map<string, IndicatorReading>): SignalConditionState {
   const r = byId.get('breakeven-5y5y');
   if (!readable(r)) return 'unknown';
-  const leg = evalLeg('breakeven-5y5y', r);
-  if (leg.lean > 0) return 'supportive';
-  if (leg.lean < 0) return 'against';
-  return 'neutral';
+  // The same status the breakeven card itself carries (T-11).
+  return r.status === 'warning' ? 'supportive' : 'neutral';
 }
 
 /** 3. Market stress: above-average stress (either index > 0) usually supports gold. */

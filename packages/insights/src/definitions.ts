@@ -258,6 +258,16 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // ECB reference currencies against USD (see src/basket.ts). Values are
     // close to the published DXY but NOT the official DXY; the page always
     // calls it "Currena dollar basket".
+    //
+    // Fix spec B-03 (2026-10-14): the SPEED RULE joins the level rule — a
+    // 30-day move at or above the world-currencies alarm threshold (the
+    // dollar basket moving 3% against six majors, R3_DOLLAR_M1_STRONG in
+    // the fx module) counts as needs-attention on the main page too, so the
+    // dollar card, the hero and the currencies section read the same number
+    // the same way (unrounded values, >= comparison). The fx alarm speaks
+    // in percent of the basket; the card's change30d is in points on a
+    // ~100 index, so the rule measures the PERCENT move over its own
+    // window (mode 'pct', 4 weeks ≈ the 30-day window).
     id: 'dollar-basket',
     section: 'global',
     group: 'dollar-strength',
@@ -267,7 +277,13 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     cadence: 'daily',
     changeKind: 'points',
     phase: 'P1',
-    rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
+    rule: {
+      kind: 'any-of',
+      of: [
+        { kind: 'percentile', tail: 'high', cutoff: 0.1 },
+        { kind: 'change', mode: 'pct', direction: 'rise', magnitude: 3, windowWeeks: 4 },
+      ],
+    },
     staleAfterDays: 4,
   },
   {
@@ -323,6 +339,11 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // measured on the year-on-year GROWTH, not the level, so it is not
     // permanently pinned near 100% just for existing.
     percentileBasis: 'yoy',
+    // B-09: FRED's H.6 release publishes month M in the LAST week of M+1 —
+    // the obs (month-start dated) legitimately ages ~90 days between
+    // releases (verified live 2026-10-14: obs 2026-08-01 is the freshest
+    // print that exists).
+    staleAfterDays: 90,
   },
   {
     // Step-2 add-list §B3: US unemployment (FRED UNRATE, monthly, verified
@@ -368,6 +389,9 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'points',
     phase: 'P2',
     rule: { kind: 'percentile', tail: 'low', cutoff: 0.2 },
+    // B-09: the Pink Sheet publishes month M in the first days of M+1 — the
+    // month-start-dated obs legitimately ages ~40 days between releases.
+    staleAfterDays: 60,
   },
   {
     id: 'usdcny',
@@ -674,6 +698,9 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'above-low', rise: 0.5 },
+    // B-09: the ABS publishes month M's Labour Force ~2 weeks into M+1
+    // (obs month-start dated) — ages ~46 days between releases.
+    staleAfterDays: 60,
   },
   {
     id: 'au-home-values',
@@ -702,6 +729,10 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'points',
     phase: 'P2',
     rule: { kind: 'percentile', tail: 'high', cutoff: 0.2 },
+    // B-09: RBA E2's quarterly obs ages up to ~190 days between releases
+    // (quarter dating + release lag) — the documented override that keeps
+    // the 120-day quarterly default honest for the rest.
+    staleAfterDays: 190,
   },
   /* -------- Australia — How is trade and the currency? -------- */
   {
@@ -762,6 +793,9 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'pct',
     phase: 'P2',
     rule: { kind: 'info' },
+    // B-09: Pink Sheet monthly cadence — same ~40-day honest age as
+    // copper-gold.
+    staleAfterDays: 60,
   },
   {
     id: 'gold-aud',

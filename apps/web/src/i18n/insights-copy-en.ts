@@ -1122,6 +1122,15 @@ export const insightsCopyEn = {
     noSummary: 'Not enough voting data to read the gauges yet.',
     excludedNote: '{n} items set aside: stale or missing (see “How this is calculated”).',
     howCalculated: 'How is this calculated?',
+    // Fix spec A-08 (2026-10-14): the run-status block on About this data.
+    statusTitle: 'Status of this data',
+    statusTimeLocale: 'en-AU',
+    statusGeneratedAt: 'Snapshot generated {time} ({tz}); UTC time is shown in the card details.',
+    statusFailedSources: 'Sources that failed on the last refresh:',
+    statusAllSourcesOk: 'Every source refreshed on the last run.',
+    statusFlaggedTests: 'Validation tests that flagged readings (held on their last good values):',
+    statusStaleCards: 'Cards not updated within their maximum age:',
+    statusNoStaleCards: 'Every card is within its maximum age.',
     howCalculatedHide: 'Hide how this is calculated',
     explainerIntro:
       'Each question group is a gauge: the share of its voting indicators currently in their alert zone sets the gauge’s step (0 → step 1, up to ⅓ → 2, up to ⅔ → 3, more → 4).',
@@ -1167,7 +1176,7 @@ export const insightsCopyEn = {
     icsDownload: 'Download calendar (.ics)',
     // PB1: the prices board.
     pricesTitle: 'Prices',
-    pricesSubtitle: 'What the key commodities cost: context, not scored indicators.',
+    pricesSubtitle: 'Prices — oil is scored; gold, silver and Bitcoin are context.',
     pricePositionLow: 'cheap',
     pricePositionTypical: 'normal',
     pricePositionHigh: 'expensive',
@@ -1191,7 +1200,31 @@ export const insightsCopyEn = {
     lastChangeLine: 'Last change: {change} on {date}',
     nextDecisionLine: 'Next RBA decision: {date}',
     staleTag: 'Stale',
+    // Fix spec A-03/A-04 (2026-10-14): the held-value tag — the validation
+    // suite flagged the fresh value, the card holds its last good reading.
+    checkPendingTag: 'Check pending',
+    checkPendingLine: 'Check pending — {reason}',
+    // Fix spec A-02 (2026-10-14): the needs-attention line is GENERATED from
+    // the reading's rule and value (the hand-written meanings are gone).
+    attentionLine: 'Now {value} — in the zone its rule watches: {rule}.',
+    // Fix spec A-07 (2026-10-14): the scoring-rule version rides the card.
+    ruleVersionLine: 'Rule version {v} (changed {date}).',
+    // Fix spec B-05 (2026-10-14): newer data is due today, not yet in.
+    nextReleaseToday: 'Next release: today.',
+    // Fix spec B-06 (2026-10-14): the policy cards' two dates.
+    decidedEffectiveLine: 'Decided {decided} · effective {effective}',
     belowPeak: '{pct}% below its 10-year peak',
+    // Fix spec B-01: the record line names the peak, its date and its basis.
+    belowPeakRecord: '{pct}% below its record {value} on {date} ({basis})',
+    peakBasisHigh: 'highest daily high',
+    peakBasisClose: 'highest daily close',
+    // Fix spec B-15: the copper/gold card's value is the monthly average.
+    monthlyAverageNote: 'This is the monthly average, not a live price.',
+    // Fix spec B-19: the highest-since line for long-history series.
+    highestSince: 'highest since {year}',
+    // Fix spec B-10: the gap card's mixed-dates tag.
+    datesDiffer: 'dates differ',
+    gapLegDates: '{a} ({aDate}) minus {b} ({bDate})',
     pricesUpdated: 'prices updated {time}',
     // Step-1 A3 + Step-2 §B2: the companion note line per parent card —
     // core CPI beside the headline, the US 10-year beside the AU one.
@@ -2126,6 +2159,7 @@ export const insightsCopyEn = {
     normal: 'Normal',
     context: 'Context',
     stale: 'Stale',
+    'check-pending': 'Check pending',
     'no-history': 'Limited history',
     unavailable: 'No data',
   },
@@ -2183,77 +2217,6 @@ export const insightsCopyEn = {
    * Typed as a Partial so the components can index any IndicatorId;
    * en and fa carry the same key set by hand.
    * ---------------------------------------------------------------- */
-  meaning: {
-    'yield-curve-10y2y':
-      'The 10-year yield sits below the 2-year: the inverted curve that has usually flagged a late cycle.',
-    'real-yield-10y':
-      'Safe money pays near a decade high after inflation: the headwind that usually weighs on gold and property.',
-    us10y:
-      'US 10-year borrowing costs are at a decade high or have jumped: loans everywhere price off this number.',
-    'fed-target':
-      'The US policy rate is at a decade high: new loans and card debt cost more.',
-    'ecb-dfr':
-      'The euro area’s policy rate is at a decade high: euro loans cost more.',
-    'govt-interest-revenue':
-      'Interest takes a historically large share of US government income: less room to spend or cut taxes.',
-    'us-cpi-yoy':
-      'US prices are rising faster than the 2% target: each dollar buys a little less every month.',
-    'breakeven-5y5y':
-      'Markets expect US inflation to stay elevated over the next five to ten years.',
-    'stress-stlfsi':
-      'US money markets are more stressed than usual: funding gets tighter and pricier.',
-    nfci:
-      'US financial conditions are tighter than usual: credit is harder to get.',
-    'gold-silver':
-      'Gold is historically expensive against silver: silver is the cheap side of the pair.',
-    'dollar-basket':
-      'The dollar is at a decade high against major currencies: imports cost more outside the US.',
-    usdjpy:
-      'The dollar has dropped fast against the yen: Japanese goods and travel got cheaper for anyone holding dollars.',
-    'china-pmi':
-      'Chinese factories are contracting: the world’s biggest raw-material buyer is pulling back.',
-    'm2-us':
-      'The US money supply is shrinking year-on-year: a rare squeeze that has usually preceded slowdowns.',
-    // Step-2 add-list §B3/§B4/§B5: the new scored cards' needs-attention
-    // lines (one per warning rule).
-    'us-unemployment':
-      'US unemployment is high for its decade: a steady rise is usually the first sign of a slowing US economy.',
-    'sahm-rule':
-      'The recession alarm has fired: US unemployment has risen 0.50+ points from its recent low, the pattern that has coincided with the start of past US recessions.',
-    vix: 'Market fear is in the top of its decade range: world share markets are jumpy.',
-    'copper-gold':
-      'Copper is historically cheap against gold: factory demand is running cold.',
-    brent:
-      'Oil has jumped more than 25% in a quarter: petrol, power and transport costs follow with a lag.',
-    'au-cpi':
-      'Australian prices are rising above the 2–3% target band: the scoreboard the RBA watches.',
-    'au-trimmed-mean':
-      'Underlying inflation is above the target band: the rise isn’t just one volatile item.',
-    'au-10y':
-      'Australian 10-year borrowing costs are high for their decade: fixed home-loan rates and term deposits tend to sit higher in this setting.',
-    'au-us-10y-gap':
-      'US 10-year money now costs more than Australia’s: the setting that has usually weighed on the Australian dollar.',
-    'au-home-loan':
-      'The rate people actually pay on home loans is at a decade high: mortgages bite hardest here.',
-    'au-wage-growth':
-      'Wages are trailing prices: each year’s pay rise buys less than the year before.',
-    'au-rent-yoy':
-      'Rents are rising at a decade-high pace: housing takes a bigger slice of the budget.',
-    'au-unemployment':
-      'Unemployment has climbed off its low: finding work is taking longer.',
-    'au-home-values':
-      'Home values have fallen several periods in a row: owners’ equity is shrinking.',
-    'au-household-debt-arrears':
-      'A historically large share of households is behind on loan payments: stress is showing in credit.',
-    audusd:
-      'The Australian dollar sits at a decade low against the US dollar: imports and overseas travel cost more.',
-    audjpy:
-      'The Australian dollar has dropped fast against the yen: trips to Japan cost more.',
-    'terms-of-trade':
-      'Export prices are slipping against import prices: national income feels the squeeze.',
-    'iron-ore':
-      'Iron ore sits at a decade low: Australia’s biggest export earner is weak.',
-  } as Partial<Record<IndicatorId, string>>,
 
   /* ---------------------------------------------------------------- *
    * I17 (v2, Block T1): the "Together" connection cards.
@@ -2270,13 +2233,19 @@ export const insightsCopyEn = {
     state: {
       active: 'Active',
       partly: 'Partly active',
+      pending: 'Pass-through pending',
       inactive: 'Not active',
       disagree: 'Signals disagree',
       unknown: 'Not enough fresh data',
     },
+    // Fix spec B-04 (2026-10-14): the context-leg and caveat labels.
+    contextLeg: 'context',
+    contextCaveat: 'a level, not a servicing cost',
+    passThroughLine: 'The cash rate moved {policy} on {decided}; the home-loan data that follows it is not in yet (the loan rate has moved {loan} since that decision where data exists).',
     // R7b: the collapsed section’s one-line summary.
     summaryActive: '{n} active',
     summaryPartly: '{n} partly active',
+    summaryPending: '{n} pass-through pending',
     summaryInactive: '{n} not active',
     summaryDisagree: '{n} show signals that disagree',
     summaryUnknown: '{n} unreadable',
@@ -2286,6 +2255,7 @@ export const insightsCopyEn = {
     rightNowShort: {
       active: 'Usual pattern showing right now.',
       partly: 'Part of the usual pattern showing right now.',
+      pending: 'Pass-through pending: the rate decision is newer than the loan data.',
       inactive: 'Too quiet to read right now.',
       disagree: 'Usual pattern not showing: {a}, {b}.',
       unknown: 'Not enough fresh data right now.',
@@ -2307,10 +2277,9 @@ export const insightsCopyEn = {
     },
     // Leg phrase assembly (telegraphic: bilingual-safe, no verb agreement).
     phrases: {
-      levelDir: '{name}: {level} and {direction}',
-      levelOnly: '{name}: {level}',
       dirOnly: '{name}: {direction}',
       none: '{name}: no fresh reading',
+      overWindow: '(over {days} days)',
     },
     level: { high: 'high', typical: 'mid-range', low: 'low' },
     direction: { rising: 'rising', falling: 'falling', steady: 'steady' },
@@ -2359,10 +2328,9 @@ export const insightsCopyEn = {
         legs: {
           'copper-gold': 'the copper price vs gold',
           'china-pmi': 'Chinese factory activity',
-          'm2-us': 'US money supply',
         },
         relation:
-          'Copper is wired into industry, so a firm copper-to-gold ratio tends to come with busy factories and growing money: and the mix tends to soften together too.',
+          'Copper is wired into industry, so a firm copper-to-gold ratio tends to come with busy factories. (The link to US money supply is weak, so that leg is no longer counted.)',
         rightNow: {
           active: 'Right now {a}, {b}, {c}: the growth mix is in place.',
           partly: 'Right now {a}, {b}, {c}: the growth mix is only partly showing.',
@@ -2377,9 +2345,10 @@ export const insightsCopyEn = {
           'iron-ore': 'iron ore',
           'terms-of-trade': 'the terms of trade',
           audusd: 'the Australian dollar',
+          'dollar-basket': 'the US dollar',
         },
         relation:
-          'Iron ore is one of Australia’s biggest exports, so firm export prices tend to lift the terms of trade and, over time, the Australian dollar.',
+          'Iron ore is one of Australia’s biggest exports, so firm export prices tend to lift the terms of trade and, over time, the Australian dollar. The US dollar rides along as context: a falling Australian dollar is often mostly a rising US dollar.',
         rightNow: {
           active: 'Right now {a}, {b}, {c}: the export chain is in place.',
           partly: 'Right now {a}, {b}, {c}: only part of the export chain is showing.',
@@ -2396,7 +2365,7 @@ export const insightsCopyEn = {
           'au-household-debt-arrears': 'household debt ratios',
         },
         relation:
-          'When the RBA lifts the cash rate, the home-loan rates people actually pay tend to follow, and debt servicing tends to get heavier.',
+          'When the RBA changes the cash rate, the home-loan rates people actually pay tend to follow one to three months later; the card reads pass-through pending until that data exists. (The debt leg is a debt-to-income level, not a debt-servicing cost.)',
         rightNow: {
           active: 'Right now {a}, {b}, {c}: the household rate chain is engaged.',
           partly: 'Right now {a}, {b}, {c}: the household rate chain is partly engaged.',
@@ -2528,6 +2497,11 @@ export const insightsCopyEn = {
       cost: { up: 'Becoming more expensive', down: 'Getting cheaper', flat: 'No clear direction' },
       savings: { up: 'Earning more interest', down: 'Earning less', flat: 'No clear direction' },
     },
+    // Fix spec B-18 (2026-10-14): the savings row's real return — the new
+    // term-deposit rate minus yearly inflation, labelled before tax. A
+    // condition, never advice.
+    realReturn:
+      'Real return on savings: new term deposits pay {deposit} and prices rose {inflation} over the past year — the difference is {real} points a year (before tax).',
     areas: {
       petrol: {
         name: 'Petrol and transport',

@@ -466,13 +466,13 @@ export function VerdictBlock({
               {shown.map(({ id }) => {
                 const r = readings.find((x) => x.id === id);
                 if (!r) return null;
-                const meaning = copy.meaning[id];
-                const meaningText =
-                  meaning ??
-                  interpolate(copy.ui.attentionTileRule, {
-                    rule: formatRuleText(definitionFor(id).rule, id, copy.rule, copy.units, numberLocale),
-                    value: r.value !== null ? formatIndicatorValue(id, r.value, numberLocale, copy.units) : copy.ui.na,
-                  });
+                // Fix spec A-02 (2026-10-14): the tile's meaning text is
+                // GENERATED from the reading's rule and value — the
+                // hand-written meanings are gone.
+                const meaningText = interpolate(copy.ui.attentionTileRule, {
+                  rule: formatRuleText(definitionFor(id).rule, id, copy.rule, copy.units, numberLocale),
+                  value: r.value !== null ? formatIndicatorValue(id, r.value, numberLocale, copy.units) : copy.ui.na,
+                });
                 const valueParts =
                   r.value !== null ? indicatorValueParts(id, r.value, numberLocale, copy.units) : null;
                 return (

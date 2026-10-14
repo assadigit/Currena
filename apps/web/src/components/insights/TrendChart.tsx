@@ -171,6 +171,7 @@ export function TrendPanel({
   deltaData,
   plotData,
   defaultRange = 'quarter',
+  deltaKind,
 }: {
   id: IndicatorId;
   copy: InsightsCopy;
@@ -188,6 +189,13 @@ export function TrendPanel({
   /** R43: the range the chips open on — quarter by default; the money
    *  panel's rows open on the annual window (owner round 43). */
   defaultRange?: TrendRange;
+  /**
+   * Fix spec B-17 (2026-10-14): how the signed window delta is expressed —
+   * 'pct' (prices and indexes) or 'points' (rates, inflation, yields and
+   * unemployment). Defaults to 'pct'; the money panel passes the
+   * indicator's changeKind so a rate chart never shows "+12.7%".
+   */
+  deltaKind?: 'pct' | 'points';
 }) {
   const { ui } = copy;
   const gradId = useId();
@@ -264,16 +272,17 @@ export function TrendPanel({
   const lastPt = coords[coords.length - 1]!;
   const area = `${line} L${lastPt.x.toFixed(1)},${PLOT_H - PLOT_PAD} L${firstPt.x.toFixed(1)},${PLOT_H - PLOT_PAD} Z`;
 
-  // The window's move, in the series' own units — one signed percent,
-  // quiet ink (the verdict word beside it already speaks in colour).
+  // The window's move, in the series' own units — one signed percent
+  // (prices and indexes) or percentage POINTS (rates, inflation, yields and
+  // unemployment — fix spec B-17: never "+12.7%" on a home-loan rate).
+  // Quiet ink either way (the verdict word beside it already speaks in colour).
   const firstVal = series[0]![1];
   const lastVal = series[series.length - 1]![1];
-  const deltaPct = firstVal !== 0 ? ((lastVal - firstVal) / firstVal) * 100 : null;
+  const kind = deltaKind ?? 'pct';
+  const deltaValue = kind === 'points' ? lastVal - firstVal : firstVal !== 0 ? ((lastVal - firstVal) / firstVal) * 100 : null;
   const deltaText =
-    deltaPct !== null
-      ? deltaPct > 0
-        ? `+${formatNumber(deltaPct, numberLocale, { maximumFractionDigits: 1 })}` // sign rides with the number (never colour alone)
-        : formatNumber(deltaPct, numberLocale, { maximumFractionDigits: 1 })
+    deltaValue !== null
+      ? (deltaValue > 0 ? '+' : '') + formatNumber(deltaValue, numberLocale, { maximumFractionDigits: 1 }) // sign rides with the number (never colour alone)
       : null;
 
   const lastDay = series[series.length - 1]![0];
@@ -479,7 +488,10 @@ export function TrendPanel({
             {/* Step-1 audit item C11: the range word is VISIBLE — "−5.5%"
              * alone (with "Quarter" hidden in sr-only) read as a forecast;
              * it is the PAST window's measured change. */}
-            <bdi dir="ltr">{deltaText}%</bdi>{' '}
+            <bdi dir="ltr">
+              {deltaText}
+              {kind === 'points' ? '' : '%'}
+            </bdi>{' '}
             <span className="opacity-80">{ui[TREND_RANGE_COPY_KEY[range]]}</span>
           </span>
         ) : null}

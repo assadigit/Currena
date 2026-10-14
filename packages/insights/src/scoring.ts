@@ -37,27 +37,18 @@ import {
 
 /**
  * Stale thresholds: the maximum age (days) of the freshest observation before
- * a series is "not updated since [date]". Derived from real release lags, not
- * just the calendar cadence: observation dates lag publication, so e.g. a
- * quarterly series observed at quarter-start can legitimately be ~6 months
- * old between releases (obs lag + release lag + one full period of margin).
- * `per-change` (cash rate) is a level and never goes stale by age.
- *
- * I15 (2026-10-08 data spec §3): a definition's `staleAfterDays` OVERRIDES
- * its cadence grace — the per-series freshness limits (Brent 12, NFCI 14,
- * ECB DFR 7, Fed target 5, ABS CPI items 70, WPI 130 …). See definitions.ts.
+ * a series is "not updated since [date]". Fix spec B-09 (2026-10-14): the
+ * DEFAULTS are 4 days for dailies, 10 for weeklies, 45 for monthlies and
+ * 120 for quarterlies — every series whose real release cycle legitimately
+ * ages further carries an explicit `staleAfterDays` override in its
+ * definition (documented per series), so the default stays honest for the
+ * rest. `per-change` (cash rate) is a level and never goes stale by age.
  */
 export const GRACE_DAYS: Readonly<Record<IndicatorDefinition['cadence'], number | null>> = {
-  // Step-1 audit item H1: 5 calendar days for dailies — FRED's H.15 series
-  // (DGS10/DFII10) publish with a 1-day lag and a Friday observation is
-  // legitimately 3 days old by the next ingest; 3 days false-alarmed every
-  // long weekend (production evidence 2026-10-13: DGS10 obs 2026-10-08
-  // reading `stale` on Oct 12 while FRED confirmed it was the freshest
-  // print that existed).
-  daily: 5,
-  weekly: 16,
-  monthly: 95,
-  quarterly: 190,
+  daily: 4,
+  weekly: 10,
+  monthly: 45,
+  quarterly: 120,
   'per-change': null,
   manual: 45,
 };
@@ -92,6 +83,8 @@ const CHANGE_ANCHOR_TOLERANCE_DAYS = 3;
 /** Tolerance of the 7d/30d display-change anchors (days; slightly wider for 30d). */
 const CHANGE7D_TOLERANCE_DAYS = 3;
 const CHANGE30D_TOLERANCE_DAYS = 5;
+/** Tolerance of the 90-day display-change anchor (B-04's oil windows). */
+const CHANGE90D_TOLERANCE_DAYS = 10;
 
 /* ------------------------------------------------------------------ *
  * Rule evaluation
@@ -352,17 +345,17 @@ export interface AuxSeries {
   series: readonly SeriesPoint[];
 }
 
-/** 7/30-day change in the definition's units; undefined when not measurable. */
+/** 7/30/90-day change in the definition's units; undefined when not measurable. */
 function windowChange(
   series: readonly SeriesPoint[],
   current: SeriesPoint,
-  days: number,
+  days: 7 | 30 | 90,
   kind: 'pct' | 'points',
 ): number | undefined {
   const target = addDays(current.date, -days);
   const then = pointAtOrBefore(series, target);
   if (!then || then.date === current.date) return undefined;
-  const tolerance = days <= 7 ? CHANGE7D_TOLERANCE_DAYS : CHANGE30D_TOLERANCE_DAYS;
+  const tolerance = days <= 7 ? CHANGE7D_TOLERANCE_DAYS : days <= 30 ? CHANGE30D_TOLERANCE_DAYS : CHANGE90D_TOLERANCE_DAYS;
   // Sparse series (monthly/quarterly): the nearest older point can be far
   // beyond the intended 7/30-day anchor — show a dash, not a mislabelled delta.
   if (daysBetween(then.date, target) > tolerance) return undefined;
@@ -449,8 +442,11 @@ export function computeReading(
 
   // Step-1 audit item C6: monthly/quarterly/manual series show the change
   // since the PREVIOUS RELEASE (previous observation); daily/weekly keep the
-  // 7/30-day windows.
+  // 7/30-day windows — and dailies additionally carry the 90-day change
+  // (B-04: the oil leg of the oil→expectations→costs connection checks
+  // several windows because a big annual move can hide behind a calm month).
   const usesPreviousRelease = cadenceUsesPreviousRelease(parsed.cadence);
+  const dailyCadence = parsed.cadence === 'daily';
   const reading: IndicatorReading = {
     ...base,
     value: current.value,
@@ -461,6 +457,7 @@ export function computeReading(
     change30d: usesPreviousRelease
       ? previousReleaseChange(series, current, parsed.changeKind)
       : windowChange(series, current, 30, parsed.changeKind),
+    ...(dailyCadence ? { change90d: windowChange(series, current, 90, parsed.changeKind) } : {}),
     status: 'normal',
   };
 

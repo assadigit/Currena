@@ -24,11 +24,9 @@ import {
   dataPeriodText,
   definitionFor,
   formatChange,
-  formatFromPeak,
   formatReadingValue,
   policyLastChangeOf,
-  tierOf,
-} from './config';
+  tierOf, attentionLineOf, formatPeakDistance, formatIndicatorValue } from './config';
 import { PositionBar } from './PositionBar';
 import { formatAsOf } from './HistoryChart';
 
@@ -107,10 +105,10 @@ export function CompactRow({
       ? dataPeriodText(reading.id, reading.asOf, numberLocale === 'fa-IR' ? 'fa' : 'en', numberLocale)
       : null;
   const changeLabel = changeWindowLabel(reading.id) === 'since-previous' ? copy.ui.sincePreviousRelease : copy.ui.days30;
-  // R6 → round 24: the needs-attention MEANING line also rides compact
-  // rows when a needs-attention row renders without a card (never hidden
-  // by R7) — the meaning, not the "Rule: …" jargon (see AlertCard).
-  const meaningLine = tier === 'needs-attention' ? copy.meaning[reading.id] : undefined;
+  // Fix spec A-02 (2026-10-14): the needs-attention line is GENERATED from
+  // the reading's own rule and value (see AlertCard) — the hand-written
+  // meanings are gone.
+  const meaningLine = attentionLineOf(reading, copy, numberLocale);
   // R30: the sentence-versus-number guard (see AlertCard) — a
   // needs-attention row never says "usual range" beside its rule line.
   const cs = consequenceState(reading, false);
@@ -129,6 +127,14 @@ export function CompactRow({
   const nextDecisionText =
     reading.id === 'rba-cash-rate' && nextRbaDecision !== undefined
       ? interpolate(copy.ui.nextDecisionLine, { date: formatAsOf(nextRbaDecision, locale) })
+      : null;
+  // Fix spec B-06 (2026-10-14): decided · effective on the policy rows.
+  const decidedEffectiveText =
+    reading.decidedDate !== undefined && reading.lastChange !== undefined
+      ? interpolate(copy.ui.decidedEffectiveLine, {
+          decided: formatAsOf(reading.decidedDate, locale),
+          effective: formatAsOf(reading.lastChange.date, locale),
+        })
       : null;
 
   return (
@@ -176,14 +182,31 @@ export function CompactRow({
                     {copy.ui.staleTag}
                   </span>
                 ) : null}
-                {interpolate(reading.status === 'stale' ? copy.ui.dataForStale : copy.ui.dataFor, { date: dataDate })}
+                {reading.status === 'check-pending' ? (
+                  <span className="me-1 rounded-full bg-currena-muted/20 px-1.5 py-0.5 font-bold text-[var(--color-text-secondary)]">
+                    {copy.ui.checkPendingTag}
+                  </span>
+                ) : null}
+                {interpolate(reading.status === 'stale' || reading.status === 'check-pending' ? copy.ui.dataForStale : copy.ui.dataFor, { date: dataDate })}
+                {reading.nextReleaseToday === true ? <span className="ms-1 opacity-80">{copy.ui.nextReleaseToday}</span> : null}
               </span>
             ) : null}
             {/* Step-1 C9: distance from the 10-year peak (prices/gold-silver
                 rows) — the same honesty the stock tiles carry. */}
-            {reading.fromPeak10y !== undefined && reading.fromPeak10y < -0.05 && reading.id !== 'rba-cash-rate' && (reading.id === 'gold-usd' || reading.id === 'silver-usd' || reading.id === 'brent' || reading.id === 'btc-usd') ? (
+            {(reading.id === 'gold-usd' || reading.id === 'silver-usd' || reading.id === 'brent' || reading.id === 'btc-usd') && reading.fromPeak10y !== undefined && reading.fromPeak10y < -0.05 ? (
               <span className="shrink-0 whitespace-nowrap text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
-                {formatFromPeak(reading.fromPeak10y, numberLocale, (pct) => interpolate(copy.ui.belowPeak, { pct }))}
+                {formatPeakDistance(
+                  reading,
+                  numberLocale,
+                  copy.ui,
+                  (iso: string) => formatAsOf(iso, locale),
+                  (value: number) => formatIndicatorValue(reading.id, value, numberLocale, copy.units),
+                )}
+              </span>
+            ) : null}
+            {reading.highestSinceYear !== undefined ? (
+              <span className="shrink-0 whitespace-nowrap text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
+                {interpolate(copy.ui.highestSince, { year: String(reading.highestSinceYear) })}
               </span>
             ) : null}
             <TinySparkline id={reading.id} />
@@ -204,10 +227,12 @@ export function CompactRow({
           ) : null}
           {/* Step-2 §B1: the policy rows' exact last decision + the RBA's
            * next decision date — one line, date and size, no 30-day window. */}
-          {lastChangeText !== null || nextDecisionText !== null ? (
+          {lastChangeText !== null || nextDecisionText !== null || decidedEffectiveText !== null ? (
             <span className="block text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-secondary)]">
               {lastChangeText !== null ? <bdi>{lastChangeText}</bdi> : null}
-              {lastChangeText !== null && nextDecisionText !== null ? <span aria-hidden="true"> · </span> : null}
+              {lastChangeText !== null && decidedEffectiveText !== null ? <span aria-hidden="true"> · </span> : null}
+              {decidedEffectiveText !== null ? <bdi>{decidedEffectiveText}</bdi> : null}
+              {(lastChangeText !== null || decidedEffectiveText !== null) && nextDecisionText !== null ? <span aria-hidden="true"> · </span> : null}
               {nextDecisionText !== null ? <bdi>{nextDecisionText}</bdi> : null}
             </span>
           ) : null}

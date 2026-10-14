@@ -428,8 +428,9 @@ describe('mergeLivePricesIntoSnapshot', () => {
     expect(goldBtc.value).toBeCloseTo(4190.6 / 82510.08, 3);
     expect(goldBtc.asOf).toBe('2026-10-12');
     const silverBtc = merged.readings.find((r) => r.id === 'silver-btc')!;
-    // 4-dp rounding (merge precision) — 0.0007353… → 0.0007.
-    expect(silverBtc.value).toBe(Math.round((60.67 / 82510.08) * 10_000) / 10_000);
+    // Fix spec B-16 (2026-10-14): 6-dp precision — the inverted display
+    // (₿ per oz) must match the prices shown: 0.0007353… stays precise.
+    expect(silverBtc.value).toBe(Math.round((60.67 / 82510.08) * 1_000_000) / 1_000_000);
     const goldAud = merged.readings.find((r) => r.id === 'gold-aud')!;
     expect(goldAud.value).toBeCloseTo(4190.6 / 0.698129, 2);
   });

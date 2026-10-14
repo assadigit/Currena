@@ -55,7 +55,9 @@ export {
   downsampleSeries,
   historyToSeries,
   parseReleaseSchedule,
+  parsePolicyDecisions,
+  parseContextNotes,
   HISTORY_MAX_POINTS,
   HISTORY_WINDOW_DAYS,
 } from './snapshot';
-export type { ReleaseScheduleEntry, SnapshotBuildInputs } from './snapshot';
+export type { ReleaseScheduleEntry, SnapshotBuildInputs, PolicyDecision, ContextNote, PeakInput } from './snapshot';

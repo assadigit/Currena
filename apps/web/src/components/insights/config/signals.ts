@@ -22,20 +22,27 @@ import type { InsightsCopy } from '../../../i18n/insights-copy-en';
  */
 export const SIGNALS_ENABLED = true;
 
-/** One leg's phrase for a connection's right-now line (telegraphic,
- * bilingual-safe): "real yields: high and rising" / «طلا: بالا و ثابت». */
+/**
+ * One leg's phrase for a connection's right-now line (telegraphic,
+ * bilingual-safe): "real yields: rising" / «طلا: در حال رشد».
+ * Fix spec B-04 (2026-10-14): the v2 leg method is direction over a window
+ * with a minimum move — the phrase names the qualifying window when the leg
+ * moved on a longer one ("gold: rising over 90 days").
+ */
 export function legPhrase(
   leg: LegEval,
   shortName: string,
   copy: Pick<InsightsCopy, 'together'>,
 ): string {
   const t = copy.together;
-  const level = leg.level !== null ? t.level[leg.level] : null;
   const direction = leg.direction !== null ? t.direction[leg.direction] : null;
-  if (level !== null && direction !== null) {
-    return interpolate(t.phrases.levelDir, { name: shortName, level, direction });
+  const windowWord =
+    leg.moved && leg.moveWindow !== null && leg.moveWindow !== 30
+      ? interpolate(t.phrases.overWindow, { days: String(leg.moveWindow) })
+      : null;
+  if (direction !== null && windowWord !== null) {
+    return `${interpolate(t.phrases.dirOnly, { name: shortName, direction })} ${windowWord}`;
   }
-  if (level !== null) return interpolate(t.phrases.levelOnly, { name: shortName, level });
   if (direction !== null) return interpolate(t.phrases.dirOnly, { name: shortName, direction });
   return interpolate(t.phrases.none, { name: shortName });
 }
@@ -50,7 +57,7 @@ export type StatusTone = 'danger' | 'success' | 'info' | 'muted';
  * Round-2 R7b: the collapsed Together/Signals summaries.
  * ------------------------------------------------------------------ */
 
-const TOGETHER_STATE_ORDER: readonly ConnectionState[] = ['active', 'partly', 'disagree', 'inactive', 'unknown'];
+const TOGETHER_STATE_ORDER: readonly ConnectionState[] = ['active', 'partly', 'pending', 'disagree', 'inactive', 'unknown'];
 
 interface TogetherSummary {
   /** One line: "2 active, 3 show signals that disagree, 1 partly active". */
@@ -62,7 +69,7 @@ interface TogetherSummary {
 export function togetherSummary(
   connections: readonly ConnectionReading[],
   nameOf: (connection: string) => string,
-  templates: { active: string; partly: string; inactive: string; disagree: string; unknown: string },
+  templates: { active: string; partly: string; pending: string; inactive: string; disagree: string; unknown: string },
   fmt: (n: number) => string = String,
   joiner = ', ',
 ): TogetherSummary {

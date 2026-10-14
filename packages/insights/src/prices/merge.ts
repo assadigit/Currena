@@ -45,6 +45,16 @@ function round4(value: number): number {
   return Math.round(value * 10_000) / 10_000;
 }
 
+/**
+ * Fix spec B-16 (2026-10-14): the silver-per-bitcoin display inverts this
+ * ratio (₿ per oz), so 4 decimals left "1,429 oz" where the displayed prices
+ * gave 1,425 — the stored ratio now keeps 6 significant decimals, enough for
+ * the inverted line to match the prices shown on the same snapshot.
+ */
+function round6(value: number): number {
+  return Math.round(value * 1_000_000) / 1_000_000;
+}
+
 /** ISO date compare — `null` reading dates (unavailable) always lose to a live date. */
 function asOfAtLeast(liveAsOf: string, readingAsOf: string | null): boolean {
   return readingAsOf === null || liveAsOf >= readingAsOf;
@@ -110,14 +120,21 @@ export function mergeLivePricesIntoSnapshot(
     const reading = byId.get(assetId);
     if (entry === undefined || reading === undefined) continue; // no quote / no such row — never invent rows
     if (!asOfAtLeast(entry.asOf, reading.asOf)) continue; // never rewind a fresher EOD print
-    out.set(assetId, patchReading(reading, {
+    const patched = patchReading(reading, {
       value: entry.value,
       asOf: entry.asOf,
       ...mergedChanges(reading, entry),
       sourceName: LIVE_PRICE_ASSETS[assetId].sourceName,
       sourceUrl: LIVE_PRICE_ASSETS[assetId].sourceUrl,
       updatedAt: generatedAt,
-    }));
+    });
+    // Fix spec B-01 (2026-10-14): the record distance follows the live value —
+    // the peak (with its date and basis) stays, the distance is recomputed so
+    // the card's number and its record line can never disagree.
+    if (patched.peak !== undefined && patched.peak.value > 0) {
+      patched.fromPeak10y = ((patched.value ?? patched.peak.value) - patched.peak.value) / patched.peak.value * 100;
+    }
+    out.set(assetId, patched);
   }
 
   const liveGold = live.assets['gold-usd'];
@@ -129,7 +146,7 @@ export function mergeLivePricesIntoSnapshot(
     const reading = byId.get('gold-btc');
     if (reading !== undefined) {
       out.set('gold-btc', patchReading(reading, {
-        value: round4(liveGold.value / liveBtc.value),
+        value: round6(liveGold.value / liveBtc.value),
         asOf: laterDate(liveGold.asOf, liveBtc.asOf),
         sourceName: LIVE_RATIO_SOURCE.goldBtc.name,
         sourceUrl: LIVE_RATIO_SOURCE.goldBtc.url,
@@ -141,7 +158,7 @@ export function mergeLivePricesIntoSnapshot(
     const reading = byId.get('silver-btc');
     if (reading !== undefined) {
       out.set('silver-btc', patchReading(reading, {
-        value: round4(liveSilver.value / liveBtc.value),
+        value: round6(liveSilver.value / liveBtc.value),
         asOf: laterDate(liveSilver.asOf, liveBtc.asOf),
         sourceName: LIVE_RATIO_SOURCE.silverBtc.name,
         sourceUrl: LIVE_RATIO_SOURCE.silverBtc.url,

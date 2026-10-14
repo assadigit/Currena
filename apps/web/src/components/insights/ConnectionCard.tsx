@@ -70,6 +70,16 @@ function ConnectionStateIcon({ state }: { state: ConnectionState }) {
           <path d="M11 8.2l2.2 1.8L11 11.8" />
         </svg>
       );
+    case 'pending':
+      // Fix spec B-04: pass-through pending — the decision exists, the loan
+      // data has not caught up yet.
+      return (
+        <svg {...common}>
+          <circle cx="8" cy="8" r="6.2" />
+          <path d="M8 4.6V8l2.4 1.6" />
+          <path d="M11.2 4.2h1.6v1.6" />
+        </svg>
+      );
     case 'unknown':
       return (
         <svg {...common}>
@@ -84,6 +94,7 @@ function ConnectionStateIcon({ state }: { state: ConnectionState }) {
 const STATE_TONE: Record<ConnectionState, string> = {
   active: 'bg-currena-blue/10 text-[var(--color-status-context)]',
   partly: 'bg-currena-blue/10 text-[var(--color-status-context)]',
+  pending: 'bg-currena-muted/15 text-[var(--color-status-stale)]',
   inactive: 'bg-currena-muted/15 text-[var(--color-status-stale)]',
   disagree: 'bg-currena-muted/15 text-[var(--color-status-stale)]',
   unknown: 'bg-currena-muted/15 text-[var(--color-status-stale)]',
@@ -141,6 +152,11 @@ function MoveIcon({ kind }: { kind: MoveKind }) {
 }
 
 type MoveKind = 'up' | 'down' | 'flat' | 'level';
+
+/** Fix spec B-04: the pass-through compare line's signed points ("+0.25"). */
+function formatSignedPoints(points: number): string {
+  return `${points > 0 ? '+' : ''}${points.toFixed(2).replace(/\.?0+$/, '')} pts`;
+}
 type Move = { text: string; cls: string; kind: MoveKind };
 
 /** One leg STAT CHIP: short name, live value WITH UNIT, the state word at
@@ -161,25 +177,39 @@ function LegChip({
   onFocusCard: (id: IndicatorId, opener?: HTMLElement | null) => void;
 }) {
   const t = copy.together;
-  const unreadable = reading === undefined || reading.status === 'stale' || reading.status === 'unavailable';
+  const unreadable =
+    reading === undefined ||
+    reading.status === 'stale' ||
+    reading.status === 'check-pending' ||
+    reading.status === 'unavailable';
   const valueText =
     reading !== undefined && reading.value !== null
       ? formatIndicatorValue(leg.id, reading.value, numberLocale, copy.units)
       : null;
-  // One plain state word: the direction when measurable, else the level.
-  const stateWord =
-    leg.direction !== null
-      ? t.direction[leg.direction]
-      : leg.level !== null
-        ? t.level[leg.level]
-        : null;
+  // One plain state word: the leg's direction (B-04: the uniform method).
+  const stateWord = leg.direction !== null ? t.direction[leg.direction] : null;
+  // Fix spec B-04: context legs display but never gate — they say so quietly;
+  // the debt leg is labelled as a debt-to-income level, not a servicing cost.
+  const roleTag =
+    leg.role === 'context'
+      ? leg.caveat === 'debt-level'
+        ? t.contextCaveat
+        : t.contextLeg
+      : null;
   return (
     <button
       type="button"
       onClick={(e) => onFocusCard(leg.id, e.currentTarget)}
       className="insights-focusable inline-flex min-h-[44px] cursor-pointer flex-col items-start gap-0 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2.5 py-1.5 text-start transition-colors hover:border-currena-blue/50"
     >
-      <span className="text-[length:var(--type-caption)] font-bold text-[var(--color-text-primary)]">{shortName}</span>
+      <span className="text-[length:var(--type-caption)] font-bold text-[var(--color-text-primary)]">
+        {shortName}
+        {roleTag !== null ? (
+          <span className="ms-1.5 rounded-full bg-currena-muted/15 px-1.5 py-0.5 text-[0.62rem] font-bold text-[var(--color-text-tertiary)]">
+            {roleTag}
+          </span>
+        ) : null}
+      </span>
       <span className="flex flex-wrap items-baseline gap-x-2">
         {valueText !== null ? (
           <bdi dir="ltr" className="type-number font-semibold tabular-nums text-[var(--color-text-primary)]">
@@ -225,12 +255,19 @@ export function ConnectionCard({
     legPhrase(leg, entry.legs[leg.id as keyof typeof entry.legs] ?? leg.id, copy),
   );
   // R27: the right-now line — ONE truthful clause keyed by state; the
-  // disagree case names the concrete leg phrases.
+  // disagree case names the concrete leg phrases. Fix spec B-04: the pending
+  // state names the decision and what it waits for.
   const rightNowTemplate = copy.together.rightNowShort[reading.state];
   const rightNow =
     reading.state === 'disagree'
       ? interpolate(rightNowTemplate, { a: phrases[0] ?? '', b: phrases[1] ?? '' })
-      : rightNowTemplate;
+      : reading.state === 'pending' && reading.passThrough
+        ? interpolate(copy.together.passThroughLine, {
+            decided: reading.passThrough.decisionDate,
+            policy: formatSignedPoints(reading.passThrough.decisionPoints),
+            loan: formatSignedPoints(reading.passThrough.loanPoints),
+          })
+        : rightNowTemplate;
 
   // Owner follow-up (11 Oct): the pattern line must ALSO say what moves
   // and which way — one plain clause per leg. Colour carries DIRECTION
@@ -245,18 +282,15 @@ export function ConnectionCard({
       ? reading.legs
           .map((leg): Move | null => {
             const name = entry.legs[leg.id as keyof typeof entry.legs] ?? leg.id;
+            // B-04: the moves speak the leg's own direction (the uniform
+            // method); context legs display but carry no motion claim.
+            if (leg.role === 'context') return null;
             if (leg.direction === 'rising')
               return { text: interpolate(copy.together.moves.up, { name }), cls: 'text-[var(--color-status-normal)]', kind: 'up' };
             if (leg.direction === 'falling')
               return { text: interpolate(copy.together.moves.down, { name }), cls: 'text-[var(--color-status-alert)]', kind: 'down' };
             if (leg.direction === 'steady')
               return { text: interpolate(copy.together.moves.flat, { name }), cls: 'text-[var(--color-text-secondary)]', kind: 'flat' };
-            if (leg.level === 'high')
-              return { text: interpolate(copy.together.moves.high, { name }), cls: 'text-[var(--color-text-secondary)]', kind: 'level' };
-            if (leg.level === 'low')
-              return { text: interpolate(copy.together.moves.low, { name }), cls: 'text-[var(--color-text-secondary)]', kind: 'level' };
-            if (leg.level === 'typical')
-              return { text: interpolate(copy.together.moves.mid, { name }), cls: 'text-[var(--color-text-secondary)]', kind: 'level' };
             return null;
           })
           .filter((m): m is Move => m !== null)

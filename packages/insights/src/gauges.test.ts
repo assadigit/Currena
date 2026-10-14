@@ -121,8 +121,9 @@ describe('sectionVerdictStep (the Step-1 E1 count rule — one mapping, both reg
 
   it('unreadable gauges lower nothing; nothing readable → 0', () => {
     expect(sectionVerdictStep('global', [])).toBe(0);
-    // Only price-board context readings (no gauge members) → 0.
-    expect(sectionVerdictStep('global', [reading('gold-usd', 'context'), reading('brent', 'warning')])).toBe(0);
+    // Only non-gauge readings → 0 (brent now votes in prices-heat — fix
+    // B-14 — so the context rows alone still read nothing).
+    expect(sectionVerdictStep('global', [reading('gold-usd', 'context')])).toBe(0);
   });
 
   it('clamps to 1–4 when readable', () => {
@@ -159,7 +160,6 @@ describe('summarizeByGauges (the summary wire shape)', () => {
       ...readingsFor('au-trade-currency', 0, 4, 0), // step 1 (3 members since iron-ore went context)
       // Non-member readings must not leak into the counts:
       reading('gold-usd', 'context'),
-      reading('brent', 'warning'),
       reading('rba-cash-rate', 'context'),
       reading('iron-ore', 'context'),
       reading('au-deposit-rate', 'context'),
@@ -200,8 +200,8 @@ describe('GAUGES table shape (v1 membership, data spec §4)', () => {
     expect(GAUGES.filter((g) => g.section === 'australia')).toHaveLength(3);
   });
 
-  it('19 global scored + 13 australia scored = 32 voting members (Step-2: +vix/us-unemployment/sahm-rule global, +au-10y −iron-ore australia)', () => {
-    expect(GAUGES.filter((g) => g.section === 'global').flatMap((g) => g.members)).toHaveLength(19);
+  it('20 global scored + 13 australia scored = 33 voting members (fix B-14: +brent in prices-heat; Step-2: +vix/us-unemployment/sahm-rule global, +au-10y −iron-ore australia)', () => {
+    expect(GAUGES.filter((g) => g.section === 'global').flatMap((g) => g.members)).toHaveLength(20);
     expect(GAUGES.filter((g) => g.section === 'australia').flatMap((g) => g.members)).toHaveLength(13);
   });
 
@@ -210,8 +210,9 @@ describe('GAUGES table shape (v1 membership, data spec §4)', () => {
     expect(new Set(all).size).toBe(all.length);
   });
 
-  it('prices-board group is NOT a gauge (price rows never vote)', () => {
+  it('prices-board group is NOT a gauge (the strip rows stay out of the lanes; oil counts in prices-heat — fix B-14)', () => {
     expect(GAUGES.map((g) => g.id)).not.toContain('prices-board');
+    expect(GAUGES.find((g) => g.id === 'prices-heat')!.members).toContain('brent');
   });
 
   it('gaugesForSection returns readings in GAUGES order', () => {

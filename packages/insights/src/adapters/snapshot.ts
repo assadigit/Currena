@@ -10,6 +10,27 @@
  *
  * Everything here is deterministic given its inputs (frozen clock passed in,
  * AGENTS.md rule 2 style) so the ingest script is a thin shell around these.
+ *
+ * Fix spec 2026-10-14 additions:
+ *  - A-03/A-04: `flags` (from runValidationSuite) hold the LAST GOOD value
+ *    of a flagged reading with status `check-pending` — the fresh bad value
+ *    never reaches the live page, and the reason rides on the reading.
+ *  - B-05: `releaseDate` is the release that PUBLISHED THE SHOWN DATA (the
+ *    earliest schedule entry after the observation's period end), and
+ *    `nextReleaseToday` marks "newer data due today, not yet in".
+ *  - B-06: `decidedDate` for the policy-rate cards (from the hand-maintained
+ *    data/policy-decisions.json) — "decided 16 Sep 2026 · effective 17 Sep".
+ *  - B-01: `peaks` (value + date + basis) attach to the price rows, and
+ *    fromPeak10y is recomputed against the stated peak.
+ *  - B-10: `gapLegs` records the AU and US legs' own dates so the gap card
+ *    can show both dates and the "dates differ" tag.
+ *  - B-19: `highestSince` years (yields: the last time the value was this
+ *    high, from the full stored history).
+ *  - B-04: the home-loan reading carries `sinceDecision` — its change since
+ *    the latest RBA cash-rate decision (the pass-through card's rule).
+ *  - A-06: `contextNotes` (human-written, dated, expiring) attach to their
+ *    readings when unexpired; nothing shows by default.
+ *  - A-07: the snapshot carries `ruleVersion`.
  */
 
 import type { CalendarEvent, IndicatorHistory, IndicatorId, InsightsSnapshot, InsightsSourceReport, InsightsStatus, IndicatorReading } from '@currena/core';
@@ -17,15 +38,18 @@ import { InsightsSnapshotSchema, IndicatorHistorySchema, InsightsStatusSchema } 
 import { changedSince, computeReading, PERCENTILE_WINDOW_DAYS, type AuxSeries, type ReadingSource } from '../scoring';
 import { summarizeByGauges } from '../gauges';
 import { DEFINITIONS } from '../definitions';
+import { RULE_VERSION } from '../ruleVersion';
+import type { SafetyFlag } from '../validation';
 import { addDays, epochDay, fromEpochDay, pointAtOrBefore, type SeriesPoint } from '../series';
 import { AUX_RULE_WIRING, READING_SOURCES } from './derived';
 
 /**
- * Step-1 audit items A2/A3: a hand-maintained release event (official
- * publication dates for the monthly/quarterly series — data/
- * insights-release-schedule.json). The ingest stamps the matching readings
- * with `releaseDate` so cards can say "data for August 2026 · released
- * 11 September 2026".
+ * Step-1 audit items A2/A3 + fix spec B-05 (2026-10-14): a hand-maintained
+ * release event (official publication dates for the monthly/quarterly
+ * series — data/insights-release-schedule.json). The ingest stamps the
+ * matching readings with the release date OF THE DATA SHOWN (see
+ * releaseDateOf below) so a card never says "released Oct 14" about August
+ * data while September's release is still hours away.
  */
 export interface ReleaseScheduleEntry {
   /** The official release (publication) date. */
@@ -53,6 +77,71 @@ export function parseReleaseSchedule(raw: unknown): readonly ReleaseScheduleEntr
   return out;
 }
 
+/** Fix spec B-06: a hand-maintained policy decision (decided + effective dates). */
+export interface PolicyDecision {
+  /** The policy-rate indicator the decision belongs to. */
+  id: IndicatorId;
+  /** The decision (announcement) date. */
+  decided: string;
+  /** The date the new rate took effect (the series' step date). */
+  effective: string;
+  /** The step's size in points (cross-check against the series). */
+  points?: number;
+}
+
+/** Validate the raw JSON of data/policy-decisions.json (loud, never garbage). */
+export function parsePolicyDecisions(raw: unknown): readonly PolicyDecision[] {
+  if (!Array.isArray(raw)) throw new Error('policy decisions: expected a JSON array');
+  const out: PolicyDecision[] = [];
+  for (const entry of raw) {
+    if (typeof entry !== 'object' || entry === null) throw new Error('policy decisions: entry is not an object');
+    const { id, decided, effective, points } = entry as Record<string, unknown>;
+    if (typeof id !== 'string' || typeof decided !== 'string' || typeof effective !== 'string') {
+      throw new Error('policy decisions: id/decided/effective must be strings');
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(decided) || !/^\d{4}-\d{2}-\d{2}$/.test(effective)) {
+      throw new Error(`policy decisions: bad dates at ${id}`);
+    }
+    if (points !== undefined && typeof points !== 'number') throw new Error(`policy decisions: bad points at ${id}`);
+    out.push({ id: id as IndicatorId, decided, effective, ...(points !== undefined ? { points } : {}) });
+  }
+  return out;
+}
+
+/** Fix spec A-06: a human-written context note with an author date and an expiry date. */
+export interface ContextNote {
+  /** The indicator the note explains (or '*' for the page-level note). */
+  id: string;
+  text: string;
+  authored: string;
+  expires: string;
+}
+
+/** Validate the raw JSON of data/insights-context-notes.json (loud, never garbage). */
+export function parseContextNotes(raw: unknown): readonly ContextNote[] {
+  if (!Array.isArray(raw)) throw new Error('context notes: expected a JSON array');
+  const out: ContextNote[] = [];
+  for (const entry of raw) {
+    if (typeof entry !== 'object' || entry === null) throw new Error('context notes: entry is not an object');
+    const { id, text, authored, expires } = entry as Record<string, unknown>;
+    if (typeof id !== 'string' || typeof text !== 'string' || text.length === 0) {
+      throw new Error('context notes: id and text must be non-empty strings');
+    }
+    if (typeof authored !== 'string' || typeof expires !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(authored) || !/^\d{4}-\d{2}-\d{2}$/.test(expires)) {
+      throw new Error(`context notes: bad dates at ${id}`);
+    }
+    out.push({ id, text, authored, expires });
+  }
+  return out;
+}
+
+/** Fix spec B-01: a price row's full-history peak. */
+export interface PeakInput {
+  value: number;
+  date: string;
+  basis: 'daily-high' | 'daily-close';
+}
+
 export interface SnapshotBuildInputs {
   /** Assembled indicator series (buildIndicatorSeries output). */
   series: Partial<Record<IndicatorId, SeriesPoint[]>>;
@@ -73,29 +162,119 @@ export interface SnapshotBuildInputs {
    * target range) — attached to the fed-target reading as `rangeHigh`.
    */
   fedTargetUpper?: SeriesPoint[];
+  /**
+   * Fix spec B-06: hand-maintained policy decisions
+   * (data/policy-decisions.json) — stamps `decidedDate` on the policy-rate
+   * readings whose `lastChange` matches the effective date.
+   */
+  policyDecisions?: readonly PolicyDecision[];
+  /**
+   * Fix spec B-01: full-history peaks for the price rows (computed by the
+   * ingest from the Yahoo daily-high series for the metals and Bitcoin, and
+   * the daily-close series for Brent).
+   */
+  peaks?: Partial<Record<IndicatorId, PeakInput>>;
+  /**
+   * Fix spec B-19: the "highest since {year}" years for long-history
+   * series (computed by the ingest from the full fetched history).
+   */
+  highestSince?: Partial<Record<IndicatorId, number>>;
+  /**
+   * Fix spec A-06: human-written context notes (data/insights-context-notes.json).
+   * Expired notes are filtered out here — they never reach the page.
+   */
+  contextNotes?: readonly ContextNote[];
+  /**
+   * Fix spec A-03/A-04: the validation suite's safety flags — a flagged
+   * reading holds its LAST GOOD value with status `check-pending`.
+   */
+  flags?: ReadonlyMap<IndicatorId, SafetyFlag>;
   /** The run's clock (ISO 8601 UTC) — generatedAt and every reading's updatedAt. */
   now: string;
 }
 
+/* ------------------------------------------------------------------ *
+ * Date helpers (UTC, pure)
+ * ------------------------------------------------------------------ */
+
+/** The last day of the observation's month (asOf is month-start dated). */
+function monthEndOf(iso: string): string {
+  const [y, m] = iso.split('-').map(Number) as [number, number, number];
+  return new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
+}
+
+/** The first day of the month `months` after the observation's month. */
+function monthStartPlus(iso: string, months: number): string {
+  const [y, m] = iso.split('-').map(Number) as [number, number, number];
+  return new Date(Date.UTC(y, m - 1 + months, 1)).toISOString().slice(0, 10);
+}
+
+/** The end of the observation's period: month-end for monthlies, quarter-end for quarterlies. */
+function periodEndOf(cadence: 'monthly' | 'quarterly', asOf: string): string {
+  return cadence === 'monthly' ? monthEndOf(asOf) : monthEndOf(monthStartPlus(asOf, 2));
+}
+
+/**
+ * Fix spec B-05: the release date OF THE DATA SHOWN — the earliest schedule
+ * entry dated after the observation's period end (that is the release that
+ * published this observation). The OLD behaviour (the latest entry ≤ today)
+ * stamped October's release date onto August data while September's release
+ * was still hours away.
+ */
+function releaseDateOf(
+  id: IndicatorId,
+  cadence: 'monthly' | 'quarterly',
+  asOf: string,
+  schedule: readonly ReleaseScheduleEntry[],
+  nowDay: string,
+): string | undefined {
+  const periodEnd = periodEndOf(cadence, asOf);
+  const candidates = schedule.filter((e) => e.affects.includes(id) && e.date > periodEnd && e.date <= nowDay);
+  return candidates.length > 0 ? candidates[0]!.date : undefined;
+}
+
+/**
+ * Fix spec B-05: is NEWER data due TODAY and not yet in? True when the
+ * earliest upcoming schedule entry for the indicator is today AND the
+ * reading's observation predates the month that entry publishes (the
+ * month before today).
+ */
+function nextReleaseToday(
+  id: IndicatorId,
+  asOf: string,
+  schedule: readonly ReleaseScheduleEntry[],
+  nowDay: string,
+): boolean {
+  const upcoming = schedule.filter((e) => e.affects.includes(id) && e.date >= nowDay);
+  if (upcoming.length === 0 || upcoming[0]!.date !== nowDay) return false;
+  const publishesFrom = monthStartPlus(nowDay, -1); // a monthly release publishes last month
+  return asOf < publishesFrom;
+}
+
+/* ------------------------------------------------------------------ *
+ * The snapshot builder
+ * ------------------------------------------------------------------ */
+
 /**
  * Build the full snapshot. Missing series produce honest `unavailable`
  * readings (never omitted — the contract promises one reading per indicator
- * id eventually; the refine allows subsets but the runner always emits all
- * 28). The result is schema-validated: the runner refuses to write a
+ * id). The result is schema-validated: the runner refuses to write a
  * snapshot that would not survive the Worker's read-side validation.
  */
 export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnapshot {
   const readings: IndicatorReading[] = [];
   const nowDayIso = inputs.now.slice(0, 10);
-  // The latest release event at or before today, per indicator id.
-  const releaseBy = new Map<IndicatorId, string>();
-  for (const entry of inputs.releaseSchedule ?? []) {
-    if (entry.date > nowDayIso) continue;
-    for (const id of entry.affects) releaseBy.set(id, entry.date);
+  const schedule = inputs.releaseSchedule ?? [];
+  const notesByIndicator = new Map<string, ContextNote>();
+  for (const note of inputs.contextNotes ?? []) {
+    // A-06: expired notes disappear here — they never reach the page.
+    if (note.expires >= nowDayIso) notesByIndicator.set(note.id, note);
   }
   for (const def of DEFINITIONS) {
-    const series = inputs.series[def.id];
     const source: ReadingSource = READING_SOURCES[def.id] ?? { name: def.sourceRef };
+    const series = inputs.series[def.id];
+    const flag = inputs.flags?.get(def.id);
+
     if (!series) {
       // Step-1 audit item H3: a failed fetch HOLDS the last good value —
       // carried forward with its ORIGINAL asOf (never today's date) and
@@ -128,13 +307,73 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
     const auxOf = AUX_RULE_WIRING[def.id];
     const auxSeries = auxOf ? auxOf(inputs.series) : undefined;
     const aux: AuxSeries | undefined = auxSeries ? { series: auxSeries } : undefined;
-    const reading = computeReading(def, series, inputs.now, source, aux);
-    // Step-1 audit items A2/A3: stamp the official release date when the
-    // schedule knows it (only meaningful once the observation exists).
-    const releaseDate = reading.asOf !== null ? releaseBy.get(def.id) : undefined;
-    if (releaseDate !== undefined && reading.asOf !== null && releaseDate >= reading.asOf) {
-      reading.releaseDate = releaseDate;
+    let reading = computeReading(def, series, inputs.now, source, aux);
+
+    // ---- Fix spec B-05: the real release date of the data shown. ----
+    if (reading.asOf !== null && (def.cadence === 'monthly' || def.cadence === 'quarterly')) {
+      const releaseDate = releaseDateOf(def.id, def.cadence, reading.asOf, schedule, nowDayIso);
+      if (releaseDate !== undefined) reading.releaseDate = releaseDate;
+      if (nextReleaseToday(def.id, reading.asOf, schedule, nowDayIso)) {
+        (reading as { nextReleaseToday?: boolean }).nextReleaseToday = true;
+      }
     }
+
+    // ---- Fix spec B-01: the full-history peak on the price rows. ----
+    const peak = inputs.peaks?.[def.id];
+    if (peak !== undefined && reading.value !== null && peak.value > 0) {
+      reading.peak = { value: peak.value, date: peak.date, basis: peak.basis };
+      reading.fromPeak10y = ((reading.value - peak.value) / peak.value) * 100;
+    }
+
+    // ---- Fix spec B-19: "highest since {year}" for long-history series. ----
+    const sinceYear = inputs.highestSince?.[def.id];
+    if (sinceYear !== undefined) reading.highestSinceYear = sinceYear;
+
+    // ---- Fix spec B-10: the AU−US gap's legs' own dates. ----
+    if (def.id === 'au-us-10y-gap' && reading.asOf !== null) {
+      const au = inputs.series['au-10y'];
+      const us = inputs.series['us10y'];
+      const auLast = au?.[au.length - 1]?.date;
+      const usLast = us?.[us.length - 1]?.date;
+      if (auLast !== undefined && usLast !== undefined) {
+        reading.gapLegs = {
+          a: { id: 'au-10y', asOf: auLast },
+          b: { id: 'us10y', asOf: usLast },
+        };
+      }
+    }
+
+    // ---- Fix spec B-04: the loan reading's change since the RBA decision. ----
+    if (def.id === 'au-home-loan' && reading.asOf !== null && reading.value !== null) {
+      const cash = inputs.series['rba-cash-rate'];
+      const decision = lastStepOf(cash ?? [], reading.asOf);
+      if (decision !== undefined && decision.date <= reading.asOf) {
+        const before = pointAtOrBefore(series, decision.date);
+        if (before !== undefined) {
+          reading.sinceDecision = { decisionDate: decision.date, points: reading.value - before.value };
+        }
+      }
+    }
+
+    // ---- Fix spec B-06: the policy cards' decided + effective dates. ----
+    if (reading.lastChange !== undefined && inputs.policyDecisions !== undefined) {
+      const match = inputs.policyDecisions.find(
+        (d) => d.id === def.id && d.effective === reading.lastChange!.date,
+      );
+      if (match !== undefined) reading.decidedDate = match.decided;
+    }
+
+    // ---- Fix spec A-06: an unexpired context note rides its reading. ----
+    const note = notesByIndicator.get(def.id as string);
+    if (note !== undefined) {
+      reading.note = { text: note.text, authored: note.authored, expires: note.expires };
+    }
+
+    // ---- Fix spec A-03/A-04: apply the validation safety flags. ----
+    if (flag !== undefined) {
+      reading = applyFlag(reading, flag, inputs.previous, inputs.now);
+    }
+
     readings.push(reading);
   }
 
@@ -170,7 +409,61 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
     readings,
     changedThisWeek,
     calendar: [...inputs.calendar],
+    ruleVersion: RULE_VERSION,
   });
+}
+
+/** The most recent step change in a series on or before `asOf` (the RBA decision). */
+function lastStepOf(series: readonly SeriesPoint[], asOf: string): { date: string; points: number } | undefined {
+  const current = pointAtOrBefore(series, asOf);
+  if (!current) return undefined;
+  const idx = series.findIndex((p) => p.date === current.date);
+  for (let i = idx; i > 0; i--) {
+    const cur = series[i]!;
+    const prev = series[i - 1]!;
+    if (cur.value !== prev.value) return { date: cur.date, points: cur.value - prev.value };
+  }
+  return undefined;
+}
+
+/**
+ * Fix spec A-04: hold the LAST GOOD value of a flagged reading, mark it
+ * `check-pending`, record the reason, and strip the derived fields computed
+ * from the bad value — the flagged number never reaches the live page.
+ */
+function applyFlag(
+  reading: IndicatorReading,
+  flag: SafetyFlag,
+  previous: InsightsSnapshot | undefined,
+  now: string,
+): IndicatorReading {
+  const held: IndicatorReading = { ...reading };
+  if (flag.stripPeak === true) {
+    delete held.peak;
+    delete held.fromPeak10y;
+    return held;
+  }
+  if (!flag.holdLastGood) return held;
+  const lastGood = previous?.readings.find(
+    (r) => r.id === reading.id && r.status !== 'check-pending' && r.status !== 'unavailable' && r.value !== null && r.asOf !== null,
+  );
+  if (lastGood !== undefined) {
+    held.value = lastGood.value;
+    held.asOf = lastGood.asOf;
+    if (lastGood.releaseDate !== undefined) held.releaseDate = lastGood.releaseDate;
+  }
+  held.status = 'check-pending';
+  held.flag = { test: flag.test, reason: flag.reason };
+  delete held.change7d;
+  delete held.change30d;
+  delete held.change90d;
+  delete held.moveScore;
+  delete held.percentile10y;
+  delete held.fromPeak10y;
+  delete held.peak;
+  delete held.highestSinceYear;
+  held.updatedAt = now;
+  return held;
 }
 
 /* ------------------------------------------------------------------ *
@@ -267,6 +560,8 @@ interface StatusBuildInputs {
   generatedAt: string;
   mode: InsightsStatus['mode'];
   dryRun: boolean;
+  /** Fix spec Part D: the validation suite's results. */
+  validation?: InsightsStatus['validation'];
 }
 
 /** The per-source freshness record for /admin (insights:status). */
@@ -277,5 +572,7 @@ export function buildInsightsStatus(inputs: StatusBuildInputs): InsightsStatus {
     mode: inputs.mode,
     dryRun: inputs.dryRun,
     sources: [...inputs.reports],
+    ...(inputs.validation !== undefined ? { validation: inputs.validation } : {}),
+    ruleVersion: RULE_VERSION,
   });
 }

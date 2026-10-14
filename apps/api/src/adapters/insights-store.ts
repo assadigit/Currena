@@ -31,6 +31,7 @@ import type {
 import {
   INSIGHTS_SNAPSHOT_KEY,
   INSIGHTS_STATUS_KEY,
+  insightsArchiveKey,
   insightsHistoryKey,
   parseStoredValue,
   type InsightsReader,
@@ -64,6 +65,12 @@ export class KvInsightsReader implements InsightsReader {
       (v) => InsightsStatusSchema.parse(v),
       INSIGHTS_STATUS_KEY,
     );
+  }
+
+  /** Fix spec A-05: a past day's archived snapshot (one KV read). */
+  async getArchive(date: string): Promise<InsightsSnapshot | undefined> {
+    const key = insightsArchiveKey(date);
+    return parseStoredValue(await this.kv.get(key), (v) => InsightsSnapshotSchema.parse(v), key);
   }
 }
 

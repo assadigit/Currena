@@ -224,6 +224,89 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
     return response;
   });
 
+  app.get('/status', async (c) => {
+    // Fix spec A-08 (2026-10-14): the run status for the "About this data"
+    // panel — the snapshot time with its time zone, the failed sources and
+    // the validation results of the last refresh. One KV read, cached at the
+    // edge for 5 minutes like the other reads.
+    if (typeof caches !== 'undefined') {
+      const edgeCached = await caches.default.match(c.req.raw);
+      if (edgeCached !== undefined) return edgeCached;
+    }
+    let status: InsightsStatus | undefined;
+    try {
+      status = await deps.getReader(c.env).getStatus();
+    } catch (err) {
+      console.warn('[insights] status read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'insights_status_unavailable',
+        'Insights status is temporarily unavailable — please retry shortly.',
+      );
+    }
+    if (!status) {
+      return errorResponse(
+        c,
+        503,
+        'insights_status_not_ready',
+        'No Insights status stored yet — the daily ingestion run has not completed.',
+      );
+    }
+    const etag = `"insights-status:${status.generatedAt}"`;
+    if (c.req.header('if-none-match') === etag) {
+      return c.body(null, 304, { 'Cache-Control': 'public, max-age=300, s-maxage=300', ETag: etag });
+    }
+    const response = c.json(status, 200, {
+      'Cache-Control': 'public, max-age=300, s-maxage=300',
+      ETag: etag,
+    });
+    if (typeof caches !== 'undefined') {
+      try {
+        await caches.default.put(c.req.raw, response.clone());
+      } catch {
+        /* cache warm failures never fail the request */
+      }
+    }
+    return response;
+  });
+
+  // Fix spec A-05 (2026-10-14): the daily snapshot archive — the exact
+  // snapshot the page showed on a past day (values, statuses, calendar and
+  // rule version), written by the ingest under insights:archive:v1:<date>.
+  // Registered BEFORE /:id/history so the literal path wins.
+  app.get('/archive/:date', async (c) => {
+    const raw = c.req.param('date');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+      return errorResponse(
+        c,
+        400,
+        'invalid_archive_date',
+        `Archive date must be YYYY-MM-DD, received ${JSON.stringify(raw)}`,
+      );
+    }
+    let snapshot: InsightsSnapshot | undefined;
+    try {
+      snapshot = await deps.getReader(c.env).getArchive(raw);
+    } catch (err) {
+      console.warn('[insights] archive read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'archive_unavailable',
+        'The snapshot archive is temporarily unavailable — please retry shortly.',
+      );
+    }
+    if (!snapshot) {
+      return errorResponse(c, 404, 'archive_not_found', `No archived snapshot for ${raw}`);
+    }
+    const etag = `"insights-archive:${raw}:${snapshot.generatedAt}"`;
+    if (c.req.header('if-none-match') === etag) {
+      return c.body(null, 304, { 'Cache-Control': 'public, max-age=300', ETag: etag });
+    }
+    return c.json(snapshot, 200, { 'Cache-Control': 'public, max-age=300', ETag: etag });
+  });
+
   app.get('/:id/history', async (c) => {
     const raw = c.req.param('id');
     const parsed = IndicatorIdSchema.safeParse(raw);

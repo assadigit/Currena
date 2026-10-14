@@ -1,10 +1,11 @@
 /**
- * connections.test.ts — the "Together" card logic (I17, UI spec Block T1).
+ * connections.test.ts — the "Together" card logic (I17 → fix spec B-04,
+ * 2026-10-14: every relationship an explicit rule, one uniform leg method).
  *
  * Everything is synthetic IndicatorReadings: no fixtures, no network
  * (AGENTS.md rule 7). The "live-like" cases mirror the production snapshot
- * of 2026-10-08 (real-yield 2.91 rising · gold high · brent +22.7% ·
- * dollar basket rising · PMI 50.1 · AUD −3.6%) so the shipped states are
+ * of 2026-10-14 (dollar +3.10 pts · gold −5.19% · brent 30d −12.9% with a
+ * 90d leg above +25% · breakeven 2.33 steady) so the shipped states are
  * pinned, not accidental.
  */
 
@@ -12,13 +13,14 @@ import { describe, expect, it } from 'vitest';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import {
   CONNECTIONS,
+  evalConnectionLeg,
   evalLeg,
   evaluateConnection,
   evaluateConnections,
   type ConnectionDef,
 } from './connections';
 
-const BASE = '2026-10-08T04:20:11Z';
+const BASE = '2026-10-14T04:20:11Z';
 
 function reading(
   id: IndicatorId,
@@ -27,7 +29,7 @@ function reading(
   return {
     id,
     value: 1,
-    asOf: '2026-10-07',
+    asOf: '2026-10-13',
     status: 'normal',
     sourceName: 'test',
     updatedAt: BASE,
@@ -41,11 +43,17 @@ const def = (id: ConnectionDef['id']): ConnectionDef => {
   return d;
 };
 
+const legRule = (id: ConnectionDef['id'], legId: IndicatorId) => {
+  const rule = def(id).legs.find((l) => l.id === legId);
+  if (!rule) throw new Error(`no leg ${legId} in ${id}`);
+  return rule;
+};
+
 /* ---------------------------------------------------------------- *
- * evalLeg — direction thresholds, level fallback, honest nulls
+ * evalLeg — the signals vocabulary (direction + level lean)
  * ---------------------------------------------------------------- */
 
-describe('evalLeg', () => {
+describe('evalLeg (signals vocabulary)', () => {
   it('maps change30d across the per-leg threshold to rising/falling/steady (points)', () => {
     const ry = (ch: number) => reading('real-yield-10y', { change30d: ch, percentile10y: 0.5 });
     expect(evalLeg('real-yield-10y', ry(0.11)).direction).toBe('rising');
@@ -55,16 +63,7 @@ describe('evalLeg', () => {
     expect(evalLeg('real-yield-10y', ry(0.1)).direction).toBe('steady');
   });
 
-  it('uses pct thresholds for pct legs (brent 5, gold 3)', () => {
-    expect(evalLeg('brent', reading('brent', { change30d: 22.7 })).direction).toBe('rising');
-    expect(evalLeg('brent', reading('brent', { change30d: -5.1 })).direction).toBe('falling');
-    expect(evalLeg('brent', reading('brent', { change30d: 4.9 })).direction).toBe('steady');
-    expect(evalLeg('gold-usd', reading('gold-usd', { change30d: 3.1 })).direction).toBe('rising');
-    expect(evalLeg('gold-usd', reading('gold-usd', { change30d: 2.9 })).direction).toBe('steady');
-  });
-
   it('falls back to the level lean when direction is unmeasurable', () => {
-    // gold has no change30d yet (I16 accrual) but sits high: lean +1
     const leg = evalLeg('gold-usd', reading('gold-usd', { percentile10y: 0.925, change30d: undefined }));
     expect(leg.direction).toBeNull();
     expect(leg.level).toBe('high');
@@ -72,22 +71,53 @@ describe('evalLeg', () => {
   });
 
   it('a steady direction still leans by level (flat at a decade extreme is not neutral)', () => {
-    const leg = evalLeg('rba-cash-rate', reading('rba-cash-rate', { change30d: 0.01, percentile10y: 1 }));
+    const leg = evalLeg('real-yield-10y', reading('real-yield-10y', { change30d: 0.01, percentile10y: 1 }));
     expect(leg.direction).toBe('steady');
     expect(leg.lean).toBe(1);
-    const low = evalLeg('audusd', reading('audusd', { change30d: 0, percentile10y: 0.1 }));
+    const low = evalLeg('copper-gold', reading('copper-gold', { change30d: 0, percentile10y: 0.1 }));
     expect(low.lean).toBe(-1);
   });
+});
 
-  it('steady + typical is honestly neutral; missing fields degrade to null', () => {
-    const leg = evalLeg('terms-of-trade', reading('terms-of-trade', { percentile10y: 0.43 }));
+/* ---------------------------------------------------------------- *
+ * The uniform v2 leg rule — direction over a window with a minimum move
+ * ---------------------------------------------------------------- */
+
+describe('evalConnectionLeg (B-04 uniform method)', () => {
+  it('a leg moves when any window change reaches that window minimum', () => {
+    const rule = legRule('oil-expectations-costs', 'brent');
+    // 30-day calm (+2%) but a 90-day surge (+30%) — the B-04 case: a big
+    // annual move hidden behind a calm month.
+    const leg = evalConnectionLeg(rule, reading('brent', { change30d: 2, change90d: 30 }));
+    expect(leg.moved).toBe(true);
+    expect(leg.direction).toBe('rising');
+    expect(leg.moveWindow).toBe(90);
+    expect(leg.move).toBe(30);
+  });
+
+  it('a 30-day burst also qualifies on its own', () => {
+    const rule = legRule('dollar-gold-oil', 'brent');
+    const leg = evalConnectionLeg(rule, reading('brent', { change30d: -12.9, change90d: undefined }));
+    expect(leg.moved).toBe(true);
+    expect(leg.direction).toBe('falling');
+    expect(leg.moveWindow).toBe(30);
+  });
+
+  it('steady when no window qualifies — direction reads from the display change', () => {
+    const rule = legRule('real-yields-gold', 'real-yield-10y');
+    const leg = evalConnectionLeg(rule, reading('real-yield-10y', { change30d: 0.02 }));
+    expect(leg.moved).toBe(false);
+    expect(leg.direction).toBe('rising'); // display-only sign of the sub-threshold move
+    const flat = evalConnectionLeg(rule, reading('real-yield-10y', { change30d: 0 }));
+    expect(flat.direction).toBe('steady');
+  });
+
+  it('no change data at all degrades honestly', () => {
+    const rule = legRule('real-yields-gold', 'gold-usd');
+    const leg = evalConnectionLeg(rule, reading('gold-usd', { change30d: undefined }));
+    expect(leg.moved).toBe(false);
     expect(leg.direction).toBeNull();
-    expect(leg.level).toBe('typical');
-    expect(leg.lean).toBe(0);
-    const bare = evalLeg('iron-ore', reading('iron-ore', {}));
-    expect(bare.direction).toBeNull();
-    expect(bare.level).toBeNull();
-    expect(bare.lean).toBe(0);
+    expect(leg.move).toBeNull();
   });
 });
 
@@ -95,103 +125,181 @@ describe('evalLeg', () => {
  * The uniform state rule
  * ---------------------------------------------------------------- */
 
-describe('evaluateConnection', () => {
-  it('active — every leg leans the same way', () => {
+describe('evaluateConnection (v2 rules)', () => {
+  it('B-04: never Active with a steady required leg — the audited oil chain', () => {
+    // The audited state: oil steady on the month, expectations steady —
+    // only borrowing costs moved. The card must NOT read active.
     const readings = [
-      reading('brent', { change30d: 22.7 }),
-      reading('breakeven-5y5y', { change30d: 0.02, percentile10y: 0.9 }),
+      reading('brent', { change30d: 2, change90d: 3 }),
+      reading('breakeven-5y5y', { change30d: 0.02 }),
       reading('us10y', { change30d: 0.49 }),
     ];
     const r = evaluateConnection(def('oil-expectations-costs'), readings);
-    // brent rising, breakeven steady-but-high → +1, us10y rising → all +1
-    expect(r.state).toBe('active');
-    expect(r.legs.map((l) => l.lean)).toEqual([1, 1, 1]);
+    expect(r.state).not.toBe('active');
+    expect(r.state).toBe('partly');
   });
 
-  it('disagree — non-zero leans point both ways (the live see-saw: yields high AND gold high)', () => {
+  it('active when every required leg moves in the structure direction (oil chain, all up)', () => {
     const readings = [
-      reading('real-yield-10y', { change30d: 0.48, percentile10y: 0.998 }),
-      reading('gold-usd', { percentile10y: 0.925, change30d: undefined }),
+      reading('brent', { change30d: 6.2, change90d: 31 }),
+      reading('breakeven-5y5y', { change30d: 0.14 }),
+      reading('us10y', { change30d: 0.49 }),
     ];
-    const r = evaluateConnection(def('real-yields-gold'), readings);
-    expect(r.state).toBe('disagree');
-    expect(r.legs.map((l) => l.lean)).toEqual([1, 1]);
+    const r = evaluateConnection(def('oil-expectations-costs'), readings);
+    expect(r.state).toBe('active');
   });
 
-  it('inverse connections read active when the legs lean against each other (both directions)', () => {
-    // yields falling, gold rising — the classic supportive pattern
+  it('B-04: the dollar rising while gold falls is the see-saw WORKING (not a disagreement)', () => {
+    // The audited complaint: "Signals disagree while the dollar is rising
+    // and gold is falling, which is the usual pattern."
+    const r = evaluateConnection(
+      def('dollar-gold-oil'),
+      [
+        reading('dollar-basket', { change30d: 3.1, change90d: 3.2 }),
+        reading('gold-usd', { change30d: -5.2, change90d: -8 }),
+        reading('brent', { change30d: -12.9, change90d: -2 }),
+      ],
+    );
+    expect(r.state).toBe('active');
+  });
+
+  it('see-saw active in both directions (real yields vs gold)', () => {
     const classic = evaluateConnection(
       def('real-yields-gold'),
       [
-        reading('real-yield-10y', { change30d: -0.3, percentile10y: 0.1 }),
-        reading('gold-usd', { change30d: 4, percentile10y: 0.9 }),
+        reading('real-yield-10y', { change30d: -0.3 }),
+        reading('gold-usd', { change30d: 4 }),
       ],
     );
     expect(classic.state).toBe('active');
-
-    // yields rising, gold falling — the see-saw working the other way
     const reverse = evaluateConnection(
       def('real-yields-gold'),
       [
-        reading('real-yield-10y', { change30d: 0.3, percentile10y: 0.95 }),
-        reading('gold-usd', { change30d: -4, percentile10y: 0.1 }),
+        reading('real-yield-10y', { change30d: 0.3 }),
+        reading('gold-usd', { change30d: -4 }),
       ],
     );
     expect(reverse.state).toBe('active');
-
-    // dollar strong AND commodities soft — the dollar pressure showing
-    const pressure = evaluateConnection(
-      def('dollar-gold-oil'),
-      [
-        reading('dollar-basket', { change30d: 2, percentile10y: 0.9 }),
-        reading('gold-usd', { change30d: -4, percentile10y: 0.3 }),
-        reading('brent', { change30d: -8, percentile10y: 0.2 }),
-      ],
-    );
-    expect(pressure.state).toBe('active');
-
-    // dollar weak AND commodities firm — the reverse also reads active
-    const relief = evaluateConnection(
-      def('dollar-gold-oil'),
-      [
-        reading('dollar-basket', { change30d: -2, percentile10y: 0.1 }),
-        reading('gold-usd', { change30d: 4, percentile10y: 0.9 }),
-        reading('brent', { change30d: 8, percentile10y: 0.9 }),
-      ],
-    );
-    expect(relief.state).toBe('active');
   });
 
-  it('partly — some legs lean, none opposes, rest neutral (live export chain: only AUD moves)', () => {
-    const readings = [
-      reading('iron-ore', { change30d: 1.45, percentile10y: 0.415 }),
-      reading('terms-of-trade', { percentile10y: 0.43 }),
-      reading('audusd', { change30d: -3.65, percentile10y: 0.46 }),
-    ];
-    const r = evaluateConnection(def('iron-terms-aud'), readings);
-    expect(r.state).toBe('partly');
-    expect(r.legs.map((l) => l.lean)).toEqual([0, 0, -1]);
+  it('disagree — required legs move in structure-breaking directions', () => {
+    // real yields AND gold both rising — the see-saw is broken.
+    const r = evaluateConnection(
+      def('real-yields-gold'),
+      [
+        reading('real-yield-10y', { change30d: 0.48 }),
+        reading('gold-usd', { change30d: 5.1 }),
+      ],
+    );
+    expect(r.state).toBe('disagree');
   });
 
-  it('inactive — no leg leans at all', () => {
+  it('inactive — no required leg moves at all', () => {
     const readings = [
-      reading('brent', { change30d: 1, percentile10y: 0.5 }),
-      reading('breakeven-5y5y', { change30d: 0.02, percentile10y: 0.5 }),
-      reading('us10y', { change30d: 0.05, percentile10y: 0.5 }),
+      reading('brent', { change30d: 1 }),
+      reading('breakeven-5y5y', { change30d: 0.02 }),
+      reading('us10y', { change30d: 0.05 }),
     ];
     const r = evaluateConnection(def('oil-expectations-costs'), readings);
     expect(r.state).toBe('inactive');
   });
 
-  it('unknown — a stale or absent leg freezes the state but keeps the other legs for display', () => {
+  it('B-04: the US money-supply leg is gone from copper-china-growth', () => {
+    const legs = def('copper-china-growth').legs.map((l) => l.id);
+    expect(legs).toEqual(['copper-gold', 'china-pmi']);
+    expect(legs).not.toContain('m2-us');
+  });
+
+  it('B-04: the US dollar rides iron-terms-aud as a CONTEXT leg (displays, never gates)', () => {
+    const rules = def('iron-terms-aud').legs;
+    const dollar = rules.find((l) => l.id === 'dollar-basket')!;
+    expect(dollar.role).toBe('context');
+    // A moving dollar context cannot change the state: everything else
+    // steady + a big dollar move must still read inactive (not partly).
+    const r = evaluateConnection(
+      def('iron-terms-aud'),
+      [
+        reading('iron-ore', { change30d: 1.45 }),
+        reading('terms-of-trade', { change30d: 0.2 }),
+        reading('audusd', { change30d: -1.4 }),
+        reading('dollar-basket', { change30d: 3.1 }),
+      ],
+    );
+    expect(r.state).toBe('inactive');
+    // The context leg still displays its move.
+    const dollarLeg = r.legs.find((l) => l.id === 'dollar-basket')!;
+    expect(dollarLeg.moved).toBe(true);
+    expect(dollarLeg.direction).toBe('rising');
+  });
+
+  it('B-04: the RBA pass-through card reads pending until the loan data catches up', () => {
+    const decision = '2026-09-30';
     const readings = [
+      reading('rba-cash-rate', { value: 4.6, status: 'context', lastChange: { date: decision, points: 0.25 } }),
+      // The loan reading's data (Aug 31) predates the Sep 30 decision.
+      reading('au-home-loan', { value: 6.2, asOf: '2026-08-31', status: 'warning', change30d: 0.05 }),
+      reading('au-household-debt-arrears', { value: 178.4, percentile10y: 0.158 }),
+    ];
+    const r = evaluateConnection(def('rba-loan-debt'), readings);
+    expect(r.state).toBe('pending');
+  });
+
+  it('B-04: the pass-through card compares the loan change since the decision', () => {
+    const decision = '2026-09-30';
+    const base = [
+      reading('rba-cash-rate', { value: 4.6, status: 'context', lastChange: { date: decision, points: 0.25 } }),
+      reading('au-household-debt-arrears', { value: 178.4, percentile10y: 0.158 }),
+    ];
+    // The loan data postdates the decision by a month and repriced with it.
+    const passed = evaluateConnection(
+      def('rba-loan-debt'),
+      [
+        ...base,
+        reading('au-home-loan', {
+          value: 6.38,
+          asOf: '2026-10-31',
+          status: 'warning',
+          sinceDecision: { decisionDate: decision, points: 0.18 },
+        }),
+      ],
+    );
+    expect(passed.state).toBe('active');
+    expect(passed.passThrough).toEqual({ decisionDate: decision, decisionPoints: 0.25, loanPoints: 0.18 });
+
+    // The window passed but the loan did not reprice — inactive.
+    const stuck = evaluateConnection(
+      def('rba-loan-debt'),
+      [
+        ...base,
+        reading('au-home-loan', {
+          value: 6.2,
+          asOf: '2026-10-31',
+          status: 'warning',
+          sinceDecision: { decisionDate: decision, points: 0 },
+        }),
+      ],
+    );
+    expect(stuck.state).toBe('inactive');
+  });
+
+  it('the debt leg is context and labelled as a debt-to-income level (B-04)', () => {
+    const debt = def('rba-loan-debt').legs.find((l) => l.id === 'au-household-debt-arrears')!;
+    expect(debt.role).toBe('context');
+    expect(debt.caveat).toBe('debt-level');
+  });
+
+  it('unknown — a stale, check-pending or absent required leg freezes the state', () => {
+    const r = evaluateConnection(def('real-yields-gold'), [
       reading('real-yield-10y', { change30d: -0.3 }),
       reading('gold-usd', { status: 'stale', percentile10y: 0.9 }),
-    ];
-    const r = evaluateConnection(def('real-yields-gold'), readings);
+    ]);
     expect(r.state).toBe('unknown');
-    expect(r.legs[0]!.lean).toBe(-1); // still evaluated for the chip
-    expect(r.legs[1]!.direction).toBeNull(); // unreadable leg degrades
+
+    const held = evaluateConnection(def('real-yields-gold'), [
+      reading('real-yield-10y', { change30d: -0.3 }),
+      reading('gold-usd', { status: 'check-pending', percentile10y: 0.9 }),
+    ]);
+    expect(held.state).toBe('unknown');
 
     const missing = evaluateConnection(def('rba-loan-debt'), [
       reading('rba-cash-rate', { percentile10y: 1 }),
@@ -201,43 +309,50 @@ describe('evaluateConnection', () => {
     expect(missing.state).toBe('unknown');
   });
 
-  it('unavailable legs also force unknown (no reading at all)', () => {
+  it('a required leg with no measurable change also forces unknown', () => {
     const r = evaluateConnection(def('dollar-gold-oil'), [
       reading('dollar-basket', { change30d: 3.4 }),
-      reading('gold-usd', { status: 'unavailable', value: null, asOf: null }),
+      reading('gold-usd', { change30d: undefined, percentile10y: 0.9 }),
       reading('brent', { change30d: 22.7 }),
     ]);
     expect(r.state).toBe('unknown');
   });
 
-  it('live-like snapshot pins the shipped states for all six connections', () => {
+  it('live-like snapshot (2026-10-14) pins the shipped states for all six connections', () => {
     const live = [
       reading('real-yield-10y', { value: 2.91, change30d: 0.48, percentile10y: 0.998 }),
-      reading('gold-usd', { value: 4125.8, status: 'context', percentile10y: 0.925 }),
-      reading('brent', { value: 125.44, change30d: 22.69, percentile10y: 0.992, status: 'warning' }),
-      reading('dollar-basket', { value: 102.41, change30d: 3.44, percentile10y: 0.748 }),
-      reading('breakeven-5y5y', { value: 2.35, change30d: 0.02, percentile10y: 0.901, status: 'warning' }),
-      reading('us10y', { value: 5.27, change30d: 0.49, percentile10y: 0.998, status: 'warning' }),
+      reading('gold-usd', { value: 4125.9, status: 'context', change30d: -5.19, change90d: 9, percentile10y: 0.925 }),
+      reading('brent', { value: 106.06, change30d: -12.9, change90d: 30, percentile10y: 0.992, status: 'warning' }),
+      reading('dollar-basket', { value: 102.27, change30d: 3.1, change90d: 3.2, percentile10y: 0.748 }),
+      reading('breakeven-5y5y', { value: 2.33, change30d: 0.01, percentile10y: 0.901, status: 'normal' }),
+      reading('us10y', { value: 5.24, change30d: 0.41, change90d: 0.55, percentile10y: 0.998, status: 'warning' }),
       reading('copper-gold', { value: 3.35, change30d: 0.103, percentile10y: 0.212 }),
-      reading('china-pmi', { value: 50.1, change30d: 0.3 }),
-      reading('m2-us', { value: 23342.8, change30d: 0.54, percentile10y: 1 }),
+      reading('china-pmi', { value: 50.1, change30d: 0.2 }),
       reading('iron-ore', { value: 97.7, change30d: 1.45, percentile10y: 0.415 }),
-      reading('terms-of-trade', { value: 94.8, percentile10y: 0.432 }),
+      reading('terms-of-trade', { value: 94.8, change30d: 0.2, percentile10y: 0.432 }),
       reading('audusd', { value: 0.695, change30d: -3.65, percentile10y: 0.461 }),
-      reading('rba-cash-rate', { value: 4.36, status: 'context', change30d: 0.01, percentile10y: 1 }),
-      reading('au-home-loan', { value: 6.2, change30d: 0, percentile10y: 0.953, status: 'warning' }),
+      reading('rba-cash-rate', { value: 4.6, status: 'context', change30d: 0.25, lastChange: { date: '2026-09-30', points: 0.25 } }),
+      reading('au-home-loan', { value: 6.2, asOf: '2026-08-31', change30d: 0, percentile10y: 0.953, status: 'warning' }),
       reading('au-household-debt-arrears', { value: 178.4, percentile10y: 0.158 }),
     ];
     const states = Object.fromEntries(
       evaluateConnections(live).map((r) => [r.connection, r.state]),
     );
     expect(states).toEqual({
-      'real-yields-gold': 'disagree', // yields high+rising vs gold high
-      'dollar-gold-oil': 'disagree', // dollar rising vs gold+oil firm
-      'oil-expectations-costs': 'active', // oil↑ expectations-high yields↑
-      'copper-china-growth': 'active', // copper ratio↑ PMI↑ M2↑
-      'iron-terms-aud': 'partly', // only the AUD moves
-      'rba-loan-debt': 'disagree', // rates+loans high vs debt ratio low
+      // Real yields rising vs gold falling — the see-saw working.
+      'real-yields-gold': 'active',
+      // The dollar rising against soft commodities — the usual pressure
+      // pattern (B-04: this is the structure WORKING, not a disagreement).
+      'dollar-gold-oil': 'active',
+      // Oil's recent leg is down (30d −12.9%) while yields rose — the
+      // chain's legs point both ways; NOT active (the audited bug class).
+      'oil-expectations-costs': 'disagree',
+      // The copper/gold ratio firmed but China's PMI is steady — one leg.
+      'copper-china-growth': 'partly',
+      // Only the AUD moves (down, past 2%) — one leg, no opposition.
+      'iron-terms-aud': 'partly',
+      // The Sep 30 hike is newer than the August loan data.
+      'rba-loan-debt': 'pending',
     });
   });
 });
@@ -251,8 +366,14 @@ describe('CONNECTIONS table integrity', () => {
     ]);
     for (const c of CONNECTIONS) {
       expect(c.legs.length).toBeGreaterThanOrEqual(2);
-      expect(c.legs.length).toBeLessThanOrEqual(3);
-      for (const leg of c.legs) expect(known.has(leg)).toBe(true);
+      for (const leg of c.legs) {
+        expect(known.has(leg.id)).toBe(true);
+        expect(leg.windows.length).toBeGreaterThanOrEqual(1);
+        for (const w of leg.windows) {
+          expect(w.minMove).toBeGreaterThan(0);
+          expect([7, 30, 90]).toContain(w.days);
+        }
+      }
     }
   });
 
@@ -265,5 +386,17 @@ describe('CONNECTIONS table integrity', () => {
       'iron-terms-aud',
       'rba-loan-debt',
     ]);
+  });
+
+  it('every relationship carries its explicit rule (B-04: the rules live in the registry)', () => {
+    for (const c of CONNECTIONS) {
+      for (const leg of c.legs) {
+        // Every leg — context legs included — declares windows + minima.
+        expect(leg.windows.length).toBeGreaterThan(0);
+      }
+      // At most one context leg per card; at least two required.
+      expect(c.legs.filter((l) => l.role === 'context').length).toBeLessThanOrEqual(1);
+      expect(c.legs.filter((l) => l.role === 'required').length).toBeGreaterThanOrEqual(2);
+    }
   });
 });

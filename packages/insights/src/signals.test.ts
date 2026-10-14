@@ -58,7 +58,9 @@ describe('evaluateSignal — gold (S1)', () => {
   it('all five supportive → mostly supportive', () => {
     const r = evaluateSignal('gold', [
       reading('real-yield-10y', { change30d: -0.4, percentile10y: 0.1 }),
-      reading('breakeven-5y5y', { change30d: 0.3, percentile10y: 0.95 }),
+      // Fix spec B-12: the expectations condition reads the breakeven card's
+      // SCORED STATUS — warning means elevated, and supportive for gold.
+      reading('breakeven-5y5y', { change30d: 0.3, percentile10y: 0.95, status: 'warning' }),
       reading('stress-stlfsi', { value: 0.5 }),
       reading('nfci', { value: -0.2 }),
       reading('dollar-basket', { change30d: -2, percentile10y: 0.2 }),
@@ -66,6 +68,23 @@ describe('evaluateSignal — gold (S1)', () => {
     ]);
     expect(r.metCount).toBe(5);
     expect(r.lean).toBe('mostly-supportive');
+  });
+
+  it('B-12: a Normal breakeven card never reads as elevated on the gold card', () => {
+    // The audited disagreement: the global card called 2.33% "Normal" while
+    // the gold card listed inflation expectations as supportive with an
+    // elevated-reading claim. The expectations condition now mirrors the
+    // indicator's own scored status — percentile alone never elevates.
+    const r = evaluateSignal('gold', [
+      reading('real-yield-10y', { change30d: -0.4, percentile10y: 0.1 }),
+      reading('breakeven-5y5y', { change30d: 0.3, percentile10y: 0.95, status: 'normal' }),
+      reading('stress-stlfsi', { value: 0.5 }),
+      reading('nfci', { value: -0.2 }),
+      reading('dollar-basket', { change30d: -2, percentile10y: 0.2 }),
+      reading('gold-usd', { change30d: 4, percentile10y: 0.9 }),
+    ]);
+    expect(r.conditions.find((c) => c.key === 'expectations')?.state).toBe('neutral');
+    expect(r.metCount).toBe(4);
   });
 
   it('four against (one neutral) → mostly unsupportive; neutral counts toward neither', () => {
@@ -142,7 +161,7 @@ describe('evaluateSignal — silver (S2)', () => {
   it('silver reaches mostly supportive at 4 of 6 met', () => {
     const r = evaluateSignal('silver', [
       reading('real-yield-10y', { change30d: -0.4, percentile10y: 0.1 }),
-      reading('breakeven-5y5y', { change30d: 0.3, percentile10y: 0.95 }),
+      reading('breakeven-5y5y', { change30d: 0.3, percentile10y: 0.95, status: 'warning' }),
       reading('stress-stlfsi', { value: 0.5 }),
       reading('nfci', { value: 0.2 }),
       reading('dollar-basket', { change30d: -2, percentile10y: 0.2 }),

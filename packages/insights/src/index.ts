@@ -87,19 +87,22 @@ export type { AuxSeries, ReadingSource, RuleVerdict } from './scoring';
 
 export {
   CONNECTIONS,
+  evalConnectionLeg,
   evalLeg,
   evaluateConnection,
   evaluateConnections,
+  PASS_THROUGH_WINDOW_DAYS,
 } from './connections';
 export type {
   ConnectionDef,
   ConnectionId,
-  ConnectionLeg,
+  ConnectionLegRule,
   ConnectionReading,
   ConnectionState,
   LegDirection,
   LegEval,
   LegLevel,
+  SignalLegEval,
 } from './connections';
 
 export { evaluateSignal, evaluateSignals } from './signals';
@@ -111,3 +114,6 @@ export type {
   SignalMetal,
   SignalReading,
 } from './signals';
+
+export { RULE_VERSION, RULE_CHANGELOG } from './ruleVersion';
+export type { RuleChangeLogEntry } from './ruleVersion';

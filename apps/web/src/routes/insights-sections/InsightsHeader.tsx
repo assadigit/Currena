@@ -75,11 +75,13 @@ export function InsightsHeader({
     const iso = state.snapshot.generatedAt;
     const dateText = locale === 'fa' ? formatJalaliDate(iso, 'fa-IR') : formatDateWords(iso, 'en-US');
     const pricesIso = state.snapshot.pricesAsOf;
+    // Fix spec B-08 (2026-10-14): the time carries its time ZONE — the
+    // quotes are stamped in UTC (shown in the details), never a naked clock.
     const pricesText =
       pricesIso !== undefined
         ? locale === 'fa'
-          ? formatJalaliDate(pricesIso, 'fa-IR', { withTime: true })
-          : new Intl.DateTimeFormat('en-AU', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }).format(new Date(pricesIso))
+          ? `${formatJalaliDate(pricesIso, 'fa-IR', { withTime: true })} (UTC)`
+          : `${new Intl.DateTimeFormat('en-AU', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }).format(new Date(pricesIso))} UTC`
         : null;
     return {
       date: dateText,

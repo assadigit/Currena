@@ -7,6 +7,9 @@
 import type { IndicatorReading, WarningRule } from '@currena/core';
 import { interpolate } from '../../../i18n';
 import type { IndicatorCopyEntry, ConsequenceLines, InsightsCopy } from '../../../i18n/insights-copy-en';
+import { formatRuleText } from './labels';
+import { formatIndicatorValue } from './display';
+import { definitionFor } from './sections';
 
 /* ------------------------------------------------------------------ *
  * 10-year position — warning zone, position WORDS, state keys
@@ -141,6 +144,25 @@ export function consequenceLine(
   const value = reading.value;
   if (!band || value === null) return raw.replace(/\{bandPos\}/g, '').replace(/\{bandLabel\}/g, band?.label ?? '');
   return interpolate(raw, { bandPos: bandPositionWord(value, band, words), bandLabel: band.label });
+}
+
+/**
+ * Fix spec A-02 (2026-10-14): the needs-attention line is GENERATED from the
+ * reading's own rule and value — the hand-written `meaning` conclusions are
+ * gone (they could contradict the card's numbers). Changing a value changes
+ * this line automatically; nothing here can say "easing" while the value
+ * rises, because the sentence is interpolated from the reading itself.
+ */
+export function attentionLineOf(
+  reading: IndicatorReading,
+  copy: InsightsCopy,
+  numberLocale: 'en-US' | 'fa-IR',
+): string | undefined {
+  if (reading.status !== 'warning' || reading.value === null) return undefined;
+  const def = definitionFor(reading.id);
+  const rule = formatRuleText(def.rule, reading.id, copy.rule, copy.units, numberLocale);
+  const value = formatIndicatorValue(reading.id, reading.value, numberLocale, copy.units);
+  return interpolate(copy.ui.attentionLine, { rule, value });
 }
 
 /** Band position words keyed by locale (the R28 tokens' rendered form). */

@@ -38,14 +38,39 @@ export function dataPeriodText(
   numberLocale: 'en-US' | 'fa-IR',
 ): string {
   const def = definitionFor(id);
-  const month = new Intl.DateTimeFormat(
-    locale === 'fa' ? 'fa-IR-u-ca-gregory' : 'en-US-u-ca-gregory',
-    { month: 'long', year: 'numeric', timeZone: 'UTC' },
-  ).format(new Date(`${asOf}T00:00:00Z`));
-  if (def.cadence === 'monthly' || def.cadence === 'quarterly' || def.cadence === 'manual') {
+  if (def.cadence === 'quarterly') {
+    // Fix spec B-07 (2026-10-14): quarterly data is labelled by QUARTER NAME
+    // and period end ("June quarter 2026") — never a bare month name.
+    return quarterPeriodText(asOf, locale);
+  }
+  if (def.cadence === 'monthly' || def.cadence === 'manual') {
+    const month = new Intl.DateTimeFormat(
+      locale === 'fa' ? 'fa-IR-u-ca-gregory' : 'en-US-u-ca-gregory',
+      { month: 'long', year: 'numeric', timeZone: 'UTC' },
+    ).format(new Date(`${asOf}T00:00:00Z`));
     return month;
   }
   return formatDateWords(asOf, numberLocale === 'fa-IR' ? 'fa-IR' : 'en-US');
+}
+
+/**
+ * Fix spec B-07 (2026-10-14): "June quarter 2026" / «سه‌ماههٔ ژوئن ۲۰۲۶» —
+ * the quarter named by its period END month (the Australian convention).
+ * Quarterly observations are quarter-start dated (1 Apr → the June quarter).
+ */
+export function quarterPeriodText(asOf: string, locale: 'en' | 'fa'): string {
+  const [y, m] = asOf.split('-').map(Number) as [number, number, number];
+  const endMonth = m + 2 > 12 ? m - 10 : m + 2;
+  const endYear = m + 2 > 12 ? y + 1 : y;
+  const monthName = new Intl.DateTimeFormat(
+    locale === 'fa' ? 'fa-IR-u-ca-gregory' : 'en-US-u-ca-gregory',
+    { month: 'long', timeZone: 'UTC' },
+  ).format(new Date(Date.UTC(endYear, endMonth - 1, 1)));
+  const yearText = new Intl.DateTimeFormat(locale === 'fa' ? 'fa-IR-u-ca-gregory' : 'en-US-u-ca-gregory', {
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(endYear, 0, 1)));
+  return locale === 'fa' ? `سه‌ماههٔ ${monthName} ${yearText}` : `${monthName} quarter ${yearText}`;
 }
 
 /** "X.X% below its 10-year peak" — the C9 distance line (≤ 0, 1 decimal). */
@@ -59,6 +84,35 @@ export function formatFromPeak(
     maximumFractionDigits: 1,
   });
   return template(pct);
+}
+
+/**
+ * Fix spec B-01 (2026-10-14): the record-distance line names the peak value
+ * and its date ("33.5% below its record $126,272 on 6 Oct 2025 (highest
+ * daily high)") — computed from the full stored price history on one stated
+ * basis, never a silent 10-year window. Falls back to the old line when the
+ * reading carries no peak.
+ */
+export function formatPeakDistance(
+  reading: { fromPeak10y?: number; peak?: { value: number; date: string; basis: 'daily-high' | 'daily-close' } },
+  numberLocale: 'en-US' | 'fa-IR',
+  copy: { belowPeak: string; belowPeakRecord: string; peakBasisHigh: string; peakBasisClose: string },
+  formatDate: (iso: string) => string,
+  formatValue: (value: number) => string,
+): string | null {
+  if (reading.fromPeak10y === undefined || reading.fromPeak10y >= -0.05) return null;
+  const pct = formatNumber(Math.abs(reading.fromPeak10y), numberLocale, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  if (reading.peak === undefined) {
+    return copy.belowPeak.replace('{pct}', pct);
+  }
+  return copy.belowPeakRecord
+    .replace('{pct}', pct)
+    .replace('{value}', formatValue(reading.peak.value))
+    .replace('{date}', formatDate(reading.peak.date))
+    .replace('{basis}', reading.peak.basis === 'daily-high' ? copy.peakBasisHigh : copy.peakBasisClose);
 }
 
 /* ------------------------------------------------------------------ *

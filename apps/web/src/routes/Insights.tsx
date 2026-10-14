@@ -441,8 +441,10 @@ export function Insights() {
             eventTargets={EVENT_TARGETS}
           />
 
-          {/* R25: "About this data" — quiet and collapsible. */}
-          <AboutTheData copy={copy} expandToken={aboutToken} />
+          {/* R25: "About this data" — quiet and collapsible. Fix spec A-08:
+           * the run status (snapshot time + time zone, failed sources, stale
+           * cards) renders from the page's own snapshot + /api/insights/status. */}
+          <AboutTheData copy={copy} expandToken={aboutToken} snapshot={state.snapshot} />
         </div>
       ) : null}
 

@@ -525,10 +525,15 @@ export type IndicatorDefinition = z.infer<typeof IndicatorDefinitionSchema>;
 
 /**
  * One indicator's computed state for the snapshot. Status semantics
- * (02-page-design-spec.md section 6 + Phase I1 refinements):
+ * (02-page-design-spec.md section 6 + Phase I1 refinements + the fix spec
+ * 2026-10-14):
  *  - `warning` / `normal` — voted, counts in the summary
  *  - `context`           — info-only card, never votes
  *  - `stale`             — data older than cadence + grace; greyed, excluded
+ *  - `check-pending`      — the validation suite flagged the fresh value
+ *                          (duplicate monthly print, failed source, failed
+ *                          test): the LAST GOOD value is held with its
+ *                          original asOf and never shown as today's data
  *  - `no-history`        — fresh value, but too little history to evaluate
  *                          the rule (excluded; card shows the value, no verdict)
  *  - `unavailable`       — no data at all (`value`/`asOf` are null)
@@ -538,6 +543,7 @@ export const IndicatorReadingStatusSchema = z.enum([
   'normal',
   'context',
   'stale',
+  'check-pending',
   'no-history',
   'unavailable',
 ]);
@@ -577,6 +583,13 @@ export const IndicatorReadingSchema = z
      */
     releaseDate: z.iso.date().optional(),
     /**
+     * Fix spec B-05 (2026-10-14): newer data for this indicator is due
+     * TODAY and is not yet in — the card shows "next release: today"
+     * beside the current data's release date instead of stamping today's
+     * date on last month's data.
+     */
+    nextReleaseToday: z.boolean().optional(),
+    /**
      * Step-1 audit item A1: the Fed target range's bounds (DFEDTARL/DFEDTARU).
      * `value` carries the lower bound; rangeHigh the upper. Other
      * indicators leave both absent.
@@ -596,6 +609,97 @@ export const IndicatorReadingSchema = z
         date: z.iso.date(),
         /** The step's size in the series' own units (percentage points for rates). */
         points: z.number().finite(),
+      })
+      .optional(),
+    /**
+     * Fix spec B-04 (2026-10-14): the 90-day change for daily series, same
+     * units — the oil leg of the oil→expectations→costs connection checks
+     * several windows (7, 30 and 90 days) because a big annual move can hide
+     * behind a calm month. Absent when not measurable or for cadences that
+     * express changes since the previous release instead.
+     */
+    change90d: z.number().finite().optional(),
+    /**
+     * Fix spec B-01 (2026-10-14): the full-history PEAK the distance is
+     * measured against — the value, its date and the basis (highest daily
+     * high vs highest daily close), so the card can state all three. Only the
+     * price rows carry it (gold/silver/Bitcoin/Brent).
+     */
+    peak: z
+      .object({
+        value: z.number().finite().positive(),
+        date: z.iso.date(),
+        basis: z.enum(['daily-high', 'daily-close']),
+      })
+      .optional(),
+    /**
+     * Fix spec B-19 (2026-10-14): for long-history series (yields), the year
+     * of the last time the value was this high, found by searching the full
+     * stored history — a 10-year window cannot say "highest since 2002".
+     * Absent when the value is not at (or within 1% of) the 10-year high or
+     * the history is too short to search.
+     */
+    highestSinceYear: z.number().int().positive().optional(),
+    /**
+     * Fix spec B-06 (2026-10-14): the policy-rate cards show BOTH dates —
+     * "decided 16 Sep 2026 · effective 17 Sep 2026". The series' step date
+     * is the EFFECTIVE date (lastChange.date); the decision date comes from
+     * the hand-maintained data/policy-decisions.json (the provider series
+     * carries no decision calendar).
+     */
+    decidedDate: z.iso.date().optional(),
+    /**
+     * Fix spec B-10 (2026-10-14): the two legs' latest observation dates for a
+     * derived gap/spread (au-us-10y-gap). The VALUE is always computed from
+     * same-date observations (exact-date join), but when the legs' freshest
+     * dates differ from the gap's own asOf the card shows both dates and the
+     * "dates differ" tag instead of letting the reader subtract the two
+     * displayed numbers and get a third answer.
+     */
+    gapLegs: z
+      .object({
+        a: z.object({ id: IndicatorIdSchema, asOf: z.iso.date() }),
+        b: z.object({ id: IndicatorIdSchema, asOf: z.iso.date() }),
+      })
+      .optional(),
+    /**
+     * Fix spec B-04 (2026-10-14): the home-loan reading's change since the
+     * LATEST RBA cash-rate decision — the pass-through card compares the
+     * decision (rba-cash-rate.lastChange) with the loan move 1–3 months
+     * later, and shows "pass-through pending" until this field exists.
+     * Computed by the ingest from the loan series against the decision date.
+     */
+    sinceDecision: z
+      .object({
+        /** The decision the change is measured from. */
+        decisionDate: z.iso.date(),
+        /** The loan-rate change since that decision, in points. */
+        points: z.number().finite(),
+      })
+      .optional(),
+    /**
+     * Fix spec A-03/A-04 (2026-10-14): why a reading sits in `check-pending` —
+     * the validation test id and the reason it flagged the fresh value.
+     * Rendered in the details panel ("Check pending — duplicate monthly
+     * value") and the status page.
+     */
+    flag: z
+      .object({
+        test: z.string().min(1),
+        reason: z.string().min(1),
+      })
+      .optional(),
+    /**
+     * Fix spec A-06 (2026-10-14): an optional human-written context note with
+     * an author date and an expiry date, filtered by the ingest (expired
+     * notes never leave the runner). Off by default: no note exists unless
+     * data/insights-context-notes.json carries one.
+     */
+    note: z
+      .object({
+        text: z.string().min(1),
+        authored: z.iso.date(),
+        expires: z.iso.date(),
       })
       .optional(),
     status: IndicatorReadingStatusSchema,
@@ -647,7 +751,13 @@ export const CalendarEventSchema = z.object({
   // Step-2 add-list §D: the six event kinds that move Australian money —
   // RBA and Fed decisions, ABS CPI + the ABS jobs report, US CPI + the US
   // jobs report (Employment Situation).
-  kind: z.enum(['rba', 'abs-cpi', 'abs-jobs', 'fed', 'us-cpi', 'us-jobs', 'other']),
+  kind: z.enum(['rba', 'abs-cpi', 'abs-jobs', 'fed', 'us-cpi', 'us-jobs', 'ecb', 'other']),
+  /**
+   * Fix spec C-07 (2026-10-14): the event's OWN time zone as an IANA name
+   * (e.g. 'Australia/Sydney'). "Days away" is computed IN this zone so a
+   * plain date is never converted through UTC. Absent → the browser's zone.
+   */
+  tz: z.string().min(1).optional(),
 });
 export type CalendarEvent = z.infer<typeof CalendarEventSchema>;
 
@@ -667,6 +777,12 @@ export const InsightsSnapshotSchema = z
     readings: z.array(IndicatorReadingSchema),
     changedThisWeek: z.array(ChangedEventSchema),
     calendar: z.array(CalendarEventSchema),
+    /**
+     * Fix spec A-07 (2026-10-14): the scoring-rule version that produced
+     * this snapshot — surfaced in "How is this calculated?" and archived with
+     * every daily snapshot so a past page can be reproduced exactly.
+     */
+    ruleVersion: z.number().int().positive().optional(),
   })
   .refine(
     (snap) => new Set(snap.readings.map((r) => r.id)).size === snap.readings.length,
@@ -717,6 +833,31 @@ export const InsightsSourceReportSchema = z.object({
 export type InsightsSourceReport = z.infer<typeof InsightsSourceReportSchema>;
 
 /**
+ * Fix spec Part D (2026-10-14): one validation test's result, written to the
+ * status file by the ingest AFTER the data is fetched and BEFORE anything
+ * is published. `ok` false means the flagged readings were held on their
+ * last good values (status `check-pending`) — never published as fresh.
+ */
+export const ValidationTestResultSchema = z.object({
+  /** The test id: 'T-01' … 'T-14' (INSIGHTS_FIX_SPEC.md Part D). */
+  test: z.string().min(1),
+  /** The test's plain-language name. */
+  name: z.string().min(1),
+  ok: z.boolean(),
+  /** The readings flagged by this test (empty when ok). */
+  flagged: z.array(IndicatorIdSchema),
+  /** One line per flagged reading explaining the failure. */
+  failures: z.array(z.string().min(1)),
+  /**
+   * Skip notes — why a test could not run its full check this refresh
+   * (e.g. a validation-only series the provider did not return). A skip is
+   * NOT a failure: ok stays true and the note is recorded for the status page.
+   */
+  notes: z.array(z.string().min(1)).optional(),
+});
+export type ValidationTestResult = z.infer<typeof ValidationTestResultSchema>;
+
+/**
  * Per-source freshness of the last insights ingestion run, stored under
  * `insights:status` and rendered on the /admin console (roadmap I3).
  */
@@ -729,6 +870,16 @@ export const InsightsStatusSchema = z.object({
   /** True for a fetch-and-score pass that wrote nothing to KV. */
   dryRun: z.boolean(),
   sources: z.array(InsightsSourceReportSchema),
+  /**
+   * Fix spec Part D (2026-10-14): the validation suite's results — every
+   * test that ran on this refresh, what it flagged, and whether it passed.
+   * The "About this data" status page renders this (A-08).
+   */
+  validation: z.array(ValidationTestResultSchema).optional(),
+  /**
+   * Fix spec A-07 (2026-10-14): the scoring-rule version of this run.
+   */
+  ruleVersion: z.number().int().positive().optional(),
 });
 export type InsightsStatus = z.infer<typeof InsightsStatusSchema>;
 

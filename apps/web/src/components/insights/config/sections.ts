@@ -9,7 +9,7 @@ import type {
   InsightsSection,
   IndicatorGroupId,
 } from '@currena/core';
-import { DEFINITIONS } from '@currena/insights';
+import { DEFINITIONS, GAUGES } from '@currena/insights';
 
 /* ------------------------------------------------------------------ *
  * Section / group layout (the I15 question-group restructure)
@@ -86,13 +86,21 @@ export function definitionFor(id: IndicatorId): (typeof DEFINITIONS)[number] {
   return def;
 }
 
-/** Per-group status line counts: voters, alerts, excluded within one group. */
+/** Per-group status line counts: voters, alerts, excluded within one group.
+ *  Fix spec B-14 (2026-10-14): the counts follow the GAUGE membership (the
+ *  area's scored list — oil counts in prices-heat while its card renders on
+ *  the prices strip), so the area counts, the hero count and the summary all
+ *  describe the same list.
+ */
 export function groupCounts(
   readings: readonly IndicatorReading[],
   section: InsightsSection,
   group: IndicatorGroupId,
 ): { alertCount: number; votingCount: number; excludedCount: number } {
-  const ids = new Set(definitionsForGroup(section, group).map((d) => d.id));
+  const gauge = GAUGES.find((g) => g.id === group && g.section === section);
+  const ids = new Set<IndicatorId>(
+    gauge ? gauge.members : definitionsForGroup(section, group).map((d) => d.id),
+  );
   let alertCount = 0;
   let votingCount = 0;
   let excludedCount = 0;
@@ -101,7 +109,7 @@ export function groupCounts(
     if (r.status === 'warning' || r.status === 'normal') {
       votingCount += 1;
       if (r.status === 'warning') alertCount += 1;
-    } else if (r.status === 'stale' || r.status === 'no-history' || r.status === 'unavailable') {
+    } else if (r.status === 'stale' || r.status === 'no-history' || r.status === 'check-pending' || r.status === 'unavailable') {
       excludedCount += 1;
     }
   }

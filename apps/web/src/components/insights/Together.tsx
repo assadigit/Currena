@@ -89,6 +89,7 @@ export function Together({
       }, {
         active: copy.together.summaryActive,
         partly: copy.together.summaryPartly,
+        pending: copy.together.summaryPending,
         inactive: copy.together.summaryInactive,
         disagree: copy.together.summaryDisagree,
         unknown: copy.together.summaryUnknown,

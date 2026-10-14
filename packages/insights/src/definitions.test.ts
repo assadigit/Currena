@@ -74,17 +74,22 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     ]);
   });
 
-  it('GAUGE membership is exactly the scored ids in gauged groups (32 voters, Step-2: +vix/us-unemployment/sahm-rule/au-10y, −iron-ore)', () => {
+  it('GAUGE membership is the scored list (33 voters; fix B-14: +brent counts in prices-heat while its card renders on the prices strip; Step-2: +vix/us-unemployment/sahm-rule/au-10y, −iron-ore)', () => {
     const gaugedGroups = new Set(GAUGES.map((g) => g.id));
     const memberIds = new Set(GAUGES.flatMap((g) => g.members));
-    expect(memberIds.size).toBe(32);
-    // Every gauge member is a scored (non-info) definition in that gauge's group.
+    expect(memberIds.size).toBe(33);
+    // Every gauge member is a scored (non-info) definition. B-14's one
+    // deliberate exception: brent lives in the prices-board lane group but
+    // counts in the prices-heat gauge (the card renders on the Prices
+    // strip; only the count membership moved).
     for (const g of GAUGES) {
       for (const id of g.members) {
         const def = DEFINITIONS.find((d) => d.id === id)!;
         expect(def.rule.kind, `${id} in gauge ${g.id} must be a voting rule`).not.toBe('info');
-        expect(def.group, `${id} must live in its gauge's group`).toBe(g.id);
-        expect(gaugedGroups.has(def.group)).toBe(true);
+        if (id !== 'brent') {
+          expect(def.group, `${id} must live in its gauge's group`).toBe(g.id);
+        }
+        expect(gaugedGroups.has(def.group) || def.group === 'prices-board', `${id} must live in a gauged group`).toBe(true);
       }
     }
     // And the inverse: every scored definition in a gauged group is a member.
@@ -110,6 +115,13 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expectStale('au-rent-yoy', 95);
     expectStale('au-petrol-yoy', 95);
     expectStale('brent', 12);
+    // Fix B-09 (2026-10-14): the release-cycle overrides that keep the
+    // tightened cadence defaults (4/10/45/120) honest.
+    expectStale('m2-us', 90);
+    expectStale('copper-gold', 60);
+    expectStale('au-unemployment', 60);
+    expectStale('au-household-debt-arrears', 190);
+    expectStale('iron-ore', 60);
     expectStale('gold-usd', 2);
     expectStale('silver-usd', 2);
     expectStale('btc-usd', 2);
@@ -150,7 +162,16 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(byId.get('china-pmi')!.rule).toEqual({ kind: 'threshold', direction: 'below', value: 50 });
     expect(byId.get('fed-target')!.rule).toEqual({ kind: 'percentile', tail: 'high', cutoff: 0.1 });
     expect(byId.get('ecb-dfr')!.rule).toEqual({ kind: 'percentile', tail: 'high', cutoff: 0.1 });
-    expect(byId.get('dollar-basket')!.rule).toEqual({ kind: 'percentile', tail: 'high', cutoff: 0.1 });
+    // Fix spec B-03 (2026-10-14): the dollar's level rule is JOINED by the
+    // speed rule — a 30-day move at or above the world-currencies alarm
+    // threshold (3% against six majors) counts as needs-attention here too.
+    expect(byId.get('dollar-basket')!.rule).toEqual({
+      kind: 'any-of',
+      of: [
+        { kind: 'percentile', tail: 'high', cutoff: 0.1 },
+        { kind: 'change', mode: 'pct', direction: 'rise', magnitude: 3, windowWeeks: 4 },
+      ],
+    });
     expect(byId.get('au-home-loan')!.rule).toEqual({ kind: 'percentile', tail: 'high', cutoff: 0.1 });
     expect(byId.get('au-rent-yoy')!.rule).toEqual({ kind: 'percentile', tail: 'high', cutoff: 0.1 });
     expect(byId.get('au-wage-growth')!.rule).toEqual({ kind: 'below-aux' });

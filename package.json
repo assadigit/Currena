@@ -2,7 +2,7 @@
   "name": "currena",
   "private": true,
   "version": "0.1.0",
-  "description": "Currena — currency converter with live Iranian Toman (open-market) and international rates. Hono API on Cloudflare Workers + Vite React SPA (PWA).",
+  "description": "Currena \u2014 currency converter with live Iranian Toman (open-market) and international rates. Hono API on Cloudflare Workers + Vite React SPA (PWA).",
   "packageManager": "pnpm@10.34.5",
   "engines": {
     "node": ">=20"
@@ -15,7 +15,8 @@
     "deploy": "pnpm --filter @currena/api run deploy",
     "copy:audit": "node scripts/audit-persian-copy.mjs",
     "copy:audit:update": "node scripts/update-persian-copy-manifest.mjs",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "registry:generate": "tsx scripts/generate-indicators-registry.ts"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

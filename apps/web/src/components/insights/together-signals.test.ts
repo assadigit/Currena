@@ -21,31 +21,38 @@ import { CONNECTIONS, evaluateConnections } from '@currena/insights';
 
 const leg = (fields: Partial<LegEval>): LegEval => ({
   id: 'gold-usd',
+  role: 'required',
   direction: null,
-  level: null,
-  lean: 0,
+  move: null,
+  moveWindow: null,
+  moved: false,
   ...fields,
 });
 
-describe('legPhrase (T1 right-now line assembly)', () => {
+describe('legPhrase (T1 right-now line assembly, B-04 uniform method)', () => {
   const copy = insightsCopyEn;
 
-  it('level + direction → "gold: high and rising"', () => {
-    expect(legPhrase(leg({ level: 'high', direction: 'rising', lean: 1 }), 'gold', copy)).toBe(
-      'gold: high and rising',
+  it('direction → "gold: rising"', () => {
+    expect(legPhrase(leg({ direction: 'rising', moved: true, move: 4.2, moveWindow: 30 }), 'gold', copy)).toBe(
+      'gold: rising',
     );
   });
 
-  it('level only / direction only / neither', () => {
-    expect(legPhrase(leg({ level: 'typical' }), 'real yields', copy)).toBe('real yields: mid-range');
+  it('a longer qualifying window is named ("over 90 days")', () => {
+    expect(
+      legPhrase(leg({ direction: 'rising', moved: true, move: 30, moveWindow: 90 }), 'oil', copy),
+    ).toBe(`oil: rising ${copy.together.phrases.overWindow.replace('{days}', '90')}`);
+  });
+
+  it('direction only / neither', () => {
     expect(legPhrase(leg({ direction: 'falling' }), 'the dollar', copy)).toBe('the dollar: falling');
     expect(legPhrase(leg({}), 'gold', copy)).toBe('gold: no fresh reading');
   });
 
   it('fa phrases render the Persian template with the same inputs', () => {
     const fa = insightsCopyFa;
-    expect(legPhrase(leg({ level: 'high', direction: 'steady' }), 'طلا', fa)).toBe('طلا: بالا و بدون تغییر محسوس');
-    expect(legPhrase(leg({}), 'طلا', fa)).toBe('طلا: دادهٔ به‌روز در دسترس نیست');
+    expect(legPhrase(leg({ direction: 'steady' }), 'طلا', fa)).toBe(`طلا: ${fa.together.direction.steady}`);
+    expect(legPhrase(leg({}), 'طلا', fa)).toBe('طلا: دادهٔ تازه ندارد');
   });
 });
 
@@ -124,15 +131,15 @@ describe('the I17 wiring', () => {
     const reading = (id: IndicatorId, fields: Partial<IndicatorReading> = {}): IndicatorReading =>
       ({ id, value: 1, asOf: '2026-10-07', status: 'normal', sourceName: 't', updatedAt: '2026-10-08T00:00:00Z', ...fields }) as IndicatorReading;
     const readings = CONNECTIONS.flatMap((c) =>
-      c.legs.map((id) =>
-        reading(id, { percentile10y: 0.5, change30d: id === 'terms-of-trade' ? undefined : 0.01 }),
+      c.legs.map((l) =>
+        reading(l.id, { percentile10y: 0.5, change30d: l.id === 'terms-of-trade' ? undefined : 0.01 }),
       ),
     );
     const evaluated = evaluateConnections(readings);
     expect(evaluated).toHaveLength(6);
     // every leg present, every state a valid vocabulary word
     for (const c of evaluated) {
-      expect(['active', 'partly', 'inactive', 'disagree', 'unknown']).toContain(c.state);
+      expect(['active', 'partly', 'pending', 'inactive', 'disagree', 'unknown']).toContain(c.state);
       expect(c.legs).toHaveLength(CONNECTIONS.find((d) => d.id === c.connection)!.legs.length);
     }
   });

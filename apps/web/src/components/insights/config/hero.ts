@@ -5,7 +5,7 @@
  */
 
 import type { IndicatorId, IndicatorReading, InsightsSection } from '@currena/core';
-import { DEFINITIONS } from '@currena/insights';
+import { GAUGES } from '@currena/insights';
 import type { GaugeReading } from '@currena/insights';
 import { interpolate } from '../../../i18n';
 import { warningZone } from './bands';
@@ -131,12 +131,18 @@ interface AttentionTileRow {
   extremity: number;
 }
 
-/** The warning members of one section, extremity-sorted (R3 tile order). */
+/** The warning members of one section, extremity-sorted (R3 tile order).
+ *  Fix spec B-14 (2026-10-14): the tiles are the GAUGE members in warning —
+ *  the same scored list the areas count, so the hero count equals the sum of
+ *  the area counts by construction (T-09).
+ */
 export function attentionTiles(
   readings: readonly IndicatorReading[],
   section: InsightsSection,
 ): AttentionTileRow[] {
-  const sectionIds = new Set(DEFINITIONS.filter((d) => d.section === section).map((d) => d.id));
+  const sectionIds = new Set(
+    GAUGES.filter((g) => g.section === section).flatMap((g) => [...g.members]),
+  );
   const rows: AttentionTileRow[] = [];
   for (const r of readings) {
     if (r.status !== 'warning' || !sectionIds.has(r.id)) continue;

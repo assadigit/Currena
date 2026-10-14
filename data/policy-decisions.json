@@ -1,0 +1,23 @@
+[
+  {
+    "id": "fed-target",
+    "decided": "2026-09-16",
+    "effective": "2026-09-17",
+    "points": 0.25,
+    "_note": "FOMC decision day 16 Sep 2026 (the meeting's second day); the FRED DFEDTARL series steps on the effective date 17 Sep — INSIGHTS_FIX_SPEC.md reference values + FRED's own series (verified live 2026-10-14: 3.50 → 3.75 on 2026-09-17)."
+  },
+  {
+    "id": "ecb-dfr",
+    "decided": "2026-09-10",
+    "effective": "2026-09-16",
+    "points": 0.25,
+    "_note": "ECB Governing Council decision 10 Sep 2026; the new deposit rate applied from 16 Sep — INSIGHTS_FIX_SPEC.md reference values (ECB Data Portal DFR series steps on the effective date; verified 2.50 live 2026-10-14)."
+  },
+  {
+    "id": "rba-cash-rate",
+    "decided": "2026-09-29",
+    "effective": "2026-09-30",
+    "points": 0.25,
+    "_note": "RBA Board decision 29 Sep 2026 (14:30 AEST); the new cash rate target applied from 30 Sep — the RBA F1 daily series steps on 2026-09-30 (verified live 2026-10-14: 4.35 → 4.60). The decision date is from the repo's documented 29-Sep hike (docs + prior owner rounds)."
+  }
+]
