@@ -103,7 +103,11 @@ export function Converter() {
   const [prevRate, setPrevRate] = useState<number | null>(null);
   const [failure, setFailure] = useState<ConvertFailure | null>(null);
   const [tgjuUrls, setTgjuUrls] = useState<Record<string, string>>({});
-  const [recentPairs, setRecentPairs] = useState<RecentPair[]>([]);
+  // Recent pairs — read ONCE via the lazy initializer (WS-5: the mount
+  // effect's set-state was the D-17-accepted shape; the lazy read is the
+  // lint-clean equivalent — same first paint, one fewer render pass).
+  // Written after each conversion (addRecentPair → setRecentPairs).
+  const [recentPairs, setRecentPairs] = useState<RecentPair[]>(() => readRecentPairs());
 
   // TGJU profile links from /api/meta (core's static map is the fallback).
   useEffect(() => {
@@ -141,11 +145,6 @@ export function Converter() {
   const showStaleBanner = isConfirmedStale(sourceState);
   const showOfflineBanner = !store.online && sourceState.snapshot !== null;
 
-  // Recent pairs — read once on mount (written after each conversion).
-  useEffect(() => {
-    setRecentPairs(readRecentPairs());
-  }, []);
-
   // I14 — `A` opens the alerts dialog (desktop keyboards; the same guard
   // family as Insights' / J K: skip while typing, with modifiers, or when
   // a dialog is already open). Live in THIS route only — Insights keeps
@@ -179,23 +178,6 @@ export function Converter() {
   const waitingCount = alerts.filter((a) => a.triggeredAt === undefined).length;
   const triggeredCount = alerts.length - waitingCount;
 
-  // I12 self-heal completion: when the CURRENT pair's source recovers
-  // (error → ready — the store's retry ladder landed data) while a failure
-  // card is on screen, finish the interrupted conversion automatically.
-  // The user already asked for it; the app just needed the outage window
-  // to pass. 'loading' is transitional (error → loading → ready): skipped
-  // so the remembered status stays 'error' until the fetch SETTLES.
-  const prevSourceStatusRef = useRef<'idle' | 'loading' | 'ready' | 'error' | undefined>(undefined);
-  useEffect(() => {
-    const status = store[pairSource].status;
-    if (status === 'loading') return; // transitional — keep the memory
-    const prev = prevSourceStatusRef.current;
-    prevSourceStatusRef.current = status;
-    if (prev === 'error' && status === 'ready' && failure !== null && phase === 'idle') {
-      void onSubmit();
-    }
-  }, [store, pairSource, failure, phase]);
-
   // Deep-link prefill: #/?from=EUR&to=IRR&amount=500 — powers History's
   // "Repeat" action AND shareable conversion links. Unknown values are
   // dropped silently; the URL is cleaned so a later remount never re-applies.
@@ -220,50 +202,6 @@ export function Converter() {
   const swap = (): void => {
     setFrom(to);
     setTo(from);
-  };
-
-  const onSubmit = async (): Promise<void> => {
-    if (phase === 'fetching') return;
-    const parsed = parseInputAmount(amount);
-    if (parsed === null || parsed <= 0) {
-      setAmountInvalid(true);
-      return;
-    }
-
-    setAmountInvalid(false);
-    setFailure(null);
-    // The dialog discipline returns focus here on close (audit D-3) —
-    // capture the submit control BEFORE the async gap blurs it.
-    resultOpenerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    setPhase('fetching');
-    const startedAt = Date.now();
-
-    try {
-      const { view, prevRate: baseline } = await runConversion(parsed);
-      const remaining = MIN_FETCHING_MS - (Date.now() - startedAt);
-      if (remaining > 0) await sleep(remaining);
-      setResult(view);
-      setPrevRate(baseline);
-      setPhase('result');
-      addRecentPair(view.from, view.to);
-      setRecentPairs(readRecentPairs());
-      saveHistoryEntry({
-        amount: parsed,
-        from: view.from,
-        to: view.to,
-        result: view.result,
-        rate: view.rate,
-        source: view.source,
-        is_cached: view.stale,
-        fetchedAt: view.source === 'manual' ? null : view.fetchedAt,
-        timestamp: new Date().toISOString(),
-      });
-    } catch (err) {
-      const remaining = MIN_FETCHING_MS - (Date.now() - startedAt);
-      if (remaining > 0) await sleep(remaining);
-      setFailure(toFailure(err, snapshotStore.getState().online));
-      setPhase('idle');
-    }
   };
 
   const runConversion = async (parsedAmount: number): Promise<{ view: ConversionView; prevRate: number | null }> => {
@@ -399,6 +337,70 @@ export function Converter() {
       lines: [t('errors.cantReachServer'), t('converter.checkConnection')],
     };
   };
+
+  const onSubmit = async (): Promise<void> => {
+    if (phase === 'fetching') return;
+    const parsed = parseInputAmount(amount);
+    if (parsed === null || parsed <= 0) {
+      setAmountInvalid(true);
+      return;
+    }
+
+    setAmountInvalid(false);
+    setFailure(null);
+    // The dialog discipline returns focus here on close (audit D-3) —
+    // capture the submit control BEFORE the async gap blurs it.
+    resultOpenerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    setPhase('fetching');
+    const startedAt = Date.now();
+
+    try {
+      const { view, prevRate: baseline } = await runConversion(parsed);
+      const remaining = MIN_FETCHING_MS - (Date.now() - startedAt);
+      if (remaining > 0) await sleep(remaining);
+      setResult(view);
+      setPrevRate(baseline);
+      setPhase('result');
+      addRecentPair(view.from, view.to);
+      setRecentPairs(readRecentPairs());
+      saveHistoryEntry({
+        amount: parsed,
+        from: view.from,
+        to: view.to,
+        result: view.result,
+        rate: view.rate,
+        source: view.source,
+        is_cached: view.stale,
+        fetchedAt: view.source === 'manual' ? null : view.fetchedAt,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      const remaining = MIN_FETCHING_MS - (Date.now() - startedAt);
+      if (remaining > 0) await sleep(remaining);
+      setFailure(toFailure(err, snapshotStore.getState().online));
+      setPhase('idle');
+    }
+  };
+
+
+  // I12 self-heal completion: when the CURRENT pair's source recovers
+  // (error → ready — the store's retry ladder landed data) while a failure
+  // card is on screen, finish the interrupted conversion automatically.
+  // The user already asked for it; the app just needed the outage window
+  // to pass. 'loading' is transitional (error → loading → ready): skipped
+  // so the remembered status stays 'error' until the fetch SETTLES.
+  // (WS-5: moved below onSubmit's declaration — the access-before-declared
+  // advisory was pure declaration order; effect behavior unchanged.)
+  const prevSourceStatusRef = useRef<'idle' | 'loading' | 'ready' | 'error' | undefined>(undefined);
+  useEffect(() => {
+    const status = store[pairSource].status;
+    if (status === 'loading') return; // transitional — keep the memory
+    const prev = prevSourceStatusRef.current;
+    prevSourceStatusRef.current = status;
+    if (prev === 'error' && status === 'ready' && failure !== null && phase === 'idle') {
+      void onSubmit();
+    }
+  }, [store, pairSource, failure, phase]);
 
   const tgjuTarget = from === 'IRR' ? to : from;
   const tgjuUrl = tgjuUrls[tgjuTarget] ?? tgjuProfileUrl(tgjuTarget) ?? null;
