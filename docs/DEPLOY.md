@@ -1003,3 +1003,51 @@ precedent). `EODHD_API_TOKEN` re-put on markets immediately after
   renders all sections in FA; 375×667 no horizontal bleed on converter
   or insights; zero console errors and zero console messages across
   the entire pass.
+
+## Session record — 2026-10-15 REMAINING_WORK session (WS-1 → WS-6)
+
+Deployed from `fb1fded` (CI green, origin/main = HEAD): **currena-api
+`155ecb3d-05bb-4f73-84ae-746008f59e98`** + **currena-markets
+`9b5ff7e0-c37b-4f06-8e02-228b90fbb280`** (both 2026-10-14T19:52Z).
+`EODHD_API_TOKEN` re-put on markets immediately after (idempotent).
+
+- What changed since the QA close-out record above (the owner's
+  REMAINING_WORK.md work order, executed in order): WS-1 the three
+  reliability minors (A-5 fx fallback per-currency validation D-19;
+  A-6 the store `prev`-threading D-20 — worst-case subrequests 50 → 48
+  incl. KV ops; A-8 serve-time staleness re-evaluation on the markets +
+  fx rows D-21); WS-2 the test closers (C-6 the markets/fx SPA clients,
+  C-8 the wrangler.jsonc cron contract, C-9 the jsdom component suite
+  D-22); WS-3 the six a11y fixes + three documented declines (D-23);
+  WS-4 the five remaining module-tree splits + the B-4 MetaResponse
+  consolidation (Receipt/Settle/fx-presentation/Converter/Signals, all
+  characterization-first, zero behavior change); WS-5 the advisory
+  worklist executed with an honest split — 34 → 14 warnings, the 14
+  declines each with a stated reason (D-24); WS-6 the three owner
+  option papers (D-25/D-26/D-27, awaiting Ali — no behavior change).
+- Serve-visible change to note: `/api/insights/markets` + `/api/insights/fx`
+  now re-evaluate per-row `stale` at serve time (D-21 — a multi-day
+  cron failure now serves honestly-flipped flags instead of frozen
+  `stale:false`; fresh snapshots byte-identical).
+- No stored-shape changes — KV readers/writers stay compatible both
+  directions; no snapshot job ordering needed.
+- Gates at deploy: **1,255/1,255 tests** (core 190 · scraper 67 ·
+  insights 356 · markets 13 · api 208 · web 421 — the web total carries
+  this session's +9 Receipt and +6 Settle jsdom characterization suites
+  on top of the prior segment's C-6/C-8/C-9 additions), typecheck 6/6,
+  lint 0 errors / 14 accepted advisories (D-24), copy audit clean,
+  budgets held (entry 294.60/88.50 vs 296/89.5 — the Converter split's
+  prop plumbing cost +1.0 kB raw, inside budget, no bump; Insights lazy
+  581.45/136.82 vs 582/137).
+- Post-deploy smoke (all verified): health `{"ok":true,"kv":"ok"}`;
+  rates tgju live (no-store + ETag); convert parity 100 USD →
+  26,390,000 @ 263,900; `/admin` 401 (the view gate — Worker-first
+  intact); insights markets + fx serve with `public, max-age=300,
+  s-maxage=300` + ETag + live 304 (D-12/D-13 intact).
+- Browser verification (Chrome, post-deploy): EN desktop the money
+  path (100 USD → 26,390,000 Toman live, result popup with rate/trend/
+  high-low); FA/RTL toggle (Persian h1 کورنا، مبدل ارز); 375×812
+  mobile /insights renders all 19 sections incl. the split
+  world-markets + fx + signals sections and the verdict strip; the
+  split Settle + Receipt routes render; zero console errors and zero
+  console messages across the entire pass.

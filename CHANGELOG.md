@@ -5,6 +5,107 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-15b] — REMAINING_WORK session: reliability minors, test closers, a11y leftovers, the five splits, the advisory worklist
+
+The owner-commissioned follow-up work order (REMAINING_WORK.md at the repo
+root, commissioned after the QA long-run). Executed in the recommended
+order: WS-1 → WS-2 → WS-3 → WS-4 → WS-5 → WS-6, conventional commits with
+CI green between them, both workers deployed + live-verified at the close.
+
+### Fixed — reliability (WS-1, D-19/D-20/D-21)
+
+- **fx fallback validation per-currency (A-5, D-19):** a Yahoo fallback
+  answering 5 of 6 required currencies no longer rejects the WHOLE set
+  (exactly during a Frankfurter outage, when the fallback is the only
+  source) — absent legs hold their stored rows with notes, present legs
+  compute; the full-set and empty-set outcomes are pinned unchanged.
+- **Subrequest budget 50 → 48 (A-6, D-20):** `putMarketsIfChanged` /
+  `putFxIfChanged` take the run's start-of-run `prev` instead of
+  re-reading KV — the worst-case provider+KV count now sits 2 under the
+  free plan's 50 cap (budget test extended to count KV ops through the
+  production store).
+- **Serve-time staleness (A-8, D-21):** `/api/insights/markets` + `/fx`
+  re-evaluate per-row `stale` at serve time (one daysBetween per row) —
+  a multi-day double-cron failure no longer serves frozen `stale:false`
+  to machine consumers (CSV exports); fresh snapshots byte-identical,
+  ETag identity unchanged (flips land within the ≤5-minute cache
+  windows).
+
+### Added — the test closers (WS-2) + characterization suites (WS-4)
+
+- C-6: the markets + fx SPA clients covered at the insights.test.ts bar;
+  C-8: the markets cron test READS wrangler.jsonc (config drift now
+  fails); C-9 (D-22): jsdom + @testing-library as web devDeps with
+  Converter + LiveRates DOM suites.
+- WS-4's characterization-first discipline added a 9-test Receipt suite
+  (form, live-total LOCAL math, generate guard + happy path, per-item
+  currency normalization through the snapshot — the legacy mixed-sum
+  bug pinned fixed — and the budget progressbar) and a 6-test Settle
+  suite (create-group flow + persistence, detail tablist, add-expense,
+  mark-settled balance cancellation). Web tests 352 → 421.
+
+### Fixed — a11y leftovers (WS-3, D-23)
+
+Settle's tabs + BatchConverter's mode toggle are REAL tablists (roving
+tabindex, RTL-aware arrow keys via the new shared use-roving-keys hook);
+AlertsDialog's radio group gains arrow-key selection; Splitter's ±
+steppers carry real verbs (en/fa, needs-review manifest entries);
+BatchConverter's share title moved to a copy key; three misleading
+constant `aria-expanded={false}` removed; Header/Footer/Converter
+quick-tools render REAL `<a href="#/…">` anchors. Declined with reasons
+(D-23): the LED table restructure (subgrid CSS architecture), lazy
+imgs (no remote below-fold imagery exists), the Insights idle prefetch
+(chunk already in the SW precache manifest).
+
+### Changed — de-monolith-ing round 2 (WS-4, behavior-preserving)
+
+- **B-4:** MetaResponse consolidated into packages/core — the api/web
+  zod twins deleted, parity tests became single-source tests.
+- Five module-tree splits, each characterization-first where coverage
+  was thin, one tree per commit: **WorldMarkets** 977 → 262 shell +
+  world-markets/ (5); **Receipt** 951 → 560 + receipt/ (5); **Settle**
+  947 → 342 + settle/ (8); **fx-presentation** 892 → a 30-line barrel +
+  fx-presentation/ (6 — the public surface byte-identical, ten
+  importers untouched); **Converter** 849 → 540 + converter/ (7 — the
+  shell keeps the conversion state machine; entry chunk 293.60 →
+  294.60 raw, inside the 296 budget); **Signals** 813 → 174 +
+  signals/ (3). No web/src file exceeds 560 lines anymore.
+- One copy-manifest re-point per split that moved a Persian literal
+  (the ٪ glyph — the established split-move pattern, text+hash
+  unchanged).
+
+### Fixed — the ESLint advisory worklist (WS-5, D-24: 34 → 14)
+
+Every warning the compiler's own prescribed shapes could fix without
+behavior churn: the localStorage hydration set-states became lazy
+`useState` initializers (Converter recents, Settle groups, History
+entries — the Settle `hydrated` guard retired because its crash window
+is structurally gone); declaration-order advisories dissolved by pure
+reordering; the memo-dependency gaps gained their real inputs
+(Together numberLocale, QuestionGroup group, AlertsDialog's extracted
+naLabel); BatchConverter's formatters hoisted to pure module functions;
+PairsTable's group-header boundaries precomputed. The 14 advisories
+that remain are DECLINED, each with a stated reason in D-24 (animation
+loops, data-fetch state machines, expand-token responses, the
+deliberate onSubmit omission, the ref-in-cleanup, the
+compilation-skip) — the rules stay at warn; honesty over lint-perfect.
+
+### Added — owner-decision papers (WS-6, D-25/D-26/D-27 — awaiting Ali)
+
+D-08 follow-up (R7's euro-led card: keep recommended — the 0-in-10y
+rarity is basket mathematics); D-09 follow-up (R5 at 15.3% of weeks:
+keep recommended); A-11 follow-up (/api/convert's exotic Number() forms:
+keep recommended). No behavior change without Ali's go.
+
+### Deployed
+
+Both workers from `fb1fded` (api `155ecb3d` + markets `9b5ff7e0`,
+2026-10-14T19:52Z; EODHD secret re-put). Gates: 1,255/1,255 tests,
+typecheck 6/6, lint 0 errors/14 advisories, copy audit clean, budgets
+held. Live verification: EN+FA, desktop+375px, the money path at live
+rates (100 USD → 26,390,000 Toman), all split routes + Insights
+sections, zero console errors, D-12/D-13 cache chain + 304 intact.
+
 ## [2026-10-15] — Codebase QA session: reliability hardening, contract suites, de-monolith-ing, a11y majors, ESLint
 
 The owner-commissioned autonomous QA session (docs/NEXT_SESSION_PROMPT.md
