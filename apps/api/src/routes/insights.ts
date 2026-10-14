@@ -30,15 +30,14 @@ import type {
   InsightsSnapshot,
   LivePricesSnapshot,
   MarketsSnapshot,
-  RatesError,
 } from '@currena/core';
 import { Hono } from 'hono';
-import type { Context } from 'hono';
 import type { InsightsReader } from '@currena/insights/store';
 import type { MarketsReader } from '@currena/insights/markets';
 import type { FxReader } from '@currena/insights/fx';
 import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
+import { errorResponse } from '../http';
 import type { Bindings } from '../index';
 
 export interface InsightsRouteDeps {
@@ -50,17 +49,6 @@ export interface InsightsRouteDeps {
   getFxReader: (env: Bindings) => FxReader;
   /** Live-prices store construction (route tests inject the in-memory fake). */
   getPricesReader: (env: Bindings) => PricesReader;
-}
-
-/** Mirrors index.ts's errorResponse (private there) — same envelope, no import cycle. */
-function errorResponse(
-  c: Context<{ Bindings: Bindings }>,
-  status: 400 | 404 | 503,
-  code: string,
-  message: string,
-) {
-  const body: RatesError = { error: { code, message } };
-  return c.json(body, status, { 'Cache-Control': 'no-store' });
 }
 
 export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: Bindings }> {
