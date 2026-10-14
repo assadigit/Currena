@@ -1045,8 +1045,10 @@ export const FxRuleStateSchema = z.object({
   confirmedBy: z.array(z.string()),
   /** 0–100: how far the main leg moved toward its warning line (spec §6.7). */
   progress: z.number().min(0).max(100),
-  /** R4's two shapes and R7's two leads. */
-  variant: z.enum(['flight', 'wobble', 'dollar-led', 'euro-led']).optional(),
+  /** R4's two shapes, R7's two leads, and R3's fast/slow leg (v1.3: which
+   * trigger fired — 'm1' = the one-month line ±3.0, 'm3' = the three-month
+   * line ±4.0 — so the sentence can name its period honestly). */
+  variant: z.enum(['flight', 'wobble', 'dollar-led', 'euro-led', 'm1', 'm3']).optional(),
   legs: z.array(FxLegSchema),
   pattern: FxPatternCheckSchema,
   chart: z.object({
@@ -1068,6 +1070,31 @@ export const FxSummarySchema = z.object({
 });
 export type FxSummary = z.infer<typeof FxSummarySchema>;
 
+/**
+ * The v1.3 plain-language additions (change request §6, "Build notes"):
+ * two tiny fields the cron job derives once so the page never has to.
+ * `dollarYearExtreme` powers S1's "its strongest/weakest in a year"
+ * clause (from the 52-week range of the dollar measure); `movers` holds
+ * each big currency's OWN one-month change against the US dollar
+ * (positive = the currency gained on the dollar — USD/X pairs inverted).
+ *
+ * OPTIONAL on the snapshot: pre-v1.3 copies (KV + every visitor's
+ * localStorage cache) must keep parsing; the page derives the same
+ * values from the stored pairs/dollar rows when `plain` is absent.
+ */
+export const FxPlainSchema = z.object({
+  dollarYearExtreme: z.enum(['high', 'low']).nullable(),
+  movers: z.object({
+    EUR: z.number().finite().optional(),
+    JPY: z.number().finite().optional(),
+    GBP: z.number().finite().optional(),
+    CNY: z.number().finite().optional(),
+    CHF: z.number().finite().optional(),
+    AUD: z.number().finite().optional(),
+  }),
+});
+export type FxPlain = z.infer<typeof FxPlainSchema>;
+
 /** The value of `insights:fx:v1`, verbatim over the wire (spec §4). */
 export const FxSnapshotSchema = z
   .object({
@@ -1078,6 +1105,9 @@ export const FxSnapshotSchema = z
     pairs: z.array(FxPairEntrySchema),
     rules: z.array(FxRuleStateSchema),
     summary: FxSummarySchema,
+    /** v1.3 plain-language helpers (CR §6) — optional: pre-v1.3 copies
+     * (KV + localStorage caches) must keep parsing. */
+    plain: FxPlainSchema.optional(),
   })
   .refine((s) => new Set(s.pairs.map((p) => p.id)).size === s.pairs.length, {
     message: 'fx pairs must contain each pair id at most once',

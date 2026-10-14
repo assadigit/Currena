@@ -12,7 +12,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import type { FxRuleState, FxSnapshot } from '@currena/core';
+import type { FxPairEntry, FxRuleState, FxSnapshot } from '@currena/core';
 import { insightsCopyEn } from '../i18n/insights-copy-en';
 import { insightsCopyFa } from '../i18n/insights-copy-fa';
 import {
@@ -42,6 +42,32 @@ function ruleOf(partial: Partial<FxRuleState> & Pick<FxRuleState, 'id' | 'outcom
     chart: { expect: 'together', series: [] },
     ...partial,
   } as FxRuleState;
+}
+
+/** A minimal full snapshot around a rules array (fxHeadline reads the
+ * dollar measure + pairs for the v1.3 big-mover template). */
+function snapOf(
+  rules: FxRuleState[],
+  opts?: { dollarM1?: number; pairs?: FxPairEntry[]; countedWarnings?: number; signal?: FxSnapshot['summary']['signal']; headlineRule?: FxSnapshot['summary']['headlineRule'] },
+): FxSnapshot {
+  const quietWorld = opts?.pairs ?? [];
+  return {
+    v: 1,
+    generatedAt: '2026-10-13T17:01:00Z',
+    dollarMeasure: {
+      asOf: '2026-10-12',
+      value: 100,
+      chg: { d1: 0, m1: opts?.dollarM1 ?? 0, m3: 0, y1: 0 },
+      weekly: [[1, 100]],
+    },
+    pairs: quietWorld,
+    rules,
+    summary: {
+      signal: opts?.signal ?? 'normal',
+      countedWarnings: opts?.countedWarnings ?? 0,
+      headlineRule: opts?.headlineRule ?? null,
+    },
+  } as FxSnapshot;
 }
 
 describe('fxRuleView — the §9.3 status table (V1: only Active/Watching/Quiet + chips)', () => {
@@ -101,7 +127,7 @@ describe('fxPatternOrder — §9.3 item 3', () => {
 });
 
 describe('the quiet area (§9.3 item 4 / §6.7)', () => {
-  it('closest-to-warning = the quiet rule with the highest progress; nodata never rides', () => {
+  it('closest-to-warning = the quiet rule with the highest progress; nodata never rides; the closest is excluded from the list (B6)', () => {
     const rules: FxRuleState[] = [
       ruleOf({ id: 'r1_risk_mood', outcome: 'quiet', counted: false, progress: 12 }),
       ruleOf({ id: 'r2_carry_trade', outcome: 'quiet', counted: false, progress: 41 }),
@@ -113,6 +139,11 @@ describe('the quiet area (§9.3 item 4 / §6.7)', () => {
     expect(fxQuietRules(rules as FxRuleState[]).map((r) => r.id)).toEqual([
       'r1_risk_mood',
       'r2_carry_trade',
+      'r6_europe_worry',
+    ]);
+    // v1.3 fix B6: with the closest excluded, the list holds the OTHERS only.
+    expect(fxQuietRules(rules as FxRuleState[], 'r2_carry_trade').map((r) => r.id)).toEqual([
+      'r1_risk_mood',
       'r6_europe_worry',
     ]);
   });
@@ -133,12 +164,9 @@ describe('the §9.10 measure labels + §10.3 headlines', () => {
     const rules = [
       ruleOf({ id: 'r1_risk_mood', outcome: 'quiet', counted: false, progress: 30 }),
     ];
-    const snap = { rules, summary: { signal: 'normal', countedWarnings: 0, headlineRule: null } } as never as Pick<
-      FxSnapshot,
-      'rules' | 'summary'
-    >;
+    const snap = snapOf(rules);
     expect(fxHeadline(snap, en.fx)).toBe('No pattern is active. Closest to a warning: “Nervous or relaxed?”.');
-    expect(fxHeadline(snap, fa.fx)).toContain('بازار نگران است یا آرام؟');
+    expect(fxHeadline(snap, fa.fx)).toContain('نگران یا آرام؟');
   });
 
   it('one active pattern: the active headline; plus-n-more rides the second template', () => {
@@ -146,30 +174,32 @@ describe('the §9.10 measure labels + §10.3 headlines', () => {
       ruleOf({ id: 'r3_dollar_strength', outcome: 'warning', counted: true }),
       ruleOf({ id: 'r5_china_link', outcome: 'watch', counted: false }),
     ];
-    const one = { rules: [rules[0]!], summary: { signal: 'attention', countedWarnings: 1, headlineRule: 'r3_dollar_strength' } } as never;
-    expect(fxHeadline(one as never, en.fx)).toBe('“Strong or weak dollar” is active.');
-    const two = {
-      rules: [rules[0]!, ruleOf({ id: 'r6_europe_worry', outcome: 'warning', counted: true })],
-      summary: { signal: 'attention', countedWarnings: 2, headlineRule: 'r3_dollar_strength' },
-    } as never;
-    expect(fxHeadline(two as never, en.fx)).toBe('“Strong or weak dollar” is active, plus 1 more.');
+    const one = snapOf([rules[0]!], { signal: 'attention', countedWarnings: 1, headlineRule: 'r3_dollar_strength' });
+    expect(fxHeadline(one, en.fx)).toBe('“Strong or weak dollar” is active.');
+    const two = snapOf([rules[0]!, ruleOf({ id: 'r6_europe_worry', outcome: 'warning', counted: true })], {
+      signal: 'attention',
+      countedWarnings: 2,
+      headlineRule: 'r3_dollar_strength',
+    });
+    expect(fxHeadline(two, en.fx)).toBe('“Strong or weak dollar” is active, plus 1 more.');
   });
 
   it('unusual + the wobble get their own headlines (§10.3 rows 3–4)', () => {
-    const unusual = {
-      rules: [
+    const unusual = snapOf(
+      [
         ruleOf({ id: 'r1_risk_mood', outcome: 'warning', counted: true }),
         ruleOf({ id: 'r2_carry_trade', outcome: 'warning', counted: true }),
         ruleOf({ id: 'r3_dollar_strength', outcome: 'warning', counted: true }),
       ],
-      summary: { signal: 'unusual', countedWarnings: 3, headlineRule: 'r1_risk_mood' },
-    } as never;
-    expect(fxHeadline(unusual as never, en.fx)).toBe('Several patterns are active at once, led by “Nervous or relaxed?”.');
-    const wobble = {
-      rules: [ruleOf({ id: 'r4_money_hiding', outcome: 'warning', counted: true, variant: 'wobble' })],
-      summary: { signal: 'unusual', countedWarnings: 1, headlineRule: 'r4_money_hiding' },
-    } as never;
-    expect(fxHeadline(wobble as never, en.fx)).toBe(
+      { signal: 'unusual', countedWarnings: 3, headlineRule: 'r1_risk_mood' },
+    );
+    expect(fxHeadline(unusual, en.fx)).toBe('Several patterns are active at once, led by “Nervous or relaxed?”.');
+    const wobble = snapOf([ruleOf({ id: 'r4_money_hiding', outcome: 'warning', counted: true, variant: 'wobble' })], {
+      signal: 'unusual',
+      countedWarnings: 1,
+      headlineRule: 'r4_money_hiding',
+    });
+    expect(fxHeadline(wobble, en.fx)).toBe(
       'Money is leaving stocks and the dollar together, which is unusual.',
     );
   });
@@ -225,6 +255,36 @@ describe('fxSentence — the two-part sentences (§7), EN + FA', () => {
     expect(sentence?.see).toBe('دلار آمریکا در سه ماه گذشته ۴٫۳ درصد در برابر ارزهای بزرگ جهان تقویت شده است.');
     // No Latin digit may leak into the Farsi sentence.
     expect(sentence?.see).not.toMatch(/[0-9]/);
+  });
+
+  it('R3 warning via the v1.3 one-month leg uses the month wording', () => {
+    const rule = ruleOf({
+      id: 'r3_dollar_strength',
+      outcome: 'warning',
+      counted: true,
+      variant: 'm1',
+      numbers: { dollar_m1: 3.2, dollar_m3: 1.5 },
+    });
+    expect(fxSentence(rule, en.fx, 'en-US')?.see).toBe(
+      'The US dollar is up 3.2% against the big currencies over the past month.',
+    );
+  });
+
+  it('R7 dollar-led uses the euro\'s own move (lost/gained), never "moved"', () => {
+    const down = ruleOf({
+      id: 'r7_dollar_or_euro',
+      outcome: 'context',
+      counted: false,
+      variant: 'dollar-led',
+      numbers: { eurusd_m1: -3.6, dollar_m1: 3.2 },
+    });
+    expect(fxSentence(down, en.fx, 'en-US')?.see).toBe(
+      'The euro lost 3.6% against the US dollar over the past month, and the US dollar gained 3.2% against the other big currencies.',
+    );
+    const up = ruleOf({ ...down, numbers: { eurusd_m1: 3.0, dollar_m1: -1.8 } });
+    expect(fxSentence(up, en.fx, 'en-US')?.see).toBe(
+      'The euro gained 3.0% against the US dollar over the past month, and the US dollar lost 1.8% against the other big currencies.',
+    );
   });
 
   it('R5 watch names whichever leg moved ({leg})', () => {
@@ -283,7 +343,16 @@ describe('the copy corpus (both locales, spec-verbatim anchors)', () => {
     expect(Object.keys(copy.fx.entries)).toHaveLength(10);
     expect(Object.keys(copy.fx.rules)).toHaveLength(7);
     expect(copy.fx.rules.r1.warning.see).toContain('{x}');
-    expect(copy.fx.rules.r7.dollarLed.see).toContain('{d}');
+    expect(copy.fx.rules.r7.dollarLedEuroDown.see).toContain('{d}');
+    // v1.3: the four-answer layer + the plain-words block + the glossary.
+    expect(copy.fx.rules.r1.changeLine).toContain('{line}');
+    expect(copy.fx.rules.r3.changeLine).toContain('{line1}');
+    expect(copy.fx.rules.r2.name).toBeTruthy();
+    expect(copy.fx.plainTitle).toBeTruthy();
+    expect(copy.fx.s1MuchStronger).toContain('{extreme}');
+    expect(copy.fx.howToReadItems).toHaveLength(5);
+    expect(Object.keys(copy.fx.glossary)).toHaveLength(10);
+    expect(copy.fx.quietNumbers.r6).toContain('{dir}');
   };
   it('EN carries every anchor', () => check(en));
   it('FA carries every anchor', () => check(fa));

@@ -22,26 +22,35 @@
  * (§9.7): signs, words and glyphs carry it together.
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useId, useState } from 'react';
 import type { ReactElement } from 'react';
 import { formatNumber } from '@currena/core';
 import type { FxPairEntry, FxPairId, FxRuleState, FxSnapshot } from '@currena/core';
 import { decodeWeeklySeries } from '@currena/insights/markets/definitions';
+import { fxRuleHasPatternCheck } from '@currena/insights/fx/definitions';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { interpolate } from '../../i18n';
 import { Skeleton } from '../ui';
 import {
+  fxChangeLine,
+  fxChartLineLabel,
+  fxDollarMeaning,
   fxClosestToWarning,
   fxHeadline,
+  fxHeadlineVerdict,
+  fxMoneyLine,
+  fxPlainWords,
+  fxQuietRules,
+  fxQuietView,
   fxRuleCopyKey,
   fxMeasureKey,
   fxPairRows,
-  fxQuietRules,
   fxRulePairIds,
   fxRuleView,
   fxSentence,
   fxTrendOf,
   fxPatternOrder,
+  type FxQuietView,
 } from '../../lib/fx-presentation';
 import { formatAsOf } from './HistoryChart';
 import { SectionVerdictLine } from './SectionVerdictLine';
@@ -83,6 +92,132 @@ function formatDateShort(iso: string, locale: 'en' | 'fa'): string {
     day: 'numeric',
     timeZone: 'UTC',
   }).format(new Date(`${iso}T00:00:00Z`));
+}
+
+/* ------------------------------------------------------------------ *
+ * v1.3 — the glossary tip (CR §4.6): a small "?" after a term opens the
+ * one-sentence definition. Tap or keyboard, never hover-only.
+ * ------------------------------------------------------------------ */
+
+function GlossaryTip({ def, srLabel }: { def: string; srLabel: string }) {
+  const [open, setOpen] = useState(false);
+  const panelId = useId();
+  return (
+    <>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        aria-label={srLabel}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((v) => !v);
+        }}
+        className="insights-focusable ms-1 inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-currena-muted/25 align-middle text-[0.66rem] font-bold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/45"
+      >
+        ?
+      </button>
+      {open ? (
+        <span
+          id={panelId}
+          className="mt-1 block rounded-[var(--radius-md)] bg-currena-soft/70 px-2.5 py-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]"
+        >
+          <bdi>{def}</bdi>
+        </span>
+      ) : null}
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * v1.3 — "How to read this section" (CR §4.5): a small button next to the
+ * title, closed by default; five short items + the glossary tips.
+ * ------------------------------------------------------------------ */
+
+function HowToRead({ copy }: { copy: InsightsCopy }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="min-w-0">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls="insights-fx-howto"
+        onClick={() => setOpen((v) => !v)}
+        className="insights-focusable inline-flex min-h-[36px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-3 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
+      >
+        {copy.fx.howToRead}
+        <span aria-hidden="true" className="ms-1">{open ? '▴' : '▾'}</span>
+      </button>
+      {open ? (
+        <div
+          id="insights-fx-howto"
+          className="mt-2 flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)]"
+        >
+          <ol className="m-0 flex list-decimal flex-col gap-1.5 ps-5 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
+            {copy.fx.howToReadItems.map((item, i) => (
+              <li key={i}>
+                <bdi>{item}</bdi>
+              </li>
+            ))}
+          </ol>
+          <p className="m-0 text-[length:var(--type-caption)] font-bold text-[var(--color-text-tertiary)]">
+            {copy.fx.glossaryTitle}
+          </p>
+          <ul className="m-0 grid list-none gap-1 p-0">
+            {Object.values(copy.fx.glossary).map((g) => (
+              <li key={g.term} className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
+                <span className="font-semibold">{g.term}</span>
+                <GlossaryTip def={g.def} srLabel={g.term} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * v1.3 — the "In plain words" block (CR §4.2), directly under the verdict
+ * line: three to four short lines built from the numbers. This is what
+ * most visitors read.
+ * ------------------------------------------------------------------ */
+
+function PlainWords({
+  snapshot,
+  copy,
+  numberLocale,
+}: {
+  snapshot: FxSnapshot;
+  copy: InsightsCopy;
+  numberLocale: 'en-US' | 'fa-IR';
+}) {
+  const words = useMemo(() => fxPlainWords(snapshot, copy.fx, numberLocale), [snapshot, copy, numberLocale]);
+  return (
+    <div className="flex flex-col gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)]">
+      <p className="m-0 text-[length:var(--type-caption)] font-bold text-[var(--color-text-tertiary)]">
+        {copy.fx.plainTitle}
+      </p>
+      <ul className="m-0 grid list-none gap-1 p-0">
+        <li className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
+          <bdi>{words.s1}</bdi>
+        </li>
+        {words.s2 !== null ? (
+          <li className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
+            <bdi>{words.s2}</bdi>
+          </li>
+        ) : null}
+        {words.s3 !== null ? (
+          <li className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
+            <bdi>{words.s3}</bdi>
+          </li>
+        ) : null}
+        <li className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+          <bdi>{words.s4}</bdi>
+        </li>
+      </ul>
+    </div>
+  );
 }
 
 /* ------------------------------------------------------------------ *
@@ -149,11 +284,13 @@ function RebasedChart({
   series,
   expect,
   copy,
+  locale,
   numberLocale,
 }: {
   series: readonly { id: string; points: number[] }[];
   expect: 'together' | 'opposite';
   copy: InsightsCopy;
+  locale: 'en' | 'fa';
   numberLocale: 'en-US' | 'fa-IR';
 }) {
   if (series.length < 2) return null;
@@ -217,14 +354,18 @@ function RebasedChart({
         </svg>
       </div>
       <figcaption className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
+        {/* v1.3 (CR §4.8): the caption says what the relationship means. */}
         <span>{expect === 'together' ? copy.fx.chartCaptionTogether : copy.fx.chartCaptionOpposite}</span>
+        <span>{copy.fx.chartStartsAt100}</span>
+        {/* v1.3 (CR §4.7): plain names + the window's change at each line's
+         * end — never a raw code (fix B4). */}
         <span className="inline-flex items-center gap-1">
           <span aria-hidden="true" className="inline-block h-0.5 w-4 bg-[var(--color-text-primary)]" />
-          {solid.id.toUpperCase()}
+          <bdi>{fxChartLineLabel(solid.id, solid.points, copy.fx, numberLocale, locale)}</bdi>
         </span>
         <span className="inline-flex items-center gap-1">
           <span aria-hidden="true" className="inline-block h-0.5 w-4 border-t-2 border-dashed border-[var(--color-text-primary)]" />
-          {dashed.id.toUpperCase()}
+          <bdi>{fxChartLineLabel(dashed.id, dashed.points, copy.fx, numberLocale, locale)}</bdi>
         </span>
         <span className="sr-only">
           {interpolate(copy.fx.chartAria, {})}, {num(maxLen)} points
@@ -259,20 +400,14 @@ function PatternCard({
   const view = fxRuleView(rule);
   const sentence = fxSentence(rule, copy.fx, numberLocale);
   const ruleCopy = copy.fx.rules[fxRuleCopyKey(rule.id)];
+  // v1.3 (CR §4.3): the Level-1 HEADLINE VERDICT — "Investors look nervous".
+  const verdict = fxHeadlineVerdict(rule, copy.fx);
+  // v1.3 (CR §4.3, fix B5): the alarm level in words replaces the raw
+  // warning-line row; a context card (R7) carries none at all.
+  const changeLine = fxChangeLine(rule, copy.fx, numberLocale);
   const statusWord =
     view.status === 'active' ? copy.fx.statusActive : view.status === 'watching' ? copy.fx.statusWatching : copy.fx.statusQuiet;
   const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
-
-  // The warning line rows (§9.3 Level 2 item 2) — "AUD/JPY −4.1% · warning line −3.0%".
-  const warningLine = rule.legs
-    .map((leg) =>
-      interpolate(copy.fx.warningLine, {
-        pair: leg.name.replace('_m1', '').replace('_m3', '').replace(/_/g, ' ').toUpperCase(),
-        value: signedPct(leg.value, numberLocale, locale),
-        threshold: signedPct(leg.line, numberLocale, locale),
-      }),
-    )
-    .join(' · ');
 
   // §9.3: "Pairs used in this pattern" — the four periods for the pairs
   // this rule reads (from the chart series keys).
@@ -324,6 +459,13 @@ function PatternCard({
         </span>
         {rule.outcome !== 'nodata' && sentence !== null ? (
           <span className="flex flex-col gap-0.5">
+            {/* v1.3 (CR §4.3): Level 1 starts with the short headline
+             * verdict, then the two-part sentence. */}
+            {verdict !== null ? (
+              <span className="text-[length:var(--type-label)] font-bold leading-relaxed text-[var(--color-text-primary)]">
+                <bdi>{verdict}</bdi>
+              </span>
+            ) : null}
             {/* The two-part sentence on two short lines (§9.3 Level 1). */}
             <span className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
               <bdi>{sentence.see}</bdi>
@@ -335,18 +477,28 @@ function PatternCard({
         ) : null}
       </button>
 
-      {/* Level 2 — the opened card (§9.3): chart, warning line, 13 dots. */}
+      {/* Level 2 — the opened card (§9.3 + CR §4.3): chart, the alarm
+       * level in words, and the 13 dots for rules WITH a pattern check. */}
       {open && rule.outcome !== 'nodata' ? (
         <div id={`insights-fx-rule-panel-${rule.id}`} className="flex flex-col gap-3 px-3 pb-3">
           {rule.chart.series.length >= 2 ? (
-            <RebasedChart series={rule.chart.series} expect={rule.chart.expect} copy={copy} numberLocale={numberLocale} />
+            <RebasedChart series={rule.chart.series} expect={rule.chart.expect} copy={copy} locale={locale} numberLocale={numberLocale} />
           ) : null}
-          {warningLine !== '' ? (
-            <p className="m-0 text-[length:var(--type-caption)] tabular-nums text-[var(--color-text-secondary)]">
-              <bdi dir="auto">{warningLine}</bdi>
-            </p>
+          {changeLine !== null ? (
+            <div>
+              <p className="m-0 mb-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-tertiary)]">
+                {copy.fx.changeLineLabel}
+              </p>
+              <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+                <bdi>{changeLine}</bdi>
+              </p>
+            </div>
           ) : null}
-          <Dots13 pattern={rule.pattern} copy={copy} numberLocale={numberLocale} />
+          {/* v1.3 fix B3: rules without a pattern check (R4, R7) show no
+           * dots, no "Held in" line and no end labels. */}
+          {fxRuleHasPatternCheck(rule.id) && rule.pattern.weeks.length > 0 ? (
+            <Dots13 pattern={rule.pattern} copy={copy} numberLocale={numberLocale} />
+          ) : null}
           {rule.confirmedBy.length > 0 ? (
             <p className="m-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
               <bdi>{copy.fx.rules.r1.confirmLine}</bdi>
@@ -372,6 +524,15 @@ function PatternCard({
           {level3 ? (
             <div id={`insights-fx-rule-deep-${rule.id}`} className="flex flex-col gap-2">
               <dl className="m-0 flex flex-col gap-1.5">
+                {/* v1.3 (CR §4.3): Level 3 starts with "In everyday terms". */}
+                <div>
+                  <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
+                    {copy.fx.everydayLabel}
+                  </dt>
+                  <dd className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
+                    <bdi>{'everyday' in ruleCopy ? ruleCopy.everyday : ''}</bdi>
+                  </dd>
+                </div>
                 <div>
                   <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
                     {copy.fx.labelWhy}
@@ -453,7 +614,9 @@ function PatternCard({
 }
 
 /* ------------------------------------------------------------------ *
- * The quiet area (§9.3 item 4): the closest-to-warning row + the toggle
+ * The quiet area (§9.3 item 4 + CR §4.4): the "Nearest to sounding the
+ * alarm" row + the "{n} more quiet patterns" toggle (the closest pattern
+ * is never repeated in the list — fix B6).
  * ------------------------------------------------------------------ */
 
 function QuietArea({
@@ -468,52 +631,60 @@ function QuietArea({
   numberLocale: 'en-US' | 'fa-IR';
 }) {
   const [open, setOpen] = useState(false);
-  const quiet = useMemo(() => fxQuietRules(rules), [rules]);
   const closest = useMemo(() => fxClosestToWarning(rules), [rules]);
-  const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
-  if (quiet.length === 0 && closest === null) return null;
+  // v1.3 fix B6: the list shows the OTHER quiet patterns only.
+  const quiet = useMemo(() => fxQuietRules(rules, closest?.id), [rules, closest]);
+  const closestView = useMemo(
+    () => (closest !== null ? fxQuietView(closest, copy.fx, numberLocale) : null),
+    [closest, copy, numberLocale],
+  );
+  const num = (n: number): string => formatNumber(Math.round(n), numberLocale, { maximumFractionDigits: 0 });
+  if (quiet.length === 0 && closestView === null) return null;
 
-  const bar = (rule: FxRuleState): { name: string; pct: number; text: string } | null => {
-    if (rule.legs.length === 0) return null;
-    const leg = rule.legs[0]!;
-    return {
-      name: copy.fx.rules[fxRuleCopyKey(rule.id)].name,
-      pct: rule.progress,
-      text: interpolate(copy.fx.distanceBarText, {
-        name: leg.name.replace('_m1', '').replace('_m3', '').replace(/_/g, ' ').toUpperCase(),
-        value: signedPct(leg.value, numberLocale, locale),
-        threshold: signedPct(leg.line, numberLocale, locale),
-      }),
-    };
-  };
+  // One quiet row: line 1 (title · quiet headline), line 2 (the numbers in
+  // words), and the bar with its label + text value — never bar-only (§9.7).
+  const row = (view: FxQuietView, labelId: string): ReactElement => (
+    <div className="flex flex-col gap-1">
+      <p className="m-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-primary)]">
+        <bdi>{view.line1}</bdi>
+      </p>
+      {view.line2 !== null ? (
+        <p className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+          <bdi>{view.line2}</bdi>
+        </p>
+      ) : null}
+      <div className="flex items-center gap-2">
+        <span id={labelId} className="shrink-0 text-[0.66rem] font-semibold text-[var(--color-text-tertiary)]">
+          {copy.fx.barLabel}
+        </span>
+        <span
+          role="progressbar"
+          aria-labelledby={labelId}
+          aria-valuenow={Math.round(view.progress)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          className="h-1.5 flex-1 overflow-hidden rounded-full bg-currena-muted/20"
+        >
+          <span
+            className="block h-full rounded-full bg-[var(--color-text-secondary)]"
+            style={{ width: `${Math.max(2, Math.min(100, view.progress))}%` }}
+          />
+        </span>
+        <bdi dir="ltr" className="shrink-0 text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
+          {num(view.progress)}{locale === 'fa' ? '٪' : '%'}
+        </bdi>
+      </div>
+    </div>
+  );
 
   return (
     <div className="rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)]">
-      {closest !== null && bar(closest) !== null ? (
-        <div>
-          <p className="m-0 mb-1 text-[length:var(--type-caption)] font-bold text-[var(--color-text-tertiary)]">
-            {copy.fx.closestToWarning} · {copy.fx.statusQuiet}
+      {closestView !== null ? (
+        <div className="flex flex-col gap-1.5">
+          <p className="m-0 text-[length:var(--type-caption)] font-bold text-[var(--color-text-tertiary)]">
+            {copy.fx.quietAreaTitle}
           </p>
-          <div className="flex flex-col gap-1">
-            <p className="m-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-primary)]">
-              {bar(closest)!.name}
-            </p>
-            {/* The thin distance bar + its value in text (§9.7). */}
-            <div className="flex items-center gap-2">
-              <span
-                aria-hidden="true"
-                className="h-1.5 flex-1 overflow-hidden rounded-full bg-currena-muted/20"
-              >
-                <span
-                  className="block h-full rounded-full bg-[var(--color-text-secondary)]"
-                  style={{ width: `${Math.max(2, Math.min(100, closest.progress))}%` }}
-                />
-              </span>
-              <bdi dir="auto" className="text-[length:var(--type-caption)] tabular-nums text-[var(--color-text-secondary)]">
-                {bar(closest)!.text}
-              </bdi>
-            </div>
-          </div>
+          {row(closestView, 'insights-fx-closest-bar-label')}
         </div>
       ) : null}
       {quiet.length > 0 ? (
@@ -524,31 +695,16 @@ function QuietArea({
           onClick={() => setOpen((v) => !v)}
           className="insights-focusable mt-2 inline-flex min-h-[36px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-3 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
         >
-          {interpolate(copy.fx.quietPatternsLine, { n: num(quiet.length) })}
+          {interpolate(copy.fx.quietMore, { n: num(quiet.length) })}
           <span aria-hidden="true" className="ms-1">{open ? '▴' : '▾'}</span>
         </button>
       ) : null}
       {open ? (
-        <ul id="insights-fx-quiet-list" className="m-0 mt-2 flex list-none flex-col gap-2 p-0">
-          {quiet.map((rule) => {
-            const b = bar(rule);
-            if (b === null) return null;
-            return (
-              <li key={rule.id} className="flex flex-col gap-1">
-                <p className="m-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-primary)]">{b.name}</p>
-                <div className="flex items-center gap-2">
-                  <span aria-hidden="true" className="h-1.5 flex-1 overflow-hidden rounded-full bg-currena-muted/20">
-                    <span
-                      className="block h-full rounded-full bg-[var(--color-text-secondary)]"
-                      style={{ width: `${Math.max(2, Math.min(100, rule.progress))}%` }}
-                    />
-                  </span>
-                  <bdi dir="auto" className="text-[length:var(--type-caption)] tabular-nums text-[var(--color-text-secondary)]">
-                    {b.text}
-                  </bdi>
-                </div>
-              </li>
-            );
+        <ul id="insights-fx-quiet-list" className="m-0 mt-2 flex list-none flex-col gap-2.5 p-0">
+          {quiet.map((rule, i) => {
+            const view = fxQuietView(rule, copy.fx, numberLocale);
+            if (view === null) return null;
+            return <li key={rule.id}>{row(view, `insights-fx-quiet-bar-label-${i}`)}</li>;
           })}
         </ul>
       ) : null}
@@ -572,10 +728,15 @@ function DollarRow({
   numberLocale: 'en-US' | 'fa-IR';
 }) {
   const d = snapshot.dollarMeasure;
+  // v1.3 (CR §4.9, fix B7): the meaning line FOLLOWS the direction — the
+  // old fixed sentence was wrong whenever the dollar was weak or steady.
+  const meaning = fxDollarMeaning(d.chg.m1, copy.fx);
   return (
     <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-3 py-2.5 ring-1 ring-[var(--color-border)]">
-      <p className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
+      <p className="m-0 inline-flex flex-wrap items-baseline text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
         {copy.fx.dollarRowTitle}
+        {/* v1.3 (CR §4.9): the row title carries its glossary tip. */}
+        <GlossaryTip def={copy.fx.glossary.dollarStrength.def} srLabel={copy.fx.glossary.dollarStrength.term} />
       </p>
       <span className="inline-flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
         <span className="inline-flex gap-1">
@@ -596,7 +757,7 @@ function DollarRow({
         </span>
       </span>
       <span className="w-full text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
-        <bdi>{copy.fx.dollarEntry.you}</bdi>
+        <bdi>{meaning}</bdi>
       </span>
     </div>
   );
@@ -624,6 +785,9 @@ function PairDetail({
   const entryCopy = copy.fx.entries[entry.id];
   const weekly = useMemo(() => decodeWeeklySeries(entry.weekly), [entry.weekly]);
   const num = (n: number, dp = 4): string => formatNumber(n, numberLocale, { maximumFractionDigits: dp });
+  // v1.3 (CR §4.2 S5): the "what it means in money" line — the same line
+  // in every pair's panel, using that pair's currencies.
+  const moneyLine = useMemo(() => fxMoneyLine(entry, copy.fx, numberLocale), [entry, copy, numberLocale]);
   // §9.4: the patterns that use this pair, each linking back to its card.
   const usingRules = snapshot.rules.filter((r) => r.chart.series.some((s) => s.id === entry.id));
   return (
@@ -655,6 +819,16 @@ function PairDetail({
             <bdi>{entryCopy.you}</bdi>
           </dd>
         </div>
+        {moneyLine !== null ? (
+          <div>
+            <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
+              {copy.fx.moneyLabel}
+            </dt>
+            <dd className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
+              <bdi>{moneyLine}</bdi>
+            </dd>
+          </div>
+        ) : null}
       </dl>
       {/* §9.4/§9.6: the 1-year line chart, time left to right even in Farsi. */}
       <div dir="ltr" className="not-prose">
@@ -765,15 +939,22 @@ function PairsTable({
     <>
       {/* Desktop (≥900px): the real table (§9.7). */}
       <div className="hidden min-[900px]:block">
-        {/* §9.3: the one-line legend under the header. */}
-        <p className="m-0 mb-1 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
+        {/* §9.3: the one-line legend under the header (v1.3 §4.6: the
+         * stronger/weaker term carries its glossary tip). */}
+        <p className="m-0 mb-1 flex flex-wrap items-baseline text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
           {copy.fx.directionLegend}
+          <GlossaryTip def={copy.fx.glossary.stronger.def} srLabel={copy.fx.glossary.stronger.term} />
         </p>
         <table className="w-full border-collapse text-[length:var(--type-caption)]">
           <caption className="sr-only">{copy.fx.tableLabel}</caption>
           <thead>
             <tr className="border-b border-[var(--color-border)]">
-              <th scope="col" className="px-2 py-1.5 text-start font-bold text-[var(--color-text-secondary)]">{copy.fx.thPair}</th>
+              <th scope="col" className="px-2 py-1.5 text-start font-bold text-[var(--color-text-secondary)]">
+                <span className="inline-flex items-baseline">
+                  {copy.fx.thPair}
+                  <GlossaryTip def={copy.fx.glossary.pair.def} srLabel={copy.fx.glossary.pair.term} />
+                </span>
+              </th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.fx.thToday}</th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.fx.thM1}</th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.fx.thM3}</th>
@@ -937,9 +1118,14 @@ export function WorldCurrencies({
 
   const heading = (
     <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-      <h2 id="insights-fx-title" className="type-section m-0">
-        {copy.fx.title}
-      </h2>
+      <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+        <h2 id="insights-fx-title" className="type-section m-0">
+          {copy.fx.title}
+        </h2>
+        {/* v1.3 (CR §4.5): "How to read this section" — a small button next
+         * to the title, closed by default. */}
+        <HowToRead copy={copy} />
+      </div>
       {asOf ? (
         <bdi className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
           {interpolate(copy.fx.asOf, { date: formatDateShort(asOf, locale) })}
@@ -1016,9 +1202,13 @@ export function WorldCurrencies({
           copy={copy}
         />
         <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-          <bdi>{fxHeadline(snapshot, copy.fx)}</bdi>
+          <bdi>{fxHeadline(snapshot, copy.fx, numberLocale)}</bdi>
         </p>
       </div>
+
+      {/* v1.3 (CR §4.2): the "In plain words" block, directly under the
+       * verdict line — this is what most visitors read. */}
+      <PlainWords snapshot={snapshot} copy={copy} numberLocale={numberLocale} />
 
       {/* The pattern cards (§9.3 item 3) — at most 3, the first open at
        * Level 2 only (the spec's "only the first card is open by default"):

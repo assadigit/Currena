@@ -22,6 +22,7 @@ import type { SeriesPoint } from '../series';
 import {
   buildDollarMeasure,
   buildFxPairEntry,
+  buildFxPlain,
   buildFxSnapshot,
   changesOf,
   evaluateFxRules,
@@ -371,12 +372,43 @@ describe('step 4 — the seven rules', () => {
   it('R3: dollar m3 +4.5 → Warning; −4.5 → Supportive; progress counts the nearer side', () => {
     const up = evaluateFxRules(inputsOf({}, { dollarM3: 4.5 }));
     expect(byId(up, 'r3_dollar_strength').outcome).toBe('warning');
+    expect(byId(up, 'r3_dollar_strength').variant).toBe('m3');
     const down = evaluateFxRules(inputsOf({}, { dollarM3: -4.5 }));
     expect(byId(down, 'r3_dollar_strength').outcome).toBe('supportive');
+    expect(byId(down, 'r3_dollar_strength').variant).toBe('m3');
     const quiet = evaluateFxRules(inputsOf({}, { dollarM3: 1 }));
     const r3 = byId(quiet, 'r3_dollar_strength');
     expect(r3.outcome).toBe('quiet');
     expect(r3.progress).toBe(25); // 1/4 of the way to the +4 line
+  });
+
+  it('R3 v1.3 (CR §3.1): the one-month fast leg fires on its own — M1 +3.2 with M3 +1.5 is a Warning (the screenshot\'s B8 case)', () => {
+    const rules = evaluateFxRules(inputsOf({}, { dollarM1: 3.2, dollarM3: 1.5 }));
+    const r3 = byId(rules, 'r3_dollar_strength');
+    expect(r3.outcome).toBe('warning');
+    expect(r3.counted).toBe(true);
+    expect(r3.variant).toBe('m1'); // the fast leg owns the wording
+    expect(summarizeFxRules(rules).signal).toBe('attention');
+    // The mirror: M1 −3.2 → Supportive with the one-month wording.
+    const mirror = evaluateFxRules(inputsOf({}, { dollarM1: -3.2, dollarM3: 0.5 }));
+    const r3m = byId(mirror, 'r3_dollar_strength');
+    expect(r3m.outcome).toBe('supportive');
+    expect(r3m.variant).toBe('m1');
+    // Steady month, big quarter: the m3 leg still carries it.
+    const slow = evaluateFxRules(inputsOf({}, { dollarM1: 0.5, dollarM3: 4.2 }));
+    expect(byId(slow, 'r3_dollar_strength').variant).toBe('m3');
+    // Between the lines (|M1| < 3.0 and |M3| < 4.0) → quiet.
+    const calm = evaluateFxRules(inputsOf({}, { dollarM1: 2.9, dollarM3: 3.9 }));
+    expect(byId(calm, 'r3_dollar_strength').outcome).toBe('quiet');
+  });
+
+  it('R3 v1.3: progress is the NEARER of the two legs (M1 vs ±3.0, M3 vs ±4.0)', () => {
+    // M1 1.5 (50% of 3.0) vs M3 3.0 (75% of 4.0) → the m3 leg is nearer.
+    const a = byId(evaluateFxRules(inputsOf({}, { dollarM1: 1.5, dollarM3: 3.0 })), 'r3_dollar_strength');
+    expect(a.progress).toBe(75);
+    // M1 2.4 (80%) vs M3 2.0 (50%) → the m1 leg is nearer; weak side counts too.
+    const b = byId(evaluateFxRules(inputsOf({}, { dollarM1: -2.4, dollarM3: -2.0 })), 'r3_dollar_strength');
+    expect(b.progress).toBe(80);
   });
 
   it('R4: flight (dollar +2.5, sp500 −3.5) → Warning flight; wobble (dollar −2.5, sp500 −3.5, gold +3.5) → forces Unusual', () => {
@@ -413,19 +445,35 @@ describe('step 4 — the seven rules', () => {
     expect(byId(watch, 'r6_europe_worry').outcome).toBe('watch');
   });
 
-  it('R7: below 2.5% the context card stays away entirely; above it, dollar-led vs euro-led', () => {
+  it('R7 v1.3 (CR §3.3): below 2.5% no card; dollar-led works in DOLLAR strength (EUR/USD down + dollar up)', () => {
     const quiet = evaluateFxRules(inputsOf({ eurusd: { m1: 1.0, m3: 0 } }, { dollarM1: 0.5 }));
     const r7q = byId(quiet, 'r7_dollar_or_euro');
     expect(r7q.outcome).toBe('quiet');
     expect(r7q.legs).toHaveLength(0);
 
-    const led = evaluateFxRules(inputsOf({ eurusd: { m1: 3.0, m3: 0 } }, { dollarM1: 2.0 }));
+    // The screenshot's B1 case: EUR/USD −3.6 (e = +3.6), dollar +3.2 → dollar-led.
+    const led = evaluateFxRules(inputsOf({ eurusd: { m1: -3.6, m3: 0 } }, { dollarM1: 3.2 }));
     const r7d = byId(led, 'r7_dollar_or_euro');
     expect(r7d.outcome).toBe('context');
     expect(r7d.variant).toBe('dollar-led');
+    // The mirror: EUR/USD up 3% while the dollar fell 2% → also dollar-led.
+    const mirror = evaluateFxRules(inputsOf({ eurusd: { m1: 3.0, m3: 0 } }, { dollarM1: -2.0 }));
+    expect(byId(mirror, 'r7_dollar_or_euro').variant).toBe('dollar-led');
 
+    // Euro-led: the euro moved ≥2.5% but the dollar stayed under 1.0 either way.
     const euro = evaluateFxRules(inputsOf({ eurusd: { m1: -3.0, m3: 0 } }, { dollarM1: 0.5 }));
     expect(byId(euro, 'r7_dollar_or_euro').variant).toBe('euro-led');
+  });
+
+  it('R7 v1.3: the ambiguous middle and the opposite way show NO card (never a guess)', () => {
+    // |d| between 1.0 and 1.5 → no card.
+    const mid = evaluateFxRules(inputsOf({ eurusd: { m1: -3.0, m3: 0 } }, { dollarM1: 1.2 }));
+    const r7mid = byId(mid, 'r7_dollar_or_euro');
+    expect(r7mid.outcome).toBe('quiet');
+    expect(r7mid.legs).toHaveLength(0);
+    // d moved the OPPOSITE way to e (old bug B1's engine half) → no card.
+    const opp = evaluateFxRules(inputsOf({ eurusd: { m1: -3.6, m3: 0 } }, { dollarM1: -1.8 }));
+    expect(byId(opp, 'r7_dollar_or_euro').outcome).toBe('quiet');
   });
 
   it('the pattern check: holding ≥9, mixed 7–8, not-holding ≤6, nodata on absent series', () => {
@@ -498,6 +546,43 @@ describe('step 4 — the seven rules', () => {
     expect(r1.progress).toBe(0);
     const toward = evaluateFxRules(inputsOf({ audjpy: { m1: -1.5, m3: 0 } }, { sp500: 0 }));
     expect(byId(toward, 'r1_risk_mood').progress).toBe(50);
+  });
+
+  it('v1.3 buildFxPlain: movers invert USD/X pairs; the year-extreme flag reads the 52-week window', async () => {
+    // A world where the dollar rose against everything over the month.
+    const snap = await pipelineSnapshot(fxWorld({ drift: { EUR: 0.001, JPY: 0.001, GBP: 0.001, CHF: 0.001, CNY: 0.001, AUD: 0.001 } }));
+    const plain = snap.plain!;
+    // Every currency LOST ground on the dollar → every mover is negative.
+    for (const ccy of ['EUR', 'JPY', 'GBP', 'CNY', 'CHF', 'AUD'] as const) {
+      expect(plain.movers[ccy]).toBeDefined();
+      expect(plain.movers[ccy]!).toBeLessThan(0);
+    }
+    // The inversion: usdjpy m1 is POSITIVE (dollar up) yet the yen's own
+    // mover is negative, and |mover| < |pair m1| (1/(1+x)−1 shrinks).
+    const usdjpy = snap.pairs.find((p) => p.id === 'usdjpy')!;
+    expect(usdjpy.chg.m1).toBeGreaterThan(0);
+    expect(plain.movers.JPY!).toBeGreaterThan(-usdjpy.chg.m1);
+    // The euro rides its own pair change exactly.
+    const eurusd = snap.pairs.find((p) => p.id === 'eurusd')!;
+    expect(plain.movers.EUR).toBe(eurusd.chg.m1);
+    // A rising dollar world ends at its 52-week high → 'high'.
+    expect(plain.dollarYearExtreme).toBe('high');
+
+    // A falling-dollar world flags the low; a truly flat one flags nothing
+    // (fxWorld's default drift is 0.0002/day, so zero it out explicitly).
+    const down = await pipelineSnapshot(fxWorld({ drift: { EUR: -0.001, JPY: -0.001, GBP: -0.001, CHF: -0.001, CNY: -0.001, AUD: -0.001, CAD: -0.001, SEK: -0.001 } }));
+    expect(down.plain!.dollarYearExtreme).toBe('low');
+    const flat = await pipelineSnapshot(fxWorld({ drift: { EUR: 0, JPY: 0, GBP: 0, CHF: 0, CNY: 0, AUD: 0, CAD: 0, SEK: 0 } }));
+    expect(flat.plain!.dollarYearExtreme).toBeNull();
+  });
+
+  it('v1.3: the stored snapshot carries plain and stays schema-valid; a pre-v1.3 copy (no plain) still parses', async () => {
+    const snap = await pipelineSnapshot(fxWorld({}));
+    expect(snap.plain).toBeDefined();
+    expect(() => FxSnapshotSchema.parse(JSON.parse(JSON.stringify(snap)))).not.toThrow();
+    const legacy = JSON.parse(JSON.stringify(snap)) as Record<string, unknown>;
+    delete legacy.plain;
+    expect(() => FxSnapshotSchema.parse(legacy)).not.toThrow(); // old caches keep working
   });
 });
 

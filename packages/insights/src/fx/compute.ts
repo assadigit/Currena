@@ -18,6 +18,7 @@ import type {
   FxPairEntry,
   FxPairId,
   FxPatternCheck,
+  FxPlain,
   FxRuleState,
   FxRuleId,
   FxSnapshot,
@@ -51,6 +52,8 @@ import {
   R2_NIKKEI_M1_WARN,
   R2_USDJPY_M1_WARN,
   R2_USDJPY_M3_PRESSURE,
+  R3_DOLLAR_M1_STRONG,
+  R3_DOLLAR_M1_WEAK,
   R3_DOLLAR_M3_STRONG,
   R3_DOLLAR_M3_WEAK,
   R4_DOLLAR_M1_DOWN,
@@ -64,6 +67,7 @@ import {
   R6_EURCHF_M1_WARN,
   R6_EUROSTOXX_M1_WARN,
   R7_DOLLAR_FOLLOWS,
+  R7_DOLLAR_QUIET,
   R7_EURUSD_M1_MOVE,
   VERDICT_ATTENTION_COUNT,
   VERDICT_UNUSUAL_COUNT,
@@ -656,16 +660,37 @@ function evaluateRule(id: FxRuleId, inputs: FxRuleInputs): FxRuleState {
     case 'r3_dollar_strength': {
       const d = inputs.dollar.chg;
       const numbers = numbersOf([['dollar_m3', d.m3], ['dollar_m1', d.m1]]);
+      // v1.3 (CR §3.1): the fast one-month leg fires the rule on its own —
+      // M1 ≥ +3.0 or M3 ≥ +4.0 → Warning; M1 ≤ −3.0 or M3 ≤ −4.0 →
+      // Supportive. `variant` records WHICH leg fired so the sentence names
+      // its period honestly (the M1 leg wins the wording when both fire:
+      // the fast trigger is the story of the week).
+      const m1Strong = d.m1 >= R3_DOLLAR_M1_STRONG;
+      const m1Weak = d.m1 <= R3_DOLLAR_M1_WEAK;
+      const m3Strong = d.m3 >= R3_DOLLAR_M3_STRONG;
+      const m3Weak = d.m3 <= R3_DOLLAR_M3_WEAK;
       const legs: FxLeg[] = [
-        leg('dollar_m3_up', d.m3, R3_DOLLAR_M3_STRONG, d.m3 >= R3_DOLLAR_M3_STRONG),
-        leg('dollar_m3_down', d.m3, R3_DOLLAR_M3_WEAK, d.m3 <= R3_DOLLAR_M3_WEAK),
+        leg('dollar_m1_up', d.m1, R3_DOLLAR_M1_STRONG, m1Strong),
+        leg('dollar_m1_down', d.m1, R3_DOLLAR_M1_WEAK, m1Weak),
+        leg('dollar_m3_up', d.m3, R3_DOLLAR_M3_STRONG, m3Strong),
+        leg('dollar_m3_down', d.m3, R3_DOLLAR_M3_WEAK, m3Weak),
       ];
       let outcome: FxRuleState['outcome'] = 'quiet';
-      if (d.m3 >= R3_DOLLAR_M3_STRONG) outcome = 'warning';
-      else if (d.m3 <= R3_DOLLAR_M3_WEAK) outcome = 'supportive';
-      // §6.7: progress toward whichever warning side is nearer.
-      const progress = Math.max(0, Math.min(100, (Math.max(d.m3 / R3_DOLLAR_M3_STRONG, -d.m3 / R3_DOLLAR_M3_STRONG)) * 100));
-      return { id, outcome, counted: outcome === 'warning', numbers, confirmedBy: [], progress, legs, pattern, chart };
+      let variant: FxRuleState['variant'] | undefined;
+      if (m1Strong || m3Strong) {
+        outcome = 'warning';
+        variant = m1Strong ? 'm1' : 'm3';
+      } else if (m1Weak || m3Weak) {
+        outcome = 'supportive';
+        variant = m1Weak ? 'm1' : 'm3';
+      }
+      // §6.7 + CR §3.1: progress counts the NEARER of the two legs
+      // (M1 against ±3.0, M3 against ±4.0), either direction.
+      const progress = Math.max(
+        0,
+        Math.min(100, Math.max((Math.abs(d.m1) / R3_DOLLAR_M1_STRONG) * 100, (Math.abs(d.m3) / R3_DOLLAR_M3_STRONG) * 100)),
+      );
+      return { id, outcome, counted: outcome === 'warning', variant, numbers, confirmedBy: [], progress, legs, pattern, chart };
     }
     case 'r4_money_hiding': {
       const d = inputs.dollar.chg;
@@ -770,8 +795,20 @@ function evaluateRule(id: FxRuleId, inputs: FxRuleInputs): FxRuleState {
         // Below the trigger the context card stays away entirely (§9.3).
         return { id, outcome: 'quiet', counted: false, numbers, confirmedBy: [], progress: 0, legs: [], pattern, chart };
       }
-      const sameWay = Math.sign(d.m1) === Math.sign(eurusd.m1);
+      // v1.3 — the CORRECTED R7 (CR §3.3, fix B1): work in DOLLAR
+      // strength. EUR/USD down means the dollar got stronger against the
+      // euro, so e = −eurusd.m1 (positive = the dollar gained on the euro).
+      // The old code compared the dollar measure with EUR/USD itself, so a
+      // euro fall read as "the dollar barely moved".
+      const e = -eurusd.m1;
+      const sameWay = Math.sign(d.m1) === Math.sign(e);
       const dollarLed = sameWay && Math.abs(d.m1) >= R7_DOLLAR_FOLLOWS;
+      const euroLed = Math.abs(d.m1) < R7_DOLLAR_QUIET;
+      if (!dollarLed && !euroLed) {
+        // Between 1.0 and 1.5, or the dollar moved the OPPOSITE way to the
+        // euro: show NO card — do not guess (CR §3.3 item 5).
+        return { id, outcome: 'quiet', counted: false, numbers, confirmedBy: [], progress: 0, legs: [], pattern, chart };
+      }
       return {
         id,
         outcome: 'context',
@@ -826,8 +863,59 @@ export function summarizeFxRules(rules: readonly FxRuleState[]): FxSummary {
       : counted.length >= VERDICT_ATTENTION_COUNT
         ? 'attention'
         : 'normal';
+  // v1.3 (fix B2): the headline names only the leading pattern that
+  // COUNTS (a counted Warning). Supportive/Watch rows never lead it, and
+  // the R7 context card can never appear here — a context card is not an
+  // active pattern ("calm" + "Dollar or euro? is active" contradicted
+  // itself). When nothing counts, the UI falls back to the calm headline
+  // (§10.3 + CR §3.2's big-mover template).
   const headlineRule: FxRuleId | null = wobble !== undefined ? wobble.id : (counted[0]?.id ?? null);
   return { signal, countedWarnings: counted.length, headlineRule };
+}
+
+/**
+ * The v1.3 plain-language helpers (CR §6 “Build notes”): tiny derived
+ * fields stored once so the page never re-derives them. Under 1 KB:
+ * `dollarYearExtreme` is one word, `movers` six small numbers.
+ *
+ * - `dollarYearExtreme`: 'high'/'low' when the dollar measure sits at its
+ *   52-week extreme (S1's optional "its strongest/weakest in a year"
+ *   clause) — computed from the stored weekly closes, null otherwise.
+ * - `movers`: each big currency's OWN one-month change against the US
+ *   dollar, percent, positive = the currency GAINED on the dollar (S2).
+ *   X/USD pairs (euro, pound, Australian dollar) ride their own pair
+ *   change; USD/X pairs (yen, yuan, franc) invert: 1 ÷ (1 + chg) − 1.
+ */
+export function buildFxPlain(
+  dollarMeasure: FxDollarMeasure,
+  pairs: readonly FxPairEntry[],
+): FxPlain {
+  const window = dollarMeasure.weekly.map(([, v]) => v).slice(-FX_WEEKLY_POINTS);
+  let dollarYearExtreme: 'high' | 'low' | null = null;
+  if (window.length > 0) {
+    const max = Math.max(...window);
+    const min = Math.min(...window);
+    const v = dollarMeasure.value;
+    if (v >= max && v > min) dollarYearExtreme = 'high';
+    else if (v <= min && v < max) dollarYearExtreme = 'low';
+  }
+  const byId = new Map(pairs.map((p) => [p.id as string, p]));
+  const own = (xUsd: FxPairId): number | undefined => byId.get(xUsd)?.chg.m1;
+  const inv = (usdX: FxPairId): number | undefined => {
+    const m1 = byId.get(usdX)?.chg.m1;
+    return m1 === undefined ? undefined : round2((1 / (1 + m1 / 100) - 1) * 100);
+  };
+  return {
+    dollarYearExtreme,
+    movers: {
+      EUR: own('eurusd'),
+      JPY: inv('usdjpy'),
+      GBP: own('gbpusd'),
+      CNY: inv('usdcny'),
+      CHF: inv('usdchf'),
+      AUD: own('audusd'),
+    },
+  };
 }
 
 /** Assemble the ONE stored object (schema-validated before it is written). */
@@ -845,6 +933,7 @@ export function buildFxSnapshot(input: {
     pairs: [...input.pairs],
     rules: [...input.rules],
     summary,
+    plain: buildFxPlain(input.dollarMeasure, input.pairs),
   };
   return FxSnapshotSchema.parse(snapshot);
 }

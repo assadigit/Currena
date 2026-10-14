@@ -62,6 +62,12 @@ export const R2_NIKKEI_M1_WARN = -3.0;
 export const R2_USDJPY_M3_PRESSURE = 6.0;
 export const R3_DOLLAR_M3_STRONG = 4.0;
 export const R3_DOLLAR_M3_WEAK = -4.0;
+/** v1.3 (change request §3.1): R3's FAST leg — a sharp one-month move fires
+ * the rule without waiting for the three-month line (B8: a calm verdict on
+ * the dollar's biggest one-month gain in a year read as an error). Starting
+ * values; tuned only by the evidence-run rule in the main spec. */
+export const R3_DOLLAR_M1_STRONG = 3.0;
+export const R3_DOLLAR_M1_WEAK = -3.0;
 export const R4_DOLLAR_M1_UP = 2.0;
 export const R4_SP500_M1_DOWN = -3.0;
 export const R4_DOLLAR_M1_DOWN = -2.0;
@@ -185,6 +191,23 @@ export function fxRuleDefinition(id: FxRuleId): FxRuleDefinition {
   if (def === undefined) throw new Error(`[fx] unknown rule id ${JSON.stringify(id)}`);
   return def;
 }
+
+/**
+ * Whether the §6.4 pattern check (the 13 dots) applies to a rule. v1.3 fix
+ * B3: rules WITHOUT a pattern check (R4, R7) show no dots, no "Held in"
+ * line and no end labels — "Held in 0 of the last 13 weeks" on a rule with
+ * no check reads as a failure.
+ */
+export function fxRuleHasPatternCheck(id: FxRuleId): boolean {
+  return fxRuleDefinition(id).hasPatternCheck;
+}
+
+/**
+ * v1.3 (CR §3.2): the |M1| size that makes the dollar measure or a pair a
+ * "big mover" for the Normal-with-a-big-mover headline. A pair also counts
+ * when its stored `bigMove` flag is true (§6.2's 90th-percentile tag).
+ */
+export const FX_BIG_MOVE_M1_PCT = 3.0;
 
 // Re-exported for the compute module's delta-decoding (one base day for the
 // whole page — the markets section's).
