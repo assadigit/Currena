@@ -964,3 +964,42 @@ Deployed from `296a63f` (CI green): **currena-api `33c1b18b`** +
   `public, max-age=300, s-maxage=300` + ETag (D-13 intact); insights
   `max-age=60` with the dual-generation ETag (prices rung 04:13 riding);
   convert parity; RatesError envelope on 400.
+
+## Session record — 2026-10-14/15 QA session close-out (Phases 3–5)
+
+Deployed from `6090842` (CI green, origin/main = HEAD): **currena-api
+`93ae180a`** + **currena-markets `d825a8d4`** (both 2026-10-14T14:28Z;
+this redeploy pins the version marker to the final HEAD after the
+unrecorded 08:03Z deploy of the same tree — the 2026-09-18 wrap-up
+precedent). `EODHD_API_TOKEN` re-put on markets immediately after
+(idempotent; owner re-provided the same key).
+
+- What changed since the Phase-2 record above (all behavior-preserving):
+  Phase 3's five god-module splits (api index → routes/, fx compute →
+  domain modules, insights config → config/, WorldCurrencies + the
+  /insights route → section components; D-16 budget bump 580→582 raw);
+  Phase 4's a11y majors + minors (skip link, h1s, useDialogFocus
+  discipline on ResultPopup/Receipt/Settle/Header drawer), the
+  knip-verified dead-code sweep (6 deletions, 20 barrel trims, 137
+  un-exports), ESLint as a CI gate (D-17: advisories at warn,
+  rules-of-hooks at error) and the zero-advisory dependency set (D-18:
+  pnpm overrides + wrangler 4.151).
+- No stored-shape changes — KV readers/writers stay compatible both
+  directions; no snapshot job ordering needed.
+- Gates at deploy (re-verified on a fresh clone before the deploy):
+  1,171/1,171 tests (core 183 · scraper 67 · insights 350 · markets 13
+  · api 206 · web 352), typecheck 6/6, lint 0 errors / 34 accepted
+  advisory warnings, copy audit clean, bundle budgets held (entry
+  292.77/87.80 vs 296/89.5; Insights lazy 581.44/136.81 vs 582/137).
+- Post-deploy smoke (all verified against https://currena.ir): health
+  `{"ok":true,"kv":"ok"}`; rates `no-store` + ETag cycling with the
+  minute keep-warm; convert parity (100 USD → 26,390,000 @ 263,900);
+  history `public, max-age=60` + ETag; markets + fx
+  `public, max-age=300, s-maxage=300` + ETag + live 304 (D-12/D-13
+  intact); markets ETag = the 23:30:26Z snapshot run (cron fired).
+- Browser verification (Chrome, post-deploy): converter renders with
+  the a11y layer (skip link, h1, labeled controls); 100 USD → 263,900
+  live result; FA/RTL toggle with Persian h1 and copy; /insights
+  renders all sections in FA; 375×667 no horizontal bleed on converter
+  or insights; zero console errors and zero console messages across
+  the entire pass.

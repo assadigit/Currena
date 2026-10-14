@@ -95,6 +95,16 @@ documented-with-reason; D-14…D-16 recorded in docs/DECISIONS_FOR_ALI.md.
   dompurify / source-map-js / serialize-javascript — `pnpm audit` now
   reports **zero** known vulnerabilities (was 15, all transitive).
 
+### Deployed
+
+- Both workers from `6090842` (CI green): currena-api `93ae180a` +
+  currena-markets `d825a8d4` (2026-10-14T14:28Z; pins the version
+  marker to the final HEAD). Gates re-verified on a fresh clone first:
+  1,171/1,171 tests, typecheck 6/6, lint 0 errors, copy audit clean,
+  budgets held (entry 292.77/87.80; Insights lazy 581.44/136.81).
+  Post-deploy smoke + browser verification (EN+FA, desktop + 375px,
+  zero console errors) recorded in docs/DEPLOY.md. D-14…D-18 logged.
+
 ## [2026-10-14] — Freshness: the daily update becomes visible in ~5 minutes
 
 Owner-approved pair of changes (D-12 + D-13) closing the gap between the
