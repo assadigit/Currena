@@ -928,3 +928,31 @@ finish-line artifacts (the evidence run + the fx data check).
   minutes (was up to ~5 hours).
 - One-off diagnosis/fix script (zone settings probe + PATCH) deleted after
   use, per repo discipline; its logic is recorded in this entry.
+
+## Session record — 2026-10-14 Phase 2 (QA hardening: KV-failure honesty + contract suites)
+
+Deployed from `296a63f` (CI green): **currena-api `33c1b18b`** +
+**currena-markets `28c9d3f5`** (both 2026-10-14T05:06Z).
+
+- What changed (serve path): `/api/history` answers the calm 503
+  `history_unavailable` on KV read failure (was a raw 500); the four
+  insights serve routes guard their KV reads with distinct 503 codes
+  (`insights_unavailable`, `markets_unavailable`, `fx_unavailable`,
+  `indicator_history_unavailable` — D-15); `/api/status` + `/admin`
+  degrade per-row (allSettled) instead of 500ing; the SPA `fetchMeta`
+  memo retries after a transient failure.
+- What changed (jobs): the fx Yahoo fallback window `range=1y` → `2y`
+  (D-14 — the y1 anchor needs calendar margin); explicit cron-kind
+  matching on currena-markets (unknown expressions log + skip);
+  `parseFrankfurterTimeseries` drops non-positive rates (V1 parity).
+- No stored-shape changes — KV readers/writers stay compatible both
+  directions; no snapshot job ordering needed.
+- Gates at deploy: 1,171/1,171 tests (was 1,058; +113), typecheck 6/6,
+  copy audit clean, bundle budgets held (entry 290.36/87.08; Insights
+  lazy 579.62/136.48).
+- Post-deploy smoke (all verified against https://currena.ir): health
+  `{"ok":true,"kv":"ok"}`; rates `no-store` + ETag; history
+  `public, max-age=60` + ETag + live 304 revalidation; markets + fx
+  `public, max-age=300, s-maxage=300` + ETag (D-13 intact); insights
+  `max-age=60` with the dual-generation ETag (prices rung 04:13 riding);
+  convert parity; RatesError envelope on 400.
