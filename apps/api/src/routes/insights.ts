@@ -23,7 +23,15 @@
  */
 
 import { IndicatorIdSchema } from '@currena/core';
-import type { IndicatorId, LivePricesSnapshot, RatesError } from '@currena/core';
+import type {
+  FxSnapshot,
+  IndicatorHistory,
+  IndicatorId,
+  InsightsSnapshot,
+  LivePricesSnapshot,
+  MarketsSnapshot,
+  RatesError,
+} from '@currena/core';
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import type { InsightsReader } from '@currena/insights/store';
@@ -59,7 +67,22 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
   const app = new Hono<{ Bindings: Bindings }>();
 
   app.get('/', async (c) => {
-    const snapshot = await deps.getReader(c.env).getSnapshot();
+    // KV-failure honesty (QA audit A-2): a reader rejection is NOT "not
+    // ready" — it is a degraded store. Same calm 503 surface, distinct
+    // machine code for observability; the SPA's insights client already
+    // treats any non-200 as its designed "being prepared" fallback.
+    let snapshot: InsightsSnapshot | undefined;
+    try {
+      snapshot = await deps.getReader(c.env).getSnapshot();
+    } catch (err) {
+      console.warn('[insights] snapshot read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'insights_unavailable',
+        'Insights are temporarily unavailable — please retry shortly.',
+      );
+    }
     if (!snapshot) {
       return errorResponse(
         c,
@@ -98,7 +121,19 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
       const edgeCached = await caches.default.match(c.req.raw);
       if (edgeCached !== undefined) return edgeCached;
     }
-    const snapshot = await deps.getMarketsReader(c.env).getMarkets();
+    // KV-failure honesty (QA audit A-2) — same calm 503, distinct code.
+    let snapshot: MarketsSnapshot | undefined;
+    try {
+      snapshot = await deps.getMarketsReader(c.env).getMarkets();
+    } catch (err) {
+      console.warn('[insights] markets read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'markets_unavailable',
+        'World markets are temporarily unavailable — please retry shortly.',
+      );
+    }
     if (!snapshot) {
       // The calm "being prepared" answer: the section has never been
       // populated (fresh deploy, or the scheduled job has not landed yet).
@@ -139,7 +174,19 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
       const edgeCached = await caches.default.match(c.req.raw);
       if (edgeCached !== undefined) return edgeCached;
     }
-    const snapshot = await deps.getFxReader(c.env).getFx();
+    // KV-failure honesty (QA audit A-2) — same calm 503, distinct code.
+    let snapshot: FxSnapshot | undefined;
+    try {
+      snapshot = await deps.getFxReader(c.env).getFx();
+    } catch (err) {
+      console.warn('[insights] fx read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'fx_unavailable',
+        'World currencies are temporarily unavailable — please retry shortly.',
+      );
+    }
     if (!snapshot) {
       // The calm "being prepared" answer: the section has never been
       // populated (fresh deploy, or the scheduled job has not landed yet).
@@ -182,7 +229,19 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
       );
     }
     const id: IndicatorId = parsed.data;
-    const history = await deps.getReader(c.env).getHistory(id);
+    // KV-failure honesty (QA audit A-2) — same calm 503, distinct code.
+    let history: IndicatorHistory | undefined;
+    try {
+      history = await deps.getReader(c.env).getHistory(id);
+    } catch (err) {
+      console.warn(`[insights] history read failed for ${id}:`, err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'indicator_history_unavailable',
+        'Indicator history is temporarily unavailable — please retry shortly.',
+      );
+    }
     if (!history) {
       // Unknown id → 400 above; known id with no stored history (missing run,
       // or a single-point live card that never gets a key) → honest 404.

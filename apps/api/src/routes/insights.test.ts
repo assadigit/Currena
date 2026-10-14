@@ -511,3 +511,80 @@ describe('GET /api/insights/fx', () => {
     expect(store.ops.reads - readsBefore).toBe(1);
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * KV-failure honesty (QA audit A-2): a reader rejection surfaces as   *
+ * the calm 503 with a distinct machine code — never a raw 500         *
+ * internal_error. (The prices-reader twin was already covered.)       *
+ * ------------------------------------------------------------------ */
+
+describe('KV-failure honesty (audit A-2 — reader throws, route stays calm)', () => {
+  const kvFailure = new Error('KV unavailable');
+
+  it('GET /api/insights → 503 insights_unavailable (no-store) when the reader rejects', async () => {
+    const app = createApp({
+      makeInsightsReader: () => ({
+        getSnapshot: () => Promise.reject(kvFailure),
+        getHistory: () => Promise.reject(kvFailure),
+        getStatus: () => Promise.reject(kvFailure),
+      }),
+    });
+    const res = await app.request('/api/insights', undefined, env);
+    expect(res.status).toBe(503);
+    expect(res.headers.get('cache-control')).toBe('no-store');
+    const body = (await res.json()) as { error: { code: string; message: string } };
+    expect(body.error.code).toBe('insights_unavailable');
+    expect(body.error.message).toContain('temporarily unavailable');
+  });
+
+  it('GET /api/insights/markets → 503 markets_unavailable when the reader rejects', async () => {
+    const app = createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeMarketsReader: () => ({ getMarkets: () => Promise.reject(kvFailure) }),
+    });
+    const res = await app.request('/api/insights/markets', undefined, env);
+    expect(res.status).toBe(503);
+    expect(res.headers.get('cache-control')).toBe('no-store');
+    const body = (await res.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('markets_unavailable');
+  });
+
+  it('GET /api/insights/fx → 503 fx_unavailable when the reader rejects', async () => {
+    const app = createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeFxReader: () => ({ getFx: () => Promise.reject(kvFailure) }),
+    });
+    const res = await app.request('/api/insights/fx', undefined, env);
+    expect(res.status).toBe(503);
+    expect(res.headers.get('cache-control')).toBe('no-store');
+    const body = (await res.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('fx_unavailable');
+  });
+
+  it('GET /api/insights/:id/history → 503 indicator_history_unavailable when the reader rejects', async () => {
+    const app = createApp({
+      makeInsightsReader: () => ({
+        getSnapshot: () => Promise.resolve(undefined),
+        getHistory: () => Promise.reject(kvFailure),
+        getStatus: () => Promise.resolve(undefined),
+      }),
+    });
+    const res = await app.request('/api/insights/us10y/history', undefined, env);
+    expect(res.status).toBe(503);
+    expect(res.headers.get('cache-control')).toBe('no-store');
+    const body = (await res.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('indicator_history_unavailable');
+  });
+
+  it('a KV failure on the MARKETS reader must not take down /api/insights (route isolation)', async () => {
+    const store = new InMemoryInsightsStore();
+    await store.putSnapshot(snapshot);
+    const app = createApp({
+      makeInsightsReader: () => store,
+      makeMarketsReader: () => ({ getMarkets: () => Promise.reject(kvFailure) }),
+    });
+    const res = await app.request('/api/insights', undefined, env);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual(snapshot);
+  });
+});
