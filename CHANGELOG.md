@@ -5,6 +5,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-15c] — D-25/D-26/D-27 decided: all three KEEP (WS-6 fully closed)
+
+The owner's reply arrived in session chat — "do the D25 D26 D27" —
+interpreted as adopting each paper's recommendation (option (a) for
+all three; no alternative option was named, and the overrule path
+stays open: reply to the row in docs/DECISIONS_FOR_ALI.md). Docs-only:
+zero code, zero copy, zero behavior change, nothing deployed.
+
+### Decided — the three WS-6 owner papers
+
+- **D-25 (D-08 follow-up — R7's euro-led card): KEEP.** "Mostly a euro
+  story" stays rare by basket mathematics (0 of 522 weeks; EUR carries
+  57.6% of the D-06 basket) — honest rarity, not a defect.
+  `R7_DOLLAR_QUIET` and the basket weights are untouched.
+- **D-26 (D-09 follow-up — R5 China link at 15.3% of weeks): KEEP.** A
+  touch above the spec's 15% usefulness bar, far under the change
+  request's 25% bar, with high catch quality (2018-19, March 2020,
+  2022). `R5_USDCNY_M3_WEAK`/`R5_AUDUSD_M3_FALL` are untouched.
+- **D-27 (A-11 follow-up — /api/convert's exotic `Number()` forms):
+  KEEP.** The finite/positive/≤1e15 gates already reject the dangerous
+  forms; the exotic-but-finite forms (`0x10` → 16, `1e3` → 1000,
+  ` 42 ` → 42) stay accepted surface, pinned by contract tests.
+
+### Not deployed (docs-only)
+
+Runtime is unchanged: production stays currena-api `155ecb3d` +
+currena-markets `9b5ff7e0` (both from `fb1fded`) — a docs-only commit
+serves the same bytes. Gates re-run before the commit: 1,255/1,255
+tests (core 190 · scraper 67 · insights 356 · markets 13 · api 208 ·
+web 421), typecheck 6/6, lint 0 errors / 14 accepted advisories, copy
+audit clean, budgets held (entry 294.60/88.50 vs 296/89.5; Insights
+lazy 581.45/136.82 vs 582/137).
+
 ## [2026-10-15b] — REMAINING_WORK session: reliability minors, test closers, a11y leftovers, the five splits, the advisory worklist
 
 The owner-commissioned follow-up work order (REMAINING_WORK.md at the repo

@@ -1,19 +1,23 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-15 (the REMAINING_WORK session close; final code
-commit `fb1fded`, both workers deployed + live-verified from it).
+Hand-off date: 2026-10-15 (the REMAINING_WORK session close, plus the
+2026-10-15c docs-only close of D-25/D-26/D-27 — runtime-identical to
+the final code commit `fb1fded`, both workers deployed + live-verified
+from it).
 · Production: https://currena.ir · Deployed: currena-api `155ecb3d` +
 currena-markets `9b5ff7e0` (both 2026-10-14T19:52Z from `fb1fded`, see
-docs/DEPLOY.md's last session record).
+docs/DEPLOY.md's last session record; the D-decision commit after it
+is docs-only — zero served bytes changed, no deploy needed).
 · **REMAINING_WORK.md IS CLOSED**: WS-1 (A-5/A-6/A-8, D-19/D-20/D-21) →
 WS-2 (C-6/C-8/C-9, D-22) → WS-3 (6 fixed + 3 declined, D-23) → WS-4
 (B-4 + all six splits, characterization-first) → WS-5 (34 → 14
 advisories, the declines reasoned in D-24) → WS-6 (the three option
-papers D-25/D-26/D-27) — every item either done or declined with a
+papers D-25/D-26/D-27 — decided 2026-10-15c, all KEEP, the owner's
+go in session chat) — every item either done or declined with a
 recorded reason. Nothing from that work order remains open.
 · The next session's work is whatever the OWNER commissions next: the
-standing backlog is `docs/BACKLOG.md`; the awaiting-Ali decisions are
-D-25/D-26/D-27 (+ the older D-08/D-09 notes they extend); the owner-side
+standing backlog is `docs/BACKLOG.md`; NO D-row awaits Ali anymore
+(D-25/D-26/D-27 were decided 2026-10-15c, all KEEP); the owner-side
 checklist below carries the rest.
 
 ---
@@ -94,10 +98,11 @@ history), `docs/DECISIONS_FOR_ALI.md` (D-01…D-27), `docs/DEPLOY.md`
    omission, useDialogFocus's ref-in-cleanup, LiveRateLine's
    compilation-skip notice. Each is a designed pattern; forcing them
    lint-clean is behavior churn for a badge.
-2. **The three awaiting-Ali papers** (D-25/D-26/D-27): R7 euro-led
-   rarity (keep recommended), R5 firing rate (keep recommended),
-   /api/convert's exotic Number() forms (keep recommended). NO behavior
-   change without Ali's explicit go.
+2. **D-25/D-26/D-27 are DECIDED (2026-10-15c): all three KEEP** — R7's
+   euro-led card stays rare by basket mathematics, R5 stays at 15.3% of
+   weeks, /api/convert keeps its exotic-but-finite Number() forms. Zero
+   behavior change resulted. If Ali ever wants (b)/(c) on any of them,
+   the overrule path is replying to the row in DECISIONS_FOR_ALI.md.
 3. **i18n copy corpora** (`insights-copy-en/fa.ts`) and
    `packages/core/src/schemas.ts` — data-file and sacred-surface
    respectively; unchanged policy.
@@ -109,7 +114,6 @@ history), `docs/DECISIONS_FOR_ALI.md` (D-01…D-27), `docs/DEPLOY.md`
 ## 4. Next-session work
 
 Whatever the owner commissions. Likely candidates from the record:
-- Answering D-25/D-26/D-27 (one-line owner replies; the agent executes).
 - `docs/BACKLOG.md` items.
 - If a NEW monolith grows past ~800 lines, the Phase-3/WS-4 split
   recipe is now well-trodden: characterization tests first (the jsdom
