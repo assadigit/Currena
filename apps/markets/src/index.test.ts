@@ -21,6 +21,19 @@ import type { MarketJobFetchers, MarketSeries, KVLike } from '@currena/insights/
 import { runScheduledMarkets } from './index';
 import { MAIN_CRON, RETRY_CRON } from './crons';
 
+// The node surface this TEST file uses, resolved at RUNTIME through a
+// non-literal specifier (vitest runs on Node) so the app's worker program
+// never sees @types/node — AGENTS.md rule 2's portability guard keeps its
+// teeth: worker source can never accidentally resolve node APIs.
+const nodeFsSpecifier = 'node:fs' as string;
+type NodeFsLike = { readFileSync(path: string | URL, encoding: string): string };
+const { readFileSync } = (await import(nodeFsSpecifier)) as NodeFsLike;
+declare global {
+  interface ImportMeta {
+    readonly url: string;
+  }
+}
+
 /* ------------------------------------------------------------------ *
  * Fakes: KV with a failing-put injector, providers with a mutable world
  * ------------------------------------------------------------------ */
@@ -204,7 +217,21 @@ describe('runScheduledMarkets — the 24-hour budget', () => {
     expect(kv.ops.writes).toBe(1);
   });
 
-  it('the cron expressions match wrangler.jsonc', () => {
+  it('the cron expressions match wrangler.jsonc (the file is READ, not mirrored — audit C-8)', () => {
+    // Parse the wrangler config the way a human would: strip // comments,
+    // then pull triggers.crons out of the JSON. A drift between the code
+    // constants and the deployed triggers fails HERE — the old literal
+    // mirror could never catch it.
+    const raw = readFileSync(new URL('../wrangler.jsonc', import.meta.url), 'utf8');
+    const uncommented = raw.replace(/^\s*\/\/.*$/gm, '');
+    const config = JSON.parse(uncommented) as { triggers?: { crons?: string[] } };
+    const crons = config.triggers?.crons;
+    expect(crons).toBeDefined();
+    expect(crons).toHaveLength(2);
+    expect(MAIN_CRON).toBe(crons![0]);
+    expect(RETRY_CRON).toBe(crons![1]);
+    // The literal spellings stay pinned too — a wrong expression in BOTH
+    // places would otherwise pass silently.
     expect(MAIN_CRON).toBe('30 23 * * 1-5');
     expect(RETRY_CRON).toBe('30 1 * * 2-6');
   });
