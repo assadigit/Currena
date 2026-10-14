@@ -156,6 +156,10 @@ function makeApp() {
     makeMarketsReader: () => marketsStore,
     makeFxReader: () => fxStore,
     makePricesReader: () => pricesStore,
+    // A-8: pin the serve-time staleness clock near the fixtures' asOf
+    // (markets 2026-10-12, fx 2026-10-13) so the golden bodies stay
+    // deterministic regardless of the wall clock.
+    now: () => new Date('2026-10-13T12:00:00Z'),
   });
 }
 

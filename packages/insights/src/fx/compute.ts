@@ -29,5 +29,5 @@ export { buildDollarMeasure, buildFxPairEntry } from './entries';
 export { goldInputFromHistory, stockInputsFromMarkets } from './cross-inputs';
 export type { FxGoldInput, FxRuleInputs, FxStockInputs } from './cross-inputs';
 export { evaluateFxRules } from './rules';
-export { buildFxPlain, buildFxSnapshot, summarizeFxRules } from './summary';
+export { buildFxPlain, buildFxSnapshot, reStaleFxSnapshot, summarizeFxRules } from './summary';
 export { fxContentEqual, fxContentHash, ratesAgree, suspiciousDayMove } from './content';

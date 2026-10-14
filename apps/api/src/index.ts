@@ -60,6 +60,12 @@ export interface AppDeps {
   makeFxReader?: (env: Bindings) => import('@currena/insights/fx').FxReader;
   /** Override the live-prices store (route tests inject the in-memory fake). */
   makePricesReader?: (env: Bindings) => import('@currena/insights/prices').PricesReader;
+  /**
+   * Injectable clock for the serve-time staleness re-evaluation (audit
+   * A-8) — defaults to the real time. Tests pin it so fixtures with frozen
+   * dates stay deterministic.
+   */
+  now?: () => Date;
 }
 
 export function createApp(deps: AppDeps = {}) {
@@ -125,7 +131,15 @@ export function createApp(deps: AppDeps = {}) {
   // the scheduled jobs. Read-only here.
   app.route(
     '/api/insights',
-    createInsightsRoutes({ getReader: getInsightsReader, getMarketsReader, getFxReader, getPricesReader }),
+    createInsightsRoutes({
+      getReader: getInsightsReader,
+      getMarketsReader,
+      getFxReader,
+      getPricesReader,
+      // A-8: the serve-time staleness re-evaluation needs a clock; tests
+      // pin it so aged fixtures flip deterministically.
+      now: deps.now ?? (() => new Date()),
+    }),
   );
 
   /* ------------------------- error envelopes ----------------------------- */

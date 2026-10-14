@@ -357,6 +357,10 @@ describe('GET /api/insights/markets', () => {
     return createApp({
       makeInsightsReader: () => new InMemoryInsightsStore(),
       makeMarketsReader: () => store,
+      // A-8: pin the serve-time staleness clock to the fixture world's
+      // "today" (asOf 2026-10-12 + 1 day = fresh) so assertions stay
+      // deterministic regardless of the wall clock.
+      now: () => new Date('2026-10-13T12:00:00Z'),
     });
   }
 
@@ -379,6 +383,37 @@ describe('GET /api/insights/markets', () => {
       env,
     );
     expect(res.status).toBe(304);
+  });
+
+  it('A-8: an aged stale:false row serves stale:true (serve-time re-evaluation); fresh serves byte-identical', async () => {
+    // asOf 2026-10-09 rows stored with stale:false (the write-time flag
+    // froze — audit A-8: both crons failing for days would age KV silently).
+    const snap = await realisticSnapshot();
+    expect(snap.markets.every((m) => !m.stale)).toBe(true);
+    await store.putMarketsIfChanged(snap, undefined);
+
+    // Fresh serve (now = 2026-10-13): byte-identical to the stored snapshot.
+    const freshRes = await makeApp().request('/api/insights/markets', undefined, env);
+    expect(freshRes.status).toBe(200);
+    expect(await freshRes.text()).toBe(JSON.stringify(snap));
+
+    // Aged serve (now = 2026-10-16: asOf + 7 days = STALE_DAYS + 2): every
+    // row flips to stale:true; everything else stays byte-identical.
+    const agedApp = createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeMarketsReader: () => store,
+      now: () => new Date('2026-10-16T12:00:00Z'),
+    });
+    const agedRes = await agedApp.request('/api/insights/markets', undefined, env);
+    expect(agedRes.status).toBe(200);
+    const body = (await agedRes.json()) as typeof snap;
+    expect(body.markets.every((m) => m.stale)).toBe(true);
+    expect(body).toEqual({
+      ...snap,
+      markets: snap.markets.map((m) => ({ ...m, stale: true })),
+    });
+    // The ETag still keys on generatedAt (the stored snapshot is unchanged).
+    expect(agedRes.headers.get('etag')).toBe('"insights-markets:2026-10-12T23:31:00Z"');
   });
 
   it('answers 503 markets_not_ready (calm, no-store) when KV is empty', async () => {
@@ -464,6 +499,8 @@ describe('GET /api/insights/fx', () => {
     return createApp({
       makeInsightsReader: () => new InMemoryInsightsStore(),
       makeFxReader: () => store,
+      // A-8: pinned staleness clock — the fx fixtures' asOf is 2026-10-12.
+      now: () => new Date('2026-10-13T12:00:00Z'),
     });
   }
 
@@ -486,6 +523,36 @@ describe('GET /api/insights/fx', () => {
       env,
     );
     expect(res.status).toBe(304);
+  });
+
+  it('A-8: an aged stale:false pair serves stale:true (serve-time re-evaluation); fresh serves byte-identical', async () => {
+    // Pairs asOf 2026-10-12 stored with stale:false (write-time freeze).
+    const snap = await realisticFxSnapshot();
+    expect(snap.pairs.every((p) => !p.stale)).toBe(true);
+    await store.putFxIfChanged(snap, undefined);
+
+    // Fresh serve (now = 2026-10-13): byte-identical to the stored snapshot.
+    const freshRes = await makeApp().request('/api/insights/fx', undefined, env);
+    expect(freshRes.status).toBe(200);
+    expect(await freshRes.json()).toEqual(snap);
+
+    // Aged serve (now = 2026-10-19: asOf + 7 days = FX_STALE_DAYS + 2):
+    // every pair flips to stale:true; everything else stays byte-identical
+    // (the dollar measure and rules carry no stale flag by schema).
+    const agedApp = createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeFxReader: () => store,
+      now: () => new Date('2026-10-19T12:00:00Z'),
+    });
+    const agedRes = await agedApp.request('/api/insights/fx', undefined, env);
+    expect(agedRes.status).toBe(200);
+    const body = (await agedRes.json()) as typeof snap;
+    expect(body.pairs.every((p) => p.stale)).toBe(true);
+    expect(body).toEqual({
+      ...snap,
+      pairs: snap.pairs.map((p) => ({ ...p, stale: true })),
+    });
+    expect(agedRes.headers.get('etag')).toBe('"insights-fx:2026-10-13T17:01:00Z"');
   });
 
   it('answers 503 fx_not_ready (calm, no-store) when KV is empty', async () => {

@@ -33,7 +33,9 @@ import type {
 } from '@currena/core';
 import { Hono } from 'hono';
 import type { InsightsReader } from '@currena/insights/store';
+import { reStaleMarketsSnapshot } from '@currena/insights/markets';
 import type { MarketsReader } from '@currena/insights/markets';
+import { reStaleFxSnapshot } from '@currena/insights/fx';
 import type { FxReader } from '@currena/insights/fx';
 import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
@@ -49,10 +51,17 @@ interface InsightsRouteDeps {
   getFxReader: (env: Bindings) => FxReader;
   /** Live-prices store construction (route tests inject the in-memory fake). */
   getPricesReader: (env: Bindings) => PricesReader;
+  /**
+   * Injectable clock for the serve-time staleness re-evaluation (audit
+   * A-8, D-21) — defaults to the real time. Tests pin it so aged fixtures
+   * flip deterministically instead of depending on the wall clock.
+   */
+  now?: () => Date;
 }
 
 export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: Bindings }> {
   const app = new Hono<{ Bindings: Bindings }>();
+  const now = deps.now ?? (() => new Date());
 
   app.get('/', async (c) => {
     // KV-failure honesty (QA audit A-2): a reader rejection is NOT "not
@@ -132,6 +141,12 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
         'No world-markets snapshot stored yet — the scheduled job has not completed.',
       );
     }
+    // A-8 (D-21): re-evaluate per-row staleness at SERVE time — the stored
+    // flag freezes at write time, so a multi-day double-cron failure would
+    // otherwise keep `stale:false` while asOf ages. Fresh snapshots come
+    // back untouched (byte-identical); the 304 short-circuit below stays
+    // cheap (no re-computation needed to answer "not modified").
+    snapshot = reStaleMarketsSnapshot(snapshot, now().toISOString().slice(0, 10));
     const etag = `"insights-markets:${snapshot.generatedAt}"`;
     if (c.req.header('if-none-match') === etag) {
       return c.body(null, 304, { 'Cache-Control': 'public, max-age=300, s-maxage=300', ETag: etag });
@@ -185,6 +200,10 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
         'No world-currencies snapshot stored yet — the scheduled job has not completed.',
       );
     }
+    // A-8 (D-21): the fx twin of the markets route's serve-time staleness
+    // re-evaluation — same shape, honestly flipped values, fresh snapshots
+    // byte-identical.
+    snapshot = reStaleFxSnapshot(snapshot, now().toISOString().slice(0, 10));
     const etag = `"insights-fx:${snapshot.generatedAt}"`;
     if (c.req.header('if-none-match') === etag) {
       return c.body(null, 304, { 'Cache-Control': 'public, max-age=300, s-maxage=300', ETag: etag });

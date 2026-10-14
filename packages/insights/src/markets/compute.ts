@@ -344,6 +344,29 @@ export function buildMarketsSnapshot(input: BuildMarketsInput): MarketsSnapshot 
   return MarketsSnapshotSchema.parse(snapshot);
 }
 
+/**
+ * Serve-time staleness re-evaluation (audit A-8, D-21): the stored `stale`
+ * flag freezes at WRITE time (buildMarketsSnapshot's reStale), so if BOTH
+ * crons fail for days the KV row keeps `stale:false` while `asOf` ages.
+ * The serve path (currena-api's /api/insights/markets route) re-evaluates
+ * every row against today's UTC date with this helper — one daysBetween
+ * per row, same JSON shape, honestly flipped values. Fresh snapshots come
+ * back as the SAME object (byte-identical response); only genuinely aged
+ * rows are rebuilt. The route's ETag still keys on generatedAt: a flipped
+ * flag lands within the 5-minute cache windows (the D-12/D-13 chain) —
+ * acceptable for a boolean that flips once per row lifetime.
+ */
+export function reStaleMarketsSnapshot(snapshot: MarketsSnapshot, todayIso: string): MarketsSnapshot {
+  let changed = false;
+  const markets = snapshot.markets.map((m) => {
+    const staleNow = daysBetween(m.asOf, todayIso) > STALE_DAYS;
+    if (staleNow === m.stale) return m;
+    changed = true;
+    return { ...m, stale: staleNow };
+  });
+  return changed ? { ...snapshot, markets } : snapshot;
+}
+
 /** The §5.3 rollup: counts, the highest matching signal row, worst group. */
 export function summarizeMarkets(markets: readonly MarketEntry[]): MarketsSummary {
   const nAttention = markets.filter((m) => m.status === 'correction').length;

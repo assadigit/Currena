@@ -30,6 +30,7 @@ import {
   pairSeriesFromQuotes,
   patternCheck,
   ratesAgree,
+  reStaleFxSnapshot,
   stockInputsFromMarkets,
   summarizeFxRules,
   suspiciousDayMove,
@@ -768,6 +769,29 @@ describe('step 5 — the job, the store, the write gate', () => {
       ],
     } as never;
     expect(stockInputsFromMarkets(stale, RUN_DATE)).toEqual({});
+  });
+
+  it('A-8: reStaleFxSnapshot flips an aged pair at serve time; fresh pairs ride byte-identical', async () => {
+    const snap = await pipelineSnapshot(fxWorld({})); // pairs asOf 2026-10-12, stale:false
+    // Today = 2026-10-18: 6 days = FX_STALE_DAYS + 1 → flips.
+    const served = reStaleFxSnapshot(snap, '2026-10-18');
+    for (const p of served.pairs) {
+      expect(p.stale).toBe(true);
+      expect(p.asOf).toBe('2026-10-12'); // the row itself stays honest
+    }
+    // The dollar measure carries no stale flag — untouched, same object.
+    expect(served.dollarMeasure).toBe(snap.dollarMeasure);
+    // One day later than asOf (fresh): the SAME snapshot object back.
+    expect(reStaleFxSnapshot(snap, '2026-10-13')).toBe(snap);
+    // The boundary itself (5 days) is not yet stale.
+    expect(reStaleFxSnapshot(snap, '2026-10-17')).toBe(snap);
+  });
+
+  it('A-8: a pair already stored stale:true never un-flips while asOf ages', async () => {
+    const snap = await pipelineSnapshot(fxWorld({ lastDate: '2026-10-01' })); // stale:true stored
+    const served = reStaleFxSnapshot(snap, '2026-10-18');
+    expect(served.pairs.every((p) => p.stale)).toBe(true);
+    expect(served).toBe(snap); // no change → same object
   });
 
   it('fxContentEqual ignores generatedAt (the write gate)', async () => {

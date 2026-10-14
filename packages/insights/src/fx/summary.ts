@@ -14,8 +14,9 @@ import type {
   FxSummary,
 } from '@currena/core';
 import { FxSnapshotSchema } from '@currena/core';
-import { FX_WEEKLY_POINTS, VERDICT_ATTENTION_COUNT, VERDICT_UNUSUAL_COUNT } from './definitions';
+import { FX_STALE_DAYS, FX_WEEKLY_POINTS, VERDICT_ATTENTION_COUNT, VERDICT_UNUSUAL_COUNT } from './definitions';
 import { round2 } from './maths';
+import { daysBetween } from '../series';
 
 export function summarizeFxRules(rules: readonly FxRuleState[]): FxSummary {
   const counted = rules.filter((r) => r.outcome === 'warning' && r.counted);
@@ -99,4 +100,27 @@ export function buildFxSnapshot(input: {
     plain: buildFxPlain(input.dollarMeasure, input.pairs),
   };
   return FxSnapshotSchema.parse(snapshot);
+}
+
+/**
+ * Serve-time staleness re-evaluation (audit A-8, D-21 — the fx twin of
+ * markets/compute.ts's reStaleMarketsSnapshot): the stored pairs' `stale`
+ * flags freeze at WRITE time (job.ts's reStale), so if BOTH crons fail
+ * for days KV keeps `stale:false` while `asOf` ages. The serve path
+ * (currena-api's /api/insights/fx route) re-evaluates every pair row
+ * against today's UTC date here — one daysBetween per row, same JSON
+ * shape, honestly flipped values. Fresh snapshots come back as the SAME
+ * object (byte-identical response). The dollar measure and the rules
+ * carry no stale flag by schema; their freshness rides asOf/notes as
+ * designed.
+ */
+export function reStaleFxSnapshot(snapshot: FxSnapshot, todayIso: string): FxSnapshot {
+  let changed = false;
+  const pairs = snapshot.pairs.map((p) => {
+    const staleNow = daysBetween(p.asOf, todayIso) > FX_STALE_DAYS;
+    if (staleNow === p.stale) return p;
+    changed = true;
+    return { ...p, stale: staleNow };
+  });
+  return changed ? { ...snapshot, pairs } : snapshot;
 }

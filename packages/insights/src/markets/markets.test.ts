@@ -18,6 +18,7 @@ import {
   buildMarketsSnapshot,
   marketsContentEqual,
   marketsContentHash,
+  reStaleMarketsSnapshot,
   resolveMarket,
   statusOf,
   summarizeMarkets,
@@ -480,6 +481,37 @@ describe('marketsContentHash / marketsContentEqual', () => {
 
   it('undefined stored is never equal (the first run always writes)', () => {
     expect(marketsContentEqual(undefined, base)).toBe(false);
+  });
+});
+
+describe('reStaleMarketsSnapshot — serve-time staleness (audit A-8)', () => {
+  it('a stored stale:false row with asOf STALE_DAYS+1 old flips to stale:true; the fresh row is untouched', () => {
+    const snap = fakeSnapshot([
+      storedEntry('dax'),                                    // asOf 2026-10-09, stale:false
+      storedEntry('sp500', { asOf: '2026-10-12' }),          // fresh vs 2026-10-15
+    ]);
+    // Today = 2026-10-15: dax is 6 days old (STALE_DAYS 5 + 1) → flips.
+    const served = reStaleMarketsSnapshot(snap, '2026-10-15');
+    const dax = served.markets.find((m) => m.id === 'dax')!;
+    const sp500 = served.markets.find((m) => m.id === 'sp500')!;
+    expect(dax.stale).toBe(true);
+    expect(dax.asOf).toBe('2026-10-09'); // the row itself stays honest
+    expect(sp500.stale).toBe(false);
+    // The fresh row is the SAME object; only the aged row is rebuilt.
+    expect(served.markets.find((m) => m.id === 'sp500')).toBe(snap.markets.find((m) => m.id === 'sp500'));
+  });
+
+  it('a snapshot with no flips comes back as the same object (byte-identical)', () => {
+    const snap = fakeSnapshot([storedEntry('dax')]);
+    expect(reStaleMarketsSnapshot(snap, '2026-10-10')).toBe(snap); // 1 day old — fresh
+    expect(reStaleMarketsSnapshot(snap, '2026-10-14')).toBe(snap); // 5 days = the boundary, not yet stale
+  });
+
+  it('a row already stored stale:true never un-flips while asOf ages', () => {
+    const snap = fakeSnapshot([storedEntry('dax', { stale: true })]);
+    const served = reStaleMarketsSnapshot(snap, '2026-10-15');
+    expect(served.markets.find((m) => m.id === 'dax')!.stale).toBe(true);
+    expect(served).toBe(snap); // no change → same object
   });
 });
 
