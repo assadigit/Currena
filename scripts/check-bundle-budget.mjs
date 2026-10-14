@@ -256,7 +256,21 @@ const BUDGETS = [
   // all localized strings, zero logic. The ENTRY chunk stays untouched
   // (290.36/87.07 vs 296/89.5). Justified in CHANGELOG §2026-10-13f
   // (persian copy round 2 + the docs/localization audit system).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 545_000, gz: 128_500, label: 'Insights lazy chunk' },
+  // World-currencies v1.3 bump (543.31/127.75 → 579.62/136.48, budget
+  // 545/128.5 → 580/137): the 2026-10-14 change request
+  // (docs/specs/insights-world-currencies-v1.3-change-request.md) —
+  // (1) the plain-language layer: "In plain words" S1–S5 builders, the
+  // four-answer pattern cards (headline verdicts, "What would change this"
+  // alarm-in-words, "In everyday terms"), the quiet-area rework, the
+  // how-to-read drawer, 10 glossary tooltips and the money line; (2) the
+  // corrected R3 (one-month ±3.0 trigger, variant sentences) and R7
+  // (dollar-led/euro-led framing); (3) ~150 new/changed copy strings × 2
+  // locales, all wording verbatim from the change request. Raw +36.31 kB,
+  // gzip +8.73 kB, all of it the requested feature + bilingual strings.
+  // The ENTRY chunk stays untouched (290.36/87.08 vs 296/89.5) — the
+  // section remains lazy. Justified in CHANGELOG §2026-10-14
+  // (world currencies v1.3).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 580_000, gz: 137_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

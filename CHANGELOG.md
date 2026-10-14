@@ -5,6 +5,78 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-14] — World currencies v1.3: bugs B1–B8, R3 one-month trigger, corrected R7, the plain-language layer
+
+Implements the owner's change request
+(`docs/specs/insights-world-currencies-v1.3-change-request.md` — wins over the
+v1.2 spec where they disagree). Full requirement → code → test map in
+`docs/specs/traceability.md`; every agent decision in `docs/DECISIONS_FOR_ALI.md`
+(D-07…D-11); 14 QA'd screenshots in `docs/screenshots/`.
+
+### Fixed (change request §2 — the eight bugs from Ali's review)
+
+- **B1** R7 said the dollar "barely moved" at +3.2% — R7 now works in dollar
+  strength (§3.3): dollar-led / euro-led / no card, never a guess.
+- **B2** the context card counted as an active pattern and led the headline —
+  only counted Active/Watching rules lead; R7 never does.
+- **B3** dots and "Held in" lines on rules without a pattern check (R4, R7) —
+  gated by `fxRuleHasPatternCheck`.
+- **B4** raw codes (EURUSD, DOLLAR, …) on screen — plain names everywhere,
+  both locales, chart labels included.
+- **B5** warning lines on the context card — removed; other cards state the
+  alarm level in words ("The alarm sounds if…").
+- **B6** the closest-to-alarm pattern repeated in the quiet list — excluded.
+- **B7** the fixed dollar meaning line — follows the direction now
+  (stronger / weaker / steady, CR §4.9).
+- **B8** "calm" during the dollar's biggest one-month move — fixed by the new
+  R3 trigger + the big-mover headline.
+
+### Changed
+
+- **R3 fast-move trigger (§3.1):** Warning at dollar M1 ≥ +3.0 or M3 ≥ +4.0
+  (supportive mirror); the sentence names the leg that fired; distance to
+  warning uses the nearer leg. Evidence replay (522 weeks): warning 14.2% of
+  weeks, M1 leg alone 10.7% — under the 25% change bar, thresholds kept (D-07).
+- **Corrected R7 (§3.3):** card only when EUR/USD moved ≥2.5% in a month;
+  dollar-led when the dollar measure agrees and \|d\| ≥ 1.5; euro-led when
+  \|d\| < 1.0; otherwise no card. Honest finding for the owner (D-08):
+  euro-led fired 0 times in 10 years — the euro carries 57.6% of the Currena
+  basket, so a big euro month nearly always drags the measure past the
+  dollar-led line. Not broken, mathematically rare; any change needs Ali.
+- **Calm-with-a-big-mover headline (§3.2):** "No warning pattern is active,
+  but the US dollar is up {x}% this month."
+- **Bundle budget:** Insights lazy chunk 545/128.5 → 580/137 kB (543.31/127.75
+  → 579.62/136.48) — the v1.3 plain-language layer + ~150 copy strings × 2
+  locales, all wording verbatim from the change request. The entry chunk
+  (the converter money page) stays untouched at 290.36/87.08 vs 296/89.5.
+
+### Added
+
+- **The plain-language layer (§4):** "In plain words" block (S1 dollar ·
+  S2 biggest movers · S3 Australian dollar · S4 mood), S5 money line in every
+  pair panel; four-answer pattern cards (headline verdict, "What would change
+  this", "In everyday terms"); the quiet-area rework ("Nearest to sounding the
+  alarm", "{n} more quiet patterns"); the "How to read this section" drawer
+  (5 items); 10 glossary tooltips; plain chart captions; the direction-aware
+  "US dollar strength" row; stored `plain` fields (128 bytes — CR §6's < 1 KB).
+- **`docs/specs/traceability.md`** — every requirement of both documents
+  mapped to its implementation and its proof.
+- **14 screenshots** in `docs/screenshots/` (en/fa × desktop/phone × all
+  states), visually QA'd.
+
+### Tests
+
+- 1,058/1,058 workspace-wide (core 183 · scraper 67 · insights 339 · markets
+  7 · api 136 · web 326), including the 31 new `fx-v13.test.ts` cases for the
+  acceptance matrix T1–T11 + S5; typecheck 6/6; `pnpm copy:audit` clean.
+
+### Repo tidy-up
+
+Root now holds only README/CHANGELOG/AGENTS: the v1.3 change request moved to
+`docs/specs/`, six superseded spec drafts/fix lists to `docs/specs/archive/`
+(indexed), 16 Persian-copy working documents to
+`docs/localization/persian-site-copy/`.
+
 ## [2026-10-13g] — Round-2 wrap-up: calendar titles live in the snapshot, final QA re-run
 
 Closes out the 2026-10-13f wave. No code changed; this records the
