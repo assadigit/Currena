@@ -136,6 +136,8 @@ export function Converter() {
   const [alertsOpen, setAlertsOpen] = useState(false);
 
   const [phase, setPhase] = useState<Phase>('idle');
+  /** The control that opened the result popup — focus returns there on close (audit D-3). */
+  const resultOpenerRef = useRef<HTMLElement | null>(null);
   const [amount, setAmount] = useState('');
   const [amountInvalid, setAmountInvalid] = useState(false);
   const [from, setFrom] = useState<CurrencyCode>('USD'); // legacy defaults
@@ -280,6 +282,9 @@ export function Converter() {
 
     setAmountInvalid(false);
     setFailure(null);
+    // The dialog discipline returns focus here on close (audit D-3) —
+    // capture the submit control BEFORE the async gap blurs it.
+    resultOpenerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     setPhase('fetching');
     const startedAt = Date.now();
 
@@ -458,6 +463,10 @@ export function Converter() {
     // rail with the "at a glance" mini-board) is retired: mobile keeps the
     // focused legacy form (≤500px) and now gets the boards too.
     <div className="mx-auto w-full max-w-[500px] px-5 py-5 lg:max-w-[1160px] lg:px-10 lg:py-10">
+      {/* The page's h1 (QA audit D-2): every other route has one; the
+          converter is the money page — its heading stays screen-reader-only
+          so the owner's amount-first first viewport is untouched visually. */}
+      <h1 className="sr-only">{t('converter.title')}</h1>
       {showOfflineBanner ? <OfflineBanner source={pairSource} /> : null}
       {showStaleBanner && sourceState.snapshot ? (
         <div className="mb-5">
@@ -818,6 +827,7 @@ export function Converter() {
           tgjuUrl={tgjuUrl}
           onClose={() => setPhase('idle')}
           onNewConversion={() => setPhase('idle')}
+          returnFocusTo={resultOpenerRef.current}
         />
       ) : null}
 

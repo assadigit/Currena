@@ -19,6 +19,7 @@ import { Odometer } from './Odometer';
 import { RateDeltaChip } from './RateDeltaChip';
 import { Sparkline } from './Sparkline';
 import { Button, LiveIndicator, SourceBadge } from './ui';
+import { useDialogFocus } from './useDialogFocus';
 
 /** Everything the popup renders — produced by the converter's state machine. */
 export interface ConversionView {
@@ -45,6 +46,8 @@ export interface ResultPopupProps {
   tgjuUrl: string | null;
   /** Baseline rate from the previous snapshot generation (null → hide ▲/▼). */
   prevRate?: number | null;
+  /** The control that opened the popup (the convert button) — focus returns there on close. */
+  returnFocusTo?: HTMLElement | null;
 }
 
 const SOURCE_KEY: Record<Source, TranslationKey> = {
@@ -60,7 +63,7 @@ function rateMaxFractionDigits(rate: number, irrPair: boolean): number {
   return irrPair ? 0 : 4;
 }
 
-export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate }: ResultPopupProps) {
+export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate, returnFocusTo = null }: ResultPopupProps) {
   const { t, numberLocale } = useI18n();
   const label = useCodeLabel();
   const [copied, setCopied] = useState(false);
@@ -68,6 +71,12 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
   const [toast, setToast] = useState<string | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+
+  // Dialog focus discipline (QA audit D-3): focus moves in on open (the
+  // pair heading, announced by role=dialog), Tab is trapped inside,
+  // Escape closes, focus returns to the convert button on close, and body
+  // scroll locks while open — the DetailsPanel-proven pattern, shared.
+  const { containerRef, onKeyDown } = useDialogFocus({ onClose, returnFocusTo });
 
   // Micro-trend (rate-history sparkline): only for live sources, not manual/local.
   const historySource = view.source === 'tgju' || view.source === 'frankfurter' ? view.source : null;
@@ -82,7 +91,9 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
       ? ''
       : `${trend.pct >= 0 ? '+' : ''}${formatNumber(trend.pct, numberLocale, { maximumFractionDigits: 2 })}%`;
 
-  // Escape closes (legacy had X + overlay click; Escape is the a11y twin).
+  // Escape closes (legacy had X + overlay click; the shared hook now owns
+  // the full discipline incl. Escape — this window listener stays as
+  // belt-and-braces for focus-outside edge cases).
   useEffect(() => {
     const onKey = (e: KeyboardEvent): void => {
       if (e.key === 'Escape') onClose();
@@ -232,6 +243,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
 
   return (
     <div
+      ref={containerRef}
       role="dialog"
       aria-modal="true"
       aria-label={t('converter.conversionResult')}
@@ -239,6 +251,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
+      onKeyDown={onKeyDown}
     >
       <div
         ref={cardRef}
@@ -260,7 +273,15 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate 
             timestamp, smaller sparkline, reduced paddings/margins. */}
         <div className="mb-1 flex items-center justify-center gap-2.5 sm:mb-2 sm:gap-3">
           <LiveIndicator live={live} />
-          <h2 className="text-sm font-bold text-currena-blue sm:text-base">{fromName} → {toName}</h2>
+          {/* data-dialog-heading: the shared focus discipline focuses this on
+              open so the announced dialog starts at its heading. */}
+          <h2
+            data-dialog-heading
+            tabIndex={-1}
+            className="text-sm font-bold text-currena-blue focus:outline-none sm:text-base"
+          >
+            {fromName} → {toName}
+          </h2>
         </div>
         <div className="mb-1 hidden text-center text-4xl sm:mb-2 sm:block" aria-hidden="true">
           💰

@@ -129,8 +129,24 @@ export function App() {
 
   return (
     <div className="flex min-h-screen flex-col bg-currena-bg-light text-currena-dark transition-colors duration-300">
+      {/* Skip-to-content link (QA audit D-1): keyboard users otherwise tab
+          through the brand + 10 nav pills + 4 utility buttons on every
+          route. Rendered as a button, not <a href="#…"> — this is a
+          hash-router SPA and a hash link would navigate away. */}
+      <button
+        type="button"
+        onClick={() => {
+          const main = document.getElementById('main-content');
+          if (main === null) return;
+          main.focus({ preventScroll: true });
+          main.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }}
+        className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[1002] focus:rounded-lg focus:bg-currena-blue focus:px-4 focus:py-2.5 focus:text-sm focus:font-bold focus:text-white focus:shadow-lg"
+      >
+        {t('nav.skipToContent')}
+      </button>
       <Header />
-      <main className="flex-1 pt-16 lg:pt-20">
+      <main id="main-content" tabIndex={-1} className="flex-1 pt-16 focus:outline-none lg:pt-20">
         <ErrorBoundary>
           {route === '/' ? <Converter /> : null}
           {route === '/live-rates' ? <LiveRates /> : null}

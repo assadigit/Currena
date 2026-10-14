@@ -338,10 +338,12 @@ export function LiveRates() {
             and the last-updated stamp. Both boards read the same TGJU
             snapshot, so both stamps show the same scrape time. */}
         <div className="mb-4 text-center">
-          <h2 className="mb-2.5 flex items-center justify-center gap-2.5 text-2xl font-bold text-currena-dark lg:text-3xl">
+          {/* The page's h1 (QA audit D-2): the primary board heading carries
+              it — identical classes, so nothing visual moves. */}
+          <h1 className="mb-2.5 flex items-center justify-center gap-2.5 text-2xl font-bold text-currena-dark lg:text-3xl">
             <span aria-hidden="true">💵</span>
             {t('liveRates.currencyBoardHeading')}
-          </h2>
+          </h1>
           <a
             href="https://www.tgju.org/"
             target="_blank"

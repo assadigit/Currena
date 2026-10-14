@@ -28,6 +28,7 @@ import {
 import type { CurrencyCode, SnapshotSource } from '@currena/core';
 import { CurrencySelect } from '../components/CurrencySelect';
 import { Button, Card, LoaderDots, Switch, Toast } from '../components/ui';
+import { useDialogFocus } from '../components/useDialogFocus';
 import { useCodeLabel } from '../lib/display';
 import { downloadBlob } from '../lib/download';
 import { uniqueId } from '../lib/id';
@@ -133,12 +134,29 @@ export function Receipt() {
   ]);
 
   const [receipt, setReceipt] = useState<GeneratedReceipt | null>(null);
+  /** The control that opened the receipt modal — focus returns there on close (audit D-4). */
+  const receiptOpenerRef = useRef<HTMLElement | null>(null);
   const [exporting, setExporting] = useState<'pdf' | 'image' | 'excel' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   const paperRef = useRef<HTMLDivElement>(null);
   const paperCloseRef = useRef<HTMLButtonElement>(null);
+
+  // Dialog focus discipline (QA audit D-4): the receipt paper modal now
+  // moves focus in on open (the close button — the audit's fix), traps Tab,
+  // closes on Escape, returns focus to the generating control on close, and
+  // locks body scroll while open. The `active` flag drives the
+  // conditionally-rendered modal from the route level.
+  const {
+    containerRef: receiptDialogRef,
+    onKeyDown: receiptDialogKeyDown,
+  } = useDialogFocus({
+    onClose: () => setReceipt(null),
+    returnFocusTo: receiptOpenerRef.current,
+    active: receipt !== null,
+    initialFocusRef: paperCloseRef,
+  });
 
   useEffect(() => {
     if (!toast) return;
@@ -269,6 +287,8 @@ export function Receipt() {
       })
       .filter((i): i is ReceiptItem => i !== null);
 
+    // Capture the opener BEFORE the modal mounts (audit D-4).
+    receiptOpenerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     setReceipt({
       id: uniqueId(),
       date,
@@ -772,6 +792,7 @@ export function Receipt() {
       {/* ---------- Receipt modal ---------- */}
       {receipt ? (
         <div
+          ref={receiptDialogRef}
           role="dialog"
           aria-modal="true"
           aria-label={t('receipt.expenseReceipt')}
@@ -779,6 +800,7 @@ export function Receipt() {
           onClick={(e) => {
             if (e.target === e.currentTarget) setReceipt(null);
           }}
+          onKeyDown={receiptDialogKeyDown}
         >
           <div className="popup-slide-up max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-[15px] bg-white p-5 shadow-[0_25px_70px_rgba(0,0,0,0.5)] lg:p-7 dark:bg-[#1A222E]">
             <button

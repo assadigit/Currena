@@ -15,12 +15,13 @@
  * the choice persists under the legacy `theme` key.
  */
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { navigate, useRoute, ROUTES } from '../router';
 import { useTheme } from '../lib/theme';
 import { useI18n } from '../lib/locale';
 import { InstallButton } from './InstallButton';
 import { HEADER_ICON_BUTTON_CLASS } from './ui';
+import { useDialogFocus } from './useDialogFocus';
 import type { TranslationKey } from '../lib/locale';
 import type { RoutePath } from '../router';
 
@@ -48,6 +49,20 @@ export function Header() {
   const route = useRoute();
   const { theme, toggle } = useTheme();
   const { t, setLocale, locale } = useI18n();
+  /** The hamburger — focus returns here when the drawer closes (audit D-6). */
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
+
+  // Drawer focus discipline (QA audit D-6): while the side menu is open, Tab
+  // is trapped inside it, Escape closes, focus moves in on open and back to
+  // the hamburger on close. The nav stays mounted (it slides), so the
+  // `active` flag drives the discipline from menuOpen. No scroll lock — the
+  // drawer is a peek-in overlay, not a modal dialog.
+  const { containerRef: drawerRef, onKeyDown: drawerKeyDown } = useDialogFocus({
+    onClose: () => setMenuOpen(false),
+    returnFocusTo: hamburgerRef.current,
+    active: menuOpen,
+    lockScroll: false,
+  });
 
   const go = (path: RoutePath): void => {
     setMenuOpen(false);
@@ -129,6 +144,7 @@ export function Header() {
           </button>
           {/* Hamburger — mobile/tablet only (the inline nav takes over at lg) */}
           <button
+            ref={hamburgerRef}
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
             aria-label={t('nav.menu')}
@@ -152,9 +168,14 @@ export function Header() {
 
       {/* Side menu — slides from the inline-end edge (fixed to `end-0` so the
           closed state is fully off-screen; the static-position default left
-          the translated panel hovering over the page center) */}
+          the translated panel hovering over the page center). `inert` while
+          closed: the off-screen panel is unreachable by Tab AND hidden from
+          assistive tech (audit D-6 — off-screen focusables were tabbable). */}
       <nav
+        ref={drawerRef}
         aria-label={t('nav.menu')}
+        inert={!menuOpen}
+        onKeyDown={drawerKeyDown}
         className={`side-menu fixed bottom-0 top-16 end-0 z-[999] w-[280px] overflow-y-auto bg-white p-5 shadow-[-5px_0_20px_rgba(0,0,0,0.1)] dark:bg-[#161D28] lg:top-20 lg:w-[320px] ${
           menuOpen ? 'translate-x-0' : 'translate-x-full rtl:-translate-x-full'
         }`}
@@ -165,7 +186,12 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => go(path)}
-                className="mb-2 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 bg-currena-soft px-3.5 py-3.5 text-[0.95rem] font-medium text-currena-dark transition-all duration-300 hover:bg-currena-blue hover:text-white"
+                aria-current={route === path ? 'page' : undefined}
+                className={`mb-2 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-3.5 py-3.5 text-[0.95rem] font-medium transition-all duration-300 ${
+                  route === path
+                    ? 'bg-currena-blue text-white'
+                    : 'bg-currena-soft text-currena-dark hover:bg-currena-blue hover:text-white'
+                }`}
               >
                 <span className="text-xl" aria-hidden="true">
                   {emoji}

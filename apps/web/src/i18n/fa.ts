@@ -21,6 +21,7 @@ export const fa: Dictionary = {
 
   nav: {
     home: 'صفحهٔ اصلی',
+    skipToContent: 'پرش به محتوای اصلی',
     receiptGenerator: 'ساخت رسید',
     calculator: 'ماشین‌حساب',
     liveRates: 'نرخ‌های لحظه‌ای',

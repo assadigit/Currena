@@ -37,6 +37,7 @@ import {
 import type { SettleGroup, SettleExpense } from '../lib/settle-storage';
 import { deletePhotos, getPhoto, putPhoto } from '../lib/photo-store';
 import { useI18n } from '../lib/locale';
+import { useDialogFocus } from '../components/useDialogFocus';
 import type { TranslationKey } from '../lib/locale';
 
 /* ------------------------------------------------------------------ *
@@ -116,16 +117,24 @@ function Modal({
   onClose: () => void;
   children: React.ReactNode;
 }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  const { t } = useI18n();
+  // The opener still holds focus when the modal mounts — capture it for the
+  // return-focus discipline (audit D-5). Read once per mount via useRef.
+  const openerRef = useRef<HTMLElement | null>(null);
+  if (openerRef.current === null) {
+    openerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  }
+  // Dialog focus discipline (QA audit D-5): focus moves to the title on
+  // open, Tab is trapped, Escape closes, focus returns to the opener, body
+  // scroll locks — replacing the Escape-only handling.
+  const { containerRef, onKeyDown } = useDialogFocus({
+    onClose,
+    returnFocusTo: openerRef.current,
+  });
 
   return (
     <div
+      ref={containerRef}
       role="dialog"
       aria-modal="true"
       aria-label={title}
@@ -133,14 +142,19 @@ function Modal({
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
+      onKeyDown={onKeyDown}
     >
       <div className="popup-slide-up max-h-[88vh] w-full max-w-[430px] overflow-y-auto rounded-[25px] bg-white p-6 shadow-[0_25px_70px_rgba(0,0,0,0.5)] sm:max-w-[520px] dark:bg-[#1A222E]">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold">{title}</h2>
+          {/* data-dialog-heading: the shared focus discipline lands here on
+              open so the announced dialog starts at its title. */}
+          <h2 data-dialog-heading tabIndex={-1} className="text-lg font-bold focus:outline-none">
+            {title}
+          </h2>
           <button
             type="button"
             onClick={onClose}
-            aria-label="×"
+            aria-label={t('common.close')}
             className="h-8 w-8 cursor-pointer rounded-full border-0 bg-currena-warning/10 text-xl text-currena-warning transition-all duration-300 hover:rotate-90"
           >
             ×

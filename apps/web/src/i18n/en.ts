@@ -20,6 +20,7 @@ export const en = {
 
   nav: {
     home: 'Home',
+    skipToContent: 'Skip to main content',
     receiptGenerator: 'Receipt Generator',
     calculator: 'Calculator',
     liveRates: 'Live Rates',
