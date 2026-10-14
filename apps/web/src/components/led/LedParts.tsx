@@ -224,6 +224,7 @@ export function LedValueCell({
   staggerMs,
   label,
   unitLabel,
+  naLabel,
   size,
   emphasis,
   decimals = 0,
@@ -238,6 +239,9 @@ export function LedValueCell({
   staggerMs: number;
   label: string;
   unitLabel: string;
+  /** Locale n/a word for a module whose quote is missing, already translated
+   *  (both boards thread t('common.na') — never hardcoded English). */
+  naLabel: string;
   size: string;
   emphasis: 'primary' | 'secondary';
   decimals?: number;
@@ -252,7 +256,7 @@ export function LedValueCell({
     <div className={wrapperClass}>
       <span
         role="img"
-        aria-label={`${label} ${ok && Number.isFinite(value) ? `${text.replace(/ /g, ',')} ${unitLabel}` : 'n/a'}`}
+        aria-label={`${label} ${ok && Number.isFinite(value) ? `${text.replace(/ /g, ',')} ${unitLabel}` : naLabel}`}
       >
         <LedDigits
           key={`${keyId}-${stat}-${text}`}

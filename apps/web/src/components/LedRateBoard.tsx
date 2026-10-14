@@ -143,6 +143,8 @@ interface LedRowProps {
   lowLabel: string;
   unitLabel: string;
   name: string;
+  /** Locale n/a word for a module whose quote is missing, already translated. */
+  naLabel: string;
   /** false → the day-high/day-low modules are NOT rendered at all
    *  (homepage CURRENT-only placement — see the file header). */
   showDayStats: boolean;
@@ -161,6 +163,7 @@ const LedRow = memo(function LedRow({
   lowLabel,
   unitLabel,
   name,
+  naLabel,
   showDayStats,
 }: LedRowProps) {
   const stagger = index * FLASH_STAGGER_MS;
@@ -214,6 +217,7 @@ const LedRow = memo(function LedRow({
         staggerMs={stagger}
         label={currentLabel}
         unitLabel={unitLabel}
+        naLabel={naLabel}
         size="text-[1.25rem] sm:text-[1.35rem] lg:text-[1.6rem]"
         emphasis="primary"
       />
@@ -232,6 +236,7 @@ const LedRow = memo(function LedRow({
             staggerMs={stagger}
             label={highLabel}
             unitLabel={unitLabel}
+            naLabel={naLabel}
             size="text-[0.72rem] sm:text-[1.14rem] lg:text-[1.38rem]"
             emphasis="secondary"
             wrapperClass="hidden text-right md:block"
@@ -244,6 +249,7 @@ const LedRow = memo(function LedRow({
             staggerMs={stagger}
             label={lowLabel}
             unitLabel={unitLabel}
+            naLabel={naLabel}
             size="text-[0.72rem] sm:text-[1.14rem] lg:text-[1.38rem]"
             emphasis="secondary"
             wrapperClass="hidden text-right md:block"
@@ -291,6 +297,7 @@ export function LedRateBoard({ showDayStats = true }: LedRateBoardProps) {
   const highLabel = t('liveRates.boardHigh');
   const lowLabel = t('liveRates.boardLow');
   const unitLabel = t('liveRates.boardUnitToman');
+  const naLabel = t('common.na');
 
   // Column-header letter-spacing (owner request 2026-09-27: sans-serif
   // headers, slightly wider tracking) — Latin only: letter-spacing breaks
@@ -390,6 +397,7 @@ export function LedRateBoard({ showDayStats = true }: LedRateBoardProps) {
                 lowLabel={lowLabel}
                 unitLabel={unitLabel}
                 name={t(`currencies.${quote.code}` as TranslationKey)}
+                naLabel={naLabel}
                 showDayStats={showDayStats}
               />
             ))
@@ -404,6 +412,7 @@ export function LedRateBoard({ showDayStats = true }: LedRateBoardProps) {
                 lowLabel={lowLabel}
                 unitLabel={unitLabel}
                 name={t(`currencies.${code}` as TranslationKey)}
+                naLabel={naLabel}
                 showDayStats={showDayStats}
               />
             ))}

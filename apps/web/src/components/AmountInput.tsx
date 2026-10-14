@@ -35,7 +35,7 @@
  * (Persian-digit tolerant via parseAmount).
  */
 
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { parseAmount, thousandSeparateInput } from '@currena/core';
 import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
@@ -64,6 +64,9 @@ export function AmountInput({ id, value, onChange, currency, invalid, footer }: 
   const { t } = useI18n();
   const label = useCodeLabel();
   const [focused, setFocused] = useState(false);
+  /** The invalid-amount hint's id — threaded into the input's
+   *  aria-describedby ONLY while the error is showing (audit D minor). */
+  const errorId = useId();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const measureRef = useRef<HTMLSpanElement | null>(null);
@@ -163,6 +166,7 @@ export function AmountInput({ id, value, onChange, currency, invalid, footer }: 
           placeholder={placeholder}
           value={value}
           aria-invalid={invalid === true}
+          aria-describedby={invalid ? errorId : undefined}
           style={fitPx !== null ? { fontSize: `${fitPx}px` } : undefined}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
@@ -190,7 +194,11 @@ export function AmountInput({ id, value, onChange, currency, invalid, footer }: 
         </span>
       </div>
       {footer ? <div className="mt-3">{footer}</div> : null}
-      {invalid ? <p className="mt-2 text-xs font-semibold text-currena-warning-deep">{t('converter.enterValidAmount')}</p> : null}
+      {invalid ? (
+        <p id={errorId} className="mt-2 text-xs font-semibold text-currena-warning-deep">
+          {t('converter.enterValidAmount')}
+        </p>
+      ) : null}
     </div>
   );
 }

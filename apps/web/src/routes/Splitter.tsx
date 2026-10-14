@@ -146,8 +146,10 @@ export function Splitter() {
           </div>
         </div>
 
-        {/* People stepper (legacy: number input 1-100) */}
-        <label htmlFor="splitPeople" className="mb-1.5 block text-sm font-bold text-currena-dark">
+        {/* People stepper (legacy: number input 1-100). The label points at
+            no control — <output> is not labelable — so the output carries its
+            accessible name itself (aria-label) instead of htmlFor. */}
+        <label className="mb-1.5 block text-sm font-bold text-currena-dark">
           {t('expenseSplitter.numberOfPeople')}
         </label>
         <div className="mb-4 flex items-center gap-3">
@@ -162,6 +164,7 @@ export function Splitter() {
           <output
             id="splitPeople"
             aria-live="polite"
+            aria-label={t('expenseSplitter.numberOfPeople')}
             className="min-w-16 flex-1 rounded-[15px] border-2 border-gray-200 bg-white py-2.5 text-center text-lg font-bold text-currena-dark dark:border-white/10 dark:bg-[#222C3B]"
           >
             {peopleLabel}

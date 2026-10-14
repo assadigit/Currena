@@ -22,6 +22,17 @@
     <meta name="twitter:image" content="https://currena.ir/icons/icon-512.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <!-- Font preloads (audit D minor): both faces ship as static files under
+         /fonts (see the @font-face blocks in src/index.css), so plain URLs —
+         no build-time hashing involved. crossorigin is required even
+         same-origin: font fetches always go through CORS, and the preload
+         must match. DSEG7 Bold is the face the LED boards actually paint
+         (.led-digits is font-weight 700; the Regular face stays unloaded).
+         Vazirmatn (one variable file, all weights) renders only :lang(fa)
+         pages; the unconditional preload trades its ~109KB upfront fetch on
+         every locale for a no-swap first paint on fa. -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/dseg/DSEG7Classic-Bold.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/vazirmatn-var.woff2" crossorigin />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>Currena | Currency Converter</title>
@@ -45,6 +56,7 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>Currena requires JavaScript to run — please enable it in your browser.</noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -21,7 +21,7 @@
  * stack (gold first) and the tools grid reflows 2→3→6 columns.
  */
 
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useId, useMemo, useRef, useState } from 'react';
 import {
   CURRENCIES,
   CoreError,
@@ -144,6 +144,9 @@ export function Converter() {
   const [to, setTo] = useState<CurrencyCode>('IRR');
   const [manualOpen, setManualOpen] = useState(false);
   const [manualRate, setManualRate] = useState('');
+  /** The custom-rate region's id — the collapsible button's aria-controls
+   *  points here (ToolsMenu pattern; the input mounts only while open). */
+  const manualRateId = useId();
   const [result, setResult] = useState<ConversionView | null>(null);
   /** Baseline rate from the previous snapshot generation (▲/▼ in the popup). */
   const [prevRate, setPrevRate] = useState<number | null>(null);
@@ -587,6 +590,7 @@ export function Converter() {
               type="button"
               onClick={() => setManualOpen((open) => !open)}
               aria-expanded={manualOpen}
+              aria-controls={manualRateId}
               className="flex w-full cursor-pointer items-center gap-2 rounded-xl border-0 bg-transparent px-3 py-2.5 text-sm font-medium text-currena-muted transition-all duration-300 hover:bg-currena-blue/5"
             >
               <span
@@ -599,6 +603,7 @@ export function Converter() {
             </button>
             {manualOpen ? (
               <input
+                id={manualRateId}
                 type="text"
                 inputMode="decimal"
                 autoComplete="off"

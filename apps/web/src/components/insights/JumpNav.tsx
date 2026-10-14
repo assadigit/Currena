@@ -73,8 +73,10 @@ export function JumpNav({
   };
   return (
     <nav aria-label={copy.ui.navLabel} className="insights-sticky-nav mt-4">
+      {/* Plain container (no role="list"): ARIA lists require listitem
+          children, but these are buttons — the labeled <nav> carries the
+          semantics (audit D minor). */}
       <span
-        role="list"
         className="no-print flex list-none items-center gap-1.5 overflow-x-auto py-2"
         style={{ scrollbarWidth: 'thin' }}
       >

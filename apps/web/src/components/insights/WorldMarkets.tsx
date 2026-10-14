@@ -644,6 +644,17 @@ function MarketsTable({
               <tr
                 key={m.id}
                 onClick={() => onOpenRow(m.id)}
+                tabIndex={0}
+                role="button"
+                onKeyDown={(e) => {
+                  // Keyboard activation mirrors the mobile list's real-button
+                  // semantics: Enter/Space open the same detail panel as the
+                  // click (Space also stops the page scroll default).
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onOpenRow(m.id);
+                  }
+                }}
                 className="cursor-pointer border-b border-[var(--color-border)]/60 transition-colors last:border-b-0 hover:bg-currena-soft/50"
               >
                 <th scope="row" className="px-2 py-1.5 text-start font-semibold text-[var(--color-text-primary)]">
@@ -651,7 +662,7 @@ function MarketsTable({
                   {/* §6.7: the English index name in small Latin text beside
                    * the Persian name — same rule as the detail panel. */}
                   {locale === 'fa' ? (
-                    <span dir="ltr" className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
+                    <span lang="en" dir="ltr" className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
                       {copy.markets.entries[m.id].latin}
                     </span>
                   ) : null}
@@ -714,7 +725,7 @@ function MarketsTable({
                 {/* §6.7: the small Latin name rides the mobile row list too
                  * (the table's mobile form — same three numbers, same names). */}
                 {locale === 'fa' ? (
-                  <span dir="ltr" className="ms-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
+                  <span lang="en" dir="ltr" className="ms-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
                     {copy.markets.entries[m.id].latin}
                   </span>
                 ) : null}

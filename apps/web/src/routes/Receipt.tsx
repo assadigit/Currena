@@ -110,7 +110,7 @@ const inputClass =
  * ------------------------------------------------------------------ */
 
 export function Receipt() {
-  const { t, numberLocale } = useI18n();
+  const { t, numberLocale, locale } = useI18n();
   const label = useCodeLabel();
   const store = useSnapshotStore();
 
@@ -813,10 +813,13 @@ export function Receipt() {
               ×
             </button>
 
-            {/* Receipt paper (legacy: Courier, dashed border, always light) */}
+            {/* Receipt paper (legacy: Courier, dashed border, always light).
+                dir=ltr with the CURRENT app locale's lang so localized (fa)
+                strings inside keep their pronunciation/braille rules. */}
             <div
               ref={paperRef}
               dir="ltr"
+              lang={locale}
               className="clear-both rounded-[4px] border-2 border-dashed border-gray-300 bg-white px-5 py-6 font-mono text-[#2C3E50]"
             >
               <div className="mb-5 border-b-2 border-black pb-4 text-center">

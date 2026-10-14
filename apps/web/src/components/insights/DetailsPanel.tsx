@@ -225,7 +225,7 @@ export function DetailsPanel({
               <span>
                 {entry.name}
               {entry.ticker ? (
-                <span dir="ltr" className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+                <span lang="en" dir="ltr" className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
                   {entry.ticker}
                 </span>
               ) : null}

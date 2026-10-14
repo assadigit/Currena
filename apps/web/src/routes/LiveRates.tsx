@@ -94,7 +94,8 @@ const BoardCardView = memo(function BoardCardView({
       <header className="mb-4 flex items-center gap-3">
         <img
           src={`/images/flags/${code.toLowerCase()}.png`}
-          alt={code}
+          alt=""
+          aria-hidden="true"
           className="h-[35px] w-[50px] rounded-md object-cover"
         />
         <div className="min-w-0 flex-1">
@@ -412,7 +413,10 @@ export function LiveRates() {
 
         {/* Banners */}
         {!store.online && snapshot ? (
-          <div className="slide-down mb-4 flex items-center gap-3 rounded-[15px] border-s-4 border-currena-muted bg-currena-muted/15 px-4 py-3.5">
+          <div
+            role="status"
+            className="slide-down mb-4 flex items-center gap-3 rounded-[15px] border-s-4 border-currena-muted bg-currena-muted/15 px-4 py-3.5"
+          >
             <span aria-hidden="true">🔌</span>
             <p className="text-sm font-medium">{t('common.offlineRatesFrom', { source: t('sources.tgju') })}</p>
           </div>
@@ -436,7 +440,10 @@ export function LiveRates() {
 
         {/* Error state (legacy .error-message) */}
         {state.status === 'error' && !snapshot ? (
-          <div className="mb-4 rounded-xl bg-red-500/15 px-4 py-4 text-sm font-semibold text-red-600 dark:text-red-400">
+          <div
+            role="alert"
+            className="mb-4 rounded-xl bg-red-500/15 px-4 py-4 text-sm font-semibold text-red-600 dark:text-red-400"
+          >
             {t('liveRates.couldNotFetch')}
           </div>
         ) : null}
