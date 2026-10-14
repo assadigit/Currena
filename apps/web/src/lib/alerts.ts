@@ -31,14 +31,14 @@ export const ALERTS_KEY = 'currena:rate-alerts';
 export const ALERTS_SEEN_KEY = 'currena:rate-alerts-seen';
 
 /** What the user typed into the create form (before validation). */
-export interface AlertDraft {
+interface AlertDraft {
   base: RateAlert['base'];
   quote: RateAlert['quote'];
   direction: AlertDirection;
   threshold: number;
 }
 
-export interface AlertsState {
+interface AlertsState {
   /** Core-validated list (cap ALERTS_CAP), newest first. */
   alerts: RateAlert[];
   /** Epoch-ms the dialog was last opened — null until the first open. */

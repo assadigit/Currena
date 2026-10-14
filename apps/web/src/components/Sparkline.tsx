@@ -15,7 +15,7 @@
 
 import { useId } from 'react';
 
-export interface SparklineProps {
+interface SparklineProps {
   /** Oldest → newest observations. Non-finite values must be pre-filtered. */
   points: number[];
   /** Rendered width in px (viewBox matches; CSS can still scale it). */

@@ -37,7 +37,7 @@ import type { SpotPrice } from './types';
 import type { WorldBankMonthly } from './worldbank';
 
 /** Pounds per metric tonne — gold-api's HG copper quote (USD/lb) → the World Bank's USD/mt unit. */
-export const COPPER_LB_PER_TONNE = 2204.62262;
+const COPPER_LB_PER_TONNE = 2204.62262;
 
 export interface SeriesInputs {
   /** FRED series outputs keyed by FRED_SERIES name. */

@@ -9,7 +9,7 @@ import type {
   InsightsSection,
   IndicatorGroupId,
 } from '@currena/core';
-import { DEFINITIONS, GAUGES } from '@currena/insights';
+import { DEFINITIONS } from '@currena/insights';
 
 /* ------------------------------------------------------------------ *
  * Section / group layout (the I15 question-group restructure)
@@ -106,9 +106,4 @@ export function groupCounts(
     }
   }
   return { alertCount, votingCount, excludedCount };
-}
-
-/** Is this id one of the gauge's voting members (vs a lane context row)? */
-export function isGaugeMember(id: IndicatorId): boolean {
-  return GAUGES.some((g) => g.members.includes(id));
 }

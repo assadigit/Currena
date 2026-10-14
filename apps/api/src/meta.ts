@@ -13,13 +13,13 @@ import { z } from 'zod';
  * live snapshot is authoritative at runtime — this list feeds UI hints only).
  * AED and VND are deliberately absent.
  */
-export const FRANKFURTER_CURRENCIES: readonly string[] = [
+const FRANKFURTER_CURRENCIES: readonly string[] = [
   'AUD', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD',
   'HUF', 'IDR', 'ILS', 'INR', 'ISK', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK',
   'NZD', 'PHP', 'PLN', 'RON', 'SEK', 'SGD', 'THB', 'TRY', 'ZAR',
 ];
 
-export const MetaCurrencySchema = z.object({
+const MetaCurrencySchema = z.object({
   code: CurrencyCodeSchema,
   name: z.string().min(1),
   symbol: z.string(),
@@ -42,7 +42,7 @@ export const MetaResponseSchema = z.object({
   limitations: z.array(z.string().min(1)),
 });
 
-export type MetaResponse = z.infer<typeof MetaResponseSchema>;
+type MetaResponse = z.infer<typeof MetaResponseSchema>;
 
 export function buildMeta(): MetaResponse {
   const currencies = CURRENCIES.map((c) => {

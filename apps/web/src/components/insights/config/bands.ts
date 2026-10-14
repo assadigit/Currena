@@ -95,7 +95,7 @@ export function attentionToneClass(warnings: number): string {
 }
 
 /** The state key for consequence-line selection (data spec §6 + F4). */
-export type ConsequenceState = keyof ConsequenceLines; // 'highRising' | 'highEasing' | 'typical' | 'low' | 'jumping'
+type ConsequenceState = keyof ConsequenceLines; // 'highRising' | 'highEasing' | 'typical' | 'low' | 'jumping'
 
 /**
  * Pick the consequence-line state for one reading:
@@ -144,7 +144,7 @@ export function consequenceLine(
 }
 
 /** Band position words keyed by locale (the R28 tokens' rendered form). */
-export type BandPosition = 'inside' | 'above' | 'below';
+type BandPosition = 'inside' | 'above' | 'below';
 
 export function bandPositionOf(value: number, band: { min?: number; max?: number }): BandPosition {
   if (band.min !== undefined && value < band.min) return 'below';
@@ -158,7 +158,7 @@ export function bandPositionOf(value: number, band: { min?: number; max?: number
 }
 
 /** The rendered band-position word for a locale's copy. */
-export function bandPositionWord(
+function bandPositionWord(
   value: number,
   band: { min?: number; max?: number; label: string },
   words: { inside: string; above: string; below: string } = BAND_WORDS_EN,
@@ -166,7 +166,7 @@ export function bandPositionWord(
   return words[bandPositionOf(value, band)];
 }
 
-export const BAND_WORDS_EN: { inside: string; above: string; below: string } = {
+const BAND_WORDS_EN: { inside: string; above: string; below: string } = {
   inside: 'inside',
   above: 'above',
   below: 'below',

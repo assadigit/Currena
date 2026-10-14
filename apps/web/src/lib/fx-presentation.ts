@@ -38,14 +38,14 @@ import { interpolate } from '../i18n';
  * Active / Watching / Quiet + the page's own severity chips
  * ------------------------------------------------------------------ */
 
-export type FxScreenStatus = 'active' | 'watching' | 'quiet';
+type FxScreenStatus = 'active' | 'watching' | 'quiet';
 
 /** The copy corpus keys the seven rules ride (r1…r7), from the engine ids. */
 export function fxRuleCopyKey(id: FxRuleId): 'r1' | 'r2' | 'r3' | 'r4' | 'r5' | 'r6' | 'r7' {
   return id.slice(0, 2) as 'r1' | 'r2' | 'r3' | 'r4' | 'r5' | 'r6' | 'r7';
 }
 
-export interface FxRuleView {
+interface FxRuleView {
   rule: FxRuleState;
   /** The screen status word (V1: only Active / Watching / Quiet). */
   status: FxScreenStatus;
@@ -140,7 +140,7 @@ export function fxClosestToWarning(rules: readonly FxRuleState[]): FxRuleState |
  * The headline (§10.3 + CR §3.2) and the verdict line's measure label (§9.10)
  * ------------------------------------------------------------------ */
 
-export type FxMeasureLabel = 'measureNormal' | 'measureAttention' | 'measureUnusual';
+type FxMeasureLabel = 'measureNormal' | 'measureAttention' | 'measureUnusual';
 
 /** §9.10's measure label for the section's current signal. */
 export function fxMeasureKey(signal: FxSnapshot['summary']['signal']): FxMeasureLabel {
@@ -194,7 +194,7 @@ const PAIR_CURRENCIES: Record<FxPairId, readonly [FxCurrency | 'USD', FxCurrency
 
 /** CR §3.2's {mover sentence} — "the US dollar is up {x}% this month" or
  * "the euro lost {x}% against the US dollar this month". */
-export function fxMoverSentence(mover: FxBigMover, copy: InsightsCopy['fx'], numberLocale: 'en-US' | 'fa-IR'): string {
+function fxMoverSentence(mover: FxBigMover, copy: InsightsCopy['fx'], numberLocale: 'en-US' | 'fa-IR'): string {
   const x = abs1(mover.m1, numberLocale);
   if (mover.kind === 'dollar') {
     return interpolate(mover.m1 > 0 ? copy.moverDollarUp : copy.moverDollarDown, { x });
@@ -248,7 +248,7 @@ export function fxHeadline(
  * The pairs table (§9.3 item 6)
  * ------------------------------------------------------------------ */
 
-export interface FxPairRow {
+interface FxPairRow {
   entry: FxPairEntry;
   group: FxGroupId;
   /** The §6.2 tag rides only when bigMove is true. */
@@ -306,7 +306,7 @@ export function fxTrendOf(entry: FxPairEntry): 'up' | 'flat' | 'down' {
  * it usually means — filled from the rule state, never free text
  * ------------------------------------------------------------------ */
 
-export interface FxSentence {
+interface FxSentence {
   see: string;
   means: string;
 }
@@ -521,7 +521,7 @@ export function fxSentence(
 
 /** A signed percentage for on-screen labels ("−3.6%"). A value that rounds
  * to zero carries no sign — "−0.0%" reads as a bug. */
-export function fxSignedPct(n: number, numberLocale: 'en-US' | 'fa-IR', locale: 'en' | 'fa'): string {
+function fxSignedPct(n: number, numberLocale: 'en-US' | 'fa-IR', locale: 'en' | 'fa'): string {
   const num = formatNumber(Math.abs(n), numberLocale, {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
@@ -570,7 +570,7 @@ export function fxMoversOf(snapshot: FxSnapshot): Partial<Record<FxCurrency, num
 /** 'high'/'low' when the dollar measure sits at its 52-week extreme (S1's
  * optional clause); derived from the stored weekly closes when a pre-v1.3
  * snapshot has no `plain`. */
-export function fxDollarYearExtremeOf(snapshot: FxSnapshot): 'high' | 'low' | null {
+function fxDollarYearExtremeOf(snapshot: FxSnapshot): 'high' | 'low' | null {
   if (snapshot.plain !== undefined) return snapshot.plain.dollarYearExtreme;
   const window = snapshot.dollarMeasure.weekly.map(([, v]) => v).slice(-52);
   if (window.length === 0) return null;
@@ -588,7 +588,7 @@ const S1_STEADY_BAND = 1.0;
 /** The "In plain words" block (CR §4.2): three to four short lines built
  * from the numbers — S1 the dollar, S2 the biggest movers, S3 the
  * Australian dollar, S4 the mood. Null lines are skipped, never blank. */
-export interface FxPlainWords {
+interface FxPlainWords {
   s1: string;
   s2: string | null;
   s3: string | null;

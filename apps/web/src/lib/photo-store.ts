@@ -70,7 +70,7 @@ export function getPhoto(id: string): Promise<Blob | null> {
 }
 
 /** Delete one photo. */
-export function deletePhoto(id: string): Promise<unknown> {
+function deletePhoto(id: string): Promise<unknown> {
   return withStore('readwrite', (store) => store.delete(id));
 }
 

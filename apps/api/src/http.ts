@@ -19,7 +19,7 @@ export const NO_STORE: Readonly<Record<string, string>> = { 'Cache-Control': 'no
 /** /api/convert amount cap — 1e15 keeps doubles exact through every math path. */
 export const MAX_AMOUNT = 1e15;
 
-export type ErrorStatus = 400 | 401 | 404 | 413 | 429 | 500 | 501 | 503;
+type ErrorStatus = 400 | 401 | 404 | 413 | 429 | 500 | 501 | 503;
 
 /** RatesError envelope with the right status + no-store (+ Retry-After). */
 export function errorResponse(

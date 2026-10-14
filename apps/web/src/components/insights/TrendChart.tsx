@@ -51,9 +51,9 @@ import type { IndicatorId } from '@currena/core';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { ApiError, fetchIndicatorHistory } from '../../lib/insights';
 
-export type TrendRange = 'quarter' | '1y' | '5y';
+type TrendRange = 'quarter' | '1y' | '5y';
 
-export const TREND_RANGES: readonly TrendRange[] = ['quarter', '1y', '5y'];
+const TREND_RANGES: readonly TrendRange[] = ['quarter', '1y', '5y'];
 
 const TREND_RANGE_DAYS: Readonly<Record<TrendRange, number>> = {
   quarter: 92,
@@ -73,7 +73,7 @@ export const TREND_RANGE_COPY_KEY: Record<
 
 /** Slice a series to the window a range chip names (days back from the
  * last point — the same rule the details panel's ranges follow). */
-export function trendSeries(
+function trendSeries(
   points: readonly [number, number][],
   range: TrendRange,
 ): readonly [number, number][] {
@@ -84,7 +84,7 @@ export function trendSeries(
 }
 
 /** A range chip is only clickable when its window can show ≥2 points. */
-export function trendPlottable(
+function trendPlottable(
   points: readonly [number, number][],
   range: TrendRange,
 ): boolean {
@@ -115,7 +115,7 @@ export function trendTickFormatter(numberLocale: 'en-US' | 'fa-IR'): (v: number)
   };
 }
 
-export type TrendHistoryState =
+type TrendHistoryState =
   | { kind: 'loading' }
   | { kind: 'ready'; points: [number, number][] }
   | { kind: 'error' }
@@ -124,7 +124,7 @@ export type TrendHistoryState =
 /** One indicator's history with the shared loading/error/none states —
  * module-cached behind fetchIndicatorHistory, so a second panel on the
  * same series (savings + shop both ride au-cpi) never refetches. */
-export function useIndicatorHistory(id: IndicatorId): TrendHistoryState {
+function useIndicatorHistory(id: IndicatorId): TrendHistoryState {
   const [state, setState] = useState<TrendHistoryState>({ kind: 'loading' });
   useEffect(() => {
     let cancelled = false;

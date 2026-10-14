@@ -4,8 +4,7 @@
  * see ./index.ts). Pure, platform-free.
  */
 
-import type { IndicatorId, IndicatorReading, InsightsSection } from '@currena/core';
-import { DEFINITIONS, GAUGES } from '@currena/insights';
+import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { MOVE_SCORE_THRESHOLD } from './bands';
 import { PRICE_ROWS, definitionFor } from './sections';
 
@@ -13,7 +12,7 @@ import { PRICE_ROWS, definitionFor } from './sections';
  * The big-mover callout (Block H3 + data spec §4)
  * ------------------------------------------------------------------ */
 
-export interface BigMoverRow {
+interface BigMoverRow {
   id: IndicatorId;
   /** |z| ≥ 2 items only — the callout hides otherwise (Block H3). */
   change30d: number;
@@ -42,37 +41,6 @@ export function bigMovers(readings: readonly IndicatorReading[], limit = 3): Big
 }
 
 /* ------------------------------------------------------------------ *
- * Alerting-indicator chips (Block H2) — sorted by 10y-range height
- * ------------------------------------------------------------------ */
-
-export interface AlertChipRow {
-  id: IndicatorId;
-  percentile10y: number;
-}
-
-/**
- * The alerting gauge members of one section, sorted by how high they sit in
- * their own 10-year range (descending), with the no-percentile items last.
- */
-export function alertingIndicators(
-  readings: readonly IndicatorReading[],
-  section: InsightsSection,
-): AlertChipRow[] {
-  const sectionIds = new Set(DEFINITIONS.filter((d) => d.section === section).map((d) => d.id));
-  const gaugeIds = new Set(GAUGES.filter((g) => g.section === section).flatMap((g) => g.members));
-  return readings
-    .filter(
-      (r) =>
-        r.status === 'warning' &&
-        gaugeIds.has(r.id) &&
-        sectionIds.has(r.id) &&
-        r.percentile10y !== undefined,
-    )
-    .map((r) => ({ id: r.id, percentile10y: r.percentile10y! }))
-    .sort((a, b) => b.percentile10y - a.percentile10y);
-}
-
-/* ------------------------------------------------------------------ *
  * R5: the two-tier status model (round-2 spec §4 + Block R5)
  *                     only the user-facing word changes)
  *   unusual         — no rule fired, but the value sits in the top/bottom
@@ -97,10 +65,10 @@ export type IndicatorTier =
   | 'unavailable';
 
 /** The unusual band: top or bottom 10% of the indicator's own 10y range. */
-export const UNUSUAL_CUTOFF = 0.1;
+const UNUSUAL_CUTOFF = 0.1;
 
 /** Is this reading in the unusual band? (Normal-status readings only.) */
-export function isUnusual(reading: IndicatorReading): boolean {
+function isUnusual(reading: IndicatorReading): boolean {
   if (reading.status !== 'normal') return false;
   if (reading.percentile10y === undefined) return false;
   return reading.percentile10y <= UNUSUAL_CUTOFF || reading.percentile10y >= 1 - UNUSUAL_CUTOFF;
@@ -127,7 +95,7 @@ export function tierIsCard(tier: IndicatorTier): boolean {
 
 export type StatusFilter = 'all' | 'warning' | 'unusual' | 'normal' | 'context';
 
-export interface CardFilter {
+interface CardFilter {
   status: StatusFilter;
   query: string;
 }

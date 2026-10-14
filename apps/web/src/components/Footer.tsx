@@ -17,7 +17,7 @@ import { useI18n } from '../lib/locale';
 export const ABOUT_SCROLL_TARGET = 'currena:about-scroll';
 
 /** Navigate to /about and stage a section id for About to scroll to. */
-export function navigateToAboutSection(sectionId: string): void {
+function navigateToAboutSection(sectionId: string): void {
   try {
     window.sessionStorage.setItem(ABOUT_SCROLL_TARGET, sectionId);
   } catch {

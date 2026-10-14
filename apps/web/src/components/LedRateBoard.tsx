@@ -101,7 +101,7 @@ export const BOARD: readonly CurrencyCode[] = ['USD', 'AUD', 'EUR', 'TRY', 'AED'
 const FLASH_STAGGER_MS = 30;
 
 /** One LED row: TGJU's three daily stats for a currency, Toman per unit. */
-export interface BoardQuote {
+interface BoardQuote {
   code: CurrencyCode;
   /** Current open-market price, Toman per 1 unit (TGJU `p`). */
   current: number;
@@ -114,7 +114,7 @@ export interface BoardQuote {
 
 /** Quotes for every board currency off one snapshot (local math only —
  *  current via convert(), day stats read straight off the rate entry). */
-export function boardQuotes(snapshot: Snapshot | null): BoardQuote[] | null {
+function boardQuotes(snapshot: Snapshot | null): BoardQuote[] | null {
   if (!snapshot) return null;
   return BOARD.map((code) => {
     try {
@@ -262,7 +262,7 @@ const LedRow = memo(function LedRow({
 
 /* ------------------------------- board ------------------------------ */
 
-export interface LedRateBoardProps {
+interface LedRateBoardProps {
   /** Render the DAY HIGH / DAY LOW columns? Default true (the full
    *  `/live-rates` board). `false` = the homepage CURRENT-only placement:
    * two-track grid at every viewport (see the file header). */

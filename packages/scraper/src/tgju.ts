@@ -55,7 +55,7 @@ export const TGJU_PROFILES: readonly { code: string; slug: string }[] = Object.f
  * parseTgjuGold converts via rialToToman (the same ÷10 the FX ladder uses
  * — the app's canonical Iranian unit, AGENTS.md §6).
  */
-export const TGJU_GOLD_SYMBOLS: readonly { id: GoldId; slug: string; unit: GoldUnit }[] = Object.freeze([
+const TGJU_GOLD_SYMBOLS: readonly { id: GoldId; slug: string; unit: GoldUnit }[] = Object.freeze([
   { id: 'gold-ounce', slug: 'ons', unit: 'USD' }, // انس طلا (global market — the row the owner linked: tgju.org/profile/ons)
   { id: 'gold-18k', slug: 'geram18', unit: 'TOMAN' }, // طلای 18 عیار
   { id: 'gold-24k', slug: 'geram24', unit: 'TOMAN' }, // طلای 24 عیار

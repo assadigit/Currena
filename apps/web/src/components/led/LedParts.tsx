@@ -46,7 +46,7 @@ const ledJalaliFormatter = new Intl.DateTimeFormat('fa-IR-u-nu-latn-ca-persian',
   day: 'numeric',
 });
 
-export function formatLedDate(date: Date, locale: 'en' | 'fa'): string {
+function formatLedDate(date: Date, locale: 'en' | 'fa'): string {
   if (locale === 'fa') {
     const parts = ledJalaliFormatter.formatToParts(date);
     const get = (type: string): string => parts.find((p) => p.type === type)?.value ?? '';
@@ -62,7 +62,7 @@ export function formatLedDate(date: Date, locale: 'en' | 'fa'): string {
  * separator — the DSEG7 glyph set covers it (used by the USD gold ounce).
  * Numbers are canonical until this render-time boundary.
  */
-export function formatLedNumber(value: number, decimals = 0): string {
+function formatLedNumber(value: number, decimals = 0): string {
   const fixed = Math.round(value * 10 ** decimals) / 10 ** decimals;
   const parts = fixed.toFixed(decimals).split('.');
   const int = parts[0] ?? '0';
@@ -89,7 +89,7 @@ export function formatLedNumber(value: number, decimals = 0): string {
  * pixel-perfect. `value` must be a pure ASCII run (digits, spaces, ':',
  * '.', '-'); the parent supplies the accessible label (role="img").
  */
-export function LedDigits({
+function LedDigits({
   value,
   className = '',
   flash = false,

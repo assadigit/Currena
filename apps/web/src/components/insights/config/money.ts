@@ -17,7 +17,7 @@ import { definitionFor } from './sections';
  * ------------------------------------------------------------------ */
 
 export type MoneyAreaId = 'petrol' | 'homeLoan' | 'savings' | 'shop' | 'overseas' | 'jobs';
-export type MoneyAreaState = 'attention' | 'unusual' | 'calm';
+type MoneyAreaState = 'attention' | 'unusual' | 'calm';
 
 export const MONEY_AREAS: Readonly<Record<MoneyAreaId, readonly IndicatorId[]>> = {
   petrol: ['brent', 'au-petrol-yoy', 'audusd'],
@@ -31,7 +31,7 @@ export const MONEY_AREAS: Readonly<Record<MoneyAreaId, readonly IndicatorId[]>> 
   jobs: ['au-unemployment', 'au-wage-growth'],
 };
 
-export interface MoneyAreaRow {
+interface MoneyAreaRow {
   area: MoneyAreaId;
   state: MoneyAreaState;
   /** The indicators driving the state (up to two chips). */
@@ -112,7 +112,7 @@ export function moneyPanel(readings: readonly IndicatorReading[]): MoneyAreaRow[
  * (G5).
  * ---------------------------------------------------------------- */
 
-export type MoneyDriverKind = 'direct' | 'inverse' | 'growth' | 'none';
+type MoneyDriverKind = 'direct' | 'inverse' | 'growth' | 'none';
 export type MoneyDirection = 'up' | 'down' | 'flat';
 
 /** Only the money-area drivers need semantics; every other id
@@ -179,14 +179,7 @@ export function moneyDriverVote(
  * move: +0.25 pts" and "Level: 2.50%, usual range for the decade" can
  * never collapse into one confusing sentence again.
  */
-export const POLICY_RATE_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>(['ecb-dfr', 'fed-target', 'rba-cash-rate']);
-
-/** The move worth naming: ≥ 5bp on a policy rate. */
-export function policyMoveOf(reading: IndicatorReading): number | null {
-  if (!POLICY_RATE_IDS.has(reading.id)) return null;
-  if (reading.change30d === undefined || Math.abs(reading.change30d) < 0.05) return null;
-  return reading.change30d;
-}
+const POLICY_RATE_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>(['ecb-dfr', 'fed-target', 'rba-cash-rate']);
 
 /**
  * Step-2 add-list §B1: the policy cards' LAST DECISION — the engine's

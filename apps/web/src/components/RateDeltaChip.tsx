@@ -10,14 +10,14 @@
 import { formatNumber } from '@currena/core';
 import { useI18n } from '../lib/locale';
 
-export interface RateDelta {
+interface RateDelta {
   /** Current rate (units of `to` per 1 `from`). */
   current: number;
   /** Baseline rate from the previous snapshot generation. */
   previous: number;
 }
 
-export interface RateDeltaChipProps {
+interface RateDeltaChipProps {
   delta: RateDelta;
   /** Maximum fraction digits for the absolute delta (0 for IRR pairs). */
   decimals?: number;

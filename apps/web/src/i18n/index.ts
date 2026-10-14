@@ -14,15 +14,11 @@ import { fa } from './fa';
  * via Intl.NumberFormat('fa-IR' | 'en-US') in @currena/core.
  */
 
-export const locales = ['en', 'fa'] as const;
+const locales = ['en', 'fa'] as const;
 export type Locale = (typeof locales)[number];
-export const defaultLocale: Locale = 'en';
+const defaultLocale: Locale = 'en';
 
-export const dictionaries: Record<Locale, Dictionary> = { en, fa };
-
-export function isLocale(value: string): value is Locale {
-  return (locales as readonly string[]).includes(value);
-}
+const dictionaries: Record<Locale, Dictionary> = { en, fa };
 
 export function getDictionary(locale: Locale): Dictionary {
   return dictionaries[locale] ?? dictionaries[defaultLocale];

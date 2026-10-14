@@ -38,7 +38,7 @@ export interface ConversionView {
   stale: boolean;
 }
 
-export interface ResultPopupProps {
+interface ResultPopupProps {
   view: ConversionView;
   onClose: () => void;
   onNewConversion: () => void;

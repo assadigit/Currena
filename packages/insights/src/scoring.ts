@@ -87,7 +87,7 @@ export const YOY_MIN_DAYS_BACK = 350;
 export const YOY_MAX_DAYS_BACK = 380;
 
 /** Maximum staleness of a change-rule window anchor before the window is refused (days). */
-export const CHANGE_ANCHOR_TOLERANCE_DAYS = 3;
+const CHANGE_ANCHOR_TOLERANCE_DAYS = 3;
 
 /** Tolerance of the 7d/30d display-change anchors (days; slightly wider for 30d). */
 const CHANGE7D_TOLERANCE_DAYS = 3;
@@ -405,7 +405,7 @@ export function cadenceUsesPreviousRelease(cadence: IndicatorDefinition['cadence
  * policy-rate cards. Undefined when the current observation is the series'
  * first (no earlier point to differ from).
  */
-export function lastStepChange(
+function lastStepChange(
   series: readonly SeriesPoint[],
   current: SeriesPoint,
 ): { date: string; points: number } | undefined {

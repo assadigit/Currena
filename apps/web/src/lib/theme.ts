@@ -15,7 +15,7 @@
 
 import { useSyncExternalStore } from 'react';
 
-export type Theme = 'light' | 'dark';
+type Theme = 'light' | 'dark';
 
 const STORAGE_KEY = 'theme';
 
@@ -82,9 +82,9 @@ class ThemeStore {
   }
 }
 
-export const themeStore = new ThemeStore();
+const themeStore = new ThemeStore();
 
-export interface ThemeApi {
+interface ThemeApi {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   toggle: () => void;

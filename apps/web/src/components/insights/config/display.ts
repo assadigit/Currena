@@ -125,13 +125,13 @@ const FED_CORRIDOR_HALF = 0.125;
  * `unit` is null when the unit binds tight (percent, prefixed US$/¥/CN¥,
  * the fed corridor) or is absent. `formatIndicatorValue` below is the
  * exact join of these parts — outputs stay byte-identical everywhere. */
-export interface IndicatorValueParts {
+interface IndicatorValueParts {
   value: string;
   unit: string | null;
 }
 
 /** Optional true bounds for a range-rendered value (fed-target). */
-export interface ValueRangeBounds {
+interface ValueRangeBounds {
   low: number;
   high: number;
 }

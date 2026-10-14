@@ -52,7 +52,7 @@ const PAD_BOTTOM = 24; // room for the year axis labels
 /** I9: the three reader-facing ranges, in order. */
 const RANGES: readonly ChartRange[] = ['10y', '5y', '1y'];
 
-export interface HistoryChartProps {
+interface HistoryChartProps {
   id: IndicatorId;
   points: readonly [number, number][];
   copy: InsightsCopy;

@@ -12,7 +12,7 @@ import { insightsCopyEn } from '../../i18n/insights-copy-en';
 import { insightsCopyFa } from '../../i18n/insights-copy-fa';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 
-export interface InsightsCopyApi {
+interface InsightsCopyApi {
   copy: InsightsCopy;
   locale: 'en' | 'fa';
   numberLocale: 'en-US' | 'fa-IR';
@@ -26,5 +26,3 @@ export function useInsightsCopy(): InsightsCopyApi {
     numberLocale,
   };
 }
-
-export type { InsightsCopy };

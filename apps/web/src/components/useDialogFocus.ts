@@ -19,7 +19,7 @@ import type { RefObject } from 'react';
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-export interface UseDialogFocusOptions {
+interface UseDialogFocusOptions {
   /** Closes the dialog (Escape key and the discipline's contract). */
   onClose: () => void;
   /** The element that opened the dialog — focus returns here on close. */

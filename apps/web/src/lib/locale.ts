@@ -85,7 +85,7 @@ class LocaleStore {
   }
 }
 
-export const localeStore = new LocaleStore();
+const localeStore = new LocaleStore();
 
 function lookup(dictionary: Dictionary, key: TranslationKey): string {
   const value = key.split('.').reduce<unknown>(

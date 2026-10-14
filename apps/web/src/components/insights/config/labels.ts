@@ -18,7 +18,7 @@ import { definitionFor } from './sections';
  * ------------------------------------------------------------------ */
 
 /** Which change window label a reading's cadence demands. */
-export type ChangeWindowLabel = '7d' | '30d' | 'since-previous';
+type ChangeWindowLabel = '7d' | '30d' | 'since-previous';
 
 export function changeWindowLabel(id: IndicatorId): ChangeWindowLabel {
   const def = definitionFor(id);
@@ -67,7 +67,7 @@ export function formatFromPeak(
  * ------------------------------------------------------------------ */
 
 /** Copy fragments for rendering a WarningRule in plain language. */
-export interface RuleCopy {
+interface RuleCopy {
   info: string;
   thresholdAbove: string;
   thresholdAboveSustained: string;

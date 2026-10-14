@@ -56,9 +56,9 @@ const lsKey = (source: SnapshotSource): string => `currena:snapshot:${source}`;
 const lsPrevKey = (source: SnapshotSource): string => `currena:prev-snapshot:${source}`;
 
 /** Where the currently-served snapshot physically came from. */
-export type ServedFrom = 'live' | 'cache' | 'local-store';
+type ServedFrom = 'live' | 'cache' | 'local-store';
 
-export interface SourceState {
+interface SourceState {
   status: 'idle' | 'loading' | 'ready' | 'error';
   snapshot: Snapshot | null;
   /** The prior DISTINCT snapshot (different fetchedAt) — powers ▲/▼ deltas. */
@@ -76,7 +76,7 @@ export interface SourceState {
   nextRetryAt: number | null;
 }
 
-export interface StoreState {
+interface StoreState {
   tgju: SourceState;
   frankfurter: SourceState;
   online: boolean;

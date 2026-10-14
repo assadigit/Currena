@@ -106,7 +106,7 @@ function arrowOf(n: number): 'up' | 'flat' | 'down' {
  * labelled "Down"). The trend WORD and its ARROW now come from the same
  * number the row shows.
  */
-export const MARKETS_FLAT_BAND_PCT = 1;
+const MARKETS_FLAT_BAND_PCT = 1;
 
 function bandedArrow(pct: number): 'up' | 'flat' | 'down' {
   if (pct > MARKETS_FLAT_BAND_PCT) return 'up';
@@ -115,7 +115,7 @@ function bandedArrow(pct: number): 'up' | 'flat' | 'down' {
 }
 
 /** The Trend column's word source: the 3-month change (the default lens). */
-export function trendOf(m: Pick<MarketEntry, 'chg3m'>): 'up' | 'flat' | 'down' {
+function trendOf(m: Pick<MarketEntry, 'chg3m'>): 'up' | 'flat' | 'down' {
   return bandedArrow(m.chg3m);
 }
 
@@ -135,7 +135,7 @@ function viewValue(m: MarketEntry, view: MarketsView): { pct: number; arrow: 'up
  * day behind → the "Delayed" tag (the provider lag the audit caught on
  * TSX/Ibovespa, honestly named instead of invisible).
  */
-export function tradingDaysBehind(asOf: string, freshest: string): number {
+function tradingDaysBehind(asOf: string, freshest: string): number {
   if (asOf >= freshest) return 0;
   const from = Date.parse(`${asOf}T00:00:00Z`);
   const to = Date.parse(`${freshest}T00:00:00Z`);
@@ -469,7 +469,7 @@ function MarketDetail({
  * directly (markets-verdict.test.ts).
  * ------------------------------------------------------------------ */
 
-export type MarketsVerdictStep = 1 | 2 | 3 | 4;
+type MarketsVerdictStep = 1 | 2 | 3 | 4;
 
 export function marketsVerdictStep(snapshot: Pick<MarketsSnapshot, 'markets' | 'summary'>): MarketsVerdictStep {
   const { summary, markets } = snapshot;
@@ -481,7 +481,7 @@ export function marketsVerdictStep(snapshot: Pick<MarketsSnapshot, 'markets' | '
 }
 
 /** How many of the snapshot's markets sit in correction or a bear market. */
-export function marketsInCorrectionCount(markets: readonly MarketEntry[]): number {
+function marketsInCorrectionCount(markets: readonly MarketEntry[]): number {
   return markets.filter((m) => m.status === 'correction' || m.status === 'bear').length;
 }
 

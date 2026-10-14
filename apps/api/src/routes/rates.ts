@@ -17,7 +17,7 @@ import { errorResponse, MAX_AMOUNT, NO_STORE, parseSourceParam } from '../http';
 import { RatesService, RatesServiceError } from '../rates-service';
 import type { Bindings } from '../index';
 
-export interface RatesRouteDeps {
+interface RatesRouteDeps {
   /** Service construction (route tests inject a fake ladder). */
   makeService: (env: Bindings) => RatesService;
 }

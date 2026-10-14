@@ -40,7 +40,7 @@ import type { PricesReader } from '@currena/insights/prices';
 import { errorResponse } from '../http';
 import type { Bindings } from '../index';
 
-export interface InsightsRouteDeps {
+interface InsightsRouteDeps {
   /** Store construction (route tests inject the in-memory fake). */
   getReader: (env: Bindings) => InsightsReader;
   /** Markets store construction (route tests inject the in-memory fake). */

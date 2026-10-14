@@ -36,7 +36,7 @@ import type { Snapshot, SnapshotSource } from '@currena/core';
 export const HISTORY_MAX_GENERATIONS = 240;
 
 /** One recorded generation — the same shape the client history stores. */
-export interface HistoryGeneration {
+interface HistoryGeneration {
   /** Snapshot.fetchedAt (ISO) — the generation identity. */
   at: string;
   /** Snapshot.source. */

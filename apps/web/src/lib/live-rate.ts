@@ -12,7 +12,7 @@ import { convert, formatNumber, reverseRate } from '@currena/core';
 import type { CurrencyCode, Snapshot, SnapshotSource } from '@currena/core';
 
 /** View model for the converter's rate line. */
-export interface LiveRateView {
+interface LiveRateView {
   /** 1 `from` = `rate` `to` (canonical, unformatted). */
   rate: number;
   /** 1 `to` = `inverse` `from`. */

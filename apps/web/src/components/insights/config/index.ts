@@ -57,7 +57,6 @@ export {
   definitionsForGroup,
   definitionFor,
   groupCounts,
-  isGaugeMember,
 } from './sections';
 
 export {
@@ -70,9 +69,6 @@ export {
 } from './display';
 export type {
   UnitToken,
-  UnitLabels,
-  IndicatorValueParts,
-  ValueRangeBounds,
 } from './display';
 
 export {
@@ -81,7 +77,6 @@ export {
   formatFromPeak,
   formatRuleText,
 } from './labels';
-export type { ChangeWindowLabel, RuleCopy } from './labels';
 
 export {
   warningZone,
@@ -89,28 +84,22 @@ export {
   stepToneClass,
   bandToneClass,
   attentionToneClass,
-  MOVE_SCORE_THRESHOLD,
   consequenceState,
   consequenceLine,
   bandPositionOf,
-  bandPositionWord,
-  BAND_WORDS_EN,
   bandWordsOf,
 } from './bands';
-export type { PositionBand, ConsequenceState, BandPosition } from './bands';
+export type { PositionBand } from './bands';
 
 export {
   bigMovers,
-  alertingIndicators,
-  UNUSUAL_CUTOFF,
-  isUnusual,
   tierOf,
   tierIsCard,
   indicatorMatchesFilter,
   filterVisibleIds,
   statusCounts,
 } from './movers';
-export type { IndicatorTier, StatusFilter, CardFilter, BigMoverRow, AlertChipRow } from './movers';
+export type { IndicatorTier, StatusFilter } from './movers';
 
 export {
   sliceHistoryToRange,
@@ -121,26 +110,23 @@ export {
   epochDayToIso,
   sampleHistoryRows,
 } from './history-config';
-export type { ChartRange, HistoryRow } from './history-config';
+export type { ChartRange } from './history-config';
 
 export {
   SIGNALS_ENABLED,
   legPhrase,
   togetherSummary,
   TOGETHER_CARD_ORDER,
-  signalSummaryPosition,
   mergeSignals,
 } from './signals';
-export type { StatusTone, TogetherSummary, MergedSignals } from './signals';
+export type { StatusTone } from './signals';
 
 export {
   heroReason,
   heroReasonIsConsistent,
   attentionTiles,
-  GROUP_MIN_VISIBLE,
   groupVisibility,
 } from './hero';
-export type { HeroReasonInput, AttentionTileRow, GroupVisibility } from './hero';
 
 export {
   MONEY_AREAS,
@@ -148,8 +134,6 @@ export {
   moneyPanel,
   MONEY_DRIVER_KIND,
   moneyDriverVote,
-  POLICY_RATE_IDS,
-  policyMoveOf,
   policyLastChangeOf,
   nextEventDate,
   moneyAreaDirection,
@@ -157,8 +141,5 @@ export {
 } from './money';
 export type {
   MoneyAreaId,
-  MoneyAreaState,
-  MoneyAreaRow,
-  MoneyDriverKind,
   MoneyDirection,
 } from './money';

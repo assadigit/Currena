@@ -28,7 +28,7 @@ const CHIP_ACTIVE: Readonly<Record<StatusFilter, string>> = {
   context: 'border-currena-blue/40 bg-currena-blue/15 text-currena-blue-deep',
 };
 
-export interface ToolsMenuProps {
+interface ToolsMenuProps {
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
   open: boolean;

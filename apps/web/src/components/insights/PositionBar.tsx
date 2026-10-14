@@ -16,7 +16,6 @@
  */
 
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import type { ConsequenceLines } from '../../i18n/insights-copy-en';
 import { formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
 import { positionBand, bandToneClass, type PositionBand } from './config';
@@ -108,5 +107,3 @@ export function PositionBar({
     </span>
   );
 }
-
-export type { ConsequenceLines };

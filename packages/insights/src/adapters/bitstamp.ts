@@ -12,7 +12,7 @@ import { fetchWithRetry } from '@currena/scraper';
 import { assertAscending, type SeriesPoint } from '../series';
 import { AdapterError, type FetchDeps } from './types';
 
-export const BITSTAMP_OHLC_BASE = 'https://www.bitstamp.net/api/v2/ohlc';
+const BITSTAMP_OHLC_BASE = 'https://www.bitstamp.net/api/v2/ohlc';
 
 /** OHLC response contract (probe 2026-10-06; zod-validated — loud on change). */
 const BitstampOhlcSchema = z.object({

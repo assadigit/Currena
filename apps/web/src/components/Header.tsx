@@ -16,7 +16,7 @@
  */
 
 import { useRef, useState } from 'react';
-import { navigate, useRoute, ROUTES } from '../router';
+import { navigate, useRoute } from '../router';
 import { useTheme } from '../lib/theme';
 import { useI18n } from '../lib/locale';
 import { InstallButton } from './InstallButton';
@@ -231,5 +231,3 @@ export function Header() {
     </>
   );
 }
-
-export { ROUTES };

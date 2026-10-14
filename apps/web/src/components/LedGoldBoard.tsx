@@ -55,7 +55,7 @@ import type { TranslationKey } from '../lib/locale';
 
 /** Board items in DISPLAY order — the global ounce first, then the Tehran
  *  market in the owner's pasted order. Mirrors TGJU's own طلا و سکه table. */
-export const GOLD_BOARD: readonly GoldId[] = [
+const GOLD_BOARD: readonly GoldId[] = [
   'gold-ounce',
   'gold-18k',
   'gold-24k',
@@ -71,13 +71,13 @@ export const GOLD_BOARD: readonly GoldId[] = [
 const FLASH_STAGGER_MS = 30;
 
 /** One gold row view model: the item id + its quote (null → dashes). */
-export interface GoldBoardItem {
+interface GoldBoardItem {
   id: GoldId;
   quote: GoldQuote | null;
 }
 
 /** Items for the gold board off one snapshot (pure lookup — no math). */
-export function goldBoardItems(snapshot: Snapshot | null): GoldBoardItem[] | null {
+function goldBoardItems(snapshot: Snapshot | null): GoldBoardItem[] | null {
   if (!snapshot) return null;
   return GOLD_BOARD.map((id) => ({
     id,
@@ -245,7 +245,7 @@ const LedGoldRow = memo(function LedGoldRow({
 
 /* ------------------------------- board ------------------------------ */
 
-export interface LedGoldBoardProps {
+interface LedGoldBoardProps {
   /** Render the DAY HIGH / DAY LOW columns? Default true (the full
    *  `/live-rates` board). `false` = the homepage CURRENT-only placement:
    *  two-track grid at every viewport (see the file header). */

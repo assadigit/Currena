@@ -12,7 +12,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-export interface OdometerProps {
+interface OdometerProps {
   value: number;
   format: (value: number) => string;
   /** Animation duration in ms (default 800). */

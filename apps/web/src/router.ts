@@ -85,7 +85,7 @@ export function parseRouteAndQuery(hash: string): { path: RoutePath; params: URL
   return { path, params: new URLSearchParams(queryPart) };
 }
 
-export function currentRoute(): RoutePath {
+function currentRoute(): RoutePath {
   return parseHash(window.location.hash);
 }
 

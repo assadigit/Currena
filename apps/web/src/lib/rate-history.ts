@@ -174,7 +174,7 @@ function toRates(gen: RateGeneration): Snapshot['rates'] {
 }
 
 /** First→last trend over a series (sparkline caption + a11y summary). */
-export interface TrendInfo {
+interface TrendInfo {
   dir: 'up' | 'down' | 'flat';
   /** Signed percent change, first → last. */
   pct: number;

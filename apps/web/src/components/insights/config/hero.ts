@@ -20,7 +20,7 @@ import { definitionFor } from './sections';
  * readable gauge sits at step 1).
  * ------------------------------------------------------------------ */
 
-export interface HeroReasonInput {
+interface HeroReasonInput {
   /** The section's gauge readings (gaugeReading rows). */
   gauges: readonly GaugeReading[];
   /** The step words, keyed 1–4 (copy.label). */
@@ -125,7 +125,7 @@ export function heroReasonIsConsistent(
  * sits into its own 10-year range (rule-tail aware).
  * ------------------------------------------------------------------ */
 
-export interface AttentionTileRow {
+interface AttentionTileRow {
   id: IndicatorId;
   /** 0..1 — how deep into the watched tail the value sits. */
   extremity: number;
@@ -155,7 +155,7 @@ export function attentionTiles(
  * Round-2 R7: the signals-first default view — per-group split.
  * ------------------------------------------------------------------ */
 
-export interface GroupVisibility {
+interface GroupVisibility {
   /** Needs-attention + unusual + enough normal rows to reach MIN_VISIBLE. */
   visible: readonly IndicatorReading[];
   /** The rest — collapsed behind "See all {n} indicators". */
@@ -163,7 +163,7 @@ export interface GroupVisibility {
 }
 
 /** At least this many items visible per group (spec R7). */
-export const GROUP_MIN_VISIBLE = 3;
+const GROUP_MIN_VISIBLE = 3;
 
 export function groupVisibility(readings: readonly IndicatorReading[]): GroupVisibility {
   const cards: IndicatorReading[] = [];

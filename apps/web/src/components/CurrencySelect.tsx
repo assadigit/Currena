@@ -13,7 +13,7 @@ import type { TranslationKey } from '../lib/locale';
 
 const ALL_CODES: readonly CurrencyCode[] = CURRENCIES.map((c) => c.code);
 
-export interface CurrencySelectProps {
+interface CurrencySelectProps {
   id: string;
   value: CurrencyCode;
   onChange: (code: CurrencyCode) => void;

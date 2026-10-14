@@ -15,7 +15,7 @@ import type { TranslationKey } from '../lib/locale';
  * Button
  * ------------------------------------------------------------------ */
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'cta' | 'secondary' | 'ghost';
 }
 
@@ -142,7 +142,7 @@ export function SourceBadge({ source }: { source: Source }) {
  * StaleBanner — legacy .cache-warning ("Using Cached Rates")
  * ------------------------------------------------------------------ */
 
-export interface StaleBannerProps {
+interface StaleBannerProps {
   /** ISO datetime of the served snapshot. */
   fetchedAt: string;
   /** Extra context line (API notice / degraded reason). */
@@ -193,7 +193,7 @@ export function OfflineBanner({ source }: { source: Source }) {
  * Switch — legacy .toggle-switch pill (splitter / receipt options)
  * ------------------------------------------------------------------ */
 
-export interface SwitchProps {
+interface SwitchProps {
   id: string;
   checked: boolean;
   onChange: (checked: boolean) => void;

@@ -36,7 +36,7 @@ import { useSnapshotStore } from '../lib/snapshot-store';
 import { useI18n } from '../lib/locale';
 import type { TranslationKey } from '../lib/locale';
 
-export interface AlertsDialogProps {
+interface AlertsDialogProps {
   /** The converter's current pair — pre-fills the create form. */
   defaultBase: CurrencyCode;
   defaultQuote: CurrencyCode;

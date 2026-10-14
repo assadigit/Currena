@@ -13,7 +13,7 @@ import { RatesErrorSchema, RatesResponseSchema } from '@currena/core';
 import type { RatesResponse, SnapshotSource } from '@currena/core';
 import { z } from 'zod';
 
-export type ApiErrorKind = 'network' | 'rates' | 'parse';
+type ApiErrorKind = 'network' | 'rates' | 'parse';
 
 export class ApiError extends Error {
   readonly kind: ApiErrorKind;
@@ -122,7 +122,7 @@ const MetaResponseSchema = z.object({
   limitations: z.array(z.string().min(1)),
 });
 
-export type MetaResponse = z.infer<typeof MetaResponseSchema>;
+type MetaResponse = z.infer<typeof MetaResponseSchema>;
 
 let metaPromise: Promise<MetaResponse> | null = null;
 

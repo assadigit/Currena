@@ -52,12 +52,12 @@ export const LOCK_TTL_SEC = 30;
  * × 12 s at 4-concurrency) — far past the lock TTL and past any sane request
  * latency; the ladder now falls through to stale-cache after this budget.
  */
-export const SCRAPE_DEADLINE_MS = 25_000;
+const SCRAPE_DEADLINE_MS = 25_000;
 
 /** Scraper registry — one function per snapshot source. */
-export type Scrapers = { [S in SnapshotSource]: () => Promise<Snapshot> };
+type Scrapers = { [S in SnapshotSource]: () => Promise<Snapshot> };
 
-export interface RatesServiceOptions {
+interface RatesServiceOptions {
   store: RateStore;
   scrapers: Scrapers;
   /** Injectable clock (tests). Default: real time. */
@@ -80,7 +80,7 @@ export class RatesServiceError extends Error {
   }
 }
 
-export interface GetRatesOptions {
+interface GetRatesOptions {
   /** internal/refresh: bypass step 1 (fresh cache) + MIN_SCRAPE_INTERVAL_SEC; still single-flight. */
   force?: boolean;
 }
@@ -295,7 +295,7 @@ export class RatesService {
   }
 }
 
-export interface StatusReportSource {
+interface StatusReportSource {
   source: SnapshotSource;
   status?: SourceStatus;
   cache: {

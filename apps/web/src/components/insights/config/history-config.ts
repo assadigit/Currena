@@ -93,7 +93,7 @@ export function epochDayToIso(day: number): string {
   return `${y}-${m}-${dd}`;
 }
 
-export interface HistoryRow {
+interface HistoryRow {
   iso: string;
   value: number;
 }

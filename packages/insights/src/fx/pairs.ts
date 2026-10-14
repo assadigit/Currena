@@ -12,7 +12,7 @@ import type { FxQuoteSet } from './providers';
 import { pctChange, round2 } from './maths';
 
 /** The USD-side rate of one currency on a date (undefined when absent). */
-export type RateMap = Partial<Record<FxCurrency, number>>;
+type RateMap = Partial<Record<FxCurrency, number>>;
 
 /**
  * A pair's rate (quote units per 1 base) from the USD-side rates.

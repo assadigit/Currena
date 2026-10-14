@@ -211,7 +211,7 @@ export function downsampleSeries(series: readonly SeriesPoint[], maxPoints = HIS
 /**
  * Options for {@link buildHistoryFile}.
  */
-export interface BuildHistoryFileOptions {
+interface BuildHistoryFileOptions {
   /**
    * Minimum observation count that still emits a file — 2 by default
    * (single-point "live" cards like gold-btc/silver-btc/gold-aud get no
@@ -262,7 +262,7 @@ export function historyToSeries(history: IndicatorHistory): SeriesPoint[] {
  * Run status
  * ------------------------------------------------------------------ */
 
-export interface StatusBuildInputs {
+interface StatusBuildInputs {
   reports: readonly InsightsSourceReport[];
   generatedAt: string;
   mode: InsightsStatus['mode'];

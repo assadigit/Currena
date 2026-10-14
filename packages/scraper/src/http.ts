@@ -39,7 +39,7 @@ export interface FetchRetryOptions {
  *  for the API ladder, /api/status and admin telemetry. `dns_or_network`
  *  is honest: the fetch web standard cannot distinguish DNS failure from a
  *  dropped connection — both surface as TypeError. */
-export type HttpErrorCode =
+type HttpErrorCode =
   | 'timeout'
   | 'dns_or_network'
   | 'rate_limited'

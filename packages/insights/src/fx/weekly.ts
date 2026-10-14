@@ -16,7 +16,7 @@ import {
 import { round2, round5 } from './maths';
 
 /** Week start (Monday) of an epoch day. */
-export function weekStartOf(day: number): number {
+function weekStartOf(day: number): number {
   return day - ((day + 3) % 7);
 }
 

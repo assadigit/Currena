@@ -29,7 +29,7 @@ export function marketsCsvFilename(generatedAt: string): string {
 }
 
 /** Column order — stable API for anyone scripting over the export. */
-export function marketsCsvHeaders(copy: InsightsCopy): string[] {
+function marketsCsvHeaders(copy: InsightsCopy): string[] {
   return [
     copy.markets.csvColMarket,
     copy.markets.csvColToday,

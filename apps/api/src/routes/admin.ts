@@ -21,7 +21,7 @@ import { clientIp, rateLimitTake, rateLimitRetryAfterSec, secretMatches } from '
 import { RatesService, RatesServiceError } from '../rates-service';
 import type { Bindings } from '../index';
 
-export interface AdminRouteDeps {
+interface AdminRouteDeps {
   /** Service construction (route tests inject a fake ladder). */
   makeService: (env: Bindings) => RatesService;
   /** Insights freshness reader (the console's optional telemetry card). */

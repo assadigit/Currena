@@ -4,7 +4,7 @@
  */
 
 /** A change that rounds to zero from below must not serialize as -0 (JSON). */
-export function normalizeZero(n: number): number {
+function normalizeZero(n: number): number {
   return n === 0 ? 0 : n;
 }
 

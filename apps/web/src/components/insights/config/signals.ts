@@ -52,7 +52,7 @@ export type StatusTone = 'danger' | 'success' | 'info' | 'muted';
 
 const TOGETHER_STATE_ORDER: readonly ConnectionState[] = ['active', 'partly', 'disagree', 'inactive', 'unknown'];
 
-export interface TogetherSummary {
+interface TogetherSummary {
   /** One line: "2 active, 3 show signals that disagree, 1 partly active". */
   line: string;
   /** One chip per connection (short title + state). */
@@ -83,19 +83,11 @@ export function togetherSummary(
  * not active → unreadable. */
 export const TOGETHER_CARD_ORDER: readonly ConnectionState[] = TOGETHER_STATE_ORDER;
 
-/** Collapsed-Signals line per metal: position top/bottom percent or ''. */
-export function signalSummaryPosition(percentile: number | null): { word: 'top' | 'bottom'; pct: number } | null {
-  if (percentile === null || !Number.isFinite(percentile)) return null;
-  if (percentile >= 0.9) return { word: 'top', pct: Math.round((1 - percentile) * 100) };
-  if (percentile <= 0.1) return { word: 'bottom', pct: Math.round(percentile * 100) };
-  return null;
-}
-
 /* ------------------------------------------------------------------ *
  * Round-2 R26: the merged gold-and-silver signals card.
  * ------------------------------------------------------------------ */
 
-export interface MergedSignals {
+interface MergedSignals {
   /** The four global conditions (identical for both metals by construction). */
   shared: readonly { key: string; state: string }[];
   /** Per-metal footing rows. */

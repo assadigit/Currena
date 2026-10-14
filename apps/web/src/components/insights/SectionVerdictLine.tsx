@@ -14,7 +14,7 @@
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 
 /** The page's three severity tiers (the chips' own wording lives in copy). */
-export type SectionChip = 'normal' | 'attention' | 'unusual' | null;
+type SectionChip = 'normal' | 'attention' | 'unusual' | null;
 
 export function SectionVerdictLine({
   label,

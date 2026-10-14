@@ -40,7 +40,7 @@ import { parseAmount, thousandSeparateInput } from '@currena/core';
 import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
 
-export interface AmountInputProps {
+interface AmountInputProps {
   id: string;
   value: string;
   onChange: (value: string) => void;

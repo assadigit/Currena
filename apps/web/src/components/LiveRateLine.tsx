@@ -38,7 +38,7 @@ import { seriesForPair, trendOf, useRateHistory } from '../lib/rate-history';
 /** Trend observations shown in the sparkline (older ones are noise). */
 const TREND_WINDOW = 40;
 
-export interface LiveRateLineProps {
+interface LiveRateLineProps {
   from: CurrencyCode;
   to: CurrencyCode;
   /** Booted snapshot for the PAIR'S source (store[sourceForPair(from, to)]). */
