@@ -894,3 +894,37 @@ finish-line artifacts (the evidence run + the fx data check).
   heroes, 5 of 16 in correction with 2 Delayed tags, mobile 375px no
   overflow (en + fa RTL). Screenshots for the second audit:
   docs/evidence/step1-audit/.
+
+## Session record — 2026-10-14 freshness (D-12 + D-13: 5-minute visibility)
+
+- **D-12 — zone-side, no deploy**: the currena.ir zone's legacy Browser
+  Cache TTL was `14400` (Cloudflare's old default), rewriting the origin
+  `max-age=300` to 4 hours on every edge-cache HIT (verified in a real
+  browser; curl/HEAD misses the HIT path). Applied via the Cloudflare API:
+  `PATCH /zones/<id>/settings/browser_cache_ttl` → `0` = Respect Existing
+  Headers. Browser-verified immediately: the same cached entry (age 3392)
+  switched to serving `max-age=300`. Scope had been exactly the two
+  edge-cached insights routes; HTML/assets/rates were never affected.
+- **D-13 — code + spec (commit `3fbd20e`, pushed `2f86d08..3fbd20e`, CI
+  green)**: `/api/insights/markets` + `/api/insights/fx` `s-maxage`
+  3600 → 300 (200 + 304 responses) and the serve-path KV `cacheTtl`
+  3600 → 300 (`KvMarketsReader`/`KvFxReader`); both specs' cache rules
+  updated in place. Gates: 1,058/1,058 tests, typecheck 6/6, budgets held
+  (entry 290.36/87.08; Insights 579.62/136.48 — byte-identical chunk
+  hashes, comment-only web diff).
+- **Deploy**: currena-api **`bb7b3ae4`** (992.30 KiB / gzip 178.43; the
+  route + adapter change; assets unchanged) + currena-markets
+  **`39dfc6b3`** (both crons intact: `30 23 * * 1-5`, `30 1 * * 2-6`);
+  `EODHD_API_TOKEN` secret re-put on markets (idempotent; owner
+  re-provided). Token: env-only per command, never in files.
+- **Live QA** (agent-browser, currena.ir): cache-busted fetches prove the
+  deployed origin answers `public, max-age=300, s-maxage=300` on both
+  routes; a true edge HIT (`cf-cache-status: HIT`, age 0) serves the same;
+  the plain SPA URL (what visitors fetch) serves it on HITs too;
+  `/api/health` ok; the insights page renders EN (In plain words, dollar
+  story, no raw codes) and FA (RTL, «به زبان ساده», Persian digits), no
+  overflow, zero console/page errors. Net effect: after the 23:30/01:30
+  UTC snapshot runs every visitor sees the new currencies within ~5
+  minutes (was up to ~5 hours).
+- One-off diagnosis/fix script (zone settings probe + PATCH) deleted after
+  use, per repo discipline; its logic is recorded in this entry.
