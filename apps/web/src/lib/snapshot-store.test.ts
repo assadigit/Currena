@@ -281,3 +281,284 @@ describe('ensureSnapshot (converter entry point)', () => {
     expect(state.error).toBeInstanceOf(Error);
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * QA audit C-3 + C-7 — the honest-stale display contract and the
+ * gold-heal / persistence paths that had no coverage.
+ * ------------------------------------------------------------------ */
+
+import { isConfirmedStale } from './snapshot-store';
+
+const goldSnap = (fetchedAt: string): Snapshot => ({
+  ...snap('tgju', fetchedAt),
+  gold: [{ id: 'gold-ounce', unit: 'USD', price: 2650.5 }],
+});
+
+describe('isConfirmedStale — the banner/LED contract (audit C-3)', () => {
+  it('boot-local derivation NEVER confirms stale (the transient blink is not a banner)', () => {
+    expect(
+      isConfirmedStale({
+        status: 'ready',
+        snapshot: snap('tgju', '2026-10-14T10:00:00Z'),
+        previous: null,
+        stale: true, // derived: persisted snapshot older than the window
+        servedFrom: 'local-store',
+        notice: null,
+        error: null,
+        degraded: false,
+        nextRetryAt: null,
+      }),
+    ).toBe(false);
+  });
+
+  it('server-confirmed stale (cache + stale) DOES confirm', () => {
+    expect(
+      isConfirmedStale({
+        status: 'ready',
+        snapshot: snap('tgju', '2026-10-14T10:00:00Z'),
+        previous: null,
+        stale: true,
+        servedFrom: 'cache',
+        notice: 'Using cached rates — last updated 3 hours ago',
+        error: null,
+        degraded: false,
+        nextRetryAt: null,
+      }),
+    ).toBe(true);
+  });
+
+  it('degraded mode (fetch failed, last-good still served) confirms stale', () => {
+    expect(
+      isConfirmedStale({
+        status: 'ready',
+        snapshot: snap('tgju', '2026-10-14T10:00:00Z'),
+        previous: null,
+        stale: true,
+        servedFrom: 'cache',
+        notice: null,
+        error: new Error('network') as never,
+        degraded: true,
+        nextRetryAt: null,
+      }),
+    ).toBe(true);
+  });
+
+  it('fresh data never confirms stale, whatever the origin', () => {
+    for (const servedFrom of ['live', 'cache', 'local-store'] as const) {
+      expect(
+        isConfirmedStale({
+          status: 'ready',
+          snapshot: snap('tgju', '2026-10-14T10:00:00Z'),
+          previous: null,
+          stale: false,
+          servedFrom,
+          notice: null,
+          error: null,
+          degraded: false,
+          nextRetryAt: null,
+        }),
+      ).toBe(false);
+    }
+  });
+
+  it('no snapshot at all → not stale, the surface shows its error state instead', () => {
+    expect(
+      isConfirmedStale({
+        status: 'error',
+        snapshot: null,
+        previous: null,
+        stale: false,
+        servedFrom: null,
+        notice: null,
+        error: new Error('network') as never,
+        degraded: false,
+        nextRetryAt: Date.now() + 15_000,
+      }),
+    ).toBe(false);
+  });
+});
+
+describe('gold-heal — a fresh-but-goldless tgju snapshot self-heals (audit C-3)', () => {
+  it('a FRESH goldless snapshot forces one re-fetch inside the freshness window', async () => {
+    const now = Date.now();
+    seedLocal('tgju', snap('tgju', new Date(now - 60_000).toISOString())); // 1 min old: fresh, no gold
+    fetchRates.mockImplementation(async (source: SnapshotSource) =>
+      ratesResponse(goldSnap(new Date(now).toISOString())),
+    );
+
+    const store = new SnapshotStore();
+    store.boot();
+    await vi.runAllTimersAsync();
+
+    expect(callsFor('tgju')).toBe(1); // the heal fetch (frankfurter was never persisted)
+    expect(store.getState().tgju.snapshot?.gold).toHaveLength(1); // healed
+  });
+
+  it('a FAILED heal attempt is throttled — one attempt per freshness window, never a storm', async () => {
+    const now = Date.now();
+    seedLocal('tgju', snap('tgju', new Date(now - 60_000).toISOString())); // fresh, goldless
+    fetchRates.mockRejectedValue(networkError());
+
+    const store = new SnapshotStore();
+    store.boot();
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(callsFor('tgju')).toBe(1); // one heal attempt at boot
+    // Degraded mode has no self-healing retries, and the gold-heal throttle
+    // holds: two minutes of silence (poll-time equivalent) = zero calls.
+    await vi.advanceTimersByTimeAsync(120_000);
+    expect(callsFor('tgju')).toBe(1);
+
+    // After the freshness window passes (5 min), the next natural trigger
+    // (the LiveRates poll / a conversion) heals again — degraded mode has
+    // no AUTO-retry by design, so the test plays the poll's role.
+    fetchRates.mockImplementation(async (source: SnapshotSource) =>
+      ratesResponse(goldSnap(new Date(now + 6 * 60_000).toISOString())),
+    );
+    await vi.advanceTimersByTimeAsync(190_000);
+    await store.refresh('tgju');
+    expect(callsFor('tgju')).toBe(2);
+    expect(store.getState().tgju.snapshot?.gold).toHaveLength(1);
+  });
+
+  it('a gold-bearing fresh snapshot does NOT trigger the heal', async () => {
+    const now = Date.now();
+    seedLocal('tgju', goldSnap(new Date(now - 60_000).toISOString()));
+    fetchRates.mockImplementation(async (source: SnapshotSource) =>
+      ratesResponse(snap(source, new Date(now).toISOString())),
+    );
+
+    const store = new SnapshotStore();
+    store.boot();
+    await vi.runAllTimersAsync();
+
+    expect(callsFor('tgju')).toBe(0); // fresh + healthy: zero network
+  });
+});
+
+describe('persistence honesty (audit C-7)', () => {
+  it('a corrupt persisted snapshot is discarded, never rendered — the boot refetches', async () => {
+    storage.setItem('currena:snapshot:tgju', '{"base":"IRR","source":"tgju"'); // truncated JSON
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const now = Date.now();
+    fetchRates.mockImplementation(async (source: SnapshotSource) =>
+      ratesResponse(snap(source, new Date(now).toISOString())),
+    );
+
+    const store = new SnapshotStore();
+    store.boot();
+    await vi.runAllTimersAsync();
+
+    const state = store.getState().tgju;
+    expect(state.snapshot?.fetchedAt).toBe(new Date(now).toISOString()); // fresh from the wire
+    expect(state.servedFrom).toBe('live');
+    expect(warn).toHaveBeenCalled(); // the discard was loud in the console
+    warn.mockRestore();
+  });
+
+  it('a schema-invalid persisted snapshot (bad rate) is discarded too', async () => {
+    const bogus = { ...snap('tgju', new Date(Date.now() - 60_000).toISOString()), rates: [{ code: 'USD', name: 'US Dollar', rate: -5 }] };
+    storage.setItem('currena:snapshot:tgju', JSON.stringify(bogus));
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const now = Date.now();
+    fetchRates.mockImplementation(async (source: SnapshotSource) =>
+      ratesResponse(snap(source, new Date(now).toISOString())),
+    );
+
+    const store = new SnapshotStore();
+    store.boot();
+    await vi.runAllTimersAsync();
+
+    expect(store.getState().tgju.servedFrom).toBe('live'); // refused the poison, refetched
+    vi.restoreAllMocks();
+  });
+
+  it('a localStorage quota failure on persist never breaks serving (audit C-7)', async () => {
+    const now = Date.now();
+    const setItem = storage.setItem;
+    Object.defineProperty(storage, 'setItem', {
+      configurable: true,
+      value: () => {
+        throw new DOMException('QuotaExceededError', 'QuotaExceededError');
+      },
+    });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    fetchRates.mockImplementation(async (source: SnapshotSource) =>
+      ratesResponse(snap(source, new Date(now).toISOString())),
+    );
+
+    const store = new SnapshotStore();
+    store.boot();
+    await vi.runAllTimersAsync();
+
+    const state = store.getState().tgju;
+    expect(state.status).toBe('ready'); // in-memory serving continues
+    expect(state.snapshot).not.toBeNull();
+    expect(warn).toHaveBeenCalled();
+    Object.defineProperty(storage, 'setItem', { configurable: true, value: setItem });
+    warn.mockRestore();
+  });
+});
+
+describe('generation bookkeeping (audit C-7)', () => {
+  it('a NEW generation replaces the snapshot, keeps the old one as the delta baseline, and records history', async () => {
+    const now = Date.now();
+    const gen1 = snap('tgju', new Date(now - 10 * 60_000).toISOString());
+    seedLocal('tgju', gen1);
+    fetchRates.mockImplementation(async (source: SnapshotSource) =>
+      ratesResponse(snap(source, new Date(now).toISOString())),
+    );
+
+    const store = new SnapshotStore();
+    store.boot();
+    await vi.runAllTimersAsync();
+
+    const state = store.getState().tgju;
+    expect(state.previous?.fetchedAt).toBe(gen1.fetchedAt); // baseline kept
+    expect(storage.getItem('currena:prev-snapshot:tgju')).toContain(gen1.fetchedAt); // persisted
+    expect(recordGeneration).toHaveBeenCalled();
+  });
+
+  it('the SAME generation settle keeps the existing baseline — no phantom delta, no duplicate history record', async () => {
+    const now = Date.now();
+    const gen = snap('tgju', new Date(now - 10 * 60_000).toISOString());
+    seedLocal('tgju', gen);
+    // The server answers the same generation served from ITS cache.
+    fetchRates.mockImplementation(async (source: SnapshotSource) => ({
+      snapshot: gen,
+      stale: false,
+      servedFrom: 'cache' as const,
+      notice: undefined,
+    }));
+
+    const store = new SnapshotStore();
+    store.boot();
+    await vi.runAllTimersAsync();
+
+    const state = store.getState().tgju;
+    expect(state.previous).toBeNull(); // baseline untouched
+    expect(state.snapshot?.fetchedAt).toBe(gen.fetchedAt);
+    // No tgju history record for a same-generation settle — the ONE call
+    // that may exist is frankfurter's boot fetch (nothing was persisted
+    // for that source in this test).
+    expect(recordGeneration.mock.calls.filter((c) => c[0] === 'tgju')).toHaveLength(0);
+    expect(storage.getItem('currena:prev-snapshot:tgju')).toBeNull();
+  });
+
+  it('refresh(force) re-fetches even inside the freshness window (manual refresh button)', async () => {
+    const now = Date.now();
+    seedLocal('tgju', goldSnap(new Date(now - 60_000).toISOString())); // fresh + healthy
+    fetchRates.mockImplementation(async (source: SnapshotSource) =>
+      ratesResponse(goldSnap(new Date(now).toISOString())),
+    );
+
+    const store = new SnapshotStore();
+    store.boot();
+    await vi.runAllTimersAsync();
+    expect(callsFor('tgju')).toBe(0); // nothing to fetch — all fresh
+
+    await store.refresh('tgju', { force: true });
+    expect(callsFor('tgju')).toBe(1); // the forced refresh went to the wire
+    expect(store.getState().tgju.snapshot?.fetchedAt).toBe(new Date(now).toISOString());
+  });
+});
