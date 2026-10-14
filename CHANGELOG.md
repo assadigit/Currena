@@ -12,13 +12,14 @@ operational finish line and the re-verified quality gates.
 
 - **Calendar titles landed in the KV snapshot.** The 14 revised `titleFa`
   values (RBA «تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره», Fed, ABS
-  jobs/CPI, US CPI/jobs) are baked into the snapshot by the ingest, and the
+  jobs/CPI, US CPI/jobs) are baked into the snapshot by the ingest. The
   2026-10-13T23:07 UTC dispatch confirmed every fetch/scoring step green —
   only the final KV write was refused by the account-wide free-tier daily
-  cap (HTTP 429, code 10048) at 23:0x UTC. The first post-quota-reset
-  ingest (dispatched 2026-10-14 just after 00:00 UTC) stores the snapshot
-  and brings the revised titles to the live Insights page; the scheduled
-  04:20 UTC run is the standing backstop.
+  cap (HTTP 429, code 10048). The first post-quota-reset ingest (run
+  38487665811, dispatched 2026-10-14T00:00:48Z) succeeded and stored the
+  snapshot (generatedAt 2026-10-14T00:01:14Z): all 22 calendar events now
+  serve the revised titles live (verified in-browser; the scheduled 04:20
+  UTC run is the standing backstop).
 - **Final QA re-run on 996f496** (identical code to the deployed 841c783):
   typecheck 6/6 packages, 1,020/1,020 tests (core 183 · scraper 67 ·
   insights 334 · markets 7 · api 136 · web 293), `pnpm copy:audit` clean,
