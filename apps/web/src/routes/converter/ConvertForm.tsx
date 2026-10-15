@@ -98,7 +98,7 @@ export function ConvertForm(props: {
                       setAmountInvalid(false);
                     }}
                     aria-pressed={active}
-                    className={`min-h-[34px] cursor-pointer rounded-full border px-3 py-1 text-[0.8rem] font-bold transition-all duration-300 motion-safe:hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
+                    className={`min-h-10 cursor-pointer rounded-full border px-3 py-1 text-[0.8rem] font-bold transition-all duration-300 motion-safe:hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
                       active
                         ? 'amount-chip-active border-transparent shadow-[0_6px_18px_rgba(240,180,41,0.45)] dark:shadow-[0_6px_18px_rgba(102,126,234,0.4)]'
                         : 'border-[#EBD48A] bg-white text-currena-dark hover:border-[#E8B923] hover:shadow-[0_4px_12px_rgba(240,180,41,0.18)] dark:border-white/10 dark:bg-[#222C3B] dark:hover:border-currena-blue/40 dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)]'

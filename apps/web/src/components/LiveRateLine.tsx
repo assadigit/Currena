@@ -163,7 +163,7 @@ export function LiveRateLine({ from, to, snapshot, stale, hidden = false }: Live
             type="button"
             onClick={copyRate}
             aria-label={copied ? t('converter.rateCopied') : t('converter.copyRate')}
-            className={`no-print inline-flex h-8 min-w-[2rem] cursor-pointer items-center justify-center gap-1 rounded-full border-0 px-2.5 text-[0.7rem] font-bold transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
+            className={`no-print inline-flex h-9 min-w-[2rem] cursor-pointer items-center justify-center gap-1 rounded-full border-0 px-2.5 text-[0.7rem] font-bold transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
               copied
                 ? 'bg-currena-success/15 text-currena-success'
                 : 'bg-currena-blue/10 text-currena-blue hover:bg-currena-blue/20 motion-safe:hover:-translate-y-0.5'

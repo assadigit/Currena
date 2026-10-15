@@ -52,7 +52,7 @@ export function ExpenseItemRow({
           type="button"
           onClick={() => onRemove(item.id)}
           aria-label={t('common.delete')}
-          className="h-8 w-8 shrink-0 cursor-pointer rounded-full border-0 bg-currena-warning/15 text-base font-bold text-currena-warning transition-all duration-300 hover:bg-currena-warning/25"
+          className="h-9 w-9 shrink-0 cursor-pointer rounded-full border-0 bg-currena-warning/15 text-base font-bold text-currena-warning transition-all duration-300 hover:bg-currena-warning/25"
         >
           ×
         </button>
