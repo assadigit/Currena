@@ -377,3 +377,58 @@ asks, all shipped:
 
 Session fully closed: `origin/main` = docs HEAD; production =
 currena-api `ca46a4f7` + currena-markets `9b5ff7e0`.
+
+
+---
+
+# SESSION_LOG — Round 43 Session 2026-10-18
+
+Branch `main` · base `690e8ab` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's five-item follow-up on the round-42 hero verdict
+cards (colors back on the grades · AUS white space · tip placements ·
+bullets at sentence starts · a container around the bullets).
+
+### 1 · feat(insights): round 43 — the grades wear their colors again — `d643353`
+**What:** (1) meters revert to the four-step status inks at every size
+(round-36/42 neutral-ink decree reversed by the owner; Carbon palette
+returns to hero, grouped rows, MarketsVerdict, QuestionGroup — words
+still carry the meaning); (2) both "?" tips seat at their subjects —
+the verdict-rule tip inside the FIRST group's header, the how-computed
+tip on the verdict row (`GlossaryTip` + optional backward-compatible
+`panelClassName` so panels wrap full-width below their flex rows);
+(3) the attention module flows from the top (the R40 bottom-anchor had
+turned AUS's missing bullets into a mid-card hole; the spare now falls
+to the card's bottom inside edge; R30 equal-height stretch kept — the
+natural-height alternative was A/B-tested in the browser and rejected
+as the return of the R30 "void under Australia"); (4) the bullet-less
+card leads with SIX of its own attention tiles (baseReveal = hasBullets
+? 3 : 6; the reveal count now derives from shown.length) — AUS's real
+"items to mention" fill the space the alert box would have taken;
+(5) alert bullets carry an explicit flex marker (shared BULLET_DOT) —
+the old ::marker rode the inline-block button's LAST-line baseline and
+landed beside the WRAPPED line (root cause proven by zoomed screenshot);
+(6) the alert container is now clearly visible (alert ring 25% / bg 5%).
+**Discipline:** no copy changes (manifest untouched); schemas.ts
+untouched; presentation only.
+**Evidence:** 1,325 tests green (every suite matches its pre-round
+count), typecheck 6/6, lint 0 errors / 15 advisories, copy:audit clean,
+budgets held — Insights 603.84/142.59 vs 604/142.8 (the deduped
+BULLET_DOT absorbed the round; NO bump), entry 294.75/88.53.
+Browser-verified en/fa × light/dark × 375/desktop (tips open/close,
+panels wrap, dots at sentence starts in both directions, reveal works
+3 → 6, no 375 bleed, zero console errors). Evidence:
+`docs/evidence/2026-10-18-round43/`.
+
+### 2 · Deploy + production verification
+**What:** deployed currena-api `7b5f7896-3068-4b33-a815-732457cb2f2c`
+from `d643353` (CI green pre-deploy); markets untouched (`9b5ff7e0`).
+**Evidence:** smoke — health 200 (kv ok), insights 51 readings
+ruleVersion 2, /admin 401, convert parity 100 USD → 26,790,000 IRR @
+267,900 tgju + EUR→GBP frankfurter; production DOM — meters computed
+`rgb(36, 161, 72)` on-1, 2 tips per card, rule panel opens, AUS 6
+tiles, reveal works, 375 scrollWidth === 375, zero page errors after
+the known one-reload SW cycle.
+
+Session closed: production = currena-api `7b5f7896` +
+currena-markets `9b5ff7e0`. **Token rotation still outstanding**
+(owner-side; fifth session).

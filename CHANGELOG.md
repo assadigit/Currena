@@ -5,6 +5,76 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-18] — Round 43: the grades wear their colors again
+
+The owner's feedback on the round-42 result: "Revert colors back to the
+situation grades." + "Now a considerable white space is created for AUS,
+because it has no items to mention, we need to think for that." + "the
+place of 'help tool tip' needs better placements" + "the bullet points
+aren't at the beginning of the sentence" + "add a container around bullet
+points." Full disposition table in
+`docs/QA/quirks-2026-10-18-round43.md`; evidence in
+`docs/evidence/2026-10-18-round43/`.
+
+### Changed
+
+- **The meters REVERT to the four-step status inks** (round 42's
+  neutral-ink decree reversed by the owner): a filled step wears its
+  step's own colour again — green / yellow / orange / red, the
+  owner-pinned Carbon palette — at EVERY size (hero `lg`, the grouped
+  rows' `sm`, MarketsVerdict, QuestionGroup). The words still carry the
+  meaning; the meters carry the colour. Unfilled steps stay border grey.
+- **The two "?" tips seat at their subjects** (no more lone floats):
+  the verdict-rule tip («مبنای تعیین وضعیت هر حوزه») sits in the FIRST
+  status group's header, beside the word it explains; the
+  how-computed tip («این نتیجه چگونه محاسبه می‌شود؟») rides the verdict
+  row itself. `GlossaryTip` gains an optional `panelClassName` so a
+  panel hosted in a flex row wraps onto its own full-width line
+  (backward-compatible — every other usage unchanged).
+- **The alert container becomes clearly visible**: a soft alert-tinted
+  bounded box (`ring` 25% / `bg` 5%) — the round-42 container was
+  effectively invisible in the light theme.
+- **The attention module flows from the top**: the R40 bottom-anchor
+  (`mt-auto`) turned Australia's missing bullets into a mid-card hole;
+  the spare space now falls to the card's bottom inside edge, where it
+  reads as padding. The R30 equal-height stretch stays (no "void under
+  Australia" beside the taller card).
+
+### Fixed
+
+- **The alert bullets start at the sentence START in every direction**:
+  the old `::marker` rode the inline-block button's LAST-line baseline,
+  so on wrapped items the dot landed beside the second line. Each bullet
+  now carries an explicit flex marker (one shared `BULLET_DOT` element);
+  `items-start` pins it beside the first line — right edge in fa, left
+  edge in en.
+- **Australia's white space fills with its own data**: a card with no
+  section-signal bullets (Australia never grows the alert box — the
+  signals are Global-scope) leads with SIX of its own attention tiles
+  instead of three, so the space the alert box would have taken holds
+  the card's real "items to mention". Cards WITH bullets keep the
+  3 + "+n more" economy; the reveal button's count reads
+  `tiles.length - shown.length` instead of a hardcoded 3.
+
+### Verification
+
+- No copy changes (zero new/retired strings — copy:audit untouched).
+- Gates: tests 1,325 green (core 191 · scraper 67 · insights 403 ·
+  markets 13 · api 208 · web 443); typecheck 6/6; lint 0 errors / 15
+  accepted advisories (D-24); copy:audit clean; budgets held — Insights
+  lazy **603.84/142.59** vs 604/142.8 (the deduped `BULLET_DOT`
+  absorbed the round; NO budget bump), entry untouched 294.75/88.53.
+- Browser-verified (vite + production data) en/fa × light/dark ×
+  375 px/desktop: meters wear the four-step colours, both tips seat and
+  expand (tap + keyboard, panels wrap below their rows), the alert box
+  is visible in both themes, bullet dots sit at sentence starts, the
+  AUS card leads with 6 tiles and no reveal chip, the reveal still
+  works on Global (3 → 6), 375 px `scrollWidth === 375`, zero
+  console/page errors.
+- Deployed currena-api `7b5f7896-3068-4b33-a815-732457cb2f2c` from
+  `d643353`; production DOM re-verified (the known one-reload PWA SW
+  cycle) — see `docs/DEPLOY.md`.
+
 ## [2026-10-17] — Round 42: the hero verdict cards calm down
 
 The owner's feedback on the Insights hero verdict cards (Global /

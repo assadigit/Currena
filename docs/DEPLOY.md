@@ -1170,3 +1170,35 @@ docs/QA/quirks-2026-10-17-hero-calm.md).
   (Australia), the full-explainer link scrolls to + expands About
   (scrollY 60 → 21810), 375 px scrollWidth === 375 (no bleed); zero
   page errors / console messages.
+
+
+## Session record — 2026-10-18 Round 43 (the grades wear their colors again)
+
+Commission: the owner's five-item follow-up on the round-42 result
+(CHANGELOG §2026-10-18, QA table docs/QA/quirks-2026-10-18-round43.md).
+
+- **Deployed**: currena-api **`7b5f7896-3068-4b33-a815-732457cb2f2c`**
+  (2026-10-18) from HEAD `d643353` — the round-43 feature commit rides
+  as the Worker's static assets. Cron `* * * * *` + KV intact.
+- **currena-markets NOT redeployed** (`9b5ff7e0` stays current — zero
+  markets imports touched).
+- **Gates at deploy**: tests 1,325 green (core 191 · scraper 67 ·
+  insights 403 · markets 13 · api 208 · web 443), typecheck 6/6, lint
+  0 errors / 15 advisories (D-24), copy audit clean (no copy changes
+  this round), budgets held (entry 294.75/88.53 vs 296/89.5; Insights
+  lazy **603.84/142.59** vs 604/142.8 — the deduped BULLET_DOT absorbed
+  the round; NO bump).
+- **CI**: green on the pushed HEAD (`d643353`), verified via API.
+- **Post-deploy smoke on currena.ir**: `/api/health` 200 (kv ok);
+  `/api/insights` 51 readings, ruleVersion 2; `/admin` 401; convert
+  parity 100 USD → 26,790,000 IRR @ 267,900 (tgju live) + EUR → GBP
+  via frankfurter.
+- **Production DOM re-verified**: the new bundle serves after one plain
+  reload (the PWA SW update cycle — known one-reload behaviour);
+  meters wear the four-step colours (computed on-1
+  `rgb(36, 161, 72)`); exactly 2 "?" tips per card seated at their
+  subjects (rule tip opens with its full panel; how-tip on the verdict
+  row); the alert container visibly tints (Global); 3 flex bullet dots
+  at sentence starts; Australia leads with 6 attention tiles; Global's
+  reveal still works (3 → 6); 375 px scrollWidth === 375; zero page
+  errors / console messages.
