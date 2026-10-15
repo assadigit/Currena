@@ -27,8 +27,12 @@ function stageAboutSection(sectionId: string): void {
 export function Footer() {
   const { t } = useI18n();
 
+  // 2026-10-16 quirk pass: inline-flex + py-2 lifts the row's hit area from
+  // a 16px text line to a ~32px touch target (the footer stays visually a
+  // text row — full 44px buttons would bloat it — while meeting the WCAG
+  // 2.5.8 AA floor with room to spare on the app's most-used small links).
   const linkClass =
-    'cursor-pointer border-0 bg-transparent font-semibold text-currena-blue underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue';
+    'inline-flex cursor-pointer items-center border-0 bg-transparent py-2 font-semibold text-currena-blue underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue';
 
   return (
     <footer className="px-5 py-5 text-center text-xs text-currena-muted opacity-80">
