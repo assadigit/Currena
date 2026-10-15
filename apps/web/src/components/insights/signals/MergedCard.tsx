@@ -236,40 +236,52 @@ export function MergedSignalsCard({
 
       {/* The shared conditions, listed ONCE (identical states by construction).
        * Round 22: the three state headings take the state's own ink and all
-       * five group headings share one label-size style (hierarchy + rhythm). */}
+       * five group headings share one label-size style (hierarchy + rhythm).
+       * 2026-10-16 quirk pass: each heading renders ONLY when its group has
+       * rows — an empty green "Supports" above a full "Works against" read
+       * like a rendering bug, not information (the neutral group already
+       * worked this way). */}
       <div className="flex flex-col gap-2">
-        <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-status-normal)]">
-          {s.sideSupportive}
-        </h4>
-        <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
-          {merged.shared
-            .filter((c) => c.state === 'supportive')
-            .map((c) => (
-              <ConditionRow
-                key={c.key}
-                condition={gold.conditions.find((gc) => gc.key === c.key)!}
-                readings={readings}
-                copy={copy}
-                numberLocale={numberLocale}
-              />
-            ))}
-        </ul>
-        <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-status-alert)]">
-          {s.sideAgainst}
-        </h4>
-        <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
-          {merged.shared
-            .filter((c) => c.state === 'against')
-            .map((c) => (
-              <ConditionRow
-                key={c.key}
-                condition={gold.conditions.find((gc) => gc.key === c.key)!}
-                readings={readings}
-                copy={copy}
-                numberLocale={numberLocale}
-              />
-            ))}
-        </ul>
+        {merged.shared.some((c) => c.state === 'supportive') ? (
+          <>
+            <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-status-normal)]">
+              {s.sideSupportive}
+            </h4>
+            <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
+              {merged.shared
+                .filter((c) => c.state === 'supportive')
+                .map((c) => (
+                  <ConditionRow
+                    key={c.key}
+                    condition={gold.conditions.find((gc) => gc.key === c.key)!}
+                    readings={readings}
+                    copy={copy}
+                    numberLocale={numberLocale}
+                  />
+                ))}
+            </ul>
+          </>
+        ) : null}
+        {merged.shared.some((c) => c.state === 'against') ? (
+          <>
+            <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-status-alert)]">
+              {s.sideAgainst}
+            </h4>
+            <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
+              {merged.shared
+                .filter((c) => c.state === 'against')
+                .map((c) => (
+                  <ConditionRow
+                    key={c.key}
+                    condition={gold.conditions.find((gc) => gc.key === c.key)!}
+                    readings={readings}
+                    copy={copy}
+                    numberLocale={numberLocale}
+                  />
+                ))}
+            </ul>
+          </>
+        ) : null}
         {merged.shared.some((c) => c.state === 'neutral' || c.state === 'unknown') ? (
           <>
             <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-status-stale)]">
