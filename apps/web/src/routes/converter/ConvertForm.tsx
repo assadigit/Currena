@@ -177,7 +177,9 @@ export function ConvertForm(props: {
             className="flex w-full cursor-pointer items-center gap-2 rounded-xl border-0 bg-transparent px-3 py-2.5 text-sm font-medium text-currena-muted transition-all duration-300 hover:bg-currena-blue/5"
           >
             <span
-              className={`text-xs text-currena-blue transition-transform duration-300 ${manualOpen ? 'rotate-90' : ''}`}
+              className={`text-xs text-currena-blue transition-transform duration-300 ${
+                manualOpen ? 'rotate-90 rtl:rotate-[270deg]' : 'rtl:rotate-180'
+              }`}
               aria-hidden="true"
             >
               ▶
