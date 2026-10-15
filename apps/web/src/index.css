@@ -1224,8 +1224,14 @@ html:not(:lang(fa)) .type-kicker {
 }
 
 /* Verdict meter (H1): four segments + a marker on the current step.
- * R30: segment inks mirror the FOUR-STEP word scale exactly (the word
- * and its meter share one hue — never colour alone). */
+ * R30: segment inks mirrored the FOUR-STEP word scale (the word and its
+ * meter shared one hue — never colour alone).
+ * Round 42 (owner): "I don't like the multi-colored grades … use a more
+ * low-key color; this section has too much color" — a filled step is now
+ * ONE neutral ink at EVERY size (the big hero meter joins the small ones,
+ * which went normal-ink in round 36). The step's WORD — beside the meter
+ * and in the grouped status rows — carries the meaning; never colour
+ * alone. Unfilled steps stay the border grey. */
 .verdict-meter {
   display: flex;
   gap: 3px;
@@ -1237,27 +1243,18 @@ html:not(:lang(fa)) .type-kicker {
   border-radius: 999px;
   background: var(--color-border);
 }
-.verdict-meter-seg.on-1 { background: var(--color-status-normal); }
-.verdict-meter-seg.on-2 { background: var(--color-status-watch); }
-.verdict-meter-seg.on-3 { background: var(--color-status-stressed); }
-.verdict-meter-seg.on-4 { background: var(--color-status-alert); }
+.verdict-meter-seg.on-1,
+.verdict-meter-seg.on-2,
+.verdict-meter-seg.on-3,
+.verdict-meter-seg.on-4 {
+  background: var(--color-text-secondary);
+}
 /* The hero's meter is the page's status instrument — bigger there.
  * The compact one rides each per-gauge hero row (fixed 44px track). */
 .verdict-meter-lg { flex: 1 1 auto; max-width: 150px; min-width: 90px; }
 .verdict-meter-lg .verdict-meter-seg { height: 12px; border-radius: 4px; }
 .verdict-meter-sm { width: 52px; }
 .verdict-meter-sm .verdict-meter-seg { height: 6px; }
-/* Round 36 (owner): "for the smaller grades … use normal color not color
- * coding" — the six small per-gauge meters lose the status rainbow: a
- * filled step is ONE normal ink (same as the step word's normal ink),
- * an unfilled step stays the border grey. The colour coding lives on
- * the hero's BIG meter only. */
-.verdict-meter-sm .verdict-meter-seg.on-1,
-.verdict-meter-sm .verdict-meter-seg.on-2,
-.verdict-meter-sm .verdict-meter-seg.on-3,
-.verdict-meter-sm .verdict-meter-seg.on-4 {
-  background: var(--color-text-secondary);
-}
 @media (prefers-reduced-motion: reduce) {
   .verdict-meter-seg { transition: none; }
 }

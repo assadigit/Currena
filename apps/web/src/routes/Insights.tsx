@@ -239,6 +239,14 @@ export function Insights() {
 
   const jumpAbout = useCallback(() => {
     setAboutToken((n) => n + 1);
+    // Round 42: the hero's how-tip link now also SCROLLS to the section —
+    // hidden behind a tip, a bare expand below the fold read as a dead
+    // click (the same roast round 33 answered for the section jump).
+    const el = document.getElementById('insights-about');
+    if (el) {
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    }
   }, []);
 
   const jumpToSection = useCallback((section: InsightsSection) => {

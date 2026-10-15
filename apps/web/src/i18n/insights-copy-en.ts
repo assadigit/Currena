@@ -1192,18 +1192,12 @@ export const insightsCopyEn = {
     heroTitle: 'Where things stand',
     verdictStepAria: '{section}: {label}, step {step} of 4',
     verdictMeterLabel: 'Reading on a four-step scale',
-    heroReasonCalm: 'Conditions are calm across the board: nothing needs your attention today.',
-    heroReasonTop: '{k} of {n} areas {isAre} {word}: {names}.',
-    heroReasonOthers: 'The rest are {word}.',
-    heroReasonOthersOne: 'The other one is {word}.',
-    // Round 24 (roast): the tail clause used the MODE of the remaining
-    // gauges — "The rest are Stable" while one sat Cautious. When the rest
-    // disagree, enumerate their DISTINCT words instead (never a false
-    // single word); {words} is pre-joined with andWord.
-    heroReasonOthersMixed: 'The rest are {words}.',
-    heroReasonAndWord: 'and',
-    heroReasonIs: 'is',
-    heroReasonAre: 'are',
+    // Round 42 (owner): the computed reason sentence ("2 of 5 areas are
+    // Stressed: … The rest are Stable") and the calm line are RETIRED —
+    // they repeated, word for word, what the grouped status rows now say
+    // (the roast: "it's everything and nothing because it's confusing").
+    // The grouping IS the sentence now; heroReason stays in config, pinned
+    // by its own tests.
     heroGaugesLabel: 'The gauges behind this verdict',
     inAlert: '{warnings} of {voting} indicators need attention',
     /** The count line's variant when the world-markets signal is raised
@@ -1213,6 +1207,11 @@ export const insightsCopyEn = {
     noSummary: 'Not enough voting data to read the gauges yet.',
     excludedNote: '{n} items set aside: stale or missing (see “How this is calculated”).',
     howCalculated: 'How is this calculated?',
+    // Round 42 (owner): the long verdict-rule paragraph and the how-link
+    // hide behind quiet "?" tips — the pill labels below are their
+    // accessible names; the panels carry the full text.
+    verdictRuleLabel: 'How the verdict word is chosen',
+    explainerFullLink: 'Read the full explainer',
     // Fix spec A-08 (2026-10-14): the run-status block on About this data.
     statusTitle: 'Status of this data',
     statusTimeLocale: 'en-AU',
@@ -1229,7 +1228,6 @@ export const insightsCopyEn = {
     // mapping for both regions (the code: gauges.ts sectionVerdictStep).
     verdictRule:
       'How the verdict word is chosen: each area’s gauge steps 1–4 from how many of its scored indicators need attention. Critical: at least two areas critical, or every area stressed or worse. Stressed: at least two areas stressed or worse, or most areas cautious or worse. Cautious: any area cautious or worse. Stable: every area calm.',
-    heroCalmList: 'Calm: {names}.',
     explainerScore:
       'A region’s verdict word comes from a single count rule (shown above this line), the same for both regions: the word can never disagree with the areas it names.',
     explainerLabels: 'The labels describe conditions, not advice: Currena never recommends actions.',

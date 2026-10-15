@@ -28,6 +28,24 @@
  * has always been icon-then-word). The meter stays last.
  *
  * Round-2 D7: Global renders first (no swap setting — retired).
+ *
+ * Round 42 (owner, “too much color — everything and nothing”): the card
+ * calms down —
+ *  1. the region mark drops to a quiet 24/28 (the big artwork lives in the
+ *     dedicated sections mid-page);
+ *  2. the state artwork rides smaller (32/40), proportionate to its word;
+ *  3. the gauges GROUP BY STATUS — one box per step word (Stressed: … /
+ *     Stable: …) — the flat chip row, the computed reason sentence and the
+ *     calm line all said the same thing three times; the grouping IS the
+ *     sentence now (heroReason stays in config, pinned by its tests);
+ *  4. the long verdict-rule paragraph hides behind a quiet "?" tip;
+ *  5. the red alert lines group into ONE bounded container with bullets
+ *     (red stays on the alert words, not as open text on the card);
+ *  6. the how-link hides behind the same "?" tip pattern (short answer +
+ *     a link to the full explainer);
+ *  7. the four-segment meters go low-key (one neutral ink, see index.css
+ *     round 42) and the attention tiles lose their pink tint for neutral
+ *     surfaces.
  */
 
 import { useState } from 'react';
@@ -43,10 +61,10 @@ import {
   definitionFor,
   formatIndicatorValue,
   formatRuleText,
-  heroReason,
   indicatorValueParts,
   stepToneClass,
 } from './config';
+import { GlossaryTip } from './world-currencies/GlossaryTip';
 
 function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
   return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
@@ -175,25 +193,6 @@ export function VerdictBlock({
     step: num(step || 0, numberLocale),
   });
 
-  // R2: the reason line — computed from the fixed table over gauge steps.
-  // R30: names are the SHORT gauge names (the old full questions read as
-  // punctuation errors: "…Alarmed: Are prices heating up?.").
-  const reason = heroReason({
-    gauges: gaugeRows,
-    words: { 1: copy.label.relaxed, 2: copy.label.cautious, 3: copy.label.stressed, 4: copy.label.alarmed },
-    calm: copy.ui.heroReasonCalm,
-    top: copy.ui.heroReasonTop,
-    others: copy.ui.heroReasonOthers,
-    othersOne: copy.ui.heroReasonOthersOne,
-    othersMixed: copy.ui.heroReasonOthersMixed,
-    andWord: copy.ui.heroReasonAndWord,
-    is: copy.ui.heroReasonIs,
-    are: copy.ui.heroReasonAre,
-    notEnough: copy.ui.noSummary,
-    nameOf: (gauge) => copy.groupShort[gauge as keyof typeof copy.groupShort] ?? copy.groups[gauge as keyof typeof copy.groups] ?? gauge,
-    fmt: (n) => num(n, numberLocale),
-  });
-
   // R3: the needs-attention tiles (extremity-sorted, up to 3 + "+n more").
   // Round 33: "+n more" reveals the rest IN PLACE (local state) — the old
   // jump-to-lane behaviour read as a dead click (the owner: "doesn't show
@@ -218,11 +217,11 @@ export function VerdictBlock({
     >
       <header className="flex items-center justify-between gap-3">
         {/* Round 28 (owner): each region wears its own mark — the globe for
-         * Global, the map for Australia. Round 33 (owner): back to a QUIET
-         * mark (48/64, 64px the hard ceiling) — the 128px hero artwork was
-         * visual noise; the big 128px icons now live ONLY on the dedicated
-         * sections mid-page (round 33, Insights.tsx). */}
-        <IconImg src={sectionIconUrl(section)} size={48} desktopSize={64} />
+         * Global, the map for Australia. Round 33: a QUIET mark (48/64).
+         * Round 42 (owner): quieter still — 24/28, a compact identifier in
+         * the header line; the artwork moments belong to the dedicated
+         * sections mid-page. */}
+        <IconImg src={sectionIconUrl(section)} size={24} desktopSize={28} />
         <h3 className="type-kicker m-0 min-w-0 flex-1 text-[var(--color-text-tertiary)]">
           {sectionLabel}
         </h3>
@@ -250,215 +249,270 @@ export function VerdictBlock({
  * word-first order read as [stressed][icon]); same reading order as
  * every other chip in the app. The meter stays last. */}
       <p className="m-0 flex items-center gap-3">
-        {stateIconUrl(step) !== null ? <IconImg src={stateIconUrl(step)!} size={44} desktopSize={60} className="drop-shadow-sm" /> : null}
+        {/* Round 42 (owner): the artwork rides SMALLER (32/40) — still the
+         * page's warm status moment beside its word, no longer a shout. */}
+        {stateIconUrl(step) !== null ? <IconImg src={stateIconUrl(step)!} size={32} desktopSize={40} className="drop-shadow-sm" /> : null}
         <span className={`type-verdict ${stepToneClass(step)}`}>{verdictLabel}</span>
         <VerdictMeter step={step} label={verdictLabel} ariaLabel={ariaLabel} size="lg" />
       </p>
 
-      {/* R2 → R30 → round 24 (roast) → round 36 (owner): the gauges as ONE
-       * LINE PER GAUGE — short name, its own mini meter, its step word —
-       * but ONLY the non-calm ones (the roast: the hero repeated itself;
-       * calm rows duplicated what the meter and the sentence already say).
-       * Unreadable rows (step 0) stay: they are the honest "cannot read"
-       * signal. Round 36 (owner): "align this 6 boxes — too visual noise"
-       * → every row is EXACTLY ONE LINE HIGH: the name owns the flex room
-       * and truncates with its full text on hover (the old wrap made
-       * "Borrowing costs" rows 42px while single-line neighbours sat at
-       * 21px — the six boxes zig-zagged). And the small meters + their
-       * words are NOT colour-coded any more (see the sm CSS + the word's
-       * normal ink): the colour rainbow on six small rows was the noise;
-       * the colour coding stays on the hero's BIG meter and word only. */}
+      {/* R2 → R30 → round 24 → round 36 → round 42 (owner): the gauges
+       * GROUPED BY STATUS. The old flat row of chips + the computed reason
+       * sentence + the calm line said the same thing three times (the
+       * roast: "it's everything and nothing because it's confusing"). Now
+       * ONE grouped module: a quiet box per step word — "Stressed:" names
+       * its areas, "Stable:" names the calm ones, the areas keep their
+       * mini meters — the grouping IS the sentence, and it can never
+       * contradict the gauges because it IS the gauges. Unreadable rows
+       * (step 0) keep their honest group at the end; when NO gauge is
+       * readable the module says so in one line (the old notEnough path).
+       * Rows stay exactly one line high (round 36's alignment decree) and
+       * the per-row word is gone — the group's word covers every row under
+       * it; each meter's aria still names its own step. */}
       {(() => {
-        const shownGauges = gaugeRows.filter((g) => g.step !== 1);
-        if (shownGauges.length === 0) return null;
+        const readable = gaugeRows.filter((g) => g.step >= 1);
+        const zeroRows = gaugeRows.filter((g) => g.step === 0);
+        const wordOfStep = (s: number) =>
+          s === 1 ? copy.label.relaxed : s === 2 ? copy.label.cautious : s === 3 ? copy.label.stressed : copy.label.alarmed;
+        if (readable.length === 0 && zeroRows.length === 0) return null;
+        if (readable.length === 0) {
+          return (
+            <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+              {copy.ui.noSummary}
+            </p>
+          );
+        }
+        const steps = [4, 3, 2, 1].filter((s) => readable.some((g) => g.step === s));
         return (
           <ul
-            className="m-0 grid list-none grid-cols-1 gap-x-5 gap-y-1 p-0 sm:grid-cols-2"
+            className="m-0 flex list-none flex-col gap-1.5 p-0"
             aria-label={copy.ui.heroGaugesLabel}
+            data-hero-gauges
           >
-            {shownGauges.map((g) => {
-              const gWord =
-                g.step === 0
-                  ? copy.ui.gaugeNoReading
-                  : g.step === 1
-                    ? copy.label.relaxed
-                    : g.step === 2
-                      ? copy.label.cautious
-                      : g.step === 3
-                        ? copy.label.stressed
-                        : copy.label.alarmed;
-              const gaugeName = copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge];
-              return (
-                <li key={g.gauge} className="flex items-center gap-1.5 text-[length:var(--type-label)]">
-                  {/* Round 36: the name owns the row's free width and NEVER
-                   * wraps (truncate) — every box is one line high, so the
-                   * meters and words sit on the same baselines across all
-                   * six boxes BY STRUCTURE (the alignment decree). The full
-                   * name stays on hover (title) and in the meter's aria. */}
-                  <span
-                    title={gaugeName}
-                    className="min-w-0 flex-1 truncate font-semibold text-[var(--color-text-primary)]"
-                  >
-                    {gaugeName}
+            {steps.map((s) => (
+              <li
+                key={s}
+                className="rounded-[var(--radius-md)] bg-currena-muted/[0.05] px-2.5 py-2 ring-1 ring-[var(--color-border)]/60"
+                data-gauge-group={s}
+              >
+                <p className="m-0 mb-1">
+                  <span className="inline-flex rounded-full bg-currena-muted/15 px-2 py-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)]">
+                    {wordOfStep(s)}
                   </span>
-                  <span className="flex shrink-0 items-center gap-1.5">
-                    <VerdictMeter
-                      step={g.step}
-                      label={gWord}
-                      ariaLabel={interpolate(copy.ui.gaugeStepAria, {
-                        question: gaugeName,
-                        label: gWord,
-                        step: num(g.step, numberLocale),
-                      })}
-                      size="sm"
-                    />
-                    {/* Round 36: normal ink, not the step's status colour —
-                     * the word still names the step (never colour alone). */}
-                    <span className="w-16 shrink-0 text-end font-semibold text-[var(--color-text-secondary)]">{gWord}</span>
+                </p>
+                <ul className="m-0 grid list-none grid-cols-1 gap-x-5 gap-y-1 p-0 sm:grid-cols-2">
+                  {readable
+                    .filter((g) => g.step === s)
+                    .map((g) => {
+                      const gWord = wordOfStep(g.step);
+                      const gaugeName =
+                        copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge];
+                      return (
+                        <li key={g.gauge} className="flex items-center gap-1.5 text-[length:var(--type-label)]">
+                          <span
+                            title={gaugeName}
+                            className="min-w-0 flex-1 truncate font-semibold text-[var(--color-text-primary)]"
+                          >
+                            {gaugeName}
+                          </span>
+                          <span className="flex shrink-0 items-center gap-1.5">
+                            <VerdictMeter
+                              step={g.step}
+                              label={gWord}
+                              ariaLabel={interpolate(copy.ui.gaugeStepAria, {
+                                question: gaugeName,
+                                label: gWord,
+                                step: num(g.step, numberLocale),
+                              })}
+                              size="sm"
+                            />
+                          </span>
+                        </li>
+                      );
+                    })}
+                </ul>
+              </li>
+            ))}
+            {zeroRows.length > 0 ? (
+              <li
+                className="rounded-[var(--radius-md)] bg-currena-muted/[0.05] px-2.5 py-2 ring-1 ring-[var(--color-border)]/60"
+                data-gauge-group="0"
+              >
+                <p className="m-0 mb-1">
+                  <span className="inline-flex rounded-full bg-currena-muted/15 px-2 py-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)]">
+                    {copy.ui.gaugeNoReading}
                   </span>
-                </li>
-              );
-            })}
+                </p>
+                <ul className="m-0 grid list-none grid-cols-1 gap-x-5 gap-y-1 p-0 sm:grid-cols-2">
+                  {zeroRows.map((g) => {
+                    const gaugeName =
+                      copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge];
+                    return (
+                      <li key={g.gauge} className="flex items-center gap-1.5 text-[length:var(--type-label)]">
+                        <span
+                          title={gaugeName}
+                          className="min-w-0 flex-1 truncate font-semibold text-[var(--color-text-primary)]"
+                        >
+                          {gaugeName}
+                        </span>
+                        <VerdictMeter
+                          step={g.step}
+                          label={copy.ui.gaugeNoReading}
+                          ariaLabel={interpolate(copy.ui.gaugeStepAria, {
+                            question: gaugeName,
+                            label: copy.ui.gaugeNoReading,
+                            step: num(g.step, numberLocale),
+                          })}
+                          size="sm"
+                        />
+                      </li>
+                    );
+                  })}
+                </ul>
+              </li>
+            ) : null}
           </ul>
         );
       })()}
-
-      {/* R2: the one reason line — from the fixed table, gauge-agreeing. */}
-      <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-        {reason}
-      </p>
-      {/* Step-1 audit item E3: the CALM areas ride beside the stressed ones
-       * ("Financial stress and the yield curve are normal, so the stress is
-       * in prices, not in markets") — one quiet line naming what is calm,
-       * shown only when calm and non-calm coexist. */}
-      {(() => {
-        const calmGauges = gaugeRows.filter((g) => g.step === 1);
-        const nonCalm = gaugeRows.filter((g) => g.step !== 1);
-        if (calmGauges.length === 0 || nonCalm.length === 0) return null;
-        const calmNames = calmGauges
-          .map((g) => copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge as keyof typeof copy.groups] ?? g.gauge)
-          .join(', ');
-        return (
-          <p className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]">
-            <bdi>{interpolate(copy.ui.heroCalmList, { names: calmNames })}</bdi>
-          </p>
-        );
-      })()}
-      {/* Step-1 audit item E1: the count rule for the verdict word, displayed
-       * beside the word it produced — the SAME rule for both regions. */}
-      <p className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]">
-        <bdi>{copy.ui.verdictRule}</bdi>
-      </p>
-      {/* R3 → round 24 → R40 (owner): the count line, the needs-attention
-       * tiles WITH NUMBERS (largest text in the tile), the "+n more"
-       * reveal and the how-link are ONE bottom-anchored module — a single
-       * mt-auto pins its top edge, so the tile ROW starts at the same y in
-       * BOTH hero panels by structure (the alignment decree): Australia's
-       * taller gauge/reason block used to push its row lower and the two
-       * rows zig-zagged; the free space now lives above the module. Each
-       * tile face is geometry-fixed — 2-line clamped name, one-line value
-       * with the unit read SMALL (R40: '۱۲۵٫۴۴ دلار آمریکا' keeps the
-       * number's row), 3-line clamped meaning — so the row height is
-       * identical across regions. The tint is softened — red is reserved
-       * for the words and the count, not a wall of pink. */}
+      {/* Step-1 audit item E1 → round 42 (owner): the long verdict-rule
+       * paragraph hides behind a quiet "?" tip — visible on demand, off
+       * the card's face. The SAME rule for both regions. */}
+      <div>
+        <GlossaryTip def={copy.ui.verdictRule} srLabel={copy.ui.verdictRuleLabel} />
+      </div>
+      {/* R3 → round 24 → R40 (owner) → round 42 (owner): the count line,
+       * the needs-attention tiles WITH NUMBERS (largest text in the tile),
+       * the "+n more" reveal and the how-tip are ONE bottom-anchored
+       * module — a single mt-auto pins its top edge, so the tile ROW starts
+       * at the same y in BOTH hero panels by structure (the alignment
+       * decree). Each tile face is geometry-fixed — 2-line clamped name,
+       * one-line value with the unit read SMALL (R40), 3-line clamped
+       * meaning — so the row height is identical across regions.
+       * Round 42 (owner): the red notes group into ONE bounded container
+       * with bullets — the count line is the container's header, each
+       * raised signal becomes one bullet — so the reds stop floating as
+       * open text on the card. With nothing to list, the count line rides
+       * bare as before. The tiles lose their pink tint for neutral
+       * surfaces (red stays on the words, not as a wall of pink). */}
       <div className="mt-auto" data-attention-module>
-        {/* §5.3 hero integration: the raised world-markets signal appears
-         * in the named-alerts module WITH ITS NUMBERS, using the module's
-         * own tone language (attention = the alert red, unusual = the amber
-         * watch ink — the same tiers the tiles speak). Clicking jumps to the
-         * world-markets section. */}
-        {marketsAlert ? (
-          <button
-            type="button"
-            onClick={() => onJumpMarkets?.()}
-            className={`insights-focusable -my-0.5 mb-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold underline decoration-current/40 underline-offset-4 transition-opacity hover:opacity-80 ${
-              marketsAlert.signal === 'unusual'
-                ? 'text-[var(--color-status-watch)]'
-                : 'text-[var(--color-status-alert)]'
-            }`}
-            data-markets-signal={marketsAlert.signal}
-          >
-            <bdi>
-              {interpolate(
-                marketsAlert.signal === 'unusual'
-                  ? copy.markets.heroAlertUnusual
-                  : copy.markets.heroAlertAttention,
-                {
-                  n: num(marketsAlert.n, numberLocale),
-                  count: num(marketsAlert.count, numberLocale),
-                },
-              )}
-            </bdi>
-          </button>
-        ) : null}
-        {/* §6.5 hero integration (currencies build step 11): the raised
-         * currency signal appears in the SAME named-alerts module, with its
-         * PATTERN NAMES (the cards carry the detail) — no new card. */}
-        {fxAlert ? (
-          <button
-            type="button"
-            onClick={() => onJumpFx?.()}
-            className={`insights-focusable -my-0.5 mb-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold underline decoration-current/40 underline-offset-4 transition-opacity hover:opacity-80 ${
-              fxAlert.signal === 'unusual'
-                ? 'text-[var(--color-status-watch)]'
-                : 'text-[var(--color-status-alert)]'
-            }`}
-            data-fx-signal={fxAlert.signal}
-          >
-            <bdi>
-              {interpolate(
-                fxAlert.signal === 'unusual' ? copy.fx.heroAlertUnusual : copy.fx.heroAlertAttention,
-                { patterns: fxAlert.patterns.join(' · ') },
-              )}
-            </bdi>
-          </button>
-        ) : null}
-        <p
-          className={`m-0 text-[length:var(--type-caption)] font-semibold ${attentionToneClass(
-            tiles.length + (marketsAlert ? 1 : 0) + (fxAlert ? 1 : 0),
-          )}`}
-          data-attention-count
-          data-markets-in-count={marketsAlert ? 'true' : undefined}
-          data-fx-in-count={fxAlert ? 'true' : undefined}
-        >
-          {interpolate(copy.ui.inAlert, {
-            warnings: num(tiles.length, numberLocale),
-            voting: num(voting, numberLocale),
-          })}
-        </p>
-
-        {/* §6.11/§9.10: the two world sections as SEPARATE indicators —
-         * each with its own measure label and chip, never merged. A calm
-         * stock section beside a warning currency pattern is the designed
-         * state (they measure different things); the labels say so. */}
-        {sectionIndicators !== undefined && sectionIndicators.length > 0 ? (
-          <p className="m-0 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[length:var(--type-caption)] font-semibold" data-section-indicators>
-            {sectionIndicators.map((ind, i) => (
-              <span key={i} className="inline-flex flex-wrap items-center gap-1">
-                {ind.signal !== 'normal' && ind.onJump !== undefined ? (
-                  <button
-                    type="button"
-                    onClick={ind.onJump}
-                    data-section-indicator={ind.signal}
-                    className={`insights-focusable cursor-pointer rounded-md border-0 bg-transparent px-1 py-0.5 font-bold underline decoration-current/40 underline-offset-4 transition-opacity hover:opacity-80 ${
-                      ind.signal === 'unusual'
-                        ? 'text-[var(--color-status-watch)]'
-                        : 'text-[var(--color-status-alert)]'
-                    }`}
-                  >
-                    {ind.label}
-                    <span className="ms-1 font-bold">· {ind.signal === 'unusual' ? copy.fx.chipUnusual : copy.fx.chipAttention}</span>
-                  </button>
-                ) : (
-                  <span className="px-1 py-0.5 text-[var(--color-text-tertiary)]" data-section-indicator="normal">
-                    {ind.label}
-                    <span className="ms-1">· {copy.fx.chipNormal}</span>
-                  </span>
-                )}
-              </span>
-            ))}
-          </p>
-        ) : null}
+        {(() => {
+          const countLine = (
+            <p
+              className={`m-0 text-[length:var(--type-caption)] font-semibold ${attentionToneClass(
+                tiles.length + (marketsAlert ? 1 : 0) + (fxAlert ? 1 : 0),
+              )}`}
+              data-attention-count
+              data-markets-in-count={marketsAlert ? 'true' : undefined}
+              data-fx-in-count={fxAlert ? 'true' : undefined}
+            >
+              {interpolate(copy.ui.inAlert, {
+                warnings: num(tiles.length, numberLocale),
+                voting: num(voting, numberLocale),
+              })}
+            </p>
+          );
+          const hasBullets =
+            marketsAlert !== undefined ||
+            fxAlert !== undefined ||
+            (sectionIndicators !== undefined && sectionIndicators.length > 0);
+          if (!hasBullets) return countLine;
+          return (
+            <div
+              className="rounded-[var(--radius-md)] bg-currena-muted/[0.05] px-2.5 py-2 ring-1 ring-[var(--color-border)]/60"
+              data-attention-box
+            >
+              {countLine}
+              <ul
+                className="m-0 mt-1 list-disc space-y-1 ps-4 marker:text-[var(--color-text-tertiary)]"
+                data-attention-bullets
+              >
+                {/* §5.3 hero integration: the raised world-markets signal
+                 * appears WITH ITS NUMBERS, using the module's own tone
+                 * language (attention = the alert red, unusual = the amber
+                 * watch ink). Clicking jumps to the world-markets section. */}
+                {marketsAlert ? (
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => onJumpMarkets?.()}
+                      className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold underline decoration-current/40 underline-offset-4 transition-opacity hover:opacity-80 ${
+                        marketsAlert.signal === 'unusual'
+                          ? 'text-[var(--color-status-watch)]'
+                          : 'text-[var(--color-status-alert)]'
+                      }`}
+                      data-markets-signal={marketsAlert.signal}
+                    >
+                      <bdi>
+                        {interpolate(
+                          marketsAlert.signal === 'unusual'
+                            ? copy.markets.heroAlertUnusual
+                            : copy.markets.heroAlertAttention,
+                          {
+                            n: num(marketsAlert.n, numberLocale),
+                            count: num(marketsAlert.count, numberLocale),
+                          },
+                        )}
+                      </bdi>
+                    </button>
+                  </li>
+                ) : null}
+                {/* §6.5 hero integration (currencies build step 11): the
+                 * raised currency signal with its PATTERN NAMES (the cards
+                 * carry the detail) — no new card. */}
+                {fxAlert ? (
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => onJumpFx?.()}
+                      className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold underline decoration-current/40 underline-offset-4 transition-opacity hover:opacity-80 ${
+                        fxAlert.signal === 'unusual'
+                          ? 'text-[var(--color-status-watch)]'
+                          : 'text-[var(--color-status-alert)]'
+                      }`}
+                      data-fx-signal={fxAlert.signal}
+                    >
+                      <bdi>
+                        {interpolate(
+                          fxAlert.signal === 'unusual' ? copy.fx.heroAlertUnusual : copy.fx.heroAlertAttention,
+                          { patterns: fxAlert.patterns.join(' · ') },
+                        )}
+                      </bdi>
+                    </button>
+                  </li>
+                ) : null}
+                {/* §6.11/§9.10: the two world sections as SEPARATE
+                 * indicators — each with its own measure label and chip,
+                 * never merged. A calm stock section beside a warning
+                 * currency pattern is the designed state (they measure
+                 * different things); the labels say so. */}
+                {(sectionIndicators ?? []).map((ind, i) => (
+                  <li key={i}>
+                    {ind.signal !== 'normal' && ind.onJump !== undefined ? (
+                      <button
+                        type="button"
+                        onClick={ind.onJump}
+                        data-section-indicator={ind.signal}
+                        className={`insights-focusable -ms-1 cursor-pointer rounded-md border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold underline decoration-current/40 underline-offset-4 transition-opacity hover:opacity-80 ${
+                          ind.signal === 'unusual'
+                            ? 'text-[var(--color-status-watch)]'
+                            : 'text-[var(--color-status-alert)]'
+                        }`}
+                      >
+                        {ind.label}
+                        <span className="ms-1 font-bold">· {ind.signal === 'unusual' ? copy.fx.chipUnusual : copy.fx.chipAttention}</span>
+                      </button>
+                    ) : (
+                      <span className="px-1 py-0.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]" data-section-indicator="normal">
+                        {ind.label}
+                        <span className="ms-1">· {copy.fx.chipNormal}</span>
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })()}
 
         {shown.length > 0 ? (
           <div className="mt-2">
@@ -480,7 +534,7 @@ export function VerdictBlock({
                     <button
                       type="button"
                       onClick={() => onFocusCard(id)}
-                      className="insights-focusable flex h-full w-full cursor-pointer flex-col items-start gap-0.5 rounded-[var(--radius-md)] bg-currena-warning/[0.07] px-2 py-2 text-start ring-1 ring-currena-warning/20 transition-colors hover:bg-currena-warning/[0.13]"
+                      className="insights-focusable flex h-full w-full cursor-pointer flex-col items-start gap-0.5 rounded-[var(--radius-md)] bg-currena-muted/[0.06] px-2 py-2 text-start ring-1 ring-[var(--color-border)]/70 transition-colors hover:bg-currena-muted/[0.13]"
                     >
                       <span className="flex h-[2.75em] w-full items-start gap-1 text-[length:var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
                         {/* Round 28: the tile's indicator wears its artwork when
@@ -527,16 +581,21 @@ export function VerdictBlock({
           </div>
         ) : null}
 
-        {/* H1 → R40: the "how is this computed?" link rides INSIDE the
-         * anchored module — it keeps its place at the tiles' bottom edge
-         * without owning the card's free space any more. */}
-        <button
-          type="button"
-          onClick={onJumpAbout}
-          className="insights-focusable -ms-1.5 mt-1.5 w-fit cursor-pointer rounded-lg border-0 bg-transparent px-1.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
-        >
-          {copy.ui.howCalculated}
-        </button>
+        {/* H1 → R40 → round 42 (owner): the "how is this computed?" link
+         * hides behind the same quiet "?" tip — the panel answers in one
+         * sentence and keeps the jump to the full explainer. */}
+        <div className="mt-1.5">
+          <GlossaryTip srLabel={copy.ui.howCalculated}>
+            <bdi>{copy.ui.explainerIntro}</bdi>
+            <button
+              type="button"
+              onClick={onJumpAbout}
+              className="insights-focusable mt-1 inline-flex w-fit cursor-pointer items-center rounded-lg border-0 bg-transparent p-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+            >
+              {copy.ui.explainerFullLink} ↧
+            </button>
+          </GlossaryTip>
+        </div>
       </div>
     </article>
   );
