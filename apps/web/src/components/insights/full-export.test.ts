@@ -226,29 +226,92 @@ describe('buildInsightsTxt', () => {
 });
 
 describe('buildInsightsFullCsv', () => {
+  /** Tiny RFC-4180 parser for block assertions (mirrors strict readers). */
+  function parseCsv(text: string): string[][] {
+    const out: string[][] = [];
+    let field = '';
+    let row: string[] = [];
+    let inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i]!;
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') {
+            field += '"';
+            i++;
+          } else inQuotes = false;
+        } else field += c;
+      } else if (c === '"') inQuotes = true;
+      else if (c === ',') {
+        row.push(field);
+        field = '';
+      } else if (c === '\r') {
+        row.push(field);
+        out.push(row);
+        row = [];
+        field = '';
+        if (text[i + 1] === '\n') i++;
+      } else if (c === '\n') {
+        row.push(field);
+        out.push(row);
+        row = [];
+        field = '';
+      } else field += c;
+    }
+    if (field !== '' || row.length > 0) {
+      row.push(field);
+      out.push(row);
+    }
+    return out;
+  }
+
+  const csv = buildInsightsFullCsv(input);
+  const rows = parseCsv(csv.slice(1)); // slice off the BOM
+
+  it('opens with the UTF-8 BOM (BOM-less CSV decodes as ANSI-1256 on fa Excel)', () => {
+    expect(csv.charCodeAt(0)).toBe(0xfeff);
+  });
+
   it('emits CRLF line endings with a trailing CRLF (RFC 4180)', () => {
-    const csv = buildInsightsFullCsv(input);
     expect(csv.endsWith('\r\n')).toBe(true);
     expect(csv).not.toMatch(/[^\r]\n/);
   });
 
-  it('uses the stable 26-column flat header and 26-slot rows', () => {
-    const csv = buildInsightsFullCsv(input);
-    const lines = csv.split('\r\n').filter((l) => l !== '');
-    expect(lines[0]!.split(',')).toHaveLength(26);
-    expect(lines[0]).toContain('Section');
-    // Row width at the DOC level (raw text lines can legally carry commas
-    // inside quoted free-text fields — RFC 4180).
+  it('leads with the title + the meta floor as single-cell rows', () => {
+    expect(rows[0]).toEqual(['Insights']);
+    // Meta floor: subtitle first, then the data-as-of line with the date.
+    expect(rows.slice(1, 5).some((r) => r[0]?.includes('2026-10-07'))).toBe(true);
+  });
+
+  it('renders one dense block per section: heading, own header, rows', () => {
     const doc = assembleExportDoc(input);
+    let at = 0;
     for (const section of doc.sections) {
-      for (const row of section.rows) expect(row).toHaveLength(26);
+      const headingAt = rows.findIndex((r, i) => i >= at && r.length === 1 && r[0] === section.heading);
+      expect(headingAt).toBeGreaterThanOrEqual(at); // the heading row exists, in order
+      const cursor = headingAt + 1 + section.lines.length;
+      expect(rows[cursor]).toHaveLength(section.headers.length); // the block's own header
+      let count = 0;
+      for (let i = cursor + 1; i < rows.length && rows[i]!.length > 1; i++) count++;
+      expect(count).toBe(section.rows.length); // every row is present and dense
+      at = cursor + 1 + section.rows.length;
     }
   });
 
-  it('tags every row with its section and guards free-text columns', () => {
-    const csv = buildInsightsFullCsv(input);
-    expect(csv).toContain('World stock markets');
-    expect(csv).toContain('Indicators');
+  it('carries the indicators block at full depth (snapshot order)', () => {
+    const indicators = rows.findIndex((r) => r.length === 1 && r[0] === 'Indicators');
+    expect(indicators).toBeGreaterThan(0);
+    expect(rows[indicators + 1]).toHaveLength(12);
+    expect(rows[indicators + 2]![0]).toBe('yield-curve-10y2y'); // snapshot order, first reading
+    // Whole-file audit: title + meta floor + per rendered section one
+    // blank + heading + header + its lines + its rows (computed, no hardcode).
+    const doc = assembleExportDoc(input);
+    const rendered = doc.sections.filter((s) => s.rows.length > 0);
+    const dataRows = rendered.reduce((n, s) => n + s.rows.length + s.lines.length, 0);
+    expect(rows).toHaveLength(1 + doc.metaLines.length + dataRows + 3 * rendered.length);
+  });
+
+  it('stays machine-readable: ASCII digits, no Persian numerals', () => {
     expect(csv).not.toMatch(/[\u06F0-\u06F9]/); // never a Persian digit
   });
 });

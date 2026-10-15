@@ -143,7 +143,12 @@ export function InsightsHeader({
         );
         const { downloadBlob } = await import('../../lib/download');
         downloadBlob(file.blob, insightsExportFilename(state.snapshot.generatedAt, file.ext));
-      });
+      })
+        .catch((err: unknown) => {
+          // Never a silent nothing-downloaded again (the 2026-10-18 export
+          // finding): the failure is at least loud in the console.
+          console.error('insights full export failed', err);
+        });
     },
     [state, copy, locale, t, marketsState, fxState],
   );

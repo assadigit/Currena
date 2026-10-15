@@ -20,16 +20,19 @@
  *   calendar    — the upcoming key dates (locale titles, like the page)
  *   changed     — the indicators that changed state this week
  *
- * Structure: every row is stored FLAT (one 26-wide slot list, section
- * first) so the CSV renderer is a straight dump; each section also declares
- * which flat columns its on-page table shows, so the Markdown / TXT / XLSX
- * renderers reproduce the page's own tables. Numbers stay real numbers for
- * the XLSX (the zero-dependency writer emits number cells) and are rendered
- * as ASCII en-US text everywhere else — the same machine-readable discipline
- * as insights-csv.ts / markets-csv.ts / fx-csv.ts (localized NAMES and
- * HEADERS, ASCII digits and period decimals, OWASP formula-injection guard
- * on every free-text CSV cell, CRLF + trailing CRLF for the CSV; MD/TXT use
- * the plain-document LF convention).
+ * Structure: every row is stored FLAT (one 26-wide slot list); each
+ * section declares which flat columns its on-page table shows. The MD /
+ * TXT / CSV renderers reproduce the page's own tables per section (the
+ * CSV opens as one dense block per section, UTF-8 with BOM so Excel on
+ * every locale decodes the Persian text — the owner's 2026-10-18
+ * finding); the XLSX gets one worksheet per section with real number
+ * cells (the zero-dependency writer) and an RTL sheet view for fa.
+ * Numbers are rendered as ASCII en-US text everywhere else — the same
+ * machine-readable discipline as insights-csv.ts / markets-csv.ts /
+ * fx-csv.ts (localized NAMES and HEADERS, ASCII digits and period
+ * decimals, OWASP formula-injection guard on every free-text CSV cell,
+ * CRLF + trailing CRLF for the CSV; MD/TXT use the plain-document LF
+ * convention).
  *
  * Pure builders — no DOM. The caller (InsightsHeader's export handlers)
  * dynamically imports this whole module, builds the file for one format via
@@ -119,41 +122,6 @@ const FLAT = {
 } as const;
 
 const FLAT_WIDTH = 26;
-
-/** The stable flat-table header order — a stable API for anyone scripting
- * over the CSV export. Reviewed header strings are reused wherever one
- * exists; the three new slots (section / details / date / position) carry
- * the new export strings. */
-export function fullExportCsvHeaders(copy: InsightsCopy): string[] {
-  const h: string[] = [];
-  h[FLAT.section] = copy.ui.exportSection;
-  h[FLAT.id] = copy.ui.csvColId;
-  h[FLAT.name] = copy.ui.csvColName;
-  h[FLAT.ticker] = copy.ui.csvColTicker;
-  h[FLAT.value] = copy.ui.csvColValue;
-  h[FLAT.unit] = copy.ui.csvColUnit;
-  h[FLAT.status] = copy.ui.csvColStatus;
-  h[FLAT.change7d] = copy.ui.csvColChange7d;
-  h[FLAT.change30d] = copy.ui.csvColChange30d;
-  h[FLAT.chg1d] = copy.markets.csvColToday;
-  h[FLAT.chg1m] = copy.fx.csvColM1;
-  h[FLAT.chg3m] = copy.markets.csvCol3m;
-  h[FLAT.chg1y] = copy.fx.csvColY1;
-  h[FLAT.percentile10y] = copy.ui.csvColPosition10y;
-  h[FLAT.position] = copy.ui.exportPosition;
-  h[FLAT.fromHigh] = copy.markets.csvColFromHigh;
-  h[FLAT.trend] = copy.fx.csvColTrend;
-  h[FLAT.close] = copy.markets.csvColClose;
-  h[FLAT.high52w] = copy.markets.csvColHigh52w;
-  h[FLAT.low52w] = copy.markets.csvColLow52w;
-  h[FLAT.rate] = copy.fx.csvColRate;
-  h[FLAT.detail] = copy.ui.exportDetail;
-  h[FLAT.date] = copy.ui.exportColDate;
-  h[FLAT.asOf] = copy.ui.csvColAsOf;
-  h[FLAT.updatedAt] = copy.ui.csvColUpdated;
-  h[FLAT.source] = copy.ui.csvColSource;
-  return h;
-}
 
 interface DocSection {
   /** Stable key (tests) — never rendered. */
@@ -669,23 +637,33 @@ export function buildInsightsTxt(input: FullExportInput): string {
 }
 
 /* ------------------------------------------------------------------ *
- * Renderer: CSV — one flat table, the section column first (RFC 4180)
+ * Renderer: CSV — one dense block per section (the page's own tables),
+ * RFC 4180 CRLF, UTF-8 **with BOM**
+ *
+ * The first cut (2026-10-16) dumped one flat 26-slot table; the owner
+ * reported it "incomplete / not working" in Excel: the sparse matrix
+ * reads as missing columns, and without a BOM Excel on a fa-Windows
+ * machine decodes the Persian text as ANSI-1256 mojibake. The CSV now
+ * mirrors the MD/TXT structure the owner approved: title + meta floor,
+ * then one block per section — heading line, the section's own header
+ * row, its rows. The BOM makes Excel pick UTF-8 on every locale.
  * ------------------------------------------------------------------ */
 
 export function buildInsightsFullCsv(input: FullExportInput): string {
   const doc = assembleExportDoc(input);
-  const headers = fullExportCsvHeaders(input.copy);
-  const lines: string[] = [headers.map(csvText).join(',')];
+  const lines: string[] = [`\uFEFF${csvText(doc.heading)}`];
+  for (const line of doc.metaLines) lines.push(csvText(line));
   for (const section of doc.sections) {
-    for (const flatRow of section.rows) {
-      // Slot 0 (the section column) is filled here — every row is tagged
-      // with its own section heading, which is what makes one flat table
-      // filterable per page section.
-      const row = flatRow.slice();
-      row[FLAT.section] = section.heading;
+    if (section.rows.length === 0) continue;
+    lines.push('');
+    lines.push(csvText(section.heading));
+    for (const line of section.lines) lines.push(csvText(line));
+    lines.push(section.headers.map(csvText).join(','));
+    for (const row of section.rows) {
       lines.push(
-        row
-          .map((v) => {
+        section.columns
+          .map((slot) => {
+            const v = row[slot] ?? null;
             if (v === null || v === undefined) return '';
             if (typeof v === 'number') return asciiNumber(v, section.digits);
             return csvText(v);
@@ -744,7 +722,10 @@ export async function buildInsightsExportFile(input: FullExportInput, format: Ex
       return { blob: new Blob([buildInsightsFullCsv(input)], { type: 'text/csv;charset=utf-8' }), ext: 'csv' };
     case 'xlsx': {
       const { buildXlsxBlob } = await import('../../lib/xlsx-writer');
-      return { blob: buildXlsxBlob(buildInsightsXlsxSheets(input)), ext: 'xlsx' };
+      return {
+        blob: buildXlsxBlob(buildInsightsXlsxSheets(input), { rtl: input.locale === 'fa' }),
+        ext: 'xlsx',
+      };
     }
   }
 }

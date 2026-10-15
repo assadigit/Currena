@@ -74,5 +74,7 @@ export function buildFxCsv(snapshot: FxSnapshot, copy: InsightsCopy): string {
       );
     }
   }
-  return `${lines.join('\r\n')}\r\n`;
+  // UTF-8 BOM: Excel on a fa-Windows machine decodes BOM-less CSV as
+  // ANSI-1256 (the 2026-10-18 full-export finding) — mark the encoding.
+  return `\uFEFF${lines.join('\r\n')}\r\n`;
 }

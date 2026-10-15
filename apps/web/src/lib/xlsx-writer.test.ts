@@ -65,8 +65,8 @@ function crcOf(bytes: Uint8Array): number {
   return (c ^ 0xffffffff) >>> 0;
 }
 
-async function entries(sheet: XlsxSheet | XlsxSheet[]): Promise<Map<string, string>> {
-  const blob = buildXlsxBlob(Array.isArray(sheet) ? sheet : [sheet]);
+async function entries(sheet: XlsxSheet | XlsxSheet[], opts?: { rtl?: boolean }): Promise<Map<string, string>> {
+  const blob = buildXlsxBlob(Array.isArray(sheet) ? sheet : [sheet], opts);
   expect(blob.type).toBe(XLSX_MIME);
   const buffer = await blob.arrayBuffer();
   return readZip(new Uint8Array(buffer));
@@ -90,6 +90,8 @@ describe('xlsx-writer — OOXML structure', () => {
       [
         '[Content_Types].xml',
         '_rels/.rels',
+        'docProps/app.xml',
+        'docProps/core.xml',
         'xl/_rels/workbook.xml.rels',
         'xl/styles.xml',
         'xl/workbook.xml',
@@ -101,9 +103,13 @@ describe('xlsx-writer — OOXML structure', () => {
     expect(contentTypes).toContain('/xl/workbook.xml');
     expect(contentTypes).toContain('/xl/worksheets/sheet1.xml');
     expect(contentTypes).toContain('/xl/styles.xml');
+    expect(contentTypes).toContain('/docProps/core.xml');
+    expect(contentTypes).toContain('/docProps/app.xml');
 
     const rootRels = files.get('_rels/.rels')!;
     expect(rootRels).toContain('Target="xl/workbook.xml"');
+    expect(rootRels).toContain('Target="docProps/core.xml"');
+    expect(rootRels).toContain('Target="docProps/app.xml"');
 
     const workbook = files.get('xl/workbook.xml')!;
     expect(workbook).toContain('<sheet name="Receipt" sheetId="1" r:id="rId1"/>');
@@ -113,14 +119,17 @@ describe('xlsx-writer — OOXML structure', () => {
     expect(workbookRels).toContain('Target="styles.xml"');
 
     expect(files.get('xl/styles.xml')!).toContain('<cellXfs count="1">');
+    // The named "Normal" style floor — strict viewers warn/repair without it.
+    expect(files.get('xl/styles.xml')!).toContain('<cellStyle name="Normal" xfId="0" builtinId="0"/>');
   });
 
   it('writes strings as inlineStr (XML-escaped) and numbers as <v>', async () => {
     const files = await entries({ name: 'Receipt', rows: RECEIPT_ROWS });
     const sheet = files.get('xl/worksheets/sheet1.xml')!;
 
-    // Header cell A1 as inline string with preserved whitespace semantics.
-    expect(sheet).toContain('<c r="A1" t="inlineStr" xml:space="preserve"><is><t>EXPENSE RECEIPT</t></is></c>');
+    // Header cell A1 as inline string with preserved whitespace semantics
+    // (xml:space sits on <t>, where Excel itself puts it).
+    expect(sheet).toContain('<c r="A1" t="inlineStr"><is><t xml:space="preserve">EXPENSE RECEIPT</t></is></c>');
     // Numeric amount cell.
     expect(sheet).toContain('<c r="B5"><v>42.5</v></c>');
     // XML-escaped notes.
@@ -145,7 +154,34 @@ describe('xlsx-writer — OOXML structure', () => {
     expect(workbook).toContain('r:id="rId2"');
     expect(files.has('xl/worksheets/sheet2.xml')).toBe(true);
     const sheet2 = files.get('xl/worksheets/sheet2.xml')!;
-    expect(sheet2).toContain('<t>ب</t>');
+    expect(sheet2).toContain('<t xml:space="preserve">ب</t>');
+  });
+
+  it('frames every sheet with a dimension, a default view and column widths', async () => {
+    const files = await entries({ name: 'Receipt', rows: RECEIPT_ROWS });
+    const sheet = files.get('xl/worksheets/sheet1.xml')!;
+    expect(sheet).toContain('<dimension ref="A1:D8"/>'); // 4 columns × 8 rows
+    expect(sheet).toContain('<sheetView workbookViewId="0"/>');
+    expect(sheet).toContain('<cols><col min="1" max="4" width="22" customWidth="1"/></cols>');
+    // Element order per the schema: dimension → sheetViews → cols → sheetData.
+    expect(sheet.indexOf('<dimension')).toBeLessThan(sheet.indexOf('<sheetViews'));
+    expect(sheet.indexOf('<sheetViews')).toBeLessThan(sheet.indexOf('<cols'));
+    expect(sheet.indexOf('<cols')).toBeLessThan(sheet.indexOf('<sheetData'));
+  });
+
+  it('flips the sheet view to right-to-left only when asked', async () => {
+    const rtl = await entries({ name: 'S', rows: [['x']] }, { rtl: true });
+    expect(rtl.get('xl/worksheets/sheet1.xml')!).toContain('<sheetView rightToLeft="1" workbookViewId="0"/>');
+    const ltr = await entries({ name: 'S', rows: [['x']] });
+    expect(ltr.get('xl/worksheets/sheet1.xml')!).not.toContain('rightToLeft');
+  });
+
+  it('writes numbers as plain decimals (never exponent forms in <v>)', async () => {
+    const files = await entries({ name: 'S', rows: [['tiny', 1.2e-7], ['zero', -0]] });
+    const sheet = files.get('xl/worksheets/sheet1.xml')!;
+    expect(sheet).toContain('<c r="B1"><v>0.00000012</v></c>');
+    expect(sheet).toContain('<c r="B2"><v>0</v></c>');
+    expect(sheet).not.toMatch(/[eE][+-]?\d/); // no 1.2e-7 style values
   });
 
   it('is deterministic — identical input produces identical bytes', async () => {

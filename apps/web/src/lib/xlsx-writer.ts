@@ -5,9 +5,16 @@
  *
  * Produces a valid Office Open XML workbook: a STORE-method ZIP (no
  * compression — xlsx readers accept it and it keeps the writer ~150 lines)
- * containing workbook/sheet/styles parts, with cell text as `inlineStr`
- * (no sharedStrings table needed). Output is deterministic (fixed DOS
- * timestamp), so tests can assert byte-for-byte stability.
+ * containing workbook/sheet/styles/docProps parts, with cell text as
+ * `inlineStr` (no sharedStrings table needed). Output is deterministic
+ * (fixed DOS timestamp), so tests can assert byte-for-byte stability.
+ *
+ * 2026-10-18 hardening (the Insights full export must open cleanly in
+ * strict viewers — Excel mobile / WPS repair-or-refuse minimal packages):
+ * docProps parts, a named "Normal" cell style, a per-sheet <dimension> and
+ * <cols> width, xml:space moved onto <t> (the conventional placement), a
+ * plain-decimal guard for numbers (never "1.2e-7" in <v>), and an optional
+ * rightToLeft sheet view for the fa workbook.
  *
  * Scope: string/number grids, one or more named sheets — exactly what the
  * Receipt export needs. Not a general-purpose spreadsheet engine.
@@ -166,18 +173,31 @@ function columnLetters(index: number): string {
   return out;
 }
 
+/** Plain decimal for <v> — xsd:double allows "1.2e-7" but several
+ * spreadsheet viewers mis-parse exponent forms; write plain decimals. */
+function numberToXml(n: number): string {
+  const s = String(n);
+  if (!/[eE]/.test(s)) return s === '-0' ? '0' : s;
+  return n
+    .toFixed(20)
+    .replace(/(\.\d*?)0+$/, '$1')
+    .replace(/\.$/, '')
+    .replace(/^-0$/, '0');
+}
+
 function cellXml(rowNumber: number, columnIndex: number, cell: string | number | null): string {
   if (cell === null || cell === undefined) return '';
   const ref = `${columnLetters(columnIndex)}${rowNumber}`;
   if (typeof cell === 'number') {
     if (!Number.isFinite(cell)) return ''; // never write NaN/Infinity as <v>
-    return `<c r="${ref}"><v>${String(cell)}</v></c>`;
+    return `<c r="${ref}"><v>${numberToXml(cell)}</v></c>`;
   }
-  // Preserve leading/trailing whitespace exactly (xml:space).
-  return `<c r="${ref}" t="inlineStr" xml:space="preserve"><is><t>${escapeXml(cell)}</t></is></c>`;
+  // Preserve leading/trailing whitespace exactly (xml:space on <t>, the
+  // placement Excel itself uses).
+  return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${escapeXml(cell)}</t></is></c>`;
 }
 
-function sheetXml(sheet: XlsxSheet): string {
+function sheetXml(sheet: XlsxSheet, rtlView: boolean): string {
   const rows = sheet.rows
     .map((row, rowIndex) => {
       const r = rowIndex + 1;
@@ -187,9 +207,18 @@ function sheetXml(sheet: XlsxSheet): string {
       return cells === '' ? `<row r="${r}"/>` : `<row r="${r}">${cells}</row>`;
     })
     .join('');
+  // Lightweight viewers rely on <dimension>; <cols> lifts every column off
+  // the 8.43 default so Persian/English names are readable without resizing.
+  const maxCols = sheet.rows.reduce((m, row) => Math.max(m, row.length), 0);
+  const dimension = `A1:${columnLetters(Math.max(0, maxCols - 1))}${Math.max(1, sheet.rows.length)}`;
+  const cols = maxCols > 0 ? `<cols><col min="1" max="${maxCols}" width="22" customWidth="1"/></cols>` : '';
+  const rtlAttr = rtlView ? ' rightToLeft="1"' : '';
   return (
     '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
     `<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">` +
+    `<dimension ref="${dimension}"/>` +
+    `<sheetViews><sheetView${rtlAttr} workbookViewId="0"/></sheetViews>` +
+    cols +
     `<sheetData>${rows}</sheetData>` +
     `</worksheet>`
   );
@@ -200,6 +229,8 @@ const CONTENT_TYPES = (sheetCount: number): string =>
   '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
   '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
   '<Default Extension="xml" ContentType="application/xml"/>' +
+  '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>' +
+  '<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>' +
   '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
   '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
   Array.from(
@@ -213,7 +244,26 @@ const ROOT_RELS =
   '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
   '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
   '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>' +
+  '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>' +
+  '<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>' +
   '</Relationships>';
+
+/** Deterministic doc parts (fixed timestamp) — several strict viewers
+ * (Excel mobile, WPS, QuickLook) expect a docProps floor. */
+const DOC_PROPS_CORE =
+  '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
+  '<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" ' +
+  'xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" ' +
+  'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
+  '<dc:creator>Currena</dc:creator><cp:lastModifiedBy>Currena</cp:lastModifiedBy>' +
+  '<dcterms:created xsi:type="dcterms:W3CDTF">1980-01-01T00:00:00Z</dcterms:created>' +
+  '</cp:coreProperties>';
+
+const DOC_PROPS_APP =
+  '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
+  '<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">' +
+  '<Application>Currena</Application>' +
+  '</Properties>';
 
 function workbookXml(sheets: XlsxSheet[]): string {
   const sheetTags = sheets
@@ -255,6 +305,7 @@ const STYLES =
   '<borders count="1"><border/></borders>' +
   '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
   '<cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs>' +
+  '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>' +
   '</styleSheet>';
 
 /* --------------------------------- API ----------------------------------- */
@@ -264,8 +315,9 @@ export const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsh
 /**
  * Build a .xlsx Blob from one or more sheets. Throws on invalid sheet names
  * (Excel's rules) — validate at the UI boundary, not here in library code.
+ * `opts.rtl` flips every sheet to a right-to-left view (the fa workbook).
  */
-export function buildXlsxBlob(sheets: XlsxSheet[]): Blob {
+export function buildXlsxBlob(sheets: XlsxSheet[], opts?: { rtl?: boolean }): Blob {
   if (sheets.length === 0) throw new Error('xlsx-writer: at least one sheet is required');
   for (const sheet of sheets) {
     if (!/^[^\\/?*[\]:]{1,31}$/.test(sheet.name)) {
@@ -276,12 +328,14 @@ export function buildXlsxBlob(sheets: XlsxSheet[]): Blob {
   const files: { name: string; contents: string }[] = [
     { name: '[Content_Types].xml', contents: CONTENT_TYPES(sheets.length) },
     { name: '_rels/.rels', contents: ROOT_RELS },
+    { name: 'docProps/core.xml', contents: DOC_PROPS_CORE },
+    { name: 'docProps/app.xml', contents: DOC_PROPS_APP },
     { name: 'xl/workbook.xml', contents: workbookXml(sheets) },
     { name: 'xl/_rels/workbook.xml.rels', contents: workbookRels(sheets.length) },
     { name: 'xl/styles.xml', contents: STYLES },
     ...sheets.map((sheet, i) => ({
       name: `xl/worksheets/sheet${i + 1}.xml`,
-      contents: sheetXml(sheet),
+      contents: sheetXml(sheet, opts?.rtl === true),
     })),
   ];
 

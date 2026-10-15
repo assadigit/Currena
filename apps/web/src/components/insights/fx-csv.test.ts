@@ -35,7 +35,7 @@ describe('buildFxCsv', () => {
     } as unknown as FxSnapshot;
     const csv = buildFxCsv(snapshot, insightsCopyEn);
     const lines = csv.split('\r\n');
-    expect(lines[0]).toBe(fxCsvHeaders(insightsCopyEn).join(','));
+    expect(lines[0]).toBe(`\uFEFF${fxCsvHeaders(insightsCopyEn).join(',')}`); // UTF-8 BOM
     // Group order: eurusd (dollarWorld) before audjpy (warningLights).
     expect(lines[1]!.startsWith('Euro vs US dollar')).toBe(true);
     expect(lines[2]!.startsWith('Australian dollar vs yen')).toBe(true);
