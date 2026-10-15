@@ -205,6 +205,18 @@ describe('runValidationSuite — the Part D tests', () => {
     expect(t08.failures.join(' ')).toContain('repeated');
   });
 
+  it('T-08 exempts the administrative rate series whose flat prints are normal (2026-10-15 venue evidence)', () => {
+    // F6's outstanding-loan rate printed 6.21 for three straight months —
+    // the series reprices only as the loan stock rolls. A repeated monthly
+    // print there is NOT the duplicate bug class.
+    const loan = monthlySeries('2026-08-01', 40, (back) => 6.2 + (back % 3 === 0 ? 0.01 : 0));
+    loan[loan.length - 1]!.value = loan[loan.length - 2]!.value;
+    const out = runValidationSuite(suiteInput({ 'au-home-loan': loan }));
+    const t08 = out.results.find((r) => r.test === 'T-08')!;
+    expect(t08.ok).toBe(true);
+    expect(t08.flagged).not.toContain('au-home-loan');
+  });
+
   it('T-09 records a count mismatch when a scored reading sits outside every area', () => {
     // brent is in the prices-heat gauge (B-14) — remove it to simulate the
     // audited misconfiguration and the test must catch the mismatch.

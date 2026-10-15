@@ -453,15 +453,28 @@ const MAX_UNCHANGED_RUN: Readonly<Record<IndicatorDefinition['cadence'], number 
 };
 
 /**
- * Policy-rate step series (2026-10-15, live-run evidence): a central-bank
- * target is SET at decision meetings and legitimately sits unchanged for
- * months or years between them (the Fed's 2008–15 hold ran seven years; the
- * 2026 evidence — 28 unchanged daily prints — is the normal state, not a
- * duplicate). Their run length is judged by the decision calendar
- * (data/insights-calendar.json + data/policy-decisions.json), not the
- * observation cadence; T-04 freshness still guards their staleness.
+ * Administrative rate series whose flat prints are the NORMAL state, not
+ * the "+0.00%" duplicate bug class (live-run evidence 2026-10-15, both
+ * venues):
+ *  - Policy targets SET at decision meetings (fed-target, ecb-dfr,
+ *    rba-cash-rate): a target legitimately sits unchanged for months or
+ *    years (the Fed's 2008–15 hold ran seven years; the 2026 evidence was
+ *    28 unchanged daily prints). Judged by the decision calendar
+ *    (data/insights-calendar.json + data/policy-decisions.json), not the
+ *    observation cadence.
+ *  - Monthly average rates that reprice only as the loan/deposit stock
+ *    rolls (au-home-loan F6 FLRHOOTA, au-deposit-rate F4.1 PDRNTH): the
+ *    recorded venue history prints 6.21 for three straight months — the
+ *    2026-07→08 repetition is the series being itself, not a failed fetch.
+ * T-04 freshness still guards every one of them for staleness.
  */
-const STEP_POLICY_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>(['fed-target', 'ecb-dfr', 'rba-cash-rate']);
+const UNCHANGED_NORMAL_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
+  'fed-target',
+  'ecb-dfr',
+  'rba-cash-rate',
+  'au-home-loan',
+  'au-deposit-rate',
+]);
 
 function t08SuspiciousValues(inputs: ValidationInputs): ValidationTestResult {
   const failures: string[] = [];
@@ -471,7 +484,7 @@ function t08SuspiciousValues(inputs: ValidationInputs): ValidationTestResult {
     const series = seriesOf(inputs, def.id);
     if (!series || series.length < 2) continue;
     const maxRun = MAX_UNCHANGED_RUN[def.cadence];
-    if (maxRun === null || STEP_POLICY_IDS.has(def.id)) continue;
+    if (maxRun === null || UNCHANGED_NORMAL_IDS.has(def.id)) continue;
     const current = pointAtOrBefore(series, nowDay);
     if (!current) continue;
     const idx = series.findIndex((p) => p.date === current.date);
