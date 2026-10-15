@@ -5,6 +5,65 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-18b] — the CSV and XLSX exports open correctly in Excel
+
+The owner on the 2026-10-16b full export: "The xlsx and csv outputs are
+incomplete and not working. md and txt works." Forensics against real
+production data (`/api/insights` + markets + fx, en and fa): the builders
+were complete — a strict RFC-4180 parse-back of the CSV returned every
+section and all 51 readings, and the XLSX passed `unzip -t`, per-part XML
+validation and an openpyxl read-back (10 sheets, 131 rows, real number
+cells). The failure was Excel-side rendering of both formats:
+
+### Fixed
+
+- **CSV: the Persian text was mojibake in Excel.** The export was UTF-8
+  **without a BOM**, so Excel on a fa-Windows machine decodes it as
+  ANSI-1256. Every CSV the app ships now carries the UTF-8 BOM (Excel
+  itself, Google Sheets "CSV for Excel" and every reporting tool do the
+  same; Sheets/pandas strip it) — the full export AND the three
+  long-standing per-table exports (insights / markets / fx).
+- **CSV: the flat 26-slot dump read as "incomplete".** One header row
+  cannot serve nine different tables: each section only filled some of
+  the 26 columns, so Excel showed a sparse matrix with wide gaps. The
+  full CSV now mirrors the MD/TXT structure the owner approved — title +
+  meta floor, then one **dense block per section** (heading line, the
+  section's own header row, its rows), CRLF + trailing CRLF, OWASP guard
+  and ASCII numbers unchanged. The flat `Section`-column API is retired
+  (shipped 2026-10-16b, replaced before any external consumer).
+- **XLSX: the minimal package tripped strict viewers.** openpyxl warned
+  *"Workbook contains no default style"* — the same class of gap that
+  makes Excel mobile / WPS repair-or-refuse hand-rolled packages. The
+  zero-dependency writer now emits the parts real viewers expect:
+  `docProps/core.xml` + `docProps/app.xml` (+ content-type overrides +
+  root rels), a named **"Normal"** cell style, a per-sheet
+  `<dimension ref>` and `<cols>` width 22 (names readable without
+  resizing), `xml:space` moved onto `<t>` (Excel's own placement), and a
+  plain-decimal guard so `<v>` never carries an exponent form
+  (`1.2e-7` → `0.00000012`). Bytes stay deterministic.
+- **XLSX (fa): the workbook now opens right-to-left** —
+  `buildXlsxBlob(sheets, { rtl })` flips every sheet view for the fa
+  export, matching the page. The Receipt export (no opts) is untouched.
+- **The download handler no longer swallows failures** — the
+  `void import(...).then(...)` chain now has a `.catch` that logs loudly
+  instead of a silent nothing-downloaded.
+
+### Verification
+
+Tests 1,331 green (web 443 → 449: BOM + per-section block parse-back +
+writer hardening suites); typecheck 6/6; lint 0 errors / 15 advisories;
+copy audit clean (zero copy changes); budgets held (entry untouched
+294.75/88.52; Insights lazy 603.89/142.61 vs 604/142.8). Browser-verified
+on the harness with real production data — in-page module eval: fa CSV
+BOM + dense blocks (`gold-usd,قیمت طلا…,4194.6,…`), 10 fa sheets, XLSX
+`PK` magic; all four format buttons clicked through the real UI with
+zero console/page errors; 375 px scrollWidth === 375. Production
+(currena.ir): deployed, smoke green, and the deployed
+`full-export-zgApEZWy.js` / `xlsx-writer-DzSEJ58r.js` chunks probed
+in-page — docProps, Normal style, dimension, cols, `rightToLeft`, plain
+decimals and `xml:space`-on-`<t>` all live. Evidence:
+`docs/evidence/2026-10-18-export-fix/`.
+
 ## [2026-10-18] — Round 43: the grades wear their colors again
 
 The owner's feedback on the round-42 result: "Revert colors back to the

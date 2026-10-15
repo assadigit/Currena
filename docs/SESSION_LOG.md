@@ -432,3 +432,45 @@ the known one-reload SW cycle.
 Session closed: production = currena-api `7b5f7896` +
 currena-markets `9b5ff7e0`. **Token rotation still outstanding**
 (owner-side; fifth session).
+
+# SESSION_LOG — Export-Fix Session 2026-10-18b
+
+Branch `main` · base `facda92` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's bug report on the 2026-10-16b full export —
+"The xlsx and csv outputs are incomplete and not working. md and txt
+works."
+
+### 1 · fix(insights): the CSV and XLSX exports open correctly in Excel — `ca991e7`
+**What:** Forensics first (repro script over real production data, en+fa,
+via the builders themselves): the CSV parse-back was clean (116 rows × 26
+cols, every section + all 51 readings) and the XLSX passed `unzip -t`,
+per-part XML validation and an openpyxl read-back (10 sheets, 131 rows,
+real numbers) — the builders were NEVER missing data; Excel-side
+rendering was the failure. Three root causes fixed: (1) BOM-less UTF-8
+CSV → ANSI-1256 mojibake on fa-Windows — every CSV now carries the UTF-8
+BOM (full export + insights/markets/fx); (2) the flat 26-slot CSV dump →
+one dense block per section (title + meta floor, heading, the section's
+own header, its rows — the MD/TXT structure the owner approved; the
+Section-column flat API retired before any external consumer); (3) the
+minimal OOXML package (openpyxl: "Workbook contains no default style";
+Excel-mobile/WPS repair-or-refuse) → the writer emits docProps
+core/app + overrides + rels, a named "Normal" cell style, per-sheet
+<dimension> + <cols> width 22, xml:space on <t>, a plain-decimal <v>
+guard, and an optional rightToLeft sheet view (fa workbook opens RTL;
+Receipt caller untouched; bytes still deterministic). Plus a loud .catch
+on the export handler (never a silent nothing-downloaded again).
+**Evidence:** tests 1,331 green (web +6: BOM, block parse-back with a
+tiny RFC-4180 parser, writer part list, Normal style, dimension/cols
+order, rtl on/off, exponent guard); typecheck 6/6; lint 0 errors/15
+advisories; copy:audit clean; budgets held (entry untouched 294.75/88.52;
+Insights lazy 603.89/142.61 vs 604/142.8). Browser: in-page module eval
+with prod data (fa CSV BOM + dense rows, 10 fa sheets, PK magic; en
+verdict row dense), all four format buttons clicked through the real UI
+zero-error, 375 px no-bleed. Production: deployed `be5c0121` from
+`ca991e7`, CI green, smoke green, deployed chunks probed in-page (every
+hardening live), evidence in `docs/evidence/2026-10-18-export-fix/`.
+
+### 2 · wrap-up — docs + evidence
+CHANGELOG §2026-10-18b, DEPLOY session record, PROGRESS status row,
+NEXT_SESSION_PROMPT rewritten, evidence README + artifact samples +
+screenshots.

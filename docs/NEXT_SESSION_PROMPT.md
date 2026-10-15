@@ -1,16 +1,21 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-18 (Round 43 — the grades wear their colors
-again: the owner's five-item follow-up on the round-42 hero cards
-shipped, deployed and production-verified — currena-api `7b5f7896`
-from HEAD `d643353`, currena-markets `9b5ff7e0` untouched; see
-CHANGELOG 2026-10-18, docs/QA/quirks-2026-10-18-round43.md,
-docs/DEPLOY.md's last session record and
-docs/evidence/2026-10-18-round43/).
+Hand-off date: 2026-10-18b (export-fix session — the owner's bug report
+"The xlsx and csv outputs are incomplete and not working. md and txt
+works." forensically diagnosed (the builders were complete; the failure
+was Excel-side: BOM-less UTF-8 CSV mojibake on fa-Windows, the flat
+26-slot sparse matrix, and the minimal OOXML package tripping strict
+viewers) and fixed — every CSV ships with the UTF-8 BOM, the full CSV is
+one dense block per section (the MD/TXT structure), the xlsx-writer is
+hardened (docProps floor, named "Normal" style, per-sheet dimension +
+cols width, xml:space on <t>, plain-decimal <v>, rightToLeft fa sheet
+views), and the download handler fails loudly. Deployed currena-api
+`be5c0121` from HEAD `ca991e7`, currena-markets `9b5ff7e0` untouched;
+see CHANGELOG 2026-10-18b, docs/DEPLOY.md's last session record and
+docs/evidence/2026-10-18-export-fix/).
 · Production: https://currena.ir
-· The round-43 commission is CLOSED; round 42, the export commission
-  and the quirk-pass commission are CLOSED
-  (docs/QA/quirks-2026-10-16.md). Do not reopen declined items.
+· The export-fix, round-43, round-42 and quirk-pass commissions are all
+  CLOSED. Do not reopen declined items.
 
 ---
 
@@ -37,7 +42,7 @@ Workers (Free plan, permanently — see the I0 gate decision).
 - `apps/web` — Vite + React + TS + Tailwind **PWA** (hash router,
   routes: Converter, LiveRates, History, BatchConverter, Calculator,
   Splitter, Settle, Receipt, About, Insights) en/fa RTL, light+dark.
-  Insights is a lazy chunk (603.84/142.59 vs 604/142.8 budget — thin).
+  Insights is a lazy chunk (603.89/142.61 vs 604/142.8 budget — thin).
 - `packages/core` — zod contracts (`schemas.ts` — **storage
   compatibility is sacred**).
 - `packages/insights` — compute engine: scoring, validation (T-01…T-14),
@@ -57,15 +62,21 @@ never hit live sites, secrets never persisted. Then this file,
 commission's record), `docs/QA/quirks-2026-10-17-hero-calm.md` and
 `docs/QA/quirks-2026-10-16.md` (the prior ones), `FIX_REPORT.md`.
 
-## 2. Current verified state (2026-10-18 close)
+## 2. Current verified state (2026-10-18b close)
 
-- Gates green at close: **1,325 tests** (core 191 · scraper 67 ·
-  insights 403 · markets 13 · api 208 · web 443), typecheck 6/6, lint
+- Gates green at close: **1,331 tests** (core 191 · scraper 67 ·
+  insights 403 · markets 13 · api 208 · web 449), typecheck 6/6, lint
   0 errors / 15 accepted advisories (D-24), copy audit clean, budgets
-  held (entry 294.75/88.53 vs 296/89.5; Insights lazy **603.84/142.59**
-  vs 604/142.8 — round 43 was absorbed by deduping the BULLET_DOT
-  element; NO bump this round; the export builders remain separate
-  lazy chunks).
+  held (entry 294.75/88.52 vs 296/89.5; Insights lazy **603.89/142.61**
+  vs 604/142.8; the export builders remain separate lazy chunks —
+  full-export + xlsx-writer + panel, none budget-tracked).
+- The export surface (2026-10-18b): every CSV carries the UTF-8 BOM;
+  the full CSV is one dense block per section (title + meta floor,
+  heading, the section's own header row, its rows — MD/TXT structure);
+  the xlsx-writer emits docProps + Normal style + dimension + cols +
+  `xml:space`-on-`<t>` + plain-decimal `<v>` + optional rightToLeft
+  sheet views (the fa workbook opens RTL); the download handler logs
+  failures loudly. Receipt's XLSX (no opts) untouched.
 - Live data floor: 51 readings, ruleVersion 2, validation 14/14, no
   failed sources; archive serving; freshness chain (D-12 + D-13)
   verified intact post-deploy.
@@ -96,21 +107,20 @@ commission's record), `docs/QA/quirks-2026-10-17-hero-calm.md` and
    U+066B separator, KOSPI's yellow bear chip, flap-board ASCII
    digits, wrapped-title tile drift, the repeated fa header date, the
    FAB overlap. Deliberate conventions or deliberate patterns.
-4. **Bundle budgets**: entry 296/89.5 (294.75/88.53 measured);
-   Insights lazy **604/142.8** (603.84/142.59 measured — round 43 fit
-   inside the budget by deduping the shared BULLET_DOT element; the
-   export builders are separate lazy chunks). Any further
-   Insights-chunk growth needs its own justification. NOTE: the
-   meters now wear the FOUR-STEP status colours at every size (round
-   43 owner decree — this REVERSES round 42's one-neutral-ink note;
-   do not re-neutralise them).
+4. **Bundle budgets**: entry 296/89.5 (294.75/88.52 measured);
+   Insights lazy **604/142.8** (603.89/142.61 measured; the export
+   builders are separate lazy chunks). Any further Insights-chunk
+   growth needs its own justification. NOTE: the meters now wear the
+   FOUR-STEP status colours at every size (round 43 owner decree —
+   this REVERSES round 42's one-neutral-ink note; do not re-neutralise
+   them).
 5. **i18n copy corpora** (`insights-copy-en/fa.ts`) and
    `packages/core/src/schemas.ts` — data-file and sacred-surface;
    unchanged policy.
 6. **Owner-side items**: Telegram ingest-alert secrets, the I7
    launch-approval exit gate (BACKTEST review), the signals-wording
    legal read (S3), connection-evidence confirmations, **token
-   rotation** (all three tokens have now transited chat across five
+   rotation** (all three tokens have now transited chat across six
    sessions — this is the strongest rotation nudge yet).
 
 ## 4. Session workflow (per AGENTS.md, enforced)
@@ -195,6 +205,20 @@ commission's record), `docs/QA/quirks-2026-10-17-hero-calm.md` and
   JSON.stringify the whole file; it reformats 22k lines).
 - **agent-browser screenshot paths are relative to ITS cwd** — pass
   absolute paths or the save silently fails.
+- **CSV exports for spreadsheet users MUST carry the UTF-8 BOM** —
+  BOM-less UTF-8 decodes as ANSI-1256 on fa-Windows Excel (mojibake);
+  Sheets/pandas strip the BOM, so it costs nothing elsewhere. Also:
+  one flat table cannot serve nine different column layouts — a
+  per-section dense block (own header per block) is what "complete"
+  looks like in Excel.
+- **A minimal-but-valid OOXML package is NOT enough for strict
+  viewers** — emit the docProps floor, a named "Normal" cellStyle, a
+  per-sheet <dimension> + <cols>, xml:space on <t> (not <c>), and
+  plain-decimal <v> (no exponent forms). openpyxl's warnings are the
+  cheap proxy for Excel-mobile/WPS strictness.
+- **`void import(...).then(...)` chains need a .catch** — an unhandled
+  rejection in a download handler = silent nothing-downloaded, which
+  the owner reports as "not working" with zero diagnostic trail.
 
 ## 6. Credentials (the owner pastes fresh ones at session start)
 

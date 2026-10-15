@@ -1202,3 +1202,42 @@ Commission: the owner's five-item follow-up on the round-42 result
   at sentence starts; Australia leads with 6 attention tiles; Global's
   reveal still works (3 → 6); 375 px scrollWidth === 375; zero page
   errors / console messages.
+
+## Session record — 2026-10-18b the CSV and XLSX exports open in Excel
+
+The owner's bug report on the 2026-10-16b full export: "The xlsx and csv
+outputs are incomplete and not working. md and txt works." Forensics
+(repro against real production data, en+fa) proved the builders complete
+— the failure was Excel-side: BOM-less UTF-8 CSV → ANSI-1256 mojibake on
+fa-Windows, the flat 26-slot dump reading as a sparse "incomplete"
+matrix, and the minimal OOXML package tripping strict viewers (openpyxl:
+"Workbook contains no default style"). Fixes: UTF-8 BOM on every CSV
+(full + insights/markets/fx), the full CSV restructured to one dense
+block per section (MD/TXT structure), and the xlsx-writer hardened
+(docProps floor, named "Normal" style, per-sheet dimension + cols width,
+xml:space on <t>, plain-decimal <v> guard, optional rightToLeft sheet
+view — the fa workbook opens RTL). Plus a loud .catch on the download
+handler. Feature commit `ca991e7` (CHANGELOG §2026-10-18b).
+
+- **Deployed**: currena-api **`be5c0121-c856-447c-9b4e-b97d90cf95a2`**
+  (2026-10-18) from HEAD `ca991e7`. Cron `* * * * *` + KV intact.
+- **currena-markets NOT redeployed** (`9b5ff7e0` stays current — zero
+  markets imports touched).
+- **Gates at deploy**: tests 1,331 green (core 191 · scraper 67 ·
+  insights 403 · markets 13 · api 208 · web 449 — +6 export tests),
+  typecheck 6/6, lint 0 errors / 15 advisories, copy audit clean (zero
+  copy changes), budgets held (entry 294.75/88.52 untouched; Insights
+  lazy 603.89/142.61 vs 604/142.8).
+- **CI**: green on the pushed HEAD (`ca991e7`), verified via API.
+- **Post-deploy smoke on currena.ir**: `/api/health` 200 (kv ok);
+  `/api/insights` 51 readings, ruleVersion 2; `/admin` 401; convert
+  parity 100 USD → 26,790,000 IRR @ 267,900 (tgju live).
+- **Production re-verified** (after the one plain reload — the known SW
+  update cycle): the export panel opens with all four fa format rows;
+  CSV + XLSX clicked through the real UI with zero page/console errors;
+  the deployed lazy chunks probed in-page
+  (`full-export-zgApEZWy.js`, `xlsx-writer-DzSEJ58r.js`) — BOM'd dense
+  fa CSV (`gold-usd,قیمت طلا…,4194.6,…`), 10 sheets, `PK` magic, and
+  every writer hardening present (docProps, Normal style, dimension,
+  cols, rightToLeft, plain decimals, xml:space on <t>); 375 px
+  scrollWidth === 375. Evidence: `docs/evidence/2026-10-18-export-fix/`.
