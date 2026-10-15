@@ -194,7 +194,12 @@ export default {
   },
 };
 
-/* Test-only resets re-exported so existing test imports stay stable. */
+/* Test-only resets re-exported so existing test imports stay stable.
+ * NOTE: workerd's local dev runtime rejects non-handler VALUE exports —
+ * only functions / ExportedHandlers may pass through `export { … }` here.
+ * PRICES_CRON_MINUTE (a number) is therefore imported from './cron' by
+ * tests directly; re-exporting it here breaks `wrangler dev` (it deployed
+ * fine, which is how this slipped past CI — caught 2026-10-15 polish pass). */
 export { __resetRateLimiterForTests } from './security';
 export { __resetSnapshotMemoForTests } from './default-service';
-export { PRICES_CRON_MINUTE, runScheduledPricesRefresh, runScheduled } from './cron';
+export { runScheduled, runScheduledPricesRefresh } from './cron';

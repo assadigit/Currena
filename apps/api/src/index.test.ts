@@ -3,7 +3,8 @@ import { convert } from '@currena/core';
 import { InMemoryRateStore } from '@currena/scraper';
 import type { PricesJobFetchers } from '@currena/insights/prices';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createApp, __resetRateLimiterForTests, PRICES_CRON_MINUTE, runScheduledPricesRefresh, type Bindings } from './index';
+import { PRICES_CRON_MINUTE, runScheduledPricesRefresh } from './cron';
+import { createApp, __resetRateLimiterForTests, type Bindings } from './index';
 import { MetaResponseSchema } from '@currena/core';
 import { RatesService } from './rates-service';
 
