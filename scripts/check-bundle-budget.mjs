@@ -281,7 +281,12 @@ const BUDGETS = [
   // (route halves; every section independently navigable) for a 0.23%
   // raw cost on a lazy chunk. Justified in CHANGELOG §2026-10-15
   // (Phase 3-e) + D-16 in docs/DECISIONS_FOR_ALI.md.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 582_000, gz: 137_000, label: 'Insights lazy chunk' },
+  // Fix-spec bump (599.37/141.52 → budgets 600/142): the four Part-C cards
+  // (fed-expectations, us30y, philly-fed, rba-expectations) carry full
+  // bilingual copy — 11 fields × 2 locales ≈ +17 kB raw / +4.5 kB gz on the
+  // lazy chunk. The ENTRY chunk stays untouched (294.61/88.50 vs 296/89.5).
+  // Justified in CHANGELOG §2026-10-15 (insights fix spec Part C).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 600_000, gz: 142_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

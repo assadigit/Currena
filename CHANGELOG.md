@@ -5,6 +5,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-15d] — INSIGHTS_FIX_SPEC: Parts A–D implemented
+
+The 14-October insights audit's fix spec, implemented in full (A:
+foundation, B: fixes, C: additions, D: validation). Commits 2dd2eae →
+04d36bc. FIX_REPORT.md carries the item-by-item verification record.
+
+### Bundle budget (this entry's own justification)
+
+The Insights lazy chunk grew 582 → 599.37 kB raw / 137 → 141.52 kB gz
+(budgets now 600/142): the four Part-C cards (fed-expectations, us30y,
+philly-fed, rba-expectations) carry full bilingual copy — 11 fields ×
+2 locales. The ENTRY chunk is untouched (294.61/88.50 vs 296/89.5).
+
+### What changed (one line each)
+
+- **A**: indicators.json registry (51 entries, CI-pinned); generated
+  needs-attention text (the hand-written `meaning` maps are gone);
+  T-01…T-14 validation suite runs before every publish; check-pending
+  holds last-good values; daily archive (insights:archive:v1:<date>);
+  context notes (off by default); rule version 2 shown on every card;
+  /api/insights/status + the About-this-data run status.
+- **B**: full-history record peaks with basis (gold 5,586.20 · silver
+  121.30 · BTC 126,198.07 — all daily-high, 2026-01-29/2025-10-06;
+  Brent 138.21 close 2026-04-07); M2 duplicate detection; the dollar
+  speed rule wired to the hero; the relationship cards rewritten as
+  explicit rules (windows, pass-through, context legs); release/decided/
+  effective dates; quarter labels; UTC timestamps; stale tags; same-date
+  gaps; sources on every card; hero counts from the gauge membership
+  (37 voters); live-snapshot ratios; points-not-percent on rate charts;
+  the real-return-on-savings line; "highest since {year}".
+- **C**: the four additions (above) + the ECB decision day on the
+  calendar (29 Oct, own timezone; tz now stored on every event).
+- **D**: the ingest runs the suite before publishing (a flagged reading
+  never reaches the page fresh); fixtures/regression-episodes.json
+  (COVID-2020 + inflation-2022, 11 cases, replayed every run and in
+  CI); scripts/safety-demo.ts (the operator's broken-input demo);
+  KV-read/write/outside-request budget printed every run.
+
 ## [2026-10-15c] — D-25/D-26/D-27 decided: all three KEEP (WS-6 fully closed)
 
 The owner's reply arrived in session chat — "do the D25 D26 D27" —
