@@ -130,6 +130,20 @@ describe('formatJalaliDate (Intl persian calendar — no jalaali dependency)', (
       '۱۴۰۵/۰۷/۱۵، ۱۵:۴۶:۲۵',
     );
   });
+
+  it('withClock renders MINUTE precision — no seconds (2026-10-16 quirk pass: en/fa parity on the Insights header line)', () => {
+    expect(formatDate('2026-10-07T15:46:25.777Z', 'en-US', { withClock: true })).toBe(
+      '10/07/2026, 03:46 PM',
+    );
+    // Same Persian-comma join as withTime, without the trailing :25 seconds.
+    expect(formatJalaliDate('2026-10-07T15:46:25.777Z', 'fa-IR', { withClock: true })).toBe(
+      '۱۴۰۵/۰۷/۱۵، ۱۵:۴۶',
+    );
+    // withTime keeps the second stamp — LiveRates + the result popup rely on it.
+    expect(formatDate('2026-10-07T15:46:25.777Z', 'en-US', { withTime: true })).toBe(
+      '10/07/2026, 03:46:25 PM',
+    );
+  });
 });
 
 describe('formatRelative (legacy getTimeAgo parity + fa)', () => {

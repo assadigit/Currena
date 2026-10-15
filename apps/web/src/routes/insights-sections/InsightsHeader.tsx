@@ -77,10 +77,16 @@ export function InsightsHeader({
     const pricesIso = state.snapshot.pricesAsOf;
     // Fix spec B-08 (2026-10-14): the time carries its time ZONE — the
     // quotes are stamped in UTC (shown in the details), never a naked clock.
+    // 2026-10-16 quirk pass: fa now uses the MINUTE-precision clock
+    // (withClock) instead of the second-stamped withTime — the en line
+    // renders hour:minute, and fa showing ۱۰:۱۳:۱۷ against en "10:13 am"
+    // read as two different precisions of the same number. LiveRates and
+    // the convert result popup keep the second-stamped withTime (both
+    // locales show seconds there — consistency is per-surface).
     const pricesText =
       pricesIso !== undefined
         ? locale === 'fa'
-          ? `${formatJalaliDate(pricesIso, 'fa-IR', { withTime: true })} (UTC)`
+          ? `${formatJalaliDate(pricesIso, 'fa-IR', { withClock: true })} (UTC)`
           : `${new Intl.DateTimeFormat('en-AU', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }).format(new Date(pricesIso))} UTC`
         : null;
     return {

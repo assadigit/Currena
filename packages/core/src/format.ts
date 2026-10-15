@@ -159,6 +159,12 @@ export function formatCurrencyAmount(
 export interface DateFormatOptions {
   /** Append HH:mm:ss (local time). */
   withTime?: boolean;
+  /** Append HH:mm (local time, MINUTE precision — no seconds). The
+   * Insights header's "prices updated" line pairs this with the en
+   * rendering (hour:minute) so both locales carry the same precision:
+   * second-level digits on an hourly-refresh series read as false
+   * precision (2026-10-16 UI/UX quirk pass). */
+  withClock?: boolean;
 }
 
 function parseIso(iso: string): Date {
@@ -196,6 +202,7 @@ export function formatDate(iso: string, locale: Locale, opts: DateFormatOptions 
     month: '2-digit',
     day: '2-digit',
     ...(opts.withTime ? { hour: '2-digit', minute: '2-digit', second: '2-digit' } : {}),
+    ...(opts.withClock ? { hour: '2-digit', minute: '2-digit' } : {}),
     ...(isDateOnly(iso) ? { timeZone: 'UTC' } : {}),
   }).format(parseIso(iso));
 }
@@ -228,6 +235,7 @@ export function formatJalaliDate(iso: string, locale: Locale, opts: DateFormatOp
     month: '2-digit',
     day: '2-digit',
     ...(opts.withTime ? { hour: '2-digit', minute: '2-digit', second: '2-digit' } : {}),
+    ...(opts.withClock ? { hour: '2-digit', minute: '2-digit' } : {}),
     ...(isDateOnly(iso) ? { timeZone: 'UTC' } : {}),
   }).format(parseIso(iso));
   // ICU joins a fa-IR persian date and time with a LATIN comma + space
