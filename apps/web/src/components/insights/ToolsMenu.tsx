@@ -12,11 +12,12 @@
  * R15's "counts did not match the lane on screen" fix).
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { formatNumber } from '@currena/core';
 import { CalendarDays, Download, Search, Wrench } from 'lucide-react';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import type { StatusFilter } from './config';
+import { clampPanelToViewport } from '../../lib/clamp-panel';
 
 /** Active chip surface per tier — the I6 deep-ink families. */
 const CHIP_ACTIVE: Readonly<Record<StatusFilter, string>> = {
@@ -68,6 +69,16 @@ export function ToolsMenu({
 }: ToolsMenuProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const filtering = status !== 'all' || query.trim() !== '';
+
+  // 2026-10-16 fix: the `end-0` anchor flips side with the writing
+  // direction and slid this panel 75 px off-screen at 375 px EN (and did
+  // the mirrored thing in fa) — clamp the open panel inside the viewport
+  // (the same treatment the export panel got the same day).
+  useLayoutEffect(() => {
+    if (!open) return;
+    const panel = panelRef.current?.querySelector<HTMLElement>('#insights-tools-panel');
+    if (panel) clampPanelToViewport(panel);
+  }, [open]);
 
   // Escape closes and returns focus to the button; outside click closes.
   useEffect(() => {
