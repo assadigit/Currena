@@ -11,6 +11,7 @@ import { bitstampOhlcUrl, fetchBitstampCloses } from './bitstamp';
 import { parseManualSeries } from './manual';
 import { fetchEcbDfrSeries, ECB_DFR_SERIES_KEY } from './ecb';
 import { fetchRbaSeries, RBA_TABLES, rbaTableUrl } from './rba';
+import { computeHighestSinceYear } from './derived';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const FIXTURES = join(HERE, '..', '..', 'fixtures');
@@ -298,5 +299,66 @@ describe('manual series loader', () => {
       parseManualSeries({ ...file, observations: [...file.observations, { date: '2026-08-01', value: 50 }] }, 'china-pmi'),
     ).toThrow(/duplicate observation/);
     expect(() => parseManualSeries({ ...file, observations: [] }, 'china-pmi')).toThrow(/schema validation/);
+  });
+});
+
+describe('computeHighestSinceYear (fix spec B-19 — episode-aware long-history context)', () => {
+  it('skips the trailing cluster: the 10-year at 5.21 under its own October high names the last independent year, not this one', () => {
+    // The live 2026-10 evidence shape: the October cluster (5.31 high) then
+    // 5.21 today; nothing between 2007 and the cluster reached 5.21.
+    const series = [
+      { date: '2007-06-12', value: 5.29 },
+      { date: '2023-10-02', value: 4.98 },
+      { date: '2026-10-05', value: 5.31 },
+      { date: '2026-10-06', value: 5.27 },
+      { date: '2026-10-07', value: 5.28 },
+      { date: '2026-10-08', value: 5.22 },
+      { date: '2026-10-09', value: 5.24 },
+      { date: '2026-10-13', value: 5.21 },
+    ];
+    expect(computeHighestSinceYear(series)).toBe(2007);
+  });
+
+  it('a genuine record reads the last pre-record year (the 5.31 touch: highest since 2002)', () => {
+    const series = [
+      { date: '2002-04-01', value: 5.5 },
+      { date: '2007-06-12', value: 5.29 },
+      { date: '2026-10-01', value: 5.25 },
+      { date: '2026-10-05', value: 5.31 },
+    ];
+    // The 5.25 of Oct 1 rides within ±2% of 5.31 — part of the same move,
+    // skipped; the last independent ≥5.31 sighting was April 2002.
+    expect(computeHighestSinceYear(series)).toBe(2002);
+  });
+
+  it("no claim when the level was reached within the reading's own year outside the episode", () => {
+    const series = [
+      { date: '2026-01-15', value: 5.3 },
+      { date: '2026-03-01', value: 4.5 },
+      { date: '2026-10-13', value: 5.21 },
+    ];
+    expect(computeHighestSinceYear(series)).toBeUndefined();
+  });
+
+  it('no claim when a crash lands just under a same-year peak', () => {
+    const series = [
+      { date: '2020-01-02', value: 3.0 },
+      { date: '2026-10-12', value: 6.0 },
+      { date: '2026-10-13', value: 5.0 },
+    ];
+    expect(computeHighestSinceYear(series)).toBeUndefined();
+  });
+
+  it("a whole-history record floors at the first observation's year", () => {
+    const series = [
+      { date: '2016-01-04', value: 2.6 },
+      { date: '2020-01-02', value: 1.7 },
+      { date: '2026-10-13', value: 5.56 },
+    ];
+    expect(computeHighestSinceYear(series)).toBe(2016);
+  });
+
+  it('too short to search', () => {
+    expect(computeHighestSinceYear([{ date: '2026-10-13', value: 5 }])).toBeUndefined();
   });
 });

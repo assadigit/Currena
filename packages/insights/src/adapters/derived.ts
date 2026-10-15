@@ -491,20 +491,43 @@ export function computePeaks(
 /**
  * Fix spec B-19 (2026-10-14): the year of the last time the value was this
  * high, found by searching the full stored history backward from the newest
- * observation — a 10-year window cannot say "highest since 2002". Returns
- * undefined when the history is too short to search.
+ * observation — a 10-year window cannot say "highest since 2002".
+ *
+ * Episode-aware (live-run evidence 2026-10-15): the backward search first
+ * SKIPS the trailing run at approximately the current level (±2%) — the
+ * current move itself. Without the skip, a reading that sits a hair under
+ * its own recent high claims "highest since {this year}" — true and
+ * useless (the 10-year at 5.21 under October's own 5.31). With it, the
+ * claim names the last INDEPENDENT time the level was reached. Returns
+ * undefined when no multi-year claim is honest (the level was also reached
+ * within the reading's own year, or the history is too short).
  */
 export function computeHighestSinceYear(series: readonly SeriesPoint[]): number | undefined {
   if (series.length < 2) return undefined;
   const current = series[series.length - 1]!;
-  for (let i = series.length - 2; i >= 0; i--) {
+  const currentYear = Number(current.date.slice(0, 4));
+  // 1. Skip the trailing episode: the contiguous run within ±2% of the
+  //    current level (a 2% band: the yield cluster of one move, not the
+  //    decade's highs).
+  const floor = current.value * 0.98;
+  const ceiling = current.value * 1.02;
+  let i = series.length - 2;
+  while (i >= 0 && series[i]!.value >= floor && series[i]!.value <= ceiling) i--;
+  // 2. The last independent time the level was reached.
+  for (; i >= 0; i--) {
     if (series[i]!.value >= current.value) {
-      return Number(series[i]!.date.slice(0, 4));
+      const year = Number(series[i]!.date.slice(0, 4));
+      // Reached again within the reading's own year (after the episode) —
+      // no multi-year claim is honest; say nothing.
+      return year >= currentYear ? undefined : year;
     }
   }
-  // The current value is the highest of the whole stored history — the year
-  // of the first observation is the honest floor.
-  return Number(series[0]!.date.slice(0, 4));
+  // 3. Nothing before the episode ever reached this level — the current
+  //    value is the highest of the whole stored history; the first
+  //    observation's year is the honest floor (and only when it is a
+  //    genuinely earlier year).
+  const firstYear = Number(series[0]!.date.slice(0, 4));
+  return firstYear < currentYear ? firstYear : undefined;
 }
 
 /**
