@@ -7,13 +7,15 @@
  * them; the world sections' CSV exports arrive as already-gated props.
  */
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { formatJalaliDate, formatDateWords } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { Locale } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { ToolsMenu } from '../../components/insights/ToolsMenu';
+import { DataExportMenu } from '../../components/insights/DataExportMenu';
+import type { ExportFormat } from '../../components/insights/full-export';
 import type { MarketsLoadState } from '../../components/insights/WorldMarkets';
 import type { FxLoadState } from '../../components/insights/WorldCurrencies';
 import { statusCounts, type StatusFilter } from '../../components/insights/config';
@@ -117,6 +119,35 @@ export function InsightsHeader({
     );
   }, [state, locale]);
 
+  // The one-file "download all data" export (owner request 2026-10-16):
+  // every section of the page in one MD / TXT / CSV / XLSX file. The whole
+  // builder module is dynamically imported, so the Insights page chunk
+  // never carries it; the export uses the same in-memory snapshots the
+  // page renders (snapshot + the two world feeds when they are ready).
+  const [exportOpen, setExportOpen] = useState(false);
+  const exportButtonRef = useRef<HTMLButtonElement | null>(null);
+  const downloadAll = useCallback(
+    (format: ExportFormat) => {
+      if (state.kind !== 'ready') return;
+      void import('../../components/insights/full-export').then(async ({ buildInsightsExportFile, insightsExportFilename }) => {
+        const file = await buildInsightsExportFile(
+          {
+            snapshot: state.snapshot,
+            copy,
+            locale,
+            title: t('insights.title'),
+            markets: marketsState.kind === 'ready' ? marketsState.snapshot : null,
+            fx: fxState.kind === 'ready' ? fxState.snapshot : null,
+          },
+          format,
+        );
+        const { downloadBlob } = await import('../../lib/download');
+        downloadBlob(file.blob, insightsExportFilename(state.snapshot.generatedAt, file.ext));
+      });
+    },
+    [state, copy, locale, t, marketsState, fxState],
+  );
+
   return (
     <header className="mb-3">
       <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
@@ -136,25 +167,30 @@ export function InsightsHeader({
             </p>
           ) : null}
         </div>
-        {/* R15: ONE Tools disclosure — search, filter, shortcuts, .ics, CSV. */}
+        {/* R15: ONE Tools disclosure — search, filter, shortcuts, .ics, CSV.
+            Beside it, the one-file "download all data" export (2026-10-16
+            owner request): one button, four formats (MD/TXT/CSV/XLSX). */}
         {state.kind === 'ready' ? (
-          <ToolsMenu
-            copy={copy}
-            numberLocale={numberLocale}
-            open={toolsOpen}
-            onOpenChange={setToolsOpen}
-            counts={laneCounts}
-            status={statusFilter}
-            onStatusChange={setStatusFilter}
-            query={query}
-            onQueryChange={setQuery}
-            searchInputRef={searchInputRef}
-            buttonRef={toolsButtonRef}
-            onDownloadCsv={downloadCsv}
-            onDownloadIcs={downloadIcs}
-            onDownloadMarketsCsv={marketsState.kind === 'ready' ? downloadMarketsCsv : undefined}
-            onDownloadFxCsv={fxState.kind === 'ready' ? downloadFxCsv : undefined}
-          />
+          <div className="flex flex-wrap items-start gap-2">
+            <DataExportMenu copy={copy} open={exportOpen} onOpenChange={setExportOpen} buttonRef={exportButtonRef} onPick={downloadAll} />
+            <ToolsMenu
+              copy={copy}
+              numberLocale={numberLocale}
+              open={toolsOpen}
+              onOpenChange={setToolsOpen}
+              counts={laneCounts}
+              status={statusFilter}
+              onStatusChange={setStatusFilter}
+              query={query}
+              onQueryChange={setQuery}
+              searchInputRef={searchInputRef}
+              buttonRef={toolsButtonRef}
+              onDownloadCsv={downloadCsv}
+              onDownloadIcs={downloadIcs}
+              onDownloadMarketsCsv={marketsState.kind === 'ready' ? downloadMarketsCsv : undefined}
+              onDownloadFxCsv={fxState.kind === 'ready' ? downloadFxCsv : undefined}
+            />
+          </div>
         ) : null}
       </div>
     </header>

@@ -1475,6 +1475,22 @@ export const insightsCopyEn = {
       'Indicators describe the past and present, not the future. Data can be delayed, revised or wrong. Before acting on money decisions, check primary sources and consider qualified advice: Currena is not licensed to provide it.',
     // I13: the snapshot CSV export (About this data → download button).
     downloadCsv: 'Download the data (CSV)',
+    // 2026-10-16 owner request: the one-file "download all data" export
+    // (MD / TXT / CSV / XLSX) — the button lives beside Tools in the header.
+    exportAllLabel: 'Download data',
+    exportAllTitle: 'All the data on this page',
+    exportAllNote: 'One file with every section of this page.',
+    exportFormatMd: 'Markdown (.md)',
+    exportFormatTxt: 'Plain text (.txt)',
+    exportFormatCsv: 'CSV spreadsheet (.csv)',
+    exportFormatXlsx: 'Excel workbook (.xlsx)',
+    exportSection: 'Section',
+    exportDetail: 'Details',
+    exportPosition: 'Position',
+    exportColDate: 'Date',
+    exportRuleVersion: 'Rule version: {v}',
+    exportVerdictCounts: '{warning} of {voting} in warning',
+    changedThisWeekTitle: 'Changed this week',
     csvHint:
       'Every indicator on this page with its value, changes and source: plain numbers, ready for any spreadsheet.',
     csvColId: 'ID',

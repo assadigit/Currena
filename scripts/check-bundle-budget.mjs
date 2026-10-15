@@ -286,7 +286,16 @@ const BUDGETS = [
   // bilingual copy — 11 fields × 2 locales ≈ +17 kB raw / +4.5 kB gz on the
   // lazy chunk. The ENTRY chunk stays untouched (294.61/88.50 vs 296/89.5).
   // Justified in CHANGELOG §2026-10-15 (insights fix spec Part C).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 600_000, gz: 142_000, label: 'Insights lazy chunk' },
+  // Export-feature bump (599.53/141.53 → budgets 604/142.8): the one-file
+  // "download all data" export (owner request 2026-10-16, MD/TXT/CSV/XLSX).
+  // The builders (full-export 11.18 kB + xlsx-writer 5.57 kB + the format
+  // panel 2.75 kB) are all SEPARATE lazy chunks — the Insights chunk itself
+  // grows only by the trigger button + the download handler + 14 copy
+  // strings × 2 locales + the shared popover viewport-clamp fix (which also
+  // fixed the pre-existing Tools-panel off-screen bug) = 603.71 kB raw /
+  // 142.72 kB gz measured. Justified in CHANGELOG §2026-10-16 (insights
+  // full export). Entry chunk untouched (294.75/89.36 vs 296/89.5).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 604_000, gz: 142_800, label: 'Insights lazy chunk' },
 ];
 
 function main() {
