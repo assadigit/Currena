@@ -8,6 +8,7 @@
  * Synthetic series only (AGENTS.md rule 7): no fixtures, no network.
  */
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { IndicatorId, IndicatorReading, InsightsSnapshot } from '@currena/core';
 import { DEFINITIONS } from './definitions';
@@ -265,6 +266,20 @@ describe('runValidationSuite — the Part D tests', () => {
     ];
     const bad = runValidationSuite(suiteInput({}, { episodes: tampered }));
     expect(bad.results.find((r) => r.test === 'T-14')!.ok).toBe(false);
+  });
+
+  // Fix spec T-14 (2026-10-15): the REAL episodes file — cut from live
+  // history (COVID 2020, inflation 2022) — replays clean in CI, so a rule
+  // change that flips any recorded status fails the build, not the page.
+  it('T-14 replays the saved episodes file (fixtures/regression-episodes.json)', () => {
+    const raw: unknown = JSON.parse(readFileSync(new URL('../fixtures/regression-episodes.json', import.meta.url), 'utf8'));
+    const file = raw as { episodes: readonly RegressionEpisode[] };
+    expect(file.episodes.length).toBeGreaterThanOrEqual(2);
+    expect(file.episodes.reduce((n, e) => n + e.cases.length, 0)).toBeGreaterThanOrEqual(10);
+    const out = runValidationSuite(suiteInput({}, { episodes: file.episodes }));
+    const t14 = out.results.find((r) => r.test === 'T-14')!;
+    expect(t14.ok, `failures: ${t14.failures.join('; ')}`).toBe(true);
+    expect(t14.notes?.length ?? 0).toBe(0); // genuinely ran, not skipped
   });
 });
 

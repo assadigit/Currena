@@ -47,10 +47,16 @@ import {
   buildInsightsSnapshot,
   buildInsightsStatus,
   collectAllSources,
+  computeHighestSinceYear,
+  computePeaks,
   historyToSeries,
+  parseContextNotes,
   parseManualSeries,
+  parsePolicyDecisions,
   parseReleaseSchedule,
 } from '../src/adapters/index';
+import { runValidationSuite } from '../src/validation';
+import type { RegressionEpisode } from '../src/validation';
 import { RestInsightsStore } from '../src/store';
 
 /** Semantic equality (JSON round-trips can reorder keys). */
@@ -160,6 +166,29 @@ console.log(
     : `[ingest] release schedule: ${releaseSchedule!.length} entries`,
 );
 
+// Fix spec B-06 (2026-10-14): the hand-maintained policy decision dates
+// (decided vs effective) — absent is soft (cards then show the effective
+// date only), present-but-malformed fails loudly.
+const decisionsUrl = new URL('data/policy-decisions.json', repoRoot);
+const decisionsRaw = loadJsonFile(decisionsUrl);
+const policyDecisions = decisionsRaw === undefined ? undefined : parsePolicyDecisions(decisionsRaw);
+console.log(
+  decisionsRaw === undefined
+    ? '[ingest] data/policy-decisions.json: absent — policy cards show the effective date only'
+    : `[ingest] policy decisions: ${policyDecisions!.length} entries`,
+);
+
+// Fix spec A-06 (2026-10-14): the optional human-written context notes —
+// absent by default (nothing shows); expired ones never leave the builder.
+const notesUrl = new URL('data/insights-context-notes.json', repoRoot);
+const notesRaw = loadJsonFile(notesUrl);
+const contextNotes = notesRaw === undefined ? undefined : parseContextNotes(notesRaw);
+console.log(
+  notesRaw === undefined
+    ? '[ingest] data/insights-context-notes.json: absent — no notes (off by default)'
+    : `[ingest] context notes: ${contextNotes!.length} entries`,
+);
+
 const series = buildIndicatorSeries({ ...inputs, chinaPmi });
 
 /* ------------------------------------------------------------------ *
@@ -203,15 +232,116 @@ if (previous) {
   console.log('\n[ingest] no previous snapshot — first run (changedThisWeek starts empty)');
 }
 
+/* ------------------------------------------------------------------ *
+ * Fix spec Part D + A-03 (2026-10-14): the validation suite runs AFTER
+ * the fetch and BEFORE anything is published. A draft snapshot is built
+ * first; the suite judges it; flagged readings are then held on their
+ * last good values when the PUBLISHED snapshot is rebuilt with the flags.
+ * ------------------------------------------------------------------ */
+
+// The assembled Brent series rides along: its close-peak (within the stored
+// 10-year window) is the card's record — not the 40-day Yahoo window alone.
+const peaks = computePeaks(inputs, series.brent);
+for (const [id, peak] of Object.entries(peaks) as [IndicatorId, { value: number; date: string; basis: string }][]) {
+  console.log(`[ingest] peak ${id}: ${peak.value} on ${peak.date} (${peak.basis})`);
+}
+
+// Fix spec B-19: "highest since {year}" for the long-history yields,
+// computed from the full fetched series (DGS10/DGS30/DFII10/F2 go back
+// decades — a 10-year window cannot say 2002).
+const HIGHEST_SINCE_IDS: IndicatorId[] = ['us10y', 'us30y', 'real-yield-10y', 'au-10y'];
+const highestSince: Partial<Record<IndicatorId, number>> = {};
+for (const id of HIGHEST_SINCE_IDS) {
+  const full = series[id];
+  if (full && full.length > 1) {
+    const year = computeHighestSinceYear(full);
+    if (year !== undefined) highestSince[id] = year;
+  }
+}
+
+// Fix spec T-07: scan the copy corpus for the forbidden forecast wording —
+// the registry templates plus the web copy dictionaries, read from the repo.
+const copyTexts: string[] = [];
+for (const dictPath of ['apps/web/src/i18n/insights-copy-en.ts', 'apps/web/src/i18n/insights-copy-fa.ts']) {
+  try {
+    const raw = readFileSync(new URL(dictPath, repoRoot), 'utf8');
+    // Strip comments first (2026-10-15, live-run evidence): quote-marked
+    // phrases inside comments are not user-facing text, and the naive
+    // literal scan flagged them. URLs survive (their // follows a colon,
+    // never whitespace).
+    const stripped = raw
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|\s)\/\/.*$/gm, '');
+    // Extract the string literals (template-safe: the corpus is data, not code).
+    for (const match of stripped.matchAll(/'((?:[^'\\]|\\.)*)'/g)) copyTexts.push(match[1]!);
+    for (const match of stripped.matchAll(/"((?:[^"\\]|\\.)*)"/g)) copyTexts.push(match[1]!);
+  } catch {
+    // The runner may execute from a shallow clone without apps/ — T-07
+    // records a skip note instead (the CI corpus tests cover the templates).
+  }
+}
+
+// Fix spec T-14: the saved regression episodes (fixtures/regression-episodes.json —
+// cut from live history by scripts/generate-regression-episodes.ts).
+let episodes: readonly RegressionEpisode[] | undefined;
+try {
+  const parsed: unknown = JSON.parse(readFileSync(new URL('../fixtures/regression-episodes.json', import.meta.url), 'utf8'));
+  // The file carries { version, episodes } — the version wrapper documents the
+  // fixture format; the replay consumes the episodes array inside.
+  episodes = Array.isArray(parsed) ? parsed : Array.isArray((parsed as { episodes?: unknown }).episodes) ? (parsed as { episodes: readonly RegressionEpisode[] }).episodes : undefined;
+} catch {
+  episodes = undefined;
+}
+
+const draft = buildInsightsSnapshot({
+  series,
+  previous,
+  calendar,
+  releaseSchedule,
+  fedTargetUpper: inputs.fred.DFEDTARU,
+  policyDecisions,
+  peaks,
+  highestSince,
+  contextNotes,
+  now: nowIso,
+});
+
+const outcome = runValidationSuite({
+  series,
+  readings: draft.readings,
+  calendar,
+  now: nowIso,
+  breakeven10y: inputs.fred.T10YIE,
+  ...(copyTexts.length > 0 ? { copyTexts } : {}),
+  ...(episodes !== undefined ? { episodes } : {}),
+});
+
+// The published snapshot: same inputs + the suite's flags (A-04 — a flagged
+// reading holds its last good value and never reaches the live page fresh).
 const snapshot = buildInsightsSnapshot({
   series,
   previous,
   calendar,
   releaseSchedule,
   fedTargetUpper: inputs.fred.DFEDTARU,
+  policyDecisions,
+  peaks,
+  highestSince,
+  contextNotes,
+  flags: outcome.flags,
   now: nowIso,
 });
-const status = buildInsightsStatus({ reports, generatedAt: nowIso, mode, dryRun });
+const status = buildInsightsStatus({ reports, generatedAt: nowIso, mode, dryRun, validation: outcome.results });
+
+console.log('\n## Validation suite (Part D — runs before every publish)');
+for (const result of outcome.results) {
+  const flagNote = result.flagged.length > 0 ? ` flagged: ${result.flagged.join(', ')}` : '';
+  const note = result.notes?.length ? ` (${result.notes.join('; ')})` : '';
+  console.log(
+    `  ${result.ok ? '✅' : '❌'} ${result.test} ${result.name}${note}${flagNote}`,
+  );
+  for (const failure of result.failures) console.log(`      ${failure}`);
+}
 
 /* ------------------------------------------------------------------ *
  * Report (compact — live-run prints the full sanity table)
@@ -257,6 +387,17 @@ if (!store) {
     console.log('  ✍ insights:snapshot');
     await store.putStatus(status);
     console.log('  ✍ insights:status');
+    // Fix spec A-05 (2026-10-14): the daily archive — one dated file per
+    // day (the exact snapshot the page showed, with its rule version).
+    // One extra KV write per day; two years of daily keys keep the history.
+    const archiveDate = nowIso.slice(0, 10);
+    const alreadyArchived = (await store.getArchive(archiveDate)) !== undefined;
+    if (!alreadyArchived) {
+      await store.putArchive(archiveDate, snapshot);
+      console.log(`  ✍ insights:archive:v1:${archiveDate}`);
+    } else {
+      console.log(`  · insights:archive:v1:${archiveDate} already written today`);
+    }
   } catch (err) {
     fail(`critical write failed — snapshot/status not stored: ${err instanceof Error ? err.message : String(err)}`);
   }
@@ -294,8 +435,17 @@ if (!store) {
     `\n  history: ${written} written · ${unchanged} unchanged (skipped) · ${singlePoint} single-point (no key) · ${failed} failed`,
   );
   const { reads, writes, retriedWrites } = store.ops;
+  // Fix spec Part 0 rule 6: the free-tier budget report (KV reads, KV
+  // writes and OUTSIDE requests one full refresh uses).
+  const providerRows = reports.filter((r) => !['manual', 'cross-check'].includes(r.source)).length;
+  // One logged row ≈ one outside HTTP request, except the World Bank row
+  // (page scrape + workbook = 2 round-trips in one row).
+  const outsideRequests = providerRows + 1;
   console.log(
     `  KV ops this run: ${reads} reads, ${writes} writes (${retriedWrites} retried after the daily cap) — free limits: 100,000 reads / 1,000 writes per day.`,
+  );
+  console.log(
+    `  Outside requests this run: ${outsideRequests} (${providerRows} provider fetches + 1 for the World Bank's page-then-workbook round trip) — within the free Workers plan's 50-subrequest-per-invocation ceiling, and this ingest runs on GitHub Actions (its own venue), not a Worker invocation.`,
   );
 }
 

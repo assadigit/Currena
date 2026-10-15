@@ -27,7 +27,9 @@
     "markets-backtest": "tsx scripts/markets-backtest.ts",
     "prices-run": "tsx scripts/prices-run.ts",
     "fx-data-check": "tsx scripts/fx-data-check.ts",
-    "fx-evidence": "tsx scripts/fx-evidence.ts"
+    "fx-evidence": "tsx scripts/fx-evidence.ts",
+    "safety-demo": "tsx scripts/safety-demo.ts",
+    "regression:generate": "tsx scripts/generate-regression-episodes.ts"
   },
   "dependencies": {
     "@currena/core": "workspace:*",
