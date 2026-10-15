@@ -350,3 +350,30 @@ button. Shipped end-to-end this session:
 
 Session fully closed: `origin/main` = docs HEAD; production =
 currena-api `30f647f6` + currena-markets `9b5ff7e0`.
+
+## Round 42 — hero verdict cards calm down (2026-10-17) — owner's polish commission
+
+The owner's verdict on the hero cards: "This section has toooooo much
+color. It's everything and nothing because being confusing." Seven
+asks, all shipped:
+
+- **Feature** (`a7d52b0`): region mark 24/28, state artwork 32/40,
+  gauges GROUPED BY STATUS (the flat chip row + reason sentence + calm
+  line retired — the grouping IS the sentence), the verdict-rule
+  paragraph behind a "?" tip, the red notes in ONE bounded container
+  with bullets, the how-link behind a "?" tip (short answer +
+  full-explainer link that now SCROLLS to About), meters low-key (one
+  neutral ink at every size — round 36's decree extended), tiles
+  neutral. Nine reason-line copy keys retired; two new keys triaged.
+- **Verification**: 1,326 tests green, typecheck 6/6, lint 0 errors,
+  copy audit clean, budgets held — the round SHRANK the Insights chunk
+  (603.29/142.46 vs 604/142.8). Browser-verified en/fa × light/dark ×
+  375/desktop; zero console errors. Evidence:
+  `docs/evidence/2026-10-17-hero-calm/`.
+- **Deployed**: currena-api `ca46a4f7` from `a7d52b0`; markets
+  untouched. Production DOM re-verified (SW one-reload update cycle
+  noted — the new bundle serves after one plain reload).
+- **Token rotation still outstanding** (owner-side; fourth session).
+
+Session fully closed: `origin/main` = docs HEAD; production =
+currena-api `ca46a4f7` + currena-markets `9b5ff7e0`.

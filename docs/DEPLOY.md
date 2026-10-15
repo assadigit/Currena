@@ -1140,3 +1140,33 @@ financial-indicators page (CHANGELOG §2026-10-16b).
   XLSX downloads from production (77,366 B, byte-size identical to the
   local run on the same snapshot), the panel clamps inside the 375 px
   viewport (8..348); zero page errors / console messages.
+
+
+## Session record — 2026-10-17 Round 42 (the hero verdict cards calm down)
+
+Commission: the owner's seven-item polish pass on the Insights hero
+verdict cards (CHANGELOG §2026-10-17, QA table
+docs/QA/quirks-2026-10-17-hero-calm.md).
+
+- **Deployed**: currena-api **`ca46a4f7-03b9-4585-9b21-c80e269313f5`**
+  (2026-10-17) from HEAD `a7d52b0` — the round-42 feature commit
+  rides as the Worker's static assets. Cron `* * * * *` + KV intact.
+- **currena-markets NOT redeployed** (`9b5ff7e0` stays current — zero
+  markets imports touched).
+- **Gates at deploy**: tests 1,326 green (core 191 · scraper 67 ·
+  insights 403 · markets 13 · api 208 · web 443), typecheck 6/6, lint
+  0 errors / 15 advisories (D-24), copy audit clean, budgets held
+  (entry 294.75/88.53 vs 296/89.5; Insights lazy **603.29/142.46** vs
+  604/142.8 — the round SHRANK the chunk).
+- **CI**: green on the pushed HEAD (`a7d52b0`), verified via API.
+- **Post-deploy smoke on currena.ir**: `/api/health` 200; `/api/insights`
+  51 readings, ruleVersion 2; `/admin` 401; convert parity 100 USD →
+  26,790,000 IRR @ 267,900 (tgju live).
+- **Production DOM re-verified** (fa, light + dark, 1280 + 375): the
+  new bundle (`index-Bj0-uN9d.js`) serves after one plain reload (the
+  PWA SW update cycle — known one-reload behaviour); both group boxes
+  render, both "?" tips expand (tap + keyboard), the red-notes
+  container + bullets render (Global) and the bare count line rides
+  (Australia), the full-explainer link scrolls to + expands About
+  (scrollY 60 → 21810), 375 px scrollWidth === 375 (no bleed); zero
+  page errors / console messages.

@@ -1,14 +1,15 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-16 (the Insights full export: the one-file
-"download all data" MD/TXT/CSV/XLSX export shipped, deployed and
-production-verified — currena-api `30f647f6` from HEAD `186a070`,
-currena-markets `9b5ff7e0` untouched; see CHANGELOG 2026-10-16b,
-docs/DEPLOY.md's last session record and
-docs/evidence/2026-10-16-export/).
+Hand-off date: 2026-10-17 (Round 42 — the hero verdict cards calm
+down: the owner's seven-item polish pass shipped, deployed and
+production-verified — currena-api `ca46a4f7` from HEAD `a7d52b0`,
+currena-markets `9b5ff7e0` untouched; see CHANGELOG 2026-10-17,
+docs/QA/quirks-2026-10-17-hero-calm.md, docs/DEPLOY.md's last session
+record and docs/evidence/2026-10-17-hero-calm/).
 · Production: https://currena.ir
-· The export commission is CLOSED; the quirk-pass commission is CLOSED
-  (docs/QA/quirks-2026-10-16.md). Do not reopen declined items.
+· The round-42 commission is CLOSED; the export commission is CLOSED;
+  the quirk-pass commission is CLOSED (docs/QA/quirks-2026-10-16.md).
+  Do not reopen declined items.
 
 ---
 
@@ -51,25 +52,33 @@ Workers (Free plan, permanently — see the I0 gate decision).
 zod at every boundary, RTL/LTR native, **TOMAN canonical**, tests
 never hit live sites, secrets never persisted. Then this file,
 `docs/PROGRESS.md`, `docs/DECISIONS_FOR_ALI.md` (D-01…D-27),
-`docs/DEPLOY.md`, `docs/QA/quirks-2026-10-16.md` (this commission's
-record), `FIX_REPORT.md` (the insights audit's record).
+`docs/DEPLOY.md`, `docs/QA/quirks-2026-10-17-hero-calm.md` (the latest
+commission's record), `docs/QA/quirks-2026-10-16.md` (the prior one),
+`FIX_REPORT.md` (the insights audit's record).
 
-## 2. Current verified state (2026-10-16b close)
+## 2. Current verified state (2026-10-17 close)
 
 - Gates green at close: **1,326/1,326 tests** (core 191 · scraper 67 ·
   insights 403 · markets 13 · api 208 · web 443), typecheck 6/6, lint
   0 errors / 15 accepted advisories (D-24), copy audit clean, budgets
-  held (entry 294.75/88.53 vs 296/89.5; Insights lazy 603.71/142.72 vs
-  the consciously bumped 604/142.8 — the export builders are separate
-  lazy chunks: full-export 11.18 + xlsx-writer 5.57 + panel 2.75).
+  held (entry 294.75/88.53 vs 296/89.5; Insights lazy **603.29/142.46**
+  vs the consciously bumped 604/142.8 — round 42 SHRANK the chunk; the
+  export builders remain separate lazy chunks).
 - Live data floor: 51 readings, ruleVersion 2, validation 14/14, no
   failed sources; archive serving; freshness chain (D-12 + D-13)
   verified intact post-deploy.
-- Production DOM re-verified post-deploy at 375 px: the export button
-  renders, the XLSX downloads from production, the export/Tools panels
-  clamp inside the viewport (8..348), header buttons 44×44 ×4, footer
-  links 32px, chips 40px, copy chip 36px, receipt delete 36px; zero
-  console errors; no horizontal bleed.
+- Production DOM re-verified post-deploy (fa, light + dark, 1280 +
+  375): the calm hero renders (grouped [پرتنش]/[پایدار] boxes, mono
+  meters, 24/28 region mark, 32/40 state artwork), both "?" tips
+  expand, the red-notes container + bullets render, the
+  full-explainer link scrolls to + expands About, 375 px
+  scrollWidth === 375, zero console errors. NOTE: the PWA service
+  worker needs ONE plain reload after a deploy before the new bundle
+  serves (known one-reload behaviour).
+- A11y floor intact: skip link, h1s, useDialogFocus on every dialog,
+  real tablists, radio-group arrows, live regions, labeled validation
+  errors; the two "?" tips carry aria-expanded + aria-controls and are
+  keyboard-operable.
 - A11y floor: skip link, h1s, useDialogFocus on every dialog, real
   tablists, radio-group arrows, live regions, labeled validation
   errors — keep every one of these green while restyling.
@@ -87,16 +96,18 @@ record), `FIX_REPORT.md` (the insights audit's record).
    digits, wrapped-title tile drift, the repeated fa header date, the
    FAB overlap. Deliberate conventions or deliberate patterns.
 4. **Bundle budgets**: entry 296/89.5 (294.75/88.53 measured);
-   Insights lazy **604/142.8** (603.71/142.72 measured — the
-   2026-10-16b export bump; the builders are separate lazy chunks).
-   Any further Insights-chunk growth needs its own justification.
+   Insights lazy **604/142.8** (603.29/142.46 measured — round 42
+   SHRANK it; the export builders are separate lazy chunks). Any
+   further Insights-chunk growth needs its own justification.
+   NOTE: the meters are now ONE neutral ink at every size (round 42)
+   — do not "restore" the status rainbow; the words carry the meaning.
 5. **i18n copy corpora** (`insights-copy-en/fa.ts`) and
    `packages/core/src/schemas.ts` — data-file and sacred-surface;
    unchanged policy.
 6. **Owner-side items**: Telegram ingest-alert secrets, the I7
    launch-approval exit gate (BACKTEST review), the signals-wording
    legal read (S3), connection-evidence confirmations, **token
-   rotation** (all three tokens have now transited chat across three
+   rotation** (all three tokens have now transited chat across four
    sessions — this is the strongest rotation nudge yet).
 
 ## 4. Session workflow (per AGENTS.md, enforced)
@@ -110,11 +121,16 @@ record), `FIX_REPORT.md` (the insights audit's record).
    push often; **check the Actions run is green before stacking the
    next change.** CI = typecheck → lint → tests.
 3. Local verification: vite dev on the browser-reachable port
-   (`:3000` in the sandbox via the platform gateway) + a read-only
-   forwarder to production for real data if needed; verify with
-   agent-browser in BOTH locales + BOTH themes at 375 px and desktop.
-   Background processes get reaped between calls — spawn detached
-   (see the shared worklog for the double-detach pattern).
+   (`:3000` in the sandbox via the platform gateway; vite proxies
+   `/api` → :8787) + a read-only bun forwarder :8787 → currena.ir for
+   real data (both were rebuilt this session: `node /home/z/
+   spawn-detached.mjs <log> bun /home/z/forwarder-8787.ts` and
+   `SPAWN_CWD=<web> … pnpm exec vite --port 3000 --strictPort --host`);
+   verify with agent-browser in BOTH locales + BOTH themes at 375 px
+   and desktop. Background processes get reaped between calls — spawn
+   detached (see the shared worklog for the double-detach pattern).
+   Locale/theme switches are localStorage keys `currena:locale` and
+   `theme`.
 4. Deploy: `CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… pnpm
    --filter @currena/api exec wrangler deploy` (markets only if it
    changed — the web app ships as the api Worker's static assets).
@@ -146,11 +162,17 @@ record), `FIX_REPORT.md` (the insights audit's record).
 - **Sandbox resets between sessions** — commit and push often; the
   shared worklog (`/home/z/my-project/worklog.md`) is the recovery
   ledger; never rely on uncommitted work surviving.
-- **Bundle budgets**: the Insights chunk is 0.29 kB raw from its cap —
-  any look-tweak that adds code there needs measurement first; prefer
-  CSS-only tweaks; a bump needs a changelog note. The export builders
-  are separate lazy chunks — new export features cost the Insights
-  chunk only their copy strings.
+- **Bundle budgets**: the Insights chunk has ~0.7 kB raw headroom
+  (round 42 shrank it) — any look-tweak that adds code there needs
+  measurement first; prefer CSS-only tweaks; a bump needs a changelog
+  note. The export builders are separate lazy chunks — new export
+  features cost the Insights chunk only their copy strings.
+- **The copy manifest: REMOVED dictionary keys are a MANUAL edit** —
+  the updater only adds/updates entries; deleting the 9 reason-line
+  entries was a hand edit (workflow §104-106), then re-serialize
+  canonically via `loadManifest`/`saveManifest` from
+  scripts/lib/persian-copy.mjs (one entry per line — never
+  JSON.stringify the whole file; it reformats 22k lines).
 - **agent-browser screenshot paths are relative to ITS cwd** — pass
   absolute paths or the save silently fails.
 

@@ -5,6 +5,67 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-17] — Round 42: the hero verdict cards calm down
+
+The owner's feedback on the Insights hero verdict cards (Global /
+Australia): "This section has toooooo much color. It's everything and
+nothing because being confusing." — with seven specific asks. Full
+disposition table in `docs/QA/quirks-2026-10-17-hero-calm.md`; evidence
+in `docs/evidence/2026-10-17-hero-calm/`.
+
+### Changed
+
+- **Region mark** (the globe / the Australia map) 48/64 → **24/28** —
+  a compact header identifier; the big artwork stays in the dedicated
+  sections mid-page.
+- **State artwork** (the gauge beside the verdict word) 44/60 →
+  **32/40** — proportionate to its word, no longer a shout.
+- **The gauges GROUP BY STATUS**: one quiet box per step word
+  («پرتنش» / «پایدار» …) with each area and its mini meter inside.
+  The flat chip row, the computed reason sentence ("از ۳ حوزه، ۲ حوزه
+  یعنی…") and the calm line are retired — they said the same thing
+  three times; the grouping IS the sentence and can never contradict
+  the gauges because it IS the gauges. `heroReason` stays in config,
+  pinned by its tests. Nine reason-line copy keys retired (manifest
+  pruned in the same commit).
+- **The verdict-rule paragraph** («مبنای تعیین وضعیت هر حوزه: …»)
+  hides behind a quiet "?" tip (the shared GlossaryTip pattern —
+  tap/keyboard, never hover-only). New key `ui.verdictRuleLabel`.
+- **The red notes group into ONE bounded container with bullets**:
+  the count line is the header, each raised signal (world stock
+  markets, the section indicators, currency patterns) is one disc
+  bullet. With nothing to list, the count line rides bare
+  (Australia's usual case). Red stays on the alert words only.
+- **The how-link** ("این نتیجه چگونه محاسبه می‌شود؟") hides behind the
+  same "?" tip: the panel answers in one sentence (`ui.explainerIntro`)
+  and keeps **"Read the full explainer"** (new key
+  `ui.explainerFullLink`) — which now also SCROLLS to the About
+  section (a bare expand below the fold read as a dead click; the
+  same roast round 33 answered for the section jump).
+- **The meters go low-key**: a filled segment is ONE neutral ink at
+  every size — round 36's small-meter decree ("use normal color not
+  color coding") extended to the big hero meter. The attention tiles
+  lose their pink tint for neutral surfaces. Colour remains only
+  where it means something: the verdict word, the alert words inside
+  the bounded container, the region's own artwork.
+- The multi-ink meter change also applies to the world-markets focal
+  verdict box (it shares `.verdict-meter`).
+
+### Verification
+
+- Tests 1,326/1,326 green (no behavioral assertions lost — the
+  component had no DOM tests; `heroReason`'s pure-function tests stay
+  green), typecheck 6/6, lint 0 errors / 15 accepted advisories,
+  copy audit clean (2 new strings triaged `processed`, round-2 ref =
+  the QA doc).
+- Budgets: the pass **shrank** the Insights chunk — 603.29/142.46 vs
+  the 604/142.8 budget (entry untouched 294.75/88.53).
+- Browser-verified en/fa × light/dark × 375 px/desktop: groups render
+  both statuses, tips expand/collapse (tap + keyboard), bullets
+  RTL-align, the markets bullet jumps to the markets section, the
+  full-explainer link scrolls + expands About, 375 px `scrollWidth ===
+  375`, zero console/page errors.
+
 ## [2026-10-16b] — Insights full export: one-file "download all data" (MD/TXT/CSV/XLSX)
 
 The owner's request: a download button that exports every data table the
