@@ -1051,3 +1051,41 @@ Deployed from `fb1fded` (CI green, origin/main = HEAD): **currena-api
   world-markets + fx + signals sections and the verdict strip; the
   split Settle + Receipt routes render; zero console errors and zero
   console messages across the entire pass.
+
+## Session record — 2026-10-15 INSIGHTS_FIX_SPEC session (Parts A–E + wrap-up)
+
+The 14-October insights audit's fix spec, executed end-to-end in one
+session. Commits `2dd2eae` (A+B) → `7471622` (C) → `4738263` (D) →
+`04d36bc` (T-08 venue fix) → `7a43a72` (bundle budget) → `aeb701d`
+(B-19 episode-aware) → `b6a35a7` (Part E: FIX_REPORT + every spec
+checkbox ticked). CI green on every push; final CI green on `b6a35a7`.
+
+- **Data-bearing deploy**: currena-api `cdf4df66-2e2b-4324-90e4-d783136f387a`
+  (#124, 2026-10-15T01:44Z) — after the live GHA ingest run had
+  published the validated snapshot (14/14 tests, 51 readings,
+  ruleVersion 2, 50 sources, none failed) and the B-19 republish.
+- **Wrap-up redeploy (this record's floor)**: currena-api
+  **`97e8c38a-0b20-4316-b9a1-b8093e4575f2`** (#125, 2026-10-15T03:05Z)
+  from final HEAD `b6a35a7`. The commits between the two deploys are
+  docs/tests-only, so served bytes are identical; the redeploy makes
+  the version record unambiguous for the next session.
+- **currena-markets NOT redeployed** (deliberate): the fix spec
+  touched none of its imports (`insights/fx`, `insights/markets`,
+  `series` — verified by diff; `packages/core` grew only optional
+  reader-side fields), so the deployed `9b5ff7e0` (from `fb1fded`)
+  stays current. `EODHD_API_TOKEN` was not touched (no markets deploy).
+- Gates at deploy: **1,308/1,308 tests** (core 190 · scraper 67 ·
+  insights 403 · markets 13 · api 208 · web 427), typecheck 6/6, lint
+  0 errors / 14 accepted advisories (D-24), copy audit clean, budgets
+  held (entry 294.61/88.50 vs 296/89.5; Insights lazy 599.37/141.52 vs
+  the 2026-10-15d bump 600/142).
+- Post-deploy smoke on currena.ir: health `{"ok":true,"kv":"ok"}`;
+  `/api/insights` 51 readings incl. the four new cards
+  (fed-expectations +1.04 · us30y 5.56 "highest since 2004" ·
+  philly-fed 37.8 · rba-expectations +0.33); `/api/insights/status`
+  14/14 tests, ruleVersion 2, no failed sources;
+  `/api/insights/archive/2026-10-15` 200 (the day's exact snapshot);
+  markets + fx 200 with `public, max-age=300, s-maxage=300` + ETag
+  (D-12/D-13 intact); convert parity 100 USD → 26,390,000 @ 263,900
+  (tgju live); `/admin` 401 (Worker-first gate intact); the new
+  `Insights-CF53RA0h.js` lazy chunk serves (599.37 kB).

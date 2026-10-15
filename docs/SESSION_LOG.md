@@ -255,3 +255,38 @@ deps reinstalled):
 
 Session fully closed: `origin/main` = final docs HEAD; production =
 version `1ca53028`.
+
+## Wrap-up completion (2026-10-15 ~03:10 UTC) — INSIGHTS_FIX_SPEC session close
+
+Final round closed the 14-October audit's fix project from a fresh
+environment (repo re-cloned, deps reinstalled):
+
+- **Part E done:** every checkbox in INSIGHTS_FIX_SPEC.md ticked
+  (48/48: A-01…A-08, B-01…B-19, C-01…C-07, T-01…T-14);
+  FIX_REPORT.md carries the item-by-item verification record, every
+  changed number with its reason, the not-verified list, the safety
+  demo evidence, the regression episodes and the full-export
+  instructions for the next audit.
+- **Published live:** the GHA ingest (manual dispatch 01:39Z, then the
+  daily 04:20 UTC cron from now on) fetched 50 sources (none failed),
+  ran the T-01…T-14 suite BEFORE publishing, wrote 51 readings +
+  ruleVersion 2 + the day's archive key; budget 55 KV reads / 31 KV
+  writes / 49 outside requests per full refresh (free tier).
+- **Deployed:** currena-api `cdf4df66` (01:44Z data-bearing) then the
+  wrap-up redeploy **`97e8c38a`** (#125, 03:05Z) from final HEAD
+  `b6a35a7` — commits between are docs/tests-only. currena-markets
+  `9b5ff7e0` unchanged (its imports untouched by the fix spec —
+  verified by diff). Full record in docs/DEPLOY.md.
+- **Post-deploy smoke on currena.ir:** health ok; `/api/insights` 51
+  readings with the four new cards; `/api/insights/status` 14/14, no
+  failed sources; the archive route serves today's snapshot; markets +
+  fx cache headers intact (D-12/D-13); convert parity 100 USD →
+  26,390,000 @ 263,900 (tgju live); `/admin` 401 gate intact.
+- **Docs closed out:** CHANGELOG 2026-10-15e (wrap-up entry),
+  PROGRESS.md current-status row updated (INSIGHTS_FIX_SPEC SHIPPED),
+  DEPLOY.md session record appended, this log entry, and
+  NEXT_SESSION_PROMPT.md rewritten for the next commission (minor
+  UI/UX quirks + look tweaks).
+
+Session fully closed: `origin/main` = final wrap-up HEAD; production =
+currena-api `97e8c38a` + currena-markets `9b5ff7e0`.

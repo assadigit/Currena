@@ -5,6 +5,53 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-15e] — INSIGHTS_FIX_SPEC wrap-up: Part E, published, deployed
+
+The close-out of the 14-October audit's fix project. All 48 spec items
+(A-01…A-08, B-01…B-19, C-01…C-07, T-01…T-14) are done and verified —
+Part E's item-by-item record lives in `FIX_REPORT.md`, every checkbox in
+`INSIGHTS_FIX_SPEC.md` is ticked. This entry pins the publication and
+deployment floor the next session starts from.
+
+### Published
+
+- **Ingest**: the daily `insights-ingest` Action (04:20 UTC) now runs
+  the full T-01…T-14 validation suite after the fetch and before
+  anything is published; today's live run (manual dispatch,
+  2026-10-15T01:39Z): 50 sources fetched, none failed, 14/14 tests
+  green, 51 readings, ruleVersion 2. Free-tier budget per full
+  refresh: **55 KV reads / 31 KV writes / 49 outside requests**.
+- **Archive**: `GET /api/insights/archive/2026-10-15` serves the day's
+  exact published snapshot (one dated KV key per day, written
+  write-only-if-absent).
+- **Reference values re-verified post-publish**: Fed 3.75–4.00 decided
+  2026-09-16; ECB 2.50 decided 09-10; RBA 4.60 decided 09-29; AU CPI
+  4.0 released 09-30; US September CPI released 10-14; peaks gold
+  5,586.20 / silver 121.30 / BTC 126,198.07 (daily-high) and Brent
+  138.21 (2026-04-07 close); US 10-year at 5.21 reads "highest since
+  2007" (episode-aware B-19), 30-year 5.56 "highest since 2004".
+
+### Deployed
+
+- currena-api `cdf4df66` (01:44 UTC, the session's data-bearing
+  deploy) superseded by the wrap-up redeploy **`97e8c38a`** (03:05 UTC,
+  Workers version #125) from final HEAD `b6a35a7` — every commit after
+  the data-bearing deploy is docs/tests-only, so served bytes are
+  identical; the redeploy makes the version record unambiguous.
+- currena-markets `9b5ff7e0` is UNCHANGED and current: the fix spec
+  touched none of its imports (`insights/fx`, `insights/markets`,
+  `series` — verified by `git diff fb1fded..HEAD`), and `packages/core`
+  grew only optional reader-side fields.
+- Post-deploy smoke on currena.ir: health 200; `/api/insights` 51
+  readings (fed-expectations +1.04 · us30y 5.56 · philly-fed 37.8 ·
+  rba-expectations +0.33); `/api/insights/status` 14/14; the archive
+  route 200; markets + fx 200 with the D-12/D-13 cache headers intact;
+  convert parity 100 USD → 26,390,000 @ 263,900 (tgju live); `/admin`
+  401 (Worker-first gate intact).
+- Gates at HEAD: CI green on `b6a35a7`; bundle budgets held (entry
+  294.61/88.50 vs 296/89.5; Insights lazy 599.37/141.52 vs the
+  2026-10-15d bump 600/142).
+
 ## [2026-10-15d] — INSIGHTS_FIX_SPEC: Parts A–D implemented
 
 The 14-October insights audit's fix spec, implemented in full (A:
