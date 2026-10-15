@@ -148,6 +148,26 @@ describe('buildInsightsSnapshot', () => {
     expect(snap.calendar).toEqual([]);
   });
 
+  it('A-06: context notes are off by default and expired notes never reach the page', () => {
+    const series = { us10y: daily('2026-10-13', 40, 5.2) };
+    // Default: no notes file — nothing shows.
+    const bare = buildInsightsSnapshot({ series, calendar: [], now: NOW });
+    expect(bare.readings.find((r) => r.id === 'us10y')!.note).toBeUndefined();
+    // A live note attaches with its author and expiry dates…
+    const noted = buildInsightsSnapshot({
+      series,
+      calendar: [],
+      now: NOW,
+      contextNotes: [
+        { id: 'us10y', text: 'A dated, human-written note.', authored: '2026-10-01', expires: '2026-11-01' },
+        { id: 'gold-usd', text: 'An expired note.', authored: '2026-08-01', expires: '2026-10-01' },
+      ],
+    });
+    expect(noted.readings.find((r) => r.id === 'us10y')!.note?.text).toBe('A dated, human-written note.');
+    // …and the expired one disappears — it never reaches the page.
+    expect(noted.readings.find((r) => r.id === 'gold-usd')!.note).toBeUndefined();
+  });
+
   it('Step-1 H3: a missing series HOLDS the previous reading marked stale (never today\'s date)', () => {
     const previous = buildInsightsSnapshot({
       series: { us10y: daily('2026-08-29', 40, 3) },
