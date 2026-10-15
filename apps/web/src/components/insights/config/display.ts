@@ -56,6 +56,10 @@ const PREFIXED_UNITS: ReadonlySet<UnitToken> = new Set(['usd', 'aud', 'usd-bn', 
 
 export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'yield-curve-10y2y': { decimals: 2, unit: 'points' },
+  'fed-expectations': { decimals: 2, unit: 'points' },
+  us30y: { decimals: 2, unit: 'percent' },
+  'philly-fed': { decimals: 1, unit: 'points' },
+  'rba-expectations': { decimals: 2, unit: 'points' },
   'real-yield-10y': { decimals: 2, unit: 'percent' },
   us10y: { decimals: 2, unit: 'percent' },
   'fed-target': { decimals: 2, unit: 'percent', range: true },

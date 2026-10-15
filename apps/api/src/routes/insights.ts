@@ -28,6 +28,7 @@ import type {
   IndicatorHistory,
   IndicatorId,
   InsightsSnapshot,
+  InsightsStatus,
   LivePricesSnapshot,
   MarketsSnapshot,
 } from '@currena/core';

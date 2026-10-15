@@ -51,6 +51,10 @@ export const RBA_TABLES = {
   cashRateDaily: { file: 'f1', prefix: 'F1', series: 'Cash Rate Target' },
   cashRate: { file: 'f1.1', prefix: 'F1.1', series: 'Cash Rate Target' },
   au10y: { file: 'f2', prefix: 'F2', series: 'Australian Government 10 year bond' },
+  // Fix spec C-06 (2026-10-14): F2's 3-year series — the RBA-expectations
+  // card (3-year government bond yield minus the cash rate). Series ID
+  // FCMYGBAG3D confirmed from the F2 CSV's own Series ID row.
+  au3y: { file: 'f2', prefix: 'F2', seriesId: 'FCMYGBAG3D' },
   householdDebtToIncome: { file: 'e2', prefix: 'E2', series: 'Household debt to income' },
   homeLoanOutstanding: { file: 'f6', prefix: 'F6', seriesId: 'FLRHOOTA' },
   // Step-2 add-list §B7: F4.1 "Paid Deposit Rates" (the RBA's monthly table

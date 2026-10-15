@@ -88,6 +88,9 @@ const EVENT_TARGETS: Readonly<Record<string, IndicatorId | undefined>> = {
   // (abs-cpi keeps no us-cpi target — the CPI events target the CPI cards).
   'abs-jobs': 'au-unemployment',
   fed: 'fed-target',
+  // Fix spec C-07 (2026-10-14): the ECB decision links to the euro policy
+  // rate card.
+  ecb: 'ecb-dfr',
   'us-cpi': 'us-cpi-yoy',
   'us-jobs': 'us-unemployment',
 };

@@ -35,6 +35,7 @@ import {
 } from '../components/insights/config';
 import { insightsCopyEn } from '../i18n/insights-copy-en';
 import { insightsCopyFa } from '../i18n/insights-copy-fa';
+import { containsForbiddenWords } from '@currena/insights/validation';
 import { definitionFor } from '../components/insights/config';
 import type { InsightsSnapshot, IndicatorReading } from '@currena/core';
 
@@ -544,9 +545,27 @@ describe('copy dictionaries', () => {
       expect(insightsCopyFa.indicators[id]).toBeDefined();
       expect(insightsCopyFa.indicators[id]?.name.length).toBeGreaterThan(0);
     }
-    // Step-2: the corpus grew to 47 (au-10y, us-unemployment, sahm-rule, vix,
-      // au-deposit-rate) and fa must carry every one of them.
-      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(47);
+    // Step-2 + fix spec C (2026-10-14): the corpus grew to 51
+      // (+fed-expectations, us30y, philly-fed, rba-expectations) and fa
+      // must carry every one of them.
+      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(51);
+  });
+
+  // Fix spec T-07 (2026-10-15): the CI-side corpus scan — the ingest's
+  // live T-07 reads the same dictionaries from the repo at run time; this
+  // keeps the discipline enforced on every pull request too.
+  it('the copy corpus carries no forecast wording (T-07)', () => {
+    const texts: string[] = [];
+    const walk = (value: unknown): void => {
+      if (typeof value === 'string') texts.push(value);
+      else if (Array.isArray(value)) value.forEach(walk);
+      else if (value !== null && typeof value === 'object') Object.values(value as Record<string, unknown>).forEach(walk);
+    };
+    walk(insightsCopyEn);
+    walk(insightsCopyFa);
+    expect(texts.length).toBeGreaterThan(1500);
+    const offenders = texts.filter((text) => containsForbiddenWords(text).length > 0);
+    expect(offenders, `forbidden forecast wording in: ${offenders.slice(0, 3).join(' | ')}`).toEqual([]);
   });
 });
 

@@ -327,6 +327,11 @@ export const IndicatorIdSchema = z.enum([
   'us-cpi-yoy',
   'us-cpi-core-yoy',
   'breakeven-5y5y',
+  // Fix spec Part C (2026-10-14): the four additions.
+  'fed-expectations',
+  'us30y',
+  'philly-fed',
+  'rba-expectations',
   // Global — Are markets nervous?
   'stress-stlfsi',
   'nfci',

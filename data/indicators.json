@@ -141,6 +141,76 @@
       "ruleVersion": 2
     },
     {
+      "id": "fed-expectations",
+      "title": "What markets expect from the Fed (2-year gap)",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": "borrowing-costs",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "derived",
+        "name": "FRED (DGS2 − DFEDTARL)",
+        "url": "https://fred.stlouisfed.org/series/DGS2",
+        "seriesIdOrTable": "FRED:DGS2 − FRED:DFEDTARL (2-year yield minus the policy rate)"
+      },
+      "unit": "points",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "percentile",
+        "tail": "high",
+        "cutoff": 0.1
+      },
+      "ruleVersion": 2
+    },
+    {
+      "id": "us30y",
+      "title": "US 30-year Treasury yield",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": "borrowing-costs",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (DGS30)",
+        "url": "https://fred.stlouisfed.org/series/DGS30",
+        "seriesIdOrTable": "FRED:DGS30"
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "any-of",
+        "of": [
+          {
+            "kind": "percentile",
+            "tail": "high",
+            "cutoff": 0.1
+          },
+          {
+            "kind": "change",
+            "mode": "points",
+            "direction": "rise",
+            "magnitude": 0.5,
+            "windowWeeks": 4
+          }
+        ]
+      },
+      "ruleVersion": 2
+    },
+    {
       "id": "ecb-dfr",
       "title": "ECB deposit facility rate",
       "area": {
@@ -557,6 +627,35 @@
       "ruleVersion": 2
     },
     {
+      "id": "philly-fed",
+      "title": "Philadelphia Fed manufacturing index",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": "growth-health",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (GACDFSA066MSFRBPHI), Philadelphia Fed",
+        "url": "https://fred.stlouisfed.org/series/GACDFSA066MSFRBPHI",
+        "seriesIdOrTable": "FRED:GACDFSA066MSFRBPHI (Philadelphia Fed manufacturing index, SA)"
+      },
+      "unit": "points",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 60,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "threshold",
+        "direction": "below",
+        "value": 0
+      },
+      "ruleVersion": 2
+    },
+    {
       "id": "us-unemployment",
       "title": "US unemployment rate",
       "area": {
@@ -937,6 +1036,35 @@
         "seriesIdOrTable": "RBA F2 FCMYGBAG10D (Australian Government 10 year bond)"
       },
       "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "weekly",
+      "maxAgeDays": 10,
+      "maxAgeBasis": "cadence default (weekly)",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "percentile",
+        "tail": "high",
+        "cutoff": 0.1
+      },
+      "ruleVersion": 2
+    },
+    {
+      "id": "rba-expectations",
+      "title": "What markets expect from the RBA (3-year gap)",
+      "area": {
+        "section": "australia",
+        "group": "au-inflation-rates",
+        "gauge": "au-inflation-rates",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "derived",
+        "name": "RBA F2 (FCMYGBAG3D) − RBA F1",
+        "url": "https://www.rba.gov.au/statistics/tables/",
+        "seriesIdOrTable": "RBA F2 FCMYGBAG3D (3-year bond) − RBA F1 cash rate target"
+      },
+      "unit": "points",
       "changeUnit": "percentage points",
       "cadence": "weekly",
       "maxAgeDays": 10,

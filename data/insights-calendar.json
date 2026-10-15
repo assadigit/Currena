@@ -4,153 +4,183 @@
     "date": "2026-10-14",
     "titleEn": "US consumer price index: September 2026",
     "titleFa": "شاخص قیمت مصرف‌کنندهٔ آمریکا، سپتامبر ۲۰۲۶",
-    "kind": "us-cpi"
+    "kind": "us-cpi",
+    "tz": "America/New_York"
   },
   {
     "id": "abs-jobs-2026-09",
     "date": "2026-10-15",
     "titleEn": "ABS jobs report (Labour Force): September 2026",
     "titleFa": "گزارش وضعیت بازار کار استرالیا: سپتامبر ۲۰۲۶",
-    "kind": "abs-jobs"
-  },
-  {
-    "id": "fomc-2026-10",
-    "date": "2026-10-28",
-    "titleEn": "US Fed interest rate decision (FOMC)",
-    "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
-    "kind": "fed"
+    "kind": "abs-jobs",
+    "tz": "Australia/Sydney"
   },
   {
     "id": "abs-cpi-2026-09",
     "date": "2026-10-28",
     "titleEn": "ABS monthly CPI: September 2026",
     "titleFa": "شاخص ماهانهٔ قیمت مصرف‌کنندهٔ استرالیا، سپتامبر ۲۰۲۶",
-    "kind": "abs-cpi"
+    "kind": "abs-cpi",
+    "tz": "Australia/Sydney"
+  },
+  {
+    "id": "fomc-2026-10",
+    "date": "2026-10-28",
+    "titleEn": "US Fed interest rate decision (FOMC)",
+    "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
+    "kind": "fed",
+    "tz": "America/New_York"
+  },
+  {
+    "id": "ecb-2026-10",
+    "date": "2026-10-29",
+    "titleEn": "ECB interest rate decision",
+    "titleFa": "تصمیم بانک مرکزی اروپا دربارهٔ نرخ بهره",
+    "kind": "ecb",
+    "tz": "Europe/Frankfurt"
   },
   {
     "id": "rba-2026-11",
     "date": "2026-11-03",
     "titleEn": "RBA cash rate decision",
     "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
-    "kind": "rba"
+    "kind": "rba",
+    "tz": "Australia/Sydney"
   },
   {
     "id": "us-jobs-2026-10",
     "date": "2026-11-06",
     "titleEn": "US jobs report (Employment Situation): October 2026",
     "titleFa": "گزارش اشتغال آمریکا، اکتبر ۲۰۲۶",
-    "kind": "us-jobs"
+    "kind": "us-jobs",
+    "tz": "America/New_York"
   },
   {
     "id": "us-cpi-2026-10",
     "date": "2026-11-10",
     "titleEn": "US consumer price index: October 2026",
     "titleFa": "شاخص قیمت مصرف‌کنندهٔ آمریکا، اکتبر ۲۰۲۶",
-    "kind": "us-cpi"
+    "kind": "us-cpi",
+    "tz": "America/New_York"
   },
   {
     "id": "abs-jobs-2026-10",
     "date": "2026-11-19",
     "titleEn": "ABS jobs report (Labour Force): October 2026",
     "titleFa": "گزارش وضعیت بازار کار استرالیا: اکتبر ۲۰۲۶",
-    "kind": "abs-jobs"
+    "kind": "abs-jobs",
+    "tz": "Australia/Sydney"
   },
   {
     "id": "abs-cpi-2026-10",
     "date": "2026-11-25",
     "titleEn": "ABS monthly CPI: October 2026",
     "titleFa": "شاخص ماهانهٔ قیمت مصرف‌کنندهٔ استرالیا، اکتبر ۲۰۲۶",
-    "kind": "abs-cpi"
+    "kind": "abs-cpi",
+    "tz": "Australia/Sydney"
   },
   {
     "id": "us-jobs-2026-11",
     "date": "2026-12-04",
     "titleEn": "US jobs report (Employment Situation): November 2026",
     "titleFa": "گزارش اشتغال آمریکا، نوامبر ۲۰۲۶",
-    "kind": "us-jobs"
+    "kind": "us-jobs",
+    "tz": "America/New_York"
   },
   {
     "id": "rba-2026-12",
     "date": "2026-12-08",
     "titleEn": "RBA cash rate decision",
     "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
-    "kind": "rba"
+    "kind": "rba",
+    "tz": "Australia/Sydney"
   },
   {
     "id": "fomc-2026-12",
     "date": "2026-12-09",
     "titleEn": "US Fed interest rate decision (FOMC)",
     "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
-    "kind": "fed"
+    "kind": "fed",
+    "tz": "America/New_York"
   },
   {
     "id": "us-cpi-2026-11",
     "date": "2026-12-10",
     "titleEn": "US consumer price index: November 2026",
     "titleFa": "شاخص قیمت مصرف‌کنندهٔ آمریکا، نوامبر ۲۰۲۶",
-    "kind": "us-cpi"
+    "kind": "us-cpi",
+    "tz": "America/New_York"
   },
   {
     "id": "abs-jobs-2026-11",
     "date": "2026-12-17",
     "titleEn": "ABS jobs report (Labour Force): November 2026",
     "titleFa": "گزارش وضعیت بازار کار استرالیا: نوامبر ۲۰۲۶",
-    "kind": "abs-jobs"
-  },
-  {
-    "id": "fomc-2027-01",
-    "date": "2027-01-27",
-    "titleEn": "US Fed interest rate decision (FOMC)",
-    "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
-    "kind": "fed"
+    "kind": "abs-jobs",
+    "tz": "Australia/Sydney"
   },
   {
     "id": "abs-cpi-2026-12",
     "date": "2027-01-27",
     "titleEn": "ABS monthly CPI: December 2026",
     "titleFa": "شاخص ماهانهٔ قیمت مصرف‌کنندهٔ استرالیا، دسامبر ۲۰۲۶",
-    "kind": "abs-cpi"
+    "kind": "abs-cpi",
+    "tz": "Australia/Sydney"
+  },
+  {
+    "id": "fomc-2027-01",
+    "date": "2027-01-27",
+    "titleEn": "US Fed interest rate decision (FOMC)",
+    "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
+    "kind": "fed",
+    "tz": "America/New_York"
   },
   {
     "id": "rba-2027-02",
     "date": "2027-02-09",
     "titleEn": "RBA cash rate decision",
     "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
-    "kind": "rba"
+    "kind": "rba",
+    "tz": "Australia/Sydney"
   },
   {
     "id": "abs-cpi-2027-01",
     "date": "2027-02-24",
     "titleEn": "ABS monthly CPI: January 2027",
     "titleFa": "شاخص ماهانهٔ قیمت مصرف‌کنندهٔ استرالیا، ژانویهٔ ۲۰۲۷",
-    "kind": "abs-cpi"
+    "kind": "abs-cpi",
+    "tz": "Australia/Sydney"
   },
   {
     "id": "fomc-2027-03",
     "date": "2027-03-17",
     "titleEn": "US Fed interest rate decision (FOMC)",
     "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
-    "kind": "fed"
+    "kind": "fed",
+    "tz": "America/New_York"
   },
   {
     "id": "rba-2027-03",
     "date": "2027-03-23",
     "titleEn": "RBA cash rate decision",
     "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
-    "kind": "rba"
+    "kind": "rba",
+    "tz": "Australia/Sydney"
   },
   {
     "id": "fomc-2027-04",
     "date": "2027-04-28",
     "titleEn": "US Fed interest rate decision (FOMC)",
     "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
-    "kind": "fed"
+    "kind": "fed",
+    "tz": "America/New_York"
   },
   {
     "id": "rba-2027-05",
     "date": "2027-05-04",
     "titleEn": "RBA cash rate decision",
     "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
-    "kind": "rba"
+    "kind": "rba",
+    "tz": "Australia/Sydney"
   }
 ]

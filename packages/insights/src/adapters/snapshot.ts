@@ -560,8 +560,8 @@ interface StatusBuildInputs {
   generatedAt: string;
   mode: InsightsStatus['mode'];
   dryRun: boolean;
-  /** Fix spec Part D: the validation suite's results. */
-  validation?: InsightsStatus['validation'];
+  /** Fix spec Part D: the validation suite's results (readonly in, copied out). */
+  validation?: readonly NonNullable<InsightsStatus['validation']>[number][];
 }
 
 /** The per-source freshness record for /admin (insights:status). */
@@ -572,7 +572,7 @@ export function buildInsightsStatus(inputs: StatusBuildInputs): InsightsStatus {
     mode: inputs.mode,
     dryRun: inputs.dryRun,
     sources: [...inputs.reports],
-    ...(inputs.validation !== undefined ? { validation: inputs.validation } : {}),
+    ...(inputs.validation !== undefined ? { validation: [...inputs.validation] } : {}),
     ruleVersion: RULE_VERSION,
   });
 }

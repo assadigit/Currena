@@ -63,4 +63,9 @@ export const FRED_SERIES = {
   usUnemployment: 'UNRATE', // us-unemployment: the US unemployment rate, monthly BLS
   sahmRealtime: 'SAHMREALTIME', // sahm-rule: the real-time Sahm recession indicator, monthly
   vix: 'VIXCLS', // vix: the Cboe Volatility Index close, daily (Cboe data via FRED)
+  // Fix spec C-03/C-04/C-05 + T-01 (2026-10-14, each verified live on FRED):
+  us2y: 'DGS2', // fed-expectations: 2-year Treasury yield (the Fed policy gap's market leg)
+  us30y: 'DGS30', // us30y: the US 30-year Treasury yield, daily
+  breakeven10y: 'T10YIE', // validation-only: the 10-year breakeven (T-01 reconciliation)
+  phillyFed: 'GACDFSA066MSFRBPHI', // philly-fed: Philadelphia Fed manufacturing index, monthly SA
 } as const;

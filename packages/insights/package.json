@@ -6,6 +6,7 @@
   "description": "Insights feature: indicator definitions, scoring engine, fixture parsers and (via ./adapters) the Phase I2 source adapters. Root export stays pure/platform-free for the SPA; ./adapters carries the fetch halves (web-standard fetch only) for the runner.",
   "exports": {
     ".": "./src/index.ts",
+    "./validation": "./src/validation.ts",
     "./adapters": "./src/adapters/index.ts",
     "./store": "./src/store.ts",
     "./markets": "./src/markets/index.ts",

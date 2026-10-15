@@ -31,10 +31,12 @@
  */
 
 import type { IndicatorId } from '@currena/core';
-import { combineSeries, yoyPctSeries, type SeriesPoint } from '../series';
+import { combineSeries, yoyPctSeries, addDays, type SeriesPoint } from '../series';
 import { BASKET_CURRENCIES, computeBasketValue } from '../basket';
+import { PERCENTILE_WINDOW_DAYS } from '../scoring';
 import type { SpotPrice } from './types';
 import type { WorldBankMonthly } from './worldbank';
+import type { YahooQuote } from './yahoo';
 
 /** Pounds per metric tonne — gold-api's HG copper quote (USD/lb) → the World Bank's USD/mt unit. */
 const COPPER_LB_PER_TONNE = 2204.62262;
@@ -92,6 +94,8 @@ export interface SeriesInputs {
     /** The F1.1 monthly-average series (kept separately for diagnostics). */
     cashRateMonthly?: SeriesPoint[];
     au10y?: SeriesPoint[];
+    /** Fix spec C-06: F2 FCMYGBAG3D — the 3-year government bond yield. */
+    au3y?: SeriesPoint[];
     householdDebtRatio?: SeriesPoint[];
     homeLoanOutstanding?: SeriesPoint[];
     /** Step-2 §B7: F4.1 PDRNTH — the paid rate on new household term deposits. */
@@ -109,6 +113,14 @@ export interface SeriesInputs {
    * base alone and the history grows from there.
    */
   seedHistory?: Partial<Record<IndicatorId, SeriesPoint[]>>;
+  /**
+   * Fix spec B-01 (2026-10-14): 10-year Yahoo daily quotes for the price
+   * rows (gold GC=F, silver SI=F, Bitcoin BTC-USD) — the record-history
+   * backfill. The gold/silver/bitcoin VALUE series ride these daily closes
+   * (the monthly World Bank history no longer carries them); the daily
+   * HIGH series computes the record peaks (see computePeaks).
+   */
+  yahooHistories?: Partial<Record<'gold-usd' | 'silver-usd' | 'btc-usd', YahooQuote>>;
   /** The runner's calendar date (ISO) — stamps live points. */
   today: string;
 }
@@ -230,6 +242,13 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
       combineSeries(fred.A091RC1Q027SBEA, fred.W006RC1Q027SBEA, (interest, receipts) => interest / receipts),
     );
   }
+  // Fix spec C-03 (2026-10-14): the 2-year yield minus the Fed policy rate
+  // (the target range's lower bound — the same leg fed-target renders).
+  if (fred.DGS2 && fred.DFEDTARL) {
+    put('fed-expectations', combineSeries(fred.DGS2, fred.DFEDTARL, (two, policy) => two - policy));
+  }
+  // Fix spec C-04 (2026-10-14): the US 30-year Treasury yield.
+  put('us30y', fred.DGS30);
 
   /* ---------------- Global — Are prices heating up? ---------------- */
   if (fred.CPIAUCSL) put('us-cpi-yoy', yoyPctSeries(fred.CPIAUCSL));
@@ -274,6 +293,8 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // full history) so their stored histories cover the 10-year window.
   put('us-unemployment', fred.UNRATE);
   put('sahm-rule', fred.SAHMREALTIME);
+  // Fix spec C-05 (2026-10-14): the Philadelphia Fed manufacturing index.
+  put('philly-fed', fred.GACDFSA066MSFRBPHI);
   if (wb) put('copper-gold', combineSeries(wb.copper, wb.gold, (c, g) => c / g));
   put('usdcny', fx.CNY);
 
@@ -287,32 +308,41 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   if (out.brent === undefined && inputs.brentYahoo !== undefined) put('brent', inputs.brentYahoo);
   if (out.brent === undefined && wb) put('brent', wb.brent);
 
-  // Gold: gold-api XAU live + (WB monthly ∪ accumulated daily) history.
-  if (inputs.xauSpot) {
-    const base = wb ? mergeSeries(wb.gold, inputs.seedHistory?.['gold-usd'] ?? []) : (inputs.seedHistory?.['gold-usd'] ?? []);
-    put(
-      'gold-usd',
-      base.length > 0
-        ? withLivePoint(base, today, inputs.xauSpot.price)
-        : singlePoint(today, inputs.xauSpot.price),
-    );
-  } else if (wb) {
-    put('gold-usd', mergeSeries(wb.gold, inputs.seedHistory?.['gold-usd'] ?? []));
+  // Gold (fix B-01): the Yahoo 10-year daily closes are the value history;
+  // today's gold-api spot stamps the live point; the WB monthly and any
+  // accumulated seeds only cover a Yahoo outage.
+  {
+    const yahoo = inputs.yahooHistories?.['gold-usd'];
+    const fallback = wb
+      ? mergeSeries(wb.gold, inputs.seedHistory?.['gold-usd'] ?? [])
+      : (inputs.seedHistory?.['gold-usd'] ?? []);
+    const base = yahoo !== undefined && yahoo.points.length > 0 ? yahoo.points : fallback;
+    if (inputs.xauSpot) {
+      put(
+        'gold-usd',
+        base.length > 0 ? withLivePoint(base, today, inputs.xauSpot.price) : singlePoint(today, inputs.xauSpot.price),
+      );
+    } else if (base.length > 0) {
+      put('gold-usd', base);
+    }
   }
 
   // Silver: same recipe with XAG.
-  if (inputs.xagSpot) {
-    const base = wb ? mergeSeries(wb.silver, inputs.seedHistory?.['silver-usd'] ?? []) : (inputs.seedHistory?.['silver-usd'] ?? []);
-    put(
-      'silver-usd',
-      base.length > 0
-        ? withLivePoint(base, today, inputs.xagSpot.price)
-        : singlePoint(today, inputs.xagSpot.price),
-    );
-  } else if (wb) {
-    put('silver-usd', mergeSeries(wb.silver, inputs.seedHistory?.['silver-usd'] ?? []));
+  {
+    const yahoo = inputs.yahooHistories?.['silver-usd'];
+    const fallback = wb
+      ? mergeSeries(wb.silver, inputs.seedHistory?.['silver-usd'] ?? [])
+      : (inputs.seedHistory?.['silver-usd'] ?? []);
+    const base = yahoo !== undefined && yahoo.points.length > 0 ? yahoo.points : fallback;
+    if (inputs.xagSpot) {
+      put(
+        'silver-usd',
+        base.length > 0 ? withLivePoint(base, today, inputs.xagSpot.price) : singlePoint(today, inputs.xagSpot.price),
+      );
+    } else if (base.length > 0) {
+      put('silver-usd', base);
+    }
   }
-
   // Copper: live HG (USD/lb) converted to USD/mt so it joins the World Bank
   // monthly history and the accumulated dailies in one consistent unit.
   if (inputs.hgSpot) {
@@ -330,19 +360,24 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
     put('copper-usd', mergeSeries(wb.copper, inputs.seedHistory?.['copper-usd'] ?? []));
   }
 
-  // Bitcoin: accumulated daily snapshots + today's live point (no 10-year
-  // position by design — data spec §3 note).
-  const btcBase = inputs.seedHistory?.['btc-usd'] ?? [];
-  put(
-    'btc-usd',
-    inputs.btcSpot
-      ? btcBase.length > 0
-        ? withLivePoint(btcBase, today, inputs.btcSpot.price)
-        : singlePoint(today, inputs.btcSpot.price)
-      : btcBase.length > 0
-        ? btcBase
-        : undefined,
-  );
+  // Bitcoin (fix B-01): the Yahoo 10-year daily closes are the value
+  // history; the gold-api spot stamps today's point; accumulated seeds only
+  // cover a Yahoo outage. (The 10-year position now EXISTS — the data spec's
+  // "no multi-year history" note no longer applies.)
+  {
+    const yahoo = inputs.yahooHistories?.['btc-usd'];
+    const btcBase = yahoo !== undefined && yahoo.points.length > 0 ? yahoo.points : (inputs.seedHistory?.['btc-usd'] ?? []);
+    put(
+      'btc-usd',
+      inputs.btcSpot
+        ? btcBase.length > 0
+          ? withLivePoint(btcBase, today, inputs.btcSpot.price)
+          : singlePoint(today, inputs.btcSpot.price)
+        : btcBase.length > 0
+          ? btcBase
+          : undefined,
+    );
+  }
 
   // Context ratios under the Bitcoin price row (PB2: "context only, not
   // used in signals").
@@ -359,6 +394,10 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // Step-2 add-list §B2: the AU 10-year yield card (RBA F2 FCMYGBAG10D —
   // the same series the gap card subtracts, now also its own scored card).
   put('au-10y', rba?.au10y);
+  // Fix spec C-06 (2026-10-14): the 3-year bond yield minus the cash rate.
+  if (rba?.au3y && rba?.cashRate) {
+    put('rba-expectations', combineSeries(rba.au3y, rba.cashRate, (three, cash) => three - cash));
+  }
   if (rba?.au10y && fred.DGS10) {
     put('au-us-10y-gap', combineSeries(rba.au10y, fred.DGS10, (au, us) => au - us));
   }
@@ -395,6 +434,80 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
 }
 
 /**
+ * Fix spec B-01 (2026-10-14): the price rows' full-history PEAKS — the
+ * metals and Bitcoin read their Yahoo daily HIGH series (the record basis);
+ * Brent reads its own close-based series (FRED EIA spot + the BZ=F
+ * extension — the spec's "do not mix intraday peaks with closing prices").
+ * Each peak carries its value, date and basis so the card can state all
+ * three; the T-05 record floors verify them.
+ */
+export function computePeaks(
+  inputs: SeriesInputs,
+  /** The assembled Brent series (EIA spot ∪ BZ=F gap-fill — buildIndicatorSeries' output) — its close-peak is the card's record. */
+  brentSeries?: readonly SeriesPoint[],
+): Partial<Record<IndicatorId, { value: number; date: string; basis: 'daily-high' | 'daily-close' }>> {
+  const peaks: Partial<Record<IndicatorId, { value: number; date: string; basis: 'daily-high' | 'daily-close' }>> = {};
+  // The record is the highest DAILY HIGH (its own date — the max high can
+  // land on a different day than the max close); a response without highs
+  // falls back to the highest close.
+  const fromHigh = (quote: YahooQuote | undefined): { value: number; date: string } | undefined => {
+    if (quote === undefined) return undefined;
+    let best: { value: number; date: string } | undefined;
+    if (quote.highs !== undefined) {
+      for (const [date, high] of quote.highs) {
+        if (best === undefined || high > best.value) best = { value: high, date };
+      }
+      if (best !== undefined) return best;
+    }
+    for (const point of quote.points) {
+      if (best === undefined || point.value > best.value) best = point;
+    }
+    return best;
+  };
+  const gold = fromHigh(inputs.yahooHistories?.['gold-usd']);
+  if (gold) peaks['gold-usd'] = { ...gold, basis: 'daily-high' };
+  const silver = fromHigh(inputs.yahooHistories?.['silver-usd']);
+  if (silver) peaks['silver-usd'] = { ...silver, basis: 'daily-high' };
+  const btc = fromHigh(inputs.yahooHistories?.['btc-usd']);
+  if (btc) peaks['btc-usd'] = { ...btc, basis: 'daily-high' };
+  // Brent: the highest CLOSE of the assembled series (EIA spot + BZ=F
+  // gap-fill), constrained to the same 10-year window the stored history
+  // keeps — the card says "10-year peak", so a 2008 record outside the
+  // stored window is not the claim being made (the 2026-04-07 138.21 close
+  // is the window's own record; T-05's 127 floor still passes). The
+  // Yahoo-only fallback covers a missing FRED fetch (a short, honest peak
+  // the T-05 test flags anyway).
+  const brentSource = brentSeries ?? inputs.brentYahoo;
+  const brent =
+    brentSource !== undefined && brentSource.length > 0
+      ? brentSource
+          .filter((p) => p.date >= addDays(brentSource[brentSource.length - 1]!.date, -PERCENTILE_WINDOW_DAYS))
+          .reduce((best, p) => (best === undefined || p.value > best.value ? p : best), undefined as SeriesPoint | undefined)
+      : undefined;
+  if (brent) peaks.brent = { value: brent.value, date: brent.date, basis: 'daily-close' };
+  return peaks;
+}
+
+/**
+ * Fix spec B-19 (2026-10-14): the year of the last time the value was this
+ * high, found by searching the full stored history backward from the newest
+ * observation — a 10-year window cannot say "highest since 2002". Returns
+ * undefined when the history is too short to search.
+ */
+export function computeHighestSinceYear(series: readonly SeriesPoint[]): number | undefined {
+  if (series.length < 2) return undefined;
+  const current = series[series.length - 1]!;
+  for (let i = series.length - 2; i >= 0; i--) {
+    if (series[i]!.value >= current.value) {
+      return Number(series[i]!.date.slice(0, 4));
+    }
+  }
+  // The current value is the highest of the whole stored history — the year
+  // of the first observation is the honest floor.
+  return Number(series[0]!.date.slice(0, 4));
+}
+
+/**
  * The aux-series wiring for `below-aux` rules (I15): wage growth compares
  * against the au-cpi yearly series — the runner passes this map's au-cpi
  * entry to computeReading. Kept next to the composition so the pairing is
@@ -423,6 +536,12 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     url: 'https://data.ecb.europa.eu/data/datasets/FM/B.EUR.4F.KR.DFR.LEV',
   },
   'govt-interest-revenue': { name: 'FRED (BEA series, derived)', url: 'https://fred.stlouisfed.org/series/A091RC1Q027SBEA' },
+  'fed-expectations': { name: 'FRED (DGS2 − DFEDTARL)', url: 'https://fred.stlouisfed.org/series/DGS2' },
+  us30y: { name: 'FRED (DGS30)', url: 'https://fred.stlouisfed.org/series/DGS30' },
+  'philly-fed': {
+    name: 'FRED (GACDFSA066MSFRBPHI), Philadelphia Fed',
+    url: 'https://fred.stlouisfed.org/series/GACDFSA066MSFRBPHI',
+  },
   'us-cpi-yoy': { name: 'FRED (CPIAUCSL)', url: 'https://fred.stlouisfed.org/series/CPIAUCSL' },
   'us-cpi-core-yoy': { name: 'FRED (CPILFESL)', url: 'https://fred.stlouisfed.org/series/CPILFESL' },
   'breakeven-5y5y': { name: 'FRED (T5YIFR)', url: 'https://fred.stlouisfed.org/series/T5YIFR' },
@@ -482,6 +601,7 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   audusd: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   audjpy: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   'au-us-10y-gap': { name: 'RBA F2 − FRED (DGS10)', url: 'https://www.rba.gov.au/statistics/tables/' },
+  'rba-expectations': { name: 'RBA F2 (FCMYGBAG3D) − RBA F1', url: 'https://www.rba.gov.au/statistics/tables/' },
   'gold-aud': { name: 'gold-api.com × Frankfurter (ECB)', url: 'https://www.gold-api.com' },
   'iron-ore': {
     name: 'World Bank Pink Sheet',

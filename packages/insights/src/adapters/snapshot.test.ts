@@ -138,8 +138,9 @@ describe('buildInsightsSnapshot', () => {
       calendar: [],
       now: NOW,
     });
-    expect(snap.readings).toHaveLength(47);
-    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(47);
+    // Fix spec C (2026-10-14): the four additions grew the set.
+    expect(snap.readings).toHaveLength(51);
+    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(51);
     expect(snap.readings.find((r) => r.id === 'us10y')!.status).not.toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.status).toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.value).toBeNull();

@@ -42,7 +42,7 @@ export { RBA_TABLES, fetchRbaSeries, rbaTableUrl, RBA_CSV_BASE } from './rba';
 export type { RbaTableKey, RbaTableSpec } from './rba';
 export { ManualSeriesFileSchema, parseManualSeries } from './manual';
 export type { ManualSeriesFile } from './manual';
-export { buildIndicatorSeries, READING_SOURCES } from './derived';
+export { buildIndicatorSeries, computeHighestSinceYear, computePeaks, READING_SOURCES } from './derived';
 export type { SeriesInputs } from './derived';
 export { readXlsxSheet } from './xlsx';
 export type { XlsxCell } from './xlsx';

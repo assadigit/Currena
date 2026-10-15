@@ -22,9 +22,9 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 29 P1 / 18 P2 (Step-2: +au-10y/us-unemployment/sahm-rule/vix P1, +au-deposit-rate P2)', () => {
+  it('splits 29 P1 / 22 P2 (Step-2: +au-10y/us-unemployment/sahm-rule/vix P1, +au-deposit-rate P2; fix spec C: +fed-expectations/us30y/philly-fed/rba-expectations P2)', () => {
     expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(29);
-    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(18);
+    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(22);
   });
 
   it('groups are the question groups (global 5 + prices-board, australia 3)', () => {
@@ -74,10 +74,10 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     ]);
   });
 
-  it('GAUGE membership is the scored list (33 voters; fix B-14: +brent counts in prices-heat while its card renders on the prices strip; Step-2: +vix/us-unemployment/sahm-rule/au-10y, −iron-ore)', () => {
+  it('GAUGE membership is the scored list (37 voters; fix B-14: +brent counts in prices-heat; fix spec C: +fed-expectations/us30y/philly-fed/rba-expectations)', () => {
     const gaugedGroups = new Set(GAUGES.map((g) => g.id));
     const memberIds = new Set(GAUGES.flatMap((g) => g.members));
-    expect(memberIds.size).toBe(33);
+    expect(memberIds.size).toBe(37);
     // Every gauge member is a scored (non-info) definition. B-14's one
     // deliberate exception: brent lives in the prices-board lane group but
     // counts in the prices-heat gauge (the card renders on the Prices

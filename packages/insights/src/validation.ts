@@ -452,6 +452,17 @@ const MAX_UNCHANGED_RUN: Readonly<Record<IndicatorDefinition['cadence'], number 
   manual: 1,
 };
 
+/**
+ * Policy-rate step series (2026-10-15, live-run evidence): a central-bank
+ * target is SET at decision meetings and legitimately sits unchanged for
+ * months or years between them (the Fed's 2008–15 hold ran seven years; the
+ * 2026 evidence — 28 unchanged daily prints — is the normal state, not a
+ * duplicate). Their run length is judged by the decision calendar
+ * (data/insights-calendar.json + data/policy-decisions.json), not the
+ * observation cadence; T-04 freshness still guards their staleness.
+ */
+const STEP_POLICY_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>(['fed-target', 'ecb-dfr', 'rba-cash-rate']);
+
 function t08SuspiciousValues(inputs: ValidationInputs): ValidationTestResult {
   const failures: string[] = [];
   const flagged: IndicatorId[] = [];
@@ -460,7 +471,7 @@ function t08SuspiciousValues(inputs: ValidationInputs): ValidationTestResult {
     const series = seriesOf(inputs, def.id);
     if (!series || series.length < 2) continue;
     const maxRun = MAX_UNCHANGED_RUN[def.cadence];
-    if (maxRun === null) continue;
+    if (maxRun === null || STEP_POLICY_IDS.has(def.id)) continue;
     const current = pointAtOrBefore(series, nowDay);
     if (!current) continue;
     const idx = series.findIndex((p) => p.date === current.date);
@@ -548,6 +559,12 @@ function t09Counts(inputs: ValidationInputs): ValidationTestResult {
  */
 const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'yield-curve-10y2y',
+  // Fix spec C-03/C-04/C-05/C-06 (2026-10-14): the four additions all speak
+  // in points — two yield gaps, one yield, one diffusion index.
+  'fed-expectations',
+  'us30y',
+  'philly-fed',
+  'rba-expectations',
   'real-yield-10y',
   'us10y',
   'fed-target',

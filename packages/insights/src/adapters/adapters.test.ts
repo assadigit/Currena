@@ -86,7 +86,9 @@ describe('fred adapter', () => {
     expect(Object.values(FRED_SERIES)).toContain('UNRATE');
     expect(Object.values(FRED_SERIES)).toContain('SAHMREALTIME');
     expect(Object.values(FRED_SERIES)).toContain('VIXCLS');
-    expect(Object.values(FRED_SERIES)).toHaveLength(17);
+    // Fix spec C-03/C-04/C-05 + T-01 (2026-10-14): DGS2, DGS30, T10YIE and
+    // GACDFSA066MSFRBPHI joined.
+    expect(Object.values(FRED_SERIES)).toHaveLength(21);
   });
 });
 

@@ -32,6 +32,12 @@ export interface YahooQuote {
   livePrice: number;
   /** Daily closes, ascending by date; the LAST bar is the live session's provisional close. */
   points: SeriesPoint[];
+  /**
+   * Fix spec B-01 (2026-10-14): daily session HIGHS keyed by date — the
+   * record-peak basis for the metals and Bitcoin ("highest daily high").
+   * Absent when the response carries no high series (the closes still work).
+   */
+  highs?: ReadonlyMap<string, number>;
 }
 
 /** Thrown with the symbol in the message so per-asset fault isolation can log it. */
@@ -84,7 +90,7 @@ export function parseYahooQuoteResponse(json: unknown, symbol: string): Omit<Yah
   }
   const r = result as {
     timestamp?: number[];
-    indicators?: { quote?: { close?: (number | null)[] }[]; adjclose?: { adjclose?: (number | null)[] }[] };
+    indicators?: { quote?: { close?: (number | null)[]; high?: (number | null)[] }[]; adjclose?: { adjclose?: (number | null)[] }[] };
     meta?: { regularMarketPrice?: number };
   };
   const stamps = r.timestamp;
@@ -93,12 +99,14 @@ export function parseYahooQuoteResponse(json: unknown, symbol: string): Omit<Yah
   }
   const closes = r.indicators?.quote?.[0]?.close;
   const adjcloses = r.indicators?.adjclose?.[0]?.adjclose;
+  const highs = r.indicators?.quote?.[0]?.high;
   const series = Array.isArray(adjcloses) ? adjcloses : closes;
   if (!Array.isArray(series)) {
     throw new YahooQuoteError(symbol, 'neither adjclose nor close series present');
   }
 
   const byDate = new Map<string, number>();
+  const highsByDate = new Map<string, number>();
   let livePrice = r.meta?.regularMarketPrice;
   for (let i = 0; i < stamps.length; i++) {
     const value = series[i];
@@ -108,6 +116,10 @@ export function parseYahooQuoteResponse(json: unknown, symbol: string): Omit<Yah
     // A session's provisional close is fresher than any printed close — the
     // live price always wins when it is present and sane.
     if (i === stamps.length - 1 && typeof livePrice !== 'number') livePrice = value;
+    const high = highs?.[i];
+    if (typeof high === 'number' && Number.isFinite(high) && high > 0) {
+      highsByDate.set(day, Math.max(highsByDate.get(day) ?? 0, high));
+    }
   }
   if (byDate.size === 0) {
     throw new YahooQuoteError(symbol, 'no date carried a positive close');
@@ -118,7 +130,7 @@ export function parseYahooQuoteResponse(json: unknown, symbol: string): Omit<Yah
   const points: SeriesPoint[] = [...byDate.entries()]
     .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
     .map(([date, value]) => ({ date, value }));
-  return { livePrice, points };
+  return { livePrice, points, ...(highsByDate.size > 0 ? { highs: highsByDate } : {}) };
 }
 
 /** Fetch one symbol's chart (daily interval). Range must cover the 30-day change window. */

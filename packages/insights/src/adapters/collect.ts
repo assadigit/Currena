@@ -87,6 +87,22 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     fetchYahooQuote('BZ=F', '40d'),
   );
 
+  // Fix spec B-01 (2026-10-14): the record-history backfill for the price
+  // rows — 10 years of Yahoo daily quotes for gold (GC=F), silver (SI=F) and
+  // Bitcoin (BTC-USD). The peaks for the metals and Bitcoin read the DAILY
+  // HIGH series (Bitstamp cross-checks BTC); Brent's peak reads its own
+  // close-based series (FRED EIA spot + the BZ=F extension). These power the
+  // reading.peak / fromPeak10y fields and T-05's record floors.
+  const goldYahooQuote = await fetchLogged('yahoo', 'GC=F daily quotes (10-year record history)', () =>
+    fetchYahooQuote('GC=F', '10y'),
+  );
+  const silverYahooQuote = await fetchLogged('yahoo', 'SI=F daily quotes (10-year record history)', () =>
+    fetchYahooQuote('SI=F', '10y'),
+  );
+  const btcYahooQuote = await fetchLogged('yahoo', 'BTC-USD daily quotes (10-year record history)', () =>
+    fetchYahooQuote('BTC-USD', '10y'),
+  );
+
   // ECB Data Portal (deposit facility rate, full history).
   const ecbDfr = await fetchLogged('ecb', 'FM/D.U2.EUR.4F.KR.DFR.LEV', () => fetchEcbDfrSeries());
 
@@ -123,6 +139,8 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
   const rbaCashRateDaily = await fetchLogged('rba', 'F1 Cash Rate Target (daily)', () => fetchRbaSeries('cashRateDaily'));
   const rbaCashRate = await fetchLogged('rba', 'F1.1 Cash Rate Target', () => fetchRbaSeries('cashRate'));
   const rbaAu10y = await fetchLogged('rba', 'F2 Australian Government 10 year bond', () => fetchRbaSeries('au10y'));
+  // Fix spec C-06: F2's 3-year series (FCMYGBAG3D) — the RBA-expectations leg.
+  const rbaAu3y = await fetchLogged('rba', 'F2 FCMYGBAG3D Australian Government 3 year bond', () => fetchRbaSeries('au3y'));
   const rbaHouseholdDebt = await fetchLogged('rba', 'E2 Household debt to income', () =>
     fetchRbaSeries('householdDebtToIncome'),
   );
@@ -151,6 +169,11 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
       today,
       fred,
       brentYahoo: brentYahooQuote?.points,
+      yahooHistories: {
+        'gold-usd': goldYahooQuote,
+        'silver-usd': silverYahooQuote,
+        'btc-usd': btcYahooQuote,
+      },
       ecb: { dfr: ecbDfr },
       fx: {
         JPY: fx?.JPY,
@@ -172,6 +195,7 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
         cashRate: rbaCashRateDaily ?? rbaCashRate,
         cashRateMonthly: rbaCashRate,
         au10y: rbaAu10y,
+        au3y: rbaAu3y,
         householdDebtRatio: rbaHouseholdDebt,
         homeLoanOutstanding: rbaHomeLoan,
         depositRateNewTermHouseholds: rbaDepositRate,

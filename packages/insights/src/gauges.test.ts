@@ -200,9 +200,9 @@ describe('GAUGES table shape (v1 membership, data spec §4)', () => {
     expect(GAUGES.filter((g) => g.section === 'australia')).toHaveLength(3);
   });
 
-  it('20 global scored + 13 australia scored = 33 voting members (fix B-14: +brent in prices-heat; Step-2: +vix/us-unemployment/sahm-rule global, +au-10y −iron-ore australia)', () => {
-    expect(GAUGES.filter((g) => g.section === 'global').flatMap((g) => g.members)).toHaveLength(20);
-    expect(GAUGES.filter((g) => g.section === 'australia').flatMap((g) => g.members)).toHaveLength(13);
+  it('23 global scored + 14 australia scored = 37 voting members (fix B-14: +brent in prices-heat; fix spec C: +fed-expectations/us30y/philly-fed global, +rba-expectations australia)', () => {
+    expect(GAUGES.filter((g) => g.section === 'global').flatMap((g) => g.members)).toHaveLength(23);
+    expect(GAUGES.filter((g) => g.section === 'australia').flatMap((g) => g.members)).toHaveLength(14);
   });
 
   it('no member appears in two gauges', () => {

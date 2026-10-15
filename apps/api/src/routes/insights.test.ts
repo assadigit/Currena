@@ -594,6 +594,7 @@ describe('KV-failure honesty (audit A-2 — reader throws, route stays calm)', (
         getSnapshot: () => Promise.reject(kvFailure),
         getHistory: () => Promise.reject(kvFailure),
         getStatus: () => Promise.reject(kvFailure),
+        getArchive: () => Promise.reject(kvFailure),
       }),
     });
     const res = await app.request('/api/insights', undefined, env);
@@ -634,6 +635,7 @@ describe('KV-failure honesty (audit A-2 — reader throws, route stays calm)', (
         getSnapshot: () => Promise.resolve(undefined),
         getHistory: () => Promise.reject(kvFailure),
         getStatus: () => Promise.resolve(undefined),
+        getArchive: () => Promise.resolve(undefined),
       }),
     });
     const res = await app.request('/api/insights/us10y/history', undefined, env);

@@ -39,7 +39,18 @@ export const GAUGES: readonly GaugeDef[] = [
   {
     id: 'borrowing-costs',
     section: 'global',
-    members: ['yield-curve-10y2y', 'real-yield-10y', 'us10y', 'fed-target', 'ecb-dfr', 'govt-interest-revenue'],
+    // Fix spec C-03/C-04 (2026-10-14): the Fed-expectations gap and the
+    // 30-year yield join the voters (both scored rate series).
+    members: [
+      'yield-curve-10y2y',
+      'fed-expectations',
+      'real-yield-10y',
+      'us10y',
+      'us30y',
+      'fed-target',
+      'ecb-dfr',
+      'govt-interest-revenue',
+    ],
   },
   {
     // Fix spec B-14 (2026-10-14): oil IS scored (its change rule votes) and
@@ -56,13 +67,19 @@ export const GAUGES: readonly GaugeDef[] = [
   { id: 'dollar-strength', section: 'global', members: ['dollar-basket', 'usdjpy'] },
   // Step-2 add-list §B3/§B4: US unemployment and the Sahm rule join the
   // growth-health voters, next to the US macro series already there.
-  { id: 'growth-health', section: 'global', members: ['china-pmi', 'm2-us', 'us-unemployment', 'sahm-rule', 'copper-gold'] },
+  // Fix spec C-05 (2026-10-14): the Philadelphia Fed survey joins them.
+  {
+    id: 'growth-health',
+    section: 'global',
+    members: ['china-pmi', 'philly-fed', 'm2-us', 'us-unemployment', 'sahm-rule', 'copper-gold'],
+  },
   {
     id: 'au-inflation-rates',
     section: 'australia',
     // Step-2 add-list §B2: the AU 10-year yield is a scored rate (its
     // 10-year position), joining the CPI and gap voters.
-    members: ['au-cpi', 'au-trimmed-mean', 'au-10y', 'au-us-10y-gap'],
+    // Fix spec C-06 (2026-10-14): the RBA-expectations gap joins them.
+    members: ['au-cpi', 'au-trimmed-mean', 'rba-expectations', 'au-10y', 'au-us-10y-gap'],
   },
   {
     id: 'au-households',

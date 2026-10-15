@@ -155,6 +155,52 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou:
       'The world’s most-copied rate dial: what the Fed decides tends to reach Australian mortgage and savings rates indirectly.',
   },
+  'fed-expectations': {
+    // Fix spec C-03 (2026-10-14): the 2-year yield minus the policy rate.
+    name: 'What markets expect from the Fed',
+    ticker: '2-year gap',
+    oneLiner:
+      'The 2-year US borrowing rate minus the Fed’s policy rate: a wide positive gap means the market’s short-term rate sits above today’s policy rate; a negative gap means below it.',
+    lines: {
+      highRising:
+        'The 2-year rate sits well above the policy rate and the gap is widening: the market’s own pricing sits above today’s setting.',
+      highEasing: 'The gap between the 2-year rate and the policy rate is positive but narrowing.',
+      typical: 'The 2-year rate sits close to the policy rate: no strong lean either way.',
+      low: 'The 2-year rate sits below the policy rate: the market’s own pricing sits below today’s setting.',
+    },
+    whatItIs:
+      'The US 2-year Treasury yield (FRED’s DGS2) minus the Fed’s policy rate (the lower bound of the target range, FRED’s DFEDTARL), from FRED.',
+    whyItMatters:
+      'Two-year yields track the policy path the market itself prices: this gap is the market’s lean relative to today’s setting, watched by savers and borrowers everywhere.',
+    tendedToMean:
+      'Wide positive gaps have appeared when the market priced a rising policy path; negative gaps appeared in the run-ups to past rate-cutting cycles.',
+    cantTell:
+      'It describes market pricing, not the Fed’s own intentions, and it moves with growth and inflation news too.',
+    forYou: 'A quick read on the direction of US borrowing costs the market has priced — context, never advice.',
+  },
+  us30y: {
+    // Fix spec C-04 (2026-10-14): the long end of the US curve.
+    name: 'US 30-year Treasury yield',
+    ticker: '30-year',
+    oneLiner:
+      'The interest rate on 30-year US government borrowing: the long end of the world’s biggest bond market.',
+    lines: {
+      highRising:
+        'Long-term US borrowing costs are high for their decade and rising: the setting where long-dated borrowing, including fixed home loans, is expensive.',
+      highEasing: 'Long-term US borrowing costs are high for their decade but easing.',
+      typical: 'The 30-year yield sits in its usual range for the decade.',
+      low: 'Long-term US borrowing costs are low.',
+    },
+    whatItIs:
+      'The market yield on 30-year US Treasury bonds, daily from FRED (DGS30).',
+    whyItMatters:
+      'The 30-year yield anchors long-term borrowing costs worldwide, from fixed-rate mortgages to corporate and government debt issuance.',
+    tendedToMean:
+      'Sustained rises in this yield tend to lift fixed-rate mortgage pricing; falls tend to ease it.',
+    cantTell:
+      'It is a market price, not a policy setting, and it moves with growth, inflation and borrowing-supply news.',
+    forYou: 'A benchmark for long-term borrowing costs, including the pricing of long fixed-rate loans.',
+  },
   'ecb-dfr': {
     name: 'The euro area’s policy rate',
     oneLiner:
@@ -311,7 +357,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       low: 'Market fear is low: the calm setting for share markets.',
     },
     whatItIs:
-      'The Cboe Volatility Index (VIX): the market’s own measure of how big the next month’s S&P 500 swings are expected to be. Daily close from FRED (VIXCLS), © Cboe.',
+      'The Cboe Volatility Index (VIX): the market’s own gauge of the size of S&P 500 swings priced into one-month options. Daily close from FRED (VIXCLS), © Cboe.',
     whyItMatters:
       'It is the market’s own fear thermometer: readings in the teens mean calm, those in the twenties mean nerves, and the rare spikes above 30 have marked panics.',
     tendedToMean:
@@ -449,6 +495,28 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     cantTell:
       'How fast money changes hands matters as much as how much of it exists; supply alone doesn’t set prices.',
     forYou: 'Background that makes inflation debates easier to follow.',
+  },
+  'philly-fed': {
+    // Fix spec C-05 (2026-10-14): the free US activity survey.
+    name: 'US factory survey (Philadelphia Fed)',
+    ticker: 'Philly Fed',
+    oneLiner:
+      'A monthly survey of manufacturers in the US mid-Atlantic: above zero means expansion.',
+    lines: {
+      highRising: 'More manufacturers are growing and the pace is quickening: a strong reading for US activity.',
+      highEasing: 'Manufacturers are still growing, but more slowly.',
+      typical: 'The survey sits in its usual range for the decade.',
+      low: 'More manufacturers are shrinking than growing: the reading that marks contraction.',
+    },
+    whatItIs:
+      'The Philadelphia Fed’s manufacturing index (FRED’s GACDFSA066MSFRBPHI): the share of firms reporting growth minus the share reporting decline, seasonally adjusted; above zero means expansion.',
+    whyItMatters:
+      'One of the first US activity numbers released each month — a same-month signal, before the national data.',
+    tendedToMean:
+      'Reads below zero have marked US manufacturing slowdowns; the survey moves early in the cycle.',
+    cantTell:
+      'It covers one Federal Reserve district, not the whole country, and one month’s dip is not a trend.',
+    forYou: 'An early, free read on US factory activity for the month.',
   },
   'us-unemployment': {
     name: 'US unemployment',
@@ -634,13 +702,13 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     },
     unitNote: 'US dollars per bitcoin',
     whatItIs:
-      'The live price of one bitcoin in US dollars: an hourly quote from Yahoo Finance’s spot index on a daily gold-api.com backbone. By design there is no 10-year position here (the feed carries no multi-year history) so the 7- and 30-day changes come from stored daily snapshots.',
+      'The live price of one bitcoin in US dollars: an hourly quote from Yahoo Finance’s spot index on a daily gold-api.com backbone. The 10-year position and the record peak come from ten years of Yahoo daily data.',
     whyItMatters:
       'Bitcoin is the flagship of the crypto world: its mood tends to set the tone for a whole family of digital assets.',
     tendedToMean:
       'The great booms (2020–21) met easy money; the deep crash (2022) met tightening: a pattern of risk appetite, nothing steadier.',
     cantTell:
-      'Famously volatile: the price says nothing about value, and nothing here is a view on what anyone should hold.',
+      'Famously volatile: the price says nothing about value, and this page takes no view on holdings.',
     forYou:
       'A context price for crypto headlines: and a reminder that a fast-moving asset can move just as fast the other way.',
   },
@@ -729,6 +797,29 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     cantTell:
       'It moves with world bond markets (US yields, global growth news), so it can shift with no Australian news at all.',
     forYou: 'Background for fixed home-loan and term-deposit pricing.',
+  },
+  'rba-expectations': {
+    // Fix spec C-06 (2026-10-14): the 3-year bond yield minus the cash rate.
+    name: 'What markets expect from the RBA',
+    ticker: '3-year gap',
+    oneLiner:
+      'The 3-year Australian government borrowing rate minus the RBA cash rate: a positive gap means the market’s 3-year rate sits above today’s cash rate; a negative gap means below.',
+    lines: {
+      highRising:
+        'The 3-year rate sits well above the cash rate and the gap is widening: the market’s own pricing sits above today’s setting.',
+      highEasing: 'The gap between the 3-year rate and the cash rate is positive but narrowing.',
+      typical: 'The 3-year rate sits close to the cash rate: no strong lean either way.',
+      low: 'The 3-year rate sits below the cash rate: the market’s own pricing sits below today’s setting.',
+    },
+    whatItIs:
+      'The RBA’s 3-year Australian Government bond yield (statistical table F2, series FCMYGBAG3D) minus the cash rate target (table F1), from the RBA.',
+    whyItMatters:
+      'This gap is the market’s lean relative to today’s cash rate — the same measure the financial press quotes as what the market prices for the RBA.',
+    tendedToMean:
+      'Positive gaps have appeared when the market priced a rising cash-rate path; negative gaps appeared in the run-ups to past rate-cutting cycles.',
+    cantTell:
+      'It describes market pricing, not the RBA’s own intentions, and it moves with world bond markets too.',
+    forYou: 'A quick read on the direction of Australian borrowing costs the market has priced — context, never advice.',
   },
   'au-us-10y-gap': {
     name: 'The gap between Australian and US 10-year borrowing',

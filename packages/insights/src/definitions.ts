@@ -100,6 +100,47 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 5,
   },
   {
+    // Fix spec C-03 (2026-10-14): "What markets expect from the Fed" — the
+    // US 2-year Treasury yield minus the Fed policy rate (the target range's
+    // lower bound, the same leg the fed-target card renders beside its
+    // upper). When the 2-year yield sits well above the policy rate, markets
+    // price higher future policy; well below, they price cuts. Scored
+    // through the engine's standard percentile machinery — the explicit
+    // word thresholds are a Step-3 deliverable and the card says so.
+    id: 'fed-expectations',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'What markets expect from the Fed (2-year gap)',
+    source: 'derived',
+    sourceRef: 'FRED:DGS2 − FRED:DFEDTARL (2-year yield minus the policy rate)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
+    staleAfterDays: 4,
+  },
+  {
+    // Fix spec C-04 (2026-10-14): the US 30-year Treasury yield — the long
+    // end of the borrowing-costs lane; shows "highest since {year}" (B-19).
+    id: 'us30y',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'US 30-year Treasury yield',
+    source: 'fred',
+    sourceRef: 'FRED:DGS30',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: {
+      kind: 'any-of',
+      of: [
+        { kind: 'percentile', tail: 'high', cutoff: 0.1 },
+        { kind: 'change', mode: 'points', direction: 'rise', magnitude: 0.5, windowWeeks: 4 },
+      ],
+    },
+    staleAfterDays: 4,
+  },
+  {
     id: 'ecb-dfr',
     section: 'global',
     group: 'borrowing-costs',
@@ -346,6 +387,25 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 90,
   },
   {
+    // Fix spec C-05 (2026-10-14): one free US activity survey — the
+    // Philadelphia Fed manufacturing index (FRED GACDFSA066MSFRBPHI, monthly
+    // SA diffusion index, series confirmed live on FRED 2026-10-14:
+    // Sep 2026 = 37.8). Below zero reads as contraction — the scored rule.
+    id: 'philly-fed',
+    section: 'global',
+    group: 'growth-health',
+    name: 'Philadelphia Fed manufacturing index',
+    source: 'fred',
+    sourceRef: 'FRED:GACDFSA066MSFRBPHI (Philadelphia Fed manufacturing index, SA)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'threshold', direction: 'below', value: 0 },
+    // Monthly obs (M-01) ages ~46 days between releases (published ~3rd
+    // week of M+1) — 60 keeps the cadence honest.
+    staleAfterDays: 60,
+  },
+  {
     // Step-2 add-list §B3: US unemployment (FRED UNRATE, monthly, verified
     // live 2026-10-13: Sep 2026 = 4.2). Scored on its own 10-year level
     // ("high unemployment for the decade") — the "rising fast" signal is
@@ -564,6 +624,24 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     cadence: 'weekly',
     changeKind: 'points',
     phase: 'P1',
+    rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
+  },
+  {
+    // Fix spec C-06 (2026-10-14): "What markets expect from the RBA" — the
+    // Australian 3-year government bond yield (RBA F2 FCMYGBAG3D, series ID
+    // confirmed from the F2 CSV's own Series ID row) minus the cash rate.
+    // When the 3-year yield sits above the cash rate, markets price higher
+    // future policy; below it, cuts. Scored through the percentile
+    // machinery — the explicit words are a Step-3 deliverable.
+    id: 'rba-expectations',
+    section: 'australia',
+    group: 'au-inflation-rates',
+    name: 'What markets expect from the RBA (3-year gap)',
+    source: 'derived',
+    sourceRef: 'RBA F2 FCMYGBAG3D (3-year bond) − RBA F1 cash rate target',
+    cadence: 'weekly',
+    changeKind: 'points',
+    phase: 'P2',
     rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
   },
   {
