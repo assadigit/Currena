@@ -1224,14 +1224,14 @@ html:not(:lang(fa)) .type-kicker {
 }
 
 /* Verdict meter (H1): four segments + a marker on the current step.
- * R30: segment inks mirrored the FOUR-STEP word scale (the word and its
- * meter shared one hue — never colour alone).
- * Round 42 (owner): "I don't like the multi-colored grades … use a more
- * low-key color; this section has too much color" — a filled step is now
- * ONE neutral ink at EVERY size (the big hero meter joins the small ones,
- * which went normal-ink in round 36). The step's WORD — beside the meter
- * and in the grouped status rows — carries the meaning; never colour
- * alone. Unfilled steps stay the border grey. */
+ * R30: segment inks mirror the FOUR-STEP word scale exactly (the word
+ * and its meter share one hue — never colour alone).
+ * Round 36 → 42 (owner): the meters went one neutral ink (sm first, then
+ * every size). Round 43 (owner): "Revert colors back to the situation
+ * grades" — the decree is REVERSED at every size: a filled step wears its
+ * step's own ink again (green / yellow / orange / red, the owner-pinned
+ * Carbon palette), the word beside it still carries the meaning. Unfilled
+ * steps stay the border grey. */
 .verdict-meter {
   display: flex;
   gap: 3px;
@@ -1243,12 +1243,10 @@ html:not(:lang(fa)) .type-kicker {
   border-radius: 999px;
   background: var(--color-border);
 }
-.verdict-meter-seg.on-1,
-.verdict-meter-seg.on-2,
-.verdict-meter-seg.on-3,
-.verdict-meter-seg.on-4 {
-  background: var(--color-text-secondary);
-}
+.verdict-meter-seg.on-1 { background: var(--color-status-normal); }
+.verdict-meter-seg.on-2 { background: var(--color-status-watch); }
+.verdict-meter-seg.on-3 { background: var(--color-status-stressed); }
+.verdict-meter-seg.on-4 { background: var(--color-status-alert); }
 /* The hero's meter is the page's status instrument — bigger there.
  * The compact one rides each per-gauge hero row (fixed 44px track). */
 .verdict-meter-lg { flex: 1 1 auto; max-width: 150px; min-width: 90px; }

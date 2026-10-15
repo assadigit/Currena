@@ -17,6 +17,7 @@ export function GlossaryTip({
   def,
   srLabel,
   children,
+  panelClassName,
 }: {
   /** The one-sentence definition. Omit when `children` carries the panel. */
   def?: string;
@@ -24,6 +25,10 @@ export function GlossaryTip({
   /** Round 42: richer panels (the hero's how-calculated tip adds a link to
    * the full explainer) — replaces the plain `def` text when given. */
   children?: ReactNode;
+  /** Round 43: extra classes for the panel span — the hero seats the tip
+   * inside flex rows, where the panel must wrap onto its own full-width
+   * line (`w-full basis-full`) instead of squeezing beside its button. */
+  panelClassName?: string;
 }) {
   const [open, setOpen] = useState(false);
   const panelId = useId();
@@ -45,7 +50,7 @@ export function GlossaryTip({
       {open ? (
         <span
           id={panelId}
-          className="mt-1 block rounded-[var(--radius-md)] bg-currena-soft/70 px-2.5 py-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]"
+          className={`mt-1 block rounded-[var(--radius-md)] bg-currena-soft/70 px-2.5 py-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]${panelClassName ? ` ${panelClassName}` : ''}`}
         >
           {children ?? <bdi>{def}</bdi>}
         </span>

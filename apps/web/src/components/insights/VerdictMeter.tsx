@@ -46,6 +46,28 @@
  *  7. the four-segment meters go low-key (one neutral ink, see index.css
  *     round 42) and the attention tiles lose their pink tint for neutral
  *     surfaces.
+ *
+ * Round 43 (owner, on the round-42 result):
+ *  1. the meters REVERT to the four-step status inks (index.css round 43 —
+ *     the round-36/42 neutral-ink decree is reversed);
+ *  2. the two "?" tips move from lone floats to their subjects: the
+ *     verdict-rule tip seats in the FIRST status group's header (beside
+ *     the group word it explains), the how-computed tip rides the verdict
+ *     row itself;
+ *  3. the attention module flows from the top — the old bottom-anchor
+ *     turned the Australia card's missing bullets into a mid-card hole;
+ *     now the spare space falls to the card's bottom inside edge (reads
+ *     as padding — the R30 equal-height stretch stays);
+ *  4. the alert bullets get an explicit flex marker so the dot sits at
+ *     the sentence START in every direction (the old ::marker rode the
+ *     button's last text baseline — it landed beside the WRAPPED line);
+ *  5. the alert container becomes clearly visible: a soft alert-tinted
+ *     bounded box (the reds stop floating as open text);
+ *  6. the bullet-less card (Australia never grows the alert box — the
+ *     section signals are Global-scope) leads with SIX of its own
+ *     attention tiles instead of three — the card's real "items to
+ *     mention" fill the space the alert box would have taken, so the
+ *     stretch no longer strands a mid-card hole or a bottom void.
  */
 
 import { useState } from 'react';
@@ -69,6 +91,16 @@ import { GlossaryTip } from './world-currencies/GlossaryTip';
 function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
   return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
 }
+
+/* Round 43: the alert bullet's explicit marker — one shared element (the
+ * old ::marker rode the button's last-line baseline and landed beside the
+ * wrapped line; a flex marker sits at the sentence START in every
+ * direction). Static JSX, safe to reuse in every bullet row. */
+const BULLET_DOT = (
+  <span aria-hidden="true" className="shrink-0 select-none leading-[1.6] text-[var(--color-text-tertiary)]">
+    •
+  </span>
+);
 
 /** The four-step segmented meter with a marker on the current step.
  *  R30: `large` is the hero's status instrument (taller segments);
@@ -193,13 +225,20 @@ export function VerdictBlock({
     step: num(step || 0, numberLocale),
   });
 
-  // R3: the needs-attention tiles (extremity-sorted, up to 3 + "+n more").
-  // Round 33: "+n more" reveals the rest IN PLACE (local state) — the old
-  // jump-to-lane behaviour read as a dead click (the owner: "doesn't show
-  // other indicators").
+  // R3: the needs-attention tiles (extremity-sorted). Round 33: "+n more"
+  // reveals the rest IN PLACE (local state). Round 43 (owner): a card with
+  // no section-signal bullets (Australia never grows the alert box — the
+  // signals are Global-scope) leads with SIX of its own attention tiles —
+  // the card's real "items to mention" fill the space the alert box would
+  // have taken; a card WITH bullets keeps the 3 + "+n more" economy.
   const tiles = attentionTiles(readings, section);
+  const hasBullets =
+    marketsAlert !== undefined ||
+    fxAlert !== undefined ||
+    (sectionIndicators !== undefined && sectionIndicators.length > 0);
+  const baseReveal = hasBullets ? 3 : 6;
   const [revealAllTiles, setRevealAllTiles] = useState(false);
-  const shown = revealAllTiles ? tiles : tiles.slice(0, 3);
+  const shown = revealAllTiles ? tiles : tiles.slice(0, baseReveal);
 
   // Gauge member count for the "n of m" line (same denominator as before).
   const gaugeMemberIds = new Set(sectionGauges.flatMap((g) => [...g.members]));
@@ -248,13 +287,28 @@ export function VerdictBlock({
  * word — [icon][word] — the state's mark LEADS the row (the old
  * word-first order read as [stressed][icon]); same reading order as
  * every other chip in the app. The meter stays last. */}
-      <p className="m-0 flex items-center gap-3">
-        {/* Round 42 (owner): the artwork rides SMALLER (32/40) — still the
-         * page's warm status moment beside its word, no longer a shout. */}
-        {stateIconUrl(step) !== null ? <IconImg src={stateIconUrl(step)!} size={32} desktopSize={40} className="drop-shadow-sm" /> : null}
-        <span className={`type-verdict ${stepToneClass(step)}`}>{verdictLabel}</span>
-        <VerdictMeter step={step} label={verdictLabel} ariaLabel={ariaLabel} size="lg" />
-      </p>
+      {/* Round 43 (owner): the "how is this computed?" tip rides the row it
+       * explains — the verdict itself — instead of floating at the card's
+       * foot. The panel wraps to its own full-width line (panelClassName). */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <p className="m-0 flex min-w-0 flex-1 items-center gap-3">
+          {/* Round 42 (owner): the artwork rides SMALLER (32/40) — still the
+           * page's warm status moment beside its word, no longer a shout. */}
+          {stateIconUrl(step) !== null ? <IconImg src={stateIconUrl(step)!} size={32} desktopSize={40} className="drop-shadow-sm" /> : null}
+          <span className={`type-verdict ${stepToneClass(step)}`}>{verdictLabel}</span>
+          <VerdictMeter step={step} label={verdictLabel} ariaLabel={ariaLabel} size="lg" />
+        </p>
+        <GlossaryTip srLabel={copy.ui.howCalculated} panelClassName="w-full basis-full">
+          <bdi>{copy.ui.explainerIntro}</bdi>
+          <button
+            type="button"
+            onClick={onJumpAbout}
+            className="insights-focusable mt-1 inline-flex w-fit cursor-pointer items-center rounded-lg border-0 bg-transparent p-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+          >
+            {copy.ui.explainerFullLink} ↧
+          </button>
+        </GlossaryTip>
+      </div>
 
       {/* R2 → R30 → round 24 → round 36 → round 42 (owner): the gauges
        * GROUPED BY STATUS. The old flat row of chips + the computed reason
@@ -274,11 +328,25 @@ export function VerdictBlock({
         const zeroRows = gaugeRows.filter((g) => g.step === 0);
         const wordOfStep = (s: number) =>
           s === 1 ? copy.label.relaxed : s === 2 ? copy.label.cautious : s === 3 ? copy.label.stressed : copy.label.alarmed;
-        if (readable.length === 0 && zeroRows.length === 0) return null;
+        if (readable.length === 0 && zeroRows.length === 0) {
+          /* No gauges at all — the rule tip keeps its standalone home. */
+          return (
+            <div>
+              <GlossaryTip def={copy.ui.verdictRule} srLabel={copy.ui.verdictRuleLabel} />
+            </div>
+          );
+        }
+        /* Round 43 (owner): the verdict-rule tip seats in the FIRST group's
+         * header — beside the status word it explains — instead of floating
+         * alone under the groups. */
+        const ruleTip = (
+          <GlossaryTip def={copy.ui.verdictRule} srLabel={copy.ui.verdictRuleLabel} panelClassName="w-full basis-full" />
+        );
         if (readable.length === 0) {
           return (
             <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
               {copy.ui.noSummary}
+              {ruleTip}
             </p>
           );
         }
@@ -289,16 +357,17 @@ export function VerdictBlock({
             aria-label={copy.ui.heroGaugesLabel}
             data-hero-gauges
           >
-            {steps.map((s) => (
+            {steps.map((s, si) => (
               <li
                 key={s}
                 className="rounded-[var(--radius-md)] bg-currena-muted/[0.05] px-2.5 py-2 ring-1 ring-[var(--color-border)]/60"
                 data-gauge-group={s}
               >
-                <p className="m-0 mb-1">
+                <p className="m-0 mb-1 flex flex-wrap items-center gap-x-1.5 gap-y-1">
                   <span className="inline-flex rounded-full bg-currena-muted/15 px-2 py-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)]">
                     {wordOfStep(s)}
                   </span>
+                  {si === 0 ? ruleTip : null}
                 </p>
                 <ul className="m-0 grid list-none grid-cols-1 gap-x-5 gap-y-1 p-0 sm:grid-cols-2">
                   {readable
@@ -374,27 +443,33 @@ export function VerdictBlock({
           </ul>
         );
       })()}
-      {/* Step-1 audit item E1 → round 42 (owner): the long verdict-rule
-       * paragraph hides behind a quiet "?" tip — visible on demand, off
-       * the card's face. The SAME rule for both regions. */}
-      <div>
-        <GlossaryTip def={copy.ui.verdictRule} srLabel={copy.ui.verdictRuleLabel} />
-      </div>
       {/* R3 → round 24 → R40 (owner) → round 42 (owner): the count line,
-       * the needs-attention tiles WITH NUMBERS (largest text in the tile),
-       * the "+n more" reveal and the how-tip are ONE bottom-anchored
-       * module — a single mt-auto pins its top edge, so the tile ROW starts
-       * at the same y in BOTH hero panels by structure (the alignment
-       * decree). Each tile face is geometry-fixed — 2-line clamped name,
-       * one-line value with the unit read SMALL (R40), 3-line clamped
+       * the needs-attention tiles WITH NUMBERS (largest text in the tile)
+       * and the "+n more" reveal are ONE module. It was bottom-anchored
+       * (R40: a single mt-auto pinned the tile ROW to the same y in both
+       * hero panels), but round 42's alert container only ever fills the
+       * GLOBAL card — Australia never grows one — so the anchor turned
+       * Australia's missing bullets into a mid-card hole. Round 43 (owner):
+       * the module flows from the top and the spare space falls to the
+       * card's bottom inside edge (reads as padding); the R30 equal-height
+       * stretch stays. Each tile face is geometry-fixed — 2-line clamped
+       * name, one-line value with the unit read SMALL (R40), 3-line clamped
        * meaning — so the row height is identical across regions.
        * Round 42 (owner): the red notes group into ONE bounded container
        * with bullets — the count line is the container's header, each
        * raised signal becomes one bullet — so the reds stop floating as
        * open text on the card. With nothing to list, the count line rides
        * bare as before. The tiles lose their pink tint for neutral
-       * surfaces (red stays on the words, not as a wall of pink). */}
-      <div className="mt-auto" data-attention-module>
+       * surfaces (red stays on the words, not as a wall of pink).
+       * Round 43 (owner): the container becomes clearly visible — a soft
+       * alert-tinted box; each bullet carries an EXPLICIT flex marker so
+       * the dot sits at the sentence START (the old ::marker rode the
+       * button's last-line baseline and landed beside the wrapped line);
+       * and the module flows from the top — the old bottom-anchor (mt-auto)
+       * turned Australia's missing bullets into a mid-card hole, while the
+       * spare space now falls to the card's bottom inside edge (the R30
+       * equal-height stretch stays). */}
+      <div data-attention-module>
         {(() => {
           const countLine = (
             <p
@@ -411,19 +486,15 @@ export function VerdictBlock({
               })}
             </p>
           );
-          const hasBullets =
-            marketsAlert !== undefined ||
-            fxAlert !== undefined ||
-            (sectionIndicators !== undefined && sectionIndicators.length > 0);
           if (!hasBullets) return countLine;
           return (
             <div
-              className="rounded-[var(--radius-md)] bg-currena-muted/[0.05] px-2.5 py-2 ring-1 ring-[var(--color-border)]/60"
+              className="rounded-[var(--radius-md)] bg-[var(--color-status-alert)]/[0.05] px-3 py-2.5 ring-1 ring-[var(--color-status-alert)]/25"
               data-attention-box
             >
               {countLine}
               <ul
-                className="m-0 mt-1 list-disc space-y-1 ps-4 marker:text-[var(--color-text-tertiary)]"
+                className="m-0 mt-2 list-none space-y-1.5 p-0"
                 data-attention-bullets
               >
                 {/* §5.3 hero integration: the raised world-markets signal
@@ -431,7 +502,8 @@ export function VerdictBlock({
                  * language (attention = the alert red, unusual = the amber
                  * watch ink). Clicking jumps to the world-markets section. */}
                 {marketsAlert ? (
-                  <li>
+                  <li className="flex items-start gap-1.5">
+                    {BULLET_DOT}
                     <button
                       type="button"
                       onClick={() => onJumpMarkets?.()}
@@ -460,7 +532,8 @@ export function VerdictBlock({
                  * raised currency signal with its PATTERN NAMES (the cards
                  * carry the detail) — no new card. */}
                 {fxAlert ? (
-                  <li>
+                  <li className="flex items-start gap-1.5">
+                    {BULLET_DOT}
                     <button
                       type="button"
                       onClick={() => onJumpFx?.()}
@@ -486,7 +559,8 @@ export function VerdictBlock({
                  * currency pattern is the designed state (they measure
                  * different things); the labels say so. */}
                 {(sectionIndicators ?? []).map((ind, i) => (
-                  <li key={i}>
+                  <li key={i} className="flex items-start gap-1.5">
+                    {BULLET_DOT}
                     {ind.signal !== 'normal' && ind.onJump !== undefined ? (
                       <button
                         type="button"
@@ -569,33 +643,17 @@ export function VerdictBlock({
                 );
               })}
             </ul>
-            {tiles.length > 3 && !revealAllTiles ? (
+            {tiles.length > baseReveal && !revealAllTiles ? (
               <button
                 type="button"
                 onClick={() => setRevealAllTiles(true)}
                 className="insights-focusable mt-1.5 inline-flex min-h-[24px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
               >
-                {interpolate(copy.ui.attentionTileMore, { n: num(tiles.length - 3, numberLocale) })}
+                {interpolate(copy.ui.attentionTileMore, { n: num(tiles.length - shown.length, numberLocale) })}
               </button>
             ) : null}
           </div>
         ) : null}
-
-        {/* H1 → R40 → round 42 (owner): the "how is this computed?" link
-         * hides behind the same quiet "?" tip — the panel answers in one
-         * sentence and keeps the jump to the full explainer. */}
-        <div className="mt-1.5">
-          <GlossaryTip srLabel={copy.ui.howCalculated}>
-            <bdi>{copy.ui.explainerIntro}</bdi>
-            <button
-              type="button"
-              onClick={onJumpAbout}
-              className="insights-focusable mt-1 inline-flex w-fit cursor-pointer items-center rounded-lg border-0 bg-transparent p-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
-            >
-              {copy.ui.explainerFullLink} ↧
-            </button>
-          </GlossaryTip>
-        </div>
       </div>
     </article>
   );
