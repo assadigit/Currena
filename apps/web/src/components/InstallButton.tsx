@@ -8,7 +8,7 @@
  * entry point instead:
  *
  *   - `variant="icon"`  → compact 📲 icon button for the header top bar
- *                         (h-10 w-10, same pattern as the theme/language
+ *                         (h-11 w-11, same pattern as the theme/language
  *                         toggles so the bar stays visually balanced).
  *   - `variant="row"`   → labeled row for the mobile side menu (same
  *                         pattern as the theme/language rows).

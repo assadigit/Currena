@@ -112,7 +112,7 @@ export function Header() {
         <div className="flex shrink-0 items-center gap-2 lg:gap-3">
           {/* Utility group (owner request 2026-09-20): install · language ·
               theme · hamburger — ONE shared bordered icon-button container
-              (HEADER_ICON_BUTTON_CLASS) with equal 40px hit areas, so the
+              (HEADER_ICON_BUTTON_CLASS) with equal 44px hit areas, so the
               group reads as a single consistent settings row in both themes
               (the former mixed plain-text / plain-emoji / unstyled boxes
               retired). */}

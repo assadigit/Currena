@@ -110,13 +110,14 @@ export function LiveIndicator({ live }: { live: boolean }) {
  * visual treatment of the utility icon group") — the ONE shared
  * container style for the top-bar utility controls (PWA install ·
  * language · theme · hamburger). A bordered icon-button surface with
- * equal 40px hit areas, so the former mix of plain text / plain emoji /
+ * equal 44px hit areas (the WCAG touch-target floor; 2026-10-16 quirk
+ * pass — was 40px), so the former mix of plain text / plain emoji /
  * unstyled boxes reads as a single consistent settings row in both
  * themes. Callers append only their glyph size (text-sm/text-lg/…).
  * ------------------------------------------------------------------ */
 
 export const HEADER_ICON_BUTTON_CLASS =
-  'inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-[10px] border border-black/10 bg-black/[0.03] text-currena-dark transition-all duration-300 hover:border-black/25 hover:bg-black/[0.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.12]';
+  'inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-[10px] border border-black/10 bg-black/[0.03] text-currena-dark transition-all duration-300 hover:border-black/25 hover:bg-black/[0.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.12]';
 
 /* ------------------------------------------------------------------ *
  * Source badge — TGJU / Frankfurter / Manual / Local
