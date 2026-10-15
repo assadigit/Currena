@@ -5,6 +5,63 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-16b] — Insights full export: one-file "download all data" (MD/TXT/CSV/XLSX)
+
+The owner's request: a download button that exports every data table the
+financial-indicators page displays, in ONE file, in four formats.
+
+### Added
+
+- **"Download data" button** beside Tools in the Insights header (44px
+  target, ToolsMenu's disclosure discipline): one click opens the format
+  choice, one click downloads. Formats: Markdown (.md), plain text
+  (.txt), CSV (.csv), Excel workbook (.xlsx); filename
+  `currena-insights-full-<snapshot-date>.<ext>`.
+- **Content** (everything the page lists and displays): the hero
+  verdicts (the precomputed summary lines), the prices board rows with
+  position words and the board's own context lines (gold A$ · BTC
+  ratios), the world-markets table (worst-first), the world-currencies
+  pairs (group order), the Together connections (card order, with each
+  card's relation + right-now leg phrases), the gold/silver signals
+  checklists, all 51 indicator readings (the long-standing 12-column
+  layout), the upcoming calendar, and this week's state changes — plus
+  the meta floor (subtitle, data-as-of, prices-as-of, rule version).
+- **Discipline** identical to the existing exports (insights-csv /
+  markets-csv / fx-csv): machine-readable VALUES (ASCII digits, period
+  decimals, NO grouping — a grouping comma inside a CSV field would
+  corrupt the column alignment), localized names/headers, the OWASP
+  formula-injection guard on free-text CSV cells, CRLF + trailing CRLF
+  for the CSV (RFC 4180); MD/TXT use LF. The XLSX is the in-house
+  zero-dependency writer (real number cells), one worksheet per section.
+- **Everything lazily loaded**: the builders (full-export 11.18 kB +
+  xlsx-writer 5.57 kB) and the format panel (2.75 kB) are separate
+  chunks — the Insights chunk grows only by the trigger button, the
+  download handler and 14 copy strings × 2 locales (603.71/142.72 vs
+  the consciously bumped **604/142.8** — note in the budget script).
+
+### Fixed
+
+- **Popover off-screen bug** (found while verifying the export panel):
+  the Tools panel anchored `end-0` slid 75 px off-screen at 375 px EN
+  and did the mirrored thing in fa RTL — the anchor side flips with the
+  writing direction but the flex-wrap can leave the button at either
+  visual edge. Both panels now clamp inside the viewport via a shared
+  physical clamp (`lib/clamp-panel.ts`, 8 px margins, X + Y).
+
+### Verification
+
+- 16 new unit tests (web 427 → 443; monorepo 1,310 → 1,326 green);
+  typecheck 6/6; lint 0 errors / 15 accepted advisories (D-24);
+  copy:audit clean (14 new fa strings triaged in the manifest).
+- Browser-verified en/fa × light/dark × 375 px/desktop: all four
+  formats download with correct names/MIME/sizes; MD structure, CSV
+  columns and XLSX ZIP magic inspected; the panel clamps inside the
+  viewport in both directions; zero console errors; no horizontal
+  bleed. Evidence: `docs/evidence/2026-10-16-export/`.
+- Deploy: currena-api **`30f647f6`** from HEAD `186a070`; production
+  XLSX download re-verified on currena.ir (77,366 B, panel clamp OK at
+  375 px, zero errors).
+
 ## [2026-10-16] — UI/UX quirk pass: touch targets, RTL, signals headings
 
 The owner's polish commission (docs/NEXT_SESSION_PROMPT.md §0) — visual

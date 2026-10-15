@@ -1,14 +1,14 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-16 (the UI/UX quirk pass: 7 quirks shipped,
-7 declined with reasons — see docs/QA/quirks-2026-10-16.md, CHANGELOG
-2026-10-16 and docs/DEPLOY.md's last session record. Production:
-currena-api `9d995f01` from HEAD `8eb6c94`, currena-markets `9b5ff7e0`
-untouched).
+Hand-off date: 2026-10-16 (the Insights full export: the one-file
+"download all data" MD/TXT/CSV/XLSX export shipped, deployed and
+production-verified — currena-api `30f647f6` from HEAD `186a070`,
+currena-markets `9b5ff7e0` untouched; see CHANGELOG 2026-10-16b,
+docs/DEPLOY.md's last session record and
+docs/evidence/2026-10-16-export/).
 · Production: https://currena.ir
-· The owner's polish commission is CLOSED — the quirk inventory is
-  fully dispositioned (every item shipped or declined); do not reopen
-  declined items (Q1, Q2, Q10–Q14 — the reasons live in the QA report).
+· The export commission is CLOSED; the quirk-pass commission is CLOSED
+  (docs/QA/quirks-2026-10-16.md). Do not reopen declined items.
 
 ---
 
@@ -54,19 +54,22 @@ never hit live sites, secrets never persisted. Then this file,
 `docs/DEPLOY.md`, `docs/QA/quirks-2026-10-16.md` (this commission's
 record), `FIX_REPORT.md` (the insights audit's record).
 
-## 2. Current verified state (2026-10-16 close)
+## 2. Current verified state (2026-10-16b close)
 
-- Gates green at close: **1,309/1,309 tests** (core 191 · scraper 67 ·
-  insights 403 · markets 13 · api 208 · web 427), typecheck 6/6, lint
+- Gates green at close: **1,326/1,326 tests** (core 191 · scraper 67 ·
+  insights 403 · markets 13 · api 208 · web 443), typecheck 6/6, lint
   0 errors / 15 accepted advisories (D-24), copy audit clean, budgets
-  held (entry 294.67/88.53 vs 296/89.5; Insights lazy 599.53/141.53 vs
-  600/142).
+  held (entry 294.75/88.53 vs 296/89.5; Insights lazy 603.71/142.72 vs
+  the consciously bumped 604/142.8 — the export builders are separate
+  lazy chunks: full-export 11.18 + xlsx-writer 5.57 + panel 2.75).
 - Live data floor: 51 readings, ruleVersion 2, validation 14/14, no
   failed sources; archive serving; freshness chain (D-12 + D-13)
   verified intact post-deploy.
-- Production DOM re-verified post-deploy at 375 px: header buttons
-  44×44 ×4, footer links 32px, chips 40px, copy chip 36px, receipt
-  delete 36px; zero console errors; no horizontal bleed.
+- Production DOM re-verified post-deploy at 375 px: the export button
+  renders, the XLSX downloads from production, the export/Tools panels
+  clamp inside the viewport (8..348), header buttons 44×44 ×4, footer
+  links 32px, chips 40px, copy chip 36px, receipt delete 36px; zero
+  console errors; no horizontal bleed.
 - A11y floor: skip link, h1s, useDialogFocus on every dialog, real
   tablists, radio-group arrows, live regions, labeled validation
   errors — keep every one of these green while restyling.
@@ -83,10 +86,14 @@ record), `FIX_REPORT.md` (the insights audit's record).
    U+066B separator, KOSPI's yellow bear chip, flap-board ASCII
    digits, wrapped-title tile drift, the repeated fa header date, the
    FAB overlap. Deliberate conventions or deliberate patterns.
-4. **i18n copy corpora** (`insights-copy-en/fa.ts`) and
+4. **Bundle budgets**: entry 296/89.5 (294.75/88.53 measured);
+   Insights lazy **604/142.8** (603.71/142.72 measured — the
+   2026-10-16b export bump; the builders are separate lazy chunks).
+   Any further Insights-chunk growth needs its own justification.
+5. **i18n copy corpora** (`insights-copy-en/fa.ts`) and
    `packages/core/src/schemas.ts` — data-file and sacred-surface;
    unchanged policy.
-5. **Owner-side items**: Telegram ingest-alert secrets, the I7
+6. **Owner-side items**: Telegram ingest-alert secrets, the I7
    launch-approval exit gate (BACKTEST review), the signals-wording
    legal read (S3), connection-evidence confirmations, **token
    rotation** (all three tokens have now transited chat across three
@@ -139,9 +146,11 @@ record), `FIX_REPORT.md` (the insights audit's record).
 - **Sandbox resets between sessions** — commit and push often; the
   shared worklog (`/home/z/my-project/worklog.md`) is the recovery
   ledger; never rely on uncommitted work surviving.
-- **Bundle budgets**: the Insights chunk is 0.47 kB raw from its cap —
+- **Bundle budgets**: the Insights chunk is 0.29 kB raw from its cap —
   any look-tweak that adds code there needs measurement first; prefer
-  CSS-only tweaks; a bump needs a changelog note.
+  CSS-only tweaks; a bump needs a changelog note. The export builders
+  are separate lazy chunks — new export features cost the Insights
+  chunk only their copy strings.
 - **agent-browser screenshot paths are relative to ITS cwd** — pass
   absolute paths or the save silently fails.
 

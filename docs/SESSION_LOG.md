@@ -319,3 +319,34 @@ the fixes shipped, deployed and re-verified on currena.ir:
 
 Session fully closed: `origin/main` = docs HEAD; production =
 currena-api `9d995f01` + currena-markets `9b5ff7e0`.
+
+## Insights full export (2026-10-16b ~14:45 UTC) — owner's export commission
+
+The owner asked for a one-click export of ALL data displayed on the
+financial-indicators page in MD / TXT / CSV / XLSX with a download
+button. Shipped end-to-end this session:
+
+- **Feature**: the "Download data" button beside Tools; four formats;
+  every displayed section in one file (verdicts, prices, markets,
+  currencies, connections, signals, 51 readings, calendar, changed
+  this week, meta). All builders lazily chunked; the XLSX rides the
+  in-house zero-dependency writer.
+- **Bonus fix**: the popover viewport clamp (lib/clamp-panel.ts) — the
+  verification found the Tools panel 75 px off-screen at 375 px EN
+  (and mirrored in fa); both panels now clamp physically.
+- **Budget**: Insights lazy 603.71/142.72 vs the consciously bumped
+  604/142.8 (builders are separate lazy chunks; entry untouched).
+- **Commits**: `764e841` (clamp fix) + `186a070` (the feature) — each
+  with the full gate suite; CI green; pushed from a fresh environment
+  recovery (the sandbox reaped the dev harness mid-session; rebuilt
+  vite :3000 + the read-only :8787 production forwarder).
+- **Deployed**: currena-api `30f647f6` from `186a070`; markets
+  untouched. Production smoke re-verified the button, the XLSX
+  download and the panel clamp on currena.ir.
+- **Docs closed out**: CHANGELOG 2026-10-16b, DEPLOY.md record, this
+  log, PROGRESS status, NEXT_SESSION_PROMPT, evidence
+  `docs/evidence/2026-10-16-export/`.
+- **Token rotation still outstanding** (owner-side).
+
+Session fully closed: `origin/main` = docs HEAD; production =
+currena-api `30f647f6` + currena-markets `9b5ff7e0`.

@@ -1116,3 +1116,27 @@ with reasons — full record in `docs/QA/quirks-2026-10-16.md`.
   fix — 4× header buttons 44×44, footer links 32px, converter chips
   40px, copy chip 36px, receipt delete 36px; zero page errors, zero
   console messages; no horizontal bleed.
+
+## Session record — 2026-10-16b Insights full export (MD/TXT/CSV/XLSX)
+
+Commission: the owner's one-file "download all data" export for the
+financial-indicators page (CHANGELOG §2026-10-16b).
+
+- **Deployed**: currena-api **`30f647f6-84d6-4193-8edd-cb1f3f0f9ef3`**
+  (2026-10-16, ~14:40 UTC) from HEAD `186a070` — the two feature
+  commits (`764e841` popover clamp fix, `186a070` the export feature)
+  ride as the Worker's static assets. Cron `* * * * *` + KV intact.
+- **currena-markets NOT redeployed** (`9b5ff7e0` stays current — zero
+  markets imports touched).
+- **Gates at deploy**: tests 1,326 green (core 191 · scraper 67 ·
+  insights 403 · markets 13 · api 208 · web 443), typecheck 6/6, lint
+  0 errors / 15 advisories (D-24), copy audit clean, budgets held
+  (entry 294.75/88.53 vs 296/89.5; Insights lazy 603.71/142.72 vs the
+  consciously bumped 604/142.8 — builders are separate lazy chunks).
+- **CI**: green on the pushed HEAD (`186a070`), verified via API.
+- **Post-deploy smoke on currena.ir**: `/api/health` 200; `/api/insights`
+  51 readings, ruleVersion 2; `/admin` 401; convert parity 100 USD →
+  26,790,000 IRR @ 267,900 (tgju live); the export button renders, the
+  XLSX downloads from production (77,366 B, byte-size identical to the
+  local run on the same snapshot), the panel clamps inside the 375 px
+  viewport (8..348); zero page errors / console messages.
