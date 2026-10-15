@@ -1089,3 +1089,30 @@ checkbox ticked). CI green on every push; final CI green on `b6a35a7`.
   (D-12/D-13 intact); convert parity 100 USD → 26,390,000 @ 263,900
   (tgju live); `/admin` 401 (Worker-first gate intact); the new
   `Insights-CF53RA0h.js` lazy chunk serves (599.37 kB).
+
+## Session record — 2026-10-16 UI/UX quirk pass (touch targets + polish)
+
+Commission: the owner's minor UI/UX quirks + look tweaks
+(docs/NEXT_SESSION_PROMPT.md §0). Seven quirks shipped, seven declined
+with reasons — full record in `docs/QA/quirks-2026-10-16.md`.
+
+- **Deployed**: currena-api **`9d995f01-3f72-4246-b425-2bbd7771bbed`**
+  (2026-10-16, ~11:16 UTC) from HEAD `8eb6c94` (the web app ships as
+  the Worker's static assets — the CSS-only fix commits ride along).
+  Cron `* * * * *` + KV bindings intact.
+- **currena-markets NOT redeployed**: the quirk pass touched zero
+  markets imports; deployed `9b5ff7e0` stays current.
+- **Gates at deploy**: tests 1,309 green (core 191 · scraper 67 ·
+  insights 403 · markets 13 · api 208 · web 427), typecheck 6/6, lint
+  0 errors / 15 accepted advisories (D-24), copy audit clean, budgets
+  held (entry 294.67/88.53 vs 296/89.5; Insights lazy 599.53/141.53 vs
+  600/142 — CSS-only, no bump).
+- **CI**: green on the pushed HEAD (`8eb6c94`, "gates" completed
+  success — verified via the API after each push).
+- **Post-deploy smoke on currena.ir**: `/api/health` 200;
+  `/api/insights` serving (ruleVersion 2 snapshot); `/admin` 401
+  (Worker-first gate intact); convert parity 100 USD → 26,690,000 IRR
+  @ 266,900 (tgju live); fresh production DOM at 375 px carries every
+  fix — 4× header buttons 44×44, footer links 32px, converter chips
+  40px, copy chip 36px, receipt delete 36px; zero page errors, zero
+  console messages; no horizontal bleed.

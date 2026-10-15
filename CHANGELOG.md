@@ -5,6 +5,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-16] — UI/UX quirk pass: touch targets, RTL, signals headings
+
+The owner's polish commission (docs/NEXT_SESSION_PROMPT.md §0) — visual
+and interaction quality only; no data, scoring, wording-policy or
+behavior changes. Full inventory, verification record and the seven
+declined quirks: `docs/QA/quirks-2026-10-16.md`. Evidence:
+`docs/evidence/2026-10-16-quirks/`.
+
+### Fixed
+
+- **Header utility icon buttons 40px → 44px** (`HEADER_ICON_BUTTON_CLASS`,
+  the install · language · theme · hamburger group) — the WCAG 2.5.8
+  touch-target floor; `eb0f3d1`.
+- **Footer trust links gain a 32px hit area** (py-2 inline-flex; were a
+  bare 16px text line — the smallest targets in the app); `9630c5a`.
+- **Converter amount quick-chips 34px → 40px; live-rate copy chip
+  32px → 36px; receipt delete button 32px → 36px** — three controls
+  under the touch-target floor lifted; `8eb6c94`.
+- **Insights fa "prices updated" time drops the seconds** — en/fa time
+  precision now matches (shared clock formatter); `5ef803c`.
+- **Signals group headings render only when the group has rows** — no
+  more empty "Supports"/"Works against" headers; `bb8fb6a`.
+- **Converter custom-rate disclosure triangle mirrors in RTL**; `f81eda7`.
+
+### Verification
+
+- Gates at close: tests **1,309 green** (core 191 · scraper 67 ·
+  insights 403 · markets 13 · api 208 · web 427), typecheck 6/6, lint
+  0 errors / 15 accepted advisories (D-24), copy:audit clean, budgets
+  held (entry 294.67/88.53 vs 296/89.5; Insights lazy 599.53/141.53 vs
+  600/142 — CSS-only, no bump needed).
+- Production DOM (currena.ir, 375 px, post-deploy): all 4 header
+  buttons 44×44, footer links 32px, chips 40px, copy chip 36px,
+  receipt delete 36px; zero console errors; no horizontal bleed.
+- Deploy: currena-api **`9d995f01`** (2026-10-16, ~11:16 UTC) from
+  HEAD `8eb6c94`; currena-markets untouched (`9b5ff7e0` still current
+  — no markets imports changed).
+
 ## [2026-10-15e] — INSIGHTS_FIX_SPEC wrap-up: Part E, published, deployed
 
 The close-out of the 14-October audit's fix project. All 48 spec items

@@ -290,3 +290,32 @@ environment (repo re-cloned, deps reinstalled):
 
 Session fully closed: `origin/main` = final wrap-up HEAD; production =
 currena-api `97e8c38a` + currena-markets `9b5ff7e0`.
+
+## UI/UX quirk pass (2026-10-16 ~11:20 UTC) — owner's polish commission
+
+The full sweep happened this session against the live-shaped local
+harness (vite :3000 + a read-only :8787 forwarder to production), then
+the fixes shipped, deployed and re-verified on currena.ir:
+
+- **Sweep**: 10 routes × EN-light-desktop(1440) + FA-dark-mobile(375),
+  dialogs, drawer, keyboard focus, sticky-footer, chart labels,
+  Persian digits, chip legibility. Evidence:
+  `docs/evidence/2026-10-16-quirks/`.
+- **Inventory**: Q1–Q14; shipped Q3–Q9 as F1–F6, declined Q1, Q2, Q10,
+  Q11, Q12, Q13, Q14 with reasons — `docs/QA/quirks-2026-10-16.md`.
+- **Commits** (each with the full gate suite + CI green): `5ef803c`
+  (fa/en time precision), `bb8fb6a` (empty signals headings),
+  `f81eda7` (RTL disclosure mirror), `eb0f3d1` (header buttons 44px),
+  `9630c5a` (footer links 32px), `8eb6c94` (chips 40px / copy 36px /
+  receipt delete 36px).
+- **Deployed**: currena-api `9d995f01` from `8eb6c94`; markets
+  untouched. Post-deploy smoke + production DOM re-verified every
+  number; zero console errors; no 375px bleed.
+- **Docs closed out**: CHANGELOG 2026-10-16 entry, DEPLOY.md session
+  record, this log, PROGRESS.md status, NEXT_SESSION_PROMPT.md
+  rewritten for the next commission.
+- **Token rotation still outstanding** (all three tokens transited
+  chat repeatedly across sessions) — owner-side.
+
+Session fully closed: `origin/main` = docs HEAD; production =
+currena-api `9d995f01` + currena-markets `9b5ff7e0`.
