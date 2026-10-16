@@ -1,0 +1,1359 @@
+{
+  "_fixture": "Parsed from docs/insights/baseline/currena-insights-full-2026-10-15.md by packages/insights/scripts/parse-baseline-export.ts — regenerate, never hand-edit.",
+  "meta": {
+    "What the world’s money is doing": "plain-language gauges, prices and indicators.",
+    "Data as of": "2026-10-15",
+    "Prices updated": "2026-10-15 22:13 UTC",
+    "Rule version": "2"
+  },
+  "tables": {
+    "Where things stand": {
+      "headers": [
+        "Indicator",
+        "Status",
+        "Details"
+      ],
+      "rows": [
+        {
+          "Indicator": "Global",
+          "Status": "Stressed",
+          "Details": "6 of 23 in warning"
+        },
+        {
+          "Indicator": "Australia",
+          "Status": "Stressed",
+          "Details": "6 of 14 in warning"
+        }
+      ]
+    },
+    "Prices": {
+      "headers": [
+        "Indicator",
+        "Value",
+        "Unit",
+        "7-day change",
+        "30-day change",
+        "Position",
+        "Details"
+      ],
+      "rows": [
+        {
+          "Indicator": "Oil price (Brent)",
+          "Value": 105.65,
+          "Unit": "US$",
+          "7-day change": 1.31,
+          "30-day change": -2.85,
+          "Position": "expensive",
+          "Details": "One bitcoin buys 19.6 oz of gold · One bitcoin buys about 1430 oz of silver"
+        },
+        {
+          "Indicator": "Gold price (ounce)",
+          "Value": 4191.7,
+          "Unit": "US$",
+          "7-day change": 0.83,
+          "30-day change": -3.26,
+          "Position": "expensive",
+          "Details": "Gold price in Australian dollars: 5979.8792 · One bitcoin buys 19.6 oz of gold · One bitcoin buys about 1430 oz of silver"
+        },
+        {
+          "Indicator": "Silver price (ounce)",
+          "Value": 57.6,
+          "Unit": "US$",
+          "7-day change": -2.48,
+          "30-day change": -8.91,
+          "Position": "expensive",
+          "Details": "One bitcoin buys 19.6 oz of gold · One bitcoin buys about 1430 oz of silver"
+        },
+        {
+          "Indicator": "Bitcoin price",
+          "Value": 82360.58,
+          "Unit": "US$",
+          "7-day change": 0.84,
+          "30-day change": 8.92,
+          "Position": "expensive",
+          "Details": "One bitcoin buys 19.6 oz of gold · One bitcoin buys about 1430 oz of silver"
+        }
+      ]
+    },
+    "World stock markets": {
+      "headers": [
+        "Market",
+        "Today %",
+        "3 months %",
+        "From 52-week high %",
+        "Trend",
+        "Status",
+        "Last close",
+        "52-week high",
+        "52-week low",
+        "As of",
+        "Source"
+      ],
+      "rows": [
+        {
+          "Market": "KOSPI",
+          "Today %": -0.44,
+          "3 months %": -11.9,
+          "From 52-week high %": -34.07,
+          "Trend": "Down",
+          "Status": "Bear market",
+          "Last close": 6008.81,
+          "52-week high": 9114.55,
+          "52-week low": 3561.81,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        },
+        {
+          "Market": "Nifty 50",
+          "Today %": -0.44,
+          "3 months %": -6.02,
+          "From 52-week high %": -14.08,
+          "Trend": "Down",
+          "Status": "Correction",
+          "Last close": 22622.7,
+          "52-week high": 26328.55,
+          "52-week low": 22231.8,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        },
+        {
+          "Market": "Hang Seng",
+          "Today %": -0.13,
+          "3 months %": -2.78,
+          "From 52-week high %": -13.06,
+          "Trend": "Down",
+          "Status": "Correction",
+          "Last close": 24314.17,
+          "52-week high": 27968.09,
+          "52-week low": 22671.86,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        },
+        {
+          "Market": "Shanghai Composite",
+          "Today %": -0.88,
+          "3 months %": -2.97,
+          "From 52-week high %": -11.2,
+          "Trend": "Down",
+          "Status": "Correction",
+          "Last close": 3767.23,
+          "52-week high": 4242.57,
+          "52-week low": 3764.15,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        },
+        {
+          "Market": "CAC 40",
+          "Today %": 0.58,
+          "3 months %": -6.02,
+          "From 52-week high %": -9.77,
+          "Trend": "Down",
+          "Status": "Correction",
+          "Last close": 7873.11,
+          "52-week high": 8726.03,
+          "52-week low": 7665.62,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        },
+        {
+          "Market": "Nikkei 225",
+          "Today %": -0.05,
+          "3 months %": 1.36,
+          "From 52-week high %": -6.39,
+          "Trend": "Up",
+          "Status": "Normal",
+          "Last close": 67744.29,
+          "52-week high": 72366.34,
+          "52-week low": 46847.32,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        },
+        {
+          "Market": "ASX 200",
+          "Today %": -0.64,
+          "3 months %": -1.28,
+          "From 52-week high %": -5.86,
+          "Trend": "Down",
+          "Status": "Normal",
+          "Last close": 8727.9,
+          "52-week high": 9271.6,
+          "52-week low": 8365.9,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        },
+        {
+          "Market": "Euro Stoxx 50",
+          "Today %": 0.38,
+          "3 months %": -1.48,
+          "From 52-week high %": -5.51,
+          "Trend": "Down",
+          "Status": "Normal",
+          "Last close": 6190.37,
+          "52-week high": 6551.22,
+          "52-week low": 5501.28,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        },
+        {
+          "Market": "Dow Jones",
+          "Today %": -0.09,
+          "3 months %": -1.77,
+          "From 52-week high %": -5.02,
+          "Trend": "Down",
+          "Status": "Normal",
+          "Last close": 51621.48,
+          "52-week high": 54349.12,
+          "52-week low": 45166.64,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        },
+        {
+          "Market": "DAX",
+          "Today %": 0.15,
+          "3 months %": 1.54,
+          "From 52-week high %": -4.79,
+          "Trend": "Down",
+          "Status": "Normal",
+          "Last close": 25298.61,
+          "52-week high": 26569.99,
+          "52-week low": 22300.75,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        },
+        {
+          "Market": "Nasdaq 100",
+          "Today %": -2.02,
+          "3 months %": 3.19,
+          "From 52-week high %": -4.08,
+          "Trend": "Flat",
+          "Status": "Normal",
+          "Last close": 29950.82,
+          "52-week high": 31224.47,
+          "52-week low": 22953.38,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        },
+        {
+          "Market": "S&P/TSX Composite",
+          "Today %": -1.11,
+          "3 months %": 0.69,
+          "From 52-week high %": -3.72,
+          "Trend": "Down",
+          "Status": "Normal",
+          "Last close": 35584.46,
+          "52-week high": 36957.6,
+          "52-week low": 29777.8,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        },
+        {
+          "Market": "TAIEX",
+          "Today %": 0.59,
+          "3 months %": 6.58,
+          "From 52-week high %": -2.4,
+          "Trend": "Up",
+          "Status": "Normal",
+          "Last close": 48625.83,
+          "52-week high": 49822.55,
+          "52-week low": 26434.94,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        },
+        {
+          "Market": "FTSE 100",
+          "Today %": 0.7,
+          "3 months %": 1.44,
+          "From 52-week high %": -1.7,
+          "Trend": "Flat",
+          "Status": "Normal",
+          "Last close": 10724.9,
+          "52-week high": 10910.6,
+          "52-week low": 9354.6,
+          "As of": "2026-10-14",
+          "Source": "yahoo"
+        },
+        {
+          "Market": "S&P 500",
+          "Today %": -1.11,
+          "3 months %": 2.46,
+          "From 52-week high %": -1.28,
+          "Trend": "Flat",
+          "Status": "Normal",
+          "Last close": 7718.94,
+          "52-week high": 7818.93,
+          "52-week low": 6343.72,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        },
+        {
+          "Market": "Ibovespa",
+          "Today %": -0.18,
+          "3 months %": 18.8,
+          "From 52-week high %": -1.22,
+          "Trend": "Up",
+          "Status": "Normal",
+          "Last close": 206505.98,
+          "52-week high": 209066.9,
+          "52-week low": 141682.99,
+          "As of": "2026-10-14",
+          "Source": "eodhd"
+        }
+      ]
+    },
+    "World currencies": {
+      "headers": [
+        "Pair",
+        "Today %",
+        "1 month %",
+        "3 months %",
+        "1 year %",
+        "Trend",
+        "Rate",
+        "As of",
+        "Source"
+      ],
+      "rows": [
+        {
+          "Pair": "Euro vs US dollar",
+          "Today %": 0.06,
+          "1 month %": -3.08,
+          "3 months %": -1.84,
+          "1 year %": -3.1,
+          "Trend": "Down",
+          "Rate": 1.12,
+          "As of": "2026-10-14",
+          "Source": "frankfurter"
+        },
+        {
+          "Pair": "US dollar vs yen",
+          "Today %": 0.21,
+          "1 month %": 2.52,
+          "3 months %": -2.32,
+          "1 year %": 4.17,
+          "Trend": "Flat",
+          "Rate": 158.45,
+          "As of": "2026-10-14",
+          "Source": "frankfurter"
+        },
+        {
+          "Pair": "Pound vs US dollar",
+          "Today %": 0.15,
+          "1 month %": -1.69,
+          "3 months %": -0.88,
+          "1 year %": 0.04,
+          "Trend": "Down",
+          "Rate": 1.33,
+          "As of": "2026-10-14",
+          "Source": "frankfurter"
+        },
+        {
+          "Pair": "US dollar vs Swiss franc",
+          "Today %": 0.13,
+          "1 month %": 2.07,
+          "3 months %": 2.68,
+          "1 year %": 3.58,
+          "Trend": "Up",
+          "Rate": 0.83,
+          "As of": "2026-10-14",
+          "Source": "frankfurter"
+        },
+        {
+          "Pair": "US dollar vs yuan",
+          "Today %": -0.02,
+          "1 month %": -0.23,
+          "3 months %": -1.29,
+          "1 year %": -6.26,
+          "Trend": "Flat",
+          "Rate": 6.69,
+          "As of": "2026-10-14",
+          "Source": "frankfurter"
+        },
+        {
+          "Pair": "Australian dollar vs US dollar",
+          "Today %": 0.46,
+          "1 month %": -1.68,
+          "3 months %": 0.97,
+          "1 year %": 8.64,
+          "Trend": "Down",
+          "Rate": 0.7,
+          "As of": "2026-10-14",
+          "Source": "frankfurter"
+        },
+        {
+          "Pair": "Australian dollar vs yen",
+          "Today %": 0.67,
+          "1 month %": 0.8,
+          "3 months %": -1.38,
+          "1 year %": 13.18,
+          "Trend": "Down",
+          "Rate": 111.07,
+          "As of": "2026-10-14",
+          "Source": "frankfurter"
+        },
+        {
+          "Pair": "Euro vs yen",
+          "Today %": 0.27,
+          "1 month %": -0.64,
+          "3 months %": -4.12,
+          "1 year %": 0.95,
+          "Trend": "Down",
+          "Rate": 177.38,
+          "As of": "2026-10-14",
+          "Source": "frankfurter"
+        },
+        {
+          "Pair": "Euro vs Swiss franc",
+          "Today %": 0.19,
+          "1 month %": -1.07,
+          "3 months %": 0.79,
+          "1 year %": 0.37,
+          "Trend": "Down",
+          "Rate": 0.93,
+          "As of": "2026-10-14",
+          "Source": "frankfurter"
+        },
+        {
+          "Pair": "Australian dollar vs yuan",
+          "Today %": 0.44,
+          "1 month %": -1.91,
+          "3 months %": -0.33,
+          "1 year %": 1.84,
+          "Trend": "Down",
+          "Rate": 4.69,
+          "As of": "2026-10-14",
+          "Source": "frankfurter"
+        }
+      ]
+    },
+    "Together": {
+      "headers": [
+        "Indicator",
+        "Status",
+        "Details"
+      ],
+      "rows": [
+        {
+          "Indicator": "Real yields and gold",
+          "Status": "Active",
+          "Details": "Real yields and gold usually move in opposite directions: when “safe” money pays more after inflation, gold tends to lose shine, and the other way round. — real yields: rising · gold: falling"
+        },
+        {
+          "Indicator": "Copper demand, Chinese factories and money",
+          "Status": "Active",
+          "Details": "Copper is wired into industry, so a firm copper-to-gold ratio tends to come with busy factories. (The link to US money supply is weak, so that leg is no longer counted.) — the copper price vs gold: rising · Chinese factory activity: rising"
+        },
+        {
+          "Indicator": "The dollar, gold and oil",
+          "Status": "Partly active",
+          "Details": "Gold and oil are priced in US dollars, so a strong dollar tends to weigh on them, and a weak one tends to lift them. — the dollar: rising · gold: falling · oil: falling"
+        },
+        {
+          "Indicator": "Oil, inflation expectations and borrowing costs",
+          "Status": "Partly active",
+          "Details": "When oil jumps, markets tend to expect more inflation, and long-term borrowing costs tend to rise with it. — oil: falling · inflation expectations: steady · 10-year borrowing costs: rising"
+        },
+        {
+          "Indicator": "Iron ore, the terms of trade and the Australian dollar",
+          "Status": "Partly active",
+          "Details": "Iron ore is one of Australia’s biggest exports, so firm export prices tend to lift the terms of trade and, over time, the Australian dollar. The US dollar rides along as context: a falling Australian dollar is often mostly a rising US dollar. — iron ore: rising · the terms of trade: falling · the Australian dollar: falling · the US dollar: rising"
+        },
+        {
+          "Indicator": "The RBA rate, home loans and household debt",
+          "Status": "Pass-through pending",
+          "Details": "When the RBA changes the cash rate, the home-loan rates people actually pay tend to follow one to three months later; the card reads pass-through pending until that data exists. (The debt leg is a debt-to-income level, not a debt-servicing cost.) — the RBA cash rate: rising · the home-loan rate people pay: steady · household debt ratios: rising"
+        }
+      ]
+    },
+    "What the signals say": {
+      "headers": [
+        "Indicator",
+        "Conditions right now",
+        "Details"
+      ],
+      "rows": [
+        {
+          "Indicator": "gold",
+          "Conditions right now": "mostly unsupportive",
+          "Details": "0 of 5 conditions met — Real yields: Works against · Inflation expectations: Sitting neutral · Market stress: Works against · The US dollar: Works against · Price footing: Works against"
+        },
+        {
+          "Indicator": "silver",
+          "Conditions right now": "mostly unsupportive",
+          "Details": "1 of 6 conditions met — Real yields: Works against · Inflation expectations: Sitting neutral · Market stress: Works against · The US dollar: Works against · Price footing: Works against · Industrial demand: Supports"
+        }
+      ]
+    },
+    "Indicators": {
+      "headers": [
+        "ID",
+        "Indicator",
+        "Ticker",
+        "Value",
+        "Unit",
+        "Status",
+        "7-day change",
+        "30-day change",
+        "10-year position",
+        "As of",
+        "Snapshot time",
+        "Source"
+      ],
+      "rows": [
+        {
+          "ID": "yield-curve-10y2y",
+          "Indicator": "The gap between 10-year and 2-year US borrowing",
+          "Ticker": "",
+          "Value": 0.37,
+          "Unit": "pts",
+          "Status": "Normal",
+          "7-day change": -0.14,
+          "30-day change": 0.05,
+          "10-year position": 0.490188,
+          "As of": "2026-10-14",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (T10Y2Y)"
+        },
+        {
+          "ID": "real-yield-10y",
+          "Indicator": "US 10-year interest after inflation",
+          "Ticker": "",
+          "Value": 2.88,
+          "Unit": "%",
+          "Status": "Needs attention",
+          "7-day change": -0.03,
+          "30-day change": 0.28,
+          "10-year position": 0.996394,
+          "As of": "2026-10-13",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (DFII10)"
+        },
+        {
+          "ID": "us10y",
+          "Indicator": "What the US government pays to borrow for 10 years",
+          "Ticker": "",
+          "Value": 5.21,
+          "Unit": "%",
+          "Status": "Needs attention",
+          "7-day change": -0.06,
+          "30-day change": 0.25,
+          "10-year position": 0.995994,
+          "As of": "2026-10-13",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (DGS10)"
+        },
+        {
+          "ID": "fed-target",
+          "Indicator": "The US central bank’s policy rate",
+          "Ticker": "",
+          "Value": 3.75,
+          "Unit": "%",
+          "Status": "Normal",
+          "7-day change": 0,
+          "30-day change": 0.25,
+          "10-year position": 0.681831,
+          "As of": "2026-10-14",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (DFEDTARL/U)"
+        },
+        {
+          "ID": "fed-expectations",
+          "Indicator": "What markets expect from the Fed",
+          "Ticker": "2-year gap",
+          "Value": 1.04,
+          "Unit": "pts",
+          "Status": "Needs attention",
+          "7-day change": 0,
+          "30-day change": -0.09,
+          "10-year position": 0.91226,
+          "As of": "2026-10-13",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (DGS2 − DFEDTARL)"
+        },
+        {
+          "ID": "us30y",
+          "Indicator": "US 30-year Treasury yield",
+          "Ticker": "30-year",
+          "Value": 5.56,
+          "Unit": "%",
+          "Status": "Needs attention",
+          "7-day change": -0.08,
+          "30-day change": 0.21,
+          "10-year position": 0.995994,
+          "As of": "2026-10-13",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (DGS30)"
+        },
+        {
+          "ID": "ecb-dfr",
+          "Indicator": "The euro area’s policy rate",
+          "Ticker": "",
+          "Value": 2.5,
+          "Unit": "%",
+          "Status": "Normal",
+          "7-day change": 0,
+          "30-day change": 0.25,
+          "10-year position": 0.771507,
+          "As of": "2026-10-15",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "ECB Data Portal (DFR)"
+        },
+        {
+          "ID": "govt-interest-revenue",
+          "Indicator": "The US government’s interest bill vs its income",
+          "Ticker": "",
+          "Value": 0.335539,
+          "Unit": "%",
+          "Status": "Normal",
+          "7-day change": "",
+          "30-day change": -0.001617,
+          "10-year position": 0.72973,
+          "As of": "2026-04-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (BEA series, derived)"
+        },
+        {
+          "ID": "us-cpi-yoy",
+          "Indicator": "US prices vs a year ago",
+          "Ticker": "CPI",
+          "Value": 3.717251,
+          "Unit": "%",
+          "Status": "Needs attention",
+          "7-day change": "",
+          "30-day change": 0.364235,
+          "10-year position": 0.752137,
+          "As of": "2026-09-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (CPIAUCSL)"
+        },
+        {
+          "ID": "us-cpi-core-yoy",
+          "Indicator": "Core inflation",
+          "Ticker": "Core CPI",
+          "Value": 2.565841,
+          "Unit": "%",
+          "Status": "Context",
+          "7-day change": "",
+          "30-day change": 0.119678,
+          "10-year position": 0.495726,
+          "As of": "2026-09-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (CPILFESL)"
+        },
+        {
+          "ID": "breakeven-5y5y",
+          "Indicator": "Expected US inflation, five to ten years ahead",
+          "Ticker": "",
+          "Value": 2.34,
+          "Unit": "%",
+          "Status": "Normal",
+          "7-day change": -0.01,
+          "30-day change": 0,
+          "10-year position": 0.881057,
+          "As of": "2026-10-14",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (T5YIFR)"
+        },
+        {
+          "ID": "stress-stlfsi",
+          "Indicator": "Stress in US money markets",
+          "Ticker": "",
+          "Value": -0.7206,
+          "Unit": "index",
+          "Status": "Normal",
+          "7-day change": -0.2531,
+          "30-day change": 0.0712,
+          "10-year position": 0.171154,
+          "As of": "2026-10-09",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (STLFSI4)"
+        },
+        {
+          "ID": "nfci",
+          "Indicator": "US financial conditions",
+          "Ticker": "",
+          "Value": -0.494,
+          "Unit": "index",
+          "Status": "Normal",
+          "7-day change": 0.016,
+          "30-day change": 0.055,
+          "10-year position": 0.533719,
+          "As of": "2026-10-02",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (NFCI)"
+        },
+        {
+          "ID": "vix",
+          "Indicator": "Market fear gauge",
+          "Ticker": "VIX",
+          "Value": 15.27,
+          "Unit": "index",
+          "Status": "Normal",
+          "7-day change": 0.26,
+          "30-day change": -0.57,
+          "10-year position": 0.35234,
+          "As of": "2026-10-13",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (VIXCLS), © Cboe"
+        },
+        {
+          "ID": "gold-silver",
+          "Indicator": "Gold’s price versus silver",
+          "Ticker": "",
+          "Value": 72.8,
+          "Unit": "ratio",
+          "Status": "Normal",
+          "7-day change": 3.516251,
+          "30-day change": "",
+          "10-year position": 0.246032,
+          "As of": "2026-10-15",
+          "Snapshot time": "2026-10-15T22:13:17.973Z",
+          "Source": "Yahoo Finance (live ratio)"
+        },
+        {
+          "ID": "dollar-basket",
+          "Indicator": "The dollar vs six big currencies",
+          "Ticker": "",
+          "Value": 102.224744,
+          "Unit": "index",
+          "Status": "Normal",
+          "7-day change": -0.184137,
+          "30-day change": 2.742127,
+          "10-year position": 0.737974,
+          "As of": "2026-10-14",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "Currena basket (ECB rates via Frankfurter)"
+        },
+        {
+          "ID": "usdjpy",
+          "Indicator": "Dollar vs yen",
+          "Ticker": "USD/JPY",
+          "Value": 158.45,
+          "Unit": "¥",
+          "Status": "Normal",
+          "7-day change": 0.139038,
+          "30-day change": 2.523455,
+          "10-year position": 0.94955,
+          "As of": "2026-10-14",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "Frankfurter (ECB)"
+        },
+        {
+          "ID": "eur-usd",
+          "Indicator": "Euro per US dollar",
+          "Ticker": "EUR/USD",
+          "Value": 0.89326,
+          "Unit": "€",
+          "Status": "Context",
+          "7-day change": -0.159832,
+          "30-day change": 3.179975,
+          "10-year position": 0.531873,
+          "As of": "2026-10-14",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "Frankfurter (ECB)"
+        },
+        {
+          "ID": "china-pmi",
+          "Indicator": "Chinese factory activity",
+          "Ticker": "",
+          "Value": 50.1,
+          "Unit": "index",
+          "Status": "Normal",
+          "7-day change": "",
+          "30-day change": 0.3,
+          "10-year position": "",
+          "As of": "2026-09-30",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "China NBS (manual entry)"
+        },
+        {
+          "ID": "m2-us",
+          "Indicator": "The amount of money in the US economy",
+          "Ticker": "M2 money",
+          "Value": 23342.8,
+          "Unit": "trillion",
+          "Status": "Normal",
+          "7-day change": "",
+          "30-day change": 0.537947,
+          "10-year position": 0.641026,
+          "As of": "2026-08-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (M2SL)"
+        },
+        {
+          "ID": "philly-fed",
+          "Indicator": "US factory survey (Philadelphia Fed)",
+          "Ticker": "Philly Fed",
+          "Value": 37.8,
+          "Unit": "pts",
+          "Status": "Normal",
+          "7-day change": "",
+          "30-day change": -9.6,
+          "10-year position": 0.949153,
+          "As of": "2026-09-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (GACDFSA066MSFRBPHI), Philadelphia Fed"
+        },
+        {
+          "ID": "us-unemployment",
+          "Indicator": "US unemployment",
+          "Ticker": "BLS: UNRATE",
+          "Value": 4.2,
+          "Unit": "%",
+          "Status": "Normal",
+          "7-day change": "",
+          "30-day change": 0.1,
+          "10-year position": 0.564103,
+          "As of": "2026-09-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (UNRATE), US BLS"
+        },
+        {
+          "ID": "sahm-rule",
+          "Indicator": "US recession alarm (Sahm rule)",
+          "Ticker": "Sahm rule",
+          "Value": 0,
+          "Unit": "pts",
+          "Status": "Normal",
+          "7-day change": "",
+          "30-day change": 0.07,
+          "10-year position": 0.324786,
+          "As of": "2026-09-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "FRED (SAHMREALTIME)"
+        },
+        {
+          "ID": "copper-gold",
+          "Indicator": "Copper’s price versus gold",
+          "Ticker": "",
+          "Value": 3.351239,
+          "Unit": "ratio",
+          "Status": "Normal",
+          "7-day change": "",
+          "30-day change": 0.103449,
+          "10-year position": 0.211864,
+          "As of": "2026-09-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "World Bank Pink Sheet"
+        },
+        {
+          "ID": "usdcny",
+          "Indicator": "Dollar vs Chinese yuan",
+          "Ticker": "USD/CNY",
+          "Value": 6.6927,
+          "Unit": "CN¥",
+          "Status": "Context",
+          "7-day change": -0.17749,
+          "30-day change": -0.234035,
+          "10-year position": 0.255377,
+          "As of": "2026-10-14",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "Frankfurter (ECB)"
+        },
+        {
+          "ID": "brent",
+          "Indicator": "Oil price (Brent)",
+          "Ticker": "",
+          "Value": 105.65,
+          "Unit": "US$",
+          "Status": "Needs attention",
+          "7-day change": 1.31,
+          "30-day change": -2.85,
+          "10-year position": 0.933333,
+          "As of": "2026-10-15",
+          "Snapshot time": "2026-10-15T22:13:17.973Z",
+          "Source": "Yahoo Finance: Brent front-month futures (BZ=F)"
+        },
+        {
+          "ID": "gold-usd",
+          "Indicator": "Gold price (ounce)",
+          "Ticker": "",
+          "Value": 4191.7,
+          "Unit": "US$",
+          "Status": "Context",
+          "7-day change": 0.83,
+          "30-day change": -3.26,
+          "10-year position": 0.922006,
+          "As of": "2026-10-15",
+          "Snapshot time": "2026-10-15T22:13:17.973Z",
+          "Source": "Yahoo Finance: COMEX gold futures (GC=F)"
+        },
+        {
+          "ID": "silver-usd",
+          "Indicator": "Silver price (ounce)",
+          "Ticker": "",
+          "Value": 57.6,
+          "Unit": "US$",
+          "Status": "Context",
+          "7-day change": -2.48,
+          "30-day change": -8.91,
+          "10-year position": 0.914411,
+          "As of": "2026-10-15",
+          "Snapshot time": "2026-10-15T22:13:17.973Z",
+          "Source": "Yahoo Finance: COMEX silver futures (SI=F)"
+        },
+        {
+          "ID": "copper-usd",
+          "Indicator": "Copper price",
+          "Ticker": "",
+          "Value": 14772.999807,
+          "Unit": "US$",
+          "Status": "Context",
+          "7-day change": 1.958925,
+          "30-day change": "",
+          "10-year position": 0.992063,
+          "As of": "2026-10-15",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "gold-api.com (HG, history: World Bank)"
+        },
+        {
+          "ID": "btc-usd",
+          "Indicator": "Bitcoin price",
+          "Ticker": "BTC",
+          "Value": 82360.58,
+          "Unit": "US$",
+          "Status": "Context",
+          "7-day change": 0.84,
+          "30-day change": 8.92,
+          "10-year position": 0.872329,
+          "As of": "2026-10-15",
+          "Snapshot time": "2026-10-15T22:13:17.973Z",
+          "Source": "Yahoo Finance: Bitcoin spot index (BTC-USD)"
+        },
+        {
+          "ID": "gold-btc",
+          "Indicator": "Gold versus Bitcoin",
+          "Ticker": "",
+          "Value": 0.050894,
+          "Unit": "ratio",
+          "Status": "Context",
+          "7-day change": "",
+          "30-day change": "",
+          "10-year position": "",
+          "As of": "2026-10-15",
+          "Snapshot time": "2026-10-15T22:13:17.973Z",
+          "Source": "Yahoo Finance (live ratio)"
+        },
+        {
+          "ID": "silver-btc",
+          "Indicator": "Silver versus Bitcoin",
+          "Ticker": "",
+          "Value": 0.000699,
+          "Unit": "ratio",
+          "Status": "Context",
+          "7-day change": "",
+          "30-day change": "",
+          "10-year position": "",
+          "As of": "2026-10-15",
+          "Snapshot time": "2026-10-15T22:13:17.973Z",
+          "Source": "Yahoo Finance (live ratio)"
+        },
+        {
+          "ID": "au-cpi",
+          "Indicator": "Australian prices vs a year ago",
+          "Ticker": "CPI",
+          "Value": 3.967855,
+          "Unit": "%",
+          "Status": "Needs attention",
+          "7-day change": "",
+          "30-day change": 0.51508,
+          "10-year position": "",
+          "As of": "2026-08-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "ABS (monthly CPI All groups)"
+        },
+        {
+          "ID": "au-trimmed-mean",
+          "Indicator": "Underlying inflation",
+          "Ticker": "",
+          "Value": 3.574018,
+          "Unit": "%",
+          "Status": "Needs attention",
+          "7-day change": "",
+          "30-day change": -0.051209,
+          "10-year position": "",
+          "As of": "2026-08-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "ABS (monthly CPI Trimmed Mean)"
+        },
+        {
+          "ID": "au-10y",
+          "Indicator": "What Australia pays to borrow for 10 years",
+          "Ticker": "RBA F2: 10y",
+          "Value": 5.404,
+          "Unit": "%",
+          "Status": "Needs attention",
+          "7-day change": 0.06,
+          "30-day change": 0.213,
+          "10-year position": 0.999204,
+          "As of": "2026-10-07",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "RBA F2 (10-year bond yield)"
+        },
+        {
+          "ID": "rba-expectations",
+          "Indicator": "What markets expect from the RBA",
+          "Ticker": "3-year gap",
+          "Value": 0.333,
+          "Unit": "pts",
+          "Status": "Normal",
+          "7-day change": 0.011,
+          "30-day change": -0.096,
+          "10-year position": 0.640781,
+          "As of": "2026-10-07",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "RBA F2 (FCMYGBAG3D) − RBA F1"
+        },
+        {
+          "ID": "au-us-10y-gap",
+          "Indicator": "The gap between Australian and US 10-year borrowing",
+          "Ticker": "",
+          "Value": 0.124,
+          "Unit": "pts",
+          "Status": "Normal",
+          "7-day change": 0.07,
+          "30-day change": -0.261,
+          "10-year position": 0.561187,
+          "As of": "2026-10-07",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "RBA F2 − FRED (DGS10)"
+        },
+        {
+          "ID": "au-petrol-yoy",
+          "Indicator": "Petrol prices vs a year ago",
+          "Ticker": "CPI: fuel",
+          "Value": 13.528998,
+          "Unit": "%",
+          "Status": "Context",
+          "7-day change": "",
+          "30-day change": 13.883428,
+          "10-year position": 0.736842,
+          "As of": "2026-08-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "ABS (CPI Automotive fuel)"
+        },
+        {
+          "ID": "rba-cash-rate",
+          "Indicator": "Australia’s official interest rate",
+          "Ticker": "",
+          "Value": 4.6,
+          "Unit": "%",
+          "Status": "Context",
+          "7-day change": 0,
+          "30-day change": 0.25,
+          "10-year position": 0.996046,
+          "As of": "2026-10-14",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "RBA F1 (Cash Rate Target)"
+        },
+        {
+          "ID": "au-home-loan",
+          "Indicator": "The home-loan rate people actually pay",
+          "Ticker": "",
+          "Value": 6.2,
+          "Unit": "%",
+          "Status": "Needs attention",
+          "7-day change": "",
+          "30-day change": 0,
+          "10-year position": 0.952941,
+          "As of": "2026-08-31",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "RBA F6 (owner-occupier outstanding)"
+        },
+        {
+          "ID": "au-deposit-rate",
+          "Indicator": "Savings rates (new term deposits)",
+          "Ticker": "RBA F4.1",
+          "Value": 4.8,
+          "Unit": "%",
+          "Status": "Context",
+          "7-day change": "",
+          "30-day change": 0,
+          "10-year position": 0.988235,
+          "As of": "2026-08-31",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "RBA F4.1 (new term deposits)"
+        },
+        {
+          "ID": "au-wage-growth",
+          "Indicator": "Wage growth vs a year ago",
+          "Ticker": "",
+          "Value": 3.203075,
+          "Unit": "%",
+          "Status": "Needs attention",
+          "7-day change": "",
+          "30-day change": -0.018575,
+          "10-year position": 0.621622,
+          "As of": "2026-04-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "ABS (Wage Price Index)"
+        },
+        {
+          "ID": "au-rent-yoy",
+          "Indicator": "Rent growth vs a year ago",
+          "Ticker": "CPI: rents",
+          "Value": 3.57823,
+          "Unit": "%",
+          "Status": "Normal",
+          "7-day change": "",
+          "30-day change": -0.001818,
+          "10-year position": 0.081081,
+          "As of": "2026-08-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "ABS (CPI Rents)"
+        },
+        {
+          "ID": "au-unemployment",
+          "Indicator": "The share of Australians without work",
+          "Ticker": "",
+          "Value": 4.718349,
+          "Unit": "%",
+          "Status": "Needs attention",
+          "7-day change": "",
+          "30-day change": 0.066741,
+          "10-year position": 0.508475,
+          "As of": "2026-09-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "ABS (Labour Force)"
+        },
+        {
+          "ID": "au-home-values",
+          "Indicator": "Australian home prices",
+          "Ticker": "",
+          "Value": 1100.4,
+          "Unit": "index",
+          "Status": "Normal",
+          "7-day change": "",
+          "30-day change": -0.739672,
+          "10-year position": 0.567568,
+          "As of": "2026-04-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "ABS (RES_DWELL_ST)"
+        },
+        {
+          "ID": "au-household-debt-arrears",
+          "Indicator": "Australian household debt versus income",
+          "Ticker": "",
+          "Value": 178.4,
+          "Unit": "%",
+          "Status": "Normal",
+          "7-day change": "",
+          "30-day change": 1.2,
+          "10-year position": 0.157895,
+          "As of": "2026-06-30",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "RBA E2 (household ratios)"
+        },
+        {
+          "ID": "audusd",
+          "Indicator": "Australian dollar vs US dollar",
+          "Ticker": "AUD/USD",
+          "Value": 0.700967,
+          "Unit": "US$",
+          "Status": "Normal",
+          "7-day change": 0.841161,
+          "30-day change": -1.682322,
+          "10-year position": 0.500587,
+          "As of": "2026-10-14",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "Frankfurter (ECB)"
+        },
+        {
+          "ID": "audjpy",
+          "Indicator": "Australian dollar vs yen",
+          "Ticker": "AUD/JPY",
+          "Value": 111.068274,
+          "Unit": "¥",
+          "Status": "Normal",
+          "7-day change": 0.981368,
+          "30-day change": 0.798681,
+          "10-year position": 0.950724,
+          "As of": "2026-10-14",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "Frankfurter (ECB)"
+        },
+        {
+          "ID": "terms-of-trade",
+          "Indicator": "Australia’s export prices vs import prices",
+          "Ticker": "",
+          "Value": 94.8,
+          "Unit": "index",
+          "Status": "Normal",
+          "7-day change": "",
+          "30-day change": -1.5,
+          "10-year position": 0.432432,
+          "As of": "2026-04-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "ABS (ANA_AGG terms of trade)"
+        },
+        {
+          "ID": "iron-ore",
+          "Indicator": "Iron ore price",
+          "Ticker": "",
+          "Value": 97.7,
+          "Unit": "US$",
+          "Status": "Context",
+          "7-day change": "",
+          "30-day change": 1.45379,
+          "10-year position": 0.415254,
+          "As of": "2026-09-01",
+          "Snapshot time": "2026-10-15T09:13:13.847Z",
+          "Source": "World Bank Pink Sheet"
+        },
+        {
+          "ID": "gold-aud",
+          "Indicator": "Gold price in Australian dollars",
+          "Ticker": "gold in A$",
+          "Value": 5979.8792,
+          "Unit": "A$",
+          "Status": "Context",
+          "7-day change": "",
+          "30-day change": "",
+          "10-year position": "",
+          "As of": "2026-10-15",
+          "Snapshot time": "2026-10-15T22:13:17.973Z",
+          "Source": "Yahoo Finance (gold, live) × Frankfurter (AUD)"
+        }
+      ]
+    },
+    "Next up": {
+      "headers": [
+        "ID",
+        "Indicator",
+        "Date"
+      ],
+      "rows": [
+        {
+          "ID": "us-cpi",
+          "Indicator": "US consumer price index: September 2026",
+          "Date": "2026-10-14"
+        },
+        {
+          "ID": "abs-jobs",
+          "Indicator": "ABS jobs report (Labour Force): September 2026",
+          "Date": "2026-10-15"
+        },
+        {
+          "ID": "abs-cpi",
+          "Indicator": "ABS monthly CPI: September 2026",
+          "Date": "2026-10-28"
+        },
+        {
+          "ID": "fed",
+          "Indicator": "US Fed interest rate decision (FOMC)",
+          "Date": "2026-10-28"
+        },
+        {
+          "ID": "ecb",
+          "Indicator": "ECB interest rate decision",
+          "Date": "2026-10-29"
+        },
+        {
+          "ID": "rba",
+          "Indicator": "RBA cash rate decision",
+          "Date": "2026-11-03"
+        },
+        {
+          "ID": "us-jobs",
+          "Indicator": "US jobs report (Employment Situation): October 2026",
+          "Date": "2026-11-06"
+        },
+        {
+          "ID": "us-cpi",
+          "Indicator": "US consumer price index: October 2026",
+          "Date": "2026-11-10"
+        },
+        {
+          "ID": "abs-jobs",
+          "Indicator": "ABS jobs report (Labour Force): October 2026",
+          "Date": "2026-11-19"
+        },
+        {
+          "ID": "abs-cpi",
+          "Indicator": "ABS monthly CPI: October 2026",
+          "Date": "2026-11-25"
+        },
+        {
+          "ID": "us-jobs",
+          "Indicator": "US jobs report (Employment Situation): November 2026",
+          "Date": "2026-12-04"
+        },
+        {
+          "ID": "rba",
+          "Indicator": "RBA cash rate decision",
+          "Date": "2026-12-08"
+        },
+        {
+          "ID": "fed",
+          "Indicator": "US Fed interest rate decision (FOMC)",
+          "Date": "2026-12-09"
+        },
+        {
+          "ID": "us-cpi",
+          "Indicator": "US consumer price index: November 2026",
+          "Date": "2026-12-10"
+        },
+        {
+          "ID": "abs-jobs",
+          "Indicator": "ABS jobs report (Labour Force): November 2026",
+          "Date": "2026-12-17"
+        },
+        {
+          "ID": "abs-cpi",
+          "Indicator": "ABS monthly CPI: December 2026",
+          "Date": "2027-01-27"
+        },
+        {
+          "ID": "fed",
+          "Indicator": "US Fed interest rate decision (FOMC)",
+          "Date": "2027-01-27"
+        },
+        {
+          "ID": "rba",
+          "Indicator": "RBA cash rate decision",
+          "Date": "2027-02-09"
+        },
+        {
+          "ID": "abs-cpi",
+          "Indicator": "ABS monthly CPI: January 2027",
+          "Date": "2027-02-24"
+        },
+        {
+          "ID": "fed",
+          "Indicator": "US Fed interest rate decision (FOMC)",
+          "Date": "2027-03-17"
+        },
+        {
+          "ID": "rba",
+          "Indicator": "RBA cash rate decision",
+          "Date": "2027-03-23"
+        },
+        {
+          "ID": "fed",
+          "Indicator": "US Fed interest rate decision (FOMC)",
+          "Date": "2027-04-28"
+        },
+        {
+          "ID": "rba",
+          "Indicator": "RBA cash rate decision",
+          "Date": "2027-05-04"
+        }
+      ]
+    },
+    "Changed this week": {
+      "headers": [
+        "ID",
+        "Indicator",
+        "Status",
+        "As of"
+      ],
+      "rows": [
+        {
+          "ID": "breakeven-5y5y",
+          "Indicator": "Expected US inflation, five to ten years ahead",
+          "Status": "Needs attention → Normal",
+          "As of": "2026-10-09"
+        }
+      ]
+    }
+  }
+}
