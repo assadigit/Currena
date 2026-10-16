@@ -11,8 +11,9 @@
  *
  * - Pure local math over the already-booted snapshot (swap / currency
  *   changes re-render instantly, zero network — same rule as the form).
- * - Trend + sparkline from the recorded rate-history generations (last 40),
- *   same source the ResultPopup's micro-trend uses.
+ * - Trend + sparkline from the recorded rate-history generations (the whole
+ *   ≤240-generation window, drawn bucket-averaged), same source the
+ *   ResultPopup's micro-trend uses.
  * - Honest states: stale snapshot → warning-tinted freshness + LIVE→CACHED
  *   badge; unresolvable pair / same-currency / no snapshot → renders null.
  * - Copy copies a localized share line; "Copied" feedback (2s, same
@@ -32,11 +33,8 @@ import { SourceBadge } from './ui';
 import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
 import type { TranslationKey } from '../lib/locale';
-import { liveRateView, rateDecimals, rateShareText, sparklineWindow } from '../lib/live-rate';
+import { bucketMean, liveRateView, rateDecimals, rateShareText, TREND_BUCKETS } from '../lib/live-rate';
 import { seriesForPair, trendOf, useRateHistory } from '../lib/rate-history';
-
-/** Trend observations shown in the sparkline (older ones are noise). */
-const TREND_WINDOW = 40;
 
 interface LiveRateLineProps {
   from: CurrencyCode;
@@ -65,11 +63,12 @@ export function LiveRateLine({ from, to, snapshot, stale, hidden = false }: Live
   const historySource: SnapshotSource | null =
     view === null ? null : view.source === 'tgju' || view.source === 'frankfurter' ? view.source : null;
   const generations = useRateHistory(historySource);
-  const trendSeries = useMemo(
-    () => (historySource ? sparklineWindow(seriesForPair(generations, from, to), TREND_WINDOW) : []),
+  const rawSeries = useMemo(
+    () => (historySource ? seriesForPair(generations, from, to) : []),
     [generations, historySource, from, to],
   );
-  const trend = trendOf(trendSeries);
+  const trendSeries = useMemo(() => bucketMean(rawSeries, TREND_BUCKETS), [rawSeries]);
+  const trend = trendOf(rawSeries);
 
   if (hidden || view === null) return null;
 
@@ -77,7 +76,7 @@ export function LiveRateLine({ from, to, snapshot, stale, hidden = false }: Live
   const rateText = formatNumber(view.rate, numberLocale, {
     maximumFractionDigits: rateDecimals(view.rate, irrPair),
   });
-  const prev = trendSeries.length >= 2 ? trendSeries[trendSeries.length - 2] : null;
+  const prev = rawSeries.length >= 2 ? rawSeries[rawSeries.length - 2] : null;
   const freshness = formatRelative(view.fetchedAt, numberLocale);
   const pctText =
     trend === null

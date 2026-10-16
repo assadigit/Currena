@@ -57,6 +57,52 @@ export function sparklineWindow(series: readonly number[], max: number): number[
   return series.slice(Math.max(0, series.length - max));
 }
 
+/**
+ * The drawn sparklines aggregate the whole recorded window (≤240 generations
+ * — days of real movement) into this many bucket means. Drawing raw points
+ * min-max-normalized rendered TGJU's sub-percent re-quote noise as a violent
+ * full-height sawtooth (owner report 2026-10-16: "the graph seems irregular
+ * and like a placeholder or buggy"). Bucket means melt the noise while the
+ * trend chips / ranges / counts stay computed from the RAW series — only the
+ * drawn polyline is aggregated.
+ */
+export const TREND_BUCKETS = 48;
+
+/**
+ * Aggregate a series into ≤ `maxBuckets` points for DRAWING (each bucket's
+ * arithmetic mean, contiguous fractional-width buckets so the spread is
+ * even). The trend sparklines draw up to 240 recorded generations; plotting
+ * them raw min-max-normalized turns TGJU's sub-percent re-quote noise into a
+ * violent full-height sawtooth (owner report 2026-10-16: "the graph seems
+ * irregular and like a placeholder"). Averaging buckets melts the noise
+ * while keeping every observation IN the aggregate; trend chips, ranges and
+ * counts stay computed from the RAW series by the callers — only the drawn
+ * polyline is smoothed.
+ *
+ * A short series passes through untouched (nothing to aggregate).
+ */
+export function bucketMean(series: readonly number[], maxBuckets: number): number[] {
+  if (!Number.isFinite(maxBuckets) || maxBuckets <= 0 || series.length === 0) return [];
+  if (series.length <= maxBuckets) return [...series];
+  const bucketWidth = series.length / maxBuckets;
+  const out: number[] = [];
+  for (let b = 0; b < maxBuckets; b++) {
+    const start = Math.floor(b * bucketWidth);
+    const end = Math.min(series.length, Math.max(start + 1, Math.floor((b + 1) * bucketWidth)));
+    let sum = 0;
+    let n = 0;
+    for (let i = start; i < end; i++) {
+      const v = series[i];
+      if (v !== undefined) {
+        sum += v;
+        n++;
+      }
+    }
+    if (n > 0) out.push(sum / n);
+  }
+  return out;
+}
+
 /** Rate decimals for display: IRR pairs are Toman integers, tiny rates get
  *  8 (legacy precision rule, same as ResultPopup's rateMaxFractionDigits). */
 export function rateDecimals(rate: number, irrPair: boolean): number {

@@ -1,6 +1,6 @@
 import type { Snapshot } from '@currena/core';
 import { describe, expect, it } from 'vitest';
-import { liveRateView, rateDecimals, rateShareText, sparklineWindow } from './live-rate';
+import { liveRateView, rateDecimals, rateShareText, sparklineWindow, bucketMean } from './live-rate';
 
 function tgjuSnapshot(fetchedAt: string): Snapshot {
   return {
@@ -70,6 +70,60 @@ describe('sparklineWindow', () => {
   it('max 0 and empty series → empty window', () => {
     expect(sparklineWindow([1, 2, 3], 0)).toEqual([]);
     expect(sparklineWindow([], 40)).toEqual([]);
+  });
+});
+
+describe('bucketMean — the drawn-line noise melt (owner report 2026-10-16)', () => {
+  it('series at or under maxBuckets passes through untouched', () => {
+    expect(bucketMean([3, 1, 2], 48)).toEqual([3, 1, 2]);
+    expect(bucketMean([3, 1, 2], 3)).toEqual([3, 1, 2]);
+  });
+
+  it('averages contiguous equal buckets (exact division)', () => {
+    // 240 points → 48 buckets of exactly 5.
+    const series = Array.from({ length: 240 }, (_, i) => i + 1); // 1..240
+    const drawn = bucketMean(series, 48);
+    expect(drawn).toHaveLength(48);
+    expect(drawn[0]).toBe(3); // (1+2+3+4+5)/5
+    expect(drawn[1]).toBe(8); // (6..10)/5
+    expect(drawn[47]).toBe(238); // (236..240)/5
+  });
+
+  it('spreads an uneven remainder without gaps or overlaps', () => {
+    const series = Array.from({ length: 100 }, (_, i) => i + 1); // 1..100
+    const drawn = bucketMean(series, 48);
+    expect(drawn).toHaveLength(48);
+    // Mass conservation: every input lands in exactly one bucket — each
+    // bucket mean weighted by its occupancy (floor((b+1)·w) − floor(b·w),
+    // w = 100/48) reconstructs sum(1..100) = 5050 exactly.
+    const w = 100 / 48;
+    let mass = 0;
+    for (let b = 0; b < 48; b++) {
+      const n = Math.floor((b + 1) * w) - Math.floor(b * w);
+      mass += drawn[b]! * n;
+    }
+    expect(mass).toBeCloseTo(5050, 6);
+    // Monotonic bucket means for a monotonic series (order preserved).
+    for (let i = 1; i < drawn.length; i++) {
+      expect(drawn[i]!).toBeGreaterThanOrEqual(drawn[i - 1]!);
+    }
+  });
+
+  it('melts strict a/b alternation into a calm band (the TGJU sawtooth)', () => {
+    // 240 ticks alternating between two levels 0.375% apart, drifting down.
+    const a = 100;
+    const b = 100.375;
+    const series = Array.from({ length: 240 }, (_, i) => (i % 2 === 0 ? a - i * 0.005 : b - i * 0.005));
+    const drawn = bucketMean(series, 48);
+    expect(drawn).toHaveLength(48);
+    // Consecutive bucket means differ by FAR less than the raw a/b step.
+    const maxStep = Math.max(...drawn.slice(1).map((v, i) => Math.abs(v - drawn[i]!)));
+    expect(maxStep).toBeLessThan((b - a) / 2);
+  });
+
+  it('maxBuckets 0 and empty series → empty array', () => {
+    expect(bucketMean([1, 2, 3], 0)).toEqual([]);
+    expect(bucketMean([], 48)).toEqual([]);
   });
 });
 

@@ -14,6 +14,7 @@ import { formatDate, formatJalaliDate, formatNumber, formatRelative } from '@cur
 import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
 import type { TranslationKey } from '../lib/locale';
+import { bucketMean, TREND_BUCKETS } from '../lib/live-rate';
 import { seriesForPair, trendOf, useRateHistory } from '../lib/rate-history';
 import { Odometer } from './Odometer';
 import { RateDeltaChip } from './RateDeltaChip';
@@ -79,13 +80,18 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate,
   const { containerRef, onKeyDown } = useDialogFocus({ onClose, returnFocusToRef });
 
   // Micro-trend (rate-history sparkline): only for live sources, not manual/local.
+  // Raw series drives the trend chip, the range caption and the check count;
+  // the DRAWN line is bucket-averaged (≤48 means) so TGJU's re-quote noise
+  // reads as a calm band instead of a full-height sawtooth (owner report
+  // 2026-10-16).
   const historySource = view.source === 'tgju' || view.source === 'frankfurter' ? view.source : null;
   const generations = useRateHistory(historySource);
-  const trendSeries = useMemo(
+  const rawSeries = useMemo(
     () => (historySource ? seriesForPair(generations, view.from, view.to) : []),
     [generations, historySource, view.from, view.to],
   );
-  const trend = trendOf(trendSeries);
+  const trendSeries = useMemo(() => bucketMean(rawSeries, TREND_BUCKETS), [rawSeries]);
+  const trend = trendOf(rawSeries);
   const trendPctText =
     trend === null
       ? ''
@@ -335,7 +341,7 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate,
           <div className="my-1.5 rounded-[10px] border-s-[3px] border-currena-success/60 bg-currena-success/[0.07] px-2.5 py-1.5 sm:my-2.5 sm:py-2">
             <div className="mb-0.5 flex items-baseline justify-between gap-2 sm:mb-1">
               <p className="text-[0.65rem] font-semibold uppercase tracking-wide text-currena-muted">
-                📈 {t('trend.recentChecks', { n: trendSeries.length })}
+                📈 {t('trend.recentChecks', { n: rawSeries.length })}
               </p>
               <p
                 className={`text-[0.7rem] font-bold sm:text-xs ${
@@ -363,11 +369,11 @@ export function ResultPopup({ view, onClose, onNewConversion, tgjuUrl, prevRate,
             <p className="mt-0.5 flex flex-wrap items-center justify-between gap-1 text-[0.6rem] text-currena-muted sm:mt-1 sm:text-[0.68rem]">
               <span>
                 {t('trend.range', {
-                  min: formatNumber(Math.min(...trendSeries), numberLocale, {
-                    maximumFractionDigits: rateMaxFractionDigits(Math.min(...trendSeries), irrPair),
+                  min: formatNumber(Math.min(...rawSeries), numberLocale, {
+                    maximumFractionDigits: rateMaxFractionDigits(Math.min(...rawSeries), irrPair),
                   }),
-                  max: formatNumber(Math.max(...trendSeries), numberLocale, {
-                    maximumFractionDigits: rateMaxFractionDigits(Math.max(...trendSeries), irrPair),
+                  max: formatNumber(Math.max(...rawSeries), numberLocale, {
+                    maximumFractionDigits: rateMaxFractionDigits(Math.max(...rawSeries), irrPair),
                   }),
                 })}
               </span>

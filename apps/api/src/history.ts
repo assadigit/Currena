@@ -14,9 +14,20 @@
  *   history:<source> → { v: 1, gens: HistoryGeneration[] }
  *
  * Write discipline (free-tier KV safety):
- *   - a generation is appended ONLY when the rate VALUES actually changed
- *     (content fingerprint vs the last recorded entry) — a same-value
- *     re-scrape is a no-op, so writes are bounded by real market moves;
+ *   - a generation is appended ONLY when a rate moves materially vs the last
+ *     RECORDED generation — a relative deadband (HISTORY_RECORD_DEADBAND,
+ *     0.05%) measured 2026-10-16 over 240 live TGJU ticks: per-tick re-quote
+ *     jitter is median 0.01–0.04% (EUR/GBP/CHF change on nearly every tick),
+ *     so exact-value dedup recorded noise every 6 minutes, burned the 240-slot
+ *     window in ~24h and rendered sparklines as a full-height sawtooth (the
+ *     owner's "the graph looks placeholder/buggy" report). The deadband is
+ *     hysteresis around the last recorded LEVEL: sub-noise wiggles never
+ *     record, and genuine slow drift records at its first cumulative
+ *     ≥0.05% step — the window then spans real market movement, not hours
+ *     of jitter. The upstream USD quote bobbing between two levels 0.37%
+ *     apart still records (a real served quote is never rewritten); the
+ *     client additionally smooths the DRAWN line, see
+ *     apps/web/src/lib/live-rate.ts bucketMean;
  *   - capped at HISTORY_MAX_GENERATIONS entries (old points drop off);
  *   - single logical writer per minute (the cron) — KV last-write-wins races
  *     are limited to concurrent user-triggered scrapes and are idempotent in
@@ -54,12 +65,35 @@ interface HistoryFile {
 
 const historyKey = (source: SnapshotSource): string => `history:${source}`;
 
-/** Order-independent content signature — unchanged rates → identical string. */
-function fingerprint(gen: HistoryGeneration): string {
-  const keys = Object.keys(gen.rates).sort();
-  let sig = `${gen.base}`;
-  for (const k of keys) sig += `|${k}:${gen.rates[k]}`;
-  return sig;
+/**
+ * Smallest per-rate relative move (vs the last RECORDED generation) that
+ * counts as a market change. 0.05% sits ABOVE TGJU's per-tick re-quote
+ * jitter (median 0.01–0.04%, p90 ~0.12%, measured over 240 live ticks on
+ * 2026-10-16) and far BELOW real market moves (the USD window drift over
+ * the same sample was 3.1%). A code appearing in / disappearing from the
+ * snapshot always counts as a change.
+ */
+export const HISTORY_RECORD_DEADBAND = 0.0005;
+
+/**
+ * Hysteresis vs the last RECORDED level: a candidate generation is
+ * material when any rate moved ≥ the deadband relative to the value the
+ * history actually holds, or the rate set changed. Sub-deadband re-quote
+ * jitter never accumulates into a record (each comparison restarts from
+ * the recorded level), while genuine drift records at its first step that
+ * crosses the band — the chart's levels stay real, the noise stays out.
+ */
+function materialChange(last: HistoryGeneration, gen: HistoryGeneration): boolean {
+  const lastCodes = Object.keys(last.rates);
+  const genCodes = Object.keys(gen.rates);
+  if (lastCodes.length !== genCodes.length) return true; // rate set changed
+  for (const [code, value] of Object.entries(gen.rates)) {
+    const prev = last.rates[code];
+    if (prev === undefined) return true; // new code
+    if (!Number.isFinite(prev) || prev <= 0) return true; // poisoned baseline
+    if (Math.abs(value - prev) / prev >= HISTORY_RECORD_DEADBAND) return true;
+  }
+  return false;
 }
 
 export function toHistoryGeneration(snapshot: Snapshot): HistoryGeneration {
@@ -108,7 +142,7 @@ export async function recordHistory(
   const gens = parseFile(await kv.get(historyKey(source)));
   const gen = toHistoryGeneration(snapshot);
   const last = gens[gens.length - 1];
-  if (last !== undefined && fingerprint(last) === fingerprint(gen)) return false; // no market change
+  if (last !== undefined && !materialChange(last, gen)) return false; // sub-deadband re-quote — no write
   const next = [...gens.filter((g) => g.at !== gen.at), gen].slice(-HISTORY_MAX_GENERATIONS);
   const file: HistoryFile = { v: 1, gens: next };
   await kv.put(historyKey(source), JSON.stringify(file));

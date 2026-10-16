@@ -33,6 +33,7 @@ import { Sparkline } from '../components/Sparkline';
 import { fetchMeta } from '../lib/api';
 import { useCodeLabel } from '../lib/display';
 import { useI18n } from '../lib/locale';
+import { bucketMean, TREND_BUCKETS } from '../lib/live-rate';
 import { seriesForPair, trendOf, useRateHistory } from '../lib/rate-history';
 import { isConfirmedStale, snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
 import type { TranslationKey } from '../lib/locale';
@@ -156,7 +157,7 @@ const BoardCardView = memo(function BoardCardView({
             </p>
           </div>
           <Sparkline
-            points={series}
+            points={bucketMean(series, TREND_BUCKETS)}
             width={92}
             height={34}
             ariaLabel={t('trend.summary', {
