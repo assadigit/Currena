@@ -1350,3 +1350,42 @@ sources whose terms allow public display:
   (4) verifying the 'unknown' licence terms first-hand (ECB Data
   Portal, Frankfurter/ECB reference rates, World Bank CC BY 4.0) would
   return ~10 more cards to the public page.
+
+## Session record — 2026-10-19c Round 44 (the meter grades in one hue)
+
+The owner's colour-grading idea for the verdict meter: stop the rainbow —
+grade the four segments in ONE hue, the CURRENT step's, with the segments
+before the current one wearing progressively whiter tints ("when it's
+stable show green … when it's orange, the grad turns to orange, previous
+ones get orange too like this: [more pale orange] [pale orange] [orange]
+… same for red").
+
+- **Change** (commit `50ba45b`): index.css round 44 — the round-43
+  per-segment rainbow inks retired; the filled segments paint as a
+  monochromatic ramp of the current step's ink via `color-mix` toward
+  white (cautious 55% yellow · stressed 40/70% orange · critical
+  30/55/78% red; stable stays pure green). `VerdictMeter` + the
+  `QuestionGroup` header meter carry `data-step` so every meter on the
+  page (hero lg, per-gauge sm, MarketsVerdict, six question headers)
+  grades identically in both themes.
+- **Gates**: web 453/453 (1,407 total), typecheck 6/6, lint 0 errors /
+  15 advisories, budgets held (entry 294.78/89.38; Insights lazy
+  594.68/142.03 — +0.19 kB raw from the ramp).
+- **Deployed**: currena-api **`e8a47a2d-c593-456a-b4c6-5a9428fd159f`**
+  from `50ba45b` (+ this docs commit). currena-markets untouched
+  (`9b5ff7e0`); SITE_MODE=public unchanged; the INSIGHTS_PASSWORD
+  secret stays set.
+- **Production verified**: the deployed `index-*.css` is byte-identical
+  to the local build and carries the full ramp; live DOM: the Critical
+  hero meter resolves `rgb(244,188,191) → rgb(235,131,137) →
+  rgb(226,79,87) → rgb(218,30,40)` (Carbon Red 60 verbatim at the top);
+  per-gauge + per-question step-4 meters carry the same palest tint on
+  `on-1`; the Stable meter stays pure `#24a148`; health 200 kv ok;
+  unauthed /api/insights → 200 `public, max-age=60` (displayMode
+  public, ruleVersion 2, 27 readings); 375 px scrollWidth === 375;
+  zero page/console errors.
+- **Standing order recorded**: the owner decreed (2026-10-19c) that
+  from now on every completed round AUTO-commits, pushes and deploys —
+  no per-round approval gate (OWNER_SETUP §10).
+- **Evidence**: `docs/evidence/2026-10-19-round44-meter-grading/` (the
+  light+dark ramp render + production screenshots at 1280 and 375).

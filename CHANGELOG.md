@@ -5,6 +5,47 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-19c] — the verdict meter grades in one hue (round 44)
+
+The owner's colour-grading idea, in their words: "when it's stable show
+green. when it's yellow the previous grade must be shown with yellow (but
+with more tint = eg whiter yellow). when it's orange, the grad turns to
+orange, previous ones get orange two like this: [more pale orange]
+[pale orange] [orange]. and same for red, with it's critical the all
+grades become different tints of red."
+
+### Changed
+
+- `apps/web/src/index.css` (round 44 block) — the round-43 per-segment
+  "rainbow" inks are retired. The four-segment verdict meter now grades
+  in ONE hue — the CURRENT step's: the highest filled segment wears the
+  full step ink; the segments BEFORE it wear progressively whiter tints
+  of the same hue via `color-mix(in srgb, <status ink> N%, white)` —
+  cautious 55% yellow · stressed 40/70% orange · critical 30/55/78% red.
+  Stable stays pure green; unfilled steps stay the border grey.
+- `VerdictMeter` + the `QuestionGroup` header meter carry the current
+  step to the stylesheet (`data-step`) — every meter on the page grades
+  the same way: hero (lg), per-gauge rows (sm), MarketsVerdict, and the
+  six per-question header meters. The verdict WORD keeps its own step
+  ink (unchanged, round 43).
+- Bundle budgets hold: entry 294.78/89.38 vs 296/89.5; Insights lazy
+  594.68/142.03 vs 604/142.8 (+0.19 kB raw from the ramp). Tests 453/453
+  web (1,407 total), typecheck 6/6, lint 0 errors / 15 advisories.
+
+### Deployed
+
+- currena-api **`e8a47a2d-c593-456a-b4c6-5a9428fd159f`** from `50ba45b`
+  (+ the docs wrap-up commit). currena-markets untouched (`9b5ff7e0`).
+- Production verified: the deployed CSS asset is byte-identical to the
+  local build and carries the full ramp; the live hero meter (Critical,
+  step 4) resolves `rgb(244,188,191) → rgb(235,131,137) → rgb(226,79,87)
+  → rgb(218,30,40)` (= Carbon Red 60 at the top); per-gauge + per-question
+  meters grade identically; the Stable meter stays pure `#24a148`;
+  health 200 kv ok; unauthed /api/insights → 200 `public, max-age=60`
+  (displayMode public, 27 readings); 375 px scrollWidth === 375; zero
+  console/page errors. Evidence:
+  `docs/evidence/2026-10-19-round44-meter-grading/`.
+
 ## [2026-10-19b] — the Insights page goes PUBLIC (owner decree)
 
 The owner on the private gate: "Why you made the page private? make it

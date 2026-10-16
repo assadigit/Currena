@@ -1,3 +1,21 @@
+# SESSION_LOG — Round 44 Meter Grading 2026-10-19c
+
+Branch `insights-rebuild` (== main after the push) · production `e8a47a2d` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's colour-grading idea — the verdict meter grades in ONE hue (the current step's), previous segments as progressively whiter tints; then "Push, COmmit, Deploy. From now on, auto push commit and deploy."
+
+### 1 · feat: the monochromatic tint ramp (round 44)
+**What:** index.css round 44 retires the round-43 per-segment rainbow — the filled segments paint as a pale→full ramp of the CURRENT step's ink via `color-mix(in srgb, <status ink> N%, white)` (cautious 55% yellow · stressed 40/70% orange · critical 30/55/78% red; stable pure green; unfilled steps border grey). `VerdictMeter` + the `QuestionGroup` header meter carry `data-step={step}` — every meter (hero lg, per-gauge sm, MarketsVerdict, six question headers) grades identically in both themes. No copy changes.
+**Evidence:** commit `50ba45b`; scratch preview (verbatim CSS block, light+dark) verified the ramp visually before deploy — docs/evidence/2026-10-19-round44-meter-grading/.
+
+### 2 · deploy + verify (FIRST auto-deploy under the owner's standing order)
+**What:** deployed currena-api `e8a47a2d-c593-456a-b4c6-5a9428fd159f` from `50ba45b`; currena-markets untouched (`9b5ff7e0`); SITE_MODE=public unchanged. Production: deployed CSS byte-identical to the local build with the full ramp present; live hero meter (Critical, step 4) = `rgb(244,188,191)→rgb(235,131,137)→rgb(226,79,87)→rgb(218,30,40)` (Carbon Red 60 at the top); per-gauge + question-header step-4 meters carry the palest tint on on-1; the Stable meter stays pure `#24a148`; health 200 kv ok; unauthed /api/insights → 200 public (27 readings, ruleVersion 2); 375 scrollWidth === 375; zero page/console errors.
+**Evidence:** docs/evidence/2026-10-19-round44-meter-grading/ (prod-hero-critical.png, prod-hero-375.png, meter-grading-light-dark.png + README).
+
+### 3 · docs + the standing order
+**What:** CHANGELOG 2026-10-19c, DEPLOY record, SESSION_LOG, PROGRESS row, OWNER_SETUP §10 (AUTO push+commit+deploy standing order), NEXT_SESSION_PROMPT, evidence README. Pushed `insights-rebuild` + fast-forwarded `main` (CI runs on main pushes).
+**Evidence:** this commit.
+
+---
 # SESSION_LOG — Public Insights Flip 2026-10-19b
 
 Branch `insights-rebuild` (== main after the ship) · production `36d76363` · runner: pnpm 10.34.5 / Node 24.21.

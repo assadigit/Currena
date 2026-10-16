@@ -1,34 +1,35 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-19b (PUBLIC FLIP session — the owner's "make it
-public dude": SITE_MODE=public deployed `36d76363`; the public page
-serves the licence-legal projection only — 27 of 51 readings, the
-EODHD/Yahoo world boards + 24 non-'yes' indicators hidden via the
-generated data/site-mode-overrides.json; T-15 passes in public mode;
-tests 1,407 green; production verified leak-free — see CHANGELOG
-2026-10-19b + docs/evidence/2026-10-19-public-insights/). The prior
-2026-10-19 session shipped the insights rebuild itself (b137f3ef from
-1f70552; INSIGHTS_PASSWORD set; main fast-forwarded). — the owner's
-"Approved. Push and Deploy and commit." on the completed AGENT_RUNBOOK
-execution. The sandbox had reset, so the state was rebuilt from a fresh
-clone: gates re-run green (1,389 tests), OWNER_SETUP §1 executed on the
-owner's behalf (INSIGHTS_PASSWORD generated + uploaded as a Worker
-secret, value handed over in chat), currena-api deployed → `b137f3ef`
-from `1f70552`, currena-markets untouched (`9b5ff7e0`), production
-smoke + DOM verified (private gate LIVE: unauthed /api/insights → 401
-no-data; exports CSV/XLSX clicked through the real UI, BOM + valid
-OOXML, zero errors; fa RTL; 375 no-bleed), then `insights-rebuild`
-pushed and `main` FAST-FORWARDED to it (main's stray `branches: ain]`
-ci.yml edit is gone — CI now triggers on main pushes). See CHANGELOG
-2026-10-19, docs/DEPLOY.md's last session record and
-docs/evidence/2026-10-19-insights-deploy/.
-· Production: https://currena.ir — the Insights page is now PUBLIC
-  (owner decree 2026-10-19b): no gate screen; the API serves the
-  projection keys only; /markets + /fx answer 404 hidden_site_mode.
-  The INSIGHTS_PASSWORD secret stays set — SITE_MODE='private' re-arms
-  the gate instantly (12h cookie session).
-· The AGENT_RUNBOOK commission and the export-fix, round-43, round-42
-  and quirk-pass commissions are all CLOSED. Do not reopen declined
+Hand-off date: 2026-10-19c (ROUND 44 session — the owner's colour-grading
+idea shipped: the verdict meter grades in ONE hue, the CURRENT step's —
+the highest filled segment wears the full step ink, the segments before
+it wear progressively whiter tints (cautious 55% yellow · stressed
+40/70% orange · critical 30/55/78% red; stable pure green); VerdictMeter
++ the QuestionGroup header meter carry `data-step` so every meter (hero
+lg, per-gauge sm, MarketsVerdict, six question headers) grades
+identically in both themes. Deployed currena-api `e8a47a2d` from
+`50ba45b`; production verified — deployed CSS byte-identical, the live
+Critical hero meter resolves pale→full red ending at Carbon Red 60
+verbatim, Stable stays #24a148, 375 clean, zero errors; see CHANGELOG
+2026-10-19c + docs/evidence/2026-10-19-round44-meter-grading/.
+The prior 2026-10-19b session flipped Insights PUBLIC (owner decree:
+SITE_MODE=public deployed `36d76363`; the licence-legal projection only
+— 27 of 51 readings; the EODHD/Yahoo world boards + 24 non-'yes'
+indicators hidden via the generated data/site-mode-overrides.json; T-15
+passes in public mode). The 2026-10-19 session shipped the insights
+rebuild itself (b137f3ef from 1f70552) — see CHANGELOG 2026-10-19,
+docs/DEPLOY.md's session records and docs/evidence/.
+· **STANDING ORDER (OWNER_SETUP §10, 2026-10-19c): every completed
+  round AUTO-commits, pushes and deploys — no per-round approval gate.**
+  Gates before push, deploy smoke before "done", evidence in
+  docs/evidence/ — the discipline stays.
+· Production: https://currena.ir — the Insights page is PUBLIC:
+  no gate screen; the API serves the projection keys only; /markets +
+  /fx answer 404 hidden_site_mode. The INSIGHTS_PASSWORD secret stays
+  set — SITE_MODE='private' re-arms the gate instantly (12h cookie
+  session).
+· The AGENT_RUNBOOK commission, the export-fix, rounds 42/43/44 and
+  the quirk-pass commissions are all CLOSED. Do not reopen declined
   items.
 
 ---
@@ -87,22 +88,23 @@ never hit live sites, secrets never persisted. Then this file,
 files (the authority order: runbook → STEP3 → DEFECTS → FIX_SPEC),
 `FIX_REPORT.md`, `STEP3_REPORT.md`, `MAINTENANCE.md`, `OWNER_SETUP.md`.
 
-## 2. Current verified state (2026-10-19 close)
+## 2. Current verified state (2026-10-19c close)
 
-- Gates green at close: **1,389 tests** (core 191 · scraper 67 ·
-  insights 451 · markets 13 · api 214 · web 453), typecheck 6/6, lint
+- Gates green at close: **1,407 tests** (core 191 · scraper 67 ·
+  insights 461 · markets 13 · api 222 · web 453), typecheck 6/6, lint
   0 errors / 15 accepted advisories (D-24), copy audit clean, budgets
-  held (entry 294.79/88.56 vs 296/89.5; Insights lazy **594.49/141.54**
+  held (entry 294.78/89.38 vs 296/89.5; Insights lazy **594.68/142.03**
   vs 604/142.8; the export builders remain separate lazy chunks —
   full-export + xlsx-writer + panel, none budget-tracked).
-- Production = currena-api **`b137f3ef`** from HEAD `1f70552`;
-  currena-markets `9b5ff7e0`. Repo: `main` == `insights-rebuild` (the
-  runbook branch shipped; new work branches off `main`).
-- **The private gate is LIVE**: unauthed `/api/insights*` → 401
-  `private_page` + `no-store`; `POST /api/insights/login` → signed
-  HttpOnly Secure SameSite=Lax 12h cookie → authed 200 `private,
-  no-store`. `INSIGHTS_PASSWORD` is set on the Worker (OWNER_SETUP §1
-  done 2026-10-19; rotate any time with `wrangler secret put`).
+- Production = currena-api **`e8a47a2d`** from HEAD `50ba45b` (+ docs
+  wrap-up); currena-markets `9b5ff7e0`. Repo: `main` ==
+  `insights-rebuild` (new work branches off `main`).
+- **The page is PUBLIC (2026-10-19b)**: unauthed `/api/insights` → 200
+  `public, max-age=60` serving the projection keys only (27 readings,
+  ruleVersion 2, displayMode public); `/markets` + `/fx` → 404
+  `hidden_site_mode`; the world sections stay hidden in the web build.
+  `INSIGHTS_PASSWORD` stays set — SITE_MODE='private' re-arms the 401
+  gate instantly (rotate any time with `wrangler secret put`).
 - The runbook surface live: 51 scored readings + the crypto Fear &
   Greed context card (corpus 51→52), ruleVersion 2, licence register +
   generated `LICENCES.md`, the E-23/E-24 audit columns in exports,
@@ -138,22 +140,21 @@ files (the authority order: runbook → STEP3 → DEFECTS → FIX_SPEC),
    what unblocks each): L1-05/08/11/14 + L2-10 remain Check /
    not-verified — they stay "Link out" or hidden until their series or
    terms verify; do NOT display them as normal cards.
-5. **Bundle budgets**: entry 296/89.5 (294.79/88.56 measured);
-   Insights lazy **604/142.8** (594.49/141.54 measured; the export
+5. **Bundle budgets**: entry 296/89.5 (294.78/89.38 measured);
+   Insights lazy **604/142.8** (594.68/142.03 measured; the export
    builders are separate lazy chunks). Any further Insights-chunk
-   growth needs its own justification. The meters wear the FOUR-STEP
-   status colours at every size (round 43 owner decree — do not
-   re-neutralise them).
+   growth needs its own justification. The meters GRADE IN ONE HUE —
+   the current step's, pale→full tints (round 44 owner decree — do
+   not re-rainbow them, do not re-neutralise them).
 6. **i18n copy corpora** (`insights-copy-en/fa.ts`) and
    `packages/core/src/schemas.ts` — data-file and sacred-surface;
    unchanged policy.
 7. **Owner-side items**: Telegram ingest-alert secrets, the I7
    launch-approval exit gate (BACKTEST review), the signals-wording
    legal read (S3), connection-evidence confirmations, **token
-   rotation** (all tokens have now transited chat across SEVEN+
+   rotation** (all tokens have now transited chat across EIGHT+
    sessions — strongest rotation nudge yet), and the OWNER_SETUP §9
-   housekeeping is RESOLVED (the branch fixed ci.yml; SITE_MODE stays
-   `private` by decree).
+   housekeeping is RESOLVED (the branch fixed ci.yml).
 
 ## 4. Session workflow (per AGENTS.md, enforced)
 
@@ -180,16 +181,19 @@ files (the authority order: runbook → STEP3 → DEFECTS → FIX_SPEC),
    the Private page form (or POST /api/insights/login) — the password
    is the owner's INSIGHTS_PASSWORD (owner-side value; agent-browser
    downloads land in /home/z/Downloads — copy export artefacts into
-   the evidence dir from there).
-4. Deploy: `CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… pnpm
-   --filter @currena/api exec wrangler deploy` (markets only if it
-   changed — the web app ships as the api Worker's static assets).
-   Post-deploy smoke: health, unauthed /api/insights → 401 (the gate
-   must stay fail-closed), login + authed 200 `private, no-store`,
-   /admin 401, convert parity
+   the evidence dir from there). SINCE 2026-10-19b the page is PUBLIC
+   — production DOM checks run signed-out; the gate story only matters
+   if SITE_MODE returns to 'private'.
+4. Deploy (per the STANDING ORDER — every completed round ships):
+   `CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… pnpm
+   --filter @currena/api run deploy` (markets only if it changed —
+   the web app ships as the api Worker's static assets). Post-deploy
+   smoke: health, unauthed /api/insights → 200 `public, max-age=60`
+   with displayMode=public and ZERO hidden-id leaks, /markets + /fx →
+   404 `hidden_site_mode`, /admin 401, convert parity
    (`/api/convert?from=USD&to=IRR&amount=100` — IRR is the
    tgju-routed code; TMN/IRT are NOT), cache headers, THEN production
-   DOM re-verification.
+   DOM re-verification (375 px + both themes).
 5. Secrets discipline: tokens arrive in chat, never get committed;
    wipe one-off scripts after use; remind the owner to rotate tokens
    at the end.

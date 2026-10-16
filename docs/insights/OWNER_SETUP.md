@@ -113,3 +113,18 @@ crossed several sessions. Rotate them at your leisure:
   indicators + the EODHD/Yahoo boards; scripts/check-site-mode.mjs
   verifies). Flipping SITE_MODE back to 'private' re-arms the
   INSIGHTS_PASSWORD gate instantly (the secret stays on the Worker).
+
+## 10. STANDING ORDER — auto push, commit and deploy (owner decree 2026-10-19c)
+
+The owner, after approving the round-44 meter grading: "Push, COmmit,
+Deploy. From now on, auto push commit and deploy." From this point on:
+
+- Every completed round/change ships WITHOUT a per-round approval gate:
+  gates green → commit → push `insights-rebuild` → fast-forward `main`
+  → deploy currena-api (markets only if it changed) → post-deploy
+  smoke + DOM verification → docs wrap-up, all in one pass.
+- The per-change discipline stays: tests/typecheck/lint/budgets MUST
+  pass before any push; the deploy smoke MUST verify before the
+  session reports done; evidence still lands in docs/evidence/.
+- The credentials still arrive per-session in chat (§6) — the standing
+  order covers WHEN to deploy, not the secrets themselves.
