@@ -50,7 +50,6 @@ import { buildInsightsMarkdown, type FullExportInput } from '../../../apps/web/s
 import { DISPLAY } from '../../../apps/web/src/components/insights/config/display';
 import { insightsCopyEn } from '../../../apps/web/src/i18n/insights-copy-en';
 import { insightsCopyFa } from '../../../apps/web/src/i18n/insights-copy-fa';
-import auditJson from '../../../data/indicator-audit.json';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '..', '..', '..');
