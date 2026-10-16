@@ -1,3 +1,21 @@
+# SESSION_LOG — Public Insights Flip 2026-10-19b
+
+Branch `insights-rebuild` (== main after the ship) · production `36d76363` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's "Why you made the page private? make it public dude." — the Step 3 §12 reserved task, done licence-safely.
+
+### 1 · feat: the public projection + the generated hidden set
+**What:** `data/site-mode-overrides.json` (generated, test-pinned: 24 non-'yes' indicators + the EODHD/Yahoo boards); `projectSnapshotToPublic` (pure: subset + recomputed summaries + additive `displayMode:'public'`); the ingest writes `insights:snapshot-public` + `insights:archive-public:v1:<date>` daily (+2 writes, budget 31→33); `pnpm --filter @currena/insights public-projection` bootstraps from a stored snapshot; T-15 (check-site-mode.mjs) gains its real pass path (verified: exits 0 in public mode); the Worker serves projection keys only (mode-aware KvInsightsReader), 404s the boards + hidden histories before any KV read, skips the Yahoo live-prices merge; the web hides the world sections when the snapshot says public.
+**Evidence:** tests 1,407 green (+18); SITE_MODE=public check-site-mode exits 0; see CHANGELOG 2026-10-19b.
+
+### 2 · deploy + verify: public and leak-free
+**What:** bootstrap wrote the public keys from the live snapshot (51 → 27 public-ok, 2 reads / 2 writes); deployed currena-api `36d76363-6346-4ac7-9c41-914f1f7d5c19` with SITE_MODE=public; production matrix: unauthed /api/insights → 200 public,max-age=60, 27 readings, ZERO hidden-id leaks; /markets + /fx → 404 hidden_site_mode; brent/history → 404, us10y/history → 200; health 200; /admin 401; convert parity intact; browser: no gate screen, sections hidden, fa + 375 clean, zero console errors (one-reload SW cycle observed).
+**Evidence:** docs/evidence/2026-10-19-public-insights/.
+
+### 3 · docs
+**What:** CHANGELOG 2026-10-19b, DEPLOY record, SESSION_LOG, PROGRESS row, OWNER_SETUP §9 amendment, NEXT_SESSION_PROMPT, evidence README.
+**Evidence:** this commit.
+
+---
 # SESSION_LOG — Insights Rebuild Ship 2026-10-19
 
 Branch `insights-rebuild` (fast-forwarded to `main` after approval) · HEAD `1f70552` → production `b137f3ef` · runner: pnpm 10.34.5 / Node 24.21.

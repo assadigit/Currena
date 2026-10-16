@@ -157,8 +157,13 @@ export function Insights() {
 
   // The two world-section feeds + the hero's section indicators — moved
   // verbatim to insights-sections/world-feeds.ts (Phase 3-e).
-  const { marketsState, marketsAlert, jumpToMarkets, downloadMarketsCsv } = useWorldMarketsSection(copy);
-  const { fxState, fxAlert, jumpToFxCurrencies, downloadFxCsv } = useWorldCurrenciesSection(copy);
+  // PUBLIC MODE (2026-10-19, AC-08/LR-02): the public projection's snapshot
+  // carries displayMode 'public' — the private-only world sections (the
+  // EODHD/Yahoo-backed boards + the US-shares view built on them) never
+  // render and their feeds are never fetched.
+  const worldFeedsEnabled = state.kind !== 'ready' || state.snapshot.displayMode !== 'public';
+  const { marketsState, marketsAlert, jumpToMarkets, downloadMarketsCsv } = useWorldMarketsSection(copy, worldFeedsEnabled);
+  const { fxState, fxAlert, jumpToFxCurrencies, downloadFxCsv } = useWorldCurrenciesSection(copy, worldFeedsEnabled);
   const sectionIndicators = useWorldSectionIndicators(marketsState, fxState, copy, jumpToMarkets, jumpToFxCurrencies);
 
   const togglePin = useCallback((id: IndicatorId, next: boolean): void => {
@@ -392,14 +397,21 @@ export function Insights() {
           {/* World stock markets (insights-world-markets-spec.md §6.2):
            * right after the commodity prices — both answer "what is moving";
            * never above the verdict or alerts. Self-contained feed: its own
-           * loading/empty states, never an error surface for the page. */}
-          <WorldMarkets state={marketsState} copy={copy} locale={locale} numberLocale={numberLocale} />
+           * loading/empty states, never an error surface for the page.
+           * PUBLIC MODE: licence-hidden entirely (no render, no fetch). */}
+          {worldFeedsEnabled && (
+            <WorldMarkets state={marketsState} copy={copy} locale={locale} numberLocale={numberLocale} />
+          )}
 
           {/* Step 3 L2-03 + §7.1 (runbook Phase 4): the US shares in AUD view
            * (same-date arithmetic, refused when the feeds mismatch) and the
            * collapsed "Know before you buy US shares" box (only the
-           * exchange-rate and fees lines — no approved text exists). */}
-          <UsSharesAudBox marketsState={marketsState} fxState={fxState} copy={copy} numberLocale={numberLocale} />
+           * exchange-rate and fees lines — no approved text exists).
+           * PUBLIC MODE: the AUD view rides the hidden world feeds — hidden
+           * with them; the copy-only notes box stays. */}
+          {worldFeedsEnabled && (
+            <UsSharesAudBox marketsState={marketsState} fxState={fxState} copy={copy} numberLocale={numberLocale} />
+          )}
           <UsSharesNotesBox copy={copy} />
 
           {/* World currencies (insights-world-currencies-spec.md §9.2):
@@ -407,8 +419,11 @@ export function Insights() {
            * each other, and each verdict names what it measures (§9.10), so
            * a calm stock section beside a warning currency pattern can never
            * read as one contradiction. Self-contained feed: its own
-           * loading/empty states, never an error surface for the page. */}
-          <WorldCurrencies state={fxState} copy={copy} locale={locale} numberLocale={numberLocale} />
+           * loading/empty states, never an error surface for the page.
+           * PUBLIC MODE: licence-hidden entirely (no render, no fetch). */}
+          {worldFeedsEnabled && (
+            <WorldCurrencies state={fxState} copy={copy} locale={locale} numberLocale={numberLocale} />
+          )}
 
           {/* R11: "What it means for my money" — at most 4 lines. */}
           <MoneyPanel

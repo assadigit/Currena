@@ -8,6 +8,7 @@ import {
   downsampleSeries,
   HISTORY_MAX_POINTS,
   HISTORY_WINDOW_DAYS,
+  projectSnapshotToPublic,
   quarterPeriodOf,
 } from './snapshot';
 
@@ -363,5 +364,60 @@ describe('buildInsightsStatus', () => {
     expect(status.mode).toBe('scheduled');
     expect(status.sources).toHaveLength(2);
     expect(status.sources[1]!.ok).toBe(false);
+  });
+});
+
+describe('projectSnapshotToPublic (2026-10-19 public projection)', () => {
+  const full = buildInsightsSnapshot({
+    series: { us10y: daily('2026-08-29', 40, 3), 'gold-usd': daily('2026-09-20', 20, 2400) },
+    calendar: [],
+    now: NOW,
+  });
+
+  it('drops the hidden ids entirely (no unavailable placeholders) and stamps displayMode public', () => {
+    const hidden = new Set(['gold-usd', 'brent', 'china-pmi']);
+    const pub = projectSnapshotToPublic(full, hidden);
+    expect(pub.displayMode).toBe('public');
+    expect(pub.readings.find((r) => r.id === 'gold-usd')).toBeUndefined();
+    expect(pub.readings.find((r) => r.id === 'us10y')).toBeDefined();
+    expect(pub.readings).toHaveLength(full.readings.length - hidden.size);
+    expect(pub.calendar).toEqual(full.calendar);
+    expect(pub.ruleVersion).toBe(full.ruleVersion);
+  });
+
+  it('filters changedThisWeek events for hidden ids and recomputes the summaries over the survivors', () => {
+    const withEvents: InsightsSnapshot = {
+      ...full,
+      changedThisWeek: [
+        { id: 'gold-usd', from: 'normal', to: 'warning', asOf: '2026-10-06' },
+        { id: 'us10y', from: 'warning', to: 'normal', asOf: '2026-10-05' },
+      ],
+    };
+    const pub = projectSnapshotToPublic(withEvents, new Set(['gold-usd']));
+    expect(pub.changedThisWeek.map((e) => e.id)).toEqual(['us10y']);
+    // The summary is the SAME summarizer over the subset — vote counts shrink.
+    expect(pub.summary.global.votingCount).toBeLessThanOrEqual(full.summary.global.votingCount);
+  });
+
+  it('is idempotent (projecting a projection changes nothing)', () => {
+    const once = projectSnapshotToPublic(full, new Set(['gold-usd', 'brent']));
+    const twice = projectSnapshotToPublic(once, new Set(['gold-usd', 'brent']));
+    expect(twice).toEqual(once);
+  });
+
+  it('LR-02 regression: with the GENERATED overrides file, no hidden id survives and the boards are declared', async () => {
+    const { readFileSync } = await import('node:fs');
+    const overrides = JSON.parse(
+      readFileSync(new URL('../../../../data/site-mode-overrides.json', import.meta.url), 'utf8'),
+    ) as { hiddenIndicatorIds: string[]; hiddenBoards: string[] };
+    const full52 = buildInsightsSnapshot({ series: {}, calendar: [], now: NOW });
+    const pub = projectSnapshotToPublic(full52, new Set(overrides.hiddenIndicatorIds));
+    for (const reading of pub.readings) {
+      expect(overrides.hiddenIndicatorIds).not.toContain(reading.id);
+    }
+    expect(pub.readings).toHaveLength(full52.readings.length - overrides.hiddenIndicatorIds.length);
+    for (const board of ['markets', 'fx']) {
+      expect(overrides.hiddenBoards).toContain(board);
+    }
   });
 });

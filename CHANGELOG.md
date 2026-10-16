@@ -5,6 +5,43 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-19b] — the Insights page goes PUBLIC (owner decree)
+
+The owner on the private gate: "Why you made the page private? make it
+public dude." Going public is the Step 3 spec's own reserved task (§12)
+and it is done licence-safely: the public page shows ONLY sources whose
+terms allow public display. The private gate's fail-closed design (and
+the INSIGHTS_PASSWORD secret) stays intact — flipping SITE_MODE back to
+'private' re-arms it instantly.
+
+### Added
+
+- `data/site-mode-overrides.json` — generated, test-pinned hidden set
+  (24 indicators + the two EODHD/Yahoo world boards); T-15
+  (check-site-mode.mjs) gains a real pass path: public mode passes only
+  when the hidden set covers exactly the non-'yes' audit verdicts.
+- `projectSnapshotToPublic` — the pure public projection (subset +
+  recomputed summaries + the additive `displayMode` schema field),
+  written daily by the ingest under `insights:snapshot-public` (+2
+  KV writes/day, budget 31 → 33) and bootstrappable from a stored
+  snapshot via `pnpm --filter @currena/insights public-projection`.
+- Public serve path (SITE_MODE=public, AC-08): mode-aware
+  KvInsightsReader (projection keys only — the private document cannot
+  leak by construction), 404 `hidden_site_mode` on /markets + /fx and
+  on hidden ids' histories (before any KV read), no Yahoo live-prices
+  merge, and the web hides the world sections when the snapshot says
+  `displayMode:'public'` (no fetch, no cached render).
+
+### Verification
+
+- Tests **1,407** green (+18 public-mode tests), typecheck 6/6, lint 0
+  errors / 15 advisories, copy audit clean, budgets held.
+- Production: unauthed `/api/insights` → 200 `public, max-age=60`,
+  27 public-ok readings, ZERO hidden-id leaks; boards + hidden
+  histories → 404 `hidden_site_mode`; the page renders signed-out with
+  no gate screen; fa + 375 px clean. Evidence:
+  `docs/evidence/2026-10-19-public-insights/`.
+
 ## [2026-10-19] — the insights rebuild ships to production (owner-approved)
 
 The AGENT_RUNBOOK execution on `insights-rebuild` (Setup → Phase 7, 14

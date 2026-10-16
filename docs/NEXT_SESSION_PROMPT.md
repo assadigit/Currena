@@ -1,6 +1,14 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-19 (insights-rebuild SHIP session — the owner's
+Hand-off date: 2026-10-19b (PUBLIC FLIP session — the owner's "make it
+public dude": SITE_MODE=public deployed `36d76363`; the public page
+serves the licence-legal projection only — 27 of 51 readings, the
+EODHD/Yahoo world boards + 24 non-'yes' indicators hidden via the
+generated data/site-mode-overrides.json; T-15 passes in public mode;
+tests 1,407 green; production verified leak-free — see CHANGELOG
+2026-10-19b + docs/evidence/2026-10-19-public-insights/). The prior
+2026-10-19 session shipped the insights rebuild itself (b137f3ef from
+1f70552; INSIGHTS_PASSWORD set; main fast-forwarded). — the owner's
 "Approved. Push and Deploy and commit." on the completed AGENT_RUNBOOK
 execution. The sandbox had reset, so the state was rebuilt from a fresh
 clone: gates re-run green (1,389 tests), OWNER_SETUP §1 executed on the
@@ -14,9 +22,11 @@ pushed and `main` FAST-FORWARDED to it (main's stray `branches: ain]`
 ci.yml edit is gone — CI now triggers on main pushes). See CHANGELOG
 2026-10-19, docs/DEPLOY.md's last session record and
 docs/evidence/2026-10-19-insights-deploy/.
-· Production: https://currena.ir — the Insights page is now PRIVATE:
-  every /api/insights* route answers 401 until sign-in; the password is
-  the INSIGHTS_PASSWORD secret (owner-side value, 12h cookie session).
+· Production: https://currena.ir — the Insights page is now PUBLIC
+  (owner decree 2026-10-19b): no gate screen; the API serves the
+  projection keys only; /markets + /fx answer 404 hidden_site_mode.
+  The INSIGHTS_PASSWORD secret stays set — SITE_MODE='private' re-arms
+  the gate instantly (12h cookie session).
 · The AGENT_RUNBOOK commission and the export-fix, round-43, round-42
   and quirk-pass commissions are all CLOSED. Do not reopen declined
   items.

@@ -27,6 +27,7 @@
 import { Hono } from 'hono';
 import type { MarketsReader } from '@currena/insights/markets';
 import { KvInsightsReader, KvMarketsReader, KvFxReader, KvPricesReader } from './adapters/insights-store';
+import { siteModeOf, type InsightsServeMode } from './public-mode';
 import { createInsightsRoutes } from './routes/insights';
 import { createRatesRoutes } from './routes/rates';
 import { createOpsRoutes } from './routes/ops';
@@ -85,9 +86,17 @@ export function createApp(deps: AppDeps = {}) {
 
   // Insights serve path: ONE KV read per request (KvInsightsReader is a
   // lazy singleton — the binding is stable for the isolate's lifetime).
+  // Mode-aware (2026-10-19): SITE_MODE=public reads ONLY the public
+  // projection keys — re-keyed if the mode ever differs from the memoized
+  // reader's (defensive: SITE_MODE is constant per deployment).
   let insightsReader: import('@currena/insights/store').InsightsReader | undefined;
+  let insightsReaderMode: InsightsServeMode | undefined;
   const getInsightsReader = (env: Bindings): import('@currena/insights/store').InsightsReader => {
-    insightsReader ??= deps.makeInsightsReader ? deps.makeInsightsReader(env) : new KvInsightsReader(env.RATES);
+    const mode = siteModeOf(env);
+    if (insightsReader === undefined || insightsReaderMode !== mode) {
+      insightsReader = deps.makeInsightsReader ? deps.makeInsightsReader(env) : new KvInsightsReader(env.RATES, mode);
+      insightsReaderMode = mode;
+    }
     return insightsReader;
   };
 

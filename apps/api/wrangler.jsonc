@@ -32,10 +32,17 @@
   // Step 3 §2.2 (runbook Phase 3): SITE_MODE is 'private' by default — every
   // /api/insights* route sits behind the INSIGHTS_PASSWORD gate (a wrangler
   // SECRET, set with `wrangler secret put INSIGHTS_PASSWORD`, never here).
-  // Flipping SITE_MODE to 'public' removes the gate; the T-15 build check
-  // then fails while any displayed source is not public-display-ok.
+  // 2026-10-19 OWNER DECREE: the Insights page is PUBLIC. SITE_MODE='public'
+  // skips the gate (AC-08) and the T-15 build gate verifies the generated
+  // data/site-mode-overrides.json hides every source that is not public-
+  // display-ok (24 indicators + the EODHD/Yahoo-backed world boards; LR-02).
+  // The public serve path reads ONLY the projection keys
+  // (insights:snapshot-public, written by the daily ingest + the
+  // public-projection bootstrap) — the private document never leaks.
+  // Flipping back to 'private' re-arms the password gate (the
+  // INSIGHTS_PASSWORD secret stays set on the Worker).
   "vars": {
-    "SITE_MODE": "private"
+    "SITE_MODE": "public"
   },
   "assets": {
     "directory": "../web/dist",

@@ -19,6 +19,7 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
     "test": "vitest run",
     "backtest": "tsx scripts/backtest.ts",
+    "public-projection": "tsx scripts/public-projection.ts",
     "live-run": "tsx scripts/live-run.ts",
     "ingest": "tsx scripts/ingest.ts",
     "selfcheck": "tsx scripts/selfcheck.ts",

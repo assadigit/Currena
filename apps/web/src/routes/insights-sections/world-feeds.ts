@@ -24,13 +24,17 @@ import type { FxLoadState } from '../../components/insights/WorldCurrencies';
 import type { FxAlert, MarketsAlert, SectionIndicatorState } from '../../components/insights/VerdictMeter';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 
-export function useWorldMarketsSection(copy: InsightsCopy) {
+export function useWorldMarketsSection(copy: InsightsCopy, enabled = true) {
   // World stock markets (insights-world-markets-spec.md): an independent
   // feed with its own last-good cache. It NEVER surfaces an error — the
   // designed fallbacks are the loading skeletons and the calm "being
   // prepared" line (§6.6) — so a missing/unready feed cannot break the
   // page, and a page request never reaches a provider (§4 rule 4).
   const [marketsState, setMarketsState] = useState<MarketsLoadState>(() => {
+    // PUBLIC MODE (2026-10-19, AC-08/LR-02): when the snapshot says the page
+    // is the public projection, the world feeds are licence-hidden — no
+    // fetch, no cached last-good, a calm empty state the shell never renders.
+    if (!enabled) return { kind: 'empty' };
     try {
       const cachedMarkets = readCachedMarkets();
       return cachedMarkets ? { kind: 'ready', snapshot: cachedMarkets } : { kind: 'loading' };
@@ -39,13 +43,14 @@ export function useWorldMarketsSection(copy: InsightsCopy) {
     }
   });
   useEffect(() => {
+    if (!enabled) return;
     const controller = new AbortController();
     void fetchMarketsSnapshot(controller.signal).then((snapshot) => {
       if (controller.signal.aborted) return;
       setMarketsState(snapshot !== null ? { kind: 'ready', snapshot } : { kind: 'empty' });
     });
     return () => controller.abort();
-  }, []);
+  }, [enabled]);
 
   // §5.3 (build step 9): the raised section signal joins the GLOBAL hero
   // verdict's attention module; undefined when calm or not yet populated.
@@ -82,11 +87,14 @@ export function useWorldMarketsSection(copy: InsightsCopy) {
   return { marketsState, marketsAlert, jumpToMarkets, downloadMarketsCsv };
 }
 
-export function useWorldCurrenciesSection(copy: InsightsCopy) {
+export function useWorldCurrenciesSection(copy: InsightsCopy, enabled = true) {
   // World currencies (insights-world-currencies-spec.md): the same
   // independent-feed discipline — own last-good cache, never an error
   // surface; loading skeletons and the calm "being prepared" line (§9.5).
   const [fxState, setFxState] = useState<FxLoadState>(() => {
+    // PUBLIC MODE (2026-10-19): the markets twin — disabled means empty,
+    // never fetched, never rendered (the shell hides the section).
+    if (!enabled) return { kind: 'empty' };
     try {
       const cachedFx = readCachedFx();
       return cachedFx ? { kind: 'ready', snapshot: cachedFx } : { kind: 'loading' };
@@ -95,13 +103,14 @@ export function useWorldCurrenciesSection(copy: InsightsCopy) {
     }
   });
   useEffect(() => {
+    if (!enabled) return;
     const controller = new AbortController();
     void fetchFxSnapshot(controller.signal).then((snapshot) => {
       if (controller.signal.aborted) return;
       setFxState(snapshot !== null ? { kind: 'ready', snapshot } : { kind: 'empty' });
     });
     return () => controller.abort();
-  }, []);
+  }, [enabled]);
 
   // §6.5 (currencies build step 11): the raised currency signal joins the
   // hero's attention module WITH ITS PATTERN NAMES — the existing mechanism.

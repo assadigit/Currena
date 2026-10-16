@@ -2,7 +2,10 @@ import type { IndicatorReading, InsightsSnapshot, InsightsStatus, IndicatorHisto
 import { InMemoryInsightsStore } from '@currena/insights/store';
 import { InMemoryPricesStore } from '@currena/insights/prices';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { Hono } from 'hono';
 import { createApp, type Bindings } from '../index';
+import { INSIGHTS_SESSION_COOKIE, sessionTokenFor } from '../insights-auth';
+import { KvInsightsReader } from '../adapters/insights-store';
 
 /* Contract-valid fixtures (the runner's exact output shapes). */
 const reading = (id: IndicatorId, status: IndicatorReading['status'] = 'normal'): IndicatorReading => ({
@@ -42,6 +45,33 @@ const env: Bindings = {
   RATES: { get: async () => null } as unknown as KVNamespace,
   SITE_MODE: 'public',
 };
+
+/* ------------------------------------------------------------------ *
+ * The authed-PRIVATE venue (2026-10-19, AC-08/LR-02): the private-feed
+ * payload/cache-shape tests ride a real signed session cookie — public
+ * mode now REFUSES the Yahoo-backed boards (404 hidden_site_mode) and
+ * skips the Yahoo live-prices merge, so the private behaviour is only
+ * reachable authenticated.
+ * ------------------------------------------------------------------ */
+const PASSWORD = 'the-gate-test-password';
+const authedEnv: Bindings = {
+  RATES: { get: async () => null } as unknown as KVNamespace,
+  INSIGHTS_PASSWORD: PASSWORD,
+};
+async function authedCookie(): Promise<string> {
+  const { token } = await sessionTokenFor(PASSWORD, Date.now());
+  return `${INSIGHTS_SESSION_COOKIE}=${token}`;
+}
+/** Wrap the app so every request carries a valid session cookie. */
+function authed(app: ReturnType<typeof createApp>) {
+  const wrapper = new Hono<{ Bindings: Bindings }>();
+  wrapper.all('*', async (c, next) => {
+    c.req.raw.headers.set('cookie', await authedCookie());
+    await next();
+  });
+  wrapper.route('/', app);
+  return wrapper;
+}
 
 describe('GET /api/insights (injected in-memory store)', () => {
   let store: InMemoryInsightsStore;
@@ -176,7 +206,7 @@ describe('GET /api/insights — live-prices merge', () => {
       generatedAt: '2026-10-12T12:13:00.000Z',
       assets: { brent: liveEntry(107.14) },
     });
-    const res = await makeApp().request('/api/insights', undefined, env);
+    const res = await authed(makeApp()).request('/api/insights', undefined, authedEnv);
     expect(res.status).toBe(200);
     const body = (await res.json()) as InsightsSnapshot;
     const brent = body.readings.find((r) => r.id === 'brent')!;
@@ -195,11 +225,11 @@ describe('GET /api/insights — live-prices merge', () => {
       generatedAt: '2026-10-12T12:13:00.000Z',
       assets: { brent: liveEntry(107.14) },
     });
-    const res = await makeApp().request('/api/insights', undefined, env);
+    const res = await authed(makeApp()).request('/api/insights', undefined, authedEnv);
     expect(res.headers.get('etag')).toBe('"insights:2026-10-07T04:20:00.000Z+prices:2026-10-12T12:13:00.000Z"');
-    const revalidate = await makeApp().request('/api/insights', {
+    const revalidate = await authed(makeApp()).request('/api/insights', {
       headers: { 'if-none-match': '"insights:2026-10-07T04:20:00.000Z+prices:2026-10-12T12:13:00.000Z"' },
-    }, env);
+    }, authedEnv);
     expect(revalidate.status).toBe(304);
     // The next hourly rung writes a new generation → the old ETag no longer matches.
     await pricesStore.putLivePricesIfChanged({
@@ -207,9 +237,9 @@ describe('GET /api/insights — live-prices merge', () => {
       generatedAt: '2026-10-12T13:13:00.000Z',
       assets: { brent: liveEntry(107.9) },
     });
-    const fresh = await makeApp().request('/api/insights', {
+    const fresh = await authed(makeApp()).request('/api/insights', {
       headers: { 'if-none-match': '"insights:2026-10-07T04:20:00.000Z+prices:2026-10-12T12:13:00.000Z"' },
-    }, env);
+    }, authedEnv);
     expect(fresh.status).toBe(200);
   });
 
@@ -220,8 +250,8 @@ describe('GET /api/insights — live-prices merge', () => {
         throw new Error('KV unreachable');
       },
     };
-    const app = createApp({ makeInsightsReader: () => insightsStore, makePricesReader: () => poisoned });
-    const res = await app.request('/api/insights', undefined, env);
+    const app = authed(createApp({ makeInsightsReader: () => insightsStore, makePricesReader: () => poisoned }));
+    const res = await app.request('/api/insights', undefined, authedEnv);
     expect(res.status).toBe(200);
     expect(res.headers.get('etag')).toBe('"insights:2026-10-07T04:20:00.000Z+prices:none"');
     expect(await res.json()).toEqual(staleOilSnapshot);
@@ -229,7 +259,7 @@ describe('GET /api/insights — live-prices merge', () => {
 
   it('an empty live key serves the plain snapshot (prices:none)', async () => {
     await insightsStore.putSnapshot(staleOilSnapshot);
-    const res = await makeApp().request('/api/insights', undefined, env);
+    const res = await authed(makeApp()).request('/api/insights', undefined, authedEnv);
     expect(res.status).toBe(200);
     expect(res.headers.get('etag')).toBe('"insights:2026-10-07T04:20:00.000Z+prices:none"');
     expect(await res.json()).toEqual(staleOilSnapshot);
@@ -245,7 +275,7 @@ describe('GET /api/insights — live-prices merge', () => {
       generatedAt: '2026-10-12T12:13:00.000Z',
       assets: { brent: liveEntry(120, { asOf: '2026-10-05' }) },
     });
-    const res = await makeApp().request('/api/insights', undefined, env);
+    const res = await authed(makeApp()).request('/api/insights', undefined, authedEnv);
     const body = (await res.json()) as InsightsSnapshot;
     expect(body.readings.find((r) => r.id === 'brent')!.value).toBe(3.9); // the EOD reading untouched
     // The stored quotes' generation still rides the ETag (the key exists).
@@ -367,23 +397,23 @@ describe('GET /api/insights/markets', () => {
     });
   }
 
-  it('serves the stored snapshot with ETag + the spec §4 rule 5 cache headers', async () => {
+  it('serves the stored snapshot with ETag + the AC-05 private cache stamp (licence-private feed)', async () => {
     const snap = await realisticSnapshot();
     await store.putMarketsIfChanged(snap, undefined);
-    const res = await makeApp().request('/api/insights/markets', undefined, env);
+    const res = await authed(makeApp()).request('/api/insights/markets', undefined, authedEnv);
     expect(res.status).toBe(200);
     expect(res.headers.get('etag')).toBe('"insights-markets:2026-10-12T23:31:00Z"');
-    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
+    expect(res.headers.get('cache-control')).toBe('private, no-store');
     expect(await res.json()).toEqual(snap);
   });
 
   it('answers 304 on a matching If-None-Match', async () => {
     const snap = await realisticSnapshot();
     await store.putMarketsIfChanged(snap, undefined);
-    const res = await makeApp().request(
+    const res = await authed(makeApp()).request(
       '/api/insights/markets',
       { headers: { 'if-none-match': '"insights-markets:2026-10-12T23:31:00Z"' } },
-      env,
+      authedEnv,
     );
     expect(res.status).toBe(304);
   });
@@ -396,18 +426,18 @@ describe('GET /api/insights/markets', () => {
     await store.putMarketsIfChanged(snap, undefined);
 
     // Fresh serve (now = 2026-10-13): byte-identical to the stored snapshot.
-    const freshRes = await makeApp().request('/api/insights/markets', undefined, env);
+    const freshRes = await authed(makeApp()).request('/api/insights/markets', undefined, authedEnv);
     expect(freshRes.status).toBe(200);
     expect(await freshRes.text()).toBe(JSON.stringify(snap));
 
     // Aged serve (now = 2026-10-16: asOf + 7 days = STALE_DAYS + 2): every
     // row flips to stale:true; everything else stays byte-identical.
-    const agedApp = createApp({
+    const agedApp = authed(createApp({
       makeInsightsReader: () => new InMemoryInsightsStore(),
       makeMarketsReader: () => store,
       now: () => new Date('2026-10-16T12:00:00Z'),
-    });
-    const agedRes = await agedApp.request('/api/insights/markets', undefined, env);
+    }));
+    const agedRes = await agedApp.request('/api/insights/markets', undefined, authedEnv);
     expect(agedRes.status).toBe(200);
     const body = (await agedRes.json()) as typeof snap;
     expect(body.markets.every((m) => m.stale)).toBe(true);
@@ -420,11 +450,11 @@ describe('GET /api/insights/markets', () => {
   });
 
   it('answers 503 markets_not_ready (calm, no-store) when KV is empty', async () => {
-    const res = await makeApp().request('/api/insights/markets', undefined, env);
+    const res = await authed(makeApp()).request('/api/insights/markets', undefined, authedEnv);
     expect(res.status).toBe(503);
     const body = (await res.json()) as { error: { code: string; message: string } };
     expect(body.error.code).toBe('markets_not_ready');
-    expect(res.headers.get('cache-control')).toBe('no-store');
+    expect(res.headers.get('cache-control')).toBe('private, no-store');
   });
 
   it('keeps the full 16-market response under the 12 KB budget (spec §9 step 4)', async () => {
@@ -439,7 +469,7 @@ describe('GET /api/insights/markets', () => {
     const snap = await realisticSnapshot();
     await store.putMarketsIfChanged(snap, undefined);
     const readsBefore = store.ops.reads;
-    await makeApp().request('/api/insights/markets', undefined, env);
+    await authed(makeApp()).request('/api/insights/markets', undefined, authedEnv);
     expect(store.ops.reads - readsBefore).toBe(1);
   });
 });
@@ -507,23 +537,23 @@ describe('GET /api/insights/fx', () => {
     });
   }
 
-  it('serves the stored snapshot with ETag + the spec §5 rule 4 cache headers', async () => {
+  it('serves the stored snapshot with ETag + the AC-05 private cache stamp (licence-private feed)', async () => {
     const snap = await realisticFxSnapshot();
     await store.putFxIfChanged(snap, undefined);
-    const res = await makeApp().request('/api/insights/fx', undefined, env);
+    const res = await authed(makeApp()).request('/api/insights/fx', undefined, authedEnv);
     expect(res.status).toBe(200);
     expect(res.headers.get('etag')).toBe('"insights-fx:2026-10-13T17:01:00Z"');
-    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
+    expect(res.headers.get('cache-control')).toBe('private, no-store');
     expect(await res.json()).toEqual(snap);
   });
 
   it('answers 304 on a matching If-None-Match', async () => {
     const snap = await realisticFxSnapshot();
     await store.putFxIfChanged(snap, undefined);
-    const res = await makeApp().request(
+    const res = await authed(makeApp()).request(
       '/api/insights/fx',
       { headers: { 'if-none-match': '"insights-fx:2026-10-13T17:01:00Z"' } },
-      env,
+      authedEnv,
     );
     expect(res.status).toBe(304);
   });
@@ -535,19 +565,19 @@ describe('GET /api/insights/fx', () => {
     await store.putFxIfChanged(snap, undefined);
 
     // Fresh serve (now = 2026-10-13): byte-identical to the stored snapshot.
-    const freshRes = await makeApp().request('/api/insights/fx', undefined, env);
+    const freshRes = await authed(makeApp()).request('/api/insights/fx', undefined, authedEnv);
     expect(freshRes.status).toBe(200);
     expect(await freshRes.json()).toEqual(snap);
 
     // Aged serve (now = 2026-10-19: asOf + 7 days = FX_STALE_DAYS + 2):
     // every pair flips to stale:true; everything else stays byte-identical
     // (the dollar measure and rules carry no stale flag by schema).
-    const agedApp = createApp({
+    const agedApp = authed(createApp({
       makeInsightsReader: () => new InMemoryInsightsStore(),
       makeFxReader: () => store,
       now: () => new Date('2026-10-19T12:00:00Z'),
-    });
-    const agedRes = await agedApp.request('/api/insights/fx', undefined, env);
+    }));
+    const agedRes = await agedApp.request('/api/insights/fx', undefined, authedEnv);
     expect(agedRes.status).toBe(200);
     const body = (await agedRes.json()) as typeof snap;
     expect(body.pairs.every((p) => p.stale)).toBe(true);
@@ -559,11 +589,11 @@ describe('GET /api/insights/fx', () => {
   });
 
   it('answers 503 fx_not_ready (calm, no-store) when KV is empty', async () => {
-    const res = await makeApp().request('/api/insights/fx', undefined, env);
+    const res = await authed(makeApp()).request('/api/insights/fx', undefined, authedEnv);
     expect(res.status).toBe(503);
     const body = (await res.json()) as { error: { code: string; message: string } };
     expect(body.error.code).toBe('fx_not_ready');
-    expect(res.headers.get('cache-control')).toBe('no-store');
+    expect(res.headers.get('cache-control')).toBe('private, no-store');
   });
 
   it('keeps the full 10-pair response under the 20 KB budget (spec §5 rule 5)', async () => {
@@ -577,7 +607,7 @@ describe('GET /api/insights/fx', () => {
     const snap = await realisticFxSnapshot();
     await store.putFxIfChanged(snap, undefined);
     const readsBefore = store.ops.reads;
-    await makeApp().request('/api/insights/fx', undefined, env);
+    await authed(makeApp()).request('/api/insights/fx', undefined, authedEnv);
     expect(store.ops.reads - readsBefore).toBe(1);
   });
 });
@@ -592,58 +622,62 @@ describe('KV-failure honesty (audit A-2 — reader throws, route stays calm)', (
   const kvFailure = new Error('KV unavailable');
 
   it('GET /api/insights → 503 insights_unavailable (no-store) when the reader rejects', async () => {
-    const app = createApp({
+    const app = authed(createApp({
       makeInsightsReader: () => ({
         getSnapshot: () => Promise.reject(kvFailure),
         getHistory: () => Promise.reject(kvFailure),
         getStatus: () => Promise.reject(kvFailure),
         getArchive: () => Promise.reject(kvFailure),
+        getPublicSnapshot: () => Promise.reject(kvFailure),
+        getPublicArchive: () => Promise.reject(kvFailure),
       }),
-    });
-    const res = await app.request('/api/insights', undefined, env);
+    }));
+    const res = await app.request('/api/insights', undefined, authedEnv);
     expect(res.status).toBe(503);
-    expect(res.headers.get('cache-control')).toBe('no-store');
+    expect(res.headers.get('cache-control')).toBe('private, no-store');
     const body = (await res.json()) as { error: { code: string; message: string } };
     expect(body.error.code).toBe('insights_unavailable');
     expect(body.error.message).toContain('temporarily unavailable');
   });
 
   it('GET /api/insights/markets → 503 markets_unavailable when the reader rejects', async () => {
-    const app = createApp({
+    const app = authed(createApp({
       makeInsightsReader: () => new InMemoryInsightsStore(),
       makeMarketsReader: () => ({ getMarkets: () => Promise.reject(kvFailure) }),
-    });
-    const res = await app.request('/api/insights/markets', undefined, env);
+    }));
+    const res = await app.request('/api/insights/markets', undefined, authedEnv);
     expect(res.status).toBe(503);
-    expect(res.headers.get('cache-control')).toBe('no-store');
+    expect(res.headers.get('cache-control')).toBe('private, no-store');
     const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('markets_unavailable');
   });
 
   it('GET /api/insights/fx → 503 fx_unavailable when the reader rejects', async () => {
-    const app = createApp({
+    const app = authed(createApp({
       makeInsightsReader: () => new InMemoryInsightsStore(),
       makeFxReader: () => ({ getFx: () => Promise.reject(kvFailure) }),
-    });
-    const res = await app.request('/api/insights/fx', undefined, env);
+    }));
+    const res = await app.request('/api/insights/fx', undefined, authedEnv);
     expect(res.status).toBe(503);
-    expect(res.headers.get('cache-control')).toBe('no-store');
+    expect(res.headers.get('cache-control')).toBe('private, no-store');
     const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('fx_unavailable');
   });
 
   it('GET /api/insights/:id/history → 503 indicator_history_unavailable when the reader rejects', async () => {
-    const app = createApp({
+    const app = authed(createApp({
       makeInsightsReader: () => ({
         getSnapshot: () => Promise.resolve(undefined),
         getHistory: () => Promise.reject(kvFailure),
         getStatus: () => Promise.resolve(undefined),
         getArchive: () => Promise.resolve(undefined),
+        getPublicSnapshot: () => Promise.resolve(undefined),
+        getPublicArchive: () => Promise.resolve(undefined),
       }),
-    });
-    const res = await app.request('/api/insights/us10y/history', undefined, env);
+    }));
+    const res = await app.request('/api/insights/us10y/history', undefined, authedEnv);
     expect(res.status).toBe(503);
-    expect(res.headers.get('cache-control')).toBe('no-store');
+    expect(res.headers.get('cache-control')).toBe('private, no-store');
     const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('indicator_history_unavailable');
   });
@@ -651,12 +685,132 @@ describe('KV-failure honesty (audit A-2 — reader throws, route stays calm)', (
   it('a KV failure on the MARKETS reader must not take down /api/insights (route isolation)', async () => {
     const store = new InMemoryInsightsStore();
     await store.putSnapshot(snapshot);
-    const app = createApp({
+    const app = authed(createApp({
       makeInsightsReader: () => store,
       makeMarketsReader: () => ({ getMarkets: () => Promise.reject(kvFailure) }),
-    });
-    const res = await app.request('/api/insights', undefined, env);
+    }));
+    const res = await app.request('/api/insights', undefined, authedEnv);
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual(snapshot);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * PUBLIC mode (2026-10-19 owner decree; AC-08 + LR-02 + T-15): the
+ * licence-legal projection is served with NO cookie; the private
+ * document and the Yahoo-backed boards never leak.
+ * ------------------------------------------------------------------ */
+describe('PUBLIC mode — the public projection serve path', () => {
+  let store: InMemoryInsightsStore;
+  const publicSnapshot: InsightsSnapshot = { ...snapshot, displayMode: 'public' };
+
+  beforeEach(() => {
+    store = new InMemoryInsightsStore();
+  });
+
+  /**
+   * The mode contract: a PUBLIC-mode reader (KvInsightsReader with mode
+   * 'public') hands the request handlers the PUBLIC projection keys. The
+   * injected fake models exactly that — getSnapshot/getArchive read the
+   * public keys, and the private document behind putSnapshot is invisible.
+   */
+  function modePublicReader() {
+    return {
+      getSnapshot: () => store.getPublicSnapshot(),
+      getPublicSnapshot: () => store.getPublicSnapshot(),
+      getHistory: (id: IndicatorId) => store.getHistory(id),
+      getStatus: () => store.getStatus(),
+      getArchive: (date: string) => store.getPublicArchive(date),
+      getPublicArchive: (date: string) => store.getPublicArchive(date),
+    };
+  }
+
+  function makeApp() {
+    return createApp({ makeInsightsReader: () => modePublicReader() });
+  }
+
+  it('serves the PUBLIC keys without any cookie (gate skipped, indexable cache headers)', async () => {
+    await store.putPublicSnapshot(publicSnapshot);
+    const res = await makeApp().request('/api/insights', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('public, max-age=60');
+    expect(res.headers.get('x-robots-tag')).toBeNull();
+    const body = (await res.json()) as InsightsSnapshot;
+    expect(body.displayMode).toBe('public');
+    expect(body).toEqual(publicSnapshot);
+  });
+
+  it('NEVER falls back to the private snapshot when the public key is absent (fail closed)', async () => {
+    await store.putSnapshot(snapshot);
+    const res = await makeApp().request('/api/insights', undefined, env);
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('insights_not_ready');
+  });
+
+  it('the Yahoo-backed world boards answer 404 hidden_site_mode with zero data', async () => {
+    for (const path of ['/api/insights/markets', '/api/insights/fx']) {
+      const res = await makeApp().request(path, undefined, env);
+      expect(res.status).toBe(404);
+      const body = (await res.json()) as { error: { code: string } };
+      expect(body.error.code).toBe('hidden_site_mode');
+    }
+  });
+
+  it("a hidden indicator's history is refused before any KV read (LR-02)", async () => {
+    const res = await makeApp().request('/api/insights/brent/history', undefined, env);
+    expect(res.status).toBe(404);
+    const body = (await res.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('hidden_site_mode');
+  });
+
+  it("a public-ok indicator's history still serves", async () => {
+    await store.putHistory(history);
+    const res = await makeApp().request('/api/insights/us10y/history', undefined, env);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual(history);
+  });
+
+  it('the live-prices key is never consulted (Yahoo quotes never merge publicly)', async () => {
+    const app = createApp({
+      makeInsightsReader: () => modePublicReader(),
+      makePricesReader: () => ({
+        getLivePrices: async (): Promise<LivePricesSnapshot | undefined> => {
+          throw new Error('the public serve path must not read the Yahoo quotes key');
+        },
+      }),
+    });
+    await store.putPublicSnapshot(publicSnapshot);
+    const res = await app.request('/api/insights', undefined, env);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual(publicSnapshot);
+  });
+});
+
+describe('KvInsightsReader — mode-aware keys (2026-10-19)', () => {
+  const publicSnapshot: InsightsSnapshot = { ...snapshot, displayMode: 'public' };
+  const makeKv = (expectedKeys: string[], payload: InsightsSnapshot): KVNamespace =>
+    ({
+      get: async (key: string) => (expectedKeys.includes(key) ? JSON.stringify(payload) : null),
+    }) as unknown as KVNamespace;
+
+  it('public mode reads insights:snapshot-public + insights:archive-public:v1:<date> — the private document never leaks', async () => {
+    const reader = new KvInsightsReader(
+      makeKv(['insights:snapshot-public', 'insights:archive-public:v1:2026-10-07'], publicSnapshot),
+      'public',
+    );
+    const snap = await reader.getSnapshot();
+    expect(snap?.displayMode).toBe('public');
+    expect(await reader.getPublicArchive('2026-10-07')).toBeDefined();
+    // In public mode the private ARCHIVE key is the same public document —
+    // the reader only ever hands out the projection family.
+    expect(await reader.getArchive('2026-10-07')).toBeDefined();
+  });
+
+  it('private mode keeps the private keys and the public reads come back empty', async () => {
+    const reader = new KvInsightsReader(makeKv(['insights:snapshot', 'insights:archive:v1:2026-10-07'], snapshot), 'private');
+    expect(await reader.getSnapshot()).toBeDefined();
+    expect(await reader.getArchive('2026-10-07')).toBeDefined();
+    expect(await reader.getPublicSnapshot()).toBeUndefined();
   });
 });

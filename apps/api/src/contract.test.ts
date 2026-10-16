@@ -35,7 +35,9 @@ import { InMemoryMarketsStore } from '@currena/insights/markets';
 import { InMemoryFxStore } from '@currena/insights/fx';
 import { InMemoryPricesStore } from '@currena/insights/prices';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { Hono } from 'hono';
 import { createApp, type Bindings } from './index';
+import { INSIGHTS_SESSION_COOKIE, sessionTokenFor } from './insights-auth';
 import { MetaResponseSchema } from '@currena/core';
 import { RatesService } from './rates-service';
 
@@ -140,6 +142,28 @@ const env: Bindings = {
   RATES: { get: async () => null } as unknown as KVNamespace,
   SITE_MODE: 'public',
 };
+
+/* The authed-PRIVATE venue (2026-10-19, AC-08/LR-02): the private-feed
+ * payload/cache-shape tests ride a real signed cookie — public mode now
+ * refuses the Yahoo-backed boards and skips the Yahoo live-prices merge. */
+const PASSWORD = 'the-contract-test-password';
+const authedEnv: Bindings = {
+  RATES: { get: async () => null } as unknown as KVNamespace,
+  INSIGHTS_PASSWORD: PASSWORD,
+};
+async function authedCookie(): Promise<string> {
+  const { token } = await sessionTokenFor(PASSWORD, Date.now());
+  return `${INSIGHTS_SESSION_COOKIE}=${token}`;
+}
+function authed(app: ReturnType<typeof createApp>) {
+  const wrapper = new Hono<{ Bindings: Bindings }>();
+  wrapper.all('*', async (c, next) => {
+    c.req.raw.headers.set('cookie', await authedCookie());
+    await next();
+  });
+  wrapper.route('/', app);
+  return wrapper;
+}
 let store: InMemoryRateStore;
 let insightsStore: InMemoryInsightsStore;
 let marketsStore: InMemoryMarketsStore;
@@ -203,17 +227,17 @@ describe('golden bodies validate against the packages/core contracts', () => {
     expect(() => InsightsSnapshotSchema.parse(body)).not.toThrow();
   });
 
-  it('GET /api/insights/markets → MarketsSnapshotSchema', async () => {
+  it('GET /api/insights/markets → MarketsSnapshotSchema (authed-private: the board is licence-hidden publicly)', async () => {
     await marketsStore.putMarketsIfChanged(marketsSnapshot, undefined);
-    const res = await makeApp().request('/api/insights/markets', undefined, env);
+    const res = await authed(makeApp()).request('/api/insights/markets', undefined, authedEnv);
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(() => MarketsSnapshotSchema.parse(body)).not.toThrow();
   });
 
-  it('GET /api/insights/fx → FxSnapshotSchema', async () => {
+  it('GET /api/insights/fx → FxSnapshotSchema (authed-private)', async () => {
     await fxStore.putFxIfChanged(fxSnapshot, undefined);
-    const res = await makeApp().request('/api/insights/fx', undefined, env);
+    const res = await authed(makeApp()).request('/api/insights/fx', undefined, authedEnv);
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(() => FxSnapshotSchema.parse(body)).not.toThrow();
@@ -293,21 +317,21 @@ describe('cache-chain matrix (spec rules + D-13; every layer pinned)', () => {
     expect(health.headers.get('cache-control')).toBe('no-store');
   });
 
-  it('/api/insights: public,max-age=60 + dual-generation ETag; 304 mirrors; a new price generation re-tags', async () => {
+  it('/api/insights: the AC-05 private stamp + dual-generation ETag; 304 mirrors; a new price generation re-tags (authed-private)', async () => {
     await insightsStore.putSnapshot(insightsSnapshot);
     await pricesStore.putLivePricesIfChanged(livePrices);
-    const app = makeApp();
+    const app = authed(makeApp());
 
-    const first = await app.request('/api/insights', undefined, env);
-    expect(first.headers.get('cache-control')).toBe('public, max-age=60');
+    const first = await app.request('/api/insights', undefined, authedEnv);
+    expect(first.headers.get('cache-control')).toBe('private, no-store');
     const etag = first.headers.get('etag');
     expect(etag).toBe('"insights:2026-10-07T04:20:00.000Z+prices:2026-10-12T12:13:00Z"');
 
     const revalidated = await app.request('/api/insights', {
       headers: { 'if-none-match': etag! },
-    }, env);
+    }, authedEnv);
     expect(revalidated.status).toBe(304);
-    expect(revalidated.headers.get('cache-control')).toBe('public, max-age=60');
+    expect(revalidated.headers.get('cache-control')).toBe('private, no-store');
 
     // A new live-prices generation busts the cache the same way a new
     // daily snapshot does (the hourly :13 rung's visibility guarantee).
@@ -323,7 +347,7 @@ describe('cache-chain matrix (spec rules + D-13; every layer pinned)', () => {
         },
       },
     });
-    const next = await app.request('/api/insights', undefined, env);
+    const next = await app.request('/api/insights', undefined, authedEnv);
     expect(next.status).toBe(200);
     expect(next.headers.get('etag')).toBe('"insights:2026-10-07T04:20:00.000Z+prices:2026-10-12T13:13:00Z"');
   });
@@ -332,23 +356,23 @@ describe('cache-chain matrix (spec rules + D-13; every layer pinned)', () => {
     { route: '/api/insights/markets', store: 'markets' },
     { route: '/api/insights/fx', store: 'fx' },
   ] as const)(
-    '$route: public,max-age=300,s-maxage=300 + ETag on 200 AND 304 (spec rules, D-13)',
+    '$route: the AC-05 private stamp + ETag on 200 AND 304 (authed-private; the boards are licence-hidden publicly)',
     async ({ route, store: which }) => {
       if (which === 'markets') await marketsStore.putMarketsIfChanged(marketsSnapshot, undefined);
       else await fxStore.putFxIfChanged(fxSnapshot, undefined);
-      const app = makeApp();
+      const app = authed(makeApp());
 
-      const first = await app.request(route, undefined, env);
+      const first = await app.request(route, undefined, authedEnv);
       expect(first.status).toBe(200);
-      expect(first.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
+      expect(first.headers.get('cache-control')).toBe('private, no-store');
       const etag = first.headers.get('etag');
       expect(etag).not.toBeNull();
 
       const revalidated = await app.request(route, {
         headers: { 'if-none-match': etag! },
-      }, env);
+      }, authedEnv);
       expect(revalidated.status).toBe(304);
-      expect(revalidated.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
+      expect(revalidated.headers.get('cache-control')).toBe('private, no-store');
       expect(revalidated.headers.get('etag')).toBe(etag);
     },
   );
@@ -366,14 +390,14 @@ describe('cache-chain matrix (spec rules + D-13; every layer pinned)', () => {
     expect(revalidated.headers.get('cache-control')).toBe('public, max-age=300');
   });
 
-  it('every error path is no-store (400 validation + 503 not-ready)', async () => {
+  it('every error path is no-store (400 validation + the authed 503 not-ready)', async () => {
     const app = makeApp();
     const bad = await app.request('/api/rates?source=nope', undefined, env);
     expect(bad.status).toBe(400);
     expect(bad.headers.get('cache-control')).toBe('no-store');
-    const notReady = await app.request('/api/insights/markets', undefined, env);
+    const notReady = await authed(makeApp()).request('/api/insights/markets', undefined, authedEnv);
     expect(notReady.status).toBe(503);
-    expect(notReady.headers.get('cache-control')).toBe('no-store');
+    expect(notReady.headers.get('cache-control')).toBe('private, no-store');
   });
 });
 

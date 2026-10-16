@@ -58,6 +58,7 @@ export {
   parseReleaseSchedule,
   parsePolicyDecisions,
   parseContextNotes,
+  projectSnapshotToPublic,
   HISTORY_MAX_POINTS,
   HISTORY_WINDOW_DAYS,
 } from './snapshot';

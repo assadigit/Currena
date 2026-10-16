@@ -107,6 +107,9 @@ crossed several sessions. Rotate them at your leisure:
   should be `[main]`), so pushes to main do NOT trigger CI (PRs still do).
   One-line fix, left to you because the runbook forbids changes beyond the
   specs.
-- The SITE_MODE var stays 'private'. Flipping it to 'public' removes the
-  gate AND fails the build (T-15) until every displayed source is
-  public-display-ok — see `scripts/check-site-mode.mjs`.
+- SITE_MODE: the owner decreed PUBLIC on 2026-10-19 (“make it public”) —
+  it is now 'public' in apps/api/wrangler.jsonc and the T-15 gate passes
+  (the generated data/site-mode-overrides.json hides the 24 non-'yes'
+  indicators + the EODHD/Yahoo boards; scripts/check-site-mode.mjs
+  verifies). Flipping SITE_MODE back to 'private' re-arms the
+  INSIGHTS_PASSWORD gate instantly (the secret stays on the Worker).

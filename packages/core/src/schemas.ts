@@ -808,6 +808,15 @@ export const InsightsSnapshotSchema = z
      * every daily snapshot so a past page can be reproduced exactly.
      */
     ruleVersion: z.number().int().positive().optional(),
+    /**
+     * The PUBLIC projection (2026-10-19 owner decree; Step 3 §2.2 AC-08):
+     * stamped 'public' ONLY on the licence-legal subset snapshot built by
+     * projectSnapshotToPublic and served when SITE_MODE=public — the page
+     * hides its private-only world sections when it sees it. Absent on the
+     * full private snapshot. ADDITIVE: stored old snapshots and old readers
+     * are unaffected.
+     */
+    displayMode: z.literal('public').optional(),
   })
   .refine(
     (snap) => new Set(snap.readings.map((r) => r.id)).size === snap.readings.length,

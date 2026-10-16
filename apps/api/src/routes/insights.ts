@@ -45,6 +45,7 @@ import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
 import { errorResponse } from '../http';
 import { handleInsightsLogin, requireInsightsAuth } from '../insights-auth';
+import { HIDDEN_INDICATOR_IDS, siteModeOf } from '../public-mode';
 import type { Bindings } from '../index';
 
 interface InsightsRouteDeps {
@@ -103,13 +104,18 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
     // them into the four Prices-board tiles + companions. A missing,
     // poisoned or unreadable key degrades CALMLY to the plain snapshot —
     // the daily EOD backbone answers alone, never an error.
+    // PUBLIC MODE (2026-10-19, LR-02): the quotes are Yahoo-sourced — the
+    // merge is skipped entirely and the projection's EOD backbone answers
+    // alone (its price rows are hidden by the overrides anyway).
     let live: LivePricesSnapshot | undefined;
-    try {
-      live = await deps.getPricesReader(c.env).getLivePrices();
-    } catch (err) {
-      console.warn('[insights] live-prices read failed — serving the EOD snapshot:', err instanceof Error ? err.message : err);
+    if (siteModeOf(c.env) !== 'public') {
+      try {
+        live = await deps.getPricesReader(c.env).getLivePrices();
+      } catch (err) {
+        console.warn('[insights] live-prices read failed — serving the EOD snapshot:', err instanceof Error ? err.message : err);
+      }
     }
-    const served = mergeLivePricesIntoSnapshot(snapshot, live);
+    const served = live !== undefined ? mergeLivePricesIntoSnapshot(snapshot, live) : snapshot;
     // The ETag covers BOTH generations — a new hourly quote busts caches the
     // same way a new daily snapshot does.
     const etag = `"insights:${snapshot.generatedAt}+prices:${live?.generatedAt ?? 'none'}"`;
@@ -123,6 +129,13 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
   // ONE-key snapshot, served read-only. Registered BEFORE /:id/history so
   // the literal path wins over the parameterised one.
   app.get('/markets', async (c) => {
+    // PUBLIC MODE (2026-10-19, LR-02): the board is EODHD/Yahoo-backed end
+    // to end — it must never appear when SITE_MODE=public (the T-15 build
+    // gate verifies the overrides file declares it hidden). 404 with zero
+    // data, BEFORE any KV read.
+    if (siteModeOf(c.env) === 'public') {
+      return errorResponse(c, 404, 'hidden_site_mode', 'This section is not published on the public site.');
+    }
     // The Worker's own edge cache — absent in plain test runtimes.
     if (typeof caches !== 'undefined') {
       const edgeCached = await caches.default.match(c.req.raw);
@@ -182,6 +195,11 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
   // /markets (edge cache + ETag + the calm 503 "being prepared" answer).
   // Registered BEFORE /:id/history so the literal path wins.
   app.get('/fx', async (c) => {
+    // PUBLIC MODE (2026-10-19, LR-02): the markets twin — EODHD/Yahoo-backed,
+    // hidden by the overrides file, refused with zero data before any read.
+    if (siteModeOf(c.env) === 'public') {
+      return errorResponse(c, 404, 'hidden_site_mode', 'This section is not published on the public site.');
+    }
     // The Worker's own edge cache — absent in plain test runtimes.
     if (typeof caches !== 'undefined') {
       const edgeCached = await caches.default.match(c.req.raw);
@@ -329,6 +347,11 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
       );
     }
     const id: IndicatorId = parsed.data;
+    // PUBLIC MODE (2026-10-19, LR-02): a hidden id's history IS its data —
+    // refused with zero rows before any KV read.
+    if (siteModeOf(c.env) === 'public' && HIDDEN_INDICATOR_IDS.has(id)) {
+      return errorResponse(c, 404, 'hidden_site_mode', 'This indicator is not published on the public site.');
+    }
     // KV-failure honesty (QA audit A-2) — same calm 503, distinct code.
     let history: IndicatorHistory | undefined;
     try {

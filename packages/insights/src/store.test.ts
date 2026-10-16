@@ -3,7 +3,9 @@ import type { IndicatorReading, InsightsSnapshot, InsightsStatus, IndicatorHisto
 import {
   InMemoryInsightsStore,
   INSIGHTS_SNAPSHOT_KEY,
+  INSIGHTS_SNAPSHOT_PUBLIC_KEY,
   INSIGHTS_STATUS_KEY,
+  insightsArchivePublicKey,
   insightsHistoryKey,
   RestInsightsStore,
 } from './store';
@@ -214,5 +216,46 @@ describe('RestInsightsStore', () => {
     const store = makeStore(fetchImpl);
     expect(await store.getSnapshot()).toBeUndefined();
     warn.mockRestore();
+  });
+});
+
+describe('public projection keys (2026-10-19)', () => {
+  it('InMemoryInsightsStore round-trips the public snapshot + public archive under their own keys', async () => {
+    const store = new InMemoryInsightsStore();
+    await store.putPublicSnapshot(snapshot);
+    expect(await store.getPublicSnapshot()).toEqual(snapshot);
+    // The private key stays untouched — the documents never mix.
+    expect(await store.getSnapshot()).toBeUndefined();
+    await store.putPublicArchive('2026-10-07', snapshot);
+    expect(await store.getPublicArchive('2026-10-07')).toEqual(snapshot);
+    expect(await store.getArchive('2026-10-07')).toBeUndefined();
+  });
+
+  it('RestInsightsStore targets the public keys (insights:snapshot-public / insights:archive-public:v1:<date>)', async () => {
+    const okPut = () => new Response('{"success":true,"errors":[]}', { status: 200 });
+    const { calls, fetchImpl } = fakeRest([
+      { match: (c) => c.method === 'PUT', respond: okPut },
+      { match: () => true, respond: () => new Response('{"result":null,"errors":[]}', { status: 404 }) },
+    ]);
+    const store = makeStore(fetchImpl);
+
+    await store.putPublicSnapshot(snapshot);
+    await store.putPublicArchive('2026-10-07', snapshot);
+
+    expect(calls.map((c) => c.url)).toEqual([kvUrl(INSIGHTS_SNAPSHOT_PUBLIC_KEY), kvUrl(insightsArchivePublicKey('2026-10-07'))]);
+    expect(JSON.parse(calls[0]!.body!)).toEqual(snapshot);
+  });
+
+  it('RestInsightsStore GETs the public snapshot back; a missing key reads as undefined', async () => {
+    const { fetchImpl } = fakeRest([
+      {
+        match: (c) => c.method === 'GET' && c.url === kvUrl(INSIGHTS_SNAPSHOT_PUBLIC_KEY),
+        respond: () => new Response(JSON.stringify(snapshot), { status: 200 }),
+      },
+      { match: () => true, respond: () => new Response('{"result":null,"errors":[]}', { status: 404 }) },
+    ]);
+    const store = makeStore(fetchImpl);
+    expect(await store.getPublicSnapshot()).toEqual(snapshot);
+    expect(await store.getPublicArchive('2026-10-07')).toBeUndefined();
   });
 });

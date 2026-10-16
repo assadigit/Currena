@@ -31,11 +31,14 @@ import type {
 import {
   INSIGHTS_SNAPSHOT_KEY,
   INSIGHTS_STATUS_KEY,
+  INSIGHTS_SNAPSHOT_PUBLIC_KEY,
   insightsArchiveKey,
+  insightsArchivePublicKey,
   insightsHistoryKey,
   parseStoredValue,
   type InsightsReader,
 } from '@currena/insights/store';
+import type { InsightsServeMode } from '../public-mode';
 import { MARKETS_KV_KEY, parseStoredMarkets } from '@currena/insights/markets';
 import type { MarketsReader } from '@currena/insights/markets';
 import { FX_KV_KEY, parseStoredFx } from '@currena/insights/fx';
@@ -43,15 +46,23 @@ import type { FxReader } from '@currena/insights/fx';
 import { PRICES_KV_KEY, parseStoredLivePrices } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
 
+/**
+ * Which document family the serve path reads. 'private' (the default) reads
+ * the full snapshot; 'public' reads ONLY the licence-legal projection keys
+ * (2026-10-19 owner decree; AC-08) — the private document never leaks into
+ * the public serve path, by construction. The type lives in public-mode.ts.
+ */
+export type { InsightsServeMode };
+
 export class KvInsightsReader implements InsightsReader {
-  constructor(private readonly kv: KVNamespace) {}
+  constructor(
+    private readonly kv: KVNamespace,
+    private readonly mode: InsightsServeMode = 'private',
+  ) {}
 
   async getSnapshot(): Promise<InsightsSnapshot | undefined> {
-    return parseStoredValue(
-      await this.kv.get(INSIGHTS_SNAPSHOT_KEY),
-      (v) => InsightsSnapshotSchema.parse(v),
-      INSIGHTS_SNAPSHOT_KEY,
-    );
+    const key = this.mode === 'public' ? INSIGHTS_SNAPSHOT_PUBLIC_KEY : INSIGHTS_SNAPSHOT_KEY;
+    return parseStoredValue(await this.kv.get(key), (v) => InsightsSnapshotSchema.parse(v), key);
   }
 
   async getHistory(id: IndicatorId): Promise<IndicatorHistory | undefined> {
@@ -69,7 +80,21 @@ export class KvInsightsReader implements InsightsReader {
 
   /** Fix spec A-05: a past day's archived snapshot (one KV read). */
   async getArchive(date: string): Promise<InsightsSnapshot | undefined> {
-    const key = insightsArchiveKey(date);
+    const key = this.mode === 'public' ? insightsArchivePublicKey(date) : insightsArchiveKey(date);
+    return parseStoredValue(await this.kv.get(key), (v) => InsightsSnapshotSchema.parse(v), key);
+  }
+
+  /** The PUBLIC projection (2026-10-19): always the public keys, both modes. */
+  async getPublicSnapshot(): Promise<InsightsSnapshot | undefined> {
+    return parseStoredValue(
+      await this.kv.get(INSIGHTS_SNAPSHOT_PUBLIC_KEY),
+      (v) => InsightsSnapshotSchema.parse(v),
+      INSIGHTS_SNAPSHOT_PUBLIC_KEY,
+    );
+  }
+
+  async getPublicArchive(date: string): Promise<InsightsSnapshot | undefined> {
+    const key = insightsArchivePublicKey(date);
     return parseStoredValue(await this.kv.get(key), (v) => InsightsSnapshotSchema.parse(v), key);
   }
 }

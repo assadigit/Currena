@@ -57,6 +57,20 @@ export function insightsHistoryKey(id: IndicatorId): string {
   return `insights:hist:${id}`;
 }
 
+/**
+ * The PUBLIC projection (2026-10-19 owner decree; Step 3 §2.2 AC-08):
+ * SITE_MODE=public serves these keys — the licence-legal subset built by
+ * projectSnapshotToPublic and written by the daily ingest (plus the
+ * public-projection bootstrap script). Same namespace, own prefix: the
+ * private document NEVER leaks into the public serve path.
+ */
+export const INSIGHTS_SNAPSHOT_PUBLIC_KEY = 'insights:snapshot-public';
+/** `insights:archive-public:v1:<date>` — the public projection's archive. */
+export const INSIGHTS_ARCHIVE_PUBLIC_PREFIX = 'insights:archive-public:v1:';
+export function insightsArchivePublicKey(date: string): string {
+  return `${INSIGHTS_ARCHIVE_PUBLIC_PREFIX}${date}`;
+}
+
 /** Read halves — what the Worker's KV adapter implements (serve path). */
 export interface InsightsReader {
   getSnapshot(): Promise<InsightsSnapshot | undefined>;
@@ -64,6 +78,10 @@ export interface InsightsReader {
   getStatus(): Promise<InsightsStatus | undefined>;
   /** Fix spec A-05: a past day's archived snapshot (404-ish undefined when absent). */
   getArchive(date: string): Promise<InsightsSnapshot | undefined>;
+  /** The PUBLIC projection (2026-10-19): the licence-legal subset document. */
+  getPublicSnapshot(): Promise<InsightsSnapshot | undefined>;
+  /** The public projection's past-day archive. */
+  getPublicArchive(date: string): Promise<InsightsSnapshot | undefined>;
 }
 
 /** Write halves — what the runner's REST adapter implements. */
@@ -73,6 +91,9 @@ export interface InsightsWriter {
   putStatus(status: InsightsStatus): Promise<void>;
   /** Fix spec A-05: archive one day's snapshot under its dated key. */
   putArchive(date: string, snapshot: InsightsSnapshot): Promise<void>;
+  /** The PUBLIC projection (2026-10-19): written by the ingest + bootstrap. */
+  putPublicSnapshot(snapshot: InsightsSnapshot): Promise<void>;
+  putPublicArchive(date: string, snapshot: InsightsSnapshot): Promise<void>;
 }
 
 export interface InsightsStore extends InsightsReader, InsightsWriter {}
@@ -136,6 +157,23 @@ export class InMemoryInsightsStore implements InsightsStore {
 
   async putArchive(date: string, snapshot: InsightsSnapshot): Promise<void> {
     this.entries.set(insightsArchiveKey(date), JSON.stringify(snapshot));
+  }
+
+  async getPublicSnapshot(): Promise<InsightsSnapshot | undefined> {
+    return parseStoredValue(this.entries.get(INSIGHTS_SNAPSHOT_PUBLIC_KEY), (v) => InsightsSnapshotSchema.parse(v), INSIGHTS_SNAPSHOT_PUBLIC_KEY);
+  }
+
+  async putPublicSnapshot(snapshot: InsightsSnapshot): Promise<void> {
+    this.entries.set(INSIGHTS_SNAPSHOT_PUBLIC_KEY, JSON.stringify(snapshot));
+  }
+
+  async getPublicArchive(date: string): Promise<InsightsSnapshot | undefined> {
+    const key = insightsArchivePublicKey(date);
+    return parseStoredValue(this.entries.get(key), (v) => InsightsSnapshotSchema.parse(v), key);
+  }
+
+  async putPublicArchive(date: string, snapshot: InsightsSnapshot): Promise<void> {
+    this.entries.set(insightsArchivePublicKey(date), JSON.stringify(snapshot));
   }
 }
 
@@ -278,5 +316,22 @@ export class RestInsightsStore implements InsightsStore {
 
   async putArchive(date: string, snapshot: InsightsSnapshot): Promise<void> {
     await this.put(insightsArchiveKey(date), JSON.stringify(snapshot));
+  }
+
+  async getPublicSnapshot(): Promise<InsightsSnapshot | undefined> {
+    return parseStoredValue(await this.getText(INSIGHTS_SNAPSHOT_PUBLIC_KEY), (v) => InsightsSnapshotSchema.parse(v), INSIGHTS_SNAPSHOT_PUBLIC_KEY);
+  }
+
+  async putPublicSnapshot(snapshot: InsightsSnapshot): Promise<void> {
+    await this.put(INSIGHTS_SNAPSHOT_PUBLIC_KEY, JSON.stringify(snapshot));
+  }
+
+  async getPublicArchive(date: string): Promise<InsightsSnapshot | undefined> {
+    const key = insightsArchivePublicKey(date);
+    return parseStoredValue(await this.getText(key), (v) => InsightsSnapshotSchema.parse(v), key);
+  }
+
+  async putPublicArchive(date: string, snapshot: InsightsSnapshot): Promise<void> {
+    await this.put(insightsArchivePublicKey(date), JSON.stringify(snapshot));
   }
 }

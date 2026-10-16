@@ -493,6 +493,41 @@ function lastStepOf(series: readonly SeriesPoint[], asOf: string): { date: strin
   return undefined;
 }
 
+/* ------------------------------------------------------------------ *
+ * The PUBLIC projection (2026-10-19 owner decree; Step 3 §2.2 AC-08)
+ * ------------------------------------------------------------------ */
+
+/**
+ * Project a validated snapshot onto the PUBLIC-DISPLAY-OK subset: drop every
+ * reading whose id is in the hidden set (data/site-mode-overrides.json —
+ * generated; every licence verdict other than 'yes', fail-closed 'unknown'
+ * included), drop its changed-this-week events, recompute the hero summaries
+ * over exactly what remains, and stamp displayMode 'public'.
+ *
+ * Pure subset semantics: the surviving readings carry ALL their enrichments
+ * (peaks, release dates, highest-since, notes, flags) unchanged, and the
+ * summaries come from the SAME summarizeByGauges the full snapshot uses — a
+ * public verdict can never contradict its own gauges (the R2 invariant).
+ * The daily ingest runs this right after the private snapshot is built, and
+ * scripts/public-projection.ts uses it to backfill the public KV keys from a
+ * stored snapshot (first flip / KV recreation) without re-fetching anything.
+ */
+export function projectSnapshotToPublic(
+  snapshot: InsightsSnapshot,
+  hiddenIds: ReadonlySet<string>,
+): InsightsSnapshot {
+  const readings = snapshot.readings.filter((r) => !hiddenIds.has(r.id));
+  return InsightsSnapshotSchema.parse({
+    generatedAt: snapshot.generatedAt,
+    displayMode: 'public',
+    summary: summarizeByGauges(readings),
+    readings,
+    changedThisWeek: snapshot.changedThisWeek.filter((e) => !hiddenIds.has(e.id)),
+    calendar: snapshot.calendar,
+    ruleVersion: snapshot.ruleVersion,
+  });
+}
+
 /**
  * Fix spec A-04: hold the LAST GOOD value of a flagged reading, mark it
  * `check-pending`, record the reason, and strip the derived fields computed
