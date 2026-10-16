@@ -5,6 +5,63 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-19f] — the sparklines draw honest trends (the owner's screenshot report)
+
+The owner (screenshot of the USD→IRT converter card): "The graph seems
+irregular and like a placeholder or buggy." — a violent, perfectly regular
+sawtooth where a trend should be.
+
+### Root cause (production forensics, not guesswork)
+
+- `/api/history?source=tgju` held 240/240 DISTINCT generations over ~24 h:
+  TGJU re-quotes jitter on nearly every 6-minute tick (median 0.01–0.04%,
+  p90 ~0.12%; EUR/GBP/CHF changed on 229–235 of 239 ticks), so exact-value
+  dedup recorded noise nonstop and the window never spanned more than a day.
+- The USD quote itself bobs between two levels ~0.375% apart (155
+  transitions, 38 clean a-b-a patterns — a genuinely served quote).
+- The UI drew raw points min-max-normalized (last 40 on the converter card,
+  all 240 in the popup and /live-rates) — sub-percent noise filled the full
+  plot height: the sawtooth. The real +3.1% window trend was invisible.
+
+### The fix (three coordinated layers)
+
+- **Record deadband (`apps/api/src/history.ts`)** — a generation appends
+  only when a rate moves ≥ `HISTORY_RECORD_DEADBAND` (0.05%) vs the last
+  RECORDED level (hysteresis; rate-set changes always record). Genuine
+  drift records at its first crossing; jitter never accumulates into a
+  record. KV write budget drops with it.
+- **Drawn-line aggregation (`apps/web/src/lib/live-rate.ts`)** —
+  `bucketMean(series, TREND_BUCKETS = 48)`: only the DRAWN polyline is
+  bucket-averaged; trend chips, ranges, check counts and the
+  delta-vs-previous stay RAW. Applied at all three call sites
+  (LiveRateLine, ResultPopup, LiveRates board) — the drawn window now
+  spans the whole recorded history (days), not the last 40 ticks.
+- **Honest amplitude (`apps/web/src/components/Sparkline.tsx`)** — the
+  plot domain pads to ≥2.5% of the series' mid-level (always containing
+  the data), so sub-noise wiggles render proportionally calm and real
+  trends still fill the plot.
+- **One-time KV prune** (post-deploy, KV REST) — the stored window
+  re-filtered with the same deadband: tgju 240 → 188 gens (USD 259,600 →
+  267,900 across the window — the genuine rise now visible immediately);
+  frankfurter already clean.
+
+### Gates + deploy
+
+- Tests 1,431 green (+12: deadband ×5 incl. hysteresis; bucketMean ×5;
+  Sparkline amplitude ×3 — calm band never touches the edges, a ≥2.5%
+  move still fills the plot, drift+noise stays visible). Typecheck 6/6;
+  lint 0 errors (15 accepted advisories); copy:audit clean; budgets held
+  (entry 295.15/88.76, Insights 594.68/141.60).
+- Deploy currena-api `ed79e2cc-fb2f-44ce-bcad-00d73dc57eed` (cron, KV,
+  SITE_MODE=public untouched). Production browser verification: the
+  owner's exact card (fa, 375 px) now draws a smooth rising line; popup
+  "TREND: LAST 189 UPDATES · +3.2% · low 256,895 · high 267,900";
+  /#/live-rates cards all calm; zero console/page errors; no 375 px
+  overflow; the Insights prices grid (2026-10-19e) untouched.
+- Evidence: `docs/evidence/2026-10-19f-sparkline-honesty/` (before
+  screenshot + pre-fix history analysis + pruned-history capture + five
+  production screenshots + README).
+
 ## [2026-10-19e] — the prices board returns to public mode (the owner's directive)
 
 The owner: "Still there aren't GOLD BITCOIN SILVER price, like it used

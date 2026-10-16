@@ -1,22 +1,26 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-19e (PRICES RESTORE session — the owner's "Still
-there aren't GOLD BITCOIN SILVER price, like it used to… a dedicated
-nice section with images"). The Oct-19b licence-cautious hide was the
-cause; the OWNER DIRECTIVE restored exactly {brent, gold-usd,
-silver-usd, btc-usd} to public mode: `OWNER_PUBLIC_DISPLAY_OVERRIDE` in
-scripts/generate-indicators-registry.ts (display disposition only —
-licence facts verbatim, Yahoo legs stay in the engine, world boards
-stay hidden), hidden set 24 → 20, a NEW pin test guards the four tiles
-against re-hiding, the LR-02 hidden-history fixture moved brent → vix.
-Public projection rebuilt 52 → 32; the live prices section renders the
-four tiles WITH images; the money panel's "Petrol and transport" row
-returned with brent. Deployed currena-api `d40211f9` from `81ca3e3`;
-1,419 tests green. See CHANGELOG 2026-10-19e + docs/DEPLOY.md's
-2026-10-19e record. Prior state (2026-10-19d): the ingest watchdog
-ships (cron :40 re-dispatch when the snapshot is >26 h stale;
-GH_INGEST_DISPATCH_TOKEN set) after the GitHub schedule silently died
-3 days.
+Hand-off date: 2026-10-19f (SPARKLINE HONESTY session — the owner's
+screenshot report: the USD→IRT converter sparkline "seems irregular and
+like a placeholder or buggy"). Root cause was NOT quota/API: TGJU
+re-quotes jitter every 6-minute tick (median 0.01–0.04%) and the USD
+quote bobs between two levels ~0.375% apart; exact-value dedup recorded
+every tick (240/240 distinct gens ≈ 24 h) and the UI drew raw points
+min-max-normalized → a full-height sawtooth. Fixed in three honest
+layers: record deadband 0.05% vs last RECORDED level (hysteresis),
+drawn-line bucketMean(≤48) with RAW trend/range/count chips, Sparkline
+domain padded to ≥2.5% of level; one-time KV prune (tgju 240 → 188).
+Deployed currena-api `ed79e2cc` from `9724040`; 1,431 tests green; the
+owner's exact card verified calm on production (fa, 375 px). See
+CHANGELOG 2026-10-19f + docs/evidence/2026-10-19f-sparkline-honesty/.
+Prior state (2026-10-19e): the PRICES RESTORE — the owner's "Still
+there aren't GOLD BITCOIN SILVER price… a dedicated nice section with
+images" resolved by OWNER_PUBLIC_DISPLAY_OVERRIDE for exactly {brent,
+gold-usd, silver-usd, btc-usd}; hidden set 24 → 20; the four tiles
+render WITH images; the money panel's "Petrol and transport" row
+returned. The Oct-19b licence-cautious hide remains for the world
+boards + other non-'yes' indicators (T-15 passes in public mode); the
+ingest watchdog ships (2026-10-19d).
 The prior 2026-10-19b session flipped Insights PUBLIC (owner decree:
 SITE_MODE=public deployed `36d76363`; the licence-legal projection only
 — 27 of 51 readings; the EODHD/Yahoo world boards + 24 non-'yes'

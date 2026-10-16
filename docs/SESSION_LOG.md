@@ -1,3 +1,51 @@
+# SESSION_LOG — Sparklines Draw Honest Trends 2026-10-19f
+
+Branch `main` · base `7dcabcd` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's screenshot report — the USD→IRT converter card's
+sparkline "seems irregular and like a placeholder or buggy" (a violent,
+perfectly regular sawtooth).
+
+### 1 · fix(web+api): record deadband + drawn-line bucket means + padded amplitude — `9724040`
+**What:** production forensics first: `/api/history?source=tgju` held 240/240
+DISTINCT generations over ~24h — TGJU re-quotes jitter on nearly every
+6-minute tick (median 0.01–0.04%, p90 ~0.12%; EUR/GBP/CHF changed on 229–235
+of 239 ticks), the USD quote itself bobs between two levels ~0.375% apart
+(155 transitions, 38 clean a-b-a patterns — a genuinely served quote, never
+rewritten), and the UI drew raw points min-max-normalized → sub-percent
+noise filled the full plot height while the real +3.1% window trend stayed
+invisible. Three coordinated layers: (1) `apps/api/src/history.ts` records a
+generation only when a rate moves ≥ HISTORY_RECORD_DEADBAND (0.05%) vs the
+last RECORDED level (hysteresis; rate-set changes always record); (2)
+`apps/web/src/lib/live-rate.ts` gains bucketMean(series, TREND_BUCKETS=48) —
+only the DRAWN polyline aggregates; trend chips, ranges, check counts and
+the delta-vs-previous stay RAW (applied at LiveRateLine, ResultPopup and the
+/#/live-rates board — the drawn window now spans the whole recorded
+history); (3) `Sparkline.tsx` pads the plot domain to ≥2.5% of the series'
+mid-level (always containing the data) — sub-noise wiggles render
+proportionally calm, real trends still fill the plot. Post-deploy one-time
+KV prune (same deadband, via the KV REST API): tgju 240 → 188 gens (USD
+259,600 → 267,900 — the genuine rise visible immediately); frankfurter
+already clean.
+**Evidence:** `docs/evidence/2026-10-19f-sparkline-honesty/` (before
+screenshot + pre/post history captures + five production screenshots +
+README); tests 1,431 green (+12: deadband ×5 incl. hysteresis, bucketMean
+×5, Sparkline amplitude ×3); typecheck 6/6; lint 0 errors; copy:audit
+clean; budgets held (entry 295.15/88.76; Insights 594.68/141.60).
+
+### 2 · Deploy + production verification
+**What:** deployed currena-api `ed79e2cc-fb2f-44ce-bcad-00d73dc57eed` from
+`9724040` (cron + KV + SITE_MODE=public untouched; markets untouched
+`9b5ff7e0`). Production browser verification: the owner's exact card (fa,
+375 px) now draws a smooth rising line; the result popup reads "TREND: LAST
+189 UPDATES · +3.2% · low 256,895 · high 267,900" with the honest footnote;
+/#/live-rates cards (USD +3.2%, AUD +1.92%, EUR +3.22%) all calm; zero
+console/page errors; 375 scrollWidth === 375; the Insights prices grid
+(2026-10-19e) untouched — 4 tiles with icons.
+
+Session closed: production = currena-api `ed79e2cc` + currena-markets
+`9b5ff7e0`. **Token rotation still outstanding** (owner-side; tokens
+transited chat again this session).
+
 # SESSION_LOG — Prices Board Restored to Public Mode 2026-10-19e
 
 Branch `insights-rebuild` (== main after the push) · production `d40211f9` · runner: pnpm 10.34.5 / Node 24.21.

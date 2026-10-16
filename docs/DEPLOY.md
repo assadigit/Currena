@@ -1477,3 +1477,23 @@ the petrol/transport money row is gone while employment rate appeared.
   design: recovering the four price tiles publicly needs either
   verified-'unknown' licences (~10 more cards) or public-ok source
   swaps — owner decisions, not silent fixes.
+
+## Session record — 2026-10-19f the sparklines draw honest trends (the owner's screenshot report)
+
+- **Deployed**: currena-api **`ed79e2cc-fb2f-44ce-bcad-00d73dc57eed`** from
+  `9724040` (cron `* * * * *`, KV binding RATES `4627ac33…`, SITE_MODE=public
+  untouched; currena-markets untouched `9b5ff7e0`).
+- **Gates pre-deploy**: 1,431/1,431 tests (core 191 · scraper 67 · insights
+  462 · markets 13 · api 237 · web 461), typecheck 6/6, lint 0 errors / 15
+  accepted advisories, copy audit clean, budgets held (entry 295.15 kB /
+  88.76 gz; Insights lazy 594.68 / 141.60 gz).
+- **Post-deploy data migration**: one-time prune of `history:tgju` via the
+  KV REST API with the same 0.05% deadband (240 → 188 generations; USD
+  window 259,600 → 267,900); `history:frankfurter` already clean (21 gens,
+  no write). The Worker's deadband keeps future noise out.
+- **Verified live**: the owner's exact card (fa, 375 px) draws a smooth
+  rising line; popup "TREND: LAST 189 UPDATES · +3.2% · low 256,895 · high
+  267,900"; /#/live-rates cards calm (USD +3.2%, AUD +1.92%, EUR +3.22%);
+  zero console/page errors; no 375 px overflow; the 2026-10-19e prices
+  grid untouched (4 tiles + icons).
+- **Evidence**: `docs/evidence/2026-10-19f-sparkline-honesty/`.
