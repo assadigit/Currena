@@ -205,6 +205,37 @@ describe('runValidationSuite — the Part D tests', () => {
     expect(t08.failures.join(' ')).toContain('repeated');
   });
 
+  it('E-04: a DAILY value repeated exactly across days is the frozen-cache bug class — flagged', () => {
+    // The 15 Oct copper row: a daily spot printed to six decimals that
+    // never moved. Daily cadence tolerates NO exact repeat (T-08 (a)).
+    const copper = dailySeries('2026-10-14', 30, () => 14772.999807);
+    const out = runValidationSuite(suiteInput({ 'copper-usd': copper }));
+    const t08 = out.results.find((r) => r.test === 'T-08')!;
+    expect(t08.ok).toBe(false);
+    expect(t08.flagged).toContain('copper-usd');
+    expect(t08.failures.join(' ')).toContain('copper-usd');
+  });
+
+  it('E-04 cross-day: a daily value identical to 6 decimals to the PREVIOUS snapshot is flagged', () => {
+    // The series itself moves; today's print repeats what the previous
+    // snapshot published — the frozen-cache shape the ingest compare catches.
+    const copper = dailySeries('2026-10-14', 30, (back) => (back === 0 ? 14772.999807 : 14773 - back * 2));
+    const prevReading = {
+      id: 'copper-usd',
+      value: 14772.999807,
+      asOf: '2026-10-13',
+      status: 'normal',
+      sourceName: 'gold-api.com',
+      updatedAt: '2026-10-13T04:20:00.000Z',
+    } as import('@currena/core').IndicatorReading;
+    const out = runValidationSuite(suiteInput({ 'copper-usd': copper }, { previousReadings: [prevReading] }));
+    const t08 = out.results.find((r) => r.test === 'T-08')!;
+    expect(t08.flagged).toContain('copper-usd');
+    expect(t08.failures.join(' ')).toContain('across days');
+    // And the flag HOLDS the last good value (A-04): check-pending.
+    expect(out.flags.get('copper-usd')).toBeDefined();
+  });
+
   it('T-08 exempts the administrative rate series whose flat prints are normal (2026-10-15 venue evidence)', () => {
     // F6's outstanding-loan rate printed 6.21 for three straight months —
     // the series reprices only as the loan stock rolls. A repeated monthly

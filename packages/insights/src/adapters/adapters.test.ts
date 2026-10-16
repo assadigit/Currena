@@ -280,6 +280,8 @@ describe('manual series loader', () => {
   const file = {
     id: 'china-pmi',
     sourceName: 'China NBS official PMI',
+    enteredOn: '2026-10-15',
+    expires: '2026-10-31',
     observations: [
       { date: '2026-07-01', value: 49.4 },
       { date: '2026-06-01', value: 50.1 },
@@ -288,17 +290,26 @@ describe('manual series loader', () => {
   };
 
   it('sorts observations and validates the contract', () => {
-    const series = parseManualSeries(file, 'china-pmi');
-    expect(series.map((p) => p.date)).toEqual(['2026-06-01', '2026-07-01', '2026-08-01']);
-    expect(series.at(-1)).toEqual({ date: '2026-08-01', value: 49.8 });
+    const { points } = parseManualSeries(file, 'china-pmi');
+    expect(points.map((p) => p.date)).toEqual(['2026-06-01', '2026-07-01', '2026-08-01']);
+    expect(points.at(-1)).toEqual({ date: '2026-08-01', value: 49.8 });
   });
 
-  it('rejects id mismatch, duplicates and empty observation lists', () => {
+  it('returns the E-08 bookkeeping (enteredOn/expires)', () => {
+    const parsed = parseManualSeries(file, 'china-pmi');
+    expect(parsed.enteredOn).toBe('2026-10-15');
+    expect(parsed.expires).toBe('2026-10-31');
+  });
+
+  it('rejects id mismatch, duplicates, empty observation lists and a file WITHOUT the E-08 bookkeeping', () => {
     expect(() => parseManualSeries({ ...file, id: 'other' }, 'china-pmi')).toThrow(/expected "china-pmi"/);
     expect(() =>
       parseManualSeries({ ...file, observations: [...file.observations, { date: '2026-08-01', value: 50 }] }, 'china-pmi'),
     ).toThrow(/duplicate observation/);
     expect(() => parseManualSeries({ ...file, observations: [] }, 'china-pmi')).toThrow(/schema validation/);
+    // Defect E-08: an undated manual entry can never ship.
+    const { enteredOn: _e, expires: _x, ...undated } = file;
+    expect(() => parseManualSeries(undated, 'china-pmi')).toThrow(/schema validation/);
   });
 });
 

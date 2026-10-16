@@ -50,7 +50,7 @@ function loadJsonFile(url: URL): unknown | undefined {
 }
 
 const calendar: CalendarEvent[] = z.array(CalendarEventSchema).parse(loadJsonFile(new URL('data/insights-calendar.json', repoRoot)) ?? []);
-const chinaPmi = parseManualSeries(loadJsonFile(new URL('data/manual/china-pmi.json', repoRoot))!, 'china-pmi');
+const chinaPmi = parseManualSeries(loadJsonFile(new URL('data/manual/china-pmi.json', repoRoot))!, 'china-pmi').points;
 const releaseSchedule = parseReleaseSchedule(loadJsonFile(new URL('data/insights-release-schedule.json', repoRoot))!);
 const policyDecisions = parsePolicyDecisions(loadJsonFile(new URL('data/policy-decisions.json', repoRoot))!);
 

@@ -52,13 +52,32 @@ import type {
 import { evaluateConnections, evaluateSignals } from '@currena/insights';
 import type { ConnectionReading } from '@currena/insights';
 import { FX_GROUP_ORDER, FX_PAIRS } from '@currena/insights/fx/definitions';
+import { TREND_BAND_PCT } from '@currena/insights/markets/definitions';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import type { XlsxSheet } from '../../lib/xlsx-writer';
 import { fxTrendOf } from '../../lib/fx-presentation';
 import { DISPLAY } from './config/display';
 import { positionBand } from './config/bands';
+import { statusWordKeyOf } from './config/labels';
+import { tierOf } from './config/movers';
 import { PRICE_ROWS, TOGETHER_CARD_ORDER } from './config';
 import { SIGNALS_ENABLED, legPhrase } from './config/signals';
+import auditJson from '../../../../../data/indicator-audit.json';
+
+/** Defect E-23: the per-indicator licence + rule facts (generated sidecar). */
+interface IndicatorAuditEntry {
+  id: string;
+  licenceName: string;
+  publicDisplayOk: string;
+  privateOk: boolean;
+  maxAgeDays: number | null;
+  ruleVersion: number;
+  rule: string;
+}
+
+const AUDIT_BY_ID = new Map<string, IndicatorAuditEntry>(
+  (auditJson as unknown as { indicators: IndicatorAuditEntry[] }).indicators.map((a) => [a.id, a]),
+);
 
 export type ExportFormat = 'md' | 'txt' | 'csv' | 'xlsx';
 
@@ -89,7 +108,7 @@ export function insightsExportFilename(generatedAt: string, ext: ExportFormat): 
 }
 
 /* ------------------------------------------------------------------ *
- * The flat slot layout (26 slots, section first — the CSV's own order)
+ * The flat slot layout (38 slots, section first — the CSV's own order)
  * ------------------------------------------------------------------ */
 
 const FLAT = {
@@ -119,9 +138,23 @@ const FLAT = {
   asOf: 23,
   updatedAt: 24,
   source: 25,
+  // Defect E-23 (2026-10-16): the audit columns.
+  published: 26,
+  stale: 27,
+  sourceUrl: 28,
+  licence: 29,
+  privateOnly: 30,
+  publicOk: 31,
+  ruleVersion: 32,
+  thresholds: 33,
+  // Defect E-24 (2026-10-16): the price table's peak columns.
+  peak: 34,
+  peakDate: 35,
+  peakBasis: 36,
+  belowPeak: 37,
 } as const;
 
-const FLAT_WIDTH = 26;
+const FLAT_WIDTH = 38;
 
 interface DocSection {
   /** Stable key (tests) — never rendered. */
@@ -168,6 +201,40 @@ function unitOf(reading: IndicatorReading, copy: InsightsCopy): string {
   return display === undefined ? '' : copy.units[display.unit];
 }
 
+/**
+ * Defect E-10 (2026-10-16): the export cell carries the DISPLAYED value —
+ * the display scale (m2-us: billions → trillions) applied, so the value and
+ * the unit word never disagree in the export (23342.8 under "trillion" was
+ * the audited bug).
+ */
+function exportValue(reading: IndicatorReading): number | null {
+  if (reading.value === null) return null;
+  return reading.value * (DISPLAY[reading.id]?.scale ?? 1);
+}
+
+/**
+ * Defect E-21 (2026-10-16): the export's status word is the PAGE's two-tier
+ * word (tierOf) — a normal-status reading parked in the top/bottom 10% of
+ * its own 10-year range reads "Unusual", never plain "Normal" (the 15 Oct
+ * export's USD/JPY + AUD/JPY at the 95th percentile were the audited loss).
+ */
+function tierWord(r: IndicatorReading, copy: InsightsCopy): string {
+  const tier = tierOf(r);
+  const key =
+    tier === 'needs-attention'
+      ? 'warning'
+      : tier === 'unusual'
+        ? 'unusual'
+        : tier === 'normal'
+          ? 'normal'
+          : tier === 'context'
+            ? 'context'
+            : tier === 'unavailable'
+              ? 'unavailable'
+              : 'stale';
+  return copy.status[key];
+}
+
 /* ------------------------------ row builders ------------------------------ */
 
 function verdictRows(input: FullExportInput): (string | number | null)[][] {
@@ -197,6 +264,13 @@ function verdictRows(input: FullExportInput): (string | number | null)[][] {
 /** The prices board's own context lines (gold A$ companion, BTC ratios). */
 function priceDetail(id: string, byId: Map<string, IndicatorReading>, copy: InsightsCopy): string {
   const parts: string[] = [];
+  // Defect E-03 (2026-10-16): Brent/gold/silver read FUTURES quotes (the
+  // EIA spot series is extended with the front-month contract; the metals'
+  // history is the COMEX futures) — the detail line says so, so a futures
+  // price is never mistaken for spot.
+  if (id === 'brent' || id === 'gold-usd' || id === 'silver-usd') {
+    parts.push(copy.ui.exportFuturesNote);
+  }
   const goldAud = byId.get('gold-aud');
   if (id === 'gold-usd' && goldAud && goldAud.value !== null) {
     parts.push(`${copy.indicators['gold-aud'].name}: ${asciiNumber(goldAud.value)}`);
@@ -204,10 +278,12 @@ function priceDetail(id: string, byId: Map<string, IndicatorReading>, copy: Insi
   const gold = byId.get('gold-usd');
   const silver = byId.get('silver-usd');
   const btc = byId.get('btc-usd');
-  if (btc?.value != null && gold?.value != null && gold.value > 0) {
+  // Defect E-13 (2026-10-16): the bitcoin-buying sentence belongs on the
+  // BITCOIN row only (the 15 Oct export repeated it on Brent/gold/silver).
+  if (id === 'btc-usd' && btc?.value != null && gold?.value != null && gold.value > 0) {
     parts.push(interpolateS(copy.ui.btcBuysGold, { value: asciiNumber(btc.value / gold.value, 1) }));
   }
-  if (btc?.value != null && silver?.value != null && silver.value > 0) {
+  if (id === 'btc-usd' && btc?.value != null && silver?.value != null && silver.value > 0) {
     parts.push(interpolateS(copy.ui.btcBuysSilver, { value: asciiNumber(btc.value / silver.value, 0) }));
   }
   return parts.join(' · ');
@@ -232,13 +308,25 @@ function priceRows(input: FullExportInput): (string | number | null)[][] {
     const row = blankRow();
     put(row, FLAT.id, r.id);
     put(row, FLAT.name, copy.indicators[r.id]?.name ?? r.id);
-    put(row, FLAT.value, r.value);
+    put(row, FLAT.value, exportValue(r));
     put(row, FLAT.unit, unitOf(r, copy));
     put(row, FLAT.status, copy.status[r.status]);
     put(row, FLAT.change7d, r.change7d ?? null);
     put(row, FLAT.change30d, r.change30d ?? null);
     put(row, FLAT.percentile10y, r.percentile10y ?? null);
     put(row, FLAT.position, positionWord);
+    // Defect E-24 (2026-10-16): the peak, its date, its basis and the
+    // distance below it ride the price table (T-05's floors verify them).
+    if (r.peak !== undefined) {
+      put(row, FLAT.peak, r.peak.value);
+      put(row, FLAT.peakDate, r.peak.date);
+      put(
+        row,
+        FLAT.peakBasis,
+        r.peak.basis === 'daily-high' ? copy.ui.peakBasisHigh : copy.ui.peakBasisClose,
+      );
+    }
+    if (r.fromPeak10y !== undefined) put(row, FLAT.belowPeak, r.fromPeak10y);
     put(row, FLAT.detail, priceDetail(id, byId, copy));
     put(row, FLAT.asOf, r.asOf);
     rows.push(row);
@@ -247,18 +335,19 @@ function priceRows(input: FullExportInput): (string | number | null)[][] {
 }
 
 function marketRow(m: MarketEntry, copy: InsightsCopy): (string | number | null)[] {
+  // Defect E-18 (2026-10-16): the Trend word is RECOMPUTED from the same
+  // chg3m number the row shows (≥ +1% Up, ≤ −1% Down, else Flat) — the
+  // stored field keeps the old basis until the markets worker next writes,
+  // so the export derives it exactly like the page does.
   const trendWord =
-    m.trend === 'up'
+    m.chg3m >= TREND_BAND_PCT
       ? copy.markets.trendUp
-      : m.trend === 'down'
+      : m.chg3m <= -TREND_BAND_PCT
         ? copy.markets.trendDown
         : copy.markets.trendFlat;
-  const statusWord =
-    m.status === 'correction'
-      ? copy.markets.statusCorrection
-      : m.status === 'bear'
-        ? copy.markets.statusBear
-        : copy.markets.statusNormal;
+  // Defect E-22 (2026-10-16): the L2-01 stock-state words, from the
+  // distance below the 52-week high (closing basis) — never "Normal".
+  const statusWord = copy.markets[statusWordKeyOf(m.fromHigh)];
   const row = blankRow();
   put(row, FLAT.id, m.id);
   put(row, FLAT.name, copy.markets.entries[m.id].name);
@@ -351,20 +440,41 @@ function signalRowMap(readings: readonly IndicatorReading[], copy: InsightsCopy)
   return rows;
 }
 
-function readingRow(r: IndicatorReading, copy: InsightsCopy): (string | number | null)[] {
+function readingRow(r: IndicatorReading, copy: InsightsCopy, nowDay: string): (string | number | null)[] {
   const row = blankRow();
+  const audit = AUDIT_BY_ID.get(r.id);
   put(row, FLAT.id, r.id);
   put(row, FLAT.name, copy.indicators[r.id]?.name ?? r.id);
   put(row, FLAT.ticker, copy.indicators[r.id]?.ticker ?? null);
-  put(row, FLAT.value, r.value);
+  put(row, FLAT.value, exportValue(r));
   put(row, FLAT.unit, unitOf(r, copy));
-  put(row, FLAT.status, copy.status[r.status]);
+  put(row, FLAT.status, tierWord(r, copy));
   put(row, FLAT.change7d, r.change7d ?? null);
   put(row, FLAT.change30d, r.change30d ?? null);
   put(row, FLAT.percentile10y, r.percentile10y ?? null);
   put(row, FLAT.asOf, r.asOf);
   put(row, FLAT.updatedAt, r.updatedAt);
   put(row, FLAT.source, r.sourceName);
+  // ---- Defect E-23 (2026-10-16): the audit columns. ----
+  put(row, FLAT.published, r.releaseDate ?? null);
+  const staleDays =
+    r.asOf !== null
+      ? Math.max(0, Math.round((Date.parse(`${nowDay}T00:00:00Z`) - Date.parse(`${r.asOf}T00:00:00Z`)) / 86_400_000))
+      : null;
+  const stale =
+    r.status === 'stale' || r.status === 'check-pending'
+      ? staleDays !== null
+        ? interpolateS(copy.ui.exportStaleWithAge, { days: String(staleDays) })
+        : copy.ui.exportYes
+      : copy.ui.exportNo;
+  put(row, FLAT.stale, stale);
+  put(row, FLAT.sourceUrl, r.sourceUrl ?? null);
+  put(row, FLAT.licence, audit?.licenceName ?? null);
+  // Fail closed: an id without an audit entry counts as private-only.
+  put(row, FLAT.privateOnly, audit === undefined ? copy.ui.exportYes : audit.publicDisplayOk === 'yes' ? copy.ui.exportNo : copy.ui.exportYes);
+  put(row, FLAT.publicOk, audit?.publicDisplayOk ?? 'unknown');
+  put(row, FLAT.ruleVersion, audit?.ruleVersion ?? null);
+  put(row, FLAT.thresholds, audit?.rule ?? null);
   return row;
 }
 
@@ -421,11 +531,15 @@ export function assembleExportDoc(input: FullExportInput): ExportDoc {
     digits: 0,
   });
 
-  // Prices — the board's rows with their position words + context lines.
+  // Prices — the board's rows with their position words + context lines
+  // + the peak columns (defect E-24).
   sections.push({
     key: 'prices',
     heading: copy.ui.pricesTitle,
-    columns: [FLAT.name, FLAT.value, FLAT.unit, FLAT.change7d, FLAT.change30d, FLAT.position, FLAT.detail],
+    columns: [
+      FLAT.name, FLAT.value, FLAT.unit, FLAT.change7d, FLAT.change30d, FLAT.position,
+      FLAT.peak, FLAT.peakDate, FLAT.peakBasis, FLAT.belowPeak, FLAT.detail,
+    ],
     headers: [
       copy.ui.csvColName,
       copy.ui.csvColValue,
@@ -433,6 +547,10 @@ export function assembleExportDoc(input: FullExportInput): ExportDoc {
       copy.ui.csvColChange7d,
       copy.ui.csvColChange30d,
       copy.ui.exportPosition,
+      copy.ui.exportColPeak,
+      copy.ui.exportColPeakDate,
+      copy.ui.exportColPeakBasis,
+      copy.ui.exportColBelowPeak,
       copy.ui.exportDetail,
     ],
     rows: priceRows(input),
@@ -519,13 +637,17 @@ export function assembleExportDoc(input: FullExportInput): ExportDoc {
     }
   }
 
-  // Indicators — every reading, snapshot order, the long-standing columns.
+  // Indicators — every reading, snapshot order, plus the E-23 audit
+  // columns (published date, stale flag with age, source URL, licence,
+  // private-only / public-display verdicts, rule version + thresholds).
   sections.push({
     key: 'indicators',
     heading: copy.ui.navIndicators,
     columns: [
       FLAT.id, FLAT.name, FLAT.ticker, FLAT.value, FLAT.unit, FLAT.status,
       FLAT.change7d, FLAT.change30d, FLAT.percentile10y, FLAT.asOf, FLAT.updatedAt, FLAT.source,
+      FLAT.published, FLAT.stale, FLAT.sourceUrl, FLAT.licence, FLAT.privateOnly, FLAT.publicOk,
+      FLAT.ruleVersion, FLAT.thresholds,
     ],
     headers: [
       copy.ui.csvColId,
@@ -540,8 +662,16 @@ export function assembleExportDoc(input: FullExportInput): ExportDoc {
       copy.ui.csvColAsOf,
       copy.ui.csvColUpdated,
       copy.ui.csvColSource,
+      copy.ui.exportColPublished,
+      copy.ui.exportColStale,
+      copy.ui.exportColSourceUrl,
+      copy.ui.exportColLicence,
+      copy.ui.exportColPrivateOnly,
+      copy.ui.exportColPublicOk,
+      copy.ui.exportColRuleVersion,
+      copy.ui.exportColThresholds,
     ],
-    rows: snapshot.readings.map((r) => readingRow(r, copy)),
+    rows: snapshot.readings.map((r) => readingRow(r, copy, snapshot.generatedAt.slice(0, 10))),
     lines: [],
     digits: 6,
   });

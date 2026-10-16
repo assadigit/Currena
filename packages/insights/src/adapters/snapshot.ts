@@ -189,6 +189,13 @@ export interface SnapshotBuildInputs {
    * reading holds its LAST GOOD value with status `check-pending`.
    */
   flags?: ReadonlyMap<IndicatorId, SafetyFlag>;
+  /**
+   * Defect E-08 (2026-10-16): manual-entry expiries (id → the next
+   * scheduled release, from each data/manual/<id>.json file's `expires`).
+   * A manual reading whose expiry has passed wears the stale tag — an
+   * entry no one has refreshed can never read as current.
+   */
+  manualExpires?: Readonly<Record<string, string>>;
   /** The run's clock (ISO 8601 UTC) — generatedAt and every reading's updatedAt. */
   now: string;
 }
@@ -212,6 +219,29 @@ function monthStartPlus(iso: string, months: number): string {
 /** The end of the observation's period: month-end for monthlies, quarter-end for quarterlies. */
 function periodEndOf(cadence: 'monthly' | 'quarterly', asOf: string): string {
   return cadence === 'monthly' ? monthEndOf(asOf) : monthEndOf(monthStartPlus(asOf, 2));
+}
+
+/**
+ * Defect E-07 (2026-10-16): the quarter a QUARTERLY observation belongs to,
+ * named by its END month regardless of whether the source series dates the
+ * quarter by its start (ABS/FRED: 2026-04-01) or its end (RBA E2:
+ * 2026-06-30) — both label as "June quarter 2026". Returns the period's
+ * first and last day, or undefined when `asOf` is not a quarter boundary.
+ */
+export function quarterPeriodOf(asOf: string): { start: string; end: string } | undefined {
+  const [y, m, d] = asOf.split('-').map(Number) as [number, number, number];
+  // Quarter-START dated: Jan/Apr/Jul/Oct day 01. Quarter-END dated: the
+  // last day of Mar/Jun/Sep/Dec.
+  const isQuarterStart = d === 1 && (m === 1 || m === 4 || m === 7 || m === 10);
+  const endDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  const isQuarterEnd = (m === 3 || m === 6 || m === 9 || m === 12) && d === endDay;
+  if (isQuarterStart) {
+    return { start: asOf, end: monthEndOf(monthStartPlus(asOf, 2)) };
+  }
+  if (isQuarterEnd) {
+    return { start: monthStartPlus(asOf, -2), end: asOf };
+  }
+  return undefined;
 }
 
 /**
@@ -318,6 +348,25 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
       }
     }
 
+    // ---- Defect E-07: quarterly readings carry their period's bounds. ----
+    if (def.cadence === 'quarterly' && reading.asOf !== null) {
+      const q = quarterPeriodOf(reading.asOf);
+      if (q !== undefined) {
+        reading.periodStart = q.start;
+        reading.periodEnd = q.end;
+      }
+    }
+
+    // ---- Defect E-08: an expired manual entry wears the stale tag. ----
+    const manualExpiry = inputs.manualExpires?.[def.id];
+    if (manualExpiry !== undefined && nowDayIso > manualExpiry && reading.status !== 'unavailable') {
+      reading.status = 'stale';
+      reading.flag = {
+        test: 'E-08',
+        reason: `manual entry expired on ${manualExpiry} (next scheduled release) — update data/manual/${def.id}.json`,
+      };
+    }
+
     // ---- Fix spec B-01: the full-history peak on the price rows. ----
     const peak = inputs.peaks?.[def.id];
     if (peak !== undefined && reading.value !== null && peak.value > 0) {
@@ -408,7 +457,12 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
     summary,
     readings,
     changedThisWeek,
-    calendar: [...inputs.calendar],
+    // Defect E-09 (2026-10-16): released events (their date has passed) are
+    // history — they never ride the snapshot's calendar again, so neither
+    // the page's "Next up" strip nor the export can list a past release as
+    // upcoming. The hand-maintained file keeps the entries (the archive
+    // pages may want them); the snapshot shows only today-and-future.
+    calendar: inputs.calendar.filter((e) => e.date >= nowDayIso),
     ruleVersion: RULE_VERSION,
   });
 }

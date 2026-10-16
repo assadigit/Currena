@@ -138,11 +138,15 @@ console.log(
 
 const pmiUrl = new URL('data/manual/china-pmi.json', repoRoot);
 const pmiRaw = loadJsonFile(pmiUrl);
-const chinaPmi: SeriesPoint[] | undefined = pmiRaw === undefined ? undefined : parseManualSeries(pmiRaw, 'china-pmi');
+const pmiParsed = pmiRaw === undefined ? undefined : parseManualSeries(pmiRaw, 'china-pmi');
+const chinaPmi: SeriesPoint[] | undefined = pmiParsed?.points;
+// Defect E-08: the manual file's own expiry rides into the snapshot — an
+// entry older than its next scheduled release shows stale, never fresh.
+const manualExpires: Readonly<Record<string, string>> = pmiParsed ? { 'china-pmi': pmiParsed.expires } : {};
 console.log(
   pmiRaw === undefined
     ? '[ingest] data/manual/china-pmi.json: absent — china-pmi reads unavailable (Phase I5/I6 content work)'
-    : `[ingest] china-pmi: ${chinaPmi?.length ?? 0} observations`,
+    : `[ingest] china-pmi: ${chinaPmi?.length ?? 0} observations (entered ${pmiParsed?.enteredOn ?? '?'}, expires ${pmiParsed?.expires ?? '?'})`,
 );
 reports.push({
   source: 'manual',
@@ -150,7 +154,7 @@ reports.push({
   detail:
     pmiRaw === undefined
       ? 'no data files yet (Phase I5 content work)'
-      : `china-pmi: ${chinaPmi?.length ?? 0} observations`,
+      : `china-pmi: ${chinaPmi?.length ?? 0} observations (expires ${pmiParsed?.expires ?? '?'})`,
 });
 
 // Step-1 audit items A2/A3: the hand-maintained release schedule (official
@@ -303,6 +307,7 @@ const draft = buildInsightsSnapshot({
   peaks,
   highestSince,
   contextNotes,
+  manualExpires,
   now: nowIso,
 });
 
@@ -312,6 +317,8 @@ const outcome = runValidationSuite({
   calendar,
   now: nowIso,
   breakeven10y: inputs.fred.T10YIE,
+  // Defect E-04: the previous snapshot feeds the cross-day frozen-value check.
+  ...(previous !== undefined ? { previousReadings: previous.readings } : {}),
   ...(copyTexts.length > 0 ? { copyTexts } : {}),
   ...(episodes !== undefined ? { episodes } : {}),
 });
@@ -328,6 +335,7 @@ const snapshot = buildInsightsSnapshot({
   peaks,
   highestSince,
   contextNotes,
+  manualExpires,
   flags: outcome.flags,
   now: nowIso,
 });

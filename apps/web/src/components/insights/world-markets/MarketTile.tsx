@@ -18,8 +18,8 @@ import {
   fmtClose,
   isOld,
   signedPct,
-  STATUS_TONE,
-  STATUS_WORD,
+  statusToneOf,
+  statusWordKeyOf,
   TREND_WORD_OF,
   tradingDaysBehind,
   trendOf,
@@ -100,7 +100,7 @@ export function MarketTile({
       ) : (
         <span
           className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.68rem] font-bold ${
-            entry.status === 'normal' ? 'bg-currena-muted/15 text-[var(--color-text-secondary)]' : STATUS_TONE[entry.status]
+            statusToneOf(entry.fromHigh)
           }`}
         >
           {interpolate(copy.markets.tileTagBelow, { x: tagX })}
@@ -117,7 +117,7 @@ export function MarketTile({
         </span>
       ) : null}
       <span className="sr-only">
-        {trendWord}, {copy.markets[STATUS_WORD[entry.status]]}, {interpolate(copy.markets.asOf, { date: oldDate })}
+        {trendWord}, {copy.markets[statusWordKeyOf(entry.fromHigh)]}, {interpolate(copy.markets.asOf, { date: oldDate })}
       </span>
     </button>
   );
@@ -158,8 +158,8 @@ export function MarketDetail({
             {marketCopy.latin}
           </span>
         ) : null}
-        <span className={`ms-auto inline-flex items-center rounded-full px-2 py-0.5 text-[0.68rem] font-bold ${STATUS_TONE[entry.status]}`}>
-          {copy.markets[STATUS_WORD[entry.status]]}
+        <span className={`ms-auto inline-flex items-center rounded-full px-2 py-0.5 text-[0.68rem] font-bold ${statusToneOf(entry.fromHigh)}`}>
+          {copy.markets[statusWordKeyOf(entry.fromHigh)]}
         </span>
       </p>
       <dl className="m-0 mb-2 flex flex-col gap-1">

@@ -73,6 +73,13 @@ export interface ValidationInputs {
   copyTexts?: readonly string[];
   /** T-14: the saved regression episodes (fixtures/regression-episodes.json). */
   episodes?: readonly RegressionEpisode[];
+  /**
+   * Defect E-04 (2026-10-16): the previous STORED snapshot's readings — the
+   * cross-day half of the frozen-value check (a daily value identical to
+   * six decimals across days is a stale cache shown as fresh). The ingest
+   * passes the snapshot it just read from KV.
+   */
+  previousReadings?: readonly IndicatorReading[];
 }
 
 /** Why one reading was flagged (the snapshot builder turns this into `check-pending`). */
@@ -438,13 +445,16 @@ function t07ForbiddenWords(inputs: ValidationInputs): ValidationTestResult {
 /**
  * How many consecutive unchanged observations a cadence tolerates before
  * the value is suspicious. Policy rates (per-change) hold constants between
- * decisions BY DESIGN and are never checked; daily series tolerate a week
- * (data-vendor smoothing); monthly/quarterly tolerate one repeat — a
- * monthly series printing the same value twice in a row is the "+0.00%
- * since previous release" bug class (B-02).
+ * decisions BY DESIGN and are never checked. Defect E-04 (2026-10-16):
+ * DAILY series tolerate NO exact repeat — a daily print identical to the
+ * previous day is the frozen-cache bug class (the 15 Oct copper row), so
+ * the tolerance drops to zero and both halves below (in-series and
+ * cross-day) flag it. Monthly/quarterly tolerate one repeat — a monthly
+ * series printing the same value twice in a row is the "+0.00% since
+ * previous release" bug class (B-02).
  */
 const MAX_UNCHANGED_RUN: Readonly<Record<IndicatorDefinition['cadence'], number | null>> = {
-  daily: 7,
+  daily: 0,
   weekly: 3,
   monthly: 1,
   quarterly: 1,
@@ -490,10 +500,11 @@ function t08SuspiciousValues(inputs: ValidationInputs): ValidationTestResult {
     const idx = series.findIndex((p) => p.date === current.date);
     // (a) the latest value repeats the previous observation exactly — for a
     // monthly/quarterly series this is the "+0.00% since previous release"
-    // bug class (a duplicate print or a failed fetch).
+    // bug class (a duplicate print or a failed fetch); for a DAILY series
+    // any exact repeat across days is the E-04 frozen-cache class.
     if (idx > 0) {
       const prev = series[idx - 1]!;
-      if (prev.value === current.value && def.cadence !== 'daily') {
+      if (prev.value === current.value) {
         failures.push(
           `${def.id}: ${def.cadence} series repeated ${current.value} on ${current.date} (previous print ${prev.date}) — possible duplicate or failed fetch`,
         );
@@ -509,6 +520,24 @@ function t08SuspiciousValues(inputs: ValidationInputs): ValidationTestResult {
     }
     if (run - 1 > maxRun) {
       failures.push(`${def.id}: last ${run} observations unchanged (cadence tolerates ${maxRun})`);
+      flagged.push(def.id);
+      continue;
+    }
+    // (c) E-04 cross-day half: the current value identical to six decimals
+    // to what the PREVIOUS snapshot published for the same id — the value
+    // did not move across days while the card claims a new one.
+    const prevReading = inputs.previousReadings?.find((r) => r.id === def.id);
+    if (
+      def.cadence === 'daily' &&
+      prevReading !== undefined &&
+      prevReading.value !== null &&
+      prevReading.asOf !== null &&
+      current.value.toFixed(6) === prevReading.value.toFixed(6) &&
+      prevReading.asOf < current.date
+    ) {
+      failures.push(
+        `${def.id}: daily value identical to 6 decimals across days (${current.value} on ${current.date}, previous snapshot ${prevReading.asOf}) — frozen value shown as fresh`,
+      );
       flagged.push(def.id);
     }
   }

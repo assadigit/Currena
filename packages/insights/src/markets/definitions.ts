@@ -40,9 +40,14 @@ export const SHOCK_DAY_COUNT = 5;
  */
 export const CHG_WINDOW_DAYS = 90;
 
-/** Trend rule: moving-average length in trading days (spec §5.1). */
-export const TREND_MA_DAYS = 50;
-/** Trend rule: band around the average, in percent (up above +1, down below −1). */
+/**
+ * Trend rule band, in percent (up at or above +1, down at or below −1),
+ * applied to the SAME window the table's own "3-month" column shows
+ * (CHG_WINDOW_DAYS). Defect E-18 (2026-10-16): the Trend label is
+ * reproducible from the number printed beside it — ≥ +1.0% Up, ≤ −1.0%
+ * Down, otherwise Flat. (The old 50-day-average basis produced labels that
+ * contradicted the displayed 3-month change — DAX +1.54% labelled "Down".)
+ */
 export const TREND_BAND_PCT = 1;
 
 /** Validation R3: a one-day move of this size (percent) is suspicious. */

@@ -200,6 +200,12 @@ export function PricesBoard({
           // A$ companion and Bitcoin's two ratios (the roast: "the Bitcoin
           // tile is structured differently").
           const contextParts: string[] = [];
+          // Defect E-03 (2026-10-16): Brent/gold/silver quote FUTURES (the
+          // front-month contract extends/leads the series) — the tile says
+          // so, so a futures price is never mistaken for spot.
+          if (id === 'brent' || id === 'gold-usd' || id === 'silver-usd') {
+            contextParts.push(copy.ui.exportFuturesNote);
+          }
           if (id === 'gold-usd' && goldAud && goldAud.value !== null) {
             contextParts.push(
               interpolate(copy.ui.goldAudLine, {
@@ -211,17 +217,19 @@ export function PricesBoard({
           // are computed FROM THE SAME DISPLAYED PRICES (btc ÷ gold, btc ÷
           // silver — one snapshot, no stored rounding in between), so the
           // "one bitcoin buys X oz" line always matches the prices shown.
+          // Defect E-13 (2026-10-16): the sentence belongs on the BITCOIN
+          // tile only — it repeated on every price tile in the 15 Oct export.
           const goldReading = byId.get('gold-usd');
           const silverReading = byId.get('silver-usd');
           const btcReading = byId.get('btc-usd');
-          if (btcReading?.value != null && goldReading?.value != null && goldReading.value > 0) {
+          if (id === 'btc-usd' && btcReading?.value != null && goldReading?.value != null && goldReading.value > 0) {
             const ozGold = formatNumber(btcReading.value / goldReading.value, numberLocale, {
               minimumFractionDigits: 1,
               maximumFractionDigits: 1,
             });
             contextParts.push(interpolate(copy.ui.btcBuysGold, { value: ozGold }));
           }
-          if (btcReading?.value != null && silverReading?.value != null && silverReading.value > 0) {
+          if (id === 'btc-usd' && btcReading?.value != null && silverReading?.value != null && silverReading.value > 0) {
             const ozSilver = formatNumber(btcReading.value / silverReading.value, numberLocale, {
               maximumFractionDigits: 0,
             });

@@ -48,7 +48,7 @@
         "privateOk": true,
         "publicDisplayOk": "no",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-16) · Legs (fred:T10Y2Y): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -195,9 +195,9 @@
       },
       "source": {
         "provider": "derived",
-        "name": "FRED (DGS2 − DFEDTARL)",
+        "name": "FRED (DGS2 − policy-rate midpoint)",
         "url": "https://fred.stlouisfed.org/series/DGS2",
-        "seriesIdOrTable": "FRED:DGS2 − FRED:DFEDTARL (2-year yield minus the policy rate)"
+        "seriesIdOrTable": "FRED:DGS2 − FRED:DFEDTARL/DFEDTARU midpoint (2-year yield minus the policy-rate midpoint)"
       },
       "unit": "points",
       "changeUnit": "percentage points",
@@ -214,14 +214,14 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "Own computation — inherits the upstream sources’ terms",
-        "attributionText": "",
-        "attributionRequired": false,
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
+        "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
-        "termsUrl": null
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16) · Legs (fred:DGS2, fred:DFEDTARL, fred:DFEDTARU): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
     {
@@ -346,14 +346,14 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "Own computation — inherits the upstream sources’ terms",
-        "attributionText": "",
-        "attributionRequired": false,
+        "licenceName": "Varies by series (FRED license tags)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
+        "publicDisplayOk": "no",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
-        "termsUrl": null
+        "termsEvidence": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>) — scanned 2026-10-16, records in data/fred-copyright.json; public-domain series may be public, citation-required series are private-only. · Legs (fred:A091RC1Q027SBEA, fred:W006RC1Q027SBEA): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
     {
@@ -367,9 +367,9 @@
       },
       "source": {
         "provider": "fred",
-        "name": "FRED (CPIAUCSL)",
-        "url": "https://fred.stlouisfed.org/series/CPIAUCSL",
-        "seriesIdOrTable": "FRED:CPIAUCSL (12-month % change)"
+        "name": "FRED (CPIAUCNS, not seasonally adjusted)",
+        "url": "https://fred.stlouisfed.org/series/CPIAUCNS",
+        "seriesIdOrTable": "FRED:CPIAUCNS (12-month % change, not seasonally adjusted — the BLS headline basis)"
       },
       "unit": "percent",
       "changeUnit": "percentage points",
@@ -407,9 +407,9 @@
       },
       "source": {
         "provider": "fred",
-        "name": "FRED (CPILFESL)",
-        "url": "https://fred.stlouisfed.org/series/CPILFESL",
-        "seriesIdOrTable": "FRED:CPILFESL (12-month % change)"
+        "name": "FRED (CPILFENS, not seasonally adjusted)",
+        "url": "https://fred.stlouisfed.org/series/CPILFENS",
+        "seriesIdOrTable": "FRED:CPILFENS (12-month % change, not seasonally adjusted)"
       },
       "unit": "percent",
       "changeUnit": "percentage points",
@@ -626,14 +626,14 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "licenceName": "Free API — commercial use permitted (their ToS)",
         "attributionText": "",
         "attributionRequired": false,
         "privateOk": true,
         "publicDisplayOk": "unknown",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
-        "termsUrl": null
+        "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".) · Legs (world-bank, gold-api): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://gold-api.com/terms"
       }
     },
     {
@@ -678,14 +678,14 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "Own computation — inherits the upstream sources’ terms",
-        "attributionText": "",
-        "attributionRequired": false,
+        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "unknown",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
-        "termsUrl": null
+        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless. · Legs (frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://frankfurter.dev/license/"
       }
     },
     {
@@ -996,14 +996,14 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "Own computation — inherits the upstream sources’ terms",
-        "attributionText": "",
-        "attributionRequired": false,
+        "licenceName": "Unknown (CC BY 4.0 expected, not quoted)",
+        "attributionText": "Source: World Bank",
+        "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "unknown",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
-        "termsUrl": null
+        "termsEvidence": "World Bank Open Data terms are commonly CC BY 4.0, but the licence page could not be quoted verbatim on 2026-10-16 (JS-rendered) — marked unknown, fail closed in public mode until read in a browser. · Legs (world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.worldbank.org/en/about/legal/terms-of-use"
       }
     },
     {
@@ -1076,14 +1076,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "FRED license #copyright-public-domain (public domain)",
-        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
-        "attributionRequired": true,
+        "licenceName": "No reuse licence offered (unofficial endpoints)",
+        "attributionText": "",
+        "attributionRequired": false,
         "privateOk": true,
-        "publicDisplayOk": "yes",
+        "publicDisplayOk": "no",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
-        "termsUrl": "https://fred.stlouisfed.org/legal/"
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (fred:DCOILBRENTEU, yahoo:BZ=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://finance.yahoo.com/"
       }
     },
     {
@@ -1114,14 +1114,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "Free API — commercial use permitted (their ToS)",
+        "licenceName": "No reuse licence offered (unofficial endpoints)",
         "attributionText": "",
         "attributionRequired": false,
         "privateOk": true,
-        "publicDisplayOk": "yes",
+        "publicDisplayOk": "no",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".)",
-        "termsUrl": "https://gold-api.com/terms"
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:XAU, yahoo:GC=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://finance.yahoo.com/"
       }
     },
     {
@@ -1152,14 +1152,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "Free API — commercial use permitted (their ToS)",
+        "licenceName": "No reuse licence offered (unofficial endpoints)",
         "attributionText": "",
         "attributionRequired": false,
         "privateOk": true,
-        "publicDisplayOk": "yes",
+        "publicDisplayOk": "no",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".)",
-        "termsUrl": "https://gold-api.com/terms"
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:XAG, yahoo:SI=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://finance.yahoo.com/"
       }
     },
     {
@@ -1190,14 +1190,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "Free API — commercial use permitted (their ToS)",
-        "attributionText": "",
-        "attributionRequired": false,
+        "licenceName": "Unknown (CC BY 4.0 expected, not quoted)",
+        "attributionText": "Source: World Bank",
+        "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "yes",
+        "publicDisplayOk": "unknown",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".)",
-        "termsUrl": "https://gold-api.com/terms"
+        "termsEvidence": "World Bank Open Data terms are commonly CC BY 4.0, but the licence page could not be quoted verbatim on 2026-10-16 (JS-rendered) — marked unknown, fail closed in public mode until read in a browser. · Legs (gold-api:HG, world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.worldbank.org/en/about/legal/terms-of-use"
       }
     },
     {
@@ -1228,19 +1228,19 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "Free API — commercial use permitted (their ToS)",
+        "licenceName": "No reuse licence offered (unofficial endpoints)",
         "attributionText": "",
         "attributionRequired": false,
         "privateOk": true,
-        "publicDisplayOk": "yes",
+        "publicDisplayOk": "no",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".)",
-        "termsUrl": "https://gold-api.com/terms"
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:BTC, yahoo:BTC-USD): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://finance.yahoo.com/"
       }
     },
     {
       "id": "gold-btc",
-      "title": "Gold / Bitcoin",
+      "title": "Bitcoin priced in gold (BTC per ounce)",
       "area": {
         "section": "global",
         "group": "prices-board",
@@ -1251,7 +1251,7 @@
         "provider": "derived",
         "name": "gold-api.com (XAU ÷ BTC)",
         "url": "https://www.gold-api.com",
-        "seriesIdOrTable": "gold-api.com XAU ÷ BTC"
+        "seriesIdOrTable": "gold-api.com XAU ÷ BTC (bitcoin per troy ounce)"
       },
       "unit": "ratio",
       "changeUnit": "percent",
@@ -1266,19 +1266,19 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "licenceName": "Free API — commercial use permitted (their ToS)",
         "attributionText": "",
         "attributionRequired": false,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
+        "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
-        "termsUrl": null
+        "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".) · Legs (gold-api:XAU, gold-api:BTC): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://gold-api.com/terms"
       }
     },
     {
       "id": "silver-btc",
-      "title": "Silver / Bitcoin",
+      "title": "Bitcoin priced in silver (BTC per ounce)",
       "area": {
         "section": "global",
         "group": "prices-board",
@@ -1289,7 +1289,7 @@
         "provider": "derived",
         "name": "gold-api.com (XAG ÷ BTC)",
         "url": "https://www.gold-api.com",
-        "seriesIdOrTable": "gold-api.com XAG ÷ BTC"
+        "seriesIdOrTable": "gold-api.com XAG ÷ BTC (bitcoin per troy ounce)"
       },
       "unit": "ratio",
       "changeUnit": "percent",
@@ -1304,14 +1304,14 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "licenceName": "Free API — commercial use permitted (their ToS)",
         "attributionText": "",
         "attributionRequired": false,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
+        "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
-        "termsUrl": null
+        "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".) · Legs (gold-api:XAG, gold-api:BTC): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://gold-api.com/terms"
       }
     },
     {
@@ -1411,9 +1411,9 @@
       },
       "unit": "percent",
       "changeUnit": "percentage points",
-      "cadence": "weekly",
-      "maxAgeDays": 10,
-      "maxAgeBasis": "cadence default (weekly)",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "per-series override",
       "scored": true,
       "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
       "rule": {
@@ -1451,9 +1451,9 @@
       },
       "unit": "points",
       "changeUnit": "percentage points",
-      "cadence": "weekly",
-      "maxAgeDays": 10,
-      "maxAgeBasis": "cadence default (weekly)",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "per-series override",
       "scored": true,
       "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
       "rule": {
@@ -1464,14 +1464,14 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "Own computation — inherits the upstream sources’ terms",
-        "attributionText": "",
-        "attributionRequired": false,
+        "licenceName": "CC BY 4.0 (RBA terms for statistical tables)",
+        "attributionText": "Source: Reserve Bank of Australia",
+        "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
+        "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
-        "termsUrl": null
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0 for most material; commercial/personal use allowed if RBA endorsement is not implied. Third-party content INSIDE RBA tables needs that third party’s consent — re-check each table’s source notes at the quarterly review. · Legs (rba:F2, rba:F1): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.rba.gov.au/copyright/"
       }
     },
     {
@@ -1491,9 +1491,9 @@
       },
       "unit": "points",
       "changeUnit": "percentage points",
-      "cadence": "weekly",
-      "maxAgeDays": 10,
-      "maxAgeBasis": "cadence default (weekly)",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "per-series override",
       "scored": true,
       "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
       "rule": {
@@ -1504,14 +1504,14 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "Own computation — inherits the upstream sources’ terms",
-        "attributionText": "",
-        "attributionRequired": false,
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
+        "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
-        "termsUrl": null
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16) · Legs (rba:F2, fred:DGS10): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
     {
@@ -2051,14 +2051,14 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "Own computation — inherits the upstream sources’ terms",
-        "attributionText": "",
-        "attributionRequired": false,
+        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "unknown",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
-        "termsUrl": null
+        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless. · Legs (gold-api:XAU, frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://frankfurter.dev/license/"
       }
     }
   ]

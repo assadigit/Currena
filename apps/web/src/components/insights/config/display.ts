@@ -64,7 +64,9 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   us10y: { decimals: 2, unit: 'percent' },
   'fed-target': { decimals: 2, unit: 'percent', range: true },
   'ecb-dfr': { decimals: 2, unit: 'percent' },
-  'govt-interest-revenue': { decimals: 1, unit: 'percent', scale: 100 },
+  // Defect E-11 (2026-10-16): the engine now stores the share as a true
+  // percentage (33.55) — no display-scale compensation any more.
+  'govt-interest-revenue': { decimals: 1, unit: 'percent' },
   'us-cpi-yoy': { decimals: 1, unit: 'percent' },
   // Step-1 audit item A3: the core-CPI companion (rendered INSIDE the
   // us-cpi-yoy card, never as its own row).

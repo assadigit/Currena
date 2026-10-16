@@ -169,7 +169,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       low: 'The 2-year rate sits below the policy rate: the market’s own pricing sits below today’s setting.',
     },
     whatItIs:
-      'The US 2-year Treasury yield (FRED’s DGS2) minus the Fed’s policy rate (the lower bound of the target range, FRED’s DFEDTARL), from FRED.',
+      'The US 2-year Treasury yield (FRED’s DGS2) minus the Fed’s policy-rate midpoint (the average of the target range’s two bounds, FRED’s DFEDTARL and DFEDTARU), from FRED.',
     whyItMatters:
       'Two-year yields track the policy path the market itself prices: this gap is the market’s lean relative to today’s setting, watched by savers and borrowers everywhere.',
     tendedToMean:
@@ -255,7 +255,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       low: 'US inflation is low: the rare setting that usually lets central banks ease.',
     },
     whatItIs:
-      'The 12-month change in the US consumer price index (FRED’s CPIAUCSL): the world’s most-watched inflation number, published monthly.',
+      'The 12-month change in the US consumer price index, not seasonally adjusted (FRED’s CPIAUCNS): the world’s most-watched inflation number, published monthly.',
     whyItMatters:
       'US inflation sets the mood for world interest rates: hot readings tend to delay rate cuts everywhere, cold ones hasten them.',
     tendedToMean:
@@ -274,7 +274,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     oneLiner: 'US prices excluding food and energy, compared with a year ago.',
     lines: {},
     whatItIs:
-      'The 12-month change in the US core consumer price index (FRED’s CPILFESL): the steady underlying measure the Fed watches most.',
+      'The 12-month change in the US core consumer price index, not seasonally adjusted (FRED’s CPILFENS): the steady underlying measure the Fed watches most.',
     whyItMatters:
       'Core strips the volatile food and energy swings: it is the cleaner read on where inflation is heading.',
     tendedToMean:
@@ -713,7 +713,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'A context price for crypto headlines: and a reminder that a fast-moving asset can move just as fast the other way.',
   },
   'gold-btc': {
-    name: 'Gold versus Bitcoin',
+    name: 'Bitcoin priced in gold (BTC per ounce)',
     oneLiner: 'How many bitcoins one ounce of gold buys: old money priced in new money.',
     whatItIs:
       'The gold price in US dollars divided by the bitcoin price, both from the same hourly snapshot (Yahoo Finance quotes on the gold-api backbone).',
@@ -726,8 +726,8 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou: 'Context for conversations comparing bitcoin with gold as a store of value.',
   },
   'silver-btc': {
-    name: 'Silver versus Bitcoin',
-    oneLiner: 'Silver’s price expressed in bitcoin terms.',
+    name: 'Bitcoin priced in silver (BTC per ounce)',
+    oneLiner: 'How many bitcoins one ounce of silver buys: the metal priced in crypto.',
     whatItIs:
       'The silver price divided by the bitcoin price, both from the same hourly snapshot (Yahoo Finance quotes on the gold-api backbone).',
     whyItMatters:
@@ -1488,6 +1488,25 @@ export const insightsCopyEn = {
     exportColDate: 'Date',
     exportRuleVersion: 'Rule version: {v}',
     exportVerdictCounts: '{warning} of {voting} in warning',
+    // Defect E-03: the futures wording on the Brent/gold/silver detail lines.
+    exportFuturesNote: 'futures (front-month contract), not spot',
+    // Defect E-23: the indicators table's audit columns + yes/no words.
+    exportColPublished: 'Published',
+    exportColStale: 'Stale',
+    exportColSourceUrl: 'Source URL',
+    exportColLicence: 'Licence',
+    exportColPrivateOnly: 'Private only',
+    exportColPublicOk: 'Public display OK',
+    exportColRuleVersion: 'Rule version',
+    exportColThresholds: 'Thresholds (rule JSON)',
+    exportYes: 'yes',
+    exportNo: 'no',
+    exportStaleWithAge: 'yes ({days} days old)',
+    // Defect E-24: the price table's peak columns.
+    exportColPeak: 'Peak',
+    exportColPeakDate: 'Peak date',
+    exportColPeakBasis: 'Peak basis',
+    exportColBelowPeak: 'Below peak %',
     changedThisWeekTitle: 'Changed this week',
     csvHint:
       'Every indicator on this page with its value, changes and source: plain numbers, ready for any spreadsheet.',
@@ -1548,8 +1567,13 @@ export const insightsCopyEn = {
     delayedTag: 'Delayed',
     /** Step-1 F4: returns are in each market's own currency. */
     localCurrencyNote: 'Returns in each market’s local currency.',
-    /** Status words (§8.2) — correction maps to Needs attention, bear to Unusual. */
-    statusNormal: 'Normal',
+    /** Status words (§8.2) — the L2-01 stock-state convention (defect E-22):
+     * the word reads from the distance below the 52-week high (closing
+     * basis): within 5% Near its high, 5–10% Pullback, 10–20% Correction,
+     * 20% or more Bear market. Common market conventions, stated in the
+     * section's how-it-is-calculated copy. */
+    statusNearHigh: 'Near its high',
+    statusPullback: 'Pullback',
     statusCorrection: 'Correction',
     statusBear: 'Bear market',
     /** Trend words (§8.1). */

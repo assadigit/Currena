@@ -112,7 +112,7 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     group: 'borrowing-costs',
     name: 'What markets expect from the Fed (2-year gap)',
     source: 'derived',
-    sourceRef: 'FRED:DGS2 − FRED:DFEDTARL (2-year yield minus the policy rate)',
+    sourceRef: 'FRED:DGS2 − FRED:DFEDTARL/DFEDTARU midpoint (2-year yield minus the policy-rate midpoint)',
     cadence: 'daily',
     changeKind: 'points',
     phase: 'P2',
@@ -180,7 +180,7 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     group: 'prices-heat',
     name: 'US inflation (yearly)',
     source: 'fred',
-    sourceRef: 'FRED:CPIAUCSL (12-month % change)',
+    sourceRef: 'FRED:CPIAUCNS (12-month % change, not seasonally adjusted — the BLS headline basis)',
     cadence: 'monthly',
     // Step-1 audit item C5: a yearly RATE — its changes are expressed in
     // percentage points, never as a percent-of-percent.
@@ -202,7 +202,7 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     group: 'prices-heat',
     name: 'US core inflation (yearly)',
     source: 'fred',
-    sourceRef: 'FRED:CPILFESL (12-month % change)',
+    sourceRef: 'FRED:CPILFENS (12-month % change, not seasonally adjusted)',
     cadence: 'monthly',
     changeKind: 'points',
     phase: 'P2',
@@ -549,24 +549,30 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 2,
   },
   {
+    // Defect E-12 (2026-10-16): the stored value is BITCOIN PER OUNCE
+    // (XAU ÷ BTC ≈ 0.0509) — the old title 'Gold / Bitcoin' read as the
+    // inverse (gold per bitcoin, ≈ 19.6 oz). The title now names the value
+    // exactly as stored.
     id: 'gold-btc',
     section: 'global',
     group: 'prices-board',
-    name: 'Gold / Bitcoin',
+    name: 'Bitcoin priced in gold (BTC per ounce)',
     source: 'derived',
-    sourceRef: 'gold-api.com XAU ÷ BTC',
+    sourceRef: 'gold-api.com XAU ÷ BTC (bitcoin per troy ounce)',
     cadence: 'daily',
     changeKind: 'pct',
     phase: 'P2',
     rule: { kind: 'info' },
   },
   {
+    // Defect E-12 (2026-10-16): same orientation fix — the value is bitcoin
+    // per ounce of silver (XAG ÷ BTC ≈ 0.0007).
     id: 'silver-btc',
     section: 'global',
     group: 'prices-board',
-    name: 'Silver / Bitcoin',
+    name: 'Bitcoin priced in silver (BTC per ounce)',
     source: 'derived',
-    sourceRef: 'gold-api.com XAG ÷ BTC',
+    sourceRef: 'gold-api.com XAG ÷ BTC (bitcoin per troy ounce)',
     cadence: 'daily',
     changeKind: 'pct',
     phase: 'P2',
@@ -619,12 +625,15 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     name: 'Australian 10-year government bond yield',
     source: 'rba',
     sourceRef: 'RBA F2 FCMYGBAG10D (Australian Government 10 year bond)',
-    // Weekly cadence (not daily): RBA F2 publishes with a 2–4 business-day
-    // lag — the same venue finding the gap card's cadence records.
-    cadence: 'weekly',
+    // Defect E-06 (2026-10-16): a DAILY series — the F2 table publishes
+    // each business day (with a 2–4 business-day publication lag, the
+    // Phase-I2 venue finding), so the max age is the daily default of 4
+    // days and an older row wears the stale tag instead of reading fresh.
+    cadence: 'daily',
     changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
+    staleAfterDays: 4,
   },
   {
     // Fix spec C-06 (2026-10-14): "What markets expect from the RBA" — the
@@ -639,10 +648,13 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     name: 'What markets expect from the RBA (3-year gap)',
     source: 'derived',
     sourceRef: 'RBA F2 FCMYGBAG3D (3-year bond) − RBA F1 cash rate target',
-    cadence: 'weekly',
+    // Defect E-06 (2026-10-16): the 3-year leg is the same daily F2 table —
+    // daily cadence, 4-day max age (the lag is publication-side, not cadence).
+    cadence: 'daily',
     changeKind: 'points',
     phase: 'P2',
     rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
+    staleAfterDays: 4,
   },
   {
     id: 'au-us-10y-gap',
@@ -651,12 +663,13 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     name: 'Australia vs US 10-year yield gap',
     source: 'derived',
     sourceRef: 'RBA F2 10y − FRED:DGS10',
-    // Weekly cadence (not daily): RBA F2 publishes with a 2–4 business-day
-    // lag (Phase I2 venue finding, docs/insights/03-data-sources.md).
-    cadence: 'weekly',
+    // Defect E-06 (2026-10-16): the Australian leg is the daily F2 table —
+    // daily cadence, 4-day max age. The same-date join (B-10/gapLegs) stays.
+    cadence: 'daily',
     changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'threshold', direction: 'below', value: 0 },
+    staleAfterDays: 4,
   },
   {
     // An index, not a pump price (data spec §3 note) — context item.

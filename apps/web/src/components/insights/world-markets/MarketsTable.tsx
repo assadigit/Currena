@@ -11,8 +11,8 @@ import {
   DirectionGlyph,
   fmtClose,
   signedPct,
-  STATUS_TONE,
-  STATUS_WORD,
+  statusToneOf,
+  statusWordKeyOf,
   TREND_WORD_OF,
   tradingDaysBehind,
   trendOf,
@@ -107,8 +107,8 @@ export function MarketsTable({
                   {trendCell(m)}
                 </td>
                 <td className="px-2 py-1.5">
-                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.68rem] font-bold ${STATUS_TONE[m.status]}`}>
-                    {copy.markets[STATUS_WORD[m.status]]}
+                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.68rem] font-bold ${statusToneOf(m.fromHigh)}`}>
+                    {copy.markets[statusWordKeyOf(m.fromHigh)]}
                   </span>
                 </td>
                 <td className="px-2 py-1.5 text-end tabular-nums">
@@ -168,7 +168,7 @@ export function MarketsTable({
                   <span className="sr-only"> {copy.markets.thFromHigh}</span>
                 </bdi>
               </span>
-              <span className="sr-only">{copy.markets[TREND_WORD_OF[trendOf(m)]]}, {copy.markets[STATUS_WORD[m.status]]}</span>
+              <span className="sr-only">{copy.markets[TREND_WORD_OF[trendOf(m)]]}, {copy.markets[statusWordKeyOf(m.fromHigh)]}</span>
               {tradingDaysBehind(m.asOf, freshestIso) > 1 ? (
                 <span className="rounded-full bg-currena-muted/15 px-1.5 py-0.5 text-[0.68rem] font-semibold text-[var(--color-text-secondary)]">
                   {copy.markets.delayedTag}

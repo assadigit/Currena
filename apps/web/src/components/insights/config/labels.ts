@@ -4,7 +4,7 @@
  */
 
 import { formatNumber, formatDateWords } from '@currena/core';
-import type { IndicatorId, WarningRule, WarningRuleAtom } from '@currena/core';
+import type { IndicatorId, MarketEntry, WarningRule, WarningRuleAtom } from '@currena/core';
 import { cadenceUsesPreviousRelease } from '@currena/insights';
 import { interpolate } from '../../../i18n';
 import { DISPLAY } from './display';
@@ -26,21 +26,62 @@ export function changeWindowLabel(id: IndicatorId): ChangeWindowLabel {
   return '30d';
 }
 
+/* ------------------------------------------------------------------ *
+ * Defect E-22 (2026-10-16) — Step 3 L2-01: the stock-market STATE words.
+ * From the distance below the 52-week high (CLOSING basis — fromHigh is
+ * last close vs the 52-week closing high): within 5%: Near its high ·
+ * 5–10%: Pullback · 10–20%: Correction · 20% or more: Bear market. Common
+ * market conventions, stated in the section's how-it-is-calculated copy.
+ * The stored coarse band (m.status) keeps driving the summary counts; the
+ * word the reader sees is this one.
+ * ------------------------------------------------------------------ */
+
+/** Correction → the needs-attention tone; Bear → the unusual tone (§8.2). */
+export const STATUS_TONE: Record<MarketEntry['status'], string> = {
+  normal: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
+  correction: 'bg-currena-warning/15 text-[var(--color-status-alert)]',
+  bear: 'bg-currena-warning/10 text-[var(--color-status-watch)]',
+};
+
+export type StockStateWordKey = 'statusNearHigh' | 'statusPullback' | 'statusCorrection' | 'statusBear';
+
+export function statusWordKeyOf(fromHigh: number): StockStateWordKey {
+  if (fromHigh > -5) return 'statusNearHigh';
+  if (fromHigh > -10) return 'statusPullback';
+  if (fromHigh > -20) return 'statusCorrection';
+  return 'statusBear';
+}
+
+/** The tone follows the same L2-01 line the word reads from (E-22). */
+export function statusToneOf(fromHigh: number): string {
+  if (fromHigh > -10) return STATUS_TONE.normal;
+  if (fromHigh > -20) return STATUS_TONE.correction;
+  return STATUS_TONE.bear;
+}
+
 /**
  * "Data for August 2026" for monthly/quarterly observations (the asOf
  * month/quarter), "as of {date}" for daily ones. Locale-aware, UTC-safe
  * (formatDateWords' date-only fix).
+ *
+ * Defect E-07 (2026-10-16): when the reading carries its STORED period end
+ * (snapshot.ts stamps periodStart/periodEnd on every quarterly reading),
+ * the quarter is named from that end month — the sources disagree on the
+ * dating basis (ABS/FRED quarter-start, RBA E2 quarter-end) and both must
+ * label identically (2026-04-01 and 2026-06-30 are both "June quarter 2026").
  */
 export function dataPeriodText(
   id: IndicatorId,
   asOf: string,
   locale: 'en' | 'fa',
   numberLocale: 'en-US' | 'fa-IR',
+  periodEnd?: string,
 ): string {
   const def = definitionFor(id);
   if (def.cadence === 'quarterly') {
     // Fix spec B-07 (2026-10-14): quarterly data is labelled by QUARTER NAME
     // and period end ("June quarter 2026") — never a bare month name.
+    if (periodEnd !== undefined) return quarterLabelFromPeriodEnd(periodEnd, locale);
     return quarterPeriodText(asOf, locale);
   }
   if (def.cadence === 'monthly' || def.cadence === 'manual') {
@@ -62,14 +103,24 @@ export function quarterPeriodText(asOf: string, locale: 'en' | 'fa'): string {
   const [y, m] = asOf.split('-').map(Number) as [number, number, number];
   const endMonth = m + 2 > 12 ? m - 10 : m + 2;
   const endYear = m + 2 > 12 ? y + 1 : y;
+  return quarterLabelFromPeriodEnd(`${endYear}-${String(endMonth).padStart(2, '0')}-01`, locale);
+}
+
+/**
+ * The quarter label from the period's END month (defect E-07, 2026-10-16):
+ * "June quarter 2026" / «سه‌ماههٔ ژوئن ۲۰۲۶» — the Australian convention,
+ * identical for both source dating bases.
+ */
+export function quarterLabelFromPeriodEnd(periodEnd: string, locale: 'en' | 'fa'): string {
+  const [y, m] = periodEnd.split('-').map(Number) as [number, number, number];
   const monthName = new Intl.DateTimeFormat(
     locale === 'fa' ? 'fa-IR-u-ca-gregory' : 'en-US-u-ca-gregory',
     { month: 'long', timeZone: 'UTC' },
-  ).format(new Date(Date.UTC(endYear, endMonth - 1, 1)));
+  ).format(new Date(Date.UTC(y, m - 1, 1)));
   const yearText = new Intl.DateTimeFormat(locale === 'fa' ? 'fa-IR-u-ca-gregory' : 'en-US-u-ca-gregory', {
     year: 'numeric',
     timeZone: 'UTC',
-  }).format(new Date(Date.UTC(endYear, 0, 1)));
+  }).format(new Date(Date.UTC(y, 0, 1)));
   return locale === 'fa' ? `سه‌ماههٔ ${monthName} ${yearText}` : `${monthName} quarter ${yearText}`;
 }
 

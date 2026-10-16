@@ -49,11 +49,15 @@ export const FRED_SERIES = {
   govtReceipts: 'W006RC1Q027SBEA',
   brent: 'DCOILBRENTEU',
   m2Us: 'M2SL',
-  // I15 (2026-10-08 data spec §3):
-  usCpiIndex: 'CPIAUCSL', // us-cpi-yoy: 12-month % change, computed
+  // I15 (2026-10-08 data spec §3). Defect E-14 (2026-10-16): the BLS
+  // headline annual rate is published from the NOT seasonally adjusted
+  // index, so the YoY rates here compute from the NSA series (CPIAUCNS /
+  // CPILFENS) — the SA siblings (CPIAUCSL / CPILFESL) can differ by a few
+  // hundredths and are retired from this pipeline.
+  usCpiIndex: 'CPIAUCNS', // us-cpi-yoy: 12-month % change, computed (NSA — the BLS headline basis)
   // Step-1 audit item A3: core CPI (ex food & energy) — the context
-  // companion shown on the US inflation card.
-  usCpiCoreIndex: 'CPILFESL', // us-cpi-core-yoy: 12-month % change, computed
+  // companion shown on the US inflation card (NSA, same defect E-14 basis).
+  usCpiCoreIndex: 'CPILFENS', // us-cpi-core-yoy: 12-month % change, computed (NSA)
   fedTargetLower: 'DFEDTARL', // fed-target: the lower bound of the target range
   fedTargetUpper: 'DFEDTARU', // …and its upper bound (rangeHigh on the reading)
   nfci: 'NFCI', // Chicago Fed National Financial Conditions, weekly

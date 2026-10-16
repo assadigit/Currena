@@ -28,6 +28,7 @@ import type { InsightsSnapshot, IndicatorReading } from '@currena/core';
 import { csvEscapeField, csvNeutralizeFormula } from '@currena/core';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { DISPLAY, type UnitToken } from './config';
+import { tierOf } from './config/movers';
 
 /** All-ASCII number rendering for CSV cells (machine-readable). */
 function csvNumber(value: number, maximumFractionDigits = 6): string {
@@ -65,8 +66,26 @@ export function insightsCsvHeaders(copy: InsightsCopy): string[] {
   ];
 }
 
+/**
+ * Defect E-21 (2026-10-16): the CSV's status word is the PAGE's two-tier
+ * word (tierOf) — "Unusual" for a normal-status reading parked in the top
+ * or bottom 10% of its own 10-year range, never a plain "Normal".
+ */
 function statusWord(reading: IndicatorReading, copy: InsightsCopy): string {
-  return copy.status[reading.status];
+  const tier = tierOf(reading);
+  const key =
+    tier === 'needs-attention'
+      ? 'warning'
+      : tier === 'unusual'
+        ? 'unusual'
+        : tier === 'normal'
+          ? 'normal'
+          : tier === 'context'
+            ? 'context'
+            : tier === 'unavailable'
+              ? 'unavailable'
+              : 'stale';
+  return copy.status[key];
 }
 
 /**
@@ -84,7 +103,9 @@ export function buildInsightsCsv(snapshot: InsightsSnapshot, copy: InsightsCopy)
         csvText(reading.id),
         csvText(ind.name),
         csvText(ind.ticker ?? ''),
-        reading.value === null ? '' : csvNumber(reading.value),
+        // Defect E-10 (2026-10-16): the DISPLAYED value — the display scale
+        // (m2-us: billions → trillions) applied, so value and unit agree.
+        reading.value === null ? '' : csvNumber(reading.value * (DISPLAY[reading.id]?.scale ?? 1)),
         csvText(copy.units[unitToken]),
         csvText(statusWord(reading, copy)),
         csvOptional(reading.change7d),

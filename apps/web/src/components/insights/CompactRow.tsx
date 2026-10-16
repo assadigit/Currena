@@ -102,7 +102,7 @@ export function CompactRow({
   // 2026") — never hidden to the details panel, including Normal cards.
   const dataDate =
     reading.asOf !== null
-      ? dataPeriodText(reading.id, reading.asOf, numberLocale === 'fa-IR' ? 'fa' : 'en', numberLocale)
+      ? dataPeriodText(reading.id, reading.asOf, numberLocale === 'fa-IR' ? 'fa' : 'en', numberLocale, reading.periodEnd)
       : null;
   const changeLabel = changeWindowLabel(reading.id) === 'since-previous' ? copy.ui.sincePreviousRelease : copy.ui.days30;
   // Fix spec A-02 (2026-10-14): the needs-attention line is GENERATED from

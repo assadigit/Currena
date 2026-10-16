@@ -74,6 +74,14 @@ export interface ConnectionLegRule {
   /** The windows checked (days): 7 uses change7d, 30 change30d, 90 change90d. */
   windows: readonly { days: 7 | 30 | 90; minMove: number }[];
   /**
+   * Defect E-19 (2026-10-16): the connection's TRIGGER — the leg whose move
+   * the tendency describes ("when oil jumps", "a strong dollar weighs on…").
+   * A card may read Active or Partly active ONLY when its trigger leg has
+   * itself moved; without the trigger the tendency is not in play and the
+   * card shows "Not showing", regardless of the other legs' moves.
+   */
+  trigger?: true;
+  /**
    * A display-only caveat for the leg's label (B-04): the debt leg is a
    * debt-to-income LEVEL, not a servicing ratio.
    */
@@ -111,6 +119,8 @@ export interface LegEval {
   moveWindow: 7 | 30 | 90 | null;
   /** Did this leg MEET its rule (move ≥ minMove over any window)? */
   moved: boolean;
+  /** Defect E-19: this leg is the connection's trigger (the card says so). */
+  trigger?: true;
   caveat?: 'debt-level';
 }
 
@@ -139,61 +149,65 @@ const UNREADABLE_STATUS = new Set(['stale', 'check-pending', 'unavailable']);
  */
 export const CONNECTIONS: readonly ConnectionDef[] = [
   // (1) real yields and gold — the classic see-saw (inverse co-movement).
+  // Windows are per-leg and DOCUMENTED (E-20): the real yield's 30-day
+  // points move vs gold's 30-day percent move.
   {
     id: 'real-yields-gold',
     polarity: 'inverse',
     legs: [
-      { id: 'real-yield-10y', role: 'required', windows: [{ days: 30, minMove: 0.1 }] },
+      { id: 'real-yield-10y', role: 'required', windows: [{ days: 30, minMove: 0.1 }], trigger: true },
       { id: 'gold-usd', role: 'required', windows: [{ days: 30, minMove: 3 }] },
     ],
   },
   // (2) the dollar and gold and oil — a strong dollar tends to weigh on
   // dollar-priced commodities (inverse co-movement, three legs). Uniform
   // method (B-04): direction over the same window with a minimum move —
-  // dollar up + gold down is the pattern WORKING.
+  // dollar up + gold down is the pattern WORKING. Windows (E-20, shown on
+  // the card): dollar 30d/1pt · gold 30d/3% · oil 30d/5% OR 90d/25% (the
+  // 90-day leg mirrors the Brent card's own scored rule — a +65%-a-year
+  // move can hide behind a calm month).
   {
     id: 'dollar-gold-oil',
     polarity: 'inverse',
     legs: [
-      { id: 'dollar-basket', role: 'required', windows: [{ days: 30, minMove: 1 }] },
+      { id: 'dollar-basket', role: 'required', windows: [{ days: 30, minMove: 1 }], trigger: true },
       { id: 'gold-usd', role: 'required', windows: [{ days: 30, minMove: 3 }] },
-      // B-04: check several windows for oil — a +65%-a-year move can hide
-      // behind a calm month (30-day noise band) — the 90-day leg mirrors
-      // the Brent card's own scored rule (25% over 13 weeks).
       { id: 'brent', role: 'required', windows: [{ days: 30, minMove: 5 }, { days: 90, minMove: 25 }] },
     ],
   },
   // (3) oil and inflation expectations and borrowing costs — the chain
   // (same-direction co-movement). A card may be Active only if every
-  // required leg meets its rule (B-04).
+  // required leg meets its rule (B-04) AND the oil trigger leg moved
+  // (E-19 — the tendency is "when oil jumps").
   {
     id: 'oil-expectations-costs',
     polarity: 'same',
     legs: [
-      { id: 'brent', role: 'required', windows: [{ days: 30, minMove: 5 }, { days: 90, minMove: 25 }] },
+      { id: 'brent', role: 'required', windows: [{ days: 30, minMove: 5 }, { days: 90, minMove: 25 }], trigger: true },
       { id: 'breakeven-5y5y', role: 'required', windows: [{ days: 30, minMove: 0.1 }] },
       { id: 'us10y', role: 'required', windows: [{ days: 30, minMove: 0.15 }] },
     ],
   },
   // (4) copper-to-gold and China factory activity — the growth mix. B-04:
   // the US money-supply leg is REMOVED (the link is weak); the card keeps
-  // its two strong legs.
+  // its two strong legs. Trigger (E-19): China factory activity.
   {
     id: 'copper-china-growth',
     polarity: 'same',
     legs: [
       { id: 'copper-gold', role: 'required', windows: [{ days: 30, minMove: 0.08 }] },
-      { id: 'china-pmi', role: 'required', windows: [{ days: 30, minMove: 0.25 }] },
+      { id: 'china-pmi', role: 'required', windows: [{ days: 30, minMove: 0.25 }], trigger: true },
     ],
   },
   // (5) iron ore and terms of trade and the Australian dollar — the export
   // chain, with the US dollar as a CONTEXT leg (B-04: an AUD fall is often
-  // mostly dollar strength — displayed, never gating).
+  // mostly dollar strength — displayed, never gating). Trigger (E-19):
+  // iron ore.
   {
     id: 'iron-terms-aud',
     polarity: 'same',
     legs: [
-      { id: 'iron-ore', role: 'required', windows: [{ days: 30, minMove: 5 }] },
+      { id: 'iron-ore', role: 'required', windows: [{ days: 30, minMove: 5 }], trigger: true },
       { id: 'terms-of-trade', role: 'required', windows: [{ days: 30, minMove: 1 }] },
       { id: 'audusd', role: 'required', windows: [{ days: 30, minMove: 2 }] },
       { id: 'dollar-basket', role: 'context', windows: [{ days: 30, minMove: 1 }] },
@@ -203,12 +217,13 @@ export const CONNECTIONS: readonly ConnectionDef[] = [
   // pass-through card (B-04): the decision is compared with the loan rate
   // 1–3 months LATER; 'pending' until that data exists. The debt leg is
   // context, labelled as a debt-to-income level (not a servicing cost).
+  // Trigger (E-19): the cash-rate decision itself.
   {
     id: 'rba-loan-debt',
     polarity: 'same',
     passThrough: true,
     legs: [
-      { id: 'rba-cash-rate', role: 'required', windows: [{ days: 30, minMove: 0.1 }] },
+      { id: 'rba-cash-rate', role: 'required', windows: [{ days: 30, minMove: 0.1 }], trigger: true },
       { id: 'au-home-loan', role: 'required', windows: [{ days: 30, minMove: 0.05 }] },
       { id: 'au-household-debt-arrears', role: 'context', windows: [{ days: 30, minMove: 0.5 }], caveat: 'debt-level' },
     ],
@@ -247,6 +262,7 @@ export function evalConnectionLeg(rule: ConnectionLegRule, reading: IndicatorRea
       move: best.change,
       moveWindow: best.days,
       moved: true,
+      ...(rule.trigger !== undefined ? { trigger: true } : {}),
       ...(rule.caveat !== undefined ? { caveat: rule.caveat } : {}),
     };
   }
@@ -260,6 +276,7 @@ export function evalConnectionLeg(rule: ConnectionLegRule, reading: IndicatorRea
     move: display?.change ?? null,
     moveWindow: display?.days ?? null,
     moved: false,
+    ...(rule.trigger !== undefined ? { trigger: true } : {}),
     ...(rule.caveat !== undefined ? { caveat: rule.caveat } : {}),
   };
 }
@@ -367,6 +384,16 @@ export function evaluateConnection(
   // A required leg with NO measurable change at all also blocks the read.
   if (legs.some((l) => l.role === 'required' && l.move === null)) {
     return { connection: def.id, state: 'unknown', legs };
+  }
+
+  // Defect E-19 (2026-10-16): the TRIGGER leg gates the read. The tendency
+  // describes what happens when the trigger moves ("when oil jumps"); with
+  // the trigger steady the tendency is simply not in play — the card shows
+  // "Not showing" no matter how the other legs moved (the 15 Oct export's
+  // "Partly active" with oil falling was exactly this error).
+  const triggerLeg = legs.find((l) => l.trigger === true);
+  if (triggerLeg !== undefined && !triggerLeg.moved) {
+    return { connection: def.id, state: 'inactive', legs };
   }
 
   // Relation-relative sign: for 'inverse' connections, legs after the first

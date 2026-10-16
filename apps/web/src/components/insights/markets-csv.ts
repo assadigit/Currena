@@ -13,7 +13,9 @@
 import { formatNumber } from '@currena/core';
 import { csvEscapeField, csvNeutralizeFormula } from '@currena/core';
 import type { MarketsSnapshot, MarketEntry } from '@currena/core';
+import { TREND_BAND_PCT } from '@currena/insights/markets/definitions';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { statusWordKeyOf } from './config/labels';
 
 function csvNumber(value: number, maximumFractionDigits = 2): string {
   return formatNumber(value, 'en-US', { maximumFractionDigits });
@@ -45,12 +47,17 @@ function marketsCsvHeaders(copy: InsightsCopy): string[] {
   ];
 }
 
+// Defect E-18 (2026-10-16): the Trend word is recomputed from the chg3m
+// number the row shows (≥ +1% Up, ≤ −1% Down, else Flat) — reproducible
+// from the stated rule, never the stored field's old basis.
 function trendWord(m: MarketEntry, copy: InsightsCopy): string {
-  return copy.markets[m.trend === 'up' ? 'trendUp' : m.trend === 'down' ? 'trendDown' : 'trendFlat'];
+  return copy.markets[m.chg3m >= TREND_BAND_PCT ? 'trendUp' : m.chg3m <= -TREND_BAND_PCT ? 'trendDown' : 'trendFlat'];
 }
 
+// Defect E-22 (2026-10-16): the L2-01 stock-state words from the distance
+// below the 52-week high (closing basis) — never "Normal".
 function statusWord(m: MarketEntry, copy: InsightsCopy): string {
-  return copy.markets[m.status === 'correction' ? 'statusCorrection' : m.status === 'bear' ? 'statusBear' : 'statusNormal'];
+  return copy.markets[statusWordKeyOf(m.fromHigh)];
 }
 
 export function buildMarketsCsv(snapshot: MarketsSnapshot, copy: InsightsCopy): string {

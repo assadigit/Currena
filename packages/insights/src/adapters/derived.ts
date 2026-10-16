@@ -239,20 +239,26 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   if (fred.A091RC1Q027SBEA && fred.W006RC1Q027SBEA) {
     put(
       'govt-interest-revenue',
-      combineSeries(fred.A091RC1Q027SBEA, fred.W006RC1Q027SBEA, (interest, receipts) => interest / receipts),
+      // Defect E-11 (2026-10-16): the share is stored as a PERCENTAGE
+      // (33.55), not a fraction labelled '%' — the display scale becomes 1
+      // and the export/CSV no longer show 0.335539 under a % header.
+      combineSeries(fred.A091RC1Q027SBEA, fred.W006RC1Q027SBEA, (interest, receipts) => (interest / receipts) * 100),
     );
   }
-  // Fix spec C-03 (2026-10-14): the 2-year yield minus the Fed policy rate
-  // (the target range's lower bound — the same leg fed-target renders).
-  if (fred.DGS2 && fred.DFEDTARL) {
-    put('fed-expectations', combineSeries(fred.DGS2, fred.DFEDTARL, (two, policy) => two - policy));
+  // Fix spec C-03 (2026-10-14), amended by defect E-15 (2026-10-16): the
+  // 2-year yield minus the policy-rate MIDPOINT (L2-08: (DFEDTARL +
+  // DFEDTARU)/2) — the lower bound understated the gap by half a step
+  // (0.125 pts at the current 25bp corridor).
+  if (fred.DGS2 && fred.DFEDTARL && fred.DFEDTARU) {
+    const mid = combineSeries(fred.DFEDTARL, fred.DFEDTARU, (lower, upper) => (lower + upper) / 2);
+    put('fed-expectations', combineSeries(fred.DGS2, mid, (two, policy) => two - policy));
   }
   // Fix spec C-04 (2026-10-14): the US 30-year Treasury yield.
   put('us30y', fred.DGS30);
 
   /* ---------------- Global — Are prices heating up? ---------------- */
-  if (fred.CPIAUCSL) put('us-cpi-yoy', yoyPctSeries(fred.CPIAUCSL));
-  if (fred.CPILFESL) put('us-cpi-core-yoy', yoyPctSeries(fred.CPILFESL));
+  if (fred.CPIAUCNS) put('us-cpi-yoy', yoyPctSeries(fred.CPIAUCNS));
+  if (fred.CPILFENS) put('us-cpi-core-yoy', yoyPctSeries(fred.CPILFENS));
   put('breakeven-5y5y', fred.T5YIFR);
 
   /* ---------------- Global — Are markets nervous? ---------------- */
@@ -559,14 +565,14 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     url: 'https://data.ecb.europa.eu/data/datasets/FM/B.EUR.4F.KR.DFR.LEV',
   },
   'govt-interest-revenue': { name: 'FRED (BEA series, derived)', url: 'https://fred.stlouisfed.org/series/A091RC1Q027SBEA' },
-  'fed-expectations': { name: 'FRED (DGS2 − DFEDTARL)', url: 'https://fred.stlouisfed.org/series/DGS2' },
+  'fed-expectations': { name: 'FRED (DGS2 − policy-rate midpoint)', url: 'https://fred.stlouisfed.org/series/DGS2' },
   us30y: { name: 'FRED (DGS30)', url: 'https://fred.stlouisfed.org/series/DGS30' },
   'philly-fed': {
     name: 'FRED (GACDFSA066MSFRBPHI), Philadelphia Fed',
     url: 'https://fred.stlouisfed.org/series/GACDFSA066MSFRBPHI',
   },
-  'us-cpi-yoy': { name: 'FRED (CPIAUCSL)', url: 'https://fred.stlouisfed.org/series/CPIAUCSL' },
-  'us-cpi-core-yoy': { name: 'FRED (CPILFESL)', url: 'https://fred.stlouisfed.org/series/CPILFESL' },
+  'us-cpi-yoy': { name: 'FRED (CPIAUCNS, not seasonally adjusted)', url: 'https://fred.stlouisfed.org/series/CPIAUCNS' },
+  'us-cpi-core-yoy': { name: 'FRED (CPILFENS, not seasonally adjusted)', url: 'https://fred.stlouisfed.org/series/CPILFENS' },
   'breakeven-5y5y': { name: 'FRED (T5YIFR)', url: 'https://fred.stlouisfed.org/series/T5YIFR' },
   'stress-stlfsi': { name: 'FRED (STLFSI4)', url: 'https://fred.stlouisfed.org/series/STLFSI4' },
   nfci: { name: 'FRED (NFCI)', url: 'https://fred.stlouisfed.org/series/NFCI' },

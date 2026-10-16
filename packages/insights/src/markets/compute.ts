@@ -43,7 +43,6 @@ import {
   PROVIDER_AGREEMENT_PCT,
   STALE_DAYS,
   TREND_BAND_PCT,
-  TREND_MA_DAYS,
   UNUSUAL_COUNT,
   US_OVERRIDE_IDS,
   WEEKLY_POINTS,
@@ -55,14 +54,6 @@ import {
 /* ------------------------------------------------------------------ *
  * Per-market derived numbers (§5.1)
  * ------------------------------------------------------------------ */
-
-/** Trading-day moving average of the last `n` closes. */
-function movingAverage(points: readonly SeriesPoint[], n: number): number | null {
-  if (points.length < n) return null;
-  let sum = 0;
-  for (let i = points.length - n; i < points.length; i++) sum += points[i]!.value;
-  return sum / n;
-}
 
 /**
  * Storage precision: indices are quoted to two decimals and the UI never
@@ -85,14 +76,20 @@ function pctChange(last: number, base: number | undefined | null): number | null
   return ((last - base) / base) * 100;
 }
 
-/** Trend vs the 50-day average (§5.1): up > +1%, down < −1%, else flat. */
+/**
+ * Trend vs the table's own 3-month window (defect E-18, 2026-10-16): the
+ * label is reproducible from the number printed beside it — ≥ +1.0% Up,
+ * ≤ −1.0% Down, otherwise Flat (the ±1% band is TREND_BAND_PCT). The old
+ * 50-day-average basis produced labels that contradicted the displayed
+ * 3-month change (DAX +1.54% labelled "Down").
+ */
 export function trendOf(points: readonly SeriesPoint[]): 'up' | 'flat' | 'down' {
   const last = points[points.length - 1]!;
-  const ma = movingAverage(points, TREND_MA_DAYS);
-  if (ma === null || ma <= 0) return 'flat';
-  const delta = ((last.value - ma) / ma) * 100;
-  if (delta > TREND_BAND_PCT) return 'up';
-  if (delta < -TREND_BAND_PCT) return 'down';
+  const windowAgo = pointAtOrBefore(points, addDays(last.date, -CHG_WINDOW_DAYS));
+  const chg = pctChange(last.value, windowAgo?.value);
+  if (chg === null) return 'flat';
+  if (chg >= TREND_BAND_PCT) return 'up';
+  if (chg <= -TREND_BAND_PCT) return 'down';
   return 'flat';
 }
 

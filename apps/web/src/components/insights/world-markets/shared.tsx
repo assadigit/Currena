@@ -110,18 +110,11 @@ export function fmtClose(close: number, numberLocale: 'en-US' | 'fa-IR'): string
   return formatNumber(close, numberLocale, { maximumFractionDigits: close >= 1000 ? 0 : 2 });
 }
 
-/** Correction → the needs-attention tone; Bear → the unusual tone (§8.2). */
-export const STATUS_TONE: Record<MarketEntry['status'], string> = {
-  normal: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
-  correction: 'bg-currena-warning/15 text-[var(--color-status-alert)]',
-  bear: 'bg-currena-warning/10 text-[var(--color-status-watch)]',
-};
-
-export const STATUS_WORD: Record<MarketEntry['status'], 'statusNormal' | 'statusCorrection' | 'statusBear'> = {
-  normal: 'statusNormal',
-  correction: 'statusCorrection',
-  bear: 'statusBear',
-};
+// Defect E-22: the L2-01 stock-state words + tones live in config/labels.ts
+// (pure, shared with the full-export + CSV builders) — re-exported here for
+// the section's components.
+export { STATUS_TONE, statusToneOf, statusWordKeyOf } from '../config/labels';
+export type { StockStateWordKey } from '../config/labels';
 
 /** Step-1 F2: the trend WORD key for trendOf's result (chg3m-sourced). */
 export const TREND_WORD_OF: Record<'up' | 'flat' | 'down', 'trendUp' | 'trendFlat' | 'trendDown'> = {

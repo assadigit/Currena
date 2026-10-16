@@ -126,9 +126,12 @@ describe('evalConnectionLeg (B-04 uniform method)', () => {
  * ---------------------------------------------------------------- */
 
 describe('evaluateConnection (v2 rules)', () => {
-  it('B-04: never Active with a steady required leg — the audited oil chain', () => {
-    // The audited state: oil steady on the month, expectations steady —
-    // only borrowing costs moved. The card must NOT read active.
+  it('B-04 + E-19: never Active — and never Partly — when the TRIGGER leg is steady (the audited oil chain)', () => {
+    // The audited state (E-19's exact case): oil steady on the month (the
+    // trigger — the tendency is "when oil jumps"), expectations steady —
+    // only borrowing costs moved. The card must NOT read active (B-04)
+    // and, since E-19, not "partly" either: without the trigger the
+    // tendency is not in play. "Not showing" (inactive) is the honest read.
     const readings = [
       reading('brent', { change30d: 2, change90d: 3 }),
       reading('breakeven-5y5y', { change30d: 0.02 }),
@@ -136,6 +139,16 @@ describe('evaluateConnection (v2 rules)', () => {
     ];
     const r = evaluateConnection(def('oil-expectations-costs'), readings);
     expect(r.state).not.toBe('active');
+    expect(r.state).toBe('inactive');
+  });
+
+  it('E-19: partly survives when the TRIGGER moved and a follower did not (oil up, costs up, expectations steady)', () => {
+    const readings = [
+      reading('brent', { change30d: 6.2, change90d: 31 }),
+      reading('breakeven-5y5y', { change30d: 0.02 }),
+      reading('us10y', { change30d: 0.49 }),
+    ];
+    const r = evaluateConnection(def('oil-expectations-costs'), readings);
     expect(r.state).toBe('partly');
   });
 
@@ -339,18 +352,24 @@ describe('evaluateConnection (v2 rules)', () => {
       evaluateConnections(live).map((r) => [r.connection, r.state]),
     );
     expect(states).toEqual({
-      // Real yields rising vs gold falling — the see-saw working.
+      // Real yields rising vs gold falling — the see-saw working (trigger
+      // leg — the real yield — moved).
       'real-yields-gold': 'active',
       // The dollar rising against soft commodities — the usual pressure
-      // pattern (B-04: this is the structure WORKING, not a disagreement).
+      // pattern (B-04: this is the structure WORKING, not a disagreement;
+      // the trigger leg — the dollar — moved).
       'dollar-gold-oil': 'active',
       // Oil's recent leg is down (30d −12.9%) while yields rose — the
       // chain's legs point both ways; NOT active (the audited bug class).
+      // The oil trigger itself moved, so the state survives (E-19).
       'oil-expectations-costs': 'disagree',
-      // The copper/gold ratio firmed but China's PMI is steady — one leg.
-      'copper-china-growth': 'partly',
-      // Only the AUD moves (down, past 2%) — one leg, no opposition.
-      'iron-terms-aud': 'partly',
+      // The copper/gold ratio firmed but China's PMI (the E-19 trigger —
+      // the tendency is about China's growth) is steady: without the
+      // trigger the tendency is not in play → "Not showing" (E-19).
+      'copper-china-growth': 'inactive',
+      // Iron ore (the E-19 trigger) is steady; only the AUD moves (down,
+      // past 2%) — without the trigger the export chain is not in play.
+      'iron-terms-aud': 'inactive',
       // The Sep 30 hike is newer than the August loan data.
       'rba-loan-debt': 'pending',
     });

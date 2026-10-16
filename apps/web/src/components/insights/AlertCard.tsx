@@ -116,7 +116,10 @@ export function AlertCard({
   // official release date follows when the schedule knows it, and a stale
   // reading wears its tag — never a fetch-date "Updated Jul 31".
   const locale = numberLocale === 'fa-IR' ? 'fa' : 'en';
-  const dataDate = reading.asOf !== null ? dataPeriodText(reading.id, reading.asOf, locale, numberLocale) : null;
+  const dataDate =
+    reading.asOf !== null
+      ? dataPeriodText(reading.id, reading.asOf, locale, numberLocale, reading.periodEnd)
+      : null;
   const releaseText =
     reading.releaseDate !== undefined
       ? formatAsOf(reading.releaseDate, locale)

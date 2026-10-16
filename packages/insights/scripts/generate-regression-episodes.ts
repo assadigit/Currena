@@ -85,7 +85,7 @@ function downsample(series: readonly SeriesPoint[], asOf: string, dailyWindowDay
 const chinaPmi = parseManualSeries(
   JSON.parse(readFileSync(new URL('data/manual/china-pmi.json', repoRoot), 'utf8')),
   'china-pmi',
-);
+).points;
 
 console.log('[regression] fetching live sources…');
 const { inputs } = await collectAllSources();

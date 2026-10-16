@@ -561,6 +561,16 @@ export const IndicatorReadingSchema = z
     value: z.number().finite().nullable(),
     /** Observation date of the value (YYYY-MM-DD); null iff status is 'unavailable'. */
     asOf: z.iso.date().nullable(),
+    /**
+     * Defect E-07 (2026-10-16): a QUARTERLY observation's period start and
+     * period end, stored on the reading so the card can name the quarter
+     * ("June quarter 2026") regardless of which date the source series
+     * carries (ABS/FRED quarterlies are quarter-START dated, RBA E2 is
+     * quarter-END dated — the same quarter must label identically).
+     * Absent on non-quarterly series.
+     */
+    periodStart: z.iso.date().optional(),
+    periodEnd: z.iso.date().optional(),
     /** 7-day change in `changeKind` units (pct or points); absent when not measurable. */
     change7d: z.number().finite().optional(),
     /** 30-day change, same units; absent when not measurable. */

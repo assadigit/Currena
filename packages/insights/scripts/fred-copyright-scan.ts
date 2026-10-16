@@ -10,7 +10,7 @@
  *   corepack pnpm --filter @currena/insights exec tsx scripts/fred-copyright-scan.ts
  */
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 

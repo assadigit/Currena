@@ -8,6 +8,7 @@ import {
   downsampleSeries,
   HISTORY_MAX_POINTS,
   HISTORY_WINDOW_DAYS,
+  quarterPeriodOf,
 } from './snapshot';
 
 const NOW = '2026-10-07T04:20:00.000Z';
@@ -279,6 +280,71 @@ describe('buildInsightsSnapshot', () => {
     expect(snap.changedThisWeek).toEqual([
       { id: 'us10y', from: 'normal', to: 'warning', asOf: addDays('2026-10-07', -2) },
     ]);
+  });
+});
+
+
+describe('defect fixes E-07 / E-08 / E-09 (2026-10-16)', () => {
+  it('E-07: quarterly readings carry their period start/end — both source dating bases name the SAME quarter', () => {
+    // ABS/FRED convention: the quarter dated by its START (2026-04-01 → June quarter).
+    const absLike = buildInsightsSnapshot({
+      series: { 'govt-interest-revenue': [{ date: '2026-04-01', value: 33.55 }] },
+      calendar: [],
+      now: NOW,
+    });
+    const abs = absLike.readings.find((r) => r.id === 'govt-interest-revenue')!;
+    expect(abs.periodStart).toBe('2026-04-01');
+    expect(abs.periodEnd).toBe('2026-06-30');
+    // RBA E2 convention: the quarter dated by its END (2026-06-30 → the same June quarter).
+    const rbaLike = buildInsightsSnapshot({
+      series: { 'au-household-debt-arrears': [{ date: '2026-06-30', value: 178.4 }] },
+      calendar: [],
+      now: NOW,
+    });
+    const rba = rbaLike.readings.find((r) => r.id === 'au-household-debt-arrears')!;
+    expect(rba.periodStart).toBe('2026-04-01');
+    expect(rba.periodEnd).toBe('2026-06-30');
+    // The pure helper agrees on both bases.
+    expect(quarterPeriodOf('2026-04-01')).toEqual({ start: '2026-04-01', end: '2026-06-30' });
+    expect(quarterPeriodOf('2026-06-30')).toEqual({ start: '2026-04-01', end: '2026-06-30' });
+    expect(quarterPeriodOf('2026-05-15')).toBeUndefined(); // not a quarter boundary
+  });
+
+  it('E-08: an expired manual entry wears the stale tag with its reason — never reads fresh', () => {
+    const series = { 'china-pmi': [{ date: '2026-09-30', value: 50.1 }] };
+    const fresh = buildInsightsSnapshot({
+      series,
+      calendar: [],
+      manualExpires: { 'china-pmi': '2026-10-31' },
+      now: NOW, // 2026-10-07 < expiry
+    });
+    expect(fresh.readings.find((r) => r.id === 'china-pmi')!.status).not.toBe('stale');
+    const expired = buildInsightsSnapshot({
+      series,
+      calendar: [],
+      manualExpires: { 'china-pmi': '2026-10-01' },
+      now: NOW, // past the expiry
+    });
+    const pmi = expired.readings.find((r) => r.id === 'china-pmi')!;
+    expect(pmi.status).toBe('stale');
+    expect(pmi.flag?.test).toBe('E-08');
+    expect(pmi.flag?.reason).toContain('expired');
+  });
+
+  it('E-09: released calendar events never ride the snapshot — only today-and-future', () => {
+    const snap = buildInsightsSnapshot({
+      series: { us10y: daily('2026-08-29', 40, 3) },
+      calendar: [
+        { id: 'us-cpi-2026-09', date: '2026-10-06', titleEn: 'US consumer price index: September 2026', titleFa: 'شاخص قیمت مصرف‌کننده', kind: 'us-cpi' },
+        { id: 'fed-2026-10', date: '2026-10-28', titleEn: 'Fed decision', titleFa: 'تصمیم فدرال رزرو', kind: 'fed' },
+        { id: 'rba-2026-11', date: NOW.slice(0, 10), titleEn: 'RBA decision', titleFa: 'تصمیم بانک مرکزی', kind: 'rba' },
+      ],
+      now: NOW,
+    });
+    const ids = snap.calendar.map((e) => e.id);
+    expect(ids).not.toContain('us-cpi-2026-09'); // released — gone
+    expect(ids).toContain('fed-2026-10'); // future — kept
+    expect(ids).toContain('rba-2026-11'); // today — kept (not yet released)
   });
 });
 

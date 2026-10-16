@@ -41,7 +41,15 @@ const snapshot: InsightsSnapshot = {
     reading({ id: 'yield-curve-10y2y', value: 0.48, change7d: 0.11, change30d: 0.07 }),
     reading({ id: 'us10y', value: 5.31, status: 'warning' }),
     // The prices board rows: gold prices + the context companions.
-    reading({ id: 'gold-usd', value: 5586.2, change7d: 12.3, change30d: -4.1, percentile10y: 0.97 }),
+    reading({
+      id: 'gold-usd',
+      value: 5586.2,
+      change7d: 12.3,
+      change30d: -4.1,
+      percentile10y: 0.97,
+      peak: { value: 5590, date: '2026-01-28', basis: 'daily-high' },
+      fromPeak10y: -22.6,
+    }),
     reading({ id: 'silver-usd', value: 121.3, status: 'context' }),
     reading({ id: 'btc-usd', value: 126198.07, status: 'context' }),
     reading({ id: 'gold-aud', value: 8420.5, status: 'context' }),
@@ -164,13 +172,33 @@ describe('assembleExportDoc', () => {
     expect(verdicts.rows[1]![6]).toBe('Stable'); // copy.label.relaxed
   });
 
-  it('keeps the prices board context lines on the gold row', () => {
+  it('keeps the prices board context lines on the right rows (E-03 futures note, E-13 BTC lines on bitcoin only)', () => {
     const doc = assembleExportDoc(input);
     const prices = doc.sections.find((s) => s.key === 'prices')!;
     const gold = prices.rows.find((r) => r[1] === 'gold-usd')!;
+    const btc = prices.rows.find((r) => r[1] === 'btc-usd')!;
+    const brent = prices.rows.find((r) => r[1] === 'brent')!;
     expect(gold[14]).toBe('expensive'); // percentile 0.97 → the high band
-    expect(String(gold[21])).toContain('22.6'); // btc ÷ gold, one decimal
-    expect(String(gold[21])).toContain('1040'); // btc ÷ silver, no grouping
+    // E-03: the futures wording rides the Brent/gold/silver detail lines.
+    expect(String(gold[21])).toContain('futures');
+    expect(String(brent[21])).toContain('futures');
+    expect(String(brent[21])).not.toContain('oz of gold'); // E-13: not on Brent
+    expect(String(gold[21])).not.toContain('oz of gold'); // E-13: not on gold
+    // E-13: the bitcoin-buying sentences live on the bitcoin row only.
+    expect(String(btc[21])).toContain('22.6'); // btc ÷ gold, one decimal
+    expect(String(btc[21])).toContain('1040'); // btc ÷ silver, no grouping
+  });
+
+  it('carries the peak columns on the price rows (E-24)', () => {
+    const doc = assembleExportDoc(input);
+    const prices = doc.sections.find((s) => s.key === 'prices')!;
+    expect(prices.headers).toEqual(expect.arrayContaining(['Peak', 'Peak date', 'Peak basis', 'Below peak %']));
+    const gold = prices.rows.find((r) => r[1] === 'gold-usd')!;
+    // gold peak 5590 (T-05 floor) on 28 Jan 2026, daily-high basis
+    expect(gold[34]).toBe(5590);
+    expect(gold[35]).toBe('2026-01-28');
+    expect(gold[36]).toBe('highest daily high');
+    expect(gold[37]).toBeCloseTo(-22.6, 0);
   });
 
   it('sorts the markets table worst-first (the page order)', () => {
@@ -298,11 +326,23 @@ describe('buildInsightsFullCsv', () => {
     }
   });
 
-  it('carries the indicators block at full depth (snapshot order)', () => {
+  it('carries the indicators block at full depth (snapshot order) with the E-23 audit columns', () => {
     const indicators = rows.findIndex((r) => r.length === 1 && r[0] === 'Indicators');
     expect(indicators).toBeGreaterThan(0);
-    expect(rows[indicators + 1]).toHaveLength(12);
+    // 12 display columns + the 8 E-23 audit columns.
+    expect(rows[indicators + 1]).toHaveLength(20);
+    expect(rows[indicators + 1]).toEqual(
+      expect.arrayContaining(['Published', 'Stale', 'Source URL', 'Licence', 'Private only', 'Public display OK', 'Rule version', 'Thresholds (rule JSON)']),
+    );
     expect(rows[indicators + 2]![0]).toBe('yield-curve-10y2y'); // snapshot order, first reading
+    // The audit facts ride the row: licence name + public verdict + rule JSON.
+    const firstDataRow = rows[indicators + 2]!;
+    // CSV cells are POSITIONAL (the section's own 20 columns): licence 15,
+    // private-only 16, public verdict 17, thresholds 19.
+    expect(String(firstDataRow[15])).toContain('FRED'); // licence column
+    expect(['yes', 'no', 'unknown']).toContain(String(firstDataRow[17])); // public-display verdict
+    expect(['yes', 'no']).toContain(String(firstDataRow[16])); // private-only flag
+    expect(() => JSON.parse(String(firstDataRow[19]))).not.toThrow(); // the rule JSON is valid
     // Whole-file audit: title + meta floor + per rendered section one
     // blank + heading + header + its lines + its rows (computed, no hardcode).
     const doc = assembleExportDoc(input);

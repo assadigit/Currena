@@ -221,8 +221,8 @@ describe('formatIndicatorValue', () => {
     expect(formatIndicatorValue('us10y', 5.31, 'fa-IR', insightsCopyFa.units)).toBe('۵٫۳۱٪');
   });
 
-  it('scales the fraction-valued indicator into percent for display', () => {
-    expect(formatIndicatorValue('govt-interest-revenue', 0.3355, 'en-US', insightsCopyEn.units)).toBe(
+  it('renders the interest-bill share as the stored percentage (E-11: the engine stores 33.55, not a fraction)', () => {
+    expect(formatIndicatorValue('govt-interest-revenue', 33.5539, 'en-US', insightsCopyEn.units)).toBe(
       '33.6%',
     );
   });

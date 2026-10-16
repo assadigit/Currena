@@ -82,7 +82,7 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
       W006RC1Q027SBEA: pts([['2026-04-01', 800]]),
       DCOILBRENTEU: pts([['2026-10-05', 82.5]]),
       M2SL: pts([['2026-08-01', 23342]]),
-      CPIAUCSL: pts([['2025-09-01', 300], ['2026-09-01', 309]]),
+      CPIAUCNS: pts([['2025-09-01', 300], ['2026-09-01', 309]]),
       DFEDTARL: pts([['2026-10-05', 3.5]]),
       DFEDTARU: pts([['2026-10-05', 3.75]]),
       NFCI: pts([['2026-10-02', -0.4]]),
@@ -133,8 +133,8 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
 
     // direct
     expect(out['yield-curve-10y2y']).toEqual(inputs.fred.T10Y2Y);
-    // ratio join on common dates
-    expect(out['govt-interest-revenue']).toEqual([{ date: '2026-04-01', value: 0.125 }]);
+    // ratio join on common dates — stored as a PERCENTAGE (E-11: 33.55, not 0.3355)
+    expect(out['govt-interest-revenue']).toEqual([{ date: '2026-04-01', value: 12.5 }]);
     // yoy percent
     expect(out['au-cpi']).toEqual([{ date: '2026-06-01', value: 4 }]);
     // inverse (full series inverted)

@@ -19,6 +19,7 @@ import type { MarketJobFetchers, MarketJobReport } from './job';
 import { retryRunOptions, runMarketsJob } from './job';
 import { buildMarketsSnapshot } from './compute';
 import { marketsContentEqual } from './compute';
+import { checkE05IdenticalMoves } from '../validation-step3';
 import type { MarketsReader, MarketsWriter } from './store';
 
 export interface RunMarketsUpdateDeps {
@@ -43,6 +44,13 @@ export interface RunMarketsUpdateResult {
   snapshot?: MarketsSnapshot;
   reports: readonly MarketJobReport[];
   providerCalls: { eodhd: number; yahoo: number };
+  /**
+   * Defect E-05 (2026-10-16): unrelated symbols whose daily moves are
+   * identical to two decimals — flagged for human eyes in the run report
+   * (may be a coincidence; the check exists so a copy/mapping bug cannot
+   * hide). Informational, never blocks the write.
+   */
+  moveWarnings: readonly string[];
   /** KV write failure (e.g. the daily cap) — informational, NOT fatal. */
   writeError?: string;
 }
@@ -81,6 +89,10 @@ export async function runMarketsUpdate(
     providerOrder: options.providerOrder,
     reports: job.reports,
     providerCalls: job.providerCalls,
+    moveWarnings:
+      snapshot === undefined
+        ? ([] as string[])
+        : checkE05IdenticalMoves(snapshot.markets.map((m) => ({ id: m.id as string, chg1d: m.chg1d }))),
   };
 
   if (snapshot === undefined) {
@@ -131,6 +143,8 @@ export function formatRunReport(result: RunMarketsUpdateResult): string {
     if (r.notes.length > 0) bits.push(r.notes.join('; '));
     return `  ${bits.join(' · ')}`;
   });
+  // Defect E-05: identical daily moves on unrelated symbols — for human eyes.
+  const warnings = result.moveWarnings.map((w) => `  ⚠ E-05 ${w}`);
   const tail = result.nothingToStore
     ? '  → nothing to store (all providers failed; nothing previously stored)'
     : result.writeError !== undefined
@@ -138,5 +152,5 @@ export function formatRunReport(result: RunMarketsUpdateResult): string {
       : result.wroteSnapshot
         ? `  → written (${result.snapshot?.summary.signal} · n=${(result.snapshot?.summary.nAttention ?? 0) + (result.snapshot?.summary.nUnusual ?? 0)})`
         : '  → unchanged (no write spent)';
-  return [head, ...rows, tail].join('\n');
+  return [head, ...rows, ...warnings, tail].join('\n');
 }
