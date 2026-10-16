@@ -68,6 +68,15 @@
  *     attention tiles instead of three — the card's real "items to
  *     mention" fill the space the alert box would have taken, so the
  *     stretch no longer strands a mid-card hole or a bottom void.
+ *
+ * Round 44 (owner, "color grading"): the four-segment meter stops being
+ * a rainbow. It grades in ONE hue — the CURRENT step's: the highest
+ * filled segment wears the full step ink and the segments BEFORE it wear
+ * progressively whiter tints of the same hue ([palest] → [pale] → … →
+ * [full]; stable stays pure green). The component only carries the
+ * current step to the stylesheet (data-step) — index.css round 44 owns
+ * the tint ramp. Every size and every meter on the page grades the same
+ * way (hero, per-gauge rows, markets verdict, per-question headers).
  */
 
 import { useState } from 'react';
@@ -104,7 +113,10 @@ const BULLET_DOT = (
 
 /** The four-step segmented meter with a marker on the current step.
  *  R30: `large` is the hero's status instrument (taller segments);
- *  `sm` is the compact per-gauge row meter. */
+ *  `sm` is the compact per-gauge row meter.
+ *  Round 44 (owner): data-step carries the current step to index.css,
+ *  which paints the filled segments as ONE hue graded pale→full toward
+ *  the current step (the old per-segment rainbow inks are retired). */
 export function VerdictMeter({
   step,
   ariaLabel,
@@ -118,6 +130,7 @@ export function VerdictMeter({
   return (
     <span
       className={`verdict-meter ${size === 'lg' ? 'verdict-meter-lg' : size === 'sm' ? 'verdict-meter-sm' : ''}`}
+      data-step={step}
       role="img"
       aria-label={ariaLabel}
       title={ariaLabel}

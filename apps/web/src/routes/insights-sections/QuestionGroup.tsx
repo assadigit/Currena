@@ -174,6 +174,7 @@ export function QuestionGroup({
           {/* L2: the gauge reading + count. */}
           <span
             className="verdict-meter !h-1.5 max-w-[120px]"
+            data-step={step}
             role="img"
             aria-label={interpolate(copy.ui.gaugeStepAria, { question, label: stepWord, step: num(step, numberLocale) })}
           >

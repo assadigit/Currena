@@ -1231,7 +1231,16 @@ html:not(:lang(fa)) .type-kicker {
  * grades" — the decree is REVERSED at every size: a filled step wears its
  * step's own ink again (green / yellow / orange / red, the owner-pinned
  * Carbon palette), the word beside it still carries the meaning. Unfilled
- * steps stay the border grey. */
+ * steps stay the border grey.
+ * Round 44 (owner, "color grading"): the rainbow meter is retired — the
+ * meter now grades in ONE hue, the CURRENT step's. The highest filled
+ * segment wears the full step ink; the segments BEFORE it wear
+ * progressively WHITER tints of the same hue (the owner's ramp:
+ * [palest] → [pale] → … → [full]). Stable stays pure green; a raised
+ * step repaints the whole meter in its own colour family — yellow turns
+ * everything yellow, orange everything orange, red everything red.
+ * Unfilled steps stay the border grey; data-step (set by VerdictMeter
+ * and the per-question header meter) carries the current step here. */
 .verdict-meter {
   display: flex;
   gap: 3px;
@@ -1243,10 +1252,38 @@ html:not(:lang(fa)) .type-kicker {
   border-radius: 999px;
   background: var(--color-border);
 }
+/* Stable (step 1) — pure green, nothing before it to tint. */
 .verdict-meter-seg.on-1 { background: var(--color-status-normal); }
-.verdict-meter-seg.on-2 { background: var(--color-status-watch); }
-.verdict-meter-seg.on-3 { background: var(--color-status-stressed); }
-.verdict-meter-seg.on-4 { background: var(--color-status-alert); }
+/* Cautious (step 2) — the yellow family: [whiter yellow] [yellow]. */
+.verdict-meter[data-step='2'] .verdict-meter-seg.on-1 {
+  background: color-mix(in srgb, var(--color-status-watch) 55%, white);
+}
+.verdict-meter[data-step='2'] .verdict-meter-seg.on-2 {
+  background: var(--color-status-watch);
+}
+/* Stressed (step 3) — the orange family: [more pale] [pale] [orange]. */
+.verdict-meter[data-step='3'] .verdict-meter-seg.on-1 {
+  background: color-mix(in srgb, var(--color-status-stressed) 40%, white);
+}
+.verdict-meter[data-step='3'] .verdict-meter-seg.on-2 {
+  background: color-mix(in srgb, var(--color-status-stressed) 70%, white);
+}
+.verdict-meter[data-step='3'] .verdict-meter-seg.on-3 {
+  background: var(--color-status-stressed);
+}
+/* Critical (step 4) — the red family: every grade a different tint of red. */
+.verdict-meter[data-step='4'] .verdict-meter-seg.on-1 {
+  background: color-mix(in srgb, var(--color-status-alert) 30%, white);
+}
+.verdict-meter[data-step='4'] .verdict-meter-seg.on-2 {
+  background: color-mix(in srgb, var(--color-status-alert) 55%, white);
+}
+.verdict-meter[data-step='4'] .verdict-meter-seg.on-3 {
+  background: color-mix(in srgb, var(--color-status-alert) 78%, white);
+}
+.verdict-meter[data-step='4'] .verdict-meter-seg.on-4 {
+  background: var(--color-status-alert);
+}
 /* The hero's meter is the page's status instrument — bigger there.
  * The compact one rides each per-gauge hero row (fixed 44px track). */
 .verdict-meter-lg { flex: 1 1 auto; max-width: 150px; min-width: 90px; }
