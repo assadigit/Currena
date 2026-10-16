@@ -36,10 +36,10 @@ Make the Insights page correct, self-checking, private by default, and complete 
 
 ## 3. Setup
 
-- [ ] Create branch `insights-rebuild` from the current default branch.
-- [ ] Find and record: the test runner (use the repo's own; if none exists add Vitest), the command to run all tests, how the page export is generated, where indicators are defined, where rules live, how text is produced, how the refresh is scheduled, and the KV bindings.
-- [ ] Run the existing tests and record the baseline result.
-- [ ] Parse `baseline/currena-insights-full-2026-10-15.md` into fixture data under `tests/fixtures/` so tests can run against it.
+- [x] Create branch `insights-rebuild` from the current default branch.
+- [x] Find and record: the test runner (use the repo's own; if none exists add Vitest), the command to run all tests, how the page export is generated, where indicators are defined, where rules live, how text is produced, how the refresh is scheduled, and the KV bindings.
+- [x] Run the existing tests and record the baseline result.
+- [x] Parse `baseline/currena-insights-full-2026-10-15.md` into fixture data under `tests/fixtures/` so tests can run against it.
 
 ## 4. Phases
 
@@ -51,50 +51,50 @@ Produce `docs/insights/CURRENT_STATE_REPORT.md` covering items S-01 to S-08 of `
 
 ### Phase 1: tests first, then foundation
 
-- [ ] Implement the validation tests T-01 to T-14 from `INSIGHTS_FIX_SPEC.md` and T-15 to T-24 from `INSIGHTS_STEP3_SPEC.md`, plus one extra test per defect E-04, E-05, E-06, E-10, E-11, E-18 and E-24.
-- [ ] Run these tests against the baseline fixtures. For each defect they must **fail**, proving they catch it. Record the list of failing tests as `docs/insights/baseline-test-results.md`.
-- [ ] Implement `INSIGHTS_FIX_SPEC.md` Part A (A-01 to A-08): single indicator registry, generated text, validation before publish, safe failure, daily snapshot archive, context notes off by default, rule versions, status panel.
-- [ ] Add the licence fields from `INSIGHTS_STEP3_SPEC.md` section 8 to the registry.
+- [x] Implement the validation tests T-01 to T-14 from `INSIGHTS_FIX_SPEC.md` and T-15 to T-24 from `INSIGHTS_STEP3_SPEC.md`, plus one extra test per defect E-04, E-05, E-06, E-10, E-11, E-18 and E-24.
+- [x] Run these tests against the baseline fixtures. For each defect they must **fail**, proving they catch it. Record the list of failing tests as `docs/insights/baseline-test-results.md`.
+- [x] Implement `INSIGHTS_FIX_SPEC.md` Part A (A-01 to A-08): single indicator registry, generated text, validation before publish, safe failure, daily snapshot archive, context notes off by default, rule versions, status panel.
+- [x] Add the licence fields from `INSIGHTS_STEP3_SPEC.md` section 8 to the registry.
 
 ### Phase 2: defects and fixes
 
-- [ ] Fix every defect E-01 to E-24 in `INSIGHTS_DEFECTS_2026-10-15.md`. After each fix, the matching test must go from failing to passing.
-- [ ] Implement every remaining item in `INSIGHTS_FIX_SPEC.md` Part B and Part C that is not already in place (check against the baseline; items verified as present in section B of the defects file only need a regression test).
-- [ ] Tick each checkbox in the spec files only after you have implemented and verified it.
+- [x] Fix every defect E-01 to E-24 in `INSIGHTS_DEFECTS_2026-10-15.md`. After each fix, the matching test must go from failing to passing.
+- [x] Implement every remaining item in `INSIGHTS_FIX_SPEC.md` Part B and Part C that is not already in place (check against the baseline; items verified as present in section B of the defects file only need a regression test).
+- [x] Tick each checkbox in the spec files only after you have implemented and verified it.
 
 ### Phase 3: access and licences
 
-- [ ] Implement `INSIGHTS_STEP3_SPEC.md` section 2: private gate (AC-01 to AC-08), `SITE_MODE`, licence register (LR-01 to LR-04), `LICENCES.md`.
-- [ ] The gate must protect every Insights data endpoint, the snapshot archive and the export. The page shell may stay public. Unauthenticated requests return 401 or 403 with no data. Use a password read from a secret named `INSIGHTS_PASSWORD` (signed, expiring cookie, rate limited), unless Cloudflare Access is already available and simpler.
-- [ ] Mark every source `private_ok` and `public_display_ok`, with `terms_checked_on` and the attribution text.
+- [x] Implement `INSIGHTS_STEP3_SPEC.md` section 2: private gate (AC-01 to AC-08), `SITE_MODE`, licence register (LR-01 to LR-04), `LICENCES.md`.
+- [x] The gate must protect every Insights data endpoint, the snapshot archive and the export. The page shell may stay public. Unauthenticated requests return 401 or 403 with no data. Use a password read from a secret named `INSIGHTS_PASSWORD` (signed, expiring cookie, rate limited), unless Cloudflare Access is already available and simpler.
+- [x] Mark every source `private_ok` and `public_display_ok`, with `terms_checked_on` and the attribution text.
 
 ### Phase 4: published indicators and definitions
 
-- [ ] Implement `INSIGHTS_STEP3_SPEC.md` sections 4 to 7: Layer 1 indicators (with status Use, Check or Link out), Layer 2 definitions (L2-01 to L2-10), Layer 3 summaries (L3-01 to L3-04), Australian coverage, and the "Know before you buy US shares" box (show only the exchange-rate and fees lines unless the owner has added approved text to `docs/insights/approved-text/`).
-- [ ] Any indicator whose series or terms cannot be verified stays "Link out" or hidden, and is listed in the report.
+- [x] Implement `INSIGHTS_STEP3_SPEC.md` sections 4 to 7: Layer 1 indicators (with status Use, Check or Link out), Layer 2 definitions (L2-01 to L2-10), Layer 3 summaries (L3-01 to L3-04), Australian coverage, and the "Know before you buy US shares" box (show only the exchange-rate and fees lines unless the owner has added approved text to `docs/insights/approved-text/`).
+- [x] Any indicator whose series or terms cannot be verified stays "Link out" or hidden, and is listed in the report.
 
 ### Phase 5: automatic self-audit and export
 
-- [ ] Extend the export generator with the columns from defect E-23 (published date, fetched time, stale flag, source URL, licence, private and public flags, peak value, peak date, peak basis, rule version and thresholds).
-- [ ] Add a command `npm run insights:selfcheck` (or the repo's equivalent) that: builds the current snapshot, runs every test, writes `docs/insights/exports/currena-insights-full-<UTC date>.md`, and writes `docs/insights/SELF_AUDIT.md` with a table of every test, pass or fail, and a list of stale or "can't tell" cards.
-- [ ] Make a scheduled GitHub Action (or the repo's equivalent) run the self-check daily and fail visibly if any test fails. Do not publish anything from it.
+- [x] Extend the export generator with the columns from defect E-23 (published date, fetched time, stale flag, source URL, licence, private and public flags, peak value, peak date, peak basis, rule version and thresholds).
+- [x] Add a command `npm run insights:selfcheck` (or the repo's equivalent) that: builds the current snapshot, runs every test, writes `docs/insights/exports/currena-insights-full-<UTC date>.md`, and writes `docs/insights/SELF_AUDIT.md` with a table of every test, pass or fail, and a list of stale or "can't tell" cards.
+- [x] Make a scheduled GitHub Action (or the repo's equivalent) run the self-check daily and fail visibly if any test fails. Do not publish anything from it.
 
 ### Phase 6: documents
 
 Create these files in `docs/insights/`:
 
-- [ ] `FIX_REPORT.md`: every ID from the fix spec and defects file, with done, partly done or not done, and how you checked it.
-- [ ] `STEP3_REPORT.md`: as described in section 10 of the Step 3 spec, including the licence table with the date each term was checked.
-- [ ] `MAINTENANCE.md`: the owner's weekly routine (Step 3 spec section 11), plus the steps to update any manual-entry value.
-- [ ] `OWNER_SETUP.md`: the exact steps the owner must do by hand, with exact commands, and nothing else. Include: setting the `INSIGHTS_PASSWORD` secret, any missing API key, how to review the branch, how to deploy the preview, how to deploy to production after approval, how to roll back, how to run the self-check, and how to produce a full export for audit.
+- [x] `FIX_REPORT.md`: every ID from the fix spec and defects file, with done, partly done or not done, and how you checked it.
+- [x] `STEP3_REPORT.md`: as described in section 10 of the Step 3 spec, including the licence table with the date each term was checked.
+- [x] `MAINTENANCE.md`: the owner's weekly routine (Step 3 spec section 11), plus the steps to update any manual-entry value.
+- [x] `OWNER_SETUP.md`: the exact steps the owner must do by hand, with exact commands, and nothing else. Include: setting the `INSIGHTS_PASSWORD` secret, any missing API key, how to review the branch, how to deploy the preview, how to deploy to production after approval, how to roll back, how to run the self-check, and how to produce a full export for audit.
 
 ### Phase 7: final verification
 
-- [ ] Run all tests and the self-check. All must pass, or be recorded as blocked with a reason.
-- [ ] Start the project locally or on the preview. Request each Insights data endpoint without a login. Each must return 401 or 403 and no data. Record the result.
-- [ ] Search the built client files and the repository for API keys. Record that none are present.
-- [ ] Search all generated text for forbidden words (T-07, T-19). Record the result.
-- [ ] Push the branch. If the GitHub CLI is available, open a pull request titled "Insights rebuild" with the three reports linked. Do not merge it.
+- [x] Run all tests and the self-check. All must pass, or be recorded as blocked with a reason.
+- [x] Start the project locally or on the preview. Request each Insights data endpoint without a login. Each must return 401 or 403 and no data. Record the result.
+- [x] Search the built client files and the repository for API keys. Record that none are present.
+- [x] Search all generated text for forbidden words (T-07, T-19). Record the result.
+- [x] Push the branch. If the GitHub CLI is available, open a pull request titled "Insights rebuild" with the three reports linked. Do not merge it.
 
 ## 5. Final output
 
