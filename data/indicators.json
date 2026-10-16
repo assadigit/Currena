@@ -1118,9 +1118,9 @@
         "attributionText": "",
         "attributionRequired": false,
         "privateOk": true,
-        "publicDisplayOk": "no",
+        "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (fred:DCOILBRENTEU, yahoo:BZ=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (fred:DCOILBRENTEU, yahoo:BZ=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): FRED leg is public-domain (T-16: DCOILBRENTEU #copyright-public-domain); the Yahoo BZ=F gap-fill leg stays in the engine — the owner directive lifts its worst-leg display bar.",
         "termsUrl": "https://finance.yahoo.com/"
       }
     },
@@ -1156,9 +1156,9 @@
         "attributionText": "",
         "attributionRequired": false,
         "privateOk": true,
-        "publicDisplayOk": "no",
+        "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:XAU, yahoo:GC=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:XAU, yahoo:GC=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): gold-api leg is public-display-ok (their §9 permits commercial use in web applications, read first-hand 2026-10-16); the Yahoo GC=F history leg stays in the engine — the owner directive lifts its worst-leg display bar.",
         "termsUrl": "https://finance.yahoo.com/"
       }
     },
@@ -1194,9 +1194,9 @@
         "attributionText": "",
         "attributionRequired": false,
         "privateOk": true,
-        "publicDisplayOk": "no",
+        "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:XAG, yahoo:SI=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:XAG, yahoo:SI=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): gold-api leg is public-display-ok (their §9 permits commercial use, read first-hand 2026-10-16); the Yahoo SI=F history leg stays in the engine — the owner directive lifts its worst-leg display bar.",
         "termsUrl": "https://finance.yahoo.com/"
       }
     },
@@ -1270,9 +1270,9 @@
         "attributionText": "",
         "attributionRequired": false,
         "privateOk": true,
-        "publicDisplayOk": "no",
+        "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:BTC, yahoo:BTC-USD): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:BTC, yahoo:BTC-USD): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): gold-api leg is public-display-ok (their §9 permits commercial use, read first-hand 2026-10-16); the Yahoo BTC-USD history leg stays in the engine — the owner directive lifts its worst-leg display bar.",
         "termsUrl": "https://finance.yahoo.com/"
       }
     },

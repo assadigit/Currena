@@ -758,7 +758,9 @@ describe('PUBLIC mode — the public projection serve path', () => {
   });
 
   it("a hidden indicator's history is refused before any KV read (LR-02)", async () => {
-    const res = await makeApp().request('/api/insights/brent/history', undefined, env);
+    // vix stays licence-hidden (Cboe copyright); brent/gold-usd/silver-usd/
+    // btc-usd are BACK in public mode since the 2026-10-19e owner directive.
+    const res = await makeApp().request('/api/insights/vix/history', undefined, env);
     expect(res.status).toBe(404);
     const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('hidden_site_mode');

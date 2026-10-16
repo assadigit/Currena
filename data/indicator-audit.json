@@ -239,7 +239,7 @@
     {
       "id": "brent",
       "licenceName": "No reuse licence offered (unofficial endpoints)",
-      "publicDisplayOk": "no",
+      "publicDisplayOk": "yes",
       "privateOk": true,
       "maxAgeDays": 12,
       "ruleVersion": 2,
@@ -248,7 +248,7 @@
     {
       "id": "gold-usd",
       "licenceName": "No reuse licence offered (unofficial endpoints)",
-      "publicDisplayOk": "no",
+      "publicDisplayOk": "yes",
       "privateOk": true,
       "maxAgeDays": 2,
       "ruleVersion": 2,
@@ -257,7 +257,7 @@
     {
       "id": "silver-usd",
       "licenceName": "No reuse licence offered (unofficial endpoints)",
-      "publicDisplayOk": "no",
+      "publicDisplayOk": "yes",
       "privateOk": true,
       "maxAgeDays": 2,
       "ruleVersion": 2,
@@ -275,7 +275,7 @@
     {
       "id": "btc-usd",
       "licenceName": "No reuse licence offered (unofficial endpoints)",
-      "publicDisplayOk": "no",
+      "publicDisplayOk": "yes",
       "privateOk": true,
       "maxAgeDays": 2,
       "ruleVersion": 2,

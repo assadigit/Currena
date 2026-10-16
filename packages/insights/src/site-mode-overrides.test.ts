@@ -31,6 +31,15 @@ describe('data/site-mode-overrides.json (the generated public-mode hidden set)',
     expect(overrides.hiddenBoards).toEqual(expect.arrayContaining(['markets', 'fx']));
   });
 
+  it('keeps the 2026-10-19e owner-directive prices tiles PUBLIC (gold, silver, bitcoin, brent)', () => {
+    // The owner restored the prices board explicitly (it displayed publicly
+    // before the rebuild); a generator change must never re-hide these four.
+    for (const id of ['brent', 'gold-usd', 'silver-usd', 'btc-usd']) {
+      expect(overrides.hiddenIndicatorIds).not.toContain(id);
+      expect(audit.indicators.find((i) => i.id === id)?.publicDisplayOk).toBe('yes');
+    }
+  });
+
   it('only hides KNOWN indicator ids (a stale rename must fail loudly here)', () => {
     for (const id of overrides.hiddenIndicatorIds) {
       expect(() => IndicatorIdSchema.parse(id)).not.toThrow();

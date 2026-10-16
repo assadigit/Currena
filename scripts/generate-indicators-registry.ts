@@ -138,6 +138,28 @@ function licenceBlockFor(def: { id: string; source: string; sourceRef: string })
   return licenceForProvider(def.source);
 }
 
+/**
+ * OWNER DIRECTIVE (2026-10-19e, credentials chat session): the four prices
+ * board tiles (gold, silver, bitcoin, brent) displayed publicly on
+ * currena.ir BEFORE the insights rebuild, from these same sources. The owner
+ * explicitly directs their restoration in public mode and accepts the
+ * display risk on their own site. This lifts ONLY the public-display
+ * disposition of the worst-leg walk — the underlying licence facts stay
+ * verbatim, the Yahoo legs stay in the ENGINE (private view unchanged), and
+ * the world boards (markets/fx) stay hidden. NOT a terms re-verification:
+ * the quarterly licence review re-confirms this decision.
+ */
+const OWNER_PUBLIC_DISPLAY_OVERRIDE: Readonly<Record<string, string>> = {
+  brent:
+    'FRED leg is public-domain (T-16: DCOILBRENTEU #copyright-public-domain); the Yahoo BZ=F gap-fill leg stays in the engine — the owner directive lifts its worst-leg display bar.',
+  'gold-usd':
+    'gold-api leg is public-display-ok (their §9 permits commercial use in web applications, read first-hand 2026-10-16); the Yahoo GC=F history leg stays in the engine — the owner directive lifts its worst-leg display bar.',
+  'silver-usd':
+    'gold-api leg is public-display-ok (their §9 permits commercial use, read first-hand 2026-10-16); the Yahoo SI=F history leg stays in the engine — the owner directive lifts its worst-leg display bar.',
+  'btc-usd':
+    'gold-api leg is public-display-ok (their §9 permits commercial use, read first-hand 2026-10-16); the Yahoo BTC-USD history leg stays in the engine — the owner directive lifts its worst-leg display bar.',
+};
+
 const indicators = DEFINITIONS.map((def) => {
   const source = READING_SOURCES[def.id] ?? { name: def.sourceRef };
   const display = DISPLAY[def.id as keyof typeof DISPLAY];
@@ -173,15 +195,24 @@ const indicators = DEFINITIONS.map((def) => {
     layer: LAYER2_IDS.has(def.id) ? 2 : 1,
     licence: (() => {
       const l = licenceBlockFor(def);
+      const ownerOverride = OWNER_PUBLIC_DISPLAY_OVERRIDE[def.id];
+      const resolved =
+        ownerOverride !== undefined
+          ? {
+              ...l,
+              publicDisplayOk: 'yes' as const,
+              termsEvidence: `${l.termsEvidence} · OWNER DIRECTIVE (2026-10-19e): ${ownerOverride}`,
+            }
+          : l;
       return {
-        licenceName: l.licenceName,
-        attributionText: l.attributionText,
-        attributionRequired: l.attributionRequired,
-        privateOk: l.privateOk,
-        publicDisplayOk: l.publicDisplayOk,
-        termsCheckedOn: l.termsCheckedOn,
-        termsEvidence: l.termsEvidence,
-        termsUrl: l.termsUrl ?? null,
+        licenceName: resolved.licenceName,
+        attributionText: resolved.attributionText,
+        attributionRequired: resolved.attributionRequired,
+        privateOk: resolved.privateOk,
+        publicDisplayOk: resolved.publicDisplayOk,
+        termsCheckedOn: resolved.termsCheckedOn,
+        termsEvidence: resolved.termsEvidence,
+        termsUrl: resolved.termsUrl ?? null,
       };
     })(),
   };
