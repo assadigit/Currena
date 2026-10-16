@@ -20,6 +20,7 @@ const runPricesUpdate = vi.hoisted(() => vi.fn());
 const formatPricesReport = vi.hoisted(() => vi.fn(() => 'prices report'));
 const defaultPricesFetchers = vi.hoisted(() => vi.fn(() => ({ fetchBrent: () => {} })));
 const KvPricesStore = vi.hoisted(() => class {});
+const runIngestWatchdog = vi.hoisted(() => vi.fn(async () => 'fresh' as const));
 
 vi.mock('@currena/scraper', () => ({
   scrapeTgju,
@@ -31,6 +32,12 @@ vi.mock('@currena/insights/prices', () => ({
   formatPricesReport,
   defaultPricesFetchers,
   KvPricesStore,
+}));
+vi.mock('./ingest-watchdog', () => ({
+  runIngestWatchdog,
+  WATCHDOG_MINUTE: 40,
+  STALE_AFTER_HOURS: 26,
+  NUDGE_EVERY_HOURS: 6,
 }));
 
 const api = await import('./index');
@@ -93,6 +100,8 @@ beforeEach(() => {
   scrapeFrankfurter.mockReset();
   runPricesUpdate.mockReset();
   runPricesUpdate.mockResolvedValue({ wroteSnapshot: false, report: {} });
+  runIngestWatchdog.mockReset();
+  runIngestWatchdog.mockResolvedValue('fresh');
 });
 
 afterEach(() => {
@@ -173,5 +182,28 @@ describe('the minute-cron wrapper (keep-warm backbone, audit C-4)', () => {
     expect(map.has('snapshot:tgju')).toBe(true); // the ladder's work survived
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('prices refresh failed'), expect.anything());
     warn.mockRestore();
+  });
+
+  it('the hourly :40 rung runs the ingest watchdog (fault-isolated)', async () => {
+    scrapeTgju.mockResolvedValue(tgjuSnapshot('2026-10-14T10:40:05.000Z'));
+    runIngestWatchdog.mockRejectedValue(new Error('github down'));
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    await expect(
+      worker.scheduled(eventAtMinute(40), { RATES: kv }, ctx),
+    ).resolves.toBeUndefined();
+
+    expect(runIngestWatchdog).toHaveBeenCalledTimes(1);
+    expect(runIngestWatchdog).toHaveBeenCalledWith({ RATES: kv });
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('ingest watchdog failed'), expect.anything());
+    warn.mockRestore();
+  });
+
+  it('an off-watchdog minute never runs the watchdog', async () => {
+    scrapeTgju.mockResolvedValue(tgjuSnapshot('2026-10-14T10:41:05.000Z'));
+
+    await worker.scheduled(eventAtMinute(41), { RATES: kv }, ctx);
+
+    expect(runIngestWatchdog).not.toHaveBeenCalled();
   });
 });

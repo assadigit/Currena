@@ -58,6 +58,17 @@ export type Bindings = {
    * displayed source must be public-display-ok). Set as a wrangler var.
    */
   SITE_MODE?: string;
+  /**
+   * The ingest watchdog's dispatch token (2026-10-16c, ingest-watchdog.ts):
+   * a GitHub token with repo + Actions write. When the daily
+   * insights-ingest schedule silently stops firing (GitHub-side schedule
+   * delays/skips — observed live), the Worker's own cron re-dispatches the
+   * workflow through the GitHub API. UNSET = the watchdog logs and does
+   * nothing (graceful, like the optional Telegram alerter). Set with
+   * `wrangler secret put GH_INGEST_DISPATCH_TOKEN`; rides the owner's
+   * token-rotation pass.
+   */
+  GH_INGEST_DISPATCH_TOKEN?: string;
   /** Static-assets binding (implicit when wrangler.jsonc has `assets`); serves the SPA. */
   ASSETS?: Fetcher;
 };

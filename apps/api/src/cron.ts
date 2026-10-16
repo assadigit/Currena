@@ -18,6 +18,7 @@
 import { runPricesUpdate, formatPricesReport, defaultPricesFetchers } from '@currena/insights/prices';
 import { KvPricesStore } from '@currena/insights/prices';
 import type { PricesJobFetchers } from '@currena/insights/prices';
+import { runIngestWatchdog, WATCHDOG_MINUTE } from './ingest-watchdog';
 import { recordHistory } from './history';
 import { makeDefaultService } from './default-service';
 import type { SnapshotSource } from '@currena/core';
@@ -90,6 +91,17 @@ export async function runScheduled(env: Bindings, scheduledTimeMs: number): Prom
       ? [
           runScheduledPricesRefresh(env).catch((err: unknown) => {
             console.warn('[cron] prices refresh failed:', err instanceof Error ? err.message : err);
+          }),
+        ]
+      : []),
+    // The hourly ingest-watchdog rung (2026-10-16c): when the daily GHA
+    // ingest silently stops firing (GitHub schedule delays/skips — observed
+    // live over a 3-day outage), the Worker re-dispatches it. Fault-isolated
+    // like every other rung; a GitHub hiccup never fails the cron.
+    ...(minute === WATCHDOG_MINUTE
+      ? [
+          runIngestWatchdog(env).catch((err: unknown) => {
+            console.warn('[cron] ingest watchdog failed:', err instanceof Error ? err.message : err);
           }),
         ]
       : []),
