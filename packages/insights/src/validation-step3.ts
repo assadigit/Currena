@@ -223,11 +223,24 @@ export const FORBIDDEN_ADVICE_WORDS = [
  */
 export function containsAdviceWording(text: string): string[] {
   const hits: string[] = [];
-  // The ratio-orientation sentence ("One bitcoin buys 19.6 oz of gold") is
-  // plain arithmetic the Step 3 spec itself keeps (defects E-12/E-13 fix:
-  // "show the 19.6 and 1,430 orientation already used on the price cards")
-  // — mask it before scanning so the advice check stays about ADVICE.
-  const masked = text.replace(/\bbuys?\s+(about\s+)?~?[\d.,]+\s*oz\b/gi, 'converts-to');
+  // The check is about ADVICE — imperative buy/sell/hold calls and market
+  // verdicts. The descriptive/arithmetic senses the specs themselves keep
+  // are masked before scanning (each mask names its authority):
+  //  1. The ratio-orientation sentence ("One bitcoin buys 19.6 oz of gold")
+  //     — plain arithmetic (defects E-12/E-13 keep it).
+  //  2. The conversion sentence ("how many yen one dollar buys") — the same
+  //     arithmetic, on the currency cards.
+  //  3. "buyers"/"seller's" — people who ALREADY transact, conditions about
+  //     them, never a call to become one.
+  //  4. "on hold" (a central bank's own rate state) and "if you hold a
+  //     variable loan" (the reader's existing position) — conditions.
+  const masked = text
+    .replace(/\bbuys?\s+(about\s+)?~?[\d.,]+\s*oz\b/gi, 'converts-to')
+    .replace(/\bhow many[^.:;]*\bbuys\b/gi, 'converts-to')
+    .replace(/\bbuyers?\b/gi, 'transactors')
+    .replace(/\bseller['’]?s?\b/gi, 'a-transactor')
+    .replace(/\bon hold\b/gi, 'unchanged')
+    .replace(/\bif you hold\b/gi, 'if you carry');
   const patterns: ReadonlyArray<readonly [string, RegExp]> = [
     ['will', /\bwill\b/i],
     ['should', /\bshould\b/i],

@@ -21,6 +21,7 @@
     "backtest": "tsx scripts/backtest.ts",
     "live-run": "tsx scripts/live-run.ts",
     "ingest": "tsx scripts/ingest.ts",
+    "selfcheck": "tsx scripts/selfcheck.ts",
     "markets-data-check": "tsx scripts/markets-data-check.ts",
     "markets-run": "tsx scripts/markets-run.ts",
     "fx-run": "tsx scripts/fx-run.ts",

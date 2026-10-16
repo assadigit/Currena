@@ -1,0 +1,39 @@
+# Insights daily self-check (runbook Phase 5).
+#
+# Builds the current snapshot from live sources, runs every validation test
+# (T-01…T-14 + the Step 3 / defect checks) and writes the audit artefacts to
+# docs/insights/ (SELF_AUDIT.md + the dated full export). It PUBLISHES
+# NOTHING — no KV write, no deploy, no commit; the run result itself is the
+# signal (a red run = a failing test = do not rely on the affected cards).
+# The ingest workflow (insights-ingest.yml) stays the only KV writer.
+
+name: insights-selfcheck
+
+on:
+  schedule:
+    # 04:50 UTC — after the 04:20 ingest, still inside the fresh KV slice.
+    - cron: '50 4 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  selfcheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install pnpm
+        run: npm i -g pnpm@10.34.5
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run the self-check (build snapshot + every test + audit docs)
+        run: pnpm --filter @currena/insights selfcheck
