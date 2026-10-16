@@ -37,6 +37,14 @@ Recorded: T-24's unit suite (insights-auth.test.ts, 6 tests) covers the
 unconfigured-secret fail-closed path, tampered + expired cookies, and the
 429 rate-limit surface.
 
+Smoke limits (honest): the checks above were made with HTTP requests
+against the local worker — the SPA's private-state SCREEN itself was not
+re-rendered in a browser from this venue (the local worker serves the
+built bundle but no KV data, and the sandbox would not restart the worker
+for a second pass). The private state renders via the unit-tested
+component (453 web tests green, production build clean); the owner's
+preview (OWNER_SETUP step 3) is the visual pass.
+
 ## 3. Secrets scan — none present
 
 - Working tree (git grep over tracked files): no `cfut_…` token, no
