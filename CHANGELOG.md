@@ -5,6 +5,55 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-19e] — the prices board returns to public mode (the owner's directive)
+
+The owner: "Still there aren't GOLD BITCOIN SILVER price, like it used
+to. please read previous version you will findout there was a dedicated
+nice section with images for it." — this resolves the decision left open
+by the 2026-10-19d investigation (recovering the four price tiles was
+listed as an owner choice).
+
+### The restoration (one mechanism, honest trail)
+
+- **The images never left** — production still serves
+  `/assets/icons/{oil,gold,silver,bitcoin,copper}.png` and the
+  PricesBoard code ships in the live bundle; the tiles were DATA-starved
+  (the Oct-19b licence-cautious hide filtered their readings out of the
+  public projection).
+- **`scripts/generate-indicators-registry.ts` gains
+  `OWNER_PUBLIC_DISPLAY_OVERRIDE`** for exactly {brent, gold-usd,
+  silver-usd, btc-usd}: it lifts ONLY the public-display disposition of
+  the E-01/LR-02 worst-leg walk, and appends a dated evidence note to
+  every card (the underlying licence facts stay verbatim; the Yahoo
+  legs stay in the ENGINE — the private page is unchanged; the world
+  boards markets/fx and all other non-'yes' verdicts stay hidden).
+  Explicitly recorded as an owner directive, NOT a terms
+  re-verification — the quarterly licence review re-confirms it.
+- **Regenerated artifacts**: hidden set 24 → 20
+  (data/indicators.json, data/indicator-audit.json,
+  data/site-mode-overrides.json — all cross-checks stay consistent by
+  construction).
+- **Tests**: the LR-02 hidden-history fixture moves brent → vix (still
+  Cboe-hidden); NEW pin — the four owner-directive tiles must never be
+  re-hidden by a future generator change. Suite 1,419 green (+1).
+- **Gates**: tests 1,419 (core 191 · scraper 67 · insights 462 ·
+  markets 13 · api 233 · web 453), typecheck 6/6, lint 0 errors / 15
+  advisories, copy:audit clean, budgets held (entry 294.78/89.39 vs
+  296/89.5; Insights lazy 594.68/142.02 vs 604/142.8), T-15 PASSED in
+  SITE_MODE=public (20 hidden + the boards declared).
+- **Deployed**: currena-api **`d40211f9-970b-4756-970c-8424f6062b20`**
+  from the restore commit; the public projection REBUILT from the
+  stored snapshot without re-fetching (52 → 32 public-ok readings; KV
+  2 reads / 1 write).
+- **Production verified**: /api/insights → 32 readings with brent
+  109.13, gold 4,164.70, silver 57.27, bitcoin 81,180.14 (US$); the
+  live `#insights-prices` section renders all four tiles WITH their
+  images; zero console/page errors; 375 scrollWidth === 375. BONUS:
+  the money panel's "Petrol and transport" row returned with brent
+  ("Becoming more expensive — US$109.13 Oil price (Brent)") — the
+  data-driven gap the 2026-10-19d investigation diagnosed.
+- Evidence: docs/evidence/2026-10-19e-prices-restore/.
+
 ## [2026-10-19d] — the missing-items investigation + the ingest watchdog
 
 The owner: "Some items are gone, for example the grid that shown GOLD -

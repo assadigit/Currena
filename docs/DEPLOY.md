@@ -1390,6 +1390,45 @@ ones get orange too like this: [more pale orange] [pale orange] [orange]
 - **Evidence**: `docs/evidence/2026-10-19-round44-meter-grading/` (the
   light+dark ramp render + production screenshots at 1280 and 375).
 
+## Session record — 2026-10-19e the prices board returns to public mode (the owner's directive)
+
+The owner: "Still there aren't GOLD BITCOIN SILVER price, like it used
+to. please read previous version you will findout there was a dedicated
+nice section with images for it." — resolves the decision the 2026-10-19d
+investigation left open (the four tiles' restoration was listed as an
+owner choice).
+
+- **Diagnosis re-verified LIVE before touching anything**: the API
+  served 28 public readings; the four price ids absent (arithmetic: the
+  hidden 24 = 16 world indices on the boards + 7 price tiles + vix);
+  EODHD probed healthy with real quotes (not quota, not an outage); all
+  five tile icons still 200 on production — the "images" never left,
+  the tiles were data-starved by the Oct-19b licence-cautious hide.
+- **The fix — one mechanism, honest trail** (commit `81ca3e3`):
+  `OWNER_PUBLIC_DISPLAY_OVERRIDE` in the registry generator for exactly
+  {brent, gold-usd, silver-usd, btc-usd}; the three generated JSONs
+  regenerated (hidden set 24 → 20); a NEW test pins the four tiles
+  against re-hiding; the LR-02 hidden-history fixture moves
+  brent → vix. The licence facts stay verbatim, the Yahoo legs stay in
+  the engine (private view unchanged), the world boards stay hidden.
+- **Gates**: 1,419 tests green (+1), typecheck 6/6, lint 0 errors / 15
+  advisories, copy:audit clean, budgets held (entry 294.78/89.39;
+  Insights lazy 594.68/142.02), T-15 PASSED in SITE_MODE=public.
+- **Deployed**: currena-api **`d40211f9-970b-4756-970c-8424f6062b20`**;
+  currena-markets untouched (`9b5ff7e0`). The public projection was
+  then REBUILT from the stored private snapshot
+  (`pnpm --filter @currena/insights public-projection`; 52 → 32
+  public-ok readings; KV 2 reads / 1 write) so the tiles appeared
+  immediately instead of riding the next daily ingest.
+- **Production smoke**: /api/insights 200 public, 32 readings (brent
+  109.13 · gold 4,164.70 · silver 57.27 · bitcoin 81,180.14 US$); the
+  live prices section renders the four tiles WITH images (oil barrel,
+  gold bar, silver, bitcoin); zero console/page errors; 375
+  scrollWidth === 375; the money panel's "Petrol and transport" row is
+  BACK ("Becoming more expensive — US$109.13 Oil price (Brent)").
+- **Evidence**: `docs/evidence/2026-10-19e-prices-restore/` (before/after
+  API captures + desktop/mobile screenshots + README).
+
 ## Session record — 2026-10-19d the missing-items investigation + the ingest watchdog
 
 The owner: "Some items are gone… the grid that shown GOLD - Silver -

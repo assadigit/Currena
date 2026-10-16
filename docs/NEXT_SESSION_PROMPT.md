@@ -1,19 +1,22 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-19d (MISSING-ITEMS INVESTIGATION session — the
-owner's "investigate whether it's api problem, quota or what": VERDICT —
-the gold/silver/brent/bitcoin grid + the no-data gauges are the PUBLIC
-projection's licence hiding BY DESIGN; the money-panel petrol→employment
-shift is DATA-driven (petrol's drivers calm on BOTH pages; employment's
-drivers warning AND public-ok). THE REAL OUTAGE: the daily
-insights-ingest GitHub schedule silently died after Oct 16 (3 days,
-zero attempted runs). FIXED: manual dispatch restored data (public
-projection 27 → 28 — crypto-fng rode in) + the INGEST WATCHDOG shipped:
-apps/api/src/ingest-watchdog.ts — the Worker cron's :40 rung
-re-dispatches the ingest when the snapshot is >26 h stale (6 h nudge
-bound; GH_INGEST_DISPATCH_TOKEN secret set). Deployed currena-api
-`0eb91818` from `193237e`; 1,418 tests green. See CHANGELOG
-2026-10-19d + docs/DEPLOY.md's 2026-10-19d record.
+Hand-off date: 2026-10-19e (PRICES RESTORE session — the owner's "Still
+there aren't GOLD BITCOIN SILVER price, like it used to… a dedicated
+nice section with images"). The Oct-19b licence-cautious hide was the
+cause; the OWNER DIRECTIVE restored exactly {brent, gold-usd,
+silver-usd, btc-usd} to public mode: `OWNER_PUBLIC_DISPLAY_OVERRIDE` in
+scripts/generate-indicators-registry.ts (display disposition only —
+licence facts verbatim, Yahoo legs stay in the engine, world boards
+stay hidden), hidden set 24 → 20, a NEW pin test guards the four tiles
+against re-hiding, the LR-02 hidden-history fixture moved brent → vix.
+Public projection rebuilt 52 → 32; the live prices section renders the
+four tiles WITH images; the money panel's "Petrol and transport" row
+returned with brent. Deployed currena-api `d40211f9` from `81ca3e3`;
+1,419 tests green. See CHANGELOG 2026-10-19e + docs/DEPLOY.md's
+2026-10-19e record. Prior state (2026-10-19d): the ingest watchdog
+ships (cron :40 re-dispatch when the snapshot is >26 h stale;
+GH_INGEST_DISPATCH_TOKEN set) after the GitHub schedule silently died
+3 days.
 The prior 2026-10-19b session flipped Insights PUBLIC (owner decree:
 SITE_MODE=public deployed `36d76363`; the licence-legal projection only
 — 27 of 51 readings; the EODHD/Yahoo world boards + 24 non-'yes'
@@ -90,17 +93,23 @@ never hit live sites, secrets never persisted. Then this file,
 files (the authority order: runbook → STEP3 → DEFECTS → FIX_SPEC),
 `FIX_REPORT.md`, `STEP3_REPORT.md`, `MAINTENANCE.md`, `OWNER_SETUP.md`.
 
-## 2. Current verified state (2026-10-19d close)
+## 2. Current verified state (2026-10-19e close)
 
-- Gates green at close: **1,418 tests** (core 191 · scraper 67 ·
-  insights 461 · markets 13 · api 233 · web 453), typecheck 6/6, lint
+- Gates green at close: **1,419 tests** (core 191 · scraper 67 ·
+  insights 462 · markets 13 · api 233 · web 453), typecheck 6/6, lint
   0 errors / 15 accepted advisories (D-24), copy audit clean, budgets
-  held (entry 294.78/89.38 vs 296/89.5; Insights lazy **594.68/142.03**
+  held (entry 294.78/89.39 vs 296/89.5; Insights lazy **594.68/142.02**
   vs 604/142.8; the export builders remain separate lazy chunks —
   full-export + xlsx-writer + panel, none budget-tracked).
-- Production = currena-api **`0eb91818`** from HEAD `193237e` (+ docs
+- Production = currena-api **`d40211f9`** from HEAD `81ca3e3` (+ docs
   wrap-up); currena-markets `9b5ff7e0`. Repo: `main` ==
   `insights-rebuild` (new work branches off `main`).
+- **The prices board is PUBLIC again (owner directive 2026-10-19e)**:
+  the projection serves 32 readings; the four tiles render with their
+  icons; the OTHER price ids (gold-aud, copper-usd, copper-gold,
+  gold-silver) + vix + the 16 world indices stay hidden — the quarterly
+  licence review must RE-CONFIRM the owner directive (the evidence note
+  on every overridden card says so).
 - **The ingest watchdog is LIVE** (ingest-watchdog.ts): the cron's :40
   hourly rung re-dispatches insights-ingest when the snapshot is >26 h
   old (6 h nudge bound via insights:ingest-nudge:v1);
@@ -111,10 +120,11 @@ files (the authority order: runbook → STEP3 → DEFECTS → FIX_SPEC),
   silently skipped 3 days (delays had grown to ~4h45m first); the
   watchdog now self-heals it hourly. insights-selfcheck's schedule has
   NEVER fired (registered 2026-10-19) — audit-only, no data path.
-- **The page is PUBLIC (2026-10-19b)**: unauthed `/api/insights` → 200
-  `public, max-age=60` serving the projection keys only (27 readings,
-  ruleVersion 2, displayMode public); `/markets` + `/fx` → 404
-  `hidden_site_mode`; the world sections stay hidden in the web build.
+- **The page is PUBLIC (2026-10-19b; prices restored 19e)**: unauthed
+  `/api/insights` → 200 `public, max-age=60` serving the projection
+  keys only (32 readings, ruleVersion 2, displayMode public);
+  `/markets` + `/fx` → 404 `hidden_site_mode`; the world sections stay
+  hidden in the web build.
   `INSIGHTS_PASSWORD` stays set — SITE_MODE='private' re-arms the 401
   gate instantly (rotate any time with `wrangler secret put`).
 - The runbook surface live: 51 scored readings + the crypto Fear &

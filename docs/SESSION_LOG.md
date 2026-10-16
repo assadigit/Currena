@@ -1,3 +1,21 @@
+# SESSION_LOG — Prices Board Restored to Public Mode 2026-10-19e
+
+Branch `insights-rebuild` (== main after the push) · production `d40211f9` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's "Still there aren't GOLD BITCOIN SILVER price, like it used to. please read previous version you will findout there was a dedicated nice section with images for it." — resolves the owner decision the 2026-10-19d investigation left open.
+
+### 1 · the re-diagnosis (live production, no repo needed at first)
+**What:** sandbox had reset again (no clone, no tokens); the repo is private — did the entire diagnosis against PRODUCTION: /api/insights etag + 28 readings (the four price ids absent; hidden set arithmetic 24 = 16 world indices + 7 price tiles + vix); EODHD probed healthy with a real quote (NOT quota, NOT an outage); all five tile icons still 200 (`/assets/icons/{oil,gold,silver,bitcoin,copper}.png` — the images never left); the live bundle carries the PricesBoard + icon map + Persian copy. Verdict: the tiles are data-starved by the Oct-19b licence-cautious hide, by design.
+**Evidence:** docs/evidence/2026-10-19e-prices-restore/ (api-before capture).
+
+### 2 · the restoration (owner directive, honest trail)
+**What:** with fresh tokens: cloned 95351cc; `OWNER_PUBLIC_DISPLAY_OVERRIDE` in scripts/generate-indicators-registry.ts for exactly {brent, gold-usd, silver-usd, btc-usd} — lifts ONLY the public-display disposition of the worst-leg walk with a dated evidence note per card (licence facts verbatim; Yahoo legs stay in the engine; world boards stay hidden); regenerated the three JSONs (hidden 24 → 20); LR-02 fixture brent → vix; NEW pin: the four tiles must never be re-hidden. Gates: 1,419 tests green (+1), typecheck 6/6, lint 0 errors/15 advisories, copy:audit clean, budgets held (entry 294.78/89.39; Insights lazy 594.68/142.02), T-15 PASSED in SITE_MODE=public (20 + boards).
+**Evidence:** commit `81ca3e3`; the generated-diff review (only the four licence blocks changed).
+
+### 3 · deploy + projection rebuild + live verify
+**What:** deployed currena-api `d40211f9-970b-4756-970c-8424f6062b20` (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`); rebuilt the public projection from the stored snapshot (52 → 32 public-ok; KV 2 reads / 1 write) so the tiles appeared immediately. Production: /api/insights → 32 readings (brent 109.13 · gold 4,164.70 · silver 57.27 · bitcoin 81,180.14 US$); live `#insights-prices` renders the four tiles WITH images; zero console/page errors; 375 scrollWidth === 375. BONUS: the money panel's "Petrol and transport" row is BACK (brent is 'expensive' again → "Becoming more expensive — US$109.13 Oil price (Brent)") — the data-driven gap diagnosed in 2026-10-19d.
+**Evidence:** docs/evidence/2026-10-19e-prices-restore/ (api-after capture + desktop/mobile screenshots + README); docs/DEPLOY.md's 2026-10-19e record.
+
+---
 # SESSION_LOG — Missing-Items Investigation + Ingest Watchdog 2026-10-19d
 
 Branch `insights-rebuild` (== main after the push) · production `0eb91818` · runner: pnpm 10.34.5 / Node 24.21.

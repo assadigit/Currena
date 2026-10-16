@@ -25,6 +25,13 @@ names where to look; nothing here needs the agent.
   (the register's evidence column names what to re-quote). Re-run
   `pnpm --filter @currena/insights exec tsx scripts/fred-copyright-scan.ts`
   and commit any changed records.
+- **RE-CONFIRM the 2026-10-19e owner directive**: the four prices tiles
+  (brent, gold-usd, silver-usd, btc-usd) are public BY OWNER DECISION —
+  `OWNER_PUBLIC_DISPLAY_OVERRIDE` in `scripts/generate-indicators-registry.ts`
+  lifts the Yahoo-leg display bar (not a terms re-verification). Ask the
+  owner each quarter whether the decision stands; if it is withdrawn,
+  delete the override entry and re-run the generator (the pin test will
+  correctly fail until the JSONs are regenerated).
 - **Review the registry**: `data/indicators.json` is generated — change the
   sources (`packages/insights/src/definitions.ts`) and run
   `pnpm registry:generate`, never the JSON by hand.
