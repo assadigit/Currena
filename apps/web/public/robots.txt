@@ -1,5 +1,10 @@
 User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /api/insights
 
 # Currena — the /admin ops page is noindex (meta + X-Robots-Tag + this rule).
+# Step 3 §2.2 AC-06 (2026-10-16): the Insights data paths are excluded here,
+# and every /api/insights* response carries X-Robots-Tag: noindex itself; the
+# gated payloads are private (401 without a session), so there is nothing to
+# index even if a link leaks.

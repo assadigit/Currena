@@ -134,7 +134,12 @@ const livePrices: LivePricesSnapshot = {
 
 /* --------------------------------- app ---------------------------------- */
 
-const env: Bindings = { RATES: { get: async () => null } as unknown as KVNamespace };
+// SITE_MODE 'public': these payload/cache-shape tests exercise the data
+// routes with the gate OFF — the gate itself is covered in insights-auth.test.ts.
+const env: Bindings = {
+  RATES: { get: async () => null } as unknown as KVNamespace,
+  SITE_MODE: 'public',
+};
 let store: InMemoryRateStore;
 let insightsStore: InMemoryInsightsStore;
 let marketsStore: InMemoryMarketsStore;

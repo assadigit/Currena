@@ -29,6 +29,14 @@
     }
   ],
   // One deploy, no CORS: the same Worker serves the built SPA (Phase 5).
+  // Step 3 §2.2 (runbook Phase 3): SITE_MODE is 'private' by default — every
+  // /api/insights* route sits behind the INSIGHTS_PASSWORD gate (a wrangler
+  // SECRET, set with `wrangler secret put INSIGHTS_PASSWORD`, never here).
+  // Flipping SITE_MODE to 'public' removes the gate; the T-15 build check
+  // then fails while any displayed source is not public-display-ok.
+  "vars": {
+    "SITE_MODE": "private"
+  },
   "assets": {
     "directory": "../web/dist",
     "binding": "ASSETS",

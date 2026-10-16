@@ -357,6 +357,12 @@ export const insightsCopyFa: InsightsCopy = {
     exportColDate: 'تاریخ',
     exportRuleVersion: 'نسخهٔ قواعد: {v}',
     exportVerdictCounts: '{warning} از {voting} هشدار',
+    // گام ۳ بند ۲.۲ (AC-03): حالت خصوصی دروازه و فرم ورود.
+    privateTitle: 'صفحهٔ خصوصی',
+    privateBody: 'این صفحه خصوصی است. اطلاعاتش فقط در دسترس مالک آن است.',
+    privatePasswordLabel: 'گذرواژه',
+    privateSubmit: 'ورود',
+    privateWrong: 'این گذرواژه صفحه را باز نکرد.',
     // نقص E-03: توضیح قرارداد آینده روی سطرهای برنت/طلا/نقره.
     exportFuturesNote: 'قرارداد آینده (ماه جاری)، نه قیمت نقدی',
     // نقص E-23: ستون‌های حسابرسی جدول شاخص‌ها.

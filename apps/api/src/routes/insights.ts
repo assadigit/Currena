@@ -1,19 +1,22 @@
 /**
  * Insights read routes (Phase I3, roadmap §2 "API"):
  *
- *   GET /api/insights                — the precomputed snapshot
- *   GET /api/insights/markets        — the world stock markets snapshot
- *   GET /api/insights/fx             — the world currencies snapshot
- *   GET /api/insights/:id/history    — one indicator's downsampled 10-year series
+ *   POST /api/insights/login        — the private gate's sign-in (Step 3 §2.2)
+ *   GET /api/insights               — the precomputed snapshot
+ *   GET /api/insights/markets       — the world stock markets snapshot
+ *   GET /api/insights/fx            — the world currencies snapshot
+ *   GET /api/insights/:id/history   — one indicator's downsampled 10-year series
  *
+ * Step 3 §2.2 (runbook Phase 3, 2026-10-16): EVERY data route here sits
+ * behind the private gate (`requireInsightsAuth`) — an unauthenticated
+ * request returns 401 with no data; the page shell stays public. In
+ * SITE_MODE=public the gate skips (content eligibility is T-15's job).
+ * Authenticated responses carry `Cache-Control: private, no-store` (AC-05).
  * The Worker only READS what a scheduled job wrote (cheap: exactly one KV
  * read per request, no scoring at the edge — for the markets route the
- * read rides the spec's 5-minute KV edge cache, and the response itself is
- * double-cached: browser/CDN via Cache-Control and the Worker's own
- * caches.default). All routes carry content-addressed ETags +
- * If-None-Match 304s like /api/rates and /api/history, and a short public
- * cache (the payloads change at most once a day). Errors use the
- * RatesError envelope, same as the rest of /api.
+ * read rides the spec's 5-minute KV edge cache). Routes carry
+ * content-addressed ETags + If-None-Match 304s like /api/rates. Errors use
+ * the RatesError envelope, same as the rest of /api.
  *
  * 2026-10-14 (owner-approved, D-13): the /markets and /fx edge TTL was
  * tightened from 1 hour to 5 minutes (s-maxage 3600 → 300, KV read
@@ -41,6 +44,7 @@ import type { FxReader } from '@currena/insights/fx';
 import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
 import { errorResponse } from '../http';
+import { handleInsightsLogin, requireInsightsAuth } from '../insights-auth';
 import type { Bindings } from '../index';
 
 interface InsightsRouteDeps {
@@ -63,6 +67,11 @@ interface InsightsRouteDeps {
 export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: Bindings }> {
   const app = new Hono<{ Bindings: Bindings }>();
   const now = deps.now ?? (() => new Date());
+
+  // The private gate (Step 3 §2.2, runbook Phase 3): ONE middleware wraps
+  // every data route below; the login route itself mounts BEFORE it.
+  app.post('/login', handleInsightsLogin);
+  app.use('*', requireInsightsAuth());
 
   app.get('/', async (c) => {
     // KV-failure honesty (QA audit A-2): a reader rejection is NOT "not

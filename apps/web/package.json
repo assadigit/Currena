@@ -7,7 +7,7 @@
     "dev": "vite",
     "icons": "node scripts/generate-icons.mjs",
     "prebuild": "node scripts/generate-icons.mjs",
-    "build": "vite build",
+    "build": "node ../../scripts/check-site-mode.mjs && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"

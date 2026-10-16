@@ -64,6 +64,7 @@ import { InsightsHeader } from './insights-sections/InsightsHeader';
 import {
   InsightsErrorState,
   InsightsLoadingState,
+  InsightsPrivateState,
   ReadingProgress,
   StaleCacheNotice,
   type LoadState,
@@ -139,6 +140,13 @@ export function Insights() {
       })
       .catch((err: unknown) => {
         if (controller.signal.aborted) return;
+        // Step 3 §2.2 AC-03 (runbook Phase 3): the gate's 401 flips the page
+        // to the neutral private state — even over a cached 'ready' (the
+        // session has expired; nothing may read as current).
+        if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+          setState({ kind: 'private' });
+          return;
+        }
         const message =
           err instanceof ApiError && err.kind === 'rates' ? err.message : err instanceof Error ? err.message : 'Insights feed unavailable';
         setState((prev) => (prev.kind === 'ready' ? prev : { kind: 'error', message, cached }));
@@ -337,6 +345,8 @@ export function Insights() {
        * own big icon; the hero's "View section" links scroll to them. */}
 
       {state.kind === 'loading' ? <InsightsLoadingState /> : null}
+
+      {state.kind === 'private' ? <InsightsPrivateState copy={copy} /> : null}
 
       {state.kind === 'error' ? (
         <InsightsErrorState copy={copy} message={state.message} onRetry={() => setRetryToken((n) => n + 1)} />

@@ -19,7 +19,8 @@ import { Button } from '../../components/ui';
 export type LoadState =
   | { kind: 'loading' }
   | { kind: 'ready'; snapshot: InsightsSnapshot; fromCache: boolean }
-  | { kind: 'error'; message: string; cached: InsightsSnapshot | null };
+  | { kind: 'error'; message: string; cached: InsightsSnapshot | null }
+  | { kind: 'private' };
 
 function SummarySkeleton() {
   return (
@@ -66,6 +67,71 @@ export function InsightsErrorState({
           {copy.ui.retry}
         </Button>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Step 3 §2.2 AC-03 (runbook Phase 3, 2026-10-16): the PRIVATE state — what
+ * an unauthenticated visitor sees. One neutral message with no values, no
+ * source names and no hints, plus the owner's sign-in form (the gate's
+ * password posts to /api/insights/login; success reloads the page with the
+ * signed session cookie). The form's error line is equally neutral — it
+ * never says whether the password was close.
+ */
+export function InsightsPrivateState({ copy }: { copy: InsightsCopy }) {
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [wrong, setWrong] = useState(false);
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (busy || password.length === 0) return;
+    setBusy(true);
+    setWrong(false);
+    try {
+      const res = await fetch('/api/insights/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        window.location.reload(); // the signed cookie is set — boot fresh
+        return;
+      }
+      setWrong(true);
+    } catch {
+      setWrong(true);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="flex flex-col items-center gap-4 rounded-[var(--radius-lg)] bg-[var(--color-surface)] px-5 py-10 text-center ring-1 ring-[var(--color-border)]">
+      <h2 className="m-0 text-[length:var(--type-title)] font-bold text-[var(--color-text-primary)]">{copy.ui.privateTitle}</h2>
+      <p className="m-0 max-w-md text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.ui.privateBody}</p>
+      <form onSubmit={submit} className="mt-2 flex w-full max-w-xs flex-col gap-2">
+        <label className="sr-only" htmlFor="insights-gate-password">
+          {copy.ui.privatePasswordLabel}
+        </label>
+        {/* The house ui.tsx carries no Input primitive — a styled native
+         * input keeps the dependency-free discipline. 44px tall (touch). */}
+        <input
+          id="insights-gate-password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          autoComplete="current-password"
+          className="h-11 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-[length:var(--type-label)] text-[var(--color-text-primary)] outline-none focus:ring-2 focus:ring-[var(--color-ring)]"
+        />
+        <Button type="submit" variant="cta" disabled={busy || password.length === 0} className="h-11">
+          {copy.ui.privateSubmit}
+        </Button>
+      </form>
+      {wrong ? (
+        <p role="alert" className="m-0 text-[length:var(--type-label)] font-semibold text-[var(--color-status-alert)]">
+          {copy.ui.privateWrong}
+        </p>
+      ) : null}
     </div>
   );
 }

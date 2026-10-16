@@ -45,6 +45,18 @@ export type Bindings = {
   REFRESH_SECRET?: string;
   /** Optional: when set, GET /admin requires a sign-in (HMAC cookie session). */
   ADMIN_VIEW_SECRET?: string;
+  /**
+   * Step 3 §2.2 (runbook Phase 3): the Insights private gate's password.
+   * UNSET = the gate fails closed (every /api/insights* route answers 401).
+   * Set with `wrangler secret put INSIGHTS_PASSWORD` (OWNER_SETUP step 1).
+   */
+  INSIGHTS_PASSWORD?: string;
+  /**
+   * Step 3 §2.2 AC-08: 'private' (default) gates every Insights data
+   * route; 'public' skips the gate — the build then enforces T-15 (every
+   * displayed source must be public-display-ok). Set as a wrangler var.
+   */
+  SITE_MODE?: string;
   /** Static-assets binding (implicit when wrangler.jsonc has `assets`); serves the SPA. */
   ASSETS?: Fetcher;
 };

@@ -1488,6 +1488,13 @@ export const insightsCopyEn = {
     exportColDate: 'Date',
     exportRuleVersion: 'Rule version: {v}',
     exportVerdictCounts: '{warning} of {voting} in warning',
+    // Step 3 §2.2 AC-03: the private gate's neutral state + sign-in form.
+    privateTitle: 'Private page',
+    privateBody:
+      'This page is private. Its information is available to the owner only.',
+    privatePasswordLabel: 'Password',
+    privateSubmit: 'Sign in',
+    privateWrong: 'That password did not open the page.',
     // Defect E-03: the futures wording on the Brent/gold/silver detail lines.
     exportFuturesNote: 'futures (front-month contract), not spot',
     // Defect E-23: the indicators table's audit columns + yes/no words.
