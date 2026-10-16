@@ -1,3 +1,21 @@
+# SESSION_LOG — Missing-Items Investigation + Ingest Watchdog 2026-10-19d
+
+Branch `insights-rebuild` (== main after the push) · production `0eb91818` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's "Some items are gone… investigate whether it's api problem, quota or what" — the gold/silver/brent/bitcoin grid, the no-data items, and the petrol→employment money-panel shift.
+
+### 1 · the investigation (KV forensics, not guesses)
+**What:** pulled BOTH snapshots (public API + the private `insights:snapshot` via wrangler KV): 51 private / 27 public / exactly the 24 generated hidden ids; ZERO stale/unavailable in both; the hidden set maps 1:1 to data/site-mode-overrides.json (audit verdicts no/unknown). Prices grid = the four tiles' licence hiding (PricesBoard renders nothing when its readings are hidden). Gauge "no data" = hidden members (Market stress 0/4 + The US dollar 0/2 fully unreadable; four gauges partial). Money panel = `moneyPanel()` computed on both snapshots → identical rows (homeLoan, savings, shop, jobs) — petrol's remaining drivers are all calm (row absent on private too); employment's drivers are both warning AND public-ok.
+**Evidence:** this record + CHANGELOG 2026-10-19d (the verdict table).
+
+### 2 · the REAL outage + the instant remediation
+**What:** found the daily insights-ingest schedule SILENTLY dead since Oct 16 (zero attempted runs ×3 days; delays had grown to ~4h45m before the stop; push CI fired instantly — not quota, not the file). Dispatched the workflow manually (run 35 success): generatedAt 09:06 → 17:59; public projection 27 → 28 (crypto-fng rode in as predicted).
+**Evidence:** GHA run 35; the public API's new etag.
+
+### 3 · the durable fix (deployed)
+**What:** apps/api/src/ingest-watchdog.ts — the Worker cron's :40 hourly rung; snapshot >26 h → GitHub workflow_dispatch re-dispatch; 6 h nudge bound via KV marker; no-token = honest no-op; all failures caught. GH_INGEST_DISPATCH_TOKEN set on currena-api. Tests +11 (9 branches + 2 routing); 1,418 green; budgets held. Deployed currena-api `0eb91818` from `193237e`; smoke green (health/insights 200 public/markets 404 by design/convert parity LIVE).
+**Evidence:** docs/DEPLOY.md's 2026-10-19d record.
+
+---
 # SESSION_LOG — Round 44 Meter Grading 2026-10-19c
 
 Branch `insights-rebuild` (== main after the push) · production `e8a47a2d` · runner: pnpm 10.34.5 / Node 24.21.

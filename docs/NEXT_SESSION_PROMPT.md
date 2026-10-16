@@ -1,17 +1,19 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-19c (ROUND 44 session — the owner's colour-grading
-idea shipped: the verdict meter grades in ONE hue, the CURRENT step's —
-the highest filled segment wears the full step ink, the segments before
-it wear progressively whiter tints (cautious 55% yellow · stressed
-40/70% orange · critical 30/55/78% red; stable pure green); VerdictMeter
-+ the QuestionGroup header meter carry `data-step` so every meter (hero
-lg, per-gauge sm, MarketsVerdict, six question headers) grades
-identically in both themes. Deployed currena-api `e8a47a2d` from
-`50ba45b`; production verified — deployed CSS byte-identical, the live
-Critical hero meter resolves pale→full red ending at Carbon Red 60
-verbatim, Stable stays #24a148, 375 clean, zero errors; see CHANGELOG
-2026-10-19c + docs/evidence/2026-10-19-round44-meter-grading/.
+Hand-off date: 2026-10-19d (MISSING-ITEMS INVESTIGATION session — the
+owner's "investigate whether it's api problem, quota or what": VERDICT —
+the gold/silver/brent/bitcoin grid + the no-data gauges are the PUBLIC
+projection's licence hiding BY DESIGN; the money-panel petrol→employment
+shift is DATA-driven (petrol's drivers calm on BOTH pages; employment's
+drivers warning AND public-ok). THE REAL OUTAGE: the daily
+insights-ingest GitHub schedule silently died after Oct 16 (3 days,
+zero attempted runs). FIXED: manual dispatch restored data (public
+projection 27 → 28 — crypto-fng rode in) + the INGEST WATCHDOG shipped:
+apps/api/src/ingest-watchdog.ts — the Worker cron's :40 rung
+re-dispatches the ingest when the snapshot is >26 h stale (6 h nudge
+bound; GH_INGEST_DISPATCH_TOKEN secret set). Deployed currena-api
+`0eb91818` from `193237e`; 1,418 tests green. See CHANGELOG
+2026-10-19d + docs/DEPLOY.md's 2026-10-19d record.
 The prior 2026-10-19b session flipped Insights PUBLIC (owner decree:
 SITE_MODE=public deployed `36d76363`; the licence-legal projection only
 — 27 of 51 readings; the EODHD/Yahoo world boards + 24 non-'yes'
@@ -88,17 +90,27 @@ never hit live sites, secrets never persisted. Then this file,
 files (the authority order: runbook → STEP3 → DEFECTS → FIX_SPEC),
 `FIX_REPORT.md`, `STEP3_REPORT.md`, `MAINTENANCE.md`, `OWNER_SETUP.md`.
 
-## 2. Current verified state (2026-10-19c close)
+## 2. Current verified state (2026-10-19d close)
 
-- Gates green at close: **1,407 tests** (core 191 · scraper 67 ·
-  insights 461 · markets 13 · api 222 · web 453), typecheck 6/6, lint
+- Gates green at close: **1,418 tests** (core 191 · scraper 67 ·
+  insights 461 · markets 13 · api 233 · web 453), typecheck 6/6, lint
   0 errors / 15 accepted advisories (D-24), copy audit clean, budgets
   held (entry 294.78/89.38 vs 296/89.5; Insights lazy **594.68/142.03**
   vs 604/142.8; the export builders remain separate lazy chunks —
   full-export + xlsx-writer + panel, none budget-tracked).
-- Production = currena-api **`e8a47a2d`** from HEAD `50ba45b` (+ docs
+- Production = currena-api **`0eb91818`** from HEAD `193237e` (+ docs
   wrap-up); currena-markets `9b5ff7e0`. Repo: `main` ==
   `insights-rebuild` (new work branches off `main`).
+- **The ingest watchdog is LIVE** (ingest-watchdog.ts): the cron's :40
+  hourly rung re-dispatches insights-ingest when the snapshot is >26 h
+  old (6 h nudge bound via insights:ingest-nudge:v1);
+  `GH_INGEST_DISPATCH_TOKEN` is set on the Worker — it MUST ride the
+  owner's token rotation (a dead token = the watchdog degrades to the
+  honest logged no-op, never a crash).
+- **The ingest GHA schedule is watch-listed**: GitHub's scheduler
+  silently skipped 3 days (delays had grown to ~4h45m first); the
+  watchdog now self-heals it hourly. insights-selfcheck's schedule has
+  NEVER fired (registered 2026-10-19) — audit-only, no data path.
 - **The page is PUBLIC (2026-10-19b)**: unauthed `/api/insights` → 200
   `public, max-age=60` serving the projection keys only (27 readings,
   ruleVersion 2, displayMode public); `/markets` + `/fx` → 404

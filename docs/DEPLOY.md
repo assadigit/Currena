@@ -1389,3 +1389,52 @@ ones get orange too like this: [more pale orange] [pale orange] [orange]
   no per-round approval gate (OWNER_SETUP §10).
 - **Evidence**: `docs/evidence/2026-10-19-round44-meter-grading/` (the
   light+dark ramp render + production screenshots at 1280 and 375).
+
+## Session record — 2026-10-19d the missing-items investigation + the ingest watchdog
+
+The owner: "Some items are gone… the grid that shown GOLD - Silver -
+brent oil and bitcoin price… many items have no data / or not defined /
+or waiting… investigate whether it's api problem, quota or what." Plus:
+the petrol/transport money row is gone while employment rate appeared.
+
+- **Investigated, not guessed**: last ingest 50/50 sources OK, ZERO
+  stale/unavailable readings in BOTH snapshots; push CI ran throughout
+  (so no minutes quota). The prices grid + the no-data gauges are the
+  PUBLIC projection's licence hiding (gold/silver/brent/btc =
+  `public_display_ok: no` → absent from the public snapshot →
+  PricesBoard renders nothing; Market stress 0/4 + The US dollar 0/2
+  gauge members fully hidden → "not enough data to read"). The
+  money-panel shift is DATA-driven: `moneyPanel()` computed on BOTH
+  snapshots gives identical rows (homeLoan, savings, shop, jobs) —
+  petrol's remaining drivers are all calm right now (row absent on
+  private too); employment's drivers are both warning AND public-ok.
+- **The REAL outage**: the daily insights-ingest schedule silently
+  stopped firing after Oct 16 (three days, zero attempted runs; the
+  04:20 cron had been firing ~4h45m late before the stop — GitHub-side
+  schedule delays/skips; NOT quota, NOT the workflow file).
+- **Freshness restored**: manual workflow_dispatch (run 35, success) —
+  generatedAt 09:06 → 17:59, public projection 27 → 28 readings (the
+  crypto Fear & Greed card rode in as predicted).
+- **The durable fix** (commit `193237e`): `apps/api/src/ingest-watchdog.ts`
+  — the Worker's cron :40 hourly rung reads insights:status; snapshot
+  > 26 h old → re-dispatch the ingest workflow via the GitHub API
+  (nudges bounded 1/6 h by a KV marker; missing token = honest logged
+  no-op; all failure paths caught). `GH_INGEST_DISPATCH_TOKEN` set as a
+  Worker secret (rides the owner's token-rotation pass). +11 tests
+  (9 watchdog branches + 2 cron routing).
+- **Gates**: 1,418 tests green, typecheck 6/6, lint 0 errors / 15
+  advisories, budgets held, copy audit clean.
+- **Deployed**: currena-api **`0eb91818-9a1f-4dd6-ac8f-f250b1004f28`**
+  from `193237e`. SITE_MODE=public untouched; currena-markets untouched
+  (`9b5ff7e0`). Smoke: health 200 kv ok; insights 200 public; markets
+  404 hidden_site_mode (by design); convert parity 26,790,000 @ 267,900
+  LIVE; secret list carries GH_INGEST_DISPATCH_TOKEN.
+- **Honest limits**: the watchdog's stale path is unit-verified; its
+  first LIVE exercise rides the next :40 rung after the snapshot ages
+  past 26 h (the healthy path exercises hourly). The selfcheck GHA's
+  schedule (registered Oct 16) has never fired once — same GitHub-side
+  class of failure; it is an audit nicety, not data-path, and stays
+  watch-listed. The licence-hiding itself is the spec's fail-safe
+  design: recovering the four price tiles publicly needs either
+  verified-'unknown' licences (~10 more cards) or public-ok source
+  swaps — owner decisions, not silent fixes.

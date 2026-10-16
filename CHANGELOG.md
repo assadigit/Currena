@@ -5,6 +5,76 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-19d] — the missing-items investigation + the ingest watchdog
+
+The owner: "Some items are gone, for example the grid that shown GOLD -
+Silver - brent oil and bitcoin price. also many items have no data / or
+not defined / or waiting. investigate whether it's api problem, quota or
+what."
+
+### Verdict (investigated, not guessed)
+
+- **API problem? No.** The last ingest (Oct 16 09:06) succeeded 50/50
+  sources with ZERO failures; both the private and public snapshots
+  carry ZERO stale/unavailable readings. Quota? No — push-triggered CI
+  kept running throughout.
+- **The prices grid (gold/silver/brent/bitcoin) is GONE BY DESIGN** —
+  the PUBLIC projection's licence hiding: all four tiles' sources carry
+  `public_display_ok: no` in the indicator audit (EODHD/Yahoo terms do
+  not allow public display), so their readings are absent from
+  `insights:snapshot-public` and `PricesBoard` renders nothing
+  (`rows.length === 0 → return null`). The world boards (/markets, /fx)
+  are hidden the same way.
+- **The "no data / not defined" items are the hidden gauge members** —
+  with 24 of 51 indicators hidden, two GLOBAL question gauges lose
+  every member (Market stress 0/4, The US dollar 0/2 → the honest
+  "not enough data to read" group), and four more read partially
+  (borrowing-costs 5/8, prices-heat 1/3, growth-health 3/6,
+  au-trade-currency 1/3).
+- **The money-panel shift is DATA-driven, not licence-driven** — money
+  rows show only attention/unusual areas. Petrol/transport's drivers
+  are `['brent', 'au-petrol-yoy', 'audusd']`: brent + audusd are
+  licence-hidden publicly AND (the decisive part) ALL of petrol's
+  remaining drivers are calm right now, so the row is absent on BOTH
+  the private and public pages today (verified by computing
+  `moneyPanel()` on both snapshots — identical rows: homeLoan, savings,
+  shop, jobs). Employment appears because `au-unemployment` +
+  `au-wage-growth` are BOTH currently `warning` — and both are
+  public-ok, so the row survives the projection.
+
+### The REAL outage found underneath (and fixed)
+
+The daily `insights-ingest` schedule had silently STOPPED firing after
+Oct 16 (zero attempted runs for three days; the 04:20 UTC cron had
+already been firing ~4h45m late before the full stop — GitHub-side
+schedule delays/skips). Data was three days stale with only the /admin
+staleness pill as a signal.
+
+### Added
+
+- `apps/api/src/ingest-watchdog.ts` — the Worker-side self-heal: the
+  cron's :40 hourly rung reads `insights:status`; a snapshot older than
+  26 h re-dispatches the insights-ingest workflow via the GitHub API.
+  Nudges bounded to one per 6 h (`insights:ingest-nudge:v1`); a missing
+  `GH_INGEST_DISPATCH_TOKEN` secret is an honest logged no-op; every
+  failure path is caught. Healthy path: 1 KV read/hour, zero writes.
+- `GH_INGEST_DISPATCH_TOKEN` set on currena-api (rides the owner's
+  token-rotation pass).
+- Tests: +9 watchdog branches, +2 cron-routing tests. Suite 1,418
+  green; budgets held; typecheck 6/6; lint 0 errors / 15 advisories.
+
+### Deployed
+
+- currena-api **`0eb91818-9a1f-4dd6-ac8f-f250b1004f28`** from `193237e`.
+  SITE_MODE=public untouched; currena-markets untouched (`9b5ff7e0`).
+- Freshness RESTORED first: a manual `workflow_dispatch` ran the ingest
+  immediately (run 35, success) — the public snapshot's generatedAt
+  jumped 09:06 → 17:59 and the public projection grew **27 → 28
+  readings** (the crypto Fear & Greed card rode in, exactly as the
+  2026-10-19b deploy notes predicted). Post-deploy smoke: health 200
+  kv ok; insights 200 public; markets 404 hidden_site_mode (by design);
+  convert parity 100 USD = 26,790,000 @ 267,900 tgju LIVE.
+
 ## [2026-10-19c] — the verdict meter grades in one hue (round 44)
 
 The owner's colour-grading idea, in their words: "when it's stable show
