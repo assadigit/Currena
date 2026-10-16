@@ -1,3 +1,25 @@
+# SESSION_LOG — Insights Rebuild Ship 2026-10-19
+
+Branch `insights-rebuild` (fast-forwarded to `main` after approval) · HEAD `1f70552` → production `b137f3ef` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's "Approved. Push and Deploy and commit." on the completed AGENT_RUNBOOK execution — re-verify, ship, wrap docs.
+
+### 1 · ops: OWNER_SETUP §1 on the owner's behalf — INSIGHTS_PASSWORD set
+**What:** generated a long random password (`openssl rand -base64 18`) and uploaded it as the `INSIGHTS_PASSWORD` Worker secret on currena-api (`printf '%s' | wrangler secret put` — no trailing newline, per DEPLOY.md's hard-won warning). Value handed to the owner in chat; never written to the repo or logs.
+**Evidence:** `wrangler secret list` → ADMIN_VIEW_SECRET, INSIGHTS_PASSWORD, REFRESH_SECRET.
+
+### 2 · deploy: currena-api `b137f3ef` from `1f70552` (owner-approved)
+**What:** sandbox had reset (checkout lost) → fresh clone, `insights-rebuild` at `1f70552` (== origin, tree clean, nothing to commit code-wise), all gates re-run green (1,389 tests: core 191 · scraper 67 · insights 451 · markets 13 · api 214 · web 453; typecheck 6/6; lint 0 errors/15 advisories; copy audit clean; build + T-15 site-mode OK; budgets held 294.79/88.56 and 594.49/141.54), then `wrangler deploy` of apps/api. currena-markets untouched (`9b5ff7e0`).
+**Evidence:** wrangler deploy output (29 assets + worker + cron, version `b137f3ef-00c7-4356-abbd-7e8083212744`).
+
+### 3 · verify: the private gate is LIVE and the exports still work — on production
+**What:** smoke matrix — health 200 kv ok; unauthed `/api/insights` → 401 `private_page` no-store (fail-closed honoured in production); login → signed HttpOnly 12h cookie → authed 200 `private, no-store` with 51 readings, ruleVersion 2; `/admin` 401; convert parity 100 USD → 26,790,000 @ 267,900 tgju. agent-browser DOM pass: private gate screen → sign-in → full render (grouped status boxes, seated tips, F&G card live); CSV + XLSX clicked through the real UI, downloaded (23.5 kB / 114.1 kB), zero page/console errors; CSV BOM (ef bb bf) + E-23/E-24 audit columns verified; XLSX valid zip, docProps, Normal style, 10 sheets; fa `dir=rtl lang=fa`; 375 px scrollWidth === 375. The only buy/sell/hold regex hit on the page is "One bitcoin buys 19.4 oz of gold" — a context sentence, not a verdict word.
+**Evidence:** `docs/evidence/2026-10-19-insights-deploy/` (5 screenshots + both downloaded artefacts).
+
+### 4 · repo: branch pushed, main fast-forwarded
+**What:** docs commit on `insights-rebuild` (this file, DEPLOY record, CHANGELOG 2026-10-19, PROGRESS row, NEXT_SESSION_PROMPT rewrite, evidence) → push; `main` fast-forwarded to the same line → push (the branch also repairs main's `branches: ain]` ci.yml stray edit, so CI triggers on main pushes from here).
+**Evidence:** git log both branches at the docs commit; CI "gates" run on main.
+
+---
 # SESSION_LOG — Autonomous Session 2026-09-24
 
 Branch `improve/autonomous-session-2026-09-24` · base `bf61524` · runner: pnpm 10.34.5 / Node 24.

@@ -1,31 +1,37 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-18b (export-fix session — the owner's bug report
-"The xlsx and csv outputs are incomplete and not working. md and txt
-works." forensically diagnosed (the builders were complete; the failure
-was Excel-side: BOM-less UTF-8 CSV mojibake on fa-Windows, the flat
-26-slot sparse matrix, and the minimal OOXML package tripping strict
-viewers) and fixed — every CSV ships with the UTF-8 BOM, the full CSV is
-one dense block per section (the MD/TXT structure), the xlsx-writer is
-hardened (docProps floor, named "Normal" style, per-sheet dimension +
-cols width, xml:space on <t>, plain-decimal <v>, rightToLeft fa sheet
-views), and the download handler fails loudly. Deployed currena-api
-`be5c0121` from HEAD `ca991e7`, currena-markets `9b5ff7e0` untouched;
-see CHANGELOG 2026-10-18b, docs/DEPLOY.md's last session record and
-docs/evidence/2026-10-18-export-fix/).
-· Production: https://currena.ir
-· The export-fix, round-43, round-42 and quirk-pass commissions are all
-  CLOSED. Do not reopen declined items.
+Hand-off date: 2026-10-19 (insights-rebuild SHIP session — the owner's
+"Approved. Push and Deploy and commit." on the completed AGENT_RUNBOOK
+execution. The sandbox had reset, so the state was rebuilt from a fresh
+clone: gates re-run green (1,389 tests), OWNER_SETUP §1 executed on the
+owner's behalf (INSIGHTS_PASSWORD generated + uploaded as a Worker
+secret, value handed over in chat), currena-api deployed → `b137f3ef`
+from `1f70552`, currena-markets untouched (`9b5ff7e0`), production
+smoke + DOM verified (private gate LIVE: unauthed /api/insights → 401
+no-data; exports CSV/XLSX clicked through the real UI, BOM + valid
+OOXML, zero errors; fa RTL; 375 no-bleed), then `insights-rebuild`
+pushed and `main` FAST-FORWARDED to it (main's stray `branches: ain]`
+ci.yml edit is gone — CI now triggers on main pushes). See CHANGELOG
+2026-10-19, docs/DEPLOY.md's last session record and
+docs/evidence/2026-10-19-insights-deploy/.
+· Production: https://currena.ir — the Insights page is now PRIVATE:
+  every /api/insights* route answers 401 until sign-in; the password is
+  the INSIGHTS_PASSWORD secret (owner-side value, 12h cookie session).
+· The AGENT_RUNBOOK commission and the export-fix, round-43, round-42
+  and quirk-pass commissions are all CLOSED. Do not reopen declined
+  items.
 
 ---
 
 ## 0. This session's commission — TBD by the owner
 
 No pre-staged spec for the next wave. When the owner assigns it, start
-from: (a) the remaining owner-side items below, (b) whatever new
-commission arrives. If asked to "keep polishing", the QA reports'
-"also checked, already clean" lists are the honest floor — do not
-invent work against the deliberate-KEEP decisions.
+from: (a) the remaining owner-side / not-verified items below, (b)
+whatever new commission arrives. If asked to "keep polishing", the QA
+reports' "also checked, already clean" lists are the honest floor — do
+not invent work against the deliberate-KEEP decisions. IMPORTANT since
+2026-10-19: `main` == `insights-rebuild` — start NEW work on a NEW
+branch off `main`.
 
 ## 1. What this project is
 
@@ -36,60 +42,71 @@ Workers (Free plan, permanently — see the I0 gate decision).
 
 - `apps/api` — Hono on Workers (`/api/*`, zero-JS `/admin`, serves the
   built SPA). Cron `* * * * *` keep-warms the live rates ladder; the
-  `:13` minute rung refreshes Insights live prices.
+  `:13` minute rung refreshes Insights live prices. Since
+  2026-10-19 it also runs the PRIVATE GATE (`src/insights-auth.ts`):
+  HMAC-signed 12h HttpOnly cookie, rate-limited login, fail-closed
+  when `INSIGHTS_PASSWORD` is unset, `SITE_MODE` var (stays
+  `private` — flipping to `public` removes the gate AND fails the
+  build via T-15, `scripts/check-site-mode.mjs`).
 - `apps/markets` — source scrapers + daily snapshot crons. Deployed
   `9b5ff7e0` is current — untouched since 2026-10-15.
 - `apps/web` — Vite + React + TS + Tailwind **PWA** (hash router,
   routes: Converter, LiveRates, History, BatchConverter, Calculator,
   Splitter, Settle, Receipt, About, Insights) en/fa RTL, light+dark.
-  Insights is a lazy chunk (603.89/142.61 vs 604/142.8 budget — thin).
+  Insights is a lazy chunk (594.49/141.54 vs 604/142.8 budget).
 - `packages/core` — zod contracts (`schemas.ts` — **storage
-  compatibility is sacred**).
-- `packages/insights` — compute engine: scoring, validation (T-01…T-14),
-  connections, gauges, adapters.
+  compatibility is sacred**; the runbook added the additive
+  quarterly periodStart/End fields).
+- `packages/insights` — compute engine: the indicator registry,
+  scoring, validation (T-01…T-14), connections, gauges, adapters,
+  the licence register (`src/licences.ts`).
 - `packages/scraper` — TGJU + Frankfurter + … source scrapers.
-- `data/` — `indicators.json` (51-entry registry, generated —
-  CI-pinned), `policy-decisions.json`, context-notes slot.
+- `data/` — `indicators.json` (51-entry registry + the runbook's
+  licence fields, generated — CI-pinned), `indicator-audit.json`
+  (generated sidecar), `policy-decisions.json`, context-notes slot.
 - Ingest: the `insights-ingest` GHA (04:20 UTC daily) fetches →
   validates → publishes to KV (budget 55 reads / 31 writes / 49
-  outside requests per refresh).
+  outside requests per refresh). `insights-selfcheck` GHA (04:50 UTC)
+  runs the self-audit daily and publishes nothing.
 
 **Read before touching anything:** `AGENTS.md` (root) — TS strict,
 zod at every boundary, RTL/LTR native, **TOMAN canonical**, tests
 never hit live sites, secrets never persisted. Then this file,
 `docs/PROGRESS.md`, `docs/DECISIONS_FOR_ALI.md` (D-01…D-27),
-`docs/DEPLOY.md`, `docs/QA/quirks-2026-10-18-round43.md` (the latest
-commission's record), `docs/QA/quirks-2026-10-17-hero-calm.md` and
-`docs/QA/quirks-2026-10-16.md` (the prior ones), `FIX_REPORT.md`.
+`docs/DEPLOY.md`, `docs/insights/AGENT_RUNBOOK.md` + its four spec
+files (the authority order: runbook → STEP3 → DEFECTS → FIX_SPEC),
+`FIX_REPORT.md`, `STEP3_REPORT.md`, `MAINTENANCE.md`, `OWNER_SETUP.md`.
 
-## 2. Current verified state (2026-10-18b close)
+## 2. Current verified state (2026-10-19 close)
 
-- Gates green at close: **1,331 tests** (core 191 · scraper 67 ·
-  insights 403 · markets 13 · api 208 · web 449), typecheck 6/6, lint
+- Gates green at close: **1,389 tests** (core 191 · scraper 67 ·
+  insights 451 · markets 13 · api 214 · web 453), typecheck 6/6, lint
   0 errors / 15 accepted advisories (D-24), copy audit clean, budgets
-  held (entry 294.75/88.52 vs 296/89.5; Insights lazy **603.89/142.61**
+  held (entry 294.79/88.56 vs 296/89.5; Insights lazy **594.49/141.54**
   vs 604/142.8; the export builders remain separate lazy chunks —
   full-export + xlsx-writer + panel, none budget-tracked).
-- The export surface (2026-10-18b): every CSV carries the UTF-8 BOM;
-  the full CSV is one dense block per section (title + meta floor,
-  heading, the section's own header row, its rows — MD/TXT structure);
-  the xlsx-writer emits docProps + Normal style + dimension + cols +
-  `xml:space`-on-`<t>` + plain-decimal `<v>` + optional rightToLeft
-  sheet views (the fa workbook opens RTL); the download handler logs
-  failures loudly. Receipt's XLSX (no opts) untouched.
+- Production = currena-api **`b137f3ef`** from HEAD `1f70552`;
+  currena-markets `9b5ff7e0`. Repo: `main` == `insights-rebuild` (the
+  runbook branch shipped; new work branches off `main`).
+- **The private gate is LIVE**: unauthed `/api/insights*` → 401
+  `private_page` + `no-store`; `POST /api/insights/login` → signed
+  HttpOnly Secure SameSite=Lax 12h cookie → authed 200 `private,
+  no-store`. `INSIGHTS_PASSWORD` is set on the Worker (OWNER_SETUP §1
+  done 2026-10-19; rotate any time with `wrangler secret put`).
+- The runbook surface live: 51 scored readings + the crypto Fear &
+  Greed context card (corpus 51→52), ruleVersion 2, licence register +
+  generated `LICENCES.md`, the E-23/E-24 audit columns in exports,
+  `insights:selfcheck` (19/19 live at Phase 5) + the daily GHA.
 - Live data floor: 51 readings, ruleVersion 2, validation 14/14, no
   failed sources; archive serving; freshness chain (D-12 + D-13)
   verified intact post-deploy.
-- Production DOM re-verified post-deploy (fa, light + dark, 1280 +
-  375): the meters wear the four-step status colours again (owner
-  decree — round 42's neutral-ink note is superseded), both "?"
-  tips seat at their subjects (rule tip in the first status group's
-  header, how-tip on the verdict row; panels wrap full-width below
-  their rows), the alert container visibly tints, bullet dots sit at
-  sentence starts, Australia leads with 6 attention tiles, 375 px
-  scrollWidth === 375, zero console errors. NOTE: the PWA service
-  worker needs ONE plain reload after a deploy before the new bundle
-  serves (known one-reload behaviour).
+- Production DOM re-verified post-deploy (en+fa, light, 1280 + 375):
+  private gate screen → sign-in → full render; CSV + XLSX downloaded
+  through the real UI with zero errors (CSV = UTF-8 BOM + dense
+  per-section blocks + audit columns; XLSX = valid zip, docProps,
+  "Normal" style, 10 sheets); 375 px scrollWidth === 375. NOTE: the
+  PWA service worker needs ONE plain reload after a deploy before the
+  new bundle serves (known one-reload behaviour).
 - A11y floor intact: skip link, h1s, useDialogFocus on every dialog,
   real tablists, radio-group arrows, live regions, labeled validation
   errors; the two "?" tips carry aria-expanded + aria-controls and are
@@ -107,21 +124,26 @@ commission's record), `docs/QA/quirks-2026-10-17-hero-calm.md` and
    U+066B separator, KOSPI's yellow bear chip, flap-board ASCII
    digits, wrapped-title tile drift, the repeated fa header date, the
    FAB overlap. Deliberate conventions or deliberate patterns.
-4. **Bundle budgets**: entry 296/89.5 (294.75/88.52 measured);
-   Insights lazy **604/142.8** (603.89/142.61 measured; the export
+4. **Runbook not-verified items** (honest limits, STEP3_REPORT lists
+   what unblocks each): L1-05/08/11/14 + L2-10 remain Check /
+   not-verified — they stay "Link out" or hidden until their series or
+   terms verify; do NOT display them as normal cards.
+5. **Bundle budgets**: entry 296/89.5 (294.79/88.56 measured);
+   Insights lazy **604/142.8** (594.49/141.54 measured; the export
    builders are separate lazy chunks). Any further Insights-chunk
-   growth needs its own justification. NOTE: the meters now wear the
-   FOUR-STEP status colours at every size (round 43 owner decree —
-   this REVERSES round 42's one-neutral-ink note; do not re-neutralise
-   them).
-5. **i18n copy corpora** (`insights-copy-en/fa.ts`) and
+   growth needs its own justification. The meters wear the FOUR-STEP
+   status colours at every size (round 43 owner decree — do not
+   re-neutralise them).
+6. **i18n copy corpora** (`insights-copy-en/fa.ts`) and
    `packages/core/src/schemas.ts` — data-file and sacred-surface;
    unchanged policy.
-6. **Owner-side items**: Telegram ingest-alert secrets, the I7
+7. **Owner-side items**: Telegram ingest-alert secrets, the I7
    launch-approval exit gate (BACKTEST review), the signals-wording
    legal read (S3), connection-evidence confirmations, **token
-   rotation** (all three tokens have now transited chat across six
-   sessions — this is the strongest rotation nudge yet).
+   rotation** (all tokens have now transited chat across SEVEN+
+   sessions — strongest rotation nudge yet), and the OWNER_SETUP §9
+   housekeeping is RESOLVED (the branch fixed ci.yml; SITE_MODE stays
+   `private` by decree).
 
 ## 4. Session workflow (per AGENTS.md, enforced)
 
@@ -130,26 +152,32 @@ commission's record), `docs/QA/quirks-2026-10-17-hero-calm.md` and
    `node scripts/check-bundle-budget.mjs` (run the budget script from
    the REPO ROOT — it resolves `apps/web/dist` itself). Shell gotcha:
    the tool cwd resets between calls — use `pnpm -C <dir>` /
-   `git -C <path> …` and absolute paths.
+   `git -C <path> …` and absolute paths; a bare `pnpm -r …` from the
+   wrong cwd silently targets the sandbox scaffold.
 2. Conventional commits, one quirk (or small coherent group) each;
    push often; **check the Actions run is green before stacking the
-   next change.** CI = typecheck → lint → tests.
+   next change.** CI = typecheck → lint → tests → build → budget →
+   copy:audit; since 2026-10-19 it triggers on main pushes too.
 3. Local verification: vite dev on the browser-reachable port
    (`:3000` in the sandbox via the platform gateway; vite proxies
    `/api` → :8787) + a read-only bun forwarder :8787 → currena.ir for
-   real data (both rebuilt this session: `node /home/z/
-   spawn-detached.mjs <log> bun /home/z/forwarder-8787.ts` and
-   `SPAWN_CWD=<web> … pnpm exec vite --port 3000 --strictPort --host`);
-   verify with agent-browser in BOTH locales + BOTH themes at 375 px
-   and desktop. Background processes get reaped between calls — spawn
-   detached (see the shared worklog for the double-detach pattern).
-   Locale/theme switches are localStorage keys `currena:locale`
-   (PLAIN `fa`/`en` — not JSON-quoted) and `theme`.
+   real data; verify with agent-browser in BOTH locales + BOTH themes
+   at 375 px and desktop. Background processes get reaped between
+   calls — spawn detached (see the shared worklog for the
+   double-detach pattern). Locale/theme switches are localStorage keys
+   `currena:locale` (PLAIN `fa`/`en` — not JSON-quoted) and `theme`.
+   For production DOM checks, remember the PRIVATE GATE: sign in via
+   the Private page form (or POST /api/insights/login) — the password
+   is the owner's INSIGHTS_PASSWORD (owner-side value; agent-browser
+   downloads land in /home/z/Downloads — copy export artefacts into
+   the evidence dir from there).
 4. Deploy: `CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… pnpm
    --filter @currena/api exec wrangler deploy` (markets only if it
    changed — the web app ships as the api Worker's static assets).
-   Post-deploy smoke: health, /api/insights, /admin 401, convert
-   parity (`/api/convert?from=USD&to=IRR&amount=100` — IRR is the
+   Post-deploy smoke: health, unauthed /api/insights → 401 (the gate
+   must stay fail-closed), login + authed 200 `private, no-store`,
+   /admin 401, convert parity
+   (`/api/convert?from=USD&to=IRR&amount=100` — IRR is the
    tgju-routed code; TMN/IRT are NOT), cache headers, THEN production
    DOM re-verification.
 5. Secrets discipline: tokens arrive in chat, never get committed;
@@ -177,14 +205,14 @@ commission's record), `docs/QA/quirks-2026-10-17-hero-calm.md` and
   KV edge cache keeps regenerating stale responses.
 - **Sandbox resets between sessions** — commit and push often; the
   shared worklog (`/home/z/my-project/worklog.md`) is the recovery
-  ledger; never rely on uncommitted work surviving.
-- **Bundle budgets**: the Insights chunk has ~0.16 kB raw headroom
-  (round 43 absorbed its growth by deduping the shared BULLET_DOT JSX
-  element into a module const — repeated inline JSX is cheap weight to
-  shave). Any look-tweak that adds code there needs measurement first;
-  prefer CSS-only tweaks; a bump needs a changelog note. The export
-  builders are separate lazy chunks — new export features cost the
-  Insights chunk only their copy strings.
+  ledger; never rely on uncommitted work surviving. (2026-10-19: the
+  checkout was lost mid-flight — the fresh clone + green gates +
+  pushed-HEAD discipline is what made the ship a 30-minute rebuild.)
+- **Bundle budgets**: the Insights chunk has ~9.5 kB raw headroom since
+  the rebuild (594.49 vs 604) — measure anyway; prefer CSS-only
+  tweaks; a bump needs a changelog note. The export builders are
+  separate lazy chunks — new export features cost the Insights chunk
+  only their copy strings.
 - **A CSS `::marker` aligns to the FIRST inline box's LAST-line
   baseline** — an inline-block button wrapping to 2+ lines drags the
   dot beside the wrapped line, NOT the sentence start. Explicit flex
@@ -204,7 +232,8 @@ commission's record), `docs/QA/quirks-2026-10-17-hero-calm.md` and
   from scripts/lib/persian-copy.mjs (one entry per line — never
   JSON.stringify the whole file; it reformats 22k lines).
 - **agent-browser screenshot paths are relative to ITS cwd** — pass
-  absolute paths or the save silently fails.
+  absolute paths or the save silently fails. Downloads land in
+  /home/z/Downloads (copy them into the evidence dir).
 - **CSV exports for spreadsheet users MUST carry the UTF-8 BOM** —
   BOM-less UTF-8 decodes as ANSI-1256 on fa-Windows Excel (mojibake);
   Sheets/pandas strip the BOM, so it costs nothing elsewhere. Also:
@@ -219,12 +248,19 @@ commission's record), `docs/QA/quirks-2026-10-17-hero-calm.md` and
 - **`void import(...).then(...)` chains need a .catch** — an unhandled
   rejection in a download handler = silent nothing-downloaded, which
   the owner reports as "not working" with zero diagnostic trail.
+- **The private gate is fail-closed by design** — with
+  `INSIGHTS_PASSWORD` unset every /api/insights* route answers 401,
+  even for the owner. After any Worker recreation, re-put the secret
+  (OWNER_SETUP §1) before debugging the gate itself.
 
 ## 6. Credentials (the owner pastes fresh ones at session start)
 
 - GitHub token (repo `assadigit/Currena`, private): `<paste>`
 - Cloudflare API token + Account ID `5f123468027e4b2094167df1d2f2e852`: `<paste>`
 - EODHD API key (secret on currena-markets; re-put is idempotent): `<paste>`
+- The Insights password: set 2026-10-19 as the `INSIGHTS_PASSWORD`
+  Worker secret; the value was handed to the owner in chat (never in
+  the repo). Rotate with `wrangler secret put INSIGHTS_PASSWORD`.
 
-All three have transited chat across 2026-10-14/15/16/17/18 sessions —
+All tokens have transited chat across 2026-10-14…19 sessions —
 rotation strongly recommended; if not rotated, the existing ones work.

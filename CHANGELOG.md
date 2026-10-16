@@ -5,6 +5,47 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-19] — the insights rebuild ships to production (owner-approved)
+
+The AGENT_RUNBOOK execution on `insights-rebuild` (Setup → Phase 7, 14
+phase commits — see `docs/insights/FIX_REPORT.md`, `STEP3_REPORT.md`,
+`MAINTENANCE.md`, `OWNER_SETUP.md` and `PHASE7_VERIFICATION.md`)
+deployed after the owner's explicit approval. The Insights product is
+now correct, self-checking (T-01…T-24 + the daily `insights-selfcheck`
+Action), **private by default** (every `/api/insights*` route answers
+401 with no data until sign-in; `INSIGHTS_PASSWORD` set as a Worker
+secret per OWNER_SETUP §1), licence-walked (`LICENCES.md` generated
+from the register), and complete for an Australian saver and investor
+(Layer 1/2/3, the "Know before you buy US shares" box, the crypto Fear
+& Greed context card — corpus 51→52).
+
+### Changed
+
+- Production currena-api → **`b137f3ef`** from `1f70552`; currena-markets
+  untouched (`9b5ff7e0`).
+- `main` fast-forwarded to the branch (its stray `branches: ain]`
+  ci.yml edit is gone — CI triggers on main pushes from here).
+- OWNER_SETUP §1 done for the owner: `INSIGHTS_PASSWORD` generated and
+  uploaded as a secret (the fail-closed gate is now usable; the value
+  lives in the chat handover, never in the repo).
+
+### Verification
+
+- Fresh-clone gates (the sandbox had reset): **1,389 tests green**
+  (core 191 · scraper 67 · insights 451 · markets 13 · api 214 · web
+  453), typecheck 6/6, lint 0 errors / 15 advisories, copy audit
+  clean, T-15 site-mode OK, budgets held (entry 294.79/88.56 vs
+  296/89.5; Insights lazy 594.49/141.54 vs 604/142.8).
+- Production smoke: unauthed `/api/insights` → 401 `private_page`
+  `no-store`; signed 12h HttpOnly cookie → 200 `private, no-store`
+  (51 readings, ruleVersion 2); `/admin` 401; convert parity 100 USD →
+  26,790,000 IRR @ 267,900 (tgju live).
+- Production DOM: the private gate screen → sign-in → full render;
+  CSV + XLSX downloaded through the real UI (UTF-8 BOM + audit
+  columns / valid OOXML, 10 sheets) with zero errors; fa `dir=rtl`;
+  375 px scrollWidth === 375. Evidence:
+  `docs/evidence/2026-10-19-insights-deploy/`.
+
 ## [2026-10-18b] — the CSV and XLSX exports open correctly in Excel
 
 The owner on the 2026-10-16b full export: "The xlsx and csv outputs are

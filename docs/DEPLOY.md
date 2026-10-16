@@ -1241,3 +1241,51 @@ handler. Feature commit `ca991e7` (CHANGELOG §2026-10-18b).
   every writer hardening present (docProps, Normal style, dimension,
   cols, rightToLeft, plain decimals, xml:space on <t>); 375 px
   scrollWidth === 375. Evidence: `docs/evidence/2026-10-18-export-fix/`.
+
+## Session record — 2026-10-19 the insights rebuild ships (owner-approved)
+
+The `insights-rebuild` branch — the AGENT_RUNBOOK execution (Setup →
+Phase 7, 14 phase commits) — deployed after the owner's explicit
+approval: "Approved. Push and Deploy and commit." (the runbook's own
+rule 2 "never deploy / never push main" was written for the rebuild
+itself and is lifted by this approval). OWNER_SETUP §1 was executed on
+the owner's behalf: a generated long random password was uploaded as
+the `INSIGHTS_PASSWORD` Worker secret (`printf '%s'`, no trailing
+newline; the value was handed to the owner in chat — rotate any time
+with `wrangler secret put INSIGHTS_PASSWORD`).
+
+- **Deployed**: currena-api **`b137f3ef-00c7-4356-abbd-7e8083212744`**
+  (2026-10-19) from HEAD `1f70552` (the branch's phase-7 commit).
+- **currena-markets NOT redeployed** (`9b5ff7e0` stays current — the
+  runbook touched no markets imports; OWNER_SETUP §4 note honoured;
+  its EODHD secret persists on the Worker).
+- **Gates re-verified from a fresh clone** (the sandbox had reset and
+  the checkout was lost): tests 1,389 green (core 191 · scraper 67 ·
+  insights 451 · markets 13 · api 214 · web 453), typecheck 6/6, lint
+  0 errors / 15 advisories, copy audit clean, build + T-15 site-mode
+  check OK (SITE_MODE=private in the served bundle), budgets held
+  (entry 294.79/88.56 vs 296/89.5; Insights lazy 594.49/141.54 vs
+  604/142.8).
+- **Post-deploy smoke on currena.ir**: `/api/health` 200 (kv ok);
+  unauthed `/api/insights` → **401 `private_page` + `no-store`** (the
+  private gate is LIVE in production and fails closed);
+  `POST /api/insights/login` → signed HttpOnly Secure SameSite=Lax
+  12h cookie → authed `/api/insights` → 200 `private, no-store` with
+  51 readings, ruleVersion 2, same-day generatedAt; `/admin` 401;
+  convert parity 100 USD → 26,790,000 IRR @ 267,900 (tgju live).
+- **Production DOM verified** (agent-browser): the neutral private
+  gate screen renders; sign-in lands on the full Insights page
+  (grouped status boxes, seated "?" tips, four-step meter inks,
+  "+N more" reveal, the crypto Fear & Greed context card live); the
+  "Download data" panel opens with all four formats; CSV + XLSX
+  clicked through the real UI — files downloaded (23,514 B / 114,145
+  B) with ZERO page/console errors; the CSV starts with the UTF-8 BOM
+  (ef bb bf) and carries the E-23/E-24 audit columns; the XLSX is a
+  valid zip with docProps + the "Normal" style + 10 sheets; fa toggle
+  → `dir=rtl lang=fa`; 375 px scrollWidth === 375. Evidence:
+  `docs/evidence/2026-10-19-insights-deploy/` (5 screenshots + the 2
+  downloaded export artefacts).
+- **Repo**: `insights-rebuild` pushed (docs commit); `main`
+  fast-forwarded to the same line and pushed — the branch also fixes
+  main's stray `branches: ain]` ci.yml edit, so pushes to main DO
+  trigger CI from here on.
