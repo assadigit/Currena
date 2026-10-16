@@ -9,7 +9,7 @@
  * Run: pnpm registry:generate   (repo root — writes data/indicators.json)
  */
 
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -25,12 +25,63 @@ import { RULE_VERSION } from '../packages/insights/src/ruleVersion';
 import { staleAfterDaysFor, GRACE_DAYS } from '../packages/insights/src/scoring';
 // @ts-expect-error — same.
 import { DISPLAY } from '../apps/web/src/components/insights/config/display';
+// @ts-expect-error — same (Step 3 §8 licence block, 2026-10-16).
+import { licenceForProvider, fredLicenceForSeries, type FredCopyrightRecord, type SourceLicence } from '../packages/insights/src/licences';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const outPath = join(here, '..', 'data', 'indicators.json');
 
 const gaugeOf = new Map<string, string>();
 for (const g of GAUGES) for (const id of g.members) gaugeOf.set(id, g.id);
+
+/* ---------------- Step 3 §8: licence block + layer ---------------- */
+
+// The T-16 FRED copyright scan (data/fred-copyright.json) decides the
+// per-series public-display eligibility. Fail closed: a FRED series with no
+// scan record is public 'no'.
+const fredRecords: FredCopyrightRecord[] = (
+  JSON.parse(readFileSync(join(here, '..', 'data', 'fred-copyright.json'), 'utf8')) as {
+    records: FredCopyrightRecord[];
+  }
+).records;
+
+/** Derived indicators (plain arithmetic over published inputs) — Step 3 layer 2. */
+const LAYER2_IDS = new Set<string>([
+  'yield-curve-10y2y',
+  'gold-silver',
+  'copper-gold',
+  'gold-btc',
+  'silver-btc',
+  'fed-expectations',
+  'rba-expectations',
+  'au-us-10y-gap',
+  'dollar-basket',
+  'gold-aud',
+  'govt-interest-revenue',
+]);
+
+function licenceBlockFor(def: { id: string; source: string; sourceRef: string }): SourceLicence {
+  if (def.source === 'fred') {
+    // sourceRef strings compose one or more FRED series ids; the licence is
+    // the WORST of the legs (a citation-required leg keeps the card private).
+    const tokens = def.sourceRef.match(/\b[A-Z][A-Z0-9]{3,}\b/g) ?? [];
+    const matched = tokens
+      .map((t) => fredRecords.find((r) => r.seriesId === t))
+      .filter((r): r is FredCopyrightRecord => Boolean(r));
+    if (matched.length === 0) {
+      return {
+        ...licenceForProvider('fred'),
+        licenceName: 'FRED series — copyright not scanned (fail closed)',
+        publicDisplayOk: 'no',
+        termsEvidence: `No T-16 scan record matched ${def.sourceRef} — fail closed. Run scripts/fred-copyright-scan.ts.`,
+      };
+    }
+    const worst = matched.find((r) => r.copyrightNotice) ?? matched[0]!;
+    const resolved = fredLicenceForSeries(worst.seriesId, fredRecords);
+    return resolved.licence;
+  }
+  return licenceForProvider(def.source);
+}
 
 const indicators = DEFINITIONS.map((def) => {
   const source = READING_SOURCES[def.id] ?? { name: def.sourceRef };
@@ -64,6 +115,20 @@ const indicators = DEFINITIONS.map((def) => {
     historyWindow: '10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)',
     rule: def.rule,
     ruleVersion: RULE_VERSION,
+    layer: LAYER2_IDS.has(def.id) ? 2 : 1,
+    licence: (() => {
+      const l = licenceBlockFor(def);
+      return {
+        licenceName: l.licenceName,
+        attributionText: l.attributionText,
+        attributionRequired: l.attributionRequired,
+        privateOk: l.privateOk,
+        publicDisplayOk: l.publicDisplayOk,
+        termsCheckedOn: l.termsCheckedOn,
+        termsEvidence: l.termsEvidence,
+        termsUrl: l.termsUrl ?? null,
+      };
+    })(),
   };
 });
 
@@ -72,7 +137,7 @@ const registry = {
   version: RULE_VERSION,
   graceDayDefaults: GRACE_DAYS,
   generatedFrom:
-    'packages/insights/src/definitions.ts + src/adapters/derived.ts (READING_SOURCES) + src/gauges.ts + src/ruleVersion.ts + apps/web/src/components/insights/config/display.ts',
+    'packages/insights/src/definitions.ts + src/adapters/derived.ts (READING_SOURCES) + src/gauges.ts + src/ruleVersion.ts + apps/web/src/components/insights/config/display.ts + src/licences.ts (Step 3 §8 licence block, T-16 scan data/fred-copyright.json)',
   textTemplates:
     'apps/web/src/i18n/insights-copy-en.ts (and insights-copy-fa.ts): every card sentence is produced from a status-keyed template (highRising / highEasing / typical / low / jumping, oneLiner fallback) interpolated with the live value — fix spec A-02.',
   indicators,

@@ -9,7 +9,7 @@
     "per-change": null,
     "manual": 45
   },
-  "generatedFrom": "packages/insights/src/definitions.ts + src/adapters/derived.ts (READING_SOURCES) + src/gauges.ts + src/ruleVersion.ts + apps/web/src/components/insights/config/display.ts",
+  "generatedFrom": "packages/insights/src/definitions.ts + src/adapters/derived.ts (READING_SOURCES) + src/gauges.ts + src/ruleVersion.ts + apps/web/src/components/insights/config/display.ts + src/licences.ts (Step 3 §8 licence block, T-16 scan data/fred-copyright.json)",
   "textTemplates": "apps/web/src/i18n/insights-copy-en.ts (and insights-copy-fa.ts): every card sentence is produced from a status-keyed template (highRising / highEasing / typical / low / jumping, oneLiner fallback) interpolated with the live value — fix spec A-02.",
   "indicators": [
     {
@@ -39,7 +39,18 @@
         "direction": "below",
         "value": 0
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 2,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "real-yield-10y",
@@ -68,7 +79,18 @@
         "tail": "high",
         "cutoff": 0.2
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "us10y",
@@ -109,7 +131,18 @@
           }
         ]
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "fed-target",
@@ -138,7 +171,18 @@
         "tail": "high",
         "cutoff": 0.1
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "fed-expectations",
@@ -167,7 +211,18 @@
         "tail": "high",
         "cutoff": 0.1
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 2,
+      "licence": {
+        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
+        "termsUrl": null
+      }
     },
     {
       "id": "us30y",
@@ -208,7 +263,18 @@
           }
         ]
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "ecb-dfr",
@@ -237,7 +303,18 @@
         "tail": "high",
         "cutoff": 0.1
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "ECB Data Portal terms (not verbatim-verified)",
+        "attributionText": "Source: European Central Bank",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "The ECB Data Portal terms page is JS-rendered; the reuse clause could not be quoted on 2026-10-16 — unknown, fail closed in public mode until read in a browser.",
+        "termsUrl": "https://data.ecb.europa.eu/"
+      }
     },
     {
       "id": "govt-interest-revenue",
@@ -266,7 +343,18 @@
         "tail": "high",
         "cutoff": 0.2
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 2,
+      "licence": {
+        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
+        "termsUrl": null
+      }
     },
     {
       "id": "us-cpi-yoy",
@@ -295,7 +383,18 @@
         "direction": "above",
         "value": 3
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "us-cpi-core-yoy",
@@ -322,7 +421,18 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "breakeven-5y5y",
@@ -352,7 +462,18 @@
         "value": 2.4,
         "sustainedWeeks": 4
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "stress-stlfsi",
@@ -382,7 +503,18 @@
         "value": 0,
         "sustainedWeeks": 4
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "nfci",
@@ -411,7 +543,18 @@
         "direction": "above",
         "value": 0
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "vix",
@@ -440,7 +583,18 @@
         "tail": "high",
         "cutoff": 0.2
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyright, 2016, Chicago Board Options Exchange, Inc\" (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "gold-silver",
@@ -469,7 +623,18 @@
         "tail": "high",
         "cutoff": 0.2
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 2,
+      "licence": {
+        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
+        "termsUrl": null
+      }
     },
     {
       "id": "dollar-basket",
@@ -510,7 +675,18 @@
           }
         ]
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 2,
+      "licence": {
+        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
+        "termsUrl": null
+      }
     },
     {
       "id": "usdjpy",
@@ -541,7 +717,18 @@
         "magnitude": 5,
         "windowWeeks": 4
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless.",
+        "termsUrl": "https://frankfurter.dev/license/"
+      }
     },
     {
       "id": "eur-usd",
@@ -568,7 +755,18 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless.",
+        "termsUrl": "https://frankfurter.dev/license/"
+      }
     },
     {
       "id": "china-pmi",
@@ -597,7 +795,18 @@
         "direction": "below",
         "value": 50
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Publisher terms vary; entered by hand",
+        "attributionText": "Source: National Bureau of Statistics of China",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Manual entries carry no provider feed; defect E-08 requires entered_on/expiry bookkeeping. Public display blocked until each publisher’s reuse terms are read and recorded.",
+        "termsUrl": null
+      }
     },
     {
       "id": "m2-us",
@@ -624,7 +833,18 @@
       "rule": {
         "kind": "yoy-negative"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "philly-fed",
@@ -653,7 +873,18 @@
         "direction": "below",
         "value": 0
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "us-unemployment",
@@ -682,7 +913,18 @@
         "tail": "high",
         "cutoff": 0.2
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "sahm-rule",
@@ -711,7 +953,18 @@
         "direction": "above",
         "value": 0.5
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "copper-gold",
@@ -740,7 +993,18 @@
         "tail": "low",
         "cutoff": 0.2
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 2,
+      "licence": {
+        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
+        "termsUrl": null
+      }
     },
     {
       "id": "usdcny",
@@ -767,7 +1031,18 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless.",
+        "termsUrl": "https://frankfurter.dev/license/"
+      }
     },
     {
       "id": "brent",
@@ -798,7 +1073,18 @@
         "magnitude": 25,
         "windowWeeks": 13
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     },
     {
       "id": "gold-usd",
@@ -825,7 +1111,18 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Free API — commercial use permitted (their ToS)",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".)",
+        "termsUrl": "https://gold-api.com/terms"
+      }
     },
     {
       "id": "silver-usd",
@@ -852,7 +1149,18 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Free API — commercial use permitted (their ToS)",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".)",
+        "termsUrl": "https://gold-api.com/terms"
+      }
     },
     {
       "id": "copper-usd",
@@ -879,7 +1187,18 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Free API — commercial use permitted (their ToS)",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".)",
+        "termsUrl": "https://gold-api.com/terms"
+      }
     },
     {
       "id": "btc-usd",
@@ -906,7 +1225,18 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Free API — commercial use permitted (their ToS)",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".)",
+        "termsUrl": "https://gold-api.com/terms"
+      }
     },
     {
       "id": "gold-btc",
@@ -933,7 +1263,18 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 2,
+      "licence": {
+        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
+        "termsUrl": null
+      }
     },
     {
       "id": "silver-btc",
@@ -960,7 +1301,18 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 2,
+      "licence": {
+        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
+        "termsUrl": null
+      }
     },
     {
       "id": "au-cpi",
@@ -989,7 +1341,18 @@
         "direction": "above",
         "value": 3
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
     },
     {
       "id": "au-trimmed-mean",
@@ -1018,7 +1381,18 @@
         "direction": "above",
         "value": 3
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
     },
     {
       "id": "au-10y",
@@ -1047,7 +1421,18 @@
         "tail": "high",
         "cutoff": 0.1
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0 (RBA terms for statistical tables)",
+        "attributionText": "Source: Reserve Bank of Australia",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0 for most material; commercial/personal use allowed if RBA endorsement is not implied. Third-party content INSIDE RBA tables needs that third party’s consent — re-check each table’s source notes at the quarterly review.",
+        "termsUrl": "https://www.rba.gov.au/copyright/"
+      }
     },
     {
       "id": "rba-expectations",
@@ -1076,7 +1461,18 @@
         "tail": "high",
         "cutoff": 0.1
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 2,
+      "licence": {
+        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
+        "termsUrl": null
+      }
     },
     {
       "id": "au-us-10y-gap",
@@ -1105,7 +1501,18 @@
         "direction": "below",
         "value": 0
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 2,
+      "licence": {
+        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
+        "termsUrl": null
+      }
     },
     {
       "id": "au-petrol-yoy",
@@ -1132,7 +1539,18 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
     },
     {
       "id": "rba-cash-rate",
@@ -1159,7 +1577,18 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0 (RBA terms for statistical tables)",
+        "attributionText": "Source: Reserve Bank of Australia",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0 for most material; commercial/personal use allowed if RBA endorsement is not implied. Third-party content INSIDE RBA tables needs that third party’s consent — re-check each table’s source notes at the quarterly review.",
+        "termsUrl": "https://www.rba.gov.au/copyright/"
+      }
     },
     {
       "id": "au-home-loan",
@@ -1188,7 +1617,18 @@
         "tail": "high",
         "cutoff": 0.1
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0 (RBA terms for statistical tables)",
+        "attributionText": "Source: Reserve Bank of Australia",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0 for most material; commercial/personal use allowed if RBA endorsement is not implied. Third-party content INSIDE RBA tables needs that third party’s consent — re-check each table’s source notes at the quarterly review.",
+        "termsUrl": "https://www.rba.gov.au/copyright/"
+      }
     },
     {
       "id": "au-deposit-rate",
@@ -1215,7 +1655,18 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0 (RBA terms for statistical tables)",
+        "attributionText": "Source: Reserve Bank of Australia",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0 for most material; commercial/personal use allowed if RBA endorsement is not implied. Third-party content INSIDE RBA tables needs that third party’s consent — re-check each table’s source notes at the quarterly review.",
+        "termsUrl": "https://www.rba.gov.au/copyright/"
+      }
     },
     {
       "id": "au-wage-growth",
@@ -1242,7 +1693,18 @@
       "rule": {
         "kind": "below-aux"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
     },
     {
       "id": "au-rent-yoy",
@@ -1271,7 +1733,18 @@
         "tail": "high",
         "cutoff": 0.1
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
     },
     {
       "id": "au-unemployment",
@@ -1299,7 +1772,18 @@
         "kind": "above-low",
         "rise": 0.5
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
     },
     {
       "id": "au-home-values",
@@ -1327,7 +1811,18 @@
         "kind": "consecutive-decline",
         "periods": 3
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
     },
     {
       "id": "au-household-debt-arrears",
@@ -1356,7 +1851,18 @@
         "tail": "high",
         "cutoff": 0.2
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0 (RBA terms for statistical tables)",
+        "attributionText": "Source: Reserve Bank of Australia",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0 for most material; commercial/personal use allowed if RBA endorsement is not implied. Third-party content INSIDE RBA tables needs that third party’s consent — re-check each table’s source notes at the quarterly review.",
+        "termsUrl": "https://www.rba.gov.au/copyright/"
+      }
     },
     {
       "id": "audusd",
@@ -1385,7 +1891,18 @@
         "tail": "low",
         "cutoff": 0.2
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
+        "termsUrl": null
+      }
     },
     {
       "id": "audjpy",
@@ -1416,7 +1933,18 @@
         "magnitude": 5,
         "windowWeeks": 4
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
+        "termsUrl": null
+      }
     },
     {
       "id": "terms-of-trade",
@@ -1444,7 +1972,18 @@
         "kind": "consecutive-decline",
         "periods": 2
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
     },
     {
       "id": "iron-ore",
@@ -1471,7 +2010,18 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Unknown (CC BY 4.0 expected, not quoted)",
+        "attributionText": "Source: World Bank",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "World Bank Open Data terms are commonly CC BY 4.0, but the licence page could not be quoted verbatim on 2026-10-16 (JS-rendered) — marked unknown, fail closed in public mode until read in a browser.",
+        "termsUrl": "https://www.worldbank.org/en/about/legal/terms-of-use"
+      }
     },
     {
       "id": "gold-aud",
@@ -1498,7 +2048,18 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2
+      "ruleVersion": 2,
+      "layer": 2,
+      "licence": {
+        "licenceName": "Own computation — inherits the upstream sources’ terms",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
+        "termsUrl": null
+      }
     }
   ]
 }
