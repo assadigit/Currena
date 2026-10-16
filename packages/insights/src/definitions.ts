@@ -281,6 +281,24 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 4,
   },
   {
+    // Step 3 L1-18 (2026-10-16): the Alternative.me crypto Fear and Greed
+    // Index — CONTEXT ONLY (rule info): the spec's L3-03 forbids composite
+    // sentiment scores and the card never presents the index as a signal.
+    // The publisher's own description and attribution render beside the
+    // data; the 0-100 scale is the publisher's (0 fear, 100 greed).
+    id: 'crypto-fng',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Crypto Fear and Greed Index',
+    source: 'alternative-me',
+    sourceRef: 'alternative.me /fng/ API (daily, 0-100)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 4,
+  },
+  {
     id: 'gold-silver',
     section: 'global',
     group: 'market-stress',

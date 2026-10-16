@@ -641,6 +641,7 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'copper-gold',
   'terms-of-trade',
   'vix',
+  'crypto-fng', // Step 3 L1-18: the publisher's own 0-100 index speaks in index points
   'stress-stlfsi',
   'nfci',
 ]);

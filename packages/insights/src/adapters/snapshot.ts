@@ -51,6 +51,9 @@ import { AUX_RULE_WIRING, READING_SOURCES } from './derived';
  * releaseDateOf below) so a card never says "released Oct 14" about August
  * data while September's release is still hours away.
  */
+/** Step 3 L2-02: the price rows the 200-day-average gap is computed for. */
+const L2_02_IDS: ReadonlySet<string> = new Set(['brent', 'gold-usd', 'silver-usd', 'btc-usd']);
+
 export interface ReleaseScheduleEntry {
   /** The official release (publication) date. */
   date: string;
@@ -345,6 +348,16 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
       if (releaseDate !== undefined) reading.releaseDate = releaseDate;
       if (nextReleaseToday(def.id, reading.asOf, schedule, nowDayIso)) {
         (reading as { nextReleaseToday?: boolean }).nextReleaseToday = true;
+      }
+    }
+
+    // ---- Step 3 L2-02: the price's gap to its 200-day average. ----
+    if (reading.asOf !== null && reading.value !== null && L2_02_IDS.has(def.id)) {
+      const pts = series;
+      if (pts.length >= 200) {
+        const last200 = pts.slice(-200);
+        const avg = last200.reduce((sum, p) => sum + p.value, 0) / last200.length;
+        if (avg > 0) reading.ma200GapPct = ((reading.value - avg) / avg) * 100;
       }
     }
 

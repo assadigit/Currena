@@ -103,6 +103,8 @@ export interface SeriesInputs {
   };
   /** Manual china-pmi observations (data/manual/china-pmi.json). */
   chinaPmi?: SeriesPoint[];
+  /** Step 3 L1-18: the Alternative.me crypto Fear and Greed index (context only). */
+  cryptoFng?: SeriesPoint[];
   /**
    * I15: previously-STORED daily history (epoch-day points decoded back to
    * dates by the runner) for the live-priced rows — gold/silver/copper/
@@ -293,6 +295,10 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
 
   /* ---------------- Global — Is growth healthy? ---------------- */
   put('china-pmi', inputs.chinaPmi);
+  // Step 3 L1-18 (2026-10-16): the crypto Fear and Greed index — CONTEXT
+  // ONLY (rule info; L3-03 forbids composite sentiment scores, and the
+  // card never presents the index as a signal).
+  put('crypto-fng', inputs.cryptoFng);
   put('m2-us', fred.M2SL);
   // Step-2 add-list §B3/§B4: the US labour-market pair — the unemployment
   // LEVEL and the Sahm recession alarm, both straight from FRED (monthly,
@@ -579,6 +585,10 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   vix: {
     name: 'FRED (VIXCLS), © Cboe',
     url: 'https://fred.stlouisfed.org/series/VIXCLS',
+  },
+  'crypto-fng': {
+    name: 'Alternative.me (Crypto Fear and Greed Index)',
+    url: 'https://alternative.me/crypto/fear-and-greed-index/',
   },
   'gold-silver': { name: 'gold-api.com (history: World Bank)', url: 'https://www.gold-api.com' },
   'dollar-basket': {

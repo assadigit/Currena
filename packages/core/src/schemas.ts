@@ -336,6 +336,8 @@ export const IndicatorIdSchema = z.enum([
   'stress-stlfsi',
   'nfci',
   'vix',
+  'crypto-fng', // Step 3 L1-18: the Alternative.me crypto Fear and Greed index (context)
+
   'gold-silver',
   // Global — Is the dollar strong?
   'dollar-basket',
@@ -431,7 +433,7 @@ export const IndicatorSourceSchema = z.enum([
   'world-bank',
   'manual',
   'derived',
-  'ecb',
+  'ecb', 'alternative-me',
 ]);
 export type IndicatorSource = z.infer<typeof IndicatorSourceSchema>;
 
@@ -561,6 +563,14 @@ export const IndicatorReadingSchema = z
     value: z.number().finite().nullable(),
     /** Observation date of the value (YYYY-MM-DD); null iff status is 'unavailable'. */
     asOf: z.iso.date().nullable(),
+    /**
+     * Step 3 L2-02 (2026-10-16): the price's gap to its 200-DAY average, in
+     * percent (signed; >0 above, <0 below) — a standard definition, shown as
+     * "above/below its 200-day average". Computed by the snapshot builder
+     * from the stored daily series when at least 200 closes exist; absent
+     * otherwise (never a guess from a shorter base).
+     */
+    ma200GapPct: z.number().finite().optional(),
     /**
      * Defect E-07 (2026-10-16): a QUARTERLY observation's period start and
      * period end, stored on the reading so the card can name the quarter

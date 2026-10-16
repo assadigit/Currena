@@ -19,6 +19,7 @@ import type { InsightsSourceReport } from '@currena/core';
 import { ABS_SERIES, fetchAbsSeries } from './abs';
 import { fetchBitstampCloses } from './bitstamp';
 import { fetchEcbDfrSeries } from './ecb';
+import { fetchCryptoFng } from './fng';
 import { fetchFrankfurterSeries } from './frankfurter';
 import { FRED_SERIES, fetchFredSeries } from './fred';
 import { fetchGoldApiSpot } from './goldapi';
@@ -153,6 +154,12 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     fetchRbaSeries('depositRateNewTermHouseholds'),
   );
 
+  // Step 3 L1-18 (2026-10-16): the Alternative.me crypto Fear and Greed
+  // index (context card; attribution shown next to the data).
+  const cryptoFng = await fetchLogged('alternative-me', 'Crypto Fear and Greed (daily history)', () =>
+    fetchCryptoFng(),
+  );
+
   // Cross-checks (03-data-sources.md): independent sources must agree.
   if (bitstamp && btcSpot) {
     const last = bitstamp.at(-1)!;
@@ -190,6 +197,7 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
       xagSpot,
       btcSpot,
       hgSpot,
+      cryptoFng,
       abs: absSeries,
       rba: {
         cashRate: rbaCashRateDaily ?? rbaCashRate,

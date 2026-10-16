@@ -238,6 +238,17 @@ export function PricesBoard({
           // Step-1 audit item C9 + fix spec B-01: distance from the record —
           // the peak, its date and its basis are named (the full stored
           // history, one basis; never a silent 10-year window).
+          // Step 3 L2-02 (runbook Phase 4): the 200-day average gap — a
+          // standard definition, conditions only ("X% above/below").
+          if (reading.ma200GapPct !== undefined) {
+            const pct = formatNumber(Math.abs(reading.ma200GapPct), numberLocale, {
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 1,
+            });
+            contextParts.push(
+              interpolate(reading.ma200GapPct >= 0 ? copy.ui.ma200Above : copy.ui.ma200Below, { pct }),
+            );
+          }
           const peakLine = formatPeakDistance(
             reading,
             numberLocale,

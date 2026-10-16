@@ -220,7 +220,7 @@ describe('buildInsightsMarkdown', () => {
   });
 
   it('renders one heading per displayed section', () => {
-    expect(md).toContain('## Where things stand');
+    expect(md).toContain('## Summary of the gauges below'); // L3-01 rename
     expect(md).toContain('## Prices');
     expect(md).toContain('## World stock markets');
     expect(md).toContain('## World currencies');

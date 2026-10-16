@@ -712,6 +712,20 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou:
       'A context price for crypto headlines: and a reminder that a fast-moving asset can move just as fast the other way.',
   },
+  'crypto-fng': {
+    // Step 3 L1-18 (2026-10-16): the Alternative.me index — context only.
+    name: 'Crypto fear and greed',
+    oneLiner: 'A daily 0-to-100 gauge of how fearful or greedy crypto markets feel today.',
+    whatItIs:
+      'The Alternative.me Crypto Fear and Greed Index, a daily 0-to-100 scale built from crypto market volatility, momentum, social media and dominance measures (0 = extreme fear, 100 = extreme greed). Shown with the publisher\u2019s own scale; attribution to Alternative.me.',
+    whyItMatters:
+      'A sentiment backdrop for crypto headlines: the number describes the mood of that market today, nothing more.',
+    tendedToMean:
+      'Extreme readings have often appeared near sharp market turns in that market — a tendency, not a rule.',
+    cantTell:
+      'Sentiment gauges describe feelings, not prices; this page never treats the index as a recommendation.',
+    forYou: 'Context for crypto news — the same day-by-day honesty as every other card here.',
+  },
   'gold-btc': {
     name: 'Bitcoin priced in gold (BTC per ounce)',
     oneLiner: 'How many bitcoins one ounce of gold buys: old money priced in new money.',
@@ -1189,7 +1203,9 @@ export const insightsCopyEn = {
     unpinAction: 'Remove from watchlist',
     // H1: verdict meters. Round-2 R2: the reason line is COMPUTED from the
     // gauge steps (fixed table): never a static per-label sentence.
-    heroTitle: 'Where things stand',
+    // Step 3 L3-01 (2026-10-16): the spec's label rename — the hero is a
+    // SUMMARY of the gauges, never a verdict of its own.
+    heroTitle: 'Summary of the gauges below',
     verdictStepAria: '{section}: {label}, step {step} of 4',
     verdictMeterLabel: 'Reading on a four-step scale',
     // Round 42 (owner): the computed reason sentence ("2 of 5 areas are
@@ -1488,6 +1504,23 @@ export const insightsCopyEn = {
     exportColDate: 'Date',
     exportRuleVersion: 'Rule version: {v}',
     exportVerdictCounts: '{warning} of {voting} in warning',
+    // Step 3 §7.1: "Know before you buy US shares" — the collapsed info
+    // box. ONLY the exchange-rate and fees lines ship (no approved text
+    // exists in docs/insights/approved-text/); the professional review
+    // gates anything more.
+    usSharesBoxTitle: 'Know before you buy US shares',
+    usSharesFxLine: 'Returns are affected by the AUD/USD exchange rate.',
+    usSharesFeesLine: 'Currency conversion and brokerage fees apply.',
+    usSharesDisclaimer: 'General information only. Not financial or tax advice.',
+    // Step 3 L2-02: the price row's 200-day average line.
+    ma200Above: '{pct} above its 200-day average',
+    ma200Below: '{pct} below its 200-day average',
+    // Step 3 L2-03: the US shares in Australian dollars box.
+    usAudTitle: 'US shares in Australian dollars',
+    usAudLevel: '{name}: {usd} · {aud} in AUD',
+    usAudSameDate: 'both prices from the same date',
+    usAudDatesDiffer: 'dates differ — the AUD view needs the same date',
+    usAudChange: '1 month: {usd} in USD · {aud} in AUD · exchange-rate effect {fx}',
     // Step 3 §2.2 AC-03: the private gate's neutral state + sign-in form.
     privateTitle: 'Private page',
     privateBody:
@@ -2366,12 +2399,15 @@ export const insightsCopyEn = {
       'How the indicators usually relate. Each card checks whether the usual pattern is showing today.',
     // R27: the quiet section-level note replaces the per-card placeholder tag.
     evidenceNote: 'Relationships are general tendencies, not forecasts.',
+    // Step 3 L3-02 (2026-10-16): the verdict words are RETIRED — the card
+    // is the current readings with their direction plus the usual tendency.
+    // The chip now states presence only (conditions, never verdicts).
     state: {
-      active: 'Active',
-      partly: 'Partly active',
+      active: 'Showing',
+      partly: 'Partly showing',
       pending: 'Pass-through pending',
-      inactive: 'Not active',
-      disagree: 'Signals disagree',
+      inactive: 'Not showing',
+      disagree: 'Not showing',
       unknown: 'Not enough fresh data',
     },
     // Fix spec B-04 (2026-10-14): the context-leg and caveat labels.
@@ -2379,11 +2415,11 @@ export const insightsCopyEn = {
     contextCaveat: 'a level, not a servicing cost',
     passThroughLine: 'The cash rate moved {policy} on {decided}; the home-loan data that follows it is not in yet (the loan rate has moved {loan} since that decision where data exists).',
     // R7b: the collapsed section’s one-line summary.
-    summaryActive: '{n} active',
-    summaryPartly: '{n} partly active',
+    summaryActive: '{n} showing',
+    summaryPartly: '{n} partly showing',
     summaryPending: '{n} pass-through pending',
-    summaryInactive: '{n} not active',
-    summaryDisagree: '{n} show signals that disagree',
+    summaryInactive: '{n} not showing',
+    summaryDisagree: '{n} not showing',
     summaryUnknown: '{n} unreadable',
     seeAllConnections: 'See all {n} connections',
     viewLegCard: 'View this indicator',

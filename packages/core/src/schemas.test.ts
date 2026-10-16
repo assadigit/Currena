@@ -327,7 +327,7 @@ import {
 describe('Insights: IndicatorIdSchema (contract shape is deliberate)', () => {
   it('pins the exact v2 indicator set — 51 ids (I15 restructure +11, Step-1 +us-cpi-core-yoy, Step-2 +au-10y/us-unemployment/sahm-rule/vix/au-deposit-rate, fix spec C +fed-expectations/us30y/philly-fed/rba-expectations), blocked/licensed items absent', () => {
     const ids = IndicatorIdSchema.options;
-    expect(ids).toHaveLength(51);
+    expect(ids).toHaveLength(52);
     // Step-2 add-list §B5: VIX is IN (FRED VIXCLS, licence noted); the rest
     // of the v1 blocked list stays blocked.
     for (const blocked of ['spx-gold', 'breadth', 'cape']) {

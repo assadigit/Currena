@@ -597,6 +597,44 @@
       }
     },
     {
+      "id": "crypto-fng",
+      "title": "Crypto Fear and Greed Index",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "alternative-me",
+        "name": "Alternative.me (Crypto Fear and Greed Index)",
+        "url": "https://alternative.me/crypto/fear-and-greed-index/",
+        "seriesIdOrTable": "alternative.me /fng/ API (daily, 0-100)"
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Free API — attribution next to the data",
+        "attributionText": "Source: Alternative.me Crypto Fear and Greed Index",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "alternative.me states the index may be displayed freely when \"attribution is given right next to the display of the data\" (read 2026-10-16). Attribution renders beside the card.",
+        "termsUrl": "https://alternative.me/crypto/fear-and-greed-index/"
+      }
+    },
+    {
       "id": "gold-silver",
       "title": "Gold / Silver",
       "area": {

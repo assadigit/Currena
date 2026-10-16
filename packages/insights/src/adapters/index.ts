@@ -41,6 +41,7 @@ export type { BitstampWindow } from './bitstamp';
 export { RBA_TABLES, fetchRbaSeries, rbaTableUrl, RBA_CSV_BASE } from './rba';
 export type { RbaTableKey, RbaTableSpec } from './rba';
 export { ManualSeriesFileSchema, parseManualSeries } from './manual';
+export { fetchCryptoFng, FNG_URL } from './fng';
 export type { ManualSeriesFile } from './manual';
 export { buildIndicatorSeries, computeHighestSinceYear, computePeaks, READING_SOURCES } from './derived';
 export type { SeriesInputs } from './derived';

@@ -129,6 +129,15 @@
       "rule": "{\"kind\":\"percentile\",\"tail\":\"high\",\"cutoff\":0.2}"
     },
     {
+      "id": "crypto-fng",
+      "licenceName": "Free API — attribution next to the data",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "maxAgeDays": 4,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
       "id": "gold-silver",
       "licenceName": "Free API — commercial use permitted (their ToS)",
       "publicDisplayOk": "unknown",

@@ -22,9 +22,9 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 29 P1 / 22 P2 (Step-2: +au-10y/us-unemployment/sahm-rule/vix P1, +au-deposit-rate P2; fix spec C: +fed-expectations/us30y/philly-fed/rba-expectations P2)', () => {
+  it('splits 29 P1 / 23 P2 (Step-2 + fix spec C additions; Step 3 L1-18 adds crypto-fng P2)', () => {
     expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(29);
-    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(22);
+    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(23);
   });
 
   it('groups are the question groups (global 5 + prices-board, australia 3)', () => {
@@ -54,13 +54,14 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('info-only cards never vote: exactly the fourteen info rules (Step-2: +au-deposit-rate, iron-ore went context)', () => {
+  it('info-only cards never vote: exactly the fifteen info rules (Step 3 L1-18 adds crypto-fng)', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
     expect(info).toEqual([
       'au-deposit-rate',
       'au-petrol-yoy',
       'btc-usd',
       'copper-usd',
+      'crypto-fng',
       'eur-usd',
       'gold-aud',
       'gold-btc',

@@ -70,6 +70,7 @@ import {
   type LoadState,
 } from './insights-sections/InsightsStatusBlocks';
 import { SectionLane } from './insights-sections/SectionLane';
+import { UsSharesAudBox, UsSharesNotesBox } from './insights-sections/UsSharesNotes';
 import {
   useWorldCurrenciesSection,
   useWorldMarketsSection,
@@ -393,6 +394,13 @@ export function Insights() {
            * never above the verdict or alerts. Self-contained feed: its own
            * loading/empty states, never an error surface for the page. */}
           <WorldMarkets state={marketsState} copy={copy} locale={locale} numberLocale={numberLocale} />
+
+          {/* Step 3 L2-03 + §7.1 (runbook Phase 4): the US shares in AUD view
+           * (same-date arithmetic, refused when the feeds mismatch) and the
+           * collapsed "Know before you buy US shares" box (only the
+           * exchange-rate and fees lines — no approved text exists). */}
+          <UsSharesAudBox marketsState={marketsState} fxState={fxState} copy={copy} numberLocale={numberLocale} />
+          <UsSharesNotesBox copy={copy} />
 
           {/* World currencies (insights-world-currencies-spec.md §9.2):
            * right after the world stock markets — the two sections explain

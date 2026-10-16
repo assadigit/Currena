@@ -277,6 +277,16 @@ function priceDetail(id: string, byId: Map<string, IndicatorReading>, copy: Insi
   }
   const gold = byId.get('gold-usd');
   const silver = byId.get('silver-usd');
+  const self = byId.get(id);
+  // Step 3 L2-02: the 200-day average gap rides the detail line.
+  if (self?.ma200GapPct !== undefined) {
+    const pct = asciiNumber(Math.abs(self.ma200GapPct), 1);
+    parts.push(
+      self.ma200GapPct >= 0
+        ? interpolateS(copy.ui.ma200Above, { pct })
+        : interpolateS(copy.ui.ma200Below, { pct }),
+    );
+  }
   const btc = byId.get('btc-usd');
   // Defect E-13 (2026-10-16): the bitcoin-buying sentence belongs on the
   // BITCOIN row only (the 15 Oct export repeated it on Brent/gold/silver).
