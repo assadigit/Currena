@@ -124,20 +124,24 @@ export const verdictTone: Record<SignalVerdict, string> = {
 /* ---------------------------------------------------------------- *
  * Round 33 (owner): the Estimation chip's white space is the metal's
  * own price history — clickable range chips (Quarter · One year · Five
- * years) + a signed window delta. Round 34 (owner): the charts grew
- * real X/Y axes and a hover inspector, and they moved into the SHARED
- * TrendPanel (TrendChart.tsx) — the exact structure the money panel's
- * mini charts now wear, so both sections stay aligned by construction.
- * Data rides the same module-cached /api/insights/:id/history fetch
- * the details panel uses, so opening a card later never re-downloads.
+ * years · — since 2026-10-20's owner request — Ten years) + a signed
+ * window delta. Round 34 (owner): the charts grew real X/Y axes and a
+ * hover inspector, and they moved into the SHARED TrendPanel
+ * (TrendChart.tsx) — the exact structure the money panel's mini charts
+ * now wear, so both sections stay aligned by construction. Data rides
+ * the same module-cached /api/insights/:id/history fetch the details
+ * panel uses, so opening a card later never re-downloads.
  * ---------------------------------------------------------------- */
 
-export type StripRange = 'quarter' | '1y' | '5y';
+export type StripRange = 'quarter' | '1y' | '5y' | '10y';
 
 /** The per-metal trend chart inside an Estimation chip (round 33/34).
  * 2026-10-20 (owner sketch): the chart is THE body of the chip — a tall
  * plot (h-40 mobile / h-52 desktop, vs the old h-20) so the TREND, not
- * the price, is the emphasis. */
+ * the price, is the emphasis. Same day (owner): "Add 10 year View of the
+ * gold and silver price as well" — the chips offer the full decade; the
+ * history feed already carries the complete 10-year daily series for
+ * both metals, so the window is always plottable in practice. */
 export function MetalTrendChart({
   metal,
   copy,
@@ -157,6 +161,7 @@ export function MetalTrendChart({
       copy={copy}
       numberLocale={numberLocale}
       plotHeightClass={plotHeightClass}
+      ranges={['quarter', '1y', '5y', '10y']}
       ariaLabelFor={(range: StripRange) =>
         interpolate(copy.ui.stripChartAria, {
           metal: s.metals[metal],

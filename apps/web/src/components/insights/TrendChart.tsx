@@ -15,7 +15,8 @@
  * Structure (identical everywhere — the alignment rule):
  *   [ Y tick labels ] [ plot: gridlines + area/line svg + crosshair +
  *   hover dot + value/date tooltip + X tick labels ]
- *   [ range chips (quarter · 1 year · 5 years) … signed window delta ]
+ *   [ range chips (quarter · 1 year · 5 years · — where a caller opts in
+ *   — 10 years) … signed window delta ]
  *
  * Round 43 (owner): the DEFAULT range is per-caller — `defaultRange`
  * (quarter everywhere by default; the money panel passes '1y' — "the
@@ -51,24 +52,37 @@ import type { IndicatorId } from '@currena/core';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { ApiError, fetchIndicatorHistory } from '../../lib/insights';
 
-type TrendRange = 'quarter' | '1y' | '5y';
+export type TrendRange = 'quarter' | '1y' | '5y' | '10y';
 
-const TREND_RANGES: readonly TrendRange[] = ['quarter', '1y', '5y'];
+/** The full ordered chip list a caller may offer. 2026-10-20 (owner):
+ * "Add 10 year View of the gold and silver price as well" — the metals'
+ * Estimation-chip charts grow the decade; the feed's history endpoint
+ * already serves the full 10-year daily series, so the chip is gated by
+ * the same plottability rule as its siblings. Exported as the canonical
+ * order (test seam, the way chart-range.ts exposes CHART_RANGE_VALUES). */
+export const TREND_RANGES: readonly TrendRange[] = ['quarter', '1y', '5y', '10y'];
+
+/** The chips EVERY caller shows unless it opts into more — the money
+ * panel's rows and the strip keep Quarter · 1 year · 5 years; only the
+ * gold/silver analysis chips pass the decade (owner, 2026-10-20). */
+const DEFAULT_TREND_RANGES: readonly TrendRange[] = ['quarter', '1y', '5y'];
 
 const TREND_RANGE_DAYS: Readonly<Record<TrendRange, number>> = {
   quarter: 92,
   '1y': 366,
   '5y': 1827,
+  '10y': 3653, // 10 years + leap-day slack — the details panel's 10y window
 };
 
 /** Copy key per range — shared by the chips and the delta's sr-only note. */
 export const TREND_RANGE_COPY_KEY: Record<
   TrendRange,
-  'rangeQuarter' | 'range1y' | 'range5y'
+  'rangeQuarter' | 'range1y' | 'range5y' | 'range10y'
 > = {
   quarter: 'rangeQuarter',
   '1y': 'range1y',
   '5y': 'range5y',
+  '10y': 'range10y',
 };
 
 /** Slice a series to the window a range chip names (days back from the
@@ -172,6 +186,7 @@ export function TrendPanel({
   plotData,
   defaultRange = 'quarter',
   deltaKind,
+  ranges = DEFAULT_TREND_RANGES,
 }: {
   id: IndicatorId;
   copy: InsightsCopy;
@@ -189,6 +204,11 @@ export function TrendPanel({
   /** R43: the range the chips open on — quarter by default; the money
    *  panel's rows open on the annual window (owner round 43). */
   defaultRange?: TrendRange;
+  /** 2026-10-20 (owner): which chips to render, in order — defaults to
+   *  Quarter · 1 year · 5 years; the metals' analysis chips pass the
+   *  decade too ("Add 10 year View of the gold and silver price as well").
+   *  A window with <2 plottable points still renders disabled. */
+  ranges?: readonly TrendRange[];
   /**
    * Fix spec B-17 (2026-10-14): how the signed window delta is expressed —
    * 'pct' (prices and indexes) or 'points' (rates, inflation, yields and
@@ -454,7 +474,7 @@ export function TrendPanel({
           data-trend-range={id}
           {...rangeGroupData}
         >
-          {TREND_RANGES.map((r) => {
+          {ranges.map((r) => {
             const active = r === range;
             const plottable = trendPlottable(clean, r);
             return (
