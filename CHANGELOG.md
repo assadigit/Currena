@@ -5,6 +5,69 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-18b] — the world stock markets return to public mode (the owner's directive)
+
+The owner: *"This insights page used to show World important stock
+exchanges, but currently it's vanished. It might be due to recent updates —
+find the culprit, investigate the issue and recover this section."*
+
+### The culprit (investigated, not guessed)
+
+- **The section never left the codebase** — `WorldMarkets.tsx`, the
+  16-exchange definitions and the currena-markets cron pipeline all shipped
+  continuously. It vanished from the PUBLIC page through the 2026-10-19b
+  "page goes public" chain: `SITE_MODE=public` + the generated
+  `data/site-mode-overrides.json` declaring `hiddenBoards:["markets","fx"]`
+  (the EODHD/Yahoo licence walk) + the API's 404 `hidden_site_mode`
+  refusal + the web hiding the board when the snapshot says
+  `displayMode:'public'` (no render, no fetch). The 2026-10-19e directive
+  restored the four prices tiles the same way; this round extends it to the
+  markets board — the owner supplies their own EODHD key (already the
+  currena-markets `EODHD_API_TOKEN` secret; the standing snapshot is 15/16
+  EODHD-sourced, FTSE falls back to Yahoo — the plan carries no EODHD code
+  for it).
+- **Secondary finding**: the KV snapshot was one trading day stale
+  (Thursday's closes — the Friday 23:30 main run and the Saturday 01:30
+  retry had not landed). Refreshed via the repo's own manual runner
+  (`markets-run`, live EODHD fetch → write-if-changed) so the recovered
+  section opened with Friday's closes; the standing crons continue.
+
+### The restoration (one mechanism, honest trail)
+
+- **`scripts/generate-indicators-registry.ts`** gains
+  `OWNER_PUBLIC_BOARD_OVERRIDE` for {markets} with a dated evidence note —
+  the regenerated overrides carry `hiddenBoards:['fx']` and the directive
+  rides in the file as `ownerBoardDirectives`.
+- **`scripts/check-site-mode.mjs` (T-15)** — the fx board must stay
+  hidden; the markets board must stay PUBLIC (key-pinned; only the owner
+  can re-hide it) and its directive note must be present.
+- **`apps/api/src/routes/insights.ts`** — the `/markets` + `/fx`
+  public-mode refusals are now driven by `HIDDEN_BOARDS` (the generated
+  file): one source of truth; a future generator run that re-hides a board
+  arms the 404 again automatically.
+- **`apps/web/src/routes/Insights.tsx`** — per-board feed gating: the
+  route bundles the SAME generated overrides file; markets fetches and
+  renders in public mode, fx stays licence-hidden, and the US-shares AUD
+  view (it needs BOTH feeds) rides the stricter of the two gates.
+- **Bundle budget** — Insights lazy chunk 607.00/145.20 → 608.00/145.60
+  (measured 607.21/145.24: the bundled overrides JSON + the gating).
+
+### Verified
+
+- Tests 1,486 green (+1 public-markets serve test; fx 404 pinned),
+  typecheck 6/6, lint 0 errors / 15 advisories, copy:audit clean,
+  SITE_MODE=public build + T-15 + bundle budgets held.
+- Deployed currena-api `c476307f-4c12-4879-88b2-41cbd844ea65`, then
+  `9f66a82c-d0d4-494e-a3cd-524eac3b557b` after integrating the remote
+  main's PWA service-worker fix (both live-verified).
+  Production: `/api/insights/markets` 404→**200** (16 markets, asOf
+  2026-10-16, signal attention); `/api/insights/fx` still 404 (by design);
+  the page renders the section in EN + FA (verdict box, 3 groups, 16
+  tiles, detail panel, full-table disclosure); `GET /api/insights/markets
+  → 200` in the page's network log; zero console errors; 375 px
+  scrollWidth === 375. Evidence:
+  `docs/evidence/2026-10-18b-markets-public-restore/`.
+
 ## [2026-10-18a] — scope trim: the grayscale reskin keeps the header/hero ONLY
 
 Owner review of the deployed 2026-10-17f release: the page-wide grayscale

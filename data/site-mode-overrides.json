@@ -24,7 +24,9 @@
     "yield-curve-10y2y"
   ],
   "hiddenBoards": [
-    "markets",
     "fx"
-  ]
+  ],
+  "ownerBoardDirectives": {
+    "markets": "The board is EODHD-first on the owner’s own API key (the currena-markets secret); the Yahoo fallback leg stays in the engine — the owner directive (2026-10-18b) lifts the board’s display bar, exactly the 2026-10-19e pattern the four prices tiles set."
+  }
 }

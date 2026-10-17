@@ -30,10 +30,12 @@ export function useWorldMarketsSection(copy: InsightsCopy, enabled = true) {
   // designed fallbacks are the loading skeletons and the calm "being
   // prepared" line (§6.6) — so a missing/unready feed cannot break the
   // page, and a page request never reaches a provider (§4 rule 4).
+  // PUBLIC MODE (2026-10-18b owner directive): `enabled` stays TRUE — the
+  // markets board is public on the owner's own EODHD key (the generated
+  // overrides file no longer hides it).
   const [marketsState, setMarketsState] = useState<MarketsLoadState>(() => {
-    // PUBLIC MODE (2026-10-19, AC-08/LR-02): when the snapshot says the page
-    // is the public projection, the world feeds are licence-hidden — no
-    // fetch, no cached last-good, a calm empty state the shell never renders.
+    // When a deployment disables the board (no render, no fetch), the
+    // state is the calm empty kind the shell never renders.
     if (!enabled) return { kind: 'empty' };
     try {
       const cachedMarkets = readCachedMarkets();
@@ -92,8 +94,10 @@ export function useWorldCurrenciesSection(copy: InsightsCopy, enabled = true) {
   // independent-feed discipline — own last-good cache, never an error
   // surface; loading skeletons and the calm "being prepared" line (§9.5).
   const [fxState, setFxState] = useState<FxLoadState>(() => {
-    // PUBLIC MODE (2026-10-19): the markets twin — disabled means empty,
-    // never fetched, never rendered (the shell hides the section).
+    // The markets twin: disabled means empty, never fetched, never rendered
+    // (the shell hides the section). Public mode keeps the fx board
+    // licence-hidden — it carries no owner directive (2026-10-18b lifted
+    // only the markets board).
     if (!enabled) return { kind: 'empty' };
     try {
       const cachedFx = readCachedFx();

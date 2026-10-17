@@ -5,10 +5,12 @@
  * The hidden set is the GENERATED data/site-mode-overrides.json (bundled at
  * build time — the same file the T-15 build gate verifies: every indicator
  * whose licence verdict is other than 'yes', fail-closed 'unknown'
- * included, plus the two EODHD/Yahoo-backed world boards). Serving is
- * fail-closed twice: this module THROWS at startup when the bundled file is
- * malformed (a broken repo must never silently open), and the routes refuse
- * (404, zero data) anything on the list when SITE_MODE=public.
+ * included, plus every EODHD/Yahoo-backed world board with no owner
+ * directive; the markets board rides the 2026-10-18b owner directive and
+ * stays public). Serving is fail-closed twice: this module THROWS at
+ * startup when the bundled file is malformed (a broken repo must never
+ * silently open), and the routes refuse (404, zero data) anything on the
+ * hidden lists when SITE_MODE=public.
  */
 
 import siteModeOverridesJson from '../../../data/site-mode-overrides.json';
@@ -19,6 +21,10 @@ const SiteModeOverridesSchema = z.object({
   version: z.number(),
   hiddenIndicatorIds: z.array(z.string()),
   hiddenBoards: z.array(z.string()),
+  // 2026-10-18b: the dated owner-directive evidence notes for boards that
+  // are NOT hidden (the markets board). Informational at serve time — the
+  // T-15 build gate is what pins its presence.
+  ownerBoardDirectives: z.record(z.string(), z.string()).optional(),
 });
 
 const parsed = SiteModeOverridesSchema.parse(siteModeOverridesJson);

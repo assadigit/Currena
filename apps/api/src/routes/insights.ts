@@ -45,7 +45,7 @@ import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
 import { errorResponse } from '../http';
 import { handleInsightsLogin, requireInsightsAuth } from '../insights-auth';
-import { HIDDEN_INDICATOR_IDS, siteModeOf } from '../public-mode';
+import { HIDDEN_BOARDS, HIDDEN_INDICATOR_IDS, siteModeOf } from '../public-mode';
 import type { Bindings } from '../index';
 
 interface InsightsRouteDeps {
@@ -129,11 +129,14 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
   // ONE-key snapshot, served read-only. Registered BEFORE /:id/history so
   // the literal path wins over the parameterised one.
   app.get('/markets', async (c) => {
-    // PUBLIC MODE (2026-10-19, LR-02): the board is EODHD/Yahoo-backed end
-    // to end — it must never appear when SITE_MODE=public (the T-15 build
-    // gate verifies the overrides file declares it hidden). 404 with zero
-    // data, BEFORE any KV read.
-    if (siteModeOf(c.env) === 'public') {
+    // PUBLIC MODE (2026-10-19, LR-02 → 2026-10-18b owner directive): the
+    // board's public visibility is the GENERATED overrides file's call —
+    // data/site-mode-overrides.json no longer declares 'markets' hidden
+    // (the owner restored the section on their own EODHD key), so public
+    // mode serves it exactly like private mode. The fx twin stays hidden.
+    // A future generator run that re-adds 'markets' to hiddenBoards arms
+    // this refusal again — 404 with zero data, BEFORE any KV read.
+    if (siteModeOf(c.env) === 'public' && HIDDEN_BOARDS.has('markets')) {
       return errorResponse(c, 404, 'hidden_site_mode', 'This section is not published on the public site.');
     }
     // The Worker's own edge cache — absent in plain test runtimes.
@@ -195,9 +198,12 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
   // /markets (edge cache + ETag + the calm 503 "being prepared" answer).
   // Registered BEFORE /:id/history so the literal path wins.
   app.get('/fx', async (c) => {
-    // PUBLIC MODE (2026-10-19, LR-02): the markets twin — EODHD/Yahoo-backed,
-    // hidden by the overrides file, refused with zero data before any read.
-    if (siteModeOf(c.env) === 'public') {
+    // PUBLIC MODE (2026-10-19, LR-02 — still in force): the markets twin,
+    // and unlike the markets board it carries NO owner directive — the
+    // generated overrides file keeps 'fx' hidden, so public mode refuses
+    // with zero data before any read. (If the owner ever lifts it, the
+    // generator's OWNER_PUBLIC_BOARD_OVERRIDE + this check flip together.)
+    if (siteModeOf(c.env) === 'public' && HIDDEN_BOARDS.has('fx')) {
       return errorResponse(c, 404, 'hidden_site_mode', 'This section is not published on the public site.');
     }
     // The Worker's own edge cache — absent in plain test runtimes.

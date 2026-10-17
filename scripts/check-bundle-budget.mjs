@@ -313,7 +313,16 @@ const BUDGETS = [
   // over the pre-redesign line. Headroom 145.20/607.00 so the next growth
   // bumps consciously, per the gate's own rule. Justified in CHANGELOG
   // §2026-10-17f and §2026-10-18a.
-{ pattern: /^Insights-[\w-]+\.js$/, raw: 607_000, gz: 145_200, label: 'Insights lazy chunk' },
+  // Markets-public bump (607.00/145.20 → 608.00/145.60, 2026-10-18b owner
+  // directive): the world stock markets board returns to public mode — the
+  // Insights route now bundles the GENERATED data/site-mode-overrides.json
+  // (the single source of truth the API worker and the T-15 gate already
+  // consume; ~1.3 kB raw / ~0.3 kB gz incl. the dated owner-directive note)
+  // and drives the per-board feed gating from it (markets fetches/renders,
+  // fx stays licence-hidden, the US-shares AUD view rides both). Measured
+  // 607.21 kB raw / 145.24 kB gz. Justified in CHANGELOG §2026-10-18b.
+  // Entry chunk untouched (295.15/88.76 vs 296/89.5).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 608_000, gz: 145_600, label: 'Insights lazy chunk' },
 ];
 
 function main() {

@@ -49,8 +49,9 @@ const env: Bindings = {
 /* ------------------------------------------------------------------ *
  * The authed-PRIVATE venue (2026-10-19, AC-08/LR-02): the private-feed
  * payload/cache-shape tests ride a real signed session cookie — public
- * mode now REFUSES the Yahoo-backed boards (404 hidden_site_mode) and
- * skips the Yahoo live-prices merge, so the private behaviour is only
+ * mode now REFUSES the fx board (404 hidden_site_mode; the markets board
+ * rides the 2026-10-18b owner directive and serves publicly) and skips
+ * the Yahoo live-prices merge, so the private behaviour is only
  * reachable authenticated.
  * ------------------------------------------------------------------ */
 const PASSWORD = 'the-gate-test-password';
@@ -748,13 +749,33 @@ describe('PUBLIC mode — the public projection serve path', () => {
     expect(body.error.code).toBe('insights_not_ready');
   });
 
-  it('the Yahoo-backed world boards answer 404 hidden_site_mode with zero data', async () => {
-    for (const path of ['/api/insights/markets', '/api/insights/fx']) {
-      const res = await makeApp().request(path, undefined, env);
-      expect(res.status).toBe(404);
-      const body = (await res.json()) as { error: { code: string } };
-      expect(body.error.code).toBe('hidden_site_mode');
-    }
+  it('the fx board (no owner directive) answers 404 hidden_site_mode with zero data', async () => {
+    const res = await makeApp().request('/api/insights/fx', undefined, env);
+    expect(res.status).toBe(404);
+    const body = (await res.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('hidden_site_mode');
+  });
+
+  it('the MARKETS board serves publicly (2026-10-18b owner directive) with the standard cache stamps', async () => {
+    // The generated overrides file no longer declares 'markets' hidden —
+    // the owner restored the world stock exchanges on their own EODHD key.
+    // Public mode serves the stored snapshot exactly like private mode;
+    // only the fx board keeps its licence refusal.
+    const marketsStore = new InMemoryMarketsStore();
+    const snap = await realisticSnapshot();
+    await marketsStore.putMarketsIfChanged(snap, undefined);
+    const app = createApp({
+      makeInsightsReader: () => modePublicReader(),
+      makeMarketsReader: () => marketsStore,
+      // A-8: pin the serve-time staleness clock to the fixture world's
+      // "today" so the stale re-evaluation is deterministic.
+      now: () => new Date('2026-10-13T12:00:00Z'),
+    });
+    const res = await app.request('/api/insights/markets', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
+    expect(res.headers.get('etag')).toBe('"insights-markets:2026-10-12T23:31:00Z"');
+    expect(await res.json()).toEqual(snap);
   });
 
   it("a hidden indicator's history is refused before any KV read (LR-02)", async () => {

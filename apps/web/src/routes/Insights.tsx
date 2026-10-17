@@ -38,6 +38,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { IndicatorId, InsightsSection } from '@currena/core';
 import type { IndicatorReading } from '@currena/core';
+// The generated public-mode hidden set (2026-10-18b): the SAME file the API
+// worker and the T-15 build gate consume — bundling it here keeps the web's
+// section gating and the API's route gating driven by one source of truth.
+// The markets board rides the owner directive and is NOT in hiddenBoards;
+// the fx board is.
+import siteModeOverrides from '../../../../data/site-mode-overrides.json';
 import { useI18n } from '../lib/locale';
 import { routeQuery } from '../router';
 import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../lib/insights';
@@ -157,13 +163,20 @@ export function Insights() {
 
   // The two world-section feeds + the hero's section indicators — moved
   // verbatim to insights-sections/world-feeds.ts (Phase 3-e).
-  // PUBLIC MODE (2026-10-19, AC-08/LR-02): the public projection's snapshot
-  // carries displayMode 'public' — the private-only world sections (the
-  // EODHD/Yahoo-backed boards + the US-shares view built on them) never
-  // render and their feeds are never fetched.
-  const worldFeedsEnabled = state.kind !== 'ready' || state.snapshot.displayMode !== 'public';
-  const { marketsState, marketsAlert, jumpToMarkets, downloadMarketsCsv } = useWorldMarketsSection(copy, worldFeedsEnabled);
-  const { fxState, fxAlert, jumpToFxCurrencies, downloadFxCsv } = useWorldCurrenciesSection(copy, worldFeedsEnabled);
+  // PUBLIC MODE (2026-10-19, AC-08/LR-02 → 2026-10-18b owner directive): the
+  // public projection's snapshot carries displayMode 'public', and each
+  // world board's public visibility is the GENERATED overrides file's call.
+  // The markets board (the owner's own EODHD key backs it) renders and its
+  // feed fetches; the fx board (no owner directive) stays licence-hidden —
+  // no render, no fetch — and the US-shares AUD view, which needs BOTH
+  // feeds, rides the stricter of the two.
+  const publicMarketsBoard = !(siteModeOverrides.hiddenBoards as readonly string[]).includes('markets');
+  const publicFxBoard = !(siteModeOverrides.hiddenBoards as readonly string[]).includes('fx');
+  const isPublicProjection = state.kind === 'ready' && state.snapshot.displayMode === 'public';
+  const marketsFeedEnabled = !isPublicProjection || publicMarketsBoard;
+  const fxFeedEnabled = !isPublicProjection || publicFxBoard;
+  const { marketsState, marketsAlert, jumpToMarkets, downloadMarketsCsv } = useWorldMarketsSection(copy, marketsFeedEnabled);
+  const { fxState, fxAlert, jumpToFxCurrencies, downloadFxCsv } = useWorldCurrenciesSection(copy, fxFeedEnabled);
   const sectionIndicators = useWorldSectionIndicators(marketsState, fxState, copy, jumpToMarkets, jumpToFxCurrencies);
 
   const togglePin = useCallback((id: IndicatorId, next: boolean): void => {
@@ -398,17 +411,22 @@ export function Insights() {
            * right after the commodity prices — both answer "what is moving";
            * never above the verdict or alerts. Self-contained feed: its own
            * loading/empty states, never an error surface for the page.
-           * PUBLIC MODE: licence-hidden entirely (no render, no fetch). */}
-          {worldFeedsEnabled && (
+           * PUBLIC MODE: rides the generated overrides file — the markets
+           * board is PUBLIC since the 2026-10-18b owner directive (the
+           * owner's own EODHD key backs it); the fx twin below stays
+           * licence-hidden. */}
+          {marketsFeedEnabled && (
             <WorldMarkets state={marketsState} copy={copy} locale={locale} numberLocale={numberLocale} />
           )}
 
           {/* Step 3 L2-03 (runbook Phase 4): the US shares in AUD view
-           * (same-date arithmetic, refused when the feeds mismatch).
-           * PUBLIC MODE: the AUD view rides the hidden world feeds — hidden
-           * with them. (The §7.1 "Know before you buy US shares" notes box
-           * was removed at the owner's direct request, 2026-10-20.) */}
-          {worldFeedsEnabled && (
+           * (same-date arithmetic, refused when the feeds mismatch). It
+           * needs BOTH world feeds, so it rides the stricter gate — in
+           * public mode the fx board stays hidden and this view stays
+           * hidden with it. (The §7.1 "Know before you buy US shares"
+           * notes box was removed at the owner's direct request,
+           * 2026-10-20.) */}
+          {marketsFeedEnabled && fxFeedEnabled && (
             <UsSharesAudBox marketsState={marketsState} fxState={fxState} copy={copy} numberLocale={numberLocale} />
           )}
 
@@ -418,8 +436,9 @@ export function Insights() {
            * a calm stock section beside a warning currency pattern can never
            * read as one contradiction. Self-contained feed: its own
            * loading/empty states, never an error surface for the page.
-           * PUBLIC MODE: licence-hidden entirely (no render, no fetch). */}
-          {worldFeedsEnabled && (
+           * PUBLIC MODE: licence-hidden entirely (no render, no fetch) —
+           * the fx board carries no owner directive. */}
+          {fxFeedEnabled && (
             <WorldCurrencies state={fxState} copy={copy} locale={locale} numberLocale={numberLocale} />
           )}
 
