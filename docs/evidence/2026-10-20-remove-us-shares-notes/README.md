@@ -54,6 +54,8 @@ details box was copy-only and rendered in BOTH site modes.
 ## Files
 
 - `prod-status.txt` — home status + served entry name + sha256 + chunk greps.
-- `prod-Insights-chunk.js` — the served lazy chunk (immutable capture).
+- `prod-Insights-chunk.js.txt` — the served lazy chunk (immutable capture;
+  stored as `.txt` so ESLint never lints the minified capture — sha256
+  `0725fcdd1b51fdcee2947072ee0b32313af3080c62e212fe1f449762350ff183`).
 - `api-after.json` / `api-after-summary.json` — the public projection after
   the removal (32 readings; four price tiles present).

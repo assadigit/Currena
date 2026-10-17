@@ -10,6 +10,7 @@
 
 import type { CSSProperties } from 'react';
 import type { SignalReading } from '@currena/insights';
+import { Coins } from 'lucide-react';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg, indicatorIconUrl } from '../../icons/currena';
@@ -70,7 +71,11 @@ export function VerdictIcon({
  * bar; unmapped metals (none today) fall back to no icon. Round 29
  * (owner): 28/36 defaults; round 31: the verdict strip calls it at the
  * price tiles' scale — 96px mobile / 128×128 desktop — the artwork IS
- * the verdict chip's face. */
+ * the verdict chip's face.
+ * 2026-10-20 (owner sketch): the chip header puts the artwork in a SMALL
+ * tinted corner box (56/64px) — the chart, not the artwork, owns the
+ * chip now. The tint follows the price tiles' language: gold wears the
+ * brand-gold box, silver the quiet context tint. */
 export function MetalIcon({
   metal,
   size = 28,
@@ -82,6 +87,32 @@ export function MetalIcon({
 }) {
   const icon = indicatorIconUrl(metal === 'gold' ? 'gold-usd' : 'silver-usd');
   return icon !== null ? <IconImg src={icon} size={size} desktopSize={desktopSize} /> : null;
+}
+
+/** The chip header's boxed artwork (2026-10-20 owner sketch) — the same
+ * tinted-box language as the prices board's PriceIconBox, miniaturised. */
+export function MetalIconBox({ metal }: { metal: 'gold' | 'silver' }) {
+  const isGold = metal === 'gold';
+  const icon = indicatorIconUrl(metal === 'gold' ? 'gold-usd' : 'silver-usd');
+  return (
+    <span
+      aria-hidden="true"
+      className={`grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-md)] ring-1 ring-[var(--color-border)] sm:h-16 sm:w-16 ${
+        isGold ? 'bg-[var(--color-accent-gold)]/25' : 'bg-currena-soft/70'
+      }`}
+    >
+      {icon !== null ? (
+        <IconImg src={icon} size={40} desktopSize={48} />
+      ) : (
+        <Coins
+          aria-hidden
+          strokeWidth={1.2}
+          className="currena-icon text-[var(--color-status-context)]"
+          style={{ '--icon-size': '40px', '--icon-size-sm': '48px' } as CSSProperties}
+        />
+      )}
+    </span>
+  );
 }
 
 export const verdictTone: Record<SignalVerdict, string> = {
@@ -103,15 +134,20 @@ export const verdictTone: Record<SignalVerdict, string> = {
 
 export type StripRange = 'quarter' | '1y' | '5y';
 
-/** The per-metal trend chart inside an Estimation chip (round 33/34). */
+/** The per-metal trend chart inside an Estimation chip (round 33/34).
+ * 2026-10-20 (owner sketch): the chart is THE body of the chip — a tall
+ * plot (h-40 mobile / h-52 desktop, vs the old h-20) so the TREND, not
+ * the price, is the emphasis. */
 export function MetalTrendChart({
   metal,
   copy,
   numberLocale,
+  plotHeightClass = 'h-40 sm:h-52',
 }: {
   metal: 'gold' | 'silver';
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
+  plotHeightClass?: string;
 }) {
   const s = copy.signals;
   const id = metal === 'gold' ? 'gold-usd' : 'silver-usd';
@@ -120,6 +156,7 @@ export function MetalTrendChart({
       id={id}
       copy={copy}
       numberLocale={numberLocale}
+      plotHeightClass={plotHeightClass}
       ariaLabelFor={(range: StripRange) =>
         interpolate(copy.ui.stripChartAria, {
           metal: s.metals[metal],
@@ -138,39 +175,40 @@ export function MetalTrendChart({
 export function VerdictStrip({
   gold,
   silver,
+  prices,
   copy,
   numberLocale,
 }: {
   gold: SignalReading;
   silver: SignalReading;
+  /** Each metal's current price, display-formatted (2026-10-20 owner
+   * sketch): the header carries it in a LIGHTER ink — the price already
+   * leads the prices board above; here the TREND is the emphasis. */
+  prices: { gold: string | null; silver: string | null };
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
 }) {
   const s = copy.signals;
   const rows = [
-    { reading: gold, verdict: verdictOf(gold) },
-    { reading: silver, verdict: verdictOf(silver) },
+    { reading: gold, verdict: verdictOf(gold), price: prices.gold },
+    { reading: silver, verdict: verdictOf(silver), price: prices.silver },
   ];
   if (rows.every((r) => r.verdict === null)) return null;
   /* Round 31 (owner): the strip is THE answer of the whole card — "it's
-   * the verdict and estimation of the whole section" — so it now carries
-   * the app's focal-section recipe (the money panel's, round 29): a
-   * brand-gold gradient field with a 2px gold ring and a gold-tinted
-   * shadow, so the white verdict chips pop against the card. The metal
-   * artwork leads each chip at the price tiles' scale (96px mobile /
-   * 128×128 desktop) with the metal name under it, and the verdict word
-   * speaks at the price's own size in the verdict ink (icon + word,
-   * never colour alone).
-   * Round 33 (owner): the chip's white space is no longer empty — the
-   * metal's own price history (chart + clickable Quarter / 1 year /
-   * 5 years chips) fills the space right of the artwork on desktop and
-   * sits under it on phones.
-   * Round 34 (owner, alignment rule): the two chips align BY
-   * STRUCTURE, not by luck — the verdict word owns a fixed two-line
-   * slot (silver's «جهت روشنی ندارد» wraps, gold's «پایین می‌آید»
-   * doesn't; the slot keeps both tiles' rows on the same baselines),
-   * and the chart column owns a reserved height so loading/none states
-   * can't pull one tile's chips row above the other's. */
+   * the verdict and estimation of the whole section" — so it carries the
+   * app's focal-section recipe (a brand-gold gradient field, 2px gold
+   * ring, gold-tinted shadow) so the white verdict chips pop.
+   * 2026-10-20 OWNER SKETCH — the chip is redrawn as an ANALYSIS card:
+   *   [ boxed artwork (start corner) · name + verdict · price (lighter) ]
+   *   [ THE TREND — one BIG chart filling the rest of the chip           ]
+   *   [ range chips · window delta                                       ]
+   * ONE anatomy for mobile AND desktop (the old artwork-column-vs-chart
+   * side split is gone — "do the same for mobile view"). The price rides
+   * in the muted ink (it already leads the prices board; the trend is
+   * the emphasis), the artwork shrinks into a small tinted box, and the
+   * chart grows to h-40/h-52. The verdict word keeps a floored two-line
+   * slot so the two desktop chips' charts start on the same baseline
+   * (the round-34 alignment rule, kept by structure). */
   return (
     <div
       className="flex flex-col gap-2 rounded-[var(--radius-lg)] bg-gradient-to-b from-[var(--color-accent-gold)]/[0.16] via-[var(--color-accent-gold)]/[0.07] to-transparent p-3.5 shadow-[0_10px_34px_rgba(168,126,28,0.15)] ring-2 ring-[var(--color-accent-gold)]/45 sm:p-4 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
@@ -180,32 +218,41 @@ export function VerdictStrip({
         {s.verdictTitle}
       </h4>
       <ul className="m-0 flex list-none flex-col gap-2 p-0 sm:flex-row">
-        {rows.map(({ reading, verdict }) => (
+        {rows.map(({ reading, verdict, price }) => (
           <li
             key={reading.metal}
             data-verdict-metal={reading.metal}
             data-verdict-direction={verdict ?? 'none'}
-            className="flex min-w-0 flex-1 flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] sm:flex-row sm:items-center sm:gap-4"
+            className="flex min-w-0 flex-1 flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)]"
           >
-            <div className="flex shrink-0 flex-col items-start gap-1 sm:w-40">
-              <MetalIcon metal={reading.metal} size={96} desktopSize={128} />
-              <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-secondary)]">
-                {s.metals[reading.metal]}
-              </span>
-              <span
-                className={`inline-flex min-h-[2.5em] items-center gap-1.5 ${
-                  verdict !== null ? verdictTone[verdict] : 'text-[var(--color-status-stale)]'
-                }`}
-              >
-                <VerdictIcon verdict={verdict ?? 'flat'} />
-                <span className="text-[length:var(--type-number)] font-bold leading-tight">
-                  {verdict === 'up' ? s.verdictUp : verdict === 'down' ? s.verdictDown : verdict === 'flat' ? s.verdictFlat : s.verdictNone}
+            {/* Header: boxed artwork · name + verdict · price (lighter). */}
+            <div className="flex items-center gap-3">
+              <MetalIconBox metal={reading.metal} />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-primary)]">
+                  {s.metals[reading.metal]}
+                </span>
+                <span
+                  className={`mt-0.5 inline-flex min-h-[2.5em] items-center gap-1.5 ${
+                    verdict !== null ? verdictTone[verdict] : 'text-[var(--color-status-stale)]'
+                  }`}
+                >
+                  <VerdictIcon verdict={verdict ?? 'flat'} />
+                  <span className="text-[length:var(--type-label)] font-bold leading-tight">
+                    {verdict === 'up' ? s.verdictUp : verdict === 'down' ? s.verdictDown : verdict === 'flat' ? s.verdictFlat : s.verdictNone}
+                  </span>
                 </span>
               </span>
+              {price !== null ? (
+                <bdi className="shrink-0 whitespace-nowrap text-[length:var(--type-label)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
+                  {price}
+                </bdi>
+              ) : null}
             </div>
+            {/* THE TREND — the big chart fills the rest of the chip. */}
             <div
               data-verdict-chart={reading.metal}
-              className="flex min-h-[136px] min-w-0 flex-1 flex-col justify-center gap-1.5 sm:border-s sm:border-[var(--color-border)] sm:ps-4"
+              className="flex min-w-0 flex-1 flex-col justify-center gap-1.5"
             >
               <MetalTrendChart metal={reading.metal} copy={copy} numberLocale={numberLocale} />
             </div>

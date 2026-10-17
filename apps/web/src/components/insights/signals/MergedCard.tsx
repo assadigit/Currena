@@ -112,6 +112,17 @@ export function MergedSignalsCard({
   const merged = mergeSignals(gold, silver);
   const byId = new Map(readings.map((r) => [r.id as string, r]));
 
+  /** The metal's current price, display-formatted — the VerdictStrip's
+   * header carries it in the lighter ink (2026-10-20 owner sketch: the
+   * price already leads the prices board; the strip emphasises the
+   * TREND). Honest absence → null, no placeholder. */
+  const priceTextOf = (priceId: IndicatorId): string | null => {
+    const reading = byId.get(priceId);
+    return reading !== undefined && reading.value !== null
+      ? formatIndicatorValue(priceId, reading.value, numberLocale, copy.units)
+      : null;
+  };
+
   const metalLeanLine = (reading: SignalReading): string => {
     const leanWord = reading.lean !== null ? s.lean[reading.lean] : s.notEnoughData;
     return interpolate(s.metalLean, {
@@ -211,8 +222,17 @@ export function MergedSignalsCard({
       </header>
 
       {/* Round 23 (owner): the stated estimation — one direction chip per
-       * metal, derived from the conditions below. Answer first. */}
-      <VerdictStrip gold={gold} silver={silver} copy={copy} numberLocale={numberLocale} />
+       * metal, derived from the conditions below. Answer first.
+       * 2026-10-20 (owner sketch): the chips redraw as analysis cards —
+       * header (artwork box · name + verdict · lighter price) over a BIG
+       * trend chart, one anatomy for mobile and desktop. */}
+      <VerdictStrip
+        gold={gold}
+        silver={silver}
+        prices={{ gold: priceTextOf('gold-usd'), silver: priceTextOf('silver-usd') }}
+        copy={copy}
+        numberLocale={numberLocale}
+      />
 
       {/* Step-1 audit item C12: gold near its DECADE high while real yields
        * are also high — the one combination the checklist's separate lines
