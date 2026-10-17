@@ -1,55 +1,65 @@
 /**
  * signals/BalanceScale — the gold card's balance visual (owner spec
  * docs/insights/gold-balance-card-spec.md, the v2 seesaw patch, v3, v4,
- * v5 and now the v6 PANS directive, 2026-10-26 — Iteration 4: the
- * factors must VISIBLY REST ON real weighing pans hung from the beam,
- * so the items read as the loads that tilt the scale).
+ * v5, the v6 PANS directive, and now the v7 Iteration-5 addendum,
+ * 2026-10-26 — "Rotate the beam only, and visualize weight").
  *
- * v6 composition (one coherent drawing, four connected parts):
+ * v7 supersedes v6's motion rules (addendum §A): EXACTLY ONE element
+ * rotates — the beam group (beam bar + pivot ring + needle), by
+ * rotate(θ, pivotX, pivotY) about the pivot. The pans, their rim ends,
+ * tiles, text, icons, headings and overflow pills are NEVER rotated,
+ * skewed or scaled: a pan moves ONLY by translate(x, y) so it hangs
+ * plumb from its beam-end joint, and the hanger lines are redrawn
+ * every frame from each joint to the two fixed rim corners of its
+ * upright pan — their angle changes slightly as the pans travel,
+ * which reads as a real hanging pan. All of it — beam rotation, joint
+ * positions, pan translations, hanger endpoints — derives from ONE
+ * animated value θ in the SAME frame (one React state → one render;
+ * no element carries its own CSS transition, so nothing can desync
+ * and detach). The vertical travel stays inside the fixed reserved
+ * envelope computed from the maximum θ, so no layout shift occurs.
  *
- *   1. the heading «برآیند عوامل مؤثر بر قیمت طلا» + its subtitle;
- *   2. the two SIDE CAPTIONS over the pan columns — each names its
- *      side («عوامل حمایتی/فشارآور بر قیمت طلا») with its icon and
- *      side colour, aligned exactly over the pan it labels;
- *   3. THE BALANCE ITSELF — a beam + pivot + bead + hanger + PAN
- *      assembly per side, all in one fixed-height stage:
- *        · a tapered beam (9px mid → ~6px ends) rotating on a compact
- *          hub-and-keystone pivot (v4's mark, kept);
- *        · an accent bead terminating each beam end — green for /
- *          red against (the side marker where the hangers meet the
- *          beam);
- *        · TWO THIN SUSPENSION LINES per side, splayed from the beam
- *          end down to the pan's top edge — the clear, restrained
- *          mechanical connection;
- *        · a SHALLOW PAN (a rimmed tray with a heavier floor edge)
- *          hanging at a fixed distance below its beam end;
- *        · the COMPACT FACTOR TILES resting INSIDE the pan — bottom-
- *          aligned on the floor, gapped, contact-shadowed: they are
- *          the loads the scale is weighing. Each tile is a real
- *          button opening the shared detail panel.
- *   4. the aggregate assessment (the soft centred box, v5) directly
- *      beneath the drawing;
- *   5. the full per-side factor lists (rows with full labels + the
- *      evidence-based empty lines) as controlled expansions below the
- *      assessment, opened by the pan's "+{n} more" pill;
- *   6. the shared detail panel and the Neutral / Couldn't read trays.
+ * v7 also adds the weight read-outs the addendum §B allows WITHOUT
+ * inventing data (the scoring model is untouched — counts only):
+ *   · the beam angle itself: θ ∝ the signed net score on a clamped
+ *     linear presentation scale — max 8° at the model's full range
+ *     (|net| = total), floored at 2° for any valid directional
+ *     result, exactly 0° for neutral, 0° + the explicit state label
+ *     for unavailable (the item count never sets θ);
+ *   · a POINTER NEEDLE fixed to the beam's pivot, pointing downward
+ *     and rotating with the beam, read against a small FIXED arc
+ *     scale with three ticks only (adverse end · centre · supportive
+ *     end — no numeric labels, no fabricated thresholds), hidden
+ *     when the state is unavailable. The needle is what makes a 2°
+ *     lean legible.
+ * Per-side weighted totals and per-factor weights do NOT exist in
+ * the model, so the side-load bar and the per-tile weight marker are
+ * deliberately NOT implemented (addendum §B: never fabricate).
  *
- * Physical coherence (the whole point of v6): the beam rotates by the
- * model's angle θ about the pivot, so each bead (beam end) drops by
- * (Lh ÷ 2) × sin θ. Every pan assembly translates by EXACTLY the same
- * drop (CSS: 25cqw × sin θ — 25cqw IS Lh ÷ 2 because the beam spans
- * half the stage) and tilts by a restrained 0.2 × θ (≤ 2.4° at the
- * 12° maximum, so factor text never needs head-tilting). The hangers
- * are rigid parts of the translating assembly, so the connection
- * bead → lines → pan stays coherent at every angle, and the geometry
- * is pure CSS calc — no runtime measurement, no ResizeObserver.
+ * Composition (v6, kept): the heading + subtitle; the two side
+ * captions over the pan columns; THE BALANCE — a beam + pivot + bead
+ * + hanger + pan assembly per side in one fixed-height stage, with
+ * the compact factor tiles resting INSIDE the pans (the loads); the
+ * aggregate assessment box; the full per-side factor lists opened by
+ * each pan's "+{n} more" pill; the shared detail panel; the Neutral /
+ * Couldn't-read trays.
  *
- * Rules that survive verbatim from v3/v4/v5:
+ * Physical coherence (v7's whole point): the beam group rotates by θ
+ * about the pivot, so each beam end (joint) lands at
+ * (cx ± (L/2)·cos θ, cy ± (L/2)·sin θ). The pan on the lowered end
+ * moves DOWN by its joint's vertical displacement, the raised one UP
+ * — each by translate(0, dy) only, so it hangs plumb. The hangers are
+ * recomputed straight lines joint → rim; because the joint also
+ * travels a second-order horizontal amount ((L/2)·(cos θ − 1) ≈ 1.5px
+ * at 8°) while the pan stays on its column, the two lines' angles
+ * change slightly — the real-hanging-pan cue the addendum asks for.
+ *
+ * Rules that survive verbatim from v3/v4/v5/v6:
  *   1. Carefully proportioned vector geometry with controlled weights
- *      (beam 9px > hub 15px > beads 12px > hangers 2px > reference
- *      dots ~1px) and deliberate reserved whitespace — the stage
- *      reserves exactly the ±(Lh ÷ 2) × sin 12° swing plus the pan
- *      stack, at a FIXED height (272px mobile / 240px ≥sm).
+ *      (beam 12px > pivot ring 16px > beads 13px > hangers/needle 2px)
+ *      and a fixed-height stage (272px mobile / 240px ≥ sm) that
+ *      reserves exactly the ±(L/2)·sin 8° swing plus the pan stack —
+ *      the envelope is computed from the maximum θ (addendum §A).
  *   2. No dashed placeholder rectangles: a side with no qualifying
  *      factors keeps its COMPLETE pan (hangers, rim, floor) with a
  *      minimal muted marker inside, and its full evidence-based line
@@ -57,34 +67,36 @@
  *      carry the distinct "nothing to weigh yet" marker instead.
  *   3. Capacity, not overflow: each pan shows the first
  *      BALANCE_PAN_CAPACITY tiles; the rest are counted by the
- *      "+{n} more" pill hanging under the pan (styled like the site's
- *      attention-tile pill — deliberately NOT a tile, so it can never
- *      read as another load), which expands the side's full list.
- *      Nothing is silently omitted; the model still sees every
- *      driver; the stage's geometry never depends on any count.
- *   4. Direction follows the model (v1 §6 steps 3–4, byte-identical):
- *      the beam tilts ONLY for a valid aggregate verdict, angle =
- *      |net|/total × 12° floored at 4°; balanced and unreadable
- *      verdicts render level. The NUMBER of tiles never sets the
- *      tilt — only the documented net/total ratio does.
+ *      "+{n} more" pill hanging under the pan (deliberately NOT a
+ *      tile, so it can never read as another load), which expands
+ *      the side's full list. Nothing is silently omitted; the model
+ *      still sees every driver; the stage's geometry never depends
+ *      on any count.
+ *   4. Direction follows the model (v1 §6 steps 3–4 — the ratio law
+ *      itself is UNTOUCHED; the v7 addendum supersedes only its
+ *      presentation scale): the beam tilts ONLY for a valid
+ *      aggregate verdict, angle = |net|/total × 8° clamped to
+ *      [2°, 8°]; balanced and unreadable verdicts render level. The
+ *      NUMBER of tiles never sets the tilt — only the documented
+ *      net/total ratio does.
  *   5. Fixed stage geometry: the stage's height is constant per
  *      breakpoint; any number of factors on either side can never
  *      resize, clip or collide with the drawing.
  *
  * RTL: the pan columns, captions and list sections are CSS-grid
  * children, so they mirror with the document direction automatically.
- * The beam's rotation sign flips for RTL in JS (--s; the physical
- * signed angle --t that drives the pan drops is direction-free), and
- * the beads are placed with inset-inline utilities so the `for` bead
- * always terminates the beam end above the `for` pan. Nothing mirrors
- * text.
+ * The beam's rotation sign flips for RTL in the geometry (the heavy
+ * side's end always dips; the physical signed angle that drives the
+ * pan drops is direction-free), and the joint/pan/rim coordinates are
+ * computed per side so the `for` hangers always meet the beam end
+ * above the `for` pan. Nothing mirrors text.
  *
  * Reusable by contract (spec §2.6): the component takes a list of
  * drivers and knows nothing about gold beyond the copy strings; the
  * merged card applies it to the gold driver list only.
  */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { formatNumber } from '@currena/core';
 import type { SignalConditionState } from '@currena/insights';
@@ -148,19 +160,22 @@ export function balanceCounts(drivers: readonly BalanceDriver[]): BalanceCounts 
   return { for: f, against: a, neutral: n, unread: u, total: drivers.length, net: f - a, readable: f + a + n };
 }
 
-/** The tilt constants (v2 patch §5.1.5, kept by v3–v6 — the angle
- * formula is the owner's model and must not change: ratio × 12°, 4° floor). */
-export const BALANCE_MAX_ANGLE_DEG = 12;
-export const BALANCE_MIN_ANGLE_DEG = 4;
+/** The tilt constants. The RATIO LAW (v1 §6 steps 3–4: net/total) is
+ * the owner's scoring model and is byte-identical; the v7 Iteration-5
+ * addendum supersedes only its PRESENTATION scale: a clamped linear
+ * mapping with a 8° maximum at the model's full range (|net|/total =
+ * 1) and a 2° floor so any valid directional result is visibly
+ * unlevel (the needle makes even 2° readable). Neutral and
+ * unavailable are exactly level. */
+export const BALANCE_MAX_ANGLE_DEG = 8;
+export const BALANCE_MIN_ANGLE_DEG = 2;
 
 /* ------------------------------------------------------------------ *
- * v6 stage metrics — ONE fixed-height stage drawn with CSS geometry.
- * The logical design width is 640px (the stage's max width); every
- * horizontal anchor is a percentage so the drawing scales with the
- * stage: the beam spans 25%–75% (its ends = the two pan columns'
- * centres), the pans fill 92% of their 50% columns, and the pan drop
- * is 25cqw × sin θ (25cqw = Lh ÷ 2 by construction, so the pans track
- * their beads EXACTLY at every width).
+ * v7 stage metrics — ONE fixed-height stage. The logical design width
+ * is 640px (the stage's max width); the beam spans 25%–75% of the
+ * stage (its ends = the two pan columns' centres), the pans fill 92%
+ * of their 50% columns, and every mechanical coordinate is computed
+ * from the MEASURED stage width so the drawing scales as one piece.
  * ------------------------------------------------------------------ */
 
 /** The physical signed angle of the balance, in degrees: positive
@@ -173,9 +188,9 @@ export function signedTiltDeg(tilt: Pick<BalanceTilt, 'angleDeg' | 'heavy'>): nu
 }
 
 /** The drawn arm at the 640px design width (the 25%–75% beam): the
- * reference Lh for the pure tilt math. The RENDERED drops use
- * 25cqw × sin θ, so they scale with the stage width exactly as the
- * arm does — the model's angle is untouched. */
+ * reference Lh for the pure tilt math. The RENDERED joints scale with
+ * the measured stage width exactly as the arm does — the model's
+ * angle is untouched. */
 export const BALANCE_LH_PX = 320;
 
 /** v6 capacity: the compact tiles a pan shows before its "+{n} more"
@@ -183,44 +198,60 @@ export const BALANCE_LH_PX = 320;
  * viewport; the rest stay one tap away in the side's full list). */
 export const BALANCE_PAN_CAPACITY = 2;
 
-/** The restrained pan tilt as a fraction of the beam's angle: 0.2 →
- * at most 2.4° at the 12° maximum — the pans follow the beam enough
- * to feel connected while factor text stays comfortably upright. */
-export const BALANCE_PAN_TILT_FRACTION = 0.2;
-
 /** The pivot's y in stage pixels (the beam's rotation centre; the
  * dotted level reference runs through it). */
 export const BALANCE_PIVOT_Y_PX = 44;
 /** The vertical hang from a beam end at rest to its pan's top edge —
- * the suspension length the hangers draw. */
+ * the rest length the hangers draw. */
 export const BALANCE_HANG_PX = 36;
 /** How far each hanger's bottom anchor sits from its column centre —
- * the two lines splay from the bead (a point) to the pan's top edge. */
+ * the two lines run from the joint (a point) to the pan's top rim. */
 export const BALANCE_HANG_SPREAD_PX = 24;
-/** The hanger lines' drawn length (√(spread² + hang²) — the hypotenuse
- * from bead to pan edge) and their splay off vertical. */
-export const BALANCE_HANG_LEN_PX = Math.hypot(BALANCE_HANG_SPREAD_PX, BALANCE_HANG_PX);
-export const BALANCE_HANG_ANGLE_DEG = (Math.atan2(BALANCE_HANG_SPREAD_PX, BALANCE_HANG_PX) * 180) / Math.PI;
 /** The pan tops' y = pivot + hang: the stage's fixed pan-grid offset. */
 export const BALANCE_PAN_TOP_PX = BALANCE_PIVOT_Y_PX + BALANCE_HANG_PX;
 /** The fixed stage heights (mobile / ≥sm) and pan heights: the stage
- * reserves the pan stack, the overflow pill, and exactly the
- * ±(Lh ÷ 2) × sin 12° swing of the 640px design width (≥sm). */
+ * reserves the pan stack, the overflow pill, and the ±(Lh ÷ 2) × sin
+ * of the 8° maximum at the 640 design width (the envelope is
+ * computed from the maximum θ — addendum §A). */
 export const BALANCE_STAGE_H_MOBILE = 260;
 export const BALANCE_STAGE_H_DESKTOP = 240;
 export const BALANCE_PAN_H_MOBILE = 118;
 export const BALANCE_PAN_H_DESKTOP = 88;
+/** The beam's pin-to-pin length is half the stage, so the vertical
+ * travel of one pan is (stageWidth ÷ 4) × sin θ — at the 640 design
+ * width and the 8° maximum this is 160 × sin 8° ≈ 22.27px: the fixed
+ * reserved envelope every frame must stay inside (tested). */
+export const BALANCE_SWING_PX = (BALANCE_LH_PX / 2) * Math.sin((BALANCE_MAX_ANGLE_DEG * Math.PI) / 180);
+
+/** The needle + arc (addendum §B): the needle hangs from the pivot,
+ * 26px long, and reads against a fixed arc of radius 27 with three
+ * ticks (r 27 → 32) at straight-down ± the maximum angle — the tip
+ * sweeps exactly to the end ticks at ±8°. */
+export const BALANCE_NEEDLE_LEN_PX = 26;
+export const BALANCE_ARC_R_PX = 27;
+export const BALANCE_ARC_TICK_OUT_PX = 32;
+
+/** The stage's logical design width — the pre-measurement default
+ * (the SSR render draws the level balance at this width; the layout
+ * effect swaps in the measured width before the first paint). */
+export const BALANCE_STAGE_W_DESIGN = 640;
+
+/** The tilt animation (the Odometer's rAF pattern, per addendum §A):
+ * ~500 ms ease-out cubic on the ONE animated value θ — every derived
+ * coordinate re-renders in the same frame. prefers-reduced-motion
+ * users land on the verdict angle immediately. */
+const TILT_ANIMATION_MS = 500;
 
 const radOf = (deg: number): number => (deg * Math.PI) / 180;
+/** Rendered SVG coordinates are rounded to 2 decimals — deterministic
+ * strings, no float noise, sub-0.01px error. */
+const r2 = (v: number): number => Math.round(v * 100) / 100;
 
 export interface BalanceTilt {
   /** The beam's rotation in degrees (positive = the against side
-   * heavy in the LTR reading; the RTL render flips the visual sign
-   * via --s). 0 = level. */
+   * heavy in the LTR reading; the RTL render flips the visual sign). */
   angleDeg: number;
-  /** The vertical move of ONE beam end off rest: (Lh ÷ 2) × sin(angle) —
-   * the heavy end drops by this, the light one climbs by it. The two
-   * endpoint beads therefore sit 2 × risePx apart = Lh × sin(angle). */
+  /** The vertical move of ONE beam end off rest: (Lh ÷ 2) × sin(angle). */
   risePx: number;
   /** The beam-end height difference: Lh × sin(angle) — the ONLY height
    * difference the picture may show. */
@@ -230,10 +261,11 @@ export interface BalanceTilt {
 }
 
 /**
- * The tilt rule (v1 §6 steps 3–4, kept verbatim by v2 §4, v3–v6 rule
- * 4): net 0 → level; nothing readable → level; otherwise angle =
- * |net|/total × MAX, floored at MIN so one driver still leans. `lhPx`
- * is the pin-to-pin distance in the drawing's units (0 → level).
+ * The tilt rule (v1 §6 steps 3–4 — the net/total ratio law, kept
+ * verbatim; the v7 addendum supersedes the presentation scale): net 0
+ * → level; nothing readable → level; otherwise angle =
+ * |net|/total × MAX clamped to [MIN, MAX]. `lhPx` is the
+ * pin-to-pin distance in the drawing's units (0 → level).
  */
 export function balanceTilt(counts: BalanceCounts, lhPx: number): BalanceTilt {
   if (counts.readable === 0 || counts.net === 0 || lhPx <= 0) {
@@ -249,7 +281,7 @@ export type BalanceVerdict = 'for' | 'balanced' | 'against' | 'none';
 
 /** The verdict word (spec §5.1 + §13): nothing readable → "Can't read…";
  * otherwise the net's sign, "Balanced" at exactly zero. The beam tilts
- * ONLY when this verdict is directional (v3–v6 rule 4). */
+ * ONLY when this verdict is directional (v3–v7 rule 4). */
 export function balanceVerdictOf(counts: BalanceCounts): BalanceVerdict {
   if (counts.readable === 0) return 'none';
   if (counts.net > 0) return 'for';
@@ -271,10 +303,151 @@ export function countLineParts(counts: BalanceCounts, copy: InsightsCopy, number
   return parts.filter(([count]) => count > 0).map(([, text]) => text);
 }
 
-/** The tilt animation (v1 §6.7, kept by v2 §5.9, v3–v6): ~500 ms ease
- * on the beam rotation AND on the pan assemblies' drop+tilt — one
- * motion, disabled for prefers-reduced-motion users. */
-const TILT_TRANSITION_CLASS = 'transition-transform duration-500 ease-out motion-reduce:transition-none';
+/* ------------------------------------------------------------------ *
+ * v7 stage geometry — the pure per-frame derivation (addendum §A).
+ * Given the measured stage width, the CURRENT signed physical angle
+ * and the direction, this computes EVERYTHING the frame draws: the
+ * beam group's rotate(θ, pivotX, pivotY), each side's beam-end joint,
+ * each pan's pure-vertical translation, and the hanger endpoints
+ * (joint → the pan's two fixed rim corners). Pure — unit-tested
+ * without a DOM; the component renders from it every frame.
+ * ------------------------------------------------------------------ */
+
+export interface BalancePoint {
+  x: number;
+  y: number;
+}
+
+export interface BalanceSideGeometry {
+  /** The beam-end joint this side hangs from, at the current θ:
+   * (cx ± (L/2)·cos θ, cy ± (L/2)·sin θ) — the hangers' top end. */
+  joint: BalancePoint;
+  /** The pan's translation — ONLY vertical (the pan hangs plumb from
+   * its joint): the joint's y displacement off rest. */
+  panDrop: number;
+  /** The pan's top-rim suspension point at −SPREAD from its column
+   * centre, translated by the drop — a FIXED point of the pan. */
+  rimStart: BalancePoint;
+  /** The pan's top-rim suspension point at +SPREAD (idem). */
+  rimEnd: BalancePoint;
+}
+
+export interface BalanceStageGeometry {
+  stageWidth: number;
+  /** The pivot: the beam's rotation centre (cx, cy = pivotY). */
+  cx: number;
+  cy: number;
+  /** The beam's half-length — a quarter of the stage width (the beam
+   * spans 25%–75%, its ends over the two pan columns' centres). */
+  halfArm: number;
+  /** The VISUAL beam rotation in degrees (RTL flips the sign so the
+   * heavy side's end always dips; the physical angle drives drops). */
+  beamAngleDeg: number;
+  /** The beam group's transform — rotate(θ, pivotX, pivotY). This is
+   * the ONLY transform in the whole drawing (tested). */
+  beamTransform: string;
+  for: BalanceSideGeometry;
+  against: BalanceSideGeometry;
+}
+
+export function balanceStageGeometry(
+  stageWidth: number,
+  signedPhysicalDeg: number,
+  rtl: boolean,
+): BalanceStageGeometry {
+  const w = Math.max(1, stageWidth);
+  const cx = w / 2;
+  const cy = BALANCE_PIVOT_Y_PX;
+  const halfArm = w / 4;
+  const visualDeg = rtl ? -signedPhysicalDeg : signedPhysicalDeg;
+  const rad = radOf(visualDeg);
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  // The beam ends under rotation: the joints the pans hang from.
+  const left: BalancePoint = { x: cx - halfArm * cos, y: cy - halfArm * sin };
+  const right: BalancePoint = { x: cx + halfArm * cos, y: cy + halfArm * sin };
+  // LTR: the for pan is the LEFT column; RTL mirrors the grid, so for
+  // is the right one. The pan centres are the joints' REST positions.
+  const forIsLeft = !rtl;
+  const forJoint = forIsLeft ? left : right;
+  const againstJoint = forIsLeft ? right : left;
+  const forCentreX = forIsLeft ? cx - halfArm : cx + halfArm;
+  const againstCentreX = forIsLeft ? cx + halfArm : cx - halfArm;
+  // Each pan translates by EXACTLY its joint's vertical displacement —
+  // plumb. (The joint's second-order horizontal travel (L/2)(cosθ−1)
+  // is deliberately NOT followed: the hangers' angles change slightly
+  // instead, which reads as a real hanging pan.)
+  const side = (joint: BalancePoint, centreX: number): BalanceSideGeometry => {
+    const drop = joint.y - cy;
+    return {
+      joint,
+      panDrop: drop,
+      rimStart: { x: centreX - BALANCE_HANG_SPREAD_PX, y: BALANCE_PAN_TOP_PX + drop },
+      rimEnd: { x: centreX + BALANCE_HANG_SPREAD_PX, y: BALANCE_PAN_TOP_PX + drop },
+    };
+  };
+  return {
+    stageWidth: w,
+    cx,
+    cy,
+    halfArm,
+    beamAngleDeg: visualDeg,
+    beamTransform: `rotate(${r2(visualDeg)} ${r2(cx)} ${r2(cy)})`,
+    for: side(forJoint, forCentreX),
+    against: side(againstJoint, againstCentreX),
+  };
+}
+
+/** The fixed gauge (addendum §B): a small arc behind the needle with
+ * THREE ticks only — adverse end, centre, supportive end. The needle
+ * is rigid with the beam and points DOWN, so its tip swings to the
+ * side OPPOSITE the heavy pan (rigid-body rotation); the ticks are
+ * therefore labelled by VERDICT: the tick the needle reaches when a
+ * side is heavy names that side, so "needle at the adverse mark"
+ * reads as the adverse verdict (a dial, not a pointer-at-the-pan —
+ * the way a real instrument's scale compensates its mechanism). No
+ * numeric labels, no fabricated thresholds; the text equivalent is
+ * the whole drawing's aria (colour never rides alone). */
+export interface BalanceGaugeTick {
+  kind: 'adverse' | 'center' | 'supportive';
+  from: BalancePoint;
+  to: BalancePoint;
+}
+
+export interface BalanceGaugeGeometry {
+  /** The arc path (r = 27, spanning straight-down ± the max angle). */
+  arcPath: string;
+  ticks: BalanceGaugeTick[];
+}
+
+export function balanceGaugeGeometry(cx: number, cy: number, rtl: boolean): BalanceGaugeGeometry {
+  const max = BALANCE_MAX_ANGLE_DEG;
+  // SVG angles measured from +x, straight-down = 90°; the arc spans
+  // 90° ± max. adverse tick: 90° + max in LTR (the left end — the
+  // needle swings there when the right/against pan is heavy), mirrored
+  // for RTL (the against pan is the left column there).
+  const adverseDeg = 90 + (rtl ? -max : max);
+  const supportiveDeg = 90 - (rtl ? -max : max);
+  const point = (deg: number, r: number): BalancePoint => ({
+    x: r2(cx + r * Math.cos(radOf(deg))),
+    y: r2(cy + r * Math.sin(radOf(deg))),
+  });
+  const start = point(90 - max, BALANCE_ARC_R_PX);
+  const end = point(90 + max, BALANCE_ARC_R_PX);
+  const tick = (deg: number, kind: BalanceGaugeTick['kind']): BalanceGaugeTick => ({
+    kind,
+    from: point(deg, BALANCE_ARC_R_PX),
+    to: point(deg, BALANCE_ARC_TICK_OUT_PX),
+  });
+  return {
+    arcPath: `M ${start.x} ${start.y} A ${BALANCE_ARC_R_PX} ${BALANCE_ARC_R_PX} 0 0 1 ${end.x} ${end.y}`,
+    ticks: [
+      tick(adverseDeg, 'adverse'),
+      tick(90, 'center'),
+      tick(supportiveDeg, 'supportive'),
+    ],
+  };
+}
 
 export function BalanceScale({
   drivers,
@@ -296,26 +469,102 @@ export function BalanceScale({
    * pan's "+{n} more" pill — one independent toggle per side). */
   const [openLists, setOpenLists] = useState<{ for: boolean; against: boolean }>({ for: false, against: false });
 
-  if (drivers.length === 0) return null;
-
+  /* Model-level reads (pure — an empty driver list yields the level
+   * balance, so every hook below keeps its call order unconditional). */
   const counts = balanceCounts(drivers);
   const verdict = balanceVerdictOf(counts);
+  /* The tilt from the fixed design-width arm (rule 5: the model math
+   * never depends on anything measured at runtime; the rendered
+   * geometry scales with the measured stage width below). */
+  const tilt = balanceTilt(counts, BALANCE_LH_PX);
+  /* The PHYSICAL signed angle (against-heavy positive) is the ANGLE
+   * TARGET; the VISUAL beam rotation flips for RTL inside the
+   * geometry so the heavy side's end always dips. */
+  const targetDeg = signedTiltDeg(tilt);
+
+  /* THE ONE ANIMATED VALUE (addendum §A): θ. The SSR/first render
+   * paints the final angle (progressive: the static picture is the
+   * verdict, matching v5/v6 behaviour — no settle-in on load), and
+   * the rAF timeline below animates it whenever the model's target
+   * changes (a data refresh), re-deriving the beam rotation, joints,
+   * pan translations and hanger endpoints in the SAME frame. */
+  const [theta, setTheta] = useState(targetDeg);
+  const thetaRef = useRef(targetDeg);
+  const frame = useRef(0);
+
+  /** The measured stage width (the pre-paint default is the 640
+   * design width; a layout effect swaps in the real measurement
+   * before the first paint, and a ResizeObserver keeps it current). */
+  const [stageWidth, setStageWidth] = useState(BALANCE_STAGE_W_DESIGN);
+  const stageEl = useRef<HTMLDivElement | null>(null);
+  const widthRef = useRef(BALANCE_STAGE_W_DESIGN);
+
+  useEffect(() => {
+    const el = stageEl.current;
+    if (!el) return undefined;
+    const apply = (w: number): void => {
+      if (w > 0 && Math.abs(w - widthRef.current) > 0.5) {
+        widthRef.current = w;
+        setStageWidth(w);
+      }
+    };
+    // Pre-paint sync measurement — the first client paint is already
+    // at the true width (no flash of the 640-default geometry).
+    apply(el.getBoundingClientRect().width);
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver((entries) => {
+      apply(entries[0]?.contentRect.width ?? 0);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const from = thetaRef.current;
+    if (from === targetDeg) return undefined;
+    const land = (v: number): void => {
+      thetaRef.current = v;
+      setTheta(v);
+    };
+    // Reduced motion (the Odometer rule): land on the verdict angle
+    // immediately; the same media query silences the app's other
+    // motion. Environments without rAF land the same way.
+    const reduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced || typeof requestAnimationFrame !== 'function') {
+      land(targetDeg);
+      return undefined;
+    }
+    const start = performance.now();
+    const tick = (now: number): void => {
+      const progress = Math.min(1, (now - start) / TILT_ANIMATION_MS);
+      const eased = 1 - (1 - progress) ** 3; // ease-out cubic
+      land(from + (targetDeg - from) * eased);
+      if (progress < 1) {
+        frame.current = requestAnimationFrame(tick);
+      } else {
+        land(targetDeg);
+      }
+    };
+    frame.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame.current);
+  }, [targetDeg]);
+
+  useEffect(() => () => cancelAnimationFrame(frame.current), []);
+
+  if (drivers.length === 0) return null;
 
   const forBlocks = drivers.filter((d) => d.state === 'for');
   const againstBlocks = drivers.filter((d) => d.state === 'against');
   const neutralChips = drivers.filter((d) => d.state === 'neutral');
   const unreadChips = drivers.filter((d) => d.state === 'unread');
 
-  /* The tilt from the fixed design-width arm (rule 5: the geometry
-   * never depends on anything measured at runtime — the rendered drops
-   * scale with the stage via 25cqw × sin θ). */
-  const tilt = balanceTilt(counts, BALANCE_LH_PX);
-  /* The PHYSICAL signed angle (against-heavy positive) drives the pan
-   * drops (--t); the VISUAL beam rotation (--s) flips for RTL so the
-   * heavy side's end always dips. The drops themselves stay signed by
-   * --t in BOTH directions. */
-  const tDeg = signedTiltDeg(tilt);
-  const sDeg = rtl ? -tDeg : tDeg;
+  /* THE FRAME: every mechanical coordinate derives from the one θ in
+   * this single render — beam rotation, joints, plumb pan drops,
+   * hanger endpoints (joint → the pan's two fixed rim corners). */
+  const geo = balanceStageGeometry(stageWidth, theta, rtl);
+  const gauge = balanceGaugeGeometry(geo.cx, geo.cy, rtl);
 
   const verdictWord =
     verdict === 'for'
@@ -336,32 +585,35 @@ export function BalanceScale({
   const parts = countLineParts(counts, copy, numberLocale);
   const ariaLabel = interpolate(b.aria, { summary: parts.join(' · '), verdict: verdictWord });
 
+  /* The gauge's text equivalent (addendum §B: never colour alone) —
+   * the whole mechanical drawing is one role="img" whose label states
+   * the beam tilt and the verdict. Hidden entirely when the state is
+   * unavailable (no needle, no verdict — the state label in the
+   * assessment box carries it). */
+  const gaugeAvailable = verdict !== 'none';
+  const gaugeAria = interpolate(b.gaugeAria, {
+    n: formatNumber(tilt.angleDeg, numberLocale, { maximumFractionDigits: 0 }),
+    verdict: verdictWord,
+  });
+
+  /* The frame's fixed anchors: the beam-group LOCAL coordinates of
+   * the two beads — the for bead terminates the beam end above the
+   * for pan (left in LTR, right in RTL), the against bead the other. */
+  const forEndX = geo.for.joint.x < geo.cx ? geo.cx - geo.halfArm : geo.cx + geo.halfArm;
+  const againstEndX = geo.for.joint.x < geo.cx ? geo.cx + geo.halfArm : geo.cx - geo.halfArm;
+
   const toggle = (key: string): void => setOpenKey((prev) => (prev === key ? null : key));
   const openDriver = drivers.find((d) => d.key === openKey) ?? null;
-
-  /** The stage's geometry custom properties: --t (physical signed
-   * angle) and --s (visual, RTL-flipped) in degrees; --lh-half is
-   * 25cqw = Lh ÷ 2 BY CONSTRUCTION (the beam spans half the stage),
-   * so each pan drops exactly as far as its bead does; --pan-tilt is
-   * the restrained 0.2 × --s lean that keeps the pans feeling hung
-   * while tiles stay upright enough to read. Pure CSS calc + sin() —
-   * no runtime measurement (a browser without trig simply renders the
-   * level state, never a wrong direction). */
-  const stageVars = {
-    '--t': `${tDeg}deg`,
-    '--s': `${sDeg}deg`,
-    '--lh-half': '25cqw',
-    '--drop-against': 'calc(var(--lh-half) * sin(var(--t)))',
-    '--drop-for': 'calc(var(--lh-half) * sin(var(--t)) * -1)',
-    '--pan-tilt': `calc(var(--s) * ${BALANCE_PAN_TILT_FRACTION})`,
-  } as React.CSSProperties;
 
   /** One compact factor tile RESTING ON THE PAN (v6's load): icon +
    * full short name (never truncated) + the value where space permits
    * (hidden below `sm` so mobile rows stay single-line legible). A
    * real button — its tap opens the shared detail panel with the
    * factor's full explanation. Bottom of the pan = the floor, so the
-   * loads sit ON the surface (contact shadow included). */
+   * loads sit ON the surface (contact shadow included). v7: the tile
+   * is NEVER rotated, skewed or scaled — it only rides its pan's
+   * plumb translation, so its text stays horizontal at every angle
+   * (the 12.48px caption floor holds at every viewport). */
   const tile = (d: BalanceDriver, side: 'for' | 'against'): React.JSX.Element => (
     <button
       key={d.key}
@@ -471,58 +723,30 @@ export function BalanceScale({
     );
   };
 
-  /** One side's PAN ASSEMBLY — the rigid hanging group: two thin
-   * suspension lines from the beam-end bead down to the pan's top
-   * edge, the shallow rimmed pan (a heavier floor edge), the factor
-   * tiles resting on that floor, and the "+{n} more" pill hanging
-   * just under the pan. The whole assembly translates by its side's
-   * drop (var(--drop-…) — exactly its bead's drop) and tilts by the
-   * restrained 0.2 × --s, pivoting at the hang point (its top centre),
-   * so bead → lines → pan read as one connected machine at every
-   * angle. Geometry is FIXED: capacity-bound tiles, fixed pan height,
-   * nothing about the count can resize the drawing. */
+  /** One side's PAN ASSEMBLY (v7: translate ONLY): the junction ring
+   * dots on the pan's top rim, the shallow rimmed pan (a heavier
+   * floor edge), the factor tiles resting on that floor, and the
+   * "+{n} more" pill hanging just under the pan. The assembly moves
+   * by translate(0, dy) — EXACTLY its joint's vertical displacement —
+   * so it hangs plumb; it NEVER rotates, skews or scales. The
+   * hangers themselves live in the SVG layer below and are redrawn
+   * every frame from the joint to these rim points. Geometry is
+   * FIXED: capacity-bound tiles, fixed pan height, nothing about the
+   * count can resize the drawing. */
   const panAssembly = (side: 'for' | 'against', blocks: readonly BalanceDriver[]): React.JSX.Element => {
     const visible = blocks.slice(0, BALANCE_PAN_CAPACITY);
     const hiddenCount = blocks.length - visible.length;
     const expanded = openLists[side];
+    const drop = side === 'for' ? geo.for.panDrop : geo.against.panDrop;
     return (
       <div
         data-balance-assembly={side}
-        className={`relative ${TILT_TRANSITION_CLASS}`}
-        style={{
-          transform: `translateY(var(--drop-${side})) rotate(var(--pan-tilt))`,
-          transformOrigin: '50% 0',
-        }}
+        className="relative"
+        style={{ transform: `translate(0px, ${r2(drop)}px)` }}
       >
-        {/* The two suspension lines: splayed from the bead (a point at
-         * the column centre, at the beam's end) down to the pan's top
-         * edge ± BALANCE_HANG_SPREAD_PX — thin (2px), rounded, drawn
-         * in the tertiary ink (quiet in light, still visible in dark)
-         * — plus a tiny junction dot where each line meets the pan rim
-         * (the "ring" that makes the connection read as mechanical,
-         * not sketched). */}
-        <span
-          aria-hidden="true"
-          data-balance-hanger={`${side}-start`}
-          className="absolute bottom-full w-[2px] rounded-full bg-[var(--color-text-tertiary)]"
-          style={{
-            left: `calc(50% - ${BALANCE_HANG_SPREAD_PX + 1}px)`,
-            height: BALANCE_HANG_LEN_PX,
-            transform: `rotate(${BALANCE_HANG_ANGLE_DEG}deg)`,
-            transformOrigin: 'bottom center',
-          }}
-        />
-        <span
-          aria-hidden="true"
-          data-balance-hanger={`${side}-end`}
-          className="absolute bottom-full w-[2px] rounded-full bg-[var(--color-text-tertiary)]"
-          style={{
-            left: `calc(50% + ${BALANCE_HANG_SPREAD_PX - 1}px)`,
-            height: BALANCE_HANG_LEN_PX,
-            transform: `rotate(${-BALANCE_HANG_ANGLE_DEG}deg)`,
-            transformOrigin: 'bottom center',
-          }}
-        />
+        {/* The two rim junction rings — the hangers' bottom anchors:
+         * fixed points of the pan (its top edge, ±SPREAD from the
+         * column centre), carried by the translating assembly. */}
         <span
           aria-hidden="true"
           data-balance-hanger={`${side}-start-ring`}
@@ -589,6 +813,34 @@ export function BalanceScale({
     );
   };
 
+  /** The hanger lines of one side (v7: SVG lines, redrawn every
+   * frame): straight lines from the side's beam-end JOINT to the
+   * pan's two fixed rim corners — they meet the joint exactly, and
+   * their angles change slightly as the pans travel (the pan stays
+   * on its column while the joint arcs). No transform anywhere —
+   * the endpoints themselves are the geometry. */
+  const hangersOf = (side: 'for' | 'against'): React.JSX.Element[] => {
+    const g = side === 'for' ? geo.for : geo.against;
+    const ends: Array<{ name: 'start' | 'end'; to: BalancePoint }> = [
+      { name: 'start', to: g.rimStart },
+      { name: 'end', to: g.rimEnd },
+    ];
+    return ends.map(({ name, to }) => (
+      <line
+        key={`${side}-${name}`}
+        aria-hidden="true"
+        data-balance-hanger={`${side}-${name}`}
+        x1={r2(g.joint.x)}
+        y1={r2(g.joint.y)}
+        x2={r2(to.x)}
+        y2={r2(to.y)}
+        strokeWidth={2}
+        strokeLinecap="round"
+        className="stroke-[var(--color-text-tertiary)]"
+      />
+    ));
+  };
+
   return (
     <div className="flex flex-col gap-3" data-balance>
       {/* 1. THE HEADING + SUBTITLE: the concept's own name — «برآیند
@@ -626,20 +878,22 @@ export function BalanceScale({
         ))}
       </div>
 
-      {/* 3. THE BALANCE STAGE: one fixed-height relative box (a size
-       * container — cqw units resolve against it). Inside, in paint
-       * order: the dotted level reference (behind everything), the
-       * two pan assemblies (the interactive layer — the tiles are real
-       * buttons), and the beam zone (beam + beads + hub + keystone,
-       * pointer-transparent, painted OVER the hanger tops so each bead
-       * caps its suspension lines). role="group" carries the result as
-       * its label (§12.1); the tiles inside stay real buttons (§7.4). */}
+      {/* 3. THE BALANCE STAGE: one fixed-height relative box. Inside,
+       * in paint order: the dotted level reference (behind
+       * everything), the MECHANICAL LAYER — one SVG holding the
+       * hanger lines, the fixed gauge (arc + three ticks), and THE
+       * BEAM GROUP (beam bar + beads + pivot ring + needle), the
+       * only element that rotates — then the pan grid (the
+       * interactive layer — the tiles are real buttons, translated
+       * plumb). role="group" carries the result as its label
+       * (§12.1); the SVG is one role="img" whose label is the
+       * needle's text equivalent (hidden when unavailable). */}
       <div
+        ref={stageEl}
         data-balance-stage
         role="group"
         aria-label={ariaLabel}
-        className="relative mx-auto h-[260px] w-full max-w-[640px] text-[var(--color-text-secondary)] [container-type:inline-size] sm:h-[240px]"
-        style={stageVars}
+        className="relative mx-auto h-[260px] w-full max-w-[640px] text-[var(--color-text-secondary)] sm:h-[240px]"
       >
         {/* The dotted level reference through the pivot (v2 §5.3,
          * kept): behind everything, spanning WIDER than the beam —
@@ -656,54 +910,104 @@ export function BalanceScale({
             backgroundPosition: '0 0',
           }}
         />
+        {/* THE MECHANICAL LAYER (v7): hangers (redrawn per frame,
+         * joint → rim) → the fixed gauge arc + its three ticks → the
+         * BEAM GROUP, rotated by rotate(θ, pivotX, pivotY) — the one
+         * and only transform in the drawing. The beam group carries
+         * the tapered bar, the two accent beads (green for / red
+         * against — the side markers where the hangers meet the
+         * beam), the pivot ring with its pin, and the needle (hidden
+         * when the state is unavailable). */}
+        <svg
+          data-balance-mech
+          role={gaugeAvailable ? 'img' : undefined}
+          aria-label={gaugeAvailable ? gaugeAria : undefined}
+          aria-hidden={gaugeAvailable ? undefined : true}
+          className="pointer-events-none absolute inset-0 z-[1] h-full w-full"
+        >
+          {hangersOf('for')}
+          {hangersOf('against')}
+          {/* The fixed gauge scale: a quiet arc behind the needle with
+           * three ticks only — adverse end, centre, supportive end
+           * (labelled by verdict; see balanceGaugeGeometry). */}
+          <g data-balance-arc>
+            <path
+              d={gauge.arcPath}
+              fill="none"
+              strokeWidth={2}
+              strokeLinecap="round"
+              className="stroke-[var(--color-text-tertiary)]"
+            />
+            {gauge.ticks.map((t) => (
+              <line
+                key={t.kind}
+                data-balance-tick={t.kind}
+                x1={t.from.x}
+                y1={t.from.y}
+                x2={t.to.x}
+                y2={t.to.y}
+                strokeWidth={2}
+                strokeLinecap="round"
+                className="stroke-[var(--color-text-tertiary)]"
+              />
+            ))}
+          </g>
+          {/* THE BEAM GROUP — rotate(θ, pivotX, pivotY): the beam bar
+           * (tapered 12px mid → 8px ends), the accent beads at the
+           * joints, the needle below the pivot, the pivot ring + pin
+           * capping it all (the ring turns with the beam — the
+           * addendum's rotating pivot ring). */}
+          <g data-balance-beam transform={geo.beamTransform}>
+            <path
+              data-balance-beam-bar
+              fill="currentColor"
+              d={`M ${r2(geo.cx - geo.halfArm)} ${r2(geo.cy - 4)} L ${r2(geo.cx)} ${r2(geo.cy - 6)} L ${r2(geo.cx + geo.halfArm)} ${r2(geo.cy - 4)} L ${r2(geo.cx + geo.halfArm)} ${r2(geo.cy + 4)} L ${r2(geo.cx)} ${r2(geo.cy + 6)} L ${r2(geo.cx - geo.halfArm)} ${r2(geo.cy + 4)} Z`}
+            />
+            <circle
+              data-balance-bead="for"
+              r={6.5}
+              cx={r2(forEndX)}
+              cy={geo.cy}
+              className="fill-[var(--color-status-normal)]"
+            />
+            <circle
+              data-balance-bead="against"
+              r={6.5}
+              cx={r2(againstEndX)}
+              cy={geo.cy}
+              className="fill-[var(--color-status-alert)]"
+            />
+            {/* The pointer needle (addendum §B): fixed to the pivot,
+             * pointing downward, rotating with the beam — a rigid
+             * down-needle swings to the side OPPOSITE the heavy pan,
+             * so the arc's end ticks are labelled by verdict. Hidden
+             * when the state is unavailable. */}
+            {gaugeAvailable ? (
+              <line
+                data-balance-needle
+                x1={r2(geo.cx)}
+                y1={r2(geo.cy)}
+                x2={r2(geo.cx)}
+                y2={r2(geo.cy + BALANCE_NEEDLE_LEN_PX)}
+                strokeWidth={2}
+                strokeLinecap="round"
+                className="stroke-current"
+              />
+            ) : null}
+            {/* The pivot ring (rotates with the beam) + its pin dot in
+             * the card's surface colour. */}
+            <circle data-balance-pivot r={8} cx={r2(geo.cx)} cy={geo.cy} className="fill-current" />
+            <circle r={3.25} cx={r2(geo.cx)} cy={geo.cy} className="fill-[var(--color-surface)]" />
+          </g>
+        </svg>
         {/* The pan grid at the fixed pan-top offset: one assembly per
          * column, no gap (the pans centre themselves in their
-         * columns, so the beam ends land exactly over the column
-         * centres). */}
-        <div className="absolute inset-x-0 top-[80px] z-[1] grid grid-cols-2">
+         * columns, so the beam joints land exactly over the column
+         * centres at rest). Each assembly TRANSLATES ONLY — never
+         * rotates, skews or scales. */}
+        <div className="absolute inset-x-0 top-[80px] z-[2] grid grid-cols-2">
           {panAssembly('for', forBlocks)}
           {panAssembly('against', againstBlocks)}
-        </div>
-        {/* The beam zone (painted over the hangers' tops): the tapered
-         * beam rotating about the pivot with its two accent beads,
-         * then the fixed hub + keystone pivot above it. */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-[2]">
-          <div
-            data-balance-beam
-            className={`absolute left-1/4 top-[38px] h-[12px] w-1/2 bg-current [clip-path:polygon(0%_17%,50%_0%,100%_17%,100%_83%,50%_100%,0%_83%)] ${TILT_TRANSITION_CLASS}`}
-            style={{ transform: 'rotate(var(--s))' }}
-          >
-            <span
-              data-balance-bead="for"
-              className="absolute top-1/2 size-[13px] -translate-y-1/2 start-[-6.5px] rounded-full bg-[var(--color-status-normal)]"
-            />
-            <span
-              data-balance-bead="against"
-              className="absolute top-1/2 size-[13px] -translate-y-1/2 end-[-6.5px] rounded-full bg-[var(--color-status-alert)]"
-            />
-          </div>
-          {/* The hub caps the beam's centre — the machined pivot with
-           * a pin dot in the card's surface colour (fixed: never
-           * rotates, the beam turns under it). */}
-          <span
-            data-balance-pivot
-            className="absolute left-1/2 top-[44px] flex size-4 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-current"
-          >
-            <span className="size-[6.5px] rounded-full bg-[var(--color-surface)]" />
-          </span>
-          {/* The keystone: a 30×13 triangle whose apex meets the hub's
-           * underside (v4 rule: NOT a support column, NO base bar —
-           * the flat base is the ground). */}
-          <span
-            data-balance-fulcrum
-            className="absolute top-[52px] h-0 w-0"
-            style={{
-              left: 'calc(50% - 15px)',
-              borderLeft: '15px solid transparent',
-              borderRight: '15px solid transparent',
-              borderBottom: '13px solid currentColor',
-            }}
-          />
         </div>
       </div>
 

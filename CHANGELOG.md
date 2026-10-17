@@ -5,6 +5,92 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-26b] — the gold balance rotates ONLY its beam, and visualizes weight (Iteration-5 addendum: v7)
+
+The owner's Iteration-5 addendum supersedes the earlier pan-rotation,
+tilt/motion and tile-content rules: "Rotate the beam only, and
+visualize weight". The scoring model, the data and the Persian copy
+are untouched (the net/total ratio law is byte-identical); only its
+PRESENTATION scale changes (max 8° at the model's full range, floor
+2° for any valid directional result, exactly 0° for neutral and for
+unavailable). Strictly scoped to the balance component + the gauge
+copy key.
+
+### Changed
+
+- **Exactly ONE rotating element (BalanceScale.tsx)** — the beam
+  group (tapered bar + accent beads + pivot ring + needle) rotates by
+  `rotate(θ, pivotX, pivotY)` about the pivot. The v6 CSS-calc stage
+  (`--t`/`--s`/`--drop-*`/`25cqw × sin()` + the 0.2×θ pan tilt) is
+  retired: the mechanical drawing is now an SVG layer whose hangers
+  are recomputed EVERY FRAME as straight lines from each side's
+  beam-end joint (cx ± (L/2)·cos θ, cy ± (L/2)·sin θ) to the pan's
+  two fixed rim corners. The pans move by `translate(0, dy)` ONLY —
+  exactly their joint's vertical displacement, so they hang plumb;
+  their rotation is exactly 0°, and tiles/text/icons/pills are never
+  rotated, skewed or scaled.
+- **ONE animated value in JS (the Odometer's rAF pattern)** — a
+  single θ state drives the beam rotation, joint positions, pan
+  translations and hanger endpoints in the SAME render frame (no CSS
+  transitions on any element, so nothing can desync and detach). The
+  SSR/first paint already carries the verdict angle; a changed
+  verdict settles over ~500 ms ease-out cubic; reduced-motion users
+  land immediately. The stage width is measured pre-paint + via
+  ResizeObserver so the whole drawing scales as one piece; the
+  vertical travel stays inside the fixed reserved envelope
+  (160 × sin 8° ≈ 22.27px at the 640 design width — asserted in
+  tests).
+- **The pointer-needle gauge (addendum §B)** — a slim needle fixed to
+  the beam's pivot, pointing downward and rotating with the beam,
+  read against a small FIXED arc scale with THREE ticks only (adverse
+  end · centre · supportive end, labelled by verdict — a rigid
+  down-needle swings opposite the heavy pan, so the tick the needle
+  reaches when a side is heavy names that side; no numeric labels, no
+  fabricated thresholds). The needle hides when the state is
+  unavailable. The whole drawing is one `role="img"` whose label is
+  the needle's text equivalent — `gaugeAria`, round-52, one new copy
+  key × 2 locales + QA record + manifest entry.
+- **Weight visuals, honestly scoped** — the model audit found: a net
+  score EXISTS (count-based: net = for − against), but there are NO
+  per-side weighted totals and NO per-factor weights. Therefore the
+  side-load bar and the per-tile weight marker are deliberately NOT
+  implemented (the addendum forbids fabricating them); the beam angle
+  (from the net ratio) and the needle are the only weight read-outs.
+- **The v4 keystone is retired** — the addendum's rotating pivot ring
+  + downward needle + fixed arc replace the static hub-and-keystone
+  mark (the needle's mandated path runs exactly through where the
+  keystone sat).
+- **balance.test.tsx rewritten (45 tests)** — the angle law on the
+  new scale (floor 2°, max 8°, the 1-vs-4 and 5-vs-5 count-vs-weight
+  fixtures); the pure `balanceStageGeometry()`/`balanceGaugeGeometry()`
+  contracts (plumb drops, θ-free rim x, joint = rotated beam end,
+  envelope ≤ 160×sin 8°, stage heights reserve the stack + swing, RTL
+  visual-sign flip with direction-free drops); rendered structure
+  with the addendum-§A audit (ONLY the beam group carries rotate; the
+  two assemblies carry `translate(0px, Npx)`; tiles/hangers/rings/
+  text carry NOTHING), hanger endpoints == the pure geometry, needle
+  hidden for 'none', the gauge aria in both locales, the target-change
+  landing, and all v6 behaviour tests kept (capacity, pills, empty
+  pans, interactions, order, integration).
+
+### Verified (addendum §C)
+
+- DOM audit at every fixture: exactly 3 transformed elements (beam
+  group rotate + 2 assemblies translate-only); attach error 0.000px
+  at θ = 0°, 2°, 5.71°, 8° and at 390/768/1366 × en/fa.
+- Mid-animation probe (D→E settle, 49 rAF samples): 0 violations —
+  pan drop == joint Δy and rim == pan top + drop on EVERY frame.
+- Fixtures: 1-vs-4 → 4.8° (count settles it — the model has no
+  weights); 5-vs-5 → 0° "Balanced"; 5-vs-0 → the 8° maximum; all
+  unread → 0°, «فعلاً قابل ارزیابی نیست», needle hidden.
+- Tile text 12.48px (≥ 12px), horizontal, fa-RTL + en-LTR at
+  1366/768/390; zero horizontal overflow at 390.
+- Gates: typecheck 6/6; 1,534 tests green; lint 0 errors/15 accepted
+  advisories; copy:audit clean (2,171 entries); build + budgets —
+  Insights 635.18/152.06 vs the bumped 636/152.50 (D-33), entry
+  chunk untouched 295.29/88.81.
+
+
 ## [2026-10-26] — the gold balance's factors REST ON real pans (Iteration 4: the balance becomes a connected weighing machine)
 
 The owner's Iteration-4 directive: the latest v5 composition (factor

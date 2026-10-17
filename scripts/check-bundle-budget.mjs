@@ -385,7 +385,19 @@ const BUDGETS = [
   // 2026-10-25b: 629.04/150.69), and the combined tree measures
   // 634.57/151.67 — both features' honest markup together. The entry
   // chunk is untouched at 295.29/88.82 vs 296/89.5.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 635_000, gz: 152_000, label: 'Insights lazy chunk' },
+  // v7 beam-only rotation (635.00 → 636.00 raw, 152.00 → 152.50 gz,
+  // 2026-10-26b — the owner's Iteration-5 addendum "Rotate the beam
+  // only, and visualize weight"): the CSS-calc stage becomes an
+  // SVG mechanical layer (hangers as recomputed joint→rim lines, the
+  // needle + three-tick arc gauge) driven by ONE JS-animated θ through
+  // the pure balanceStageGeometry()/balanceGaugeGeometry() derivation
+  // and the Odometer-pattern rAF settle; the pans lose their rotate/
+  // tilt. Measured 635.18/152.06 — raw +0.61 kB, gz +0.39 kB over the
+  // v6 merged tree: the per-frame derivation + gauge + one new copy
+  // key × 2 locales, minus the retired CSS-var machinery. The entry
+  // chunk is untouched at 295.29/88.81 vs 296/89.5. Justified in
+  // CHANGELOG §2026-10-26 (v7) and D-33 in docs/DECISIONS_FOR_ALI.md.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 636_000, gz: 152_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {

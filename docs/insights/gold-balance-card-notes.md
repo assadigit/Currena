@@ -987,3 +987,97 @@ the factor tiles themselves.
 Screenshots: `docs/insights/screenshots/gold-balance/v6/` (the
 before/after comparison, the A–H × en/fa sweep, the mobile and dark
 sets, the interaction captures) + README.
+
+## v7 — the Iteration-5 addendum: rotate the beam ONLY, visualize weight (2026-10-26b)
+
+The owner's addendum supersedes the earlier pan-rotation, tilt/motion
+and tile-content rules. The scoring model, the data and the Persian
+copy are untouched; the net/total ratio law is byte-identical.
+
+### The model audit (what "weight" the model actually produces)
+
+| Value | Exists? | What it is |
+|---|---|---|
+| Net weighted aggregate score | YES, count-based | `net = for − against` (BalanceCounts); the tilt ratio is `net/total` |
+| Weighted total per side | NO | only per-side COUNTS — a share bar would fabricate data |
+| Weight per factor | NO | conditions are categorical states (`supportive/against/neutral/unknown`) — no magnitude |
+
+Therefore the implemented weight visuals are: the beam angle
+(θ from the net ratio) and the pointer-needle gauge. The side-load
+bar («سهم وزنی») and the per-tile weight marker («وزن: بالا…»)
+are deliberately SKIPPED — the addendum forbids fabricating side
+totals or factor weights.
+
+### θ mapping (code: `balanceTilt()` in BalanceScale.tsx)
+
+angle = |net|/total × 8° clamped to [2°, 8°] for a directional
+verdict; exactly 0° for balanced and for the unavailable state
+(readable 0 → the «فعلاً قابل ارزیابی نیست» label, no verdict).
+The 8° maximum lands at the model's full range (|net| = total);
+the 2° floor keeps a one-driver lean visibly unlevel. The v1
+ratio LAW is untouched — only the presentation scale changed (the
+addendum supersedes the v2–v6 12°/4° presentation).
+
+### The v7 construction
+
+- ONE rotating element: the beam group (tapered bar + beads +
+  pivot ring + needle) by `rotate(θ, cx, cy)` — the addendum's
+  literal transform. The v4 keystone is retired (the needle's
+  mandated path runs through where it sat).
+- Pans: `translate(0, dy)` ONLY (plumb) — dy = the joint's vertical
+  displacement; pan rotation is exactly 0°; tiles/text/icons/pills
+  never rotate, skew or scale.
+- Hangers: SVG `<line>`s recomputed every frame from the joint
+  (cx ± (L/2)·cos θ, cy ± (L/2)·sin θ) to the pan's two fixed rim
+  corners; their angles change slightly (the joint arcs a
+  second-order ~1.5px sideways at 8° while the pan stays on its
+  column) — the real-hanging-pan cue.
+- ONE animated value: the Odometer's rAF pattern (500 ms ease-out
+  cubic; reduced-motion lands immediately; no CSS transform
+  transitions anywhere — desync is impossible by construction).
+  The SSR/first paint already carries the verdict angle.
+- The gauge: a 26px needle rigid with the beam, pointing down,
+  reading a fixed 27px arc with 3 ticks (27→32px) at
+  straight-down ± 8°. A rigid down-needle swings OPPOSITE the heavy
+  pan, so the end ticks are labelled by VERDICT (LTR: adverse tick
+  at the left end; mirrored for RTL) — the tick the needle reaches
+  when a side is heavy names that side. No numeric labels, no
+  fabricated thresholds. The needle hides when the state is
+  unavailable. The whole drawing is one role="img" labelled
+  `gaugeAria` (round-52): EN "Beam tilt: {n}°, {verdict}." /
+  fa «شیب تیر: {n} درجه، {verdict}.» — never colour alone.
+- The envelope: the travel is (stageWidth/4) × sin θ ≤ 160 × sin 8°
+  ≈ 22.27px at the 640 design width; the fixed stage heights
+  (240/260) reserve the pan stack + pill + swing (asserted in
+  tests); the raised pan's top (80 − 22.27 = 57.7) never reaches
+  the beam bottom (50).
+
+### Verification (addendum §C — measured on the harness)
+
+- **Only the beam rotates**: at every fixture the stage holds
+  EXACTLY 3 transformed elements — the beam group
+  (`rotate(2 320 44)`-style) + the two assemblies
+  (`translate(0px, ±Npx)`); tiles, hangers, rings, beads, needle,
+  arc, text: none.
+- **Hangers attached**: attach error 0.000px at θ = 0° (D), 2° (A),
+  4.8° (B/C), 5.71° (H), 8° (E), and at 390/768/1366 × en/fa/RTL;
+  mid-animation probe (D→E settle, 49 rAF samples): 0 violations of
+  drop == joint Δy / rim == pan top + drop.
+- **Fixtures** (aggregate → θ → lower pan): A (net −1/4) → 2° →
+  against; B (net +3/5, the 1-heavy-vs-4 fixture) → 4.8° → for
+  (the count settles it — the model has no weights); C → 4.8° →
+  against; D (5v5) → 0° → level, "Balanced", no directional label;
+  E (5/5 against) → 8° → against; F (0 readable) → 0° → level,
+  «فعلاً قابل ارزیابی نیست», needle hidden; G → 5.33° → against;
+  H (6/1) → 5.71° → against (+4-more pill intact).
+- **Text**: 12.48px horizontal tile labels (en + fa) at 1366/768/
+  390; zero horizontal overflow at 390.
+- **Gates**: typecheck 6/6; 1,534 tests; lint 0/15; copy:audit
+  clean (2,171); Insights 635.18/152.06 vs the bumped 636/152.50
+  (D-33); entry chunk untouched.
+- Declined from VLM critiques: making the heavy pan look heavier
+  (fabricated weight), greying the unavailable beam (the state
+  label + needle absence already carry it), re-steepening the tilt
+  (the addendum's own 8°/2° scale).
+
+Screenshots: `docs/insights/screenshots/gold-balance/v7/` + README.
