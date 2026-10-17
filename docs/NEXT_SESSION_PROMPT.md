@@ -1,7 +1,27 @@
 # Currena — Next Session Brief
 
 Hand-off date: 2026-10-17 (edge-verified; see the dating note) — the
-owner's prices-board redesign — DONE: the four price cards (Bitcoin /
+owner's Persian dollar convention — DONE: fa says «دلار» for USD, never
+«دلار آمریکا» — the unqualified word is what Persian financial usage
+already means — with dollar nationality RESERVED to «دلار استرالیا»
+(AUD) and «دلار کانادا» (CAD). 114 tracked strings re-triaged (manifest
+round-47 → docs/QA/quirks-2026-10-17c-fa-dollar-convention.md); NZD also
+drops its qualifier per the rule's second clause (picker rows keep the
+code: «NZD · دلار» — one-line revert in `fa.ts` `currencies.NZD` if the
+owner wants it back); cents untouched («۶۲ سنت آمریکا»); EN untouched.
+Tests re-pinned (live-rate, fx-presentation, insights, fx-v13). Gates
+green (1,455 tests; typecheck 6/6; lint 0 errors/15 advisories; budgets
+held — Insights lazy SHRANK 599.38 → 597.79 kB raw with the dropped
+qualifier). Deployed currena-api `c970f556-0070-4fc9-a7ab-98e653461857`;
+served chunks sha256-identical; «دلار آمریکا» ×0 in both served bundles;
+production browser-verified (fa home + insights × desktop + 375 — tile
+unit «دلار», 52-week tail «… دلار», metals chip «۴٬۱۶۵ دلار» + the
+Task-17 outlook sentence, fx «قدرت دلار»; EN regression clean; zero
+errors). See CHANGELOG 2026-10-17c +
+docs/QA/quirks-2026-10-17c-fa-dollar-convention.md +
+docs/evidence/2026-10-17c-fa-dollar-convention/.
+
+Prior state (2026-10-17b): the owner's prices-board redesign — DONE: the four price cards (Bitcoin /
 Silver / Gold / Brent) speak the owner's five-point sketch: "1. Picture
 next to Unit name and price 2. Daily / Weekly / Monthly/ Quarterly
 Percentages 3. Descriptions and verdict 4. some more meta data facts and

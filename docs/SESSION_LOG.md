@@ -1,3 +1,61 @@
+# SESSION_LOG — The Persian Dollar Convention 2026-10-17c
+
+Branch `main` · base `ebe1228` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's copy convention — "in farsi only say دلار not دلار
+آمریکا because farsi speakers already knows what dollar is. only mention
+dollar nationality when it's for australia or canada."
+
+### 1 · the survey
+Sandbox reset again (repo re-cloned at `ebe1228`, all prior rounds
+confirmed pushed). «دلار آمریکا» lived in exactly four source files:
+`insights-copy-fa.ts` ×113, `fa.ts` ×1 (`currencies.USD`), plus two
+doc-comment examples (VerdictMeter, PricesBoard) and two more comments
+(config/display ×2, lib/live-rate) found by a second exhaustive sweep
+(the first repo-wide grep had been paginated). Zero hits in packages/,
+apps/api/ and the calendar data. Suffix forms («دلار آمریکایی» /
+«آمریکاست») checked — none exist, so a literal phrase replace is safe.
+
+### 2 · the convention applied
+Plain replace «دلار آمریکا» → «دلار» across the two dictionaries and the
+four comments; `fa.ts` `currencies.USD: 'دلار'` with the rule recorded as
+a Persian owner-rule comment beside the IRR one. Nationality reserved:
+AUD «دلار استرالیا» (81× in the insights dictionary) and CAD «دلار
+کانادا» (2×) untouched; cents untouched («۶۲ سنت آمریکا»). NZD — the
+rule's second clause reserves dollar nationality to AU/CA, so NZD also
+shortened to «دلار» (the picker shows the code: «NZD · دلار»); flagged in
+the QA doc and the report as a one-line revert if the owner disagrees.
+EN untouched.
+
+### 3 · the workflow + gates
+`pnpm copy:audit` → 114 CHANGED, 0 NEW/REMOVED/MISSING → all 114 triaged
+`processed` round-47 against the new
+`docs/QA/quirks-2026-10-17c-fa-dollar-convention.md` → audit clean.
+Tests re-pinned (live-rate share line, fx-presentation r3 sentence,
+insights brent value, fx-v13 chart label + dollarRowTitle + s1). Full
+gates green: 1,455 tests (web 485, api 237, insights 462, core 191,
+scraper 67, markets 13), typecheck 6/6, lint 0 errors/15 advisories,
+budgets held — Insights lazy SHRANK 599.38 → 597.79 kB raw (the dropped
+qualifier), entry 295.15/88.76 gz.
+
+### 4 · deploy + production verification
+currena-api `c970f556-0070-4fc9-a7ab-98e653461857` (SITE_MODE=public;
+currena-markets untouched `9b5ff7e0`). Served chunks sha256-identical to
+the local build; «دلار آمریکا» ×0 in BOTH served bundles; «دلار
+استرالیا» ×86 / «دلار کانادا» ×2 alive; /api/insights → 32 readings.
+Browser (production data via the read-only :3000 forwarder, fresh
+context — the SW lesson honored by confirming the loaded chunk
+`Insights-4U1oyeMS.js`): fa home «USD · دلار» / «AUD · دلار استرالیا» /
+«CAD · دلار کانادا» / «NZD · دلار»; fa insights — prices tile unit line
+«دلار», 52-week «… ۵٬۳۱۸ دلار», metals chip «چشم‌انداز | طلا | ۴٬۱۶۵ دلار
+|» with the owner's Task-17 sentence intact, fx row «قدرت دلار», 375
+scrollWidth === 375; EN spot «USD · US Dollar», no fa leakage; zero
+page/console errors. Evidence:
+`docs/evidence/2026-10-17c-fa-dollar-convention/`.
+
+Open item (unchanged): token rotation (GitHub + Cloudflare) —
+credentials transited chat again this session.
+
+
 # SESSION_LOG — The Prices Board Cards Re-drawn from the Owner's Sketch 2026-10-17
 
 Branch `main` · base `c62f3ba` · runner: pnpm 10.34.5 / Node 24.21.

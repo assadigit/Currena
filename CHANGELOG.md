@@ -5,6 +5,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-17c] — the Persian dollar convention
+
+The owner's convention: "in farsi only say دلار not دلار آمریکا … only
+mention dollar nationality when it's for australia or canada."
+
+### Changed (copy-only — no data, scoring or formatting logic)
+
+- **USD reads «دلار» everywhere** — 113 strings in `insights-copy-fa.ts`
+  plus `currencies.USD` in `fa.ts`: indicator values («۱۱۳٫۹۶ دلار»),
+  the board tiles' unit lines, 52-week-range tails, the metals chips'
+  muted price («۴٬۱۶۵ دلار»), the fx rows («قدرت دلار»), the converter
+  picker («USD · دلار»), the share line, the dollar-index copy. The
+  unqualified «دلار» is what Persian financial usage already means.
+- **Nationality reserved** — «دلار استرالیا» (AUD, 86 served occurrences)
+  and «دلار کانادا» (CAD, 2) keep their qualifiers; cents untouched
+  («۶۲ سنت آمریکا» — the rule speaks about دلار). NZD also drops its
+  qualifier per the rule's second clause (the picker keeps the code:
+  «NZD · دلار»; flagged for the owner — one-line revert in
+  `fa.ts` `currencies.NZD` if unintended).
+- **EN untouched** — US$ / US Dollar stay as-is.
+- Comment-only examples updated so the source no longer models the old
+  phrase (VerdictMeter, PricesBoard, config/display, lib/live-rate).
+
+### Copy workflow
+
+- Manifest round-47: 114 keys re-triaged `processed` against
+  `docs/QA/quirks-2026-10-17c-fa-dollar-convention.md`; `pnpm copy:audit`
+  clean (2,090 entries).
+- Tests re-pinned to the new strings (live-rate, fx-presentation,
+  insights, fx-v13). Gates green: 1,455 tests, typecheck 6/6, lint
+  0 errors/15 advisories, budgets held — the Insights lazy chunk SHRANK
+  599.38 → 597.79 kB raw (the dropped qualifier).
+- Deployed currena-api `c970f556-0070-4fc9-a7ab-98e653461857`; served
+  chunks sha256-identical to the build, «دلار آمریکا» ×0 in both served
+  bundles; production browser-verified (fa home/insights × desktop/375,
+  EN regression, zero errors). Evidence:
+  `docs/evidence/2026-10-17c-fa-dollar-convention/`.
+
 ## [2026-10-17b] — the prices board cards re-drawn from the owner's sketch
 
 The owner's five-point directive for the four-tile prices board

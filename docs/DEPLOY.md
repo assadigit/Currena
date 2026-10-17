@@ -1619,3 +1619,28 @@ the petrol/transport money row is gone while employment rate appeared.
   tile; zero page/console errors; /api/insights → 32 readings; metals
   conditions strip (Tasks 15–17) + money panel untouched.
 - **Evidence**: `docs/evidence/2026-10-17-prices-card-redesign/`.
+
+## Session record — 2026-10-17c: the Persian dollar convention
+
+- **What**: the owner's copy convention — fa says «دلار» for USD, never
+  «دلار آمریکا»; dollar nationality reserved to «دلار استرالیا» (AUD) and
+  «دلار کانادا» (CAD). 114 tracked keys re-triaged (manifest round-47 →
+  `docs/QA/quirks-2026-10-17c-fa-dollar-convention.md`); NZD also
+  shortened per the rule's second clause (flagged, one-line revert if
+  unintended); cents untouched; EN untouched. Copy-only — no data,
+  scoring or formatting logic change.
+- **Gates pre-deploy**: copy:audit clean (2,090 entries); full workspace
+  tests 1,455; typecheck 6/6; lint 0 errors/15 advisories; budgets held
+  (entry 295.15/88.76 gz; Insights lazy 597.79/142.51 gz — SHRANK
+  599.38 → 597.79 raw with the dropped qualifier).
+- **Deployed**: currena-api `c970f556-0070-4fc9-a7ab-98e653461857`
+  (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`).
+- **Verified live**: served `Insights-4U1oyeMS.js` + `index-Cz6G_o2s.js`
+  sha256-identical local == production; «دلار آمریکا» ×0 in both served
+  bundles; «دلار استرالیا» ×86 / «دلار کانادا» ×2 alive; /api/insights →
+  32 readings; production browser (fresh context, loaded chunk verified):
+  fa home «USD · دلار» + AUD/CAD qualified + «NZD · دلار»; fa insights —
+  tile unit «دلار», 52-week tail «… دلار», metals chip «۴٬۱۶۵ دلار» +
+  owner outlook sentence, fx «قدرت دلار», 375 scrollWidth === 375; EN
+  regression clean; zero page/console errors.
+- **Evidence**: `docs/evidence/2026-10-17c-fa-dollar-convention/`.
