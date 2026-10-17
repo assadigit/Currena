@@ -352,7 +352,20 @@ const BUDGETS = [
   // (149.92 vs 150.00 — the pill markup is highly compressible); the
   // entry chunk is untouched at 295.29/88.81 vs 296/89.5. Justified in
   // CHANGELOG §2026-10-26.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 627_000, gz: 150_000, label: 'Insights lazy chunk' },
+  // Asset-cards polish bump (627.00/150.00 → 630.00/151.00,
+  // 2026-10-25b, rebased over the v5 round): the prices cards' polish
+  // round — the title/measurement-basis header (priceCardTitles +
+  // priceCardUnits × 2 locales), the one-line price + currency split
+  // (priceValueParts), the expanded panel's six semantic sections (18
+  // new copy keys × 2 locales + the sectioned markup) and the
+  // instrument-coverage notes (futures/blend/fetch-time, shown only
+  // when the served attribution is that instrument). Measured on the
+  // combined tree 629.04/150.69 + the v5 round's raw +0.27 — the raw
+  // overage is bilingual copy and panel structure, not logic; the
+  // entry chunk is untouched (295.29/88.81 vs 296/89.5). Justified in
+  // CHANGELOG §2026-10-25b and
+  // docs/QA/quirks-2026-10-25b-asset-cards-polish.md.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 630_000, gz: 151_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

@@ -62,6 +62,7 @@ export {
 export {
   DISPLAY,
   indicatorValueParts,
+  priceValueParts,
   formatIndicatorValue,
   formatReadingValue,
   formatChange,
@@ -71,6 +72,7 @@ export {
 } from './display';
 export type {
   UnitToken,
+  PriceValueParts,
 } from './display';
 
 export {

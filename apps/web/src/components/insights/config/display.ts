@@ -204,6 +204,48 @@ export function formatIndicatorValue(
 }
 
 /**
+ * 2026-10-25b (asset-cards polish, task §5): the prices cards' PRICE LINE
+ * — the number and its currency on ONE baseline, as separate elements so
+ * the digits stay dominant (≈28px bold) while the currency renders
+ * secondary (≈14px). Built from the SAME DISPLAY config as
+ * indicatorValueParts (no string surgery on its output): plain-unit
+ * assets split into {number, prefix|suffix}; the special compositions
+ * (percent, ranges, usd-tr) fall back to the joined form in `number`
+ * with no currency element — the four board assets (usd unit) always
+ * take the split path.
+ */
+export interface PriceValueParts {
+  /** The formatted number alone ('4,166' / '۴٬۱۶۶'). */
+  number: string;
+  /** Currency rendered BEFORE the number (en: 'US$'). Null when none. */
+  prefix: string | null;
+  /** Currency rendered AFTER the number (fa: 'دلار'). Null when none. */
+  suffix: string | null;
+}
+
+export function priceValueParts(
+  id: IndicatorId,
+  value: number,
+  numberLocale: 'en-US' | 'fa-IR',
+  units: UnitLabels,
+): PriceValueParts {
+  const cfg = DISPLAY[id];
+  const num = formatNumber(value * (cfg.scale ?? 1), numberLocale, {
+    minimumFractionDigits: cfg.decimals,
+    maximumFractionDigits: cfg.decimals,
+  });
+  const unit = units[cfg.unit];
+  // Compositions the price line never splits (not the board assets).
+  if (!unit || cfg.range || cfg.unit === 'percent' || cfg.unit === 'usd-tr') {
+    return { number: indicatorValueParts(id, value, numberLocale, units).value, prefix: null, suffix: null };
+  }
+  if (numberLocale === 'en-US' && PREFIXED_UNITS.has(cfg.unit)) {
+    return { number: num, prefix: unit, suffix: null };
+  }
+  return { number: num, prefix: null, suffix: unit };
+}
+
+/**
  * Step-1: render a READING's value (the reading's own range bounds ride
  * along when present — fed-target). Null-safe for unavailable rows.
  */

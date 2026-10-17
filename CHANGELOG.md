@@ -93,6 +93,77 @@ invented to imitate the sketch's example tilt.
   ("professional editorial data visualization", all tilt/empty/RTL states
   verified). Evidence: `docs/insights/screenshots/gold-balance/v5-iteration/`
   (24 captures + README).
+## [2026-10-25b] — the asset-cards polish round: editorial hierarchy, one-line prices, honest instrument notes
+
+The owner's polish task: make the four financial asset cards feel like
+a premium editorial financial publication — strictly scoped to the
+cards and their supporting copy; no page, provider, scoring or routing
+change; every working calculation preserved.
+
+### Changed
+
+- **The asset header** — the icon vertically centred against a title
+  block: the plain title («قیمت طلا» / "Gold price", 18px semibold)
+  over a measurement-basis subtitle («هر اونس تروی» / "per troy
+  ounce", 13px secondary). The unit left the title ("Gold price
+  (ounce)" retired); the four units verified against the served
+  instruments (gold/silver per troy ounce — XAU/XAG spot and the
+  GC=F/SI=F live refresh both quote per troy ounce; Brent per barrel;
+  Bitcoin per coin).
+- **The one-line price (the owner's required correction)** — the
+  number (28px bold tabular) and its currency share ONE baseline
+  («۴٬۱۶۶ دلار» / "US$4,166") via the new pure `priceValueParts`
+  display helper; each part an isolated `<bdi>` so a direction change
+  can never split or reorder them. The old two-line block (digits,
+  then «دلار» beneath) is gone.
+- **The expanded panel reorganised into six semantic sections** —
+  تغییرات قیمت (one «X گذشته» label family: «هفت روز گذشته / ۳۰ روز
+  گذشته / ۹۰ روز گذشته / ۶ ماه گذشته / ۱ سال گذشته») → محدودهٔ قیمت در
+  ۵۲ هفتهٔ گذشته («۳٬۹۶۱ تا ۵٬۳۱۸ دلار», «تا» BETWEEN the endpoints,
+  rendered in the locale's own direction) → سوابق تاریخی قیمت →
+  جایگاه قیمت نسبت به شاخص‌های مرجع (10-year level + note, 200-day
+  gap, distance from the 10-year high, companion ratios — Bitcoin's
+  two metal ratios now ONE sentence; fa's second ratio was a
+  fragment) → منبع داده و زمان به‌روزرسانی (attribution link,
+  observation date vs the app's fetch time, coverage notes) →
+  دربارهٔ این اعداد. Section headings drop the latin-only
+  uppercase/letter-spacing in fa (tracking visually separates joined
+  Persian script).
+
+### Fixed (data corrections, verified against the implementation)
+
+- **The futures note no longer lies on spot prices** — it rendered
+  unconditionally on gold/silver/oil while the served EOD snapshot is
+  gold-api XAU/XAG SPOT. It now shows ONLY when the served
+  attribution actually is the futures quote (the serve-time live
+  merge rewrites `sourceName` to the Yahoo GC=F/SI=F/BZ=F attribution
+  when a fresher quote wins). Brent's EOD attribution (EIA spot ∪
+  BZ=F gap-fill) gets its own accurate blend note.
+- **The record label no longer claims all-time coverage** —
+  «بیشترین مقدار تاریخی» / "Historical high" became «بیشترین قیمت ۱۰
+  سال اخیر» / "10-year high": `computePeaks` reads the 10-YEAR window
+  (Brent's own series is explicitly capped to it).
+
+### Tests & gates
+
+- +14 tests (prices-cards.test.tsx: header/one-line price/sections/
+  bidi range/conditional notes/disclosure; price-value-parts.test.ts).
+- typecheck 6/6; lint 0 errors/15 accepted advisories; 1,520 green;
+  copy:audit clean (round-51: 18 new + 5 relabelled strings triaged
+  against docs/QA/quirks-2026-10-25b-asset-cards-polish.md); build OK;
+  Insights budget consciously bumped 626/150 → 630/151 (measured
+  629.04/150.69 — bilingual copy + panel structure; entry untouched).
+- Verified on the production build + real production API (harness):
+  layout/bidi caret probes (the fa range reads exactly «۳٬۹۶۱ تا
+  ۵٬۳۱۸ دلار», U+066C separators), en+fa, 1280/768/375/320, dark,
+  keyboard, click-through, zero console errors. Evidence:
+  `docs/evidence/2026-10-25b-asset-cards-polish/` (before/after).
+- Rebase note: authored against the 2026-10-24d deploy (cc6f28e6) and
+  rebased over the 2026-10-26 balance-v5 round (5f37014) before
+  push/deploy; the v5 round touches BalanceScale/MergedCard/its tests
+  only — PricesBoard and the copy keys are untouched there, and the
+  budget script carries both rounds' justifications (627 by v5 → 630
+  by this round).
 
 ## [2026-10-25] — the gold balance becomes the abstract editorial mark «برآیند عوامل مؤثر بر قیمت طلا» (owner Iteration-2 directive)
 
