@@ -1,7 +1,30 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-20c (the owner's "Add 10 year View of the gold and
-silver price as well.") — DONE: the metals' Estimation-chip trend charts
+Hand-off date: 2026-10-21 (the owner's EN/fa drift bug + "Gold Market
+Outlook — Complete State List") — DONE: the metals' verdict slot speaks
+the owner's SEVEN states (Strong Bullish / Bullish / Neutral /
+Range-Bound / Bearish / Strong Bearish / Mixed Signals) with the owner's
+own bilingual sentences. `outlookOf` (signals/verdict.tsx) maps the
+condition tally: strong bar = the lean's LEAN_STRONG=4 (exported from
+@currena/insights); majority → bullish/bearish; equal split → mixed;
+all-readable-neutral → neutral; range-bound ONLY with |change30d| < 2%
+AND the typical 10-year band (the owner's Neutral ≠ Range-Bound ≠ Mixed
+distinction, honoured mechanically). verdictUp/Down/Flat retired (the fa
+drift WAS the bug); round-45 manifest 21 NEW + 2 CHANGED + 3 REMOVED;
+verdictTitle → "Outlook"/«چشم‌انداز»; the sentence rides its own
+full-width chip line (the header slot staircase-wrapped at 375px on the
+first deploy). Gates green (1,446 tests, +15; typecheck 6/6; lint 0
+errors/15 advisories; budgets held — Insights lazy 596.60/141.83,
++0.53 kB gz). Deployed currena-api `d0d28c3f`; production verified with
+agent-browser (PURGE the PWA precache before re-verifying a new deploy —
+the stale service worker silently served the old chunk and faked the
+first check; verify the loaded chunk hash, not the deploy log). Live
+bearish on both metals; EN + fa render the same state; collapsed
+"Outlook: Bearish"/«چشم‌انداز: نزولی»; 375 clean; zero errors. See
+CHANGELOG 2026-10-21 + docs/QA/quirks-2026-10-21-outlook-states.md +
+docs/evidence/2026-10-21-outlook-states/.
+Prior state (2026-10-20c): the owner's "Add 10 year View of the gold and
+silver price as well." — DONE: the metals' Estimation-chip trend charts
 offer the decade. The shared TrendPanel gained an opt-in `ranges` prop
 (default Quarter · 1y · 5y — the money panel and all other callers
 UNCHANGED); TrendRange/StripRange grew '10y' (3653 days — the details

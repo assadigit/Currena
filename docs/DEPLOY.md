@@ -1561,3 +1561,34 @@ the petrol/transport money row is gone while employment rate appeared.
   «+۲۳۰٫۳% ۱۰ سال»/«+۲۲۵٫۶% ۱۰ سال», Jalali ticks مهر ۱۳۹۵→مهر ۱۴۰۵; zero
   page/console errors.
 - **Evidence**: `docs/evidence/2026-10-20-metals-10y/`.
+
+## Session record — 2026-10-21 the gold/silver outlook speaks the owner's seven states (the EN/fa drift bug)
+
+- **Deployed**: currena-api **`d0d28c3f-f0a9-4619-b269-8f7337d9daa9`**
+  (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`).
+  Two deploys this session: `a5d2f793` first, then the layout adjustment —
+  the outlook sentence moved out of the chip header (it wrapped into a
+  4-6-line staircase at 375px there) onto its own full-width line between
+  the header and the chart.
+- **Change**: the metals' verdict slot adopts the owner's SEVEN-STATE
+  "Gold Market Outlook" classification with the owner's own bilingual
+  sentences (`outlookOf` over the same condition tally; strong bar =
+  the lean's `LEAN_STRONG = 4`, now exported from `@currena/insights`;
+  range-bound needs the affirmative quiet-mid-range price evidence).
+  verdictUp/Down/Flat retired from both dictionaries (their fa drift WAS
+  the bug); round-45 manifest: 21 NEW + 2 CHANGED + 3 REMOVED, referenced
+  to docs/QA/quirks-2026-10-21-outlook-states.md. Signals CSV header
+  decoupled to `ui.csvColStatus`. No data/scoring/API change.
+- **Gates pre-deploy**: copy:audit clean; full workspace tests 1,446
+  (+15 outlook tests); typecheck 6/6; lint 0 errors/15 advisories;
+  budgets held (entry 295.15/88.76 gz; Insights lazy 596.60/141.83,
+  +0.53 kB gz).
+- **Verified live** (agent-browser, SW caches purged — the stale precache
+  was serving the old chunk and faking the first re-check): served chunk
+  `Insights-DlDkQ-3K.js` sha256-identical local == production; the old
+  mismatched fa sentence 0 occurrences; live data bearish on both metals,
+  EN + fa render the SAME state with the owner's sentences (one line,
+  zigzag-led, muted prices); collapsed "Outlook: Bearish"/«چشم‌انداز:
+  نزولی»; 375 scrollWidth === 375 both locales; prices board untouched;
+  zero page/console errors.
+- **Evidence**: `docs/evidence/2026-10-21-outlook-states/`.

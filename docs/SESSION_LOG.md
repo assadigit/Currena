@@ -1,3 +1,75 @@
+# SESSION_LOG — The Gold/Silver Outlook Speaks the Owner's Seven States 2026-10-21
+
+Branch `main` · base `20f9d9a` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's bug report — for gold and silver the verdict slot said
+EN "Works against" but fa «شرایط موجود با الگوی معمول هم‌خوانی ندارد» —
+"these are not same thing. investigate and fix the issue" — together with
+the owner's "Gold Market Outlook — Complete State List" (7 states with
+exact bilingual sentences + the recommended state logic + the
+Neutral/Range-Bound/Mixed distinction).
+
+### 1 · the drift, confirmed at the root
+Both locales shared `signals.verdictDown`; EN held the short directional
+word ("Works against"), fa a leftover sentence about the USUAL PATTERN not
+holding — the old pattern-conformance framing that had survived the
+round-31 wording pass on the fa side only. Same key, different meanings.
+
+### 2 · the fix — the owner's seven states, mechanically mapped
+`signals/verdict.tsx`: new `OutlookState` + `outlookOf(reading)` over the
+same condition tally — strong-bullish/strong-bearish at the card lean's
+OWN strong bar (`LEAN_STRONG = 4`, newly exported from `@currena/insights`;
+≥4 of ≤6 always implies the majority); bullish/bearish on a majority;
+mixed on an equal split; neutral when all readable conditions sit neutral;
+range-bound ONLY with affirmative quiet-price evidence (|change30d| < 2%
+AND the typical band of the 10-year range) while the driver split stays
+within one — the owner's Neutral ≠ Range-Bound ≠ Mixed distinction is
+honoured mechanically, never by renaming. `null` (nothing readable) keeps
+verdictNone. `verdictTone`/`VerdictIcon` extend to the seven states
+(bullish family green + up zigzag, bearish family red + down zigzag, calm
+states + null the muted dash). `Signals.tsx`'s collapsed line speaks the
+short state names via `signals.verdictStateNames`.
+
+### 3 · copy (round-45) + the one layout adjustment
+Dictionaries: `verdictUp/Down/Flat` retired from BOTH dictionaries (3
+manifest entries pruned); the owner's verbatim sentences land as
+`signals.verdictStates` (7 × gold/silver; gold strings exactly as the
+owner wrote them, silver mirrors) + `verdictStateNames` (7 short names);
+`verdictTitle` «شرایط فعلی» → «چشم‌انداز» ("Outlook"); `collapsedVerdict`
+→ "Outlook: {verdict}"/«چشم‌انداز: {verdict}» — 21 NEW + 2 CHANGED
+manifest entries referenced to docs/QA/quirks-2026-10-21-outlook-states.md
+(the owner's table recorded verbatim). full-export.ts: the signals CSV
+header decouples from verdictTitle (the row value is the lean) → generic
+`ui.csvColStatus`. LAYOUT: the sentence cannot live in the sketch's
+header column — at 375px it wrapped into a 4-6-line staircase (caught
+live on the first deploy `a5d2f793`); it now rides its own full-width
+line between the header (icon box · name · lighter price) and the chart,
+zigzag leading, floored two-line slot keeping the desktop chips' charts
+on one baseline. Redeployed as `d0d28c3f`.
+
+### 4 · gates + deploy + production browser verify
+Gates all green: copy:audit clean; full workspace tests 1,446 (web 476,
++15 outlook tests pinning the mapping edges, the owner's verbatim strings
+and the retired keys' absence); typecheck 6/6; lint 0 errors/15
+advisories; budgets held (entry 295.15/88.76; Insights lazy 596.60/141.83,
++0.53 kB gz for the 28 authored sentences). Deployed currena-api
+`d0d28c3f-f0a9-4619-b269-8f7337d9daa9` (SITE_MODE=public; currena-markets
+untouched 9b5ff7e0). Served Insights chunk `Insights-DlDkQ-3K.js`
+byte-identical local == production (sha256 1d0778c5…); the old mismatched
+fa sentence 0 occurrences in the served bundle. Live verification
+(agent-browser, SW caches PURGED first — the PWA's stale precache kept
+serving the old chunk and silently faked the first re-check; verify the
+loaded chunk hash, not the deploy log): live data produced `bearish` for
+both metals; EN "Outlook" + "Signs point to a potential decline in
+gold/silver prices." one line, red zigzag, muted US$4,165/US$57.27; fa
+«چشم‌انداز» + «نشانه‌ها حاکی از احتمال افت قیمت طلاست./…نقره است.»
+RTL-mirrored, Jalali ticks; collapsed "Outlook: Bearish"/«چشم‌انداز:
+نزولی»; 375 scrollWidth === 375 both locales; prices board (4 tiles) +
+condition checklist untouched; zero page/console errors. Evidence:
+docs/evidence/2026-10-21-outlook-states/.
+
+Committed as one fix commit + one docs commit; pushed to origin/main;
+remote reset to the tokenless URL. Open item (unchanged): token rotation.
+
 # SESSION_LOG — The Metals' Analysis Charts Grow the 10-Year View 2026-10-20c
 
 Branch `main` · base `702b6c6` · runner: pnpm 10.34.5 / Node 24.21.

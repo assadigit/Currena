@@ -5,6 +5,95 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-21] — the gold/silver outlook speaks the owner's seven states (the EN/fa drift bug)
+
+The owner's bug report: for gold and silver the verdict slot said EN
+"Works against" but fa «شرایط موجود با الگوی معمول هم‌خوانی ندارد» —
+"these are not same thing." Confirmed: the two locales shared the
+`signals.verdictDown` key but not a meaning (the fa string was a leftover
+of the old "pattern conformance" framing). Fixed by adopting the owner's
+**"Gold Market Outlook — Complete State List"**: SEVEN states with the
+owner's own bilingual sentences, so one state machine feeds both locales
+and drift is structurally impossible.
+
+### Changed (`signals/verdict.tsx`, `Signals.tsx`, dictionaries, `full-export.ts`)
+
+- **New seven-state outlook classifier `outlookOf`** over the same
+  condition tally (gold 5 / silver 6 conditions): strong-bullish /
+  strong-bearish at the card lean's OWN strong bar (`LEAN_STRONG = 4`,
+  now exported from `@currena/insights` — one strength definition per
+  card); bullish / bearish on a majority of directional conditions;
+  mixed on an equal split (the indicators disagree); neutral when all
+  readable conditions sit neutral (no directional bias); **range-bound**
+  only with affirmative quiet-price evidence (|30-day speed| < 2% AND the
+  price in the typical band of its 10-year range) while the driver split
+  stays within one — the owner's distinctions (Neutral ≠ Range-Bound ≠
+  Mixed) are honoured mechanically, not by renaming.
+- **The old `up/down/flat` words are retired** — `verdictUp`
+  ('Supports' / «حمایت‌کننده»), `verdictDown` ('Works against' /
+  «شرایط موجود با الگوی معمول هم‌خوانی ندارد») and `verdictFlat`
+  ('Mixed' / «ترکیبی») are gone from both dictionaries and their three
+  manifest entries pruned; `verdictNone` («هنوز نمی‌توان نتیجه‌گیری کرد»)
+  stays for the nothing-readable edge.
+- **The owner's verbatim sentences** land as `signals.verdictStates`
+  (7 states × gold/silver, EN + fa — the gold strings exactly as the
+  owner wrote them, silver mirrors) and `signals.verdictStateNames`
+  (7 short names — Strong bullish/Bullish/Neutral/Range-bound/Bearish/
+  Strong bearish/Mixed signals; fa: صعودی قوی/صعودی/خنثی/محدوده‌ای/
+  نزولی/نزولی قوی/نشانه‌های مختلط) for the collapsed line. The strip
+  heading becomes "Outlook"/«چشم‌انداز» and the collapsed template
+  "Outlook: {verdict}"/«چشم‌انداز: {verdict}» — 21 new + 2 changed
+  manifest entries, round-45, referenced to
+  docs/QA/quirks-2026-10-21-outlook-states.md (the owner's table recorded
+  verbatim).
+- **The sentence gets its own line in the chip** — the 2026-10-20 sketch's
+  header (icon box · name · lighter price) stays, but a full sentence
+  cannot live in that narrow column (it wrapped into a 4-6-line staircase
+  at 375px — caught in production verification of the first deploy,
+  `a5d2f793`): the outlook sentence now rides a full-width line between
+  the header and the chart, zigzag icon leading, floored two-line slot
+  keeping the two desktop chips' charts on one baseline (the round-34
+  rule). One anatomy for mobile AND desktop, both locales.
+- **`verdictTone`/`VerdictIcon` extend to the seven states** — the
+  bullish family keeps the green ink + up zigzag, the bearish family the
+  red ink + down zigzag (colour never rides alone), and the calm states
+  (neutral/range-bound/mixed, plus unreadable null) share the dash in
+  the muted ink.
+- **The signals CSV header decouples** from `verdictTitle` (the row's
+  status value is the checklist lean, not the outlook) — it now uses the
+  generic `ui.csvColStatus` like the other sections.
+
+### Unchanged (deliberately)
+
+The condition checklist and its side words (Supports / Works against /
+Sitting neutral), the lean words and counts, the data/scoring engine, the
+API shape, the prices board and every other section.
+
+### Gates
+
+`copy:audit` clean · full workspace tests green (1,446 — +15 new outlook
+tests pinning the mapping edges, the owner's verbatim strings and the
+retired keys' absence) · typecheck 6/6 · lint 0 errors/15 accepted
+advisories · budgets held (entry 295.15/88.76 kB raw/gz vs 296/89.5;
+Insights lazy 596.60/141.83 vs 604/142.8 — +0.53 kB gz for the 28
+authored sentences).
+
+### Deploy + production verification
+
+Deployed currena-api `d0d28c3f-f0a9-4619-b269-8f7337d9daa9` (SITE_MODE=
+public, cron, KV intact; currena-markets untouched `9b5ff7e0`). Served
+Insights chunk `Insights-DlDkQ-3K.js` byte-identical to the local build
+(sha256 1d0778c5…); the old mismatched fa sentence — 0 occurrences in the
+served bundle. Live browser verification (agent-browser, fresh
+SW-purged loads): live data produced `bearish` for both metals and BOTH
+locales render the same state — EN "Outlook: Signs point to a potential
+decline in gold/silver prices." with red zigzag + muted prices US$4,165 /
+US$57.27; fa «چشم‌انداز: نشانه‌ها حاکی از احتمال افت قیمت طلاست./…نقره
+است.» RTL-mirrored with Jalali ticks; collapsed "Outlook: Bearish" /
+«چشم‌انداز: نزولی»; 375px scrollWidth === 375 both locales; the prices
+board (4 tiles) and condition checklist untouched; zero page/console
+errors. Evidence: docs/evidence/2026-10-21-outlook-states/.
+
 ## [2026-10-20c] — the gold/silver analysis charts grow the 10-year view (the owner's request)
 
 The owner, one message after the verdict-chip redesign shipped: **"Add 10
