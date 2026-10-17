@@ -1,4 +1,4 @@
-# Gold balance v7 — the Iteration-5 addendum: rotate the beam ONLY (2026-10-26b)
+# Gold balance v7 — the Iteration-5 addendum: rotate the beam ONLY (2026-10-26d)
 
 The owner's addendum "Rotate the beam only, and visualize weight":
 exactly one rotating element (the beam group, by

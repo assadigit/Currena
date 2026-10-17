@@ -988,7 +988,7 @@ Screenshots: `docs/insights/screenshots/gold-balance/v6/` (the
 before/after comparison, the A–H × en/fa sweep, the mobile and dark
 sets, the interaction captures) + README.
 
-## v7 — the Iteration-5 addendum: rotate the beam ONLY, visualize weight (2026-10-26b)
+## v7 — the Iteration-5 addendum: rotate the beam ONLY, visualize weight (2026-10-26d)
 
 The owner's addendum supersedes the earlier pan-rotation, tilt/motion
 and tile-content rules. The scoring model, the data and the Persian

@@ -386,7 +386,7 @@ const BUDGETS = [
   // 634.57/151.67 — both features' honest markup together. The entry
   // chunk is untouched at 295.29/88.82 vs 296/89.5.
   // v7 beam-only rotation (635.00 → 636.00 raw, 152.00 → 152.50 gz,
-  // 2026-10-26b — the owner's Iteration-5 addendum "Rotate the beam
+  // 2026-10-26d — the owner's Iteration-5 addendum "Rotate the beam
   // only, and visualize weight"): the CSS-calc stage becomes an
   // SVG mechanical layer (hangers as recomputed joint→rim lines, the
   // needle + three-tick arc gauge) driven by ONE JS-animated θ through

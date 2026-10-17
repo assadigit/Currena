@@ -2768,7 +2768,7 @@ export const insightsCopyEn = {
       // text equivalent — the whole mechanical drawing is one
       // role="img" whose label states the beam tilt and the verdict
       // (colour never rides alone). Round-52, QA record
-      // docs/QA/quirks-2026-10-26b-balance-v7-fa-copy.md.
+      // docs/QA/quirks-2026-10-26d-balance-v7-fa-copy.md.
       gaugeAria: 'Beam tilt: {n}°, {verdict}.',
       listEmptyFor: 'None of the factors checked shows a meaningful signal supporting gold’s price right now.',
       listEmptyAgainst: 'None of the factors checked shows a meaningful signal working against gold’s price right now.',

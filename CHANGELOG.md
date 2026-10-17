@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
-## [2026-10-26b] — the gold balance rotates ONLY its beam, and visualizes weight (Iteration-5 addendum: v7)
+## [2026-10-26d] — the gold balance rotates ONLY its beam, and visualizes weight (Iteration-5 addendum: v7)
 
 The owner's Iteration-5 addendum supersedes the earlier pan-rotation,
 tilt/motion and tile-content rules: "Rotate the beam only, and
@@ -195,7 +195,7 @@ tiles never sets the tilt, only the documented net/total ratio does.
   + mobile sets) + README; notes §v6 in
   docs/insights/gold-balance-card-notes.md.
 
-## [2026-10-26b] — the asset cards drop the «دربارهٔ این اعداد» methodology note (owner directive)
+## [2026-10-26d] — the asset cards drop the «دربارهٔ این اعداد» methodology note (owner directive)
 
 A one-scope removal, requested verbatim by the owner after reviewing the
 2026-10-25b polish: the sixth expanded-detail section — the heading
@@ -243,7 +243,7 @@ five sections with zero occurrences of the removed heading in either
 locale, the last section paints inside the tile (element-from-point
 probe), mobile 375 no overflow, zero console errors. Deploy record:
 docs/DEPLOY.md §CURRENT DEPLOYMENT; evidence
-docs/evidence/2026-10-26b-remove-methodology-note/ (sandbox + live).
+docs/evidence/2026-10-26d-remove-methodology-note/ (sandbox + live).
 
 ## [2026-10-26] — the gold balance re-composed to the owner's wireframe reference (factors above, beam beneath)
 

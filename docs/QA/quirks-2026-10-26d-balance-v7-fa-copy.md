@@ -1,4 +1,4 @@
-# QA — 2026-10-26b: balance v7 copy (fa)
+# QA — 2026-10-26d: balance v7 copy (fa)
 
 Round-52 review record for the ONE new Persian string of the gold
 balance's v7 revision (owner Iteration-5 addendum, 2026-10-26:
