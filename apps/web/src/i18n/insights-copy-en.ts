@@ -2653,6 +2653,8 @@ export const insightsCopyEn = {
       countNeutral: '{n} neutral',
       countUnread: "{n} couldn't be read",
       aria: 'Balance for gold: {summary}. {verdict}.',
+      listEmptyFor: 'No readings support gold right now.',
+      listEmptyAgainst: 'No readings work against gold right now.',
     },
     silverOnly: 'Silver only',
     footingTitle: 'Price footing',

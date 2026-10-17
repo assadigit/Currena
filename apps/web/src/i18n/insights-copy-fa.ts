@@ -1443,6 +1443,8 @@ export const insightsCopyFa: InsightsCopy = {
       countNeutral: '{n} خنثی',
       countUnread: '{n} قابل ارزیابی نیست',
       aria: 'ترازوی طلا: {summary}. {verdict}.',
+      listEmptyFor: 'فعلاً هیچ عامل به نفع طلا دیده نمی‌شود.',
+      listEmptyAgainst: 'فعلاً هیچ عامل به ضرر طلا دیده نمی‌شود.',
     },
     silverOnly: 'فقط برای نقره',
     footingTitle: 'سطح قیمت',

@@ -5,6 +5,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-18d] — the gold balance becomes a classic hanging-pan scale (the owner's v3 directive)
+
+The owner: *"The latest implementation does not yet meet the intended
+balance redesign."* Seven directives, all implemented (notes v3 section in
+`docs/insights/gold-balance-card-notes.md`):
+
+- **The illustration** is now ONE carefully-proportioned inline SVG
+  (520×252 viewBox): tapered beam with rounded end knuckles, pinned
+  pivot, tapered pillar on a two-step plinth, splayed chains to shallow
+  pan dishes, dotted level reference — varied stroke weights, deliberate
+  whitespace, the page's neutral secondary ink (7.98:1/7.7:1).
+- **The dashed empty rectangle is gone**: both sides always draw their
+  complete pans; a side with no qualifying factors gets a concise,
+  evidence-based empty line under its list heading (2 new copy keys,
+  round-48, QA record `docs/QA/quirks-2026-10-18-balance-v3-fa-empty-states.md`).
+- **Factor cards are OFF the beam**: the beam carries only the aggregate
+  tilt; the factors render in lists beneath their supportive/adverse
+  side captions (the v2 caption row became the list headings), growing
+  independently of the fixed-geometry illustration (no runtime
+  measurement, no reserved-height arithmetic — the ResizeObserver is
+  deleted).
+- **Direction follows the model**: the beam tilts only for a directional
+  verdict; balanced and unavailable states render level (net-0 and
+  readable-0 rules unchanged — no financial model, weight, threshold or
+  copy change beyond the two empty-state keys).
+- **RTL mirrors the whole SVG** with one scaleX(-1) (pure geometry), so
+  the for-pan lands inline-end and the visual rotation flips in the same
+  transform; the lists mirror via the grid.
+- Verified: 30 updated component tests; harness-measured tilt law
+  exact for cases A–H (rim difference = Lh × sin(angle) to 0.1px); no
+  horizontal overflow at 320–1280 in both locales; keyboard + panel
+  behaviour unchanged; VLM design review positive. Screenshots:
+  `docs/insights/screenshots/gold-balance/v3-*.png`.
+
 ## [2026-10-18c] — the deploy-record reconciliation (no code change)
 
 The owner: *"It seems like you didn't push commit deploy yet."* — verified

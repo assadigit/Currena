@@ -548,3 +548,130 @@ no-deploy hold is lifted by that order.
   - 360px FA: `scrollWidth 360 == clientWidth 360` — no horizontal
     scroll around the seesaw.
   - Console after a fresh reload: zero messages, zero page errors.
+
+## v3 — the classic hanging-pan balance (owner directive 2026-10-18d)
+
+The owner reviewed the deployed v2 seesaw: *"The latest implementation
+does not yet meet the intended balance redesign."* The directive (seven
+points, mapped one-to-one below) supersedes v2 §5's drawing AND lifts the
+§8 "BalanceScale stays untouched" pin of the economic-indicators session
+by direct owner order — the component is now this file's to revise again.
+
+### The directive, verbatim mapping
+
+1. **Sophisticated vector geometry** — the drawing is now ONE inline SVG
+   (viewBox 520×252): a subtly tapered beam (16u centre → 9u ends) with
+   7.5u rounded end knuckles, a pinned pivot (13u cap + 4.5u surface pin),
+   a tapered pillar (26u → 14u) on a two-step plinth, two splayed 2u
+   chains per side hanging to shallow 3u-stroked pan dishes with an 8%-ink
+   fill, and the dotted level reference line through the pivot. Stroke
+   weights intentionally vary (body fill > pan rim 3u > chains 2u >
+   reference dotted); whitespace: ≥80u pan-to-pillar, 20u margins.
+2. **No dashed empty rectangle** — both pans ALWAYS draw their complete
+   structure (chains + dish). A side with no qualifying factors gets a
+   concise, evidence-based line under its list heading: "No readings
+   support gold right now." / «فعلاً هیچ عامل به نفع طلا دیده نمی‌شود.»
+   (and the against twins). Round-48, QA record
+   `docs/QA/quirks-2026-10-18-balance-v3-fa-empty-states.md`.
+3. **No factor cards on the beam** — the SVG is pure geometry; its tilt
+   IS the aggregate. The factor rows (the v2 compact 56px buttons,
+   unchanged) render in lists beneath their side captions — the v2 §5.7
+   caption row became the list headings — and grow downward, fully
+   independent of the illustration.
+4. **Direction follows the model** — the beam tilts only for a
+   directional verdict ('for'/'against'); 'balanced' and 'none'
+   (unavailable) render level. The tilt formula is untouched
+   (|net|/total × 12°, 4° floor — v1 §6.3-4 verbatim), so the financial
+   model, weights, thresholds and counts are exactly as before.
+5. **Multi-factor safety** — the SVG's height is a fixed function of its
+   width (viewBox aspect, no runtime measurement at all — the v2
+   ResizeObserver and reserved-height arithmetic are deleted); the lists
+   just grow. Case H (6 + 3 factors, harness-only) proves it.
+6. **Everything else preserved** — data flow, driver mapping, verdict
+   word, count line, banner, trays, detail panel, price footing, RTL,
+   responsive behaviour, copy: unchanged (two new empty-state keys are
+   the only string additions).
+7. **Verified** — the measured table + scenario screenshots below.
+
+### Decisions (D-v3)
+
+- **D-v3-1 — "valid, supported aggregate score"** = the model's verdict
+  word. The verdict (balanceVerdictOf) is the model's own directional
+  statement; the beam tilts iff the verdict is 'for'/'against' with the
+  exact v1 magnitude rule. "Neutral / unavailable / insufficient /
+  invalid" map to 'balanced' / 'none' / (net-0 with unread drivers — the
+  ratio pulls toward level) / (no drivers — the component renders null);
+  none of these tilt. No weights were invented, no threshold changed.
+- **D-v3-2 — neutral-ink machinery.** The whole illustration draws in the
+  page's secondary text ink (7.98:1 / 7.7:1); the side captions and the
+  verdict line carry the green/red semantics (the reference drawing does
+  the same — grey scale, coloured labels). Colour never rides alone
+  (§12.2 unchanged).
+- **D-v3-3 — RTL as one mirror.** The SVG is pure geometry, so RTL
+  applies `scaleX(-1)` to the whole `<svg>`: the `for` pan moves to the
+  inline-end AND the visual rotation sign flips in the one transform.
+  The rotation VALUE therefore stays LTR-signed (no re-signing), and the
+  pans' translateY is direction-agnostic. The lists mirror via the
+  grid's direction-aware columns, so each list stays under its own pan.
+- **D-v3-4 — chain tops at the unrotated knuckle.** The chains are drawn
+  inside the pan group from the knuckle's at-rest position; at max angle
+  the knuckle drifts ≤3.7u horizontally (Lh/2 × (1−cos12°)), absorbed by
+  the 7.5u knuckle circle. The vertical follows exactly: knuckle y =
+  pivot y ± rise = the pan group's translate.
+- **D-v3-5 — lists have no cap and no scroll.** The real driver universe
+  is 4; case H proves 9 rows render without collision. Overflow is
+  "handled independently" by ordinary document flow — the illustration
+  never resizes.
+- **D-v3-6 — empty states are prose, not boxes.** Quiet secondary-ink
+  lines (evidence-based: they state what the readings show, no
+  prediction), deliberately unlike the retired dashed placeholder.
+- **D-v3-7 — the motion pair.** The tilt transition moved from inline
+  style to the repo's standard Tailwind class
+  (`transition-transform duration-500 ease-out motion-reduce:transition-none`)
+  so prefers-reduced-motion is honoured on the SVG groups (v1 §6.7).
+
+### Measured checks (browser, on the temporary harness — never shipped)
+
+| # | Check | Result |
+| --- | --- | --- |
+| V1' | Tilt law: measured pan-rim height difference = Lh × sin(angle) | A 4°→23.4px (exp 23.4) · B 0→0 · C 9°→52.6 (exp 52.6) · D 0→0 · E 12°→69.9 (exp 69.9) · G 0→0 · H 4°→23.4 (exp 23.4) — all exact |
+| V2' | Non-directional states stay level | B, D, G: rotate(0deg), rim diff 0px |
+| V3' | Rows | 56px everywhere; chips min-h 44px |
+| V4' | Fixed geometry | The zone's innerHTML is byte-identical across cases A/B/H modulo transforms + aria-label; no inline height ever set |
+| V5' | No overlap / no collision | banner→zone→lists strict at 320px; case H clean (VLM-verified) |
+| V6' | Contrast | machinery ink 7.98:1 light / 7.7:1 dark (≥3:1); count line ≥4.5:1 (unchanged classes) |
+| V7' | Visible lean | 360px: case A 23px rim diff; case E 69.9px |
+| V8' | Empty sides | A (for-empty), C (against-empty), D (both): prose empty states render; `data-balance-slot` no longer exists anywhere |
+| V9' | Overflow | 0px horizontal at 320, 360, 768, 1280 (en + fa) |
+| V10' | Old checks | §4 mapping, §6 formula, verdict/count/aria, panel behaviour, trays, integration — all re-tested (30 tests, file `balance.test.tsx`) |
+| V11' | Keyboard | Row focus + Enter opens the shared panel, aria-expanded true; tab order verdict→rows→trays |
+| V12' | RTL | svg scaleX(-1), for-pan + for-list on the right, beam 4° unchanged, rim diff 23px, 0 overflow |
+| V13' | Design review | VLM critique: "Professional & Sophisticated" — proportions, stroke hierarchy, whitespace, alignment all pass; the single nitpick (stylised rigid chains) is the deliberate stable-icon choice |
+
+### Scenario sentences (one per screenshot, the v2 §8 convention)
+
+- `v3-A-1280-en.png` — a visitor sees "Leaning against gold · 1 against
+  · 3 couldn't be read", a classic balance tipped slightly down on the
+  right, Real yields 2.84% in the Against-gold list, and a quiet
+  "No readings support gold right now." line under the empty For-gold
+  heading — an honest light lean.
+- `v3-E-1280-en.png` — the same balance tipped to its full 12° with four
+  adverse rows — a clearly heavier against-lean.
+- `v3-C-1280-en.png` — "Leaning for gold", beam down on the left, three
+  green rows, and the against-empty line on the right.
+- `v3-D-1280-en.png` — "Can't read the conditions right now", a level
+  beam, both lists empty, four dashed unread chips below — no direction
+  implied.
+- `v3-B/G-1280-en.png` — "Balanced", level beam, rows on both sides.
+- `v3-H-1280-en.png` — six rows left, three right, the balance identical
+  in size and tilt to any other 3-net case.
+- `v3-*-fa.png` — the mirrored fa layout: «به نفع طلا» column on the
+  right, Persian digits, the SVG mirrored, the lean on the same
+  semantic side.
+- `v3-*-360-*.png` / `768` — the same anatomy at mobile widths, no
+  horizontal scroll, rows wrapping cleanly at half-card width.
+- `v3-A-1280-*-dark.png` — the drawing in dark theme (same ink pair,
+  7.7:1).
+
+The harness files (`balance-harness.html`, `src/balance-harness-main.tsx`)
+were temporary and are deleted — no test data ships.
