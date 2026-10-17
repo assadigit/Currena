@@ -331,7 +331,18 @@ const BUDGETS = [
   // gzip-NEUTRAL vs the 145.60 budget (the additions are mostly localized
   // label words, highly compressible); the raw overage is wording, not
   // logic. Justified in CHANGELOG §2026-10-24b.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 609_000, gz: 145_600, label: 'Insights lazy chunk' },
+  // Financial-asset-cards bump (609.00/145.60 → 626.00/150.00,
+  // 2026-10-24c — the spec-pack session of 2026-10-22 rebased onto
+  // round-46 main): the financial-asset-cards spec pack lands on the
+  // prices board — the day-spaced 7-day sparkline (PriceSparkline) + the
+  // pure trend/briefing module (price-trend.ts, 16 tests) + the per-card
+  // «جزئیات بیشتر» disclosure with the full detail rows + 41 new copy
+  // keys × 2 locales. The raw overage is the honest price of the
+  // real-data trend story and the bilingual hedged-briefing corpus the
+  // spec demands; the entry chunk (the money page) is untouched at
+  // 295.15/88.76 vs 296/89.5. Justified in CHANGELOG §2026-10-24c and
+  // docs/QA/quirks-2026-10-22-financial-asset-cards.md.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 626_000, gz: 150_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

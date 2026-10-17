@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "*   **Image 1 (Persian RTL Desktop):** PASS. The layout is clean, text is properly aligned to the right (RTL), and all four asset cards are fully visible without overlapping.\n*   **Image 2 (Persian Mobile 375px):** PASS. The single-column layout is correctly applied, the card content is well-spaced, and the header elements remain accessible without breaking.\n*   **Image 3 (Persian Dark Mode Desktop):** PASS. The dark theme provides excellent contrast for readability. The charts, text, and UI elements are clearly visible against the dark background.\n*   **Image 4 (English Desktop - Insights):** PASS. The \"Insights\" panel is fully expanded with a clear two-column structure. Text is legible, indicators are aligned, and there is no visual clutter or clipping.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1792259187,
+  "id": "202610180146193c52b2917ae94655",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "202610180146193c52b2917ae94655",
+  "usage": {
+    "completion_tokens": 175,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 5451,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 5626
+  }
+}
