@@ -368,7 +368,7 @@ export function TrendPanel({
             role="img"
             aria-label={ariaLabel}
             tabIndex={0}
-            className={`relative block w-full cursor-crosshair rounded-[var(--radius-sm)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-text-primary)] ${plotHeightClass}`}
+            className={`relative block w-full cursor-crosshair rounded-[var(--radius-sm)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-currena-blue ${plotHeightClass}`}
             onPointerMove={(e) => {
               if (e.pointerType !== 'mouse') return; // touch scrolls; tap inspects
               setHover(indexFromClientX(e.clientX));
@@ -419,12 +419,12 @@ export function TrendPanel({
                  * all aria-hidden decoration (the label carries meaning). */}
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute bottom-0 top-0 w-px bg-[var(--color-text-primary)]/40"
+                  className="pointer-events-none absolute bottom-0 top-0 w-px bg-currena-blue/40"
                   style={{ left: `${hoverXPct}%` }}
                 />
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-text-primary)] ring-2 ring-[var(--color-surface)]"
+                  className="pointer-events-none absolute h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-currena-blue ring-2 ring-[var(--color-surface)]"
                   style={{ left: `${hoverXPct}%`, top: `${hoverYPct}%` }}
                 />
                 <div
@@ -470,7 +470,7 @@ export function TrendPanel({
         <span
           role="group"
           aria-label={ui.chartRangeLabel}
-          className="no-print flex items-center gap-1 rounded-full bg-currena-muted/[0.08] p-0.5 dark:bg-white/[0.06]"
+          className="no-print flex items-center gap-1 rounded-full bg-currena-soft/70 p-0.5 dark:bg-white/[0.06]"
           data-trend-range={id}
           {...rangeGroupData}
         >
@@ -488,9 +488,9 @@ export function TrendPanel({
                   setRange(r);
                   setHover(null); // the window changed — a stale index lies
                 }}
-                className={`inline-flex min-h-[28px] cursor-pointer items-center rounded-full px-2.5 text-[length:var(--type-caption)] font-bold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-text-primary)] disabled:cursor-not-allowed disabled:opacity-40 ${
+                className={`inline-flex min-h-[28px] cursor-pointer items-center rounded-full px-2.5 text-[length:var(--type-caption)] font-bold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-currena-blue disabled:cursor-not-allowed disabled:opacity-40 ${
                   active
-                    ? 'bg-white text-currena-dark shadow-sm ring-1 ring-black/[0.06] dark:bg-[#243040] dark:text-currena-dark dark:ring-white/[0.1]'
+                    ? 'bg-white text-currena-blue-deep shadow-sm ring-1 ring-black/[0.06] dark:bg-[#243040] dark:text-currena-blue dark:ring-white/[0.1]'
                     : 'bg-transparent text-currena-muted hover:text-currena-dark dark:hover:text-currena-dark'
                 }`}
               >

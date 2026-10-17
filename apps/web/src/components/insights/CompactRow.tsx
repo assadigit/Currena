@@ -215,7 +215,7 @@ export function CompactRow({
                 {copy.ui.mixedEvidenceTag}
               </span>
             ) : null}
-            <span className="ms-auto shrink-0 whitespace-nowrap text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)]">
+            <span className="ms-auto shrink-0 whitespace-nowrap text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)]">
               {copy.ui.detailsButton} ›
             </span>
           </span>

@@ -45,7 +45,7 @@ export function ViewSwitch({
     <div
       role="radiogroup"
       aria-label={copy.markets.viewSwitchAria}
-      className="inline-flex max-w-full overflow-x-auto rounded-full bg-currena-muted/[0.08] p-0.5 ring-1 ring-[var(--color-border)]"
+      className="inline-flex max-w-full overflow-x-auto rounded-full bg-currena-soft/70 p-0.5 ring-1 ring-[var(--color-border)]"
     >
       {VIEWS.map((v, i) => {
         const selected = view === v;

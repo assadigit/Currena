@@ -64,11 +64,14 @@ import { deriveTileStats, type TileStats } from './price-stats';
  * it; the 256px sources downscale cleanly).
  * ------------------------------------------------------------------ */
 function PriceIconBox({ id }: { id: IndicatorId }) {
+  const isGold = id === 'gold-usd';
   const icon = indicatorIconUrl(id);
   return (
     <span
       aria-hidden="true"
-      className={`grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-md)] ring-1 ring-[var(--color-border)] sm:h-[72px] sm:w-[72px] bg-currena-muted/[0.08]`}
+      className={`grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-md)] ring-1 ring-[var(--color-border)] sm:h-[72px] sm:w-[72px] ${
+        isGold ? 'bg-[var(--color-accent-gold)]/25' : 'bg-currena-soft/70'
+      }`}
     >
       {icon !== null ? (
         <IconImg src={icon} size={96} desktopSize={72} />
@@ -76,7 +79,7 @@ function PriceIconBox({ id }: { id: IndicatorId }) {
         <Coins
           aria-hidden
           strokeWidth={1.2}
-          className="currena-icon text-[var(--color-text-secondary)]"
+          className="currena-icon text-[var(--color-status-context)]"
           style={{ '--icon-size': '96px', '--icon-size-sm': '72px' } as CSSProperties}
         />
       )}
@@ -179,7 +182,7 @@ export function PricesBoard({
     <section id="insights-prices" aria-labelledby="insights-prices-title" className="scroll-mt-24">
       <h2 id="insights-prices-title" className="type-section m-0 mb-1">
         <span className="inline-flex items-center gap-1.5">
-          <Coins aria-hidden size={26} strokeWidth={1.8} className="shrink-0 text-[var(--color-text-secondary)]" />
+          <Coins aria-hidden size={26} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
           {copy.ui.pricesTitle}
         </span>
       </h2>

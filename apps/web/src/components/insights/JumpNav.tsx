@@ -90,8 +90,8 @@ export function JumpNav({
               aria-current={isActive ? 'true' : undefined}
               className={`insights-focusable inline-flex min-h-[36px] shrink-0 cursor-pointer items-center rounded-full px-3.5 text-[length:var(--type-caption)] font-bold transition-colors duration-200 ${
                 isActive
-                  ? 'bg-[var(--color-text-primary)] text-[var(--color-surface)] shadow-sm ring-1 ring-[var(--color-text-primary)]'
-                  : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] hover:text-[var(--color-text-primary)]'
+                  ? 'bg-[var(--color-accent-gold)] text-[var(--color-accent-gold-ink)] shadow-sm ring-1 ring-[var(--color-accent-gold)]/40'
+                  : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] hover:text-[var(--color-status-context)]'
               }`}
             >
               {t.label}

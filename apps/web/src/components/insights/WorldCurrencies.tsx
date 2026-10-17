@@ -104,7 +104,7 @@ export function WorldCurrencies({
   // The mother container — the same soft field + hairline ring + quiet
   // shadow the markets section wears (one visual family, §9.10).
   const shell =
-    'scroll-mt-24 flex flex-col gap-4 rounded-[var(--radius-lg)] bg-currena-muted/[0.05] p-4 shadow-[0_10px_34px_rgba(15,23,42,0.07)] ring-1 ring-[var(--color-border)] sm:gap-5 sm:p-6 dark:shadow-[0_14px_44px_rgba(0,0,0,0.4)]';
+    'scroll-mt-24 flex flex-col gap-4 rounded-[var(--radius-lg)] bg-currena-soft/60 p-4 shadow-[0_10px_34px_rgba(15,23,42,0.07)] ring-1 ring-[var(--color-border)] sm:gap-5 sm:p-6 dark:shadow-[0_14px_44px_rgba(0,0,0,0.4)]';
 
   const heading = (
     <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">

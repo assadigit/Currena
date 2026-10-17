@@ -1320,21 +1320,29 @@ html:not(:lang(fa)) .type-kicker {
   }
 }
 
-/* Alert-card accent (F1): the inline-start severity border stays — red
- * for needs-attention, amber for the Unusual tier (R30 colour roles; the
- * icon+word chip beside it keeps the never-colour-alone contract).
- * Grayscale redesign (2026-10-17, economic-indicators-ui-spec.md §6):
- * the tinted background gradient is retired — the card face is the plain
- * surface; the colored start border + status chip carry the tier. */
+/* Alert-card accent (F1): inline-start border + light tint, never colour alone.
+ * R30 colour roles: RED = needs attention only. The Unusual tier gets the
+ * amber watch ink (border + tint) so the two tiers stop looking alike —
+ * the roast: "the left accent border is red on Unusual cards as well".
+ * (Scope note 2026-10-18: the owner kept the grayscale redesign for the
+ * header/hero ONLY — the tinted gradient below the hero is restored.) */
 .alert-card {
   border-inline-start-width: 4px;
   border-inline-start-style: solid;
   border-inline-start-color: var(--color-status-alert);
-  background: var(--color-surface);
+  background: linear-gradient(
+    to var(--dir-gradient, right),
+    var(--color-surface-alert-tint),
+    var(--color-surface) 55%
+  );
 }
 .alert-card[data-tier='unusual'] {
   border-inline-start-color: var(--color-status-watch);
-  background: var(--color-surface);
+  background: linear-gradient(
+    to var(--dir-gradient, right),
+    color-mix(in srgb, var(--color-status-watch) 7%, transparent),
+    var(--color-surface) 55%
+  );
 }
 
 /* Card lanes (round 22, owner: "such gaps must never happen"): flex-wrap
@@ -1461,20 +1469,21 @@ html[dir='rtl'] .insights-panel {
 }
 
 /* Focus outlines (G6): every interactive control keeps a visible ring.
- * Grayscale redesign (spec §3.5): the ring speaks the neutral primary ink
- * — visible in both themes, no brand blue on this page. */
+ * (Restored 2026-10-18: the owner kept the grayscale redesign for the
+ * header/hero ONLY — the page-wide brand-blue ring is back.) */
 .insights-focusable:focus-visible {
-  outline: 2px solid var(--color-text-primary);
+  outline: 2px solid var(--color-accent-brand);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
 
-/* Grayscale redesign (spec §3.4): every artwork PNG on the Insights page
- * (region marks, state icons, indicator icons, money-area icons, metal
- * icons) renders desaturated — the shapes stay recognizable, the color
- * stops competing with the severity inks. Scoped to the Insights route
- * root (.insights-page on the route wrapper) so no other page changes. */
-.insights-page .currena-icon {
+/* Grayscale redesign, HERO-SCOPED (owner scope note 2026-10-18): only the
+ * artwork inside the two overview cards (region marks, state icons) renders
+ * desaturated — the shapes stay recognizable, the color stops competing
+ * with the severity inks. Everything below the hero keeps its colored
+ * artwork (money-area icons, metal icons, market icons) as before the
+ * redesign. */
+.insights-hero-grid .currena-icon {
   filter: grayscale(1);
 }
 

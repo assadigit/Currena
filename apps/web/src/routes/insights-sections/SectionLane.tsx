@@ -107,10 +107,10 @@ export function SectionLane({
   return (
     <div id="insights-section-lane" className="scroll-mt-24 flex flex-col gap-10">
       {visibleIds !== null && visibleIds.size === 0 ? (
-        <div className="rounded-[var(--radius-lg)] bg-currena-muted/[0.05] px-5 py-8 text-center ring-1 ring-[var(--color-border)]">
+        <div className="rounded-[var(--radius-lg)] bg-currena-soft/60 px-5 py-8 text-center ring-1 ring-[var(--color-border)]">
           <div
             aria-hidden="true"
-            className="mx-auto mb-1 flex h-11 w-11 items-center justify-center rounded-full bg-currena-muted/10 text-[var(--color-text-secondary)]"
+            className="mx-auto mb-1 flex h-11 w-11 items-center justify-center rounded-full bg-currena-blue/10 text-[var(--color-status-context)]"
           >
             <Search size={24} strokeWidth={1.8} />
           </div>
@@ -123,7 +123,7 @@ export function SectionLane({
               setStatusFilter('all');
               setQuery('');
             }}
-            className="insights-focusable mt-3 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-text-secondary)]/50 hover:text-[var(--color-text-primary)]"
+            className="insights-focusable mt-3 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-currena-blue/40 bg-currena-blue/15 px-5 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
           >
             {copy.ui.clearFilters}
           </button>
@@ -158,7 +158,7 @@ export function SectionLane({
                * per region, so global and australia can never share
                * or fuse their boxes. The anchors, aria and scroll
                * margins are untouched. */
-              className="scroll-mt-24 flex flex-col gap-6 rounded-[var(--radius-lg)] bg-currena-muted/[0.05] p-4 shadow-[0_10px_34px_rgba(15,23,42,0.07)] ring-1 ring-[var(--color-border)] sm:p-6 dark:shadow-[0_14px_44px_rgba(0,0,0,0.4)]"
+              className="scroll-mt-24 flex flex-col gap-6 rounded-[var(--radius-lg)] bg-currena-soft/60 p-4 shadow-[0_10px_34px_rgba(15,23,42,0.07)] ring-1 ring-[var(--color-border)] sm:p-6 dark:shadow-[0_14px_44px_rgba(0,0,0,0.4)]"
             >
               <h2
                 id={`insights-section-${sec}-title`}
