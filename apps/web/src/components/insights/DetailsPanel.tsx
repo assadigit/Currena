@@ -12,7 +12,7 @@
  * its own address"). Body scroll locks while open.
  */
 
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
@@ -21,7 +21,8 @@ import { ApiError, fetchIndicatorHistory } from '../../lib/insights';
 import { Star, X } from 'lucide-react';
 import { IconImg, indicatorIconUrl } from '../icons/currena';
 import { HistoryChart, formatAsOf } from './HistoryChart';
-import { definitionFor, formatRuleText } from './config';
+import { PRICE_ROWS, definitionFor, formatRuleText } from './config';
+import { PriceDetailsSections } from './PriceDetails';
 import { staleAfterDaysFor, RULE_CHANGELOG, RULE_VERSION } from '@currena/insights';
 
 function Section({ title, body }: { title: string; body: string }) {
@@ -140,6 +141,7 @@ function PanelHistory({
 
 export function DetailsPanel({
   reading,
+  readings,
   copy,
   locale,
   numberLocale,
@@ -149,6 +151,9 @@ export function DetailsPanel({
   returnFocusTo,
 }: {
   reading: IndicatorReading;
+  /** The full snapshot's readings — the price sections' companion lines
+   * read other assets (gold's A$ line, Bitcoin's metal ratios). */
+  readings: readonly IndicatorReading[];
   copy: InsightsCopy;
   locale: 'en' | 'fa';
   numberLocale: 'en-US' | 'fa-IR';
@@ -162,6 +167,15 @@ export function DetailsPanel({
   const headingId = useId();
   const entry = copy.indicators[reading.id];
   const indicatorDef = definitionFor(reading.id);
+
+  // 2026-10-26c: the four asset cards' «جزئیات بیشتر» sections render
+  // INSIDE this side panel (owner directive) — the same sections that
+  // used to expand inline in the tile, unchanged in content.
+  const isPriceRow = PRICE_ROWS.includes(reading.id);
+  const byId = useMemo(
+    () => new Map(readings.map((r) => [r.id as string, r])),
+    [readings],
+  );
 
   // Focus trap + Escape (F5).
   const onKeyDown = useCallback(
@@ -232,7 +246,11 @@ export function DetailsPanel({
                * — it identifies the card at a glance and deserves real size. */}
               {indicatorIconUrl(reading.id) !== null ? <IconImg src={indicatorIconUrl(reading.id)!} size={32} desktopSize={44} /> : null}
               <span>
-                {entry.name}
+                {/* 2026-10-26c: the four asset cards' panels carry the SAME
+                 * verified title the card face uses (2026-10-25b) — the
+                 * registry's legacy "(ounce)" suffix would contradict the
+                 * card's measurement-basis subtitle one screen apart. */}
+                {isPriceRow ? (copy.ui.priceCardTitles[reading.id] ?? entry.name) : entry.name}
               {entry.ticker ? (
                 <span lang="en" dir="ltr" className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
                   {entry.ticker}
@@ -262,6 +280,22 @@ export function DetailsPanel({
           {/* Step-2 §A: the card-spec facts (updates · stale age · fetched ·
            * scored/context). */}
           <CardFacts reading={reading} copy={copy} numberLocale={numberLocale} />
+
+          {/* 2026-10-26c: the asset cards' five detail sections (A–E) —
+           * تغییرات قیمت … منبع داده و زمان به‌روزرسانی — ride the panel
+           * for the four price rows, directly under the facts. */}
+          {isPriceRow ? (
+            <div className="mb-4">
+              <PriceDetailsSections
+                id={reading.id}
+                reading={reading}
+                copy={copy}
+                locale={locale}
+                numberLocale={numberLocale}
+                byId={byId}
+              />
+            </div>
+          ) : null}
 
           {/* Step-2 §B5: the VIX card's interim-presentation note (the
            * calm/nervous words are a Step-3 deliverable computed from the

@@ -208,7 +208,6 @@ export const insightsCopyFa: InsightsCopy = {
     sumBtcMixed: 'قیمت {asset} در هفت روز گذشته نوسان داشته است.',
     sumOilDrivers: 'برای توضیح عوامل مؤثر بر این تغییر، باید داده‌های مرتبط با عرضه، تقاضا و شرایط بازار نیز بررسی شوند.',
     moreDetails: 'جزئیات بیشتر',
-    lessDetails: 'نمایش کمتر',
     changesLabel: 'تغییرها',
     change30dLabel: '۳۰ روز گذشته',
     change90dLabel: '۹۰ روز گذشته',

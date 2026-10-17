@@ -2,23 +2,27 @@
  * @vitest-environment jsdom
  *
  * prices-cards.test.tsx — the prices board's 2026-10-25b polish round
- * (asset-cards task): the card header (title + measurement-basis
- * subtitle, icon block), the ONE-LINE price + currency composition
- * (task §5 — «۴٬۱۶۶ دلار» / "US$4,166", never separate lines), the
- * expanded panel's semantic sections (task §9 A–E; the former F
- * «دربارهٔ این اعداد» methodology note was removed at the owner's
- * direction, 2026-10-26b), the 52-week range's
- * bidirectional rendering («۳٬۹۶۱ تا ۵٬۳۱۸ دلار» with «تا» BETWEEN the
- * endpoints), the 10-YEAR record relabel (computePeaks reads the 10-year
- * window — never an all-time claim), and the instrument-coverage notes
- * shown ONLY when the SERVED attribution actually is that instrument
- * (task §10: the live merge serves GC=F/SI=F/BZ=F futures with a futures
- * attribution; the EOD snapshot serves gold-api XAU/XAG spot — a futures
- * note on a spot price would be false).
+ * (asset-cards task) + the 2026-10-26c sidebar directive ("The more
+ * details must show up in side bar"): the card header (title +
+ * measurement-basis subtitle, icon block), the ONE-LINE price + currency
+ * composition (task §5 — «۴٬۱۶۶ دلار» / "US$4,166", never separate
+ * lines), the «جزئیات بیشتر» button now OPENING THE DETAILS SIDE PANEL
+ * (no inline disclosure — the card never expands), the five detail
+ * sections (task §9 A–E; the former F «دربارهٔ این اعداد» methodology
+ * note was removed at the owner's direction, 2026-10-26b) rendering
+ * INSIDE DetailsPanel, the 52-week range's bidirectional rendering
+ * («۳٬۹۶۱ تا ۵٬۳۱۸ دلار» with «تا» BETWEEN the endpoints), the 10-YEAR
+ * record relabel (computePeaks reads the 10-year window — never an
+ * all-time claim), and the instrument-coverage notes shown ONLY when the
+ * SERVED attribution actually is that instrument (task §10: the live
+ * merge serves GC=F/SI=F/BZ=F futures with a futures attribution; the
+ * EOD snapshot serves gold-api XAU/XAG spot — a futures note on a spot
+ * price would be false).
  *
- * The tile histories come from a stubbed fetch returning dense synthetic
- * series (the same endpoint the sparklines use), so the client-derived
- * rows (52-week range, changes) render from real code paths.
+ * The tile/panel histories come from a stubbed fetch returning dense
+ * synthetic series (the same endpoint the sparklines, the panel chart and
+ * the price sections use), so the client-derived rows (52-week range,
+ * changes) render from real code paths.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -28,6 +32,7 @@ import type { IndicatorId, IndicatorReading } from '@currena/core';
 import type { InsightsSnapshot } from '@currena/core';
 import { insightsCopyEn } from '../../i18n/insights-copy-en';
 import { insightsCopyFa } from '../../i18n/insights-copy-fa';
+import { DetailsPanel } from './DetailsPanel';
 import { PricesBoard } from './PricesBoard';
 
 /* ------------------------------------------------------------------ *
@@ -97,6 +102,28 @@ function renderBoard(
       locale={locale}
       numberLocale={numberLocale}
       onFocusCard={onFocusCard}
+    />,
+  );
+}
+
+/** Renders the side panel the «جزئیات بیشتر» button opens. */
+function renderPanel(
+  panelReading: IndicatorReading,
+  allReadings: IndicatorReading[],
+  locale: 'en' | 'fa',
+  numberLocale: 'en-US' | 'fa-IR',
+) {
+  render(
+    <DetailsPanel
+      reading={panelReading}
+      readings={allReadings}
+      copy={locale === 'fa' ? insightsCopyFa : insightsCopyEn}
+      locale={locale}
+      numberLocale={numberLocale}
+      onClose={vi.fn()}
+      onPinChange={vi.fn()}
+      pinned={false}
+      returnFocusTo={null}
     />,
   );
 }
@@ -194,19 +221,53 @@ describe('PricesBoard 2026-10-25b — header, price line, hierarchy', () => {
 });
 
 /* ------------------------------------------------------------------ *
- * The expanded panel's semantic sections (task §9 A–E; the former F
+ * The sidebar directive (2026-10-26c): «جزئیات بیشتر» opens the side
+ * panel; the card itself never expands.
+ * ------------------------------------------------------------------ */
+
+describe('PricesBoard 2026-10-26c — the more-details sidebar', () => {
+  it('opens the details panel instead of expanding inline — onFocusCard carries the id + the opener', () => {
+    renderBoard(FOUR.map((id) => reading(id)), 'en', 'en-US');
+
+    const triggers = screen.getAllByRole('button', { name: /more details/i });
+    expect(triggers.length).toBe(4);
+    // Not a disclosure anymore: no exposed expand state, no controlled region.
+    expect(triggers[0]!.getAttribute('aria-expanded')).toBeNull();
+    expect(triggers[0]!.getAttribute('aria-haspopup')).toBe('dialog');
+
+    fireEvent.click(triggers[0]!);
+    expect(onFocusCard).toHaveBeenCalledTimes(1);
+    const [calledId, opener] = onFocusCard.mock.calls[0]!;
+    expect(calledId).toBe('gold-usd');
+    // The opener element rides along — the panel returns focus to it on close.
+    expect(opener).toBe(triggers[0]!);
+  });
+
+  it('never renders the detail sections on the card itself (fa)', () => {
+    renderBoard(FOUR.map((id) => reading(id)), 'fa', 'fa-IR');
+    expect(screen.queryByText('تغییرات قیمت')).toBeNull();
+    expect(screen.queryByText('محدودهٔ قیمت در ۵۲ هفتهٔ گذشته')).toBeNull();
+    expect(screen.queryByText('منبع داده و زمان به‌روزرسانی')).toBeNull();
+    expect(screen.getAllByRole('button', { name: 'جزئیات بیشتر' }).length).toBe(4);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * The side panel's semantic sections (task §9 A–E; the former F
  * methodology note was removed 2026-10-26b)
  * ------------------------------------------------------------------ */
 
-describe('PricesBoard 2026-10-25b — the expanded detail sections', () => {
+describe('DetailsPanel 2026-10-26c — the price sections in the side panel', () => {
   it('organises the details into the A–E sections with one «X گذشته» label family (en)', async () => {
-    renderBoard(FOUR.map((id) => reading(id)), 'en', 'en-US');
+    renderPanel(reading('gold-usd'), FOUR.map((id) => reading(id)), 'en', 'en-US');
 
-    fireEvent.click(screen.getAllByRole('button', { name: /more details/i })[0]!);
+    // The panel header carries the card's verified title — not the
+    // registry's legacy "(ounce)" suffix (2026-10-26c).
+    expect(screen.queryByText(/Gold price \(ounce\)/)).toBeNull();
 
     // A — price changes, one label family, shortest → longest.
     expect(screen.getByText('Price changes')).toBeTruthy();
-    expect(screen.getAllByText('Past 7 days').length).toBe(5); // face + detail row
+    expect(screen.getAllByText('Past 7 days').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Past 30 days')).toBeTruthy();
     expect(screen.getByText('Past 90 days')).toBeTruthy();
     expect(screen.getByText('Past 6 months')).toBeTruthy();
@@ -230,12 +291,11 @@ describe('PricesBoard 2026-10-25b — the expanded detail sections', () => {
 
     // E — source & freshness: attribution, observation date, fetch time.
     expect(screen.getByText('Data source & freshness')).toBeTruthy();
-    expect(screen.getByText('gold-api.com (XAU)')).toBeTruthy();
-    // The observation date rides on every card face (4) AND in section E.
-    expect(screen.getAllByText('as of Oct 17, 2026').length).toBe(5);
+    expect(screen.getAllByText('gold-api.com (XAU)').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('as of Oct 17, 2026').length).toBeGreaterThanOrEqual(1);
 
     // F — the methodology note is GONE (owner directive, 2026-10-26b):
-    // neither its heading nor its body may render on the card.
+    // neither its heading nor its body may render in the panel.
     expect(screen.queryByText('About these numbers')).toBeNull();
     expect(screen.queryByText(/share one window:/)).toBeNull();
 
@@ -246,9 +306,7 @@ describe('PricesBoard 2026-10-25b — the expanded detail sections', () => {
   });
 
   it('renders the fa sections: the 52-week range with «تا» between the endpoints', async () => {
-    renderBoard(FOUR.map((id) => reading(id)), 'fa', 'fa-IR');
-
-    fireEvent.click(screen.getAllByRole('button', { name: 'جزئیات بیشتر' })[0]!);
+    renderPanel(reading('gold-usd'), FOUR.map((id) => reading(id)), 'fa', 'fa-IR');
 
     expect(screen.getByText('تغییرات قیمت')).toBeTruthy();
     expect(await screen.findByText('محدودهٔ قیمت در ۵۲ هفتهٔ گذشته')).toBeTruthy();
@@ -269,10 +327,17 @@ describe('PricesBoard 2026-10-25b — the expanded detail sections', () => {
   });
 
   it('shows the fetch time as a line distinct from the observation date', async () => {
-    renderBoard(FOUR.map((id) => reading(id)), 'en', 'en-US');
-    fireEvent.click(screen.getAllByRole('button', { name: /more details/i })[0]!);
+    renderPanel(reading('gold-usd'), FOUR.map((id) => reading(id)), 'en', 'en-US');
     const fetched = screen.getByText(/^Price fetched: /);
     expect(fetched.textContent!.startsWith('Price fetched: ')).toBe(true);
+  });
+
+  it('does NOT render the price sections for a non-price indicator', async () => {
+    // Any non-PRICE_ROWS reading: the panel keeps its generic anatomy.
+    const vix = reading('gold-usd', { id: 'vix', value: 21.4 }) as IndicatorReading;
+    renderPanel(vix, [vix], 'en', 'en-US');
+    expect(screen.queryByText('Price changes')).toBeNull();
+    expect(screen.queryByText('Data source & freshness')).toBeNull();
   });
 });
 
@@ -281,14 +346,13 @@ describe('PricesBoard 2026-10-25b — the expanded detail sections', () => {
  * SERVED attribution, not a hardcoded asset list.
  * ------------------------------------------------------------------ */
 
-describe('PricesBoard 2026-10-25b — instrument coverage notes', () => {
+describe('DetailsPanel 2026-10-26c — instrument coverage notes', () => {
   it('shows the futures note only when the served attribution is a futures quote', async () => {
     const liveGold = reading('gold-usd', {
       sourceName: 'Yahoo Finance: COMEX gold futures (GC=F)',
       sourceUrl: 'https://finance.yahoo.com/quote/GC=F',
     });
-    renderBoard([liveGold], 'en', 'en-US');
-    fireEvent.click(screen.getByRole('button', { name: /more details/i }));
+    renderPanel(liveGold, [liveGold], 'en', 'en-US');
     expect(
       screen.getByText('The displayed price is the front-month futures contract, not the spot price.'),
     ).toBeTruthy();
@@ -299,8 +363,7 @@ describe('PricesBoard 2026-10-25b — instrument coverage notes', () => {
       sourceName: 'FRED (EIA Brent) + Yahoo Finance (BZ=F)',
       sourceUrl: 'https://fred.stlouisfed.org/series/DCOILBRENTEU',
     });
-    renderBoard([eodBrent], 'en', 'en-US');
-    fireEvent.click(screen.getByRole('button', { name: /more details/i }));
+    renderPanel(eodBrent, [eodBrent], 'en', 'en-US');
     expect(
       screen.getByText(
         'The Brent series is the EIA spot price, extended past its last published date by the BZ=F futures contract.',
@@ -312,8 +375,7 @@ describe('PricesBoard 2026-10-25b — instrument coverage notes', () => {
   });
 
   it('never shows a futures note on the XAU spot attribution', async () => {
-    renderBoard([reading('gold-usd')], 'en', 'en-US');
-    fireEvent.click(screen.getByRole('button', { name: /more details/i }));
+    renderPanel(reading('gold-usd'), [reading('gold-usd')], 'en', 'en-US');
     expect(
       screen.queryByText('The displayed price is the front-month futures contract, not the spot price.'),
     ).toBeNull();
@@ -322,27 +384,6 @@ describe('PricesBoard 2026-10-25b — instrument coverage notes', () => {
         'The Brent series is the EIA spot price, extended past its last published date by the BZ=F futures contract.',
       ),
     ).toBeNull();
-  });
-});
-
-/* ------------------------------------------------------------------ *
- * The disclosure itself stays per-card and accessible.
- * ------------------------------------------------------------------ */
-
-describe('PricesBoard 2026-10-25b — disclosure mechanics', () => {
-  it('toggles one card independently with exposed state', async () => {
-    renderBoard(FOUR.map((id) => reading(id)), 'en', 'en-US');
-    const triggers = screen.getAllByRole('button', { name: /more details/i });
-    expect(triggers.length).toBe(4);
-    fireEvent.click(triggers[0]!);
-    expect(triggers[0]!.getAttribute('aria-expanded')).toBe('true');
-    expect(triggers[1]!.getAttribute('aria-expanded')).toBe('false');
-    // The panel the trigger controls exists and is wired.
-    const panelId = triggers[0]!.getAttribute('aria-controls');
-    const panel = document.getElementById(panelId!);
-    expect(panel).toBeTruthy();
-    fireEvent.click(triggers[0]!);
-    expect(triggers[0]!.getAttribute('aria-expanded')).toBe('false');
   });
 });
 

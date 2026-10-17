@@ -335,6 +335,14 @@ export function Insights() {
     return state.snapshot.readings.find((r) => r.id === panel.id) ?? null;
   }, [panel, state]);
 
+  // The panel's companion data (2026-10-26c): the full snapshot's
+  // readings, empty until loaded — the price sections read other assets
+  // from it (gold's A$ line, Bitcoin's metal ratios).
+  const snapshotReadings = useMemo(
+    () => (state.kind === 'ready' ? state.snapshot.readings : []),
+    [state],
+  );
+
   return (
     <div className="insights-page mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-6xl lg:px-8 xl:max-w-[1440px]">
       <ReadingProgress label={copy.ui.progressLabel} />
@@ -509,10 +517,12 @@ export function Insights() {
         </div>
       ) : null}
 
-      {/* F5: the details panel (side sheet / bottom sheet). */}
+      {/* F5: the details panel (side sheet / bottom sheet). 2026-10-26c:
+          the asset cards' «جزئیات بیشتر» sections render inside it. */}
       {panelReading && panel ? (
         <DetailsPanel
           reading={panelReading}
+          readings={snapshotReadings}
           copy={copy}
           locale={locale}
           numberLocale={numberLocale}

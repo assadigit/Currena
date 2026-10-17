@@ -5,6 +5,80 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-26c] — the asset cards' details move to the side panel (owner directive)
+
+The owner's directive — "The more details must show up in side bar" —
+relocates the «جزئیات بیشتر» surface: the five detail sections that used
+to expand INLINE inside each asset card now render inside the F5 DETAILS
+SIDE PANEL (desktop: inline-end sheet, RTL: start sheet, phones: bottom
+sheet). Clicking «جزئیات بیشتر» opens the panel (the same dialog the
+whole-card click-through opens) with the sections directly under the
+card facts — the card itself NEVER expands, so the four-tile grid stays
+compact and stable, and the details inherit the panel's focus trap,
+Escape, scrim, scroll lock and focus-return for free. No section content
+changed: the five sections (A تغییرات قیمت … E منبع داده و زمان
+به‌روزرسانی) render byte-identical reviewed copy, from the same data
+paths.
+
+### Changed
+
+- **PricesBoard.tsx** — the per-card disclosure (open state,
+  aria-expanded/aria-controls, the inline panel div and ~140 lines of
+  section markup) is GONE; the «جزئیات بیشتر» button now calls
+  `onFocusCard(id, trigger)` (aria-haspopup="dialog", the panel-side
+  affordance PanelRight/PanelLeft by locale). The tile slims to the
+  collapsed-card facts (trend, daily change, briefing) — all
+  panel-only computations moved out.
+- **PriceDetails.tsx (new)** — the five sections as a self-contained
+  `PriceDetailsSections` component: the shared atoms (ChangeValue,
+  PanelSection, DetailRow, NoteLine, formatPriceRange, formatUpdatedAt)
+  relocated from PricesBoard, plus `usePricePanelData` — the same
+  module-cached history fetch the sparkline and the panel chart use
+  (one request, three consumers), keyed by id so a panel that switches
+  readings never shows stale stats.
+- **DetailsPanel.tsx** — accepts `readings` (the snapshot's full
+  readings, for the companion lines) and renders `PriceDetailsSections`
+  for the four price rows directly under CardFacts; the panel HEADER now
+  carries the card's verified title (priceCardTitles — "Gold price", not
+  the registry's legacy "Gold price (ounce)") so the sidebar and the card
+  describe the asset identically. Insights.tsx passes the readings.
+- **Copy** — `lessDetails` («نمایش کمتر») retired from BOTH dictionaries
+  + its manifest entry deleted (the disclosure's collapse label is gone
+  with the disclosure; the panel's close affordance replaces it). The `٪`
+  technical entry re-homed PricesBoard → PriceDetails with the code it
+  terminates. Round-52 triage:
+  docs/QA/quirks-2026-10-26c-asset-cards-sidebar.md. `moreDetails`
+  («جزئیات بیشتر») stays the button's label.
+
+### Tests
+
+- prices-cards.test.tsx rewritten for the new behavior (+2 net): the
+  board tests assert «جزئیات بیشتر» calls onFocusCard with the id + the
+  trigger element and that NO sections render on the cards (en + fa);
+  the section/coverage/methodology-guard tests now render DetailsPanel
+  (the real surface) — all five sections, the «تا» range, the 10-year
+  record, the served-attribution notes, the no-methodology guards in
+  both locales, and the non-price-indicator negative case. 13 tests in
+  the battery (was 11).
+
+Gates: typecheck 6/6; lint 0 errors/15 accepted advisories (unchanged —
+the panel-data hook is keyed, not sync-reset); 1,522 tests green (web
+550); `copy:audit` clean (2,167 entries); web build OK; budgets held
+(Insights 629.41/150.53 vs 630/151; entry 295.29/88.81 untouched).
+Verified on the production build + real API (:4173 harness): EN 1280 —
+the panel opens on the right (440px, flush inline-end) with the five
+sections under the facts, heading "Gold price", focus trapped, body
+scroll locked, Escape closes and focus RETURNS to the trigger; fa RTL —
+«قیمت طلا» heading, the five Persian sections, sheet flush LEFT, caret
+probes prove the range reads «۳٬۹۶۱ تا ۵٬۳۱۸ دلار» (right=۳٬۹۶۱ /
+center=تا / left=دلار); mobile 375 — bottom sheet full-width, no
+horizontal overflow, scrim click closes; the four tiles stay compact
+(zero h4 inside the cards); zero console errors.
+
+*(Rebased over the parallel balance-v6 round `2f9f4e6` — the balance
+component's pans re-composition rides beneath; no file overlap beyond
+the shared changelog/manifest prepend.)*
+
 ## [2026-10-26] — the gold balance's factors REST ON real pans (Iteration 4: the balance becomes a connected weighing machine)
 
 The owner's Iteration-4 directive: the latest v5 composition (factor
