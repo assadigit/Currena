@@ -515,3 +515,36 @@ case shows.
   **605.59 kB / 144.60 kB gz** vs the 606.00 / 144.60 budgets — all held
   (the seesaw replaced the hanging pans inside the same chunk; gz lands
   exactly on the budget line, raw 0.41 kB under).
+
+## 9. The seesaw goes live (v2 deploy record)
+
+Owner order: "merge the branch, push, commit and deploy." §2.4's
+no-deploy hold is lifted by that order.
+
+- **Merge** — `feature/gold-balance-card` (7aca42f spec + 49dcd69 seesaw)
+  merged into main as **660f5ad**; the notes file auto-merged (v1 deploy
+  record and the v2 §8 landed side by side, no conflict). Pre-merge
+  sanity on the merged tree: typecheck 6/6, web 515 + insights 462
+  tests green, lint 0 errors / 15 advisories, copy audit clean.
+- **Push** — main `aecdd40..660f5ad` on origin; remote reset to the
+  tokenless URL.
+- **Build + budgets** — `Insights-pTPOEBQD.js` 605.59 kB / 144.60 kB gz
+  vs the 606.00 / 144.60 budgets; entry 295.15 / 88.76 — all held.
+- **Deploy** — wrangler `currena-api`, version
+  **db046ce5-06ae-4f15-8990-d88e1cdd010c**, 18 new assets uploaded
+  (79 cached), cron re-armed (`* * * * *`).
+- **Live verification** (agent-browser on https://currena.ir/#/insights):
+  - The page loads `Insights-pTPOEBQD.js` — the v2 chunk, not v1.
+  - EN 1280: the seesaw drawn exactly per the patch — up-pointing
+    fulcrum, tilted beam, level plates with hinge dots, the empty
+    for-side as a dashed slot, "Real yields 2.78%" sitting low on the
+    against-side plate; verdict "Leaning against gold · 1 against ·
+    3 couldn't be read"; couldn't-read tray with three chips; price
+    footing below. Screenshot: `live-prod-v2-en-1280.png`.
+  - FA 1280 (RTL): mirrored seesaw — "بازده واقعی اراق فجره ۲.۷۸٪"
+    plate low on the left, dashed slot high on the right; «ترازوی
+    طلا: ۱ به ضرر · ۳ قابل ارزیابی نیست. تمایل به ضرر طلا.»
+    Screenshot: `live-prod-v2-fa-1280.png`.
+  - 360px FA: `scrollWidth 360 == clientWidth 360` — no horizontal
+    scroll around the seesaw.
+  - Console after a fresh reload: zero messages, zero page errors.
