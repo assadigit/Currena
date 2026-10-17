@@ -90,6 +90,91 @@ copy key.
   Insights 635.18/152.06 vs the bumped 636/152.50 (D-33), entry
   chunk untouched 295.29/88.81.
 
+## [2026-10-26c] — the asset cards' details move to the side panel (owner directive)
+
+The owner's directive — "The more details must show up in side bar" —
+relocates the «جزئیات بیشتر» surface: the five detail sections that used
+to expand INLINE inside each asset card now render inside the F5 DETAILS
+SIDE PANEL (desktop: inline-end sheet, RTL: start sheet, phones: bottom
+sheet). Clicking «جزئیات بیشتر» opens the panel (the same dialog the
+whole-card click-through opens) with the sections directly under the
+card facts — the card itself NEVER expands, so the four-tile grid stays
+compact and stable, and the details inherit the panel's focus trap,
+Escape, scrim, scroll lock and focus-return for free. No section content
+changed: the five sections (A تغییرات قیمت … E منبع داده و زمان
+به‌روزرسانی) render byte-identical reviewed copy, from the same data
+paths.
+
+### Changed
+
+- **PricesBoard.tsx** — the per-card disclosure (open state,
+  aria-expanded/aria-controls, the inline panel div and ~140 lines of
+  section markup) is GONE; the «جزئیات بیشتر» button now calls
+  `onFocusCard(id, trigger)` (aria-haspopup="dialog", the panel-side
+  affordance PanelRight/PanelLeft by locale). The tile slims to the
+  collapsed-card facts (trend, daily change, briefing) — all
+  panel-only computations moved out.
+- **PriceDetails.tsx (new)** — the five sections as a self-contained
+  `PriceDetailsSections` component: the shared atoms (ChangeValue,
+  PanelSection, DetailRow, NoteLine, formatPriceRange, formatUpdatedAt)
+  relocated from PricesBoard, plus `usePricePanelData` — the same
+  module-cached history fetch the sparkline and the panel chart use
+  (one request, three consumers), keyed by id so a panel that switches
+  readings never shows stale stats.
+- **DetailsPanel.tsx** — accepts `readings` (the snapshot's full
+  readings, for the companion lines) and renders `PriceDetailsSections`
+  for the four price rows directly under CardFacts; the panel HEADER now
+  carries the card's verified title (priceCardTitles — "Gold price", not
+  the registry's legacy "Gold price (ounce)") so the sidebar and the card
+  describe the asset identically. Insights.tsx passes the readings.
+- **Copy** — `lessDetails` («نمایش کمتر») retired from BOTH dictionaries
+  + its manifest entry deleted (the disclosure's collapse label is gone
+  with the disclosure; the panel's close affordance replaces it). The `٪`
+  technical entry re-homed PricesBoard → PriceDetails with the code it
+  terminates. Round-52 triage:
+  docs/QA/quirks-2026-10-26c-asset-cards-sidebar.md. `moreDetails`
+  («جزئیات بیشتر») stays the button's label.
+
+### Tests
+
+- prices-cards.test.tsx rewritten for the new behavior (+2 net): the
+  board tests assert «جزئیات بیشتر» calls onFocusCard with the id + the
+  trigger element and that NO sections render on the cards (en + fa);
+  the section/coverage/methodology-guard tests now render DetailsPanel
+  (the real surface) — all five sections, the «تا» range, the 10-year
+  record, the served-attribution notes, the no-methodology guards in
+  both locales, and the non-price-indicator negative case. 13 tests in
+  the battery (was 11).
+
+Gates: typecheck 6/6; lint 0 errors/15 accepted advisories (unchanged —
+the panel-data hook is keyed, not sync-reset); 1,522 tests green (web
+550); `copy:audit` clean (2,167 entries); web build OK; budgets held
+(Insights 629.41/150.53 vs 630/151; entry 295.29/88.81 untouched).
+Verified on the production build + real API (:4173 harness): EN 1280 —
+the panel opens on the right (440px, flush inline-end) with the five
+sections under the facts, heading "Gold price", focus trapped, body
+scroll locked, Escape closes and focus RETURNS to the trigger; fa RTL —
+«قیمت طلا» heading, the five Persian sections, sheet flush LEFT, caret
+probes prove the range reads «۳٬۹۶۱ تا ۵٬۳۱۸ دلار» (right=۳٬۹۶۱ /
+center=تا / left=دلار); mobile 375 — bottom sheet full-width, no
+horizontal overflow, scrim click closes; the four tiles stay compact
+(zero h4 inside the cards); zero console errors.
+
+*(Rebased over the parallel balance-v6 round `2f9f4e6` — the balance
+component's pans re-composition rides beneath; no file overlap beyond
+the shared changelog/manifest prepend.)*
+
+**Deployed**: pushed as 99742c2 (rebased over the parallel balance-v6
+round) and live on currena-api worker `6adfb632` (SITE_MODE=public,
+bindings/cron unchanged; currena-markets untouched); serves
+index-gB3_zV9f.js + Insights-DW1SDXvu.js — the fresh build's exact
+filenames, live on both currena.ir and workers.dev. Live-verified:
+EN desktop — the right sheet opens with the five sections under the
+facts, focus trapped, Escape closes and focus returns to the trigger;
+fa RTL — «قیمت طلا», the five Persian sections, the sheet flush LEFT;
+mobile 375 fa — bottom sheet, no overflow; zero console errors. Deploy
+record: docs/DEPLOY.md §CURRENT DEPLOYMENT; live captures in
+docs/evidence/2026-10-26c-asset-cards-sidebar/.
 
 ## [2026-10-26] — the gold balance's factors REST ON real pans (Iteration 4: the balance becomes a connected weighing machine)
 
@@ -195,7 +280,7 @@ tiles never sets the tilt, only the documented net/total ratio does.
   + mobile sets) + README; notes §v6 in
   docs/insights/gold-balance-card-notes.md.
 
-## [2026-10-26d] — the asset cards drop the «دربارهٔ این اعداد» methodology note (owner directive)
+## [2026-10-26b] — the asset cards drop the «دربارهٔ این اعداد» methodology note (owner directive)
 
 A one-scope removal, requested verbatim by the owner after reviewing the
 2026-10-25b polish: the sixth expanded-detail section — the heading
@@ -243,7 +328,7 @@ five sections with zero occurrences of the removed heading in either
 locale, the last section paints inside the tile (element-from-point
 probe), mobile 375 no overflow, zero console errors. Deploy record:
 docs/DEPLOY.md §CURRENT DEPLOYMENT; evidence
-docs/evidence/2026-10-26d-remove-methodology-note/ (sandbox + live).
+docs/evidence/2026-10-26b-remove-methodology-note/ (sandbox + live).
 
 ## [2026-10-26] — the gold balance re-composed to the owner's wireframe reference (factors above, beam beneath)
 

@@ -29,10 +29,14 @@
  *      (price-trend.ts briefingText: observed movement + an explicit
  *      hedge; Bitcoin volatility-aware; oil gets the drivers-evidence
  *      caveat; no causes, forecasts, probabilities or advice);
- *   7. DISCLOSURE — «جزئیات بیشتر» / "More details": the secondary
- *      statistics behind an accessible per-card expand/collapse —
- *      preserved, not deleted, and organised into semantic sections
- *      (2026-10-25b):
+ *   7. «جزئیات بیشتر» / "More details" — opens the DETAILS SIDE PANEL
+ *      (2026-10-26c, owner directive: "The more details must show up
+ *      in side bar"). What used to expand inline inside the tile — the
+ *      five semantic sections (2026-10-25b, unchanged in content) — now
+ *      renders INSIDE the F5 side sheet (desktop: inline-end sheet; RTL:
+ *      the start side; phones: bottom sheet) via PriceDetails.tsx, so
+ *      the four cards stay compact and equal-height and the details get
+ *      the panel's focus trap, Escape, scrim and focus-return for free:
  *        A تغییرات قیمت          — 7d/30d/90d/6m/1y, one «X گذشته» label family;
  *        B محدودهٔ قیمت در ۵۲ هفتهٔ گذشته — the range «۳٬۹۶۱ تا ۵٬۳۱۸ دلار»
  *                                  with «تا» between the endpoints, rendered
@@ -75,33 +79,29 @@
  *
  * Kept from the previous anatomy: ONE anatomy for all four tiles, the
  * stretch grid, the whole-body click-through to the details panel (the
- * full chart, rule text and source live there), honest "—" for a change
- * that does not exist, and the failure-state discipline — an
- * unavailable/stale/failed fetch is a system message in neutral ink,
- * never an adverse market signal, and a missing trend is never a flat
- * line.
+ * full chart, rule text and source live there — the «جزئیات بیشتر»
+ * button now opens the SAME panel, with the price sections inside it),
+ * honest "—" for a change that does not exist, and the failure-state
+ * discipline — an unavailable/stale/failed fetch is a system message in
+ * neutral ink, never an adverse market signal, and a missing trend is
+ * never a flat line.
  */
 
-import { useEffect, useId, useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import { formatDate, formatJalaliDate, formatNumber } from '@currena/core';
-import { ArrowDown, ArrowUp, ChevronDown, Coins, Minus } from 'lucide-react';
+import { Coins, PanelLeft, PanelRight } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { fetchIndicatorHistory } from '../../lib/insights';
 import { IconImg, indicatorIconUrl } from '../icons/currena';
 import {
   PRICE_ROWS,
-  changeToneClass,
   definitionFor,
   formatChange,
-  formatIndicatorValue,
-  indicatorValueParts,
-  positionBand,
   priceValueParts,
 } from './config';
 import { formatAsOf } from './HistoryChart';
+import { ChangeValue } from './PriceDetails';
 import { deriveTileStats, type TileStats } from './price-stats';
 import { briefingText, cleanPriceSeries, window7d, type TrendWindow } from './price-trend';
 import { PriceSparkline } from './PriceSparkline';
@@ -166,117 +166,6 @@ function useTileData(ids: readonly IndicatorId[]): Partial<Record<string, TileDa
   return derived;
 }
 
-/**
- * The 52-week range in the tile's own units — EN prefixes the currency on
- * both ends ('US$2,895 – US$4,305'), fa says it once («۲٬۸۹۵ تا ۴٬۳۰۵
- * دلار» — «تا» BETWEEN the endpoints, the currency attached to the whole
- * range). Pure formatting; the caller renders it in the locale's own
- * direction so the RTL flow — not a forced LTR island — orders the parts.
- */
-function formatPriceRange(
-  id: IndicatorId,
-  low: number,
-  high: number,
-  numberLocale: 'en-US' | 'fa-IR',
-  copy: InsightsCopy,
-): string {
-  const lo = indicatorValueParts(id, low, numberLocale, copy.units);
-  const hi = indicatorValueParts(id, high, numberLocale, copy.units);
-  const join = copy.ui.rangeJoin;
-  if (numberLocale === 'fa-IR') {
-    const unit = lo.unit ?? hi.unit ?? '';
-    return `${lo.value} ${join} ${hi.value}${unit !== '' ? ` ${unit}` : ''}`;
-  }
-  const pre = lo.unit ?? '';
-  return `${pre}${lo.value} ${join} ${pre}${hi.value}`;
-}
-
-/** One signed change: sign + arrow + tone together (never colour alone). */
-function ChangeValue({
-  value,
-  changeKind,
-  numberLocale,
-  copy,
-  na,
-}: {
-  value: number | undefined;
-  changeKind: 'pct' | 'points';
-  numberLocale: 'en-US' | 'fa-IR';
-  copy: InsightsCopy;
-  na: string;
-}) {
-  if (value === undefined || !Number.isFinite(value)) {
-    return <bdi dir="ltr" className="tabular-nums text-[var(--color-text-secondary)]">{na}</bdi>;
-  }
-  const Icon = value > 0 ? ArrowUp : value < 0 ? ArrowDown : Minus;
-  return (
-    <bdi
-      dir="ltr"
-      className={`inline-flex items-center gap-0.5 font-semibold tabular-nums ${
-        changeToneClass(value) || 'text-[var(--color-text-primary)]'
-      }`}
-    >
-      {formatChange(value, changeKind, numberLocale, copy.units)}
-      <Icon aria-hidden size={12} strokeWidth={2.5} />
-    </bdi>
-  );
-}
-
-/** One label : value row of the expanded section. */
-function DetailRow({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex items-baseline justify-between gap-2">
-      <dt className="min-w-0 text-[var(--color-text-secondary)]">{label}</dt>
-      <dd className="m-0 min-w-0 text-end text-[var(--color-text-primary)]">{children}</dd>
-    </div>
-  );
-}
-
-/** One quiet context line of the expanded section (the notes block). */
-function NoteLine({ children }: { children: ReactNode }) {
-  return (
-    <li className="flex items-baseline gap-1.5 leading-relaxed text-[var(--color-text-secondary)]">
-      <span aria-hidden className="select-none text-[var(--color-text-tertiary)]">•</span>
-      <bdi className="min-w-0">{children}</bdi>
-    </li>
-  );
-}
-
-/**
- * One semantic section of the expanded panel. The latin-only heading
- * treatments (uppercase + letter-spacing) are applied in en ONLY —
- * tracking visually separates the joined strokes of Persian script.
- */
-function PanelSection({
-  title,
-  locale,
-  children,
-}: {
-  title: string;
-  locale: 'en' | 'fa';
-  children: ReactNode;
-}) {
-  return (
-    <section>
-      <h4
-        className={`m-0 mb-2 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] ${
-          locale === 'en' ? 'uppercase tracking-wide' : ''
-        }`}
-      >
-        {title}
-      </h4>
-      {children}
-    </section>
-  );
-}
-
-/** The reading's fetch time — Jalali + clock in fa, Gregorian + clock in en. */
-function formatUpdatedAt(iso: string, locale: 'en' | 'fa'): string {
-  return locale === 'fa'
-    ? formatJalaliDate(iso, 'fa-IR', { withClock: true })
-    : formatDate(iso, 'en-US', { withClock: true });
-}
-
 /* ------------------------------------------------------------------ *
  * The tile
  * ------------------------------------------------------------------ */
@@ -287,7 +176,6 @@ function PriceTile({
   copy,
   locale,
   numberLocale,
-  byId,
   data,
   onFocusCard,
 }: {
@@ -296,12 +184,9 @@ function PriceTile({
   copy: InsightsCopy;
   locale: 'en' | 'fa';
   numberLocale: 'en-US' | 'fa-IR';
-  byId: Map<string, IndicatorReading>;
   data: TileData | undefined;
   onFocusCard: (id: IndicatorId, opener?: HTMLElement | null) => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const panelId = useId();
   const def = definitionFor(id);
   const entry = copy.indicators[id];
   const subject = copy.ui.priceSubjects[id] ?? entry.name;
@@ -341,125 +226,11 @@ function PriceTile({
       ? formatChange(netPct, def.changeKind, numberLocale, copy.units)
       : copy.ui.trendInsufficient;
 
-  /* -------------------- the expanded-section facts -------------------- */
+  /* -------------------- the collapsed-card facts -------------------- */
 
-  // Feed First (every price reading carries 7d/30d/90d today), the
-  // stored-history derivation second — EXCEPT the 7-day number, which
-  // prefers the window the chart draws so the two can never disagree.
+  // The daily change (feed first, stored-history derivation second — the
+  // feed has no 1-day field, so this usually derives from the history).
   const c1 = stats?.c1;
-  const c7 = trend?.netPct ?? reading.change7d ?? stats?.c7;
-  const c30 = reading.change30d ?? stats?.c30;
-  const c90 = reading.change90d ?? stats?.c90;
-  const c6m = stats?.c6m;
-  const c1y = stats?.c1y;
-  const has52 = stats?.low52 !== undefined && stats?.high52 !== undefined;
-
-  // The clarified «بالا»: the reading's percentile band inside its own
-  // 10-year history — a LEVEL, named precisely, explained in a note.
-  const band =
-    reading.percentile10y !== undefined && !isUnavailable ? positionBand(reading.percentile10y) : null;
-  const levelWord =
-    band === 'high'
-      ? copy.ui.priceLevelHigh
-      : band === 'low'
-        ? copy.ui.priceLevelLow
-        : band === 'typical'
-            ? copy.ui.priceLevelTypical
-            : null;
-
-  // Section C — the record. computePeaks (packages/insights) reads the
-  // 10-YEAR window: the label says exactly that, never "all-time".
-  const peak = reading.peak;
-  const peakParts = peak !== undefined ? indicatorValueParts(id, peak.value, numberLocale, copy.units) : null;
-
-  // Section D — the distance below the 10-year high (the record's own
-  // value and date live in section C; this line does not repeat them).
-  const fromRecord =
-    !isUnavailable && reading.fromPeak10y !== undefined && reading.fromPeak10y < 0 && peak !== undefined
-      ? interpolate(copy.ui.priceBelow10yHigh, {
-          // The gap is a percentage — the sign is carried by the wording
-          // («پایین‌تر» / "below"), so the placeholder takes the magnitude
-          // with the locale's percent glyph.
-          pct: `${formatNumber(Math.abs(reading.fromPeak10y), numberLocale, {
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1,
-          })}${numberLocale === 'fa-IR' ? '٪' : '%'}`,
-        })
-      : null;
-
-  const ma200 =
-    !isUnavailable && reading.ma200GapPct !== undefined && Math.abs(reading.ma200GapPct) >= 0.05
-      ? interpolate(reading.ma200GapPct >= 0 ? copy.ui.ma200Above : copy.ui.ma200Below, {
-          // The gap is a percentage — the sign rides INSIDE the {pct}
-          // placeholder (locale percent glyph), per the template's intent.
-          pct: `${formatNumber(Math.abs(reading.ma200GapPct), numberLocale, {
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1,
-          })}${numberLocale === 'fa-IR' ? '٪' : '%'}`,
-        })
-      : null;
-
-  // Section D — the companion lines, computed FROM THE SAME DISPLAYED
-  // SNAPSHOT (gold's A$ line; Bitcoin's two metal ratios as ONE sentence —
-  // fa's second ratio is a continuation of the first, and two separate
-  // bullets read as a fragment).
-  const companions: string[] = [];
-  const goldAud = byId.get('gold-aud');
-  if (id === 'gold-usd' && goldAud && goldAud.value !== null) {
-    companions.push(
-      interpolate(copy.ui.goldAudLine, {
-        value: formatIndicatorValue('gold-aud', goldAud.value, numberLocale, copy.units),
-      }),
-    );
-  }
-  const goldReading = byId.get('gold-usd');
-  const silverReading = byId.get('silver-usd');
-  const btcReading = byId.get('btc-usd');
-  if (
-    id === 'btc-usd' &&
-    btcReading?.value != null &&
-    goldReading?.value != null &&
-    goldReading.value > 0 &&
-    silverReading?.value != null &&
-    silverReading.value > 0
-  ) {
-    companions.push(
-      interpolate(copy.ui.btcCompanions, {
-        gold: formatNumber(btcReading.value / goldReading.value, numberLocale, {
-          minimumFractionDigits: 1,
-          maximumFractionDigits: 1,
-        }),
-        silver: formatNumber(btcReading.value / silverReading.value, numberLocale, {
-          maximumFractionDigits: 0,
-        }),
-      }),
-    );
-  }
-
-  // Section E — the instrument coverage notes, shown ONLY when the SERVED
-  // attribution actually is that instrument. The serve-time live merge
-  // (packages/insights/prices) rewrites sourceName to the Yahoo futures
-  // attribution when a fresher quote wins; the EOD snapshot serves
-  // gold-api XAU/XAG spot. Matching the attribution string is the card's
-  // honest way to know which instrument the number is.
-  const sourceName = reading.sourceName ?? '';
-  const servedFutures = /futures/i.test(sourceName);
-  const servedBrentBlend = id === 'brent' && !servedFutures && /BZ=F/.test(sourceName);
-
-  const hasDetails =
-    !isUnavailable &&
-    (c7 !== undefined ||
-      c30 !== undefined ||
-      c90 !== undefined ||
-      c6m !== undefined ||
-      c1y !== undefined ||
-      has52 ||
-      levelWord !== null ||
-      peak !== undefined ||
-      fromRecord !== null ||
-      ma200 !== null ||
-      companions.length > 0 ||
-      reading.sourceName !== undefined);
 
   /* ---------------------------- render ---------------------------- */
 
@@ -631,183 +402,26 @@ function PriceTile({
         <span className="sr-only">, {copy.ui.viewCard}</span>
       </button>
 
-      {/* 7. «جزئیات بیشتر» — the per-card disclosure. Keyboard + touch,
-       * state exposed (aria-expanded/aria-controls), focus stays on the
-       * trigger, the chevron is the only thing that moves. */}
-      {hasDetails ? (
-        <>
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
-            aria-controls={panelId}
-            className="insights-focusable mt-3 flex min-h-[44px] w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-text-secondary)]/60 hover:text-[var(--color-text-primary)]"
-          >
-            <span>{open ? copy.ui.lessDetails : copy.ui.moreDetails}</span>
-            <ChevronDown
-              aria-hidden
-              size={15}
-              strokeWidth={2}
-              className={`shrink-0 motion-safe:transition-transform ${open ? 'rotate-180' : ''}`}
-            />
-          </button>
-          {open ? (
-            <div
-              id={panelId}
-              className="mt-2.5 flex flex-col gap-3.5 rounded-[var(--radius-md)] bg-currena-muted/[0.06] p-3.5 text-[length:var(--type-label)] dark:bg-white/[0.05]"
-            >
-              {/* A — تغییرات قیمت: every window labelled with its own
-               * period, one «X گذشته» label family, shortest → longest. */}
-              <PanelSection title={copy.ui.sectionChanges} locale={locale}>
-                <dl className="m-0 flex flex-col gap-1.5">
-                  <DetailRow label={copy.ui.past7days}>
-                    <ChangeValue value={c7} changeKind={def.changeKind} numberLocale={numberLocale} copy={copy} na={copy.ui.na} />
-                  </DetailRow>
-                  <DetailRow label={copy.ui.change30dLabel}>
-                    <ChangeValue value={c30} changeKind={def.changeKind} numberLocale={numberLocale} copy={copy} na={copy.ui.na} />
-                  </DetailRow>
-                  <DetailRow label={copy.ui.change90dLabel}>
-                    <ChangeValue value={c90} changeKind={def.changeKind} numberLocale={numberLocale} copy={copy} na={copy.ui.na} />
-                  </DetailRow>
-                  <DetailRow label={copy.ui.stat6mChange}>
-                    <ChangeValue value={c6m} changeKind={def.changeKind} numberLocale={numberLocale} copy={copy} na={copy.ui.na} />
-                  </DetailRow>
-                  <DetailRow label={copy.ui.stat1yChange}>
-                    <ChangeValue value={c1y} changeKind={def.changeKind} numberLocale={numberLocale} copy={copy} na={copy.ui.na} />
-                  </DetailRow>
-                </dl>
-              </PanelSection>
-
-              {/* B — محدودهٔ قیمت در ۵۲ هفتهٔ گذشته: the range as the
-               * section's own display value, «۳٬۹۶۱ تا ۵٬۳۱۸ دلار» with
-               * «تا» between the endpoints, rendered in the locale's own
-               * direction (a forced LTR island is what scrambles mixed
-               * ranges). Only shown when the stored window really spans
-               * the year (price-stats' 300-day guard). */}
-              {has52 ? (
-                <PanelSection title={copy.ui.section52w} locale={locale}>
-                  <p className="m-0">
-                    <bdi
-                      dir={numberLocale === 'fa-IR' ? 'rtl' : 'ltr'}
-                      className="text-[15px] font-semibold tabular-nums leading-relaxed text-[var(--color-text-primary)]"
-                    >
-                      {formatPriceRange(id, stats!.low52!, stats!.high52!, numberLocale, copy)}
-                    </bdi>
-                  </p>
-                </PanelSection>
-              ) : null}
-
-              {/* C — سوابق تاریخی قیمت: the 10-year high, its date and
-               * its basis (daily high vs daily close) — structured parts,
-               * each isolated, flowing in the locale's own direction. */}
-              {peak !== undefined && peakParts !== null ? (
-                <PanelSection title={copy.ui.sectionRecords} locale={locale}>
-                  <dl className="m-0 flex flex-col gap-1.5">
-                    <DetailRow label={copy.ui.statRecordHigh}>
-                      <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
-                        <bdi className="font-semibold tabular-nums">
-                          {peakParts.value}
-                          {peakParts.unit !== null ? ` ${peakParts.unit}` : ''}
-                        </bdi>
-                        <span aria-hidden className="text-[var(--color-text-tertiary)]">·</span>
-                        <bdi>{formatAsOf(peak.date, locale === 'fa' ? 'fa' : 'en')}</bdi>
-                        <span className="text-[length:var(--type-caption)] font-normal text-[var(--color-text-tertiary)]">
-                          ({peak.basis === 'daily-high' ? copy.ui.peakBasisHigh : copy.ui.peakBasisClose})
-                        </span>
-                      </span>
-                    </DetailRow>
-                  </dl>
-                </PanelSection>
-              ) : null}
-
-              {/* D — جایگاه قیمت نسبت به شاخص‌های مرجع: the 10-year
-               * LEVEL (the clarified «بالا», with its level-not-direction
-               * note), the 200-day average gap, the distance below the
-               * 10-year high, and the companion ratios. */}
-              {levelWord !== null || ma200 !== null || fromRecord !== null || companions.length > 0 ? (
-                <PanelSection title={copy.ui.sectionReferences} locale={locale}>
-                  {levelWord !== null ? (
-                    <>
-                      <dl className="m-0 flex flex-col gap-1.5">
-                        <DetailRow label={copy.ui.priceLevelLabel}>
-                          <span className="font-semibold">{levelWord}</span>
-                        </DetailRow>
-                      </dl>
-                      <p className="m-0 mt-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]">
-                        {copy.ui.priceLevelNote}
-                      </p>
-                    </>
-                  ) : null}
-                  {ma200 !== null ? (
-                    <p className="m-0 mt-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
-                      <bdi>{ma200}</bdi>
-                    </p>
-                  ) : null}
-                  {fromRecord !== null ? (
-                    <p className="m-0 mt-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
-                      <bdi>{fromRecord}</bdi>
-                    </p>
-                  ) : null}
-                  {companions.length > 0 ? (
-                    <ul className="m-0 mt-1.5 flex list-none flex-col gap-1.5 p-0">
-                      {companions.map((n) => (
-                        <NoteLine key={n}>{n}</NoteLine>
-                      ))}
-                    </ul>
-                  ) : null}
-                </PanelSection>
-              ) : null}
-
-              {/* E — منبع داده و زمان به‌روزرسانی: the provider +
-               * instrument attribution (the source link), the observation
-               * date, the app's fetch time (distinct from the observation
-               * when they differ), and the honest coverage notes — the
-               * futures note ONLY when the served price IS the futures
-               * quote, the blend note for Brent's EOD series. The card
-               * FACE stays source-free — the owner's decree; the
-               * disclosure and the details panel carry the attribution. */}
-              <PanelSection title={copy.ui.sectionSource} locale={locale}>
-                {reading.sourceUrl ? (
-                  <a
-                    href={reading.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="insights-focusable inline-flex items-center gap-1 rounded-full bg-currena-muted/10 px-3 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-currena-muted/20"
-                  >
-                    {reading.sourceName}
-                    <span aria-hidden="true">↗</span>
-                    <span className="sr-only">{copy.ui.viewSource}</span>
-                  </a>
-                ) : (
-                  <p className="m-0 text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
-                    {reading.sourceName}
-                  </p>
-                )}
-                {reading.asOf ? (
-                  <p className="m-0 mt-1.5 text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
-                    <bdi>{interpolate(copy.ui.pricesAsOf, { date: formatAsOf(reading.asOf, locale) })}</bdi>
-                  </p>
-                ) : null}
-                {reading.updatedAt ? (
-                  <p className="m-0 mt-1 text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
-                    <bdi>{interpolate(copy.ui.priceFetchedAt, { time: formatUpdatedAt(reading.updatedAt, locale) })}</bdi>
-                  </p>
-                ) : null}
-                {servedFutures ? (
-                  <p className="m-0 mt-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
-                    <bdi>{copy.ui.priceFuturesNote}</bdi>
-                  </p>
-                ) : null}
-                {servedBrentBlend ? (
-                  <p className="m-0 mt-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
-                    <bdi>{copy.ui.priceBrentBlendNote}</bdi>
-                  </p>
-                ) : null}
-              </PanelSection>
-            </div>
-          ) : null}
-        </>
-      ) : null}
+      {/* 7. «جزئیات بیشتر» — opens the DETAILS SIDE PANEL (2026-10-26c,
+       * owner directive: "The more details must show up in side bar").
+       * Keyboard + touch, 44px target; the opener element carries back
+       * into the panel for focus-return on close; the panel provides the
+       * focus trap, Escape, the scrim and the responsive sheet (desktop
+       * inline-end sheet / RTL start sheet / phone bottom sheet). The
+       * panel-side affordance points toward the sheet's side. */}
+      <button
+        type="button"
+        onClick={(e) => onFocusCard(id, e.currentTarget)}
+        aria-haspopup="dialog"
+        className="insights-focusable mt-3 flex min-h-[44px] w-full cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-text-secondary)]/60 hover:text-[var(--color-text-primary)]"
+      >
+        <span>{copy.ui.moreDetails}</span>
+        {locale === 'fa' ? (
+          <PanelLeft aria-hidden size={15} strokeWidth={2} className="shrink-0" />
+        ) : (
+          <PanelRight aria-hidden size={15} strokeWidth={2} className="shrink-0" />
+        )}
+      </button>
     </article>
   );
 }
@@ -843,7 +457,7 @@ export function PricesBoard({
   /* The owner's post-deploy report (2026-10-24d): the prices block is the
    * densest strip on the page — a touch more air below it before the markets
    * section (the shared 28px page gap + this padding) so the two never read
-   * as collided, especially while a disclosure is open. */
+   * as collided. */
   return (
     <section id="insights-prices" aria-labelledby="insights-prices-title" className="scroll-mt-24 pb-3">
       <h2 id="insights-prices-title" className="type-section m-0 mb-1">
@@ -857,8 +471,8 @@ export function PricesBoard({
       </p>
       {/* Four tiles, one grid, ONE anatomy (spec default order: Gold →
        * Silver → Oil → Bitcoin — PRICE_ROWS). Default stretch so the four
-       * containers are the SAME height; each tile grows naturally when its
-       * disclosure opens (spec 02 §5: never clip to force equal heights). */}
+       * containers are the SAME height — the details no longer expand the
+       * tile (they live in the side panel now), so the grid is stable. */}
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
         {rows.map(({ id, reading }) => (
           <PriceTile
@@ -868,7 +482,6 @@ export function PricesBoard({
             copy={copy}
             locale={locale}
             numberLocale={numberLocale}
-            byId={byId}
             data={derived[id]}
             onFocusCard={onFocusCard}
           />

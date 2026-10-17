@@ -1336,7 +1336,6 @@ export const insightsCopyEn = {
     sumBtcMixed: '{asset} has fluctuated over the past seven days.',
     sumOilDrivers: 'Explaining the drivers would require supporting evidence about supply, demand, and market conditions.',
     moreDetails: 'More details',
-    lessDetails: 'Show less',
     changesLabel: 'Changes',
     change30dLabel: 'Past 30 days',
     change90dLabel: 'Past 90 days',

@@ -83,7 +83,47 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
-## CURRENT DEPLOYMENT — the balance v6 pans + the merged parallel rounds (2026-10-26c, worker 4079aed7)
+## CURRENT DEPLOYMENT — the asset cards' details sidebar (2026-10-26c, worker 6adfb632)
+
+The owner's directive — "The more details must show up in side bar" —
+is LIVE: the «جزئیات بیشتر» button opens the F5 details side panel
+(never an inline expansion), with the five sections rendering inside it
+under the card facts. Pushed as 99742c2 (rebased over the parallel
+balance-v6 round 2f9f4e6; both ride).
+
+- **Active worker**: currena-api **`6adfb632-1d28-4156-896e-dc823846feb4`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched).
+- **What it carries**: PricesBoard's disclosure deleted (the button calls
+  onFocusCard with aria-haspopup=dialog + PanelRight/PanelLeft
+  affordance), the new PriceDetails.tsx (the five sections + the shared
+  atoms + the keyed usePricePanelData on the module-cached fetch),
+  DetailsPanel rendering the sections for the four price rows + the
+  verified panel title (priceCardTitles), lessDetails retired from both
+  dictionaries + the manifest (round-52:
+  docs/QA/quirks-2026-10-26c-asset-cards-sidebar.md), the rewritten
+  13-test battery — and everything from the balance v6 + 2026-10-25b +
+  2026-10-26b rounds beneath.
+- **Chunk proof**: the fresh 99742c2 build serves `index-gB3_zV9f.js`
+  (295.29/88.82) + `Insights-DW1SDXvu.js` (634.13/151.33 — budgets
+  635/152 held) — both live on currena-api.sedanama-ir.workers.dev and
+  currena.ir.
+- **Verified live** (agent-browser, fresh profile, currena.ir): EN
+  desktop 1280 — «More details» opens the right sheet (440px flush
+  inline-end), heading "Gold price" (not the legacy "(ounce)"), the
+  five sections under the facts, focus trapped, body scroll locked,
+  Escape closes and focus RETURNS to the trigger; fa RTL — «قیمت طلا»,
+  the five Persian sections, the sheet flush LEFT (start side); mobile
+  375 fa — bottom sheet (full-width, top ≈ 97px), no horizontal
+  overflow; the four tiles stay compact (zero h4 inside the cards);
+  zero console/page errors. Evidence:
+  `docs/evidence/2026-10-26c-asset-cards-sidebar/` (harness + live
+  captures + the sandbox-mirror set).
+- **Gates on the rebased tree**: typecheck 6/6; lint 0 errors/15
+  accepted advisories; 1,521 tests green (web 549); copy:audit clean
+  (2,169 entries); build OK; budgets held.
+
+## Previous: the balance v6 pans + the merged parallel rounds (2026-10-26c, worker 4079aed7)
 
 The owner's Iteration-4 directive is LIVE: the gold balance's factor
 tiles REST ON real weighing pans hung from the beam — one connected
