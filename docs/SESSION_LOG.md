@@ -1,3 +1,78 @@
+# SESSION_LOG — The Prices Board Cards Re-drawn from the Owner's Sketch 2026-10-17
+
+Branch `main` · base `c62f3ba` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's five-point directive for the prices board — "1. Picture
+next to Unit name and price 2. Daily / Weekly / Monthly/ Quarterly
+Percentages 3. Descriptions and verdict 4. some more meta data facts and
+percentages (must be in bullet point) 5. very small text showing update
+time." — with a hand-drawn sketch and a screenshot of the current board.
+
+### 1 · the data reality check first
+The four tiles' readings already carry `change7d/change30d/change90d`
+(production-verified against /api/insights — the engine computes the 90-day
+window for every daily series, fix spec B-04), so weekly/monthly/quarterly
+come free from the feed. The feed has NO 1-day field, and the sketch's
+"more meta data facts" (6-month change, 1-year change, 52-week range) live
+only in the stored history — the same /history endpoint the sparklines
+fetch (brent 2536 / btc 1826 points, a full decade). Frontend-only change;
+API untouched.
+
+### 2 · the anatomy, rebuilt once
+`PricesBoard.tsx` rewritten to the sketch: header row = price block (big
+digits; the fa unit on its own small line UNDER the digits — beside it,
+the 4-across grid made brent's fa price wrap while gold's did not, breaking
+the alignment decree) + the name in its fixed two-line slot + the tinted
+icon box (96px mobile / 72px desktop) at the row's far end; then the FOUR
+percentage rows (labels start, values end-aligned, quiet "—"); then the
+"Description" heading row with the verdict word (price-position band, R31
+ink) at its far end above the hedged consequence line; then the fact
+bullets (derived stats, then the existing context lines as bullets); then
+the as-of line at 10px pinned with mt-auto. RTL mirrors the sketch
+automatically. The stacked-artwork face (R29r2) retires.
+
+### 3 · price-stats.ts — the derivation, with one honesty fix
+Pure module + 9 tests. R30's rules kept: history-internal numbers only,
+nearest-point within ≤3 days, absent never fabricated. NEW: the last
+stored point can no longer be its own window reference — the old hook
+could return a fabricated 0% "daily change" when nothing sat within
+tolerance; the tests caught it before the first deploy. The 52-week range
+is only NAMED when the stored window spans ≥300 days.
+
+### 4 · copy + manifest round-46
+9 new keys in both dictionaries (priceChangeDaily/Weekly/Monthly/Quarterly,
+descriptionLabel, stat6mChange, stat1yChange, stat52wRange, rangeJoin).
+days7/days30 stay for AlertCard/HeroBlock/CompactRow. QA reference:
+docs/QA/quirks-2026-10-17-prices-card-redesign.md (the owner's requirements
+mapped key by key). copy:audit clean at 2,090 entries.
+
+### 5 · gates, deploy, verification
+1,455 tests green (web 485, +9); typecheck 6/6; lint 0 errors/15
+advisories; budgets held (entry 295.15/88.76; Insights 599.38/142.60 gz,
++0.77 under the cap). Deployed currena-api `0652db45` — served chunk
+`Insights-E8NrMws9.js` sha256-identical local == production after the SW
+precache purge (the Task-17 lesson applied). agent-browser: EN desktop +
+mobile, fa RTL desktop + mobile — the sketch anatomy everywhere, 375
+scrollWidth === 375 in both locales, details panel opens/closes from the
+tile, zero page/console errors; metals conditions strip + money panel
+untouched; /api/insights → 32 readings (gold-aud honestly absent — no A$
+bullet this snapshot).
+
+### 6 · dating note
+The edge clock (Cloudflare Date header) and the machine clock agree the
+session date is 2026-10-17 — the repo's 2026-10-20/21 entries were
+future-dated by earlier sessions. This session's records use the
+edge-verified date; the changelog section is `[2026-10-17b]` (the b
+disambiguates from round-42's existing `[2026-10-17]`).
+
+Stage summary:
+- Production now: currena-api `0652db45` + currena-markets `9b5ff7e0`;
+  SITE_MODE=public; the prices board speaks the owner's sketch on mobile
+  and desktop in both locales.
+- Standing order honored: gates → deploy → production smoke → evidence →
+  push, no per-round approval.
+- Open item (unchanged): token rotation (GitHub + Cloudflare) —
+  credentials transited chat again this session.
+
 # SESSION_LOG — The Gold/Silver Outlook Speaks the Owner's Seven States 2026-10-21
 
 Branch `main` · base `20f9d9a` · runner: pnpm 10.34.5 / Node 24.21.

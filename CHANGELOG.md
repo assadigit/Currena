@@ -5,6 +5,78 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-17b] — the prices board cards re-drawn from the owner's sketch
+
+The owner's five-point directive for the four-tile prices board
+(Bitcoin / Silver / Gold / Brent): "1. Picture next to Unit name and price
+2. Daily / Weekly / Monthly/ Quarterly Percentages 3. Descriptions and
+verdict 4. some more meta data facts and percentages (must be in bullet
+point) 5. very small text showing update time." — with a hand-drawn card
+sketch (price + "Price per ounce" caption beside the artwork at the top's
+far end; four stacked percentage lines; a big "Description" heading; bullet
+rows; very small as-of).
+
+### Changed (`PricesBoard.tsx` — one rebuilt anatomy, mobile AND desktop)
+
+- **Header row: the artwork beside the unit name and price** — the big
+  digits at the start (the fa unit drops to its own small line UNDER the
+  digits so every fa tile has the same price-block height; EN keeps the
+  merged `US$4,165`), the indicator name in its fixed two-line slot, the
+  tinted `PriceIconBox` (96px mobile / 72px desktop) at the row's far
+  end. RTL mirrors the sketch automatically. The stacked-artwork face
+  (R29r2) retires.
+- **FOUR percentage rows** — daily / weekly / monthly / quarterly, one per
+  line, labels at the start and values end-aligned (they share one edge in
+  every tile), the quiet "—" when a window does not exist. Weekly /
+  monthly / quarterly come from the feed (`change7d/change30d/change90d`,
+  production-verified present on all four tiles); the DAILY row is derived
+  from the stored history.
+- **Description + verdict** — a "Description" label row whose far end
+  carries the price-position verdict word (cheap/normal/expensive, the
+  R31 status ink) above the existing hedged consequence line.
+- **The fact BULLETS** (`role="list"`, `data-price-facts`) — the derived
+  stats first (6-month change, 1-year change, 52-week range), then the
+  tile's context lines (the futures note, gold's A$ companion, Bitcoin's
+  ratios, the 200-day gap, the record distance). A fact that cannot be
+  measured stays OFF the card; "as of" drops to 10px tertiary ink pinned
+  with `mt-auto` so the four footers align.
+- **New `price-stats.ts`** — the client-side derivation module with the
+  R30 honesty rules tightened: every number comes from the stored history
+  ALONE; a window's reference is the nearest stored point within ≤3 days
+  (a sparse series yields absent, never a stretched number); the last
+  stored point can no longer be its own reference (the old derivation
+  could fabricate a 0% change out of a missing window — caught by the new
+  tests); the "52-week range" is only NAMED when the window really spans
+  ≥300 days; zero baselines yield absent, never Infinity. +9 tests.
+- **Copy** — 9 new keys in both dictionaries (`priceChangeDaily/Weekly/
+  Monthly/Quarterly`, `descriptionLabel`, `stat6mChange`, `stat1yChange`,
+  `stat52wRange`, `rangeJoin`); `days7`/`days30` untouched (AlertCard,
+  HeroBlock and CompactRow still speak them). Manifest round-46: 9 NEW
+  entries referenced to `docs/QA/quirks-2026-10-17-prices-card-redesign.md`.
+  No data/scoring/API change; the metals analysis chips (Tasks 15–17) and
+  the money panel untouched.
+
+- Gates: copy:audit clean (2,090 entries); full workspace tests 1,455
+  green (web 485, +9 price-stats); typecheck 6/6; lint 0 errors/15
+  accepted advisories; bundle budgets held — entry 295.15/88.76 kB gz;
+  Insights lazy 599.38/142.60 gz (+2.78 kB raw, +0.77 gz under the cap).
+- Deployed currena-api `0652db45-3fc2-418f-87c2-bb06caa51e5c` (SITE_MODE=
+  public untouched; currena-markets untouched `9b5ff7e0`).
+- Production browser-verified (agent-browser, SW precache purged first —
+  the Task-17 lesson): served chunk `Insights-E8NrMws9.js` byte-identical
+  local == production (sha256 `f3a0d27c…`); EN desktop — the sketch
+  anatomy on all four tiles, gold rows `Daily −0.13% / Weekly −1.22% /
+  Monthly −5.08% / Quarterly +3.63%`, 6 fact bullets incl. `52-week
+  range: US$3,961 – US$5,318`, as-of 10px; fa RTL — icon mirrored to the
+  top-left, unit `دلار آمریکا` under the digits, «محدودهٔ ۵۲ هفته: ۳٬۹۶۱
+  تا ۵٬۳۱۸ دلار آمریکا», verdict «بالا» red at the توضیحات heading's end;
+  mobile 375 scrollWidth === 375 in BOTH locales (icon 96px, same
+  anatomy); clicking a tile opens/closes the details panel; zero
+  page/console errors; `/api/insights` → 32 readings (gold-aud honestly
+  absent — no A$ bullet this snapshot); the metals conditions strip
+  untouched.
+- Evidence: `docs/evidence/2026-10-17-prices-card-redesign/`.
+
 ## [2026-10-21] — the gold/silver outlook speaks the owner's seven states (the EN/fa drift bug)
 
 The owner's bug report: for gold and silver the verdict slot said EN

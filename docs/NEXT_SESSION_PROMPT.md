@@ -1,7 +1,49 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-21 (the owner's EN/fa drift bug + "Gold Market
-Outlook — Complete State List") — DONE: the metals' verdict slot speaks
+Hand-off date: 2026-10-17 (edge-verified; see the dating note) — the
+owner's prices-board redesign — DONE: the four price cards (Bitcoin /
+Silver / Gold / Brent) speak the owner's five-point sketch: "1. Picture
+next to Unit name and price 2. Daily / Weekly / Monthly/ Quarterly
+Percentages 3. Descriptions and verdict 4. some more meta data facts and
+percentages (must be in bullet point) 5. very small text showing update
+time." One rebuilt PricesBoard anatomy, mobile AND desktop, RTL-mirrored:
+the tinted artwork sits BESIDE the big digits + name (fa's unit drops to
+its own small line UNDER the digits — beside it brent's fa price wrapped
+while gold's did not, breaking the alignment decree); FOUR percentage
+rows (daily/weekly/monthly/quarterly — the feed's change7d/30d/90d cover
+three, the daily row derives); a "Description" heading row with the
+price-position verdict word at its end; fact bullets (6-month change,
+1-year change, 52-week range via the new price-stats.ts — history-
+internal numbers, ≤3-day nearest-point rule, the last point can no
+longer be its own reference (the old hook could fabricate a 0% change),
+≥300-day span gate for the "52-week" name — then the existing context
+lines as bullets); the as-of line at 10px pinned with mt-auto. 9 new
+copy keys both locales; manifest round-46 (9 NEW →
+docs/QA/quirks-2026-10-17-prices-card-redesign.md); days7/days30
+untouched (AlertCard/HeroBlock/CompactRow still speak them). UI-only; no
+data/scoring/API change; the metals analysis chips (Tasks 15–17) and the
+money panel untouched. Gates green (1,455 tests, +9 price-stats;
+typecheck 6/6; lint 0 errors/15 advisories; budgets held — Insights lazy
+599.38/142.60 gz, +0.77 under the cap). Deployed currena-api
+`0652db45-3fc2-418f-87c2-bb06caa51e5c`; production browser-verified with
+agent-browser (PURGE the PWA precache before re-verifying a new deploy —
+the stale service worker silently serves the old chunk and fakes the
+first check; verify the loaded chunk hash, not the deploy log): served
+chunk Insights-E8NrMws9.js sha256-identical (f3a0d27c…); EN + fa ×
+desktop + mobile all render the sketch; 375 scrollWidth === 375 both
+locales; details panel opens/closes from a tile; zero errors;
+/api/insights → 32 readings (gold-aud honestly absent this snapshot — no
+A$ bullet). See CHANGELOG 2026-10-17b +
+docs/QA/quirks-2026-10-17-prices-card-redesign.md +
+docs/evidence/2026-10-17-prices-card-redesign/.
+
+DATING NOTE: the Cloudflare edge Date header and the machine clock agree
+the session date is 2026-10-17 — the repo's 2026-10-20/21 entries were
+future-dated by earlier sessions. Keep appending in file order; the
+changelog disambiguates same-day sections with letter suffixes.
+
+Prior state (2026-10-21): the owner's EN/fa drift bug + "Gold Market
+Outlook — Complete State List" — DONE: the metals' verdict slot speaks
 the owner's SEVEN states (Strong Bullish / Bullish / Neutral /
 Range-Bound / Bearish / Strong Bearish / Mixed Signals) with the owner's
 own bilingual sentences. `outlookOf` (signals/verdict.tsx) maps the
@@ -16,13 +58,12 @@ full-width chip line (the header slot staircase-wrapped at 375px on the
 first deploy). Gates green (1,446 tests, +15; typecheck 6/6; lint 0
 errors/15 advisories; budgets held — Insights lazy 596.60/141.83,
 +0.53 kB gz). Deployed currena-api `d0d28c3f`; production verified with
-agent-browser (PURGE the PWA precache before re-verifying a new deploy —
-the stale service worker silently served the old chunk and faked the
-first check; verify the loaded chunk hash, not the deploy log). Live
-bearish on both metals; EN + fa render the same state; collapsed
-"Outlook: Bearish"/«چشم‌انداز: نزولی»; 375 clean; zero errors. See
-CHANGELOG 2026-10-21 + docs/QA/quirks-2026-10-21-outlook-states.md +
+agent-browser. Live bearish on both metals; EN + fa render the same
+state; collapsed "Outlook: Bearish"/«چشم‌انداز: نزولی»; 375 clean; zero
+errors. See CHANGELOG 2026-10-21 +
+docs/QA/quirks-2026-10-21-outlook-states.md +
 docs/evidence/2026-10-21-outlook-states/.
+Prior state (2026-10-20c): the owner's "Add 10 year View of the gold and
 Prior state (2026-10-20c): the owner's "Add 10 year View of the gold and
 silver price as well." — DONE: the metals' Estimation-chip trend charts
 offer the decade. The shared TrendPanel gained an opt-in `ranges` prop

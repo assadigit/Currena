@@ -1592,3 +1592,30 @@ the petrol/transport money row is gone while employment rate appeared.
   نزولی»; 375 scrollWidth === 375 both locales; prices board untouched;
   zero page/console errors.
 - **Evidence**: `docs/evidence/2026-10-21-outlook-states/`.
+
+## Session record — 2026-10-17b: the prices board cards re-drawn from the owner's sketch
+
+- **What**: the owner's five-point directive for the four-tile prices board
+  (picture beside unit name and price; daily/weekly/monthly/quarterly
+  percentages; descriptions and verdict; meta facts + percentages as bullet
+  points; very small update-time text), shipped as one rebuilt PricesBoard
+  anatomy + the new price-stats.ts derivation module (1-day change, 6-month
+  change, 1-year change, 52-week range — history-internal, ≤3-day
+  nearest-point rule, the last point can no longer be its own reference,
+  ≥300-day span gate for the "52-week" name). 9 new copy keys both locales;
+  manifest round-46 (9 NEW → docs/QA/quirks-2026-10-17-prices-card-redesign.md).
+  No data/scoring/API change.
+- **Gates pre-deploy**: copy:audit clean (2,090 entries); full workspace
+  tests 1,455 (web 485, +9); typecheck 6/6; lint 0 errors/15 advisories;
+  budgets held (entry 295.15/88.76 gz; Insights lazy 599.38/142.60 gz).
+- **Deployed**: currena-api `0652db45-3fc2-418f-87c2-bb06caa51e5c`
+  (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`).
+- **Verified live** (agent-browser, SW precache purged first): served chunk
+  `Insights-E8NrMws9.js` sha256-identical local == production; EN + fa ×
+  desktop + mobile all render the sketch anatomy (icon beside price+name,
+  4 change rows, Description+verdict, fact bullets, 10px as-of); fa unit
+  rides UNDER the digits (beside it wrapped brent's fa price at 4-across);
+  375 scrollWidth === 375 both locales; details panel opens/closes from a
+  tile; zero page/console errors; /api/insights → 32 readings; metals
+  conditions strip (Tasks 15–17) + money panel untouched.
+- **Evidence**: `docs/evidence/2026-10-17-prices-card-redesign/`.
