@@ -70,7 +70,7 @@ import {
   type LoadState,
 } from './insights-sections/InsightsStatusBlocks';
 import { SectionLane } from './insights-sections/SectionLane';
-import { UsSharesAudBox, UsSharesNotesBox } from './insights-sections/UsSharesNotes';
+import { UsSharesAudBox } from './insights-sections/UsSharesNotes';
 import {
   useWorldCurrenciesSection,
   useWorldMarketsSection,
@@ -403,16 +403,14 @@ export function Insights() {
             <WorldMarkets state={marketsState} copy={copy} locale={locale} numberLocale={numberLocale} />
           )}
 
-          {/* Step 3 L2-03 + §7.1 (runbook Phase 4): the US shares in AUD view
-           * (same-date arithmetic, refused when the feeds mismatch) and the
-           * collapsed "Know before you buy US shares" box (only the
-           * exchange-rate and fees lines — no approved text exists).
+          {/* Step 3 L2-03 (runbook Phase 4): the US shares in AUD view
+           * (same-date arithmetic, refused when the feeds mismatch).
            * PUBLIC MODE: the AUD view rides the hidden world feeds — hidden
-           * with them; the copy-only notes box stays. */}
+           * with them. (The §7.1 "Know before you buy US shares" notes box
+           * was removed at the owner's direct request, 2026-10-20.) */}
           {worldFeedsEnabled && (
             <UsSharesAudBox marketsState={marketsState} fxState={fxState} copy={copy} numberLocale={numberLocale} />
           )}
-          <UsSharesNotesBox copy={copy} />
 
           {/* World currencies (insights-world-currencies-spec.md §9.2):
            * right after the world stock markets — the two sections explain

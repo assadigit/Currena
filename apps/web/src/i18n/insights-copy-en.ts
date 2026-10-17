@@ -1504,14 +1504,6 @@ export const insightsCopyEn = {
     exportColDate: 'Date',
     exportRuleVersion: 'Rule version: {v}',
     exportVerdictCounts: '{warning} of {voting} in warning',
-    // Step 3 §7.1: "Know before you buy US shares" — the collapsed info
-    // box. ONLY the exchange-rate and fees lines ship (no approved text
-    // exists in docs/insights/approved-text/); the professional review
-    // gates anything more.
-    usSharesBoxTitle: 'Know before you buy US shares',
-    usSharesFxLine: 'Returns are affected by the AUD/USD exchange rate.',
-    usSharesFeesLine: 'Currency conversion and brokerage fees apply.',
-    usSharesDisclaimer: 'General information only. Not financial or tax advice.',
     // Step 3 L2-02: the price row's 200-day average line.
     ma200Above: '{pct} above its 200-day average',
     ma200Below: '{pct} below its 200-day average',
