@@ -164,6 +164,13 @@ change; every working calculation preserved.
   only — PricesBoard and the copy keys are untouched there, and the
   budget script carries both rounds' justifications (627 by v5 → 630
   by this round).
+- Deployed: pushed as db31745 → currena-api worker
+  ead002b6-3c9e-4e9a-aae9-4535bb462f9f; re-verified LIVE on both
+  currena.ir and the workers.dev domain (Insights-BMyE-MXL.js served;
+  en + fa desktop and mobile 375: header/one-line price/six
+  sections/range/record/conditional notes, no overflow, zero errors) —
+  evidence `docs/evidence/2026-10-25b-asset-cards-polish/LIVE-*.png`,
+  deploy record in `docs/DEPLOY.md` §CURRENT DEPLOYMENT.
 
 ## [2026-10-25] — the gold balance becomes the abstract editorial mark «برآیند عوامل مؤثر بر قیمت طلا» (owner Iteration-2 directive)
 

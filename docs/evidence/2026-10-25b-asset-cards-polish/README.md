@@ -103,3 +103,22 @@ strictly preserving the card's scope and every working calculation.
 | `after/AFTER-desktop-1280-fa-expanded.png` | fa sections, «۳٬۹۶۱ تا ۵٬۳۱۸ دلار», «بیشترین قیمت ۱۰ سال اخیر» |
 | `after/AFTER-mobile-375-fa-expanded.png` | mobile — panel inside the tile, no overflow |
 | `after/AFTER-tablet-768-en-dark-expanded.png` | tablet 2-col + dark mode |
+
+
+## Live verification (post-deploy, worker ead002b6)
+
+Deployed as worker `ead002b6-3c9e-4e9a-aae9-4535bb462f9f` (pushed as
+`db31745`, rebased over the balance-v5 round). Both
+`currena-api.sedanama-ir.workers.dev` and `currena.ir` serve the
+deploy's `Insights-BMyE-MXL.js`.
+
+| File | State |
+|---|---|
+| `LIVE-desktop-1280-fa-expanded.png` | LIVE fa — the six sections, «۳٬۹۶۱ تا ۵٬۳۱۸ دلار», «بیشترین قیمت ۱۰ سال اخیر», fetch-time line |
+| `LIVE-desktop-1280-en-collapsed.png` | LIVE en — the polished cards |
+| `LIVE-mobile-375-en-collapsed.png` | LIVE mobile — "Gold price"/"per troy ounce", "US$ 4,166" one line, no overflow |
+
+Live DOM probes: title/subtitle/one-line price in both locales; the
+fa range reads exactly «۳٬۹۶۱ تا ۵٬۳۱۸ دلار»; gold's XAU spot
+attribution carries NO futures note; scrollWidth == viewport at 375;
+zero console errors.
