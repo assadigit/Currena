@@ -10,7 +10,9 @@
  *      quarterly (the feed carries 7d/30d/90d on every price reading; the
  *      daily row and the fact bullets derive from the stored history —
  *      price-stats.ts, the R30 honesty rules: nearest-point ≤3 days,
- *      history-internal numbers, absent never fabricated);
+ *      history-internal numbers, absent never fabricated); the SIGNED
+ *      values speak the owner's status inks (2026-10-17: negative red,
+ *      positive green, zero/absent neutral);
  *   3. the description and the verdict — a "Description" label row whose
  *      far end carries the price-position verdict word (its status ink:
  *      expensive = the alert red, cheap = the supportive green — R31
@@ -43,6 +45,7 @@ import {
   PRICE_ROWS,
   bandToneClass,
   bandWordsOf,
+  changeToneClass,
   consequenceLine,
   definitionFor,
   formatChange,
@@ -138,12 +141,12 @@ function formatPriceRange(
 }
 
 /** One bullet row: marker + "label: value" (value isolated dir="ltr"). */
-function FactItem({ label, value }: { label: string; value: ReactNode }) {
+function FactItem({ label, value, tone }: { label: string; value: ReactNode; tone?: string }) {
   return (
     <span role="listitem" className="flex items-baseline gap-1.5" data-price-fact>
       <span aria-hidden className="select-none text-[var(--color-text-tertiary)]">•</span>
       <span className="min-w-0">
-        {label}: <bdi dir="ltr" className="font-semibold tabular-nums">{value}</bdi>
+        {label}: <bdi dir="ltr" className={`font-semibold tabular-nums ${tone ?? ''}`}>{value}</bdi>
       </span>
     </span>
   );
@@ -332,8 +335,10 @@ export function PricesBoard({
                       )}
                       {/* Plain name — no tickers, no series ids (R14). The
                        * two-line min-height keeps the rows under it aligned
-                       * across tiles even when a neighbour's name wraps. */}
-                      <span className="min-h-[2.75em] text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-secondary)]">
+                       * across tiles even when a neighbour's name wraps.
+                       * 2026-10-17 owner: the tile's title reads BIG, bold
+                       * and clear (primary ink), not a quiet caption. */}
+                      <span className="min-h-[2.75em] text-lg font-bold leading-snug text-[var(--color-text-primary)]">
                         {entry.name}
                       </span>
                     </span>
@@ -347,7 +352,14 @@ export function PricesBoard({
                     {changeRows.map(({ label, value }) => (
                       <span key={label} className="flex items-baseline justify-between gap-2">
                         <span className="opacity-80">{label}</span>
-                        <bdi dir="ltr" className="font-semibold tabular-nums text-[var(--color-text-primary)]">
+                        <bdi
+                          dir="ltr"
+                          className={`font-semibold tabular-nums ${
+                            value !== undefined
+                              ? changeToneClass(value) || 'text-[var(--color-text-primary)]'
+                              : 'text-[var(--color-text-secondary)]'
+                          }`}
+                        >
                           {value !== undefined ? formatChange(value, def.changeKind, numberLocale, copy.units) : '—'}
                         </bdi>
                       </span>
@@ -396,12 +408,14 @@ export function PricesBoard({
                         <FactItem
                           label={copy.ui.stat6mChange}
                           value={formatChange(c6m, def.changeKind, numberLocale, copy.units)}
+                          tone={changeToneClass(c6m)}
                         />
                       ) : null}
                       {c1y !== undefined ? (
                         <FactItem
                           label={copy.ui.stat1yChange}
                           value={formatChange(c1y, def.changeKind, numberLocale, copy.units)}
+                          tone={changeToneClass(c1y)}
                         />
                       ) : null}
                       {has52 ? (

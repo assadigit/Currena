@@ -2574,7 +2574,11 @@ export const insightsCopyEn = {
       mixed: 'mixed',
       'mostly-unsupportive': 'mostly unsupportive',
     },
-    metals: { gold: 'gold', silver: 'silver' },
+    // 2026-10-17 (owner, "comply with capital letters — write Silver"):
+    // the metal's name is a TITLE everywhere it leads a card, a row or an
+    // export column — first letter capitalized. fa is unaffected (طلا/نقره
+    // carry no case).
+    metals: { gold: 'Gold', silver: 'Silver' },
     // 2026-10-21 (owner, "Gold Market Outlook — Complete State List"): the
     // strip speaks SEVEN outlook states, each with its own authored
     // sentence — the old verdictUp/Down/Flat words are retired because EN

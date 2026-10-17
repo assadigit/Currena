@@ -1,13 +1,17 @@
 /**
- * HeroBlock — the page's first screen (round-2 Blocks R1/R2/R3/R4 + H5/N2).
+ * HeroBlock — the page's first screen (round-2 Blocks R1/R2/R3/R4 + H5).
  *
  * Top to bottom: the two verdict blocks (GLOBAL first — decision D7, the old
  * Australia-first swap setting is retired), ONE biggest-move CARD (R4 — the
  * line always carries its "unusually large for this indicator" reason; the
- * owner's 11 Oct follow-up puts it back in a proper container), the
+ * owner's 11 Oct follow-up puts it back in a proper container), and the
  * what-changed one-liner (H5 — the hero no longer names the next scheduled
- * event; "Next up" lives once, below the indicators, R16), and the single
- * disclaimer line (N2).
+ * event; "Next up" lives once, below the indicators, R16).
+ *
+ * N2 retired (owner, 2026-10-17): the short disclaimer line + the
+ * «درباره این داده‌ها ↧» jump button no longer sit under the hero — the
+ * page-bottom About section carries the full text and the global footer
+ * already carries the app-wide non-advice disclaimer.
  */
 
 import { useMemo } from 'react';
@@ -16,7 +20,7 @@ import { formatNumber } from '@currena/core';
 import { TrendingUp } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { bandWordsOf, bigMovers, consequenceLine, formatChange } from './config';
+import { bandWordsOf, bigMovers, changeToneClass, consequenceLine, formatChangeParts } from './config';
 import { VerdictBlock, type MarketsAlert, type FxAlert, type SectionIndicatorState } from './VerdictMeter';
 
 function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
@@ -75,6 +79,15 @@ export function HeroBlock({
 
   const moverEntry = mover ? copy.indicators[mover.id] : null;
   const moverReading = mover ? readings.find((r) => r.id === mover.id) : null;
+  // The mover's change in PARTS: the signed number rides its own ltr island;
+  // a WORD unit («واحد درصد» / 'pts') rides OUTSIDE as its own element so the
+  // RTL line reads «+۰٫۲۵ واحد درصد» and never the scattered
+  // «واحد درصد … +۰٫۲۵» the owner reported (2026-10-17).
+  const moverChange =
+    mover && moverReading
+      ? formatChangeParts(mover.change30d, mover.changeKind, numberLocale, copy.units)
+      : null;
+  const moverTone = mover ? changeToneClass(mover.change30d) : '';
 
   return (
     <section aria-label={copy.ui.heroTitle} className="m-0">
@@ -116,8 +129,10 @@ export function HeroBlock({
       {/* R4 → owner follow-up (11 Oct) → round 24 (roast #7): the biggest
        * move is the page's FOCAL MOMENT — it now carries the brand gold
        * (the one accent): a gold ring on the card and a gold kicker icon.
-       * The 30-day label sits OUTSIDE the ltr bdi so it never collides with
-       * the value ("نقطه۳۰ روز" squish). */}
+       * The signed number keeps its own ltr island; the WORD unit (fa
+       * «واحد درصد») rides OUTSIDE the island as its own span so the RTL
+       * line never scatters it (2026-10-17 owner glitch report). The value
+       * speaks the owner's sign inks: positive green, negative red. */}
       {mover && moverReading && moverEntry ? (
         <div
           className="mt-3 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-accent-gold)]/45"
@@ -135,9 +150,14 @@ export function HeroBlock({
             >
               {moverEntry.name}
             </button>
-            <bdi dir="ltr" className="type-number shrink-0 font-bold tabular-nums text-[var(--color-text-primary)]">
-              {formatChange(mover.change30d, mover.changeKind, numberLocale, copy.units)}
+            <bdi dir="ltr" className={`type-number shrink-0 font-bold tabular-nums ${moverTone || 'text-[var(--color-text-primary)]'}`}>
+              {moverChange!.value}
             </bdi>
+            {moverChange!.unit !== null ? (
+              <span className="shrink-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)]">
+                {moverChange!.unit}
+              </span>
+            ) : null}
             <span className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">{copy.ui.days30}</span>
             <span>{copy.ui.bigMoverReason}</span>
             <span className="sr-only">{consequenceLine(moverReading, moverEntry, false, bandWordsOf(copy))}</span>
@@ -150,17 +170,10 @@ export function HeroBlock({
         <bdi>{changedLine}</bdi>
       </p>
 
-      {/* N2: ONE short disclaimer line — links to the full text below. */}
-      <div role="note" className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{copy.ui.disclaimerBar}</span>
-        <button
-          type="button"
-          onClick={onJumpAbout}
-          className="insights-focusable -my-1.5 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
-        >
-          {copy.ui.aboutTitle} ↧
-        </button>
-      </div>
+      {/* N2 retired (owner, 2026-10-17): the short disclaimer + the
+       * about-jump button no longer live under the hero. The full text is
+       * the page-bottom About section; the global footer carries the
+       * app-wide non-advice disclaimer. */}
     </section>
   );
 }

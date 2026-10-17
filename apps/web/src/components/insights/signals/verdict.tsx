@@ -298,10 +298,13 @@ export function VerdictStrip({
             data-verdict-direction={verdict ?? 'none'}
             className="flex min-w-0 flex-1 flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)]"
           >
-            {/* Header: boxed artwork · name · price (lighter). */}
+            {/* Header: boxed artwork · name · price (lighter).
+             * 2026-10-17 owner: the metal's name is the card's TITLE —
+             * much larger than a caption («نقره» / "Silver" at 20px bold),
+             * the price stays the lighter, quieter end of the row. */}
             <div className="flex items-center gap-3">
               <MetalIconBox metal={reading.metal} />
-              <span className="min-w-0 flex-1 text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-primary)]">
+              <span className="min-w-0 flex-1 text-xl font-bold leading-snug text-[var(--color-text-primary)]">
                 {s.metals[reading.metal]}
               </span>
               {price !== null ? (

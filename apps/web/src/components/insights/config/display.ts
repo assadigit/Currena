@@ -220,9 +220,36 @@ export function formatReadingValue(
   return formatIndicatorValue(reading.id, reading.value, numberLocale, units, bounds);
 }
 
-/** Signed 7/30-day change rendering ('+0.62%' / '+۰٫۱۱ نقطه'). Render inside dir="ltr".
+/** Signed change rendering, in PARTS: the isolated signed number plus the
+ * WORD-like unit ('pts' / «واحد درصد») when the unit is a word. A percent
+ * binds tight and rides INSIDE the number island ('+0.62%'), a word unit
+ * rides OUTSIDE as its own element — so an RTL page can render
+ * «+۰٫۲۵» right next to «واحد درصد» instead of an ltr bdi visually
+ * scattering it into «واحد درصد … +۰٫۲۵» (the 2026-10-17 hero glitch).
  * Step-1 audit item C5: `scale` lets percentage-point changes of fraction-
  * valued series (govt-interest-revenue) render in their displayed units. */
+export function formatChangeParts(
+  change: number,
+  changeKind: 'pct' | 'points',
+  numberLocale: 'en-US' | 'fa-IR',
+  units: UnitLabels,
+  scale = 1,
+): { value: string; unit: string | null } {
+  const num = formatNumber(Math.abs(change) * scale, numberLocale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  const sign = change > 0 ? '+' : change < 0 ? '−' : '';
+  // Percent binds tight ('+0.62%'); word-like units take a space ('+0.11 pts').
+  return changeKind === 'pct'
+    ? { value: `${sign}${num}${units.percent}`, unit: null }
+    : { value: `${sign}${num}`, unit: units.points };
+}
+
+/** Signed 7/30-day change rendering ('+0.62%' / '+۰٫۱۱ نقطه'). Render the
+ * returned string inside dir="ltr" ONLY when it is a pure number island
+ * (percent); word-unit strings must be split via formatChangeParts so the
+ * RTL word never lands inside the ltr bdi. */
 export function formatChange(
   change: number,
   changeKind: 'pct' | 'points',
@@ -230,14 +257,19 @@ export function formatChange(
   units: UnitLabels,
   scale = 1,
 ): string {
-  const num = formatNumber(Math.abs(change) * scale, numberLocale, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-  const sign = change > 0 ? '+' : change < 0 ? '−' : '';
-  const unit = changeKind === 'pct' ? units.percent : units.points;
-  // Percent binds tight ('+0.62%'); word-like units take a space ('+0.11 pts').
-  return changeKind === 'pct' ? `${sign}${num}${unit}` : `${sign}${num} ${unit}`;
+  const parts = formatChangeParts(change, changeKind, numberLocale, units, scale);
+  return parts.unit === null ? parts.value : `${parts.value} ${parts.unit}`;
+}
+
+/** Owner convention (2026-10-17): signed changes speak in status ink —
+ * positive green, negative red, zero/absent stays neutral. The tokens are
+ * the owner palette's contrast-documented pair (Carbon Green 50 / Red 60
+ * with their dark-surface siblings). */
+export function changeToneClass(change: number | undefined | null): string {
+  if (change === undefined || change === null || !Number.isFinite(change)) return '';
+  if (change > 0) return 'text-[var(--color-status-normal)]';
+  if (change < 0) return 'text-[var(--color-status-alert)]';
+  return '';
 }
 
 /** The display scale of one indicator's changes (fraction series ×100). */

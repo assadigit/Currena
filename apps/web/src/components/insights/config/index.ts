@@ -65,6 +65,8 @@ export {
   formatIndicatorValue,
   formatReadingValue,
   formatChange,
+  formatChangeParts,
+  changeToneClass,
   changeScaleOf,
 } from './display';
 export type {
