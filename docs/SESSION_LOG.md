@@ -1,3 +1,55 @@
+# SESSION_LOG — Verdict Chips Redrawn as Analysis Cards 2026-10-20b
+
+Branch `main` · base `0158630` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's drawn UI for the gold/silver "Conditions right now"
+chips — boxed artwork corner, name + verdict, the price in a LIGHTER ink
+("the price is already mentioned once in upper section. the emphasis must
+be on the TREND, not the price necessarily"), ONE big chart filling the
+card — "DO THE SAME FOR MOBILE VIEW."
+
+### 1 · the redesign (UI-only, data untouched)
+**What:** `signals/verdict.tsx` — the chip anatomy rebuilt: NEW
+`MetalIconBox` (the 96/128px bare artwork → a small tinted corner box
+56/64px; gold keeps the brand-gold tint, silver the soft tint — the price
+tiles' language); header row = icon box · name (bold primary) + verdict
+word with its direction artwork (verdict ink) · the current price at the
+far end in the MUTED secondary ink; the chart IS the body —
+`MetalTrendChart` gains `plotHeightClass` and opens h-40 mobile / h-52
+desktop (was h-20); the side-split (`sm:w-40`, `sm:border-s`,
+`min-h-[136px]`) deleted → ONE anatomy for mobile AND desktop; range
+chips + delta unchanged; the verdict word's floored two-line slot keeps
+the round-34 alignment rule. `signals/MergedCard.tsx` computes each
+metal's display price from the SAME snapshot readings and passes
+`prices={{ gold, silver }}` (honest absence → nothing rendered). No copy
+changes (no new strings), no data/scoring change.
+**Detour:** the lint gate blew up to 227 errors — the PREVIOUS round's
+evidence capture `prod-Insights-chunk.js` (a minified bundle in
+docs/evidence/) was being ESLinted; renamed inert
+`prod-Insights-chunk.js.txt` (sha256 recorded in its README) → lint back
+to 0 errors/15 advisories. Lesson: never commit `.js` captures into the
+linted tree.
+
+### 2 · gates + deploy + production browser verify
+**What:** gates all green — copy:audit clean; workspace tests 1,431
+(core 191 · scraper 67 · insights 462 · markets 13 · api 237 · web 461);
+typecheck all; lint 0 errors/15 advisories; budgets held (entry
+295.15/88.76 gz; Insights lazy 593.51/141.27 gz, +0.9 kB raw). Deployed
+currena-api `757cb15b-45ae-4a61-8f4a-d808a515968d` (SITE_MODE=public
+untouched; currena-markets untouched `9b5ff7e0`). Production
+browser-verified (agent-browser): EN desktop — both chips render, plot
+**208px** (was 80), header prices "US$4,165"/"US$57.27" muted at the far
+end; EN mobile 375 — identical anatomy, scrollWidth 375 (no overflow);
+fa RTL — icon box at the start (right), the verdict sentence in red
+beside it, «۴٬۱۶۵ دلار آمریکا» muted at the end (left), big chart with
+Jalali ticks + همه‌ها/یک سال/پنج سال + delta; prices board above
+untouched (4 tiles + 4 icons); zero page/console errors.
+**Evidence:** `docs/evidence/2026-10-20-verdict-chip-redesign/`
+(fa/EN × desktop/mobile screenshots + measurements.txt + README).
+
+Session closed: production = currena-api `757cb15b` + currena-markets
+`9b5ff7e0`. **Token rotation still outstanding** (owner-side; tokens
+transited chat again this session).
+
 # SESSION_LOG — "Know before you buy US shares" Box Removed 2026-10-20
 
 Branch `main` · base `326dc42` · runner: pnpm 10.34.5 / Node 24.21.

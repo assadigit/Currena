@@ -1,16 +1,25 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-20 (the owner pasted the exact rendered
-`<details>` «پیش از خرید سهام آمریکا بدانید» box and said "Remove this
-entirely.") — DONE: `UsSharesNotesBox` deleted (component + render +
-import; `UsSharesAudBox` untouched), the four `usShares*` copy keys
-retired from both dictionaries, their four manifest entries pruned.
-Gates green (copy:audit clean; web 461/461 + full workspace; typecheck
-6/6; lint 0 errors; budgets held — Insights lazy SHRANK to 592.61/
-141.14 gz). Deployed currena-api `e6d18811` from main; production
-verified (served chunk byte-identical, 0 occurrences of the box copy;
-/api/insights → 32 readings, all four price tiles present). See
-CHANGELOG 2026-10-20 + docs/evidence/2026-10-20-remove-us-shares-notes/.
+Hand-off date: 2026-10-20b (the owner's drawn UI for the gold/silver
+"Conditions right now" chips) — DONE: the chips are analysis cards now —
+header row (boxed artwork 56/64px · name + verdict · the current price in
+the MUTED secondary ink at the far end) over ONE BIG trend chart (h-40
+mobile / h-52 desktop, was h-20); the artwork-column side split is gone →
+ONE anatomy for mobile AND desktop ("do the same for mobile view").
+MergedCard passes the metals' display prices from the same snapshot
+readings. No copy, no data change. Gates green (1,431 tests; lint 0
+errors after renaming the prior round's minified evidence capture
+prod-Insights-chunk.js → .js.txt — ESLint was linting it; budgets held,
+Insights lazy 593.51/141.27). Deployed currena-api `757cb15b`;
+production browser-verified (EN desktop plot 208px + muted header
+prices; mobile 375 identical, no overflow; fa RTL mirrors the sketch;
+zero errors). See CHANGELOG 2026-10-20b +
+docs/evidence/2026-10-20-verdict-chip-redesign/.
+Prior state (2026-10-20): the "Know before you buy US shares" <details>
+box removed entirely at the owner's direct request (UsSharesNotesBox +
+render + import gone; the four usShares* copy keys retired; manifest
+pruned; deployed `e6d18811`; production verified 0 occurrences, prices
+board intact).
 Prior state (2026-10-19f): the SPARKLINE HONESTY round — the owner's
 screenshot report on the USD→IRT converter sparkline ("irregular …
 like a placeholder or buggy") fixed in three honest layers (record

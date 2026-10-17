@@ -1515,3 +1515,26 @@ the petrol/transport money row is gone while employment rate appeared.
   → 32 readings, all four price tiles (`brent · gold-usd · silver-usd ·
   btc-usd`) present — the prices board and sparkline fixes untouched.
 - **Evidence**: `docs/evidence/2026-10-20-remove-us-shares-notes/`.
+
+## Session record — 2026-10-20b the gold/silver verdict chips become analysis cards (the owner's sketch)
+
+- **Deployed**: currena-api **`757cb15b-45ae-4a61-8f4a-d808a515968d`**
+  (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`).
+- **Change**: the "Conditions right now" chips redrawn per the owner's
+  sketch — header row (boxed artwork 56/64px · name + verdict · the
+  current price in the MUTED secondary ink) over ONE BIG trend chart
+  (h-40 mobile / h-52 desktop, was h-20); the artwork-column side split
+  is gone — one anatomy for mobile AND desktop. MergedCard passes the
+  metals' display prices from the same snapshot readings. No copy, no
+  data change.
+- **Gates pre-deploy**: copy:audit clean; workspace tests 1,431 green;
+  typecheck all; lint 0 errors / 15 accepted advisories (after renaming
+  the previous round's minified evidence capture to `.js.txt` — ESLint
+  was linting it); budgets held (entry 295.15/88.76; Insights lazy
+  593.51/141.27, +0.9 kB raw).
+- **Verified live** (agent-browser): EN desktop plot 208px with muted
+  header prices "US$4,165"/"US$57.27"; EN mobile 375 identical anatomy,
+  no overflow; fa RTL mirrors the sketch (icon right, verdict red, price
+  left, Jalali ticks); prices board untouched (4 tiles + icons); zero
+  page/console errors.
+- **Evidence**: `docs/evidence/2026-10-20-verdict-chip-redesign/`.

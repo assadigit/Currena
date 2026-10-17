@@ -5,6 +5,45 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-20b] — the gold/silver verdict chips become analysis cards (the owner's sketch)
+
+The owner drew the chip UI for the gold and silver "Conditions right now"
+strip: boxed artwork in the corner, the name + verdict beside it, the PRICE
+in a lighter ink ("the price is already mentioned once in upper section.
+the emphasis must be on the TREND, not the price necessarily"), and ONE big
+chart filling the rest of the card — "DO THE SAME FOR MOBILE VIEW."
+
+### Changed (`signals/verdict.tsx`, `signals/MergedCard.tsx`)
+
+- **Header row** (replaces the 96/128px artwork column): `MetalIconBox` —
+  the metal artwork in a small tinted box (56/64px; gold brand-gold tint,
+  silver soft tint) · name (bold, primary) + verdict word with its direction
+  artwork (verdict ink) · the current price at the far end in the MUTED
+  secondary ink (tabular, nowrap) — the price already leads the prices
+  board; here the trend speaks.
+- **The chart is the body**: `MetalTrendChart` gains `plotHeightClass` and
+  opens at **h-40 mobile / h-52 desktop** (was h-20); the side-split layout
+  (`sm:w-40`, `sm:border-s`, `min-h-[136px]`) is gone — ONE anatomy for
+  mobile AND desktop, exactly as the owner asked. Range chips + window
+  delta unchanged. The verdict word keeps its floored two-line slot (the
+  round-34 alignment rule survives by structure).
+- **Price source**: MergedCard computes each metal's display price from the
+  SAME snapshot readings (`formatIndicatorValue`), passes
+  `prices={{ gold, silver }}`; honest absence → nothing rendered.
+
+No copy changes, no data/scoring change.
+
+### Gates
+
+`copy:audit` clean · workspace tests **1,431 green** · typecheck all · lint
+0 errors/15 advisories · budgets held (entry 295.15/88.76 gz; Insights lazy
+593.51/141.27 gz, +0.9 kB raw). Deployed currena-api
+`757cb15b-45ae-4a61-8f4a-d808a515968d`→ production browser-verified: EN
+desktop plot 208px with muted header prices; mobile 375 identical anatomy,
+no overflow; fa RTL mirrors the sketch (icon right, muted price left, Jalali
+ticks); prices board untouched; zero page/console errors. Evidence:
+`docs/evidence/2026-10-20-verdict-chip-redesign/`.
+
 ## [2026-10-20] — the "Know before you buy US shares" box removed (the owner's direct request)
 
 The owner pasted the exact rendered `<details>` element (fa:
