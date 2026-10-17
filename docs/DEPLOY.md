@@ -83,6 +83,54 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Insights UI redesign deploy (2026-10-24, economic-indicators-ui-spec.md)
+
+**Web-change-only** (apps/web + docs; no packages/insights, apps/api or
+apps/markets code touched — the markets worker was NOT deployed). The
+concurrent session's real-spec implementation (2c171ca) + this session's
+reconciliation (9623595, merged main):
+
+1. `pnpm --filter @currena/web build` — entry `index-BfcmObfm.js`
+   295.15/88.76 (budget 296/89.5); Insights lazy `Insights-CZEldAUv.js`
+   605.68/144.60 (documented ceiling 607/145.20, CHANGELOG §2026-10-17f);
+   precache 93 entries / 3120.65 KiB.
+2. `CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… pnpm --filter @currena/api
+   exec wrangler deploy` → **Worker version `66fb622f-f8ed-4abb-9535-3005e7ce8c59`**
+   (first run `6f0de2c4-fe66-4044-98c2-6fc3815d61b1` uploaded the same dist —
+   the assets took a moment to settle on the edge; the second run confirmed
+   the serving manifest). RATES KV + ASSETS + `* * * * *` cron + SITE_MODE
+   public intact; 106 asset files.
+
+**Live verification (https://currena.ir/#/insights, agent-browser, SW
+precache purged first):**
+
+- Served build: entry `index-BfcmObfm.js` (byte-identical index.html md5
+  `b2b83a8b…` vs local dist); Insights `Insights-CZEldAUv.js`.
+- EN light desktop 1280: hero grid + **Australia left / Global right**
+  (measured rects); flagged rows 3 → "+3 more" → 6 → "Show fewer" → 3 with
+  aria-expanded/aria-controls; step-4 meter grades pale→full Carbon Red 60;
+  Critical word `rgb(218,30,40)`; probe-based banned-ink audit (oklab
+  color-mix aware) = **zero occurrences** in the public render.
+- FA dark desktop 1280 + FA dark mobile 360: `dir=rtl`, «جهانی» heading,
+  «۶ شاخص از ۱۰ شاخص نیازمند توجه‌اند.» Persian digits, Vazirmatn, meters
+  `direction:ltr`, Global stays right; `scrollWidth === clientWidth` at 360
+  both locales (also 320–1440 verified locally).
+- EN light mobile 360: no overflow. Signals section renders; the v2 seesaw
+  present (`data-balance-captions`/`#gold-balance-detail` in DOM, artwork
+  grayscaled via the page rule).
+- Zero console errors across all combos. VLM review of the live hero:
+  "clean, professional palette… color used functionally… no decorative
+  blue or gold".
+- Screenshots: `docs/insights/screenshots/economic-indicators-redesign/`
+  (en/fa × light/dark × desktop/mobile + the signals/seesaw section + the
+  local private-mode world-markets board).
+- Full evidence + method:
+  `docs/insights/economic-indicators-verification-notes.md`.
+
+No ingest dispatch needed — presentation-layer only; the production
+snapshot (`generatedAt 2026-10-17T08:38:42Z`, 32 public readings) is
+unchanged.
+
 ## Post-deploy smoke (2 minutes)
 
 ```sh
