@@ -5,6 +5,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-24] — reconciliation, verification harness and deploy of the Economic Indicators redesign
+
+The two-session convergence: the concurrent session's 2c171ca (built to the
+owner's actual spec, 63adfe8) is adopted as the base; this session's
+draft-spec branch was retired unpushed (D-28). On top of the merged work:
+
+- **`scripts/local-seed-fixtures.ts`** — the local private-mode preview
+  harness: fixture markets/fx snapshots (the repo's own summarizeMarkets +
+  fx job over the test-suite quote world, one correction + one bear row)
+  so wrangler dev renders the licence-hidden boards beside the REAL
+  production public snapshot + histories (fetched from the live API,
+  displayMode stripped — the schema-honest private form). No provider is
+  ever called; nothing is deployed from it.
+- **Full verification battery** (docs/insights/economic-indicators-
+  verification-notes.md): computed-STYLE probe DOM audits (oklab
+  color-mix aware — rgb() regex audits silently miss Tailwind v4 tints)
+  = ZERO banned inks in light + dark + private; card order measured
+  both locales; expand/collapse 3→6→3; meters colored + LTR in fa;
+  320–1440 no-overflow; keyboard model; zero console errors; VLM review.
+- **Gates from merged main:** typecheck 6/6; 1,485 tests; lint 0 errors;
+  copy:audit clean (manifest untouched); budgets held (Insights lazy
+  605.68/144.60 vs the documented 607/145.2 ceiling, D-30).
+- **Deployed currena-api + live-verified** on currena.ir (EN + fa, light +
+  dark, 1280 + 360): zero console errors, no h-scroll at 360, seesaw intact,
+  flagged expand/collapse works, zero banned inks in the public render.
+  Screenshots in docs/insights/screenshots/economic-indicators-redesign/;
+  worker version + chunk hash in DEPLOY.md's 2026-10-24 entry.
+- D-28 (the reconciliation), D-29 (the verification methodology), D-30
+  (the budget ceiling) — docs/DECISIONS_FOR_ALI.md.
+
 ## [2026-10-17f] — the Economic Indicators page re-drawn from the owner's real spec
 
 The owner supplied the actual `economic-indicators-ui-spec.md` (the session
