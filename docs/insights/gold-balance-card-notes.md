@@ -5,6 +5,19 @@ root 2026-10-17 and moved to `docs/insights/` on the feature branch as the
 spec itself instructs). Branch: `feature/gold-balance-card`. Per spec §15.3:
 not merged, not deployed.
 
+> **UPDATE (owner order, 2026-10-17, after this note was written):** the
+> owner instructed "commit push deploy in the main branch", overriding
+> §15.3. The branch was re-verified locally (typecheck 6/6, 1,480 tests,
+> lint 0 errors, copy audit clean, bundle budgets held), fast-forward
+> merged into `main` (`97c65d6..35a18d2`) and pushed, then deployed with
+> `wrangler deploy` — Worker `currena-api`, version `ef455c43-3798-4cd9-
+> a52d-8063366df8be`, https://currena-api.sedanama-ir.workers.dev. Live
+> verification at https://currena.ir/#/insights: the balance renders with
+> the live state (aria "Balance for gold: 1 against · 3 couldn't be read.
+> Leaning against gold."), the fa layout mirrors («ترازوی طلا: ۱ به ضرر ·
+> ۳ قابل ارزیابی نیست.»), no horizontal scroll at 360 px, console clean.
+> Post-deploy evidence: `screenshots/gold-balance/live-prod-{en,fa}-1280.png`.
+
 ## 1. The stack that was found (spec §2.3)
 
 - **Framework**: Vite 8 + React 19 + TypeScript 5 (strict) SPA — never
