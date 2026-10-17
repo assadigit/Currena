@@ -342,7 +342,17 @@ const BUDGETS = [
   // spec demands; the entry chunk (the money page) is untouched at
   // 295.15/88.76 vs 296/89.5. Justified in CHANGELOG §2026-10-24c and
   // docs/QA/quirks-2026-10-22-financial-asset-cards.md.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 626_000, gz: 150_000, label: 'Insights lazy chunk' },
+  // Balance v5 bump (626.00 → 627.00 raw, gz HELD at 150.00 — the gz
+  // budget is NOT touched, 2026-10-26): the gold balance's wireframe-
+  // reference iteration (docs/ui-reference/gold-silver-balance-target-
+  // wireframe.png) moves the two factor columns ABOVE the drawing and
+  // adds the per-column progressive disclosure ("+{n} more" / "Show
+  // fewer" pills — the attention-tile convention, reused copy keys)
+  // and the soft centred assessment box. Raw +0.27 kB, gzip-neutral
+  // (149.92 vs 150.00 — the pill markup is highly compressible); the
+  // entry chunk is untouched at 295.29/88.81 vs 296/89.5. Justified in
+  // CHANGELOG §2026-10-26.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 627_000, gz: 150_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

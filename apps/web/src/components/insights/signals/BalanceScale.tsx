@@ -1,44 +1,61 @@
 /**
  * signals/BalanceScale — the gold card's balance visual (owner spec
  * docs/insights/gold-balance-card-spec.md, the v2 seesaw patch, the v3
- * revision and now the v4 ITERATION-2 directive, 2026-10-25: "Refine the
- * Gold/Silver Balance into a Premium Editorial Visualization").
+ * revision, the v4 Iteration-2 directive and now the v5 WIREFRAME
+ * directive, 2026-10-26: match the composition of the owner's reference
+ * board docs/ui-reference/gold-silver-balance-target-wireframe.png).
  *
- * v4 replaces v3's literal hanging-pan scale (pillar, chains, suspended
- * dishes) with the abstract editorial concept «برآیند عوامل مؤثر بر قیمت
- * طلا» — a restrained data-visualization mark, not a drawing of a machine:
+ * v5 keeps v4's abstract editorial mark (ONE tapered beam rotating on a
+ * compact hub-and-keystone pivot with accent-coloured endpoint beads)
+ * and re-arranges the composition to the reference board's hierarchy:
  *
+ *   1. the heading «برآیند عوامل مؤثر بر قیمت طلا» and its subtitle;
+ *   2. the TWO OPPOSING FACTOR GROUPS at the top — the supportive and
+ *      adverse columns side by side (stacking below `sm`), each column
+ *      headed by its side label, every factor a separate card row, each
+ *      list progressive-disclosed past 3 rows ("+{n} more" / "Show
+ *      fewer" — the site's attention-tile convention, reusing its copy
+ *      keys and pill anatomy);
+ *   3. the ABSTRACT BALANCE ILLUSTRATION centred BENEATH both groups —
+ *      its endpoint beads sit exactly under the two columns' CENTRES
+ *      (25% / 75% of the shared footprint), so each group visually
+ *      weighs on its own beam end without anything attached to the
+ *      beam;
+ *   4. the COMPACT AGGREGATE ASSESSMENT directly under the illustration
+ *      — verdict word + count line (+ the card's banner where needed)
+ *      in one soft centred box, visually connected to the drawing;
+ *   5. the shared detail panel and the Neutral / Couldn't read trays
+ *      (the existing product's disclosure mechanism).
+ *
+ * The drawing (v4 rules 1–5, all kept by the wireframe directive):
  *   - ONE refined horizontal beam, slightly weighted (tapered 9u at the
  *     centre → 6u at the ends), rotating around a compact pivot.
  *   - A compact, geometrically precise central pivot: a 9u hub pinned
  *     with a surface-colour dot, its apex meeting a 13u keystone
- *     triangle — deliberately NOT a tall support column, with NO base
- *     bar (the triangle's flat base is the ground).
+ *     triangle — NOT a tall support column, NO base bar.
  *   - Subtle, clearly defined endpoints: an accent-coloured bead at
- *     each beam end — green for / red against, the only colour in the
- *     drawing, so the sides stay identified while the structure stays
- *     neutral.
- *   - The dotted level reference through the pivot (kept from v2/v3):
- *     the eye compares the tilted beam with level.
+ *     each beam end — green for / red against, the only colour.
+ *   - The dotted level reference through the pivot: the eye compares
+ *     the tilted beam with level. It spans WIDER than the beam, per the
+ *     reference board.
  *   - No hanging wires, no suspended bowls, no tall column, no
- *     decorative machinery, no unnecessary outlines.
+ *     decorative machinery, no unnecessary outlines — and NOTHING is
+ *     ever attached to or positioned on the beam.
  *
- * The v3 rules that survive verbatim (the owner's Iteration-2 prompt
+ * The rules that survive verbatim from v3/v4 (the wireframe directive
  * repeats them):
  *   1. Carefully proportioned vector geometry with controlled stroke
  *      weights (beam body > hub 9u > endpoint beads 6.25u > reference
  *      1.5u dotted) and deliberate whitespace (the canvas reserves
- *      exactly the ±35u swing of the 12° max tilt, ~11u clear each
- *      side).
+ *      exactly the ±27u swing of the 12° max tilt on the 260u arm).
  *   2. No dashed empty rectangle: both sides always draw their complete
  *      structure; a side with no qualifying factors gets a concise,
  *      evidence-based line under its list heading, and when NOTHING
  *      could be read, both sides carry the unavailable line instead.
  *   3. No factor cards on the beam: the beam carries ONLY the aggregate
  *      weighted assessment (its tilt); the individual factors render in
- *      organised lists beneath their supportive/adverse sides, growing
- *      downward — the illustration's geometry never depends on the
- *      factor count and vice versa.
+ *      the organised columns ABOVE the drawing — the illustration's
+ *      geometry never depends on the factor count and vice versa.
  *   4. Direction follows the model: the beam tilts ONLY for a valid,
  *      supported aggregate score (the verdict word 'for'/'against');
  *      balanced (net 0) and unavailable (nothing readable) verdicts
@@ -48,20 +65,14 @@
  *      of its width; any number of factors on either side cannot
  *      collide with, overlap or resize the illustration.
  *
- * Tilt arithmetic (v1 §6.3–4, kept verbatim by v2 §4, v3 and v4): angle
+ * Tilt arithmetic (v1 §6.3–4, kept verbatim by v2 §4, v3, v4 and v5): angle
  * = |net|/total × 12° floored at 4°; level at net 0 and at readable 0.
+ * The arm length (Lh 260u = the column-centre span) is a DRAWING
+ * decision — the model's angle is untouched.
  * RTL: the whole SVG mirrors with scaleX(-1) — it is pure geometry, so
- * the mirror relocates the `for` platform to the inline-end AND flips
- * the visual rotation sign in one move; the lists mirror via the grid's
+ * the mirror relocates the `for` bead to the inline-end AND flips the
+ * visual rotation sign in one move; the columns mirror via the grid's
  * direction-aware columns.
- *
- * Hierarchy (the Iteration-2 prompt §3, top to bottom): the heading
- * «برآیند عوامل مؤثر بر قیمت طلا» → the concise explanatory subtitle →
- * the balance illustration → the two side-labelled factor lists with
- * their empty states → the overall assessment (verdict word + count
- * line + the card's banner sentence, where needed) → the shared detail
- * panel → the Neutral / Couldn't read trays. Price footing stays in the
- * merged card below the trays, never a driver.
  *
  * Reusable by contract (spec §2.6): the component takes a list of
  * drivers and knows nothing about gold beyond the copy strings; the
@@ -132,30 +143,37 @@ export function balanceCounts(drivers: readonly BalanceDriver[]): BalanceCounts 
   return { for: f, against: a, neutral: n, unread: u, total: drivers.length, net: f - a, readable: f + a + n };
 }
 
-/** The tilt constants (v2 patch §5.1.5, kept by v3 and v4 — the angle
+/** The tilt constants (v2 patch §5.1.5, kept by v3, v4 and v5 — the angle
  * formula is the owner's model and must not change: ratio × 12°, 4° floor). */
 export const BALANCE_MAX_ANGLE_DEG = 12;
 export const BALANCE_MIN_ANGLE_DEG = 4;
 
+/** v5 progressive disclosure: the rows a factor column reveals before
+ * its "+{n} more" pill — 3, the site's attention-tile convention. */
+export const BALANCE_LIST_REVEAL = 3;
+
 /* ------------------------------------------------------------------ *
- * v4 drawing metrics — everything lives in ONE fixed viewBox (SVG
+ * v5 drawing metrics — everything lives in ONE fixed viewBox (SVG
  * user units); the SVG scales responsively, so the geometry never
  * depends on the rendered width, the factor count or the tilt.
+ * The 520-wide canvas maps onto the SAME footprint the two factor
+ * columns share, so x=130/x=390 (the bead centres) land exactly under
+ * the columns' centres — the reference board's alignment.
  * ------------------------------------------------------------------ */
 /** The SVG's logical canvas: a deliberately FLAT, editorial proportion
- * (v4: no tall machinery — the whole structure is 31u tall, the canvas
- * reserves exactly the ±35u swing of a 12° tilt on both sides). */
+ * (520×88 — the structure is ~31u tall; the canvas reserves exactly the
+ * ±33u swing of a 12° tilt on the 260u arm, ~11u clear each side). */
 export const BALANCE_VIEWBOX_W = 520;
-export const BALANCE_VIEWBOX_H = 104;
+export const BALANCE_VIEWBOX_H = 88;
 /** The pivot — the beam's rotation centre (x is the canvas centre; y
  * centres the swing so the max tilt clears the canvas by ~11u each
  * side). */
 export const BALANCE_PIVOT_X = 260;
-export const BALANCE_PIVOT_Y = 52;
-/** The bead-to-bead distance: the two beam-end endpoint beads (v1 §6's
- * Lh, in viewBox units — unchanged from v2/v3 so the tilt law's span
- * is the same number). */
-export const BALANCE_LH_VB = 336;
+export const BALANCE_PIVOT_Y = 44;
+/** The bead-to-bead distance: 260u = exactly the span between the two
+ * factor columns' centres (25%/75% of the shared footprint, v5). The
+ * tilt law's angle is unchanged — only the drawn arm is shorter. */
+export const BALANCE_LH_VB = 260;
 /** The endpoint bead x of each side (Lh ÷ 2 either side of the pivot). */
 export const BALANCE_HINGE_FOR_X = BALANCE_PIVOT_X - BALANCE_LH_VB / 2;
 export const BALANCE_HINGE_AGAINST_X = BALANCE_PIVOT_X + BALANCE_LH_VB / 2;
@@ -183,8 +201,8 @@ export interface BalanceTilt {
 }
 
 /**
- * The tilt rule (v1 §6 steps 3–4, kept verbatim by v2 §4, v3 and v4
- * rule 4): net 0 → level; nothing readable → level; otherwise angle =
+ * The tilt rule (v1 §6 steps 3–4, kept verbatim by v2 §4, v3, v4 and
+ * v5 rule 4): net 0 → level; nothing readable → level; otherwise angle =
  * |net|/total × MAX, floored at MIN so one driver still leans. `lhPx`
  * is the pin-to-pin distance in the drawing's units (0 → level).
  */
@@ -202,7 +220,7 @@ export type BalanceVerdict = 'for' | 'balanced' | 'against' | 'none';
 
 /** The verdict word (spec §5.1 + §13): nothing readable → "Can't read…";
  * otherwise the net's sign, "Balanced" at exactly zero. The beam tilts
- * ONLY when this verdict is directional (v3/v4 rule 4). */
+ * ONLY when this verdict is directional (v3/v4/v5 rule 4). */
 export function balanceVerdictOf(counts: BalanceCounts): BalanceVerdict {
   if (counts.readable === 0) return 'none';
   if (counts.net > 0) return 'for';
@@ -224,23 +242,24 @@ export function countLineParts(counts: BalanceCounts, copy: InsightsCopy, number
   return parts.filter(([count]) => count > 0).map(([, text]) => text);
 }
 
-/** The tilt animation (v1 §6.7, kept by v2 §5.9, v3 and v4): ~500 ms ease
+/** The tilt animation (v1 §6.7, kept by v2 §5.9, v3, v4 and v5): ~500 ms ease
  * on the beam rotation, disabled for prefers-reduced-motion users (the
  * repo's standard pair — the same Tailwind class the collapsible
  * chevrons use, applied to the SVG group). */
 const TILT_TRANSITION_CLASS = 'transition-transform duration-500 ease-out motion-reduce:transition-none';
 const TILT_TRANSFORM_ORIGIN_STYLE = { transformBox: 'view-box', transformOrigin: `${BALANCE_PIVOT_X}px ${BALANCE_PIVOT_Y}px` } as const;
 
-/** The beam's tapered body (v4 rule 1: a refined, slightly weighted
- * horizontal beam — 9u tall at the centre, 6u at the ends). One filled
- * path, no stroke, no outline: the drawing's heaviest mark. */
+/** The beam's tapered body (v4/v5 rule 1: a refined, slightly weighted
+ * horizontal beam — 9u tall at the centre, 6u at the ends, spanning
+ * exactly bead-to-bead). One filled path, no stroke, no outline: the
+ * drawing's heaviest mark. */
 const BEAM_BODY_PATH =
-  'M 92 49 C 170 48.2 214 47.5 260 47.5 C 306 47.5 350 48.2 428 49 L 428 55 C 350 55.8 306 56.5 260 56.5 C 214 56.5 170 55.8 92 55 Z';
+  'M 130 41 C 185 40.3 230 39.5 260 39.5 C 290 39.5 335 40.3 390 41 L 390 47 C 335 47.7 290 48.5 260 48.5 C 230 48.5 185 47.7 130 47 Z';
 /** The compact pivot's keystone: a 13u equilateral-ish triangle whose
- * apex meets the hub's underside (v4: NOT a support column, NO base
+ * apex meets the hub's underside (v4/v5: NOT a support column, NO base
  * bar — the flat triangle base is the ground, the dotted reference is
  * the level). */
-const PIVOT_MOUNT_PATH = 'M 260 61 L 274 74 L 246 74 Z';
+const PIVOT_MOUNT_PATH = 'M 260 53 L 274 66 L 246 66 Z';
 
 export function BalanceScale({
   drivers,
@@ -252,12 +271,15 @@ export function BalanceScale({
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
   /** The card's existing verdict banner sentence (spec §5.2 — kept
-   * unchanged, rendered with the overall assessment at the end). */
+   * unchanged, rendered inside the aggregate assessment box). */
   banner?: ReactNode;
 }): React.JSX.Element | null {
   const b = copy.signals.balance;
   const rtl = numberLocale === 'fa-IR';
   const [openKey, setOpenKey] = useState<string | null>(null);
+  /** Which factor columns are fully revealed (v5 progressive
+   * disclosure — one independent toggle per side). */
+  const [openLists, setOpenLists] = useState<{ for: boolean; against: boolean }>({ for: false, against: false });
 
   if (drivers.length === 0) return null;
 
@@ -269,7 +291,7 @@ export function BalanceScale({
   const neutralChips = drivers.filter((d) => d.state === 'neutral');
   const unreadChips = drivers.filter((d) => d.state === 'unread');
 
-  /* The tilt, from the fixed viewBox Lh (v4 rule 5: the geometry never
+  /* The tilt, from the fixed viewBox Lh (v5 rule 5: the geometry never
    * depends on anything measured at runtime). */
   const tilt = balanceTilt(counts, BALANCE_LH_VB);
   /* CSS rotation, LTR-signed: negative = counter-clockwise = the
@@ -301,7 +323,7 @@ export function BalanceScale({
   const toggle = (key: string): void => setOpenKey((prev) => (prev === key ? null : key));
   const openDriver = drivers.find((d) => d.key === openKey) ?? null;
 
-  /** One compact factor row (v2 §5.5, the v3/v4 LIST item): icon ~20px +
+  /** One compact factor row (v2 §5.5, the v3/v4/v5 LIST item): icon ~20px +
    * the short name + the current value, 56px tall, NO sentence at any
    * width — a real button whose tap opens the shared detail panel. */
   const block = (d: BalanceDriver, side: 'for' | 'against'): React.JSX.Element => (
@@ -331,7 +353,7 @@ export function BalanceScale({
     </button>
   );
 
-  /** The empty-side line (v4 rule 2 + the Iteration-2 §5 semantics —
+  /** The empty-side line (v4/v5 rule 2 + the Iteration-2 §5 semantics —
    * the cases stay distinct): when the evaluation ran, the side with no
    * qualifying factors carries the evidence-based line; when NOTHING
    * could be read (readable 0), both sides carry the unavailable line
@@ -340,38 +362,70 @@ export function BalanceScale({
   const emptyLineOf = (side: 'for' | 'against'): string =>
     counts.readable === 0 ? b.listEmptyNone : side === 'for' ? b.listEmptyFor : b.listEmptyAgainst;
 
-  /** One side's list column (v3/v4 rules 3 + 5): the caption heading
-   * with its side icon and side colour, the factor rows beneath it, and
-   * — when the side has no qualifying factors — the concise empty line
-   * in place of any on-beam placeholder. The column grows downward
-   * independently of the illustration above; the two columns sit side
-   * by side from `sm:` up and stack on the narrowest screens so the
-   * long side labels never wrap mid-word. */
-  const listColumn = (side: 'for' | 'against', blocks: readonly BalanceDriver[]): React.JSX.Element => (
-    <div className="flex min-w-0 flex-col gap-1.5" data-balance-list={side}>
-      <h4
-        data-balance-caption={side}
-        className={`m-0 inline-flex items-center gap-1.5 text-[length:var(--type-label)] font-bold ${
-          side === 'for' ? 'text-[var(--color-status-normal)]' : 'text-[var(--color-status-alert)]'
-        }`}
+  /** One side's factor column (v5: ABOVE the drawing, per the reference
+   * board): the caption heading with its side icon and side colour, the
+   * factor rows beneath it — the first BALANCE_LIST_REVEAL rows before
+   * the "+{n} more" pill (the site's attention-tile convention, its own
+   * copy keys and pill anatomy, aria-expanded + aria-controls) — and,
+   * when the side has no qualifying factors, the concise empty line in
+   * place of any placeholder. The two columns sit side by side from
+   * `sm:` up and stack on the narrowest screens so the long side labels
+   * never wrap mid-word. */
+  const listColumn = (side: 'for' | 'against', blocks: readonly BalanceDriver[]): React.JSX.Element => {
+    const expanded = openLists[side];
+    const rows = expanded ? blocks : blocks.slice(0, BALANCE_LIST_REVEAL);
+    const hidden = blocks.length - rows.length;
+    /** The column's progressive-disclosure pill (v5): "+{n} more"
+     * collapsed, "Show fewer" expanded — the attention-tile pill's own
+     * copy keys and anatomy. `expandedState` is the list's CURRENT
+     * state; the click toggles it. */
+    const disclose = (expandedState: boolean): React.JSX.Element => (
+      <button
+        type="button"
+        onClick={() => setOpenLists((prev) => ({ ...prev, [side]: !expandedState }))}
+        aria-expanded={expandedState ? 'true' : 'false'}
+        aria-controls={`gold-balance-list-${side}`}
+        data-balance-fewer={expandedState ? side : undefined}
+        data-balance-more={expandedState ? undefined : side}
+        className="insights-focusable mt-1 inline-flex min-h-[24px] cursor-pointer items-center self-start rounded-full bg-currena-muted/15 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
       >
-        <IconImg src={side === 'for' ? DIRECTION_UP_URL : DIRECTION_DOWN_URL} size={16} className="shrink-0" />
-        {side === 'for' ? b.sideFor : b.sideAgainst}
-      </h4>
-      {blocks.length > 0 ? (
-        <span className="flex min-w-0 flex-col gap-1.5">{blocks.map((d) => block(d, side))}</span>
-      ) : (
-        <p
-          data-balance-empty={side}
-          className="m-0 rounded-[var(--radius-sm)] px-2.5 py-2.5 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-secondary)]"
+        {expandedState
+          ? copy.ui.showFewer
+          : interpolate(copy.ui.attentionTileMore, {
+              n: formatNumber(hidden, numberLocale, { maximumFractionDigits: 0 }),
+            })}
+      </button>
+    );
+    return (
+      <div className="flex min-w-0 flex-col gap-1.5" data-balance-list={side} id={`gold-balance-list-${side}`}>
+        <h4
+          data-balance-caption={side}
+          className={`m-0 inline-flex items-center gap-1.5 text-[length:var(--type-label)] font-bold ${
+            side === 'for' ? 'text-[var(--color-status-normal)]' : 'text-[var(--color-status-alert)]'
+          }`}
         >
-          {emptyLineOf(side)}
-        </p>
-      )}
-    </div>
-  );
+          <IconImg src={side === 'for' ? DIRECTION_UP_URL : DIRECTION_DOWN_URL} size={16} className="shrink-0" />
+          {side === 'for' ? b.sideFor : b.sideAgainst}
+        </h4>
+        {blocks.length > 0 ? (
+          <span className="flex min-w-0 flex-col gap-1.5">
+            {rows.map((d) => block(d, side))}
+            {hidden > 0 ? disclose(false) : null}
+            {expanded && blocks.length > BALANCE_LIST_REVEAL ? disclose(true) : null}
+          </span>
+        ) : (
+          <p
+            data-balance-empty={side}
+            className="m-0 rounded-[var(--radius-sm)] bg-currena-soft/60 px-2.5 py-2.5 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-secondary)]"
+          >
+            {emptyLineOf(side)}
+          </p>
+        )}
+      </div>
+    );
+  };
 
-  /** One side's endpoint (v4 rule 1): the accent-coloured bead that
+  /** One side's endpoint (v4/v5 rule 1): the accent-coloured bead that
    * terminates its beam end — the side's marker in the drawing, rigidly
    * part of the rotating beam group. It is a symbolic endpoint, never a
    * carrier for factor rows, and the ONLY colour in the illustration. */
@@ -390,10 +444,10 @@ export function BalanceScale({
 
   return (
     <div className="flex flex-col gap-3" data-balance>
-      {/* 1. THE HEADING + SUBTITLE (Iteration-2 §3 order): the concept's
-       * own name — «برآیند عوامل مؤثر بر قیمت طلا» — clearly more
-       * prominent than its explanatory subtitle (the site's card-question
-       * voice at 15/600 over the caption voice in the secondary ink). */}
+      {/* 1. THE HEADING + SUBTITLE: the concept's own name — «برآیند
+       * عوامل مؤثر بر قیمت طلا» — clearly more prominent than its
+       * explanatory subtitle (the site's card-question voice at 15/600
+       * over the caption voice in the secondary ink). */}
       <div className="flex flex-col gap-1" data-balance-heading>
         <h4 data-balance-title className="type-question m-0 text-[var(--color-text-primary)]">
           {b.heading}
@@ -406,18 +460,33 @@ export function BalanceScale({
         </p>
       </div>
 
-      {/* 2. THE BALANCE ZONE (v4 rules 1 + 5): ONE inline SVG in the
-       * abstract editorial mark's flat proportion (520×120), capped at
-       * ~520px and centred on wide screens, full width on mobile. Its
-       * height is a fixed function of its width — no factor count, no
-       * tilt and no runtime measurement can change it. The role="img"
-       * layer carries the result as its label (§12.1); the interactive
-       * factor rows live BELOW it as list items — role="img" children
-       * are presentational and the rows must stay real buttons (§7.4).
-       * The illustration is pure geometry, so RTL mirrors the whole SVG
-       * with scaleX(-1): the `for` platform lands on the inline-end
-       * side AND the visual rotation sign flips in the same transform. */}
-      <div data-balance-zone className="mx-auto w-full max-w-[520px]">
+      {/* 2. THE TWO OPPOSING FACTOR GROUPS (v5: ABOVE the drawing, per
+       * the reference board): one column per side, caption-headed,
+       * growing downward, progressive-disclosed past 3 rows. The grid
+       * shares the drawing's own max-w-[640px] footprint so each column
+       * sits over ITS side's beam bead (x=25%/75% of the footprint); it
+       * mirrors with the document direction, and on the narrowest
+       * screens the columns stack so the long side labels stay on one
+       * line. DOM order (for → against) is the tab order (§12.4). */}
+      <div className="mx-auto grid w-full max-w-[640px] grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3" data-balance-lists>
+        {listColumn('for', forBlocks)}
+        {listColumn('against', againstBlocks)}
+      </div>
+
+      {/* 3. THE BALANCE ZONE (v4/v5 rules 1 + 5): ONE inline SVG in the
+       * abstract editorial mark's flat proportion (520×88), sharing the
+       * columns' max-w-[640px] footprint and centred beneath both
+       * groups — its endpoint beads sit exactly under the two columns'
+       * centres. Its height is a fixed function of its width — no
+       * factor count, no tilt and no runtime measurement can change it.
+       * The role="img" layer carries the result as its label (§12.1);
+       * the interactive factor rows live ABOVE it as list items —
+       * role="img" children are presentational and the rows must stay
+       * real buttons (§7.4). The illustration is pure geometry, so RTL
+       * mirrors the whole SVG with scaleX(-1): the `for` bead lands on
+       * the inline-end side AND the visual rotation sign flips in the
+       * same transform. */}
+      <div data-balance-zone className="mx-auto w-full max-w-[640px]">
         <div
           role="img"
           aria-label={ariaLabel}
@@ -432,13 +501,14 @@ export function BalanceScale({
             focusable="false"
           >
             {/* The dotted level reference through the pivot (v2 §5.3,
-             * kept): behind everything — the eye compares the tilted
+             * kept; v5: it spans WIDER than the beam, per the reference
+             * board): behind everything — the eye compares the tilted
              * beam with level, so a small lean stays honest. */}
             <line
               data-balance-reference
-              x1={24}
+              x1={44}
               y1={BALANCE_PIVOT_Y}
-              x2={BALANCE_VIEWBOX_W - 24}
+              x2={BALANCE_VIEWBOX_W - 44}
               y2={BALANCE_PIVOT_Y}
               stroke="var(--color-border)"
               strokeWidth={1.5}
@@ -447,7 +517,7 @@ export function BalanceScale({
             />
             {/* The rotating assembly: the tapered beam body plus both
              * accent-coloured endpoint beads — ONE rigid group rotating
-             * around the pivot (v4: no pans, no chains, no platforms,
+             * around the pivot (v4/v5: no pans, no chains, no platforms,
              * nothing translates separately). */}
             <g
               data-balance-beam
@@ -462,11 +532,11 @@ export function BalanceScale({
               {endPoint('against')}
             </g>
             {/* The compact pivot's keystone triangle, fixed (never
-             * rotates — v2 §5.2.4's rule, now a 13u apex-to-base
-             * triangle: geometrically precise, deliberately NOT a
-             * support column, and no base bar — the flat base is the
-             * ground). Drawn after the beam so the apex reads as one
-             * assembly with the hub. */}
+             * rotates — v2 §5.2.4's rule, a 13u apex-to-base triangle:
+             * geometrically precise, deliberately NOT a support column,
+             * and no base bar — the flat base is the ground). Drawn
+             * after the beam so the apex reads as one assembly with the
+             * hub. */}
             <g data-balance-fulcrum fill="currentColor">
               <path d={PIVOT_MOUNT_PATH} />
             </g>
@@ -478,31 +548,20 @@ export function BalanceScale({
         </div>
       </div>
 
-      {/* 3. THE TWO FACTOR LISTS (v3/v4 rule 3): one column per side
-       * under the illustration, caption-headed, growing downward. The
-       * grid shares the beam's own max-w-[520px] footprint so each list
-       * sits under ITS side's half of the illustration; it mirrors with
-       * the document direction, and on the narrowest screens the
-       * columns stack so the long side labels stay on one line. DOM
-       * order (for → against) is the tab order (§12.4). */}
-      <div className="mx-auto grid w-full max-w-[520px] grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3" data-balance-lists>
-        {listColumn('for', forBlocks)}
-        {listColumn('against', againstBlocks)}
-      </div>
-
-      {/* 4. THE OVERALL ASSESSMENT (Iteration-2 §3 item 6): the verdict
-       * word with its icon, the count line on its OWN line directly
-       * under it (≥14px in the secondary ink, 7.98:1 / 7.7:1 ≥ 4.5:1 —
-       * colour never rides alone, §12.2: the icon and the word carry
-       * the meaning), and the card's banner sentence where needed.
-       * Divider-separated from the lists, like the footing strip. */}
+      {/* 4. THE AGGREGATE ASSESSMENT (the reference board's conclusion
+       * box): the verdict word with its icon in the question voice (the
+       * box's focal line), the count line directly under it (≥14px in the
+       * secondary ink — colour never rides alone, §12.2: the icon and the
+       * word carry the meaning) and the card's banner sentence where
+       * needed — ONE compact, centred, soft box directly beneath the
+       * drawing, visually connected to it. */}
       <div
-        className="flex flex-col gap-0.5 border-t border-[var(--color-border)] pt-3"
+        className="mx-auto flex w-full max-w-[440px] flex-col items-center gap-1 rounded-[var(--radius-lg)] bg-currena-soft/60 px-4 py-3 text-center"
         data-balance-verdict={verdict}
       >
         <span className={`inline-flex items-center gap-1.5 ${verdictToneClass}`}>
           <VerdictIcon verdict={verdictIcon} size={20} desktopSize={24} />
-          <span className="text-[length:var(--type-label)] font-bold leading-tight">{verdictWord}</span>
+          <span className="type-question font-bold leading-tight">{verdictWord}</span>
         </span>
         {parts.length > 0 ? (
           <span
