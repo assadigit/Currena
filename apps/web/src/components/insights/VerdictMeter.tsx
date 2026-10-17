@@ -20,7 +20,7 @@
  * module (single mt-auto), and each tile face is geometry-fixed (2-line
  * clamped name / one-line value / 3-line clamped meaning) so the row's
  * height is identical across regions. The value's unit reads SMALL so a
- * long currency label ('۱۲۵٫۴۴ دلار آمریکا') keeps the number's row.
+ * long currency label ('۱۲۵٫۴۴ دلار') keeps the number's row.
  *
  * Round 41 (owner): the state's artwork LEADS the row — [icon][word] —
  * the old word-first order read as [stressed][icon]; the mark now opens

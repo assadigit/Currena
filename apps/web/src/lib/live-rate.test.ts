@@ -153,8 +153,8 @@ describe('rateShareText', () => {
   });
 
   it('builds the localized share line (fa — Persian digits, native brand)', () => {
-    expect(rateShareText(view, 'دلار آمریکا', 'تومان ایرانی', 'کورنا', 'fa-IR', true)).toBe(
-      '۱ دلار آمریکا = ۲۳۰٬۵۰۰ تومان ایرانی · کورنا (currena.ir)',
+    expect(rateShareText(view, 'دلار', 'تومان ایرانی', 'کورنا', 'fa-IR', true)).toBe(
+      '۱ دلار = ۲۳۰٬۵۰۰ تومان ایرانی · کورنا (currena.ir)',
     );
   });
 

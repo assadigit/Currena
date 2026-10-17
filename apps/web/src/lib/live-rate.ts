@@ -113,7 +113,7 @@ export function rateDecimals(rate: number, irrPair: boolean): number {
 /**
  * Copy/share text for the rate line, e.g.
  * `1 US Dollar = 230,500 Iranian Toman · Currena — currena.ir`
- * (fa: «۱ دلار آمریکا = ۲۳۰٬۵۰۰ تومان ایرانی · کورنا — currena.ir»).
+ * (fa: «۱ دلار = ۲۳۰٬۵۰۰ تومان ایرانی · کورنا — currena.ir»).
  * Labels and brand arrive pre-localized; the number formats per locale.
  */
 export function rateShareText(

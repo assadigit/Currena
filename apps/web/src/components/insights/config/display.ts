@@ -130,7 +130,7 @@ const FED_CORRIDOR_HALF = 0.125;
 
 /** R40: value/unit split for renderers that style the unit separately —
  * the hero attention tiles read the unit SMALL so a long word-unit label
- * ('۱۲۵٫۴۴ دلار آمریکا') never pushes the value onto a second row.
+ * ('۱۲۵٫۴۴ دلار') never pushes the value onto a second row.
  * `unit` is null when the unit binds tight (percent, prefixed US$/¥/CN¥,
  * the fed corridor) or is absent. `formatIndicatorValue` below is the
  * exact join of these parts — outputs stay byte-identical everywhere. */
@@ -188,7 +188,7 @@ export function indicatorValueParts(
     return { value: num, unit };
   }
   if (numberLocale === 'en-US' && PREFIXED_UNITS.has(cfg.unit)) return { value: `${unit}${num}`, unit: null }; // 'US$113.96'
-  return { value: num, unit }; // '۱۱۳٫۹۶ دلار آمریکا' / '0.48 pts'
+  return { value: num, unit }; // '۱۱۳٫۹۶ دلار' / '0.48 pts'
 }
 
 /** Current-value rendering, e.g. '5.31%', 'US$23,343bn', '۰٫۴۸'. */

@@ -229,7 +229,7 @@ describe('formatIndicatorValue', () => {
 
   it('prefixes currency units in English and suffixes words in Farsi', () => {
     expect(formatIndicatorValue('brent', 113.96, 'en-US', insightsCopyEn.units)).toBe('US$113.96');
-    expect(formatIndicatorValue('brent', 113.96, 'fa-IR', insightsCopyFa.units)).toBe('۱۱۳٫۹۶ دلار آمریکا');
+    expect(formatIndicatorValue('brent', 113.96, 'fa-IR', insightsCopyFa.units)).toBe('۱۱۳٫۹۶ دلار');
   });
 
   it('honours per-indicator decimals', () => {

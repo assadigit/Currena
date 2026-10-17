@@ -252,7 +252,7 @@ describe('fxSentence — the two-part sentences (§7), EN + FA', () => {
       numbers: { dollar_m3: 4.25 },
     });
     const sentence = fxSentence(rule, fa.fx, 'fa-IR');
-    expect(sentence?.see).toBe('دلار آمریکا در سه ماه گذشته ۴٫۳ درصد در برابر ارزهای بزرگ جهان تقویت شده است.');
+    expect(sentence?.see).toBe('دلار در سه ماه گذشته ۴٫۳ درصد در برابر ارزهای بزرگ جهان تقویت شده است.');
     // No Latin digit may leak into the Farsi sentence.
     expect(sentence?.see).not.toMatch(/[0-9]/);
   });

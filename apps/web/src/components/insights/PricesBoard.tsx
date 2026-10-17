@@ -117,7 +117,7 @@ function useDerivedTileStats(ids: readonly IndicatorId[]): Partial<Record<string
 /**
  * The 52-week range in the tile's own units — EN prefixes the currency on
  * both ends ('US$2,895 – US$4,305'), fa says it once («۲٬۸۹۵ تا ۴٬۳۰۵
- * دلار آمریکا»). Pure formatting; both parts ride in one <bdi dir="ltr">.
+ * دلار»). Pure formatting; both parts ride in one <bdi dir="ltr">.
  */
 function formatPriceRange(
   id: IndicatorId,
