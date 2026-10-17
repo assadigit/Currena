@@ -95,6 +95,13 @@ behavior unchanged by the rebase.
   light+dark, disclosure keyboard-toggle (Enter, aria-expanded, focus
   retained), details-panel click-through preserved, no horizontal overflow,
   zero console errors.
+- **Deployed** currena-api `6d6e1300-9af8-42fe-b42e-bd73ee865211` from
+  `d952983` (pushed to main); live-served `Insights-DgGMrELI.js` sha256
+  `fdd478e7…` byte-identical to the fresh build; live re-verified on
+  currena-api.sedanama-ir.workers.dev AND currena.ir (4 cards in spec
+  order, disclosure round-trip, fa RTL, 375 no overflow, zero errors) —
+  evidence `docs/evidence/2026-10-24c-financial-asset-cards/LIVE-*.png`,
+  deploy record in `docs/DEPLOY.md` §CURRENT DEPLOYMENT.
 
 ## [2026-10-24b] — the market view switch grows the weekly and monthly lenses (round 46)
 
