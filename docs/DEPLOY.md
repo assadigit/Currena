@@ -83,7 +83,56 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
-## CURRENT DEPLOYMENT — the asset cards' details sidebar (2026-10-26c, worker 6adfb632)
+## CURRENT DEPLOYMENT — the gold balance rotates ONLY its beam (2026-10-26d, worker 2e802ae7)
+
+The owner's Iteration-5 addendum — "Rotate the beam only, and
+visualize weight" — is LIVE: exactly one rotating element (the beam
+group: bar + beads + pivot ring + needle, by rotate(theta, pivotX,
+pivotY)); the pans translate plumb and are never rotated, skewed or
+scaled; the hangers are recomputed every frame from each beam-end
+joint to the pan's two fixed rim corners; ONE JS-animated theta (the
+Odometer rAF pattern) derives beam rotation, joints, pan drops and
+hanger endpoints in the same frame. The tilt presentation scale is
+the addendum's 8 deg max / 2 deg floor (the net/total ratio law
+byte-identical), and the weight read-outs are scoped to what the
+model produces — the beam angle + the needle gauge (three
+verdict-labelled ticks, hidden when unavailable, gaugeAria round-52);
+per-side totals and per-factor weights do not exist, so the side-load
+bar and per-tile markers are skipped rather than fabricated. Pushed
+as 9e2fc59 (the v7 round merged over the parallel 2026-10-26c sidebar
+round; both ride).
+
+- **Active worker**: currena-api **`2e802ae7-c068-4c39-96a7-54862370cb32`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched).
+- **What it carries**: BalanceScale v7 (the SVG mechanical layer with
+  the pure balanceStageGeometry/balanceGaugeGeometry derivation, the
+  Odometer-pattern settle, the needle + arc, the retired v4 keystone
+  and the retired CSS-calc stage), gaugeAria x 2 locales + QA record +
+  manifest entry (round-52), the rewritten 45-test battery — and
+  everything from the 2026-10-26c sidebar + balance v6 + 2026-10-26b +
+  2026-10-25b rounds beneath.
+- **Chunk proof**: the fresh 9e2fc59 build serves `index-DJK_gsXg.js`
+  (295.29/88.81) + `Insights-CH3Xq64v.js` (635.91/152.00 — the bumped
+  636/152.50, D-33) — the served chunk is byte-identical on currena.ir
+  (sha256 1872ef4f..., 635,911 bytes, verified live).
+- **Verified live** (agent-browser, fresh profile, currena.ir): EN
+  desktop — the live state (1 against + 3 unread) renders the 2 deg
+  floor: beam `rotate(2 320 44)`, for/against pan translates
+  -5.58/+5.58 = 160 x sin 2 deg, hanger attach error 0.000, needle +
+  3 ticks + "Beam tilt: 2 degrees, Leaning against gold."; fa RTL —
+  beam `rotate(-2 320 44)` (the visual sign flips, the against pan on
+  the LEFT still drops +5.58), gauge aria in Persian with Persian
+  digits, the against pan (top 85.6 vs the for 74.4) matches the
+  verdict; mobile 390 — the drawing scales as one piece (stage 326,
+  pivot 163, drop 2.84 = 81.5 x sin 2 deg), zero overflow; the tile
+  tap opens the shared panel (verified in fa); zero console errors.
+  Evidence: docs/insights/screenshots/gold-balance/v7/ (live-v7-*.png).
+- **Gates on the merged tree**: typecheck 6/6; lint 0 errors/15
+  accepted advisories; 1,536 tests green (web 564); copy:audit clean
+  (2,170 entries); build OK; budgets held.
+
+## PREVIOUS DEPLOYMENT — the asset cards' details sidebar (2026-10-26c, worker 6adfb632)
 
 The owner's directive — "The more details must show up in side bar" —
 is LIVE: the «جزئیات بیشتر» button opens the F5 details side panel

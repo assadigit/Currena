@@ -34,3 +34,6 @@ test data ships). The verification numbers live in
 Numeric verification per case (aggregate score, θ, lower pan) and the
 DOM/mid-animation audits: see `docs/insights/gold-balance-card-notes.md`
 §v7 "Verification".
+| `live-v7-en-1280.png` | LIVE production (currena.ir, worker 2e802ae7): the live state (1 against + 3 unread) at the 2° floor — beam `rotate(2 320 44)`, pan translates ±5.58px = 160 × sin 2°, attach error 0.000 measured on production |
+| `live-v7-fa-1280-rtl.png` | LIVE fa RTL: beam `rotate(-2 320 44)` (the visual sign flips; the against pan on the LEFT still drops), gauge aria «شیب تیر: ۲ درجه، تمایل به ضرر طلا.», the tile tap opens the Persian detail panel |
+| `live-v7-en-360.png`, `live-v7-fa-360-rtl.png` | LIVE mobile 390: the drawing scales as one piece (stage 326, pivot 163, drop 2.84 = 81.5 × sin 2°), zero overflow — the served Insights chunk is byte-identical to the fresh build (sha256 1872ef4f…) |
