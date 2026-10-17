@@ -122,6 +122,14 @@ both live evidence screenshots from that round show the defect.
   push/deploy; the balance round touches BalanceScale/MergedCard/copy
   dictionaries only — PricesBoard is untouched there and this fix applies
   cleanly on top.
+- Deployed: pushed as `c8e0741` → currena-api worker
+  `cc6f28e6-76dc-405f-a6ba-5fa7fd6adc9b`; re-verified LIVE on both
+  currena.ir and the workers.dev domain (panel paints on desktop +
+  mobile × en/fa RTL, 40px card→markets air, no overflow, zero errors;
+  post-rebase gates: typecheck 6/6, lint clean, 1,506 tests, copy:audit
+  clean, budgets held) — evidence
+  `docs/evidence/2026-10-24d-disclosure-overflow-fix/live/`, deploy
+  record in `docs/DEPLOY.md` §CURRENT DEPLOYMENT.
 
 ## [2026-10-24c] — the prices board cards re-drawn from the financial-asset-cards spec pack (rebased onto round-46 main)
 

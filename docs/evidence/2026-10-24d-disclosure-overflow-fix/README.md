@@ -45,3 +45,27 @@ tiles); panel bounding box fully inside its tile's box; collapsed grid
 restores four equal tiles; no horizontal overflow at 375px. Gates:
 typecheck 6/6, lint clean, web 533 green, copy:audit clean, budgets
 held (entry 295.29/88.82; Insights 624.64/149.59 vs 626/150).
+
+## Live verification (post-deploy, worker cc6f28e6)
+
+Rebased over the 2026-10-25 balance-v4 round (`29418f7`), pushed as
+`c8e0741`, deployed as worker `cc6f28e6-76dc-405f-a6ba-5fa7fd6adc9b`.
+Re-verified on LIVE production (both `currena-api.sedanama-ir.workers.dev`
+and `currena.ir` serve the deploy's `Insights-CPlqsmeb.js`):
+
+| File | State |
+|---|---|
+| `live/LIVE-desktop-1280-en-gold-expanded.png` | LIVE — panel paints inside the Gold tile with the full detail set (changes table, 52-week range US$3,961–5,318, record US$5,586 · Jan 29 2026, source); VLM PASS |
+| `live/LIVE-desktop-1280-en-prices-markets-spacing.png` | LIVE — collapsed grid; measured 40px card→markets air (was 28px) |
+| `live/LIVE-mobile-375-en-expanded.png` | LIVE — panel inside the grown tile, Silver 10px below it, scrollWidth 375 (no overflow) |
+| `live/LIVE-mobile-375-fa-rtl-expanded.png` | LIVE fa RTL — Persian rows paint («تغییر ۶ ماهه −۱۴٫۶۲٪», «سطح قیمت نسبت به دامنهٔ ۱۰ ساله»); VLM PASS |
+
+Live probe evidence: elementFromPoint at the expanded panel's own
+coordinates hits the panel's rows (EN: "52-week range US$3,961 –
+US$5,318", "25.4% below its record", the source link, the method note;
+fa: «تغییر ۶ ماهه−۱۴٫۶۲٪», «سطح قیمت نسبت به دامنهٔ ۱۰ ساله…»); panel
+bottom inside tile bottom on desktop AND mobile; `aria-expanded` +
+label flip verified in both locales; zero page errors. Post-rebase
+gates re-run green: typecheck 6/6, lint 0 errors, 1,506 tests (web
+534), copy:audit clean, budgets held (entry 295.29/88.81, Insights
+625.47/149.75 vs 626/150).

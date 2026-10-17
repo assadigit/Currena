@@ -83,7 +83,48 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
-## CURRENT DEPLOYMENT — the gold balance v4 abstract editorial mark (2026-10-25, worker c6e0c2c9)
+## CURRENT DEPLOYMENT — the «جزئیات بیشتر» white-space fix (2026-10-24d, worker cc6f28e6)
+
+The owner's post-deploy bug report is FIXED and LIVE: clicking «جزئیات
+بیشتر» / "More details" on the live site now renders the detail rows
+inside the card (was "just a white space"), and the prices block gained
+breathing room to the markets section (was "collided"). Root cause and
+fix: `docs/evidence/2026-10-24d-disclosure-overflow-fix/README.md`.
+
+- **Active worker**: currena-api **`cc6f28e6-76dc-405f-a6ba-5fa7fd6adc9b`**
+  (wrangler deploy from main @ `c8e0741` — the fix rebased over the
+  balance-v4 round `29418f7` and pushed before deploy; SITE_MODE=public,
+  RATES KV + ASSETS bindings, the `* * * * *` keep-warm cron unchanged).
+  currena-markets untouched.
+- **What it carries**: PricesBoard.tsx only — the tile `article` becomes
+  `flex h-full flex-col` and the card-body click-through button drops
+  `h-full` (keeps `grow`), so the disclosure trigger + expanded panel stay
+  INSIDE the tile and the tile grows naturally with the open panel (spec 02
+  §5); plus `pb-3` on the prices section = 40px card→markets air (was
+  28px; the page-wide rhythm untouched). All prior lineage (balance v4,
+  financial-asset-cards 2026-10-24c, market lenses, economic-indicators)
+  rides beneath, byte-for-byte.
+- **Chunk proof**: the deploy serves `index-Djk3ghSx.js` (295.29/88.81) +
+  `Insights-CPlqsmeb.js` (625.47/149.75 — budgets 626/150 held) — the
+  live-served chunks are the fresh main build's (`c8e0741`) exact
+  filenames (the entry hash moves with the lazy-chunk rename).
+- **Verified live** (agent-browser, fresh profile, both
+  `currena-api.sedanama-ir.workers.dev/insights` and `currena.ir`):
+  desktop 1280 EN — the expanded Gold panel PAINTS (elementFromPoint
+  probes hit the panel's own rows: "52-week range US$3,961 – US$5,318",
+  "25.4% below its record US$5,586", the source link, the method note);
+  panel bottom inside the tile bottom; measured 40px card→markets air
+  collapsed; mobile 375 EN — panel inside the grown tile, Silver 10px
+  below it, scrollWidth == 375, no horizontal overflow; fa RTL — «جزئیات
+  بیشتر»/«نمایش کمتر» label flip, Persian rows paint («تغییر ۶ ماهه
+  −۱۴٫۶۲٪», «سطح قیمت نسبت به دامنهٔ ۱۰ ساله»); VLM reviews of the live
+  captures pass; zero page errors. Evidence:
+  `docs/evidence/2026-10-24d-disclosure-overflow-fix/live/`.
+- **Post-rebase gates** (re-run on `c8e0741`): typecheck 6/6; lint 0
+  errors/15 accepted advisories; 1,506 tests green (web 534); copy:audit
+  clean; bundle budgets held.
+
+## Previous: the gold balance v4 abstract editorial mark (2026-10-25, worker c6e0c2c9)
 
 The owner's Iteration-2 directive is LIVE: the gold/silver balance
 component re-drawn as the abstract editorial mark «برآیند عوامل مؤثر بر
