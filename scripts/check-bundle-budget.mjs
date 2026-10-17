@@ -352,6 +352,19 @@ const BUDGETS = [
   // (149.92 vs 150.00 — the pill markup is highly compressible); the
   // entry chunk is untouched at 295.29/88.81 vs 296/89.5. Justified in
   // CHANGELOG §2026-10-26.
+  // Asset-cards polish bump (627.00/150.00 → 630.00/151.00,
+  // 2026-10-25b, rebased over the v5 round): the prices cards' polish
+  // round — the title/measurement-basis header (priceCardTitles +
+  // priceCardUnits × 2 locales), the one-line price + currency split
+  // (priceValueParts), the expanded panel's six semantic sections (18
+  // new copy keys × 2 locales + the sectioned markup) and the
+  // instrument-coverage notes (futures/blend/fetch-time, shown only
+  // when the served attribution is that instrument). Measured on the
+  // combined tree 629.04/150.69 + the v5 round's raw +0.27 — the raw
+  // overage is bilingual copy and panel structure, not logic; the
+  // entry chunk is untouched (295.29/88.81 vs 296/89.5). Justified in
+  // CHANGELOG §2026-10-25b and
+  // docs/QA/quirks-2026-10-25b-asset-cards-polish.md.
   // Balance v6 bump (627.00 → 632.00 raw, 150.00 → 151.00 gz,
   // 2026-10-26 — the Iteration-4 pans directive): the factor tiles
   // now REST ON real weighing pans hung from the beam — the drawing
@@ -365,7 +378,14 @@ const BUDGETS = [
   // entry chunk is untouched at 295.29/88.81 vs 296/89.5. Justified
   // in CHANGELOG §2026-10-26 (v6) and D-32 in
   // docs/DECISIONS_FOR_ALI.md.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 632_000, gz: 151_000, label: 'Insights lazy chunk' },
+  // Merged-tree final (632.00 → 635.00 raw, 151.00 → 152.00 gz,
+  // 2026-10-26 — the v6 pans round MERGED with the parallel 2026-10-25b
+  // asset-cards-polish round above): the two rounds were measured
+  // independently against the v5 base (v6: 631.01/150.80;
+  // 2026-10-25b: 629.04/150.69), and the combined tree measures
+  // 634.57/151.67 — both features' honest markup together. The entry
+  // chunk is untouched at 295.29/88.82 vs 296/89.5.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 635_000, gz: 152_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

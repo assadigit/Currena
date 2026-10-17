@@ -1,17 +1,20 @@
 /**
  * PricesBoard — the prices strip, re-drawn by the financial-asset-cards
  * spec pack (17 Oct 2026; supersedes the owner-sketch anatomy of
- * 2026-10-17b while preserving every statistic it introduced).
+ * 2026-10-17b while preserving every statistic it introduced) and polished
+ * by the 2026-10-25b asset-cards round (title/unit header, one-line price
+ * + currency, semantic detail sections, verified instrument notes).
  *
- * THE SPEC-PACK ANATOMY (one anatomy, every tile, mobile AND desktop —
- * spec 02 §2):
- *   1. IDENTITY ROW — the tinted icon box + the asset's plain name (the
- *      card's identifying label; the icon stays supportive, never larger
- *      than the name and price);
- *   2. PRICE ROW — the current price as the dominant numeric element,
- *      the unit attached as smaller secondary text on its own line under
- *      the digits (the established fa-safe convention: every tile's price
- *      block shares one height, beside-artifact wrapping is impossible);
+ * THE CARD ANATOMY (one anatomy, every tile, mobile AND desktop):
+ *   1. ASSET HEADER — the tinted icon box vertically centred against the
+ *      title block: the plain asset TITLE (semibold, ~18px) over the
+ *      MEASUREMENT-BASIS SUBTITLE (~13px secondary — «هر اونس تروی» /
+ *      "per troy ounce", verified against the served instrument). The
+ *      unit no longer rides inside the title ("Gold price (ounce)");
+ *   2. PRICE LINE — the current price and its currency on ONE baseline:
+ *      the digits dominant (~28px bold, tabular) with the currency
+ *      secondary beside it (fa «۴٬۱۶۶ دلار», en "US$4,166") — never on
+ *      separate lines, never split apart by direction changes;
  *   3. FRESHNESS — the compact per-card "as of" date; never implies the
  *      four assets are synchronised;
  *   4. SEVEN-DAY TREND — THE movement story: the horizon label, the net
@@ -27,17 +30,42 @@
  *      hedge; Bitcoin volatility-aware; oil gets the drivers-evidence
  *      caveat; no causes, forecasts, probabilities or advice);
  *   7. DISCLOSURE — «جزئیات بیشتر» / "More details": the secondary
- *      statistics (30/90-day, 6-month, 1-year changes, the 52-week range,
- *      the clarified 10-year price LEVEL, the record high with its date
- *      and basis, the 200-day gap, the futures note, the companion lines)
- *      behind an accessible per-card expand/collapse — preserved, not
- *      deleted.
+ *      statistics behind an accessible per-card expand/collapse —
+ *      preserved, not deleted, and organised into semantic sections
+ *      (2026-10-25b):
+ *        A تغییرات قیمت          — 7d/30d/90d/6m/1y, one «X گذشته» label family;
+ *        B محدودهٔ قیمت در ۵۲ هفتهٔ گذشته — the range «۳٬۹۶۱ تا ۵٬۳۱۸ دلار»
+ *                                  with «تا» between the endpoints, rendered
+ *                                  in the locale's own direction;
+ *        C سوابق تاریخی قیمت     — the 10-YEAR high with its date + basis
+ *                                  (computePeaks reads the 10-year window —
+ *                                  the label never claims an all-time record);
+ *        D جایگاه قیمت نسبت به شاخص‌های مرجع — the 10-year price LEVEL (the
+ *                                  clarified «بالا»), the 200-day average
+ *                                  gap, the distance below the 10-year high,
+ *                                  and the companion ratios;
+ *        E منبع داده و زمان به‌روزرسانی — provider + instrument attribution,
+ *                                  observation date vs fetch time, and the
+ *                                  futures/blend coverage notes — shown ONLY
+ *                                  when the SERVED attribution actually is
+ *                                  that instrument (the live merge rewrites
+ *                                  sourceName to the Yahoo futures attribution
+ *                                  when a fresher quote wins; the EOD snapshot
+ *                                  serves gold-api XAU/XAG spot — a futures
+ *                                  note on a spot price would be false);
+ *        F دربارهٔ این اعداد      — the methodology note.
  *
  * «بالا» CLARIFIED: the bare position word left the card face. The
  * metric it stood for — the reading's percentile inside its own 10-year
- * history — stays, in the expanded section, named precisely ("Price
- * level vs 10-year range: High — top 20% of the decade") with a note
- * that it describes a LEVEL, not a direction.
+ * history — stays, in section D, named precisely ("Price level vs
+ * 10-year range: High — top 20% of the decade") with a note that it
+ * describes a LEVEL, not a direction.
+ *
+ * PERSIAN TYPOGRAPHY (2026-10-25b): section headings drop the latin-only
+ * uppercase/letter-spacing treatments in fa (tracking breaks the visual
+ * joining of Persian script); every mixed-direction value (the price
+ * line, the range, the record row) is built from isolated <bdi> parts in
+ * the locale's own flow — never reversed substrings.
  *
  * Kept from the previous anatomy: ONE anatomy for all four tiles, the
  * stretch grid, the whole-body click-through to the details panel (the
@@ -51,7 +79,7 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import { formatNumber } from '@currena/core';
+import { formatDate, formatJalaliDate, formatNumber } from '@currena/core';
 import { ArrowDown, ArrowUp, ChevronDown, Coins, Minus } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
@@ -63,9 +91,9 @@ import {
   definitionFor,
   formatChange,
   formatIndicatorValue,
-  formatPeakDistance,
   indicatorValueParts,
   positionBand,
+  priceValueParts,
 } from './config';
 import { formatAsOf } from './HistoryChart';
 import { deriveTileStats, type TileStats } from './price-stats';
@@ -75,7 +103,7 @@ import { PriceSparkline } from './PriceSparkline';
 /* ------------------------------------------------------------------ *
  * The tile's icon box — compact and supportive (spec 02 §5: never more
  * prominent than the name and price), same tinted-ring language as the
- * previous anatomy.
+ * previous anatomy. One consistent size across all asset cards.
  * ------------------------------------------------------------------ */
 function PriceIconBox({ id }: { id: IndicatorId }) {
   const icon = indicatorIconUrl(id);
@@ -135,7 +163,9 @@ function useTileData(ids: readonly IndicatorId[]): Partial<Record<string, TileDa
 /**
  * The 52-week range in the tile's own units — EN prefixes the currency on
  * both ends ('US$2,895 – US$4,305'), fa says it once («۲٬۸۹۵ تا ۴٬۳۰۵
- * دلار»). Pure formatting; both parts ride in one <bdi dir="ltr">.
+ * دلار» — «تا» BETWEEN the endpoints, the currency attached to the whole
+ * range). Pure formatting; the caller renders it in the locale's own
+ * direction so the RTL flow — not a forced LTR island — orders the parts.
  */
 function formatPriceRange(
   id: IndicatorId,
@@ -206,6 +236,41 @@ function NoteLine({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * One semantic section of the expanded panel. The latin-only heading
+ * treatments (uppercase + letter-spacing) are applied in en ONLY —
+ * tracking visually separates the joined strokes of Persian script.
+ */
+function PanelSection({
+  title,
+  locale,
+  children,
+}: {
+  title: string;
+  locale: 'en' | 'fa';
+  children: ReactNode;
+}) {
+  return (
+    <section>
+      <h4
+        className={`m-0 mb-2 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] ${
+          locale === 'en' ? 'uppercase tracking-wide' : ''
+        }`}
+      >
+        {title}
+      </h4>
+      {children}
+    </section>
+  );
+}
+
+/** The reading's fetch time — Jalali + clock in fa, Gregorian + clock in en. */
+function formatUpdatedAt(iso: string, locale: 'en' | 'fa'): string {
+  return locale === 'fa'
+    ? formatJalaliDate(iso, 'fa-IR', { withClock: true })
+    : formatDate(iso, 'en-US', { withClock: true });
+}
+
 /* ------------------------------------------------------------------ *
  * The tile
  * ------------------------------------------------------------------ */
@@ -246,10 +311,10 @@ function PriceTile({
   const trend = isUnavailable ? null : (data?.trend ?? null);
   const netPct = trend?.netPct;
 
-  const valueParts =
-    reading.value !== null
-      ? indicatorValueParts(id, reading.value, numberLocale, copy.units)
-      : null;
+  // The price line's split parts (task §5): number + currency on one
+  // baseline, built from the display config — no string surgery.
+  const price =
+    reading.value !== null ? priceValueParts(id, reading.value, numberLocale, copy.units) : null;
 
   // The briefing (spec 03): deterministic templates, evidence only.
   const summary = briefingText(
@@ -272,7 +337,7 @@ function PriceTile({
 
   /* -------------------- the expanded-section facts -------------------- */
 
-  // Feed first (every price reading carries 7d/30d/90d today), the
+  // Feed First (every price reading carries 7d/30d/90d today), the
   // stored-history derivation second — EXCEPT the 7-day number, which
   // prefers the window the chart draws so the two can never disagree.
   const c1 = stats?.c1;
@@ -293,20 +358,28 @@ function PriceTile({
       : band === 'low'
         ? copy.ui.priceLevelLow
         : band === 'typical'
-          ? copy.ui.priceLevelTypical
-          : null;
+            ? copy.ui.priceLevelTypical
+            : null;
 
+  // Section C — the record. computePeaks (packages/insights) reads the
+  // 10-YEAR window: the label says exactly that, never "all-time".
   const peak = reading.peak;
   const peakParts = peak !== undefined ? indicatorValueParts(id, peak.value, numberLocale, copy.units) : null;
-  const fromRecord = !isUnavailable
-    ? formatPeakDistance(
-        reading,
-        numberLocale,
-        copy.ui,
-        (iso: string) => formatAsOf(iso, numberLocale === 'fa-IR' ? 'fa' : 'en'),
-        (value: number) => formatIndicatorValue(id, value, numberLocale, copy.units),
-      )
-    : null;
+
+  // Section D — the distance below the 10-year high (the record's own
+  // value and date live in section C; this line does not repeat them).
+  const fromRecord =
+    !isUnavailable && reading.fromPeak10y !== undefined && reading.fromPeak10y < 0 && peak !== undefined
+      ? interpolate(copy.ui.priceBelow10yHigh, {
+          // The gap is a percentage — the sign is carried by the wording
+          // («پایین‌تر» / "below"), so the placeholder takes the magnitude
+          // with the locale's percent glyph.
+          pct: `${formatNumber(Math.abs(reading.fromPeak10y), numberLocale, {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+          })}${numberLocale === 'fa-IR' ? '٪' : '%'}`,
+        })
+      : null;
 
   const ma200 =
     !isUnavailable && reading.ma200GapPct !== undefined && Math.abs(reading.ma200GapPct) >= 0.05
@@ -320,14 +393,14 @@ function PriceTile({
         })
       : null;
 
-  // The companion lines, computed FROM THE SAME DISPLAYED SNAPSHOT.
-  const notes: string[] = [];
-  if (!isUnavailable && (id === 'brent' || id === 'gold-usd' || id === 'silver-usd')) {
-    notes.push(copy.ui.exportFuturesNote);
-  }
+  // Section D — the companion lines, computed FROM THE SAME DISPLAYED
+  // SNAPSHOT (gold's A$ line; Bitcoin's two metal ratios as ONE sentence —
+  // fa's second ratio is a continuation of the first, and two separate
+  // bullets read as a fragment).
+  const companions: string[] = [];
   const goldAud = byId.get('gold-aud');
   if (id === 'gold-usd' && goldAud && goldAud.value !== null) {
-    notes.push(
+    companions.push(
       interpolate(copy.ui.goldAudLine, {
         value: formatIndicatorValue('gold-aud', goldAud.value, numberLocale, copy.units),
       }),
@@ -336,19 +409,36 @@ function PriceTile({
   const goldReading = byId.get('gold-usd');
   const silverReading = byId.get('silver-usd');
   const btcReading = byId.get('btc-usd');
-  if (id === 'btc-usd' && btcReading?.value != null && goldReading?.value != null && goldReading.value > 0) {
-    const ozGold = formatNumber(btcReading.value / goldReading.value, numberLocale, {
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 1,
-    });
-    notes.push(interpolate(copy.ui.btcBuysGold, { value: ozGold }));
+  if (
+    id === 'btc-usd' &&
+    btcReading?.value != null &&
+    goldReading?.value != null &&
+    goldReading.value > 0 &&
+    silverReading?.value != null &&
+    silverReading.value > 0
+  ) {
+    companions.push(
+      interpolate(copy.ui.btcCompanions, {
+        gold: formatNumber(btcReading.value / goldReading.value, numberLocale, {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 1,
+        }),
+        silver: formatNumber(btcReading.value / silverReading.value, numberLocale, {
+          maximumFractionDigits: 0,
+        }),
+      }),
+    );
   }
-  if (id === 'btc-usd' && btcReading?.value != null && silverReading?.value != null && silverReading.value > 0) {
-    const ozSilver = formatNumber(btcReading.value / silverReading.value, numberLocale, {
-      maximumFractionDigits: 0,
-    });
-    notes.push(interpolate(copy.ui.btcBuysSilver, { value: ozSilver }));
-  }
+
+  // Section E — the instrument coverage notes, shown ONLY when the SERVED
+  // attribution actually is that instrument. The serve-time live merge
+  // (packages/insights/prices) rewrites sourceName to the Yahoo futures
+  // attribution when a fresher quote wins; the EOD snapshot serves
+  // gold-api XAU/XAG spot. Matching the attribution string is the card's
+  // honest way to know which instrument the number is.
+  const sourceName = reading.sourceName ?? '';
+  const servedFutures = /futures/i.test(sourceName);
+  const servedBrentBlend = id === 'brent' && !servedFutures && /BZ=F/.test(sourceName);
 
   const hasDetails =
     !isUnavailable &&
@@ -362,10 +452,17 @@ function PriceTile({
       peak !== undefined ||
       fromRecord !== null ||
       ma200 !== null ||
-      notes.length > 0 ||
+      companions.length > 0 ||
       reading.sourceName !== undefined);
 
   /* ---------------------------- render ---------------------------- */
+
+  // The card header's title + measurement-basis subtitle (2026-10-25b):
+  // the unit is VERIFIED against the served instrument — gold/silver per
+  // troy ounce (XAU/XAG spot and the GC=F/SI=F refresh both quote per
+  // troy ounce), Brent per barrel (EIA spot / BZ=F), Bitcoin per coin.
+  const cardTitle = copy.ui.priceCardTitles[id] ?? entry.name;
+  const cardUnit = copy.ui.priceCardUnits[id] ?? null;
 
   return (
     <article
@@ -387,13 +484,20 @@ function PriceTile({
         onClick={(e) => onFocusCard(id, e.currentTarget)}
         className="insights-focusable flex w-full grow cursor-pointer flex-col border-0 bg-transparent p-0 text-start"
       >
-        {/* 1. IDENTITY — icon + plain name (no tickers, no series ids). The
-         * two-line min-height keeps the price rows aligned across tiles
-         * even when a neighbour's name wraps. */}
+        {/* 1. ASSET HEADER — icon vertically centred against the title
+         * block: plain title over the measurement-basis subtitle. No
+         * tickers, no series ids, no unit inside the title. */}
         <span className="flex w-full items-center gap-2.5">
           <PriceIconBox id={id} />
-          <span className="min-h-[2.75em] min-w-0 text-lg font-bold leading-snug text-[var(--color-text-primary)]">
-            {entry.name}
+          <span className="min-w-0 flex-1">
+            <span className="block text-lg font-semibold leading-snug text-[var(--color-text-primary)]">
+              {cardTitle}
+            </span>
+            {cardUnit !== null ? (
+              <span className="mt-0.5 block text-[13px] leading-snug text-[var(--color-text-secondary)]">
+                {cardUnit}
+              </span>
+            ) : null}
           </span>
         </span>
 
@@ -405,22 +509,30 @@ function PriceTile({
           </span>
         ) : (
           <>
-            {/* 2. PRICE — the dominant numeric element; the unit rides in
-             * its own small line under the digits (grouped, secondary,
-             * fa-safe: every tile's price block shares one height). */}
-            <span className="mt-3 flex w-full flex-col items-start gap-0.5">
-              {valueParts !== null ? (
+            {/* 2. THE PRICE LINE — price and currency on ONE baseline
+             * (task §5): the digits dominant, the currency secondary,
+             * grouped as a single semantic value. The parts ride in the
+             * document's own direction (fa: «۴٬۱۶۶ دلار»; en: "US$4,166")
+             * — each fragment isolated so a direction change can never
+             * split or reorder them. */}
+            <span className="mt-3 flex w-full flex-wrap items-baseline gap-x-1">
+              {price !== null ? (
                 <>
+                  {price.prefix !== null ? (
+                    <bdi className="type-number text-[15px] font-semibold leading-none text-[var(--color-text-secondary)]">
+                      {price.prefix}
+                    </bdi>
+                  ) : null}
                   <bdi
-                    className={`type-number tabular-nums text-[26px] font-bold leading-none tracking-tight ${
+                    className={`type-number tabular-nums text-[28px] font-bold leading-none tracking-tight ${
                       isStale ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-primary)]'
                     }`}
                   >
-                    {valueParts.value}
+                    {price.number}
                   </bdi>
-                  {valueParts.unit !== null ? (
-                    <bdi className="whitespace-nowrap text-[length:var(--type-caption)] font-semibold leading-tight text-[var(--color-text-secondary)]">
-                      {valueParts.unit}
+                  {price.suffix !== null ? (
+                    <bdi className="whitespace-nowrap text-[14px] font-semibold leading-none text-[var(--color-text-secondary)]">
+                      {price.suffix}
                     </bdi>
                   ) : null}
                 </>
@@ -538,11 +650,9 @@ function PriceTile({
               id={panelId}
               className="mt-2.5 flex flex-col gap-3.5 rounded-[var(--radius-md)] bg-currena-muted/[0.06] p-3.5 text-[length:var(--type-label)] dark:bg-white/[0.05]"
             >
-              {/* The changes — every window labelled with its own period. */}
-              <section>
-                <h4 className="m-0 mb-2 text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
-                  {copy.ui.changesLabel}
-                </h4>
+              {/* A — تغییرات قیمت: every window labelled with its own
+               * period, one «X گذشته» label family, shortest → longest. */}
+              <PanelSection title={copy.ui.sectionChanges} locale={locale}>
                 <dl className="m-0 flex flex-col gap-1.5">
                   <DetailRow label={copy.ui.past7days}>
                     <ChangeValue value={c7} changeKind={def.changeKind} numberLocale={numberLocale} copy={copy} na={copy.ui.na} />
@@ -560,70 +670,97 @@ function PriceTile({
                     <ChangeValue value={c1y} changeKind={def.changeKind} numberLocale={numberLocale} copy={copy} na={copy.ui.na} />
                   </DetailRow>
                 </dl>
-              </section>
+              </PanelSection>
 
-              {/* Ranges, records and the clarified price LEVEL. */}
-              <section>
-                <h4 className="m-0 mb-2 text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
-                  {copy.ui.stat52wRange} · {copy.ui.statRecordHigh}
-                </h4>
-                <dl className="m-0 flex flex-col gap-1.5">
-                  {has52 ? (
-                    <DetailRow label={copy.ui.stat52wRange}>
-                      <bdi dir="ltr" className="font-semibold tabular-nums">
-                        {formatPriceRange(id, stats!.low52!, stats!.high52!, numberLocale, copy)}
-                      </bdi>
-                    </DetailRow>
-                  ) : null}
-                  {peak !== undefined && peakParts !== null ? (
-                    <DetailRow label={copy.ui.statRecordHigh}>
-                      <bdi dir="ltr" className="font-semibold tabular-nums">
-                        {peakParts.value}
-                        {peakParts.unit !== null ? ` ${peakParts.unit}` : ''} ·{' '}
-                        {formatAsOf(peak.date, numberLocale === 'fa-IR' ? 'fa' : 'en')}{' '}
-                        <span className="font-normal text-[var(--color-text-tertiary)]">
-                          ({peak.basis === 'daily-high' ? copy.ui.peakBasisHigh : copy.ui.peakBasisClose})
-                        </span>
-                      </bdi>
-                    </DetailRow>
-                  ) : null}
-                  {levelWord !== null ? (
-                    <DetailRow label={copy.ui.priceLevelLabel}>
-                      <span className="font-semibold">{levelWord}</span>
-                    </DetailRow>
-                  ) : null}
-                </dl>
-                {levelWord !== null ? (
-                  <p className="m-0 mt-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]">
-                    {copy.ui.priceLevelNote}
+              {/* B — محدودهٔ قیمت در ۵۲ هفتهٔ گذشته: the range as the
+               * section's own display value, «۳٬۹۶۱ تا ۵٬۳۱۸ دلار» with
+               * «تا» between the endpoints, rendered in the locale's own
+               * direction (a forced LTR island is what scrambles mixed
+               * ranges). Only shown when the stored window really spans
+               * the year (price-stats' 300-day guard). */}
+              {has52 ? (
+                <PanelSection title={copy.ui.section52w} locale={locale}>
+                  <p className="m-0">
+                    <bdi
+                      dir={numberLocale === 'fa-IR' ? 'rtl' : 'ltr'}
+                      className="text-[15px] font-semibold tabular-nums leading-relaxed text-[var(--color-text-primary)]"
+                    >
+                      {formatPriceRange(id, stats!.low52!, stats!.high52!, numberLocale, copy)}
+                    </bdi>
                   </p>
-                ) : null}
-                {fromRecord !== null ? (
-                  <p className="m-0 mt-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
-                    <bdi>{fromRecord}</bdi>
-                  </p>
-                ) : null}
-                {ma200 !== null ? (
-                  <p className="m-0 mt-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
-                    <bdi>{ma200}</bdi>
-                  </p>
-                ) : null}
-              </section>
-
-              {/* The context notes (futures basis, companions, ratios). */}
-              {notes.length > 0 ? (
-                <section>
-                  <ul className="m-0 flex list-none flex-col gap-1.5 p-0">{notes.map((n) => <NoteLine key={n}>{n}</NoteLine>)}</ul>
-                </section>
+                </PanelSection>
               ) : null}
 
-              {/* Source + as-of + the method note (the card FACE stays
-               * source-free — the owner's decree; the disclosure and the
-               * details panel carry the attribution). */}
-              <section>
-                <h4 className="m-0 mb-2 text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
-                  {copy.ui.priceSourceLabel}
-                </h4>
+              {/* C — سوابق تاریخی قیمت: the 10-year high, its date and
+               * its basis (daily high vs daily close) — structured parts,
+               * each isolated, flowing in the locale's own direction. */}
+              {peak !== undefined && peakParts !== null ? (
+                <PanelSection title={copy.ui.sectionRecords} locale={locale}>
+                  <dl className="m-0 flex flex-col gap-1.5">
+                    <DetailRow label={copy.ui.statRecordHigh}>
+                      <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
+                        <bdi className="font-semibold tabular-nums">
+                          {peakParts.value}
+                          {peakParts.unit !== null ? ` ${peakParts.unit}` : ''}
+                        </bdi>
+                        <span aria-hidden className="text-[var(--color-text-tertiary)]">·</span>
+                        <bdi>{formatAsOf(peak.date, locale === 'fa' ? 'fa' : 'en')}</bdi>
+                        <span className="text-[length:var(--type-caption)] font-normal text-[var(--color-text-tertiary)]">
+                          ({peak.basis === 'daily-high' ? copy.ui.peakBasisHigh : copy.ui.peakBasisClose})
+                        </span>
+                      </span>
+                    </DetailRow>
+                  </dl>
+                </PanelSection>
+              ) : null}
+
+              {/* D — جایگاه قیمت نسبت به شاخص‌های مرجع: the 10-year
+               * LEVEL (the clarified «بالا», with its level-not-direction
+               * note), the 200-day average gap, the distance below the
+               * 10-year high, and the companion ratios. */}
+              {levelWord !== null || ma200 !== null || fromRecord !== null || companions.length > 0 ? (
+                <PanelSection title={copy.ui.sectionReferences} locale={locale}>
+                  {levelWord !== null ? (
+                    <>
+                      <dl className="m-0 flex flex-col gap-1.5">
+                        <DetailRow label={copy.ui.priceLevelLabel}>
+                          <span className="font-semibold">{levelWord}</span>
+                        </DetailRow>
+                      </dl>
+                      <p className="m-0 mt-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]">
+                        {copy.ui.priceLevelNote}
+                      </p>
+                    </>
+                  ) : null}
+                  {ma200 !== null ? (
+                    <p className="m-0 mt-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+                      <bdi>{ma200}</bdi>
+                    </p>
+                  ) : null}
+                  {fromRecord !== null ? (
+                    <p className="m-0 mt-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+                      <bdi>{fromRecord}</bdi>
+                    </p>
+                  ) : null}
+                  {companions.length > 0 ? (
+                    <ul className="m-0 mt-1.5 flex list-none flex-col gap-1.5 p-0">
+                      {companions.map((n) => (
+                        <NoteLine key={n}>{n}</NoteLine>
+                      ))}
+                    </ul>
+                  ) : null}
+                </PanelSection>
+              ) : null}
+
+              {/* E — منبع داده و زمان به‌روزرسانی: the provider +
+               * instrument attribution (the source link), the observation
+               * date, the app's fetch time (distinct from the observation
+               * when they differ), and the honest coverage notes — the
+               * futures note ONLY when the served price IS the futures
+               * quote, the blend note for Brent's EOD series. The card
+               * FACE stays source-free — the owner's decree; the
+               * disclosure and the details panel carry the attribution. */}
+              <PanelSection title={copy.ui.sectionSource} locale={locale}>
                 {reading.sourceUrl ? (
                   <a
                     href={reading.sourceUrl}
@@ -645,11 +782,31 @@ function PriceTile({
                     <bdi>{interpolate(copy.ui.pricesAsOf, { date: formatAsOf(reading.asOf, locale) })}</bdi>
                   </p>
                 ) : null}
-                <p className="m-0 mt-2.5 text-[11px] leading-relaxed text-[var(--color-text-tertiary)]">
-                  <span className="font-semibold">{copy.ui.aboutNumbersLabel}: </span>
+                {reading.updatedAt ? (
+                  <p className="m-0 mt-1 text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
+                    <bdi>{interpolate(copy.ui.priceFetchedAt, { time: formatUpdatedAt(reading.updatedAt, locale) })}</bdi>
+                  </p>
+                ) : null}
+                {servedFutures ? (
+                  <p className="m-0 mt-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+                    <bdi>{copy.ui.priceFuturesNote}</bdi>
+                  </p>
+                ) : null}
+                {servedBrentBlend ? (
+                  <p className="m-0 mt-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+                    <bdi>{copy.ui.priceBrentBlendNote}</bdi>
+                  </p>
+                ) : null}
+              </PanelSection>
+
+              {/* F — دربارهٔ این اعداد: the methodology note (the
+               * chart/percentage window, the daily-change basis, the
+               * no-fabrication rule). */}
+              <PanelSection title={copy.ui.aboutNumbersLabel} locale={locale}>
+                <p className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]">
                   {copy.ui.aboutNumbersBody}
                 </p>
-              </section>
+              </PanelSection>
             </div>
           ) : null}
         </>

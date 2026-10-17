@@ -83,7 +83,46 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
-## CURRENT DEPLOYMENT — the gold balance v5 wireframe re-composition (2026-10-26, worker 2f1e8f92)
+## CURRENT DEPLOYMENT — the asset-cards polish round (2026-10-25b, worker ead002b6)
+
+The owner's asset-cards polish task is LIVE: the four financial cards
+carry the editorial header (plain title over a verified measurement-
+basis subtitle), the ONE-LINE price + currency («۴٬۱۶۶ دلار» /
+"US$4,166"), the expanded panel's six semantic sections, and honest
+instrument notes that follow the SERVED attribution (the futures note
+no longer renders on gold-api XAU/XAG spot prices; «بیشترین قیمت ۱۰
+سال اخیر» replaces the all-time record claim). Pushed as db31745
+(rebased over the balance-v5 round 5f37014) before deploy.
+
+- **Active worker**: currena-api **`ead002b6-3c9e-4e9a-aae9-4535bb462f9f`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched).
+- **What it carries**: PricesBoard.tsx (header/price line/sections
+  A–F/conditional notes), the new pure priceValueParts display helper,
+  18 new copy keys + 5 relabelled (en+fa), +14 tests, the round-51
+  copy triage, and the documented Insights budget bump 627/150 →
+  630/151. All prior lineage (balance v5 + v4, financial-asset-cards
+  2026-10-24c/d, market lenses, economic-indicators) rides beneath.
+- **Chunk proof**: serves `index-BtcN1ZYd.js` (295.29/88.82) +
+  `Insights-BMyE-MXL.js` (629.85/150.88 — budgets 630/151 held) —
+  the fresh db31745 build's exact filenames.
+- **Verified live** (agent-browser, fresh profile, both
+  currena-api.sedanama-ir.workers.dev and currena.ir serve
+  Insights-BMyE-MXL.js): desktop 1280 fa — «قیمت طلا»/«هر اونس تروی»,
+  «۴٬۱۶۶ دلار» on one line, the six sections («تغییرات قیمت …
+  دربارهٔ این اعداد»), the range «۳٬۹۶۱ تا ۵٬۳۱۸ دلار», the record
+  «بیشترین قیمت ۱۰ سال اخیر», the fetch-time line; desktop 1280 en —
+  the six sections, gold's XAU spot attribution with NO futures note
+  (brent keeps its blend note); mobile 375 en — "Gold price" + "per
+  troy ounce", "US$ 4,166" one line, no horizontal overflow. Zero
+  console errors. Evidence:
+  `docs/evidence/2026-10-25b-asset-cards-polish/` (before/after +
+  LIVE-*.png).
+- **Gates on the rebased tree**: typecheck 6/6; lint 0 errors/15
+  accepted advisories; 1,520 tests green (web 548); copy:audit clean
+  (2,170 entries); build OK; budgets held.
+
+## Previous: the gold balance v5 wireframe re-composition (2026-10-26, worker 2f1e8f92)
 
 The owner's wireframe reference (docs/ui-reference/gold-silver-balance-target-
 wireframe.png) is LIVE: the gold balance component re-composed — the two

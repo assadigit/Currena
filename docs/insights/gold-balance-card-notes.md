@@ -978,9 +978,11 @@ the factor tiles themselves.
   model), shrinking or removing the empty pan (the fixed-geometry and
   complete-structure rules), hiding the level reference (the v2 §5.3
   rule kept through v4/v5).
-- **Budget:** Insights lazy 631.01/150.80 vs the bumped 632.00/151.00
-  (raw +4.01 kB, gz +0.80 kB over v5 — the mandated markup's honest
-  price; D-32); the entry chunk untouched at 295.29/88.81.
+- **Budget:** the v6 round measured 631.01/150.80 alone (+4.01 raw
+  over v5 — the mandated markup's honest price; D-32); the parallel
+  2026-10-25b asset-cards round landed at push time, so the MERGED tree
+  measures 634.57/151.67 vs the bumped 635.00/152.00; the entry chunk
+  untouched at 295.29/88.82.
 
 Screenshots: `docs/insights/screenshots/gold-balance/v6/` (the
 before/after comparison, the A–H × en/fa sweep, the mobile and dark

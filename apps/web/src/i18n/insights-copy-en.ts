@@ -1293,8 +1293,11 @@ export const insightsCopyEn = {
     priceChangeMonthly: 'Monthly',
     priceChangeQuarterly: 'Quarterly',
     descriptionLabel: 'Description',
-    stat6mChange: '6-month change',
-    stat1yChange: '1-year change',
+    // 2026-10-25b (asset-cards polish): one consistent «X گذشته» label
+    // family for every change window on the prices cards — the old mix
+    // ('6-month change' / '30 days') read as different kinds of numbers.
+    stat6mChange: 'Past 6 months',
+    stat1yChange: 'Past 1 year',
     stat52wRange: '52-week range',
     rangeJoin: '–',
     btcRatiosLabel: 'Context only, not used in signals',
@@ -1335,8 +1338,45 @@ export const insightsCopyEn = {
     moreDetails: 'More details',
     lessDetails: 'Show less',
     changesLabel: 'Changes',
-    change30dLabel: '30 days',
-    change90dLabel: '90 days',
+    change30dLabel: 'Past 30 days',
+    change90dLabel: 'Past 90 days',
+    // 2026-10-25b (asset-cards polish, task §4/§6): the card header's
+    // title + measurement-basis subtitle. The unit is VERIFIED against the
+    // served instrument: gold/silver per troy ounce (XAU/XAG spot or the
+    // GC=F/SI=F futures refresh — both quote per troy ounce), Brent per
+    // barrel (EIA spot / BZ=F), Bitcoin in US dollars per coin.
+    priceCardTitles: {
+      'gold-usd': 'Gold price',
+      'silver-usd': 'Silver price',
+      brent: 'Brent crude oil',
+      'btc-usd': 'Bitcoin price',
+    } as Partial<Record<string, string>>,
+    priceCardUnits: {
+      'gold-usd': 'per troy ounce',
+      'silver-usd': 'per troy ounce',
+      brent: 'per barrel',
+      'btc-usd': 'per bitcoin',
+    } as Partial<Record<string, string>>,
+    // 2026-10-25b (task §9): the expanded panel's semantic sections.
+    sectionChanges: 'Price changes',
+    section52w: 'Price range over the past 52 weeks',
+    sectionRecords: 'Historical price records',
+    sectionReferences: 'Price vs reference levels',
+    sectionSource: 'Data source & freshness',
+    // Task §9C: the records are 10-year-window peaks (computePeaks reads
+    // the 10-year Yahoo histories; Brent's own series is capped to the
+    // same window) — the label must not claim an all-time record.
+    priceBelow10yHigh: '{pct} below its 10-year high',
+    // Task §10 (instrument consistency): these coverage notes render ONLY
+    // when the SERVED attribution actually is that instrument — the card
+    // checks reading.sourceName (the live merge rewrites it to the Yahoo
+    // futures attribution when a fresher quote wins).
+    priceFuturesNote: 'The displayed price is the front-month futures contract, not the spot price.',
+    priceBrentBlendNote: 'The Brent series is the EIA spot price, extended past its last published date by the BZ=F futures contract.',
+    priceFetchedAt: 'Price fetched: {time}',
+    // One line when both companion ratios exist (fa's second ratio is a
+    // sentence continuation — two separate bullets read as a fragment).
+    btcCompanions: 'One bitcoin buys {gold} oz of gold, or about {silver} oz of silver.',
     // The 10-year price LEVEL, precisely identified (the clarified
     // «بالا»): a percentile band of the asset's own decade, not a trend.
     priceLevelLabel: 'Price level vs 10-year range',
@@ -1344,7 +1384,9 @@ export const insightsCopyEn = {
     priceLevelTypical: 'Within its usual range',
     priceLevelLow: 'Low — bottom 20% of the decade',
     priceLevelNote: 'This describes the price level relative to the asset’s own ten-year history — not its direction.',
-    statRecordHigh: 'Historical high',
+    // 2026-10-25b: 10-year-window record (see computePeaks) — was
+    // 'Historical high', which claimed more coverage than the data has.
+    statRecordHigh: '10-year high',
     priceSourceLabel: 'Data source',
     aboutNumbersLabel: 'About these numbers',
     aboutNumbersBody:
