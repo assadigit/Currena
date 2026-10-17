@@ -17,7 +17,7 @@ import {
   DirectionGlyph,
   fmtClose,
   isOld,
-  signedPct,
+  signedPctOrDash,
   statusToneOf,
   statusWordKeyOf,
   TREND_WORD_OF,
@@ -84,12 +84,14 @@ export function MarketTile({
       </span>
       {/* The number + the owner's up/down artwork: the signed number
        * carries the meaning, the green/red zigzags ride beside it (round
-       * 44) — direction is never colour alone (§6.8). */}
+       * 44) — direction is never colour alone (§6.8). Round 46: a lens the
+       * row does not carry yet shows the honest dash and no artwork —
+       * never a zero, never a guess. */}
       <span className="inline-flex items-center gap-1 font-semibold text-[var(--color-text-primary)]">
         <bdi dir="ltr" className="type-number tabular-nums">
-          {signedPct(pct, numberLocale, locale)}
+          {signedPctOrDash(pct, numberLocale, locale)}
         </bdi>
-        <DirectionGlyph arrow={arrow} />
+        {pct === null ? null : <DirectionGlyph arrow={arrow} />}
       </span>
       {/* Step-1 F5: the 52-week distance rides EVERY tile — the correcting
        * markets keep their warning tone; a market at its high says so. */}

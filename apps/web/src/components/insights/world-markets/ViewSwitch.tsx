@@ -1,6 +1,7 @@
 /**
- * world-markets/ViewSwitch — the Today | 3 months | From 52-week-high
- * lens switch (§6.3; split from WorldMarkets.tsx, code moved verbatim).
+ * world-markets/ViewSwitch — the Today | 1 week | 1 month | 3 months |
+ * From 52-week-high lens switch (§6.3; split from WorldMarkets.tsx, code
+ * moved verbatim; round 46 added the weekly and monthly lenses).
  * A real radiogroup, arrow keys work; the NORMAL timeframe is 3 months.
  */
 
@@ -11,12 +12,17 @@ import type { MarketsView } from './shared';
 /* ------------------------------------------------------------------ *
  * The view switch (§6.3): a real radiogroup, arrow keys work. The NORMAL
  * timeframe is 3 months — it is the lens the section opens on (owner
- * round 44; Today stays one tap away).
+ * round 44; Today, 1 week and 1 month stay one tap away). Round 46 added
+ * the two shorter lenses in ascending duration order, so the switch reads
+ * Today | 1 week | 1 month | 3 months | From 52-week high — one arc,
+ * the 52-week distance last.
  * ------------------------------------------------------------------ */
 
-const VIEWS: readonly MarketsView[] = ['today', '3m', 'high'];
-const VIEW_LABEL: Record<MarketsView, 'viewToday' | 'view3m' | 'viewFromHigh'> = {
+const VIEWS: readonly MarketsView[] = ['today', '1w', '1m', '3m', 'high'];
+const VIEW_LABEL: Record<MarketsView, 'viewToday' | 'viewWeek' | 'viewMonth' | 'view3m' | 'viewFromHigh'> = {
   today: 'viewToday',
+  '1w': 'viewWeek',
+  '1m': 'viewMonth',
   '3m': 'view3m',
   high: 'viewFromHigh',
 };

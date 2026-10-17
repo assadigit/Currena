@@ -66,7 +66,8 @@ export const WEEKLY_POINTS = 52;
 /**
  * Day-zero for the delta-encoded weekly series: 2020-01-01's epoch day
  * (days since 1970-01-01 UTC). Keeps every stored day delta small so the
- * ONE stored object stays under the route's 12 KB budget.
+ * ONE stored object stays under the route's 13 KB budget (raised from
+ * 12 KB by round 46 — the weekly lens field).
  */
 export const WEEKLY_EPOCH_BASE_DAY = 18262;
 

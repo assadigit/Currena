@@ -59,9 +59,10 @@ import {
  * Storage precision: indices are quoted to two decimals and the UI never
  * renders more, so the stored object rounds closes/changes to 2 decimals
  * and rangePos to one — that is what keeps the whole 16-market payload
- * (weekly series included) comfortably under the route's 12 KB budget
- * (spec §4). Status/trend are computed from the raw values BEFORE rounding
- * so band edges stay deterministic.
+ * (weekly series included) comfortably under the route's 13 KB budget
+ * (spec §4; raised from 12 KB by round 46 — the weekly lens field, which
+ * measured the old ceiling at 98% consumed). Status/trend are computed
+ * from the raw values BEFORE rounding so band edges stay deterministic.
  */
 function round2(n: number): number {
   return Math.round(n * 100) / 100;
@@ -110,7 +111,8 @@ export function statusOf(fromHigh: number, prevStatus: MarketStatus | undefined)
 
 /**
  * The ≤52-point weekly series (§4 rule 7), DELTA-ENCODED to keep the one
- * stored object under the route's 12 KB budget: the LAST close of each
+ * stored object under the route's 13 KB budget (spec §4; raised from 12 KB
+ * by round 46): the LAST close of each
  * calendar week (Monday-start), oldest first, as [dayDelta, close] pairs.
  * dayDelta counts days from the previous entry (the first from
  * WEEKLY_EPOCH_BASE — 2020-01-01); close is integer chart precision.
@@ -180,6 +182,14 @@ export function buildEntry(
   const chg3m = pctChange(last.value, windowAgo?.value);
   if (chg3m === null) throw new Error(`[markets] ${id}: no close on/before three months back for chg3m`);
 
+  // chg1w: vs the last close on or before the same date one week earlier —
+  // the weekly lens of the view switch (round 46), the same rolling-anchor
+  // rule chg1m/chg3m use. A ~400-day provider window always carries an
+  // anchor; if it somehow does not, the row omits the field (the UI shows
+  // an honest dash, never a guess).
+  const weekAgo = pointAtOrBefore(points, addDays(last.date, -7));
+  const chg1w = pctChange(last.value, weekAgo?.value);
+
   // chg1m: vs the last close on or before the same date one month earlier —
   // the leg the currency section's rules read (currencies spec §6.3). A
   // ~400-day provider window always carries an anchor; if it somehow does
@@ -204,6 +214,7 @@ export function buildEntry(
     asOf: last.date,
     close: round2(last.value),
     chg1d: round2(chg1d),
+    ...(chg1w !== null ? { chg1w: round2(chg1w) } : {}),
     ...(chg1m !== null ? { chg1m: round2(chg1m) } : {}),
     chg3m: round2(chg3m),
     high52w: round2(high),

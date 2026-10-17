@@ -17,9 +17,11 @@ export type MarketsLoadState =
   | { kind: 'empty' }
   | { kind: 'ready'; snapshot: MarketsSnapshot };
 
-/** The section's lenses: today, the NORMAL 3-month window, or the distance
- * from the 52-week high (spec §6.3 as amended by owner round 44). */
-export type MarketsView = 'today' | '3m' | 'high';
+/** The section's lenses: today, 1 week, 1 month, the NORMAL 3-month window,
+ * or the distance from the 52-week high (spec §6.3 as amended by owner round
+ * 44; round 46 added the weekly and monthly lenses in ascending duration
+ * order, the 52-week distance last). */
+export type MarketsView = 'today' | '1w' | '1m' | '3m' | 'high';
 
 /* ------------------------------------------------------------------ *
  * Pure display helpers
@@ -57,13 +59,35 @@ export function trendOf(m: Pick<MarketEntry, 'chg3m'>): 'up' | 'flat' | 'down' {
   return bandedArrow(m.chg3m);
 }
 
-/** The number + direction the current view shows for one market. */
-export function viewValue(m: MarketEntry, view: MarketsView): { pct: number; arrow: 'up' | 'flat' | 'down' } {
+/** The number + direction the current view shows for one market. A null pct
+ * means the row carries no reading for that lens yet (a stored row written
+ * before round 46) — the caller renders the honest dash, never a guess. */
+export function viewValue(m: MarketEntry, view: MarketsView): { pct: number | null; arrow: 'up' | 'flat' | 'down' } {
   if (view === 'high') {
     return { pct: m.fromHigh, arrow: bandedArrow(m.fromHigh) };
   }
-  const pct = view === 'today' ? m.chg1d : m.chg3m;
-  return { pct, arrow: bandedArrow(pct) };
+  if (view === 'today') {
+    return { pct: m.chg1d, arrow: bandedArrow(m.chg1d) };
+  }
+  if (view === '1w') {
+    return m.chg1w === undefined ? { pct: null, arrow: 'flat' } : { pct: m.chg1w, arrow: bandedArrow(m.chg1w) };
+  }
+  if (view === '1m') {
+    return m.chg1m === undefined ? { pct: null, arrow: 'flat' } : { pct: m.chg1m, arrow: bandedArrow(m.chg1m) };
+  }
+  return { pct: m.chg3m, arrow: bandedArrow(m.chg3m) };
+}
+
+/** Round 46: the honest no-reading placeholder for a lens the row does not
+ * carry yet (a stored row written before the weekly/monthly fields existed).
+ * Same rule as the fx engine's missing input: an absent row is absent —
+ * never a zero, never a guess. Rendered inside the same bdi as a percentage
+ * so bidi never moves it. */
+export const NO_READING = '—';
+
+/** signedPct for a lens value, with the honest dash for a missing one. */
+export function signedPctOrDash(pct: number | null, numberLocale: 'en-US' | 'fa-IR', locale: 'en' | 'fa'): string {
+  return pct === null ? NO_READING : signedPct(pct, numberLocale, locale);
 }
 
 /**

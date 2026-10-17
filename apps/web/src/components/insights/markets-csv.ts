@@ -30,7 +30,11 @@ export function marketsCsvFilename(generatedAt: string): string {
   return `currena-world-markets-${date}.csv`;
 }
 
-/** Column order — stable API for anyone scripting over the export. */
+/** Column order — stable API for anyone scripting over the export. Round 46
+ * (the weekly/monthly lenses) APPENDED the 1-week and 1-month columns at the
+ * END (after Source) so position-pinned scripts keep reading every existing
+ * column at the same index; the human-facing table orders them by duration
+ * instead — the table is a page surface, this file is a machine surface. */
 function marketsCsvHeaders(copy: InsightsCopy): string[] {
   return [
     copy.markets.csvColMarket,
@@ -44,6 +48,8 @@ function marketsCsvHeaders(copy: InsightsCopy): string[] {
     copy.markets.csvColLow52w,
     copy.markets.csvColAsOf,
     copy.markets.csvColSource,
+    copy.markets.csvColWeek,
+    copy.markets.csvColMonth,
   ];
 }
 
@@ -77,6 +83,10 @@ export function buildMarketsCsv(snapshot: MarketsSnapshot, copy: InsightsCopy): 
         csvNumber(m.low52w),
         m.asOf,
         m.source,
+        // Round 46: a stored row without the lens yet exports an EMPTY field —
+        // absent is absent, never a guessed zero.
+        m.chg1w === undefined ? '' : csvNumber(m.chg1w),
+        m.chg1m === undefined ? '' : csvNumber(m.chg1m),
       ].join(','),
     );
   }

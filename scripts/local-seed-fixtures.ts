@@ -59,6 +59,7 @@ function entry(
     asOf: '2026-10-16',
     close,
     chg1d,
+    chg1w: chg3m / 12,
     chg1m: chg3m / 3,
     chg3m,
     high52w,

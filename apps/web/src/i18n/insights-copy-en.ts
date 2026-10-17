@@ -1582,10 +1582,14 @@ export const insightsCopyEn = {
     asOf: 'as of {date}',
     /** Regional groups, east to west (the trading day's order). */
     groups: { asia: 'Asia-Pacific', europe: 'Europe', americas: 'Americas' },
-    /** The segmented view switch (§6.3, round 44): the NORMAL timeframe is
-     * 3 months — the lens the section opens on; Today stays one tap away. */
+    /** The segmented view switch (§6.3, round 44 → round 46): the NORMAL
+     * timeframe is 3 months — the lens the section opens on; Today, 1 week
+     * and 1 month stay one tap away (round 46 added the two shorter
+     * lenses, ascending duration order, the 52-week distance last). */
     viewSwitchAria: 'Choose the number every market tile shows',
     viewToday: 'Today',
+    viewWeek: '1 week',
+    viewMonth: '1 month',
     view3m: '3 months',
     viewFromHigh: 'From 52-week high',
     /** The focal verdict box's words (owner round 44) — market-speak on the
@@ -1632,6 +1636,8 @@ export const insightsCopyEn = {
     tableLabel: 'All world stock markets',
     thMarket: 'Market',
     thToday: 'Today',
+    thWeek: '1 week',
+    thMonth: '1 month',
     th3m: '3 months',
     thFromHigh: 'From 52-week high',
     thTrend: 'Trend',
@@ -1668,6 +1674,8 @@ export const insightsCopyEn = {
     /** CSV export columns (the Tools menu, §6.4). */
     csvColMarket: 'Market',
     csvColToday: 'Today %',
+    csvColWeek: '1 week %',
+    csvColMonth: '1 month %',
     csvCol3m: '3 months %',
     csvColFromHigh: 'From 52-week high %',
     csvColTrend: 'Trend',

@@ -15,6 +15,7 @@ import { parseEodhdEodResponse, parseYahooChartResponse, ProviderError } from '.
 import { fetchEodhdSeries, fetchYahooSeries } from './providers';
 import type { MarketSeries } from './providers';
 import {
+  buildEntry,
   buildMarketsSnapshot,
   marketsContentEqual,
   marketsContentHash,
@@ -26,6 +27,7 @@ import {
   weeklySeries,
 } from './compute';
 import type { MarketResolution } from './compute';
+import { addDays, pointAtOrBefore } from '../series';
 import { lastExpectedCloseDate, marketsNeedingData, retryRunOptions, runMarketsJob } from './job';
 import type { MarketJobFetchers } from './job';
 import { InMemoryMarketsStore, RestMarketsStore, parseStoredMarkets } from './store';
@@ -236,6 +238,31 @@ describe('trendOf', () => {
     expect(trendOf(flat(100.5))).toBe('flat'); // +0.5%
     expect(trendOf(flat(99.5))).toBe('flat'); // −0.5%
     expect(trendOf(flat(98.5))).toBe('down'); // −1.5%
+  });
+});
+
+describe('buildEntry — the derived numbers (round 46: the weekly/monthly lenses)', () => {
+  it('derives chg1w from the last close on/before 7 calendar days earlier, chg1m from 30 — the same rolling-anchor rule as chg3m', () => {
+    const s = series('sp500', 'eodhd', '2026-10-12', 300);
+    const entry = buildEntry('sp500', s, undefined, RUN_DATE);
+    const last = s.points[s.points.length - 1]!;
+    const pctVs = (days: number): number => {
+      const anchor = pointAtOrBefore(s.points, addDays(last.date, -days))!;
+      return Math.round(((last.value - anchor.value) / anchor.value) * 100 * 100) / 100;
+    };
+    expect(entry.chg1w).not.toBeUndefined();
+    expect(entry.chg1w).toBe(pctVs(7));
+    expect(entry.chg1m).not.toBeUndefined();
+    expect(entry.chg1m).toBe(pctVs(30));
+    // The generator declines ~0.1 per trading day toward the end date, so
+    // every window is negative and strictly deeper the longer it gets — a
+    // window mix-up (e.g. chg1w reading the 30-day anchor) flattens the
+    // ladder and fails here.
+    expect(entry.chg1d).toBeGreaterThan(entry.chg1w!);
+    expect(entry.chg1w!).toBeLessThan(0);
+    expect(entry.chg1w!).toBeGreaterThan(entry.chg1m!);
+    expect(entry.chg1m!).toBeGreaterThan(entry.chg3m);
+    expect(entry.chg3m).toBe(pctVs(90));
   });
 });
 
