@@ -1,18 +1,23 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-19f (SPARKLINE HONESTY session — the owner's
-screenshot report: the USD→IRT converter sparkline "seems irregular and
-like a placeholder or buggy"). Root cause was NOT quota/API: TGJU
-re-quotes jitter every 6-minute tick (median 0.01–0.04%) and the USD
-quote bobs between two levels ~0.375% apart; exact-value dedup recorded
-every tick (240/240 distinct gens ≈ 24 h) and the UI drew raw points
-min-max-normalized → a full-height sawtooth. Fixed in three honest
-layers: record deadband 0.05% vs last RECORDED level (hysteresis),
-drawn-line bucketMean(≤48) with RAW trend/range/count chips, Sparkline
-domain padded to ≥2.5% of level; one-time KV prune (tgju 240 → 188).
-Deployed currena-api `ed79e2cc` from `9724040`; 1,431 tests green; the
-owner's exact card verified calm on production (fa, 375 px). See
-CHANGELOG 2026-10-19f + docs/evidence/2026-10-19f-sparkline-honesty/.
+Hand-off date: 2026-10-20 (the owner pasted the exact rendered
+`<details>` «پیش از خرید سهام آمریکا بدانید» box and said "Remove this
+entirely.") — DONE: `UsSharesNotesBox` deleted (component + render +
+import; `UsSharesAudBox` untouched), the four `usShares*` copy keys
+retired from both dictionaries, their four manifest entries pruned.
+Gates green (copy:audit clean; web 461/461 + full workspace; typecheck
+6/6; lint 0 errors; budgets held — Insights lazy SHRANK to 592.61/
+141.14 gz). Deployed currena-api `e6d18811` from main; production
+verified (served chunk byte-identical, 0 occurrences of the box copy;
+/api/insights → 32 readings, all four price tiles present). See
+CHANGELOG 2026-10-20 + docs/evidence/2026-10-20-remove-us-shares-notes/.
+Prior state (2026-10-19f): the SPARKLINE HONESTY round — the owner's
+screenshot report on the USD→IRT converter sparkline ("irregular …
+like a placeholder or buggy") fixed in three honest layers (record
+deadband 0.05% vs last RECORDED level; drawn-line bucketMean(≤48) with
+RAW trend/range/count chips; Sparkline domain padded to ≥2.5% of
+level) + a one-time KV prune (tgju 240 → 188). Deployed `ed79e2cc`
+from `9724040`; 1,431 tests green.
 Prior state (2026-10-19e): the PRICES RESTORE — the owner's "Still
 there aren't GOLD BITCOIN SILVER price… a dedicated nice section with
 images" resolved by OWNER_PUBLIC_DISPLAY_OVERRIDE for exactly {brent,

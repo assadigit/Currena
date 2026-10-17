@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-10-16T17:59:50.927Z",
+  "readings": 32,
+  "priceTilesPresent": [
+    "brent",
+    "gold-usd",
+    "silver-usd",
+    "btc-usd"
+  ]
+}

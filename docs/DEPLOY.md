@@ -1497,3 +1497,21 @@ the petrol/transport money row is gone while employment rate appeared.
   zero console/page errors; no 375 px overflow; the 2026-10-19e prices
   grid untouched (4 tiles + icons).
 - **Evidence**: `docs/evidence/2026-10-19f-sparkline-honesty/`.
+
+## Session record — 2026-10-20 the "Know before you buy US shares" box removed (the owner's direct request)
+
+- **Deployed**: currena-api **`e6d18811-46ae-4f27-890a-6a1f63b90cd1`**
+  (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`).
+- **Change**: `UsSharesNotesBox` deleted (component + render + import) at
+  the owner's explicit "Remove this entirely"; the four `usShares*` copy
+  keys retired from both dictionaries; their four manifest entries pruned.
+  No data/scoring/projection change.
+- **Gates pre-deploy**: copy:audit clean; all workspace suites green (web
+  461/461); typecheck 6/6; lint 0 errors / 15 accepted advisories; budgets
+  held — Insights lazy 592.61/141.14 gz (shrank from 594.68/141.60), entry
+  295.15/88.76.
+- **Verified live**: home 200; served `Insights-CvxT_7lu.js` byte-identical
+  to the local build with **0** occurrences of the box copy; `/api/insights`
+  → 32 readings, all four price tiles (`brent · gold-usd · silver-usd ·
+  btc-usd`) present — the prices board and sparkline fixes untouched.
+- **Evidence**: `docs/evidence/2026-10-20-remove-us-shares-notes/`.

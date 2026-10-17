@@ -1,3 +1,47 @@
+# SESSION_LOG — "Know before you buy US shares" Box Removed 2026-10-20
+
+Branch `main` · base `326dc42` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner pasted the exact rendered `<details>` element (fa:
+«پیش از خرید سهام آمریکا بدانید») with one instruction — "Remove this
+entirely."
+
+### 1 · the removal (surgical, UI-only)
+**What:** located the block as `UsSharesNotesBox` (Step 3 §7.1, runbook
+Phase 4, 2026-10-16) — rendered unconditionally on Insights between the
+world-markets and world-currencies sections. Deleted the component from
+`apps/web/src/routes/insights-sections/UsSharesNotes.tsx` (the file keeps
+`UsSharesAudBox` — the L2-03 AUD view is a DIFFERENT box, untouched) and
+dropped the render + import from `Insights.tsx`, with a dated note in both
+comments so the box is never resurrected by mistake. Retired the four copy
+keys (`usSharesBoxTitle`, `usSharesFxLine`, `usSharesFeesLine`,
+`usSharesDisclaimer`) from BOTH dictionaries and pruned their four entries
+from `docs/localization/persian-copy-manifest.json` (REMOVED findings fail
+`pnpm copy:audit`). No data/scoring/projection/behaviour change — the box
+was copy-only and identical in both site modes.
+**Checks:** no test referenced the box (the `us-shares-aud.test.ts` suite
+tests the lib, not the notes box); `validation-step3.ts` mentions the title
+in a comment only — no functional coupling.
+
+### 2 · gates + deploy + production verify
+**What:** gates all green — `pnpm copy:audit` clean; web tests 461/461
+(34 files; full workspace suites green); typecheck 6/6; lint 0 errors
+(15 accepted advisories); budgets held with the Insights lazy chunk
+SHRINKING to 592.61 kB / 141.14 gz (was 594.68/141.60; budgets 604/142.8),
+entry 295.15/88.76. Deployed currena-api
+`e6d18811-46ae-4f27-890a-6a1f63b90cd1` from the working tree (SITE_MODE=
+public untouched; currena-markets untouched `9b5ff7e0`). Production:
+home 200; served entry `index-DMIAshTW.js` byte-identical to the local
+build; served `Insights-CvxT_7lu.js` (592,611 bytes, byte-identical)
+carries **0** occurrences of `usSharesBoxTitle`/`Know before you buy US
+shares`; `/api/insights` → 32 readings with all four price tiles present
+— the 2026-10-19e prices board and the 2026-10-19f sparklines untouched.
+**Evidence:** `docs/evidence/2026-10-20-remove-us-shares-notes/`
+(README + prod-status.txt + the served chunk capture + api-after).
+
+Session closed: production = currena-api `e6d18811` + currena-markets
+`9b5ff7e0`. **Token rotation still outstanding** (owner-side; tokens
+transited chat again this session).
+
 # SESSION_LOG — Sparklines Draw Honest Trends 2026-10-19f
 
 Branch `main` · base `7dcabcd` · runner: pnpm 10.34.5 / Node 24.21.

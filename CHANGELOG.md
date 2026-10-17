@@ -5,6 +5,46 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-20] — the "Know before you buy US shares" box removed (the owner's direct request)
+
+The owner pasted the exact rendered `<details>` element (fa:
+«پیش از خرید سهام آمریکا بدانید» — the collapsed FX/fees/disclaimer notes box
+on the Insights page) with one instruction: **"Remove this entirely."**
+
+### Removed
+
+- **`UsSharesNotesBox`** (`apps/web/src/routes/insights-sections/UsSharesNotes.tsx`)
+  — the Step 3 §7.1 collapsed info box, rendered unconditionally on Insights
+  since the 2026-10-16 rebuild, is gone: component deleted, the
+  `<UsSharesNotesBox copy={copy} />` render + import removed from
+  `Insights.tsx`, and the section comment now dates the owner-requested
+  removal so it is never "helpfully" resurrected. `UsSharesAudBox` (the
+  L2-03 AUD view — a different box in the same file) is untouched.
+- **Copy keys retired** in both dictionaries (`insights-copy-en.ts`,
+  `insights-copy-fa.ts`): `usSharesBoxTitle`, `usSharesFxLine`,
+  `usSharesFeesLine`, `usSharesDisclaimer` — en↔fa parity intact.
+- **`docs/localization/persian-copy-manifest.json`**: the four matching
+  entries pruned (REMOVED findings fail `pnpm copy:audit`).
+
+### Unchanged (deliberately)
+
+No data, scoring, projection, or behaviour change — the box was copy-only
+and rendered identically in both site modes. The world-markets/AUD boxes,
+the prices board (2026-10-19e) and the sparkline fix (2026-10-19f) are
+untouched.
+
+### Gates
+
+`pnpm copy:audit` clean · web tests 461/461 (34 files; full workspace green)
+· typecheck 6/6 · lint 0 errors (15 accepted advisories) · budgets held —
+the Insights lazy chunk **shrank** to 592.61 kB / 141.14 gz (was
+594.68/141.60; budgets 604/142.8), entry untouched 295.15/88.76.
+
+Deployed currena-api `e6d18811-46ae-4f27-890a-6a1f63b90cd1`; production
+verified: served Insights chunk carries **0** occurrences of the box copy,
+prices board + 32-reading projection intact. Evidence:
+`docs/evidence/2026-10-20-remove-us-shares-notes/`.
+
 ## [2026-10-19f] — the sparklines draw honest trends (the owner's screenshot report)
 
 The owner (screenshot of the USD→IRT converter card): "The graph seems
