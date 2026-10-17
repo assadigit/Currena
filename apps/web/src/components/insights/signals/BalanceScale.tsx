@@ -1,34 +1,50 @@
 /**
  * signals/BalanceScale — the gold card's balance visual (owner spec
- * docs/insights/gold-balance-card-spec.md, 2026-10-17e): the grouped
- * driver list (Supports / Works against / Sitting neutral) becomes a
- * beam balance. A visitor with no finance education sees in five seconds
- * which way the conditions lean for gold, and how many drivers could not
- * be read.
+ * docs/insights/gold-balance-card-spec.md + the v2 seesaw patch
+ * docs/insights/gold-balance-card-v2-seesaw-patch-spec.md): the grouped
+ * driver list became a beam balance (v1) and the DRAWING is now a seesaw
+ * with level plates (v2 §5). A visitor with no finance education sees in
+ * five seconds which way the conditions lean for gold, and how many
+ * drivers could not be read.
  *
- * Layout (spec §5): the verdict line (word + icon + the " · "-joined
- * count line) → the card's banner sentence (passed through unchanged) →
- * the balance (beam, pivot, two pans of blocks) → the two trays
- * (Neutral / Couldn't read) with the shared detail panel between.
+ * Layout (v2 §5): the verdict line → the count line (own line, directly
+ * under the verdict word, ≥14px) → the card's banner sentence (passed
+ * through unchanged) → the balance zone (seesaw) → the fixed caption row
+ * → the shared detail panel (only when open) → the two trays (Neutral /
+ * Couldn't read). Price footing stays in the merged card below the trays.
  *
- * Beam rule (spec §6): net = for − against; the HEAVIER side goes DOWN
- * like a real scale; angle = |net|/total × 14° with a 3° floor so a
- * one-driver lean stays visible; unread drivers pull the beam toward
- * level (the ratio divides by TOTAL, not readable). Only the beam
- * rotates — the pans and their text stay upright and just ride each
- * beam end up or down (the pan drop equals the beam end's drop exactly:
- * both are sin(angle) × halfBeam). RTL flips the rotation sign so the
- * lowered side still matches the heavier side; grid columns mirror the
- * pans automatically.
+ * Seesaw geometry (v2 §5.1–5.4): ONE straight beam rotates around the
+ * pivot at its centre — thick (10px) with fully rounded ends, inked with
+ * the page's secondary text colour (≥3:1 on the card). A dotted level
+ * reference line runs through the pivot behind everything, so the eye
+ * can compare the tilted beam with level. The fulcrum is a triangle
+ * pointing UP: apex on the beam's underside at the centre, base on a
+ * short flat base line, never rotating. Each pan is a LEVEL plate
+ * mounted on top of its beam end over a small round hinge dot; plates
+ * only translate up/down by (Lh ÷ 2) × sin(angle) — never rotate, never
+ * move because of their block count (the blocks stand ON the plate,
+ * stacked upward). The picture's only height difference is the beam's:
+ * Lh × sin(angle) — one reading out of four looks like the small lean it
+ * is (angle = |net|/total × 12°, floored at 4° so a one-driver lean
+ * stays visible; unread drivers pull toward level because the ratio
+ * divides by TOTAL; level at net 0 and at readable 0). RTL flips the
+ * rotation SIGN so the lowered side still matches the heavier side; the
+ * plates mirror through the logical inset properties.
  *
- * Blocks (spec §7) are real <button>s with aria-expanded: below ~900px a
- * tap opens the driver's existing explanation sentence in the detail
- * panel under the balance (one open at a time); at ~900px and above the
- * sentence is shown inside the block and no tap is needed. Trays (spec
- * §8) hold neutral (quiet) and unread (dashed + the existing clock icon)
+ * Blocks (v2 §5.5) are compact (56px, icon + short name + current value
+ * — NO sentence at any width) real <button>s with aria-expanded; a tap
+ * opens the driver's existing explanation sentence in the detail panel
+ * under the caption row (one open at a time, every width — v2 §5.5.6
+ * replaces the v1 wide-screen inline sentence). An empty side shows one
+ * dashed, aria-hidden slot of the block's size (v2 §5.6). The captions
+ * ("For gold" / "Against gold") live in one fixed row under the base
+ * line and never move with the tilt (v2 §5.7). The zone's height is
+ * reserved from the largest stack at maxAngle and the seesaw anchors to
+ * its bottom, so the tilt changes no layout size (v2 §5.8). Trays (§8)
+ * hold neutral (quiet) and unread (dashed + the existing clock icon)
  * chips; both are tappable into the same panel. Price footing is NOT a
- * driver and never touches the beam (spec §9 — it lives in the merged
- * card below the trays).
+ * driver and never touches the beam (§9 — it lives in the merged card
+ * below the trays).
  *
  * Reusable by contract (spec §2.6): the component takes a list of
  * drivers and knows nothing about gold beyond the copy strings; the
@@ -54,8 +70,8 @@ export interface BalanceDriver {
   key: string;
   /** Short driver name ("Real yields"). */
   label: string;
-  /** The driver's existing explanation sentence (shown in the block at
-   * ≥900px, in the detail panel below that). */
+  /** The driver's existing explanation sentence (opens in the detail
+   * panel under the caption row — v2 §5.5.6, every width). */
   detail: string;
   /** The current value(s), display-formatted, or null when unread. */
   valueText: string | null;
@@ -99,44 +115,66 @@ export function balanceCounts(drivers: readonly BalanceDriver[]): BalanceCounts 
   return { for: f, against: a, neutral: n, unread: u, total: drivers.length, net: f - a, readable: f + a + n };
 }
 
-/** Spec §6 suggested constants. The drop cap (not in the spec) keeps the
- * graphic a fixed, modest height on wide screens — where a 14° tilt on a
- * 720px beam would otherwise swing the pans ±87px; the angle is then
- * derived back from the capped drop so the beam ends and the pans still
- * move EXACTLY together. Recorded in the notes file. */
-export const BALANCE_MAX_ANGLE_DEG = 14;
-export const BALANCE_MIN_ANGLE_DEG = 3;
-export const BALANCE_DROP_CAP_PX = 30;
+/** The tilt constants (v2 patch §5.1.5 — they replace v1 §6's 14°/3° and
+ * retire the v1 pan-drop cap: with Lh bounded by the zone the swing is
+ * modest by construction, and the picture may show NO other height
+ * difference than Lh × sin(angle)). */
+export const BALANCE_MAX_ANGLE_DEG = 12;
+export const BALANCE_MIN_ANGLE_DEG = 4;
+
+/** The fixed drawing metrics of the seesaw (v2 §5, px — every "~"
+ * suggestion resolved here and recorded in the notes file). */
+export const BALANCE_BEAM_H_PX = 10;
+export const BALANCE_PLATE_H_PX = 6;
+export const BALANCE_HINGE_D_PX = 8;
+export const BALANCE_BASE_W_PX = 96;
+export const BALANCE_BASE_H_PX = 6;
+export const BALANCE_BLOCK_H_PX = 56;
+export const BALANCE_BLOCK_GAP_PX = 6;
+/** The balance zone's width cap (v2 §7: ~520px, centred, on ≥768px). */
+export const BALANCE_ZONE_MAX_W_PX = 520;
+/** The plate/block width on wide screens (v2 §7: "About 180px"). */
+export const BALANCE_DESKTOP_PLATE_W_PX = 180;
+/** The central gap between the two plates ("about half of the zone,
+ * minus a gap" — v2 §7); it also sizes the mobile plates. */
+export const BALANCE_PLATE_GAP_PX = 24;
+/** v2 §5.2.3: the fulcrum keeps the lowered beam end this far above the
+ * base line at maxAngle. */
+export const BALANCE_FULCRUM_CLEARANCE_PX = 12;
+/** v2 §5.8.1: the zone keeps this much air above the tallest stack. */
+export const BALANCE_ZONE_MARGIN_PX = 8;
 
 const radOf = (deg: number): number => (deg * Math.PI) / 180;
-const degOf = (rad: number): number => (rad * 180) / Math.PI;
 
 export interface BalanceTilt {
   /** The beam's CSS rotation in degrees (LTR sign convention; RTL flips
    * it at render time). 0 = level. */
   angleDeg: number;
-  /** The vertical drop of the heavy beam end (and its pan) in px. */
-  dropPx: number;
+  /** The vertical move of ONE plate off level: (Lh ÷ 2) × sin(angle) —
+   * the heavy plate drops by this, the light one climbs by it (v2
+   * §5.4.3). The two plate surfaces therefore sit 2 × risePx apart. */
+  risePx: number;
+  /** The beam-end height difference: Lh × sin(angle) (v2 §5.1 "why" —
+   * the ONLY height difference the picture may show). */
+  endDropPx: number;
   /** Which side is heavy (null = level: net 0 or nothing readable). */
   heavy: 'for' | 'against' | null;
 }
 
 /**
- * The tilt rule (spec §6): net 0 → level; nothing readable → level;
- * otherwise angle = |net|/total × MAX (floored at MIN so one driver
- * still leans), capped by the pan-drop cap. `halfBeamPx` is half the
- * rendered beam width (0 → level).
+ * The tilt rule (v1 §6 steps 3–4, kept verbatim by the v2 patch §4):
+ * net 0 → level; nothing readable → level; otherwise angle =
+ * |net|/total × MAX, floored at MIN so one driver still leans. `lhPx` is
+ * the hinge-to-hinge distance (the beam length, v2 §5.1.4; 0 → level).
  */
-export function balanceTilt(counts: BalanceCounts, halfBeamPx: number): BalanceTilt {
-  if (counts.readable === 0 || counts.net === 0 || halfBeamPx <= 0) {
-    return { angleDeg: 0, dropPx: 0, heavy: null };
+export function balanceTilt(counts: BalanceCounts, lhPx: number): BalanceTilt {
+  if (counts.readable === 0 || counts.net === 0 || lhPx <= 0) {
+    return { angleDeg: 0, risePx: 0, endDropPx: 0, heavy: null };
   }
   const ratio = Math.abs(counts.net) / counts.total;
-  const rawDeg = Math.min(BALANCE_MAX_ANGLE_DEG, Math.max(BALANCE_MIN_ANGLE_DEG, ratio * BALANCE_MAX_ANGLE_DEG));
-  const rawDrop = Math.sin(radOf(rawDeg)) * halfBeamPx;
-  const dropPx = Math.min(rawDrop, BALANCE_DROP_CAP_PX);
-  const angleDeg = degOf(Math.asin(Math.min(1, dropPx / halfBeamPx)));
-  return { angleDeg, dropPx, heavy: counts.net > 0 ? 'for' : 'against' };
+  const angleDeg = Math.min(BALANCE_MAX_ANGLE_DEG, Math.max(BALANCE_MIN_ANGLE_DEG, ratio * BALANCE_MAX_ANGLE_DEG));
+  const endDropPx = Math.sin(radOf(angleDeg)) * lhPx;
+  return { angleDeg, risePx: endDropPx / 2, endDropPx, heavy: counts.net > 0 ? 'for' : 'against' };
 }
 
 export type BalanceVerdict = 'for' | 'balanced' | 'against' | 'none';
@@ -164,17 +202,18 @@ export function countLineParts(counts: BalanceCounts, copy: InsightsCopy, number
   return parts.filter(([count]) => count > 0).map(([, text]) => text);
 }
 
-/** Spec §7.9: a pan stacks its blocks in one column up to four; beyond
- * that the extra blocks go to a second column inside the same pan. */
+/** v1 §7.9 (kept by the v2 patch): a plate stacks its blocks in one
+ * column up to four; beyond that the extra blocks go to a second column
+ * on the same plate. */
 export function panColumnCounts(blockCount: number): [number, number] {
   if (blockCount <= 4) return [blockCount, 0];
   return [4, blockCount - 4];
 }
 
-/** The rendered beam width in px. ResizeObserver's first callback fires
+/** The rendered zone width in px. ResizeObserver's first callback fires
  * right after observe (before paint), so the real width lands without a
  * synchronous setState in the effect body; jsdom/older envs keep the
- * mobile-first fallback (the SPA never server-renders). */
+ * fallback (the SPA never server-renders). */
 function useMeasuredWidth(fallback = 340): [RefObject<HTMLDivElement | null>, number] {
   const ref = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(fallback);
@@ -189,37 +228,14 @@ function useMeasuredWidth(fallback = 340): [RefObject<HTMLDivElement | null>, nu
   return [ref, width];
 }
 
-/** Spec §7.5/§7.6's ~900px wide-screen branch. The initial read happens
- * in the useState initialiser; the effect only subscribes to changes (no
- * synchronous setState in the effect body). */
-function useWideScreen(query = '(min-width: 900px)'): boolean {
-  const read = (): boolean =>
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia(query).matches;
-  const [wide, setWide] = useState(read);
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
-    const mq = window.matchMedia(query);
-    const onChange = (e: MediaQueryListEvent): void => setWide(e.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, [query]);
-  return wide;
-}
-
-/** The graphic strip's fixed geometry (px): beam centred at 24, strings
- * hang 24→44, the pans row tucks under with −4px so a level pan's label
- * meets its string exactly. */
-const STRIP_CLASS = 'relative h-12';
-const BEAM_CENTER_CLASS = 'top-1/2';
-const STRING_TOP_CLASS = 'top-6';
-const STRING_LENGTH_CLASS = 'h-5';
-const PANS_TUCK_CLASS = '-mt-1';
-
-/** The tilt animation (spec §6.7): ~500 ms ease, disabled for
+/** The tilt animation (v1 §6.7, kept by v2 §5.9): ~500 ms ease on BOTH
+ * the beam rotation and the plate movement, disabled for
  * prefers-reduced-motion users (the repo's standard pair). */
 const TILT_TRANSITION_CLASS = 'transition-transform duration-500 ease-out motion-reduce:transition-none';
+
+/** The seesaw's shared ink: the page's secondary text colour — 7.98:1 on
+ * the light card, 7.7:1 on the dark one (v2 §5.1.3 ≥3:1, v2 §6-V6). */
+const INK_CLASS = 'bg-[var(--color-text-secondary)]';
 
 export function BalanceScale({
   drivers,
@@ -231,28 +247,78 @@ export function BalanceScale({
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
   /** The card's existing verdict banner sentence (spec §5.2 — kept
-   * unchanged, rendered between the verdict line and the balance). */
+   * unchanged, rendered after the verdict + count lines, v2 §5 order). */
   banner?: ReactNode;
 }): React.JSX.Element | null {
   const b = copy.signals.balance;
   const rtl = numberLocale === 'fa-IR';
-  const wide = useWideScreen();
-  const [areaRef, areaWidth] = useMeasuredWidth();
+  const [zoneRef, zoneWidth] = useMeasuredWidth();
   const [openKey, setOpenKey] = useState<string | null>(null);
 
   if (drivers.length === 0) return null;
 
   const counts = balanceCounts(drivers);
   const verdict = balanceVerdictOf(counts);
-  const tilt = balanceTilt(counts, areaWidth / 2);
 
-  // Spec §6.6: RTL flips the rotation SIGN so the lowered end still sits
-  // under the heavier pan (the pans themselves are side-agnostic — the
-  // heavy one always moves DOWN by dropPx).
+  const forBlocks = drivers.filter((d) => d.state === 'for');
+  const againstBlocks = drivers.filter((d) => d.state === 'against');
+  const neutralChips = drivers.filter((d) => d.state === 'neutral');
+  const unreadChips = drivers.filter((d) => d.state === 'unread');
+
+  /* ---------------------------------------------------------------- *
+   * Seesaw geometry (v2 §5). Everything derives from the measured
+   * zone width; the fixed parts anchor to the zone's BOTTOM edge so
+   * the tilt never changes the layout size (v2 §5.8.2).
+   * ---------------------------------------------------------------- */
+  const [forCol1, forCol2] = panColumnCounts(forBlocks.length);
+  const [againstCol1, againstCol2] = panColumnCounts(againstBlocks.length);
+  /** One block's width (v2 §7: ~half the zone minus a gap on mobile,
+   * ~180px on wide screens). */
+  const blockW = Math.min(BALANCE_DESKTOP_PLATE_W_PX, (zoneWidth - BALANCE_PLATE_GAP_PX) / 2);
+  const forPlateW = forCol2 > 0 ? blockW * 2 + BALANCE_BLOCK_GAP_PX : blockW;
+  const againstPlateW = againstCol2 > 0 ? blockW * 2 + BALANCE_BLOCK_GAP_PX : blockW;
+  const plateW = Math.max(forPlateW, againstPlateW);
+  /** Lh — the hinge-to-hinge distance (v2 §5.1.4): the beam length; the
+   * plates sit centred on the beam ends, outer edge on the zone edge. */
+  const lh = Math.max(0, zoneWidth - plateW);
+  const tilt = balanceTilt(counts, lh);
+  /** The plate rise at MAX angle — the reserved height uses the worst
+   * case so switching cases with the same larger stack never resizes
+   * the zone (v2 §5.8.1, check V9). */
+  const maxRise = lh > 0 ? (lh / 2) * Math.sin(radOf(BALANCE_MAX_ANGLE_DEG)) : 0;
+  /** v2 §5.2.3: fulcrum height = (Lh ÷ 2) × sin(maxAngle) + ~12px. */
+  const fulcrumH = maxRise + BALANCE_FULCRUM_CLEARANCE_PX;
+  /** The larger stack's rows (a ≥5-block side caps at 4 rows per the
+   * second-column rule; an empty side still shows one slot, v2 §5.6). */
+  const rows = Math.max(Math.min(forBlocks.length, 4), Math.min(againstBlocks.length, 4), 1);
+  const stackH = rows * BALANCE_BLOCK_H_PX + (rows - 1) * BALANCE_BLOCK_GAP_PX;
+  /** v2 §5.8.1: blocks + gaps + plate + hinge + max rise + the fixed
+   * base/fulcrum/beam machinery + ~8px of air. The spec's sum is
+   * measured from the pivot; the bottom machinery sits under it. */
+  const zoneH =
+    BALANCE_BASE_H_PX +
+    fulcrumH +
+    BALANCE_BEAM_H_PX +
+    BALANCE_HINGE_D_PX +
+    BALANCE_PLATE_H_PX +
+    maxRise +
+    stackH +
+    BALANCE_ZONE_MARGIN_PX;
+  /** The plate assembly's bottom (the hinge dot) sits on the beam TOP. */
+  const beamBottom = BALANCE_BASE_H_PX + fulcrumH;
+  const assemblyBottom = beamBottom + BALANCE_BEAM_H_PX;
+  /** The pivot's y off the zone bottom (the beam's centre). */
+  const pivotY = beamBottom + BALANCE_BEAM_H_PX / 2;
+  /** The beam ends sit half a plate inside each zone edge. */
+  const beamEndInset = (zoneWidth - lh) / 2;
+
+  // v1 §6.6 (kept by v2 §7): RTL flips the rotation SIGN so the lowered
+  // end still sits under the heavier plate (the plates themselves are
+  // side-agnostic — the heavy one always moves DOWN by risePx).
   const ltrSign = tilt.heavy === 'for' ? -1 : 1; // CSS: negative = counter-clockwise = the inline-start (left) end down
   const rotateDeg = tilt.angleDeg === 0 ? 0 : ltrSign * tilt.angleDeg * (rtl ? -1 : 1);
-  const forDrop = tilt.heavy === 'for' ? tilt.dropPx : tilt.heavy === 'against' ? -tilt.dropPx : 0;
-  const againstDrop = -forDrop;
+  const forMove = tilt.heavy === 'for' ? tilt.risePx : tilt.heavy === 'against' ? -tilt.risePx : 0;
+  const againstMove = -forMove;
 
   const verdictWord =
     verdict === 'for'
@@ -273,105 +339,112 @@ export function BalanceScale({
   const parts = countLineParts(counts, copy, numberLocale);
   const ariaLabel = interpolate(b.aria, { summary: parts.join(' · '), verdict: verdictWord });
 
-  const forBlocks = drivers.filter((d) => d.state === 'for');
-  const againstBlocks = drivers.filter((d) => d.state === 'against');
-  const neutralChips = drivers.filter((d) => d.state === 'neutral');
-  const unreadChips = drivers.filter((d) => d.state === 'unread');
-
   const toggle = (key: string): void => setOpenKey((prev) => (prev === key ? null : key));
   const openDriver = drivers.find((d) => d.key === openKey) ?? null;
 
-  /** One pan column: the side label above the stacked blocks (§7.3), the
-   * dish below; the whole column rides its beam end up/down (§6.5). */
-  const pan = (
+  /** One compact block (v2 §5.5): icon ~20px + the short name + the
+   * current value, 56px tall, NO sentence at any width — a real button
+   * whose tap opens the shared detail panel (v2 §5.5.6). */
+  const block = (d: BalanceDriver, side: 'for' | 'against'): React.JSX.Element => (
+    <button
+      key={d.key}
+      type="button"
+      aria-expanded={openKey === d.key}
+      aria-controls="gold-balance-detail"
+      onClick={() => toggle(d.key)}
+      data-balance-block={d.key}
+      className="insights-focusable flex h-[56px] w-full cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2.5 py-1 text-start ring-1 ring-[var(--color-border)]"
+    >
+      <IconImg src={side === 'for' ? DIRECTION_UP_URL : DIRECTION_DOWN_URL} size={20} className="shrink-0" />
+      <span className="flex min-w-0 flex-col justify-center">
+        <span className="text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">
+          {d.label}
+        </span>
+        {d.valueText !== null ? (
+          <bdi
+            dir="ltr"
+            className="text-[length:var(--type-label)] font-semibold leading-tight tabular-nums text-[var(--color-text-secondary)]"
+          >
+            {d.valueText}
+          </bdi>
+        ) : null}
+      </span>
+    </button>
+  );
+
+  /** One plate assembly (v2 §5.4/§5.5/§5.6): the stack (or the dashed
+   * empty slot) standing ON a level plate bar over a hinge dot; the
+   * whole assembly only translates up/down by risePx — never rotates,
+   * and its position never depends on the block count. */
+  const plate = (
     side: 'for' | 'against',
     blocks: readonly BalanceDriver[],
-    dropPx: number,
+    movePx: number,
+    col1: number,
+    col2: number,
   ): React.JSX.Element => {
-    const [firstCol, secondCol] = panColumnCounts(blocks.length);
-    const column = (items: readonly BalanceDriver[]): React.JSX.Element[] =>
-      items.map((d) => {
-        const expanded = wide ? true : openKey === d.key;
-        return (
-          <button
-            key={d.key}
-            type="button"
-            aria-expanded={expanded}
-            aria-controls={wide ? undefined : 'gold-balance-detail'}
-            onClick={() => {
-              if (!wide) toggle(d.key);
-            }}
-            data-balance-block={d.key}
-            className="insights-focusable flex min-h-[44px] w-full cursor-pointer items-start gap-2 rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2.5 py-2 text-start ring-1 ring-[var(--color-border)]"
-          >
-            <IconImg
-              src={side === 'for' ? DIRECTION_UP_URL : DIRECTION_DOWN_URL}
-              size={18}
-              className="mt-0.5 shrink-0"
-            />
-            <span className="flex min-w-0 flex-col gap-0.5">
-              <span className="text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-primary)]">
-                {d.label}
-              </span>
-              {d.valueText !== null ? (
-                <bdi
-                  dir="ltr"
-                  className="text-[length:var(--type-label)] font-semibold tabular-nums leading-snug text-[var(--color-text-secondary)]"
-                >
-                  {d.valueText}
-                </bdi>
-              ) : null}
-              {wide ? (
-                <span className="text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-                  {d.detail}
-                </span>
-              ) : null}
-            </span>
-          </button>
-        );
-      });
+    const plateW = col2 > 0 ? blockW * 2 + BALANCE_BLOCK_GAP_PX : blockW;
     return (
-      <span
+      <div
         data-balance-pan={side}
-        className={`flex min-w-0 flex-col gap-1.5 ${TILT_TRANSITION_CLASS}`}
-        style={{ transform: `translateY(${dropPx}px)` }}
+        className={`absolute ${TILT_TRANSITION_CLASS}`}
+        style={{
+          width: plateW,
+          bottom: assemblyBottom,
+          transform: `translateY(${movePx}px)`,
+          ...(side === 'for'
+            ? { insetInlineStart: Math.max(0, beamEndInset - plateW / 2) }
+            : { insetInlineEnd: Math.max(0, beamEndInset - plateW / 2) }),
+        }}
       >
-        <span
-          className={`text-[length:var(--type-label)] font-bold ${
-            side === 'for' ? 'text-[var(--color-status-normal)]' : 'text-[var(--color-status-alert)]'
-          }`}
-        >
-          {side === 'for' ? b.sideFor : b.sideAgainst}
-        </span>
-        {secondCol > 0 ? (
-          <span className="grid grid-cols-2 items-start gap-1.5">
-            <span className="flex min-w-0 flex-col gap-1.5">{column(blocks.slice(0, firstCol))}</span>
-            <span className="flex min-w-0 flex-col gap-1.5">{column(blocks.slice(firstCol))}</span>
-          </span>
+        {blocks.length > 0 ? (
+          col2 > 0 ? (
+            <span className="grid w-full grid-cols-2 items-end gap-[6px]">
+              <span className="flex min-w-0 flex-col-reverse gap-[6px]">
+                {blocks.slice(0, col1).map((d) => block(d, side))}
+              </span>
+              <span className="flex min-w-0 flex-col-reverse gap-[6px]">
+                {blocks.slice(col1).map((d) => block(d, side))}
+              </span>
+            </span>
+          ) : (
+            <span className="flex min-w-0 flex-col-reverse gap-[6px]">{blocks.map((d) => block(d, side))}</span>
+          )
         ) : (
-          <span className="flex min-w-0 flex-col gap-1.5">{column(blocks)}</span>
+          // v2 §5.6: the empty side shows one dashed slot, the block's
+          // size, no text, hidden from screen readers.
+          <span
+            data-balance-slot={side}
+            aria-hidden="true"
+            className="block h-[56px] w-full rounded-[var(--radius-sm)] border-2 border-dashed border-[var(--color-border)]"
+          />
         )}
-        {/* The pan's dish — decorative, the blocks sit "in" it. */}
-        <span
-          aria-hidden="true"
-          className="h-1.5 w-full rounded-b-full bg-currena-dark/45 dark:bg-white/45"
-        />
-      </span>
+        {/* The level plate bar (v2 §5.4.2): ~6px, rounded, as wide as a
+         * block; the blocks stand ON its top surface. */}
+        <span data-balance-plate={side} aria-hidden="true" className={`mt-0 block h-[6px] w-full rounded-full ${INK_CLASS}`} />
+        {/* The small round hinge dot (v2 §5.4.1) on the beam end. */}
+        <span aria-hidden="true" className={`mx-auto block h-[8px] w-[8px] rounded-full ${INK_CLASS}`} />
+      </div>
     );
   };
 
   return (
     <div className="flex flex-col gap-3" data-balance>
-      {/* 1. THE VERDICT LINE (§5.1) — the answer first: word + icon, then
-       * the " · "-joined count line. Colour never rides alone: the icon
-       * and the word carry the meaning (§12.2). */}
+      {/* 1. THE VERDICT LINE + COUNT LINE (v2 §5 order, §6): the verdict
+       * word with its icon, then the count line on its OWN line directly
+       * under it — ≥14px in the secondary ink (7.98:1 / 7.7:1 ≥4.5:1).
+       * Colour never rides alone (§12.2): the icon and the word carry
+       * the meaning. */}
       <div className="flex flex-col gap-0.5" data-balance-verdict={verdict}>
         <span className={`inline-flex items-center gap-1.5 ${verdictToneClass}`}>
           <VerdictIcon verdict={verdictIcon} size={20} desktopSize={24} />
           <span className="text-[length:var(--type-label)] font-bold leading-tight">{verdictWord}</span>
         </span>
         {parts.length > 0 ? (
-          <span className="text-[length:var(--type-caption)] text-[var(--color-text-secondary)]" data-balance-count>
+          <span
+            className="text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)]"
+            data-balance-count
+          >
             {parts.join(' · ')}
           </span>
         ) : null}
@@ -380,52 +453,88 @@ export function BalanceScale({
       {/* 2. THE CARD'S BANNER SENTENCE (§5.2) — passed through unchanged. */}
       {banner}
 
-      {/* 3. THE BALANCE (§5.3). The graphic strip carries role="img" with
-       * the result as its label (§12.1); the interactive pans live
+      {/* 3. THE BALANCE ZONE (v2 §5). The graphic layer carries role="img"
+       * with the result as its label (§12.1); the interactive plates live
        * OUTSIDE it as siblings — role="img" children are presentational,
-       * and the blocks must stay real buttons (§7.4). The area is capped
-       * at ~720px and centred on wide screens (§10.3); full width on
-       * mobile (§10.2). */}
-      <div ref={areaRef} className="relative mx-auto w-full max-w-[720px]" style={{ paddingBottom: tilt.dropPx + 6 }}>
-        {/* The beam + pivot + strings. Only the beam rotates (§6.5); the
-         * strings translate with their pans so they stay attached to both
-         * the beam end and the pan. */}
-        <div className={STRIP_CLASS} role="img" aria-label={ariaLabel} data-balance-graphic>
-          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-12">
+       * and the blocks must stay real buttons (§7.4). The zone is capped
+       * at ~520px and centred on wide screens (v2 §7); full width on
+       * mobile. Anchored to the zone's bottom: the tilt changes no
+       * layout size (v2 §5.8.2). */}
+      <div
+        ref={zoneRef}
+        data-balance-zone
+        className="relative mx-auto w-full max-w-[520px]"
+        style={{ height: zoneH }}
+      >
+        {/* The graphic layer: the dotted level reference line THROUGH the
+         * pivot behind everything (v2 §5.3), the rotating beam, the
+         * up-pointing fulcrum and its base line (v2 §5.2). */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          role="img"
+          aria-label={ariaLabel}
+          data-balance-graphic
+        >
+          <span aria-hidden="true" className="absolute inset-0">
+            {/* Level reference line through the pivot (v2 §5.3). */}
+            <span
+              data-balance-reference
+              className="absolute inset-x-0 border-t-2 border-dotted border-[var(--color-border)]"
+              style={{ bottom: pivotY - 1 }}
+            />
+            {/* The beam: ONE straight bar, only it rotates (v2 §5.1.1),
+             * ~10px thick with fully rounded ends (v2 §5.1.2). */}
             <span
               data-balance-beam
-              className={`absolute inset-x-0 h-1.5 rounded-full bg-currena-dark/45 dark:bg-white/45 ${BEAM_CENTER_CLASS} ${TILT_TRANSITION_CLASS}`}
-              style={{ transform: `translateY(-50%) rotate(${rotateDeg}deg)` }}
+              className={`absolute inset-x-0 mx-auto h-[10px] rounded-full ${INK_CLASS} ${TILT_TRANSITION_CLASS}`}
+              style={{ width: lh, bottom: beamBottom, transform: `rotate(${rotateDeg}deg)` }}
             />
-            {/* The fulcrum under the beam's centre — it never moves. */}
-            <span className="absolute inset-x-0 top-[26px] flex justify-center">
-              <span className="border-x-[7px] border-x-transparent border-t-[11px] border-t-currena-dark/60 dark:border-t-white/60" />
-            </span>
+            {/* The fulcrum: a triangle pointing UP, apex on the beam's
+             * underside at the centre, base on the base line; fixed (v2
+             * §5.2.1–4). Height = (Lh ÷ 2) × sin(maxAngle) + 12px. */}
             <span
-              data-balance-string="for"
-              className={`absolute start-0 w-0.5 bg-currena-dark/30 dark:bg-white/35 ${STRING_TOP_CLASS} ${STRING_LENGTH_CLASS} ${TILT_TRANSITION_CLASS}`}
-              style={{ transform: `translateY(${forDrop}px)` }}
+              data-balance-fulcrum
+              className={`absolute inset-x-0 mx-auto ${INK_CLASS}`}
+              style={{
+                width: BALANCE_BASE_W_PX,
+                height: fulcrumH,
+                bottom: BALANCE_BASE_H_PX,
+                clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)',
+              }}
             />
+            {/* The short, flat base line (v2 §5.2.2). */}
             <span
-              data-balance-string="against"
-              className={`absolute end-0 w-0.5 bg-currena-dark/30 dark:bg-white/35 ${STRING_TOP_CLASS} ${STRING_LENGTH_CLASS} ${TILT_TRANSITION_CLASS}`}
-              style={{ transform: `translateY(${againstDrop}px)` }}
+              data-balance-base
+              className={`absolute inset-x-0 mx-auto h-[6px] rounded-full ${INK_CLASS}`}
+              style={{ width: BALANCE_BASE_W_PX, bottom: 0 }}
             />
           </span>
         </div>
-        {/* The pans: for at the inline-start end, against at the inline
-         * end (§6.2) — grid columns mirror in RTL automatically. DOM
-         * order (for → against) is the tab order (§12.4). */}
-        <div className={`grid grid-cols-2 items-start gap-2.5 ${PANS_TUCK_CLASS}`}>
-          {pan('for', forBlocks, forDrop)}
-          {pan('against', againstBlocks, againstDrop)}
-        </div>
+        {/* The plates: for at the inline-start end, against at the inline
+         * end (§6.2) — the logical insets mirror them in RTL. DOM order
+         * (for → against) is the tab order (§12.4). */}
+        {plate('for', forBlocks, forMove, forCol1, forCol2)}
+        {plate('against', againstBlocks, againstMove, againstCol1, againstCol2)}
       </div>
 
-      {/* The shared detail panel (§7.5): one open panel at a time, tap
-       * again to close. It always exists in the DOM (so every
-       * aria-controls is valid) and stays hidden until a block (narrow
-       * screens) or a tray chip (§8.4 — every width) opens it. */}
+      {/* 4. THE CAPTION ROW (v2 §5.7): one fixed row under the base
+       * line, each caption under its own half with its side icon and
+       * side colour — never moved by the tilt. */}
+      <div data-balance-captions className="grid grid-cols-2 gap-2">
+        <span className="inline-flex items-center justify-center gap-1.5 text-[length:var(--type-label)] font-bold text-[var(--color-status-normal)]">
+          <IconImg src={DIRECTION_UP_URL} size={16} className="shrink-0" />
+          {b.sideFor}
+        </span>
+        <span className="inline-flex items-center justify-center gap-1.5 text-[length:var(--type-label)] font-bold text-[var(--color-status-alert)]">
+          <IconImg src={DIRECTION_DOWN_URL} size={16} className="shrink-0" />
+          {b.sideAgainst}
+        </span>
+      </div>
+
+      {/* The shared detail panel (v2 §5.5.6 — every width now): one open
+       * panel at a time, tap again to close. It always exists in the DOM
+       * (so every aria-controls is valid) and stays hidden until a block
+       * or a tray chip (§8.4) opens it. */}
       <div
         id="gold-balance-detail"
         data-balance-detail={openDriver !== null ? openDriver.key : undefined}
@@ -440,7 +549,7 @@ export function BalanceScale({
         ) : null}
       </div>
 
-      {/* 4. THE TRAYS (§5.4 + §8) — neutral (quiet) and unread (dashed +
+      {/* 5. THE TRAYS (§5.4 + §8) — neutral (quiet) and unread (dashed +
        * the existing clock icon) are DIFFERENT states and never touch the
        * beam. Empty trays hide (§8.5). */}
       {neutralChips.length > 0 ? (
