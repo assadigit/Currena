@@ -35,3 +35,17 @@ design below) survives intact in the newer build other sessions shipped on top o
   control.
 - Zero console errors and zero console messages across the whole session
   (theme toggle, language toggle, viewport changes, tile interactions).
+
+## Fresh-browser capture (owner follow-up "I still don't see any noticeable change")
+
+- `live-now-en-hero-1280.png` — what a fresh browser gets RIGHT NOW at the page
+  top: the hero with **Australia left / Global right** (the redesign's fixed
+  order), desaturated hero icons, colored region artwork, colored below-hero.
+- `live-now-en-markets-section.png` — the **World stock markets** section live
+  and healthy: 16 market tiles in 3 groups (7 Asia-Pacific / 4 Europe /
+  5 Americas), as-of line, rendered (not loading).
+- Diagnosis for "no visible change": the site is a PWA — a browser holding an
+  OLD cached service-worker build keeps serving the old app. The deterministic
+  update path (no-store `sw.js` + `controllerchange` reload) ships in the
+  CURRENT build, but a browser already on an OLD build needs one manual
+  nudge (hard refresh / close all tabs) to cross over.
