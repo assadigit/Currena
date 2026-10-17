@@ -116,6 +116,14 @@ describe('markets copy parity (en/fa)', () => {
     }
   });
 
+  it('round 46: the weekly and monthly lens labels exist everywhere (views, table, CSV)', () => {
+    for (const copy of [insightsCopyEn, insightsCopyFa]) {
+      for (const key of ['viewWeek', 'viewMonth', 'thWeek', 'thMonth', 'csvColWeek', 'csvColMonth'] as const) {
+        expect(copy.markets[key].length).toBeGreaterThan(0);
+      }
+    }
+  });
+
   it('the relocated source line lives in the About footer, not the section', () => {
     expect('footer' in insightsCopyEn.markets).toBe(false);
     expect('footer' in insightsCopyFa.markets).toBe(false);

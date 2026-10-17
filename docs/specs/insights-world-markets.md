@@ -164,6 +164,7 @@ Limits (Cloudflare documentation, October 2026): KV reads 100,000 per day · KV 
 
 ### 5.1 Per market
 - `chg_1d` = last close vs the previous close, in percent.
+- `chg_1w` = last close vs the last close on or before the same date one week earlier, in percent (round 46; OPTIONAL in the contract exactly like `chg_1m` — a stored row without it is a pre-round-46 row and renders an honest dash, never a guess).
 - `chg_1m` = last close vs the last close on or before the same date one month earlier.
 - `high_52w` / `low_52w` = highest and lowest daily close in the last 365 days.
 - `from_high` = last close vs `high_52w`, in percent (zero or negative).
@@ -234,7 +235,7 @@ Attention order stays: verdict, named alerts, prices, **world stock markets (new
 ### 6.3 Anatomy (top to bottom)
 1. **Header row:** title, and the "as of" date on the far side (Jalali date in Farsi).
 2. **Takeaway line:** one sentence generated from the numbers (section 8).
-3. **View switch:** one segmented control **Today | 1 month | From 52-week high**. Default Today.
+3. **View switch:** one segmented control **Today | 1 week | 1 month | 3 months | From 52-week high** — ascending duration, the 52-week distance last (round 46 added the two middle lenses). Default: the NORMAL 3-month timeframe (owner round 44).
 4. **Strip:** three labelled groups, **Asia-Pacific (7) · Europe (3) · Americas (4)**. No group has more than 7 tiles.
    - **Tile:** short name, percentage, arrow glyph. Two lines at most.
    - **Quiet by default:** only a market in Correction or Bear market gets an extra tag, for example "−12% below 52-week high" (Persian: «۱۲٪ زیر سقف یک‌ساله»). Normal markets stay plain, so problems stand out without colour tricks.
@@ -243,7 +244,7 @@ Attention order stays: verdict, named alerts, prices, **world stock markets (new
 6. **Footer line:** source, "end-of-day", "local currency". The page footer keeps the single shared disclaimer and "Before you act" box, as already decided.
 
 ### 6.4 Full table (desktop, 900 px and wider)
-Columns: Market · Today · 1 month · From 52-week high · Trend · Status · Last close.
+Columns: Market · Today · 1 week · 1 month · 3 months · From 52-week high · Trend · Status · Last close (round 46 added the weekly and monthly columns beside Today, the same lenses the view switch offers).
 Fixed group order. One sort only: "From 52-week high" (worst first). Row click opens the same detail panel. CSV of this table goes into the existing Tools menu.
 On mobile there is no table; the disclosure shows a vertical list of rows with the same three numbers.
 
@@ -483,7 +484,7 @@ Work in this order. Loop on each step until its test passes, then continue. Matc
 | 1 | Provider adapters (EODHD, Yahoo) returning one common shape | Unit tests using saved sample responses for both |
 | 2 | Calculation, status and signal rules (sections 3.5, 5), plus the back-test over the last year | Unit tests for rules R1 to R7 (including a fake 20% jump and a fake stale date), for the 2-point buffer, and for the US override. The back-test table is committed for Ali to review |
 | 3 | Scheduled jobs and the single KV key with write-only-if-changed | Test: running the job twice with the same data causes exactly one write |
-| 4 | Public read route with cache headers | Response under 12 KB, correct headers, works when KV is empty |
+| 4 | Public read route with cache headers | Response under 13 KB (raised from 12 KB by round 46), correct headers, works when KV is empty |
 | 5 | UI: strip, view switch, detail panel, table, all states in 6.6 | Visual check in English and Farsi (right-to-left), phone and desktop widths |
 | 6 | Wording and context text (sections 7, 8) in both languages | All 14 markets present in both languages, Persian digits and Jalali date in Farsi |
 | 7 | Accessibility pass (6.8) | Keyboard-only walkthrough; no meaning carried by colour alone |

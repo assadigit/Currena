@@ -929,6 +929,10 @@ export type InsightsStatus = z.infer<typeof InsightsStatusSchema>;
  * (camelCase here to match every other contract in this file):
  *   asOf     — the market's own last-close date (its calendar, not UTC's)
  *   chg1d    — last close vs previous close, percent
+ *   chg1w    — last close vs the last close on/before the same date one week
+ *              earlier, percent (the weekly lens, round 46) — OPTIONAL
+ *   chg1m    — last close vs the last close on/before the same date one month
+ *              earlier, percent (the currencies rules read it) — OPTIONAL
  *   chg3m    — last close vs the last close on/before the same date three
  *              months earlier, percent (the section's NORMAL timeframe —
  *              owner round 44, spec v1.2)
@@ -993,6 +997,16 @@ export const MarketEntrySchema = z.object({
   /** Last close vs previous close, percent. */
   chg1d: z.number().finite(),
   /**
+   * Last close vs the last close on or before the same date one week
+   * earlier, percent — the weekly lens of the view switch (round 46:
+   * Today | 1 week | 1 month | 3 months | From 52-week high). OPTIONAL
+   * for back-compat with stored rows written before this change, exactly
+   * like chg1m below: a row without it is a pre-lens row, never a guess —
+   * the UI shows an honest dash. The next markets run rewrites every row
+   * with it.
+   */
+  chg1w: z.number().finite().optional(),
+  /**
    * Last close vs the last close on/before the same date one month earlier,
    * percent — the leg the currency section's rules read (currencies spec
    * §6.3: S&P 500, Nikkei 225, Euro Stoxx 50 1-month changes). OPTIONAL for
@@ -1018,7 +1032,8 @@ export const MarketEntrySchema = z.object({
   stale: z.boolean(),
   /**
    * ≤52 weekly closes for the detail chart, delta-encoded to keep the ONE
-   * stored object under the route's 12 KB budget (spec §4): each entry is
+   * stored object under the route's 13 KB budget (spec §4; raised from 12 KB
+   * by round 46 — the weekly lens field): each entry is
    * [dayDelta, close] where dayDelta counts days from the previous entry
    * (the first from the WEEKLY_EPOCH_BASE of 2020-01-01, exported from
    * @currena/insights/markets/definitions) and close is rounded to integer

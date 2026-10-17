@@ -322,7 +322,16 @@ const BUDGETS = [
   // fx stays licence-hidden, the US-shares AUD view rides both). Measured
   // 607.21 kB raw / 145.24 kB gz. Justified in CHANGELOG §2026-10-18b.
   // Entry chunk untouched (295.15/88.76 vs 296/89.5).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 608_000, gz: 145_600, label: 'Insights lazy chunk' },
+  // Round-46 bump (608.00 → 609.00 raw, 2026-10-24b): the market view
+  // switch grows the weekly and monthly lenses — two more radiogroup
+  // options, the 5-lens viewValue switch (with the honest-dash missing
+  // path), the two new columns in the full table + mobile list, the
+  // Tools-menu CSV columns and the full-export flat-slot puts, plus six
+  // copy strings × two locales. Measured 608.78 kB raw / 145.54 kB gz —
+  // gzip-NEUTRAL vs the 145.60 budget (the additions are mostly localized
+  // label words, highly compressible); the raw overage is wording, not
+  // logic. Justified in CHANGELOG §2026-10-24b.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 609_000, gz: 145_600, label: 'Insights lazy chunk' },
 ];
 
 function main() {
