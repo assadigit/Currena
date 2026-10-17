@@ -83,7 +83,51 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
-## CURRENT DEPLOYMENT — the asset-cards polish round (2026-10-25b, worker ead002b6)
+## CURRENT DEPLOYMENT — the methodology-note removal (2026-10-26b, worker f9571a79)
+
+The owner's follow-up directive is LIVE: the sixth expanded-detail
+section — «دربارهٔ این اعداد» ("About these numbers") and its
+three-sentence methodology body — no longer renders on the four asset
+cards. The panel now carries the five data sections A–E; the methodology
+itself is untouched (it stays implemented in price-trend.ts /
+price-stats.ts and documented in the QA docs). Pushed as 648f5aa (no
+rebase needed — main had not advanced).
+
+- **Active worker**: currena-api **`f9571a79-afb6-433a-bae7-d3423e6ac692`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched).
+- **What it carries**: the PricesBoard section-F removal + its
+  header-comment tag, `aboutNumbersLabel`/`aboutNumbersBody` deleted from
+  both dictionaries, the two manifest entries deleted per the copy
+  workflow's removal rule (2,170 → 2,168, `copy:audit` clean), and the
+  test's F assertion replaced with removal guards in BOTH locales.
+  Everything else from 2026-10-25b rides beneath unchanged.
+- **Chunk proof**: serves `index-CKqYpOMM.js` (295.29/88.81 — the entry
+  hash rotated because it embeds the lazy chunk's filename; its own size
+  is byte-identical) + `Insights-7kn32ZoI.js` (628.67/150.59 — budgets
+  630/151 held; the removed copy shrinks the chunk ~1.2 kB) — the fresh
+  648f5aa build's exact filenames.
+- **Verified live** (agent-browser, fresh profile, both
+  currena-api.sedanama-ir.workers.dev and currena.ir reference
+  index-CKqYpOMM.js and serve Insights-7kn32ZoI.js): desktop 1280 en —
+  the expanded Gold card shows EXACTLY the five sections (Price changes /
+  Price range over the past 52 weeks / Historical price records / Price
+  vs reference levels / Data source & freshness), 'About these numbers'
+  zero occurrences, the element-from-point probe at the LAST section's
+  coordinates hits that H4 itself (the panel paints inside the tile — the
+  2026-10-24d lesson applied); desktop 1280 fa RTL — exactly
+  تغییرات قیمت / محدودهٔ قیمت در ۵۲ هفتهٔ گذشته / سوابق تاریخی قیمت /
+  جایگاه قیمت نسبت به شاخص‌های مرجع / منبع داده و زمان به‌روزرسانی,
+  «دربارهٔ این اعداد» zero occurrences; mobile 375 fa — no horizontal
+  overflow (scrollWidth 375), five sections intact. Zero console/page
+  errors across the session. Evidence:
+  `docs/evidence/2026-10-26b-remove-methodology-note/` (sandbox + live
+  captures).
+- **Gates on the deployed tree**: typecheck 6/6; lint 0 errors/15
+  accepted advisories; 1,520 tests green (web 548); copy:audit clean
+  (2,168 entries); build OK; budgets held.
+
+## Previous: the asset-cards polish round (2026-10-25b, worker ead002b6)
 
 The owner's asset-cards polish task is LIVE: the four financial cards
 carry the editorial header (plain title over a verified measurement-

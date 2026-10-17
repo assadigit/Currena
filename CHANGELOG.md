@@ -109,6 +109,56 @@ tiles never sets the tilt, only the documented net/total ratio does.
   + mobile sets) + README; notes §v6 in
   docs/insights/gold-balance-card-notes.md.
 
+## [2026-10-26b] — the asset cards drop the «دربارهٔ این اعداد» methodology note (owner directive)
+
+A one-scope removal, requested verbatim by the owner after reviewing the
+2026-10-25b polish: the sixth expanded-detail section — the heading
+«دربارهٔ این اعداد» ("About these numbers") and its three-sentence
+methodology body (the shared seven-day window, the daily-change basis, the
+no-fabrication rule) — no longer renders on the asset cards. The panel now
+carries the five data sections A–E (تغییرات قیمت / محدودهٔ قیمت در ۵۲
+هفتهٔ گذشته / سوابق تاریخی قیمت / جایگاه قیمت نسبت به شاخص‌های مرجع /
+منبع داده و زمان به‌روزرسانی). The methodology ITSELF is untouched — the
+window semantics live in `price-trend.ts` / `price-stats.ts` and stay
+documented in the code comments and QA docs; only the on-card disclosure of
+it is gone.
+
+### Removed
+
+- **PricesBoard.tsx** — the section F `<PanelSection>` block and its
+  header-comment map entry (the comment now carries this round's tag so the
+  removal stays traceable where the section used to be described); the rest
+  of the component — all five sections, the collapsed card, the conditional
+  coverage notes — is untouched.
+- **Copy** — `aboutNumbersLabel` / `aboutNumbersBody` deleted from BOTH
+  dictionaries (en "About these numbers…" / fa «دربارهٔ این اعداد…»), and
+  the two matching entries deleted from
+  `docs/localization/persian-copy-manifest.json` in the same commit, per
+  the copy workflow's removal rule (manifest 2,170 → 2,168 entries;
+  `copy:audit` clean).
+- **prices-cards.test.tsx** — the section-F assertion is replaced with
+  removal guards in BOTH locales (`queryByText('About these numbers')` and
+  `queryByText('دربارهٔ این اعداد')` must both stay null), so the removal
+  itself is now a tested behaviour; the A–F labels in the file updated to
+  A–E. Still 11 tests in the battery.
+
+Gates: typecheck 6/6; lint 0 errors (15 accepted advisories, unchanged);
+1,520 tests green; `copy:audit` clean (2,168 entries); web build OK; bundle
+budgets held — the removed copy shrinks the Insights chunk ~1.2 kB
+(628.67 kB / 150.59 kB gz vs the 630/151 budget; entry chunk untouched at
+295.29/88.81).
+
+**Deployed**: pushed as 648f5aa (no rebase — main had not advanced) and
+live on currena-api worker `f9571a79` (SITE_MODE=public, bindings/cron
+unchanged; currena-markets untouched); serves index-CKqYpOMM.js +
+Insights-7kn32ZoI.js — the fresh build's exact filenames. Live-verified on
+currena.ir + workers.dev: en + fa RTL expanded cards show EXACTLY the
+five sections with zero occurrences of the removed heading in either
+locale, the last section paints inside the tile (element-from-point
+probe), mobile 375 no overflow, zero console errors. Deploy record:
+docs/DEPLOY.md §CURRENT DEPLOYMENT; evidence
+docs/evidence/2026-10-26b-remove-methodology-note/ (sandbox + live).
+
 ## [2026-10-26] — the gold balance re-composed to the owner's wireframe reference (factors above, beam beneath)
 
 The owner supplied a hand-drawn reference board

@@ -5,7 +5,9 @@
  * (asset-cards task): the card header (title + measurement-basis
  * subtitle, icon block), the ONE-LINE price + currency composition
  * (task §5 — «۴٬۱۶۶ دلار» / "US$4,166", never separate lines), the
- * expanded panel's semantic sections (task §9 A–F), the 52-week range's
+ * expanded panel's semantic sections (task §9 A–E; the former F
+ * «دربارهٔ این اعداد» methodology note was removed at the owner's
+ * direction, 2026-10-26b), the 52-week range's
  * bidirectional rendering («۳٬۹۶۱ تا ۵٬۳۱۸ دلار» with «تا» BETWEEN the
  * endpoints), the 10-YEAR record relabel (computePeaks reads the 10-year
  * window — never an all-time claim), and the instrument-coverage notes
@@ -192,11 +194,12 @@ describe('PricesBoard 2026-10-25b — header, price line, hierarchy', () => {
 });
 
 /* ------------------------------------------------------------------ *
- * The expanded panel's semantic sections (task §9 A–F)
+ * The expanded panel's semantic sections (task §9 A–E; the former F
+ * methodology note was removed 2026-10-26b)
  * ------------------------------------------------------------------ */
 
 describe('PricesBoard 2026-10-25b — the expanded detail sections', () => {
-  it('organises the details into the A–F sections with one «X گذشته» label family (en)', async () => {
+  it('organises the details into the A–E sections with one «X گذشته» label family (en)', async () => {
     renderBoard(FOUR.map((id) => reading(id)), 'en', 'en-US');
 
     fireEvent.click(screen.getAllByRole('button', { name: /more details/i })[0]!);
@@ -231,8 +234,10 @@ describe('PricesBoard 2026-10-25b — the expanded detail sections', () => {
     // The observation date rides on every card face (4) AND in section E.
     expect(screen.getAllByText('as of Oct 17, 2026').length).toBe(5);
 
-    // F — methodology.
-    expect(screen.getByText('About these numbers', { selector: 'h4' })).toBeTruthy();
+    // F — the methodology note is GONE (owner directive, 2026-10-26b):
+    // neither its heading nor its body may render on the card.
+    expect(screen.queryByText('About these numbers')).toBeNull();
+    expect(screen.queryByText(/share one window:/)).toBeNull();
 
     // The EOD spot attribution carries NO futures note (task §10).
     expect(
@@ -254,6 +259,8 @@ describe('PricesBoard 2026-10-25b — the expanded detail sections', () => {
     expect(screen.getByText('بیشترین قیمت ۱۰ سال اخیر')).toBeTruthy();
     expect(screen.getByText('جایگاه قیمت نسبت به شاخص‌های مرجع')).toBeTruthy();
     expect(screen.getByText('منبع داده و زمان به‌روزرسانی')).toBeTruthy();
+    // The methodology note is gone in fa too (owner directive, 2026-10-26b).
+    expect(screen.queryByText('دربارهٔ این اعداد')).toBeNull();
     // The record row: value + Jalali date + basis, structured parts (the
     // date is formatAsOf's own Jalali rendering — asserted via the same
     // formatter, so the test pins the wiring, not the ICU build).
