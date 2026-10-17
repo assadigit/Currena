@@ -83,7 +83,47 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
-## CURRENT DEPLOYMENT — financial-asset-cards spec pack (2026-10-24c)
+## CURRENT DEPLOYMENT — the gold balance v4 abstract editorial mark (2026-10-25, worker c6e0c2c9)
+
+The owner's Iteration-2 directive is LIVE: the gold/silver balance
+component re-drawn as the abstract editorial mark «برآیند عوامل مؤثر بر
+قیمت طلا» (the literal hanging-pan scale retired). Merged to main as
+`e1b2e68` (feature branch `7d360aa`) and pushed before deploy.
+
+- **Active worker**: currena-api **`c6e0c2c9-02d9-4652-8377-fb65a94f6b5e`**
+  (wrangler deploy from main @ `e1b2e68`; SITE_MODE=public, RATES KV +
+  ASSETS bindings, the `* * * * *` keep-warm cron unchanged).
+  currena-markets untouched.
+- **What it carries**: the ONE flat 520×104 balance SVG (tapered beam,
+  compact hub + 13u keystone pivot — no base bar/column — accent endpoint
+  beads, dotted level reference); the Iteration-2 §3 hierarchy (heading +
+  subtitle → illustration → the two side-labelled factor lists sharing the
+  beam's max-w-520 footprint → the divider-separated overall assessment
+  with the C12 banner → the shared panel → the trays); the round-50 copy
+  (heading/subtitle/side labels/evidence-based empty lines + the NEW
+  `listEmptyNone` unavailable wording); the tilt law untouched
+  (|net|/total × 12°, 4° floor). All prior lineage (financial-asset-cards
+  2026-10-24c, market lenses, economic-indicators) rides beneath,
+  byte-for-byte.
+- **Byte-identical proof**: the deploy serves `index-CjQNEJy-.js`
+  (295.29/88.81) + `Insights-BLn59lac.js` (625.46/149.74 — budgets
+  626/150 held) — the live-served chunks are the fresh main build's
+  (`e1b2e68`) exact filenames.
+- **Verified live** (agent-browser, `currena.ir/#/insights`): EN 1280 —
+  the heading/subtitle/beam/lists/assessment hierarchy renders, and the
+  TILT LAW MEASURED ON PRODUCTION: bead Δy = 23.438u = Lh × sin(4°) with
+  **0.0u diff** (the live state: 1 against · 3 couldn't be read → 4° lean
+  to the red bead); fa RTL 1280 — «برآیند عوامل مؤثر بر قیمت طلا»,
+  SVG mirrored (scaleX(-1)), «۱ به ضرر · ۳ قابل ارزیابی نیست» with
+  Persian digits, the same 4° LTR-signed rotation, the evidence-based
+  empty line under the empty «عوامل حمایتی از قیمت طلا» list; mobile 360
+  fa — the lists stack to one column (measured), scrollWidth == 360, the
+  row's keyboard Enter opens the shared detail panel (aria-expanded
+  true); zero console errors. VLM reviews of both live captures pass.
+  Evidence: `docs/insights/screenshots/gold-balance/` (live-v4-*.png +
+  the v4 harness battery + before-v3 capture).
+
+## Previous: financial-asset-cards spec pack (2026-10-24c, worker 6d6e1300)
 
 The prices-board cards redesign per the owner's
 `financial-asset-cards-spec-pack.zip` is LIVE. Session 2026-10-22, rebased
@@ -151,7 +191,7 @@ entry; this closes that gap).
   h-overflow at 1280/360, keyboard `/` + Escape, zero console errors.
   Evidence: `docs/insights/screenshots/economic-indicators-redesign/final-continuation/`.
 
-## CURRENT DEPLOYMENT — gold balance v3 + market lenses + the financial-asset-cards spec pack (2026-10-18d, worker 7b939901)
+## Previous: gold balance v3 + market lenses (2026-10-18d, worker 7b939901) — superseded by the v4 above
 
 Three concurrent sessions' work rides this deploy (merged in order):
 market lenses round-46 (0e411e6) → the financial-asset-cards spec pack
