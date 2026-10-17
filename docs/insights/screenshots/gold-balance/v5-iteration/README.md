@@ -57,3 +57,22 @@ before commit) at 1280×900 / 360×800, light + dark, en + fa.
 - Zero console errors on every capture session.
 - VLM final review: "professional editorial data visualization" — all
   tilt/empty/unavailable/RTL/mobile states pass.
+
+## Live (production, currena.ir, worker 2f1e8f92, 2026-10-26)
+
+Captured on the LIVE deployment after the push (fresh profile, the
+service worker purged per D-29 so the new build is what renders):
+
+- `live-v5-en-1280.png` — EN desktop: the full v5 hierarchy on the real
+  data (1 against · 3 couldn't be read): columns above the beam, the 4°
+  tilt (bead Δy 22px = 320 × sin 4°, measured on production), the soft
+  assessment box, the row tap verified to open the shared panel
+  (detail=real-yield).
+- `live-v5-fa-1280-rtl.png` — fa RTL desktop: «برآیند عوامل مؤثر بر قیمت
+  طلا», the for column + its green bead on the right, Persian digits.
+- `live-v5-fa-360-rtl.png` — fa mobile, scrolled to the section: stacked
+  columns, compact beam, assessment box, zero overflow (scrollWidth ===
+  clientWidth), VLM pass.
+
+The served `Insights-BuYjxnZ9.js` sha256 (da8163846c186db7…) is
+byte-identical to the fresh main build — production serves main exactly.

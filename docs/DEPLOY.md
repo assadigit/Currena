@@ -83,7 +83,50 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
-## CURRENT DEPLOYMENT — the «جزئیات بیشتر» white-space fix (2026-10-24d, worker cc6f28e6)
+## CURRENT DEPLOYMENT — the gold balance v5 wireframe re-composition (2026-10-26, worker 2f1e8f92)
+
+The owner's wireframe reference (docs/ui-reference/gold-silver-balance-target-
+wireframe.png) is LIVE: the gold balance component re-composed — the two
+opposing factor columns ABOVE the abstract beam (its endpoint beads under
+the columns' centres), the compact soft assessment box beneath, per-column
+progressive disclosure ("+{n} more" / "Show fewer"). The tilt law and every
+user-facing string are untouched (zero copy changes). Merged to main as
+1e99007 (my feature merge 7742966/51edd10 + the parallel 2026-10-24d
+white-space fix 0d39bb0 — no file overlap, both rounds ride).
+
+- **Active worker**: currena-api **`2f1e8f92-e587-4ef2-951b-821e44438077`**
+  (wrangler deploy from main @ `1e99007`; SITE_MODE=public, RATES KV +
+  ASSETS bindings, the `* * * * *` keep-warm cron unchanged).
+  currena-markets untouched.
+- **What it carries**: BalanceScale.tsx (the v5 composition + the
+  disclosure pills + the assessment box), its 31-test suite re-pinned, the
+  MergedCard comment, the documented Insights raw budget bump 626 → 627
+  (gz HELD 150) — everything else byte-for-byte (the parallel session's
+  PricesBoard white-space fix included).
+- **Chunk proof**: the deploy serves `index-CWDirSZM.js` (295.29/88.81) +
+  `Insights-BuYjxnZ9.js` (626.28/149.93 — budgets 627/150 held); the
+  live-served Insights chunk sha256 `da8163846c186db7…` is byte-identical
+  to the fresh main build's.
+- **Verified live** (agent-browser, fresh profile, SW purged per D-29,
+  currena.ir): EN 1280 — the columns render ABOVE the beam (DOM-verified:
+  lists.bottom ≤ zone.top), the beads sit under their column centres
+  (477/480, 803/800 — the 3px residue is the grid gap), the live state
+  (1 against · 3 couldn't be read) tilts exactly 4° with bead Δy 22px =
+  320px × sin(4°) measured on production, the assessment box
+  (bg-currena-soft/60) follows the zone, the for side shows the
+  evidence-based empty line, a row tap opens the shared panel
+  (detail=real-yield); fa RTL 1280 — dir=rtl, «برآیند عوامل مؤثر بر قیمت
+  طلا» heading, the for column + its green bead on the RIGHT, the against
+  bead lower, Persian digits («۱ به ضرر · ۳ قابل ارزیابی نیست»); mobile
+  360 fa — the columns stack, zero horizontal overflow, the beam +
+  assessment readable, VLM pass on the scrolled capture; zero console
+  errors across the session. Evidence:
+  `docs/insights/screenshots/gold-balance/v5-iteration/` (live-v5-*).
+- **Post-merge gates** (re-run on `1e99007`): typecheck 6/6; lint 0
+  errors/15 accepted advisories; web tests 534/534 green; copy:audit
+  clean; bundle budgets held.
+
+## Previous: the «جزئیات بیشتر» white-space fix (2026-10-24d, worker cc6f28e6)
 
 The owner's post-deploy bug report is FIXED and LIVE: clicking «جزئیات
 بیشتر» / "More details" on the live site now renders the detail rows
