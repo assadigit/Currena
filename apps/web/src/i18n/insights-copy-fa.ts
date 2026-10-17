@@ -157,6 +157,18 @@ export const insightsCopyFa: InsightsCopy = {
     pricePositionLow: 'ارزان',
     pricePositionTypical: 'در محدودهٔ معمول',
     pricePositionHigh: 'بالا',
+    // طرح دستی مالک (۱۷ اکتبر ۲۰۲۶): چهار پنجرهٔ تغییر کارت قیمت —
+    // روزانه / هفتگی / ماهانه / سه‌ماهه — و گلوله‌های آمار آن.
+    // days7/days30 برای ردیف‌های تغییر هشد/قهرمان/فشرده باقی می‌مانند.
+    priceChangeDaily: 'روزانه',
+    priceChangeWeekly: 'هفتگی',
+    priceChangeMonthly: 'ماهانه',
+    priceChangeQuarterly: 'سه‌ماهه',
+    descriptionLabel: 'توضیحات',
+    stat6mChange: 'تغییر ۶ ماهه',
+    stat1yChange: 'تغییر ۱ ساله',
+    stat52wRange: 'محدودهٔ ۵۲ هفته',
+    rangeJoin: 'تا',
     btcRatiosLabel: 'صرفاً برای اطلاع؛ در محاسبهٔ سیگنال‌ها نقشی ندارد',
     // گام ۱ (بند C2): نسبت‌ها برای نمایش وارونه می‌شوند — «یک بیت‌کوین
     // ۱۹٫۶ اونس طلا می‌خرد» (مقدار ذخیره‌شده اونس بر بیت‌کوین است و برچسب

@@ -1,30 +1,37 @@
 /**
- * PricesBoard — round-2 Block R10, re-anatomised by R30 (roast 11 Oct).
+ * PricesBoard — round-2 Block R10, re-anatomised by R30 (roast 11 Oct),
+ * re-drawn by the owner's sketch (17 Oct 2026).
  *
- * ONE anatomy for all four tiles, in the same order, with no floating
- * labels: name → LARGE price → the 7d/30d change row (ALWAYS rendered,
- * an em-dash marking a change that does not exist) with the position
- * word INLINE at the row's end → one hedged consequence line → one
- * optional context line (gold in A$ / the Bitcoin ratios — same slot,
- * same style, one line) → "as of".
+ * THE OWNER'S SKETCH ANATOMY (one anatomy, every tile, mobile AND desktop):
+ *   1. the artwork BESIDE the unit name and price (price + unit at the
+ *      start, the tinted icon box at the row's far end — no more stacked
+ *      face);
+ *   2. FOUR percentage rows under the price — daily / weekly / monthly /
+ *      quarterly (the feed carries 7d/30d/90d on every price reading; the
+ *      daily row and the fact bullets derive from the stored history —
+ *      price-stats.ts, the R30 honesty rules: nearest-point ≤3 days,
+ *      history-internal numbers, absent never fabricated);
+ *   3. the description and the verdict — a "Description" label row whose
+ *      far end carries the price-position verdict word (its status ink:
+ *      expensive = the alert red, cheap = the supportive green — R31
+ *      decree) above the hedged consequence line;
+ *   4. the "more percentages and details" BULLET list — the derived facts
+ *      (6-month change, 1-year change, 52-week range) then the context
+ *      lines (the futures note, gold's A$ companion, Bitcoin's ratios,
+ *      the 200-day gap, the record distance);
+ *   5. the "as of" date in VERY small tertiary text, pinned to the tile's
+ *      bottom (mt-auto) so the four tiles' footers align.
  *
- * R30 changes:
- *  - Position words follow the price position band's status ink —
- *    expensive = the alert red, cheap = the supportive green, typical
- *    stays neutral (R31 owner decree, restoring the pre-R30 valence:
- *    "everywhere which is marked 'expensive' use red color"). Never
- *    colour alone: the word rides beside the change numbers.
- *  - Gold, silver and Bitcoin changes are derived CLIENT-SIDE from the
- *    same 10-year history the sparklines fetch (module-cached) — the
- *    feed currently carries change fields for oil only, which is why
- *    only oil used to show changes. Missing data renders "—", never a
- *    fabricated number.
- *  - The Bitcoin ratios collapse into the tile's single context line so
- *    the tile stops being "structured differently".
+ * Kept from R30: ONE anatomy for all four tiles, the stretch grid so the
+ * containers share one width/height, the whole tile clickable (details
+ * panel), honest "—" for a change that does not exist, and the alignment
+ * decree (name in a fixed two-line slot; values end-aligned per row; the
+ * fa unit on its own small line under the digits so every fa tile has the
+ * SAME price-block height — beside-artifact wrapping is impossible).
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { Coins } from 'lucide-react';
 import { formatNumber } from '@currena/core';
@@ -40,54 +47,51 @@ import {
   definitionFor,
   formatChange,
   formatIndicatorValue,
+  indicatorValueParts,
   positionBand, formatPeakDistance } from './config';
 import { formatAsOf } from './HistoryChart';
+import { deriveTileStats, type TileStats } from './price-stats';
 
 /* ------------------------------------------------------------------ *
- * Round 24 (roast #5): a small PICTOGRAM per commodity — the price
- * lane was the last icon-less strip (the roast: "add warmth via small
- * commodity pictograms"). Round 28 (owner): the stroke glyphs are GONE
- * — every tile now wears the owner's own artwork (oil barrel, gold
- * bar, silver bar, bitcoin) at its natural colours inside the same
- * tinted box; gold keeps the brand-gold box, the others the quiet
- * context tint. aria-hidden — the name carries the meaning.
+ * The tile's icon box — gold wears the brand-gold accent (round 24),
+ * the rest the quiet context tint (money-panel language). Owner sketch
+ * (17 Oct 2026): the artwork sits BESIDE the name+price at the row's
+ * far end — 96px on mobile (the full-width tile affords it), 72px on
+ * ≥640px screens (the 4-across grid keeps a wide price column beside
+ * it; the 256px sources downscale cleanly).
  * ------------------------------------------------------------------ */
-/** The tile's icon box — gold wears the brand-gold accent (round 24),
- * the rest stay in the neutral context tint (money-panel language).
- * Round 29r2 (owner): "the main prices … must have at least 128×128 icon
- * in pc." The artwork IS the tile's face now — 96px on mobile, 128px on
- * ≥640px screens (the 256px sources downscale cleanly), filling the
- * tinted box edge to edge like a framed plate. The box sits ABOVE the
- * name/price (stacked card) — beside a 128px artwork the 4-across grid
- * left only ~100px for the largest number on the page, and in fa the
- * price wrapped to three lines (owner: numbers must align). */
 function PriceIconBox({ id }: { id: IndicatorId }) {
   const isGold = id === 'gold-usd';
   const icon = indicatorIconUrl(id);
   return (
     <span
       aria-hidden="true"
-      className={`grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-md)] ring-1 ring-[var(--color-border)] sm:h-32 sm:w-32 ${
+      className={`grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-md)] ring-1 ring-[var(--color-border)] sm:h-[72px] sm:w-[72px] ${
         isGold ? 'bg-[var(--color-accent-gold)]/25' : 'bg-currena-soft/70'
       }`}
     >
       {icon !== null ? (
-        <IconImg src={icon} size={96} desktopSize={128} />
+        <IconImg src={icon} size={96} desktopSize={72} />
       ) : (
         <Coins
           aria-hidden
           strokeWidth={1.2}
           className="currena-icon text-[var(--color-status-context)]"
-          style={{ '--icon-size': '96px', '--icon-size-sm': '128px' } as CSSProperties}
+          style={{ '--icon-size': '96px', '--icon-size-sm': '72px' } as CSSProperties}
         />
       )}
     </span>
   );
 }
 
-/** Client-side 7d/30d change for tiles whose feed reading lacks them. */
-function useDerivedChanges(ids: readonly IndicatorId[]): Partial<Record<string, { c7?: number; c30?: number }>> {
-  const [derived, setDerived] = useState<Partial<Record<string, { c7?: number; c30?: number }>>>({});
+/**
+ * Client-side derived tile statistics (the daily % row + the fact bullets)
+ * for tiles whose history the browser still has to fetch. Every value is
+ * computed from the stored history ALONE (price-stats.ts); a failed fetch
+ * is honest absence — the row shows "—", the bullet stays off the card.
+ */
+function useDerivedTileStats(ids: readonly IndicatorId[]): Partial<Record<string, TileStats>> {
+  const [derived, setDerived] = useState<Partial<Record<string, TileStats>>>({});
   const needed = ids.filter((id) => PRICE_ROWS.includes(id)).join(',');
   useEffect(() => {
     if (!needed) return;
@@ -96,33 +100,11 @@ function useDerivedChanges(ids: readonly IndicatorId[]): Partial<Record<string, 
       void fetchIndicatorHistory(id as IndicatorId)
         .then((history) => {
           if (cancelled || !history) return;
-          const pts = history.points.filter((p): p is [number, number] => typeof p[1] === 'number');
-          if (pts.length < 2) return;
-          const last = pts[pts.length - 1]!;
-          // The nearest point to N days back — but only if it is really
-          // NEAR (≤3 days): a sparse series (early Bitcoin accumulation)
-          // must yield "—", never one number repeated for both windows.
-          const pick = (back: number): [number, number] | null => {
-            const target = last[0] - back;
-            let best: [number, number] | null = null;
-            for (const p of pts) {
-              if (best === null || Math.abs(p[0] - target) < Math.abs(best[0] - target)) best = p;
-            }
-            return best !== null && Math.abs(best[0] - target) <= 3 ? best : null;
-          };
-          const kind = definitionFor(id as IndicatorId).changeKind;
-          const conv = (then: [number, number] | null): number | undefined => {
-            if (!then || then[1] === 0 || last[1] === undefined) return undefined;
-            return kind === 'pct' ? ((last[1] - then[1]) / then[1]) * 100 : last[1] - then[1];
-          };
-          setDerived((prev) =>
-            prev[id] && prev[id]!.c7 !== undefined && prev[id]!.c30 !== undefined
-              ? prev
-              : { ...prev, [id]: { c7: conv(pick(7)), c30: conv(pick(30)) } },
-          );
+          const stats = deriveTileStats(history.points, definitionFor(id as IndicatorId).changeKind);
+          setDerived((prev) => (prev[id] ? prev : { ...prev, [id]: stats }));
         })
         .catch(() => {
-          /* honest absence — the tile shows "—" for a missing change */
+          /* honest absence — "—" on the daily row, no fact bullets */
         });
     }
     return () => {
@@ -130,6 +112,41 @@ function useDerivedChanges(ids: readonly IndicatorId[]): Partial<Record<string, 
     };
   }, [needed]);
   return derived;
+}
+
+/**
+ * The 52-week range in the tile's own units — EN prefixes the currency on
+ * both ends ('US$2,895 – US$4,305'), fa says it once («۲٬۸۹۵ تا ۴٬۳۰۵
+ * دلار آمریکا»). Pure formatting; both parts ride in one <bdi dir="ltr">.
+ */
+function formatPriceRange(
+  id: IndicatorId,
+  low: number,
+  high: number,
+  numberLocale: 'en-US' | 'fa-IR',
+  copy: InsightsCopy,
+): string {
+  const lo = indicatorValueParts(id, low, numberLocale, copy.units);
+  const hi = indicatorValueParts(id, high, numberLocale, copy.units);
+  const join = copy.ui.rangeJoin;
+  if (numberLocale === 'fa-IR') {
+    const unit = lo.unit ?? hi.unit ?? '';
+    return `${lo.value} ${join} ${hi.value}${unit !== '' ? ` ${unit}` : ''}`;
+  }
+  const pre = lo.unit ?? '';
+  return `${pre}${lo.value} ${join} ${pre}${hi.value}`;
+}
+
+/** One bullet row: marker + "label: value" (value isolated dir="ltr"). */
+function FactItem({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <span role="listitem" className="flex items-baseline gap-1.5" data-price-fact>
+      <span aria-hidden className="select-none text-[var(--color-text-tertiary)]">•</span>
+      <span className="min-w-0">
+        {label}: <bdi dir="ltr" className="font-semibold tabular-nums">{value}</bdi>
+      </span>
+    </span>
+  );
 }
 
 export function PricesBoard({
@@ -153,7 +170,7 @@ export function PricesBoard({
       ),
     [byId],
   );
-  const derived = useDerivedChanges(PRICE_ROWS);
+  const derived = useDerivedTileStats(PRICE_ROWS);
   if (rows.length === 0) return null;
 
   const goldAud = byId.get('gold-aud');
@@ -169,10 +186,10 @@ export function PricesBoard({
       <p className="m-0 mb-2 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">
         {copy.ui.pricesSubtitle}
       </p>
-      {/* R10: four tiles, one grid, ONE anatomy (R30). Default stretch so
-       * the four containers are the SAME width and height — the owner's
-       * 11 Oct follow-up: ragged tile bottoms read as a layout bug.
-       * h-full on the tile + button keeps the whole box clickable. */}
+      {/* R10: four tiles, one grid, ONE anatomy. Default stretch so the four
+       * containers are the SAME width and height — ragged tile bottoms read
+       * as a layout bug (owner, 11 Oct). h-full on the tile + button keeps
+       * the whole box clickable; mt-auto pins every footer line down. */}
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
         {rows.map(({ id, reading }) => {
           const def = definitionFor(id);
@@ -189,20 +206,30 @@ export function PricesBoard({
                 ? copy.ui.pricePositionHigh
                 : copy.ui.pricePositionTypical
             : null;
-          const valueText =
-            reading.value !== null ? formatIndicatorValue(id, reading.value, numberLocale, copy.units) : null;
+          const valueParts =
+            reading.value !== null
+              ? indicatorValueParts(id, reading.value, numberLocale, copy.units)
+              : null;
 
-          // R30: feed changes first, client-side derivation second.
-          const c7 = reading.change7d ?? derived[id]?.c7;
-          const c30 = reading.change30d ?? derived[id]?.c30;
+          // The four sketch windows: feed first (every price reading carries
+          // 7d/30d/90d today), the stored-history derivation second; the
+          // daily row is always derived (the feed has no 1-day field).
+          const stats = derived[id];
+          const c1 = stats?.c1;
+          const c7 = reading.change7d ?? stats?.c7;
+          const c30 = reading.change30d ?? stats?.c30;
+          const c90 = reading.change90d ?? stats?.c90;
+          const changeRows: Array<{ label: string; value: number | undefined }> = [
+            { label: copy.ui.priceChangeDaily, value: c1 },
+            { label: copy.ui.priceChangeWeekly, value: c7 },
+            { label: copy.ui.priceChangeMonthly, value: c30 },
+            { label: copy.ui.priceChangeQuarterly, value: c90 },
+          ];
 
-          // R30: ONE context line per tile, same slot, same style — gold's
-          // A$ companion and Bitcoin's two ratios (the roast: "the Bitcoin
-          // tile is structured differently").
-          const contextParts: string[] = [];
           // Defect E-03 (2026-10-16): Brent/gold/silver quote FUTURES (the
           // front-month contract extends/leads the series) — the tile says
           // so, so a futures price is never mistaken for spot.
+          const contextParts: string[] = [];
           if (id === 'brent' || id === 'gold-usd' || id === 'silver-usd') {
             contextParts.push(copy.ui.exportFuturesNote);
           }
@@ -215,10 +242,9 @@ export function PricesBoard({
           }
           // Step-1 audit item C2 + fix spec B-16 (2026-10-14): the ratios
           // are computed FROM THE SAME DISPLAYED PRICES (btc ÷ gold, btc ÷
-          // silver — one snapshot, no stored rounding in between), so the
-          // "one bitcoin buys X oz" line always matches the prices shown.
+          // silver — one snapshot, no stored rounding in between).
           // Defect E-13 (2026-10-16): the sentence belongs on the BITCOIN
-          // tile only — it repeated on every price tile in the 15 Oct export.
+          // tile only.
           const goldReading = byId.get('gold-usd');
           const silverReading = byId.get('silver-usd');
           const btcReading = byId.get('btc-usd');
@@ -235,9 +261,6 @@ export function PricesBoard({
             });
             contextParts.push(interpolate(copy.ui.btcBuysSilver, { value: ozSilver }));
           }
-          // Step-1 audit item C9 + fix spec B-01: distance from the record —
-          // the peak, its date and its basis are named (the full stored
-          // history, one basis; never a silent 10-year window).
           // Step 3 L2-02 (runbook Phase 4): the 200-day average gap — a
           // standard definition, conditions only ("X% above/below").
           if (reading.ma200GapPct !== undefined) {
@@ -249,6 +272,8 @@ export function PricesBoard({
               interpolate(reading.ma200GapPct >= 0 ? copy.ui.ma200Above : copy.ui.ma200Below, { pct }),
             );
           }
+          // Step-1 audit item C9 + fix spec B-01: distance from the record —
+          // the peak, its date and its basis are named.
           const peakLine = formatPeakDistance(
             reading,
             numberLocale,
@@ -259,6 +284,13 @@ export function PricesBoard({
           if (peakLine !== null) {
             contextParts.push(peakLine);
           }
+
+          // The sketch's fact bullets: the derived percentages first, then
+          // the tile's context lines. A missing fact stays OFF the card.
+          const c6m = stats?.c6m;
+          const c1y = stats?.c1y;
+          const has52 = stats?.low52 !== undefined && stats?.high52 !== undefined;
+          const hasFacts = c6m !== undefined || c1y !== undefined || has52 || contextParts.length > 0;
 
           return (
             <article
@@ -272,94 +304,126 @@ export function PricesBoard({
                 onClick={(e) => onFocusCard(id, e.currentTarget)}
                 className="insights-focusable block h-full w-full cursor-pointer border-0 bg-transparent p-0 text-start"
               >
-                {/* h-full: buttons vertically centre short content (UA
-                 * behaviour) — without it the name/price/change rows start
-                 * at a DIFFERENT y per tile (owner: every heading on the
-                 * same line, every number aligned). Filling the button
-                 * pins the column to the top in all four tiles.
-                 * Round 29r2 (owner): the 128px artwork leads the tile as
-                 * its face; the name and the big price stack UNDER it at
-                 * full tile width (beside it they wrapped fa prices to
-                 * three lines). The name rides in a fixed two-line slot so
-                 * the price — and everything under it — starts at the SAME
-                 * y in every tile, wrapped or not. */}
-                <span className="flex h-full w-full flex-col items-start gap-1">
-                  <PriceIconBox id={id} />
-                  {/* Plain name — no tickers, no series ids (R14). The
-                   * two-line min-height (2 × leading-snug) keeps the price
-                   * rows aligned across tiles even when a neighbour's name
-                   * wraps (round 24, roast #5). */}
-                  <span className="min-h-[2.75em] text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-secondary)]">
-                    {entry.name}
+                <span className="flex h-full w-full flex-col items-start gap-1.5">
+                  {/* 1. THE SKETCH'S HEADER ROW — the artwork beside the
+                   * price: price block (big digits, the fa unit on its own
+                   * small line under them so EVERY fa tile has the same
+                   * price-block height) at the start, the tinted icon box
+                   * at the row's far end. */}
+                  <span className="flex w-full items-start justify-between gap-3">
+                    <span className="flex min-w-0 flex-col items-start gap-0.5">
+                      {valueParts !== null ? (
+                        <>
+                          <bdi
+                            className={`type-number tabular-nums text-[var(--color-text-primary)] ${
+                              isStale ? 'text-[var(--color-text-secondary)]' : ''
+                            }`}
+                          >
+                            {valueParts.value}
+                          </bdi>
+                          {valueParts.unit !== null ? (
+                            <bdi className="whitespace-nowrap text-[length:var(--type-caption)] font-semibold leading-tight text-[var(--color-text-secondary)]">
+                              {valueParts.unit}
+                            </bdi>
+                          ) : null}
+                        </>
+                      ) : (
+                        <span className="type-number text-[var(--color-text-secondary)]">{copy.ui.na}</span>
+                      )}
+                      {/* Plain name — no tickers, no series ids (R14). The
+                       * two-line min-height keeps the rows under it aligned
+                       * across tiles even when a neighbour's name wraps. */}
+                      <span className="min-h-[2.75em] text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-secondary)]">
+                        {entry.name}
+                      </span>
+                    </span>
+                    <PriceIconBox id={id} />
                   </span>
-                  {/* The large price with unit — the largest text in the tile.
-                   * Plain <bdi> (auto direction): the fa unit word lands on
-                   * the same side of the digits in EVERY tile — the old
-                   * dir="ltr" flipped "۱۲۵٫۴۴ دلار" to "دلار ۱۲۵٫۴۴" in
-                   * some tiles and not others (owner: numbers must align). */}
-                  {valueText !== null ? (
-                    <bdi className={`type-number tabular-nums text-[var(--color-text-primary)] ${isStale ? 'text-[var(--color-text-secondary)]' : ''}`}>
-                      {valueText}
-                    </bdi>
+                  {/* 2. THE FOUR PERCENTAGE ROWS — daily / weekly / monthly
+                   * / quarterly, one per line, values end-aligned (they
+                   * share one edge in every tile). A change that does not
+                   * exist renders the quiet "—", never a fabricated number. */}
+                  <span className="flex w-full flex-col gap-[3px] text-[length:var(--type-caption)] text-[var(--color-text-secondary)]" data-price-changes>
+                    {changeRows.map(({ label, value }) => (
+                      <span key={label} className="flex items-baseline justify-between gap-2">
+                        <span className="opacity-80">{label}</span>
+                        <bdi dir="ltr" className="font-semibold tabular-nums text-[var(--color-text-primary)]">
+                          {value !== undefined ? formatChange(value, def.changeKind, numberLocale, copy.units) : '—'}
+                        </bdi>
+                      </span>
+                    ))}
+                  </span>
+                  {/* 3. DESCRIPTION + VERDICT — the sketch's "Description"
+                   * heading; the verdict word (the price-position band's
+                   * status ink) rides the heading's far end, the hedged
+                   * consequence line below. */}
+                  {reading.status !== 'unavailable' ? (
+                    <>
+                      <span className="flex w-full flex-wrap items-baseline justify-between gap-x-2">
+                        <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
+                          {copy.ui.descriptionLabel}
+                        </span>
+                        {band && positionWord ? (
+                          <span
+                            className={`whitespace-nowrap text-[length:var(--type-caption)] font-bold ${
+                              bandToneClass(band) || 'text-[var(--color-text-primary)]'
+                            }`}
+                            data-price-position={band}
+                          >
+                            {positionWord}
+                          </span>
+                        ) : null}
+                      </span>
+                      <span className="block text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+                        {consequenceLine(reading, entry, true, bandWordsOf(copy))}
+                      </span>
+                    </>
                   ) : (
-                    <span className="type-number text-[var(--color-text-secondary)]">{copy.ui.na}</span>
-                  )}
-                  {reading.status === 'unavailable' ? (
                     <span className="text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
                       {copy.ui.unavailableCard}
                     </span>
-                  ) : null}
-                  {/* R30 → round 24 (roast #5): the change row keeps ONE
-                   * anatomy, but a missing change renders a QUIET em-dash —
-                   * the old "ناموجود / n/a" twice per tile read as six empty
-                   * labels in a strip that should be clean. */}
-                  <span className="flex w-full flex-wrap items-baseline gap-x-4 gap-y-0.5 text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
-                    <span className="inline-flex items-baseline gap-1">
-                      <bdi dir="ltr" className="min-w-[4.75rem]">
-                        {c7 !== undefined ? formatChange(c7, def.changeKind, numberLocale, copy.units) : '—'}
-                      </bdi>
-                      <span className="opacity-80">{copy.ui.days7}</span>
-                    </span>
-                    <span className="inline-flex items-baseline gap-1">
-                      <bdi dir="ltr" className="min-w-[4.75rem]">
-                        {c30 !== undefined ? formatChange(c30, def.changeKind, numberLocale, copy.units) : '—'}
-                      </bdi>
-                      <span className="opacity-80">{copy.ui.days30}</span>
-                    </span>
-                    {band && positionWord ? (
-                      <span
-                        className={`ms-auto whitespace-nowrap font-bold ${
-                          bandToneClass(band) || 'text-[var(--color-text-primary)]'
-                        }`}
-                        data-price-position={band}
-                      >
-                        {positionWord}
-                      </span>
-                    ) : null}
-                  </span>
-                  {/* One hedged practical consequence line. */}
-                  {reading.status !== 'unavailable' ? (
-                    <span className="block text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-                      {consequenceLine(reading, entry, true, bandWordsOf(copy))}
-                    </span>
-                  ) : null}
-                  {/* R30: the ONE optional context line — same slot and
-                   * style on every tile (gold A$ / Bitcoin ratios). */}
-                  {contextParts.length > 0 ? (
+                  )}
+                  {/* 4. THE FACT BULLETS — "more percentages and details":
+                   * the derived stats (6-month change, 1-year change, the
+                   * 52-week range) then the tile's context lines. */}
+                  {hasFacts ? (
                     <span
-                      className="block text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]"
-                      data-price-context
+                      role="list"
+                      className="flex w-full flex-col gap-1 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]"
+                      data-price-facts
                     >
-                      <bdi>{contextParts.join(' · ')}</bdi>
+                      {c6m !== undefined ? (
+                        <FactItem
+                          label={copy.ui.stat6mChange}
+                          value={formatChange(c6m, def.changeKind, numberLocale, copy.units)}
+                        />
+                      ) : null}
+                      {c1y !== undefined ? (
+                        <FactItem
+                          label={copy.ui.stat1yChange}
+                          value={formatChange(c1y, def.changeKind, numberLocale, copy.units)}
+                        />
+                      ) : null}
+                      {has52 ? (
+                        <FactItem
+                          label={copy.ui.stat52wRange}
+                          value={formatPriceRange(id, stats!.low52!, stats!.high52!, numberLocale, copy)}
+                        />
+                      ) : null}
+                      {contextParts.map((line) => (
+                        <span key={line} role="listitem" className="flex items-baseline gap-1.5" data-price-fact>
+                          <span aria-hidden className="select-none text-[var(--color-text-tertiary)]">•</span>
+                          <bdi className="min-w-0">{line}</bdi>
+                        </span>
+                      ))}
                     </span>
                   ) : null}
-                  {/* PB3: "as of {date}"; stale chips only past the limit.
-                   * Owner request (sources off the cards): the tile no longer
-                   * names its source — which price this tile carries (Brent
-                   * futures BZ=F vs the EIA spot base, the metals' live
-                   * futures vs the EOD spot backbone) lives in the details
-                   * panel footer and the About/sources section now. */}
-                  <span className="flex flex-wrap items-baseline gap-x-2 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
+                  {/* 5. "AS OF" IN VERY SMALL TEXT — pinned to the tile's
+                   * bottom so the four footers align on the stretch grid.
+                   * Owner request (sources off the cards): the tile does
+                   * not name its source — the details panel and the
+                   * About/sources section do. */}
+                  <span className="mt-auto flex w-full flex-wrap items-baseline gap-x-2 pt-1 text-[10px] leading-4 text-[var(--color-text-tertiary)]">
                     {reading.asOf ? <bdi>{interpolate(copy.ui.pricesAsOf, { date: formatAsOf(reading.asOf, locale) })}</bdi> : null}
                     {reading.status === 'stale' && reading.asOf ? (
                       <bdi className="font-semibold">{interpolate(copy.ui.staleSince, { date: formatAsOf(reading.asOf, locale) })}</bdi>

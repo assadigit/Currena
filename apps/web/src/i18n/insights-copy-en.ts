@@ -1285,6 +1285,18 @@ export const insightsCopyEn = {
     pricePositionLow: 'cheap',
     pricePositionTypical: 'normal',
     pricePositionHigh: 'expensive',
+    // Owner sketch (17 Oct 2026): the price card's FOUR change windows —
+    // daily / weekly / monthly / quarterly — and its fact bullets.
+    // days7/days30 stay for the alert/hero/compact change rows.
+    priceChangeDaily: 'Daily',
+    priceChangeWeekly: 'Weekly',
+    priceChangeMonthly: 'Monthly',
+    priceChangeQuarterly: 'Quarterly',
+    descriptionLabel: 'Description',
+    stat6mChange: '6-month change',
+    stat1yChange: '1-year change',
+    stat52wRange: '52-week range',
+    rangeJoin: '–',
     btcRatiosLabel: 'Context only, not used in signals',
     // Step-1 audit item C2: the ratios inverted for display — "One bitcoin
     // buys 19.6 oz of gold" (the stored fraction is oz-per-bitcoin; the old
