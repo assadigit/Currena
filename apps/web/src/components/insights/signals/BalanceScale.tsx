@@ -1,23 +1,39 @@
 /**
  * signals/BalanceScale — the gold card's balance visual (owner spec
- * docs/insights/gold-balance-card-spec.md, the v2 seesaw patch
- * docs/insights/gold-balance-card-v2-seesaw-patch-spec.md, and the v3
- * revision (owner directive 2026-10-18d, this file's git history): the
- * drawing is now a CLASSIC HANGING-PAN BALANCE drawn as one inline SVG,
- * the factor cards live OFF the beam in lists beneath their sides, and
- * an empty side is communicated in prose under that side — never as a
- * dashed placeholder on the illustration.
+ * docs/insights/gold-balance-card-spec.md, the v2 seesaw patch, the v3
+ * revision and now the v4 ITERATION-2 directive, 2026-10-25: "Refine the
+ * Gold/Silver Balance into a Premium Editorial Visualization").
  *
- * v3 rules (owner directive, verbatim mapping):
- *   1. Sophisticated, carefully proportioned vector geometry — a
- *      machined pedestal (two-step plinth + tapered pillar), a pinned
- *      pivot, a subtly tapered beam with rounded end knuckles, splayed
- *      chains and shallow pan dishes; varied stroke weights (beam is a
- *      filled body, chains 2u, pan rim 3u) and deliberate whitespace
- *      (≥80u between every pan and the pillar, ≥20u page margins).
+ * v4 replaces v3's literal hanging-pan scale (pillar, chains, suspended
+ * dishes) with the abstract editorial concept «برآیند عوامل مؤثر بر قیمت
+ * طلا» — a restrained data-visualization mark, not a drawing of a machine:
+ *
+ *   - ONE refined horizontal beam, slightly weighted (tapered 9u at the
+ *     centre → 6u at the ends), rotating around a compact pivot.
+ *   - A compact, geometrically precise central pivot: a 9u hub pinned
+ *     with a surface-colour dot, its apex meeting a 13u keystone
+ *     triangle — deliberately NOT a tall support column, with NO base
+ *     bar (the triangle's flat base is the ground).
+ *   - Subtle, clearly defined endpoints: an accent-coloured bead at
+ *     each beam end — green for / red against, the only colour in the
+ *     drawing, so the sides stay identified while the structure stays
+ *     neutral.
+ *   - The dotted level reference through the pivot (kept from v2/v3):
+ *     the eye compares the tilted beam with level.
+ *   - No hanging wires, no suspended bowls, no tall column, no
+ *     decorative machinery, no unnecessary outlines.
+ *
+ * The v3 rules that survive verbatim (the owner's Iteration-2 prompt
+ * repeats them):
+ *   1. Carefully proportioned vector geometry with controlled stroke
+ *      weights (beam body > hub 9u > endpoint beads 6.25u > reference
+ *      1.5u dotted) and deliberate whitespace (the canvas reserves
+ *      exactly the ±35u swing of the 12° max tilt, ~11u clear each
+ *      side).
  *   2. No dashed empty rectangle: both sides always draw their complete
- *      structure (chains + pan); a side with no qualifying factors gets
- *      a concise, evidence-based empty line under its list heading.
+ *      structure; a side with no qualifying factors gets a concise,
+ *      evidence-based line under its list heading, and when NOTHING
+ *      could be read, both sides carry the unavailable line instead.
  *   3. No factor cards on the beam: the beam carries ONLY the aggregate
  *      weighted assessment (its tilt); the individual factors render in
  *      organised lists beneath their supportive/adverse sides, growing
@@ -28,23 +44,24 @@
  *      balanced (net 0) and unavailable (nothing readable) verdicts
  *      render level — no directional implication. The ratio |net|/total
  *      still scales the angle, so unread drivers pull toward level.
- *   5. Fixed viewBox geometry: the SVG's height is constant per width;
- *      any number of factors on either side cannot collide with, overlap
- *      or resize the illustration.
+ *   5. Fixed viewBox geometry: the SVG's height is a constant function
+ *      of its width; any number of factors on either side cannot
+ *      collide with, overlap or resize the illustration.
  *
- * Tilt arithmetic (v1 §6.3–4, kept verbatim by v2 §4 and v3): angle =
- * |net|/total × 12° floored at 4°; level at net 0 and at readable 0.
+ * Tilt arithmetic (v1 §6.3–4, kept verbatim by v2 §4, v3 and v4): angle
+ * = |net|/total × 12° floored at 4°; level at net 0 and at readable 0.
  * RTL: the whole SVG mirrors with scaleX(-1) — it is pure geometry, so
- * the mirror relocates the `for` pan to the inline-end AND flips the
- * visual rotation sign in one move; the lists mirror via the grid's
+ * the mirror relocates the `for` platform to the inline-end AND flips
+ * the visual rotation sign in one move; the lists mirror via the grid's
  * direction-aware columns.
  *
- * Layout (top to bottom): verdict line + count line → the card's banner
- * sentence (unchanged) → the SVG balance zone (role="img") → the two
- * factor lists under their side captions (green For gold / red Against
- * gold, v2 §5.7's fixed row became the list headings) → the shared
- * detail panel → the Neutral / Couldn't read trays (§8). Price footing
- * stays in the merged card below the trays (§9), never a driver.
+ * Hierarchy (the Iteration-2 prompt §3, top to bottom): the heading
+ * «برآیند عوامل مؤثر بر قیمت طلا» → the concise explanatory subtitle →
+ * the balance illustration → the two side-labelled factor lists with
+ * their empty states → the overall assessment (verdict word + count
+ * line + the card's banner sentence, where needed) → the shared detail
+ * panel → the Neutral / Couldn't read trays. Price footing stays in the
+ * merged card below the trays, never a driver.
  *
  * Reusable by contract (spec §2.6): the component takes a list of
  * drivers and knows nothing about gold beyond the copy strings; the
@@ -115,34 +132,38 @@ export function balanceCounts(drivers: readonly BalanceDriver[]): BalanceCounts 
   return { for: f, against: a, neutral: n, unread: u, total: drivers.length, net: f - a, readable: f + a + n };
 }
 
-/** The tilt constants (v2 patch §5.1.5, kept by v3 — the angle formula
- * is the owner's model and must not change: ratio × 12°, 4° floor). */
+/** The tilt constants (v2 patch §5.1.5, kept by v3 and v4 — the angle
+ * formula is the owner's model and must not change: ratio × 12°, 4° floor). */
 export const BALANCE_MAX_ANGLE_DEG = 12;
 export const BALANCE_MIN_ANGLE_DEG = 4;
 
 /* ------------------------------------------------------------------ *
- * v3 drawing metrics — everything lives in ONE fixed viewBox (SVG
+ * v4 drawing metrics — everything lives in ONE fixed viewBox (SVG
  * user units); the SVG scales responsively, so the geometry never
  * depends on the rendered width, the factor count or the tilt.
  * ------------------------------------------------------------------ */
-/** The SVG's logical canvas (v3 §1: carefully proportioned). */
+/** The SVG's logical canvas: a deliberately FLAT, editorial proportion
+ * (v4: no tall machinery — the whole structure is 31u tall, the canvas
+ * reserves exactly the ±35u swing of a 12° tilt on both sides). */
 export const BALANCE_VIEWBOX_W = 520;
-export const BALANCE_VIEWBOX_H = 252;
-/** The pivot — the beam's rotation centre (x is the canvas centre). */
+export const BALANCE_VIEWBOX_H = 104;
+/** The pivot — the beam's rotation centre (x is the canvas centre; y
+ * centres the swing so the max tilt clears the canvas by ~11u each
+ * side). */
 export const BALANCE_PIVOT_X = 260;
-export const BALANCE_PIVOT_Y = 72;
-/** The hinge-to-hinge distance: the two beam-end knuckles (v1 §6's Lh,
- * in viewBox units). */
+export const BALANCE_PIVOT_Y = 52;
+/** The bead-to-bead distance: the two beam-end endpoint beads (v1 §6's
+ * Lh, in viewBox units — unchanged from v2/v3 so the tilt law's span
+ * is the same number). */
 export const BALANCE_LH_VB = 336;
-/** The knuckle x of each side (Lh ÷ 2 either side of the pivot). */
+/** The endpoint bead x of each side (Lh ÷ 2 either side of the pivot). */
 export const BALANCE_HINGE_FOR_X = BALANCE_PIVOT_X - BALANCE_LH_VB / 2;
 export const BALANCE_HINGE_AGAINST_X = BALANCE_PIVOT_X + BALANCE_LH_VB / 2;
-/** One pan: width and the rim's y at rest (the pans hang at rest and
- * only translate ±rise with the tilt — v2 §5.4.3's law, now in SVG). */
-export const BALANCE_PAN_W_VB = 144;
-export const BALANCE_PAN_RIM_Y_VB = 150;
-/** The pan dish's depth below the rim (quadratic control points). */
-const PAN_DEPTH_VB = 28;
+/** Each side's endpoint bead radius — the accent-coloured terminator at
+ * its beam end. */
+export const BALANCE_END_R_VB = 6.25;
+/** The pivot hub's radius (the compact, geometrically precise pivot). */
+export const BALANCE_HUB_R_VB = 9;
 
 const radOf = (deg: number): number => (deg * Math.PI) / 180;
 
@@ -150,9 +171,9 @@ export interface BalanceTilt {
   /** The beam's rotation in degrees (LTR sign convention — the RTL
    * mirror flips the visual sign; the SVG never re-signs it). 0 = level. */
   angleDeg: number;
-  /** The vertical move of ONE pan off rest: (Lh ÷ 2) × sin(angle) — the
-   * heavy pan drops by this, the light one climbs by it. The two pan
-   * rims therefore sit 2 × risePx apart = Lh × sin(angle). */
+  /** The vertical move of ONE beam end off rest: (Lh ÷ 2) × sin(angle) —
+   * the heavy end drops by this, the light one climbs by it. The two
+   * endpoint pins therefore sit 2 × risePx apart = Lh × sin(angle). */
   risePx: number;
   /** The beam-end height difference: Lh × sin(angle) — the ONLY height
    * difference the picture may show. */
@@ -162,10 +183,10 @@ export interface BalanceTilt {
 }
 
 /**
- * The tilt rule (v1 §6 steps 3–4, kept verbatim by v2 §4 and v3 rule 4):
- * net 0 → level; nothing readable → level; otherwise angle =
+ * The tilt rule (v1 §6 steps 3–4, kept verbatim by v2 §4, v3 and v4
+ * rule 4): net 0 → level; nothing readable → level; otherwise angle =
  * |net|/total × MAX, floored at MIN so one driver still leans. `lhPx`
- * is the hinge-to-hinge distance in the drawing's units (0 → level).
+ * is the pin-to-pin distance in the drawing's units (0 → level).
  */
 export function balanceTilt(counts: BalanceCounts, lhPx: number): BalanceTilt {
   if (counts.readable === 0 || counts.net === 0 || lhPx <= 0) {
@@ -181,7 +202,7 @@ export type BalanceVerdict = 'for' | 'balanced' | 'against' | 'none';
 
 /** The verdict word (spec §5.1 + §13): nothing readable → "Can't read…";
  * otherwise the net's sign, "Balanced" at exactly zero. The beam tilts
- * ONLY when this verdict is directional (v3 rule 4). */
+ * ONLY when this verdict is directional (v3/v4 rule 4). */
 export function balanceVerdictOf(counts: BalanceCounts): BalanceVerdict {
   if (counts.readable === 0) return 'none';
   if (counts.net > 0) return 'for';
@@ -203,21 +224,23 @@ export function countLineParts(counts: BalanceCounts, copy: InsightsCopy, number
   return parts.filter(([count]) => count > 0).map(([, text]) => text);
 }
 
-/** The tilt animation (v1 §6.7, kept by v2 §5.9 and v3): ~500 ms ease on
- * BOTH the beam rotation and the pan movement, disabled for
- * prefers-reduced-motion users (the repo's standard pair — the same
- * Tailwind class the collapsible chevrons use, applied to the SVG <g>
- * groups). */
+/** The tilt animation (v1 §6.7, kept by v2 §5.9, v3 and v4): ~500 ms ease
+ * on the beam rotation, disabled for prefers-reduced-motion users (the
+ * repo's standard pair — the same Tailwind class the collapsible
+ * chevrons use, applied to the SVG group). */
 const TILT_TRANSITION_CLASS = 'transition-transform duration-500 ease-out motion-reduce:transition-none';
 const TILT_TRANSFORM_ORIGIN_STYLE = { transformBox: 'view-box', transformOrigin: `${BALANCE_PIVOT_X}px ${BALANCE_PIVOT_Y}px` } as const;
 
-/** One pan's complete drawing (v3 rule 2 — ALWAYS fully drawn): the two
- * splayed chains from the beam-end knuckle down to the pan's rim ends
- * and the shallow dish. One <g> per side that only translates ±rise. */
-const panGeometry = (hingeX: number): { rimStartX: number; rimEndX: number } => ({
-  rimStartX: hingeX - BALANCE_PAN_W_VB / 2,
-  rimEndX: hingeX + BALANCE_PAN_W_VB / 2,
-});
+/** The beam's tapered body (v4 rule 1: a refined, slightly weighted
+ * horizontal beam — 9u tall at the centre, 6u at the ends). One filled
+ * path, no stroke, no outline: the drawing's heaviest mark. */
+const BEAM_BODY_PATH =
+  'M 92 49 C 170 48.2 214 47.5 260 47.5 C 306 47.5 350 48.2 428 49 L 428 55 C 350 55.8 306 56.5 260 56.5 C 214 56.5 170 55.8 92 55 Z';
+/** The compact pivot's keystone: a 13u equilateral-ish triangle whose
+ * apex meets the hub's underside (v4: NOT a support column, NO base
+ * bar — the flat triangle base is the ground, the dotted reference is
+ * the level). */
+const PIVOT_MOUNT_PATH = 'M 260 61 L 274 74 L 246 74 Z';
 
 export function BalanceScale({
   drivers,
@@ -229,7 +252,7 @@ export function BalanceScale({
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
   /** The card's existing verdict banner sentence (spec §5.2 — kept
-   * unchanged, rendered after the verdict + count lines). */
+   * unchanged, rendered with the overall assessment at the end). */
   banner?: ReactNode;
 }): React.JSX.Element | null {
   const b = copy.signals.balance;
@@ -246,18 +269,15 @@ export function BalanceScale({
   const neutralChips = drivers.filter((d) => d.state === 'neutral');
   const unreadChips = drivers.filter((d) => d.state === 'unread');
 
-  /* The tilt, from the fixed viewBox Lh (v3 rule 5: the geometry never
+  /* The tilt, from the fixed viewBox Lh (v4 rule 5: the geometry never
    * depends on anything measured at runtime). */
   const tilt = balanceTilt(counts, BALANCE_LH_VB);
   /* CSS rotation, LTR-signed: negative = counter-clockwise = the
    * inline-start (for) end down. The RTL SVG mirror (scaleX(-1)) flips
    * the VISUAL sign, so the code must NOT re-sign it — the mirrored
-   * render keeps the heavier pan down on both directions (v1 §6.6). */
+   * render keeps the heavier end down in both directions (v1 §6.6). */
   const ltrSign = tilt.heavy === 'for' ? -1 : 1;
   const rotateDeg = tilt.angleDeg === 0 ? 0 : ltrSign * tilt.angleDeg;
-  /* translateY: positive = down in SVG user units, like the page. */
-  const forMove = tilt.heavy === 'for' ? tilt.risePx : tilt.heavy === 'against' ? -tilt.risePx : 0;
-  const againstMove = -forMove;
 
   const verdictWord =
     verdict === 'for'
@@ -281,10 +301,9 @@ export function BalanceScale({
   const toggle = (key: string): void => setOpenKey((prev) => (prev === key ? null : key));
   const openDriver = drivers.find((d) => d.key === openKey) ?? null;
 
-  /** One compact factor row (v2 §5.5, now a LIST item — v3 rule 3):
-   * icon ~20px + the short name + the current value, 56px tall, NO
-   * sentence at any width — a real button whose tap opens the shared
-   * detail panel. */
+  /** One compact factor row (v2 §5.5, the v3/v4 LIST item): icon ~20px +
+   * the short name + the current value, 56px tall, NO sentence at any
+   * width — a real button whose tap opens the shared detail panel. */
   const block = (d: BalanceDriver, side: 'for' | 'against'): React.JSX.Element => (
     <button
       key={d.key}
@@ -312,17 +331,27 @@ export function BalanceScale({
     </button>
   );
 
-  /** One side's list column (v3 rules 3 + 5): the caption heading (the
-   * v2 §5.7 fixed caption row, now heading its list) with its side icon
-   * and side colour, the factor rows beneath it, and — when the side has
-   * no qualifying factors — the concise, evidence-based empty line in
-   * place of any on-beam placeholder (v3 rule 2). The column grows
-   * downward independently of the illustration above. */
+  /** The empty-side line (v4 rule 2 + the Iteration-2 §5 semantics —
+   * the cases stay distinct): when the evaluation ran, the side with no
+   * qualifying factors carries the evidence-based line; when NOTHING
+   * could be read (readable 0), both sides carry the unavailable line
+   * instead — an absence of readings is never worded as an absence of
+   * pressure, and never as a prediction. */
+  const emptyLineOf = (side: 'for' | 'against'): string =>
+    counts.readable === 0 ? b.listEmptyNone : side === 'for' ? b.listEmptyFor : b.listEmptyAgainst;
+
+  /** One side's list column (v3/v4 rules 3 + 5): the caption heading
+   * with its side icon and side colour, the factor rows beneath it, and
+   * — when the side has no qualifying factors — the concise empty line
+   * in place of any on-beam placeholder. The column grows downward
+   * independently of the illustration above; the two columns sit side
+   * by side from `sm:` up and stack on the narrowest screens so the
+   * long side labels never wrap mid-word. */
   const listColumn = (side: 'for' | 'against', blocks: readonly BalanceDriver[]): React.JSX.Element => (
     <div className="flex min-w-0 flex-col gap-1.5" data-balance-list={side}>
       <h4
         data-balance-caption={side}
-        className={`m-0 inline-flex items-center justify-center gap-1.5 text-[length:var(--type-label)] font-bold ${
+        className={`m-0 inline-flex items-center gap-1.5 text-[length:var(--type-label)] font-bold ${
           side === 'for' ? 'text-[var(--color-status-normal)]' : 'text-[var(--color-status-alert)]'
         }`}
       >
@@ -336,74 +365,57 @@ export function BalanceScale({
           data-balance-empty={side}
           className="m-0 rounded-[var(--radius-sm)] px-2.5 py-2.5 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-secondary)]"
         >
-          {side === 'for' ? b.listEmptyFor : b.listEmptyAgainst}
+          {emptyLineOf(side)}
         </p>
       )}
     </div>
   );
 
-  /** One pan assembly as SVG (v3 rules 1–2): chains + dish, translated
-   * ±rise with the tilt. Always fully drawn — loaded or empty. */
-  const pan = (side: 'for' | 'against', movePx: number): React.JSX.Element => {
-    const hingeX = side === 'for' ? BALANCE_HINGE_FOR_X : BALANCE_HINGE_AGAINST_X;
-    const { rimStartX, rimEndX } = panGeometry(hingeX);
-    const rimMidX = (rimStartX + rimEndX) / 2;
+  /** One side's endpoint (v4 rule 1): the accent-coloured bead that
+   * terminates its beam end — the side's marker in the drawing, rigidly
+   * part of the rotating beam group. It is a symbolic endpoint, never a
+   * carrier for factor rows, and the ONLY colour in the illustration. */
+  const endPoint = (side: 'for' | 'against'): React.JSX.Element => {
+    const beadX = side === 'for' ? BALANCE_HINGE_FOR_X : BALANCE_HINGE_AGAINST_X;
     return (
-      <g data-balance-pan={side} className={TILT_TRANSITION_CLASS} style={{ transform: `translateY(${movePx}px)` }}>
-        {/* The two splayed chains from the beam-end knuckle to the pan
-         * rim's ends (stroke 2u — the finest line in the drawing). */}
-        <line x1={hingeX} y1={BALANCE_PIVOT_Y} x2={rimStartX} y2={BALANCE_PAN_RIM_Y_VB} stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
-        <line x1={hingeX} y1={BALANCE_PIVOT_Y} x2={rimEndX} y2={BALANCE_PAN_RIM_Y_VB} stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
-        {/* The shallow pan dish: rim-to-rim quadratic bowl, closed with
-         * the straight rim; stroke 3u, a whisper of fill. */}
-        <path
-          d={`M ${rimStartX} ${BALANCE_PAN_RIM_Y_VB} Q ${rimStartX + PAN_DEPTH_VB / 2} ${BALANCE_PAN_RIM_Y_VB + PAN_DEPTH_VB} ${rimMidX} ${
-            BALANCE_PAN_RIM_Y_VB + PAN_DEPTH_VB
-          } Q ${rimEndX - PAN_DEPTH_VB / 2} ${BALANCE_PAN_RIM_Y_VB + PAN_DEPTH_VB} ${rimEndX} ${BALANCE_PAN_RIM_Y_VB} Z`}
-          fill="currentColor"
-          fillOpacity={0.08}
-          stroke="currentColor"
-          strokeWidth={3}
-          strokeLinejoin="round"
-        />
-      </g>
+      <circle
+        data-balance-end={side}
+        cx={beadX}
+        cy={BALANCE_PIVOT_Y}
+        r={BALANCE_END_R_VB}
+        fill={side === 'for' ? 'var(--color-status-normal)' : 'var(--color-status-alert)'}
+      />
     );
   };
 
   return (
     <div className="flex flex-col gap-3" data-balance>
-      {/* 1. THE VERDICT LINE + COUNT LINE (v2 §5 order, §6): the verdict
-       * word with its icon, then the count line on its OWN line directly
-       * under it — ≥14px in the secondary ink (7.98:1 / 7.7:1 ≥4.5:1).
-       * Colour never rides alone (§12.2): the icon and the word carry
-       * the meaning. */}
-      <div className="flex flex-col gap-0.5" data-balance-verdict={verdict}>
-        <span className={`inline-flex items-center gap-1.5 ${verdictToneClass}`}>
-          <VerdictIcon verdict={verdictIcon} size={20} desktopSize={24} />
-          <span className="text-[length:var(--type-label)] font-bold leading-tight">{verdictWord}</span>
-        </span>
-        {parts.length > 0 ? (
-          <span
-            className="text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)]"
-            data-balance-count
-          >
-            {parts.join(' · ')}
-          </span>
-        ) : null}
+      {/* 1. THE HEADING + SUBTITLE (Iteration-2 §3 order): the concept's
+       * own name — «برآیند عوامل مؤثر بر قیمت طلا» — clearly more
+       * prominent than its explanatory subtitle (the site's card-question
+       * voice at 15/600 over the caption voice in the secondary ink). */}
+      <div className="flex flex-col gap-1" data-balance-heading>
+        <h4 data-balance-title className="type-question m-0 text-[var(--color-text-primary)]">
+          {b.heading}
+        </h4>
+        <p
+          data-balance-subtitle
+          className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]"
+        >
+          {b.subtitle}
+        </p>
       </div>
 
-      {/* 2. THE CARD'S BANNER SENTENCE (§5.2) — passed through unchanged. */}
-      {banner}
-
-      {/* 3. THE BALANCE ZONE (v3 rules 1 + 5): ONE inline SVG, capped at
-       * ~520px and centred on wide screens (v2 §7), full width on
-       * mobile. Its height is a fixed function of its width — no factor
-       * count, no tilt and no runtime measurement can change it. The
-       * role="img" layer carries the result as its label (§12.1); the
-       * interactive factor rows live BELOW it as list items — role="img"
-       * children are presentational and the rows must stay real buttons
-       * (§7.4). The illustration is pure geometry, so RTL mirrors the
-       * whole SVG with scaleX(-1): the `for` pan lands on the inline-end
+      {/* 2. THE BALANCE ZONE (v4 rules 1 + 5): ONE inline SVG in the
+       * abstract editorial mark's flat proportion (520×120), capped at
+       * ~520px and centred on wide screens, full width on mobile. Its
+       * height is a fixed function of its width — no factor count, no
+       * tilt and no runtime measurement can change it. The role="img"
+       * layer carries the result as its label (§12.1); the interactive
+       * factor rows live BELOW it as list items — role="img" children
+       * are presentational and the rows must stay real buttons (§7.4).
+       * The illustration is pure geometry, so RTL mirrors the whole SVG
+       * with scaleX(-1): the `for` platform lands on the inline-end
        * side AND the visual rotation sign flips in the same transform. */}
       <div data-balance-zone className="mx-auto w-full max-w-[520px]">
         <div
@@ -419,28 +431,24 @@ export function BalanceScale({
             aria-hidden="true"
             focusable="false"
           >
-            {/* The dotted level reference line through the pivot (v2
-             * §5.3), behind everything: the eye compares the tilted beam
-             * with level, so a small lean stays honest. */}
+            {/* The dotted level reference through the pivot (v2 §5.3,
+             * kept): behind everything — the eye compares the tilted
+             * beam with level, so a small lean stays honest. */}
             <line
               data-balance-reference
-              x1={16}
+              x1={24}
               y1={BALANCE_PIVOT_Y}
-              x2={BALANCE_VIEWBOX_W - 16}
+              x2={BALANCE_VIEWBOX_W - 24}
               y2={BALANCE_PIVOT_Y}
               stroke="var(--color-border)"
-              strokeWidth={2}
-              strokeDasharray="1 7"
+              strokeWidth={1.5}
+              strokeDasharray="1 6"
               strokeLinecap="round"
             />
-            {/* The pans render FIRST so the beam's knuckles sit over the
-             * chain tops (the joint looks machined). */}
-            {pan('for', forMove)}
-            {pan('against', againstMove)}
-            {/* The beam: ONE tapered body with rounded end knuckles — the
-             * only element that rotates, around the pinned pivot (v2
-             * §5.1.1, v3 rule 1). Filled body (no stroke): the drawing's
-             * heaviest mark. */}
+            {/* The rotating assembly: the tapered beam body plus both
+             * accent-coloured endpoint beads — ONE rigid group rotating
+             * around the pivot (v4: no pans, no chains, no platforms,
+             * nothing translates separately). */}
             <g
               data-balance-beam
               className={TILT_TRANSITION_CLASS}
@@ -449,36 +457,62 @@ export function BalanceScale({
                 ...TILT_TRANSFORM_ORIGIN_STYLE,
               }}
             >
-              <path
-                d={`M 96 67.5 C 170 64.6 214 64 ${BALANCE_PIVOT_X} 64 C 306 64 350 64.6 424 67.5 L 424 76.5 C 350 79.4 306 80 ${BALANCE_PIVOT_X} 80 C 214 80 170 79.4 96 76.5 Z`}
-                fill="currentColor"
-              />
-              <circle cx={BALANCE_HINGE_FOR_X} cy={BALANCE_PIVOT_Y} r={7.5} fill="currentColor" />
-              <circle cx={BALANCE_HINGE_AGAINST_X} cy={BALANCE_PIVOT_Y} r={7.5} fill="currentColor" />
+              <path data-balance-beam-body d={BEAM_BODY_PATH} fill="currentColor" />
+              {endPoint('for')}
+              {endPoint('against')}
             </g>
-            {/* The pedestal, fixed (never rotates — v2 §5.2.4): a tapered
-             * pillar on a two-step plinth. Drawn after the beam so the
-             * pivot's cap reads as one assembly. */}
+            {/* The compact pivot's keystone triangle, fixed (never
+             * rotates — v2 §5.2.4's rule, now a 13u apex-to-base
+             * triangle: geometrically precise, deliberately NOT a
+             * support column, and no base bar — the flat base is the
+             * ground). Drawn after the beam so the apex reads as one
+             * assembly with the hub. */}
             <g data-balance-fulcrum fill="currentColor">
-              <path d={`M 253 84 L 267 84 L 273 226 L 247 226 Z`} />
-              <rect x={226} y={226} width={68} height={8} rx={4} />
-              <rect x={202} y={234} width={116} height={8} rx={4} />
+              <path d={PIVOT_MOUNT_PATH} />
             </g>
-            {/* The pinned pivot: a machined cap over the beam's centre
-             * with a pin dot in the card's surface colour. */}
-            <circle data-balance-pivot cx={BALANCE_PIVOT_X} cy={BALANCE_PIVOT_Y} r={13} fill="currentColor" />
-            <circle cx={BALANCE_PIVOT_X} cy={BALANCE_PIVOT_Y} r={4.5} fill="var(--color-surface)" />
+            {/* The hub caps the beam's centre — the machined pivot with
+             * a pin dot in the card's surface colour. */}
+            <circle data-balance-pivot cx={BALANCE_PIVOT_X} cy={BALANCE_PIVOT_Y} r={BALANCE_HUB_R_VB} fill="currentColor" />
+            <circle cx={BALANCE_PIVOT_X} cy={BALANCE_PIVOT_Y} r={3.5} fill="var(--color-surface)" />
           </svg>
         </div>
       </div>
 
-      {/* 4. THE TWO FACTOR LISTS (v3 rule 3): one column per side under
-       * the illustration, caption-headed, growing downward — the grid
-       * mirrors with the document direction so each list stays under its
-       * own pan. DOM order (for → against) is the tab order (§12.4). */}
-      <div className="grid grid-cols-2 items-start gap-2 sm:gap-3" data-balance-lists>
+      {/* 3. THE TWO FACTOR LISTS (v3/v4 rule 3): one column per side
+       * under the illustration, caption-headed, growing downward. The
+       * grid shares the beam's own max-w-[520px] footprint so each list
+       * sits under ITS side's half of the illustration; it mirrors with
+       * the document direction, and on the narrowest screens the
+       * columns stack so the long side labels stay on one line. DOM
+       * order (for → against) is the tab order (§12.4). */}
+      <div className="mx-auto grid w-full max-w-[520px] grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3" data-balance-lists>
         {listColumn('for', forBlocks)}
         {listColumn('against', againstBlocks)}
+      </div>
+
+      {/* 4. THE OVERALL ASSESSMENT (Iteration-2 §3 item 6): the verdict
+       * word with its icon, the count line on its OWN line directly
+       * under it (≥14px in the secondary ink, 7.98:1 / 7.7:1 ≥ 4.5:1 —
+       * colour never rides alone, §12.2: the icon and the word carry
+       * the meaning), and the card's banner sentence where needed.
+       * Divider-separated from the lists, like the footing strip. */}
+      <div
+        className="flex flex-col gap-0.5 border-t border-[var(--color-border)] pt-3"
+        data-balance-verdict={verdict}
+      >
+        <span className={`inline-flex items-center gap-1.5 ${verdictToneClass}`}>
+          <VerdictIcon verdict={verdictIcon} size={20} desktopSize={24} />
+          <span className="text-[length:var(--type-label)] font-bold leading-tight">{verdictWord}</span>
+        </span>
+        {parts.length > 0 ? (
+          <span
+            className="text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)]"
+            data-balance-count
+          >
+            {parts.join(' · ')}
+          </span>
+        ) : null}
+        {banner}
       </div>
 
       {/* The shared detail panel (v2 §5.5.6 — every width): one open

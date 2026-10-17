@@ -5,6 +5,72 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-25] — the gold balance becomes the abstract editorial mark «برآیند عوامل مؤثر بر قیمت طلا» (owner Iteration-2 directive)
+
+The owner reviewed the deployed v3 classic hanging-pan balance ("a literal
+weighing scale with suspended bowls, wires, and a tall central column … not
+the desired visual direction") and directed the earlier, simpler concept: an
+abstract, restrained, editorial visualization. Strictly scoped to the
+gold/silver balance component and its factor lists — no page, provider,
+scoring, data or unrelated-card change. The tilt law (|net|/total × 12°,
+4° floor, level at net 0 and readable 0) is untouched; no weight or threshold
+was invented.
+
+### Changed
+
+- **The illustration (BalanceScale.tsx)** — ONE inline SVG in a flat 520×104
+  viewBox: a refined slightly-weighted tapered beam (9u at the centre → 6u at
+  the ends) rotating around a compact geometrically precise pivot (9u hub +
+  surface pin dot + 13u keystone triangle — NO base bar, NO tall column),
+  with subtle accent-coloured endpoint beads (green for / red against — the
+  only colour in the drawing) and the dotted level reference through the
+  pivot. The v3 machinery (pillar, plinth, chains, suspended pans, pan
+  translations, the 252u-tall viewBox) is deleted; the geometry was reworked,
+  not recoloured or resized. RTL stays one scaleX(-1) mirror; the 500 ms
+  reduced-motion-aware tilt transition stays.
+- **The hierarchy (Iteration-2 §3 order)** — the block now leads with the
+  concept's own heading «برآیند عوامل مؤثر بر قیمت طلا» / "The aggregate of
+  factors affecting the price of gold" (card-question voice) + a concise
+  explanatory subtitle (caption voice), then the illustration, then the two
+  side-labelled factor lists (now sharing the beam's max-w-520 footprint so
+  each list sits under its side's half; stacking to one column below sm:),
+  then the OVERALL ASSESSMENT at the end (verdict word + count line + the
+  C12 banner where needed, divider-separated), then the shared detail panel
+  and trays. The v1 "answer-first" verdict placement is retired by this
+  directive's own ordering.
+- **Side labels + empty-state copy (round-50)** — the list captions become
+  «عوامل حمایتی از قیمت طلا» / "Factors supporting gold's price" and
+  «عوامل فشارآور بر قیمت طلا» / "Factors pressuring gold's price"; the
+  empty-side lines adopt the owner's suggested evidence-based wording, and a
+  NEW distinct unavailable wording (`listEmptyNone`) renders on BOTH sides
+  when nothing could be read — an absence of readings is never worded as an
+  absence of pressure. QA record
+  `docs/QA/quirks-2026-10-25-balance-v4-fa-copy.md`.
+- **Tests (balance.test.tsx)** — rewritten for v4: the SVG part inventory
+  (beam body, beads with side accent fills, hub, one-path fulcrum, the
+  reference as the ONLY line), the heading/subtitle/order assertions, the
+  unavailable-empty-state split (case D), the LTR-signed rotation (case C
+  negative), the lists-footprint classes, the RTL mirror and the
+  divider-separated assessment, on top of the unchanged §4/§6/§13 logic
+  suites and the merged-card integration.
+
+### Verified
+
+- Browser (temporary harness, deleted before commit): the bead height
+  difference equals Lh × sin(angle) with 0.0u diff on every case (A 4°,
+  B/D/G level, E 12°, H −4°) at both 1280 and 360 (scale 0.5385); zero
+  horizontal overflow at 360/1280 in en + fa; keyboard Enter opens/closes
+  the shared panel; zero console errors on a fresh session; VLM design
+  review passes on the reworked geometry ("refined in its restraint",
+  "well-proportioned", "balanced and professional") with the tilt-angle and
+  green/red-token suggestions declined (owner's model and tokens).
+- Gates: typecheck 6/6; 1,486 tests; lint 0 errors / 15 accepted advisories;
+  copy:audit clean (2,152 entries, round-50); bundle budgets held (entry
+  295.29/88.81; Insights lazy 625.46/149.74 vs 626/150).
+- Screenshots: `docs/insights/screenshots/gold-balance/` — the v4 battery
+  (A/B/C/D/E/G/H × en/fa × 1280/360 + 768 + dark + the banner variant) and
+  the before-v3 capture.
+
 ## [2026-10-24c] — the prices board cards re-drawn from the financial-asset-cards spec pack (rebased onto round-46 main)
 
 The owner supplied the `financial-asset-cards-spec-pack.zip` (8 Markdown specs,

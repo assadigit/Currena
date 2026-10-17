@@ -2697,8 +2697,16 @@ export const insightsCopyEn = {
     // REPLACED by the balance visual — the side* headings retired, the
     // side labels now speak the balance's own pan labels (§13 verbatim).
     balance: {
-      sideFor: 'For gold',
-      sideAgainst: 'Against gold',
+      // 2026-10-25 (owner Iteration-2 directive): the balance's own
+      // HEADING + explanatory subtitle now lead the block (the concept
+      // «برآیند عوامل مؤثر بر قیمت طلا»), the side captions name the two
+      // lists, and the empty states stay evidence-based. Round-50, QA
+      // record docs/QA/quirks-2026-10-25-balance-v4-fa-copy.md.
+      heading: 'The aggregate of factors affecting the price of gold',
+      subtitle:
+        'Each factor is read against its usual range and weighed equally; the beam shows the combined lean of today’s readings.',
+      sideFor: 'Factors supporting gold’s price',
+      sideAgainst: 'Factors pressuring gold’s price',
       verdictFor: 'Leaning for gold',
       verdictBalanced: 'Balanced',
       verdictAgainst: 'Leaning against gold',
@@ -2710,8 +2718,9 @@ export const insightsCopyEn = {
       countNeutral: '{n} neutral',
       countUnread: "{n} couldn't be read",
       aria: 'Balance for gold: {summary}. {verdict}.',
-      listEmptyFor: 'No readings support gold right now.',
-      listEmptyAgainst: 'No readings work against gold right now.',
+      listEmptyFor: 'None of the factors checked shows a meaningful signal supporting gold’s price right now.',
+      listEmptyAgainst: 'None of the factors checked shows a meaningful signal working against gold’s price right now.',
+      listEmptyNone: 'Nothing could be read yet, so neither side has been weighed.',
     },
     silverOnly: 'Silver only',
     footingTitle: 'Price footing',
