@@ -83,6 +83,38 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Insights UI redesign — FINAL deploy after the owner's scope trim (2026-10-24, second entry)
+
+The owner reviewed the deployed full-grayscale release ("why did it turn
+everything on the page black and white?") and the concurrent session scoped
+the redesign to the header/hero (de897d4 / CHANGELOG 2026-10-18a): the
+grayscale + selective-severity treatment keeps ONLY the page header + the
+Global/Australia overview cards; the 28 component files below the hero are
+byte-identical to the pre-redesign colored design (green/blue chip tones,
+gold JumpNav pill, blue focus ring + progress bar, tinted alert faces,
+colored artwork — `filter: grayscale(1)` rescoped to `.insights-hero-grid`).
+
+This session merged the trim, re-gated, re-deployed:
+
+1. `pnpm --filter @currena/web build` — entry `index-CuowDJ_B.js`
+   295.15/88.76; Insights lazy `Insights-DvW0Xuc4.js` 606.32/144.86
+   (documented ceiling 607/145.20); precache 93 entries.
+2. `CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… pnpm --filter @currena/api
+   exec wrangler deploy` → **Worker version `d93bd0ba-9be2-4dc1-971b-4ccc7babe3d5`**
+   — RATES KV + ASSETS + `* * * * *` cron + SITE_MODE public intact.
+
+**Live verification (final state, https://currena.ir/#/insights, SW purged):**
+entry `index-CuowDJ_B.js` + `Insights-DvW0Xuc4.js` (200, 606319 B); hero
+icons `grayscale(1)` + below-hero icons colored; Context chip blue / Normal
+green / Needs attention red / Unusual amber; JumpNav active pill gold;
+expand/collapse 3→6→3 with aria state; fa dark RTL (Global right, «جهانی»,
+Persian digits, Vazirmatn, LTR meters); no h-overflow at 360 EN + fa; zero
+console errors. Screenshots refreshed in
+`docs/insights/screenshots/economic-indicators-redesign/` (final state).
+
+(The earlier `66fb622f` deploy of the full-grayscale build — same session,
+before the trim — remains recorded below as the intermediate state.)
+
 ## Insights UI redesign deploy (2026-10-24, economic-indicators-ui-spec.md)
 
 **Web-change-only** (apps/web + docs; no packages/insights, apps/api or

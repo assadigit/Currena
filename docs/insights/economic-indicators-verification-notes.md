@@ -2,11 +2,38 @@
 
 **Spec:** `economic-indicators-ui-spec.md` (repo root — the OWNER'S ACTUAL file,
 pushed as 63adfe8 mid-session; the earlier in-session draft was replaced).
-**Implementation:** 2c171ca (the concurrent session's re-draw, built to the real
-spec), reconciled + verified + deployed by this session. **Final page state:**
-grayscale structural foundation, selective severity inks, top-3 flagged rows +
-expand, Global-right/Australia-left fixed card order, colored round-44 meter
-grading, indicator ROWS, WCAG 2.2 AA targets, 320–1440 responsive.
+
+## FINAL STATE (owner scope trim, de897d4 / CHANGELOG 2026-10-18a)
+
+The owner reviewed the deployed full-grayscale release and scoped the redesign
+down: **the grayscale + selective-severity treatment keeps ONLY the page header
+and the Global/Australia overview cards** (exactly as shipped in 2026-10-17f —
+region-name titles, severity labels + colored meters, top-3 flagged rows with
+accessible expand, fixed Global-right/Australia-left, hero artwork grayscale).
+**Everything below the overview cards is byte-identical to the pre-redesign
+colored design** (63adfe8): green/blue status chip tones, gold JumpNav pill,
+blue focus ring + progress bar, tinted alert faces, colored artwork. The
+`filter: grayscale(1)` rule is rescoped to `.insights-hero-grid`.
+
+Final live verification (worker `d93bd0ba`, entry `index-CuowDJ_B.js`, Insights
+`Insights-DvW0Xuc4.js` 606.32/144.86 — budget ceiling 607/145.2, D-30):
+
+- EN light desktop 1280: hero grid + Australia left / Global right (measured);
+  hero icons `grayscale(1)`, below-hero icons `none` (colored); "Context" chip
+  blue / "Normal" green / "Needs attention" red / "Unusual" amber (the owner's
+  restored palette); JumpNav active pill gold `rgb(243,177,63)`; flagged rows
+  3 → "+3 more" → 6 → "Show fewer" → 3 with aria-expanded/aria-controls.
+- FA dark desktop 1280: `dir=rtl`, «جهانی», «۶ شاخص از ۱۰ شاخص نیازمند
+  توجه‌اند.», Vazirmatn, meters `direction:ltr`, Global stays right.
+- EN + FA × 360 mobile: no horizontal overflow; zero console errors across
+  all combos; expand/collapse + seesaw present.
+- Screenshots (final state):
+  `docs/insights/screenshots/economic-indicators-redesign/`.
+
+The sections below record the INTERMEDIATE full-grayscale state (the
+2026-10-17f build, worker 66fb622f) — kept as the verification evidence for
+that deploy; the hero-scope results remain valid for the final state (the
+hero is unchanged by the trim).
 
 ## Method
 
