@@ -140,3 +140,38 @@ manifest additions beyond the original 41 strings:
 Gates re-verified on the rebased tree: copy:audit clean (2,147);
 1,505 tests; typecheck 6/6; lint 0 errors/15 advisories; budgets held
 (entry 295.29/88.82; Insights lazy 624.65/149.59 vs 626/150).
+
+## Addendum — 2026-10-24d: the «جزئیات بیشتر» white-space defect (owner-reported, post-deploy)
+
+The owner reported that on the live deployment clicking «جزئیات بیشتر» /
+"More details" produced "just a white space with no more extra detail",
+and that the prices block and the markets section below it read as
+collided. Diagnosis (reproduced on worker 7b939901):
+
+- **The defect shipped with this round.** The card-body click-through
+  button carried `h-full` (height:100%). The tile `article` is a
+  stretched grid item: when the disclosure opened, the grid row grew to
+  fit card+trigger+panel, the article stretched to the row, and the body
+  button then resolved `h-full` against the FULL stretched article
+  height — pushing the trigger and the expanded panel BELOW the tile's
+  box. The panel kept its DOM/aria state (why the round's aria-based
+  verification passed) but painted under later DOM siblings (the
+  Silver/Brent tiles on mobile; the markets section on desktop),
+  leaving ~690px of white space. Both LIVE evidence screenshots from
+  this round show the defect; the expanded-state verification had
+  relied on DOM/aria assertions where it should have probed pixels.
+- **Fix**: the article becomes `flex h-full flex-col`; the body button
+  drops `h-full` and keeps `grow` (it fills only the space the
+  disclosure leaves it). Trigger + panel stay inside the tile; the tile
+  grows naturally; equal tile heights preserved (grid stretch + grow).
+- **Lesson recorded for verification procedure**: an expanded-state
+  check must include an element-from-point (or equivalent paint) probe
+  at the panel's own coordinates — aria-expanded + panel existence is
+  NOT evidence of visible rendering under grid stretch.
+- **Also**: the prices section gains `pb-3` (owner's spacing note) —
+  40px of air to the markets block; the page-wide 28px rhythm untouched.
+
+Gates: typecheck 6/6; lint clean; web 533 green; copy:audit clean (no
+copy change); budgets held (entry 295.29/88.82; Insights 624.64/149.59
+vs 626/150). Evidence:
+`docs/evidence/2026-10-24d-disclosure-overflow-fix/`.
