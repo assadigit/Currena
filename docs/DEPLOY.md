@@ -1538,3 +1538,26 @@ the petrol/transport money row is gone while employment rate appeared.
   left, Jalali ticks); prices board untouched (4 tiles + icons); zero
   page/console errors.
 - **Evidence**: `docs/evidence/2026-10-20-verdict-chip-redesign/`.
+
+## Session record — 2026-10-20c the gold/silver analysis charts grow the 10-year view (the owner's request)
+
+- **Deployed**: currena-api **`4e8a54e0-fda4-4ce7-bc1e-9ba245c1bfc9`**
+  (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`).
+- **Change**: the metals' Estimation-chip trend charts (TrendPanel) grow an
+  opt-in `ranges` prop; `TrendRange`/`StripRange` gain `'10y'` (3653 days —
+  the details panel's window); `MetalTrendChart` opts in so the gold and
+  silver analysis chips now show Quarter · 1 year · 5 years · **10 years**.
+  Reuses the existing `range10y` copy key — zero new strings. Money panel,
+  details panel, API and data untouched (the feed already served the full
+  decade: 2514/2513 points, 2016-10-18 → 2026-10-16).
+- **Gates pre-deploy**: copy:audit clean; full workspace tests green
+  (exit 0); typecheck 6/6; lint 0 errors / 15 accepted advisories; budgets
+  held — entry 295.15/88.76; Insights lazy 593.58/141.30 (+0.07 kB gz).
+- **Verified live** (agent-browser): served Insights chunk byte-identical
+  (sha256 39d1e4ea…); EN desktop — 10 years clickable on both metals,
+  ticks Oct 2016/Oct 2021/Oct 2026, deltas +230.3%/+225.6% "10 years",
+  muted header prices intact; money panel still 3 chips; EN mobile 375
+  identical anatomy, scrollWidth 375; fa RTL — «۱۰ سال» chip, deltas
+  «+۲۳۰٫۳% ۱۰ سال»/«+۲۲۵٫۶% ۱۰ سال», Jalali ticks مهر ۱۳۹۵→مهر ۱۴۰۵; zero
+  page/console errors.
+- **Evidence**: `docs/evidence/2026-10-20-metals-10y/`.

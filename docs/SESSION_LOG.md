@@ -1,3 +1,53 @@
+# SESSION_LOG — The Metals' Analysis Charts Grow the 10-Year View 2026-10-20c
+
+Branch `main` · base `702b6c6` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's follow-up, one message after the verdict-chip
+redesign shipped — **"Add 10 year View of the gold and silver price as
+well."**
+
+### 1 · the range (UI-only, data + API untouched)
+**Pre-flight:** production `/api/insights/{gold-usd,silver-usd}/history`
+already serve the full decade (gold 2514 points, silver 2513; both
+2016-10-18 → 2026-10-16) — no API or data change needed.
+**What:** the shared `TrendPanel` (TrendChart.tsx) grows an opt-in
+`ranges` prop (defaults to the old Quarter · 1y · 5y list — the money
+panel and every other caller unchanged); `TrendRange` gains `'10y'`
+(3653 days — the details panel's exact 10-year window incl. leap-day
+slack) mapped to the EXISTING `range10y` copy key ('10 years' / «۱۰ سال»)
+— zero new strings, no manifest change; `TREND_RANGES` (the full ordered
+list) is now exported as the canonical order/test seam.
+`signals/verdict.tsx`: `StripRange` gains `'10y'`; `MetalTrendChart`
+passes `ranges={['quarter','1y','5y','10y']}` so BOTH metals' analysis
+chips offer the decade, gated by the same ≥2-plottable-points rule as
+the sibling chips. Deliberately unchanged: the money panel's mini charts
+(still 3 chips — the owner asked for gold and silver), the details
+panel's HistoryChart (already had 10y), copy, data, scoring.
+
+### 2 · gates + deploy + production browser verify
+**What:** gates all green — copy:audit clean; full workspace tests exit 0
+(web 461 · api 237 · the rest as before, 1,431 total); typecheck 6/6;
+lint 0 errors/15 advisories; budgets held (entry 295.15/88.76 gz;
+Insights lazy 593.58/141.30 gz, +0.07 kB for the fourth chip). Deployed
+currena-api `4e8a54e0-fda4-4ce7-bc1e-9ba245c1bfc9` (SITE_MODE=public
+untouched; currena-markets untouched `9b5ff7e0`). Production verified
+(agent-browser): served Insights chunk byte-identical (sha256
+39d1e4ea…); EN desktop — both chips show Quarter · 1 year · 5 years ·
+**10 years**, 10 years activates on click, ticks Oct 2016/Oct 2021/
+Oct 2026, deltas **+230.3% 10 years** (gold) / **+225.6% 10 years**
+(silver), muted header prices intact (US$4,165/US$57.27), plot 208px;
+money panel still exactly 3 chips; EN mobile 375 — identical anatomy,
+10y active both metals, plot 205×160, scrollWidth 375 (no overflow);
+fa RTL — chips «سه‌ماهه · یک سال · پنج سال · ۱۰ سال», deltas
+«+۲۳۰٫۳% ۱۰ سال»/«+۲۲۵٫۶% ۱۰ سال», aria «روند قیمت طلا در ۱۰ سال گذشته»,
+Jalali X ticks مهر ۱۳۹۵→مهر ۱۴۰۵; zero page/console errors.
+**Evidence:** `docs/evidence/2026-10-20-metals-10y/` (4 screenshots EN/fa
+× desktop/mobile + measurements.txt + README + prod chunk capture as
+inert .js.txt).
+
+Session closed: production = currena-api `4e8a54e0` + currena-markets
+`9b5ff7e0`. **Token rotation still outstanding** (owner-side; tokens
+transited chat again this session).
+
 # SESSION_LOG — Verdict Chips Redrawn as Analysis Cards 2026-10-20b
 
 Branch `main` · base `0158630` · runner: pnpm 10.34.5 / Node 24.21.

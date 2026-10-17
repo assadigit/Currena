@@ -5,6 +5,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-20c] — the gold/silver analysis charts grow the 10-year view (the owner's request)
+
+The owner, one message after the verdict-chip redesign shipped: **"Add 10
+year View of the gold and silver price as well."** — the metals' Estimation
+chips ("Conditions right now") offered only Quarter · 1 year · 5 years; the
+decade was missing although the history feed already serves the complete
+10-year daily series for both metals (2514/2513 points, 2016-10-18 →
+2026-10-16 — verified on production before touching anything).
+
+### Changed (`TrendChart.tsx`, `signals/verdict.tsx`) — UI-only
+
+- **`TrendRange` grows `'10y'`** (3653 days — the details panel's exact
+  10-year window incl. leap-day slack). `TREND_RANGE_COPY_KEY` maps it to
+  the EXISTING `range10y` key ('10 years' / «۱۰ سال») — zero new strings,
+  no manifest change.
+- **New optional `ranges` prop** on the shared `TrendPanel` (defaults to
+  the old Quarter · 1y · 5y list) — only callers that opt in grow the
+  decade chip. `TREND_RANGES` (the full ordered list) is now exported as
+  the canonical order/test seam.
+- **`MetalTrendChart` passes `ranges={['quarter','1y','5y','10y']}`** —
+  both metals' analysis chips offer the decade; `StripRange` grows `'10y'`.
+  The chip is gated by the same ≥2-plottable-points rule as its siblings.
+
+### Unchanged (deliberately)
+
+The money panel's mini charts keep exactly three chips (Quarter · 1 year ·
+5 years) — the owner asked for gold and silver specifically. The details
+panel's HistoryChart already had its own 10y zoom. No copy keys, no data,
+no scoring, no API change.
+
+### Gates
+
+`copy:audit` clean · full workspace tests green (1,431) · typecheck 6/6 ·
+lint 0 errors/15 advisories · budgets held (entry 295.15/88.76 gz;
+**Insights lazy 593.58/141.30 gz**, +0.07 kB for the fourth chip). Deployed
+currena-api `4e8a54e0-fda4-4ce7-bc1e-9ba245c1bfc9` → production
+browser-verified: EN desktop — both chips show Quarter · 1 year · 5 years ·
+**10 years**, decade ticks Oct 2016 → Oct 2026, deltas **+230.3% 10 years**
+(gold) / **+225.6% 10 years** (silver), muted header prices intact; money
+panel still three chips; EN mobile 375 identical, no overflow; fa RTL —
+«۱۰ سال» chip, Persian-digit deltas, Jalali X ticks; zero page/console
+errors. Evidence: `docs/evidence/2026-10-20-metals-10y/`.
+
 ## [2026-10-20b] — the gold/silver verdict chips become analysis cards (the owner's sketch)
 
 The owner drew the chip UI for the gold and silver "Conditions right now"

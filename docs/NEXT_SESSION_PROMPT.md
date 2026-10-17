@@ -1,7 +1,25 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-20b (the owner's drawn UI for the gold/silver
-"Conditions right now" chips) — DONE: the chips are analysis cards now —
+Hand-off date: 2026-10-20c (the owner's "Add 10 year View of the gold and
+silver price as well.") — DONE: the metals' Estimation-chip trend charts
+offer the decade. The shared TrendPanel gained an opt-in `ranges` prop
+(default Quarter · 1y · 5y — the money panel and all other callers
+UNCHANGED); TrendRange/StripRange grew '10y' (3653 days — the details
+panel's exact window) reusing the EXISTING range10y copy key
+('10 years' / «۱۰ سال», zero new strings); MetalTrendChart opts in → both
+gold/silver analysis chips show Quarter · 1 year · 5 years · 10 years.
+Pre-flight verified the feed already serves the full decade (gold 2514 /
+silver 2513 points, 2016-10-18 → 2026-10-16) — no API/data change.
+Gates green (1,431 tests; typecheck 6/6; lint 0 errors/15 advisories;
+budgets held, Insights lazy 593.58/141.30, +0.07 kB gz). Deployed
+currena-api `4e8a54e0`; production browser-verified (agent-browser): EN
+desktop — 10 years active on both metals, ticks Oct 2016/Oct 2021/Oct
+2026, deltas +230.3%/+225.6% "10 years", muted header prices intact,
+money panel still 3 chips; EN mobile 375 identical, no overflow; fa RTL —
+«۱۰ سال» chip, Persian-digit deltas, Jalali ticks; zero errors. See
+CHANGELOG 2026-10-20c + docs/evidence/2026-10-20-metals-10y/.
+Prior state (2026-10-20b): the owner's drawn UI for the gold/silver
+"Conditions right now" chips — DONE: the chips are analysis cards now —
 header row (boxed artwork 56/64px · name + verdict · the current price in
 the MUTED secondary ink at the far end) over ONE BIG trend chart (h-40
 mobile / h-52 desktop, was h-20); the artwork-column side split is gone →
