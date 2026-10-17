@@ -47,7 +47,7 @@ export function HeroBlock({
   numberLocale: 'en-US' | 'fa-IR';
   onJumpSection: (section: InsightsSection) => void;
   onJumpAbout: () => void;
-  onFocusCard: (id: IndicatorId) => void;
+  onFocusCard: (id: IndicatorId, opener?: HTMLElement | null) => void;
   /** §5.3 (build step 9): the world-markets signal when raised — joins the
    * GLOBAL verdict's attention module; undefined when calm or unpopulated. */
   marketsAlert?: MarketsAlert;
@@ -94,59 +94,80 @@ export function HeroBlock({
       <h2 className="sr-only">{copy.ui.heroTitle}</h2>
       {/* R30: items-STRETCH (was items-start) — the two verdict cards share
        * one height, so the shorter one carries no floating void beside the
-       * taller one (the roast: "a void under Australia"). */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+       * taller one (the roast: "a void under Australia").
+       *
+       * Real spec (economic-indicators-ui-spec.md §5, 2026-10-17): the
+       * two-column hero turns on only at lg (1024px) — below that, two
+       * columns would make each card narrower than the spec's ~420px
+       * minimum, so the cards STACK (Global first, Australia second, the
+       * spec's mobile order). Gap 16px stacked (mobile) → 20px (md) → 24px
+       * at the two-column desktop (spec §5 spacing targets).
+       *
+       * Real spec §5 + §8: at >=1024px the cards keep FIXED locations in
+       * BOTH locales — Global on the right, Australia on the left (matching
+       * both supplied references; intentional content priority, NOT
+       * mirrored by direction). index.css drives that via
+       * .insights-hero-grid [data-region-card] order rules; the DOM keeps
+       * D7's Global-first order so the stacked (mobile/tablet) reading
+       * order stays Global → Australia in every locale. */}
+      <div className="insights-hero-grid grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-2 lg:gap-6">
         {/* D7/R1: Global first, always — the blocks array is fixed order. The
          * world-markets alert (when raised) lives in the GLOBAL block: world
          * stock markets are a global question (§5.3). */}
-        <VerdictBlock
-          section="global"
-          sectionLabel={copy.sections.global}
-          readings={readings}
-          copy={copy}
-          numberLocale={numberLocale}
-          onJumpSection={onJumpSection}
-          onJumpAbout={onJumpAbout}
-          onFocusCard={onFocusCard}
-          marketsAlert={marketsAlert}
-          onJumpMarkets={onJumpMarkets}
-          fxAlert={fxAlert}
-          onJumpFx={onJumpFx}
-          sectionIndicators={sectionIndicators}
-        />
-        <VerdictBlock
-          section="australia"
-          sectionLabel={copy.sections.australia}
-          readings={readings}
-          copy={copy}
-          numberLocale={numberLocale}
-          onJumpSection={onJumpSection}
-          onJumpAbout={onJumpAbout}
-          onFocusCard={onFocusCard}
-        />
+        <div data-region-card="global">
+          <VerdictBlock
+            section="global"
+            sectionLabel={copy.sections.global}
+            readings={readings}
+            copy={copy}
+            numberLocale={numberLocale}
+            onJumpSection={onJumpSection}
+            onJumpAbout={onJumpAbout}
+            onFocusCard={onFocusCard}
+            marketsAlert={marketsAlert}
+            onJumpMarkets={onJumpMarkets}
+            fxAlert={fxAlert}
+            onJumpFx={onJumpFx}
+            sectionIndicators={sectionIndicators}
+          />
+        </div>
+        <div data-region-card="australia">
+          <VerdictBlock
+            section="australia"
+            sectionLabel={copy.sections.australia}
+            readings={readings}
+            copy={copy}
+            numberLocale={numberLocale}
+            onJumpSection={onJumpSection}
+            onJumpAbout={onJumpAbout}
+            onFocusCard={onFocusCard}
+          />
+        </div>
       </div>
 
-      {/* R4 → owner follow-up (11 Oct) → round 24 (roast #7): the biggest
-       * move is the page's FOCAL MOMENT — it now carries the brand gold
-       * (the one accent): a gold ring on the card and a gold kicker icon.
-       * The signed number keeps its own ltr island; the WORD unit (fa
-       * «واحد درصد») rides OUTSIDE the island as its own span so the RTL
-       * line never scatters it (2026-10-17 owner glitch report). The value
-       * speaks the owner's sign inks: positive green, negative red. */}
+      {/* R4 → owner follow-up (11 Oct) → round 24 (roast #7) → grayscale
+       * redesign (spec §8): the biggest move keeps its place as the page's
+       * focal moment, but the emphasis now comes from TYPOGRAPHY (the big
+       * signed number) on a standard neutral card — the gold ring and gold
+       * kicker icon are retired. The signed number keeps its own ltr island;
+       * the WORD unit (fa «واحد درصد») rides OUTSIDE the island as its own
+       * span so the RTL line never scatters it (2026-10-17 owner glitch
+       * report). The value speaks the owner's sign inks: positive green,
+       * negative red. */}
       {mover && moverReading && moverEntry ? (
         <div
-          className="mt-3 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-accent-gold)]/45"
+          className="mt-3 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)]"
           data-biggest-move
         >
           <p className="m-0 mb-1 flex items-center gap-1.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-tertiary)]">
-            <TrendingUp aria-hidden="true" size={16} strokeWidth={1.8} className="shrink-0 text-[var(--color-accent-gold-deep)]" />
+            <TrendingUp aria-hidden="true" size={16} strokeWidth={1.8} className="shrink-0 text-[var(--color-text-secondary)]" />
             {copy.ui.bigMoverTitle}
           </p>
           <p className="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
             <button
               type="button"
               onClick={() => onFocusCard(mover.id)}
-              className="insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 font-bold text-[var(--color-text-primary)] underline decoration-currena-coral/50 underline-offset-4 transition-colors hover:decoration-currena-coral"
+              className="insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 font-bold text-[var(--color-text-primary)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:decoration-[var(--color-text-secondary)]"
             >
               {moverEntry.name}
             </button>

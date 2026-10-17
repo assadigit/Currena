@@ -29,13 +29,14 @@ import { TOGETHER_CARD_ORDER, togetherSummary } from './config';
 
 const STORAGE_KEY = 'currena.insights.together-open.v1';
 
-/** R30: the collapsed chips' state words speak in status ink (the roast:
- * "gray state words" carried none of the card's meaning). Icon + word
- * stays — colour is never alone: every chip is also a button with the
- * state word itself. */
+/** R30: the collapsed chips' state words speak in status ink. Grayscale
+ * redesign (2026-10-17, spec §8): active/partly are CATEGORICAL states
+ * (the connection holds / partly holds) — they go neutral; "disagree"
+ * stays amber (a genuine watch-me state). Icon + word stays — colour is
+ * never alone: every chip is also a button with the state word itself. */
 const CHIP_STATE_TONE: Record<string, string> = {
-  active: 'text-[var(--color-status-normal)]',
-  partly: 'text-[var(--color-status-context)]',
+  active: 'text-[var(--color-text-secondary)]',
+  partly: 'text-[var(--color-text-secondary)]',
   disagree: 'text-[var(--color-status-watch)]',
   inactive: 'text-[var(--color-text-tertiary)]',
   unknown: 'text-[var(--color-text-tertiary)]',
@@ -126,7 +127,7 @@ export function Together({
           aria-expanded={open}
           aria-controls="insights-together-body"
           onClick={() => setOpen(!open)}
-          className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+          className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[length:var(--type-caption)] font-bold text-[var(--color-text-primary)] underline decoration-[var(--color-border)] underline-offset-2 transition-colors hover:decoration-[var(--color-text-secondary)]"
         >
           <span aria-hidden="true">
             <ChevronDown
@@ -172,7 +173,7 @@ export function Together({
               <button
                 type="button"
                 onClick={() => setShowAll(true)}
-                className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:decoration-[var(--color-status-context)]"
+                className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:decoration-[var(--color-text-secondary)]"
               >
                 {interpolate(copy.together.seeAllConnections, { n: formatNumber(ordered.length, numberLocale, { maximumFractionDigits: 0 }) })}
               </button>
@@ -190,7 +191,7 @@ export function Together({
                   <button
                     type="button"
                     onClick={() => expandTo(chip.connection)}
-                    className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center gap-1.5 rounded-full bg-[var(--color-surface)] px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] transition-colors hover:text-[var(--color-status-context)]"
+                    className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center gap-1.5 rounded-full bg-[var(--color-surface)] px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] transition-colors hover:text-[var(--color-text-primary)]"
                   >
                     {chip.name}
                     <span className={`font-bold ${CHIP_STATE_TONE[chip.state] ?? 'text-[var(--color-text-tertiary)]'}`}>

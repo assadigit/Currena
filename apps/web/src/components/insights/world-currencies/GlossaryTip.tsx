@@ -50,7 +50,7 @@ export function GlossaryTip({
       {open ? (
         <span
           id={panelId}
-          className={`mt-1 block rounded-[var(--radius-md)] bg-currena-soft/70 px-2.5 py-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]${panelClassName ? ` ${panelClassName}` : ''}`}
+          className={`mt-1 block rounded-[var(--radius-md)] bg-currena-muted/[0.06] px-2.5 py-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]${panelClassName ? ` ${panelClassName}` : ''}`}
         >
           {children ?? <bdi>{def}</bdi>}
         </span>

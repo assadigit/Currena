@@ -60,7 +60,7 @@ export function PairDetail({
       </p>
       <dl className="m-0 mb-2 flex flex-col gap-1">
         <div>
-          <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
+          <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
             {copy.markets.detailWhat}
           </dt>
           <dd className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
@@ -68,7 +68,7 @@ export function PairDetail({
           </dd>
         </div>
         <div>
-          <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
+          <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
             {copy.markets.detailYou}
           </dt>
           <dd className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
@@ -77,7 +77,7 @@ export function PairDetail({
         </div>
         {moneyLine !== null ? (
           <div>
-            <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
+            <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
               {copy.fx.moneyLabel}
             </dt>
             <dd className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
@@ -237,7 +237,7 @@ export function PairsTable({
                 <FragmentByKey key={entry.id} groupHeader={groupHeader} groupCount={rows.filter((r) => r.group === group).length}>
                   <tr
                     onClick={() => onOpenPair(entry.id)}
-                    className="cursor-pointer border-b border-[var(--color-border)]/60 transition-colors last:border-b-0 hover:bg-currena-soft/50"
+                    className="cursor-pointer border-b border-[var(--color-border)]/60 transition-colors last:border-b-0 hover:bg-currena-muted/[0.05]"
                   >
                     <th scope="row" className="px-2 py-1.5 text-start font-semibold text-[var(--color-text-primary)]">
                       {copy.fx.entries[entry.id].name}
@@ -283,7 +283,7 @@ export function PairsTable({
               <button
                 type="button"
                 onClick={() => onOpenPair(entry.id)}
-                className="insights-focusable flex min-h-[44px] w-full cursor-pointer flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-2.5 py-2 text-start ring-1 ring-[var(--color-border)] transition-colors hover:bg-currena-soft/50"
+                className="insights-focusable flex min-h-[44px] w-full cursor-pointer flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-2.5 py-2 text-start ring-1 ring-[var(--color-border)] transition-colors hover:bg-currena-muted/[0.05]"
               >
                 <span className="min-w-0 flex-1 font-semibold text-[var(--color-text-primary)]">
                   {copy.fx.entries[entry.id].name}

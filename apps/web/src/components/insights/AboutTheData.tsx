@@ -128,7 +128,7 @@ export function AboutTheData({
           aria-expanded={open}
           aria-controls="insights-about-body"
           onClick={() => setOpen(!open)}
-          className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1 rounded-lg px-1.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+          className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1 rounded-lg px-1.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] underline decoration-[var(--color-border)] underline-offset-2 transition-colors hover:decoration-[var(--color-text-secondary)]"
         >
           <span aria-hidden="true">
             <ChevronDown
@@ -155,7 +155,7 @@ export function AboutTheData({
             href={FRED_TERMS_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="insights-focusable font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
+            className="insights-focusable font-semibold text-[var(--color-text-primary)] underline decoration-[var(--color-border)] underline-offset-2"
           >
             {copy.ui.fredTerms} ↗
           </a>

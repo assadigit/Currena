@@ -167,7 +167,7 @@ export function AlertCard({
       id={`insights-card-${reading.id}`}
       data-status={reading.status}
       data-tier={tier}
-      className={`alert-card scroll-mt-24 rounded-[var(--radius-lg)] p-4 shadow-[0_4px_18px_rgba(0,0,0,0.05)] ring-1 ring-[var(--color-border)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] motion-safe:transition-[box-shadow,transform] motion-safe:duration-200 md:motion-safe:hover:-translate-y-0.5 ${pinned ? 'ring-currena-blue/30' : ''}`}
+      className={`alert-card scroll-mt-24 rounded-[var(--radius-lg)] p-4 shadow-[0_4px_18px_rgba(0,0,0,0.05)] ring-1 ring-[var(--color-border)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] motion-safe:transition-[box-shadow,transform] motion-safe:duration-200 md:motion-safe:hover:-translate-y-0.5 ${pinned ? 'ring-[var(--color-text-primary)]/25' : ''}`}
     >
       <button
         type="button"
@@ -192,7 +192,7 @@ export function AlertCard({
              * the card face — it lives in the details panel now. */}
           </span>
           <span className="flex shrink-0 items-center gap-1">
-            {pinned ? <span aria-hidden="true" className="text-sm text-[var(--color-status-context)]">★</span> : null}
+            {pinned ? <span aria-hidden="true" className="text-sm text-[var(--color-text-secondary)]">★</span> : null}
             <StatusChip status={reading.status} copy={copy} tier={tier} />
           </span>
         </span>
@@ -277,10 +277,11 @@ export function AlertCard({
               </span>
             ) : null}
 
-            {/* R6 → round 24: the needs-attention face line — the one-line
-             * meaning (softened tint; red belongs to the words). */}
+            {/* R6 → round 24 → grayscale redesign (spec §6): the needs-attention
+             * face line — the one-line meaning on a NEUTRAL tint box (red
+             * belongs to the chip/border words, not a wall of pink). */}
             {meaningLine !== undefined ? (
-              <span className="mt-2 block rounded-[var(--radius-sm)] bg-currena-warning/[0.07] px-2.5 py-1.5 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
+              <span className="mt-2 block rounded-[var(--radius-sm)] bg-currena-muted/[0.07] px-2.5 py-1.5 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
                 <bdi>{meaningLine}</bdi>
               </span>
             ) : null}
@@ -365,7 +366,7 @@ export function AlertCard({
               </>
             ) : null}
           </span>
-          <span className="whitespace-nowrap font-semibold text-[var(--color-status-context)]">{copy.ui.detailsButton} ›</span>
+          <span className="whitespace-nowrap font-semibold text-[var(--color-text-primary)]">{copy.ui.detailsButton} ›</span>
         </span>
       </button>
     </article>

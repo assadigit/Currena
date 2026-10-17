@@ -94,7 +94,7 @@ export function MarketsChart({
         role="img"
         aria-label={`${copy.markets.chartAria}: ${copy.markets.high52wLabel} ${num(high52w)}, ${copy.markets.low52wLabel} ${num(low52w)}, ${copy.markets.lastCloseLabel} ${num(close)}`}
         tabIndex={0}
-        className="insights-focusable flex w-full flex-col gap-1 rounded-[var(--radius-md)] bg-currena-soft/40 p-2 ring-1 ring-[var(--color-border)]"
+        className="insights-focusable flex w-full flex-col gap-1 rounded-[var(--radius-md)] bg-currena-muted/[0.05] p-2 ring-1 ring-[var(--color-border)]"
       >
         <div className="flex w-full items-stretch gap-1.5">
           {/* Y labels: top = high, bottom = low (the chart's own span). */}
@@ -118,7 +118,7 @@ export function MarketsChart({
                 vectorEffect="non-scaling-stroke"
                 strokeDasharray="3 4"
               />
-              <path d={geometry.area} fill="var(--color-status-context)" opacity="0.1" />
+              <path d={geometry.area} fill="var(--color-text-primary)" opacity="0.1" />
               <path
                 d={geometry.line}
                 fill="none"

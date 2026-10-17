@@ -12,11 +12,16 @@ import type { IndicatorTier, StatusTone } from './config';
 // Ink-grade tokens (G4): ≥4.5:1 on each chip's own tint in BOTH themes.
 // R30 colour roles: needs-attention = red (danger); UNUSUAL = the amber
 // watch ink (was blue-info, then indistinct from the alert tier's border).
+// Grayscale redesign (2026-10-17, economic-indicators-ui-spec.md §3.2):
+// severity ink is SELECTIVE — a calm state never shouts. Normal (was
+// green) and Context (was blue) join the stale family on the neutral
+// muted chip; only the two flagged tiers keep their severity inks. Every
+// chip still carries its own icon + word (never colour alone, G5).
 const TONE_CLASSES: Record<StatusTone, string> = {
   danger: 'bg-currena-warning/15 text-[var(--color-status-alert)]',
-  success: 'bg-currena-success/15 text-[var(--color-status-normal)]',
-  info: 'bg-currena-blue/10 text-[var(--color-status-context)]',
-  muted: 'bg-currena-muted/15 text-[var(--color-status-stale)]',
+  success: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
+  info: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
+  muted: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
 };
 
 /** R30: the Unusual tier's own chip tone — amber, so the two card tiers

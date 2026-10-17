@@ -79,7 +79,7 @@ export function MarketsTable({
                     onOpenRow(m.id);
                   }
                 }}
-                className="cursor-pointer border-b border-[var(--color-border)]/60 transition-colors last:border-b-0 hover:bg-currena-soft/50"
+                className="cursor-pointer border-b border-[var(--color-border)]/60 transition-colors last:border-b-0 hover:bg-currena-muted/[0.05]"
               >
                 <th scope="row" className="px-2 py-1.5 text-start font-semibold text-[var(--color-text-primary)]">
                   {copy.markets.entries[m.id].name}
@@ -142,7 +142,7 @@ export function MarketsTable({
             <button
               type="button"
               onClick={() => onOpenRow(m.id)}
-              className="insights-focusable flex min-h-[44px] w-full cursor-pointer flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-2.5 py-2 text-start ring-1 ring-[var(--color-border)] transition-colors hover:bg-currena-soft/50"
+              className="insights-focusable flex min-h-[44px] w-full cursor-pointer flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-2.5 py-2 text-start ring-1 ring-[var(--color-border)] transition-colors hover:bg-currena-muted/[0.05]"
             >
               <span className="min-w-0 flex-1 truncate font-semibold text-[var(--color-text-primary)]">
                 {copy.markets.entries[m.id].name}

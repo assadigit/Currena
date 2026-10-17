@@ -154,10 +154,13 @@ export function InsightsHeader({
   );
 
   return (
-    <header className="mb-3">
+    <header className="mb-7">
       <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
         <div className="min-w-0">
-          <h1 className="m-0 text-2xl font-bold tracking-tight">{t('insights.title')}</h1>
+          {/* Real spec §5 (2026-10-17): the page title targets 24–28px mobile
+           * / 32–36px desktop, weight 700 — and the header separates from the
+           * cards by ~28–36px (mb-7 = 28px; the mb-3 was 12px). */}
+          <h1 className="m-0 text-2xl font-bold tracking-tight sm:text-[2rem] sm:leading-[2.4rem]">{t('insights.title')}</h1>
           <p className="mt-1 mb-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.ui.subtitle}</p>
           {dataAsOfLine ? (
             <p className="mt-1 mb-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]" title={dataAsOfLine.tooltip}>

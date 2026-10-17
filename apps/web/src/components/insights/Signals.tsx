@@ -121,7 +121,7 @@ export function Signals({
       <header className="mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 id="insights-signals-title" className="type-section m-0">
           <span className="inline-flex items-center gap-1.5">
-            <Activity aria-hidden size={23} strokeWidth={1.8} className="shrink-0 text-[var(--color-status-context)]" />
+            <Activity aria-hidden size={23} strokeWidth={1.8} className="shrink-0 text-[var(--color-text-secondary)]" />
             {copy.signals.title}
           </span>
         </h2>
@@ -131,7 +131,7 @@ export function Signals({
             aria-expanded={open}
             aria-controls="insights-signals-body"
             onClick={() => setOpen(!open)}
-            className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+            className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[length:var(--type-caption)] font-bold text-[var(--color-text-primary)] underline decoration-[var(--color-border)] underline-offset-2 transition-colors hover:decoration-[var(--color-text-secondary)]"
           >
             <span aria-hidden="true">
               <ChevronDown

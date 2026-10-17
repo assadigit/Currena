@@ -302,7 +302,16 @@ const BUDGETS = [
   // the merged card's grouped driver list it replaces. Measured 605.28 kB
   // raw / 144.51 kB gz. Justified in CHANGELOG §2026-10-17e
   // (gold balance card). Entry chunk untouched.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 606_000, gz: 144_600, label: 'Insights lazy chunk' },
+    // Redesign bump (2026-10-17, economic-indicators-ui-spec.md): the hero
+  // region cards restructure (region-name titles + severity labels, flagged
+  // tile GRID -> indicator ROWS with leading severity symbols + trailing
+  // values, the count line moved to the Why position, fixed Global-right/
+  // Australia-left ordering, aria-expanded/aria-controls on the expand
+  // controls) — roughly raw-neutral (tile grid code out, row list + svg in)
+  // but +3 B gz over the line. Headroom 145.20/607.00 so the next growth
+  // bumps consciously, per the gate's own rule. Justified in CHANGELOG
+  // §2026-10-17f.
+{ pattern: /^Insights-[\w-]+\.js$/, raw: 607_000, gz: 145_200, label: 'Insights lazy chunk' },
 ];
 
 function main() {

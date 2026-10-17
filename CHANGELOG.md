@@ -5,6 +5,59 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-17f] — the Economic Indicators page re-drawn from the owner's real spec
+
+The owner supplied the actual `economic-indicators-ui-spec.md` (the session
+draft was authored from the kickoff message because the real file had not
+arrived); it now governs the Insights page: grayscale structural foundation,
+SELECTIVE severity inks, top-3 flagged + expand, fixed Global-right/
+Australia-left card order in both locales, indicator ROWS, WCAG 2.2 AA,
+viewports 320-1440. The spec file replaced the draft at the repo root.
+
+### Changed
+
+- **Hero region cards (VerdictBlock)** — restructured per spec §4/§5: the
+  region NAME is now the card title (26-30px/700 desktop, 22-26px mobile)
+  with the severity label (the verdict word, 15-17px/600-700) and the
+  severity mark/scale (state artwork + four-step meter) sharing the title
+  row; a concise "Why" line (the existing count line, red when flagged)
+  sits directly below the heading with the existing how-computed tip.
+- **Flagged indicators** — the tile GRID became indicator ROWS: leading
+  severity symbol (warning triangle, alert red) at the inline-start edge,
+  flexible text column (name + the generated rule line), primary value at
+  the trailing edge; 12px radius, 1px border, white surface, >=72px rows
+  that grow naturally. The flagged heading carries the FULL underlying
+  count ("Needing attention now · 6"), the count never describes only the
+  visible three. "+n more" / "Show fewer" keep the in-place reveal and now
+  announce state (aria-expanded + aria-controls per list).
+- **Verdict meters** — RESTORED the round-44 colored grading (the session
+  draft's neutral ramp is retired): the real spec's §6 requires the meter's
+  segments and color to match the existing severity logic, so the scale
+  speaks the app's classification at every size (hero lg, gauge sm,
+  question headers).
+- **Hero card order** — FIXED desktop locations in BOTH locales per spec
+  §5/§8: Global on the right, Australia on the left, never mirrored by
+  direction (index.css order rules at >=1024px; below that the cards stack
+  Global-first). The two-column hero now turns on only at lg — below 1024px
+  two columns would make each card narrower than the spec's ~420px minimum.
+- **Layout targets** — page title 24->32px at sm, header->cards gap
+  12->28px, card padding 16/20/24px (md/lg), hero gaps 16/20/24px, page
+  container capped at 1440px (xl:max-w-[1440px]); "View section" became a
+  quiet card-footer link (redesigned placement, never deleted); the hero
+  rows now pass the opener for focus-return on panel close (the existing
+  PricesBoard/MoneyPanel pattern).
+- Bundle budget: Insights lazy chunk 606.00/144.60 -> 607.00/145.20 kB
+  (raw-neutral restructure, +3 B gz over the line; headroom so the next
+  growth bumps consciously).
+
+### Verified
+
+- pnpm -r typecheck, lint (0 errors; 15 pre-existing warnings), test
+  (1285 tests), copy:audit clean, build + bundle budget held.
+- Browser: EN + FA at 320/375/768/1024/1280/1440 (no horizontal overflow
+  at 320), expand/collapse, DetailsPanel Escape + focus-return, colored
+  meters, Persian digits, RTL logical edges.
+
 ## [2026-10-17e] — the gold card's balance visual (owner spec)
 
 The owner's `docs/insights/gold-balance-card-spec.md`: the gold signals

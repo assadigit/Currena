@@ -1252,6 +1252,12 @@ html:not(:lang(fa)) .type-kicker {
   border-radius: 999px;
   background: var(--color-border);
 }
+/* Round 44 (owner), RESTORED by the real spec (2026-10-17,
+ * economic-indicators-ui-spec.md §6 "Applying severity"): the meter is the
+ * severity scale the app already calculates — its filled segments and their
+ * color must match the existing severity logic (hue graded pale→full toward
+ * the current step). The session-1 neutral ramp is retired: a neutral
+ * meter no longer speaks the existing severity classification. */
 /* Stable (step 1) — pure green, nothing before it to tint. */
 .verdict-meter-seg.on-1 { background: var(--color-status-normal); }
 /* Cautious (step 2) — the yellow family: [whiter yellow] [yellow]. */
@@ -1261,7 +1267,7 @@ html:not(:lang(fa)) .type-kicker {
 .verdict-meter[data-step='2'] .verdict-meter-seg.on-2 {
   background: var(--color-status-watch);
 }
-/* Stressed (step 3) — the orange family: [more pale] [pale] [orange]. */
+/* Stressed (step 3) — the orange family: [paler] [pale] [orange]. */
 .verdict-meter[data-step='3'] .verdict-meter-seg.on-1 {
   background: color-mix(in srgb, var(--color-status-stressed) 40%, white);
 }
@@ -1314,27 +1320,21 @@ html:not(:lang(fa)) .type-kicker {
   }
 }
 
-/* Alert-card accent (F1): inline-start border + light tint, never colour alone.
- * R30 colour roles: RED = needs attention only. The Unusual tier gets the
- * amber watch ink (border + tint) so the two tiers stop looking alike —
- * the roast: "the left accent border is red on Unusual cards as well". */
+/* Alert-card accent (F1): the inline-start severity border stays — red
+ * for needs-attention, amber for the Unusual tier (R30 colour roles; the
+ * icon+word chip beside it keeps the never-colour-alone contract).
+ * Grayscale redesign (2026-10-17, economic-indicators-ui-spec.md §6):
+ * the tinted background gradient is retired — the card face is the plain
+ * surface; the colored start border + status chip carry the tier. */
 .alert-card {
   border-inline-start-width: 4px;
   border-inline-start-style: solid;
   border-inline-start-color: var(--color-status-alert);
-  background: linear-gradient(
-    to var(--dir-gradient, right),
-    var(--color-surface-alert-tint),
-    var(--color-surface) 55%
-  );
+  background: var(--color-surface);
 }
 .alert-card[data-tier='unusual'] {
   border-inline-start-color: var(--color-status-watch);
-  background: linear-gradient(
-    to var(--dir-gradient, right),
-    color-mix(in srgb, var(--color-status-watch) 7%, transparent),
-    var(--color-surface) 55%
-  );
+  background: var(--color-surface);
 }
 
 /* Card lanes (round 22, owner: "such gaps must never happen"): flex-wrap
@@ -1349,6 +1349,25 @@ html:not(:lang(fa)) .type-kicker {
 }
 .lane-fill > * { flex: 1 1 300px; }
 .lane-fill-rows > * { flex-basis: 420px; }
+
+/* Real spec (economic-indicators-ui-spec.md §5 + §8, 2026-10-17): the two
+ * overview cards keep FIXED desktop locations in BOTH locales — Global on
+ * the right, Australia on the left, matching both supplied references; the
+ * ordering is intentional content priority and is NOT mirrored when the
+ * page direction changes. Inner content still obeys RTL/LTR.
+ * The rule only applies where the cards sit side by side (the 2-column
+ * hero starts at 1024px — below that each card would be narrower than the
+ * ~420px minimum, so they stack in DOM order: Global first, Australia
+ * second, spec §5 mobile). Grid order is direction-aware: in RTL the flow
+ * starts at the inline-start (right) edge, so Global (order 1) lands on
+ * the right and Australia (order 2) on the left; in LTR Australia (order 1)
+ * takes the left and Global (order 2) the right. Same visual result. */
+@media (min-width: 1024px) {
+  .insights-hero-grid > [data-region-card='australia'] { order: 1; }
+  .insights-hero-grid > [data-region-card='global'] { order: 2; }
+  [dir='rtl'] .insights-hero-grid > [data-region-card='australia'] { order: 2; }
+  [dir='rtl'] .insights-hero-grid > [data-region-card='global'] { order: 1; }
+}
 
 /* The details side panel (F5) — desktop right sheet, mobile bottom sheet. */
 .insights-panel-scrim {
@@ -1441,11 +1460,22 @@ html[dir='rtl'] .insights-panel {
   }
 }
 
-/* Focus outlines (G6): every interactive control keeps a visible ring. */
+/* Focus outlines (G6): every interactive control keeps a visible ring.
+ * Grayscale redesign (spec §3.5): the ring speaks the neutral primary ink
+ * — visible in both themes, no brand blue on this page. */
 .insights-focusable:focus-visible {
-  outline: 2px solid var(--color-accent-brand);
+  outline: 2px solid var(--color-text-primary);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
+}
+
+/* Grayscale redesign (spec §3.4): every artwork PNG on the Insights page
+ * (region marks, state icons, indicator icons, money-area icons, metal
+ * icons) renders desaturated — the shapes stay recognizable, the color
+ * stops competing with the severity inks. Scoped to the Insights route
+ * root (.insights-page on the route wrapper) so no other page changes. */
+.insights-page .currena-icon {
+  filter: grayscale(1);
 }
 
 /* ------------------------------------------------------------------ *

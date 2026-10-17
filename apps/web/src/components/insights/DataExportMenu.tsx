@@ -67,7 +67,7 @@ export function DataExportMenu({
         aria-controls="insights-export-panel"
         aria-haspopup="true"
         onClick={() => onOpenChange(!open)}
-        className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full border border-currena-blue/40 bg-currena-blue/15 px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
+        className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-text-secondary)]/50 hover:text-[var(--color-text-primary)]"
       >
         <Download aria-hidden size={17} strokeWidth={1.9} className="shrink-0" />
         {copy.ui.exportAllLabel}

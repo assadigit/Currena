@@ -74,7 +74,7 @@ export function MarketTile({
           ? 'ring-currena-warning/30 hover:bg-currena-warning/[0.06]'
           : entry.status === 'bear'
             ? 'ring-currena-warning/40 hover:bg-currena-warning/[0.06]'
-            : 'ring-[var(--color-border)] hover:bg-currena-soft/60'
+            : 'ring-[var(--color-border)] hover:bg-currena-muted/[0.06]'
       } ${old ? 'opacity-80' : ''} bg-[var(--color-surface)]`}
     >
       {/* §6.3 "short name" — the full name wraps to at most two lines
@@ -164,7 +164,7 @@ export function MarketDetail({
       </p>
       <dl className="m-0 mb-2 flex flex-col gap-1">
         <div>
-          <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
+          <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
             {copy.markets.detailWhat}
           </dt>
           <dd className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
@@ -172,7 +172,7 @@ export function MarketDetail({
           </dd>
         </div>
         <div>
-          <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
+          <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
             {copy.markets.detailWhy}
           </dt>
           <dd className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
@@ -180,7 +180,7 @@ export function MarketDetail({
           </dd>
         </div>
         <div>
-          <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
+          <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
             {copy.markets.detailYou}
           </dt>
           <dd className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">

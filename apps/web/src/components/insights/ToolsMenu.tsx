@@ -19,14 +19,25 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import type { StatusFilter } from './config';
 import { clampPanelToViewport } from '../../lib/clamp-panel';
 
-/** Active chip surface per tier — the I6 deep-ink families. */
+/** Grayscale redesign (2026-10-17, economic-indicators-ui-spec.md §3.5):
+ * the filter chips are CONTROLS, not status displays — the selected state
+ * is the charcoal fill (the page's one "selected" language, same as the
+ * JumpNav active pill), every tier identical; severity ink stays on the
+ * cards themselves. One shared string — every tier speaks it. */
+const CHIP_SELECTED =
+  'border-[var(--color-text-primary)] bg-[var(--color-text-primary)] text-[var(--color-surface)]';
 const CHIP_ACTIVE: Readonly<Record<StatusFilter, string>> = {
-  all: 'border-currena-blue/40 bg-currena-blue/15 text-currena-blue-deep',
-  warning: 'border-currena-warning/40 bg-currena-warning/15 text-currena-warning-deep',
-  unusual: 'border-currena-blue/40 bg-currena-blue/15 text-currena-blue-deep',
-  normal: 'border-currena-success/40 bg-currena-success/15 text-currena-success-deep',
-  context: 'border-currena-blue/40 bg-currena-blue/15 text-currena-blue-deep',
+  all: CHIP_SELECTED,
+  warning: CHIP_SELECTED,
+  unusual: CHIP_SELECTED,
+  normal: CHIP_SELECTED,
+  context: CHIP_SELECTED,
 };
+
+/** The one download-button surface (grayscale): shared by every export
+ * control in the menu. */
+const DOWNLOAD_BUTTON_CLASS =
+  'insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-text-secondary)]/50 hover:text-[var(--color-text-primary)]';
 
 interface ToolsMenuProps {
   copy: InsightsCopy;
@@ -117,14 +128,14 @@ export function ToolsMenu({
         aria-expanded={open}
         aria-controls="insights-tools-panel"
         onClick={() => onOpenChange(!open)}
-        className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-currena-blue/50 hover:text-[var(--color-status-context)]"
+        className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-text-secondary)]/50 hover:text-[var(--color-text-primary)]"
       >
         <Wrench aria-hidden size={17} strokeWidth={1.9} className="shrink-0" />
         {copy.ui.toolsLabel}
         {filtering ? (
           <span
             aria-hidden="true"
-            className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-currena-blue px-1 text-[0.62rem] font-bold text-white"
+            className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-text-primary)] px-1 text-[0.62rem] font-bold text-[var(--color-surface)]"
           >
             !
           </span>
@@ -156,7 +167,7 @@ export function ToolsMenu({
                 aria-keyshortcuts="/"
                 placeholder={copy.ui.searchLabel}
                 ref={searchInputRef}
-                className="h-10 w-full rounded-full border border-black/10 bg-white ps-9 pe-3 text-sm text-currena-dark placeholder:text-currena-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue dark:border-white/15 dark:bg-[#1A222E] dark:text-currena-dark"
+                className="h-10 w-full rounded-full border border-black/10 bg-white ps-9 pe-3 text-sm text-currena-dark placeholder:text-currena-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-text-primary)] dark:border-white/15 dark:bg-[#1A222E] dark:text-currena-dark"
               />
             </div>
           </div>
@@ -175,10 +186,10 @@ export function ToolsMenu({
                     type="button"
                     aria-pressed={active}
                     onClick={() => onStatusChange(chip.value)}
-                    className={`inline-flex min-h-[36px] cursor-pointer items-center whitespace-nowrap rounded-full border px-3 text-xs font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue ${
+                    className={`inline-flex min-h-[36px] cursor-pointer items-center whitespace-nowrap rounded-full border px-3 text-xs font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-text-primary)] ${
                       active
                         ? CHIP_ACTIVE[chip.value]
-                        : 'border-black/10 bg-white text-currena-dark hover:border-currena-blue/40 hover:bg-currena-blue/10 dark:border-white/15 dark:bg-[#1A222E] dark:text-currena-dark dark:hover:border-currena-blue/40'
+                        : 'border-black/10 bg-white text-currena-dark hover:border-[var(--color-text-secondary)]/40 hover:bg-currena-muted/10 dark:border-white/15 dark:bg-[#1A222E] dark:text-currena-dark dark:hover:border-[var(--color-text-secondary)]/40'
                     }`}
                   >
                     {chip.label}
@@ -196,7 +207,7 @@ export function ToolsMenu({
                   onStatusChange('all');
                   onQueryChange('');
                 }}
-                className="mt-2 inline-flex min-h-[36px] cursor-pointer items-center rounded-full px-2 text-[0.7rem] font-bold text-currena-blue-deep underline decoration-currena-blue/40 underline-offset-2 transition-colors hover:bg-currena-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue dark:text-currena-blue"
+                className="mt-2 inline-flex min-h-[36px] cursor-pointer items-center rounded-full px-2 text-[0.7rem] font-bold text-[var(--color-text-primary)] underline decoration-[var(--color-border)] underline-offset-2 transition-colors hover:decoration-[var(--color-text-secondary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-text-primary)]"
               >
                 {copy.ui.clearFilters}
               </button>
@@ -212,7 +223,7 @@ export function ToolsMenu({
               <button
                 type="button"
                 onClick={onDownloadIcs}
-                className="insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-currena-blue/40 bg-currena-blue/15 px-3 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
+                className={DOWNLOAD_BUTTON_CLASS}
               >
                 <CalendarDays aria-hidden size={16} strokeWidth={1.9} className="shrink-0" />
                 {copy.ui.icsDownload}
@@ -220,7 +231,7 @@ export function ToolsMenu({
               <button
                 type="button"
                 onClick={onDownloadCsv}
-                className="insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-currena-blue/40 bg-currena-blue/15 px-3 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
+                className={DOWNLOAD_BUTTON_CLASS}
               >
                 <Download aria-hidden size={16} strokeWidth={1.9} className="shrink-0" />
                 {copy.ui.downloadCsv}
@@ -229,7 +240,7 @@ export function ToolsMenu({
                 <button
                   type="button"
                   onClick={onDownloadMarketsCsv}
-                  className="insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-currena-blue/40 bg-currena-blue/15 px-3 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
+                  className={DOWNLOAD_BUTTON_CLASS}
                 >
                   <Download aria-hidden size={16} strokeWidth={1.9} className="shrink-0" />
                   {copy.markets.csvDownload}
@@ -239,7 +250,7 @@ export function ToolsMenu({
                 <button
                   type="button"
                   onClick={onDownloadFxCsv}
-                  className="insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-currena-blue/40 bg-currena-blue/15 px-3 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25"
+                  className={DOWNLOAD_BUTTON_CLASS}
                 >
                   <Download aria-hidden size={16} strokeWidth={1.9} className="shrink-0" />
                   {copy.fx.csvDownload}

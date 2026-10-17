@@ -189,19 +189,17 @@ export function MoneyPanel({
 
   return (
     /* Round 29 (owner): "what it means for my money … this is one of the
-     * most important sections — needs more contrast and visual weight.
-     * Different bg, color, shadow or anything else." → the panel gets the
-     * app's FOCAL treatment: the brand-gold gradient field (round 24 made
-     * gold the one focal accent), a 2px gold ring, a soft gold-tinted
-     * shadow, and its own padding so the white rows inside sit ON the
-     * tinted field — the wrapper vs the rows IS the contrast. Dark mode
-     * keeps the same gradient logic with a deeper shadow. The white rows
-     * and their plain rings stay untouched — the wrapper carries the
-     * weight, the rows keep the readable surface. */
+     * most important sections — needs more contrast and visual weight."
+     * Round 24 gave the panel the brand-gold focal treatment. Grayscale
+     * redesign (2026-10-17, economic-indicators-ui-spec.md §8): the WEIGHT
+     * now comes from the section title, the dark charcoal kicker header
+     * treatment and the colored direction words inside the rows — the
+     * wrapper becomes a standard surface card (neutral ring, no gradient,
+     * no gold shadow); the white rows and their rings are unchanged. */
     <section
       id="insights-money"
       aria-labelledby="insights-money-title"
-      className="scroll-mt-24 rounded-[var(--radius-lg)] bg-gradient-to-b from-[var(--color-accent-gold)]/[0.16] via-[var(--color-accent-gold)]/[0.07] to-transparent p-3.5 shadow-[0_10px_34px_rgba(168,126,28,0.15)] ring-2 ring-[var(--color-accent-gold)]/45 sm:p-4 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
+      className="scroll-mt-24 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-3.5 ring-1 ring-[var(--color-border)] sm:p-4"
     >
       <h2 id="insights-money-title" className="type-section m-0 mb-1">
         {copy.money.title}
@@ -294,9 +292,9 @@ export function MoneyPanel({
                   <div className="flex items-start gap-3">
                     <span
                       aria-hidden="true"
-                      className="grid h-16 w-16 shrink-0 place-items-center rounded-[var(--radius-md)] bg-currena-soft/70 ring-1 ring-[var(--color-border)] sm:h-24 sm:w-24"
+                      className="grid h-16 w-16 shrink-0 place-items-center rounded-[var(--radius-md)] bg-currena-muted/[0.08] ring-1 ring-[var(--color-border)] sm:h-24 sm:w-24"
                     >
-                      <span className={moneyAreaIconUrl(area) !== null ? '' : 'text-[var(--color-status-context)]'}>
+                      <span className={moneyAreaIconUrl(area) !== null ? '' : 'text-[var(--color-text-secondary)]'}>
                         <AreaIcon area={area} />
                       </span>
                     </span>

@@ -97,7 +97,7 @@ export function WorldMarkets({
    * the verdict box, the tiles, the panels and the table ALL live inside it,
    * so nothing reads stray and the white cards layer on the field. */
   const shell =
-    'scroll-mt-24 flex flex-col gap-4 rounded-[var(--radius-lg)] bg-currena-soft/60 p-4 shadow-[0_10px_34px_rgba(15,23,42,0.07)] ring-1 ring-[var(--color-border)] sm:gap-5 sm:p-6 dark:shadow-[0_14px_44px_rgba(0,0,0,0.4)]';
+    'scroll-mt-24 flex flex-col gap-4 rounded-[var(--radius-lg)] bg-currena-muted/[0.05] p-4 shadow-[0_10px_34px_rgba(15,23,42,0.07)] ring-1 ring-[var(--color-border)] sm:gap-5 sm:p-6 dark:shadow-[0_14px_44px_rgba(0,0,0,0.4)]';
 
   /** The header row: the owner's exchange-chart artwork at the regions'
    * 96/128 scale, the title, and the as-of date on the far side. */

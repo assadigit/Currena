@@ -90,14 +90,17 @@ function ConnectionStateIcon({ state }: { state: ConnectionState }) {
   }
 }
 
-/** Neutral tones only — pattern presence is information, never advice. */
+/** Neutral tones only — pattern presence is information, never advice.
+ * Grayscale redesign (spec §8): active/partly lose the blue info ink and
+ * join the neutral family (the state WORD carries the category); the
+ * disagree chip keeps its amber word in the summary strip above. */
 const STATE_TONE: Record<ConnectionState, string> = {
-  active: 'bg-currena-blue/10 text-[var(--color-status-context)]',
-  partly: 'bg-currena-blue/10 text-[var(--color-status-context)]',
-  pending: 'bg-currena-muted/15 text-[var(--color-status-stale)]',
-  inactive: 'bg-currena-muted/15 text-[var(--color-status-stale)]',
-  disagree: 'bg-currena-muted/15 text-[var(--color-status-stale)]',
-  unknown: 'bg-currena-muted/15 text-[var(--color-status-stale)]',
+  active: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
+  partly: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
+  pending: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
+  inactive: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
+  disagree: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
+  unknown: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
 };
 
 /** Round 32 (owner): the move chips' direction glyph — the money panel's
@@ -200,7 +203,7 @@ function LegChip({
     <button
       type="button"
       onClick={(e) => onFocusCard(leg.id, e.currentTarget)}
-      className="insights-focusable inline-flex min-h-[44px] cursor-pointer flex-col items-start gap-0 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2.5 py-1.5 text-start transition-colors hover:border-currena-blue/50"
+      className="insights-focusable inline-flex min-h-[44px] cursor-pointer flex-col items-start gap-0 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2.5 py-1.5 text-start transition-colors hover:border-[var(--color-text-secondary)]/50"
     >
       <span className="text-[length:var(--type-caption)] font-bold text-[var(--color-text-primary)]">
         {shortName}
@@ -221,7 +224,7 @@ function LegChip({
         {stateWord !== null ? (
           <span
             className={`text-[length:var(--type-caption)] font-bold ${
-              unreadable ? 'text-[var(--color-status-stale)]' : 'text-[var(--color-status-context)]'
+              unreadable ? 'text-[var(--color-status-stale)]' : 'text-[var(--color-text-secondary)]'
             }`}
           >
             {stateWord}
@@ -302,7 +305,7 @@ export function ConnectionCard({
       data-connection-state={reading.state}
       // R27: the evidence tag stays in the DATA, never on the face.
       data-evidence="to-verify"
-      className={`flex flex-col gap-2.5 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)] ${autoFocus ? 'motion-safe:animate-pulse ring-currena-blue/50' : ''}`}
+      className={`flex flex-col gap-2.5 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)] ${autoFocus ? 'motion-safe:animate-pulse ring-[var(--color-text-primary)]/50' : ''}`}
     >
       <header className="flex flex-wrap items-center gap-2">
         <span
@@ -352,7 +355,7 @@ export function ConnectionCard({
        * happens to end at. */}
       {moves.length > 0 ? (
         <div
-          className="mt-auto flex flex-col gap-2 rounded-[var(--radius-lg)] bg-gradient-to-b from-[var(--color-accent-gold)]/[0.16] via-[var(--color-accent-gold)]/[0.07] to-transparent p-3 shadow-[0_10px_34px_rgba(168,126,28,0.15)] ring-2 ring-[var(--color-accent-gold)]/45 sm:p-3.5 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
+          className="mt-auto flex flex-col gap-2 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] sm:p-3.5 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
           data-connection-verdict
         >
           <p className="m-0 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]">

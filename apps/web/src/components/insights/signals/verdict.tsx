@@ -148,14 +148,11 @@ export function MetalIcon({
 /** The chip header's boxed artwork (2026-10-20 owner sketch) — the same
  * tinted-box language as the prices board's PriceIconBox, miniaturised. */
 export function MetalIconBox({ metal }: { metal: 'gold' | 'silver' }) {
-  const isGold = metal === 'gold';
   const icon = indicatorIconUrl(metal === 'gold' ? 'gold-usd' : 'silver-usd');
   return (
     <span
       aria-hidden="true"
-      className={`grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-md)] ring-1 ring-[var(--color-border)] sm:h-16 sm:w-16 ${
-        isGold ? 'bg-[var(--color-accent-gold)]/25' : 'bg-currena-soft/70'
-      }`}
+      className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-md)] bg-currena-muted/[0.08] ring-1 ring-[var(--color-border)] sm:h-16 sm:w-16"
     >
       {icon !== null ? (
         <IconImg src={icon} size={40} desktopSize={48} />
@@ -163,7 +160,7 @@ export function MetalIconBox({ metal }: { metal: 'gold' | 'silver' }) {
         <Coins
           aria-hidden
           strokeWidth={1.2}
-          className="currena-icon text-[var(--color-status-context)]"
+          className="currena-icon text-[var(--color-text-secondary)]"
           style={{ '--icon-size': '40px', '--icon-size-sm': '48px' } as CSSProperties}
         />
       )}
@@ -284,7 +281,7 @@ export function VerdictStrip({
    * kept by structure). */
   return (
     <div
-      className="flex flex-col gap-2 rounded-[var(--radius-lg)] bg-gradient-to-b from-[var(--color-accent-gold)]/[0.16] via-[var(--color-accent-gold)]/[0.07] to-transparent p-3.5 shadow-[0_10px_34px_rgba(168,126,28,0.15)] ring-2 ring-[var(--color-accent-gold)]/45 sm:p-4 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
+      className="flex flex-col gap-2 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-3.5 ring-1 ring-[var(--color-border)] sm:p-4 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
       data-signal-verdict
     >
       <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-secondary)]">

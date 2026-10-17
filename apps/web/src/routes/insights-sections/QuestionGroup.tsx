@@ -242,7 +242,7 @@ export function QuestionGroup({
         <button
           type="button"
           onClick={() => setShowAll(true)}
-          className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:decoration-[var(--color-status-context)]"
+          className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:decoration-[var(--color-text-secondary)]"
         >
           {hidden.length === 1 ? copy.ui.seeAllOne : interpolate(copy.ui.seeAll, { n: num(hidden.length, numberLocale) })}
         </button>
@@ -251,7 +251,7 @@ export function QuestionGroup({
         <button
           type="button"
           onClick={() => setShowAll(false)}
-          className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:text-[var(--color-status-context)]"
+          className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:text-[var(--color-text-primary)]"
         >
           {copy.ui.showFewer}
         </button>

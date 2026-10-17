@@ -323,7 +323,7 @@ export function Insights() {
   }, [panel, state]);
 
   return (
-    <div className="mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-6xl lg:px-8">
+    <div className="insights-page mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-6xl lg:px-8 xl:max-w-[1440px]">
       <ReadingProgress label={copy.ui.progressLabel} />
       <InsightsHeader
         t={t}

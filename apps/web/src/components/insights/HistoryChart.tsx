@@ -213,7 +213,7 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
         <span
           role="group"
           aria-label={copy.ui.chartRangeLabel}
-          className="no-print flex items-center gap-1 rounded-full bg-currena-soft/70 p-0.5 dark:bg-white/[0.06]"
+          className="no-print flex items-center gap-1 rounded-full bg-currena-muted/[0.08] p-0.5 dark:bg-white/[0.06]"
         >
           {RANGES.map((r) => {
             const active = r === range;
@@ -230,9 +230,9 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
                   writeChartRange(r); // I13: remember the reader's zoom
                   setFocusIdx(null); // indices shift with the window
                 }}
-                className={`inline-flex min-h-[28px] cursor-pointer items-center rounded-full px-2.5 text-[length:var(--type-caption)] font-bold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-currena-blue disabled:cursor-not-allowed disabled:opacity-40 ${
+                className={`inline-flex min-h-[28px] cursor-pointer items-center rounded-full px-2.5 text-[length:var(--type-caption)] font-bold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-text-primary)] disabled:cursor-not-allowed disabled:opacity-40 ${
                   active
-                    ? 'bg-white text-currena-blue-deep shadow-sm ring-1 ring-black/[0.06] dark:bg-[#243040] dark:text-currena-blue dark:ring-white/[0.1]'
+                    ? 'bg-white text-currena-dark shadow-sm ring-1 ring-black/[0.06] dark:bg-[#243040] dark:text-currena-dark dark:ring-white/[0.1]'
                     : 'bg-transparent text-currena-muted hover:text-currena-dark dark:hover:text-currena-dark'
                 }`}
               >
@@ -242,11 +242,11 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
           })}
         </span>
       </figcaption>
-      <span dir="ltr" className="relative block text-currena-blue">
+      <span dir="ltr" className="relative block text-[var(--color-text-primary)]">
         <svg
           ref={svgRef}
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-          className="h-auto w-full cursor-crosshair touch-pan-y rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue"
+          className="h-auto w-full cursor-crosshair touch-pan-y rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-text-primary)]"
           role="img"
           aria-label={ariaLabel}
           tabIndex={0}
@@ -388,7 +388,7 @@ export function HistoryChart({ id, points, copy, locale, numberLocale }: History
       </span>
       {/* Data-table alternative (spec §9) — real table, collapsed by default.
           I6 audit F7: the summary is a full-width row with a 44px hit area. */}
-      <details className="mt-2 rounded-xl bg-currena-soft/60 px-3 py-1 dark:bg-white/[0.04]">
+      <details className="mt-2 rounded-xl bg-currena-muted/[0.06] px-3 py-1 dark:bg-white/[0.04]">
         <summary className="-mx-3 flex min-h-[44px] cursor-pointer select-none items-center px-3 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
           {copy.ui.chartTable}
         </summary>

@@ -539,7 +539,7 @@ export function BalanceScale({
         id="gold-balance-detail"
         data-balance-detail={openDriver !== null ? openDriver.key : undefined}
         hidden={openDriver === null}
-        className="rounded-[var(--radius-sm)] bg-currena-soft/60 px-3 py-2 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]"
+        className="rounded-[var(--radius-sm)] bg-currena-muted/[0.06] px-3 py-2 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]"
       >
         {openDriver !== null ? (
           <>
