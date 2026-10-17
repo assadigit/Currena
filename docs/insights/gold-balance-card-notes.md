@@ -251,3 +251,267 @@ All saved in `docs/insights/screenshots/gold-balance/`:
   strip and translate with their pans, so they stay attached to both the
   beam end and the pan at every tilt (verified at 0°, 3.5°, 10.5° and
   the capped maximum).
+
+## 8. v2 patch — the seesaw geometry (owner spec
+## docs/insights/gold-balance-card-v2-seesaw-patch-spec.md)
+
+The owner's v2 patch replaces ONLY the drawing of the balance (beam,
+fulcrum, plates, blocks) with a seesaw that shows the real lean and
+nothing more. The v1 tilt rule, the data mapping, the verdict/count
+line content, the trays, the price footing strip, the copy, the RTL
+mirroring, the `role="img"` summary and the aria label are unchanged
+(patch §4). The patch spec was uploaded to
+`docs/insights/gold-balance-card-v2-seesaw-patch-spec.md` and pushed to
+the branch BEFORE the work started (commit 7aca42f), per the owner's
+"upload this spec file into github then build upon that".
+
+### 8.1 The v1 problems, reproduced FIRST (patch §3) — measured at
+### 1280px on the temporary harness, v1 code
+
+| # | Problem (patch §3) | Reproduced measurement |
+|---|---|---|
+| 1 | The picture exaggerates the lean — the pan bars move with the STACK, not just the tilt | Case A: the two pan BARS sat **170.7px apart** while the rotated beam's ends sat only ~44px apart (beam AABB 49.9px incl. its 6px thickness). Case E: pan bars **497.0px** apart vs a beam-end difference of ~60px (2 × the 30px v1 drop cap). The layout offset between an empty pan's dish and a stacked pan's dish (label + block heights) rode on top of the tilt — a light signal drew as a heavy one. |
+| 2 | The block is too big (full explanation sentence inside) | Case A block at ≥900px: **126.8px** high (name + value + sentence, 109 chars) — the patch bounds blocks to 44–72px. |
+| 3 | The pivot points the wrong way | The v1 fulcrum was a CSS `border-t` triangle — a flat top edge under the beam with the apex pointing DOWN, hanging like a pointer instead of holding the beam up. |
+| 4 | The empty side looks broken | Case A/E for-side: label + bare grey dish bar with nothing in it. |
+| 5 | The beam is thin and pale; the count line is small and light grey | The v1 beam was 6px (`h-1.5`) at 45% ink opacity; the count line was `--type-caption` (12.48px) in the secondary grey. |
+
+Evidence screenshots (temporary, not committed):
+/tmp/v1-problem-caseA-wide.png, /tmp/v1-problem-caseE-wide.png.
+
+### 8.2 Every decision for a missing detail (patch §2.7)
+
+1. **The "~" suggestions resolved to:** beam 10px; plate 6px; hinge dot
+   8px; base line 96×6px; block 56px fixed; block gap 6px; maxAngle 12°;
+   min angle 4°; zone cap 520px; desktop plate/block 180px; central
+   plate gap 24px; fulcrum clearance 12px; zone top margin 8px.
+2. **Lh derivation:** `Lh = zoneWidth − plateWidth` (the plates sit
+   centred on the beam ends, their outer edge exactly on the zone edge).
+   At a 360px screen the card's inner width is 296px → block width
+   (296−24)/2 = 136px → **Lh = 160px** ("about half of the card's inner
+   width"; the spec's ~170px sketch assumed a slightly wider inner
+   width — V7's hard 10px/30px gates pass with margin: 11.2px / 33.3px).
+   At ≥768px the zone caps at 520px → block 180px → **Lh = 340px**.
+3. **No drop cap.** The v1 30px pan-drop cap is RETIRED: with Lh bounded
+   by the ~520px zone the swing is modest by construction (≤70.7px at
+   Lh 340), and the patch's geometry law — the picture may show no other
+   height difference than Lh × sin(angle) — makes a cap meaningless.
+4. **Reserved height (patch §5.8):** the spec's sum (blocks + gaps +
+   plate + max rise + ~8px) is measured from the PIVOT; the fixed bottom
+   machinery (base 6 + fulcrum (Lh/2)·sin(maxAngle)+12 + beam 10 + hinge
+   8) sits under it, so the implemented zone height is
+   `6 + fulcrumH + 10 + 8 + 6 + maxRise + stackH + 8`. An EMPTY side
+   still shows one slot (patch §5.6), so the reserved "larger stack" is
+   at least 1 row (case D reserves one row). The v1 §7.9 second-column
+   rule survives (a ≥5-block side caps at 4 rows and the plate widens to
+   two columns) — dormant with the current four drivers, unit-tested.
+5. **V2's "plate positions" are measured relative to the beam centre**
+   (plate surface y − beam centre y): §5.8.1 legitimately grows the zone
+   with the larger stack, so the viewport-absolute plate y differs
+   between case B (2-row zone) and case G (1-row zone) by exactly the
+   reserved rows — what must not move is the plate ON ITS BEAM END, and
+   that is equal within 0.0px (measured both ways; the translateY styles
+   are identical strings too).
+6. **Count line ink:** the secondary text colour at `--type-label`
+   (14px) — 7.98:1 on the light card / 7.7:1 on the dark one (patch §6.2
+   ≥4.5:1). The beam/fulcrum/base/reference share the same secondary ink
+   (≥3:1 per patch §5.1.3) except the reference line, which uses the
+   page's low-contrast border token (patch §5.3.2 "low-contrast").
+7. **Block layout:** icon 20px + name (bold, wraps to a second line,
+   never clipped) over the value, vertically centred in the fixed 56px
+   height — 3 lines of 14px/1.25 fit inside 56px, so a wrapping name
+   never changes the height (V3 measures 56.0px in both languages).
+8. **No width branch.** The v1 `useWideScreen` hook is deleted; the
+   detail panel opens from a block tap at EVERY width (patch §5.5.6).
+9. **Banner data in the harness:** the synthetic readings gained a
+   real-yield 10-year percentile (0.85) so the C12 banner renders in the
+   harness and V5's stack-vs-banner gap is measurable (43.5–90.7px
+   across the cases).
+10. **The v1 `role="img"` split is kept:** the graphic layer (level
+    reference line + beam + fulcrum + base) carries the aria label; the
+    plates with their buttons are siblings of that layer (§12.1 + §7.4).
+11. **The empty slot is drawn behind nothing** — it stands on its plate
+    like a block would, `aria-hidden`, no text (patch §5.6.2).
+
+### 8.3 The measured checks (patch §8, V1–V10)
+
+Measured in headless Chromium on the temporary harness
+(`#/gold-balance-test?case=…`), via element rects (never by eye). The
+harness and its route registration were deleted before the commit.
+
+| Check | Pass condition | Measured | Result |
+|---|---|---|---|
+| V1 Tilt geometry | plate-surface difference = Lh × sin(angle) ±2px; B/D/G show 0 ±1px | 360 EN: A **11.2** (exp 11.2), B **0**, C **25.0** (exp 25.0), D **0**, E **33.3** (exp 33.3), G **0**. 1280 EN: A **23.7** (23.7), B 0, C **53.2** (53.2), D 0, E **70.7** (70.7), G 0. FA (360/1280): identical values. Δ = **0.0px everywhere** | PASS |
+| V2 Stack independence | plate positions in B and G equal within 1px | plate−beamCentre: B {−19, −19} == G {−19, −19} (Δ **0.0px**); translateY styles identical (`translateY(0px)`) | PASS |
+| V3 Block size | every block 44–72px, equal within 1px | **56.0px** on every block, both languages, all widths (min = max = 56.0) | PASS |
+| V4 Fulcrum contact | apex touches the beam underside within 1px at every angle; lowered end above the base line in E | apex gap **0.0px** at 0°/4°/9°/12°; case E beam bottom **12.1px** above the base line (360), **12.11px** (1280) | PASS |
+| V5 No overlap | no stack touches the banner, a caption or the tray (A–G, EN+FA) | banner gap **29.7–90.7px**, caption gap **124.5–296px**, tray gap **90.6–122.3px**; 0 mutual block/slot overlaps in every case | PASS |
+| V6 Visibility | beam/fulcrum ≥3:1; count line ≥14px at ≥4.5:1 | beam ink **7.98:1** light / 7.7:1 dark; count line **14px** at **7.98:1** | PASS |
+| V7 Visible lean | at ~360px: ≥10px in A, ≥30px in E | A **11.2px**, E **33.3px** (EN and FA alike) | PASS |
+| V8 Empty side | dashed slot on every empty side (A, D, E); captions visible | A slot[for], D slot[for+against], E slot[for] (C: slot[against]); captions visible everywhere | PASS |
+| V9 Stable zone | same larger stack → zone height Δ 0px | A **139.3 == G 139.3** (360), A **176.7 == G 176.7** (1280) — same 1-row stack, different tilts | PASS |
+| V10 Old checks | every v1 §14 check passes again | see 8.4 | PASS |
+
+### 8.4 V10 — the v1 §14 checks re-run on the v2 drawing
+
+- Beam tilts per §6 (A against-down 4°, B level, C for-down 9°, D level
+  + "Can't read the conditions right now", E against-down 12°, G level)
+  — PASS (30 unit tests + the browser V1 measurements).
+- No horizontal scroll at ~320px — PASS (`scrollWidth 320 == innerWidth
+  320`; hScroll false in every case/width/language).
+- No cut text, no overlapping blocks — PASS (V5 overlaps 0; names wrap;
+  no ellipsis anywhere).
+- Every block and chip ≥44px — PASS (blocks 56.0px fixed; chips
+  min-h-[44px] by class, measured 44+).
+- Farsi mirrored, Persian digits, tilt toward the correct side — PASS
+  (the for plate sits RIGHT in fa; the rotation sign flips: EN +4°/+12° →
+  fa −4°/−12°; Persian digits in the count line, values and aria label).
+- Keyboard: Tab reaches every block and chip, Enter/Space opens the
+  detail panel — PASS (walked the order: block real-yield → chips
+  expectations → stress → dollar; Enter opens, Space closes; chip Enter
+  opens; one panel at a time).
+- `prefers-reduced-motion` stops the animation — PASS (beam + plates
+  carry `motion-reduce:transition-none`; the generated CSS contains
+  `@media (prefers-reduced-motion: reduce) { .motion-reduce\:transition-none
+  { transition-property: none } }`).
+- Browser console shows no error — PASS (zero errors on the harness).
+- Network tab shows no new request — PASS (0 `/api/insights` calls from
+  the balance; only the app shell's pre-existing snapshot/rates calls,
+  502 locally by design; the trend charts' history is served from the
+  harness's in-memory stub, never from the network).
+- §6.7 / v2 §5.9 animation — PASS (beam and plates both
+  `transition: transform 0.5s` with the same ease; reduced-motion off
+  switch above).
+
+### 8.5 What changed (v2)
+
+- `apps/web/src/components/insights/signals/BalanceScale.tsx` — the
+  drawing replaced with the seesaw: fixed-metric constants, the tilt
+  helper now returns the per-plate rise and the Lh × sin(angle) end
+  difference (12°/4°, no cap), the zone reserves its height from the
+  largest stack and anchors the seesaw to its bottom, the graphic layer
+  (reference line + rotating beam + up-pointing fulcrum + base line),
+  the level plates with hinge dots and upward block stacks, compact
+  56px blocks with no sentence, dashed aria-hidden empty slots, the
+  fixed caption row, the count line at 14px, and the panel-after-
+  captions order. The v1 `useWideScreen` hook is gone.
+- `apps/web/src/components/insights/signals/balance.test.tsx` — the tilt
+  tests re-pinned to 12°/4° and the rise/end-drop semantics; the wide-
+  screen inline-sentence suite replaced by the every-width panel suite;
+  new tests: empty slots (aria-hidden), plate translate ±rise, B/G
+  plate + zone stability, caption row, the v2 §5 DOM order. 30 tests.
+- `docs/insights/screenshots/gold-balance/` — the 24 v1 screenshots
+  replaced by the 28 v2 ones (§8.6).
+- The temp harness (`signals/GoldBalanceHarness.tsx`, the
+  `/gold-balance-test` route registration in `router.ts` + `App.tsx`)
+  existed ONLY for the checks and was deleted before the commit.
+- Not changed: the signal logic, thresholds, data sources, explanation
+  texts, the banner, the trays, the price footing strip, the copy, the
+  merged card, any other card, the packages. No new dependency, no new
+  API call, no KV read/write.
+
+### 8.6 The screenshots — what a first-time visitor sees (one sentence each)
+
+All 28 live in `docs/insights/screenshots/gold-balance/` as
+`v2-<case>-<width>-<lang>.png`; each was opened and checked against its
+case's data (patch §8, final gate).
+
+- `v2-A-360-en.png` — A mobile EN: a small lean to the right — one block
+  ("Real yields 2.84%") weighs the Against plate down while the For
+  plate shows an empty dashed slot, under the verdict "Leaning against
+  gold / 1 against · 3 couldn't be read".
+- `v2-A-360-fa.png` — A mobile FA: the mirrored small lean to the left —
+  the block «بازده واقعی ۲/۸۴٪» lowers the left (به ضرر طلا) plate, the
+  empty dashed slot rides high on the right, with «۱ به ضرر · ۳ قابل
+  ارزیابی نیست» in Persian digits.
+- `v2-A-1280-en.png` — A desktop EN: the same one-block lean, small and
+  unhurried, with the dotted level line making the modest tilt obvious
+  and the C12 banner sentence above.
+- `v2-A-1280-fa.png` — A desktop FA: the mirrored desktop lean — block
+  left, dashed slot right — «تمایل به ضرر طلا» with Persian digits.
+- `v2-A-768-en.png` — A tablet EN: the seesaw at its 520px cap, one
+  block against an empty slot, the three unread chips in their tray.
+- `v2-A-768-fa.png` — A tablet FA: the mirrored tablet lean with the
+  unread chips tray on the right.
+- `v2-B-360-en.png` — B mobile EN: a perfectly level seesaw — two green
+  blocks stand on the For plate, two red on the Against plate, under
+  "Balanced / 2 for · 2 against".
+- `v2-B-360-fa.png` — B mobile FA: the mirrored level seesaw with «۲ به
+  نفع · ۲ به ضرر» and four compact fa blocks.
+- `v2-B-1280-en.png` — B desktop EN: the level beam through the dotted
+  reference line, two blocks per side at identical plate heights.
+- `v2-B-1280-fa.png` — B desktop FA: the mirrored level seesaw, names
+  wrapping inside their 56px blocks, «متعادل» verdict.
+- `v2-C-360-en.png` — C mobile EN: a clear lean to the left — three for
+  blocks stack on the lowered For plate while the Against plate carries
+  one dashed empty slot, "Leaning for gold / 3 for · 1 neutral", the US
+  dollar chip in the Neutral tray.
+- `v2-C-360-fa.png` — C mobile FA: the mirrored lean to the right —
+  three fa blocks lowered, empty slot raised, «۳ به نفع · ۱ خنثی».
+- `v2-C-1280-en.png` — C desktop EN: the three-block stack visibly
+  heavier, the dotted line showing exactly how far the beam has tipped.
+- `v2-C-1280-fa.png` — C desktop FA: the mirrored three-block lean with
+  the Neutral («خنثی») tray below.
+- `v2-D-360-en.png` — D mobile EN: a level seesaw with BOTH plates
+  showing dashed empty slots — nothing could be read, and the verdict
+  says so: "Can't read the conditions right now / 4 couldn't be read",
+  all four drivers as dashed tray chips.
+- `v2-D-360-fa.png` — D mobile FA: the mirrored empty seesaw, «فعلاً
+  قابل ارزیابی نیست» verdict, four dashed fa chips.
+- `v2-D-1280-en.png` — D desktop EN: the level beam and two empty slots
+  under the honesty verdict — the balance honestly says it is blind.
+- `v2-D-1280-fa.png` — D desktop FA: the mirrored empty seesaw with the
+  «قابل ارزیابی نیست» tray holding all four drivers.
+- `v2-E-360-en.png` — E mobile EN: the strongest lean — four red blocks
+  stack on the sunken Against plate while the For plate rides high with
+  its dashed slot, "Leaning against gold / 4 against".
+- `v2-E-360-fa.png` — E mobile FA: the mirrored heavy lean to the left
+  with «۴ به ضرر» and four fa blocks.
+- `v2-E-1280-en.png` — E desktop EN: the full 12° tilt — four blocks
+  weigh the right plate down to the beam end while the empty left plate
+  lifts, the dotted line making the swing unmistakable.
+- `v2-E-1280-fa.png` — E desktop FA: the mirrored full tilt, four fa
+  blocks on the lowered left plate.
+- `v2-E-768-en.png` — E tablet EN: the heavy four-block lean at the
+  520px zone cap, tray-free (all drivers read) with the price footing
+  strip below.
+- `v2-E-768-fa.png` — E tablet FA: the mirrored heavy lean with the
+  Persian-digit values «۱۰۳/۲۰» and «۲/۸۴٪».
+- `v2-G-360-en.png` — G mobile EN: a level seesaw with ONE block on
+  each plate — "Balanced / 1 for · 1 against · 2 couldn't be read" —
+  the unread pair safe in their dashed tray.
+- `v2-G-360-fa.png` — G mobile FA: the mirrored one-versus-one balance,
+  «۱ به نفع · ۱ به ضرر · ۲ قابل ارزیابی نیست».
+- `v2-G-1280-en.png` — G desktop EN: the level beam with equal single
+  stacks — the picture says "even" and the count line says why.
+- `v2-G-1280-fa.png` — G desktop FA: the mirrored even seesaw with two
+  dashed unread chips in the tray.
+
+Each sentence matches its case's data (A: 1 against + 3 unread = small
+lean + empty slot + 3 chips; B: 2v2 = level; C: 3 for = lean left/EN;
+D: 4 unread = level + both slots + 4 chips; E: 4 against = heavy lean;
+G: 1v1 + 2 unread = level + 2 chips) — no sentence claims more than its
+case shows.
+
+### 8.7 Gates (run after the v2 change)
+
+- `pnpm -r typecheck` — 6/6 clean.
+- `pnpm -r test` — all green (see §8.8 for the final counts).
+- `pnpm run lint` — 0 errors / the pre-existing 15 advisory warnings.
+- `pnpm copy:audit` — clean (no copy change in v2).
+- `pnpm --filter @currena/web build` + `node scripts/check-bundle-budget.mjs`
+  — final numbers in §8.8.
+
+### 8.8 The final gate numbers
+
+- `pnpm -r typecheck` — 6/6 packages clean.
+- `pnpm -r test` — **1,485 tests green** (core 191, scraper 67, insights
+  462, markets 13, api 237, web 515 — the balance suite grew 25 → 30).
+- `pnpm run lint` — 0 errors / 15 advisory warnings (the pre-existing
+  baseline; the seesaw adds none).
+- `pnpm copy:audit` — clean (v2 changed no copy).
+- `pnpm --filter @currena/web build` + bundle budget — entry
+  295.15 kB / 88.76 kB gz (budgets 296.00 / 89.50); Insights lazy chunk
+  **605.59 kB / 144.60 kB gz** vs the 606.00 / 144.60 budgets — all held
+  (the seesaw replaced the hanging pans inside the same chunk; gz lands
+  exactly on the budget line, raw 0.41 kB under).
