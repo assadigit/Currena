@@ -352,7 +352,20 @@ const BUDGETS = [
   // (149.92 vs 150.00 — the pill markup is highly compressible); the
   // entry chunk is untouched at 295.29/88.81 vs 296/89.5. Justified in
   // CHANGELOG §2026-10-26.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 627_000, gz: 150_000, label: 'Insights lazy chunk' },
+  // Balance v6 bump (627.00 → 632.00 raw, 150.00 → 151.00 gz,
+  // 2026-10-26 — the Iteration-4 pans directive): the factor tiles
+  // now REST ON real weighing pans hung from the beam — the drawing
+  // gains the pan assemblies (hangers + ring dots + rimmed trays +
+  // floor lines), the compact tile anatomy with its contact shadows,
+  // the "+{n} more" overflow pills under the pans, the per-side full-
+  // list sections below the assessment, and 2 new copy keys × 2
+  // locales. Measured 631.01/150.80 — raw +4.01 kB, gz +0.80 kB: the
+  // honest price of the directive's mandated markup (a connected
+  // weighing machine cannot be smaller than an abstract beam); the
+  // entry chunk is untouched at 295.29/88.81 vs 296/89.5. Justified
+  // in CHANGELOG §2026-10-26 (v6) and D-32 in
+  // docs/DECISIONS_FOR_ALI.md.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 632_000, gz: 151_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

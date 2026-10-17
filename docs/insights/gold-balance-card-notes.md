@@ -884,3 +884,104 @@ Screenshots: `docs/insights/screenshots/gold-balance/v5-iteration/`
 (24 captures + README) — before-v4 baseline, cases A–E/G/H × en/fa ×
 1280/360, the expanded H, the banner variant, both dark captures. The
 harness route was again temporary and is deleted — no test data ships.
+
+## v6 — the Iteration-4 pans directive: the factors REST ON real pans (2026-10-26)
+
+Directive: the owner's Iteration-4 work order — v5's composition
+(factors above, an abstract beam with colored endpoint dots) "does not
+convincingly communicate that the factors are the loads causing the
+balance to tilt"; the factors must be "physically supported by the
+balance pans", in a "sophisticated, minimal, editorial
+financial-dashboard" voice. This SUPERSEDES the v5 layout instruction
+(factors above the beam): the pans now hang BELOW the beam and carry
+the factor tiles themselves.
+
+- **The stage (one fixed-height relative box, max-w-[640px]):** 240px
+  ≥ `sm:` / 260px below, a container-type:inline-size size context.
+  In paint order: the dotted level reference (behind everything, wider
+  than the beam — v2 §5.3 kept) → the pan grid at the fixed pan-top
+  offset 80px (z-1, the interactive layer) → the beam zone (z-2,
+  pointer-transparent, painted over the hanger tops so each bead caps
+  its suspension lines). All geometry is CSS percentages + cqw — no
+  SVG viewBox, no ResizeObserver, no runtime measurement.
+- **The machine per side:** a 12px-tall tapered beam rotating about
+  the compact hub (16px) + keystone (30×13) pivot; a 13px accent bead
+  terminating each end (green for / red against — the side marker
+  where the hangers meet the beam); TWO 2px suspension lines splaying
+  ±24px over a 36px hang from the bead down to the pan's top edge,
+  each capped with a 4px junction "ring" dot; a SHALLOW PAN (92% of
+  its 50% column, 88px ≥ sm / 118px below): 1.5px rim, 3px floor edge
+  in the darker secondary ink, a light inner wall line (tray
+  thickness), bg-currena-soft/70 (/90 in dark), a soft under-shadow.
+- **Physical coherence (the core of v6):** the beam rotates by θ
+  (`--s`), each pan assembly translates by exactly its bead's drop —
+  `--drop = 25cqw × sin(--t)` (25cqw = Lh ÷ 2 by construction: the
+  beam spans 25%–75% of the stage) — and tilts by 0.2 × θ
+  (`--pan-tilt`, ≤ 2.4°) about its top-center hang point. The hangers
+  are rigid parts of the assembly, so bead → lines → pan stay
+  connected at every angle. MEASURED: case A (4°) pan-pair and
+  bead-pair differences both 22.32px = 320×sin4°; case E (12°) both
+  66.53px = 320×sin12°; hanger tops converge at the bead centers
+  within 0.6px. `--t` is the DIRECTION-FREE physical sign (drives the
+  drops); `--s` flips for RTL so the heavy end always dips. One 500ms
+  ease transition on both the beam and the assemblies (motion-reduce:
+  none). A browser without CSS `sin()`/`cqw` degrades to the level
+  state — never a wrong direction.
+- **The tiles (the loads):** compact real buttons — direction icon +
+  full short label (never truncated) + the value (hidden below `sm:`)
+  — bottom-aligned on the pan's floor (justify-end: they REST on the
+  surface), 6px gaps, contact shadows, min-h 40px mobile / 32px ≥ sm.
+  Each tap opens the shared detail panel. The v5 full-width factor
+  columns above the beam are retired.
+- **Capacity + overflow (rule 3):** BALANCE_PAN_CAPACITY = 2 tiles
+  per pan; the rest are counted by a "+{n} more" pill (the
+  attention-tile copy keys + anatomy) hanging just UNDER the pan
+  inside the translating assembly — clearly attached to its side,
+  deliberately NOT on the pan surface so it can never read as another
+  load or a fabricated weight. The pill expands the side's full row
+  list below the assessment (56px rows, one shared panel); "Show
+  fewer" collapses it. Empty sides show their full evidence-based line
+  WITHOUT any disclosure. Nothing is silently omitted; the stage
+  geometry never depends on any count (regression-tested: the stage
+  class is byte-identical across 1-row and 6-row sides).
+- **Empty pans (rule 2):** an empty side keeps its COMPLETE pan
+  (hangers, ring dots, rim, floor) with a minimal muted marker pill
+  inside — `panEmpty` when the evaluation ran (this side simply has no
+  qualifying factors), the distinct `panUnreadable` when readable = 0.
+  The v4 five-state semantics ride unchanged in the list area below.
+- **RTL:** the pan/caption/list grids mirror with the document
+  direction (CSS grid, no mirroring transform); the for-bead uses
+  `inset-inline-start` so it always terminates the beam end above the
+  for-pan; `--s` flips sign in JS while `--t` (the drops) is
+  direction-free. NOTHING mirrors text — the source carries a
+  regression test asserting no `scaleX(-1)` exists.
+- **Copy (round-51):** 2 NEW keys — `panEmpty` /
+  `panUnreadable` (the pans' minimal interior markers), en + fa; all
+  other balance strings byte-identical to round-50. QA record:
+  docs/QA/quirks-2026-10-26-balance-v6-fa-copy.md. Manifest 2,154
+  entries, audit clean.
+- **The v6 test suite (30 tests):** the §4/§6/§13 logic suites
+  byte-identical + `signedTiltDeg`; rendered: the full structure, the
+  pan-drop CSS law (the --t/--s/--drop/25cqw expressions), capacity +
+  pill disclosure, the distinct empty/unreadable pans, the RTL sign
+  split (fa --t unchanged, --s flipped), the no-mirror source
+  guarantee, the order chain, the interactions, the merged-card
+  integration.
+- **Harness verification (route deleted before commit):** cases
+  A–H × en/fa × 1280/360/320, light + dark — all VLM scenario reviews
+  pass ("coherent machine", "factors clearly read as physical loads",
+  "clearly attached pills", mobile "no clipping"); the before/after
+  comparison verdict: "highly successful Iteration-4 implementation".
+  Zero horizontal overflow at 320px (documentElement.scrollWidth =
+  innerWidth), keyboard Enter opens the panel, zero console errors.
+  Declined from VLM critiques: steepening the 4° floor (the owner's
+  model), shrinking or removing the empty pan (the fixed-geometry and
+  complete-structure rules), hiding the level reference (the v2 §5.3
+  rule kept through v4/v5).
+- **Budget:** Insights lazy 631.01/150.80 vs the bumped 632.00/151.00
+  (raw +4.01 kB, gz +0.80 kB over v5 — the mandated markup's honest
+  price; D-32); the entry chunk untouched at 295.29/88.81.
+
+Screenshots: `docs/insights/screenshots/gold-balance/v6/` (the
+before/after comparison, the A–H × en/fa sweep, the mobile and dark
+sets, the interaction captures) + README.
