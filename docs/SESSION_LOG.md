@@ -1,3 +1,58 @@
+# SESSION_LOG — The Prices Polish: Sign Inks, Titles, Hero Glitch 2026-10-17d
+
+Branch `main` · base `ead8948` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's four-point follow-up — signed percents red/green
+("for example" a prices-board row); bigger bold titles in the prices
+board and the metal chips ("silver gold must be written much larger");
+EN capitalized ("so silver is wrong, write Silver. Be professional.");
+the glitchy hero mover line (fa rendered «… آمریکا واحد درصد ۳۰ روز
++۰/۲۵»); and the short disclaimer + «درباره این داده‌ها ↧» button
+"remove or relocate to bottom footer".
+
+### 1 · recon
+The sign-ink tokens already existed as the owner palette's
+contrast-documented pair (`--color-status-normal` Carbon Green 50 /
+`--color-status-alert` Carbon Red 60 — light+dark documented in
+index.css). The lowercase "silver" lived in `signals.metals`
+(`{ gold: 'gold', silver: 'silver' }` — chips, merged rows, collapsed
+lines, export Name column); every other EN display name audited —
+already capitalized. The glitch: HeroBlock forced «+۰٫۲۵ واحد درصد»
+(the whole `formatChange` output, number AND RTL word unit) into one
+`dir="ltr"` bdi — the bidi algorithm scattered the word: «واحد درصد»
+landed right after the name, the number drifted to the line's far end.
+The disclaimer pair = HeroBlock N2; the global Footer ALREADY carries
+the app-wide non-advice disclaimer and the page-bottom About section
+carries the full text — removal loses nothing.
+
+### 2 · implemented
+`formatChangeParts` (signed number + word-unit split; percent binds
+tight inside the island) with `formatChange` delegating to it — composed
+output byte-identical, pinned by the existing tests. HeroBlock renders
+the number in its own ltr island, the unit as the next element, and
+speaks the sign ink. `changeToneClass` applied to the four prices rows,
+the 6m/1y fact bullets (FactItem gained an optional tone) and the mover
+value. Prices-board tile names 14→18px bold primary; metal chip names
+14→20px bold primary (price stays lighter — the Task-15 decree intact).
+EN `signals.metals` capitalized. N2 removed from the hero (`onJumpAbout`
+kept — VerdictBlock's alert cards use it).
+
+### 3 · gates + deploy + verification
+Gates all green: 1,455 tests, typecheck 6/6, lint 0 errors/15 advisories,
+copy:audit clean (NO fa string changed — no manifest touch), budgets held
+(entry 295.15/88.76; Insights lazy 597.50/142.51). Deployed currena-api
+`8caff087-39fd-4026-b6ad-3274fa5ff77b`. Production: served chunks
+sha256-identical; sign colors sampled live (green rgb(36,161,72) / red
+rgb(218,30,40)) across btc/gold/silver/btc rows + fact bullets + the
+mover (+۰٫۲۵ → green); titles 18px/20px bold primary; chip "Gold"
+capitalized; the mover line reads «نرخ سیاستی فدرال رزرو آمریکا +۰٫۲۵
+واحد درصد ۳۰ روز …» in fa and "+0.25 pts 30-day" in EN; `role="note"` ×0
+at the page top; 375 scrollWidth === 375; zero page/console errors. Evidence:
+`docs/evidence/2026-10-17d-prices-polish/`.
+
+Open item (unchanged): token rotation (GitHub + Cloudflare) —
+credentials transited chat again this session.
+
+
 # SESSION_LOG — The Persian Dollar Convention 2026-10-17c
 
 Branch `main` · base `ebe1228` · runner: pnpm 10.34.5 / Node 24.21.

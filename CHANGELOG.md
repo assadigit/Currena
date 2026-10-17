@@ -5,6 +5,65 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-17d] — the prices polish: sign inks, bigger titles, the hero glitch, N2 retired
+
+The owner's four-point follow-up: signed percentages in red/green ("for
+example" a prices-board change row); bigger, bold, clear section titles
+in the prices board AND the metal chips ("silver gold must be written
+much larger"); EN titles capitalized ("so silver is wrong, write
+Silver. Be professional."); the hero's big-move line "seems glitchy"
+(the fa fed-rate mover rendered «… آمریکا واحد درصد ۳۰ روز +۰/۲۵»);
+and the short disclaimer + «درباره این داده‌ها ↧» button removed or
+relocated to the bottom.
+
+### Added (`config/display.ts`)
+
+- **`changeToneClass`** — the owner's sign inks as one helper: positive →
+  `--color-status-normal` (Carbon Green 50), negative →
+  `--color-status-alert` (Carbon Red 60), zero/absent neutral. Applied to
+  the four prices-board change rows, the 6-month/1-year fact bullets and
+  the hero mover's value.
+- **`formatChangeParts`** — the signed number and the WORD unit split:
+  percents bind tight inside the number island ('+3.63%'), word units
+  ('pts' / «واحد درصد») ride OUTSIDE as their own element.
+  `formatChange` delegates to it — its composed output is byte-identical
+  (pinned by the existing tests).
+
+### Fixed
+
+- **The hero glitch, structurally** — the big-move line forced
+  «+۰٫۲۵ واحد درصد» into one `dir="ltr"` island, and the bidi algorithm
+  scattered the RTL word unit: the line read «… آمریکا واحد درصد ۳۰ روز
+  +۰/۲۵». Now the number keeps its own ltr island and the unit rides the
+  next element: fa «نرخ سیاستی فدرال رزرو آمریکا +۰٫۲۵ واحد درصد ۳۰ روز
+  …», EN "… policy rate +0.25 pts 30-day …".
+- **EN title case** — `signals.metals` now `{ gold: 'Gold', silver:
+  'Silver' }` (chips, merged-card rows, collapsed lines, the export Name
+  column). All other EN display names audited — already capitalized.
+
+### Changed
+
+- **Titles bigger** — prices-board tile names 14→18px bold primary ink;
+  metal chip names 14→20px bold primary (the price stays the lighter,
+  quieter end of the header row — the Task-15 decree intact).
+- **N2 retired from the hero** — the short disclaimer line and the
+  about-jump button no longer sit under the hero: the page-bottom About
+  section carries the full text, the global footer already carries the
+  app-wide non-advice disclaimer, and the top nav chips still jump to
+  About. `onJumpAbout` stays (the verdict blocks' alert cards use it).
+
+### Workflow
+
+- NO fa string changed — `pnpm copy:audit` clean without a manifest
+  touch. Gates green: 1,455 tests, typecheck 6/6, lint 0 errors/15
+  advisories, budgets held (entry 295.15/88.76 gz; Insights lazy
+  597.50/142.51 gz). Deployed currena-api
+  `8caff087-39fd-4026-b6ad-3274fa5ff77b`; served chunks sha256-identical;
+  production browser-verified (sign colors sampled live, title sizes,
+  "Gold" capitalized, the mover order fixed in both locales, `role=
+  "note"` ×0 at the page top, 375 scrollWidth === 375, zero errors).
+  Evidence: `docs/evidence/2026-10-17d-prices-polish/`.
+
 ## [2026-10-17c] — the Persian dollar convention
 
 The owner's convention: "in farsi only say دلار not دلار آمریکا … only

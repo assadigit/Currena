@@ -1644,3 +1644,30 @@ the petrol/transport money row is gone while employment rate appeared.
   owner outlook sentence, fx «قدرت دلار», 375 scrollWidth === 375; EN
   regression clean; zero page/console errors.
 - **Evidence**: `docs/evidence/2026-10-17c-fa-dollar-convention/`.
+
+## Session record — 2026-10-17d: the prices polish (sign inks, titles, hero glitch, N2)
+
+- **What**: the owner's four-point follow-up — signed percents in the
+  status inks (green positive / red negative) on the prices-board rows,
+  the 6m/1y fact bullets and the hero mover; bigger bold titles
+  (prices-board names 14→18px primary, metal chip names 14→20px
+  primary); EN `signals.metals` capitalized (Gold/Silver — chips, rows,
+  collapsed lines, export column); the hero's bidi glitch fixed
+  structurally via `formatChangeParts` (the signed number keeps its ltr
+  island, the word unit «واحد درصد»/'pts' rides outside — fa reads
+  «+۰٫۲۵ واحد درصد ۳۰ روز», EN "+0.25 pts 30-day"); the hero's N2
+  disclaimer line + about-jump button retired (the bottom About section
+  keeps the full text; the global footer carries the app-wide
+  disclaimer; nav chips still jump to About). NO fa string changed.
+- **Gates pre-deploy**: copy:audit clean; full workspace tests 1,455;
+  typecheck 6/6; lint 0 errors/15 advisories; budgets held (entry
+  295.15/88.76 gz; Insights lazy 597.50/142.51 gz).
+- **Deployed**: currena-api `8caff087-39fd-4026-b6ad-3274fa5ff77b`
+  (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`).
+- **Verified live**: served chunks sha256-identical local == production;
+  sign colors sampled (green rgb(36,161,72) / red rgb(218,30,40)) on all
+  four tiles' rows + fact bullets + mover; titles 18px/20px bold
+  primary; chip "Gold" capitalized; mover order correct in fa and EN;
+  role="note" ×0 at the page top; 375 scrollWidth === 375; zero
+  page/console errors; /api/insights → 32 readings.
+- **Evidence**: `docs/evidence/2026-10-17d-prices-polish/`.

@@ -1,7 +1,30 @@
 # Currena — Next Session Brief
 
 Hand-off date: 2026-10-17 (edge-verified; see the dating note) — the
-owner's Persian dollar convention — DONE: fa says «دلار» for USD, never
+prices polish — DONE: signed percentages speak the status inks
+(positive green `--color-status-normal`, negative red
+`--color-status-alert`, zero/absent neutral) on the prices-board rows,
+the 6m/1y fact bullets and the hero mover; titles enlarged (prices-board
+tile names 18px bold primary, metal chip names 20px bold primary with
+the price staying lighter); EN `signals.metals` capitalized
+(Gold/Silver — chips, rows, collapsed lines, export Name column); the
+hero's big-move bidi glitch fixed structurally with `formatChangeParts`
+(the signed number keeps its ltr island, the word unit «واحد درصد»/'pts'
+rides outside — fa reads «+۰٫۲۵ واحد درصد ۳۰ روز», EN "+0.25 pts
+30-day"); the hero's N2 disclaimer + «درباره این داده‌ها ↧» button
+retired (the page-bottom About section keeps the full text; the global
+footer carries the app-wide non-advice disclaimer; nav chips still jump
+to About). NO fa string changed — no manifest touch. Gates green (1,455
+tests; typecheck 6/6; lint 0 errors/15 advisories; budgets held — entry
+295.15/88.76, Insights lazy 597.50/142.51). Deployed currena-api
+`8caff087-39fd-4026-b6ad-3274fa5ff77b`; production verified (sign
+colors sampled live, sizes, "Gold" capitalized, mover order correct in
+both locales, role="note" ×0 at the top, 375 scrollWidth === 375, zero
+errors). See CHANGELOG 2026-10-17d +
+docs/evidence/2026-10-17d-prices-polish/.
+
+Prior state (2026-10-17c): the owner's Persian dollar convention —
+DONE: fa says «دلار» for USD, never
 «دلار آمریکا» — the unqualified word is what Persian financial usage
 already means — with dollar nationality RESERVED to «دلار استرالیا»
 (AUD) and «دلار کانادا» (CAD). 114 tracked strings re-triaged (manifest
