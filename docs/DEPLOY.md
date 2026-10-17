@@ -83,6 +83,40 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## CURRENT DEPLOYMENT — world stock markets public restore (2026-10-18b lineage, recorded 2026-10-18c)
+
+The newest code on main is LIVE — this section records the reconciliation
+for owners reading this runbook top-down (the 2026-10-18b session
+documented its deploys in CHANGELOG + evidence README but no DEPLOY.md
+entry; this closes that gap).
+
+- **Active worker (Cloudflare-confirmed)**: currena-api
+  **`9f66a82c-d0d4-494e-a3cd-524eac3b557b`** — the Gradual Deployments API
+  shows this version at **100%** (deployment `7c2a2526`, created
+  2026-10-17T16:51:58Z, source wrangler), preceded by
+  `c476307f-4c12-4879-88b2-41cbd844ea65` (the first public-restore deploy,
+  then re-deployed after integrating remote main's PWA `sw.js` no-store fix
+  40a66f5). currena-markets untouched.
+- **What it carries** (all merged to main, all pushed): the Economic
+  Indicators redesign in the owner-trimmed scope (hero grayscale — see the
+  two entries below), the deterministic PWA update path (no-store `sw.js`
+  + `controllerchange` reload), and the world stock markets board back in
+  public mode (130e8a8 — `/api/insights/markets` 200 with 16 markets;
+  `/api/insights/fx` still hidden by design).
+- **Byte-identical proof (2026-10-18c reconciliation)**: a fresh
+  `pnpm --filter @currena/web build` of main @ `4d339b5` produces
+  `index-ChVkduNn.js` (sha256 `c06ff8db…`) + `Insights-BwhME956.js`
+  (sha256 `cbb6da44…`) — **identical hashes to the live-served chunks**,
+  so the deployment matches main exactly; nothing newer is undeployed and
+  nothing undeployed is unpushed.
+- **Re-verified live** (agent-browser, fresh context): hero icons
+  `grayscale(1)` both themes, Australia-left/Global-right at 1280, colored
+  design below hero, markets section renders (16 tiles, detail panel,
+  full-table disclosure), tile rule 3 + `+3 more`/`نمایش کمتر` round-trip
+  with aria-expanded, fa RTL + Persian digits + 92 LTR islands, no
+  h-overflow at 1280/360, keyboard `/` + Escape, zero console errors.
+  Evidence: `docs/insights/screenshots/economic-indicators-redesign/final-continuation/`.
+
 ## Insights UI redesign — FINAL deploy after the owner's scope trim (2026-10-24, second entry)
 
 The owner reviewed the deployed full-grayscale release ("why did it turn

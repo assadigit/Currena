@@ -5,6 +5,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-18c] — the deploy-record reconciliation (no code change)
+
+The owner: *"It seems like you didn't push commit deploy yet."* — verified
+end-to-end that this was a **documentation gap, not a missing deploy**: every
+commit on main was pushed AND the newest code was already live; the 2026-10-18b
+session had simply recorded its deploys in CHANGELOG + its evidence README
+instead of DEPLOY.md, so the runbook's newest visible deploy entry was the
+redesign's `d93bd0ba`.
+
+- **Cloudflare-confirmed**: active currena-api version
+  `9f66a82c-d0d4-494e-a3cd-524eac3b557b` at 100% (deployment `7c2a2526`,
+  2026-10-17T16:51:58Z), preceded by `c476307f` — the public-restore lineage.
+- **Byte-identical proof**: a fresh web build of main @ `4d339b5` yields
+  `index-ChVkduNn.js` (sha256 `c06ff8db…`) + `Insights-BwhME956.js`
+  (sha256 `cbb6da44…`) — hashes identical to the live-served chunks; the
+  deployment matches main exactly.
+- **Re-verified live** (agent-browser, fresh context): hero grayscale both
+  themes, Australia-left/Global-right at 1280, markets section renders,
+  tile rule round-trip EN+fa, fa RTL + Persian digits, no h-overflow at
+  1280/360, keyboard `/` + Escape, zero console errors — evidence in
+  `docs/insights/screenshots/economic-indicators-redesign/final-continuation/`.
+- **DEPLOY.md** gains a "CURRENT DEPLOYMENT" section recording the whole
+  lineage (redesign `d93bd0ba` → PWA fix → public restore `c476307f` →
+  `9f66a82c`) so top-down readers see the true current state. No worker
+  re-deploy needed: main and production are byte-identical.
+
 ## [2026-10-18b] — the world stock markets return to public mode (the owner's directive)
 
 The owner: *"This insights page used to show World important stock
