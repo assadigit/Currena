@@ -5,6 +5,95 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-26] — the gold balance re-composed to the owner's wireframe reference (factors above, beam beneath)
+
+The owner supplied a hand-drawn reference board
+(`docs/ui-reference/gold-silver-balance-target-wireframe.png`, also delivered
+via upload) with the target composition: a concise heading + subtitle, the
+TWO OPPOSING FACTOR GROUPS at the top (supportive vs adverse columns), a
+simplified abstract balance centred BENEATH both groups with its endpoints
+visually corresponding to the columns, a compact aggregate assessment under
+the illustration, progressive disclosure for additional factors, and a mobile
+adaptation preserving the same hierarchy. Strictly scoped to the balance
+component and its factor lists — no page, provider, scoring, data or
+unrelated-card change. The tilt law (|net|/total × 12°, 4° floor, level at
+net 0 and at readable 0) is untouched; no weight, threshold or angle was
+invented to imitate the sketch's example tilt.
+
+### Changed
+
+- **The composition (BalanceScale.tsx)** — the wireframe's vertical order:
+  the concept's heading + subtitle now lead into the TWO FACTOR COLUMNS
+  (side by side ≥ `sm:`, stacked below, DOM order for → against = tab
+  order), the abstract editorial beam sits BENEATH them sharing the same
+  max-w-[640px] footprint, and the aggregate assessment follows directly
+  under the drawing. The v4 order (illustration first, lists beneath it,
+  divider-separated verdict at the end) is retired. The beam keeps v4's
+  abstract mark — one tapered beam, compact hub + 13u keystone pivot,
+  accent endpoint beads, dotted level reference — with the arm re-proportioned
+  so the beads sit exactly under the two columns' centres (Lh 336u → 260u =
+  25%/75% of the footprint; the canvas 520×104 → 520×88; the ANGLE law is
+  byte-identical, only the drawn arm is shorter).
+- **Progressive disclosure per column (new, the reference's "view all
+  factors")** — each column reveals its first 3 rows (BALANCE_LIST_REVEAL =
+  3, the attention-tile convention); beyond that a "+{n} more" pill expands
+  the list, "Show fewer" collapses it back — reusing the site's existing
+  copy keys (`ui.attentionTileMore` / `ui.showFewer`) and the tiles' pill
+  anatomy (`aria-expanded` + `aria-controls` → the column). Neither the row
+  count nor the disclosure state can affect the illustration: the zone's
+  SVG is byte-identical across 1/2/6-row cases and across expansion
+  (regression-tested).
+- **The aggregate assessment (the reference's conclusion box)** — the
+  verdict word + icon (now in the question voice, the box's focal line),
+  the count line, and the C12 banner ride together in ONE compact, centred,
+  soft box (bg-currena-soft/60, max-w-440) directly beneath the drawing —
+  replacing v4's divider-separated block.
+- **The empty side (the reference's deliberate empty states)** — the
+  evidence-based line now sits in the same soft tint block (no ring, no
+  dashed border — never a placeholder slot), keeping the column's visual
+  presence when its opposite carries rows. The five-state semantics
+  (no-qualifying-factors vs insufficient vs unavailable vs mixed vs valid)
+  are unchanged, as are all their Persian/English strings — zero copy
+  changes, zero manifest entries, audit clean.
+
+### Kept (explicitly verified)
+
+- The tilt follows the real model only: supportive dominance lowers the
+  supportive bead, adverse lowers the adverse, balanced and
+  nothing-readable stay level (all five states regression-tested; the
+  harness cases A–E/G/H re-verified by measurement: bead Δy = Lh×sin(angle)
+  with 0.0u diff at 1280 and 360).
+- RTL mirrors the whole SVG with one scaleX(-1): the for column and its
+  bead both land on the inline-end (right) side in fa, the visual rotation
+  sign flips with the mirror, Persian digits and the bidi islands render
+  correctly (DOM-measured on the harness at 1280; mobile 360 fa captured).
+- Rows stay real buttons with aria-expanded + the shared detail panel (one
+  open at a time); trays keep the neutral/unread distinction; keyboard
+  focus + Enter verified; no horizontal overflow at 320/360/768/1280.
+
+### Budget
+
+- Insights lazy chunk: 626.27/149.92 vs budgets 627.00/150.00 — the raw
+  budget bumped +0.27 kB (626.00 → 627.00, gz HELD) for the per-column
+  disclosure pills + the assessment box; documented in
+  `scripts/check-bundle-budget.mjs` and D-31. Entry chunk untouched
+  (295.29/88.81 vs 296/89.5).
+
+### Gates
+
+- typecheck 6/6 packages; 1,506 tests (web 534 — the balance suite now 31:
+  the v4 assertions re-pinned to the wireframe order + new
+  progressive-disclosure tests; insights 463; api 238; core 191; scraper
+  67; markets 13); lint 0 errors / 15 accepted advisories; copy:audit
+  clean (zero new strings — the disclosure reuses reviewed keys);
+  build + bundle budgets held. Visual loop: baseline (v4) captured →
+  implementation → desktop/mobile/dark/RTL captures → VLM design +
+  scenario critique rounds → refinements (the empty-state tint block, the
+  verdict-word hierarchy, the pill-class dedupe) → final pass clean
+  ("professional editorial data visualization", all tilt/empty/RTL states
+  verified). Evidence: `docs/insights/screenshots/gold-balance/v5-iteration/`
+  (24 captures + README).
+
 ## [2026-10-25] — the gold balance becomes the abstract editorial mark «برآیند عوامل مؤثر بر قیمت طلا» (owner Iteration-2 directive)
 
 The owner reviewed the deployed v3 classic hanging-pan balance ("a literal

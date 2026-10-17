@@ -838,3 +838,49 @@ states, the trays, the detail panel, the data flow.
 
 The harness route (`src/routes/GoldBalanceTest.tsx` + its ROUTES and
 App registrations) was temporary and is deleted — no test data ships.
+
+## v5 — the wireframe-reference re-composition (2026-10-26)
+
+Directive: the owner's reference board
+`docs/ui-reference/gold-silver-balance-target-wireframe.png` — the two
+opposing factor groups move ABOVE the drawing, the abstract balance sits
+centred beneath them, a compact aggregate assessment follows, and long
+lists progressive-disclose. The v4 abstract MARK is kept (beam + hub +
+keystone + accent beads + dotted level reference — no pans, wires or
+column); only the COMPOSITION and the arm proportion change.
+
+- **Order (top → bottom):** the heading + subtitle → the two factor
+  columns (side by side ≥ `sm:`, stacked below; for → against DOM order)
+  → the beam (SVG, sharing the columns' max-w-[640px] footprint) → the
+  soft centred assessment box (verdict + count + banner) → the shared
+  detail panel → the neutral/unread trays.
+- **Endpoint alignment (the reference's core idea):** the beads sit at
+  25%/75% of the shared footprint — exactly under the two columns'
+  centres (measured: bead centre 480 vs column centre 477 at 1280, the
+  3px residue is the grid gap; D-31 records why centre-alignment beat
+  the full-width reading of the sketch).
+- **Arm:** Lh 336u → 260u, canvas 520×104 → 520×88, pivot y 52 → 44.
+  The ANGLE law is untouched — endDrop = Lh × sin(angle) still exact
+  (0.0u diff on every harness case at 1280 and 360); only the drawn arm
+  is shorter. The swing reserve is now ±27u (the 12° max on the 260u
+  arm) with ~11u canvas clearance each side.
+- **Progressive disclosure:** BALANCE_LIST_REVEAL = 3 rows per column,
+  then "+{n} more" / "Show fewer" pills (the attention-tile copy keys
+  and anatomy, `aria-expanded` + `aria-controls` → the column). The
+  zone's SVG is byte-identical across disclosure states and row counts
+  (regression-tested; the v5 suite is 31 tests).
+- **Assessment box:** bg-currena-soft/60, max-w-[440px], centred under
+  the pivot; the verdict word in the question voice (the box's focal
+  line) over the count line (label voice, ≥14px).
+- **Empty side:** the evidence-based line in the same soft tint (no
+  ring, no dashed slot — a statement, never a placeholder). The
+  five-state semantics and every string are the v4 ones — zero copy
+  changes, zero manifest entries, audit clean.
+- **Budget:** Insights lazy 626.27/149.92 vs 627.00/150.00 — the raw
+  bumped +0.27 kB for the disclosure pills + the assessment box
+  (D-31); gz held.
+
+Screenshots: `docs/insights/screenshots/gold-balance/v5-iteration/`
+(24 captures + README) — before-v4 baseline, cases A–E/G/H × en/fa ×
+1280/360, the expanded H, the banner variant, both dark captures. The
+harness route was again temporary and is deleted — no test data ships.
