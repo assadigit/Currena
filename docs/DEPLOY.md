@@ -151,6 +151,35 @@ entry; this closes that gap).
   h-overflow at 1280/360, keyboard `/` + Escape, zero console errors.
   Evidence: `docs/insights/screenshots/economic-indicators-redesign/final-continuation/`.
 
+## CURRENT DEPLOYMENT — gold balance v3 + market lenses + the financial-asset-cards spec pack (2026-10-18d, worker 7b939901)
+
+Three concurrent sessions' work rides this deploy (merged in order):
+market lenses round-46 (0e411e6) → the financial-asset-cards spec pack
+(2026-10-24c, d952983, itself deployed as 6d6e1300 first) → the gold
+balance v3 (the owner directive 2026-10-18d, this session, c6278f6
+after two conflict-free merges of the dictionaries/CHANGELOG/manifest).
+
+- **Deployed**: currena-api **`7b939901-9779-4033-be46-98875fb4eb2b`**
+  (SITE_MODE=public intact; currena-markets untouched `0135290c`), built
+  from main @ `c6278f6`: entry `index-sbafnz6H.js`, Insights lazy
+  `Insights-DW2zP-PU.js` — 624.63 kB / 149.57 kB gz vs the 626/150
+  budgets (the spec-pack session's bump); gates re-run on the merged
+  tree: typecheck 6/6, web 533 + api 238 tests, lint 0 errors/15
+  advisories, copy:audit clean (2,147 entries).
+- **The balance v3 live** (https://currena.ir/#/insights, fresh
+  browser): SVG viewBox 520×252, beam rotate(4°) for the live state (1
+  against · 3 unread — the 4° floor), measured pan-rim difference
+  23.4px = Lh × sin(4°) exactly; the against list carries "Real yields
+  2.84%", the for side the empty-state line "No readings support gold
+  right now."; no dashed slot exists anywhere; fa RTL: the SVG mirrored
+  scaleX(-1), «تمایل به ضرر طلا», «۱ به ضرر · ۳ قابل ارزیابی نیست»,
+  «فعلاً هیچ عامل به نفع طلا دیده نمی‌شود.», the for list on the
+  right; 360px fa: 0px horizontal overflow; zero console errors and
+  zero messages across theme + locale + viewport changes.
+- **Screenshots**: `docs/insights/screenshots/gold-balance/v3-live-*.png`
+  (en 1280 light + dark, fa 1280 RTL, fa 360 RTL) + the harness set
+  `v3-<case>-<width>-<lang>.png` (cases A–H × en/fa × 360/768/1280).
+
 ## Insights UI redesign — FINAL deploy after the owner's scope trim (2026-10-24, second entry)
 
 The owner reviewed the deployed full-grayscale release ("why did it turn
