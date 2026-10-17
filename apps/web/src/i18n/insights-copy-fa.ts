@@ -1424,11 +1424,26 @@ export const insightsCopyFa: InsightsCopy = {
     goldHighYieldsWarning:
       'قیمت طلا به سقف ده‌ساله خود نزدیک است، اما نرخ بهره واقعی نیز بالاست. در گذشته، چنین ترکیبی معمولاً شرایط دشوارتری برای طلا ایجاد کرده است؛ بنابراین حتی با وجود قیمت بالا، نشانه‌های موجود کاملاً به نفع طلا نیستند.',
     // R26: واژه‌های بی‌طرف (بدون علامت درست/غلط، بدون سبز/قرمز).
-    sideSupportive: 'حمایت‌کننده است',
-    // Round 32 (owner): «علیه کار می‌کند» ترجمهٔ خوبی نیست — «در تضاد است».
-    sideAgainst: 'در تضاد با الگوی معمول',
-    sideNeutral: 'خنثی است',
-    sideUnknown: 'فعلاً قابل ارزیابی نیست',
+    // ۲۰۲۶-۱۰-۱۷e (spec مالک، docs/insights/gold-balance-card-spec.md):
+    // گروه‌های فهرست عوامل با نمودار ترازو جایگزین شدند؛ سرتیترهای قدیمی
+    // side* بازنشسته شدند. فارسی طبق §13 از واژه‌های موجود سایت استفاده
+    // می‌کند: «قابل ارزیابی نیست» (conditionState.unknown) و «خنثی»
+    // (conditionStateShort.neutral).
+    balance: {
+      sideFor: 'به نفع طلا',
+      sideAgainst: 'به ضرر طلا',
+      verdictFor: 'تمایل به نفع طلا',
+      verdictBalanced: 'متعادل',
+      verdictAgainst: 'تمایل به ضرر طلا',
+      verdictNone: 'فعلاً قابل ارزیابی نیست',
+      trayNeutral: 'خنثی',
+      trayUnread: 'قابل ارزیابی نیست',
+      countFor: '{n} به نفع',
+      countAgainst: '{n} به ضرر',
+      countNeutral: '{n} خنثی',
+      countUnread: '{n} قابل ارزیابی نیست',
+      aria: 'ترازوی طلا: {summary}. {verdict}.',
+    },
     silverOnly: 'فقط برای نقره',
     footingTitle: 'سطح قیمت',
     footingRow: '{metal}: {state}',

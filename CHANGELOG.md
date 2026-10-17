@@ -5,6 +5,69 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-17e] — the gold card's balance visual (owner spec)
+
+The owner's `docs/insights/gold-balance-card-spec.md`: the gold signals
+card's grouped driver list ("Works against" / "Sitting neutral") becomes
+a BEAM BALANCE a visitor reads in five seconds — which way the
+conditions lean for gold, and how many drivers could not be read. Built
+on the branch `feature/gold-balance-card` per spec §15.3 (not merged, not
+deployed yet).
+
+### Added
+
+- **`signals/BalanceScale.tsx`** — the reusable balance component (takes
+  a list of drivers, applied to the GOLD driver list only): the verdict
+  line (word + the owner's up/down zigzag icon + the " · "-joined count
+  line, zero parts omitted), the beam/pivot/strings graphic strip
+  (`role="img"` whose label states the result — the interactive pans are
+  siblings of it so the blocks stay real buttons), two pans of blocks
+  (`for` at the inline-start end, `against` at the inline end; heavier
+  side DOWN like a real scale; angle = |net|/total × 14° with a 3° floor
+  and a 30 px pan-drop cap whose angle is re-derived so the pans follow
+  the beam ends exactly; only the beam rotates — text stays upright;
+  500 ms ease, `motion-reduce` disables it; RTL flips the rotation
+  sign), the shared detail panel (blocks below ~900 px tap to open their
+  existing explanation sentence, one open at a time; at ≥900 px the
+  sentence lives inside the block; tray chips open it at every width),
+  and the two trays — "Neutral" (quiet chips) and "Couldn't read"
+  (dashed chips + the existing clock icon), empty trays hidden, never on
+  the beam. Pure helpers exported + unit-tested (`balanceTilt`'s tilt
+  rule, the state map, the count line, the pan columns).
+- **`signals.balance` copy** — 13 keys × 2 locales (spec §13 verbatim;
+  fa uses the existing site terms «قابل ارزیابی نیست»/«خنثی» per §13).
+  Manifest round-48 (13 NEW processed, reference = the spec); the
+  retired group headings (`sideSupportive/sideAgainst/sideNeutral/
+  sideUnknown`) removed from both dictionaries and the manifest.
+
+### Changed
+
+- **`MergedSignalsCard`** — the three grouped driver lists are replaced
+  by the balance; the C12 gold-high-yields banner rides the balance's
+  §5.2 slot (text unchanged); the Price footing strip moves below the
+  trays behind a divider (§9 — footing is not a driver and is never
+  counted); the silver-only list and the outlook chip strip untouched.
+  No signal logic, threshold, data source or explanation text changed
+  (§16); no new dependency, API call or KV access (§2.4/§2.5).
+- **Bundle budget** — the Insights lazy chunk budget bumps
+  604 → 606 kB raw / 142.8 → 144.6 kB gz: the BalanceScale component +
+  13 copy strings × 2 locales, minus the removed group markup. Measured
+  605.31 kB raw / 144.53 kB gz. Entry chunk untouched (295.15/88.76).
+
+### Verification
+
+- Gates: 1,480 tests green (+25 balance tests), typecheck 6/6, lint
+  0 errors/15 advisories, copy:audit clean, budgets held.
+- Spec §14 loop: all five tilt cases (A–E) screenshotted at ~360 px and
+  ~1280 px in EN and FA plus case A at ~768 px
+  (`docs/insights/screenshots/gold-balance/`, 24 shots incl. the live
+  production smoke via a read-only currena.ir forwarder — the live state
+  matched case A exactly: 1 against, 3 couldn't be read); no horizontal
+  scroll at 320 px; blocks/chips ≥ 44 px; tab order verdict → for →
+  against → trays → footing; Enter/Space open the panel; reduced-motion
+  kills the animation; console clean; no new network requests.
+- Full detail: `docs/insights/gold-balance-card-notes.md`.
+
 ## [2026-10-17d] — the prices polish: sign inks, bigger titles, the hero glitch, N2 retired
 
 The owner's four-point follow-up: signed percentages in red/green ("for

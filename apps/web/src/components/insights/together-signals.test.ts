@@ -88,8 +88,16 @@ describe('I17 copy parity (en ↔ fa)', () => {
     expect(sorted(Object.keys(fa.conditions))).toEqual(sorted(Object.keys(en.conditions)));
     expect(fa.conditions.industrial!.tag).toBeTypeOf('string');
     expect(sorted(tokens(fa.conditionsMet))).toEqual(sorted(tokens(en.conditionsMet)));
-    expect(sorted(tokens(fa.sideSupportive))).toEqual(sorted(tokens(en.sideSupportive)));
-    expect(sorted(tokens(fa.sideAgainst))).toEqual(sorted(tokens(en.sideAgainst)));
+    // 2026-10-17e (owner spec): the grouped driver list became the balance
+    // visual — the side labels are the balance's pan labels now; the count
+    // line and the aria label must carry the same {n}/{summary}/{verdict}
+    // tokens in both locales.
+    expect(sorted(tokens(fa.balance.countFor))).toEqual(sorted(tokens(en.balance.countFor)));
+    expect(sorted(tokens(fa.balance.countAgainst))).toEqual(sorted(tokens(en.balance.countAgainst)));
+    expect(sorted(tokens(fa.balance.countNeutral))).toEqual(sorted(tokens(en.balance.countNeutral)));
+    expect(sorted(tokens(fa.balance.countUnread))).toEqual(sorted(tokens(en.balance.countUnread)));
+    expect(sorted(tokens(fa.balance.aria))).toEqual(sorted(tokens(en.balance.aria)));
+    expect(sorted(Object.keys(fa.balance))).toEqual(sorted(Object.keys(en.balance)));
     // R7b: the collapsed per-metal summary carries the same tokens.
     expect(sorted(tokens(fa.collapsedFooting!))).toEqual(sorted(tokens(en.collapsedFooting!)));
     expect(sorted(tokens(fa.bandTop!))).toEqual(sorted(tokens(en.bandTop!)));

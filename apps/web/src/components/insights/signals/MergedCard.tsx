@@ -14,6 +14,7 @@ import type { SignalConditionReading, SignalReading } from '@currena/insights';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { formatChange, formatIndicatorValue, mergeSignals } from '../config';
+import { BalanceScale, driverStateOf, type BalanceDriver } from './BalanceScale';
 import { ConditionIcon, LeanIcon, stateToneClass } from './icons';
 import { MetalIcon, VerdictStrip } from './verdict';
 
@@ -133,6 +134,35 @@ export function MergedSignalsCard({
     });
   };
 
+  /* ---------------------------------------------------------------- *
+   * The gold card's balance visual (owner spec
+   * docs/insights/gold-balance-card-spec.md): the grouped driver list
+   * becomes a beam balance. The driver list is READ from the signal
+   * data (gold's conditions minus its own footing — footing is the
+   * price strip below the trays, never a driver, §9); the length is
+   * whatever the evaluator produces, never hard-coded. The explanation
+   * sentences, the values and the banner below are the card's existing
+   * copy, unchanged.
+   * ---------------------------------------------------------------- */
+  const balanceValueText = (inputs: readonly IndicatorId[]): string | null => {
+    const parts: string[] = [];
+    for (const id of inputs) {
+      const r = byId.get(id);
+      if (r === undefined || r.value === null) continue;
+      parts.push(formatIndicatorValue(id, r.value, numberLocale, copy.units));
+    }
+    return parts.length > 0 ? parts.join(' · ') : null;
+  };
+  const balanceDrivers: BalanceDriver[] = gold.conditions
+    .filter((c) => c.key !== 'footing')
+    .map((c) => ({
+      key: c.key,
+      label: s.conditions[c.key].name,
+      detail: s.conditions[c.key].how,
+      valueText: balanceValueText(c.inputs),
+      state: driverStateOf(c.state),
+    }));
+
   const positionWordOf = (percentile: number | null): string | null => {
     if (percentile === null) return null;
     return percentile > 0.8 ? copy.ui.positionHigh : percentile < 0.2 ? copy.ui.positionLow : copy.ui.positionTypical;
@@ -234,96 +264,45 @@ export function MergedSignalsCard({
         numberLocale={numberLocale}
       />
 
-      {/* Step-1 audit item C12: gold near its DECADE high while real yields
-       * are also high — the one combination the checklist's separate lines
-       * cannot say by construction. Computed from the same readings (no
-       * new claim, a named interaction the backtested relationships
-       * support: high real yields raise the opportunity cost of holding
-       * gold, and buying the decade's peak price while they do has
-       * historically been difficult). */}
-      {(() => {
-        const goldReading = byId.get('gold-usd');
-        const realYield = byId.get('real-yield-10y');
-        const goldHigh = goldReading !== undefined && (goldReading.percentile10y ?? 0) >= 0.9;
-        const yieldsHigh = realYield !== undefined && (realYield.percentile10y ?? 0) >= 0.8 && realYield.value !== null && realYield.value > 0;
-        if (!goldHigh || !yieldsHigh) return null;
-        return (
-          <p className="m-0 rounded-[var(--radius-sm)] bg-currena-warning/[0.08] px-2.5 py-2 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-gold-yields-warning>
-            <bdi>{copy.signals.goldHighYieldsWarning}</bdi>
-          </p>
-        );
-      })()}
+      {/* The gold card's BALANCE (owner spec docs/insights/gold-balance-card-spec.md,
+       * §5 layout): the verdict line → the existing banner sentence (kept
+       * verbatim) → the beam/pans → the trays. Replaces the old grouped
+       * driver list (Supports / Works against / Sitting neutral). The
+       * C12 interaction note rides the banner slot unchanged. */}
+      <BalanceScale
+        drivers={balanceDrivers}
+        copy={copy}
+        numberLocale={numberLocale}
+        banner={
+          /* Step-1 audit item C12: gold near its DECADE high while real
+           * yields are also high — the one combination the balance's
+           * separate blocks cannot say by construction. Computed from
+           * the same readings (no new claim, a named interaction the
+           * backtested relationships support). */
+          (() => {
+            const goldReading = byId.get('gold-usd');
+            const realYield = byId.get('real-yield-10y');
+            const goldHigh = goldReading !== undefined && (goldReading.percentile10y ?? 0) >= 0.9;
+            const yieldsHigh =
+              realYield !== undefined && (realYield.percentile10y ?? 0) >= 0.8 && realYield.value !== null && realYield.value > 0;
+            if (!goldHigh || !yieldsHigh) return null;
+            return (
+              <p
+                className="m-0 rounded-[var(--radius-sm)] bg-currena-warning/[0.08] px-2.5 py-2 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]"
+                data-gold-yields-warning
+              >
+                <bdi>{copy.signals.goldHighYieldsWarning}</bdi>
+              </p>
+            );
+          })()
+        }
+      />
 
-      {/* The shared conditions, listed ONCE (identical states by construction).
-       * Round 22: the three state headings take the state's own ink and all
-       * five group headings share one label-size style (hierarchy + rhythm).
-       * 2026-10-16 quirk pass: each heading renders ONLY when its group has
-       * rows — an empty green "Supports" above a full "Works against" read
-       * like a rendering bug, not information (the neutral group already
-       * worked this way). */}
-      <div className="flex flex-col gap-2">
-        {merged.shared.some((c) => c.state === 'supportive') ? (
-          <>
-            <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-status-normal)]">
-              {s.sideSupportive}
-            </h4>
-            <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
-              {merged.shared
-                .filter((c) => c.state === 'supportive')
-                .map((c) => (
-                  <ConditionRow
-                    key={c.key}
-                    condition={gold.conditions.find((gc) => gc.key === c.key)!}
-                    readings={readings}
-                    copy={copy}
-                    numberLocale={numberLocale}
-                  />
-                ))}
-            </ul>
-          </>
-        ) : null}
-        {merged.shared.some((c) => c.state === 'against') ? (
-          <>
-            <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-status-alert)]">
-              {s.sideAgainst}
-            </h4>
-            <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
-              {merged.shared
-                .filter((c) => c.state === 'against')
-                .map((c) => (
-                  <ConditionRow
-                    key={c.key}
-                    condition={gold.conditions.find((gc) => gc.key === c.key)!}
-                    readings={readings}
-                    copy={copy}
-                    numberLocale={numberLocale}
-                  />
-                ))}
-            </ul>
-          </>
-        ) : null}
-        {merged.shared.some((c) => c.state === 'neutral' || c.state === 'unknown') ? (
-          <>
-            <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-status-stale)]">
-              {s.sideNeutral}
-            </h4>
-            <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
-              {merged.shared
-                .filter((c) => c.state === 'neutral' || c.state === 'unknown')
-                .map((c) => {
-                  const cond = gold.conditions.find((gc) => gc.key === c.key)!;
-                  return (
-                    <ConditionRow key={c.key} condition={cond} readings={readings} copy={copy} numberLocale={numberLocale} />
-                  );
-                })}
-            </ul>
-          </>
-        ) : null}
-      </div>
-
-      {/* Per-metal footing rows (position + speed ride here, speed only
-       * when the data exists — no "Measuring…" placeholder). */}
-      <div className="flex flex-col gap-2">
+      {/* Price footing strip (owner spec §9): the SAME content that used
+       * to sit beside the driver groups, now below the trays, separated
+       * by a clear gap and a divider line. Footing is NOT a driver — it
+       * is never counted in the balance's total/net/readable. */}
+      <div className="flex flex-col gap-2 border-t border-[var(--color-border)] pt-3">
         <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-tertiary)]">
           {s.footingTitle}
         </h4>

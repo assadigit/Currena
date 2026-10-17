@@ -2635,10 +2635,25 @@ export const insightsCopyEn = {
     goldHighYieldsWarning:
       'Gold is near its 10-year high while real yields are also high: this combination has historically been difficult for gold. The conditions work against it even at a record price.',
     // R26: neutral side words (no check/cross marks, no green/red).
-    sideSupportive: 'Supports',
-    sideAgainst: 'Works against',
-    sideNeutral: 'Sitting neutral',
-    sideUnknown: 'Cannot read right now',
+    // 2026-10-17e (owner spec docs/insights/gold-balance-card-spec.md): the
+    // grouped driver list (Supports / Works against / Sitting neutral) is
+    // REPLACED by the balance visual — the side* headings retired, the
+    // side labels now speak the balance's own pan labels (§13 verbatim).
+    balance: {
+      sideFor: 'For gold',
+      sideAgainst: 'Against gold',
+      verdictFor: 'Leaning for gold',
+      verdictBalanced: 'Balanced',
+      verdictAgainst: 'Leaning against gold',
+      verdictNone: "Can't read the conditions right now",
+      trayNeutral: 'Neutral',
+      trayUnread: "Couldn't read",
+      countFor: '{n} for',
+      countAgainst: '{n} against',
+      countNeutral: '{n} neutral',
+      countUnread: "{n} couldn't be read",
+      aria: 'Balance for gold: {summary}. {verdict}.',
+    },
     silverOnly: 'Silver only',
     footingTitle: 'Price footing',
     footingRow: '{metal}: {state}',

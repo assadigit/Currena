@@ -295,7 +295,14 @@ const BUDGETS = [
   // fixed the pre-existing Tools-panel off-screen bug) = 603.71 kB raw /
   // 142.72 kB gz measured. Justified in CHANGELOG §2026-10-16 (insights
   // full export). Entry chunk untouched (294.75/89.36 vs 296/89.5).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 604_000, gz: 142_800, label: 'Insights lazy chunk' },
+  // Gold-balance bump (604/142.8 → 606/144.6): the owner-spec balance
+  // visual on the gold signals card (docs/insights/gold-balance-card-spec.md)
+  // — the BalanceScale component (beam/pivot/pans/blocks/trays/panel, pure
+  // CSS transforms, no new dependency) + 13 copy strings × 2 locales, and
+  // the merged card's grouped driver list it replaces. Measured 605.28 kB
+  // raw / 144.51 kB gz. Justified in CHANGELOG §2026-10-17e
+  // (gold balance card). Entry chunk untouched.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 606_000, gz: 144_600, label: 'Insights lazy chunk' },
 ];
 
 function main() {
