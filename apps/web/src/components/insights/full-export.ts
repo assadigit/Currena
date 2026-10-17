@@ -639,7 +639,10 @@ export function assembleExportDoc(input: FullExportInput): ExportDoc {
         key: 'signals',
         heading: copy.signals.title,
         columns: [FLAT.name, FLAT.status, FLAT.detail],
-        headers: [copy.ui.csvColName, copy.signals.verdictTitle, copy.ui.exportDetail],
+        // 2026-10-21: the header is the generic Status column — the strip's
+        // verdictTitle is the OUTLOOK heading now and the CSV row's status
+        // value is the checklist lean, so they no longer share a string.
+        headers: [copy.ui.csvColName, copy.ui.csvColStatus, copy.ui.exportDetail],
         rows: sigRows,
         lines: [copy.signals.subtitle],
         digits: 0,

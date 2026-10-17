@@ -105,7 +105,7 @@ export type {
   SignalLegEval,
 } from './connections';
 
-export { evaluateSignal, evaluateSignals } from './signals';
+export { evaluateSignal, evaluateSignals, LEAN_STRONG } from './signals';
 export type {
   SignalConditionKey,
   SignalConditionReading,

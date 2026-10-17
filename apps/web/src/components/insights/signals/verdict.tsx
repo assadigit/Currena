@@ -1,15 +1,19 @@
 /**
- * signals/verdict — Round 23's stated estimation (owner): the mechanical
+ * signals/verdict — the metals' stated outlook. Round 23's mechanical
  * tally (supportive minus against; the sign is the direction), the
  * verdict icons/artwork and the Estimation chip strip with its per-metal
- * price-history charts (rounds 26–34) (Phase: WS-4 module split of the
- * former Signals.tsx monolith — zero behavior change, code moved
- * verbatim; the shell and the merged card import these so the collapsed
- * line and the strip can never drift apart on tally semantics).
+ * price-history charts (rounds 26–34) — and, since 2026-10-21, the
+ * owner's SEVEN-STATE "Gold Market Outlook" classification
+ * (`outlookOf` + the exact bilingual sentences) replacing the old
+ * up/down/flat words that had drifted apart between locales.
+ * (Phase: WS-4 module split of the former Signals.tsx monolith; the
+ * shell and the merged card import these so the collapsed line and the
+ * strip can never drift apart on tally semantics.)
  */
 
 import type { CSSProperties } from 'react';
 import type { SignalReading } from '@currena/insights';
+import { LEAN_STRONG } from '@currena/insights';
 import { Coins } from 'lucide-react';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
@@ -17,15 +21,63 @@ import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg, indicatorIconUrl } from 
 import { formatIndicatorValue } from '../config';
 import { TREND_RANGE_COPY_KEY, TrendPanel, trendTickFormatter } from '../TrendChart';
 
-export type SignalVerdict = 'up' | 'down' | 'flat';
+/* ------------------------------------------------------------------ *
+ * The gold/silver OUTLOOK (2026-10-21 owner directive, "Gold Market
+ * Outlook — Complete State List"): SEVEN states with exact bilingual
+ * sentences, replacing the old up/down/flat tally words whose EN
+ * ("Works against") and FA («شرایط موجود با الگوی معمول هم‌خوانی ندارد»)
+ * had drifted into saying different things — the bug this fixes.
+ *
+ * The owner's state logic, mapped onto the condition tally (S supportive
+ * vs A against; gold 5 conditions, silver 6):
+ *   strong-bullish / strong-bearish — STRONG signals favor the move: the
+ *     same bar the card's lean already speaks (LEAN_STRONG = 4 conditions
+ *     on one side; ≥4 implies the majority, so no second check needed).
+ *   bullish / bearish — a majority of the directional conditions favors
+ *     the move.
+ *   mixed — the directional conditions conflict with no majority (S = A).
+ *   range-bound — no clear driver edge (the split within one) AND the
+ *     price itself consolidates: |30-day speed| < RANGE_SPEED_PCT with
+ *     the price in the typical band of its 10-year range. The owner's
+ *     distinction is kept honest: Neutral = no directional bias (all
+ *     readable conditions sit neutral); Range-Bound = the affirmative
+ *     "prices trade within a defined range, no breakout" read, which
+ *     needs the quiet-price evidence; Mixed = the indicators disagree.
+ *   neutral — readable conditions, none directional.
+ * `null` stays "nothing could be read" (every condition unreadable —
+ * verdictNone), exactly as before.
+ * ------------------------------------------------------------------ */
 
-export function verdictOf(reading: SignalReading): SignalVerdict | null {
+export type OutlookState =
+  | 'strong-bullish'
+  | 'bullish'
+  | 'neutral'
+  | 'range-bound'
+  | 'bearish'
+  | 'strong-bearish'
+  | 'mixed';
+
+/** A 30-day move under this many PERCENT is a consolidation for the metals
+ * (trending months run well above it) — half of the range-bound evidence,
+ * beside the price sitting in the typical band of its 10-year range.
+ * Percent units by construction: change30d on price rows is % (scoring). */
+export const RANGE_SPEED_PCT = 2;
+
+export function outlookOf(reading: SignalReading): OutlookState | null {
   const supportive = reading.conditions.filter((c) => c.state === 'supportive').length;
   const against = reading.conditions.filter((c) => c.state === 'against').length;
-  if (supportive + against === 0) return null; // nothing could be read
-  if (supportive > against) return 'up';
-  if (against > supportive) return 'down';
-  return 'flat';
+  const unknown = reading.conditions.filter((c) => c.state === 'unknown').length;
+  if (unknown === reading.conditions.length) return null; // nothing could be read
+  if (supportive >= LEAN_STRONG) return 'strong-bullish'; // ≥4 of ≤6 ⇒ majority
+  if (against >= LEAN_STRONG) return 'strong-bearish';
+  const rangeEvidence =
+    reading.speed !== null &&
+    Math.abs(reading.speed) < RANGE_SPEED_PCT &&
+    reading.position !== null &&
+    reading.position.band === 'typical';
+  if (rangeEvidence && Math.abs(supportive - against) <= 1) return 'range-bound';
+  if (supportive === against) return supportive > 0 ? 'mixed' : 'neutral';
+  return supportive > against ? 'bullish' : 'bearish';
 }
 
 export function VerdictIcon({
@@ -33,18 +85,22 @@ export function VerdictIcon({
   size = 28,
   desktopSize = 36,
 }: {
-  verdict: SignalVerdict;
+  verdict: OutlookState | null;
   size?: number;
   desktopSize?: number;
 }) {
   /* Round 28 (owner artwork): the metals' up/down arrows wear the owner's
    * green zigzag / red zigzag PNGs — their fixed colours match this card's
    * valence by construction (up = the holder's gain). The flat dash stays
-   * a stroke glyph in the neutral ink (there is no "flat" artwork).
+   * a stroke glyph in the neutral ink (there is no "flat" artwork); the
+   * outlook's calm states (neutral / range-bound / mixed) and the unread
+   * null share it.
    * Round 29 (owner): both grow to the strip's new scale (28 mobile /
    * 36 desktop) — the estimation is this card's answer. */
-  if (verdict === 'up') return <IconImg src={DIRECTION_UP_URL} size={size} desktopSize={desktopSize} />;
-  if (verdict === 'down') return <IconImg src={DIRECTION_DOWN_URL} size={size} desktopSize={desktopSize} />;
+  if (verdict === 'strong-bullish' || verdict === 'bullish')
+    return <IconImg src={DIRECTION_UP_URL} size={size} desktopSize={desktopSize} />;
+  if (verdict === 'strong-bearish' || verdict === 'bearish')
+    return <IconImg src={DIRECTION_DOWN_URL} size={size} desktopSize={desktopSize} />;
   const common = {
     className: 'currena-icon shrink-0',
     style: {
@@ -115,10 +171,18 @@ export function MetalIconBox({ metal }: { metal: 'gold' | 'silver' }) {
   );
 }
 
-export const verdictTone: Record<SignalVerdict, string> = {
-  up: 'text-[var(--color-status-normal)]',
-  down: 'text-[var(--color-status-alert)]',
-  flat: 'text-[var(--color-status-stale)]',
+/** The outlook's ink: the bullish family wears the normal (green) ink, the
+ * bearish family the alert (red) ink — colour never rides alone, the
+ * zigzag icon leads every sentence — and the calm no-direction states
+ * (neutral / range-bound / mixed) stay in the muted stale ink. */
+export const verdictTone: Record<OutlookState, string> = {
+  'strong-bullish': 'text-[var(--color-status-normal)]',
+  bullish: 'text-[var(--color-status-normal)]',
+  neutral: 'text-[var(--color-status-stale)]',
+  'range-bound': 'text-[var(--color-status-stale)]',
+  mixed: 'text-[var(--color-status-stale)]',
+  bearish: 'text-[var(--color-status-alert)]',
+  'strong-bearish': 'text-[var(--color-status-alert)]',
 };
 
 /* ---------------------------------------------------------------- *
@@ -195,8 +259,8 @@ export function VerdictStrip({
 }) {
   const s = copy.signals;
   const rows = [
-    { reading: gold, verdict: verdictOf(gold), price: prices.gold },
-    { reading: silver, verdict: verdictOf(silver), price: prices.silver },
+    { reading: gold, verdict: outlookOf(gold), price: prices.gold },
+    { reading: silver, verdict: outlookOf(silver), price: prices.silver },
   ];
   if (rows.every((r) => r.verdict === null)) return null;
   /* Round 31 (owner): the strip is THE answer of the whole card — "it's
@@ -204,16 +268,20 @@ export function VerdictStrip({
    * app's focal-section recipe (a brand-gold gradient field, 2px gold
    * ring, gold-tinted shadow) so the white verdict chips pop.
    * 2026-10-20 OWNER SKETCH — the chip is redrawn as an ANALYSIS card:
-   *   [ boxed artwork (start corner) · name + verdict · price (lighter) ]
+   *   [ boxed artwork (start corner) · name · price (lighter)           ]
+   *   [ the OUTLOOK sentence — its own full-width line (2026-10-21)     ]
    *   [ THE TREND — one BIG chart filling the rest of the chip           ]
    *   [ range chips · window delta                                       ]
    * ONE anatomy for mobile AND desktop (the old artwork-column-vs-chart
    * side split is gone — "do the same for mobile view"). The price rides
    * in the muted ink (it already leads the prices board; the trend is
    * the emphasis), the artwork shrinks into a small tinted box, and the
-   * chart grows to h-40/h-52. The verdict word keeps a floored two-line
-   * slot so the two desktop chips' charts start on the same baseline
-   * (the round-34 alignment rule, kept by structure). */
+   * chart grows to h-40/h-52. 2026-10-21: the verdict WORD became the
+   * outlook's full sentence and moved to its own line under the header
+   * (a sentence cannot live beside the artwork and the price at 375px);
+   * the sentence keeps a floored two-line slot so the two desktop chips'
+   * charts start on the same baseline (the round-34 alignment rule,
+   * kept by structure). */
   return (
     <div
       className="flex flex-col gap-2 rounded-[var(--radius-lg)] bg-gradient-to-b from-[var(--color-accent-gold)]/[0.16] via-[var(--color-accent-gold)]/[0.07] to-transparent p-3.5 shadow-[0_10px_34px_rgba(168,126,28,0.15)] ring-2 ring-[var(--color-accent-gold)]/45 sm:p-4 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
@@ -230,23 +298,11 @@ export function VerdictStrip({
             data-verdict-direction={verdict ?? 'none'}
             className="flex min-w-0 flex-1 flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)]"
           >
-            {/* Header: boxed artwork · name + verdict · price (lighter). */}
+            {/* Header: boxed artwork · name · price (lighter). */}
             <div className="flex items-center gap-3">
               <MetalIconBox metal={reading.metal} />
-              <span className="min-w-0 flex-1">
-                <span className="block text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-primary)]">
-                  {s.metals[reading.metal]}
-                </span>
-                <span
-                  className={`mt-0.5 inline-flex min-h-[2.5em] items-center gap-1.5 ${
-                    verdict !== null ? verdictTone[verdict] : 'text-[var(--color-status-stale)]'
-                  }`}
-                >
-                  <VerdictIcon verdict={verdict ?? 'flat'} />
-                  <span className="text-[length:var(--type-label)] font-bold leading-tight">
-                    {verdict === 'up' ? s.verdictUp : verdict === 'down' ? s.verdictDown : verdict === 'flat' ? s.verdictFlat : s.verdictNone}
-                  </span>
-                </span>
+              <span className="min-w-0 flex-1 text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-primary)]">
+                {s.metals[reading.metal]}
               </span>
               {price !== null ? (
                 <bdi className="shrink-0 whitespace-nowrap text-[length:var(--type-label)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
@@ -254,6 +310,24 @@ export function VerdictStrip({
                 </bdi>
               ) : null}
             </div>
+            {/* The outlook sentence rides its OWN full-width line between
+             * the header and the chart (2026-10-21 owner state list): a
+             * sentence cannot live in the header's narrow column next to
+             * the artwork and the price — there it wrapped into a 4-6-line
+             * staircase at 375px. Here it wraps at most twice at any
+             * width, and the floored slot keeps the two desktop chips'
+             * charts on one baseline (the round-34 alignment rule).
+             * Colour never rides alone: the zigzag icon leads it. */}
+            <span
+              className={`inline-flex min-h-[2.5em] items-center gap-1.5 ${
+                verdict !== null ? verdictTone[verdict] : 'text-[var(--color-status-stale)]'
+              }`}
+            >
+              <VerdictIcon verdict={verdict} />
+              <span className="text-[length:var(--type-label)] font-bold leading-tight">
+                {verdict !== null ? s.verdictStates[verdict][reading.metal] : s.verdictNone}
+              </span>
+            </span>
             {/* THE TREND — the big chart fills the rest of the chip. */}
             <div
               data-verdict-chart={reading.metal}

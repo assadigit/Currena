@@ -2563,14 +2563,56 @@ export const insightsCopyEn = {
       'mostly-unsupportive': 'mostly unsupportive',
     },
     metals: { gold: 'gold', silver: 'silver' },
-    // Step-1 audit item G1: the strip states the CONDITION tally — "will
-    // go up / will go down" was a forecast and contradicted the page's own
-    // "conditions, not forecasts" line. Supports / Works against only.
-    verdictTitle: 'Conditions right now',
-    verdictUp: 'Supports',
-    verdictDown: 'Works against',
-    verdictFlat: 'Mixed',
+    // 2026-10-21 (owner, "Gold Market Outlook — Complete State List"): the
+    // strip speaks SEVEN outlook states, each with its own authored
+    // sentence — the old verdictUp/Down/Flat words are retired because EN
+    // ("Works against") and the fa sentence had drifted into saying
+    // different things. "Signs point to…" keeps the page's
+    // conditions-not-forecasts contract. The gold sentences are the
+    // owner's verbatim; silver mirrors them.
+    verdictTitle: 'Outlook',
     verdictNone: 'Cannot read yet',
+    verdictStates: {
+      'strong-bullish': {
+        gold: 'Signs point to a potential significant rise in gold prices.',
+        silver: 'Signs point to a potential significant rise in silver prices.',
+      },
+      bullish: {
+        gold: 'Signs point to a potential rise in gold prices.',
+        silver: 'Signs point to a potential rise in silver prices.',
+      },
+      neutral: {
+        gold: 'Signs point to a neutral outlook for gold prices.',
+        silver: 'Signs point to a neutral outlook for silver prices.',
+      },
+      'range-bound': {
+        gold: 'Signs point to gold prices trading within a defined range.',
+        silver: 'Signs point to silver prices trading within a defined range.',
+      },
+      bearish: {
+        gold: 'Signs point to a potential decline in gold prices.',
+        silver: 'Signs point to a potential decline in silver prices.',
+      },
+      'strong-bearish': {
+        gold: 'Signs point to a potential significant decline in gold prices.',
+        silver: 'Signs point to a potential significant decline in silver prices.',
+      },
+      mixed: {
+        gold: 'Market signals for gold prices are mixed.',
+        silver: 'Market signals for silver prices are mixed.',
+      },
+    },
+    // The collapsed summary line carries the short state names; the full
+    // sentences live in the strip chips.
+    verdictStateNames: {
+      'strong-bullish': 'Strong bullish',
+      bullish: 'Bullish',
+      neutral: 'Neutral',
+      'range-bound': 'Range-bound',
+      bearish: 'Bearish',
+      'strong-bearish': 'Strong bearish',
+      mixed: 'Mixed signals',
+    },
     // Step-1 audit item C12: the one named interaction the checklist's
     // separate lines cannot say — gold at its decade high WHILE real
     // yields sit high too.
@@ -2631,10 +2673,10 @@ export const insightsCopyEn = {
     // R7b: the collapsed summary: one line per metal ("Gold: mixed, 2 of
     // 5 conditions met: price in the top 7% of the last 10 years").
     collapsedFooting: 'price in the {band} of the last 10 years',
-    // Round 24: the collapsed line gets its takeaway — the conditions
-    // tally rides the collapsed summary too (Step-1 G1: "conditions",
-    // never "estimation").
-    collapsedVerdict: 'conditions: {verdict}',
+    // Round 24: the collapsed line gets its takeaway. 2026-10-21 (owner):
+    // the takeaway names the seven-state outlook (the strip holds the
+    // full sentences).
+    collapsedVerdict: 'Outlook: {verdict}',
     bandTop: 'top {p}%',
     bandBottom: 'bottom {p}%',
     bandMid: 'the middle',
