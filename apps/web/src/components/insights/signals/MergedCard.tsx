@@ -265,12 +265,14 @@ export function MergedSignalsCard({
       />
 
       {/* The gold card's BALANCE (owner spec docs/insights/gold-balance-card-spec.md
-       * + the 2026-10-25 Iteration-2 directive + the 2026-10-26 wireframe
-       * reference): the heading + subtitle → the two opposing factor
-       * columns above → the abstract editorial beam beneath them → the
-       * overall assessment box (verdict word + count line, where the C12
-       * interaction note rides as the banner). Replaces the old grouped
-       * driver list (Supports / Works against / Sitting neutral). */}
+       * + the 2026-10-25 Iteration-2 directive + the 2026-10-26
+       * Iteration-4 pans directive): the heading + subtitle → the side
+       * captions over the pan columns → the balance with the factor
+       * tiles resting ON real pans hung from the beam → the overall
+       * assessment box (verdict word + count line, where the C12
+       * interaction note rides as the banner) → the full factor lists.
+       * Replaces the old grouped driver list (Supports / Works
+       * against / Sitting neutral). */}
       <BalanceScale
         drivers={balanceDrivers}
         copy={copy}

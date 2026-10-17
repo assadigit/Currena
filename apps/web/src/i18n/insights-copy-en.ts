@@ -2718,6 +2718,13 @@ export const insightsCopyEn = {
       countNeutral: '{n} neutral',
       countUnread: "{n} couldn't be read",
       aria: 'Balance for gold: {summary}. {verdict}.',
+      // 2026-10-26 (owner Iteration-4 directive): the pans' own minimal
+      // empty markers — panEmpty when the evaluation ran but this side
+      // has no qualifying factors, panUnreadable when nothing could be
+      // read at all (the full evidence-based lines still render in the
+      // list area below). Round-51.
+      panEmpty: 'No qualifying signals',
+      panUnreadable: 'Nothing to weigh yet',
       listEmptyFor: 'None of the factors checked shows a meaningful signal supporting gold’s price right now.',
       listEmptyAgainst: 'None of the factors checked shows a meaningful signal working against gold’s price right now.',
       listEmptyNone: 'Nothing could be read yet, so neither side has been weighed.',

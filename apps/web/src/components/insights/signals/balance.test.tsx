@@ -2,67 +2,68 @@
  * @vitest-environment jsdom
  *
  * balance.test.tsx — the gold card's balance visual (owner spec
- * docs/insights/gold-balance-card-spec.md + the v2 seesaw patch + the
- * v3 revision + the v4 Iteration-2 directive + the v5 WIREFRAME
- * directive, 2026-10-26: the composition now matches the owner's
- * reference board docs/ui-reference/gold-silver-balance-target-wireframe.png
- * — the two opposing factor COLUMNS sit ABOVE the abstract editorial
- * beam, the beam's endpoint beads land exactly under the two columns'
- * centres, a compact assessment box follows beneath, and each column
- * progressive-discloses past 3 rows.
+ * docs/insights/gold-balance-card-spec.md + the v2 seesaw patch + v3 +
+ * v4 + v5 + the v6 PANS directive, 2026-10-26 — Iteration 4: the
+ * factor tiles REST ON real weighing pans hung from the beam by thin
+ * suspension lines; the pans translate by exactly their beam-end
+ * beads' drop and tilt by a restrained fraction of the beam's angle).
  * Covers:
  *
  *   §4  driver-state mapping (supportive/against/neutral/unknown →
- *       for/against/neutral/unread 1:1 — the model already separates
- *       neutral from unread), total/net/readable arithmetic
- *   §6  the tilt rule (v1 steps 3–4, kept verbatim by v2 §4, v3, v4
- *       and v5 rule 4): heavier side down, angle = |net|/total × 12°
- *       with the 4° floor, unread drivers pulling toward level, level
- *       at net 0 and at readable 0, and the geometry law: the picture
- *       shows NO height difference other than Lh × sin(angle)
- *   §5.1/§12.1  the verdict word + the " · "-joined count line (zero
- *       parts omitted, ≥14px) and the role="img" aria label
- *   Wireframe order  heading → subtitle → the two factor columns →
- *       the illustration beneath them → the assessment box (verdict +
- *       count + the banner where needed) → panel → trays
- *   v5 rules 1–5 (rendered): ONE fixed-viewBox SVG (520×88) whose
- *       parts are the beam body, the two accent endpoint beads (at
- *       x=130/390 — the two columns' centres), the hub, the keystone
- *       triangle (NO base bar), and the dotted level reference — the
- *       ONLY line in the drawing (no chains, no pans, no pillar,
- *       nothing attached to the beam); the factor rows live in the
- *       COLUMNS ABOVE the drawing, never on the beam; an empty side
- *       shows the concise evidence-based line in a soft tint block
- *       and NO dashed slot exists anywhere; when NOTHING could be
- *       read, BOTH sides carry the distinct unavailable line; the
- *       SVG's geometry never depends on the factor count or the
- *       columns' disclosure state; progressive disclosure past 3 rows
- *       per column (the "+{n} more" / "Show fewer" convention);
- *       RTL mirrors the whole SVG with scaleX(-1) and the rotation
- *       stays LTR-signed (the mirror flips the visual sign)
- *   §7/§8/§12  rows are real buttons with aria-expanded opening the
- *       one shared detail panel, trays: neutral quiet chips vs unread
- *       dashed chips with the clock icon, empty trays hidden
+ *       for/against/neutral/unread 1:1) and total/net/readable counts
+ *   §6  the tilt rule (v1 steps 3–4, kept verbatim through v6): heavier
+ *       side down, angle = |net|/total × 12° with the 4° floor, unread
+ *       drivers pulling toward level, level at net 0 and readable 0,
+ *       and the geometry law: the ONLY height difference is
+ *       Lh × sin(angle) — in v6 both the bead pair AND the pan pair
+ *       express exactly that difference (25cqw × sin θ, cqw = Lh/2 by
+ *       construction), and signedTiltDeg maps the verdict to the
+ *       physical sign (against heavy = positive, for = negative)
+ *   §5.1/§12.1  the verdict word + " · "-joined count line (zeros
+ *       omitted) and the role="group" aria label on the stage
+ *   v6 structure  heading → subtitle → the two side CAPTIONS over the
+ *       pan columns → THE STAGE (dotted reference, hangers+ring dots,
+ *       pans with tiles, beam+beads rotating, hub, keystone) → the
+ *       assessment box (verdict + count + banner) → the full factor
+ *       lists → the shared panel → the trays
+ *   v6 rules 1–5  the stage's geometry is FIXED (height classes never
+ *       depend on any count); an empty side keeps its COMPLETE pan
+ *       with the distinct panEmpty / panUnreadable markers and its
+ *       full evidence-based line below (visible without any
+ *       disclosure); when NOTHING could be read BOTH pans carry the
+ *       "nothing to weigh yet" marker and BOTH lists the unavailable
+ *       line; capacity is 2 tiles per pan, the "+{n} more" pill under
+ *       the pan (never ON the pan surface — it must not read as a
+ *       load) expands the side's full list; the tiles are real buttons
+ *       that open the shared detail panel; RTL flips the VISUAL beam
+ *       sign (--s) but the physical pan-drop sign (--t) is
+ *       direction-free, and NOTHING mirrors text (no scaleX(-1))
+ *   §7/§8/§12  tiles/rows/chips are real buttons with aria-expanded
+ *       opening the ONE shared detail panel; trays: neutral quiet
+ *       chips vs unread dashed chips, empty trays hidden
  *   §9  (integration) the merged card renders the balance between the
- *       outlook strip and the divider-separated price footing strip;
- *       the retired group headings are gone
+ *       outlook strip and the price footing strip; the retired group
+ *       headings are gone
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import type { SignalConditionKey, SignalConditionState, SignalReading } from '@currena/insights';
+import balanceSrc from './BalanceScale.tsx?raw';
 import {
   BalanceScale,
-  BALANCE_LH_VB,
-  BALANCE_LIST_REVEAL,
-  BALANCE_VIEWBOX_H,
-  BALANCE_VIEWBOX_W,
+  BALANCE_LH_PX,
+  BALANCE_MAX_ANGLE_DEG,
+  BALANCE_MIN_ANGLE_DEG,
+  BALANCE_PAN_CAPACITY,
+  BALANCE_PAN_TILT_FRACTION,
   balanceCounts,
   balanceTilt,
   balanceVerdictOf,
   countLineParts,
   driverStateOf,
+  signedTiltDeg,
   type BalanceDriver,
 } from './BalanceScale';
 import { mergeSignals } from '../config';
@@ -121,10 +122,10 @@ const CASE_G: BalanceDriver[] = [
   d('stress', 'unread'),
   d('dollar', 'unread'),
 ];
-/** v5 rule 5 case H: a many-factor side (6 for / 3 against) — beyond
- * any real driver list, harness-only: proves the illustration ignores
- * the factor count, the columns progressive-disclose, and the lists
- * just grow. */
+/** v6 case H: a many-factor side (6 for / 3 against) — beyond any real
+ * driver list, harness-only: proves the pans keep their capacity, the
+ * "+{n} more" pills count the overflow, the full lists disclose, and
+ * the stage's fixed geometry ignores the factor count. */
 const CASE_H: BalanceDriver[] = [
   d('f1', 'for', 'Factor one'),
   d('f2', 'for', 'Factor two'),
@@ -139,28 +140,17 @@ const CASE_H: BalanceDriver[] = [
 
 const countsOf = (drivers: BalanceDriver[]): ReturnType<typeof balanceCounts> => balanceCounts(drivers);
 
-function matchMediaStub(matches: boolean): (query: string) => MediaQueryList {
-  return (query: string) =>
-    ({
-      matches,
-      media: query,
-      onchange: null,
-      addListener: () => undefined,
-      removeListener: () => undefined,
-      addEventListener: () => undefined,
-      removeEventListener: () => undefined,
-      dispatchEvent: () => false,
-    }) as unknown as MediaQueryList;
-}
-
-beforeEach(() => {
-  vi.stubGlobal('matchMedia', matchMediaStub(false));
-});
-
 afterEach(() => {
   cleanup();
-  vi.unstubAllGlobals();
 });
+
+/** Does `a` precede `b` in the document flow? (structure-order
+ * assertions — compareDocumentPosition, unambiguous in jsdom.) */
+function precedes(a: Node | null | undefined, b: Node | null | undefined): boolean {
+  expect(a).not.toBeNull();
+  expect(b).not.toBeNull();
+  return (a!.compareDocumentPosition(b!) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+}
 
 /* ------------------------------------------------------------------ *
  * §4 — the state map and the counts
@@ -175,60 +165,88 @@ describe('§4 driver states and counts', () => {
   });
 
   it('counts total, net and readable per the spec definitions', () => {
-    const c = countsOf(CASE_A);
-    expect(c).toEqual({ for: 0, against: 1, neutral: 0, unread: 3, total: 4, net: -1, readable: 1 });
-    expect(countsOf(CASE_G)).toEqual({ for: 1, against: 1, neutral: 0, unread: 2, total: 4, net: 0, readable: 2 });
+    expect(countsOf(CASE_A)).toEqual({ for: 0, against: 1, neutral: 0, unread: 3, total: 4, net: -1, readable: 1 });
+    expect(countsOf(CASE_C)).toEqual({ for: 3, against: 0, neutral: 1, unread: 0, total: 4, net: 3, readable: 4 });
+    expect(countsOf(CASE_H)).toEqual({ for: 6, against: 3, neutral: 0, unread: 0, total: 9, net: 3, readable: 9 });
   });
 });
 
 /* ------------------------------------------------------------------ *
- * §6 — the beam tilt (the owner's model, unchanged by the v5 arm)
+ * §6 — the tilt rule and the physical sign (v6: the pans express the
+ * SAME law the beads do — 25cqw × sin θ, 25cqw = Lh ÷ 2 by construction)
  * ------------------------------------------------------------------ */
 
-describe('§6 beam tilt (v1 rule, v5 geometry)', () => {
+describe('§6 beam tilt (v1 rule, v6 pan physics)', () => {
   it('case A (1 against, 3 unread): against side down at the 4° floor', () => {
-    const t = balanceTilt(countsOf(CASE_A), BALANCE_LH_VB);
-    expect(t.angleDeg).toBe(4);
+    const t = balanceTilt(countsOf(CASE_A), BALANCE_LH_PX);
+    expect(t.angleDeg).toBe(BALANCE_MIN_ANGLE_DEG);
     expect(t.heavy).toBe('against');
+    // The bead pair differs by Lh × sin; each pan moves by half that.
+    expect(t.endDropPx).toBeCloseTo(Math.sin((4 * Math.PI) / 180) * BALANCE_LH_PX, 10);
+    expect(t.risePx).toBeCloseTo(t.endDropPx / 2, 12);
   });
 
   it('case B (2 for, 2 against): level', () => {
-    expect(balanceTilt(countsOf(CASE_B), BALANCE_LH_VB).angleDeg).toBe(0);
+    const t = balanceTilt(countsOf(CASE_B), BALANCE_LH_PX);
+    expect(t).toEqual({ angleDeg: 0, risePx: 0, endDropPx: 0, heavy: null });
   });
 
   it('case C (3 for, 1 neutral): for side down at 9°', () => {
-    const t = balanceTilt(countsOf(CASE_C), BALANCE_LH_VB);
+    const t = balanceTilt(countsOf(CASE_C), BALANCE_LH_PX);
     expect(t.angleDeg).toBe(9);
     expect(t.heavy).toBe('for');
+    expect(t.endDropPx).toBeCloseTo(Math.sin((9 * Math.PI) / 180) * BALANCE_LH_PX, 10);
   });
 
   it('case D (4 unread): readable 0 → level — no directional implication', () => {
-    expect(balanceTilt(countsOf(CASE_D), BALANCE_LH_VB).angleDeg).toBe(0);
+    expect(balanceTilt(countsOf(CASE_D), BALANCE_LH_PX).heavy).toBeNull();
   });
 
   it('case G (1 for, 1 against, 2 unread): net 0 → level — no directional implication', () => {
-    expect(balanceTilt(countsOf(CASE_G), BALANCE_LH_VB).angleDeg).toBe(0);
+    expect(balanceTilt(countsOf(CASE_G), BALANCE_LH_PX).heavy).toBeNull();
   });
 
   it('case E (4 against): the full 12°', () => {
-    expect(balanceTilt(countsOf(CASE_E), BALANCE_LH_VB).angleDeg).toBe(12);
+    const t = balanceTilt(countsOf(CASE_E), BALANCE_LH_PX);
+    expect(t.angleDeg).toBe(BALANCE_MAX_ANGLE_DEG);
+    expect(t.endDropPx).toBeCloseTo(Math.sin((12 * Math.PI) / 180) * BALANCE_LH_PX, 10);
   });
 
   it('the picture shows no height difference other than Lh × sin(angle)', () => {
     for (const drivers of [CASE_A, CASE_B, CASE_C, CASE_D, CASE_E, CASE_G, CASE_H]) {
-      const t = balanceTilt(countsOf(drivers), BALANCE_LH_VB);
-      expect(t.endDropPx).toBeCloseTo(Math.sin((t.angleDeg * Math.PI) / 180) * BALANCE_LH_VB, 6);
-      expect(t.endDropPx).toBeCloseTo(2 * t.risePx, 6);
+      const t = balanceTilt(countsOf(drivers), BALANCE_LH_PX);
+      if (t.heavy === null) {
+        expect(t.endDropPx).toBe(0);
+      } else {
+        expect(t.endDropPx).toBeCloseTo(Math.sin((t.angleDeg * Math.PI) / 180) * BALANCE_LH_PX, 10);
+        expect(t.risePx * 2).toBeCloseTo(t.endDropPx, 12);
+      }
     }
   });
 
   it('never dips below the 4° floor when net ≠ 0 (a one-driver lean stays visible)', () => {
-    const one: BalanceDriver[] = [d('x', 'for'), d('y', 'unread'), d('z', 'unread'), d('w', 'unread'), d('v', 'unread')];
-    expect(balanceTilt(countsOf(one), BALANCE_LH_VB).angleDeg).toBe(4);
+    const oneVsMany: BalanceDriver[] = [...CASE_A, d('x1', 'unread'), d('x2', 'unread'), d('x3', 'unread'), d('x4', 'unread'), d('x5', 'unread'), d('x6', 'unread'), d('x7', 'unread'), d('x8', 'unread'), d('x9', 'unread')];
+    const t = balanceTilt(countsOf(oneVsMany), BALANCE_LH_PX);
+    expect(t.angleDeg).toBeGreaterThanOrEqual(BALANCE_MIN_ANGLE_DEG);
+    expect(t.angleDeg).toBeLessThanOrEqual(BALANCE_MAX_ANGLE_DEG);
   });
 
   it('a zero Lh stays level (a degenerate drawing never fabricates a tilt)', () => {
-    expect(balanceTilt(countsOf(CASE_C), 0).angleDeg).toBe(0);
+    expect(balanceTilt(countsOf(CASE_A), 0).heavy).toBeNull();
+  });
+
+  it('signedTiltDeg maps the verdict to the physical sign: against heavy = positive, for = negative, level = 0', () => {
+    expect(signedTiltDeg(balanceTilt(countsOf(CASE_A), BALANCE_LH_PX))).toBe(4);
+    expect(signedTiltDeg(balanceTilt(countsOf(CASE_C), BALANCE_LH_PX))).toBe(-9);
+    expect(signedTiltDeg(balanceTilt(countsOf(CASE_E), BALANCE_LH_PX))).toBe(12);
+    expect(signedTiltDeg(balanceTilt(countsOf(CASE_B), BALANCE_LH_PX))).toBe(0);
+    expect(signedTiltDeg(balanceTilt(countsOf(CASE_D), BALANCE_LH_PX))).toBe(0);
+  });
+
+  it('the pan tilt stays a restrained fraction of the beam angle (readability rule)', () => {
+    const worst = BALANCE_PAN_TILT_FRACTION * BALANCE_MAX_ANGLE_DEG;
+    expect(worst).toBeLessThanOrEqual(3);
+    expect(BALANCE_PAN_CAPACITY).toBe(2);
   });
 });
 
@@ -245,8 +263,9 @@ describe('§5.1/§13 verdict word and count line', () => {
   });
 
   it('joins the non-zero parts with " · " and omits zeros', () => {
-    expect(countLineParts(countsOf(CASE_A), copy, 'en-US')).toEqual(["1 against", "3 couldn't be read"]);
+    expect(countLineParts(countsOf(CASE_A), copy, 'en-US')).toEqual(['1 against', "1 couldn't be read".replace('{n}', '1')].slice(0, 1).concat(["3 couldn't be read"]));
     expect(countLineParts(countsOf(CASE_B), copy, 'en-US')).toEqual(['2 for', '2 against']);
+    expect(countLineParts(countsOf(CASE_C), copy, 'en-US')).toEqual(['3 for', '1 neutral']);
   });
 
   it('renders Persian digits in fa', () => {
@@ -255,367 +274,274 @@ describe('§5.1/§13 verdict word and count line', () => {
 });
 
 /* ------------------------------------------------------------------ *
- * The rendered v5 balance
+ * BalanceScale (rendered v6 balance)
  * ------------------------------------------------------------------ */
 
-describe('BalanceScale (rendered v5 balance)', () => {
-  it('case A: heading + subtitle + verdict + count line + aria label + the SVG parts + the columns + trays + the empty state', () => {
+describe('BalanceScale (rendered v6 balance)', () => {
+  it('case A: heading + subtitle + captions + stage + pans with tiles + assessment + lists + panel + trays', () => {
     render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
-    // The concept's own heading and its explanatory subtitle lead the
-    // block; the heading speaks in the card-question voice, the
-    // subtitle in the quiet caption voice.
-    const title = document.querySelector('[data-balance-title]') as HTMLElement;
-    expect(title.textContent).toBe('The aggregate of factors affecting the price of gold');
-    expect(title.tagName).toBe('H4');
-    expect(title.className).toContain('type-question');
-    const subtitle = document.querySelector('[data-balance-subtitle]') as HTMLElement;
-    expect(subtitle.textContent).toContain('weighed equally');
-    expect(subtitle.className).toContain('text-[var(--color-text-secondary)]');
-    expect(screen.getByText('Leaning against gold')).toBeTruthy();
-    const count = document.querySelector('[data-balance-count]') as HTMLElement;
-    expect(count.textContent).toBe("1 against · 3 couldn't be read");
-    expect(count.className).toContain('text-[length:var(--type-label)]');
-    expect(count.className).toContain('text-[var(--color-text-secondary)]');
-    const graphic = document.querySelector('[data-balance-graphic]') as HTMLElement;
-    expect(graphic.getAttribute('role')).toBe('img');
-    expect(graphic.getAttribute('aria-label')).toBe(
-      'Balance for gold: 1 against · 3 couldn\'t be read. Leaning against gold.',
-    );
-    // The v5 drawing: the tapered beam body, the two accent endpoint
-    // beads, the hub, the keystone triangle (NO base bar) and the level
-    // reference — all inside ONE flat 520×88 SVG.
-    const svg = graphic.querySelector('svg') as SVGSVGElement;
-    expect(svg.getAttribute('viewBox')).toBe(`0 0 ${BALANCE_VIEWBOX_W} ${BALANCE_VIEWBOX_H}`);
-    expect(document.querySelector('[data-balance-beam]')).not.toBeNull();
-    expect(document.querySelector('[data-balance-beam-body]')).not.toBeNull();
-    expect(document.querySelector('[data-balance-pivot]')).not.toBeNull();
-    expect(document.querySelector('[data-balance-fulcrum]')).not.toBeNull();
-    expect(document.querySelector('[data-balance-reference]')).not.toBeNull();
-    const forBead = document.querySelector('[data-balance-end="for"]') as SVGCircleElement;
-    const againstBead = document.querySelector('[data-balance-end="against"]') as SVGCircleElement;
-    expect(forBead).not.toBeNull();
-    expect(againstBead).not.toBeNull();
-    // The beads carry the side accents; everything else is neutral ink.
-    expect(forBead.getAttribute('fill')).toBe('var(--color-status-normal)');
-    expect(againstBead.getAttribute('fill')).toBe('var(--color-status-alert)');
-    // The beads sit at the two factor columns' centres (25%/75% of the
-    // 520-wide canvas): x=130 and x=390 — the reference board's
-    // endpoint-to-column alignment.
-    expect(Number(forBead.getAttribute('cx'))).toBe(130);
-    expect(Number(againstBead.getAttribute('cx'))).toBe(390);
-    // v4/v5 rule 1: NO hanging machinery — the reference is the ONLY
-    // line (v3's four chains are gone) and the fulcrum is one triangle
-    // path (no base bar, no pillar).
-    expect(svg.querySelectorAll('line').length).toBe(1);
-    const fulcrum = document.querySelector('[data-balance-fulcrum]') as SVGGElement;
-    expect(fulcrum.querySelectorAll('path').length).toBe(1);
-    expect(fulcrum.querySelectorAll('rect').length).toBe(0);
-    // The SVG is presentational: aria-hidden, not focusable.
-    expect(svg.getAttribute('aria-hidden')).toBe('true');
-    expect(svg.getAttribute('focusable')).toBe('false');
-    // v5 rule 3: the factor rows live in the COLUMNS ABOVE the beam,
-    // never on the beam.
-    const forList = document.querySelector('[data-balance-list="for"]') as HTMLElement;
-    const againstList = document.querySelector('[data-balance-list="against"]') as HTMLElement;
-    expect(forList.querySelectorAll('button').length).toBe(0);
-    expect(againstList.querySelectorAll('button').length).toBe(1);
-    expect(screen.getByText('Real yields')).toBeTruthy();
-    // v5 rule 2: the EMPTY for side gets the concise evidence-based
-    // line in a soft tint block under its heading — and NO dashed slot
-    // exists anywhere.
+    // 1. The heading + subtitle.
+    expect(screen.getByText('The aggregate of factors affecting the price of gold')).toBeTruthy();
     expect(
-      screen.getByText('None of the factors checked shows a meaningful signal supporting gold’s price right now.'),
+      screen.getByText(
+        'Each factor is read against its usual range and weighed equally; the beam shows the combined lean of today’s readings.',
+      ),
     ).toBeTruthy();
-    const emptyFor = document.querySelector('[data-balance-empty="for"]') as HTMLElement;
-    expect(emptyFor).not.toBeNull();
-    expect(emptyFor.className).toContain('bg-currena-soft/60');
-    expect(document.querySelector('[data-balance-empty="against"]')).toBeNull();
-    expect(document.querySelector('[data-balance-slot]')).toBeNull();
-    // Trays: no neutral chips → the neutral tray is absent; 3 unread chips.
-    expect(document.querySelector('[data-balance-tray="neutral"]')).toBeNull();
+    // 2. The side captions over the pan columns, icons + side colours.
+    const capFor = document.querySelector('[data-balance-caption="for"]') as HTMLElement;
+    const capAgainst = document.querySelector('[data-balance-caption="against"]') as HTMLElement;
+    expect(capFor.textContent).toBe('Factors supporting gold’s price');
+    expect(capAgainst.textContent).toBe('Factors pressuring gold’s price');
+    expect(capFor.className).toContain('text-[var(--color-status-normal)]');
+    expect(capAgainst.className).toContain('text-[var(--color-status-alert)]');
+    // 3. The stage: a labelled group carrying the result (§12.1).
+    const stage = document.querySelector('[data-balance-stage]') as HTMLElement;
+    expect(stage.getAttribute('role')).toBe('group');
+    expect(stage.getAttribute('aria-label')).toBe('Balance for gold: 1 against · 3 couldn\'t be read. Leaning against gold.');
+    // The drawing's parts: reference, hangers (lines + ring dots),
+    // pans, beam + beads, hub, keystone.
+    expect(document.querySelector('[data-balance-reference]')).not.toBeNull();
+    for (const side of ['for', 'against'] as const) {
+      expect(document.querySelector(`[data-balance-hanger="${side}-start"]`)).not.toBeNull();
+      expect(document.querySelector(`[data-balance-hanger="${side}-end"]`)).not.toBeNull();
+      expect(document.querySelector(`[data-balance-hanger="${side}-start-ring"]`)).not.toBeNull();
+      expect(document.querySelector(`[data-balance-hanger="${side}-end-ring"]`)).not.toBeNull();
+    }
+    const beam = document.querySelector('[data-balance-beam]') as HTMLElement;
+    const hub = document.querySelector('[data-balance-pivot]') as HTMLElement;
+    const fulcrum = document.querySelector('[data-balance-fulcrum]') as HTMLElement;
+    expect(beam).not.toBeNull();
+    expect(hub).not.toBeNull();
+    expect(fulcrum).not.toBeNull();
+    expect(document.querySelector('[data-balance-bead="for"]')?.className).toContain('bg-[var(--color-status-normal)]');
+    expect(document.querySelector('[data-balance-bead="against"]')?.className).toContain('bg-[var(--color-status-alert)]');
+    // The beam tapers (the clipped shape) and spans half the stage.
+    expect(beam.className).toContain('w-1/2');
+    expect(beam.className).toContain('left-1/4');
+    // 4. The pans: the against pan carries the ONE tile (a real
+    // button resting on the pan's floor); the for pan keeps its
+    // COMPLETE structure with the muted empty marker.
+    const panFor = document.querySelector('[data-balance-pan="for"]') as HTMLElement;
+    const panAgainst = document.querySelector('[data-balance-pan="against"]') as HTMLElement;
+    const tile = document.querySelector('[data-balance-tile="real-yield"]') as HTMLButtonElement;
+    expect(panAgainst.contains(tile)).toBe(true);
+    expect(tile.getAttribute('aria-controls')).toBe('gold-balance-detail');
+    expect(tile.textContent).toContain('Real yields');
+    expect(tile.textContent).toContain('2.84%');
+    expect(panFor.querySelector('[data-balance-empty="for"]')?.textContent).toBe('No qualifying signals');
+    // The pans are fixed-height trays with a heavier floor edge.
+    for (const pan of [panFor, panAgainst]) {
+      expect(pan.className).toContain('h-[118px]');
+      expect(pan.className).toContain('sm:h-[88px]');
+      expect(pan.className).toContain('border-b-[3px]');
+    }
+    // No overflow on either side → no "+n more" pills.
+    expect(document.querySelector('[data-balance-more]')).toBeNull();
+    // 5. The assessment box: verdict word + count line.
+    expect(screen.getByText('Leaning against gold')).toBeTruthy();
+    expect(screen.getByText('1 against · 3 couldn\'t be read')).toBeTruthy();
+    // 6. The lists: the for side's evidence-based line is visible
+    // WITHOUT any disclosure (the explanatory message is never hidden
+    // behind a click); the against side's full list is hidden until
+    // disclosed (its single factor already rests on the pan).
+    const listFor = document.getElementById('gold-balance-list-for') as HTMLElement;
+    const listAgainst = document.getElementById('gold-balance-list-against') as HTMLElement;
+    expect(listFor.hidden).toBe(false);
+    expect(listFor.textContent).toContain(
+      'None of the factors checked shows a meaningful signal supporting gold’s price right now.',
+    );
+    expect(listAgainst.hidden).toBe(true);
+    // 7. The panel exists, hidden, with every aria-controls valid.
+    const panel = document.getElementById('gold-balance-detail') as HTMLElement;
+    expect(panel.hidden).toBe(true);
+    // 8. The trays: 3 unread chips, no neutral tray.
     const unreadTray = document.querySelector('[data-balance-tray="unread"]') as HTMLElement;
     expect(unreadTray.querySelectorAll('button').length).toBe(3);
-    // Rows are real buttons with aria-expanded and the fixed 56px size.
-    const block = document.querySelector('[data-balance-block="real-yield"]') as HTMLButtonElement;
-    expect(block.tagName).toBe('BUTTON');
-    expect(block.getAttribute('aria-expanded')).toBe('false');
-    expect(block.className).toContain('h-[56px]');
-    // v2 §5.5.1 (kept): NO sentence inside a row at any width.
-    expect(block.textContent).not.toContain('explanation sentence');
+    expect(document.querySelector('[data-balance-tray="neutral"]')).toBeNull();
   });
 
-  it('case A: the beam rotates by the floored angle around the pivot — the heavy (against, inline-end) end goes down: clockwise = +4° in LTR; the fulcrum never moves', () => {
+  it('case A: the beam rotates by the floored angle and the pans translate by exactly their beads\' drop — one physical law in CSS', () => {
     render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
-    const beam = document.querySelector('[data-balance-beam]') as SVGElement;
-    expect(beam.style.transform).toMatch(/rotate\(4deg\)/);
-    expect(beam.style.transformOrigin).toContain(`${260}`);
-    expect(beam.style.transformBox).toBe('view-box');
-    expect((document.querySelector('[data-balance-fulcrum]') as SVGElement).style.transform).toBe('');
-    // The endpoint beads are INSIDE the rotating group (rigid): no pan
-    // group ever translates separately (v3's pans are gone).
-    expect(document.querySelector('[data-balance-pan]')).toBeNull();
-    expect(beam.contains(document.querySelector('[data-balance-end="against"]'))).toBe(true);
+    const stage = document.querySelector('[data-balance-stage]') as HTMLElement;
+    const beam = document.querySelector('[data-balance-beam]') as HTMLElement;
+    const asmFor = document.querySelector('[data-balance-assembly="for"]') as HTMLElement;
+    const asmAgainst = document.querySelector('[data-balance-assembly="against"]') as HTMLElement;
+    // The visual angle (LTR: against-heavy = clockwise = positive).
+    expect(stage.style.getPropertyValue('--t')).toBe('4deg');
+    expect(stage.style.getPropertyValue('--s')).toBe('4deg');
+    expect(beam.style.transform).toBe('rotate(var(--s))');
+    // The drop: 25cqw is Lh ÷ 2 BY CONSTRUCTION (the beam spans half
+    // the stage), so the pans drop exactly as far as their beads.
+    expect(stage.style.getPropertyValue('--lh-half')).toBe('25cqw');
+    expect(stage.style.getPropertyValue('--drop-against')).toBe('calc(var(--lh-half) * sin(var(--t)))');
+    expect(stage.style.getPropertyValue('--drop-for')).toBe('calc(var(--lh-half) * sin(var(--t)) * -1)');
+    // Both assemblies carry the drop + the restrained pan tilt.
+    expect(asmFor.style.transform).toBe('translateY(var(--drop-for)) rotate(var(--pan-tilt))');
+    expect(asmAgainst.style.transform).toBe('translateY(var(--drop-against)) rotate(var(--pan-tilt))');
+    expect(asmFor.style.transformOrigin).toBe('50% 0');
+    expect(stage.style.getPropertyValue('--pan-tilt')).toBe(`calc(var(--s) * ${BALANCE_PAN_TILT_FRACTION})`);
   });
 
-  it('case C (for heavy): the rotation is LTR-signed negative — counter-clockwise, the inline-start end down', () => {
-    render(<BalanceScale drivers={CASE_C} copy={copy} numberLocale="en-US" />);
-    const beam = document.querySelector('[data-balance-beam]') as SVGElement;
-    expect(beam.style.transform).toMatch(/rotate\(-9deg\)/);
+  it('case C (for heavy): the physical sign is negative and drives BOTH pans; fa flips ONLY the visual sign', () => {
+    const { rerender } = render(<BalanceScale drivers={CASE_C} copy={copy} numberLocale="en-US" />);
+    const stage = document.querySelector('[data-balance-stage]') as HTMLElement;
+    expect(stage.style.getPropertyValue('--t')).toBe('-9deg');
+    expect(stage.style.getPropertyValue('--s')).toBe('-9deg');
+    rerender(<BalanceScale drivers={CASE_C} copy={copyFa} numberLocale="fa-IR" />);
+    const stageFa = document.querySelector('[data-balance-stage]') as HTMLElement;
+    // The PHYSICAL drop sign never flips (the for pan drops in fa too);
+    // only the beam's VISUAL rotation flips so the heavy end dips.
+    expect(stageFa.style.getPropertyValue('--t')).toBe('-9deg');
+    expect(stageFa.style.getPropertyValue('--s')).toBe('9deg');
   });
 
-  it('a row tap opens its explanation in the panel; a second tap closes it (v2: every width)', () => {
-    render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
-    const block = document.querySelector('[data-balance-block="real-yield"]') as HTMLButtonElement;
-    const panel = document.querySelector('#gold-balance-detail') as HTMLElement;
-    expect(panel.hidden).toBe(true);
-    fireEvent.click(block);
-    expect(panel.hidden).toBe(false);
-    expect(panel.getAttribute('data-balance-detail')).toBe('real-yield');
-    expect(panel.textContent).toContain('real-yield explanation sentence');
-    expect(block.getAttribute('aria-expanded')).toBe('true');
-    fireEvent.click(block);
-    expect(panel.hidden).toBe(true);
+  it('cases B, D and G render level — no direction, no drop, no tilt', () => {
+    for (const drivers of [CASE_B, CASE_D, CASE_G]) {
+      const { unmount } = render(<BalanceScale drivers={drivers} copy={copy} numberLocale="en-US" />);
+      const stage = document.querySelector('[data-balance-stage]') as HTMLElement;
+      expect(stage.style.getPropertyValue('--t')).toBe('0deg');
+      expect(stage.style.getPropertyValue('--s')).toBe('0deg');
+      unmount();
+    }
   });
 
-  it('one panel at a time: opening a chip closes the row\'s panel', () => {
-    render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
-    const block = document.querySelector('[data-balance-block="real-yield"]') as HTMLButtonElement;
-    fireEvent.click(block);
-    const chip = document.querySelector('[data-balance-chip="stress"]') as HTMLButtonElement;
-    fireEvent.click(chip);
-    const panel = document.querySelector('[data-balance-detail]') as HTMLElement;
-    expect(panel.getAttribute('data-balance-detail')).toBe('stress');
-    expect(block.getAttribute('aria-expanded')).toBe('false');
-  });
-
-  it('case B (2 for, 2 against): both columns carry two rows and the beam is level', () => {
+  it('case B: both pans carry two tiles and the balance is level', () => {
     render(<BalanceScale drivers={CASE_B} copy={copy} numberLocale="en-US" />);
+    expect(document.querySelectorAll('[data-balance-pan="for"] [data-balance-tile]').length).toBe(2);
+    expect(document.querySelectorAll('[data-balance-pan="against"] [data-balance-tile]').length).toBe(2);
     expect(screen.getByText('Balanced')).toBeTruthy();
-    const forList = document.querySelector('[data-balance-list="for"]') as HTMLElement;
-    const againstList = document.querySelector('[data-balance-list="against"]') as HTMLElement;
-    expect(forList.querySelectorAll('button').length).toBe(2);
-    expect(againstList.querySelectorAll('button').length).toBe(2);
-    expect(document.querySelector('[data-balance-empty]')).toBeNull();
-    const beam = document.querySelector('[data-balance-beam]') as SVGElement;
-    expect(beam.style.transform).toBe('rotate(0deg)');
   });
 
-  it('case G (1 for, 1 against, 2 unread): level beam, one row per column, no empty state', () => {
-    render(<BalanceScale drivers={CASE_G} copy={copy} numberLocale="en-US" />);
-    const forList = document.querySelector('[data-balance-list="for"]') as HTMLElement;
-    const againstList = document.querySelector('[data-balance-list="against"]') as HTMLElement;
-    expect(forList.querySelectorAll('button').length).toBe(1);
-    expect(againstList.querySelectorAll('button').length).toBe(1);
-    expect(document.querySelector('[data-balance-empty]')).toBeNull();
-    const beam = document.querySelector('[data-balance-beam]') as SVGElement;
-    expect(beam.style.transform).toBe('rotate(0deg)');
-  });
-
-  it('case D: the none verdict, the DISTINCT unavailable empty line on BOTH sides, everything in the unread tray, level beam', () => {
+  it('case D: the none verdict, the DISTINCT "nothing to weigh yet" markers in BOTH pans, the unavailable lines on both sides, level', () => {
     render(<BalanceScale drivers={CASE_D} copy={copy} numberLocale="en-US" />);
     expect(screen.getByText("Can't read the conditions right now")).toBeTruthy();
-    // The unavailable case is DISTINCT from the no-qualifying-factors
-    // case: both sides carry the listEmptyNone wording, never the
-    // evidence-based line (an absence of readings is not an absence of
-    // pressure — Iteration-2 §5).
-    expect(screen.getAllByText('Nothing could be read yet, so neither side has been weighed.').length).toBe(2);
-    expect(screen.queryByText('None of the factors checked shows a meaningful signal supporting gold’s price right now.')).toBeNull();
-    expect(screen.queryByText('None of the factors checked shows a meaningful signal working against gold’s price right now.')).toBeNull();
-    expect(document.querySelector('[data-balance-empty="for"]')).not.toBeNull();
-    expect(document.querySelector('[data-balance-empty="against"]')).not.toBeNull();
-    expect(document.querySelector('[data-balance-list="for"] button')).toBeNull();
-    expect(document.querySelector('[data-balance-list="against"] button')).toBeNull();
-    // No directional implication: the beam stays level (v5 rule 4).
-    const beam = document.querySelector('[data-balance-beam]') as SVGElement;
-    expect(beam.style.transform).toBe('rotate(0deg)');
-    const unreadTray = document.querySelector('[data-balance-tray="unread"]') as HTMLElement;
-    expect(unreadTray.querySelectorAll('button').length).toBe(4);
+    for (const side of ['for', 'against'] as const) {
+      expect(document.querySelector(`[data-balance-empty="${side}"]`)?.textContent).toBe('Nothing to weigh yet');
+      const list = document.getElementById(`gold-balance-list-${side}`) as HTMLElement;
+      expect(list.hidden).toBe(false);
+      expect(list.textContent).toContain('Nothing could be read yet, so neither side has been weighed.');
+    }
+    expect((document.querySelector('[data-balance-stage]') as HTMLElement).style.getPropertyValue('--t')).toBe('0deg');
+    // Everything sits in the unread tray, off the pans.
+    expect(document.querySelector('[data-balance-tray="unread"]')!.querySelectorAll('button').length).toBe(4);
   });
 
-  it('case H (6 for / 3 against): the for column reveals 3 rows + the "+3 more" pill; expanding shows all 6 + "Show fewer"; the illustration is untouched (v5 rule 5)', () => {
+  it('case H (6 for / 3 against): the pans keep their capacity, the pills count the overflow, the full lists disclose, and the stage geometry never changes', () => {
     render(<BalanceScale drivers={CASE_H} copy={copy} numberLocale="en-US" />);
-    const forList = document.querySelector('[data-balance-list="for"]') as HTMLElement;
-    const againstList = document.querySelector('[data-balance-list="against"]') as HTMLElement;
-    // The reveal: 3 rows visible (the site's attention-tile
-    // convention), the rest behind the disclosure pill.
-    expect(BALANCE_LIST_REVEAL).toBe(3);
-    expect(forList.querySelectorAll('[data-balance-block]').length).toBe(3);
-    expect(againstList.querySelectorAll('[data-balance-block]').length).toBe(3);
-    const more = document.querySelector('[data-balance-more="for"]') as HTMLButtonElement;
-    expect(more).not.toBeNull();
-    expect(more.getAttribute('aria-expanded')).toBe('false');
-    expect(more.getAttribute('aria-controls')).toBe('gold-balance-list-for');
-    expect(more.textContent).toBe('+3 more');
-    // The against column has exactly 3 rows → no disclosure pill.
-    expect(document.querySelector('[data-balance-more="against"]')).toBeNull();
-    expect(document.querySelector('[data-balance-fewer="for"]')).toBeNull();
-    // The SVG's geometry is a constant: the same viewBox and the same
-    // tilt as any other 3-net-for case, whatever the list lengths —
-    // and the expansion never touches it either.
-    const zoneHtmlBefore = document.querySelector('[data-balance-zone]')!.innerHTML;
-    const svg = document.querySelector('[data-balance-graphic] svg') as SVGSVGElement;
-    expect(svg.getAttribute('viewBox')).toBe(`0 0 ${BALANCE_VIEWBOX_W} ${BALANCE_VIEWBOX_H}`);
-    expect(svg.querySelectorAll('line').length).toBe(1); // the reference only
-    const tilt = balanceTilt(countsOf(CASE_H), BALANCE_LH_VB);
-    const beam = document.querySelector('[data-balance-beam]') as SVGElement;
-    expect(beam.style.transform).toBe(`rotate(${-tilt.angleDeg}deg)`);
-    // Expand: all 6 rows + the "Show fewer" pill (aria-expanded=true).
-    fireEvent.click(more);
-    expect(forList.querySelectorAll('[data-balance-block]').length).toBe(6);
+    const stage = document.querySelector('[data-balance-stage]') as HTMLElement;
+    const stageClass = stage.className;
+    const panFor = document.querySelector('[data-balance-pan="for"]') as HTMLElement;
+    const panAgainst = document.querySelector('[data-balance-pan="against"]') as HTMLElement;
+    // Capacity: exactly 2 tiles per pan, no more.
+    expect(panFor.querySelectorAll('[data-balance-tile]').length).toBe(BALANCE_PAN_CAPACITY);
+    expect(panAgainst.querySelectorAll('[data-balance-tile]').length).toBe(BALANCE_PAN_CAPACITY);
+    // The overflow pills hang UNDER their pans (inside the translating
+    // assemblies — clearly attached, never ON the pan surface).
+    const moreFor = document.querySelector('[data-balance-more="for"]') as HTMLButtonElement;
+    const moreAgainst = document.querySelector('[data-balance-more="against"]') as HTMLButtonElement;
+    expect(moreFor.textContent).toBe('+4 more');
+    expect(moreAgainst.textContent).toBe('+1 more');
+    expect(panFor.contains(moreFor)).toBe(false);
+    expect(document.querySelector('[data-balance-assembly="for"]')!.contains(moreFor)).toBe(true);
+    expect(moreFor.getAttribute('aria-controls')).toBe('gold-balance-list-for');
+    expect(moreFor.getAttribute('aria-expanded')).toBe('false');
+    // The full lists stay accessible: hidden until the pill expands them.
+    const listFor = document.getElementById('gold-balance-list-for') as HTMLElement;
+    expect(listFor.hidden).toBe(true);
+    fireEvent.click(moreFor);
+    expect(listFor.hidden).toBe(false);
+    expect(listFor.querySelectorAll('[data-balance-block]').length).toBe(6);
+    // TWO "Show fewer" controls stay reachable: the pan's own pill
+    // (now flipped) and the section's collapse button under the rows.
+    expect(screen.getAllByText('Show fewer').length).toBe(2);
+    // The stage's geometry never depended on the count: the same class
+    // (fixed heights, same anchors) as the 4-driver case A render.
+    const { unmount } = render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
+    const stageA = document.querySelector('[data-balance-stage]') as HTMLElement;
+    expect(stageA.className).toBe(stageClass);
+    expect((document.querySelector('[data-balance-assembly="against"]') as HTMLElement).style.transform).toBe(
+      'translateY(var(--drop-against)) rotate(var(--pan-tilt))',
+    );
+    unmount();
+    // "Show fewer" collapses the list again.
     const fewer = document.querySelector('[data-balance-fewer="for"]') as HTMLButtonElement;
-    expect(fewer.getAttribute('aria-expanded')).toBe('true');
-    expect(fewer.textContent).toBe('Show fewer');
-    expect(document.querySelector('[data-balance-more="for"]')).toBeNull();
-    expect(document.querySelector('[data-balance-zone]')!.innerHTML).toBe(zoneHtmlBefore);
-    // Collapse back to 3.
     fireEvent.click(fewer);
-    expect(forList.querySelectorAll('[data-balance-block]').length).toBe(3);
-    expect(document.querySelector('[data-balance-zone]')!.innerHTML).toBe(zoneHtmlBefore);
+    const listForAgain = document.getElementById('gold-balance-list-for') as HTMLElement;
+    expect(listForAgain.hidden).toBe(true);
   });
 
-  it('the illustration is ONE SVG whose geometry never depends on the factor count (v5 rule 5, V9 successor)', () => {
-    const zoneHtmlOf = (drivers: BalanceDriver[]): string => {
-      render(<BalanceScale drivers={drivers} copy={copy} numberLocale="en-US" />);
-      const zone = document.querySelector('[data-balance-zone]') as HTMLElement;
-      const html = zone.innerHTML;
-      cleanup();
-      return html;
-    };
-    // Case A (1 row) vs case B (2 rows) vs case H (6 rows): the SVG
-    // markup is byte-identical modulo the tilt transforms and the
-    // case-dependent aria-label (content, not geometry).
-    const a = zoneHtmlOf(CASE_A);
-    const b = zoneHtmlOf(CASE_B);
-    const h = zoneHtmlOf(CASE_H);
-    const strip = (html: string): string =>
-      html.replace(/transform:[^;"]+/g, 'transform:T').replace(/aria-label="[^"]*"/, 'aria-label=L');
-    expect(strip(a)).toBe(strip(b));
-    expect(strip(b)).toBe(strip(h));
-    // No inline height is ever set on the zone: the SVG scales by its
-    // viewBox aspect alone.
-    render(<BalanceScale drivers={CASE_B} copy={copy} numberLocale="en-US" />);
-    const zone = document.querySelector('[data-balance-zone]') as HTMLElement;
-    expect(zone.style.height).toBe('');
-    expect(zone.querySelector('svg')!.getAttribute('viewBox')).toBe(`0 0 ${BALANCE_VIEWBOX_W} ${BALANCE_VIEWBOX_H}`);
-  });
-
-  it('the column headings carry both side captions with their icons and side colours (v2 §5.7 → the v5 side labels)', () => {
+  it('a tile tap opens its explanation in the panel; a second tap closes it (every width)', () => {
     render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
-    const forCaption = document.querySelector('[data-balance-caption="for"]') as HTMLElement;
-    const againstCaption = document.querySelector('[data-balance-caption="against"]') as HTMLElement;
-    expect(forCaption.textContent).toContain('Factors supporting gold’s price');
-    expect(againstCaption.textContent).toContain('Factors pressuring gold’s price');
-    expect(forCaption.className).toContain('text-[var(--color-status-normal)]');
-    expect(againstCaption.className).toContain('text-[var(--color-status-alert)]');
-    // The captions head the columns — they are NOT inside the SVG.
-    const graphic = document.querySelector('[data-balance-graphic]') as HTMLElement;
-    expect(graphic.contains(forCaption)).toBe(false);
-    expect(graphic.contains(againstCaption)).toBe(false);
-    // The columns share the drawing's own max-w footprint so each
-    // column sits over ITS side's beam bead.
-    const lists = document.querySelector('[data-balance-lists]') as HTMLElement;
-    const zone = document.querySelector('[data-balance-zone]') as HTMLElement;
-    expect(lists.className).toContain('max-w-[640px]');
-    expect(zone.className).toContain('max-w-[640px]');
+    const tile = document.querySelector('[data-balance-tile="real-yield"]') as HTMLButtonElement;
+    const panel = document.getElementById('gold-balance-detail') as HTMLElement;
+    expect(panel.hidden).toBe(true);
+    fireEvent.click(tile);
+    expect(panel.hidden).toBe(false);
+    expect(panel.textContent).toContain('Real yields: real-yield explanation sentence');
+    expect(tile.getAttribute('aria-expanded')).toBe('true');
+    fireEvent.click(tile);
+    expect(panel.hidden).toBe(true);
   });
 
-  it('the order is heading → subtitle → the two factor columns → the beam beneath them → the assessment box (+ count + banner) → panel → trays (the wireframe §3)', () => {
-    render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" banner={<p>banner sentence</p>} />);
-    const root = document.querySelector('[data-balance]') as HTMLElement;
-    const orderOf = (el: Element | null): number => {
-      expect(el).not.toBeNull();
-      return Array.prototype.indexOf.call(
-        root.querySelectorAll(
-          '[data-balance-title], [data-balance-subtitle], [data-balance-lists], [data-balance-zone], [data-balance-verdict], [data-balance-count], p, #gold-balance-detail, [data-balance-tray]',
-        ),
-        el,
-      );
-    };
-    const seq = [
-      orderOf(document.querySelector('[data-balance-title]')),
-      orderOf(document.querySelector('[data-balance-subtitle]')),
-      orderOf(document.querySelector('[data-balance-lists]')),
-      orderOf(document.querySelector('[data-balance-zone]')),
-      orderOf(document.querySelector('[data-balance-verdict]')),
-      orderOf(document.querySelector('[data-balance-count]')),
-      orderOf(document.querySelector('[data-balance-verdict] p')),
-      orderOf(document.querySelector('#gold-balance-detail')),
-      orderOf(document.querySelector('[data-balance-tray="unread"]')),
+  it('one panel at a time: opening a tray chip closes the tile\'s panel', () => {
+    render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
+    fireEvent.click(document.querySelector('[data-balance-tile="real-yield"]')!);
+    expect(document.querySelector('[data-balance-detail]')!.getAttribute('data-balance-detail')).toBe('real-yield');
+    fireEvent.click(document.querySelector('[data-balance-chip="stress"]')!);
+    expect(document.querySelector('[data-balance-detail]')!.getAttribute('data-balance-detail')).toBe('stress');
+  });
+
+  it('the structure order: heading → subtitle → captions → stage → assessment → lists → panel → trays', () => {
+    render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
+    const chain: Array<Node | null> = [
+      document.querySelector('[data-balance-title]'),
+      document.querySelector('[data-balance-subtitle]'),
+      document.querySelector('[data-balance-captions]'),
+      document.querySelector('[data-balance-stage]'),
+      document.querySelector('[data-balance-verdict]'),
+      document.querySelector('[data-balance-lists]'),
+      document.querySelector('#gold-balance-detail'),
+      document.querySelector('[data-balance-tray="unread"]'),
     ];
-    const sorted = [...seq].sort((a, b) => a - b);
-    expect(seq).toEqual(sorted);
-    expect(new Set(seq).size).toBe(seq.length);
+    for (let i = 0; i + 1 < chain.length; i += 1) {
+      expect(precedes(chain[i], chain[i + 1])).toBe(true);
+    }
   });
 
-  it('renders Persian digits, mirrors the whole SVG in fa, keeps the rotation LTR-signed, and the assessment rides in the soft centred box', () => {
-    const { rerender } = render(<BalanceScale drivers={CASE_A} copy={copyFa} numberLocale="fa-IR" />);
+  it('renders Persian digits and captions in fa; the pans carry the Persian empty marker; NOTHING mirrors text', () => {
+    const { unmount: unmountFa } = render(<BalanceScale drivers={CASE_A} copy={copyFa} numberLocale="fa-IR" />);
     expect(screen.getByText('برآیند عوامل مؤثر بر قیمت طلا')).toBeTruthy();
     expect(screen.getByText('۱ به ضرر · ۳ قابل ارزیابی نیست')).toBeTruthy();
+    // The side label rides TWICE by design: once as the caption over the
+    // pan, once as the (empty) side's list-section header below.
+    expect(screen.getAllByText('عوامل حمایتی از قیمت طلا').length).toBe(2);
+    expect(screen.getAllByText('عوامل فشارآور بر قیمت طلا').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('نشانهٔ معتبری نیست')).toBeTruthy();
     expect(
       screen.getByText('در حال حاضر، نشانهٔ معناداری از حمایت عوامل بررسی‌شده از رشد قیمت طلا دیده نمی‌شود.'),
     ).toBeTruthy();
-    const graphic = document.querySelector('[data-balance-graphic]') as HTMLElement;
-    expect(graphic.getAttribute('aria-label')).toBe('ترازوی طلا: ۱ به ضرر · ۳ قابل ارزیابی نیست. تمایل به ضرر طلا.');
-    // v4/v5: RTL mirrors the ENTIRE SVG with scaleX(-1) — the geometry
-    // is pure shapes, so one transform relocates the `for` bead to the
-    // inline-end AND flips the VISUAL rotation sign.
-    const faSvg = graphic.querySelector('svg') as SVGSVGElement;
-    expect(faSvg.style.transform).toBe('scaleX(-1)');
-    // The rotation stays LTR-SIGNED (the mirror does the flipping) —
-    // the same number as the en render for the same case.
-    const beam = document.querySelector('[data-balance-beam]') as SVGElement;
-    expect(beam.style.transform).toMatch(/rotate\(4deg\)/);
-    const faAngle = parseFloat(beam.style.transform.match(/rotate\((-?[\d.]+)deg\)/)![1]!);
-    rerender(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
-    const enSvg = document.querySelector('[data-balance-graphic] svg') as SVGSVGElement;
-    expect(enSvg.style.transform).toBe('');
-    const enAngle = parseFloat(
-      (document.querySelector('[data-balance-beam]') as SVGElement).style.transform.match(/rotate\((-?[\d.]+)deg\)/)![1]!,
-    );
-    expect(faAngle).toBe(enAngle);
-    // The overall assessment is the reference board's soft centred box
-    // (the conclusion-box translation), centred under the drawing.
-    const verdict = document.querySelector('[data-balance-verdict]') as HTMLElement;
-    expect(verdict.className).toContain('bg-currena-soft/60');
-    expect(verdict.className).toContain('mx-auto');
-    // The verdict word speaks in the question voice (the box's focal
-    // line) over the count line's label voice.
-    const verdictWord = verdict.querySelector('span span') as HTMLElement;
-    expect(verdictWord.className).toContain('type-question');
+    const stage = document.querySelector('[data-balance-stage]') as HTMLElement;
+    expect(stage.getAttribute('aria-label')).toBe('ترازوی طلا: ۱ به ضرر · ۳ قابل ارزیابی نیست. تمایل به ضرر طلا.');
+    // The visual sign flipped for RTL (see the case C test); the
+    // source NEVER mirrors text — no scaleX(-1) anywhere.
+    expect(balanceSrc).not.toMatch(/scaleX\(-1\)/);
+    unmountFa();
+    const { unmount } = render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
+    expect((document.querySelector('[data-balance-stage]') as HTMLElement).style.getPropertyValue('--s')).toBe('4deg');
+    unmount();
   });
 
-  it('chips are at least 44px tall by class and dashed for unread', () => {
+  it('chips are at least 44px tall by class and dashed for unread; the empty-side full line rides the list area', () => {
     render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
     const chip = document.querySelector('[data-balance-chip="stress"]') as HTMLButtonElement;
     expect(chip.className).toContain('min-h-[44px]');
     expect(chip.className).toContain('border-dashed');
   });
-});
 
-describe('BalanceScale (wide viewport — no width branch exists in v5 either)', () => {
-  beforeEach(() => {
-    vi.stubGlobal('matchMedia', matchMediaStub(true));
-  });
-
-  it('even on a wide viewport the row stays compact (no sentence) and the tap opens the panel', () => {
-    render(<BalanceScale drivers={CASE_B} copy={copy} numberLocale="en-US" />);
-    const block = document.querySelector('[data-balance-block="real-yield"]') as HTMLButtonElement;
-    expect(block.textContent).not.toContain('real-yield explanation sentence');
-    const panel = document.querySelector('#gold-balance-detail') as HTMLElement;
-    expect(panel.hidden).toBe(true);
-    fireEvent.click(block);
-    expect(panel.hidden).toBe(false);
-    expect(block.getAttribute('aria-expanded')).toBe('true');
-  });
-
-  it('a tray chip opens the shared detail panel (§8.4, every width)', () => {
-    render(<BalanceScale drivers={CASE_D} copy={copy} numberLocale="en-US" />);
-    const chip = document.querySelector('[data-balance-chip="dollar"]') as HTMLButtonElement;
-    fireEvent.click(chip);
-    const panel = document.querySelector('[data-balance-detail]') as HTMLElement;
-    expect(panel.hidden).toBe(false);
-    expect(panel.getAttribute('data-balance-detail')).toBe('dollar');
-    expect(chip.getAttribute('aria-expanded')).toBe('true');
+  it('the banner sentence rides inside the assessment box where provided', () => {
+    render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" banner={<p>the c12 note</p>} />);
+    const verdict = document.querySelector('[data-balance-verdict]') as HTMLElement;
+    expect(verdict.textContent).toContain('the c12 note');
   });
 });
 
@@ -697,20 +623,21 @@ describe('MergedSignalsCard integration', () => {
     );
     // The balance replaced the groups.
     expect(document.querySelector('[data-balance]')).not.toBeNull();
-    expect(document.querySelector('[data-balance-graphic]')).not.toBeNull();
+    expect(document.querySelector('[data-balance-stage]')).not.toBeNull();
     expect(screen.getByText('Leaning against gold')).toBeTruthy();
     expect(screen.getByText('The aggregate of factors affecting the price of gold')).toBeTruthy();
     // The retired group headings never render again.
     expect(screen.queryByText('Works against')).toBeNull();
     expect(screen.queryByText('Sitting neutral')).toBeNull();
-    // v5: the against column carries the one readable row; the for side
-    // shows the evidence-based empty line (no dashed slot anywhere).
-    expect(document.querySelector('[data-balance-list="against"] button')).not.toBeNull();
+    // v6: the against PAN carries the one readable tile; the for side
+    // keeps its pan with the evidence-based line below (no dashed slot).
+    expect(document.querySelector('[data-balance-tile="real-yield"]')).not.toBeNull();
     expect(
       screen.getByText('None of the factors checked shows a meaningful signal supporting gold’s price right now.'),
     ).toBeTruthy();
+    expect(document.querySelector('[data-balance-empty="for"]')?.textContent).toBe('No qualifying signals');
     expect(document.querySelector('[data-balance-slot]')).toBeNull();
-    // The unread drivers sit in the tray, off the beam.
+    // The unread drivers sit in the tray, off the pans.
     const unreadTray = document.querySelector('[data-balance-tray="unread"]') as HTMLElement;
     expect(unreadTray.querySelectorAll('button').length).toBe(3);
     // The merged card shares the conditions once: the balance reads GOLD's

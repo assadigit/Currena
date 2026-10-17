@@ -5,6 +5,107 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-26] — the gold balance's factors REST ON real pans (Iteration 4: the balance becomes a connected weighing machine)
+
+The owner's Iteration-4 directive: the latest v5 composition (factor
+columns above an abstract beam with colored endpoint dots) "does not
+convincingly communicate that the factors are the loads causing the
+balance to tilt". The required result: real weighing pans attached to
+the beam ends with the factor items visibly supported by the pan
+surfaces, while preserving the editorial financial-dashboard aesthetic.
+Strictly scoped to the balance component, its factor lists, the
+aggregate summary and the supporting copy — no page layout, token,
+other-card or model change. The tilt law (|net|/total × 12°, 4° floor,
+level at net 0 and at readable 0) is byte-identical; the NUMBER of
+tiles never sets the tilt, only the documented net/total ratio does.
+
+### Changed
+
+- **The drawing (BalanceScale.tsx)** — one fixed-height CSS stage
+  (240px ≥ sm / 260px below, max-w-[640px]) replacing the 520×88 SVG:
+  a weightier tapered beam (12px mid, rotating about the compact
+  hub-and-keystone pivot), accent beads terminating the beam ends, TWO
+  thin suspension lines per side splaying from the bead down to the
+  pan's top edge (with tiny junction "ring" dots), and a SHALLOW
+  RIMMED PAN per side (1.5px rim, 3px floor edge in the darker ink, an
+  inner wall line for tray thickness, soft surface tint, drop shadow).
+  The pans HANG at a fixed distance below their beam ends and are
+  rigid parts of one translating assembly.
+- **Physical coherence, pure CSS** — the beam rotates by the model's
+  angle θ (`--s`, RTL-sign-flipped), and each pan assembly translates
+  by EXACTLY its bead's drop — `25cqw × sin(--t)` (25cqw = Lh ÷ 2 by
+  construction, the beam spans half the stage; `--t` is the
+  direction-free physical sign) — and tilts by a restrained
+  0.2 × θ (≤ 2.4° at the 12° maximum) about its hang point. Measured
+  on the harness: the pan-pair and bead-pair height differences are
+  byte-equal (22.32px = 320×sin 4° at case A; 66.53px = 320×sin 12° at
+  case E) at every angle. No ResizeObserver, no runtime measurement; a
+  browser without CSS `sin()` degrades to the level state (never a
+  wrong direction).
+- **The factor tiles rest ON the pans** — compact buttons (icon + full
+  short label, never truncated + the value where space permits) sit
+  bottom-aligned on the pan's floor with a contact shadow, gapped, in
+  a fixed-height pan: they read as the loads. Each tap opens the shared
+  detail panel. The full-width v5 factor columns above the beam are
+  retired.
+- **Capacity + overflow (v6 rule 3)** — each pan shows its first
+  BALANCE_PAN_CAPACITY (2) tiles; the rest are counted by a "+{n}
+  more" pill hanging just under the pan (inside the translating
+  assembly, clearly attached to its side, deliberately NOT on the pan
+  surface so it can never read as another load or a fabricated
+  weight). The pill expands the side's full row list below the
+  assessment ("Show fewer" collapses); an empty side shows its full
+  evidence-based line WITHOUT any disclosure. Nothing is silently
+  omitted; the model still sees every driver; the stage's geometry
+  never depends on any count (regression-tested).
+- **Empty pans are deliberate (v6 rule 2)** — an empty side keeps its
+  COMPLETE pan (hangers, rim, floor) with a minimal muted marker
+  inside: `panEmpty` ("No qualifying signals" / «نشانهٔ معتبری نیست»)
+  when the evaluation ran, the distinct `panUnreadable` ("Nothing to
+  weigh yet" / «هنوز چیزی برای سنجیدن نیست») when nothing could be
+  read (readable 0). The five-state semantics of v4 are unchanged.
+- **RTL** — the pan columns, captions and list sections mirror via
+  CSS-grid direction; the for-bead uses `inset-inline-start` so it
+  always terminates the beam end above the for-pan; the beam's visual
+  rotation sign flips in JS (`--s`) while the physical drop sign
+  (`--t`) stays direction-free. Nothing mirrors text.
+- **Copy (round-51, QA record docs/QA/quirks-2026-10-26-balance-v6-fa-copy.md)** —
+  2 NEW keys (`panEmpty`, `panUnreadable`) in both locales; all other
+  strings byte-identical to round-50. Manifest 2,152 → 2,154 entries,
+  audit clean.
+
+### Budget
+
+- Insights lazy chunk 631.01/150.80 vs the bumped 632.00/151.00
+  (raw +4.01 kB, gz +0.80 kB over v5's 627.00/150.00 — the honest
+  price of the directive's mandated markup; the entry chunk untouched
+  at 295.29/88.81). Justified here and in D-32
+  (docs/DECISIONS_FOR_ALI.md).
+
+### Verified
+
+- balance.test.tsx rewritten for v6 (30 tests): the §4/§6/§13 logic
+  suites byte-identical (the tilt law, the counts, the verdict words)
+  + signedTiltDeg, the rendered structure, the pan-drop CSS law, the
+  capacity/overflow disclosure, the distinct empty/unreadable pans,
+  the RTL sign split, the no-text-mirror source guarantee, the order,
+  the interactions (tile/row/chip → one shared panel; the pill
+  expansion) and the merged-card integration.
+- On the (temporary, deleted) harness: cases A–H × en/fa ×
+  1280/360/320, both themes — pan/bead sync measured exact, zero
+  horizontal overflow (320px included), keyboard Enter opens the
+  panel, zero console errors, VLM scenario review all pass
+  ("coherent machine", "factors clearly read as physical loads";
+  its "steepen the tilt / shrink the empty pan" suggestions declined —
+  the owner's model and fixed-geometry rules).
+- Gates: typecheck 6/6; 1,505 tests (web 533); lint 0 errors / the
+  15 accepted advisories; copy:audit clean (2,154); bundle budgets
+  held (documented bump above).
+- Evidence: docs/insights/screenshots/gold-balance/v6/ (a before/after
+  comparison, the full scenario sweep, the interaction captures, dark
+  + mobile sets) + README; notes §v6 in
+  docs/insights/gold-balance-card-notes.md.
+
 ## [2026-10-26] — the gold balance re-composed to the owner's wireframe reference (factors above, beam beneath)
 
 The owner supplied a hand-drawn reference board
