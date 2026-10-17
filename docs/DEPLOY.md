@@ -83,7 +83,50 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
-## CURRENT DEPLOYMENT — the methodology-note removal (2026-10-26b, worker f9571a79)
+## CURRENT DEPLOYMENT — the balance v6 pans + the merged parallel rounds (2026-10-26c, worker 4079aed7)
+
+The owner's Iteration-4 directive is LIVE: the gold balance's factor
+tiles REST ON real weighing pans hung from the beam — one connected
+weighing machine. Pushed as 8075e10 (a merge: the v6 round + the two
+parallel prices rounds 2026-10-25b and 2026-10-26b, both riding
+beneath).
+
+- **Active worker**: currena-api **`4079aed7-1fd0-46d8-a785-98e65b2363e6`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched).
+- **What it carries**: the v6 balance (BalanceScale.tsx rewritten —
+  the CSS stage, pans, hangers, tiles, capacity/overflow pills, the
+  round-51 panEmpty/panUnreadable copy, manifest 2,168 → 2,172,
+  `copy:audit` clean) + everything from 2026-10-25b and 2026-10-26b
+  beneath it (the asset-cards polish + the methodology-note removal).
+- **Chunk proof**: the fresh 8075e10 build serves
+  `index-DqAkLpec.js` (295.29/88.81) + `Insights-DxCfnBbd.js`
+  (633.39/151.41 — budgets 635/152 held; D-32 records the merged-tree
+  bump).
+- **Verified live** (agent-browser, fresh profile with the SW purged
+  per D-29, currena.ir): the balance renders the full v6 anatomy (2
+  pans, 8 hanger elements, beam + 2 beads) with the live state (1
+  against · 3 unread → the 4° floor). The TILT LAW MEASURED ON
+  PRODUCTION: pan-pair difference = bead-pair difference = 22.32px =
+  320×sin(4°) at the 640px stage (and 10.32px = 148×sin(4°) at the
+  296px mobile stage) — the pans track their beads exactly. The
+  against pan carries the «بازده واقعی اوراق قرضه ۲٫۷۸٪» tile (the
+  tap opens the shared panel — verified), the for pan shows the
+  «نشانهٔ معتبری نیست» marker, the verdict box reads
+  «تمایل به ضرر طلا · ۱ به ضرر · ۳ قابل ارزیابی نیست» + the C12
+  banner. fa RTL: the green side on the right, Persian digits; en
+  LTR verified ("Real yields 2.78%" / "No qualifying signals" /
+  "Factors supporting gold's price"). Mobile 360: pans side by side,
+  tile legible, no horizontal overflow (scrollWidth 360 = innerWidth).
+  Zero page errors across the session. VLM review of the live
+  captures: factors-on-pans confirmed, RTL correct, "High" editorial
+  quality, no defects. Evidence:
+  `docs/insights/screenshots/gold-balance/v6/live-v6-*.png`.
+- **Gates on the deployed tree**: typecheck 6/6; lint 0 errors/15
+  accepted advisories; 1,519 tests green (web 547, the balance suite
+  30); copy:audit clean (2,172 entries); build OK; budgets held.
+
+## Previous: the methodology-note removal (2026-10-26b, worker f9571a79)
 
 The owner's follow-up directive is LIVE: the sixth expanded-detail
 section — «دربارهٔ این اعداد» ("About these numbers") and its

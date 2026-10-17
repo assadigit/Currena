@@ -25,6 +25,8 @@ test data ships). The verification numbers live in
 | `full-fa-caseH-320.png` | The narrowest supported viewport (320px, fa): no overflow |
 | `detail-en-caseE-1280.png` | The max-tilt (12°) detail: bead/hanger/pan alignment verified (pan-pair = bead-pair = 66.53px = 320×sin12°) |
 | `final-v6-caseA-en/fa-1280.png`, `final-v6-caseA-en/fa-360.png` | The final state, both locales, desktop + mobile |
+| `live-v6-en-1280.png`, `live-v6-fa-1280-rtl.png`, `live-v6-fa-360-rtl.png` | LIVE production (currena.ir, worker 4079aed7): the live state (1 against · 3 unread → 4°) — the tilt law measured on production: pan-pair = bead-pair = 22.32px = 320×sin4° at 640px (10.32px at the 296px mobile stage) |
+| `live-v6-fa-panel-open.png` | LIVE: the tile tap opens the shared detail panel (the real-yield explanation in Persian) |
 
 The measured verification numbers behind this set (pan/bead sync at
 every angle, the overflow checks, the keyboard pass, the VLM design
