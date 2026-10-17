@@ -79,6 +79,18 @@ horizontal overflow, scrim click closes; the four tiles stay compact
 component's pans re-composition rides beneath; no file overlap beyond
 the shared changelog/manifest prepend.)*
 
+**Deployed**: pushed as 99742c2 (rebased over the parallel balance-v6
+round) and live on currena-api worker `6adfb632` (SITE_MODE=public,
+bindings/cron unchanged; currena-markets untouched); serves
+index-gB3_zV9f.js + Insights-DW1SDXvu.js — the fresh build's exact
+filenames, live on both currena.ir and workers.dev. Live-verified:
+EN desktop — the right sheet opens with the five sections under the
+facts, focus trapped, Escape closes and focus returns to the trigger;
+fa RTL — «قیمت طلا», the five Persian sections, the sheet flush LEFT;
+mobile 375 fa — bottom sheet, no overflow; zero console errors. Deploy
+record: docs/DEPLOY.md §CURRENT DEPLOYMENT; live captures in
+docs/evidence/2026-10-26c-asset-cards-sidebar/.
+
 ## [2026-10-26] — the gold balance's factors REST ON real pans (Iteration 4: the balance becomes a connected weighing machine)
 
 The owner's Iteration-4 directive: the latest v5 composition (factor

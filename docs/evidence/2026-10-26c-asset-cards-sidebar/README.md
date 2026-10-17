@@ -32,3 +32,24 @@ No section content changed — the same reviewed copy, the same data paths.
 The sandbox mirror (src/components/asset-cards in the demo project)
 mirrors the same behavior with a Sheet side panel (side flips with the
 locale; Escape + focus return verified; no inline expansion).
+
+## Live verification (production, worker 6adfb632)
+
+Deployed from `99742c2` (rebased over the parallel balance-v6 round
+`2f9f4e6`); both currena-api.sedanama-ir.workers.dev and currena.ir
+serve `index-gB3_zV9f.js` + `Insights-DW1SDXvu.js` — the fresh build's
+exact filenames.
+
+| Check | Result |
+| --- | --- |
+| EN desktop 1280 | «More details» × 4, aria-haspopup=dialog, zero inline h4; the right sheet opens 440px flush inline-end, heading "Gold price", the five sections under the facts, focus trapped, body scroll locked |
+| Close + focus return | Escape closes; focus RETURNS to the «More details» trigger |
+| fa RTL desktop 1280 | «قیمت طلا» heading, the five Persian sections, the sheet flush LEFT |
+| Mobile 375 fa | bottom sheet (top ≈ 97px, full width), no horizontal overflow |
+| Console / page errors | zero |
+
+### Live captures
+
+- `live-en-panel.png` — production EN, Gold's side panel open.
+- `live-fa-panel.png` — production fa RTL, «قیمت طلا» from the left.
+- `live-fa-mobile-375.png` — production mobile 375 fa bottom sheet.
