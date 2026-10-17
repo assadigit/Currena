@@ -35,7 +35,7 @@ gauge never relies on colour alone.
 
 ## Verification
 
-- `pnpm run copy:audit` clean for the manifest (2,171 entries; the
+- `pnpm run copy:audit` clean for the manifest (2,170 entries; the
   only remaining findings are the temporary verification harness's
   two synthetic labels, which are deleted before the round's commit).
 - fa aria rendered and asserted in balance.test.tsx:

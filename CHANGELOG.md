@@ -86,9 +86,11 @@ copy key.
 - Tile text 12.48px (≥ 12px), horizontal, fa-RTL + en-LTR at
   1366/768/390; zero horizontal overflow at 390.
 - Gates: typecheck 6/6; 1,534 tests green; lint 0 errors/15 accepted
-  advisories; copy:audit clean (2,171 entries); build + budgets —
+  advisories; copy:audit clean (2,170 entries); build + budgets —
   Insights 635.18/152.06 vs the bumped 636/152.50 (D-33), entry
-  chunk untouched 295.29/88.81.
+  chunk untouched 295.29/88.81. Merged-tree re-gate with the parallel
+  2026-10-26c sidebar round: 1,536 tests green, the lazy chunk
+  measures 635.91/152.00 — still inside the bump, no further bump.
 
 ## [2026-10-26c] — the asset cards' details move to the side panel (owner directive)
 

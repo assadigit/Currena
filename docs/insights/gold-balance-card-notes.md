@@ -1073,7 +1073,7 @@ addendum supersedes the v2–v6 12°/4° presentation).
 - **Text**: 12.48px horizontal tile labels (en + fa) at 1366/768/
   390; zero horizontal overflow at 390.
 - **Gates**: typecheck 6/6; 1,534 tests; lint 0/15; copy:audit
-  clean (2,171); Insights 635.18/152.06 vs the bumped 636/152.50
+  clean (2,170); Insights 635.18/152.06 vs the bumped 636/152.50
   (D-33); entry chunk untouched.
 - Declined from VLM critiques: making the heavy pan look heavier
   (fabricated weight), greying the unavailable beam (the state

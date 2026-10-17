@@ -397,6 +397,12 @@ const BUDGETS = [
   // key × 2 locales, minus the retired CSS-var machinery. The entry
   // chunk is untouched at 295.29/88.81 vs 296/89.5. Justified in
   // CHANGELOG §2026-10-26 (v7) and D-33 in docs/DECISIONS_FOR_ALI.md.
+  // Merged-tree final (measured 635.91/152.00, 2026-10-26d — the v7
+  // beam-only round MERGED with the parallel 2026-10-26c asset-cards
+  // sidebar round above): the sidebar's PriceDetails module nets
+  // +0.73 kB raw / -0.06 kB gz against v7's 635.18/152.06, staying
+  // inside the 636/152.50 bump — no further bump. The entry chunk is
+  // untouched at 295.29/88.81.
   { pattern: /^Insights-[\w-]+\.js$/, raw: 636_000, gz: 152_500, label: 'Insights lazy chunk' },
 ];
 
