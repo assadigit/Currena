@@ -44,6 +44,17 @@ budgets held — the removed copy shrinks the Insights chunk ~1.2 kB
 (628.67 kB / 150.59 kB gz vs the 630/151 budget; entry chunk untouched at
 295.29/88.81).
 
+**Deployed**: pushed as 648f5aa (no rebase — main had not advanced) and
+live on currena-api worker `f9571a79` (SITE_MODE=public, bindings/cron
+unchanged; currena-markets untouched); serves index-CKqYpOMM.js +
+Insights-7kn32ZoI.js — the fresh build's exact filenames. Live-verified on
+currena.ir + workers.dev: en + fa RTL expanded cards show EXACTLY the
+five sections with zero occurrences of the removed heading in either
+locale, the last section paints inside the tile (element-from-point
+probe), mobile 375 no overflow, zero console errors. Deploy record:
+docs/DEPLOY.md §CURRENT DEPLOYMENT; evidence
+docs/evidence/2026-10-26b-remove-methodology-note/ (sandbox + live).
+
 ## [2026-10-26] — the gold balance re-composed to the owner's wireframe reference (factors above, beam beneath)
 
 The owner supplied a hand-drawn reference board
