@@ -70,6 +70,58 @@ was invented.
 - Screenshots: `docs/insights/screenshots/gold-balance/` — the v4 battery
   (A/B/C/D/E/G/H × en/fa × 1280/360 + 768 + dark + the banner variant) and
   the before-v3 capture.
+## [2026-10-24d] — the «جزئیات بیشتر» white-space fix (the owner's post-deploy report; rebased over the 2026-10-25 balance-v4 round)
+
+The owner reported that on the LIVE deployment clicking «جزئیات بیشتر» /
+"More details" produced "just a white space with no more extra detail", and
+that the prices block and the markets (index) section below it read as
+collided. Reproduced on production (worker 7b939901): the bug shipped with
+2026-10-24c itself and the original session's expanded-state verification
+relied on DOM/aria assertions while the pixels showed the white space —
+both live evidence screenshots from that round show the defect.
+
+### Fixed
+
+- **Why the panel vanished** — the card-body click-through button carried
+  `h-full` (height:100%). The tile `article` is a stretched grid item, so
+  once the disclosure opened, the grid row grew to fit card+button+panel,
+  the article stretched to the row, and the body button then resolved
+  `h-full` against the FULL stretched article height — pushing the
+  disclosure trigger and the expanded panel BELOW the tile's box. The
+  panel kept its DOM/aria state (why aria-expanded checks passed) but
+  painted under the following cards (mobile: Silver/Brent tiles) or under
+  the markets section (desktop) — later DOM siblings paint on top —
+  leaving ~690px of white space and, on desktop, the "collision" with the
+  markets section.
+- **The fix** — the article becomes `flex h-full flex-col` and the body
+  button drops `h-full` and keeps `grow`: it now only fills the space the
+  disclosure leaves it, so the trigger and panel stay INSIDE the tile and
+  the tile grows naturally with the open panel (spec 02 §5 — never clip to
+  force equal heights). Equal tile heights across the row are preserved
+  (grid stretch + `grow`), so nothing else about the anatomy changes.
+- **Prices ↔ markets breathing room** — the owner also asked for more
+  space between the prices block and the markets section: the section
+  gains `pb-3`, taking the card-to-section air from 28px to 40px (scoped
+  to the prices section only; the page-wide 28px rhythm is untouched).
+
+### Verified
+
+- Production build + real API (the 4173 harness): desktop 1280 EN —
+  expanded panel renders INSIDE the Gold tile (element-from-point probes
+  hit the panel's own rows), Silver/Oil/Bitcoin un-overlapped, clean
+  spacing to the markets section; mobile 375 — panel inside the tile,
+  Silver 10px below the grown tile, no horizontal overflow; fa RTL —
+  Persian rows render, 40px air to the markets section; collapsed —
+  four equal tiles, no spill.
+- Gates: typecheck 6/6, lint clean, web tests 533 green, copy:audit
+  clean (no new copy), bundle budgets held (entry 295.29/88.82,
+  Insights 624.64/149.59).
+- Evidence: `docs/evidence/2026-10-24d-disclosure-overflow-fix/`.
+- Rebase note: this round was authored against production 7b939901 and
+  rebased over the 2026-10-25 gold-balance v4 round (29418f7) before
+  push/deploy; the balance round touches BalanceScale/MergedCard/copy
+  dictionaries only — PricesBoard is untouched there and this fix applies
+  cleanly on top.
 
 ## [2026-10-24c] — the prices board cards re-drawn from the financial-asset-cards spec pack (rebased onto round-46 main)
 

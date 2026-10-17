@@ -370,17 +370,22 @@ function PriceTile({
   return (
     <article
       id={`insights-card-${id}`}
-      className={`price-row scroll-mt-24 h-full rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)] ${
+      className={`price-row scroll-mt-24 flex h-full flex-col rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)] ${
         isStale ? 'opacity-90' : ''
       }`}
       data-status={reading.status}
     >
       {/* The card body — rows 1–6, still the whole-surface click-through to
-       * the details panel (the full chart + rule + source live there). */}
+       * the details panel (the full chart + rule + source live there). The
+       * article is a flex column and this button only GROWS into the space
+       * the disclosure leaves it — a percentage height here would resolve
+       * against the stretched grid item and push the disclosure + panel
+       * out of the tile's box (the white-space bug the owner reported:
+       * the panel rendered under the neighbouring cards). */}
       <button
         type="button"
         onClick={(e) => onFocusCard(id, e.currentTarget)}
-        className="insights-focusable flex h-full w-full grow cursor-pointer flex-col border-0 bg-transparent p-0 text-start"
+        className="insights-focusable flex w-full grow cursor-pointer flex-col border-0 bg-transparent p-0 text-start"
       >
         {/* 1. IDENTITY — icon + plain name (no tickers, no series ids). The
          * two-line min-height keeps the price rows aligned across tiles
@@ -681,8 +686,12 @@ export function PricesBoard({
   const derived = useTileData(PRICE_ROWS);
   if (rows.length === 0) return null;
 
+  /* The owner's post-deploy report (2026-10-24d): the prices block is the
+   * densest strip on the page — a touch more air below it before the markets
+   * section (the shared 28px page gap + this padding) so the two never read
+   * as collided, especially while a disclosure is open. */
   return (
-    <section id="insights-prices" aria-labelledby="insights-prices-title" className="scroll-mt-24">
+    <section id="insights-prices" aria-labelledby="insights-prices-title" className="scroll-mt-24 pb-3">
       <h2 id="insights-prices-title" className="type-section m-0 mb-1">
         <span className="inline-flex items-center gap-1.5">
           <Coins aria-hidden size={26} strokeWidth={1.8} className="shrink-0 text-[var(--color-text-secondary)]" />
