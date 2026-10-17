@@ -52,8 +52,14 @@
  *                                  sourceName to the Yahoo futures attribution
  *                                  when a fresher quote wins; the EOD snapshot
  *                                  serves gold-api XAU/XAG spot — a futures
- *                                  note on a spot price would be false);
- *        F دربارهٔ این اعداد      — the methodology note.
+ *                                  note on a spot price would be false).
+ *                                  (2026-10-26b: the former section F
+ *                                  «دربارهٔ این اعداد» — the methodology
+ *                                  note — was removed at the owner's
+ *                                  direction; the methodology itself is
+ *                                  unchanged and stays documented in
+ *                                  price-trend.ts / price-stats.ts and
+ *                                  the QA docs, just not on the card.)
  *
  * «بالا» CLARIFIED: the bare position word left the card face. The
  * metric it stood for — the reading's percentile inside its own 10-year
@@ -797,15 +803,6 @@ function PriceTile({
                     <bdi>{copy.ui.priceBrentBlendNote}</bdi>
                   </p>
                 ) : null}
-              </PanelSection>
-
-              {/* F — دربارهٔ این اعداد: the methodology note (the
-               * chart/percentage window, the daily-change basis, the
-               * no-fabrication rule). */}
-              <PanelSection title={copy.ui.aboutNumbersLabel} locale={locale}>
-                <p className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]">
-                  {copy.ui.aboutNumbersBody}
-                </p>
               </PanelSection>
             </div>
           ) : null}

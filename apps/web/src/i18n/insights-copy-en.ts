@@ -1388,9 +1388,6 @@ export const insightsCopyEn = {
     // 'Historical high', which claimed more coverage than the data has.
     statRecordHigh: '10-year high',
     priceSourceLabel: 'Data source',
-    aboutNumbersLabel: 'About these numbers',
-    aboutNumbersBody:
-      'The seven-day chart and its percentage share one window: the last seven calendar days of stored observations, anchored at the latest observation at or before seven days back (within a 3-day tolerance). Daily change compares the latest observation with the previous stored one. Missing values are never fabricated or interpolated.',
     priceSubjects: {
       'gold-usd': 'Gold',
       'silver-usd': 'Silver',
