@@ -675,3 +675,166 @@ by direct owner order — the component is now this file's to revise again.
 
 The harness files (`balance-harness.html`, `src/balance-harness-main.tsx`)
 were temporary and are deleted — no test data ships.
+
+## v4 — the abstract editorial balance (owner Iteration-2 directive, 2026-10-25)
+
+The owner reviewed the deployed v3 hanging-pan scale: *"The latest
+iteration introduced a literal weighing scale with suspended bowls,
+wires, and a tall central column. Although this makes the balance
+metaphor immediately recognizable, it is not the desired visual
+direction. The target is the earlier, simpler concept titled «برآیند
+عوامل مؤثر بر قیمت طلا»… abstract, restrained, editorial, carefully
+proportioned."* This section supersedes v3's drawing (again by direct
+owner order) while keeping every logic rule the lineage has pinned:
+the tilt law, the state mapping, the off-beam lists, the prose empty
+states, the trays, the detail panel, the data flow.
+
+### The directive, verbatim mapping
+
+1. **Correct the visual metaphor** — the drawing is now ONE inline SVG
+   (520×104, a deliberately FLAT editorial proportion): a refined,
+   slightly weighted horizontal beam (a filled tapered path, 9u tall
+   at the centre → 6u at the ends), a compact geometrically precise
+   central pivot (a 9u hub with a surface-colour pin dot, its apex
+   meeting a 13u keystone triangle — NO base bar, NO tall column),
+   and subtle clearly-defined endpoints (a 6.25u bead at each beam
+   end, green for / red against — the only colour in the drawing).
+   The dotted level reference through the pivot is kept (the honest
+   comparison device). NO hanging wires, suspended bowls, tall support
+   column, unnecessary outlines or decorative machinery — and the
+   geometry/composition was reworked from scratch, not recoloured or
+   resized: the v3 constants (520×252 viewBox, pillar, chains, pans,
+   pan translations, endDrop plumbing) are deleted.
+2. **Clear visual hierarchy (Iteration-2 §3 order)** — heading
+   «برآیند عوامل مؤثر بر قیمت طلا» (type-question voice) → the
+   concise explanatory subtitle (caption voice, secondary ink) → the
+   illustration (max-w 520, centred) → the two side-labelled factor
+   lists (max-w 520, centred — each list sits under its side's half
+   of the beam) → the OVERALL ASSESSMENT at the end (the verdict word
+   + the count line + the card's banner sentence where needed,
+   divider-separated from the lists like the footing strip) → the
+   shared detail panel → the trays. The v1 "answer first" verdict
+   placement is retired BY THIS DIRECTIVE's own ordering.
+3. **The aggregate separated from the factors** — unchanged from v3
+   rule 3 (the lists beneath their sides; the illustration's geometry
+   is independent of the factor count), now with the lists sharing
+   the beam's footprint.
+4. **Empty-side state (Iteration-2 §5)** — the prose empty lines are
+   kept and SPLIT by evaluation state: a side with no qualifying
+   factors after a completed evaluation carries the evidence-based
+   line («در حال حاضر، نشانهٔ معناداری از حمایت عوامل بررسی‌شده از
+   رشد قیمت طلا دیده نمی‌شود.» — the owner's suggested wording,
+   round-50); when NOTHING could be read (readable 0) BOTH sides
+   carry the distinct unavailable line (listEmptyNone) so an absence
+   of readings is never worded as an absence of pressure. No dashed
+   rectangle anywhere.
+5. **Consistent with the actual assessment** — the tilt law is
+   UNTOUCHED (|net|/total × 12°, 4° floor; level at net 0 and at
+   readable 0). Measured on the harness: the bead height difference
+   equals Lh × sin(angle) with 0.0u diff for every case (A 4°, B/D/G
+   0°, E 12°, H −4°) at BOTH 1280 (scale 1.0) and 360 (scale 0.5385).
+6. **Responsive** — the lists stack below `sm:` (the long side labels
+   stay on one line at 360) and sit side-by-side under their halves of
+   the beam from `sm:` up; zero horizontal overflow measured at 360
+   and 1280 in both locales; the illustration is a fixed function of
+   its width (viewBox aspect 520:104 — less than half v3's height).
+7. **Preserved** — data flow, driver mapping, verdict word, count
+   line, banner, trays, detail panel, price footing, RTL (one
+   scaleX(-1) mirror of the pure-geometry SVG, rotation stays
+   LTR-signed), motion pair (500 ms ease, reduced-motion honoured).
+
+### Decisions (D-v4)
+
+- **D-v4-1 — the "sides" speak with colour beads, not platforms.** The
+  Iteration-2 prompt allows "endpoints OR platforms". A first draft
+  drew platform bars under the beam ends; the design-critique loop
+  (VLM pass 1) read them as "floating underlines that slipped" and
+  the trapezoid mount + base bar as a "desk toy". The rework slimmed
+  the beam (11u → 9u centre), replaced the mount with the 13u keystone
+  triangle (no base bar), and replaced the platforms with the
+  accent-coloured endpoint beads — subtle, clearly defined, and the
+  only colour in the drawing. The side captions + icons in the lists
+  below carry the explicit labels (colour never rides alone, §12.2).
+- **D-v4-2 — the unavailable empty state is its own copy key.** v3's
+  two empty lines assumed an evaluation had run; case D (4 unread)
+  showed "No readings support gold right now." on an empty side —
+  wording that claims a completed evaluation. v4 adds
+  `listEmptyNone` ("Nothing could be read yet, so neither side has
+  been weighed." / «فعلاً هیچ عاملی قابل خواندن نبود؛ بنابراین هیچ
+  سویی سنجیده نشده است.») used on BOTH sides only when readable 0.
+  The five Iteration-2 §5 cases map: no qualifying factors → the
+  evidence line; data unavailable/stale → listEmptyNone + verdict
+  'none' + the unread tray; mixed signals → 'Balanced' verdict +
+  level beam; insufficient evidence → the model's own honest design
+  (unread drivers divide into `total`, pulling the ratio toward
+  level — expressed by the small angle + the count line, no new
+  state invented); valid aggregate → the tilt.
+- **D-v4-3 — the tilt angle and the green/red tokens are NOT
+  designer-adjustable.** The VLM critique passes suggested increasing
+  the case-A lean to 6–8° "for semiotic clarity" and muting the
+  greens/reds. Both declined: the angle formula is the owner's model
+  (spec §6, "no weights", "no extra threshold") and the colours are
+  the site's own status tokens (spec §12.3 "reuse the tokens the page
+  already uses").
+- **D-v4-4 — the lists share the beam's footprint.** The lists grid
+  is max-w-[520px] mx-auto like the SVG, so each list sits under its
+  side's half of the illustration on any card width (the VLM's
+  "align the lists with the sides" note), stacking to one column
+  below `sm:` so «عوامل حمایتی از قیمت طلا» never wraps mid-word.
+- **D-v4-5 — the site's zig-zag trend icons stay.** The VLM disliked
+  them ("iconographic dissonance") — they are the owner's own
+  artwork (the verdict strip's up/down zigzags) and the page-wide
+  factor-direction language; replacing them site-wide is outside this
+  component's scope (Iteration-2 §1: "Do not change … shared
+  typography … in ways that affect the rest of the application").
+
+### Measured checks (browser, on the temporary harness — never shipped)
+
+| # | Check | Result |
+|---|---|---|
+| V1'' | Tilt geometry | Bead Δy = Lh × sin(angle) with **0.0u diff** at 1280 AND 360 (scale 0.5385): A 23.438/23.438, E 69.858/69.858; B/D/G level 0 |
+| V2'' | No hanging machinery | `[data-balance-pan]` absent; the reference is the ONLY `<line>`; the fulcrum is ONE path (no base bar, no pillar, no chains) |
+| V3'' | Multi-factor safety | Case H (6+3): the SVG markup byte-identical modulo transforms/aria (jsdom) and the same tilt as any 3-net case |
+| V4'' | Overflow | scrollWidth == clientWidth at 360 and 1280, en + fa |
+| V5'' | Empty states | Case A: evidence line under the empty For list; case D: the distinct unavailable line on BOTH sides (getAllByText ×2); no `[data-balance-slot]` anywhere |
+| V6'' | RTL | fa: whole SVG mirrored (scaleX(-1)), the rotation value identical to en (4°), «برآیند عوامل مؤثر بر قیمت طلا» heading, Persian digits, the for list on the inline-end |
+| V7'' | Interaction | Keyboard: focus a row → Enter opens the shared panel (aria-expanded=true) → Enter closes; a tray chip opens the same panel; zero console errors on a fresh session |
+| V8'' | Design review | VLM pass 2 on the reworked geometry: "refined in its restraint", "well-proportioned", "clean hierarchical structure… polished, professional"; pass 3: the lists sit under their sides, composition "balanced and professional" |
+| V9'' | Gates | typecheck 6/6; web 534, api 238, insights 463, core 191, scraper 67, markets 13 (1,486 total); lint 0 errors/15 accepted advisories; copy:audit clean (round-50, 2,152 entries); budgets held: entry 295.29/88.81, Insights lazy 625.46/149.74 vs 626/150 |
+
+### Scenario sentences (one per screenshot, the v2 §8 convention)
+
+- `before-v3-A-1280-en.png` — the BEFORE state: v3's literal
+  hanging-pan scale (pillar, chains, suspended dishes) the owner
+  rejected.
+- `v4-A-1280-en.png` — a visitor sees the heading "The aggregate of
+  factors affecting the price of gold" with its one-line subtitle,
+  an abstract beam leaning gently down to the red bead, Real yields
+  2.84% in the Factors-pressuring list, the evidence-based empty
+  line under the empty Factors-supporting list, and the overall
+  assessment "Leaning against gold · 1 against · 3 couldn't be read"
+  after a divider — an honest light lean, editorial not mechanical.
+- `v4-E-1280-en.png` — the same beam at its full 12° with four red
+  rows — a clearly heavier against-lean, still one flat mark.
+- `v4-C-1280-en.png` — "Leaning for gold", beam down to the green
+  bead, three green rows, the against-empty line on the other side.
+- `v4-D-1280-en.png` — "Can't read the conditions right now", a
+  LEVEL beam (no direction implied), both lists carrying the
+  unavailable line, four dashed unread chips below.
+- `v4-B/G-1280-en.png` — "Balanced", level beam, rows on both sides
+  (mixed signals stay undirected).
+- `v4-H-1280-en.png` — six rows left, three right, the illustration
+  identical in size and tilt to any other 3-net case.
+- `v4-A2-1280-en.png` — the banner (the C12 gold-high-with-high-
+  real-yields note) riding with the overall assessment at the end.
+- `v4-*-fa.png` — the mirrored fa layout: «عوامل حمایتی از قیمت
+  طلا» list on the right under its green bead, «برآیند عوامل مؤثر
+  بر قیمت طلا» heading, Persian digits, the SVG mirrored, the lean
+  on the same semantic side.
+- `v4-*-360-*.png` / `768` — the same anatomy at mobile widths, the
+  lists stacked on one column, zero horizontal scroll.
+- `v4-A-1280-*-dark.png` — the mark in dark theme (same ink pair,
+  7.7:1; VLM: "all clearly visible with excellent contrast").
+
+The harness route (`src/routes/GoldBalanceTest.tsx` + its ROUTES and
+App registrations) was temporary and is deleted — no test data ships.
