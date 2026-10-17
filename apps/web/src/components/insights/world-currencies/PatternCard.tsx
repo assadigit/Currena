@@ -74,7 +74,7 @@ export function PatternCard({
         aria-expanded={open}
         aria-controls={`insights-fx-rule-panel-${rule.id}`}
         onClick={() => onToggle(rule.id)}
-        className="insights-focusable flex min-h-[44px] w-full cursor-pointer flex-col gap-1 rounded-[var(--radius-md)] px-3 py-2.5 text-start transition-colors hover:bg-currena-muted/[0.05]"
+        className="insights-focusable flex min-h-[44px] w-full cursor-pointer flex-col gap-1 rounded-[var(--radius-md)] px-3 py-2.5 text-start transition-colors hover:bg-currena-soft/50"
       >
         <span className="flex w-full flex-wrap items-center gap-x-2 gap-y-1">
           <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
@@ -167,7 +167,7 @@ export function PatternCard({
               <dl className="m-0 flex flex-col gap-1.5">
                 {/* v1.3 (CR §4.3): Level 3 starts with "In everyday terms". */}
                 <div>
-                  <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                  <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
                     {copy.fx.everydayLabel}
                   </dt>
                   <dd className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
@@ -175,7 +175,7 @@ export function PatternCard({
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                  <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
                     {copy.fx.labelWhy}
                   </dt>
                   <dd className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
@@ -183,7 +183,7 @@ export function PatternCard({
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                  <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
                     {copy.fx.labelSeenBefore}
                   </dt>
                   <dd className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
@@ -191,7 +191,7 @@ export function PatternCard({
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                  <dt className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
                     {copy.fx.labelForYou}
                   </dt>
                   <dd className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">

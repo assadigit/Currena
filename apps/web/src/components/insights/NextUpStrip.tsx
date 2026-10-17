@@ -16,22 +16,17 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { downloadBlob } from '../../lib/download';
 import { buildInsightsIcs } from './ics';
 
-/* Grayscale redesign (2026-10-17, economic-indicators-ui-spec.md §8):
- * the event-kind chips are CATEGORICAL (which institution publishes),
- * not severity — they all speak the one neutral muted tint now; the
- * KIND_BADGE letters carry the category. */
-const KIND_CHIP = 'bg-currena-muted/15 text-[var(--color-text-secondary)]';
 const KIND_CLASS: Record<CalendarEvent['kind'], string> = {
-  rba: KIND_CHIP,
-  'abs-cpi': KIND_CHIP,
+  rba: 'bg-currena-coral/20 text-[var(--color-text-secondary)]',
+  'abs-cpi': 'bg-currena-success/15 text-[var(--color-text-secondary)]',
   // Step-2 add-list §D: the two jobs-report kinds wear their region's tint.
-  'abs-jobs': KIND_CHIP,
-  fed: KIND_CHIP,
+  'abs-jobs': 'bg-currena-success/15 text-[var(--color-text-secondary)]',
+  fed: 'bg-currena-blue/15 text-[var(--color-status-context)]',
   // Fix spec C-07: the ECB decision joins the calendar kinds.
-  ecb: KIND_CHIP,
-  'us-cpi': KIND_CHIP,
-  'us-jobs': KIND_CHIP,
-  other: KIND_CHIP,
+  ecb: 'bg-currena-blue/15 text-[var(--color-status-context)]',
+  'us-cpi': 'bg-currena-blue/15 text-[var(--color-status-context)]',
+  'us-jobs': 'bg-currena-blue/15 text-[var(--color-status-context)]',
+  other: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
 };
 
 const KIND_BADGE: Record<CalendarEvent['kind'], string> = {
@@ -110,7 +105,7 @@ export function NextUpStrip({
         <h2 id="insights-coming-up-title" className="type-section m-0 mb-2">
           {copy.ui.comingUpTitle}
         </h2>
-        <p className="m-0 rounded-[var(--radius-lg)] bg-currena-muted/[0.06] px-4 py-3 text-[length:var(--type-label)] text-[var(--color-text-secondary)] dark:bg-white/[0.04]">
+        <p className="m-0 rounded-[var(--radius-lg)] bg-currena-soft/60 px-4 py-3 text-[length:var(--type-label)] text-[var(--color-text-secondary)] dark:bg-white/[0.04]">
           {copy.ui.noEvents}
         </p>
       </section>
@@ -146,7 +141,7 @@ export function NextUpStrip({
           <button
             type="button"
             onClick={downloadIcs}
-            className="no-print insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-currena-muted/10"
+            className="no-print insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/10"
           >
             <CalendarDays aria-hidden size={16} strokeWidth={1.9} className="shrink-0" />
             {copy.ui.icsDownload}
@@ -188,7 +183,7 @@ export function NextUpStrip({
                 <button
                   type="button"
                   onClick={() => onFocusCard(target!)}
-                  className="insights-focusable -ms-1 mt-1 w-fit cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] underline decoration-[var(--color-border)] underline-offset-2"
+                  className="insights-focusable -ms-1 mt-1 w-fit cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
                 >
                   {copy.indicators[target].name}
                   <span className="sr-only">, {copy.ui.viewCard}</span>
@@ -204,7 +199,7 @@ export function NextUpStrip({
           type="button"
           onClick={() => setShowAll((v) => !v)}
           aria-expanded={showAll}
-          className="insights-focusable mt-2 inline-flex min-h-[36px] cursor-pointer items-center rounded-full border border-[var(--color-border)] bg-transparent px-3.5 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-currena-muted/10"
+          className="insights-focusable mt-2 inline-flex min-h-[36px] cursor-pointer items-center rounded-full border border-[var(--color-border)] bg-transparent px-3.5 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/10"
         >
           {showAll ? copy.ui.hideCalendar : copy.ui.fullCalendar}
           <span aria-hidden="true" className={`ms-1 transition-transform ${showAll ? 'rotate-180' : ''}`}>

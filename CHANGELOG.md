@@ -5,6 +5,50 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-18a] — scope trim: the grayscale reskin keeps the header/hero ONLY
+
+Owner review of the deployed 2026-10-17f release: the page-wide grayscale
+treatment went too far — "why did it turn everything on the page black and
+white?" The redesign's scope is now the page header + the two overview
+cards (Global & Australia) exactly as shipped in 2026-10-17f; EVERYTHING
+below the overview cards is reverted to the pre-redesign colored design.
+
+### Reverted (below the overview cards)
+
+- **StatusChip** — the success (green) and info (blue) chip tones are
+  back (the redesign had folded them into the neutral muted family; only
+  the two flagged tiers kept severity ink).
+- **Artwork desaturation** — the `filter: grayscale(1)` rule now covers
+  ONLY `.insights-hero-grid` (the region/state artwork inside the two
+  overview cards); every icon/artwork below the hero renders in color
+  again (money-area icons, metal icons, market icons, globe/map marks).
+- **Alert cards** — the tinted inline-start gradient faces are back
+  (needs-attention red tint, Unusual amber tint); the redesign had
+  flattened them to the plain surface.
+- **Focus ring** — the page-wide keyboard focus ring is brand blue again
+  (`--color-accent-brand`; the redesign had switched it to charcoal).
+- **JumpNav** — the active section pill is gold again (was charcoal).
+- **ReadingProgress** — the top progress bar is blue again (was charcoal).
+- **Section lanes / QuestionGroup / CompactRow / AlertCard / DetailsPanel /
+  GlossaryTip / PairsTable / PatternCard / MarketTile / MarketsTable /
+  ViewSwitch / ConnectionCard / MoneyPanel / PricesBoard / Signals /
+  Together / HistoryChart / TrendChart / MarketsChart / NextUpStrip /
+  AboutTheData / BalanceScale / signals/verdict / WorldCurrencies /
+  WorldMarkets** — all blue/gold/soft-tint accents, pale-blue tooltip and
+  panel surfaces, and tier-colored filter chips are restored to their
+  pre-redesign values (28 component files, byte-identical to 63adfe8).
+
+### Kept (header/hero, unchanged from 2026-10-17f)
+
+- The page header (32px title, 28px separation), the 1440px container,
+  the hero grid with FIXED Global-right/Australia-left order in both
+  locales, region-name card titles + severity labels + colored verdict
+  meters, the top-3 flagged indicator ROWS with full-count heading and
+  accessible "+n more / Show fewer", the header Tools/Download utilities.
+- Budget note: the Insights chunk measures 606.32 kB / 144.86 kB gz —
+  still over the pre-redesign line, so the 2026-10-17f budget bump
+  (607.00/145.20) stays.
+
 ## [2026-10-24] — reconciliation, verification harness and deploy of the Economic Indicators redesign
 
 The two-session convergence: the concurrent session's 2c171ca (built to the

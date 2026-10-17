@@ -197,7 +197,7 @@ export function ReadingProgress({ label }: { label: string }) {
       aria-valuenow={Math.round(pct)}
       className="no-print fixed inset-x-0 top-0 z-[1001] h-[3px]"
     >
-      <div className="h-full bg-[var(--color-text-primary)]" style={{ width: `${pct}%` }} />
+      <div className="h-full bg-currena-blue" style={{ width: `${pct}%` }} />
     </div>
   );
 }
