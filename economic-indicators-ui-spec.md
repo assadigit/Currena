@@ -1,211 +1,389 @@
-# Economic Indicators — UI Redesign Specification
+# Economic Indicators Page — UI/UX Design Specification
 
-**Page:** Currena → Insights (`#/insights`) — titled "Economic Indicators" / «شاخص‌های اقتصادی»
-**Status:** Approved redesign direction, implementation-ready
-**Scope:** Visual redesign of the Insights page only (`apps/web` insights route + shared insights CSS tokens). No financial-logic, data, or copy changes.
-**Companions:** `AGENTS.md` (engineering rules), `docs/insights/06-ux-round-2-spec.md` (behavioral spec — behavior preserved), `docs/localization/persian-copy-workflow.md` (copy gate).
+**Document type:** Implementation specification  
+**Scope:** Economic indicators overview page and its existing interactions  
+**Status:** Ready for implementation planning  
+**Primary references:** The supplied grayscale proposed layout (1280 × 960) and the supplied current Persian interface (1129 × 777)
 
----
+## 1. Goal
 
-## 1. Purpose and approved direction
+Refine the Economic Indicators page by using the proposed design's clearer hierarchy and spacious layout while retaining the current interface's meaningful severity colors, contextual explanations, indicator categories, and working functionality.
 
-The current page is information-dense and functional, but its visual layer is loud: four severity hues (green / yellow / orange / red) are painted across verdict words, segmented meters at three sizes, status chips, gauge groups, tinted card gradients, plus brand gold and blue accents, coral tags, and full-color artwork. Everything is colored, so nothing stands out.
+The page should feel calm, credible, modern, and understandable to people who are not financial professionals. Serious economic conditions should be visually clear without making the entire page feel like an alarm.
 
-The approved redesign:
+### Product principle
 
-1. **Grayscale structural foundation.** Every structural and navigational element — surfaces, borders, text, chips, meters, links, buttons, tools, tabs, charts, artwork, section tints — renders in the neutral ink ramp.
-2. **Selective, meaningful severity colors.** The existing IBM Carbon severity palette is retained ONLY where it carries meaning: status words and chips for flagged/unusual states, the flagged-card accent, the attention module, the region verdict words, and signed direction (up/down). A calm state never shouts: "Normal", "Context", "Stale" and equivalent states render in neutral gray.
-3. **Clean, professional, authoritative, and readable by ordinary (non-financial) users.** The result reads like a serious financial publication: neutral paper, strong typography, red and amber reserved for things that genuinely need attention.
-4. **Top three flagged indicators first.** Each region summary initially shows exactly the three most important flagged indicators, with a clear expand control for the remaining flagged indicators (and collapse back).
-5. **Bilingual RTL/LTR and fully responsive**, preserved from the current implementation.
-6. **Financial context preserved.** No indicator, explanation, data source, date, chart, download, or control is removed. Secondary context stays behind the existing collapse/expand mechanisms.
+**Make the state easy to scan; make the reason easy to understand; keep deeper detail available without putting everything in the user's way.**
 
-## 2. Guardrails — what must NOT change
+### Success outcomes
 
-- No changes to financial calculations, indicator rules, thresholds, status classification, scoring, gauge math, or the `attentionTiles` importance ordering (deepest-into-its-own-10-year-tail first). (`packages/insights`, `packages/core`, `config/*` logic — untouched.)
-- No fabricated or hardcoded data; the page keeps serving `/api/insights` (and the world feeds in private mode) exactly as before.
-- No indicator, category, explanation line, companion value, calendar event, source note, date, or download is removed.
-- No user-facing copy string is added or changed (EN or FA). New UI states must reuse existing dictionary keys, so `pnpm copy:audit` stays green with an untouched manifest.
-- Data fetching, refresh, localStorage last-good cache, stale banner, private/public display modes, error and loading states — behavior preserved.
-- Existing keyboard model preserved: `/` tools + search, `j`/`k` card walking, roving tablists, DetailsPanel focus trap + Escape + focus-return, scroll-spy JumpNav, `aria-*` labels, never-color-alone (icon + word) chips.
-- No new dependencies. No changes outside the Insights page (other routes, the app header/footer, and the rates pages keep the shared brand look).
-- Bundle budget for the Insights lazy chunk continues to hold (scripts/check-bundle-budget.mjs).
+A first-time visitor should be able to identify:
 
-## 3. Color system
+1. The current assessment for Global and Australia.
+2. Why each assessment has that state.
+3. The three most important flagged indicators in each section.
+4. The meaning of each displayed figure, in plain language.
+5. Where to expand the section to see remaining flagged indicators and other existing categories.
 
-### 3.1 Neutral ink ramp (the foundation)
+## 2. Scope and guardrails
 
-Unchanged tokens, used for ALL structure:
+### Included
 
-| Token | Light | Dark | Used for |
-|---|---|---|---|
-| `--color-text-primary` | `#2C3E50` | `#E8EDF4` | primary text, active states, chart lines, focus ring |
-| `--color-text-secondary` | `#47525D` | `#A9B5C5` | body/labels, inactive controls, icon fallbacks |
-| `--color-text-tertiary` | `#4F5A66` | `#A2AEBC` | captions, timestamps, sources |
-| `--color-surface` | `#FFFFFF` | `#1A222E` | all card surfaces |
-| `--color-surface-raised` | `#FFFFFF` | `#202A38` | raised chips/tiles inside cards |
-| `--color-border` | `rgba(44,62,80,.14)` | `rgba(232,237,244,.16)` | all borders/rings |
-| `currena-muted` at 5–15% alpha | — | — | neutral tint fills (group boxes, chips, toolbars, note boxes) |
+- Page layout, spacing, typography, surfaces, borders, icons, status treatment, and responsive behavior.
+- Existing header actions and tools on this page.
+- Global and Australia summary cards.
+- Flagged-indicator lists, show-more/show-less behavior, existing calm/normal categories, and insufficient-data groups.
+- Existing explanatory tooltips or information controls.
+- Existing data-download/export action if it is currently implemented.
+- Existing “next on the page” or related navigation notice, if this is a real part of the product experience.
+- Persian RTL and English LTR presentation.
+- Accessibility and implementation acceptance criteria.
 
-**Structural rule:** the pale-blue `currena-soft` surface tint, the `currena-blue`/`--color-status-context` ink, the `currena-coral` tag, and the `--color-accent-gold` family no longer appear anywhere on the Insights page. Their previous uses become neutral: links/labels → `text-primary`/`text-secondary`; tinted surfaces → `currena-muted` at low alpha; gold-highlight boxes → standard surface cards with `ring-[var(--color-border)]`.
+### Not included
 
-### 3.2 Severity inks (the only color on the page)
+- Changing economic data, formulas, indicator definitions, data sources, severity thresholds, or status-classification logic.
+- Inventing new financial metrics, new sections, new navigation destinations, or new controls that are not supported by the existing product.
+- Replacing the application's framework, state-management approach, routing, localization, or data-fetching architecture.
+- Redesigning unrelated pages or introducing a site-wide design-system migration.
 
-The existing Carbon-pinned tokens, values unchanged:
+### Preserve existing behavior
 
-| Ink | Token | Allowed on (exhaustive) |
+Before implementation, inspect the repository and identify which controls are real and what they do. Retain existing behavior unless a specific behavior is broken and the fix is necessary for this page. A control that is only illustrative in a screenshot must not be made to imply functionality that does not exist. Do not remove an existing working download/export action merely because it is omitted from the grayscale proposal.
+
+## 3. Design direction
+
+Use the grayscale proposal as the **structural foundation**:
+
+- Clear page heading and short subtitle.
+- Two prominent overview cards for Global and Australia.
+- Strong distinction between status, explanation, and individual indicators.
+- Three flagged indicators visible initially in each overview.
+- A clear expansion control for the rest of the flagged list.
+- Calm and insufficient-data sections visually secondary to the main findings.
+
+Retain selectively from the current interface:
+
+- Severity colors that have meaning.
+- Indicator category labels and concise interpretation text.
+- A visible data-as-of date, where already available.
+- Existing tooltips, data-download functionality, and useful context.
+- The product's current Persian font, icon set, branding, and established interaction patterns where suitable.
+
+Do not copy the grayscale proposal literally as a monochrome production interface. Do not keep all the current screen's red/orange surfaces and nested boxes at full strength. Use color as a semantic signal rather than decoration.
+
+## 4. Page anatomy and content hierarchy
+
+The page should use this hierarchy:
+
+1. **Page header:** title, short explanatory subtitle, data freshness text, and existing utility actions.
+2. **Primary overview:** Global and Australia status cards.
+3. **Status summary within each card:** region name, severity label, severity mark/scale if already supported, and a concise “Why” summary with an optional information control.
+4. **Flagged indicators:** section heading with total count, followed by the top three indicators.
+5. **Expanded flagged indicators:** the rest of the flagged indicators, available through a show-more/show-less control.
+6. **Secondary groups:** existing calm/normal categories and insufficient-data groups, initially collapsed if consistent with current functionality.
+7. **Existing follow-on/navigation notice:** a low-emphasis footer strip only where real product content or navigation exists.
+
+### Summary wording
+
+- Use the current localized state labels and existing severity logic. Do not invent replacement status labels or silently rename classifications.
+- The “Why” line should summarize the count of flagged indicators and the most important contributing indicator, when the data model supports that information.
+- Prefer short everyday-language explanations over technical shorthand.
+- Preserve the difference between an indicator's observed value and the interpretation of what it may mean.
+- Avoid making one indicator sound like proof of an overall economic conclusion. Use appropriately qualified wording already supported by the product's editorial rules.
+- Do not fabricate missing values. Use the product's current unavailable/insufficient-data treatment.
+
+## 5. Layout and spacing
+
+Use the existing page container and styling conventions if they already meet these targets. The measurements below are design targets, not a reason to add a new layout framework.
+
+### Spacing scale
+
+Use a consistent 4 px base scale:
+
+| Token | Target | Typical use |
+|---|---:|---|
+| `space-1` | 4 px | Icon/text micro-gap |
+| `space-2` | 8 px | Compact inline spacing |
+| `space-3` | 12 px | Label/value gaps |
+| `space-4` | 16 px | Mobile card padding, compact section spacing |
+| `space-5` | 20 px | Tablet gaps |
+| `space-6` | 24 px | Desktop card padding and main grid gap |
+| `space-8` | 32 px | Header/content separation |
+| `space-10` | 40 px | Wide desktop outer margin |
+
+### Desktop: 1024 px and wider
+
+- Center the page in a fluid container with a maximum width of approximately **1440 px**.
+- Use **32–40 px** outer horizontal padding on wide desktop viewports; never let content touch the viewport edge.
+- Header and main content should share the same left/right alignment lines.
+- Place Global and Australia cards in a two-column grid with equal width and approximately **24 px** gap.
+- Keep **Global on the right and Australia on the left**, matching both supplied references. Do not automatically swap the two cards when the language changes; this ordering is an intentional content priority. Inner content must still obey RTL/LTR direction.
+- Use approximately **24 px** card padding and **16 px** corner radius. Use a thin neutral border rather than heavy shadows.
+- Keep the first three flagged indicators visible. Avoid making either overview card dramatically taller just to force equal heights; the two cards may stretch to the same row height where natural, but content must not be clipped or artificially spaced.
+- Separate the header from the cards by approximately **28–36 px**.
+
+### Tablet: 768–1023 px
+
+- Use **20–24 px** outer horizontal padding.
+- Stack the two overview cards vertically if two columns would make either card narrower than approximately **420 px**. At 1024 px and above, use the two-column desktop layout.
+- Use a **20 px** vertical gap between stacked cards, and **20–24 px** card padding depending on available width.
+- Keep actions from overflowing the header; allow them to wrap cleanly.
+
+### Mobile: 320–767 px
+
+- Use **16 px** outer horizontal padding (reduce only when necessary to avoid overflow on very narrow screens).
+- Stack the overview cards vertically, Global first and Australia second, unless the existing product order is intentionally different for a documented reason.
+- Use **16 px** card padding and **16 px** between major cards.
+- Stack the header elements into a readable layout. Keep the page title and subtitle prominent; place existing utility actions in a separate row that can wrap without crowding the title.
+- Allow long indicator labels and explanations to wrap. No text, value, badge, or control may cause horizontal page scrolling at **320 px** viewport width.
+- Indicator rows may become taller on mobile. Do not shrink text to keep a fixed row height.
+
+### Card and indicator structure
+
+- Card title: region name and severity treatment share a row when there is enough room; wrap naturally on narrow screens.
+- “Why” summary: place directly below the card heading, with optional info control adjacent to the relevant text.
+- Flagged-list heading: visually distinct from the summary, but quieter than the region title.
+- Indicator row: use a flexible text column and a compact value column. The value must stay readable and aligned consistently within the card.
+- Indicator rows should normally have at least **72 px** vertical space on desktop, with **12–16 px** internal padding. Allow rows with longer descriptions to grow naturally.
+- Use **12 px** corner radius for individual indicator rows, with a **1 px** neutral border and a subtle or white surface.
+- The leading severity symbol, indicator text, and value must not collide or overlap when translated text becomes longer.
+- On very narrow layouts, let the value move below the text if necessary rather than compressing either column excessively.
+
+## 6. Visual design tokens
+
+Start from the following suggested tokens. Map them onto the project's existing CSS variables/theme system if possible instead of introducing competing token systems. Check every actual foreground/background combination for contrast before release.
+
+### Neutral palette
+
+| Token | Suggested value | Use |
 |---|---|---|
-| **Alert red** | `--color-status-alert` | ① needs-attention status chips (icon+word) ② flagged-card inline-start accent border ③ hero attention count line and alert box (tint + ring + bullet words) ④ the "Critical" region verdict word ⑤ negative signed changes ⑥ error / failed-source / unavailable-data states ⑦ bearish outlook words ⑧ market "Correction" chips + tile rings ⑨ money-panel "pressure" (costs-up) lines ⑩ band word "expensive"/top-of-range + rule-zone ticks on the position bar ⑪ connection "moves down" lines |
-| **Watch amber** | `--color-status-watch` | ① Unusual-tier status chips + card inline-start accent ② the "Cautious" region verdict word ③ unusual section signals (bear-market chips, unusual FX patterns, section-signal bullets) ④ watch notes (stale sources in About, dates-differ tag) |
-| **Stressed orange** | `--color-status-stressed` | the "Stressed" region verdict word ONLY |
-| **Normal green** | `--color-status-normal` | ① the "Stable" region verdict word ② positive signed changes ③ money-panel "relief" lines ④ band word "cheap"/bottom-of-range ⑤ market "trend up" chip ⑥ bullish outlook words ⑦ connection "moves up" lines ⑧ Together "disagree" state stays amber (see below) |
+| `page-bg` | `#F4F5F6` | Page background; a quiet neutral |
+| `surface` | `#FFFFFF` | Main cards and indicator rows |
+| `surface-muted` | `#F7F8F9` | Secondary surfaces and low-emphasis sections |
+| `text-primary` | `#242424` | Headings, core values, primary text |
+| `text-secondary` | `#55585C` | Descriptions and secondary copy |
+| `text-muted` | `#686D73` | Metadata and helper text; must remain readable |
+| `border` | `#D2D5D8` | Default card and row borders |
+| `border-strong` | `#9A9FA4` | Emphasized neutral outlines |
+| `focus-ring` | `#1769AA` | Visible keyboard focus indicator |
 
-Everything else on the page is neutral. In particular, these LOSE their color: "Normal", "Context", "Stale", "Check pending", "Limited history", "No data" status chips (neutral gray, keeping their distinct icons + words); all verdict meters; gauge-group boxes and their step-word pills; the biggest-move card (plain card, signed value keeps red/green); the Money panel box (plain card); the JumpNav active pill (charcoal fill, not gold); Tools menu, filters, search, download buttons; calendar event-kind chips; chart lines/crosshairs/range controls; DetailsPanel headers and actions; pinned indicator ring/star; all artwork (grayscale filter).
+### Severity colors
 
-### 3.3 The verdict meter goes neutral
+Severity colors should be applied consistently to the written state, icon/marker, and a small amount of supporting emphasis. A pale tint may be used behind a status badge or a genuinely important explanation. Do not color every row or the full card background solely because the overall status is severe.
 
-The four-segment meter (all sizes: hero `lg`, gauge `sm`, question headers) stops painting step hues. Filled segments grade in ONE neutral ramp toward the current step; unfilled segments stay `--color-border`:
+| Semantic token | Accent / icon | Pale background | Typical meaning |
+|---|---|---|---|
+| `severity-critical` | `#C62832` | `#FFF1F2` | Critical/crisis state, only where the existing product defines it |
+| `severity-elevated` | `#C65313` | `#FFF4E8` | Elevated/stressed/tense state, according to existing mapping |
+| `severity-moderate` | `#946200` | `#FFF8E6` | Moderate/cautious state, according to existing mapping |
+| `severity-stable` | `#187A45` | `#ECF8F0` | Stable/positive state, where supported |
+| `severity-neutral` | `#686D73` | `#F0F1F2` | Calm, unclassified, or non-severity information |
 
-```
-on-1: color-mix(in srgb, var(--color-text-primary) 40%, var(--color-surface))
-on-2: color-mix(in srgb, var(--color-text-primary) 60%, var(--color-surface))
-on-3: color-mix(in srgb, var(--color-text-primary) 80%, var(--color-surface))
-on-4: var(--color-text-primary)
-```
+**Important:** These are presentation tokens only. Match them to the application's current state taxonomy and thresholds after inspecting the code. Do not infer that a state is critical based only on a label in the screenshot. Do not communicate severity by color alone; keep the textual state and, where useful, a distinct shape/icon.
 
-The meter keeps `direction: ltr` (analytical axis, G9), its `data-step` attribute, segment count = step, and its `role="img"` + aria-label. The colored verdict WORD beside each meter carries the severity meaning; the meter communicates position only (like a signal-strength bar).
+### Applying severity
 
-### 3.4 Artwork
+- Use the strongest accent on the severity label and one primary marker (icon or scale).
+- Prefer neutral borders and white surfaces for the main cards.
+- Use pale severity backgrounds for small badges or a single focused explanatory panel, not as a flood of color across the whole section.
+- Use one coherent severity scale everywhere on this page.
+- Keep the severity scale/bar only if it conveys actual information already calculated by the application. Its number of filled segments and color must match existing severity logic; do not hard-code a visual severity level.
+- Calm groups should not look like warnings. Insufficient-data groups should be neutral, not green or red.
 
-All Insights-page artwork PNGs (region marks, state icons, indicator icons, money-area icons, metal icons) render desaturated: `filter: grayscale(1)` applied via a page-scoped CSS rule (`.insights-page .currena-icon`). Sizes, layout, and decorative-aria treatment are unchanged. Shapes stay recognizable; color stops competing with severity inks.
+## 7. Typography
 
-### 3.5 Focus and interaction inks
+First inspect the current font setup. Reuse the site's existing font family and licensed assets if they render Persian and English well. Do not introduce a new typeface solely for this page without a real need. Confirm Persian punctuation, numerals, mixed-script text, and percent/currency layouts in the browser.
 
-- Focus ring (`.insights-focusable:focus-visible` and all chart/control `focus-visible:outline-*`): 2px `var(--color-text-primary)`, offset 2px (offset 1px on dense chart controls) — visible in both themes, no longer blue.
-- Links: `text-[var(--color-text-primary)]` + `underline decoration-[var(--color-border)]` (hover: `decoration-[var(--color-text-secondary)]`). No blue link ink, no brand-blue decoration.
-- Selected/active controls (JumpNav active pill, active Tools filter chip, active chart-range button): solid `bg-[var(--color-text-primary)]` with `text-[var(--color-surface)]` — the charcoal "selected" language.
-- Hover states on cards/rows/tiles: existing neutral darkens (`bg-currena-muted/[0.05–0.13]`, border → `--color-text-secondary`-tinted); nothing turns blue/gold.
+### Target sizes
 
-## 4. Layout and component hierarchy
+| Element | Desktop target | Mobile target | Weight |
+|---|---:|---:|---|
+| Page title | 32–36 px | 24–28 px | 700 |
+| Region/card title | 26–30 px | 22–26 px | 700 |
+| Severity label | 15–17 px | 14–16 px | 600–700 |
+| Primary indicator value | 21–24 px | 19–22 px | 700 |
+| Indicator name | 15–17 px | 15–16 px | 600–700 |
+| Indicator explanation | 14–15 px | 14–15 px | 400 |
+| Section label / count | 13–14 px | 13–14 px | 600–700 |
+| Date and helper metadata | 13–14 px | 13–14 px | 400 |
 
-The page's section order and anatomy are PRESERVED from the round-2/33 structure (this is a reskin, not a re-layout):
+- Body and explanatory copy must not be reduced to tiny text to fit a card. Aim for **14 px or larger** for routine readable text.
+- Use a line height of approximately **1.45–1.65** for body text, especially Persian text.
+- Use tabular numerals for comparable numeric values when the font supports them.
+- Keep indicator values visually prominent, but not so large that they overpower the indicator names and explanations.
+- Use boldness and spacing—not multiple font colors or excessive uppercase labels—to establish hierarchy.
 
-```
-Header: title · subtitle · "Data as of {date}" · Tools disclosure (search, filters, keyboard hints, CSV/ICS downloads)
-Hero (id=insights-hero):
-  Global card   — region mark · kicker · "View section" link
-                 — [state artwork][verdict word][meter lg] · "?" how-computed tip
-                 — gauge groups (step-word pills + gauge rows w/ sm meters) · "?" verdict-rule tip
-                 — attention module: count line + alert box (markets/fx/section bullets)
-                 — flagged tiles (3) + expand
-  Australia card — same anatomy (no alert bullets)
-  Biggest-move card · what-changed line
-Sticky JumpNav: Status · Prices · Together · Signals · Indicators · About
-Prices strip (4 tiles) → World markets → US shares in AUD → World currencies   [private mode only]
-Money panel ("What it means for my money", ≤4 lines)
-Together (collapsed) · Signals (collapsed, private)
-Indicator lane: watchlist strip (pinned) → Global section → Australia section
-  (each: big region artwork + heading + per-question groups; needs-attention +
-   unusual cards always visible; normal rows capped at 3 per group + "See all")
-Next-up calendar → "About this data" (collapsed) → app footer
-DetailsPanel: side sheet (≤767px bottom sheet) per card
-```
+## 8. Language, RTL and LTR
 
-Grid and spacing rules are unchanged: page column `max-w-[480px] → sm:max-w-2xl → md:max-w-3xl → lg:max-w-6xl`, `px-4 lg:px-8`, section stack `gap-7`; hero grid `grid-cols-1 sm:grid-cols-2` with `items-stretch`; tile rows `grid-cols-1 sm:grid-cols-3`; card lanes `.lane-fill` (flex-wrap, `flex: 1 1 300px`); cards `rounded-[var(--radius-lg)] p-4 ring-1`; group boxes `rounded-[var(--radius-md)] bg-currena-muted/[0.05] ring-[var(--color-border)]/60`.
+The page must support Persian RTL and English LTR. Reuse the project's established localization mechanism; do not add a new language switcher if one does not already exist.
 
-Hero region cards: ring is ALWAYS `ring-[var(--color-border)]` (the previous red ring on a Critical verdict is retired — the red verdict word + alert module carry the alarm).
+### Direction rules
 
-## 5. The flagged-indicator rule (top three + expand)
+- Set the document/page direction from the active locale (for example, `dir="rtl"` for Persian and `dir="ltr"` for English); do not simulate RTL with text alignment alone.
+- Use logical CSS properties such as `margin-inline-start`, `padding-inline-end`, `inset-inline-start`, and `border-inline-start` instead of hard-coded left/right properties where direction-dependent behavior is intended.
+- Align headings, summaries, and descriptions to the reading direction.
+- Within an indicator row, keep the severity symbol at the leading edge and the primary value at the trailing edge; these positions should adapt to the active direction.
+- Preserve the desktop card locations (Global on the right, Australia on the left) in both locales for visual continuity. Do not mirror the main card ordering just because the page direction changed.
+- Mirror directional icons (such as a back/forward arrow) only when their meaning depends on reading direction. Do not mirror logos, warning triangles, charts, or non-directional symbols.
+- Keep percentages, dates, currencies, and mixed Persian/Latin text legible. Use the application's locale-aware formatter and appropriate bidi isolation for embedded LTR fragments when needed; do not hand-build numbers from strings.
+- Translate all user-facing labels, tooltips, expansion controls, empty states, and accessibility names. Avoid hard-coded English strings inside components used by the Persian page.
+- Verify that long Persian labels wrap naturally and that Latin indicator names, rates, and abbreviations do not reverse punctuation order.
 
-Both hero region cards use ONE identical module:
+## 9. Interaction behavior
 
-1. **Importance order** — unchanged `attentionTiles(readings, section)`: warning-status members of the section's gauges, sorted by rule-tail extremity (deepest into its own watched 10-year tail first).
-2. **Initial state** — exactly **3 tiles** ("the three most important flagged indicators"), regardless of whether the card carries alert bullets. (The previous 6-tile variant for bullet-less cards is retired.)
-3. **Expand** — when more flagged indicators exist, a `+{n} more` pill (existing key `ui.attentionTileMore`) below the row reveals ALL remaining flagged tiles in place (no navigation, no duplicates — the actual remaining readings).
-4. **Collapse** — after expanding, a "Show fewer" control (existing key `ui.showFewer`) returns the module to 3 tiles. Both controls are ≥24px-tall rounded pills, neutral ink, `aria-expanded` semantics on the container module are preserved via the existing list label (`ui.attentionTilesLabel`).
-5. Tile anatomy is unchanged: 2-line-clamped name + artwork, large value + small unit, 3-line-clamped generated rule line, click → reveal card + scroll + open DetailsPanel.
-6. The count line ("{warnings} of {voting} indicators need attention") keeps its red-when-flagged ink (`attentionToneClass`); the alert box (raised markets/fx/section signals) keeps its soft red tint + ring.
+Implement only interactions that exist in the product or are explicitly represented by the current page. Preserve established URLs, callbacks, and data behavior after the visual refactor.
 
-The indicator LANE below keeps its existing expandable-group behavior verbatim (needs-attention + unusual cards always visible; ≤3 normal rows + "Show all {n} hidden indicators"; deep links reveal; pins persist).
+### Header actions
 
-## 6. Indicator cards and rows
+- Keep the existing Tools control and any currently working data-download/export control.
+- Preserve each action's actual menu, download, or navigation behavior.
+- Menus/popovers must open and close using the existing interaction model, be keyboard-operable, and not be clipped by the page card/container.
+- If the grayscale proposal omits a current working action, redesign its appearance or placement rather than silently deleting it.
 
-- **AlertCard (needs-attention / unusual tiers):** white surface, `ring-1 ring-[var(--color-border)]`, 4px inline-start accent border — red for needs-attention, amber for unusual (`.alert-card[data-tier]`). The previous tinted background gradient is removed: the surface is plain `--color-surface`. Status chip top-inline-end (severity ink per §3.2); name + artwork (grayscale) + big value + 7d/30d changes + generated rule line (rule line box: `bg-currena-muted/[0.07]`, primary text) + consequence line + sparkline (neutral) + date row. Pinned ring: `ring-[var(--color-text-primary)]/25`; pin star: tertiary ink. "Details ›": primary ink.
-- **CompactRow (normal/context/stale):** unchanged neutral anatomy; "Details ›" link becomes primary ink.
-- **StatusChip:** `warning` → red text on `currena-warning/15`; `unusual` → amber on `currena-warning/10`; **all other statuses → `bg-currena-muted/15 text-[var(--color-text-secondary)]`** (normal loses green, context loses blue). Icons and words per status are unchanged — severity labels never rely on color alone.
-- **DetailsPanel:** neutral headings (secondary ink), neutral action buttons/pills, note boxes `bg-currena-muted/[0.06]`; the history chart goes neutral (§7); status-colored content lines (history error, held/stale notes) keep their current inks.
+### Info controls and tooltips
 
-## 7. Charts and data visualization
+- Info icons must have accessible names and expose the existing explanation.
+- On pointer devices, the explanation may appear on hover; it must also work on keyboard focus and tap.
+- Tooltips must not contain the only copy of essential status information. They must be dismissible and remain readable on small screens.
 
-- History/Trend chart line + area + crosshair + inspector dot: `--color-text-primary` (area at ≤12% alpha). Grid/borders neutral as today.
-- Sparkline: stays neutral.
-- MarketsChart area fill: neutral ≤10% alpha.
-- Range toggle groups (1Y/5Y/10Y buttons): track `bg-currena-muted/[0.08]`, active button `bg-[var(--color-surface)] text-[var(--color-text-primary)]` + subtle ring/shadow, inactive `text-secondary`; focus ring per §3.5.
-- Verdict meters: §3.3. Position bars: neutral track; the rule-zone band + zone ticks keep the red severity ink; marker unchanged.
+### Show more / show less flagged indicators
 
-## 8. Supporting sections
+- Initially show the **top three flagged indicators** for each region, ordered by the application's existing relevance/rank order.
+- Display an expansion control only when more flagged indicators exist than are currently visible.
+- Activating the control reveals the remaining flagged indicators without losing the current card state or jumping the page unexpectedly.
+- The control label and accessible state must update correctly (for example, show-more/show-less and `aria-expanded`).
+- If there are three or fewer flagged indicators, do not show a redundant expansion control.
+- The total flagged count in the section heading must reflect the complete underlying count, not only visible rows.
 
-- **Prices board:** four identical tiles, neutral structure; metal chips `bg-currena-muted/[0.08]`; signed 7d/30d changes and fact bullets keep the red/green sign inks (owner convention 2026-10-17d); "Gold"/"Silver" title emphasis (2026-10-17d) unchanged.
-- **World markets / US-shares AUD / World currencies (private mode):** section shells become standard surface cards (`bg-[var(--color-surface)]`, neutral ring) instead of pale-blue tinted panels; severity chips (Correction/Bear, pattern attention/unusual) keep their inks; table/tile hovers go neutral; `dt` stat labels secondary ink.
-- **Money panel:** the gold-gradient feature box becomes a standard card (`bg-[var(--color-surface)] ring-1 ring-[var(--color-border)]`); direction lines keep red/green valence inks; ≤4 lines unchanged.
-- **Together:** collapsed-by-default unchanged; state chips neutral except `disagree` (amber); expanded detail cards standard surfaces.
-- **Signals (private):** merged card loses the gold feature box → standard card; outlook verdict words keep green/red; the BalanceScale component is untouched.
-- **Next-up calendar:** event-kind chips all `bg-currena-muted/15 text-secondary`; "Add to calendar" and card links primary ink; date/`tz` handling unchanged.
-- **About this data:** quiet collapsible unchanged; links primary ink; failed-sources line keeps red, stale line keeps amber.
-- **JumpNav:** sticky scroll-spy pills; active = charcoal fill + surface text; inactive = surface + border + secondary text (hover → primary text).
+### Calm and insufficient-data groups
 
-## 9. Typography and spacing
+- Retain the existing groups and their contents.
+- If currently collapsible, keep them collapsible and ensure the visible disclosure control communicates the state.
+- If the reference introduces a collapsed appearance but the application currently has no expand/collapse behavior, add it only if it is necessary to meet the agreed top-three information-density rule and can be implemented without changing data behavior.
+- Do not fabricate calm indicators or fill in missing values.
 
-Unchanged type system: `--type-verdict 1.6rem/800` (region verdict words), `--type-number 1.45rem/800 tabular-nums` (values), `.type-section 19px/700` (section titles), `.type-question 15px/600`, `--type-label 0.875rem/600`, `--type-caption 0.78rem/500`, `.type-kicker 0.72rem/600 uppercase` (no letter-spacing for FA). Radii `--radius-sm .5rem / -md .75rem / -lg 1.125rem`. Spacing `--space-1..5`. Persian renders in Vazirmatn, Latin in Poppins; numbers format only at render via `Intl.NumberFormat(numberLocale)` with Persian digits in FA. No type-role changes are part of this redesign.
+### Related-page / next-on-page notice
 
-## 10. RTL (FA) and LTR (EN)
+The proposed wireframe shows a “next on the page” notice for prices, personal-finance implications, and a calendar. Treat it as a subdued informational strip only if this is part of the intended product navigation/content flow.
 
-- `dir` on `<html>` from locale; all offsets use logical properties (`ms-/me-/ps-/pe-/start/end`); the alert-card accent border stays on the inline-start edge; the details sheet slides from the inline-end (bottom sheet ≤767px); connection arrows mirror under `[dir=rtl]`.
-- Verdict meters keep `direction: ltr` in FA (time/level axis convention, G9).
-- Signed numbers keep their `dir="ltr"` islands with the word-unit OUTSIDE the island (2026-10-17 bidi fix preserved).
-- Persian digit rendering, Jalali dates, and the copy corpus are untouched.
+- Do not implement fake links or invent routes for these items.
+- If real destinations already exist, preserve their destinations and make links clearly identifiable and keyboard-accessible.
+- If it is only a planning note from the wireframe and has no user-facing role in the actual product, do not ship it as production UI.
 
-## 11. Responsive behavior
+### Loading, empty, and error states
 
-Unchanged breakpoints, verified at 360, 768, 1024, 1440 px: single column ≤639px (hero cards stack; JumpNav horizontally scrollable; tile rows 1-col; DetailsPanel bottom sheet) → hero 2-col + tiles 3-col at `sm:` → lane cards 2-col `md:` → 3-col `lg:` with `lane-fill` stretch. No horizontal overflow at 320px. Touch targets ≥44px for primary controls (≥24px for compact in-card pills, as today).
+- Inspect the existing data lifecycle and preserve its real states.
+- Reuse the product's established loading, failed-data, and insufficient-data patterns. Do not show invented financial numbers or a false “stable” state while data is loading or unavailable.
+- Avoid layout jumps where possible; keep card structure stable during loading.
 
-## 12. Interaction, loading, and error states
+## 10. Responsive interaction and overflow rules
 
-Preserved from the current implementation, reskinned neutral where structural:
+- Controls must remain reachable and legible when cards stack.
+- Expanded indicator lists must flow in document order and must not be cut off by fixed heights.
+- Tooltips/popovers must reposition to stay within the viewport.
+- The page must not use fixed heights that clip Persian text or longer English indicator names.
+- Long titles, rates, explanatory sentences, and translated labels must wrap without colliding with icons or values.
+- At mobile widths, the value may move to a new line, but it must remain visually associated with its indicator name.
+- Test viewport widths of **320, 375, 768, 1024, and 1280 px**, plus one wide screen around **1440 px**.
 
-- **Loading:** neutral skeleton shells (`InsightsLoadingState`).
-- **Error:** red error card + retry (severity ink, retained).
-- **Stale cache:** red-tinted stale banner (retained) + per-card stale tags (neutral chips + word).
-- **Private mode:** neutral sign-in explanation state (`InsightsPrivateState`), no data leaked.
-- **Unavailable indicators:** honest "No data" cards/rows (neutral).
-- **Expand/collapse:** the existing `expandToken` + localStorage idiom for Together/Signals/About; in-place reveals for tiles and groups; reduced-motion honored (`scroll-behavior: auto`, no meter transitions).
-- **Tooltips:** GlossaryTip "?" pills (click-toggle, `aria-expanded`, `aria-controls`) — panel background becomes neutral `bg-currena-muted/[0.06]`; content unchanged.
+## 11. Accessibility requirements
 
-## 13. Dark mode
+Meet WCAG 2.2 AA practices applicable to this page.
 
-All changes are token-driven and must hold in `.dark`: neutral ramp inverts via tokens; severity inks keep their existing dark-theme values (Carbon dark siblings already defined); meter neutral grading uses the same `color-mix` over dark tokens (light-on-dark); grayscale artwork filter is theme-independent; charcoal selected-pills become `--color-text-primary` (#E8EDF4) fill with `--color-surface` text — i.e. inverted, still "the dark pill". Verify contrast ≥4.5:1 for text, ≥3:1 for UI accents in both themes.
+- Text contrast: at least **4.5:1** for normal text and **3:1** for large text.
+- Non-text control boundaries, meaningful icons, and focus indicators: target at least **3:1** contrast against adjacent colors.
+- Status is communicated by text plus color and/or icon/shape, never by color alone.
+- All interactive controls work with keyboard alone, with logical focus order and a clearly visible focus ring.
+- Use semantic headings in a logical order; do not select heading levels based only on desired font size.
+- Buttons and disclosure controls have meaningful accessible names. Expansion controls announce their expanded/collapsed state.
+- Every icon-only control has an accessible label. Decorative icons are hidden from assistive technology.
+- Do not rely on hover as the only way to reveal information.
+- Ensure touch targets are preferably at least **44 × 44 px** where practical, especially for icon-only controls.
+- Respect reduced-motion preferences if transitions are used. Avoid decorative animation that communicates severity in place of readable text.
+- Page reading order must remain sensible in both RTL and LTR locales and match the visual order of interactive controls.
 
-## 14. Accessibility requirements
+## 12. Implementation instructions for the coding agent
 
-- Every severity chip keeps icon + word (never color alone); verdict words keep their meter + aria-label.
-- Focus ring visible on every interactive element (neutral, 2px).
-- Keyboard model unchanged: `/`, `j`/`k`, roving arrow keys, Home/End, Escape closes the panel, focus returns to the opener, body scroll lock while the panel is open.
-- `role="img"` meters with text alternatives; `aria-expanded`/`aria-controls` on all disclosures; screen-reader-only text for icon-only buttons.
-- The expand/collapse controls for flagged tiles are real `<button>`s in tab order.
+Follow this sequence before editing the page.
 
-## 15. Acceptance criteria
+### Step 1 — Inspect
 
-1. Both hero region cards show exactly 3 flagged tiles initially; `+{n} more` reveals the remaining flagged tiles in place; "Show fewer" collapses back; ordering matches `attentionTiles` (unchanged logic, verified against live data: 6 global + 6 AU warnings).
-2. No `currena-blue`, `--color-status-context`, `currena-soft`, `currena-coral`, or `--color-accent-gold*` ink remains anywhere in the Insights page render (light and dark).
-3. Severity inks appear only in the §3.2 allowed locations (spot-check: chips, cards, meters, links, nav, tools, charts, calendar, artwork).
-4. "Normal" and "Context" status chips render neutral with their icons; severity labels remain understandable in grayscale (icon + word test).
-5. All verdict meters render the neutral graded ramp at `lg`/`sm`/question sizes, LTR in FA, with `data-step` intact.
-6. Signed changes still render red/green; band words still colored; verdict words still 4-hue; attention count still red when flagged.
-7. AlertCards keep the red/amber inline-start border on a plain white/dark surface (no gradient tint); flagged rule line box is neutral.
-8. EN (LTR) and FA (RTL) both render correctly: logical edges, mirrored arrows, bidi islands, Persian digits, Vazirmatn.
-9. No horizontal overflow or clipped content at 360/768/1024/1440; details panel bottom-sheet on mobile; footer sticks/pushes naturally.
-10. Keyboard: tab order sensible; focus ring visible; `/`, `j`/`k`, Escape, focus-return all work; tooltips keyboard-operable.
-11. Loading, error, stale, private, and unavailable states render correctly (verified by blocking the API and using cached data).
-12. `pnpm -r typecheck`, `pnpm -r test`, `pnpm lint`, `pnpm copy:audit` all pass; `pnpm --filter @currena/web build` + bundle budget hold.
-13. No user-facing string was added or changed (manifest untouched); no financial logic, data source, or endpoint changed.
-14. Dark mode verified for the above in both themes.
+1. Read the repository's setup/agent instructions and identify the framework, entry points, routes, UI library, and styling system.
+2. Locate the implementation of this Economic Indicators page and its shared components.
+3. Identify the source of Global/Australia data, indicator ordering, severity classification, localization, tooltip content, expansion behavior, and data-download action.
+4. Identify existing breakpoints, typography, fonts, icon assets, CSS variables/tokens, and RTL handling.
+5. Run the current page and note any baseline visual or functional issues before changing it.
+
+### Step 2 — Plan
+
+- Write a brief implementation plan in the agent session or existing project workflow before large edits.
+- Map the specification to existing components and tokens; reuse project conventions where possible.
+- Clearly distinguish visual changes from behavioral changes.
+- Do not replace functional code simply to match the screenshot if an existing component can be restyled safely.
+
+### Step 3 — Implement
+
+- Build on the existing framework and component patterns.
+- Keep the scope limited to this page and components directly required by it.
+- Prefer small, reusable page-specific components where the current codebase supports them (for example, region summary card, indicator row, severity badge, and disclosure group).
+- Use data-driven lists rather than hard-coded copies of the first three indicators.
+- Keep severity style mapping separate from indicator calculations. Presentation changes must not alter data or state classification.
+- Use the existing localization/formatting system for all copy, dates, and values.
+- Preserve current routes, downloads, tooltip content, and event behavior.
+- Do not add dependencies unless a clear need is demonstrated and approved by repository conventions.
+
+### Step 4 — Verify
+
+- Run the project's appropriate lint, type-check, unit-test, and build commands when available.
+- Test Persian RTL and English LTR separately.
+- Test default and expanded indicator lists, all existing header actions, tooltips, calm groups, insufficient-data groups, and unavailable-data behavior.
+- Inspect responsive layouts at the required viewport widths.
+- Check the browser console for new errors and verify there is no horizontal overflow at 320 px.
+- Compare the result against both supplied references: the hierarchy and spacing should be closer to the proposed wireframe, while selective severity colors and useful details from the existing implementation remain.
+- Report changed files, checks performed, any checks that could not be run, and any unresolved limitations. Do not claim a check passed unless it was actually run.
+
+## 13. Acceptance criteria
+
+The implementation is complete when all applicable criteria below pass.
+
+### Visual hierarchy and layout
+
+- [ ] A visitor can identify the page title, Global status, and Australia status quickly without reading every indicator.
+- [ ] Global and Australia use equal-priority overview cards with Global on the right and Australia on the left on desktop, matching the supplied references.
+- [ ] Cards have a light surface, subtle border, consistent radius, and clear internal spacing.
+- [ ] Severity colors are selective and consistent; the entire page is not dominated by red/orange surfaces.
+- [ ] Values remain prominent while names and explanations are still easy to read.
+- [ ] The top three flagged indicators are shown by default in each region.
+- [ ] Calm and insufficient-data groups are visually secondary to flagged indicators.
+
+### Content and behavior
+
+- [ ] Existing severity labels, thresholds, data, indicator rank/order, and calculations are unchanged.
+- [ ] The displayed flagged count represents the full data count.
+- [ ] Show-more/show-less appears only when needed, reveals the remaining items, and reports its state accessibly.
+- [ ] Existing tooltips and header actions still work.
+- [ ] Any working download/export action has not been removed.
+- [ ] No new route, fake action, fabricated value, or unsupported indicator has been introduced.
+- [ ] Data freshness and insufficient-data messages remain accurate according to existing data.
+
+### Localization and responsiveness
+
+- [ ] Persian content uses true RTL direction; English content uses true LTR direction.
+- [ ] Card placement remains consistent across locales while inner alignment follows direction.
+- [ ] Text, punctuation, numbers, and percentages render correctly in both locales.
+- [ ] At 320 px width, there is no horizontal page scrolling or overlapping content.
+- [ ] Desktop uses two columns; narrower layouts stack cards when their content would otherwise become cramped.
+- [ ] Cards and rows grow to fit content instead of clipping it.
+
+### Accessibility and engineering quality
+
+- [ ] Text and controls meet the stated contrast targets.
+- [ ] All interactive controls are keyboard-operable with visible focus.
+- [ ] Icon-only controls have accessible names; status does not rely on color alone.
+- [ ] No new console errors, lint failures, type errors, or build failures are introduced, where those checks exist.
+- [ ] The existing framework, localization, data behavior, and project conventions have been preserved.
+- [ ] The agent's final report accurately lists the files changed and verification actually completed.
+
+## 14. Final design summary
+
+Build a restrained, information-first dashboard: the proposed wireframe's layout and spacing, paired with the current product's meaningful severity colors and contextual explanations. Keep the main state and top three flagged indicators visible, provide an obvious path to the rest, support Persian RTL and English LTR properly, and preserve all existing product behavior. Optimize for readability and trust—not for maximum color or the largest possible amount of data on the first screen.
