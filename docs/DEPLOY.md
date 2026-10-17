@@ -83,7 +83,41 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
-## CURRENT DEPLOYMENT — world stock markets public restore (2026-10-18b lineage, recorded 2026-10-18c)
+## CURRENT DEPLOYMENT — financial-asset-cards spec pack (2026-10-24c)
+
+The prices-board cards redesign per the owner's
+`financial-asset-cards-spec-pack.zip` is LIVE. Session 2026-10-22, rebased
+onto main @ round 46 (`0e411e6`) and pushed as `d952983` before deploy.
+
+- **Active worker**: currena-api **`6d6e1300-9af8-42fe-b42e-bd73ee865211`**
+  (wrangler deploy from `d952983`; SITE_MODE=public, RATES KV + ASSETS
+  bindings unchanged). currena-markets untouched.
+- **What it carries**: the four asset cards re-anatomised per spec 02 —
+  identity → dominant price + unit line → per-card as-of → THE SEVEN-DAY
+  TREND (day-spaced real-data `PriceSparkline` + net % + documented trend
+  word) → labelled daily change → deterministic hedged briefing →
+  «جزئیات بیشتر» disclosure (every secondary statistic preserved behind
+  it); `price-trend.ts` (+16 tests); PRICE_ROWS → Gold, Silver, Oil,
+  Bitcoin; 41 copy keys × 2 locales + the ma200 ٪ technical entry
+  (manifest 2,147); budgets 609/145.60 → 626/150. All concurrent-session
+  work (markets lenses round 46, economic-indicators lineage) rides
+  beneath, byte-for-byte.
+- **Byte-identical proof**: the deploy serves `index-BKEHdQbU.js`
+  (sha256 `730232ae…`, 295.29/88.82) + `Insights-DgGMrELI.js`
+  (sha256 `fdd478e7…`, 624.65/149.59) — the live-served Insights chunk
+  hashes **identically** to the fresh build of `d952983`.
+- **Verified live** (agent-browser, fresh profile, both
+  `currena-api.sedanama-ir.workers.dev` and `currena.ir` serve
+  `index-BKEHdQbU.js`): 4 cards in spec order (gold/silver/brent/btc),
+  4 aria-expanded disclosures, sparklines rendered, "Past 7 days" +
+  "Daily change" labels, gold US$4,166; disclosure click → aria-expanded
+  true + Changes/30 days/52-week/Price level vs 10-year range/Historical
+  high/Data source rows + label flips "Show less"; fa RTL (dir=rtl,
+  Persian digits, «جزئیات بیشتر», Jalali ۱۴۰۵); 375px single column, no
+  horizontal overflow at any width; zero page errors. Evidence:
+  `docs/evidence/2026-10-24c-financial-asset-cards/` (LIVE-*.png).
+
+## Previous: world stock markets public restore (2026-10-18b lineage, recorded 2026-10-18c)
 
 The newest code on main is LIVE — this section records the reconciliation
 for owners reading this runbook top-down (the 2026-10-18b session
