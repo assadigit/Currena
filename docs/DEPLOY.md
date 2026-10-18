@@ -83,6 +83,54 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## CURRENT DEPLOYMENT — the economic indicators hero closes the gap to the approved reference (2026-10-19 UI-fidelity correction round, worker 5164c21a)
+
+The owner's correction brief (the editorial hero still read as a generic
+KPI dashboard) is LIVE on `/#/insights`, presentation-only: the page
+container widens to ~95% viewport (`xl:max-w-[min(calc(100%-56px),1840px)]`
+— 1544px at 1600, 1704px at 1760), the Sydney/world-map art bands settle
+in the reference's washed-watermark zone (26%/30% veils), THE NAMED
+SEVERITY BUG is fixed (the flagged rows' inline-start accent, the
+fallback triangle and the attention-count line now follow the REGION'S
+OWN verdict step via `article[data-ei-step]` → `--ei-accent` — a
+Stressed Australia speaks the #ff832b amber ink, only a Critical region
+speaks red), the status-grouped gauge boxes become the reference's
+compact CATEGORY ROWS (label · tinted state badge · sm meter, worst
+first), each card closes with the restrained contextual explanation
+panel (Global: the raised world signals under `worldSignalsTitle` on
+pale red — verified live with the production markets feed — falling
+back to the word-choice rule; Australia: `verdictRuleLabel` + rule on
+pale amber; tint + the 3px inline-start rule follow the region step),
+the indicator names step to 16px, the hero meters return to pill
+radius, and the new `ContinueStrip` names the next page sections in
+order under the hero. Two new copy strings × 2 locales, manifest round
+`editorial-fidelity-2026-10-19`. Evidence + 10 screenshots:
+`docs/insights/economic-indicators-fidelity-verification.md`.
+
+- **Active worker**: currena-api **`5164c21a-5e30-4c9f-a596-0f8316d5270b`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *` keep-warm
+  cron unchanged; currena-markets untouched — UI-only round).
+- **What it carries**: everything from 29ebc99b (the editorial hero
+  round) + the fidelity corrections (commit `89d35d4`, fast-forward
+  merged to main; CI green on it — typecheck, lint, 1,603 tests, build,
+  bundle budgets after the documented 657.00/157.50 Insights bump
+  (D-37), copy audit).
+- **Live-verified** (currena.ir, fresh profile): EN desktop 1600 —
+  container 1544px, Australia left / Global right, AU rows
+  `rgb(255,131,43)` amber vs Global red, Global panel kind `signals`,
+  strip present, zero page overflow, zero console errors; EN mobile 390
+  — carousel opens on Global, real Next click → Australia, dot flips;
+  fa RTL desktop 1600 — 1544px, Australia left, amber accents, panel
+  heading «مبنای تعیین وضعیت هر حوزه», panel accent 3px amber, row
+  chevron mirrored (`matrix(-1,0,0,1)`), strip «ادامهٔ صفحه …»; fa
+  mobile 390 — Global first, zero overflow.
+- **Rollback**: `wrangler rollback` (previous version 29ebc99b), or
+  redeploy any prior main commit — the Worker carries the SPA build
+  from `apps/web/dist` at deploy time.
+
+The previous deployment record (the editorial handoff round, worker
+29ebc99b) follows below.
+
 ## CURRENT DEPLOYMENT — the economic indicators hero becomes the editorial financial interface (2026-10-19 editorial handoff round, worker 29ebc99b)
 
 The owner's `currena-hero.zip` handoff package (approved visual references,
