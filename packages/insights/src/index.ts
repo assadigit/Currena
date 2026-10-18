@@ -117,3 +117,6 @@ export type {
 
 export { RULE_VERSION, RULE_CHANGELOG } from './ruleVersion';
 export type { RuleChangeLogEntry } from './ruleVersion';
+
+export { computeLean, MAX_TILT_DEG, MIN_COVERAGE, MIN_TILT_DEG, STEP_TILT_DEG } from './lean';
+export type { LeanFactor, LeanResult, FactorState } from './lean';
