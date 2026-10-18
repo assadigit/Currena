@@ -77,12 +77,15 @@ function MoverCard({
       <p className="m-0 text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)]">
         {title}
       </p>
-      <div className="flex min-w-0 items-center gap-2.5">
-        <MarketLogo id={entry.id} latin={marketCopy.latin} size={36} desktopSize={44} />
+      <div className="flex min-w-0 items-center gap-3">
+        {/* 2026-10-18 owner follow-up ("at least 96×96 px"): the featured
+         * mover wordmark renders at 96px (112 on desktop) — the cards are
+         * half/full-width, so the horizontal identity row keeps its room. */}
+        <MarketLogo id={entry.id} latin={marketCopy.latin} size={96} desktopSize={112} />
         <span className="min-w-0 flex-1">
           {/* The canonical index name leads; the Latin name rides beside it
            * in Farsi (§6.7) and the country/market is the secondary line. */}
-          <span className="block truncate text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-primary)]">
+          <span className="block truncate text-[1rem] font-bold leading-snug text-[var(--color-text-primary)]">
             {marketCopy.name}
             {locale === 'fa' ? (
               <span lang="en" dir="ltr" className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">

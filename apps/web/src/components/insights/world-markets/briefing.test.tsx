@@ -218,6 +218,39 @@ describe('the featured movers', () => {
 });
 
 /* ------------------------------------------------------------------ *
+ * The index wordmarks (the 2026-10-18 owner follow-up: ≥96×96 px)
+ * ------------------------------------------------------------------ */
+
+describe('the index wordmarks', () => {
+  it('every rendered logo box is at least 96×96 px on BOTH breakpoints (the owner directive)', () => {
+    render(<WorldMarkets state={{ kind: 'ready', snapshot: snapshotFixture() }} copy={insightsCopyEn} locale="en" numberLocale="en-US" />);
+    // 5 explorer tiles + the 2 featured mover cards.
+    const logos = Array.from(document.querySelectorAll('img.currena-market-logo'));
+    expect(logos.length).toBe(7);
+    for (const img of logos) {
+      const styleAttr = img.getAttribute('style') ?? '';
+      const sizes = [...styleAttr.matchAll(/--icon-size(?:-sm)?:\s*([\d.]+)px/g)].map((m) => parseFloat(m[1]));
+      // The mobile box is always declared; the desktop box rides beside it.
+      expect(sizes.length).toBeGreaterThan(0);
+      for (const size of sizes) {
+        expect(size).toBeGreaterThanOrEqual(96);
+      }
+    }
+  });
+
+  it('opening a tile detail renders the same ≥96px wordmark beside the heading', () => {
+    render(<WorldMarkets state={{ kind: 'ready', snapshot: snapshotFixture() }} copy={insightsCopyEn} locale="en" numberLocale="en-US" />);
+    fireEvent.click(screen.getByRole('button', { name: /Nikkei 225/ }));
+    const detail = document.getElementById('insights-market-detail-n225')!;
+    const styleAttr = detail.querySelector('img.currena-market-logo')!.getAttribute('style') ?? '';
+    const sizes = [...styleAttr.matchAll(/--icon-size(?:-sm)?:\s*([\d.]+)px/g)].map((m) => parseFloat(m[1]));
+    for (const size of sizes) {
+      expect(size).toBeGreaterThanOrEqual(96);
+    }
+  });
+});
+
+/* ------------------------------------------------------------------ *
  * The explorer + the list/heatmap switch (§3.5, §3.6)
  * ------------------------------------------------------------------ */
 

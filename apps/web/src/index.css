@@ -1325,11 +1325,14 @@ html:not(:lang(fa)) .type-kicker {
  * ring — object-fit: contain preserves every logo's own whitespace, and
  * white stays white in dark mode (the artworks are light-background;
  * a dark chip would eat their edges). Same --icon-size / --icon-size-sm
- * recipe as .currena-icon so one media query drives every logo surface. */
+ * recipe as .currena-icon so one media query drives every logo surface.
+ * 2026-10-18 owner follow-up ("at least 96×96 px"): every rendered box is
+ * now ≥96px, so the corner radius is CAPPED at 16px — the /4 proportion
+ * would give a 24–28px radius on the big chips and read as a pill. */
 .currena-market-logo {
   width: var(--icon-size, 24px);
   height: var(--icon-size, 24px);
-  border-radius: calc(var(--icon-size, 24px) / 4);
+  border-radius: min(calc(var(--icon-size, 24px) / 4), 16px);
   object-fit: contain;
   background: #ffffff;
   box-shadow: inset 0 0 0 1px var(--color-border);

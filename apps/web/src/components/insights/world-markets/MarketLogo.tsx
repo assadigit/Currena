@@ -17,7 +17,11 @@
  *
  * Sizing follows the .currena-icon recipe: --icon-size (mobile box) and
  * --icon-size-sm (the ≥640px box), driven by .currena-market-logo in
- * index.css so one media query drives every logo surface.
+ * index.css so one media query drives every logo surface. 2026-10-18
+ * owner follow-up directive: every rendered box is AT LEAST 96×96 px
+ * (the supplied JPEGs are 256×256, so 96–112px renders stay sharp) —
+ * tiles 96 (stacked above the name: the explorer tiles stay narrow at
+ * 2→7 grid columns), movers 96/112, the detail heading 96.
  */
 
 import { useState, type CSSProperties } from 'react';
@@ -41,8 +45,7 @@ export function MarketLogo({
   id: MarketId;
   /** The copy dictionary's Latin display name (the initials source). */
   latin: string;
-  /** Rendered box in px on <640px viewports (24–32 on rows, larger on the
-   * mover cards). */
+  /** Rendered box in px on <640px viewports (the owner's ≥96 floor). */
   size?: number;
   /** Rendered box in px on ≥640px viewports. Omitted → same as size. */
   desktopSize?: number;

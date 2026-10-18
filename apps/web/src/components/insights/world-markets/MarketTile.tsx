@@ -88,11 +88,15 @@ export function MarketTile({
       } ${old ? 'opacity-80' : ''} bg-[var(--color-surface)]`}
     >
       {/* The identity row: logo (supplementary) + canonical name + the
-       * country/market line (§3.5 — every index is named AND located). */}
-      <span className="flex w-full items-center gap-1.5">
-        <MarketLogo id={entry.id} latin={marketCopy.latin} size={24} desktopSize={30} />
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-[length:var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
+       * country/market line (§3.5 — every index is named AND located).
+       * 2026-10-18 owner follow-up ("at least 96×96 px"): the wordmark
+       * renders at 96px and STACKS above the name — the explorer tiles
+       * stay narrow (2→7 columns), so a 96px logo beside the text would
+       * starve the name; stacked keeps both readable at every grid width. */}
+      <span className="flex w-full flex-col gap-1.5">
+        <MarketLogo id={entry.id} latin={marketCopy.latin} size={96} desktopSize={96} />
+        <span className="min-w-0">
+          <span className="block truncate text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-secondary)]">
             {marketCopy.name}
           </span>
           <span className="block truncate text-[0.68rem] leading-snug text-[var(--color-text-tertiary)]">
@@ -177,17 +181,25 @@ export function MarketDetail({
       id={`insights-market-detail-${entry.id}`}
       className="rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)]"
     >
-      <p className="m-0 mb-1 flex flex-wrap items-baseline gap-x-2 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
-        <MarketLogo id={entry.id} latin={marketCopy.latin} size={20} desktopSize={24} className="align-middle" />
-        {marketCopy.name}
-        <span className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
-          {marketCopy.country}
-        </span>
-        {locale === 'fa' ? (
-          <span lang="en" dir="ltr" className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
-            {marketCopy.latin}
+      {/* 2026-10-18 owner follow-up: the detail heading carries the same
+       * ≥96px wordmark beside the name block (the panel is full-width, so
+       * the horizontal identity row has room) — the same logo + name +
+       * country anatomy every surface wears. */}
+      <p className="m-0 mb-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+        <MarketLogo id={entry.id} latin={marketCopy.latin} size={96} desktopSize={96} />
+        <span className="min-w-0">
+          <span className="block truncate text-[length:var(--type-number)] font-bold leading-tight text-[var(--color-text-primary)]">
+            {marketCopy.name}
           </span>
-        ) : null}
+          <span className="block truncate text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
+            {marketCopy.country}
+            {locale === 'fa' ? (
+              <span lang="en" dir="ltr" className="ms-1.5">
+                {marketCopy.latin}
+              </span>
+            ) : null}
+          </span>
+        </span>
         <span className={`ms-auto inline-flex items-center rounded-full px-2 py-0.5 text-[0.68rem] font-bold ${statusToneOf(entry.fromHigh)}`}>
           {copy.markets[statusWordKeyOf(entry.fromHigh)]}
         </span>
