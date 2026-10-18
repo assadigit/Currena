@@ -2874,8 +2874,6 @@ export const insightsCopyEn = {
         tag: 'mixed',
       },
     },
-    // R26: the 30-day speed rides the footing row only when the data exists.
-    speedLabel: '30-day speed',
     notEnoughData: 'Not enough fresh data to read this card yet.',
     // R7b: the collapsed summary: one line per metal ("Gold: mixed, 2 of
     // 5 conditions met: price in the top 7% of the last 10 years").

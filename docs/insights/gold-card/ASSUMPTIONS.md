@@ -135,3 +135,36 @@ stays untouched in the repo root.
     dollar-basket, china-pmi). The stress row shows STLFSI's value +
     NFCI's; the industrial row shows China PMI + copper-to-gold (values
     line, as the old card did).
+
+## Decisions added during the build
+
+13. **The row chevron**: UX spec 01 §F.2 lists a chevron on the collapsed
+    row; the reference HTML omits it. Added (rotates on open) — file 01
+    governs behaviour, and the affordance matters for progressive
+    disclosure.
+14. **Driver display names ride the repo's own condition vocabulary**
+    (`signals.conditions.*.name`): "Real yields", "Inflation
+    expectations", "Market stress", "The US dollar", "Industrial demand"
+    (spec 04 proposed "US dollar" — the repo's established term wins).
+    Values render through the house DISPLAY config (e.g. the dollar
+    basket shows "104.20 index", not the reference's stripped "104.2").
+15. **EN plural**: "Updated … · 1 sources" would be a grammar error —
+    `updatedMetaOne` joins the corpus (the repo's seeAll/seeAllOne
+    pattern); fa needs no split.
+16. **Card-level error/loading states**: the page already owns them —
+    the Signals section renders only on a ready snapshot (the page-level
+    error state carries its own retry via `ui.retry`), so the card
+    itself needs neither the "We couldn't load this right now" state nor
+    a skeleton. The beam SVG reserves its own height (no CLS).
+17. **Verification method** (05 §C): no Playwright dependency was added
+    to the repo (acceptance E.2 — no new runtime dependency); the
+    sandbox's agent-browser (Playwright-based) drove the real Vite dev
+    build of the real component + copy + CSS. The 8 combinations were
+    captured as screenshots and checked (structure/tilt/overflow/digits)
+    both programmatically (scrollWidth, computed display, computed
+    animation under emulated reduced motion) and visually via a VLM pass
+    against the reference pair. A pixel-diff harness was NOT built.
+18. **The temporary render harness** (`apps/web/harness.html` +
+    `src/harness-main.tsx`) existed only during verification and is
+    removed from the final tree (it appears in one intermediate commit
+    only).
