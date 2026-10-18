@@ -18,7 +18,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import type { SignalConditionKey, SignalConditionReading, SignalConditionState, SignalReading } from '@currena/insights';
+import type { SignalConditionReading, SignalConditionState, SignalReading } from '@currena/insights';
 import { insightsCopyEn } from '../../../i18n/insights-copy-en';
 import { insightsCopyFa } from '../../../i18n/insights-copy-fa';
 import { BalanceCard } from './BalanceCard';
@@ -474,6 +474,31 @@ describe('Farsi rendering (acceptance C)', () => {
     const flip = q('[data-gc-flip]');
     expect(flip.textContent).toContain('اگر تنش بازار به زیر');
     expect(flip.textContent).toContain('برسد، شرایط متعادل می‌شود');
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Integration — the REAL section shell + REAL evaluator feeding the
+ * card (the wiring Signals.tsx performs, pinned end to end)
+ * ------------------------------------------------------------------ */
+
+describe('Signals section integration (evaluateSignal → BalanceCard)', () => {
+  it('renders the card from live-like readings through the real evaluator', async () => {
+    const { Signals } = await import('../Signals');
+    const readings = liveReadings().map((r) =>
+      r.id === 'breakeven-5y5y' ? { ...r, status: 'warning' as const } : r,
+    );
+    const { container } = render(
+      <Signals readings={readings} copy={insightsCopyEn} numberLocale="en-US" expandToken={0} />,
+    );
+    // real-yield high (against) + stress calm (against) + expectations
+    // warning (supportive) + dollar typical (neutral): P2 S1 N1 → net 1.
+    expect(container.querySelector('[data-gc-verdict]')!.getAttribute('data-gc-verdict')).toBe('slight_against');
+    expect(screen.getByRole('heading', { level: 3 }).textContent).toBe('Slight lean against gold');
+    expect(screen.getByText('High confidence · 4 of 4 factors read')).toBeTruthy();
+    expect(container.querySelectorAll('details[data-gc-row]')).toHaveLength(4);
+    // The heavier side is pressures — no pressure-side thresholds → no flip line.
+    expect(container.querySelector('[data-gc-flip]')).toBeNull();
   });
 });
 
