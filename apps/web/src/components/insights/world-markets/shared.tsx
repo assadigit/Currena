@@ -17,11 +17,14 @@ export type MarketsLoadState =
   | { kind: 'empty' }
   | { kind: 'ready'; snapshot: MarketsSnapshot };
 
-/** The section's lenses: today, 1 week, 1 month, the NORMAL 3-month window,
- * or the distance from the 52-week high (spec §6.3 as amended by owner round
- * 44; round 46 added the weekly and monthly lenses in ascending duration
- * order, the 52-week distance last). */
-export type MarketsView = 'today' | '1w' | '1m' | '3m' | 'high';
+/** The section's return-period lenses: daily, weekly, monthly and the
+ * NORMAL quarterly window (02-ui-spec §3.3, the 2026-10-18 handoff
+ * round). The 52-week-high distance is NOT a lens any more — it rides
+ * every surface as secondary context (tile tags, mover cards, table
+ * column) — and an annual lens does not exist in the stored contract
+ * (no chg1y/YTD field; the weekly series is chart-rounded, so deriving
+ * one would fabricate precision). See briefing.ts for the closed list. */
+export type MarketsView = 'today' | '1w' | '1m' | '3m';
 
 /* ------------------------------------------------------------------ *
  * Pure display helpers
@@ -35,7 +38,15 @@ export function signedPct(n: number, numberLocale: 'en-US' | 'fa-IR', locale: 'e
   // A value that rounds to zero shows no sign — "−0.0" reads as a bug.
   const roundsToZero = Math.round(Math.abs(n) * 10) === 0;
   const sign = roundsToZero ? '' : n > 0 ? '+' : '−';
-  return `${sign}${num}${locale === 'fa' ? '٪' : '%'}`;
+  return `${sign}${num}${percentGlyph(locale)}`;
+}
+
+/** The locale's percent glyph — ٪ in Persian, % otherwise. A technical
+ * character (claimed by the manifest's technical.worldMarkets.percentSign
+ * entry), never copy: the number beside it carries the meaning. Shared so
+ * every surface renders the SAME glyph (tiles, movers, legend). */
+export function percentGlyph(locale: 'en' | 'fa'): string {
+  return locale === 'fa' ? '٪' : '%';
 }
 
 /**
@@ -59,13 +70,10 @@ export function trendOf(m: Pick<MarketEntry, 'chg3m'>): 'up' | 'flat' | 'down' {
   return bandedArrow(m.chg3m);
 }
 
-/** The number + direction the current view shows for one market. A null pct
+/** The number + direction the selected period shows for one market. A null pct
  * means the row carries no reading for that lens yet (a stored row written
  * before round 46) — the caller renders the honest dash, never a guess. */
 export function viewValue(m: MarketEntry, view: MarketsView): { pct: number | null; arrow: 'up' | 'flat' | 'down' } {
-  if (view === 'high') {
-    return { pct: m.fromHigh, arrow: bandedArrow(m.fromHigh) };
-  }
   if (view === 'today') {
     return { pct: m.chg1d, arrow: bandedArrow(m.chg1d) };
   }

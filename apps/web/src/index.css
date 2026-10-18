@@ -1320,6 +1320,39 @@ html:not(:lang(fa)) .type-kicker {
   }
 }
 
+/* World-indices round (2026-10-18): the 16 supplied index wordmarks
+ * (JPEGs on white, own padding) ride a quiet WHITE chip with a hairline
+ * ring — object-fit: contain preserves every logo's own whitespace, and
+ * white stays white in dark mode (the artworks are light-background;
+ * a dark chip would eat their edges). Same --icon-size / --icon-size-sm
+ * recipe as .currena-icon so one media query drives every logo surface. */
+.currena-market-logo {
+  width: var(--icon-size, 24px);
+  height: var(--icon-size, 24px);
+  border-radius: calc(var(--icon-size, 24px) / 4);
+  object-fit: contain;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+.currena-market-logo-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(var(--icon-size, 24px) * 0.34);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-text-secondary);
+}
+@media (min-width: 640px) {
+  .currena-market-logo {
+    width: var(--icon-size-sm, var(--icon-size, 24px));
+    height: var(--icon-size-sm, var(--icon-size, 24px));
+  }
+  .currena-market-logo-fallback {
+    font-size: calc(var(--icon-size-sm, var(--icon-size, 24px)) * 0.34);
+  }
+}
+
 /* Alert-card accent (F1): inline-start border + light tint, never colour alone.
  * R30 colour roles: RED = needs attention only. The Unusual tier gets the
  * amber watch ink (border + tint) so the two tiers stop looking alike —

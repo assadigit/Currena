@@ -5,6 +5,111 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-18] — the world stock indices section becomes the editorial market briefing «نبض بازارهای جهان» (the owner's world-indices handoff round; branch feature/world-indices-briefing, NOT deployed)
+
+The owner's handoff package (`01-new-session-prompt.md`, `02-ui-spec.md`,
+`03-agent-rules.md`, `ASSET-MAP.md` + 16 index wordmark JPEGs + a
+non-authoritative style image) reshapes the World stock markets section on
+`/#/insights` into an editorial market briefing, UI-only. The governing
+spec records the round as §11 of `docs/specs/insights-world-markets.md`;
+the copy decisions live in
+`docs/localization/world-indices-copy-review.md`.
+
+### Added
+
+- **The editorial header (§3.1)** — «نبض بازارهای جهان» over the new
+  descriptive label «شاخص‌های بورسی جهان», the §3.1 descriptor subtitle,
+  and the «آخرین داده‌ها · پایان جلسهٔ معاملاتی» badge beside the as-of
+  date ("live"/"real time" remains banned wording).
+- **The breadth layer (§3.2)** — the summary card's selected-period
+  up/down/flat strip («شاخص‌های مثبت / منفی / بدون تغییر») plus the
+  separate below-52-week-high count line, both computed from RAW stored
+  values in the new pure module
+  `apps/web/src/components/insights/world-markets/briefing.ts`
+  (`marketBreadth` reuses the section's ±1% flat band; `belowHighCount`
+  reads `CORRECTION_PCT` from the markets config block — a −9.96% distance
+  that displays as −10% is NOT counted).
+- **The featured movers (§3.4)** — `world-markets/MarketMovers.tsx`:
+  «بیشترین رشد» / «بیشترین افت» as true extrema of the selected period
+  (`topMovers`: missing lens rows are never ranked as zero; no valid rows →
+  the honest empty state, never a fake winner), each card carrying the
+  logo, canonical name, country/market, signed return and the 52-week
+  distance as secondary context.
+- **The index wordmarks** — the 16 supplied 256×256 JPEGs ship as
+  `apps/web/public/assets/markets/{marketId}.jpg` (named by canonical id so
+  a file can never drift from its data row); `world-markets/MarketLogo.tsx`
+  renders them in a standardized white chip (object-fit contain, hairline
+  ring, initials fallback on load failure) — supplementary identifiers
+  that never override the canonical names.
+- **The desktop performance map (§3.6)** — `world-markets/MarketsHeatmap.tsx`
+  behind a «فهرست»/«نقشهٔ عملکرد» switch (lg+ only; mobile keeps the
+  readable list): EQUAL-AREA tiles (no weighting metric exists in the
+  contract, so size never implies importance), the exact signed percentage
+  + name + arrow on every tile, a visible zero-centred legend with the
+  period-relative note (`heatmapScale` rounds the largest |raw return| up
+  to a nice step, per period), keyboard/tap opening the same detail panel,
+  and the list/table as the always-available textual alternative.
+- **Country/market labels** — every index entry gained `country` in both
+  dictionaries (16 × 2 strings; EURO STOXX 50 = «منطقهٔ یورو», Hang Seng =
+  «هنگ‌کنگ» — market labels, not countries), shown on tiles, mover cards
+  and the detail panel.
+
+### Changed
+
+- **The period control (§3.3)** — the view switch now offers EXACTLY the
+  four horizons the stored contract carries: روزانه / هفتگی / ماهانه /
+  سه‌ماهه. The "From 52-week high" lens was removed from the switch (the
+  distance stays secondary context on tiles, mover cards and the table
+  column), and the annual horizon is deliberately NOT offered: no
+  `chg1y`/YTD field exists in `MarketEntrySchema` and the weekly series is
+  chart-rounded, so deriving one would fabricate precision — the gap is
+  recorded in spec §11.2 and closing it needs owner approval + a
+  markets-worker contract change.
+- **The explorer tiles (§3.5)** — each tile gained the logo + country
+  identity row; region groups are semantic `<h3>`s with counts from the
+  loaded dataset.
+- **The summary card** — the round-44 verdict box now also carries the
+  breadth strip + below-high line; the verdict anatomy, the §6.11 measure
+  line, the hero count and the takeaway templates are unchanged.
+- **Copy** — 38 new + 3 changed + 5 removed fa strings through the audit
+  workflow (round `handoff-world-indices`, reference
+  `docs/localization/world-indices-copy-review.md`; manifest 2,203, audit
+  clean). Notably «سقف یک‌ساله» was kept over the handoff's suggested
+  «سقف ۵۲هفته‌ای» (the repo terminology dictionary is the final authority),
+  and the legend's «٪» glyph routes through the new shared
+  `percentGlyph()` so no new hardcoded literal ships.
+
+### Tests
+
+- `world-markets/briefing.test.ts` — the closed lens list, breadth
+  (incl. partial data + the ±1 band edges), the raw −10% threshold
+  (incl. the −9.96% rounding boundary), top movers on
+  positive/negative/mixed/partial/missing/single-valid data + tie order,
+  the heatmap scale + tones, and cross-surface period consistency.
+- `world-markets/briefing.test.tsx` — 17 rendered-section tests: the
+  editorial header, the load states, period changes moving breadth +
+  movers + tiles together, the honest dash + coverage note, the
+  list/heatmap switch, and the fa/RTL rendering (Persian digits,
+  dir-isolated Latin names, the verbatim owner-directed title).
+- `markets-verdict.test.ts` updated for the copy-parity suite (incl. the
+  no-annual-lens guard and the 16 country labels);
+  `full-export.test.ts` re-pinned to the renamed export heading.
+
+### Budget
+
+- Insights lazy chunk consciously bumped **636.00/152.50 → 652.00/156.50**
+  (measured 650.28/155.51; +14.37 kB raw / +3.51 kB gz — the new feature
+  layer + ~108 strings × 2 locales; the 16 JPEGs are public assets, not
+  chunk bytes). Entry chunk untouched (295.29/88.81 vs 296/89.5). D-35 in
+  `docs/DECISIONS_FOR_ALI.md`.
+
+### Not changed
+
+Providers, crons, KV, the public read route, the §5.3 signal rules, hero
+integration, the detail panel's 52-week chart, the full table, the CSV
+exports; no deploy (the branch waits for the owner's review; the legacy
+production Django app untouched).
+
 ## [2026-10-26e] — the repository root cleaned of misplaced specification markdown (owner cleanup work order)
 
 The owner's minimal-cleanup work order: move the specification-related

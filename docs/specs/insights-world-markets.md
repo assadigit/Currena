@@ -498,3 +498,91 @@ Work in this order. Loop on each step until its test passes, then continue. Matc
 - **Licence:** both free sources are personal-use. Fine for today's non-commercial site with credit given; revisit before Currena earns money (D1).
 - **Thin free quota:** EODHD free has 6 spare calls per day. The retry job only re-fetches failed markets to protect it.
 - **Holidays:** a market can be closed for days. Each tile shows its own last-close date, so this is never a bug.
+
+---
+
+## 11. Round 2026-10-18 (the world-indices handoff): the editorial market briefing
+
+Owner-directed redesign round. The instruction package (handoff:
+`01-new-session-prompt.md`, `02-ui-spec.md`, `03-agent-rules.md`,
+`ASSET-MAP.md` + 16 index-logo JPEGs + a non-authoritative style image)
+asked for an editorial market briefing for ordinary Persian-speaking
+users, while keeping the section a rigorous comparison tool. This
+addendum records what changed, what was deliberately NOT changed, and
+the one data gap the round surfaced. Section references below are to
+`02-ui-spec.md`.
+
+### 11.1 What changed (UI only)
+
+- **Header (§3.1):** the editorial title «نبض بازارهای جهان» over the
+  descriptive label «شاخص‌های بورسی جهان», the descriptor sentence and
+  the «آخرین داده‌ها · پایان جلسهٔ معاملاتی» badge beside the as-of
+  date. "Live"/"real time" remains banned wording.
+- **Summary card (§3.2):** the focal verdict box (round 44) gained the
+  selected-period breadth strip (up/down/flat counts from RAW values,
+  the ±1% flat band the section already uses) plus the separate
+  below-52-week-high count line — `world-markets/briefing.ts`
+  (`marketBreadth`, `belowHighCount`). The verdict anatomy, the §6.11
+  measure line, the hero count and the takeaway templates are unchanged.
+- **Movers (§3.4):** two new featured cards «بیشترین رشد» /
+  «بیشترین افت» — true extrema of the selected period (briefing.
+  `topMovers`), logo + canonical name + country + signed return + the
+  52-week distance as secondary context; honest empty state when the
+  lens has no valid rows.
+- **Period control (§3.3):** the view switch now offers EXACTLY the four
+  horizons the stored contract carries — Daily | Weekly | Monthly |
+  Quarterly. The "From 52-week high" lens was REMOVED from the switch
+  (the distance stays secondary context everywhere: tile tags, mover
+  cards, the table column). The annual horizon is NOT offered — see 11.2.
+- **Explorer (§3.5):** each tile gained the index wordmark (in the new
+  standardized white frame, `object-fit: contain`, initials fallback —
+  `world-markets/MarketLogo.tsx`, assets at `/assets/markets/{id}.jpg`)
+  and the country/market line from the copy dictionary. Region groups
+  are semantic `<h3>`s.
+- **Performance map (§3.6):** a new desktop-only list/«نقشهٔ عملکرد»
+  switch (`MarketsHeatmap.tsx`): equal-area tiles (no weighting metric
+  exists in the contract, so size never implies importance), the exact
+  signed percentage + name on every tile, a visible zero-centred legend
+  with the period-relative note, keyboard/tap opening the same detail
+  panel, and the list/table as the always-available textual alternative.
+- **Copy:** 38 new fa strings + 3 changed + 5 removed, all through the
+  copy-audit workflow, round `handoff-world-indices`, reference
+  `docs/localization/world-indices-copy-review.md` (the terminology
+  decisions are recorded there; notably «سقف یک‌ساله» was kept over the
+  handoff's suggested «سقف ۵۲هفته‌ای» — the repo dictionary wins).
+
+### 11.2 The data gap this round MUST report (no fabrication)
+
+The requested horizon list in the handoff was daily / weekly / monthly /
+quarterly / annual. The stored contract (`MarketEntrySchema`) carries
+`chg1d`, `chg1w` (optional), `chg1m` (optional), `chg3m` — and NO annual
+value: no `chg1y`, no YTD field, no year-start date, and the weekly
+series is chart-rounded integer closes, so deriving an annual return in
+the frontend would fabricate precision. Per the handoff's own data-truth
+rules, the annual horizon is simply not offered, and this gap is the
+change that would need owner approval to close: add `chg1y` (or YTD) to
+`packages/insights/src/markets/compute.ts` + `packages/core/src/schemas.ts`
++ a markets-worker rewrite of the stored object (a contract change on the
+provider side of the boundary — NOT done in this round).
+
+### 11.3 Explicitly NOT changed
+
+The data pipeline (EODHD/Yahoo, crons `30 23 * * 1-5` + `30 1 * * 2-6`
+UTC, the one `insights:markets:v1` KV key, write-only-if-changed), the
+public read route, the §5.3 signal rules and hero integration, the
+§6.11 verdict-line wiring, the detail panel's 52-week chart, the full
+table (worst-first sort, all columns), the CSV exports, and every
+loading/empty/partial/stale state discipline. No provider call ever
+happens on a page request.
+
+### 11.4 Tests
+
+`world-markets/briefing.test.ts` (pure rules: the closed lens list,
+breadth with partial data, the raw −10% threshold incl. the −9.96%
+rounding boundary, top-movers on positive/negative/mixed/partial/missing
+data, the heatmap scale + tones, cross-surface period consistency) and
+`world-markets/briefing.test.tsx` (rendered section: period changes move
+breadth + movers + tiles together, the honest dash for a missing lens,
+the list/heatmap switch, the fa/RTL rendering with the editorial header
+and Persian digits) + the updated `markets-verdict.test.ts` copy-parity
+suite. All fixture-backed; no live providers.

@@ -13,10 +13,13 @@ import { MarketsChart } from '../MarketsChart';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { formatAsOf } from '../HistoryChart';
+import { MarketLogo } from './MarketLogo';
+import { periodWord } from './ViewSwitch';
 import {
   DirectionGlyph,
   fmtClose,
   isOld,
+  signedPct,
   signedPctOrDash,
   statusToneOf,
   statusWordKeyOf,
@@ -28,7 +31,11 @@ import {
 } from './shared';
 
 /* ------------------------------------------------------------------ *
- * One market tile (§6.3): quiet by default, real button, aria-expanded
+ * One market tile (§6.3 + the handoff round's explorer row, §3.5): quiet
+ * by default, real button, aria-expanded. The index wordmark rides in
+ * the standardized frame with the CANONICAL NAME as primary text and
+ * the country/market as the secondary line (the logo is supplementary —
+ * it can never replace the written name).
  * ------------------------------------------------------------------ */
 
 export function MarketTile({
@@ -62,6 +69,9 @@ export function MarketTile({
   const tagX = formatNumber(Math.abs(entry.fromHigh), numberLocale, { maximumFractionDigits: 0 });
   const oldDate = formatAsOf(entry.asOf, locale);
   const trendWord = copy.markets[TREND_WORD_OF[trendOf(entry)]];
+  // §9: the screen reader hears the name, country, selected period and
+  // value (or the missing-reading phrase) in the same sentence.
+  const srValue = pct === null ? copy.markets.noReadingAria : signedPct(pct, numberLocale, locale);
 
   return (
     <button
@@ -77,10 +87,18 @@ export function MarketTile({
             : 'ring-[var(--color-border)] hover:bg-currena-soft/60'
       } ${old ? 'opacity-80' : ''} bg-[var(--color-surface)]`}
     >
-      {/* §6.3 "short name" — the full name wraps to at most two lines
-       * ("Shanghai Composite"); never truncated into guesswork. */}
-      <span className="w-full text-[length:var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
-        {marketCopy.name}
+      {/* The identity row: logo (supplementary) + canonical name + the
+       * country/market line (§3.5 — every index is named AND located). */}
+      <span className="flex w-full items-center gap-1.5">
+        <MarketLogo id={entry.id} latin={marketCopy.latin} size={24} desktopSize={30} />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-[length:var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
+            {marketCopy.name}
+          </span>
+          <span className="block truncate text-[0.68rem] leading-snug text-[var(--color-text-tertiary)]">
+            {marketCopy.country}
+          </span>
+        </span>
       </span>
       {/* The number + the owner's up/down artwork: the signed number
        * carries the meaning, the green/red zigzags ride beside it (round
@@ -119,7 +137,13 @@ export function MarketTile({
         </span>
       ) : null}
       <span className="sr-only">
-        {trendWord}, {copy.markets[statusWordKeyOf(entry.fromHigh)]}, {interpolate(copy.markets.asOf, { date: oldDate })}
+        {interpolate(copy.markets.heatmapValueAria, {
+          name: marketCopy.name,
+          country: marketCopy.country,
+          value: srValue,
+          period: periodWord(view, copy),
+        })}
+        , {trendWord}, {copy.markets[statusWordKeyOf(entry.fromHigh)]}, {interpolate(copy.markets.asOf, { date: oldDate })}
       </span>
     </button>
   );
@@ -154,9 +178,13 @@ export function MarketDetail({
       className="rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)]"
     >
       <p className="m-0 mb-1 flex flex-wrap items-baseline gap-x-2 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
+        <MarketLogo id={entry.id} latin={marketCopy.latin} size={20} desktopSize={24} className="align-middle" />
         {marketCopy.name}
+        <span className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
+          {marketCopy.country}
+        </span>
         {locale === 'fa' ? (
-          <span dir="ltr" className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
+          <span lang="en" dir="ltr" className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
             {marketCopy.latin}
           </span>
         ) : null}

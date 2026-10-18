@@ -403,7 +403,23 @@ const BUDGETS = [
   // +0.73 kB raw / -0.06 kB gz against v7's 635.18/152.06, staying
   // inside the 636/152.50 bump — no further bump. The entry chunk is
   // untouched at 295.29/88.81.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 636_000, gz: 152_500, label: 'Insights lazy chunk' },
+  // World-indices handoff round (636.00 → 652.00 raw, 152.50 → 156.50 gz,
+  // 2026-10-18 (2)): the world stock indices section becomes the editorial
+  // market briefing «نبض بازارهای جهان» — the movers cards
+  // (world-markets/MarketMovers.tsx), the desktop performance map
+  // (world-markets/MarketsHeatmap.tsx + legend), the logo frame with its
+  // initials fallback (world-markets/MarketLogo.tsx), the breadth strip
+  // inside the summary card, the tile identity row (logo + country line),
+  // the pure decision layer (world-markets/briefing.ts) and ~108 new copy
+  // strings × 2 locales (38 new fa keys + 16 countries + the en twins).
+  // Measured 650.28/155.51 — raw +14.37 kB, gz +3.51 kB over the
+  // 2026-10-26d merged tree: an owner-directed feature layer, mostly
+  // highly-compressible JSX + dictionary copy. The 16 index wordmark
+  // JPEGs ship as public assets (152 kB on disk), NOT in the JS chunk;
+  // the entry chunk is untouched at 295.29/88.81 vs 296/89.5. Justified
+  // in CHANGELOG §2026-10-18 (world-indices round) and D-35 in
+  // docs/DECISIONS_FOR_ALI.md.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 652_000, gz: 156_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {

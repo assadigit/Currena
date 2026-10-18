@@ -1664,21 +1664,34 @@ export const insightsCopyEn = {
    * World stock markets (insights-world-markets-spec.md §7 + §8, verbatim)
    * ------------------------------------------------------------------ */
   markets: {
-    title: 'World stock markets',
-    subtitle: 'Last close · end-of-day data',
+    /** The editorial market-briefing header (the 2026-10-18 world-indices
+     * handoff round): the owner-directed title + descriptive label, the
+     * provenance descriptor, and the last-close badge. "Indices", never
+     * "exchanges"; "last available close", never "live" (02-ui-spec §3.1). */
+    title: 'The pulse of world markets',
+    sectionLabel: 'World stock indices',
+    subtitle: 'How selected stock indices performed to the last trading close',
+    lastCloseBadge: 'Latest data · end of trading day',
     asOf: 'as of {date}',
     /** Regional groups, east to west (the trading day's order). */
     groups: { asia: 'Asia-Pacific', europe: 'Europe', americas: 'Americas' },
-    /** The segmented view switch (§6.3, round 44 → round 46): the NORMAL
-     * timeframe is 3 months — the lens the section opens on; Today, 1 week
-     * and 1 month stay one tap away (round 46 added the two shorter
-     * lenses, ascending duration order, the 52-week distance last). */
-    viewSwitchAria: 'Choose the number every market tile shows',
-    viewToday: 'Today',
-    viewWeek: '1 week',
-    viewMonth: '1 month',
-    view3m: '3 months',
-    viewFromHigh: 'From 52-week high',
+    /** The period radiogroup (02-ui-spec §3.3, handoff round): daily,
+     * weekly, monthly, quarterly — the four horizons the stored contract
+     * actually carries. The 52-week-high distance is secondary context,
+     * not a period; an annual/YTD horizon does not exist in the data
+     * contract and must not appear here. */
+    viewSwitchAria: 'Choose the performance period for the indices',
+    viewDaily: 'Daily',
+    viewWeekly: 'Weekly',
+    viewMonthly: 'Monthly',
+    viewQuarterly: 'Quarterly',
+    /** The list / performance-map switch (02-ui-spec §3.6, desktop). */
+    displaySwitchAria: 'Choose how the indices are shown',
+    viewList: 'List',
+    viewHeatmap: 'Performance map',
+    heatmapLegendLabel: 'Intensity is relative to the selected period',
+    heatmapValueAria: '{name}, {country}: {value} over {period}',
+    noReadingAria: 'no data for this period',
     /** The focal verdict box's words (owner round 44) — market-speak on the
      * page's four-step instrument: step 1 Bullish (calm, most markets up
      * over 3 months), 2 Mixed (calm, no clear direction), 3 Mixed with the
@@ -1693,6 +1706,21 @@ export const insightsCopyEn = {
     verdictAria: 'World stock markets verdict: {label}, step {step} of 4',
     /** Step-1 E2: the attention tier's count line beside the word. */
     inCorrectionCount: '{n} of {count} markets in correction',
+    /** Market breadth (02-ui-spec §3.2): counts of indices up / down /
+     * flat over the SELECTED period, computed from raw values; the
+     * below-52w-high line is separate secondary context. */
+    breadthPeriod: '{period} performance',
+    breadthUp: 'Indices up',
+    breadthDown: 'Indices down',
+    breadthFlat: 'Flat',
+    coverageNote: '{count} of {total} indices carry this period.',
+    belowHighLine: '{n} of {count} indices are at least 10% below their 52-week high',
+    /** The two featured movers (02-ui-spec §3.4): true extrema of the
+     * selected period, never a fake winner. */
+    moverGain: 'Biggest gain',
+    moverLoss: 'Biggest fall',
+    moverPeriodLabel: 'Selected period: {period}',
+    moversNone: 'No data for this period yet.',
     /** Quiet-by-default tile tag (§6.3): correction/bear markets only. */
     tileTagBelow: '{x}% below 52-week high',
     /** Step-1 F5: the at-high tag — every tile carries its 52-week distance. */
@@ -1778,6 +1806,7 @@ export const insightsCopyEn = {
       n225: {
         name: 'Nikkei 225',
         latin: 'Nikkei 225',
+        country: 'Japan',
         what: '225 large Japanese companies, many of them exporters.',
         why: 'It moves with the yen (you already track USD/JPY): a weak yen usually helps exporters, and a sudden yen jump can hit this index hard.',
         you: 'Big yen swings can shake global markets, as happened in August 2024.',
@@ -1785,6 +1814,7 @@ export const insightsCopyEn = {
       asx200: {
         name: 'ASX 200',
         latin: 'ASX 200',
+        country: 'Australia',
         what: 'The 200 largest companies on the Australian Securities Exchange, led by banks and miners.',
         why: 'Your home market. It follows iron ore, China’s demand and the big banks.',
         you: 'Most Australian super funds hold a large slice of these companies, so it affects your retirement savings.',
@@ -1792,6 +1822,7 @@ export const insightsCopyEn = {
       kospi: {
         name: 'KOSPI',
         latin: 'KOSPI',
+        country: 'South Korea',
         what: 'South Korea’s main stock index, led by Samsung Electronics and SK Hynix.',
         why: 'A bellwether for the world’s computer-chip cycle and for AI hardware demand.',
         you: 'Chip demand shapes the cost and availability of phones, cars and AI services.',
@@ -1799,6 +1830,7 @@ export const insightsCopyEn = {
       hsi: {
         name: 'Hang Seng',
         latin: 'Hang Seng',
+        country: 'Hong Kong',
         what: 'Hong Kong’s biggest companies, including many Chinese technology and finance firms.',
         why: 'The main door through which foreign investors buy into China, so it reacts fast to China news.',
         you: 'Sharp moves here are an early hint of how global investors feel about China.',
@@ -1806,6 +1838,7 @@ export const insightsCopyEn = {
       ssec: {
         name: 'Shanghai Composite',
         latin: 'Shanghai Composite',
+        country: 'China',
         what: 'All stocks listed on the Shanghai Stock Exchange.',
         why: 'A read on China’s domestic economy, which drives demand for oil, iron ore and copper.',
         you: 'China buys a large share of Australia’s iron ore, so a weak China market can mean weaker Australian exports and a softer Australian dollar.',
@@ -1813,6 +1846,7 @@ export const insightsCopyEn = {
       taiex: {
         name: 'TAIEX',
         latin: 'TAIEX',
+        country: 'Taiwan',
         what: 'Taiwan’s main stock index. TSMC, which makes most of the world’s most advanced chips, carries a huge weight.',
         why: 'Shows the health of the AI-chip supply chain, and carries geopolitical risk around Taiwan.',
         you: 'Trouble in Taiwan would ripple through every technology and AI company.',
@@ -1820,6 +1854,7 @@ export const insightsCopyEn = {
       nifty50: {
         name: 'Nifty 50',
         latin: 'Nifty 50',
+        country: 'India',
         what: 'The 50 largest companies on India’s National Stock Exchange.',
         why: 'India is one of the fastest-growing big economies and competes with China for global investor money.',
         you: 'Money moving into or out of India can shift emerging-market funds and demand for oil and gold.',
@@ -1827,6 +1862,7 @@ export const insightsCopyEn = {
       stoxx50: {
         name: 'Euro Stoxx 50',
         latin: 'Euro Stoxx 50',
+        country: 'Eurozone',
         what: 'The 50 biggest companies in the eurozone.',
         why: 'One number for the health of the euro area, one of the world’s largest economic blocs.',
         you: 'It affects the euro and European interest rates, which matter for imports, travel and global funds.',
@@ -1834,6 +1870,7 @@ export const insightsCopyEn = {
       dax: {
         name: 'DAX',
         latin: 'DAX',
+        country: 'Germany',
         what: 'The 40 largest German companies, heavy in cars, chemicals and machinery.',
         why: 'Germany sells goods worldwide, so the DAX is a good read on global trade and on demand from China.',
         you: 'Weakness can signal slowing world trade, which tends to cool growth and commodity prices.',
@@ -1841,6 +1878,7 @@ export const insightsCopyEn = {
       cac: {
         name: 'CAC 40',
         latin: 'CAC 40',
+        country: 'France',
         what: 'The 40 largest companies on the Paris exchange: luxury goods, energy, banks and aerospace.',
         why: 'France is the eurozone’s second-largest economy; alongside the DAX and Euro Stoxx 50 it shows how Europe’s blue chips are faring.',
         you: 'It moves with the euro and European interest rates, which shape the cost of travel and goods imported from Europe.',
@@ -1848,6 +1886,7 @@ export const insightsCopyEn = {
       ftse: {
         name: 'FTSE 100',
         latin: 'FTSE 100',
+        country: 'United Kingdom',
         what: 'The 100 largest companies on the London Stock Exchange.',
         why: 'Full of global miners, oil companies and banks that earn most of their money abroad, so it works more like a gauge of commodities and world growth than of the UK itself.',
         you: 'It often rises when oil and metal prices rise, even if the UK economy is weak.',
@@ -1855,6 +1894,7 @@ export const insightsCopyEn = {
       sp500: {
         name: 'S&P 500',
         latin: 'S&P 500',
+        country: 'United States',
         what: 'The 500 biggest companies listed in the United States.',
         why: 'It is the world’s main stock-market benchmark; when it falls sharply, markets almost everywhere follow.',
         you: 'Many super and index funds hold US shares, so its moves reach your retirement savings.',
@@ -1862,6 +1902,7 @@ export const insightsCopyEn = {
       ndx: {
         name: 'Nasdaq 100',
         latin: 'Nasdaq 100',
+        country: 'United States',
         what: 'The 100 largest non-financial companies on the Nasdaq exchange, led by big technology and AI firms.',
         why: 'Shows the mood for technology and growth stocks. It usually swings harder than the S&P 500.',
         you: 'Falls here often mean investors are pulling back from risk, which can ripple into crypto and growth funds.',
@@ -1869,6 +1910,7 @@ export const insightsCopyEn = {
       dow: {
         name: 'Dow Jones',
         latin: 'Dow Jones',
+        country: 'United States',
         what: 'The 30 biggest and best-known US companies, the index the evening news quotes.',
         why: 'The world’s most famous market number: a big drop in the Dow leads the news everywhere and can set the mood for every market that opens after New York.',
         you: 'It weights companies by price and holds only 30 of them, so the S&P 500 above is the better measure, but the Dow still moves sentiment, including the US shares inside many super funds.',
@@ -1876,6 +1918,7 @@ export const insightsCopyEn = {
       tsx: {
         name: 'S&P/TSX Composite',
         latin: 'S&P/TSX',
+        country: 'Canada',
         what: 'Canada’s main stock index, heavy in energy, banks and mining.',
         why: 'A read on oil and metal prices, and Canada is the US’s closest trading partner.',
         you: 'It often moves with oil prices, which affect what you pay for petrol.',
@@ -1883,6 +1926,7 @@ export const insightsCopyEn = {
       ibov: {
         name: 'Ibovespa',
         latin: 'Ibovespa',
+        country: 'Brazil',
         what: 'Brazil’s main stock index, with large oil, mining and bank companies.',
         why: 'The usual stand-in for emerging markets and commodity exporters. It drops when investors flee riskier countries.',
         you: 'A sharp fall often goes with a stronger US dollar and weaker emerging-market currencies.',

@@ -252,7 +252,9 @@ describe('buildInsightsMarkdown', () => {
   it('renders one heading per displayed section', () => {
     expect(md).toContain('## Summary of the gauges below'); // L3-01 rename
     expect(md).toContain('## Prices');
-    expect(md).toContain('## World stock markets');
+    // The world-indices handoff round renamed the section's editorial
+    // title (markets.title) — the export heading follows the dictionary.
+    expect(md).toContain('## The pulse of world markets');
     expect(md).toContain('## World currencies');
     expect(md).toContain('## Together');
     expect(md).toContain('## What the signals say');
@@ -278,7 +280,7 @@ describe('buildInsightsTxt', () => {
     const txt = buildInsightsTxt(input);
     expect(txt).not.toMatch(/^#/m);
     expect(txt).not.toContain(']( '); // no markdown links
-    expect(txt).toContain('World stock markets');
+    expect(txt).toContain('The pulse of world markets');
     expect(txt).toContain('5586.2');
   });
 });

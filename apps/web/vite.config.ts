@@ -115,7 +115,11 @@ export default defineConfig({
         // no dependence on a prompt-mode page posting SKIP_WAITING.
         skipWaiting: true,
         clientsClaim: true,
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
+        // jpg joins the precache for the 16 index wordmarks (the
+        // world-indices handoff round) — the same treatment the owner's
+        // PNG icon set gets: generateSW revisions by content, so a changed
+        // wordmark re-precaches on the next deploy.
+        globPatterns: ['**/*.{js,css,html,svg,png,jpg,woff2,webmanifest}'],
         // Store-listing screenshots (manifest only — PWABuilder/Play fetch
         // them over HTTP; the app never needs them offline).
         globIgnores: ['**/screenshots/**'],

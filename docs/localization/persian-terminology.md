@@ -57,11 +57,16 @@ Band position words: در محدودهٔ (inside), بالاتر از (above), پ
 
 | English | Persian | Notes |
 | --- | --- | --- |
-| Stock markets | بازارهای سهام | `markets.title` «بازارهای سهام جهان» |
+| Stock markets | بازارهای سهام | `markets.title` — the section's editorial title is now «نبض بازارهای جهان» with «شاخص‌های بورسی جهان» as the descriptive label (`markets.sectionLabel`, handoff-world-indices round) |
 | Index (stock) | شاخص | same word as economic indicator — context disambiguates |
 | World currencies | ارزهای مهم جهان | section title |
 | Verdict meter | وضعیت در مقیاس چهارسطحی | `markets.verdictMeterLabel`; hero = «وضعیت در یک نگاه» |
 | Chart value | ارزش در نمودار | `markets.chartValueAria` |
+| Performance period (daily/weekly/monthly/quarterly) | بازهٔ عملکرد؛ روزانه / هفتگی / ماهانه / سه‌ماهه | `markets.viewDaily…viewQuarterly` (handoff-world-indices: adjectival lens labels) |
+| Biggest gain / biggest fall | بیشترین رشد / بیشترین افت | `markets.moverGain` / `markets.moverLoss` |
+| Indices up / down / flat | شاخص‌های مثبت / شاخص‌های منفی / بدون تغییر | `markets.breadthUp/Down/Flat` |
+| List / performance map | فهرست / نقشهٔ عملکرد | `markets.viewList` / `markets.viewHeatmap` |
+| Country / market label (per index) | کشور/بازار هر شاخص | `markets.entries.*.country` — ژاپن، استرالیا، کرهٔ جنوبی، هنگ‌کنگ (بازار، نه کشور), چین، تایوان، هند، منطقهٔ یورو (نه یک کشور), آلمان، فرانسه، بریتانیا، آمریکا، کانادا، برزیل |
 
 ## Bonds, yields, interest rates
 
