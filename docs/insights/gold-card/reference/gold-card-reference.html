@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gold card reference</title>
+<style>
+:root{--bg:#EEF2F5;--surface:#FFFFFF;--tint:#F3F7FA;--hair:#D9E1E8;--ctl:#7B8A98;--text:#14212B;--text2:#4A5A68;--muted:#5F6E7C;--sup:#1A7A3A;--sup-bg:#E8F5EC;--sup-bd:#A9D6B8;--prs:#B3243A;--prs-bg:#FBEDEF;--prs-bd:#E4A6AF;--unr:#8A5A00;--unr-bg:#FFF4DC;--acc:#1F6F8B}
+[data-theme=dark]{--bg:#0A0E12;--surface:#10161C;--tint:#141C23;--hair:#26313B;--ctl:#6B7B8A;--text:#E8EDF2;--text2:#A9B6C2;--muted:#8A98A6;--sup:#4CC38A;--sup-bg:#12281F;--sup-bd:#2F6B4C;--prs:#F2828C;--prs-bg:#2B171B;--prs-bd:#7A3A44;--unr:#E7B04A;--unr-bg:#2B2210;--acc:#6CC3E0}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;max-width:720px;margin:0 auto 12px}.ctl button{font:inherit;font-size:12px;padding:6px 10px;border:1px solid var(--hair);border-radius:6px;background:var(--surface);color:var(--text);cursor:pointer}.ctl button[aria-pressed=true]{border-color:var(--acc);color:var(--acc)}
+.card{container-type:inline-size;max-width:720px;margin:0 auto;background:var(--surface);border:1px solid var(--hair);border-radius:12px;padding:20px;font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.meta{font-size:12px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--hair);border-radius:8px;overflow:hidden}.seg button{font:inherit;font-weight:500;min-height:44px;padding:0 16px;border:0;background:none;color:var(--text2);cursor:pointer}.seg button[aria-selected=true]{background:var(--tint);color:var(--text)}
+h3{margin:16px 0 4px;font-size:22px;font-weight:600;line-height:1.3}.sub{font-size:13px;color:var(--text2)}
+svg{display:block;width:100%;height:auto;margin-top:8px}
+.tok rect{stroke-width:1}.tok .tn{font-size:12px;font-weight:500;text-anchor:middle}.tok .tv{font-size:12px;text-anchor:middle;fill:var(--text2)}
+.tok.sup rect{fill:var(--sup-bg);stroke:var(--sup-bd)}.tok.sup .tn{fill:var(--sup)}.tok.prs rect{fill:var(--prs-bg);stroke:var(--prs-bd)}.tok.prs .tn{fill:var(--prs)}
+.cap{font-size:12px;font-weight:500;text-anchor:middle;fill:var(--text2)}.none{font-size:13px;text-anchor:middle;fill:var(--muted)}
+.beam{transform-box:view-box;transform-origin:340px var(--by);transform:rotate(var(--rot));animation:rot .8s cubic-bezier(.2,.8,.2,1)}
+.tok{transform:translateY(var(--dy));animation:mv .8s cubic-bezier(.2,.8,.2,1)}
+@keyframes rot{from{transform:rotate(0)}}@keyframes mv{from{transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){.beam,.tok{animation:none}}
+.bands{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:4px}.gcap{font-size:12px;font-weight:500;margin-bottom:6px}.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:12px;height:30px;padding:0 10px;border-radius:6px;background:none;color:var(--text2);border:1px solid var(--ctl);cursor:pointer}.chip.u{border-style:dashed;color:var(--muted)}.chip.n{background:var(--tint)}
+.unr{color:var(--unr)}
+.mob{display:none;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}.mob div{font-size:13px}.mob b{display:block;font-size:12px;margin-bottom:4px}
+@container (max-width:520px){.tok,.cap,.none{display:none}.mob{display:grid}.sub,.hd{font-size:12px}h3{font-size:20px}.card{padding:16px}}
+.ctx{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--hair);margin-top:12px;padding-top:12px}.ctx .l{font-size:12px;color:var(--muted)}.ctx .p{font-size:15px;font-weight:500}.ctx .p span{font-size:13px;font-weight:400;color:var(--text2)}
+.bar{position:relative;height:2px;background:var(--ctl);width:150px}.bar i{position:absolute;top:-4px;width:2px;height:10px;background:var(--text)}.bl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px;width:150px}
+details{border-top:1px solid var(--hair)}details:last-of-type{border-bottom:1px solid var(--hair)}summary{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 0;cursor:pointer;list-style:none}summary::-webkit-details-marker{display:none}
+summary .ic{flex:none;width:16px;height:16px}.r1{flex:1}.r1 b{font-weight:500}.r1 small{display:block;font-size:13px;color:var(--text2)}.rv{font-weight:500}
+.x{padding:0 26px 12px;font-size:13px;color:var(--text2)}.s-supports{color:var(--sup)}.s-pressures{color:var(--prs)}.s-neutral{color:var(--text2)}.s-unread{color:var(--muted)}
+.flip{margin-top:12px;font-size:13px}.foot{margin-top:10px;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="ctl" id="ctl"></div>
+<section class="card" id="card" aria-labelledby="vt"></section>
+<script>
+// ===== CONFIGURATION (same values as lean-logic.js) =====
+const MIN_COVERAGE=.75,MIN_TILT=3,STEP_TILT=1.5,MAX_TILT=7,CX=340,HALF=240;
+// ========================================================
+function computeLean(fs){const total=fs.length,c=s=>fs.filter(f=>f.state===s).length,S=c('supports'),P=c('pressures'),N=c('neutral'),U=c('unread'),read=total-U,enough=read>=Math.ceil(MIN_COVERAGE*total),net=P-S,mag=enough&&net?Math.min(MAX_TILT,MIN_TILT+STEP_TILT*(Math.abs(net)-1)):0,cov=total?read/total:0,conf=cov===1?'high':cov>=MIN_COVERAGE?'medium':'low';let v;if(!read)v='none';else if(!enough)v='insufficient';else if(!net)v='balanced';else v=(Math.abs(net)===1?'slight':Math.abs(net)===2?'lean':'strong')+'_'+(net>0?'against':'for');let flip=null;if(enough&&net){const h=fs.filter(f=>f.state===(net>0?'pressures':'supports')&&f.flip&&typeof f.value==='number').sort((a,b)=>Math.abs(a.value-a.flip.at)-Math.abs(b.value-b.flip.at));if(h.length)flip={f:h[0],key:Math.abs(net)===1?'balance':'ease'}}return{total,S,P,N,U,read,enough,net,tilt:Math.sign(net)*mag,conf,verdict:v,flip}}
+const I={en:{slight_against:'Slight lean against {a}',lean_against:'Leaning against {a}',strong_against:'Strong lean against {a}',slight_for:'Slight lean for {a}',lean_for:'Leaning for {a}',strong_for:'Strong lean for {a}',balanced:'Balanced for {a}',insufficient:'Not enough readings to call',none:'No readings available right now',high:'High confidence',medium:'Medium confidence',low:'Low confidence',sub:'{c} · {r} of {t} factors read',cs:'Supporting · {n}',cp:'Pressuring · {n}',gn:'Neutral · {n}',gu:"Couldn't read · {n}",empty:'None right now',upd:'Updated 12 min ago · 4 sources',foot:"Each factor counts equally. This is today's combined lean, not a forecast.",ctx:'What {a} is doing · context, not a weight',holding:'holding near its 10-year high',fading:'near its 10-year high but fading',mixed:'moving sideways',d30:'{p} in 30 days',lo:'10-yr low',hi:'high',supports:'Supporting',pressures:'Pressuring',neutral:'Neutral',unread:"Couldn't read",neu:'Sitting in its usual range.',asof:'As of today · sample data',unrs:"couldn't read, source unavailable",bal:'This would balance out if {n} {d} {x}',eas:'This would ease if {n} {d} {x}',below:'fell below',above:'rose above',tg:'Gold',ts:'Silver',tl:'Tilts toward pressuring.',tr:'Tilts toward supporting.',t0:'Level.',alt:'Balance scale: {s} supporting, {p} pressuring, {u} not read. {t}'},
+fa:{slight_against:'کمی به ضرر {a}',lean_against:'به ضرر {a}',strong_against:'به‌شدت به ضرر {a}',slight_for:'کمی به نفع {a}',lean_for:'به نفع {a}',strong_for:'به‌شدت به نفع {a}',balanced:'متعادل برای {a}',insufficient:'برای قضاوت، داده کافی نیست',none:'فعلاً هیچ داده‌ای در دسترس نیست',high:'اطمینان بالا',medium:'اطمینان متوسط',low:'اطمینان پایین',sub:'{c} · {r} از {t} عامل خوانده شد',cs:'حمایتی · {n}',cp:'فشارآور · {n}',gn:'خنثی · {n}',gu:'خوانده نشد · {n}',empty:'فعلاً هیچ‌کدام',upd:'به‌روزرسانی ۱۲ دقیقه پیش · ۴ منبع',foot:'وزن همهٔ عوامل برابر است. این برآیند امروز است، نه پیش‌بینی.',ctx:'وضعیت خود {a} · زمینه، نه وزنه',holding:'ماندن نزدیک اوج ۱۰ سال اخیر',fading:'نزدیک اوج ۱۰ سال اخیر، اما در حال عقب‌نشینی',mixed:'در حال نوسان',d30:'{p} در ۳۰ روز',lo:'کمینه ۱۰ ساله',hi:'بیشینه',supports:'حمایتی',pressures:'فشارآور',neutral:'خنثی',unread:'خوانده نشد',neu:'در محدودهٔ معمول خود است.',asof:'تا امروز · داده نمونه',unrs:'خوانده نشد؛ منبع در دسترس نیست',bal:'اگر {n} {d} {x} برسد، شرایط متعادل می‌شود',eas:'اگر {n} {d} {x} برسد، فشار کمتر می‌شود',below:'به زیر',above:'به بالای',tg:'طلا',ts:'نقره',tl:'به سمت فشارآور متمایل است.',tr:'به سمت حمایتی متمایل است.',t0:'تراز است.',alt:'ترازو: {s} حمایتی، {p} فشارآور، {u} خوانده‌نشده. {t}'}};
+const F=[{id:'real',n:{en:'Real yields',fa:'بازده واقعی'},v:2.78,u:'%',pos:.88,fl:{pressures:{dir:'below',at:2.5}},eff:{en:'Higher real yields make {a} less attractive.',fa:'بازده واقعی بالاتر، {a} را کم‌جذاب‌تر می‌کند.'},ex:{en:'Real yields are what savers earn after inflation. A metal that pays no interest loses appeal when savers earn more.',fa:'بازده واقعی همان سودی است که سپرده‌گذار پس از کسر تورم می‌گیرد. فلزی که سودی نمی‌دهد، وقتی این سود بالاتر می‌رود جذابیت کمتری پیدا می‌کند.'}},
+{id:'infl',n:{en:'Inflation expectations',fa:'انتظارات تورمی'},v:2.31,u:'%',pos:.7,eff:{en:'Expected price rises tend to support {a}.',fa:'انتظار گرانی، معمولاً از {a} حمایت می‌کند.'},ex:{en:'When people expect prices to keep rising, they often buy metals like gold and silver to protect their savings.',fa:'وقتی مردم انتظار دارند قیمت‌ها بالا برود، اغلب برای حفظ ارزش پس‌انداز خود فلزاتی مثل طلا و نقره می‌خرند.'}},
+{id:'stress',n:{en:'Market stress',fa:'تنش بازار'},v:18.4,u:'i',pos:.5,eff:{en:'Nervous markets tend to send money to {a}.',fa:'نگرانی بازار، معمولاً پول را به سمت {a} می‌برد.'},ex:{en:'When markets are jittery, investors often treat precious metals as a safe place to wait.',fa:'وقتی بازارها پرتنش می‌شوند، سرمایه‌گذاران اغلب فلزات گران‌بها را جایی امن برای انتظار می‌دانند.'}},
+{id:'usd',n:{en:'US dollar',fa:'دلار آمریکا'},v:104.2,u:'i',pos:.6,eff:{en:'A stronger dollar usually weighs on {a}.',fa:'دلار قوی‌تر معمولاً بر {a} فشار می‌آورد.'},ex:{en:'Metals are priced in dollars. When the dollar rises, they get more expensive for everyone else, which usually cools demand.',fa:'قیمت فلزات به دلار است. وقتی دلار بالا می‌رود، برای بقیهٔ دنیا گران‌تر می‌شوند و معمولاً تقاضا کم می‌شود.'}}];
+const IND={id:'ind',n:{en:'Industrial demand',fa:'تقاضای صنعتی'},v:51.2,u:'i',pos:.5,eff:{en:'Busy factories support {a}.',fa:'کارخانه‌های پرکار از {a} حمایت می‌کنند.'},ex:{en:'Silver is used in electronics and solar panels. Busy factories usually mean more demand.',fa:'نقره در الکترونیک و پنل خورشیدی به کار می‌رود. کارخانه‌های پرکار معمولاً یعنی تقاضای بیشتر.'}};
+const A={gold:{k:'tg',price:4166,dec:0,chg:-5.31,ft:'fading',pos:.94,f:F},silver:{k:'ts',price:57.12,dec:2,chg:-12.76,ft:'fading',pos:.96,f:[...F,IND]}};
+const SC={now:{real:'pressures'},three:{real:'pressures',usd:'pressures',stress:'neutral'},balanced:{real:'pressures',usd:'pressures',infl:'supports',stress:'supports'},supportive:{infl:'supports',stress:'supports',usd:'neutral',real:'neutral'}};
+const SCN={now:'1 of 4 read',three:'3 of 4 read',balanced:'balanced',supportive:'supportive'};
+let lang='en',theme='light',asset='gold',sc='now';
+const fa=()=>lang==='fa',t=(k,p={})=>{let s=I[lang][k]||k;for(const x in p)s=s.split('{'+x+'}').join(p[x]);return s},nf=(n,d=0)=>new Intl.NumberFormat(fa()?'fa-IR':'en-US',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n),pc=(n,d=2)=>nf(n,d)+(fa()?'٪':'%'),vt=f=>f.u==='%'?pc(f.v):nf(f.v,1),nm=f=>f.n[lang],L=s=>'<bdi dir="ltr">'+s+'</bdi>';
+const G={supports:'↗',pressures:'↘',neutral:'→',unread:''};
+const ic=s=>({supports:'<path d="M4 12 12 4M5 4h7v7"/>',pressures:'<path d="M4 4l8 8M5 12h7V5"/>',neutral:'<path d="M3 8h10"/>',unread:'<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/>'}[s]);
+const svgi=s=>'<svg class="ic s-'+s+'" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin:0">'+ic(s)+'</svg>';
+function render(){
+ document.documentElement.lang=lang;document.documentElement.dir=fa()?'rtl':'ltr';document.documentElement.dataset.theme=theme;
+ const a=A[asset],st=SC[sc],an=t(a.k),fs=a.f.map(f=>({...f,state:st[f.id]||'unread',flip:f.fl&&f.fl[st[f.id]]})),r=computeLean(fs);
+ const S=fs.filter(f=>f.state==='supports'),P=fs.filter(f=>f.state==='pressures'),N=fs.filter(f=>f.state==='neutral'),U=fs.filter(f=>f.state==='unread');
+ const dir=fa()?-1:1,ms=Math.max(1,S.length,P.length),BY=44+ms*44+(ms-1)*6+10,H=BY+72,xs=CX-dir*HALF,xp=CX+dir*HALF,mag=Math.abs(r.tilt),dyP=r.tilt?Math.sign(r.tilt)*HALF*Math.sin(mag*Math.PI/180):0,rot=r.tilt*dir;
+ const tk=(f,i,x,dy,c)=>{const y=BY-10-44-i*50;return '<g class="tok '+c+'" style="--dy:'+dy+'px"><rect x="'+(x-78)+'" y="'+y+'" width="156" height="44" rx="6"/><text class="tn" x="'+x+'" y="'+(y+18)+'">'+nm(f)+'</text><text class="tv" direction="ltr" x="'+x+'" y="'+(y+35)+'">'+G[f.state]+' '+vt(f)+'</text></g>'};
+ const emp=(x)=>'<text class="none" x="'+x+'" y="'+(BY-36)+'">'+t('empty')+'</text>';
+ const tiltT=r.tilt>0?t('tl'):r.tilt<0?t('tr'):t('t0');
+ const svg='<svg viewBox="0 0 680 '+H+'" role="img"><title>'+t('alt',{s:S.length,p:P.length,u:U.length,t:tiltT})+'</title><line x1="24" y1="'+BY+'" x2="656" y2="'+BY+'" stroke="var(--ctl)" stroke-dasharray="2 4"/>'
+ +'<path d="M'+CX+' '+(BY+5)+' L'+(CX-14)+' '+(BY+30)+' L'+(CX+14)+' '+(BY+30)+'Z" fill="none" stroke="var(--text2)"/><line x1="'+(CX-44)+'" y1="'+(BY+30)+'" x2="'+(CX+44)+'" y2="'+(BY+30)+'" stroke="var(--text2)"/>'
+ +'<g class="beam" style="--rot:'+rot+'deg;--by:'+BY+'px"><line x1="'+(CX-HALF)+'" y1="'+BY+'" x2="'+(CX+HALF)+'" y2="'+BY+'" stroke="var(--text)" stroke-width="2"/><circle cx="'+xs+'" cy="'+BY+'" r="5" fill="'+(r.tilt<0?'var(--sup)':'var(--surface)')+'" stroke="var(--sup)" stroke-width="1.5"/><circle cx="'+xp+'" cy="'+BY+'" r="5" fill="'+(r.tilt>0?'var(--prs)':'var(--surface)')+'" stroke="var(--prs)" stroke-width="1.5"/></g>'
+ +'<circle cx="'+CX+'" cy="'+BY+'" r="5" fill="var(--surface)" stroke="var(--text)" stroke-width="1.5"/>'
+ +S.map((f,i)=>tk(f,i,xs,-dyP,'sup')).join('')+P.map((f,i)=>tk(f,i,xp,dyP,'prs')).join('')+(S.length?'':emp(xs))+(P.length?'':emp(xp))
+ +'<text class="cap" x="'+xs+'" y="'+(BY+56)+'">'+t('cs',{n:nf(S.length)})+'</text><text class="cap" x="'+xp+'" y="'+(BY+56)+'">'+t('cp',{n:nf(P.length)})+'</text></svg>';
+ const mob='<div class="mob"><div><b>'+t('cs',{n:nf(S.length)})+'</b>'+(S.map(f=>nm(f)+' '+L(vt(f))).join('<br>')||t('empty'))+'</div><div><b>'+t('cp',{n:nf(P.length)})+'</b>'+(P.map(f=>nm(f)+' '+L(vt(f))).join('<br>')||t('empty'))+'</div></div>';
+ const chip=(f,c)=>'<button class="chip '+c+'" data-id="'+f.id+'">'+nm(f)+'</button>';
+ const bands='<div class="bands">'+(N.length?'<div><div class="gcap">'+t('gn',{n:nf(N.length)})+'</div><div class="chips">'+N.map(f=>chip(f,'n')).join('')+'</div></div>':'')+(U.length?'<div><div class="gcap unr">'+t('gu',{n:nf(U.length)})+'</div><div class="chips">'+U.map(f=>chip(f,'u')).join('')+'</div></div>':'')+'</div>';
+ const verdict=t(r.verdict,{a:fa()?an:an.toLowerCase()}),sub=r.verdict==='none'?'':t('sub',{c:t(r.conf),r:nf(r.read),t:nf(r.total)});
+ const ctx='<div class="ctx"><div><div class="l">'+t('ctx',{a:fa()?an:an.toLowerCase()})+'</div><div class="p">'+(fa()?L(nf(a.price,a.dec))+' دلار':L('US$'+nf(a.price,a.dec)))+' <span>'+t(a.ft)+(fa()?'، ':', ')+t('d30',{p:L((fa()?'−':'−')+pc(Math.abs(a.chg)))})+'</span></div></div><div><div class="bar"><i style="inset-inline-start:'+(a.pos*100)+'%"></i></div><div class="bl"><span>'+t('lo')+'</span><span>'+t('hi')+'</span></div></div></div>';
+ const rows=[...P,...S,...N,...U].map(f=>{const un=f.state==='unread';return '<details id="row-'+f.id+'"><summary>'+svgi(f.state)+'<span class="r1"><b'+(un?' class="s-unread"':'')+'>'+nm(f)+'</b><small>'+(un?t('unrs'):f.state==='neutral'?t('neu'):f.eff[lang].split('{a}').join(fa()?an:an.toLowerCase()))+'</small></span>'+(un?'':'<span class="rv">'+L(vt(f))+'</span>')+'</summary><div class="x">'+f.ex[lang]+'<br>'+t('asof')+'</div></details>'}).join('');
+ const flip=r.flip?'<div class="flip">'+t(r.flip.key==='balance'?'bal':'eas',{n:nm(r.flip.f),d:t(r.flip.f.flip.dir),x:L(pc(r.flip.f.flip.at,1))})+'</div>':'';
+ document.getElementById('card').innerHTML='<div class="hd"><div class="seg" role="tablist">'+['gold','silver'].map(k=>'<button role="tab" data-a="'+k+'" aria-selected="'+(asset===k)+'">'+t(A[k].k)+'</button>').join('')+'</div><span class="meta">'+t('upd')+'</span></div><h3 id="vt">'+verdict+'</h3><div class="sub">'+sub+'</div>'+svg+mob+bands+ctx+'<div style="margin-top:12px">'+rows+'</div>'+flip+'<div class="foot">'+t('foot')+'</div>';
+ document.getElementById('ctl').innerHTML=['en','fa'].map(l=>'<button data-l="'+l+'" aria-pressed="'+(lang===l)+'">'+(l==='en'?'English':'فارسی')+'</button>').join('')+['light','dark'].map(m=>'<button data-m="'+m+'" aria-pressed="'+(theme===m)+'">'+m+'</button>').join('')+Object.keys(SC).map(k=>'<button data-s="'+k+'" aria-pressed="'+(sc===k)+'">'+SCN[k]+'</button>').join('');
+}
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;if(d.l)lang=d.l;else if(d.m)theme=d.m;else if(d.s)sc=d.s;else if(d.a)asset=d.a;else if(d.id){const el=document.getElementById('row-'+d.id);el.open=true;el.scrollIntoView({block:'nearest'});return}else return;render()});
+render();
+</script>
+</body>
+</html>
