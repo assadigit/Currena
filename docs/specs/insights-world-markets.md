@@ -586,3 +586,29 @@ breadth + movers + tiles together, the honest dash for a missing lens,
 the list/heatmap switch, the fa/RTL rendering with the editorial header
 and Persian digits) + the updated `markets-verdict.test.ts` copy-parity
 suite. All fixture-backed; no live providers.
+
+### 11.5 Round 2026-10-18 (2): the ≥96×96 px wordmark floor (owner follow-up)
+
+The owner's follow-up directive on the deployed round — "The pictures of
+each indices are too small make them at least 96x96 pixel" — supersedes
+the handoff's 24–32px row guidance for the wordmark size. Every rendered
+`MarketLogo` box is now ≥96×96 px (the supplied JPEGs are 256×256, so
+96–112px renders stay sharp):
+
+- **Tiles**: 96 (mobile and desktop), STACKED above the name — the
+  explorer grid runs 2→7 narrow columns, and a 96px logo beside the text
+  would starve the canonical name; the tile name moves one type step up
+  to `--type-label` to keep the identity readable beside the bigger art.
+- **Movers**: 96 mobile / 112 desktop; the cards are half/full-width, so
+  the horizontal identity row (logo beside name) keeps its room.
+- **Detail heading**: 96 beside the name block; name at `--type-number`
+  with country (+ Latin in fa) beneath — the same logo + name + country
+  anatomy every surface wears.
+- **Chip**: the white frame's corner radius is capped at 16px
+  (`min(size/4, 16px)`) so the big chips read as rounded squares rather
+  than pills; every pre-existing small-size rendering is unchanged.
+- The heatmap and the full table remain text-first (data-density views —
+  they carry no pictures, so the directive does not apply to them).
+- Regression guards: `briefing.test.tsx` asserts every rendered logo box
+  ≥96px on both breakpoints (parsing `--icon-size`/`--icon-size-sm` from
+  the style attribute) and the detail panel's wordmark ≥96px.

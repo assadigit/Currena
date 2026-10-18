@@ -83,7 +83,39 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
-## CURRENT DEPLOYMENT — the world stock indices editorial briefing is LIVE (2026-10-18 world-indices round, worker b9a412e0)
+## CURRENT DEPLOYMENT — the index wordmarks at the owner-directed ≥96×96 px (2026-10-18 (2), worker 20b9549c)
+
+The owner's follow-up on the freshly deployed world-indices briefing
+("The pictures of each indices are too small make them at least 96x96
+pixel") is LIVE: every rendered index wordmark box is ≥96×96 px — tiles
+96 (stacked above the name; the explorer grid's 2→7 narrow columns leave
+no room for a beside-the-text logo), movers 96/112, the detail heading
+96 beside the name block. The white chip radius is capped at 16px so the
+big chips read as rounded squares, not pills. Shipped as 0a7387e (5
+files, +2 regression guards in briefing.test.tsx).
+
+- **Active worker**: currena-api **`20b9549c-46be-4d6a-a9ef-4f0cfc38ce70`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched — UI-only round).
+- **What it carries**: everything from b9a412e0 (the full world-indices
+  briefing + every round beneath) PLUS the ≥96px wordmark floor.
+- **Chunk proof**: the fresh 0a7387e build serves `index-Cl8aIt4y.js`
+  (295.29/88.82) + `Insights-DeBhQeKJ.js` (650.30/155.50) — served live
+  on the workers.dev origin (Insights-CUm3UhiW.js 650,283B is now 404;
+  the new 650,296B chunk answers 200).
+- **Verified live** (agent-browser, fresh profile, workers.dev): measured
+  boxes on the rendered page — 18 logos (16 tiles + 2 movers), min 96px /
+  max 112px, all naturalWidth>0 (loaded); the n225 detail panel opens
+  with a 96×96 wordmark; fa RTL desktop + EN desktop full pass; mobile
+  390 — scrollWidth 390 = innerWidth, zero horizontal overflow; zero
+  console + zero page errors. Evidence:
+  `docs/insights/screenshots/world-indices-briefing/logo-96px/`.
+- **Gates on 0a7387e** (local, all green): typecheck 6/6; 614 web tests
+  (+2 guards; full suite 1,586); lint 0 errors/15 accepted advisories;
+  copy:audit clean (no copy changes); build OK; budgets held (Insights
+  650.30/155.50 vs 652/156.50).
+
+## PREVIOUS DEPLOYMENT — the world stock indices editorial briefing is LIVE (2026-10-18 world-indices round, worker b9a412e0)
 
 The owner's directive ("if not committed and deployed, deploy them — I
 don't see any change in the live site") closed the gap between the

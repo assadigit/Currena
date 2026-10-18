@@ -5,6 +5,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-18 (2)] — the index wordmarks render at the owner-directed ≥96×96 px (deployed as worker 20b9549c)
+
+The owner's follow-up directive on the freshly deployed briefing — "The
+pictures of each indices are too small make them at least 96x96 pixel" —
+raises every rendered index wordmark box to ≥96×96 px (the supplied JPEGs
+are 256×256, so 96–112px renders stay sharp). UI-only: tiles 96 (STACKED
+above the name — the explorer grid runs 2→7 narrow columns, so a 96px logo
+beside the text would starve the canonical name; name bumped one type step
+to `--type-label`), the featured movers 96 mobile / 112 desktop (the cards
+are half/full-width, the horizontal identity row keeps its room; name at
+1rem), the detail heading 96 beside the name block (name at
+`--type-number`, the same logo + name + country anatomy every surface
+wears). The white chip's corner radius is capped at 16px — the old /4
+proportion would give a 24–28px radius on the big chips and read as a
+pill; every pre-existing small-size rendering is unchanged. The heatmap
+and the full table stay text-first (data-density views; no pictures to
+resize). Two regression guards added (briefing.test.tsx): every rendered
+logo box ≥96px on BOTH breakpoints, and the detail panel carries the same
+≥96px wordmark. No copy changes (audit clean), no contract change, no
+provider/cron/KV/route change. Budgets held (Insights 650.29/155.75 vs
+652/156.50). Live-verified fa/EN desktop + mobile 390/320 (zero overflow,
+zero console errors) — evidence:
+`docs/insights/screenshots/world-indices-briefing/logo-96px/`.
+
 ## [2026-10-18] — the world stock indices section becomes the editorial market briefing «نبض بازارهای جهان» (the owner's world-indices handoff round; merged to main + deployed as worker b9a412e0 — see DEPLOY.md)
 
 The owner's handoff package (`01-new-session-prompt.md`, `02-ui-spec.md`,
