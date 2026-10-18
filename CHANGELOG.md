@@ -5,6 +5,70 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-19 (fidelity)] — the economic indicators hero closes the gap to the approved reference (the owner's UI-fidelity correction brief)
+
+The owner reviewed the editorial hero round against the approved
+`currena-hero.zip` references and returned a correction brief: the result
+still read as a generic KPI dashboard, not the approved editorial financial
+interface. This round corrects the actual causes — presentation-only again:
+every calculation, threshold, ranking, aria hook, count, feed and translated
+string is untouched (the panel/strip copy is the only addition, triaged in
+the Persian copy manifest round `editorial-fidelity-2026-10-19`).
+
+### Changed
+
+- **Page content width (brief §3)** — the old `xl:max-w-[1440px]` cap left
+  80–160px dead margins on 1600–1760px screens; the Insights container now
+  rides `lg:max-w-[calc(100%-40px)]` / `xl:max-w-[calc(100%-56px)]` /
+  `2xl:max-w-[1840px]` — 1544px (96.5%) at 1600, 1704px (96.8%) at 1760,
+  with a ceiling so ultra-wide desktops keep a sane reading measure. The
+  page title steps up to 34px desktop (inside the spec's 32–36px band).
+- **The art band shows (brief §4)** — the uniform veils over the Sydney
+  Harbour / world-map artwork were too heavy (the artwork read as absent):
+  Australia's veil drops 30% → 12% surface mix, Global's 46% → 30% with its
+  overall opacity raised to 0.85 — the reference's clearly-visible faded
+  band, with the bottom fade (and the mobile/dark toning) keeping the
+  header's contrast.
+- **The severity mapping bug (brief §5 — the round's named defect)** —
+  `.ei-row-accent` hardcoded the Crisis red for flagged rows in BOTH
+  regions, so a Stressed Australia wore red row edges. The accent now
+  follows the region's own verdict step via the card article's
+  `[data-ei-step]` → `--ei-accent` custom property (Critical → red,
+  Stressed → the amber/orange stressed ink, Cautious → watch amber); the
+  icon-less row's fallback triangle and the attention-count line speak the
+  same region ink. Status and row presentation can no longer disagree.
+- **Category summary rows (brief §7)** — the round-42 status-grouped boxes
+  ("Stressed: … / Stable: …") become the reference's compact category
+  rows: one quiet row per gauge — category label · small tinted state
+  badge · the four-step mini meter (the reference's severity bar) — worst
+  state first, unreadable gauges last in honest neutral, the module headed
+  by the existing `heroGaugesLabel` + the verdict-rule tip.
+- **The contextual explanation panel (brief §7)** — each regional card now
+  closes with the reference's restrained tinted panel: Global carries the
+  raised world signals (markets / currencies / section indicators — the
+  existing module, now with a clear `worldSignalsTitle` heading on the
+  pale-red surface; underline affordances dropped per the brief) and falls
+  back to the word-choice rule when no feed has loaded; Australia carries
+  the existing `verdictRuleLabel` + verdict-rule explanation on a pale
+  amber surface. The tint follows the region's own step ink, never a
+  saturated warning surface.
+
+### Added
+
+- **The bottom information strip (brief §7)** — `ContinueStrip`: the
+  reference's compact footer strip under the hero, naming the page's next
+  sections in their intended order (the JumpNav labels, hero excluded) and
+  wired to the same expand-then-scroll navigation. Two new copy strings ×
+  2 locales (`ui.worldSignalsTitle`, `ui.continueLabel`).
+
+### Budgets
+
+Insights lazy chunk 656.00/157.00 → **657.00/157.50** (measured
+656.80/157.17; the entry chunk untouched at 295.29/88.81 vs 296/89.5) —
+the category rows + panels + strip are compressible JSX + 2 copy strings.
+D-37 in `docs/DECISIONS_FOR_ALI.md`. Seven new regression guards in
+`apps/web/src/components/insights/hero-editorial.test.tsx` (17 total).
+
 ## [2026-10-19] — the economic indicators hero becomes the editorial financial interface (the currena-hero.zip handoff round)
 
 The owner's `currena-hero.zip` handoff package (approved visual references,

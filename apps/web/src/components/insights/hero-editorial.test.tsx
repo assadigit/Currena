@@ -35,6 +35,7 @@ import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { insightsCopyEn } from '../../i18n/insights-copy-en';
 import { insightsCopyFa } from '../../i18n/insights-copy-fa';
 import { HeroBlock } from './HeroBlock';
+import { ContinueStrip } from './ContinueStrip';
 
 /* ------------------------------------------------------------------ *
  * Fixtures
@@ -100,6 +101,12 @@ function trackOf(): HTMLElement {
 /** The region cards in DOM order. */
 function regionCards(): HTMLElement[] {
   return Array.from(trackOf().querySelectorAll(':scope > [data-region-card]')) as HTMLElement[];
+}
+
+/** Regex-escape a copy string (the no-reading word contains no specials
+ * today, but the guard should not break when copy evolves). */
+function escapeRe(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /* ------------------------------------------------------------------ *
@@ -302,5 +309,166 @@ describe('editorial hero §7/§4/§8 — art band, severity pill, flagged rows',
     const globalCard = within(cards[0]! as HTMLElement);
     // 5 global warnings in the fixture → the heading says "· 5"
     expect(globalCard.getByText('Needing attention now', { exact: false }).textContent).toContain('5');
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * UI-fidelity round (2026-10-19, the owner's correction brief) —
+ * §5 the severity mapping, §7 the category rows + explanation panel +
+ * bottom information strip.
+ * ------------------------------------------------------------------ */
+
+describe('fidelity round §5 — the region severity mapping', () => {
+  afterEach(cleanup);
+
+  it('each card article carries data-ei-step matching its own verdict pill', () => {
+    renderHero(insightsCopyEn, 'en-US');
+    const cards = regionCards();
+    for (const card of cards) {
+      const article = card.querySelector('article[data-ei-step]') as HTMLElement | null;
+      expect(article).not.toBeNull();
+      const pill = card.querySelector('[data-verdict-pill]');
+      expect(pill).not.toBeNull();
+      // the accent hook (index.css --ei-accent) and the pill can never
+      // disagree — Australia Stressed ⇒ its rows speak the amber ink
+      expect(article!.getAttribute('data-ei-step')).toBe(pill!.getAttribute('data-step'));
+    }
+  });
+});
+
+describe('fidelity round §7 — the category summary rows', () => {
+  afterEach(cleanup);
+
+  it('one compact row per gauge: label + state badge + sm meter, worst first', () => {
+    renderHero(insightsCopyEn, 'en-US');
+    for (const card of regionCards()) {
+      const module = card.querySelector('[data-hero-gauges]');
+      expect(module).not.toBeNull();
+      // the visible heading names the module (heroGaugesLabel)
+      expect(module!.textContent).toContain(insightsCopyEn.ui.heroGaugesLabel);
+      const rows = Array.from(module!.querySelectorAll('[data-gauge]')) as HTMLElement[];
+      expect(rows.length).toBeGreaterThanOrEqual(2);
+      const steps = rows.map((r) => Number(r.getAttribute('data-gauge-step')));
+      // worst first: the sorted head never sits below a calmer row
+      const sorted = [...steps].sort((a, b) => b - a);
+      expect(steps).toEqual(sorted);
+      for (const row of rows) {
+        expect(row.querySelector('.verdict-meter-sm')).not.toBeNull();
+        // the row's badge carries a state word (or the honest no-reading)
+        expect(row.textContent).toMatch(
+          new RegExp(`(Stable|Cautious|Stressed|Critical|${escapeRe(insightsCopyEn.ui.gaugeNoReading)})`),
+        );
+      }
+    }
+  });
+});
+
+describe('fidelity round §7 — the contextual explanation panel', () => {
+  afterEach(cleanup);
+
+  it('every region card closes with a panel; without feeds it carries the word-choice rule', () => {
+    renderHero(insightsCopyEn, 'en-US');
+    const cards = regionCards();
+    expect(cards).toHaveLength(2);
+    for (const card of cards) {
+      const panel = card.querySelector('[data-ei-panel]');
+      expect(panel).not.toBeNull();
+      expect(panel!.getAttribute('data-ei-panel-kind')).toBe('rule');
+      const heading = panel!.querySelector('[data-ei-panel-heading]');
+      expect(heading!.textContent).toContain(insightsCopyEn.ui.verdictRuleLabel);
+      const rule = panel!.querySelector('[data-ei-panel-rule]');
+      expect(rule!.textContent).toBe(insightsCopyEn.ui.verdictRule);
+    }
+  });
+
+  it('Global with raised signals carries the signals panel (heading + bullet); Australia never does', () => {
+    render(
+      <HeroBlock
+        readings={READINGS}
+        changedThisWeek={[]}
+        copy={insightsCopyEn}
+        numberLocale="en-US"
+        onJumpSection={noop}
+        onJumpAbout={noop}
+        onFocusCard={noop}
+        marketsAlert={{ signal: 'attention', n: 4, count: 16 }}
+        onJumpMarkets={noop}
+      />,
+    );
+    const cards = regionCards();
+    const globalPanel = cards[0]!.querySelector('[data-ei-panel]') as HTMLElement | null;
+    const auPanel = cards[1]!.querySelector('[data-ei-panel]') as HTMLElement | null;
+    expect(globalPanel).not.toBeNull();
+    expect(globalPanel!.getAttribute('data-ei-panel-kind')).toBe('signals');
+    // the signals panel keeps the established attention-box hook
+    expect(globalPanel!.hasAttribute('data-attention-box')).toBe(true);
+    expect(globalPanel!.querySelector('[data-ei-panel-heading]')!.textContent).toContain(
+      insightsCopyEn.ui.worldSignalsTitle,
+    );
+    expect(globalPanel!.querySelector('[data-attention-bullets]')).not.toBeNull();
+    // the raised market signal bullet rides with its numbers
+    expect(globalPanel!.textContent).toContain('4');
+    // Australia keeps the rule panel — the world signals are Global-scope
+    expect(auPanel!.getAttribute('data-ei-panel-kind')).toBe('rule');
+  });
+
+  it('fa: the rule panel speaks Persian', () => {
+    renderHero(insightsCopyFa, 'fa-IR');
+    const card = regionCards()[1]!;
+    const panel = card.querySelector('[data-ei-panel]') as HTMLElement | null;
+    expect(panel!.querySelector('[data-ei-panel-rule]')!.textContent).toBe(insightsCopyFa.ui.verdictRule);
+    expect(panel!.querySelector('[data-ei-panel-heading]')!.textContent).toContain(
+      insightsCopyFa.ui.verdictRuleLabel,
+    );
+  });
+});
+
+describe('fidelity round §7 — the bottom information strip', () => {
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
+  beforeEach(() => {
+    // jsdom: no scrollIntoView / matchMedia (the strip's jump path).
+    Element.prototype.scrollIntoView = vi.fn();
+    vi.stubGlobal(
+      'matchMedia',
+      (query: string) =>
+        ({
+          matches: false,
+          media: query,
+          onchange: null,
+          addListener: () => undefined,
+          removeListener: () => undefined,
+          addEventListener: () => undefined,
+          removeEventListener: () => undefined,
+          dispatchEvent: () => false,
+        }) as MediaQueryList,
+    );
+  });
+
+  it('names the next sections in order and jumps on click', () => {
+    const onWillNavigate = vi.fn();
+    const targets = [
+      { id: 'insights-prices', label: 'Prices' },
+      { id: 'insights-together', label: 'Together' },
+      { id: 'insights-about', label: 'About' },
+    ];
+    const { container } = render(
+      <ContinueStrip targets={targets} copy={insightsCopyEn} onWillNavigate={onWillNavigate} />,
+    );
+    const nav = container.querySelector('[data-continue-strip]');
+    expect(nav).not.toBeNull();
+    const buttons = Array.from(nav!.querySelectorAll('[data-continue-target]')) as HTMLElement[];
+    expect(buttons.map((b) => b.textContent)).toEqual(['Prices', 'Together', 'About']);
+    fireEvent.click(buttons[0]!);
+    expect(onWillNavigate).toHaveBeenCalledWith('insights-prices');
+    // the lead-in names the strip's purpose
+    expect(nav!.textContent).toContain(insightsCopyEn.ui.continueLabel);
+  });
+
+  it('empty targets render nothing', () => {
+    const { container } = render(<ContinueStrip targets={[]} copy={insightsCopyEn} />);
+    expect(container.querySelector('[data-continue-strip]')).toBeNull();
   });
 });

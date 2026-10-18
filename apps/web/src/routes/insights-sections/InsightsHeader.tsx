@@ -162,8 +162,11 @@ export function InsightsHeader({
            * cards by ~28–36px (mb-7 = 28px; the mb-3 was 12px). Editorial
            * handoff (§5): the title speaks the navy print ink (--ei-navy),
            * the same ink as the region card headings — weight and spacing
-           * carry the hierarchy, not many colors. */}
-          <h1 className="m-0 text-2xl font-bold tracking-tight text-[var(--ei-navy)] sm:text-[2rem] sm:leading-[2.4rem]">{t('insights.title')}</h1>
+           * carry the hierarchy, not many colors. UI-fidelity round
+           * (2026-10-19): the owner's correction brief asks the header to
+           * read like the reference's dominant editorial title — 34px
+           * desktop (still inside the spec's 32–36px band). */}
+          <h1 className="m-0 text-2xl font-bold tracking-tight text-[var(--ei-navy)] sm:text-[2.125rem] sm:leading-[2.55rem]">{t('insights.title')}</h1>
           <p className="mt-1 mb-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.ui.subtitle}</p>
           {dataAsOfLine ? (
             <p className="mt-1 mb-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]" title={dataAsOfLine.tooltip}>

@@ -51,6 +51,7 @@ import { AboutTheData } from '../components/insights/AboutTheData';
 import { DetailsPanel } from '../components/insights/DetailsPanel';
 import { HeroBlock } from '../components/insights/HeroBlock';
 import { JumpNav, type JumpTarget } from '../components/insights/JumpNav';
+import { ContinueStrip } from '../components/insights/ContinueStrip';
 import { MoneyPanel } from '../components/insights/MoneyPanel';
 import { NextUpStrip } from '../components/insights/NextUpStrip';
 import { PricesBoard } from '../components/insights/PricesBoard';
@@ -344,7 +345,20 @@ export function Insights() {
   );
 
   return (
-    <div className="insights-page mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-6xl lg:px-8 xl:max-w-[1440px]">
+    // UI-fidelity round (2026-10-19, the owner's correction brief §3
+    // "Content width and spacing"): the old xl:max-w-[1440px] cap left
+    // 80–160px dead margins beside the two regional cards on 1600–1760px
+    // screens — the brief asks for ~95% of the available viewport with
+    // 24–32px desktop side gutters. lg uses calc(100% − 40px) (20px outer
+    // gutter + the 16px px-8 padding each side, spec §11's 1024–1199
+    // "reduce outer gutter" band); xl is min(calc(100% − 56px), 1840px)
+    // — 28px gutters (1600 → 1544px / 96.5%, 1760 → 1704px / 96.8%) with
+    // the absolute 1840px ceiling folded into the SAME rule (a separate
+    // 2xl: class would win the cascade at ≥1536px and flatten the calc,
+    // as the first build proved) so ultra-wide desktops keep a sane
+    // reading measure. Tablet (md:max-w-3xl) and the phone column are
+    // untouched.
+    <div className="insights-page mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-[calc(100%-40px)] lg:px-8 xl:max-w-[min(calc(100%-56px),1840px)]">
       <ReadingProgress label={copy.ui.progressLabel} />
       <InsightsHeader
         t={t}
@@ -402,6 +416,14 @@ export function Insights() {
               sectionIndicators={sectionIndicators}
             />
           </div>
+
+          {/* UI-fidelity round (2026-10-19, the owner's correction brief §7
+           * "Bottom information strip"): the reference's compact footer
+           * strip naming the page's next sections in their intended order —
+           * the same labels and the same expand-then-scroll navigation the
+           * JumpNav pills below speak (the hero target itself is skipped:
+           * the strip names what comes NEXT). */}
+          <ContinueStrip targets={jumpTargets.slice(1)} copy={copy} onWillNavigate={onWillNavigate} />
 
           {/* P1/R19: the sticky section pills. */}
           <JumpNav targets={jumpTargets} copy={copy} onWillNavigate={onWillNavigate} />

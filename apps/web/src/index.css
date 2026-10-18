@@ -1303,9 +1303,13 @@ html:not(:lang(fa)) .type-kicker {
   background: var(--color-status-alert);
 }
 /* The hero's meter is the page's status instrument — bigger there.
- * The compact one rides each per-gauge hero row (fixed 44px track). */
+ * The compact one rides each per-gauge hero row (fixed 44px track).
+ * UI-fidelity round (2026-10-19, brief §10): the lg segments keep the
+ * base PILL radius (the 4px rectangle read as a hard progress bar in the
+ * reference comparison — the approved meters are soft gauge lights), and
+ * every meter size now speaks the same rounded segment language. */
 .verdict-meter-lg { flex: 1 1 auto; max-width: 150px; min-width: 90px; }
-.verdict-meter-lg .verdict-meter-seg { height: 12px; border-radius: 4px; }
+.verdict-meter-lg .verdict-meter-seg { height: 12px; border-radius: 999px; }
 .verdict-meter-sm { width: 52px; }
 .verdict-meter-sm .verdict-meter-seg { height: 6px; }
 @media (prefers-reduced-motion: reduce) {
@@ -1483,7 +1487,21 @@ html:not(:lang(fa)) .type-kicker {
  * the article. First layer wins (the fade), second the veil, third the
  * art — the Opera House held toward the center-right of the band (spec
  * §7 Australia), the map centered. Dark mode: the pale art tones down
- * under the dark veil so it whispers on the navy card. */
+ * under the dark veil so it whispers on the navy card.
+ *
+ * UI-fidelity round (2026-10-19, the owner's correction brief §4
+ * "Match the regional card header and imagery"): the uniform veils were
+ * too heavy (30–46% surface mix) — the artwork read as absent, and the
+ * approved reference shows a CLEARLY PRESENT washed Sydney band behind
+ * the header. The uniform veil drops to 22% (Australia) / 30% (Global,
+ * where the map must stay the quieter of the two — spec §7 "opacity
+ * very low"): the band's first comparison pass (12%) swung too
+ * photographic against the reference's heavily-washed treatment, so
+ * 22% keeps the Opera House READABLE as artwork while it stays the
+ * quietest layer on the card; the pass-2 VLM review still read it
+ * ~5–10% stronger than the reference's ghosted watermark, so the final
+ * veil settles at 26%; the bottom fade keeps the count line's contrast,
+ * and the pre-faded asset keeps the whole band editorial. */
 .ei-hero-art {
   position: absolute;
   inset: 0;
@@ -1493,7 +1511,7 @@ html:not(:lang(fa)) .type-kicker {
 .ei-hero-art--au {
   background-image:
     linear-gradient(to top, var(--color-surface) 0%, color-mix(in srgb, var(--color-surface) 62%, transparent) 46%, transparent 100%),
-    linear-gradient(color-mix(in srgb, var(--color-surface) 30%, transparent), color-mix(in srgb, var(--color-surface) 30%, transparent)),
+    linear-gradient(color-mix(in srgb, var(--color-surface) 26%, transparent), color-mix(in srgb, var(--color-surface) 26%, transparent)),
     url('/assets/artwork/sydney-harbour-faded.webp');
   background-size: 100% 100%, 100% 100%, cover;
   background-position: center, center, 72% center;
@@ -1501,11 +1519,11 @@ html:not(:lang(fa)) .type-kicker {
 .ei-hero-art--global {
   background-image:
     linear-gradient(to top, var(--color-surface) 0%, color-mix(in srgb, var(--color-surface) 62%, transparent) 46%, transparent 100%),
-    linear-gradient(color-mix(in srgb, var(--color-surface) 46%, transparent), color-mix(in srgb, var(--color-surface) 46%, transparent)),
+    linear-gradient(color-mix(in srgb, var(--color-surface) 30%, transparent), color-mix(in srgb, var(--color-surface) 30%, transparent)),
     url('/assets/artwork/global-map-faded.webp');
   background-size: 100% 100%, 100% 100%, cover;
   background-position: center, center, center;
-  opacity: 0.75; /* the map must stay even quieter than Sydney (spec §7 Global) */
+  opacity: 0.85; /* the map must stay even quieter than Sydney (spec §7 Global) */
 }
 .dark .ei-hero-art--au { opacity: 0.5; }
 .dark .ei-hero-art--global { opacity: 0.35; }
@@ -1561,12 +1579,41 @@ html:not(:lang(fa)) .type-kicker {
 
 /* The flagged row's restrained severity edge (editorial spec §4/§8): the
  * row face stays neutral; the needs-attention tier speaks through a thin
- * inline-start accent in the alert ink — the same logical-edge language
- * as .alert-card above, never a saturated card. */
+ * inline-start accent — the same logical-edge language as .alert-card
+ * above, never a saturated card.
+ *
+ * UI-fidelity round (2026-10-19, the owner's correction brief §5 "Correct
+ * the severity-color system" — the round's named bug): the accent used to
+ * be hardcoded alert RED for every flagged row in BOTH regions, so
+ * Australia's card said "Stressed" in its pill while its rows wore the
+ * Crisis ink. The accent now follows the REGION'S OWN verdict step via
+ * the article's [data-ei-step] → --ei-accent custom property: step 4
+ * Critical keeps the red, step 3 Stressed speaks the amber/orange
+ * stressed ink, step 2 the watch amber — status and row presentation can
+ * no longer disagree. The fallback (no data-ei-step ancestor) stays the
+ * alert red so an unannotated surface keeps its established meaning. */
+[data-ei-step='4'] { --ei-accent: var(--color-status-alert); }
+[data-ei-step='3'] { --ei-accent: var(--color-status-stressed); }
+[data-ei-step='2'] { --ei-accent: var(--color-status-watch); }
+[data-ei-step='1'] { --ei-accent: var(--color-status-normal); }
 .ei-row-accent {
   border-inline-start-width: 3px;
   border-inline-start-style: solid;
-  border-inline-start-color: var(--color-status-alert);
+  border-inline-start-color: var(--ei-accent, var(--color-status-alert));
+}
+
+/* The flagged row's tier fallback mark (the alert triangle every row
+ * without its own subject artwork carries, spec §8) speaks the SAME
+ * region accent as the row's inline-start edge — never a stray red
+ * triangle on an amber-accented card. */
+.ei-fallback-mark { color: var(--ei-accent, var(--color-status-alert)); }
+
+/* UI-fidelity round (brief §7): the reference's explanation panels
+ * carry a soft ~3px inline-start rule in the region's severity ink —
+ * the same logical-edge language as the flagged rows (it flips with
+ * the reading direction; the 1px ring stays on the other edges). */
+.ei-panel-accent {
+  border-inline-start: 3px solid var(--ei-accent, var(--color-status-alert));
 }
 
 /* The flagged row's trailing drill-down chevron (editorial spec §8): a

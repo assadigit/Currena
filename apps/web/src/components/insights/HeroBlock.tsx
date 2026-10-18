@@ -344,7 +344,7 @@ export function HeroBlock({
        * negative red. */}
       {mover && moverReading && moverEntry ? (
         <div
-          className="mt-3 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)]"
+          className="mt-3 rounded-[var(--radius-lg)] bg-[var(--color-surface)] px-4 py-3 ring-1 ring-[var(--color-border)]"
           data-biggest-move
         >
           <p className="m-0 mb-1 flex items-center gap-1.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-tertiary)]">

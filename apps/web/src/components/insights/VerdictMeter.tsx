@@ -100,12 +100,12 @@ import { IconImg, indicatorIconUrl, sectionIconUrl, stateIconUrl } from '../icon
 import { FlowChevron } from '../icons/FlowChevron';
 import { GAUGES, gaugesForSection, labelForVerdictStep, sectionVerdictStep } from '@currena/insights';
 import {
-  attentionToneClass,
   attentionTiles,
   definitionFor,
   formatIndicatorValue,
   formatRuleText,
   indicatorValueParts,
+  stepToneClass,
 } from './config';
 import { GlossaryTip } from './world-currencies/GlossaryTip';
 
@@ -279,6 +279,7 @@ export function VerdictBlock({
   return (
     <article
       className="flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface)] ring-1 ring-[var(--color-border)]"
+      data-ei-step={step}
     >
       {/* Editorial handoff (2026-10-19, economic-indicators-editorial-spec.md
        * §7): the card opens with the quiet ART BAND — Sydney Harbour on the
@@ -330,12 +331,15 @@ export function VerdictBlock({
         {/* Real spec §4.3: a concise "Why" summary directly below the card
          * heading, with the optional information control (the existing
          * how-computed tip, round 43). The count line is the existing copy
-         * (no new strings); attentionToneClass keeps it red when flagged,
-         * green when calm. The data attributes are unchanged. */}
+         * (no new strings); UI-fidelity round (2026-10-19, brief §5) — the
+         * count ink follows the REGION'S OWN verdict step (stepToneClass),
+         * so a Stressed Australia counts its warnings in the same amber
+         * accent its rows carry, and only a Critical region speaks red.
+         * The data attributes are unchanged. */}
         <div className="relative flex flex-wrap items-center gap-x-2 gap-y-1">
           <p
-            className={`m-0 text-[length:var(--type-label)] font-semibold leading-relaxed ${attentionToneClass(
-              tiles.length + (marketsAlert ? 1 : 0) + (fxAlert ? 1 : 0),
+            className={`m-0 text-[length:var(--type-label)] font-semibold leading-relaxed ${stepToneClass(
+              tiles.length + (marketsAlert ? 1 : 0) + (fxAlert ? 1 : 0) > 0 ? step : 1,
             )}`}
             data-attention-count
             data-markets-in-count={marketsAlert ? 'true' : undefined}
@@ -425,6 +429,10 @@ export function VerdictBlock({
                       {subjectIcon !== null ? (
                         <IconImg src={subjectIcon} size={22} desktopSize={24} />
                       ) : (
+                        /* UI-fidelity round (2026-10-19, brief §5): the
+                         * fallback tier mark speaks the REGION accent
+                         * (.ei-fallback-mark → --ei-accent), never a stray
+                         * red triangle on an amber-accented card. */
                         <svg
                           width="16"
                           height="16"
@@ -435,7 +443,7 @@ export function VerdictBlock({
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           focusable="false"
-                          className="text-[var(--color-status-alert)]"
+                          className="ei-fallback-mark"
                         >
                           <path d="M8 1.8 14.6 13.4H1.4L8 1.8Z" />
                           <path d="M8 6.2v3.4" />
@@ -444,7 +452,11 @@ export function VerdictBlock({
                       )}
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col gap-1">
-                      <span className="line-clamp-2 text-[0.9375rem] font-bold leading-snug text-[var(--color-text-primary)]">
+                      {/* UI-fidelity round (brief §10 typography): the name
+                       * steps up to 16px (spec §5's 15–17px band) so the
+                       * name/rule hierarchy reads like the reference's
+                       * pronounced title-vs-subtext pairing. */}
+                      <span className="line-clamp-2 text-[1rem] font-bold leading-snug text-[var(--color-text-primary)]">
                         {copy.indicators[id].name}
                       </span>
                       <span className="m-0 text-[length:var(--type-label)] font-normal leading-relaxed text-[var(--color-text-secondary)]">
@@ -501,19 +513,19 @@ export function VerdictBlock({
         </section>
       ) : null}
 
-      {/* R2 → R30 → round 24 → round 36 → round 42 (owner): the gauges
-       * GROUPED BY STATUS. The old flat row of chips + the computed reason
-       * sentence + the calm line said the same thing three times (the
-       * roast: "it's everything and nothing because it's confusing"). Now
-       * ONE grouped module: a quiet box per step word — "Stressed:" names
-       * its areas, "Stable:" names the calm ones, the areas keep their
-       * mini meters — the grouping IS the sentence, and it can never
-       * contradict the gauges because it IS the gauges. Unreadable rows
-       * (step 0) keep their honest group at the end; when NO gauge is
-       * readable the module says so in one line (the old notEnough path).
-       * Rows stay exactly one line high (round 36's alignment decree) and
-       * the per-row word is gone — the group's word covers every row under
-       * it; each meter's aria still names its own step. */}
+      {/* R2 → R30 → round 24 → round 36 → round 42 → UI-fidelity round
+       * (2026-10-19, the owner's correction brief §7 "Category summary
+       * section"): the gauges render as COMPACT CATEGORY ROWS — the
+       * approved reference's lower-card summary. One quiet row per gauge:
+       * category label · small tinted state badge · the four-step mini
+       * meter (the reference's severity bar) — white/near-white surface,
+       * fine border, worst state first, unreadable gauges (step 0) last
+       * in honest neutral. The grouping-by-status-word box is retired:
+       * each row's badge carries its own state word (the same words, the
+       * same meters, the same aria — nothing about the data changed, the
+       * rows just speak one-per-category like the reference). When NO
+       * gauge is readable the module says so in one line (the old
+       * notEnough path). */}
       {(() => {
         const readable = gaugeRows.filter((g) => g.step >= 1);
         const zeroRows = gaugeRows.filter((g) => g.step === 0);
@@ -527,9 +539,8 @@ export function VerdictBlock({
             </div>
           );
         }
-        /* Round 43 (owner): the verdict-rule tip seats in the FIRST group's
-         * header — beside the status word it explains — instead of floating
-         * alone under the groups. */
+        /* Round 43 (owner): the verdict-rule tip seats beside the module's
+         * heading — beside the verdict it explains. */
         const ruleTip = (
           <GlossaryTip def={copy.ui.verdictRule} srLabel={copy.ui.verdictRuleLabel} panelClassName="w-full basis-full" />
         );
@@ -541,205 +552,225 @@ export function VerdictBlock({
             </p>
           );
         }
-        const steps = [4, 3, 2, 1].filter((s) => readable.some((g) => g.step === s));
+        /* The compact tinted badge inks (light tint of the step's own hue —
+         * the same pairing .ei-state-pill speaks, at caption size). Step 0
+         * stays NEUTRAL: insufficient data must never read as positive
+         * (spec §4 severity treatment). */
+        const badgeTone = (s: number): string =>
+          s === 4
+            ? 'bg-[var(--color-status-alert)]/10 text-[var(--color-status-alert)]'
+            : s === 3
+              ? 'bg-[var(--color-status-stressed)]/15 text-[var(--color-status-stressed)]'
+              : s === 2
+                ? 'bg-[var(--color-status-watch)]/15 text-[var(--color-status-watch)]'
+                : s === 1
+                  ? 'bg-[var(--color-status-normal)]/12 text-[var(--color-status-normal)]'
+                  : 'bg-currena-muted/15 text-[var(--color-text-secondary)]';
+        const ordered = [...readable].sort((a, b) => b.step - a.step);
+        const rowOf = (gauge: string, gStep: number, word: string) => {
+          const gaugeName =
+            copy.groupShort[gauge as keyof typeof copy.groupShort] ?? copy.groups[gauge as keyof typeof copy.groups];
+          return (
+            <li
+              key={gauge}
+              data-gauge={gauge}
+              data-gauge-step={gStep}
+              className="flex min-w-0 items-center gap-2 rounded-[var(--radius-md)] bg-currena-muted/[0.04] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]/60"
+            >
+              <span
+                title={gaugeName}
+                className="min-w-0 flex-1 truncate text-[length:var(--type-label)] font-semibold text-[var(--color-text-primary)]"
+              >
+                {gaugeName}
+              </span>
+              <span
+                className={`shrink-0 rounded-full px-2 py-0.5 text-[length:var(--type-caption)] font-bold ${badgeTone(gStep)}`}
+              >
+                {word}
+              </span>
+              <VerdictMeter
+                step={gStep}
+                label={word}
+                ariaLabel={interpolate(copy.ui.gaugeStepAria, {
+                  question: gaugeName,
+                  label: word,
+                  step: num(gStep, numberLocale),
+                })}
+                size="sm"
+              />
+            </li>
+          );
+        };
         return (
-          <ul
-            className="m-0 flex list-none flex-col gap-1.5 p-0"
-            aria-label={copy.ui.heroGaugesLabel}
-            data-hero-gauges
-          >
-            {steps.map((s, si) => (
-              <li
-                key={s}
-                className="rounded-[var(--radius-md)] bg-currena-muted/[0.05] px-2.5 py-2 ring-1 ring-[var(--color-border)]/60"
-                data-gauge-group={s}
-              >
-                <p className="m-0 mb-1 flex flex-wrap items-center gap-x-1.5 gap-y-1">
-                  <span className="inline-flex rounded-full bg-currena-muted/15 px-2 py-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)]">
-                    {wordOfStep(s)}
-                  </span>
-                  {si === 0 ? ruleTip : null}
-                </p>
-                <ul className="m-0 grid list-none grid-cols-1 gap-x-5 gap-y-1 p-0 sm:grid-cols-2">
-                  {readable
-                    .filter((g) => g.step === s)
-                    .map((g) => {
-                      const gWord = wordOfStep(g.step);
-                      const gaugeName =
-                        copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge];
-                      return (
-                        <li key={g.gauge} className="flex items-center gap-1.5 text-[length:var(--type-label)]">
-                          <span
-                            title={gaugeName}
-                            className="min-w-0 flex-1 truncate font-semibold text-[var(--color-text-primary)]"
-                          >
-                            {gaugeName}
-                          </span>
-                          <span className="flex shrink-0 items-center gap-1.5">
-                            <VerdictMeter
-                              step={g.step}
-                              label={gWord}
-                              ariaLabel={interpolate(copy.ui.gaugeStepAria, {
-                                question: gaugeName,
-                                label: gWord,
-                                step: num(g.step, numberLocale),
-                              })}
-                              size="sm"
-                            />
-                          </span>
-                        </li>
-                      );
-                    })}
-                </ul>
-              </li>
-            ))}
-            {zeroRows.length > 0 ? (
-              <li
-                className="rounded-[var(--radius-md)] bg-currena-muted/[0.05] px-2.5 py-2 ring-1 ring-[var(--color-border)]/60"
-                data-gauge-group="0"
-              >
-                <p className="m-0 mb-1">
-                  <span className="inline-flex rounded-full bg-currena-muted/15 px-2 py-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)]">
-                    {copy.ui.gaugeNoReading}
-                  </span>
-                </p>
-                <ul className="m-0 grid list-none grid-cols-1 gap-x-5 gap-y-1 p-0 sm:grid-cols-2">
-                  {zeroRows.map((g) => {
-                    const gaugeName =
-                      copy.groupShort[g.gauge as keyof typeof copy.groupShort] ?? copy.groups[g.gauge];
-                    return (
-                      <li key={g.gauge} className="flex items-center gap-1.5 text-[length:var(--type-label)]">
-                        <span
-                          title={gaugeName}
-                          className="min-w-0 flex-1 truncate font-semibold text-[var(--color-text-primary)]"
-                        >
-                          {gaugeName}
-                        </span>
-                        <VerdictMeter
-                          step={g.step}
-                          label={copy.ui.gaugeNoReading}
-                          ariaLabel={interpolate(copy.ui.gaugeStepAria, {
-                            question: gaugeName,
-                            label: copy.ui.gaugeNoReading,
-                            step: num(g.step, numberLocale),
-                          })}
-                          size="sm"
-                        />
-                      </li>
-                    );
-                  })}
-                </ul>
-              </li>
-            ) : null}
-          </ul>
+          <section data-hero-gauges>
+            <p className="m-0 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.8125rem] font-bold text-[var(--color-text-secondary)]">
+              {copy.ui.heroGaugesLabel}
+              {ruleTip}
+            </p>
+            <ul
+              className="m-0 mt-2 grid list-none grid-cols-1 gap-1.5 p-0 sm:grid-cols-2"
+              aria-label={copy.ui.heroGaugesLabel}
+            >
+              {ordered.map((g) => rowOf(g.gauge, g.step, wordOfStep(g.step)))}
+              {zeroRows.map((g) => rowOf(g.gauge, g.step, copy.ui.gaugeNoReading))}
+            </ul>
+          </section>
         );
       })()}
 
       {/* Real spec §4.6 (secondary groups) + §6 ("a single focused
-       * explanatory panel"): the gauge groups above stay the verdict's
-       * per-question breakdown (calm groups read calm — never warnings);
-       * this box is the Global-only raised world-section module (markets /
-       * currencies / section signals), the page's one pale severity
-       * panel. Round 42/43 built it: a bounded container with EXPLICIT
-       * flex bullet markers so the dot sits at the sentence START in every
-       * direction. The count line (formerly the box's header) moved up to
-       * the Why position directly under the card heading (spec §4.3); the
-       * bullets stand on their own. Australia never grows this box — the
-       * signals are Global-scope. */}
-      {hasBullets ? (
-        <div
-          className="rounded-[var(--radius-md)] bg-[var(--color-status-alert)]/[0.05] px-3 py-2.5 ring-1 ring-[var(--color-status-alert)]/25"
-          data-attention-box
-        >
-          <ul className="m-0 list-none space-y-1.5 p-0" data-attention-bullets>
-            {/* §5.3 hero integration: the raised world-markets signal
-             * appears WITH ITS NUMBERS, using the module's own tone
-             * language (attention = the alert red, unusual = the amber
-             * watch ink). Clicking jumps to the world-markets section. */}
-            {marketsAlert ? (
-              <li className="flex items-start gap-1.5">
-                {BULLET_DOT}
-                <button
-                  type="button"
-                  onClick={() => onJumpMarkets?.()}
-                  className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold underline decoration-current/40 underline-offset-4 transition-opacity hover:opacity-80 ${
-                    marketsAlert.signal === 'unusual'
-                      ? 'text-[var(--color-status-watch)]'
-                      : 'text-[var(--color-status-alert)]'
-                  }`}
-                  data-markets-signal={marketsAlert.signal}
-                >
-                  <bdi>
-                    {interpolate(
-                      marketsAlert.signal === 'unusual'
-                        ? copy.markets.heroAlertUnusual
-                        : copy.markets.heroAlertAttention,
-                      {
-                        n: num(marketsAlert.n, numberLocale),
-                        count: num(marketsAlert.count, numberLocale),
-                      },
-                    )}
-                  </bdi>
-                </button>
-              </li>
-            ) : null}
-            {/* §6.5 hero integration (currencies build step 11): the
-             * raised currency signal with its PATTERN NAMES (the cards
-             * carry the detail) — no new card. */}
-            {fxAlert ? (
-              <li className="flex items-start gap-1.5">
-                {BULLET_DOT}
-                <button
-                  type="button"
-                  onClick={() => onJumpFx?.()}
-                  className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold underline decoration-current/40 underline-offset-4 transition-opacity hover:opacity-80 ${
-                    fxAlert.signal === 'unusual'
-                      ? 'text-[var(--color-status-watch)]'
-                      : 'text-[var(--color-status-alert)]'
-                  }`}
-                  data-fx-signal={fxAlert.signal}
-                >
-                  <bdi>
-                    {interpolate(
-                      fxAlert.signal === 'unusual' ? copy.fx.heroAlertUnusual : copy.fx.heroAlertAttention,
-                      { patterns: fxAlert.patterns.join(' · ') },
-                    )}
-                  </bdi>
-                </button>
-              </li>
-            ) : null}
-            {/* §6.11/§9.10: the two world sections as SEPARATE
-             * indicators — each with its own measure label and chip,
-             * never merged. A calm stock section beside a warning
-             * currency pattern is the designed state (they measure
-             * different things); the labels say so. */}
-            {(sectionIndicators ?? []).map((ind, i) => (
-              <li key={i} className="flex items-start gap-1.5">
-                {BULLET_DOT}
-                {ind.signal !== 'normal' && ind.onJump !== undefined ? (
-                  <button
-                    type="button"
-                    onClick={ind.onJump}
-                    data-section-indicator={ind.signal}
-                    className={`insights-focusable -ms-1 cursor-pointer rounded-md border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold underline decoration-current/40 underline-offset-4 transition-opacity hover:opacity-80 ${
-                      ind.signal === 'unusual'
-                        ? 'text-[var(--color-status-watch)]'
-                        : 'text-[var(--color-status-alert)]'
-                    }`}
-                  >
-                    {ind.label}
-                    <span className="ms-1 font-bold">· {ind.signal === 'unusual' ? copy.fx.chipUnusual : copy.fx.chipAttention}</span>
-                  </button>
-                ) : (
-                  <span className="px-1 py-0.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]" data-section-indicator="normal">
-                    {ind.label}
-                    <span className="ms-1">· {copy.fx.chipNormal}</span>
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
+       * explanatory panel") → UI-fidelity round (2026-10-19, the owner's
+       * correction brief §7 "Contextual explanation panel"): the dedicated
+       * restrained panel at the bottom of each regional card — the approved
+       * reference's closing module.
+       *
+       * GLOBAL carries the raised world-section signals (markets /
+       * currencies / section indicators — the existing module, now with a
+       * clear heading on the pale-red surface the brief specifies); when no
+       * feed has loaded, it falls back to the word-choice rule so the
+       * panel always explains its state with real content.
+       * AUSTRALIA never grows the world signals (they are Global-scope);
+       * its panel carries the existing verdict-rule explanation on a pale
+       * amber surface appropriate to its Stressed state.
+       *
+       * The tint follows the REGION'S OWN step ink (spec §4: "the exact
+       * existing product taxonomy controls which token is applied") —
+       * pale red for a Critical region, pale amber for Stressed, never a
+       * saturated warning surface. Round 42/43's EXPLICIT flex bullet
+       * markers stay so the dot sits at the sentence START in every
+       * direction; the signal lines keep their working jump buttons but
+       * lose the underline (the brief's "avoid underlined text" — the
+       * bold severity ink is the affordance). */}
+      {gaugeRows.length > 0 ? (
+        (() => {
+          const signals = section === 'global' && hasBullets;
+          const tint =
+            step === 4
+              ? 'bg-[var(--color-status-alert)]/[0.05] ring-[var(--color-status-alert)]/20'
+              : step === 3
+                ? 'bg-[var(--color-status-stressed)]/[0.06] ring-[var(--color-status-stressed)]/20'
+                : step === 2
+                  ? 'bg-[var(--color-status-watch)]/[0.08] ring-[var(--color-status-watch)]/25'
+                  : step === 1
+                    ? 'bg-[var(--color-status-normal)]/[0.05] ring-[var(--color-status-normal)]/20'
+                    : 'bg-currena-muted/[0.06] ring-[var(--color-border)]';
+          return (
+            <div
+              className={`ei-panel-accent rounded-[var(--radius-md)] px-3 py-2.5 ring-1 ${tint}`}
+              data-ei-panel
+              data-ei-panel-kind={signals ? 'signals' : 'rule'}
+              {...(signals ? { 'data-attention-box': true } : {})}
+            >
+              <p
+                className={`m-0 mb-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[length:var(--type-caption)] font-bold ${stepToneClass(step)}`}
+                data-ei-panel-heading
+              >
+                {stateIconUrl(step) !== null ? (
+                  <IconImg src={stateIconUrl(step)!} size={16} desktopSize={18} className="drop-shadow-sm" />
+                ) : null}
+                {signals ? copy.ui.worldSignalsTitle : copy.ui.verdictRuleLabel}
+              </p>
+              {signals ? (
+                <ul className="m-0 list-none space-y-1.5 p-0" data-attention-bullets>
+                  {/* §5.3 hero integration: the raised world-markets signal
+                   * appears WITH ITS NUMBERS, using the module's own tone
+                   * language (attention = the alert red, unusual = the amber
+                   * watch ink). Clicking jumps to the world-markets section. */}
+                  {marketsAlert ? (
+                    <li className="flex items-start gap-1.5">
+                      {BULLET_DOT}
+                      <button
+                        type="button"
+                        onClick={() => onJumpMarkets?.()}
+                        className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold transition-opacity hover:opacity-80 ${
+                          marketsAlert.signal === 'unusual'
+                            ? 'text-[var(--color-status-watch)]'
+                            : 'text-[var(--color-status-alert)]'
+                        }`}
+                        data-markets-signal={marketsAlert.signal}
+                      >
+                        <bdi>
+                          {interpolate(
+                            marketsAlert.signal === 'unusual'
+                              ? copy.markets.heroAlertUnusual
+                              : copy.markets.heroAlertAttention,
+                            {
+                              n: num(marketsAlert.n, numberLocale),
+                              count: num(marketsAlert.count, numberLocale),
+                            },
+                          )}
+                        </bdi>
+                      </button>
+                    </li>
+                  ) : null}
+                  {/* §6.5 hero integration (currencies build step 11): the
+                   * raised currency signal with its PATTERN NAMES (the cards
+                   * carry the detail) — no new card. */}
+                  {fxAlert ? (
+                    <li className="flex items-start gap-1.5">
+                      {BULLET_DOT}
+                      <button
+                        type="button"
+                        onClick={() => onJumpFx?.()}
+                        className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold transition-opacity hover:opacity-80 ${
+                          fxAlert.signal === 'unusual'
+                            ? 'text-[var(--color-status-watch)]'
+                            : 'text-[var(--color-status-alert)]'
+                        }`}
+                        data-fx-signal={fxAlert.signal}
+                      >
+                        <bdi>
+                          {interpolate(
+                            fxAlert.signal === 'unusual' ? copy.fx.heroAlertUnusual : copy.fx.heroAlertAttention,
+                            { patterns: fxAlert.patterns.join(' · ') },
+                          )}
+                        </bdi>
+                      </button>
+                    </li>
+                  ) : null}
+                  {/* §6.11/§9.10: the two world sections as SEPARATE
+                   * indicators — each with its own measure label and chip,
+                   * never merged. A calm stock section beside a warning
+                   * currency pattern is the designed state (they measure
+                   * different things); the labels say so. */}
+                  {(sectionIndicators ?? []).map((ind, i) => (
+                    <li key={i} className="flex items-start gap-1.5">
+                      {BULLET_DOT}
+                      {ind.signal !== 'normal' && ind.onJump !== undefined ? (
+                        <button
+                          type="button"
+                          onClick={ind.onJump}
+                          data-section-indicator={ind.signal}
+                          className={`insights-focusable -ms-1 cursor-pointer rounded-md border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold transition-opacity hover:opacity-80 ${
+                            ind.signal === 'unusual'
+                              ? 'text-[var(--color-status-watch)]'
+                              : 'text-[var(--color-status-alert)]'
+                          }`}
+                        >
+                          {ind.label}
+                          <span className="ms-1 font-bold">· {ind.signal === 'unusual' ? copy.fx.chipUnusual : copy.fx.chipAttention}</span>
+                        </button>
+                      ) : (
+                        <span className="px-1 py-0.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]" data-section-indicator="normal">
+                          {ind.label}
+                          <span className="ms-1">· {copy.fx.chipNormal}</span>
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                /* The word-choice rule — the existing localized explanation
+                 * of what makes this region's verdict word what it is (the
+                 * same text the quiet "?" tip carries, visible here as the
+                 * reference's readable explanatory points). */
+                <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]" data-ei-panel-rule>
+                  {copy.ui.verdictRule}
+                </p>
+              )}
+            </div>
+          );
+        })()
       ) : null}
 
       {/* Real spec §9 (header actions): "View section" is a real, working

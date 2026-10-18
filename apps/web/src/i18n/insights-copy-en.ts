@@ -1225,6 +1225,15 @@ export const insightsCopyEn = {
     // The grouping IS the sentence now; heroReason stays in config, pinned
     // by its own tests.
     heroGaugesLabel: 'The gauges behind this verdict',
+    // UI-fidelity round (2026-10-19, the owner's correction brief §7
+    // "Contextual explanation panel"): the Global card's explanation panel
+    // heading — the raised world-section signals (markets / currencies)
+    // ride under it on the pale-red surface.
+    worldSignalsTitle: 'World signals',
+    // UI-fidelity round (§7 "Bottom information strip"): the lead-in of
+    // the compact strip under the hero that names the next page sections
+    // in their intended order (the JumpNav labels).
+    continueLabel: 'Keep reading',
     inAlert: '{warnings} of {voting} indicators need attention',
     /** The count line's variant when the world-markets signal is raised
      * (world-markets spec §5.3 / build step 9: the section signal appears

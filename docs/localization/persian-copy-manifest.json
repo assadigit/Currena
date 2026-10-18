@@ -22419,6 +22419,26 @@
       "reference": "persian_site_copy_round2_part3_panels_calendar_polished-translated.md",
       "text": "گزارش اشتغال آمریکا، نوامبر ۲۰۲۶",
       "sha256": "21cf70943b1165c5999304db853c1c5e50ff9283cff26bf33dd8285637be6be6"
+    },
+    {
+      "id": "ui.worldSignalsTitle",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "round": "editorial-fidelity-2026-10-19",
+      "reference": "owner UI-fidelity correction brief §7 (Contextual explanation panel)",
+      "text": "سیگنال‌های جهانی",
+      "sha256": "1fba03eefe65ce6ec3d90658e5757a35512f314cd240c6a2aa189cf60a6808cb"
+    },
+    {
+      "id": "ui.continueLabel",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "round": "editorial-fidelity-2026-10-19",
+      "reference": "owner UI-fidelity correction brief §7 (Bottom information strip)",
+      "text": "ادامهٔ صفحه",
+      "sha256": "ce17ceb4fe89477d715137c34ad5fbc1f670ee286b62170cd7bf0c530e3b52a6"
     }
   ]
 }

@@ -439,7 +439,25 @@ const BUDGETS = [
   // assets (precached), NOT in the JS chunk; the entry chunk is untouched
   // at 295.29/88.81 vs 296/89.5. Justified in CHANGELOG §2026-10-19
   // (editorial hero round) and D-36 in docs/DECISIONS_FOR_ALI.md.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 656_000, gz: 157_000, label: 'Insights lazy chunk' },
+  // UI-fidelity correction round (656.00 → 657.00 raw, 157.00 → 157.50 gz,
+  // 2026-10-19, the owner's correction brief): the hero closes the gap to
+  // the approved reference — the page container widens to ~95% viewport
+  // (Insights.tsx), the art band veils lighten (index.css), the flagged
+  // rows' severity accent follows the REGION's own verdict step (article
+  // [data-ei-step] → --ei-accent — the brief's named bug: Australia
+  // Stressed no longer wears Crisis-red row edges), the gauge groups
+  // become the reference's compact CATEGORY ROWS (label + tinted state
+  // badge + sm meter), each card closes with the restrained contextual
+  // explanation panel (Global: the raised world signals on pale red;
+  // Australia / no-feed fallback: the existing word-choice rule on pale
+  // amber), and the ContinueStrip names the page's next sections after
+  // the hero. Measured 656.80/157.17 — raw +1.76 kB, gz +0.44 kB over
+  // the 2026-10-19 build: compressible JSX + 2 copy strings × 2 locales
+  // (worldSignalsTitle / continueLabel, manifest round
+  // editorial-fidelity-2026-10-19). Entry chunk untouched at
+  // 295.29/88.81 vs 296/89.5. Justified in CHANGELOG §2026-10-19
+  // (fidelity round) and D-37 in docs/DECISIONS_FOR_ALI.md.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 657_000, gz: 157_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {
