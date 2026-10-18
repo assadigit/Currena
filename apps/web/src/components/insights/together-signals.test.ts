@@ -88,16 +88,37 @@ describe('I17 copy parity (en ↔ fa)', () => {
     expect(sorted(Object.keys(fa.conditions))).toEqual(sorted(Object.keys(en.conditions)));
     expect(fa.conditions.industrial!.tag).toBeTypeOf('string');
     expect(sorted(tokens(fa.conditionsMet))).toEqual(sorted(tokens(en.conditionsMet)));
-    // 2026-10-17e (owner spec): the grouped driver list became the balance
-    // visual — the side labels are the balance's pan labels now; the count
-    // line and the aria label must carry the same {n}/{summary}/{verdict}
-    // tokens in both locales.
-    expect(sorted(tokens(fa.balance.countFor))).toEqual(sorted(tokens(en.balance.countFor)));
-    expect(sorted(tokens(fa.balance.countAgainst))).toEqual(sorted(tokens(en.balance.countAgainst)));
-    expect(sorted(tokens(fa.balance.countNeutral))).toEqual(sorted(tokens(en.balance.countNeutral)));
-    expect(sorted(tokens(fa.balance.countUnread))).toEqual(sorted(tokens(en.balance.countUnread)));
-    expect(sorted(tokens(fa.balance.aria))).toEqual(sorted(tokens(en.balance.aria)));
-    expect(sorted(Object.keys(fa.balance))).toEqual(sorted(Object.keys(en.balance)));
+    // Balance Rework (docs/insights/gold-card/): the expanded card's copy
+    // corpus — every interpolated string carries the same tokens in both
+    // locales and the two objects stay key-identical, so the verdict
+    // phrases, captions, context lines, unread reasons, flip lines and
+    // effect lines can never drift apart.
+    expect(sorted(Object.keys(fa.balanceCard))).toEqual(sorted(Object.keys(en.balanceCard)));
+    expect(sorted(Object.keys(fa.balanceCard.verdict))).toEqual(sorted(Object.keys(en.balanceCard.verdict)));
+    expect(sorted(Object.keys(fa.balanceCard.confidence))).toEqual(sorted(Object.keys(en.balanceCard.confidence)));
+    expect(sorted(Object.keys(fa.balanceCard.stateWords))).toEqual(sorted(Object.keys(en.balanceCard.stateWords)));
+    expect(sorted(Object.keys(fa.balanceCard.unreadReason))).toEqual(sorted(Object.keys(en.balanceCard.unreadReason)));
+    expect(sorted(Object.keys(fa.balanceCard.flip))).toEqual(sorted(Object.keys(en.balanceCard.flip)));
+    expect(sorted(Object.keys(fa.balanceCard.effect))).toEqual(sorted(Object.keys(en.balanceCard.effect)));
+    for (const key of Object.keys(en.balanceCard.effect) as (keyof typeof en.balanceCard.effect)[]) {
+      expect(sorted(Object.keys(fa.balanceCard.effect[key]!))).toEqual(
+        sorted(Object.keys(en.balanceCard.effect[key]!)),
+      );
+      for (const line of ['forAsset', 'against', 'explain'] as const) {
+        expect(sorted(tokens(fa.balanceCard.effect[key]![line]))).toEqual(
+          sorted(tokens(en.balanceCard.effect[key]![line])),
+        );
+      }
+    }
+    for (const key of Object.keys(en.balanceCard.verdict) as (keyof typeof en.balanceCard.verdict)[]) {
+      expect(sorted(tokens(fa.balanceCard.verdict[key]))).toEqual(sorted(tokens(en.balanceCard.verdict[key])));
+    }
+    for (const key of ['updatedMeta', 'subline', 'capSupports', 'capPressures', 'beamAlt', 'grpNeutral', 'grpUnread', 'ctxLabel', 'ctxChange', 'asOf', 'lastKnown'] as const) {
+      expect(sorted(tokens(fa.balanceCard[key]))).toEqual(sorted(tokens(en.balanceCard[key])));
+    }
+    for (const key of Object.keys(en.balanceCard.flip) as (keyof typeof en.balanceCard.flip)[]) {
+      expect(sorted(tokens(fa.balanceCard.flip[key]))).toEqual(sorted(tokens(en.balanceCard.flip[key])));
+    }
     // R7b: the collapsed per-metal summary carries the same tokens.
     expect(sorted(tokens(fa.collapsedFooting!))).toEqual(sorted(tokens(en.collapsedFooting!)));
     expect(sorted(tokens(fa.bandTop!))).toEqual(sorted(tokens(en.bandTop!)));

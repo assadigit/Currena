@@ -31,7 +31,7 @@
  *   history-config.ts — chart range zoom, pinned watchlist, epoch-day
  *                       history rows
  *   signals.ts        — SIGNALS_ENABLED, leg phrases, StatusTone, the
- *                       collapsed Together/Signals summaries, mergeSignals
+ *                       collapsed Together/Signals summaries
  *   hero.ts           — the hero reason line, attention tiles, per-group
  *                       visibility
  *   money.ts          — the money area map, driver votes, policy-rate
@@ -123,7 +123,6 @@ export {
   legPhrase,
   togetherSummary,
   TOGETHER_CARD_ORDER,
-  mergeSignals,
 } from './signals';
 export type { StatusTone } from './signals';
 

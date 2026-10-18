@@ -1,11 +1,9 @@
 /**
  * The "Together" connection cards + the signals cards: the feature flag,
- * leg phrases, StatusTone, the collapsed summaries, and the merged
- * gold-and-silver card (Phase 3-c split of the former config.ts monolith —
- * see ./index.ts). Pure, platform-free.
+ * leg phrases, StatusTone and the collapsed summaries (Phase 3-c split of
+ * the former config.ts monolith — see ./index.ts). Pure, platform-free.
  */
 
-import type { IndicatorId } from '@currena/core';
 import type { ConnectionReading, ConnectionState, LegEval } from '@currena/insights';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
@@ -91,28 +89,9 @@ export function togetherSummary(
 export const TOGETHER_CARD_ORDER: readonly ConnectionState[] = TOGETHER_STATE_ORDER;
 
 /* ------------------------------------------------------------------ *
- * Round-2 R26: the merged gold-and-silver signals card.
+ * R26 once merged the two metals' cards for the old presentation; the
+ * "Balance Rework" (docs/insights/gold-card/) replaced it with ONE
+ * template rendered per asset behind the Gold | Silver segmented control
+ * (signals/BalanceCard.tsx + signals/balance-card-model.ts) — the merge
+ * helper retired with the old card.
  * ------------------------------------------------------------------ */
-
-interface MergedSignals {
-  /** The four global conditions (identical for both metals by construction). */
-  shared: readonly { key: string; state: string }[];
-  /** Per-metal footing rows. */
-  footing: readonly { metal: 'gold' | 'silver'; state: string; priceId: IndicatorId }[];
-  /** The silver-only condition rows. */
-  silverOnly: readonly { key: string; state: string }[];
-}
-
-export function mergeSignals(gold: { conditions: readonly { key: string; state: string }[]; priceId: IndicatorId }, silver: { conditions: readonly { key: string; state: string }[]; priceId: IndicatorId }): MergedSignals {
-  const shared = gold.conditions.filter((c) => c.key !== 'footing' && c.key !== 'industrial');
-  const goldFooting = gold.conditions.find((c) => c.key === 'footing');
-  const silverFooting = silver.conditions.find((c) => c.key === 'footing');
-  const footing: { metal: 'gold' | 'silver'; state: string; priceId: IndicatorId }[] = [];
-  if (goldFooting) footing.push({ metal: 'gold', state: goldFooting.state, priceId: gold.priceId });
-  if (silverFooting) footing.push({ metal: 'silver', state: silverFooting.state, priceId: silver.priceId });
-  return {
-    shared,
-    footing,
-    silverOnly: silver.conditions.filter((c) => c.key === 'industrial'),
-  };
-}

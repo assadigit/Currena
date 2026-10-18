@@ -1576,3 +1576,381 @@ html[dir='rtl'] .insights-panel {
     overflow-x: visible !important;
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * The gold/silver balance card (owner spec docs/insights/gold-card/,
+ * "Balance Rework" — 02-VISUAL-SPEC.md; the reference HTML is the look
+ * authority). Scoped to .balance-card: the four HOST roles (surface,
+ * text, border, background) reuse the page tokens so the card stays
+ * Currena; the state hues, control ink and tint are the spec's own
+ * (contrast pairs verified in 02 §"Verified contrast" — supports/
+ * pressures/unread never share a hue, amber is unread-only, red stays
+ * small-area). Container queries drive the <520px mobile anatomy.
+ * ------------------------------------------------------------------ */
+.balance-card {
+  /* spec tokens that have no host sibling */
+  --gc-surface-tint: #f3f7fa;
+  --gc-control: #7b8a98; /* dashed outlines + the level line (3.5:1 UI) */
+  --gc-supports: #1a7a3a;
+  --gc-supports-bg: #e8f5ec;
+  --gc-supports-border: #a9d6b8;
+  --gc-pressures: #b3243a;
+  --gc-pressures-bg: #fbeef0;
+  --gc-pressures-border: #e4a6af;
+  --gc-unread: #8a5a00;
+  --gc-unread-bg: #fff4dc;
+  --gc-accent: #1f6f8b;
+  /* host-token roles (reused per 02 rule 1) */
+  --gc-surface: var(--color-surface);
+  --gc-hairline: var(--color-border);
+  --gc-text: var(--color-text-primary);
+  --gc-text-2: var(--color-text-secondary);
+  --gc-text-muted: var(--color-text-tertiary);
+
+  container-type: inline-size;
+  font-variant-numeric: tabular-nums;
+}
+.dark .balance-card {
+  --gc-surface-tint: #141c23;
+  --gc-control: #6b7b8a;
+  --gc-supports: #4cc38a;
+  --gc-supports-bg: #12281f;
+  --gc-supports-border: #2f6b4c;
+  --gc-pressures: #f2828c;
+  --gc-pressures-bg: #2b171b;
+  --gc-pressures-border: #7a3a44;
+  --gc-unread: #e7b04a;
+  --gc-unread-bg: #2b2210;
+  --gc-accent: #6cc3e0;
+}
+
+/* A. Header — the Gold | Silver segmented control (44px targets). */
+.gc-seg {
+  display: inline-flex;
+  border: 1px solid var(--gc-hairline);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.gc-seg button {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  background: none;
+  color: var(--gc-text-2);
+  cursor: pointer;
+}
+.gc-seg button[aria-selected='true'] {
+  background: var(--gc-surface-tint);
+  color: var(--gc-text);
+}
+.gc-meta {
+  font-size: 12px;
+  color: var(--gc-text-muted);
+}
+
+/* B. Verdict + subline. */
+.gc-verdict {
+  margin: 16px 0 4px;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--gc-text);
+}
+.gc-subline {
+  font-size: 13px;
+  color: var(--gc-text-2);
+}
+
+/* C. The beam (SVG viewBox 680; all geometry in user units — see
+ * BalanceCard.tsx). The beam group rotates about the pivot; tokens ride
+ * their end and translate plumb. One 800ms settle, cubic-bezier(.2,.8,.2,1);
+ * transform-only (02 §Motion). */
+.gc-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 8px;
+}
+.gc-beam {
+  transform-box: view-box;
+  transform-origin: 340px var(--gc-by);
+  transform: rotate(var(--gc-rot));
+}
+.gc-live .gc-beam {
+  animation: gc-rot 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.gc-tok {
+  transform: translateY(var(--gc-dy));
+}
+.gc-live .gc-tok {
+  animation: gc-mv 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes gc-rot {
+  from {
+    transform: rotate(0deg);
+  }
+}
+@keyframes gc-mv {
+  from {
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gc-live .gc-beam,
+  .gc-live .gc-tok {
+    animation: none;
+  }
+}
+.gc-tok-rect {
+  stroke-width: 1;
+}
+.gc-tok-name {
+  font-size: 12px;
+  font-weight: 500;
+  text-anchor: middle;
+}
+.gc-tok-val {
+  font-size: 12px;
+  text-anchor: middle;
+  fill: var(--gc-text-2);
+}
+.gc-tok.sup .gc-tok-rect {
+  fill: var(--gc-supports-bg);
+  stroke: var(--gc-supports-border);
+}
+.gc-tok.sup .gc-tok-name {
+  fill: var(--gc-supports);
+}
+.gc-tok.prs .gc-tok-rect {
+  fill: var(--gc-pressures-bg);
+  stroke: var(--gc-pressures-border);
+}
+.gc-tok.prs .gc-tok-name {
+  fill: var(--gc-pressures);
+}
+.gc-cap {
+  font-size: 12px;
+  font-weight: 500;
+  text-anchor: middle;
+  fill: var(--gc-text-2);
+}
+.gc-none {
+  font-size: 13px;
+  text-anchor: middle;
+  fill: var(--gc-text-muted);
+}
+
+/* The <520px mobile lists under the beam (01 §Mobile). */
+.gc-mob {
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 8px;
+}
+.gc-mob > div {
+  font-size: 13px;
+  color: var(--gc-text-2);
+}
+.gc-mob b {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--gc-text-2);
+}
+
+/* D. Neutral / unread bands. */
+.gc-bands {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 4px;
+}
+.gc-gcap {
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: var(--gc-text-2);
+}
+.gc-gcap.unr {
+  color: var(--gc-unread);
+}
+.gc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.gc-chip {
+  font: inherit;
+  font-size: 12px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: none;
+  color: var(--gc-text-2);
+  border: 1px solid var(--gc-control);
+  cursor: pointer;
+}
+.gc-chip.u {
+  border-style: dashed;
+  color: var(--gc-text-muted);
+}
+.gc-chip.n {
+  background: var(--gc-surface-tint);
+}
+
+/* E. Price context — a phrase, never a weight (no state colour). */
+.gc-ctx {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--gc-hairline);
+  margin-top: 12px;
+  padding-top: 12px;
+}
+.gc-ctx-label {
+  font-size: 12px;
+  color: var(--gc-text-muted);
+}
+.gc-ctx-price {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--gc-text);
+}
+.gc-ctx-price span {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--gc-text-2);
+}
+.gc-bar {
+  position: relative;
+  height: 2px;
+  background: var(--gc-control);
+  width: 150px;
+}
+.gc-bar i {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 10px;
+  background: var(--gc-text);
+}
+.gc-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--gc-text-muted);
+  margin-top: 6px;
+  width: 150px;
+}
+
+/* F. Factor rows — native details/summary (keyboard + SR for free). */
+.gc-rows {
+  margin-top: 12px;
+}
+.gc-rows details {
+  border-top: 1px solid var(--gc-hairline);
+}
+.gc-rows details:last-of-type {
+  border-bottom: 1px solid var(--gc-hairline);
+}
+.gc-rows summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 0;
+  cursor: pointer;
+  list-style: none;
+}
+.gc-rows summary::-webkit-details-marker {
+  display: none;
+}
+.gc-rows summary .ic {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+.gc-row-main {
+  flex: 1;
+  min-width: 0;
+}
+.gc-row-name {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--gc-text);
+}
+.gc-row-effect {
+  display: block;
+  font-size: 13px;
+  color: var(--gc-text-2);
+}
+.gc-row-val {
+  font-weight: 500;
+  color: var(--gc-text);
+}
+.gc-row-x {
+  padding: 0 26px 12px;
+  font-size: 13px;
+  color: var(--gc-text-2);
+}
+.gc-s-supports {
+  color: var(--gc-supports);
+}
+.gc-s-pressures {
+  color: var(--gc-pressures);
+}
+.gc-s-neutral {
+  color: var(--gc-text-2);
+}
+.gc-s-unread {
+  color: var(--gc-text-muted);
+}
+.gc-chev {
+  flex: none;
+  color: var(--gc-text-muted);
+  transition: rotate 0.2s ease;
+}
+.gc-rows details[open] .gc-chev {
+  rotate: 180deg;
+}
+
+/* G. Flip line + H. footnote. */
+.gc-flip {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--gc-text-2);
+}
+.gc-foot {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--gc-text-muted);
+}
+
+/* Focus: the spec's accent ring, visible on every interactive piece. */
+.balance-card :focus-visible {
+  outline: 2px solid var(--gc-accent);
+  outline-offset: 2px;
+}
+
+/* Mobile (container width below 520px): tokens/captions hide, the two
+ * lists show, paddings tighten (01 §Mobile). */
+@container (max-width: 520px) {
+  .gc-tok,
+  .gc-cap,
+  .gc-none {
+    display: none;
+  }
+  .gc-mob {
+    display: grid;
+  }
+  .gc-verdict {
+    font-size: 20px;
+  }
+}

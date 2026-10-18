@@ -12,7 +12,7 @@
  *   R13 units coverage — every DISPLAY row renders a unit in both locales
  *   R14 code-pattern scan — no source codes/series ids in names or tags
  *   R18 counts consistency — hero-side counts equal the group sums
- *   R26 mergeSignals — no duplicated condition keys, silver-only split
+ *   R26 → Balance Rework — glyph guard over the new signals module tree
  *   R27 evidence discipline — no visible "to verify" placeholder
  *   R28 sentence-versus-number guard — band words computed from live values
  */
@@ -34,7 +34,6 @@ import {
   groupVisibility,
   heroReason,
   heroReasonIsConsistent,
-  mergeSignals,
   moneyPanel,
   MONEY_AREAS,
   statusCounts,
@@ -47,8 +46,8 @@ import { insightsCopyFa } from '../../i18n/insights-copy-fa';
 import signalsSrc from './Signals.tsx?raw';
 import signalsIconsSrc from './signals/icons.tsx?raw';
 import signalsVerdictSrc from './signals/verdict.tsx?raw';
-import signalsBalanceSrc from './signals/BalanceScale.tsx?raw';
-import signalsCardSrc from './signals/MergedCard.tsx?raw';
+import signalsCardSrc from './signals/BalanceCard.tsx?raw';
+import signalsBalanceSrc from './signals/balance-card-model.ts?raw';
 import connectionCardSrc from './ConnectionCard.tsx?raw';
 
 /* ------------------------------------------------------------------ *
@@ -431,28 +430,11 @@ describe('R18 counts (hero-side totals equal the group sums)', () => {
 });
 
 /* ------------------------------------------------------------------ *
- * R26 — the merged signals card
+ * R26 → the Balance Rework (docs/insights/gold-card/): the merged card
+ * became ONE template per asset behind the Gold | Silver control.
  * ------------------------------------------------------------------ */
 
-describe('R26 mergeSignals (shared listed once, silver-only split)', () => {
-  const conditionsOf = (metal: 'gold' | 'silver') =>
-    ['real-yield', 'expectations', 'stress', 'dollar', 'footing', ...(metal === 'silver' ? ['industrial'] : [])].map(
-      (key) => ({ key, state: 'supportive' }),
-    );
-
-  it('shared conditions appear once; footing is per-metal; industrial is silver-only', () => {
-    const merged = mergeSignals(
-      { conditions: conditionsOf('gold'), priceId: 'gold-usd' },
-      { conditions: conditionsOf('silver'), priceId: 'silver-usd' },
-    );
-    const keys = merged.shared.map((c) => c.key);
-    expect(new Set(keys).size).toBe(keys.length); // no duplicates
-    expect(keys).not.toContain('footing');
-    expect(keys).not.toContain('industrial');
-    expect(merged.footing.map((f) => f.metal)).toEqual(['gold', 'silver']);
-    expect(merged.silverOnly.map((c) => c.key)).toEqual(['industrial']);
-  });
-
+describe('R26 → Balance Rework (one card template per asset)', () => {
   it('no check or cross glyph anywhere in the Signals markup source', () => {
     // The WS-4 split moved the markup into the signals/ module tree —
     // the guard now covers the whole tree (same intent, wider surface).

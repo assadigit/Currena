@@ -2658,10 +2658,6 @@ export const insightsCopyEn = {
     title: 'What the signals say',
     subtitle:
       'The conditions that usually surround each metal, in plain words: conditions, not forecasts, and not advice.',
-    // R26: one merged gold-and-silver card. Step-1 audit item G1: the card
-    // is named for its CONDITIONS, never an estimation.
-    mergedTitle: 'Conditions for gold and silver',
-    mergedSubtitle: 'The two precious metals share most of their drivers: shared conditions are listed once.',
     conditionsMet: '{met} of {total} conditions met',
     metalLean: '{metal}: {lean}, {met} of {total} conditions met',
     lean: {
@@ -2675,12 +2671,9 @@ export const insightsCopyEn = {
     // carry no case).
     metals: { gold: 'Gold', silver: 'Silver' },
     // 2026-10-21 (owner, "Gold Market Outlook — Complete State List"): the
-    // strip speaks SEVEN outlook states, each with its own authored
-    // sentence — the old verdictUp/Down/Flat words are retired because EN
-    // ("Works against") and the fa sentence had drifted into saying
-    // different things. "Signs point to…" keeps the page's
-    // conditions-not-forecasts contract. The gold sentences are the
-    // owner's verbatim; silver mirrors them.
+    // seven-state outlook vocabulary — the collapsed summary line's
+    // takeaway and the data export speak it. (The expanded card now speaks
+    // the balance card below; the sentences are the owner's verbatim.)
     verdictTitle: 'Outlook',
     verdictNone: 'Cannot read yet',
     verdictStates: {
@@ -2713,8 +2706,8 @@ export const insightsCopyEn = {
         silver: 'Market signals for silver prices are mixed.',
       },
     },
-    // The collapsed summary line carries the short state names; the full
-    // sentences live in the strip chips.
+    // The collapsed summary line carries the short state names; the data
+    // export reuses them.
     verdictStateNames: {
       'strong-bullish': 'Strong bullish',
       bullish: 'Bullish',
@@ -2724,59 +2717,121 @@ export const insightsCopyEn = {
       'strong-bearish': 'Strong bearish',
       mixed: 'Mixed signals',
     },
-    // Step-1 audit item C12: the one named interaction the checklist's
-    // separate lines cannot say — gold at its decade high WHILE real
-    // yields sit high too.
-    goldHighYieldsWarning:
-      'Gold is near its 10-year high while real yields are also high: this combination has historically been difficult for gold. The conditions work against it even at a record price.',
-    // R26: neutral side words (no check/cross marks, no green/red).
-    // 2026-10-17e (owner spec docs/insights/gold-balance-card-spec.md): the
-    // grouped driver list (Supports / Works against / Sitting neutral) is
-    // REPLACED by the balance visual — the side* headings retired, the
-    // side labels now speak the balance's own pan labels (§13 verbatim).
-    balance: {
-      // 2026-10-25 (owner Iteration-2 directive): the balance's own
-      // HEADING + explanatory subtitle now lead the block (the concept
-      // «برآیند عوامل مؤثر بر قیمت طلا»), the side captions name the two
-      // lists, and the empty states stay evidence-based. Round-50, QA
-      // record docs/QA/quirks-2026-10-25-balance-v4-fa-copy.md.
-      heading: 'The aggregate of factors affecting the price of gold',
-      subtitle:
-        'Each factor is read against its usual range and weighed equally; the beam shows the combined lean of today’s readings.',
-      sideFor: 'Factors supporting gold’s price',
-      sideAgainst: 'Factors pressuring gold’s price',
-      verdictFor: 'Leaning for gold',
-      verdictBalanced: 'Balanced',
-      verdictAgainst: 'Leaning against gold',
-      verdictNone: "Can't read the conditions right now",
-      trayNeutral: 'Neutral',
-      trayUnread: "Couldn't read",
-      countFor: '{n} for',
-      countAgainst: '{n} against',
-      countNeutral: '{n} neutral',
-      countUnread: "{n} couldn't be read",
-      aria: 'Balance for gold: {summary}. {verdict}.',
-      // 2026-10-26 (owner Iteration-4 directive): the pans' own minimal
-      // empty markers — panEmpty when the evaluation ran but this side
-      // has no qualifying factors, panUnreadable when nothing could be
-      // read at all (the full evidence-based lines still render in the
-      // list area below). Round-51.
-      panEmpty: 'No qualifying signals',
-      panUnreadable: 'Nothing to weigh yet',
-      // 2026-10-26 (owner Iteration-5 addendum): the needle gauge's
-      // text equivalent — the whole mechanical drawing is one
-      // role="img" whose label states the beam tilt and the verdict
-      // (colour never rides alone). Round-52, QA record
-      // docs/QA/quirks-2026-10-26d-balance-v7-fa-copy.md.
-      gaugeAria: 'Beam tilt: {n}°, {verdict}.',
-      listEmptyFor: 'None of the factors checked shows a meaningful signal supporting gold’s price right now.',
-      listEmptyAgainst: 'None of the factors checked shows a meaningful signal working against gold’s price right now.',
-      listEmptyNone: 'Nothing could be read yet, so neither side has been weighed.',
+    /* ---------------------------------------------------------------- *
+     * The balance card (owner spec docs/insights/gold-card/, "Balance
+     * Rework"): ONE card, one template, rendered per asset behind the
+     * Gold | Silver segmented control. Verdict first, hairline beam,
+     * ghost chips for unread drivers, price as CONTEXT (never a weight),
+     * factor rows with plain-language effect lines, and the "what would
+     * flip it" line. Copy is the spec pack's file 04; the Farsi twin
+     * prefers the repo's established terms (ASSUMPTIONS.md §2).
+     * ---------------------------------------------------------------- */
+    balanceCard: {
+      // A. Header — the "Updated {ago} · {n} sources" meta line.
+      updatedMeta: 'Updated {ago} · {n} sources',
+      // B. Verdict phrases (the largest text in the card). {asset} is the
+      // metal's name, lower case inside an English phrase (spec 04 §4).
+      verdict: {
+        slight_against: 'Slight lean against {asset}',
+        lean_against: 'Leaning against {asset}',
+        strong_against: 'Strong lean against {asset}',
+        slight_for: 'Slight lean for {asset}',
+        lean_for: 'Leaning for {asset}',
+        strong_for: 'Strong lean for {asset}',
+        balanced: 'Balanced for {asset}',
+        insufficient: 'Not enough readings to call',
+        none: 'No readings available right now',
+      },
+      // B. Subline: "{confidence} · {read} of {total} factors read".
+      confidence: {
+        high: 'High confidence',
+        medium: 'Medium confidence',
+        low: 'Low confidence',
+      },
+      subline: '{confidence} · {read} of {total} factors read',
+      // C. Beam: end captions, the empty-side line, the SVG's built text.
+      capSupports: 'Supporting · {n}',
+      capPressures: 'Pressuring · {n}',
+      sideEmpty: 'None right now',
+      beamAlt: 'Balance scale: {s} supporting, {p} pressuring, {u} not read. {tilt}',
+      tiltPressures: 'Tilts toward pressuring.',
+      tiltSupports: 'Tilts toward supporting.',
+      tiltLevel: 'Level.',
+      // D. Neutral / unread bands.
+      grpNeutral: 'Neutral · {n}',
+      grpUnread: 'Couldn’t read · {n}',
+      // E. Price context — a phrase, not a weight: derived from the metal's
+      // own 10-year position + 30-day change (holding / fading / mixed).
+      ctxLabel: 'What {asset} is doing · context, not a weight',
+      ctxHolding: 'holding near its 10-year high',
+      ctxFading: 'near its 10-year high but fading',
+      ctxMixed: 'moving sideways',
+      ctxChange: '{pct} in 30 days',
+      rangeLow: '10-yr low',
+      rangeHigh: 'high',
+      // F. Rows: state words (icon + word, never colour alone), the neutral
+      // effect line, the "as of" line, unread reasons, last known value.
+      stateWords: {
+        supports: 'Supporting',
+        pressures: 'Pressuring',
+        neutral: 'Neutral',
+        unread: 'Couldn’t read',
+      },
+      neutralLine: 'Sitting in its usual range.',
+      asOf: 'As of {date} · {source}',
+      unreadReason: {
+        source_unavailable: 'couldn’t read, source unavailable',
+        stale: 'couldn’t read, last data {n} days ago',
+        not_available_yet: 'not available yet',
+      },
+      lastKnown: 'Last known: {value}',
+      // G. The flip line. "balance" when one flip levels the beam (|net| =
+      // 1); "ease" when it only softens the lean — pressures-heavy leans
+      // ease the PRESSURE, supports-heavy leans soften the LEAN (spec 04's
+      // Farsi note, mirrored in English).
+      flip: {
+        balance_below: 'This would balance out if {name} fell below {x}',
+        balance_above: 'This would balance out if {name} rose above {x}',
+        ease_pressure_below: 'The pressure would ease if {name} fell below {x}',
+        ease_pressure_above: 'The pressure would ease if {name} rose above {x}',
+        ease_support_below: 'The lean would soften if {name} fell below {x}',
+        ease_support_above: 'The lean would soften if {name} rose above {x}',
+      },
+      // H. Footnote.
+      footnote: 'Each factor counts equally. This is today’s combined lean, not a forecast.',
+      // F. Driver effect lines + expanded explanations, keyed by the signal
+      // condition key. Each driver carries the line for the state where it
+      // pushes the price the way it says (spec 04 §"Drivers") plus the
+      // inverse line for the opposite state; the neutral state shows
+      // neutralLine above. {asset} keeps one string per driver per state.
+      effect: {
+        'real-yield': {
+          forAsset: 'Lower real yields make {asset} more attractive.',
+          against: 'Higher real yields make {asset} less attractive.',
+          explain: 'Real yields are what savers earn after inflation. A metal that pays no interest loses appeal when savers earn more.',
+        },
+        expectations: {
+          forAsset: 'Expected price rises tend to support {asset}.',
+          against: 'Fading inflation expectations tend to weigh on {asset}.',
+          explain: 'When people expect prices to keep rising, they often start buying metals like gold and silver to protect their savings.',
+        },
+        stress: {
+          forAsset: 'Nervous markets tend to send money to {asset}.',
+          against: 'Calm markets tend to cool the safe-haven bid for {asset}.',
+          explain: 'When markets are jittery, investors often treat precious metals as a safe place to wait.',
+        },
+        dollar: {
+          forAsset: 'A weaker dollar usually lifts {asset}.',
+          against: 'A stronger dollar usually weighs on {asset}.',
+          explain: 'Metals are priced in dollars. When the dollar rises, they get more expensive for everyone else, which usually cools demand.',
+        },
+        industrial: {
+          forAsset: 'Busy factories support {asset}.',
+          against: 'Quiet factories usually mean less demand for {asset}.',
+          explain: 'Silver is used in electronics and solar panels. Busy factories usually mean more demand.',
+        },
+      },
     },
-    silverOnly: 'Silver only',
-    footingTitle: 'Price footing',
-    footingRow: '{metal}: {state}',
-    footingPosition: '{band} of the last 10 years',
     conditionState: {
       supportive: 'in place',
       against: 'working against',
@@ -2824,8 +2879,7 @@ export const insightsCopyEn = {
     // 5 conditions met: price in the top 7% of the last 10 years").
     collapsedFooting: 'price in the {band} of the last 10 years',
     // Round 24: the collapsed line gets its takeaway. 2026-10-21 (owner):
-    // the takeaway names the seven-state outlook (the strip holds the
-    // full sentences).
+    // the takeaway names the seven-state outlook (the data export reuses it).
     collapsedVerdict: 'Outlook: {verdict}',
     bandTop: 'top {p}%',
     bandBottom: 'bottom {p}%',

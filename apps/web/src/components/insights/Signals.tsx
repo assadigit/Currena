@@ -41,7 +41,7 @@ import { Activity, ChevronDown } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { SIGNALS_ENABLED } from './config';
-import { MergedSignalsCard } from './signals/MergedCard';
+import { BalanceCard } from './signals/BalanceCard';
 import { VerdictIcon, outlookOf, verdictTone } from './signals/verdict';
 
 /** Round 24: the collapsed per-metal line's takeaway — the estimation,
@@ -150,7 +150,13 @@ export function Signals({
 
       <div id="insights-signals-body">
         {open ? (
-          <MergedSignalsCard gold={gold} silver={silver} readings={readings} copy={copy} numberLocale={numberLocale} />
+          <BalanceCard
+            gold={gold}
+            silver={silver}
+            readings={readings}
+            copy={copy}
+            numberLocale={numberLocale}
+          />
         ) : (
           /* Collapsed: one line per metal (spec R7b). */
           <ul className="m-0 flex list-none flex-col gap-1 p-0" data-signals-summary>

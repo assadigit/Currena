@@ -17,13 +17,16 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
 export default tseslint.config(
-  // Ignore build output, deps, and generated files.
+  // Ignore build output, deps, and generated files. docs/** stays out too:
+  // its .js files are verbatim owner spec artifacts (e.g. the gold-card
+  // reference lean-logic pair) that must never be edited to satisfy lint.
   {
     ignores: [
       '**/dist/**',
       '**/coverage/**',
       '**/node_modules/**',
       'apps/web/public/**',
+      'docs/**',
       'legacy/**',
       'legacy-captures/**',
     ],
