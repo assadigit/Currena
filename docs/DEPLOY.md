@@ -83,7 +83,40 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
-## CURRENT DEPLOYMENT — the gold balance rotates ONLY its beam (2026-10-26d, worker 2e802ae7)
+## CURRENT DEPLOYMENT — the repo root cleaned of misplaced specification markdown (2026-10-26e, worker 26c23d91)
+
+The owner's wrap-up directive ("commit, push, deploy") closing the
+minimal-cleanup work order: two root specification markdowns moved
+into their existing sibling folders as R100 byte-identical renames
+(`economic-indicators-ui-spec.md` → `docs/insights/`;
+`REMAINING_WORK.md` → `docs/`), the README pointer + the verification
+notes header updated, CHANGELOG §2026-10-26e + D-34 recorded (commit
+`057cd20`, the work order's exact message). **Runtime-identical to the
+26d deployment**: zero code, zero copy, zero served bytes changed.
+
+- **Active worker**: currena-api **`26c23d91-f9a3-4162-a9c1-a1dcee8ad6be`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched — same scope
+  as 26d).
+- **What it carries**: everything from 2e802ae7 (the balance v7 +
+  every round beneath) — byte-for-byte; the only delta is repository
+  documentation layout.
+- **Chunk proof**: the fresh `057cd20` build serves `index-DJK_gsXg.js`
+  (295.29/88.81) + `Insights-CH3Xq64v.js` (635.91/152.00) — both
+  sha256-identical on currena.ir (8f2ba133… / 1872ef4f… — the SAME
+  hashes as the 26d live verification; the deploy uploaded no
+  updated assets).
+- **Verified live** (agent-browser, fresh profile, currena.ir): EN
+  desktop + EN mobile 390 (scrollWidth 390 = innerWidth, zero
+  overflow) + fa RTL desktop («کورنا، مبدل ارز», dir=rtl) + fa
+  `#/insights` (the moved spec's page — «شاخص‌های اقتصادی» renders,
+  1366 = 1366); zero console + zero page errors across all four
+  combos. Evidence: docs/evidence/2026-10-26e-root-specs-cleanup/.
+- **Gates on `057cd20`**: typecheck 6/6; 1,536 tests green (web 564);
+  lint 0 errors/15 accepted advisories; copy:audit clean; build OK;
+  budgets held (entry 295.29/88.81; Insights 635.91/152.00).
+
+## PREVIOUS DEPLOYMENT — the gold balance rotates ONLY its beam (2026-10-26d, worker 2e802ae7)
 
 The owner's Iteration-5 addendum — "Rotate the beam only, and
 visualize weight" — is LIVE: exactly one rotating element (the beam
