@@ -1118,6 +1118,14 @@ body {
   --color-status-watch: #f1c21b;   /* owner palette: Carbon Yellow 30, verbatim — the Cautious word */
   --color-status-context: #245E9F;
   --color-status-stale: #46505C;
+  /* Editorial handoff tokens (2026-10-19, docs/insights/
+   * economic-indicators-editorial-spec.md §4): the approved direction
+   * deepens the hero's headline ink to a navy that reads like financial
+   * print. Scoped to --ei-* names (never global) and only consumed by the
+   * hero band styles + the two overview cards' headings/values; body text
+   * keeps the verified G4 ramp above (13.2:1 / 7.98:1 / 7.03:1 on white).
+   * #0F2D4A on #FFFFFF = 14.3:1, on #F8FAFB = 13.6:1 — AA/AAA safe. */
+  --ei-navy: #0F2D4A;
   /* Spacing scale */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -1156,6 +1164,10 @@ body {
   --color-status-watch: #f1c21b;   /* Carbon Yellow 30 verbatim — 9.5:1 on #1A222E */
   --color-status-context: #6FAEEC;
   --color-status-stale: #9AA8BC;
+  /* Editorial navy inverts with the theme (the G4 ramp's own rule): on the
+   * #1A222E card the deep navy would be invisible, so the hero headings
+   * speak the existing light ink (13.1:1 on #1A222E). */
+  --ei-navy: #E8EDF4;
 }
 
 /* Type-role utilities (G3) — the four sizes the page is allowed to speak in. */
@@ -1405,13 +1417,164 @@ html:not(:lang(fa)) .type-kicker {
  * second, spec §5 mobile). Grid order is direction-aware: in RTL the flow
  * starts at the inline-start (right) edge, so Global (order 1) lands on
  * the right and Australia (order 2) on the left; in LTR Australia (order 1)
- * takes the left and Global (order 2) the right. Same visual result. */
+ * takes the left and Global (order 2) the right. Same visual result.
+ *
+ * Editorial handoff (2026-10-19, economic-indicators-editorial-spec.md
+ * §10): below 768px the stack becomes the mandated GLOBAL-FIRST HORIZONTAL
+ * SWIPE CAROUSEL — one card per screen, native overflow + CSS scroll snap
+ * (no new dependency), dots + prev/next + a localized cue rendered by
+ * HeroBlock (md:hidden — they only exist where the track scrolls). The DOM
+ * order never changes (D7: Global first), so the carousel starts on Global
+ * in every locale and the 768–1023px tablet range keeps the calm stack. */
 @media (min-width: 1024px) {
   .insights-hero-grid > [data-region-card='australia'] { order: 1; }
   .insights-hero-grid > [data-region-card='global'] { order: 2; }
   [dir='rtl'] .insights-hero-grid > [data-region-card='australia'] { order: 2; }
   [dir='rtl'] .insights-hero-grid > [data-region-card='global'] { order: 1; }
 }
+@media (max-width: 767.98px) {
+  /* The carousel track — implemented as a COLUMN-FLOW GRID, not flex: a
+   * flex track with %-basis items and hidden scrollbars leaks ~98px of
+   * PHANTOM scrollable overflow into the document in Chrome (measured on
+   * the local harness: documentElement.scrollWidth = viewport + 98 with
+   * nothing painted there; bisected to the flex layout itself — the same
+   * track as a grid auto-flow column measures 0). Grid columns carry the
+   * same one-card-per-screen geometry, the same logical (RTL-aware)
+   * flow, and the same snap points. */
+  .insights-hero-grid {
+    display: grid;
+    grid-template-columns: none; /* defeat the Tailwind grid-cols-1 template */
+    grid-auto-flow: column;
+    grid-auto-columns: 100%;
+    gap: 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* the dots + cue carry the position */
+    /* contain:paint keeps the track's scrollable overflow OUT of the
+     * document's scrollable area — without it Chrome unions the track's
+     * overflow into the ICB and the whole page becomes pannable ~98px
+     * into blank space (measured on the local harness; every containment
+     * or compositing toggle clears it — this is the spec-level one).
+     * Paint containment changes nothing visually here: the track already
+     * clips its painting via overflow-x, and no fixed-position element
+     * lives inside the cards (the details panel renders outside). */
+    contain: paint;
+  }
+  .insights-hero-grid::-webkit-scrollbar { display: none; }
+  /* One card per screen: the track sits inside the page container's px-4
+   * gutters, so a 100% card = viewport − 32px, the spec's "full available
+   * width minus outer gutters". snap-start keeps the resting position
+   * flush with the reading edge in BOTH directions (grid + scroll-snap
+   * are logical: RTL flows right-to-left automatically). */
+  .insights-hero-grid > [data-region-card] {
+    scroll-snap-align: start;
+  }
+}
+
+/* The editorial hero header band (economic-indicators-editorial-spec.md
+ * §7): the region mark, title, status pill and count sit on a quiet art
+ * band — Sydney Harbour on the Australia card, an even fainter world-map
+ * texture on the Global card. The artwork is DECORATIVE (aria-hidden span,
+ * pointer-events none) and always rides BEHIND a surface-colored veil +
+ * bottom fade so the navy heading and the severity pill keep their
+ * contrast; the band inherits the card's radius via overflow hidden on
+ * the article. First layer wins (the fade), second the veil, third the
+ * art — the Opera House held toward the center-right of the band (spec
+ * §7 Australia), the map centered. Dark mode: the pale art tones down
+ * under the dark veil so it whispers on the navy card. */
+.ei-hero-art {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-repeat: no-repeat;
+}
+.ei-hero-art--au {
+  background-image:
+    linear-gradient(to top, var(--color-surface) 0%, color-mix(in srgb, var(--color-surface) 62%, transparent) 46%, transparent 100%),
+    linear-gradient(color-mix(in srgb, var(--color-surface) 30%, transparent), color-mix(in srgb, var(--color-surface) 30%, transparent)),
+    url('/assets/artwork/sydney-harbour-faded.webp');
+  background-size: 100% 100%, 100% 100%, cover;
+  background-position: center, center, 72% center;
+}
+.ei-hero-art--global {
+  background-image:
+    linear-gradient(to top, var(--color-surface) 0%, color-mix(in srgb, var(--color-surface) 62%, transparent) 46%, transparent 100%),
+    linear-gradient(color-mix(in srgb, var(--color-surface) 46%, transparent), color-mix(in srgb, var(--color-surface) 46%, transparent)),
+    url('/assets/artwork/global-map-faded.webp');
+  background-size: 100% 100%, 100% 100%, cover;
+  background-position: center, center, center;
+  opacity: 0.75; /* the map must stay even quieter than Sydney (spec §7 Global) */
+}
+.dark .ei-hero-art--au { opacity: 0.5; }
+.dark .ei-hero-art--global { opacity: 0.35; }
+@media (max-width: 767.98px) {
+  /* Narrow cards (spec §7): the art steps back so the stacked title/pill
+   * never competes with it — the veil gets heavier, not the band taller. */
+  .ei-hero-art--au {
+    background-image:
+      linear-gradient(to top, var(--color-surface) 0%, color-mix(in srgb, var(--color-surface) 78%, transparent) 55%, transparent 100%),
+      linear-gradient(color-mix(in srgb, var(--color-surface) 46%, transparent), color-mix(in srgb, var(--color-surface) 46%, transparent)),
+      url('/assets/artwork/sydney-harbour-faded.webp');
+  }
+  .ei-hero-art--global { opacity: 0.55; }
+}
+
+/* The editorial severity pill (economic-indicators-editorial-spec.md §4
+ * "Severity treatment"): the region card's verdict word + state artwork
+ * sit in ONE compact tinted pill — pale tint of the step's own ink, the
+ * ink itself for the word (the same pairing the app's StatusChips have
+ * spoken since R30, so no contrast surface is new). The four-step meter
+ * stays beside it: the pill names the state, the meter is the real
+ * 4-step scale — never colour alone (word + artwork + meter). */
+.ei-state-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 9999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.ei-state-pill[data-step='1'] {
+  background: color-mix(in srgb, var(--color-status-normal) 12%, transparent);
+  color: var(--color-status-normal);
+}
+.ei-state-pill[data-step='2'] {
+  background: color-mix(in srgb, var(--color-status-watch) 14%, transparent);
+  color: var(--color-status-watch);
+}
+.ei-state-pill[data-step='3'] {
+  background: color-mix(in srgb, var(--color-status-stressed) 14%, transparent);
+  color: var(--color-status-stressed);
+}
+.ei-state-pill[data-step='4'] {
+  background: color-mix(in srgb, var(--color-status-alert) 10%, transparent);
+  color: var(--color-status-alert);
+}
+.ei-state-pill[data-step='0'] {
+  background: color-mix(in srgb, var(--color-status-stale) 12%, transparent);
+  color: var(--color-status-stale);
+}
+
+/* The flagged row's restrained severity edge (editorial spec §4/§8): the
+ * row face stays neutral; the needs-attention tier speaks through a thin
+ * inline-start accent in the alert ink — the same logical-edge language
+ * as .alert-card above, never a saturated card. */
+.ei-row-accent {
+  border-inline-start-width: 3px;
+  border-inline-start-style: solid;
+  border-inline-start-color: var(--color-status-alert);
+}
+
+/* The flagged row's trailing drill-down chevron (editorial spec §8): a
+ * directional glyph — it mirrors with the reading flow in RTL (the same
+ * G1 physical-flip rule as .connection-arrow above; flags, meters and
+ * subject icons never mirror). */
+.ei-row-chevron { display: inline-flex; }
+[dir='rtl'] .ei-row-chevron { transform: scaleX(-1); }
 
 /* The details side panel (F5) — desktop right sheet, mobile bottom sheet. */
 .insights-panel-scrim {
@@ -1513,15 +1676,14 @@ html[dir='rtl'] .insights-panel {
   border-radius: var(--radius-sm);
 }
 
-/* Grayscale redesign, HERO-SCOPED (owner scope note 2026-10-18): only the
- * artwork inside the two overview cards (region marks, state icons) renders
- * desaturated — the shapes stay recognizable, the color stops competing
- * with the severity inks. Everything below the hero keeps its colored
- * artwork (money-area icons, metal icons, market icons) as before the
- * redesign. */
-.insights-hero-grid .currena-icon {
-  filter: grayscale(1);
-}
+/* Grayscale redesign, HERO-SCOPED (owner scope note 2026-10-18) — RETIRED
+ * by the editorial handoff (2026-10-19, economic-indicators-editorial-
+ * spec.md §4): the approved direction restores the restrained severity
+ * colors on the hero — the state artwork, the pill and the meter speak
+ * the four-step inks again ("use amber/orange and red sparingly for
+ * actual severity states, with green reserved for supported stable/
+ * favorable states"). The artwork below the hero was never touched by
+ * this rule and stays colored, exactly as before. */
 
 /* ------------------------------------------------------------------ *
  * Print (I7, BACKLOG #49 — Insights-first, app-wide hygiene)

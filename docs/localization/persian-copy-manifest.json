@@ -19088,6 +19088,26 @@
       "sha256": "f8db127ea6fa8f50e8935a2a934a474005df0c11e352511db5506f9bd5b5d2bc"
     },
     {
+      "id": "ui.cardPosition",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "round": "editorial-hero-2026-10-19",
+      "reference": "docs/insights/economic-indicators-editorial-spec.md",
+      "text": "کارت {card}، {n} از {m}",
+      "sha256": "5400ca89a912d8158561d2d401be0eb4b7763cb1add2cb882100fab83952e696"
+    },
+    {
+      "id": "ui.carouselLabel",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "round": "editorial-hero-2026-10-19",
+      "reference": "docs/insights/economic-indicators-editorial-spec.md",
+      "text": "کارت‌های خلاصهٔ مناطق",
+      "sha256": "0ee02833240fd13d81275af7be0fb48e008e978c4861c936a3ab77794195068f"
+    },
+    {
       "id": "ui.change30dLabel",
       "source": "apps/web/src/i18n/insights-copy-fa.ts",
       "status": "processed",
@@ -20531,6 +20551,16 @@
       "sha256": "49b71a76c5a47ccf2f4e9ba7c7785b52e44fb6d0de62f2bee1aa343d10f877fe"
     },
     {
+      "id": "ui.nextCard",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "round": "editorial-hero-2026-10-19",
+      "reference": "docs/insights/economic-indicators-editorial-spec.md",
+      "text": "بعدی",
+      "sha256": "a381bb5c90e2686df0b999808a8519ebedeb44b5d85a7d24a34ddfc227fbfb40"
+    },
+    {
       "id": "ui.nextDecisionLine",
       "source": "apps/web/src/i18n/insights-copy-fa.ts",
       "status": "processed",
@@ -20739,6 +20769,16 @@
       "reference": "persian_site_copy_round2_part1_ui_vocabulary_polished-translated.md",
       "text": "در {pct} درصد از ۱۰ سال گذشته، مقدار شاخص کمتر از مقدار فعلی بوده است",
       "sha256": "8ba7387f79f25310d247d9bc8c71e61689afbb51897431966f874d326c8d8d0d"
+    },
+    {
+      "id": "ui.prevCard",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "round": "editorial-hero-2026-10-19",
+      "reference": "docs/insights/economic-indicators-editorial-spec.md",
+      "text": "قبلی",
+      "sha256": "28d94a2716a95c2132ed4a602c90441268cf90d261fd60ab19ed4e9ee357932e"
     },
     {
       "id": "ui.priceBelow10yHigh",
@@ -21765,6 +21805,16 @@
       "reference": "persian_site_copy_round2_part1_ui_vocabulary_polished-translated.md",
       "text": "خلاصهٔ وضعیت",
       "sha256": "aa6303df9ef4d00621d7e8d57e7257e0d0581c4a397c642d66dea661e897722d"
+    },
+    {
+      "id": "ui.swipeCue",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "round": "editorial-hero-2026-10-19",
+      "reference": "docs/insights/economic-indicators-editorial-spec.md",
+      "text": "برای دیدن {region} بکشید",
+      "sha256": "98b581da9dfd528603126fb7a7ab4d01125355f290582bd13b4d603a66b60acd"
     },
     {
       "id": "ui.tendedToMean",

@@ -1208,6 +1208,16 @@ export const insightsCopyEn = {
     heroTitle: 'Summary of the gauges below',
     verdictStepAria: '{section}: {label}, step {step} of 4',
     verdictMeterLabel: 'Reading on a four-step scale',
+    // Editorial handoff (2026-10-19, economic-indicators-editorial-spec.md
+    // §10): the mobile Global-first swipe carousel's accessible furniture.
+    // The cue always names the OTHER card (Global ↔ Australia), the dots
+    // and the "n of m" group labels announce position, and the prev/next
+    // words are direction-neutral (their meaning follows the reading flow).
+    carouselLabel: 'Region overview cards',
+    swipeCue: 'Swipe to view {region}',
+    cardPosition: '{card} card, {n} of {m}',
+    prevCard: 'Previous',
+    nextCard: 'Next',
     // Round 42 (owner): the computed reason sentence ("2 of 5 areas are
     // Stressed: … The rest are Stable") and the calm line are RETIRED —
     // they repeated, word for word, what the grouped status rows now say

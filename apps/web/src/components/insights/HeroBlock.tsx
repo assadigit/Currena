@@ -8,23 +8,94 @@
  * what-changed one-liner (H5 — the hero no longer names the next scheduled
  * event; "Next up" lives once, below the indicators, R16).
  *
+ * Editorial handoff (2026-10-19, docs/insights/
+ * economic-indicators-editorial-spec.md §10): below 768px the two region
+ * cards become the mandated GLOBAL-FIRST HORIZONTAL SWIPE CAROUSEL — the
+ * same .insights-hero-grid container turns into a native scroll-snap track
+ * (index.css), one card per screen, Global first, swipe (or the dots /
+ * prev-next control bar above the track) to reach Australia. The DOM order
+ * never changes (D7: Global first in every locale), each card keeps its
+ * own expand/collapse state while swiped off-screen (both stay mounted),
+ * and ≥768px the furniture (cue + dots + buttons) is display:none — the
+ * track reverts to the calm tablet stack / the fixed two-column desktop.
+ *
  * N2 retired (owner, 2026-10-17): the short disclaimer line + the
  * «درباره این داده‌ها ↧» jump button no longer sit under the hero — the
  * page-bottom About section carries the full text and the global footer
  * already carries the app-wide non-advice disclaimer.
  */
 
-import { useMemo } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import type { KeyboardEvent } from 'react';
 import type { IndicatorId, IndicatorReading, InsightsSection } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { TrendingUp } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { FlowChevron } from '../icons/FlowChevron';
 import { bandWordsOf, bigMovers, changeToneClass, consequenceLine, formatChangeParts } from './config';
 import { VerdictBlock, type MarketsAlert, type FxAlert, type SectionIndicatorState } from './VerdictMeter';
 
 function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
   return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
+}
+
+/** The mobile carousel furniture: a localized swipe cue naming the OTHER
+ * card, two position dots, and prev/next buttons (spec §10 — "accessible
+ * previous/next controls as a fallback for users who do not use touch
+ * gestures"). md:hidden — it exists only where the track scrolls. */
+function CarouselControls({
+  copy,
+  numberLocale,
+  labels,
+  active,
+  onGo,
+}: {
+  copy: InsightsCopy;
+  numberLocale: 'en-US' | 'fa-IR';
+  /** The card labels in DOM order: [Global, Australia]. */
+  labels: readonly [string, string];
+  active: number;
+  onGo: (index: number) => void;
+}) {
+  const other = labels[active === 0 ? 1 : 0] ?? labels[0]!;
+  return (
+    <div className="flex items-center justify-between gap-2" data-region-carousel>
+      <p className="m-0 flex min-w-0 items-center gap-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
+        <span className="truncate">{interpolate(copy.ui.swipeCue, { region: other })}</span>
+        <FlowChevron />
+      </p>
+      <span className="flex shrink-0 items-center gap-2">
+        {labels.map((label, i) => (
+          <button
+            key={label}
+            type="button"
+            onClick={() => onGo(i)}
+            aria-label={interpolate(copy.ui.cardPosition, {
+              card: label,
+              n: num(i + 1, numberLocale),
+              m: num(labels.length, numberLocale),
+            })}
+            aria-current={active === i ? 'true' : 'false'}
+            className="insights-focusable flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 transition-opacity hover:opacity-100"
+            data-carousel-dot={i}
+          >
+            {/* The dot: 8px ink mark, aria-hidden — the button's accessible
+             * name carries the position; shape+colour signal the active one
+             * (never colour alone: aria-current + the enlarged active dot). */}
+            <span
+              aria-hidden="true"
+              className={`block rounded-full transition-all ${
+                active === i
+                  ? 'h-2.5 w-6 bg-[var(--color-text-primary)]'
+                  : 'h-2 w-2 bg-[var(--color-text-primary)]/25'
+              }`}
+            />
+          </button>
+        ))}
+      </span>
+    </div>
+  );
 }
 
 export function HeroBlock({
@@ -89,6 +160,74 @@ export function HeroBlock({
       : null;
   const moverTone = mover ? changeToneClass(mover.change30d) : '';
 
+  // §10 mobile carousel: the track element + which card rests at the
+  // reading edge (0 = Global — the D7 DOM order guarantees Global is the
+  // first card, so the carousel OPENS on Global in every locale). The
+  // index is measured, never assumed: the "closest card edge to the
+  // scroll origin" comparison is sign-agnostic, so RTL's negative
+  // scrollLeft (Chrome/Edge) and positive-descending variants (older
+  // Safari/Firefox) both resolve to the same visible card.
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [activeCard, setActiveCard] = useState(0);
+  const labels = useMemo<readonly [string, string]>(
+    () => [copy.sections.global, copy.sections.australia],
+    [copy.sections.global, copy.sections.australia],
+  );
+
+  const onTrackScroll = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const kids = Array.from(el.children) as unknown as readonly HTMLElement[];
+    let best = 0;
+    let bestDist = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < kids.length; i++) {
+      const d = Math.abs(kids[i]!.offsetLeft - el.scrollLeft);
+      if (d < bestDist) {
+        bestDist = d;
+        best = i;
+      }
+    }
+    setActiveCard(best);
+  }, []);
+
+  const goToCard = useCallback((index: number) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const kids = Array.from(el.children) as unknown as readonly HTMLElement[];
+    const target = kids[index];
+    if (!target) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollTo({ left: target.offsetLeft, behavior: reduced ? 'auto' : 'smooth' });
+    setActiveCard(index);
+  }, []);
+
+  // §10 keyboard: ArrowLeft/ArrowRight on the cue line step along the
+  // READING direction (in RTL the visual arrows invert — Left means
+  // "forward"), Home/End jump to the first/last card. The buttons remain
+  // the always-available control; this only adds the shortcut where the
+  // furniture already sits.
+  const onCarouselKey = useCallback(
+    (e: KeyboardEvent<HTMLDivElement>) => {
+      const rtl = document.documentElement.dir === 'rtl';
+      const forward = rtl ? 'ArrowLeft' : 'ArrowRight';
+      const back = rtl ? 'ArrowRight' : 'ArrowLeft';
+      if (e.key === forward && activeCard < labels.length - 1) {
+        e.preventDefault();
+        goToCard(activeCard + 1);
+      } else if (e.key === back && activeCard > 0) {
+        e.preventDefault();
+        goToCard(activeCard - 1);
+      } else if (e.key === 'Home' && activeCard !== 0) {
+        e.preventDefault();
+        goToCard(0);
+      } else if (e.key === 'End' && activeCard !== labels.length - 1) {
+        e.preventDefault();
+        goToCard(labels.length - 1);
+      }
+    },
+    [activeCard, goToCard, labels.length],
+  );
+
   return (
     <section aria-label={copy.ui.heroTitle} className="m-0">
       <h2 className="sr-only">{copy.ui.heroTitle}</h2>
@@ -99,22 +238,71 @@ export function HeroBlock({
        * Real spec (economic-indicators-ui-spec.md §5, 2026-10-17): the
        * two-column hero turns on only at lg (1024px) — below that, two
        * columns would make each card narrower than the spec's ~420px
-       * minimum, so the cards STACK (Global first, Australia second, the
-       * spec's mobile order). Gap 16px stacked (mobile) → 20px (md) → 24px
-       * at the two-column desktop (spec §5 spacing targets).
+       * minimum. Editorial handoff (§10): <768px the container is the
+       * swipeable single-card track (index.css media query); 768–1023px
+       * stays the calm one-column stack. Gap 12px on the mobile track →
+       * 16px stacked (md) → 24px at the two-column desktop.
        *
        * Real spec §5 + §8: at >=1024px the cards keep FIXED locations in
        * BOTH locales — Global on the right, Australia on the left (matching
        * both supplied references; intentional content priority, NOT
        * mirrored by direction). index.css drives that via
        * .insights-hero-grid [data-region-card] order rules; the DOM keeps
-       * D7's Global-first order so the stacked (mobile/tablet) reading
-       * order stays Global → Australia in every locale. */}
-      <div className="insights-hero-grid grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-2 lg:gap-6">
+       * D7's Global-first order so the mobile carousel AND the stacked
+       * tablet reading order stay Global → Australia in every locale. */}
+      {/* §10: the cue + dots + prev/next — the carousel's control bar,
+       * rendered ABOVE the track (mobile only, md:hidden): a card is taller
+       * than a phone screen, so a below-the-track affordance would sit under
+       * the fold and never be seen; here it rides with the page header and
+       * the first thing the reader meets is the card + its swipe cue
+       * together. Prev/next are real buttons so keyboard/touch users without
+       * swipe gestures still change cards; the words are direction-neutral
+       * ("Previous"/"Next") whose meaning follows the reading direction. */}
+      <div onKeyDown={onCarouselKey} className="mb-2.5 md:hidden">
+        <CarouselControls
+          copy={copy}
+          numberLocale={numberLocale}
+          labels={labels}
+          active={activeCard}
+          onGo={goToCard}
+        />
+        <div className="mt-1 flex items-center justify-center gap-2" data-carousel-buttons>
+          <button
+            type="button"
+            onClick={() => goToCard(Math.max(0, activeCard - 1))}
+            disabled={activeCard === 0}
+            className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full bg-currena-muted/15 px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25 disabled:cursor-default disabled:opacity-40"
+          >
+            {/* Mirrors with the reading flow (RTL = visually points the
+             * other way) — the shared flow glyph, flipped. */}
+            <FlowChevron className="rotate-180" />
+            {copy.ui.prevCard}
+          </button>
+          <button
+            type="button"
+            onClick={() => goToCard(Math.min(labels.length - 1, activeCard + 1))}
+            disabled={activeCard === labels.length - 1}
+            className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full bg-currena-muted/15 px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25 disabled:cursor-default disabled:opacity-40"
+          >
+            {copy.ui.nextCard}
+            <FlowChevron />
+          </button>
+        </div>
+      </div>
+
+      <div
+        ref={trackRef}
+        onScroll={onTrackScroll}
+        className="insights-hero-grid grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-2 lg:gap-6"
+        data-region-track
+        aria-label={copy.ui.carouselLabel}
+      >
         {/* D7/R1: Global first, always — the blocks array is fixed order. The
          * world-markets alert (when raised) lives in the GLOBAL block: world
-         * stock markets are a global question (§5.3). */}
-        <div data-region-card="global">
+         * stock markets are a global question (§5.3). role=group + the
+         * "n of m" label lets screen readers announce the carousel position
+         * (spec §10) without duplicating the card's own heading. */}
+        <div data-region-card="global" role="group" aria-label={interpolate(copy.ui.cardPosition, { card: labels[0], n: num(1, numberLocale), m: num(2, numberLocale) })}>
           <VerdictBlock
             section="global"
             sectionLabel={copy.sections.global}
@@ -131,7 +319,7 @@ export function HeroBlock({
             sectionIndicators={sectionIndicators}
           />
         </div>
-        <div data-region-card="australia">
+        <div data-region-card="australia" role="group" aria-label={interpolate(copy.ui.cardPosition, { card: labels[1], n: num(2, numberLocale), m: num(2, numberLocale) })}>
           <VerdictBlock
             section="australia"
             sectionLabel={copy.sections.australia}

@@ -159,8 +159,11 @@ export function InsightsHeader({
         <div className="min-w-0">
           {/* Real spec §5 (2026-10-17): the page title targets 24–28px mobile
            * / 32–36px desktop, weight 700 — and the header separates from the
-           * cards by ~28–36px (mb-7 = 28px; the mb-3 was 12px). */}
-          <h1 className="m-0 text-2xl font-bold tracking-tight sm:text-[2rem] sm:leading-[2.4rem]">{t('insights.title')}</h1>
+           * cards by ~28–36px (mb-7 = 28px; the mb-3 was 12px). Editorial
+           * handoff (§5): the title speaks the navy print ink (--ei-navy),
+           * the same ink as the region card headings — weight and spacing
+           * carry the hierarchy, not many colors. */}
+          <h1 className="m-0 text-2xl font-bold tracking-tight text-[var(--ei-navy)] sm:text-[2rem] sm:leading-[2.4rem]">{t('insights.title')}</h1>
           <p className="mt-1 mb-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.ui.subtitle}</p>
           {dataAsOfLine ? (
             <p className="mt-1 mb-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]" title={dataAsOfLine.tooltip}>

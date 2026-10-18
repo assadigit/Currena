@@ -18,11 +18,15 @@ import globals from 'globals';
 
 export default tseslint.config(
   // Ignore build output, deps, and generated files.
+  // (**/.wrangler/**: any local `wrangler dev` run drops bundled JS into
+  // .wrangler/tmp — linting those 5k generated files fails on no-undef and
+  // buries the real findings; CI never sees the folder, local runs do.)
   {
     ignores: [
       '**/dist/**',
       '**/coverage/**',
       '**/node_modules/**',
+      '**/.wrangler/**',
       'apps/web/public/**',
       'legacy/**',
       'legacy-captures/**',

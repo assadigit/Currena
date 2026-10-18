@@ -77,6 +77,18 @@
  * current step to the stylesheet (data-step) — index.css round 44 owns
  * the tint ramp. Every size and every meter on the page grades the same
  * way (hero, per-gauge rows, markets verdict, per-question headers).
+ *
+ * Editorial handoff (2026-10-19, docs/insights/
+ * economic-indicators-editorial-spec.md): the two overview cards open
+ * with the quiet ART BAND (Sydney Harbour / faint world map, §7) behind
+ * the header + count line; the region title speaks the navy print ink
+ * (--ei-navy); the verdict word + state artwork ride in ONE compact
+ * tinted pill (.ei-state-pill, §4) with the meter still beside it; the
+ * flagged rows lead with the indicator's own subject artwork in a soft
+ * container (the alert triangle keeps the tier when no artwork exists)
+ * and close with a drill-down chevron that mirrors in RTL; the severity
+ * accent is the thin inline-start edge (.ei-row-accent). No data logic,
+ * aria, count, ranking or copy changed — presentation only.
  */
 
 import { useState } from 'react';
@@ -84,7 +96,8 @@ import type { IndicatorReading, InsightsSection, IndicatorId } from '@currena/co
 import { formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { IconImg, sectionIconUrl, stateIconUrl } from '../icons/currena';
+import { IconImg, indicatorIconUrl, sectionIconUrl, stateIconUrl } from '../icons/currena';
+import { FlowChevron } from '../icons/FlowChevron';
 import { GAUGES, gaugesForSection, labelForVerdictStep, sectionVerdictStep } from '@currena/insights';
 import {
   attentionToneClass,
@@ -93,7 +106,6 @@ import {
   formatIndicatorValue,
   formatRuleText,
   indicatorValueParts,
-  stepToneClass,
 } from './config';
 import { GlossaryTip } from './world-currencies/GlossaryTip';
 
@@ -266,79 +278,106 @@ export function VerdictBlock({
 
   return (
     <article
-      className="flex h-full flex-col gap-3 rounded-[var(--radius-lg)] p-4 ring-1 ring-[var(--color-border)] bg-[var(--color-surface)] md:p-5 lg:p-6"
+      className="flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface)] ring-1 ring-[var(--color-border)]"
     >
-      {/* Real spec (economic-indicators-ui-spec.md §4 "Status summary" + §5
-       * "Card and indicator structure", 2026-10-17): the region NAME is the
-       * card title (26-30px/700 desktop, 22-26px mobile); the severity label
-       * (the verdict word, 15-17px/600-700, severity ink R29) and the
-       * severity mark/scale (the state artwork + the four-step meter — its
-       * color stays the EXISTING severity logic) share the title row and
-       * wrap naturally on narrow screens. Never colour alone: word +
-       * artwork + meter. Round 28: each region wears its own mark — the
-       * globe for Global, the map for Australia, a quiet 24/28px id. */}
-      <header className="m-0 flex flex-wrap items-center gap-x-3 gap-y-2">
-        <IconImg src={sectionIconUrl(section)} size={24} desktopSize={28} />
-        <h3 className="m-0 min-w-0 flex-1 text-[1.375rem] font-bold leading-tight text-[var(--color-text-primary)] sm:text-[1.625rem]">
-          {sectionLabel}
-        </h3>
-        <p className="m-0 flex shrink-0 flex-wrap items-center gap-x-2.5 gap-y-1">
-          {/* Round 41: the state's artwork LEADS the severity cluster —
-           * [icon][word][meter], the same reading order as every other
-           * chip in the app. Round 42 (owner): the artwork rides smaller
-           * (24/32) — the word and meter carry the severity. */}
-          {stateIconUrl(step) !== null ? (
-            <IconImg src={stateIconUrl(step)!} size={24} desktopSize={32} className="drop-shadow-sm" />
-          ) : null}
-          <span className={`text-[0.9375rem] font-bold leading-none sm:text-[1rem] ${stepToneClass(step)}`}>
-            {verdictLabel}
-          </span>
-          <VerdictMeter step={step} label={verdictLabel} ariaLabel={ariaLabel} size="lg" />
-        </p>
-      </header>
+      {/* Editorial handoff (2026-10-19, economic-indicators-editorial-spec.md
+       * §7): the card opens with the quiet ART BAND — Sydney Harbour on the
+       * Australia card, an even fainter world-map texture on the Global
+       * card (index.css .ei-hero-art). The band carries the header + the
+       * count line, and the artwork always sits BEHIND a surface-colored
+       * veil + bottom fade (dark mode tones it further down), so the navy
+       * title, the state pill and the count keep their contrast. The card
+       * body below keeps the card's own padding; overflow-hidden gives the
+       * band the card's rounded corners. */}
+      <div className="relative flex flex-col gap-3 p-4 pb-3.5 md:p-5 md:pb-3.5 lg:p-6 lg:pb-3.5">
+        <span
+          aria-hidden="true"
+          className={`ei-hero-art ${section === 'australia' ? 'ei-hero-art--au' : 'ei-hero-art--global'}`}
+          data-hero-art={section}
+        />
+        {/* Real spec (economic-indicators-ui-spec.md §4 "Status summary" + §5
+         * "Card and indicator structure", 2026-10-17): the region NAME is the
+         * card title (26-30px/700 desktop, 22-26px mobile) — the editorial
+         * handoff §5 deepens it to the navy print ink (--ei-navy); the
+         * severity label (the verdict word, 15-17px/600-700, severity ink
+         * R29) and the severity mark/scale (the state artwork + the
+         * four-step meter — its color stays the EXISTING severity logic)
+         * share the title row and wrap naturally on narrow screens. Never
+         * colour alone: word + artwork + meter. Round 28: each region wears
+         * its own mark — the globe for Global, the map for Australia, a
+         * quiet 24/28px id. Editorial §4: the word + artwork now ride in
+         * ONE compact tinted pill (.ei-state-pill), the meter stays beside. */}
+        <header className="relative m-0 flex flex-wrap items-center gap-x-3 gap-y-2">
+          <IconImg src={sectionIconUrl(section)} size={24} desktopSize={28} />
+          <h3 className="m-0 min-w-0 flex-1 text-[1.375rem] font-bold leading-tight text-[var(--ei-navy)] sm:text-[1.625rem]">
+            {sectionLabel}
+          </h3>
+          <p className="relative m-0 flex shrink-0 flex-wrap items-center gap-x-2.5 gap-y-1">
+            <span className="ei-state-pill" data-step={step} data-verdict-pill>
+              {/* Round 41: the state's artwork LEADS the severity cluster —
+               * [icon][word], the same reading order as every other chip in
+               * the app. Round 42 (owner): the artwork rides smaller
+               * (24/32) — the word and meter carry the severity. */}
+              {stateIconUrl(step) !== null ? (
+                <IconImg src={stateIconUrl(step)!} size={20} desktopSize={24} className="drop-shadow-sm" />
+              ) : null}
+              <span className="leading-none">{verdictLabel}</span>
+            </span>
+            <VerdictMeter step={step} label={verdictLabel} ariaLabel={ariaLabel} size="lg" />
+          </p>
+        </header>
 
-      {/* Real spec §4.3: a concise "Why" summary directly below the card
-       * heading, with the optional information control (the existing
-       * how-computed tip, round 43). The count line is the existing copy
-       * (no new strings); attentionToneClass keeps it red when flagged,
-       * green when calm. The data attributes are unchanged. */}
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <p
-          className={`m-0 text-[length:var(--type-label)] font-semibold leading-relaxed ${attentionToneClass(
-            tiles.length + (marketsAlert ? 1 : 0) + (fxAlert ? 1 : 0),
-          )}`}
-          data-attention-count
-          data-markets-in-count={marketsAlert ? 'true' : undefined}
-          data-fx-in-count={fxAlert ? 'true' : undefined}
-        >
-          {interpolate(copy.ui.inAlert, {
-            warnings: num(tiles.length, numberLocale),
-            voting: num(voting, numberLocale),
-          })}
-        </p>
-        <GlossaryTip srLabel={copy.ui.howCalculated} panelClassName="w-full basis-full">
-          <bdi>{copy.ui.explainerIntro}</bdi>
-          <button
-            type="button"
-            onClick={onJumpAbout}
-            className="insights-focusable mt-1 inline-flex w-fit cursor-pointer items-center rounded-lg border-0 bg-transparent p-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] underline decoration-[var(--color-border)] underline-offset-2 transition-colors hover:decoration-[var(--color-text-secondary)]"
+        {/* Real spec §4.3: a concise "Why" summary directly below the card
+         * heading, with the optional information control (the existing
+         * how-computed tip, round 43). The count line is the existing copy
+         * (no new strings); attentionToneClass keeps it red when flagged,
+         * green when calm. The data attributes are unchanged. */}
+        <div className="relative flex flex-wrap items-center gap-x-2 gap-y-1">
+          <p
+            className={`m-0 text-[length:var(--type-label)] font-semibold leading-relaxed ${attentionToneClass(
+              tiles.length + (marketsAlert ? 1 : 0) + (fxAlert ? 1 : 0),
+            )}`}
+            data-attention-count
+            data-markets-in-count={marketsAlert ? 'true' : undefined}
+            data-fx-in-count={fxAlert ? 'true' : undefined}
           >
-            {copy.ui.explainerFullLink} ↧
-          </button>
-        </GlossaryTip>
+            {interpolate(copy.ui.inAlert, {
+              warnings: num(tiles.length, numberLocale),
+              voting: num(voting, numberLocale),
+            })}
+          </p>
+          <GlossaryTip srLabel={copy.ui.howCalculated} panelClassName="w-full basis-full">
+            <bdi>{copy.ui.explainerIntro}</bdi>
+            <button
+              type="button"
+              onClick={onJumpAbout}
+              className="insights-focusable mt-1 inline-flex w-fit cursor-pointer items-center rounded-lg border-0 bg-transparent p-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] underline decoration-[var(--color-border)] underline-offset-2 transition-colors hover:decoration-[var(--color-text-secondary)]"
+            >
+              {copy.ui.explainerFullLink} ↧
+            </button>
+          </GlossaryTip>
+        </div>
       </div>
 
+      {/* The card body — the editorial band hands back to the standard
+       * surface here; every module below is byte-identical in behavior to
+       * the pre-handoff card (only the row face was restyled, §8). */}
+      <div className="flex flex-1 flex-col gap-3 p-4 pt-1 md:p-5 md:pt-1 lg:p-6 lg:pt-1">
       {/* Real spec §4.4/§4.5 (flagged indicators) + §5 (indicator row
        * anatomy) + §9 (show more / show less): the flagged-list heading
        * carries the FULL underlying count (never just the visible rows),
        * followed by the TOP THREE rows (the existing importance order);
        * "+n more" reveals the rest IN PLACE, "Show fewer" collapses back,
        * both announcing their state (aria-expanded + aria-controls).
-       * Each row: the leading severity symbol at the inline-start edge, a
-       * flexible text column (name + the generated interpretation), the
-       * primary value at the trailing edge — all direction-aware, growing
-       * naturally (no fixed heights); click opens the existing
-       * DetailsPanel. */}
+       * Editorial §8: each row = the leading subject icon in a soft
+       * neutral container (the existing PNG artwork where an icon exists —
+       * the alert triangle carries the tier when it doesn't), a flexible
+       * text column (name + the generated interpretation), the primary
+       * value in strong navy at the trailing edge and a drill-down
+       * chevron — all direction-aware, growing naturally (no fixed
+       * heights); click opens the existing DetailsPanel. The tier accent
+       * is the restrained inline-start edge (.ei-row-accent), never a
+       * saturated face. */}
       {shown.length > 0 ? (
         <section data-flagged-list>
           <p className="m-0 text-[0.8125rem] font-bold text-[var(--color-text-secondary)]">
@@ -366,34 +405,44 @@ export function VerdictBlock({
               });
               const valueParts =
                 r.value !== null ? indicatorValueParts(id, r.value, numberLocale, copy.units) : null;
+              const subjectIcon = indicatorIconUrl(id);
               return (
                 <li key={id}>
                   <button
                     type="button"
                     onClick={(e) => onFocusCard(id, e.currentTarget)}
-                    className="insights-focusable flex min-h-[72px] w-full cursor-pointer items-start gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-3 py-3 text-start ring-1 ring-[var(--color-border)] transition-colors hover:bg-currena-muted/[0.06] hover:ring-[var(--color-border)]/90"
+                    className="insights-focusable ei-row-accent flex min-h-[76px] w-full cursor-pointer items-start gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-3 py-3 text-start ring-1 ring-[var(--color-border)] transition-colors hover:bg-currena-muted/[0.06] hover:ring-[var(--color-border)]/90"
                   >
-                    {/* The leading severity symbol — the same warning-triangle
-                     * shape language as the StatusChip icon, alert red: the
-                     * marker carries the tier, the row face stays neutral
-                     * (spec §6: never color every row). */}
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                    {/* The leading mark — the indicator's own subject
+                     * artwork in a soft neutral container where the set
+                     * has one (spec §8); otherwise the alert triangle
+                     * keeps the tier symbol so the geometry (and the
+                     * never-colour-alone rule) holds on every row. */}
+                    <span
                       aria-hidden="true"
-                      focusable="false"
-                      className="mt-1 shrink-0 text-[var(--color-status-alert)]"
+                      className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-currena-muted/15"
                     >
-                      <path d="M8 1.8 14.6 13.4H1.4L8 1.8Z" />
-                      <path d="M8 6.2v3.4" />
-                      <path d="M8 11.7h.01" />
-                    </svg>
+                      {subjectIcon !== null ? (
+                        <IconImg src={subjectIcon} size={22} desktopSize={24} />
+                      ) : (
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          focusable="false"
+                          className="text-[var(--color-status-alert)]"
+                        >
+                          <path d="M8 1.8 14.6 13.4H1.4L8 1.8Z" />
+                          <path d="M8 6.2v3.4" />
+                          <path d="M8 11.7h.01" />
+                        </svg>
+                      )}
+                    </span>
                     <span className="flex min-w-0 flex-1 flex-col gap-1">
                       <span className="line-clamp-2 text-[0.9375rem] font-bold leading-snug text-[var(--color-text-primary)]">
                         {copy.indicators[id].name}
@@ -404,7 +453,7 @@ export function VerdictBlock({
                     </span>
                     {valueParts !== null ? (
                       <span className="flex shrink-0 flex-col items-end gap-0.5">
-                        <bdi className="type-number inline-flex flex-wrap items-baseline gap-x-1 text-[var(--color-text-primary)]">
+                        <bdi className="type-number inline-flex flex-wrap items-baseline gap-x-1 text-[var(--ei-navy)]">
                           <span>{valueParts.value}</span>
                         </bdi>
                         {valueParts.unit !== null ? (
@@ -414,6 +463,11 @@ export function VerdictBlock({
                         ) : null}
                       </span>
                     ) : null}
+                    {/* The drill-down affordance — the shared directional
+                     * glyph that mirrors with the reading flow; the sr-only
+                     * "View card" phrase keeps the meaning for assistive
+                     * tech. */}
+                    <FlowChevron className="mt-1.5 text-[var(--color-text-tertiary)]" />
                     <span className="sr-only">, {copy.ui.viewCard}</span>
                   </button>
                 </li>
@@ -701,6 +755,7 @@ export function VerdictBlock({
           {copy.ui.viewSection}
           <span className="sr-only">, {sectionLabel}</span>
         </button>
+      </div>
       </div>
     </article>
   );

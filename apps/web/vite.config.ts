@@ -119,7 +119,10 @@ export default defineConfig({
         // world-indices handoff round) — the same treatment the owner's
         // PNG icon set gets: generateSW revisions by content, so a changed
         // wordmark re-precaches on the next deploy.
-        globPatterns: ['**/*.{js,css,html,svg,png,jpg,woff2,webmanifest}'],
+        // webp joins for the editorial hero artwork (the 2026-10-19
+        // economic-indicators handoff): the Sydney Harbour band + the
+        // Global map texture are 12KB/4KB WebP files in /assets/artwork/.
+        globPatterns: ['**/*.{js,css,html,svg,png,jpg,webp,woff2,webmanifest}'],
         // Store-listing screenshots (manifest only — PWABuilder/Play fetch
         // them over HTTP; the app never needs them offline).
         globIgnores: ['**/screenshots/**'],

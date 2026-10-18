@@ -5,6 +5,57 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-19] — the economic indicators hero becomes the editorial financial interface (the currena-hero.zip handoff round)
+
+The owner's `currena-hero.zip` handoff package (approved visual references,
+`spec/economic-indicators-ui-spec.md`, design tokens, Sydney Harbour + world-
+map artwork — recorded in the repo as
+`docs/insights/economic-indicators-editorial-spec.md`) reshapes the Insights
+hero on `/#/insights`, presentation-only: every calculation, threshold,
+ranking, aria hook, count and translated string is untouched (the new
+carousel copy is the only addition, triaged in the Persian copy manifest).
+
+### Added
+
+- **The Global-first mobile swipe carousel (spec §10)** — below 768px the
+  two overview cards become ONE horizontal scroll-snap track: Global first,
+  swipe (or the localized cue / two `aria-current` dots / Previous-Next
+  buttons / ← → Home End keys) to reach Australia. Both cards stay mounted,
+  so each keeps its own expand/collapse state while swiped off-screen; the
+  furniture is `md:hidden`, so the 768–1023px tablet keeps the calm stack
+  and ≥1024px keeps the FIXED desktop placement (Australia left, Global
+  right, both locales). Ten regression guards in
+  `apps/web/src/components/insights/hero-editorial.test.tsx`.
+- **The quiet art band (spec §7)** — the Sydney Harbour / Opera House
+  artwork (12 KB WebP, from the handoff pack) behind the Australia card's
+  header, an even fainter world-map texture (4 KB) behind the Global card:
+  decorative `aria-hidden` layers under a surface-colored veil + bottom
+  fade, toned further down in dark mode and on narrow cards. The artwork
+  joins the PWA precache (`webp` added to `globPatterns`).
+- **The editorial ink + severity pill (spec §4/§5)** — the region titles,
+  the flagged rows' key values and the page title speak the navy print ink
+  `--ei-navy` (#0F2D4A light / the existing light ink in dark); the
+  verdict word + state artwork ride ONE compact tinted pill
+  (`.ei-state-pill`, the same ink+tint pairing the StatusChips speak) with
+  the four-step meter unchanged beside it; the hero-scoped grayscale
+  filter (the 2026-10-18a scope trim) is retired — the new direction
+  restores the restrained severity colors on the hero.
+- **The flagged rows' editorial anatomy (spec §8)** — the indicator's own
+  subject artwork leads in a soft neutral container (the alert triangle
+  keeps the tier where the icon set deliberately has no artwork), the
+  severity accent is the thin inline-start tier edge, and a directional
+  drill-down chevron (`.ei-row-chevron`, mirrored in RTL) closes the row.
+  The top-3 + "+n more" → "Show fewer" disclosure is byte-identical in
+  behavior.
+
+### Budgets
+
+Insights lazy chunk 652.00/156.50 → **656.00/157.00** (measured
+655.04/156.73; the entry chunk untouched at 295.29/88.81 vs 296/89.5) —
+the carousel controls + art band + pill + row anatomy + 10 copy strings ×
+2 locales; the two artwork files ship as public assets, not JS. D-36 in
+`docs/DECISIONS_FOR_ALI.md`.
+
 ## [2026-10-18 (2)] — the index wordmarks render at the owner-directed ≥96×96 px (deployed as worker 20b9549c)
 
 The owner's follow-up directive on the freshly deployed briefing — "The

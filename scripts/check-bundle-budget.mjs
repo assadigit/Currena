@@ -419,7 +419,27 @@ const BUDGETS = [
   // the entry chunk is untouched at 295.29/88.81 vs 296/89.5. Justified
   // in CHANGELOG §2026-10-18 (world-indices round) and D-35 in
   // docs/DECISIONS_FOR_ALI.md.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 652_000, gz: 156_500, label: 'Insights lazy chunk' },
+  // Editorial economic-indicators handoff round (652.00 → 656.00 raw,
+  // 156.50 → 157.00 gz, 2026-10-19): the hero's two overview cards become
+  // the editorial financial interface (docs/insights/
+  // economic-indicators-editorial-spec.md) — the <768px GLOBAL-FIRST
+  // horizontal swipe carousel (HeroBlock: the scroll-snap track + the cue
+  // + two aria-current dots + Previous/Next + arrow-key steps), the quiet
+  // art band (Sydney Harbour / faint world map behind each card header,
+  // .ei-hero-art in index.css), the navy print ink (--ei-navy) on the
+  // region titles + key values + page title, the compact tinted severity
+  // pill (.ei-state-pill) with the four-step meter kept beside it, and
+  // the flagged rows' editorial anatomy (subject-icon container + the
+  // shared FlowChevron drill-down glyph + the restrained inline-start
+  // tier edge) + 10 new copy strings × 2 locales (carousel cue/positions/
+  // controls). Measured 655.04/156.73 — raw +4.74 kB, gz +1.23 kB over
+  // the 2026-10-18 (2) build: an owner-directed presentation layer over
+  // the existing data, mostly highly-compressible JSX + dictionary copy.
+  // The two decorative artwork WebP files (12 KB + 4 KB) ship as public
+  // assets (precached), NOT in the JS chunk; the entry chunk is untouched
+  // at 295.29/88.81 vs 296/89.5. Justified in CHANGELOG §2026-10-19
+  // (editorial hero round) and D-36 in docs/DECISIONS_FOR_ALI.md.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 656_000, gz: 157_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {
