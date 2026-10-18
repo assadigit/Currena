@@ -83,7 +83,59 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
-## CURRENT DEPLOYMENT — the index wordmarks at the owner-directed ≥96×96 px (2026-10-18 (2), worker 20b9549c)
+## CURRENT DEPLOYMENT — the economic indicators hero becomes the editorial financial interface (2026-10-19 editorial handoff round, worker 29ebc99b)
+
+The owner's `currena-hero.zip` handoff package (approved visual references,
+`spec/economic-indicators-ui-spec.md`, design tokens, Sydney Harbour +
+world-map artwork — recorded in the repo as
+`docs/insights/economic-indicators-editorial-spec.md`) is LIVE on
+`/#/insights`, presentation-only: the `<768px` GLOBAL-FIRST horizontal
+swipe carousel (scroll-snap track, cue + two aria-current dots + 44px
+Previous/Next above the track), the quiet Sydney/map art bands behind the
+two region card headers, the `--ei-navy` print ink (region titles, flagged
+values, page title), the tinted `.ei-state-pill` severity pill with the
+four-step meter unchanged beside it, and the flagged rows' editorial
+anatomy (subject-icon container, inline-start tier edge, RTL-mirroring
+drill-down chevron). The hero-scoped grayscale filter is retired (the new
+direction restores the restrained severity inks). Every calculation,
+threshold, ranking, aria hook, count and translated string is untouched —
+the 5 new fa carousel strings are manifest-triaged (round
+`editorial-hero-2026-10-19`).
+
+- **Active worker**: currena-api **`29ebc99b-e290-4d68-8623-5a892a75d2f9`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *` keep-warm
+  cron unchanged; currena-markets untouched — UI-only round).
+- **What it carries**: everything from 20b9549c (the ≥96px wordmark round +
+  every round beneath) PLUS the editorial hero.
+- **Chunk proof**: the 32b23b1 build serves `index-D4_TboZK.js`
+  (295.29/88.81) + `Insights-BI2tkJ8c.js` (655.03/156.73 — the documented
+  656/157 bump, D-36 + CHANGELOG §2026-10-19); both artwork WebP files
+  answer 200 (12,294 B + 3,668 B).
+- **Verified live** (agent-browser, fresh profile, workers.dev + currena.ir
+  smoke): EN desktop 1280 — Australia left:32 / Global right:652, both art
+  bands rendering behind legible navy titles, 2 pills + meters, zero
+  overflow; EN mobile 375 — Global first (x:16) with Australia off-screen,
+  cue + dots + buttons on the FIRST screen, real Next click → Australia
+  x:16 with the dot/cue flipping, `scrollWidth === clientWidth`; fa RTL
+  desktop + 390 mobile — «برای دیدن استرالیا بکشید», real «بعدی» click →
+  Australia x:16, track scrollLeft −370 (logical RTL), zero overflow at
+  every width; zero console/page errors everywhere. Evidence:
+  `docs/insights/economic-indicators-editorial-verification.md` +
+  `docs/insights/screenshots/economic-indicators-editorial/` (local) and
+  `/tmp/verify-live` (live-run screenshots, 5 files).
+- **Notable engineering finding**: the first carousel implementation (a
+  FLEX track with %-basis items) leaked ~98 px of PHANTOM scrollable
+  overflow into the document on mobile (page pannable into blank space;
+  nothing painted; baseline build measured clean). Bisected to a
+  layout-engine scrollable-overflow computation — fixed with the grid
+  auto-flow-column track + `contain: paint` (full story in index.css +
+  the verification notes).
+- **Gates on 32b23b1** (local + CI green): typecheck 6/6; 1,596 tests
+  (+10 new hero-editorial guards); lint 0 errors/15 accepted advisories;
+  copy:audit clean; build OK; budgets held (Insights 655.03/156.73 vs
+  656/157). CI run on main: completed/success.
+
+## PREVIOUS DEPLOYMENT — the index wordmarks at the owner-directed ≥96×96 px (2026-10-18 (2), worker 20b9549c)
 
 The owner's follow-up on the freshly deployed world-indices briefing
 ("The pictures of each indices are too small make them at least 96x96

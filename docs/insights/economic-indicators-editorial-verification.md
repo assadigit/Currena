@@ -101,3 +101,29 @@ manifest, round `editorial-hero-2026-10-19`) · build OK · budgets held
   overflow (hiding it changed nothing).
 - The row-name `line-clamp-2` truncation is the pre-existing two-line
   clamp (unchanged); VLM flagged it once as "truncation" — intended.
+
+## Production verification (post-deploy — worker 29ebc99b, 2026-10-19)
+
+Deployed through the established pipeline (`pnpm --filter @currena/web
+build` + `pnpm --filter @currena/api exec wrangler deploy`, commit 32b23b1
+fast-forward merged to main; CI on main: completed/success). Live on
+https://currena.ir/#/insights and currena-api.sedanama-ir.workers.dev:
+
+- **Chunk proof**: the served entry `index-D4_TboZK.js` (295.29 kB) and
+  `Insights-BI2tkJ8c.js` (655,034 B) are exactly the 32b23b1 build; both
+  artwork WebP files answer 200 (12,294 B + 3,668 B).
+- **EN light desktop 1280** (agent-browser, fresh profile, workers.dev):
+  Australia left:32 / Global right:652, both `[data-hero-art]` bands
+  rendering behind legible navy titles (computed #0F2D4A), 2 pills + 2
+  meters, zero horizontal overflow, zero page errors.
+- **EN mobile 375**: Global first (x:16), Australia off-screen (x:371),
+  cue "Swipe to view Australia" + dots + Previous/Next on the first
+  screen; a real Next click lands Australia flush at x:16 with the dot
+  ("Australia card, 2 of 2") and cue ("Swipe to view Global") flipping;
+  `documentElement.scrollWidth === clientWidth`.
+- **fa RTL desktop 1280 + mobile 390**: dir=rtl; «برای دیدن استرالیا
+  بکشید» + «کارت جهانی، ۱ از ۲»; a real «بعدی» click lands Australia at
+  x:16 with track scrollLeft −370 (logical RTL scroll) and the dot/cue
+  flipping; zero overflow.
+- **currena.ir smoke**: `/api/insights` 200, the Sydney artwork 200.
+- Zero console errors / zero page errors across every live combo above.
