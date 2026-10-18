@@ -83,7 +83,58 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
-## CURRENT DEPLOYMENT — the repo root cleaned of misplaced specification markdown (2026-10-26e, worker 26c23d91)
+## CURRENT DEPLOYMENT — the world stock indices editorial briefing is LIVE (2026-10-18 world-indices round, worker b9a412e0)
+
+The owner's directive ("if not committed and deployed, deploy them — I
+don't see any change in the live site") closed the gap between the
+shipped branch and production: `feature/world-indices-briefing`
+(f72e1a0, the 2026-10-18 handoff round — 42 files: 16 wordmark JPEGs +
+UI/i18n/tests/docs) was fast-forward-merged into main (e8815e3 → f72e1a0,
+zero regressions possible — the branch sat directly on the deployed
+state), pushed, and deployed. The 26c23d91 worker was serving the
+pre-redesign build (live chunk proof: index-DJK_gsXg.js) because the
+round had shipped to the branch only, awaiting review.
+
+- **Active worker**: currena-api **`b9a412e0-2bb5-4352-9c70-f22249ade149`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched — UI-only round).
+- **What it carries**: everything from 26c23d91 (057cd20, runtime-
+  identical to 26d) PLUS the world-indices briefing: the editorial header
+  «نبض بازارهای جهان» / «شاخص‌های بورسی جهان», the verdict card with the
+  period breadth strip + below-52w-high count, the «بیشترین رشد»/
+  «بیشترین افت» movers cards, the 4-lens period switch (روزانه/هفتگی/
+  ماهانه/سه‌ماهه — the annual gap stays reported, not fabricated), the
+  equal-area «نقشهٔ عملکرد» heatmap, the 16 wordmark logos
+  (/assets/markets/{id}.jpg), the country labels, and the honest
+  empty/partial states. 34 new assets uploaded (16 jpg + hashed chunks).
+- **Chunk proof**: the fresh f72e1a0 build serves `index-Cslta9H2.js`
+  (295.29/88.81) + `Insights-CUm3UhiW.js` (650.28/155.51 — the bumped
+  652/156.50, D-35) — sha256-identical on the workers.dev origin
+  (4609c779… / 92199993… = the local build hashes), so the deployment
+  matches main exactly.
+- **Verified live** (agent-browser, fresh profile, workers.dev): fa RTL
+  desktop 1440 — the new title + badge render, the verdict breadth strip,
+  movers on real stored data, the period switch (سهماهه → هفتگی moves
+  tiles+movers together), the heatmap switch (16 equal tiles + legend),
+  the detail panel opens from tiles, 19 market-logo imgs all loaded from
+  the CDN; EN locale full pass ("The pulse of world markets" + Daily/
+  Weekly/Monthly/Quarterly/List); mobile 390 — scrollWidth 390 =
+  innerWidth, zero horizontal overflow; zero console + zero page errors
+  across all combos. Evidence:
+  `docs/insights/screenshots/world-indices-briefing/`.
+- **Gates on f72e1a0** (local, all green): typecheck 6/6; 1,584 tests
+  (web 612); lint 0 errors/15 accepted advisories; copy:audit clean
+  (manifest 2,203); build OK; budgets held. GitHub CI on the main push:
+  run 39146557672 → **success**.
+- **Not changed**: providers, crons, KV, the markets worker, the read
+  route, the contract (MarketEntrySchema untouched; only the 4 supported
+  horizons offered — no invented annual return).
+- **Noted (pre-existing, unrelated)**: the 09:08 UTC insights-selfcheck
+  red run (T-03 dates) executed on e8815e32 hours before this push — a
+  live-source date condition in the daily data audit, not this UI-only
+  round.
+
+## PREVIOUS DEPLOYMENT — the repo root cleaned of misplaced specification markdown (2026-10-26e, worker 26c23d91)
 
 The owner's wrap-up directive ("commit, push, deploy") closing the
 minimal-cleanup work order: two root specification markdowns moved

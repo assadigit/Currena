@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
-## [2026-10-18] — the world stock indices section becomes the editorial market briefing «نبض بازارهای جهان» (the owner's world-indices handoff round; branch feature/world-indices-briefing, NOT deployed)
+## [2026-10-18] — the world stock indices section becomes the editorial market briefing «نبض بازارهای جهان» (the owner's world-indices handoff round; merged to main + deployed as worker b9a412e0 — see DEPLOY.md)
 
 The owner's handoff package (`01-new-session-prompt.md`, `02-ui-spec.md`,
 `03-agent-rules.md`, `ASSET-MAP.md` + 16 index wordmark JPEGs + a
