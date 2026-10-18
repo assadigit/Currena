@@ -1,7 +1,8 @@
 # Economic Indicators UI redesign — verification record
 
-**Spec:** `economic-indicators-ui-spec.md` (repo root — the OWNER'S ACTUAL file,
-pushed as 63adfe8 mid-session; the earlier in-session draft was replaced).
+**Spec:** `docs/insights/economic-indicators-ui-spec.md` (the OWNER'S ACTUAL file,
+pushed as 63adfe8 mid-session; the earlier in-session draft was replaced. Moved
+from the repo root 2026-10-26e — contents byte-identical).
 
 ## FINAL STATE (owner scope trim, de897d4 / CHANGELOG 2026-10-18a)
 

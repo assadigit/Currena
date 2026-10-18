@@ -5,6 +5,51 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-26e] — the repository root cleaned of misplaced specification markdown (owner cleanup work order)
+
+The owner's minimal-cleanup work order: move the specification-related
+Markdown out of the repo root into the EXISTING folders that already hold
+their siblings, update every affected live reference, and touch nothing
+else. Docs-only: zero code, zero copy, zero behavior change; both moves
+are byte-identical git renames (R100 — the contents are preserved
+exactly, no rewrite/merge/delete). Rationale recorded as D-34.
+
+### Changed — two files moved, two live references updated
+
+- **`economic-indicators-ui-spec.md` →
+  `docs/insights/economic-indicators-ui-spec.md`.** The Economic
+  Indicators page UI/UX specification joins its own lineage in
+  `docs/insights/` — the sibling UI specs (`02-page-design-spec.md`,
+  `06-ux-round-2-spec.md`, `gold-balance-card-spec.md`) and its
+  companion record `economic-indicators-verification-notes.md`, whose
+  header now points at the new path instead of claiming the repo root.
+  NOT `docs/specs/` — that folder is the governing world-currencies /
+  world-markets data-spec lineage per AGENTS.md's docs map.
+- **`REMAINING_WORK.md` → `docs/REMAINING_WORK.md`.** The CLOSED
+  (2026-10-15c) follow-up work order moves in with its process-doc
+  siblings (`BACKLOG.md`, `NEXT_SESSION_PROMPT.md`, `PROGRESS.md`,
+  `SESSION_LOG.md`); the README docs-map pointer now reads
+  `docs/REMAINING_WORK.md`. Its own internal references are
+  repo-root-relative prose paths, which remain valid from `docs/`.
+- **Left exactly as-is (deliberate, minimal diff):** `README.md`,
+  `AGENTS.md`, `CHANGELOG.md` (essential root files per the work
+  order); the bare-name spec citations in code comments
+  (`VerdictMeter.tsx`, `HeroBlock.tsx`, `ToolsMenu.tsx`,
+  `apps/web/src/index.css`, `scripts/check-bundle-budget.mjs` — no
+  path, name unchanged, grep-resolvable, so no app-code churn); the
+  historical session/decision/changelog records (DEPLOY.md headings,
+  D-28, the 2026-10-15 CHANGELOG/PROGRESS rows — records of past
+  events, not live pointers); `financial-asset-cards-spec-pack.zip`
+  (not a Markdown file and not a supporting asset of the moved specs —
+  outside the work order's `.md` scope); `vite-dev.log` (untracked
+  local artifact). The root now holds only `README.md`, `AGENTS.md`,
+  `CHANGELOG.md` and application configuration. No Markdown-link form
+  (`](…)`) references either file anywhere in the tree (audited), so
+  nothing else can 404. Pre-existing staleness observed and NOT
+  touched (out of scope): `docs/insights/CURRENT_STATE_REPORT.md`
+  claims `FIX_REPORT.md` sits at "repo root" (it lives in
+  `docs/insights/`).
+
 ## [2026-10-26d] — the gold balance rotates ONLY its beam, and visualizes weight (Iteration-5 addendum: v7)
 
 The owner's Iteration-5 addendum supersedes the earlier pan-rotation,
