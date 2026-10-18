@@ -711,7 +711,7 @@ export function BalanceCard({
         });
   const metaLine =
     meta.newestUpdatedAt !== null
-      ? interpolate(s.updatedMeta, {
+      ? interpolate(meta.sourcesCount === 1 ? s.updatedMetaOne : s.updatedMeta, {
           ago: formatRelative(meta.newestUpdatedAt, numberLocale, nowMs),
           n: formatNumber(meta.sourcesCount, numberLocale, { maximumFractionDigits: 0 }),
         })

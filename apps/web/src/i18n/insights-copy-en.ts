@@ -2729,6 +2729,8 @@ export const insightsCopyEn = {
     balanceCard: {
       // A. Header — the "Updated {ago} · {n} sources" meta line.
       updatedMeta: 'Updated {ago} · {n} sources',
+      // The honest singular: one source reads "1 source".
+      updatedMetaOne: 'Updated {ago} · {n} source',
       // B. Verdict phrases (the largest text in the card). {asset} is the
       // metal's name, lower case inside an English phrase (spec 04 §4).
       verdict: {

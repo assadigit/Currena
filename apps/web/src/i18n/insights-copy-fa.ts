@@ -1519,6 +1519,8 @@ export const insightsCopyFa: InsightsCopy = {
     balanceCard: {
       // الف) سربرگ — خط «به‌روزرسانی {ago} · {n} منبع».
       updatedMeta: 'به‌روزرسانی {ago} · {n} منبع',
+      // فارسی جمع را از شمارش نمی‌گیرد؛ کلید تک‌تعداد برای هم‌ارزی نوع EN است.
+      updatedMetaOne: 'به‌روزرسانی {ago} · {n} منبع',
       // ب) جمله‌های حکم (بزرگ‌ترین متن کارت). {asset} نام فلز است.
       verdict: {
         slight_against: 'کمی به ضرر {asset}',

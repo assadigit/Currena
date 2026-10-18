@@ -113,7 +113,7 @@ describe('I17 copy parity (en ↔ fa)', () => {
     for (const key of Object.keys(en.balanceCard.verdict) as (keyof typeof en.balanceCard.verdict)[]) {
       expect(sorted(tokens(fa.balanceCard.verdict[key]))).toEqual(sorted(tokens(en.balanceCard.verdict[key])));
     }
-    for (const key of ['updatedMeta', 'subline', 'capSupports', 'capPressures', 'beamAlt', 'grpNeutral', 'grpUnread', 'ctxLabel', 'ctxChange', 'asOf', 'lastKnown'] as const) {
+    for (const key of ['updatedMeta', 'updatedMetaOne', 'subline', 'capSupports', 'capPressures', 'beamAlt', 'grpNeutral', 'grpUnread', 'ctxLabel', 'ctxChange', 'asOf', 'lastKnown'] as const) {
       expect(sorted(tokens(fa.balanceCard[key]))).toEqual(sorted(tokens(en.balanceCard[key])));
     }
     for (const key of Object.keys(en.balanceCard.flip) as (keyof typeof en.balanceCard.flip)[]) {

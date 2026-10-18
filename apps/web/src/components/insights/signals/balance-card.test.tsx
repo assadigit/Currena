@@ -159,6 +159,11 @@ describe('structure (acceptance B)', () => {
     // newest updatedAt = 11:48Z, NOW = 12:00Z → "12 minutes ago"; distinct
     // source names: 5 driver inputs + the gold price = 6.
     expect(screen.getByText('Updated 12 minutes ago · 6 sources')).toBeTruthy();
+    // One distinct source reads the honest singular.
+    const oneSource = liveReadings().map((r) => ({ ...r, sourceName: 'FRED' }));
+    cleanup();
+    renderCard({ 'real-yield': 'against', dollar: 'against', stress: 'neutral', expectations: 'neutral' }, { readings: oneSource });
+    expect(screen.getByText('Updated 12 minutes ago · 1 source')).toBeTruthy();
   });
 
   it('the mobile lists exist for the <520px container query (names + values)', () => {
