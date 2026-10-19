@@ -80,11 +80,11 @@ Write `docs/insights/CURRENT_STATE_REPORT.md` for items S-01 to S-08 of `INSIGHT
 
 ### Phase 8: documents
 Create in `docs/insights/`:
-- [ ] `FIX_REPORT.md`: every ID in the fix spec and defects file, with done, partly done or not done, and how you checked it.
-- [ ] `STEP3_REPORT.md`: as in `INSIGHTS_STEP3_SPEC.md` section 10, including the source table and the "Fetched sources" section.
-- [ ] `UI_REPORT.md`: every UI-xx item, the screenshots, the U-xx results, and whether the gauge fallback was used.
-- [ ] `MAINTENANCE.md`: the owner's weekly routine, and the steps to update every manual-entry value with the next release dates.
-- [ ] `OWNER_SETUP.md`: only the steps the owner must do by hand, with exact commands: setting `INSIGHTS_OWNER_TOKEN`, any missing API key, reviewing the branch, deploying the preview, deploying to production after approval, rolling back, using the panic switch, enabling or disabling a source, running the self-check, producing a full export.
+- [x] `FIX_REPORT.md`: every ID in the fix spec and defects file, with done, partly done or not done, and how you checked it.
+- [x] `STEP3_REPORT.md`: as in `INSIGHTS_STEP3_SPEC.md` section 10, including the source table and the "Fetched sources" section.
+- [x] `UI_REPORT.md`: every UI-xx item, the screenshots, the U-xx results, and whether the gauge fallback was used.
+- [x] `MAINTENANCE.md`: the owner's weekly routine, and the steps to update every manual-entry value with the next release dates.
+- [x] `OWNER_SETUP.md`: only the steps the owner must do by hand, with exact commands: setting `INSIGHTS_OWNER_TOKEN`, any missing API key, reviewing the branch, deploying the preview, deploying to production after approval, rolling back, using the panic switch, enabling or disabling a source, running the self-check, producing a full export.
 
 ### Phase 9: final verification
 - [ ] Run all tests and the self-check. All must pass or be recorded as blocked with a reason.

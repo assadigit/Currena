@@ -1,130 +1,159 @@
-# OWNER_SETUP.md — the exact steps the owner must do by hand
+# OWNER_SETUP.md — the exact steps the owner must do by hand (v3)
 
 Nothing else. Every command assumes the repo root and `pnpm` installed
-(`npm i -g pnpm@10.34.5`).
+(`npm i -g pnpm@10.34.5`). Nothing below was done by the agent: no deploy,
+no secret, no production change was made on this branch.
 
-## 1. Set the Insights password (REQUIRED before the gated deploy)
-
-The gate fails closed until this exists (every /api/insights* route answers
-401 — even for you):
-
-```bash
-cd apps/api
-npx wrangler secret put INSIGHTS_PASSWORD
-# paste a long random password when prompted; do NOT commit it anywhere
-```
-
-Local development reads `.dev.vars` (gitignored):
-
-```bash
-echo 'INSIGHTS_PASSWORD=choose-a-dev-only-password' >> apps/api/.dev.vars
-```
-
-To sign in: open the Insights page, enter the password in the Private page
-box. The session lasts 12 hours, then the page asks again.
-
-## 2. Review the branch
+## 1. Review the branch (start here)
 
 ```bash
 git fetch origin
 git checkout insights-rebuild
-corepack pnpm install --frozen-lockfile
-corepack pnpm -r test          # 1,389 tests, all green
-corepack pnpm -r typecheck
-corepack pnpm run lint
-corepack pnpm run copy:audit
-corepack pnpm run build        # includes the T-15 site-mode check
-node scripts/check-bundle-budget.mjs
-corepack pnpm --filter @currena/insights selfcheck   # writes SELF_AUDIT.md
+git pull            # the branch is pushed; a PR named "Insights rebuild" is open — do NOT merge it from the agent's side; review then merge when satisfied
+pnpm install --frozen-lockfile
+pnpm -r test          # 1,637 tests, all green
+pnpm -r typecheck
+pnpm run lint
+pnpm run copy:audit   # clean (new fa strings are queued needs-review — see §9)
+pnpm run build        # includes the T-15 site-mode check + the bundle budgets
+pnpm --filter @currena/web run visual:fixtures
+pnpm --filter @currena/web run visual:test      # 19/19 (U-14 wired in §6's boot)
+pnpm --filter @currena/insights selfcheck       # runs everything incl. the unit suites; writes SELF_AUDIT.md + the dated export
 ```
 
-Read the three reports: `docs/insights/FIX_REPORT.md`,
-`docs/insights/STEP3_REPORT.md`, `docs/insights/SELF_AUDIT.md`.
+Read the four reports: `docs/insights/FIX_REPORT.md`,
+`docs/insights/STEP3_REPORT.md`, `docs/insights/UI_REPORT.md`,
+`docs/insights/SELF_AUDIT.md` (+ `RISK_REGISTER.md` for the source
+decisions that are YOURS alone).
 
-## 3. Deploy the preview (staging)
+## 2. Set the owner token (REQUIRED for the export and the live panic switch)
 
-The branch deploys the SAME worker with its own name (never production):
+```bash
+cd apps/api
+npx wrangler secret put INSIGHTS_OWNER_TOKEN
+# paste a long random token; do NOT commit it anywhere
+```
+
+- Without it: the export tool answers 403 `owner_disabled` (by design) and
+  the live mode flip is unavailable — the env-var panic switch (§5) still
+  works.
+- With it: the page's Tools menu → "Owner sign-in" accepts the token (it is
+  sent once to `POST /api/insights/owner/session`, stored only as a 12-hour
+  HttpOnly cookie, never logged), unlocking the export menu including the
+  server-side full audit export.
+
+## 3. Keep the login password alive (the private gate)
+
+`INSIGHTS_PASSWORD` is already set on the Worker (the v2 handover). It
+matters whenever the panic switch (§5) arms the private gate:
+
+```bash
+cd apps/api
+npx wrangler secret list          # confirm INSIGHTS_PASSWORD exists
+npx wrangler secret put INSIGHTS_PASSWORD   # only if you want to rotate it
+```
+
+## 4. Any missing API key?
+
+None are missing for the Insights pipeline: FRED/ABS/RBA/ECB/Frankfurter/
+World Bank/Alternative.me are keyless; `EODHD_API_TOKEN` (markets board)
+and `GH_INGEST_DISPATCH_TOKEN` (the watchdog) are already set;
+`INSIGHTS_OWNER_TOKEN` is the ONE new secret (§2). Local development reads
+`.dev.vars` (gitignored):
+
+```bash
+echo 'INSIGHTS_PASSWORD=choose-a-dev-only-password' >> apps/api/.dev.vars
+echo 'INSIGHTS_OWNER_TOKEN=choose-a-dev-only-token' >> apps/api/.dev.vars
+```
+
+## 5. The panic switch (M-5) — flip the page private in minutes
+
+```bash
+# (a) no-redeploy, from the owner tools (needs the §2 token):
+#     Tools → Owner sign-in → the mode control (POST /api/insights/mode)
+# (b) env-var (survives everything, needs a deploy):
+cd apps/api
+npx wrangler deploy --var PANIC_PRIVATE:true     # every Insights data endpoint answers 401 within one refresh cycle
+npx wrangler deploy --var PANIC_PRIVATE:false    # back to public (ACCESS_MODE defaults to public)
+```
+
+`ACCESS_MODE=private` does the same as a var; `SITE_MODE` still works
+(private re-arms the gate). Flipping via (a) takes effect within ~60 s
+(one cached read); via (b) at the next deploy.
+
+## 6. Boot it locally and see it (including the U-14 export check)
+
+```bash
+pnpm --parallel dev
+# api: wrangler dev on :8787 · web: vite on :5173
+```
+
+Then in another terminal (or your browser): open http://localhost:5173,
+switch the app to فارسی too, and try:
+`GET http://localhost:8787/api/insights/export` without a token → 401;
+with the owner token (`Authorization: Bearer <token>`) → the audit export.
+`GET /api/insights` unauthenticated in public mode → the public projection;
+set `PANIC_PRIVATE=true` in `apps/api/.dev.vars`, restart → 401 everywhere
+until you sign in.
+
+## 7. Deploy the preview (staging) — never production from the agent's side
 
 ```bash
 cd apps/api
 npx wrangler versions upload --name currena-api-preview
 ```
 
-(Or skip this and review locally: `corepack pnpm --filter @currena/api dev`
-with `.dev.vars` set — the gate then works on http://localhost:8787.)
-
-## 4. Deploy to production AFTER your approval
+## 8. Deploy to production AFTER your approval
 
 ```bash
 git checkout insights-rebuild
-corepack pnpm run build
+pnpm run build
 cd apps/api
-npx wrangler deploy
+npx wrangler deploy          # currena-api
+cd ../markets
+npx wrangler deploy          # currena-markets (its code DID change on this branch: honest-UA fetches)
 ```
 
-Markets/fx worker (only if its code changed on the branch — it did NOT in
-this run): `cd apps/markets && npx wrangler deploy`.
-
-## 5. Roll back
+## 9. Roll back / enable-disable a source / run the self-check / the export
 
 ```bash
-cd apps/api
-npx wrangler rollback            # lists deployments, re-activates the previous one
+cd apps/api && npx wrangler rollback                 # the previous deployment
+# enable/disable a source (the M-6 kill switch): edit packages/insights/src/sources.ts
+#   → set that row's `enabled` (and for a NEW L2 source, set owner_accepts to yes
+#   in docs/insights/RISK_REGISTER.md YOURSELF — the agent never flips it)
+pnpm registry:generate                                # regenerates the registry + the hidden set
+pnpm -r test                                          # the pin tests re-verify everything
+pnpm --filter @currena/insights selfcheck             # SELF_AUDIT.md + the dated full export
+# on the page (owner): Tools → Owner sign-in → "Download data" → any format,
+# or the server audit export (md/csv/json) — it carries the E-23 columns
+# incl. level, owner accepts, source enabled, fetch method.
 ```
 
-## 6. Run the self-check
+## 10. Rotate the API tokens (strongly recommended — the same keys have
+## crossed many sessions, including this one's chat handover)
 
-```bash
-corepack pnpm --filter @currena/insights selfcheck
-# → docs/insights/SELF_AUDIT.md + docs/insights/exports/currena-insights-full-<UTC date>.md
-```
-
-The scheduled GitHub Action (`insights-selfcheck`) runs it daily at 04:50
-UTC and shows red on any failing test. It publishes nothing.
-
-## 7. Produce a full export for an audit
-
-Signed in on the page: Tools menu → expand "Show hidden indicators",
-"Show full table" and the full calendar → header → "Download data" →
-Markdown (.md). The file carries the E-23 audit columns and the E-24 peak
-columns; every indicator appears with source, dates, licence and rule.
-
-## 8. Rotate the API tokens (strongly recommended — sixth session with the same keys)
-
-The Cloudflare API token, the GitHub token and the EODHD key have now
-crossed several sessions. Rotate them at your leisure:
-
-- Cloudflare: dash.cloudflare.com → My Profile → API Tokens (roll the
-  ingest token; update the GitHub Action secrets `CLOUDFLARE_API_TOKEN`,
-  `CLOUDFLARE_ACCOUNT_ID`, `INSIGHTS_KV_NAMESPACE_ID` if the token changes).
+- Cloudflare: dash.cloudflare.com → My Profile → API Tokens; update the
+  GitHub secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`,
+  `INSIGHTS_KV_NAMESPACE_ID` if the token changes.
 - GitHub: Settings → Developer settings → Personal access tokens.
 - EODHD: your dashboard → API key.
-- Also set the new `INSIGHTS_PASSWORD` (step 1) as part of this pass.
+- Set the new `INSIGHTS_OWNER_TOKEN` (§2) as part of this pass.
 
-## 9. Known items the owner may want to fix
+## 11. The fa copy review (a human step the repo's own workflow requires)
 
-- `.github/workflows/ci.yml` line 17 reads `branches: ain]` (a stray edit —
-  should be `[main]`), so pushes to main do NOT trigger CI (PRs still do).
-  One-line fix, left to you because the runbook forbids changes beyond the
-  specs.
-- SITE_MODE: the owner decreed PUBLIC on 2026-10-19 (“make it public”) —
-  it is now 'public' in apps/api/wrangler.jsonc and the T-15 gate passes
-  (the generated data/site-mode-overrides.json hides the 24 non-'yes'
-  indicators + the EODHD/Yahoo boards; scripts/check-site-mode.mjs
-  verifies). Flipping SITE_MODE back to 'private' re-arms the
-  INSIGHTS_PASSWORD gate instantly (the secret stays on the Worker).
+`pnpm copy:audit` lists the new Persian strings queued `needs-review`
+(the hero, balance, relationship, About and owner-tools copy from this
+rebuild). View the page in فارسی (§6), then record the approval:
 
-## 10. STANDING ORDER — auto push, commit and deploy (owner decree 2026-10-19c)
+```bash
+node scripts/update-persian-copy-manifest.mjs --ids <id1,id2,…> \
+  --status processed --round <your-round-name> --reference <your review note>
+pnpm copy:audit    # must stay clean
+```
 
-The owner, after approving the round-44 meter grading: "Push, COmmit,
-Deploy. From now on, auto push commit and deploy." From this point on:
+## 12. NOTE — this round deliberately did NOT auto-ship
 
-- Every completed round/change ships WITHOUT a per-round approval gate:
-  gates green → commit → push `insights-rebuild` → fast-forward `main`
-  → deploy currena-api (markets only if it changed) → post-deploy
-  smoke + DOM verification → docs wrap-up, all in one pass.
-- The per-change discipline stays: tests/typecheck/lint/budgets MUST
-  pass before any push; the deploy smoke MUST verify before the
-  session reports done; evidence still lands in docs/evidence/.
-- The credentials still arrive per-session in chat (§6) — the standing
-  order covers WHEN to deploy, not the secrets themselves.
+The 2026-10-19c standing order ("auto push, commit and deploy") is
+OVERRIDDEN by this round's instructions: the v3 runbook and the start
+prompt both say never deploy to production and never push main from the
+agent session. The branch is pushed and the PR is open; §8 is yours.

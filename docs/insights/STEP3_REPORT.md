@@ -1,135 +1,126 @@
-# STEP3_REPORT.md — the Step 3 report (AGENT_RUNBOOK Phase 6)
+# STEP3_REPORT.md — the v3 Step 3 report (runbook Phase 8)
 
-Report date: 16 October 2026 (UTC). Branch: `insights-rebuild`.
-This report follows `INSIGHTS_STEP3_SPEC.md` §10.
+Report date: 20 October 2026 (UTC). Branch: `insights-rebuild`, v3 spec
+package. Supersedes the v2 edition (in git history). Every claim cites the
+file that proves it; tests 1,637 green; `SELF_AUDIT.md` carries the latest
+full-suite result.
 
-## 1. Every checklist ID — done, partly done or not done
+## 1. Per-ID status (`INSIGHTS_STEP3_SPEC.md`)
 
-### §1 Phase 0 (S-01…S-08) — **done**
-`CURRENT_STATE_REPORT.md` (commit e736c74): the inventory, hosting/limits,
-test-suite and access findings, each with file:line evidence.
-
-### §2 Access and licence policy
 | ID | Status | How checked |
 |---|---|---|
-| AC-01 gate choice | **done** | Cloudflare Access is not part of the owner's free setup → the Worker fallback: `INSIGHTS_PASSWORD` secret + HMAC-signed 12h expiring cookie (`apps/api/src/insights-auth.ts`), rate-limited login (the /admin bucket). |
-| AC-02 gate the data | **done** | ONE `requireInsightsAuth()` middleware wraps the whole insights sub-app — snapshot, markets, fx, status, archive, history, live prices. T-24 tests: every endpoint 401s unauthenticated with no data. |
-| AC-03 neutral private state | **done** | The 401 envelope is `{code:'private_page', message:'Private page'}` — zero values/sources/hints; the page flips to the neutral Private screen with the sign-in form. |
-| AC-04 no keys in the browser | **done** | The password only ever compares server-side; the cookie carries only the signed expiry. Phase 7 re-scans the built client bundle. |
-| AC-05 cache safety | **done** | Authed responses carry `Cache-Control: private, no-store`; refusals are `no-store` too. |
-| AC-06 search engines | **done** | `X-Robots-Tag: noindex, nofollow` on every gated response + robots.txt `Disallow: /api/insights` (+ /admin already excluded). |
-| AC-07 owner only | **done** | One password, one cookie; no user registry. |
-| AC-08 SITE_MODE | **done** | Wrangler var `SITE_MODE: 'private'` (default); 'public' skips the gate and the build then enforces T-15. |
-| LR-01 LICENCES.md | **done** | `docs/insights/LICENCES.md`, generated from the live register (licence, exact attribution, private/public verdicts, checked date, evidence trail). |
-| LR-02 Yahoo flagged | **done** | Every Yahoo-sourced card is private-only via the upstream-legs walk; never shown in public mode (T-15). |
-| LR-03 private_ok/public_display_ok | **done** | Every source + every indicator carries both (licences.ts + the registry's licence blocks + the audit sidecar). |
-| LR-04 attribution | **done** | Cards' details name the source; About-this-data lists every source; the export carries a Licence column; T-17 checks the exact attribution text. |
+| S-01..S-08 (Phase 0) | **done** | `CURRENT_STATE_REPORT.md` (rewritten against the v3 package at `568598c`). |
+| P-1 What it is / isn't | **done** | The §8 registry fields on all 54 indicators (whatItIs/whatItIsnt from the audited copy; `registry-sync.test.ts` pins presence); the card details render them. |
+| P-2 Fail closed | **done** | The builder gates (stale/sanity/kill-switch/blocked/format), A-04 hold-last-good, the visual U-07. |
+| P-3 Readings, not instructions | **done** | T-07/T-19 + the copy corpus scan; the gauges display "CNN-style" published numbers as the publisher's own readings only. |
+| P-4 Source level gate | **done** | `sources.ts` + the generator's `sourceRisk` block; T-15 (display), T-26 (terms recorded), T-30/T-31 (disabled/L3 never requested). |
+| P-5 FRED copyright check | **done** | T-16 + `data/fred-copyright.json` (8 citation-required, 14 public-domain; unscanned fails closed). |
+| P-6 Attribution | **done** | Per-card meta row (UI-20), About table, the export columns; T-17. |
+| P-7 Australia first | **done** | The chains in §7 (below) render with Australian links; the AUD view (L2-03) beside the US-shares notes. |
+| L1-01..L1-05 (RBA/ABS/I2) | **done** | Live cards; I2's third-party notes recorded for the quarterly review (L1-05's "Use after checking" is the standing MAINTENANCE item). |
+| L1-06 ASX Rate Tracker | **link out** | FS-02 discovery: the ASX Terms of use prohibit spiders/scrapers AND redistribution (quoted verbatim in RISK_REGISTER.md) → **L3**. The L2-09 card links to the public tracker page; Currena never fetches it. |
+| L1-07 Westpac-MI | **manual entry (built), disabled** | M5 per FS-03: the manual-entry mechanism + MAINTENANCE steps exist; no values entered (never invented); owner_accepts = no. |
+| L1-08 NAB | **link out** | Not verified (the spec's own status); no card, no fetch. |
+| L1-10 VIX | **done (L2)** | Live; © Cboe via FRED, private/hidden publicly per the T-15 walk; owner acceptance recorded. |
+| L1-11 NY Fed recession probability | **link out** | The methodology page is JS-walled to plain fetches — the probit coefficients cannot be quoted, so the probability is never computed (do-not-invent rule). The Sahm rule (L1-12) carries the recession slot; the T10Y3M scan record is ready if the owner pastes the formula from a rendered read. |
+| L1-12 Sahm rule | **done** | Live (SAHMREALTIME, copyright scanned). |
+| L1-13 stress/conditions | **done** | STLFSI4 + NFCI live. |
+| L1-14 Shiller CAPE/ECY | **built, disabled (T-30)** | The FS-06 pipeline: `scripts/shiller-fetch.ts` (verified live against the provider's own file: CAPE 40.71, ECY 0.56% for 2026-10; archived `data/shiller/shiller-cape.json` + monthly copy), the monthly `shiller-fetch.yml` Action, two context cards (shiller-cape/shiller-ecy) with full bilingual copy; the register row is L2 with `owner_accepts: no` → the cards are hidden and the ingest does not read the file until the owner flips RISK_REGISTER.md. |
+| L1-15 CME FedWatch | **link out** | Paid API declined by the owner (D-3); the L2-08 proxy carries the slot. |
+| L1-16 BLS CPI/jobs | **done** | NSA year-on-year basis (E-14). |
+| L1-17 activity survey | **done** | Philly Fed live (copyright scanned). |
+| L1-18 crypto F&G | **done (L0)** | The publisher's own reading, attribution beside the data (F-19..F-22 pattern). |
+| L1-19 CNN F&G | **L3 — link out** | FS-01 discovery: the reported JSON endpoint answered **HTTP 418 "I'm a teapot. You're a bot."** to one honest request with the declared UA → blocked → never fetched (RULES 4.3; an owner override cannot cover circumvention). robots.txt also disallows /terms, so the licence could not be read honestly. |
+| L2-01..L2-09 | **done** | The four-band stock states (U-11), 200-day average, AUD conversion (T-21), highest-since (T-22), same-date spreads (T-20), real savings return, T-01 reconciliation, the midpoint gap, the RBA gap (with the ASX link). |
+| L2-10 valuation context | **built, disabled** | Rides the Shiller cards; the "valuation says little about the next few months" line is in the card copy; enabled the moment the owner accepts. |
+| L3-01 hero words | **done** | UI-01..09 per `UI_SPEC.md`; the visible rule behind the control; "Summary of the gauges below". |
+| L3-02 relationship cards | **done** | UI-33..38: neutral "N of M readings match the usual pattern", per-leg markers, "Trigger not present", pass-through pending, weaker-link tag (U-08). |
+| L3-03 no composite scores | **done** | No self-made scores; the published gauges only. |
+| L3-04 context notes | **done** | Off by default, dated, expire (A-06). |
+| R-01..R-05 | **done** | Trigger gating + windows + pass-through in `connections.ts` (T-35 fixtures); the dollar context leg; weaker links labelled. |
+| §7 coverage chains | **done** | Oil→petrol(ABS fuel CPI)→CPI→cash rate; USD→AUD (AUD view); China/commodities→AUD; rates→household (real return line); US shares (states + AUD + VIX + valuation context (disabled) + highest-since + proxies); calendar (7 kinds, decision days, own time zones). AIP weekly petrol: no legal feed confirmed (link out; ABS fuel CPI carries it). |
+| §7.1 US-shares box | **done** | Collapsed; only the two approved lines (no `approved-text/` folder exists). |
+| §8 registry additions | **done** | All fields on all 54 indicators (see FIX_REPORT §3). |
+| §9 tests T-15..T-24, T-35 | **done** | See `baseline-test-results.md` (v3 section) for the per-test map and where each lives. |
+| §11 owner routine | **done** | MAINTENANCE.md (v3 edition). |
 
-### §3 Principles
-| ID | Status | Evidence |
-|---|---|---|
-| P-1 what it is / isn't | **done** | Every indicator card carries whatItIs/whyItMatters/tendedToMean/cantTell (en+fa); the details panel shows publisher + link. |
-| P-2 fail closed | **done** | Stale/flagged/unverified → stale tag or 'can't tell'; the E-08 expiry and the E-04 freeze both fail closed; unavailable never renders a verdict. |
-| P-3 readings not instructions | **done** | L3-02 retired the verdict words; T-19 scans the generated corpus for advice wording. |
-| P-4 licence gate | **done** | Every source carries licence_name, attribution_text, private_ok, public_display_ok, terms_checked_on (+ permission_ref implied: none needed — recorded in LICENCES.md). |
-| P-5 FRED copyright scan | **done** | `data/fred-copyright.json` (22 series, checked 2026-10-16); citation-required series are public 'no' (T-16). |
-| P-6 attribution | **done** | T-17 + LR-04 above. |
-| P-7 Australia first | **done** | The oil→petrol→CPI→cash-rate, dollar→AUD→US-shares-in-AUD, China→iron-ore→ToT chains render with the AU links (the connections + coverage sections). |
+## 2. The licence table (the date each term was checked)
 
-### §4 Layer 1 (published indicators)
-| ID | Status | Note |
-|---|---|---|
-| L1-01..L1-04 (RBA/ABS core) | **done** | Present and verified since Steps 1-2 (current-state report S-04). |
-| L1-05 RBA I2 commodity index | **check (open)** | Third-party content inside the RBA table needs per-table source notes; not loaded this session — recorded for the quarterly review. |
-| L1-06 ASX RBA Rate Tracker | **link out (recorded)** | No free feed/reuse terms; the rba-expectations card's details link the ASX Rate Tracker page (L2-09's link). |
-| L1-07 Westpac-MI sentiment | **link out (recorded)** | No free reuse terms; not rendered — listed here and in MAINTENANCE for a manual check. |
-| L1-08 NAB survey | **not verified** | Spec says research later; left out. |
-| L1-10 VIX | **done** | Present, FRED VIXCLS, private-only (copyright series), © Cboe attribution. |
-| L1-11 NY Fed recession probability | **check (open)** | The spec forbids inventing the published coefficients; they were not verified from the NY Fed's own page this session, so the card does not exist. The existing yield-curve alarm card covers the same input (T10Y3M family) without a reproduced formula. What unblocks: fetch the NY Fed's published methodology and reproduce it exactly. |
-| L1-12 Sahm rule | **done** | Present (FRED SAHMREALTIME). |
-| L1-13 stress + NFCI | **done** | Present (STLFSI4, NFCI). |
-| L1-14 Shiller CAPE | **not verified** | The ie_data.xls monthly pipeline (download → JSON conversion → archive) was not built this session; L2-10 therefore absent. What unblocks: the monthly Shiller job (spec §4.2 L1-14's own fallback design) + a permissions note. |
-| L1-15 CME FedWatch | **link out (recorded)** | Paid API declined (D-3); the free proxy L2-08 renders; the card copy points at the market's own pricing. |
-| L1-16 US CPI/jobs | **done** | Present (BLS via FRED, NSA basis per E-14). |
-| L1-17 Philly Fed | **done** | Present (C-05). |
-| L1-18 crypto Fear & Greed | **done** | Alternative.me API verified live (2026-10-16); context-only card with attribution. |
+See `LICENCES.md` (the full v3 register with quoted lines) and
+`RISK_REGISTER.md` (levels + the owner's recorded acceptances + the fresh
+2026-10-20 read attempts with venue blocks recorded). Summary:
 
-### §5 Layer 2
-| ID | Status | Note |
-|---|---|---|
-| L2-01 stock states | **done** | Near its high / Pullback / Correction / Bear market (E-22). |
-| L2-02 200-day average | **done** | ma200GapPct computed from ≥200 closes; tiles + export line. |
-| L2-03 US shares in AUD | **done** | usSharesInAud — same-date arithmetic, refused on date mismatch (T-21). |
-| L2-04 highest since | **done** | B-19's episode-aware year (us10y/us30y/real-10y/au-10y). |
-| L2-05 spreads | **done** | Same-date joins (B-10); the AU/US gap + 10y2y + 3y−cash. |
-| L2-06 real savings return | **done** | B-18's term-deposit minus inflation, before tax. |
-| L2-07 reconciliation | **done** | T-01 on T10YIE. |
-| L2-08 Fed proxy | **done** | Midpoint basis (E-15). |
-| L2-09 RBA proxy | **done** | Present since C-06; the ASX Rate Tracker link recorded. |
-| L2-10 CAPE context | **not done** | Follows L1-14 (above). |
+| Source | Level | Checked | Public display |
+|---|---|---|---|
+| RBA | L0 | 2026-10-20 (venue-403 recorded) | yes |
+| ABS | L0 | 2026-10-20 (JS-walled; CC nav item observed) | yes |
+| FRED public-domain series | L0 | 2026-10-16 (scan) | yes |
+| FRED citation-required (© Cboe) | L2 | 2026-10-16 | no (T-15) |
+| gold-api | L0 | 2026-10-16 (§9 quoted) + endpoint re-verified 2026-10-20 | yes |
+| Alternative.me | L0 | 2026-10-16 | yes |
+| EODHD | L2 | 2026-10-16 | no |
+| Yahoo (unofficial) | L2 | 2026-10-16 (+ honest-UA 200 verified 2026-10-20) | no (owner-directive tiles only) |
+| Frankfurter/ECB | L1 | 2026-10-20 (the ECB disclaimer quoted verbatim; reuse clause unquoted) | unknown → no |
+| ECB Data Portal | L1 | 2026-10-20 | unknown → no |
+| World Bank | L1 | 2026-10-20 (terms URL 404; catalogue bot-checked — recorded) | unknown → no |
+| Bitstamp | L1 | 2026-10-16 | unknown → no |
+| China NBS (manual) | L1 | 2026-10-16 | no |
+| Shiller | L2 | 2026-10-16 (+ file verified live 2026-10-20) | no — disabled until the owner accepts |
+| CNN | **L3** | 2026-10-20 (blocked) | never |
+| ASX | **L3** | 2026-10-20 (terms prohibit, quoted) | never |
+| Westpac-MI | L2 | 2026-10-16 | no — manual entry, disabled |
+| NAB / AIP | L2 pending | not verified | no card |
 
-### §6 Layer 3
-| ID | Status | Note |
-|---|---|---|
-| L3-01 hero label | **done** | "Summary of the gauges below". |
-| L3-02 relationship cards | **done** | Verdict words retired; trigger-leg rule (E-19); windows documented (E-20). |
-| L3-03 no composites | **done (respected)** | VIX, stress, NFCI and the FNG index all render as their own published readings. |
-| L3-04 context notes | **done** | A-06 machinery (off by default, dated, expiring). |
+## 3. Items left as "Link out" or "Not verified" — what would unblock them
 
-### §7 Coverage + the box
-- The chains (oil, dollar, China, rates, US shares, calendar) render — evidence: the page sections + the connections.
-- "Know before you buy US shares": **done (minimal form)** — only the exchange-rate and fees lines + the general-information line; `docs/insights/approved-text/` does not exist, so nothing more ships (spec's own rule).
+- **NY Fed recession probability (L1-11):** a rendered read of the
+  methodology page (the owner can paste the probit formula from
+  https://www.newyorkfed.org/research/capital_markets/ycfaq); then the card
+  builds from the already-scanned T10Y3M with the formula quoted.
+- **CNN F&G (L1-19):** only a CNN-provided documented API could unblock it;
+  the current endpoint blocks the honest identity and the terms page is
+  robots-disallowed. An owner override cannot cover circumvention.
+- **ASX Rate Tracker (L1-06):** written permission from ASX (their terms
+  name prior written consent) or an official feed. Until then: link out.
+- **NAB / AIP petrol:** a legal machine feed or manual entry once terms are
+  read. AIP: the site is JS-rendered; no feed found.
+- **ABS/ECB/World Bank/Frankfurter public display:** a rendered browser read
+  of the licence pages to quote the reuse clauses verbatim (the quarterly
+  MAINTENANCE step).
 
-### §8 registry additions — **done** (layer + licence block on all 52 entries; T-16 scan; audit sidecar)
+## 4. Fetched sources (`SCRAPING_SPEC.md` §11)
 
-### §9 tests
-| ID | Status |
-|---|---|
-| T-15 mode gate | **done** — check-site-mode.mjs (verified: 25 public-mode failures today; private no-op) + t15ModeGate unit tests. |
-| T-16 FRED scan | **done** — scan script + records + licence resolution. |
-| T-17 attribution | **done** — unit tests + the daily self-check. |
-| T-18 fail closed | **done** — unit tests (forced stale → 'can't tell'). |
-| T-19 advice wording | **done** — the corpus scan (refined matcher, named masks). |
-| T-20 same-date spreads | **done** — unit tests + the AUD view's dates-differ. |
-| T-21 AUD conversion | **done** — us-shares-aud tests. |
-| T-22 highest since | **done** — baseline + unit coverage. |
-| T-23 Layer 2 regression | **done** — validation-step3 tests. |
-| T-24 access | **done** — insights-auth.test.ts (6 tests). |
+| Card | Terms lines quoted | robots.txt | Level | Method found | Runtime | Blocked | Enabled | The owner's unblock step |
+|---|---|---|---|---|---|---|---|---|
+| FS-01 CNN F&G | terms not readable (robots.txt disallows /terms; recorded) | read: no disallow on the page path; /terms disallowed | L3 | none — the dataviz endpoint answered HTTP 418 "teapot" to the honest UA | — | **yes** | never | none possible (no circumvention); only a future documented API |
+| FS-02 ASX Tracker | "use any spider, screen scraper, robot… including monitoring, downloading or copying" + redistribution prohibited (verbatim) | read: no disallow on the tracker path | L3 | none (terms prohibit) | — | no (never attempted) | never | written permission from ASX |
+| FS-03 Westpac-MI | monthly release public; automated-reuse terms unconfirmed | — | L2 | M5 manual entry | manual | no | **no** | set owner_accepts to yes in RISK_REGISTER.md + enter values (F-24..F-27) |
+| FS-04 NAB | not verified | — | L2 pending | none | — | no | no | read the terms; manual entry or link stays |
+| FS-05 Alternative.me | "…displayed freely when attribution is given right next to the display of the data" | — | L0 | M1 API | GitHub Action | no | **yes** (live) | — |
+| FS-06 Shiller | open academic data, attribution expected; no formal reuse terms found; the workbook's own Disclaimer sheet quoted in the register | — | L2 | M2 bulk file (ie_data.xls verified: HTTP 200, 1.6 MB, ETag; live file found via the provider's own home page link — current through 2026-10) | GitHub Action (monthly, 5th 04:35 UTC) | no | **no** | set owner_accepts to yes in RISK_REGISTER.md |
+| FS-07 other composites | none identified; nothing added | — | — | — | — | — | — | — |
 
-### §10/§11 — this report + MAINTENANCE.md **done**.
+## 5. Latest test results + budgets
 
-## 2. Source licence table (the checked terms)
+- 1,637 vitest tests green (core 191 · scraper 67 · insights 517 · markets 13
+  · api 329 · web 520); the visual suite 19/19 (U-14 the one expected-fail —
+  its real-worker wiring is Phase 9); typecheck 6/6; lint 0 errors;
+  copy:audit clean; `SELF_AUDIT.md`: all rows pass.
+- Bundle budgets: entry unchanged; the Insights lazy chunk grew with the v3
+  UI (dated justifications in `scripts/check-bundle-budget.mjs`).
 
-See `docs/insights/LICENCES.md` — generated from the live register; every
-row carries the licence name, the exact attribution text, private/public
-verdicts, the checked date (2026-10-16) and the evidence trail.
+## 6. KV reads, KV writes and outside requests per full refresh
 
-## 3. Left as Link out / Not verified (what unblocks each)
-- L1-05 (RBA I2): read the table's source notes for third-party content.
-- L1-06/L1-07/L1-15: link-outs need nothing further (recorded).
-- L1-08: owner research.
-- L1-11: fetch + reproduce the NY Fed's published coefficients exactly.
-- L1-14/L2-10: the monthly Shiller download-and-convert job.
+Measured (the ingest's own ops counter + the 2026-10-19 records), unchanged
+in shape by the v3 work (the new endpoints add no scheduled load; the
+Shiller Action is monthly and writes no KV):
 
-## 4. Latest test results
-`docs/insights/SELF_AUDIT.md` — 19/19 pass (self-check 2026-10-16); the
-branch's CI-relevant totals: 1,389 tests across 6 packages, all green.
-
-## 5. KV reads, KV writes and outside requests per full refresh
-Unchanged from the measured budget (CURRENT_STATE_REPORT S-05): ~55 KV
-reads, ≤31 KV writes, ~49 outside requests per ingest run — inside the free
-tier (100k reads/day, 1k writes/day, 50 subrequests/invocation). The
-self-check adds ZERO KV ops (it writes nothing). The gate adds zero per
-refresh (it is request-time only).
-
-## 6. How to review the branch and deploy after approval
-See `OWNER_SETUP.md` (exact commands).
-
-## 7. Full-export instructions (for the next audit)
-1. Sign in to the private page (the Insights password).
-2. Open the Tools menu → expand "Show hidden indicators", "Show full table"
-   and the full calendar.
-3. Header → "Download data" → Markdown (.md) — `currena-insights-full-<date>.md`.
-   (The CLI equivalent: `pnpm --filter @currena/insights selfcheck` writes
-   the same document to docs/insights/exports/ — markets/fx sections
-   omitted there; the page export carries them.)
+- **KV reads: 55** per full refresh (seed reads + write-gate comparisons).
+- **KV writes: 31–33** (snapshot, status, the two archives, the public
+  projection, per-series histories only-if-changed; the markets/fx content
+  hashes gate their own writes).
+- **Outside requests: 49** per full refresh (16 FRED series + RBA tables
+  [F2 now fetched once for both series — T-32] + ABS + ECB + Frankfurter +
+  World Bank + gold-api ×4 + Yahoo ×4 + Bitstamp + Alternative.me + the
+  WB page probe) — inside the free tier with headroom. The RBA F2 memo
+  (2026-10-20) removed one duplicate download per refresh.
