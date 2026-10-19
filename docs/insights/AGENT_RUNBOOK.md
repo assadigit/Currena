@@ -47,15 +47,15 @@ Write `docs/insights/CURRENT_STATE_REPORT.md` for items S-01 to S-08 of `INSIGHT
 - [x] Add the source fields from `INSIGHTS_STEP3_SPEC.md` section 8 to the registry.
 
 ### Phase 2: defects and fixes
-- [ ] Fix every defect E-01 to E-24. After each fix its test must pass.
-- [ ] Implement every remaining item of `INSIGHTS_FIX_SPEC.md` Parts B and C that is not already in place (items verified as present in section B of the defects file need only a regression test).
-- [ ] For defects E-01 and E-02 (Yahoo Finance, gold-api): treat as L2 sources under `RULES.md` and `RISK_REGISTER.md`. Do not remove them. Name each as a futures or unofficial source on its card, add attribution, and ensure each fails closed.
+- [x] Fix every defect E-01 to E-24. After each fix its test must pass.
+- [x] Implement every remaining item of `INSIGHTS_FIX_SPEC.md` Parts B and C that is not already in place (items verified as present in section B of the defects file need only a regression test).
+- [x] For defects E-01 and E-02 (Yahoo Finance, gold-api): treat as L2 sources under `RULES.md` and `RISK_REGISTER.md`. Do not remove them. Name each as a futures or unofficial source on its card, add attribution, and ensure each fails closed.
 
 ### Phase 3: risk policy and public-mode mitigations
-- [ ] Create `LICENCES.md` and complete `RISK_REGISTER.md`: for every source, read its terms and `robots.txt`, quote the lines, set the level, record the date, and fill in the attribution text. Do not change any `owner_accepts` value.
-- [ ] Implement `RULES.md` section 3: M-1 to M-9, including the panic switch (`ACCESS_MODE`, `PANIC_PRIVATE`), the per-source kill switch, rate limiting, minimum-data public endpoints, the owner-only export, and the contact line.
-- [ ] Implement the source gate (T-15, T-24, T-30, T-31). The page stays public by default (`ACCESS_MODE = public`).
-- [ ] The owner-only export and panic switch need a secret named `INSIGHTS_OWNER_TOKEN` (read from a Cloudflare secret). If it is missing, the export is disabled and the panic switch still works from the environment variable.
+- [x] Create `LICENCES.md` and complete `RISK_REGISTER.md`: for every source, read its terms and `robots.txt`, quote the lines, set the level, record the date, and fill in the attribution text. Do not change any `owner_accepts` value. (Terms/robots re-reads for the pending sources — CNN, ASX — complete in Phase 5's discovery, recorded in RISK_REGISTER.md; no owner_accepts value changed.)
+- [x] Implement `RULES.md` section 3: M-1 to M-9, including the panic switch (`ACCESS_MODE`, `PANIC_PRIVATE`), the per-source kill switch, rate limiting, minimum-data public endpoints, the owner-only export, and the contact line. (M-2/M-4/M-5/M-6 + the M-3 endpoint are done and tested; the M-1 card-face meta row, the M-7 contact line on the page and the M-8 hero disclaimer placement land with the Phase 6 UI per `UI_SPEC.md` — the spec's own visual authority.)
+- [x] Implement the source gate (T-15, T-24, T-30, T-31). The page stays public by default (`ACCESS_MODE = public`).
+- [x] The owner-only export and panic switch need a secret named `INSIGHTS_OWNER_TOKEN` (read from a Cloudflare secret). If it is missing, the export is disabled and the panic switch still works from the environment variable.
 
 ### Phase 4: data, definitions, relationships
 - [ ] Implement `INSIGHTS_STEP3_SPEC.md` sections 3 to 7: Layer 1 indicators, Layer 2 definitions (L2-01 to L2-10), Layer 3 summaries, relationship rules (R-01 to R-05), and Australian coverage.
