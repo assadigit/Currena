@@ -73,3 +73,18 @@ typecheck 6/6 packages · lint 0 errors (15 baseline advisories) ·
 1,603 tests green (the three panel guards now exercise the disclosure
 end-to-end) · copy:audit clean (no new strings) · build OK · budgets held
 (entry 295.29/88.81 vs 296/89.5; Insights 658.10/157.49 vs 659/158.00).
+
+## Production (currena.ir, after the 0230f09b deploy)
+
+CI on main `557ff75`: completed/success (the full gate suite on GitHub's
+runner). Live pass on a fresh profile (SW cleared): EN desktop 1600 — the
+served chunks are exactly the `557ff75` build (`index-Uqbna-ql.js`,
+`Insights-D2o0OWve.js`); ONE signals panel on Global at 15px/700 with the
+production markets bullet ("World stock markets · Needs attention: 4 of
+16 markets are 10% or more below their 52-week high."), ONE collapsed
+toggle on Australia; the real toggle click expands the rule panel
+(`aria-expanded="true"`, kind `rule`, real rule text). fa — toggle
+«مبنای تعیین وضعیت هر حوزه» + signals «سیگنال‌های جهانی» correct. fa
+mobile 390 — the carousel opens on جهانی with the open signals panel,
+zero horizontal overflow. Zero page errors everywhere. Screenshot:
+`fa-mobile-390-PROD.png` in the same folder.

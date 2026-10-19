@@ -83,6 +83,47 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## CURRENT DEPLOYMENT — the rule panel tucks behind a low-key toggle; the world-signals panel becomes the hero's emphasized closing module (2026-10-19 (panels) owner round 3, worker 0230f09b)
+
+The owner's two directives on the closing explanation panels are LIVE on
+`/#/insights`, presentation-only: the word-choice RULE panel (Australia +
+Global's no-feed fallback) now hides behind a LOW-KEY TOGGLE — one quiet
+muted pill (`verdictRuleLabel` + a direction-neutral chevron, the "+n
+more" disclosure language, `aria-expanded`/`aria-controls` like
+GlossaryTip) whose click reveals the familiar tinted panel with its
+`data-ei-panel/-kind="rule"/-heading/-rule` hooks and copy byte-identical
+to the fidelity round's — while the Global SIGNALS panel, "probably one
+of the most important parts of the whole hero" (owner), steps UP in type:
+heading + bullets from the 12.5px caption tier to 15px bold
+`leading-relaxed`, the state mark 16/18 → 18/20, roomier bullet rhythm
+and panel padding (never toggled — always open; the pale-red surface,
+region-step ink and `data-attention-box`/bullets hooks stay exactly as
+approved). No new copy keys, no data logic, feed, count, ranking or
+aria-hook changes. Evidence + 8 screenshots:
+`docs/insights/economic-indicators-panels-verification.md`.
+
+- **Active worker**: currena-api **`0230f09b-b10e-4fdc-9e7a-544730950d79`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *` keep-warm
+  cron unchanged; currena-markets untouched — UI-only round).
+- **What it carries**: everything from 5164c21a (the fidelity round) +
+  the panels round (commit `557ff75`, fast-forward merged to main; CI
+  green on it — typecheck, lint, 1,603 tests, build, bundle budgets after
+  the documented 659.00/158.00 Insights bump (D-38), copy audit).
+- **Live-verified** (currena.ir, fresh profile, SW cleared): EN desktop
+  1600 — served chunks exactly the `557ff75` build (`index-Uqbna-ql.js`,
+  `Insights-D2o0OWve.js`), ONE signals panel on Global at 15px/700 with
+  the production markets bullet ("4 of 16 markets…"), ONE collapsed
+  toggle on Australia; real toggle click → `aria-expanded="true"` + the
+  rule panel appears; fa — toggle «مبنای تعیین وضعیت هر حوزه» + signals
+  «سیگنال‌های جهانی»; fa mobile 390 — carousel opens on جهانی with the
+  open signals panel, zero horizontal overflow; zero page errors.
+- **Rollback**: `wrangler rollback` (previous version 5164c21a), or
+  redeploy any prior main commit — the Worker carries the SPA build
+  from `apps/web/dist` at deploy time.
+
+The previous deployment record (the UI-fidelity round, worker 5164c21a)
+follows below.
+
 ## CURRENT DEPLOYMENT — the economic indicators hero closes the gap to the approved reference (2026-10-19 UI-fidelity correction round, worker 5164c21a)
 
 The owner's correction brief (the editorial hero still read as a generic
