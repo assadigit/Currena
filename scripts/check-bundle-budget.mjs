@@ -457,7 +457,22 @@ const BUDGETS = [
   // editorial-fidelity-2026-10-19). Entry chunk untouched at
   // 295.29/88.81 vs 296/89.5. Justified in CHANGELOG §2026-10-19
   // (fidelity round) and D-37 in docs/DECISIONS_FOR_ALI.md.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 657_000, gz: 157_500, label: 'Insights lazy chunk' },
+  // Owner round 3 (2026-10-19 (panels)): the closing explanation panels
+  // PART WAYS — the rule panel (Australia / Global's no-feed fallback)
+  // hides behind a LOW-KEY TOGGLE (the "+n more" muted-pill disclosure
+  // language: chevron pill + conditional panel, the aria-expanded/
+  // aria-controls mechanics of GlossaryTip) while the Global SIGNALS
+  // panel — "probably one of the most important parts of the whole hero"
+  // (owner) — steps UP in type: 15px bold heading + bullets (from the
+  // 12.5px caption tier), the state mark 18/20, roomier rhythm. No new
+  // copy, no data logic, no aria-hook changes; the signals panel keeps
+  // data-attention-box/bullets and stays always-open. Measured
+  // 658.10/157.49 — raw +1.30 kB, gz +0.32 kB over the fidelity build:
+  // the disclosure button + direction-neutral chevron + the branched
+  // heading markup. Entry chunk untouched at 295.29/88.81 vs 296/89.5.
+  // Justified in CHANGELOG §2026-10-19 (panels) and D-38 in
+  // docs/DECISIONS_FOR_ALI.md.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 659_000, gz: 158_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

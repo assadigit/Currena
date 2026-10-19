@@ -5,6 +5,46 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-19 (panels)] — the rule panel tucks behind a low-key toggle; the world-signals panel becomes the hero's emphasized closing module (owner round 3)
+
+The owner reviewed the fidelity-round hero and returned two directives on
+the closing explanation panels: the long word-choice rule («مبنای تعیین
+وضعیت هر حوزه») is reference material that should stop occupying the
+card, while the Global signals («سیگنال‌های جهانی») are "probably one of
+the most important parts of the whole hero" and must read that way.
+Presentation-only again: no calculation, feed, count, ranking, aria hook
+or translated string changes (both panels reuse their existing copy keys).
+
+### Changed
+
+- **The rule panel hides behind a low-key toggle** — the always-visible
+  tinted rule panel (Australia, and Global's no-feed fallback) collapses
+  to one quiet muted pill (the established "+n more" disclosure language:
+  `verdictRuleLabel` + a direction-neutral chevron, `aria-expanded`/
+  `aria-controls` like GlossaryTip); the click reveals the familiar
+  tinted panel beneath it — same hooks (`data-ei-panel`,
+  `data-ei-panel-kind="rule"`, `-heading`, `-rule`), same copy, same
+  tint ladder. The Australia card stops spending its closing module on
+  the reference paragraph.
+- **The world-signals panel steps UP in type** — the Global panel's
+  heading and every bullet rise from the 12.5px caption tier to 15px
+  bold (`leading-relaxed`), the state mark grows 16/18 → 18/20, the
+  bullet rhythm gets roomier (1.5 → 2 spacing) and the panel padding
+  breathes (px-3/py-2.5 → px-3.5/py-3) — emphasis through type and
+  space, not louder chrome: the pale-red surface, region-step ink and
+  the `data-attention-box`/bullets hooks stay exactly as approved. The
+  panel is never tucked behind the toggle — it is always open.
+
+### Budgets
+
+Insights lazy chunk 657.00/157.50 → **659.00/158.00** (measured
+658.10/157.49; the entry chunk untouched at 295.29/88.81 vs 296/89.5) —
+the disclosure button + chevron + branched heading markup; gz +0.32 kB.
+D-38 in `docs/DECISIONS_FOR_ALI.md`. The three panel guards in
+`apps/web/src/components/insights/hero-editorial.test.tsx` now exercise
+the disclosure (collapsed default → click → real panel, signals panel
+never toggled); 17 guards total.
+
 ## [2026-10-19 (fidelity)] — the economic indicators hero closes the gap to the approved reference (the owner's UI-fidelity correction brief)
 
 The owner reviewed the editorial hero round against the approved

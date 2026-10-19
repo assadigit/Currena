@@ -89,6 +89,16 @@
  * and close with a drill-down chevron that mirrors in RTL; the severity
  * accent is the thin inline-start edge (.ei-row-accent). No data logic,
  * aria, count, ranking or copy changed — presentation only.
+ *
+ * Owner round 3 (2026-10-20): the closing explanation panels part ways.
+ * The RULE panel (Australia, and Global's no-feed fallback) is reference
+ * material — it now hides behind a LOW-KEY TOGGLE (the muted-pill
+ * disclosure language of "+n more", the aria mechanics of GlossaryTip):
+ * collapsed by default, the quiet pill alone carries the panel label.
+ * The Global SIGNALS panel is the opposite — "probably one of the most
+ * important parts of the whole hero" (owner): its type steps UP from the
+ * caption tier to 15px bold (heading and every bullet), the state mark
+ * grows, the rhythm gets roomier. Hooks, tint and copy unchanged.
  */
 
 import { useState } from 'react';
@@ -116,9 +126,14 @@ function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
 /* Round 43: the alert bullet's explicit marker — one shared element (the
  * old ::marker rode the button's last-line baseline and landed beside the
  * wrapped line; a flex marker sits at the sentence START in every
- * direction). Static JSX, safe to reuse in every bullet row. */
+ * direction). Owner round 3: the marker's size is LOCKED to the signals
+ * panel's emphasized 15px bullet type so the dot keeps its first-line
+ * seat. Static JSX, safe to reuse in every bullet row. */
 const BULLET_DOT = (
-  <span aria-hidden="true" className="shrink-0 select-none leading-[1.6] text-[var(--color-text-tertiary)]">
+  <span
+    aria-hidden="true"
+    className="shrink-0 select-none text-[0.9375rem] leading-[1.6] text-[var(--color-text-tertiary)]"
+  >
     •
   </span>
 );
@@ -268,6 +283,10 @@ export function VerdictBlock({
     (sectionIndicators !== undefined && sectionIndicators.length > 0);
   const baseReveal = 3;
   const [revealAllTiles, setRevealAllTiles] = useState(false);
+  // Owner round 3: the rule explanation panel starts COLLAPSED behind its
+  // low-key toggle (the signals panel is never toggled — it is the
+  // emphasized, always-open module).
+  const [ruleOpen, setRuleOpen] = useState(false);
   const shown = revealAllTiles ? tiles : tiles.slice(0, baseReveal);
 
   // Gauge member count for the "n of m" line (same denominator as before).
@@ -624,14 +643,21 @@ export function VerdictBlock({
        * restrained panel at the bottom of each regional card — the approved
        * reference's closing module.
        *
+       * Owner round 3 (2026-10-20): the two panels PART WAYS.
        * GLOBAL carries the raised world-section signals (markets /
-       * currencies / section indicators — the existing module, now with a
-       * clear heading on the pale-red surface the brief specifies); when no
-       * feed has loaded, it falls back to the word-choice rule so the
-       * panel always explains its state with real content.
+       * currencies / section indicators — the existing module) — "one of
+       * the most important parts of the whole hero" (owner): the panel
+       * steps UP in type (15px bold heading + bullets, larger state mark,
+       * roomier rhythm) while keeping its restrained pale surface +
+       * region-step ink. It is always open — never tucked behind the
+       * toggle. When no feed has loaded, Global falls back to the
+       * word-choice rule (behind the toggle, like Australia).
        * AUSTRALIA never grows the world signals (they are Global-scope);
-       * its panel carries the existing verdict-rule explanation on a pale
-       * amber surface appropriate to its Stressed state.
+       * its rule explanation is REFERENCE material — it hides behind a
+       * LOW-KEY TOGGLE: collapsed, one quiet muted pill (the "+n more"
+       * disclosure language) carries the panel label; expanded, the
+       * familiar tinted panel appears under it with its hooks and copy
+       * byte-identical to the fidelity round's.
        *
        * The tint follows the REGION'S OWN step ink (spec §4: "the exact
        * existing product taxonomy controls which token is applied") —
@@ -654,120 +680,183 @@ export function VerdictBlock({
                   : step === 1
                     ? 'bg-[var(--color-status-normal)]/[0.05] ring-[var(--color-status-normal)]/20'
                     : 'bg-currena-muted/[0.06] ring-[var(--color-border)]';
+          /* Owner round 3: the RULE panel hides behind the low-key toggle —
+           * collapsed by default, the quiet pill alone; expanded, the
+           * familiar tinted panel (same hooks, same copy) rides under it.
+           * The pill borrows the "+n more" disclosure language and
+           * GlossaryTip's aria mechanics; the chevron is direction-neutral
+           * (down → up) so nothing mirrors in RTL. */
+          if (!signals) {
+            const rulePanelId = `ei-rule-panel-${section}`;
+            return (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setRuleOpen((v) => !v)}
+                  aria-expanded={ruleOpen}
+                  aria-controls={rulePanelId}
+                  data-ei-rule-toggle
+                  className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center gap-1 self-start rounded-full bg-currena-muted/15 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
+                >
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    focusable="false"
+                    className={`shrink-0 motion-safe:transition-transform motion-safe:duration-200${ruleOpen ? ' rotate-180' : ''}`}
+                  >
+                    <path d="M3.5 6 8 10.5 12.5 6" />
+                  </svg>
+                  {copy.ui.verdictRuleLabel}
+                </button>
+                {ruleOpen ? (
+                  <div
+                    id={rulePanelId}
+                    className={`ei-panel-accent rounded-[var(--radius-md)] px-3 py-2.5 ring-1 ${tint}`}
+                    data-ei-panel
+                    data-ei-panel-kind="rule"
+                  >
+                    <p
+                      className={`m-0 mb-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[length:var(--type-caption)] font-bold ${stepToneClass(step)}`}
+                      data-ei-panel-heading
+                    >
+                      {stateIconUrl(step) !== null ? (
+                        <IconImg src={stateIconUrl(step)!} size={16} desktopSize={18} className="drop-shadow-sm" />
+                      ) : null}
+                      {copy.ui.verdictRuleLabel}
+                    </p>
+                    {/* The word-choice rule — the existing localized
+                     * explanation of what makes this region's verdict word
+                     * what it is (the same text the quiet "?" tip carries,
+                     * readable here once the toggle is opened). */}
+                    <p
+                      className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]"
+                      data-ei-panel-rule
+                    >
+                      {copy.ui.verdictRule}
+                    </p>
+                  </div>
+                ) : null}
+              </>
+            );
+          }
+          /* Owner round 3: the SIGNALS panel — the hero's most important
+           * closing module steps UP in type (15px bold heading + bullets,
+           * larger state mark, roomier rhythm) while keeping its restrained
+           * pale surface + region-step ink exactly as approved. */
           return (
             <div
-              className={`ei-panel-accent rounded-[var(--radius-md)] px-3 py-2.5 ring-1 ${tint}`}
+              className={`ei-panel-accent rounded-[var(--radius-md)] px-3.5 py-3 ring-1 ${tint}`}
               data-ei-panel
-              data-ei-panel-kind={signals ? 'signals' : 'rule'}
-              {...(signals ? { 'data-attention-box': true } : {})}
+              data-ei-panel-kind="signals"
+              data-attention-box="true"
             >
               <p
-                className={`m-0 mb-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[length:var(--type-caption)] font-bold ${stepToneClass(step)}`}
+                className={`m-0 mb-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.9375rem] font-bold ${stepToneClass(step)}`}
                 data-ei-panel-heading
               >
                 {stateIconUrl(step) !== null ? (
-                  <IconImg src={stateIconUrl(step)!} size={16} desktopSize={18} className="drop-shadow-sm" />
+                  <IconImg src={stateIconUrl(step)!} size={18} desktopSize={20} className="drop-shadow-sm" />
                 ) : null}
-                {signals ? copy.ui.worldSignalsTitle : copy.ui.verdictRuleLabel}
+                {copy.ui.worldSignalsTitle}
               </p>
-              {signals ? (
-                <ul className="m-0 list-none space-y-1.5 p-0" data-attention-bullets>
-                  {/* §5.3 hero integration: the raised world-markets signal
-                   * appears WITH ITS NUMBERS, using the module's own tone
-                   * language (attention = the alert red, unusual = the amber
-                   * watch ink). Clicking jumps to the world-markets section. */}
-                  {marketsAlert ? (
-                    <li className="flex items-start gap-1.5">
-                      {BULLET_DOT}
-                      <button
-                        type="button"
-                        onClick={() => onJumpMarkets?.()}
-                        className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold transition-opacity hover:opacity-80 ${
+              <ul className="m-0 list-none space-y-2 p-0" data-attention-bullets>
+                {/* §5.3 hero integration: the raised world-markets signal
+                 * appears WITH ITS NUMBERS, using the module's own tone
+                 * language (attention = the alert red, unusual = the amber
+                 * watch ink). Clicking jumps to the world-markets section. */}
+                {marketsAlert ? (
+                  <li className="flex items-start gap-1.5">
+                    {BULLET_DOT}
+                    <button
+                      type="button"
+                      onClick={() => onJumpMarkets?.()}
+                      className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[0.9375rem] font-bold leading-relaxed transition-opacity hover:opacity-80 ${
+                        marketsAlert.signal === 'unusual'
+                          ? 'text-[var(--color-status-watch)]'
+                          : 'text-[var(--color-status-alert)]'
+                      }`}
+                      data-markets-signal={marketsAlert.signal}
+                    >
+                      <bdi>
+                        {interpolate(
                           marketsAlert.signal === 'unusual'
-                            ? 'text-[var(--color-status-watch)]'
-                            : 'text-[var(--color-status-alert)]'
-                        }`}
-                        data-markets-signal={marketsAlert.signal}
-                      >
-                        <bdi>
-                          {interpolate(
-                            marketsAlert.signal === 'unusual'
-                              ? copy.markets.heroAlertUnusual
-                              : copy.markets.heroAlertAttention,
-                            {
-                              n: num(marketsAlert.n, numberLocale),
-                              count: num(marketsAlert.count, numberLocale),
-                            },
-                          )}
-                        </bdi>
-                      </button>
-                    </li>
-                  ) : null}
-                  {/* §6.5 hero integration (currencies build step 11): the
-                   * raised currency signal with its PATTERN NAMES (the cards
-                   * carry the detail) — no new card. */}
-                  {fxAlert ? (
-                    <li className="flex items-start gap-1.5">
-                      {BULLET_DOT}
+                            ? copy.markets.heroAlertUnusual
+                            : copy.markets.heroAlertAttention,
+                          {
+                            n: num(marketsAlert.n, numberLocale),
+                            count: num(marketsAlert.count, numberLocale),
+                          },
+                        )}
+                      </bdi>
+                    </button>
+                  </li>
+                ) : null}
+                {/* §6.5 hero integration (currencies build step 11): the
+                 * raised currency signal with its PATTERN NAMES (the cards
+                 * carry the detail) — no new card. */}
+                {fxAlert ? (
+                  <li className="flex items-start gap-1.5">
+                    {BULLET_DOT}
+                    <button
+                      type="button"
+                      onClick={() => onJumpFx?.()}
+                      className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[0.9375rem] font-bold leading-relaxed transition-opacity hover:opacity-80 ${
+                        fxAlert.signal === 'unusual'
+                          ? 'text-[var(--color-status-watch)]'
+                          : 'text-[var(--color-status-alert)]'
+                      }`}
+                      data-fx-signal={fxAlert.signal}
+                    >
+                      <bdi>
+                        {interpolate(
+                          fxAlert.signal === 'unusual' ? copy.fx.heroAlertUnusual : copy.fx.heroAlertAttention,
+                          { patterns: fxAlert.patterns.join(' · ') },
+                        )}
+                      </bdi>
+                    </button>
+                  </li>
+                ) : null}
+                {/* §6.11/§9.10: the two world sections as SEPARATE
+                 * indicators — each with its own measure label and chip,
+                 * never merged. A calm stock section beside a warning
+                 * currency pattern is the designed state (they measure
+                 * different things); the labels say so. */}
+                {(sectionIndicators ?? []).map((ind, i) => (
+                  <li key={i} className="flex items-start gap-1.5">
+                    {BULLET_DOT}
+                    {ind.signal !== 'normal' && ind.onJump !== undefined ? (
                       <button
                         type="button"
-                        onClick={() => onJumpFx?.()}
-                        className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold transition-opacity hover:opacity-80 ${
-                          fxAlert.signal === 'unusual'
+                        onClick={ind.onJump}
+                        data-section-indicator={ind.signal}
+                        className={`insights-focusable -ms-1 cursor-pointer rounded-md border-0 bg-transparent px-1 py-0.5 text-start text-[0.9375rem] font-bold leading-relaxed transition-opacity hover:opacity-80 ${
+                          ind.signal === 'unusual'
                             ? 'text-[var(--color-status-watch)]'
                             : 'text-[var(--color-status-alert)]'
                         }`}
-                        data-fx-signal={fxAlert.signal}
                       >
-                        <bdi>
-                          {interpolate(
-                            fxAlert.signal === 'unusual' ? copy.fx.heroAlertUnusual : copy.fx.heroAlertAttention,
-                            { patterns: fxAlert.patterns.join(' · ') },
-                          )}
-                        </bdi>
+                        {ind.label}
+                        <span className="ms-1 font-bold">· {ind.signal === 'unusual' ? copy.fx.chipUnusual : copy.fx.chipAttention}</span>
                       </button>
-                    </li>
-                  ) : null}
-                  {/* §6.11/§9.10: the two world sections as SEPARATE
-                   * indicators — each with its own measure label and chip,
-                   * never merged. A calm stock section beside a warning
-                   * currency pattern is the designed state (they measure
-                   * different things); the labels say so. */}
-                  {(sectionIndicators ?? []).map((ind, i) => (
-                    <li key={i} className="flex items-start gap-1.5">
-                      {BULLET_DOT}
-                      {ind.signal !== 'normal' && ind.onJump !== undefined ? (
-                        <button
-                          type="button"
-                          onClick={ind.onJump}
-                          data-section-indicator={ind.signal}
-                          className={`insights-focusable -ms-1 cursor-pointer rounded-md border-0 bg-transparent px-1 py-0.5 text-start text-[length:var(--type-caption)] font-bold transition-opacity hover:opacity-80 ${
-                            ind.signal === 'unusual'
-                              ? 'text-[var(--color-status-watch)]'
-                              : 'text-[var(--color-status-alert)]'
-                          }`}
-                        >
-                          {ind.label}
-                          <span className="ms-1 font-bold">· {ind.signal === 'unusual' ? copy.fx.chipUnusual : copy.fx.chipAttention}</span>
-                        </button>
-                      ) : (
-                        <span className="px-1 py-0.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]" data-section-indicator="normal">
-                          {ind.label}
-                          <span className="ms-1">· {copy.fx.chipNormal}</span>
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                /* The word-choice rule — the existing localized explanation
-                 * of what makes this region's verdict word what it is (the
-                 * same text the quiet "?" tip carries, visible here as the
-                 * reference's readable explanatory points). */
-                <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]" data-ei-panel-rule>
-                  {copy.ui.verdictRule}
-                </p>
-              )}
+                    ) : (
+                      <span
+                        className="px-1 py-0.5 text-[0.9375rem] font-semibold leading-relaxed text-[var(--color-text-tertiary)]"
+                        data-section-indicator="normal"
+                      >
+                        {ind.label}
+                        <span className="ms-1">· {copy.fx.chipNormal}</span>
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
           );
         })()

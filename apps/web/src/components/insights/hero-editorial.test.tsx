@@ -363,16 +363,28 @@ describe('fidelity round §7 — the category summary rows', () => {
   });
 });
 
-describe('fidelity round §7 — the contextual explanation panel', () => {
+describe('fidelity round §7 — the contextual explanation panel (owner round 3: rule behind a low-key toggle, signals emphasized)', () => {
   afterEach(cleanup);
 
-  it('every region card closes with a panel; without feeds it carries the word-choice rule', () => {
+  it('without feeds the word-choice rule hides behind a low-key toggle that reveals the real panel', () => {
     renderHero(insightsCopyEn, 'en-US');
     const cards = regionCards();
     expect(cards).toHaveLength(2);
     for (const card of cards) {
-      const panel = card.querySelector('[data-ei-panel]');
+      // collapsed by default: the quiet pill carries the panel label, and
+      // no panel exists in the DOM yet
+      const toggle = card.querySelector('[data-ei-rule-toggle]') as HTMLElement | null;
+      expect(toggle).not.toBeNull();
+      expect(toggle!.getAttribute('aria-expanded')).toBe('false');
+      expect(toggle!.getAttribute('aria-controls')).toMatch(/^ei-rule-panel-(global|australia)$/);
+      expect(toggle!.textContent).toContain(insightsCopyEn.ui.verdictRuleLabel);
+      expect(card.querySelector('[data-ei-panel]')).toBeNull();
+      // the click reveals the real rule panel — the same hooks, same copy
+      fireEvent.click(toggle!);
+      expect(toggle!.getAttribute('aria-expanded')).toBe('true');
+      const panel = card.querySelector('[data-ei-panel]') as HTMLElement | null;
       expect(panel).not.toBeNull();
+      expect(panel!.id).toBe(toggle!.getAttribute('aria-controls'));
       expect(panel!.getAttribute('data-ei-panel-kind')).toBe('rule');
       const heading = panel!.querySelector('[data-ei-panel-heading]');
       expect(heading!.textContent).toContain(insightsCopyEn.ui.verdictRuleLabel);
@@ -381,7 +393,7 @@ describe('fidelity round §7 — the contextual explanation panel', () => {
     }
   });
 
-  it('Global with raised signals carries the signals panel (heading + bullet); Australia never does', () => {
+  it('Global with raised signals carries the signals panel OPEN (never toggled); Australia keeps the toggled rule', () => {
     render(
       <HeroBlock
         readings={READINGS}
@@ -396,8 +408,9 @@ describe('fidelity round §7 — the contextual explanation panel', () => {
       />,
     );
     const cards = regionCards();
+    // the signals panel is the emphasized, always-open module — no toggle
+    expect(cards[0]!.querySelector('[data-ei-rule-toggle]')).toBeNull();
     const globalPanel = cards[0]!.querySelector('[data-ei-panel]') as HTMLElement | null;
-    const auPanel = cards[1]!.querySelector('[data-ei-panel]') as HTMLElement | null;
     expect(globalPanel).not.toBeNull();
     expect(globalPanel!.getAttribute('data-ei-panel-kind')).toBe('signals');
     // the signals panel keeps the established attention-box hook
@@ -408,13 +421,23 @@ describe('fidelity round §7 — the contextual explanation panel', () => {
     expect(globalPanel!.querySelector('[data-attention-bullets]')).not.toBeNull();
     // the raised market signal bullet rides with its numbers
     expect(globalPanel!.textContent).toContain('4');
-    // Australia keeps the rule panel — the world signals are Global-scope
+    // Australia: the rule stays behind its toggle (the world signals are
+    // Global-scope) — collapsed first, the real panel after the click
+    expect(cards[1]!.querySelector('[data-ei-panel]')).toBeNull();
+    const auToggle = cards[1]!.querySelector('[data-ei-rule-toggle]') as HTMLElement | null;
+    expect(auToggle).not.toBeNull();
+    fireEvent.click(auToggle!);
+    const auPanel = cards[1]!.querySelector('[data-ei-panel]') as HTMLElement | null;
     expect(auPanel!.getAttribute('data-ei-panel-kind')).toBe('rule');
   });
 
-  it('fa: the rule panel speaks Persian', () => {
+  it('fa: the toggled rule panel speaks Persian', () => {
     renderHero(insightsCopyFa, 'fa-IR');
     const card = regionCards()[1]!;
+    const toggle = card.querySelector('[data-ei-rule-toggle]') as HTMLElement | null;
+    expect(toggle).not.toBeNull();
+    expect(toggle!.textContent).toContain(insightsCopyFa.ui.verdictRuleLabel);
+    fireEvent.click(toggle!);
     const panel = card.querySelector('[data-ei-panel]') as HTMLElement | null;
     expect(panel!.querySelector('[data-ei-panel-rule]')!.textContent).toBe(insightsCopyFa.ui.verdictRule);
     expect(panel!.querySelector('[data-ei-panel-heading]')!.textContent).toContain(
