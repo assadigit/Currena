@@ -1518,8 +1518,20 @@ live machinery implements it.
   regenerated.
 - **Deploy**: all three commands — web build + `currena-api` +
   `currena-markets` (the markets worker's honest-UA fetchers changed);
-  SITE_MODE=public rides the owner directive. Deployment IDs + the
-  live-verified evidence land below with this round's release tag.
+  SITE_MODE=public rides the owner directive. LIVE: currena-api
+  **d50def63-38f6-41a7-9377-bac12c157d1d**, currena-markets
+  **3f245d75-6693-4fef-a965-97a33fc3b1a4** (both crons re-armed; the
+  board serves honest chg1y dashes until tonight's 23:30 UTC run).
+- **Live-verified on currena.ir (2026-10-19)**: /api/insights 200 public
+  (32 readings) · markets 200 (16 rows) · fx 404 (by design) · export 403
+  `owner_disabled` (U-14: 401/403 — the owner token is the ONE unset
+  secret) · the v3 hero (verdict Stressed + the full anatomy) · the
+  per-metal balances with the sparse-honesty rule live (gold 1 of 4,
+  silver 1 of 5 readable → BOTH level + the refusal line in en and fa) ·
+  the briefing with five lenses + the exact UI-27 table (16 rows) · fa
+  RTL + Persian digits + silver's own copy · 390px zero overflow · zero
+  console/page errors. Evidence:
+  `docs/evidence/2026-10-19-v3-merge/` (README + 5 screenshots).
 
 ## Session record — 2026-10-08 I16 (the daily-accumulation fix)
 
