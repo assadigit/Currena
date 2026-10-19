@@ -100,4 +100,26 @@ fa-desktop-table-1600, en-mobile-390, fa-mobile-390.
 
 ## Delivery state
 
-See DEPLOY.md CURRENT DEPLOYMENT after the round's deploy.
+- **Git: DELIVERED.** `feature/markets-yearly-lens` @ 80e15bd pushed and
+  fast-forward-merged to main (ad89404..80e15bd); GitHub CI on the main
+  push: **completed / success**.
+- **Production deploy: PENDING** the owner-provided Cloudflare credentials
+  (env-only by policy — absent from this session). This round is NOT
+  UI-only (rounds 1–4 never touched the markets worker), so the deploy
+  needs THREE commands — the markets worker carries the chg1y cron:
+
+  ```sh
+  pnpm --filter @currena/web build
+  pnpm --filter @currena/api exec wrangler deploy          # SPA + API (the yearly lens UI)
+  pnpm --filter @currena/markets deploy                    # currena-markets (computes chg1y nightly)
+  ```
+
+  Skipping the third command ships the Yearly tab with permanent dashes
+  (no cron ever writes chg1y). After both deploys: the nightly
+  23:30/01:30 UTC runs backfill `chg1y` per market as each next close
+  lands (the R5 same-date stability rule holds the current rows verbatim
+  for at most a trading day or two per market) — the same honest roll-in
+  round 46's weekly lens used. The EODHD_API_TOKEN secret persists on
+  currena-markets across deploys (no secret changes this round).
+- Live verification follows the deploy (fresh profile, SW cleared), per
+  the established DEPLOY.md CURRENT DEPLOYMENT convention.
