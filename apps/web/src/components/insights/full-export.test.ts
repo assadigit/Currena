@@ -194,11 +194,13 @@ describe('assembleExportDoc', () => {
     const prices = doc.sections.find((s) => s.key === 'prices')!;
     expect(prices.headers).toEqual(expect.arrayContaining(['Peak', 'Peak date', 'Peak basis', 'Below peak %']));
     const gold = prices.rows.find((r) => r[1] === 'gold-usd')!;
-    // gold peak 5590 (T-05 floor) on 28 Jan 2026, daily-high basis
-    expect(gold[34]).toBe(5590);
-    expect(gold[35]).toBe('2026-01-28');
-    expect(gold[36]).toBe('highest daily high');
-    expect(gold[37]).toBeCloseTo(-22.6, 0);
+    // gold peak 5590 (T-05 floor) on 28 Jan 2026, daily-high basis.
+    // (E-23 v3 shifted the flat layout +4: the risk columns live in the
+    // INDICATORS rows; the prices rows keep the peaks at 38..41.)
+    expect(gold[38]).toBe(5590);
+    expect(gold[39]).toBe('2026-01-28');
+    expect(gold[40]).toBe('highest daily high');
+    expect(gold[41]).toBeCloseTo(-22.6, 0);
   });
 
   it('sorts the markets table worst-first (the page order)', () => {
@@ -329,11 +331,17 @@ describe('buildInsightsFullCsv', () => {
   it('carries the indicators block at full depth (snapshot order) with the E-23 audit columns', () => {
     const indicators = rows.findIndex((r) => r.length === 1 && r[0] === 'Indicators');
     expect(indicators).toBeGreaterThan(0);
-    // 12 display columns + the 8 E-23 audit columns.
-    expect(rows[indicators + 1]).toHaveLength(20);
+    // 12 display columns + the 8 E-23 audit columns + the 4 v3 risk columns.
+    expect(rows[indicators + 1]).toHaveLength(24);
     expect(rows[indicators + 1]).toEqual(
-      expect.arrayContaining(['Published', 'Stale', 'Source URL', 'Licence', 'Private only', 'Public display OK', 'Rule version', 'Thresholds (rule JSON)']),
+      expect.arrayContaining(['Published', 'Stale', 'Source URL', 'Licence', 'Private only', 'Public display OK', 'Rule version', 'Thresholds (rule JSON)', 'Level', 'Owner accepts', 'Source enabled', 'Fetch method']),
     );
+    // E-23 v3 spot-check: gold-usd's row carries the risk-register columns.
+    const goldRow = rows.find((r) => r[0] === 'gold-usd')!;
+    expect(String(goldRow[rows[indicators + 1]!.indexOf('Level')])).toBe('L2');
+    expect(String(goldRow[rows[indicators + 1]!.indexOf('Owner accepts')])).toBe('yes');
+    expect(String(goldRow[rows[indicators + 1]!.indexOf('Source enabled')])).toBe('yes');
+    expect(String(goldRow[rows[indicators + 1]!.indexOf('Fetch method')])).toBe('M1');
     expect(rows[indicators + 2]![0]).toBe('yield-curve-10y2y'); // snapshot order, first reading
     // The audit facts ride the row: licence name + public verdict + rule JSON.
     const firstDataRow = rows[indicators + 2]!;

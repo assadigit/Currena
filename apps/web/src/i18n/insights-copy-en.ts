@@ -739,7 +739,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'Very high CAPE readings have, historically, come with lower US share returns over the following decade, and very low readings with higher ones — a long-run tendency with wide variation around it.',
     cantTell:
       'Valuation measures say little about the next few months: CAPE has stayed high for years while shares rose, and low while they fell. It is not a timing tool and never a signal.',
-    forYou: 'Long-run context for anyone buying US shares — one number, one publisher, no view attached.',
+    forYou: 'Long-run context for the US share market — one number, one publisher, no view attached.',
   },
   'shiller-ecy': {
     name: 'Excess CAPE Yield (Shiller)',
@@ -1694,6 +1694,10 @@ export const insightsCopyEn = {
     exportColPublicOk: 'Public display OK',
     exportColRuleVersion: 'Rule version',
     exportColThresholds: 'Thresholds (rule JSON)',
+    exportColLevel: 'Level',
+    exportColOwnerAccepts: 'Owner accepts',
+    exportColSourceEnabled: 'Source enabled',
+    exportColFetchMethod: 'Fetch method',
     exportYes: 'yes',
     exportNo: 'no',
     exportStaleWithAge: 'yes ({days} days old)',

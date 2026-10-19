@@ -446,12 +446,16 @@ function t07ForbiddenWords(inputs: ValidationInputs): ValidationTestResult {
  * How many consecutive unchanged observations a cadence tolerates before
  * the value is suspicious. Policy rates (per-change) hold constants between
  * decisions BY DESIGN and are never checked. Defect E-04 (2026-10-16):
- * DAILY series tolerate NO exact repeat — a daily print identical to the
- * previous day is the frozen-cache bug class (the 15 Oct copper row), so
- * the tolerance drops to zero and both halves below (in-series and
- * cross-day) flag it. Monthly/quarterly tolerate one repeat — a monthly
- * series printing the same value twice in a row is the "+0.00% since
- * previous release" bug class (B-02).
+ * DAILY series tolerate no exact repeat AT HIGH PRECISION — a daily print
+ * identical to the previous day at three-plus decimals (the 15 Oct copper
+ * row, 14772.999807) is the frozen-cache bug class, and both halves below
+ * (in-series and cross-day) flag it. v3 refinement (2026-10-20, found by
+ * the live self-check): a daily repeat at NATURAL QUOTE PRECISION (≤2
+ * decimals — yields 5.43, VIX 15.27) is a plausible coincidence, so the
+ * daily rule is precision-aware: ≤2dp values tolerate a short repeat run
+ * (2), ≥3dp values tolerate none. Monthly/quarterly keep the one-repeat
+ * rule — a monthly series printing the same value twice in a row is the
+ * "+0.00% since previous release" bug class (B-02).
  */
 const MAX_UNCHANGED_RUN: Readonly<Record<IndicatorDefinition['cadence'], number | null>> = {
   daily: 0,
@@ -461,6 +465,22 @@ const MAX_UNCHANGED_RUN: Readonly<Record<IndicatorDefinition['cadence'], number 
   'per-change': null,
   manual: 1,
 };
+
+/** The decimal places a value's own representation carries (15.27 → 2; 14772.999807 → 6). */
+function decimalsOf(value: number): number {
+  const text = String(value);
+  const dot = text.indexOf('.');
+  return dot === -1 ? 0 : text.length - dot - 1;
+}
+
+/**
+ * v3 (2026-10-20): the daily unchanged-run tolerance by precision —
+ * natural-quote (≤2dp) values may repeat briefly; high-precision (≥3dp)
+ * values may not repeat at all.
+ */
+function dailyUnchangedTolerance(value: number): number {
+  return decimalsOf(value) <= 2 ? 2 : 0;
+}
 
 /**
  * Administrative rate series whose flat prints are the NORMAL state, not
@@ -500,9 +520,11 @@ function t08SuspiciousValues(inputs: ValidationInputs): ValidationTestResult {
     const idx = series.findIndex((p) => p.date === current.date);
     // (a) the latest value repeats the previous observation exactly — for a
     // monthly/quarterly series this is the "+0.00% since previous release"
-    // bug class (a duplicate print or a failed fetch); for a DAILY series
-    // any exact repeat across days is the E-04 frozen-cache class.
-    if (idx > 0) {
+    // bug class (a duplicate print or a failed fetch); for a DAILY series a
+    // repeat only counts as the E-04 frozen-cache class at ≥3 decimals
+    // (v3 precision refinement: a 2dp yield printing 5.43 twice is a
+    // plausible market close, not a frozen cache).
+    if (idx > 0 && !(def.cadence === 'daily' && decimalsOf(current.value) <= 2)) {
       const prev = series[idx - 1]!;
       if (prev.value === current.value) {
         failures.push(
@@ -518,7 +540,8 @@ function t08SuspiciousValues(inputs: ValidationInputs): ValidationTestResult {
       if (series[i]!.value === series[i - 1]!.value) run++;
       else break;
     }
-    if (run - 1 > maxRun) {
+    const effectiveRun = def.cadence === 'daily' ? dailyUnchangedTolerance(current.value) : maxRun;
+    if (run - 1 > effectiveRun) {
       failures.push(`${def.id}: last ${run} observations unchanged (cadence tolerates ${maxRun})`);
       flagged.push(def.id);
       continue;
@@ -532,6 +555,7 @@ function t08SuspiciousValues(inputs: ValidationInputs): ValidationTestResult {
       prevReading !== undefined &&
       prevReading.value !== null &&
       prevReading.asOf !== null &&
+      decimalsOf(current.value) >= 3 && // v3: 2dp quotes repeat legitimately; high precision does not
       current.value.toFixed(6) === prevReading.value.toFixed(6) &&
       prevReading.asOf < current.date
     ) {

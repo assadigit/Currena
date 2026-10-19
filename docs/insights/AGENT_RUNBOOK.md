@@ -74,9 +74,9 @@ Write `docs/insights/CURRENT_STATE_REPORT.md` for items S-01 to S-08 of `INSIGHT
 - [x] Do not change anything outside the Insights page.
 
 ### Phase 7: automatic self-audit and export
-- [ ] Extend the export generator with the columns from defect E-23 (published date, fetched time, stale flag, source URL, level, owner_accepts, enabled, peak value, peak date, peak basis, rule version and thresholds).
-- [ ] Add `npm run insights:selfcheck` (or the repo's equivalent) that builds the current snapshot, runs every test, writes `docs/insights/exports/currena-insights-full-<UTC date>.md`, and writes `docs/insights/SELF_AUDIT.md` with every test's result and a list of stale or "can't tell" cards.
-- [ ] Add a scheduled GitHub Action (or equivalent) that runs the self-check daily and fails visibly on any failing test. It must publish nothing.
+- [x] Extend the export generator with the columns from defect E-23 (published date, fetched time, stale flag, source URL, level, owner_accepts, enabled, peak value, peak date, peak basis, rule version and thresholds). (Both exports: the client full-export + the server owner-only /api/insights/export.)
+- [x] Add `npm run insights:selfcheck` (or the repo's equivalent) that builds the current snapshot, runs every test, writes `docs/insights/exports/currena-insights-full-<UTC date>.md`, and writes `docs/insights/SELF_AUDIT.md` with every test's result and a list of stale or "can't tell" cards. (`pnpm --filter @currena/insights selfcheck` — now runs the whole monorepo's unit suites too, one row per package, and fails on any failing package.)
+- [x] Add a scheduled GitHub Action (or equivalent) that runs the self-check daily and fails visibly on any failing test. It must publish nothing. (insights-selfcheck.yml, daily 04:50 UTC — unchanged, publishes nothing.)
 
 ### Phase 8: documents
 Create in `docs/insights/`:

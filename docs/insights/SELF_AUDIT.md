@@ -1,8 +1,8 @@
 # SELF_AUDIT.md — the automatic self-check
 
-Generated: 2026-10-16T13:59:56.229Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-16.md`
+Generated: 2026-10-19T21:01:49.484Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-19.md`
 
-Result: **ALL TESTS PASS** (19 of 19 pass)
+Result: **ALL TESTS PASS** (25 of 25 pass)
 
 ## Every test, pass or fail
 
@@ -27,14 +27,23 @@ Result: **ALL TESTS PASS** (19 of 19 pass)
 | E-10 | Money-supply scale: the export cell carries the DISPLAYED value (23.3 trillion) | pass | the display scale is applied at export (full-export.ts exportValue); registry-sync pins the unit token |
 | E-24 | The export price table carries the peak columns | pass | — |
 | E-18 | Trend labels reproducible from the stated 3-month rule | pass | the export + CSV recompute from chg3m (markets/compute.ts trendOf); pinned by markets + full-export tests |
+| SUITE:packages/core | Unit suite — packages/core | pass | 191 tests |
+| SUITE:packages/scraper | Unit suite — packages/scraper | pass | 67 tests |
+| SUITE:packages/insights | Unit suite — packages/insights | pass | 517 tests |
+| SUITE:apps/markets | Unit suite — apps/markets | pass | 13 tests |
+| SUITE:apps/api | Unit suite — apps/api | pass | 329 tests |
+| SUITE:apps/web | Unit suite — apps/web | pass | 520 tests |
 
 ## Stale or "can't tell" cards
 
-None — every card reads current or carries its own honest tag.
-
+| Indicator | Status | As of | Reason |
+| au-wage-growth | stale | 2026-04-01 | stale |
 
 ## Unavailable cards
 
+- ecb-dfr
+- shiller-cape
+- shiller-ecy
 - au-10y
 - rba-expectations
 - au-us-10y-gap
@@ -70,7 +79,7 @@ None — every card reads current or carries its own honest tag.
 - ✅ yahoo — GC=F daily quotes (10-year record history)
 - ✅ yahoo — SI=F daily quotes (10-year record history)
 - ✅ yahoo — BTC-USD daily quotes (10-year record history)
-- ✅ ecb — FM/D.U2.EUR.4F.KR.DFR.LEV
+- ❌ ecb — FM/D.U2.EUR.4F.KR.DFR.LEV: The operation was aborted due to timeout
 - ✅ frankfurter — USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF since 2016-01-04
 - ✅ world-bank — Pink Sheet monthly workbook
 - ✅ gold-api — XAU spot
@@ -86,15 +95,15 @@ None — every card reads current or carries its own honest tag.
 - ✅ abs — CPI/1.40081.10.50.M
 - ✅ abs — WPI/1.OHRPEB.7.TOT.10.AUS.Q
 - ✅ bitstamp — btcusd last 10 daily candles
-- ❌ rba — F1 Cash Rate Target (daily): GET https://www.rba.gov.au/statistics/tables/csv/f1-data.csv failed with HTTP 403
-- ❌ rba — F1.1 Cash Rate Target: GET https://www.rba.gov.au/statistics/tables/csv/f1.1-data.csv failed with HTTP 403
-- ❌ rba — F2 Australian Government 10 year bond: GET https://www.rba.gov.au/statistics/tables/csv/f2-data.csv failed with HTTP 403
-- ❌ rba — F2 FCMYGBAG3D Australian Government 3 year bond: GET https://www.rba.gov.au/statistics/tables/csv/f2-data.csv failed with HTTP 403
-- ❌ rba — E2 Household debt to income: GET https://www.rba.gov.au/statistics/tables/csv/e2-data.csv failed with HTTP 403
-- ❌ rba — F6 FLRHOOTA owner-occupier outstanding home-loan rate: GET https://www.rba.gov.au/statistics/tables/csv/f6-data.csv failed with HTTP 403
-- ❌ rba — F4.1 PDRNTH new household term-deposit rate: GET https://www.rba.gov.au/statistics/tables/csv/f4.1-data.csv failed with HTTP 403
+- ❌ rba — F1 Cash Rate Target (daily: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
+- ❌ rba — F1.1 Cash Rate Target: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
+- ❌ rba — F2 Australian Government 10 year bond: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
+- ❌ rba — F2 FCMYGBAG3D Australian Government 3 year bond: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
+- ❌ rba — E2 Household debt to income: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
+- ❌ rba — F6 FLRHOOTA owner-occupier outstanding home-loan rate: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
+- ❌ rba — F4.1 PDRNTH new household term-deposit rate: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ✅ alternative-me — Crypto Fear and Greed (daily history)
-- ✅ cross-check — gold-api BTC 82043 vs Bitstamp close 81932 (2026-10-16) → 0.14%
+- ✅ cross-check — gold-api BTC 81918 vs Bitstamp close 81925 (2026-10-19) → -0.01%
 
 ## Scope notes
 

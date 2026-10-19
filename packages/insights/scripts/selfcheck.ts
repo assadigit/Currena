@@ -21,6 +21,7 @@
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
@@ -258,6 +259,51 @@ rows.push({
   failures: [],
   notes: ['the export + CSV recompute from chg3m (markets/compute.ts trendOf); pinned by markets + full-export tests'],
 });
+
+/* ---------------- 4b. v3 (2026-10-20): the full unit-suite results ----------------
+ * The runbook's self-check "runs every test" — so this step runs the
+ * monorepo's vitest suites and records one row per package. Any failing
+ * package fails the whole self-check (the scheduled Action goes red).
+ * ------------------------------------------------------------------ */
+interface SuiteRow {
+  pkg: string;
+  tests: number;
+  failed: number;
+  ok: boolean;
+  note: string;
+}
+const suiteRows: SuiteRow[] = [];
+try {
+  const run = spawnSync('pnpm', ['-r', 'test'], {
+    cwd: REPO,
+    encoding: 'utf8',
+    timeout: 10 * 60 * 1000,
+    maxBuffer: 64 * 1024 * 1024,
+  });
+  const text = run.stdout + '\n' + run.stderr;
+  const seen = new Map<string, SuiteRow>();
+  for (const m of text.matchAll(/^(\S+) test: {2,}Tests {2}(\d+) passed(?: \((\d+)\))?(?:, (\d+) failed)?/gm)) {
+    const pkg = m[1]!.replace(/ test:$/, '');
+    const tests = Number(m[2]);
+    const failed = m[4] !== undefined ? Number(m[4]) : 0;
+    seen.set(pkg, { pkg, tests, failed, ok: failed === 0, note: failed === 0 ? `${tests} tests` : `${failed} failing` });
+  }
+  for (const [pkg, row] of seen) suiteRows.push(row);
+  if (suiteRows.length === 0) {
+    suiteRows.push({ pkg: '(suites)', tests: 0, failed: 1, ok: false, note: 'no suite output parsed — the runner output shape changed' });
+  }
+} catch (err) {
+  suiteRows.push({ pkg: '(suites)', tests: 0, failed: 1, ok: false, note: `runner failed: ${err instanceof Error ? err.message : String(err)}` });
+}
+for (const sr of suiteRows) {
+  rows.push({
+    id: `SUITE:${sr.pkg}`,
+    name: `Unit suite — ${sr.pkg}`,
+    ok: sr.ok,
+    failures: sr.ok ? [] : [`${sr.failed} test(s) failed in ${sr.pkg}`],
+    notes: [sr.note],
+  });
+}
 
 /* ---------------- 5. SELF_AUDIT.md ---------------- */
 

@@ -64,7 +64,7 @@ import { PRICE_ROWS, TOGETHER_CARD_ORDER } from './config';
 import { SIGNALS_ENABLED, legPhrase } from './config/signals';
 import auditJson from '../../../../../data/indicator-audit.json';
 
-/** Defect E-23: the per-indicator licence + rule facts (generated sidecar). */
+/** Defect E-23 (+v3 2026-10-20): the per-indicator licence + rule + risk facts (generated sidecar). */
 interface IndicatorAuditEntry {
   id: string;
   licenceName: string;
@@ -73,6 +73,11 @@ interface IndicatorAuditEntry {
   maxAgeDays: number | null;
   ruleVersion: number;
   rule: string;
+  /** E-23 v3: the risk-register columns (level, owner_accepts, enabled, method). */
+  level?: 'L0' | 'L1' | 'L2' | 'L3';
+  ownerAccepts?: boolean | null;
+  enabled?: boolean;
+  method?: string | null;
 }
 
 const AUDIT_BY_ID = new Map<string, IndicatorAuditEntry>(
@@ -147,14 +152,19 @@ const FLAT = {
   publicOk: 31,
   ruleVersion: 32,
   thresholds: 33,
+  // E-23 v3 (2026-10-20): the risk-register audit columns.
+  level: 34,
+  ownerAccepts: 35,
+  sourceEnabled: 36,
+  fetchMethod: 37,
   // Defect E-24 (2026-10-16): the price table's peak columns.
-  peak: 34,
-  peakDate: 35,
-  peakBasis: 36,
-  belowPeak: 37,
+  peak: 38,
+  peakDate: 39,
+  peakBasis: 40,
+  belowPeak: 41,
 } as const;
 
-const FLAT_WIDTH = 38;
+const FLAT_WIDTH = 42;
 
 interface DocSection {
   /** Stable key (tests) — never rendered. */
@@ -485,6 +495,12 @@ function readingRow(r: IndicatorReading, copy: InsightsCopy, nowDay: string): (s
   put(row, FLAT.publicOk, audit?.publicDisplayOk ?? 'unknown');
   put(row, FLAT.ruleVersion, audit?.ruleVersion ?? null);
   put(row, FLAT.thresholds, audit?.rule ?? null);
+  // E-23 v3 (2026-10-20): the risk-register audit columns — level,
+  // owner_accepts, the kill-switch state and the method-ladder slot.
+  put(row, FLAT.level, audit?.level ?? 'not recorded');
+  put(row, FLAT.ownerAccepts, audit?.ownerAccepts === null || audit?.ownerAccepts === undefined ? 'n/a' : audit.ownerAccepts ? 'yes' : 'no');
+  put(row, FLAT.sourceEnabled, audit?.enabled === undefined ? 'not recorded' : audit.enabled ? 'yes' : 'no (kill switch off)');
+  put(row, FLAT.fetchMethod, audit?.method ?? 'not recorded');
   return row;
 }
 
@@ -658,6 +674,7 @@ export function assembleExportDoc(input: FullExportInput): ExportDoc {
       FLAT.change7d, FLAT.change30d, FLAT.percentile10y, FLAT.asOf, FLAT.updatedAt, FLAT.source,
       FLAT.published, FLAT.stale, FLAT.sourceUrl, FLAT.licence, FLAT.privateOnly, FLAT.publicOk,
       FLAT.ruleVersion, FLAT.thresholds,
+      FLAT.level, FLAT.ownerAccepts, FLAT.sourceEnabled, FLAT.fetchMethod,
     ],
     headers: [
       copy.ui.csvColId,
@@ -680,6 +697,10 @@ export function assembleExportDoc(input: FullExportInput): ExportDoc {
       copy.ui.exportColPublicOk,
       copy.ui.exportColRuleVersion,
       copy.ui.exportColThresholds,
+      copy.ui.exportColLevel,
+      copy.ui.exportColOwnerAccepts,
+      copy.ui.exportColSourceEnabled,
+      copy.ui.exportColFetchMethod,
     ],
     rows: snapshot.readings.map((r) => readingRow(r, copy, snapshot.generatedAt.slice(0, 10))),
     lines: [],

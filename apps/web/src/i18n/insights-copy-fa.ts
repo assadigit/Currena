@@ -515,6 +515,10 @@ export const insightsCopyFa: InsightsCopy = {
     exportColPublicOk: 'مجاز نمایش عمومی',
     exportColRuleVersion: 'نسخهٔ قاعده',
     exportColThresholds: 'آستانه‌ها (JSON قاعده)',
+    exportColLevel: 'سطح ریسک',
+    exportColOwnerAccepts: 'پذیرش مالک',
+    exportColSourceEnabled: 'منبع فعال',
+    exportColFetchMethod: 'روش دریافت',
     exportYes: 'بله',
     exportNo: 'خیر',
     exportStaleWithAge: 'بله ({days} روز قدمت)',
@@ -2322,7 +2326,7 @@ export const insightsCopyFa: InsightsCopy = {
         'در تاریخ این شاخص، مقادیر بسیار بالا معمولاً با بازده کمتر سهام آمریکا در دههٔ پس از آن همراه بوده و مقادیر بسیار پایین با بازده بیشتر؛ گرایشی بلندمدت با پراکندگی زیاد.',
       cantTell:
         'سنجه‌های ارزش‌گذاری دربارهٔ چند ماه آینده چیز کمی می‌گویند: CAPE سال‌ها بالا مانده در حالی که سهام بالاتر می‌رفت. ابزار زمان‌بندی نیست و هرگز سیگنال نیست.',
-      forYou: 'زمینهٔ بلندمدت برای خرید سهام آمریکا؛ یک عدد، یک ناشر، بدون هیچ توصیه.',
+      forYou: 'زمینهٔ بلندمدت برای بازار سهام آمریکا؛ یک عدد، یک ناشر، بدون هیچ توصیه.',
     },
     'shiller-ecy': {
       name: 'بازدهٔ مازاد CAPE (شیلر)',
