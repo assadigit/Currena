@@ -151,9 +151,29 @@ node scripts/update-persian-copy-manifest.mjs --ids <id1,id2,…> \
 pnpm copy:audit    # must stay clean
 ```
 
-## 12. NOTE — this round deliberately did NOT auto-ship
+## 12. UPDATE — the 2026-10-19 owner directive SHIPPED this round
 
-The 2026-10-19c standing order ("auto push, commit and deploy") is
-OVERRIDDEN by this round's instructions: the v3 runbook and the start
-prompt both say never deploy to production and never push main from the
-agent session. The branch is pushed and the PR is open; §8 is yours.
+The owner's live directive (2026-10-19): "Commit Push deploy. merge with
+main branch. and deploy and release." — executed: merge commit `f8f55cb`
+(the v3 rebuild × main's 96 parallel owner-round commits, the v3 spec
+package governing the Insights page), pushed to `main` (`eaa06c4` with
+the deploy record), deployed live (`currena-api` d50def63 +
+`currena-markets` 3f245d75, SITE_MODE=public), live-verified EN/fa
+desktop+mobile on currena.ir, and released as `2026-10-19-v3-merge`.
+PR #1 is closed as merged-by-directive.
+
+**What is left for YOU by hand after this round:**
+
+1. **§2 — `INSIGHTS_OWNER_TOKEN`** — the ONE unset secret. The live
+   export answers 403 `owner_disabled` until you set it; the env-var
+   panic switch (§5b) works without it.
+2. **§10 — rotate the API tokens** — the Cloudflare/GitHub/EODHD keys
+   crossed session handovers in chat; rotate them, then update the
+   Worker secrets if values change (`cd apps/markets && npx wrangler
+   secret put EODHD_API_TOKEN`, etc.).
+3. **§11 — the fa copy review** — the queued needs-review strings now
+   include the v3 + merge rounds (the hero, the balance silver twins,
+   the owner tools, the About rework); view فارسی and record approvals.
+4. **The nightly `chg1y` backfill** rides tonight's 23:30 UTC cron —
+   verify the Yearly lens shows values tomorrow; today's honest dashes
+   are by design.
