@@ -26,8 +26,10 @@
 
 import { Hono } from 'hono';
 import type { MarketsReader } from '@currena/insights/markets';
+import type { InsightsReader } from '@currena/insights/store';
 import { KvInsightsReader, KvMarketsReader, KvFxReader, KvPricesReader } from './adapters/insights-store';
-import { siteModeOf, type InsightsServeMode } from './public-mode';
+import { resolveAccessModeForRequest, type AccessMode } from './access-mode';
+import { KvAccessModeStore, type AccessModeKvStore } from './adapters/access-mode-store';
 import { createInsightsRoutes } from './routes/insights';
 import { createRatesRoutes } from './routes/rates';
 import { createOpsRoutes } from './routes/ops';
@@ -56,8 +58,32 @@ export type Bindings = {
    * Step 3 §2.2 AC-08: 'private' (default) gates every Insights data
    * route; 'public' skips the gate — the build then enforces T-15 (every
    * displayed source must be public-display-ok). Set as a wrangler var.
+   * M-5 back-compat: the LOWEST layer of the resolved access mode
+   * (access-mode.ts) — PANIC_PRIVATE / the KV override / ACCESS_MODE win.
    */
   SITE_MODE?: string;
+  /**
+   * M-5 (RULES.md §3, T-24): the deploy-time access-mode var — 'public' |
+   * 'private'. Any private signal wins; the panic switch resolves within
+   * one refresh cycle. Set as a wrangler var (SITE_MODE's successor).
+   */
+  ACCESS_MODE?: string;
+  /**
+   * M-5 (RULES.md §3, T-24): the HARD panic — 'true' | '1' forces private
+   * mode on every Insights data endpoint immediately, with no KV read at
+   * all (it survives a broken KV and clears only on redeploy). Set as a
+   * wrangler var.
+   */
+  PANIC_PRIVATE?: string;
+  /**
+   * M-3 (RULES.md §3, runbook Phase 3): the OWNER-ONLY surfaces' secret —
+   * the full export (GET /api/insights/export) and the mode switch's
+   * bearer auth. UNSET = every owner endpoint answers 403 owner_disabled
+   * (fail closed; the export is simply disabled). Set with
+   * `wrangler secret put INSIGHTS_OWNER_TOKEN` (OWNER_SETUP step 2).
+   * Never logged, never echoed, compared constant-time only.
+   */
+  INSIGHTS_OWNER_TOKEN?: string;
   /**
    * The ingest watchdog's dispatch token (2026-10-16c, ingest-watchdog.ts):
    * a GitHub token with repo + Actions write. When the daily
@@ -77,7 +103,12 @@ export interface AppDeps {
   /** Override service construction (route tests inject a fake ladder). */
   makeService?: (env: Bindings) => RatesService;
   /** Override the Insights store (route tests inject the in-memory fake). */
-  makeInsightsReader?: (env: Bindings) => import('@currena/insights/store').InsightsReader;
+  makeInsightsReader?: (env: Bindings) => InsightsReader;
+  /**
+   * M-3: override the EXPORT reader — ALWAYS the private document family
+   * (route tests inject a fake that holds the private snapshot).
+   */
+  makeExportReader?: (env: Bindings) => InsightsReader;
   /** Override the world-markets store (route tests inject the in-memory fake). */
   makeMarketsReader?: (env: Bindings) => MarketsReader;
   /** Override the world-currencies store (route tests inject the in-memory fake). */
@@ -95,20 +126,57 @@ export interface AppDeps {
 export function createApp(deps: AppDeps = {}) {
   const makeService = deps.makeService ?? makeDefaultService;
 
-  // Insights serve path: ONE KV read per request (KvInsightsReader is a
-  // lazy singleton — the binding is stable for the isolate's lifetime).
-  // Mode-aware (2026-10-19): SITE_MODE=public reads ONLY the public
-  // projection keys — re-keyed if the mode ever differs from the memoized
-  // reader's (defensive: SITE_MODE is constant per deployment).
-  let insightsReader: import('@currena/insights/store').InsightsReader | undefined;
-  let insightsReaderMode: InsightsServeMode | undefined;
-  const getInsightsReader = (env: Bindings): import('@currena/insights/store').InsightsReader => {
-    const mode = siteModeOf(env);
+  /* ------------------ M-5: the resolved access mode ------------------- *
+   * The panic switch's own plumbing (access-mode.ts): PANIC_PRIVATE → the
+   * KV runtime override (`insights:access-mode:v1`, written by POST
+   * /api/insights/mode) → ACCESS_MODE → the legacy SITE_MODE. The KV read
+   * rides access-mode.ts's per-isolate 60-second memo, so the whole app
+   * costs at most ONE access-mode KV read per minute — the gate, the
+   * reader family and every public-mode behaviour share one resolution.
+   * ------------------------------------------------------------------- */
+  const getAccessModeKv = (env: Bindings): AccessModeKvStore => new KvAccessModeStore(env.RATES);
+  const accessModeOf = (env: Bindings): Promise<AccessMode> =>
+    resolveAccessModeForRequest(env, () => getAccessModeKv(env).get(), Date.now());
+
+  // Insights serve path: ONE KV read per request (the reader is a lazy
+  // singleton per resolved mode). Mode-aware since the M-5 rework: public
+  // mode reads ONLY the public projection keys — re-keyed when the
+  // resolved mode changes, so a runtime panic flip re-keys on the very
+  // next request (KV failure degrades calmly: access-mode.ts never
+  // throws, and the env chain answers).
+  let insightsReader: InsightsReader | undefined;
+  let insightsReaderMode: AccessMode | undefined;
+  const getInsightsReader = async (env: Bindings): Promise<InsightsReader> => {
+    if (deps.makeInsightsReader !== undefined) return deps.makeInsightsReader(env);
+    const mode = await accessModeOf(env);
     if (insightsReader === undefined || insightsReaderMode !== mode) {
-      insightsReader = deps.makeInsightsReader ? deps.makeInsightsReader(env) : new KvInsightsReader(env.RATES, mode);
+      insightsReader = new KvInsightsReader(env.RATES, mode);
       insightsReaderMode = mode;
     }
     return insightsReader;
+  };
+
+  // M-3: the export's reader — ALWAYS the PRIVATE document family,
+  // whatever the site's resolved access mode is (the owner's export is
+  // never reduced to the public projection). A lazy singleton in the
+  // production path; tests inject their own fake.
+  let exportReader: InsightsReader | undefined;
+  const getExportReader = (env: Bindings): InsightsReader => {
+    if (deps.makeExportReader !== undefined) return deps.makeExportReader(env);
+    if (deps.makeInsightsReader !== undefined) return deps.makeInsightsReader(env);
+    exportReader ??= new KvInsightsReader(env.RATES, 'private');
+    return exportReader;
+  };
+
+  // The /admin console's freshness card: the STATUS key is mode-
+  // independent, so the console keeps its own plain private-family reader
+  // (sync signature) — the mode-aware serve path stays the data routes'.
+  let adminInsightsReader: InsightsReader | undefined;
+  const getAdminInsightsReader = (env: Bindings): InsightsReader => {
+    adminInsightsReader ??= deps.makeInsightsReader
+      ? deps.makeInsightsReader(env)
+      : new KvInsightsReader(env.RATES, 'private');
+    return adminInsightsReader;
   };
 
   // World stock markets serve path: the section's ONE key behind the spec's
@@ -154,7 +222,7 @@ export function createApp(deps: AppDeps = {}) {
 
   app.route('/', createOpsRoutes({ makeService }));
   app.route('/', createRatesRoutes({ makeService }));
-  app.route('/', createAdminRoutes({ makeService, getInsightsReader }));
+  app.route('/', createAdminRoutes({ makeService, getInsightsReader: getAdminInsightsReader }));
   app.route('/', createInternalRoutes({ makeService }));
 
   /* ----------------------------- insights ------------------------------- */
@@ -165,9 +233,11 @@ export function createApp(deps: AppDeps = {}) {
     '/api/insights',
     createInsightsRoutes({
       getReader: getInsightsReader,
+      getExportReader,
       getMarketsReader,
       getFxReader,
       getPricesReader,
+      getAccessModeKv,
       // A-8: the serve-time staleness re-evaluation needs a clock; tests
       // pin it so aged fixtures flip deterministically.
       now: deps.now ?? (() => new Date()),

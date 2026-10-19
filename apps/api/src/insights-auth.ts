@@ -32,6 +32,7 @@
 import { getCookie, setCookie } from 'hono/cookie';
 import type { Context, MiddlewareHandler } from 'hono';
 import { clientIp, rateLimitRetryAfterSec, rateLimitTake, secretMatches } from './security';
+import type { AccessMode } from './access-mode';
 import type { Bindings } from './index';
 
 /** The session cookie (HttpOnly, Secure, SameSite=Lax, expiring). */
@@ -85,13 +86,21 @@ export async function verifySessionToken(token: string | undefined, password: st
 }
 
 /**
- * The gate middleware (AC-02/03/05/06/08). Mount on the insights sub-app so
- * EVERY data route behind it is covered by one wrap.
+ * The gate middleware (AC-02/03/05/06/08 + M-5). Mount on the insights
+ * sub-app so EVERY data route behind it is covered by one wrap. The gate is
+ * armed by the RESOLVED ACCESS MODE (access-mode.ts — PANIC_PRIVATE / the
+ * KV runtime override / ACCESS_MODE / the legacy SITE_MODE): 'public' skips
+ * it (T-15 governs what may be displayed), any private signal re-arms it.
  */
-export function requireInsightsAuth(): MiddlewareHandler<{ Bindings: Bindings }> {
+export interface InsightsGateDeps {
+  /** The resolved access mode for THIS request (KV-memoized, never a raw env read). */
+  accessModeOf: (c: Context<{ Bindings: Bindings }>) => Promise<AccessMode>;
+}
+
+export function requireInsightsAuth(deps: InsightsGateDeps): MiddlewareHandler<{ Bindings: Bindings }> {
   return async (c, next) => {
-    // AC-08: public mode skips the gate (T-15 governs what may be displayed).
-    if (c.env.SITE_MODE === 'public') {
+    // M-5/AC-08: public mode skips the gate; a private resolution re-arms it.
+    if ((await deps.accessModeOf(c)) === 'public') {
       await next();
       return;
     }

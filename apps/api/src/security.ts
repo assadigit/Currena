@@ -1,7 +1,8 @@
 /**
  * Isolate-local defense primitives (Phase 3 split of the former index.ts
- * monolith): the best-effort rate limiter for the two secret-guessing
- * surfaces and the constant-time-ish secret comparison.
+ * monolith): the best-effort rate limiter for the secret-guessing surfaces
+ * (login/admin/internal/mode/export/owner-session) + the M-4 Insights DATA
+ * bucket (RULES.md §3), and the constant-time-ish secret comparison.
  *
  * Token bucket per (IP, surface), PER ISOLATE: Workers isolates are
  * ephemeral and per-PoP, so a patient attacker rotating PoPs can exceed
@@ -18,6 +19,20 @@ const RATE_LIMIT_CAPACITY = 10; // burst size
 const RATE_LIMIT_REFILL_PER_MIN = 5; // sustained attempts/minute
 const RATE_LIMIT_MAP_MAX = 10_000;
 
+/**
+ * M-4 (RULES.md §3, T-24): the Insights DATA bucket — generous for the SPA
+ * (a page load is a handful of GETs), hostile to bulk copying. A separate
+ * key family (`ip#insights-data`) with its own capacity/refill, so the
+ * secret-guessing buckets below stay exactly as tight as they were.
+ */
+export const INSIGHTS_DATA_RATE_CAPACITY = 120;
+export const INSIGHTS_DATA_RATE_REFILL_PER_MIN = 60;
+
+/** The data-GET bucket key (distinct from the login/admin/internal families). */
+export function insightsDataRateKey(ip: string): string {
+  return `${ip}#insights-data`;
+}
+
 interface RateBucket {
   tokens: number;
   lastRefillMs: number;
@@ -30,14 +45,22 @@ export function clientIp(c: Context<{ Bindings: Bindings }>): string {
   return c.req.header('CF-Connecting-IP') ?? 'unknown';
 }
 
-/** Take one token; false = the bucket is empty (429). */
-export function rateLimitTake(key: string, nowMs: number): boolean {
-  const bucket = rateBuckets.get(key) ?? { tokens: RATE_LIMIT_CAPACITY, lastRefillMs: nowMs };
+/**
+ * Take one token; false = the bucket is empty (429). Capacity/refill are
+ * parameters so the M-4 data family (120 / 60 per minute) rides the same
+ * isolate-local bucket map as the login/admin/internal families — every key
+ * always passes its own family's constants, so the shared map stays
+ * consistent. Defaults preserve the original login-bucket behaviour.
+ */
+export function rateLimitTake(
+  key: string,
+  nowMs: number,
+  capacity: number = RATE_LIMIT_CAPACITY,
+  refillPerMin: number = RATE_LIMIT_REFILL_PER_MIN,
+): boolean {
+  const bucket = rateBuckets.get(key) ?? { tokens: capacity, lastRefillMs: nowMs };
   const elapsedMs = Math.max(0, nowMs - bucket.lastRefillMs);
-  bucket.tokens = Math.min(
-    RATE_LIMIT_CAPACITY,
-    bucket.tokens + (elapsedMs / 60_000) * RATE_LIMIT_REFILL_PER_MIN,
-  );
+  bucket.tokens = Math.min(capacity, bucket.tokens + (elapsedMs / 60_000) * refillPerMin);
   bucket.lastRefillMs = nowMs;
   const allowed = bucket.tokens >= 1;
   if (allowed) bucket.tokens -= 1;
@@ -51,12 +74,12 @@ export function rateLimitTake(key: string, nowMs: number): boolean {
 }
 
 /** Seconds until one token is available again (for Retry-After). */
-export function rateLimitRetryAfterSec(key: string): number {
+export function rateLimitRetryAfterSec(key: string, refillPerMin: number = RATE_LIMIT_REFILL_PER_MIN): number {
   const bucket = rateBuckets.get(key);
   if (!bucket) return 1;
   const deficit = 1 - bucket.tokens;
   if (deficit <= 0) return 1;
-  return Math.max(1, Math.ceil((deficit / RATE_LIMIT_REFILL_PER_MIN) * 60));
+  return Math.max(1, Math.ceil((deficit / refillPerMin) * 60));
 }
 
 /** Test-only: reset the isolate-local buckets between test cases. */
