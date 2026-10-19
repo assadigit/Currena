@@ -132,12 +132,13 @@ const server = http.createServer((req, res) => {
       return;
     }
     if (pathname === '/api/insights/export') {
-      // TODO(Phase 9 / U-14): the owner-only export lives on the REAL Worker
-      // (apps/api routes/insights.ts — GET /api/insights/export, gated by the
-      // INSIGHTS_OWNER_TOKEN bearer, 401/403 without it, RULES.md M-3). This
-      // zero-dependency fixture server cannot host the Worker, so it answers
-      // 404 like any unknown route; U-14 pins the 401/403 behaviour against
-      // the real worker once Phase 9 wires the deployed preview in.
+      // The owner-only export is served by the REAL Worker only (apps/api
+      // routes/insights.ts — GET /api/insights/export, gated by the
+      // INSIGHTS_OWNER_TOKEN bearer, 401/403 without it, RULES.md M-3). The
+      // visual harness boots a local wrangler-dev instance of that Worker
+      // (playwright.config.ts webServer, :8799) and U-14 asserts the 401/403
+      // refusal against it — this zero-dependency fixture server cannot
+      // host the Worker and intentionally keeps answering 404 for the path.
       sendError(res, 404, 'not_found', 'The owner-only export is not part of the fixture server (real Worker route).');
       return;
     }

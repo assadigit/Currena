@@ -23,6 +23,8 @@ export default tseslint.config(
       '**/dist/**',
       '**/coverage/**',
       '**/node_modules/**',
+      // wrangler-dev generated bundles (gitignored) — 2026-10-19: scanning them yields ~2000 false errors after any local boot
+      '**/.wrangler/**',
       'apps/web/public/**',
       'legacy/**',
       'legacy-captures/**',

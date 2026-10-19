@@ -41,7 +41,9 @@
  *    · U-09 the gold/silver balance visual (beam + fulcrum + factor
  *      columns + readable-count line) at 360px in LTR and RTL
  *    · U-09a the low-readable variant keeps the beam level (UI-40)
- * Still expected-fail (Phase-9 target owned by ANOTHER task): U-14.
+ * All 19 tests now PASS — U-14 was the last expected-fail; Phase 9 wired
+ *   it to the REAL Worker booted locally (wrangler dev, playwright.config.ts
+ *   webServer on :8799), never a live deployment.
  */
 
 import { test, expect, type Page } from '@playwright/test';
@@ -945,13 +947,14 @@ test('U-13 no hard-coded copy outside the string table (source scan)', () => {
  * ------------------------------------------------------------------ */
 
 test('U-14 owner-only export is 401/403 without the owner token', async ({ request }) => {
-  // TODO(Phase 3 wiring): point this at the real Worker route the api agent
-  // is building (GET /api/insights/export gated by INSIGHTS_OWNER_TOKEN,
-  // RULES.md M-3). Until that endpoint exists the fixture server answers
-  // 404 — so this assertion fails, as expected. When Phase 3 lands, replace
-  // the fixture check with the deploy-preview check (or point the harness
-  // server at a proxy of the real Worker) and drop the test.fail marker.
-  test.fail();
-  const response = await request.get('/api/insights/export');
+  // Phase 9: the export lives on the REAL Worker (RULES.md M-3) — the
+  // config boots a local wrangler-dev instance on :8799 for this test
+  // (CURRENA_WORKER_URL overridable). It refuses anonymous callers before
+  // any KV read: 401 with the owner token secret set (the repo's
+  // gitignored .dev.vars), 403 owner_disabled without it — both designed.
+  // The fixture server keeps 404ing the path on purpose; this test
+  // deliberately bypasses it.
+  const workerUrl = process.env.CURRENA_WORKER_URL ?? 'http://localhost:8799';
+  const response = await request.get(`${workerUrl}/api/insights/export`);
   expect([401, 403], 'the export must refuse anonymous callers').toContain(response.status());
 });

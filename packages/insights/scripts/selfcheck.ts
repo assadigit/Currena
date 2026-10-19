@@ -288,7 +288,7 @@ try {
     const failed = m[4] !== undefined ? Number(m[4]) : 0;
     seen.set(pkg, { pkg, tests, failed, ok: failed === 0, note: failed === 0 ? `${tests} tests` : `${failed} failing` });
   }
-  for (const [pkg, row] of seen) suiteRows.push(row);
+  for (const [, row] of seen) suiteRows.push(row);
   if (suiteRows.length === 0) {
     suiteRows.push({ pkg: '(suites)', tests: 0, failed: 1, ok: false, note: 'no suite output parsed — the runner output shape changed' });
   }
