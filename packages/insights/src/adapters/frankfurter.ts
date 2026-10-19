@@ -5,7 +5,7 @@
  * with the latest business day (probe 2026-10-06).
  */
 
-import { fetchWithRetry } from '@currena/scraper';
+import { insightsFetch } from './fetch-policy';
 import { parseFrankfurterTimeseries } from '../parsers';
 import type { SeriesPoint } from '../series';
 import type { FetchDeps } from './types';
@@ -48,7 +48,7 @@ export async function fetchFrankfurterSeries(
   currencies: readonly string[] = FRANKFURTER_INSIGHTS_CURRENCIES,
   deps: FetchDeps = {},
 ): Promise<Record<string, SeriesPoint[]>> {
-  const res = await fetchWithRetry(frankfurterTimeseriesUrl(start, currencies), {}, deps);
+  const res = await insightsFetch(frankfurterTimeseriesUrl(start, currencies), {}, deps);
   const text = await res.text();
   const out: Record<string, SeriesPoint[]> = {};
   for (const ccy of currencies) {

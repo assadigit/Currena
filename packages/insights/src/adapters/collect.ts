@@ -16,6 +16,8 @@
  */
 
 import type { InsightsSourceReport } from '@currena/core';
+import { classifySourceError, contentHash } from './fetch-policy';
+import { providerFetchEnabled } from '../sources';
 import { ABS_SERIES, fetchAbsSeries } from './abs';
 import { fetchBitstampCloses } from './bitstamp';
 import { fetchEcbDfrSeries } from './ecb';
@@ -23,7 +25,7 @@ import { fetchCryptoFng } from './fng';
 import { fetchFrankfurterSeries } from './frankfurter';
 import { FRED_SERIES, fetchFredSeries } from './fred';
 import { fetchGoldApiSpot } from './goldapi';
-import { fetchRbaSeries } from './rba';
+import { fetchRbaTableText, parseRbaSeriesFromText, type RbaTableKey } from './rba';
 import { fetchYahooQuote } from './yahoo';
 import { fetchWorldBankMonthly } from './worldbank';
 import type { SeriesInputs } from './derived';
@@ -58,15 +60,44 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
   const today = new Date().toISOString().slice(0, 10);
 
   const reports: InsightsSourceReport[] = [];
-  const report = (source: string, ok: boolean, detail: string) => reports.push({ source, ok, detail });
+  const report = (source: string, ok: boolean, detail: string, kind?: InsightsSourceReport['kind'], hash?: string) =>
+    reports.push(hash !== undefined && kind ? { source, ok, detail, kind, hash } : kind ? { source, ok, detail, kind } : { source, ok, detail });
 
+  // v3 (2026-10-20) SCRAPING_SPEC gates ride every fetch:
+  //  - M-6 kill switch: a disabled source is never requested (T-30/T-31).
+  //  - T-27: a block (403/418/429/bot-check) is recorded as 'blocked' — no
+  //    retry, no circumvention; the next scheduled refresh tries again.
+  //  - F-16: a format change is recorded as 'format-changed' (the status
+  //    panel says so; the card fails closed).
+  //  - F-18: the content hash of the fetched value block rides the report
+  //    so unchanged repeats can be detected across refreshes.
   async function fetchLogged<T>(source: string, label: string, fn: () => Promise<T>): Promise<T | undefined> {
+    if (!providerFetchEnabled(source)) {
+      report(source, false, `${label}: skipped — source disabled (kill switch M-6)`, 'disabled');
+      return undefined;
+    }
     try {
       const value = await fn();
-      report(source, true, label);
+      report(source, true, label, 'fetched', safeHash(value));
       return value;
     } catch (err) {
-      report(source, false, `${label}: ${errMessage(err)}`);
+      const kind = classifySourceError(err);
+      const detail =
+        kind === 'blocked'
+          ? `${label}: blocked by the site — no retry, waiting for the next scheduled refresh (${errMessage(err)})`
+          : kind === 'format-changed'
+            ? `${label}: format changed — the card shows can't tell right now until the shape is re-verified (${errMessage(err)})`
+            : `${label}: ${errMessage(err)}`;
+      report(source, false, detail, kind);
+      return undefined;
+    }
+  }
+
+  /** F-18: hash the fetched VALUE BLOCK (undefined on unserialisable results). */
+  function safeHash(value: unknown): string | undefined {
+    try {
+      return contentHash(JSON.stringify(value));
+    } catch {
       return undefined;
     }
   }
@@ -137,22 +168,24 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
   // but verified HTTP 200 from the GitHub Actions runner — 03-data-sources.md).
   // Step-1 audit item A4: the DAILY F1 'Cash Rate Target' is fetched first;
   // F1.1 (monthly average) stays as the fallback when the daily table fails.
-  const rbaCashRateDaily = await fetchLogged('rba', 'F1 Cash Rate Target (daily)', () => fetchRbaSeries('cashRateDaily'));
-  const rbaCashRate = await fetchLogged('rba', 'F1.1 Cash Rate Target', () => fetchRbaSeries('cashRate'));
-  const rbaAu10y = await fetchLogged('rba', 'F2 Australian Government 10 year bond', () => fetchRbaSeries('au10y'));
+  // v3 F-08/T-32 (2026-10-20): each RBA TABLE document downloads exactly once
+  // per refresh — the F2 10y/3y pair parses two series out of one CSV via the
+  // per-run memo; the per-series report rows stay (same as before).
+  const rbaTables = new Map<string, Promise<string>>();
+  // A rejected table download rejects every series parsed from it — the
+  // identical error row on each is honest; the table is fetched ONCE.
+  const rbaSeriesVia = (key: RbaTableKey) => () =>
+    fetchRbaTableText(key, {}, rbaTables).then((text) => parseRbaSeriesFromText(text, key));
+  const rbaCashRateDaily = await fetchLogged('rba', 'F1 Cash Rate Target (daily', rbaSeriesVia('cashRateDaily'));
+  const rbaCashRate = await fetchLogged('rba', 'F1.1 Cash Rate Target', rbaSeriesVia('cashRate'));
+  const rbaAu10y = await fetchLogged('rba', 'F2 Australian Government 10 year bond', rbaSeriesVia('au10y'));
   // Fix spec C-06: F2's 3-year series (FCMYGBAG3D) — the RBA-expectations leg.
-  const rbaAu3y = await fetchLogged('rba', 'F2 FCMYGBAG3D Australian Government 3 year bond', () => fetchRbaSeries('au3y'));
-  const rbaHouseholdDebt = await fetchLogged('rba', 'E2 Household debt to income', () =>
-    fetchRbaSeries('householdDebtToIncome'),
-  );
-  const rbaHomeLoan = await fetchLogged('rba', 'F6 FLRHOOTA owner-occupier outstanding home-loan rate', () =>
-    fetchRbaSeries('homeLoanOutstanding'),
-  );
+  const rbaAu3y = await fetchLogged('rba', 'F2 FCMYGBAG3D Australian Government 3 year bond', rbaSeriesVia('au3y'));
+  const rbaHouseholdDebt = await fetchLogged('rba', 'E2 Household debt to income', rbaSeriesVia('householdDebtToIncome'));
+  const rbaHomeLoan = await fetchLogged('rba', 'F6 FLRHOOTA owner-occupier outstanding home-loan rate', rbaSeriesVia('homeLoanOutstanding'));
   // Step-2 add-list §B7: F4.1 PDRNTH — the paid rate on new household term
   // deposits (the "Savings and interest" card's real number).
-  const rbaDepositRate = await fetchLogged('rba', 'F4.1 PDRNTH new household term-deposit rate', () =>
-    fetchRbaSeries('depositRateNewTermHouseholds'),
-  );
+  const rbaDepositRate = await fetchLogged('rba', 'F4.1 PDRNTH new household term-deposit rate', rbaSeriesVia('depositRateNewTermHouseholds'));
 
   // Step 3 L1-18 (2026-10-16): the Alternative.me crypto Fear and Greed
   // index (context card; attribution shown next to the data).

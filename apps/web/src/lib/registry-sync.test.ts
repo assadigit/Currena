@@ -29,6 +29,27 @@ interface RegistryEntry {
   historyWindow: string;
   rule: unknown;
   ruleVersion: number;
+  layer: number;
+  publisher: string;
+  publisherUrl: string | null;
+  methodUrl: string | null;
+  whatItIs: string | null;
+  whatItIsnt: string | null;
+  trackRecordNote: string | null;
+  definition: string | null;
+  failClosedConditions: string;
+  sourceRisk: {
+    level: 'L0' | 'L1' | 'L2' | 'L3';
+    ownerAccepts: boolean | null;
+    enabled: boolean;
+    method: string | null;
+    runtime: string | null;
+    termsLines: string;
+    termsReadOn: string;
+    attributionText: string;
+    legs: string[];
+  };
+  licence: { publicDisplayOk: string; attributionText: string; termsCheckedOn: string };
 }
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -83,5 +104,39 @@ describe('data/indicators.json — the single indicator registry (A-01)', () => 
     for (const id of ['brent', 'gold-usd', 'silver-usd', 'btc-usd', 'usdjpy', 'audusd', 'gold-btc', 'm2-us', 'iron-ore', 'au-home-values']) {
       expect(byId.get(id)!.changeUnit, `${id} must speak in percent`).toBe('percent');
     }
+  });
+
+  it('Step 3 §8 (v3): every entry carries the source-risk block, the publisher, what-it-is texts and the fail-closed sentence', () => {
+    for (const entry of registry.indicators) {
+      const sr = entry.sourceRisk;
+      expect(['L0', 'L1', 'L2', 'L3'], `${entry.id} level`).toContain(sr.level);
+      expect(sr.enabled, `${entry.id} enabled`).toBeTypeOf('boolean');
+      expect(sr.termsLines.length, `${entry.id} termsLines`).toBeGreaterThan(0);
+      expect(sr.legs.length, `${entry.id} legs`).toBeGreaterThan(0);
+      expect(entry.publisher.length, `${entry.id} publisher`).toBeGreaterThan(0);
+      expect(entry.whatItIs, `${entry.id} whatItIs`).toBeTruthy();
+      expect(entry.whatItIsnt, `${entry.id} whatItIsnt`).toBeTruthy();
+      expect(entry.failClosedConditions, `${entry.id} failClosedConditions`).toContain('fail closed');
+    }
+  });
+
+  it('Step 3 §8 + T-15 (v3): no displayed card is L3, and every L2 card carries owner acceptance', () => {
+    for (const entry of registry.indicators) {
+      if (entry.licence.publicDisplayOk !== 'yes') continue; // hidden in public mode anyway
+      expect(entry.sourceRisk.level, `${entry.id} must not be L3 while displayed`).not.toBe('L3');
+      if (entry.sourceRisk.level === 'L2') {
+        expect(entry.sourceRisk.ownerAccepts, `${entry.id} is L2 and displayed — the owner must have accepted it`).toBe(true);
+      }
+    }
+  });
+
+  it('Layer 2 entries carry their plain-arithmetic definition; Layer 1 entries leave it null', () => {
+    const byId = new Map(registry.indicators.map((i) => [i.id, i]));
+    for (const id of ['yield-curve-10y2y', 'gold-silver', 'copper-gold', 'gold-btc', 'silver-btc', 'fed-expectations', 'rba-expectations', 'au-us-10y-gap', 'dollar-basket', 'gold-aud', 'govt-interest-revenue']) {
+      expect(byId.get(id)!.definition, `${id} is Layer 2 — it needs its definition`).toBeTruthy();
+      expect(byId.get(id)!.layer).toBe(2);
+    }
+    expect(byId.get('us10y')!.definition).toBeNull();
+    expect(byId.get('us10y')!.layer).toBe(1);
   });
 });

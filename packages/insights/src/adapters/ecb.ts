@@ -9,7 +9,7 @@
  * class Green: free reuse with attribution (data spec §1 row 5).
  */
 
-import { fetchWithRetry } from '@currena/scraper';
+import { insightsFetch } from './fetch-policy';
 import { parseEcbDfrCsv } from '../parsers';
 import type { SeriesPoint } from '../series';
 import type { FetchDeps } from './types';
@@ -26,7 +26,7 @@ export function ecbDfrUrl(): string {
 
 /** Fetch and parse the ECB deposit facility rate series (full history). */
 export async function fetchEcbDfrSeries(deps: FetchDeps = {}): Promise<SeriesPoint[]> {
-  const res = await fetchWithRetry(ecbDfrUrl(), {}, deps);
+  const res = await insightsFetch(ecbDfrUrl(), {}, deps);
   const text = await res.text();
   return parseEcbDfrCsv(text);
 }

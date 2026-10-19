@@ -13,7 +13,7 @@
  * seconds) — the SeriesPoint date is that UTC day, never the fetch instant.
  */
 
-import { fetchWithRetry } from '@currena/scraper';
+import { insightsFetch } from './fetch-policy';
 import { z } from 'zod';
 import type { SeriesPoint } from '../series';
 import type { FetchDeps } from './types';
@@ -37,7 +37,7 @@ const FngResponseSchema = z.object({
 
 /** Fetch the daily history (newest last) for the crypto-fng reading. */
 export async function fetchCryptoFng(deps: FetchDeps = {}, limit = 400): Promise<SeriesPoint[]> {
-  const res = await fetchWithRetry(`${FNG_URL}?limit=${limit}`, {}, deps);
+  const res = await insightsFetch(`${FNG_URL}?limit=${limit}`, {}, deps);
   const body: unknown = await res.json();
   const parsed = FngResponseSchema.safeParse(body);
   if (!parsed.success) {

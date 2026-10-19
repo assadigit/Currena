@@ -209,7 +209,7 @@ describe('fetchEodhdSeries / fetchYahooSeries', () => {
     await expect(fetchEodhdSeries('ftse', { apiToken: 'k', fetchImpl })).rejects.toThrow(/no EODHD code/);
   });
 
-  it('sends a browser-like User-Agent to Yahoo and encodes the symbol', async () => {
+  it('sends the declared honest User-Agent to Yahoo and encodes the symbol (T-25/F-09)', async () => {
     const calls: Array<{ url: string; headers: HeadersInit }> = [];
     const yahooBody = JSON.stringify({
       chart: { result: [{ timestamp: [1791552600], indicators: { quote: [{ close: [7811.54] }] } }] },
@@ -220,7 +220,7 @@ describe('fetchEodhdSeries / fetchYahooSeries', () => {
     }) as typeof fetch;
     await fetchYahooSeries('n225', { fetchImpl, baseUrl: 'https://yahoo.test/chart' });
     expect(calls[0]!.url).toBe('https://yahoo.test/chart/%5EN225?range=1y&interval=1d');
-    expect((calls[0]!.headers as Record<string, string>)['user-agent']).toMatch(/Mozilla/);
+    expect(new Headers(calls[0]!.headers as HeadersInit).get('user-agent')).toMatch(/CurrenaDashboard\/1\.0/);
   });
 });
 

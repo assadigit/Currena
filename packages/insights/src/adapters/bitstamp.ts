@@ -8,7 +8,7 @@
  */
 
 import { z } from 'zod';
-import { fetchWithRetry } from '@currena/scraper';
+import { insightsFetch } from './fetch-policy';
 import { assertAscending, type SeriesPoint } from '../series';
 import { AdapterError, type FetchDeps } from './types';
 
@@ -69,7 +69,7 @@ export async function fetchBitstampCloses(
   window: BitstampWindow = {},
   deps: FetchDeps = {},
 ): Promise<SeriesPoint[]> {
-  const res = await fetchWithRetry(bitstampOhlcUrl(pair, 86_400, window), {}, deps);
+  const res = await insightsFetch(bitstampOhlcUrl(pair, 86_400, window), {}, deps);
   const json: unknown = await res.json();
   const parsed = BitstampOhlcSchema.safeParse(json);
   if (!parsed.success) {

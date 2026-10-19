@@ -11,7 +11,7 @@
  * "NoRecordsFound" — that is an upstream/key change and must fail loudly.
  */
 
-import { fetchWithRetry } from '@currena/scraper';
+import { insightsFetch } from './fetch-policy';
 import { parseAbsSdmxCsv } from '../parsers';
 import type { SeriesPoint } from '../series';
 import type { FetchDeps } from './types';
@@ -57,7 +57,7 @@ export function absDataUrl(key: string): string {
 
 /** Fetch and parse one ABS series (full history). */
 export async function fetchAbsSeries(key: string, deps: FetchDeps = {}): Promise<SeriesPoint[]> {
-  const res = await fetchWithRetry(absDataUrl(key), {}, deps);
+  const res = await insightsFetch(absDataUrl(key), {}, deps);
   const text = await res.text();
   if (text.trim() === 'NoRecordsFound') {
     throw new Error(`ABS: series "${key}" returned NoRecordsFound (key or flow changed upstream?)`);

@@ -78,6 +78,24 @@ function historiesEqual(a: IndicatorHistory, b: IndicatorHistory): boolean {
  */
 const SEED_IDS: IndicatorId[] = ['gold-usd', 'silver-usd', 'copper-usd', 'btc-usd', 'gold-silver'];
 
+/**
+ * v3 M-6 (2026-10-20): the ids whose source legs are disabled in the risk
+ * register (the kill switch), read from the generated audit sidecar — the
+ * SAME file the registry sync pins, so the ingest and the public projection
+ * cannot disagree. data/indicator-audit.json carries per-indicator
+ * `enabled` (generated from packages/insights/src/sources.ts).
+ */
+function auditDisabledIds(): string[] {
+  try {
+    const raw = JSON.parse(readFileSync(new URL('../../../../data/indicator-audit.json', import.meta.url), 'utf8')) as {
+      indicators: Array<{ id: string; enabled: boolean }>;
+    };
+    return raw.indicators.filter((i) => !i.enabled).map((i) => i.id);
+  } catch {
+    return []; // no sidecar → no extra hiding (the licence walk still governs)
+  }
+}
+
 const dryRun = process.argv.includes('--dry-run');
 
 function fail(message: string): never {
@@ -112,6 +130,17 @@ console.log(`# Insights ingestion run — ${nowIso}`);
 console.log(`mode=${mode}${dryRun ? ' DRY-RUN (no KV writes)' : ''}\n`);
 
 const { inputs, reports } = await collectAllSources();
+
+// v3 (2026-10-20) — the fail-closed inputs the snapshot builder now takes:
+//  - M-6: ids whose source legs carry a disabled register row (kill switch);
+//  - T-27/F-16: per-provider blocked / format-changed outcomes from this run.
+const disabledReadings: string[] = auditDisabledIds();
+const sourceOutcomes: Record<string, 'blocked' | 'format-changed'> = {};
+for (const row of reports) {
+  if (row.source === 'cross-check' || row.ok) continue;
+  if (row.kind === 'blocked') sourceOutcomes[row.source] = 'blocked';
+  else if (row.kind === 'format-changed') sourceOutcomes[row.source] = 'format-changed';
+}
 
 // Hand-maintained data files (roadmap §2 "Package layout") — Phase I5/I6
 // content work populates them; their ABSENCE is expected and soft, but a
@@ -330,6 +359,8 @@ const draft = buildInsightsSnapshot({
   highestSince,
   contextNotes,
   manualExpires,
+  disabledReadings,
+  sourceOutcomes,
   now: nowIso,
 });
 
@@ -358,6 +389,8 @@ const snapshot = buildInsightsSnapshot({
   highestSince,
   contextNotes,
   manualExpires,
+  disabledReadings,
+  sourceOutcomes,
   flags: outcome.flags,
   now: nowIso,
 });

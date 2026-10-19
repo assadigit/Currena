@@ -11,18 +11,20 @@
  *      market kept moving), Yahoo's daily closes extend the series so the
  *      stored history, percentiles and 7/30-day changes never rot.
  *
- * Keyless, unofficial — a browser-like UA avoids the 429/999 blocks a plain
- * curl UA gets (verified in the world-markets step-0 data check; the same
- * constants live in ../markets/definitions.ts for the index fetchers).
+ * Keyless, unofficial. Since the v3 scraping spec (2026-10-20) the fetch
+ * carries the declared CurrenaDashboard identity only (F-09): if Yahoo
+ * refuses it, that is a block and the source fails closed (T-27).
  */
 
 import type { SeriesPoint } from '../series';
+import { BlockedError, insightsFetch } from './fetch-policy';
 
 /** Yahoo chart endpoint (unofficial, keyless; v7 is dead — v8 only). */
 export const YAHOO_CHART_BASE = 'https://query1.finance.yahoo.com/v8/finance/chart';
-/** User-Agent for Yahoo — a plain curl UA gets blocked with 429/999. */
-export const YAHOO_CHART_USER_AGENT =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0 Safari/537.36';
+/** User-Agent for Yahoo (v3 F-09/T-25): the declared honest identity. A
+ *  refusal (429/999/403/bot-check) now means BLOCKED — the source fails
+ *  closed until the next refresh; no identity change, ever. */
+export const YAHOO_CHART_USER_AGENT = 'CurrenaDashboard/1.0 (+https://github.com/assadigit/Currena)';
 
 /** One symbol's answer: the live quote plus its daily closes. */
 export interface YahooQuote {
@@ -61,14 +63,6 @@ export interface YahooQuoteOptions {
   userAgent?: string;
   /** Request timeout; default 15 s. */
   timeoutMs?: number;
-}
-
-function timeoutSignal(ms: number): AbortSignal | undefined {
-  try {
-    return AbortSignal.timeout(ms);
-  } catch {
-    return undefined; // environments without AbortSignal.timeout — fetch without a signal
-  }
 }
 
 /**
@@ -140,14 +134,18 @@ export async function fetchYahooQuote(
   opts: YahooQuoteOptions = {},
 ): Promise<YahooQuote> {
   const url = `${opts.baseUrl ?? YAHOO_CHART_BASE}/${encodeURIComponent(symbol)}?range=${encodeURIComponent(range)}&interval=1d`;
-  const fetchImpl = opts.fetchImpl ?? ((input: RequestInfo | URL, init?: RequestInit) => fetch(input, init));
+  // v3 (2026-10-20): the fetch goes through fetch-policy — the declared
+  // identity is enforced (T-25/F-09) and a refusal/bot-check classifies as
+  // a BLOCK (T-27) that propagates with its machine-readable reason.
   let response: Response;
   try {
-    response = await fetchImpl(url, {
-      headers: { 'user-agent': opts.userAgent ?? YAHOO_CHART_USER_AGENT, accept: 'application/json' },
-      signal: timeoutSignal(opts.timeoutMs ?? 15_000),
-    });
+    response = await insightsFetch(
+      url,
+      { headers: { accept: 'application/json' } },
+      { fetchImpl: opts.fetchImpl, timeoutMs: opts.timeoutMs ?? 15_000 },
+    );
   } catch (err) {
+    if (err instanceof BlockedError) throw err; // the block IS the answer — fail closed
     throw new YahooQuoteError(symbol, `transport failure: ${errMessage(err)}`);
   }
   if (!response.ok) {

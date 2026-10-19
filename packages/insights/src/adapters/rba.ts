@@ -29,7 +29,7 @@
  *    Series ID like F6.
  */
 
-import { fetchWithRetry } from '@currena/scraper';
+import { insightsFetch } from './fetch-policy';
 import { parseRbaTableCsv } from '../parsers';
 import type { SeriesPoint } from '../series';
 import type { FetchDeps } from './types';
@@ -73,16 +73,40 @@ export function rbaTableUrl(spec: RbaTableSpec): string {
 }
 
 /** Fetch and parse one RBA table series (full history). */
-export async function fetchRbaSeries(key: RbaTableKey, deps: FetchDeps = {}): Promise<SeriesPoint[]> {
+/**
+ * Fetch ONE RBA table's CSV text. v3 F-08 (2026-10-20): pass a `memo` map so
+ * a single refresh downloads each table document exactly ONCE no matter how
+ * many series are parsed from it (the F2 10y + 3y pair previously cost two
+ * identical downloads per run).
+ */
+export async function fetchRbaTableText(
+  key: RbaTableKey,
+  deps: FetchDeps = {},
+  memo?: Map<string, Promise<string>>,
+): Promise<string> {
   const spec: RbaTableSpec = RBA_TABLES[key];
   // RBA tables are a few hundred KB and Akamai-throttled — a wider timeout
   // than the 12s default, still overridable.
   const { timeoutMs, ...rest } = deps;
-  const res = await fetchWithRetry(rbaTableUrl(spec), {}, { ...rest, timeoutMs: timeoutMs ?? 45_000 });
-  const text = await res.text();
+  const url = rbaTableUrl(spec);
+  const existing = memo?.get(url);
+  if (existing) return existing; // one request per table per refresh (F-08/T-32)
+  const pending = insightsFetch(url, {}, { ...rest, timeoutMs: timeoutMs ?? 45_000 }).then((res) => res.text());
+  memo?.set(url, pending);
+  return pending;
+}
+
+/** Parse ONE series out of an already-downloaded RBA table CSV. */
+export function parseRbaSeriesFromText(text: string, key: RbaTableKey): SeriesPoint[] {
+  const spec: RbaTableSpec = RBA_TABLES[key];
   const opts: import('../parsers').RbaParseOptions =
     spec.seriesId !== undefined
       ? { tablePrefix: spec.prefix, seriesId: spec.seriesId }
       : { tablePrefix: spec.prefix, seriesTitle: spec.series };
   return parseRbaTableCsv(text, opts);
+}
+
+export async function fetchRbaSeries(key: RbaTableKey, deps: FetchDeps = {}): Promise<SeriesPoint[]> {
+  const text = await fetchRbaTableText(key, deps);
+  return parseRbaSeriesFromText(text, key);
 }

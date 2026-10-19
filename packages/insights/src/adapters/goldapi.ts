@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod';
-import { fetchWithRetry } from '@currena/scraper';
+import { insightsFetch } from './fetch-policy';
 import { AdapterError, type FetchDeps, type SpotPrice } from './types';
 
 export const GOLDAPI_BASE = 'https://api.gold-api.com/price';
@@ -33,7 +33,7 @@ export function goldApiPriceUrl(symbol: string): string {
 
 /** Fetch one spot price. Throws loudly on non-2xx or contract change. */
 export async function fetchGoldApiSpot(symbol: string, deps: FetchDeps = {}): Promise<SpotPrice> {
-  const res = await fetchWithRetry(goldApiPriceUrl(symbol), {}, deps);
+  const res = await insightsFetch(goldApiPriceUrl(symbol), {}, deps);
   const json: unknown = await res.json();
   const parsed = GoldApiPriceSchema.safeParse(json);
   if (!parsed.success) {

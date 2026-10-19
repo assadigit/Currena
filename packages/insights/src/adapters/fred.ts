@@ -4,7 +4,7 @@
  * time, and the runner only stores trimmed output (D1 minification).
  */
 
-import { fetchWithRetry } from '@currena/scraper';
+import { insightsFetch } from './fetch-policy';
 import { parseFredCsv } from '../parsers';
 import type { SeriesPoint } from '../series';
 import type { FetchDeps } from './types';
@@ -19,8 +19,10 @@ export const FRED_CSV_BASE = 'https://fred.stlouisfed.org/graph/fredgraph.csv';
  * programmatic CSV access; re-verified from the ingestion venue during I2.
  */
 const FRED_HEADERS: Readonly<Record<string, string>> = {
-  'User-Agent': 'CurrenaInsights/1.0 (market-indicator ingestion; github.com/assadigit/Currena)',
   Accept: 'text/csv,*/*;q=0.8',
+  // The declared identity now lives in fetch-policy.ts (T-25/F-09): every
+  // Insights fetch carries CurrenaDashboard/1.0 (+contact) — a single
+  // honest identity for the whole pipeline, never a browser fingerprint.
 };
 
 /** URL of a series' full-history CSV. */
@@ -33,7 +35,7 @@ export function fredSeriesUrl(seriesId: string): string {
  * non-2xx (after retries) or format change — never returns partial guesses.
  */
 export async function fetchFredSeries(seriesId: string, deps: FetchDeps = {}): Promise<SeriesPoint[]> {
-  const res = await fetchWithRetry(fredSeriesUrl(seriesId), { headers: FRED_HEADERS }, deps);
+  const res = await insightsFetch(fredSeriesUrl(seriesId), { headers: FRED_HEADERS }, deps);
   const text = await res.text();
   return parseFredCsv(text);
 }

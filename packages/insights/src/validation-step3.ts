@@ -676,3 +676,32 @@ export function runDefectChecksOnBaseline(
   ];
   return results;
 }
+
+/* ------------------------------------------------------------------ */
+/* T-34 (v3, 2026-10-20) — the F-17 cross-check for a fetched sentiment   */
+/* gauge: a large directional disagreement with the VIX card is flagged   */
+/* in the status report. Check sensitivity (documented, not invented     */
+/* silently): the gauge moved ≥ 10 points while the VIX moved the other  */
+/* way by ≥ 10%, or vice versa.                                          */
+/* ------------------------------------------------------------------ */
+
+export interface FngCrossCheckInput {
+  /** The fetched gauge reading: current score and the previous close's score. */
+  cnn: { score: number; prevScore: number };
+  /** The page's own VIX card: current value and the previous close. */
+  vix: { value: number; prevValue: number };
+}
+
+/** T-34: returns the flag line when the two readings disagree directionally at size, else null. */
+export function crossCheckFngVsVix(input: FngCrossCheckInput): string | null {
+  const { cnn, vix } = input;
+  const cnnMove = cnn.score - cnn.prevScore;
+  const vixPct = vix.prevValue > 0 ? ((vix.value - vix.prevValue) / vix.prevValue) * 100 : null;
+  if (vixPct === null || !Number.isFinite(cnnMove) || !Number.isFinite(vixPct)) return null;
+  const cnnJump = Math.abs(cnnMove) >= 10;
+  const vixJump = Math.abs(vixPct) >= 10;
+  if (!cnnJump || !vixJump) return null; // one side calm — nothing to compare at size
+  const opposite = Math.sign(cnnMove) === -Math.sign(vixPct);
+  if (!opposite) return null; // same direction — no disagreement to flag
+  return `directional disagreement: the gauge moved ${cnnMove > 0 ? 'up' : 'down'} ${Math.abs(cnnMove).toFixed(0)} points while the VIX card moved ${vixPct > 0 ? 'up' : 'down'} ${Math.abs(vixPct).toFixed(1)}% — check both readings before relying on either`;
+}

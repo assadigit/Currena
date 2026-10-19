@@ -353,3 +353,25 @@ describe('baseline fixture run (frozen evidence companion)', () => {
     }
   });
 });
+
+describe('T-34: the F-17 cross-check flags a large directional disagreement with the VIX card', () => {
+  it('gauge jumping while the VIX falls ≥ 10% is flagged for the CNN source', async () => {
+    const { crossCheckFngVsVix } = await import('./validation-step3');
+    const flag = crossCheckFngVsVix({
+      cnn: { score: 71, prevScore: 42 },
+      vix: { value: 15.2, prevValue: 18.9 }, // −19.6%
+    });
+    expect(flag).toContain('directional disagreement');
+    expect(flag).toContain('VIX');
+  });
+
+  it('same-direction moves and calm days read null (no false alarms)', async () => {
+    const { crossCheckFngVsVix } = await import('./validation-step3');
+    expect(
+      crossCheckFngVsVix({ cnn: { score: 64, prevScore: 61 }, vix: { value: 15.0, prevValue: 18.9 } }),
+    ).toBeNull(); // gauge move too small
+    expect(
+      crossCheckFngVsVix({ cnn: { score: 71, prevScore: 42 }, vix: { value: 21, prevValue: 18.9 } }),
+    ).toBeNull(); // same direction (both more fearful)
+  });
+});

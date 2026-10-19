@@ -863,6 +863,17 @@ export const InsightsSourceReportSchema = z.object({
   source: z.string().min(1),
   ok: z.boolean(),
   detail: z.string().min(1),
+  /**
+   * v3 (2026-10-20) SCRAPING_SPEC outcome classification: fetched | blocked |
+   * format-changed | failed | disabled | cross-check. Optional for
+   * backward compatibility with stored statuses.
+   */
+  kind: z.enum(['fetched', 'blocked', 'format-changed', 'failed', 'disabled', 'cross-check']).optional(),
+  /**
+   * F-18: content hash of the fetched value block (unchanged repeats can be
+   * detected without re-parsing). Optional.
+   */
+  hash: z.string().optional(),
 });
 export type InsightsSourceReport = z.infer<typeof InsightsSourceReportSchema>;
 

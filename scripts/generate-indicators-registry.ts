@@ -27,6 +27,10 @@ import { staleAfterDaysFor, GRACE_DAYS } from '../packages/insights/src/scoring'
 import { DISPLAY } from '../apps/web/src/components/insights/config/display';
 // @ts-expect-error — same (Step 3 §8 licence block, 2026-10-16).
 import { licenceForProvider, fredLicenceForSeries, type FredCopyrightRecord, type SourceLicence } from '../packages/insights/src/licences';
+// @ts-expect-error — same (Step 3 §8 v3 source-risk block, 2026-10-20).
+import { riskSummaryForLegs, upstreamLegsFor, riskRowForLeg, UPSTREAM_LEGS } from '../packages/insights/src/sources';
+// @ts-expect-error — the EN copy is the §8 what-it-is text source of record (2026-10-20).
+import { insightsCopyEn } from '../apps/web/src/i18n/insights-copy-en';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const outPath = join(here, '..', 'data', 'indicators.json');
@@ -63,30 +67,11 @@ const LAYER2_IDS = new Set<string>([
 
 /**
  * Defect E-01 / LR-02 (2026-10-16): the card ids whose VALUE (history or
- * live point) comes partly from Yahoo Finance's unofficial endpoints, with
- * the full leg list. The licence is the WORST of the legs — a Yahoo leg
- * (publicDisplayOk 'no') makes the whole card private-only, so no
- * Yahoo-sourced value can ever reach a future public mode (T-15).
- * Legs not listed here resolve from the definition's own source.
+ * live point) comes partly from another provider, with the full leg list.
+ * THE SHARED MAP now lives in packages/insights/src/sources.ts (moved there
+ * 2026-10-20 so the engine's kill switch + level walk and this generator
+ * cannot drift). UPSTREAM_LEGS is re-exported here for the local walk below.
  */
-const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
-  brent: ['fred:DCOILBRENTEU', 'yahoo:BZ=F'], // EIA spot extended by the BZ=F gap-fill
-  'gold-usd': ['gold-api:XAU', 'yahoo:GC=F'], // Yahoo 10y history + gold-api live spot
-  'silver-usd': ['gold-api:XAG', 'yahoo:SI=F'],
-  'btc-usd': ['gold-api:BTC', 'yahoo:BTC-USD'],
-  'gold-silver': ['world-bank', 'gold-api'],
-  'copper-gold': ['world-bank'],
-  'copper-usd': ['gold-api:HG', 'world-bank'],
-  'gold-aud': ['gold-api:XAU', 'frankfurter'],
-  'gold-btc': ['gold-api:XAU', 'gold-api:BTC'],
-  'silver-btc': ['gold-api:XAG', 'gold-api:BTC'],
-  'dollar-basket': ['frankfurter'],
-  'fed-expectations': ['fred:DGS2', 'fred:DFEDTARL', 'fred:DFEDTARU'],
-  'rba-expectations': ['rba:F2', 'rba:F1'],
-  'au-us-10y-gap': ['rba:F2', 'fred:DGS10'],
-  'govt-interest-revenue': ['fred:A091RC1Q027SBEA', 'fred:W006RC1Q027SBEA'],
-  'yield-curve-10y2y': ['fred:T10Y2Y'],
-};
 
 /** The worse of two public-display verdicts (fail-closed order). */
 function worstDisplay(a: string, b: string): string {
@@ -103,6 +88,47 @@ function licenceOfLeg(leg: string): SourceLicence {
     return { ...licenceForProvider('fred'), publicDisplayOk: 'no' }; // unscanned series fail closed
   }
   return licenceForProvider(provider ?? leg);
+}
+
+/* ---------------- Step 3 §8 (v3, 2026-10-20): what-it-is texts + L2 definitions ---------------- */
+
+/**
+ * The Layer 2 plain-arithmetic definitions (Step 3 §4). Each line states
+ * the inputs and the SAME-DATE rule — these are the definitions the cards'
+ * "How is this calculated?" shows; they mirror the composition already
+ * implemented in packages/insights/src/adapters/derived.ts.
+ */
+const LAYER2_DEFINITIONS: Readonly<Record<string, string>> = {
+  'yield-curve-10y2y': 'The published T10Y2Y series: the US 10-year Treasury yield minus the 2-year Treasury yield, same date.',
+  'gold-silver': 'The gold price divided by the silver price, same date and the same price basis.',
+  'copper-gold': 'The copper price divided by the gold price (monthly, World Bank Pink Sheet basis), same period.',
+  'gold-btc': 'The gold price divided by the Bitcoin price: ounces of gold per one bitcoin, same date.',
+  'silver-btc': 'The silver price divided by the Bitcoin price: ounces of silver per one bitcoin, same date.',
+  'fed-expectations':
+    'The US 2-year Treasury yield (DGS2) minus the Fed target-range midpoint ((DFEDTARL + DFEDTARU) / 2), same date. A rough read of what markets price for the policy rate — not a probability.',
+  'rba-expectations':
+    'The Australian 3-year government bond yield (RBA F2) minus the RBA cash rate (F1), same date. A rough read — the ASX RBA Rate Tracker carries the market-priced path.',
+  'au-us-10y-gap':
+    'The Australian 10-year yield (RBA F2) minus the US 10-year yield (DGS10). When the two data dates differ, both dates are shown and the gap is marked "dates differ".',
+  'dollar-basket':
+    'Currena\'s DXY-style basket: a weighted geometric mean of six USD exchange rates (ECB reference rates via Frankfurter), scaled with the published DXY base constant 50.14348112.',
+  'gold-aud': 'The gold price in US dollars divided by AUD/USD, same date: the gold price in Australian dollars.',
+  'govt-interest-revenue':
+    'US federal interest payments (BEA series A091RC1Q027SBEA) as a share of federal government receipts (W006RC1Q027SBEA), quarterly, in percent.',
+};
+
+/** The §8 `fail_closed_conditions` sentence, generated per indicator from its own cadence + max age (no hand-typed conclusions). */
+function failClosedConditionsFor(cadence: string, maxAgeDays: number | null): string {
+  const age = maxAgeDays !== null ? `older than ${maxAgeDays} days` : 'older than its allowed age';
+  return `No value, data ${age}, an exact repeat beyond its ${cadence} cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).`;
+}
+
+/** The §8 `publisher`: the register label of the governing (worst-level) leg. */
+function riskRowLabelFor(legs: readonly string[]): string {
+  const rank = (lvl: string): number => ({ L0: 0, L1: 1, L2: 2, L3: 3 })[lvl] ?? 1;
+  const rows = legs.map((leg) => riskRowForLeg(leg, fredRecords));
+  const worst = Math.max(...rows.map((r) => rank(r.level)));
+  return rows.find((r) => rank(r.level) === worst)!.label;
 }
 
 function licenceBlockFor(def: { id: string; source: string; sourceRef: string }): SourceLicence {
@@ -164,6 +190,11 @@ const indicators = DEFINITIONS.map((def) => {
   const source = READING_SOURCES[def.id] ?? { name: def.sourceRef };
   const display = DISPLAY[def.id as keyof typeof DISPLAY];
   const scored = def.rule.kind !== 'info';
+  const legs = upstreamLegsFor(def);
+  const risk = riskSummaryForLegs(legs, fredRecords);
+  const copyEntry = (insightsCopyEn.indicators as Record<string, { whatItIs: string; cantTell: string; tendedToMean: string }>)[def.id];
+  const layer = LAYER2_IDS.has(def.id) ? 2 : 1;
+  const maxAgeDays = staleAfterDaysFor(def) ?? null;
   return {
     id: def.id,
     title: def.name,
@@ -183,16 +214,36 @@ const indicators = DEFINITIONS.map((def) => {
       url: source.url ?? null,
       seriesIdOrTable: def.sourceRef,
     },
+    /* -------- Step 3 §8 (v3, 2026-10-20): publisher + what-it-is + fail-closed -------- */
+    publisher: riskRowLabelFor(legs),
+    publisherUrl: source.url ?? null,
+    methodUrl: source.url ?? null,
+    whatItIs: copyEntry?.whatItIs ?? null,
+    whatItIsnt: copyEntry?.cantTell ?? null,
+    trackRecordNote: copyEntry?.tendedToMean ?? null,
+    definition: layer === 2 ? (LAYER2_DEFINITIONS[def.id] ?? null) : null,
+    failClosedConditions: failClosedConditionsFor(def.cadence, maxAgeDays),
+    sourceRisk: {
+      level: risk.level,
+      ownerAccepts: risk.ownerAccepts,
+      enabled: risk.enabled,
+      method: risk.method,
+      runtime: risk.runtime,
+      termsLines: risk.governingTermsLines,
+      termsReadOn: risk.termsReadOn,
+      attributionText: risk.attribution,
+      legs: risk.legs,
+    },
     unit: display?.unit ?? 'ratio',
     changeUnit: def.changeKind === 'points' ? 'percentage points' : 'percent',
     cadence: def.cadence,
-    maxAgeDays: staleAfterDaysFor(def) ?? null,
+    maxAgeDays,
     maxAgeBasis: def.staleAfterDays !== undefined ? 'per-series override' : `cadence default (${String(def.cadence)})`,
     scored,
     historyWindow: '10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)',
     rule: def.rule,
     ruleVersion: RULE_VERSION,
-    layer: LAYER2_IDS.has(def.id) ? 2 : 1,
+    layer,
     licence: (() => {
       const l = licenceBlockFor(def);
       const ownerOverride = OWNER_PUBLIC_DISPLAY_OVERRIDE[def.id];
@@ -249,6 +300,12 @@ const audit = {
     licenceName: i.licence.licenceName,
     publicDisplayOk: i.licence.publicDisplayOk,
     privateOk: i.licence.privateOk,
+    /* E-23 v3 additions (2026-10-20): the risk-register columns the
+     * full export's audit trail needs (level, owner_accepts, enabled). */
+    level: i.sourceRisk.level,
+    ownerAccepts: i.sourceRisk.ownerAccepts,
+    enabled: i.sourceRisk.enabled,
+    method: i.sourceRisk.method,
     maxAgeDays: i.maxAgeDays,
     ruleVersion: i.ruleVersion,
     /** The rule JSON VERBATIM (never a paraphrase — no invented semantics). */
@@ -273,7 +330,11 @@ console.log(`[registry] wrote ${audit.indicators.length} audit entries to ${audi
  * ------------------------------------------------------------------ */
 
 const hiddenIndicatorIds = indicators
-  .filter((i) => i.licence.publicDisplayOk !== 'yes')
+  // v3 (2026-10-20): the public projection hides BOTH the licence-hidden
+  // set (publicDisplayOk ≠ 'yes', fail-closed unknowns included) AND every
+  // reading whose source legs carry a disabled register row (the M-6 kill
+  // switch) — one generated list, cross-checked by T-15.
+  .filter((i) => i.licence.publicDisplayOk !== 'yes' || !i.sourceRisk.enabled)
   .map((i) => i.id)
   .sort();
 const overridesPath = join(here, '..', 'data', 'site-mode-overrides.json');

@@ -14,7 +14,7 @@
  * so a silent column reorder cannot misattribute a metal.
  */
 
-import { fetchWithRetry } from '@currena/scraper';
+import { insightsFetch } from './fetch-policy';
 import { assertAscending, type SeriesPoint } from '../series';
 import { AdapterError, type FetchDeps } from './types';
 import { readXlsxSheet } from './xlsx';
@@ -145,11 +145,11 @@ export function parseWorldBankMonthlySheet(cells: { col: string; row: number; va
  * the workbook itself.
  */
 export async function fetchWorldBankMonthly(deps: FetchDeps = {}): Promise<WorldBankMonthly> {
-  const pageRes = await fetchWithRetry(WB_COMMODITY_MARKETS_PAGE, {}, deps);
+  const pageRes = await insightsFetch(WB_COMMODITY_MARKETS_PAGE, {}, deps);
   const pageHtml = await pageRes.text();
   const workbookUrl = findPinkSheetMonthlyUrl(pageHtml);
 
-  const wbRes = await fetchWithRetry(workbookUrl, {}, { ...deps, timeoutMs: deps.timeoutMs ?? 60_000 });
+  const wbRes = await insightsFetch(workbookUrl, {}, { ...deps, timeoutMs: deps.timeoutMs ?? 60_000 });
   const bytes = new Uint8Array(await wbRes.arrayBuffer());
   const cells = await readXlsxSheet(bytes, WB_MONTHLY_SHEET_NAME);
   return parseWorldBankMonthlySheet(cells);

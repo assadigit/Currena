@@ -17,13 +17,14 @@
 
 import type { FxCurrency } from '@currena/core';
 import type { SeriesPoint } from '../series';
+import { insightsFetch } from '../adapters/fetch-policy';
+import { providerFetchEnabled } from '../sources';
 import {
   FRANKFURTER_BASE_URL,
   FX_BASKET_CURRENCIES,
   FX_CURRENCIES,
   FX_HISTORY_DAYS,
   YAHOO_BASE_URL,
-  YAHOO_USER_AGENT,
 } from './definitions';
 
 /** Every currency the fx run asks providers about (6 fx + CAD + SEK for the basket). */
@@ -159,14 +160,17 @@ export interface FrankfurterFetchOptions {
  * single timeseries request with the dollar as base.
  */
 export async function fetchFrankfurterQuotes(opts: FrankfurterFetchOptions = {}): Promise<FxQuotes> {
+  // v3 M-6 kill switch (2026-10-20): a disabled register row is never requested.
+  if (!providerFetchEnabled('frankfurter')) {
+    throw new FxProviderError('frankfurter', 'source disabled (kill switch M-6) — not requested');
+  }
   const from = opts.from ?? defaultFxFromDate(new Date());
   const symbols = FX_QUOTE_CURRENCIES.join(',');
   const url =
     `${opts.baseUrl ?? FRANKFURTER_BASE_URL}/${from}..?base=USD&symbols=${encodeURIComponent(symbols)}`;
-  const fetchImpl = opts.fetchImpl ?? ((input: RequestInfo | URL, init?: RequestInit) => fetch(input, init));
   let response: Response;
   try {
-    response = await fetchImpl(url, { signal: timeoutSignal(opts.timeoutMs ?? 15_000) });
+    response = await insightsFetch(url, {}, { fetchImpl: opts.fetchImpl, timeoutMs: opts.timeoutMs ?? 15_000 });
   } catch (err) {
     throw new FxProviderError('frankfurter', `transport failure: ${errMessage(err)}`);
   }
@@ -217,7 +221,10 @@ export interface YahooFxFetchOptions {
  * whole fallback fails when NO currency answered.
  */
 export async function fetchYahooQuotes(opts: YahooFxFetchOptions = {}): Promise<FxQuotes> {
-  const fetchImpl = opts.fetchImpl ?? ((input: RequestInfo | URL, init?: RequestInit) => fetch(input, init));
+  // v3 M-6 kill switch (2026-10-20): a disabled register row is never requested.
+  if (!providerFetchEnabled('yahoo')) {
+    throw new FxProviderError('yahoo', 'source disabled (kill switch M-6) — not requested');
+  }
   const wanted = opts.only ?? FX_QUOTE_CURRENCIES;
   const out: FxQuoteSet = {};
   let failures = 0;
@@ -235,10 +242,11 @@ export async function fetchYahooQuotes(opts: YahooFxFetchOptions = {}): Promise<
     try {
       let response: Response;
       try {
-        response = await fetchImpl(url, {
-          headers: { 'user-agent': opts.userAgent ?? YAHOO_USER_AGENT, accept: 'application/json' },
-          signal: timeoutSignal(opts.timeoutMs ?? 15_000),
-        });
+        response = await insightsFetch(
+          url,
+          { headers: { accept: 'application/json' } },
+          { fetchImpl: opts.fetchImpl, timeoutMs: opts.timeoutMs ?? 15_000 },
+        );
       } catch (err) {
         throw new FxProviderError('yahoo', `transport failure for ${def.symbol}: ${errMessage(err)}`);
       }
@@ -271,14 +279,6 @@ export async function fetchYahooQuotes(opts: YahooFxFetchOptions = {}): Promise<
 /** The `from` date for the primary call: ~400 days back from today (UTC). */
 export function defaultFxFromDate(now: Date): string {
   return new Date(now.getTime() - FX_HISTORY_DAYS * 86_400_000).toISOString().slice(0, 10);
-}
-
-function timeoutSignal(ms: number): AbortSignal | undefined {
-  try {
-    return AbortSignal.timeout(ms);
-  } catch {
-    return undefined; // Very old runtimes — the platform's own timeout applies.
-  }
 }
 
 function errMessage(err: unknown): string {

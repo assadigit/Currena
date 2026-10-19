@@ -52,7 +52,8 @@ describe('fred adapter', () => {
     }) as typeof fetch;
     await fetchFredSeries('T10Y2Y', { fetchImpl });
     const headers = new Headers(seen);
-    expect(headers.get('User-Agent')).toMatch(/CurrenaInsights/);
+    // T-25/F-09: the declared honest identity, never a browser fingerprint.
+    expect(headers.get('User-Agent')).toBe('CurrenaDashboard/1.0 (+https://github.com/assadigit/Currena)');
     expect(headers.get('User-Agent')).not.toMatch(/Mozilla/);
   });
 

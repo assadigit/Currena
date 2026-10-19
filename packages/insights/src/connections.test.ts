@@ -419,3 +419,78 @@ describe('CONNECTIONS table integrity', () => {
     }
   });
 });
+
+/* ------------------------------------------------------------------ */
+/* T-35 (v3, 2026-10-20): the neutral match summary the UI-33..38 cards */
+/* render — trigger gating, per-leg markers, "N of M readings match".   */
+/* ------------------------------------------------------------------ */
+
+describe('T-35: the neutral match summary (R-01…R-03, UI-33…UI-38)', () => {
+  it('R-01: with the trigger absent the summary says so — never a match count', () => {
+    // oil-expectations-costs: oil is the trigger (steady = not in play).
+    const out = evaluateConnection(CONNECTIONS.find((c) => c.id === 'oil-expectations-costs')!, [
+      reading('brent', { value: 105, status: 'warning', change7d: -0.4, change30d: -2.85 }),
+      reading('breakeven-5y5y', { value: 2.34, status: 'normal', change7d: 0.01, change30d: 0.02 }),
+      reading('us10y', { value: 5.21, status: 'warning', change7d: 0.06, change30d: 0.25 }),
+    ]);
+    expect(out.state).toBe('inactive');
+    expect(out.summary?.triggerPresent).toBe(false);
+    expect(out.summary?.matchCount).toBeUndefined(); // no count without the trigger
+  });
+
+  it('UI-33: every moved scored leg carries a matches / does-not-match marker, and the count is neutral', () => {
+    // real-yields-gold (inverse): real yields RISING while gold FALLING is
+    // the usual pattern → both legs match.
+    const out = evaluateConnection(CONNECTIONS.find((c) => c.id === 'real-yields-gold')!, [
+      reading('real-yield-10y', { value: 2.88, status: 'warning', change7d: 0.1, change30d: 0.28 }),
+      reading('gold-usd', { value: 4191, status: 'context', change7d: -3.1, change30d: -3.26 }),
+    ]);
+    expect(out.state).toBe('active');
+    expect(out.summary?.triggerPresent).toBe(true);
+    expect(out.summary?.matchCount).toBe(2);
+    expect(out.summary?.movedCount).toBe(2);
+    expect(out.legs.map((l) => l.marker)).toEqual(['matches', 'matches']);
+    // the opposite: real yields rising, gold ALSO rising → no match on gold.
+    const contra = evaluateConnection(CONNECTIONS.find((c) => c.id === 'real-yields-gold')!, [
+      reading('real-yield-10y', { value: 2.88, status: 'warning', change7d: 0.1, change30d: 0.28 }),
+      reading('gold-usd', { value: 4191, status: 'context', change7d: 3.2, change30d: 3.5 }),
+    ]);
+    expect(contra.legs.map((l) => l.marker)).toEqual(['matches', 'does-not-match']);
+    expect(contra.summary?.matchCount).toBe(1);
+    expect(contra.summary?.movedCount).toBe(2);
+  });
+
+  it('R-02: a steady leg reads can\u2019t tell and stays OUT of the count', () => {
+    const out = evaluateConnection(CONNECTIONS.find((c) => c.id === 'real-yields-gold')!, [
+      reading('real-yield-10y', { value: 2.88, status: 'warning', change7d: 0.1, change30d: 0.28 }),
+      reading('gold-usd', { value: 4191, status: 'context', change7d: 0.1, change30d: 0.5 }), // steady (below the 3% min move)
+    ]);
+    expect(out.legs[1]!.marker).toBe('can-tell');
+    expect(out.summary?.matchCount).toBe(1);
+    expect(out.summary?.movedCount).toBe(1); // only the trigger is a reading
+  });
+
+  it('R-03: the pass-through card keeps its pending state and its own summary shape', () => {
+    const decision = '2026-09-30';
+    const out = evaluateConnection(CONNECTIONS.find((c) => c.id === 'rba-loan-debt')!, [
+      reading('rba-cash-rate', { value: 4.6, status: 'context', lastChange: { date: decision, points: 0.25 } }),
+      // The loan reading's data (Aug 31) predates the Sep 30 decision → pending.
+      reading('au-home-loan', { value: 6.2, asOf: '2026-08-31', status: 'warning', change30d: 0.05 }),
+      reading('au-household-debt-arrears', { value: 178.4, percentile10y: 0.158 }),
+    ]);
+    expect(out.state).toBe('pending'); // B-04: "Pass-through pending" until the data exists
+    // The pass-through NUMBERS only exist once the loan data covers the
+    // decision (R-03): pending carries the state, never invented figures.
+    expect(out.passThrough).toBeUndefined();
+  });
+
+  it('an unreadable required leg reads can\u2019t tell and never counts', () => {
+    const out = evaluateConnection(CONNECTIONS.find((c) => c.id === 'real-yields-gold')!, [
+      reading('real-yield-10y', { value: 2.88, status: 'warning', change7d: 0.1, change30d: 0.28 }),
+      reading('gold-usd', { value: null, asOf: null, status: 'unavailable' }),
+    ]);
+    expect(out.state).toBe('unknown');
+    expect(out.legs[1]!.marker).toBe('can-tell');
+    expect(out.summary?.matchCount).toBeUndefined(); // no count over unreadable inputs
+  });
+});

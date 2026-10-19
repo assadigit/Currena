@@ -27,6 +27,27 @@
         "url": "https://fred.stlouisfed.org/series/T10Y2Y",
         "seriesIdOrTable": "FRED:T10Y2Y"
       },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/T10Y2Y",
+      "methodUrl": "https://fred.stlouisfed.org/series/T10Y2Y",
+      "whatItIs": "The 10-year minus 2-year Treasury yield difference: the most-watched shape of the US “yield curve”, from FRED.",
+      "whatItIsnt": "It says nothing about timing or size of any downturn, and other countries’ curves can tell a different story.",
+      "trackRecordNote": "An inverted curve preceded every US recession of the past 60 years: usually by 6 to 24 months, with occasional false alarms.",
+      "definition": "The published T10Y2Y series: the US 10-year Treasury yield minus the 2-year Treasury yield, same date.",
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:T10Y2Y"
+        ]
+      },
       "unit": "points",
       "changeUnit": "percentage points",
       "cadence": "daily",
@@ -67,6 +88,27 @@
         "url": "https://fred.stlouisfed.org/series/DFII10",
         "seriesIdOrTable": "FRED:DFII10"
       },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DFII10",
+      "methodUrl": "https://fred.stlouisfed.org/series/DFII10",
+      "whatItIs": "The market yield on 10-year US inflation-protected Treasuries: the return lenders demand after inflation, from FRED.",
+      "whatItIsnt": "It prices one market’s value of time: not the whole economy, and not future returns on anything.",
+      "trackRecordNote": "High real yields make cash and bonds compete harder against riskier assets; the negative real yields of the 2010s did the opposite.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DFII10"
+        ]
+      },
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "daily",
@@ -106,6 +148,27 @@
         "name": "FRED (DGS10)",
         "url": "https://fred.stlouisfed.org/series/DGS10",
         "seriesIdOrTable": "FRED:DGS10"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DGS10",
+      "methodUrl": "https://fred.stlouisfed.org/series/DGS10",
+      "whatItIs": "The market yield on the 10-year US Treasury note, set afresh every trading day.",
+      "whatItIsnt": "The level alone doesn’t say why it moved: growth, inflation and fear each tell a different story at the same number.",
+      "trackRecordNote": "Fast rises of half a point or more within weeks have often accompanied big policy shifts or financial accidents.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DGS10"
+        ]
       },
       "unit": "percent",
       "changeUnit": "percentage points",
@@ -159,6 +222,28 @@
         "url": "https://fred.stlouisfed.org/series/DFEDTARU",
         "seriesIdOrTable": "FRED:DFEDTARL (lower bound) + DFEDTARU (upper bound)"
       },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DFEDTARU",
+      "methodUrl": "https://fred.stlouisfed.org/series/DFEDTARU",
+      "whatItIs": "The Federal Reserve’s target range for the overnight rate (FRED’s DFEDTARL and DFEDTARU): the card shows the full range, set at eight scheduled meetings a year.",
+      "whatItIsnt": "The setting says nothing about the next decision (markets reprice that constantly) and its effects arrive with long, uneven lags.",
+      "trackRecordNote": "The near-zero setting after 2008 lasted seven years; the 2022 hikes were the fastest in four decades; settings this big take years to work through.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 5 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown. · Worst of legs (fred:DFEDTARL, fred:DFEDTARU): the L0 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DFEDTARL",
+          "fred:DFEDTARU"
+        ]
+      },
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "daily",
@@ -199,6 +284,29 @@
         "url": "https://fred.stlouisfed.org/series/DGS2",
         "seriesIdOrTable": "FRED:DGS2 − FRED:DFEDTARL/DFEDTARU midpoint (2-year yield minus the policy-rate midpoint)"
       },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DGS2",
+      "methodUrl": "https://fred.stlouisfed.org/series/DGS2",
+      "whatItIs": "The US 2-year Treasury yield (FRED’s DGS2) minus the Fed’s policy-rate midpoint (the average of the target range’s two bounds, FRED’s DFEDTARL and DFEDTARU), from FRED.",
+      "whatItIsnt": "It describes market pricing, not the Fed’s own intentions, and it moves with growth and inflation news too.",
+      "trackRecordNote": "Wide positive gaps have appeared when the market priced a rising policy path; negative gaps appeared in the run-ups to past rate-cutting cycles.",
+      "definition": "The US 2-year Treasury yield (DGS2) minus the Fed target-range midpoint ((DFEDTARL + DFEDTARU) / 2), same date. A rough read of what markets price for the policy rate — not a probability.",
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown. · Worst of legs (fred:DGS2, fred:DFEDTARL, fred:DFEDTARU): the L0 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DGS2",
+          "fred:DFEDTARL",
+          "fred:DFEDTARU"
+        ]
+      },
       "unit": "points",
       "changeUnit": "percentage points",
       "cadence": "daily",
@@ -238,6 +346,27 @@
         "name": "FRED (DGS30)",
         "url": "https://fred.stlouisfed.org/series/DGS30",
         "seriesIdOrTable": "FRED:DGS30"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DGS30",
+      "methodUrl": "https://fred.stlouisfed.org/series/DGS30",
+      "whatItIs": "The market yield on 30-year US Treasury bonds, daily from FRED (DGS30).",
+      "whatItIsnt": "It is a market price, not a policy setting, and it moves with growth, inflation and borrowing-supply news.",
+      "trackRecordNote": "Sustained rises in this yield tend to lift fixed-rate mortgage pricing; falls tend to ease it.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DGS30"
+        ]
       },
       "unit": "percent",
       "changeUnit": "percentage points",
@@ -291,6 +420,27 @@
         "url": "https://data.ecb.europa.eu/data/datasets/FM/B.EUR.4F.KR.DFR.LEV",
         "seriesIdOrTable": "ECB Data Portal FM/D.U2.EUR.4F.KR.DFR.LEV"
       },
+      "publisher": "ECB Data Portal",
+      "publisherUrl": "https://data.ecb.europa.eu/data/datasets/FM/B.EUR.4F.KR.DFR.LEV",
+      "methodUrl": "https://data.ecb.europa.eu/data/datasets/FM/B.EUR.4F.KR.DFR.LEV",
+      "whatItIs": "The ECB’s deposit facility rate: what banks earn on money parked overnight at the European Central Bank, from the ECB Data Portal.",
+      "whatItIsnt": "It describes one bloc’s policy, not the world’s: and like every policy rate, it works with long, uneven lags.",
+      "trackRecordNote": "The negative-rate era of 2014–22 (a first for a major central bank) tried to revive inflation; the 2022–23 hikes fought it. Both worked slowly.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 7 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ECB Data Portal terms page (read 2026-10-16): JS-rendered, the reuse clause could not be quoted verbatim in a plain fetch — level L1 (need checking), fail closed in public mode until then. Attribution shown regardless.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: European Central Bank",
+        "legs": [
+          "ecb"
+        ]
+      },
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "daily",
@@ -330,6 +480,28 @@
         "name": "FRED (BEA series, derived)",
         "url": "https://fred.stlouisfed.org/series/A091RC1Q027SBEA",
         "seriesIdOrTable": "FRED:A091RC1Q027SBEA ÷ FRED:W006RC1Q027SBEA"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/A091RC1Q027SBEA",
+      "methodUrl": "https://fred.stlouisfed.org/series/A091RC1Q027SBEA",
+      "whatItIs": "US government interest payments divided by its total receipts, both quarterly national-accounts figures from FRED.",
+      "whatItIsnt": "It moves slowly (quarterly) and says nothing about any single year’s politics or decisions.",
+      "trackRecordNote": "Peaks historically coincided with high-rate or high-debt eras; the ratio climbed steeply after 2022.",
+      "definition": "US federal interest payments (BEA series A091RC1Q027SBEA) as a share of federal government receipts (W006RC1Q027SBEA), quarterly, in percent.",
+      "failClosedConditions": "No value, data older than 215 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": false,
+        "enabled": false,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "No T-16 scan record for A091RC1Q027SBEA — fail closed (treated as copyright-required) until scripts/fred-copyright-scan.ts runs. · Worst of legs (fred:A091RC1Q027SBEA, fred:W006RC1Q027SBEA): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:A091RC1Q027SBEA",
+          "fred:W006RC1Q027SBEA"
+        ]
       },
       "unit": "percent",
       "changeUnit": "percentage points",
@@ -371,6 +543,27 @@
         "url": "https://fred.stlouisfed.org/series/CPIAUCNS",
         "seriesIdOrTable": "FRED:CPIAUCNS (12-month % change, not seasonally adjusted — the BLS headline basis)"
       },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/CPIAUCNS",
+      "methodUrl": "https://fred.stlouisfed.org/series/CPIAUCNS",
+      "whatItIs": "The 12-month change in the US consumer price index, not seasonally adjusted (FRED’s CPIAUCNS): the world’s most-watched inflation number, published monthly.",
+      "whatItIsnt": "It is one country’s prices in one month: a single reading sets no trend, and the mix of goods inside it shifts.",
+      "trackRecordNote": "The 2021–22 surge to a 9% peak forced the fastest Fed hikes in four decades; low readings, like 2020’s, preceded long easy-money eras.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:CPIAUCNS"
+        ]
+      },
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "monthly",
@@ -411,6 +604,27 @@
         "url": "https://fred.stlouisfed.org/series/CPILFENS",
         "seriesIdOrTable": "FRED:CPILFENS (12-month % change, not seasonally adjusted)"
       },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/CPILFENS",
+      "methodUrl": "https://fred.stlouisfed.org/series/CPILFENS",
+      "whatItIs": "The 12-month change in the US core consumer price index, not seasonally adjusted (FRED’s CPILFENS): the steady underlying measure the Fed watches most.",
+      "whatItIsnt": "It is still one month of one country’s prices: not a trend on its own.",
+      "trackRecordNote": "Core runs steadier than headline inflation: it moved far less during the 2022 energy spike.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:CPILFENS"
+        ]
+      },
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "monthly",
@@ -448,6 +662,27 @@
         "name": "FRED (T5YIFR)",
         "url": "https://fred.stlouisfed.org/series/T5YIFR",
         "seriesIdOrTable": "FRED:T5YIFR"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/T5YIFR",
+      "methodUrl": "https://fred.stlouisfed.org/series/T5YIFR",
+      "whatItIs": "The “5y5y forward breakeven”: derived from the gap between ordinary and inflation-protected Treasury yields, five years forward starting in five years.",
+      "whatItIsnt": "It reflects market prices, which can move on liquidity and hedging: not just on genuine belief.",
+      "trackRecordNote": "Sustained moves above roughly 2.5% have historically unsettled central banks; slides toward 1% signal feared deflation.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:T5YIFR"
+        ]
       },
       "unit": "percent",
       "changeUnit": "percentage points",
@@ -490,6 +725,27 @@
         "url": "https://fred.stlouisfed.org/series/STLFSI4",
         "seriesIdOrTable": "FRED:STLFSI4"
       },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/STLFSI4",
+      "methodUrl": "https://fred.stlouisfed.org/series/STLFSI4",
+      "whatItIs": "The STLFSI4 index from FRED: 18 market measures (yields, spreads, volatility) combined into one weekly number centred on zero.",
+      "whatItIsnt": "It is backward-looking and US-centred: it cannot say where markets go next.",
+      "trackRecordNote": "Readings above zero for a month or more marked 2008 and the 2020 COVID shock; brief blips above zero are common and harmless.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 10 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:STLFSI4"
+        ]
+      },
       "unit": "index",
       "changeUnit": "percentage points",
       "cadence": "weekly",
@@ -531,6 +787,27 @@
         "url": "https://fred.stlouisfed.org/series/NFCI",
         "seriesIdOrTable": "FRED:NFCI"
       },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/NFCI",
+      "methodUrl": "https://fred.stlouisfed.org/series/NFCI",
+      "whatItIs": "The Chicago Fed’s National Financial Conditions Index (FRED): about 100 measures of money markets, debt markets and banking combined into one weekly number centred on zero.",
+      "whatItIsnt": "Weekly, backward-looking and US-only: it says how tight money was, not what happens next.",
+      "trackRecordNote": "Spikes above zero marked 2008 and the 2020 COVID shock; long stretches below zero marked the easy-money eras.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 14 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:NFCI"
+        ]
+      },
       "unit": "index",
       "changeUnit": "percentage points",
       "cadence": "weekly",
@@ -570,6 +847,27 @@
         "name": "FRED (VIXCLS), © Cboe",
         "url": "https://fred.stlouisfed.org/series/VIXCLS",
         "seriesIdOrTable": "FRED:VIXCLS (Cboe Volatility Index, close)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/VIXCLS",
+      "methodUrl": "https://fred.stlouisfed.org/series/VIXCLS",
+      "whatItIs": "The Cboe Volatility Index (VIX): the market’s own gauge of the size of S&P 500 swings priced into one-month options. Daily close from FRED (VIXCLS), © Cboe.",
+      "whatItIsnt": "It measures expected swings, not direction: a calm VIX says nothing about whether shares rise or fall, and it can jump overnight.",
+      "trackRecordNote": "The decade’s spikes (2015 China wobble, 2018 “Volmageddon”, 2020 COVID) each lined up with sharp share-market falls; calm stretches sit in the low teens.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:VIXCLS"
+        ]
       },
       "unit": "index",
       "changeUnit": "percentage points",
@@ -611,6 +909,27 @@
         "url": "https://alternative.me/crypto/fear-and-greed-index/",
         "seriesIdOrTable": "alternative.me /fng/ API (daily, 0-100)"
       },
+      "publisher": "Alternative.me (Crypto Fear and Greed)",
+      "publisherUrl": "https://alternative.me/crypto/fear-and-greed-index/",
+      "methodUrl": "https://alternative.me/crypto/fear-and-greed-index/",
+      "whatItIs": "The Alternative.me Crypto Fear and Greed Index, a daily 0-to-100 scale built from crypto market volatility, momentum, social media and dominance measures (0 = extreme fear, 100 = extreme greed). Shown with the publisher’s own scale; attribution to Alternative.me.",
+      "whatItIsnt": "Sentiment gauges describe feelings, not prices; this page never treats the index as a recommendation.",
+      "trackRecordNote": "Extreme readings have often appeared near sharp market turns in that market — a tendency, not a rule.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "Alternative.me states the index may be displayed freely when \"attribution is given right next to the display of the data\" (read 2026-10-16) — the attribution renders beside the card (F-19…F-22 pattern).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Alternative.me Crypto Fear and Greed Index",
+        "legs": [
+          "alternative-me"
+        ]
+      },
       "unit": "index",
       "changeUnit": "percentage points",
       "cadence": "daily",
@@ -648,6 +967,28 @@
         "name": "gold-api.com (history: World Bank)",
         "url": "https://www.gold-api.com",
         "seriesIdOrTable": "gold-api.com XAU ÷ XAG (history: World Bank gold ÷ silver)"
+      },
+      "publisher": "World Bank (Commodity Markets \"Pink Sheet\")",
+      "publisherUrl": "https://www.gold-api.com",
+      "methodUrl": "https://www.gold-api.com",
+      "whatItIs": "The gold price divided by the silver price, live from a metals feed, on a decade of World Bank monthly history.",
+      "whatItIsnt": "Both metals often move together; the ratio is not a forecast for either price.",
+      "trackRecordNote": "Very high ratios (gold very expensive versus silver) marked stress eras: 1991, 2008, 2020, and records in 2025–26.",
+      "definition": "The gold price divided by the silver price, same date and the same price basis.",
+      "failClosedConditions": "No value, data older than 2 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "World Bank Open Data terms are commonly CC BY 4.0, but the terms page is JS-rendered and could not be quoted verbatim on 2026-10-16 — level L1 (need checking), fail closed in public mode until the clause is quoted. Attribution shown regardless. · Worst of legs (world-bank, gold-api): the L1 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: World Bank",
+        "legs": [
+          "world-bank",
+          "gold-api"
+        ]
       },
       "unit": "ratio",
       "changeUnit": "percentage points",
@@ -688,6 +1029,27 @@
         "name": "Currena basket (ECB rates via Frankfurter)",
         "url": "https://frankfurter.dev",
         "seriesIdOrTable": "Frankfurter six-currency basket (DXY weights, 50.14348112 base)"
+      },
+      "publisher": "ECB reference rates via the Frankfurter project",
+      "publisherUrl": "https://frankfurter.dev",
+      "methodUrl": "https://frankfurter.dev",
+      "whatItIs": "The Currena dollar basket: a weighted average of the dollar against the euro, yen, pound, Canadian dollar, Swedish krona and Swiss franc, computed daily from ECB reference rates. It tracks close to the famous DXY index, but it is not the official DXY.",
+      "whatItIsnt": "It is an index, not an exchange rate: it names no single pair, and its level says nothing about what to do.",
+      "trackRecordNote": "Dollar surges have coincided with global stress episodes: 1997 Asia, 2008, 2022; weak-dollar stretches usually meant easier world money.",
+      "definition": "Currena's DXY-style basket: a weighted geometric mean of six USD exchange rates (ECB reference rates via Frankfurter), scaled with the published DXY base constant 50.14348112.",
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "frankfurter.dev/license links the ECB disclaimer for the data (read 2026-10-16); the ECB’s reuse terms page is JS-rendered and could not be quoted verbatim in a plain fetch — level L1 (probably fine, terms need the quarterly re-check), fail closed in public mode until then. Frankfurter’s code is MIT.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "legs": [
+          "frankfurter"
+        ]
       },
       "unit": "index",
       "changeUnit": "percentage points",
@@ -741,6 +1103,27 @@
         "url": "https://frankfurter.dev",
         "seriesIdOrTable": "Frankfurter USD→JPY"
       },
+      "publisher": "ECB reference rates via the Frankfurter project",
+      "publisherUrl": "https://frankfurter.dev",
+      "methodUrl": "https://frankfurter.dev",
+      "whatItIs": "The USD/JPY exchange rate: how many yen one US dollar buys, from ECB reference rates via Frankfurter.",
+      "whatItIsnt": "The pair reflects two economies and intervention rumours at once; direction alone is not a signal.",
+      "trackRecordNote": "Fast falls (yen surges) forced carry-trade unwinds: notably in 2008 and August 2024.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "frankfurter.dev/license links the ECB disclaimer for the data (read 2026-10-16); the ECB’s reuse terms page is JS-rendered and could not be quoted verbatim in a plain fetch — level L1 (probably fine, terms need the quarterly re-check), fail closed in public mode until then. Frankfurter’s code is MIT.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "legs": [
+          "frankfurter"
+        ]
+      },
       "unit": "jpy",
       "changeUnit": "percent",
       "cadence": "daily",
@@ -783,6 +1166,27 @@
         "url": "https://frankfurter.dev",
         "seriesIdOrTable": "Frankfurter USD→EUR"
       },
+      "publisher": "ECB reference rates via the Frankfurter project",
+      "publisherUrl": "https://frankfurter.dev",
+      "methodUrl": "https://frankfurter.dev",
+      "whatItIs": "How many euros one US dollar buys, from ECB reference rates via Frankfurter: the flip side of the market’s usual EUR/USD quote.",
+      "whatItIsnt": "A context card: one pair, information-only, voting in no gauge: and it says nothing about the Australian dollar directly.",
+      "trackRecordNote": "Readings near or above parity (a dollar worth a euro or more) came in 2000–02 and 2022, strong-dollar stress eras; the 2010s sat well below.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "frankfurter.dev/license links the ECB disclaimer for the data (read 2026-10-16); the ECB’s reuse terms page is JS-rendered and could not be quoted verbatim in a plain fetch — level L1 (probably fine, terms need the quarterly re-check), fail closed in public mode until then. Frankfurter’s code is MIT.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "legs": [
+          "frankfurter"
+        ]
+      },
       "unit": "eur",
       "changeUnit": "percent",
       "cadence": "daily",
@@ -820,6 +1224,27 @@
         "name": "China NBS (manual entry)",
         "url": "https://www.stats.gov.cn/english/",
         "seriesIdOrTable": "data/manual/china-pmi.json (NBS official releases, hand-entered)"
+      },
+      "publisher": "China NBS (manual entry)",
+      "publisherUrl": "https://www.stats.gov.cn/english/",
+      "methodUrl": "https://www.stats.gov.cn/english/",
+      "whatItIs": "China’s official manufacturing Purchasing Managers’ Index, from the national statistics bureau’s monthly survey of factory managers, hand-entered here from official releases. Above 50 means expansion; below 50, contraction.",
+      "whatItIsnt": "It measures breadth (how many firms grew), not size: one month’s dip is not a trend.",
+      "trackRecordNote": "Runs below 50 have marked Chinese slowdowns that fed through to commodity prices and the Australian dollar.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its manual cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M5",
+        "runtime": "manual",
+        "termsLines": "Manual entry (M5): the owner reads the NBS monthly manufacturing PMI release and enters the value by hand (data/manual/china-pmi.json, enteredOn/expires per defect E-08). The publisher’s own reuse terms are not quoted — level L1, manual-entry display only while the value is fresh (T-33).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: National Bureau of Statistics of China",
+        "legs": [
+          "manual"
+        ]
       },
       "unit": "index",
       "changeUnit": "percentage points",
@@ -861,6 +1286,27 @@
         "url": "https://fred.stlouisfed.org/series/M2SL",
         "seriesIdOrTable": "FRED:M2SL"
       },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/M2SL",
+      "methodUrl": "https://fred.stlouisfed.org/series/M2SL",
+      "whatItIs": "The Federal Reserve’s M2 measure of the money supply, monthly from FRED: cash, current accounts and most savings.",
+      "whatItIsnt": "How fast money changes hands matters as much as how much of it exists; supply alone doesn’t set prices.",
+      "trackRecordNote": "Year-on-year falls are rare: they clustered around recessions and the 2022–23 tightening.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 90 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:M2SL"
+        ]
+      },
       "unit": "usd-tr",
       "changeUnit": "percent",
       "cadence": "monthly",
@@ -898,6 +1344,27 @@
         "name": "FRED (GACDFSA066MSFRBPHI), Philadelphia Fed",
         "url": "https://fred.stlouisfed.org/series/GACDFSA066MSFRBPHI",
         "seriesIdOrTable": "FRED:GACDFSA066MSFRBPHI (Philadelphia Fed manufacturing index, SA)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/GACDFSA066MSFRBPHI",
+      "methodUrl": "https://fred.stlouisfed.org/series/GACDFSA066MSFRBPHI",
+      "whatItIs": "The Philadelphia Fed’s manufacturing index (FRED’s GACDFSA066MSFRBPHI): the share of firms reporting growth minus the share reporting decline, seasonally adjusted; above zero means expansion.",
+      "whatItIsnt": "It covers one Federal Reserve district, not the whole country, and one month’s dip is not a trend.",
+      "trackRecordNote": "Reads below zero have marked US manufacturing slowdowns; the survey moves early in the cycle.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:GACDFSA066MSFRBPHI"
+        ]
       },
       "unit": "points",
       "changeUnit": "percentage points",
@@ -939,6 +1406,27 @@
         "url": "https://fred.stlouisfed.org/series/UNRATE",
         "seriesIdOrTable": "FRED:UNRATE (US Bureau of Labor Statistics)"
       },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/UNRATE",
+      "methodUrl": "https://fred.stlouisfed.org/series/UNRATE",
+      "whatItIs": "The US unemployment rate from the Bureau of Labor Statistics’ monthly Employment Situation report (FRED series UNRATE), published on the first Friday of the month.",
+      "whatItIsnt": "Monthly and an average across the whole workforce; individual industries and states can move very differently.",
+      "trackRecordNote": "Rises of half a point or more from the cycle low have lined up with the start of US recessions. That pattern is what the Sahm rule next to this card formalises.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:UNRATE"
+        ]
+      },
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "monthly",
@@ -978,6 +1466,27 @@
         "name": "FRED (SAHMREALTIME)",
         "url": "https://fred.stlouisfed.org/series/SAHMREALTIME",
         "seriesIdOrTable": "FRED:SAHMREALTIME (real-time vintage)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/SAHMREALTIME",
+      "methodUrl": "https://fred.stlouisfed.org/series/SAHMREALTIME",
+      "whatItIs": "The Sahm rule compares the 3-month average US unemployment rate with its lowest point over the past year. A reading of 0.50 or more is the standard recession signal; it has flagged every US recession since 1970, usually as they began.",
+      "whatItIsnt": "It lags by construction (it needs a low to rise from) and says nothing about depth or length, only that a downturn has usually begun.",
+      "trackRecordNote": "Half-point rises from a cycle low are how US recessions have started in the jobs data since 1970.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:SAHMREALTIME"
+        ]
       },
       "unit": "points",
       "changeUnit": "percentage points",
@@ -1019,6 +1528,27 @@
         "url": "https://www.worldbank.org/en/research/commodity-markets",
         "seriesIdOrTable": "World Bank copper ÷ gold"
       },
+      "publisher": "World Bank (Commodity Markets \"Pink Sheet\")",
+      "publisherUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "methodUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "whatItIs": "The World Bank copper price divided by the gold price (monthly averages).",
+      "whatItIsnt": "Monthly and slow-moving, and both legs are US-dollar priced: dollar swings leak in.",
+      "trackRecordNote": "A low copper/gold ratio has coincided with growth scares; high readings came with industrial booms.",
+      "definition": "The copper price divided by the gold price (monthly, World Bank Pink Sheet basis), same period.",
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "World Bank Open Data terms are commonly CC BY 4.0, but the terms page is JS-rendered and could not be quoted verbatim on 2026-10-16 — level L1 (need checking), fail closed in public mode until the clause is quoted. Attribution shown regardless.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: World Bank",
+        "legs": [
+          "world-bank"
+        ]
+      },
       "unit": "ratio",
       "changeUnit": "percentage points",
       "cadence": "monthly",
@@ -1059,6 +1589,27 @@
         "url": "https://frankfurter.dev",
         "seriesIdOrTable": "Frankfurter USD→CNY"
       },
+      "publisher": "ECB reference rates via the Frankfurter project",
+      "publisherUrl": "https://frankfurter.dev",
+      "methodUrl": "https://frankfurter.dev",
+      "whatItIs": "The USD/CNY exchange rate, steered by China’s central bank inside a band (ECB reference rates via Frankfurter).",
+      "whatItIsnt": "Managed, not free: the level reflects policy choices as much as markets.",
+      "trackRecordNote": "Moves toward either edge of the tolerated band have historically carried trade-war signalling.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "frankfurter.dev/license links the ECB disclaimer for the data (read 2026-10-16); the ECB’s reuse terms page is JS-rendered and could not be quoted verbatim in a plain fetch — level L1 (probably fine, terms need the quarterly re-check), fail closed in public mode until then. Frankfurter’s code is MIT.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "legs": [
+          "frankfurter"
+        ]
+      },
       "unit": "cny",
       "changeUnit": "percent",
       "cadence": "daily",
@@ -1096,6 +1647,28 @@
         "name": "FRED (EIA Brent) + Yahoo Finance (BZ=F)",
         "url": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
         "seriesIdOrTable": "FRED:DCOILBRENTEU + Yahoo Finance BZ=F (gap-fill + live refresh)"
+      },
+      "publisher": "Yahoo Finance (unofficial endpoints)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
+      "methodUrl": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
+      "whatItIs": "Brent crude: the price of a barrel of North Sea oil, the benchmark for most of the world’s traded oil. The backbone series is the spot price from the US Energy Information Administration via FRED; the live tile refreshes hourly from Brent front-month futures (BZ=F) on Yahoo Finance, which also fills any EIA gap.",
+      "whatItIsnt": "Supply, demand and geopolitics pull the price at once: the level alone doesn’t separate them.",
+      "trackRecordNote": "Spikes above roughly $120 usually meant war or supply shocks feeding inflation; crashes below about $40 marked demand collapses.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 12 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "Yahoo offers no reuse licence for these unofficial quote endpoints (read 2026-10-16) — the terms are silent on automated reuse, which makes the source L2 under the owner’s recorded acceptance. Unofficial endpoints can break or be blocked at any time: every Yahoo leg fails closed (a block is a block — SCRAPING_SPEC F-09, no identity change). · Worst of legs (fred:DCOILBRENTEU, yahoo:BZ=F): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Data: Yahoo Finance",
+        "legs": [
+          "fred:DCOILBRENTEU",
+          "yahoo:BZ=F"
+        ]
       },
       "unit": "usd",
       "changeUnit": "percent",
@@ -1139,6 +1712,28 @@
         "url": "https://www.gold-api.com",
         "seriesIdOrTable": "gold-api.com XAU spot (history: World Bank Pink Sheet gold, monthly + daily accumulation)"
       },
+      "publisher": "Yahoo Finance (unofficial endpoints)",
+      "publisherUrl": "https://www.gold-api.com",
+      "methodUrl": "https://www.gold-api.com",
+      "whatItIs": "The spot price of gold per troy ounce: an hourly quote from COMEX gold futures (GC=F) on top of a daily gold-api.com spot and a decade of monthly World Bank prices.",
+      "whatItIsnt": "It cannot tell you where it goes next, and its “record high” headlines ignore inflation: a record in dollars is not a record in purchasing power.",
+      "trackRecordNote": "Big multi-year gold runs have historically lined up with negative real interest rates or financial stress; long drags came when real rates were high.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 2 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "Yahoo offers no reuse licence for these unofficial quote endpoints (read 2026-10-16) — the terms are silent on automated reuse, which makes the source L2 under the owner’s recorded acceptance. Unofficial endpoints can break or be blocked at any time: every Yahoo leg fails closed (a block is a block — SCRAPING_SPEC F-09, no identity change). · Worst of legs (gold-api:XAU, yahoo:GC=F): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Data: Yahoo Finance",
+        "legs": [
+          "gold-api:XAU",
+          "yahoo:GC=F"
+        ]
+      },
       "unit": "usd",
       "changeUnit": "percent",
       "cadence": "daily",
@@ -1176,6 +1771,28 @@
         "name": "gold-api.com (XAG)",
         "url": "https://www.gold-api.com",
         "seriesIdOrTable": "gold-api.com XAG spot (history: World Bank Pink Sheet silver, monthly + daily accumulation)"
+      },
+      "publisher": "Yahoo Finance (unofficial endpoints)",
+      "publisherUrl": "https://www.gold-api.com",
+      "methodUrl": "https://www.gold-api.com",
+      "whatItIs": "The spot price of silver per troy ounce: an hourly quote from COMEX silver futures (SI=F) on top of a daily gold-api.com spot and a decade of monthly World Bank prices.",
+      "whatItIsnt": "Far more volatile than gold, and its industrial and investment sides can pull in opposite directions at once.",
+      "trackRecordNote": "Its famous spikes (1980, 2011) came when investment fever met tight supply; long quiet stretches followed as the memory faded.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 2 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "Yahoo offers no reuse licence for these unofficial quote endpoints (read 2026-10-16) — the terms are silent on automated reuse, which makes the source L2 under the owner’s recorded acceptance. Unofficial endpoints can break or be blocked at any time: every Yahoo leg fails closed (a block is a block — SCRAPING_SPEC F-09, no identity change). · Worst of legs (gold-api:XAG, yahoo:SI=F): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Data: Yahoo Finance",
+        "legs": [
+          "gold-api:XAG",
+          "yahoo:SI=F"
+        ]
       },
       "unit": "usd",
       "changeUnit": "percent",
@@ -1215,6 +1832,28 @@
         "url": "https://www.gold-api.com",
         "seriesIdOrTable": "gold-api.com HG spot × 2204.62262 (history: World Bank Pink Sheet copper, monthly)"
       },
+      "publisher": "World Bank (Commodity Markets \"Pink Sheet\")",
+      "publisherUrl": "https://www.gold-api.com",
+      "methodUrl": "https://www.gold-api.com",
+      "whatItIs": "The live copper price from a metals feed (gold-api.com), converted to US dollars per metric tonne; the 10-year position comes from World Bank monthly data.",
+      "whatItIsnt": "A single world price with a monthly history: it cannot say whether demand or supply moved it, or where it heads next.",
+      "trackRecordNote": "Copper spikes came with industrial booms and stimulus (2020–21); deep slumps marked growth scares like 2008 and 2015.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 2 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "World Bank Open Data terms are commonly CC BY 4.0, but the terms page is JS-rendered and could not be quoted verbatim on 2026-10-16 — level L1 (need checking), fail closed in public mode until the clause is quoted. Attribution shown regardless. · Worst of legs (gold-api:HG, world-bank): the L1 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: World Bank",
+        "legs": [
+          "gold-api:HG",
+          "world-bank"
+        ]
+      },
       "unit": "usd",
       "changeUnit": "percent",
       "cadence": "daily",
@@ -1252,6 +1891,28 @@
         "name": "gold-api.com (BTC)",
         "url": "https://www.gold-api.com",
         "seriesIdOrTable": "gold-api.com BTC spot (history: accumulated daily snapshots)"
+      },
+      "publisher": "Yahoo Finance (unofficial endpoints)",
+      "publisherUrl": "https://www.gold-api.com",
+      "methodUrl": "https://www.gold-api.com",
+      "whatItIs": "The live price of one bitcoin in US dollars: an hourly quote from Yahoo Finance’s spot index on a daily gold-api.com backbone. The 10-year position and the record peak come from ten years of Yahoo daily data.",
+      "whatItIsnt": "Famously volatile: the price says nothing about value, and this page takes no view on holdings.",
+      "trackRecordNote": "The great booms (2020–21) met easy money; the deep crash (2022) met tightening: a pattern of risk appetite, nothing steadier.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 2 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "Yahoo offers no reuse licence for these unofficial quote endpoints (read 2026-10-16) — the terms are silent on automated reuse, which makes the source L2 under the owner’s recorded acceptance. Unofficial endpoints can break or be blocked at any time: every Yahoo leg fails closed (a block is a block — SCRAPING_SPEC F-09, no identity change). · Worst of legs (gold-api:BTC, yahoo:BTC-USD): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Data: Yahoo Finance",
+        "legs": [
+          "gold-api:BTC",
+          "yahoo:BTC-USD"
+        ]
       },
       "unit": "usd",
       "changeUnit": "percent",
@@ -1291,6 +1952,28 @@
         "url": "https://www.gold-api.com",
         "seriesIdOrTable": "gold-api.com XAU ÷ BTC (bitcoin per troy ounce)"
       },
+      "publisher": "gold-api.com",
+      "publisherUrl": "https://www.gold-api.com",
+      "methodUrl": "https://www.gold-api.com",
+      "whatItIs": "The gold price in US dollars divided by the bitcoin price, both from the same hourly snapshot (Yahoo Finance quotes on the gold-api backbone).",
+      "whatItIsnt": "These are two very different assets: this is a ratio, not a view on either one.",
+      "trackRecordNote": "The ratio collapsed during crypto manias (2020–21) and spiked whenever bitcoin fell harder than gold.",
+      "definition": "The gold price divided by the Bitcoin price: ounces of gold per one bitcoin, same date.",
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found (attribution is shown by Currena’s own choice); service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-read at the quarterly review. · Worst of legs (gold-api:XAU, gold-api:BTC): the L0 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Data: gold-api.com",
+        "legs": [
+          "gold-api:XAU",
+          "gold-api:BTC"
+        ]
+      },
       "unit": "ratio",
       "changeUnit": "percent",
       "cadence": "daily",
@@ -1329,6 +2012,28 @@
         "url": "https://www.gold-api.com",
         "seriesIdOrTable": "gold-api.com XAG ÷ BTC (bitcoin per troy ounce)"
       },
+      "publisher": "gold-api.com",
+      "publisherUrl": "https://www.gold-api.com",
+      "methodUrl": "https://www.gold-api.com",
+      "whatItIs": "The silver price divided by the bitcoin price, both from the same hourly snapshot (Yahoo Finance quotes on the gold-api backbone).",
+      "whatItIsnt": "The silver leg barely moves: this ratio mostly mirrors bitcoin.",
+      "trackRecordNote": "Its history is dominated almost entirely by the bitcoin side of the fraction.",
+      "definition": "The silver price divided by the Bitcoin price: ounces of silver per one bitcoin, same date.",
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found (attribution is shown by Currena’s own choice); service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-read at the quarterly review. · Worst of legs (gold-api:XAG, gold-api:BTC): the L0 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Data: gold-api.com",
+        "legs": [
+          "gold-api:XAG",
+          "gold-api:BTC"
+        ]
+      },
       "unit": "ratio",
       "changeUnit": "percent",
       "cadence": "daily",
@@ -1366,6 +2071,27 @@
         "name": "ABS (monthly CPI All groups)",
         "url": "https://data.api.abs.gov.au/rest/data/CPI/1.10001.10.50.M",
         "seriesIdOrTable": "ABS monthly CPI All groups index (annual change derived)"
+      },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/CPI/1.10001.10.50.M",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/CPI/1.10001.10.50.M",
+      "whatItIs": "The ABS monthly CPI (all groups) annual change: the full monthly measure the ABS now publishes.",
+      "whatItIsnt": "Headline inflation swings with volatile items: fuel, fruit, one-off electricity measures.",
+      "trackRecordNote": "Sustained runs above 3% invited rate hikes (2007, 2022); readings below 2% marked soft-demand eras.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 95 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
       },
       "unit": "percent",
       "changeUnit": "percentage points",
@@ -1407,6 +2133,27 @@
         "url": "https://data.api.abs.gov.au/rest/data/CPI/1.999902.20.50.M",
         "seriesIdOrTable": "ABS monthly CPI Trimmed Mean index (annual change derived)"
       },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/CPI/1.999902.20.50.M",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/CPI/1.999902.20.50.M",
+      "whatItIs": "The ABS monthly trimmed mean, which drops the wildest price rises and falls each month before averaging.",
+      "whatItIsnt": "Smoother means slower: it lags turning points by design.",
+      "trackRecordNote": "Sustained readings above 3% signal persistent inflation pressure; it led the 2021–24 episode.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 95 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "monthly",
@@ -1446,6 +2193,27 @@
         "name": "RBA F2 (10-year bond yield)",
         "url": "https://www.rba.gov.au/statistics/tables/#f2",
         "seriesIdOrTable": "RBA F2 FCMYGBAG10D (Australian Government 10 year bond)"
+      },
+      "publisher": "Reserve Bank of Australia (statistical tables)",
+      "publisherUrl": "https://www.rba.gov.au/statistics/tables/#f2",
+      "methodUrl": "https://www.rba.gov.au/statistics/tables/#f2",
+      "whatItIs": "The yield on Australian Government 10-year bonds, daily from the RBA’s F2 statistical table (published with a 2–4 business-day lag). The US 10-year rides beside it for comparison.",
+      "whatItIsnt": "It moves with world bond markets (US yields, global growth news), so it can shift with no Australian news at all.",
+      "trackRecordNote": "The 2022–24 global rate reset pushed it from near 1% to multi-year highs; through the decade before, and especially after 2020’s emergency setting, it sat far lower.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "github-action",
+        "termsLines": "RBA copyright page (read 2026-10-16): most RBA material is CC BY 4.0; RBA terms allow commercial and personal use provided no RBA endorsement is implied. The page is JS-heavy — the verbatim licence line could not be captured in a plain fetch; re-quote at the quarterly licence review. Third-party content inside an RBA table needs that third party’s consent (re-check each table’s source notes).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Reserve Bank of Australia",
+        "legs": [
+          "rba"
+        ]
       },
       "unit": "percent",
       "changeUnit": "percentage points",
@@ -1487,6 +2255,28 @@
         "url": "https://www.rba.gov.au/statistics/tables/",
         "seriesIdOrTable": "RBA F2 FCMYGBAG3D (3-year bond) − RBA F1 cash rate target"
       },
+      "publisher": "Reserve Bank of Australia (statistical tables)",
+      "publisherUrl": "https://www.rba.gov.au/statistics/tables/",
+      "methodUrl": "https://www.rba.gov.au/statistics/tables/",
+      "whatItIs": "The RBA’s 3-year Australian Government bond yield (statistical table F2, series FCMYGBAG3D) minus the cash rate target (table F1), from the RBA.",
+      "whatItIsnt": "It describes market pricing, not the RBA’s own intentions, and it moves with world bond markets too.",
+      "trackRecordNote": "Positive gaps have appeared when the market priced a rising cash-rate path; negative gaps appeared in the run-ups to past rate-cutting cycles.",
+      "definition": "The Australian 3-year government bond yield (RBA F2) minus the RBA cash rate (F1), same date. A rough read — the ASX RBA Rate Tracker carries the market-priced path.",
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "github-action",
+        "termsLines": "RBA copyright page (read 2026-10-16): most RBA material is CC BY 4.0; RBA terms allow commercial and personal use provided no RBA endorsement is implied. The page is JS-heavy — the verbatim licence line could not be captured in a plain fetch; re-quote at the quarterly licence review. Third-party content inside an RBA table needs that third party’s consent (re-check each table’s source notes). · Worst of legs (rba:F2, rba:F1): the L0 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Reserve Bank of Australia",
+        "legs": [
+          "rba:F2",
+          "rba:F1"
+        ]
+      },
       "unit": "points",
       "changeUnit": "percentage points",
       "cadence": "daily",
@@ -1526,6 +2316,28 @@
         "name": "RBA F2 − FRED (DGS10)",
         "url": "https://www.rba.gov.au/statistics/tables/",
         "seriesIdOrTable": "RBA F2 10y − FRED:DGS10"
+      },
+      "publisher": "Reserve Bank of Australia (statistical tables)",
+      "publisherUrl": "https://www.rba.gov.au/statistics/tables/",
+      "methodUrl": "https://www.rba.gov.au/statistics/tables/",
+      "whatItIs": "Australia’s 10-year government bond yield (RBA table F2) minus the US 10-year yield (FRED), published weekly with a short lag.",
+      "whatItIsnt": "Both legs move: the gap can shift with no Australian news at all.",
+      "trackRecordNote": "A negative gap (US yields above Australia’s) has coincided with weaker eras for the AUD.",
+      "definition": "The Australian 10-year yield (RBA F2) minus the US 10-year yield (DGS10). When the two data dates differ, both dates are shown and the gap is marked \"dates differ\".",
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "github-action",
+        "termsLines": "RBA copyright page (read 2026-10-16): most RBA material is CC BY 4.0; RBA terms allow commercial and personal use provided no RBA endorsement is implied. The page is JS-heavy — the verbatim licence line could not be captured in a plain fetch; re-quote at the quarterly licence review. Third-party content inside an RBA table needs that third party’s consent (re-check each table’s source notes). · Worst of legs (rba:F2, fred:DGS10): the L0 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Reserve Bank of Australia",
+        "legs": [
+          "rba:F2",
+          "fred:DGS10"
+        ]
       },
       "unit": "points",
       "changeUnit": "percentage points",
@@ -1567,6 +2379,27 @@
         "url": "https://data.api.abs.gov.au/rest/data/CPI/1.40081.10.50.M",
         "seriesIdOrTable": "ABS CPI Automotive fuel index (12-month % change)"
       },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/CPI/1.40081.10.50.M",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/CPI/1.40081.10.50.M",
+      "whatItIs": "The 12-month change in the ABS CPI “automotive fuel” index: an index of fuel prices, not a pump price, published monthly.",
+      "whatItIsnt": "Monthly and about a month behind: pump prices move daily and differ by city, so the index only approximates the pump.",
+      "trackRecordNote": "Big swings came with oil shocks: fuel inflation hit 35% in 2022 and fell hard in 2020; petrol usually leads headline CPI’s turning points.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 95 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "monthly",
@@ -1605,6 +2438,27 @@
         "url": "https://www.rba.gov.au/statistics/cash-rate/",
         "seriesIdOrTable": "RBA statistical table F1 (Cash Rate Target, daily)"
       },
+      "publisher": "Reserve Bank of Australia (statistical tables)",
+      "publisherUrl": "https://www.rba.gov.au/statistics/cash-rate/",
+      "methodUrl": "https://www.rba.gov.au/statistics/cash-rate/",
+      "whatItIs": "The RBA’s cash rate target, decided at board meetings through the year (statistical table F1.1).",
+      "whatItIsnt": "The current setting says nothing about the next move; markets reprice that constantly.",
+      "trackRecordNote": "Moves come in steps and runs (hikes into inflation, cuts into weakness) and set the cycle for years at a time.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than its allowed age, an exact repeat beyond its per-change cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "github-action",
+        "termsLines": "RBA copyright page (read 2026-10-16): most RBA material is CC BY 4.0; RBA terms allow commercial and personal use provided no RBA endorsement is implied. The page is JS-heavy — the verbatim licence line could not be captured in a plain fetch; re-quote at the quarterly licence review. Third-party content inside an RBA table needs that third party’s consent (re-check each table’s source notes).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Reserve Bank of Australia",
+        "legs": [
+          "rba"
+        ]
+      },
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "per-change",
@@ -1642,6 +2496,27 @@
         "name": "RBA F6 (owner-occupier outstanding)",
         "url": "https://www.rba.gov.au/statistics/tables/",
         "seriesIdOrTable": "RBA F6 FLRHOOTA (owner-occupier outstanding, all institutions)"
+      },
+      "publisher": "Reserve Bank of Australia (statistical tables)",
+      "publisherUrl": "https://www.rba.gov.au/statistics/tables/",
+      "methodUrl": "https://www.rba.gov.au/statistics/tables/",
+      "whatItIs": "The average interest rate on outstanding owner-occupier home loans across all lenders, from the RBA’s F6 table: not the advertised rate, but the one households actually pay.",
+      "whatItIsnt": "Monthly, published about a month late, and an average: your own rate depends on your loan, lender and fixed or variable mix.",
+      "trackRecordNote": "The 2022–24 rate climbs pushed it from record lows toward multi-decade highs; easing tends to arrive only as loans reprice and refinance.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 70 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "github-action",
+        "termsLines": "RBA copyright page (read 2026-10-16): most RBA material is CC BY 4.0; RBA terms allow commercial and personal use provided no RBA endorsement is implied. The page is JS-heavy — the verbatim licence line could not be captured in a plain fetch; re-quote at the quarterly licence review. Third-party content inside an RBA table needs that third party’s consent (re-check each table’s source notes).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Reserve Bank of Australia",
+        "legs": [
+          "rba"
+        ]
       },
       "unit": "percent",
       "changeUnit": "percentage points",
@@ -1683,6 +2558,27 @@
         "url": "https://www.rba.gov.au/statistics/tables/#f4-1",
         "seriesIdOrTable": "RBA F4.1 PDRNTH (paid rate, new household term deposits)"
       },
+      "publisher": "Reserve Bank of Australia (statistical tables)",
+      "publisherUrl": "https://www.rba.gov.au/statistics/tables/#f4-1",
+      "methodUrl": "https://www.rba.gov.au/statistics/tables/#f4-1",
+      "whatItIs": "The weighted-average paid rate on new household term deposits, monthly from the RBA’s F4.1 table (the series starts July 2019, the table’s full extent).",
+      "whatItIsnt": "An average across banks and terms: the best advertised rates (often online savings accounts and smaller lenders) sit above it, and it says nothing about locking money away.",
+      "trackRecordNote": "Term-deposit rates went from near zero in 2020–21 to multi-year highs through the 2022–24 hiking cycle, tracking the cash rate with a short lag.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 70 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "github-action",
+        "termsLines": "RBA copyright page (read 2026-10-16): most RBA material is CC BY 4.0; RBA terms allow commercial and personal use provided no RBA endorsement is implied. The page is JS-heavy — the verbatim licence line could not be captured in a plain fetch; re-quote at the quarterly licence review. Third-party content inside an RBA table needs that third party’s consent (re-check each table’s source notes).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Reserve Bank of Australia",
+        "legs": [
+          "rba"
+        ]
+      },
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "monthly",
@@ -1721,6 +2617,27 @@
         "url": "https://data.api.abs.gov.au/rest/data/WPI/1.OHRPEB.7.TOT.10.AUS.Q",
         "seriesIdOrTable": "ABS WPI total hourly rates excluding bonuses (12-month % change)"
       },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/WPI/1.OHRPEB.7.TOT.10.AUS.Q",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/WPI/1.OHRPEB.7.TOT.10.AUS.Q",
+      "whatItIs": "The 12-month change in the ABS Wage Price Index: the cost of an hour of labour, excluding bonuses, quarterly.",
+      "whatItIsnt": "An average across all jobs: your own pay can move very differently, and bonuses are excluded.",
+      "trackRecordNote": "Wage growth above inflation marked the strong 2023–24 stretch; the long flat 2010s matched weak pay and weak prices together.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 200 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "quarterly",
@@ -1758,6 +2675,27 @@
         "name": "ABS (CPI Rents)",
         "url": "https://data.api.abs.gov.au/rest/data/CPI/1.115522.10.50.M",
         "seriesIdOrTable": "ABS CPI Rents index, monthly (12-month % change)"
+      },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/CPI/1.115522.10.50.M",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/CPI/1.115522.10.50.M",
+      "whatItIs": "The 12-month change in the ABS CPI “rents” index: new and existing tenancies together, published monthly.",
+      "whatItIsnt": "An Australia-wide average: city and regional markets can differ sharply, and existing rents move slower than new ones.",
+      "trackRecordNote": "The 2023–26 squeeze pushed rent growth to multi-decade highs as population growth met a tight supply of homes.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 95 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
       },
       "unit": "percent",
       "changeUnit": "percentage points",
@@ -1799,6 +2737,27 @@
         "url": "https://data.api.abs.gov.au/rest/data/LF/M13.3.1599.20.AUS.M",
         "seriesIdOrTable": "ABS Labour Force M13 (persons, SA, Australia)"
       },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/LF/M13.3.1599.20.AUS.M",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/LF/M13.3.1599.20.AUS.M",
+      "whatItIs": "The ABS Labour Force unemployment rate (monthly, table M13).",
+      "whatItIsnt": "Monthly and seasonally noisy; the participation rate moves it too, and averages hide regions.",
+      "trackRecordNote": "Rises of half a point off a low have often marked turning points toward slowdowns.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "monthly",
@@ -1838,6 +2797,27 @@
         "url": "https://data.api.abs.gov.au/rest/data/RES_DWELL_ST/5.AUS.Q",
         "seriesIdOrTable": "ABS RES_DWELL_ST residential dwelling price index"
       },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/RES_DWELL_ST/5.AUS.Q",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/RES_DWELL_ST/5.AUS.Q",
+      "whatItIs": "The ABS residential property price index (quarterly): the average price of Australian dwellings, as an index.",
+      "whatItIsnt": "A national average hides big city differences, and values lag actual transactions.",
+      "trackRecordNote": "Falls have been rare and mostly brief: 2008, pockets of 2017–19, and 2022–23 with rate hikes.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 215 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
       "unit": "index",
       "changeUnit": "percent",
       "cadence": "quarterly",
@@ -1876,6 +2856,27 @@
         "name": "RBA E2 (household ratios)",
         "url": "https://www.rba.gov.au/statistics/tables/",
         "seriesIdOrTable": "RBA E2 'Household debt to income' (ABS-calculated ratios republished by the RBA)"
+      },
+      "publisher": "Reserve Bank of Australia (statistical tables)",
+      "publisherUrl": "https://www.rba.gov.au/statistics/tables/",
+      "methodUrl": "https://www.rba.gov.au/statistics/tables/",
+      "whatItIs": "The household debt-to-income ratio the RBA republishes from ABS calculations (quarterly, table E2).",
+      "whatItIsnt": "An aggregate: averages hide who actually holds the debt and how comfortably.",
+      "trackRecordNote": "Australia has sat above 150% since the mid-2000s; trouble historically shows up in arrears with a lag after rate rises.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 190 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "github-action",
+        "termsLines": "RBA copyright page (read 2026-10-16): most RBA material is CC BY 4.0; RBA terms allow commercial and personal use provided no RBA endorsement is implied. The page is JS-heavy — the verbatim licence line could not be captured in a plain fetch; re-quote at the quarterly licence review. Third-party content inside an RBA table needs that third party’s consent (re-check each table’s source notes).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Reserve Bank of Australia",
+        "legs": [
+          "rba"
+        ]
       },
       "unit": "percent",
       "changeUnit": "percentage points",
@@ -1917,6 +2918,27 @@
         "url": "https://frankfurter.dev",
         "seriesIdOrTable": "1 ÷ Frankfurter USD→AUD"
       },
+      "publisher": "derived",
+      "publisherUrl": "https://frankfurter.dev",
+      "methodUrl": "https://frankfurter.dev",
+      "whatItIs": "The AUD/USD exchange rate: how many US dollars one Australian dollar buys, from ECB reference rates via Frankfurter.",
+      "whatItIsnt": "Commodity prices, US rates and global risk sentiment all move it at once.",
+      "trackRecordNote": "Historic lows (under roughly 62¢) came with global panics; sustained strength (above 80¢) with commodity booms.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": false,
+        "enabled": false,
+        "method": null,
+        "runtime": null,
+        "termsLines": "No register row — fail closed: not fetched, not shown, until the terms are read and the row is recorded.",
+        "termsReadOn": "not verified",
+        "attributionText": "",
+        "legs": [
+          "derived"
+        ]
+      },
       "unit": "usd",
       "changeUnit": "percent",
       "cadence": "daily",
@@ -1956,6 +2978,27 @@
         "name": "Frankfurter (ECB)",
         "url": "https://frankfurter.dev",
         "seriesIdOrTable": "Frankfurter USD→JPY ÷ USD→AUD"
+      },
+      "publisher": "derived",
+      "publisherUrl": "https://frankfurter.dev",
+      "methodUrl": "https://frankfurter.dev",
+      "whatItIs": "The AUD/JPY exchange rate: how many yen one Australian dollar buys, derived from ECB reference rates.",
+      "whatItIsnt": "Both central banks’ policies move it over years, not just risk sentiment this week.",
+      "trackRecordNote": "Plunges of 5% or more within weeks have marked global de-risking episodes.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": false,
+        "enabled": false,
+        "method": null,
+        "runtime": null,
+        "termsLines": "No register row — fail closed: not fetched, not shown, until the terms are read and the row is recorded.",
+        "termsReadOn": "not verified",
+        "attributionText": "",
+        "legs": [
+          "derived"
+        ]
       },
       "unit": "jpy",
       "changeUnit": "percent",
@@ -1999,6 +3042,27 @@
         "url": "https://data.api.abs.gov.au/rest/data/ANA_AGG/M5.TTR.20.AUS.Q",
         "seriesIdOrTable": "ABS national accounts (ANA_AGG export ÷ import price index)"
       },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/ANA_AGG/M5.TTR.20.AUS.Q",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/ANA_AGG/M5.TTR.20.AUS.Q",
+      "whatItIs": "The ABS terms-of-trade index: export prices divided by import prices, quarterly.",
+      "whatItIsnt": "Slow, quarterly, and a rear-view measure of price shifts already felt in incomes.",
+      "trackRecordNote": "The mining booms (2000s, 2020–21) sent it soaring; the GFC and the 2012–15 commodity slide sank it.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 215 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
       "unit": "index",
       "changeUnit": "percentage points",
       "cadence": "quarterly",
@@ -2038,6 +3102,27 @@
         "url": "https://www.worldbank.org/en/research/commodity-markets",
         "seriesIdOrTable": "World Bank Pink Sheet iron ore, cfr spot (FRED mirror PIORECRUSDM lags ~2 months)"
       },
+      "publisher": "World Bank (Commodity Markets \"Pink Sheet\")",
+      "publisherUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "methodUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "whatItIs": "The World Bank’s monthly spot price for iron ore delivered to China, priced per dry metric tonne unit.",
+      "whatItIsnt": "China’s property and stimulus cycle dominates: forecasts for this price are famously poor.",
+      "trackRecordNote": "Sub-$60 stretches marked Chinese slowdowns; the 2020–21 surge above $200 marked stimulus booms.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "World Bank Open Data terms are commonly CC BY 4.0, but the terms page is JS-rendered and could not be quoted verbatim on 2026-10-16 — level L1 (need checking), fail closed in public mode until the clause is quoted. Attribution shown regardless.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: World Bank",
+        "legs": [
+          "world-bank"
+        ]
+      },
       "unit": "usd",
       "changeUnit": "percent",
       "cadence": "monthly",
@@ -2075,6 +3160,28 @@
         "name": "gold-api.com × Frankfurter (ECB)",
         "url": "https://www.gold-api.com",
         "seriesIdOrTable": "gold-api.com XAU × Frankfurter USD→AUD"
+      },
+      "publisher": "ECB reference rates via the Frankfurter project",
+      "publisherUrl": "https://www.gold-api.com",
+      "methodUrl": "https://www.gold-api.com",
+      "whatItIs": "The world gold price converted into Australian dollars: the live ounce price from a metals feed times the AUD exchange rate.",
+      "whatItIsnt": "It is mostly the US-dollar gold price plus the AUD/USD rate: either can move it.",
+      "trackRecordNote": "It rose through most of the 2000s and 2020s as gold climbed and the AUD varied around it.",
+      "definition": "The gold price in US dollars divided by AUD/USD, same date: the gold price in Australian dollars.",
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "frankfurter.dev/license links the ECB disclaimer for the data (read 2026-10-16); the ECB’s reuse terms page is JS-rendered and could not be quoted verbatim in a plain fetch — level L1 (probably fine, terms need the quarterly re-check), fail closed in public mode until then. Frankfurter’s code is MIT. · Worst of legs (gold-api:XAU, frankfurter): the L1 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "legs": [
+          "gold-api:XAU",
+          "frankfurter"
+        ]
       },
       "unit": "aud",
       "changeUnit": "percent",

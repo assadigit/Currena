@@ -1,0 +1,79 @@
+{
+  "v": 1,
+  "generatedAt": "2026-10-19T15:38:50.299Z",
+  "mode": "scheduled",
+  "dryRun": false,
+  "sources": [
+    {
+      "source": "fred",
+      "ok": true,
+      "detail": "15 series fetched"
+    },
+    {
+      "source": "ecb",
+      "ok": true,
+      "detail": "deposit facility rate fetched"
+    },
+    {
+      "source": "frankfurter",
+      "ok": true,
+      "detail": "8 reference rates fetched"
+    },
+    {
+      "source": "abs",
+      "ok": true,
+      "detail": "8 series fetched"
+    },
+    {
+      "source": "rba",
+      "ok": true,
+      "detail": "7 series fetched"
+    },
+    {
+      "source": "world-bank",
+      "ok": true,
+      "detail": "pink sheet fetched"
+    },
+    {
+      "source": "gold-api",
+      "ok": true,
+      "detail": "4 spot prices fetched"
+    },
+    {
+      "source": "bitstamp",
+      "ok": true,
+      "detail": "BTC-USD fetched"
+    },
+    {
+      "source": "alternative-me",
+      "ok": true,
+      "detail": "crypto fear & greed fetched"
+    },
+    {
+      "source": "manual",
+      "ok": false,
+      "detail": "china-pmi manual entry expired — reading held unavailable"
+    }
+  ],
+  "validation": [
+    {
+      "test": "T-04",
+      "name": "No frozen daily values",
+      "ok": false,
+      "flagged": [
+        "stress-stlfsi"
+      ],
+      "failures": [
+        "stress-stlfsi: duplicate daily value held on its last good reading"
+      ]
+    },
+    {
+      "test": "T-08",
+      "name": "Hero equals the gauge counts",
+      "ok": true,
+      "flagged": [],
+      "failures": []
+    }
+  ],
+  "ruleVersion": 2
+}

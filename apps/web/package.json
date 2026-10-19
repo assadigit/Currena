@@ -10,7 +10,10 @@
     "build": "node ../../scripts/check-site-mode.mjs && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "visual:fixtures": "pnpm --filter @currena/insights exec tsx ../../apps/web/visual/build-fixtures.ts",
+    "visual:test": "node visual/run-visual.mjs test",
+    "visual:screenshots": "node visual/run-visual.mjs screenshots"
   },
   "dependencies": {
     "@currena/core": "workspace:*",
@@ -26,6 +29,7 @@
   },
   "devDependencies": {
     "@fontsource/vazirmatn": "^5.3.0",
+    "@playwright/test": "^1.64.1",
     "@resvg/resvg-js": "^2.6.0",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/dom": "^10.4.2",

@@ -122,12 +122,32 @@ export interface LegEval {
   /** Defect E-19: this leg is the connection's trigger (the card says so). */
   trigger?: true;
   caveat?: 'debt-level';
+  /**
+   * T-35 / UI-34 (v3, 2026-10-20): does this leg's move MATCH the usual
+   * tendency, contradict it, or is there nothing to tell (steady,
+   * unreadable, or the trigger never moved)? Rendered as word + icon,
+   * never colour alone.
+   */
+  marker?: 'matches' | 'does-not-match' | 'can-tell';
 }
 
 export interface ConnectionReading {
   connection: ConnectionId;
   state: ConnectionState;
   legs: readonly LegEval[];
+  /**
+   * T-35 (v3, 2026-10-20): the NEUTRAL summary the UI-33 card renders —
+   * the verdict badges are gone. triggerPresent=false → the card reads
+   * "Trigger not present" (R-01), never a match count. Counts exist ONLY
+   * when the trigger moved and every required leg is readable.
+   */
+  summary?: {
+    triggerPresent: boolean;
+    /** Of the legs that MOVED: how many match the usual tendency. */
+    matchCount?: number;
+    /** How many scored legs actually moved (the M in "N of M"). */
+    movedCount?: number;
+  };
   /**
    * The pass-through card's numbers (B-04): the decision (date + points)
    * and the loan change since it, when both exist.
@@ -372,51 +392,84 @@ export function evaluateConnection(
   const byId = new Map(readings.map((r) => [r.id as string, r]));
   if (def.passThrough === true) return evaluatePassThrough(def, byId);
 
-  const legs = def.legs.map((rule) => {
+  let legs = def.legs.map((rule) => {
     const r = byId.get(rule.id);
     return r !== undefined && !UNREADABLE_STATUS.has(r.status) ? evalConnectionLeg(rule, r) : unreadableLeg(rule);
   });
 
   const requiredRules = def.legs.filter((l) => l.role === 'required');
-  if (requiredRules.some((rule) => UNREADABLE_STATUS.has(byId.get(rule.id)?.status ?? 'unavailable'))) {
-    return { connection: def.id, state: 'unknown', legs };
-  }
+  const requiredUnreadable = requiredRules.some((rule) =>
+    UNREADABLE_STATUS.has(byId.get(rule.id)?.status ?? 'unavailable'),
+  );
   // A required leg with NO measurable change at all also blocks the read.
-  if (legs.some((l) => l.role === 'required' && l.move === null)) {
-    return { connection: def.id, state: 'unknown', legs };
-  }
+  const requiredBlind = legs.some((l) => l.role === 'required' && l.move === null);
 
   // Defect E-19 (2026-10-16): the TRIGGER leg gates the read. The tendency
   // describes what happens when the trigger moves ("when oil jumps"); with
   // the trigger steady the tendency is simply not in play — the card shows
-  // "Not showing" no matter how the other legs moved (the 15 Oct export's
-  // "Partly active" with oil falling was exactly this error).
+  // "Trigger not present" (v3 UI-35 wording) no matter how the other legs
+  // moved (the 15 Oct export's "Partly active" with oil falling was this).
   const triggerLeg = legs.find((l) => l.trigger === true);
-  if (triggerLeg !== undefined && !triggerLeg.moved) {
-    return { connection: def.id, state: 'inactive', legs };
+  const triggerMoved = triggerLeg !== undefined && triggerLeg.moved;
+
+  // ---- T-35 (2026-10-20): the neutral per-leg markers + summary. ----
+  // The reference sign is the TRIGGER's own move (the tendency's subject);
+  // expected(leg) = reference for 'same', flipped for the legs after the
+  // pivot under 'inverse' (the see-saw structure).
+  let state: ConnectionState;
+  if (requiredUnreadable || requiredBlind) {
+    state = 'unknown';
+  } else if (triggerLeg !== undefined && !triggerMoved) {
+    state = 'inactive';
+  } else {
+    // Relation-relative sign: for 'inverse' connections, legs after the
+    // first count as satisfying the structure when they move AGAINST it.
+    const relSign = (i: number): number | null => {
+      const leg = legs.find((l) => l.id === requiredRules[i]!.id)!;
+      if (!leg.moved) return null;
+      const sign = leg.direction === 'rising' ? 1 : -1;
+      return def.polarity === 'inverse' && i > 0 ? -sign : sign;
+    };
+    const signs: number[] = [];
+    for (let i = 0; i < requiredRules.length; i++) {
+      const sgn = relSign(i);
+      if (sgn !== null) signs.push(sgn);
+    }
+    const movedCount = signs.length;
+    if (movedCount === 0) state = 'inactive';
+    else {
+      const positive = signs.filter((sgn) => sgn > 0).length;
+      const negative = signs.filter((sgn) => sgn < 0).length;
+      state = positive > 0 && negative > 0 ? 'disagree' : movedCount === requiredRules.length ? 'active' : 'partly';
+    }
   }
 
-  // Relation-relative sign: for 'inverse' connections, legs after the first
-  // count as satisfying the structure when they move AGAINST it.
-  const relSign = (i: number): number | null => {
-    const leg = legs.find((l) => l.id === requiredRules[i]!.id)!;
-    if (!leg.moved) return null;
-    const sign = leg.direction === 'rising' ? 1 : -1;
-    return def.polarity === 'inverse' && i > 0 ? -sign : sign;
-  };
+  // Markers + the neutral count (R-01, R-02, UI-34, UI-35).
+  const scoredReadable = !requiredUnreadable && !requiredBlind;
+  const reference =
+    triggerMoved && triggerLeg?.direction != null ? (triggerLeg.direction === 'rising' ? 1 : -1) : null;
+  let matchCount = 0;
+  let movedScored = 0;
+  legs = legs.map((leg, idx) => {
+    const inverseFlip = def.polarity === 'inverse' && idx > 0 ? -1 : 1;
+    if (!leg.moved || leg.direction === null || reference === null || !scoredReadable) {
+      return { ...leg, marker: 'can-tell' as const };
+    }
+    const actual = leg.direction === 'rising' ? 1 : -1;
+    const matches = actual === reference * inverseFlip;
+    if (leg.role === 'required') {
+      movedScored += 1;
+      if (matches) matchCount += 1;
+    }
+    return { ...leg, marker: (matches ? 'matches' : 'does-not-match') as 'matches' | 'does-not-match' };
+  });
+  const summary: ConnectionReading['summary'] = triggerMoved
+    ? scoredReadable
+      ? { triggerPresent: true, matchCount, movedCount: movedScored }
+      : { triggerPresent: true } // a required leg is unreadable — no counts over what can't be read
+    : { triggerPresent: false }; // R-01: "Trigger not present", never a count
 
-  const signs: number[] = [];
-  for (let i = 0; i < requiredRules.length; i++) {
-    const s = relSign(i);
-    if (s !== null) signs.push(s);
-  }
-  const movedCount = signs.length;
-  if (movedCount === 0) return { connection: def.id, state: 'inactive', legs };
-  const positive = signs.filter((s) => s > 0).length;
-  const negative = signs.filter((s) => s < 0).length;
-  if (positive > 0 && negative > 0) return { connection: def.id, state: 'disagree', legs };
-  if (movedCount === requiredRules.length) return { connection: def.id, state: 'active', legs };
-  return { connection: def.id, state: 'partly', legs };
+  return { connection: def.id, state, legs, summary };
 }
 
 /** All six connections in spec order (pure). */

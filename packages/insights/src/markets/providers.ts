@@ -15,11 +15,12 @@
 
 import type { MarketId } from '@currena/core';
 import type { SeriesPoint } from '../series';
+import { insightsFetch } from '../adapters/fetch-policy';
+import { providerFetchEnabled } from '../sources';
 import {
   EODHD_BASE_URL,
   HISTORY_WINDOW_DAYS,
   YAHOO_BASE_URL,
-  YAHOO_USER_AGENT,
   marketDefinition,
 } from './definitions';
 
@@ -162,6 +163,10 @@ export async function fetchEodhdSeries(
   marketId: MarketId,
   opts: EodhdFetchOptions,
 ): Promise<MarketSeries> {
+  // v3 M-6 kill switch (2026-10-20): a disabled register row is never requested.
+  if (!providerFetchEnabled('eodhd')) {
+    throw new ProviderError('eodhd', marketId, 'source disabled (kill switch M-6) — not requested');
+  }
   const def = marketDefinition(marketId);
   if (def.eodhdCode === null) {
     // Verified unavailable on the free key (data-check file) — a clean
@@ -172,10 +177,9 @@ export async function fetchEodhdSeries(
   const url =
     `${opts.baseUrl ?? EODHD_BASE_URL}/eod/${encodeURIComponent(def.eodhdCode)}` +
     `?api_token=${encodeURIComponent(opts.apiToken)}&fmt=json&period=d&from=${from}`;
-  const fetchImpl = opts.fetchImpl ?? ((input: RequestInfo | URL, init?: RequestInit) => fetch(input, init));
   let response: Response;
   try {
-    response = await fetchImpl(url, { signal: timeoutSignal(opts.timeoutMs ?? 15_000) });
+    response = await insightsFetch(url, {}, { fetchImpl: opts.fetchImpl, timeoutMs: opts.timeoutMs ?? 15_000 });
   } catch (err) {
     throw new ProviderError('eodhd', marketId, `transport failure: ${errMessage(err)}`);
   }
@@ -208,17 +212,21 @@ export async function fetchYahooSeries(
   marketId: MarketId,
   opts: YahooFetchOptions = {},
 ): Promise<MarketSeries> {
+  // v3 M-6 kill switch (2026-10-20): a disabled register row is never requested.
+  if (!providerFetchEnabled('yahoo')) {
+    throw new ProviderError('yahoo', marketId, 'source disabled (kill switch M-6) — not requested');
+  }
   const def = marketDefinition(marketId);
   const url =
     `${opts.baseUrl ?? YAHOO_BASE_URL}/${encodeURIComponent(def.yahooSymbol)}` +
     `?range=1y&interval=1d`;
-  const fetchImpl = opts.fetchImpl ?? ((input: RequestInfo | URL, init?: RequestInit) => fetch(input, init));
   let response: Response;
   try {
-    response = await fetchImpl(url, {
-      headers: { 'user-agent': opts.userAgent ?? YAHOO_USER_AGENT, accept: 'application/json' },
-      signal: timeoutSignal(opts.timeoutMs ?? 15_000),
-    });
+    response = await insightsFetch(
+      url,
+      { headers: { accept: 'application/json' } },
+      { fetchImpl: opts.fetchImpl, timeoutMs: opts.timeoutMs ?? 15_000 },
+    );
   } catch (err) {
     throw new ProviderError('yahoo', marketId, `transport failure: ${errMessage(err)}`);
   }
@@ -242,14 +250,6 @@ export async function fetchYahooSeries(
 /** The `from` date for EODHD: ~400 days back from today (UTC). */
 export function defaultFromDate(now: Date): string {
   return new Date(now.getTime() - HISTORY_WINDOW_DAYS * 86_400_000).toISOString().slice(0, 10);
-}
-
-function timeoutSignal(ms: number): AbortSignal | undefined {
-  try {
-    return AbortSignal.timeout(ms);
-  } catch {
-    return undefined; // Very old runtimes — the platform's own timeout applies.
-  }
 }
 
 function errMessage(err: unknown): string {

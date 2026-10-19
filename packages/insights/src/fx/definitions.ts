@@ -97,9 +97,9 @@ export const VERDICT_UNUSUAL_COUNT = 3;
 export const FRANKFURTER_BASE_URL = 'https://api.frankfurter.dev/v1';
 /** Yahoo Finance chart endpoint (unofficial, keyless fallback). */
 export const YAHOO_BASE_URL = 'https://query1.finance.yahoo.com/v8/finance/chart';
-/** User-Agent for Yahoo — a plain curl UA gets blocked with 429/999. */
-export const YAHOO_USER_AGENT =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0 Safari/537.36';
+/** User-Agent for Yahoo (v3 F-09/T-25): the declared honest identity. A
+ *  refusal means BLOCKED — fail closed; never a browser identity. */
+export const YAHOO_USER_AGENT = 'CurrenaDashboard/1.0 (+https://github.com/assadigit/Currena)';
 
 /** The one KV key the whole section is stored under (spec §5 rule 1). */
 export const FX_KV_KEY = 'insights:fx:v1';

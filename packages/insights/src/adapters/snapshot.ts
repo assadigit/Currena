@@ -42,6 +42,7 @@ import { RULE_VERSION } from '../ruleVersion';
 import type { SafetyFlag } from '../validation';
 import { addDays, epochDay, fromEpochDay, pointAtOrBefore, type SeriesPoint } from '../series';
 import { AUX_RULE_WIRING, READING_SOURCES } from './derived';
+import { SANITY_RANGES, withinSanityRange, upstreamLegsFor } from '../sources';
 
 /**
  * Step-1 audit items A2/A3 + fix spec B-05 (2026-10-14): a hand-maintained
@@ -199,6 +200,19 @@ export interface SnapshotBuildInputs {
    * entry no one has refreshed can never read as current.
    */
   manualExpires?: Readonly<Record<string, string>>;
+  /**
+   * v3 M-6 (2026-10-20): ids whose source legs include a register row with
+   * enabled=false (the kill switch). Their cards go dark — status
+   * 'unavailable', value hidden — and the public projection drops them.
+   */
+  disabledReadings?: readonly string[];
+  /**
+   * v3 T-27/F-16 (2026-10-20): per-PROVIDER fetch outcomes from the collect
+   * report ('blocked' | 'format-changed'). Readings whose legs include the
+   * provider carry the honest one-line reason (a block is a block; a format
+   * change means can't-tell until re-verified) — never a verdict.
+   */
+  sourceOutcomes?: Readonly<Record<string, 'blocked' | 'format-changed'>>;
   /** The run's clock (ISO 8601 UTC) — generatedAt and every reading's updatedAt. */
   now: string;
 }
@@ -294,6 +308,26 @@ function nextReleaseToday(
  * id). The result is schema-validated: the runner refuses to write a
  * snapshot that would not survive the Worker's read-side validation.
  */
+/**
+ * v3 T-27/F-16 (2026-10-20): the honest one-line reason when a reading's
+ * provider was blocked or came back format-changed this run. A block is a
+ * block — no verdict rides on it.
+ */
+function outcomeFlagFor(
+  def: { id: string; source: string; sourceRef: string },
+  sourceOutcomes?: Readonly<Record<string, 'blocked' | 'format-changed'>>,
+): IndicatorReading['flag'] {
+  if (!sourceOutcomes) return undefined;
+  const legProviders = new Set(upstreamLegsFor(def).map((leg) => leg.split(':')[0]));
+  for (const [provider, outcome] of Object.entries(sourceOutcomes)) {
+    if (!legProviders.has(provider)) continue;
+    return outcome === 'blocked'
+      ? { test: 'T-27', reason: 'source blocked by the site — no retry until the next scheduled refresh (fail closed)' }
+      : { test: 'F-16', reason: "source format changed — can't tell right now until the response shape is re-verified" };
+  }
+  return undefined;
+}
+
 export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnapshot {
   const readings: IndicatorReading[] = [];
   const nowDayIso = inputs.now.slice(0, 10);
@@ -307,6 +341,9 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
     const source: ReadingSource = READING_SOURCES[def.id] ?? { name: def.sourceRef };
     const series = inputs.series[def.id];
     const flag = inputs.flags?.get(def.id);
+    // v3 T-27/F-16: the run's honest fetch outcome for this reading's
+    // providers (blocked / format-changed) — attached in BOTH paths below.
+    const outcomeFlag = outcomeFlagFor(def, inputs.sourceOutcomes);
 
     if (!series) {
       // Step-1 audit item H3: a failed fetch HOLDS the last good value —
@@ -322,6 +359,7 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
           sourceName: source.name,
           sourceUrl: source.url,
           updatedAt: inputs.now,
+          ...(outcomeFlag ? { flag: outcomeFlag } : {}),
         });
       } else {
         readings.push({
@@ -332,6 +370,7 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
           sourceName: source.name,
           sourceUrl: source.url,
           updatedAt: inputs.now,
+          ...(outcomeFlag ? { flag: outcomeFlag } : {}),
         });
       }
       continue;
@@ -434,6 +473,44 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
     // ---- Fix spec A-03/A-04: apply the validation safety flags. ----
     if (flag !== undefined) {
       reading = applyFlag(reading, flag, inputs.previous, inputs.now);
+    }
+
+    // ---- v3 T-28 / F-14 (2026-10-20): definitional sanity range. ----
+    // A value outside its own definition's band is REJECTED — the value is
+    // hidden and the card shows can't tell right now (never a wrong number).
+    const sanityBand = SANITY_RANGES[def.id as string];
+    if (sanityBand !== undefined && reading.value !== null && !withinSanityRange(def.id as string, reading.value)) {
+      const bandText = sanityBand.minExclusive
+        ? 'must be greater than zero'
+        : `must sit in ${sanityBand.min ?? '-∞'} to ${sanityBand.max ?? '∞'}`;
+      reading = {
+        ...reading,
+        value: null,
+        asOf: null,
+        status: 'unavailable',
+        flag: {
+          test: 'T-28',
+          reason: `value outside its allowed range (${bandText}) — rejected, can't tell right now`,
+        },
+      };
+    }
+
+    // ---- v3 M-6 kill switch (2026-10-20): the source was disabled in the ----
+    // ---- register — its cards go dark, value hidden, never a verdict. ----
+    if ((inputs.disabledReadings ?? []).includes(def.id as string) && reading.status !== 'unavailable') {
+      reading = {
+        ...reading,
+        value: null,
+        asOf: null,
+        status: 'unavailable',
+        flag: { test: 'M-6', reason: 'source disabled (kill switch) — its cards are off until the owner re-enables it in the source registry' },
+      };
+    }
+
+    // ---- v3 T-27/F-16 (2026-10-20): a blocked or format-changed source ----
+    // ---- names the honest reason on the reading it feeds. ----
+    if (outcomeFlag !== undefined && reading.flag === undefined) {
+      reading = { ...reading, flag: outcomeFlag };
     }
 
     readings.push(reading);

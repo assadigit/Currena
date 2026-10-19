@@ -23,6 +23,7 @@ import { fetchLivePriceEntry } from './providers';
 import { INTERVAL_SLACK_MINUTES, LIVE_PRICE_ASSETS, PRICE_ASSET_IDS } from './definitions';
 import type { PricesReader, PricesWriter } from './store';
 import { livePricesContentEqual } from './store';
+import { providerFetchEnabled } from '../sources';
 
 export interface PricesJobFetchers {
   fetchAsset: (assetId: PriceAssetId) => Promise<LivePriceEntry>;
@@ -62,6 +63,8 @@ export interface RunPricesUpdateResult {
   reports: readonly PricesJobReport[];
   /** KV write failure (e.g. the daily cap) — informational, NOT fatal. */
   writeError?: string;
+  /** v3 M-6: the run was skipped because its source is disabled (kill switch). */
+  skippedReason?: string;
 }
 
 function errMessage(err: unknown): string {
@@ -77,6 +80,20 @@ export function withinInterval(entry: LivePriceEntry, assetId: PriceAssetId, now
 
 export async function runPricesUpdate(deps: RunPricesUpdateDeps): Promise<RunPricesUpdateResult> {
   const now = deps.now ?? new Date();
+
+  // v3 M-6 kill switch (2026-10-20): every live quote comes from Yahoo —
+  // with the register row disabled the whole job is skipped (nothing
+  // fetched, nothing written; the stored quotes keep aging honestly).
+  if (!providerFetchEnabled('yahoo')) {
+    return {
+      wroteSnapshot: false,
+      unchanged: false,
+      nothingToStore: true,
+      reports: [],
+      skippedReason: 'source disabled (kill switch M-6) — not requested',
+    };
+  }
+
   const stored = await deps.store.getLivePrices();
 
   const assets: Partial<Record<PriceAssetId, LivePriceEntry>> = {};
