@@ -92,34 +92,90 @@ values. This is the same honest-roll-in behavior round 46's weekly lens
 used. (The EODHD one-year window lands inside the ±15-day tolerance band,
 so the anchor rule fires on the primary provider too.)
 
-## Screenshots
+## Screenshots (local harness)
 
 `docs/insights/screenshots/yearly-lens/` — en-desktop-list-1600,
 en-desktop-heatmap-1600, en-desktop-table-1600, fa-desktop-list-1600,
-fa-desktop-table-1600, en-mobile-390, fa-mobile-390.
+fa-desktop-table-1600, en-mobile-390, fa-mobile-390. (Production captures
+below carry the `prod-` prefix.)
+
+## Production (post-deploy live verification, 2026-10-19)
+
+Deployed through the established pipeline with the owner-provided Cloudflare
+credentials (env-only, never persisted): `pnpm --filter @currena/web build`
+→ `pnpm --filter @currena/api exec wrangler deploy` → currena-api
+**96c4a467-1d2b-49d8-bfb7-748ca30d3486**; `pnpm --filter @currena/markets
+exec wrangler deploy` → currena-markets **18cf040e-70f0-4f08-8582-a0b3e0c2d29e**
+(both crons `30 23 * * 1-5` / `30 1 * * 2-6` re-armed; `EODHD_API_TOKEN`
+secret verified present, unchanged). Deterministic rebuild of main @ f0bfa83:
+served chunks exactly `index-Blojx-aS.js` + `Insights-BAeV8pAq.js`, budgets
+re-checked 295.29/88.81 and 660.88/158.00 — held.
+
+Live checks (currena.ir, fresh profile, SW unregistered + caches cleared
+first; workers.dev health 200 on the same build):
+
+- **EN desktop 1600** — the five-pill radiogroup (Daily | Weekly | Monthly |
+  Quarterly | Yearly), Quarterly default; Yearly click → "Yearly
+  performance", breadth zeroed (0 up / 0 down / 0 flat), coverage note
+  **"0 of 16 indices carry this period."**, movers "No data for this period
+  yet.", every list row an honest "—" with the aria "…: no data for this
+  period over Yearly, …", the 52-week context intact per row; the full
+  table carries the **"1 year"** column between "3 months" and "From
+  52-week high" with em-dashes while the other columns show live values;
+  the performance map's cells all read "no data for this period over
+  Yearly". VLM acceptance 4/4 PASS (pills + active state, honest no-data
+  surface, no visual defects, 52-week context).
+- **fa RTL desktop 1600** — «انتخاب بازهٔ عملکرد شاخص‌ها» with
+  روزانه | هفتگی | ماهانه | سه‌ماهه | **سالانه**; «عملکرد سالانه»,
+  Persian digits throughout, «۰ شاخص از ۱۶ شاخص دادهٔ این بازه را دارند.»,
+  movers «بیشترین رشد/افت: داده‌های این بازه هنوز در دسترس نیست.», the
+  local-currency note unchanged. VLM acceptance 4/4 PASS (RTL, Persian
+  digits, no clipping, production quality).
+- **Mobile 390 (fa + EN)** — zero page-level horizontal overflow in both
+  locales; the hero carousel still opens Global-first with the swipe cue;
+  fa: all five pills fit in-row (291px) with «سالانه» active + the fa
+  coverage note; EN: the pill row is the approved `overflow-x-auto`
+  segmented control — at rest the Yearly pill is partially visible and a
+  row swipe reveals it fully (measured: row 326px client / 354px content,
+  scrollLeft 28 → Yearly fully visible, `aria-checked` pill reachable —
+  the same rest-state clipping as this round's own local en-mobile-390
+  capture, i.e. the shipped round-5 build's designed behavior, not a
+  deploy regression).
+- **Hero regression (round 4)** — two signals panels live ("World signals"
+  with the production markets bullet + "Australia signals" with real
+  production data: "Inflation & rates · Critical: 2 of 2…", "Households ·
+  Stressed: 2 of 5…", "Trade & currency · Stable"); no rule toggle on
+  either card.
+- **Zero console errors, zero page errors** on every capture.
+
+**Backfill watch:** the stored markets snapshot at deploy time was written
+by the pre-round-5 markets worker (2026-10-17T17:48Z, no `chg1y` on any
+row), so the Yearly lens opens on the honest dashes + "0 of 16" coverage
+note until the NEW currena-markets worker's first cron run — tonight
+23:30 UTC (a Monday; `30 23 * * 1-5`) — rewrites every row with real
+yearly values, with the 01:30 UTC retry covering a bounced write. This is
+the same honest roll-in round 46's weekly lens used; verified against the
+live `/api/insights/markets` response (16 rows, `chg1y` absent on all,
+as designed for the pre-backfill window).
+
+Production screenshots (`prod-` prefix, same folder):
+prod-en-hero-au-signals, prod-en-yearly-list-1600,
+prod-en-yearly-table-1600, prod-en-yearly-heatmap-1600,
+prod-fa-yearly-1600, prod-fa-mobile-yearly-390, prod-en-mobile-hero-390,
+prod-en-mobile-yearly-390, prod-en-mobile-yearly-scrolled-390.
 
 ## Delivery state
 
 - **Git: DELIVERED.** `feature/markets-yearly-lens` @ 80e15bd pushed and
   fast-forward-merged to main (ad89404..80e15bd); GitHub CI on the main
   push: **completed / success**.
-- **Production deploy: PENDING** the owner-provided Cloudflare credentials
-  (env-only by policy — absent from this session). This round is NOT
-  UI-only (rounds 1–4 never touched the markets worker), so the deploy
-  needs THREE commands — the markets worker carries the chg1y cron:
-
-  ```sh
-  pnpm --filter @currena/web build
-  pnpm --filter @currena/api exec wrangler deploy          # SPA + API (the yearly lens UI)
-  pnpm --filter @currena/markets deploy                    # currena-markets (computes chg1y nightly)
-  ```
-
-  Skipping the third command ships the Yearly tab with permanent dashes
-  (no cron ever writes chg1y). After both deploys: the nightly
-  23:30/01:30 UTC runs backfill `chg1y` per market as each next close
-  lands (the R5 same-date stability rule holds the current rows verbatim
-  for at most a trading day or two per market) — the same honest roll-in
-  round 46's weekly lens used. The EODHD_API_TOKEN secret persists on
-  currena-markets across deploys (no secret changes this round).
-- Live verification follows the deploy (fresh profile, SW cleared), per
-  the established DEPLOY.md CURRENT DEPLOYMENT convention.
+- **Production deploy: DEPLOYED + LIVE-VERIFIED 2026-10-19** (see the
+  Production section above) — all THREE commands ran with the
+  owner-provided Cloudflare credentials: web build → currena-api
+  `96c4a467` → currena-markets `18cf040e` (the worker whose cron computes
+  `chg1y`; both crons re-armed, `EODHD_API_TOKEN` verified present and
+  unchanged). The nightly 23:30/01:30 UTC runs now backfill `chg1y` per
+  market as each next close lands — the same honest roll-in round 46's
+  weekly lens used. Rollback: `wrangler rollback` on currena-api (previous
+  version b1067b0a, the australia-signals round) or redeploy any prior
+  main commit.

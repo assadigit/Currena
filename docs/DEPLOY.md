@@ -83,6 +83,69 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## CURRENT DEPLOYMENT — the yearly lens on the world stock indices: a fifth view (Daily → Yearly), a real chg1y, a 1-year table column (2026-10-19 (yearly lens) owner round 5, workers 96c4a467 + 18cf040e)
+
+Owner round 5 — "add yearly view to the stocks indexes" — is LIVE on
+`/#/insights`: the period radiogroup now offers FIVE lenses — Daily |
+Weekly | Monthly | Quarterly | **Yearly** («سالانه»), Quarterly still the
+default — over a REAL stored `chg1y`: an OPTIONAL contract field on
+`MarketEntrySchema`, derived by the markets pipeline's `yearAgoAnchor`
+(the strict 365-day rolling anchor, falling back to the series' earliest
+close inside the ±15-day tolerance band — the repo's year-on-year
+convention; windows closer than 350 days omit the field), with the Yahoo
+fallback fetch widened to `range=2y` so the anchor always has real
+closes. Every view surface follows through the one `viewValue` lens map
+(breadth + coverage note, movers, tiles, heatmap scale, aria); the full
+table gains a **"1 year"** column (desktop + mobile list) appended at the
+END; `markets-csv` appends "1 year %" at the END (position-pinned scripts
+keep their indices); full-export rides the existing `chg1y` slot. Three
+new copy keys × 2 locales (`viewYearly`, `thYear`, `csvColYear` —
+manifest round `markets-yearly-lens-2026-10-19`); 6 new test guards
+(1,612 workspace tests). Evidence + 16 screenshots:
+`docs/insights/yearly-lens-verification.md`.
+
+- **Active workers**: currena-api **`96c4a467-1d2b-49d8-bfb7-748ca30d3486`**
+  (SPA + API — the yearly-lens UI; SITE_MODE=public, RATES KV + ASSETS
+  bindings, the `* * * * *` keep-warm cron unchanged) AND — this round is
+  NOT UI-only — currena-markets
+  **`18cf040e-70f0-4f08-8582-a0b3e0c2d29e`** (the worker whose
+  `30 23 * * 1-5` / `30 1 * * 2-6` crons compute and store `chg1y`;
+  `EODHD_API_TOKEN` secret verified present, unchanged). Deployed via
+  `pnpm --filter @currena/markets exec wrangler deploy` (the same
+  `exec wrangler deploy` pattern).
+- **What it carries**: everything from b1067b0a (the australia-signals
+  round) + the yearly lens (feature commit `80e15bd`, fast-forward merged
+  to main, + the docs-only delivery-state record `f0bfa83`; CI green on
+  both — typecheck, lint, 1,612 tests, build, bundle budgets held with NO
+  bump: entry 295.29/88.81, Insights 660.88/158.00 vs 661.00/158.50, copy
+  audit).
+- **Live-verified** (currena.ir, fresh profile, SW cleared): served chunks
+  exactly the `80e15bd` build (`index-Blojx-aS.js`, `Insights-BAeV8pAq.js`);
+  EN desktop 1600 — five pills with Yearly; Yearly click → "Yearly
+  performance" + "0 of 16 indices carry this period." + movers "No data
+  for this period yet." + honest "—" rows with the aria "no data for this
+  period over Yearly"; the full table's "1 year" column between "3 months"
+  and "From 52-week high" (em-dashes; other columns live); heatmap cells
+  honest; VLM 4/4. fa RTL desktop — «انتخاب بازهٔ عملکرد شاخص‌ها», five
+  pills with «سالانه», «عملکرد سالانه», «۰ شاخص از ۱۶ شاخص دادهٔ این
+  بازه را دارند.», Persian digits, VLM 4/4. Mobile 390 fa+EN — zero
+  page-level overflow; hero carousel Global-first; fa pills fit in-row
+  (291px); EN pill row is the approved `overflow-x-auto` segmented control
+  (row swipe reveals Yearly fully — measured, the same rest state as the
+  round's own local capture). Round-4 regression: both signals panels +
+  no rule toggle. Zero console/page errors everywhere.
+- **Backfill watch**: the stored markets snapshot at deploy time predates
+  the round-5 markets worker (no `chg1y` yet), so Yearly opens on the
+  honest dashes + "0 of 16" note until the NEW currena-markets worker's
+  first cron run (23:30 UTC Mon–Fri / 01:30 UTC retry) rewrites the rows
+  with real yearly values — the same honest roll-in the weekly lens used.
+- **Rollback**: `wrangler rollback` (currena-api previous version b1067b0a
+  = the australia-signals round; currena-markets previous deployment
+  2026-10-17), or redeploy any prior main commit.
+
+The previous deployment record (the australia-signals round, worker
+b1067b0a) follows below.
+
 ## CURRENT DEPLOYMENT — the Australia card closes with the same signals box as World Signals, carrying its own area data (2026-10-20 (australia signals) owner round 4, worker b1067b0a)
 
 Owner round 4 — "Just like World Signals, I want the same Box with proper
