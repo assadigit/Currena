@@ -1,108 +1,106 @@
-# Currena Insights: Agent Runbook
+# Currena Insights: Agent Runbook (version 3)
 
-This file tells the coding agent exactly what to do, in order, without asking questions. Read it completely first.
+This file tells the coding agent exactly what to do, in order, without asking questions. Read it completely first, then read every file listed below before changing anything.
 
 Repository: assadigit/Currena (Cloudflare Workers, free KV). Owner: Ali.
-Files for this job, all in `docs/insights/`:
+
+## Files (all in `docs/insights/`)
 
 | File | Purpose |
 |---|---|
-| `AGENT_RUNBOOK.md` | This file. The procedure. |
-| `INSIGHTS_FIX_SPEC.md` | Foundation, fixes, additions and tests (IDs A-xx, B-xx, C-xx, T-01 to T-14). |
-| `INSIGHTS_DEFECTS_2026-10-15.md` | Defects found in the latest page export (IDs E-01 to E-24). |
-| `INSIGHTS_STEP3_SPEC.md` | Access gate, licence policy, published indicators, standard definitions, tests T-15 to T-24. |
-| `baseline/currena-insights-full-2026-10-15.md` | The page export the defects were found in. Use it as evidence and as test fixtures. |
+| `AGENT_RUNBOOK.md` | This file: the procedure. |
+| `RULES.md` | Hard rules, source risk levels, public-mode mitigations, wording and data display rules. |
+| `RISK_REGISTER.md` | Source levels and the owner's recorded acceptance. |
+| `UI_SPEC.md` | All visual and interaction changes, with acceptance tests U-01 to U-14. |
+| `SCRAPING_SPEC.md` | The only allowed ways to fetch data, per-source method cards, tests T-25 to T-34. |
+| `INSIGHTS_STEP3_SPEC.md` | Indicators, definitions, relationship rules, coverage, tests T-15 to T-24 and T-35. |
+| `INSIGHTS_DEFECTS_2026-10-15.md` | 24 defects found in the latest export (E-01 to E-24). |
+| `INSIGHTS_FIX_SPEC.md` | Foundation, fixes, additions and tests (A-xx, B-xx, C-xx, T-01 to T-14). |
+| `GLOSSARY.md` | One vocabulary for page text and specs. |
+| `baseline/currena-insights-full-2026-10-15.md` | The page export the defects were found in. Evidence and test fixtures. |
 
-If two files disagree, the order of authority is: this runbook, then `INSIGHTS_STEP3_SPEC.md`, then `INSIGHTS_DEFECTS_2026-10-15.md`, then `INSIGHTS_FIX_SPEC.md`.
-
----
+If two files disagree: `RULES.md` wins, then `UI_SPEC.md` for anything visual, `SCRAPING_SPEC.md` for anything about fetching, then `INSIGHTS_STEP3_SPEC.md`, then `INSIGHTS_DEFECTS_2026-10-15.md`, then `INSIGHTS_FIX_SPEC.md`. This runbook decides the order of work.
 
 ## 1. Mission
 
-Make the Insights page correct, self-checking, private by default, and complete for an Australian saver and investor who buys US shares. When you finish, the owner can run one command to produce a self-audit and a full export, and the next audit needs no manual work.
+Make the Insights page correct, self-checking, clear to read, and complete for an Australian saver and investor who buys US shares. The page stays public and non-commercial, with the owner's recorded acceptance of risk for L2 sources. When you finish, the owner can run one command to produce a self-audit and a full export, so the next audit needs no manual work.
 
-## 2. Hard rules
+## 2. Setup
 
-1. **Work alone.** Do not ask questions. If something is ambiguous, choose the safest option, write the choice in the report, and continue.
-2. **Branch only.** Work on a branch named `insights-rebuild`. Commit at the end of every phase. **Never deploy to production.** Never push to the main branch. Deploy only to a preview or staging address if one exists.
-3. **Secrets.** Never print, log or commit API keys, tokens or passwords. Keep them in Cloudflare secrets or local environment files that are ignored by git. Never expose them to the browser.
-4. **Never invent.** Do not invent a series ID, table name, URL, number, threshold or licence term. Confirm each in the provider's own documentation or API response. If you cannot (for example no network), mark it "not verified" and do not show it as a normal card. Show "can't tell right now" or hide the card, and list it in the report.
-5. **Fail closed.** Wrong or stale data must never look current. Stale, failed, duplicate or unverified inputs produce a stale tag or "can't tell right now", never a verdict.
-6. **Wording.** All text shown to users describes conditions only. No forecasts. No "will", "should", "time to", "expected to". No buy, sell or hold language. No claims about causes in the news.
-7. **Units.** Percentage points for rates, inflation, yields, spreads, unemployment. % only for prices and indexes.
-8. **No design changes** and no features that are not in the specs.
-9. **No scraping** of websites that offer no feed or API and no stated reuse terms. Use a link-out.
-10. **Free limits.** Stay inside Cloudflare free-tier limits. Combine history into few large KV keys. If one scheduled run would exceed the outside-request limit, split it across several scheduled runs. Report KV reads, KV writes and outside requests per full refresh. Keep the existing refresh times (09:13 and 22:13 UTC).
+- [ ] Create branch `insights-rebuild` from the current default branch.
+- [ ] Record: the test runner (use the repo's own; if none, add Vitest), the command that runs all tests, how the page export is generated, where indicators are defined, where rules live, how text is produced, how refresh is scheduled, the KV bindings, and how the front end is built.
+- [ ] Run the existing tests and record the result.
+- [ ] Parse `baseline/currena-insights-full-2026-10-15.md` into fixture data under `tests/fixtures/`.
+- [ ] Read the existing page CSS and tokens so the UI work reuses them (`UI_SPEC.md` principle 6).
 
-## 3. Setup
+## 3. Phases
 
-- [x] Create branch `insights-rebuild` from the current default branch.
-- [x] Find and record: the test runner (use the repo's own; if none exists add Vitest), the command to run all tests, how the page export is generated, where indicators are defined, where rules live, how text is produced, how the refresh is scheduled, and the KV bindings.
-- [x] Run the existing tests and record the baseline result.
-- [x] Parse `baseline/currena-insights-full-2026-10-15.md` into fixture data under `tests/fixtures/` so tests can run against it.
-
-## 4. Phases
-
-After each phase: run the full test suite, fix failures, then commit with the message `phase N: <summary>`. If a test still fails after three honest attempts, record the item as blocked (what failed, what you tried, what is needed) and continue. Never leave the branch in a state where tests that passed before now fail.
+After each phase: run the full test suite, fix failures, commit with `phase N: <summary>`. If an item still fails after three honest attempts, record it as blocked (what failed, what you tried, what is needed) and continue. Never leave the branch worse than the last green commit.
 
 ### Phase 0: current-state report (read-only)
-
-Produce `docs/insights/CURRENT_STATE_REPORT.md` covering items S-01 to S-08 of `INSIGHTS_STEP3_SPEC.md` section 1. Cite evidence for every claim (file and line, or command output). Do not stop after writing it. Continue to Phase 1.
+Write `docs/insights/CURRENT_STATE_REPORT.md` for items S-01 to S-08 of `INSIGHTS_STEP3_SPEC.md`. Cite evidence for every claim. Do not stop afterwards; continue to Phase 1.
 
 ### Phase 1: tests first, then foundation
-
-- [x] Implement the validation tests T-01 to T-14 from `INSIGHTS_FIX_SPEC.md` and T-15 to T-24 from `INSIGHTS_STEP3_SPEC.md`, plus one extra test per defect E-04, E-05, E-06, E-10, E-11, E-18 and E-24.
-- [x] Run these tests against the baseline fixtures. For each defect they must **fail**, proving they catch it. Record the list of failing tests as `docs/insights/baseline-test-results.md`.
-- [x] Implement `INSIGHTS_FIX_SPEC.md` Part A (A-01 to A-08): single indicator registry, generated text, validation before publish, safe failure, daily snapshot archive, context notes off by default, rule versions, status panel.
-- [x] Add the licence fields from `INSIGHTS_STEP3_SPEC.md` section 8 to the registry.
+- [ ] Implement tests T-01 to T-14 (fix spec), T-15 to T-24 and T-35 (Step 3 spec), T-25 to T-34 (scraping spec), U-01 to U-14 (UI spec), plus one extra test per defect E-04, E-05, E-06, E-10, E-11, E-18, E-24.
+- [ ] Run them against the baseline fixtures. Every defect test must **fail**, proving it catches the defect. Save the list as `docs/insights/baseline-test-results.md`.
+- [ ] Implement `INSIGHTS_FIX_SPEC.md` Part A (A-01 to A-08): single registry, generated text, validation before publish, safe failure, daily snapshot archive, context notes off by default, rule versions, status panel.
+- [ ] Add the source fields from `INSIGHTS_STEP3_SPEC.md` section 8 to the registry.
 
 ### Phase 2: defects and fixes
+- [ ] Fix every defect E-01 to E-24. After each fix its test must pass.
+- [ ] Implement every remaining item of `INSIGHTS_FIX_SPEC.md` Parts B and C that is not already in place (items verified as present in section B of the defects file need only a regression test).
+- [ ] For defects E-01 and E-02 (Yahoo Finance, gold-api): treat as L2 sources under `RULES.md` and `RISK_REGISTER.md`. Do not remove them. Name each as a futures or unofficial source on its card, add attribution, and ensure each fails closed.
 
-- [x] Fix every defect E-01 to E-24 in `INSIGHTS_DEFECTS_2026-10-15.md`. After each fix, the matching test must go from failing to passing.
-- [x] Implement every remaining item in `INSIGHTS_FIX_SPEC.md` Part B and Part C that is not already in place (check against the baseline; items verified as present in section B of the defects file only need a regression test).
-- [x] Tick each checkbox in the spec files only after you have implemented and verified it.
+### Phase 3: risk policy and public-mode mitigations
+- [ ] Create `LICENCES.md` and complete `RISK_REGISTER.md`: for every source, read its terms and `robots.txt`, quote the lines, set the level, record the date, and fill in the attribution text. Do not change any `owner_accepts` value.
+- [ ] Implement `RULES.md` section 3: M-1 to M-9, including the panic switch (`ACCESS_MODE`, `PANIC_PRIVATE`), the per-source kill switch, rate limiting, minimum-data public endpoints, the owner-only export, and the contact line.
+- [ ] Implement the source gate (T-15, T-24, T-30, T-31). The page stays public by default (`ACCESS_MODE = public`).
+- [ ] The owner-only export and panic switch need a secret named `INSIGHTS_OWNER_TOKEN` (read from a Cloudflare secret). If it is missing, the export is disabled and the panic switch still works from the environment variable.
 
-### Phase 3: access and licences
+### Phase 4: data, definitions, relationships
+- [ ] Implement `INSIGHTS_STEP3_SPEC.md` sections 3 to 7: Layer 1 indicators, Layer 2 definitions (L2-01 to L2-10), Layer 3 summaries, relationship rules (R-01 to R-05), and Australian coverage.
+- [ ] Any indicator whose series or terms cannot be verified stays "Link out" or hidden and is listed in the report.
+- [ ] The "Know before you buy US shares" box shows only approved text from `docs/insights/approved-text/` (if the folder is empty, only the two exchange-rate and fees lines).
 
-- [x] Implement `INSIGHTS_STEP3_SPEC.md` section 2: private gate (AC-01 to AC-08), `SITE_MODE`, licence register (LR-01 to LR-04), `LICENCES.md`.
-- [x] The gate must protect every Insights data endpoint, the snapshot archive and the export. The page shell may stay public. Unauthenticated requests return 401 or 403 with no data. Use a password read from a secret named `INSIGHTS_PASSWORD` (signed, expiring cookie, rate limited), unless Cloudflare Access is already available and simpler.
-- [x] Mark every source `private_ok` and `public_display_ok`, with `terms_checked_on` and the attribution text.
+### Phase 5: fetching
+- [ ] Implement `SCRAPING_SPEC.md`: the method ladder, discovery procedure (at most three attempts per source), method cards, validation (F-13 to F-18), display rules (F-19 to F-23), manual entry (F-24 to F-27).
+- [ ] Run F-01 to F-07 for every source in section 8 of that spec. Record the result. Leave new L2 sources disabled until the owner sets `owner_accepts` to yes in `RISK_REGISTER.md`.
+- [ ] Never use proxies, spoofed identities, headless-browser evasion, CAPTCHA tricks, or anyone's login. A block means stop.
 
-### Phase 4: published indicators and definitions
+### Phase 6: UI
+- [ ] Implement `UI_SPEC.md` in this order: tokens and state language, card anatomy, hero, moves strip, stock table and AUD view, relationship cards, gold and silver balance, calendar, About section and data-health chip.
+- [ ] Render the page from a fixture snapshot at 360, 768 and 1200 px with Playwright (or the repo's tool). Save screenshots to `docs/insights/screenshots/`. Run U-01 to U-14.
+- [ ] For the gold and silver balance, check criteria UI-43 at 360 px. If any fails, implement the gauge fallback (UI-44) and say why in the report.
+- [ ] Do not change anything outside the Insights page.
 
-- [x] Implement `INSIGHTS_STEP3_SPEC.md` sections 4 to 7: Layer 1 indicators (with status Use, Check or Link out), Layer 2 definitions (L2-01 to L2-10), Layer 3 summaries (L3-01 to L3-04), Australian coverage, and the "Know before you buy US shares" box (show only the exchange-rate and fees lines unless the owner has added approved text to `docs/insights/approved-text/`).
-- [x] Any indicator whose series or terms cannot be verified stays "Link out" or hidden, and is listed in the report.
+### Phase 7: automatic self-audit and export
+- [ ] Extend the export generator with the columns from defect E-23 (published date, fetched time, stale flag, source URL, level, owner_accepts, enabled, peak value, peak date, peak basis, rule version and thresholds).
+- [ ] Add `npm run insights:selfcheck` (or the repo's equivalent) that builds the current snapshot, runs every test, writes `docs/insights/exports/currena-insights-full-<UTC date>.md`, and writes `docs/insights/SELF_AUDIT.md` with every test's result and a list of stale or "can't tell" cards.
+- [ ] Add a scheduled GitHub Action (or equivalent) that runs the self-check daily and fails visibly on any failing test. It must publish nothing.
 
-### Phase 5: automatic self-audit and export
+### Phase 8: documents
+Create in `docs/insights/`:
+- [ ] `FIX_REPORT.md`: every ID in the fix spec and defects file, with done, partly done or not done, and how you checked it.
+- [ ] `STEP3_REPORT.md`: as in `INSIGHTS_STEP3_SPEC.md` section 10, including the source table and the "Fetched sources" section.
+- [ ] `UI_REPORT.md`: every UI-xx item, the screenshots, the U-xx results, and whether the gauge fallback was used.
+- [ ] `MAINTENANCE.md`: the owner's weekly routine, and the steps to update every manual-entry value with the next release dates.
+- [ ] `OWNER_SETUP.md`: only the steps the owner must do by hand, with exact commands: setting `INSIGHTS_OWNER_TOKEN`, any missing API key, reviewing the branch, deploying the preview, deploying to production after approval, rolling back, using the panic switch, enabling or disabling a source, running the self-check, producing a full export.
 
-- [x] Extend the export generator with the columns from defect E-23 (published date, fetched time, stale flag, source URL, licence, private and public flags, peak value, peak date, peak basis, rule version and thresholds).
-- [x] Add a command `npm run insights:selfcheck` (or the repo's equivalent) that: builds the current snapshot, runs every test, writes `docs/insights/exports/currena-insights-full-<UTC date>.md`, and writes `docs/insights/SELF_AUDIT.md` with a table of every test, pass or fail, and a list of stale or "can't tell" cards.
-- [x] Make a scheduled GitHub Action (or the repo's equivalent) run the self-check daily and fail visibly if any test fails. Do not publish anything from it.
+### Phase 9: final verification
+- [ ] Run all tests and the self-check. All must pass or be recorded as blocked with a reason.
+- [ ] Start the project locally or on the preview. Request every public data endpoint. Record what each exposes, and confirm: no API keys, no bulk history for L2 sources, no unauthenticated export. Then set `ACCESS_MODE = private` and confirm every Insights data endpoint returns 401 or 403 without login.
+- [ ] Search the built client files and the repository for keys and tokens. Record that none are present.
+- [ ] Search all generated text for forbidden words (T-07, T-19).
+- [ ] Confirm that Currena's other pages are unchanged (compare the build output or screenshots).
+- [ ] Push the branch. If the GitHub CLI is available, open a pull request titled "Insights rebuild" linking the four reports. Do not merge it.
 
-### Phase 6: documents
-
-Create these files in `docs/insights/`:
-
-- [x] `FIX_REPORT.md`: every ID from the fix spec and defects file, with done, partly done or not done, and how you checked it.
-- [x] `STEP3_REPORT.md`: as described in section 10 of the Step 3 spec, including the licence table with the date each term was checked.
-- [x] `MAINTENANCE.md`: the owner's weekly routine (Step 3 spec section 11), plus the steps to update any manual-entry value.
-- [x] `OWNER_SETUP.md`: the exact steps the owner must do by hand, with exact commands, and nothing else. Include: setting the `INSIGHTS_PASSWORD` secret, any missing API key, how to review the branch, how to deploy the preview, how to deploy to production after approval, how to roll back, how to run the self-check, and how to produce a full export for audit.
-
-### Phase 7: final verification
-
-- [x] Run all tests and the self-check. All must pass, or be recorded as blocked with a reason.
-- [x] Start the project locally or on the preview. Request each Insights data endpoint without a login. Each must return 401 or 403 and no data. Record the result.
-- [x] Search the built client files and the repository for API keys. Record that none are present.
-- [x] Search all generated text for forbidden words (T-07, T-19). Record the result.
-- [x] Push the branch. If the GitHub CLI is available, open a pull request titled "Insights rebuild" with the three reports linked. Do not merge it.
-
-## 5. Final output
+## 4. Final output
 
 Print a short summary:
-
 1. Phases completed.
-2. Counts of items done, partly done and blocked, in the fix spec, defects file and Step 3 spec.
+2. Counts of items done, partly done and blocked, per spec file.
 3. Test results (passed and failed).
-4. Blocked items with what is needed.
-5. KV reads, KV writes and outside requests per full refresh.
-6. The exact steps in `OWNER_SETUP.md` the owner must do next.
+4. Sources enabled, disabled and blocked, and what the owner must flip in `RISK_REGISTER.md` to enable the disabled ones.
+5. Blocked items with what is needed.
+6. KV reads, KV writes and outside requests per full refresh.
+7. The exact steps in `OWNER_SETUP.md` the owner must do next.
