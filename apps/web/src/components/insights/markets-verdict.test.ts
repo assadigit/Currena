@@ -108,12 +108,83 @@ describe('markets copy parity (en/fa)', () => {
     expect(insightsCopyFa.markets.takeawayCalm).toContain('{count}');
   });
 
-  it('the 3-month lens replaced the 1-month lens everywhere (views, table, CSV)', () => {
+  it('the quarterly lens exists everywhere (views, table, CSV)', () => {
     for (const copy of [insightsCopyEn, insightsCopyFa]) {
-      expect(copy.markets.view3m.length).toBeGreaterThan(0);
+      expect(copy.markets.viewQuarterly.length).toBeGreaterThan(0);
       expect(copy.markets.th3m.length).toBeGreaterThan(0);
       expect(copy.markets.csvCol3m.length).toBeGreaterThan(0);
     }
+  });
+
+  it('round 46: the weekly and monthly lens labels exist everywhere (views, table, CSV)', () => {
+    for (const copy of [insightsCopyEn, insightsCopyFa]) {
+      for (const key of ['viewWeekly', 'viewMonthly', 'thWeek', 'thMonth', 'csvColWeek', 'csvColMonth'] as const) {
+        expect(copy.markets[key].length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('round 47: the yearly lens labels exist everywhere (views, table, CSV)', () => {
+    for (const copy of [insightsCopyEn, insightsCopyFa]) {
+      for (const key of ['viewYearly', 'thYear', 'csvColYear'] as const) {
+        expect(copy.markets[key].length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('the world-indices round: the five period lenses exist, and no YTD or 52-week-distance lens is offered (02-ui-spec §3.3 as amended by round 47)', () => {
+    for (const copy of [insightsCopyEn, insightsCopyFa]) {
+      for (const key of ['viewDaily', 'viewWeekly', 'viewMonthly', 'viewQuarterly', 'viewYearly'] as const) {
+        expect(copy.markets[key].length).toBeGreaterThan(0);
+      }
+      // The yearly horizon rides the stored chg1y field (round 47) — but
+      // YTD still does not exist in the contract and must never be offered
+      // (no year-start date; see briefing.ts).
+      expect('viewYtd' in copy.markets).toBe(false);
+      // The 52-week-high distance is secondary context, NOT a period lens.
+      expect('viewFromHigh' in copy.markets).toBe(false);
+      // The 52-week distance still lives where it belongs: the table column.
+      expect(copy.markets.thFromHigh.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('the world-indices round: the editorial header, breadth, movers and view-switch copy exist in both locales', () => {
+    const keys = [
+      'title', 'sectionLabel', 'subtitle', 'lastCloseBadge',
+      'breadthPeriod', 'breadthUp', 'breadthDown', 'breadthFlat', 'coverageNote', 'belowHighLine',
+      'moverGain', 'moverLoss', 'moverPeriodLabel', 'moversNone',
+      'displaySwitchAria', 'viewList', 'viewHeatmap', 'heatmapLegendLabel', 'heatmapValueAria', 'noReadingAria',
+    ] as const;
+    for (const key of keys) {
+      expect(insightsCopyEn.markets[key].length).toBeGreaterThan(0);
+      expect(insightsCopyFa.markets[key].length).toBeGreaterThan(0);
+    }
+    // Token parity on the interpolated strings.
+    const tokens = (s: string): string[] => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]! as string).sort();
+    for (const key of ['breadthPeriod', 'coverageNote', 'belowHighLine', 'moverPeriodLabel', 'heatmapValueAria'] as const) {
+      expect(tokens(insightsCopyFa.markets[key])).toEqual(tokens(insightsCopyEn.markets[key]));
+    }
+    // The owner-directed editorial title, verbatim.
+    expect(insightsCopyFa.markets.title).toBe('نبض بازارهای جهان');
+    expect(insightsCopyFa.markets.sectionLabel).toBe('شاخص‌های بورسی جهان');
+  });
+
+  it('the world-indices round: every index entry names its country/market in both locales', () => {
+    const ids = [
+      'n225', 'asx200', 'kospi', 'hsi', 'ssec', 'taiex', 'nifty50',
+      'stoxx50', 'dax', 'cac', 'ftse', 'sp500', 'ndx', 'dow', 'tsx', 'ibov',
+    ] as const;
+    for (const id of ids) {
+      expect(insightsCopyEn.markets.entries[id].country.length).toBeGreaterThan(0);
+      expect(insightsCopyFa.markets.entries[id].country.length).toBeGreaterThan(0);
+    }
+    // EURO STOXX 50 is a eurozone index — its market label says so (the
+    // ASSET-MAP distinction, preserved).
+    expect(insightsCopyEn.markets.entries.stoxx50.country).toBe('Eurozone');
+    expect(insightsCopyFa.markets.entries.stoxx50.country).toBe('منطقهٔ یورو');
+    // Hong Kong is a market label, not a country — it stays visible as such.
+    expect(insightsCopyEn.markets.entries.hsi.country).toBe('Hong Kong');
+    expect(insightsCopyFa.markets.entries.hsi.country).toBe('هنگ‌کنگ');
   });
 
   it('the relocated source line lives in the About footer, not the section', () => {

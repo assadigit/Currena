@@ -347,11 +347,11 @@ describe('T5 — plain names everywhere (fix B4)', () => {
     expect(fxChartLineLabel('eurusd', [100, 96.4], en.fx, 'en-US', 'en')).toBe('Euro vs US dollar −3.6%');
     expect(fxChartLineLabel('dollar', [100, 103.2], en.fx, 'en-US', 'en')).toBe('US dollar strength +3.2%');
     expect(fxChartLineLabel('sp500', [100, 97.9], en.fx, 'en-US', 'en')).toBe('US stocks (S&P 500) −2.1%');
-    expect(fxChartLineLabel('eurusd', [100, 96.4], fa.fx, 'fa-IR', 'fa')).toContain('یورو در برابر دلار آمریکا');
+    expect(fxChartLineLabel('eurusd', [100, 96.4], fa.fx, 'fa-IR', 'fa')).toContain('یورو در برابر دلار');
     expect(en.fx.rules.r2.name).toBe('Sudden yen jump');
     expect(fa.fx.rules.r2.name).toBe('جهش ناگهانی ین');
     expect(en.fx.dollarRowTitle).toBe('US dollar strength');
-    expect(fa.fx.dollarRowTitle).toBe('قدرت دلار آمریکا');
+    expect(fa.fx.dollarRowTitle).toBe('قدرت دلار');
   });
 });
 
@@ -531,7 +531,7 @@ describe('T10 — the Persian twin (CR §4.1 rule 6)', () => {
     expect(words.s2).toMatch(/[۰-۹]/);
     expect(words.s3).toMatch(/[۰-۹]/);
     expect(words.s1).toBe(
-      'دلار آمریکا این ماه خیلی قوی‌تر شد: ۳٫۲ درصد در برابر شش ارز مهم تقویت شده است و این قوی‌ترین حالتش در یک سال اخیر است.',
+      'دلار این ماه خیلی قوی‌تر شد: ۳٫۲ درصد در برابر شش ارز مهم تقویت شده است و این قوی‌ترین حالتش در یک سال اخیر است.',
     );
     expect(words.s2).toContain('یورو');
     expect(words.s2).toContain('تضعیف');

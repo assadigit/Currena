@@ -41,6 +41,23 @@ export const SHOCK_DAY_COUNT = 5;
 export const CHG_WINDOW_DAYS = 90;
 
 /**
+ * The yearly lens's anchor (round 47): the change vs the last close on or
+ * before this many calendar days back.
+ */
+export const CHG1Y_ANCHOR_DAYS = 365;
+/**
+ * The yearly anchor's tolerance band, in calendar days either side of
+ * CHG1Y_ANCHOR_DAYS — the repo's year-on-year convention (series.ts
+ * yoyPctSeries reads the latest point 350–380 days earlier). Both free
+ * providers cut history at ~one year, so the strict 365-day anchor often
+ * lands one or two days BEFORE the series starts; when the series' own
+ * first close falls inside the band, it IS the year-ago anchor. A window
+ * that starts closer than 350 days to the last close has no honest yearly
+ * reading — the row omits chg1y (the UI shows a dash, never a guess).
+ */
+export const CHG1Y_ANCHOR_TOLERANCE_DAYS = 15;
+
+/**
  * Trend rule band, in percent (up at or above +1, down at or below −1),
  * applied to the SAME window the table's own "3-month" column shows
  * (CHG_WINDOW_DAYS). Defect E-18 (2026-10-16): the Trend label is
@@ -59,14 +76,18 @@ export const PROVIDER_AGREEMENT_PCT = 0.5;
 /** Validation R6: asOf older than this many calendar days marks the row stale. */
 export const STALE_DAYS = 5;
 
-/** History window asked from providers: ~400 days back (spec §4 rule 6). */
+/** History window asked from providers: ~400 days back (spec §4 rule 6);
+ * Yahoo is asked for range=2y (round 47) so the yearly lens's 350–380-day
+ * anchor band always carries real closes even though the free plans cut
+ * EODHD at one year. */
 export const HISTORY_WINDOW_DAYS = 400;
 /** Weekly series length for the detail chart (spec §4 rule 7). */
 export const WEEKLY_POINTS = 52;
 /**
  * Day-zero for the delta-encoded weekly series: 2020-01-01's epoch day
  * (days since 1970-01-01 UTC). Keeps every stored day delta small so the
- * ONE stored object stays under the route's 12 KB budget.
+ * ONE stored object stays under the route's 13 KB budget (raised from
+ * 12 KB by round 46 — the weekly lens field).
  */
 export const WEEKLY_EPOCH_BASE_DAY = 18262;
 

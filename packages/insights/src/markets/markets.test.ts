@@ -15,6 +15,7 @@ import { parseEodhdEodResponse, parseYahooChartResponse, ProviderError } from '.
 import { fetchEodhdSeries, fetchYahooSeries } from './providers';
 import type { MarketSeries } from './providers';
 import {
+  buildEntry,
   buildMarketsSnapshot,
   marketsContentEqual,
   marketsContentHash,
@@ -26,6 +27,7 @@ import {
   weeklySeries,
 } from './compute';
 import type { MarketResolution } from './compute';
+import { addDays, epochDay, pointAtOrBefore } from '../series';
 import { lastExpectedCloseDate, marketsNeedingData, retryRunOptions, runMarketsJob } from './job';
 import type { MarketJobFetchers } from './job';
 import { InMemoryMarketsStore, RestMarketsStore, parseStoredMarkets } from './store';
@@ -209,7 +211,7 @@ describe('fetchEodhdSeries / fetchYahooSeries', () => {
     await expect(fetchEodhdSeries('ftse', { apiToken: 'k', fetchImpl })).rejects.toThrow(/no EODHD code/);
   });
 
-  it('sends the declared honest User-Agent to Yahoo and encodes the symbol (T-25/F-09)', async () => {
+  it('sends the declared honest User-Agent to Yahoo and encodes the symbol (T-25/F-09; range=2y — round 47, kept through the v3 merge: the yearly anchor needs history beyond the strict 365-day mark)', async () => {
     const calls: Array<{ url: string; headers: HeadersInit }> = [];
     const yahooBody = JSON.stringify({
       chart: { result: [{ timestamp: [1791552600], indicators: { quote: [{ close: [7811.54] }] } }] },
@@ -219,7 +221,7 @@ describe('fetchEodhdSeries / fetchYahooSeries', () => {
       return new Response(yahooBody, { status: 200 });
     }) as typeof fetch;
     await fetchYahooSeries('n225', { fetchImpl, baseUrl: 'https://yahoo.test/chart' });
-    expect(calls[0]!.url).toBe('https://yahoo.test/chart/%5EN225?range=1y&interval=1d');
+    expect(calls[0]!.url).toBe('https://yahoo.test/chart/%5EN225?range=2y&interval=1d');
     expect(new Headers(calls[0]!.headers as HeadersInit).get('user-agent')).toMatch(/CurrenaDashboard\/1\.0/);
   });
 });
@@ -236,6 +238,75 @@ describe('trendOf', () => {
     expect(trendOf(flat(100.5))).toBe('flat'); // +0.5%
     expect(trendOf(flat(99.5))).toBe('flat'); // −0.5%
     expect(trendOf(flat(98.5))).toBe('down'); // −1.5%
+  });
+});
+
+describe('buildEntry — the derived numbers (round 46: the weekly/monthly lenses)', () => {
+  it('derives chg1w from the last close on/before 7 calendar days earlier, chg1m from 30 — the same rolling-anchor rule as chg3m', () => {
+    const s = series('sp500', 'eodhd', '2026-10-12', 300);
+    const entry = buildEntry('sp500', s, undefined, RUN_DATE);
+    const last = s.points[s.points.length - 1]!;
+    const pctVs = (days: number): number => {
+      const anchor = pointAtOrBefore(s.points, addDays(last.date, -days))!;
+      return Math.round(((last.value - anchor.value) / anchor.value) * 100 * 100) / 100;
+    };
+    expect(entry.chg1w).not.toBeUndefined();
+    expect(entry.chg1w).toBe(pctVs(7));
+    expect(entry.chg1m).not.toBeUndefined();
+    expect(entry.chg1m).toBe(pctVs(30));
+    // The generator declines ~0.1 per trading day toward the end date, so
+    // every window is negative and strictly deeper the longer it gets — a
+    // window mix-up (e.g. chg1w reading the 30-day anchor) flattens the
+    // ladder and fails here.
+    expect(entry.chg1d).toBeGreaterThan(entry.chg1w!);
+    expect(entry.chg1w!).toBeLessThan(0);
+    expect(entry.chg1w!).toBeGreaterThan(entry.chg1m!);
+    expect(entry.chg1m!).toBeGreaterThan(entry.chg3m);
+    expect(entry.chg3m).toBe(pctVs(90));
+  });
+});
+
+describe('buildEntry + yearAgoAnchor — the yearly lens (round 47)', () => {
+  it('strict anchor: history beyond a year reads the close on/before 365 days back, rounding to 2 decimals like every lens', () => {
+    const s = series('sp500', 'eodhd', '2026-10-12', 300); // ~420 calendar days
+    const entry = buildEntry('sp500', s, undefined, RUN_DATE);
+    const last = s.points[s.points.length - 1]!;
+    const anchor = pointAtOrBefore(s.points, addDays(last.date, -365))!;
+    expect(anchor).toBeDefined();
+    expect(entry.chg1y).not.toBeUndefined();
+    expect(entry.chg1y).toBe(Math.round(((last.value - anchor.value) / anchor.value) * 100 * 100) / 100);
+    // The ladder keeps descending with the window: the yearly reading is
+    // deeper than the quarterly one on the declining fixture.
+    expect(entry.chg1y!).toBeLessThan(entry.chg3m);
+  });
+
+  it('one-year provider window: the series\' first close inside the ±15-day band IS the year-ago anchor (the yoyPctSeries convention)', () => {
+    // 260 trading days ≈ 364 calendar days — both free providers cut
+    // history at ~one year, so the strict 365-day target lands one or two
+    // days BEFORE the series starts; the first close sits inside the
+    // tolerance band and is the anchor.
+    const s = series('sp500', 'eodhd', '2026-10-12', 260);
+    const last = s.points[s.points.length - 1]!;
+    const earliest = s.points[0]!;
+    expect(pointAtOrBefore(s.points, addDays(last.date, -365))).toBeUndefined(); // strict anchor absent
+    const distance = epochDay(earliest.date) - (epochDay(last.date) - 365);
+    expect(distance).toBeGreaterThanOrEqual(-15);
+    expect(distance).toBeLessThanOrEqual(15); // inside the band
+    const entry = buildEntry('sp500', s, undefined, RUN_DATE);
+    expect(entry.chg1y).not.toBeUndefined();
+    expect(entry.chg1y).toBe(Math.round(((last.value - earliest.value) / earliest.value) * 100 * 100) / 100);
+  });
+
+  it('a window starting closer than 350 days to the last close omits chg1y — the honest dash, never a guess', () => {
+    const s = series('sp500', 'eodhd', '2026-10-12', 240); // ~336 calendar days
+    const last = s.points[s.points.length - 1]!;
+    const earliest = s.points[0]!;
+    expect(epochDay(earliest.date) - (epochDay(last.date) - 365)).toBeGreaterThan(15); // outside the band
+    const entry = buildEntry('sp500', s, undefined, RUN_DATE);
+    expect(entry.chg1y).toBeUndefined();
+    // The rest of the row stays intact — only the yearly lens is absent.
+    expect(entry.chg3m).toBeDefined();
+    expect(entry.chg1d).toBeDefined();
   });
 });
 

@@ -13,11 +13,14 @@ import { MarketsChart } from '../MarketsChart';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { formatAsOf } from '../HistoryChart';
+import { MarketLogo } from './MarketLogo';
+import { periodWord } from './ViewSwitch';
 import {
   DirectionGlyph,
   fmtClose,
   isOld,
   signedPct,
+  signedPctOrDash,
   statusToneOf,
   statusWordKeyOf,
   TREND_WORD_OF,
@@ -28,7 +31,11 @@ import {
 } from './shared';
 
 /* ------------------------------------------------------------------ *
- * One market tile (§6.3): quiet by default, real button, aria-expanded
+ * One market tile (§6.3 + the handoff round's explorer row, §3.5): quiet
+ * by default, real button, aria-expanded. The index wordmark rides in
+ * the standardized frame with the CANONICAL NAME as primary text and
+ * the country/market as the secondary line (the logo is supplementary —
+ * it can never replace the written name).
  * ------------------------------------------------------------------ */
 
 export function MarketTile({
@@ -62,6 +69,9 @@ export function MarketTile({
   const tagX = formatNumber(Math.abs(entry.fromHigh), numberLocale, { maximumFractionDigits: 0 });
   const oldDate = formatAsOf(entry.asOf, locale);
   const trendWord = copy.markets[TREND_WORD_OF[trendOf(entry)]];
+  // §9: the screen reader hears the name, country, selected period and
+  // value (or the missing-reading phrase) in the same sentence.
+  const srValue = pct === null ? copy.markets.noReadingAria : signedPct(pct, numberLocale, locale);
 
   return (
     <button
@@ -77,19 +87,33 @@ export function MarketTile({
             : 'ring-[var(--color-border)] hover:bg-currena-soft/60'
       } ${old ? 'opacity-80' : ''} bg-[var(--color-surface)]`}
     >
-      {/* §6.3 "short name" — the full name wraps to at most two lines
-       * ("Shanghai Composite"); never truncated into guesswork. */}
-      <span className="w-full text-[length:var(--type-caption)] font-bold leading-snug text-[var(--color-text-secondary)]">
-        {marketCopy.name}
+      {/* The identity row: logo (supplementary) + canonical name + the
+       * country/market line (§3.5 — every index is named AND located).
+       * 2026-10-18 owner follow-up ("at least 96×96 px"): the wordmark
+       * renders at 96px and STACKS above the name — the explorer tiles
+       * stay narrow (2→7 columns), so a 96px logo beside the text would
+       * starve the name; stacked keeps both readable at every grid width. */}
+      <span className="flex w-full flex-col gap-1.5">
+        <MarketLogo id={entry.id} latin={marketCopy.latin} size={96} desktopSize={96} />
+        <span className="min-w-0">
+          <span className="block truncate text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-secondary)]">
+            {marketCopy.name}
+          </span>
+          <span className="block truncate text-[0.68rem] leading-snug text-[var(--color-text-tertiary)]">
+            {marketCopy.country}
+          </span>
+        </span>
       </span>
       {/* The number + the owner's up/down artwork: the signed number
        * carries the meaning, the green/red zigzags ride beside it (round
-       * 44) — direction is never colour alone (§6.8). */}
+       * 44) — direction is never colour alone (§6.8). Round 46: a lens the
+       * row does not carry yet shows the honest dash and no artwork —
+       * never a zero, never a guess. */}
       <span className="inline-flex items-center gap-1 font-semibold text-[var(--color-text-primary)]">
         <bdi dir="ltr" className="type-number tabular-nums">
-          {signedPct(pct, numberLocale, locale)}
+          {signedPctOrDash(pct, numberLocale, locale)}
         </bdi>
-        <DirectionGlyph arrow={arrow} />
+        {pct === null ? null : <DirectionGlyph arrow={arrow} />}
       </span>
       {/* Step-1 F5: the 52-week distance rides EVERY tile — the correcting
        * markets keep their warning tone; a market at its high says so. */}
@@ -117,7 +141,13 @@ export function MarketTile({
         </span>
       ) : null}
       <span className="sr-only">
-        {trendWord}, {copy.markets[statusWordKeyOf(entry.fromHigh)]}, {interpolate(copy.markets.asOf, { date: oldDate })}
+        {interpolate(copy.markets.heatmapValueAria, {
+          name: marketCopy.name,
+          country: marketCopy.country,
+          value: srValue,
+          period: periodWord(view, copy),
+        })}
+        , {trendWord}, {copy.markets[statusWordKeyOf(entry.fromHigh)]}, {interpolate(copy.markets.asOf, { date: oldDate })}
       </span>
     </button>
   );
@@ -151,13 +181,25 @@ export function MarketDetail({
       id={`insights-market-detail-${entry.id}`}
       className="rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)]"
     >
-      <p className="m-0 mb-1 flex flex-wrap items-baseline gap-x-2 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
-        {marketCopy.name}
-        {locale === 'fa' ? (
-          <span dir="ltr" className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
-            {marketCopy.latin}
+      {/* 2026-10-18 owner follow-up: the detail heading carries the same
+       * ≥96px wordmark beside the name block (the panel is full-width, so
+       * the horizontal identity row has room) — the same logo + name +
+       * country anatomy every surface wears. */}
+      <p className="m-0 mb-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+        <MarketLogo id={entry.id} latin={marketCopy.latin} size={96} desktopSize={96} />
+        <span className="min-w-0">
+          <span className="block truncate text-[length:var(--type-number)] font-bold leading-tight text-[var(--color-text-primary)]">
+            {marketCopy.name}
           </span>
-        ) : null}
+          <span className="block truncate text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
+            {marketCopy.country}
+            {locale === 'fa' ? (
+              <span lang="en" dir="ltr" className="ms-1.5">
+                {marketCopy.latin}
+              </span>
+            ) : null}
+          </span>
+        </span>
         <span className={`ms-auto inline-flex items-center rounded-full px-2 py-0.5 text-[0.68rem] font-bold ${statusToneOf(entry.fromHigh)}`}>
           {copy.markets[statusWordKeyOf(entry.fromHigh)]}
         </span>

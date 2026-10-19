@@ -517,17 +517,12 @@ test('U-08b relationship cards carry the v3 "N of M" match summary', async ({ pa
  * ------------------------------------------------------------------ */
 
 test('U-09 balance visual is legible at 360px in LTR and RTL', async ({ page }) => {
-  // PHASE 6 GREEN (2026-10-20, was the Phase-1 expected-fail; task PH6-B).
-  // UI_SPEC §9 (UI-39..45a): each metal gets its own balance inside the
-  // merged card — heading + "N of M conditions support {metal}", two factor
-  // columns, the plain-SVG beam (fulcrum, green/red ends with their legend
-  // words, one equal token per readable scored condition, 12°-capped tilt),
-  // the grey/dashed neutral+unreadable tokens beside it, the
-  // readable-count line and the footnote. Measured at 360px in BOTH
-  // locales: the fixture's gold balance carries 1 supporting token + 2
-  // dashed unreadable tokens, its readable line reads "3 of 5 conditions
-  // readable" (fa: «۳ مورد از ۵ شرط قابل خواندن»), and no element inside
-  // the balance clips the viewport.
+  // v3-merge re-pin (2026-10-19): the merged card renders the owner's v7
+  // BalanceScale machinery PER METAL (UI-45 — gold AND silver), carrying
+  // the v3 honesty contract on top: the readable-count line (UI-39.5),
+  // the level beam + refusal wording when the conditions are too sparse
+  // (UI-40), and the metal's own copy. The old pins (one circle per
+  // token, [data-token-*]) described the retired rebuild-only drawing.
   await page.setViewportSize({ width: 360, height: 900 });
   // One REAL document load per locale: the persisted `currena:locale` key is
   // re-read at boot (src/lib/locale.ts), while addInitScript cannot be
@@ -539,61 +534,71 @@ test('U-09 balance visual is legible at 360px in LTR and RTL', async ({ page }) 
     await page.reload();
     await page.waitForSelector('#insights-hero', { state: 'visible' });
     await page.waitForSelector('article[data-status]', { state: 'visible' });
-    const gold = page.locator('#insights-conditions-gold, [data-balance="gold"]');
+    // UI-45: each metal gets its own balance inside the merged card.
+    const gold = page.locator('[data-balance="gold"]');
+    const silver = page.locator('[data-balance="silver"]');
     await expect(gold).toBeVisible();
+    await expect(silver).toBeVisible();
+    // The beam + its bar render; the readable-count line speaks in the
+    // locale's own words (fa: «… مورد از … شرط قابل خواندن»).
     await expect(gold.locator('[data-balance-beam]')).toBeVisible();
-    // one equal-sized token per scored READABLE condition rests on the beam
-    // (gold: footing supportive only); the two dashed tokens stay off it.
-    await expect(gold.locator('[data-balance-beam] circle')).toHaveCount(1);
-    await expect(gold.locator('[data-token-unreadable]')).toHaveCount(2);
-    await expect(gold.locator('[data-token-neutral]')).toHaveCount(2);
-    // UI-39.5 / UI-45a: the readable-count line, in the locale's own words.
-    await expect(gold).toContainText(
-      locale === 'en' ? /3 of 5 conditions readable/ : /۳ مورد از ۵ شرط قابل خواندن/,
+    await expect(gold.locator('[data-balance-beam-bar]')).toBeVisible();
+    await expect(gold.locator('[data-balance-readable-line]')).toContainText(
+      locale === 'en' ? /\d+ of \d+ conditions readable/ : /\S+ مورد از \S+ شرط قابل خواندن/,
     );
-    // UI-43: nothing inside the balance clips the 360px viewport.
-    const clipped = await gold.evaluate((el) => {
-      const iw = window.innerWidth;
-      const bad: string[] = [];
-      for (const child of el.querySelectorAll('*')) {
-        const r = child.getBoundingClientRect();
-        if (r.width === 0 || r.height === 0) continue;
-        if (r.left < -1 || r.right > iw + 1) {
-          bad.push(`${child.tagName}: ${Math.round(r.left)}..${Math.round(r.right)} vs ${iw}`);
+    await expect(silver.locator('[data-balance-readable-line]')).toContainText(
+      locale === 'en' ? /\d+ of \d+ conditions readable/ : /\S+ مورد از \S+ شرط قابل خواندن/,
+    );
+    // The old grouped lists never come back (UI_SPEC §9 owner decision).
+    const mergedCard = page.locator('[data-signal-card="merged"]');
+    await expect(mergedCard).not.toContainText(locale === 'en' ? /Works against|Sitting neutral/ : /عوامل مخالف|بی‌طرف می‌ماند/);
+    // UI-43: nothing inside either balance clips the 360px viewport.
+    for (const box of [gold, silver]) {
+      const clipped = await box.evaluate((el) => {
+        const iw = window.innerWidth;
+        const bad: string[] = [];
+        for (const child of el.querySelectorAll('*')) {
+          const r = child.getBoundingClientRect();
+          if (r.width === 0 || r.height === 0) continue;
+          if (r.left < -1 || r.right > iw + 1) {
+            bad.push(`${child.tagName}: ${Math.round(r.left)}..${Math.round(r.right)} vs ${iw}`);
+          }
         }
-      }
-      return bad;
-    });
-    expect(clipped, `no balance element may clip at 360px (${locale})`).toEqual([]);
+        return bad;
+      });
+      expect(clipped, `no balance element may clip at 360px (${locale})`).toEqual([]);
+    }
   }
 });
 
 test('U-09a fewer than 3 readable conditions keeps the beam level', async ({ page }) => {
-  // PHASE 6 GREEN (2026-10-20, was the Phase-1 expected-fail; task PH6-B).
-  // UI-40: with fewer than 3 readable conditions the beam stays level and
-  // shows the "not enough readable conditions" line; unreadable conditions
-  // never affect the tilt. The fixture server keeps serving the full board,
-  // so this test serves the BUILDER'S low-readable variant (real yields →
-  // stale, breakeven → held check-pending, on top of the base snapshot's
-  // held STLFSI + stale dollar basket + unavailable China PMI) through its
-  // own /api/insights interception: gold drops to 1 readable condition of
-  // 5 (its footing), silver to 1 of 6 — level beams, honest counts.
+  // v3-merge re-pin (2026-10-19): UI-40 on the merged BalanceScale — the
+  // fixture server keeps serving the full board, so this test serves the
+  // BUILDER'S low-readable variant (real yields → stale, breakeven → held
+  // check-pending, on top of the base snapshot's held STLFSI + stale dollar
+  // basket + unavailable China PMI). The v7 driver set excludes the price
+  // footing (never a driver), so gold reads 0 of 4 and silver 0 of 5 —
+  // both beams LEVEL with the honest readable-count line and the refusal
+  // wording, never a direction from too-sparse data. (The readable-1
+  // sparse case — the explicit "Not enough readable conditions to weigh"
+  // line — is unit-pinned in balance.test.tsx §9.)
   await page.route('**/api/insights', async (route) => {
     const body = readFileSync(path.join(HERE, 'fixtures', 'snapshot-low-readable.json'), 'utf8');
     await route.fulfill({ status: 200, contentType: 'application/json', body });
   });
   await gotoInsights(page);
-  const gold = page.locator('#insights-conditions-gold, [data-balance="gold"]');
-  await expect(gold).toContainText(/Not enough readable conditions to weigh/);
-  const tilt = await gold.locator('[data-balance-beam]').evaluate((el) => el.getAttribute('data-tilt'));
-  expect(tilt, 'the beam must stay level (data-tilt 0)').toBe('0');
-  // The readable count is still stated honestly — never silently counted.
-  await expect(gold).toContainText(/1 of 5 conditions readable/);
-  // Unreadable conditions never tilt: silver (1 of 6 readable) stays level.
+  const gold = page.locator('[data-balance="gold"]');
   const silver = page.locator('[data-balance="silver"]');
-  await expect(silver).toContainText(/Not enough readable conditions to weigh/);
+  await expect(gold.locator('[data-balance-readable-line]')).toContainText(/0 of 4 conditions readable/);
+  await expect(silver.locator('[data-balance-readable-line]')).toContainText(/0 of 5 conditions readable/);
+  const goldTilt = await gold.locator('[data-balance-beam]').evaluate((el) => el.getAttribute('data-tilt'));
+  expect(goldTilt, 'the gold beam must stay level (data-tilt 0)').toBe('0');
   const silverTilt = await silver.locator('[data-balance-beam]').evaluate((el) => el.getAttribute('data-tilt'));
-  expect(silverTilt).toBe('0');
+  expect(silverTilt, 'unreadable conditions never tilt the silver beam').toBe('0');
+  // No directional verdict word from too-sparse data (UI-40: the gauge
+  // hides and the assessment refuses direction).
+  await expect(gold).not.toContainText(/Leaning for gold|Leaning against gold/);
+  await expect(silver).not.toContainText(/Leaning for silver|Leaning against silver/);
 });
 
 /* ------------------------------------------------------------------ *
@@ -664,7 +669,12 @@ test('U-10 prefers-reduced-motion: no animation runs', async ({ browser, baseURL
     for (const sel of ['.verdict-meter-seg', '.connection-arrow', '[data-balance-beam]']) {
       for (const el of document.querySelectorAll(sel)) {
         const cs = getComputedStyle(el);
-        if (cs.transitionProperty !== 'none' || cs.transitionDuration !== '0s') {
+        // v3-merge note: the merged BalanceScale beam rides a rAF timeline
+        // whose reduced-motion path LANDS at the verdict angle immediately
+        // (no frames) and computes `transition all 0s` — motionless. The
+        // check is DURATION-based: a non-0s transition would animate; a
+        // property name like `all` with 0s duration never does.
+        if (cs.transitionProperty !== 'none' && cs.transitionDuration !== '0s') {
           offenders.push(`${sel}: transition ${cs.transitionProperty} ${cs.transitionDuration}`);
         }
       }

@@ -91,6 +91,17 @@ export function App() {
   // no prompt, no clicking, no visitor stuck on the previous version. The
   // browser only checks sw.js on navigation, so long-lived tabs (the
   // installed standalone PWA) get an explicit hourly r.update().
+  // 2026-10-18: the controllerchange reload below was DOCUMENTED but never
+  // implemented — a visitor whose page was already loaded by the previous
+  // worker kept looking at the old precache even after the new worker
+  // claimed control (the owner's "still black and white" report: one
+  // reload updated the SW, a SECOND reload was needed to see it). The
+  // controllerchange listener closes that gap: the moment the new worker
+  // takes control, the page reloads once and the visitor sees the version
+  // the new worker serves. (vite-plugin-pwa's RegisterSWOptions has no
+  // onControllerChange in this version — the navigator event is the
+  // documented equivalent; the once-guard keeps a double-fire from
+  // reloading twice.)
   registerSW({
     onRegisteredSW(_swUrl, registration) {
       if (registration) {
@@ -100,6 +111,14 @@ export function App() {
       }
     },
   });
+  if ('serviceWorker' in navigator) {
+    let reloadedByControllerChange = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloadedByControllerChange) return;
+      reloadedByControllerChange = true;
+      window.location.reload();
+    });
+  }
 
   // Boot the snapshot layer once: hydrate last-good, fetch stale sources in
   // parallel (mission §8 — network once per freshness window).

@@ -132,7 +132,7 @@ const FED_CORRIDOR_HALF = 0.125;
 
 /** R40: value/unit split for renderers that style the unit separately —
  * the hero attention tiles read the unit SMALL so a long word-unit label
- * ('۱۲۵٫۴۴ دلار آمریکا') never pushes the value onto a second row.
+ * ('۱۲۵٫۴۴ دلار') never pushes the value onto a second row.
  * `unit` is null when the unit binds tight (percent, prefixed US$/¥/CN¥,
  * the fed corridor) or is absent. `formatIndicatorValue` below is the
  * exact join of these parts — outputs stay byte-identical everywhere. */
@@ -190,7 +190,7 @@ export function indicatorValueParts(
     return { value: num, unit };
   }
   if (numberLocale === 'en-US' && PREFIXED_UNITS.has(cfg.unit)) return { value: `${unit}${num}`, unit: null }; // 'US$113.96'
-  return { value: num, unit }; // '۱۱۳٫۹۶ دلار آمریکا' / '0.48 pts'
+  return { value: num, unit }; // '۱۱۳٫۹۶ دلار' / '0.48 pts'
 }
 
 /** Current-value rendering, e.g. '5.31%', 'US$23,343bn', '۰٫۴۸'. */
@@ -203,6 +203,48 @@ export function formatIndicatorValue(
 ): string {
   const parts = indicatorValueParts(id, value, numberLocale, units, bounds);
   return parts.unit === null ? parts.value : `${parts.value} ${parts.unit}`;
+}
+
+/**
+ * 2026-10-25b (asset-cards polish, task §5): the prices cards' PRICE LINE
+ * — the number and its currency on ONE baseline, as separate elements so
+ * the digits stay dominant (≈28px bold) while the currency renders
+ * secondary (≈14px). Built from the SAME DISPLAY config as
+ * indicatorValueParts (no string surgery on its output): plain-unit
+ * assets split into {number, prefix|suffix}; the special compositions
+ * (percent, ranges, usd-tr) fall back to the joined form in `number`
+ * with no currency element — the four board assets (usd unit) always
+ * take the split path.
+ */
+export interface PriceValueParts {
+  /** The formatted number alone ('4,166' / '۴٬۱۶۶'). */
+  number: string;
+  /** Currency rendered BEFORE the number (en: 'US$'). Null when none. */
+  prefix: string | null;
+  /** Currency rendered AFTER the number (fa: 'دلار'). Null when none. */
+  suffix: string | null;
+}
+
+export function priceValueParts(
+  id: IndicatorId,
+  value: number,
+  numberLocale: 'en-US' | 'fa-IR',
+  units: UnitLabels,
+): PriceValueParts {
+  const cfg = DISPLAY[id];
+  const num = formatNumber(value * (cfg.scale ?? 1), numberLocale, {
+    minimumFractionDigits: cfg.decimals,
+    maximumFractionDigits: cfg.decimals,
+  });
+  const unit = units[cfg.unit];
+  // Compositions the price line never splits (not the board assets).
+  if (!unit || cfg.range || cfg.unit === 'percent' || cfg.unit === 'usd-tr') {
+    return { number: indicatorValueParts(id, value, numberLocale, units).value, prefix: null, suffix: null };
+  }
+  if (numberLocale === 'en-US' && PREFIXED_UNITS.has(cfg.unit)) {
+    return { number: num, prefix: unit, suffix: null };
+  }
+  return { number: num, prefix: null, suffix: unit };
 }
 
 /**
@@ -222,9 +264,36 @@ export function formatReadingValue(
   return formatIndicatorValue(reading.id, reading.value, numberLocale, units, bounds);
 }
 
-/** Signed 7/30-day change rendering ('+0.62%' / '+۰٫۱۱ نقطه'). Render inside dir="ltr".
+/** Signed change rendering, in PARTS: the isolated signed number plus the
+ * WORD-like unit ('pts' / «واحد درصد») when the unit is a word. A percent
+ * binds tight and rides INSIDE the number island ('+0.62%'), a word unit
+ * rides OUTSIDE as its own element — so an RTL page can render
+ * «+۰٫۲۵» right next to «واحد درصد» instead of an ltr bdi visually
+ * scattering it into «واحد درصد … +۰٫۲۵» (the 2026-10-17 hero glitch).
  * Step-1 audit item C5: `scale` lets percentage-point changes of fraction-
  * valued series (govt-interest-revenue) render in their displayed units. */
+export function formatChangeParts(
+  change: number,
+  changeKind: 'pct' | 'points',
+  numberLocale: 'en-US' | 'fa-IR',
+  units: UnitLabels,
+  scale = 1,
+): { value: string; unit: string | null } {
+  const num = formatNumber(Math.abs(change) * scale, numberLocale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  const sign = change > 0 ? '+' : change < 0 ? '−' : '';
+  // Percent binds tight ('+0.62%'); word-like units take a space ('+0.11 pts').
+  return changeKind === 'pct'
+    ? { value: `${sign}${num}${units.percent}`, unit: null }
+    : { value: `${sign}${num}`, unit: units.points };
+}
+
+/** Signed 7/30-day change rendering ('+0.62%' / '+۰٫۱۱ نقطه'). Render the
+ * returned string inside dir="ltr" ONLY when it is a pure number island
+ * (percent); word-unit strings must be split via formatChangeParts so the
+ * RTL word never lands inside the ltr bdi. */
 export function formatChange(
   change: number,
   changeKind: 'pct' | 'points',
@@ -232,14 +301,19 @@ export function formatChange(
   units: UnitLabels,
   scale = 1,
 ): string {
-  const num = formatNumber(Math.abs(change) * scale, numberLocale, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-  const sign = change > 0 ? '+' : change < 0 ? '−' : '';
-  const unit = changeKind === 'pct' ? units.percent : units.points;
-  // Percent binds tight ('+0.62%'); word-like units take a space ('+0.11 pts').
-  return changeKind === 'pct' ? `${sign}${num}${unit}` : `${sign}${num} ${unit}`;
+  const parts = formatChangeParts(change, changeKind, numberLocale, units, scale);
+  return parts.unit === null ? parts.value : `${parts.value} ${parts.unit}`;
+}
+
+/** Owner convention (2026-10-17): signed changes speak in status ink —
+ * positive green, negative red, zero/absent stays neutral. The tokens are
+ * the owner palette's contrast-documented pair (Carbon Green 50 / Red 60
+ * with their dark-surface siblings). */
+export function changeToneClass(change: number | undefined | null): string {
+  if (change === undefined || change === null || !Number.isFinite(change)) return '';
+  if (change > 0) return 'text-[var(--color-status-normal)]';
+  if (change < 0) return 'text-[var(--color-status-alert)]';
+  return '';
 }
 
 /** The display scale of one indicator's changes (fraction series ×100). */

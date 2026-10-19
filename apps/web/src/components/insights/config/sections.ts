@@ -25,13 +25,17 @@ export const GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGro
   australia: ['au-inflation-rates', 'au-households', 'au-trade-currency'],
 };
 
-/** The prices strip (round-2 R10): FOUR tiles — oil, gold, silver, Bitcoin.
- * Copper and iron ore move into the indicator lanes (copper's definition
- * group is 'growth-health'; iron-ore was always an au-trade-currency row). */
+/** The prices strip (round-2 R10): FOUR tiles. Order (financial-asset-cards
+ * spec pack 02 §10): Gold → Silver → Oil → Bitcoin — the spec's default;
+ * no user-configurable ordering exists in the app (verified 2026-10-17:
+ * PricesBoard maps PRICE_ROWS filtered by readings; no persistence of
+ * order), so the spec default applies. Copper and iron ore move into the
+ * indicator lanes (copper's definition group is 'growth-health'; iron-ore
+ * was always an au-trade-currency row). */
 export const PRICE_ROWS: readonly IndicatorId[] = [
-  'brent',
   'gold-usd',
   'silver-usd',
+  'brent',
   'btc-usd',
 ];
 

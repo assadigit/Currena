@@ -416,8 +416,9 @@ describe('projectSnapshotToPublic (2026-10-19 public projection)', () => {
       expect(overrides.hiddenIndicatorIds).not.toContain(reading.id);
     }
     expect(pub.readings).toHaveLength(full52.readings.length - overrides.hiddenIndicatorIds.length);
-    for (const board of ['markets', 'fx']) {
-      expect(overrides.hiddenBoards).toContain(board);
-    }
+    // The boards follow the generated policy (2026-10-18b owner directive):
+    // fx hidden, markets public.
+    expect(overrides.hiddenBoards).toContain('fx');
+    expect(overrides.hiddenBoards).not.toContain('markets');
   });
 });

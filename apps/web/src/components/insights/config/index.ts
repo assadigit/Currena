@@ -62,13 +62,17 @@ export {
 export {
   DISPLAY,
   indicatorValueParts,
+  priceValueParts,
   formatIndicatorValue,
   formatReadingValue,
   formatChange,
+  formatChangeParts,
+  changeToneClass,
   changeScaleOf,
 } from './display';
 export type {
   UnitToken,
+  PriceValueParts,
 } from './display';
 
 export {

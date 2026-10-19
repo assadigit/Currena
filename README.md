@@ -7,7 +7,7 @@ Parallel rebuild of the legacy Django app (live at
 https://aliassadi1993.pythonanywhere.com/ — untouched until an explicit human cutover).
 
 - **Status / phases / gates**: `docs/PROGRESS.md`
-- **Remaining / deferred work (next-session work order)**: `REMAINING_WORK.md`
+- **Remaining / deferred work (next-session work order)**: `docs/REMAINING_WORK.md`
 - **Feature inventory**: `docs/FEATURE_MAP.md`
 - **Keep / Defer / Cut decisions**: `docs/MIGRATION_CHECKLIST.md`
 - **Conventions & rules**: `AGENTS.md`

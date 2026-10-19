@@ -1,5 +1,6 @@
 # Cache headers for Workers Static Assets (2026-10-13, the owner's
-# "always live" rule made explicit):
+# "always live" rule made explicit; hardened 2026-10-18 after the owner
+# reported the stale-grayscale-page incident on the currena.ir zone):
 #
 #  - /assets/* are content-hashed by the build — a new deploy changes every
 #    hash, so a year-long immutable cache is ALWAYS correct while removing a
@@ -7,10 +8,18 @@
 #    it always revalidates, so a cached asset can only ever be one the live
 #    HTML itself references.
 #  - The document (index.html + the single-page-application fallback paths)
-#    and the service worker revalidate on every request — visitors always
-#    get the deployed version, and sw.js updates land on the next
-#    navigation. (Workers Assets already send `max-age=0, must-revalidate`
+#    revalidates on every request — visitors always get the deployed
+#    version. (Workers Assets already send `max-age=0, must-revalidate`
 #    for HTML by default; restated so the intent survives config drift.)
+#  - /sw.js is NO-STORE (was no-cache): the zone-proxied edge cache
+#    (currena.ir) was observed serving a STALE sw.js HIT with no-cache —
+#    revalidation at the edge is not trustworthy per-colo, and a stale
+#    sw.js freezes every visitor's service worker on the previous deploy
+#    (the exact 2026-10-18 "still black and white" report: fresh
+#    index.html + stale sw.js manifest = old precache forever). no-store
+#    means the edge never keeps a copy — every sw.js fetch hits the
+#    worker. The SW script is tiny and fetched once per navigation; the
+#    cost is negligible and the update path becomes deterministic.
 #  - /api, /internal and /admin are Worker-first paths and set their own
 #    headers — untouched here.
 
@@ -21,4 +30,4 @@
   Cache-Control: public, max-age=0, must-revalidate
 
 /sw.js
-  Cache-Control: no-cache
+  Cache-Control: no-store

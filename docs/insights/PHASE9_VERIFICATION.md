@@ -234,3 +234,33 @@ Runbook Phase 9, checkbox 5 (agent PH9-D). **Method: git three-dot diff against 
 `git diff origin/main...HEAD` over each: `routes/rates.ts` **identical**, `routes/ops.ts` **identical**, `routes/internal.ts` **identical**, `routes/admin.ts` **identical**, `default-service.ts` **identical**, `rates-service.ts` **identical**, `adapters/kv-store.ts` **identical** (also `public-mode.ts` and `ingest-watchdog.ts` — identical). The only shared API files that changed at all are the composition root and the security helper, both shown above to be additive with the rates mounts and the limiter defaults byte-preserved. Corroboration from this same venue: PH9-B's sweep rows 03–07 show the ladder live and healthy — `/api/status` 200, `/api/rates` fresh tgju snapshot, frankfurter snapshot, `/api/history`, `/api/convert` (100 USD → 143.14 AUD) — and rows 27–28 show `/internal/refresh` gating unchanged by the middleware work.
 
 **VERDICT: every non-Insights page component — About, BatchConverter, Calculator, Converter, History, LiveRates (the rates board), Receipt, Settle, Splitter, plus the shell (App.tsx, router.ts, main.tsx, en/fa dictionaries, index.html, vite.config.ts, public/) and every non-Insights component and lib file — is byte-identical to origin/main, and the rates API ladder (rates.ts, ops.ts, internal.ts, admin.ts, default-service.ts, rates-service.ts, kv-store.ts) is unchanged too; therefore Currena's other pages cannot have changed.** The shared files that did change (index.ts, security.ts, index.css, schemas.ts) carry additive, Insights-scoped diffs verified not to touch any behaviour the other pages exercise.
+
+
+---
+
+## Addendum — the 2026-10-19 v3 merge (post-Phase-9 delta, honestly recorded)
+
+The owner directed: merge with main and deploy. Main had moved 96 commits
+past the rebuild's base (parallel owner rounds, all live on currena.ir);
+this section records every Phase-9 claim that changed and why. The v3
+spec package (uploaded at main's tip) remains the governing authority
+for the Insights page.
+
+| Phase-9 claim | After the merge | Authority |
+|---|---|---|
+| "all 151 non-Insights files byte-identical" | Replaced by the MERGE itself: main's 96 commits (prices cards, briefing, balance v6/v7, lenses, asset sidebar, docs) enter the tree; every non-Insights file matches main | owner's merge directive |
+| The rebuild-only `Balance.tsx` (UI-39..45a) | **Deleted** — the owner's v7 `BalanceScale` renders per UI-45 (gold AND silver), carrying UI-40 (level + refusal when readable < 3, gauge hidden) + UI-39.5 (readable-count line). The 12° helper law → the owner's iterated 8°/2° law + the sparse rule | UI-45/40/39.5 on main's machinery |
+| U-09/U-09a pins (one circle, `[data-token-*]`) | Re-pinned to the merged BalanceScale DOM: per-metal balances, beam + bar + readable line, level beam + honest counts on the low-readable fixture (gold 0 of 4, silver 0 of 5) | UI_SPEC §9 acceptance |
+| Hero = v3 UI-01..09 | Unchanged — but main's editorial carousel hero (rounds between) is retired; its `hero-editorial.test.tsx` is deleted with it | UI_SPEC §3 (newest owner directive) |
+| Table = exact UI-27 set | Unchanged — now rendered inside main's editorial briefing; week/month/year ride the view lenses + every export | UI-27 |
+| Public mode hides the markets board (LR-02) | **Superseded by the owner's 2026-10-18b directive** (kept through the merge): the markets board is public on his own EODHD key; fx stays hidden — both behind the M-5 panic switch (`accessModeOf` + `HIDDEN_BOARDS`) | owner directive, recorded in the overrides file + generator |
+| Yahoo fetch honest UA | Kept; main's spoofed Mozilla UA is refused; `range=2y` (round 47's yearly anchor) rides the ONE polite request | T-25/F-09 |
+| Export columns (E-23) | Union: the v3 columns + main's week/month/year columns — a superset, never a loss | E-23 + owner rounds |
+| Bundle budgets 634/152 | Measured merged-tree 686.78/165.45 → 687/166 (justified in the budget history + CHANGELOG; entry chunk untouched) | the gate's own rule |
+| Tests 1,637 → **1,804** (core 191 · scraper 67 · insights 521 · markets 13 · api 334 · web 678) + visual 19/19 + self-check 25/25 | All green on the merged tree — the counts include main's suites (briefing, prices cards, markets chg1y) and the re-pinned balance/visual tests | every gate re-run 2026-10-19 |
+
+What did NOT change: the M-1..M-9 mitigations, the kill switch, the
+owner-only export + its 401s, the source register + owner_accepts
+values (CNN/ASX stay L3 link-outs, Shiller/Westpac stay disabled pending
+the owner), the panic switch, the fail-closed validators, the honest-UA
+policy, the state language, the GLOSSARY wording discipline.

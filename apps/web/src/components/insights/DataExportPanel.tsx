@@ -103,7 +103,7 @@ export default function DataExportPanel({
             key={format}
             type="button"
             onClick={() => onPick(format)}
-            className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[10px] border border-black/10 bg-white px-3 text-[length:var(--type-label)] font-semibold text-currena-dark transition-colors hover:border-currena-blue/40 hover:bg-currena-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue dark:border-white/15 dark:bg-[#1A222E] dark:text-currena-dark dark:hover:border-currena-blue/40"
+            className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[10px] border border-black/10 bg-white px-3 text-[length:var(--type-label)] font-semibold text-currena-dark transition-colors hover:border-[var(--color-text-secondary)]/40 hover:bg-currena-muted/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-text-primary)] dark:border-white/15 dark:bg-[#1A222E] dark:text-currena-dark dark:hover:border-[var(--color-text-secondary)]/40"
           >
             {format === 'xlsx' ? (
               <FileSpreadsheet aria-hidden size={17} strokeWidth={1.9} className="shrink-0" />

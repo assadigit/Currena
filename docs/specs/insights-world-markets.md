@@ -164,6 +164,7 @@ Limits (Cloudflare documentation, October 2026): KV reads 100,000 per day · KV 
 
 ### 5.1 Per market
 - `chg_1d` = last close vs the previous close, in percent.
+- `chg_1w` = last close vs the last close on or before the same date one week earlier, in percent (round 46; OPTIONAL in the contract exactly like `chg_1m` — a stored row without it is a pre-round-46 row and renders an honest dash, never a guess).
 - `chg_1m` = last close vs the last close on or before the same date one month earlier.
 - `high_52w` / `low_52w` = highest and lowest daily close in the last 365 days.
 - `from_high` = last close vs `high_52w`, in percent (zero or negative).
@@ -234,7 +235,7 @@ Attention order stays: verdict, named alerts, prices, **world stock markets (new
 ### 6.3 Anatomy (top to bottom)
 1. **Header row:** title, and the "as of" date on the far side (Jalali date in Farsi).
 2. **Takeaway line:** one sentence generated from the numbers (section 8).
-3. **View switch:** one segmented control **Today | 1 month | From 52-week high**. Default Today.
+3. **View switch:** one segmented control **Daily | Weekly | Monthly | Quarterly | Yearly** — ascending duration (round 46 added the two middle lenses; round 47 added the yearly lens, riding the stored `chg1y` field). Default: the NORMAL 3-month timeframe (owner round 44).
 4. **Strip:** three labelled groups, **Asia-Pacific (7) · Europe (3) · Americas (4)**. No group has more than 7 tiles.
    - **Tile:** short name, percentage, arrow glyph. Two lines at most.
    - **Quiet by default:** only a market in Correction or Bear market gets an extra tag, for example "−12% below 52-week high" (Persian: «۱۲٪ زیر سقف یک‌ساله»). Normal markets stay plain, so problems stand out without colour tricks.
@@ -243,7 +244,7 @@ Attention order stays: verdict, named alerts, prices, **world stock markets (new
 6. **Footer line:** source, "end-of-day", "local currency". The page footer keeps the single shared disclaimer and "Before you act" box, as already decided.
 
 ### 6.4 Full table (desktop, 900 px and wider)
-Columns: Market · Today · 1 month · From 52-week high · Trend · Status · Last close.
+Columns: Market · Today · 1 week · 1 month · 3 months · 1 year · From 52-week high · Trend · Status · Last close (round 46 added the weekly and monthly columns beside Today; round 47 added the yearly column beside 3 months — the same lenses the view switch offers).
 Fixed group order. One sort only: "From 52-week high" (worst first). Row click opens the same detail panel. CSV of this table goes into the existing Tools menu.
 On mobile there is no table; the disclosure shows a vertical list of rows with the same three numbers.
 
@@ -483,7 +484,7 @@ Work in this order. Loop on each step until its test passes, then continue. Matc
 | 1 | Provider adapters (EODHD, Yahoo) returning one common shape | Unit tests using saved sample responses for both |
 | 2 | Calculation, status and signal rules (sections 3.5, 5), plus the back-test over the last year | Unit tests for rules R1 to R7 (including a fake 20% jump and a fake stale date), for the 2-point buffer, and for the US override. The back-test table is committed for Ali to review |
 | 3 | Scheduled jobs and the single KV key with write-only-if-changed | Test: running the job twice with the same data causes exactly one write |
-| 4 | Public read route with cache headers | Response under 12 KB, correct headers, works when KV is empty |
+| 4 | Public read route with cache headers | Response under 13 KB (raised from 12 KB by round 46), correct headers, works when KV is empty |
 | 5 | UI: strip, view switch, detail panel, table, all states in 6.6 | Visual check in English and Farsi (right-to-left), phone and desktop widths |
 | 6 | Wording and context text (sections 7, 8) in both languages | All 14 markets present in both languages, Persian digits and Jalali date in Farsi |
 | 7 | Accessibility pass (6.8) | Keyboard-only walkthrough; no meaning carried by colour alone |
@@ -497,3 +498,175 @@ Work in this order. Loop on each step until its test passes, then continue. Matc
 - **Licence:** both free sources are personal-use. Fine for today's non-commercial site with credit given; revisit before Currena earns money (D1).
 - **Thin free quota:** EODHD free has 6 spare calls per day. The retry job only re-fetches failed markets to protect it.
 - **Holidays:** a market can be closed for days. Each tile shows its own last-close date, so this is never a bug.
+
+---
+
+## 11. Round 2026-10-18 (the world-indices handoff): the editorial market briefing
+
+Owner-directed redesign round. The instruction package (handoff:
+`01-new-session-prompt.md`, `02-ui-spec.md`, `03-agent-rules.md`,
+`ASSET-MAP.md` + 16 index-logo JPEGs + a non-authoritative style image)
+asked for an editorial market briefing for ordinary Persian-speaking
+users, while keeping the section a rigorous comparison tool. This
+addendum records what changed, what was deliberately NOT changed, and
+the one data gap the round surfaced. Section references below are to
+`02-ui-spec.md`.
+
+### 11.1 What changed (UI only)
+
+- **Header (§3.1):** the editorial title «نبض بازارهای جهان» over the
+  descriptive label «شاخص‌های بورسی جهان», the descriptor sentence and
+  the «آخرین داده‌ها · پایان جلسهٔ معاملاتی» badge beside the as-of
+  date. "Live"/"real time" remains banned wording.
+- **Summary card (§3.2):** the focal verdict box (round 44) gained the
+  selected-period breadth strip (up/down/flat counts from RAW values,
+  the ±1% flat band the section already uses) plus the separate
+  below-52-week-high count line — `world-markets/briefing.ts`
+  (`marketBreadth`, `belowHighCount`). The verdict anatomy, the §6.11
+  measure line, the hero count and the takeaway templates are unchanged.
+- **Movers (§3.4):** two new featured cards «بیشترین رشد» /
+  «بیشترین افت» — true extrema of the selected period (briefing.
+  `topMovers`), logo + canonical name + country + signed return + the
+  52-week distance as secondary context; honest empty state when the
+  lens has no valid rows.
+- **Period control (§3.3):** the view switch now offers EXACTLY the four
+  horizons the stored contract carries — Daily | Weekly | Monthly |
+  Quarterly. The "From 52-week high" lens was REMOVED from the switch
+  (the distance stays secondary context everywhere: tile tags, mover
+  cards, the table column). The annual horizon was NOT offered in this
+  round — see 11.2, closed by round 47 (§11.6) with the owner's approval.
+- **Explorer (§3.5):** each tile gained the index wordmark (in the new
+  standardized white frame, `object-fit: contain`, initials fallback —
+  `world-markets/MarketLogo.tsx`, assets at `/assets/markets/{id}.jpg`)
+  and the country/market line from the copy dictionary. Region groups
+  are semantic `<h3>`s.
+- **Performance map (§3.6):** a new desktop-only list/«نقشهٔ عملکرد»
+  switch (`MarketsHeatmap.tsx`): equal-area tiles (no weighting metric
+  exists in the contract, so size never implies importance), the exact
+  signed percentage + name on every tile, a visible zero-centred legend
+  with the period-relative note, keyboard/tap opening the same detail
+  panel, and the list/table as the always-available textual alternative.
+- **Copy:** 38 new fa strings + 3 changed + 5 removed, all through the
+  copy-audit workflow, round `handoff-world-indices`, reference
+  `docs/localization/world-indices-copy-review.md` (the terminology
+  decisions are recorded there; notably «سقف یک‌ساله» was kept over the
+  handoff's suggested «سقف ۵۲هفته‌ای» — the repo dictionary wins).
+
+### 11.2 The data gap this round reported (no fabrication) — CLOSED by round 47
+
+The requested horizon list in the handoff was daily / weekly / monthly /
+quarterly / annual. The stored contract (`MarketEntrySchema`) carried
+`chg1d`, `chg1w` (optional), `chg1m` (optional), `chg3m` — and NO annual
+value: no `chg1y`, no YTD field, no year-start date, and the weekly
+series is chart-rounded integer closes, so deriving an annual return in
+the frontend would fabricate precision. Per the handoff's own data-truth
+rules, the annual horizon was simply not offered in that round. **The
+gap is now closed the honest way (round 47, §11.6): `chg1y` was added to
+the stored contract and computed by the markets job from the provider's
+real year-ago close — never derived in the frontend.** No YTD field
+exists (there is no year-start date in the contract); it stays unoffered.
+
+### 11.3 Explicitly NOT changed
+
+The data pipeline (EODHD/Yahoo, crons `30 23 * * 1-5` + `30 1 * * 2-6`
+UTC, the one `insights:markets:v1` KV key, write-only-if-changed), the
+public read route, the §5.3 signal rules and hero integration, the
+§6.11 verdict-line wiring, the detail panel's 52-week chart, the full
+table (worst-first sort, all columns), the CSV exports, and every
+loading/empty/partial/stale state discipline. No provider call ever
+happens on a page request.
+
+### 11.4 Tests
+
+`world-markets/briefing.test.ts` (pure rules: the closed lens list,
+breadth with partial data, the raw −10% threshold incl. the −9.96%
+rounding boundary, top-movers on positive/negative/mixed/partial/missing
+data, the heatmap scale + tones, cross-surface period consistency) and
+`world-markets/briefing.test.tsx` (rendered section: period changes move
+breadth + movers + tiles together, the honest dash for a missing lens,
+the list/heatmap switch, the fa/RTL rendering with the editorial header
+and Persian digits) + the updated `markets-verdict.test.ts` copy-parity
+suite. All fixture-backed; no live providers.
+
+### 11.5 Round 2026-10-18 (2): the ≥96×96 px wordmark floor (owner follow-up)
+
+The owner's follow-up directive on the deployed round — "The pictures of
+each indices are too small make them at least 96x96 pixel" — supersedes
+the handoff's 24–32px row guidance for the wordmark size. Every rendered
+`MarketLogo` box is now ≥96×96 px (the supplied JPEGs are 256×256, so
+96–112px renders stay sharp):
+
+- **Tiles**: 96 (mobile and desktop), STACKED above the name — the
+  explorer grid runs 2→7 narrow columns, and a 96px logo beside the text
+  would starve the canonical name; the tile name moves one type step up
+  to `--type-label` to keep the identity readable beside the bigger art.
+- **Movers**: 96 mobile / 112 desktop; the cards are half/full-width, so
+  the horizontal identity row (logo beside name) keeps its room.
+- **Detail heading**: 96 beside the name block; name at `--type-number`
+  with country (+ Latin in fa) beneath — the same logo + name + country
+  anatomy every surface wears.
+- **Chip**: the white frame's corner radius is capped at 16px
+  (`min(size/4, 16px)`) so the big chips read as rounded squares rather
+  than pills; every pre-existing small-size rendering is unchanged.
+- The heatmap and the full table remain text-first (data-density views —
+  they carry no pictures, so the directive does not apply to them).
+- Regression guards: `briefing.test.tsx` asserts every rendered logo box
+  ≥96px on both breakpoints (parsing `--icon-size`/`--icon-size-sm` from
+  the style attribute) and the detail panel's wordmark ≥96px.
+
+### 11.6 Round 2026-10-19: the yearly lens (owner round 5 — "add yearly view
+ to the stocks indexes")
+
+The owner asked for a yearly view on the stock indices. The honest path
+(having refused to fabricate one in §11.2) was a contract + pipeline
+change, and that is what shipped:
+
+- **Contract:** `chg1y` (OPTIONAL, like `chg1w`/`chg1m`) on
+  `MarketEntrySchema` — last close vs the last close on or before the
+  same date one year earlier, percent, rounded to 2 decimals like every
+  lens. A stored row without it is a pre-round-47 row and renders an
+  honest dash (—), never a guess; the next markets run rewrites every
+  row with it. No YTD field exists or is offered (no year-start date in
+  the contract).
+- **The anchor rule (both free providers cut history at ~one year):**
+  the strict target — a close on/before 365 days back — often lands one
+  or two days BEFORE the provider's one-year window starts (verified
+  live 2026-10-19: EODHD free and Yahoo range=1y both start exactly at
+  the year-ago date). When the series' own first close falls inside the
+  ±15-day band around the target (350–380 days back — the repo's
+  year-on-year convention, `series.ts yoyPctSeries`), that earliest
+  close IS the year-ago anchor. A window starting closer than 350 days
+  to the last close omits `chg1y` (the honest dash). Config:
+  `CHG1Y_ANCHOR_DAYS = 365`, `CHG1Y_ANCHOR_TOLERANCE_DAYS = 15` in the
+  markets definitions block.
+- **Providers:** Yahoo is now asked `range=2y` (was `1y`) so the yearly
+  anchor always carries real closes with margin on the fallback path
+  (verified live: range=1y → 251 points from exactly one year back;
+  range=2y → 501 points from two years back). EODHD keeps its ~400-day
+  ask; the free plan's one-year cut is absorbed by the tolerance band.
+- **Surfaces:** the radiogroup's fifth lens **Yearly** («سالانه»)
+  appended after Quarterly (the default stays the NORMAL 3-month lens,
+  owner round 44); every view-driven surface follows automatically
+  (breadth counts + coverage note, movers, tiles, heatmap scale, aria)
+  because they all read the one `viewValue` lens map. The full table
+  gained a **1 year** column beside 3 months (desktop + the mobile row
+  list); the world-markets CSV and the full export gained a **1 year %**
+  column (appended at the END on the machine-surface CSV per the round-46
+  position-pinning convention; duration-ordered on the human table).
+- **Copy:** 3 new keys × 2 locales (`viewYearly`, `thYear`, `csvColYear`),
+  manifest round `markets-yearly-lens-2026-10-19` — the Persian extends
+  the reviewed lens families (روزانه/هفتگی/ماهانه/سه‌ماهه → سالانه؛
+  «بازده یک سال»; the csvCol (درصد) family).
+- **Tests:** the lens-list guards now pin the five horizons and keep
+  refusing YTD/52w-distance lenses; new guards for `yearAgoAnchor`
+  (strict anchor, the one-year-window fallback, the <350-day omission),
+  the yearly breadth/movers/tile read, the honest dash + coverage note,
+  the Yahoo `range=2y` URL, the export column slots, and the 16-market
+  route payload still under the 13 KB budget with `chg1y` on every row.
+- **Budgets:** all held — entry untouched (295.29/88.81), Insights
+  660.88/158.00 vs 661.00/158.50 (no bump needed).
+- **Backfill:** existing stored rows lack `chg1y` until each market's
+  next close (the R5 same-date stability rule holds the old row
+  verbatim) — the yearly lens shows dashes + the coverage note for at
+  most a trading day or two per market, then the cron fills it. This is
+  the same honest-roll-in behavior round 46's weekly lens used.

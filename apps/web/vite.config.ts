@@ -115,7 +115,14 @@ export default defineConfig({
         // no dependence on a prompt-mode page posting SKIP_WAITING.
         skipWaiting: true,
         clientsClaim: true,
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
+        // jpg joins the precache for the 16 index wordmarks (the
+        // world-indices handoff round) — the same treatment the owner's
+        // PNG icon set gets: generateSW revisions by content, so a changed
+        // wordmark re-precaches on the next deploy.
+        // webp joins for the editorial hero artwork (the 2026-10-19
+        // economic-indicators handoff): the Sydney Harbour band + the
+        // Global map texture are 12KB/4KB WebP files in /assets/artwork/.
+        globPatterns: ['**/*.{js,css,html,svg,png,jpg,webp,woff2,webmanifest}'],
         // Store-listing screenshots (manifest only — PWABuilder/Play fetch
         // them over HTTP; the app never needs them offline).
         globIgnores: ['**/screenshots/**'],

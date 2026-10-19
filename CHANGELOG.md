@@ -5,6 +5,1887 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-19 (v3 merge)] — the v3 Insights rebuild merges with main's parallel owner rounds and ships
+
+The owner's directive: "Commit Push deploy. merge with main branch. and
+deploy and release." The `insights-rebuild` branch (12 commits, the v3
+spec package 100% implemented, 1,637 tests at Phase 9) merges with
+`origin/main` (96 newer commits of parallel owner rounds — balance v6/v7,
+asset-cards sidebar, world-indices briefing, ≥96px wordmarks, editorial
+hero + fidelity + panels, Australia signals, yearly/weekly/monthly lenses,
+prices rounds — all live on currena.ir). Two owner-directed streams, one
+tree; the v3 spec package (uploaded last, at `1e39a24`) stays the
+governing authority for the Insights page.
+
+### Merged — v3 spec governs, main's machinery implements
+
+- **Balance (UI-45/UI-40 on the v7 machinery)**: the merged card renders
+  the owner's v7 `BalanceScale` (pans, SVG mechanical layer, needle +
+  three-tick arc gauge — kept verbatim) **per metal** — gold AND silver
+  each get their own balance; the silver-only industrial condition rides
+  silver's balance (the separate short list is retired); `range`-safe
+  honest counts ride both (UI-39.5 readable-count line); **UI-40**: fewer
+  than 3 readable conditions → level beam, gauge hidden, the honest
+  refusal wording (readable 0 keeps the owner's "Can't read the
+  conditions right now", 1–2 shows the spec's "Not enough readable
+  conditions to weigh"); the v6 2° floor keeps governing readable ≥ 3
+  tilts. The retired rebuild-only `Balance.tsx`/`balance.ts`/`readable.ts`
+  and their pins are deleted; the 12° helper law is superseded by the
+  owner's iterated 8°/2° law + the sparse rule.
+- **Hero**: the v3 hero (verdict sentence + reading bar + why-3 + calm
+  line + what-next + freshness chip + alert box, UI-01..09) replaces the
+  editorial carousel/art-band hero of the fidelity round; the
+  `ContinueStrip` under the hero is replaced by the spec's
+  `MovesNextStrip` (UI-18/19, real readings + dates); the section
+  indicators stay off the v3 hero by its documented choice.
+- **Stock table**: the exact UI-27 six-column set (Trend gone, U-11 pin)
+  inside main's editorial briefing (movers, heatmap, wordmarks, breadth);
+  the week/month/year data stays available through the five-lens view
+  switch and every export.
+- **Boards**: the owner's 2026-10-18b markets directive survives (the
+  markets board is public, fx stays hidden) — now behind the M-5 panic
+  switch (`accessModeOf` + `HIDDEN_BOARDS`).
+- **Fetching (T-25/F-09)**: Yahoo keeps the honest `CurrenaDashboard/1.0`
+  UA (never main's spoofed Mozilla) at `range=2y` (round 47's yearly
+  anchor); the M-6 kill switch guards both providers.
+- **Tools (UI-51/UI-53)**: the owner sign-in + gated exports + live mode
+  switch ride main's grayscale control language at the v3 44px touch
+  minimum.
+- **Infra**: union-merged budgets (measured merged-tree 686.78 kB raw /
+  165.45 kB gz → budgets 687/166, the entry chunk untouched at
+  295.28/88.81), state tokens + `--ei-navy` + market-logo CSS both sides,
+  copy manifest union (+silver balance strings, +verdictNone/silverOnly
+  triage, −6 retired rebuild-only entries).
+
+### Gates (merged tree)
+
+1,804 tests green (core 191 · scraper 67 · insights 521 · markets 13 ·
+api 334 · web 678) · typecheck 6/6 · lint 0 errors/15 advisories ·
+copy:audit clean · T-15 + bundle budgets held · visual acceptance
+**19/19** (U-09/U-09a re-pinned to the merged BalanceScale, U-10
+duration-based) · self-check **25/25** — SELF_AUDIT.md + the dated
+export regenerated.
+
+## [2026-10-19 (yearly lens)] — the stock indices gain a Yearly view, carried by a real chg1y in the stored contract (owner round 5)
+
+Owner round 5: "add yearly view to the stocks indexes." The world-indices
+handoff had refused to fabricate an annual lens (no field in the contract);
+this round closes that gap the honest way — a contract + pipeline change,
+never a frontend derivation.
+
+### Added
+
+- **`chg1y` on `MarketEntrySchema`** (OPTIONAL, like `chg1w`/`chg1m`) —
+  last close vs the last close on or before the same date one year
+  earlier, percent. A stored row without it is a pre-round-47 row and
+  renders an honest dash; the next markets run rewrites every row with it.
+- **The year-ago anchor rule** (`compute.ts yearAgoAnchor` + config
+  `CHG1Y_ANCHOR_DAYS`/`CHG1Y_ANCHOR_TOLERANCE_DAYS`): the strict 365-day
+  rolling anchor, and — because both free providers cut history at
+  exactly one year (verified live 2026-10-19) — when the series' first
+  close falls inside the ±15-day band around the target (350–380 days
+  back, the repo's `yoyPctSeries` year-on-year convention), that earliest
+  close IS the anchor. Closer-than-350-day windows omit the field.
+- **Yahoo `range=2y`** (was `1y`) on the fallback fetch — the yearly
+  anchor always carries real closes with margin (verified live: 1y
+  returns points from exactly one year back; 2y from two years).
+- **The Yearly lens** («سالانه») as the fifth radiogroup option after
+  Quarterly — breadth, coverage note, movers, tiles, heatmap scale and
+  aria all re-read `chg1y` through the one `viewValue` lens map; the
+  default stays the NORMAL 3-month lens (owner round 44).
+- **A "1 year" column** beside 3 months in the full table (desktop +
+  mobile row list) and a **"1 year %"** column in the world-markets CSV
+  (appended at the END — position-pinned scripts keep reading every
+  existing column at the same index) and the full export.
+- 3 new copy keys × 2 locales (`viewYearly`, `thYear`, `csvColYear`);
+  Persian copy manifest round `markets-yearly-lens-2026-10-19`.
+- 6 new test guards (1,612 total): the five-horizon lens list (YTD and
+  52w-distance still refused), the strict/one-year-window/omission anchor
+  cases, the rendered yearly surface with the honest dash + coverage
+  note, the `range=2y` URL, the export slots, and the 16-market payload
+  still under 13 KB with `chg1y` on every row.
+
+### Changed
+
+- The spec's §11.2 data-gap report is marked CLOSED by this round
+  (§11.6 documents the shipped design); §6.3/§6.4 list the five lenses
+  and the new table column.
+
+### Budgets
+
+- All held without bumps: entry untouched (295.29/88.81), Insights
+  660.88/158.00 vs 661.00/158.50.
+
+## [2026-10-20 (australia signals)] — the Australia card closes with the same signals box as World Signals, carrying its own area data (owner round 4)
+
+Owner round 4 on the hero's closing modules: "Just like World Signals, I
+want the same Box with proper data for Australia." The world-section
+signals stay Global-scope — Australia's proper data is its OWN areas, so
+its signals box raises the gauges themselves.
+
+### Added
+
+- **The Australia signals box** («سیگنال‌های استرالیا») — the SAME
+  construction as the Global world-signals panel (always open, never
+  behind the toggle; 15px bold heading + bullets; the state mark 18/20;
+  the region's own pale tint + step ink on the heading), with one bullet
+  per Australian gauge, worst first:
+  - the raised areas (step 2+) speak their counts and state word in
+    their OWN step ink — "{area} · {word}: {warnings} of {voting}
+    indicators need attention." (the markets bullet's shape) — and jump
+    to the Australia section where their lanes live;
+  - the calm areas (step 1) sit in the quiet rows' muted ink as
+    "{area} · Stable", and the unreadable ones (step 0) honestly as
+    "{area} · not enough data to read" — never buttons.
+  New hooks scoped to the new content: `data-ei-area-bullets`,
+  `data-ei-area-signal="raised|calm|no-reading"`, `data-ei-area-step`.
+- Two new copy keys, en + fa (`australiaSignalsTitle`,
+  `australiaSignalArea` — Persian copy manifest round
+  `australia-signals-2026-10-20`); the quiet rows compose existing keys
+  only.
+
+### Changed
+
+- **The round-3 rule toggle becomes the shared FALLBACK** — a region
+  with nothing to raise keeps the low-key rule toggle (no feeds on
+  Global / no readable gauge on Australia). On a readable Australia the
+  signals box replaces it; the word-choice rule is always reachable
+  through the "?" tip beside the gauges heading on both cards.
+
+### Budgets
+
+Insights lazy chunk 659.00/158.00 → **661.00/158.50** (measured
+660.14/157.86; the entry chunk untouched at 295.29/88.81 vs 296/89.5) —
+the AU panel branch + the area bullets + the two new strings; gz
++0.37 kB. D-39 in `docs/DECISIONS_FOR_ALI.md`. The panel guards in
+`apps/web/src/components/insights/hero-editorial.test.tsx` grow 3 → 6
+(the AU box structure + jump + counts, the no-readable-gauge fallback,
+fa area bullets with fa digits); 20 guards total.
+
+## [2026-10-19 (panels)] — the rule panel tucks behind a low-key toggle; the world-signals panel becomes the hero's emphasized closing module (owner round 3)
+
+The owner reviewed the fidelity-round hero and returned two directives on
+the closing explanation panels: the long word-choice rule («مبنای تعیین
+وضعیت هر حوزه») is reference material that should stop occupying the
+card, while the Global signals («سیگنال‌های جهانی») are "probably one of
+the most important parts of the whole hero" and must read that way.
+Presentation-only again: no calculation, feed, count, ranking, aria hook
+or translated string changes (both panels reuse their existing copy keys).
+
+### Changed
+
+- **The rule panel hides behind a low-key toggle** — the always-visible
+  tinted rule panel (Australia, and Global's no-feed fallback) collapses
+  to one quiet muted pill (the established "+n more" disclosure language:
+  `verdictRuleLabel` + a direction-neutral chevron, `aria-expanded`/
+  `aria-controls` like GlossaryTip); the click reveals the familiar
+  tinted panel beneath it — same hooks (`data-ei-panel`,
+  `data-ei-panel-kind="rule"`, `-heading`, `-rule`), same copy, same
+  tint ladder. The Australia card stops spending its closing module on
+  the reference paragraph.
+- **The world-signals panel steps UP in type** — the Global panel's
+  heading and every bullet rise from the 12.5px caption tier to 15px
+  bold (`leading-relaxed`), the state mark grows 16/18 → 18/20, the
+  bullet rhythm gets roomier (1.5 → 2 spacing) and the panel padding
+  breathes (px-3/py-2.5 → px-3.5/py-3) — emphasis through type and
+  space, not louder chrome: the pale-red surface, region-step ink and
+  the `data-attention-box`/bullets hooks stay exactly as approved. The
+  panel is never tucked behind the toggle — it is always open.
+
+### Budgets
+
+Insights lazy chunk 657.00/157.50 → **659.00/158.00** (measured
+658.10/157.49; the entry chunk untouched at 295.29/88.81 vs 296/89.5) —
+the disclosure button + chevron + branched heading markup; gz +0.32 kB.
+D-38 in `docs/DECISIONS_FOR_ALI.md`. The three panel guards in
+`apps/web/src/components/insights/hero-editorial.test.tsx` now exercise
+the disclosure (collapsed default → click → real panel, signals panel
+never toggled); 17 guards total.
+
+## [2026-10-19 (fidelity)] — the economic indicators hero closes the gap to the approved reference (the owner's UI-fidelity correction brief)
+
+The owner reviewed the editorial hero round against the approved
+`currena-hero.zip` references and returned a correction brief: the result
+still read as a generic KPI dashboard, not the approved editorial financial
+interface. This round corrects the actual causes — presentation-only again:
+every calculation, threshold, ranking, aria hook, count, feed and translated
+string is untouched (the panel/strip copy is the only addition, triaged in
+the Persian copy manifest round `editorial-fidelity-2026-10-19`).
+
+### Changed
+
+- **Page content width (brief §3)** — the old `xl:max-w-[1440px]` cap left
+  80–160px dead margins on 1600–1760px screens; the Insights container now
+  rides `lg:max-w-[calc(100%-40px)]` / `xl:max-w-[calc(100%-56px)]` /
+  `2xl:max-w-[1840px]` — 1544px (96.5%) at 1600, 1704px (96.8%) at 1760,
+  with a ceiling so ultra-wide desktops keep a sane reading measure. The
+  page title steps up to 34px desktop (inside the spec's 32–36px band).
+- **The art band shows (brief §4)** — the uniform veils over the Sydney
+  Harbour / world-map artwork were too heavy (the artwork read as absent):
+  Australia's veil drops 30% → 12% surface mix, Global's 46% → 30% with its
+  overall opacity raised to 0.85 — the reference's clearly-visible faded
+  band, with the bottom fade (and the mobile/dark toning) keeping the
+  header's contrast.
+- **The severity mapping bug (brief §5 — the round's named defect)** —
+  `.ei-row-accent` hardcoded the Crisis red for flagged rows in BOTH
+  regions, so a Stressed Australia wore red row edges. The accent now
+  follows the region's own verdict step via the card article's
+  `[data-ei-step]` → `--ei-accent` custom property (Critical → red,
+  Stressed → the amber/orange stressed ink, Cautious → watch amber); the
+  icon-less row's fallback triangle and the attention-count line speak the
+  same region ink. Status and row presentation can no longer disagree.
+- **Category summary rows (brief §7)** — the round-42 status-grouped boxes
+  ("Stressed: … / Stable: …") become the reference's compact category
+  rows: one quiet row per gauge — category label · small tinted state
+  badge · the four-step mini meter (the reference's severity bar) — worst
+  state first, unreadable gauges last in honest neutral, the module headed
+  by the existing `heroGaugesLabel` + the verdict-rule tip.
+- **The contextual explanation panel (brief §7)** — each regional card now
+  closes with the reference's restrained tinted panel: Global carries the
+  raised world signals (markets / currencies / section indicators — the
+  existing module, now with a clear `worldSignalsTitle` heading on the
+  pale-red surface; underline affordances dropped per the brief) and falls
+  back to the word-choice rule when no feed has loaded; Australia carries
+  the existing `verdictRuleLabel` + verdict-rule explanation on a pale
+  amber surface. The tint follows the region's own step ink, never a
+  saturated warning surface.
+
+### Added
+
+- **The bottom information strip (brief §7)** — `ContinueStrip`: the
+  reference's compact footer strip under the hero, naming the page's next
+  sections in their intended order (the JumpNav labels, hero excluded) and
+  wired to the same expand-then-scroll navigation. Two new copy strings ×
+  2 locales (`ui.worldSignalsTitle`, `ui.continueLabel`).
+
+### Budgets
+
+Insights lazy chunk 656.00/157.00 → **657.00/157.50** (measured
+656.80/157.17; the entry chunk untouched at 295.29/88.81 vs 296/89.5) —
+the category rows + panels + strip are compressible JSX + 2 copy strings.
+D-37 in `docs/DECISIONS_FOR_ALI.md`. Seven new regression guards in
+`apps/web/src/components/insights/hero-editorial.test.tsx` (17 total).
+
+## [2026-10-19] — the economic indicators hero becomes the editorial financial interface (the currena-hero.zip handoff round)
+
+The owner's `currena-hero.zip` handoff package (approved visual references,
+`spec/economic-indicators-ui-spec.md`, design tokens, Sydney Harbour + world-
+map artwork — recorded in the repo as
+`docs/insights/economic-indicators-editorial-spec.md`) reshapes the Insights
+hero on `/#/insights`, presentation-only: every calculation, threshold,
+ranking, aria hook, count and translated string is untouched (the new
+carousel copy is the only addition, triaged in the Persian copy manifest).
+
+### Added
+
+- **The Global-first mobile swipe carousel (spec §10)** — below 768px the
+  two overview cards become ONE horizontal scroll-snap track: Global first,
+  swipe (or the localized cue / two `aria-current` dots / Previous-Next
+  buttons / ← → Home End keys) to reach Australia. Both cards stay mounted,
+  so each keeps its own expand/collapse state while swiped off-screen; the
+  furniture is `md:hidden`, so the 768–1023px tablet keeps the calm stack
+  and ≥1024px keeps the FIXED desktop placement (Australia left, Global
+  right, both locales). Ten regression guards in
+  `apps/web/src/components/insights/hero-editorial.test.tsx`.
+- **The quiet art band (spec §7)** — the Sydney Harbour / Opera House
+  artwork (12 KB WebP, from the handoff pack) behind the Australia card's
+  header, an even fainter world-map texture (4 KB) behind the Global card:
+  decorative `aria-hidden` layers under a surface-colored veil + bottom
+  fade, toned further down in dark mode and on narrow cards. The artwork
+  joins the PWA precache (`webp` added to `globPatterns`).
+- **The editorial ink + severity pill (spec §4/§5)** — the region titles,
+  the flagged rows' key values and the page title speak the navy print ink
+  `--ei-navy` (#0F2D4A light / the existing light ink in dark); the
+  verdict word + state artwork ride ONE compact tinted pill
+  (`.ei-state-pill`, the same ink+tint pairing the StatusChips speak) with
+  the four-step meter unchanged beside it; the hero-scoped grayscale
+  filter (the 2026-10-18a scope trim) is retired — the new direction
+  restores the restrained severity colors on the hero.
+- **The flagged rows' editorial anatomy (spec §8)** — the indicator's own
+  subject artwork leads in a soft neutral container (the alert triangle
+  keeps the tier where the icon set deliberately has no artwork), the
+  severity accent is the thin inline-start tier edge, and a directional
+  drill-down chevron (`.ei-row-chevron`, mirrored in RTL) closes the row.
+  The top-3 + "+n more" → "Show fewer" disclosure is byte-identical in
+  behavior.
+
+### Budgets
+
+Insights lazy chunk 652.00/156.50 → **656.00/157.00** (measured
+655.04/156.73; the entry chunk untouched at 295.29/88.81 vs 296/89.5) —
+the carousel controls + art band + pill + row anatomy + 10 copy strings ×
+2 locales; the two artwork files ship as public assets, not JS. D-36 in
+`docs/DECISIONS_FOR_ALI.md`.
+
+## [2026-10-18 (2)] — the index wordmarks render at the owner-directed ≥96×96 px (deployed as worker 20b9549c)
+
+The owner's follow-up directive on the freshly deployed briefing — "The
+pictures of each indices are too small make them at least 96x96 pixel" —
+raises every rendered index wordmark box to ≥96×96 px (the supplied JPEGs
+are 256×256, so 96–112px renders stay sharp). UI-only: tiles 96 (STACKED
+above the name — the explorer grid runs 2→7 narrow columns, so a 96px logo
+beside the text would starve the canonical name; name bumped one type step
+to `--type-label`), the featured movers 96 mobile / 112 desktop (the cards
+are half/full-width, the horizontal identity row keeps its room; name at
+1rem), the detail heading 96 beside the name block (name at
+`--type-number`, the same logo + name + country anatomy every surface
+wears). The white chip's corner radius is capped at 16px — the old /4
+proportion would give a 24–28px radius on the big chips and read as a
+pill; every pre-existing small-size rendering is unchanged. The heatmap
+and the full table stay text-first (data-density views; no pictures to
+resize). Two regression guards added (briefing.test.tsx): every rendered
+logo box ≥96px on BOTH breakpoints, and the detail panel carries the same
+≥96px wordmark. No copy changes (audit clean), no contract change, no
+provider/cron/KV/route change. Budgets held (Insights 650.29/155.75 vs
+652/156.50). Live-verified fa/EN desktop + mobile 390/320 (zero overflow,
+zero console errors) — evidence:
+`docs/insights/screenshots/world-indices-briefing/logo-96px/`.
+
+## [2026-10-18] — the world stock indices section becomes the editorial market briefing «نبض بازارهای جهان» (the owner's world-indices handoff round; merged to main + deployed as worker b9a412e0 — see DEPLOY.md)
+
+The owner's handoff package (`01-new-session-prompt.md`, `02-ui-spec.md`,
+`03-agent-rules.md`, `ASSET-MAP.md` + 16 index wordmark JPEGs + a
+non-authoritative style image) reshapes the World stock markets section on
+`/#/insights` into an editorial market briefing, UI-only. The governing
+spec records the round as §11 of `docs/specs/insights-world-markets.md`;
+the copy decisions live in
+`docs/localization/world-indices-copy-review.md`.
+
+### Added
+
+- **The editorial header (§3.1)** — «نبض بازارهای جهان» over the new
+  descriptive label «شاخص‌های بورسی جهان», the §3.1 descriptor subtitle,
+  and the «آخرین داده‌ها · پایان جلسهٔ معاملاتی» badge beside the as-of
+  date ("live"/"real time" remains banned wording).
+- **The breadth layer (§3.2)** — the summary card's selected-period
+  up/down/flat strip («شاخص‌های مثبت / منفی / بدون تغییر») plus the
+  separate below-52-week-high count line, both computed from RAW stored
+  values in the new pure module
+  `apps/web/src/components/insights/world-markets/briefing.ts`
+  (`marketBreadth` reuses the section's ±1% flat band; `belowHighCount`
+  reads `CORRECTION_PCT` from the markets config block — a −9.96% distance
+  that displays as −10% is NOT counted).
+- **The featured movers (§3.4)** — `world-markets/MarketMovers.tsx`:
+  «بیشترین رشد» / «بیشترین افت» as true extrema of the selected period
+  (`topMovers`: missing lens rows are never ranked as zero; no valid rows →
+  the honest empty state, never a fake winner), each card carrying the
+  logo, canonical name, country/market, signed return and the 52-week
+  distance as secondary context.
+- **The index wordmarks** — the 16 supplied 256×256 JPEGs ship as
+  `apps/web/public/assets/markets/{marketId}.jpg` (named by canonical id so
+  a file can never drift from its data row); `world-markets/MarketLogo.tsx`
+  renders them in a standardized white chip (object-fit contain, hairline
+  ring, initials fallback on load failure) — supplementary identifiers
+  that never override the canonical names.
+- **The desktop performance map (§3.6)** — `world-markets/MarketsHeatmap.tsx`
+  behind a «فهرست»/«نقشهٔ عملکرد» switch (lg+ only; mobile keeps the
+  readable list): EQUAL-AREA tiles (no weighting metric exists in the
+  contract, so size never implies importance), the exact signed percentage
+  + name + arrow on every tile, a visible zero-centred legend with the
+  period-relative note (`heatmapScale` rounds the largest |raw return| up
+  to a nice step, per period), keyboard/tap opening the same detail panel,
+  and the list/table as the always-available textual alternative.
+- **Country/market labels** — every index entry gained `country` in both
+  dictionaries (16 × 2 strings; EURO STOXX 50 = «منطقهٔ یورو», Hang Seng =
+  «هنگ‌کنگ» — market labels, not countries), shown on tiles, mover cards
+  and the detail panel.
+
+### Changed
+
+- **The period control (§3.3)** — the view switch now offers EXACTLY the
+  four horizons the stored contract carries: روزانه / هفتگی / ماهانه /
+  سه‌ماهه. The "From 52-week high" lens was removed from the switch (the
+  distance stays secondary context on tiles, mover cards and the table
+  column), and the annual horizon is deliberately NOT offered: no
+  `chg1y`/YTD field exists in `MarketEntrySchema` and the weekly series is
+  chart-rounded, so deriving one would fabricate precision — the gap is
+  recorded in spec §11.2 and closing it needs owner approval + a
+  markets-worker contract change.
+- **The explorer tiles (§3.5)** — each tile gained the logo + country
+  identity row; region groups are semantic `<h3>`s with counts from the
+  loaded dataset.
+- **The summary card** — the round-44 verdict box now also carries the
+  breadth strip + below-high line; the verdict anatomy, the §6.11 measure
+  line, the hero count and the takeaway templates are unchanged.
+- **Copy** — 38 new + 3 changed + 5 removed fa strings through the audit
+  workflow (round `handoff-world-indices`, reference
+  `docs/localization/world-indices-copy-review.md`; manifest 2,203, audit
+  clean). Notably «سقف یک‌ساله» was kept over the handoff's suggested
+  «سقف ۵۲هفته‌ای» (the repo terminology dictionary is the final authority),
+  and the legend's «٪» glyph routes through the new shared
+  `percentGlyph()` so no new hardcoded literal ships.
+
+### Tests
+
+- `world-markets/briefing.test.ts` — the closed lens list, breadth
+  (incl. partial data + the ±1 band edges), the raw −10% threshold
+  (incl. the −9.96% rounding boundary), top movers on
+  positive/negative/mixed/partial/missing/single-valid data + tie order,
+  the heatmap scale + tones, and cross-surface period consistency.
+- `world-markets/briefing.test.tsx` — 17 rendered-section tests: the
+  editorial header, the load states, period changes moving breadth +
+  movers + tiles together, the honest dash + coverage note, the
+  list/heatmap switch, and the fa/RTL rendering (Persian digits,
+  dir-isolated Latin names, the verbatim owner-directed title).
+- `markets-verdict.test.ts` updated for the copy-parity suite (incl. the
+  no-annual-lens guard and the 16 country labels);
+  `full-export.test.ts` re-pinned to the renamed export heading.
+
+### Budget
+
+- Insights lazy chunk consciously bumped **636.00/152.50 → 652.00/156.50**
+  (measured 650.28/155.51; +14.37 kB raw / +3.51 kB gz — the new feature
+  layer + ~108 strings × 2 locales; the 16 JPEGs are public assets, not
+  chunk bytes). Entry chunk untouched (295.29/88.81 vs 296/89.5). D-35 in
+  `docs/DECISIONS_FOR_ALI.md`.
+
+### Not changed
+
+Providers, crons, KV, the public read route, the §5.3 signal rules, hero
+integration, the detail panel's 52-week chart, the full table, the CSV
+exports; no deploy (the branch waits for the owner's review; the legacy
+production Django app untouched).
+
+## [2026-10-26e] — the repository root cleaned of misplaced specification markdown (owner cleanup work order)
+
+The owner's minimal-cleanup work order: move the specification-related
+Markdown out of the repo root into the EXISTING folders that already hold
+their siblings, update every affected live reference, and touch nothing
+else. Docs-only: zero code, zero copy, zero behavior change; both moves
+are byte-identical git renames (R100 — the contents are preserved
+exactly, no rewrite/merge/delete). Rationale recorded as D-34.
+
+### Changed — two files moved, two live references updated
+
+- **`economic-indicators-ui-spec.md` →
+  `docs/insights/economic-indicators-ui-spec.md`.** The Economic
+  Indicators page UI/UX specification joins its own lineage in
+  `docs/insights/` — the sibling UI specs (`02-page-design-spec.md`,
+  `06-ux-round-2-spec.md`, `gold-balance-card-spec.md`) and its
+  companion record `economic-indicators-verification-notes.md`, whose
+  header now points at the new path instead of claiming the repo root.
+  NOT `docs/specs/` — that folder is the governing world-currencies /
+  world-markets data-spec lineage per AGENTS.md's docs map.
+- **`REMAINING_WORK.md` → `docs/REMAINING_WORK.md`.** The CLOSED
+  (2026-10-15c) follow-up work order moves in with its process-doc
+  siblings (`BACKLOG.md`, `NEXT_SESSION_PROMPT.md`, `PROGRESS.md`,
+  `SESSION_LOG.md`); the README docs-map pointer now reads
+  `docs/REMAINING_WORK.md`. Its own internal references are
+  repo-root-relative prose paths, which remain valid from `docs/`.
+- **Left exactly as-is (deliberate, minimal diff):** `README.md`,
+  `AGENTS.md`, `CHANGELOG.md` (essential root files per the work
+  order); the bare-name spec citations in code comments
+  (`VerdictMeter.tsx`, `HeroBlock.tsx`, `ToolsMenu.tsx`,
+  `apps/web/src/index.css`, `scripts/check-bundle-budget.mjs` — no
+  path, name unchanged, grep-resolvable, so no app-code churn); the
+  historical session/decision/changelog records (DEPLOY.md headings,
+  D-28, the 2026-10-15 CHANGELOG/PROGRESS rows — records of past
+  events, not live pointers); `financial-asset-cards-spec-pack.zip`
+  (not a Markdown file and not a supporting asset of the moved specs —
+  outside the work order's `.md` scope); `vite-dev.log` (untracked
+  local artifact). The root now holds only `README.md`, `AGENTS.md`,
+  `CHANGELOG.md` and application configuration. No Markdown-link form
+  (`](…)`) references either file anywhere in the tree (audited), so
+  nothing else can 404. Pre-existing staleness observed and NOT
+  touched (out of scope): `docs/insights/CURRENT_STATE_REPORT.md`
+  claims `FIX_REPORT.md` sits at "repo root" (it lives in
+  `docs/insights/`).
+
+## [2026-10-26d] — the gold balance rotates ONLY its beam, and visualizes weight (Iteration-5 addendum: v7)
+
+The owner's Iteration-5 addendum supersedes the earlier pan-rotation,
+tilt/motion and tile-content rules: "Rotate the beam only, and
+visualize weight". The scoring model, the data and the Persian copy
+are untouched (the net/total ratio law is byte-identical); only its
+PRESENTATION scale changes (max 8° at the model's full range, floor
+2° for any valid directional result, exactly 0° for neutral and for
+unavailable). Strictly scoped to the balance component + the gauge
+copy key.
+
+### Changed
+
+- **Exactly ONE rotating element (BalanceScale.tsx)** — the beam
+  group (tapered bar + accent beads + pivot ring + needle) rotates by
+  `rotate(θ, pivotX, pivotY)` about the pivot. The v6 CSS-calc stage
+  (`--t`/`--s`/`--drop-*`/`25cqw × sin()` + the 0.2×θ pan tilt) is
+  retired: the mechanical drawing is now an SVG layer whose hangers
+  are recomputed EVERY FRAME as straight lines from each side's
+  beam-end joint (cx ± (L/2)·cos θ, cy ± (L/2)·sin θ) to the pan's
+  two fixed rim corners. The pans move by `translate(0, dy)` ONLY —
+  exactly their joint's vertical displacement, so they hang plumb;
+  their rotation is exactly 0°, and tiles/text/icons/pills are never
+  rotated, skewed or scaled.
+- **ONE animated value in JS (the Odometer's rAF pattern)** — a
+  single θ state drives the beam rotation, joint positions, pan
+  translations and hanger endpoints in the SAME render frame (no CSS
+  transitions on any element, so nothing can desync and detach). The
+  SSR/first paint already carries the verdict angle; a changed
+  verdict settles over ~500 ms ease-out cubic; reduced-motion users
+  land immediately. The stage width is measured pre-paint + via
+  ResizeObserver so the whole drawing scales as one piece; the
+  vertical travel stays inside the fixed reserved envelope
+  (160 × sin 8° ≈ 22.27px at the 640 design width — asserted in
+  tests).
+- **The pointer-needle gauge (addendum §B)** — a slim needle fixed to
+  the beam's pivot, pointing downward and rotating with the beam,
+  read against a small FIXED arc scale with THREE ticks only (adverse
+  end · centre · supportive end, labelled by verdict — a rigid
+  down-needle swings opposite the heavy pan, so the tick the needle
+  reaches when a side is heavy names that side; no numeric labels, no
+  fabricated thresholds). The needle hides when the state is
+  unavailable. The whole drawing is one `role="img"` whose label is
+  the needle's text equivalent — `gaugeAria`, round-52, one new copy
+  key × 2 locales + QA record + manifest entry.
+- **Weight visuals, honestly scoped** — the model audit found: a net
+  score EXISTS (count-based: net = for − against), but there are NO
+  per-side weighted totals and NO per-factor weights. Therefore the
+  side-load bar and the per-tile weight marker are deliberately NOT
+  implemented (the addendum forbids fabricating them); the beam angle
+  (from the net ratio) and the needle are the only weight read-outs.
+- **The v4 keystone is retired** — the addendum's rotating pivot ring
+  + downward needle + fixed arc replace the static hub-and-keystone
+  mark (the needle's mandated path runs exactly through where the
+  keystone sat).
+- **balance.test.tsx rewritten (45 tests)** — the angle law on the
+  new scale (floor 2°, max 8°, the 1-vs-4 and 5-vs-5 count-vs-weight
+  fixtures); the pure `balanceStageGeometry()`/`balanceGaugeGeometry()`
+  contracts (plumb drops, θ-free rim x, joint = rotated beam end,
+  envelope ≤ 160×sin 8°, stage heights reserve the stack + swing, RTL
+  visual-sign flip with direction-free drops); rendered structure
+  with the addendum-§A audit (ONLY the beam group carries rotate; the
+  two assemblies carry `translate(0px, Npx)`; tiles/hangers/rings/
+  text carry NOTHING), hanger endpoints == the pure geometry, needle
+  hidden for 'none', the gauge aria in both locales, the target-change
+  landing, and all v6 behaviour tests kept (capacity, pills, empty
+  pans, interactions, order, integration).
+
+### Verified (addendum §C)
+
+- DOM audit at every fixture: exactly 3 transformed elements (beam
+  group rotate + 2 assemblies translate-only); attach error 0.000px
+  at θ = 0°, 2°, 5.71°, 8° and at 390/768/1366 × en/fa.
+- Mid-animation probe (D→E settle, 49 rAF samples): 0 violations —
+  pan drop == joint Δy and rim == pan top + drop on EVERY frame.
+- Fixtures: 1-vs-4 → 4.8° (count settles it — the model has no
+  weights); 5-vs-5 → 0° "Balanced"; 5-vs-0 → the 8° maximum; all
+  unread → 0°, «فعلاً قابل ارزیابی نیست», needle hidden.
+- Tile text 12.48px (≥ 12px), horizontal, fa-RTL + en-LTR at
+  1366/768/390; zero horizontal overflow at 390.
+- Gates: typecheck 6/6; 1,534 tests green; lint 0 errors/15 accepted
+  advisories; copy:audit clean (2,170 entries); build + budgets —
+  Insights 635.18/152.06 vs the bumped 636/152.50 (D-33), entry
+  chunk untouched 295.29/88.81. Merged-tree re-gate with the parallel
+  2026-10-26c sidebar round: 1,536 tests green, the lazy chunk
+  measures 635.91/152.00 — still inside the bump, no further bump.
+
+## [2026-10-26c] — the asset cards' details move to the side panel (owner directive)
+
+The owner's directive — "The more details must show up in side bar" —
+relocates the «جزئیات بیشتر» surface: the five detail sections that used
+to expand INLINE inside each asset card now render inside the F5 DETAILS
+SIDE PANEL (desktop: inline-end sheet, RTL: start sheet, phones: bottom
+sheet). Clicking «جزئیات بیشتر» opens the panel (the same dialog the
+whole-card click-through opens) with the sections directly under the
+card facts — the card itself NEVER expands, so the four-tile grid stays
+compact and stable, and the details inherit the panel's focus trap,
+Escape, scrim, scroll lock and focus-return for free. No section content
+changed: the five sections (A تغییرات قیمت … E منبع داده و زمان
+به‌روزرسانی) render byte-identical reviewed copy, from the same data
+paths.
+
+### Changed
+
+- **PricesBoard.tsx** — the per-card disclosure (open state,
+  aria-expanded/aria-controls, the inline panel div and ~140 lines of
+  section markup) is GONE; the «جزئیات بیشتر» button now calls
+  `onFocusCard(id, trigger)` (aria-haspopup="dialog", the panel-side
+  affordance PanelRight/PanelLeft by locale). The tile slims to the
+  collapsed-card facts (trend, daily change, briefing) — all
+  panel-only computations moved out.
+- **PriceDetails.tsx (new)** — the five sections as a self-contained
+  `PriceDetailsSections` component: the shared atoms (ChangeValue,
+  PanelSection, DetailRow, NoteLine, formatPriceRange, formatUpdatedAt)
+  relocated from PricesBoard, plus `usePricePanelData` — the same
+  module-cached history fetch the sparkline and the panel chart use
+  (one request, three consumers), keyed by id so a panel that switches
+  readings never shows stale stats.
+- **DetailsPanel.tsx** — accepts `readings` (the snapshot's full
+  readings, for the companion lines) and renders `PriceDetailsSections`
+  for the four price rows directly under CardFacts; the panel HEADER now
+  carries the card's verified title (priceCardTitles — "Gold price", not
+  the registry's legacy "Gold price (ounce)") so the sidebar and the card
+  describe the asset identically. Insights.tsx passes the readings.
+- **Copy** — `lessDetails` («نمایش کمتر») retired from BOTH dictionaries
+  + its manifest entry deleted (the disclosure's collapse label is gone
+  with the disclosure; the panel's close affordance replaces it). The `٪`
+  technical entry re-homed PricesBoard → PriceDetails with the code it
+  terminates. Round-52 triage:
+  docs/QA/quirks-2026-10-26c-asset-cards-sidebar.md. `moreDetails`
+  («جزئیات بیشتر») stays the button's label.
+
+### Tests
+
+- prices-cards.test.tsx rewritten for the new behavior (+2 net): the
+  board tests assert «جزئیات بیشتر» calls onFocusCard with the id + the
+  trigger element and that NO sections render on the cards (en + fa);
+  the section/coverage/methodology-guard tests now render DetailsPanel
+  (the real surface) — all five sections, the «تا» range, the 10-year
+  record, the served-attribution notes, the no-methodology guards in
+  both locales, and the non-price-indicator negative case. 13 tests in
+  the battery (was 11).
+
+Gates: typecheck 6/6; lint 0 errors/15 accepted advisories (unchanged —
+the panel-data hook is keyed, not sync-reset); 1,522 tests green (web
+550); `copy:audit` clean (2,167 entries); web build OK; budgets held
+(Insights 629.41/150.53 vs 630/151; entry 295.29/88.81 untouched).
+Verified on the production build + real API (:4173 harness): EN 1280 —
+the panel opens on the right (440px, flush inline-end) with the five
+sections under the facts, heading "Gold price", focus trapped, body
+scroll locked, Escape closes and focus RETURNS to the trigger; fa RTL —
+«قیمت طلا» heading, the five Persian sections, sheet flush LEFT, caret
+probes prove the range reads «۳٬۹۶۱ تا ۵٬۳۱۸ دلار» (right=۳٬۹۶۱ /
+center=تا / left=دلار); mobile 375 — bottom sheet full-width, no
+horizontal overflow, scrim click closes; the four tiles stay compact
+(zero h4 inside the cards); zero console errors.
+
+*(Rebased over the parallel balance-v6 round `2f9f4e6` — the balance
+component's pans re-composition rides beneath; no file overlap beyond
+the shared changelog/manifest prepend.)*
+
+**Deployed**: pushed as 99742c2 (rebased over the parallel balance-v6
+round) and live on currena-api worker `6adfb632` (SITE_MODE=public,
+bindings/cron unchanged; currena-markets untouched); serves
+index-gB3_zV9f.js + Insights-DW1SDXvu.js — the fresh build's exact
+filenames, live on both currena.ir and workers.dev. Live-verified:
+EN desktop — the right sheet opens with the five sections under the
+facts, focus trapped, Escape closes and focus returns to the trigger;
+fa RTL — «قیمت طلا», the five Persian sections, the sheet flush LEFT;
+mobile 375 fa — bottom sheet, no overflow; zero console errors. Deploy
+record: docs/DEPLOY.md §CURRENT DEPLOYMENT; live captures in
+docs/evidence/2026-10-26c-asset-cards-sidebar/.
+
+## [2026-10-26] — the gold balance's factors REST ON real pans (Iteration 4: the balance becomes a connected weighing machine)
+
+The owner's Iteration-4 directive: the latest v5 composition (factor
+columns above an abstract beam with colored endpoint dots) "does not
+convincingly communicate that the factors are the loads causing the
+balance to tilt". The required result: real weighing pans attached to
+the beam ends with the factor items visibly supported by the pan
+surfaces, while preserving the editorial financial-dashboard aesthetic.
+Strictly scoped to the balance component, its factor lists, the
+aggregate summary and the supporting copy — no page layout, token,
+other-card or model change. The tilt law (|net|/total × 12°, 4° floor,
+level at net 0 and at readable 0) is byte-identical; the NUMBER of
+tiles never sets the tilt, only the documented net/total ratio does.
+
+### Changed
+
+- **The drawing (BalanceScale.tsx)** — one fixed-height CSS stage
+  (240px ≥ sm / 260px below, max-w-[640px]) replacing the 520×88 SVG:
+  a weightier tapered beam (12px mid, rotating about the compact
+  hub-and-keystone pivot), accent beads terminating the beam ends, TWO
+  thin suspension lines per side splaying from the bead down to the
+  pan's top edge (with tiny junction "ring" dots), and a SHALLOW
+  RIMMED PAN per side (1.5px rim, 3px floor edge in the darker ink, an
+  inner wall line for tray thickness, soft surface tint, drop shadow).
+  The pans HANG at a fixed distance below their beam ends and are
+  rigid parts of one translating assembly.
+- **Physical coherence, pure CSS** — the beam rotates by the model's
+  angle θ (`--s`, RTL-sign-flipped), and each pan assembly translates
+  by EXACTLY its bead's drop — `25cqw × sin(--t)` (25cqw = Lh ÷ 2 by
+  construction, the beam spans half the stage; `--t` is the
+  direction-free physical sign) — and tilts by a restrained
+  0.2 × θ (≤ 2.4° at the 12° maximum) about its hang point. Measured
+  on the harness: the pan-pair and bead-pair height differences are
+  byte-equal (22.32px = 320×sin 4° at case A; 66.53px = 320×sin 12° at
+  case E) at every angle. No ResizeObserver, no runtime measurement; a
+  browser without CSS `sin()` degrades to the level state (never a
+  wrong direction).
+- **The factor tiles rest ON the pans** — compact buttons (icon + full
+  short label, never truncated + the value where space permits) sit
+  bottom-aligned on the pan's floor with a contact shadow, gapped, in
+  a fixed-height pan: they read as the loads. Each tap opens the shared
+  detail panel. The full-width v5 factor columns above the beam are
+  retired.
+- **Capacity + overflow (v6 rule 3)** — each pan shows its first
+  BALANCE_PAN_CAPACITY (2) tiles; the rest are counted by a "+{n}
+  more" pill hanging just under the pan (inside the translating
+  assembly, clearly attached to its side, deliberately NOT on the pan
+  surface so it can never read as another load or a fabricated
+  weight). The pill expands the side's full row list below the
+  assessment ("Show fewer" collapses); an empty side shows its full
+  evidence-based line WITHOUT any disclosure. Nothing is silently
+  omitted; the model still sees every driver; the stage's geometry
+  never depends on any count (regression-tested).
+- **Empty pans are deliberate (v6 rule 2)** — an empty side keeps its
+  COMPLETE pan (hangers, rim, floor) with a minimal muted marker
+  inside: `panEmpty` ("No qualifying signals" / «نشانهٔ معتبری نیست»)
+  when the evaluation ran, the distinct `panUnreadable` ("Nothing to
+  weigh yet" / «هنوز چیزی برای سنجیدن نیست») when nothing could be
+  read (readable 0). The five-state semantics of v4 are unchanged.
+- **RTL** — the pan columns, captions and list sections mirror via
+  CSS-grid direction; the for-bead uses `inset-inline-start` so it
+  always terminates the beam end above the for-pan; the beam's visual
+  rotation sign flips in JS (`--s`) while the physical drop sign
+  (`--t`) stays direction-free. Nothing mirrors text.
+- **Copy (round-51, QA record docs/QA/quirks-2026-10-26-balance-v6-fa-copy.md)** —
+  2 NEW keys (`panEmpty`, `panUnreadable`) in both locales; all other
+  strings byte-identical to round-50. Manifest 2,152 → 2,154 entries,
+  audit clean.
+
+### Budget
+
+- The v6 round measured 631.01/150.80 alone (raw +4.01 kB, gz +0.80 kB
+  over v5's 627.00/150.00 — the honest price of the directive's
+  mandated markup; the entry chunk untouched at 295.29/88.81). Push
+  time found the PARALLEL 2026-10-25b asset-cards-polish round on
+  origin (629.04/150.69 from the same base) — the merged tree measures
+  634.57/151.67 vs the bumped 635.00/152.00 (both rounds' bumps ride
+  in scripts/check-bundle-budget.mjs). Justified here and in D-32
+  (docs/DECISIONS_FOR_ALI.md).
+
+### Verified
+
+- balance.test.tsx rewritten for v6 (30 tests): the §4/§6/§13 logic
+  suites byte-identical (the tilt law, the counts, the verdict words)
+  + signedTiltDeg, the rendered structure, the pan-drop CSS law, the
+  capacity/overflow disclosure, the distinct empty/unreadable pans,
+  the RTL sign split, the no-text-mirror source guarantee, the order,
+  the interactions (tile/row/chip → one shared panel; the pill
+  expansion) and the merged-card integration.
+- On the (temporary, deleted) harness: cases A–H × en/fa ×
+  1280/360/320, both themes — pan/bead sync measured exact, zero
+  horizontal overflow (320px included), keyboard Enter opens the
+  panel, zero console errors, VLM scenario review all pass
+  ("coherent machine", "factors clearly read as physical loads";
+  its "steepen the tilt / shrink the empty pan" suggestions declined —
+  the owner's model and fixed-geometry rules).
+- Gates: typecheck 6/6; 1,505 tests (web 533); lint 0 errors / the
+  15 accepted advisories; copy:audit clean (2,154); bundle budgets
+  held (documented bump above).
+- Evidence: docs/insights/screenshots/gold-balance/v6/ (a before/after
+  comparison, the full scenario sweep, the interaction captures, dark
+  + mobile sets) + README; notes §v6 in
+  docs/insights/gold-balance-card-notes.md.
+
+## [2026-10-26b] — the asset cards drop the «دربارهٔ این اعداد» methodology note (owner directive)
+
+A one-scope removal, requested verbatim by the owner after reviewing the
+2026-10-25b polish: the sixth expanded-detail section — the heading
+«دربارهٔ این اعداد» ("About these numbers") and its three-sentence
+methodology body (the shared seven-day window, the daily-change basis, the
+no-fabrication rule) — no longer renders on the asset cards. The panel now
+carries the five data sections A–E (تغییرات قیمت / محدودهٔ قیمت در ۵۲
+هفتهٔ گذشته / سوابق تاریخی قیمت / جایگاه قیمت نسبت به شاخص‌های مرجع /
+منبع داده و زمان به‌روزرسانی). The methodology ITSELF is untouched — the
+window semantics live in `price-trend.ts` / `price-stats.ts` and stay
+documented in the code comments and QA docs; only the on-card disclosure of
+it is gone.
+
+### Removed
+
+- **PricesBoard.tsx** — the section F `<PanelSection>` block and its
+  header-comment map entry (the comment now carries this round's tag so the
+  removal stays traceable where the section used to be described); the rest
+  of the component — all five sections, the collapsed card, the conditional
+  coverage notes — is untouched.
+- **Copy** — `aboutNumbersLabel` / `aboutNumbersBody` deleted from BOTH
+  dictionaries (en "About these numbers…" / fa «دربارهٔ این اعداد…»), and
+  the two matching entries deleted from
+  `docs/localization/persian-copy-manifest.json` in the same commit, per
+  the copy workflow's removal rule (manifest 2,170 → 2,168 entries;
+  `copy:audit` clean).
+- **prices-cards.test.tsx** — the section-F assertion is replaced with
+  removal guards in BOTH locales (`queryByText('About these numbers')` and
+  `queryByText('دربارهٔ این اعداد')` must both stay null), so the removal
+  itself is now a tested behaviour; the A–F labels in the file updated to
+  A–E. Still 11 tests in the battery.
+
+Gates: typecheck 6/6; lint 0 errors (15 accepted advisories, unchanged);
+1,520 tests green; `copy:audit` clean (2,168 entries); web build OK; bundle
+budgets held — the removed copy shrinks the Insights chunk ~1.2 kB
+(628.67 kB / 150.59 kB gz vs the 630/151 budget; entry chunk untouched at
+295.29/88.81).
+
+**Deployed**: pushed as 648f5aa (no rebase — main had not advanced) and
+live on currena-api worker `f9571a79` (SITE_MODE=public, bindings/cron
+unchanged; currena-markets untouched); serves index-CKqYpOMM.js +
+Insights-7kn32ZoI.js — the fresh build's exact filenames. Live-verified on
+currena.ir + workers.dev: en + fa RTL expanded cards show EXACTLY the
+five sections with zero occurrences of the removed heading in either
+locale, the last section paints inside the tile (element-from-point
+probe), mobile 375 no overflow, zero console errors. Deploy record:
+docs/DEPLOY.md §CURRENT DEPLOYMENT; evidence
+docs/evidence/2026-10-26b-remove-methodology-note/ (sandbox + live).
+
+## [2026-10-26] — the gold balance re-composed to the owner's wireframe reference (factors above, beam beneath)
+
+The owner supplied a hand-drawn reference board
+(`docs/ui-reference/gold-silver-balance-target-wireframe.png`, also delivered
+via upload) with the target composition: a concise heading + subtitle, the
+TWO OPPOSING FACTOR GROUPS at the top (supportive vs adverse columns), a
+simplified abstract balance centred BENEATH both groups with its endpoints
+visually corresponding to the columns, a compact aggregate assessment under
+the illustration, progressive disclosure for additional factors, and a mobile
+adaptation preserving the same hierarchy. Strictly scoped to the balance
+component and its factor lists — no page, provider, scoring, data or
+unrelated-card change. The tilt law (|net|/total × 12°, 4° floor, level at
+net 0 and at readable 0) is untouched; no weight, threshold or angle was
+invented to imitate the sketch's example tilt.
+
+### Changed
+
+- **The composition (BalanceScale.tsx)** — the wireframe's vertical order:
+  the concept's heading + subtitle now lead into the TWO FACTOR COLUMNS
+  (side by side ≥ `sm:`, stacked below, DOM order for → against = tab
+  order), the abstract editorial beam sits BENEATH them sharing the same
+  max-w-[640px] footprint, and the aggregate assessment follows directly
+  under the drawing. The v4 order (illustration first, lists beneath it,
+  divider-separated verdict at the end) is retired. The beam keeps v4's
+  abstract mark — one tapered beam, compact hub + 13u keystone pivot,
+  accent endpoint beads, dotted level reference — with the arm re-proportioned
+  so the beads sit exactly under the two columns' centres (Lh 336u → 260u =
+  25%/75% of the footprint; the canvas 520×104 → 520×88; the ANGLE law is
+  byte-identical, only the drawn arm is shorter).
+- **Progressive disclosure per column (new, the reference's "view all
+  factors")** — each column reveals its first 3 rows (BALANCE_LIST_REVEAL =
+  3, the attention-tile convention); beyond that a "+{n} more" pill expands
+  the list, "Show fewer" collapses it back — reusing the site's existing
+  copy keys (`ui.attentionTileMore` / `ui.showFewer`) and the tiles' pill
+  anatomy (`aria-expanded` + `aria-controls` → the column). Neither the row
+  count nor the disclosure state can affect the illustration: the zone's
+  SVG is byte-identical across 1/2/6-row cases and across expansion
+  (regression-tested).
+- **The aggregate assessment (the reference's conclusion box)** — the
+  verdict word + icon (now in the question voice, the box's focal line),
+  the count line, and the C12 banner ride together in ONE compact, centred,
+  soft box (bg-currena-soft/60, max-w-440) directly beneath the drawing —
+  replacing v4's divider-separated block.
+- **The empty side (the reference's deliberate empty states)** — the
+  evidence-based line now sits in the same soft tint block (no ring, no
+  dashed border — never a placeholder slot), keeping the column's visual
+  presence when its opposite carries rows. The five-state semantics
+  (no-qualifying-factors vs insufficient vs unavailable vs mixed vs valid)
+  are unchanged, as are all their Persian/English strings — zero copy
+  changes, zero manifest entries, audit clean.
+
+### Kept (explicitly verified)
+
+- The tilt follows the real model only: supportive dominance lowers the
+  supportive bead, adverse lowers the adverse, balanced and
+  nothing-readable stay level (all five states regression-tested; the
+  harness cases A–E/G/H re-verified by measurement: bead Δy = Lh×sin(angle)
+  with 0.0u diff at 1280 and 360).
+- RTL mirrors the whole SVG with one scaleX(-1): the for column and its
+  bead both land on the inline-end (right) side in fa, the visual rotation
+  sign flips with the mirror, Persian digits and the bidi islands render
+  correctly (DOM-measured on the harness at 1280; mobile 360 fa captured).
+- Rows stay real buttons with aria-expanded + the shared detail panel (one
+  open at a time); trays keep the neutral/unread distinction; keyboard
+  focus + Enter verified; no horizontal overflow at 320/360/768/1280.
+
+### Budget
+
+- Insights lazy chunk: 626.27/149.92 vs budgets 627.00/150.00 — the raw
+  budget bumped +0.27 kB (626.00 → 627.00, gz HELD) for the per-column
+  disclosure pills + the assessment box; documented in
+  `scripts/check-bundle-budget.mjs` and D-31. Entry chunk untouched
+  (295.29/88.81 vs 296/89.5).
+
+### Gates
+
+- typecheck 6/6 packages; 1,506 tests (web 534 — the balance suite now 31:
+  the v4 assertions re-pinned to the wireframe order + new
+  progressive-disclosure tests; insights 463; api 238; core 191; scraper
+  67; markets 13); lint 0 errors / 15 accepted advisories; copy:audit
+  clean (zero new strings — the disclosure reuses reviewed keys);
+  build + bundle budgets held. Visual loop: baseline (v4) captured →
+  implementation → desktop/mobile/dark/RTL captures → VLM design +
+  scenario critique rounds → refinements (the empty-state tint block, the
+  verdict-word hierarchy, the pill-class dedupe) → final pass clean
+  ("professional editorial data visualization", all tilt/empty/RTL states
+  verified). Evidence: `docs/insights/screenshots/gold-balance/v5-iteration/`
+  (24 captures + README).
+## [2026-10-25b] — the asset-cards polish round: editorial hierarchy, one-line prices, honest instrument notes
+
+The owner's polish task: make the four financial asset cards feel like
+a premium editorial financial publication — strictly scoped to the
+cards and their supporting copy; no page, provider, scoring or routing
+change; every working calculation preserved.
+
+### Changed
+
+- **The asset header** — the icon vertically centred against a title
+  block: the plain title («قیمت طلا» / "Gold price", 18px semibold)
+  over a measurement-basis subtitle («هر اونس تروی» / "per troy
+  ounce", 13px secondary). The unit left the title ("Gold price
+  (ounce)" retired); the four units verified against the served
+  instruments (gold/silver per troy ounce — XAU/XAG spot and the
+  GC=F/SI=F live refresh both quote per troy ounce; Brent per barrel;
+  Bitcoin per coin).
+- **The one-line price (the owner's required correction)** — the
+  number (28px bold tabular) and its currency share ONE baseline
+  («۴٬۱۶۶ دلار» / "US$4,166") via the new pure `priceValueParts`
+  display helper; each part an isolated `<bdi>` so a direction change
+  can never split or reorder them. The old two-line block (digits,
+  then «دلار» beneath) is gone.
+- **The expanded panel reorganised into six semantic sections** —
+  تغییرات قیمت (one «X گذشته» label family: «هفت روز گذشته / ۳۰ روز
+  گذشته / ۹۰ روز گذشته / ۶ ماه گذشته / ۱ سال گذشته») → محدودهٔ قیمت در
+  ۵۲ هفتهٔ گذشته («۳٬۹۶۱ تا ۵٬۳۱۸ دلار», «تا» BETWEEN the endpoints,
+  rendered in the locale's own direction) → سوابق تاریخی قیمت →
+  جایگاه قیمت نسبت به شاخص‌های مرجع (10-year level + note, 200-day
+  gap, distance from the 10-year high, companion ratios — Bitcoin's
+  two metal ratios now ONE sentence; fa's second ratio was a
+  fragment) → منبع داده و زمان به‌روزرسانی (attribution link,
+  observation date vs the app's fetch time, coverage notes) →
+  دربارهٔ این اعداد. Section headings drop the latin-only
+  uppercase/letter-spacing in fa (tracking visually separates joined
+  Persian script).
+
+### Fixed (data corrections, verified against the implementation)
+
+- **The futures note no longer lies on spot prices** — it rendered
+  unconditionally on gold/silver/oil while the served EOD snapshot is
+  gold-api XAU/XAG SPOT. It now shows ONLY when the served
+  attribution actually is the futures quote (the serve-time live
+  merge rewrites `sourceName` to the Yahoo GC=F/SI=F/BZ=F attribution
+  when a fresher quote wins). Brent's EOD attribution (EIA spot ∪
+  BZ=F gap-fill) gets its own accurate blend note.
+- **The record label no longer claims all-time coverage** —
+  «بیشترین مقدار تاریخی» / "Historical high" became «بیشترین قیمت ۱۰
+  سال اخیر» / "10-year high": `computePeaks` reads the 10-YEAR window
+  (Brent's own series is explicitly capped to it).
+
+### Tests & gates
+
+- +14 tests (prices-cards.test.tsx: header/one-line price/sections/
+  bidi range/conditional notes/disclosure; price-value-parts.test.ts).
+- typecheck 6/6; lint 0 errors/15 accepted advisories; 1,520 green;
+  copy:audit clean (round-51: 18 new + 5 relabelled strings triaged
+  against docs/QA/quirks-2026-10-25b-asset-cards-polish.md); build OK;
+  Insights budget consciously bumped 626/150 → 630/151 (measured
+  629.04/150.69 — bilingual copy + panel structure; entry untouched).
+- Verified on the production build + real production API (harness):
+  layout/bidi caret probes (the fa range reads exactly «۳٬۹۶۱ تا
+  ۵٬۳۱۸ دلار», U+066C separators), en+fa, 1280/768/375/320, dark,
+  keyboard, click-through, zero console errors. Evidence:
+  `docs/evidence/2026-10-25b-asset-cards-polish/` (before/after).
+- Rebase note: authored against the 2026-10-24d deploy (cc6f28e6) and
+  rebased over the 2026-10-26 balance-v5 round (5f37014) before
+  push/deploy; the v5 round touches BalanceScale/MergedCard/its tests
+  only — PricesBoard and the copy keys are untouched there, and the
+  budget script carries both rounds' justifications (627 by v5 → 630
+  by this round).
+- Deployed: pushed as db31745 → currena-api worker
+  ead002b6-3c9e-4e9a-aae9-4535bb462f9f; re-verified LIVE on both
+  currena.ir and the workers.dev domain (Insights-BMyE-MXL.js served;
+  en + fa desktop and mobile 375: header/one-line price/six
+  sections/range/record/conditional notes, no overflow, zero errors) —
+  evidence `docs/evidence/2026-10-25b-asset-cards-polish/LIVE-*.png`,
+  deploy record in `docs/DEPLOY.md` §CURRENT DEPLOYMENT.
+
+## [2026-10-25] — the gold balance becomes the abstract editorial mark «برآیند عوامل مؤثر بر قیمت طلا» (owner Iteration-2 directive)
+
+The owner reviewed the deployed v3 classic hanging-pan balance ("a literal
+weighing scale with suspended bowls, wires, and a tall central column … not
+the desired visual direction") and directed the earlier, simpler concept: an
+abstract, restrained, editorial visualization. Strictly scoped to the
+gold/silver balance component and its factor lists — no page, provider,
+scoring, data or unrelated-card change. The tilt law (|net|/total × 12°,
+4° floor, level at net 0 and readable 0) is untouched; no weight or threshold
+was invented.
+
+### Changed
+
+- **The illustration (BalanceScale.tsx)** — ONE inline SVG in a flat 520×104
+  viewBox: a refined slightly-weighted tapered beam (9u at the centre → 6u at
+  the ends) rotating around a compact geometrically precise pivot (9u hub +
+  surface pin dot + 13u keystone triangle — NO base bar, NO tall column),
+  with subtle accent-coloured endpoint beads (green for / red against — the
+  only colour in the drawing) and the dotted level reference through the
+  pivot. The v3 machinery (pillar, plinth, chains, suspended pans, pan
+  translations, the 252u-tall viewBox) is deleted; the geometry was reworked,
+  not recoloured or resized. RTL stays one scaleX(-1) mirror; the 500 ms
+  reduced-motion-aware tilt transition stays.
+- **The hierarchy (Iteration-2 §3 order)** — the block now leads with the
+  concept's own heading «برآیند عوامل مؤثر بر قیمت طلا» / "The aggregate of
+  factors affecting the price of gold" (card-question voice) + a concise
+  explanatory subtitle (caption voice), then the illustration, then the two
+  side-labelled factor lists (now sharing the beam's max-w-520 footprint so
+  each list sits under its side's half; stacking to one column below sm:),
+  then the OVERALL ASSESSMENT at the end (verdict word + count line + the
+  C12 banner where needed, divider-separated), then the shared detail panel
+  and trays. The v1 "answer-first" verdict placement is retired by this
+  directive's own ordering.
+- **Side labels + empty-state copy (round-50)** — the list captions become
+  «عوامل حمایتی از قیمت طلا» / "Factors supporting gold's price" and
+  «عوامل فشارآور بر قیمت طلا» / "Factors pressuring gold's price"; the
+  empty-side lines adopt the owner's suggested evidence-based wording, and a
+  NEW distinct unavailable wording (`listEmptyNone`) renders on BOTH sides
+  when nothing could be read — an absence of readings is never worded as an
+  absence of pressure. QA record
+  `docs/QA/quirks-2026-10-25-balance-v4-fa-copy.md`.
+- **Tests (balance.test.tsx)** — rewritten for v4: the SVG part inventory
+  (beam body, beads with side accent fills, hub, one-path fulcrum, the
+  reference as the ONLY line), the heading/subtitle/order assertions, the
+  unavailable-empty-state split (case D), the LTR-signed rotation (case C
+  negative), the lists-footprint classes, the RTL mirror and the
+  divider-separated assessment, on top of the unchanged §4/§6/§13 logic
+  suites and the merged-card integration.
+
+### Verified
+
+- Browser (temporary harness, deleted before commit): the bead height
+  difference equals Lh × sin(angle) with 0.0u diff on every case (A 4°,
+  B/D/G level, E 12°, H −4°) at both 1280 and 360 (scale 0.5385); zero
+  horizontal overflow at 360/1280 in en + fa; keyboard Enter opens/closes
+  the shared panel; zero console errors on a fresh session; VLM design
+  review passes on the reworked geometry ("refined in its restraint",
+  "well-proportioned", "balanced and professional") with the tilt-angle and
+  green/red-token suggestions declined (owner's model and tokens).
+- Gates: typecheck 6/6; 1,486 tests; lint 0 errors / 15 accepted advisories;
+  copy:audit clean (2,152 entries, round-50); bundle budgets held (entry
+  295.29/88.81; Insights lazy 625.46/149.74 vs 626/150).
+- Screenshots: `docs/insights/screenshots/gold-balance/` — the v4 battery
+  (A/B/C/D/E/G/H × en/fa × 1280/360 + 768 + dark + the banner variant) and
+  the before-v3 capture.
+## [2026-10-24d] — the «جزئیات بیشتر» white-space fix (the owner's post-deploy report; rebased over the 2026-10-25 balance-v4 round)
+
+The owner reported that on the LIVE deployment clicking «جزئیات بیشتر» /
+"More details" produced "just a white space with no more extra detail", and
+that the prices block and the markets (index) section below it read as
+collided. Reproduced on production (worker 7b939901): the bug shipped with
+2026-10-24c itself and the original session's expanded-state verification
+relied on DOM/aria assertions while the pixels showed the white space —
+both live evidence screenshots from that round show the defect.
+
+### Fixed
+
+- **Why the panel vanished** — the card-body click-through button carried
+  `h-full` (height:100%). The tile `article` is a stretched grid item, so
+  once the disclosure opened, the grid row grew to fit card+button+panel,
+  the article stretched to the row, and the body button then resolved
+  `h-full` against the FULL stretched article height — pushing the
+  disclosure trigger and the expanded panel BELOW the tile's box. The
+  panel kept its DOM/aria state (why aria-expanded checks passed) but
+  painted under the following cards (mobile: Silver/Brent tiles) or under
+  the markets section (desktop) — later DOM siblings paint on top —
+  leaving ~690px of white space and, on desktop, the "collision" with the
+  markets section.
+- **The fix** — the article becomes `flex h-full flex-col` and the body
+  button drops `h-full` and keeps `grow`: it now only fills the space the
+  disclosure leaves it, so the trigger and panel stay INSIDE the tile and
+  the tile grows naturally with the open panel (spec 02 §5 — never clip to
+  force equal heights). Equal tile heights across the row are preserved
+  (grid stretch + `grow`), so nothing else about the anatomy changes.
+- **Prices ↔ markets breathing room** — the owner also asked for more
+  space between the prices block and the markets section: the section
+  gains `pb-3`, taking the card-to-section air from 28px to 40px (scoped
+  to the prices section only; the page-wide 28px rhythm is untouched).
+
+### Verified
+
+- Production build + real API (the 4173 harness): desktop 1280 EN —
+  expanded panel renders INSIDE the Gold tile (element-from-point probes
+  hit the panel's own rows), Silver/Oil/Bitcoin un-overlapped, clean
+  spacing to the markets section; mobile 375 — panel inside the tile,
+  Silver 10px below the grown tile, no horizontal overflow; fa RTL —
+  Persian rows render, 40px air to the markets section; collapsed —
+  four equal tiles, no spill.
+- Gates: typecheck 6/6, lint clean, web tests 533 green, copy:audit
+  clean (no new copy), bundle budgets held (entry 295.29/88.82,
+  Insights 624.64/149.59).
+- Evidence: `docs/evidence/2026-10-24d-disclosure-overflow-fix/`.
+- Rebase note: this round was authored against production 7b939901 and
+  rebased over the 2026-10-25 gold-balance v4 round (29418f7) before
+  push/deploy; the balance round touches BalanceScale/MergedCard/copy
+  dictionaries only — PricesBoard is untouched there and this fix applies
+  cleanly on top.
+- Deployed: pushed as `c8e0741` → currena-api worker
+  `cc6f28e6-76dc-405f-a6ba-5fa7fd6adc9b`; re-verified LIVE on both
+  currena.ir and the workers.dev domain (panel paints on desktop +
+  mobile × en/fa RTL, 40px card→markets air, no overflow, zero errors;
+  post-rebase gates: typecheck 6/6, lint clean, 1,506 tests, copy:audit
+  clean, budgets held) — evidence
+  `docs/evidence/2026-10-24d-disclosure-overflow-fix/live/`, deploy
+  record in `docs/DEPLOY.md` §CURRENT DEPLOYMENT.
+
+## [2026-10-24c] — the prices board cards re-drawn from the financial-asset-cards spec pack (rebased onto round-46 main)
+
+The owner supplied the `financial-asset-cards-spec-pack.zip` (8 Markdown specs,
+repo root); this round implements it on the four asset cards ONLY — no
+page-level, provider, scoring or routing change. Supersedes the 2026-10-17b
+owner-sketch anatomy while PRESERVING every statistic it introduced
+(secondary stats move behind the disclosure, nothing is deleted).
+
+**Rebase note (2026-10-24c):** the spec-pack session ran 2026-10-22 against
+the owner's uploaded snapshot (`f50e723`); before push/deploy it was rebased
+onto main @ round 46 (`0e411e6`) — the markets-view/copy/manifest/budget
+work of the concurrent sessions is preserved byte-for-byte, the copy keys,
+manifest entries and budget bump merged on top. Asset order, anatomy and
+behavior unchanged by the rebase.
+
+### Changed
+
+- **Card anatomy (spec 02 §2)** — identity row (compact icon + plain name) →
+  dominant price with the unit in its own small secondary line → per-card
+  "as of" freshness → THE SEVEN-DAY TREND as the primary movement story →
+  daily change (explicitly labelled, vs the previous stored observation) →
+  a deterministic hedged briefing → «جزئیات بیشتر» / "More details"
+  disclosure. The card body stays the whole-surface click-through to the
+  details panel (the full chart, rule and source live there); the
+  disclosure is a separate sibling button (aria-expanded/aria-controls,
+  keyboard + touch, focus retained, 44px target, motion-safe chevron flip).
+- **Seven-day sparkline (specs 02 §6 / 04)** — new `PriceSparkline.tsx`
+  (sibling of the shared Sparkline, which is untouched): day-based x
+  positions so calendar gaps render honestly, neutral ink, ≥2.5% amplitude
+  honesty pad, LTR in both locales, dashed <2-point state, aria-label
+  (asset + window + signed change). Data: `price-trend.ts` `window7d()` over
+  the same stored history endpoint the details panel charts fetch — the
+  reference anchors at the last observation at-or-before (latest − 7 days)
+  within the 3-day tolerance, the SAME convention as the API's `change7d`,
+  so the chart and the percentage share boundaries. No window ⇒ an explicit
+  "Seven-day trend unavailable" line — never a fabricated flat chart.
+- **Documented trend classification (spec 04 §5)** — `classifyTrend()`:
+  <4 points ⇒ insufficient; |net| < 1% ⇒ range (calm) or mixed (traveled
+  path ≥ 3%); |net| ≥ 1% ⇒ up/down ONLY when the net ≥ 50% of the traveled
+  range (a −1% week inside a ±3% chop is honestly "mixed", a dominant
+  crash-and-bounce is honestly "down"). Thresholds are constants with
+  rationale; 16 new unit tests pin them.
+- **Evidence-based briefings (spec 03)** — `briefingText()` templates from
+  the dictionaries: observed movement + an explicit horizon hedge; Bitcoin
+  volatility-aware ("fluctuated" ONLY on a genuinely mixed window); oil
+  gets the drivers-evidence caveat; stale readings qualify the summary with
+  "Data may be delayed."; no causes, forecasts, probabilities or advice.
+- **«بالا» clarified** — the bare position word left the card face; the
+  metric it stood for (the reading's percentile inside its own 10-year
+  history — a LEVEL, not a trend) stays in the expanded section as "Price
+  level vs 10-year range: High — top 20% of the decade" plus a note that it
+  describes a level, not a direction.
+- **Expanded details (spec 02 §8)** — 7d/30d/90d/6m/1y changes, 52-week
+  range, the clarified level, the record high with date + basis,
+  from-record distance, 200-day gap (now with its % sign — the {pct}
+  placeholder receives the locale percent glyph), futures note, gold A$
+  companion, Bitcoin ratios, source + as-of, and an "About these numbers"
+  method note.
+- **Asset order (spec 02 §10)** — `PRICE_ROWS` is now Gold → Silver → Oil →
+  Bitcoin (the spec default; no user-configurable ordering exists — the
+  full-data export rides the same list and stays consistent).
+
+### Added
+
+- `apps/web/src/components/insights/price-trend.ts` + `price-trend.test.ts`
+  (16 tests) — the pure window/classification/briefing module.
+- `apps/web/src/components/insights/PriceSparkline.tsx`.
+- 41 copy keys × 2 locales (trend states, briefing templates, disclosure,
+  detail rows, failure states — wording verbatim from spec 03's tables);
+  manifest round-49 → `docs/QA/quirks-2026-10-22-financial-asset-cards.md`.
+
+### Budget
+
+- Insights lazy chunk consciously bumped on top of the round-46 line
+  609.00/145.60 → 626.00/150.00 (measured on rebased main 624.65 kB raw /
+  149.59 kB gz): the day-spaced sparkline + trend module + disclosure +
+  82 locale strings the spec demands. Entry chunk untouched (295.29/88.82
+  vs 296/89.5).
+
+### Gates (re-verified on the rebased tree, main @ 0e411e6 + this commit)
+
+- copy:audit clean (2,147 — the 41 spec-pack strings triaged round-49 +
+  the ma200 ٪ glyph as a technical entry); 1,505 tests green (+16
+  price-trend; web 533); typecheck 6/6; lint 0 errors/15 advisories;
+  budgets held.
+- Browser-verified against the production API (fresh profile, SW purged —
+  the repo's own procedure): EN+fa × desktop/tablet-768/mobile-375/320,
+  light+dark, disclosure keyboard-toggle (Enter, aria-expanded, focus
+  retained), details-panel click-through preserved, no horizontal overflow,
+  zero console errors.
+- **Deployed** currena-api `6d6e1300-9af8-42fe-b42e-bd73ee865211` from
+  `d952983` (pushed to main); live-served `Insights-DgGMrELI.js` sha256
+  `fdd478e7…` byte-identical to the fresh build; live re-verified on
+  currena-api.sedanama-ir.workers.dev AND currena.ir (4 cards in spec
+  order, disclosure round-trip, fa RTL, 375 no overflow, zero errors) —
+  evidence `docs/evidence/2026-10-24c-financial-asset-cards/LIVE-*.png`,
+  deploy record in `docs/DEPLOY.md` §CURRENT DEPLOYMENT.
+
+## [2026-10-24b] — the market view switch grows the weekly and monthly lenses (round 46)
+
+The owner: *"Ok now they're back add monthly and weekly views of how
+percentages changed as well. I mean for here: [the Insights page's market
+view switch radiogroup]"* — the section's lens switch offered Today / 3
+months / From 52-week high; round 46 adds the two missing durations.
+
+### What changed
+
+- **`chg1w` joins the contract** (`MarketEntry`, OPTIONAL like `chg1m`):
+  last close vs the last close on/before the same date one week earlier —
+  the same rolling-anchor rule chg1m (−30d) and chg3m (−90d) use. A stored
+  row without it renders the honest dash (—), never a guess; `chg1m`
+  (already live for the currencies rules) now also serves the monthly lens.
+- **The view switch** reads **Today | 1 week | 1 month | 3 months | From
+  52-week high** — ascending duration, the 52-week distance last; the
+  default stays the NORMAL 3-month timeframe (owner round 44).
+- **The full table** (desktop + the mobile list) gains a 1-week and a
+  1-month column beside Today — the same lenses the switch offers.
+- **The Tools-menu CSV** appends Week/Month columns at the END (the file's
+  own stable-positional-API rule); a missing lens exports an empty field,
+  never a guessed zero.
+- **The full export** (MD/TXT/CSV/XLSX) carries the lenses on the EXISTING
+  flat slots 7 (`change7d`) and 10 (`chg1m`) — no flat position moves.
+- **Six new Persian strings** (views, table headers, CSV columns), triaged
+  round-46 in the copy manifest — the fx table's span convention («یک
+  هفته»/«یک ماه»), the markets table's «بازده» prefix, CSV's «(درصد)»
+  suffix. copy:audit clean.
+
+### The weekend backfill (why a new runner)
+
+`markets-run` held all 16 rows (R5 same-date stability — the weekend
+closes are identical to the stored ones), which would have left the
+weekly lens honest-dashed until Monday's cron. The new one-off
+`markets-backfill` script resolves every row with prev=undefined (fresh
+live provider answers; the closes measured 0.000% from stored) and writes
+through the SAME write-only-if-changed gate against the true stored
+snapshot. The KV key is never deleted (no "being prepared" window).
+Verified after write: 16/16 stored rows carry both lenses.
+
+### Budgets (bumped with justification, never silently)
+
+- Route payload 12 KB → **13 KB**: live after the backfill 12,225 B,
+  realistic fixture 12,370 B — the old ceiling left 63 B of slack, so any
+  future contract field or a 17th market would breach it.
+- Insights lazy chunk 608.00 → **609.00 kB raw** (measured 608.78 raw /
+  145.54 gz — gzip-neutral vs the 145.60 budget; the raw overage is
+  localized label wording, not logic).
+
+### Gates + verified
+
+- Tests 1,489 green (+3: the buildEntry anchor/window ladder, the round-46
+  copy parity, the full-export lens columns), typecheck 6/6, lint 0
+  errors / 15 accepted advisories, copy:audit clean, T-15 (public)
+  passed, bundle budgets held.
+- Deployed `currena-markets` `0135290c` (crons now compute chg1w) and
+  `currena-api` `36a4eeab` (serve path passes chg1w; fresh SPA rides it).
+- Browser-verified on currena.ir/insights (EN + FA, 1280 + 375): the
+  five-lens switch, tile values matching `GET /api/insights/markets` on
+  every lens (e.g. Nikkei −5.4% weekly vs API −5.37; +2.2% monthly vs
+  2.19), the 9-column table, Persian digits (−۵٫۴٪), zero console
+  errors, scrollWidth === viewport at both widths; VLM visual QA clean.
+  Evidence: `docs/evidence/2026-10-24b-market-lenses/`.
+
+## [2026-10-18d] — the gold balance becomes a classic hanging-pan scale (the owner's v3 directive)
+
+The owner: *"The latest implementation does not yet meet the intended
+balance redesign."* Seven directives, all implemented (notes v3 section in
+`docs/insights/gold-balance-card-notes.md`):
+
+- **The illustration** is now ONE carefully-proportioned inline SVG
+  (520×252 viewBox): tapered beam with rounded end knuckles, pinned
+  pivot, tapered pillar on a two-step plinth, splayed chains to shallow
+  pan dishes, dotted level reference — varied stroke weights, deliberate
+  whitespace, the page's neutral secondary ink (7.98:1/7.7:1).
+- **The dashed empty rectangle is gone**: both sides always draw their
+  complete pans; a side with no qualifying factors gets a concise,
+  evidence-based empty line under its list heading (2 new copy keys,
+  round-48, QA record `docs/QA/quirks-2026-10-18-balance-v3-fa-empty-states.md`).
+- **Factor cards are OFF the beam**: the beam carries only the aggregate
+  tilt; the factors render in lists beneath their supportive/adverse
+  side captions (the v2 caption row became the list headings), growing
+  independently of the fixed-geometry illustration (no runtime
+  measurement, no reserved-height arithmetic — the ResizeObserver is
+  deleted).
+- **Direction follows the model**: the beam tilts only for a directional
+  verdict; balanced and unavailable states render level (net-0 and
+  readable-0 rules unchanged — no financial model, weight, threshold or
+  copy change beyond the two empty-state keys).
+- **RTL mirrors the whole SVG** with one scaleX(-1) (pure geometry), so
+  the for-pan lands inline-end and the visual rotation flips in the same
+  transform; the lists mirror via the grid.
+- Verified: 30 updated component tests; harness-measured tilt law
+  exact for cases A–H (rim difference = Lh × sin(angle) to 0.1px); no
+  horizontal overflow at 320–1280 in both locales; keyboard + panel
+  behaviour unchanged; VLM design review positive. Screenshots:
+  `docs/insights/screenshots/gold-balance/v3-*.png`.
+
+## [2026-10-18c] — the deploy-record reconciliation (no code change)
+
+The owner: *"It seems like you didn't push commit deploy yet."* — verified
+end-to-end that this was a **documentation gap, not a missing deploy**: every
+commit on main was pushed AND the newest code was already live; the 2026-10-18b
+session had simply recorded its deploys in CHANGELOG + its evidence README
+instead of DEPLOY.md, so the runbook's newest visible deploy entry was the
+redesign's `d93bd0ba`.
+
+- **Cloudflare-confirmed**: active currena-api version
+  `9f66a82c-d0d4-494e-a3cd-524eac3b557b` at 100% (deployment `7c2a2526`,
+  2026-10-17T16:51:58Z), preceded by `c476307f` — the public-restore lineage.
+- **Byte-identical proof**: a fresh web build of main @ `4d339b5` yields
+  `index-ChVkduNn.js` (sha256 `c06ff8db…`) + `Insights-BwhME956.js`
+  (sha256 `cbb6da44…`) — hashes identical to the live-served chunks; the
+  deployment matches main exactly.
+- **Re-verified live** (agent-browser, fresh context): hero grayscale both
+  themes, Australia-left/Global-right at 1280, markets section renders,
+  tile rule round-trip EN+fa, fa RTL + Persian digits, no h-overflow at
+  1280/360, keyboard `/` + Escape, zero console errors — evidence in
+  `docs/insights/screenshots/economic-indicators-redesign/final-continuation/`.
+- **DEPLOY.md** gains a "CURRENT DEPLOYMENT" section recording the whole
+  lineage (redesign `d93bd0ba` → PWA fix → public restore `c476307f` →
+  `9f66a82c`) so top-down readers see the true current state. No worker
+  re-deploy needed: main and production are byte-identical.
+
+## [2026-10-17f] — the Economic Indicators page re-drawn from the owner's real spec
+
+The owner supplied the actual `economic-indicators-ui-spec.md` (the session
+draft was authored from the kickoff message because the real file had not
+arrived); it now governs the Insights page: grayscale structural foundation,
+SELECTIVE severity inks, top-3 flagged + expand, fixed Global-right/
+Australia-left card order in both locales, indicator ROWS, WCAG 2.2 AA,
+viewports 320-1440. The spec file replaced the draft at the repo root.
+
+### Changed
+
+- **Hero region cards (VerdictBlock)** — restructured per spec §4/§5: the
+  region NAME is now the card title (26-30px/700 desktop, 22-26px mobile)
+  with the severity label (the verdict word, 15-17px/600-700) and the
+  severity mark/scale (state artwork + four-step meter) sharing the title
+  row; a concise "Why" line (the existing count line, red when flagged)
+  sits directly below the heading with the existing how-computed tip.
+- **Flagged indicators** — the tile GRID became indicator ROWS: leading
+  severity symbol (warning triangle, alert red) at the inline-start edge,
+  flexible text column (name + the generated rule line), primary value at
+  the trailing edge; 12px radius, 1px border, white surface, >=72px rows
+  that grow naturally. The flagged heading carries the FULL underlying
+  count ("Needing attention now · 6"), the count never describes only the
+  visible three. "+n more" / "Show fewer" keep the in-place reveal and now
+  announce state (aria-expanded + aria-controls per list).
+- **Verdict meters** — RESTORED the round-44 colored grading (the session
+  draft's neutral ramp is retired): the real spec's §6 requires the meter's
+  segments and color to match the existing severity logic, so the scale
+  speaks the app's classification at every size (hero lg, gauge sm,
+  question headers).
+- **Hero card order** — FIXED desktop locations in BOTH locales per spec
+  §5/§8: Global on the right, Australia on the left, never mirrored by
+  direction (index.css order rules at >=1024px; below that the cards stack
+  Global-first). The two-column hero now turns on only at lg — below 1024px
+  two columns would make each card narrower than the spec's ~420px minimum.
+- **Layout targets** — page title 24->32px at sm, header->cards gap
+  12->28px, card padding 16/20/24px (md/lg), hero gaps 16/20/24px, page
+  container capped at 1440px (xl:max-w-[1440px]); "View section" became a
+  quiet card-footer link (redesigned placement, never deleted); the hero
+  rows now pass the opener for focus-return on panel close (the existing
+  PricesBoard/MoneyPanel pattern).
+- Bundle budget: Insights lazy chunk 606.00/144.60 -> 607.00/145.20 kB
+  (raw-neutral restructure, +3 B gz over the line; headroom so the next
+  growth bumps consciously).
+
+### Verified
+
+- pnpm -r typecheck, lint (0 errors; 15 pre-existing warnings), test
+  (1285 tests), copy:audit clean, build + bundle budget held.
+- Browser: EN + FA at 320/375/768/1024/1280/1440 (no horizontal overflow
+  at 320), expand/collapse, DetailsPanel Escape + focus-return, colored
+  meters, Persian digits, RTL logical edges.
+
+## [2026-10-17e] — the gold card's balance visual (owner spec)
+
+The owner's `docs/insights/gold-balance-card-spec.md`: the gold signals
+card's grouped driver list ("Works against" / "Sitting neutral") becomes
+a BEAM BALANCE a visitor reads in five seconds — which way the
+conditions lean for gold, and how many drivers could not be read. Built
+on the branch `feature/gold-balance-card` per spec §15.3 (not merged, not
+deployed yet).
+
+### Added
+
+- **`signals/BalanceScale.tsx`** — the reusable balance component (takes
+  a list of drivers, applied to the GOLD driver list only): the verdict
+  line (word + the owner's up/down zigzag icon + the " · "-joined count
+  line, zero parts omitted), the beam/pivot/strings graphic strip
+  (`role="img"` whose label states the result — the interactive pans are
+  siblings of it so the blocks stay real buttons), two pans of blocks
+  (`for` at the inline-start end, `against` at the inline end; heavier
+  side DOWN like a real scale; angle = |net|/total × 14° with a 3° floor
+  and a 30 px pan-drop cap whose angle is re-derived so the pans follow
+  the beam ends exactly; only the beam rotates — text stays upright;
+  500 ms ease, `motion-reduce` disables it; RTL flips the rotation
+  sign), the shared detail panel (blocks below ~900 px tap to open their
+  existing explanation sentence, one open at a time; at ≥900 px the
+  sentence lives inside the block; tray chips open it at every width),
+  and the two trays — "Neutral" (quiet chips) and "Couldn't read"
+  (dashed chips + the existing clock icon), empty trays hidden, never on
+  the beam. Pure helpers exported + unit-tested (`balanceTilt`'s tilt
+  rule, the state map, the count line, the pan columns).
+- **`signals.balance` copy** — 13 keys × 2 locales (spec §13 verbatim;
+  fa uses the existing site terms «قابل ارزیابی نیست»/«خنثی» per §13).
+  Manifest round-48 (13 NEW processed, reference = the spec); the
+  retired group headings (`sideSupportive/sideAgainst/sideNeutral/
+  sideUnknown`) removed from both dictionaries and the manifest.
+
+### Changed
+
+- **`MergedSignalsCard`** — the three grouped driver lists are replaced
+  by the balance; the C12 gold-high-yields banner rides the balance's
+  §5.2 slot (text unchanged); the Price footing strip moves below the
+  trays behind a divider (§9 — footing is not a driver and is never
+  counted); the silver-only list and the outlook chip strip untouched.
+  No signal logic, threshold, data source or explanation text changed
+  (§16); no new dependency, API call or KV access (§2.4/§2.5).
+- **Bundle budget** — the Insights lazy chunk budget bumps
+  604 → 606 kB raw / 142.8 → 144.6 kB gz: the BalanceScale component +
+  13 copy strings × 2 locales, minus the removed group markup. Measured
+  605.31 kB raw / 144.53 kB gz. Entry chunk untouched (295.15/88.76).
+
+### Verification
+
+- Gates: 1,480 tests green (+25 balance tests), typecheck 6/6, lint
+  0 errors/15 advisories, copy:audit clean, budgets held.
+- Spec §14 loop: all five tilt cases (A–E) screenshotted at ~360 px and
+  ~1280 px in EN and FA plus case A at ~768 px
+  (`docs/insights/screenshots/gold-balance/`, 24 shots incl. the live
+  production smoke via a read-only currena.ir forwarder — the live state
+  matched case A exactly: 1 against, 3 couldn't be read); no horizontal
+  scroll at 320 px; blocks/chips ≥ 44 px; tab order verdict → for →
+  against → trays → footing; Enter/Space open the panel; reduced-motion
+  kills the animation; console clean; no new network requests.
+- Full detail: `docs/insights/gold-balance-card-notes.md`.
+
+## [2026-10-17d] — the prices polish: sign inks, bigger titles, the hero glitch, N2 retired
+
+The owner's four-point follow-up: signed percentages in red/green ("for
+example" a prices-board change row); bigger, bold, clear section titles
+in the prices board AND the metal chips ("silver gold must be written
+much larger"); EN titles capitalized ("so silver is wrong, write
+Silver. Be professional."); the hero's big-move line "seems glitchy"
+(the fa fed-rate mover rendered «… آمریکا واحد درصد ۳۰ روز +۰/۲۵»);
+and the short disclaimer + «درباره این داده‌ها ↧» button removed or
+relocated to the bottom.
+
+### Added (`config/display.ts`)
+
+- **`changeToneClass`** — the owner's sign inks as one helper: positive →
+  `--color-status-normal` (Carbon Green 50), negative →
+  `--color-status-alert` (Carbon Red 60), zero/absent neutral. Applied to
+  the four prices-board change rows, the 6-month/1-year fact bullets and
+  the hero mover's value.
+- **`formatChangeParts`** — the signed number and the WORD unit split:
+  percents bind tight inside the number island ('+3.63%'), word units
+  ('pts' / «واحد درصد») ride OUTSIDE as their own element.
+  `formatChange` delegates to it — its composed output is byte-identical
+  (pinned by the existing tests).
+
+### Fixed
+
+- **The hero glitch, structurally** — the big-move line forced
+  «+۰٫۲۵ واحد درصد» into one `dir="ltr"` island, and the bidi algorithm
+  scattered the RTL word unit: the line read «… آمریکا واحد درصد ۳۰ روز
+  +۰/۲۵». Now the number keeps its own ltr island and the unit rides the
+  next element: fa «نرخ سیاستی فدرال رزرو آمریکا +۰٫۲۵ واحد درصد ۳۰ روز
+  …», EN "… policy rate +0.25 pts 30-day …".
+- **EN title case** — `signals.metals` now `{ gold: 'Gold', silver:
+  'Silver' }` (chips, merged-card rows, collapsed lines, the export Name
+  column). All other EN display names audited — already capitalized.
+
+### Changed
+
+- **Titles bigger** — prices-board tile names 14→18px bold primary ink;
+  metal chip names 14→20px bold primary (the price stays the lighter,
+  quieter end of the header row — the Task-15 decree intact).
+- **N2 retired from the hero** — the short disclaimer line and the
+  about-jump button no longer sit under the hero: the page-bottom About
+  section carries the full text, the global footer already carries the
+  app-wide non-advice disclaimer, and the top nav chips still jump to
+  About. `onJumpAbout` stays (the verdict blocks' alert cards use it).
+
+### Workflow
+
+- NO fa string changed — `pnpm copy:audit` clean without a manifest
+  touch. Gates green: 1,455 tests, typecheck 6/6, lint 0 errors/15
+  advisories, budgets held (entry 295.15/88.76 gz; Insights lazy
+  597.50/142.51 gz). Deployed currena-api
+  `8caff087-39fd-4026-b6ad-3274fa5ff77b`; served chunks sha256-identical;
+  production browser-verified (sign colors sampled live, title sizes,
+  "Gold" capitalized, the mover order fixed in both locales, `role=
+  "note"` ×0 at the page top, 375 scrollWidth === 375, zero errors).
+  Evidence: `docs/evidence/2026-10-17d-prices-polish/`.
+
+## [2026-10-17c] — the Persian dollar convention
+
+The owner's convention: "in farsi only say دلار not دلار آمریکا … only
+mention dollar nationality when it's for australia or canada."
+
+### Changed (copy-only — no data, scoring or formatting logic)
+
+- **USD reads «دلار» everywhere** — 113 strings in `insights-copy-fa.ts`
+  plus `currencies.USD` in `fa.ts`: indicator values («۱۱۳٫۹۶ دلار»),
+  the board tiles' unit lines, 52-week-range tails, the metals chips'
+  muted price («۴٬۱۶۵ دلار»), the fx rows («قدرت دلار»), the converter
+  picker («USD · دلار»), the share line, the dollar-index copy. The
+  unqualified «دلار» is what Persian financial usage already means.
+- **Nationality reserved** — «دلار استرالیا» (AUD, 86 served occurrences)
+  and «دلار کانادا» (CAD, 2) keep their qualifiers; cents untouched
+  («۶۲ سنت آمریکا» — the rule speaks about دلار). NZD also drops its
+  qualifier per the rule's second clause (the picker keeps the code:
+  «NZD · دلار»; flagged for the owner — one-line revert in
+  `fa.ts` `currencies.NZD` if unintended).
+- **EN untouched** — US$ / US Dollar stay as-is.
+- Comment-only examples updated so the source no longer models the old
+  phrase (VerdictMeter, PricesBoard, config/display, lib/live-rate).
+
+### Copy workflow
+
+- Manifest round-47: 114 keys re-triaged `processed` against
+  `docs/QA/quirks-2026-10-17c-fa-dollar-convention.md`; `pnpm copy:audit`
+  clean (2,090 entries).
+- Tests re-pinned to the new strings (live-rate, fx-presentation,
+  insights, fx-v13). Gates green: 1,455 tests, typecheck 6/6, lint
+  0 errors/15 advisories, budgets held — the Insights lazy chunk SHRANK
+  599.38 → 597.79 kB raw (the dropped qualifier).
+- Deployed currena-api `c970f556-0070-4fc9-a7ab-98e653461857`; served
+  chunks sha256-identical to the build, «دلار آمریکا» ×0 in both served
+  bundles; production browser-verified (fa home/insights × desktop/375,
+  EN regression, zero errors). Evidence:
+  `docs/evidence/2026-10-17c-fa-dollar-convention/`.
+
+## [2026-10-17b] — the prices board cards re-drawn from the owner's sketch
+
+The owner's five-point directive for the four-tile prices board
+(Bitcoin / Silver / Gold / Brent): "1. Picture next to Unit name and price
+2. Daily / Weekly / Monthly/ Quarterly Percentages 3. Descriptions and
+verdict 4. some more meta data facts and percentages (must be in bullet
+point) 5. very small text showing update time." — with a hand-drawn card
+sketch (price + "Price per ounce" caption beside the artwork at the top's
+far end; four stacked percentage lines; a big "Description" heading; bullet
+rows; very small as-of).
+
+### Changed (`PricesBoard.tsx` — one rebuilt anatomy, mobile AND desktop)
+
+- **Header row: the artwork beside the unit name and price** — the big
+  digits at the start (the fa unit drops to its own small line UNDER the
+  digits so every fa tile has the same price-block height; EN keeps the
+  merged `US$4,165`), the indicator name in its fixed two-line slot, the
+  tinted `PriceIconBox` (96px mobile / 72px desktop) at the row's far
+  end. RTL mirrors the sketch automatically. The stacked-artwork face
+  (R29r2) retires.
+- **FOUR percentage rows** — daily / weekly / monthly / quarterly, one per
+  line, labels at the start and values end-aligned (they share one edge in
+  every tile), the quiet "—" when a window does not exist. Weekly /
+  monthly / quarterly come from the feed (`change7d/change30d/change90d`,
+  production-verified present on all four tiles); the DAILY row is derived
+  from the stored history.
+- **Description + verdict** — a "Description" label row whose far end
+  carries the price-position verdict word (cheap/normal/expensive, the
+  R31 status ink) above the existing hedged consequence line.
+- **The fact BULLETS** (`role="list"`, `data-price-facts`) — the derived
+  stats first (6-month change, 1-year change, 52-week range), then the
+  tile's context lines (the futures note, gold's A$ companion, Bitcoin's
+  ratios, the 200-day gap, the record distance). A fact that cannot be
+  measured stays OFF the card; "as of" drops to 10px tertiary ink pinned
+  with `mt-auto` so the four footers align.
+- **New `price-stats.ts`** — the client-side derivation module with the
+  R30 honesty rules tightened: every number comes from the stored history
+  ALONE; a window's reference is the nearest stored point within ≤3 days
+  (a sparse series yields absent, never a stretched number); the last
+  stored point can no longer be its own reference (the old derivation
+  could fabricate a 0% change out of a missing window — caught by the new
+  tests); the "52-week range" is only NAMED when the window really spans
+  ≥300 days; zero baselines yield absent, never Infinity. +9 tests.
+- **Copy** — 9 new keys in both dictionaries (`priceChangeDaily/Weekly/
+  Monthly/Quarterly`, `descriptionLabel`, `stat6mChange`, `stat1yChange`,
+  `stat52wRange`, `rangeJoin`); `days7`/`days30` untouched (AlertCard,
+  HeroBlock and CompactRow still speak them). Manifest round-46: 9 NEW
+  entries referenced to `docs/QA/quirks-2026-10-17-prices-card-redesign.md`.
+  No data/scoring/API change; the metals analysis chips (Tasks 15–17) and
+  the money panel untouched.
+
+- Gates: copy:audit clean (2,090 entries); full workspace tests 1,455
+  green (web 485, +9 price-stats); typecheck 6/6; lint 0 errors/15
+  accepted advisories; bundle budgets held — entry 295.15/88.76 kB gz;
+  Insights lazy 599.38/142.60 gz (+2.78 kB raw, +0.77 gz under the cap).
+- Deployed currena-api `0652db45-3fc2-418f-87c2-bb06caa51e5c` (SITE_MODE=
+  public untouched; currena-markets untouched `9b5ff7e0`).
+- Production browser-verified (agent-browser, SW precache purged first —
+  the Task-17 lesson): served chunk `Insights-E8NrMws9.js` byte-identical
+  local == production (sha256 `f3a0d27c…`); EN desktop — the sketch
+  anatomy on all four tiles, gold rows `Daily −0.13% / Weekly −1.22% /
+  Monthly −5.08% / Quarterly +3.63%`, 6 fact bullets incl. `52-week
+  range: US$3,961 – US$5,318`, as-of 10px; fa RTL — icon mirrored to the
+  top-left, unit `دلار آمریکا` under the digits, «محدودهٔ ۵۲ هفته: ۳٬۹۶۱
+  تا ۵٬۳۱۸ دلار آمریکا», verdict «بالا» red at the توضیحات heading's end;
+  mobile 375 scrollWidth === 375 in BOTH locales (icon 96px, same
+  anatomy); clicking a tile opens/closes the details panel; zero
+  page/console errors; `/api/insights` → 32 readings (gold-aud honestly
+  absent — no A$ bullet this snapshot); the metals conditions strip
+  untouched.
+- Evidence: `docs/evidence/2026-10-17-prices-card-redesign/`.
+
+## [2026-10-21] — the gold/silver outlook speaks the owner's seven states (the EN/fa drift bug)
+
+The owner's bug report: for gold and silver the verdict slot said EN
+"Works against" but fa «شرایط موجود با الگوی معمول هم‌خوانی ندارد» —
+"these are not same thing." Confirmed: the two locales shared the
+`signals.verdictDown` key but not a meaning (the fa string was a leftover
+of the old "pattern conformance" framing). Fixed by adopting the owner's
+**"Gold Market Outlook — Complete State List"**: SEVEN states with the
+owner's own bilingual sentences, so one state machine feeds both locales
+and drift is structurally impossible.
+
+### Changed (`signals/verdict.tsx`, `Signals.tsx`, dictionaries, `full-export.ts`)
+
+- **New seven-state outlook classifier `outlookOf`** over the same
+  condition tally (gold 5 / silver 6 conditions): strong-bullish /
+  strong-bearish at the card lean's OWN strong bar (`LEAN_STRONG = 4`,
+  now exported from `@currena/insights` — one strength definition per
+  card); bullish / bearish on a majority of directional conditions;
+  mixed on an equal split (the indicators disagree); neutral when all
+  readable conditions sit neutral (no directional bias); **range-bound**
+  only with affirmative quiet-price evidence (|30-day speed| < 2% AND the
+  price in the typical band of its 10-year range) while the driver split
+  stays within one — the owner's distinctions (Neutral ≠ Range-Bound ≠
+  Mixed) are honoured mechanically, not by renaming.
+- **The old `up/down/flat` words are retired** — `verdictUp`
+  ('Supports' / «حمایت‌کننده»), `verdictDown` ('Works against' /
+  «شرایط موجود با الگوی معمول هم‌خوانی ندارد») and `verdictFlat`
+  ('Mixed' / «ترکیبی») are gone from both dictionaries and their three
+  manifest entries pruned; `verdictNone` («هنوز نمی‌توان نتیجه‌گیری کرد»)
+  stays for the nothing-readable edge.
+- **The owner's verbatim sentences** land as `signals.verdictStates`
+  (7 states × gold/silver, EN + fa — the gold strings exactly as the
+  owner wrote them, silver mirrors) and `signals.verdictStateNames`
+  (7 short names — Strong bullish/Bullish/Neutral/Range-bound/Bearish/
+  Strong bearish/Mixed signals; fa: صعودی قوی/صعودی/خنثی/محدوده‌ای/
+  نزولی/نزولی قوی/نشانه‌های مختلط) for the collapsed line. The strip
+  heading becomes "Outlook"/«چشم‌انداز» and the collapsed template
+  "Outlook: {verdict}"/«چشم‌انداز: {verdict}» — 21 new + 2 changed
+  manifest entries, round-45, referenced to
+  docs/QA/quirks-2026-10-21-outlook-states.md (the owner's table recorded
+  verbatim).
+- **The sentence gets its own line in the chip** — the 2026-10-20 sketch's
+  header (icon box · name · lighter price) stays, but a full sentence
+  cannot live in that narrow column (it wrapped into a 4-6-line staircase
+  at 375px — caught in production verification of the first deploy,
+  `a5d2f793`): the outlook sentence now rides a full-width line between
+  the header and the chart, zigzag icon leading, floored two-line slot
+  keeping the two desktop chips' charts on one baseline (the round-34
+  rule). One anatomy for mobile AND desktop, both locales.
+- **`verdictTone`/`VerdictIcon` extend to the seven states** — the
+  bullish family keeps the green ink + up zigzag, the bearish family the
+  red ink + down zigzag (colour never rides alone), and the calm states
+  (neutral/range-bound/mixed, plus unreadable null) share the dash in
+  the muted ink.
+- **The signals CSV header decouples** from `verdictTitle` (the row's
+  status value is the checklist lean, not the outlook) — it now uses the
+  generic `ui.csvColStatus` like the other sections.
+
+### Unchanged (deliberately)
+
+The condition checklist and its side words (Supports / Works against /
+Sitting neutral), the lean words and counts, the data/scoring engine, the
+API shape, the prices board and every other section.
+
+### Gates
+
+`copy:audit` clean · full workspace tests green (1,446 — +15 new outlook
+tests pinning the mapping edges, the owner's verbatim strings and the
+retired keys' absence) · typecheck 6/6 · lint 0 errors/15 accepted
+advisories · budgets held (entry 295.15/88.76 kB raw/gz vs 296/89.5;
+Insights lazy 596.60/141.83 vs 604/142.8 — +0.53 kB gz for the 28
+authored sentences).
+
+### Deploy + production verification
+
+Deployed currena-api `d0d28c3f-f0a9-4619-b269-8f7337d9daa9` (SITE_MODE=
+public, cron, KV intact; currena-markets untouched `9b5ff7e0`). Served
+Insights chunk `Insights-DlDkQ-3K.js` byte-identical to the local build
+(sha256 1d0778c5…); the old mismatched fa sentence — 0 occurrences in the
+served bundle. Live browser verification (agent-browser, fresh
+SW-purged loads): live data produced `bearish` for both metals and BOTH
+locales render the same state — EN "Outlook: Signs point to a potential
+decline in gold/silver prices." with red zigzag + muted prices US$4,165 /
+US$57.27; fa «چشم‌انداز: نشانه‌ها حاکی از احتمال افت قیمت طلاست./…نقره
+است.» RTL-mirrored with Jalali ticks; collapsed "Outlook: Bearish" /
+«چشم‌انداز: نزولی»; 375px scrollWidth === 375 both locales; the prices
+board (4 tiles) and condition checklist untouched; zero page/console
+errors. Evidence: docs/evidence/2026-10-21-outlook-states/.
+
+## [2026-10-20c] — the gold/silver analysis charts grow the 10-year view (the owner's request)
+
+The owner, one message after the verdict-chip redesign shipped: **"Add 10
+year View of the gold and silver price as well."** — the metals' Estimation
+chips ("Conditions right now") offered only Quarter · 1 year · 5 years; the
+decade was missing although the history feed already serves the complete
+10-year daily series for both metals (2514/2513 points, 2016-10-18 →
+2026-10-16 — verified on production before touching anything).
+
+### Changed (`TrendChart.tsx`, `signals/verdict.tsx`) — UI-only
+
+- **`TrendRange` grows `'10y'`** (3653 days — the details panel's exact
+  10-year window incl. leap-day slack). `TREND_RANGE_COPY_KEY` maps it to
+  the EXISTING `range10y` key ('10 years' / «۱۰ سال») — zero new strings,
+  no manifest change.
+- **New optional `ranges` prop** on the shared `TrendPanel` (defaults to
+  the old Quarter · 1y · 5y list) — only callers that opt in grow the
+  decade chip. `TREND_RANGES` (the full ordered list) is now exported as
+  the canonical order/test seam.
+- **`MetalTrendChart` passes `ranges={['quarter','1y','5y','10y']}`** —
+  both metals' analysis chips offer the decade; `StripRange` grows `'10y'`.
+  The chip is gated by the same ≥2-plottable-points rule as its siblings.
+
+### Unchanged (deliberately)
+
+The money panel's mini charts keep exactly three chips (Quarter · 1 year ·
+5 years) — the owner asked for gold and silver specifically. The details
+panel's HistoryChart already had its own 10y zoom. No copy keys, no data,
+no scoring, no API change.
+
+### Gates
+
+`copy:audit` clean · full workspace tests green (1,431) · typecheck 6/6 ·
+lint 0 errors/15 advisories · budgets held (entry 295.15/88.76 gz;
+**Insights lazy 593.58/141.30 gz**, +0.07 kB for the fourth chip). Deployed
+currena-api `4e8a54e0-fda4-4ce7-bc1e-9ba245c1bfc9` → production
+browser-verified: EN desktop — both chips show Quarter · 1 year · 5 years ·
+**10 years**, decade ticks Oct 2016 → Oct 2026, deltas **+230.3% 10 years**
+(gold) / **+225.6% 10 years** (silver), muted header prices intact; money
+panel still three chips; EN mobile 375 identical, no overflow; fa RTL —
+«۱۰ سال» chip, Persian-digit deltas, Jalali X ticks; zero page/console
+errors. Evidence: `docs/evidence/2026-10-20-metals-10y/`.
+
+## [2026-10-20b] — the gold/silver verdict chips become analysis cards (the owner's sketch)
+
+The owner drew the chip UI for the gold and silver "Conditions right now"
+strip: boxed artwork in the corner, the name + verdict beside it, the PRICE
+in a lighter ink ("the price is already mentioned once in upper section.
+the emphasis must be on the TREND, not the price necessarily"), and ONE big
+chart filling the rest of the card — "DO THE SAME FOR MOBILE VIEW."
+
+### Changed (`signals/verdict.tsx`, `signals/MergedCard.tsx`)
+
+- **Header row** (replaces the 96/128px artwork column): `MetalIconBox` —
+  the metal artwork in a small tinted box (56/64px; gold brand-gold tint,
+  silver soft tint) · name (bold, primary) + verdict word with its direction
+  artwork (verdict ink) · the current price at the far end in the MUTED
+  secondary ink (tabular, nowrap) — the price already leads the prices
+  board; here the trend speaks.
+- **The chart is the body**: `MetalTrendChart` gains `plotHeightClass` and
+  opens at **h-40 mobile / h-52 desktop** (was h-20); the side-split layout
+  (`sm:w-40`, `sm:border-s`, `min-h-[136px]`) is gone — ONE anatomy for
+  mobile AND desktop, exactly as the owner asked. Range chips + window
+  delta unchanged. The verdict word keeps its floored two-line slot (the
+  round-34 alignment rule survives by structure).
+- **Price source**: MergedCard computes each metal's display price from the
+  SAME snapshot readings (`formatIndicatorValue`), passes
+  `prices={{ gold, silver }}`; honest absence → nothing rendered.
+
+No copy changes, no data/scoring change.
+
+### Gates
+
+`copy:audit` clean · workspace tests **1,431 green** · typecheck all · lint
+0 errors/15 advisories · budgets held (entry 295.15/88.76 gz; Insights lazy
+593.51/141.27 gz, +0.9 kB raw). Deployed currena-api
+`757cb15b-45ae-4a61-8f4a-d808a515968d`→ production browser-verified: EN
+desktop plot 208px with muted header prices; mobile 375 identical anatomy,
+no overflow; fa RTL mirrors the sketch (icon right, muted price left, Jalali
+ticks); prices board untouched; zero page/console errors. Evidence:
+`docs/evidence/2026-10-20-verdict-chip-redesign/`.
+
+## [2026-10-20] — the "Know before you buy US shares" box removed (the owner's direct request)
+
+The owner pasted the exact rendered `<details>` element (fa:
+«پیش از خرید سهام آمریکا بدانید» — the collapsed FX/fees/disclaimer notes box
+on the Insights page) with one instruction: **"Remove this entirely."**
+
+### Removed
+
+- **`UsSharesNotesBox`** (`apps/web/src/routes/insights-sections/UsSharesNotes.tsx`)
+  — the Step 3 §7.1 collapsed info box, rendered unconditionally on Insights
+  since the 2026-10-16 rebuild, is gone: component deleted, the
+  `<UsSharesNotesBox copy={copy} />` render + import removed from
+  `Insights.tsx`, and the section comment now dates the owner-requested
+  removal so it is never "helpfully" resurrected. `UsSharesAudBox` (the
+  L2-03 AUD view — a different box in the same file) is untouched.
+- **Copy keys retired** in both dictionaries (`insights-copy-en.ts`,
+  `insights-copy-fa.ts`): `usSharesBoxTitle`, `usSharesFxLine`,
+  `usSharesFeesLine`, `usSharesDisclaimer` — en↔fa parity intact.
+- **`docs/localization/persian-copy-manifest.json`**: the four matching
+  entries pruned (REMOVED findings fail `pnpm copy:audit`).
+
+### Unchanged (deliberately)
+
+No data, scoring, projection, or behaviour change — the box was copy-only
+and rendered identically in both site modes. The world-markets/AUD boxes,
+the prices board (2026-10-19e) and the sparkline fix (2026-10-19f) are
+untouched.
+
+### Gates
+
+`pnpm copy:audit` clean · web tests 461/461 (34 files; full workspace green)
+· typecheck 6/6 · lint 0 errors (15 accepted advisories) · budgets held —
+the Insights lazy chunk **shrank** to 592.61 kB / 141.14 gz (was
+594.68/141.60; budgets 604/142.8), entry untouched 295.15/88.76.
+
+Deployed currena-api `e6d18811-46ae-4f27-890a-6a1f63b90cd1`; production
+verified: served Insights chunk carries **0** occurrences of the box copy,
+prices board + 32-reading projection intact. Evidence:
+`docs/evidence/2026-10-20-remove-us-shares-notes/`.
+
+## [2026-10-19f] — the sparklines draw honest trends (the owner's screenshot report)
+
+The owner (screenshot of the USD→IRT converter card): "The graph seems
+irregular and like a placeholder or buggy." — a violent, perfectly regular
+sawtooth where a trend should be.
+
+### Root cause (production forensics, not guesswork)
+
+- `/api/history?source=tgju` held 240/240 DISTINCT generations over ~24 h:
+  TGJU re-quotes jitter on nearly every 6-minute tick (median 0.01–0.04%,
+  p90 ~0.12%; EUR/GBP/CHF changed on 229–235 of 239 ticks), so exact-value
+  dedup recorded noise nonstop and the window never spanned more than a day.
+- The USD quote itself bobs between two levels ~0.375% apart (155
+  transitions, 38 clean a-b-a patterns — a genuinely served quote).
+- The UI drew raw points min-max-normalized (last 40 on the converter card,
+  all 240 in the popup and /live-rates) — sub-percent noise filled the full
+  plot height: the sawtooth. The real +3.1% window trend was invisible.
+
+### The fix (three coordinated layers)
+
+- **Record deadband (`apps/api/src/history.ts`)** — a generation appends
+  only when a rate moves ≥ `HISTORY_RECORD_DEADBAND` (0.05%) vs the last
+  RECORDED level (hysteresis; rate-set changes always record). Genuine
+  drift records at its first crossing; jitter never accumulates into a
+  record. KV write budget drops with it.
+- **Drawn-line aggregation (`apps/web/src/lib/live-rate.ts`)** —
+  `bucketMean(series, TREND_BUCKETS = 48)`: only the DRAWN polyline is
+  bucket-averaged; trend chips, ranges, check counts and the
+  delta-vs-previous stay RAW. Applied at all three call sites
+  (LiveRateLine, ResultPopup, LiveRates board) — the drawn window now
+  spans the whole recorded history (days), not the last 40 ticks.
+- **Honest amplitude (`apps/web/src/components/Sparkline.tsx`)** — the
+  plot domain pads to ≥2.5% of the series' mid-level (always containing
+  the data), so sub-noise wiggles render proportionally calm and real
+  trends still fill the plot.
+- **One-time KV prune** (post-deploy, KV REST) — the stored window
+  re-filtered with the same deadband: tgju 240 → 188 gens (USD 259,600 →
+  267,900 across the window — the genuine rise now visible immediately);
+  frankfurter already clean.
+
+### Gates + deploy
+
+- Tests 1,431 green (+12: deadband ×5 incl. hysteresis; bucketMean ×5;
+  Sparkline amplitude ×3 — calm band never touches the edges, a ≥2.5%
+  move still fills the plot, drift+noise stays visible). Typecheck 6/6;
+  lint 0 errors (15 accepted advisories); copy:audit clean; budgets held
+  (entry 295.15/88.76, Insights 594.68/141.60).
+- Deploy currena-api `ed79e2cc-fb2f-44ce-bcad-00d73dc57eed` (cron, KV,
+  SITE_MODE=public untouched). Production browser verification: the
+  owner's exact card (fa, 375 px) now draws a smooth rising line; popup
+  "TREND: LAST 189 UPDATES · +3.2% · low 256,895 · high 267,900";
+  /#/live-rates cards all calm; zero console/page errors; no 375 px
+  overflow; the Insights prices grid (2026-10-19e) untouched.
+- Evidence: `docs/evidence/2026-10-19f-sparkline-honesty/` (before
+  screenshot + pre-fix history analysis + pruned-history capture + five
+  production screenshots + README).
+
 ## [2026-10-19e] — the prices board returns to public mode (the owner's directive)
 
 The owner: "Still there aren't GOLD BITCOIN SILVER price, like it used

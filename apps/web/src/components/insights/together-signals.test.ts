@@ -13,10 +13,22 @@
 
 import { describe, expect, it } from 'vitest';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import type { ConnectionReading, LegEval, SignalConditionKey, SignalReading } from '@currena/insights';
+import type { ConnectionReading, LegEval, SignalConditionKey } from '@currena/insights';
 import { CONNECTIONS, evaluateConnections } from '@currena/insights';
 import { legPhrase, SIGNALS_ENABLED, connectionSummaryInfo } from './config';
-import { balanceOf, MAX_TILT_DEGREES, MIN_READABLE_TO_WEIGH } from './signals/balance';
+// v3 merge (2026-10-19): the balance law lives in BalanceScale — the owner's
+// iterated v7 ratio law (net/total × 8°, 2° floor, level when sparse per
+// UI-40) superseding the retired 12° helper, which is deleted with its
+// component (Balance.tsx) now that the v7 machinery renders per metal.
+import {
+  BALANCE_MAX_ANGLE_DEG,
+  BALANCE_MIN_ANGLE_DEG,
+  balanceCounts,
+  balanceTilt,
+  BALANCE_LH_PX,
+  signedTiltDeg,
+  type BalanceDriver,
+} from './signals/BalanceScale';
 import { insightsCopyEn } from '../../i18n/insights-copy-en';
 import { insightsCopyFa } from '../../i18n/insights-copy-fa';
 
@@ -89,8 +101,16 @@ describe('I17 copy parity (en ↔ fa)', () => {
     expect(sorted(Object.keys(fa.conditions))).toEqual(sorted(Object.keys(en.conditions)));
     expect(fa.conditions.industrial!.tag).toBeTypeOf('string');
     expect(sorted(tokens(fa.conditionsMet))).toEqual(sorted(tokens(en.conditionsMet)));
-    expect(sorted(tokens(fa.sideSupportive))).toEqual(sorted(tokens(en.sideSupportive)));
-    expect(sorted(tokens(fa.sideAgainst))).toEqual(sorted(tokens(en.sideAgainst)));
+    // 2026-10-17e (owner spec): the grouped driver list became the balance
+    // visual — the side labels are the balance's pan labels now; the count
+    // line and the aria label must carry the same {n}/{summary}/{verdict}
+    // tokens in both locales.
+    expect(sorted(tokens(fa.balance.countFor))).toEqual(sorted(tokens(en.balance.countFor)));
+    expect(sorted(tokens(fa.balance.countAgainst))).toEqual(sorted(tokens(en.balance.countAgainst)));
+    expect(sorted(tokens(fa.balance.countNeutral))).toEqual(sorted(tokens(en.balance.countNeutral)));
+    expect(sorted(tokens(fa.balance.countUnread))).toEqual(sorted(tokens(en.balance.countUnread)));
+    expect(sorted(tokens(fa.balance.aria))).toEqual(sorted(tokens(en.balance.aria)));
+    expect(sorted(Object.keys(fa.balance))).toEqual(sorted(Object.keys(en.balance)));
     // R7b: the collapsed per-metal summary carries the same tokens.
     expect(sorted(tokens(fa.collapsedFooting!))).toEqual(sorted(tokens(en.collapsedFooting!)));
     expect(sorted(tokens(fa.bandTop!))).toEqual(sorted(tokens(en.bandTop!)));
@@ -240,111 +260,95 @@ describe('the v3 display vocabulary retires the Showing family (UI-33)', () => {
 });
 
 /* ------------------------------------------------------------------ *
- * v3 UI_SPEC §9 (2026-10-20, task PH6-B) — the balance tally: grouping,
- * equal weights, the 12-degree tilt, and the honesty rules (UI-40).
+ * v3 UI_SPEC §9 — the balance law (grouping, equal weights, honesty
+ * UI-40) on the merged v7 machinery (2026-10-19 v3 merge).
  * ------------------------------------------------------------------ */
 
-const cond = (key: SignalConditionKey, state: 'supportive' | 'against' | 'neutral' | 'unknown') => ({
-  key,
-  state,
-  inputs: ['gold-usd' as IndicatorId],
-});
-
-const signalOf = (conditions: ReturnType<typeof cond>[]): SignalReading =>
-  ({
-    metal: 'gold',
-    priceId: 'gold-usd',
-    conditions,
-    metCount: conditions.filter((c) => c.state === 'supportive').length,
-    lean: 'mixed',
-    position: null,
-    speed: null,
-  }) as SignalReading;
-
-describe('balanceOf (UI-39: grouping, equal weights, the 12-degree tilt)', () => {
+describe('the merged balance law (UI-39/UI-40 on the v7 machinery)', () => {
+  const d = (key: SignalConditionKey, state: 'for' | 'against' | 'neutral' | 'unread'): BalanceDriver => ({
+    key,
+    label: key,
+    detail: key,
+    valueText: null,
+    state,
+  });
+  const driversOf = (
+    entries: Array<[SignalConditionKey, 'for' | 'against' | 'neutral' | 'unread']>,
+  ): BalanceDriver[] => entries.map(([key, state]) => d(key, state));
   const ALL = ['real-yield', 'expectations', 'stress', 'dollar', 'footing'] as const;
-  const allReadable = (): ((key: SignalConditionKey) => boolean) => () => true;
 
   it('groups the sides; an unreadable condition never joins one (never silently counted)', () => {
-    const signal = signalOf([
-      cond('real-yield', 'supportive'),
-      cond('expectations', 'neutral'),
-      cond('stress', 'against'),
-      cond('dollar', 'unknown'),
-      cond('footing', 'supportive'),
-    ]);
-    const tally = balanceOf(signal, (key) => key !== 'dollar');
-    expect(tally.supporting.map((i) => i.key)).toEqual(['real-yield', 'footing']);
-    expect(tally.pressuring.map((i) => i.key)).toEqual(['stress']);
-    expect(tally.neutral.map((i) => i.key)).toEqual(['expectations']);
-    // the engine's 'unknown' dollar AND anything the readable rule rejects
-    // both land unreadable — never on the beam
-    expect(tally.unreadable.map((i) => i.key)).toEqual(['dollar']);
-    expect(tally.readableCount).toBe(4);
-    expect(tally.totalCount).toBe(5);
-  });
-
-  it('a dataless engine-neutral is unreadable too (its dashed token never weighs)', () => {
-    const signal = signalOf([
-      cond('real-yield', 'supportive'),
-      cond('expectations', 'supportive'),
-      cond('stress', 'supportive'),
-      cond('dollar', 'neutral'), // fresh-looking to the engine, no data to compute
-      cond('footing', 'against'),
-    ]);
-    const tally = balanceOf(signal, (key) => key !== 'dollar');
-    expect(tally.unreadable.map((i) => i.key)).toEqual(['dollar']);
-    expect(tally.readableCount).toBe(4);
-  });
-
-  it('tilt = (supporting − pressuring) / readable × 12°, clamped to ±12', () => {
-    // 4 supporting of 5 readable → (4−1)/5 × 12 = 7.2°
-    const mostly = balanceOf(
-      signalOf(ALL.map((k, i) => cond(k, i === 4 ? 'against' : 'supportive'))),
-      allReadable(),
+    const counts = balanceCounts(
+      driversOf([
+        ['real-yield', 'for'],
+        ['expectations', 'neutral'],
+        ['stress', 'against'],
+        ['dollar', 'unread'],
+        ['footing', 'for'],
+      ]),
     );
-    expect(mostly.level).toBe(false);
-    expect(mostly.tilt).toBeCloseTo(7.2, 5);
-    // all supporting → the 12-degree maximum
-    const allFor = balanceOf(signalOf(ALL.map((k) => cond(k, 'supportive'))), allReadable());
-    expect(allFor.tilt).toBe(MAX_TILT_DEGREES);
-    // all pressuring → the mirrored minimum
-    const allAgainst = balanceOf(signalOf(ALL.map((k) => cond(k, 'against'))), allReadable());
-    expect(allAgainst.tilt).toBe(-MAX_TILT_DEGREES);
-    // balanced 2-2 with one neutral → 0
-    const even = balanceOf(
-      signalOf([cond('real-yield', 'supportive'), cond('expectations', 'against'), cond('stress', 'supportive'), cond('dollar', 'against'), cond('footing', 'neutral')]),
-      allReadable(),
-    );
-    expect(even.tilt).toBe(0);
+    expect(counts.for).toBe(2);
+    expect(counts.against).toBe(1);
+    expect(counts.neutral).toBe(1);
+    expect(counts.unread).toBe(1);
+    expect(counts.readable).toBe(4); // for + against + neutral — never the unread
+    expect(counts.total).toBe(5);
   });
 
-  it('UI-40: fewer than 3 readable conditions keeps the beam level — unreadable never tilts it', () => {
-    // 2 readable (1 supporting, 1 pressuring) + 3 unreadable → level
-    const scarce = balanceOf(signalOf(ALL.map((k) => cond(k, 'supportive'))), (key) => key === 'real-yield' || key === 'footing');
-    expect(scarce.readableCount).toBe(2);
-    expect(scarce.level).toBe(true);
-    expect(scarce.tilt).toBe(0);
-    // 3 readable exactly → the beam may weigh
-    expect(MIN_READABLE_TO_WEIGH).toBe(3);
-    const three = balanceOf(
-      signalOf(ALL.map((k) => cond(k, 'supportive'))),
-      (key) => ['real-yield', 'expectations', 'footing'].includes(key),
+  it('the tilt law: |net|/total × 8° with the 2° floor — superseding the retired 12° helper (owner v1–v7 law)', () => {
+    // 4 supporting vs 1 against of 5 → 3/5 × 8 = 4.8°
+    const mostly = balanceCounts(
+      driversOf(ALL.map((k, i) => [k, i === 4 ? ('against' as const) : ('for' as const)] as [SignalConditionKey, 'for' | 'against'])),
     );
-    expect(three.readableCount).toBe(3);
-    expect(three.level).toBe(false);
-    expect(three.tilt).toBe(MAX_TILT_DEGREES);
+    expect(balanceTilt(mostly, BALANCE_LH_PX).angleDeg).toBeCloseTo(4.8, 10);
+    // all supporting → the 8-degree maximum, for side heavy (negative sign)
+    const allFor = balanceCounts(driversOf(ALL.map((k) => [k, 'for'] as [SignalConditionKey, 'for'])));
+    expect(balanceTilt(allFor, BALANCE_LH_PX).angleDeg).toBe(BALANCE_MAX_ANGLE_DEG);
+    expect(signedTiltDeg(balanceTilt(allFor, BALANCE_LH_PX))).toBe(-BALANCE_MAX_ANGLE_DEG);
+    // all pressuring → the mirrored maximum
+    const allAgainst = balanceCounts(driversOf(ALL.map((k) => [k, 'against'] as [SignalConditionKey, 'against'])));
+    expect(signedTiltDeg(balanceTilt(allAgainst, BALANCE_LH_PX))).toBe(BALANCE_MAX_ANGLE_DEG);
+    // balanced 2–2 with one neutral → level
+    const even = balanceCounts(
+      driversOf([
+        ['real-yield', 'for'],
+        ['expectations', 'against'],
+        ['stress', 'for'],
+        ['dollar', 'against'],
+        ['footing', 'neutral'],
+      ]),
+    );
+    expect(balanceTilt(even, BALANCE_LH_PX)).toEqual({ angleDeg: 0, risePx: 0, endDropPx: 0, heavy: null });
+    // the constants: the v7 scale (8° max, 2° floor) — the 12° helper is retired
+    expect(BALANCE_MAX_ANGLE_DEG).toBe(8);
+    expect(BALANCE_MIN_ANGLE_DEG).toBe(2);
   });
 
-  it('silver keeps its industrial condition in the tally; gold never sees one (UI-45)', () => {
-    const gold = signalOf(ALL.map((k) => cond(k, 'supportive')));
-    const silver = signalOf([...ALL.map((k) => cond(k, 'supportive')), cond('industrial', 'supportive')]);
-    const goldTally = balanceOf(gold, allReadable());
-    const silverTally = balanceOf(silver, allReadable());
-    expect(goldTally.totalCount).toBe(5);
-    expect(silverTally.totalCount).toBe(6);
-    expect(silverTally.supporting.map((i) => i.key)).toContain('industrial');
-    expect(goldTally.supporting.map((i) => i.key)).not.toContain('industrial');
+  it('UI-40: fewer than 3 readable conditions keeps the beam LEVEL — the sparse rule rides the component (data-tilt 0 + the not-enough line; pinned in balance.test.tsx §9 and the U-09a visual)', () => {
+    // The pure law still yields the floor angle for a one-driver lean…
+    const scarce = balanceCounts(
+      driversOf([
+        ['real-yield', 'for'],
+        ['expectations', 'unread'],
+        ['stress', 'unread'],
+        ['dollar', 'unread'],
+      ]),
+    );
+    expect(scarce.readable).toBe(1);
+    expect(signedTiltDeg(balanceTilt(scarce, BALANCE_LH_PX))).toBe(-BALANCE_MIN_ANGLE_DEG);
+    // …but the COMPONENT refuses to weigh it (UI-40, BalanceScale's sparse
+    // rule): readable < 3 → targetDeg 0 — the rendered pin lives in
+    // balance.test.tsx §9 (data-tilt '0' + 'Not enough readable conditions
+    // to weigh') and in the U-09a visual test.
+  });
+
+  it('UI-45: silver keeps its industrial condition in the tally; gold never sees one (pinned rendered in balance.test.tsx §9)', () => {
+    const gold = balanceCounts(driversOf(ALL.map((k) => [k, 'for'] as [SignalConditionKey, 'for'])));
+    const silver = balanceCounts(
+      driversOf([...ALL.map((k) => [k, 'for'] as [SignalConditionKey, 'for']), ['industrial', 'for'] as [SignalConditionKey, 'for']]),
+    );
+    expect(gold.total).toBe(5);
+    expect(silver.total).toBe(6);
   });
 });
 

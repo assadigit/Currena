@@ -46,6 +46,17 @@ function scaleY(value: number, min: number, max: number, height: number, pad: nu
   return height - pad - t * (height - 2 * pad);
 }
 
+/**
+ * Minimum plot range as a fraction of the series' mid-level. Below this,
+ * the domain is padded symmetrically (always containing the data) so the
+ * line's amplitude stays HONEST: min-max normalization renders ANY variation
+ * — even sub-percent re-quote jitter — as the full plot height, which read
+ * as a placeholder-quality sawtooth (owner report 2026-10-16). A series that
+ * moved ≥2.5% of its level fills the plot exactly as before; a calmer series
+ * renders proportionally calm.
+ */
+const MIN_REL_RANGE = 0.025;
+
 export function Sparkline({
   points,
   width = 132,
@@ -83,8 +94,15 @@ export function Sparkline({
     );
   }
 
-  const min = Math.min(...clean);
-  const max = Math.max(...clean);
+  const dataMin = Math.min(...clean);
+  const dataMax = Math.max(...clean);
+  // Padded plot domain: [mid − half, mid + half] with half ≥ dataRange/2, so
+  // the data ALWAYS fits and calm series get proportionally calm amplitude.
+  const mid = (dataMin + dataMax) / 2;
+  const dataRange = dataMax - dataMin;
+  const halfRange = Math.max(dataRange / 2, (Math.abs(mid) * MIN_REL_RANGE) / 2);
+  const domainMin = mid - halfRange;
+  const domainMax = mid + halfRange;
   const firstVal = clean[0];
   const lastVal = clean[clean.length - 1];
   if (firstVal === undefined || lastVal === undefined) return null; // unreachable (clean.length ≥ 2)
@@ -93,7 +111,7 @@ export function Sparkline({
 
   const pad = 4;
   const stepX = (width - 2 * pad) / (clean.length - 1);
-  const coords = clean.map((v, i) => ({ x: pad + i * stepX, y: scaleY(v, min, max, height, pad) }));
+  const coords = clean.map((v, i) => ({ x: pad + i * stepX, y: scaleY(v, domainMin, domainMax, height, pad) }));
   const line = coords.map((c, i) => `${i === 0 ? 'M' : 'L'}${c.x.toFixed(2)},${c.y.toFixed(2)}`).join(' ');
   const firstPt = coords[0];
   const lastPt = coords[coords.length - 1];
@@ -117,13 +135,14 @@ export function Sparkline({
           <stop offset="100%" stopColor="rgba(0,0,0,0)" />
         </linearGradient>
       </defs>
-      {/* Soft band between min and max — subtle context for the line. */}
-      {max !== min ? (
+      {/* Soft band between the data's min and max — subtle context for the
+          line; inside the padded domain it also shows HOW CALM the series is. */}
+      {dataMax !== dataMin ? (
         <rect
           x={pad}
-          y={scaleY(max, min, max, height, pad)}
+          y={scaleY(dataMax, domainMin, domainMax, height, pad)}
           width={width - 2 * pad}
-          height={Math.max(2, scaleY(min, min, max, height, pad) - scaleY(max, min, max, height, pad))}
+          height={Math.max(2, scaleY(dataMin, domainMin, domainMax, height, pad) - scaleY(dataMax, domainMin, domainMax, height, pad))}
           fill="rgba(148,163,184,0.08)"
           rx={2}
         />

@@ -38,6 +38,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { IndicatorId, InsightsSection } from '@currena/core';
 import type { IndicatorReading } from '@currena/core';
+// The generated public-mode hidden set (2026-10-18b): the SAME file the API
+// worker and the T-15 build gate consume — bundling it here keeps the web's
+// section gating and the API's route gating driven by one source of truth.
+// The markets board rides the owner directive and is NOT in hiddenBoards;
+// the fx board is.
+import siteModeOverrides from '../../../../data/site-mode-overrides.json';
 import { useI18n } from '../lib/locale';
 import { routeQuery } from '../router';
 import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../lib/insights';
@@ -71,7 +77,7 @@ import {
   type LoadState,
 } from './insights-sections/InsightsStatusBlocks';
 import { SectionLane } from './insights-sections/SectionLane';
-import { UsSharesAudBox, UsSharesNotesBox } from './insights-sections/UsSharesNotes';
+import { UsSharesAudBox } from './insights-sections/UsSharesNotes';
 import {
   useWorldCurrenciesSection,
   useWorldMarketsSection,
@@ -159,11 +165,21 @@ export function Insights() {
   // world-feeds.ts (Phase 3-e). The v3 hero (2026-10-20) no longer renders
   // the raised-signal bullets or the section indicators (the sections
   // carry their own verdict lines — the choice is documented in
-  // VerdictMeter.tsx), so the route consumes the states + the CSV exports;
-  // the hero-alert pieces stay in the hooks' return for their owner.
-  const worldFeedsEnabled = state.kind !== 'ready' || state.snapshot.displayMode !== 'public';
-  const { marketsState, downloadMarketsCsv } = useWorldMarketsSection(copy, worldFeedsEnabled);
-  const { fxState, downloadFxCsv } = useWorldCurrenciesSection(copy, worldFeedsEnabled);
+  // VerdictMeter.tsx), so the route consumes the states + the CSV exports.
+  // PUBLIC MODE (2026-10-19, AC-08/LR-02 → 2026-10-18b owner directive,
+  // kept through the v3 merge): each world board's public visibility is
+  // the GENERATED overrides file's call. The markets board (the owner's
+  // own EODHD key backs it) renders and its feed fetches; the fx board
+  // (no owner directive) stays licence-hidden — no render, no fetch — and
+  // the US-shares AUD view, which needs BOTH feeds, rides the stricter
+  // of the two.
+  const publicMarketsBoard = !(siteModeOverrides.hiddenBoards as readonly string[]).includes('markets');
+  const publicFxBoard = !(siteModeOverrides.hiddenBoards as readonly string[]).includes('fx');
+  const isPublicProjection = state.kind === 'ready' && state.snapshot.displayMode === 'public';
+  const marketsFeedEnabled = !isPublicProjection || publicMarketsBoard;
+  const fxFeedEnabled = !isPublicProjection || publicFxBoard;
+  const { marketsState, downloadMarketsCsv } = useWorldMarketsSection(copy, marketsFeedEnabled);
+  const { fxState, downloadFxCsv } = useWorldCurrenciesSection(copy, fxFeedEnabled);
 
   const togglePin = useCallback((id: IndicatorId, next: boolean): void => {
     setPinned((prev) => {
@@ -331,8 +347,29 @@ export function Insights() {
     return state.snapshot.readings.find((r) => r.id === panel.id) ?? null;
   }, [panel, state]);
 
+  // The panel's companion data (2026-10-26c): the full snapshot's
+  // readings, empty until loaded — the price sections read other assets
+  // from it (gold's A$ line, Bitcoin's metal ratios).
+  const snapshotReadings = useMemo(
+    () => (state.kind === 'ready' ? state.snapshot.readings : []),
+    [state],
+  );
+
   return (
-    <div className="mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-6xl lg:px-8">
+    // UI-fidelity round (2026-10-19, the owner's correction brief §3
+    // "Content width and spacing"): the old xl:max-w-[1440px] cap left
+    // 80–160px dead margins beside the two regional cards on 1600–1760px
+    // screens — the brief asks for ~95% of the available viewport with
+    // 24–32px desktop side gutters. lg uses calc(100% − 40px) (20px outer
+    // gutter + the 16px px-8 padding each side, spec §11's 1024–1199
+    // "reduce outer gutter" band); xl is min(calc(100% − 56px), 1840px)
+    // — 28px gutters (1600 → 1544px / 96.5%, 1760 → 1704px / 96.8%) with
+    // the absolute 1840px ceiling folded into the SAME rule (a separate
+    // 2xl: class would win the cascade at ≥1536px and flatten the calc,
+    // as the first build proved) so ultra-wide desktops keep a sane
+    // reading measure. Tablet (md:max-w-3xl) and the phone column are
+    // untouched.
+    <div className="insights-page mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-[calc(100%-40px)] lg:px-8 xl:max-w-[min(calc(100%-56px),1840px)]">
       <ReadingProgress label={copy.ui.progressLabel} />
       <InsightsHeader
         t={t}
@@ -393,7 +430,10 @@ export function Insights() {
 
           {/* v3 UI-18/UI-19: "Moves and what is next" — directly under the
            * hero: the biggest movers (period stated) + the next calendar
-           * events, up to five tappable items. */}
+           * events, up to five tappable items. (This replaces the fidelity
+           * round's ContinueStrip: the v3 page order (UI_SPEC §2.3) puts the
+           * moves strip here, and it carries real readings + dates rather
+           * than a section-name echo.) */}
           <MovesNextStrip
             readings={state.snapshot.readings}
             events={state.snapshot.calendar}
@@ -421,21 +461,24 @@ export function Insights() {
            * right after the commodity prices — both answer "what is moving";
            * never above the verdict or alerts. Self-contained feed: its own
            * loading/empty states, never an error surface for the page.
-           * PUBLIC MODE: licence-hidden entirely (no render, no fetch). */}
-          {worldFeedsEnabled && (
+           * PUBLIC MODE: rides the generated overrides file — the markets
+           * board is PUBLIC since the 2026-10-18b owner directive (the
+           * owner's own EODHD key backs it); the fx twin below stays
+           * licence-hidden. */}
+          {marketsFeedEnabled && (
             <WorldMarkets state={marketsState} copy={copy} locale={locale} numberLocale={numberLocale} />
           )}
 
-          {/* Step 3 L2-03 + §7.1 (runbook Phase 4): the US shares in AUD view
-           * (same-date arithmetic, refused when the feeds mismatch) and the
-           * collapsed "Know before you buy US shares" box (only the
-           * exchange-rate and fees lines — no approved text exists).
-           * PUBLIC MODE: the AUD view rides the hidden world feeds — hidden
-           * with them; the copy-only notes box stays. */}
-          {worldFeedsEnabled && (
+          {/* Step 3 L2-03 (runbook Phase 4): the US shares in AUD view
+           * (same-date arithmetic, refused when the feeds mismatch). It
+           * needs BOTH world feeds, so it rides the stricter gate — in
+           * public mode the fx board stays hidden and this view stays
+           * hidden with it. (The §7.1 "Know before you buy US shares"
+           * notes box was removed at the owner's direct request,
+           * 2026-10-20.) */}
+          {marketsFeedEnabled && fxFeedEnabled && (
             <UsSharesAudBox marketsState={marketsState} fxState={fxState} copy={copy} numberLocale={numberLocale} />
           )}
-          <UsSharesNotesBox copy={copy} />
 
           {/* World currencies (insights-world-currencies-spec.md §9.2):
            * right after the world stock markets — the two sections explain
@@ -443,8 +486,9 @@ export function Insights() {
            * a calm stock section beside a warning currency pattern can never
            * read as one contradiction. Self-contained feed: its own
            * loading/empty states, never an error surface for the page.
-           * PUBLIC MODE: licence-hidden entirely (no render, no fetch). */}
-          {worldFeedsEnabled && (
+           * PUBLIC MODE: licence-hidden entirely (no render, no fetch) —
+           * the fx board carries no owner directive. */}
+          {fxFeedEnabled && (
             <WorldCurrencies state={fxState} copy={copy} locale={locale} numberLocale={numberLocale} />
           )}
 
@@ -525,10 +569,12 @@ export function Insights() {
         </div>
       ) : null}
 
-      {/* F5: the details panel (side sheet / bottom sheet). */}
+      {/* F5: the details panel (side sheet / bottom sheet). 2026-10-26c:
+          the asset cards' «جزئیات بیشتر» sections render inside it. */}
       {panelReading && panel ? (
         <DetailsPanel
           reading={panelReading}
+          readings={snapshotReadings}
           copy={copy}
           locale={locale}
           numberLocale={numberLocale}

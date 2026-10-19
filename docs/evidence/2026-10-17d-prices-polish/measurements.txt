@@ -1,0 +1,44 @@
+4071233800bc24ea84a50b52887252facde72516c8f270ab2a156b69ea5637ba  apps/web/dist/assets/Insights-C9T5WXmB.js
+48900e406e9154d8772bffaf29bc1b8b2de2c8bc556d9eeaa81fea378517b7b8  apps/web/dist/assets/index-D__bJv8f.js
+== 2026-10-17d prices polish — production verification ==
+
+Local build == production (sha256):
+  Insights-C9T5WXmB.js  4071233800bc24ea84a50b52887252facde72516c8f270ab2a156b69ea5637ba
+  index-D__bJv8f.js     48900e406e9154d8772bffaf29bc1b8b2de2c8bc556d9eeaa81fea378517b7b8
+
+/api/insights: 32 readings (unchanged).
+
+Browser (production via read-only :3000 forwarder, fresh context; loaded
+chunk verified = Insights-C9T5WXmB.js):
+
+1. SIGN COLORS (owner: negative red, positive green) — the four change
+   rows + the 6m/1y fact bullets + the hero mover value all speak the
+   owner-palette status tokens:
+     positive → rgb(36,161,72)  = --color-status-normal  (Carbon Green 50)
+     negative → rgb(218,30,40)  = --color-status-alert   (Carbon Red 60)
+   Sampled fa rows: btc +۳٫۰۳٪/−۱۶٫۰۷٪/−۱۴٫۶۴٪/+۲۸٫۳۷٪, gold
+   −۰٫۱۳٪/−۱٫۲۲٪/−۵٫۰۸٪/+۳٫۶۳٪ — every sign colored correctly;
+   the 52-week range and context lines stay neutral; the "—" quiet.
+2. TILE TITLES — prices board names 18px / 700 / primary ink
+   (was 14px / secondary): «طلا»، «نقره»… EN "Oil price (Brent)",
+   "Gold price (ounce)", "Silver price (ounce)", "Bitcoin price".
+3. METAL CHIP TITLES — 20px / 700 primary («طلا» / "Gold"); the price
+   stays the lighter 14px end of the header row.
+4. EN CAPITALIZATION — signals.metals { gold: 'Gold', silver: 'Silver' };
+   chip titles read "Gold"/"Silver" (was lowercase "gold"/"silver").
+   All other EN display names audited — already capitalized.
+5. THE HERO GLITCH (owner screenshot) — the fed-rate mover line rendered
+   «… آمریکا واحد درصد ۳۰ روز +۰/۲۵» (the ltr bdi scattered the RTL word
+   unit away from the number). Now the number keeps its own ltr island
+   and the word unit rides outside: DOM/visual order
+   «نرخ سیاستی فدرال رزرو آمریکا | +۰٫۲۵ | واحد درصد | ۳۰ روز | …»
+   (EN: "… policy rate | +0.25 | pts | 30-day | …"); the value speaks
+   the sign ink (green for +۰٫۲۵).
+6. N2 RETIRED — the short disclaimer line + «درباره این داده‌ها ↧» jump
+   button are OFF the hero (role="note" ×0 on the page top); the
+   page-bottom About section keeps the full text and the global footer
+   already carries the app-wide non-advice disclaimer.
+7. 375px: scrollWidth === 375; zero page/console errors in fa and en.
+
+currena-api version: 8caff087-39fd-4026-b6ad-3274fa5ff77b (SITE_MODE=public;
+currena-markets untouched 9b5ff7e0)

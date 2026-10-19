@@ -23,6 +23,7 @@ function marketEntry(id: 'dax' | 'sp500', asOf = '2026-10-09'): MarketsSnapshot[
     asOf,
     close: 19624,
     chg1d: 0.5,
+    chg1w: 0.4,
     chg1m: 1.2,
     chg3m: 3,
     high52w: 20000,

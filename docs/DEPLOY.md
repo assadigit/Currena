@@ -83,6 +83,897 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## CURRENT DEPLOYMENT — the yearly lens on the world stock indices: a fifth view (Daily → Yearly), a real chg1y, a 1-year table column (2026-10-19 (yearly lens) owner round 5, workers 96c4a467 + 18cf040e)
+
+Owner round 5 — "add yearly view to the stocks indexes" — is LIVE on
+`/#/insights`: the period radiogroup now offers FIVE lenses — Daily |
+Weekly | Monthly | Quarterly | **Yearly** («سالانه»), Quarterly still the
+default — over a REAL stored `chg1y`: an OPTIONAL contract field on
+`MarketEntrySchema`, derived by the markets pipeline's `yearAgoAnchor`
+(the strict 365-day rolling anchor, falling back to the series' earliest
+close inside the ±15-day tolerance band — the repo's year-on-year
+convention; windows closer than 350 days omit the field), with the Yahoo
+fallback fetch widened to `range=2y` so the anchor always has real
+closes. Every view surface follows through the one `viewValue` lens map
+(breadth + coverage note, movers, tiles, heatmap scale, aria); the full
+table gains a **"1 year"** column (desktop + mobile list) appended at the
+END; `markets-csv` appends "1 year %" at the END (position-pinned scripts
+keep their indices); full-export rides the existing `chg1y` slot. Three
+new copy keys × 2 locales (`viewYearly`, `thYear`, `csvColYear` —
+manifest round `markets-yearly-lens-2026-10-19`); 6 new test guards
+(1,612 workspace tests). Evidence + 16 screenshots:
+`docs/insights/yearly-lens-verification.md`.
+
+- **Active workers**: currena-api **`96c4a467-1d2b-49d8-bfb7-748ca30d3486`**
+  (SPA + API — the yearly-lens UI; SITE_MODE=public, RATES KV + ASSETS
+  bindings, the `* * * * *` keep-warm cron unchanged) AND — this round is
+  NOT UI-only — currena-markets
+  **`18cf040e-70f0-4f08-8582-a0b3e0c2d29e`** (the worker whose
+  `30 23 * * 1-5` / `30 1 * * 2-6` crons compute and store `chg1y`;
+  `EODHD_API_TOKEN` secret verified present, unchanged). Deployed via
+  `pnpm --filter @currena/markets exec wrangler deploy` (the same
+  `exec wrangler deploy` pattern).
+- **What it carries**: everything from b1067b0a (the australia-signals
+  round) + the yearly lens (feature commit `80e15bd`, fast-forward merged
+  to main, + the docs-only delivery-state record `f0bfa83`; CI green on
+  both — typecheck, lint, 1,612 tests, build, bundle budgets held with NO
+  bump: entry 295.29/88.81, Insights 660.88/158.00 vs 661.00/158.50, copy
+  audit).
+- **Live-verified** (currena.ir, fresh profile, SW cleared): served chunks
+  exactly the `80e15bd` build (`index-Blojx-aS.js`, `Insights-BAeV8pAq.js`);
+  EN desktop 1600 — five pills with Yearly; Yearly click → "Yearly
+  performance" + "0 of 16 indices carry this period." + movers "No data
+  for this period yet." + honest "—" rows with the aria "no data for this
+  period over Yearly"; the full table's "1 year" column between "3 months"
+  and "From 52-week high" (em-dashes; other columns live); heatmap cells
+  honest; VLM 4/4. fa RTL desktop — «انتخاب بازهٔ عملکرد شاخص‌ها», five
+  pills with «سالانه», «عملکرد سالانه», «۰ شاخص از ۱۶ شاخص دادهٔ این
+  بازه را دارند.», Persian digits, VLM 4/4. Mobile 390 fa+EN — zero
+  page-level overflow; hero carousel Global-first; fa pills fit in-row
+  (291px); EN pill row is the approved `overflow-x-auto` segmented control
+  (row swipe reveals Yearly fully — measured, the same rest state as the
+  round's own local capture). Round-4 regression: both signals panels +
+  no rule toggle. Zero console/page errors everywhere.
+- **Backfill watch**: the stored markets snapshot at deploy time predates
+  the round-5 markets worker (no `chg1y` yet), so Yearly opens on the
+  honest dashes + "0 of 16" note until the NEW currena-markets worker's
+  first cron run (23:30 UTC Mon–Fri / 01:30 UTC retry) rewrites the rows
+  with real yearly values — the same honest roll-in the weekly lens used.
+- **Rollback**: `wrangler rollback` (currena-api previous version b1067b0a
+  = the australia-signals round; currena-markets previous deployment
+  2026-10-17), or redeploy any prior main commit.
+
+The previous deployment record (the australia-signals round, worker
+b1067b0a) follows below.
+
+## CURRENT DEPLOYMENT — the Australia card closes with the same signals box as World Signals, carrying its own area data (2026-10-20 (australia signals) owner round 4, worker b1067b0a)
+
+Owner round 4 — "Just like World Signals, I want the same Box with proper
+data for Australia" — is LIVE on `/#/insights`: the Australia card now
+closes with the SAME emphasized signals box construction as World
+Signals (always open, never behind the toggle; 15px bold heading +
+bullets; state mark 18/20; the region's own pale tint + step ink;
+`ei-panel-accent`), its proper data being its OWN areas — one bullet per
+Australian gauge, worst first: the raised areas (step 2+) carry their
+n-of-m counts and state word in their OWN step ink ("Inflation & rates ·
+Stressed: 3 of 5 indicators need attention.") and jump to the Australia
+section; the calm ones sit in the quiet rows' muted ink ("Trade &
+currency · Stable"), the unreadable ones in the honest no-reading
+neutral — never buttons. The round-3 rule toggle survives as the shared
+FALLBACK when a region has nothing to raise (no feeds on Global / no
+readable gauge on Australia); the word-choice rule stays reachable
+through the "?" tip on both cards. Two new copy keys en+fa
+(`australiaSignalsTitle`, `australiaSignalArea` — manifest round
+`australia-signals-2026-10-20`); panel guards 3 → 6 in
+`hero-editorial.test.tsx` (20 total; 1,606 workspace tests). Evidence +
+11 screenshots:
+`docs/insights/economic-indicators-au-signals-verification.md`.
+
+- **Active worker**: currena-api **`b1067b0a-9b74-45f7-a52e-d555dbac21ad`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *` keep-warm
+  cron unchanged; currena-markets untouched — UI-only round).
+- **What it carries**: everything from 0230f09b (the panels round) + the
+  australia-signals round (feature commit `a073c18`, fast-forward merged to
+  main, + the docs-only delivery-state record `2880573`; CI green on
+  a073c18 — typecheck, lint, 1,606 tests, build, bundle budgets after the
+  documented 661.00/158.50 Insights bump (D-39), copy audit).
+- **Live-verified** (currena.ir, fresh profile, SW cleared): EN desktop
+  1600 — served chunks exactly the `a073c18` build (`index-DV6LyMkN.js`,
+  `Insights-DcNs64O3.js`), TWO signals panels live: World signals (the
+  production markets bullet) + "Australia signals" carrying the real
+  production data ("Inflation & rates · Stressed: 3 of 5…", "Households ·
+  Stressed: 3 of 6…", "Trade & currency · Stable"), no rule toggle on
+  either card; heading + raised bullets measured 15px/700
+  `rgb(255,131,43)` on the `oklab(… / 0.06)` pale amber; a real click on
+  a raised AU bullet scrolled 0 → 7321px with the Australia section in
+  the viewport; EN mobile 390 — carousel opens on Global at the origin
+  (card 16..374, dots `true,false`, cue "Swipe to view Australia"), real
+  Next → Australia at x:16, dots flip; fa RTL desktop — «سیگنال‌های
+  استرالیا» with «تورم و نرخ بهره · پرتنش: ۳ شاخص از ۵ شاخص نیازمند
+  توجه‌اند.» (fa digits), the 3px accent on the RIGHT edge; fa mobile
+  390 — opens on جهانی («برای دیدن استرالیا بکشید»), real «بعدی» →
+  Australia at x:16; zero horizontal overflow everywhere; zero
+  page/console errors on every capture.
+- **Rollback**: `wrangler rollback` (previous version 0230f09b), or
+  redeploy any prior main commit — the Worker carries the SPA build
+  from `apps/web/dist` at deploy time.
+
+The previous deployment record (the panels round, worker 0230f09b)
+follows below.
+
+## CURRENT DEPLOYMENT — the rule panel tucks behind a low-key toggle; the world-signals panel becomes the hero's emphasized closing module (2026-10-19 (panels) owner round 3, worker 0230f09b)
+
+The owner's two directives on the closing explanation panels are LIVE on
+`/#/insights`, presentation-only: the word-choice RULE panel (Australia +
+Global's no-feed fallback) now hides behind a LOW-KEY TOGGLE — one quiet
+muted pill (`verdictRuleLabel` + a direction-neutral chevron, the "+n
+more" disclosure language, `aria-expanded`/`aria-controls` like
+GlossaryTip) whose click reveals the familiar tinted panel with its
+`data-ei-panel/-kind="rule"/-heading/-rule` hooks and copy byte-identical
+to the fidelity round's — while the Global SIGNALS panel, "probably one
+of the most important parts of the whole hero" (owner), steps UP in type:
+heading + bullets from the 12.5px caption tier to 15px bold
+`leading-relaxed`, the state mark 16/18 → 18/20, roomier bullet rhythm
+and panel padding (never toggled — always open; the pale-red surface,
+region-step ink and `data-attention-box`/bullets hooks stay exactly as
+approved). No new copy keys, no data logic, feed, count, ranking or
+aria-hook changes. Evidence + 8 screenshots:
+`docs/insights/economic-indicators-panels-verification.md`.
+
+- **Active worker**: currena-api **`0230f09b-b10e-4fdc-9e7a-544730950d79`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *` keep-warm
+  cron unchanged; currena-markets untouched — UI-only round).
+- **What it carries**: everything from 5164c21a (the fidelity round) +
+  the panels round (commit `557ff75`, fast-forward merged to main; CI
+  green on it — typecheck, lint, 1,603 tests, build, bundle budgets after
+  the documented 659.00/158.00 Insights bump (D-38), copy audit).
+- **Live-verified** (currena.ir, fresh profile, SW cleared): EN desktop
+  1600 — served chunks exactly the `557ff75` build (`index-Uqbna-ql.js`,
+  `Insights-D2o0OWve.js`), ONE signals panel on Global at 15px/700 with
+  the production markets bullet ("4 of 16 markets…"), ONE collapsed
+  toggle on Australia; real toggle click → `aria-expanded="true"` + the
+  rule panel appears; fa — toggle «مبنای تعیین وضعیت هر حوزه» + signals
+  «سیگنال‌های جهانی»; fa mobile 390 — carousel opens on جهانی with the
+  open signals panel, zero horizontal overflow; zero page errors.
+- **Rollback**: `wrangler rollback` (previous version 5164c21a), or
+  redeploy any prior main commit — the Worker carries the SPA build
+  from `apps/web/dist` at deploy time.
+
+The previous deployment record (the UI-fidelity round, worker 5164c21a)
+follows below.
+
+## CURRENT DEPLOYMENT — the economic indicators hero closes the gap to the approved reference (2026-10-19 UI-fidelity correction round, worker 5164c21a)
+
+The owner's correction brief (the editorial hero still read as a generic
+KPI dashboard) is LIVE on `/#/insights`, presentation-only: the page
+container widens to ~95% viewport (`xl:max-w-[min(calc(100%-56px),1840px)]`
+— 1544px at 1600, 1704px at 1760), the Sydney/world-map art bands settle
+in the reference's washed-watermark zone (26%/30% veils), THE NAMED
+SEVERITY BUG is fixed (the flagged rows' inline-start accent, the
+fallback triangle and the attention-count line now follow the REGION'S
+OWN verdict step via `article[data-ei-step]` → `--ei-accent` — a
+Stressed Australia speaks the #ff832b amber ink, only a Critical region
+speaks red), the status-grouped gauge boxes become the reference's
+compact CATEGORY ROWS (label · tinted state badge · sm meter, worst
+first), each card closes with the restrained contextual explanation
+panel (Global: the raised world signals under `worldSignalsTitle` on
+pale red — verified live with the production markets feed — falling
+back to the word-choice rule; Australia: `verdictRuleLabel` + rule on
+pale amber; tint + the 3px inline-start rule follow the region step),
+the indicator names step to 16px, the hero meters return to pill
+radius, and the new `ContinueStrip` names the next page sections in
+order under the hero. Two new copy strings × 2 locales, manifest round
+`editorial-fidelity-2026-10-19`. Evidence + 10 screenshots:
+`docs/insights/economic-indicators-fidelity-verification.md`.
+
+- **Active worker**: currena-api **`5164c21a-5e30-4c9f-a596-0f8316d5270b`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *` keep-warm
+  cron unchanged; currena-markets untouched — UI-only round).
+- **What it carries**: everything from 29ebc99b (the editorial hero
+  round) + the fidelity corrections (commit `89d35d4`, fast-forward
+  merged to main; CI green on it — typecheck, lint, 1,603 tests, build,
+  bundle budgets after the documented 657.00/157.50 Insights bump
+  (D-37), copy audit).
+- **Live-verified** (currena.ir, fresh profile): EN desktop 1600 —
+  container 1544px, Australia left / Global right, AU rows
+  `rgb(255,131,43)` amber vs Global red, Global panel kind `signals`,
+  strip present, zero page overflow, zero console errors; EN mobile 390
+  — carousel opens on Global, real Next click → Australia, dot flips;
+  fa RTL desktop 1600 — 1544px, Australia left, amber accents, panel
+  heading «مبنای تعیین وضعیت هر حوزه», panel accent 3px amber, row
+  chevron mirrored (`matrix(-1,0,0,1)`), strip «ادامهٔ صفحه …»; fa
+  mobile 390 — Global first, zero overflow.
+- **Rollback**: `wrangler rollback` (previous version 29ebc99b), or
+  redeploy any prior main commit — the Worker carries the SPA build
+  from `apps/web/dist` at deploy time.
+
+The previous deployment record (the editorial handoff round, worker
+29ebc99b) follows below.
+
+## CURRENT DEPLOYMENT — the economic indicators hero becomes the editorial financial interface (2026-10-19 editorial handoff round, worker 29ebc99b)
+
+The owner's `currena-hero.zip` handoff package (approved visual references,
+`spec/economic-indicators-ui-spec.md`, design tokens, Sydney Harbour +
+world-map artwork — recorded in the repo as
+`docs/insights/economic-indicators-editorial-spec.md`) is LIVE on
+`/#/insights`, presentation-only: the `<768px` GLOBAL-FIRST horizontal
+swipe carousel (scroll-snap track, cue + two aria-current dots + 44px
+Previous/Next above the track), the quiet Sydney/map art bands behind the
+two region card headers, the `--ei-navy` print ink (region titles, flagged
+values, page title), the tinted `.ei-state-pill` severity pill with the
+four-step meter unchanged beside it, and the flagged rows' editorial
+anatomy (subject-icon container, inline-start tier edge, RTL-mirroring
+drill-down chevron). The hero-scoped grayscale filter is retired (the new
+direction restores the restrained severity inks). Every calculation,
+threshold, ranking, aria hook, count and translated string is untouched —
+the 5 new fa carousel strings are manifest-triaged (round
+`editorial-hero-2026-10-19`).
+
+- **Active worker**: currena-api **`29ebc99b-e290-4d68-8623-5a892a75d2f9`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *` keep-warm
+  cron unchanged; currena-markets untouched — UI-only round).
+- **What it carries**: everything from 20b9549c (the ≥96px wordmark round +
+  every round beneath) PLUS the editorial hero.
+- **Chunk proof**: the 32b23b1 build serves `index-D4_TboZK.js`
+  (295.29/88.81) + `Insights-BI2tkJ8c.js` (655.03/156.73 — the documented
+  656/157 bump, D-36 + CHANGELOG §2026-10-19); both artwork WebP files
+  answer 200 (12,294 B + 3,668 B).
+- **Verified live** (agent-browser, fresh profile, workers.dev + currena.ir
+  smoke): EN desktop 1280 — Australia left:32 / Global right:652, both art
+  bands rendering behind legible navy titles, 2 pills + meters, zero
+  overflow; EN mobile 375 — Global first (x:16) with Australia off-screen,
+  cue + dots + buttons on the FIRST screen, real Next click → Australia
+  x:16 with the dot/cue flipping, `scrollWidth === clientWidth`; fa RTL
+  desktop + 390 mobile — «برای دیدن استرالیا بکشید», real «بعدی» click →
+  Australia x:16, track scrollLeft −370 (logical RTL), zero overflow at
+  every width; zero console/page errors everywhere. Evidence:
+  `docs/insights/economic-indicators-editorial-verification.md` +
+  `docs/insights/screenshots/economic-indicators-editorial/` (local) and
+  `/tmp/verify-live` (live-run screenshots, 5 files).
+- **Notable engineering finding**: the first carousel implementation (a
+  FLEX track with %-basis items) leaked ~98 px of PHANTOM scrollable
+  overflow into the document on mobile (page pannable into blank space;
+  nothing painted; baseline build measured clean). Bisected to a
+  layout-engine scrollable-overflow computation — fixed with the grid
+  auto-flow-column track + `contain: paint` (full story in index.css +
+  the verification notes).
+- **Gates on 32b23b1** (local + CI green): typecheck 6/6; 1,596 tests
+  (+10 new hero-editorial guards); lint 0 errors/15 accepted advisories;
+  copy:audit clean; build OK; budgets held (Insights 655.03/156.73 vs
+  656/157). CI run on main: completed/success.
+
+## PREVIOUS DEPLOYMENT — the index wordmarks at the owner-directed ≥96×96 px (2026-10-18 (2), worker 20b9549c)
+
+The owner's follow-up on the freshly deployed world-indices briefing
+("The pictures of each indices are too small make them at least 96x96
+pixel") is LIVE: every rendered index wordmark box is ≥96×96 px — tiles
+96 (stacked above the name; the explorer grid's 2→7 narrow columns leave
+no room for a beside-the-text logo), movers 96/112, the detail heading
+96 beside the name block. The white chip radius is capped at 16px so the
+big chips read as rounded squares, not pills. Shipped as 0a7387e (5
+files, +2 regression guards in briefing.test.tsx).
+
+- **Active worker**: currena-api **`20b9549c-46be-4d6a-a9ef-4f0cfc38ce70`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched — UI-only round).
+- **What it carries**: everything from b9a412e0 (the full world-indices
+  briefing + every round beneath) PLUS the ≥96px wordmark floor.
+- **Chunk proof**: the fresh 0a7387e build serves `index-Cl8aIt4y.js`
+  (295.29/88.82) + `Insights-DeBhQeKJ.js` (650.30/155.50) — served live
+  on the workers.dev origin (Insights-CUm3UhiW.js 650,283B is now 404;
+  the new 650,296B chunk answers 200).
+- **Verified live** (agent-browser, fresh profile, workers.dev): measured
+  boxes on the rendered page — 18 logos (16 tiles + 2 movers), min 96px /
+  max 112px, all naturalWidth>0 (loaded); the n225 detail panel opens
+  with a 96×96 wordmark; fa RTL desktop + EN desktop full pass; mobile
+  390 — scrollWidth 390 = innerWidth, zero horizontal overflow; zero
+  console + zero page errors. Evidence:
+  `docs/insights/screenshots/world-indices-briefing/logo-96px/`.
+- **Gates on 0a7387e** (local, all green): typecheck 6/6; 614 web tests
+  (+2 guards; full suite 1,586); lint 0 errors/15 accepted advisories;
+  copy:audit clean (no copy changes); build OK; budgets held (Insights
+  650.30/155.50 vs 652/156.50).
+
+## PREVIOUS DEPLOYMENT — the world stock indices editorial briefing is LIVE (2026-10-18 world-indices round, worker b9a412e0)
+
+The owner's directive ("if not committed and deployed, deploy them — I
+don't see any change in the live site") closed the gap between the
+shipped branch and production: `feature/world-indices-briefing`
+(f72e1a0, the 2026-10-18 handoff round — 42 files: 16 wordmark JPEGs +
+UI/i18n/tests/docs) was fast-forward-merged into main (e8815e3 → f72e1a0,
+zero regressions possible — the branch sat directly on the deployed
+state), pushed, and deployed. The 26c23d91 worker was serving the
+pre-redesign build (live chunk proof: index-DJK_gsXg.js) because the
+round had shipped to the branch only, awaiting review.
+
+- **Active worker**: currena-api **`b9a412e0-2bb5-4352-9c70-f22249ade149`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched — UI-only round).
+- **What it carries**: everything from 26c23d91 (057cd20, runtime-
+  identical to 26d) PLUS the world-indices briefing: the editorial header
+  «نبض بازارهای جهان» / «شاخص‌های بورسی جهان», the verdict card with the
+  period breadth strip + below-52w-high count, the «بیشترین رشد»/
+  «بیشترین افت» movers cards, the 4-lens period switch (روزانه/هفتگی/
+  ماهانه/سه‌ماهه — the annual gap stays reported, not fabricated), the
+  equal-area «نقشهٔ عملکرد» heatmap, the 16 wordmark logos
+  (/assets/markets/{id}.jpg), the country labels, and the honest
+  empty/partial states. 34 new assets uploaded (16 jpg + hashed chunks).
+- **Chunk proof**: the fresh f72e1a0 build serves `index-Cslta9H2.js`
+  (295.29/88.81) + `Insights-CUm3UhiW.js` (650.28/155.51 — the bumped
+  652/156.50, D-35) — sha256-identical on the workers.dev origin
+  (4609c779… / 92199993… = the local build hashes), so the deployment
+  matches main exactly.
+- **Verified live** (agent-browser, fresh profile, workers.dev): fa RTL
+  desktop 1440 — the new title + badge render, the verdict breadth strip,
+  movers on real stored data, the period switch (سهماهه → هفتگی moves
+  tiles+movers together), the heatmap switch (16 equal tiles + legend),
+  the detail panel opens from tiles, 19 market-logo imgs all loaded from
+  the CDN; EN locale full pass ("The pulse of world markets" + Daily/
+  Weekly/Monthly/Quarterly/List); mobile 390 — scrollWidth 390 =
+  innerWidth, zero horizontal overflow; zero console + zero page errors
+  across all combos. Evidence:
+  `docs/insights/screenshots/world-indices-briefing/`.
+- **Gates on f72e1a0** (local, all green): typecheck 6/6; 1,584 tests
+  (web 612); lint 0 errors/15 accepted advisories; copy:audit clean
+  (manifest 2,203); build OK; budgets held. GitHub CI on the main push:
+  run 39146557672 → **success**.
+- **Not changed**: providers, crons, KV, the markets worker, the read
+  route, the contract (MarketEntrySchema untouched; only the 4 supported
+  horizons offered — no invented annual return).
+- **Noted (pre-existing, unrelated)**: the 09:08 UTC insights-selfcheck
+  red run (T-03 dates) executed on e8815e32 hours before this push — a
+  live-source date condition in the daily data audit, not this UI-only
+  round.
+
+## PREVIOUS DEPLOYMENT — the repo root cleaned of misplaced specification markdown (2026-10-26e, worker 26c23d91)
+
+The owner's wrap-up directive ("commit, push, deploy") closing the
+minimal-cleanup work order: two root specification markdowns moved
+into their existing sibling folders as R100 byte-identical renames
+(`economic-indicators-ui-spec.md` → `docs/insights/`;
+`REMAINING_WORK.md` → `docs/`), the README pointer + the verification
+notes header updated, CHANGELOG §2026-10-26e + D-34 recorded (commit
+`057cd20`, the work order's exact message). **Runtime-identical to the
+26d deployment**: zero code, zero copy, zero served bytes changed.
+
+- **Active worker**: currena-api **`26c23d91-f9a3-4162-a9c1-a1dcee8ad6be`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched — same scope
+  as 26d).
+- **What it carries**: everything from 2e802ae7 (the balance v7 +
+  every round beneath) — byte-for-byte; the only delta is repository
+  documentation layout.
+- **Chunk proof**: the fresh `057cd20` build serves `index-DJK_gsXg.js`
+  (295.29/88.81) + `Insights-CH3Xq64v.js` (635.91/152.00) — both
+  sha256-identical on currena.ir (8f2ba133… / 1872ef4f… — the SAME
+  hashes as the 26d live verification; the deploy uploaded no
+  updated assets).
+- **Verified live** (agent-browser, fresh profile, currena.ir): EN
+  desktop + EN mobile 390 (scrollWidth 390 = innerWidth, zero
+  overflow) + fa RTL desktop («کورنا، مبدل ارز», dir=rtl) + fa
+  `#/insights` (the moved spec's page — «شاخص‌های اقتصادی» renders,
+  1366 = 1366); zero console + zero page errors across all four
+  combos. Evidence: docs/evidence/2026-10-26e-root-specs-cleanup/.
+- **Gates on `057cd20`**: typecheck 6/6; 1,536 tests green (web 564);
+  lint 0 errors/15 accepted advisories; copy:audit clean; build OK;
+  budgets held (entry 295.29/88.81; Insights 635.91/152.00).
+
+## PREVIOUS DEPLOYMENT — the gold balance rotates ONLY its beam (2026-10-26d, worker 2e802ae7)
+
+The owner's Iteration-5 addendum — "Rotate the beam only, and
+visualize weight" — is LIVE: exactly one rotating element (the beam
+group: bar + beads + pivot ring + needle, by rotate(theta, pivotX,
+pivotY)); the pans translate plumb and are never rotated, skewed or
+scaled; the hangers are recomputed every frame from each beam-end
+joint to the pan's two fixed rim corners; ONE JS-animated theta (the
+Odometer rAF pattern) derives beam rotation, joints, pan drops and
+hanger endpoints in the same frame. The tilt presentation scale is
+the addendum's 8 deg max / 2 deg floor (the net/total ratio law
+byte-identical), and the weight read-outs are scoped to what the
+model produces — the beam angle + the needle gauge (three
+verdict-labelled ticks, hidden when unavailable, gaugeAria round-52);
+per-side totals and per-factor weights do not exist, so the side-load
+bar and per-tile markers are skipped rather than fabricated. Pushed
+as 9e2fc59 (the v7 round merged over the parallel 2026-10-26c sidebar
+round; both ride).
+
+- **Active worker**: currena-api **`2e802ae7-c068-4c39-96a7-54862370cb32`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched).
+- **What it carries**: BalanceScale v7 (the SVG mechanical layer with
+  the pure balanceStageGeometry/balanceGaugeGeometry derivation, the
+  Odometer-pattern settle, the needle + arc, the retired v4 keystone
+  and the retired CSS-calc stage), gaugeAria x 2 locales + QA record +
+  manifest entry (round-52), the rewritten 45-test battery — and
+  everything from the 2026-10-26c sidebar + balance v6 + 2026-10-26b +
+  2026-10-25b rounds beneath.
+- **Chunk proof**: the fresh 9e2fc59 build serves `index-DJK_gsXg.js`
+  (295.29/88.81) + `Insights-CH3Xq64v.js` (635.91/152.00 — the bumped
+  636/152.50, D-33) — the served chunk is byte-identical on currena.ir
+  (sha256 1872ef4f..., 635,911 bytes, verified live).
+- **Verified live** (agent-browser, fresh profile, currena.ir): EN
+  desktop — the live state (1 against + 3 unread) renders the 2 deg
+  floor: beam `rotate(2 320 44)`, for/against pan translates
+  -5.58/+5.58 = 160 x sin 2 deg, hanger attach error 0.000, needle +
+  3 ticks + "Beam tilt: 2 degrees, Leaning against gold."; fa RTL —
+  beam `rotate(-2 320 44)` (the visual sign flips, the against pan on
+  the LEFT still drops +5.58), gauge aria in Persian with Persian
+  digits, the against pan (top 85.6 vs the for 74.4) matches the
+  verdict; mobile 390 — the drawing scales as one piece (stage 326,
+  pivot 163, drop 2.84 = 81.5 x sin 2 deg), zero overflow; the tile
+  tap opens the shared panel (verified in fa); zero console errors.
+  Evidence: docs/insights/screenshots/gold-balance/v7/ (live-v7-*.png).
+- **Gates on the merged tree**: typecheck 6/6; lint 0 errors/15
+  accepted advisories; 1,536 tests green (web 564); copy:audit clean
+  (2,170 entries); build OK; budgets held.
+
+## PREVIOUS DEPLOYMENT — the asset cards' details sidebar (2026-10-26c, worker 6adfb632)
+
+The owner's directive — "The more details must show up in side bar" —
+is LIVE: the «جزئیات بیشتر» button opens the F5 details side panel
+(never an inline expansion), with the five sections rendering inside it
+under the card facts. Pushed as 99742c2 (rebased over the parallel
+balance-v6 round 2f9f4e6; both ride).
+
+- **Active worker**: currena-api **`6adfb632-1d28-4156-896e-dc823846feb4`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched).
+- **What it carries**: PricesBoard's disclosure deleted (the button calls
+  onFocusCard with aria-haspopup=dialog + PanelRight/PanelLeft
+  affordance), the new PriceDetails.tsx (the five sections + the shared
+  atoms + the keyed usePricePanelData on the module-cached fetch),
+  DetailsPanel rendering the sections for the four price rows + the
+  verified panel title (priceCardTitles), lessDetails retired from both
+  dictionaries + the manifest (round-52:
+  docs/QA/quirks-2026-10-26c-asset-cards-sidebar.md), the rewritten
+  13-test battery — and everything from the balance v6 + 2026-10-25b +
+  2026-10-26b rounds beneath.
+- **Chunk proof**: the fresh 99742c2 build serves `index-gB3_zV9f.js`
+  (295.29/88.82) + `Insights-DW1SDXvu.js` (634.13/151.33 — budgets
+  635/152 held) — both live on currena-api.sedanama-ir.workers.dev and
+  currena.ir.
+- **Verified live** (agent-browser, fresh profile, currena.ir): EN
+  desktop 1280 — «More details» opens the right sheet (440px flush
+  inline-end), heading "Gold price" (not the legacy "(ounce)"), the
+  five sections under the facts, focus trapped, body scroll locked,
+  Escape closes and focus RETURNS to the trigger; fa RTL — «قیمت طلا»,
+  the five Persian sections, the sheet flush LEFT (start side); mobile
+  375 fa — bottom sheet (full-width, top ≈ 97px), no horizontal
+  overflow; the four tiles stay compact (zero h4 inside the cards);
+  zero console/page errors. Evidence:
+  `docs/evidence/2026-10-26c-asset-cards-sidebar/` (harness + live
+  captures + the sandbox-mirror set).
+- **Gates on the rebased tree**: typecheck 6/6; lint 0 errors/15
+  accepted advisories; 1,521 tests green (web 549); copy:audit clean
+  (2,169 entries); build OK; budgets held.
+
+## Previous: the balance v6 pans + the merged parallel rounds (2026-10-26c, worker 4079aed7)
+
+The owner's Iteration-4 directive is LIVE: the gold balance's factor
+tiles REST ON real weighing pans hung from the beam — one connected
+weighing machine. Pushed as 8075e10 (a merge: the v6 round + the two
+parallel prices rounds 2026-10-25b and 2026-10-26b, both riding
+beneath).
+
+- **Active worker**: currena-api **`4079aed7-1fd0-46d8-a785-98e65b2363e6`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched).
+- **What it carries**: the v6 balance (BalanceScale.tsx rewritten —
+  the CSS stage, pans, hangers, tiles, capacity/overflow pills, the
+  round-51 panEmpty/panUnreadable copy, manifest 2,168 → 2,172,
+  `copy:audit` clean) + everything from 2026-10-25b and 2026-10-26b
+  beneath it (the asset-cards polish + the methodology-note removal).
+- **Chunk proof**: the fresh 8075e10 build serves
+  `index-DqAkLpec.js` (295.29/88.81) + `Insights-DxCfnBbd.js`
+  (633.39/151.41 — budgets 635/152 held; D-32 records the merged-tree
+  bump).
+- **Verified live** (agent-browser, fresh profile with the SW purged
+  per D-29, currena.ir): the balance renders the full v6 anatomy (2
+  pans, 8 hanger elements, beam + 2 beads) with the live state (1
+  against · 3 unread → the 4° floor). The TILT LAW MEASURED ON
+  PRODUCTION: pan-pair difference = bead-pair difference = 22.32px =
+  320×sin(4°) at the 640px stage (and 10.32px = 148×sin(4°) at the
+  296px mobile stage) — the pans track their beads exactly. The
+  against pan carries the «بازده واقعی اوراق قرضه ۲٫۷۸٪» tile (the
+  tap opens the shared panel — verified), the for pan shows the
+  «نشانهٔ معتبری نیست» marker, the verdict box reads
+  «تمایل به ضرر طلا · ۱ به ضرر · ۳ قابل ارزیابی نیست» + the C12
+  banner. fa RTL: the green side on the right, Persian digits; en
+  LTR verified ("Real yields 2.78%" / "No qualifying signals" /
+  "Factors supporting gold's price"). Mobile 360: pans side by side,
+  tile legible, no horizontal overflow (scrollWidth 360 = innerWidth).
+  Zero page errors across the session. VLM review of the live
+  captures: factors-on-pans confirmed, RTL correct, "High" editorial
+  quality, no defects. Evidence:
+  `docs/insights/screenshots/gold-balance/v6/live-v6-*.png`.
+- **Gates on the deployed tree**: typecheck 6/6; lint 0 errors/15
+  accepted advisories; 1,519 tests green (web 547, the balance suite
+  30); copy:audit clean (2,172 entries); build OK; budgets held.
+
+## Previous: the methodology-note removal (2026-10-26b, worker f9571a79)
+
+The owner's follow-up directive is LIVE: the sixth expanded-detail
+section — «دربارهٔ این اعداد» ("About these numbers") and its
+three-sentence methodology body — no longer renders on the four asset
+cards. The panel now carries the five data sections A–E; the methodology
+itself is untouched (it stays implemented in price-trend.ts /
+price-stats.ts and documented in the QA docs). Pushed as 648f5aa (no
+rebase needed — main had not advanced).
+
+- **Active worker**: currena-api **`f9571a79-afb6-433a-bae7-d3423e6ac692`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched).
+- **What it carries**: the PricesBoard section-F removal + its
+  header-comment tag, `aboutNumbersLabel`/`aboutNumbersBody` deleted from
+  both dictionaries, the two manifest entries deleted per the copy
+  workflow's removal rule (2,170 → 2,168, `copy:audit` clean), and the
+  test's F assertion replaced with removal guards in BOTH locales.
+  Everything else from 2026-10-25b rides beneath unchanged.
+- **Chunk proof**: serves `index-CKqYpOMM.js` (295.29/88.81 — the entry
+  hash rotated because it embeds the lazy chunk's filename; its own size
+  is byte-identical) + `Insights-7kn32ZoI.js` (628.67/150.59 — budgets
+  630/151 held; the removed copy shrinks the chunk ~1.2 kB) — the fresh
+  648f5aa build's exact filenames.
+- **Verified live** (agent-browser, fresh profile, both
+  currena-api.sedanama-ir.workers.dev and currena.ir reference
+  index-CKqYpOMM.js and serve Insights-7kn32ZoI.js): desktop 1280 en —
+  the expanded Gold card shows EXACTLY the five sections (Price changes /
+  Price range over the past 52 weeks / Historical price records / Price
+  vs reference levels / Data source & freshness), 'About these numbers'
+  zero occurrences, the element-from-point probe at the LAST section's
+  coordinates hits that H4 itself (the panel paints inside the tile — the
+  2026-10-24d lesson applied); desktop 1280 fa RTL — exactly
+  تغییرات قیمت / محدودهٔ قیمت در ۵۲ هفتهٔ گذشته / سوابق تاریخی قیمت /
+  جایگاه قیمت نسبت به شاخص‌های مرجع / منبع داده و زمان به‌روزرسانی,
+  «دربارهٔ این اعداد» zero occurrences; mobile 375 fa — no horizontal
+  overflow (scrollWidth 375), five sections intact. Zero console/page
+  errors across the session. Evidence:
+  `docs/evidence/2026-10-26b-remove-methodology-note/` (sandbox + live
+  captures).
+- **Gates on the deployed tree**: typecheck 6/6; lint 0 errors/15
+  accepted advisories; 1,520 tests green (web 548); copy:audit clean
+  (2,168 entries); build OK; budgets held.
+
+## Previous: the asset-cards polish round (2026-10-25b, worker ead002b6)
+
+The owner's asset-cards polish task is LIVE: the four financial cards
+carry the editorial header (plain title over a verified measurement-
+basis subtitle), the ONE-LINE price + currency («۴٬۱۶۶ دلار» /
+"US$4,166"), the expanded panel's six semantic sections, and honest
+instrument notes that follow the SERVED attribution (the futures note
+no longer renders on gold-api XAU/XAG spot prices; «بیشترین قیمت ۱۰
+سال اخیر» replaces the all-time record claim). Pushed as db31745
+(rebased over the balance-v5 round 5f37014) before deploy.
+
+- **Active worker**: currena-api **`ead002b6-3c9e-4e9a-aae9-4535bb462f9f`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *`
+  keep-warm cron unchanged; currena-markets untouched).
+- **What it carries**: PricesBoard.tsx (header/price line/sections
+  A–F/conditional notes), the new pure priceValueParts display helper,
+  18 new copy keys + 5 relabelled (en+fa), +14 tests, the round-51
+  copy triage, and the documented Insights budget bump 627/150 →
+  630/151. All prior lineage (balance v5 + v4, financial-asset-cards
+  2026-10-24c/d, market lenses, economic-indicators) rides beneath.
+- **Chunk proof**: serves `index-BtcN1ZYd.js` (295.29/88.82) +
+  `Insights-BMyE-MXL.js` (629.85/150.88 — budgets 630/151 held) —
+  the fresh db31745 build's exact filenames.
+- **Verified live** (agent-browser, fresh profile, both
+  currena-api.sedanama-ir.workers.dev and currena.ir serve
+  Insights-BMyE-MXL.js): desktop 1280 fa — «قیمت طلا»/«هر اونس تروی»,
+  «۴٬۱۶۶ دلار» on one line, the six sections («تغییرات قیمت …
+  دربارهٔ این اعداد»), the range «۳٬۹۶۱ تا ۵٬۳۱۸ دلار», the record
+  «بیشترین قیمت ۱۰ سال اخیر», the fetch-time line; desktop 1280 en —
+  the six sections, gold's XAU spot attribution with NO futures note
+  (brent keeps its blend note); mobile 375 en — "Gold price" + "per
+  troy ounce", "US$ 4,166" one line, no horizontal overflow. Zero
+  console errors. Evidence:
+  `docs/evidence/2026-10-25b-asset-cards-polish/` (before/after +
+  LIVE-*.png).
+- **Gates on the rebased tree**: typecheck 6/6; lint 0 errors/15
+  accepted advisories; 1,520 tests green (web 548); copy:audit clean
+  (2,170 entries); build OK; budgets held.
+
+## Previous: the gold balance v5 wireframe re-composition (2026-10-26, worker 2f1e8f92)
+
+The owner's wireframe reference (docs/ui-reference/gold-silver-balance-target-
+wireframe.png) is LIVE: the gold balance component re-composed — the two
+opposing factor columns ABOVE the abstract beam (its endpoint beads under
+the columns' centres), the compact soft assessment box beneath, per-column
+progressive disclosure ("+{n} more" / "Show fewer"). The tilt law and every
+user-facing string are untouched (zero copy changes). Merged to main as
+1e99007 (my feature merge 7742966/51edd10 + the parallel 2026-10-24d
+white-space fix 0d39bb0 — no file overlap, both rounds ride).
+
+- **Active worker**: currena-api **`2f1e8f92-e587-4ef2-951b-821e44438077`**
+  (wrangler deploy from main @ `1e99007`; SITE_MODE=public, RATES KV +
+  ASSETS bindings, the `* * * * *` keep-warm cron unchanged).
+  currena-markets untouched.
+- **What it carries**: BalanceScale.tsx (the v5 composition + the
+  disclosure pills + the assessment box), its 31-test suite re-pinned, the
+  MergedCard comment, the documented Insights raw budget bump 626 → 627
+  (gz HELD 150) — everything else byte-for-byte (the parallel session's
+  PricesBoard white-space fix included).
+- **Chunk proof**: the deploy serves `index-CWDirSZM.js` (295.29/88.81) +
+  `Insights-BuYjxnZ9.js` (626.28/149.93 — budgets 627/150 held); the
+  live-served Insights chunk sha256 `da8163846c186db7…` is byte-identical
+  to the fresh main build's.
+- **Verified live** (agent-browser, fresh profile, SW purged per D-29,
+  currena.ir): EN 1280 — the columns render ABOVE the beam (DOM-verified:
+  lists.bottom ≤ zone.top), the beads sit under their column centres
+  (477/480, 803/800 — the 3px residue is the grid gap), the live state
+  (1 against · 3 couldn't be read) tilts exactly 4° with bead Δy 22px =
+  320px × sin(4°) measured on production, the assessment box
+  (bg-currena-soft/60) follows the zone, the for side shows the
+  evidence-based empty line, a row tap opens the shared panel
+  (detail=real-yield); fa RTL 1280 — dir=rtl, «برآیند عوامل مؤثر بر قیمت
+  طلا» heading, the for column + its green bead on the RIGHT, the against
+  bead lower, Persian digits («۱ به ضرر · ۳ قابل ارزیابی نیست»); mobile
+  360 fa — the columns stack, zero horizontal overflow, the beam +
+  assessment readable, VLM pass on the scrolled capture; zero console
+  errors across the session. Evidence:
+  `docs/insights/screenshots/gold-balance/v5-iteration/` (live-v5-*).
+- **Post-merge gates** (re-run on `1e99007`): typecheck 6/6; lint 0
+  errors/15 accepted advisories; web tests 534/534 green; copy:audit
+  clean; bundle budgets held.
+
+## Previous: the «جزئیات بیشتر» white-space fix (2026-10-24d, worker cc6f28e6)
+
+The owner's post-deploy bug report is FIXED and LIVE: clicking «جزئیات
+بیشتر» / "More details" on the live site now renders the detail rows
+inside the card (was "just a white space"), and the prices block gained
+breathing room to the markets section (was "collided"). Root cause and
+fix: `docs/evidence/2026-10-24d-disclosure-overflow-fix/README.md`.
+
+- **Active worker**: currena-api **`cc6f28e6-76dc-405f-a6ba-5fa7fd6adc9b`**
+  (wrangler deploy from main @ `c8e0741` — the fix rebased over the
+  balance-v4 round `29418f7` and pushed before deploy; SITE_MODE=public,
+  RATES KV + ASSETS bindings, the `* * * * *` keep-warm cron unchanged).
+  currena-markets untouched.
+- **What it carries**: PricesBoard.tsx only — the tile `article` becomes
+  `flex h-full flex-col` and the card-body click-through button drops
+  `h-full` (keeps `grow`), so the disclosure trigger + expanded panel stay
+  INSIDE the tile and the tile grows naturally with the open panel (spec 02
+  §5); plus `pb-3` on the prices section = 40px card→markets air (was
+  28px; the page-wide rhythm untouched). All prior lineage (balance v4,
+  financial-asset-cards 2026-10-24c, market lenses, economic-indicators)
+  rides beneath, byte-for-byte.
+- **Chunk proof**: the deploy serves `index-Djk3ghSx.js` (295.29/88.81) +
+  `Insights-CPlqsmeb.js` (625.47/149.75 — budgets 626/150 held) — the
+  live-served chunks are the fresh main build's (`c8e0741`) exact
+  filenames (the entry hash moves with the lazy-chunk rename).
+- **Verified live** (agent-browser, fresh profile, both
+  `currena-api.sedanama-ir.workers.dev/insights` and `currena.ir`):
+  desktop 1280 EN — the expanded Gold panel PAINTS (elementFromPoint
+  probes hit the panel's own rows: "52-week range US$3,961 – US$5,318",
+  "25.4% below its record US$5,586", the source link, the method note);
+  panel bottom inside the tile bottom; measured 40px card→markets air
+  collapsed; mobile 375 EN — panel inside the grown tile, Silver 10px
+  below it, scrollWidth == 375, no horizontal overflow; fa RTL — «جزئیات
+  بیشتر»/«نمایش کمتر» label flip, Persian rows paint («تغییر ۶ ماهه
+  −۱۴٫۶۲٪», «سطح قیمت نسبت به دامنهٔ ۱۰ ساله»); VLM reviews of the live
+  captures pass; zero page errors. Evidence:
+  `docs/evidence/2026-10-24d-disclosure-overflow-fix/live/`.
+- **Post-rebase gates** (re-run on `c8e0741`): typecheck 6/6; lint 0
+  errors/15 accepted advisories; 1,506 tests green (web 534); copy:audit
+  clean; bundle budgets held.
+
+## Previous: the gold balance v4 abstract editorial mark (2026-10-25, worker c6e0c2c9)
+
+The owner's Iteration-2 directive is LIVE: the gold/silver balance
+component re-drawn as the abstract editorial mark «برآیند عوامل مؤثر بر
+قیمت طلا» (the literal hanging-pan scale retired). Merged to main as
+`e1b2e68` (feature branch `7d360aa`) and pushed before deploy.
+
+- **Active worker**: currena-api **`c6e0c2c9-02d9-4652-8377-fb65a94f6b5e`**
+  (wrangler deploy from main @ `e1b2e68`; SITE_MODE=public, RATES KV +
+  ASSETS bindings, the `* * * * *` keep-warm cron unchanged).
+  currena-markets untouched.
+- **What it carries**: the ONE flat 520×104 balance SVG (tapered beam,
+  compact hub + 13u keystone pivot — no base bar/column — accent endpoint
+  beads, dotted level reference); the Iteration-2 §3 hierarchy (heading +
+  subtitle → illustration → the two side-labelled factor lists sharing the
+  beam's max-w-520 footprint → the divider-separated overall assessment
+  with the C12 banner → the shared panel → the trays); the round-50 copy
+  (heading/subtitle/side labels/evidence-based empty lines + the NEW
+  `listEmptyNone` unavailable wording); the tilt law untouched
+  (|net|/total × 12°, 4° floor). All prior lineage (financial-asset-cards
+  2026-10-24c, market lenses, economic-indicators) rides beneath,
+  byte-for-byte.
+- **Byte-identical proof**: the deploy serves `index-CjQNEJy-.js`
+  (295.29/88.81) + `Insights-BLn59lac.js` (625.46/149.74 — budgets
+  626/150 held) — the live-served chunks are the fresh main build's
+  (`e1b2e68`) exact filenames.
+- **Verified live** (agent-browser, `currena.ir/#/insights`): EN 1280 —
+  the heading/subtitle/beam/lists/assessment hierarchy renders, and the
+  TILT LAW MEASURED ON PRODUCTION: bead Δy = 23.438u = Lh × sin(4°) with
+  **0.0u diff** (the live state: 1 against · 3 couldn't be read → 4° lean
+  to the red bead); fa RTL 1280 — «برآیند عوامل مؤثر بر قیمت طلا»,
+  SVG mirrored (scaleX(-1)), «۱ به ضرر · ۳ قابل ارزیابی نیست» with
+  Persian digits, the same 4° LTR-signed rotation, the evidence-based
+  empty line under the empty «عوامل حمایتی از قیمت طلا» list; mobile 360
+  fa — the lists stack to one column (measured), scrollWidth == 360, the
+  row's keyboard Enter opens the shared detail panel (aria-expanded
+  true); zero console errors. VLM reviews of both live captures pass.
+  Evidence: `docs/insights/screenshots/gold-balance/` (live-v4-*.png +
+  the v4 harness battery + before-v3 capture).
+
+## Previous: financial-asset-cards spec pack (2026-10-24c, worker 6d6e1300)
+
+The prices-board cards redesign per the owner's
+`financial-asset-cards-spec-pack.zip` is LIVE. Session 2026-10-22, rebased
+onto main @ round 46 (`0e411e6`) and pushed as `d952983` before deploy.
+
+- **Active worker**: currena-api **`6d6e1300-9af8-42fe-b42e-bd73ee865211`**
+  (wrangler deploy from `d952983`; SITE_MODE=public, RATES KV + ASSETS
+  bindings unchanged). currena-markets untouched.
+- **What it carries**: the four asset cards re-anatomised per spec 02 —
+  identity → dominant price + unit line → per-card as-of → THE SEVEN-DAY
+  TREND (day-spaced real-data `PriceSparkline` + net % + documented trend
+  word) → labelled daily change → deterministic hedged briefing →
+  «جزئیات بیشتر» disclosure (every secondary statistic preserved behind
+  it); `price-trend.ts` (+16 tests); PRICE_ROWS → Gold, Silver, Oil,
+  Bitcoin; 41 copy keys × 2 locales + the ma200 ٪ technical entry
+  (manifest 2,147); budgets 609/145.60 → 626/150. All concurrent-session
+  work (markets lenses round 46, economic-indicators lineage) rides
+  beneath, byte-for-byte.
+- **Byte-identical proof**: the deploy serves `index-BKEHdQbU.js`
+  (sha256 `730232ae…`, 295.29/88.82) + `Insights-DgGMrELI.js`
+  (sha256 `fdd478e7…`, 624.65/149.59) — the live-served Insights chunk
+  hashes **identically** to the fresh build of `d952983`.
+- **Verified live** (agent-browser, fresh profile, both
+  `currena-api.sedanama-ir.workers.dev` and `currena.ir` serve
+  `index-BKEHdQbU.js`): 4 cards in spec order (gold/silver/brent/btc),
+  4 aria-expanded disclosures, sparklines rendered, "Past 7 days" +
+  "Daily change" labels, gold US$4,166; disclosure click → aria-expanded
+  true + Changes/30 days/52-week/Price level vs 10-year range/Historical
+  high/Data source rows + label flips "Show less"; fa RTL (dir=rtl,
+  Persian digits, «جزئیات بیشتر», Jalali ۱۴۰۵); 375px single column, no
+  horizontal overflow at any width; zero page errors. Evidence:
+  `docs/evidence/2026-10-24c-financial-asset-cards/` (LIVE-*.png).
+
+## Previous: world stock markets public restore (2026-10-18b lineage, recorded 2026-10-18c)
+
+The newest code on main is LIVE — this section records the reconciliation
+for owners reading this runbook top-down (the 2026-10-18b session
+documented its deploys in CHANGELOG + evidence README but no DEPLOY.md
+entry; this closes that gap).
+
+- **Active worker (Cloudflare-confirmed)**: currena-api
+  **`9f66a82c-d0d4-494e-a3cd-524eac3b557b`** — the Gradual Deployments API
+  shows this version at **100%** (deployment `7c2a2526`, created
+  2026-10-17T16:51:58Z, source wrangler), preceded by
+  `c476307f-4c12-4879-88b2-41cbd844ea65` (the first public-restore deploy,
+  then re-deployed after integrating remote main's PWA `sw.js` no-store fix
+  40a66f5). currena-markets untouched.
+- **What it carries** (all merged to main, all pushed): the Economic
+  Indicators redesign in the owner-trimmed scope (hero grayscale — see the
+  two entries below), the deterministic PWA update path (no-store `sw.js`
+  + `controllerchange` reload), and the world stock markets board back in
+  public mode (130e8a8 — `/api/insights/markets` 200 with 16 markets;
+  `/api/insights/fx` still hidden by design).
+- **Byte-identical proof (2026-10-18c reconciliation)**: a fresh
+  `pnpm --filter @currena/web build` of main @ `4d339b5` produces
+  `index-ChVkduNn.js` (sha256 `c06ff8db…`) + `Insights-BwhME956.js`
+  (sha256 `cbb6da44…`) — **identical hashes to the live-served chunks**,
+  so the deployment matches main exactly; nothing newer is undeployed and
+  nothing undeployed is unpushed.
+- **Re-verified live** (agent-browser, fresh context): hero icons
+  `grayscale(1)` both themes, Australia-left/Global-right at 1280, colored
+  design below hero, markets section renders (16 tiles, detail panel,
+  full-table disclosure), tile rule 3 + `+3 more`/`نمایش کمتر` round-trip
+  with aria-expanded, fa RTL + Persian digits + 92 LTR islands, no
+  h-overflow at 1280/360, keyboard `/` + Escape, zero console errors.
+  Evidence: `docs/insights/screenshots/economic-indicators-redesign/final-continuation/`.
+
+## Previous: gold balance v3 + market lenses (2026-10-18d, worker 7b939901) — superseded by the v4 above
+
+Three concurrent sessions' work rides this deploy (merged in order):
+market lenses round-46 (0e411e6) → the financial-asset-cards spec pack
+(2026-10-24c, d952983, itself deployed as 6d6e1300 first) → the gold
+balance v3 (the owner directive 2026-10-18d, this session, c6278f6
+after two conflict-free merges of the dictionaries/CHANGELOG/manifest).
+
+- **Deployed**: currena-api **`7b939901-9779-4033-be46-98875fb4eb2b`**
+  (SITE_MODE=public intact; currena-markets untouched `0135290c`), built
+  from main @ `c6278f6`: entry `index-sbafnz6H.js`, Insights lazy
+  `Insights-DW2zP-PU.js` — 624.63 kB / 149.57 kB gz vs the 626/150
+  budgets (the spec-pack session's bump); gates re-run on the merged
+  tree: typecheck 6/6, web 533 + api 238 tests, lint 0 errors/15
+  advisories, copy:audit clean (2,147 entries).
+- **The balance v3 live** (https://currena.ir/#/insights, fresh
+  browser): SVG viewBox 520×252, beam rotate(4°) for the live state (1
+  against · 3 unread — the 4° floor), measured pan-rim difference
+  23.4px = Lh × sin(4°) exactly; the against list carries "Real yields
+  2.84%", the for side the empty-state line "No readings support gold
+  right now."; no dashed slot exists anywhere; fa RTL: the SVG mirrored
+  scaleX(-1), «تمایل به ضرر طلا», «۱ به ضرر · ۳ قابل ارزیابی نیست»,
+  «فعلاً هیچ عامل به نفع طلا دیده نمی‌شود.», the for list on the
+  right; 360px fa: 0px horizontal overflow; zero console errors and
+  zero messages across theme + locale + viewport changes.
+- **Screenshots**: `docs/insights/screenshots/gold-balance/v3-live-*.png`
+  (en 1280 light + dark, fa 1280 RTL, fa 360 RTL) + the harness set
+  `v3-<case>-<width>-<lang>.png` (cases A–H × en/fa × 360/768/1280).
+
+## Insights UI redesign — FINAL deploy after the owner's scope trim (2026-10-24, second entry)
+
+The owner reviewed the deployed full-grayscale release ("why did it turn
+everything on the page black and white?") and the concurrent session scoped
+the redesign to the header/hero (de897d4 / CHANGELOG 2026-10-18a): the
+grayscale + selective-severity treatment keeps ONLY the page header + the
+Global/Australia overview cards; the 28 component files below the hero are
+byte-identical to the pre-redesign colored design (green/blue chip tones,
+gold JumpNav pill, blue focus ring + progress bar, tinted alert faces,
+colored artwork — `filter: grayscale(1)` rescoped to `.insights-hero-grid`).
+
+This session merged the trim, re-gated, re-deployed:
+
+1. `pnpm --filter @currena/web build` — entry `index-CuowDJ_B.js`
+   295.15/88.76; Insights lazy `Insights-DvW0Xuc4.js` 606.32/144.86
+   (documented ceiling 607/145.20); precache 93 entries.
+2. `CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… pnpm --filter @currena/api
+   exec wrangler deploy` → **Worker version `d93bd0ba-9be2-4dc1-971b-4ccc7babe3d5`**
+   — RATES KV + ASSETS + `* * * * *` cron + SITE_MODE public intact.
+
+**Live verification (final state, https://currena.ir/#/insights, SW purged):**
+entry `index-CuowDJ_B.js` + `Insights-DvW0Xuc4.js` (200, 606319 B); hero
+icons `grayscale(1)` + below-hero icons colored; Context chip blue / Normal
+green / Needs attention red / Unusual amber; JumpNav active pill gold;
+expand/collapse 3→6→3 with aria state; fa dark RTL (Global right, «جهانی»,
+Persian digits, Vazirmatn, LTR meters); no h-overflow at 360 EN + fa; zero
+console errors. Screenshots refreshed in
+`docs/insights/screenshots/economic-indicators-redesign/` (final state).
+
+(The earlier `66fb622f` deploy of the full-grayscale build — same session,
+before the trim — remains recorded below as the intermediate state.)
+
+## Insights UI redesign deploy (2026-10-24, economic-indicators-ui-spec.md)
+
+**Web-change-only** (apps/web + docs; no packages/insights, apps/api or
+apps/markets code touched — the markets worker was NOT deployed). The
+concurrent session's real-spec implementation (2c171ca) + this session's
+reconciliation (9623595, merged main):
+
+1. `pnpm --filter @currena/web build` — entry `index-BfcmObfm.js`
+   295.15/88.76 (budget 296/89.5); Insights lazy `Insights-CZEldAUv.js`
+   605.68/144.60 (documented ceiling 607/145.20, CHANGELOG §2026-10-17f);
+   precache 93 entries / 3120.65 KiB.
+2. `CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… pnpm --filter @currena/api
+   exec wrangler deploy` → **Worker version `66fb622f-f8ed-4abb-9535-3005e7ce8c59`**
+   (first run `6f0de2c4-fe66-4044-98c2-6fc3815d61b1` uploaded the same dist —
+   the assets took a moment to settle on the edge; the second run confirmed
+   the serving manifest). RATES KV + ASSETS + `* * * * *` cron + SITE_MODE
+   public intact; 106 asset files.
+
+**Live verification (https://currena.ir/#/insights, agent-browser, SW
+precache purged first):**
+
+- Served build: entry `index-BfcmObfm.js` (byte-identical index.html md5
+  `b2b83a8b…` vs local dist); Insights `Insights-CZEldAUv.js`.
+- EN light desktop 1280: hero grid + **Australia left / Global right**
+  (measured rects); flagged rows 3 → "+3 more" → 6 → "Show fewer" → 3 with
+  aria-expanded/aria-controls; step-4 meter grades pale→full Carbon Red 60;
+  Critical word `rgb(218,30,40)`; probe-based banned-ink audit (oklab
+  color-mix aware) = **zero occurrences** in the public render.
+- FA dark desktop 1280 + FA dark mobile 360: `dir=rtl`, «جهانی» heading,
+  «۶ شاخص از ۱۰ شاخص نیازمند توجه‌اند.» Persian digits, Vazirmatn, meters
+  `direction:ltr`, Global stays right; `scrollWidth === clientWidth` at 360
+  both locales (also 320–1440 verified locally).
+- EN light mobile 360: no overflow. Signals section renders; the v2 seesaw
+  present (`data-balance-captions`/`#gold-balance-detail` in DOM, artwork
+  grayscaled via the page rule).
+- Zero console errors across all combos. VLM review of the live hero:
+  "clean, professional palette… color used functionally… no decorative
+  blue or gold".
+- Screenshots: `docs/insights/screenshots/economic-indicators-redesign/`
+  (en/fa × light/dark × desktop/mobile + the signals/seesaw section + the
+  local private-mode world-markets board).
+- Full evidence + method:
+  `docs/insights/economic-indicators-verification-notes.md`.
+
+No ingest dispatch needed — presentation-layer only; the production
+snapshot (`generatedAt 2026-10-17T08:38:42Z`, 32 public readings) is
+unchanged.
+
 ## Post-deploy smoke (2 minutes)
 
 ```sh
@@ -583,6 +1474,52 @@ justification in CHANGELOG §I15 Budget).
   gold/silver seeded 120 accumulated points from the previous KV history.
 
 
+
+## Session record — 2026-10-19 (v3 merge): the rebuild meets main, both owner streams on one tree, shipped to production
+
+The owner: "Commit Push deploy. merge with main branch. and deploy and
+release." The v3 `insights-rebuild` (12 commits, spec package 100%
+implemented, Phase-9 verified 1,637 green) merges `origin/main`'s 96
+newer parallel-round commits into one tree — the v3 spec package
+(uploaded at main's tip, `1e39a24`) governs the Insights page; main's
+live machinery implements it.
+
+- **The merge's one hard call — the balance**: the owner's v7
+  `BalanceScale` (5 wireframe iterations, live on currena.ir) renders
+  PER METAL per v3 UI-45 (gold AND silver, the silver-only industrial
+  condition inside silver's); UI-40 sparse honesty rides the component
+  (readable < 3 → level beam + refusal wording, gauge hidden); UI-39.5's
+  readable-count line renders on both. The 12° helper law is superseded
+  by the owner's iterated 8°/2° law + the sparse rule — recorded in
+  together-signals.test.ts; the readable-1 "Not enough readable
+  conditions to weigh" line is unit-pinned (balance.test.tsx §9) and the
+  readable-0 word keeps the owner's "Can't read the conditions right now".
+- **Retired by the governing v3 spec** (recorded honestly): the
+  editorial carousel hero + art bands (replaced by the UI-01..09 hero),
+  the ContinueStrip (replaced by MovesNextStrip, UI-18/19), the full
+  table's Trend/week/month/year columns (the exact UI-27 set ships; the
+  lens data + every export column stay), the separate silver-only list
+  (folded into silver's balance), the spoofed Mozilla Yahoo UA (never —
+  T-25/F-09 honest UA at range=2y).
+- **Kept from main** (owner directives, live): the markets board public
+  (2026-10-18b) behind the M-5 panic switch, the world-indices briefing
+  around the UI-27 table, the ≥96px wordmarks, the prices sparkline
+  cards + PriceDetails sidebar, the Australia signals content, the
+  grayscale controls language (at the v3 44px touch minimum).
+- **Gates on the merged tree**: 1,804 tests green (core 191 · scraper 67
+  · insights 521 · markets 13 · api 334 · web 678); typecheck 6/6; lint
+  0 errors/15 advisories; copy:audit clean (manifest union: +silver
+  balance strings, +verdictNone/silverOnly triage, −6 retired entries);
+  T-15 + budgets held (Insights lazy 686.78/165.45 inside the measured
+  687/166 bump, entry untouched 295.28/88.81); visual acceptance 19/19
+  (U-09/U-09a re-pinned to the merged BalanceScale with the level-beam +
+  readable-line pins, U-10 duration-based); self-check 25/25 —
+  SELF_AUDIT.md + `exports/currena-insights-full-2026-10-19.md`
+  regenerated.
+- **Deploy**: all three commands — web build + `currena-api` +
+  `currena-markets` (the markets worker's honest-UA fetchers changed);
+  SITE_MODE=public rides the owner directive. Deployment IDs + the
+  live-verified evidence land below with this round's release tag.
 
 ## Session record — 2026-10-08 I16 (the daily-accumulation fix)
 
@@ -1477,3 +2414,197 @@ the petrol/transport money row is gone while employment rate appeared.
   design: recovering the four price tiles publicly needs either
   verified-'unknown' licences (~10 more cards) or public-ok source
   swaps — owner decisions, not silent fixes.
+
+## Session record — 2026-10-19f the sparklines draw honest trends (the owner's screenshot report)
+
+- **Deployed**: currena-api **`ed79e2cc-fb2f-44ce-bcad-00d73dc57eed`** from
+  `9724040` (cron `* * * * *`, KV binding RATES `4627ac33…`, SITE_MODE=public
+  untouched; currena-markets untouched `9b5ff7e0`).
+- **Gates pre-deploy**: 1,431/1,431 tests (core 191 · scraper 67 · insights
+  462 · markets 13 · api 237 · web 461), typecheck 6/6, lint 0 errors / 15
+  accepted advisories, copy audit clean, budgets held (entry 295.15 kB /
+  88.76 gz; Insights lazy 594.68 / 141.60 gz).
+- **Post-deploy data migration**: one-time prune of `history:tgju` via the
+  KV REST API with the same 0.05% deadband (240 → 188 generations; USD
+  window 259,600 → 267,900); `history:frankfurter` already clean (21 gens,
+  no write). The Worker's deadband keeps future noise out.
+- **Verified live**: the owner's exact card (fa, 375 px) draws a smooth
+  rising line; popup "TREND: LAST 189 UPDATES · +3.2% · low 256,895 · high
+  267,900"; /#/live-rates cards calm (USD +3.2%, AUD +1.92%, EUR +3.22%);
+  zero console/page errors; no 375 px overflow; the 2026-10-19e prices
+  grid untouched (4 tiles + icons).
+- **Evidence**: `docs/evidence/2026-10-19f-sparkline-honesty/`.
+
+## Session record — 2026-10-20 the "Know before you buy US shares" box removed (the owner's direct request)
+
+- **Deployed**: currena-api **`e6d18811-46ae-4f27-890a-6a1f63b90cd1`**
+  (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`).
+- **Change**: `UsSharesNotesBox` deleted (component + render + import) at
+  the owner's explicit "Remove this entirely"; the four `usShares*` copy
+  keys retired from both dictionaries; their four manifest entries pruned.
+  No data/scoring/projection change.
+- **Gates pre-deploy**: copy:audit clean; all workspace suites green (web
+  461/461); typecheck 6/6; lint 0 errors / 15 accepted advisories; budgets
+  held — Insights lazy 592.61/141.14 gz (shrank from 594.68/141.60), entry
+  295.15/88.76.
+- **Verified live**: home 200; served `Insights-CvxT_7lu.js` byte-identical
+  to the local build with **0** occurrences of the box copy; `/api/insights`
+  → 32 readings, all four price tiles (`brent · gold-usd · silver-usd ·
+  btc-usd`) present — the prices board and sparkline fixes untouched.
+- **Evidence**: `docs/evidence/2026-10-20-remove-us-shares-notes/`.
+
+## Session record — 2026-10-20b the gold/silver verdict chips become analysis cards (the owner's sketch)
+
+- **Deployed**: currena-api **`757cb15b-45ae-4a61-8f4a-d808a515968d`**
+  (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`).
+- **Change**: the "Conditions right now" chips redrawn per the owner's
+  sketch — header row (boxed artwork 56/64px · name + verdict · the
+  current price in the MUTED secondary ink) over ONE BIG trend chart
+  (h-40 mobile / h-52 desktop, was h-20); the artwork-column side split
+  is gone — one anatomy for mobile AND desktop. MergedCard passes the
+  metals' display prices from the same snapshot readings. No copy, no
+  data change.
+- **Gates pre-deploy**: copy:audit clean; workspace tests 1,431 green;
+  typecheck all; lint 0 errors / 15 accepted advisories (after renaming
+  the previous round's minified evidence capture to `.js.txt` — ESLint
+  was linting it); budgets held (entry 295.15/88.76; Insights lazy
+  593.51/141.27, +0.9 kB raw).
+- **Verified live** (agent-browser): EN desktop plot 208px with muted
+  header prices "US$4,165"/"US$57.27"; EN mobile 375 identical anatomy,
+  no overflow; fa RTL mirrors the sketch (icon right, verdict red, price
+  left, Jalali ticks); prices board untouched (4 tiles + icons); zero
+  page/console errors.
+- **Evidence**: `docs/evidence/2026-10-20-verdict-chip-redesign/`.
+
+## Session record — 2026-10-20c the gold/silver analysis charts grow the 10-year view (the owner's request)
+
+- **Deployed**: currena-api **`4e8a54e0-fda4-4ce7-bc1e-9ba245c1bfc9`**
+  (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`).
+- **Change**: the metals' Estimation-chip trend charts (TrendPanel) grow an
+  opt-in `ranges` prop; `TrendRange`/`StripRange` gain `'10y'` (3653 days —
+  the details panel's window); `MetalTrendChart` opts in so the gold and
+  silver analysis chips now show Quarter · 1 year · 5 years · **10 years**.
+  Reuses the existing `range10y` copy key — zero new strings. Money panel,
+  details panel, API and data untouched (the feed already served the full
+  decade: 2514/2513 points, 2016-10-18 → 2026-10-16).
+- **Gates pre-deploy**: copy:audit clean; full workspace tests green
+  (exit 0); typecheck 6/6; lint 0 errors / 15 accepted advisories; budgets
+  held — entry 295.15/88.76; Insights lazy 593.58/141.30 (+0.07 kB gz).
+- **Verified live** (agent-browser): served Insights chunk byte-identical
+  (sha256 39d1e4ea…); EN desktop — 10 years clickable on both metals,
+  ticks Oct 2016/Oct 2021/Oct 2026, deltas +230.3%/+225.6% "10 years",
+  muted header prices intact; money panel still 3 chips; EN mobile 375
+  identical anatomy, scrollWidth 375; fa RTL — «۱۰ سال» chip, deltas
+  «+۲۳۰٫۳% ۱۰ سال»/«+۲۲۵٫۶% ۱۰ سال», Jalali ticks مهر ۱۳۹۵→مهر ۱۴۰۵; zero
+  page/console errors.
+- **Evidence**: `docs/evidence/2026-10-20-metals-10y/`.
+
+## Session record — 2026-10-21 the gold/silver outlook speaks the owner's seven states (the EN/fa drift bug)
+
+- **Deployed**: currena-api **`d0d28c3f-f0a9-4619-b269-8f7337d9daa9`**
+  (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`).
+  Two deploys this session: `a5d2f793` first, then the layout adjustment —
+  the outlook sentence moved out of the chip header (it wrapped into a
+  4-6-line staircase at 375px there) onto its own full-width line between
+  the header and the chart.
+- **Change**: the metals' verdict slot adopts the owner's SEVEN-STATE
+  "Gold Market Outlook" classification with the owner's own bilingual
+  sentences (`outlookOf` over the same condition tally; strong bar =
+  the lean's `LEAN_STRONG = 4`, now exported from `@currena/insights`;
+  range-bound needs the affirmative quiet-mid-range price evidence).
+  verdictUp/Down/Flat retired from both dictionaries (their fa drift WAS
+  the bug); round-45 manifest: 21 NEW + 2 CHANGED + 3 REMOVED, referenced
+  to docs/QA/quirks-2026-10-21-outlook-states.md. Signals CSV header
+  decoupled to `ui.csvColStatus`. No data/scoring/API change.
+- **Gates pre-deploy**: copy:audit clean; full workspace tests 1,446
+  (+15 outlook tests); typecheck 6/6; lint 0 errors/15 advisories;
+  budgets held (entry 295.15/88.76 gz; Insights lazy 596.60/141.83,
+  +0.53 kB gz).
+- **Verified live** (agent-browser, SW caches purged — the stale precache
+  was serving the old chunk and faking the first re-check): served chunk
+  `Insights-DlDkQ-3K.js` sha256-identical local == production; the old
+  mismatched fa sentence 0 occurrences; live data bearish on both metals,
+  EN + fa render the SAME state with the owner's sentences (one line,
+  zigzag-led, muted prices); collapsed "Outlook: Bearish"/«چشم‌انداز:
+  نزولی»; 375 scrollWidth === 375 both locales; prices board untouched;
+  zero page/console errors.
+- **Evidence**: `docs/evidence/2026-10-21-outlook-states/`.
+
+## Session record — 2026-10-17b: the prices board cards re-drawn from the owner's sketch
+
+- **What**: the owner's five-point directive for the four-tile prices board
+  (picture beside unit name and price; daily/weekly/monthly/quarterly
+  percentages; descriptions and verdict; meta facts + percentages as bullet
+  points; very small update-time text), shipped as one rebuilt PricesBoard
+  anatomy + the new price-stats.ts derivation module (1-day change, 6-month
+  change, 1-year change, 52-week range — history-internal, ≤3-day
+  nearest-point rule, the last point can no longer be its own reference,
+  ≥300-day span gate for the "52-week" name). 9 new copy keys both locales;
+  manifest round-46 (9 NEW → docs/QA/quirks-2026-10-17-prices-card-redesign.md).
+  No data/scoring/API change.
+- **Gates pre-deploy**: copy:audit clean (2,090 entries); full workspace
+  tests 1,455 (web 485, +9); typecheck 6/6; lint 0 errors/15 advisories;
+  budgets held (entry 295.15/88.76 gz; Insights lazy 599.38/142.60 gz).
+- **Deployed**: currena-api `0652db45-3fc2-418f-87c2-bb06caa51e5c`
+  (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`).
+- **Verified live** (agent-browser, SW precache purged first): served chunk
+  `Insights-E8NrMws9.js` sha256-identical local == production; EN + fa ×
+  desktop + mobile all render the sketch anatomy (icon beside price+name,
+  4 change rows, Description+verdict, fact bullets, 10px as-of); fa unit
+  rides UNDER the digits (beside it wrapped brent's fa price at 4-across);
+  375 scrollWidth === 375 both locales; details panel opens/closes from a
+  tile; zero page/console errors; /api/insights → 32 readings; metals
+  conditions strip (Tasks 15–17) + money panel untouched.
+- **Evidence**: `docs/evidence/2026-10-17-prices-card-redesign/`.
+
+## Session record — 2026-10-17c: the Persian dollar convention
+
+- **What**: the owner's copy convention — fa says «دلار» for USD, never
+  «دلار آمریکا»; dollar nationality reserved to «دلار استرالیا» (AUD) and
+  «دلار کانادا» (CAD). 114 tracked keys re-triaged (manifest round-47 →
+  `docs/QA/quirks-2026-10-17c-fa-dollar-convention.md`); NZD also
+  shortened per the rule's second clause (flagged, one-line revert if
+  unintended); cents untouched; EN untouched. Copy-only — no data,
+  scoring or formatting logic change.
+- **Gates pre-deploy**: copy:audit clean (2,090 entries); full workspace
+  tests 1,455; typecheck 6/6; lint 0 errors/15 advisories; budgets held
+  (entry 295.15/88.76 gz; Insights lazy 597.79/142.51 gz — SHRANK
+  599.38 → 597.79 raw with the dropped qualifier).
+- **Deployed**: currena-api `c970f556-0070-4fc9-a7ab-98e653461857`
+  (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`).
+- **Verified live**: served `Insights-4U1oyeMS.js` + `index-Cz6G_o2s.js`
+  sha256-identical local == production; «دلار آمریکا» ×0 in both served
+  bundles; «دلار استرالیا» ×86 / «دلار کانادا» ×2 alive; /api/insights →
+  32 readings; production browser (fresh context, loaded chunk verified):
+  fa home «USD · دلار» + AUD/CAD qualified + «NZD · دلار»; fa insights —
+  tile unit «دلار», 52-week tail «… دلار», metals chip «۴٬۱۶۵ دلار» +
+  owner outlook sentence, fx «قدرت دلار», 375 scrollWidth === 375; EN
+  regression clean; zero page/console errors.
+- **Evidence**: `docs/evidence/2026-10-17c-fa-dollar-convention/`.
+
+## Session record — 2026-10-17d: the prices polish (sign inks, titles, hero glitch, N2)
+
+- **What**: the owner's four-point follow-up — signed percents in the
+  status inks (green positive / red negative) on the prices-board rows,
+  the 6m/1y fact bullets and the hero mover; bigger bold titles
+  (prices-board names 14→18px primary, metal chip names 14→20px
+  primary); EN `signals.metals` capitalized (Gold/Silver — chips, rows,
+  collapsed lines, export column); the hero's bidi glitch fixed
+  structurally via `formatChangeParts` (the signed number keeps its ltr
+  island, the word unit «واحد درصد»/'pts' rides outside — fa reads
+  «+۰٫۲۵ واحد درصد ۳۰ روز», EN "+0.25 pts 30-day"); the hero's N2
+  disclaimer line + about-jump button retired (the bottom About section
+  keeps the full text; the global footer carries the app-wide
+  disclaimer; nav chips still jump to About). NO fa string changed.
+- **Gates pre-deploy**: copy:audit clean; full workspace tests 1,455;
+  typecheck 6/6; lint 0 errors/15 advisories; budgets held (entry
+  295.15/88.76 gz; Insights lazy 597.50/142.51 gz).
+- **Deployed**: currena-api `8caff087-39fd-4026-b6ad-3274fa5ff77b`
+  (SITE_MODE=public untouched; currena-markets untouched `9b5ff7e0`).
+- **Verified live**: served chunks sha256-identical local == production;
+  sign colors sampled (green rgb(36,161,72) / red rgb(218,30,40)) on all
+  four tiles' rows + fact bullets + mover; titles 18px/20px bold
+  primary; chip "Gold" capitalized; mover order correct in fa and EN;
+  role="note" ×0 at the page top; 375 scrollWidth === 375; zero
+  page/console errors; /api/insights → 32 readings.
+- **Evidence**: `docs/evidence/2026-10-17d-prices-polish/`.

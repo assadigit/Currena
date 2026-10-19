@@ -173,8 +173,10 @@ function conditionIndustrial(byId: Map<string, IndicatorReading>): SignalConditi
 
 /** Lean thresholds: ≥4 supportive → mostly supportive; ≥4 against → mostly
  * unsupportive; anything between is honestly "mixed" (gold: 5 conditions,
- * silver: 6 — the count stays legible either way). */
-const LEAN_STRONG = 4;
+ * silver: 6 — the count stays legible either way). Exported so the web's
+ * outlook classifier reuses the SAME "strong" bar for the owner's Strong
+ * Bullish / Strong Bearish states (one strength definition per card). */
+export const LEAN_STRONG = 4;
 
 export function evaluateSignal(
   metal: SignalMetal,

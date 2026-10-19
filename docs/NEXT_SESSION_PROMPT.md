@@ -1,22 +1,165 @@
 # Currena — Next Session Brief
 
-Hand-off date: 2026-10-19e (PRICES RESTORE session — the owner's "Still
-there aren't GOLD BITCOIN SILVER price, like it used to… a dedicated
-nice section with images"). The Oct-19b licence-cautious hide was the
-cause; the OWNER DIRECTIVE restored exactly {brent, gold-usd,
-silver-usd, btc-usd} to public mode: `OWNER_PUBLIC_DISPLAY_OVERRIDE` in
-scripts/generate-indicators-registry.ts (display disposition only —
-licence facts verbatim, Yahoo legs stay in the engine, world boards
-stay hidden), hidden set 24 → 20, a NEW pin test guards the four tiles
-against re-hiding, the LR-02 hidden-history fixture moved brent → vix.
-Public projection rebuilt 52 → 32; the live prices section renders the
-four tiles WITH images; the money panel's "Petrol and transport" row
-returned with brent. Deployed currena-api `d40211f9` from `81ca3e3`;
-1,419 tests green. See CHANGELOG 2026-10-19e + docs/DEPLOY.md's
-2026-10-19e record. Prior state (2026-10-19d): the ingest watchdog
-ships (cron :40 re-dispatch when the snapshot is >26 h stale;
-GH_INGEST_DISPATCH_TOKEN set) after the GitHub schedule silently died
-3 days.
+Hand-off date: 2026-10-17 (edge-verified; see the dating note) — the
+prices polish — DONE: signed percentages speak the status inks
+(positive green `--color-status-normal`, negative red
+`--color-status-alert`, zero/absent neutral) on the prices-board rows,
+the 6m/1y fact bullets and the hero mover; titles enlarged (prices-board
+tile names 18px bold primary, metal chip names 20px bold primary with
+the price staying lighter); EN `signals.metals` capitalized
+(Gold/Silver — chips, rows, collapsed lines, export Name column); the
+hero's big-move bidi glitch fixed structurally with `formatChangeParts`
+(the signed number keeps its ltr island, the word unit «واحد درصد»/'pts'
+rides outside — fa reads «+۰٫۲۵ واحد درصد ۳۰ روز», EN "+0.25 pts
+30-day"); the hero's N2 disclaimer + «درباره این داده‌ها ↧» button
+retired (the page-bottom About section keeps the full text; the global
+footer carries the app-wide non-advice disclaimer; nav chips still jump
+to About). NO fa string changed — no manifest touch. Gates green (1,455
+tests; typecheck 6/6; lint 0 errors/15 advisories; budgets held — entry
+295.15/88.76, Insights lazy 597.50/142.51). Deployed currena-api
+`8caff087-39fd-4026-b6ad-3274fa5ff77b`; production verified (sign
+colors sampled live, sizes, "Gold" capitalized, mover order correct in
+both locales, role="note" ×0 at the top, 375 scrollWidth === 375, zero
+errors). See CHANGELOG 2026-10-17d +
+docs/evidence/2026-10-17d-prices-polish/.
+
+Prior state (2026-10-17c): the owner's Persian dollar convention —
+DONE: fa says «دلار» for USD, never
+«دلار آمریکا» — the unqualified word is what Persian financial usage
+already means — with dollar nationality RESERVED to «دلار استرالیا»
+(AUD) and «دلار کانادا» (CAD). 114 tracked strings re-triaged (manifest
+round-47 → docs/QA/quirks-2026-10-17c-fa-dollar-convention.md); NZD also
+drops its qualifier per the rule's second clause (picker rows keep the
+code: «NZD · دلار» — one-line revert in `fa.ts` `currencies.NZD` if the
+owner wants it back); cents untouched («۶۲ سنت آمریکا»); EN untouched.
+Tests re-pinned (live-rate, fx-presentation, insights, fx-v13). Gates
+green (1,455 tests; typecheck 6/6; lint 0 errors/15 advisories; budgets
+held — Insights lazy SHRANK 599.38 → 597.79 kB raw with the dropped
+qualifier). Deployed currena-api `c970f556-0070-4fc9-a7ab-98e653461857`;
+served chunks sha256-identical; «دلار آمریکا» ×0 in both served bundles;
+production browser-verified (fa home + insights × desktop + 375 — tile
+unit «دلار», 52-week tail «… دلار», metals chip «۴٬۱۶۵ دلار» + the
+Task-17 outlook sentence, fx «قدرت دلار»; EN regression clean; zero
+errors). See CHANGELOG 2026-10-17c +
+docs/QA/quirks-2026-10-17c-fa-dollar-convention.md +
+docs/evidence/2026-10-17c-fa-dollar-convention/.
+
+Prior state (2026-10-17b): the owner's prices-board redesign — DONE: the four price cards (Bitcoin /
+Silver / Gold / Brent) speak the owner's five-point sketch: "1. Picture
+next to Unit name and price 2. Daily / Weekly / Monthly/ Quarterly
+Percentages 3. Descriptions and verdict 4. some more meta data facts and
+percentages (must be in bullet point) 5. very small text showing update
+time." One rebuilt PricesBoard anatomy, mobile AND desktop, RTL-mirrored:
+the tinted artwork sits BESIDE the big digits + name (fa's unit drops to
+its own small line UNDER the digits — beside it brent's fa price wrapped
+while gold's did not, breaking the alignment decree); FOUR percentage
+rows (daily/weekly/monthly/quarterly — the feed's change7d/30d/90d cover
+three, the daily row derives); a "Description" heading row with the
+price-position verdict word at its end; fact bullets (6-month change,
+1-year change, 52-week range via the new price-stats.ts — history-
+internal numbers, ≤3-day nearest-point rule, the last point can no
+longer be its own reference (the old hook could fabricate a 0% change),
+≥300-day span gate for the "52-week" name — then the existing context
+lines as bullets); the as-of line at 10px pinned with mt-auto. 9 new
+copy keys both locales; manifest round-46 (9 NEW →
+docs/QA/quirks-2026-10-17-prices-card-redesign.md); days7/days30
+untouched (AlertCard/HeroBlock/CompactRow still speak them). UI-only; no
+data/scoring/API change; the metals analysis chips (Tasks 15–17) and the
+money panel untouched. Gates green (1,455 tests, +9 price-stats;
+typecheck 6/6; lint 0 errors/15 advisories; budgets held — Insights lazy
+599.38/142.60 gz, +0.77 under the cap). Deployed currena-api
+`0652db45-3fc2-418f-87c2-bb06caa51e5c`; production browser-verified with
+agent-browser (PURGE the PWA precache before re-verifying a new deploy —
+the stale service worker silently serves the old chunk and fakes the
+first check; verify the loaded chunk hash, not the deploy log): served
+chunk Insights-E8NrMws9.js sha256-identical (f3a0d27c…); EN + fa ×
+desktop + mobile all render the sketch; 375 scrollWidth === 375 both
+locales; details panel opens/closes from a tile; zero errors;
+/api/insights → 32 readings (gold-aud honestly absent this snapshot — no
+A$ bullet). See CHANGELOG 2026-10-17b +
+docs/QA/quirks-2026-10-17-prices-card-redesign.md +
+docs/evidence/2026-10-17-prices-card-redesign/.
+
+DATING NOTE: the Cloudflare edge Date header and the machine clock agree
+the session date is 2026-10-17 — the repo's 2026-10-20/21 entries were
+future-dated by earlier sessions. Keep appending in file order; the
+changelog disambiguates same-day sections with letter suffixes.
+
+Prior state (2026-10-21): the owner's EN/fa drift bug + "Gold Market
+Outlook — Complete State List" — DONE: the metals' verdict slot speaks
+the owner's SEVEN states (Strong Bullish / Bullish / Neutral /
+Range-Bound / Bearish / Strong Bearish / Mixed Signals) with the owner's
+own bilingual sentences. `outlookOf` (signals/verdict.tsx) maps the
+condition tally: strong bar = the lean's LEAN_STRONG=4 (exported from
+@currena/insights); majority → bullish/bearish; equal split → mixed;
+all-readable-neutral → neutral; range-bound ONLY with |change30d| < 2%
+AND the typical 10-year band (the owner's Neutral ≠ Range-Bound ≠ Mixed
+distinction, honoured mechanically). verdictUp/Down/Flat retired (the fa
+drift WAS the bug); round-45 manifest 21 NEW + 2 CHANGED + 3 REMOVED;
+verdictTitle → "Outlook"/«چشم‌انداز»; the sentence rides its own
+full-width chip line (the header slot staircase-wrapped at 375px on the
+first deploy). Gates green (1,446 tests, +15; typecheck 6/6; lint 0
+errors/15 advisories; budgets held — Insights lazy 596.60/141.83,
++0.53 kB gz). Deployed currena-api `d0d28c3f`; production verified with
+agent-browser. Live bearish on both metals; EN + fa render the same
+state; collapsed "Outlook: Bearish"/«چشم‌انداز: نزولی»; 375 clean; zero
+errors. See CHANGELOG 2026-10-21 +
+docs/QA/quirks-2026-10-21-outlook-states.md +
+docs/evidence/2026-10-21-outlook-states/.
+Prior state (2026-10-20c): the owner's "Add 10 year View of the gold and
+Prior state (2026-10-20c): the owner's "Add 10 year View of the gold and
+silver price as well." — DONE: the metals' Estimation-chip trend charts
+offer the decade. The shared TrendPanel gained an opt-in `ranges` prop
+(default Quarter · 1y · 5y — the money panel and all other callers
+UNCHANGED); TrendRange/StripRange grew '10y' (3653 days — the details
+panel's exact window) reusing the EXISTING range10y copy key
+('10 years' / «۱۰ سال», zero new strings); MetalTrendChart opts in → both
+gold/silver analysis chips show Quarter · 1 year · 5 years · 10 years.
+Pre-flight verified the feed already serves the full decade (gold 2514 /
+silver 2513 points, 2016-10-18 → 2026-10-16) — no API/data change.
+Gates green (1,431 tests; typecheck 6/6; lint 0 errors/15 advisories;
+budgets held, Insights lazy 593.58/141.30, +0.07 kB gz). Deployed
+currena-api `4e8a54e0`; production browser-verified (agent-browser): EN
+desktop — 10 years active on both metals, ticks Oct 2016/Oct 2021/Oct
+2026, deltas +230.3%/+225.6% "10 years", muted header prices intact,
+money panel still 3 chips; EN mobile 375 identical, no overflow; fa RTL —
+«۱۰ سال» chip, Persian-digit deltas, Jalali ticks; zero errors. See
+CHANGELOG 2026-10-20c + docs/evidence/2026-10-20-metals-10y/.
+Prior state (2026-10-20b): the owner's drawn UI for the gold/silver
+"Conditions right now" chips — DONE: the chips are analysis cards now —
+header row (boxed artwork 56/64px · name + verdict · the current price in
+the MUTED secondary ink at the far end) over ONE BIG trend chart (h-40
+mobile / h-52 desktop, was h-20); the artwork-column side split is gone →
+ONE anatomy for mobile AND desktop ("do the same for mobile view").
+MergedCard passes the metals' display prices from the same snapshot
+readings. No copy, no data change. Gates green (1,431 tests; lint 0
+errors after renaming the prior round's minified evidence capture
+prod-Insights-chunk.js → .js.txt — ESLint was linting it; budgets held,
+Insights lazy 593.51/141.27). Deployed currena-api `757cb15b`;
+production browser-verified (EN desktop plot 208px + muted header
+prices; mobile 375 identical, no overflow; fa RTL mirrors the sketch;
+zero errors). See CHANGELOG 2026-10-20b +
+docs/evidence/2026-10-20-verdict-chip-redesign/.
+Prior state (2026-10-20): the "Know before you buy US shares" <details>
+box removed entirely at the owner's direct request (UsSharesNotesBox +
+render + import gone; the four usShares* copy keys retired; manifest
+pruned; deployed `e6d18811`; production verified 0 occurrences, prices
+board intact).
+Prior state (2026-10-19f): the SPARKLINE HONESTY round — the owner's
+screenshot report on the USD→IRT converter sparkline ("irregular …
+like a placeholder or buggy") fixed in three honest layers (record
+deadband 0.05% vs last RECORDED level; drawn-line bucketMean(≤48) with
+RAW trend/range/count chips; Sparkline domain padded to ≥2.5% of
+level) + a one-time KV prune (tgju 240 → 188). Deployed `ed79e2cc`
+from `9724040`; 1,431 tests green.
+Prior state (2026-10-19e): the PRICES RESTORE — the owner's "Still
+there aren't GOLD BITCOIN SILVER price… a dedicated nice section with
+images" resolved by OWNER_PUBLIC_DISPLAY_OVERRIDE for exactly {brent,
+gold-usd, silver-usd, btc-usd}; hidden set 24 → 20; the four tiles
+render WITH images; the money panel's "Petrol and transport" row
+returned. The Oct-19b licence-cautious hide remains for the world
+boards + other non-'yes' indicators (T-15 passes in public mode); the
+ingest watchdog ships (2026-10-19d).
 The prior 2026-10-19b session flipped Insights PUBLIC (owner decree:
 SITE_MODE=public deployed `36d76363`; the licence-legal projection only
 — 27 of 51 readings; the EODHD/Yahoo world boards + 24 non-'yes'

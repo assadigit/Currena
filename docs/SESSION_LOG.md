@@ -1,3 +1,457 @@
+# SESSION_LOG — The Prices Polish: Sign Inks, Titles, Hero Glitch 2026-10-17d
+
+Branch `main` · base `ead8948` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's four-point follow-up — signed percents red/green
+("for example" a prices-board row); bigger bold titles in the prices
+board and the metal chips ("silver gold must be written much larger");
+EN capitalized ("so silver is wrong, write Silver. Be professional.");
+the glitchy hero mover line (fa rendered «… آمریکا واحد درصد ۳۰ روز
++۰/۲۵»); and the short disclaimer + «درباره این داده‌ها ↧» button
+"remove or relocate to bottom footer".
+
+### 1 · recon
+The sign-ink tokens already existed as the owner palette's
+contrast-documented pair (`--color-status-normal` Carbon Green 50 /
+`--color-status-alert` Carbon Red 60 — light+dark documented in
+index.css). The lowercase "silver" lived in `signals.metals`
+(`{ gold: 'gold', silver: 'silver' }` — chips, merged rows, collapsed
+lines, export Name column); every other EN display name audited —
+already capitalized. The glitch: HeroBlock forced «+۰٫۲۵ واحد درصد»
+(the whole `formatChange` output, number AND RTL word unit) into one
+`dir="ltr"` bdi — the bidi algorithm scattered the word: «واحد درصد»
+landed right after the name, the number drifted to the line's far end.
+The disclaimer pair = HeroBlock N2; the global Footer ALREADY carries
+the app-wide non-advice disclaimer and the page-bottom About section
+carries the full text — removal loses nothing.
+
+### 2 · implemented
+`formatChangeParts` (signed number + word-unit split; percent binds
+tight inside the island) with `formatChange` delegating to it — composed
+output byte-identical, pinned by the existing tests. HeroBlock renders
+the number in its own ltr island, the unit as the next element, and
+speaks the sign ink. `changeToneClass` applied to the four prices rows,
+the 6m/1y fact bullets (FactItem gained an optional tone) and the mover
+value. Prices-board tile names 14→18px bold primary; metal chip names
+14→20px bold primary (price stays lighter — the Task-15 decree intact).
+EN `signals.metals` capitalized. N2 removed from the hero (`onJumpAbout`
+kept — VerdictBlock's alert cards use it).
+
+### 3 · gates + deploy + verification
+Gates all green: 1,455 tests, typecheck 6/6, lint 0 errors/15 advisories,
+copy:audit clean (NO fa string changed — no manifest touch), budgets held
+(entry 295.15/88.76; Insights lazy 597.50/142.51). Deployed currena-api
+`8caff087-39fd-4026-b6ad-3274fa5ff77b`. Production: served chunks
+sha256-identical; sign colors sampled live (green rgb(36,161,72) / red
+rgb(218,30,40)) across btc/gold/silver/btc rows + fact bullets + the
+mover (+۰٫۲۵ → green); titles 18px/20px bold primary; chip "Gold"
+capitalized; the mover line reads «نرخ سیاستی فدرال رزرو آمریکا +۰٫۲۵
+واحد درصد ۳۰ روز …» in fa and "+0.25 pts 30-day" in EN; `role="note"` ×0
+at the page top; 375 scrollWidth === 375; zero page/console errors. Evidence:
+`docs/evidence/2026-10-17d-prices-polish/`.
+
+Open item (unchanged): token rotation (GitHub + Cloudflare) —
+credentials transited chat again this session.
+
+
+# SESSION_LOG — The Persian Dollar Convention 2026-10-17c
+
+Branch `main` · base `ebe1228` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's copy convention — "in farsi only say دلار not دلار
+آمریکا because farsi speakers already knows what dollar is. only mention
+dollar nationality when it's for australia or canada."
+
+### 1 · the survey
+Sandbox reset again (repo re-cloned at `ebe1228`, all prior rounds
+confirmed pushed). «دلار آمریکا» lived in exactly four source files:
+`insights-copy-fa.ts` ×113, `fa.ts` ×1 (`currencies.USD`), plus two
+doc-comment examples (VerdictMeter, PricesBoard) and two more comments
+(config/display ×2, lib/live-rate) found by a second exhaustive sweep
+(the first repo-wide grep had been paginated). Zero hits in packages/,
+apps/api/ and the calendar data. Suffix forms («دلار آمریکایی» /
+«آمریکاست») checked — none exist, so a literal phrase replace is safe.
+
+### 2 · the convention applied
+Plain replace «دلار آمریکا» → «دلار» across the two dictionaries and the
+four comments; `fa.ts` `currencies.USD: 'دلار'` with the rule recorded as
+a Persian owner-rule comment beside the IRR one. Nationality reserved:
+AUD «دلار استرالیا» (81× in the insights dictionary) and CAD «دلار
+کانادا» (2×) untouched; cents untouched («۶۲ سنت آمریکا»). NZD — the
+rule's second clause reserves dollar nationality to AU/CA, so NZD also
+shortened to «دلار» (the picker shows the code: «NZD · دلار»); flagged in
+the QA doc and the report as a one-line revert if the owner disagrees.
+EN untouched.
+
+### 3 · the workflow + gates
+`pnpm copy:audit` → 114 CHANGED, 0 NEW/REMOVED/MISSING → all 114 triaged
+`processed` round-47 against the new
+`docs/QA/quirks-2026-10-17c-fa-dollar-convention.md` → audit clean.
+Tests re-pinned (live-rate share line, fx-presentation r3 sentence,
+insights brent value, fx-v13 chart label + dollarRowTitle + s1). Full
+gates green: 1,455 tests (web 485, api 237, insights 462, core 191,
+scraper 67, markets 13), typecheck 6/6, lint 0 errors/15 advisories,
+budgets held — Insights lazy SHRANK 599.38 → 597.79 kB raw (the dropped
+qualifier), entry 295.15/88.76 gz.
+
+### 4 · deploy + production verification
+currena-api `c970f556-0070-4fc9-a7ab-98e653461857` (SITE_MODE=public;
+currena-markets untouched `9b5ff7e0`). Served chunks sha256-identical to
+the local build; «دلار آمریکا» ×0 in BOTH served bundles; «دلار
+استرالیا» ×86 / «دلار کانادا» ×2 alive; /api/insights → 32 readings.
+Browser (production data via the read-only :3000 forwarder, fresh
+context — the SW lesson honored by confirming the loaded chunk
+`Insights-4U1oyeMS.js`): fa home «USD · دلار» / «AUD · دلار استرالیا» /
+«CAD · دلار کانادا» / «NZD · دلار»; fa insights — prices tile unit line
+«دلار», 52-week «… ۵٬۳۱۸ دلار», metals chip «چشم‌انداز | طلا | ۴٬۱۶۵ دلار
+|» with the owner's Task-17 sentence intact, fx row «قدرت دلار», 375
+scrollWidth === 375; EN spot «USD · US Dollar», no fa leakage; zero
+page/console errors. Evidence:
+`docs/evidence/2026-10-17c-fa-dollar-convention/`.
+
+Open item (unchanged): token rotation (GitHub + Cloudflare) —
+credentials transited chat again this session.
+
+
+# SESSION_LOG — The Prices Board Cards Re-drawn from the Owner's Sketch 2026-10-17
+
+Branch `main` · base `c62f3ba` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's five-point directive for the prices board — "1. Picture
+next to Unit name and price 2. Daily / Weekly / Monthly/ Quarterly
+Percentages 3. Descriptions and verdict 4. some more meta data facts and
+percentages (must be in bullet point) 5. very small text showing update
+time." — with a hand-drawn sketch and a screenshot of the current board.
+
+### 1 · the data reality check first
+The four tiles' readings already carry `change7d/change30d/change90d`
+(production-verified against /api/insights — the engine computes the 90-day
+window for every daily series, fix spec B-04), so weekly/monthly/quarterly
+come free from the feed. The feed has NO 1-day field, and the sketch's
+"more meta data facts" (6-month change, 1-year change, 52-week range) live
+only in the stored history — the same /history endpoint the sparklines
+fetch (brent 2536 / btc 1826 points, a full decade). Frontend-only change;
+API untouched.
+
+### 2 · the anatomy, rebuilt once
+`PricesBoard.tsx` rewritten to the sketch: header row = price block (big
+digits; the fa unit on its own small line UNDER the digits — beside it,
+the 4-across grid made brent's fa price wrap while gold's did not, breaking
+the alignment decree) + the name in its fixed two-line slot + the tinted
+icon box (96px mobile / 72px desktop) at the row's far end; then the FOUR
+percentage rows (labels start, values end-aligned, quiet "—"); then the
+"Description" heading row with the verdict word (price-position band, R31
+ink) at its far end above the hedged consequence line; then the fact
+bullets (derived stats, then the existing context lines as bullets); then
+the as-of line at 10px pinned with mt-auto. RTL mirrors the sketch
+automatically. The stacked-artwork face (R29r2) retires.
+
+### 3 · price-stats.ts — the derivation, with one honesty fix
+Pure module + 9 tests. R30's rules kept: history-internal numbers only,
+nearest-point within ≤3 days, absent never fabricated. NEW: the last
+stored point can no longer be its own window reference — the old hook
+could return a fabricated 0% "daily change" when nothing sat within
+tolerance; the tests caught it before the first deploy. The 52-week range
+is only NAMED when the stored window spans ≥300 days.
+
+### 4 · copy + manifest round-46
+9 new keys in both dictionaries (priceChangeDaily/Weekly/Monthly/Quarterly,
+descriptionLabel, stat6mChange, stat1yChange, stat52wRange, rangeJoin).
+days7/days30 stay for AlertCard/HeroBlock/CompactRow. QA reference:
+docs/QA/quirks-2026-10-17-prices-card-redesign.md (the owner's requirements
+mapped key by key). copy:audit clean at 2,090 entries.
+
+### 5 · gates, deploy, verification
+1,455 tests green (web 485, +9); typecheck 6/6; lint 0 errors/15
+advisories; budgets held (entry 295.15/88.76; Insights 599.38/142.60 gz,
++0.77 under the cap). Deployed currena-api `0652db45` — served chunk
+`Insights-E8NrMws9.js` sha256-identical local == production after the SW
+precache purge (the Task-17 lesson applied). agent-browser: EN desktop +
+mobile, fa RTL desktop + mobile — the sketch anatomy everywhere, 375
+scrollWidth === 375 in both locales, details panel opens/closes from the
+tile, zero page/console errors; metals conditions strip + money panel
+untouched; /api/insights → 32 readings (gold-aud honestly absent — no A$
+bullet this snapshot).
+
+### 6 · dating note
+The edge clock (Cloudflare Date header) and the machine clock agree the
+session date is 2026-10-17 — the repo's 2026-10-20/21 entries were
+future-dated by earlier sessions. This session's records use the
+edge-verified date; the changelog section is `[2026-10-17b]` (the b
+disambiguates from round-42's existing `[2026-10-17]`).
+
+Stage summary:
+- Production now: currena-api `0652db45` + currena-markets `9b5ff7e0`;
+  SITE_MODE=public; the prices board speaks the owner's sketch on mobile
+  and desktop in both locales.
+- Standing order honored: gates → deploy → production smoke → evidence →
+  push, no per-round approval.
+- Open item (unchanged): token rotation (GitHub + Cloudflare) —
+  credentials transited chat again this session.
+
+# SESSION_LOG — The Gold/Silver Outlook Speaks the Owner's Seven States 2026-10-21
+
+Branch `main` · base `20f9d9a` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's bug report — for gold and silver the verdict slot said
+EN "Works against" but fa «شرایط موجود با الگوی معمول هم‌خوانی ندارد» —
+"these are not same thing. investigate and fix the issue" — together with
+the owner's "Gold Market Outlook — Complete State List" (7 states with
+exact bilingual sentences + the recommended state logic + the
+Neutral/Range-Bound/Mixed distinction).
+
+### 1 · the drift, confirmed at the root
+Both locales shared `signals.verdictDown`; EN held the short directional
+word ("Works against"), fa a leftover sentence about the USUAL PATTERN not
+holding — the old pattern-conformance framing that had survived the
+round-31 wording pass on the fa side only. Same key, different meanings.
+
+### 2 · the fix — the owner's seven states, mechanically mapped
+`signals/verdict.tsx`: new `OutlookState` + `outlookOf(reading)` over the
+same condition tally — strong-bullish/strong-bearish at the card lean's
+OWN strong bar (`LEAN_STRONG = 4`, newly exported from `@currena/insights`;
+≥4 of ≤6 always implies the majority); bullish/bearish on a majority;
+mixed on an equal split; neutral when all readable conditions sit neutral;
+range-bound ONLY with affirmative quiet-price evidence (|change30d| < 2%
+AND the typical band of the 10-year range) while the driver split stays
+within one — the owner's Neutral ≠ Range-Bound ≠ Mixed distinction is
+honoured mechanically, never by renaming. `null` (nothing readable) keeps
+verdictNone. `verdictTone`/`VerdictIcon` extend to the seven states
+(bullish family green + up zigzag, bearish family red + down zigzag, calm
+states + null the muted dash). `Signals.tsx`'s collapsed line speaks the
+short state names via `signals.verdictStateNames`.
+
+### 3 · copy (round-45) + the one layout adjustment
+Dictionaries: `verdictUp/Down/Flat` retired from BOTH dictionaries (3
+manifest entries pruned); the owner's verbatim sentences land as
+`signals.verdictStates` (7 × gold/silver; gold strings exactly as the
+owner wrote them, silver mirrors) + `verdictStateNames` (7 short names);
+`verdictTitle` «شرایط فعلی» → «چشم‌انداز» ("Outlook"); `collapsedVerdict`
+→ "Outlook: {verdict}"/«چشم‌انداز: {verdict}» — 21 NEW + 2 CHANGED
+manifest entries referenced to docs/QA/quirks-2026-10-21-outlook-states.md
+(the owner's table recorded verbatim). full-export.ts: the signals CSV
+header decouples from verdictTitle (the row value is the lean) → generic
+`ui.csvColStatus`. LAYOUT: the sentence cannot live in the sketch's
+header column — at 375px it wrapped into a 4-6-line staircase (caught
+live on the first deploy `a5d2f793`); it now rides its own full-width
+line between the header (icon box · name · lighter price) and the chart,
+zigzag leading, floored two-line slot keeping the desktop chips' charts
+on one baseline. Redeployed as `d0d28c3f`.
+
+### 4 · gates + deploy + production browser verify
+Gates all green: copy:audit clean; full workspace tests 1,446 (web 476,
++15 outlook tests pinning the mapping edges, the owner's verbatim strings
+and the retired keys' absence); typecheck 6/6; lint 0 errors/15
+advisories; budgets held (entry 295.15/88.76; Insights lazy 596.60/141.83,
++0.53 kB gz for the 28 authored sentences). Deployed currena-api
+`d0d28c3f-f0a9-4619-b269-8f7337d9daa9` (SITE_MODE=public; currena-markets
+untouched 9b5ff7e0). Served Insights chunk `Insights-DlDkQ-3K.js`
+byte-identical local == production (sha256 1d0778c5…); the old mismatched
+fa sentence 0 occurrences in the served bundle. Live verification
+(agent-browser, SW caches PURGED first — the PWA's stale precache kept
+serving the old chunk and silently faked the first re-check; verify the
+loaded chunk hash, not the deploy log): live data produced `bearish` for
+both metals; EN "Outlook" + "Signs point to a potential decline in
+gold/silver prices." one line, red zigzag, muted US$4,165/US$57.27; fa
+«چشم‌انداز» + «نشانه‌ها حاکی از احتمال افت قیمت طلاست./…نقره است.»
+RTL-mirrored, Jalali ticks; collapsed "Outlook: Bearish"/«چشم‌انداز:
+نزولی»; 375 scrollWidth === 375 both locales; prices board (4 tiles) +
+condition checklist untouched; zero page/console errors. Evidence:
+docs/evidence/2026-10-21-outlook-states/.
+
+Committed as one fix commit + one docs commit; pushed to origin/main;
+remote reset to the tokenless URL. Open item (unchanged): token rotation.
+
+# SESSION_LOG — The Metals' Analysis Charts Grow the 10-Year View 2026-10-20c
+
+Branch `main` · base `702b6c6` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's follow-up, one message after the verdict-chip
+redesign shipped — **"Add 10 year View of the gold and silver price as
+well."**
+
+### 1 · the range (UI-only, data + API untouched)
+**Pre-flight:** production `/api/insights/{gold-usd,silver-usd}/history`
+already serve the full decade (gold 2514 points, silver 2513; both
+2016-10-18 → 2026-10-16) — no API or data change needed.
+**What:** the shared `TrendPanel` (TrendChart.tsx) grows an opt-in
+`ranges` prop (defaults to the old Quarter · 1y · 5y list — the money
+panel and every other caller unchanged); `TrendRange` gains `'10y'`
+(3653 days — the details panel's exact 10-year window incl. leap-day
+slack) mapped to the EXISTING `range10y` copy key ('10 years' / «۱۰ سال»)
+— zero new strings, no manifest change; `TREND_RANGES` (the full ordered
+list) is now exported as the canonical order/test seam.
+`signals/verdict.tsx`: `StripRange` gains `'10y'`; `MetalTrendChart`
+passes `ranges={['quarter','1y','5y','10y']}` so BOTH metals' analysis
+chips offer the decade, gated by the same ≥2-plottable-points rule as
+the sibling chips. Deliberately unchanged: the money panel's mini charts
+(still 3 chips — the owner asked for gold and silver), the details
+panel's HistoryChart (already had 10y), copy, data, scoring.
+
+### 2 · gates + deploy + production browser verify
+**What:** gates all green — copy:audit clean; full workspace tests exit 0
+(web 461 · api 237 · the rest as before, 1,431 total); typecheck 6/6;
+lint 0 errors/15 advisories; budgets held (entry 295.15/88.76 gz;
+Insights lazy 593.58/141.30 gz, +0.07 kB for the fourth chip). Deployed
+currena-api `4e8a54e0-fda4-4ce7-bc1e-9ba245c1bfc9` (SITE_MODE=public
+untouched; currena-markets untouched `9b5ff7e0`). Production verified
+(agent-browser): served Insights chunk byte-identical (sha256
+39d1e4ea…); EN desktop — both chips show Quarter · 1 year · 5 years ·
+**10 years**, 10 years activates on click, ticks Oct 2016/Oct 2021/
+Oct 2026, deltas **+230.3% 10 years** (gold) / **+225.6% 10 years**
+(silver), muted header prices intact (US$4,165/US$57.27), plot 208px;
+money panel still exactly 3 chips; EN mobile 375 — identical anatomy,
+10y active both metals, plot 205×160, scrollWidth 375 (no overflow);
+fa RTL — chips «سه‌ماهه · یک سال · پنج سال · ۱۰ سال», deltas
+«+۲۳۰٫۳% ۱۰ سال»/«+۲۲۵٫۶% ۱۰ سال», aria «روند قیمت طلا در ۱۰ سال گذشته»,
+Jalali X ticks مهر ۱۳۹۵→مهر ۱۴۰۵; zero page/console errors.
+**Evidence:** `docs/evidence/2026-10-20-metals-10y/` (4 screenshots EN/fa
+× desktop/mobile + measurements.txt + README + prod chunk capture as
+inert .js.txt).
+
+Session closed: production = currena-api `4e8a54e0` + currena-markets
+`9b5ff7e0`. **Token rotation still outstanding** (owner-side; tokens
+transited chat again this session).
+
+# SESSION_LOG — Verdict Chips Redrawn as Analysis Cards 2026-10-20b
+
+Branch `main` · base `0158630` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's drawn UI for the gold/silver "Conditions right now"
+chips — boxed artwork corner, name + verdict, the price in a LIGHTER ink
+("the price is already mentioned once in upper section. the emphasis must
+be on the TREND, not the price necessarily"), ONE big chart filling the
+card — "DO THE SAME FOR MOBILE VIEW."
+
+### 1 · the redesign (UI-only, data untouched)
+**What:** `signals/verdict.tsx` — the chip anatomy rebuilt: NEW
+`MetalIconBox` (the 96/128px bare artwork → a small tinted corner box
+56/64px; gold keeps the brand-gold tint, silver the soft tint — the price
+tiles' language); header row = icon box · name (bold primary) + verdict
+word with its direction artwork (verdict ink) · the current price at the
+far end in the MUTED secondary ink; the chart IS the body —
+`MetalTrendChart` gains `plotHeightClass` and opens h-40 mobile / h-52
+desktop (was h-20); the side-split (`sm:w-40`, `sm:border-s`,
+`min-h-[136px]`) deleted → ONE anatomy for mobile AND desktop; range
+chips + delta unchanged; the verdict word's floored two-line slot keeps
+the round-34 alignment rule. `signals/MergedCard.tsx` computes each
+metal's display price from the SAME snapshot readings and passes
+`prices={{ gold, silver }}` (honest absence → nothing rendered). No copy
+changes (no new strings), no data/scoring change.
+**Detour:** the lint gate blew up to 227 errors — the PREVIOUS round's
+evidence capture `prod-Insights-chunk.js` (a minified bundle in
+docs/evidence/) was being ESLinted; renamed inert
+`prod-Insights-chunk.js.txt` (sha256 recorded in its README) → lint back
+to 0 errors/15 advisories. Lesson: never commit `.js` captures into the
+linted tree.
+
+### 2 · gates + deploy + production browser verify
+**What:** gates all green — copy:audit clean; workspace tests 1,431
+(core 191 · scraper 67 · insights 462 · markets 13 · api 237 · web 461);
+typecheck all; lint 0 errors/15 advisories; budgets held (entry
+295.15/88.76 gz; Insights lazy 593.51/141.27 gz, +0.9 kB raw). Deployed
+currena-api `757cb15b-45ae-4a61-8f4a-d808a515968d` (SITE_MODE=public
+untouched; currena-markets untouched `9b5ff7e0`). Production
+browser-verified (agent-browser): EN desktop — both chips render, plot
+**208px** (was 80), header prices "US$4,165"/"US$57.27" muted at the far
+end; EN mobile 375 — identical anatomy, scrollWidth 375 (no overflow);
+fa RTL — icon box at the start (right), the verdict sentence in red
+beside it, «۴٬۱۶۵ دلار آمریکا» muted at the end (left), big chart with
+Jalali ticks + همه‌ها/یک سال/پنج سال + delta; prices board above
+untouched (4 tiles + 4 icons); zero page/console errors.
+**Evidence:** `docs/evidence/2026-10-20-verdict-chip-redesign/`
+(fa/EN × desktop/mobile screenshots + measurements.txt + README).
+
+Session closed: production = currena-api `757cb15b` + currena-markets
+`9b5ff7e0`. **Token rotation still outstanding** (owner-side; tokens
+transited chat again this session).
+
+# SESSION_LOG — "Know before you buy US shares" Box Removed 2026-10-20
+
+Branch `main` · base `326dc42` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner pasted the exact rendered `<details>` element (fa:
+«پیش از خرید سهام آمریکا بدانید») with one instruction — "Remove this
+entirely."
+
+### 1 · the removal (surgical, UI-only)
+**What:** located the block as `UsSharesNotesBox` (Step 3 §7.1, runbook
+Phase 4, 2026-10-16) — rendered unconditionally on Insights between the
+world-markets and world-currencies sections. Deleted the component from
+`apps/web/src/routes/insights-sections/UsSharesNotes.tsx` (the file keeps
+`UsSharesAudBox` — the L2-03 AUD view is a DIFFERENT box, untouched) and
+dropped the render + import from `Insights.tsx`, with a dated note in both
+comments so the box is never resurrected by mistake. Retired the four copy
+keys (`usSharesBoxTitle`, `usSharesFxLine`, `usSharesFeesLine`,
+`usSharesDisclaimer`) from BOTH dictionaries and pruned their four entries
+from `docs/localization/persian-copy-manifest.json` (REMOVED findings fail
+`pnpm copy:audit`). No data/scoring/projection/behaviour change — the box
+was copy-only and identical in both site modes.
+**Checks:** no test referenced the box (the `us-shares-aud.test.ts` suite
+tests the lib, not the notes box); `validation-step3.ts` mentions the title
+in a comment only — no functional coupling.
+
+### 2 · gates + deploy + production verify
+**What:** gates all green — `pnpm copy:audit` clean; web tests 461/461
+(34 files; full workspace suites green); typecheck 6/6; lint 0 errors
+(15 accepted advisories); budgets held with the Insights lazy chunk
+SHRINKING to 592.61 kB / 141.14 gz (was 594.68/141.60; budgets 604/142.8),
+entry 295.15/88.76. Deployed currena-api
+`e6d18811-46ae-4f27-890a-6a1f63b90cd1` from the working tree (SITE_MODE=
+public untouched; currena-markets untouched `9b5ff7e0`). Production:
+home 200; served entry `index-DMIAshTW.js` byte-identical to the local
+build; served `Insights-CvxT_7lu.js` (592,611 bytes, byte-identical)
+carries **0** occurrences of `usSharesBoxTitle`/`Know before you buy US
+shares`; `/api/insights` → 32 readings with all four price tiles present
+— the 2026-10-19e prices board and the 2026-10-19f sparklines untouched.
+**Evidence:** `docs/evidence/2026-10-20-remove-us-shares-notes/`
+(README + prod-status.txt + the served chunk capture + api-after).
+
+Session closed: production = currena-api `e6d18811` + currena-markets
+`9b5ff7e0`. **Token rotation still outstanding** (owner-side; tokens
+transited chat again this session).
+
+# SESSION_LOG — Sparklines Draw Honest Trends 2026-10-19f
+
+Branch `main` · base `7dcabcd` · runner: pnpm 10.34.5 / Node 24.21.
+Mission: the owner's screenshot report — the USD→IRT converter card's
+sparkline "seems irregular and like a placeholder or buggy" (a violent,
+perfectly regular sawtooth).
+
+### 1 · fix(web+api): record deadband + drawn-line bucket means + padded amplitude — `9724040`
+**What:** production forensics first: `/api/history?source=tgju` held 240/240
+DISTINCT generations over ~24h — TGJU re-quotes jitter on nearly every
+6-minute tick (median 0.01–0.04%, p90 ~0.12%; EUR/GBP/CHF changed on 229–235
+of 239 ticks), the USD quote itself bobs between two levels ~0.375% apart
+(155 transitions, 38 clean a-b-a patterns — a genuinely served quote, never
+rewritten), and the UI drew raw points min-max-normalized → sub-percent
+noise filled the full plot height while the real +3.1% window trend stayed
+invisible. Three coordinated layers: (1) `apps/api/src/history.ts` records a
+generation only when a rate moves ≥ HISTORY_RECORD_DEADBAND (0.05%) vs the
+last RECORDED level (hysteresis; rate-set changes always record); (2)
+`apps/web/src/lib/live-rate.ts` gains bucketMean(series, TREND_BUCKETS=48) —
+only the DRAWN polyline aggregates; trend chips, ranges, check counts and
+the delta-vs-previous stay RAW (applied at LiveRateLine, ResultPopup and the
+/#/live-rates board — the drawn window now spans the whole recorded
+history); (3) `Sparkline.tsx` pads the plot domain to ≥2.5% of the series'
+mid-level (always containing the data) — sub-noise wiggles render
+proportionally calm, real trends still fill the plot. Post-deploy one-time
+KV prune (same deadband, via the KV REST API): tgju 240 → 188 gens (USD
+259,600 → 267,900 — the genuine rise visible immediately); frankfurter
+already clean.
+**Evidence:** `docs/evidence/2026-10-19f-sparkline-honesty/` (before
+screenshot + pre/post history captures + five production screenshots +
+README); tests 1,431 green (+12: deadband ×5 incl. hysteresis, bucketMean
+×5, Sparkline amplitude ×3); typecheck 6/6; lint 0 errors; copy:audit
+clean; budgets held (entry 295.15/88.76; Insights 594.68/141.60).
+
+### 2 · Deploy + production verification
+**What:** deployed currena-api `ed79e2cc-fb2f-44ce-bcad-00d73dc57eed` from
+`9724040` (cron + KV + SITE_MODE=public untouched; markets untouched
+`9b5ff7e0`). Production browser verification: the owner's exact card (fa,
+375 px) now draws a smooth rising line; the result popup reads "TREND: LAST
+189 UPDATES · +3.2% · low 256,895 · high 267,900" with the honest footnote;
+/#/live-rates cards (USD +3.2%, AUD +1.92%, EUR +3.22%) all calm; zero
+console/page errors; 375 scrollWidth === 375; the Insights prices grid
+(2026-10-19e) untouched — 4 tiles with icons.
+
+Session closed: production = currena-api `ed79e2cc` + currena-markets
+`9b5ff7e0`. **Token rotation still outstanding** (owner-side; tokens
+transited chat again this session).
+
 # SESSION_LOG — Prices Board Restored to Public Mode 2026-10-19e
 
 Branch `insights-rebuild` (== main after the push) · production `d40211f9` · runner: pnpm 10.34.5 / Node 24.21.

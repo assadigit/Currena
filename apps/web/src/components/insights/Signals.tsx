@@ -5,7 +5,7 @@
  * recipe, zero behavior change — the code moved verbatim; the public
  * surface unchanged: Insights.tsx imports Signals from here):
  *
- *   signals/verdict.tsx    — round 23's estimation: verdictOf, the icons
+ *   signals/verdict.tsx    — the stated outlook (outlookOf), the icons
  *                            /artwork, MetalTrendChart, VerdictStrip
  *   signals/icons.tsx      — the condition/lean glyph set (no check or
  *                            cross glyphs anywhere — R26)
@@ -42,23 +42,23 @@ import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { SIGNALS_ENABLED } from './config';
 import { MergedSignalsCard } from './signals/MergedCard';
-import { VerdictIcon, verdictOf, verdictTone } from './signals/verdict';
+import { VerdictIcon, outlookOf, verdictTone } from './signals/verdict';
 
-/** Round 24: the collapsed per-metal line's takeaway — the estimation
- * (round 23's verdictOf), icon + word + ink (round 26: the icon joined
- * the line); unreadable metals stay silent. */
+/** Round 24: the collapsed per-metal line's takeaway — the estimation,
+ * icon + word + ink (round 26: the icon joined the line); unreadable
+ * metals stay silent. 2026-10-21 (owner): the word is the seven-state
+ * outlook's short NAME (the full sentences live in the strip chips). */
 function CollapsedVerdict({ reading, copy }: { reading: SignalReading; copy: InsightsCopy }) {
   const s = copy.signals;
-  const verdict = verdictOf(reading);
+  const verdict = outlookOf(reading);
   if (verdict === null) return null;
-  const word = verdict === 'up' ? s.verdictUp : verdict === 'down' ? s.verdictDown : s.verdictFlat;
   return (
     <span
       className={`ms-1.5 inline-flex items-center gap-1 font-bold ${verdictTone[verdict]}`}
       data-collapsed-verdict={verdict}
     >
       <VerdictIcon verdict={verdict} size={16} desktopSize={20} />
-      {interpolate(s.collapsedVerdict, { verdict: word })}
+      {interpolate(s.collapsedVerdict, { verdict: s.verdictStateNames[verdict] })}
     </span>
   );
 }

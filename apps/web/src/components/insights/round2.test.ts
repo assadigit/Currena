@@ -56,6 +56,7 @@ import { insightsCopyFa } from '../../i18n/insights-copy-fa';
 import signalsSrc from './Signals.tsx?raw';
 import signalsIconsSrc from './signals/icons.tsx?raw';
 import signalsVerdictSrc from './signals/verdict.tsx?raw';
+import signalsBalanceSrc from './signals/BalanceScale.tsx?raw';
 import signalsCardSrc from './signals/MergedCard.tsx?raw';
 import connectionCardSrc from './ConnectionCard.tsx?raw';
 
@@ -468,6 +469,7 @@ describe('R26 mergeSignals (shared listed once, silver-only split)', () => {
     expect(signalsIconsSrc).not.toMatch(/[✓✔✗✘]/);
     expect(signalsVerdictSrc).not.toMatch(/[✓✔✗✘]/);
     expect(signalsCardSrc).not.toMatch(/[✓✔✗✘]/);
+    expect(signalsBalanceSrc).not.toMatch(/[✓✔✗✘]/);
   });
 });
 

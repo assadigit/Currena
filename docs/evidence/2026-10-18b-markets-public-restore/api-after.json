@@ -1,0 +1,109 @@
+{
+  "generatedAt": "2026-10-17T16:46:43.280Z",
+  "summary": {
+    "count": 16,
+    "roseToday": 13,
+    "nAttention": 5,
+    "nUnusual": 1,
+    "signal": "attention",
+    "worstGroup": "asia"
+  },
+  "markets": [
+    {
+      "id": "n225",
+      "asOf": "2026-10-16",
+      "close": 65324.29,
+      "source": "eodhd"
+    },
+    {
+      "id": "asx200",
+      "asOf": "2026-10-16",
+      "close": 8806.7,
+      "source": "eodhd"
+    },
+    {
+      "id": "kospi",
+      "asOf": "2026-10-16",
+      "close": 5668.05,
+      "source": "eodhd"
+    },
+    {
+      "id": "hsi",
+      "asOf": "2026-10-16",
+      "close": 24186.83,
+      "source": "eodhd"
+    },
+    {
+      "id": "ssec",
+      "asOf": "2026-10-16",
+      "close": 3716.28,
+      "source": "eodhd"
+    },
+    {
+      "id": "taiex",
+      "asOf": "2026-10-16",
+      "close": 47111.26,
+      "source": "eodhd"
+    },
+    {
+      "id": "nifty50",
+      "asOf": "2026-10-16",
+      "close": 23146.15,
+      "source": "eodhd"
+    },
+    {
+      "id": "stoxx50",
+      "asOf": "2026-10-16",
+      "close": 6204.23,
+      "source": "eodhd"
+    },
+    {
+      "id": "dax",
+      "asOf": "2026-10-16",
+      "close": 25622.61,
+      "source": "eodhd"
+    },
+    {
+      "id": "cac",
+      "asOf": "2026-10-16",
+      "close": 7956.7,
+      "source": "eodhd"
+    },
+    {
+      "id": "ftse",
+      "asOf": "2026-10-16",
+      "close": 10881.9,
+      "source": "yahoo"
+    },
+    {
+      "id": "sp500",
+      "asOf": "2026-10-16",
+      "close": 7659.44,
+      "source": "eodhd"
+    },
+    {
+      "id": "ndx",
+      "asOf": "2026-10-16",
+      "close": 29187.55,
+      "source": "eodhd"
+    },
+    {
+      "id": "dow",
+      "asOf": "2026-10-16",
+      "close": 52002.41,
+      "source": "eodhd"
+    },
+    {
+      "id": "tsx",
+      "asOf": "2026-10-16",
+      "close": 36176.6,
+      "source": "eodhd"
+    },
+    {
+      "id": "ibov",
+      "asOf": "2026-10-16",
+      "close": 205430.33,
+      "source": "eodhd"
+    }
+  ]
+}

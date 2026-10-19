@@ -1250,6 +1250,16 @@ export const insightsCopyEn = {
     heroTitle: 'Summary of the gauges below',
     verdictStepAria: '{section}: {label}, step {step} of 4',
     verdictMeterLabel: 'Reading on a four-step scale',
+    // Editorial handoff (2026-10-19, economic-indicators-editorial-spec.md
+    // §10): the mobile Global-first swipe carousel's accessible furniture.
+    // The cue always names the OTHER card (Global ↔ Australia), the dots
+    // and the "n of m" group labels announce position, and the prev/next
+    // words are direction-neutral (their meaning follows the reading flow).
+    carouselLabel: 'Region overview cards',
+    swipeCue: 'Swipe to view {region}',
+    cardPosition: '{card} card, {n} of {m}',
+    prevCard: 'Previous',
+    nextCard: 'Next',
     // Round 42 (owner): the computed reason sentence ("2 of 5 areas are
     // Stressed: … The rest are Stable") and the calm line are RETIRED —
     // they repeated, word for word, what the grouped status rows now say
@@ -1257,6 +1267,22 @@ export const insightsCopyEn = {
     // The grouping IS the sentence now; heroReason stays in config, pinned
     // by its own tests.
     heroGaugesLabel: 'The gauges behind this verdict',
+    // UI-fidelity round (2026-10-19, the owner's correction brief §7
+    // "Contextual explanation panel"): the Global card's explanation panel
+    // heading — the raised world-section signals (markets / currencies)
+    // ride under it on the pale-red surface.
+    worldSignalsTitle: 'World signals',
+    // Owner round 4 (2026-10-20): the Australia card grows the SAME
+    // emphasized signals box — its proper data is its OWN areas. One bullet
+    // per gauge: the raised areas carry their n-of-m counts and state word
+    // (the markets bullet's shape); the calm and unreadable ones sit in the
+    // quiet ink beside them.
+    australiaSignalsTitle: 'Australia signals',
+    australiaSignalArea: '{area} · {word}: {warnings} of {voting} indicators need attention.',
+    // UI-fidelity round (§7 "Bottom information strip"): the lead-in of
+    // the compact strip under the hero that names the next page sections
+    // in their intended order (the JumpNav labels).
+    continueLabel: 'Keep reading',
     inAlert: '{warnings} of {voting} indicators need attention',
     /** The count line's variant when the world-markets signal is raised
      * (world-markets spec §5.3 / build step 9: the section signal appears
@@ -1400,6 +1426,21 @@ export const insightsCopyEn = {
     pricePositionLow: 'cheap',
     pricePositionTypical: 'normal',
     pricePositionHigh: 'expensive',
+    // Owner sketch (17 Oct 2026): the price card's FOUR change windows —
+    // daily / weekly / monthly / quarterly — and its fact bullets.
+    // days7/days30 stay for the alert/hero/compact change rows.
+    priceChangeDaily: 'Daily',
+    priceChangeWeekly: 'Weekly',
+    priceChangeMonthly: 'Monthly',
+    priceChangeQuarterly: 'Quarterly',
+    descriptionLabel: 'Description',
+    // 2026-10-25b (asset-cards polish): one consistent «X گذشته» label
+    // family for every change window on the prices cards — the old mix
+    // ('6-month change' / '30 days') read as different kinds of numbers.
+    stat6mChange: 'Past 6 months',
+    stat1yChange: 'Past 1 year',
+    stat52wRange: '52-week range',
+    rangeJoin: '–',
     btcRatiosLabel: 'Context only, not used in signals',
     // Step-1 audit item C2: the ratios inverted for display — "One bitcoin
     // buys 19.6 oz of gold" (the stored fraction is oz-per-bitcoin; the old
@@ -1409,6 +1450,90 @@ export const insightsCopyEn = {
     goldAudLine: 'In Australian dollars: {value}',
     copperUnitNote: 'converted from the live US price',
     pricesAsOf: 'as of {date}',
+    // Financial-asset-cards spec pack (02–05): the seven-day trend story,
+    // the evidence-based briefing, the «جزئیات بیشتر» disclosure and its
+    // detail rows. Wording follows spec 03's tables verbatim.
+    past7days: 'Past 7 days',
+    trendUp: 'Recent movement has been upward',
+    trendDown: 'Recent movement has been downward',
+    trendRange: 'Recent movement has been mostly range-bound',
+    trendMixed: 'No clear direction is evident',
+    trendInsufficient: 'Not enough data to assess the trend',
+    trendUnavailable: 'Seven-day trend unavailable',
+    trendIncomplete: 'Data for this period is incomplete; the chart may not show the full picture.',
+    sparklineAria: '{asset} price movement over the past seven days: {change}',
+    dailyChangeLabel: 'Daily change',
+    dailyChangeBasis: 'vs the previous stored close',
+    updatedUnknown: 'Update time is unknown.',
+    dataDelayed: 'Data may be delayed.',
+    priceUnavailableCard: 'Price is currently unavailable.',
+    sumUnavailable: 'There is not enough data to provide a reliable summary.',
+    sumUp: '{asset} has risen over the past seven days.',
+    sumDown: '{asset} has declined over the past seven days.',
+    sumRange: '{asset} has moved mostly within a range over the past seven days; the available data shows no clear direction.',
+    sumMixed: 'Movement of {asset} has been uneven over this period, so the available data does not show a clear direction.',
+    sumHedge: 'This describes the selected period and does not, by itself, establish the next move.',
+    sumBtcHedge: 'This movement may not persist, and short-term volatility can remain high.',
+    sumBtcMixed: '{asset} has fluctuated over the past seven days.',
+    sumOilDrivers: 'Explaining the drivers would require supporting evidence about supply, demand, and market conditions.',
+    moreDetails: 'More details',
+    changesLabel: 'Changes',
+    change30dLabel: 'Past 30 days',
+    change90dLabel: 'Past 90 days',
+    // 2026-10-25b (asset-cards polish, task §4/§6): the card header's
+    // title + measurement-basis subtitle. The unit is VERIFIED against the
+    // served instrument: gold/silver per troy ounce (XAU/XAG spot or the
+    // GC=F/SI=F futures refresh — both quote per troy ounce), Brent per
+    // barrel (EIA spot / BZ=F), Bitcoin in US dollars per coin.
+    priceCardTitles: {
+      'gold-usd': 'Gold price',
+      'silver-usd': 'Silver price',
+      brent: 'Brent crude oil',
+      'btc-usd': 'Bitcoin price',
+    } as Partial<Record<string, string>>,
+    priceCardUnits: {
+      'gold-usd': 'per troy ounce',
+      'silver-usd': 'per troy ounce',
+      brent: 'per barrel',
+      'btc-usd': 'per bitcoin',
+    } as Partial<Record<string, string>>,
+    // 2026-10-25b (task §9): the expanded panel's semantic sections.
+    sectionChanges: 'Price changes',
+    section52w: 'Price range over the past 52 weeks',
+    sectionRecords: 'Historical price records',
+    sectionReferences: 'Price vs reference levels',
+    sectionSource: 'Data source & freshness',
+    // Task §9C: the records are 10-year-window peaks (computePeaks reads
+    // the 10-year Yahoo histories; Brent's own series is capped to the
+    // same window) — the label must not claim an all-time record.
+    priceBelow10yHigh: '{pct} below its 10-year high',
+    // Task §10 (instrument consistency): these coverage notes render ONLY
+    // when the SERVED attribution actually is that instrument — the card
+    // checks reading.sourceName (the live merge rewrites it to the Yahoo
+    // futures attribution when a fresher quote wins).
+    priceFuturesNote: 'The displayed price is the front-month futures contract, not the spot price.',
+    priceBrentBlendNote: 'The Brent series is the EIA spot price, extended past its last published date by the BZ=F futures contract.',
+    priceFetchedAt: 'Price fetched: {time}',
+    // One line when both companion ratios exist (fa's second ratio is a
+    // sentence continuation — two separate bullets read as a fragment).
+    btcCompanions: 'One bitcoin buys {gold} oz of gold, or about {silver} oz of silver.',
+    // The 10-year price LEVEL, precisely identified (the clarified
+    // «بالا»): a percentile band of the asset's own decade, not a trend.
+    priceLevelLabel: 'Price level vs 10-year range',
+    priceLevelHigh: 'High — top 20% of the decade',
+    priceLevelTypical: 'Within its usual range',
+    priceLevelLow: 'Low — bottom 20% of the decade',
+    priceLevelNote: 'This describes the price level relative to the asset’s own ten-year history — not its direction.',
+    // 2026-10-25b: 10-year-window record (see computePeaks) — was
+    // 'Historical high', which claimed more coverage than the data has.
+    statRecordHigh: '10-year high',
+    priceSourceLabel: 'Data source',
+    priceSubjects: {
+      'gold-usd': 'Gold',
+      'silver-usd': 'Silver',
+      brent: 'Oil',
+      'btc-usd': 'Bitcoin',
+    } as Partial<Record<string, string>>,
     // Step-1 B5/C6: the card's data-date + change-window vocabulary.
     dataFor: 'data for {date}',
     dataForStale: 'data for {date}, not updated since',
@@ -1659,14 +1784,6 @@ export const insightsCopyEn = {
     exportColDate: 'Date',
     exportRuleVersion: 'Rule version: {v}',
     exportVerdictCounts: '{warning} of {voting} in warning',
-    // Step 3 §7.1: "Know before you buy US shares" — the collapsed info
-    // box. ONLY the exchange-rate and fees lines ship (no approved text
-    // exists in docs/insights/approved-text/); the professional review
-    // gates anything more.
-    usSharesBoxTitle: 'Know before you buy US shares',
-    usSharesFxLine: 'Returns are affected by the AUD/USD exchange rate.',
-    usSharesFeesLine: 'Currency conversion and brokerage fees apply.',
-    usSharesDisclaimer: 'General information only. Not financial or tax advice.',
     // Step 3 L2-02: the price row's 200-day average line.
     ma200Above: '{pct} above its 200-day average',
     ma200Below: '{pct} below its 200-day average',
@@ -1732,17 +1849,35 @@ export const insightsCopyEn = {
    * World stock markets (insights-world-markets-spec.md §7 + §8, verbatim)
    * ------------------------------------------------------------------ */
   markets: {
-    title: 'World stock markets',
-    subtitle: 'Last close · end-of-day data',
+    /** The editorial market-briefing header (the 2026-10-18 world-indices
+     * handoff round): the owner-directed title + descriptive label, the
+     * provenance descriptor, and the last-close badge. "Indices", never
+     * "exchanges"; "last available close", never "live" (02-ui-spec §3.1). */
+    title: 'The pulse of world markets',
+    sectionLabel: 'World stock indices',
+    subtitle: 'How selected stock indices performed to the last trading close',
+    lastCloseBadge: 'Latest data · end of trading day',
     asOf: 'as of {date}',
     /** Regional groups, east to west (the trading day's order). */
     groups: { asia: 'Asia-Pacific', europe: 'Europe', americas: 'Americas' },
-    /** The segmented view switch (§6.3, round 44): the NORMAL timeframe is
-     * 3 months — the lens the section opens on; Today stays one tap away. */
-    viewSwitchAria: 'Choose the number every market tile shows',
-    viewToday: 'Today',
-    view3m: '3 months',
-    viewFromHigh: 'From 52-week high',
+    /** The period radiogroup (02-ui-spec §3.3 as amended by round 47): daily,
+     * weekly, monthly, quarterly, yearly — the five horizons the stored
+     * contract carries (round 47 added chg1y). The 52-week-high distance is
+     * secondary context, not a period; no YTD exists in the data contract
+     * and must not appear here. */
+    viewSwitchAria: 'Choose the performance period for the indices',
+    viewDaily: 'Daily',
+    viewWeekly: 'Weekly',
+    viewMonthly: 'Monthly',
+    viewQuarterly: 'Quarterly',
+    viewYearly: 'Yearly',
+    /** The list / performance-map switch (02-ui-spec §3.6, desktop). */
+    displaySwitchAria: 'Choose how the indices are shown',
+    viewList: 'List',
+    viewHeatmap: 'Performance map',
+    heatmapLegendLabel: 'Intensity is relative to the selected period',
+    heatmapValueAria: '{name}, {country}: {value} over {period}',
+    noReadingAria: 'no data for this period',
     /** The focal verdict box's words (owner round 44) — market-speak on the
      * page's four-step instrument: step 1 Bullish (calm, most markets up
      * over 3 months), 2 Mixed (calm, no clear direction), 3 Mixed with the
@@ -1757,6 +1892,21 @@ export const insightsCopyEn = {
     verdictAria: 'World stock markets verdict: {label}, step {step} of 4',
     /** Step-1 E2: the attention tier's count line beside the word. */
     inCorrectionCount: '{n} of {count} markets in correction',
+    /** Market breadth (02-ui-spec §3.2): counts of indices up / down /
+     * flat over the SELECTED period, computed from raw values; the
+     * below-52w-high line is separate secondary context. */
+    breadthPeriod: '{period} performance',
+    breadthUp: 'Indices up',
+    breadthDown: 'Indices down',
+    breadthFlat: 'Flat',
+    coverageNote: '{count} of {total} indices carry this period.',
+    belowHighLine: '{n} of {count} indices are at least 10% below their 52-week high',
+    /** The two featured movers (02-ui-spec §3.4): true extrema of the
+     * selected period, never a fake winner. */
+    moverGain: 'Biggest gain',
+    moverLoss: 'Biggest fall',
+    moverPeriodLabel: 'Selected period: {period}',
+    moversNone: 'No data for this period yet.',
     /** Quiet-by-default tile tag (§6.3): correction/bear markets only. */
     tileTagBelow: '{x}% below 52-week high',
     /** Step-1 F5: the at-high tag — every tile carries its 52-week distance. */
@@ -1787,7 +1937,10 @@ export const insightsCopyEn = {
     tableLabel: 'All world stock markets',
     thMarket: 'Market',
     thToday: 'Today',
+    thWeek: '1 week',
+    thMonth: '1 month',
     th3m: '3 months',
+    thYear: '1 year',
     thFromHigh: 'From 52-week high',
     thTrend: 'Trend',
     // v3 UI_SPEC §7a (2026-10-20, UI-27): the state column's header — the
@@ -1828,6 +1981,9 @@ export const insightsCopyEn = {
     /** CSV export columns (the Tools menu, §6.4). */
     csvColMarket: 'Market',
     csvColToday: 'Today %',
+    csvColWeek: '1 week %',
+    csvColMonth: '1 month %',
+    csvColYear: '1 year %',
     csvCol3m: '3 months %',
     csvColFromHigh: 'From 52-week high %',
     csvColTrend: 'Trend',
@@ -1843,6 +1999,7 @@ export const insightsCopyEn = {
       n225: {
         name: 'Nikkei 225',
         latin: 'Nikkei 225',
+        country: 'Japan',
         what: '225 large Japanese companies, many of them exporters.',
         why: 'It moves with the yen (you already track USD/JPY): a weak yen usually helps exporters, and a sudden yen jump can hit this index hard.',
         you: 'Big yen swings can shake global markets, as happened in August 2024.',
@@ -1850,6 +2007,7 @@ export const insightsCopyEn = {
       asx200: {
         name: 'ASX 200',
         latin: 'ASX 200',
+        country: 'Australia',
         what: 'The 200 largest companies on the Australian Securities Exchange, led by banks and miners.',
         why: 'Your home market. It follows iron ore, China’s demand and the big banks.',
         you: 'Most Australian super funds hold a large slice of these companies, so it affects your retirement savings.',
@@ -1857,6 +2015,7 @@ export const insightsCopyEn = {
       kospi: {
         name: 'KOSPI',
         latin: 'KOSPI',
+        country: 'South Korea',
         what: 'South Korea’s main stock index, led by Samsung Electronics and SK Hynix.',
         why: 'A bellwether for the world’s computer-chip cycle and for AI hardware demand.',
         you: 'Chip demand shapes the cost and availability of phones, cars and AI services.',
@@ -1864,6 +2023,7 @@ export const insightsCopyEn = {
       hsi: {
         name: 'Hang Seng',
         latin: 'Hang Seng',
+        country: 'Hong Kong',
         what: 'Hong Kong’s biggest companies, including many Chinese technology and finance firms.',
         why: 'The main door through which foreign investors buy into China, so it reacts fast to China news.',
         you: 'Sharp moves here are an early hint of how global investors feel about China.',
@@ -1871,6 +2031,7 @@ export const insightsCopyEn = {
       ssec: {
         name: 'Shanghai Composite',
         latin: 'Shanghai Composite',
+        country: 'China',
         what: 'All stocks listed on the Shanghai Stock Exchange.',
         why: 'A read on China’s domestic economy, which drives demand for oil, iron ore and copper.',
         you: 'China buys a large share of Australia’s iron ore, so a weak China market can mean weaker Australian exports and a softer Australian dollar.',
@@ -1878,6 +2039,7 @@ export const insightsCopyEn = {
       taiex: {
         name: 'TAIEX',
         latin: 'TAIEX',
+        country: 'Taiwan',
         what: 'Taiwan’s main stock index. TSMC, which makes most of the world’s most advanced chips, carries a huge weight.',
         why: 'Shows the health of the AI-chip supply chain, and carries geopolitical risk around Taiwan.',
         you: 'Trouble in Taiwan would ripple through every technology and AI company.',
@@ -1885,6 +2047,7 @@ export const insightsCopyEn = {
       nifty50: {
         name: 'Nifty 50',
         latin: 'Nifty 50',
+        country: 'India',
         what: 'The 50 largest companies on India’s National Stock Exchange.',
         why: 'India is one of the fastest-growing big economies and competes with China for global investor money.',
         you: 'Money moving into or out of India can shift emerging-market funds and demand for oil and gold.',
@@ -1892,6 +2055,7 @@ export const insightsCopyEn = {
       stoxx50: {
         name: 'Euro Stoxx 50',
         latin: 'Euro Stoxx 50',
+        country: 'Eurozone',
         what: 'The 50 biggest companies in the eurozone.',
         why: 'One number for the health of the euro area, one of the world’s largest economic blocs.',
         you: 'It affects the euro and European interest rates, which matter for imports, travel and global funds.',
@@ -1899,6 +2063,7 @@ export const insightsCopyEn = {
       dax: {
         name: 'DAX',
         latin: 'DAX',
+        country: 'Germany',
         what: 'The 40 largest German companies, heavy in cars, chemicals and machinery.',
         why: 'Germany sells goods worldwide, so the DAX is a good read on global trade and on demand from China.',
         you: 'Weakness can signal slowing world trade, which tends to cool growth and commodity prices.',
@@ -1906,6 +2071,7 @@ export const insightsCopyEn = {
       cac: {
         name: 'CAC 40',
         latin: 'CAC 40',
+        country: 'France',
         what: 'The 40 largest companies on the Paris exchange: luxury goods, energy, banks and aerospace.',
         why: 'France is the eurozone’s second-largest economy; alongside the DAX and Euro Stoxx 50 it shows how Europe’s blue chips are faring.',
         you: 'It moves with the euro and European interest rates, which shape the cost of travel and goods imported from Europe.',
@@ -1913,6 +2079,7 @@ export const insightsCopyEn = {
       ftse: {
         name: 'FTSE 100',
         latin: 'FTSE 100',
+        country: 'United Kingdom',
         what: 'The 100 largest companies on the London Stock Exchange.',
         why: 'Full of global miners, oil companies and banks that earn most of their money abroad, so it works more like a gauge of commodities and world growth than of the UK itself.',
         you: 'It often rises when oil and metal prices rise, even if the UK economy is weak.',
@@ -1920,6 +2087,7 @@ export const insightsCopyEn = {
       sp500: {
         name: 'S&P 500',
         latin: 'S&P 500',
+        country: 'United States',
         what: 'The 500 biggest companies listed in the United States.',
         why: 'It is the world’s main stock-market benchmark; when it falls sharply, markets almost everywhere follow.',
         you: 'Many super and index funds hold US shares, so its moves reach your retirement savings.',
@@ -1927,6 +2095,7 @@ export const insightsCopyEn = {
       ndx: {
         name: 'Nasdaq 100',
         latin: 'Nasdaq 100',
+        country: 'United States',
         what: 'The 100 largest non-financial companies on the Nasdaq exchange, led by big technology and AI firms.',
         why: 'Shows the mood for technology and growth stocks. It usually swings harder than the S&P 500.',
         you: 'Falls here often mean investors are pulling back from risk, which can ripple into crypto and growth funds.',
@@ -1934,6 +2103,7 @@ export const insightsCopyEn = {
       dow: {
         name: 'Dow Jones',
         latin: 'Dow Jones',
+        country: 'United States',
         what: 'The 30 biggest and best-known US companies, the index the evening news quotes.',
         why: 'The world’s most famous market number: a big drop in the Dow leads the news everywhere and can set the mood for every market that opens after New York.',
         you: 'It weights companies by price and holds only 30 of them, so the S&P 500 above is the better measure, but the Dow still moves sentiment, including the US shares inside many super funds.',
@@ -1941,6 +2111,7 @@ export const insightsCopyEn = {
       tsx: {
         name: 'S&P/TSX Composite',
         latin: 'S&P/TSX',
+        country: 'Canada',
         what: 'Canada’s main stock index, heavy in energy, banks and mining.',
         why: 'A read on oil and metal prices, and Canada is the US’s closest trading partner.',
         you: 'It often moves with oil prices, which affect what you pay for petrol.',
@@ -1948,6 +2119,7 @@ export const insightsCopyEn = {
       ibov: {
         name: 'Ibovespa',
         latin: 'Ibovespa',
+        country: 'Brazil',
         what: 'Brazil’s main stock index, with large oil, mining and bank companies.',
         why: 'The usual stand-in for emerging markets and commodity exporters. It drops when investors flee riskier countries.',
         you: 'A sharp fall often goes with a stronger US dollar and weaker emerging-market currencies.',
@@ -2775,25 +2947,121 @@ export const insightsCopyEn = {
       mixed: 'mixed',
       'mostly-unsupportive': 'mostly unsupportive',
     },
-    metals: { gold: 'gold', silver: 'silver' },
-    // Step-1 audit item G1: the strip states the CONDITION tally — "will
-    // go up / will go down" was a forecast and contradicted the page's own
-    // "conditions, not forecasts" line. Supports / Works against only.
-    verdictTitle: 'Conditions right now',
-    verdictUp: 'Supports',
-    verdictDown: 'Works against',
-    verdictFlat: 'Mixed',
+    // 2026-10-17 (owner, "comply with capital letters — write Silver"):
+    // the metal's name is a TITLE everywhere it leads a card, a row or an
+    // export column — first letter capitalized. fa is unaffected (طلا/نقره
+    // carry no case).
+    metals: { gold: 'Gold', silver: 'Silver' },
+    // 2026-10-21 (owner, "Gold Market Outlook — Complete State List"): the
+    // strip speaks SEVEN outlook states, each with its own authored
+    // sentence — the old verdictUp/Down/Flat words are retired because EN
+    // ("Works against") and the fa sentence had drifted into saying
+    // different things. "Signs point to…" keeps the page's
+    // conditions-not-forecasts contract. The gold sentences are the
+    // owner's verbatim; silver mirrors them.
+    verdictTitle: 'Outlook',
     verdictNone: 'Cannot read yet',
+    verdictStates: {
+      'strong-bullish': {
+        gold: 'Signs point to a potential significant rise in gold prices.',
+        silver: 'Signs point to a potential significant rise in silver prices.',
+      },
+      bullish: {
+        gold: 'Signs point to a potential rise in gold prices.',
+        silver: 'Signs point to a potential rise in silver prices.',
+      },
+      neutral: {
+        gold: 'Signs point to a neutral outlook for gold prices.',
+        silver: 'Signs point to a neutral outlook for silver prices.',
+      },
+      'range-bound': {
+        gold: 'Signs point to gold prices trading within a defined range.',
+        silver: 'Signs point to silver prices trading within a defined range.',
+      },
+      bearish: {
+        gold: 'Signs point to a potential decline in gold prices.',
+        silver: 'Signs point to a potential decline in silver prices.',
+      },
+      'strong-bearish': {
+        gold: 'Signs point to a potential significant decline in gold prices.',
+        silver: 'Signs point to a potential significant decline in silver prices.',
+      },
+      mixed: {
+        gold: 'Market signals for gold prices are mixed.',
+        silver: 'Market signals for silver prices are mixed.',
+      },
+    },
+    // The collapsed summary line carries the short state names; the full
+    // sentences live in the strip chips.
+    verdictStateNames: {
+      'strong-bullish': 'Strong bullish',
+      bullish: 'Bullish',
+      neutral: 'Neutral',
+      'range-bound': 'Range-bound',
+      bearish: 'Bearish',
+      'strong-bearish': 'Strong bearish',
+      mixed: 'Mixed signals',
+    },
     // Step-1 audit item C12: the one named interaction the checklist's
     // separate lines cannot say — gold at its decade high WHILE real
     // yields sit high too.
     goldHighYieldsWarning:
       'Gold is near its 10-year high while real yields are also high: this combination has historically been difficult for gold. The conditions work against it even at a record price.',
     // R26: neutral side words (no check/cross marks, no green/red).
-    sideSupportive: 'Supports',
-    sideAgainst: 'Works against',
-    sideNeutral: 'Sitting neutral',
-    sideUnknown: 'Cannot read right now',
+    // 2026-10-17e (owner spec docs/insights/gold-balance-card-spec.md): the
+    // grouped driver list (Supports / Works against / Sitting neutral) is
+    // REPLACED by the balance visual — the side* headings retired, the
+    // side labels now speak the balance's own pan labels (§13 verbatim).
+    balance: {
+      // 2026-10-25 (owner Iteration-2 directive): the balance's own
+      // HEADING + explanatory subtitle now lead the block (the concept
+      // «برآیند عوامل مؤثر بر قیمت طلا»), the side captions name the two
+      // lists, and the empty states stay evidence-based. Round-50, QA
+      // record docs/QA/quirks-2026-10-25-balance-v4-fa-copy.md.
+      heading: 'The aggregate of factors affecting the price of gold',
+      subtitle:
+        'Each factor is read against its usual range and weighed equally; the beam shows the combined lean of today’s readings.',
+      sideFor: 'Factors supporting gold’s price',
+      sideAgainst: 'Factors pressuring gold’s price',
+      verdictFor: 'Leaning for gold',
+      verdictBalanced: 'Balanced',
+      verdictAgainst: 'Leaning against gold',
+      verdictNone: "Can't read the conditions right now",
+      trayNeutral: 'Neutral',
+      trayUnread: "Couldn't read",
+      countFor: '{n} for',
+      countAgainst: '{n} against',
+      countNeutral: '{n} neutral',
+      countUnread: "{n} couldn't be read",
+      aria: 'Balance for gold: {summary}. {verdict}.',
+      // 2026-10-26 (owner Iteration-4 directive): the pans' own minimal
+      // empty markers — panEmpty when the evaluation ran but this side
+      // has no qualifying factors, panUnreadable when nothing could be
+      // read at all (the full evidence-based lines still render in the
+      // list area below). Round-51.
+      panEmpty: 'No qualifying signals',
+      panUnreadable: 'Nothing to weigh yet',
+      // 2026-10-26 (owner Iteration-5 addendum): the needle gauge's
+      // text equivalent — the whole mechanical drawing is one
+      // role="img" whose label states the beam tilt and the verdict
+      // (colour never rides alone). Round-52, QA record
+      // docs/QA/quirks-2026-10-26d-balance-v7-fa-copy.md.
+      gaugeAria: 'Beam tilt: {n}°, {verdict}.',
+      listEmptyFor: 'None of the factors checked shows a meaningful signal supporting gold’s price right now.',
+      listEmptyAgainst: 'None of the factors checked shows a meaningful signal working against gold’s price right now.',
+      listEmptyNone: 'Nothing could be read yet, so neither side has been weighed.',
+    },
+    // v3 UI-45 (kept through the v3 merge): silver's own balance speaks
+    // the same sentences with silver's metal word — needs review per the
+    // copy workflow alongside the other v3 strings.
+    balanceSilver: {
+      heading: 'The aggregate of factors affecting the price of silver',
+      sideFor: 'Factors supporting silver’s price',
+      sideAgainst: 'Factors pressuring silver’s price',
+      verdictFor: 'Leaning for silver',
+      verdictAgainst: 'Leaning against silver',
+      aria: 'Balance for silver: {summary}. {verdict}.',
+    },
     silverOnly: 'Silver only',
     footingTitle: 'Price footing',
     footingRow: '{metal}: {state}',
@@ -2844,10 +3112,10 @@ export const insightsCopyEn = {
     // R7b: the collapsed summary: one line per metal ("Gold: mixed, 2 of
     // 5 conditions met: price in the top 7% of the last 10 years").
     collapsedFooting: 'price in the {band} of the last 10 years',
-    // Round 24: the collapsed line gets its takeaway — the conditions
-    // tally rides the collapsed summary too (Step-1 G1: "conditions",
-    // never "estimation").
-    collapsedVerdict: 'conditions: {verdict}',
+    // Round 24: the collapsed line gets its takeaway. 2026-10-21 (owner):
+    // the takeaway names the seven-state outlook (the strip holds the
+    // full sentences).
+    collapsedVerdict: 'Outlook: {verdict}',
     bandTop: 'top {p}%',
     bandBottom: 'bottom {p}%',
     bandMid: 'the middle',

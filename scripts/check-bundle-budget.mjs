@@ -330,7 +330,213 @@ const BUDGETS = [
   // All rider of the lazy Insights route; the ENTRY chunk is untouched
   // (294.78/88.56 vs 296/89.5). Justified 2026-10-20 (PH6-C, v3 UI_SPEC
   // §7a/§10).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 634_000, gz: 152_000, label: 'Insights lazy chunk' },
+  // Gold-balance bump (604/142.8 → 606/144.6): the owner-spec balance
+  // visual on the gold signals card (docs/insights/gold-balance-card-spec.md)
+  // — the BalanceScale component (beam/pivot/pans/blocks/trays/panel, pure
+  // CSS transforms, no new dependency) + 13 copy strings × 2 locales, and
+  // the merged card's grouped driver list it replaces. Measured 605.28 kB
+  // raw / 144.51 kB gz. Justified in CHANGELOG §2026-10-17e
+  // (gold balance card). Entry chunk untouched.
+  // Redesign bump (2026-10-17, economic-indicators-ui-spec.md; scope
+  // trimmed 2026-10-18 — the grayscale reskin now covers the header/hero
+  // ONLY, everything below the overview cards was reverted): the hero
+  // region cards restructure stays (region-name titles + severity labels,
+  // flagged tile GRID -> indicator ROWS with leading severity symbols +
+  // trailing values, the count line moved to the Why position, fixed
+  // Global-right/Australia-left ordering, aria-expanded/aria-controls on
+  // the expand controls) — measured 606.32 kB raw / 144.86 kB gz, still
+  // over the pre-redesign line. Headroom 145.20/607.00 so the next growth
+  // bumps consciously, per the gate's own rule. Justified in CHANGELOG
+  // §2026-10-17f and §2026-10-18a.
+  // Markets-public bump (607.00/145.20 → 608.00/145.60, 2026-10-18b owner
+  // directive): the world stock markets board returns to public mode — the
+  // Insights route now bundles the GENERATED data/site-mode-overrides.json
+  // (the single source of truth the API worker and the T-15 gate already
+  // consume; ~1.3 kB raw / ~0.3 kB gz incl. the dated owner-directive note)
+  // and drives the per-board feed gating from it (markets fetches/renders,
+  // fx stays licence-hidden, the US-shares AUD view rides both). Measured
+  // 607.21 kB raw / 145.24 kB gz. Justified in CHANGELOG §2026-10-18b.
+  // Entry chunk untouched (295.15/88.76 vs 296/89.5).
+  // Round-46 bump (608.00 → 609.00 raw, 2026-10-24b): the market view
+  // switch grows the weekly and monthly lenses — two more radiogroup
+  // options, the 5-lens viewValue switch (with the honest-dash missing
+  // path), the two new columns in the full table + mobile list, the
+  // Tools-menu CSV columns and the full-export flat-slot puts, plus six
+  // copy strings × two locales. Measured 608.78 kB raw / 145.54 kB gz —
+  // gzip-NEUTRAL vs the 145.60 budget (the additions are mostly localized
+  // label words, highly compressible); the raw overage is wording, not
+  // logic. Justified in CHANGELOG §2026-10-24b.
+  // Financial-asset-cards bump (609.00/145.60 → 626.00/150.00,
+  // 2026-10-24c — the spec-pack session of 2026-10-22 rebased onto
+  // round-46 main): the financial-asset-cards spec pack lands on the
+  // prices board — the day-spaced 7-day sparkline (PriceSparkline) + the
+  // pure trend/briefing module (price-trend.ts, 16 tests) + the per-card
+  // «جزئیات بیشتر» disclosure with the full detail rows + 41 new copy
+  // keys × 2 locales. The raw overage is the honest price of the
+  // real-data trend story and the bilingual hedged-briefing corpus the
+  // spec demands; the entry chunk (the money page) is untouched at
+  // 295.15/88.76 vs 296/89.5. Justified in CHANGELOG §2026-10-24c and
+  // docs/QA/quirks-2026-10-22-financial-asset-cards.md.
+  // Balance v5 bump (626.00 → 627.00 raw, gz HELD at 150.00 — the gz
+  // budget is NOT touched, 2026-10-26): the gold balance's wireframe-
+  // reference iteration (docs/ui-reference/gold-silver-balance-target-
+  // wireframe.png) moves the two factor columns ABOVE the drawing and
+  // adds the per-column progressive disclosure ("+{n} more" / "Show
+  // fewer" pills — the attention-tile convention, reused copy keys)
+  // and the soft centred assessment box. Raw +0.27 kB, gzip-neutral
+  // (149.92 vs 150.00 — the pill markup is highly compressible); the
+  // entry chunk is untouched at 295.29/88.81 vs 296/89.5. Justified in
+  // CHANGELOG §2026-10-26.
+  // Asset-cards polish bump (627.00/150.00 → 630.00/151.00,
+  // 2026-10-25b, rebased over the v5 round): the prices cards' polish
+  // round — the title/measurement-basis header (priceCardTitles +
+  // priceCardUnits × 2 locales), the one-line price + currency split
+  // (priceValueParts), the expanded panel's six semantic sections (18
+  // new copy keys × 2 locales + the sectioned markup) and the
+  // instrument-coverage notes (futures/blend/fetch-time, shown only
+  // when the served attribution is that instrument). Measured on the
+  // combined tree 629.04/150.69 + the v5 round's raw +0.27 — the raw
+  // overage is bilingual copy and panel structure, not logic; the
+  // entry chunk is untouched (295.29/88.81 vs 296/89.5). Justified in
+  // CHANGELOG §2026-10-25b and
+  // docs/QA/quirks-2026-10-25b-asset-cards-polish.md.
+  // Balance v6 bump (627.00 → 632.00 raw, 150.00 → 151.00 gz,
+  // 2026-10-26 — the Iteration-4 pans directive): the factor tiles
+  // now REST ON real weighing pans hung from the beam — the drawing
+  // gains the pan assemblies (hangers + ring dots + rimmed trays +
+  // floor lines), the compact tile anatomy with its contact shadows,
+  // the "+{n} more" overflow pills under the pans, the per-side full-
+  // list sections below the assessment, and 2 new copy keys × 2
+  // locales. Measured 631.01/150.80 — raw +4.01 kB, gz +0.80 kB: the
+  // honest price of the directive's mandated markup (a connected
+  // weighing machine cannot be smaller than an abstract beam); the
+  // entry chunk is untouched at 295.29/88.81 vs 296/89.5. Justified
+  // in CHANGELOG §2026-10-26 (v6) and D-32 in
+  // docs/DECISIONS_FOR_ALI.md.
+  // Merged-tree final (632.00 → 635.00 raw, 151.00 → 152.00 gz,
+  // 2026-10-26 — the v6 pans round MERGED with the parallel 2026-10-25b
+  // asset-cards-polish round above): the two rounds were measured
+  // independently against the v5 base (v6: 631.01/150.80;
+  // 2026-10-25b: 629.04/150.69), and the combined tree measures
+  // 634.57/151.67 — both features' honest markup together. The entry
+  // chunk is untouched at 295.29/88.82 vs 296/89.5.
+  // v7 beam-only rotation (635.00 → 636.00 raw, 152.00 → 152.50 gz,
+  // 2026-10-26d — the owner's Iteration-5 addendum "Rotate the beam
+  // only, and visualize weight"): the CSS-calc stage becomes an
+  // SVG mechanical layer (hangers as recomputed joint→rim lines, the
+  // needle + three-tick arc gauge) driven by ONE JS-animated θ through
+  // the pure balanceStageGeometry()/balanceGaugeGeometry() derivation
+  // and the Odometer-pattern rAF settle; the pans lose their rotate/
+  // tilt. Measured 635.18/152.06 — raw +0.61 kB, gz +0.39 kB over the
+  // v6 merged tree: the per-frame derivation + gauge + one new copy
+  // key × 2 locales, minus the retired CSS-var machinery. The entry
+  // chunk is untouched at 295.29/88.81 vs 296/89.5. Justified in
+  // CHANGELOG §2026-10-26 (v7) and D-33 in docs/DECISIONS_FOR_ALI.md.
+  // Merged-tree final (measured 635.91/152.00, 2026-10-26d — the v7
+  // beam-only round MERGED with the parallel 2026-10-26c asset-cards
+  // sidebar round above): the sidebar's PriceDetails module nets
+  // +0.73 kB raw / -0.06 kB gz against v7's 635.18/152.06, staying
+  // inside the 636/152.50 bump — no further bump. The entry chunk is
+  // untouched at 295.29/88.81.
+  // World-indices handoff round (636.00 → 652.00 raw, 152.50 → 156.50 gz,
+  // 2026-10-18 (2)): the world stock indices section becomes the editorial
+  // market briefing «نبض بازارهای جهان» — the movers cards
+  // (world-markets/MarketMovers.tsx), the desktop performance map
+  // (world-markets/MarketsHeatmap.tsx + legend), the logo frame with its
+  // initials fallback (world-markets/MarketLogo.tsx), the breadth strip
+  // inside the summary card, the tile identity row (logo + country line),
+  // the pure decision layer (world-markets/briefing.ts) and ~108 new copy
+  // strings × 2 locales (38 new fa keys + 16 countries + the en twins).
+  // Measured 650.28/155.51 — raw +14.37 kB, gz +3.51 kB over the
+  // 2026-10-26d merged tree: an owner-directed feature layer, mostly
+  // highly-compressible JSX + dictionary copy. The 16 index wordmark
+  // JPEGs ship as public assets (152 kB on disk), NOT in the JS chunk;
+  // the entry chunk is untouched at 295.29/88.81 vs 296/89.5. Justified
+  // in CHANGELOG §2026-10-18 (world-indices round) and D-35 in
+  // docs/DECISIONS_FOR_ALI.md.
+  // Editorial economic-indicators handoff round (652.00 → 656.00 raw,
+  // 156.50 → 157.00 gz, 2026-10-19): the hero's two overview cards become
+  // the editorial financial interface (docs/insights/
+  // economic-indicators-editorial-spec.md) — the <768px GLOBAL-FIRST
+  // horizontal swipe carousel (HeroBlock: the scroll-snap track + the cue
+  // + two aria-current dots + Previous/Next + arrow-key steps), the quiet
+  // art band (Sydney Harbour / faint world map behind each card header,
+  // .ei-hero-art in index.css), the navy print ink (--ei-navy) on the
+  // region titles + key values + page title, the compact tinted severity
+  // pill (.ei-state-pill) with the four-step meter kept beside it, and
+  // the flagged rows' editorial anatomy (subject-icon container + the
+  // shared FlowChevron drill-down glyph + the restrained inline-start
+  // tier edge) + 10 new copy strings × 2 locales (carousel cue/positions/
+  // controls). Measured 655.04/156.73 — raw +4.74 kB, gz +1.23 kB over
+  // the 2026-10-18 (2) build: an owner-directed presentation layer over
+  // the existing data, mostly highly-compressible JSX + dictionary copy.
+  // The two decorative artwork WebP files (12 KB + 4 KB) ship as public
+  // assets (precached), NOT in the JS chunk; the entry chunk is untouched
+  // at 295.29/88.81 vs 296/89.5. Justified in CHANGELOG §2026-10-19
+  // (editorial hero round) and D-36 in docs/DECISIONS_FOR_ALI.md.
+  // UI-fidelity correction round (656.00 → 657.00 raw, 157.00 → 157.50 gz,
+  // 2026-10-19, the owner's correction brief): the hero closes the gap to
+  // the approved reference — the page container widens to ~95% viewport
+  // (Insights.tsx), the art band veils lighten (index.css), the flagged
+  // rows' severity accent follows the REGION's own verdict step (article
+  // [data-ei-step] → --ei-accent — the brief's named bug: Australia
+  // Stressed no longer wears Crisis-red row edges), the gauge groups
+  // become the reference's compact CATEGORY ROWS (label + tinted state
+  // badge + sm meter), each card closes with the restrained contextual
+  // explanation panel (Global: the raised world signals on pale red;
+  // Australia / no-feed fallback: the existing word-choice rule on pale
+  // amber), and the ContinueStrip names the page's next sections after
+  // the hero. Measured 656.80/157.17 — raw +1.76 kB, gz +0.44 kB over
+  // the 2026-10-19 build: compressible JSX + 2 copy strings × 2 locales
+  // (worldSignalsTitle / continueLabel, manifest round
+  // editorial-fidelity-2026-10-19). Entry chunk untouched at
+  // 295.29/88.81 vs 296/89.5. Justified in CHANGELOG §2026-10-19
+  // (fidelity round) and D-37 in docs/DECISIONS_FOR_ALI.md.
+  // Owner round 3 (2026-10-19 (panels)): the closing explanation panels
+  // PART WAYS — the rule panel (Australia / Global's no-feed fallback)
+  // hides behind a LOW-KEY TOGGLE (the "+n more" muted-pill disclosure
+  // language: chevron pill + conditional panel, the aria-expanded/
+  // aria-controls mechanics of GlossaryTip) while the Global SIGNALS
+  // panel — "probably one of the most important parts of the whole hero"
+  // (owner) — steps UP in type: 15px bold heading + bullets (from the
+  // 12.5px caption tier), the state mark 18/20, roomier rhythm. No new
+  // copy, no data logic, no aria-hook changes; the signals panel keeps
+  // data-attention-box/bullets and stays always-open. Measured
+  // 658.10/157.49 — raw +1.30 kB, gz +0.32 kB over the fidelity build:
+  // the disclosure button + direction-neutral chevron + the branched
+  // heading markup. Entry chunk untouched at 295.29/88.81 vs 296/89.5.
+  // Justified in CHANGELOG §2026-10-19 (panels) and D-38 in
+  // docs/DECISIONS_FOR_ALI.md.
+  // Owner round 4 (2026-10-20, australia signals): "just like World
+  // Signals, the same box with proper data for Australia" — the
+  // Australia card grows the SAME emphasized signals box: one bullet
+  // per AUSTRALIAN gauge, worst first (the raised areas carry their
+  // n-of-m counts + state word in their own step ink and jump to the
+  // section; calm/unreadable areas sit in the quiet rows' ink), with
+  // the round-3 rule toggle kept as the shared FALLBACK when a region
+  // has nothing to raise. Two new copy keys (australiaSignalsTitle,
+  // australiaSignalArea) en+fa + manifest round. Measured 660.14/157.86
+  // — raw +2.04 kB, gz +0.37 kB over the panels build: the AU panel
+  // branch + the area bullets + the new strings. Entry chunk untouched
+  // at 295.29/88.81 vs 296/89.5. Justified in CHANGELOG §2026-10-20
+  // (australia signals) and D-39 in docs/DECISIONS_FOR_ALI.md.
+  
+  // MERGED-TREE FINAL (661.00 → 687.00 raw, 158.50 → 166.00 gz,
+  // 2026-10-19 — the v3 rebuild MERGED with the parallel owner rounds on
+  // main; both histories above are true): the combined tree carries the
+  // v3 UI_SPEC surface (hero verdict card with reading bar/why-3/what-next,
+  // the one-card anatomy with meta rows + the Delayed tier, the six-word
+  // states, MovesNextStrip, the UI-27 table, relationship cards with
+  // neutral summaries, About rework + data-health chip, owner tools with
+  // the gated export) AND main's live rounds (BalanceScale v7 rendered
+  // PER METAL per UI-45, prices sparkline cards + the PriceDetails
+  // sidebar, the world-indices briefing with movers/heatmap/wordmarks,
+  // the five-lens view switch). Measured 686.78 kB raw / 165.45 kB gz —
+  // +26.64 raw / +7.59 gz over main's 660.14/157.86: the honest price of
+  // both owner-directed surfaces on one lazy route. The entry chunk is
+  // untouched at 295.28/88.81 vs 296/89.5. Justified in the 2026-10-19
+  // v3-merge session record (docs/DEPLOY.md).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 687_000, gz: 166_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

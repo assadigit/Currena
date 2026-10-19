@@ -27,7 +27,7 @@
  */
 
 import type { CSSProperties } from 'react';
-import type { InsightsSection } from '@currena/core';
+import type { InsightsSection, MarketId } from '@currena/core';
 
 const BASE = '/assets/icons';
 
@@ -114,6 +114,23 @@ export function stateIconUrl(step: number): string | null {
  * own feed), so it gets its own named export. The money panel's "savings"
  * area reuses the same artwork — one drawing, two homes, by design. */
 export const MARKETS_SECTION_ICON_URL = urlOf('stock-exchange-index');
+
+/* ------------------------------------------------------------------ *
+ * Index logos (the 2026-10-18 world-indices handoff round): the 16
+ * supplied 256×256 wordmark JPEGs live at /assets/markets/, named by
+ * CANONICAL market id (n225.jpg, sp500.jpg, …) so a file can never drift
+ * from its data row — the display name stays in the copy dictionary and
+ * the logo stays a supplementary identifier (ASSET-MAP integration rule
+ * 2: the ticker/identifier is separate from the file name and the label).
+ * ------------------------------------------------------------------ */
+
+const MARKET_LOGO_BASE = '/assets/markets';
+
+/** The index wordmark for a market id — decorative (alt=""): the canonical
+ * name text beside it carries the identity, never the artwork alone. */
+export function marketLogoUrl(id: MarketId): string {
+  return `${MARKET_LOGO_BASE}/${id}.jpg`;
+}
 
 /** The metals' estimation arrows — green up / red down (fixed colours). */
 export const DIRECTION_UP_URL = urlOf('up-support-growth-increase');

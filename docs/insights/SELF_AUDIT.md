@@ -1,6 +1,6 @@
 # SELF_AUDIT.md — the automatic self-check
 
-Generated: 2026-10-19T21:28:53.290Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-19.md`
+Generated: 2026-10-19T23:22:29.256Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-19.md`
 
 Result: **ALL TESTS PASS** (25 of 25 pass)
 
@@ -29,10 +29,10 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 | E-18 | Trend labels reproducible from the stated 3-month rule | pass | the export + CSV recompute from chg3m (markets/compute.ts trendOf); pinned by markets + full-export tests |
 | SUITE:packages/core | Unit suite — packages/core | pass | 191 tests |
 | SUITE:packages/scraper | Unit suite — packages/scraper | pass | 67 tests |
-| SUITE:packages/insights | Unit suite — packages/insights | pass | 517 tests |
+| SUITE:packages/insights | Unit suite — packages/insights | pass | 521 tests |
 | SUITE:apps/markets | Unit suite — apps/markets | pass | 13 tests |
-| SUITE:apps/api | Unit suite — apps/api | pass | 329 tests |
-| SUITE:apps/web | Unit suite — apps/web | pass | 520 tests |
+| SUITE:apps/api | Unit suite — apps/api | pass | 334 tests |
+| SUITE:apps/web | Unit suite — apps/web | pass | 678 tests |
 
 ## Stale or "can't tell" cards
 
@@ -41,6 +41,7 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 
 ## Unavailable cards
 
+- ecb-dfr
 - shiller-cape
 - shiller-ecy
 - au-10y
@@ -78,7 +79,7 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 - ✅ yahoo — GC=F daily quotes (10-year record history)
 - ✅ yahoo — SI=F daily quotes (10-year record history)
 - ✅ yahoo — BTC-USD daily quotes (10-year record history)
-- ✅ ecb — FM/D.U2.EUR.4F.KR.DFR.LEV
+- ❌ ecb — FM/D.U2.EUR.4F.KR.DFR.LEV: The operation was aborted due to timeout
 - ✅ frankfurter — USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF since 2016-01-04
 - ✅ world-bank — Pink Sheet monthly workbook
 - ✅ gold-api — XAU spot
@@ -102,7 +103,7 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 - ❌ rba — F6 FLRHOOTA owner-occupier outstanding home-loan rate: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ❌ rba — F4.1 PDRNTH new household term-deposit rate: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ✅ alternative-me — Crypto Fear and Greed (daily history)
-- ✅ cross-check — gold-api BTC 81984 vs Bitstamp close 81962 (2026-10-19) → 0.03%
+- ✅ cross-check — gold-api BTC 81891 vs Bitstamp close 81898 (2026-10-19) → -0.01%
 
 ## Scope notes
 

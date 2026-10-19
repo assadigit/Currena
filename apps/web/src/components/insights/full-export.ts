@@ -373,7 +373,15 @@ function marketRow(m: MarketEntry, copy: InsightsCopy): (string | number | null)
   put(row, FLAT.name, copy.markets.entries[m.id].name);
   put(row, FLAT.status, statusWord);
   put(row, FLAT.chg1d, m.chg1d);
+  // Round 46: the weekly/monthly lenses ride the indicators' 7-day slot and
+  // the fx sheet's 1-month slot — semantically the same numbers, so the
+  // 38-slot flat layout stays untouched (existing positions never move).
+  // Round 47's yearly lens rides the fx sheet's 1-year slot the same way.
+  // A row without the lens yet exports an EMPTY cell — absent is absent.
+  put(row, FLAT.change7d, m.chg1w ?? null);
+  put(row, FLAT.chg1m, m.chg1m ?? null);
   put(row, FLAT.chg3m, m.chg3m);
+  put(row, FLAT.chg1y, m.chg1y ?? null);
   put(row, FLAT.fromHigh, m.fromHigh);
   put(row, FLAT.trend, trendWord);
   put(row, FLAT.close, m.close);
@@ -590,11 +598,14 @@ export function assembleExportDoc(input: FullExportInput): ExportDoc {
     sections.push({
       key: 'markets',
       heading: copy.markets.title,
-      columns: [FLAT.name, FLAT.chg1d, FLAT.chg3m, FLAT.fromHigh, FLAT.trend, FLAT.status, FLAT.close, FLAT.high52w, FLAT.low52w, FLAT.asOf, FLAT.source],
+      columns: [FLAT.name, FLAT.chg1d, FLAT.change7d, FLAT.chg1m, FLAT.chg3m, FLAT.chg1y, FLAT.fromHigh, FLAT.trend, FLAT.status, FLAT.close, FLAT.high52w, FLAT.low52w, FLAT.asOf, FLAT.source],
       headers: [
         copy.markets.csvColMarket,
         copy.markets.csvColToday,
+        copy.markets.csvColWeek,
+        copy.markets.csvColMonth,
         copy.markets.csvCol3m,
+        copy.markets.csvColYear,
         copy.markets.csvColFromHigh,
         copy.markets.csvColTrend,
         copy.markets.csvColStatus,
@@ -655,7 +666,10 @@ export function assembleExportDoc(input: FullExportInput): ExportDoc {
         key: 'signals',
         heading: copy.signals.title,
         columns: [FLAT.name, FLAT.status, FLAT.detail],
-        headers: [copy.ui.csvColName, copy.signals.verdictTitle, copy.ui.exportDetail],
+        // 2026-10-21: the header is the generic Status column — the strip's
+        // verdictTitle is the OUTLOOK heading now and the CSV row's status
+        // value is the checklist lean, so they no longer share a string.
+        headers: [copy.ui.csvColName, copy.ui.csvColStatus, copy.ui.exportDetail],
         rows: sigRows,
         lines: [copy.signals.subtitle],
         digits: 0,

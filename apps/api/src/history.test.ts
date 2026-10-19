@@ -1,10 +1,11 @@
 /**
  * history.ts tests (QA audit C-1 — this module had zero coverage).
  *
- * Pins the Task-24 write discipline (content-dedup, same-generation replace,
- * the 240-generation cap) and the poisoned-entry read defense, plus the KV
- * failure contract the /api/history route relies on (readHistory REJECTS on
- * a KV read failure — the route turns that into the calm 503; see
+ * Pins the Task-24 write discipline (the 2026-10-16 relative deadband —
+ * sub-noise re-quotes are no-ops, genuine moves record; same-generation
+ * replace, the 240-generation cap) and the poisoned-entry read defense,
+ * plus the KV failure contract the /api/history route relies on (readHistory
+ * REJECTS on a KV read failure — the route turns that into the calm 503; see
  * index.test.ts "rate history" block).
  *
  * No Workers, no live sites: KVNamespace is faked with an in-memory Map.
@@ -12,7 +13,13 @@
 
 import type { Snapshot } from '@currena/core';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { HISTORY_MAX_GENERATIONS, readHistory, recordHistory, toHistoryGeneration } from './history';
+import {
+  HISTORY_MAX_GENERATIONS,
+  HISTORY_RECORD_DEADBAND,
+  readHistory,
+  recordHistory,
+  toHistoryGeneration,
+} from './history';
 
 /** Minimal in-memory KV fake — string values, `get`/`put`/`delete`. */
 function makeKv(opts: { failReads?: boolean } = {}) {
@@ -34,7 +41,7 @@ function makeKv(opts: { failReads?: boolean } = {}) {
   };
 }
 
-function tgjuSnapshot(fetchedAt: string, usdToman: number): Snapshot {
+function tgjuSnapshot(fetchedAt: string, usdToman: number, extra?: Snapshot['rates']): Snapshot {
   return {
     base: 'IRR',
     source: 'tgju',
@@ -42,6 +49,7 @@ function tgjuSnapshot(fetchedAt: string, usdToman: number): Snapshot {
     rates: [
       { code: 'IRR', name: 'Iranian Rial', symbol: '﷼', rate: 1, unit: 'TOMAN' },
       { code: 'USD', name: 'US Dollar', symbol: '$', rate: 1 / usdToman },
+      ...(extra ?? []),
     ],
   };
 }
@@ -71,6 +79,67 @@ describe('recordHistory — the Task-24 write discipline', () => {
     expect(gens[0]!.at).toBe('2026-10-14T10:00:00Z'); // original kept
   });
 
+  it('a SUB-DEADBAND re-quote is a no-op even though the value changed (the 2026-10-16 jitter fix)', async () => {
+    // 230,500 → 230,600 = +0.0434% < HISTORY_RECORD_DEADBAND (0.05%) —
+    // the per-tick TGJU jitter that used to record every 6 minutes.
+    expect(230_600 / 230_500 - 1).toBeLessThan(HISTORY_RECORD_DEADBAND);
+    await recordHistory(harness.kv, 'tgju', tgjuSnapshot('2026-10-14T10:00:00Z', 230_500));
+    const wrote = await recordHistory(harness.kv, 'tgju', tgjuSnapshot('2026-10-14T10:05:00Z', 230_600));
+    expect(wrote).toBe(false);
+    const gens = await readHistory(harness.kv, 'tgju');
+    expect(gens).toHaveLength(1);
+    expect(gens[0]!.rates.USD).toBe(1 / 230_500); // recorded LEVEL kept
+  });
+
+  it('a move at/above the deadband records (real market moves always append)', async () => {
+    // 230,500 → 230,700 = +0.0868% ≥ 0.05%.
+    expect(230_700 / 230_500 - 1).toBeGreaterThanOrEqual(HISTORY_RECORD_DEADBAND);
+    await recordHistory(harness.kv, 'tgju', tgjuSnapshot('2026-10-14T10:00:00Z', 230_500));
+    const wrote = await recordHistory(harness.kv, 'tgju', tgjuSnapshot('2026-10-14T10:05:00Z', 230_700));
+    expect(wrote).toBe(true);
+    const gens = await readHistory(harness.kv, 'tgju');
+    expect(gens).toHaveLength(2);
+    expect(gens[1]!.rates.USD).toBe(1 / 230_700);
+  });
+
+  it('hysteresis vs the last RECORDED level: oscillating jitter never accumulates, drift records at its first crossing', async () => {
+    await recordHistory(harness.kv, 'tgju', tgjuSnapshot('2026-10-14T10:00:00Z', 230_500));
+    // ±0.02% wiggle around the recorded level — every tick sub-deadband.
+    for (const [i, tomans] of [230_540, 230_460, 230_540, 230_460].entries()) {
+      const wrote = await recordHistory(
+        harness.kv,
+        'tgju',
+        tgjuSnapshot(`2026-10-14T10:0${i + 1}:00Z`, tomans),
+      );
+      expect(wrote).toBe(false);
+    }
+    expect(await readHistory(harness.kv, 'tgju')).toHaveLength(1);
+    // A genuine drift step crosses the band vs the RECORDED level (230,500).
+    const wrote = await recordHistory(harness.kv, 'tgju', tgjuSnapshot('2026-10-14T10:10:00Z', 230_620));
+    expect(wrote).toBe(true); // +0.0521% vs the recorded level
+    const gens = await readHistory(harness.kv, 'tgju');
+    expect(gens).toHaveLength(2);
+    // ...and the next sub-deadband wiggle is a no-op vs the NEW level.
+    const wrote2 = await recordHistory(harness.kv, 'tgju', tgjuSnapshot('2026-10-14T10:15:00Z', 230_660));
+    expect(wrote2).toBe(false); // +0.0174% vs the recorded 230,620
+  });
+
+  it('a rate joining/leaving the snapshot is always a material change', async () => {
+    await recordHistory(harness.kv, 'tgju', tgjuSnapshot('2026-10-14T10:00:00Z', 230_500));
+    const withEur: Snapshot['rates'] = [
+      { code: 'EUR', name: 'Euro', symbol: '€', rate: 1 / 250_000 },
+    ];
+    const wrote = await recordHistory(
+      harness.kv,
+      'tgju',
+      tgjuSnapshot('2026-10-14T10:05:00Z', 230_500, withEur),
+    );
+    expect(wrote).toBe(true);
+    const gens = await readHistory(harness.kv, 'tgju');
+    expect(gens).toHaveLength(2);
+    expect(gens[1]!.rates.EUR).toBe(1 / 250_000);
+  });
+
   it('re-recording the SAME generation (same fetchedAt) replaces, never duplicates', async () => {
     await recordHistory(harness.kv, 'tgju', tgjuSnapshot('2026-10-14T10:00:00Z', 230_500));
     const wrote = await recordHistory(harness.kv, 'tgju', tgjuSnapshot('2026-10-14T10:00:00Z', 231_000));
@@ -80,7 +149,7 @@ describe('recordHistory — the Task-24 write discipline', () => {
     expect(gens[0]!.rates.USD).toBe(1 / 231_000);
   });
 
-  it('order-independent fingerprint: rate key order must not create a phantom change', async () => {
+  it('order-independent comparison: rate key order must not create a phantom change', async () => {
     const a = toHistoryGeneration(tgjuSnapshot('2026-10-14T10:00:00Z', 230_500));
     const reversedRates = Object.fromEntries(Object.entries(a.rates).reverse());
     await recordHistory(harness.kv, 'tgju', tgjuSnapshot('2026-10-14T10:00:00Z', 230_500));
@@ -94,8 +163,14 @@ describe('recordHistory — the Task-24 write discipline', () => {
   });
 
   it('caps the rolling window at HISTORY_MAX_GENERATIONS (oldest drop off)', async () => {
+    // +500 tomans per step = +0.217% — every step crosses the record
+    // deadband, so every scrape appends and the CAP is what gets exercised.
     for (let i = 0; i < HISTORY_MAX_GENERATIONS + 10; i++) {
-      await recordHistory(harness.kv, 'tgju', tgjuSnapshot(`2026-10-${String(i + 1).padStart(2, '0')}T10:00:00Z`, 230_000 + i));
+      await recordHistory(
+        harness.kv,
+        'tgju',
+        tgjuSnapshot(`2026-10-${String(i + 1).padStart(2, '0')}T10:00:00Z`, 230_000 + i * 500),
+      );
     }
     const gens = await readHistory(harness.kv, 'tgju');
     expect(gens).toHaveLength(HISTORY_MAX_GENERATIONS);

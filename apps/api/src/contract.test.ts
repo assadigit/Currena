@@ -93,7 +93,7 @@ const marketsSnapshot: MarketsSnapshot = {
   generatedAt: '2026-10-12T23:31:00Z',
   markets: [
     {
-      id: 'sp500', asOf: '2026-10-12', close: 5000, chg1d: 0.5, chg1m: 1.2, chg3m: 3,
+      id: 'sp500', asOf: '2026-10-12', close: 5000, chg1d: 0.5, chg1w: 0.4, chg1m: 1.2, chg3m: 3, chg1y: 11.5,
       high52w: 5100, low52w: 4500, fromHigh: -2, rangePos: 85, trend: 'up',
       status: 'normal', source: 'eodhd', stale: false, weekly: [[0, 4500], [7, 4600]],
     },

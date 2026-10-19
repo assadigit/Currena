@@ -36,6 +36,8 @@ import type { MarketSeries } from './providers';
 import {
   ATTENTION_COUNT,
   BEAR_PCT,
+  CHG1Y_ANCHOR_DAYS,
+  CHG1Y_ANCHOR_TOLERANCE_DAYS,
   CHG_WINDOW_DAYS,
   CORRECTION_PCT,
   EXIT_BUFFER_PTS,
@@ -59,9 +61,10 @@ import {
  * Storage precision: indices are quoted to two decimals and the UI never
  * renders more, so the stored object rounds closes/changes to 2 decimals
  * and rangePos to one — that is what keeps the whole 16-market payload
- * (weekly series included) comfortably under the route's 12 KB budget
- * (spec §4). Status/trend are computed from the raw values BEFORE rounding
- * so band edges stay deterministic.
+ * (weekly series included) comfortably under the route's 13 KB budget
+ * (spec §4; raised from 12 KB by round 46 — the weekly lens field, which
+ * measured the old ceiling at 98% consumed). Status/trend are computed
+ * from the raw values BEFORE rounding so band edges stay deterministic.
  */
 function round2(n: number): number {
   return Math.round(n * 100) / 100;
@@ -94,6 +97,28 @@ export function trendOf(points: readonly SeriesPoint[]): 'up' | 'flat' | 'down' 
 }
 
 /**
+ * The yearly lens's year-ago anchor (round 47): the latest close on or
+ * before 365 days back. Both free providers cut history at ~one year, so
+ * when the series starts INSIDE the ±15-day band around that date (the
+ * repo's year-on-year convention, series.ts yoyPctSeries: 350–380 days
+ * earlier), the earliest close IS the anchor. A window that starts closer
+ * than 350 days to the last close has no honest yearly reading — undefined
+ * (the row omits chg1y, the UI shows a dash, never a guess).
+ */
+export function yearAgoAnchor(points: readonly SeriesPoint[]): SeriesPoint | undefined {
+  const last = points[points.length - 1]!;
+  const strict = pointAtOrBefore(points, addDays(last.date, -CHG1Y_ANCHOR_DAYS));
+  if (strict !== undefined) return strict;
+  // The provider's one-year window starts after the strict anchor date: the
+  // earliest close, when it falls inside the tolerance band, is the anchor.
+  const earliest = points[0]!;
+  const target = epochDay(last.date) - CHG1Y_ANCHOR_DAYS;
+  const distance = epochDay(earliest.date) - target;
+  if (distance >= -CHG1Y_ANCHOR_TOLERANCE_DAYS && distance <= CHG1Y_ANCHOR_TOLERANCE_DAYS) return earliest;
+  return undefined;
+}
+
+/**
  * Status band with the 2-point exit buffer (§5.2). Entering a harsher
  * band is immediate; softening needs the line PLUS the buffer (a bear
  * market relaxes to correction only above −18%, a correction to normal
@@ -110,7 +135,8 @@ export function statusOf(fromHigh: number, prevStatus: MarketStatus | undefined)
 
 /**
  * The ≤52-point weekly series (§4 rule 7), DELTA-ENCODED to keep the one
- * stored object under the route's 12 KB budget: the LAST close of each
+ * stored object under the route's 13 KB budget (spec §4; raised from 12 KB
+ * by round 46): the LAST close of each
  * calendar week (Monday-start), oldest first, as [dayDelta, close] pairs.
  * dayDelta counts days from the previous entry (the first from
  * WEEKLY_EPOCH_BASE — 2020-01-01); close is integer chart precision.
@@ -180,6 +206,14 @@ export function buildEntry(
   const chg3m = pctChange(last.value, windowAgo?.value);
   if (chg3m === null) throw new Error(`[markets] ${id}: no close on/before three months back for chg3m`);
 
+  // chg1w: vs the last close on or before the same date one week earlier —
+  // the weekly lens of the view switch (round 46), the same rolling-anchor
+  // rule chg1m/chg3m use. A ~400-day provider window always carries an
+  // anchor; if it somehow does not, the row omits the field (the UI shows
+  // an honest dash, never a guess).
+  const weekAgo = pointAtOrBefore(points, addDays(last.date, -7));
+  const chg1w = pctChange(last.value, weekAgo?.value);
+
   // chg1m: vs the last close on or before the same date one month earlier —
   // the leg the currency section's rules read (currencies spec §6.3). A
   // ~400-day provider window always carries an anchor; if it somehow does
@@ -187,6 +221,13 @@ export function buildEntry(
   // missing input, never a guess).
   const monthAgo = pointAtOrBefore(points, addDays(last.date, -30));
   const chg1m = pctChange(last.value, monthAgo?.value);
+
+  // chg1y: vs the year-ago anchor (round 47) — the latest close on/before
+  // 365 days back, or the earliest close when the provider's one-year
+  // window starts inside the ±15-day year-ago band (see yearAgoAnchor). A
+  // series whose history starts closer than 350 days to the last close
+  // omits the field (the honest dash, never a guess).
+  const chg1y = pctChange(last.value, yearAgoAnchor(points)?.value);
 
   // 52-week window: closes within the last 365 calendar days.
   const windowStart = addDays(last.date, -365);
@@ -204,8 +245,10 @@ export function buildEntry(
     asOf: last.date,
     close: round2(last.value),
     chg1d: round2(chg1d),
+    ...(chg1w !== null ? { chg1w: round2(chg1w) } : {}),
     ...(chg1m !== null ? { chg1m: round2(chg1m) } : {}),
     chg3m: round2(chg3m),
+    ...(chg1y !== null ? { chg1y: round2(chg1y) } : {}),
     high52w: round2(high),
     low52w: round2(low),
     fromHigh: round2(Math.min(0, ((last.value - high) / high) * 100)),

@@ -85,7 +85,10 @@ const markets = {
       asOf: '2026-10-06',
       close: 6746.53,
       chg1d: -0.65,
+      chg1w: 0.8,
+      chg1m: 1.9,
       chg3m: 3.2,
+      chg1y: 12.1,
       fromHigh: -1.9,
       high52w: 6876.16,
       low52w: 4982.1,
@@ -99,7 +102,10 @@ const markets = {
       asOf: '2026-10-06',
       close: 48502.9,
       chg1d: 0.42,
+      chg1w: -0.3,
+      chg1m: 2.4,
       chg3m: 5.7,
+      chg1y: 14.8,
       fromHigh: -3.4,
       high52w: 50212.5,
       low52w: 31458.4,
@@ -209,6 +215,35 @@ describe('assembleExportDoc', () => {
     expect(rows[0]![1]).toBe('n225'); // fromHigh -3.4 is the worse row
     expect(rows[1]![1]).toBe('sp500');
   });
+
+  it('carries the round-46/47 lens columns in the markets block (slots 7/10/12, header order pinned)', () => {
+    const doc = assembleExportDoc(input);
+    const section = doc.sections.find((s) => s.key === 'markets')!;
+    expect(section.headers).toEqual([
+      'Market',
+      'Today %',
+      '1 week %',
+      '1 month %',
+      '3 months %',
+      '1 year %',
+      'From 52-week high %',
+      'Trend',
+      'Status',
+      'Last close',
+      '52-week high',
+      '52-week low',
+      'As of',
+      'Source',
+    ]);
+    // The flat rows carry the lenses on the existing 7-day/1-month/1-year
+    // slots — n225 is the worst row (first), sp500 second.
+    expect(section.rows[0]![7]).toBe(-0.3);
+    expect(section.rows[0]![10]).toBe(2.4);
+    expect(section.rows[0]![12]).toBe(14.8);
+    expect(section.rows[1]![7]).toBe(0.8);
+    expect(section.rows[1]![10]).toBe(1.9);
+    expect(section.rows[1]![12]).toBe(12.1);
+  });
 });
 
 describe('buildInsightsMarkdown', () => {
@@ -224,7 +259,9 @@ describe('buildInsightsMarkdown', () => {
   it('renders one heading per displayed section', () => {
     expect(md).toContain('## Summary of the gauges below'); // L3-01 rename
     expect(md).toContain('## Prices');
-    expect(md).toContain('## World stock markets');
+    // The world-indices handoff round renamed the section's editorial
+    // title (markets.title) — the export heading follows the dictionary.
+    expect(md).toContain('## The pulse of world markets');
     expect(md).toContain('## World currencies');
     expect(md).toContain('## Together');
     expect(md).toContain('## What the signals say');
@@ -250,7 +287,7 @@ describe('buildInsightsTxt', () => {
     const txt = buildInsightsTxt(input);
     expect(txt).not.toMatch(/^#/m);
     expect(txt).not.toContain(']( '); // no markdown links
-    expect(txt).toContain('World stock markets');
+    expect(txt).toContain('The pulse of world markets');
     expect(txt).toContain('5586.2');
   });
 });

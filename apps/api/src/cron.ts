@@ -64,8 +64,9 @@ export async function runScheduled(env: Bindings, scheduledTimeMs: number): Prom
     ...sources.map(async (source) => {
       try {
         const response = await service.getRates(source);
-        // Task 24: record every live-scraped generation — the content
-        // fingerprint inside recordHistory makes unchanged re-quotes no-ops.
+        // Task 24: record every live-scraped generation — the deadband
+        // inside recordHistory (2026-10-16) makes sub-noise re-quotes
+        // (median TGJU jitter 0.01–0.04%/tick) no-ops, not just identical ones.
         if (response.servedFrom === 'live') {
           try {
             const recorded = await recordHistory(env.RATES, source, response.snapshot);
