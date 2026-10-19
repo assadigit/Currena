@@ -88,3 +88,29 @@ The panel guards in `hero-editorial.test.tsx` grow 3 → 6 (20 total;
 `en-desktop-hero.png`, `fa-desktop-hero.png`, `fa-dark-desktop-hero.png`,
 `fa-mobile-global-first.png`, `fa-mobile-au-signals.png`,
 `en-mobile-au-signals.png`.
+
+## Delivery state
+
+Merged to `main` @ **a073c18** (fast-forward from 84ff783); CI on main:
+**completed / success** (typecheck, lint, 1,606 tests, build, budgets
+661.00/158.50 after D-39, copy audit). Feature branch
+`feature/economic-indicators-au-signals` @ a073c18.
+
+**Production deploy PENDING**: the Cloudflare tokens
+(`CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`) are owner-provided
+per round and env-only by policy — they were not present in this
+session's environment, and `wrangler whoami` confirms no cached auth.
+The live worker still serves the panels round (0230f09b, main @ 84ff783).
+To ship this round, run per `docs/DEPLOY.md`:
+
+```sh
+pnpm --filter @currena/web build
+CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… \
+  pnpm --filter @currena/api exec wrangler deploy
+```
+
+Then verify on currena.ir/#/insights: the Australia card closes with
+«Australia signals» carrying the per-area bullets (raised areas with
+counts in their own step ink, calm/unreadable in the quiet ink), no
+rule toggle on a readable Australia.
+
