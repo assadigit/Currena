@@ -20,12 +20,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { formatNumber } from '@currena/core';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import { evaluateConnections } from '@currena/insights';
+import { evaluateConnections, type ConnectionReading } from '@currena/insights';
 import { ChevronDown } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { ConnectionCard } from './ConnectionCard';
-import { TOGETHER_CARD_ORDER, togetherSummary } from './config';
+import { TOGETHER_CARD_ORDER, connectionSummaryInfo, togetherSummary } from './config';
 
 const STORAGE_KEY = 'currena.insights.together-open.v1';
 
@@ -34,15 +34,42 @@ const STORAGE_KEY = 'currena.insights.together-open.v1';
  * stays — colour is never alone: every chip is also a button with the
  * state word itself. */
 const CHIP_STATE_TONE: Record<string, string> = {
-  active: 'text-[var(--color-status-normal)]',
+  active: 'text-[var(--color-status-context)]',
   partly: 'text-[var(--color-status-context)]',
-  disagree: 'text-[var(--color-status-watch)]',
+  disagree: 'text-[var(--color-text-tertiary)]',
   inactive: 'text-[var(--color-text-tertiary)]',
+  pending: 'text-[var(--color-status-stale)]',
   unknown: 'text-[var(--color-text-tertiary)]',
 };
 
 /** Expanded shows 3 cards first (spec R7b). */
 const EXPANDED_LIMIT = 3;
+
+/** v3 UI_SPEC §8 (2026-10-20, PH6-B): the collapsed chip speaks the card's
+ * own neutral summary, not a bare state word — "1 of 2 match" for cards
+ * with counts, "Trigger not present", "Pass-through pending", "Not
+ * enough fresh data", and the pass-through card's own family word. Same
+ * selector as the card face (connectionSummaryInfo), so chip and face can
+ * never disagree. */
+function chipWordOf(reading: ConnectionReading, copy: InsightsCopy, fmt: (n: number) => string): string {
+  const t = copy.together;
+  const info = connectionSummaryInfo(reading);
+  switch (info.kind) {
+    case 'match':
+      return interpolate(t.chipMatchCount, { match: fmt(info.matchCount ?? 0), moved: fmt(info.movedCount ?? 0) });
+    case 'trigger-absent':
+      return t.state.inactive;
+    case 'pending':
+      return t.state.pending;
+    case 'not-enough':
+      return t.state.unknown;
+    default:
+      // The pass-through card's active/inactive states carry no engine
+      // summary: the loan either followed the decision (the usual pattern
+      // held) or it did not (it differed).
+      return reading.state === 'active' ? t.state.active : t.state.disagree;
+  }
+}
 
 export function Together({
   readings,
@@ -185,16 +212,19 @@ export function Together({
               {summary.line}
             </p>
             <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
-              {summary.chips.map((chip) => (
-                <li key={chip.connection}>
+              {ordered.map((conn) => (
+                <li key={conn.connection}>
                   <button
                     type="button"
-                    onClick={() => expandTo(chip.connection)}
+                    onClick={() => expandTo(conn.connection)}
                     className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center gap-1.5 rounded-full bg-[var(--color-surface)] px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] transition-colors hover:text-[var(--color-status-context)]"
                   >
-                    {chip.name}
-                    <span className={`font-bold ${CHIP_STATE_TONE[chip.state] ?? 'text-[var(--color-text-tertiary)]'}`}>
-                      {copy.together.state[chip.state]}
+                    {copy.together.connections[conn.connection as keyof typeof copy.together.connections]?.name ?? conn.connection}
+                    <span
+                      className={`font-bold ${CHIP_STATE_TONE[conn.state] ?? 'text-[var(--color-text-tertiary)]'}`}
+                      data-chip-state={conn.state}
+                    >
+                      {chipWordOf(conn, copy, (n) => formatNumber(n, numberLocale, { maximumFractionDigits: 0 }))}
                     </span>
                   </button>
                 </li>

@@ -1,72 +1,48 @@
 /**
- * CompactRow — Block F2: the anatomy of an indicator row in the "normal"
- * and "context" states. "Show one row with: status icon, plain name, value
- * with unit, 30-day change, tiny sparkline, position word, and a 'details'
- * button. Show the consequence line in one line under the name. Hide the
- * source and the date until the details panel opens." A reader can scan
- * ten rows in the time it takes to read three cards.
+ * CompactRow — Block F2 → v3 UI_SPEC §6 (UI-20..UI-23, 2026-10-20). ONE
+ * anatomy, the same order as the AlertCard face (the two faces are
+ * normalized; only the value's type size differs):
+ *
+ *   title → value + unit (tabular LTR bdi) → change line (arrow, size,
+ *   period) → status chip (end-aligned) → one-line meaning → meta row
+ *   ("data for {period} · released {date} · updated {HH:mm UTC} · Source
+ *   link", CardMeta) → details control.
+ *
+ * A can't-tell face (unavailable / check-pending) hides its value and
+ * change and shows the one-line reason instead (v3 §4, UI-17); the v3
+ * Delayed tier rides the chip; no-history keeps its value with the
+ * Context word + reason line.
+ *
+ * The row's tiny sparkline left with the v3 anatomy (UI-20 has no
+ * sparkline slot; the details panel carries the chart) — the lane scans
+ * as ten rows in the time it takes to read three cards (F2's brief).
  */
 
-import { useEffect, useRef, useState } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { fetchIndicatorHistory } from '../../lib/insights';
-import { Sparkline } from '../Sparkline';
+import { IconImg, indicatorIconUrl } from '../icons/currena';
 import { StatusChip } from './StatusChip';
+import { CardMetaRow, ChangeText, faceReasonOf } from './CardMeta';
+import { PositionBar } from './PositionBar';
+import { formatAsOf } from './HistoryChart';
 import {
   ALWAYS_POSITION_IDS,
   bandWordsOf,
   changeScaleOf,
-  changeWindowLabel,
   consequenceLine,
   consequenceState,
-  dataPeriodText,
   definitionFor,
   formatChange,
-  formatReadingValue,
+  formatIndicatorValue,
+  formatPeakDistance,
+  indicatorValueParts,
   policyLastChangeOf,
-  tierOf, attentionLineOf, formatPeakDistance, formatIndicatorValue } from './config';
-import { PositionBar } from './PositionBar';
-import { formatAsOf } from './HistoryChart';
-
-/** F2's tiny sparkline — same lazy pattern as the alert card's. */
-function TinySparkline({ id }: { id: IndicatorId }) {
-  const ref = useRef<HTMLSpanElement | null>(null);
-  const [points, setPoints] = useState<number[] | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    const el = ref.current;
-    if (!el || points !== null) return;
-    if (typeof IntersectionObserver === 'undefined') return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((e) => e.isIntersecting)) return;
-        io.disconnect();
-        void fetchIndicatorHistory(id)
-          .then((history) => {
-            if (cancelled || !history) return;
-            const values = history.points.map((p) => p[1]!);
-            setPoints(values.length >= 2 ? values : null);
-          })
-          .catch(() => {
-            /* honest absence */
-          });
-      },
-      { rootMargin: '120px' },
-    );
-    io.observe(el);
-    return () => {
-      cancelled = true;
-      io.disconnect();
-    };
-  }, [id, points]);
-  return (
-    <span ref={ref} className="hidden h-5 w-16 shrink-0 sm:block" aria-hidden="true">
-      {points ? <Sparkline points={points} width={64} height={20} ariaLabel="" tone="neutral" className="text-currena-muted" /> : null}
-    </span>
-  );
-}
+  tierOf,
+  attentionLineOf,
+  type DailyPeers,
+  type IndicatorTier,
+} from './config';
 
 export function CompactRow({
   reading,
@@ -74,6 +50,7 @@ export function CompactRow({
   numberLocale,
   onOpenDetails,
   pinned,
+  peers,
   showMixedTag,
   companionReadings = [],
   companionNote,
@@ -84,6 +61,8 @@ export function CompactRow({
   numberLocale: 'en-US' | 'fa-IR';
   onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
   pinned: boolean;
+  /** The snapshot's daily peers — unlocks the v3 Delayed tier (movers.ts). */
+  peers?: DailyPeers;
   /** The gold-silver ratio carries the gauge's "mixed evidence" tag. */
   showMixedTag?: boolean;
   /** Step-2 §B2: companion context rendered inside this row (the US 10-year
@@ -95,27 +74,21 @@ export function CompactRow({
 }) {
   const def = definitionFor(reading.id);
   const entry = copy.indicators[reading.id];
-  const isUnavailable = reading.status === 'unavailable';
-  const tier = tierOf(reading);
-  const valueText = formatReadingValue(reading, numberLocale, copy.units);
-  // Step-1 B5: every row carries its data date ("August 2026" / "9 Oct
-  // 2026") — never hidden to the details panel, including Normal cards.
-  const dataDate =
-    reading.asOf !== null
-      ? dataPeriodText(reading.id, reading.asOf, numberLocale === 'fa-IR' ? 'fa' : 'en', numberLocale, reading.periodEnd)
+  const locale = numberLocale === 'fa-IR' ? 'fa' : 'en';
+  const tier: IndicatorTier = tierOf(reading, peers);
+  const hidesValue = reading.status === 'unavailable' || reading.status === 'check-pending';
+  const faceReason = faceReasonOf(reading, copy);
+  const valueParts =
+    !hidesValue && reading.value !== null
+      ? indicatorValueParts(reading.id, reading.value, numberLocale, copy.units)
       : null;
-  const changeLabel = changeWindowLabel(reading.id) === 'since-previous' ? copy.ui.sincePreviousRelease : copy.ui.days30;
   // Fix spec A-02 (2026-10-14): the needs-attention line is GENERATED from
-  // the reading's own rule and value (see AlertCard) — the hand-written
-  // meanings are gone.
+  // the reading's own rule and value (see AlertCard).
   const meaningLine = attentionLineOf(reading, copy, numberLocale);
-  // R30: the sentence-versus-number guard (see AlertCard) — a
-  // needs-attention row never says "usual range" beside its rule line.
+  // R30: the sentence-versus-number guard (see AlertCard).
   const cs = consequenceState(reading, false);
   const showConsequence = !(tier === 'needs-attention' && cs === 'typical');
-  // Step-2 §B1: the exact last decision (date + size) on the policy rows,
-  // and the next RBA decision date on the cash-rate row.
-  const locale = numberLocale === 'fa-IR' ? 'fa' : 'en';
+  // Step-2 §B1: the exact last decision (date + size) on the policy rows.
   const lastChange = policyLastChangeOf(reading);
   const lastChangeText =
     lastChange !== null
@@ -141,128 +114,145 @@ export function CompactRow({
     <article
       id={`insights-card-${reading.id}`}
       data-status={reading.status}
-      className="scroll-mt-24 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-3.5 py-2.5 ring-1 ring-[var(--color-border)]"
+      data-tier={tier}
+      className="scroll-mt-24 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-3.5 py-2.5 ring-1 ring-[var(--color-border)] md:px-4"
     >
+      {/* The face (UI-20 items 1–5): the big tap zone (UI-53). */}
       <button
         type="button"
         onClick={(e) => onOpenDetails(reading.id, e.currentTarget)}
-        className="insights-focusable flex w-full cursor-pointer items-center gap-x-3 border-0 bg-transparent p-0 text-start"
+        className="insights-focusable block w-full cursor-pointer border-0 bg-transparent p-0 text-start"
         aria-haspopup="dialog"
         aria-label={`${copy.ui.detailsButton}: ${entry.name}`}
       >
-        <span className="flex w-full min-w-0 flex-col gap-0.5">
-          <span className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0">
-            <span className="shrink-0">
-              <StatusChip status={reading.status} copy={copy} tier={tier} />
-            </span>
-            <span className="min-w-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-primary)]">
-              {entry.name}
-              {pinned ? <span className="sr-only"> · {copy.ui.pinnedBadge}</span> : null}
-            </span>
-            {valueText !== null ? (
-              <bdi dir="ltr" className="type-number shrink-0 text-[var(--color-text-primary)]">
-                {valueText}
-              </bdi>
-            ) : isUnavailable ? (
-              <span className="text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">{copy.ui.unavailableCard}</span>
-            ) : null}
-            {reading.change30d !== undefined ? (
-              <bdi dir="ltr" className="shrink-0 text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
-                {formatChange(reading.change30d, def.changeKind, numberLocale, copy.units, changeScaleOf(reading.id))}
-                <span className="ms-1 opacity-80">{changeLabel}</span>
-              </bdi>
-            ) : null}
-            {/* Step-1 B5: the data date rides every row (never the fetch
-                date); Step-1 H1: a visible stale tag when the reading is
-                past its release schedule. */}
-            {dataDate !== null ? (
-              <span className="shrink-0 whitespace-nowrap text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
-                {reading.status === 'stale' ? (
-                  <span className="me-1 rounded-full bg-currena-muted/20 px-1.5 py-0.5 font-bold text-[var(--color-text-secondary)]">
-                    {copy.ui.staleTag}
-                  </span>
-                ) : null}
-                {reading.status === 'check-pending' ? (
-                  <span className="me-1 rounded-full bg-currena-muted/20 px-1.5 py-0.5 font-bold text-[var(--color-text-secondary)]">
-                    {copy.ui.checkPendingTag}
-                  </span>
-                ) : null}
-                {interpolate(reading.status === 'stale' || reading.status === 'check-pending' ? copy.ui.dataForStale : copy.ui.dataFor, { date: dataDate })}
-                {reading.nextReleaseToday === true ? <span className="ms-1 opacity-80">{copy.ui.nextReleaseToday}</span> : null}
-              </span>
-            ) : null}
-            {/* Step-1 C9: distance from the 10-year peak (prices/gold-silver
-                rows) — the same honesty the stock tiles carry. */}
-            {(reading.id === 'gold-usd' || reading.id === 'silver-usd' || reading.id === 'brent' || reading.id === 'btc-usd') && reading.fromPeak10y !== undefined && reading.fromPeak10y < -0.05 ? (
-              <span className="shrink-0 whitespace-nowrap text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
-                {formatPeakDistance(
-                  reading,
-                  numberLocale,
-                  copy.ui,
-                  (iso: string) => formatAsOf(iso, locale),
-                  (value: number) => formatIndicatorValue(reading.id, value, numberLocale, copy.units),
-                )}
-              </span>
-            ) : null}
-            {reading.highestSinceYear !== undefined ? (
-              <span className="shrink-0 whitespace-nowrap text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
-                {interpolate(copy.ui.highestSince, { year: String(reading.highestSinceYear) })}
-              </span>
-            ) : null}
-            <TinySparkline id={reading.id} />
-            {showMixedTag ? (
-              <span className="shrink-0 rounded-full bg-currena-muted/15 px-2 py-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)]">
-                {copy.ui.mixedEvidenceTag}
-              </span>
-            ) : null}
-            <span className="ms-auto shrink-0 whitespace-nowrap text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)]">
-              {copy.ui.detailsButton} ›
-            </span>
-          </span>
-          {/* R6 → round 24: the meaning line on needs-attention rows. */}
-          {meaningLine !== undefined ? (
-            <span className="block text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
-              <bdi>{meaningLine}</bdi>
-            </span>
+        {/* 1. Title. */}
+        <span className="flex items-center gap-1.5 text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-primary)]">
+          {indicatorIconUrl(reading.id) !== null ? (
+            <IconImg src={indicatorIconUrl(reading.id)!} size={22} desktopSize={26} />
           ) : null}
-          {/* Step-2 §B1: the policy rows' exact last decision + the RBA's
-           * next decision date — one line, date and size, no 30-day window. */}
-          {lastChangeText !== null || nextDecisionText !== null || decidedEffectiveText !== null ? (
-            <span className="block text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-secondary)]">
-              {lastChangeText !== null ? <bdi>{lastChangeText}</bdi> : null}
-              {lastChangeText !== null && decidedEffectiveText !== null ? <span aria-hidden="true"> · </span> : null}
-              {decidedEffectiveText !== null ? <bdi>{decidedEffectiveText}</bdi> : null}
-              {(lastChangeText !== null || decidedEffectiveText !== null) && nextDecisionText !== null ? <span aria-hidden="true"> · </span> : null}
-              {nextDecisionText !== null ? <bdi>{nextDecisionText}</bdi> : null}
-            </span>
-          ) : null}
-          {/* Step-2 §B2: the companion line rides rows too (US 10-year
-           * beside the AU 10-year). */}
-          {companionReadings.length > 0 ? (
-            <span className="block text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
-              {companionReadings.map((companion) =>
-                companion.value !== null ? (
-                  <span key={companion.id} className="me-2 inline-flex items-baseline gap-1">
-                    <span className="font-semibold text-[var(--color-text-primary)]">{copy.indicators[companion.id]?.name ?? companion.id}</span>
-                    <bdi dir="ltr">{formatReadingValue(companion, numberLocale, copy.units)}</bdi>
-                  </span>
-                ) : null,
-              )}
-              {companionNote !== undefined ? <span>{companionNote}</span> : null}
-            </span>
-          ) : null}
-          {/* Step-2 §B5: the VIX row always carries its 10-year position
-           * (the card spec's interim presentation). */}
-          {ALWAYS_POSITION_IDS.has(reading.id) && reading.percentile10y !== undefined ? (
-            <PositionBar percentile={reading.percentile10y} zone={null} copy={copy} numberLocale={numberLocale} />
-          ) : null}
-          {!isUnavailable && showConsequence ? (
-            <span className="block text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-              {consequenceLine(reading, entry, false, bandWordsOf(copy))}
-            </span>
-          ) : null}
+          <span className="min-w-0">{entry.name}</span>
+          {pinned ? <span className="sr-only"> · {copy.ui.pinnedBadge}</span> : null}
         </span>
+
+        {/* 2. Value + unit — or the UI-17 reason when it cannot be told. */}
+        {hidesValue ? (
+          faceReason !== null ? (
+            <span className="mt-1 block text-[length:var(--type-caption)] font-semibold leading-relaxed text-[var(--color-text-secondary)]" data-face-reason>
+              {faceReason}
+            </span>
+          ) : null
+        ) : (
+          valueParts !== null && (
+            <bdi dir="ltr" className="type-number mt-1 block font-bold tabular-nums text-[var(--color-text-primary)]">
+              <span>{valueParts.value}</span>
+              {valueParts.unit !== null ? (
+                <span className="ms-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+                  {valueParts.unit}
+                </span>
+              ) : null}
+            </bdi>
+          )
+        )}
+
+        {/* 3 + 4. Change line with the chip end-aligned on its row. */}
+        <span className="mt-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          {!hidesValue ? (
+            <span className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1 text-[length:var(--type-caption)]">
+              <ChangeText reading={reading} copy={copy} numberLocale={numberLocale} />
+              {/* Step-1 C9: distance from the 10-year peak (price rows). */}
+              {(reading.id === 'gold-usd' || reading.id === 'silver-usd' || reading.id === 'brent' || reading.id === 'btc-usd') &&
+              reading.fromPeak10y !== undefined &&
+              reading.fromPeak10y < -0.05 ? (
+                <span className="text-[var(--color-text-tertiary)]">
+                  {formatPeakDistance(
+                    reading,
+                    numberLocale,
+                    copy.ui,
+                    (iso: string) => formatAsOf(iso, locale),
+                    (value: number) => formatIndicatorValue(reading.id, value, numberLocale, copy.units),
+                  )}
+                </span>
+              ) : null}
+              {reading.highestSinceYear !== undefined ? (
+                <span className="text-[var(--color-text-tertiary)]">
+                  {interpolate(copy.ui.highestSince, { year: String(reading.highestSinceYear) })}
+                </span>
+              ) : null}
+              {showMixedTag ? (
+                <span className="rounded-full bg-currena-muted/15 px-2 py-0.5 font-bold text-[var(--color-text-secondary)]">
+                  {copy.ui.mixedEvidenceTag}
+                </span>
+              ) : null}
+            </span>
+          ) : null}
+          <span className="ms-auto shrink-0">
+            <StatusChip status={reading.status} copy={copy} tier={tier} />
+          </span>
+        </span>
+
+        {/* 5. One-line meaning (generated) + the policy/companion lines. */}
+        {reading.status === 'no-history' && faceReason !== null ? (
+          <span className="mt-1 block text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]" data-rule-line>
+            <bdi>{faceReason}</bdi>
+          </span>
+        ) : null}
+        {meaningLine !== undefined ? (
+          <span className="mt-1 block text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)]" data-rule-line>
+            <bdi>{meaningLine}</bdi>
+          </span>
+        ) : null}
+        {lastChangeText !== null || nextDecisionText !== null || decidedEffectiveText !== null ? (
+          <span className="mt-1 block text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-secondary)]">
+            {lastChangeText !== null ? <bdi>{lastChangeText}</bdi> : null}
+            {lastChangeText !== null && decidedEffectiveText !== null ? <span aria-hidden="true"> · </span> : null}
+            {decidedEffectiveText !== null ? <bdi>{decidedEffectiveText}</bdi> : null}
+            {(lastChangeText !== null || decidedEffectiveText !== null) && nextDecisionText !== null ? (
+              <span aria-hidden="true"> · </span>
+            ) : null}
+            {nextDecisionText !== null ? <bdi>{nextDecisionText}</bdi> : null}
+          </span>
+        ) : null}
+        {companionReadings.length > 0 ? (
+          <span className="mt-1 block text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+            {companionReadings.map((companion) =>
+              companion.value !== null ? (
+                <span key={companion.id} className="me-2 inline-flex items-baseline gap-1">
+                  <span className="font-semibold text-[var(--color-text-primary)]">
+                    {copy.indicators[companion.id]?.name ?? companion.id}
+                  </span>
+                  <bdi dir="ltr">{formatIndicatorValue(companion.id, companion.value, numberLocale, copy.units)}</bdi>
+                </span>
+              ) : null,
+            )}
+            {companionNote !== undefined ? <span>{companionNote}</span> : null}
+          </span>
+        ) : null}
+        {!hidesValue && showConsequence ? (
+          <span className="mt-1 block text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+            {consequenceLine(reading, entry, false, bandWordsOf(copy))}
+          </span>
+        ) : null}
+        {/* Step-2 §B5: the VIX row always carries its 10-year position. */}
+        {ALWAYS_POSITION_IDS.has(reading.id) && reading.percentile10y !== undefined ? (
+          <PositionBar percentile={reading.percentile10y} zone={null} copy={copy} numberLocale={numberLocale} />
+        ) : null}
       </button>
+
+      {/* 6. Meta row (wraps — U-02's fix). */}
+      <CardMetaRow reading={reading} copy={copy} numberLocale={numberLocale} />
+
+      {/* 7. Details control. */}
+      <div className="mt-0.5 flex justify-end">
+        <button
+          type="button"
+          onClick={(e) => onOpenDetails(reading.id, e.currentTarget)}
+          className="insights-focusable -my-1 inline-flex min-h-[44px] cursor-pointer items-center rounded-lg border-0 bg-transparent px-1 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+          aria-haspopup="dialog"
+        >
+          {copy.ui.detailsButton} ›
+          <span className="sr-only">, {entry.name}</span>
+        </button>
+      </div>
     </article>
   );
 }

@@ -4,6 +4,12 @@
  * header. One click opens the format choice; one click on a format builds
  * the file and starts the download.
  *
+ * v3 UI_SPEC §10 (2026-10-20, UI-51 + RULES M-3, PH6-C): the button is
+ * OWNER-ONLY — InsightsHeader renders this component solely when the owner
+ * surface is unlocked (a private-mode session, which the 200/401 gate flip
+ * already implies, or the owner-session cookie verified against the server
+ * export probe / the Tools-menu sign-in). Visitors never see it (M-3).
+ *
  * The format-choice PANEL (DataExportPanel) and the builders (full-export)
  * are lazily imported — the first when the menu opens, the second at
  * download time — so the Insights page chunk carries only this small
@@ -81,6 +87,12 @@ export function DataExportMenu({
               onOpenChange(false);
               buttonRef.current?.focus();
               onPick(format);
+            }}
+            onDone={() => {
+              // The server export closes the menu only after its download
+              // completed (it keeps the panel open to show a retry message).
+              onOpenChange(false);
+              buttonRef.current?.focus();
             }}
           />
         </Suspense>

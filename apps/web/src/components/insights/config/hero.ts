@@ -2,9 +2,25 @@
  * The hero reason line, the needs-attention tiles, and per-group
  * visibility (Phase 3-c split of the former config.ts monolith — see
  * ./index.ts). Pure, platform-free.
+ *
+ * v3 UI_SPEC §3 (2026-10-20, UI-01..UI-08) adds the new hero machinery:
+ *   heroSentence   — the ≤90-char generated verdict sentence (fixed table
+ *                   from the gauge steps: counts + which areas raised —
+ *                   never free text, never a new conclusion, never a
+ *                   forecast; heroReason's fixed-table discipline reused)
+ *   heroWhy        — the top-3 needs-attention readings by |moveScore|
+ *                   (fallback: percentile extremity, the R3 measure)
+ *   heroReadingCounts — the UI-02 reading bar: attention / normal /
+ *                   can't-tell-right-now over the section's gauge members
+ *   calmGauges     — the UI-04 calm line's gauge ids (zero warnings)
+ *   gaugeMembersAffected / heroHasStaleInputs — the UI-06 freshness count
+ *                   and the UI-08 alert-box condition (a stale/unavailable
+ *                   reading inside a gauge whose members voted — chosen
+ *                   CLIENT-SIDE because the engine already excludes those
+ *                   readings from every count; the hero just says so)
  */
 
-import type { IndicatorId, IndicatorReading, InsightsSection } from '@currena/core';
+import type { CalendarEvent, IndicatorId, IndicatorReading, InsightsSection } from '@currena/core';
 import { GAUGES } from '@currena/insights';
 import type { GaugeReading } from '@currena/insights';
 import { interpolate } from '../../../i18n';
@@ -18,6 +34,10 @@ import { definitionFor } from './sections';
  * gauges: the top step's word names its gauges, and no reassurance
  * phrase exists in the table (the calm line only fires when EVERY
  * readable gauge sits at step 1).
+ *
+ * v3: the RENDERED hero sentence is heroSentence below (the R2 machinery
+ * stays — it is pinned by its tests and remains the extremity fallback's
+ * fixed-table ancestor).
  * ------------------------------------------------------------------ */
 
 interface HeroReasonInput {
@@ -121,9 +141,77 @@ export function heroReasonIsConsistent(
 }
 
 /* ------------------------------------------------------------------ *
- * Round-2 R3: the needs-attention tiles — sorted by how far the value
- * sits into its own 10-year range (rule-tail aware).
+ * v3 UI-01: the generated verdict sentence (≤90 characters).
+ *
+ * A FIXED TABLE over the gauge steps, exactly like heroReason: the calm
+ * case only fires when EVERY readable gauge is calm; otherwise the raised
+ * areas are named (up to two, then "+{n} more") beside the honest count
+ * "{k} of {n} gauges". k counts GAUGES with warnings (a gauge steps ≥ 2
+ * exactly when at least one voting member fired), n counts readable
+ * gauges. No reassurance sentence exists in the table.
  * ------------------------------------------------------------------ */
+
+export interface HeroSentenceInput {
+  gauges: readonly GaugeReading[];
+  /** Short gauge names (copy.groupShort). */
+  nameOf: (gauge: string) => string;
+  /** Locale digit renderer (fa renders ۵). */
+  fmt: (n: number) => string;
+  /** Copy templates (copy.ui): */
+  calm: string; // 'All {n} gauges are calm right now.'
+  attention: string; // '{areas} {isAre} above the level their rules watch: {k} of {n} gauges.'
+  andWord: string; // 'and' / «و»
+  listSep: string; // ', ' / «، »
+  moreWord: string; // '+{n} more' / «و {n} مورد دیگر»
+  isWord: string; // 'needs' (one area, en)
+  areWord: string; // 'need' (two or more, en)
+  notEnough: string;
+}
+
+export function heroSentence(input: HeroSentenceInput): string {
+  const readable = input.gauges.filter((g) => g.step >= 1);
+  if (readable.length === 0) return input.notEnough;
+  const raised = readable.filter((g) => g.step >= 2); // has ≥1 warning member
+  if (raised.length === 0) {
+    return interpolate(input.calm, { n: input.fmt(readable.length) });
+  }
+  const names = raised.map((g) => input.nameOf(g.gauge));
+  const shown = names.slice(0, 2);
+  const rest = names.length - shown.length;
+  const joined =
+    rest > 0
+      ? `${shown.join(input.listSep)}${input.listSep}${interpolate(input.moreWord, { n: input.fmt(rest) })}`
+      : shown.length === 2
+        ? `${shown[0]} ${input.andWord} ${shown[1]}`
+        : shown[0]!;
+  return interpolate(input.attention, {
+    areas: joined,
+    isAre: raised.length === 1 ? input.isWord : input.areWord,
+    k: input.fmt(raised.length),
+    n: input.fmt(readable.length),
+  });
+}
+
+/* ------------------------------------------------------------------ *
+ * R3 → v3 UI-03: the why rows — the section's needs-attention readings.
+ *
+ * Contribution is defined honestly as |moveScore| (the reading's own
+ * 30-day move relative to its history, already on the reading). When NO
+ * warning member carries a finite moveScore the ranking falls back to
+ * the R3 percentile extremity (warning-zone aware: 1 − percentile for
+ * low-tail rules).
+ * ------------------------------------------------------------------ */
+
+/** How deep into its watched tail a warning reading sits (0..1). */
+function warningExtremity(reading: IndicatorReading): number {
+  const def = definitionFor(reading.id);
+  const zone = warningZone(def.rule);
+  let extremity = reading.percentile10y ?? 0.5;
+  if (zone && reading.percentile10y !== undefined) {
+    extremity = zone.to >= 1 ? reading.percentile10y : 1 - reading.percentile10y;
+  }
+  return extremity;
+}
 
 interface AttentionTileRow {
   id: IndicatorId;
@@ -146,15 +234,153 @@ export function attentionTiles(
   const rows: AttentionTileRow[] = [];
   for (const r of readings) {
     if (r.status !== 'warning' || !sectionIds.has(r.id)) continue;
-    const def = definitionFor(r.id);
-    const zone = warningZone(def.rule);
-    let extremity = r.percentile10y ?? 0.5;
-    if (zone && r.percentile10y !== undefined) {
-      extremity = zone.to >= 1 ? r.percentile10y : 1 - r.percentile10y;
-    }
-    rows.push({ id: r.id, extremity });
+    rows.push({ id: r.id, extremity: warningExtremity(r) });
   }
   return rows.sort((a, b) => b.extremity - a.extremity);
+}
+
+/** v3 UI-03: the top needs-attention readings of one section, the three
+ * with the largest honest contribution to the verdict (|moveScore|; the
+ * extremity fallback keeps the order when no move score exists). */
+export function heroWhy(
+  readings: readonly IndicatorReading[],
+  section: InsightsSection,
+  limit = 3,
+): IndicatorId[] {
+  const tiles = attentionTiles(readings, section);
+  const anyMoveScore = readings.some(
+    (r) => r.status === 'warning' && r.moveScore !== undefined && Number.isFinite(r.moveScore),
+  );
+  if (!anyMoveScore) return tiles.slice(0, limit).map((t) => t.id);
+  const byId = new Map(readings.map((r) => [r.id as IndicatorId, r]));
+  const scored = tiles
+    .map((t) => {
+      const r = byId.get(t.id);
+      const move = r?.moveScore;
+      return {
+        id: t.id,
+        contribution: move !== undefined && Number.isFinite(move) ? Math.abs(move) : -1,
+        extremity: t.extremity,
+      };
+    })
+    .sort((a, b) => b.contribution - a.contribution || b.extremity - a.extremity);
+  return scored.slice(0, limit).map((t) => t.id);
+}
+
+/* ------------------------------------------------------------------ *
+ * v3 UI-02: the reading bar counts over the section's gauge members.
+ *
+ * Attention = voting members in warning; Normal = voting members at ease
+ * (delayed rows still vote — they count as normal); Can't tell right now
+ * = every member that cannot vote (stale, unavailable, check-pending,
+ * no-history — and a context-status member, which by construction never
+ * votes). The verdict's transparent count, one bar, no paragraphs.
+ * ------------------------------------------------------------------ */
+
+export interface HeroReadingCounts {
+  attention: number;
+  normal: number;
+  cantTell: number;
+}
+
+export function heroReadingCounts(
+  readings: readonly IndicatorReading[],
+  section: InsightsSection,
+): HeroReadingCounts {
+  const sectionIds = new Set(
+    GAUGES.filter((g) => g.section === section).flatMap((g) => [...g.members]),
+  );
+  const counts: HeroReadingCounts = { attention: 0, normal: 0, cantTell: 0 };
+  for (const r of readings) {
+    if (!sectionIds.has(r.id)) continue;
+    if (r.status === 'warning') counts.attention += 1;
+    else if (r.status === 'normal') counts.normal += 1;
+    else counts.cantTell += 1; // stale | unavailable | check-pending | no-history | context
+  }
+  return counts;
+}
+
+/* ------------------------------------------------------------------ *
+ * v3 UI-04: the calm line — gauge ids with zero warnings, GAUGES order.
+ * ------------------------------------------------------------------ */
+
+export function calmGauges(
+  gauges: readonly GaugeReading[],
+  limit = 3,
+): string[] {
+  return gauges
+    .filter((g) => g.step === 1)
+    .slice(0, limit)
+    .map((g) => g.gauge);
+}
+
+/* ------------------------------------------------------------------ *
+ * v3 UI-05: the hero's "what is next" — the next calendar event for the
+ * region. Australia reads its own decisions and ABS prints; Global reads
+ * everything else; both fall back to the plain next event when their own
+ * kinds carry nothing ahead. (Choice documented here: the two cards answer
+ * different readers, and the fallback keeps the line honest on thin
+ * calendars.)
+ * ------------------------------------------------------------------ */
+
+const AU_EVENT_KINDS: ReadonlySet<string> = new Set(['rba', 'abs-cpi', 'abs-jobs']);
+
+function eventDaysUntil(dateIso: string, todayIso: string): number {
+  const a = Date.parse(`${todayIso}T00:00:00Z`);
+  const b = Date.parse(`${dateIso}T00:00:00Z`);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return Number.NaN;
+  return Math.round((b - a) / 86_400_000);
+}
+
+export function heroNextEvent(
+  events: readonly CalendarEvent[],
+  section: InsightsSection,
+  todayIso: string,
+): CalendarEvent | null {
+  const upcoming = events
+    .filter((e) => {
+      const days = eventDaysUntil(e.date, todayIso);
+      return Number.isFinite(days) && days >= 0;
+    })
+    .sort((a, b) => a.date.localeCompare(b.date));
+  if (upcoming.length === 0) return null;
+  const own = upcoming.find((e) =>
+    section === 'australia' ? AU_EVENT_KINDS.has(e.kind) : !AU_EVENT_KINDS.has(e.kind),
+  );
+  return own ?? upcoming[0]!;
+}
+
+/** v3 UI-06/UI-08 inputs: the stale/unavailable members of the section's
+ * gauges. UI-06 counts stale scored members; UI-08 fires when a stale or
+ * unavailable reading sits inside a gauge whose members voted (that gauge's
+ * share was computed without it — the counts deserve the caveat). The
+ * choice is made client-side because the engine has already excluded these
+ * readings everywhere; the hero only states it. */
+export function heroStaleInputs(
+  readings: readonly IndicatorReading[],
+  section: InsightsSection,
+): { staleCount: number; affectsVotingGauge: boolean } {
+  const gauges = GAUGES.filter((g) => g.section === section);
+  const byId = new Map(readings.map((r) => [r.id as IndicatorId, r]));
+  let staleCount = 0;
+  let affectsVotingGauge = false;
+  for (const gauge of gauges) {
+    let voting = 0;
+    for (const id of gauge.members) {
+      const r = byId.get(id);
+      if (!r) continue;
+      if (r.status === 'warning' || r.status === 'normal') voting += 1;
+      if (r.status === 'stale') staleCount += 1;
+    }
+    for (const id of gauge.members) {
+      const r = byId.get(id);
+      if (!r) continue;
+      if ((r.status === 'stale' || r.status === 'unavailable') && voting > 0) {
+        affectsVotingGauge = true;
+      }
+    }
+  }
+  return { staleCount, affectsVotingGauge };
 }
 
 /* ------------------------------------------------------------------ *

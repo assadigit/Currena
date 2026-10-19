@@ -17,6 +17,8 @@ import {
   GROUP_ORDER,
   SECTION_ORDER,
   attentionToneClass,
+  dailyPeersOf,
+  type DailyPeers,
   type StatusFilter,
 } from '../../components/insights/config';
 import { num, QuestionGroup } from './QuestionGroup';
@@ -24,12 +26,16 @@ import { num, QuestionGroup } from './QuestionGroup';
 /** The I10 watchlist strip (pinned items, snapshot order) — inside the lane. */
 function PinnedSection({
   readings,
+  peers,
   copy,
   numberLocale,
   onOpenDetails,
   pinned,
 }: {
   readings: readonly IndicatorReading[];
+  /** The SNAPSHOT's daily peers (v3 §4 Delayed — the strip's own subset
+   * would be the wrong benchmark). */
+  peers: DailyPeers;
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
   onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
@@ -63,6 +69,7 @@ function PinnedSection({
             numberLocale={numberLocale}
             onOpenDetails={onOpenDetails}
             pinned={pinned.has(r.id)}
+            peers={peers}
           />
         ))}
       </div>
@@ -133,6 +140,7 @@ export function SectionLane({
           {pinnedReadings.length > 0 ? (
             <PinnedSection
               readings={pinnedReadings}
+              peers={dailyPeersOf(snapshot.readings)}
               copy={copy}
               numberLocale={numberLocale}
               onOpenDetails={openDetails}

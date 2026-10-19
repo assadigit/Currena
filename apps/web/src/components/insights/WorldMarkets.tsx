@@ -180,12 +180,11 @@ export function WorldMarkets({
       <MarketsVerdictBox snapshot={snapshot} copy={copy} numberLocale={numberLocale} />
 
       {/* The view switch (§6.3). Default: the NORMAL 3-month timeframe.
-       * Step-1 F4: the local-currency note rides right beside it — returns
-       * are in each market's own currency (Ibovespa's +17.5% is not
-       * comparable with the others' USD terms). */}
+       * v3 UI-27 (2026-10-20, PH6-C): the local-currency note moved OUT of
+       * this row into MarketsTable — it answers the TABLE's numbers, so it
+       * renders as the table's header note, visible with the table. */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <ViewSwitch view={view} copy={copy} onChange={setView} />
-        <span className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{copy.markets.localCurrencyNote}</span>
       </div>
 
       {/* The strip: three labelled groups, the world waking up east to west

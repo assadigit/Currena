@@ -1,23 +1,30 @@
 /**
- * HeroBlock — the page's first screen (round-2 Blocks R1/R2/R3/R4 + H5/N2).
+ * HeroBlock — the page's first screen, rebuilt by the v3 UI_SPEC §3
+ * (UI-01..UI-14, 2026-10-20).
  *
- * Top to bottom: the two verdict blocks (GLOBAL first — decision D7, the old
- * Australia-first swap setting is retired), ONE biggest-move CARD (R4 — the
- * line always carries its "unusually large for this indicator" reason; the
- * owner's 11 Oct follow-up puts it back in a proper container), the
- * what-changed one-liner (H5 — the hero no longer names the next scheduled
- * event; "Next up" lives once, below the indicators, R16), and the single
- * disclaimer line (N2).
+ * Top to bottom: the two hero cards (GLOBAL first — decision D7; each a
+ * VerdictBlock: verdict word + generated sentence, reading bar, why-3,
+ * calm line, what's-next, freshness chip, data-trust alert box), the
+ * what-changed one-liner (H5), and the single disclaimer line (N2/UI-09).
+ *
+ * REMOVED here (v3 §3.1: "Remove from the hero: repeated explanatory
+ * paragraphs, the long rule text, duplicated counts, decorative elements
+ * that carry no information"):
+ *   - the biggest-move CARD (R4) — the move now lives in the MovesNextStrip
+ *     directly under this hero (UI-18), one place, one pattern;
+ *   - the world-markets/currencies alert bullets and the two world-section
+ *     indicators (§5.3/§6.5/§6.11) — the two sections carry their own
+ *     verdict lines with their full numbers where they render, and the
+ *     rebuilt card's alert box is reserved for the data-trust caveat
+ *     (UI-08's "only when"). Documented choice, see VerdictMeter.tsx.
  */
 
 import { useMemo } from 'react';
-import type { IndicatorId, IndicatorReading, InsightsSection } from '@currena/core';
+import type { CalendarEvent, IndicatorId, IndicatorReading, InsightsSection } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { TrendingUp } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { bandWordsOf, bigMovers, consequenceLine, formatChange } from './config';
-import { VerdictBlock, type MarketsAlert, type FxAlert, type SectionIndicatorState } from './VerdictMeter';
+import { VerdictBlock } from './VerdictMeter';
 
 function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
   return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
@@ -25,43 +32,29 @@ function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
 
 export function HeroBlock({
   readings,
+  calendar,
+  generatedAt,
   changedThisWeek,
   copy,
   numberLocale,
+  locale,
   onJumpSection,
   onJumpAbout,
   onFocusCard,
-  marketsAlert,
-  onJumpMarkets,
-  fxAlert,
-  onJumpFx,
-  sectionIndicators,
 }: {
   readings: readonly IndicatorReading[];
+  /** The snapshot's calendar — each card's "what is next" line (UI-05). */
+  calendar: readonly CalendarEvent[];
+  /** The snapshot's generation time — the freshness chips (UI-06). */
+  generatedAt: string;
   changedThisWeek: readonly { id: IndicatorId; to: string }[];
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
+  locale: 'en' | 'fa';
   onJumpSection: (section: InsightsSection) => void;
   onJumpAbout: () => void;
   onFocusCard: (id: IndicatorId) => void;
-  /** §5.3 (build step 9): the world-markets signal when raised — joins the
-   * GLOBAL verdict's attention module; undefined when calm or unpopulated. */
-  marketsAlert?: MarketsAlert;
-  /** Scroll to the world-markets section (the alert line's destination). */
-  onJumpMarkets?: () => void;
-  /** §6.5 (currencies build step 11): the world-currencies signal when
-   * raised — joins the same attention module with its pattern names. */
-  fxAlert?: FxAlert;
-  /** Scroll to the world-currencies section (the alert line's destination). */
-  onJumpFx?: () => void;
-  /** §6.11/§9.10: the two world sections as separate indicators in the
-   * transparent count — each with its own measure label and chip. */
-  sectionIndicators?: readonly SectionIndicatorState[];
 }) {
-  // R4: ONE mover line — |z| ≥ 2 only, stale items already excluded by the
-  // engine (stale readings never carry a move score — test below pins it).
-  const mover = useMemo(() => bigMovers(readings, 1)[0] ?? null, [readings]);
-
   // H5: one line — the week's status changes, or the calm quiet-week line.
   const changedLine = useMemo(() => {
     if (changedThisWeek.length === 0) return copy.ui.quietWeekLine;
@@ -73,90 +66,54 @@ export function HeroBlock({
     return interpolate(copy.ui.whatChangedLine, { changes: `${names}${suffix}` });
   }, [changedThisWeek, copy, numberLocale]);
 
-  const moverEntry = mover ? copy.indicators[mover.id] : null;
-  const moverReading = mover ? readings.find((r) => r.id === mover.id) : null;
-
   return (
     <section aria-label={copy.ui.heroTitle} className="m-0">
       <h2 className="sr-only">{copy.ui.heroTitle}</h2>
-      {/* R30: items-STRETCH (was items-start) — the two verdict cards share
-       * one height, so the shorter one carries no floating void beside the
-       * taller one (the roast: "a void under Australia"). */}
+      {/* UI-10: the two cards sit side by side ≥sm (items-stretch keeps one
+       * height — no void under the shorter card), stacked on mobile; the
+       * grid keeps its 16px gap (v3 task instruction). */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-        {/* D7/R1: Global first, always — the blocks array is fixed order. The
-         * world-markets alert (when raised) lives in the GLOBAL block: world
-         * stock markets are a global question (§5.3). */}
+        {/* D7/R1: Global first, always. */}
         <VerdictBlock
           section="global"
           sectionLabel={copy.sections.global}
           readings={readings}
+          calendar={calendar}
+          generatedAt={generatedAt}
           copy={copy}
           numberLocale={numberLocale}
+          locale={locale}
           onJumpSection={onJumpSection}
           onJumpAbout={onJumpAbout}
           onFocusCard={onFocusCard}
-          marketsAlert={marketsAlert}
-          onJumpMarkets={onJumpMarkets}
-          fxAlert={fxAlert}
-          onJumpFx={onJumpFx}
-          sectionIndicators={sectionIndicators}
         />
         <VerdictBlock
           section="australia"
           sectionLabel={copy.sections.australia}
           readings={readings}
+          calendar={calendar}
+          generatedAt={generatedAt}
           copy={copy}
           numberLocale={numberLocale}
+          locale={locale}
           onJumpSection={onJumpSection}
           onJumpAbout={onJumpAbout}
           onFocusCard={onFocusCard}
         />
       </div>
 
-      {/* R4 → owner follow-up (11 Oct) → round 24 (roast #7): the biggest
-       * move is the page's FOCAL MOMENT — it now carries the brand gold
-       * (the one accent): a gold ring on the card and a gold kicker icon.
-       * The 30-day label sits OUTSIDE the ltr bdi so it never collides with
-       * the value ("نقطه۳۰ روز" squish). */}
-      {mover && moverReading && moverEntry ? (
-        <div
-          className="mt-3 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-accent-gold)]/45"
-          data-biggest-move
-        >
-          <p className="m-0 mb-1 flex items-center gap-1.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-tertiary)]">
-            <TrendingUp aria-hidden="true" size={16} strokeWidth={1.8} className="shrink-0 text-[var(--color-accent-gold-deep)]" />
-            {copy.ui.bigMoverTitle}
-          </p>
-          <p className="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-            <button
-              type="button"
-              onClick={() => onFocusCard(mover.id)}
-              className="insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 font-bold text-[var(--color-text-primary)] underline decoration-currena-coral/50 underline-offset-4 transition-colors hover:decoration-currena-coral"
-            >
-              {moverEntry.name}
-            </button>
-            <bdi dir="ltr" className="type-number shrink-0 font-bold tabular-nums text-[var(--color-text-primary)]">
-              {formatChange(mover.change30d, mover.changeKind, numberLocale, copy.units)}
-            </bdi>
-            <span className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">{copy.ui.days30}</span>
-            <span>{copy.ui.bigMoverReason}</span>
-            <span className="sr-only">{consequenceLine(moverReading, moverEntry, false, bandWordsOf(copy))}</span>
-          </p>
-        </div>
-      ) : null}
-
       {/* H5: what changed — one line under the hero (or the calm line). */}
       <p className="mt-3 mb-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
         <bdi>{changedLine}</bdi>
       </p>
 
-      {/* N2: ONE short disclaimer line — links to the full text below. */}
+      {/* N2/UI-09: ONE short disclaimer line — links to the full text below. */}
       <div role="note" className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1">
         <span className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{copy.ui.disclaimerBar}</span>
         <button
           type="button"
           onClick={onJumpAbout}
-          className="insights-focusable -my-1.5 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
+          className="insights-focusable -my-1.5 inline-flex min-h-[44px] cursor-pointer items-center rounded-lg border-0 bg-transparent px-1 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
         >
           {copy.ui.aboutTitle} ↧
         </button>

@@ -12,25 +12,36 @@
  * there). The Playwright config pins testMatch to `*.plw.ts`; vitest never
  * matches it.
  *
- * Baseline semantics (Phase 1 of the runbook — measured 2026-10-19):
- *  - Tests for what the CURRENT v2 page already does right are normal tests
- *    and MUST PASS today (U-03 dark, U-04a, U-05, U-06, U-07, U-08a, U-10,
- *    U-11, U-12, U-13).
- *  - Tests for v3 UI that does not exist yet (hero why-list/what-next,
- *    balance visual, six-word state vocabulary, "N of M" relationship
- *    summaries, owner-only export endpoint) are marked `test.fail(...)` with
- *    "v3 target — Phase 6 turns this green": they are EXPECTED to fail, so
- *    the suite stays green while pinning the target behaviour. Phase 6
- *    flips each to a passing assertion as it implements the UI.
- *  - Two targets the prior pass believed already green are ALSO test.fail at
- *    the measured baseline, with the exact numbers in the comment (the
- *    runbook's Phase-1 rule: a defect test must fail, proving it catches
- *    the defect):
- *      · U-02 — at 360px the stale dollar-basket row's nowrap meta line
- *        pushes its card 10px past the viewport (scrollWidth 370),
- *      · U-03 light — the light-theme state tokens measure below 4.5:1
- *        ("Normal" chip 3.35:1, "Unusual" chip 1.61:1); the dark-theme
- *        variant passes and stays a normal test.
+ * Baseline semantics (Phase 1 of the runbook — measured 2026-10-19;
+ * Phase-6 flips recorded 2026-10-20):
+ *  - Tests for what the page does right are normal tests and MUST PASS
+ *    (U-03 dark, U-05, U-06, U-08a, U-10, U-11, U-12, U-13).
+ *  - Tests for v3 UI that does not exist yet are marked `test.fail(...)`
+ *    with "v3 target — Phase 6 turns this green": they are EXPECTED to
+ *    fail, so the suite stays green while pinning the target behaviour.
+ *    Phase 6 flips each to a passing assertion as it implements the UI.
+ *
+ * PHASE 6 (2026-10-20, task PH6-A) — turned GREEN by the v3 rebuild, each
+ * pin updated with its measured before-state in the test's own comment:
+ *    · U-01 hero answers three questions (verdict + why-3 rows + what-next)
+ *    · U-02 no overflow at 360px — was scrollWidth 370 (the stale row's
+ *      nowrap meta line); the v3 UI-20 meta row WRAPS (CardMeta.tsx)
+ *    · U-03 light — was "Normal" 3.35:1 / "Unusual" 1.61:1; the chip text
+ *      inks moved to the .chip-* classes (index.css, UI-15)
+ *    · U-04 — ONE six-word vocabulary test now (the 8-word U-04a retired
+ *      with the display words Unusual / Check pending / Limited history /
+ *      No data — the v3 §4 table: Normal, Needs attention, Context, Stale,
+ *      Delayed, Can't tell right now)
+ *    · U-07 — the unavailable face shows the v3 one-line reason; the value
+ *      bdi stays absent (the meta row's fetch-time digits are UI-20's meta
+ *      row, not a value — the pin asserts the VALUE stays hidden)
+ * PHASE 6 (2026-10-20, task PH6-B) — turned GREEN, each with its own note:
+ *    · U-08b the v3 neutral summary lines (N-of-M / Trigger not present /
+ *      Pass-through pending / Not enough fresh data) replace the chips
+ *    · U-09 the gold/silver balance visual (beam + fulcrum + factor
+ *      columns + readable-count line) at 360px in LTR and RTL
+ *    · U-09a the low-readable variant keeps the beam level (UI-40)
+ * Still expected-fail (Phase-9 target owned by ANOTHER task): U-14.
  */
 
 import { test, expect, type Page } from '@playwright/test';
@@ -207,30 +218,34 @@ async function assertKeyContrast(page: Page): Promise<void> {
  * ------------------------------------------------------------------ */
 
 test('U-01 hero answers three questions (verdict + why + what-next)', async ({ page }) => {
-  // v3 target — Phase 6 turns this green. UI_SPEC §3.1: the hero card carries
-  // the verdict word (exists today), a "why" list of THREE indicator rows
-  // (name + value + change + status chip), and a "what is next" line naming
-  // the next calendar event with its days away. The v2 hero has verdict +
-  // gauges + attention tiles, but NO three-row why list with chips and NO
-  // next-event line ("Next up" lives below the indicators, R16) — so the
-  // composite assertion below fails today, as expected.
-  test.fail();
+  // PHASE 6 GREEN (2026-10-20, was the Phase-1 expected-fail). UI_SPEC §3.1:
+  // each hero card carries the verdict word, a "why" list of THREE indicator
+  // rows (name + value + change + status chip — config/hero.ts heroWhy,
+  // |moveScore| ranked) and a "what is next" line naming the next calendar
+  // event with its days away (heroNextEvent; the v2 hero had verdict +
+  // gauges + attention tiles, no why rows, no next-event line).
   await gotoInsights(page);
   const hero = page.locator('#insights-hero');
 
   await expect(hero).toContainText(/Stable|Cautious|Stressed|Critical/);
 
-  // Why (UI-03): three rows, each with a name, a value, a change and a chip.
-  const whyRows = hero.locator('[data-hero-why] > *');
-  await expect(whyRows).toHaveCount(3);
-  for (const row of await whyRows.all()) {
-    await expect(row.locator('span.rounded-full')).toBeVisible(); // status chip
-    await expect(row).toContainText(/[+-]?\d/); // value or change digit
-  }
+  // Why (UI-03): three rows PER CARD, each with a name, a value, a change
+  // and a chip (the fixture plants 3 warnings per section).
+  const cards = hero.locator('[data-hero-card]');
+  await expect(cards).toHaveCount(2);
+  for (const card of await cards.all()) {
+    const whyRows = card.locator('[data-hero-why] > *');
+    await expect(whyRows).toHaveCount(3);
+    for (const row of await whyRows.all()) {
+      await expect(row.locator('span.rounded-full')).toBeVisible(); // status chip
+      await expect(row).toContainText(/[+-]?\d/); // value or change digit
+    }
 
-  // What is next (UI-05): the next calendar event with its days away.
-  await expect(hero).toContainText(/(Today|Tomorrow|\d+ days away)/);
-  await expect(hero).toContainText(/RBA|Fed|ABS|ECB|CPI/);
+    // What is next (UI-05): the next calendar event with its days away —
+    // Global reads the non-AU kinds (US CPI), Australia its own (RBA).
+    await expect(card.locator('[data-hero-next]')).toContainText(/(Today|Tomorrow|\d+ days away)/);
+    await expect(card.locator('[data-hero-next]')).toContainText(/RBA|Fed|ABS|ECB|CPI/);
+  }
 });
 
 /* ------------------------------------------------------------------ *
@@ -238,13 +253,12 @@ test('U-01 hero answers three questions (verdict + why + what-next)', async ({ p
  * ------------------------------------------------------------------ */
 
 test('U-02 no overflow at 360, 768, 1200', async ({ page }) => {
-  // v3 target — Phase 6 turns this green. Measured baseline (2026-10-19): at
-  // 360px the STALE dollar-basket compact row overflows — its nowrap
-  // "data for …, not updated since" meta line pushes the card's right edge to
-  // 370px against a 360px viewport, so document.scrollWidth is 370 > 360.
-  // No key section clips at any width and 768/1200 are clean; the UI-20 card
-  // anatomy rework (meta row that wraps) must clear the 360px failure.
-  test.fail();
+  // PHASE 6 GREEN (2026-10-20, was the Phase-1 expected-fail). Measured
+  // baseline: at 360px the STALE dollar-basket compact row overflowed — its
+  // nowrap "data for …, not updated since" meta line pushed the card's right
+  // edge to 370px against a 360px viewport (scrollWidth 370 > 360; fa-RTL
+  // 403px). The v3 UI-20 meta row (CardMeta.tsx) WRAPS — flex-wrap, no
+  // whitespace-nowrap anywhere — so scrollWidth === innerWidth at 360.
   await gotoInsights(page);
   await waitForMarketsBoard(page);
   for (const width of WIDTHS) {
@@ -281,15 +295,16 @@ test('U-02 no overflow at 360, 768, 1200', async ({ page }) => {
  * ------------------------------------------------------------------ */
 
 test('U-03 contrast: key text pairs pass 4.5:1 (light)', async ({ page }) => {
-  // v3 target — Phase 6 turns this green. Measured baseline (2026-10-19):
-  // the LIGHT-theme state tokens sit below the 4.5:1 text floor — the
-  // "Normal" chip words (Carbon Green 50 #24a148 on their 15% green tint)
-  // measure 3.35:1 and the "Unusual" chip (Carbon Yellow 30 #f1c21b on its
-  // 10% amber tint) measures 1.61:1. The dark-theme tokens hold — that
-  // variant below stays a normal passing test. The UI-15 token rework must
-  // lift the light-theme words to ≥4.5:1 (darker green + a brown/bronze
-  // watch ink), never by hiding the words.
-  test.fail();
+  // PHASE 6 GREEN (2026-10-20, was the Phase-1 expected-fail). Measured
+  // baseline: the LIGHT-theme chips sat under the 4.5:1 text floor — the
+  // "Normal" chip (Carbon Green 50 #24a148 on its 15% tint) at 3.35:1 and
+  // the "Unusual" chip (Carbon Yellow 30 #f1c21b) at 1.61:1. The v3 UI-15
+  // rework moved every chip's TEXT ink to the darker sibling of its pinned
+  // hue (.chip-* classes, index.css): Normal #0E6027 7.71:1 white / 6.70:1
+  // tint · attention #B91C1C 6.47/5.57 · watch #7A5D00 6.19/5.87 (the
+  // Delayed word's slot; "Unusual" retired from display) · context #245E9F
+  // 6.63/6.23 · muted #46505C 8.20/6.80 — the owner-pinned palette itself
+  // (meters, icons, instruments) is untouched.
   await gotoInsights(page, { theme: 'light' });
   await assertKeyContrast(page);
 });
@@ -303,62 +318,54 @@ test('U-03 contrast: key text pairs pass 4.5:1 (dark)', async ({ page }) => {
  * U-04 — State language
  * ------------------------------------------------------------------ */
 
-test('U-04a every status chip shows one of today\'s state words', async ({ page }) => {
+test('U-04 every status chip shows one of the v3 six-word state vocabulary', async ({ page }) => {
+  // PHASE 6 GREEN (2026-10-20). UI_SPEC §4: exactly six words — Normal,
+  // Needs attention, Context, Stale, Delayed, Can't tell right now — every
+  // state with its word AND icon, never colour alone. This ONE test replaces
+  // the retired 8-word U-04a (Unusual / Check pending / Limited history /
+  // No data left the display vocabulary: the unusual tier now shows the
+  // Normal word, no-history shows Context, and both held/failed readings
+  // read "Can't tell right now" — UI-17).
   await gotoInsights(page);
-  await revealAllIndicators(page); // the collapsed tail includes check-pending/unavailable rows
+  await revealAllIndicators(page); // the collapsed tail carries the held/unavailable rows
   const chips = await chipWords(page);
   expect(chips.length).toBeGreaterThan(10);
 
-  // Today's vocabulary (copy.status + the unusual tier word).
-  const TODAY = [
-    'Normal',
-    'Needs attention',
-    'Unusual',
-    'Context',
-    'Stale',
-    'Check pending',
-    'Limited history',
-    'No data',
-  ];
+  const V3 = ['Normal', 'Needs attention', 'Context', 'Stale', 'Delayed', "Can't tell right now"];
   for (const chip of chips) {
-    expect(TODAY, `chip on ${chip.card} (data-status ${chip.status})`).toContain(chip.word);
+    expect(V3, `v3 vocabulary must cover the chip on ${chip.card}`).toContain(chip.word);
   }
 
-  // The word matches the reading's status (normal-status cards may wear the
-  // unusual tier word instead — percentile ≥ 0.9, see config/movers.ts).
+  // The word matches the reading's internal status (normal-status cards may
+  // wear the Delayed tier word — one trading day behind their peers — or
+  // the Normal word of the unusual tier; no-history reads Context, v3 §4).
   const EXPECTED: Record<string, string[]> = {
     warning: ['Needs attention'],
-    normal: ['Normal', 'Unusual'],
+    normal: ['Normal', 'Delayed'],
     context: ['Context'],
+    'no-history': ['Context'],
     stale: ['Stale'],
-    'check-pending': ['Check pending'],
-    'no-history': ['Limited history'],
-    unavailable: ['No data'],
+    'check-pending': ["Can't tell right now"],
+    unavailable: ["Can't tell right now"],
   };
   for (const chip of chips) {
     expect(EXPECTED[chip.status] ?? [], `chip word for data-status "${chip.status}" on ${chip.card}`).toContain(chip.word);
   }
 
-  // Coverage: the fixture renders every status class (fixture guarantee).
+  // Coverage: the fixture renders every internal status class AND every
+  // one of the six words (delayed = usdjpy, can't-tell = china-pmi +
+  // stress-stlfsi, stale = dollar-basket, the fixture guarantee).
   const statuses = new Set(chips.map((c) => c.status));
-  for (const required of ['warning', 'normal', 'context', 'stale', 'check-pending', 'unavailable']) {
-    expect(statuses.has(required), `a card with data-status ${required} renders a chip`).toBe(true);
+  for (const required of ['warning', 'normal', 'context', 'stale', 'check-pending', 'unavailable', 'no-history']) {
+    expect(statuses.has(required as string), `a card with data-status ${required} renders a chip`).toBe(true);
   }
-});
-
-test('U-04b every status chip shows one of the v3 six-word vocabulary', async ({ page }) => {
-  // v3 target — Phase 6 turns this green. UI_SPEC §4: exactly six words —
-  // Normal, Needs attention, Context, Stale, Delayed, Can't tell right now.
-  // Today's page still renders Unusual / Check pending / Limited history /
-  // No data, so this fails until the Phase 6 state-language rename lands.
-  test.fail();
-  await gotoInsights(page);
-  await revealAllIndicators(page);
-  const chips = await chipWords(page);
-  expect(chips.length).toBeGreaterThan(10);
-  const V3 = ['Normal', 'Needs attention', 'Context', 'Stale', 'Delayed', "Can't tell right now"];
-  for (const chip of chips) {
-    expect(V3, `v3 vocabulary must cover the chip on ${chip.card}`).toContain(chip.word);
+  const words = new Set(chips.map((c) => c.word));
+  for (const required of V3) {
+    expect(words.has(required), `the six-word vocabulary must render "${required}"`).toBe(true);
+  }
+  // And the retired display words are gone from every chip.
+  for (const retired of ['Unusual', 'Check pending', 'Limited history', 'No data']) {
+    expect(words.has(retired), `"${retired}" is retired from the display vocabulary`).toBe(false);
   }
 });
 
@@ -427,16 +434,28 @@ test('U-06 quarterly cards name the quarter, never a bare month', async ({ page 
  * ------------------------------------------------------------------ */
 
 test('U-07 the unavailable card renders no value', async ({ page }) => {
+  // PHASE 6 GREEN (2026-10-20, pin updated with the v3 anatomy). UI-17: the
+  // unavailable card hides its VALUE — the face shows the one-line reason
+  // instead ("The source did not update on the last refresh." — the retired
+  // "No data right now" line). The value rows are bdis, so zero bdis means
+  // no value; the meta row's "updated {HH:mm} UTC" digits are UI-20's FETCH
+  // TIME (item 6), not a value, so the old blanket no-digits-anywhere pin is
+  // replaced by the honest value-hiding assertions below.
   await gotoInsights(page);
   await revealAllIndicators(page); // china-pmi sits in growth-health's collapsed tail
   const card = page.locator('#insights-card-china-pmi');
   await expect(card).toBeVisible();
   await expect(card).toHaveAttribute('data-status', 'unavailable');
-  // No value bdi / no digits on the face; the honest "No data right now" line.
+  // No value bdi anywhere on the face; the honest v3 reason line is there.
   await expect(card.locator('bdi')).toHaveCount(0);
+  await expect(card.locator('[data-face-reason]')).toBeVisible();
   const text = (await card.textContent()) ?? '';
-  expect(text).toMatch(/No data/);
-  expect(text, 'no numeric value may leak onto an unavailable card face').not.toMatch(/\d/);
+  expect(text).toMatch(/did not update on the last refresh/);
+  // No data date either (asOf is null on an unavailable reading) — and the
+  // VALUE stays hidden: nothing but the fetch time carries a digit.
+  expect(text).not.toMatch(/data for|as of/i);
+  const withoutFetchTime = text.replace(/\d\d:\d\d/, '');
+  expect(withoutFetchTime, 'no numeric value may leak onto an unavailable card face').not.toMatch(/\d/);
 });
 
 /* ------------------------------------------------------------------ *
@@ -466,16 +485,29 @@ test('U-08a relationship cards contain no Active/Partly active/Signals disagree'
 });
 
 test('U-08b relationship cards carry the v3 "N of M" match summary', async ({ page }) => {
-  // v3 target — Phase 6 turns this green. UI_SPEC UI-33: a neutral summary
-  // line "N of M readings match the usual pattern" on every relationship
-  // card. Today's cards show Showing/Partly showing/Not showing states with
-  // no match count, so this fails until the Phase 6 rebuild lands.
-  test.fail();
+  // PHASE 6 GREEN (2026-10-20, was the Phase-1 expected-fail; task PH6-B).
+  // UI_SPEC UI-33/35/37: the verdict chip is replaced by a NEUTRAL summary
+  // line — every card renders exactly one (data-connection-summary). On the
+  // fixture: the disagree card (oil jumped, borrowing costs moved against
+  // the chain) reads "1 of 2 readings match the usual pattern", the two
+  // quiet cards read "Trigger not present", the RBA card reads
+  // "Pass-through pending" with its decided-date line, and the two
+  // stale/unavailable-driver cards read "Not enough fresh data to read".
+  // The v2 Showing-family state words are retired from display entirely.
   await page.addInitScript(() => window.localStorage.setItem('currena.insights.together-open.v1', 'open'));
   await gotoInsights(page);
+  await page.getByRole('button', { name: /See all \d+ connections/ }).click();
   const cards = page.locator('[data-connection]');
-  await expect(cards.first()).toBeVisible();
-  await expect(cards.first()).toContainText(/\d+ of \d+ readings match the usual pattern/);
+  await expect(cards).toHaveCount(6);
+  await expect(cards.locator('[data-connection-summary]')).toHaveCount(6);
+  const text = (await cards.allTextContents()).join('\n');
+  expect(text, 'the disagree card carries the match count').toMatch(/1 of 2 readings match the usual pattern/);
+  expect(text, 'a quiet card reads the UI-35 line').toMatch(/Trigger not present/);
+  expect(text, 'the RBA card reads the UI-37 line').toMatch(/Pass-through pending/);
+  expect(text, 'an unreadable card reads the UI-33 line').toMatch(/Not enough fresh data to read/);
+  // UI-33 retirement: the v2 state words are gone from the whole section.
+  expect(text).not.toMatch(/Partly showing|Not showing/);
+  expect(text).not.toMatch(/\bShowing\b/);
 });
 
 /* ------------------------------------------------------------------ *
@@ -483,38 +515,83 @@ test('U-08b relationship cards carry the v3 "N of M" match summary', async ({ pa
  * ------------------------------------------------------------------ */
 
 test('U-09 balance visual is legible at 360px in LTR and RTL', async ({ page }) => {
-  // v3 target — Phase 6 turns this green. UI_SPEC §9: a balance beam with
-  // two factor columns, a fulcrum, one equal token per condition, tilt by
-  // readable conditions, and the missing-data line. None of it exists today
-  // (the merged gold/silver card still renders grouped lists), so the
-  // structure assertions below fail until Phase 6 builds the visual.
-  test.fail();
+  // PHASE 6 GREEN (2026-10-20, was the Phase-1 expected-fail; task PH6-B).
+  // UI_SPEC §9 (UI-39..45a): each metal gets its own balance inside the
+  // merged card — heading + "N of M conditions support {metal}", two factor
+  // columns, the plain-SVG beam (fulcrum, green/red ends with their legend
+  // words, one equal token per readable scored condition, 12°-capped tilt),
+  // the grey/dashed neutral+unreadable tokens beside it, the
+  // readable-count line and the footnote. Measured at 360px in BOTH
+  // locales: the fixture's gold balance carries 1 supporting token + 2
+  // dashed unreadable tokens, its readable line reads "3 of 5 conditions
+  // readable" (fa: «۳ مورد از ۵ شرط قابل خواندن»), and no element inside
+  // the balance clips the viewport.
+  await page.setViewportSize({ width: 360, height: 900 });
+  // One REAL document load per locale: the persisted `currena:locale` key is
+  // re-read at boot (src/lib/locale.ts), while addInitScript cannot be
+  // re-armed per iteration on the same page — a same-URL hash goto never
+  // re-runs it (measured: the fa iteration kept rendering EN text).
   await gotoInsights(page);
   for (const locale of ['en', 'fa'] as const) {
     await page.evaluate((l) => window.localStorage.setItem('currena:locale', l), locale);
     await page.reload();
     await page.waitForSelector('#insights-hero', { state: 'visible' });
     await page.waitForSelector('article[data-status]', { state: 'visible' });
-    const gold = page.locator('#insights-conditions-gold, [data-balance="gold-usd"]');
+    const gold = page.locator('#insights-conditions-gold, [data-balance="gold"]');
     await expect(gold).toBeVisible();
-    // The readable-count line (UI-39.5 / UI-45a): "N of M conditions readable".
-    await expect(gold).toContainText(/\d+ of \d+ conditions readable/);
-    // The beam itself: a fulcrum element with tilted ends.
     await expect(gold.locator('[data-balance-beam]')).toBeVisible();
+    // one equal-sized token per scored READABLE condition rests on the beam
+    // (gold: footing supportive only); the two dashed tokens stay off it.
+    await expect(gold.locator('[data-balance-beam] circle')).toHaveCount(1);
+    await expect(gold.locator('[data-token-unreadable]')).toHaveCount(2);
+    await expect(gold.locator('[data-token-neutral]')).toHaveCount(2);
+    // UI-39.5 / UI-45a: the readable-count line, in the locale's own words.
+    await expect(gold).toContainText(
+      locale === 'en' ? /3 of 5 conditions readable/ : /۳ مورد از ۵ شرط قابل خواندن/,
+    );
+    // UI-43: nothing inside the balance clips the 360px viewport.
+    const clipped = await gold.evaluate((el) => {
+      const iw = window.innerWidth;
+      const bad: string[] = [];
+      for (const child of el.querySelectorAll('*')) {
+        const r = child.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) continue;
+        if (r.left < -1 || r.right > iw + 1) {
+          bad.push(`${child.tagName}: ${Math.round(r.left)}..${Math.round(r.right)} vs ${iw}`);
+        }
+      }
+      return bad;
+    });
+    expect(clipped, `no balance element may clip at 360px (${locale})`).toEqual([]);
   }
 });
 
 test('U-09a fewer than 3 readable conditions keeps the beam level', async ({ page }) => {
-  // v3 target — Phase 6 turns this green. UI-40: with <3 readable
-  // conditions the beam stays level and shows the "not enough readable
-  // conditions" line; unreadable conditions never tilt it. Needs the Phase 6
-  // balance component plus a low-readable fixture variant.
-  test.fail();
+  // PHASE 6 GREEN (2026-10-20, was the Phase-1 expected-fail; task PH6-B).
+  // UI-40: with fewer than 3 readable conditions the beam stays level and
+  // shows the "not enough readable conditions" line; unreadable conditions
+  // never affect the tilt. The fixture server keeps serving the full board,
+  // so this test serves the BUILDER'S low-readable variant (real yields →
+  // stale, breakeven → held check-pending, on top of the base snapshot's
+  // held STLFSI + stale dollar basket + unavailable China PMI) through its
+  // own /api/insights interception: gold drops to 1 readable condition of
+  // 5 (its footing), silver to 1 of 6 — level beams, honest counts.
+  await page.route('**/api/insights', async (route) => {
+    const body = readFileSync(path.join(HERE, 'fixtures', 'snapshot-low-readable.json'), 'utf8');
+    await route.fulfill({ status: 200, contentType: 'application/json', body });
+  });
   await gotoInsights(page);
-  const balance = page.locator('#insights-conditions-gold, [data-balance="gold-usd"]');
-  await expect(balance).toContainText(/Not enough readable conditions/);
-  const tilt = await balance.locator('[data-balance-beam]').evaluate((el) => el.getAttribute('data-tilt'));
-  expect(tilt).toBe('0');
+  const gold = page.locator('#insights-conditions-gold, [data-balance="gold"]');
+  await expect(gold).toContainText(/Not enough readable conditions to weigh/);
+  const tilt = await gold.locator('[data-balance-beam]').evaluate((el) => el.getAttribute('data-tilt'));
+  expect(tilt, 'the beam must stay level (data-tilt 0)').toBe('0');
+  // The readable count is still stated honestly — never silently counted.
+  await expect(gold).toContainText(/1 of 5 conditions readable/);
+  // Unreadable conditions never tilt: silver (1 of 6 readable) stays level.
+  const silver = page.locator('[data-balance="silver"]');
+  await expect(silver).toContainText(/Not enough readable conditions to weigh/);
+  const silverTilt = await silver.locator('[data-balance-beam]').evaluate((el) => el.getAttribute('data-tilt'));
+  expect(silverTilt).toBe('0');
 });
 
 /* ------------------------------------------------------------------ *
@@ -574,9 +651,15 @@ test('U-10 prefers-reduced-motion: no animation runs', async ({ browser, baseURL
     // (grep over src: ConnectionCard renders "no arrows between chips —
     // arrows implied"), so there is nothing to measure until Phase 6 puts
     // an element inside it — from then on this same loop holds it honest.
+    // [data-balance-beam] (PH6-B, UI-42): the gold/silver balance beam's
+    // tilt rides a CSS transition that motion-reduce:transition-none must
+    // switch off under reduced motion — the beam is always mounted (the
+    // signals card opens by default), so this loop now holds it honest.
     const segs = document.querySelectorAll('.verdict-meter-seg');
     if (segs.length === 0) offenders.push('.verdict-meter-seg: no element mounted — the hero meter must exist');
-    for (const sel of ['.verdict-meter-seg', '.connection-arrow']) {
+    const beams = document.querySelectorAll('[data-balance-beam]');
+    if (beams.length === 0) offenders.push('[data-balance-beam]: no element mounted — both balances must render');
+    for (const sel of ['.verdict-meter-seg', '.connection-arrow', '[data-balance-beam]']) {
       for (const el of document.querySelectorAll(sel)) {
         const cs = getComputedStyle(el);
         if (cs.transitionProperty !== 'none' || cs.transitionDuration !== '0s') {
@@ -606,13 +689,23 @@ test('U-11 stock table uses the L2-01 state words and the local-currency note', 
   await waitForMarketsBoard(page);
 
   const section = page.locator('#insights-markets');
-  // UI-27: the header note "Returns in each market's local currency."
-  await expect(section.getByText(/Returns in each market.s local currency/)).toBeVisible();
-
   // Open the full table (disclosed by default-closed per §6.3).
   await section.getByRole('button', { name: /Show full table/ }).click();
   const table = page.locator('#insights-markets-table');
   await expect(table).toBeVisible();
+
+  // UI-27 (v3 §7a): the local-currency note is the TABLE's header note — it
+  // moved from beside the ViewSwitch to render with the table itself.
+  await expect(table.getByText(/Returns in each market.s local currency/)).toBeVisible();
+
+  // UI-27: the exact column set — Market | Today | 3 months | From 52-week
+  // high | State | Last close. The Trend column is GONE (E-18 closed by
+  // removing the unverifiable label; the 3-month number stays).
+  const headerText = (await table.locator('thead').textContent()) ?? '';
+  for (const header of ['Market', 'Today', '3 months', 'From 52-week high', 'State', 'Last close']) {
+    expect(headerText, `the table must keep its UI-27 column "${header}"`).toContain(header);
+  }
+  expect(headerText, 'the Trend column must not render (UI-27)').not.toContain('Trend');
 
   // UI-28 / L2-01: the four state words; "Normal" is retired as a stock state.
   const L201 = ['Near its high', 'Pullback', 'Correction', 'Bear market'];
@@ -641,28 +734,113 @@ test('U-12 calendar shows no past events', async ({ page }) => {
   const section = page.locator('#insights-coming-up');
   await expect(section).toBeVisible();
 
-  // The strip shows the NEXT three events, each with its Gregorian date on
-  // the date span's title attribute ("Gregorian date: YYYY-MM-DD").
+  // v3 UI-47: the strip shows the NEXT FIVE events (was three), each with
+  // its Gregorian date on the date span's title attribute ("Gregorian date:
+  // YYYY-MM-DD") and — when the event carries a mapped tz — its zone label.
   const strip = section.locator('ul > li');
-  await expect(strip).toHaveCount(3);
+  await expect(strip).toHaveCount(5);
   const todayIso = new Date().toISOString().slice(0, 10);
+  const tzLabels = [/Sydney time/, /US Eastern/, /Frankfurt time/];
+  let tzSeen = 0;
   for (const item of await strip.all()) {
     const title = (await item.locator('[title]').first().getAttribute('title')) ?? '';
     const iso = title.match(/(\d{4}-\d{2}-\d{2})/)?.[1];
     expect(iso, 'strip items carry their Gregorian date').toBeTruthy();
     // ISO dates compare lexically — a past event would fail this.
     expect(iso !== undefined && iso >= todayIso, `no past event may render in the strip (${iso} < ${todayIso})`).toBe(true);
+    const text = (await item.textContent()) ?? '';
+    if (tzLabels.some((re) => re.test(text))) tzSeen += 1;
   }
+  // The fixture's five strip events all carry mapped zones (Sydney /
+  // New York / Frankfurt) — every strip item shows its zone label.
+  expect(tzSeen, 'every mapped-zone strip item renders its tz label').toBe(5);
 
-  // Expand the full calendar: all five fixture events, all Today/Tomorrow/N days away.
+  // Expand the full calendar: all seven fixture events, all Today/Tomorrow/N days away.
   await section.getByRole('button', { name: /Full calendar/ }).click();
   const fullList = section.locator('div.mt-2 ul li');
-  await expect(fullList).toHaveCount(5);
+  await expect(fullList).toHaveCount(7);
   for (const row of await fullList.all()) {
     const text = (await row.textContent()) ?? '';
     expect(text, 'full-list rows must show a future day-count').toMatch(/(Today|Tomorrow|\d+ days away)/);
     expect(text).not.toMatch(/[-−]\d+ days away/);
   }
+});
+
+/* ------------------------------------------------------------------ *
+ * UI-50 + UI-49 (v3 §10, PH6-C) — the data-health chip and the About
+ * rework. The fixture board carries 2 stale readings (dollar-basket,
+ * au-household-debt-arrears) and 2 can't-tell readings (stress-stlfsi
+ * held, china-pmi unavailable), so the chip's honest worst-wins state is
+ * "2 unavailable" with the stale count in its title.
+ * ------------------------------------------------------------------ */
+
+test('UI-50 the data-health chip speaks the honest counts and opens About', async ({ page }) => {
+  await gotoInsights(page);
+  const chip = page.locator('[data-health-kind]');
+  await expect(chip).toBeVisible();
+  // Worst wins: the unavailable group outranks the stale one.
+  await expect(chip).toHaveAttribute('data-health-kind', 'unavailable');
+  await expect(chip).toContainText('2 unavailable');
+  // Both counts honestly: the title carries the stale count beside the
+  // visible unavailable one (the same two numbers About lists).
+  const title = (await chip.getAttribute('title')) ?? '';
+  expect(title).toMatch(/2 stale, 2 unavailable/);
+  // Word + icon, never colour alone: one aria-hidden state shape.
+  await expect(chip.locator('svg')).toHaveCount(1);
+  // Static per snapshot: no aria-live on the chip.
+  expect(await chip.getAttribute('aria-live')).toBeNull();
+  // ≥44px touch target (UI-53) beside the "Data as of" line.
+  const height = (await chip.boundingBox())?.height ?? 0;
+  expect(height).toBeGreaterThanOrEqual(44);
+  // Clicking it expands + scrolls to the About section (expandToken).
+  await chip.click();
+  await expect(page.locator('#insights-about-body')).toBeVisible();
+});
+
+test('UI-49 About rework: source table + card lists + rule version + contact', async ({ page }) => {
+  await gotoInsights(page);
+  // Open via the chip — the same path a reader takes.
+  await page.locator('[data-health-kind]').click();
+  const about = page.locator('#insights-about');
+  await expect(page.locator('#insights-about-body')).toBeVisible();
+
+  // (c) The stale + can't-tell card lists from the page's OWN readings —
+  // every listed card links to its card (44px tappable chips).
+  await expect(about.locator('[data-about-stale-cards] > li')).toHaveCount(2);
+  await expect(about.locator('[data-about-unavailable-cards] > li')).toHaveCount(2);
+
+  // (a) The per-source table — one row per provider (11 in the sidecar:
+  // abs, alternative-me, derived, ecb, frankfurter, fred, gold-api,
+  // manual, rba, shiller, world-bank), the five columns, level badges with
+  // their tooltips, and the kill-switch words. Loaded lazily on expand —
+  // expect() waits for the sidecar chunk to resolve.
+  await expect(about.locator('[data-about-sources] tbody tr')).toHaveCount(11);
+  const headerText = (await about.locator('[data-about-sources] thead').textContent()) ?? '';
+  for (const col of ['Source', 'Attribution', 'Licence', 'Level', 'Enabled']) {
+    expect(headerText, `the About table must keep its "${col}" column`).toContain(col);
+  }
+  // The mirror rows render display names + terms links (M-1/M-9).
+  const bodyText = (await about.locator('[data-about-sources] tbody').textContent()) ?? '';
+  expect(bodyText).toContain('Reserve Bank of Australia');
+  expect(bodyText).toContain('FRED, Federal Reserve Bank of St. Louis');
+  // The M-6 kill switch is honest: the disabled shiller feed reads Off,
+  // the partly-disabled derived feed reads "n of m switched off".
+  expect(bodyText).toMatch(/Off/);
+  expect(bodyText).toMatch(/\d+ of \d+ switched off/);
+  // The level badge carries its ladder tooltip (L0..L3 explanation).
+  const badge = about.locator('[data-about-sources] tbody span[title]').first();
+  expect((await badge.getAttribute('title')) ?? '').toMatch(/^L\d/);
+
+  // (d) Rule version + the PLAIN repository path (no invented hosted URL).
+  const ruleLine = about.locator('[data-about-rule-version]');
+  await expect(ruleLine).toContainText('Rule version 2');
+  await expect(ruleLine).toContainText('packages/insights/src/ruleVersion.ts');
+
+  // (f) M-7: the contact line names the owner's public contact surface.
+  await expect(about.locator('[data-about-contact]')).toContainText('https://github.com/assadigit/Currena');
+
+  // The M-7 URL is a real link (data owners can click it from the copy).
+  await expect(about.locator('[data-about-contact] a')).toHaveAttribute('href', 'https://github.com/assadigit/Currena');
 });
 
 /* ------------------------------------------------------------------ *

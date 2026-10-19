@@ -18,6 +18,7 @@ import {
   COMPANION_ONLY_IDS,
   attentionToneClass,
   companionParentOf,
+  dailyPeersOf,
   definitionsForGroup,
   groupVisibility,
   nextEventDate,
@@ -73,6 +74,11 @@ export function QuestionGroup({
   searchActive: boolean;
 }) {
   const [showAll, setShowAll] = useState(false);
+  // v3 §4 Delayed (2026-10-20): the snapshot's daily peers, computed once
+  // per group and threaded to the cards (a reading one trading day behind
+  // its freshest daily peer wears the Delayed chip; it still votes normal
+  // and ranks with the normal rows).
+  const peers = useMemo(() => dailyPeersOf(snapshot.readings), [snapshot]);
   const readings = useMemo(() => {
     const defs = definitionsForGroup(section, group);
     return snapshot.readings.filter(
@@ -133,12 +139,18 @@ export function QuestionGroup({
   });
 
   // R5 ordering: needs-attention cards first (extremity-sorted), unusual
-  // cards next, then the compact rows (normal, context, stale) in snapshot
-  // order — one tier per card, the tier decides the layout.
+  // cards next, then the compact rows (normal, context, stale, delayed) in
+  // snapshot order — one tier per card, the tier decides the layout.
   const sorted = [...readings].sort((a, b) => {
     const rank = (r: IndicatorReading): number => {
-      const tier = tierOf(r);
-      return tier === 'needs-attention' ? 0 : tier === 'unusual' ? 1 : tier === 'normal' || tier === 'context' ? 2 : 3;
+      const tier = tierOf(r, peers);
+      return tier === 'needs-attention'
+        ? 0
+        : tier === 'unusual'
+          ? 1
+          : tier === 'normal' || tier === 'context' || tier === 'delayed'
+            ? 2
+            : 3;
     };
     const ra = rank(a);
     const rb = rank(b);
@@ -161,8 +173,8 @@ export function QuestionGroup({
   const hiddenIds = new Set(hidden.map((r) => r.id));
   const collapsed = !searchActive && !showAll && hidden.length > 0;
   const visibleList = collapsed ? sorted.filter((r) => !hiddenIds.has(r.id)) : sorted;
-  const cardList = visibleList.filter((r) => tierIsCard(tierOf(r)));
-  const rowList = visibleList.filter((r) => !tierIsCard(tierOf(r)));
+  const cardList = visibleList.filter((r) => tierIsCard(tierOf(r, peers)));
+  const rowList = visibleList.filter((r) => !tierIsCard(tierOf(r, peers)));
 
   return (
     <section id={`insights-group-${group}`} aria-labelledby={`insights-group-${group}-title`} className="scroll-mt-24">
@@ -208,6 +220,7 @@ export function QuestionGroup({
               numberLocale={numberLocale}
               onOpenDetails={onOpenDetails}
               pinned={pinned.has(r.id)}
+              peers={peers}
               companionReadings={companionsByParent.get(r.id) ?? []}
               companionNote={companionNoteOf(r.id)}
               nextRbaDecision={nextRbaDecision}
@@ -227,6 +240,7 @@ export function QuestionGroup({
               numberLocale={numberLocale}
               onOpenDetails={onOpenDetails}
               pinned={pinned.has(r.id)}
+              peers={peers}
               showMixedTag={r.id === 'gold-silver'}
               companionReadings={companionsByParent.get(r.id) ?? []}
               companionNote={companionNoteOf(r.id)}

@@ -1183,6 +1183,18 @@ export const insightsCopyEn = {
     // I15 H4: "Data as of {date}": a daily snapshot, no seconds, honest.
     dataAsOf: 'Data as of {date}',
     dataAsOfTooltip: 'Daily snapshot, refreshed once a day.',
+    /* ----------------------------------------------------------------
+     * v3 UI_SPEC §10 (2026-10-20, UI-50) — the header's data-health chip,
+     * computed from the page's own readings. Worst wins: an unavailable
+     * count outranks a stale one; when both exist the title carries the
+     * stale count beside the visible unavailable one. Static per snapshot
+     * (no aria-live — it never changes on the page).
+     * -------------------------------------------------------------- */
+    healthAllCurrent: 'All data current',
+    healthStaleChip: '{n} stale',
+    healthUnavailableChip: '{n} unavailable',
+    healthTitleBoth: '{stale} stale, {unavailable} unavailable',
+    healthChipHint: 'View About this data',
     progressLabel: 'Reading progress',
     loadError: 'Insights feed unavailable',
     retry: 'Try again',
@@ -1195,10 +1207,12 @@ export const insightsCopyEn = {
     searchClear: 'Clear search',
     // Round-2 R5: the retired word "Alert": the tier words are Needs
     // attention / Unusual; internal status ids unchanged.
+    // v3 UI_SPEC §4 (2026-10-20): "Unusual" left the DISPLAY vocabulary too
+    // — the filter option was removed with the word (the tier stays
+    // internal: sorting, movers, exports; the cards show "Normal").
     filterAll: 'All',
     filterLabel: 'Filter by tier',
     filterWarning: 'Needs attention',
-    filterUnusual: 'Unusual',
     filterNormal: 'Normal',
     filterContext: 'Context',
     unusualWord: 'Unusual',
@@ -1249,6 +1263,37 @@ export const insightsCopyEn = {
      * in the transparent count AND in alerts) — the markets join the count
      * as one more attention item, named in plain words. */
     noSummary: 'Not enough voting data to read the gauges yet.',
+    /* ----------------------------------------------------------------
+     * v3 UI_SPEC §3.1 (2026-10-20, UI-01..UI-08) — the rebuilt hero:
+     * verdict word + generated sentence, reading bar, why-3, calm line,
+     * what's next, freshness chip, alert box. All templates interpolate
+     * count inputs from the gauge steps (config/hero.ts heroSentence):
+     * no free text, no conclusions, no forecasts.
+     * -------------------------------------------------------------- */
+    heroSentenceCalm: 'All {n} gauges are calm right now.',
+    heroSentenceAttention: '{areas} {isAre} attention: {k} of {n} gauges.',
+    heroSentenceAnd: 'and',
+    heroSentenceListSep: ', ',
+    heroSentenceMore: '+{n} more',
+    heroSentenceNeeds: 'needs',
+    heroSentenceNeed: 'need',
+    // UI-02 reading bar: the counts text beside the three-segment bar.
+    heroCountsAttention: '{n} need attention',
+    heroCountsNormal: '{n} normal',
+    heroCountsCantTell: "{n} can't tell right now",
+    heroCountsAria: "Gauge readings: {attention} need attention, {normal} normal, {cantTell} can't tell right now",
+    // UI-03: the why list's accessible name.
+    heroWhyLabel: 'Why: the readings behind this verdict',
+    // UI-04: the calm line names up to three calm areas.
+    heroCalmLine: 'Calm: {areas}',
+    // UI-05: the next calendar event with its relative days.
+    heroNextLine: 'Next: {title}, {date} · {when}',
+    // UI-06: the freshness chip (the stale count links to About).
+    heroFreshness: 'Updated {time} UTC',
+    heroStaleSuffix: '{n} stale',
+    // UI-08: the alert box (a stale or unavailable reading sits inside a
+    // gauge whose members voted).
+    heroAlertStaleLine: 'Some inputs are stale or missing — read the counts with care.',
     excludedNote: '{n} items set aside: stale or missing (see “How this is calculated”).',
     howCalculated: 'How is this calculated?',
     // Round 42 (owner): the long verdict-rule paragraph and the how-link
@@ -1265,6 +1310,31 @@ export const insightsCopyEn = {
     statusFlaggedTests: 'Validation tests that flagged readings (held on their last good values):',
     statusStaleCards: 'Cards not updated within their maximum age:',
     statusNoStaleCards: 'Every card is within its maximum age.',
+    /* ----------------------------------------------------------------
+     * v3 UI_SPEC §10 (2026-10-20, UI-49) — the About rework: the per-source
+     * table (rows from the generated data/indicator-audit.json sidecar,
+     * grouped one row per provider), the rule-version line with the plain
+     * repository path (no invented hosted URL), the unavailable-card list
+     * and the M-7 contact line (RULES §3; the URL stays Latin).
+     * -------------------------------------------------------------- */
+    statusUnavailableCards: "Cards that can't be read right now:",
+    aboutColSource: 'Source',
+    aboutColAttribution: 'Attribution',
+    aboutColLicence: 'Licence',
+    aboutColLevel: 'Level',
+    aboutColEnabled: 'Enabled',
+    aboutLevelL0: 'L0 — public display clearly allowed (open licence or public domain).',
+    aboutLevelL1: 'L1 — probably fine for a non-commercial public site; the terms are not explicit.',
+    aboutLevelL2: "L2 — terms restrict display or reuse; shown under the owner's recorded acceptance.",
+    aboutLevelL3: 'L3 — never copied; linked out only.',
+    aboutLevelMixed: "Levels {levels} across this source's series.",
+    aboutSourceOn: 'On',
+    aboutSourceOff: 'Off',
+    aboutSourcePartly: '{n} of {m} switched off',
+    aboutSeriesCount: '{n} series',
+    aboutKillSwitchNote: 'A switched-off source is not fetched and its cards are not shown.',
+    aboutRuleVersionLine: 'Rule version {v} — changes recorded in the repository: {path}',
+    aboutContactLine: 'Questions about this data? Contact: {url}',
     howCalculatedHide: 'Hide how this is calculated',
     explainerIntro:
       'Each question group is a gauge: the share of its voting indicators currently in their alert zone sets the gauge’s step (0 → step 1, up to ⅓ → 2, up to ⅔ → 3, more → 4).',
@@ -1291,6 +1361,15 @@ export const insightsCopyEn = {
     bigMoverReason: 'unusually large for this indicator',
     bigMoverMove: '{change} over 30 days',
     bigMoverView: 'View this indicator',
+    /* ----------------------------------------------------------------
+     * v3 UI_SPEC §5 (2026-10-20, UI-18/UI-19) — the moves-and-next strip
+     * under the hero: the biggest movers (|moveScore| ranked) beside the
+     * next calendar events; each item states its period and opens its card
+     * (or scrolls to the calendar).
+     * -------------------------------------------------------------- */
+    movesNextTitle: 'Moves and what is next',
+    stripChange7d: '7-day change',
+    stripChange30d: '30-day change',
     // H5: what changed: one line. (Round-2 R16: the hero no longer names
     // the next scheduled event: “Next up” lives once, below the indicators.)
     whatChangedLine: 'This week: {changes}',
@@ -1305,6 +1384,14 @@ export const insightsCopyEn = {
     hideCalendar: 'Show less',
     gregorianDate: 'Gregorian date: {date}',
     sameEventSeries: '{title} · meeting {n}',
+    /* ----------------------------------------------------------------
+     * v3 UI_SPEC §10 (2026-10-20, UI-47) — the calendar's per-event
+     * time-zone labels, rendered only when the event carries a tz. The map
+     * covers exactly the zone names present in data/insights-calendar.json.
+     * -------------------------------------------------------------- */
+    tzSydney: 'Sydney time',
+    tzUsEastern: 'US Eastern',
+    tzFrankfurt: 'Frankfurt time',
     // I10: RFC 5545 calendar export of the upcoming key dates.
     icsDownload: 'Download calendar (.ics)',
     // PB1: the prices board.
@@ -1336,7 +1423,9 @@ export const insightsCopyEn = {
     // Fix spec A-03/A-04 (2026-10-14): the held-value tag — the validation
     // suite flagged the fresh value, the card holds its last good reading.
     checkPendingTag: 'Check pending',
-    checkPendingLine: 'Check pending — {reason}',
+    // v3 §4 (2026-10-20): the details line speaks the six-word vocabulary
+    // too — the retired "Check pending" display word is gone everywhere.
+    checkPendingLine: "Can't tell right now — {reason}",
     // Fix spec A-02 (2026-10-14): the needs-attention line is GENERATED from
     // the reading's rule and value (the hand-written meanings are gone).
     attentionLine: 'Now {value} — in the zone its rule watches: {rule}.',
@@ -1359,6 +1448,21 @@ export const insightsCopyEn = {
     datesDiffer: 'dates differ',
     gapLegDates: '{a} ({aDate}) minus {b} ({bDate})',
     pricesUpdated: 'prices updated {time}',
+    /* ----------------------------------------------------------------
+     * v3 UI_SPEC §6 (2026-10-20, UI-20..UI-23) — the one card anatomy.
+     * Meta row, in order: data for {period} · released {date} · updated
+     * {HH:mm UTC} · Source (link). The source is BACK ON the card face per
+     * the v3 spec — this reverses the round-2 "sources off the cards"
+     * request; the v3 UI_SPEC governs (noted in AlertCard/CompactRow too).
+     * -------------------------------------------------------------- */
+    updatedUtcTime: 'updated {time} UTC',
+    staleAgeDays: '{n} days old',
+    // v3 §4: the face reason line when a reading cannot be told — the
+    // one-liner for an unavailable source with no structured flag reason.
+    cantTellFaceUnavailable: 'The source did not update on the last refresh.',
+    // v3 §4: no-history displays as Context — the value stays, the reason
+    // rides the face in one line.
+    noHistoryFace: 'Not enough stored history to evaluate its rule yet.',
     // Step-1 A3 + Step-2 §B2: the companion note line per parent card —
     // core CPI beside the headline, the US 10-year beside the AU one.
     companionNotes: {
@@ -1382,6 +1486,9 @@ export const insightsCopyEn = {
     staleAfterLine: 'shows “Stale” after {n} days',
     staleNever: 'never goes stale by age (it changes only on decisions)',
     fetchedLabel: 'Fetched',
+    // v3 UI-22 (2026-10-20): the details facts block carries the fetched
+    // time in UTC — the same clock the card faces' meta rows speak.
+    fetchedAtUtc: 'Fetched: {date} · {time} UTC',
     scoredFact: 'Scored: counts toward its area’s verdict',
     contextOnlyFact: 'Context only: never counts toward a verdict',
     // L1: the lane switch.
@@ -1526,6 +1633,26 @@ export const insightsCopyEn = {
     exportFormatTxt: 'Plain text (.txt)',
     exportFormatCsv: 'CSV spreadsheet (.csv)',
     exportFormatXlsx: 'Excel workbook (.xlsx)',
+    /* ----------------------------------------------------------------
+     * v3 UI_SPEC §10 (2026-10-20, UI-51 + RULES M-3) — the export tool is
+     * owner-only: the Tools-menu unlock (bearer token pasted into a masked
+     * input, never stored beyond the HttpOnly session cookie, never logged,
+     * cleared after submit), the Owner badge, and the server-built audit
+     * export (GET /api/insights/export, the E-23 columns).
+     * -------------------------------------------------------------- */
+    ownerToolsLabel: 'Owner tools',
+    ownerSignIn: 'Owner sign-in',
+    ownerTokenLabel: 'Owner token',
+    ownerSignInSubmit: 'Sign in',
+    ownerSignInWrong: 'Token not recognised.',
+    ownerSignInDisabled: 'Export is disabled — the owner token secret is not set.',
+    ownerSignInFailed: 'Sign-in did not complete — try again.',
+    ownerBadge: 'Owner',
+    ownerSignOut: 'Sign out',
+    ownerSignedOutNote: 'Owner tools stay hidden until the next sign-in.',
+    exportServerLabel: 'Full audit export (server)',
+    exportServerNote: 'Every section with the audit columns, built by the server.',
+    exportServerFailed: 'The server export did not complete — try again.',
     exportSection: 'Section',
     exportDetail: 'Details',
     exportPosition: 'Position',
@@ -1659,6 +1786,11 @@ export const insightsCopyEn = {
     th3m: '3 months',
     thFromHigh: 'From 52-week high',
     thTrend: 'Trend',
+    // v3 UI_SPEC §7a (2026-10-20, UI-27): the state column's header — the
+    // table's exact columns are Market | Today | 3 months | From 52-week
+    // high | State | Last close. thTrend/thStatus stay archived (§1.7:
+    // nothing existing is deleted; the CSV builder keeps its own words).
+    thState: 'State',
     thStatus: 'Status',
     thClose: 'Last close',
     /** States (§6.6). */
@@ -2351,14 +2483,24 @@ export const insightsCopyEn = {
   },
 
   status: {
+    // v3 UI_SPEC §4 (2026-10-20): the six-word state language. "Unusual"
+    // stays as a key only for the data exports (tier words in the CSV and
+    // the full export, E-21); the card face never shows it anymore.
     warning: 'Needs attention',
     unusual: 'Unusual',
     normal: 'Normal',
     context: 'Context',
     stale: 'Stale',
-    'check-pending': 'Check pending',
-    'no-history': 'Limited history',
-    unavailable: 'No data',
+    // v3: held for a check or failed outright — both read the same honest
+    // word; the value hides from the face (UI-17), the reason rides the face
+    // and the last good value lives inside the details.
+    'check-pending': "Can't tell right now",
+    // v3: no-history displays as Context (the value stays, reason on face).
+    'no-history': 'Context',
+    // v3 §4: Delayed — one trading day or more behind its daily peers,
+    // still within its allowed age (GLOSSARY: "Delayed").
+    delayed: 'Delayed',
+    unavailable: "Can't tell right now",
   },
 
   label: {
@@ -2424,30 +2566,61 @@ export const insightsCopyEn = {
   together: {
     title: 'Together',
     subtitle:
-      'How the indicators usually relate. Each card checks whether the usual pattern is showing today.',
+      'How the indicators usually relate. Each card weighs today’s readings against the usual pattern.',
     // R27: the quiet section-level note replaces the per-card placeholder tag.
     evidenceNote: 'Relationships are general tendencies, not forecasts.',
-    // Step 3 L3-02 (2026-10-16): the verdict words are RETIRED — the card
-    // is the current readings with their direction plus the usual tendency.
-    // The chip now states presence only (conditions, never verdicts).
+    // v3 UI_SPEC §8 (2026-10-20, task PH6-B): the Showing / Partly showing /
+    // Not showing words are RETIRED from display (the internal state ids
+    // stay). The six words below are the v3 neutral vocabulary: the match /
+    // differ family mirrors the UI-34 marker words, the inactive word is the
+    // UI-35 line (readable card, trigger never moved), pending is UI-37,
+    // unknown is the honest no-data word.
     state: {
-      active: 'Showing',
-      partly: 'Partly showing',
+      active: 'Matching the usual pattern',
+      partly: 'Partly matching the usual pattern',
       pending: 'Pass-through pending',
-      inactive: 'Not showing',
-      disagree: 'Not showing',
+      inactive: 'Trigger not present',
+      disagree: 'Differs from the usual pattern',
       unknown: 'Not enough fresh data',
     },
+    // v3 UI_SPEC §8 (2026-10-20, task PH6-B) — the relationship cards.
+    // UI-33: the NEUTRAL summary line that replaces the verdict chip.
+    matchSummary: '{match} of {moved} readings match the usual pattern',
+    triggerAbsentLine: 'Trigger not present',
+    notEnoughLine: 'Not enough fresh data to read',
+    // UI-37: the pending card's decided date line (the cash reading's own
+    // lastChange supplies the decision; the loan data has not arrived).
+    passThroughPendingDates:
+      'The cash rate moved {policy} on {decided}; the home-loan data that follows it is not in yet.',
+    // UI-34: the per-leg marker words (icon + word, never colour alone).
+    markerMatches: 'Matches',
+    markerMatchesLong: 'Matches the usual pattern',
+    markerDiffers: 'Differs',
+    markerCantTell: "Can't tell",
+    // The collapsed chips' compact match count.
+    chipMatchCount: '{match} of {moved} match',
+    // UI-33: the usual-tendency prefix on the relation sentence.
+    usualTendency: 'Usual tendency:',
+    // UI-36: the per-leg windows footnote (from the CONNECTIONS registry).
+    windowsUsed: 'Windows used for each reading',
+    windowDays: '{days} days',
+    orWord: 'or',
+    // UI-38: the weaker-link tag + its one documented why line.
+    weakerLink: 'weaker link',
+    weakerLinkWhy:
+      'The US money-supply leg was removed: the link between money supply and Chinese factory activity is weak.',
     // Fix spec B-04 (2026-10-14): the context-leg and caveat labels.
     contextLeg: 'context',
     contextCaveat: 'a level, not a servicing cost',
     passThroughLine: 'The cash rate moved {policy} on {decided}; the home-loan data that follows it is not in yet (the loan rate has moved {loan} since that decision where data exists).',
-    // R7b: the collapsed section’s one-line summary.
-    summaryActive: '{n} showing',
-    summaryPartly: '{n} partly showing',
+    // R7b: the collapsed section’s one-line summary. v3 (2026-10-20, task
+    // PH6-B): the showing / not-showing counts became the neutral v3
+    // vocabulary (UI-33/35); the pending / unknown words keep theirs.
+    summaryActive: '{n} matching the usual pattern',
+    summaryPartly: '{n} partly matching the usual pattern',
     summaryPending: '{n} pass-through pending',
-    summaryInactive: '{n} not showing',
-    summaryDisagree: '{n} not showing',
+    summaryInactive: '{n} without a trigger present',
+    summaryDisagree: '{n} differing from the usual pattern',
     summaryUnknown: '{n} unreadable',
     seeAllConnections: 'See all {n} connections',
     viewLegCard: 'View this indicator',
@@ -2674,6 +2847,26 @@ export const insightsCopyEn = {
     bandTop: 'top {p}%',
     bandBottom: 'bottom {p}%',
     bandMid: 'the middle',
+    // v3 UI_SPEC §9 (2026-10-20, task PH6-B) — the per-metal balance visual.
+    // UI-39.1: the heading line. M = scored conditions with readable data.
+    balanceSummary: '{n} of {m} conditions support {metal}',
+    // UI-39.2/4: the column + aside headings (rendered small uppercase).
+    colSupporting: 'Supporting',
+    colPressuring: 'Pressuring',
+    colNeutral: 'Neutral',
+    colEmpty: 'None right now.',
+    // UI-39.5: the missing-data line — R readable of M scored conditions;
+    // every unreadable condition is named, never silently counted (UI-40).
+    readableLine: '{r} of {total} conditions readable.',
+    unreadableName: "{name}: can't tell right now.",
+    // UI-40: fewer than 3 readable conditions — the beam stays level.
+    notEnoughReadable: 'Not enough readable conditions to weigh',
+    // UI-39.6: the explanatory footnote (at least 12px, contrast-safe).
+    balanceFootnote: 'Each condition counts the same. This is a snapshot of conditions, not a forecast or advice.',
+    // UI-45a: the beam's text alternative (the visible text carries the
+    // full information; this labels the graphic for screen readers).
+    beamAria:
+      'Balance of conditions for {metal}: {supporting} supporting, {pressuring} pressuring, {neutral} neutral, {unreadable} unreadable, {total} conditions in total.',
   },
 
   /* ---------------------------------------------------------------- *

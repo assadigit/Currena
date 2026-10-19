@@ -1,7 +1,25 @@
 /**
- * The big-mover callout, alerting chips, the two-tier status model, and
+ * The big-mover callout, alerting chips, the v3 state-tier model, and
  * the card filter (Phase 3-c split of the former config.ts monolith —
  * see ./index.ts). Pure, platform-free.
+ *
+ * v3 UI_SPEC §4 state language (2026-10-20, UI-15/UI-17/U-04):
+ *   warning        → Needs attention (unchanged)
+ *   normal         → Normal (the former "Unusual" DISPLAY word is retired —
+ *                    the unusual tier stays internal for sorting/movers/
+ *                    exports; the card shows "Normal" and the 10-year
+ *                    position bar carries the extremity)
+ *   context        → Context (unchanged; no-history now DISPLAYS as Context
+ *                    too — its value stays, with a reason line on the face)
+ *   stale          → Stale (+ age on the card's meta row)
+ *   check-pending  → Can't tell right now (value hidden on the face, reason
+ *                    from flag.reason, last good value inside the details only)
+ *   unavailable    → Can't tell right now (reason one-liner on the face)
+ *   delayed (NEW)  → Delayed — a daily reading whose asOf is ≥1 trading day
+ *                    behind the snapshot's newest daily asOf while still
+ *                    within its max age (computed client-side from the
+ *                    readings set, DailyPeers below; the markets board keeps
+ *                    its own row-level delayedTag per UI-32).
  */
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
@@ -9,13 +27,16 @@ import { MOVE_SCORE_THRESHOLD } from './bands';
 import { PRICE_ROWS, definitionFor } from './sections';
 
 /* ------------------------------------------------------------------ *
- * The big-mover callout (Block H3 + data spec §4)
+ * The big-mover callout (Block H3 + data spec §4 + v3 UI-18/19)
  * ------------------------------------------------------------------ */
 
 interface BigMoverRow {
   id: IndicatorId;
   /** |z| ≥ 2 items only — the callout hides otherwise (Block H3). */
   change30d: number;
+  /** The 7-day change for the moves strip ("7-day change", UI-19 states the
+   * period it shows). Falls back to change30d at render when absent. */
+  change7d?: number;
   changeKind: 'pct' | 'points';
   moveScore: number;
 }
@@ -32,28 +53,88 @@ export function bigMovers(readings: readonly IndicatorReading[], limit = 3): Big
     if (r.change30d === undefined || !Number.isFinite(r.change30d)) continue;
     const def = definitionFor(r.id);
     if (def.rule.kind === 'info' && !PRICE_ROWS.includes(r.id)) continue; // context cards never headline (price rows can)
-    rows.push({ id: r.id, change30d: r.change30d, changeKind: def.changeKind, moveScore: r.moveScore });
+    rows.push({
+      id: r.id,
+      change30d: r.change30d,
+      change7d: r.change7d !== undefined && Number.isFinite(r.change7d) ? r.change7d : undefined,
+      changeKind: def.changeKind,
+      moveScore: r.moveScore,
+    });
   }
   return rows
     .sort((a, b) => Math.abs(b.moveScore) - Math.abs(a.moveScore))
     .slice(0, limit)
-    .map(({ id, change30d, changeKind, moveScore }) => ({ id, change30d, changeKind, moveScore }));
+    .map(({ id, change30d, change7d, changeKind, moveScore }) => ({ id, change30d, change7d, changeKind, moveScore }));
 }
 
 /* ------------------------------------------------------------------ *
- * R5: the two-tier status model (round-2 spec §4 + Block R5)
- *                     only the user-facing word changes)
- *   unusual         — no rule fired, but the value sits in the top/bottom
- *                     10% of its own 10-year range (percentile ≤ 0.10 or
- *                     ≥ 0.90). percentile10y is only computed when the
- *                     base carries the engine's 30-observation floor
- *                     (MIN_PERCENTILE_OBS), so its presence IS the
- *                     history floor — no extra check needed.
- *   normal          — neither of the above
- *   context / stale / unavailable — unchanged
+ * v3 Delayed (UI_SPEC §4): daily readings behind the snapshot's peers
  *
- * ONE tier per card: needs-attention wins over unusual (details may add
- * "also unusual"). Internal ids and internal statuses stay unchanged.
+ * The peer benchmark is the snapshot's NEWEST daily asOf. "≥1 trading day
+ * behind" counts the weekdays strictly after the reading's asOf, up to and
+ * including the newest daily asOf (so Friday→Monday is 1 trading day; the
+ * weekend itself never counts). A reading past its max age is 'stale'
+ * already and never delayed. Because "live" price sources can carry today's
+ * date while FRED dailies publish at T-1/T-2 by nature, the literal rule
+ * flags those as Delayed — that is the honest reading of the spec's
+ * "behind its peers" (the same rule the stock board applies, UI-32); the
+ * OWNER can relax the cutoff here if it reads too noisy in practice.
+ * ------------------------------------------------------------------ */
+
+/** The peer context one reading needs to know its own delay. */
+export interface DailyPeers {
+  /** The newest asOf among the snapshot's daily-cadence readings, if any. */
+  newestDailyAsOf: string | null;
+}
+
+/** UTC epoch days of a YYYY-MM-DD date (NaN on malformed input). */
+function epochDayOf(iso: string): number {
+  const [y, m, d] = iso.split('-').map(Number);
+  if (y === undefined || m === undefined || d === undefined) return Number.NaN;
+  return Math.floor(Date.UTC(y, m - 1, d) / 86_400_000);
+}
+
+/** Weekdays strictly after `asOf`, up to and including `newest`
+ * (trading days the reading sits behind its freshest daily peer). Epoch
+ * day 0 (1970-01-01) was a THURSDAY, so (day + 4) % 7 gives the weekday
+ * index with Sunday = 0 — the trading days are indices 1..5 (Mon..Fri). */
+export function tradingDaysBehind(asOf: string, newest: string): number {
+  const a = epochDayOf(asOf);
+  const b = epochDayOf(newest);
+  if (!Number.isFinite(a) || !Number.isFinite(b) || b <= a) return 0;
+  let trading = 0;
+  for (let day = a + 1; day <= b; day += 1) {
+    const weekday = (day + 4) % 7;
+    if (weekday >= 1 && weekday <= 5) trading += 1;
+  }
+  return trading;
+}
+
+/** The snapshot's peer set for delay detection (pure; computed once per
+ * render and threaded to tierOf via DailyPeers). */
+export function dailyPeersOf(readings: readonly IndicatorReading[]): DailyPeers {
+  let newest: string | null = null;
+  for (const r of readings) {
+    if (r.asOf === null) continue;
+    if (definitionFor(r.id).cadence !== 'daily') continue;
+    if (newest === null || r.asOf > newest) newest = r.asOf;
+  }
+  return { newestDailyAsOf: newest };
+}
+
+/** Is this reading one trading day (or more) behind its daily peers? */
+export function isDelayedReading(reading: IndicatorReading, peers: DailyPeers): boolean {
+  if (reading.status !== 'normal') return false; // warnings/stale/etc. keep their own words
+  if (reading.asOf === null) return false;
+  const newest = peers.newestDailyAsOf;
+  if (newest === null) return false;
+  if (definitionFor(reading.id).cadence !== 'daily') return false;
+  return tradingDaysBehind(reading.asOf, newest) >= 1;
+}
+
+/* ------------------------------------------------------------------ *
+ * The display-tier model (R5 + v3 §4). The unusual tier stays internal
+ * (sorting/movers/filter/export); its card now shows the Normal word.
  * ------------------------------------------------------------------ */
 
 export type IndicatorTier =
@@ -62,7 +143,8 @@ export type IndicatorTier =
   | 'normal'
   | 'context'
   | 'stale'
-  | 'unavailable';
+  | 'unavailable'
+  | 'delayed';
 
 /** The unusual band: top or bottom 10% of the indicator's own 10y range. */
 const UNUSUAL_CUTOFF = 0.1;
@@ -74,15 +156,24 @@ function isUnusual(reading: IndicatorReading): boolean {
   return reading.percentile10y <= UNUSUAL_CUTOFF || reading.percentile10y >= 1 - UNUSUAL_CUTOFF;
 }
 
-/** The one display tier for a reading (precedence: needs-attention wins). */
-export function tierOf(reading: IndicatorReading): IndicatorTier {
+/** The one display tier for a reading (precedence: needs-attention wins).
+ *  `peers` (the snapshot's daily peers) unlocks the v3 Delayed tier — pass
+ *  it wherever the readings set is known (cards, the lane). Without it the
+ *  function behaves exactly as before (no reading can be delayed). */
+export function tierOf(reading: IndicatorReading, peers?: DailyPeers): IndicatorTier {
   if (reading.status === 'warning') return 'needs-attention';
-  if (reading.status === 'context') return 'context';
+  // v3 §4: no-history displays as Context (value kept, reason line on face).
+  if (reading.status === 'context' || reading.status === 'no-history') return 'context';
   if (reading.status === 'unavailable') return 'unavailable';
   // Fix spec A-03/A-04: a validation-flagged reading renders like a stale
-  // row (muted, compact, never counted) with its own word: Check pending.
-  if (reading.status === 'stale' || reading.status === 'no-history' || reading.status === 'check-pending') return 'stale';
-  return isUnusual(reading) ? 'unusual' : 'normal';
+  // row (muted, compact, never counted) with its own word: Can't tell.
+  if (reading.status === 'stale' || reading.status === 'check-pending') return 'stale';
+  // Precedence: the unusual tier outranks Delayed (a reading in its own
+  // top/bottom 10% keeps its full card + position bar — a one-day lag is
+  // the softer, less informative fact; the Delayed chip rides normal rows).
+  if (isUnusual(reading)) return 'unusual';
+  if (peers !== undefined && isDelayedReading(reading, peers)) return 'delayed';
+  return 'normal';
 }
 
 /** Card layout per tier: needs-attention AND unusual get the full card; the
@@ -115,7 +206,7 @@ function spacedNorm(s: string): string {
 }
 
 /** Does one reading pass the status chips + text query? (Pure, unit-tested.)
- * The 'unusual' chip filters on the R5 tier, not the internal status. */
+ * The 'unusual' chip filters on the internal tier, not the internal status. */
 export function indicatorMatchesFilter(
   reading: IndicatorReading,
   filter: CardFilter,
@@ -150,7 +241,10 @@ export function filterVisibleIds(
   return ids;
 }
 
-/** Live per-status counts for the filter chips (I9) — tier-aware. */
+/** Live per-status counts for the filter chips (I9) — tier-aware. Delayed
+ * rows count under 'normal' (they carry a Normal status and the 'normal'
+ * filter matches them); no-history rows count under 'context' (that is the
+ * word their chip now shows). */
 export function statusCounts(
   readings: readonly IndicatorReading[],
 ): { all: number; warning: number; unusual: number; normal: number; context: number } {
@@ -159,7 +253,7 @@ export function statusCounts(
     const tier = tierOf(r);
     if (tier === 'needs-attention') counts.warning += 1;
     else if (tier === 'unusual') counts.unusual += 1;
-    else if (tier === 'normal') counts.normal += 1;
+    else if (tier === 'normal' || tier === 'delayed') counts.normal += 1;
     else if (tier === 'context') counts.context += 1;
   }
   return counts;

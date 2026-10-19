@@ -295,7 +295,42 @@ const BUDGETS = [
   // fixed the pre-existing Tools-panel off-screen bug) = 603.71 kB raw /
   // 142.72 kB gz measured. Justified in CHANGELOG §2026-10-16 (insights
   // full export). Entry chunk untouched (294.75/89.36 vs 296/89.5).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 604_000, gz: 142_800, label: 'Insights lazy chunk' },
+  // v3 UI rebuild bump (603.71/142.72 → 606.01/144.54, budgets → 607/145,
+  // 2026-10-20): the Phase-6 v3 UI_SPEC pass (task PH6-A) — the rebuilt
+  // hero (verdict sentence + reading bar + why-3 rows + what-next +
+  // freshness chips), the MovesNextStrip, the one UI-20 card anatomy with
+  // its wrapping meta row (CardMeta) + face reasons, the Delayed tier
+  // (dailyPeersOf/tradingDaysBehind), the six-word state chips, and ~30
+  // copy strings × 2 locales. Note the measured gz baseline at the pass's
+  // START was already 143.06 kB (the Phase-5 shiller additions never got a
+  // bump); the +1.48 kB gz covers both honestly. The ENTRY chunk is
+  // untouched (294.78/89.38 vs 296/89.5) — the v3 surface rides the lazy
+  // route. Justified 2026-10-20 (PH6-A, v3 UI_SPEC §3-6).
+  // v3 §8+§9 balance bump (606.01/144.08 → 612.75/146.30, budgets → 613/146.5,
+  // 2026-10-20): the Phase-6 v3 UI_SPEC pass (task PH6-B) — the relationship
+  // cards' neutral summaries + per-leg markers + the windows details
+  // (UI-33..38) and the per-metal gold/silver BALANCE beam visual with its
+  // readability rule + tally helpers (UI-39..45a: Balance.tsx + balance.ts +
+  // readable.ts, the grouped-list machinery it replaces removed) + ~50 copy
+  // strings × 2 locales. All rider of the lazy Insights route; the ENTRY
+  // chunk is untouched (294.78/88.56 vs 296/89.5). Justified 2026-10-20
+  // (PH6-B, v3 UI_SPEC §8-9).
+  // v3 §7a/§10 stock-table/calendar/About/owner bump (612.75/146.30 →
+  // 633.53/151.34, budgets → 634/152, 2026-10-20): the Phase-6 v3 UI_SPEC
+  // pass (task PH6-C) — the stock table's exact UI-27 column set (Trend
+  // removed) with the table-anchored local-currency note, the calendar's
+  // five-event strip with per-event tz labels (UI-47), the About rework
+  // (UI-49: the per-source table + tappable stale/unavailable card lists +
+  // the rule-version line + the M-7 contact line), the data-health chip
+  // (UI-50) and the owner-only export surface (UI-51 + RULES M-3: the
+  // sign-in/sign-out/probe + the server audit-export row) + ~45 copy
+  // strings × 2 locales. The AUDIT SIDECAR rides its OWN lazy chunk
+  // (indicator-audit-*.js, 13.43 kB raw/1.56 gz, loaded on the About
+  // section's first expand — UI-57: the page chunk never carries it).
+  // All rider of the lazy Insights route; the ENTRY chunk is untouched
+  // (294.78/88.56 vs 296/89.5). Justified 2026-10-20 (PH6-C, v3 UI_SPEC
+  // §7a/§10).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 634_000, gz: 152_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

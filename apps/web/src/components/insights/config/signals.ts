@@ -54,6 +54,52 @@ export function legPhrase(
 export type StatusTone = 'danger' | 'success' | 'info' | 'muted';
 
 /* ------------------------------------------------------------------ *
+ * v3 UI_SPEC §8 (2026-10-20, task PH6-B): the card's NEUTRAL summary
+ * line — one pure selector for the face line (ConnectionCard) and the
+ * collapsed chips (Together), so the two can never drift apart.
+ * ------------------------------------------------------------------ */
+
+/** Which neutral summary line a relationship card speaks (UI-33/35/37). */
+export type ConnectionSummaryKind =
+  | 'match' // "{n} of {m} readings match the usual pattern" — counts exist
+  | 'trigger-absent' // "Trigger not present" — readable card, no trigger move
+  | 'pending' // "Pass-through pending" + the decided date line
+  | 'not-enough' // "Not enough fresh data to read"
+  /** The RBA pass-through card in its active/inactive states: no engine
+   * summary exists (evaluatePassThrough carries none), so the card speaks
+   * its pass-through numbers line instead. */
+  | 'pass-through';
+
+export interface ConnectionSummaryInfo {
+  kind: ConnectionSummaryKind;
+  /** Only on 'match': the N and M of "N of M readings match". */
+  matchCount?: number;
+  movedCount?: number;
+}
+
+/**
+ * Select the neutral summary a connection card shows (UI-33/35/37):
+ * pending and unknown states win first, then the engine's summary — a
+ * missing trigger beats any count, counts need every scored leg readable.
+ * Cards without a summary (the pass-through card's active/inactive) fall
+ * through to their own numbers line.
+ */
+export function connectionSummaryInfo(reading: ConnectionReading): ConnectionSummaryInfo {
+  if (reading.state === 'pending') return { kind: 'pending' };
+  if (reading.state === 'unknown') return { kind: 'not-enough' };
+  const summary = reading.summary;
+  if (summary === undefined) return { kind: 'pass-through' };
+  if (!summary.triggerPresent) return { kind: 'trigger-absent' };
+  if (summary.matchCount === undefined || summary.movedCount === undefined) {
+    // Trigger moved but a scored leg is unreadable — no counts over what
+    // cannot be read (the engine only produces this with state unknown,
+    // kept here so the selector is total and honest on its own).
+    return { kind: 'not-enough' };
+  }
+  return { kind: 'match', matchCount: summary.matchCount, movedCount: summary.movedCount };
+}
+
+/* ------------------------------------------------------------------ *
  * Round-2 R7b: the collapsed Together/Signals summaries.
  * ------------------------------------------------------------------ */
 

@@ -16,12 +16,26 @@
  * Coverage (every status class + the Step-3 card features the v3 UI will test):
  *  - normal / warning (needs attention) / context / stale / check-pending /
  *    unavailable (value null) / no-history — one reading per class at least,
- *    plus one "normal" reading in the unusual percentile tier (chip "Unusual").
+ *    plus one "normal" reading in the unusual percentile tier (chip
+ *    "Unusual" — retired from display in v3, the tier stays internal).
+ *  - v3 §4 (2026-10-20): THIRTY-SIX warnings are NOT needed, but the hero's
+ *    why-3 rows need three per section — Global: us10y, brent, sahm-rule;
+ *    Australia: au-cpi, au-rent-yoy, au-home-loan (each carries a moveScore
+ *    so the |moveScore| ranking is exercised); usdjpy rides one trading day
+ *    behind the daily peers (asOf -4 vs -1) for the Delayed chip (U-04b's
+ *    six-word coverage); shiller-cape/shiller-ecy (Phase-5 additions) carry
+ *    context rows so the builder covers every definition.
  *  - a quarterly card with periodStart/periodEnd (au-cpi → "… quarter 20XX"),
  *  - price rows with peak{value,date,basis}, fromPeak10y and ma200GapPct,
- *  - a calendar with 5 FUTURE events, tz fields and all the event kinds,
+ *  - a calendar with 7 FUTURE events, tz fields and all the event kinds
+ *    (v3 UI-47: five in the strip, two behind the full-calendar expansion),
  *  - displayMode absent — this is the FULL private snapshot, so the private
  *    page shows everything (U-11 needs the stock board).
+ *
+ * ALL DAILY asOfs sit at T-1 (the freshest daily peers), EXCEPT the one
+ * deliberate delayed row — weekday-dependent false "delayed" flapping was
+ * measured at T-2 vs T-1 (some weeks the -2/--1 pair spans a weekend); a
+ * single -4 row is deterministically ≥1 trading day behind in every week.
  *
  * Dates are computed RELATIVE TO BUILD TIME so calendar events stay in the
  * future and staleness looks honest as the days pass. Values are hand-picked
@@ -158,13 +172,17 @@ function sourceUrlOf(def: Def): string | undefined {
 }
 
 /* ------------------------------------------------------------------ *
- * The per-id reading table — exactly the DEFINITIONS set (52 rows).
+ * The per-id reading table — exactly the DEFINITIONS set.
  *
  * Statuses cover every class the U-xx tests assert against:
- *   warning      us10y, brent, au-cpi, au-rent-yoy
- *   unusual tier us30y + gold-usd (status normal, percentile ≥ 0.9 → "Unusual" chip)
+ *   warning      us10y, brent, sahm-rule (Global's 3 why rows) ·
+ *                au-cpi, au-rent-yoy, au-home-loan (Australia's 3)
+ *   unusual tier us30y + gold-usd (status normal, percentile ≥ 0.9 — the
+ *                tier stays internal in v3; the chip reads Normal)
+ *   delayed tier usdjpy (asOf -4 vs the -1 daily peers — U-04b's word)
  *   normal       most rows
- *   context      rba-expectations, crypto-fng, gold-btc, silver-btc, iron-ore
+ *   context      rba-expectations, crypto-fng, gold-btc, silver-btc,
+ *                iron-ore, shiller-cape, shiller-ecy
  *   stale        dollar-basket, au-household-debt-arrears
  *   check-pending stress-stlfsi (flag: duplicate held for verification)
  *   no-history   philly-fed (value shows, no verdict yet)
@@ -205,7 +223,16 @@ const ROWS: Record<IndicatorId, RowSpec> = {
   /* Global — borrowing costs */
   'yield-curve-10y2y': { value: 0.48, status: 'normal', change7d: 0.11, change30d: 0.07, percentile10y: 0.56 },
   'real-yield-10y': { value: 1.98, status: 'normal', change7d: 0.03, change30d: 0.06, percentile10y: 0.62 },
-  us10y: { value: 5.31, status: 'warning', change7d: 0.07, change30d: 0.53, percentile10y: 1, highestSinceYear: 2007 },
+  us10y: {
+    value: 5.31,
+    status: 'warning',
+    change7d: 0.07,
+    change30d: 0.53,
+    percentile10y: 1,
+    highestSinceYear: 2007,
+    // v3 UI-03: the |moveScore| ranking input (second-largest move).
+    moveScore: 1.2,
+  },
   'fed-target': {
     value: 4.25,
     status: 'normal',
@@ -269,13 +296,17 @@ const ROWS: Record<IndicatorId, RowSpec> = {
   'gold-silver': { value: 88.4, status: 'normal', percentile10y: 0.31, change30d: 1.2 },
   /* Global — dollar strength */
   'dollar-basket': { value: 102.4, status: 'stale', change30d: 2.86, percentile10y: 0.79, asOfDays: -20 },
-  usdjpy: { value: 149.2, status: 'normal', change7d: 0.8, change30d: 1.9, percentile10y: 0.83 },
+  // v3 §4 Delayed (U-04b): 3 calendar days behind the -1 daily peers —
+  // ≥1 trading day behind in every weekday layout, still within max age.
+  usdjpy: { value: 149.2, status: 'normal', change7d: 0.8, change30d: 1.9, percentile10y: 0.83, asOfDays: -4 },
   'eur-usd': { value: 1.084, status: 'normal', change7d: -0.4, change30d: -0.9, percentile10y: 0.44 },
   /* Global — growth health */
   'china-pmi': { value: null, status: 'unavailable' },
   'm2-us': { value: 2.1, status: 'normal', percentile10y: 0.28, change30d: 0.1 },
   'us-unemployment': { value: 4.1, status: 'normal', percentile10y: 0.55, change30d: 0.1 },
-  'sahm-rule': { value: 0.23, status: 'normal', percentile10y: 0.4 },
+  // v3 UI-01/UI-03: the third Global warning (the Sahm rule above 0.5) —
+  // the hero's why-3 ranking exercises the smallest |moveScore|.
+  'sahm-rule': { value: 0.53, status: 'warning', percentile10y: 0.85, change30d: 0.2, moveScore: 0.9 },
   'copper-gold': { value: 0.0042, status: 'normal', percentile10y: 0.5, change30d: -1.1 },
   usdcny: { value: 7.24, status: 'normal', percentile10y: 0.66, change30d: 0.3 },
   /* Global — prices board */
@@ -316,6 +347,13 @@ const ROWS: Record<IndicatorId, RowSpec> = {
   },
   'gold-btc': { value: 0.0423, status: 'context', change30d: 2.1 },
   'silver-btc': { value: 0.000516, status: 'context' },
+  /* Global — market-stress context, Phase-5 additions (FS-06): the
+   * Shiller cards carry context rows here so the builder covers every
+   * definition (in production they stay hidden until the owner flips
+   * owner_accepts — T-30); the live-verified values from the Phase-5 run
+   * (CAPE 40.71, ECY 0.56, October 2026) keep the fixture plausible. */
+  'shiller-cape': { value: 40.71, status: 'context', change30d: 0.6 },
+  'shiller-ecy': { value: 0.56, status: 'context', change30d: -0.04 },
   /* Australia — inflation and rates. au-cpi / au-trimmed-mean are ABS
    * MONTHLY series: no periodStart/periodEnd (quarter fields), the card
    * honestly says "data for July 2026" — the U-06 quarterly assertions run
@@ -327,6 +365,7 @@ const ROWS: Record<IndicatorId, RowSpec> = {
     percentile10y: 0.86,
     releaseDate: Q.releaseDate,
     nextReleaseToday: true,
+    moveScore: 1.5,
   },
   'au-trimmed-mean': {
     value: 3.4,
@@ -351,7 +390,9 @@ const ROWS: Record<IndicatorId, RowSpec> = {
     decidedDate: isoDay(-22),
     asOfDays: -21,
   },
-  'au-home-loan': { value: 6.28, status: 'normal', percentile10y: 0.78 }, // sinceDecision ABSENT → "Pass-through pending"
+  // v3 UI-01/UI-03: the third Australia warning — the why-3 ranking's
+  // smallest |moveScore| (the fixture's plausible lift in mortgage rates).
+  'au-home-loan': { value: 6.28, status: 'warning', percentile10y: 0.82, change30d: 0.15, moveScore: 0.6 }, // sinceDecision ABSENT → "Pass-through pending"
   'au-deposit-rate': { value: 4.1, status: 'normal', percentile10y: 0.6 },
   'au-wage-growth': {
     value: 3.9,
@@ -361,7 +402,7 @@ const ROWS: Record<IndicatorId, RowSpec> = {
     periodEnd: Q.periodEnd,
     releaseDate: Q.releaseDate,
   },
-  'au-rent-yoy': { value: 5.8, status: 'warning', percentile10y: 0.9, change30d: -0.1 },
+  'au-rent-yoy': { value: 5.8, status: 'warning', percentile10y: 0.9, change30d: -0.1, moveScore: 2.5 },
   'au-unemployment': { value: 4.35, status: 'normal', percentile10y: 0.5, change30d: -0.1 },
   'au-home-values': {
     value: 8.9,
@@ -394,11 +435,15 @@ const ROWS: Record<IndicatorId, RowSpec> = {
   'gold-aud': { value: 5826, status: 'normal', percentile10y: 0.62, change30d: 2.1, asOfDays: -1 },
 };
 
-/** Default asOf by cadence (ABS/RBA are month/quarter-START dated). */
+/** Default asOf by cadence (ABS/RBA are month/quarter-START dated).
+ * v3 §4: dailies sit at T-1 — the freshest daily peer set — so only the
+ * deliberate delayed row (usdjpy, -4) can wear the Delayed tier (see the
+ * header note: a T-2 default flapped with the trading-day rule across
+ * weekends). */
 function defaultAsOfDays(cadence: Def['cadence']): number {
   switch (cadence) {
     case 'daily':
-      return -2;
+      return -1;
     case 'weekly':
       return -6;
     case 'monthly':
@@ -461,7 +506,13 @@ function buildReadings(): IndicatorReading[] {
 }
 
 /* ------------------------------------------------------------------ *
- * Calendar — 5 FUTURE events, every key kind, tz fields (fix spec C-07)
+ * Calendar — 7 FUTURE events, every key kind, tz fields (fix spec C-07).
+ * v3 UI-47 (2026-10-20, PH6-C): the strip now shows FIVE events (was
+ * three), so the fixture carries seven — five in the strip + two behind
+ * the "Full calendar" expansion (U-12 pins both). Every tz value mirrors
+ * data/insights-calendar.json's zones (Australia/Sydney,
+ * America/New_York, Europe/Frankfurt — the ECB decision was Berlin in the
+ * old fixture; Frankfurt is the value the real data carries).
  * ------------------------------------------------------------------ */
 
 const ym = (offset: number): string => isoDay(offset).slice(0, 7).replace('-', '');
@@ -505,7 +556,23 @@ const calendar: CalendarEvent[] = [
     titleEn: 'ECB rate decision',
     titleFa: 'تصمیم نرخ بهره بانک مرکزی اروپا',
     kind: 'ecb',
-    tz: 'Europe/Berlin',
+    tz: 'Europe/Frankfurt',
+  },
+  {
+    id: `abs-cpi-${ym(28)}`,
+    date: isoDay(28),
+    titleEn: 'ABS monthly CPI',
+    titleFa: 'شاخص قیمت ماهانهٔ اداره آمار استرالیا',
+    kind: 'abs-cpi',
+    tz: 'Australia/Sydney',
+  },
+  {
+    id: `us-jobs-${ym(35)}`,
+    date: isoDay(35),
+    titleEn: 'US jobs report (Employment Situation)',
+    titleFa: 'گزارش وضعیت بازار کار آمریکا',
+    kind: 'us-jobs',
+    tz: 'America/New_York',
   },
 ];
 
@@ -769,8 +836,43 @@ validate(InsightsStatusSchema, 'status', status);
 validate(MarketsSnapshotSchema, 'markets', marketsSnapshot);
 for (const h of histories) validate(IndicatorHistorySchema, 'history', h);
 
+/* ------------------------------------------------------------------ *
+ * Low-readable VARIANT snapshot (v3 UI_SPEC §9 UI-40, task PH6-B,
+ * 2026-10-20) — the same synthetic board with two gold/silver driver
+ * readings degraded so the U-09a honesty test can pin the level beam:
+ *
+ *   real-yield-10y  → stale (asOf 10 days back)
+ *   breakeven-5y5y  → check-pending (the T-04 duplicate flag)
+ *
+ * With the base fixture's held STLFSI + stale dollar-basket + unavailable
+ * china-pmi, both metals drop to ONE readable scored condition (their own
+ * footing) — under the 3-readable floor, so the beam must stay level and
+ * show "Not enough readable conditions to weigh" while the missing-data
+ * line still states "1 of 5 / 6 conditions readable".
+ *
+ * Served ONLY by the U-09a test's own request interception — the fixture
+ * server never hands this variant out, so no other U-test can see it.
+ * ------------------------------------------------------------------ */
+
+const lowReadableReadings = readings.map((r): IndicatorReading => {
+  if (r.id === 'real-yield-10y') {
+    return { ...r, status: 'stale', asOf: isoDay(-10) };
+  }
+  if (r.id === 'breakeven-5y5y') {
+    return {
+      ...r,
+      status: 'check-pending',
+      flag: { test: 'T-04', reason: 'Duplicate daily value held pending verification' },
+    };
+  }
+  return r;
+});
+const snapshotLowReadable: InsightsSnapshot = { ...snapshot, readings: lowReadableReadings };
+const checkedLowReadable = validate(InsightsSnapshotSchema, 'snapshot-low-readable', snapshotLowReadable);
+
 mkdirSync(FIXTURES_DIR, { recursive: true });
 writeFileSync(path.join(FIXTURES_DIR, 'snapshot.json'), `${JSON.stringify(checkedSnapshot, null, 2)}\n`);
+writeFileSync(path.join(FIXTURES_DIR, 'snapshot-low-readable.json'), `${JSON.stringify(checkedLowReadable, null, 2)}\n`);
 writeFileSync(path.join(FIXTURES_DIR, 'status.json'), `${JSON.stringify(status, null, 2)}\n`);
 writeFileSync(path.join(FIXTURES_DIR, 'markets.json'), `${JSON.stringify(marketsSnapshot, null, 2)}\n`);
 for (const h of histories) {
@@ -786,5 +888,5 @@ console.log(
   `✓ fixtures written to ${FIXTURES_DIR}: ${checkedSnapshot.readings.length} readings ` +
     `(${Object.entries(statusCounts).map(([k, v]) => `${k}:${v}`).join(', ')}), ` +
     `${calendar.length} future calendar events, ${marketsSnapshot.markets.length} market rows, ` +
-    `${histories.length} history series.`,
+    `${histories.length} history series, 1 low-readable variant.`,
 );

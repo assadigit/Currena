@@ -13,11 +13,12 @@
 
 import { describe, expect, it } from 'vitest';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import type { LegEval } from '@currena/insights';
-import { legPhrase, SIGNALS_ENABLED } from './config';
+import type { ConnectionReading, LegEval, SignalConditionKey, SignalReading } from '@currena/insights';
+import { CONNECTIONS, evaluateConnections } from '@currena/insights';
+import { legPhrase, SIGNALS_ENABLED, connectionSummaryInfo } from './config';
+import { balanceOf, MAX_TILT_DEGREES, MIN_READABLE_TO_WEIGH } from './signals/balance';
 import { insightsCopyEn } from '../../i18n/insights-copy-en';
 import { insightsCopyFa } from '../../i18n/insights-copy-fa';
-import { CONNECTIONS, evaluateConnections } from '@currena/insights';
 
 const leg = (fields: Partial<LegEval>): LegEval => ({
   id: 'gold-usd',
@@ -94,6 +95,256 @@ describe('I17 copy parity (en ↔ fa)', () => {
     expect(sorted(tokens(fa.collapsedFooting!))).toEqual(sorted(tokens(en.collapsedFooting!)));
     expect(sorted(tokens(fa.bandTop!))).toEqual(sorted(tokens(en.bandTop!)));
     expect(sorted(tokens(fa.bandBottom!))).toEqual(sorted(tokens(en.bandBottom!)));
+  });
+
+  // v3 UI_SPEC §8/§9 (PH6-B): the new relationship + balance strings hold
+  // the same token sets in both locales — placeholders may move inside the
+  // sentence, never disappear (persian-terminology.md).
+  it('the v3 together + balance strings carry the same tokens in both locales', () => {
+    const en = insightsCopyEn.together;
+    const fa = insightsCopyFa.together;
+    const TOGETHER_TOKENED = [
+      'matchSummary',
+      'chipMatchCount',
+      'passThroughPendingDates',
+      'windowDays',
+      'passThroughLine',
+      'summaryActive',
+      'summaryPartly',
+      'summaryPending',
+      'summaryInactive',
+      'summaryDisagree',
+      'summaryUnknown',
+      'seeAllConnections',
+    ] as const;
+    for (const key of TOGETHER_TOKENED) {
+      expect(sorted(tokens(fa[key] as string)), `together.${key}`).toEqual(sorted(tokens(en[key] as string)));
+    }
+    for (const key of ['active', 'partly', 'pending', 'inactive', 'disagree', 'unknown'] as const) {
+      expect(fa.state[key], `together.state.${key} must be a non-empty fa word`).not.toBe('');
+    }
+    const enS = insightsCopyEn.signals;
+    const faS = insightsCopyFa.signals;
+    const SIGNALS_TOKENED = ['balanceSummary', 'readableLine', 'unreadableName', 'beamAria'] as const;
+    for (const key of SIGNALS_TOKENED) {
+      expect(sorted(tokens(faS[key] as string)), `signals.${key}`).toEqual(sorted(tokens(enS[key] as string)));
+    }
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * v3 UI_SPEC §8 (2026-10-20, task PH6-B) — the relationship cards' pure
+ * layer: the neutral-summary selector the card face and the collapsed
+ * chips share, and the retirement of the Showing-family display words.
+ * ------------------------------------------------------------------ */
+
+const conn = (fields: Partial<ConnectionReading>): ConnectionReading =>
+  ({
+    connection: 'real-yields-gold',
+    state: 'inactive',
+    legs: [],
+    ...fields,
+  }) as ConnectionReading;
+
+describe('connectionSummaryInfo (UI-33/35/37: the neutral summary line)', () => {
+  it('counts when the trigger moved and every scored leg is readable', () => {
+    expect(connectionSummaryInfo(conn({ state: 'active', summary: { triggerPresent: true, matchCount: 2, movedCount: 3 } }))).toEqual({
+      kind: 'match',
+      matchCount: 2,
+      movedCount: 3,
+    });
+  });
+
+  it('a missing trigger beats any count (UI-35: "Trigger not present", never a match count)', () => {
+    expect(connectionSummaryInfo(conn({ state: 'inactive', summary: { triggerPresent: false } }))).toEqual({ kind: 'trigger-absent' });
+    // even with stray counts present, triggerPresent=false wins
+    expect(
+      connectionSummaryInfo(conn({ state: 'inactive', summary: { triggerPresent: false, matchCount: 0, movedCount: 0 } })),
+    ).toEqual({ kind: 'trigger-absent' });
+  });
+
+  it('pending and unknown states win before the engine summary (UI-37/UI-33)', () => {
+    expect(connectionSummaryInfo(conn({ state: 'pending' }))).toEqual({ kind: 'pending' });
+    expect(connectionSummaryInfo(conn({ state: 'unknown', summary: { triggerPresent: false } }))).toEqual({ kind: 'not-enough' });
+    // trigger present but a scored leg unreadable: no counts over what
+    // cannot be read
+    expect(connectionSummaryInfo(conn({ state: 'unknown', summary: { triggerPresent: true } }))).toEqual({ kind: 'not-enough' });
+  });
+
+  it('cards without an engine summary (the RBA pass-through card) speak their own numbers line', () => {
+    expect(connectionSummaryInfo(conn({ state: 'active' }))).toEqual({ kind: 'pass-through' });
+    expect(connectionSummaryInfo(conn({ state: 'inactive' }))).toEqual({ kind: 'pass-through' });
+  });
+
+  it('the real engine output maps cleanly on the fixture-like snapshot', () => {
+    const reading = (id: IndicatorId, fields: Partial<IndicatorReading> = {}): IndicatorReading =>
+      ({ id, value: 1, asOf: '2026-10-07', status: 'normal', sourceName: 't', updatedAt: '2026-10-08T00:00:00Z', ...fields }) as IndicatorReading;
+    // The visual fixture's shape: oil jumps (trigger moves), expectations
+    // quiet, borrowing costs rise against the chain → 1 of 2 match.
+    const evaluated = evaluateConnections([
+      reading('brent', { change30d: -8.4, change90d: -6.1 }),
+      reading('breakeven-5y5y', { change30d: -0.02 }),
+      reading('us10y', { change30d: 0.53 }),
+    ]);
+    const oil = evaluated.find((c) => c.connection === 'oil-expectations-costs')!;
+    expect(oil.state).toBe('disagree');
+    expect(connectionSummaryInfo(oil)).toEqual({ kind: 'match', matchCount: 1, movedCount: 2 });
+  });
+});
+
+describe('the v3 display vocabulary retires the Showing family (UI-33)', () => {
+  // The words rendered on the card faces, chips and collapsed summary —
+  // the retired v2 words must not survive anywhere the page DISPLAYS (the
+  // internal state ids stay; the unused rightNow* copy keys stay archived
+  // in the dictionary per UI_SPEC §1.7's nothing-deleted rule).
+  const DISPLAY_CORPUS = (c: typeof insightsCopyEn): string[] => [
+    c.together.subtitle,
+    ...Object.values(c.together.state),
+    c.together.summaryActive,
+    c.together.summaryPartly,
+    c.together.summaryInactive,
+    c.together.summaryDisagree,
+    c.together.matchSummary,
+    c.together.triggerAbsentLine,
+    c.together.notEnoughLine,
+    c.together.chipMatchCount,
+    c.together.usualTendency,
+    c.together.weakerLink,
+    c.together.weakerLinkWhy,
+    c.together.windowsUsed,
+    c.together.passThroughPendingDates,
+  ];
+
+  it('no Showing / Partly showing / Not showing word in the EN display corpus', () => {
+    for (const text of DISPLAY_CORPUS(insightsCopyEn)) {
+      expect(/showing/i.test(text), `"${text}" still speaks a retired Showing-family word`).toBe(false);
+    }
+  });
+
+  it('no دیده می‌شود / دیده نمی‌شود in the fa display corpus', () => {
+    for (const text of DISPLAY_CORPUS(insightsCopyFa)) {
+      expect(/دیده می‌شود|دیده نمی‌شود|بخشی دیده/.test(text), `"${text}" still speaks a retired fa word`).toBe(false);
+    }
+  });
+
+  it('the four neutral summary words render distinctly (match / trigger / pending / not-enough)', () => {
+    const en = insightsCopyEn.together;
+    const words = new Set([
+      en.matchSummary.replace('{match}', '1').replace('{moved}', '2'),
+      en.triggerAbsentLine,
+      en.state.pending,
+      en.notEnoughLine,
+    ]);
+    expect(words.size).toBe(4);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * v3 UI_SPEC §9 (2026-10-20, task PH6-B) — the balance tally: grouping,
+ * equal weights, the 12-degree tilt, and the honesty rules (UI-40).
+ * ------------------------------------------------------------------ */
+
+const cond = (key: SignalConditionKey, state: 'supportive' | 'against' | 'neutral' | 'unknown') => ({
+  key,
+  state,
+  inputs: ['gold-usd' as IndicatorId],
+});
+
+const signalOf = (conditions: ReturnType<typeof cond>[]): SignalReading =>
+  ({
+    metal: 'gold',
+    priceId: 'gold-usd',
+    conditions,
+    metCount: conditions.filter((c) => c.state === 'supportive').length,
+    lean: 'mixed',
+    position: null,
+    speed: null,
+  }) as SignalReading;
+
+describe('balanceOf (UI-39: grouping, equal weights, the 12-degree tilt)', () => {
+  const ALL = ['real-yield', 'expectations', 'stress', 'dollar', 'footing'] as const;
+  const allReadable = (): ((key: SignalConditionKey) => boolean) => () => true;
+
+  it('groups the sides; an unreadable condition never joins one (never silently counted)', () => {
+    const signal = signalOf([
+      cond('real-yield', 'supportive'),
+      cond('expectations', 'neutral'),
+      cond('stress', 'against'),
+      cond('dollar', 'unknown'),
+      cond('footing', 'supportive'),
+    ]);
+    const tally = balanceOf(signal, (key) => key !== 'dollar');
+    expect(tally.supporting.map((i) => i.key)).toEqual(['real-yield', 'footing']);
+    expect(tally.pressuring.map((i) => i.key)).toEqual(['stress']);
+    expect(tally.neutral.map((i) => i.key)).toEqual(['expectations']);
+    // the engine's 'unknown' dollar AND anything the readable rule rejects
+    // both land unreadable — never on the beam
+    expect(tally.unreadable.map((i) => i.key)).toEqual(['dollar']);
+    expect(tally.readableCount).toBe(4);
+    expect(tally.totalCount).toBe(5);
+  });
+
+  it('a dataless engine-neutral is unreadable too (its dashed token never weighs)', () => {
+    const signal = signalOf([
+      cond('real-yield', 'supportive'),
+      cond('expectations', 'supportive'),
+      cond('stress', 'supportive'),
+      cond('dollar', 'neutral'), // fresh-looking to the engine, no data to compute
+      cond('footing', 'against'),
+    ]);
+    const tally = balanceOf(signal, (key) => key !== 'dollar');
+    expect(tally.unreadable.map((i) => i.key)).toEqual(['dollar']);
+    expect(tally.readableCount).toBe(4);
+  });
+
+  it('tilt = (supporting − pressuring) / readable × 12°, clamped to ±12', () => {
+    // 4 supporting of 5 readable → (4−1)/5 × 12 = 7.2°
+    const mostly = balanceOf(
+      signalOf(ALL.map((k, i) => cond(k, i === 4 ? 'against' : 'supportive'))),
+      allReadable(),
+    );
+    expect(mostly.level).toBe(false);
+    expect(mostly.tilt).toBeCloseTo(7.2, 5);
+    // all supporting → the 12-degree maximum
+    const allFor = balanceOf(signalOf(ALL.map((k) => cond(k, 'supportive'))), allReadable());
+    expect(allFor.tilt).toBe(MAX_TILT_DEGREES);
+    // all pressuring → the mirrored minimum
+    const allAgainst = balanceOf(signalOf(ALL.map((k) => cond(k, 'against'))), allReadable());
+    expect(allAgainst.tilt).toBe(-MAX_TILT_DEGREES);
+    // balanced 2-2 with one neutral → 0
+    const even = balanceOf(
+      signalOf([cond('real-yield', 'supportive'), cond('expectations', 'against'), cond('stress', 'supportive'), cond('dollar', 'against'), cond('footing', 'neutral')]),
+      allReadable(),
+    );
+    expect(even.tilt).toBe(0);
+  });
+
+  it('UI-40: fewer than 3 readable conditions keeps the beam level — unreadable never tilts it', () => {
+    // 2 readable (1 supporting, 1 pressuring) + 3 unreadable → level
+    const scarce = balanceOf(signalOf(ALL.map((k) => cond(k, 'supportive'))), (key) => key === 'real-yield' || key === 'footing');
+    expect(scarce.readableCount).toBe(2);
+    expect(scarce.level).toBe(true);
+    expect(scarce.tilt).toBe(0);
+    // 3 readable exactly → the beam may weigh
+    expect(MIN_READABLE_TO_WEIGH).toBe(3);
+    const three = balanceOf(
+      signalOf(ALL.map((k) => cond(k, 'supportive'))),
+      (key) => ['real-yield', 'expectations', 'footing'].includes(key),
+    );
+    expect(three.readableCount).toBe(3);
+    expect(three.level).toBe(false);
+    expect(three.tilt).toBe(MAX_TILT_DEGREES);
+  });
+
+  it('silver keeps its industrial condition in the tally; gold never sees one (UI-45)', () => {
+    const gold = signalOf(ALL.map((k) => cond(k, 'supportive')));
+    const silver = signalOf([...ALL.map((k) => cond(k, 'supportive')), cond('industrial', 'supportive')]);
+    const goldTally = balanceOf(gold, allReadable());
+    const silverTally = balanceOf(silver, allReadable());
+    expect(goldTally.totalCount).toBe(5);
+    expect(silverTally.totalCount).toBe(6);
+    expect(silverTally.supporting.map((i) => i.key)).toContain('industrial');
+    expect(goldTally.supporting.map((i) => i.key)).not.toContain('industrial');
   });
 });
 

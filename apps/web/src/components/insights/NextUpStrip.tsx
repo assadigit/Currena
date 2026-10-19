@@ -1,10 +1,11 @@
 /**
- * NextUpStrip — Block H6: "Show only the next three events in a strip under
- * the hero. Show the days left in bold and the date in a smaller size. Link
- * each event to the indicator it affects. Add a 'full calendar' link. In
- * the full list, group events by month and merge duplicate titles."
- * Gregorian date on hover/long-press (RBA and Fed news use Gregorian).
- * The .ics export (I10) rides the full list.
+ * NextUpStrip — Block H6 → v3 UI_SPEC §10 UI-47: the "Next up" section —
+ * the next FIVE events (was three) in a strip, each with relative days
+ * (Today / Tomorrow / N days away) and, when the event carries a tz, its
+ * time-zone label. Past events stay hidden (U-12). Gregorian date on
+ * hover/long-press (RBA and Fed news use Gregorian). The .ics export (I10)
+ * rides the full list; the full calendar expansion still groups by month
+ * and merges duplicate titles.
  */
 
 import { useMemo, useState } from 'react';
@@ -52,6 +53,16 @@ function daysUntil(dateIso: string): number {
 function monthKey(dateIso: string): string {
   return dateIso.slice(0, 7);
 }
+
+/* UI-47: the per-event time-zone label. The map covers EXACTLY the tz
+ * values present in data/insights-calendar.json (read 2026-10-20:
+ * Australia/Sydney, America/New_York, Europe/Frankfurt); any other zone
+ * renders no label — never a guessed name, never a raw IANA string. */
+export const TZ_LABEL: Readonly<Record<string, 'tzSydney' | 'tzUsEastern' | 'tzFrankfurt'>> = {
+  'Australia/Sydney': 'tzSydney',
+  'America/New_York': 'tzUsEastern',
+  'Europe/Frankfurt': 'tzFrankfurt',
+};
 
 export function NextUpStrip({
   events,
@@ -128,8 +139,14 @@ export function NextUpStrip({
     }).format(date);
   };
 
-  const strip = upcoming.slice(0, 3);
-  const stripHasMore = upcoming.length > 3;
+  const strip = upcoming.slice(0, 5);
+  const stripHasMore = upcoming.length > 5;
+
+  /** UI-47: the event's zone label, or null when unmapped/absent. */
+  const tzLabel = (event: CalendarEvent): string | null => {
+    const key = event.tz !== undefined ? TZ_LABEL[event.tz] : undefined;
+    return key !== undefined ? copy.ui[key] : null;
+  };
 
   return (
     <section id="insights-coming-up" aria-labelledby="insights-coming-up-title" className="scroll-mt-24">
@@ -141,7 +158,7 @@ export function NextUpStrip({
           <button
             type="button"
             onClick={downloadIcs}
-            className="no-print insights-focusable inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/10"
+            className="no-print insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/10"
           >
             <CalendarDays aria-hidden size={16} strokeWidth={1.9} className="shrink-0" />
             {copy.ui.icsDownload}
@@ -149,12 +166,13 @@ export function NextUpStrip({
         ) : null}
       </div>
 
-      {/* H6: the three-event strip. */}
-      <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-3">
+      {/* UI-47: the five-event strip. */}
+      <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-3 xl:grid-cols-5">
         {strip.map((event) => {
           const days = daysUntil(event.date);
           const dateText = locale === 'fa' ? formatJalaliDate(event.date, 'fa-IR') : formatDateWords(event.date, 'en-US');
           const target = eventTargets[event.kind];
+          const tz = tzLabel(event);
           return (
             <li
               key={`${event.id}-${event.date}`}
@@ -178,6 +196,7 @@ export function NextUpStrip({
                 title={interpolate(copy.ui.gregorianDate, { date: event.date })}
               >
                 <bdi>{dateText}</bdi>
+                {tz !== null ? <span> · <bdi>{tz}</bdi></span> : null}
               </span>
               {target ? (
                 <button
@@ -199,7 +218,7 @@ export function NextUpStrip({
           type="button"
           onClick={() => setShowAll((v) => !v)}
           aria-expanded={showAll}
-          className="insights-focusable mt-2 inline-flex min-h-[36px] cursor-pointer items-center rounded-full border border-[var(--color-border)] bg-transparent px-3.5 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/10"
+          className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-[var(--color-border)] bg-transparent px-3.5 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/10"
         >
           {showAll ? copy.ui.hideCalendar : copy.ui.fullCalendar}
           <span aria-hidden="true" className={`ms-1 transition-transform ${showAll ? 'rotate-180' : ''}`}>
@@ -230,6 +249,7 @@ export function NextUpStrip({
                     const days = daysUntil(event.date);
                     const dateText =
                       locale === 'fa' ? formatJalaliDate(event.date, 'fa-IR') : formatDateWords(event.date, 'en-US');
+                    const tz = tzLabel(event);
                     return (
                       <li
                         key={`${event.id}-${event.date}`}
@@ -245,6 +265,12 @@ export function NextUpStrip({
                         </span>
                         <span className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
                           <bdi>{dateText}</bdi>
+                          {tz !== null ? (
+                            <>
+                              <span className="mx-1.5 opacity-50">·</span>
+                              <bdi>{tz}</bdi>
+                            </>
+                          ) : null}
                           <span className="mx-1.5 opacity-50">·</span>
                           <bdi className="font-bold">{when(days)}</bdi>
                         </span>

@@ -21,7 +21,7 @@ import { ApiError, fetchIndicatorHistory } from '../../lib/insights';
 import { Star, X } from 'lucide-react';
 import { IconImg, indicatorIconUrl } from '../icons/currena';
 import { HistoryChart, formatAsOf } from './HistoryChart';
-import { definitionFor, formatRuleText } from './config';
+import { definitionFor, formatRuleText, formatUtcHm } from './config';
 import { staleAfterDaysFor, RULE_CHANGELOG, RULE_VERSION } from '@currena/insights';
 
 function Section({ title, body }: { title: string; body: string }) {
@@ -70,7 +70,15 @@ function CardFacts({
       <span>{staleText}</span>
       <span aria-hidden="true" className="opacity-50">·</span>
       <span>
-        {copy.ui.fetchedLabel}: {formatAsOf(reading.updatedAt.slice(0, 10), numberLocale === 'fa-IR' ? 'fa' : 'en')}
+        {/* v3 UI-22 (2026-10-20): the fetched line now speaks the UTC TIME
+         * too — the same clock every card face's meta row speaks
+         * ("Fetched: {date} · {time} UTC", RULES §6). */}
+        <bdi>
+          {interpolate(copy.ui.fetchedAtUtc, {
+            date: formatAsOf(reading.updatedAt.slice(0, 10), numberLocale === 'fa-IR' ? 'fa' : 'en'),
+            time: formatUtcHm(reading.updatedAt, numberLocale),
+          })}
+        </bdi>
       </span>
       <span aria-hidden="true" className="opacity-50">·</span>
       <span className={def.rule.kind === 'info' ? '' : 'font-semibold'}>
@@ -315,12 +323,13 @@ export function DetailsPanel({
           </div>
 
           {/* The large chart (labels ≥ caption size — the HistoryChart
-           * renders its ticks at caption size). */}
-          {reading.status !== 'unavailable' ? (
-            <div className="mt-4">
-              <PanelHistory id={reading.id} copy={copy} locale={locale} numberLocale={numberLocale} />
-            </div>
-          ) : null}
+           * renders its ticks at caption size). v3 UI-17 (2026-10-20): the
+           * chart renders for UNAVAILABLE readings too — the last good
+           * value lives HERE (the face hides it); a source with no stored
+           * history degrades honestly to the "no stored history" line. */}
+          <div className="mt-4">
+            <PanelHistory id={reading.id} copy={copy} locale={locale} numberLocale={numberLocale} />
+          </div>
         </div>
 
         {/* Footer: source + as-of + the watchlist pin (F5: at the bottom). */}

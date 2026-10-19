@@ -18,7 +18,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import type { IndicatorId, IndicatorReading, InsightsSection } from '@currena/core';
+import type { CalendarEvent, IndicatorId, IndicatorReading, InsightsSection } from '@currena/core';
 import type { GaugeReading } from '@currena/insights';
 import { formatDateWords, formatJalaliDate } from '@currena/core';
 import {
@@ -40,6 +40,15 @@ import {
   statusCounts,
   tierOf,
   togetherSummary,
+  // v3 UI_SPEC §3/§4 (2026-10-20, PH6-A)
+  heroSentence,
+  heroWhy,
+  heroReadingCounts,
+  calmGauges,
+  heroNextEvent,
+  heroStaleInputs,
+  dailyPeersOf,
+  tradingDaysBehind,
 } from './config';
 import { evaluateConnections } from '@currena/insights';
 import { insightsCopyEn, type InsightsCopy } from '../../i18n/insights-copy-en';
@@ -574,5 +583,199 @@ describe('R28 sentence-versus-number (band words computed from live values)', ()
       reading({ id: 'dollar-basket', status: 'stale', change30d: 0.3, moveScore: 5, percentile10y: 0.9 }),
     ]);
     expect(rows.map((r) => r.id)).toEqual(['brent']);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * v3 UI_SPEC §3/§4 (2026-10-20, task PH6-A) — the rebuilt hero's pure
+ * layer + the Delayed tier. Pinned here in the same file as the R2/R3
+ * machinery they extend (the R2 heroReason table + the R3 extremity
+ * fallback stay — heroWhy reuses the extremity as its ranking fallback).
+ * ------------------------------------------------------------------ */
+
+describe('v3 heroSentence (UI-01: fixed table over the gauge steps, ≤90 chars)', () => {
+  const build = (gauges: GaugeReading[]): string =>
+    heroSentence({
+      gauges,
+      nameOf: (g) =>
+        ({ 'borrowing-costs': 'Borrowing costs', 'prices-heat': 'Prices', 'market-stress': 'Market stress', 'dollar-strength': 'The US dollar', 'growth-health': 'Growth' })[g] ?? g,
+      fmt: (n) => String(n),
+      calm: 'All {n} gauges are calm right now.',
+      attention: '{areas} {isAre} attention: {k} of {n} gauges.',
+      andWord: 'and',
+      listSep: ', ',
+      moreWord: '+{n} more',
+      isWord: 'needs',
+      areWord: 'need',
+      notEnough: 'Not enough voting data to read the gauges yet.',
+    });
+
+  it('every readable gauge calm → the one calm sentence, no numbers', () => {
+    expect(build([gauge('borrowing-costs', 1), gauge('dollar-strength', 1)])).toBe(
+      'All 2 gauges are calm right now.',
+    );
+  });
+
+  it('no readable gauge → the not-enough line', () => {
+    expect(build([gauge('borrowing-costs', 0)])).toBe('Not enough voting data to read the gauges yet.');
+  });
+
+  it('one raised area → the singular is/are', () => {
+    const line = build([gauge('borrowing-costs', 3), gauge('dollar-strength', 1)]);
+    expect(line).toBe('Borrowing costs needs attention: 1 of 2 gauges.');
+  });
+
+  it('two raised areas → "A and B … need attention"; unreadable gauges stay out of n', () => {
+    const line = build([gauge('prices-heat', 2), gauge('growth-health', 2), gauge('dollar-strength', 0)]);
+    expect(line).toBe('Prices and Growth need attention: 2 of 2 gauges.');
+  });
+
+  it('more than two raised areas → two names + "+{n} more", still ≤90 chars', () => {
+    const line = build([
+      gauge('borrowing-costs', 2),
+      gauge('prices-heat', 2),
+      gauge('market-stress', 2),
+      gauge('dollar-strength', 2),
+      gauge('growth-health', 2),
+    ]);
+    // The list separator joins the "+{n} more" tail in BOTH locales: EN
+    // "A, B, +3 more"; fa "الف، ب، و ۳ مورد دیگر" (the fa tail carries its
+    // own "و") — one shared shape, no double conjunction.
+    expect(line).toBe('Borrowing costs, Prices, +3 more need attention: 5 of 5 gauges.');
+    expect(line.length).toBeLessThanOrEqual(90);
+  });
+});
+
+describe('v3 heroWhy (UI-03: the why rows — |moveScore| rank, extremity fallback)', () => {
+  it('ranks the section’s warning readings by |moveScore|, top three', () => {
+    const ids = heroWhy(
+      [
+        reading({ id: 'us10y', status: 'warning', moveScore: 1.0, percentile10y: 0.9 }),
+        reading({ id: 'brent', status: 'warning', moveScore: -3.0, percentile10y: 0.2 }),
+        reading({ id: 'us-cpi-yoy', status: 'warning', moveScore: 2.0, percentile10y: 0.8 }),
+        reading({ id: 'sahm-rule', status: 'warning', moveScore: 0.5, percentile10y: 0.7 }),
+        reading({ id: 'au-cpi', status: 'warning', moveScore: 9, percentile10y: 0.9 }), // other section
+        reading({ id: 'vix', status: 'normal', moveScore: 9, percentile10y: 0.9 }), // not a warning
+      ],
+      'global',
+      3,
+    );
+    expect(ids).toEqual(['brent', 'us-cpi-yoy', 'us10y']);
+  });
+
+  it('no moveScore anywhere → the R3 percentile extremity carries the order', () => {
+    const ids = heroWhy(
+      [
+        reading({ id: 'au-unemployment', status: 'warning', percentile10y: 0.5 }),
+        reading({ id: 'audusd', status: 'warning', percentile10y: 0.02 }), // low-tail rule → extremity 0.98
+        reading({ id: 'au-cpi', status: 'warning', percentile10y: 0.8 }),
+      ],
+      'australia',
+      2,
+    );
+    expect(ids).toEqual(['audusd', 'au-cpi']);
+  });
+});
+
+describe('v3 heroReadingCounts (UI-02: the reading bar over the gauge members)', () => {
+  it('attention / normal / can’t-tell — non-voting members count as can’t-tell, non-members never count', () => {
+    const counts = heroReadingCounts(
+      [
+        reading({ id: 'us10y', status: 'warning' }),
+        reading({ id: 'yield-curve-10y2y', status: 'normal' }),
+        reading({ id: 'dollar-basket', status: 'stale' }),
+        reading({ id: 'china-pmi', status: 'unavailable' }),
+        reading({ id: 'stress-stlfsi', status: 'check-pending' }),
+        reading({ id: 'gold-usd', status: 'normal' }), // prices-board: not a gauge member
+      ],
+      'global',
+    );
+    expect(counts).toEqual({ attention: 1, normal: 1, cantTell: 3 });
+  });
+});
+
+describe('v3 calmGauges / heroNextEvent / heroStaleInputs (UI-04/UI-05/UI-06+08)', () => {
+  it('calmGauges: step-1 gauges only, GAUGES order, capped at three', () => {
+    expect(calmGauges([gauge('growth-health', 1), gauge('prices-heat', 2), gauge('dollar-strength', 1), gauge('market-stress', 1)])).toEqual([
+      'growth-health',
+      'dollar-strength',
+      'market-stress',
+    ]);
+  });
+
+  const events: CalendarEvent[] = [
+    { id: 'rba-1', date: '2026-10-21', titleEn: 'RBA decision', titleFa: 'RBA', kind: 'rba', tz: 'Australia/Sydney' },
+    { id: 'us-cpi-1', date: '2026-10-22', titleEn: 'US CPI', titleFa: 'US CPI', kind: 'us-cpi', tz: 'America/New_York' },
+    { id: 'fed-0', date: '2026-10-19', titleEn: 'Fed (past)', titleFa: 'Fed', kind: 'fed', tz: 'America/New_York' },
+  ];
+
+  it('heroNextEvent: Australia reads its own kinds, Global the rest; past events never surface', () => {
+    expect(heroNextEvent(events, 'australia', '2026-10-20')?.id).toBe('rba-1');
+    expect(heroNextEvent(events, 'global', '2026-10-20')?.id).toBe('us-cpi-1');
+  });
+
+  it('heroNextEvent: falls back to the plain next event when the region has none of its own', () => {
+    expect(heroNextEvent([events[0]!], 'global', '2026-10-20')?.id).toBe('rba-1');
+    expect(heroNextEvent(events, 'global', '2026-11-01')).toBeNull(); // nothing ahead
+  });
+
+  it('heroStaleInputs: stale members count; the alert fires only inside a gauge whose members voted', () => {
+    const voted = heroStaleInputs(
+      [
+        reading({ id: 'dollar-basket', status: 'stale' }),
+        reading({ id: 'usdjpy', status: 'normal' }), // dollar-strength voted
+      ],
+      'global',
+    );
+    expect(voted).toEqual({ staleCount: 1, affectsVotingGauge: true });
+    const nobodyVoted = heroStaleInputs(
+      [
+        reading({ id: 'dollar-basket', status: 'stale' }),
+        reading({ id: 'china-pmi', status: 'unavailable' }),
+      ],
+      'global',
+    );
+    expect(nobodyVoted).toEqual({ staleCount: 1, affectsVotingGauge: false });
+  });
+});
+
+describe('v3 Delayed tier (§4: ≥1 trading day behind the snapshot’s daily peers)', () => {
+  it('tradingDaysBehind: same day 0 · Fri→Mon 1 · Thu→Mon 2 · over a weekend never counts Sat/Sun', () => {
+    expect(tradingDaysBehind('2024-03-11', '2024-03-11')).toBe(0);
+    expect(tradingDaysBehind('2024-03-08', '2024-03-09')).toBe(0); // Sat never counts
+    expect(tradingDaysBehind('2024-03-08', '2024-03-11')).toBe(1); // Fri → Mon
+    expect(tradingDaysBehind('2024-03-07', '2024-03-11')).toBe(2); // Thu → Fri + Mon
+  });
+
+  it('dailyPeersOf: the newest daily asOf wins; non-daily cadences never set the benchmark', () => {
+    const peers = dailyPeersOf([
+      reading({ id: 'us10y', asOf: '2026-10-16' }),
+      reading({ id: 'brent', asOf: '2026-10-17' }),
+      reading({ id: 'gold-usd', asOf: '2026-10-18' }),
+      reading({ id: 'au-cpi', asOf: '2026-10-20' }), // monthly — excluded
+      reading({ id: 'china-pmi', status: 'unavailable' }), // asOf null — excluded
+    ]);
+    expect(peers.newestDailyAsOf).toBe('2026-10-18');
+  });
+
+  it('tierOf: a daily reading ≥1 trading day behind its peers is Delayed; status rules + the unusual tier still win', () => {
+    const peers = { newestDailyAsOf: '2026-10-15' }; // a Tuesday
+    // usdjpy is daily-cadence: Fri 2026-10-09 → Tue 2026-10-15 = 2 trading days behind.
+    expect(tierOf(reading({ id: 'usdjpy', asOf: '2026-10-09' }), peers)).toBe('delayed');
+    expect(tierOf(reading({ id: 'usdjpy', asOf: '2026-10-15' }), peers)).toBe('normal'); // the peer itself
+    expect(tierOf(reading({ id: 'dollar-basket', status: 'stale', asOf: '2026-10-09' }), peers)).toBe('stale'); // stale wins
+    expect(tierOf(reading({ id: 'us10y', status: 'warning', asOf: '2026-10-09' }), peers)).toBe('needs-attention');
+    expect(tierOf(reading({ id: 'us30y', status: 'normal', percentile10y: 0.95, asOf: '2026-10-09' }), peers)).toBe('unusual'); // the position tier outranks the lag
+    expect(tierOf(reading({ id: 'au-cpi', asOf: '2026-10-01' }), peers)).toBe('normal'); // monthly: never delayed
+    expect(tierOf(reading({ id: 'usdjpy', asOf: '2026-10-09' }))).toBe('normal'); // no peers → unchanged
+  });
+
+  it('statusCounts: a delayed-tier row counts under Normal; a no-history row under Context', () => {
+    const counts = statusCounts([
+      reading({ id: 'usdjpy', asOf: '2026-10-09' }), // normal status
+      reading({ id: 'philly-fed', status: 'no-history' }),
+    ]);
+    expect(counts.normal).toBe(1);
+    expect(counts.context).toBe(1);
   });
 });

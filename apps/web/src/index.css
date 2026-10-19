@@ -1118,6 +1118,16 @@ body {
   --color-status-watch: #f1c21b;   /* owner palette: Carbon Yellow 30, verbatim — the Cautious word */
   --color-status-context: #245E9F;
   --color-status-stale: #46505C;
+  /* v3 UI-15 (2026-10-20): the state chips' own TEXT inks — darker siblings
+   * of the pinned state hues so every chip word reads ≥4.5:1 on its pill
+   * (the pinned hues stay verbatim on meters/icons/instruments). Measured:
+   * normal #0E6027 7.71:1 (white) · attention #B91C1C 6.47:1 · watch
+   * #7A5D00 6.19:1 · context #245E9F 6.63:1 · muted #46505C 8.20:1. */
+  --color-chip-ink-normal: #0E6027;    /* Carbon Green 60 — Green 50's darker sibling */
+  --color-chip-ink-attention: #B91C1C; /* Red 60's darker sibling (4.31:1 on its tint before) */
+  --color-chip-ink-watch: #7A5D00;     /* bronze — the amber hue as readable text ink */
+  --color-chip-ink-context: #245E9F;
+  --color-chip-ink-muted: #46505C;
   /* Spacing scale */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -1156,6 +1166,14 @@ body {
   --color-status-watch: #f1c21b;   /* Carbon Yellow 30 verbatim — 9.5:1 on #1A222E */
   --color-status-context: #6FAEEC;
   --color-status-stale: #9AA8BC;
+  /* v3 UI-15: the chips' text inks in dark theme keep the passing status
+   * tokens (measured vs the #1A222E card surface: normal 4.77:1 ·
+   * attention 4.77:1 · watch 9.5:1 · context/muted ≥7:1 — U-03 dark). */
+  --color-chip-ink-normal: #24a148;
+  --color-chip-ink-attention: #fa4d56;
+  --color-chip-ink-watch: #f1c21b;
+  --color-chip-ink-context: #6FAEEC;
+  --color-chip-ink-muted: #9AA8BC;
 }
 
 /* Type-role utilities (G3) — the four sizes the page is allowed to speak in. */
@@ -1294,6 +1312,82 @@ html:not(:lang(fa)) .type-kicker {
   .verdict-meter-seg { transition: none; }
 }
 
+/* ------------------------------------------------------------------ *
+ * v3 UI_SPEC §4/UI-15 (2026-10-20): chip TEXT inks + the state chips.
+ *
+ * The owner-pinned state hues (Carbon Green 50 #24a148 · Yellow 30
+ * #f1c21b · Orange 40 #ff832b · Red 60 #da1e28, light theme) stay
+ * VERBATIM for the meters, the icons and the verdict instruments. But as
+ * chip TEXT on their own tinted pills they measure (WCAG, vs the card
+ * surface — the number the U-03 harness reports — and vs the real tint):
+ *   Normal   #24a148: 3.35:1 white / 2.91:1 tint  →  #0E6027: 7.71:1 / 6.70:1
+ *   Unusual  #f1c21b: 1.68:1 white / 1.52:1 tint  →  retired from cards;
+ *     the Delayed chip now uses the bronze watch ink
+ *     #7A5D00: 6.19:1 white / 5.87:1 tint
+ *   Attention #da1e28: 4.99:1 white but 4.31:1 on its coral tint
+ *     →  #B91C1C: 6.47:1 / 5.57:1
+ *   Context  #245E9F: 6.63:1 / 6.23:1 (kept, now its own token)
+ *   Muted    #46505C: 8.20:1 / 6.80:1 (kept, now its own token)
+ * The brand palette is untouched; only the chips' own word/icon ink gets
+ * the darker sibling of its hue. Dark theme keeps the passing tokens.
+ * ------------------------------------------------------------------ */
+.chip-danger {
+  background: color-mix(in srgb, var(--color-currena-warning) 15%, transparent);
+  color: var(--color-chip-ink-attention);
+}
+.chip-success {
+  background: color-mix(in srgb, var(--color-currena-success) 15%, transparent);
+  color: var(--color-chip-ink-normal);
+}
+.chip-info {
+  background: color-mix(in srgb, var(--color-currena-blue) 10%, transparent);
+  color: var(--color-chip-ink-context);
+}
+.chip-muted {
+  background: color-mix(in srgb, var(--color-currena-muted) 15%, transparent);
+  color: var(--color-chip-ink-muted);
+}
+.chip-watch {
+  background: color-mix(in srgb, var(--color-status-watch) 16%, transparent);
+  color: var(--color-chip-ink-watch);
+}
+
+/* v3 UI-02: the hero's reading bar — one segmented bar with the counts
+ * (needs attention / normal / can't tell right now). Non-text elements:
+ * every segment ink measures ≥3:1 on the card surface in both themes
+ * (the same status tokens the meters already speak). The counts text
+ * beside the bar is the accessible rendering (the bar itself is
+ * aria-hidden — UI-45a discipline: the text carries the information). */
+.hero-count-bar {
+  display: flex;
+  gap: 2px;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  direction: ltr; /* attention reads first in both directions */
+}
+.hero-count-seg {
+  height: 100%;
+  min-width: 3px;
+  border-radius: 999px;
+}
+.hero-count-seg-attention { background: var(--color-status-alert); }
+.hero-count-seg-normal { background: var(--color-status-normal); }
+.hero-count-seg-canttell { background: var(--color-currena-muted); }
+
+/* v3 UI-14: the state colour appears only on the dot/icon, the chip and
+ * the THIN TOP BORDER of the card — the hero card and the alert card wear
+ * their step/tier as a 2px top edge on a neutral surface (the round-22
+ * gradient tint is retired with it; UI-14: backgrounds stay neutral). */
+[data-hero-card] {
+  border-block-start: 2px solid var(--color-border);
+}
+[data-hero-card][data-step='1'] { border-block-start-color: var(--color-status-normal); }
+[data-hero-card][data-step='2'] { border-block-start-color: var(--color-status-watch); }
+[data-hero-card][data-step='3'] { border-block-start-color: var(--color-status-stressed); }
+[data-hero-card][data-step='4'] { border-block-start-color: var(--color-status-alert); }
+
 /* Round 29 (owner): the owner's PNG artwork no longer whispers — one
  * class drives every artwork surface from two custom properties set
  * inline by IconImg: the MOBILE box (--icon-size) and the ≥640px box
@@ -1314,27 +1408,17 @@ html:not(:lang(fa)) .type-kicker {
   }
 }
 
-/* Alert-card accent (F1): inline-start border + light tint, never colour alone.
- * R30 colour roles: RED = needs attention only. The Unusual tier gets the
- * amber watch ink (border + tint) so the two tiers stop looking alike —
- * the roast: "the left accent border is red on Unusual cards as well". */
+/* Alert-card accent (F1) — v3 UI-14 (2026-10-20): the state colour rides
+ * the THIN TOP BORDER only, on a neutral surface (the round-22 tinted
+ * gradient is retired; UI-14: "Backgrounds stay neutral"). Tier → ink:
+ * needs-attention red, unusual the amber watch (the tier stays internal —
+ * the face shows the Normal word; the border still flags the notable
+ * position bar cards). */
 .alert-card {
-  border-inline-start-width: 4px;
-  border-inline-start-style: solid;
-  border-inline-start-color: var(--color-status-alert);
-  background: linear-gradient(
-    to var(--dir-gradient, right),
-    var(--color-surface-alert-tint),
-    var(--color-surface) 55%
-  );
+  border-block-start: 2px solid var(--color-status-alert);
 }
 .alert-card[data-tier='unusual'] {
-  border-inline-start-color: var(--color-status-watch);
-  background: linear-gradient(
-    to var(--dir-gradient, right),
-    color-mix(in srgb, var(--color-status-watch) 7%, transparent),
-    var(--color-surface) 55%
-  );
+  border-block-start-color: var(--color-status-watch);
 }
 
 /* Card lanes (round 22, owner: "such gaps must never happen"): flex-wrap

@@ -77,6 +77,7 @@ export {
   formatFromPeak,
   formatPeakDistance,
   formatRuleText,
+  formatUtcHm,
 } from './labels';
 
 export {
@@ -100,8 +101,11 @@ export {
   indicatorMatchesFilter,
   filterVisibleIds,
   statusCounts,
+  dailyPeersOf,
+  tradingDaysBehind,
+  isDelayedReading,
 } from './movers';
-export type { IndicatorTier, StatusFilter } from './movers';
+export type { IndicatorTier, StatusFilter, DailyPeers } from './movers';
 
 export {
   sliceHistoryToRange,
@@ -120,15 +124,25 @@ export {
   togetherSummary,
   TOGETHER_CARD_ORDER,
   mergeSignals,
+  // v3 UI_SPEC §8 (2026-10-20, PH6-B): the card face + collapsed chips
+  // share this one neutral-summary selector.
+  connectionSummaryInfo,
 } from './signals';
-export type { StatusTone } from './signals';
+export type { StatusTone, ConnectionSummaryInfo, ConnectionSummaryKind } from './signals';
 
 export {
   heroReason,
   heroReasonIsConsistent,
+  heroSentence,
+  heroWhy,
+  heroReadingCounts,
+  calmGauges,
+  heroNextEvent,
+  heroStaleInputs,
   attentionTiles,
   groupVisibility,
 } from './hero';
+export type { HeroSentenceInput, HeroReadingCounts } from './hero';
 
 export {
   MONEY_AREAS,

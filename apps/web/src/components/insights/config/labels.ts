@@ -264,3 +264,20 @@ export function formatRuleText(
   }
   return ruleAtomText(rule, copy, units, numberLocale, unitToken);
 }
+
+/* ------------------------------------------------------------------ *
+ * v3 UI-20/UI-22 (2026-10-20): "Updated {HH:mm UTC}" — the fetch time in
+ * UTC, 24-hour, on every card's meta row and in the details facts block.
+ * UTC is the page's stated clock (RULES §6: show the fetched time in UTC);
+ * fa keeps Persian digits through the fa-IR formatter.
+ * ------------------------------------------------------------------ */
+
+export function formatUtcHm(iso: string, numberLocale: 'en-US' | 'fa-IR'): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat(numberLocale === 'fa-IR' ? 'fa-IR' : 'en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'UTC',
+  }).format(date);
+}

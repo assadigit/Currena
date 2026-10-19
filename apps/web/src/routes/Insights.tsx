@@ -44,6 +44,7 @@ import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../lib/insi
 import { AboutTheData } from '../components/insights/AboutTheData';
 import { DetailsPanel } from '../components/insights/DetailsPanel';
 import { HeroBlock } from '../components/insights/HeroBlock';
+import { MovesNextStrip } from '../components/insights/MovesNextStrip';
 import { JumpNav, type JumpTarget } from '../components/insights/JumpNav';
 import { MoneyPanel } from '../components/insights/MoneyPanel';
 import { NextUpStrip } from '../components/insights/NextUpStrip';
@@ -74,7 +75,6 @@ import { UsSharesAudBox, UsSharesNotesBox } from './insights-sections/UsSharesNo
 import {
   useWorldCurrenciesSection,
   useWorldMarketsSection,
-  useWorldSectionIndicators,
 } from './insights-sections/world-feeds';
 import { useInsightsToolsNav } from './insights-sections/useInsightsToolsNav';
 
@@ -155,16 +155,15 @@ export function Insights() {
     return () => controller.abort();
   }, [retryToken]);
 
-  // The two world-section feeds + the hero's section indicators — moved
-  // verbatim to insights-sections/world-feeds.ts (Phase 3-e).
-  // PUBLIC MODE (2026-10-19, AC-08/LR-02): the public projection's snapshot
-  // carries displayMode 'public' — the private-only world sections (the
-  // EODHD/Yahoo-backed boards + the US-shares view built on them) never
-  // render and their feeds are never fetched.
+  // The two world-section feeds — moved verbatim to insights-sections/
+  // world-feeds.ts (Phase 3-e). The v3 hero (2026-10-20) no longer renders
+  // the raised-signal bullets or the section indicators (the sections
+  // carry their own verdict lines — the choice is documented in
+  // VerdictMeter.tsx), so the route consumes the states + the CSV exports;
+  // the hero-alert pieces stay in the hooks' return for their owner.
   const worldFeedsEnabled = state.kind !== 'ready' || state.snapshot.displayMode !== 'public';
-  const { marketsState, marketsAlert, jumpToMarkets, downloadMarketsCsv } = useWorldMarketsSection(copy, worldFeedsEnabled);
-  const { fxState, fxAlert, jumpToFxCurrencies, downloadFxCsv } = useWorldCurrenciesSection(copy, worldFeedsEnabled);
-  const sectionIndicators = useWorldSectionIndicators(marketsState, fxState, copy, jumpToMarkets, jumpToFxCurrencies);
+  const { marketsState, downloadMarketsCsv } = useWorldMarketsSection(copy, worldFeedsEnabled);
+  const { fxState, downloadFxCsv } = useWorldCurrenciesSection(copy, worldFeedsEnabled);
 
   const togglePin = useCallback((id: IndicatorId, next: boolean): void => {
     setPinned((prev) => {
@@ -263,6 +262,16 @@ export function Insights() {
     }
   }, []);
 
+  // v3 UI-18: the moves strip's calendar fallback — an event with no
+  // mapped indicator scrolls to the "Next up" section.
+  const jumpToCalendar = useCallback(() => {
+    const el = document.getElementById('insights-coming-up');
+    if (el) {
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    }
+  }, []);
+
   const jumpToSection = useCallback((section: InsightsSection) => {
     // Round 33: BOTH dedicated sections render stacked mid-page — a jump
     // SCROLLS to the region's own heading (the old click only flipped the
@@ -343,6 +352,7 @@ export function Insights() {
         downloadMarketsCsv={downloadMarketsCsv}
         fxState={fxState}
         downloadFxCsv={downloadFxCsv}
+        onJumpAbout={jumpAbout}
       />
 
       {/* Round 33 (owner): the Global | Australia switch is GONE — it sat
@@ -364,23 +374,36 @@ export function Insights() {
             <StaleCacheNotice copy={copy} locale={locale} generatedAt={state.snapshot.generatedAt} />
           ) : null}
 
-          {/* The hero (R1–R4) — Global first, both verdicts above the fold. */}
+          {/* The hero (v3 UI-01..UI-14) — Global first, both cards above
+           * the fold, each answering how / why / what next. */}
           <div id="insights-hero" className="scroll-mt-24">
             <HeroBlock
               readings={state.snapshot.readings}
+              calendar={state.snapshot.calendar}
+              generatedAt={state.snapshot.generatedAt}
               changedThisWeek={state.snapshot.changedThisWeek}
               copy={copy}
               numberLocale={numberLocale}
+              locale={locale}
               onJumpSection={jumpToSection}
               onJumpAbout={jumpAbout}
               onFocusCard={focusCard}
-              marketsAlert={marketsAlert}
-              onJumpMarkets={jumpToMarkets}
-              fxAlert={fxAlert}
-              onJumpFx={jumpToFxCurrencies}
-              sectionIndicators={sectionIndicators}
             />
           </div>
+
+          {/* v3 UI-18/UI-19: "Moves and what is next" — directly under the
+           * hero: the biggest movers (period stated) + the next calendar
+           * events, up to five tappable items. */}
+          <MovesNextStrip
+            readings={state.snapshot.readings}
+            events={state.snapshot.calendar}
+            copy={copy}
+            locale={locale}
+            numberLocale={numberLocale}
+            onFocusCard={focusCard}
+            onJumpCalendar={jumpToCalendar}
+            eventTargets={EVENT_TARGETS}
+          />
 
           {/* P1/R19: the sticky section pills. */}
           <JumpNav targets={jumpTargets} copy={copy} onWillNavigate={onWillNavigate} />
@@ -487,8 +510,18 @@ export function Insights() {
 
           {/* R25: "About this data" — quiet and collapsible. Fix spec A-08:
            * the run status (snapshot time + time zone, failed sources, stale
-           * cards) renders from the page's own snapshot + /api/insights/status. */}
-          <AboutTheData copy={copy} expandToken={aboutToken} snapshot={state.snapshot} />
+           * cards) renders from the page's own snapshot + /api/insights/status.
+           * v3 UI-49 + M-7 (PH6-C): the per-source table (one row per
+           * provider, from the audit sidecar), the tappable stale/unavailable
+           * card list, the rule-version line and the contact line; the
+           * listed cards open via the route's focusCard. */}
+          <AboutTheData
+            copy={copy}
+            expandToken={aboutToken}
+            snapshot={state.snapshot}
+            numberLocale={numberLocale}
+            onFocusCard={focusCard}
+          />
         </div>
       ) : null}
 
