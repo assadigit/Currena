@@ -124,15 +124,22 @@ describe('markets copy parity (en/fa)', () => {
     }
   });
 
-  it('the world-indices round: the four period lenses exist, and no annual/YTD or 52-week-distance lens is offered (02-ui-spec §3.3)', () => {
+  it('round 47: the yearly lens labels exist everywhere (views, table, CSV)', () => {
     for (const copy of [insightsCopyEn, insightsCopyFa]) {
-      for (const key of ['viewDaily', 'viewWeekly', 'viewMonthly', 'viewQuarterly'] as const) {
+      for (const key of ['viewYearly', 'thYear', 'csvColYear'] as const) {
         expect(copy.markets[key].length).toBeGreaterThan(0);
       }
-      // The annual horizon does not exist in the stored contract — the UI
-      // must never offer it (no chg1y/YTD field; see briefing.ts).
-      expect('viewYear' in copy.markets).toBe(false);
-      expect('view1y' in copy.markets).toBe(false);
+    }
+  });
+
+  it('the world-indices round: the five period lenses exist, and no YTD or 52-week-distance lens is offered (02-ui-spec §3.3 as amended by round 47)', () => {
+    for (const copy of [insightsCopyEn, insightsCopyFa]) {
+      for (const key of ['viewDaily', 'viewWeekly', 'viewMonthly', 'viewQuarterly', 'viewYearly'] as const) {
+        expect(copy.markets[key].length).toBeGreaterThan(0);
+      }
+      // The yearly horizon rides the stored chg1y field (round 47) — but
+      // YTD still does not exist in the contract and must never be offered
+      // (no year-start date; see briefing.ts).
       expect('viewYtd' in copy.markets).toBe(false);
       // The 52-week-high distance is secondary context, NOT a period lens.
       expect('viewFromHigh' in copy.markets).toBe(false);

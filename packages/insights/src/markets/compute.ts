@@ -36,6 +36,8 @@ import type { MarketSeries } from './providers';
 import {
   ATTENTION_COUNT,
   BEAR_PCT,
+  CHG1Y_ANCHOR_DAYS,
+  CHG1Y_ANCHOR_TOLERANCE_DAYS,
   CHG_WINDOW_DAYS,
   CORRECTION_PCT,
   EXIT_BUFFER_PTS,
@@ -92,6 +94,28 @@ export function trendOf(points: readonly SeriesPoint[]): 'up' | 'flat' | 'down' 
   if (chg >= TREND_BAND_PCT) return 'up';
   if (chg <= -TREND_BAND_PCT) return 'down';
   return 'flat';
+}
+
+/**
+ * The yearly lens's year-ago anchor (round 47): the latest close on or
+ * before 365 days back. Both free providers cut history at ~one year, so
+ * when the series starts INSIDE the ±15-day band around that date (the
+ * repo's year-on-year convention, series.ts yoyPctSeries: 350–380 days
+ * earlier), the earliest close IS the anchor. A window that starts closer
+ * than 350 days to the last close has no honest yearly reading — undefined
+ * (the row omits chg1y, the UI shows a dash, never a guess).
+ */
+export function yearAgoAnchor(points: readonly SeriesPoint[]): SeriesPoint | undefined {
+  const last = points[points.length - 1]!;
+  const strict = pointAtOrBefore(points, addDays(last.date, -CHG1Y_ANCHOR_DAYS));
+  if (strict !== undefined) return strict;
+  // The provider's one-year window starts after the strict anchor date: the
+  // earliest close, when it falls inside the tolerance band, is the anchor.
+  const earliest = points[0]!;
+  const target = epochDay(last.date) - CHG1Y_ANCHOR_DAYS;
+  const distance = epochDay(earliest.date) - target;
+  if (distance >= -CHG1Y_ANCHOR_TOLERANCE_DAYS && distance <= CHG1Y_ANCHOR_TOLERANCE_DAYS) return earliest;
+  return undefined;
 }
 
 /**
@@ -198,6 +222,13 @@ export function buildEntry(
   const monthAgo = pointAtOrBefore(points, addDays(last.date, -30));
   const chg1m = pctChange(last.value, monthAgo?.value);
 
+  // chg1y: vs the year-ago anchor (round 47) — the latest close on/before
+  // 365 days back, or the earliest close when the provider's one-year
+  // window starts inside the ±15-day year-ago band (see yearAgoAnchor). A
+  // series whose history starts closer than 350 days to the last close
+  // omits the field (the honest dash, never a guess).
+  const chg1y = pctChange(last.value, yearAgoAnchor(points)?.value);
+
   // 52-week window: closes within the last 365 calendar days.
   const windowStart = addDays(last.date, -365);
   const window = points.filter((p) => p.date >= windowStart);
@@ -217,6 +248,7 @@ export function buildEntry(
     ...(chg1w !== null ? { chg1w: round2(chg1w) } : {}),
     ...(chg1m !== null ? { chg1m: round2(chg1m) } : {}),
     chg3m: round2(chg3m),
+    ...(chg1y !== null ? { chg1y: round2(chg1y) } : {}),
     high52w: round2(high),
     low52w: round2(low),
     fromHigh: round2(Math.min(0, ((last.value - high) / high) * 100)),

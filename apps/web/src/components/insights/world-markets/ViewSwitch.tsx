@@ -1,9 +1,10 @@
 /**
  * world-markets/ViewSwitch — the period radiogroup (02-ui-spec §3.3, the
- * 2026-10-18 world-indices handoff round): Daily | Weekly | Monthly |
- * Quarterly — ascending duration, and NOTHING else. The annual horizon
- * does not exist in the stored contract and the 52-week-high distance is
- * secondary context, not a period (see briefing.ts).
+ * 2026-10-18 world-indices handoff round, as amended by round 47): Daily |
+ * Weekly | Monthly | Quarterly | Yearly — ascending duration, and NOTHING
+ * else. The yearly lens rides the stored chg1y field (round 47); no YTD
+ * exists in the contract and the 52-week-high distance is secondary
+ * context, not a period (see briefing.ts).
  *
  * A real radiogroup, arrow keys work; the NORMAL timeframe stays the
  * quarterly window (owner round 44) — the lens the section opens on.
@@ -21,11 +22,12 @@ import type { MarketsView } from './shared';
  * tap away.
  * ------------------------------------------------------------------ */
 
-const VIEW_LABEL: Record<MarketsView, 'viewDaily' | 'viewWeekly' | 'viewMonthly' | 'viewQuarterly'> = {
+const VIEW_LABEL: Record<MarketsView, 'viewDaily' | 'viewWeekly' | 'viewMonthly' | 'viewQuarterly' | 'viewYearly'> = {
   today: 'viewDaily',
   '1w': 'viewWeekly',
   '1m': 'viewMonthly',
   '3m': 'viewQuarterly',
+  '1y': 'viewYearly',
 };
 
 /** The localized period word for a lens — labels, aria sentences and the

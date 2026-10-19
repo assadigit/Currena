@@ -62,6 +62,7 @@ function entry(
     chg1w: chg3m / 12,
     chg1m: chg3m / 3,
     chg3m,
+    chg1y: chg3m * 4,
     high52w,
     low52w,
     fromHigh,

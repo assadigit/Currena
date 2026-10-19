@@ -5,6 +5,56 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-19 (yearly lens)] — the stock indices gain a Yearly view, carried by a real chg1y in the stored contract (owner round 5)
+
+Owner round 5: "add yearly view to the stocks indexes." The world-indices
+handoff had refused to fabricate an annual lens (no field in the contract);
+this round closes that gap the honest way — a contract + pipeline change,
+never a frontend derivation.
+
+### Added
+
+- **`chg1y` on `MarketEntrySchema`** (OPTIONAL, like `chg1w`/`chg1m`) —
+  last close vs the last close on or before the same date one year
+  earlier, percent. A stored row without it is a pre-round-47 row and
+  renders an honest dash; the next markets run rewrites every row with it.
+- **The year-ago anchor rule** (`compute.ts yearAgoAnchor` + config
+  `CHG1Y_ANCHOR_DAYS`/`CHG1Y_ANCHOR_TOLERANCE_DAYS`): the strict 365-day
+  rolling anchor, and — because both free providers cut history at
+  exactly one year (verified live 2026-10-19) — when the series' first
+  close falls inside the ±15-day band around the target (350–380 days
+  back, the repo's `yoyPctSeries` year-on-year convention), that earliest
+  close IS the anchor. Closer-than-350-day windows omit the field.
+- **Yahoo `range=2y`** (was `1y`) on the fallback fetch — the yearly
+  anchor always carries real closes with margin (verified live: 1y
+  returns points from exactly one year back; 2y from two years).
+- **The Yearly lens** («سالانه») as the fifth radiogroup option after
+  Quarterly — breadth, coverage note, movers, tiles, heatmap scale and
+  aria all re-read `chg1y` through the one `viewValue` lens map; the
+  default stays the NORMAL 3-month lens (owner round 44).
+- **A "1 year" column** beside 3 months in the full table (desktop +
+  mobile row list) and a **"1 year %"** column in the world-markets CSV
+  (appended at the END — position-pinned scripts keep reading every
+  existing column at the same index) and the full export.
+- 3 new copy keys × 2 locales (`viewYearly`, `thYear`, `csvColYear`);
+  Persian copy manifest round `markets-yearly-lens-2026-10-19`.
+- 6 new test guards (1,612 total): the five-horizon lens list (YTD and
+  52w-distance still refused), the strict/one-year-window/omission anchor
+  cases, the rendered yearly surface with the honest dash + coverage
+  note, the `range=2y` URL, the export slots, and the 16-market payload
+  still under 13 KB with `chg1y` on every row.
+
+### Changed
+
+- The spec's §11.2 data-gap report is marked CLOSED by this round
+  (§11.6 documents the shipped design); §6.3/§6.4 list the five lenses
+  and the new table column.
+
+### Budgets
+
+- All held without bumps: entry untouched (295.29/88.81), Insights
+  660.88/158.00 vs 661.00/158.50.
+
 ## [2026-10-20 (australia signals)] — the Australia card closes with the same signals box as World Signals, carrying its own area data (owner round 4)
 
 Owner round 4 on the hero's closing modules: "Just like World Signals, I

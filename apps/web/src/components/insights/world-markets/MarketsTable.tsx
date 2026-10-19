@@ -1,9 +1,9 @@
 /**
  * world-markets/MarketsTable — the full table (§6.4): a real <table> with
  * <th scope> at ≥900px, a vertical row list below — the same numbers either
- * way (round 46 added the 1-week and 1-month columns beside Today, the
- * same lenses the view switch offers). Split from WorldMarkets.tsx; code
- * moved verbatim.
+ * way (round 46 added the 1-week and 1-month columns beside Today; round 47
+ * added the 1-year column beside 3 months, the same lenses the view switch
+ * offers). Split from WorldMarkets.tsx; code moved verbatim.
  */
 
 import type { MarketEntry, MarketId, MarketsSnapshot } from '@currena/core';
@@ -62,6 +62,7 @@ export function MarketsTable({
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thWeek}</th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thMonth}</th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.th3m}</th>
+              <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thYear}</th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thFromHigh}</th>
               <th scope="col" className="px-2 py-1.5 text-start font-bold text-[var(--color-text-secondary)]">{copy.markets.thTrend}</th>
               <th scope="col" className="px-2 py-1.5 text-start font-bold text-[var(--color-text-secondary)]">{copy.markets.thStatus}</th>
@@ -109,6 +110,9 @@ export function MarketsTable({
                   <bdi dir="ltr" className="font-semibold">{signedPct(m.chg3m, numberLocale, locale)}</bdi>
                 </td>
                 <td className="px-2 py-1.5 text-end tabular-nums">
+                  <bdi dir="ltr" className="font-semibold">{signedPctOrDash(m.chg1y ?? null, numberLocale, locale)}</bdi>
+                </td>
+                <td className="px-2 py-1.5 text-end tabular-nums">
                   <bdi dir="ltr" className="font-semibold">{signedPct(m.fromHigh, numberLocale, locale)}</bdi>
                 </td>
                 <td className="px-2 py-1.5 whitespace-nowrap text-[var(--color-text-secondary)]">
@@ -146,6 +150,7 @@ export function MarketsTable({
           <span>{copy.markets.thWeek}</span>
           <span>{copy.markets.thMonth}</span>
           <span>{copy.markets.th3m}</span>
+          <span>{copy.markets.thYear}</span>
           <span>{copy.markets.thFromHigh}</span>
         </span>
       </p>
@@ -183,6 +188,10 @@ export function MarketsTable({
                 <bdi dir="ltr">
                   {signedPct(m.chg3m, numberLocale, locale)}
                   <span className="sr-only"> {copy.markets.th3m}</span>
+                </bdi>
+                <bdi dir="ltr">
+                  {signedPctOrDash(m.chg1y ?? null, numberLocale, locale)}
+                  <span className="sr-only"> {copy.markets.thYear}</span>
                 </bdi>
                 <bdi dir="ltr">
                   {signedPct(m.fromHigh, numberLocale, locale)}

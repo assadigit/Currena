@@ -1701,16 +1701,17 @@ export const insightsCopyEn = {
     asOf: 'as of {date}',
     /** Regional groups, east to west (the trading day's order). */
     groups: { asia: 'Asia-Pacific', europe: 'Europe', americas: 'Americas' },
-    /** The period radiogroup (02-ui-spec §3.3, handoff round): daily,
-     * weekly, monthly, quarterly — the four horizons the stored contract
-     * actually carries. The 52-week-high distance is secondary context,
-     * not a period; an annual/YTD horizon does not exist in the data
-     * contract and must not appear here. */
+    /** The period radiogroup (02-ui-spec §3.3 as amended by round 47): daily,
+     * weekly, monthly, quarterly, yearly — the five horizons the stored
+     * contract carries (round 47 added chg1y). The 52-week-high distance is
+     * secondary context, not a period; no YTD exists in the data contract
+     * and must not appear here. */
     viewSwitchAria: 'Choose the performance period for the indices',
     viewDaily: 'Daily',
     viewWeekly: 'Weekly',
     viewMonthly: 'Monthly',
     viewQuarterly: 'Quarterly',
+    viewYearly: 'Yearly',
     /** The list / performance-map switch (02-ui-spec §3.6, desktop). */
     displaySwitchAria: 'Choose how the indices are shown',
     viewList: 'List',
@@ -1780,6 +1781,7 @@ export const insightsCopyEn = {
     thWeek: '1 week',
     thMonth: '1 month',
     th3m: '3 months',
+    thYear: '1 year',
     thFromHigh: 'From 52-week high',
     thTrend: 'Trend',
     thStatus: 'Status',
@@ -1817,6 +1819,7 @@ export const insightsCopyEn = {
     csvColToday: 'Today %',
     csvColWeek: '1 week %',
     csvColMonth: '1 month %',
+    csvColYear: '1 year %',
     csvCol3m: '3 months %',
     csvColFromHigh: 'From 52-week high %',
     csvColTrend: 'Trend',

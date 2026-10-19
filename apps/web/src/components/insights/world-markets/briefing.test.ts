@@ -8,8 +8,9 @@
  *     partial / missing data
  *   - the 52-week-high threshold count from RAW values, including the
  *     rounding boundary (−9.96% displays as −10% but is NOT counted)
- *   - period-label semantics: exactly four lenses, no annual/YTD lens,
- *     the 52-week distance not offered as a period
+ *   - period-label semantics: exactly the five lenses the stored contract
+ *     carries (round 47 added the yearly chg1y lens), no YTD lens, the
+ *     52-week distance not offered as a period
  *   - the heatmap's dynamic scale and tone buckets
  *
  * Fixture-backed only — no live site, no provider (AGENTS.md rule 7).
@@ -56,13 +57,14 @@ function rows(values: number[]): MarketEntry[] {
 }
 
 /** Rows carrying explicit per-lens values (undefined = the row predates
- * the lens — the pre-round-46 back-compat case). */
-function lensRows(lens: '1w' | '1m', values: Array<number | undefined>): MarketEntry[] {
+ * the lens — the pre-round-46/47 back-compat case). */
+function lensRows(lens: '1w' | '1m' | '1y', values: Array<number | undefined>): MarketEntry[] {
   return values.map((v, i) => {
     const fields: Partial<MarketEntry> = { id: (i === 0 ? 'sp500' : `m${i}`) as MarketEntry['id'] };
     if (v !== undefined) {
       if (lens === '1w') fields.chg1w = v;
-      else fields.chg1m = v;
+      else if (lens === '1m') fields.chg1m = v;
+      else fields.chg1y = v;
     }
     return entry(fields);
   });
@@ -73,14 +75,14 @@ function lensRows(lens: '1w' | '1m', values: Array<number | undefined>): MarketE
  * ------------------------------------------------------------------ */
 
 describe('PERIOD_VIEWS — the closed lens list', () => {
-  it('offers exactly the four horizons the contract carries, ascending', () => {
-    expect(PERIOD_VIEWS).toEqual(['today', '1w', '1m', '3m']);
+  it('offers exactly the five horizons the contract carries, ascending', () => {
+    expect(PERIOD_VIEWS).toEqual(['today', '1w', '1m', '3m', '1y']);
   });
 
-  it('offers no annual, YTD or 52-week-distance lens (the data gap is a gap)', () => {
-    // The stored contract has no chg1y/YTD field and fromHigh is a context
-    // metric — neither may pose as a period (02-ui-spec §3.3).
-    expect(PERIOD_VIEWS).not.toContain('1y');
+  it('offers no YTD or 52-week-distance lens (the data gap is a gap)', () => {
+    // Round 47 added chg1y to the stored contract, so the yearly lens is
+    // real — but there is still no YTD field and fromHigh is a context
+    // metric; neither may pose as a period (02-ui-spec §3.3).
     expect(PERIOD_VIEWS).not.toContain('ytd');
     expect(PERIOD_VIEWS).not.toContain('high');
   });
@@ -88,17 +90,19 @@ describe('PERIOD_VIEWS — the closed lens list', () => {
 
 describe('periodValueOf / viewValue — the lens read the whole section shares', () => {
   it('reads each lens from its own canonical field', () => {
-    const m = entry({ chg1d: 1.2, chg1w: -5.4, chg1m: 2.2, chg3m: 1.8 });
+    const m = entry({ chg1d: 1.2, chg1w: -5.4, chg1m: 2.2, chg3m: 1.8, chg1y: 12.6 });
     expect(periodValueOf(m, 'today')).toBe(1.2);
     expect(periodValueOf(m, '1w')).toBe(-5.4);
     expect(periodValueOf(m, '1m')).toBe(2.2);
     expect(periodValueOf(m, '3m')).toBe(1.8);
+    expect(periodValueOf(m, '1y')).toBe(12.6);
   });
 
-  it('a pre-round-46 row without chg1w/chg1m reads null — never 0, never fromHigh', () => {
-    const m = entry({ chg1w: undefined, chg1m: undefined });
+  it('a pre-lens row without chg1w/chg1m/chg1y reads null — never 0, never fromHigh', () => {
+    const m = entry({ chg1w: undefined, chg1m: undefined, chg1y: undefined });
     expect(periodValueOf(m, '1w')).toBeNull();
     expect(periodValueOf(m, '1m')).toBeNull();
+    expect(periodValueOf(m, '1y')).toBeNull();
     expect(viewValue(m, '1w').pct).toBeNull();
     // The 52-week distance must NOT leak into a period read.
     expect(periodValueOf(m, 'today')).not.toBe(m.fromHigh);
@@ -138,6 +142,19 @@ describe('marketBreadth — up/down/flat over the selected period', () => {
   it('an empty snapshot is empty, not zeros-with-denominator', () => {
     const b = marketBreadth([], '3m');
     expect(b).toEqual({ up: 0, down: 0, flat: 0, valid: 0, total: 0 });
+  });
+
+  it('round 47: the yearly lens reads chg1y — missing rows lower the denominator, movers rank only carriers', () => {
+    // 4 rows carry chg1y (1 up, 2 down, 1 flat); the 5th predates the lens.
+    const markets = lensRows('1y', [14.2, undefined, -22.5, 0.4, -9.1]);
+    expect(marketBreadth(markets, '1y')).toMatchObject({ up: 1, down: 2, flat: 1, valid: 4, total: 5 });
+    const { gainer, decliner, valid } = topMovers(markets, '1y');
+    expect(valid).toBe(4);
+    expect(gainer?.id).toBe('sp500'); // +14.2
+    expect(decliner?.id).toBe('m2'); // −22.5
+    // A yearly lens is often WIDER than the quarterly one — the heatmap
+    // scale re-reads the lens's own extrema, never chg3m's.
+    expect(heatmapScale(markets, '1y')).toBe(50);
   });
 });
 

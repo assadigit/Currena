@@ -17,14 +17,13 @@ export type MarketsLoadState =
   | { kind: 'empty' }
   | { kind: 'ready'; snapshot: MarketsSnapshot };
 
-/** The section's return-period lenses: daily, weekly, monthly and the
- * NORMAL quarterly window (02-ui-spec §3.3, the 2026-10-18 handoff
- * round). The 52-week-high distance is NOT a lens any more — it rides
- * every surface as secondary context (tile tags, mover cards, table
- * column) — and an annual lens does not exist in the stored contract
- * (no chg1y/YTD field; the weekly series is chart-rounded, so deriving
- * one would fabricate precision). See briefing.ts for the closed list. */
-export type MarketsView = 'today' | '1w' | '1m' | '3m';
+/** The section's return-period lenses: daily, weekly, monthly, the NORMAL
+ * quarterly window (02-ui-spec §3.3, the 2026-10-18 handoff round) and the
+ * yearly lens (round 47 — the stored contract now carries chg1y). The
+ * 52-week-high distance is NOT a lens — it rides every surface as secondary
+ * context (tile tags, mover cards, table column). See briefing.ts for the
+ * closed list. */
+export type MarketsView = 'today' | '1w' | '1m' | '3m' | '1y';
 
 /* ------------------------------------------------------------------ *
  * Pure display helpers
@@ -82,6 +81,9 @@ export function viewValue(m: MarketEntry, view: MarketsView): { pct: number | nu
   }
   if (view === '1m') {
     return m.chg1m === undefined ? { pct: null, arrow: 'flat' } : { pct: m.chg1m, arrow: bandedArrow(m.chg1m) };
+  }
+  if (view === '1y') {
+    return m.chg1y === undefined ? { pct: null, arrow: 'flat' } : { pct: m.chg1y, arrow: bandedArrow(m.chg1y) };
   }
   return { pct: m.chg3m, arrow: bandedArrow(m.chg3m) };
 }

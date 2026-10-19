@@ -45,19 +45,19 @@ const entry = (fields: Partial<MarketEntry>): MarketEntry => ({
 
 /**
  * A five-index snapshot with KNOWN numbers on every lens:
- *   n225   : 1d +1.4 · 1w +4.5  · 1m +2.0  · 3m +6.0  · fromHigh −2
- *   asx200 : 1d −0.6 · 1w −3.5  · 1m −1.0  · 3m −8.0  · fromHigh −11  (correction)
- *   kospi  : 1d +0.2 · 1w +0.2  · 1m  —    · 3m +0.4  · fromHigh −9.96 (displays −10%)
- *   hsi    : 1d −2.6 · 1w  —     · 1m −4.0  · 3m −12.0 · fromHigh −21  (bear)
- *   sp500  : 1d +0.8 · 1w +1.2   · 1m +0.6  · 3m +3.0  · fromHigh −0.3 (at high)
+ *   n225   : 1d +1.4 · 1w +4.5  · 1m +2.0  · 3m +6.0  · 1y +18.0  · fromHigh −2
+ *   asx200 : 1d −0.6 · 1w −3.5  · 1m −1.0  · 3m −8.0  · 1y −4.5  · fromHigh −11  (correction)
+ *   kospi  : 1d +0.2 · 1w +0.2  · 1m  —    · 3m +0.4  · 1y +11.0 · fromHigh −9.96 (displays −10%)
+ *   hsi    : 1d −2.6 · 1w  —     · 1m −4.0  · 3m −12.0 · 1y  —    · fromHigh −21  (bear)
+ *   sp500  : 1d +0.8 · 1w +1.2   · 1m +0.6  · 3m +3.0  · 1y +9.4  · fromHigh −0.3 (at high)
  */
 function snapshotFixture(): MarketsSnapshot {
   const markets: MarketEntry[] = [
-    entry({ id: 'n225', chg1d: 1.4, chg1w: 4.5, chg1m: 2.0, chg3m: 6.0, fromHigh: -2, high52w: 66000, low52w: 48000, close: 65000, rangePos: 70 }),
-    entry({ id: 'asx200', chg1d: -0.6, chg1w: -3.5, chg1m: -1.0, chg3m: -8.0, fromHigh: -11, status: 'correction', rangePos: 20 }),
-    entry({ id: 'kospi', chg1d: 0.2, chg1w: 0.2, chg3m: 0.4, fromHigh: -9.96, rangePos: 30 }),
+    entry({ id: 'n225', chg1d: 1.4, chg1w: 4.5, chg1m: 2.0, chg3m: 6.0, chg1y: 18.0, fromHigh: -2, high52w: 66000, low52w: 48000, close: 65000, rangePos: 70 }),
+    entry({ id: 'asx200', chg1d: -0.6, chg1w: -3.5, chg1m: -1.0, chg3m: -8.0, chg1y: -4.5, fromHigh: -11, status: 'correction', rangePos: 20 }),
+    entry({ id: 'kospi', chg1d: 0.2, chg1w: 0.2, chg3m: 0.4, chg1y: 11.0, fromHigh: -9.96, rangePos: 30 }),
     entry({ id: 'hsi', chg1d: -2.6, chg1m: -4.0, chg3m: -12.0, fromHigh: -21, status: 'bear', rangePos: 5 }),
-    entry({ id: 'sp500', chg1d: 0.8, chg1w: 1.2, chg1m: 0.6, chg3m: 3.0, fromHigh: -0.3, rangePos: 99 }),
+    entry({ id: 'sp500', chg1d: 0.8, chg1w: 1.2, chg1m: 0.6, chg3m: 3.0, chg1y: 9.4, fromHigh: -0.3, rangePos: 99 }),
   ];
   return {
     v: 1,
@@ -169,6 +169,26 @@ describe('the period control — one selection, every surface follows', () => {
     const tile = document.getElementById('insights-market-tile-kospi')!;
     expect(tile.textContent).toContain('—');
     expect(screen.getByText('4 of 5 indices carry this period.')).toBeTruthy();
+  });
+
+  it('round 47: the yearly lens re-reads every surface from chg1y — hsi predates it, so the dash + coverage note appear', () => {
+    render(<WorldMarkets state={{ kind: 'ready', snapshot: snapshotFixture() }} copy={insightsCopyEn} locale="en" numberLocale="en-US" />);
+    fireEvent.click(findPeriodRadio('Yearly'));
+    // Breadth over chg1y: n225 +18.0 (up), asx200 −4.5 (down), kospi +11.0
+    // (up), sp500 +9.4 (up); hsi predates the lens — excluded, so the
+    // denominator drops to 4 and the coverage note says so.
+    const summary = screen.getByText('Yearly performance').closest('div')!;
+    expect(within(summary).getByText('Indices up').nextElementSibling?.textContent).toBe('3');
+    expect(within(summary).getByText('Indices down').nextElementSibling?.textContent).toBe('1');
+    expect(within(summary).getByText('Flat').nextElementSibling?.textContent).toBe('0');
+    expect(screen.getByText('4 of 5 indices carry this period.')).toBeTruthy();
+    // The movers are the chg1y extrema: n225 (+18.0) and asx200 (−4.5).
+    expect(screen.getByText('Biggest gain').closest('article')!.textContent).toContain('Nikkei 225');
+    expect(screen.getByText('Biggest gain').closest('article')!.textContent).toContain('+18.0%');
+    expect(screen.getByText('Biggest fall').closest('article')!.textContent).toContain('ASX 200');
+    // The hsi tile shows the honest dash — absent is absent, never a zero.
+    const tile = document.getElementById('insights-market-tile-hsi')!;
+    expect(tile.textContent).toContain('—');
   });
 
   it('the movers show the honest empty state only when the lens has no valid rows', () => {
@@ -311,8 +331,8 @@ describe('the fa rendering', () => {
     expect(screen.getByText('نبض بازارهای جهان')).toBeTruthy();
     expect(screen.getByText('شاخص‌های بورسی جهان')).toBeTruthy();
     expect(screen.getByText('آخرین داده‌ها · پایان جلسهٔ معاملاتی')).toBeTruthy();
-    // The period lenses (§3.3) — the four supported horizons only.
-    for (const label of ['روزانه', 'هفتگی', 'ماهانه', 'سه‌ماهه']) {
+    // The period lenses (§3.3) — the five supported horizons only.
+    for (const label of ['روزانه', 'هفتگی', 'ماهانه', 'سه‌ماهه', 'سالانه']) {
       expect(screen.getByRole('radio', { name: label })).toBeTruthy();
     }
     // Persian digits at render time (the n225 weekly value +4.5 → ‎+۴٫۵٪).

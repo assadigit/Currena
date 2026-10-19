@@ -936,6 +936,11 @@ export type InsightsStatus = z.infer<typeof InsightsStatusSchema>;
  *   chg3m    — last close vs the last close on/before the same date three
  *              months earlier, percent (the section's NORMAL timeframe —
  *              owner round 44, spec v1.2)
+ *   chg1y    — last close vs the last close on/before the same date one year
+ *              earlier, percent (the yearly lens, round 47; when the
+ *              provider's one-year window starts inside the ±15-day year-ago
+ *              anchor band, the earliest close IS the anchor — the repo's
+ *              year-on-year rule) — OPTIONAL
  *   fromHigh — last close vs high52w, percent (always ≤ 0)
  *   rangePos — (last − low) ÷ (high − low) × 100
  *   trend    — vs the 50-day average: up > +1%, down < −1%, else flat
@@ -1017,6 +1022,18 @@ export const MarketEntrySchema = z.object({
   chg1m: z.number().finite().optional(),
   /** Last close vs ~three months earlier (the normal timeframe), percent. */
   chg3m: z.number().finite(),
+  /**
+   * Last close vs the last close on/before the same date one year earlier,
+   * percent — the yearly lens of the view switch (round 47). The anchor rule
+   * mirrors the repo's year-on-year convention (series.ts yoyPctSeries): the
+   * latest close on/before 365 days back, and when the provider's free
+   * one-year window starts INSIDE the ±15-day band around that date, the
+   * earliest close is the year-ago anchor. OPTIONAL for back-compat with
+   * stored rows written before this change, exactly like chg1w/chg1m: a row
+   * without it is a pre-lens row, never a guess — the UI shows an honest
+   * dash. The next markets run rewrites every row with it.
+   */
+  chg1y: z.number().finite().optional(),
   /** Highest daily close in the last 365 days. */
   high52w: z.number().finite().positive(),
   /** Lowest daily close in the last 365 days. */

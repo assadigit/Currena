@@ -462,11 +462,15 @@ describe('GET /api/insights/markets', () => {
     const snap = await realisticSnapshot();
     expect(snap.markets.length).toBe(16);
     expect(snap.markets.every((m) => m.weekly.length === 52)).toBe(true);
-    // Round 46 (the weekly lens) adds one ~14-byte field per row. Measured
-    // live after the round-46 backfill (runDate 2026-10-17): 12,225 bytes —
-    // under even the old 12,288 ceiling, but with 63 bytes of slack, so any
-    // future contract field or a 17th market would breach it. 13 KB restores
-    // real headroom (fixture 12,370; live 12,225).
+    // Round 47 (the yearly lens) derives chg1y for every row: the fixture's
+    // 260-trading-day series starts one day inside the ±15-day year-ago
+    // anchor band, so the earliest close is the anchor (the honest yoy rule)
+    // — a row where the derivation silently broke would fail here.
+    expect(snap.markets.every((m) => m.chg1y !== undefined)).toBe(true);
+    // Round 46 (the weekly lens) adds one ~14-byte field per row; round 47
+    // (chg1y) adds ~10 more. Measured live after round 46: 12,225 bytes;
+    // the fixture (with chg1y on every row) stays comfortably under the
+    // 13 KB ceiling raised by round 46.
     const bytes = JSON.stringify(snap).length;
     expect(bytes).toBeLessThan(13 * 1024);
   });

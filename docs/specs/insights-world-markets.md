@@ -235,7 +235,7 @@ Attention order stays: verdict, named alerts, prices, **world stock markets (new
 ### 6.3 Anatomy (top to bottom)
 1. **Header row:** title, and the "as of" date on the far side (Jalali date in Farsi).
 2. **Takeaway line:** one sentence generated from the numbers (section 8).
-3. **View switch:** one segmented control **Today | 1 week | 1 month | 3 months | From 52-week high** — ascending duration, the 52-week distance last (round 46 added the two middle lenses). Default: the NORMAL 3-month timeframe (owner round 44).
+3. **View switch:** one segmented control **Daily | Weekly | Monthly | Quarterly | Yearly** — ascending duration (round 46 added the two middle lenses; round 47 added the yearly lens, riding the stored `chg1y` field). Default: the NORMAL 3-month timeframe (owner round 44).
 4. **Strip:** three labelled groups, **Asia-Pacific (7) · Europe (3) · Americas (4)**. No group has more than 7 tiles.
    - **Tile:** short name, percentage, arrow glyph. Two lines at most.
    - **Quiet by default:** only a market in Correction or Bear market gets an extra tag, for example "−12% below 52-week high" (Persian: «۱۲٪ زیر سقف یک‌ساله»). Normal markets stay plain, so problems stand out without colour tricks.
@@ -244,7 +244,7 @@ Attention order stays: verdict, named alerts, prices, **world stock markets (new
 6. **Footer line:** source, "end-of-day", "local currency". The page footer keeps the single shared disclaimer and "Before you act" box, as already decided.
 
 ### 6.4 Full table (desktop, 900 px and wider)
-Columns: Market · Today · 1 week · 1 month · 3 months · From 52-week high · Trend · Status · Last close (round 46 added the weekly and monthly columns beside Today, the same lenses the view switch offers).
+Columns: Market · Today · 1 week · 1 month · 3 months · 1 year · From 52-week high · Trend · Status · Last close (round 46 added the weekly and monthly columns beside Today; round 47 added the yearly column beside 3 months — the same lenses the view switch offers).
 Fixed group order. One sort only: "From 52-week high" (worst first). Row click opens the same detail panel. CSV of this table goes into the existing Tools menu.
 On mobile there is no table; the disclosure shows a vertical list of rows with the same three numbers.
 
@@ -533,7 +533,8 @@ the one data gap the round surfaced. Section references below are to
   horizons the stored contract carries — Daily | Weekly | Monthly |
   Quarterly. The "From 52-week high" lens was REMOVED from the switch
   (the distance stays secondary context everywhere: tile tags, mover
-  cards, the table column). The annual horizon is NOT offered — see 11.2.
+  cards, the table column). The annual horizon was NOT offered in this
+  round — see 11.2, closed by round 47 (§11.6) with the owner's approval.
 - **Explorer (§3.5):** each tile gained the index wordmark (in the new
   standardized white frame, `object-fit: contain`, initials fallback —
   `world-markets/MarketLogo.tsx`, assets at `/assets/markets/{id}.jpg`)
@@ -551,19 +552,19 @@ the one data gap the round surfaced. Section references below are to
   decisions are recorded there; notably «سقف یک‌ساله» was kept over the
   handoff's suggested «سقف ۵۲هفته‌ای» — the repo dictionary wins).
 
-### 11.2 The data gap this round MUST report (no fabrication)
+### 11.2 The data gap this round reported (no fabrication) — CLOSED by round 47
 
 The requested horizon list in the handoff was daily / weekly / monthly /
-quarterly / annual. The stored contract (`MarketEntrySchema`) carries
+quarterly / annual. The stored contract (`MarketEntrySchema`) carried
 `chg1d`, `chg1w` (optional), `chg1m` (optional), `chg3m` — and NO annual
 value: no `chg1y`, no YTD field, no year-start date, and the weekly
 series is chart-rounded integer closes, so deriving an annual return in
 the frontend would fabricate precision. Per the handoff's own data-truth
-rules, the annual horizon is simply not offered, and this gap is the
-change that would need owner approval to close: add `chg1y` (or YTD) to
-`packages/insights/src/markets/compute.ts` + `packages/core/src/schemas.ts`
-+ a markets-worker rewrite of the stored object (a contract change on the
-provider side of the boundary — NOT done in this round).
+rules, the annual horizon was simply not offered in that round. **The
+gap is now closed the honest way (round 47, §11.6): `chg1y` was added to
+the stored contract and computed by the markets job from the provider's
+real year-ago close — never derived in the frontend.** No YTD field
+exists (there is no year-start date in the contract); it stays unoffered.
 
 ### 11.3 Explicitly NOT changed
 
@@ -612,3 +613,60 @@ the handoff's 24–32px row guidance for the wordmark size. Every rendered
 - Regression guards: `briefing.test.tsx` asserts every rendered logo box
   ≥96px on both breakpoints (parsing `--icon-size`/`--icon-size-sm` from
   the style attribute) and the detail panel's wordmark ≥96px.
+
+### 11.6 Round 2026-10-19: the yearly lens (owner round 5 — "add yearly view
+ to the stocks indexes")
+
+The owner asked for a yearly view on the stock indices. The honest path
+(having refused to fabricate one in §11.2) was a contract + pipeline
+change, and that is what shipped:
+
+- **Contract:** `chg1y` (OPTIONAL, like `chg1w`/`chg1m`) on
+  `MarketEntrySchema` — last close vs the last close on or before the
+  same date one year earlier, percent, rounded to 2 decimals like every
+  lens. A stored row without it is a pre-round-47 row and renders an
+  honest dash (—), never a guess; the next markets run rewrites every
+  row with it. No YTD field exists or is offered (no year-start date in
+  the contract).
+- **The anchor rule (both free providers cut history at ~one year):**
+  the strict target — a close on/before 365 days back — often lands one
+  or two days BEFORE the provider's one-year window starts (verified
+  live 2026-10-19: EODHD free and Yahoo range=1y both start exactly at
+  the year-ago date). When the series' own first close falls inside the
+  ±15-day band around the target (350–380 days back — the repo's
+  year-on-year convention, `series.ts yoyPctSeries`), that earliest
+  close IS the year-ago anchor. A window starting closer than 350 days
+  to the last close omits `chg1y` (the honest dash). Config:
+  `CHG1Y_ANCHOR_DAYS = 365`, `CHG1Y_ANCHOR_TOLERANCE_DAYS = 15` in the
+  markets definitions block.
+- **Providers:** Yahoo is now asked `range=2y` (was `1y`) so the yearly
+  anchor always carries real closes with margin on the fallback path
+  (verified live: range=1y → 251 points from exactly one year back;
+  range=2y → 501 points from two years back). EODHD keeps its ~400-day
+  ask; the free plan's one-year cut is absorbed by the tolerance band.
+- **Surfaces:** the radiogroup's fifth lens **Yearly** («سالانه»)
+  appended after Quarterly (the default stays the NORMAL 3-month lens,
+  owner round 44); every view-driven surface follows automatically
+  (breadth counts + coverage note, movers, tiles, heatmap scale, aria)
+  because they all read the one `viewValue` lens map. The full table
+  gained a **1 year** column beside 3 months (desktop + the mobile row
+  list); the world-markets CSV and the full export gained a **1 year %**
+  column (appended at the END on the machine-surface CSV per the round-46
+  position-pinning convention; duration-ordered on the human table).
+- **Copy:** 3 new keys × 2 locales (`viewYearly`, `thYear`, `csvColYear`),
+  manifest round `markets-yearly-lens-2026-10-19` — the Persian extends
+  the reviewed lens families (روزانه/هفتگی/ماهانه/سه‌ماهه → سالانه؛
+  «بازده یک سال»; the csvCol (درصد) family).
+- **Tests:** the lens-list guards now pin the five horizons and keep
+  refusing YTD/52w-distance lenses; new guards for `yearAgoAnchor`
+  (strict anchor, the one-year-window fallback, the <350-day omission),
+  the yearly breadth/movers/tile read, the honest dash + coverage note,
+  the Yahoo `range=2y` URL, the export column slots, and the 16-market
+  route payload still under the 13 KB budget with `chg1y` on every row.
+- **Budgets:** all held — entry untouched (295.29/88.81), Insights
+  660.88/158.00 vs 661.00/158.50 (no bump needed).
+- **Backfill:** existing stored rows lack `chg1y` until each market's
+  next close (the R5 same-date stability rule holds the old row
+  verbatim) — the yearly lens shows dashes + the coverage note for at
+  most a trading day or two per market, then the cron fills it. This is
+  the same honest-roll-in behavior round 46's weekly lens used.

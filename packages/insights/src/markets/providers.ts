@@ -203,7 +203,12 @@ export interface YahooFetchOptions {
   timeoutMs?: number;
 }
 
-/** Yahoo chart endpoint — keyless fallback; a browser-like UA avoids 429s. */
+/** Yahoo chart endpoint — keyless fallback; a browser-like UA avoids 429s.
+ * range=2y (round 47): the yearly lens's 350–380-day anchor band needs real
+ * closes BEYOND the strict 365-day mark, which Yahoo's range=1y starts
+ * exactly at — the two-year ask guarantees the anchor with margin (verified
+ * live 2026-10-19: range=1y → 251 points from 2025-10-17, range=2y → 501
+ * points from 2024-10-17). */
 export async function fetchYahooSeries(
   marketId: MarketId,
   opts: YahooFetchOptions = {},
@@ -211,7 +216,7 @@ export async function fetchYahooSeries(
   const def = marketDefinition(marketId);
   const url =
     `${opts.baseUrl ?? YAHOO_BASE_URL}/${encodeURIComponent(def.yahooSymbol)}` +
-    `?range=1y&interval=1d`;
+    `?range=2y&interval=1d`;
   const fetchImpl = opts.fetchImpl ?? ((input: RequestInfo | URL, init?: RequestInit) => fetch(input, init));
   let response: Response;
   try {

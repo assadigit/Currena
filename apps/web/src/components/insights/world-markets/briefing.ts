@@ -6,14 +6,14 @@
  * helpers so they can never drift apart on what "the selected period"
  * means.
  *
- * DATA TRUTH (handoff §"Data truth and scope boundaries"):
- *  - The stored contract (MarketEntrySchema) carries exactly four return
- *    horizons: chg1d, chg1w (optional), chg1m (optional), chg3m. There is
- *    NO annual field — no chg1y, no YTD, no year-start date — and the
- *    weekly series is chart-rounded, so an annual return must never be
- *    derived in the frontend. PERIOD_VIEWS is therefore closed at four.
+ * DATA TRUTH (handoff §"Data truth and scope boundaries", as amended by
+ * round 47): the stored contract (MarketEntrySchema) carries FIVE return
+ * horizons — chg1d, chg1w (optional), chg1m (optional), chg3m and chg1y
+ * (optional, round 47). There is still NO YTD and no year-start date, and
+ * the weekly series is chart-rounded, so no other horizon may ever be
+ * derived in the frontend. PERIOD_VIEWS is therefore closed at five.
  *  - The 52-week-high distance (fromHigh) is a separate context metric,
- *    never a fifth period (02-ui-spec §3.3).
+ *    never a sixth period (02-ui-spec §3.3).
  *  - Every count and ranking reads RAW stored values, never rounded
  *    display strings: a −9.96% distance displays as −10% but is NOT
  *    "at least 10% below" (§3.2's rounding-boundary rule).
@@ -28,11 +28,14 @@ import { bandedArrow, viewValue, type MarketsView } from './shared';
  * ------------------------------------------------------------------ */
 
 /**
- * The section's return-period lenses (02-ui-spec §3.3), in ascending
- * duration. Deliberately closed: adding a horizon here without the
- * matching stored field would fabricate data (see the module header).
+ * The section's return-period lenses (02-ui-spec §3.3 as amended by round
+ * 47), in ascending duration. Deliberately closed: adding a horizon here
+ * without the matching stored field would fabricate data (see the module
+ * header) — the yearly lens exists because round 47 added chg1y to the
+ * stored contract, computed by the markets job from the provider's real
+ * year-ago close.
  */
-export const PERIOD_VIEWS: readonly MarketsView[] = ['today', '1w', '1m', '3m'];
+export const PERIOD_VIEWS: readonly MarketsView[] = ['today', '1w', '1m', '3m', '1y'];
 
 /** The raw selected-period return of one row, or null when the row does
  * not carry that lens yet (a pre-round-46 stored row without chg1w/chg1m)
