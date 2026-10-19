@@ -83,6 +83,61 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## CURRENT DEPLOYMENT — the Australia card closes with the same signals box as World Signals, carrying its own area data (2026-10-20 (australia signals) owner round 4, worker b1067b0a)
+
+Owner round 4 — "Just like World Signals, I want the same Box with proper
+data for Australia" — is LIVE on `/#/insights`: the Australia card now
+closes with the SAME emphasized signals box construction as World
+Signals (always open, never behind the toggle; 15px bold heading +
+bullets; state mark 18/20; the region's own pale tint + step ink;
+`ei-panel-accent`), its proper data being its OWN areas — one bullet per
+Australian gauge, worst first: the raised areas (step 2+) carry their
+n-of-m counts and state word in their OWN step ink ("Inflation & rates ·
+Stressed: 3 of 5 indicators need attention.") and jump to the Australia
+section; the calm ones sit in the quiet rows' muted ink ("Trade &
+currency · Stable"), the unreadable ones in the honest no-reading
+neutral — never buttons. The round-3 rule toggle survives as the shared
+FALLBACK when a region has nothing to raise (no feeds on Global / no
+readable gauge on Australia); the word-choice rule stays reachable
+through the "?" tip on both cards. Two new copy keys en+fa
+(`australiaSignalsTitle`, `australiaSignalArea` — manifest round
+`australia-signals-2026-10-20`); panel guards 3 → 6 in
+`hero-editorial.test.tsx` (20 total; 1,606 workspace tests). Evidence +
+11 screenshots:
+`docs/insights/economic-indicators-au-signals-verification.md`.
+
+- **Active worker**: currena-api **`b1067b0a-9b74-45f7-a52e-d555dbac21ad`**
+  (SITE_MODE=public, RATES KV + ASSETS bindings, the `* * * * *` keep-warm
+  cron unchanged; currena-markets untouched — UI-only round).
+- **What it carries**: everything from 0230f09b (the panels round) + the
+  australia-signals round (feature commit `a073c18`, fast-forward merged to
+  main, + the docs-only delivery-state record `2880573`; CI green on
+  a073c18 — typecheck, lint, 1,606 tests, build, bundle budgets after the
+  documented 661.00/158.50 Insights bump (D-39), copy audit).
+- **Live-verified** (currena.ir, fresh profile, SW cleared): EN desktop
+  1600 — served chunks exactly the `a073c18` build (`index-DV6LyMkN.js`,
+  `Insights-DcNs64O3.js`), TWO signals panels live: World signals (the
+  production markets bullet) + "Australia signals" carrying the real
+  production data ("Inflation & rates · Stressed: 3 of 5…", "Households ·
+  Stressed: 3 of 6…", "Trade & currency · Stable"), no rule toggle on
+  either card; heading + raised bullets measured 15px/700
+  `rgb(255,131,43)` on the `oklab(… / 0.06)` pale amber; a real click on
+  a raised AU bullet scrolled 0 → 7321px with the Australia section in
+  the viewport; EN mobile 390 — carousel opens on Global at the origin
+  (card 16..374, dots `true,false`, cue "Swipe to view Australia"), real
+  Next → Australia at x:16, dots flip; fa RTL desktop — «سیگنال‌های
+  استرالیا» with «تورم و نرخ بهره · پرتنش: ۳ شاخص از ۵ شاخص نیازمند
+  توجه‌اند.» (fa digits), the 3px accent on the RIGHT edge; fa mobile
+  390 — opens on جهانی («برای دیدن استرالیا بکشید»), real «بعدی» →
+  Australia at x:16; zero horizontal overflow everywhere; zero
+  page/console errors on every capture.
+- **Rollback**: `wrangler rollback` (previous version 0230f09b), or
+  redeploy any prior main commit — the Worker carries the SPA build
+  from `apps/web/dist` at deploy time.
+
+The previous deployment record (the panels round, worker 0230f09b)
+follows below.
+
 ## CURRENT DEPLOYMENT — the rule panel tucks behind a low-key toggle; the world-signals panel becomes the hero's emphasized closing module (2026-10-19 (panels) owner round 3, worker 0230f09b)
 
 The owner's two directives on the closing explanation panels are LIVE on

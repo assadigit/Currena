@@ -89,28 +89,42 @@ The panel guards in `hero-editorial.test.tsx` grow 3 → 6 (20 total;
 `fa-mobile-global-first.png`, `fa-mobile-au-signals.png`,
 `en-mobile-au-signals.png`.
 
-## Delivery state
+## Delivery state — DEPLOYED
 
-Merged to `main` @ **a073c18** (fast-forward from 84ff783); CI on main:
-**completed / success** (typecheck, lint, 1,606 tests, build, budgets
-661.00/158.50 after D-39, copy audit). Feature branch
+Merged to `main` (feature commit **a073c18** fast-forwarded from 84ff783,
++ the docs-only delivery-state record 2880573); CI on main: **completed /
+success** (typecheck, lint, 1,606 tests, build, budgets 661.00/158.50
+after D-39, copy audit). Feature branch
 `feature/economic-indicators-au-signals` @ a073c18.
 
-**Production deploy PENDING**: the Cloudflare tokens
-(`CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`) are owner-provided
-per round and env-only by policy — they were not present in this
-session's environment, and `wrangler whoami` confirms no cached auth.
-The live worker still serves the panels round (0230f09b, main @ 84ff783).
-To ship this round, run per `docs/DEPLOY.md`:
+Deployed through the established pipeline per `docs/DEPLOY.md`
+(`pnpm --filter @currena/web build` + `wrangler deploy` with the
+owner-provided Cloudflare token/account) → worker currena-api version
+**`b1067b0a-9b74-45f7-a52e-d555dbac21ad`** (currena.ir + workers.dev).
 
-```sh
-pnpm --filter @currena/web build
-CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… \
-  pnpm --filter @currena/api exec wrangler deploy
-```
+## Production results (currena.ir, fresh profile, SW cleared)
 
-Then verify on currena.ir/#/insights: the Australia card closes with
-«Australia signals» carrying the per-area bullets (raised areas with
-counts in their own step ink, calm/unreadable in the quiet ink), no
-rule toggle on a readable Australia.
+- **EN desktop 1600**: served chunks exactly the `a073c18` build
+  (`index-DV6LyMkN.js`, `Insights-DcNs64O3.js`); TWO signals panels —
+  World signals (the production markets bullet) + **Australia signals**
+  carrying the real production data ("Inflation & rates · Stressed: 3 of
+  5 indicators need attention.", "Households · Stressed: 3 of 6…",
+  "Trade & currency · Stable"), no rule toggle on either card; heading +
+  raised bullets measured **15px/700 `rgb(255,131,43)`** on the
+  `oklab(… / 0.06)` pale amber; a real click on a raised AU bullet
+  scrolled 0 → 7321px with the Australia section in the viewport; zero
+  overflow.
+- **EN mobile 390**: carousel opens on Global at the origin (card
+  16..374, dots `true,false`, cue "Swipe to view Australia"); real Next
+  → Australia at x:16, dots flip; zero overflow.
+- **fa RTL desktop 1600**: «سیگنال‌های استرالیا» with «تورم و نرخ بهره ·
+  پرتنش: ۳ شاخص از ۵ شاخص نیازمند توجه‌اند.» (fa digits), the 3px
+  accent on the RIGHT edge; zero overflow.
+- **fa mobile 390**: opens on جهانی («برای دیدن استرالیا بکشید»); real
+  «بعدی» → Australia at x:16 with «سیگنال‌های استرالیا»; zero overflow.
+- **Zero page/console errors on every capture.** Production
+  screenshots: `prod-en-mobile-global-first.png`, `prod-en-mobile-au.png`,
+  `prod-fa-desktop.png`, `prod-fa-mobile-au.png` (same folder).
+- The deployment is recorded in `docs/DEPLOY.md` (CURRENT DEPLOYMENT —
+  worker b1067b0a, rollback = `wrangler rollback` to 0230f09b).
 
