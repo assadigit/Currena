@@ -5,6 +5,52 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-20 (australia signals)] — the Australia card closes with the same signals box as World Signals, carrying its own area data (owner round 4)
+
+Owner round 4 on the hero's closing modules: "Just like World Signals, I
+want the same Box with proper data for Australia." The world-section
+signals stay Global-scope — Australia's proper data is its OWN areas, so
+its signals box raises the gauges themselves.
+
+### Added
+
+- **The Australia signals box** («سیگنال‌های استرالیا») — the SAME
+  construction as the Global world-signals panel (always open, never
+  behind the toggle; 15px bold heading + bullets; the state mark 18/20;
+  the region's own pale tint + step ink on the heading), with one bullet
+  per Australian gauge, worst first:
+  - the raised areas (step 2+) speak their counts and state word in
+    their OWN step ink — "{area} · {word}: {warnings} of {voting}
+    indicators need attention." (the markets bullet's shape) — and jump
+    to the Australia section where their lanes live;
+  - the calm areas (step 1) sit in the quiet rows' muted ink as
+    "{area} · Stable", and the unreadable ones (step 0) honestly as
+    "{area} · not enough data to read" — never buttons.
+  New hooks scoped to the new content: `data-ei-area-bullets`,
+  `data-ei-area-signal="raised|calm|no-reading"`, `data-ei-area-step`.
+- Two new copy keys, en + fa (`australiaSignalsTitle`,
+  `australiaSignalArea` — Persian copy manifest round
+  `australia-signals-2026-10-20`); the quiet rows compose existing keys
+  only.
+
+### Changed
+
+- **The round-3 rule toggle becomes the shared FALLBACK** — a region
+  with nothing to raise keeps the low-key rule toggle (no feeds on
+  Global / no readable gauge on Australia). On a readable Australia the
+  signals box replaces it; the word-choice rule is always reachable
+  through the "?" tip beside the gauges heading on both cards.
+
+### Budgets
+
+Insights lazy chunk 659.00/158.00 → **661.00/158.50** (measured
+660.14/157.86; the entry chunk untouched at 295.29/88.81 vs 296/89.5) —
+the AU panel branch + the area bullets + the two new strings; gz
++0.37 kB. D-39 in `docs/DECISIONS_FOR_ALI.md`. The panel guards in
+`apps/web/src/components/insights/hero-editorial.test.tsx` grow 3 → 6
+(the AU box structure + jump + counts, the no-readable-gauge fallback,
+fa area bullets with fa digits); 20 guards total.
+
 ## [2026-10-19 (panels)] — the rule panel tucks behind a low-key toggle; the world-signals panel becomes the hero's emphasized closing module (owner round 3)
 
 The owner reviewed the fidelity-round hero and returned two directives on

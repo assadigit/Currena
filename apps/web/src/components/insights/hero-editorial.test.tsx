@@ -363,37 +363,106 @@ describe('fidelity round §7 — the category summary rows', () => {
   });
 });
 
-describe('fidelity round §7 — the contextual explanation panel (owner round 3: rule behind a low-key toggle, signals emphasized)', () => {
+describe('fidelity round §7 — the closing panels (round 3: rule behind a low-key toggle; round 4: both cards close with the signals box)', () => {
   afterEach(cleanup);
 
-  it('without feeds the word-choice rule hides behind a low-key toggle that reveals the real panel', () => {
+  it('without feeds GLOBAL keeps the word-choice rule behind the low-key toggle that reveals the real panel', () => {
     renderHero(insightsCopyEn, 'en-US');
     const cards = regionCards();
     expect(cards).toHaveLength(2);
-    for (const card of cards) {
-      // collapsed by default: the quiet pill carries the panel label, and
-      // no panel exists in the DOM yet
-      const toggle = card.querySelector('[data-ei-rule-toggle]') as HTMLElement | null;
-      expect(toggle).not.toBeNull();
-      expect(toggle!.getAttribute('aria-expanded')).toBe('false');
-      expect(toggle!.getAttribute('aria-controls')).toMatch(/^ei-rule-panel-(global|australia)$/);
-      expect(toggle!.textContent).toContain(insightsCopyEn.ui.verdictRuleLabel);
-      expect(card.querySelector('[data-ei-panel]')).toBeNull();
-      // the click reveals the real rule panel — the same hooks, same copy
-      fireEvent.click(toggle!);
-      expect(toggle!.getAttribute('aria-expanded')).toBe('true');
-      const panel = card.querySelector('[data-ei-panel]') as HTMLElement | null;
-      expect(panel).not.toBeNull();
-      expect(panel!.id).toBe(toggle!.getAttribute('aria-controls'));
-      expect(panel!.getAttribute('data-ei-panel-kind')).toBe('rule');
-      const heading = panel!.querySelector('[data-ei-panel-heading]');
-      expect(heading!.textContent).toContain(insightsCopyEn.ui.verdictRuleLabel);
-      const rule = panel!.querySelector('[data-ei-panel-rule]');
-      expect(rule!.textContent).toBe(insightsCopyEn.ui.verdictRule);
-    }
+    const card = cards[0]!;
+    // collapsed by default: the quiet pill carries the panel label, and
+    // no panel exists in the DOM yet
+    const toggle = card.querySelector('[data-ei-rule-toggle]') as HTMLElement | null;
+    expect(toggle).not.toBeNull();
+    expect(toggle!.getAttribute('aria-expanded')).toBe('false');
+    expect(toggle!.getAttribute('aria-controls')).toMatch(/^ei-rule-panel-(global|australia)$/);
+    expect(toggle!.textContent).toContain(insightsCopyEn.ui.verdictRuleLabel);
+    expect(card.querySelector('[data-ei-panel]')).toBeNull();
+    // the click reveals the real rule panel — the same hooks, same copy
+    fireEvent.click(toggle!);
+    expect(toggle!.getAttribute('aria-expanded')).toBe('true');
+    const panel = card.querySelector('[data-ei-panel]') as HTMLElement | null;
+    expect(panel).not.toBeNull();
+    expect(panel!.id).toBe(toggle!.getAttribute('aria-controls'));
+    expect(panel!.getAttribute('data-ei-panel-kind')).toBe('rule');
+    const heading = panel!.querySelector('[data-ei-panel-heading]');
+    expect(heading!.textContent).toContain(insightsCopyEn.ui.verdictRuleLabel);
+    const rule = panel!.querySelector('[data-ei-panel-rule]');
+    expect(rule!.textContent).toBe(insightsCopyEn.ui.verdictRule);
   });
 
-  it('Global with raised signals carries the signals panel OPEN (never toggled); Australia keeps the toggled rule', () => {
+  it('round 4: AUSTRALIA closes with the SAME signals box — one bullet per area, worst first, raised ones with counts that jump to the section', () => {
+    const onJumpSection = vi.fn();
+    render(
+      <HeroBlock
+        readings={READINGS}
+        changedThisWeek={[]}
+        copy={insightsCopyEn}
+        numberLocale="en-US"
+        onJumpSection={onJumpSection}
+        onJumpAbout={noop}
+        onFocusCard={noop}
+      />,
+    );
+    const au = regionCards()[1]!;
+    // the signals box replaced the rule toggle on a readable Australia
+    expect(au.querySelector('[data-ei-rule-toggle]')).toBeNull();
+    const panel = au.querySelector('[data-ei-panel]') as HTMLElement | null;
+    expect(panel).not.toBeNull();
+    expect(panel!.getAttribute('data-ei-panel-kind')).toBe('signals');
+    expect(panel!.querySelector('[data-ei-panel-heading]')!.textContent).toContain(
+      insightsCopyEn.ui.australiaSignalsTitle,
+    );
+    // one bullet per gauge, worst first (the fixture: inflation step 4
+    // with 3 of 3 in warning, households step 3 with 2 of 3, trade step 0)
+    const rows = Array.from(panel!.querySelectorAll('[data-ei-area-step]')) as HTMLElement[];
+    expect(rows.map((r) => r.getAttribute('data-ei-area-step'))).toEqual(['4', '3', '0']);
+    const raised = rows.filter((r) => r.tagName === 'BUTTON');
+    expect(raised).toHaveLength(2);
+    expect(raised[0]!.getAttribute('data-ei-area-signal')).toBe('raised');
+    expect(raised[0]!.textContent).toContain(insightsCopyEn.groupShort['au-inflation-rates']);
+    expect(raised[0]!.textContent).toContain(insightsCopyEn.label.alarmed);
+    expect(raised[0]!.textContent).toContain('3 of 3');
+    expect(raised[1]!.textContent).toContain(insightsCopyEn.groupShort['au-households']);
+    expect(raised[1]!.textContent).toContain(insightsCopyEn.label.stressed);
+    expect(raised[1]!.textContent).toContain('2 of 3');
+    // clicking a raised bullet jumps to the Australia section (the
+    // areas' lanes live there)
+    fireEvent.click(raised[0]!);
+    expect(onJumpSection).toHaveBeenCalledWith('australia');
+    // the unreadable area sits in the quiet ink, never a button
+    const quiet = rows.filter((r) => r.tagName === 'SPAN');
+    expect(quiet).toHaveLength(1);
+    expect(quiet[0]!.getAttribute('data-ei-area-signal')).toBe('no-reading');
+    expect(quiet[0]!.textContent).toContain(insightsCopyEn.groupShort['au-trade-currency']);
+    expect(quiet[0]!.textContent).toContain(insightsCopyEn.ui.gaugeNoReading);
+  });
+
+  it('round 4: AUSTRALIA with NO readable gauge falls back to the rule toggle', () => {
+    const globalOnly = READINGS.filter((r) => !r.id.startsWith('au-'));
+    render(
+      <HeroBlock
+        readings={globalOnly}
+        changedThisWeek={[]}
+        copy={insightsCopyEn}
+        numberLocale="en-US"
+        onJumpSection={noop}
+        onJumpAbout={noop}
+        onFocusCard={noop}
+      />,
+    );
+    const au = regionCards()[1]!;
+    expect(au.querySelector('[data-ei-panel]')).toBeNull();
+    const toggle = au.querySelector('[data-ei-rule-toggle]') as HTMLElement | null;
+    expect(toggle).not.toBeNull();
+    expect(toggle!.getAttribute('aria-controls')).toBe('ei-rule-panel-australia');
+    fireEvent.click(toggle!);
+    const panel = au.querySelector('[data-ei-panel]') as HTMLElement | null;
+    expect(panel!.getAttribute('data-ei-panel-kind')).toBe('rule');
+  });
+
+  it('Global with raised signals carries the signals panel OPEN (never toggled); Australia carries its own signals box beside it', () => {
     render(
       <HeroBlock
         readings={READINGS}
@@ -421,24 +490,41 @@ describe('fidelity round §7 — the contextual explanation panel (owner round 3
     expect(globalPanel!.querySelector('[data-attention-bullets]')).not.toBeNull();
     // the raised market signal bullet rides with its numbers
     expect(globalPanel!.textContent).toContain('4');
-    // Australia: the rule stays behind its toggle (the world signals are
-    // Global-scope) — collapsed first, the real panel after the click
-    expect(cards[1]!.querySelector('[data-ei-panel]')).toBeNull();
-    const auToggle = cards[1]!.querySelector('[data-ei-rule-toggle]') as HTMLElement | null;
-    expect(auToggle).not.toBeNull();
-    fireEvent.click(auToggle!);
+    // Australia: the SAME box with its OWN scope (the world signals stay
+    // Global-scope) — the areas, not the rule toggle
+    expect(cards[1]!.querySelector('[data-ei-rule-toggle]')).toBeNull();
     const auPanel = cards[1]!.querySelector('[data-ei-panel]') as HTMLElement | null;
-    expect(auPanel!.getAttribute('data-ei-panel-kind')).toBe('rule');
+    expect(auPanel!.getAttribute('data-ei-panel-kind')).toBe('signals');
+    expect(auPanel!.querySelector('[data-ei-panel-heading]')!.textContent).toContain(
+      insightsCopyEn.ui.australiaSignalsTitle,
+    );
+    expect(auPanel!.querySelectorAll('[data-ei-area-step]')).toHaveLength(3);
   });
 
-  it('fa: the toggled rule panel speaks Persian', () => {
+  it('fa: the Australia signals box speaks Persian (heading, state words, fa digits)', () => {
     renderHero(insightsCopyFa, 'fa-IR');
-    const card = regionCards()[1]!;
-    const toggle = card.querySelector('[data-ei-rule-toggle]') as HTMLElement | null;
+    const au = regionCards()[1]!;
+    const panel = au.querySelector('[data-ei-panel]') as HTMLElement | null;
+    expect(panel!.getAttribute('data-ei-panel-kind')).toBe('signals');
+    const heading = panel!.querySelector('[data-ei-panel-heading]')!;
+    expect(heading.textContent).toContain(insightsCopyFa.ui.australiaSignalsTitle);
+    const raised = Array.from(panel!.querySelectorAll('button[data-ei-area-step]')) as HTMLElement[];
+    expect(raised).toHaveLength(2);
+    expect(raised[0]!.textContent).toContain(insightsCopyFa.groupShort['au-inflation-rates']);
+    expect(raised[0]!.textContent).toContain(insightsCopyFa.label.alarmed);
+    // R22: fa renders ۳, not 3 — the counts go through num()
+    expect(raised[0]!.textContent).toContain('۳');
+    expect(raised[0]!.textContent).not.toContain('3 of 3');
+  });
+
+  it('fa: the rule fallback (Global without feeds) still speaks Persian', () => {
+    renderHero(insightsCopyFa, 'fa-IR');
+    const global = regionCards()[0]!;
+    const toggle = global.querySelector('[data-ei-rule-toggle]') as HTMLElement | null;
     expect(toggle).not.toBeNull();
     expect(toggle!.textContent).toContain(insightsCopyFa.ui.verdictRuleLabel);
     fireEvent.click(toggle!);
-    const panel = card.querySelector('[data-ei-panel]') as HTMLElement | null;
+    const panel = global.querySelector('[data-ei-panel]') as HTMLElement | null;
     expect(panel!.querySelector('[data-ei-panel-rule]')!.textContent).toBe(insightsCopyFa.ui.verdictRule);
     expect(panel!.querySelector('[data-ei-panel-heading]')!.textContent).toContain(
       insightsCopyFa.ui.verdictRuleLabel,

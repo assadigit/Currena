@@ -99,6 +99,16 @@
  * important parts of the whole hero" (owner): its type steps UP from the
  * caption tier to 15px bold (heading and every bullet), the state mark
  * grows, the rhythm gets roomier. Hooks, tint and copy unchanged.
+ *
+ * Owner round 4 (2026-10-20): "just like World Signals, the same box with
+ * proper data for Australia" — the Australia card closes with the SAME
+ * emphasized signals box. The world-section signals stay Global-scope;
+ * Australia's proper data is its OWN areas: one bullet per gauge, worst
+ * first (the raised areas carry their n-of-m counts + state word in their
+ * own step ink and jump to the section; calm/unreadable areas sit in the
+ * quiet ink). The rule toggle survives as the shared FALLBACK when a
+ * region has nothing to raise (no feeds on Global / no readable gauge on
+ * Australia) — the rule is always reachable through the "?" tip too.
  */
 
 import { useState } from 'react';
@@ -275,8 +285,9 @@ export function VerdictBlock({
   // space reads as padding, round 43).
   const tiles = attentionTiles(readings, section);
   // The Global card carries the raised world-section bullets (markets/fx/
-  // section indicators); Australia never grows an alert box — the signals
-  // are Global-scope. Kept for the alert-box render below.
+  // section indicators — Global-scope; Australia's round-4 signals box
+  // raises its OWN areas from the gauge rows instead). Kept for the Global
+  // signals-panel render below.
   const hasBullets =
     marketsAlert !== undefined ||
     fxAlert !== undefined ||
@@ -650,14 +661,27 @@ export function VerdictBlock({
        * steps UP in type (15px bold heading + bullets, larger state mark,
        * roomier rhythm) while keeping its restrained pale surface +
        * region-step ink. It is always open — never tucked behind the
-       * toggle. When no feed has loaded, Global falls back to the
-       * word-choice rule (behind the toggle, like Australia).
-       * AUSTRALIA never grows the world signals (they are Global-scope);
-       * its rule explanation is REFERENCE material — it hides behind a
+       * toggle.
+       * The RULE explanation is REFERENCE material — it hides behind a
        * LOW-KEY TOGGLE: collapsed, one quiet muted pill (the "+n more"
        * disclosure language) carries the panel label; expanded, the
        * familiar tinted panel appears under it with its hooks and copy
        * byte-identical to the fidelity round's.
+       *
+       * Owner round 4 (2026-10-20): BOTH cards close with the SAME
+       * emphasized signals box — "just like World Signals, the same box
+       * with proper data for Australia" (owner). The world-section
+       * signals stay Global-scope; AUSTRALIA's proper data is its OWN
+       * areas: one bullet per gauge, worst first — the raised areas
+       * (step 2+) carry their n-of-m counts and state word in their OWN
+       * step ink (the markets bullet's shape) and jump to the section
+       * where their lanes live, while the calm ones sit in the quiet
+       * normal ink and the unreadable ones in the honest no-reading
+       * neutral (the section-indicator rows' shape). A region with
+       * nothing to raise keeps the round-3 fallback — no feeds on
+       * Global / no readable gauge on Australia → the word-choice rule
+       * behind its low-key toggle (the rule is always reachable through
+       * the "?" tip beside the gauges heading as well).
        *
        * The tint follows the REGION'S OWN step ink (spec §4: "the exact
        * existing product taxonomy controls which token is applied") —
@@ -669,7 +693,12 @@ export function VerdictBlock({
        * bold severity ink is the affordance). */}
       {gaugeRows.length > 0 ? (
         (() => {
-          const signals = section === 'global' && hasBullets;
+          /* Owner round 4: EITHER card closes with the signals box when it
+           * has signals to raise — Global's are the raised world-section
+           * bullets (hasBullets); Australia's are its OWN readable gauges
+           * (a region whose every gauge sits at step 0 has no signal —
+           * the honest fallback is the round-3 rule toggle). */
+          const signals = section === 'global' ? hasBullets : gaugeRows.some((g) => g.step >= 1);
           const tint =
             step === 4
               ? 'bg-[var(--color-status-alert)]/[0.05] ring-[var(--color-status-alert)]/20'
@@ -744,6 +773,85 @@ export function VerdictBlock({
                   </div>
                 ) : null}
               </>
+            );
+          }
+          /* Owner round 4: the AUSTRALIA signals box — the SAME
+           * construction as the world-signals panel (always open, the
+           * emphasized 15px bold type, the region's pale tint + step ink
+           * on the heading), but its bullets are the AREAS themselves:
+           * the raised ones speak their n-of-m counts and state word in
+           * their OWN step ink and jump to the section; the calm and
+           * unreadable ones sit in the quiet rows' muted ink. */
+          if (section === 'australia') {
+            const rows = [...gaugeRows].sort((a, b) => b.step - a.step);
+            const wordOf = (s: number) =>
+              s === 4 ? copy.label.alarmed : s === 3 ? copy.label.stressed : s === 2 ? copy.label.cautious : copy.label.relaxed;
+            return (
+              <div
+                className={`ei-panel-accent rounded-[var(--radius-md)] px-3.5 py-3 ring-1 ${tint}`}
+                data-ei-panel
+                data-ei-panel-kind="signals"
+              >
+                <p
+                  className={`m-0 mb-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.9375rem] font-bold ${stepToneClass(step)}`}
+                  data-ei-panel-heading
+                >
+                  {stateIconUrl(step) !== null ? (
+                    <IconImg src={stateIconUrl(step)!} size={18} desktopSize={20} className="drop-shadow-sm" />
+                  ) : null}
+                  {copy.ui.australiaSignalsTitle}
+                </p>
+                <ul className="m-0 list-none space-y-2 p-0" data-ei-area-bullets>
+                  {rows.map((g) => {
+                    const areaName =
+                      copy.groupShort[g.gauge as keyof typeof copy.groupShort] ??
+                      copy.groups[g.gauge as keyof typeof copy.groups];
+                    if (g.step >= 2) {
+                      /* The raised area — the markets bullet's shape:
+                       * "area · word: n of m indicators need attention",
+                       * the area's OWN step ink, clicking jumps to the
+                       * section where its lane lives. */
+                      return (
+                        <li key={g.gauge} className="flex items-start gap-1.5">
+                          {BULLET_DOT}
+                          <button
+                            type="button"
+                            onClick={() => onJumpSection(section)}
+                            className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[0.9375rem] font-bold leading-relaxed transition-opacity hover:opacity-80 ${stepToneClass(g.step)}`}
+                            data-ei-area-signal="raised"
+                            data-ei-area-step={g.step}
+                          >
+                            <bdi>
+                              {interpolate(copy.ui.australiaSignalArea, {
+                                area: areaName,
+                                word: wordOf(g.step),
+                                warnings: num(g.warningCount, numberLocale),
+                                voting: num(g.votingCount, numberLocale),
+                              })}
+                            </bdi>
+                          </button>
+                        </li>
+                      );
+                    }
+                    /* The calm / unreadable area — the section-indicator
+                     * quiet rows' shape: plain name · word, never a
+                     * button (nothing to drill into), muted ink. */
+                    return (
+                      <li key={g.gauge} className="flex items-start gap-1.5">
+                        {BULLET_DOT}
+                        <span
+                          className="px-1 py-0.5 text-[0.9375rem] font-semibold leading-relaxed text-[var(--color-text-tertiary)]"
+                          data-ei-area-signal={g.step === 1 ? 'calm' : 'no-reading'}
+                          data-ei-area-step={g.step}
+                        >
+                          {areaName}
+                          <span className="ms-1">· {g.step === 1 ? copy.label.relaxed : copy.ui.gaugeNoReading}</span>
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             );
           }
           /* Owner round 3: the SIGNALS panel — the hero's most important

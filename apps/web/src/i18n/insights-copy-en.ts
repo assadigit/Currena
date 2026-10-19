@@ -1230,6 +1230,13 @@ export const insightsCopyEn = {
     // heading — the raised world-section signals (markets / currencies)
     // ride under it on the pale-red surface.
     worldSignalsTitle: 'World signals',
+    // Owner round 4 (2026-10-20): the Australia card grows the SAME
+    // emphasized signals box — its proper data is its OWN areas. One bullet
+    // per gauge: the raised areas carry their n-of-m counts and state word
+    // (the markets bullet's shape); the calm and unreadable ones sit in the
+    // quiet ink beside them.
+    australiaSignalsTitle: 'Australia signals',
+    australiaSignalArea: '{area} · {word}: {warnings} of {voting} indicators need attention.',
     // UI-fidelity round (§7 "Bottom information strip"): the lead-in of
     // the compact strip under the hero that names the next page sections
     // in their intended order (the JumpNav labels).

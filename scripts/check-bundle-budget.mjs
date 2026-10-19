@@ -472,7 +472,20 @@ const BUDGETS = [
   // heading markup. Entry chunk untouched at 295.29/88.81 vs 296/89.5.
   // Justified in CHANGELOG §2026-10-19 (panels) and D-38 in
   // docs/DECISIONS_FOR_ALI.md.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 659_000, gz: 158_000, label: 'Insights lazy chunk' },
+  // Owner round 4 (2026-10-20, australia signals): "just like World
+  // Signals, the same box with proper data for Australia" — the
+  // Australia card grows the SAME emphasized signals box: one bullet
+  // per AUSTRALIAN gauge, worst first (the raised areas carry their
+  // n-of-m counts + state word in their own step ink and jump to the
+  // section; calm/unreadable areas sit in the quiet rows' ink), with
+  // the round-3 rule toggle kept as the shared FALLBACK when a region
+  // has nothing to raise. Two new copy keys (australiaSignalsTitle,
+  // australiaSignalArea) en+fa + manifest round. Measured 660.14/157.86
+  // — raw +2.04 kB, gz +0.37 kB over the panels build: the AU panel
+  // branch + the area bullets + the new strings. Entry chunk untouched
+  // at 295.29/88.81 vs 296/89.5. Justified in CHANGELOG §2026-10-20
+  // (australia signals) and D-39 in docs/DECISIONS_FOR_ALI.md.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 661_000, gz: 158_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {
