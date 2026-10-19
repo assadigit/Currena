@@ -954,6 +954,124 @@
       }
     },
     {
+      "id": "shiller-cape",
+      "title": "US share prices versus long-run earnings (Shiller CAPE)",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "shiller",
+        "name": "Robert Shiller, Irrational Exuberance data (ie_data.xls)",
+        "url": "https://shillerdata.com/",
+        "seriesIdOrTable": "Robert Shiller ie_data.xls (monthly, CAPE column)"
+      },
+      "publisher": "Robert Shiller dataset (ie_data)",
+      "publisherUrl": "https://shillerdata.com/",
+      "methodUrl": "https://shillerdata.com/",
+      "whatItIs": "The Shiller CAPE ratio from Robert Shiller’s Irrational Exuberance dataset (ie_data.xls, monthly): the S&P 500 price divided by the average of 10 years of inflation-adjusted earnings. Shown with the publisher’s own number; attribution to Robert Shiller, Yale.",
+      "whatItIsnt": "Valuation measures say little about the next few months: CAPE has stayed high for years while shares rose, and low while they fell. It is not a timing tool and never a signal.",
+      "trackRecordNote": "Very high CAPE readings have, historically, come with lower US share returns over the following decade, and very low readings with higher ones — a long-run tendency with wide variation around it.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": false,
+        "enabled": false,
+        "method": "M2",
+        "runtime": "github-action",
+        "termsLines": "Public Excel file on Robert Shiller’s Yale page (read 2026-10-16): open academic data, attribution expected, no formal reuse terms found — level L2 (unclear) until the owner accepts. Every download must be archived (FS-06).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Data: Robert Shiller, Yale",
+        "legs": [
+          "shiller"
+        ]
+      },
+      "unit": "ratio",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 45,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Open academic data — attribution; no formal reuse terms",
+        "attributionText": "Source: Robert Shiller, Irrational Exuberance data (econ.yale.edu/~shiller)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 §2.3: open academic data, no formal commercial terms found — private mode only, archive every download (L1-14).",
+        "termsUrl": "http://www.econ.yale.edu/~shiller/data.htm"
+      }
+    },
+    {
+      "id": "shiller-ecy",
+      "title": "Excess CAPE Yield (Shiller)",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "shiller",
+        "name": "Robert Shiller, Irrational Exuberance data (ie_data.xls)",
+        "url": "https://shillerdata.com/",
+        "seriesIdOrTable": "Robert Shiller ie_data.xls (monthly, Excess CAPE Yield column)"
+      },
+      "publisher": "Robert Shiller dataset (ie_data)",
+      "publisherUrl": "https://shillerdata.com/",
+      "methodUrl": "https://shillerdata.com/",
+      "whatItIs": "The Excess CAPE Yield from Robert Shiller’s ie_data.xls (monthly): the inverse of the CAPE ratio minus the real 10-year Treasury yield, exactly as the publisher computes it.",
+      "whatItIsnt": "Like CAPE, it describes a relationship over long horizons; it says little about the next few months and is never a signal.",
+      "trackRecordNote": "When the gap has been negative, the following decade’s US share returns have often been lower; when strongly positive, often higher — a long-run tendency, not a rule.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": false,
+        "enabled": false,
+        "method": "M2",
+        "runtime": "github-action",
+        "termsLines": "Public Excel file on Robert Shiller’s Yale page (read 2026-10-16): open academic data, attribution expected, no formal reuse terms found — level L2 (unclear) until the owner accepts. Every download must be archived (FS-06).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Data: Robert Shiller, Yale",
+        "legs": [
+          "shiller"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 45,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Open academic data — attribution; no formal reuse terms",
+        "attributionText": "Source: Robert Shiller, Irrational Exuberance data (econ.yale.edu/~shiller)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 §2.3: open academic data, no formal commercial terms found — private mode only, archive every download (L1-14).",
+        "termsUrl": "http://www.econ.yale.edu/~shiller/data.htm"
+      }
+    },
+    {
       "id": "gold-silver",
       "title": "Gold / Silver",
       "area": {

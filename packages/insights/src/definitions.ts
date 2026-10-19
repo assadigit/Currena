@@ -299,6 +299,42 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 4,
   },
   {
+    // Step 3 L1-14 / FS-06 (v3, 2026-10-20): the Shiller CAPE — a published
+    // long-run valuation measure, shown as the publisher's own reading
+    // (context only, never a signal; L2-10's "valuation says little about
+    // the next few months" rides the card copy). The source is DISABLED
+    // until the owner sets owner_accepts to yes in RISK_REGISTER.md (T-30):
+    // the kill-switch machinery hides these cards and the ingest never
+    // requests the file until that flip.
+    id: 'shiller-cape',
+    section: 'global',
+    group: 'market-stress',
+    name: 'US share prices versus long-run earnings (Shiller CAPE)',
+    source: 'shiller',
+    sourceRef: 'Robert Shiller ie_data.xls (monthly, CAPE column)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 45,
+  },
+  {
+    // Step 3 L1-14 / L2-10: the Excess CAPE Yield — the inverse of CAPE
+    // minus the real 10-year Treasury yield, exactly as the publisher
+    // computes it (the ie_data.xls ECY column; never recomputed by us).
+    id: 'shiller-ecy',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Excess CAPE Yield (Shiller)',
+    source: 'shiller',
+    sourceRef: 'Robert Shiller ie_data.xls (monthly, Excess CAPE Yield column)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 45,
+  },
+  {
     id: 'gold-silver',
     section: 'global',
     group: 'market-stress',

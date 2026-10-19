@@ -316,42 +316,44 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
       'Public Excel file on Robert Shiller\u2019s Yale page (read 2026-10-16): open academic data, attribution expected, no formal reuse terms found — level L2 (unclear) until the owner accepts. Every download must be archived (FS-06).',
     termsReadOn: SOURCE_RISK_READ_ON,
     attribution: 'Data: Robert Shiller, Yale',
-    termsUrl: 'http://www.econ.yale.edu/~shiller/data.htm',
+    termsUrl: 'https://shillerdata.com/', // verified https 2026-10-20; the Yale mirror (http://www.econ.yale.edu/~shiller/data.htm) stays the recorded fallback
     notes: 'NEW — disabled until the owner sets owner_accepts to yes in RISK_REGISTER.md (T-30).',
   },
   'cnn-fng': {
     id: 'cnn-fng',
     provider: 'cnn',
     label: 'CNN Fear & Greed (US stocks)',
-    usedFor: 'the US stock sentiment gauge (planned — Step 3 L1-19 / FS-01)',
-    method: null, // FS-01 discovery (F-01…F-05) pending — M3 expected, never assumed
+    usedFor: 'the US stock sentiment gauge (Step 3 L1-19 / FS-01) — LINK OUT',
+    method: null, // no allowed method: the site blocks the honest request
     runtime: null,
-    level: 'L2', // terms not read yet: unclear → L2 until F-01 quotes them; prohibited/robots-disallow/block re-levels it L3
-    ownerAccepts: false, // new source — owner must flip
+    level: 'L3', // FS-01 discovery (2026-10-20): the site blocks the request — RULES §2 L3, never used
+    ownerAccepts: false, // new source — owner would have to flip, and an override still never covers circumvention
     override: false,
     enabled: false,
-    termsLines: 'Not read yet — the FS-01 discovery procedure (SCRAPING_SPEC F-01…F-05) must quote the terms and robots.txt before any fetch. A block at any step means link out (never circumvented).',
-    termsReadOn: 'not verified',
+    termsLines:
+      'FS-01 discovery, 2026-10-20: edition.cnn.com/robots.txt (read, HTTP 200) does not disallow the fear-and-greed page path for the wildcard agent but DOES disallow /terms — the licence terms could not be read honestly. The reported JSON endpoint (production.dataviz.cnn.io/index/fearandgreed/graphdata, one honest request with the declared UA) answered HTTP 418 "I\u2019m a teapot. You\u2019re a bot." — BLOCKED. Per RULES §2/§4.3 and T-27: a block is a block; the source is never fetched and stays a link-out.',
+    termsReadOn: '2026-10-20',
     attribution: 'Source: CNN',
     termsUrl: 'https://edition.cnn.com/markets/fear-and-greed',
-    notes: 'NEW — disabled until discovery completes AND the owner sets owner_accepts to yes (T-30). L3 if the terms, robots.txt or a block say so.',
+    notes: 'L3 — link out only. An owner override could permit using a DIFFERENT method if one is ever allowed (e.g. a documented API), never circumventing the block.',
   },
   'asx-rate-tracker': {
     id: 'asx-rate-tracker',
     provider: 'asx',
     label: 'ASX RBA Rate Tracker',
-    usedFor: 'market pricing of RBA moves (planned — Step 3 L1-06 / FS-02)',
-    method: null, // FS-02 discovery pending — M3/M4 expected, never assumed
+    usedFor: 'market pricing of RBA moves (Step 3 L1-06 / FS-02) — LINK OUT',
+    method: null, // no allowed method: the terms prohibit automated access
     runtime: null,
-    level: 'L2', // unclear until the terms are quoted; automated-access prohibition → L3 (link out)
-    ownerAccepts: false, // new source — owner must flip
+    level: 'L3', // FS-02 discovery (2026-10-20): the terms explicitly prohibit it — never used
+    ownerAccepts: false,
     override: false,
     enabled: false,
-    termsLines: 'Not read yet — the FS-02 discovery procedure must read ASX\u2019s website terms and robots.txt first. If automated access is not allowed: L3, link out.',
-    termsReadOn: 'not verified',
+    termsLines:
+      'FS-02 discovery, 2026-10-20: asx.com.au/robots.txt (HTTP 200) does not disallow the tracker path, but the ASX Terms of use (read in full, HTTP 200) prohibit it verbatim: "use any spider, screen scraper, robot, other similar software or device, or other similar process, to use or access the Site in any way whatsoever, including monitoring, downloading or copying any content on the Site" and "modify, copy, reproduce, republish, frame, download onto a computer, upload to a third party, post, transmit or distribute any content on the Site in any way except as expressly provided for in these terms\u2026 or with ASX\u2019s prior written consent." Automated access AND redistribution are both prohibited → RULES §2 L3.',
+    termsReadOn: '2026-10-20',
     attribution: 'Source: ASX',
-    termsUrl: 'https://www.asx.com.au/',
-    notes: 'NEW — disabled until discovery completes AND the owner accepts (T-30).',
+    termsUrl: 'https://www.asx.com.au/content/asx/home/legals/terms-of-use.html',
+    notes: 'L3 — link out only. The L2-09 RBA-expectations card links to the public tracker page (reading it in a browser is the reader\u2019s own act); Currena never fetches it.',
   },
   'westpac-mi': {
     id: 'westpac-mi',

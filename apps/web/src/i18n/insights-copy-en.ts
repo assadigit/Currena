@@ -726,6 +726,34 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'Sentiment gauges describe feelings, not prices; this page never treats the index as a recommendation.',
     forYou: 'Context for crypto news — the same day-by-day honesty as every other card here.',
   },
+  'shiller-cape': {
+    // Step 3 L1-14 / L2-10 (v3, 2026-10-20): the Shiller CAPE — context only,
+    // shown as the publisher's own reading. Valuation, never a timing tool.
+    name: 'US share prices versus long-run earnings (Shiller CAPE)',
+    oneLiner: 'A long-run measure of how expensive US shares are against their own 10-year average of inflation-adjusted earnings.',
+    whatItIs:
+      'The Shiller CAPE ratio from Robert Shiller\u2019s Irrational Exuberance dataset (ie_data.xls, monthly): the S&P 500 price divided by the average of 10 years of inflation-adjusted earnings. Shown with the publisher\u2019s own number; attribution to Robert Shiller, Yale.',
+    whyItMatters:
+      'A way to compare today\u2019s US share prices with more than 150 years of their own history on one consistent basis.',
+    tendedToMean:
+      'Very high CAPE readings have, historically, come with lower US share returns over the following decade, and very low readings with higher ones — a long-run tendency with wide variation around it.',
+    cantTell:
+      'Valuation measures say little about the next few months: CAPE has stayed high for years while shares rose, and low while they fell. It is not a timing tool and never a signal.',
+    forYou: 'Long-run context for anyone buying US shares — one number, one publisher, no view attached.',
+  },
+  'shiller-ecy': {
+    name: 'Excess CAPE Yield (Shiller)',
+    oneLiner: 'The earnings yield of US shares minus what inflation-protected US government bonds pay.',
+    whatItIs:
+      'The Excess CAPE Yield from Robert Shiller\u2019s ie_data.xls (monthly): the inverse of the CAPE ratio minus the real 10-year Treasury yield, exactly as the publisher computes it.',
+    whyItMatters:
+      'It lines up the earnings yield of US shares against the real return on \u201csafe\u201d US government money on one scale.',
+    tendedToMean:
+      'When the gap has been negative, the following decade\u2019s US share returns have often been lower; when strongly positive, often higher — a long-run tendency, not a rule.',
+    cantTell:
+      'Like CAPE, it describes a relationship over long horizons; it says little about the next few months and is never a signal.',
+    forYou: 'The companion reading to the CAPE card, in the publisher\u2019s own units.',
+  },
   'gold-btc': {
     name: 'Bitcoin priced in gold (BTC per ounce)',
     oneLiner: 'How many bitcoins one ounce of gold buys: old money priced in new money.',

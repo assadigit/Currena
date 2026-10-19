@@ -1,0 +1,52 @@
+# FS-06 (SCRAPING_SPEC §8): the monthly Shiller ie_data.xls → small JSON
+# conversion, run by a scheduled GitHub Action (the documented runtime for
+# this source — the Worker never fetches it). Honest UA, one page read + one
+# file download per run, F-13 schema assertions, every download archived as
+# its converted JSON + content hash (F-18).
+#
+# The SOURCE is L2 and DISABLED until the owner sets owner_accepts to yes in
+# docs/insights/RISK_REGISTER.md (T-30): the ingest reads the converted file
+# only when the register row is enabled, so this workflow can run (and
+# archive) while the cards stay hidden — the owner's flip is one line.
+name: shiller-fetch
+
+on:
+  schedule:
+    # The 5th of each month at 04:35 UTC (the file updates in the first days
+    # of each month; one run per month — never more often than the source).
+    - cron: "35 4 5 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shiller-fetch
+  cancel-in-progress: false
+
+timeout-minutes: 10
+
+jobs:
+  fetch-and-convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Fetch + convert the Shiller dataset (honest UA, F-13 assertions)
+        run: pnpm --filter @currena/insights exec tsx scripts/shiller-fetch.ts
+      - name: Commit the converted JSON (archive)
+        run: |
+          git config user.name "currena-shiller-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/shiller/
+          if git diff --cached --quiet; then
+            echo "[shiller] no change — the file has not updated since last month"
+          else
+            git commit -m "data(shiller): the monthly ie_data.xls conversion (FS-06 archive)"
+            git push
+          fi

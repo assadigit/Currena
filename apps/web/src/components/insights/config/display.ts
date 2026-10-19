@@ -80,6 +80,8 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   // Step 3 L1-18: the crypto Fear and Greed index is the publisher's own
   // 0-100 scale — whole numbers, like the source shows.
   'crypto-fng': { decimals: 0, unit: 'index' },
+  'shiller-cape': { decimals: 2, unit: 'ratio' },
+  'shiller-ecy': { decimals: 2, unit: 'percent' },
   'gold-silver': { decimals: 1, unit: 'ratio' },
   'dollar-basket': { decimals: 2, unit: 'index' },
   usdjpy: { decimals: 2, unit: 'jpy' },

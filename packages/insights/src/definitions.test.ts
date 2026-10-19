@@ -22,9 +22,9 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 29 P1 / 23 P2 (Step-2 + fix spec C additions; Step 3 L1-18 adds crypto-fng P2)', () => {
+  it('splits 29 P1 / 25 P2 (Step-2 + fix spec C additions; Step 3 L1-18 + L1-14 add the context cards)', () => {
     expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(29);
-    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(23);
+    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(25);
   });
 
   it('groups are the question groups (global 5 + prices-board, australia 3)', () => {
@@ -54,7 +54,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('info-only cards never vote: exactly the fifteen info rules (Step 3 L1-18 adds crypto-fng)', () => {
+  it('info-only cards never vote: exactly the seventeen info rules (Step 3 L1-18 + L1-14 add the context cards)', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
     expect(info).toEqual([
       'au-deposit-rate',
@@ -68,6 +68,8 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'gold-usd',
       'iron-ore',
       'rba-cash-rate',
+      'shiller-cape',
+      'shiller-ecy',
       'silver-btc',
       'silver-usd',
       'us-cpi-core-yoy',

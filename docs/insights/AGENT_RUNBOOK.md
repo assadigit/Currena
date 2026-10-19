@@ -58,14 +58,14 @@ Write `docs/insights/CURRENT_STATE_REPORT.md` for items S-01 to S-08 of `INSIGHT
 - [x] The owner-only export and panic switch need a secret named `INSIGHTS_OWNER_TOKEN` (read from a Cloudflare secret). If it is missing, the export is disabled and the panic switch still works from the environment variable.
 
 ### Phase 4: data, definitions, relationships
-- [ ] Implement `INSIGHTS_STEP3_SPEC.md` sections 3 to 7: Layer 1 indicators, Layer 2 definitions (L2-01 to L2-10), Layer 3 summaries, relationship rules (R-01 to R-05), and Australian coverage.
-- [ ] Any indicator whose series or terms cannot be verified stays "Link out" or hidden and is listed in the report.
-- [ ] The "Know before you buy US shares" box shows only approved text from `docs/insights/approved-text/` (if the folder is empty, only the two exchange-rate and fees lines).
+- [x] Implement `INSIGHTS_STEP3_SPEC.md` sections 3 to 7: Layer 1 indicators, Layer 2 definitions (L2-01 to L2-10), Layer 3 summaries, relationship rules (R-01 to R-05), and Australian coverage.
+- [x] Any indicator whose series or terms cannot be verified stays "Link out" or hidden and is listed in the report. (L1-11 NY Fed recession probability = Link out — the methodology page is JS-walled to plain fetches, so the probit coefficients cannot be verified and are never invented; L1-19 CNN = L3 blocked; L1-06 ASX = L3 terms-prohibited; L1-08 NAB + AIP petrol = link out, not verified. All listed in STEP3_REPORT.md.)
+- [x] The "Know before you buy US shares" box shows only approved text from `docs/insights/approved-text/` (if the folder is empty, only the two exchange-rate and fees lines).
 
 ### Phase 5: fetching
-- [ ] Implement `SCRAPING_SPEC.md`: the method ladder, discovery procedure (at most three attempts per source), method cards, validation (F-13 to F-18), display rules (F-19 to F-23), manual entry (F-24 to F-27).
-- [ ] Run F-01 to F-07 for every source in section 8 of that spec. Record the result. Leave new L2 sources disabled until the owner sets `owner_accepts` to yes in `RISK_REGISTER.md`.
-- [ ] Never use proxies, spoofed identities, headless-browser evasion, CAPTCHA tricks, or anyone's login. A block means stop.
+- [x] Implement `SCRAPING_SPEC.md`: the method ladder, discovery procedure (at most three attempts per source), method cards, validation (F-13 to F-18), display rules (F-19 to F-23), manual entry (F-24 to F-27).
+- [x] Run F-01 to F-07 for every source in section 8 of that spec. Record the result. Leave new L2 sources disabled until the owner sets `owner_accepts` to yes in `RISK_REGISTER.md`. (FS-01 CNN → BLOCKED (HTTP 418 to the honest UA) → L3, link out; FS-02 ASX → terms prohibit automated access verbatim → L3, link out; FS-03 Westpac-MI → M5 manual entry, disabled; FS-04 NAB → link out; FS-05 Alternative.me → already live L0; FS-06 Shiller → M2 pipeline built + monthly Action + archive, DISABLED until the owner accepts; FS-07 → no other composite sources added. Venue verification with the honest UA: FRED/gold-api/Frankfurter/Alternative.me/Yahoo all HTTP 200; RBA venue-blocked as documented — its verified venue is the GitHub Actions runner.)
+- [x] Never use proxies, spoofed identities, headless-browser evasion, CAPTCHA tricks, or anyone's login. A block means stop.
 
 ### Phase 6: UI
 - [ ] Implement `UI_SPEC.md` in this order: tokens and state language, card anatomy, hero, moves strip, stock table and AUD view, relationship cards, gold and silver balance, calendar, About section and data-health chip.

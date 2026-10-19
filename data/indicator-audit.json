@@ -198,6 +198,32 @@
       "rule": "{\"kind\":\"info\"}"
     },
     {
+      "id": "shiller-cape",
+      "licenceName": "Open academic data — attribution; no formal reuse terms",
+      "publicDisplayOk": "no",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": false,
+      "enabled": false,
+      "method": "M2",
+      "maxAgeDays": 45,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "shiller-ecy",
+      "licenceName": "Open academic data — attribution; no formal reuse terms",
+      "publicDisplayOk": "no",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": false,
+      "enabled": false,
+      "method": "M2",
+      "maxAgeDays": 45,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
       "id": "gold-silver",
       "licenceName": "Free API — commercial use permitted (their ToS)",
       "publicDisplayOk": "unknown",

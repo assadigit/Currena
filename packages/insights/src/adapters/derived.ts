@@ -106,6 +106,14 @@ export interface SeriesInputs {
   /** Step 3 L1-18: the Alternative.me crypto Fear and Greed index (context only). */
   cryptoFng?: SeriesPoint[];
   /**
+   * Step 3 L1-14 / FS-06 (v3, 2026-10-20): the monthly Shiller CAPE and
+   * Excess CAPE Yield series, read from the converted bulk file
+   * (data/shiller/shiller-cape.json — fetched by the monthly
+   * shiller-fetch Action, never by the Worker). The source is L2 and
+   * stays disabled until the owner accepts (T-30).
+   */
+  shiller?: { cape?: SeriesPoint[]; ecy?: SeriesPoint[] };
+  /**
    * I15: previously-STORED daily history (epoch-day points decoded back to
    * dates by the runner) for the live-priced rows — gold/silver/copper/
    * bitcoin accumulate one observation per ingestion run, which is what
@@ -299,6 +307,10 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // ONLY (rule info; L3-03 forbids composite sentiment scores, and the
   // card never presents the index as a signal).
   put('crypto-fng', inputs.cryptoFng);
+  // Step 3 L1-14 / FS-06 (v3, 2026-10-20): the Shiller cards read the
+  // publisher's own columns from the converted bulk file — never recomputed.
+  put('shiller-cape', inputs.shiller?.cape);
+  put('shiller-ecy', inputs.shiller?.ecy);
   put('m2-us', fred.M2SL);
   // Step-2 add-list §B3/§B4: the US labour-market pair — the unemployment
   // LEVEL and the Sahm recession alarm, both straight from FRED (monthly,
@@ -589,6 +601,14 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'crypto-fng': {
     name: 'Alternative.me (Crypto Fear and Greed Index)',
     url: 'https://alternative.me/crypto/fear-and-greed-index/',
+  },
+  'shiller-cape': {
+    name: 'Robert Shiller, Irrational Exuberance data (ie_data.xls)',
+    url: 'https://shillerdata.com/', // the provider's current home (https, verified 2026-10-20); the Yale mirror is http-only
+  },
+  'shiller-ecy': {
+    name: 'Robert Shiller, Irrational Exuberance data (ie_data.xls)',
+    url: 'https://shillerdata.com/',
   },
   'gold-silver': { name: 'gold-api.com (history: World Bank)', url: 'https://www.gold-api.com' },
   'dollar-basket': {

@@ -638,6 +638,10 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'china-pmi',
   'gold-silver',
   'dollar-basket',
+  // Step 3 L1-14 (v3, 2026-10-20): the Shiller pair — CAPE is a ratio
+  // (like gold-silver); the ECY is a yield-gap measure in points.
+  'shiller-cape',
+  'shiller-ecy',
   'copper-gold',
   'terms-of-trade',
   'vix',

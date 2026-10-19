@@ -337,7 +337,11 @@ export const IndicatorIdSchema = z.enum([
   'nfci',
   'vix',
   'crypto-fng', // Step 3 L1-18: the Alternative.me crypto Fear and Greed index (context)
-
+  // Step 3 L1-14 / FS-06 (v3, 2026-10-20) — the Shiller cards. L2 source,
+  // disabled until the owner accepts (T-30); the ids exist in the contract
+  // so the registry, validation and history endpoints can carry them.
+  'shiller-cape',
+  'shiller-ecy',
   'gold-silver',
   // Global — Is the dollar strong?
   'dollar-basket',
@@ -434,6 +438,8 @@ export const IndicatorSourceSchema = z.enum([
   'manual',
   'derived',
   'ecb', 'alternative-me',
+  // Step 3 L1-14 / FS-06 (v3): the Shiller dataset (converted bulk file).
+  'shiller',
 ]);
 export type IndicatorSource = z.infer<typeof IndicatorSourceSchema>;
 

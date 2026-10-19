@@ -109,9 +109,11 @@ describe('T-30 disabled default: a new L2 source with owner_accepts = no is neve
 
 describe('T-31 L3 gate: an L3 source is never requested', () => {
   it('legMayBeFetched refuses any L3 leg (and only an owner-written override could ever change that)', () => {
-    const l3Row = { ...SOURCE_RISK_REGISTER['cnn-fng'], level: 'L3' as const };
+    const l3Row = SOURCE_RISK_REGISTER['cnn-fng']!; // L3 since the FS-01 discovery (blocked, 2026-10-20)
+    expect(l3Row.level).toBe('L3');
     expect(l3Row.enabled).toBe(false);
     expect(legMayBeFetched('cnn-fng')).toBe(false);
+    expect(legMayBeFetched('asx-rate-tracker')).toBe(false); // L3: the terms prohibit automated access (FS-02)
   });
 
   it('an un-overridden L3 leg keeps the card at L3 — the walk never upgrades it into displayability', () => {

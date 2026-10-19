@@ -200,6 +200,40 @@ console.log(
     : `[ingest] release schedule: ${releaseSchedule!.length} entries`,
 );
 
+// Step 3 L1-14 / FS-06 (v3, 2026-10-20): the converted Shiller bulk file.
+// The T-30 gate first: the register row is DISABLED until the owner sets
+// owner_accepts to yes in RISK_REGISTER.md — with the row disabled the
+// file is NOT EVEN READ from disk (never requested, never shown).
+import { providerFetchEnabled } from '../src/sources';
+const shillerEnabled = providerFetchEnabled('shiller');
+let shiller: { cape?: SeriesPoint[]; ecy?: SeriesPoint[] } | undefined;
+if (shillerEnabled) {
+  const shillerUrl = new URL('data/shiller/shiller-cape.json', repoRoot);
+  const shillerRaw = loadJsonFile(shillerUrl);
+  if (shillerRaw !== undefined) {
+    const ShillerFileSchema = z.object({
+      latestDate: z.iso.date(),
+      cape: z.number().positive(),
+      ecy: z.number(),
+      rows: z.array(z.object({ date: z.iso.date(), cape: z.number().positive(), ecy: z.number().nullable() })).min(100),
+    });
+    const parsedShiller = ShillerFileSchema.safeParse(shillerRaw);
+    if (!parsedShiller.success) {
+      fail(`data/shiller/shiller-cape.json is present but invalid: ${parsedShiller.error.issues[0]?.message}`);
+    }
+    const rows = parsedShiller.data.rows;
+    shiller = {
+      cape: rows.filter((r) => r.cape > 0).map((r) => ({ date: r.date, value: r.cape })),
+      ecy: rows.filter((r) => r.ecy !== null).map((r) => ({ date: r.date, value: (r.ecy as number) * 100 })), // stored as a decimal; the card speaks percentage points
+    };
+    console.log(`[ingest] shiller: ${rows.length} monthly rows, latest CAPE ${parsedShiller.data.cape} (${parsedShiller.data.latestDate})`);
+  } else {
+    console.log('[ingest] shiller: data/shiller/shiller-cape.json absent — run scripts/shiller-fetch.ts (the monthly Action does this)');
+  }
+} else {
+  console.log('[ingest] shiller: register row disabled (owner_accepts = no) — not requested (T-30)');
+}
+
 // Fix spec B-06 (2026-10-14): the hand-maintained policy decision dates
 // (decided vs effective) — absent is soft (cards then show the effective
 // date only), present-but-malformed fails loudly.
@@ -244,7 +278,7 @@ console.log(
   `[ingest] site-mode overrides: ${HIDDEN_PUBLIC_IDS.size} hidden ids, boards [${siteModeOverrides.hiddenBoards.join(', ')}]`,
 );
 
-const series = buildIndicatorSeries({ ...inputs, chinaPmi });
+const series = buildIndicatorSeries({ ...inputs, chinaPmi, shiller });
 
 /* ------------------------------------------------------------------ *
  * Snapshot (needs the previous snapshot for changedThisWeek continuity)
@@ -274,7 +308,7 @@ if (store) {
     for (const id of SEED_IDS) {
       if (seedHistory[id]) console.log(`[ingest] seed: ${id} ${seedHistory[id]!.length} accumulated points`);
     }
-    Object.assign(series, buildIndicatorSeries({ ...inputs, chinaPmi, seedHistory }));
+    Object.assign(series, buildIndicatorSeries({ ...inputs, chinaPmi, seedHistory, shiller }));
   }
 }
 
