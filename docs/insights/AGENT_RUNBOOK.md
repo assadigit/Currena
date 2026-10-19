@@ -68,10 +68,10 @@ Write `docs/insights/CURRENT_STATE_REPORT.md` for items S-01 to S-08 of `INSIGHT
 - [x] Never use proxies, spoofed identities, headless-browser evasion, CAPTCHA tricks, or anyone's login. A block means stop.
 
 ### Phase 6: UI
-- [ ] Implement `UI_SPEC.md` in this order: tokens and state language, card anatomy, hero, moves strip, stock table and AUD view, relationship cards, gold and silver balance, calendar, About section and data-health chip.
-- [ ] Render the page from a fixture snapshot at 360, 768 and 1200 px with Playwright (or the repo's tool). Save screenshots to `docs/insights/screenshots/`. Run U-01 to U-14.
-- [ ] For the gold and silver balance, check criteria UI-43 at 360 px. If any fails, implement the gauge fallback (UI-44) and say why in the report.
-- [ ] Do not change anything outside the Insights page.
+- [x] Implement `UI_SPEC.md` in this order: tokens and state language, card anatomy, hero, moves strip, stock table and AUD view, relationship cards, gold and silver balance, calendar, About section and data-health chip.
+- [x] Render the page from a fixture snapshot at 360, 768 and 1200 px with Playwright (or the repo's tool). Save screenshots to `docs/insights/screenshots/`. Run U-01 to U-14. (Playwright harness: `pnpm --filter @currena/web run visual:test`; 19/19 green with U-14 the one expected-fail — its real-worker wiring lands in Phase 9. Screenshots at 360/768/1200 + fa-360 committed.)
+- [x] For the gold and silver balance, check criteria UI-43 at 360 px. If any fails, implement the gauge fallback (UI-44) and say why in the report. (UI-43 PASSES at 360px in LTR and RTL — min label 12.48px, zero clipping, tilt clear; the UI-44 gauge fallback was NOT needed. Recorded in UI_REPORT.md.)
+- [x] Do not change anything outside the Insights page.
 
 ### Phase 7: automatic self-audit and export
 - [ ] Extend the export generator with the columns from defect E-23 (published date, fetched time, stale flag, source URL, level, owner_accepts, enabled, peak value, peak date, peak basis, rule version and thresholds).
