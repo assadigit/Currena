@@ -27,11 +27,11 @@ Make the Insights page correct, self-checking, clear to read, and complete for a
 
 ## 2. Setup
 
-- [ ] Create branch `insights-rebuild` from the current default branch.
-- [ ] Record: the test runner (use the repo's own; if none, add Vitest), the command that runs all tests, how the page export is generated, where indicators are defined, where rules live, how text is produced, how refresh is scheduled, the KV bindings, and how the front end is built.
-- [ ] Run the existing tests and record the result.
-- [ ] Parse `baseline/currena-insights-full-2026-10-15.md` into fixture data under `tests/fixtures/`.
-- [ ] Read the existing page CSS and tokens so the UI work reuses them (`UI_SPEC.md` principle 6).
+- [x] Create branch `insights-rebuild` from the current default branch.
+- [x] Record: the test runner (use the repo's own; if none, add Vitest), the command that runs all tests, how the page export is generated, where indicators are defined, where rules live, how text is produced, how refresh is scheduled, the KV bindings, and how the front end is built.
+- [x] Run the existing tests and record the result.
+- [x] Parse `baseline/currena-insights-full-2026-10-15.md` into fixture data under `tests/fixtures/`.
+- [x] Read the existing page CSS and tokens so the UI work reuses them (`UI_SPEC.md` principle 6).
 
 ## 3. Phases
 
@@ -41,10 +41,10 @@ After each phase: run the full test suite, fix failures, commit with `phase N: <
 Write `docs/insights/CURRENT_STATE_REPORT.md` for items S-01 to S-08 of `INSIGHTS_STEP3_SPEC.md`. Cite evidence for every claim. Do not stop afterwards; continue to Phase 1.
 
 ### Phase 1: tests first, then foundation
-- [ ] Implement tests T-01 to T-14 (fix spec), T-15 to T-24 and T-35 (Step 3 spec), T-25 to T-34 (scraping spec), U-01 to U-14 (UI spec), plus one extra test per defect E-04, E-05, E-06, E-10, E-11, E-18, E-24.
-- [ ] Run them against the baseline fixtures. Every defect test must **fail**, proving it catches the defect. Save the list as `docs/insights/baseline-test-results.md`.
-- [ ] Implement `INSIGHTS_FIX_SPEC.md` Part A (A-01 to A-08): single registry, generated text, validation before publish, safe failure, daily snapshot archive, context notes off by default, rule versions, status panel.
-- [ ] Add the source fields from `INSIGHTS_STEP3_SPEC.md` section 8 to the registry.
+- [x] Implement tests T-01 to T-14 (fix spec), T-15 to T-24 and T-35 (Step 3 spec), T-25 to T-34 (scraping spec), U-01 to U-14 (UI spec), plus one extra test per defect E-04, E-05, E-06, E-10, E-11, E-18, E-24.
+- [x] Run them against the baseline fixtures. Every defect test must **fail**, proving it catches the defect. Save the list as `docs/insights/baseline-test-results.md`.
+- [x] Implement `INSIGHTS_FIX_SPEC.md` Part A (A-01 to A-08): single registry, generated text, validation before publish, safe failure, daily snapshot archive, context notes off by default, rule versions, status panel.
+- [x] Add the source fields from `INSIGHTS_STEP3_SPEC.md` section 8 to the registry.
 
 ### Phase 2: defects and fixes
 - [ ] Fix every defect E-01 to E-24. After each fix its test must pass.

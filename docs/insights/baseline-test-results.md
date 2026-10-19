@@ -45,3 +45,39 @@ baseline data exactly as the audit recorded it. Notes:
 - E-06's authority: the defect file classifies the RBA F2 yield family as
   daily (max age 4 days); the registry's weekly label is part of the
   defect and is re-labelled in Phase 2.
+
+
+---
+
+## v3 package re-run (2026-10-20, Phase 1 of the v3 runbook)
+
+Re-run against the SAME fixture (`tests/fixtures/insights-baseline-2026-10-15.json`)
+after the v3 spec package landed: the defect checks still FAIL on the
+baseline (the proof they catch it), T-19 still PASSes honestly.
+
+New since the v2 run (all GREEN on current data, red only where the v3 UI
+has not landed yet):
+
+| id | check | status |
+|---|---|---|
+| T-25 | honest declared UA on every Insights fetch (fetch-policy) | green (fetch-policy.test.ts, collect-gates.test.ts, adapters/markets pins) |
+| T-26 | terms gate: enabled sources record terms lines + date + level | green (sources.test.ts, registry-sync pins) |
+| T-27 | 403/418/429/bot-check → "blocked by the site", one request, no circumvention | green (fetch-policy + collect-gates) |
+| T-28 | definitional sanity ranges reject out-of-range values | green (sources.test.ts, snapshot-gates.test.ts) |
+| T-29 | format change → "format changed" + status message | green (collect classification + builder gate; adapters throw FormatChangedError) |
+| T-30 | new L2 sources disabled by default — never requested, never shown | green (sources.test.ts, collect-gates.test.ts, registry-sync) |
+| T-31 | an L3 leg is never requested | green (sources.test.ts legMayBeFetched) |
+| T-32 | one request per source document per refresh (no retries; RBA F2 fetched once) | green (collect-gates.test.ts) |
+| T-33 | manual-entry expiry (exists since v2) | green (snapshot.test.ts E-08) |
+| T-34 | CNN-vs-VIX directional cross-check | green (validation-step3 crossCheckFngVsVix; the CNN source itself stays disabled) |
+| T-35 | relationship summaries: "Trigger not present", N-of-M match counts, per-leg markers | green (connections.test.ts — engine ready; the UI copy lands in Phase 6) |
+| T-24 | public minimisation + panic switch + owner-only export | green (apps/api routes/insights-mitigations.test.ts — 96 new tests) |
+
+U-01..U-14 (the UI acceptance suite): the Playwright harness EXISTS and
+runs (`pnpm --filter @currena/web run visual:test`, fixtures served from
+disk — never live). Baseline measured 2026-10-20: **9 pass** (U-02 overflow
+at 768/1200, U-04a vocabulary, U-05, U-06, U-07, U-08a, U-10, U-11, U-12,
+U-13, U-03-dark) and **9 expected-fail** — the honest red list the Phase 6
+UI work must turn green (U-01 hero, U-02 360px overflow, U-03 light-theme
+contrast, U-04b v3 vocabulary, U-08b match summary, U-09/U-09a balance,
+U-14 export auth). Screenshots live in `docs/insights/screenshots/`.
