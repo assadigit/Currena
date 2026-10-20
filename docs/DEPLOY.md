@@ -83,6 +83,53 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Session record — 2026-10-20f the map's owner round: visible borders, centred box, D/W/M cards, relative colours
+
+- **Deployed**: currena-api **`8399274f-01d8-483e-a8af-758e07c0d322`** (web-only
+  round — no API/markets/core change; currena-markets untouched `6465694c`).
+  GitHub `main` = `07baddc` (first cut `eaa7c85` + the name-row fix).
+- **Change** (the owner's four directives on the live map): (1) the country
+  borders leave near-white for a visible 32%-ink grey at 0.7 units + a deeper
+  10% land fill; (2) the map box CENTRES at `calc(100% - clamp(150px, 20cqw,
+  280px))` in the map layout — 254px under the module at desktop, 0px
+  off-centre, the list layout and the header/switch/legend keep full width;
+  (3) every card gains the Day/Week/Month performance triplet (triangle
+  up/down + 1dp signed percent, green/red, the selected period emphasised,
+  `chg1w` joins the feed; the switch speaks Today | 1 week | 1 month — the
+  map's 1Y retires, the section's own lens keeps the yearly view; the
+  Open/Closed tag becomes the legend-keyed state dot so every EN name fits,
+  No data / Old data keep their words); (4) the colour scale turns RELATIVE —
+  `mapWeightOf` normalises each period on its biggest fresh mover (honest
+  flat band kept, 0.75-power curve) driving `--t/--m/--b/--i` color-mix ramps
+  of the existing status tokens (no new hex); the five-step thresholds and
+  the threshold legend retire for a red→grey→green gradient key
+  (RTL-mirrored, "Bigger fall / Bigger rise").
+- **Gates**: world-map plw **38/38** (a NEW no-clip test — 7/9 EN names
+  clipped at the 1280 fixture width before the state-dot fix — plus the
+  centring probe, border ≥1.3:1, monotonic tint distance per direction,
+  triangle directions, the 20 regenerated screenshots) · U-suite 19/19 ·
+  screenshots 4/4 · web vitest 698/698 · every repo suite green (1,835) ·
+  typecheck + lint 0 errors + copy:audit clean (9 new fa keys triaged:
+  periodWeek/periodWordWeek/cellD/cellW/cellM/legendMoreDown/legendMoreUp/
+  srPerf/srVal; 5 retired) · one pre-existing lint error in markets.test.ts
+  fixed.
+- **Verified live** (currena.ir, agent-browser + VLM): module 1272 → stage
+  1018 (inset 254, centred 0); land 173 paths; border srgb(.769 .783 .797)
+  on land srgb(.928 .932 .936); sp500 card 1D +0.4% ▲ / 1W −1.5% ▼ / 1M
+  +0.5% ▲ with 1D selected (matches the served rows); measured --t weights
+  KOSPI 66% (max +1.76) … IBOV 37% (−0.17) — monotone in |move| per
+  direction; zero name/tag clips; fa: RTL page, LTR stage, روزانه/هفتگی/
+  ماهانه cells, FA gradient legend, ۵ از ۹ بازار امروز مثبت; 390 list
+  layout full-width, zero overflow; VLM PASS on all four asks + no
+  truncation; zero console/page errors.
+- **PWA note**: a returning visitor's pre-map precache SW can blank the land
+  during its one-visit update window (its SPA fallback answers the SVG
+  fetch); the loader is retryable and the new SW's precache carries both
+  SVGs — self-heals on the next visit, fresh visitors unaffected (observed
+  live, see the evidence README).
+- **Evidence**: `docs/evidence/2026-10-20f-map-owner-round/` (README + 3 live
+  captures: EN 1440, fa 1440, EN 390 list).
+
 ## Session record — 2026-10-20e the world markets map (the Insights geographic layer ships)
 
 - **Deployed**: currena-api **`1f96deaa-e610-4387-92a2-d999cc446a16`** +
