@@ -1,4 +1,4 @@
-# Evidence — 2026-10-20h map owner round (fixture-verified; deploy pending the owner's token)
+# Evidence — 2026-10-20h map owner round (deployed 2026-10-21, currena-api a2f88aed; live-verified)
 
 **Owner asks (this round, on the map's period switch):**
 1. *"Move this to center"* — the period segmented control **centres** under the
@@ -70,13 +70,29 @@ button and focus stayed behind).
 
 ## Deploy
 
-**Pending** — this session has no `CLOUDFLARE_API_TOKEN` (the runbook keeps
-it env-only, never persisted). The verified build sits in `apps/web/dist`;
-to ship:
+**Deployed 2026-10-21** — the owner supplied the Cloudflare token (env-only,
+never persisted); the fixture-verified `apps/web/dist` shipped as
+currena-api version **a2f88aed-b4d4-44d2-afac-6f06fdf111c3** (18 new assets,
+web-only round) via:
 
 ```sh
 CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… pnpm --filter @currena/api exec wrangler deploy
 ```
 
-Then re-verify on currena.ir per DEPLOY.md §smoke (the PWA one-visit
-transition note from 2026-10-20f still applies to returning visitors).
+**Live-verified on currena.ir** (agent-browser, real data): API smoke green
+(health/rates/insights 200); the map loads 173 land + 16 pins/cards/lines;
+the switch reads Today | 1 week | 1 month | 1 year **centered** (0.0px
+asymmetry in its row) in **48px pills at 18.72px** words; the 1Y lens drives
+the live summary ("10 of 14 markets up this year · 3 down · 1 flat" — two
+markets honestly lack chg1y), all 16 hero rows carry `.sel` with live yearly
+values (e.g. +11.3%), and ArrowRight moves focus + selection together (the
+roving pattern). fa/RTL: امروز / ۱ هفته / ۱ ماه / **۱ سال**, hero +۱۱٫۳٪,
+173 land, LTR stage inside the RTL page. 390px: list layout, all four pills
+whole (312px group), zero clips. Zero console/page errors. VLM review of the
+live 1Y capture: all seven checks pass (centered, large, active pill, "this
+year" summary, hero percentages with triangles, no collisions, professional).
+Captures: `live-en-1440-today-lens.png`, `live-en-1440-1y-lens.png`,
+`live-fa-1440.png`, `live-en-390.png`.
+
+The PWA one-visit transition note from 2026-10-20f still applies to returning
+visitors (the old SW answers the SVG fetch once while the new SW installs).

@@ -2897,9 +2897,18 @@ the petrol/transport money row is gone while employment rate appeared.
   eslint 0 errors (15 pre-existing advisories). VLM review of the
   regenerated module screenshots (EN/fa light, EN dark, EN 390) + the
   1Y-lens capture: all asks confirmed, no collisions.
-- **Deploy**: PENDING — this session carries no CLOUDFLARE_API_TOKEN
-  (env-only by runbook). The verified build sits in apps/web/dist;
-  command in docs/evidence/2026-10-20h-map-yearly/README.md. Web-only
-  round (apps/web + docs; no worker/markets changes).
+- **Deploy**: DEPLOYED 2026-10-21 — the owner supplied the Cloudflare token
+  (env-only, never persisted); the fixture-verified apps/web/dist shipped as
+  currena-api version a2f88aed-b4d4-44d2-afac-6f06fdf111c3 (18 new assets,
+  web-only round). Live-verified on currena.ir (agent-browser, real data):
+  API smoke green; 173 land + 16 pins/cards/lines; the switch centered
+  (0.0px asymmetry) in 48px pills at 18.72px words with all four lenses;
+  the 1Y lens drives the live summary ("10 of 14 markets up this year" —
+  two markets honestly lack chg1y) with all 16 hero rows `.sel`; arrow
+  roving moves focus + selection together; fa/RTL reads امروز / ۱ هفته /
+  ۱ ماه / ۱ سال with the +۱۱٫۳٪ hero; 390px list layout keeps all four
+  pills whole; zero console/page errors; VLM review of the live 1Y capture
+  passes all seven checks. The PWA one-visit transition note still applies
+  to returning visitors.
 - **Evidence**: `docs/evidence/2026-10-20h-map-yearly/` (today lens, 1Y
-  lens, 1Y lens + USA label, fa, 390).
+  lens, 1Y lens + USA label, fa, 390 + the four live captures).
