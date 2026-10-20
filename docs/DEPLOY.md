@@ -83,6 +83,64 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Session record — 2026-10-20g the map's owner round: all sixteen indices, marching ants, 60% names, 3D pins
+
+- **Deployed**: currena-api **`49380c2e-a1bd-41be-bd55-1312653f0e8f`** (web-only
+  round — the diff touches `apps/web` + docs; currena-markets untouched
+  `6465694c`). GitHub `main` = `c1c7699`.
+- **Change** (the owner's four directives on the live map): (1) **every
+  remaining index joins** — all SIXTEEN registry indices pin and card (was
+  9): the NY trio fans off the exact city (Dow SW, Nasdaq NE, S&P on New
+  York), Toronto/Paris/Taipei pin on their cities, the Euro Stoxx 50 pins
+  at Brussels with iso `null` (the app's country field for it is
+  "Eurozone" — it tints nothing, honestly), Hang Seng pins at Hong Kong
+  (iso 344 has no 110 m path — tints nothing by construction); a country
+  hosting several indices tints by its **strongest fresh mover** in the
+  selected period (never an average); the card layout re-bands for 16
+  (top 6, left 3, right 3, floats + bottom 2) with `MAP_CARD_WIDTH_PCT`
+  15→14.5 and short names for Nasdaq / S&P/TSX / Stoxx 50; (2) the
+  selected country wears an **animated marching-ants dash**
+  (`stroke-dasharray 3.5 2.8`, `wm-ants 1.05s linear infinite`, one
+  dash-period per cycle) instead of the uneven solid stroke, and honours
+  `prefers-reduced-motion` (dash stays, march stops); (3) the selected
+  country **writes its short name at 60% ink** (USA / Brazil / Australia
+  …, Persian in fa — آمریکا), one label at a time, tuned anchors
+  (`MAP_LABELS`) hand-cleared against all sixteen cards + leader lines +
+  pin bulbs, path-less rows (Hong Kong, the Eurozone) carry absolute
+  anchors; (4) every index renders a **3D pin** — a filled red/green
+  teardrop (filled whether open or closed, like a pin on a map) with a
+  rim cut ~22 mix-points hotter than the fill, a specular highlight, a
+  ground shadow and the legend-keyed open/closed core; the flat dot and
+  its halo retire; the tint mixes over the `--wm-land` token (monotone
+  distance from neutral in both themes) and the mark ramp tightens
+  60→90 (rim fill+22 cap 100, so fill ≠ rim at every weight).
+- **Gates**: world-map plw **45/45** (new: the ants march + reduced
+  motion, the label texts + 60% + retirement + FA, the pin anatomy +
+  fill ≥3:1 vs land AND surface + rim ≠ fill, the aggregation honesty
+  trio — strongest-mover tint / removing one US index keeps the tint /
+  removing all three neutralises the country, the UK flat-band floor
+  t=34%) · U-suite 19/19 · screenshots 4/4 · web vitest 698/698 · every
+  repo suite green (1,835) · typecheck + eslint 0 errors + copy:audit
+  clean (+17 fa entries triaged, round `owner-2026-10-20g-map-pins-labels`)
+  · 20 map screenshots + 4 section screenshots regenerated.
+- **Verified live** (currena.ir, agent-browser + VLM): land 173, pins 16,
+  cards 16, lines 16, map layout at 1440; real hover on the S&P 500 card →
+  US `wm-c s-u on` with `wm-ants` + `3.5px, 2.8px` and a **marching**
+  offset (−1.999 → −4.398 px across 400 ms) + label **USA at opacity
+  0.6**; leaving the map retires both; all 16 pins carry highlight +
+  shadow + core with live directions (dow/tsx/ibov/cac/dax/stoxx50/
+  nifty50/taiex/n225 red-down, sp500/ndx/ftse/hsi/ssec/kospi/asx200
+  green-up, all honestly closed); exactly **12 tinted countries**
+  (036 076 124 156 158 250 276 356 392 410 826 840 — no HK, no Eurozone);
+  fa: RTL page, LTR stage, hover → آمریکا at 0.6; 390: list layout,
+  16 pins, 173 land, zero horizontal overflow; VLM PASS (3D teardrops
+  red/green, 16 cards in the intended bands, tints, "professional and
+  highly readable"); zero console/page errors.
+- **PWA note**: unchanged from 2026-10-20f — one transitional visit while
+  the old SW updates (the new SW precaches both SVGs).
+- **Evidence**: `docs/evidence/2026-10-20g-map-pins-labels/` (README + 3 live
+  captures: EN 1440, fa 1440, EN 390 list).
+
 ## Session record — 2026-10-20f the map's owner round: visible borders, centred box, D/W/M cards, relative colours
 
 - **Deployed**: currena-api **`8399274f-01d8-483e-a8af-758e07c0d322`** (web-only
