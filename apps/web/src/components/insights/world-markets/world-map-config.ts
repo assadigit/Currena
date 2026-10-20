@@ -31,6 +31,14 @@
  *     STRONGEST fresh mover — the biggest single-index move on screen,
  *     never an average that no index actually made.
  *
+ * 2026-10-20h owner round — the period switch CENTRES under the summary,
+ * grows ~50% (48px pills, 18.7px words) and speaks FOUR periods: yearly
+ * returns to the map (the stored contract's chg1y), driving the colours
+ * exactly like the other lenses. Every callout card gains a YEARLY hero
+ * row (50% bigger than the old numbers — "easier to see") above the
+ * compact Day/Week/Month cells; the last close rides in the accessible
+ * name only.
+ *
  * Platform-free pure data (AGENTS.md rule 2) — imported by the component
  * tree and by the §9 verification probes.
  */
@@ -52,14 +60,15 @@ export const DEFAULT_PERIOD = '1D' as const;
 export const STALE_AFTER_DAYS = STALE_DAYS;
 export { OPEN_MAX_AGE_MIN };
 
-/** The map's three lenses (§M11 + the 2026-10-20f owner round: the cards
- * carry Day/Week/Month side by side, so the switch speaks the same three
- * periods and drives which one colours the map and emphasises the card).
- * NOT the section switch's five: the map speaks its own quieter control
- * and never touches the section's lens. */
-export type MapPeriod = '1D' | '1W' | '1M';
+/** The map's four lenses (§M11's original Today | 1 month | 1 year trio
+ * + the 2026-10-20f week; the 2026-10-20h owner round brings 1Y BACK to
+ * the map — "add yearly performance" — so the switch speaks all four
+ * horizons the stored contract carries). NOT the section switch's five:
+ * the map speaks its own quieter control and never touches the section's
+ * lens. */
+export type MapPeriod = '1D' | '1W' | '1M' | '1Y';
 
-export const MAP_PERIODS: readonly MapPeriod[] = ['1D', '1W', '1M'];
+export const MAP_PERIODS: readonly MapPeriod[] = ['1D', '1W', '1M', '1Y'];
 
 /* ------------------------------------------------------------------ *
  * §4.2 — the flat band per period (percent change, display only)
@@ -76,6 +85,9 @@ export const MAP_THRESHOLDS: Record<MapPeriod, number> = {
   '1D': 0.1,
   '1W': 0.5,
   '1M': 1,
+  /** 2026-10-20h: a ±3% year is an honestly flat year for a stock index
+   * (the band scales with the horizon, like the 1D/1W/1M ladder above). */
+  '1Y': 3,
 };
 
 /** The colour direction of one reading (null = flat / no honest data —
@@ -140,22 +152,22 @@ export interface MapIndexConfig {
 }
 
 export const MAP_INDICES: readonly MapIndexConfig[] = [
-  { id: 'dow', iso: '840', cc: 'us', band: 'left', card: { x: 9.5, y: 44.5 } },
+  { id: 'dow', iso: '840', cc: 'us', band: 'left', card: { x: 9.5, y: 52 } },
   { id: 'tsx', iso: '124', cc: 'ca', band: 'top', card: { x: 9.5, y: 8.5 } },
-  { id: 'sp500', iso: '840', cc: 'us', band: 'left', card: { x: 9.5, y: 26.5 } },
+  { id: 'sp500', iso: '840', cc: 'us', band: 'left', card: { x: 9.5, y: 30 } },
   { id: 'ndx', iso: '840', cc: 'us', band: 'top', card: { x: 26, y: 8.5 } },
-  { id: 'ibov', iso: '076', cc: 'br', band: 'left', card: { x: 9.5, y: 68.5 } },
-  { id: 'ftse', iso: '826', cc: 'gb', band: 'top', card: { x: 43, y: 8.5 } },
-  { id: 'cac', iso: '250', cc: 'fr', band: 'float', card: { x: 41, y: 26 } },
+  { id: 'ibov', iso: '076', cc: 'br', band: 'left', card: { x: 9.5, y: 76 } },
+  { id: 'ftse', iso: '826', cc: 'gb', band: 'top', card: { x: 43, y: 7.8 } },
+  { id: 'cac', iso: '250', cc: 'fr', band: 'float', card: { x: 41, y: 29 } },
   { id: 'dax', iso: '276', cc: 'de', band: 'top', card: { x: 59, y: 8.5 } },
   { id: 'stoxx50', iso: null, cc: 'eu', band: 'float', card: { x: 61, y: 33 } },
-  { id: 'nifty50', iso: '356', cc: 'in', band: 'bottom', card: { x: 57, y: 88 } },
-  { id: 'hsi', iso: '344', cc: 'hk', band: 'bottom', card: { x: 72, y: 88 } },
+  { id: 'nifty50', iso: '356', cc: 'in', band: 'bottom', card: { x: 57, y: 86 } },
+  { id: 'hsi', iso: '344', cc: 'hk', band: 'bottom', card: { x: 72, y: 86 } },
   { id: 'ssec', iso: '156', cc: 'cn', band: 'top', card: { x: 75.5, y: 8.5 } },
-  { id: 'taiex', iso: '158', cc: 'tw', band: 'right', card: { x: 91.5, y: 59 } },
-  { id: 'kospi', iso: '410', cc: 'kr', band: 'right', card: { x: 91.5, y: 39 } },
+  { id: 'taiex', iso: '158', cc: 'tw', band: 'right', card: { x: 90, y: 60 } },
+  { id: 'kospi', iso: '410', cc: 'kr', band: 'right', card: { x: 91.5, y: 40 } },
   { id: 'n225', iso: '392', cc: 'jp', band: 'top', card: { x: 92, y: 8.5 } },
-  { id: 'asx200', iso: '036', cc: 'au', band: 'right', card: { x: 91.5, y: 77 } },
+  { id: 'asx200', iso: '036', cc: 'au', band: 'right', card: { x: 91.5, y: 82 } },
 ];
 
 /**
@@ -192,6 +204,14 @@ export const MAP_CARD_WIDTH_PCT = 14.5;
  * whose full-size name cannot sit anywhere near them. Hong Kong and the
  * Eurozone have no geo anchor (no single path) — their entries carry an
  * absolute anchor near their pin.
+ *
+ * 2026-10-20h owner round — the cards grew a YEARLY hero row (the card
+ * box is ~19% of the stage tall now), so every anchor was re-cleared
+ * against the new card zones, the pin bulbs (the Sydney pin and the
+ * Australia centroid were COVERED by the old asx200 card — both now
+ * clear) and the leader lines. China and Australia join the tuned list
+ * (their centroids sat under cards); Brazil's centroid stays clear as
+ * the one honest default.
  * ------------------------------------------------------------------ */
 
 export interface MapLabelSpec {
@@ -210,26 +230,32 @@ export const MAP_LABEL_SIZE_DEFAULT = 20;
 export const MAP_LABELS: Partial<Record<MapCc, MapLabelSpec>> = {
   // USA: under the S&P 500's horizontal leader line, over Oklahoma.
   us: { x: 23.5, y: 29, size: 20 },
-  // Canada: below the top band, above the Toronto/New York pin fan.
-  ca: { x: 26.84, y: 17.5, size: 20 },
-  // UK: west of the London pin, over the Irish Sea (the island is tiny).
-  gb: { x: 48, y: 16.8, size: 14 },
-  // France: the corridor between the CAC card and the Stoxx leader line.
-  fr: { x: 50.8, y: 24, size: 14 },
-  // Germany: east of the Dax line, over the country's eastern half.
-  de: { x: 54.5, y: 17.5, size: 14 },
-  // India: nudged east off the Stoxx card's corner.
+  // Canada: under the ndx card, above the Toronto/New York pin fan.
+  ca: { x: 26.84, y: 19.8, size: 20 },
+  // UK: the Channel pocket right of the CAC card, below the London pin.
+  gb: { x: 50.2, y: 21.3, size: 14 },
+  // France: the corridor between the CAC and Stoxx cards, over Burgundy.
+  fr: { x: 51, y: 25.5, size: 14 },
+  // Germany: the strip under the Dax card, clear of the Frankfurt bulb.
+  de: { x: 56, y: 20.8, size: 14 },
+  // India: nudged east off the Stoxx card's corner (centroid verified).
   in: { x: 72.2, y: 35.89, size: 20 },
-  // S. Korea: the Sea of Japan gap between the Shanghai and Tokyo pins.
-  kr: { x: 85.6, y: 30, size: 14 },
-  // Japan: south of Honshu, clear of the Tokyo and Shanghai lines.
-  jp: { x: 84.6, y: 29.4, size: 14 },
+  // China: the centroid sat on the Korea label — moved south, clear of
+  // the Shanghai/Taipei bulbs and the Kospi card.
+  cn: { x: 75, y: 30, size: 20 },
+  // S. Korea: the Yellow Sea gap west of the Seoul pin's bulb.
+  kr: { x: 80, y: 26, size: 14 },
+  // Japan: the Pacific gap right of the Tokyo pin, above the Kospi card.
+  jp: { x: 89.5, y: 26, size: 14 },
   // Taiwan: the East China Sea gap NE of the island (the island is 0.6%).
-  tw: { x: 84.8, y: 31.8, size: 13 },
+  tw: { x: 79.5, y: 32.5, size: 13 },
   // Hong Kong: no path — SW of the pin, clear of the Hang Seng line.
   hk: { x: 77.8, y: 39.2, size: 13 },
   // Eurozone: no path — east of the Brussels pin, over Austria.
-  eu: { x: 58, y: 24.5, size: 14 },
+  eu: { x: 61.5, y: 20.8, size: 14 },
+  // Australia: the centroid sat under the old asx200 card — moved west
+  // over the Indian Ocean, clear of the Hang Seng line and the Sydney pin.
+  au: { x: 76, y: 67, size: 20 },
 };
 
 /* ------------------------------------------------------------------ *

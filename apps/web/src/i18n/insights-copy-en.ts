@@ -1995,20 +1995,24 @@ export const insightsCopyEn = {
     csvColLow52w: '52-week low',
     csvDownload: 'World markets CSV',
     /** The world-markets MAP module (docs/insights/world-markets-map-spec.md
-     * §4.4): its own three-period switch (Today | 1 month | 1 year — the
-     * three lenses the map colours speak), the one-line breadth summary,
-     * the legend's five step words, the Open/Closed tags and the honest
-     * missing/old-data labels. Kept under `markets.map.*` so the module
-     * reads only its own block. */
+     * §4.4): its own four-period switch (Today | 1 week | 1 month | 1 year —
+     * the lenses the map colours speak; yearly returned 2026-10-20h), the
+     * one-line breadth summary, the legend's gradient ends, the Open/Closed
+     * tags and the honest missing/old-data labels. Kept under `markets.map.*`
+     * so the module reads only its own block. */
     map: {
       periodSwitchAria: 'Choose the period shown on the map',
       periodToday: 'Today',
       periodWeek: '1 week',
       periodMonth: '1 month',
+      /** 2026-10-20h owner round: yearly returns to the map's switch (the
+       * stored contract's chg1y — the same wording as thYear above). */
+      periodYear: '1 year',
       /** The summary line's period word ("markets up today / this week…"). */
       periodWordToday: 'today',
       periodWordWeek: 'this week',
       periodWordMonth: 'this month',
+      periodWordYear: 'this year',
       open: 'Open',
       closed: 'Closed',
       noData: 'No data',
@@ -2016,11 +2020,12 @@ export const insightsCopyEn = {
       stepFall: 'Fall',
       stepFlat: 'Flat',
       stepRise: 'Rise',
-      /** The card triplet's three period captions (2026-10-20f owner
-       * round: each card shows Day/Week/Month performance side by side). */
+      /** The card's period captions (2026-10-20f: Day/Week/Month side by
+       * side; 2026-10-20h: the yearly hero row joins above them). */
       cellD: '1D',
       cellW: '1W',
       cellM: '1M',
+      cellY: '1Y',
       /** The relative-scale legend's two ends (colour strength = move size). */
       legendMoreDown: 'Bigger fall',
       legendMoreUp: 'Bigger rise',

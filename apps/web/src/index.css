@@ -2058,11 +2058,14 @@ html[dir='rtl'] .insights-panel {
 .wm-stage.hl .wm-ln { opacity: 0.3; }
 .wm-ln.on { opacity: 1; stroke: var(--wm-dir-ink, var(--color-text-primary)); stroke-width: 1.6; }
 
-/* M6/M14 + 2026-10-20f — callout cards: the D/W/M performance triplet is
- * the signal (a triangle + the signed percent per period, the ink's
- * saturation relative to that period's biggest move, the selected period
- * emphasised), the value is muted context; 1px border in the direction
- * colour at a weight-relative opacity, no glow, no neon. */
+/* M6/M14 + 2026-10-20f/h — callout cards: the YEARLY hero row is the
+ * signal (2026-10-20h: 50% bigger than the old numbers — the owner's
+ * "easier to see"), the compact Day/Week/Month cells ride below it
+ * (their percent glyph moved into the hero row — the glyph is what made
+ * the old 12.5px values overrun their 35px cells and run into each
+ * other), and the last close rides in the accessible name only; 1px
+ * border in the direction colour at a weight-relative opacity, no glow,
+ * no neon. */
 .wm-card {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -2072,7 +2075,7 @@ html[dir='rtl'] .insights-panel {
   background: var(--color-surface);
   border: 1px solid color-mix(in srgb, var(--wm-dir, var(--color-text-secondary)) var(--b, 40%), transparent);
   border-radius: 10px;
-  padding: 6px 7px;
+  padding: 5px 6px;
   display: grid;
   gap: 2px;
   line-height: 1.25;
@@ -2103,15 +2106,20 @@ html[dir='rtl'] .insights-panel {
  * narrower map box. The abnormal No data / Old data states keep words. */
 .wm-tag i { width: 9px; height: 9px; border-radius: 50%; flex: none; border: 1.5px solid currentColor; }
 .wm-tag.o i { background: currentColor; }
-.wm-tri { display: flex; gap: 4px; min-width: 0; }
+/* 2026-10-20h — the YEARLY hero row: the caption rides at the big
+ * value's baseline. The value's size lives on .wm-pv.wm-yv BELOW (two
+ * classes — it must beat the compact .wm-pv size that follows it). */
+.wm-yrow { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.wm-yrow.sel .wm-pl { color: var(--color-text-primary); font-weight: 700; }
+.wm-tri { display: flex; gap: 3px; min-width: 0; }
 .wm-cell { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .wm-pl { font-size: 11.5px; line-height: 1.1; font-weight: 600; font-style: normal; color: var(--color-text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wm-cell.sel .wm-pl { color: var(--color-text-primary); font-weight: 700; }
 .wm-pv {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  font-size: 12.5px;
+  gap: 1px;
+  font-size: 11.5px;
   line-height: 1.2;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -2121,7 +2129,9 @@ html[dir='rtl'] .insights-panel {
 .wm-pv.s-x { color: var(--color-text-secondary); }
 .wm-cell.sel .wm-pv { font-weight: 800; }
 .wm-ar2 { flex: none; fill: currentColor; }
-.wm-card-val { font-size: 12.5px; color: var(--color-text-tertiary); font-variant-numeric: tabular-nums; }
+/* The hero value — the map's loudest number: caption × 1.5 (~18.7px,
+ * the owner's "50% bigger"), the percent glyph's only visible home. */
+.wm-pv.wm-yv { font-size: calc(var(--type-caption) * 1.5); font-weight: 800; gap: 3px; }
 
 /* M12 + 2026-10-20f — one inline legend row, ≥12px text: the relative
  * scale's gradient key (bigger fall ← grey → bigger rise; the gradient

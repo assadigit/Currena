@@ -2858,3 +2858,48 @@ the petrol/transport money row is gone while employment rate appeared.
   role="note" ×0 at the page top; 375 scrollWidth === 375; zero
   page/console errors; /api/insights → 32 readings.
 - **Evidence**: `docs/evidence/2026-10-17d-prices-polish/`.
+
+## Session record — 2026-10-20h: the map's period switch centres, grows ~50%, and yearly performance returns (owner round)
+
+- **What**: the owner's three asks on the map's period switch — (1) the
+  segmented control CENTRES under the breadth summary (justify-center on
+  the row; it hugged the start edge in EN / the end edge in fa);
+  (2) "add yearly performance" — 1 year returns as the FOURTH lens
+  (Today | 1 week | 1 month | 1 year): chg1y drives country tints, 3D
+  pins, leader lines, card borders, the summary ("8 of 16 markets up
+  this year" on the fixture) and the hero emphasis; MAP_THRESHOLDS['1Y']
+  = 3 (the honest flat band scales with the horizon); (3) the switch
+  grows ~50% — 48px pills (was 32), caption × 1.5 ≈ 18.7px words (was
+  12.5); a <480px-module container-query step keeps all four pills whole
+  on phones. The radiogroup now roves correctly (arrows move focus +
+  selection).
+- **Two pre-existing defects found and fixed while measuring**: the
+  2026-10-20f D/W/M values overran their 35px cells (scrollWidth 51 vs
+  clientWidth 35 — "+0.7%+0.3%+1.1%" ran together; the % glyph was the
+  culprit) → every card now speaks a YEARLY HERO ROW (caption × 1.5, the
+  glyph's only visible home) above compact glyph-free D/W/M cells
+  (sr-only % keeps the accessible name whole), the visible last close
+  moves into the sr name, and §9.2 gains a value-collision guard; the
+  Sydney pin + the Australia label sat UNDER the asx200 card → the
+  taller hero cards re-band the callouts (top band y 8.5 → ftse 7.8,
+  left col 30/52/76, right col 40/60/82, bottom 86, cac (41,29),
+  stoxx50/taiex/x tuned) and every country label anchor is re-cleared
+  (China + Australia join the tuned list; Brazil's centroid stays the
+  honest default).
+- **Copy**: EN+fa +periodYear/periodWordYear/cellY ('1 year'/'this
+  year'/'1Y' · '۱ سال'/'امسال'/'سالانه'); spec §M11 updated (the four
+  options + the centre/size asks); manifest +3 entries triaged (round
+  owner-2026-10-20h-map-yearly); copy:audit clean.
+- **Gates**: world-map Playwright 48/48 (incl. the new switch trio +
+  value-collision guard + gotoInsights hardening — the module must be
+  attached before the scroll or the lazy land races the markets fetch);
+  U 19/19; section screenshots; repo vitest 1,835; typecheck clean;
+  eslint 0 errors (15 pre-existing advisories). VLM review of the
+  regenerated module screenshots (EN/fa light, EN dark, EN 390) + the
+  1Y-lens capture: all asks confirmed, no collisions.
+- **Deploy**: PENDING — this session carries no CLOUDFLARE_API_TOKEN
+  (env-only by runbook). The verified build sits in apps/web/dist;
+  command in docs/evidence/2026-10-20h-map-yearly/README.md. Web-only
+  round (apps/web + docs; no worker/markets changes).
+- **Evidence**: `docs/evidence/2026-10-20h-map-yearly/` (today lens, 1Y
+  lens, 1Y lens + USA label, fa, 390).

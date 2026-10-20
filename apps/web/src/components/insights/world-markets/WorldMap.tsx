@@ -123,6 +123,16 @@ function signedPct(pct: number, numberLocale: NumberLocale, locale: Locale): str
   return `${pct > 0 ? '+' : pct < 0 ? MINUS : ''}${num}${percentGlyph(locale)}`;
 }
 
+/** 2026-10-20h — the compact D/W/M cells' signed number WITHOUT the
+ * percent glyph (the hero row carries the unit loudly; the glyph was
+ * what made the old 12.5px triplet overflow its 35px cells — the values
+ * ran into each other). The unit rides along as sr-only text so the
+ * accessible name still reads "1D +0.7 percent". */
+function signedNum(pct: number, numberLocale: NumberLocale): string {
+  const num = formatNumber(Math.abs(pct), numberLocale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  return `${pct > 0 ? '+' : pct < 0 ? MINUS : ''}${num}`;
+}
+
 /** One row of map data, derived purely from the snapshot. */
 export interface MapRow {
   id: MarketId;
@@ -155,7 +165,8 @@ function pctOf(entry: MarketEntry | undefined, period: MapPeriod): number | null
   if (entry === undefined) return null;
   if (period === '1D') return entry.chg1d;
   if (period === '1W') return entry.chg1w ?? null;
-  return entry.chg1m ?? null;
+  if (period === '1M') return entry.chg1m ?? null;
+  return entry.chg1y ?? null; // 2026-10-20h: yearly returns to the map
 }
 
 /** M10's breadth counts — plain code over the same rows, never a model. */
@@ -205,6 +216,10 @@ export function WorldMap({
   const stageRef = useRef<HTMLDivElement | null>(null);
   const linesGRef = useRef<SVGGElement | null>(null);
   const cardRefs = useRef(new Map<string, HTMLButtonElement>());
+  // M11's roving tabindex: the arrow keys must MOVE FOCUS with the
+  // selection (the WAI-ARIA radiogroup pattern), not just re-check a
+  // distant button.
+  const periodBtnRefs = useRef(new Map<MapPeriod, HTMLButtonElement>());
 
   // M11: session-only period state — no network, no storage, no KV.
   const [period, setPeriod] = useState<MapPeriod>(DEFAULT_PERIOD);
@@ -272,6 +287,7 @@ export function WorldMap({
         '1D': loading || old ? null : pctOf(entry, '1D'),
         '1W': loading || old ? null : pctOf(entry, '1W'),
         '1M': loading || old ? null : pctOf(entry, '1M'),
+        '1Y': loading || old ? null : pctOf(entry, '1Y'),
       } as Record<MapPeriod, number | null>;
       return { cfg, entry, old, pcts };
     });
@@ -279,12 +295,14 @@ export function WorldMap({
       '1D': mapScaleOf(pctsAll.map((r) => r.pcts['1D'])),
       '1W': mapScaleOf(pctsAll.map((r) => r.pcts['1W'])),
       '1M': mapScaleOf(pctsAll.map((r) => r.pcts['1M'])),
+      '1Y': mapScaleOf(pctsAll.map((r) => r.pcts['1Y'])),
     } as Record<MapPeriod, number>;
     return pctsAll.map(({ cfg, entry, old, pcts }) => {
       const wts = {
         '1D': pcts['1D'] === null ? 0 : mapWeightOf(pcts['1D'], '1D', scales['1D']),
         '1W': pcts['1W'] === null ? 0 : mapWeightOf(pcts['1W'], '1W', scales['1W']),
         '1M': pcts['1M'] === null ? 0 : mapWeightOf(pcts['1M'], '1M', scales['1M']),
+        '1Y': pcts['1Y'] === null ? 0 : mapWeightOf(pcts['1Y'], '1Y', scales['1Y']),
       } as Record<MapPeriod, number>;
       const pct = pcts[period];
       const dir: MapDir | null = pct === null || pct === 0 ? null : pct > 0 ? 'u' : 'd';
@@ -408,16 +426,19 @@ export function WorldMap({
     '1D': mapCopy.periodToday,
     '1W': mapCopy.periodWeek,
     '1M': mapCopy.periodMonth,
+    '1Y': mapCopy.periodYear,
   };
   const periodWord: Record<MapPeriod, string> = {
     '1D': mapCopy.periodWordToday,
     '1W': mapCopy.periodWordWeek,
     '1M': mapCopy.periodWordMonth,
+    '1Y': mapCopy.periodWordYear,
   };
   const cellLabel: Record<MapPeriod, string> = {
     '1D': mapCopy.cellD,
     '1W': mapCopy.cellW,
     '1M': mapCopy.cellM,
+    '1Y': mapCopy.cellY,
   };
 
   const n = (v: number) => formatNumber(v, numberLocale, { maximumFractionDigits: 0 });
@@ -448,12 +469,16 @@ export function WorldMap({
               flat: n(summary.flat),
             })}
           </p>
-          {/* M11 — the three-option segmented control + M17's stale-copy line. */}
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          {/* M11 — the four-option segmented control + M17's stale-copy line.
+           * 2026-10-20h owner round: the switch CENTRES under the summary
+           * (it hugged the start edge before) and grows ~50% — 48px pills,
+           * 18.7px words — because the owner asked for bigger and easier
+           * to see. Yearly joins as the fourth lens. */}
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
             <div
               role="radiogroup"
               aria-label={mapCopy.periodSwitchAria}
-              className="inline-flex max-w-full overflow-x-auto rounded-full bg-currena-soft/70 p-0.5 ring-1 ring-[var(--color-border)]"
+              className="inline-flex max-w-full overflow-x-auto rounded-full bg-currena-soft/70 p-1 ring-1 ring-[var(--color-border)]"
             >
               {MAP_PERIODS.map((p) => {
                 const selected = period === p;
@@ -472,9 +497,14 @@ export function WorldMap({
                       else return;
                       e.preventDefault();
                       setPeriod(MAP_PERIODS[next]!);
+                      periodBtnRefs.current.get(MAP_PERIODS[next]!)?.focus();
                     }}
                     onClick={() => setPeriod(p)}
-                    className={`insights-focusable min-h-[32px] cursor-pointer whitespace-nowrap rounded-full px-3 py-0.5 text-[length:var(--type-caption)] font-semibold transition-colors ${
+                    ref={(el) => {
+                      if (el === null) periodBtnRefs.current.delete(p);
+                      else periodBtnRefs.current.set(p, el);
+                    }}
+                    className={`insights-focusable min-h-[48px] cursor-pointer whitespace-nowrap rounded-full px-4 py-1 text-[length:calc(var(--type-caption)*1.5)] font-semibold transition-colors @max-[480px]:min-h-[44px] @max-[480px]:px-3 @max-[480px]:text-[length:calc(var(--type-caption)*1.25)] ${
                       selected
                         ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)]'
                         : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
@@ -582,13 +612,14 @@ export function WorldMap({
           </g>
         </svg>
 
-        {/* M6/M8 + the 2026-10-20f owner round — the callout cards, map
+        {/* M6/M8 + the 2026-10-20f/h owner rounds — the callout cards, map
          * layout only (the container query hides them below 960px; JS gates
          * the leader lines on the same measured width). DOM order = §4.1
-         * order = tab order. Each card carries the Day/Week/Month
-         * performance side by side — a triangle (up = green, down = red,
-         * flat = a dash bar) and the signed percent, the ink's saturation
-         * relative to the biggest move in that same period. */}
+         * order = tab order. Each card carries the YEARLY hero (50% bigger
+         * — 2026-10-20h) above the compact Day/Week/Month cells — a
+         * triangle (up = green, down = red, flat = a dash bar) and the
+         * signed number, the ink's saturation relative to the biggest move
+         * in that same period. */}
         {!loading ? (
           <div className="wm-cards absolute inset-0 hidden @min-[960px]:block">
             {rows.map((r) => {
@@ -646,8 +677,48 @@ export function WorldMap({
                     </span>
                   </span>
                   <span className="sr-only">{mapCopy.srPerf}</span>
+                  {/* 2026-10-20h owner round — the YEARLY hero row: the
+                   * app's NORMAL horizon, 50% bigger than the old numbers
+                   * ("add yearly performance and make it 50% bigger and
+                   * easier to see"), triangle + signed percent in the
+                   * direction ink, emphasised when the map speaks 1Y. */}
+                  {(() => {
+                    const pct = r.pcts['1Y'];
+                    const missing = pct === null;
+                    const yDir: 'u' | 'd' | null = missing || pct === 0 ? null : pct > 0 ? 'u' : 'd';
+                    const yTri =
+                      yDir === 'u' ? (
+                        <path d="M5 1 9.5 9H.5z" />
+                      ) : yDir === 'd' ? (
+                        <path d="M.5 1h9L5 9z" />
+                      ) : (
+                        <rect x="0.5" y="3.5" width="9" height="3" rx="1" />
+                      );
+                    const yi = yDir !== null ? `${inkMixOf(r.wts['1Y'])}%` : undefined;
+                    return (
+                      <span data-p="1Y" className={`wm-yrow${period === '1Y' ? ' sel' : ''}`}>
+                        <i className="wm-pl">{cellLabel['1Y']}</i>
+                        <b className={`wm-pv wm-yv${yDir !== null ? ` s-${yDir}` : ' s-x'}`} style={yi !== undefined ? { ['--i' as string]: yi } : undefined}>
+                          {missing ? (
+                            <bdi dir="ltr">—</bdi>
+                          ) : (
+                            <>
+                              <svg className="wm-ar2" viewBox="0 0 10 10" aria-hidden="true" focusable="false" width="13" height="13">
+                                {yTri}
+                              </svg>
+                              <bdi dir="ltr">{signedPct(pct, numberLocale, locale)}</bdi>
+                            </>
+                          )}
+                        </b>
+                      </span>
+                    );
+                  })()}
+                  {/* The compact Day/Week/Month cells — the percent glyph
+                   * moved into the hero (and sr-only here): the glyph is
+                   * what made the old 12.5px values overrun their 35px
+                   * cells and run into each other. */}
                   <span className="wm-tri">
-                    {MAP_PERIODS.map((p) => {
+                    {MAP_PERIODS.filter((p) => p !== '1Y').map((p) => {
                       const pct = r.pcts[p];
                       const missing = pct === null;
                       const dir: 'u' | 'd' | null = missing || pct === 0 ? null : pct > 0 ? 'u' : 'd';
@@ -668,10 +739,11 @@ export function WorldMap({
                               <bdi dir="ltr">—</bdi>
                             ) : (
                               <>
-                                <svg className="wm-ar2" viewBox="0 0 10 10" aria-hidden="true" focusable="false" width="9" height="9">
+                                <svg className="wm-ar2" viewBox="0 0 10 10" aria-hidden="true" focusable="false" width="7" height="7">
                                   {tri}
                                 </svg>
-                                <bdi dir="ltr">{signedPct(pct, numberLocale, locale)}</bdi>
+                                <bdi dir="ltr">{signedNum(pct, numberLocale)}</bdi>
+                                <span className="sr-only">%</span>
                               </>
                             )}
                           </b>
@@ -679,10 +751,15 @@ export function WorldMap({
                       );
                     })}
                   </span>
-                  <span className="wm-card-val">
-                    <span className="sr-only">{mapCopy.srVal}</span>
-                    {hasData && r.entry !== undefined ? <bdi dir="ltr">{fmtValue(r.entry, numberLocale)}</bdi> : null}
-                  </span>
+                  {/* 2026-10-20h: the last close rides in the accessible
+                   * name only — the visible card speaks the name, the
+                   * state and the four performance horizons; the explorer
+                   * and the detail view carry the close. */}
+                  {hasData && r.entry !== undefined ? (
+                    <span className="sr-only">
+                      {mapCopy.srVal} {fmtValue(r.entry, numberLocale)}
+                    </span>
+                  ) : null}
                 </button>
               );
             })}

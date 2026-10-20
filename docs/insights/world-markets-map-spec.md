@@ -164,8 +164,8 @@ Steps: strong fall, fall, flat, rise, strong rise.
 
 ### M11 — Period switch
 **Context:** Control above the map.
-**Technical instruction:** Add a three-option segmented control: Today, 1 month, 1 year. Select Today by default. Make the map, the cards, the summary line, and the legend follow the selected period. Do not send a network request when the period changes. Keep the choice in memory for the session only.
-**Why:** Visitors who are learning gain from a longer period, which has less noise. Today stays the default because people know it from other heatmaps (Jakob's Law).
+**Technical instruction:** Add a segmented control with FOUR options: Today, 1 week, 1 month, 1 year (yearly returned by the 2026-10-20h owner round; the original trio was Today | 1 month | 1 year). Select Today by default. Centre the control under the summary line and draw it ~50% larger than a default control (48px pills, ~18.7px words) so it is easy to see. Make the map, the cards, the summary line, and the legend follow the selected period. Do not send a network request when the period changes. Keep the choice in memory for the session only.
+**Why:** Visitors who are learning gain from a longer period, which has less noise. Today stays the default because people know it from other heatmaps (Jakob's Law). The owner asked for the switch to be centred, bigger and easier to see, and for yearly performance to return to the map.
 **Note:** Use the thresholds in Section 4.2. Do not store the choice in KV.
 
 ### M12 — Legend

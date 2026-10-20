@@ -36,6 +36,24 @@
  *             its strongest fresh mover — removing one keeps the tint,
  *             removing all three neutralises the country.
  *
+ * 2026-10-20h owner round — yearly returns to the map, the switch grows
+ * up and centres:
+ *   switch   FOUR options (Today | 1 week | 1 month | 1 year), centred
+ *             under the summary, ~50% bigger (48px pills, ~18.7px words),
+ *             with a proper roving-tabindex radiogroup (arrows move
+ *             focus + selection);
+ *   yearly   chg1y drives the colours exactly like the other lenses and
+ *             every card carries a YEARLY hero row (caption × 1.5, the
+ *             percent glyph's only visible home) above the compact
+ *             Day/Week/Month cells — the old 12.5px values overran
+ *             their 35px cells and ran into each other, so the compact
+ *             cells drop the glyph (sr-only keeps the unit) and the
+ *             no-clip test now guards EVERY value against collisions;
+ *   layout   the taller cards re-band the callouts (top/left/right/
+ *             bottom/float) and every country-label anchor is re-cleared
+ *             — the Sydney pin and the Australia label, both covered by
+ *             the old asx200 card, are visible again.
+ *
  * §9.7 (the KV budget) is a vitest on the real job + store
  * (packages/insights/src/markets/markets.test.ts, "MAP §9.7") — the route
  * itself is untouched by the map, so its single cached read is unchanged
@@ -68,7 +86,10 @@ type Lang = 'en' | 'fa';
 type Theme = 'light' | 'dark';
 
 /** Boot the Insights page in a locale/theme, scroll the map into view and
- * wait for the lazy land asset + the leader lines to settle. */
+ * wait for the lazy land asset + the leader lines to settle. 2026-10-20h:
+ * the .wm module must be ATTACHED before the scroll — when the markets
+ * fetch is still in flight the module is absent, the scroll no-ops and
+ * the lazy land (an IntersectionObserver on the module) never loads. */
 async function gotoInsights(
   page: import('@playwright/test').Page,
   opts: { width: number; lang: Lang; theme: Theme; height?: number },
@@ -83,6 +104,7 @@ async function gotoInsights(
   );
   await page.goto('/#/insights');
   await page.waitForSelector('#insights-markets', { state: 'visible' });
+  await page.waitForSelector('.wm', { state: 'attached', timeout: 15_000 });
   await page.evaluate(() => document.querySelector('.wm')?.scrollIntoView({ block: 'center' }));
   await page.waitForSelector('.wm-c', { state: 'attached', timeout: 20_000 });
   await page.waitForTimeout(500); // leader lines + fonts settle
@@ -183,6 +205,21 @@ test('layout §9.2: no card text clips at the narrower map box', async ({ page }
     }),
   );
   expect(clips, `clipped: ${clips.join(', ')}`).toEqual([]);
+  // 2026-10-20h: the VALUE rows too — the old 12.5px triplet overran its
+  // 35px cells and the values ran into each other (the defect this round
+  // fixes). Every performance value and every caption must fit its box.
+  const overruns = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('.wm-card')).flatMap((c) => {
+      const id = (c as HTMLElement).dataset.id ?? '';
+      const out: string[] = [];
+      for (const el of Array.from(c.querySelectorAll('.wm-pl, .wm-pv'))) {
+        const h = el as HTMLElement;
+        if (h.scrollWidth > h.clientWidth + 1) out.push(`${id}:${h.className.split(' ')[0]}+${h.textContent ?? ''}`);
+      }
+      return out;
+    }),
+  );
+  expect(overruns, `value overruns: ${overruns.join(', ')}`).toEqual([]);
 });
 
 test('layout §9.2: centred map box ~200–300px under the module, full width in the list layout', async ({ page }) => {
@@ -397,8 +434,6 @@ for (const theme of ['light', 'dark'] as const) {
       // Real text elements on their real surfaces.
       const name = document.querySelector('.wm-card-name') as HTMLElement | null;
       if (name !== null) out['card-name-color'] = getComputedStyle(name).color;
-      const val = document.querySelector('.wm-card-val') as HTMLElement | null;
-      if (val !== null) out['card-val-color'] = getComputedStyle(val).color;
       const tag = document.querySelector('.wm-tag') as HTMLElement | null;
       if (tag !== null) out['tag-color'] = getComputedStyle(tag).color;
       const pl = document.querySelector('.wm-pl') as HTMLElement | null;
@@ -427,16 +462,16 @@ for (const theme of ['light', 'dark'] as const) {
     };
 
     const surface = probe['surface'] ?? '#ffffff';
-    // Text ≥ 4.5:1 on the card surface — the triplet inks, labels, muted texts.
+    // Text ≥ 4.5:1 on the card surface — the hero + cell inks, labels, muted texts.
     const cells = JSON.parse(probe['cells']!) as Array<{ id: string; p: string; color: string; cls: string }>;
-    expect(cells.length).toBe(48); // 16 cards × D/W/M
+    expect(cells.length).toBe(64); // 16 cards × (1Y hero + D/W/M)
     for (const c of cells) {
       if (c.cls.includes('s-x')) continue; // neutral grey cells: checked below with the muted texts
       const r = ratio(c.color, surface);
       test.info().annotations.push({ type: 'note', description: `ink ${c.id}/${c.p} ${r.toFixed(2)}:1` });
       expect(r, `cell ink ${c.id}/${c.p} on surface`).toBeGreaterThanOrEqual(4.5);
     }
-    for (const key of ['card-name-color', 'card-val-color', 'tag-color', 'pl-color', 'legend-em-color', 'legend-text-color']) {
+    for (const key of ['card-name-color', 'tag-color', 'pl-color', 'legend-em-color', 'legend-text-color']) {
       if (probe[key] === undefined) continue;
       const r = ratio(probe[key]!, surface);
       test.info().annotations.push({ type: 'note', description: `${key} ${r.toFixed(2)}:1` });
@@ -584,24 +619,43 @@ test('farsi §9.6: Persian digits, true minus, percent glyph, unmirrored map', a
   // DOM order still §4.1 (west to east, never mirrored).
   const order = await page.evaluate(() => Array.from(document.querySelectorAll('.wm-card')).map((c) => (c as HTMLElement).dataset.id));
   expect(order).toEqual([...MAP_ORDER]);
-  // The triplet cells carry the app's own Persian period words
-  // (روزانه / هفتگی / ماهانه — priceChangeDaily & co).
+  // The card's period captions carry the app's own Persian period words
+  // (روزانه / هفتگی / ماهانه — priceChangeDaily & co; 2026-10-20h: the
+  // yearly hero rides FIRST with سالانه).
   const labels = await page.evaluate(() =>
     Array.from(document.querySelectorAll('.wm-card[data-id="sp500"] .wm-pl')).map((l) => l.textContent),
   );
-  expect(labels).toEqual(['روزانه', 'هفتگی', 'ماهانه']);
+  expect(labels).toEqual(['سالانه', 'روزانه', 'هفتگی', 'ماهانه']);
   // A negative cell (Ibovespa −1.8 in the fixture): Persian digits, the
-  // true minus U+2212, the Persian percent glyph — inside an LTR bdi.
+  // true minus U+2212 — inside an LTR bdi. 2026-10-20h: the compact
+  // cells speak the number only (the glyph lives in the hero); the
+  // sr-only % keeps the unit in the accessible name.
   const neg = await page.evaluate(() => {
     const card = document.querySelector('.wm-card[data-id="ibov"]') as HTMLElement;
     const bdi = card.querySelector('.wm-cell[data-p="1D"] .wm-pv bdi')!;
-    return { text: bdi.textContent ?? '', dir: bdi.getAttribute('dir') ?? '' };
+    const sr = card.querySelector('.wm-cell[data-p="1D"] .wm-pv .sr-only')!;
+    return { text: bdi.textContent ?? '', dir: bdi.getAttribute('dir') ?? '', srUnit: sr.textContent ?? '' };
   });
   expect(neg.dir).toBe('ltr');
   expect(neg.text).toContain('−');
-  expect(neg.text).toContain('٪');
   expect(neg.text).toMatch(/[۰-۹]/);
   expect(neg.text).not.toMatch(/[0-9]/);
+  expect(neg.text).not.toContain('٪'); // the glyph moved to the hero row
+  expect(neg.srUnit).toBe('%');
+  // The YEARLY hero (Ibovespa −45.4): the big number KEEPS the Persian
+  // percent glyph — the unit's only visible home on the card.
+  const hero = await page.evaluate(() => {
+    const card = document.querySelector('.wm-card[data-id="ibov"]') as HTMLElement;
+    const bdi = card.querySelector('.wm-yrow .wm-yv bdi')!;
+    const yv = card.querySelector('.wm-yrow .wm-yv') as HTMLElement;
+    return { text: bdi.textContent ?? '', dir: bdi.getAttribute('dir') ?? '', font: getComputedStyle(yv).fontSize };
+  });
+  expect(hero.dir).toBe('ltr');
+  expect(hero.text).toContain('−');
+  expect(hero.text).toContain('٪');
+  expect(hero.text).toMatch(/[۰-۹]/);
+  expect(hero.text).not.toMatch(/[0-9]/);
+  expect(parseFloat(hero.font)).toBeGreaterThanOrEqual(18); // ~50% bigger than the 12.5px cells
   // The header's Updated line renders the Jalali calendar (Persian digits).
   const updated = await page.evaluate(() => {
     const section = document.getElementById('insights-markets')!;
@@ -621,6 +675,104 @@ test('farsi §9.6: Persian digits, true minus, percent glyph, unmirrored map', a
 });
 
 /* ------------------------------------------------------------------ *
+ * 2026-10-20h owner round — the period switch: centred, four lenses,
+ * ~50% bigger, and yearly drives the map like any other lens.
+ * ------------------------------------------------------------------ */
+
+test('switch 2026-10-20h: centred under the summary, four options, ~50% bigger', async ({ page }) => {
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  const probe = await page.evaluate(() => {
+    const wm = document.querySelector('.wm') as HTMLElement;
+    const grp = document.querySelector('[role="radiogroup"]') as HTMLElement;
+    const btns = Array.from(grp.querySelectorAll('button'));
+    const wr = wm.getBoundingClientRect();
+    const gr = grp.getBoundingClientRect();
+    const first = btns[0] as HTMLElement;
+    const cs = getComputedStyle(first);
+    return {
+      moduleW: Math.round(wr.width),
+      labels: btns.map((b) => b.textContent),
+      checked: btns.map((b) => b.getAttribute('aria-checked')),
+      tabbables: btns.map((b) => (b as HTMLElement).tabIndex),
+      btnH: Math.round(first.getBoundingClientRect().height),
+      btnFont: cs.fontSize,
+      grpW: Math.round(gr.width),
+      centered: Math.round(Math.abs(gr.left - wr.left - (wr.right - gr.right))),
+    };
+  });
+  // Four lenses in horizon order, Today checked, one tab stop (roving).
+  expect(probe.labels).toEqual(['Today', '1 week', '1 month', '1 year']);
+  expect(probe.checked).toEqual(['true', 'false', 'false', 'false']);
+  expect(probe.tabbables).toEqual([0, -1, -1, -1]);
+  // ~50% bigger and easier to see: 48px pills (was 32), ~18.7px words (was 12.5).
+  expect(probe.btnH).toBeGreaterThanOrEqual(46);
+  expect(parseFloat(probe.btnFont)).toBeGreaterThanOrEqual(18);
+  test.info().annotations.push({ type: 'note', description: `switch ${probe.grpW}px wide, pills ${probe.btnH}px @ ${probe.btnFont}` });
+  // CENTRED under the summary line (it hugged the start edge before).
+  expect(probe.centered).toBeLessThanOrEqual(2);
+});
+
+test('switch 2026-10-20h: arrow keys rove focus + selection (the ARIA radiogroup pattern)', async ({ page }) => {
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  const grp = page.locator('[role="radiogroup"]');
+  await grp.locator('button').first().focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(grp.locator('button').nth(1)).toBeFocused();
+  await expect(grp.locator('button').nth(1)).toHaveAttribute('aria-checked', 'true');
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('ArrowRight');
+  await expect(grp.locator('button').nth(3)).toBeFocused(); // 1 year
+  await expect(grp.locator('button').nth(3)).toHaveAttribute('aria-checked', 'true');
+  // Wrap: ArrowRight from the last lands on Today again.
+  await page.keyboard.press('ArrowRight');
+  await expect(grp.locator('button').first()).toBeFocused();
+  await expect(grp.locator('button').first()).toHaveAttribute('aria-checked', 'true');
+  // ArrowLeft walks back and keeps the rove symmetric.
+  await page.keyboard.press('ArrowLeft');
+  await expect(grp.locator('button').nth(3)).toBeFocused();
+  await expect(page.locator('.wm p')).toContainText('this year');
+});
+
+test('switch 2026-10-20h: 1 year drives the whole map — summary, tints, pins, hero emphasis', async ({ page }) => {
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  // The fixture's 1Y lens: 8 up, 7 down, 1 flat (FTSE −2.9 inside the
+  // ±3 flat band); SSEC flips from today's rise to the year's fall.
+  await expect(page.locator('.wm p')).toContainText('today');
+  await page.locator('[role="radiogroup"] button').nth(3).click();
+  await expect(page.locator('.wm p')).toContainText('8 of 16 markets up this year');
+  await expect(page.locator('.wm p')).toContainText('7 down');
+  await expect(page.locator('.wm p')).toContainText('1 flat');
+  // China flips with Shanghai's −6.1 year; the US stays green (S&P +10.9
+  // leads the trio); Brazil reads the year's biggest fall (−45.4).
+  const tints = await page.evaluate(() => ({
+    cn: document.querySelector('[data-iso="156"]')!.getAttribute('class') ?? '',
+    us: document.querySelector('[data-iso="840"]')!.getAttribute('class') ?? '',
+    br: document.querySelector('[data-iso="076"]')!.getAttribute('class') ?? '',
+    gb: document.querySelector('[data-iso="826"]')!.getAttribute('class') ?? '',
+  }));
+  expect(tints.cn).toContain('s-d');
+  expect(tints.us).toContain('s-u');
+  expect(tints.br).toContain('s-d');
+  // The UK's −2.9 sits INSIDE the yearly flat band → the honest floor tint.
+  expect(tints.gb).toContain('s-d');
+  // Every card's yearly hero row is the emphasised lens; the hero value
+  // keeps the percent glyph and reads Ibovespa's −45.4.
+  const heroes = await page.evaluate(() => ({
+    sel: document.querySelectorAll('.wm-yrow.sel').length,
+    ibov: (document.querySelector('.wm-card[data-id="ibov"] .wm-yv bdi') as HTMLElement).textContent ?? '',
+  }));
+  expect(heroes.sel).toBe(16);
+  expect(heroes.ibov).toContain('−45.4%');
+  // The compact cells keep their own lens emphasis OFF (1Y is selected).
+  expect(await page.evaluate(() => document.querySelectorAll('.wm-cell.sel').length)).toBe(0);
+  // Back to Today: the summary follows, no reload, no network.
+  await page.locator('[role="radiogroup"] button').first().click();
+  await expect(page.locator('.wm p')).toContainText('markets up today');
+  expect(await page.evaluate(() => document.querySelectorAll('.wm-yrow.sel').length)).toBe(0);
+  expect(await page.evaluate(() => document.querySelectorAll('.wm-cell.sel').length)).toBe(16);
+});
+
+/* ------------------------------------------------------------------ *
  * §9.8 — the mock-payload states
  * ------------------------------------------------------------------ */
 
@@ -636,17 +788,18 @@ test('state §9.8: all up', async ({ page }) => {
       m.chg1d = 2.4;
       m.chg1w = 3.1;
       m.chg1m = 6.5;
+      m.chg1y = 9.4;
     }
   });
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
   await expect(page.locator('.wm p')).toContainText('16 of 16 markets up today');
   const steps = await page.evaluate(() => Array.from(document.querySelectorAll('.wm-card')).map((c) => c.classList.contains('s-u')));
   expect(steps.every(Boolean)).toBe(true);
-  // The triplet's triangles all point up.
+  // The hero + the cells' triangles all point up.
   const tris = await page.evaluate(() =>
     Array.from(document.querySelectorAll('.wm-card .wm-pv.s-u .wm-ar2 path')).map((p) => (p as SVGPathElement).getAttribute('d')),
   );
-  expect(tris).toHaveLength(48);
+  expect(tris).toHaveLength(64);
   expect(tris.every((d) => d === 'M5 1 9.5 9H.5z')).toBe(true);
 });
 
@@ -656,6 +809,7 @@ test('state §9.8: all down', async ({ page }) => {
       m.chg1d = -2.4;
       m.chg1m = -6.5;
       m.chg1w = -3.1;
+      m.chg1y = -9.4;
     }
   });
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
@@ -663,11 +817,11 @@ test('state §9.8: all down', async ({ page }) => {
   await expect(page.locator('.wm p')).toContainText('16 down');
   const steps = await page.evaluate(() => Array.from(document.querySelectorAll('.wm-card')).map((c) => c.classList.contains('s-d')));
   expect(steps.every(Boolean)).toBe(true);
-  // The triplet's triangles all point down.
+  // The hero + the cells' triangles all point down.
   const tris = await page.evaluate(() =>
     Array.from(document.querySelectorAll('.wm-card .wm-pv.s-d .wm-ar2 path')).map((p) => (p as SVGPathElement).getAttribute('d')),
   );
-  expect(tris).toHaveLength(48);
+  expect(tris).toHaveLength(64);
   expect(tris.every((d) => d === 'M.5 1h9L5 9z')).toBe(true);
 });
 
