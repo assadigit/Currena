@@ -536,7 +536,25 @@ const BUDGETS = [
   // both owner-directed surfaces on one lazy route. The entry chunk is
   // untouched at 295.28/88.81 vs 296/89.5. Justified in the 2026-10-19
   // v3-merge session record (docs/DEPLOY.md).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 687_000, gz: 166_000, label: 'Insights lazy chunk' },
+
+  // OWNER UI-RESTORE (687.00 → 700.00 raw, 166.00 → 169.00 gz, 2026-10-20
+  // — "I liked the previous UI more… keep the new data… in the PREVIOUS
+  // UI"): the editorial hero (main@1e39a24) is restored over the v3 hero
+  // card — the art-band region cards, the tinted verdict pill, the
+  // needs-attention tiles, the compact gauge rows, the rule/signals
+  // panels and the mobile Global-first swipe carousel return, and with
+  // them the raised world-section bullets + section indicators; the full
+  // five-lens markets table returns (UI-27's column cut retired, its
+  // local-currency note kept); ContinueStrip returns in MovesNextStrip's
+  // place. The v3 DATA layer stays (sources registry, connections,
+  // reliability machinery, state words, delayed tier — all of it feeds
+  // the restored surface). Measured 697.38 kB raw / 167.88 kB gz —
+  // +10.60 raw / +2.43 gz over the merged tree: the owner's editorial
+  // components are bigger markup than the v3 card they replace (highly
+  // compressible — the gzip delta is +2.43 kB for the whole restored
+  // surface). The entry chunk is untouched at 295.28/88.81 vs 296/89.5.
+  // Justified in CHANGELOG §2026-10-20 (owner UI restore).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 700_000, gz: 169_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

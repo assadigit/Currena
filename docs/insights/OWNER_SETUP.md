@@ -177,3 +177,19 @@ PR #1 is closed as merged-by-directive.
 4. **The nightly `chg1y` backfill** rides tonight's 23:30 UTC cron —
    verify the Yearly lens shows values tomorrow; today's honest dashes
    are by design.
+
+## 13. UPDATE — the 2026-10-20 owner directive: the PREVIOUS UI restored over the v3 data
+
+The owner's follow-up directive (2026-10-20), on seeing the merged v3
+surface live: "I liked the previous UI more, especially for the world and
+australia header sections. please revert back to the previous version UI,
+but keep the new data, connections etc. … in the PREVIOUS UI." — executed
+on top of §12's shipped tree: the editorial hero (world + Australia
+header cards), the ContinueStrip and the full five-lens markets table are
+restored verbatim from `main@1e39a24`; every v3 update about the
+indicators, their connections and reliability STAYS (sources registry,
+state words, delayed tier, on-face meta, data-health chip, About rework,
+owner export, sparse-honesty balance). Full record: CHANGELOG
+§2026-10-20 (owner UI restore) + UI_REPORT's addendum. The four §12
+hand items are unchanged and still yours (owner token, token rotation,
+fa copy review, the chg1y backfill check).

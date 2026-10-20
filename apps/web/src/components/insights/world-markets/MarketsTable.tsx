@@ -1,36 +1,39 @@
 /**
- * world-markets/MarketsTable — the full table (§6.4 → v3 UI_SPEC §7a):
- * a real <table> with <th scope> at ≥900px, a vertical row list below —
- * the same three numbers either way.
+ * world-markets/MarketsTable — the full table (§6.4): a real <table> with
+ * <th scope> at ≥900px, a vertical row list below — the same numbers either
+ * way (round 46 added the 1-week and 1-month columns beside Today; round 47
+ * added the 1-year column beside 3 months, the same lenses the view switch
+ * offers). Split from WorldMarkets.tsx; code moved verbatim.
  *
- * v3 UI-27 (2026-10-20, PH6-C): the columns are EXACTLY Market | Today |
- * 3 months | From 52-week high | State | Last close (+date). The Trend
- * column is GONE: defect E-18's basis question is closed by removing the
- * unverifiable label per UI-27/UI-29 — the 3-month NUMBER stays and says
- * what it says, with no second, threshold-less word beside it. The
- * L2-01 state words stay (UI-28, no "Normal" — U-11), the mobile card
- * list has no horizontal scroll (UI-31) and the delayed/stale row tags
- * stay (UI-32).
- *
- * UI-27's ONE header note — "Returns in each market's local currency." —
- * renders HERE, with the table (it moved from the ViewSwitch row, where
- * it sat beside a control the table does not answer).
+ * OWNER DIRECTIVE (2026-10-20, post-v3-merge): "keep the new data… in the
+ * PREVIOUS UI" — this is the PREVIOUS full table, restored verbatim from
+ * main@1e39a24 (Today · 1 week · 1 month · 3 months · 1 year · from-high ·
+ * Trend · Status · Last close). The v3 UI-27 column cut is retired by that
+ * directive; the lens data the columns need never left the payload (the
+ * v3 merge kept it for the exports). One v3 honesty addition is KEPT: the
+ * local-currency note (UI-27) renders with the table — the owner's "keep
+ * the new data… and reliability" covers this caveat, and it changes no
+ * column, number or layout.
  */
 
-import type { MarketId, MarketsSnapshot } from '@currena/core';
+import type { MarketEntry, MarketId, MarketsSnapshot } from '@currena/core';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { formatAsOf } from '../HistoryChart';
 import {
+  DirectionGlyph,
   fmtClose,
   signedPct,
+  signedPctOrDash,
   statusToneOf,
   statusWordKeyOf,
+  TREND_WORD_OF,
   tradingDaysBehind,
+  trendOf,
 } from './shared';
 
 /* ------------------------------------------------------------------ *
- * The full table (§6.4 → §7a): real <table> with <th scope> at ≥900px;
- * a vertical row list below — the same three numbers either way.
+ * The full table (§6.4): real <table> with <th scope> at ≥900px; a
+ * vertical row list below — the same numbers either way.
  * ------------------------------------------------------------------ */
 
 export function MarketsTable({
@@ -49,15 +52,20 @@ export function MarketsTable({
   // One sort only (§6.4): from the 52-week high, worst first — a stable
   // sort keeps the trading-day order inside equal distances.
   const rows = [...snapshot.markets].sort((a, b) => a.fromHigh - b.fromHigh);
+  // Step-1 F2: the trend word AND arrow come from the same 3-month number
+  // the row shows (the old 50-day-MA word contradicted the row beside it).
+  const trendCell = (m: MarketEntry): string => copy.markets[TREND_WORD_OF[trendOf(m)]];
+  const arrow = (m: MarketEntry): 'up' | 'flat' | 'down' => trendOf(m);
   // Step-1 A7: the delayed tag's baseline — the freshest close in the payload.
   const freshestIso = snapshot.markets.reduce((max, m) => (m.asOf > max ? m.asOf : max), snapshot.markets[0]?.asOf ?? '');
 
   return (
     <>
-      {/* UI-27: the table's ONE header note — returns are in each market's
-       * own currency, so the three percentages beside each other are not
-       * directly comparable (Ibovespa in BRL ≠ the others in USD terms).
-       * Visible whenever the table is (both its desktop and mobile forms). */}
+      {/* UI-27 (kept through the 2026-10-20 owner restore): the table's ONE
+       * header note — returns are in each market's own currency, so the
+       * percentages beside each other are not directly comparable
+       * (Ibovespa in BRL ≠ the others in USD terms). Visible whenever the
+       * table is (both its desktop and mobile forms). */}
       <p className="m-0 mb-2 px-2.5 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]" data-local-currency-note>
         {copy.markets.localCurrencyNote}
       </p>
@@ -69,9 +77,13 @@ export function MarketsTable({
             <tr className="border-b border-[var(--color-border)]">
               <th scope="col" className="px-2 py-1.5 text-start font-bold text-[var(--color-text-secondary)]">{copy.markets.thMarket}</th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thToday}</th>
+              <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thWeek}</th>
+              <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thMonth}</th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.th3m}</th>
+              <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thYear}</th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thFromHigh}</th>
-              <th scope="col" className="px-2 py-1.5 text-start font-bold text-[var(--color-text-secondary)]">{copy.markets.thState}</th>
+              <th scope="col" className="px-2 py-1.5 text-start font-bold text-[var(--color-text-secondary)]">{copy.markets.thTrend}</th>
+              <th scope="col" className="px-2 py-1.5 text-start font-bold text-[var(--color-text-secondary)]">{copy.markets.thStatus}</th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thClose}</th>
             </tr>
           </thead>
@@ -107,10 +119,25 @@ export function MarketsTable({
                   <bdi dir="ltr" className="font-semibold">{signedPct(m.chg1d, numberLocale, locale)}</bdi>
                 </td>
                 <td className="px-2 py-1.5 text-end tabular-nums">
+                  <bdi dir="ltr" className="font-semibold">{signedPctOrDash(m.chg1w ?? null, numberLocale, locale)}</bdi>
+                </td>
+                <td className="px-2 py-1.5 text-end tabular-nums">
+                  <bdi dir="ltr" className="font-semibold">{signedPctOrDash(m.chg1m ?? null, numberLocale, locale)}</bdi>
+                </td>
+                <td className="px-2 py-1.5 text-end tabular-nums">
                   <bdi dir="ltr" className="font-semibold">{signedPct(m.chg3m, numberLocale, locale)}</bdi>
                 </td>
                 <td className="px-2 py-1.5 text-end tabular-nums">
+                  <bdi dir="ltr" className="font-semibold">{signedPctOrDash(m.chg1y ?? null, numberLocale, locale)}</bdi>
+                </td>
+                <td className="px-2 py-1.5 text-end tabular-nums">
                   <bdi dir="ltr" className="font-semibold">{signedPct(m.fromHigh, numberLocale, locale)}</bdi>
+                </td>
+                <td className="px-2 py-1.5 whitespace-nowrap text-[var(--color-text-secondary)]">
+                  <span aria-hidden="true" className="me-1 inline-flex align-[-2px]">
+                    <DirectionGlyph arrow={arrow(m)} size={13} desktopSize={14} />
+                  </span>
+                  {trendCell(m)}
                 </td>
                 <td className="px-2 py-1.5">
                   <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.68rem] font-bold ${statusToneOf(m.fromHigh)}`}>
@@ -138,7 +165,10 @@ export function MarketsTable({
         <span>{copy.markets.thMarket}</span>
         <span dir="ltr" className="inline-flex gap-3">
           <span>{copy.markets.thToday}</span>
+          <span>{copy.markets.thWeek}</span>
+          <span>{copy.markets.thMonth}</span>
           <span>{copy.markets.th3m}</span>
+          <span>{copy.markets.thYear}</span>
           <span>{copy.markets.thFromHigh}</span>
         </span>
       </p>
@@ -166,15 +196,27 @@ export function MarketsTable({
                   <span className="sr-only"> {copy.markets.thToday}</span>
                 </bdi>
                 <bdi dir="ltr">
+                  {signedPctOrDash(m.chg1w ?? null, numberLocale, locale)}
+                  <span className="sr-only"> {copy.markets.thWeek}</span>
+                </bdi>
+                <bdi dir="ltr">
+                  {signedPctOrDash(m.chg1m ?? null, numberLocale, locale)}
+                  <span className="sr-only"> {copy.markets.thMonth}</span>
+                </bdi>
+                <bdi dir="ltr">
                   {signedPct(m.chg3m, numberLocale, locale)}
                   <span className="sr-only"> {copy.markets.th3m}</span>
+                </bdi>
+                <bdi dir="ltr">
+                  {signedPctOrDash(m.chg1y ?? null, numberLocale, locale)}
+                  <span className="sr-only"> {copy.markets.thYear}</span>
                 </bdi>
                 <bdi dir="ltr">
                   {signedPct(m.fromHigh, numberLocale, locale)}
                   <span className="sr-only"> {copy.markets.thFromHigh}</span>
                 </bdi>
               </span>
-              <span className="sr-only">{copy.markets[statusWordKeyOf(m.fromHigh)]}</span>
+              <span className="sr-only">{copy.markets[TREND_WORD_OF[trendOf(m)]]}, {copy.markets[statusWordKeyOf(m.fromHigh)]}</span>
               {tradingDaysBehind(m.asOf, freshestIso) > 1 ? (
                 <span className="rounded-full bg-currena-muted/15 px-1.5 py-0.5 text-[0.68rem] font-semibold text-[var(--color-text-secondary)]">
                   {copy.markets.delayedTag}

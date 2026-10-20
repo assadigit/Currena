@@ -1,5 +1,23 @@
 # UI_REPORT.md — the UI_SPEC delivery report (runbook Phase 8)
 
+> **OWNER DIRECTIVE ADDENDUM (2026-10-20, post-merge):** "I liked the
+> previous UI more, especially for the world and australia header
+> sections… keep the new data, connections etc. … in the PREVIOUS UI."
+> The sections of this report covering the v3 **hero surface** (UI-01,
+> UI-02, UI-03, UI-04, UI-05, UI-06, UI-07, UI-08, UI-09, UI-18/UI-19
+> MovesNextStrip) and the **UI-27 column cut** are RETIRED by that
+> directive — the editorial hero from `main@1e39a24` is restored
+> (hero-editorial.test.tsx with it) and the full lens columns return with
+> UI-27's local-currency note kept. Everything this report records about
+> the **data/reliability surface** stays live: the six-word state language
+> + Delayed tier (UI-15..UI-17, U-04), on-face card meta (UI-20..UI-23,
+> U-05/U-06), the unavailable rules (U-07), relationship-card summaries
+> (UI-46, U-08), the BalanceScale sparse rule (UI-39.5/UI-40, U-09/U-09a),
+> the calendar correctness (UI-47, U-12), the data-health chip (UI-50),
+> the About rework (UI-49) and the owner export (UI-51, U-14). The visual
+> harness stays 19/19 with U-01/U-11 re-pinned to the restored surface.
+> Full record: CHANGELOG §2026-10-20 (owner UI restore).
+
 Report date: 20 October 2026 (UTC). Branch: `insights-rebuild`. Scope: the
 Insights page only (`#/insights`) — no other page, brand colour, font or
 logo changed (verified: the diff touches only Insights components, the

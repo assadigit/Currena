@@ -50,7 +50,7 @@ import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../lib/insi
 import { AboutTheData } from '../components/insights/AboutTheData';
 import { DetailsPanel } from '../components/insights/DetailsPanel';
 import { HeroBlock } from '../components/insights/HeroBlock';
-import { MovesNextStrip } from '../components/insights/MovesNextStrip';
+import { ContinueStrip } from '../components/insights/ContinueStrip';
 import { JumpNav, type JumpTarget } from '../components/insights/JumpNav';
 import { MoneyPanel } from '../components/insights/MoneyPanel';
 import { NextUpStrip } from '../components/insights/NextUpStrip';
@@ -81,6 +81,7 @@ import { UsSharesAudBox } from './insights-sections/UsSharesNotes';
 import {
   useWorldCurrenciesSection,
   useWorldMarketsSection,
+  useWorldSectionIndicators,
 } from './insights-sections/world-feeds';
 import { useInsightsToolsNav } from './insights-sections/useInsightsToolsNav';
 
@@ -161,11 +162,14 @@ export function Insights() {
     return () => controller.abort();
   }, [retryToken]);
 
-  // The two world-section feeds — moved verbatim to insights-sections/
-  // world-feeds.ts (Phase 3-e). The v3 hero (2026-10-20) no longer renders
-  // the raised-signal bullets or the section indicators (the sections
-  // carry their own verdict lines — the choice is documented in
-  // VerdictMeter.tsx), so the route consumes the states + the CSV exports.
+  // The two world-section feeds + the hero's section indicators — moved
+  // verbatim to insights-sections/world-feeds.ts (Phase 3-e).
+  // OWNER DIRECTIVE (2026-10-20, post-v3-merge): the PREVIOUS hero is
+  // restored, so the raised-signal bullets (marketsAlert/fxAlert) and the
+  // two world-section indicators return to the Global card — the v3-era
+  // omission ("the sections carry their own verdict lines") is retired
+  // with the v3 hero. The v3 DATA layer (new sources, connections,
+  // reliability) feeds them unchanged.
   // PUBLIC MODE (2026-10-19, AC-08/LR-02 → 2026-10-18b owner directive,
   // kept through the v3 merge): each world board's public visibility is
   // the GENERATED overrides file's call. The markets board (the owner's
@@ -178,8 +182,9 @@ export function Insights() {
   const isPublicProjection = state.kind === 'ready' && state.snapshot.displayMode === 'public';
   const marketsFeedEnabled = !isPublicProjection || publicMarketsBoard;
   const fxFeedEnabled = !isPublicProjection || publicFxBoard;
-  const { marketsState, downloadMarketsCsv } = useWorldMarketsSection(copy, marketsFeedEnabled);
-  const { fxState, downloadFxCsv } = useWorldCurrenciesSection(copy, fxFeedEnabled);
+  const { marketsState, marketsAlert, jumpToMarkets, downloadMarketsCsv } = useWorldMarketsSection(copy, marketsFeedEnabled);
+  const { fxState, fxAlert, jumpToFxCurrencies, downloadFxCsv } = useWorldCurrenciesSection(copy, fxFeedEnabled);
+  const sectionIndicators = useWorldSectionIndicators(marketsState, fxState, copy, jumpToMarkets, jumpToFxCurrencies);
 
   const togglePin = useCallback((id: IndicatorId, next: boolean): void => {
     setPinned((prev) => {
@@ -272,16 +277,6 @@ export function Insights() {
     // hidden behind a tip, a bare expand below the fold read as a dead
     // click (the same roast round 33 answered for the section jump).
     const el = document.getElementById('insights-about');
-    if (el) {
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
-    }
-  }, []);
-
-  // v3 UI-18: the moves strip's calendar fallback — an event with no
-  // mapped indicator scrolls to the "Next up" section.
-  const jumpToCalendar = useCallback(() => {
-    const el = document.getElementById('insights-coming-up');
     if (el) {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
@@ -411,39 +406,39 @@ export function Insights() {
             <StaleCacheNotice copy={copy} locale={locale} generatedAt={state.snapshot.generatedAt} />
           ) : null}
 
-          {/* The hero (v3 UI-01..UI-14) — Global first, both cards above
-           * the fold, each answering how / why / what next. */}
+          {/* The hero (R1–R4) — Global first, both verdicts above the fold.
+           * OWNER DIRECTIVE (2026-10-20): the PREVIOUS (editorial) hero is
+           * restored — the v3 UI-01..UI-14 card retired; the biggest-move
+           * card (R4) returns here and the raised world-section bullets +
+           * section indicators ride the Global card again. The v3 data
+           * layer (readings, state words, delayed tier) feeds it unchanged. */}
           <div id="insights-hero" className="scroll-mt-24">
             <HeroBlock
               readings={state.snapshot.readings}
-              calendar={state.snapshot.calendar}
-              generatedAt={state.snapshot.generatedAt}
               changedThisWeek={state.snapshot.changedThisWeek}
               copy={copy}
               numberLocale={numberLocale}
-              locale={locale}
               onJumpSection={jumpToSection}
               onJumpAbout={jumpAbout}
               onFocusCard={focusCard}
+              marketsAlert={marketsAlert}
+              onJumpMarkets={jumpToMarkets}
+              fxAlert={fxAlert}
+              onJumpFx={jumpToFxCurrencies}
+              sectionIndicators={sectionIndicators}
             />
           </div>
 
-          {/* v3 UI-18/UI-19: "Moves and what is next" — directly under the
-           * hero: the biggest movers (period stated) + the next calendar
-           * events, up to five tappable items. (This replaces the fidelity
-           * round's ContinueStrip: the v3 page order (UI_SPEC §2.3) puts the
-           * moves strip here, and it carries real readings + dates rather
-           * than a section-name echo.) */}
-          <MovesNextStrip
-            readings={state.snapshot.readings}
-            events={state.snapshot.calendar}
-            copy={copy}
-            locale={locale}
-            numberLocale={numberLocale}
-            onFocusCard={focusCard}
-            onJumpCalendar={jumpToCalendar}
-            eventTargets={EVENT_TARGETS}
-          />
+          {/* UI-fidelity round (2026-10-19, the owner's correction brief §7
+           * "Bottom information strip", restored by the 2026-10-20 owner
+           * directive): the reference's compact footer strip naming the
+           * page's next sections in their intended order — the same labels
+           * and the same expand-then-scroll navigation the JumpNav pills
+           * below speak (the hero target itself is skipped: the strip names
+           * what comes NEXT). The v3 MovesNextStrip is retired with the v3
+           * hero; the biggest mover + calendar data live in the hero's R4
+           * card and the "Next up" strip below the indicators. */}
+          <ContinueStrip targets={jumpTargets.slice(1)} copy={copy} onWillNavigate={onWillNavigate} />
 
           {/* P1/R19: the sticky section pills. */}
           <JumpNav targets={jumpTargets} copy={copy} onWillNavigate={onWillNavigate} />

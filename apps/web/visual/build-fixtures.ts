@@ -768,6 +768,13 @@ function buildMarkets(): { markets: MarketEntry[]; summary: Record<string, unkno
       close,
       chg1d: CHG1D[m.id]!,
       chg1m: Math.round((chg3m / 3) * 10) / 10,
+      // Restored with the full lens table (owner directive, 2026-10-20):
+      // the 1-week and 1-year synthetic lenses return so the visual page
+      // exercises the restored columns with numbers, like production rows
+      // (the contract keeps both optional — a missing lens renders a dash,
+      // never a guess).
+      chg1w: Math.round((chg3m / 13) * 100) / 100,
+      chg1y: Math.round(chg3m * 3.2 * 10) / 10,
       chg3m,
       high52w,
       low52w,

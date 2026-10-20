@@ -5,6 +5,77 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-20 (owner UI restore)] — the previous UI returns over the v3 data layer ("I liked the previous UI more… in the PREVIOUS UI")
+
+The owner's directive, on seeing the merged v3 surface live: "I liked the
+previous UI more, especially for the world and australia header sections.
+please revert back to the previous version UI, but keep the new data,
+connections etc. I mean keep those part of updates which are about the
+indicators and their connection and reliability. but in the PREVIOUS UI."
+Presentation reverts to `main@1e39a24`; the v3 **data** layer (sources
+registry, connections, reliability machinery, state words, delayed tier)
+stays and feeds the restored surface unchanged.
+
+### Restored (previous UI, verbatim from `main@1e39a24`)
+
+- **Hero (the world + Australia header sections)**: the editorial hero —
+  art-band region cards (Global first, D7), tinted verdict pill + the
+  four-step meter, needs-attention tiles with numbers + "+n more",
+  compact gauge rows with state badges, the rule-toggle/signals closing
+  panels, the R4 biggest-move card, and the mobile Global-first swipe
+  carousel (dots + prev/next + swipe cue below 768px). The v3 UI-01..14
+  card (verdict sentence / reading bar / why-3 / what-next / freshness
+  chip / data-trust alert box) is retired by the directive.
+- **World-section hero integrations return**: the raised world-markets /
+  world-currencies bullets (§5.3/§6.5) and the two section indicators
+  (§6.11/§9.10) ride the Global card again (`marketsAlert`/`fxAlert`/
+  `sectionIndicators`, via the unchanged `world-feeds.ts` hooks).
+- **`ContinueStrip`** returns under the hero (the fidelity round's
+  "bottom information strip"); the v3 `MovesNextStrip` retires from the
+  page (the component file stays, unused, mirroring how the merge kept
+  `ContinueStrip.tsx`).
+- **Full markets table**: the round-46/47 lens columns return (Today ·
+  1 week · 1 month · 3 months · 1 year · from-high) plus the Trend
+  column (Step-1 F2: word + arrow from the same 3-month number) and the
+  Status column — the v3 UI-27 column cut is retired. The lens fields
+  never left the contract (the merge kept them for the exports), and
+  **UI-27's local-currency note is kept** on the restored table (an
+  honesty caveat, not a column change). The visual fixture regains its
+  synthetic `chg1w`/`chg1y` so the harness exercises the columns.
+- **Tests**: `hero-editorial.test.tsx` (the editorial carousel's 20
+  regression guards) is restored; visual **U-01** re-pinned to the
+  restored hero (region cards, pill, 3 tiles per card, gauge rows, R4
+  mover, the live markets bullet) and **U-11** re-pinned to the restored
+  column set + the kept note.
+
+### Kept (the v3 updates about indicators, connections, reliability)
+
+- The whole data layer: sources risk registry + method ladder (T-25/T-27/
+  T-28/T-30..T-34), new adapters (Shiller FS-06 pipeline, owner-disabled),
+  connections/relationship machinery, validation + sanity gates,
+  `RULE_VERSION` — untouched.
+- The state language (six words + Delayed tier), `StatusChip` rework,
+  on-face `CardMeta` source/freshness meta rows, the header data-health
+  chip (UI-50), the About rework (UI-49 per-source table), owner-gated
+  exports (M-3), the M-5 panic switch, the per-metal v7 `BalanceScale`
+  with the UI-40 sparse-honesty rule (already main's component), the
+  5-event calendar with tz labels (UI-47), relationship cards with
+  neutral "N of M" summaries (UI-46), the markets/fx public gating —
+  all still in place; the restored hero simply renders from the same
+  snapshot.
+
+### Gates (restored-UI tree)
+
+web unit **698/698** (678 + the restored 20-test editorial suite) ·
+typecheck 6/6 · lint 0 errors/15 advisories · copy:audit clean ·
+visual acceptance **19/19** (U-01/U-11 re-pinned; U-02 overflow held at
+360/768/1200 across the restored carousel; U-13 clean on the restored
+sources) · bundle budgets: the Insights lazy chunk measured **697.38 kB
+raw / 167.88 kB gz** — the restored editorial markup is +10.60/+2.43 kB
+over the v3 card, budgets bumped 687/166 → **700/169** with this entry
+as the justification (entry chunk untouched 295.28/88.81) · self-check
+regenerated (see SELF_AUDIT.md + the dated export).
+
 ## [2026-10-19 (v3 merge)] — the v3 Insights rebuild merges with main's parallel owner rounds and ships
 
 The owner's directive: "Commit Push deploy. merge with main branch. and

@@ -216,38 +216,65 @@ async function assertKeyContrast(page: Page): Promise<void> {
 }
 
 /* ------------------------------------------------------------------ *
- * U-01 — Hero answers three questions (verdict word + why list + what-next)
+ * U-01 — The owner-restored editorial hero (world + Australia header)
  * ------------------------------------------------------------------ */
 
-test('U-01 hero answers three questions (verdict + why + what-next)', async ({ page }) => {
-  // PHASE 6 GREEN (2026-10-20, was the Phase-1 expected-fail). UI_SPEC §3.1:
-  // each hero card carries the verdict word, a "why" list of THREE indicator
-  // rows (name + value + change + status chip — config/hero.ts heroWhy,
-  // |moveScore| ranked) and a "what is next" line naming the next calendar
-  // event with its days away (heroNextEvent; the v2 hero had verdict +
-  // gauges + attention tiles, no why rows, no next-event line).
+test('U-01 hero: the restored editorial region cards (verdict + tiles + gauges + signals)', async ({ page }) => {
+  // OWNER DIRECTIVE (2026-10-20, post-v3-merge): "I liked the previous UI
+  // more, especially for the world and australia header sections… keep the
+  // new data, connections etc. … in the PREVIOUS UI." The v3 UI-01..UI-14
+  // hero (verdict sentence / reading bar / why-3 rows / what-next line /
+  // freshness chip) is RETIRED by that directive. This test pins the
+  // RESTORED editorial hero (main@1e39a24): the two art-band region cards
+  // — Global first, then Australia — each with the tinted verdict pill +
+  // the four-step meter (never colour alone), THREE needs-attention tiles
+  // with numbers (the fixture plants 3 warnings per section), the compact
+  // gauge rows with their state badges, the R4 biggest-move card with its
+  // reason, and — once the markets feed lands — the Global card's raised
+  // world-section bullets (§5.3/§6.11 returned with the restore). The v3
+  // DATA layer (readings, state words, delayed tier) feeds it unchanged.
   await gotoInsights(page);
   const hero = page.locator('#insights-hero');
 
-  await expect(hero).toContainText(/Stable|Cautious|Stressed|Critical/);
-
-  // Why (UI-03): three rows PER CARD, each with a name, a value, a change
-  // and a chip (the fixture plants 3 warnings per section).
-  const cards = hero.locator('[data-hero-card]');
+  // D7: the two region cards, Global FIRST (DOM order never swaps).
+  const cards = hero.locator('[data-region-card]');
   await expect(cards).toHaveCount(2);
+  await expect(cards.nth(0)).toHaveAttribute('data-region-card', 'global');
+  await expect(cards.nth(1)).toHaveAttribute('data-region-card', 'australia');
+
   for (const card of await cards.all()) {
-    const whyRows = card.locator('[data-hero-why] > *');
-    await expect(whyRows).toHaveCount(3);
-    for (const row of await whyRows.all()) {
-      await expect(row.locator('span.rounded-full')).toBeVisible(); // status chip
-      await expect(row).toContainText(/[+-]?\d/); // value or change digit
+    // The verdict word rides the tinted pill; the four-step meter stays
+    // beside it (word + meter, never colour alone — the LARGE instrument;
+    // the gauge rows below carry their own small meters).
+    await expect(card.locator('[data-verdict-pill]')).toContainText(/Stable|Cautious|Stressed|Critical/);
+    await expect(card.locator('.verdict-meter-lg')).toBeVisible();
+
+    // Needs-attention tiles WITH NUMBERS: three per card (fixture), each
+    // a button that opens the indicator's card.
+    const tiles = card.locator('[data-attention-tiles] > li');
+    await expect(tiles).toHaveCount(3);
+    for (const tile of await tiles.all()) {
+      await expect(tile.locator('button')).toBeVisible();
+      await expect(tile).toContainText(/[+-]?\d/); // the value (or the rule's)
     }
 
-    // What is next (UI-05): the next calendar event with its days away —
-    // Global reads the non-AU kinds (US CPI), Australia its own (RBA).
-    await expect(card.locator('[data-hero-next]')).toContainText(/(Today|Tomorrow|\d+ days away)/);
-    await expect(card.locator('[data-hero-next]')).toContainText(/RBA|Fed|ABS|ECB|CPI/);
+    // The flagged-list heading carries the FULL count (3), and the
+    // compact gauge rows speak their state badges.
+    await expect(card.locator('[data-flagged-list] > p')).toContainText('3');
+    await expect(card.locator('[data-hero-gauges] [data-gauge]').first()).toBeVisible();
   }
+
+  // R4: ONE biggest-move card, its "unusually large" reason on the line.
+  await expect(hero.locator('[data-biggest-move]')).toBeVisible();
+  await expect(hero.locator('[data-biggest-move]')).toContainText(/unusually large/);
+
+  // §5.3 returned with the restore: once the markets feed lands (the
+  // fixture has corrections + bears → attention), the Global card raises
+  // the world-markets bullet inside the always-open signals box.
+  await waitForMarketsBoard(page);
+  const global = cards.nth(0);
+  await expect(global.locator('[data-ei-panel][data-ei-panel-kind="signals"]')).toBeVisible();
+  await expect(global.locator('[data-markets-signal]')).toContainText(/8 of 16/);
 });
 
 /* ------------------------------------------------------------------ *
@@ -695,7 +722,15 @@ test('U-10 prefers-reduced-motion: no animation runs', async ({ browser, baseURL
  * U-11 — Stock table: no "Normal" state word + local-currency note
  * ------------------------------------------------------------------ */
 
-test('U-11 stock table uses the L2-01 state words and the local-currency note', async ({ page }) => {
+test('U-11 stock table: the restored full lens columns + L2-01 words + the note', async ({ page }) => {
+  // OWNER DIRECTIVE (2026-10-20, post-v3-merge): "keep the new data… in the
+  // PREVIOUS UI" — the PREVIOUS full table (main@1e39a24) is restored: the
+  // round-46/47 lens columns (1 week · 1 month · 1 year beside Today and
+  // 3 months) and the Trend column (Step-1 F2: the trend word AND arrow come
+  // from the same 3-month number the row shows) return; the v3 UI-27 column
+  // cut is retired. The lens data never left the payload (the v3 merge kept
+  // it for the exports). ONE v3 honesty addition is KEPT: UI-27's
+  // local-currency note renders with the table.
   await page.setViewportSize({ width: 1200, height: 900 });
   await gotoInsights(page);
   await waitForMarketsBoard(page);
@@ -706,18 +741,16 @@ test('U-11 stock table uses the L2-01 state words and the local-currency note', 
   const table = page.locator('#insights-markets-table');
   await expect(table).toBeVisible();
 
-  // UI-27 (v3 §7a): the local-currency note is the TABLE's header note — it
-  // moved from beside the ViewSwitch to render with the table itself.
+  // UI-27 (kept through the restore): the table's ONE header note — returns
+  // are in each market's own currency.
   await expect(table.getByText(/Returns in each market.s local currency/)).toBeVisible();
 
-  // UI-27: the exact column set — Market | Today | 3 months | From 52-week
-  // high | State | Last close. The Trend column is GONE (E-18 closed by
-  // removing the unverifiable label; the 3-month number stays).
+  // The restored column set — Market | Today | 1 week | 1 month | 3 months |
+  // 1 year | From 52-week high | Trend | Status | Last close.
   const headerText = (await table.locator('thead').textContent()) ?? '';
-  for (const header of ['Market', 'Today', '3 months', 'From 52-week high', 'State', 'Last close']) {
-    expect(headerText, `the table must keep its UI-27 column "${header}"`).toContain(header);
+  for (const header of ['Market', 'Today', '1 week', '1 month', '3 months', '1 year', 'From 52-week high', 'Trend', 'Status', 'Last close']) {
+    expect(headerText, `the restored table must keep its column "${header}"`).toContain(header);
   }
-  expect(headerText, 'the Trend column must not render (UI-27)').not.toContain('Trend');
 
   // UI-28 / L2-01: the four state words; "Normal" is retired as a stock state.
   const L201 = ['Near its high', 'Pullback', 'Correction', 'Bear market'];
