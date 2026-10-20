@@ -1065,6 +1065,26 @@ export const MarketEntrySchema = z.object({
   /** True when asOf is more than 5 calendar days old (rule R6). */
   stale: z.boolean(),
   /**
+   * World-markets MAP (docs/insights/world-markets-map-spec.md D1/D2): the
+   * provider's market-state answer for the winning series, reduced to a
+   * boolean — true only when the session was in its REGULAR phase at fetch
+   * time. Absent for EODHD (its EOD endpoint carries no market-state
+   * field, and an end-of-day close is by definition not a live quote) and
+   * for rows written before this field existed: those rows render Closed,
+   * never a guess. The UI additionally requires a fresh quoteTime before
+   * it shows Open, so a stored `true` can never go stale on screen.
+   */
+  open: z.boolean().optional(),
+  /**
+   * MAP D1: the last-update timestamp of the winning series' latest quote
+   * — Yahoo's meta.regularMarketTime as ISO 8601 UTC; absent when the
+   * provider carries no per-quote time (EODHD EOD rows are dated, not
+   * timestamped). Age vs the viewer's clock drives the Open/Closed
+   * fallback rule (OPEN_MAX_AGE_MIN, definitions.ts) and the map's
+   * "Updated {time}" line.
+   */
+  quoteTime: z.iso.datetime().optional(),
+  /**
    * ≤52 weekly closes for the detail chart, delta-encoded to keep the ONE
    * stored object under the route's 13 KB budget (spec §4; raised from 12 KB
    * by round 46 — the weekly lens field): each entry is

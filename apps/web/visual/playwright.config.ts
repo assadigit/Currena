@@ -57,6 +57,15 @@ export default defineConfig({
       testMatch: /screenshots\.plw\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // The world-markets map's §9 verification suite
+      // (docs/insights/world-markets-map-spec.md) — 20 screenshots, the
+      // geometry/contrast/axe/keyboard/Farsi checks and the mock-payload
+      // states, all against the fixture server.
+      name: 'world-map',
+      testMatch: /world-map\.plw\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
   webServer: [
     {

@@ -49,7 +49,18 @@ export function useWorldMarketsSection(copy: InsightsCopy, enabled = true) {
     const controller = new AbortController();
     void fetchMarketsSnapshot(controller.signal).then((snapshot) => {
       if (controller.signal.aborted) return;
-      setMarketsState(snapshot !== null ? { kind: 'ready', snapshot } : { kind: 'empty' });
+      // MAP M17 (world-markets-map-spec.md): a failed refresh keeps the
+      // LAST GOOD local copy on screen (flagged fromCache — the map shows
+      // its "Showing data from {time}" line) instead of collapsing the
+      // section to the "being prepared" state while perfectly good data
+      // sits in the cache. With no cache at all, the calm empty state is
+      // the honest answer, exactly as before.
+      setMarketsState((prev) => {
+        if (snapshot !== null) return { kind: 'ready', snapshot };
+        const cached = prev.kind === 'ready' ? prev.snapshot : null;
+        if (cached !== null) return { kind: 'ready', snapshot: cached, fromCache: true };
+        return { kind: 'empty' };
+      });
     });
     return () => controller.abort();
   }, [enabled]);

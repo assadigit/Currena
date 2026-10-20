@@ -76,6 +76,17 @@ export const PROVIDER_AGREEMENT_PCT = 0.5;
 /** Validation R6: asOf older than this many calendar days marks the row stale. */
 export const STALE_DAYS = 5;
 
+/**
+ * World-markets MAP (docs/insights/world-markets-map-spec.md §4.3/D2): a
+ * quote at most this many minutes old counts as an OPEN market — the
+ * fallback used ONLY when the provider carries no market-state field.
+ * The map's market state is honest about the EOD pipeline: rows written
+ * by the 23:30/01:30 UTC crons are hours past every close, so they read
+ * Closed; a row whose quote is genuinely minutes old (a live Yahoo
+ * session caught mid-run) reads Open.
+ */
+export const OPEN_MAX_AGE_MIN = 30;
+
 /** History window asked from providers: ~400 days back (spec §4 rule 6);
  * Yahoo is asked for range=2y (round 47) so the yearly lens's 350–380-day
  * anchor band always carries real closes even though the free plans cut

@@ -161,6 +161,13 @@ export async function runMarketsJob(
   options: MarketJobOptions,
   prev: MarketsSnapshot | undefined,
   runDate: string,
+  /**
+   * The run's finish clock (ISO 8601 UTC) — the MAP D2 quote-age fallback's
+   * reference. Defaults to runDate midnight; the real orchestration (run.ts)
+   * passes its generatedAt so a live Yahoo session caught mid-run reads
+   * Open honestly.
+   */
+  runTimeIso?: string,
 ): Promise<MarketJobResult> {
   const prevById = new Map((prev?.markets ?? []).map((m) => [m.id as string, m]));
   const ids = options.onlyIds ?? MARKET_IDS;
@@ -225,7 +232,7 @@ export async function runMarketsJob(
         ? { id, primary, secondary }
         : { id, primary: secondary as MarketSeries, secondary: undefined };
     try {
-      resolution = resolveMarket(candidate, prevEntry, runDate);
+      resolution = resolveMarket(candidate, prevEntry, runDate, runTimeIso);
       notes.push(...resolution.notes);
     } catch (err) {
       resolution = { id, held: true, notes: [...notes, `compute failed: ${errMessage(err)}`] };

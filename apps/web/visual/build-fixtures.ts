@@ -742,6 +742,17 @@ const CHG3M: Record<string, number> = {
   stoxx50: -3.8, dax: -6.4, cac: -8.1, ftse: -0.9, sp500: 3.4, ndx: 1.2, dow: 2.6, tsx: 1.8, ibov: -14.2,
 };
 
+/**
+ * World-markets MAP (world-markets-map-spec.md D1/D2): the fixture carries
+ * the quote-freshness fields so the map exercises BOTH market states in
+ * every screenshot run — S&P 500 and Nifty 50 answer as OPEN (their
+ * quoteTime is this build's generatedAt, minutes old at capture time),
+ * every other market honestly Closed like the EOD production cadence.
+ * The dynamic §9 state tests mock their own payloads; this static fixture
+ * only needs to be visually complete.
+ */
+const MAP_OPEN: Record<string, boolean> = { sp500: true, nifty50: true };
+
 function buildMarkets(): { markets: MarketEntry[]; summary: Record<string, unknown> } {
   const asOf = isoDay(-2); // a weekday close two days back
   const markets: MarketEntry[] = MARKETS.map((m) => {
@@ -784,6 +795,11 @@ function buildMarkets(): { markets: MarketEntry[]; summary: Record<string, unkno
       status: targetFromHigh > -10 ? ('normal' as const) : targetFromHigh > -20 ? ('correction' as const) : ('bear' as const),
       source: 'eodhd' as const,
       stale: false,
+      // MAP D1/D2 (see MAP_OPEN above): every row carries the quote time
+      // (this build's clock — minutes old at capture), the two OPEN rows
+      // say so, the rest stay honestly Closed.
+      quoteTime: generatedAt,
+      open: MAP_OPEN[m.id] === true,
       weekly,
     };
   });

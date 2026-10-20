@@ -1924,3 +1924,148 @@ html[dir='rtl'] .insights-panel {
     overflow-x: visible !important;
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * World markets MAP (docs/insights/world-markets-map-spec.md M3–M14)
+ *
+ * The module is a presentation layer over the section's existing data:
+ * every colour derives from the site's EXISTING tokens via color-mix
+ * (hard rule 9 — no new hex values). Two ramps speak the five steps:
+ *
+ *   --wm-tint-*  the country fills + legend swatches — soft mixes
+ *                toward the surface, adjacent steps separated by ≥1.1:1
+ *                in relative luminance, the strong steps clearly
+ *                stronger in LIGHTNESS than the mild ones (M4);
+ *   --wm-mark-*  the dots, the card % ink and the card borders — mixes
+ *                toward the FOREGROUND so the ≥3:1 (marks) and ≥4.5:1
+ *                (text) contrast floors hold in BOTH themes (the §9
+ *                contrast probe's mixing rule, applied at design time).
+ *
+ * The step classes (.s-sr … .s-x) set one set of custom properties per
+ * step; land paths, dots, cards and legend swatches all read them, so a
+ * step can never present two dialects.
+ * ------------------------------------------------------------------ */
+.wm {
+  --wm-land: color-mix(in srgb, var(--color-text-secondary) 6%, var(--color-surface));
+  --wm-tint-sr: color-mix(in srgb, var(--color-status-normal) 68%, var(--color-surface));
+  --wm-tint-r: color-mix(in srgb, var(--color-status-normal) 45%, var(--color-surface));
+  --wm-tint-f: color-mix(in srgb, var(--color-text-secondary) 20%, var(--color-surface));
+  --wm-tint-fl: color-mix(in srgb, var(--color-status-alert) 36%, var(--color-surface));
+  --wm-tint-sf: color-mix(in srgb, var(--color-status-alert) 60%, var(--color-surface));
+  --wm-mark-sr: var(--color-status-normal);
+  --wm-mark-r: color-mix(in srgb, var(--color-status-normal) 55%, var(--color-text-primary));
+  --wm-mark-f: var(--color-text-secondary);
+  --wm-mark-fl: color-mix(in srgb, var(--color-status-alert) 55%, var(--color-text-primary));
+  --wm-mark-sf: var(--color-status-alert);
+  --wm-ink-sr: var(--color-chip-ink-normal);
+  --wm-ink-r: color-mix(in srgb, var(--color-chip-ink-normal) 60%, var(--color-text-primary));
+  --wm-ink-f: var(--color-text-secondary);
+  --wm-ink-fl: color-mix(in srgb, var(--color-chip-ink-attention) 60%, var(--color-text-primary));
+  --wm-ink-sf: var(--color-chip-ink-attention);
+}
+/* Dark theme's own mix percentages: the same shares that separate the
+ * steps on white COLLAPSE on the dark surface (a 28% red mix is as dark
+ * as the 20% grey mix), so the fall steps deepen — every adjacent pair
+ * still differs by ≥1.1:1 in relative luminance (the §9.3 probe's
+ * measured values ride in the test annotations). */
+.dark .wm {
+  --wm-tint-fl: color-mix(in srgb, var(--color-status-alert) 45%, var(--color-surface));
+}
+.wm .s-sr { --wm-tint: var(--wm-tint-sr); --wm-mark: var(--wm-mark-sr); --wm-ink: var(--wm-ink-sr); }
+.wm .s-r  { --wm-tint: var(--wm-tint-r);  --wm-mark: var(--wm-mark-r);  --wm-ink: var(--wm-ink-r); }
+.wm .s-f  { --wm-tint: var(--wm-tint-f);  --wm-mark: var(--wm-mark-f);  --wm-ink: var(--wm-ink-f); }
+.wm .s-fl { --wm-tint: var(--wm-tint-fl); --wm-mark: var(--wm-mark-fl); --wm-ink: var(--wm-ink-fl); }
+.wm .s-sf { --wm-tint: var(--wm-tint-sf); --wm-mark: var(--wm-mark-sf); --wm-ink: var(--wm-ink-sf); }
+.wm .s-x  { --wm-tint: var(--wm-land); --wm-mark: var(--wm-mark-f); --wm-ink: var(--color-text-secondary); }
+
+/* M2 — the layout switch is the module's OWN width (container query,
+ * 960px); the cards ride the map only in the map layout. */
+.wm-stage {
+  position: relative;
+  direction: ltr; /* M15: geography never mirrors — the map box stays LTR in Farsi too */
+  aspect-ratio: 1000 / 521; /* fixed in both layouts (M2) — also the loading state's reserved height (M17) */
+  width: 100%;
+}
+.wm-map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* M3 — quiet land, thin borders at lower contrast than the fill,
+ * transparent ocean, no text, no graticule. */
+.wm-c { fill: var(--wm-land); stroke: var(--color-surface); stroke-width: 0.6; transition: stroke-width 0.2s; }
+.wm-c.s-sr, .wm-c.s-r, .wm-c.s-f, .wm-c.s-fl, .wm-c.s-sf { fill: var(--wm-tint); }
+.wm-c.on { stroke: var(--color-text-primary); stroke-width: 1.4; }
+
+/* M5 — one dot per index: filled when open, hollow ring when closed,
+ * its own step colour (never the country tint's), ~1.4× on hover/focus.
+ * Each dot rides a small SURFACE-coloured halo — the classic cartography
+ * disc — so the mark's ≥3:1 contrast floor holds on every backdrop
+ * (tinted land included) without abandoning the step colour. */
+.wm-halo { fill: var(--color-surface); }
+.wm-dot { stroke: var(--wm-mark); fill: var(--wm-mark); stroke-width: 2.2; transition: r 0.2s; }
+.wm-dot.closed { fill: var(--color-surface); }
+.wm-hit { fill: transparent; stroke: none; pointer-events: all; }
+
+/* M7 — leader lines: thin, low contrast, emphasised on hover/focus. */
+.wm-ln { stroke: var(--color-border); stroke-width: 1.1; opacity: 0.75; transition: opacity 0.2s; }
+.wm-stage.hl .wm-ln { opacity: 0.3; }
+.wm-ln.on { opacity: 1; stroke: var(--wm-mark); stroke-width: 1.6; }
+
+/* M6/M14 — callout cards: the % change is the signal (largest, bold,
+ * step ink), the value is muted context; 1px border in the step colour
+ * at reduced opacity, no glow, no neon. */
+.wm-card {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 15%;
+  direction: inherit;
+  text-align: start;
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--wm-mark) 45%, transparent);
+  border-radius: 10px;
+  padding: 7px 9px;
+  display: grid;
+  gap: 3px;
+  line-height: 1.25;
+  cursor: pointer;
+}
+.wm-card:hover, .wm-card.on { border-color: var(--wm-mark); }
+.wm-card-r1 { display: flex; align-items: center; gap: 4px; font-size: 13px; min-width: 0; }
+.wm-card-name { font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--color-text-primary); }
+.wm-flag { width: 18px; height: 18px; border-radius: 50%; flex: none; box-shadow: 0 0 0 1px var(--color-border); }
+.wm-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  margin-inline-start: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+}
+.wm-tag i { width: 7px; height: 7px; border-radius: 50%; flex: none; border: 1.5px solid currentColor; }
+.wm-tag.o i { background: currentColor; }
+.wm-card-chg {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 17px;
+  font-weight: 750;
+  line-height: 1.15;
+  color: var(--wm-ink);
+  font-variant-numeric: tabular-nums;
+}
+.wm-card-val { font-size: 12.5px; color: var(--color-text-tertiary); font-variant-numeric: tabular-nums; }
+
+/* M12 — one inline legend row, ≥12px text, wraps onto two lines when
+ * narrow; the open/closed dot key rides at the end. */
+.wm-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12px; color: var(--color-text-secondary); }
+.wm-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.wm-legend em { font-style: normal; color: var(--color-text-primary); font-weight: 600; }
+.wm-sw { width: 14px; height: 14px; border-radius: 4px; flex: none; background: var(--wm-tint); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-text-secondary) 25%, transparent); }
+.wm-kdot { width: 9px; height: 9px; border-radius: 50%; flex: none; border: 2px solid var(--wm-mark-f); display: inline-block; }
+.wm-kdot.o { background: var(--wm-mark-f); }
+
+/* The flags sprite mounts hidden once (B2/B3). */
+.wm-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* M13 — the list-layout dot tap flashes the row it scrolled to. */
+.wm-flash { outline: 2px solid var(--color-accent-brand); outline-offset: 2px; }
