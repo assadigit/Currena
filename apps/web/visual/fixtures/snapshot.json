@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-19T23:55:52.977Z",
-  "pricesAsOf": "2026-10-19T23:55:52.977Z",
+  "generatedAt": "2026-10-20T15:01:08.966Z",
+  "pricesAsOf": "2026-10-20T15:01:08.966Z",
   "summary": {
     "global": {
       "section": "global",
@@ -21,31 +21,31 @@
     {
       "id": "yield-curve-10y2y",
       "value": 0.48,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change7d": 0.11,
       "change30d": 0.07,
       "percentile10y": 0.56,
       "status": "normal",
       "sourceName": "FRED (T10Y2Y)",
       "sourceUrl": "https://fred.stlouisfed.org/series/T10Y2Y",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "real-yield-10y",
       "value": 1.98,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change7d": 0.03,
       "change30d": 0.06,
       "percentile10y": 0.62,
       "status": "normal",
       "sourceName": "FRED (DFII10)",
       "sourceUrl": "https://fred.stlouisfed.org/series/DFII10",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "us10y",
       "value": 5.31,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change7d": 0.07,
       "change30d": 0.53,
       "percentile10y": 1,
@@ -54,60 +54,60 @@
       "status": "warning",
       "sourceName": "FRED (DGS10)",
       "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "fed-target",
       "value": 4.25,
-      "asOf": "2026-09-28",
+      "asOf": "2026-09-29",
       "percentile10y": 0.72,
       "rangeLow": 4.25,
       "rangeHigh": 4.5,
       "lastChange": {
-        "date": "2026-09-28",
+        "date": "2026-09-29",
         "points": -0.25
       },
-      "decidedDate": "2026-09-27",
+      "decidedDate": "2026-09-28",
       "status": "normal",
       "sourceName": "FRED (DFEDTARL (lower bound) + DFEDTARU (upper bound))",
       "sourceUrl": "https://fred.stlouisfed.org/series/DFEDTARL (lower bound) + DFEDTARU (upper bound)",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "fed-expectations",
       "value": -0.62,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change30d": -0.08,
       "percentile10y": 0.35,
       "status": "normal",
       "sourceName": "Derived from published rates",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "us30y",
       "value": 5.72,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change30d": 0.41,
       "percentile10y": 0.95,
       "highestSinceYear": 2007,
       "status": "normal",
       "sourceName": "FRED (DGS30)",
       "sourceUrl": "https://fred.stlouisfed.org/series/DGS30",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "ecb-dfr",
       "value": 2.15,
-      "asOf": "2026-09-14",
+      "asOf": "2026-09-15",
       "percentile10y": 0.35,
       "lastChange": {
-        "date": "2026-09-14",
+        "date": "2026-09-15",
         "points": -0.25
       },
       "status": "normal",
       "sourceName": "European Central Bank",
       "sourceUrl": "https://data.ecb.europa.eu/",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "govt-interest-revenue",
@@ -119,45 +119,45 @@
       "releaseDate": "2026-11-04",
       "status": "normal",
       "sourceName": "Derived from published rates",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "us-cpi-yoy",
       "value": 3.1,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "change30d": 0.1,
       "percentile10y": 0.74,
       "status": "normal",
       "sourceName": "FRED (CPIAUCNS (12-month % change, not seasonally adjusted — the BLS headline basis))",
       "sourceUrl": "https://fred.stlouisfed.org/series/CPIAUCNS (12-month % change, not seasonally adjusted — the BLS headline basis)",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "us-cpi-core-yoy",
       "value": 2.9,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "percentile10y": 0.7,
       "status": "normal",
       "sourceName": "FRED (CPILFENS (12-month % change, not seasonally adjusted))",
       "sourceUrl": "https://fred.stlouisfed.org/series/CPILFENS (12-month % change, not seasonally adjusted)",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "breakeven-5y5y",
       "value": 2.35,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change7d": 0.01,
       "change30d": -0.02,
       "percentile10y": 0.58,
       "status": "normal",
       "sourceName": "FRED (T5YIFR)",
       "sourceUrl": "https://fred.stlouisfed.org/series/T5YIFR",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "stress-stlfsi",
       "value": 0.42,
-      "asOf": "2026-10-13",
+      "asOf": "2026-10-14",
       "change30d": 0.05,
       "flag": {
         "test": "T-04",
@@ -166,100 +166,100 @@
       "status": "check-pending",
       "sourceName": "FRED (STLFSI4)",
       "sourceUrl": "https://fred.stlouisfed.org/series/STLFSI4",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "nfci",
       "value": -0.98,
-      "asOf": "2026-10-13",
+      "asOf": "2026-10-14",
       "percentile10y": 0.22,
       "status": "normal",
       "sourceName": "FRED (NFCI)",
       "sourceUrl": "https://fred.stlouisfed.org/series/NFCI",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "vix",
       "value": 17.8,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change7d": -1.2,
       "change30d": -2.4,
       "percentile10y": 0.47,
       "status": "normal",
       "sourceName": "FRED (VIXCLS (Cboe Volatility Index, close))",
       "sourceUrl": "https://fred.stlouisfed.org/series/VIXCLS (Cboe Volatility Index, close)",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "crypto-fng",
       "value": 72,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "status": "context",
       "sourceName": "Alternative.me",
       "sourceUrl": "https://alternative.me/crypto/fear-and-greed-index/",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "shiller-cape",
       "value": 40.71,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "change30d": 0.6,
       "status": "context",
       "sourceName": "shiller",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "shiller-ecy",
       "value": 0.56,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "change30d": -0.04,
       "status": "context",
       "sourceName": "shiller",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "gold-silver",
       "value": 88.4,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change30d": 1.2,
       "percentile10y": 0.31,
       "status": "normal",
       "sourceName": "Derived from published rates",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "dollar-basket",
       "value": 102.4,
-      "asOf": "2026-09-29",
+      "asOf": "2026-09-30",
       "change30d": 2.86,
       "percentile10y": 0.79,
       "status": "stale",
       "sourceName": "Derived from published rates",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "usdjpy",
       "value": 149.2,
-      "asOf": "2026-10-15",
+      "asOf": "2026-10-16",
       "change7d": 0.8,
       "change30d": 1.9,
       "percentile10y": 0.83,
       "status": "normal",
       "sourceName": "Frankfurter (ECB)",
       "sourceUrl": "https://frankfurter.dev/",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "eur-usd",
       "value": 1.084,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change7d": -0.4,
       "change30d": -0.9,
       "percentile10y": 0.44,
       "status": "normal",
       "sourceName": "Frankfurter (ECB)",
       "sourceUrl": "https://frankfurter.dev/",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "china-pmi",
@@ -267,76 +267,76 @@
       "asOf": null,
       "status": "unavailable",
       "sourceName": "Manual entry (NBS China)",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "m2-us",
       "value": 2.1,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "change30d": 0.1,
       "percentile10y": 0.28,
       "status": "normal",
       "sourceName": "FRED (M2SL)",
       "sourceUrl": "https://fred.stlouisfed.org/series/M2SL",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "philly-fed",
       "value": -6.4,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "status": "no-history",
       "sourceName": "FRED (GACDFSA066MSFRBPHI (Philadelphia Fed manufacturing index, SA))",
       "sourceUrl": "https://fred.stlouisfed.org/series/GACDFSA066MSFRBPHI (Philadelphia Fed manufacturing index, SA)",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "us-unemployment",
       "value": 4.1,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "change30d": 0.1,
       "percentile10y": 0.55,
       "status": "normal",
       "sourceName": "FRED (UNRATE (US Bureau of Labor Statistics))",
       "sourceUrl": "https://fred.stlouisfed.org/series/UNRATE (US Bureau of Labor Statistics)",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "sahm-rule",
       "value": 0.53,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "change30d": 0.2,
       "percentile10y": 0.85,
       "moveScore": 0.9,
       "status": "warning",
       "sourceName": "FRED (SAHMREALTIME (real-time vintage))",
       "sourceUrl": "https://fred.stlouisfed.org/series/SAHMREALTIME (real-time vintage)",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "copper-gold",
       "value": 0.0042,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "change30d": -1.1,
       "percentile10y": 0.5,
       "status": "normal",
       "sourceName": "Derived from published rates",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "usdcny",
       "value": 7.24,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change30d": 0.3,
       "percentile10y": 0.66,
       "status": "normal",
       "sourceName": "Frankfurter (ECB)",
       "sourceUrl": "https://frankfurter.dev/",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "brent",
       "value": 74.5,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "ma200GapPct": -6.2,
       "change7d": -3.1,
       "change30d": -8.4,
@@ -351,18 +351,18 @@
       },
       "note": {
         "text": "Weekly batched print; the daily overlay is the exchange futures price.",
-        "authored": "2026-10-10",
-        "expires": "2026-12-18"
+        "authored": "2026-10-11",
+        "expires": "2026-12-19"
       },
       "status": "warning",
       "sourceName": "FRED (DCOILBRENTEU + Yahoo Finance BZ=F (gap-fill + live refresh))",
       "sourceUrl": "https://fred.stlouisfed.org/series/DCOILBRENTEU + Yahoo Finance BZ=F (gap-fill + live refresh)",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "gold-usd",
       "value": 3870.4,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "ma200GapPct": 12.4,
       "change7d": 1.1,
       "change30d": 2.9,
@@ -371,18 +371,18 @@
       "fromPeak10y": -1.06,
       "peak": {
         "value": 3912,
-        "date": "2026-10-16",
+        "date": "2026-10-17",
         "basis": "daily-close"
       },
       "status": "normal",
       "sourceName": "gold-api",
       "sourceUrl": "https://www.gold-api.com/",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "silver-usd",
       "value": 47.2,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "ma200GapPct": 5.1,
       "change30d": 3.8,
       "percentile10y": 0.93,
@@ -395,23 +395,23 @@
       "status": "normal",
       "sourceName": "gold-api",
       "sourceUrl": "https://www.gold-api.com/",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "copper-usd",
       "value": 4.55,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change30d": 1.2,
       "percentile10y": 0.55,
       "status": "normal",
       "sourceName": "gold-api",
       "sourceUrl": "https://www.gold-api.com/",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "btc-usd",
       "value": 91500,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "ma200GapPct": 8.9,
       "change7d": -2.2,
       "change30d": -4.1,
@@ -426,29 +426,29 @@
       "status": "normal",
       "sourceName": "gold-api",
       "sourceUrl": "https://www.gold-api.com/",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "gold-btc",
       "value": 0.0423,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change30d": 2.1,
       "status": "context",
       "sourceName": "Derived from published rates",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "silver-btc",
       "value": 0.000516,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "status": "context",
       "sourceName": "Derived from published rates",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "au-cpi",
       "value": 3.9,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "change30d": 0.2,
       "percentile10y": 0.86,
       "moveScore": 1.5,
@@ -457,105 +457,105 @@
       "status": "warning",
       "sourceName": "Australian Bureau of Statistics",
       "sourceUrl": "https://www.abs.gov.au/statistics",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "au-trimmed-mean",
       "value": 3.4,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "percentile10y": 0.71,
       "releaseDate": "2026-11-04",
       "status": "normal",
       "sourceName": "Australian Bureau of Statistics",
       "sourceUrl": "https://www.abs.gov.au/statistics",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "au-10y",
       "value": 4.52,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change7d": -0.03,
       "change30d": 0.12,
       "percentile10y": 0.68,
       "status": "normal",
       "sourceName": "Reserve Bank of Australia",
       "sourceUrl": "https://www.rba.gov.au/statistics/",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "rba-expectations",
       "value": 4,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "status": "context",
       "sourceName": "Derived from published rates",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "au-us-10y-gap",
       "value": -0.79,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "percentile10y": 0.6,
       "gapLegs": {
         "a": {
           "id": "au-10y",
-          "asOf": "2026-10-17"
+          "asOf": "2026-10-18"
         },
         "b": {
           "id": "us10y",
-          "asOf": "2026-10-16"
+          "asOf": "2026-10-17"
         }
       },
       "status": "normal",
       "sourceName": "Derived from published rates",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "au-petrol-yoy",
       "value": 2.1,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "change30d": -0.3,
       "percentile10y": 0.42,
       "status": "normal",
       "sourceName": "Australian Bureau of Statistics",
       "sourceUrl": "https://www.abs.gov.au/statistics",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "rba-cash-rate",
       "value": 4.35,
-      "asOf": "2026-09-28",
+      "asOf": "2026-09-29",
       "percentile10y": 0.5,
       "lastChange": {
-        "date": "2026-09-28",
+        "date": "2026-09-29",
         "points": -0.25
       },
-      "decidedDate": "2026-09-27",
+      "decidedDate": "2026-09-28",
       "status": "normal",
       "sourceName": "Reserve Bank of Australia",
       "sourceUrl": "https://www.rba.gov.au/statistics/",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "au-home-loan",
       "value": 6.28,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "change30d": 0.15,
       "percentile10y": 0.82,
       "moveScore": 0.6,
       "status": "warning",
       "sourceName": "Reserve Bank of Australia",
       "sourceUrl": "https://www.rba.gov.au/statistics/",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "au-deposit-rate",
       "value": 4.1,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "percentile10y": 0.6,
       "status": "normal",
       "sourceName": "Reserve Bank of Australia",
       "sourceUrl": "https://www.rba.gov.au/statistics/",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "au-wage-growth",
@@ -568,30 +568,30 @@
       "status": "normal",
       "sourceName": "Australian Bureau of Statistics",
       "sourceUrl": "https://www.abs.gov.au/statistics",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "au-rent-yoy",
       "value": 5.8,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "change30d": -0.1,
       "percentile10y": 0.9,
       "moveScore": 2.5,
       "status": "warning",
       "sourceName": "Australian Bureau of Statistics",
       "sourceUrl": "https://www.abs.gov.au/statistics",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "au-unemployment",
       "value": 4.35,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "change30d": -0.1,
       "percentile10y": 0.5,
       "status": "normal",
       "sourceName": "Australian Bureau of Statistics",
       "sourceUrl": "https://www.abs.gov.au/statistics",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "au-home-values",
@@ -604,7 +604,7 @@
       "status": "normal",
       "sourceName": "Australian Bureau of Statistics",
       "sourceUrl": "https://www.abs.gov.au/statistics",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "au-household-debt-arrears",
@@ -616,29 +616,29 @@
       "status": "stale",
       "sourceName": "Reserve Bank of Australia",
       "sourceUrl": "https://www.rba.gov.au/statistics/",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "audusd",
       "value": 0.664,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change7d": -0.9,
       "change30d": -1.8,
       "percentile10y": 0.34,
       "status": "normal",
       "sourceName": "Derived from published rates",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "audjpy",
       "value": 99.1,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change7d": 0.4,
       "change30d": 1.2,
       "percentile10y": 0.6,
       "status": "normal",
       "sourceName": "Derived from published rates",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "terms-of-trade",
@@ -651,27 +651,27 @@
       "status": "normal",
       "sourceName": "Australian Bureau of Statistics",
       "sourceUrl": "https://www.abs.gov.au/statistics",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "iron-ore",
       "value": 97.7,
-      "asOf": "2026-10-07",
+      "asOf": "2026-10-08",
       "change30d": -3.2,
       "status": "context",
       "sourceName": "World Bank Pink Sheet",
       "sourceUrl": "https://www.worldbank.org/en/research/commodity-markets",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     },
     {
       "id": "gold-aud",
       "value": 5826,
-      "asOf": "2026-10-18",
+      "asOf": "2026-10-19",
       "change30d": 2.1,
       "percentile10y": 0.62,
       "status": "normal",
       "sourceName": "Derived from published rates",
-      "updatedAt": "2026-10-19T23:55:52.977Z"
+      "updatedAt": "2026-10-20T15:01:08.966Z"
     }
   ],
   "changedThisWeek": [
@@ -679,13 +679,13 @@
       "id": "us10y",
       "from": "normal",
       "to": "warning",
-      "asOf": "2026-10-18"
+      "asOf": "2026-10-19"
     }
   ],
   "calendar": [
     {
       "id": "rba-202610",
-      "date": "2026-10-20",
+      "date": "2026-10-21",
       "titleEn": "RBA cash rate decision",
       "titleFa": "تصمیم نرخ بهره رزرو بانک استرالیا",
       "kind": "rba",
@@ -693,7 +693,7 @@
     },
     {
       "id": "us-cpi-202610",
-      "date": "2026-10-22",
+      "date": "2026-10-23",
       "titleEn": "US CPI (monthly)",
       "titleFa": "شاخص قیمت مصرفی آمریکا (ماهانه)",
       "kind": "us-cpi",
@@ -701,7 +701,7 @@
     },
     {
       "id": "fed-202610",
-      "date": "2026-10-27",
+      "date": "2026-10-28",
       "titleEn": "Fed interest rate decision (FOMC)",
       "titleFa": "تصمیم نرخ بهره فدرال رزرو (فومک)",
       "kind": "fed",
@@ -709,7 +709,7 @@
     },
     {
       "id": "abs-jobs-202611",
-      "date": "2026-11-02",
+      "date": "2026-11-03",
       "titleEn": "ABS jobs report",
       "titleFa": "گزارش اشتغال اداره آمار استرالیا",
       "kind": "abs-jobs",
@@ -717,7 +717,7 @@
     },
     {
       "id": "ecb-202611",
-      "date": "2026-11-09",
+      "date": "2026-11-10",
       "titleEn": "ECB rate decision",
       "titleFa": "تصمیم نرخ بهره بانک مرکزی اروپا",
       "kind": "ecb",
@@ -725,7 +725,7 @@
     },
     {
       "id": "abs-cpi-202611",
-      "date": "2026-11-16",
+      "date": "2026-11-17",
       "titleEn": "ABS monthly CPI",
       "titleFa": "شاخص قیمت ماهانهٔ اداره آمار استرالیا",
       "kind": "abs-cpi",
@@ -733,7 +733,7 @@
     },
     {
       "id": "us-jobs-202611",
-      "date": "2026-11-23",
+      "date": "2026-11-24",
       "titleEn": "US jobs report (Employment Situation)",
       "titleFa": "گزارش وضعیت بازار کار آمریکا",
       "kind": "us-jobs",

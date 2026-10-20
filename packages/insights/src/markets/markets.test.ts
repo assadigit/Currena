@@ -31,6 +31,7 @@ import {
 import type { MarketResolution } from './compute';
 import { addDays, epochDay, pointAtOrBefore } from '../series';
 import { lastExpectedCloseDate, marketsNeedingData, retryRunOptions, runMarketsJob } from './job';
+import { runMarketsUpdate } from './run';
 import type { MarketJobFetchers } from './job';
 import { InMemoryMarketsStore, RestMarketsStore, parseStoredMarkets } from './store';
 import { decodeWeeklySeries, MIN_CLOSES, MARKET_IDS } from './definitions';
@@ -891,5 +892,56 @@ describe('buildEntry — MAP D1/D2 fields on the stored row', () => {
     });
     expect(snap!.markets[0]!.open).toBe(true);
     expect(MarketsSnapshotSchema.parse(snap!)).toEqual(snap);
+  });
+});
+
+describe('MAP §9.7 — the map fields change ZERO KV operations', () => {
+  it('one refresh run: identical store ops with and without quote metadata', async () => {
+    const run = async (withMeta: boolean) => {
+      const store = new InMemoryMarketsStore();
+      const fetchers: MarketJobFetchers = {
+        fetchEodhd: async (id) => {
+          const s = series(id, 'eodhd', '2026-10-12', 300);
+          return s;
+        },
+        fetchYahoo: async (id) => {
+          const s = series(id, 'yahoo', '2026-10-12', 300);
+          if (withMeta) s.quoteMeta = { marketState: 'CLOSED', quoteTime: '2026-10-12T20:00:00Z' };
+          return s;
+        },
+      };
+      await runMarketsUpdate({ store, fetchers, now: new Date('2026-10-12T23:30:00Z') }, 'main');
+      return { ...store.ops };
+    };
+    const withoutMeta = await run(false);
+    const withMeta = await run(true);
+    // The SAME single read + the SAME at-most-one write — the map's fields
+    // ride the existing payload, never a new key, never an extra op.
+    expect(withMeta).toEqual(withoutMeta);
+    expect(withoutMeta.reads).toBe(1);
+    expect(withoutMeta.writes).toBeLessThanOrEqual(1);
+    expect(withMeta.reads).toBe(1);
+    expect(withMeta.writes).toBeLessThanOrEqual(1);
+  });
+
+  it('a Yahoo-sourced refresh writes the open/quoteTime fields into the ONE key', async () => {
+    const store = new InMemoryMarketsStore();
+    const fetchers: MarketJobFetchers = {
+      fetchEodhd: async (id) => {
+        throw new Error('eodhd down');
+      },
+      fetchYahoo: async (id) => {
+        const s = series(id, 'yahoo', '2026-10-12', 300);
+        s.quoteMeta = { marketState: 'REGULAR', quoteTime: '2026-10-12T23:25:00Z' };
+        return s;
+      },
+    };
+    const result = await runMarketsUpdate({ store, fetchers, now: new Date('2026-10-12T23:30:00Z') }, 'main');
+    expect(result.wroteSnapshot).toBe(true);
+    const asx = result.snapshot!.markets.find((m) => m.id === 'asx200')!;
+    expect(asx.open).toBe(true);
+    expect(asx.quoteTime).toBe('2026-10-12T23:25:00Z');
+    // Still exactly one read + one write for the whole refresh.
+    expect(store.ops).toEqual({ reads: 1, writes: 1 });
   });
 });

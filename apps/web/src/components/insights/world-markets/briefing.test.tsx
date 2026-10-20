@@ -260,7 +260,9 @@ describe('the index wordmarks', () => {
 
   it('opening a tile detail renders the same ≥96px wordmark beside the heading', () => {
     render(<WorldMarkets state={{ kind: 'ready', snapshot: snapshotFixture() }} copy={insightsCopyEn} locale="en" numberLocale="en-US" />);
-    fireEvent.click(screen.getByRole('button', { name: /Nikkei 225/ }));
+    // Scoped to the TILE: the world-markets MAP (2026-10-20) adds a callout
+    // card for the same index, so the name regex alone is ambiguous now.
+    fireEvent.click(document.getElementById('insights-market-tile-n225')!);
     const detail = document.getElementById('insights-market-detail-n225')!;
     const styleAttr = detail.querySelector('img.currena-market-logo')!.getAttribute('style') ?? '';
     const sizes = [...styleAttr.matchAll(/--icon-size(?:-sm)?:\s*([\d.]+)px/g)].map((m) => parseFloat(m[1]));

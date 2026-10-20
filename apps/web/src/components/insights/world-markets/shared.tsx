@@ -9,13 +9,24 @@
 import type { MarketEntry, MarketsSnapshot } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { STALE_DAYS } from '@currena/insights/markets/definitions';
+import { interpolate } from '../../../i18n';
 import { IconImg, DIRECTION_DOWN_URL, DIRECTION_UP_URL } from '../../icons/currena';
 
 /** The page-level feed state (owned by Insights.tsx, passed down). */
 export type MarketsLoadState =
   | { kind: 'loading' }
   | { kind: 'empty' }
-  | { kind: 'ready'; snapshot: MarketsSnapshot };
+  | {
+      kind: 'ready';
+      snapshot: MarketsSnapshot;
+      /**
+       * MAP M17 (docs/insights/world-markets-map-spec.md): the refresh
+       * failed and this is the LAST GOOD local copy — the map answers with
+       * its "Showing data from {time}" line instead of pretending to be
+       * fresh. Every other surface renders `ready` exactly as before.
+       */
+      fromCache?: boolean;
+    };
 
 /** The section's return-period lenses: daily, weekly, monthly, the NORMAL
  * quarterly window (02-ui-spec §3.3, the 2026-10-18 handoff round) and the
@@ -179,5 +190,34 @@ export function formatRelativeShort(iso: string, locale: 'en' | 'fa'): string {
     day: 'numeric',
     timeZone: 'UTC',
   }).format(new Date(iso));
+}
+
+/**
+ * MAP M9 — the section header's "Updated {time} · {age}" status: the
+ * snapshot's write time in the VIEWER's time zone with the zone name
+ * (Jalali calendar in Farsi), and its age as minutes (the spec's unit)
+ * graduating to hours/days only past the hour so the EOD cadence never
+ * reads as "743 min ago". Pure: the clock is passed in.
+ */
+export function mapUpdatedStatus(
+  generatedAt: string,
+  nowMs: number,
+  locale: 'en' | 'fa',
+  numberLocale: 'en-US' | 'fa-IR',
+  copy: { updated: string; updatedAgoMin: string; updatedAgoHour: string; updatedAgoDay: string },
+): { time: string; age: string; line: string } {
+  const tag = locale === 'fa' ? 'fa-IR-u-ca-persian' : 'en-US';
+  const time = new Intl.DateTimeFormat(tag, { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }).format(
+    new Date(generatedAt),
+  );
+  const ageMin = Math.max(0, Math.round((nowMs - Date.parse(generatedAt)) / 60_000));
+  const n = (v: number) => formatNumber(v, numberLocale, { maximumFractionDigits: 0 });
+  const age =
+    ageMin < 60
+      ? interpolate(copy.updatedAgoMin, { n: n(ageMin) })
+      : ageMin < 48 * 60
+        ? interpolate(copy.updatedAgoHour, { n: n(Math.round(ageMin / 60)) })
+        : interpolate(copy.updatedAgoDay, { n: n(Math.round(ageMin / 1440)) });
+  return { time, age, line: `${copy.updated} ${time} · ${age}` };
 }
 

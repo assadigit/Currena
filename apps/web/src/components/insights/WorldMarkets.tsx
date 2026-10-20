@@ -51,7 +51,8 @@ import { MarketsTable } from './world-markets/MarketsTable';
 import { ViewSwitch } from './world-markets/ViewSwitch';
 import { MarketMovers } from './world-markets/MarketMovers';
 import { MarketsHeatmap } from './world-markets/MarketsHeatmap';
-import { formatDateShort, formatRelativeShort, isOld, type MarketsLoadState, type MarketsView } from './world-markets/shared';
+import { WorldMap } from './world-markets/WorldMap';
+import { formatDateShort, formatRelativeShort, isOld, mapUpdatedStatus, type MarketsLoadState, type MarketsView } from './world-markets/shared';
 
 // Stable external surface (the pre-split importers keep working):
 export type { MarketsLoadState } from './world-markets/shared';
@@ -99,6 +100,17 @@ export function WorldMarkets({
     });
   }, []);
 
+  // MAP M9: the section header's right side carries the snapshot's write
+  // time — "Updated {time} · {age}" in the viewer's zone (Jalali in
+  // Farsi). Never "Live": the data is end-of-day and many markets are
+  // closed (the map spec's own §M9 rationale). The clock is sampled once
+  // per render cycle the section re-mounts into.
+  const [mapNowMs] = useState(() => Date.now());
+  const mapUpdated =
+    state.kind === 'ready'
+      ? mapUpdatedStatus(state.snapshot.generatedAt, mapNowMs, locale, numberLocale, copy.markets.map)
+      : null;
+
   /* The mother container (owner round 44, the regions' round-39 pattern):
    * the soft family tint, a hairline ring and a quiet shadow — the heading,
    * the summary card, the movers, the tiles, the panels and the table ALL
@@ -134,6 +146,11 @@ export function WorldMarkets({
           <bdi className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
             {interpolate(copy.markets.asOf, { date: formatDateShort(asOf, locale) })}
           </bdi>
+          {/* MAP M9 — the snapshot's write time replaces the reference's
+           * "Live" + pulsing dot: delayed data, honestly aged. */}
+          {mapUpdated !== null ? (
+            <bdi className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{mapUpdated.line}</bdi>
+          ) : null}
         </span>
       ) : null}
     </div>
@@ -148,6 +165,9 @@ export function WorldMarkets({
       <section id="insights-markets" aria-labelledby="insights-markets-title" className={shell}>
         {heading}
         {descriptor}
+        {/* MAP M17's loading state: grey land, grey hollow dots, no
+         * numbers, the final height reserved — never a blank rectangle. */}
+        <WorldMap loading copy={copy} locale={locale} numberLocale={numberLocale} onOpenMarket={() => undefined} />
         {/* The summary card's skeleton keeps the layout honest while loading. */}
         <Skeleton className="h-36 rounded-[var(--radius-md)]" />
         {/* The movers' skeletons (§3.4). */}
@@ -220,6 +240,19 @@ export function WorldMarkets({
        * takeaway + the selected-period breadth counts and the separate
        * below-52-week-high line. */}
       <MarketsVerdictBox snapshot={snapshot} copy={copy} numberLocale={numberLocale} view={view} />
+
+      {/* 1b — the WORLD MARKETS MAP (docs/insights/world-markets-map-spec.md
+       * M1): the same data as a map — a new presentation layer above the
+       * existing explorer, inside the section's own card. Clicking a
+       * callout opens the market's existing detail view (M13). */}
+      <WorldMap
+        snapshot={snapshot}
+        fromCache={state.fromCache === true}
+        copy={copy}
+        locale={locale}
+        numberLocale={numberLocale}
+        onOpenMarket={onOpenRow}
+      />
 
       {/* 2 — the two featured movers (§3.4): true extrema of the selected
        * period, ranked from raw values, honest when the lens is missing. */}

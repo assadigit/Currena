@@ -791,6 +791,37 @@ export const insightsCopyFa: InsightsCopy = {
     csvColHigh52w: 'بالاترین مقدار یک‌ساله',
     csvColLow52w: 'پایین‌ترین مقدار یک‌ساله',
     csvDownload: 'دریافت داده‌های بازارهای جهان (CSV)',
+    /** بلوک رشته‌های نقشهٔ بازارهای جهان (docs/insights/
+     * world-markets-map-spec.md §4.4): کلید سه‌گانهٔ بازهٔ خودِ نقشه،
+     * خط خلاصهٔ گستره، واژه‌های پنج‌گامی راهنما، برچسب باز/بسته و
+     * واژه‌های صادقانهٔ بدون داده/داده قدیمی. */
+    map: {
+      periodSwitchAria: 'انتخاب بازهٔ نمایش نقشه',
+      periodToday: 'امروز',
+      periodMonth: '۱ ماه',
+      periodYear: '۱ سال',
+      periodWordToday: 'امروز',
+      periodWordMonth: 'این ماه',
+      periodWordYear: 'امسال',
+      open: 'باز',
+      closed: 'بسته',
+      noData: 'بدون داده',
+      oldData: 'داده قدیمی',
+      stepStrongFall: 'افت شدید',
+      stepFall: 'افت',
+      stepFlat: 'ثابت',
+      stepRise: 'رشد',
+      stepStrongRise: 'رشد قوی',
+      summary: '{up} از {n} بازار {period} مثبت · {down} منفی · {flat} ثابت',
+      updated: 'به‌روزرسانی',
+      updatedAgoMin: '{n} دقیقه پیش',
+      updatedAgoHour: '{n} ساعت پیش',
+      updatedAgoDay: '{n} روز پیش',
+      showingFrom: 'نمایش داده‌های {time}',
+      srContext: '{country}، {step}',
+      srPeriod: 'در بازهٔ {period}، آخرین مقدار',
+      cardNameSsec: 'شانگهای',
+    },
     entries: {
       n225: {
         name: 'نیکی ۲۲۵',

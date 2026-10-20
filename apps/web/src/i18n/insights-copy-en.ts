@@ -1994,6 +1994,48 @@ export const insightsCopyEn = {
     csvColHigh52w: '52-week high',
     csvColLow52w: '52-week low',
     csvDownload: 'World markets CSV',
+    /** The world-markets MAP module (docs/insights/world-markets-map-spec.md
+     * §4.4): its own three-period switch (Today | 1 month | 1 year — the
+     * three lenses the map colours speak), the one-line breadth summary,
+     * the legend's five step words, the Open/Closed tags and the honest
+     * missing/old-data labels. Kept under `markets.map.*` so the module
+     * reads only its own block. */
+    map: {
+      periodSwitchAria: 'Choose the period shown on the map',
+      periodToday: 'Today',
+      periodMonth: '1 month',
+      periodYear: '1 year',
+      /** The summary line's period word ("markets up today / this month…"). */
+      periodWordToday: 'today',
+      periodWordMonth: 'this month',
+      periodWordYear: 'this year',
+      open: 'Open',
+      closed: 'Closed',
+      noData: 'No data',
+      oldData: 'Old data',
+      stepStrongFall: 'Strong fall',
+      stepFall: 'Fall',
+      stepFlat: 'Flat',
+      stepRise: 'Rise',
+      stepStrongRise: 'Strong rise',
+      summary: '{up} of {n} markets up {period} · {down} down · {flat} flat',
+      updated: 'Updated',
+      updatedAgoMin: '{n} min ago',
+      updatedAgoHour: '{n} h ago',
+      updatedAgoDay: '{n} d ago',
+      /** M17: served from the last good local copy after a failed refresh. */
+      showingFrom: 'Showing data from {time}',
+      /** M16 + axe's label-in-name rule: the card's accessible name is
+       * derived from its CONTENT — the visible strings plus these two
+       * screen-only glue phrases, so the name reads as one sentence that
+       * contains every visible word. */
+      srContext: '{country}, {step}',
+      srPeriod: 'over {period}, last close',
+      /** §M6's one short card name: the Shanghai Composite card uses the
+       * short form Iranian stock sites show (the full name is 17 chars and
+       * truncates inside the 16%-wide card). */
+      cardNameSsec: 'Shanghai',
+    },
     /** Per-market context content (§7, verbatim). */
     entries: {
       n225: {
