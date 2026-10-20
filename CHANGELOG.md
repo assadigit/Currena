@@ -5,6 +5,60 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-20d] — the World card gets its picture: the owner's New York photo joins Sydney's band (owner round)
+
+The owner's directive: "Use this picture, turn it to webP, and use it for
+the World container. so both containers aus and world now have picture."
+— the uploaded `new-york-bg-fade.jpg` (1400×248, the same band format as
+Sydney's `sydney-harbour-faded.webp`). The World (Global) region card's
+header band swaps its faint world-map texture for the New York harbour
+photo, so both region headers now open on a photograph. No data, scoring,
+copy or other page changes — a presentation-only round on the restored
+editorial hero.
+
+### The asset
+
+- `apps/web/public/assets/artwork/new-york-bg-faded.webp` (18.7 KB) —
+  the owner's JPEG converted to webp (quality 82, method 6) with one
+  recorded normalization: contrast ×1.4 + brightness ×0.97. The upload is
+  a high-key, low-contrast fade (luma std 17.9 vs Sydney's 27.0, no
+  darks below 123) that read as a blank wash through the band veil; the
+  lift brings it to Sydney's measured band weight (mean 231.1 vs 231.4,
+  std 24.0 vs 27.0) with zero pixel clipping, while keeping the owner's
+  airy, watercolour-like fade as the aesthetic.
+- `global-map-faded.webp` stays in the tree, unreferenced, for the record.
+
+### The wiring (index.css `.ei-hero-art--global`)
+
+- The photo rides the SAME veil family as Sydney's band (the 26% flat
+  surface tint; dark mode 0.5) — the retired "map must stay even quieter
+  than Sydney" sub-rule was about the map texture, not about photos.
+- Two photo-specific tunings, because the owner's photo composes
+  differently from Sydney's: (1) the framing window sits at `72%` — the
+  same offset as Sydney's — so the frame lands on the Empire State /
+  One WTC cluster (Statue of Liberty left, Brooklyn Bridge far right)
+  instead of empty haze; (2) the bottom fade completes at 30% of the band
+  (desktop; 34% mobile) instead of 46%, because this skyline rides the
+  horizon at the photo's middle third — the old fade dipped the
+  skyline under a 73-100% surface wash (the photo's subject was
+  mathematically erased; row-level render measurements confirmed 0.0
+  detail where the skyline should be). Only the water-reflection sliver
+  dissolves into the card seam now.
+
+### Gates
+
+- web 698/698 · typecheck 6/6 · lint 0 errors / 15 accepted advisories ·
+  copy:audit clean (no strings changed) · visual 19/19 (U-01..U-14 on the
+  new band) · budgets held with NO JS change (entry 295.28/88.81,
+  Insights 697.38/167.88 vs 296/89.5 and 700/169) — CSS + public asset
+  only; the webp rides the PWA precache.
+- VLM visual pass on the regenerated captures: the two bands read
+  "reasonably balanced" (Sydney 8/10, New York 6/10 — the remaining
+  softness is the owner's own fade), the NYC skyline unmistakably
+  visible (Statue of Liberty · Lower Manhattan · Brooklyn Bridge), all
+  title/pill/count text readable EN + fa, mobile + RTL clean, zero
+  overflow.
+
 ## [2026-10-20 (owner UI restore)] — the previous UI returns over the v3 data layer ("I liked the previous UI more… in the PREVIOUS UI")
 
 The owner's directive, on seeing the merged v3 surface live: "I liked the

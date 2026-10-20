@@ -1597,16 +1597,31 @@ html:not(:lang(fa)) .type-kicker {
   background-position: center, center, 72% center;
 }
 .ei-hero-art--global {
+  /* OWNER DIRECTIVE (2026-10-20d): the World card joins Australia in carrying
+   * a real photograph — the owner's new-york-bg-fade.jpg (converted to webp,
+   * the same 1400×248 band format as Sydney's) replaces the map texture, so
+   * both region headers now open on a picture. The "map must stay even
+   * quieter than Sydney" sub-rule (spec §7 Global) retires with the map; the
+   * photo rides the SAME flat tint + veil family as Sydney (26% tint) so the
+   * two bands speak one language. Two World-specific tunings, because the
+   * owner's photo composes differently from Sydney's: (1) the framing window
+   * sits at 72% — the same offset as Sydney's — so the frame lands on the
+   * Empire State / One WTC cluster (Statue of Liberty left, the bridge far
+   * right) rather than on empty haze; (2) the bottom fade completes at 30%
+   * of the band instead of 46%, because this skyline rides the horizon at
+   * the photo's MIDDLE third (Sydney's sails sit mid-upper) — the fade must
+   * dip below the horizon or it erases the skyline the owner chose the
+   * photo for; only the water-reflection sliver dissolves into the card.
+   * global-map-faded.webp stays in the tree, unreferenced, for the record. */
   background-image:
-    linear-gradient(to top, var(--color-surface) 0%, color-mix(in srgb, var(--color-surface) 62%, transparent) 46%, transparent 100%),
-    linear-gradient(color-mix(in srgb, var(--color-surface) 30%, transparent), color-mix(in srgb, var(--color-surface) 30%, transparent)),
-    url('/assets/artwork/global-map-faded.webp');
+    linear-gradient(to top, var(--color-surface) 0%, color-mix(in srgb, var(--color-surface) 62%, transparent) 10%, transparent 30%),
+    linear-gradient(color-mix(in srgb, var(--color-surface) 26%, transparent), color-mix(in srgb, var(--color-surface) 26%, transparent)),
+    url('/assets/artwork/new-york-bg-faded.webp');
   background-size: 100% 100%, 100% 100%, cover;
-  background-position: center, center, center;
-  opacity: 0.85; /* the map must stay even quieter than Sydney (spec §7 Global) */
+  background-position: center, center, 72% center;
 }
 .dark .ei-hero-art--au { opacity: 0.5; }
-.dark .ei-hero-art--global { opacity: 0.35; }
+.dark .ei-hero-art--global { opacity: 0.5; }
 @media (max-width: 767.98px) {
   /* Narrow cards (spec §7): the art steps back so the stacked title/pill
    * never competes with it — the veil gets heavier, not the band taller. */
@@ -1616,7 +1631,15 @@ html:not(:lang(fa)) .type-kicker {
       linear-gradient(color-mix(in srgb, var(--color-surface) 46%, transparent), color-mix(in srgb, var(--color-surface) 46%, transparent)),
       url('/assets/artwork/sydney-harbour-faded.webp');
   }
-  .ei-hero-art--global { opacity: 0.55; }
+  .ei-hero-art--global {
+    /* Mobile: the heavier 46% tint stays (the stacked title/pill needs it);
+     * the fade follows the desktop retune — completes at 34% so the
+     * horizon skyline stays out from under the seam fade. */
+    background-image:
+      linear-gradient(to top, var(--color-surface) 0%, color-mix(in srgb, var(--color-surface) 62%, transparent) 12%, transparent 34%),
+      linear-gradient(color-mix(in srgb, var(--color-surface) 46%, transparent), color-mix(in srgb, var(--color-surface) 46%, transparent)),
+      url('/assets/artwork/new-york-bg-faded.webp');
+  }
 }
 
 /* The editorial severity pill (economic-indicators-editorial-spec.md §4

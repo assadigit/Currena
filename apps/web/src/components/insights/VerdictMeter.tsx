@@ -93,7 +93,8 @@
  *
  * Editorial handoff (2026-10-19, docs/insights/
  * economic-indicators-editorial-spec.md): the two overview cards open
- * with the quiet ART BAND (Sydney Harbour / faint world map, §7) behind
+ * with the quiet ART BAND (Sydney Harbour / New York skyline — the
+ * owner's 2026-10-20d photo directive, §7) behind
  * the header + count line; the region title speaks the navy print ink
  * (--ei-navy); the verdict word + state artwork ride in ONE compact
  * tinted pill (.ei-state-pill, §4) with the meter still beside it; the
@@ -326,13 +327,13 @@ export function VerdictBlock({
     >
       {/* Editorial handoff (2026-10-19, economic-indicators-editorial-spec.md
        * §7): the card opens with the quiet ART BAND — Sydney Harbour on the
-       * Australia card, an even fainter world-map texture on the Global
-       * card (index.css .ei-hero-art). The band carries the header + the
-       * count line, and the artwork always sits BEHIND a surface-colored
-       * veil + bottom fade (dark mode tones it further down), so the navy
-       * title, the state pill and the count keep their contrast. The card
-       * body below keeps the card's own padding; overflow-hidden gives the
-       * band the card's rounded corners. */}
+       * Australia card, the owner's New York skyline photo on the Global
+       * card (2026-10-20d directive; index.css .ei-hero-art). The band carries
+       * the header + the count line, and the artwork always sits BEHIND a
+       * surface-colored veil + bottom fade (dark mode tones it further
+       * down), so the navy title, the state pill and the count keep their
+       * contrast. The card body below keeps the card's own padding;
+       * overflow-hidden gives the band the card's rounded corners. */}
       <div className="relative flex flex-col gap-3 p-4 pb-3.5 md:p-5 md:pb-3.5 lg:p-6 lg:pb-3.5">
         <span
           aria-hidden="true"

@@ -193,3 +193,17 @@ owner export, sparse-honesty balance). Full record: CHANGELOG
 §2026-10-20 (owner UI restore) + UI_REPORT's addendum. The four §12
 hand items are unchanged and still yours (owner token, token rotation,
 fa copy review, the chg1y backfill check).
+
+## 14. UPDATE — the 2026-10-20d owner round: the World card's photo band
+
+The owner's follow-up directive (2026-10-20d): "Use this picture, turn it
+to webP, and use it for the World container. so both containers aus and
+world now have picture." — shipped on top of §13's tree: the World
+(Global) region card's header band now carries the owner's New York
+harbour photo (converted to webp, Sydney-matched veil, framing at 72%
+and a horizon-safe bottom fade — the two tunings recorded in
+`apps/web/src/index.css`). Both region headers now open on a photograph.
+No data, scoring, export or copy change. Full record: CHANGELOG
+§2026-10-20d + UI_REPORT's 2026-10-20d addendum. The §12 hand items are
+unchanged and still yours (owner token, token rotation, fa copy review);
+the chg1y backfill check is resolved (§13).

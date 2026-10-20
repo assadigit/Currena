@@ -18,6 +18,20 @@
 > harness stays 19/19 with U-01/U-11 re-pinned to the restored surface.
 > Full record: CHANGELOG §2026-10-20 (owner UI restore).
 
+> **OWNER DIRECTIVE ADDENDUM (2026-10-20d, follow-up round):** "Use
+> this picture, turn it to webP, and use it for the World container. so
+> both containers aus and world now have picture." The §7 art-band's
+> Global variant now carries the owner's New York harbour photo
+> (`new-york-bg-faded.webp`, the same 1400×248 band format as Sydney's)
+> in place of the world-map texture; the veil family (26% flat tint,
+> dark 0.5) matches Sydney's, with two photo-specific tunings recorded
+> in index.css (the 72% framing window; the bottom fade completing at
+> 30%/34% so the horizon skyline escapes the seam wash). Visual harness
+> stays 19/19 on the new band; VLM passes the two bands as balanced
+> with all text readable EN/fa, desktop/mobile. No U-item or data
+> surface affected. Full record: CHANGELOG §2026-10-20d.
+
+
 Report date: 20 October 2026 (UTC). Branch: `insights-rebuild`. Scope: the
 Insights page only (`#/insights`) — no other page, brand colour, font or
 logo changed (verified: the diff touches only Insights components, the
