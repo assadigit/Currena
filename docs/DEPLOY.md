@@ -83,6 +83,45 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Session record — 2026-10-20e the world markets map (the Insights geographic layer ships)
+
+- **Deployed**: currena-api **`1f96deaa-e610-4387-92a2-d999cc446a16`** +
+  currena-markets **`6465694c-8e56-4726-8e5c-d011e9f35c99`** (both workers —
+  the round touches web + packages/core + packages/insights/markets).
+  GitHub `main` = `5d6c5ad` (merge of `feature/insights-world-map`, 4 commits:
+  spec docs → B1/B2 asset pipeline → MAP D1/D2 data → M1–M17 module).
+- **Change**: the Insights world-stock-markets section gains the map
+  presentation layer — a quiet Natural-Earth land (173 paths, 80 KB committed
+  SVG, `data-iso` keyed), the nine west-to-east indices as halo'd open/closed
+  dots with leader lines and callout cards (container-query map/list switch at
+  960px; the phone list keeps the explorer below as the entries, M13),
+  per-country rise/fall tints on the §4.2 thresholds, the Today/1 month/1 year
+  switch + breadth summary + one-row legend, M9's "Updated {time} · age"
+  header line, honest no-data/old/failed/loading states, an LTR map inside the
+  RTL Farsi page, and the D1/D2 quote-freshness fields (`open`, `quoteTime`)
+  joining the stored contract — currena-markets' 23:30/01:30 UTC runs start
+  writing them; until the first such run the pre-deploy snapshot honestly
+  renders Closed (D2's absent-⇒-closed rule). JSE stays deferred (not in the
+  registry — the owner's covered-only rule). Spec + full §9 evidence in
+  `docs/insights/` (20 screenshots at 5 widths × en/fa × light/dark, geometry,
+  contrast, axe, keyboard, Farsi, KV-budget proof).
+- **Gates pre-merge** (on the branch): the full §9 suite 36/36 · every repo
+  suite green (web 698/698 among them) · U-suite 19/19 · screenshots 4/4 ·
+  typecheck + lint + copy:audit clean.
+- **Verified live** (currena.ir, agent-browser, ~15:40 UTC): the two SVGs
+  serve 200 byte-identical to the build (79,968 B + 12,228 B); the module
+  lazy-loads on approach (IntersectionObserver) and renders 173 land paths,
+  exactly 9 tinted countries with the served steps (DAX −1.18% `s-sf`,
+  KOSPI +1.76% `s-sr`, Ibov −0.17% `s-fl`…), 9 dots + halos + leader lines,
+  9 cards in §4.1 order with live values, the period switch, the legend,
+  "Updated 11:30 PM UTC · 16 h ago"; 1440 = map layout (module 1272px),
+  390 = list layout with the explorer carrying the entries, zero horizontal
+  overflow; fa: RTL page, LTR stage, Persian digits/٪/U+2212; VLM pass on the
+  EN capture (no overlap/clipping); `/api/insights/markets` 200 with 16 rows;
+  zero console/page errors.
+- **Evidence**: `docs/evidence/2026-10-20e-world-markets-map-live/`
+  (README + 3 live captures: EN 1440 map, fa 1440 map, EN 390 list).
+
 ## Session record — 2026-10-20d the World card's photo band (the owner's New York picture)
 
 - **Deployed**: currena-api **`fe94fe99-bf15-4042-8064-53a3bf640222`**
