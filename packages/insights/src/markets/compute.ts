@@ -42,6 +42,7 @@ import {
   CORRECTION_PCT,
   EXIT_BUFFER_PTS,
   MAX_DAY_MOVE_PCT,
+  OPEN_MAX_AGE_MIN,
   PROVIDER_AGREEMENT_PCT,
   STALE_DAYS,
   TREND_BAND_PCT,
@@ -184,12 +185,40 @@ export interface MarketResolution {
   notes: string[];
 }
 
+/* ------------------------------------------------------------------ *
+ * Market state + quote time (world-markets map spec D1/D2)
+ * ------------------------------------------------------------------ */
+
+/**
+ * The map's Open/Closed answer for one winning series (MAP D2). The
+ * provider's market-state field wins when present: Yahoo's 'REGULAR' is
+ * the only open phase (PRE/POST/CLOSED/COVERED all render Closed).
+ * Without a market-state field the fallback is the quote's age — open
+ * only when the latest quote is OPEN_MAX_AGE_MIN minutes old or less —
+ * and a provider with neither an honest answer (EODHD's EOD rows are
+ * dated closes, never live quotes) is Closed by construction. Pure: the
+ * run's clock is passed in, never read here.
+ */
+export function marketOpenAt(
+  series: Pick<MarketSeries, 'quoteMeta'>,
+  runTimeIso: string,
+): boolean | undefined {
+  const meta = series.quoteMeta;
+  if (meta === undefined) return undefined; // provider carries no state — Closed on the map
+  if (meta.marketState !== undefined) return meta.marketState === 'REGULAR';
+  if (meta.quoteTime === undefined) return undefined;
+  const ageMin = (Date.parse(runTimeIso) - Date.parse(meta.quoteTime)) / 60_000;
+  if (!Number.isFinite(ageMin)) return undefined;
+  return ageMin >= -1 && ageMin <= OPEN_MAX_AGE_MIN;
+}
+
 /** Build the entry from a validated series; pure derivation, no rejection. */
 export function buildEntry(
   id: MarketId,
   series: MarketSeries,
   prev: MarketEntry | undefined,
   runDate: string,
+  runTimeIso: string = `${runDate}T00:00:00Z`,
 ): MarketEntry {
   const points = series.points;
   const last = points[points.length - 1]!;
@@ -240,6 +269,12 @@ export function buildEntry(
   }
   const fromHigh = Math.min(0, ((last.value - high) / high) * 100);
 
+  // MAP D1/D2: the quote's freshness metadata rides the row when the
+  // winning provider carried any (Yahoo); EODHD rows omit both fields and
+  // honestly render Closed. The optional fields keep older stored rows
+  // valid (zod `.optional()`) — a row without them is a pre-map row.
+  const open = marketOpenAt(series, runTimeIso);
+
   return {
     id,
     asOf: last.date,
@@ -257,6 +292,8 @@ export function buildEntry(
     status: statusOf(fromHigh, prev?.status),
     source: series.source,
     stale: daysBetween(last.date, runDate) > STALE_DAYS,
+    ...(series.quoteMeta?.quoteTime !== undefined ? { quoteTime: series.quoteMeta.quoteTime } : {}),
+    ...(open !== undefined ? { open } : {}),
     weekly: weeklySeries(points),
   };
 }
@@ -270,6 +307,7 @@ export function resolveMarket(
   candidate: MarketCandidate,
   prev: MarketEntry | undefined,
   runDate: string,
+  runTimeIso?: string,
 ): MarketResolution {
   const notes: string[] = [];
   const { id, primary, secondary } = candidate;
@@ -330,7 +368,7 @@ export function resolveMarket(
     }
   }
 
-  return { id, entry: buildEntry(id, primary, prev, runDate), held: false, notes };
+  return { id, entry: buildEntry(id, primary, prev, runDate, runTimeIso), held: false, notes };
 }
 
 /* ------------------------------------------------------------------ *

@@ -76,7 +76,7 @@ export async function runMarketsUpdate(
       : retryRunOptions(prev, runDate);
   if (opts?.providerOrder !== undefined) options.providerOrder = opts.providerOrder;
 
-  const job = await runMarketsJob(deps.fetchers, options, prev, runDate);
+  const job = await runMarketsJob(deps.fetchers, options, prev, runDate, generatedAt);
   const snapshot = buildMarketsSnapshot({
     resolutions: job.resolutions,
     prev,

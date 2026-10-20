@@ -11,12 +11,14 @@
 import { describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import type { MarketEntry, MarketId, MarketsSnapshot } from '@currena/core';
-import { parseEodhdEodResponse, parseYahooChartResponse, ProviderError } from './providers';
+import { MarketEntrySchema, MarketsSnapshotSchema } from '@currena/core';
+import { parseEodhdEodResponse, parseYahooChartResponse, parseYahooQuoteMeta, ProviderError } from './providers';
 import { fetchEodhdSeries, fetchYahooSeries } from './providers';
 import type { MarketSeries } from './providers';
 import {
   buildEntry,
   buildMarketsSnapshot,
+  marketOpenAt,
   marketsContentEqual,
   marketsContentHash,
   reStaleMarketsSnapshot,
@@ -804,5 +806,90 @@ describe('parseStoredMarkets — poisoned-entry defense (audit C-5)', () => {
     expect(parseStoredMarkets(undefined)).toBeUndefined();
     expect(warn).toHaveBeenCalledTimes(2);
     warn.mockRestore();
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * World-markets MAP (docs/insights/world-markets-map-spec.md D1/D2):
+ * the quote-time / market-state fields, their honest absence for EODHD,
+ * and the Open/Closed derivation rules.
+ * ------------------------------------------------------------------ */
+
+describe('parseYahooQuoteMeta — MAP D2 quote freshness metadata', () => {
+  it('reads regularMarketTime + marketState from the saved sample shape', async () => {
+    const json = JSON.parse(readFileSync(new URL('yahoo-sample.json', FIXTURES), 'utf8'));
+    const meta = parseYahooQuoteMeta(json);
+    // The saved sample carries regularMarketTime but no marketState.
+    expect(meta).toBeDefined();
+    expect(meta!.quoteTime).toBe(new Date(1791560129 * 1000).toISOString());
+    expect(meta!.marketState).toBeUndefined();
+  });
+
+  it('regularMarketTime → marketState mapping: only REGULAR is open', () => {
+    const shape = (meta: Record<string, unknown>) => ({ chart: { result: [{ meta }] } });
+    expect(parseYahooQuoteMeta(shape({ marketState: 'REGULAR' }))).toEqual({ marketState: 'REGULAR' });
+    expect(parseYahooQuoteMeta(shape({ marketState: 'POST' }))?.marketState).toBe('POST');
+    expect(parseYahooQuoteMeta(shape({ marketState: 'CLOSED' }))?.marketState).toBe('CLOSED');
+    // Degraded shapes: absent, non-numeric, empty — never a throw.
+    expect(parseYahooQuoteMeta({})).toBeUndefined();
+    expect(parseYahooQuoteMeta(shape({}))).toBeUndefined();
+    expect(parseYahooQuoteMeta(shape({ marketState: '', regularMarketTime: 'x' }))).toBeUndefined();
+  });
+});
+
+describe('marketOpenAt — the D2 rules over one series', () => {
+  const RUN = '2026-10-12T23:30:00Z';
+  it('provider field wins: REGULAR open, every other phase closed', () => {
+    expect(marketOpenAt({ quoteMeta: { marketState: 'REGULAR' } }, RUN)).toBe(true);
+    expect(marketOpenAt({ quoteMeta: { marketState: 'PRE' } }, RUN)).toBe(false);
+    expect(marketOpenAt({ quoteMeta: { marketState: 'POST' } }, RUN)).toBe(false);
+    expect(marketOpenAt({ quoteMeta: { marketState: 'COVERED' } }, RUN)).toBe(false);
+  });
+  it('fallback: open only while the quote is ≤ OPEN_MAX_AGE_MIN minutes old', () => {
+    const at = (minAgo: number) => ({ quoteTime: new Date(Date.parse(RUN) - minAgo * 60_000).toISOString() });
+    expect(marketOpenAt({ quoteMeta: at(5) }, RUN)).toBe(true);
+    expect(marketOpenAt({ quoteMeta: at(30) }, RUN)).toBe(true);
+    expect(marketOpenAt({ quoteMeta: at(31) }, RUN)).toBe(false);
+    expect(marketOpenAt({ quoteMeta: at(90) }, RUN)).toBe(false);
+  });
+  it('EODHD-style answers (no metadata at all) are honestly closed-by-absence', () => {
+    expect(marketOpenAt({}, RUN)).toBeUndefined();
+    expect(marketOpenAt({ quoteMeta: {} }, RUN)).toBeUndefined();
+  });
+});
+
+describe('buildEntry — MAP D1/D2 fields on the stored row', () => {
+  it('a Yahoo series carries quoteTime + open into the row', () => {
+    const s = series('sp500', 'yahoo', '2026-10-12', 300);
+    s.quoteMeta = { marketState: 'CLOSED', quoteTime: '2026-10-12T20:55:00Z' };
+    const entry = buildEntry('sp500', s, undefined, RUN_DATE, '2026-10-12T23:30:00Z');
+    expect(entry.quoteTime).toBe('2026-10-12T20:55:00Z');
+    expect(entry.open).toBe(false);
+  });
+  it('a live REGULAR session caught mid-run reads open', () => {
+    const s = series('asx200', 'yahoo', '2026-10-12', 300);
+    s.quoteMeta = { marketState: 'REGULAR', quoteTime: '2026-10-12T23:29:00Z' };
+    const entry = buildEntry('asx200', s, undefined, RUN_DATE, '2026-10-12T23:30:00Z');
+    expect(entry.open).toBe(true);
+  });
+  it('an EODHD series omits both fields (pre-map rows stay valid)', () => {
+    const s = series('dax', 'eodhd', '2026-10-12', 300);
+    const entry = buildEntry('dax', s, undefined, RUN_DATE, '2026-10-12T23:30:00Z');
+    expect('open' in entry).toBe(false);
+    expect('quoteTime' in entry).toBe(false);
+    // And the zod contract accepts the row.
+    expect(() => MarketEntrySchema.parse(entry)).not.toThrow();
+  });
+  it('the snapshot contract round-trips the new optional fields', () => {
+    const s = series('n225', 'yahoo', '2026-10-12', 300);
+    s.quoteMeta = { marketState: 'REGULAR', quoteTime: '2026-10-12T23:25:00Z' };
+    const snap = buildMarketsSnapshot({
+      resolutions: [{ id: 'n225', held: false, notes: [], entry: buildEntry('n225', s, undefined, RUN_DATE, '2026-10-12T23:30:00Z') }],
+      prev: undefined,
+      runDate: RUN_DATE,
+      generatedAt: '2026-10-12T23:30:00Z',
+    });
+    expect(snap!.markets[0]!.open).toBe(true);
+    expect(MarketsSnapshotSchema.parse(snap!)).toEqual(snap);
   });
 });

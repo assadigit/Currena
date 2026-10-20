@@ -30,6 +30,20 @@ export interface MarketSeries {
   source: 'eodhd' | 'yahoo';
   /** Daily closes, ascending by date, every close finite and > 0 (R1). */
   points: SeriesPoint[];
+  /**
+   * World-markets MAP (docs/insights/world-markets-map-spec.md D2): the
+   * quote's freshness metadata, when the provider carries any. Yahoo's
+   * chart meta carries `regularMarketTime` (epoch seconds of the latest
+   * regular-session trade) and usually `marketState` (REGULAR / PRE /
+   * POST / CLOSED / …). EODHD's EOD endpoint carries neither — undefined
+   * there, and the row honestly renders Closed.
+   */
+  quoteMeta?: {
+    /** Yahoo meta.marketState verbatim when present (e.g. 'REGULAR'). */
+    marketState?: string;
+    /** The latest regular-session trade time, ISO 8601 UTC. */
+    quoteTime?: string;
+  };
 }
 
 /** Provider failure — status + short excerpt, never the API token. */
@@ -130,6 +144,29 @@ export function parseYahooChartResponse(json: unknown, marketId: MarketId): Seri
   }
   points.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
   return dedupeByDate(points, 'yahoo', marketId);
+}
+
+/**
+ * Yahoo chart meta → quoteMeta (MAP D2). Pure and total: a missing meta,
+ * a non-numeric regularMarketTime or an unknown marketState shape all
+ * degrade to an absent field — never a throw, never a guess. Only a
+ * finite positive epoch second becomes a quoteTime; only the literal
+ * 'REGULAR' phase is an open market (PRE/POST/CLOSED/COVERED are all
+ * closed — the map's shape signal stays honest).
+ */
+export function parseYahooQuoteMeta(json: unknown): MarketSeries['quoteMeta'] {
+  const result = (json as { chart?: { result?: unknown[] } }).chart?.result?.[0];
+  if (typeof result !== 'object' || result === null) return undefined;
+  const meta = (result as { meta?: Record<string, unknown> }).meta;
+  if (typeof meta !== 'object' || meta === null) return undefined;
+  const out: NonNullable<MarketSeries['quoteMeta']> = {};
+  const state = meta['marketState'];
+  if (typeof state === 'string' && state.length > 0) out.marketState = state;
+  const time = meta['regularMarketTime'];
+  if (typeof time === 'number' && Number.isFinite(time) && time > 0) {
+    out.quoteTime = new Date(time * 1000).toISOString();
+  }
+  return out.marketState === undefined && out.quoteTime === undefined ? undefined : out;
 }
 
 /** Keep the LAST close per date (a genuine revision wins over the earlier print). */
@@ -253,7 +290,12 @@ export async function fetchYahooSeries(
   } catch {
     throw new ProviderError('yahoo', marketId, 'non-JSON answer');
   }
-  return { id: marketId, source: 'yahoo', points: parseYahooChartResponse(json, marketId) };
+  return {
+    id: marketId,
+    source: 'yahoo',
+    points: parseYahooChartResponse(json, marketId),
+    quoteMeta: parseYahooQuoteMeta(json),
+  };
 }
 
 /** The `from` date for EODHD: ~400 days back from today (UTC). */
