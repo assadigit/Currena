@@ -1475,6 +1475,59 @@ justification in CHANGELOG §I15 Budget).
 
 
 
+## Session record — 2026-10-20 (owner UI restore): the PREVIOUS hero + ContinueStrip + full lens table shipped over the kept v3 data layer
+
+The owner, on seeing the merged v3 surface live: "I liked the previous UI
+more, especially for the world and australia header sections. please
+revert back to the previous version UI, but keep the new data, connections
+etc. I mean keep those part of updates which are about the indicators and
+their connection and reliability. but in the PREVIOUS UI."
+
+- **Restored verbatim from `main@1e39a24`** (directive recorded in the file
+  headers, CHANGELOG §2026-10-20 and UI_REPORT's addendum): the editorial
+  hero (art-band region cards, tinted verdict pill + meter, attention
+  tiles, compact gauge rows, rule/signals panels, R4 biggest-move card,
+  the mobile Global-first swipe carousel) with the raised world-section
+  bullets + section indicators back on the Global card; the ContinueStrip;
+  the full five-lens markets table (1 week · 1 month · 1 year · Trend ·
+  Status — UI-27's column cut retired, its local-currency note KEPT);
+  `hero-editorial.test.tsx` with them. The v3 hero card + MovesNextStrip
+  retire from the page (their files stay, unused, for the record).
+- **Kept — the v3 indicators/connections/reliability layer, untouched**:
+  sources registry + method ladder + kill switches, new adapters
+  (Shiller FS-06, owner-disabled), connections machinery, validation +
+  sanity gates, six-word state language + Delayed tier, StatusChip/
+  CardMeta on-face meta, the data-health chip, the About rework, the
+  owner-gated export, the M-5 panic switch, the per-metal v7 BalanceScale
+  with the UI-40 sparse rule, the 5-event calendar with tz labels,
+  relationship cards, the markets/fx public gating.
+- **Gates**: web 698/698 (678 + the restored 20-test editorial suite) ·
+  typecheck 6/6 · lint 0 errors/15 advisories · copy:audit clean · visual
+  19/19 (U-01/U-11 re-pinned to the restored hero/table) · self-check
+  25/25 (SELF_AUDIT.md + the dated export regenerated) · budgets: the
+  restored editorial markup costs +10.60/+2.43 kB — Insights lazy
+  measured 697.38/167.88, budgets bumped 687/166 → 700/169 justified in
+  the budget script + CHANGELOG (entry untouched 295.28/88.81) · VLM
+  visual pass on the regenerated local captures (desktop + mobile
+  carousel).
+- **Deploy** (web-only round — no API/markets code changed): SPA build +
+  `currena-api` **`d51b0afe-d59f-46c0-a12d-3b58cc1cd273`** (SITE_MODE=public
+  untouched; currena-markets untouched at `3f245d75`). Commit `0bd742c`,
+  fast-forwarded `main`, released as `2026-10-20-owner-ui-restore`.
+- **Live-verified on currena.ir (2026-10-20)**: served chunk
+  `Insights-BV1B4d2b.js` == the restored local build · the editorial hero
+  (Global first, Stressed pills both regions, art bands, tiles, gauge
+  rows, the R4 mover with its reason) · the restored world-signals panel +
+  section indicators ("5 of 16 markets…") · Australia's own signals box ·
+  the ContinueStrip · the full 10-column table with 16 live rows and the
+  local-currency note — **the 1-year column now carries real values
+  (the §12 chg1y backfill check RESOLVED by tonight's 23:30 UTC run)** ·
+  the kept data surface (data-health chip "4 stale", 2 per-metal balances,
+  five lens pills) · fa RTL + Persian digits + «سیگنال‌های جهانی» ·
+  mobile 390 carousel (cue, dots, prev/next, Next → Australia, zero
+  overflow) · zero console/page errors EN+fa, 390+1440. Evidence:
+  `docs/evidence/2026-10-20-owner-ui-restore/` (README + 4 screenshots).
+
 ## Session record — 2026-10-19 (v3 merge): the rebuild meets main, both owner streams on one tree, shipped to production
 
 The owner: "Commit Push deploy. merge with main branch. and deploy and
