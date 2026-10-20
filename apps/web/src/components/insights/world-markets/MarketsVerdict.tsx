@@ -24,8 +24,7 @@ import { IconImg, stateIconUrl } from '../../icons/currena';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { belowHighCount, marketBreadth } from './briefing';
-import type { MarketsView } from './shared';
-import { periodWord } from './ViewSwitch';
+import { periodWord, type MarketsView } from './shared';
 
 /* ------------------------------------------------------------------ *
  * The section verdict (owner round 44) — the focal box's word, computed

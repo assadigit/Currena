@@ -50,7 +50,6 @@ import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../lib/insi
 import { AboutTheData } from '../components/insights/AboutTheData';
 import { DetailsPanel } from '../components/insights/DetailsPanel';
 import { HeroBlock } from '../components/insights/HeroBlock';
-import { ContinueStrip } from '../components/insights/ContinueStrip';
 import { JumpNav, type JumpTarget } from '../components/insights/JumpNav';
 import { MoneyPanel } from '../components/insights/MoneyPanel';
 import { NextUpStrip } from '../components/insights/NextUpStrip';
@@ -429,16 +428,14 @@ export function Insights() {
             />
           </div>
 
-          {/* UI-fidelity round (2026-10-19, the owner's correction brief §7
-           * "Bottom information strip", restored by the 2026-10-20 owner
-           * directive): the reference's compact footer strip naming the
-           * page's next sections in their intended order — the same labels
-           * and the same expand-then-scroll navigation the JumpNav pills
-           * below speak (the hero target itself is skipped: the strip names
-           * what comes NEXT). The v3 MovesNextStrip is retired with the v3
-           * hero; the biggest mover + calendar data live in the hero's R4
-           * card and the "Next up" strip below the indicators. */}
-          <ContinueStrip targets={jumpTargets.slice(1)} copy={copy} onWillNavigate={onWillNavigate} />
+          {/* 2026-10-21 owner round: the ContinueStrip (the one-line
+           * «ادامهٔ صفحه» chevron row that named the sections below the
+           * hero) is RETIRED — the sticky JumpNav pills one breath below
+           * it already carry the same labels, the same expand-then-scroll
+           * navigation and the scroll-spy highlight, so the quiet strip
+           * read as a redundant second set of the same buttons (the
+           * owner's own words: "it's redundant because already another
+           * set have this same buttons"). */}
 
           {/* P1/R19: the sticky section pills. */}
           <JumpNav targets={jumpTargets} copy={copy} onWillNavigate={onWillNavigate} />

@@ -1279,10 +1279,10 @@ export const insightsCopyEn = {
     // quiet ink beside them.
     australiaSignalsTitle: 'Australia signals',
     australiaSignalArea: '{area} · {word}: {warnings} of {voting} indicators need attention.',
-    // UI-fidelity round (§7 "Bottom information strip"): the lead-in of
-    // the compact strip under the hero that names the next page sections
-    // in their intended order (the JumpNav labels).
-    continueLabel: 'Keep reading',
+    // 2026-10-21 owner round: the ContinueStrip ("Keep reading" — the
+    // one-line chevron row under the hero) is RETIRED with its key; the
+    // sticky JumpNav pills already carry the same labels and the same
+    // expand-then-scroll navigation.
     inAlert: '{warnings} of {voting} indicators need attention',
     /** The count line's variant when the world-markets signal is raised
      * (world-markets spec §5.3 / build step 9: the section signal appears
@@ -1453,28 +1453,48 @@ export const insightsCopyEn = {
     // Financial-asset-cards spec pack (02–05): the seven-day trend story,
     // the evidence-based briefing, the «جزئیات بیشتر» disclosure and its
     // detail rows. Wording follows spec 03's tables verbatim.
+    // 2026-10-21 owner round ("add the same option for prices … oil
+    // silver gold and bitcoin can be seen in different time formats by
+    // those toggle"): the prices board grows the MAP's four-lens period
+    // switch (Today | 1 week | 1 month | 1 year) — the trend row, the
+    // sparkline, the trend word and the briefing all measure the SAME
+    // selected window, so the briefing templates and the sparkline aria
+    // interpolate {period} instead of hardcoding "the past seven days".
     past7days: 'Past 7 days',
+    pastToday: 'Today',
+    // The switch's own labels + aria (mirroring markets.map.periodToday…).
+    pricePeriodSwitchAria: 'Choose the period shown on the price cards',
+    pricePeriodToday: 'Today',
+    pricePeriodWeek: '1 week',
+    pricePeriodMonth: '1 month',
+    pricePeriodYear: '1 year',
+    // The {period} words the briefing templates and the sparkline aria
+    // interpolate (one per lens — "over the past seven days" / "today").
+    sumPeriod7d: 'over the past seven days',
+    sumPeriod30d: 'over the past 30 days',
+    sumPeriod1y: 'over the past year',
+    sumPeriodToday: 'today',
     trendUp: 'Recent movement has been upward',
     trendDown: 'Recent movement has been downward',
     trendRange: 'Recent movement has been mostly range-bound',
     trendMixed: 'No clear direction is evident',
     trendInsufficient: 'Not enough data to assess the trend',
-    trendUnavailable: 'Seven-day trend unavailable',
+    trendUnavailable: 'Trend unavailable for this period',
     trendIncomplete: 'Data for this period is incomplete; the chart may not show the full picture.',
-    sparklineAria: '{asset} price movement over the past seven days: {change}',
+    sparklineAria: '{asset} price movement {period}: {change}',
     dailyChangeLabel: 'Daily change',
     dailyChangeBasis: 'vs the previous stored close',
     updatedUnknown: 'Update time is unknown.',
     dataDelayed: 'Data may be delayed.',
     priceUnavailableCard: 'Price is currently unavailable.',
     sumUnavailable: 'There is not enough data to provide a reliable summary.',
-    sumUp: '{asset} has risen over the past seven days.',
-    sumDown: '{asset} has declined over the past seven days.',
-    sumRange: '{asset} has moved mostly within a range over the past seven days; the available data shows no clear direction.',
-    sumMixed: 'Movement of {asset} has been uneven over this period, so the available data does not show a clear direction.',
+    sumUp: '{asset} has risen {period}.',
+    sumDown: '{asset} has declined {period}.',
+    sumRange: '{asset} has moved mostly within a range {period}; the available data shows no clear direction.',
+    sumMixed: 'Movement of {asset} has been uneven {period}, so the available data does not show a clear direction.',
     sumHedge: 'This describes the selected period and does not, by itself, establish the next move.',
     sumBtcHedge: 'This movement may not persist, and short-term volatility can remain high.',
-    sumBtcMixed: '{asset} has fluctuated over the past seven days.',
+    sumBtcMixed: '{asset} has fluctuated {period}.',
     sumOilDrivers: 'Explaining the drivers would require supporting evidence about supply, demand, and market conditions.',
     moreDetails: 'More details',
     changesLabel: 'Changes',
@@ -1860,17 +1880,15 @@ export const insightsCopyEn = {
     asOf: 'as of {date}',
     /** Regional groups, east to west (the trading day's order). */
     groups: { asia: 'Asia-Pacific', europe: 'Europe', americas: 'Americas' },
-    /** The period radiogroup (02-ui-spec §3.3 as amended by round 47): daily,
-     * weekly, monthly, quarterly, yearly — the five horizons the stored
-     * contract carries (round 47 added chg1y). The 52-week-high distance is
-     * secondary context, not a period; no YTD exists in the data contract
-     * and must not appear here. */
-    viewSwitchAria: 'Choose the performance period for the indices',
-    viewDaily: 'Daily',
-    viewWeekly: 'Weekly',
-    viewMonthly: 'Monthly',
+    /** The period lenses — 2026-10-21 owner round ("unify the map time
+     * views with the other parts of the website"): the section's ONE
+     * period switch is the WORLD MAP's four-lens segmented control
+     * (markets.map.periodToday…periodYear); the old five-option
+     * Daily|Weekly|Monthly|Quarterly|Yearly radiogroup and its keys are
+     * RETIRED. viewQuarterly stays: '3m' keeps its word for the typed
+     * fallback (the stored contract still carries chg3m — the table's
+     * Trend column), it is just never a switch lens anymore. */
     viewQuarterly: 'Quarterly',
-    viewYearly: 'Yearly',
     /** The list / performance-map switch (02-ui-spec §3.6, desktop). */
     displaySwitchAria: 'Choose how the indices are shown',
     viewList: 'List',
@@ -2030,10 +2048,12 @@ export const insightsCopyEn = {
       legendMoreDown: 'Bigger fall',
       legendMoreUp: 'Bigger rise',
       summary: '{up} of {n} markets up {period} · {down} down · {flat} flat',
-      updated: 'Updated',
-      updatedAgoMin: '{n} min ago',
-      updatedAgoHour: '{n} h ago',
-      updatedAgoDay: '{n} d ago',
+      // 2026-10-21 owner round: the M9 "Updated {time} · {age}" header
+      // line and its keys are RETIRED — the KV snapshot's write time is
+      // fixed by the nightly cron, so the line always read as a stale,
+      // never-updating clock (the owner: "it seems stale and not
+      // updateable"). The M17 showingFrom line below stays (a real
+      // event: the refresh FAILED and the last good copy is on screen).
       /** M17: served from the last good local copy after a failed refresh. */
       showingFrom: 'Showing data from {time}',
       /** M16 + axe's label-in-name rule: the card's accessible name is

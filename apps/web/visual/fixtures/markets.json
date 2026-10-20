@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "generatedAt": "2026-10-20T15:01:08.966Z",
+  "generatedAt": "2026-10-20T23:14:42.175Z",
   "markets": [
     {
       "id": "n225",
@@ -19,7 +19,7 @@
       "status": "correction",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": false,
       "weekly": [
         [
@@ -73,7 +73,7 @@
       "status": "normal",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": false,
       "weekly": [
         [
@@ -127,7 +127,7 @@
       "status": "normal",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": false,
       "weekly": [
         [
@@ -181,7 +181,7 @@
       "status": "normal",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": false,
       "weekly": [
         [
@@ -235,7 +235,7 @@
       "status": "correction",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": false,
       "weekly": [
         [
@@ -289,7 +289,7 @@
       "status": "normal",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": false,
       "weekly": [
         [
@@ -343,7 +343,7 @@
       "status": "normal",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": true,
       "weekly": [
         [
@@ -397,7 +397,7 @@
       "status": "bear",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": false,
       "weekly": [
         [
@@ -451,7 +451,7 @@
       "status": "correction",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": false,
       "weekly": [
         [
@@ -505,7 +505,7 @@
       "status": "correction",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": false,
       "weekly": [
         [
@@ -559,7 +559,7 @@
       "status": "bear",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": false,
       "weekly": [
         [
@@ -613,7 +613,7 @@
       "status": "normal",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": true,
       "weekly": [
         [
@@ -667,7 +667,7 @@
       "status": "normal",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": false,
       "weekly": [
         [
@@ -721,7 +721,7 @@
       "status": "normal",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": false,
       "weekly": [
         [
@@ -775,7 +775,7 @@
       "status": "bear",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": false,
       "weekly": [
         [
@@ -829,7 +829,7 @@
       "status": "bear",
       "source": "eodhd",
       "stale": false,
-      "quoteTime": "2026-10-20T15:01:08.966Z",
+      "quoteTime": "2026-10-20T23:14:42.175Z",
       "open": false,
       "weekly": [
         [

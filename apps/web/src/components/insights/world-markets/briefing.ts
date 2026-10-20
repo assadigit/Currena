@@ -29,13 +29,18 @@ import { bandedArrow, viewValue, type MarketsView } from './shared';
 
 /**
  * The section's return-period lenses (02-ui-spec §3.3 as amended by round
- * 47), in ascending duration. Deliberately closed: adding a horizon here
- * without the matching stored field would fabricate data (see the module
- * header) — the yearly lens exists because round 47 added chg1y to the
- * stored contract, computed by the markets job from the provider's real
- * year-ago close.
+ * 47). 2026-10-21 owner round ("unify the map time views with the other
+ * parts of the website"): the list closes at the MAP's four — today,
+ * 1w, 1m, 1y — matching world-map-config's MAP_PERIODS exactly, because
+ * the map's segmented control is now the section's ONE period switch
+ * (the old five-option Daily|Weekly|Monthly|Quarterly|Yearly radiogroup
+ * is retired). '3m' stays a valid MarketsView VALUE (the stored contract
+ * carries chg3m; trendOf and the table's Trend column keep reading it)
+ * but is no longer offered as a lens. Adding a horizon here without the
+ * matching stored field would still fabricate data — the yearly lens
+ * exists because round 47 added chg1y to the stored contract.
  */
-export const PERIOD_VIEWS: readonly MarketsView[] = ['today', '1w', '1m', '3m', '1y'];
+export const PERIOD_VIEWS: readonly MarketsView[] = ['today', '1w', '1m', '1y'];
 
 /** The raw selected-period return of one row, or null when the row does
  * not carry that lens yet (a pre-round-46 stored row without chg1w/chg1m)

@@ -20,11 +20,11 @@ import type { MarketEntry } from '@currena/core';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { MarketLogo } from './MarketLogo';
-import { periodWord } from './ViewSwitch';
 import { topMovers, periodValueOf } from './briefing';
 import {
   bandedArrow,
   DirectionGlyph,
+  periodWord,
   signedPct,
   statusToneOf,
   statusWordKeyOf,

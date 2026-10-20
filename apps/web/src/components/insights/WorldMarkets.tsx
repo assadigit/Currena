@@ -13,9 +13,11 @@
  *      label + takeaway + the SELECTED-period breadth counts and the
  *      below-52-week-high line (§3.2)
  *   3. the two featured movers: «بیشترین رشد» / «بیشترین افت» (§3.4)
- *   4. the period control: Daily | Weekly | Monthly | Quarterly — the
- *      four horizons the contract carries; the annual horizon does not
- *      exist in the stored data and is NOT offered (§3.3, briefing.ts)
+ *   4. the period control: ONE segmented control — the WORLD MAP's own
+ *      four-lens switch (Today | 1 week | 1 month | 1 year), centred
+ *      under the map's breadth summary, driving the WHOLE section since
+ *      the 2026-10-21 unification round (the old five-option
+ *      Daily|Weekly|Monthly|Quarterly|Yearly radiogroup is retired)
  *   5. the regional index explorer: three groups east→west, each row a
  *      logo + canonical name + country + selected-period return +
  *      52-week-distance tag (§3.5); desktop may switch to the
@@ -48,11 +50,11 @@ import { Skeleton } from '../ui';
 import { MarketDetail, MarketTile } from './world-markets/MarketTile';
 import { MarketsVerdictBox } from './world-markets/MarketsVerdict';
 import { MarketsTable } from './world-markets/MarketsTable';
-import { ViewSwitch } from './world-markets/ViewSwitch';
 import { MarketMovers } from './world-markets/MarketMovers';
 import { MarketsHeatmap } from './world-markets/MarketsHeatmap';
 import { WorldMap } from './world-markets/WorldMap';
-import { formatDateShort, formatRelativeShort, isOld, mapUpdatedStatus, type MarketsLoadState, type MarketsView } from './world-markets/shared';
+import type { MapPeriod } from './world-markets/world-map-config';
+import { formatDateShort, formatRelativeShort, isOld, type MarketsLoadState, type MarketsView } from './world-markets/shared';
 
 // Stable external surface (the pre-split importers keep working):
 export type { MarketsLoadState } from './world-markets/shared';
@@ -61,6 +63,13 @@ export { marketsVerdictStep, marketsTakeaway } from './world-markets/MarketsVerd
 /** The explorer's presentation: the readable list (default, mobile's only
  * mode) or the desktop performance map (§3.6). */
 type DisplayMode = 'list' | 'heatmap';
+
+/* 2026-10-21 unification — the static bridge between the section's
+ * MarketsView lens and the map module's MapPeriod (both closed sets, so
+ * plain lookup tables at module scope; '3m' maps to '1M' defensively but
+ * is never a switch lens anymore). */
+const PERIOD_OF_VIEW: Record<MarketsView, MapPeriod> = { today: '1D', '1w': '1W', '1m': '1M', '3m': '1M', '1y': '1Y' };
+const VIEW_OF_PERIOD: Record<MapPeriod, MarketsView> = { '1D': 'today', '1W': '1w', '1M': '1m', '1Y': '1y' };
 
 export function WorldMarkets({
   state,
@@ -73,8 +82,20 @@ export function WorldMarkets({
   locale: 'en' | 'fa';
   numberLocale: 'en-US' | 'fa-IR';
 }) {
-  // The NORMAL timeframe opens the section (owner round 44): 3 months.
-  const [view, setView] = useState<MarketsView>('3m');
+  // 2026-10-21 owner round ("unify the map time views with the other
+  // parts of the website … I want the current map view time for
+  // exchanges/indices as well to replace this one"): the section keeps ONE
+  // period lens — the map's four (today | 1 week | 1 month | 1 year) —
+  // owned HERE and handed to the map as a controlled prop, because the
+  // map's segmented control (centred under its breadth summary) is now
+  // the section's only period switch: the verdict box, the movers, the
+  // tiles, the table and the map colours all follow the same lens. The
+  // old five-option Daily|Weekly|Monthly|Quarterly|Yearly radiogroup is
+  // retired (the quarterly lens stays typed — see briefing.ts).
+  const [view, setView] = useState<MarketsView>('today');
+  const onMapPeriodChange = useCallback((p: MapPeriod) => {
+    setView(VIEW_OF_PERIOD[p]);
+  }, []);
   const [openId, setOpenId] = useState<MarketId | null>(null);
   const [tableOpen, setTableOpen] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>('list');
@@ -99,17 +120,6 @@ export function WorldMarkets({
       document.getElementById(`insights-market-tile-${id}`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     });
   }, []);
-
-  // MAP M9: the section header's right side carries the snapshot's write
-  // time — "Updated {time} · {age}" in the viewer's zone (Jalali in
-  // Farsi). Never "Live": the data is end-of-day and many markets are
-  // closed (the map spec's own §M9 rationale). The clock is sampled once
-  // per render cycle the section re-mounts into.
-  const [mapNowMs] = useState(() => Date.now());
-  const mapUpdated =
-    state.kind === 'ready'
-      ? mapUpdatedStatus(state.snapshot.generatedAt, mapNowMs, locale, numberLocale, copy.markets.map)
-      : null;
 
   /* The mother container (owner round 44, the regions' round-39 pattern):
    * the soft family tint, a hairline ring and a quiet shadow — the heading,
@@ -146,11 +156,12 @@ export function WorldMarkets({
           <bdi className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
             {interpolate(copy.markets.asOf, { date: formatDateShort(asOf, locale) })}
           </bdi>
-          {/* MAP M9 — the snapshot's write time replaces the reference's
-           * "Live" + pulsing dot: delayed data, honestly aged. */}
-          {mapUpdated !== null ? (
-            <bdi className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{mapUpdated.line}</bdi>
-          ) : null}
+          {/* 2026-10-21 owner round: the M9 "Updated {time} · {age}" line
+           * RETIRES — the snapshot's KV write time is fixed by the nightly
+           * cron, so the line always read as a stale, never-updating
+           * clock (the owner: "it seems stale and not updateable"). The
+           * as-of date above stays: it names the data's own trading day,
+           * and each market's freshness keeps riding its rows/tiles. */}
         </span>
       ) : null}
     </div>
@@ -244,7 +255,12 @@ export function WorldMarkets({
       {/* 1b — the WORLD MARKETS MAP (docs/insights/world-markets-map-spec.md
        * M1): the same data as a map — a new presentation layer above the
        * existing explorer, inside the section's own card. Clicking a
-       * callout opens the market's existing detail view (M13). */}
+       * callout opens the market's existing detail view (M13).
+       * 2026-10-21 unification: the map's segmented control is now the
+       * SECTION's one period switch — the lens is owned here and handed
+       * down as a controlled prop, so the map's pills, the verdict box,
+       * the movers, the tiles and the table all speak the same four
+       * lenses (today | 1 week | 1 month | 1 year). */}
       <WorldMap
         snapshot={snapshot}
         fromCache={state.fromCache === true}
@@ -252,20 +268,23 @@ export function WorldMarkets({
         locale={locale}
         numberLocale={numberLocale}
         onOpenMarket={onOpenRow}
+        period={PERIOD_OF_VIEW[view]}
+        onPeriodChange={onMapPeriodChange}
       />
 
       {/* 2 — the two featured movers (§3.4): true extrema of the selected
        * period, ranked from raw values, honest when the lens is missing. */}
       <MarketMovers markets={snapshot.markets} view={view} copy={copy} locale={locale} numberLocale={numberLocale} />
 
-      {/* 3 — the period control (§3.3). Default: the NORMAL 3-month
-       * timeframe. Step-1 F4: the local-currency note rides right beside
-       * it — returns are in each market's own currency (Ibovespa's +17.5%
-       * is not comparable with the others' USD terms). */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <ViewSwitch view={view} copy={copy} onChange={setView} />
-        <span className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{copy.markets.localCurrencyNote}</span>
-      </div>
+      {/* 3 — the period control (§3.3) is RETIRED as a second switch
+       * (2026-10-21 owner round: "unify the map time views … I want the
+       * current map view time for exchanges/indices as well to replace
+       * this one") — the map's four-lens segmented control above IS the
+       * section's period control now. What stays here is Step-1 F4's
+       * local-currency note — returns are in each market's own currency
+       * (Ibovespa's +17.5% is not comparable with the others' USD terms)
+       * — explaining every surface below it (movers, tiles, table). */}
+      <p className="m-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{copy.markets.localCurrencyNote}</p>
 
       {/* 4 — the desktop list / performance-map switch (§3.6). Hidden below
        * lg: mobile keeps the readable list (its only mode); when the map

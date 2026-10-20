@@ -36,6 +36,22 @@
  *             its strongest fresh mover — removing one keeps the tint,
  *             removing all three neutralises the country.
  *
+ * 2026-10-21 owner round — the quiet-fill, card and switch round:
+ *   tint     New York's country (the US trio) damps its tint mix to 85%
+ *             (a 15% opacity cut on the loudest fill the map can show);
+ *   switch   the pills drop 15% (41px, caption × 1.27 — 37px / × 1.06
+ *             under 480px) AND the switch becomes the SECTION's one
+ *             period control: the old five-option Daily…Yearly
+ *             radiogroup below the movers is retired, the four lenses
+ *             drive the verdict, movers, tiles and table too;
+ *   updated  the header's M9 "Updated {time} · {age}" line retires
+ *             (the KV write time is cron-fixed — it read stale);
+ *   cards    Nifty 50 and Hang Seng leave the bottom band and float
+ *             beside their own countries (the Indian Ocean SW of India /
+ *             the South China Sea under the Hong Kong pin);
+ *   prices   (u-tests.plw.ts) the prices board grows the same four-lens
+ *             switch.
+ *
  * 2026-10-20h owner round — yearly returns to the map, the switch grows
  * up and centres:
  *   switch   FOUR options (Today | 1 week | 1 month | 1 year), centred
@@ -656,12 +672,15 @@ test('farsi §9.6: Persian digits, true minus, percent glyph, unmirrored map', a
   expect(hero.text).toMatch(/[۰-۹]/);
   expect(hero.text).not.toMatch(/[0-9]/);
   expect(parseFloat(hero.font)).toBeGreaterThanOrEqual(18); // ~50% bigger than the 12.5px cells
-  // The header's Updated line renders the Jalali calendar (Persian digits).
+  // 2026-10-21 owner round: the header's "Updated {time} · {age}" (M9)
+  // line is RETIRED — the KV write time is cron-fixed, so it always read
+  // as a stale, never-updating clock. The as-of date stays; no surface
+  // renders the write time anymore.
   const updated = await page.evaluate(() => {
     const section = document.getElementById('insights-markets')!;
     return Array.from(section.querySelectorAll('bdi')).map((b) => b.textContent ?? '').find((t) => t.includes('به‌روزرسانی')) ?? '';
   });
-  expect(updated).toMatch(/به‌روزرسانی/);
+  expect(updated).toBe('');
   // The list layout at 390 keeps the unmirrored map too.
   await page.setViewportSize({ width: 390, height: 844 });
   await page.waitForTimeout(400);
@@ -679,11 +698,11 @@ test('farsi §9.6: Persian digits, true minus, percent glyph, unmirrored map', a
  * ~50% bigger, and yearly drives the map like any other lens.
  * ------------------------------------------------------------------ */
 
-test('switch 2026-10-20h: centred under the summary, four options, ~50% bigger', async ({ page }) => {
+test('switch 2026-10-21: centred under the summary, four options, 15% smaller than the 2026-10-20h round', async ({ page }) => {
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
   const probe = await page.evaluate(() => {
     const wm = document.querySelector('.wm') as HTMLElement;
-    const grp = document.querySelector('[role="radiogroup"]') as HTMLElement;
+    const grp = document.querySelector('.wm [role="radiogroup"]') as HTMLElement;
     const btns = Array.from(grp.querySelectorAll('button'));
     const wr = wm.getBoundingClientRect();
     const gr = grp.getBoundingClientRect();
@@ -704,17 +723,27 @@ test('switch 2026-10-20h: centred under the summary, four options, ~50% bigger',
   expect(probe.labels).toEqual(['Today', '1 week', '1 month', '1 year']);
   expect(probe.checked).toEqual(['true', 'false', 'false', 'false']);
   expect(probe.tabbables).toEqual([0, -1, -1, -1]);
-  // ~50% bigger and easier to see: 48px pills (was 32), ~18.7px words (was 12.5).
-  expect(probe.btnH).toBeGreaterThanOrEqual(46);
-  expect(parseFloat(probe.btnFont)).toBeGreaterThanOrEqual(18);
+  // 2026-10-21 owner round ("slightly reduce the size of this … like
+  // 15%"): the 48px pills drop to 41px and the ~18.7px words to
+  // caption × 1.27 ≈ 15.9px (the phone step: 37px / × 1.06 ≈ 13.3px).
+  expect(probe.btnH).toBeGreaterThanOrEqual(39);
+  expect(probe.btnH).toBeLessThanOrEqual(43);
+  expect(parseFloat(probe.btnFont)).toBeGreaterThanOrEqual(15);
   test.info().annotations.push({ type: 'note', description: `switch ${probe.grpW}px wide, pills ${probe.btnH}px @ ${probe.btnFont}` });
   // CENTRED under the summary line (it hugged the start edge before).
   expect(probe.centered).toBeLessThanOrEqual(2);
+  // 2026-10-21 unification: this switch is the SECTION's ONE period
+  // control — the old five-option Daily…Yearly radiogroup is retired,
+  // and every radiogroup in the section is this one or the display switch.
+  const radios = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('#insights-markets [role="radio"]')).map((b) => b.textContent),
+  );
+  expect(radios).toEqual(['Today', '1 week', '1 month', '1 year', 'List', 'Performance map']);
 });
 
 test('switch 2026-10-20h: arrow keys rove focus + selection (the ARIA radiogroup pattern)', async ({ page }) => {
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
-  const grp = page.locator('[role="radiogroup"]');
+  const grp = page.locator('.wm [role="radiogroup"]');
   await grp.locator('button').first().focus();
   await page.keyboard.press('ArrowRight');
   await expect(grp.locator('button').nth(1)).toBeFocused();
@@ -738,7 +767,7 @@ test('switch 2026-10-20h: 1 year drives the whole map — summary, tints, pins, 
   // The fixture's 1Y lens: 8 up, 7 down, 1 flat (FTSE −2.9 inside the
   // ±3 flat band); SSEC flips from today's rise to the year's fall.
   await expect(page.locator('.wm p')).toContainText('today');
-  await page.locator('[role="radiogroup"] button').nth(3).click();
+  await page.locator('.wm [role="radiogroup"] button').nth(3).click();
   await expect(page.locator('.wm p')).toContainText('8 of 16 markets up this year');
   await expect(page.locator('.wm p')).toContainText('7 down');
   await expect(page.locator('.wm p')).toContainText('1 flat');
@@ -766,7 +795,7 @@ test('switch 2026-10-20h: 1 year drives the whole map — summary, tints, pins, 
   // The compact cells keep their own lens emphasis OFF (1Y is selected).
   expect(await page.evaluate(() => document.querySelectorAll('.wm-cell.sel').length)).toBe(0);
   // Back to Today: the summary follows, no reload, no network.
-  await page.locator('[role="radiogroup"] button').first().click();
+  await page.locator('.wm [role="radiogroup"] button').first().click();
   await expect(page.locator('.wm p')).toContainText('markets up today');
   expect(await page.evaluate(() => document.querySelectorAll('.wm-yrow.sel').length)).toBe(0);
   expect(await page.evaluate(() => document.querySelectorAll('.wm-cell.sel').length)).toBe(16);
@@ -1132,4 +1161,85 @@ test('aggregation 2026-10-20g: no US indices at all → the honest neutral count
 /* Keep the map-order map referenced for future probes (§4.1 ids). */
 test.skip('reference: §4.1 ids', () => {
   expect(Object.keys(mapIds)).toEqual([...MAP_ORDER]);
+});
+
+/* ------------------------------------------------------------------ *
+ * 2026-10-21 owner round — the quiet-fill + card-home + unification
+ * probes: New York's tint damps 15%, Nifty 50 and Hang Seng float beside
+ * their own countries, and the map's switch drives the SECTION's period.
+ * ------------------------------------------------------------------ */
+
+test('tint 2026-10-21: New York\'s country (the US trio) damps its mix to 85% — 15% less opacity', async ({ page }) => {
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  const probe = await page.evaluate(() => {
+    const us = document.querySelector('[data-iso="840"]') as SVGPathElement;
+    const uk = document.querySelector('[data-iso="826"]') as SVGPathElement;
+    return {
+      usT: us.style.getPropertyValue('--t'),
+      ukT: uk.style.getPropertyValue('--t'),
+      usCls: us.getAttribute('class') ?? '',
+    };
+  });
+  // The US stays tinted (s-u via the trio's strongest fresh mover) but its
+  // mix is 85% of the honest ramp value. The fixture's 1D lens: ndx +1.0
+  // is the trio's strongest mover (weight 0.621 → ramp 53.9%) → 53.9 ×
+  // 0.85 = 45.8%.
+  expect(probe.usCls).toContain('s-u');
+  expect(probe.usT).toBe('45.8%');
+  // Every OTHER country keeps the honest ramp: the UK's +0.1 sits inside
+  // the flat band → the floor mix, undamped.
+  expect(probe.ukT).toBe('34%');
+});
+
+test('cards 2026-10-21: Nifty 50 and Hang Seng float beside their own countries, off the bottom band', async ({ page }) => {
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  const probe = await page.evaluate(() => {
+    const stage = document.querySelector('.wm-stage') as HTMLElement;
+    const sr = stage.getBoundingClientRect();
+    const rectOf = (id: string) => {
+      const r = (document.querySelector(`.wm-card[data-id="${id}"]`) as HTMLElement).getBoundingClientRect();
+      return {
+        cx: +(((r.left + r.right) / 2 - sr.left) / sr.width * 100).toFixed(1),
+        cy: +(((r.top + r.bottom) / 2 - sr.top) / sr.height * 100).toFixed(1),
+        bottom: +((r.bottom - sr.top) / sr.height * 100).toFixed(1),
+      };
+    };
+    const lineOf = (id: string) => {
+      const l = document.querySelector(`.wm-ln[data-id="${id}"]`) as SVGLineElement;
+      return Math.hypot(l.x2.baseVal.value - l.x1.baseVal.value, l.y2.baseVal.value - l.y1.baseVal.value);
+    };
+    return { nifty: rectOf('nifty50'), hsi: rectOf('hsi'), niftyLine: lineOf('nifty50'), hsiLine: lineOf('hsi') };
+  });
+  // Off the bottom band (the old homes sat at y 86 — south of Africa)…
+  expect(probe.nifty.cy).toBeLessThan(75);
+  expect(probe.hsi.cy).toBeLessThan(75);
+  // …and beside their own countries: Nifty 50 west-southwest of the India
+  // pin (69.9, 38.2), Hang Seng under the Hong Kong pin (80.9, 36.2).
+  expect(probe.nifty.cx).toBeLessThan(69.9);
+  expect(probe.hsi.cx).toBeGreaterThan(69.9);
+  // The leader lines are SHORT (the old bottom-band lines ran ~220 units
+  // in the 1000-unit viewBox; the new homes measure ~52 / ~35).
+  expect(probe.niftyLine).toBeLessThan(75);
+  expect(probe.hsiLine).toBeLessThan(50);
+  test.info().annotations.push({
+    type: 'note',
+    description: `nifty card (${probe.nifty.cx}, ${probe.nifty.cy}) line ${probe.niftyLine.toFixed(1)}u · hsi card (${probe.hsi.cx}, ${probe.hsi.cy}) line ${probe.hsiLine.toFixed(1)}u`,
+  });
+});
+
+test('unified 2026-10-21: the map\'s switch drives the whole section — verdict, movers and tiles follow', async ({ page }) => {
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  // The section opens on Today (the map's default) and speaks the MAP's
+  // period words everywhere: the verdict's breadth line, the movers'
+  // caption and the tiles' values all read the 1-day lens.
+  await expect(page.locator('#insights-markets')).toContainText('today performance');
+  // Switch to 1 year at the map's control: every surface re-reads chg1y.
+  await page.locator('.wm [role="radiogroup"] button').nth(3).click();
+  await expect(page.locator('#insights-markets')).toContainText('this year performance');
+  // The movers re-rank from chg1y: Ibovespa's −45.4 is the year's
+  // biggest fall.
+  await expect(page.locator('#insights-markets').locator('article', { hasText: 'Biggest fall' })).toContainText('Ibovespa');
+  // The explorer tile re-reads the same lens (Nifty 50's year +17.9).
+  const nifty = page.locator('#insights-market-tile-nifty50');
+  await expect(nifty).toContainText('+17.9%');
 });

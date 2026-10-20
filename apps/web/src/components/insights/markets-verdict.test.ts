@@ -116,28 +116,35 @@ describe('markets copy parity (en/fa)', () => {
     }
   });
 
-  it('round 46: the weekly and monthly lens labels exist everywhere (views, table, CSV)', () => {
+  it('round 46: the weekly and monthly lens labels exist everywhere (table, CSV)', () => {
     for (const copy of [insightsCopyEn, insightsCopyFa]) {
-      for (const key of ['viewWeekly', 'viewMonthly', 'thWeek', 'thMonth', 'csvColWeek', 'csvColMonth'] as const) {
+      for (const key of ['thWeek', 'thMonth', 'csvColWeek', 'csvColMonth'] as const) {
         expect(copy.markets[key].length).toBeGreaterThan(0);
       }
     }
   });
 
-  it('round 47: the yearly lens labels exist everywhere (views, table, CSV)', () => {
+  it('round 47: the yearly lens labels exist everywhere (table, CSV)', () => {
     for (const copy of [insightsCopyEn, insightsCopyFa]) {
-      for (const key of ['viewYearly', 'thYear', 'csvColYear'] as const) {
+      for (const key of ['thYear', 'csvColYear'] as const) {
         expect(copy.markets[key].length).toBeGreaterThan(0);
       }
     }
   });
 
-  it('the world-indices round: the five period lenses exist, and no YTD or 52-week-distance lens is offered (02-ui-spec §3.3 as amended by round 47)', () => {
+  it('the 2026-10-21 unification: the section speaks the MAP\'s four switch lenses; the old five-option radiogroup keys retire', () => {
     for (const copy of [insightsCopyEn, insightsCopyFa]) {
-      for (const key of ['viewDaily', 'viewWeekly', 'viewMonthly', 'viewQuarterly', 'viewYearly'] as const) {
-        expect(copy.markets[key].length).toBeGreaterThan(0);
+      // The map\'s own period keys drive every surface now (periodWord reads
+      // them; the map\'s switch renders them).
+      for (const key of ['periodToday', 'periodWeek', 'periodMonth', 'periodYear'] as const) {
+        expect(copy.markets.map[key].length).toBeGreaterThan(0);
       }
-      // The yearly horizon rides the stored chg1y field (round 47) — but
+      // viewQuarterly stays as the typed '3m' fallback word ONLY.
+      expect(copy.markets.viewQuarterly.length).toBeGreaterThan(0);
+      // The retired switch\'s keys are GONE (en is the shape source of truth).
+      for (const gone of ['viewDaily', 'viewWeekly', 'viewMonthly', 'viewYearly', 'viewSwitchAria'] as const) {
+        expect(gone in copy.markets).toBe(false);
+      }
       // YTD still does not exist in the contract and must never be offered
       // (no year-start date; see briefing.ts).
       expect('viewYtd' in copy.markets).toBe(false);

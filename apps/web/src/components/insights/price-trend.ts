@@ -57,11 +57,20 @@ export interface TrendWindow {
 /** How far the reference point may sit from its target day (same as the API). */
 const DAY_TOLERANCE = 3;
 
-/** The window length in calendar days. */
+/** The seven-day window length in calendar days (the card's classic
+ * primary lens). */
 const WINDOW_7D = 7;
 
-/** A window whose span is shorter than this is flagged incomplete. */
-const MIN_WINDOW_SPAN_DAYS = 6;
+/** 2026-10-21 owner round ("add the same option for prices … different
+ * time formats by those toggle"): the board's switchable window lengths,
+ * in calendar days — 1 week | 1 month | 1 year, mirroring the world
+ * map's lenses (the Today lens rides the 1-day change from
+ * price-stats, not a window). The SAME honesty rules as the classic
+ * seven-day window apply to every length. */
+export const PRICE_WINDOW_DAYS = { '1w': 7, '1m': 30, '1y': 365 } as const;
+
+/** A window whose span is shorter than (days − 1) is flagged incomplete. */
+const minSpanOf = (days: number): number => days - 1;
 
 /* ------------------------------------------------------------------ *
  * The documented trend classification thresholds
@@ -104,16 +113,32 @@ function pctChange(now: number, then: number): number | undefined {
 }
 
 /**
- * The seven-day window (see module doc). Returns null when no honest
- * window exists (empty series, or no reference point within tolerance).
+ * The seven-day window (see module doc) — the classic primary lens, now a
+ * thin wrapper over the generalized windowFor (2026-10-21). Returns null
+ * when no honest window exists (empty series, or no reference point
+ * within tolerance).
  */
 export function window7d(points: readonly TrendPoint[]): TrendWindow | null {
+  return windowFor(points, WINDOW_7D);
+}
+
+/**
+ * The generalized N-day window (2026-10-21 owner round: the prices
+ * board's period switch). SAME convention as the seven-day window —
+ * `days` calendar days ending at the latest stored observation, the
+ * reference point is the last observation AT OR BEFORE (latest − days),
+ * accepted only within the 3-day tolerance — so a 30-day or 1-year
+ * window can never be a number stretched over a gap. The classification
+ * thresholds stay window-sized (they read the window's own path), and a
+ * window shorter than (days − 1) is flagged incomplete.
+ */
+export function windowFor(points: readonly TrendPoint[], days: number): TrendWindow | null {
   const pts = points;
   if (pts.length < 2) return null;
   const last = pts[pts.length - 1]!;
 
-  // Reference: the last point AT OR BEFORE (latest − 7 days)…
-  const target = last.day - WINDOW_7D;
+  // Reference: the last point AT OR BEFORE (latest − days)…
+  const target = last.day - days;
   let ref: TrendPoint | null = null;
   for (const p of pts) {
     if (p.day <= target) ref = p;
@@ -134,7 +159,7 @@ export function window7d(points: readonly TrendPoint[]): TrendWindow | null {
     endDay: last.day,
     netPct,
     trend: classifyTrend(inWindow, netPct),
-    incomplete: span < MIN_WINDOW_SPAN_DAYS || inWindow.length < MIN_TREND_POINTS,
+    incomplete: span < minSpanOf(days) || inWindow.length < MIN_TREND_POINTS,
   };
 }
 
@@ -200,6 +225,13 @@ export interface BriefingInput {
   stale: boolean;
   /** True when history exists but yields no usable window. */
   historyUnavailable: boolean;
+  /** 2026-10-21 (the board's period switch): the LOCALIZED period phrase
+   * the templates interpolate ("over the past seven days" / "today") —
+   * the briefing always describes the SELECTED window, never a hardcoded
+   * one. Defaults to the classic seven-day phrase for callers that have
+   * not adopted the switch yet (PriceDetails' panel keeps its fixed
+   * window). */
+  period?: string;
 }
 
 /** The copy templates the briefing interpolates (both dictionaries). */
@@ -236,25 +268,29 @@ export function briefingText(input: BriefingInput, copy: BriefingCopy): string {
   }
 
   const s = input.subject;
+  // The selected window's phrase rides every template's {period} (an
+  // absent value keeps the token visible — the manifest-tracked copy
+  // always provides it from the switch's own copy keys).
+  const period = input.period ?? '{period}';
   const kind = BRIEFING_KIND[input.asset] ?? 'plain';
   let first: string;
   let second: string | null = null;
 
   switch (input.trend) {
     case 'up':
-      first = interpolateBriefing(copy.sumUp, { asset: s });
+      first = interpolateBriefing(copy.sumUp, { asset: s, period });
       second = copy.sumHedge;
       break;
     case 'down':
-      first = interpolateBriefing(copy.sumDown, { asset: s });
+      first = interpolateBriefing(copy.sumDown, { asset: s, period });
       second = copy.sumHedge;
       break;
     case 'range':
-      first = interpolateBriefing(copy.sumRange, { asset: s });
+      first = interpolateBriefing(copy.sumRange, { asset: s, period });
       break;
     case 'mixed':
     default:
-      first = interpolateBriefing(copy.sumMixed, { asset: s });
+      first = interpolateBriefing(copy.sumMixed, { asset: s, period });
       break;
   }
 
@@ -262,7 +298,7 @@ export function briefingText(input: BriefingInput, copy: BriefingCopy): string {
   // "fluctuated" only when the window really is mixed (spec 03 §3).
   if (kind === 'volatile') {
     if (input.trend === 'mixed') {
-      first = interpolateBriefing(copy.sumBtcMixed, { asset: s });
+      first = interpolateBriefing(copy.sumBtcMixed, { asset: s, period });
     }
     second = copy.sumBtcHedge;
   }

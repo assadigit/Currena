@@ -75,8 +75,13 @@ function lensRows(lens: '1w' | '1m' | '1y', values: Array<number | undefined>): 
  * ------------------------------------------------------------------ */
 
 describe('PERIOD_VIEWS — the closed lens list', () => {
-  it('offers exactly the five horizons the contract carries, ascending', () => {
-    expect(PERIOD_VIEWS).toEqual(['today', '1w', '1m', '3m', '1y']);
+  it('offers exactly the MAP\'s four horizons (2026-10-21 unification), ascending', () => {
+    // The map's segmented control is the section's ONE period switch now;
+    // '3m' stays a valid MarketsView VALUE (the stored contract carries
+    // chg3m; trendOf + the table's Trend column keep reading it) but is
+    // never a switch lens.
+    expect(PERIOD_VIEWS).toEqual(['today', '1w', '1m', '1y']);
+    expect(PERIOD_VIEWS).not.toContain('3m');
   });
 
   it('offers no YTD or 52-week-distance lens (the data gap is a gap)', () => {

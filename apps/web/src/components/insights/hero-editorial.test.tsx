@@ -35,7 +35,6 @@ import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { insightsCopyEn } from '../../i18n/insights-copy-en';
 import { insightsCopyFa } from '../../i18n/insights-copy-fa';
 import { HeroBlock } from './HeroBlock';
-import { ContinueStrip } from './ContinueStrip';
 
 /* ------------------------------------------------------------------ *
  * Fixtures
@@ -556,28 +555,12 @@ describe('fidelity round §7 — the bottom information strip', () => {
     );
   });
 
-  it('names the next sections in order and jumps on click', () => {
-    const onWillNavigate = vi.fn();
-    const targets = [
-      { id: 'insights-prices', label: 'Prices' },
-      { id: 'insights-together', label: 'Together' },
-      { id: 'insights-about', label: 'About' },
-    ];
-    const { container } = render(
-      <ContinueStrip targets={targets} copy={insightsCopyEn} onWillNavigate={onWillNavigate} />,
-    );
-    const nav = container.querySelector('[data-continue-strip]');
-    expect(nav).not.toBeNull();
-    const buttons = Array.from(nav!.querySelectorAll('[data-continue-target]')) as HTMLElement[];
-    expect(buttons.map((b) => b.textContent)).toEqual(['Prices', 'Together', 'About']);
-    fireEvent.click(buttons[0]!);
-    expect(onWillNavigate).toHaveBeenCalledWith('insights-prices');
-    // the lead-in names the strip's purpose
-    expect(nav!.textContent).toContain(insightsCopyEn.ui.continueLabel);
-  });
-
-  it('empty targets render nothing', () => {
-    const { container } = render(<ContinueStrip targets={[]} copy={insightsCopyEn} />);
-    expect(container.querySelector('[data-continue-strip]')).toBeNull();
+  // 2026-10-21 owner round: the ContinueStrip component itself is RETIRED
+  // (the sticky JumpNav pills already carry the same labels and the same
+  // expand-then-scroll navigation — the strip read as a redundant second
+  // set of the same buttons), so its regression guards retire with it.
+  it('the strip is retired — no [data-continue-strip] renders anywhere', () => {
+    renderHero(insightsCopyEn, 'en-US');
+    expect(document.querySelector('[data-continue-strip]')).toBeNull();
   });
 });

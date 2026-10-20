@@ -161,8 +161,17 @@ export const MAP_INDICES: readonly MapIndexConfig[] = [
   { id: 'cac', iso: '250', cc: 'fr', band: 'float', card: { x: 41, y: 29 } },
   { id: 'dax', iso: '276', cc: 'de', band: 'top', card: { x: 59, y: 8.5 } },
   { id: 'stoxx50', iso: null, cc: 'eu', band: 'float', card: { x: 61, y: 33 } },
-  { id: 'nifty50', iso: '356', cc: 'in', band: 'bottom', card: { x: 57, y: 86 } },
-  { id: 'hsi', iso: '344', cc: 'hk', band: 'bottom', card: { x: 72, y: 86 } },
+  // 2026-10-21 owner round — Nifty 50 and Hang Seng leave the BOTTOM band
+  // (they sat south of Africa with ~220-unit leader lines) and float beside
+  // their OWN countries: Nifty 50 over the Indian Ocean SW of India (its
+  // leader runs up-right to the India pin, ~52 units), Hang Seng under the
+  // Hong Kong pin in the South China Sea (its leader is a ~35-unit vertical
+  // straight up to the pin). Geometry re-cleared against every card (the
+  // stoxx50 card above, the taiex/kospi cards right), every pin, label
+  // anchor (in/hk/au stay clear) and leader line (the taiex line passes
+  // 0.5% right of the Hang Seng card).
+  { id: 'nifty50', iso: '356', cc: 'in', band: 'float', card: { x: 60, y: 54 } },
+  { id: 'hsi', iso: '344', cc: 'hk', band: 'float', card: { x: 75, y: 50 } },
   { id: 'ssec', iso: '156', cc: 'cn', band: 'top', card: { x: 75.5, y: 8.5 } },
   { id: 'taiex', iso: '158', cc: 'tw', band: 'right', card: { x: 90, y: 60 } },
   { id: 'kospi', iso: '410', cc: 'kr', band: 'right', card: { x: 91.5, y: 40 } },
@@ -271,6 +280,16 @@ export const MAP_LABELS: Partial<Record<MapCc, MapLabelSpec>> = {
  * ------------------------------------------------------------------ */
 export const MAP_TINT_LO = 34;
 export const MAP_TINT_HI = 66;
+
+/** 2026-10-21 owner round — "decrease the world box background which is
+ * new york by 15% opacity": the USA hosts THREE indices (Dow, S&P 500,
+ * Nasdaq) and its tint reads the STRONGEST fresh mover, so New York's
+ * country always carried the loudest fill on the map. Its mix now damps
+ * to 85% (a 15% opacity cut); every other country keeps the honest ramp.
+ * Keyed by ISO-numeric; absent → 1 (no damping). */
+export const MAP_TINT_COUNTRY_DAMP: Readonly<Record<string, number>> = {
+  '840': 0.85,
+};
 export const MAP_MARK_LO = 60;
 export const MAP_MARK_HI = 90;
 export const MAP_BORDER_LO = 35;

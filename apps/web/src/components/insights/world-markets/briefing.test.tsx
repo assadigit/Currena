@@ -114,7 +114,7 @@ describe('WorldMarkets — the editorial briefing shell', () => {
   it('everything stale (>5 days): the section collapses to the one-line stale shell', () => {
     render(<WorldMarkets state={{ kind: 'ready', snapshot: staleSnapshot() }} copy={insightsCopyEn} locale="en" numberLocale="en-US" />);
     expect(screen.getByText(/old; last update/)).toBeTruthy();
-    expect(screen.queryByRole('radio', { name: 'Daily' })).toBeNull();
+    expect(screen.queryByRole('radio', { name: 'Today' })).toBeNull();
   });
 });
 
@@ -123,28 +123,35 @@ describe('WorldMarkets — the editorial briefing shell', () => {
  * ------------------------------------------------------------------ */
 
 describe('the period control — one selection, every surface follows', () => {
-  it('defaults to the quarterly lens (the NORMAL timeframe, owner round 44)', () => {
+  it('defaults to the TODAY lens — the map\'s four-lens switch is the section\'s one control (2026-10-21 unification)', () => {
     render(<WorldMarkets state={{ kind: 'ready', snapshot: snapshotFixture() }} copy={insightsCopyEn} locale="en" numberLocale="en-US" />);
-    expect((findPeriodRadio('Quarterly') as HTMLButtonElement).getAttribute('aria-checked')).toBe('true');
+    expect((findPeriodRadio('Today') as HTMLButtonElement).getAttribute('aria-checked')).toBe('true');
+    // The old five-option radiogroup (Daily…Yearly) is retired: the map's
+    // switch is the ONLY period control in the section now.
+    for (const gone of ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly']) {
+      expect(screen.queryByRole('radio', { name: gone })).toBeNull();
+    }
   });
 
-  it('the quarterly breadth reads from chg3m: 2 up, 2 down, 1 flat, 5 valid', () => {
+  it('the TODAY breadth reads from chg1d: 1 up, 1 down, 3 flat, 5 valid', () => {
     render(<WorldMarkets state={{ kind: 'ready', snapshot: snapshotFixture() }} copy={insightsCopyEn} locale="en" numberLocale="en-US" />);
-    const summary = screen.getByText('Quarterly performance').closest('div')!;
-    expect(within(summary).getByText('Indices up').nextElementSibling?.textContent).toBe('2');
-    expect(within(summary).getByText('Indices down').nextElementSibling?.textContent).toBe('2');
-    expect(within(summary).getByText('Flat').nextElementSibling?.textContent).toBe('1');
+    // The unified lens opens on Today: the verdict's breadth line speaks the
+    // MAP's period word ("today performance" — one vocabulary everywhere).
+    const summary = screen.getByText('today performance').closest('div')!;
+    expect(within(summary).getByText('Indices up').nextElementSibling?.textContent).toBe('1');
+    expect(within(summary).getByText('Indices down').nextElementSibling?.textContent).toBe('1');
+    expect(within(summary).getByText('Flat').nextElementSibling?.textContent).toBe('3');
     // Full coverage: no coverage note.
     expect(screen.queryByText(/indices carry this period/)).toBeNull();
   });
 
   it('switching to Weekly re-reads breadth (2/1/1 with one row missing), the movers and the tiles from chg1w', () => {
     render(<WorldMarkets state={{ kind: 'ready', snapshot: snapshotFixture() }} copy={insightsCopyEn} locale="en" numberLocale="en-US" />);
-    fireEvent.click(findPeriodRadio('Weekly'));
+    fireEvent.click(findPeriodRadio('1 week'));
     // Breadth over chg1w: n225 +4.5 (up), asx200 −3.5 (down), kospi +0.2
     // (flat), sp500 +1.2 (up); hsi predates the lens — excluded, so the
     // denominator drops to 4 and the coverage note says so.
-    const summary = screen.getByText('Weekly performance').closest('div')!;
+    const summary = screen.getByText('this week performance').closest('div')!;
     expect(within(summary).getByText('Indices up').nextElementSibling?.textContent).toBe('2');
     expect(within(summary).getByText('Indices down').nextElementSibling?.textContent).toBe('1');
     expect(within(summary).getByText('Flat').nextElementSibling?.textContent).toBe('1');
@@ -157,15 +164,15 @@ describe('the period control — one selection, every surface follows', () => {
     expect(tile.textContent).toContain('+4.5%');
   });
 
-  it('the daily lens moves the decliner to the hsi (−2.6)', () => {
+  it('the TODAY lens (the default) moves the decliner to the hsi (−2.6)', () => {
     render(<WorldMarkets state={{ kind: 'ready', snapshot: snapshotFixture() }} copy={insightsCopyEn} locale="en" numberLocale="en-US" />);
-    fireEvent.click(findPeriodRadio('Daily'));
     expect(screen.getByText('Biggest fall').closest('article')!.textContent).toContain('Hang Seng');
+    expect(screen.getByText('Biggest fall').closest('article')!.textContent).toContain('−2.6%');
   });
 
   it('the monthly lens: kospi carries no chg1m — the tile shows the honest dash and the coverage note lowers the denominator', () => {
     render(<WorldMarkets state={{ kind: 'ready', snapshot: snapshotFixture() }} copy={insightsCopyEn} locale="en" numberLocale="en-US" />);
-    fireEvent.click(findPeriodRadio('Monthly'));
+    fireEvent.click(findPeriodRadio('1 month'));
     const tile = document.getElementById('insights-market-tile-kospi')!;
     expect(tile.textContent).toContain('—');
     expect(screen.getByText('4 of 5 indices carry this period.')).toBeTruthy();
@@ -173,11 +180,11 @@ describe('the period control — one selection, every surface follows', () => {
 
   it('round 47: the yearly lens re-reads every surface from chg1y — hsi predates it, so the dash + coverage note appear', () => {
     render(<WorldMarkets state={{ kind: 'ready', snapshot: snapshotFixture() }} copy={insightsCopyEn} locale="en" numberLocale="en-US" />);
-    fireEvent.click(findPeriodRadio('Yearly'));
+    fireEvent.click(findPeriodRadio('1 year'));
     // Breadth over chg1y: n225 +18.0 (up), asx200 −4.5 (down), kospi +11.0
     // (up), sp500 +9.4 (up); hsi predates the lens — excluded, so the
     // denominator drops to 4 and the coverage note says so.
-    const summary = screen.getByText('Yearly performance').closest('div')!;
+    const summary = screen.getByText('this year performance').closest('div')!;
     expect(within(summary).getByText('Indices up').nextElementSibling?.textContent).toBe('3');
     expect(within(summary).getByText('Indices down').nextElementSibling?.textContent).toBe('1');
     expect(within(summary).getByText('Flat').nextElementSibling?.textContent).toBe('0');
@@ -199,7 +206,7 @@ describe('the period control — one selection, every surface follows', () => {
       markets: snapshot.markets.map((m) => entry({ ...m, chg1w: undefined })),
     };
     render(<WorldMarkets state={{ kind: 'ready', snapshot: noWeekly }} copy={insightsCopyEn} locale="en" numberLocale="en-US" />);
-    fireEvent.click(findPeriodRadio('Weekly'));
+    fireEvent.click(findPeriodRadio('1 week'));
     const gain = screen.getByText('Biggest gain').closest('article')!;
     expect(gain.textContent).toContain('No data for this period yet.');
     const fall = screen.getByText('Biggest fall').closest('article')!;
@@ -215,18 +222,19 @@ describe('the featured movers', () => {
   it('each card carries the logo frame, canonical name, country, signed return and the 52-week distance context', () => {
     render(<WorldMarkets state={{ kind: 'ready', snapshot: snapshotFixture() }} copy={insightsCopyEn} locale="en" numberLocale="en-US" />);
     const gain = screen.getByText('Biggest gain').closest('article')!;
-    // The quarterly gainer is n225 (+6.0): name, country, value, distance.
+    // The TODAY gainer is n225 (+1.4): name, country, value, distance.
     expect(gain.textContent).toContain('Nikkei 225');
     expect(gain.textContent).toContain('Japan');
-    expect(gain.textContent).toContain('+6.0%');
+    expect(gain.textContent).toContain('+1.4%');
     expect(gain.textContent).toContain('From 52-week high:');
     expect(gain.querySelector('img')!.getAttribute('src')).toBe('/assets/markets/n225.jpg');
-    // The period caption names the ranking basis.
-    expect(gain.textContent).toContain('Selected period: Quarterly');
-    // The decliner is hsi (−12.0) with its bear-market context.
+    // The period caption names the ranking basis (the map's period word —
+    // one vocabulary since the 2026-10-21 unification).
+    expect(gain.textContent).toContain('Selected period: today');
+    // The decliner is hsi (−2.6) with its bear-market context.
     const fall = screen.getByText('Biggest fall').closest('article')!;
     expect(fall.textContent).toContain('Hang Seng');
-    expect(fall.textContent).toContain('−12.0%');
+    expect(fall.textContent).toContain('−2.6%');
     expect(fall.textContent).toContain('Bear market');
   });
 
@@ -314,7 +322,7 @@ describe('the regional explorer', () => {
     // name and exact signed percentage (colour is never the only signal).
     const heatN225 = document.getElementById('insights-market-heat-n225')!;
     expect(heatN225.textContent).toContain('Nikkei 225');
-    expect(heatN225.textContent).toContain('+6.0%');
+    expect(heatN225.textContent).toContain('+1.4%');
     // The legend is visible and centred on zero, naming the selected period.
     expect(screen.getByText('Intensity is relative to the selected period')).toBeTruthy();
     // The list tiles still exist in the DOM (CSS keeps mobile on the list).
@@ -333,19 +341,23 @@ describe('the fa rendering', () => {
     expect(screen.getByText('نبض بازارهای جهان')).toBeTruthy();
     expect(screen.getByText('شاخص‌های بورسی جهان')).toBeTruthy();
     expect(screen.getByText('آخرین داده‌ها · پایان جلسهٔ معاملاتی')).toBeTruthy();
-    // The period lenses (§3.3) — the five supported horizons only.
-    for (const label of ['روزانه', 'هفتگی', 'ماهانه', 'سه‌ماهه', 'سالانه']) {
+    // The period lenses (§3.3) — the MAP's four horizons only (2026-10-21
+    // unification: the old five-option radiogroup retired).
+    for (const label of ['امروز', '۱ هفته', '۱ ماه', '۱ سال']) {
       expect(screen.getByRole('radio', { name: label })).toBeTruthy();
     }
+    for (const gone of ['روزانه', 'هفتگی', 'ماهانه', 'سه‌ماهه', 'سالانه']) {
+      expect(screen.queryByRole('radio', { name: gone })).toBeNull();
+    }
     // Persian digits at render time (the n225 weekly value +4.5 → ‎+۴٫۵٪).
-    fireEvent.click(findPeriodRadio('هفتگی'));
+    fireEvent.click(findPeriodRadio('۱ هفته'));
     const tile = document.getElementById('insights-market-tile-n225')!;
     expect(tile.textContent).toContain('۴٫۵');
     // The movers' Persian labels (§3.4).
     expect(screen.getByText('بیشترین رشد')).toBeTruthy();
     expect(screen.getByText('بیشترین افت')).toBeTruthy();
-    // The breadth line (§3.2).
-    expect(screen.getByText('عملکرد هفتگی')).toBeTruthy();
+    // The breadth line (§3.2) — the map's period word (این هفته).
+    expect(screen.getByText('عملکرد این هفته')).toBeTruthy();
   });
 
   it('the Latin index name rides beside the Persian name, dir-isolated (§6.7)', () => {

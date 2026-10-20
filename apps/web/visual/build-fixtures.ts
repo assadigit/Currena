@@ -677,10 +677,19 @@ function historyFor(id: IndicatorId, points: number, startDaysBack: number, endV
 
 const histories: unknown[] = [
   historyFor('us10y', 40, 720, 5.31, 1.2),
-  historyFor('brent', 40, 720, 74.5, 12),
-  historyFor('gold-usd', 40, 720, 3870.4, 900),
   historyFor('vix', 40, 720, 17.8, 6),
   historyFor('au-cpi', 24, 1440, 3.9, 1.5), // quarterly → ~4 years back
+  // 2026-10-21 owner round (the prices board's period switch): the four
+  // PRICE assets get DENSE daily series (721 points over 720 days — one
+  // point per calendar day) so every lens the switch speaks computes an
+  // honest window: the 1-day reference (pick(1)'s ±3-day tolerance) and
+  // the 7/30/365-day windows all land exactly on stored observations.
+  // (The old 40-point series spaced ~18 days apart could only answer the
+  // sparse-window honest "unavailable" — the switch deserved real data.)
+  historyFor('gold-usd', 721, 720, 3870.4, 900),
+  historyFor('silver-usd', 721, 720, 47.2, 9),
+  historyFor('brent', 721, 720, 74.5, 12),
+  historyFor('btc-usd', 721, 720, 91500, 24000),
 ];
 
 /* ------------------------------------------------------------------ *

@@ -1001,3 +1001,57 @@ test('U-14 owner-only export is 401/403 without the owner token', async ({ reque
   const response = await request.get(`${workerUrl}/api/insights/export`);
   expect([401, 403], 'the export must refuse anonymous callers').toContain(response.status());
 });
+
+/* ------------------------------------------------------------------ *
+ * U-15 (2026-10-21 owner round) — the prices board's period switch:
+ * the SAME four lenses the world map speaks (Today | 1 week | 1 month |
+ * 1 year), one selection, every movement surface on every card follows.
+ * ------------------------------------------------------------------ */
+
+test('U-15 prices: the board\'s four-lens switch re-measures every card (trend, chart, word, briefing)', async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 900 });
+  await gotoInsights(page);
+
+  const section = page.locator('#insights-prices');
+  // The switch renders centred above the grid, speaking the map's lenses.
+  const grp = section.locator('[role="radiogroup"]');
+  await expect(grp).toBeVisible();
+  await expect(grp.getByRole('radio')).toHaveCount(4);
+  await expect(grp.getByRole('radio', { name: 'Today' })).toBeVisible();
+  await expect(grp.getByRole('radio', { name: '1 year' })).toBeVisible();
+  // The classic lens opens the board (the card's established primary story).
+  await expect(grp.getByRole('radio', { name: '1 week' })).toHaveAttribute('aria-checked', 'true');
+
+  // The 1-week lens: the trend row names the seven-day window and every
+  // card carries a sparkline (its aria names the asset + window) + a
+  // trend word.
+  await expect(section.locator('#insights-card-gold-usd')).toContainText('Past 7 days');
+  await expect(section.locator('#insights-card-gold-usd [aria-label*="price movement"]')).toBeVisible();
+
+  // Switch to 1 month: the row label, the briefing's period phrase and the
+  // daily-change row all follow the SAME window.
+  await grp.getByRole('radio', { name: '1 month' }).click();
+  await expect(section.locator('#insights-card-gold-usd')).toContainText('Past 30 days');
+  await expect(section.locator('#insights-card-gold-usd')).toContainText(/over the past 30 days/);
+  // The daily change stays as its own supporting row outside the Today lens.
+  await expect(section.locator('#insights-card-gold-usd')).toContainText('Daily change');
+
+  // Switch to 1 year.
+  await grp.getByRole('radio', { name: '1 year' }).click();
+  await expect(section.locator('#insights-card-gold-usd')).toContainText('Past 1 year');
+  await expect(section.locator('#insights-card-gold-usd')).toContainText(/over the past year/);
+
+  // Switch to Today: the row becomes the daily story with its explicit
+  // basis, the sparkline and the trend word retire (a one-day window has
+  // no path), and the separate daily-change row hides (never twice).
+  await grp.getByRole('radio', { name: 'Today' }).click();
+  await expect(section.locator('#insights-card-gold-usd')).toContainText('Today');
+  await expect(section.locator('#insights-card-gold-usd')).toContainText('vs the previous stored close');
+  await expect(section.locator('#insights-card-gold-usd').locator('[aria-label*="price movement"]')).toHaveCount(0);
+
+  // Arrow keys rove focus + selection (the ARIA radiogroup pattern).
+  await grp.getByRole('radio', { name: 'Today' }).focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(grp.getByRole('radio', { name: '1 week' })).toBeFocused();
+  await expect(grp.getByRole('radio', { name: '1 week' })).toHaveAttribute('aria-checked', 'true');
+});

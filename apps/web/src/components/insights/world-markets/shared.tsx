@@ -9,7 +9,7 @@
 import type { MarketEntry, MarketsSnapshot } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { STALE_DAYS } from '@currena/insights/markets/definitions';
-import { interpolate } from '../../../i18n';
+import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { IconImg, DIRECTION_DOWN_URL, DIRECTION_UP_URL } from '../../icons/currena';
 
 /** The page-level feed state (owned by Insights.tsx, passed down). */
@@ -33,8 +33,30 @@ export type MarketsLoadState =
  * yearly lens (round 47 — the stored contract now carries chg1y). The
  * 52-week-high distance is NOT a lens — it rides every surface as secondary
  * context (tile tags, mover cards, table column). See briefing.ts for the
- * closed list. */
+ * closed list.
+ *
+ * 2026-10-21 owner round ("unify the map time views with the other parts
+ * of the website"): the SWITCH speaks the map's four lenses —
+ * today | 1w | 1m | 1y — and '3m' retires as a SELECTABLE lens (it stays
+ * in the type: the stored contract carries chg3m, the table's Trend
+ * column and trendOf keep reading it; it is simply never the switch's
+ * selection anymore). */
 export type MarketsView = 'today' | '1w' | '1m' | '3m' | '1y';
+
+/** The localized period word for a lens — labels, aria sentences and the
+ * movers' period caption all read it, so one mapping drives every
+ * mention of "which period am I in". 2026-10-21 unification: the four
+ * switch lenses speak the MAP's period words (today / this week /
+ * this month / this year) so the verdict box, the movers, the tiles and
+ * the map's own summary can never disagree; '3m' (never a switch lens
+ * now) keeps the quarterly word for type completeness. */
+export function periodWord(view: MarketsView, copy: InsightsCopy): string {
+  if (view === 'today') return copy.markets.map.periodWordToday;
+  if (view === '1w') return copy.markets.map.periodWordWeek;
+  if (view === '1m') return copy.markets.map.periodWordMonth;
+  if (view === '1y') return copy.markets.map.periodWordYear;
+  return copy.markets.viewQuarterly;
+}
 
 /* ------------------------------------------------------------------ *
  * Pure display helpers
@@ -192,32 +214,10 @@ export function formatRelativeShort(iso: string, locale: 'en' | 'fa'): string {
   }).format(new Date(iso));
 }
 
-/**
- * MAP M9 — the section header's "Updated {time} · {age}" status: the
- * snapshot's write time in the VIEWER's time zone with the zone name
- * (Jalali calendar in Farsi), and its age as minutes (the spec's unit)
- * graduating to hours/days only past the hour so the EOD cadence never
- * reads as "743 min ago". Pure: the clock is passed in.
- */
-export function mapUpdatedStatus(
-  generatedAt: string,
-  nowMs: number,
-  locale: 'en' | 'fa',
-  numberLocale: 'en-US' | 'fa-IR',
-  copy: { updated: string; updatedAgoMin: string; updatedAgoHour: string; updatedAgoDay: string },
-): { time: string; age: string; line: string } {
-  const tag = locale === 'fa' ? 'fa-IR-u-ca-persian' : 'en-US';
-  const time = new Intl.DateTimeFormat(tag, { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }).format(
-    new Date(generatedAt),
-  );
-  const ageMin = Math.max(0, Math.round((nowMs - Date.parse(generatedAt)) / 60_000));
-  const n = (v: number) => formatNumber(v, numberLocale, { maximumFractionDigits: 0 });
-  const age =
-    ageMin < 60
-      ? interpolate(copy.updatedAgoMin, { n: n(ageMin) })
-      : ageMin < 48 * 60
-        ? interpolate(copy.updatedAgoHour, { n: n(Math.round(ageMin / 60)) })
-        : interpolate(copy.updatedAgoDay, { n: n(Math.round(ageMin / 1440)) });
-  return { time, age, line: `${copy.updated} ${time} · ${age}` };
-}
+/* MAP M9's "Updated {time} · {age}" header line is RETIRED (2026-10-21
+ * owner round — the KV snapshot's write time is fixed by the nightly cron,
+ * so the line always read as a stale, never-updating clock). The map
+ * module's M17 "Showing data from {time}" line stays: it speaks only when
+ * a refresh FAILED and the last good copy is on screen — a real event,
+ * not a routine age. */
 

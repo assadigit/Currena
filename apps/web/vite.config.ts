@@ -180,11 +180,13 @@ export default defineConfig({
     }),
   ],
   // Same-origin dev: proxy the API surface to the local Worker (wrangler dev :8787)
-  // so Phase 5 dev matches production (no CORS, cookies, etc.).
+  // so Phase 5 dev matches production (no CORS, cookies, etc.). DEV_API_PROXY
+  // retargets the proxy (e.g. https://currena.ir) for UI-only sessions that
+  // exercise the real stored data without a local Worker.
   server: {
     proxy: {
-      '/api': 'http://localhost:8787',
-      '/internal': 'http://localhost:8787',
+      '/api': process.env.DEV_API_PROXY ?? 'http://localhost:8787',
+      '/internal': process.env.DEV_API_PROXY ?? 'http://localhost:8787',
     },
   },
   build: {

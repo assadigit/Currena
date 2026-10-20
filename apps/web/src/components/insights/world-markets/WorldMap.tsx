@@ -40,6 +40,7 @@ import {
   MAP_LABEL_SIZE_DEFAULT,
   MAP_PERIODS,
   MAP_THRESHOLDS,
+  MAP_TINT_COUNTRY_DAMP,
   OPEN_MAX_AGE_MIN,
   borderMixOf,
   inkMixOf,
@@ -197,6 +198,8 @@ export function WorldMap({
   locale,
   numberLocale,
   onOpenMarket,
+  period: periodProp,
+  onPeriodChange,
 }: {
   /** The section's stored snapshot (absent in the loading state). */
   snapshot?: { markets: readonly MarketEntry[]; generatedAt: string };
@@ -210,6 +213,14 @@ export function WorldMap({
   /** Opens the index's existing detail view (M13) — the section's own
    * row handler (panel + scroll), exactly like the table's rows. */
   onOpenMarket: (id: MarketId) => void;
+  /** 2026-10-21 owner round ("unify the map time views with the other
+   * parts of the website"): the switch is now THE section's ONE period
+   * control — the shell (WorldMarkets) may own the lens and pass it down
+   * (controlled), which also drives the verdict, the movers, the tiles
+   * and the table. Absent → the module keeps its own session state
+   * (the standalone/loading usage). */
+  period?: MapPeriod;
+  onPeriodChange?: (p: MapPeriod) => void;
 }) {
   const mapCopy = copy.markets.map;
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -222,7 +233,17 @@ export function WorldMap({
   const periodBtnRefs = useRef(new Map<MapPeriod, HTMLButtonElement>());
 
   // M11: session-only period state — no network, no storage, no KV.
-  const [period, setPeriod] = useState<MapPeriod>(DEFAULT_PERIOD);
+  // 2026-10-21: CONTROLLED when the shell passes period/onPeriodChange
+  // (the switch drives the whole section then); internal otherwise.
+  const [internalPeriod, setInternalPeriod] = useState<MapPeriod>(DEFAULT_PERIOD);
+  const period = periodProp ?? internalPeriod;
+  const setPeriod = useCallback(
+    (p: MapPeriod) => {
+      if (onPeriodChange !== undefined) onPeriodChange(p);
+      else setInternalPeriod(p);
+    },
+    [onPeriodChange],
+  );
   // M13: the hovered/focused card drives dot + country + line emphasis.
   const [activeId, setActiveId] = useState<MarketId | null>(null);
   const [assets, setAssets] = useState<MapAssets | null>(null);
@@ -471,9 +492,18 @@ export function WorldMap({
           </p>
           {/* M11 — the four-option segmented control + M17's stale-copy line.
            * 2026-10-20h owner round: the switch CENTRES under the summary
-           * (it hugged the start edge before) and grows ~50% — 48px pills,
+           * (it hugged the start edge before) and grew ~50% — 48px pills,
            * 18.7px words — because the owner asked for bigger and easier
-           * to see. Yearly joins as the fourth lens. */}
+           * to see. Yearly joins as the fourth lens.
+           * 2026-10-21 owner round (two asks): (a) "slightly reduce the
+           * size of this … like 15%" — the pills drop to 41px (37px under
+           * 480px) and the words to caption × 1.27 (× 1.06 on phones);
+           * (b) "unify the map time views with the other parts of the
+           * website" — this switch is now the SECTION's one period
+           * control (the old five-option Daily|Weekly|Monthly|Quarterly|
+           * Yearly radiogroup below the movers is retired); when the
+           * shell passes onPeriodChange, the same four lenses drive the
+           * verdict, movers, tiles and table. */}
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
             <div
               role="radiogroup"
@@ -504,7 +534,7 @@ export function WorldMap({
                       if (el === null) periodBtnRefs.current.delete(p);
                       else periodBtnRefs.current.set(p, el);
                     }}
-                    className={`insights-focusable min-h-[48px] cursor-pointer whitespace-nowrap rounded-full px-4 py-1 text-[length:calc(var(--type-caption)*1.5)] font-semibold transition-colors @max-[480px]:min-h-[44px] @max-[480px]:px-3 @max-[480px]:text-[length:calc(var(--type-caption)*1.25)] ${
+                    className={`insights-focusable min-h-[41px] cursor-pointer whitespace-nowrap rounded-full px-3.5 py-1 text-[length:calc(var(--type-caption)*1.27)] font-semibold transition-colors @max-[480px]:min-h-[37px] @max-[480px]:px-2.5 @max-[480px]:text-[length:calc(var(--type-caption)*1.06)] ${
                       selected
                         ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)]'
                         : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
@@ -549,7 +579,11 @@ export function WorldMap({
               const tint = countryTints.get(p.iso);
               const cls = tint !== undefined ? `wm-c s-${tint.dir}` : 'wm-c';
               const on = p.iso === activeIso ? ' on' : '';
-              const t = tint !== undefined ? `${tintMixOf(tint.wt)}%` : undefined;
+              // 2026-10-21 owner round: New York's country (the US trio)
+              // damps its mix to 85% — a 15% opacity cut on the loudest
+              // fill the map can show (see MAP_TINT_COUNTRY_DAMP).
+              const damp = MAP_TINT_COUNTRY_DAMP[p.iso] ?? 1;
+              const t = tint !== undefined ? `${Math.round(tintMixOf(tint.wt) * damp * 10) / 10}%` : undefined;
               return <path key={p.iso} data-iso={p.iso} d={p.d} className={`${cls}${on}`} style={t !== undefined ? { ['--t' as string]: t } : undefined} />;
             })}
           </g>

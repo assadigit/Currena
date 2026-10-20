@@ -87,7 +87,7 @@
  * never a flat line.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { Coins, PanelLeft, PanelRight } from 'lucide-react';
 import { interpolate } from '../../i18n';
@@ -103,8 +103,68 @@ import {
 import { formatAsOf } from './HistoryChart';
 import { ChangeValue } from './PriceDetails';
 import { deriveTileStats, type TileStats } from './price-stats';
-import { briefingText, cleanPriceSeries, window7d, type TrendWindow } from './price-trend';
+import {
+  briefingText,
+  cleanPriceSeries,
+  PRICE_WINDOW_DAYS,
+  windowFor,
+  window7d,
+  type TrendWindow,
+} from './price-trend';
 import { PriceSparkline } from './PriceSparkline';
+
+/* ------------------------------------------------------------------ *
+ * The board's period lenses — 2026-10-21 owner round ("add the same
+ * option for prices in the prices section, for example oil silver gold
+ * and bitcoin can be seen in different time formats by those toggle"):
+ * the SAME four lenses the world map's switch speaks (Today | 1 week |
+ * 1 month | 1 year). The trend row, the sparkline, the trend word and
+ * the briefing all measure the SELECTED window — never a hardcoded
+ * seven-day story beside a switch that says something else. The Today
+ * lens rides the 1-day change (vs the previous stored observation,
+ * price-stats' c1): a one-day window has no path to draw, so it shows
+ * the signed change with its explicit basis instead of a sparkline.
+ * ------------------------------------------------------------------ */
+
+export type PriceLens = 'today' | '1w' | '1m' | '1y';
+
+export const PRICE_LENSES: readonly PriceLens[] = ['today', '1w', '1m', '1y'];
+
+/** The lens's own row label (the «X گذشته» family; Today for the daily
+ * lens). */
+function lensRowLabel(lens: PriceLens, copy: InsightsCopy): string {
+  if (lens === 'today') return copy.ui.pastToday;
+  if (lens === '1w') return copy.ui.past7days;
+  if (lens === '1m') return copy.ui.change30dLabel;
+  return copy.ui.stat1yChange;
+}
+
+/** The switch pill's own label (mirrors the map's periodToday… keys). */
+function lensSwitchLabel(lens: PriceLens, copy: InsightsCopy): string {
+  if (lens === 'today') return copy.ui.pricePeriodToday;
+  if (lens === '1w') return copy.ui.pricePeriodWeek;
+  if (lens === '1m') return copy.ui.pricePeriodMonth;
+  return copy.ui.pricePeriodYear;
+}
+
+/** The localized period phrase the briefing templates and the sparkline
+ * aria interpolate ("over the past seven days" / "today"). */
+function lensPeriodWord(lens: PriceLens, copy: InsightsCopy): string {
+  if (lens === 'today') return copy.ui.sumPeriodToday;
+  if (lens === '1w') return copy.ui.sumPeriod7d;
+  if (lens === '1m') return copy.ui.sumPeriod30d;
+  return copy.ui.sumPeriod1y;
+}
+
+/** The Today lens's honest trend classification: |c1| ≥ 1% is the same
+ * NET_DIRECTIONAL_PCT floor the window classification uses — a smaller
+ * daily move is a range day, an absent one is no story at all. */
+function trendOfDaily(c1: number | undefined): 'up' | 'down' | 'range' | null {
+  if (c1 === undefined || !Number.isFinite(c1)) return null;
+  if (c1 >= 1) return 'up';
+  if (c1 <= -1) return 'down';
+  return 'range';
+}
 
 /* ------------------------------------------------------------------ *
  * The tile's icon box — compact and supportive (spec 02 §5: never more
@@ -127,10 +187,12 @@ function PriceIconBox({ id }: { id: IndicatorId }) {
   );
 }
 
-/** One tile's client-derived data: the bullet statistics + the 7-day window. */
+/** One tile's client-derived data: the bullet statistics + every lens's
+ * window (the 2026-10-21 switch computes 1w/1m/1y from the SAME stored
+ * history — the Today lens reads price-stats' c1, no window needed). */
 interface TileData {
   stats: TileStats;
-  trend: TrendWindow | null;
+  trends: { '1w': TrendWindow | null; '1m': TrendWindow | null; '1y': TrendWindow | null };
 }
 
 /**
@@ -149,9 +211,14 @@ function useTileData(ids: readonly IndicatorId[]): Partial<Record<string, TileDa
       void fetchIndicatorHistory(id as IndicatorId)
         .then((history) => {
           if (cancelled || !history) return;
+          const series = cleanPriceSeries(history.points);
           const entry: TileData = {
             stats: deriveTileStats(history.points, definitionFor(id as IndicatorId).changeKind),
-            trend: window7d(cleanPriceSeries(history.points)),
+            trends: {
+              '1w': window7d(series),
+              '1m': windowFor(series, PRICE_WINDOW_DAYS['1m']),
+              '1y': windowFor(series, PRICE_WINDOW_DAYS['1y']),
+            },
           };
           setDerived((prev) => (prev[id] ? prev : { ...prev, [id]: entry }));
         })
@@ -177,6 +244,7 @@ function PriceTile({
   locale,
   numberLocale,
   data,
+  lens,
   onFocusCard,
 }: {
   id: IndicatorId;
@@ -185,6 +253,10 @@ function PriceTile({
   locale: 'en' | 'fa';
   numberLocale: 'en-US' | 'fa-IR';
   data: TileData | undefined;
+  /** The board's selected period lens (2026-10-21): every movement
+   * surface on the card — the trend row, the sparkline, the trend word
+   * and the briefing — measures THIS window. */
+  lens: PriceLens;
   onFocusCard: (id: IndicatorId, opener?: HTMLElement | null) => void;
 }) {
   const def = definitionFor(id);
@@ -199,22 +271,32 @@ function PriceTile({
   // would describe an old market as if it were current. A stale card still
   // renders its trend — qualified by the "data may be delayed" suffix in
   // the freshness row AND the briefing (spec 04 §8).
-  const trend = isUnavailable ? null : (data?.trend ?? null);
-  const netPct = trend?.netPct;
+  // 2026-10-21: the window follows the SELECTED lens; the Today lens reads
+  // the 1-day change (c1) instead of a window (it has no path to draw).
+  const trend: TrendWindow | null = isUnavailable
+    ? null
+    : lens === 'today'
+      ? null
+      : (data?.trends[lens] ?? null);
+  const netPct = lens === 'today' ? (isUnavailable ? undefined : stats?.c1) : trend?.netPct;
+  const dailyTrend = lens === 'today' && !isUnavailable ? trendOfDaily(stats?.c1) : null;
 
   // The price line's split parts (task §5): number + currency on one
   // baseline, built from the display config — no string surgery.
   const price =
     reading.value !== null ? priceValueParts(id, reading.value, numberLocale, copy.units) : null;
 
-  // The briefing (spec 03): deterministic templates, evidence only.
+  // The briefing (spec 03): deterministic templates, evidence only —
+  // describing the SELECTED window through its {period} phrase (the
+  // Today lens classifies the 1-day move with the same 1% floor).
   const summary = briefingText(
     {
       asset: id,
       subject,
-      trend: trend?.trend ?? null,
+      trend: lens === 'today' ? dailyTrend : (trend?.trend ?? null),
       stale: isStale,
-      historyUnavailable: trend === null,
+      historyUnavailable: lens === 'today' ? dailyTrend === null : trend === null,
+      period: lensPeriodWord(lens, copy),
     },
     copy.ui,
   );
@@ -222,7 +304,7 @@ function PriceTile({
   // The sparkline's accessible description: asset + window + the signed
   // move (or the honest "insufficient" word when the window is too thin).
   const ariaChange =
-    netPct !== undefined && trend?.trend !== 'insufficient'
+    netPct !== undefined && (lens === 'today' ? dailyTrend !== null : trend?.trend !== 'insufficient')
       ? formatChange(netPct, def.changeKind, numberLocale, copy.units)
       : copy.ui.trendInsufficient;
 
@@ -329,24 +411,50 @@ function PriceTile({
               {isStale ? <bdi className="font-semibold">{copy.ui.dataDelayed}</bdi> : null}
             </span>
 
-            {/* 4. THE SEVEN-DAY TREND — the primary movement story. The
-             * chart and the percentage share one window (price-trend.ts);
-             * the trend word comes from the documented classification;
-             * no window ⇒ an explicit unavailable line, never a fake
-             * flat chart. */}
+            {/* 4. THE SELECTED-PERIOD TREND — the primary movement story
+             * (2026-10-21: the lens the switch speaks — Today | 1 week |
+             * 1 month | 1 year). The chart and the percentage share one
+             * window (price-trend.ts); the trend word comes from the
+             * documented classification; no window ⇒ an explicit
+             * unavailable line, never a fake flat chart. The Today lens
+             * rides the 1-day change with its EXPLICIT basis — a one-day
+             * window has no path, so no sparkline and no trend word. */}
             <span className="mt-3 flex w-full flex-col gap-1 border-t border-[var(--color-border)] pt-3">
               <span className="flex w-full items-baseline justify-between gap-2">
                 <span className="text-[length:var(--type-label)] font-medium text-[var(--color-text-secondary)]">
-                  {copy.ui.past7days}
+                  {lensRowLabel(lens, copy)}
+                  {lens === 'today' ? (
+                    <span
+                      className="ms-1 whitespace-nowrap text-[11px] text-[var(--color-text-tertiary)]"
+                      title={copy.ui.dailyChangeBasis}
+                    >
+                      ({copy.ui.dailyChangeBasis})
+                    </span>
+                  ) : null}
                 </span>
-                {trend && netPct !== undefined && trend.trend !== 'insufficient' ? (
+                {lens === 'today' ? (
+                  dailyTrend !== null && netPct !== undefined ? (
+                    <ChangeValue value={netPct} changeKind={def.changeKind} numberLocale={numberLocale} copy={copy} na={copy.ui.na} />
+                  ) : (
+                    <bdi dir="ltr" className="tabular-nums text-[var(--color-text-secondary)]">{copy.ui.na}</bdi>
+                  )
+                ) : trend && netPct !== undefined && trend.trend !== 'insufficient' ? (
                   <ChangeValue value={netPct} changeKind={def.changeKind} numberLocale={numberLocale} copy={copy} na={copy.ui.na} />
                 ) : null}
               </span>
-              {trend ? (
+              {lens === 'today' ? (
+                /* The one-day lens has no path to draw: the honest
+                 * unavailable line takes the sparkline's place when the
+                 * previous close is not measurable either. */
+                dailyTrend === null ? (
+                  <span className="mt-1 flex h-[46px] items-center rounded-[var(--radius-md)] bg-currena-muted/[0.06] px-3 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
+                    {copy.ui.trendUnavailable}
+                  </span>
+                ) : null
+              ) : trend ? (
                 <PriceSparkline
                   points={trend.points}
-                  ariaLabel={interpolate(copy.ui.sparklineAria, { asset: subject, change: ariaChange })}
+                  ariaLabel={interpolate(copy.ui.sparklineAria, { asset: subject, period: lensPeriodWord(lens, copy), change: ariaChange })}
                   className="mt-1 w-full text-[var(--color-text-secondary)]"
                   height={46}
                 />
@@ -355,7 +463,7 @@ function PriceTile({
                   {copy.ui.trendUnavailable}
                 </span>
               )}
-              {trend ? (
+              {lens !== 'today' && trend ? (
                 <span className="text-[length:var(--type-label)] leading-snug text-[var(--color-text-secondary)]">
                   {trend.trend === 'up'
                     ? copy.ui.trendUp
@@ -368,7 +476,7 @@ function PriceTile({
                           : copy.ui.trendInsufficient}
                 </span>
               ) : null}
-              {trend?.incomplete ? (
+              {lens !== 'today' && trend?.incomplete ? (
                 <span className="text-[11px] leading-4 text-[var(--color-text-tertiary)]">
                   {copy.ui.trendIncomplete}
                 </span>
@@ -378,7 +486,10 @@ function PriceTile({
             {/* 5. DAILY CHANGE — supporting info, its own explicit period,
              * measured against the previous stored observation (the feed
              * has no 1-day field). A coexisting opposite sign is fine:
-             * different windows, both labelled. */}
+             * different windows, both labelled. HIDDEN in the Today lens —
+             * that lens IS the daily story (the same number must never
+             * render twice on one card). */}
+            {lens === 'today' ? null : (
             <span className="mt-2.5 flex w-full items-baseline justify-between gap-2 text-[length:var(--type-label)]">
               <span className="min-w-0 text-[var(--color-text-secondary)]">
                 {copy.ui.dailyChangeLabel}
@@ -391,6 +502,7 @@ function PriceTile({
               </span>
               <ChangeValue value={c1} changeKind={def.changeKind} numberLocale={numberLocale} copy={copy} na={copy.ui.na} />
             </span>
+            )}
 
             {/* 6. THE BRIEFING — deterministic, evidence-grounded, hedged
              * (price-trend.ts); never a cause, forecast or advice. */}
@@ -443,6 +555,12 @@ export function PricesBoard({
   numberLocale: 'en-US' | 'fa-IR';
   onFocusCard: (id: IndicatorId, opener?: HTMLElement | null) => void;
 }) {
+  // 2026-10-21 owner round: the board's period lens — session-only state
+  // (never stored, never fetched; the windows are all client-derived from
+  // the SAME stored history). The default stays the card's classic primary
+  // story, the seven-day window — the map's Today default is one tap away,
+  // and every surface on the card re-measures when it is picked.
+  const [lens, setLens] = useState<PriceLens>('1w');
   const byId = useMemo(() => new Map(readings.map((r) => [r.id as string, r])), [readings]);
   const rows = useMemo(
     () =>
@@ -469,11 +587,16 @@ export function PricesBoard({
       <p className="m-0 mb-2 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">
         {copy.ui.pricesSubtitle}
       </p>
+      {/* The period switch (2026-10-21 owner round) — the SAME four lenses
+       * the world map's segmented control speaks, in the map's own pill
+       * style (including its 2026-10-21 −15% sizing): centred above the
+       * grid, a real radiogroup with roving tabindex + arrow keys. */}
+      <PricePeriodSwitch lens={lens} copy={copy} onChange={setLens} />
       {/* Four tiles, one grid, ONE anatomy (spec default order: Gold →
        * Silver → Oil → Bitcoin — PRICE_ROWS). Default stretch so the four
        * containers are the SAME height — the details no longer expand the
        * tile (they live in the side panel now), so the grid is stable. */}
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-2.5 pt-2 sm:grid-cols-2 xl:grid-cols-4">
         {rows.map(({ id, reading }) => (
           <PriceTile
             key={id}
@@ -483,10 +606,77 @@ export function PricesBoard({
             locale={locale}
             numberLocale={numberLocale}
             data={derived[id]}
+            lens={lens}
             onFocusCard={onFocusCard}
           />
         ))}
       </div>
     </section>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * The period switch (2026-10-21 owner round) — the world map's segmented
+ * control, on the prices board: Today | 1 week | 1 month | 1 year, the
+ * map's pill styling (41px pills — its own 2026-10-21 −15% sizing — with
+ * a <480px viewport step at 37px, matching the map's phone pills), a real
+ * radiogroup, arrow keys ROVE focus + selection (the WAI-ARIA pattern the
+ * map's switch already speaks).
+ * ------------------------------------------------------------------ */
+
+function PricePeriodSwitch({
+  lens,
+  copy,
+  onChange,
+}: {
+  lens: PriceLens;
+  copy: InsightsCopy;
+  onChange: (l: PriceLens) => void;
+}) {
+  const refs = useRef<Array<HTMLButtonElement | null>>([]);
+  const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let next: number;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (index + 1) % PRICE_LENSES.length;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (index - 1 + PRICE_LENSES.length) % PRICE_LENSES.length;
+    else return;
+    e.preventDefault();
+    onChange(PRICE_LENSES[next]!);
+    requestAnimationFrame(() => {
+      refs.current[next]?.focus();
+    });
+  };
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+      <div
+        role="radiogroup"
+        aria-label={copy.ui.pricePeriodSwitchAria}
+        className="inline-flex max-w-full overflow-x-auto rounded-full bg-currena-soft/70 p-1 ring-1 ring-[var(--color-border)]"
+      >
+        {PRICE_LENSES.map((l, i) => {
+          const selected = lens === l;
+          return (
+            <button
+              key={l}
+              ref={(el) => {
+                refs.current[i] = el;
+              }}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              tabIndex={selected ? 0 : -1}
+              onKeyDown={(e) => onKeyDown(e, i)}
+              onClick={() => onChange(l)}
+              className={`insights-focusable min-h-[41px] cursor-pointer whitespace-nowrap rounded-full px-3.5 py-1 text-[length:calc(var(--type-caption)*1.27)] font-semibold transition-colors max-[480px]:min-h-[37px] max-[480px]:px-2.5 max-[480px]:text-[length:calc(var(--type-caption)*1.06)] ${
+                selected
+                  ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)]'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+              }`}
+            >
+              {lensSwitchLabel(l, copy)}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }

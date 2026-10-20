@@ -24,8 +24,7 @@ import { formatNumber } from '@currena/core';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { heatToneOf, heatmapScale, periodValueOf } from './briefing';
-import { bandedArrow, percentGlyph, signedPct, type MarketsView } from './shared';
-import { periodWord } from './ViewSwitch';
+import { bandedArrow, periodWord, percentGlyph, signedPct, type MarketsView } from './shared';
 
 /** The tint ramp: three intensity steps per direction on the app's own
  * success/alert families (light and dark variants both resolve), the

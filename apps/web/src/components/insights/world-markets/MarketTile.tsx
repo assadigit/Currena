@@ -14,11 +14,12 @@ import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { formatAsOf } from '../HistoryChart';
 import { MarketLogo } from './MarketLogo';
-import { periodWord } from './ViewSwitch';
+
 import {
   DirectionGlyph,
   fmtClose,
   isOld,
+  periodWord,
   signedPct,
   signedPctOrDash,
   statusToneOf,
