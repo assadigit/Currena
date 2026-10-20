@@ -2912,3 +2912,56 @@ the petrol/transport money row is gone while employment rate appeared.
   to returning visitors.
 - **Evidence**: `docs/evidence/2026-10-20h-map-yearly/` (today lens, 1Y
   lens, 1Y lens + USA label, fa, 390 + the four live captures).
+
+## Session record — 2026-10-21: the map's quiet fill, the cards' true homes, and ONE period vocabulary across the page (owner round)
+
+- **Deployed**: currena-api **`4b18bb9b-bcc7-4ebb-afbb-f57ed3653024`**
+  (web-only round — the diff touches `apps/web` + docs; currena-markets
+  untouched). GitHub `main` = `7bde8b3`.
+- **What**: the owner's seven asks —
+  1. **New York's tint −15%**: the USA hosts three indices and tints by
+     its strongest fresh mover, so its fill was always the loudest on the
+     map; `MAP_TINT_COUNTRY_DAMP` damps its mix to 85% (48.4% live where
+     the honest ramp said 57).
+  2. **The never-updating "Updated {time} · {age}" header line retires**
+     (with `markets.map.updated*`): the KV write time is cron-fixed, so
+     the line read as stale by construction; the as-of date stays, each
+     market keeps its own freshness, and M17's "Showing data from" stays
+     (a real event, not a routine age).
+  3. **The redundant «ادامهٔ صفحه» ContinueStrip retires** with its key:
+     the sticky JumpNav pills one breath below already carry the same
+     labels, the same expand-then-scroll navigation and the scroll-spy.
+  4. **The map's period switch drops 15%**: 41px pills (37px under
+     480px), caption × 1.27 words (× 1.06 on phones).
+  5. **The prices board grows the same four-lens switch**
+     (Today | 1 week | 1 month | 1 year): the trend row, the sparkline,
+     the trend word and the briefing all measure the SELECTED window —
+     `windowFor(days)` generalizes the seven-day window with unchanged
+     honesty rules (the reference point stays the last observation at-or-
+     before latest−N within the 3-day tolerance); Today rides the 1-day
+     change with its explicit basis and NO sparkline (a one-day window
+     has no path); the daily-change row hides in the Today lens (the same
+     number never renders twice); briefing templates interpolate {period}.
+  6. **Nifty 50 and Hang Seng leave the south-of-Africa bottom band** and
+     float beside their own countries — the Indian Ocean SW of India and
+     the South China Sea under the Hong Kong pin (~52/35-unit leader
+     lines; the geometry is re-cleared against every card, pin, label
+     anchor and leader line — the §9.2 no-overlap test passes).
+  7. **ONE period vocabulary**: the map's segmented control IS the
+     section's period switch now — the old five-option
+     Daily|Weekly|Monthly|Quarterly|Yearly radiogroup retires with its
+     keys (`ViewSwitch.tsx` deleted; `PERIOD_VIEWS` closes at the map's
+     four; `periodWord` moves to shared.tsx and reads the MAP's period
+     words, so the verdict, the movers, the tiles and the table can never
+     disagree with the map's summary). `'3m'` stays a valid
+     `MarketsView` value (the table's Trend column reads chg3m); it is
+     simply never a switch lens anymore.
+- **Verification**: 697 unit + 20 U (incl. the new U-15 prices-switch
+  probe) + 51 world-map (the updated-line retirement, the 41px switch,
+  the 45.8% damped tint, the card homes, the unified-section drive) +
+  repo-wide green; the copy manifest triaged (17 processed, 10 retired —
+  audit exit 0); dense 721-point price fixtures make every lens honest;
+  live-verified on currena.ir EN/fa desktop + 390px mobile (strip gone,
+  Updated gone, both 4-lens switches interactive, the map switch drives
+  the verdict "this year performance" + the Nifty tile's −11.4%, no
+  console errors, no horizontal overflow) + VLM-confirmed captures.
