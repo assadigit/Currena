@@ -13,8 +13,11 @@
  *     runtime as a static Worker asset (spec B3).
  *
  *   src/components/insights/world-markets/world-map-geo.json
- *     viewBox height + the nine dot positions as percentages of the map box
- *     (JSE All Share deferred — see worklog). Imported (bundled), not
+ *     viewBox height + the SIXTEEN dot positions as percentages of the map
+ *     box (2026-10-20g owner round: every index the app carries joins the
+ *     map) plus the twelve covered countries' label anchors (the projected
+ *     centroid of each country's LARGEST polygon — the mainland, so "USA"
+ *     lands on Kansas, not dragged NW by Alaska). Imported (bundled), not
  *     fetched — that is why it lives under src/.
  *
  *   public/assets/map/world-flags.svg
@@ -52,22 +55,52 @@ const MARGIN = 1; // breathing room around the projected sphere
 const ANTARCTICA_ID = '010'; // ISO 3166-1 numeric — removed per spec M3
 const MAX_SVG_BYTES = 80 * 1024; // raw size budget for world-map.svg (spec B1)
 
-// Dot cities (spec §4.1, JSE deferred): [market id, lat, lon, ISO numeric].
-// Array order = west-to-east order = JSON key order.
+// Dot cities — ALL SIXTEEN registry indices, west to east (2026-10-20g
+// owner round: "add any remaining indice of the app to the world map").
+// [market id, lat, lon, fanDx, fanDy]: lat/lon = the exchange's city;
+// fanDx/fanDy = an OPTIONAL display fan in % of the map box, applied AFTER
+// projection, for cities that host several indices (their pins would stack
+// into one blob otherwise). The fan is a display nudge (~200–300 km at this
+// scale, invisible next to the 110 m coastline resolution); the card, the
+// leader line and the accessible name keep each index's identity honest.
+//   New York hosts the S&P 500, Nasdaq 100 and Dow Jones — kept at the exact
+//   city with the other two fanned off it (Dow SW toward Pennsylvania,
+//   Nasdaq NE toward New England).
+//   Brussels hosts the Euro Stoxx 50's pin (the EU capital — the app's own
+//   country field for it is "Eurozone", so it tints no single country);
+//   fanned SE off the tight London/Paris/Frankfurt cluster so the four
+//   Western-European pins stay apart.
 const DOT_CITIES = [
-  ['sp500', 40.71, -74.01, '840'], // New York
-  ['ibov', -23.55, -46.63, '076'], // São Paulo
-  ['ftse', 51.51, -0.13, '826'], // London
-  ['dax', 50.11, 8.68, '276'], // Frankfurt
-  ['nifty50', 19.08, 72.88, '356'], // Mumbai
-  ['ssec', 31.23, 121.47, '156'], // Shanghai
-  ['kospi', 37.57, 126.98, '410'], // Seoul
-  ['n225', 35.68, 139.69, '392'], // Tokyo
-  ['asx200', -33.87, 151.21, '036'], // Sydney
+  ['dow', 40.71, -74.01, -1.75, 2.3], // New York (fan SW)
+  ['tsx', 43.65, -79.38, 0, 0], // Toronto
+  ['sp500', 40.71, -74.01, 0, 0], // New York (exact)
+  ['ndx', 40.71, -74.01, 1.75, -2.3], // New York (fan NE)
+  ['ibov', -23.55, -46.63, 0, 0], // São Paulo
+  ['ftse', 51.51, -0.13, 0, 0], // London
+  ['cac', 48.86, 2.35, 0, 0], // Paris
+  ['dax', 50.11, 8.68, 0, 0], // Frankfurt
+  ['stoxx50', 50.85, 4.35, 1.5, 2.5], // Brussels (fan SE, off the cluster)
+  ['nifty50', 19.08, 72.88, 0, 0], // Mumbai
+  ['hsi', 22.32, 114.17, 0, 0], // Hong Kong
+  ['ssec', 31.23, 121.47, 0, 0], // Shanghai
+  ['taiex', 25.03, 121.57, 0, 0], // Taipei
+  ['kospi', 37.57, 126.98, 0, 0], // Seoul
+  ['n225', 35.68, 139.69, 0, 0], // Tokyo
+  ['asx200', -33.87, 151.21, 0, 0], // Sydney
 ];
 
-// flag-icons 1×1 country codes — the nine map countries, west to east.
-const FLAG_COUNTRIES = ['us', 'br', 'gb', 'de', 'in', 'cn', 'kr', 'jp', 'au'];
+// ISO numerics whose dot has NO path on the 110 m map (Hong Kong merges
+// into China at this resolution) — the iso check below exempts them.
+const DOT_ISO_EXEMPT = new Set(['344']);
+
+// The covered countries whose LABEL anchor is emitted (the centroid of the
+// largest polygon). MUST agree with world-map-config.ts's MAP_INDICES isos
+// minus the path-less ones (Hong Kong) and the tint-less Euro Stoxx 50.
+const LABEL_COUNTRIES = ['036', '076', '124', '156', '158', '250', '276', '356', '392', '410', '826', '840'];
+
+// flag-icons 1×1 country codes — the sixteen map countries, west to east
+// (eu = the Euro Stoxx 50's Eurozone flag; hk = Hong Kong).
+const FLAG_COUNTRIES = ['us', 'ca', 'br', 'gb', 'fr', 'de', 'eu', 'in', 'hk', 'cn', 'tw', 'kr', 'jp', 'au'];
 
 // --- helpers ----------------------------------------------------------------
 
@@ -125,15 +158,45 @@ function renderMapSvg(countries, projection, viewH, digits) {
 
 function buildDots(projection, viewH) {
   const dots = {};
-  for (const [key, lat, lon, iso] of DOT_CITIES) {
+  for (const [key, lat, lon, fanDx = 0, fanDy = 0] of DOT_CITIES) {
     const [x, y] = projection([lon, lat]); // d3 projections take [lon, lat]
-    const dot = { x: round2((x / VIEW_W) * 100), y: round2((y / viewH) * 100), iso };
+    const dot = { x: round2((x / VIEW_W) * 100 + fanDx), y: round2((y / viewH) * 100 + fanDy) };
     if (dot.x < 0 || dot.x > 100 || dot.y < 0 || dot.y > 100) {
       fail(`dot ${key} projected outside the map box (${dot.x}%, ${dot.y}%)`);
     }
     dots[key] = dot;
   }
   return dots;
+}
+
+// The label anchors (2026-10-20g): one per covered country — the projected
+// centroid of its LARGEST polygon (the mainland), so multi-polygon countries
+// (USA + Alaska, Canada + its islands, Japan + Honshu) anchor their name on
+// the piece a reader would point at.
+function buildLabels(countries, projection) {
+  const path = geoPath(projection);
+  const labels = {};
+  for (const iso of LABEL_COUNTRIES) {
+    const feature = countries.find((f) => f.id === iso);
+    if (feature === undefined) fail(`label country ${iso} missing from the map`);
+    const geom = feature.geometry;
+    const polys = geom.type === 'Polygon' ? [geom.coordinates] : geom.type === 'MultiPolygon' ? geom.coordinates : [];
+    let best = null;
+    let bestArea = -1;
+    for (const poly of polys) {
+      const obj = { type: 'Polygon', coordinates: poly };
+      const area = path.area(obj);
+      if (area > bestArea) {
+        bestArea = area;
+        best = obj;
+      }
+    }
+    if (best === null) fail(`label country ${iso} has no polygon`);
+    const [cx, cy] = path.centroid(best);
+    if (!Number.isFinite(cx) || !Number.isFinite(cy)) fail(`label country ${iso} centroid not finite`);
+    labels[iso] = { x: round2((cx / VIEW_W) * 100), y: round2((cy / viewH) * 100) };
+  }
+  return labels;
 }
 
 // --- flags sprite (spec B2) -------------------------------------------------
@@ -165,9 +228,22 @@ function buildFlagsSprite() {
 const countries = buildCountries();
 const { projection, viewH } = fitProjection();
 const dots = buildDots(projection, viewH);
+const labels = buildLabels(countries, projection);
 
-// Every dot's country must actually be a path on the map.
-for (const [key, , , iso] of DOT_CITIES) {
+// The DOT→COUNTRY table the config reads (iso per dot), kept beside the
+// dots so the two never drift — the map component pairs them by market id.
+const DOT_ISOS = {
+  dow: '840', tsx: '124', sp500: '840', ndx: '840', ibov: '076', ftse: '826',
+  cac: '250', dax: '276', stoxx50: null, nifty50: '356', hsi: '344', ssec: '156',
+  taiex: '158', kospi: '410', n225: '392', asx200: '036',
+};
+
+// Every dot's country must actually be a path on the map — unless the 110 m
+// data merges it into a neighbour (Hong Kong → China), which is exempt and
+// documented: such a dot renders but tints nothing.
+for (const [key] of DOT_CITIES) {
+  const iso = DOT_ISOS[key];
+  if (iso === null || DOT_ISO_EXEMPT.has(iso)) continue;
   if (!countries.some((f) => f.id === iso)) fail(`dot ${key}: country ${iso} missing from the map`);
 }
 
@@ -183,7 +259,7 @@ if (bytes(mapSvg) > MAX_SVG_BYTES) {
   fail(`world-map.svg is ${bytes(mapSvg)} bytes — over the ${MAX_SVG_BYTES} byte budget even at 0 decimals`);
 }
 
-const geoJson = JSON.stringify({ viewBox: { width: VIEW_W, height: viewH }, dots }, null, 2) + '\n';
+const geoJson = JSON.stringify({ viewBox: { width: VIEW_W, height: viewH }, dots, labels }, null, 2) + '\n';
 const flagsSvg = buildFlagsSprite();
 
 mkdirSync(dirname(svgOutPath), { recursive: true });
@@ -193,8 +269,11 @@ writeFileSync(geoOutPath, geoJson);
 writeFileSync(flagsOutPath, flagsSvg);
 
 console.log(`✓ world-map.svg (${countries.length} country paths, viewBox 0 0 ${VIEW_W} ${viewH}, ${digits} decimal${digits === 1 ? '' : 's'}, ${bytes(mapSvg)} bytes ≤ ${MAX_SVG_BYTES})`);
-console.log(`✓ world-map-geo.json (${Object.keys(dots).length} dots, viewBox ${VIEW_W}×${viewH}, ${bytes(geoJson)} bytes)`);
+console.log(`✓ world-map-geo.json (${Object.keys(dots).length} dots, ${Object.keys(labels).length} label anchors, viewBox ${VIEW_W}×${viewH}, ${bytes(geoJson)} bytes)`);
 for (const [key] of DOT_CITIES) {
-  console.log(`  ${key.padEnd(7)} x ${String(dots[key].x).padStart(5)}%  y ${String(dots[key].y).padStart(5)}%  iso ${dots[key].iso}`);
+  console.log(`  ${key.padEnd(7)} x ${String(dots[key].x).padStart(5)}%  y ${String(dots[key].y).padStart(5)}%`);
+}
+for (const iso of LABEL_COUNTRIES) {
+  console.log(`  label ${iso}  x ${String(labels[iso].x).padStart(5)}%  y ${String(labels[iso].y).padStart(5)}%`);
 }
 console.log(`✓ world-flags.svg (${FLAG_COUNTRIES.length} symbols, ${bytes(flagsSvg)} bytes)`);

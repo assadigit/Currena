@@ -2038,10 +2038,35 @@ export const insightsCopyEn = {
       srContext: '{country}, {step}',
       srPerf: 'performance:',
       srVal: 'last close',
-      /** §M6's one short card name: the Shanghai Composite card uses the
-       * short form Iranian stock sites show (the full name is 17 chars and
-       * truncates inside the 16%-wide card). */
+      /** §M6's short card names: the cards use the short forms Iranian
+       * stock sites show when the canonical name truncates inside the
+       * 14.5%-wide card (Shanghai Composite, Euro Stoxx 50, S&P/TSX
+       * Composite); the accessible name and the explorer keep the full
+       * names regardless. */
       cardNameSsec: 'Shanghai',
+      cardNameStoxx: 'Stoxx 50',
+      cardNameTsx: 'S&P/TSX',
+      cardNameNdx: 'Nasdaq',
+      /** The selected country's short map name (2026-10-20g owner round:
+       * "in the selected country write it's name with 60% opacity like
+       * Brazil USA Australia") — one label per country, keyed by the
+       * flag code the card already carries. */
+      countryNames: {
+        us: 'USA',
+        ca: 'Canada',
+        br: 'Brazil',
+        gb: 'UK',
+        fr: 'France',
+        de: 'Germany',
+        eu: 'Eurozone',
+        in: 'India',
+        hk: 'Hong Kong',
+        cn: 'China',
+        tw: 'Taiwan',
+        kr: 'S. Korea',
+        jp: 'Japan',
+        au: 'Australia',
+      },
     },
     /** Per-market context content (§7, verbatim). */
     entries: {

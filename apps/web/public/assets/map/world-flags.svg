@@ -4,7 +4,8 @@
   <marker id="us-a" markerHeight="30" markerWidth="30">
     <path fill="#fff" d="m15 0 9.3 28.6L0 11h30L5.7 28.6"/>
   </marker>
-  <path fill="none" marker-mid="url(#us-a)" d="m0 0 18 11h65 65 65 65 66L51 39h65 65 65 65L18 66h65 65 65 65 66L51 94h65 65 65 65L18 121h65 65 65 65 66L51 149h65 65 65 65L18 177h65 65 65 65 66L51 205h65 65 65 65L18 232h65 65 65 65 66z"/></symbol><symbol id="wm-flag-br" viewBox="0 0 512 512"><g stroke-width="1pt">
+  <path fill="none" marker-mid="url(#us-a)" d="m0 0 18 11h65 65 65 65 66L51 39h65 65 65 65L18 66h65 65 65 65 66L51 94h65 65 65 65L18 121h65 65 65 65 66L51 149h65 65 65 65L18 177h65 65 65 65 66L51 205h65 65 65 65L18 232h65 65 65 65 66z"/></symbol><symbol id="wm-flag-ca" viewBox="0 0 512 512"><path fill="#fff" d="M81.1 0h362.3v512H81.1z"/>
+  <path fill="#d52b1e" d="M-100 0H81.1v512H-100zm543.4 0h181.1v512H443.4zM135.3 247.4l-14 4.8 65.4 57.5c5 14.8-1.7 19.1-6 26.9l71-9-1.8 71.5 14.8-.5-3.3-70.9 71.2 8.4c-4.4-9.3-8.3-14.2-4.3-29l65.4-54.5-11.4-4.1c-9.4-7.3 4-34.8 6-52.2 0 0-38.1 13.1-40.6 6.2l-9.9-18.5-34.6 38c-3.8 1-5.4-.6-6.3-3.8l16-79.7-25.4 14.3q-3.3 1.3-5.6-2.4l-24.5-49-25.2 50.9q-3 2.7-5.4.8l-24.2-13.6 14.5 79.2c-1.1 3-3.9 4-7.1 2.3l-33.3-37.8c-4.3 7-7.3 18.4-13 21-5.7 2.3-25-4.9-37.9-7.7 4.4 15.9 18.2 42.3 9.5 51z"/></symbol><symbol id="wm-flag-br" viewBox="0 0 512 512"><g stroke-width="1pt">
     <path fill="#229e45" fill-rule="evenodd" d="M0 0h512v512H0z"/>
     <path fill="#f8e509" fill-rule="evenodd" d="m261.4 405.4 229.8-149.2L260 106.6l-230.7 150z"/>
     <path fill="#2b49a3" fill-rule="evenodd" d="M361.5 256a97.2 97.2 0 1 1-194.3-.2 97.2 97.2 0 0 1 194.3.2"/>
@@ -50,9 +51,36 @@
   <path fill="#FFF" d="M512 0v64L322 256l190 187v69h-67L254 324 68 512H0v-68l186-187L0 74V0h62l192 188L440 0z"/>
   <path fill="#C8102E" d="m184 324 11 34L42 512H0v-3zm124-12 54 8 150 147v45zM512 0 320 196l-4-44L466 0zM0 1l193 189-59-8L0 49z"/>
   <path fill="#FFF" d="M176 0v512h160V0zM0 176v160h512V176z"/>
-  <path fill="#C8102E" d="M0 208v96h512v-96zM208 0v512h96V0z"/></symbol><symbol id="wm-flag-de" viewBox="0 0 512 512"><path fill="#fc0" d="M0 341.3h512V512H0z"/>
+  <path fill="#C8102E" d="M0 208v96h512v-96zM208 0v512h96V0z"/></symbol><symbol id="wm-flag-fr" viewBox="0 0 512 512"><path fill="#fff" d="M0 0h512v512H0z"/>
+  <path fill="#000091" d="M0 0h170.7v512H0z"/>
+  <path fill="#e1000f" d="M341.3 0H512v512H341.3z"/></symbol><symbol id="wm-flag-de" viewBox="0 0 512 512"><path fill="#fc0" d="M0 341.3h512V512H0z"/>
   <path fill="#000001" d="M0 0h512v170.7H0z"/>
-  <path fill="red" d="M0 170.7h512v170.6H0z"/></symbol><symbol id="wm-flag-in" viewBox="0 0 512 512"><path fill="#f93" d="M0 0h512v170.7H0z"/>
+  <path fill="red" d="M0 170.7h512v170.6H0z"/></symbol><symbol id="wm-flag-eu" viewBox="0 0 512 512"><defs>
+    <g id="eu-d">
+      <g id="eu-b">
+        <path id="eu-a" d="m0-1-.3 1 .5.1z"/>
+        <use xlink:href="#eu-a" transform="scale(-1 1)"/>
+      </g>
+      <g id="eu-c">
+        <use xlink:href="#eu-b" transform="rotate(72)"/>
+        <use xlink:href="#eu-b" transform="rotate(144)"/>
+      </g>
+      <use xlink:href="#eu-c" transform="scale(-1 1)"/>
+    </g>
+  </defs>
+  <path fill="#039" d="M0 0h512v512H0z"/>
+  <g fill="#fc0" transform="translate(256 258.4)scale(25.28395)">
+    <use xlink:href="#eu-d" width="100%" height="100%" y="-6"/>
+    <use xlink:href="#eu-d" width="100%" height="100%" y="6"/>
+    <g id="eu-e">
+      <use xlink:href="#eu-d" width="100%" height="100%" x="-6"/>
+      <use xlink:href="#eu-d" width="100%" height="100%" transform="rotate(-144 -2.3 -2.1)"/>
+      <use xlink:href="#eu-d" width="100%" height="100%" transform="rotate(144 -2.1 -2.3)"/>
+      <use xlink:href="#eu-d" width="100%" height="100%" transform="rotate(72 -4.7 -2)"/>
+      <use xlink:href="#eu-d" width="100%" height="100%" transform="rotate(72 -5 .5)"/>
+    </g>
+    <use xlink:href="#eu-e" width="100%" height="100%" transform="scale(-1 1)"/>
+  </g></symbol><symbol id="wm-flag-in" viewBox="0 0 512 512"><path fill="#f93" d="M0 0h512v170.7H0z"/>
   <path fill="#fff" d="M0 170.7h512v170.6H0z"/>
   <path fill="#128807" d="M0 341.3h512V512H0z"/>
   <g transform="translate(256 256)scale(3.41333)">
@@ -74,7 +102,12 @@
     </g>
     <use xlink:href="#in-d" width="100%" height="100%" transform="rotate(120)"/>
     <use xlink:href="#in-d" width="100%" height="100%" transform="rotate(-120)"/>
-  </g></symbol><symbol id="wm-flag-cn" viewBox="0 0 512 512"><defs>
+  </g></symbol><symbol id="wm-flag-hk" viewBox="0 0 512 512"><path fill="#EC1B2E" d="M0 0h512v512H0"/>
+  <path id="hk-a" fill="#fff" d="M282.3 119.2C203 114 166.6 218 241.6 256.4 215.6 234 221 201 231.5 184l1.9 1c-13.8 23.6-11.2 52.8 11 71-12.6-12.2-9.4-39 12.2-48.8s23.6-39.3 16.4-49.1q-14.7-25.6 9.3-39zM243.9 180l-4.7 7.4-1.8-8.6-8.6-2.3 7.8-4.3-.6-9 6.5 6.2 8.3-3.3-3.7 8 5.6 6.9z"/>
+  <use xlink:href="#hk-a" transform="rotate(72 248.5 259.5)"/>
+  <use xlink:href="#hk-a" transform="rotate(144 248.5 259.5)"/>
+  <use xlink:href="#hk-a" transform="rotate(216 248.5 259.5)"/>
+  <use xlink:href="#hk-a" transform="rotate(288 248.5 259.5)"/></symbol><symbol id="wm-flag-cn" viewBox="0 0 512 512"><defs>
     <path id="cn-a" fill="#ff0" d="M1-.3-.7.8 0-1 .6.8-1-.3z"/>
   </defs>
   <path fill="#ee1c25" d="M0 0h512v512H0z"/>
@@ -82,7 +115,36 @@
   <use xlink:href="#cn-a" width="30" height="20" transform="rotate(-121 142.6 -47)scale(25.5827)"/>
   <use xlink:href="#cn-a" width="30" height="20" transform="rotate(-98.1 198 -82)scale(25.6)"/>
   <use xlink:href="#cn-a" width="30" height="20" transform="rotate(-74 272.4 -114)scale(25.6137)"/>
-  <use xlink:href="#cn-a" width="30" height="20" transform="matrix(16 -19.968 19.968 16 256 230.4)"/></symbol><symbol id="wm-flag-kr" viewBox="0 0 512 512"><path fill="#fff" fill-rule="evenodd" d="M0 0h512v512H0Z"/>
+  <use xlink:href="#cn-a" width="30" height="20" transform="matrix(16 -19.968 19.968 16 256 230.4)"/></symbol><symbol id="wm-flag-tw" viewBox="0 0 512 512"><clipPath id="tw-a">
+    <path d="M0 0h512v512H0z"/>
+  </clipPath>
+  <g clip-path="url(#tw-a)">
+    <path fill="red" d="M0 0h768v512H0z"/>
+    <path fill="#000095" d="M0 0h384v256H0z"/>
+    <g fill="#fff">
+      <path d="m164.3 135.4-2.7 10.2 10.1 2.7-2-7.4zm50 5.5-2 7.4 10.1-2.7-2.7-10.2zm-44.6-25.8-5.4 5.5 2 7.4z"/>
+      <path d="m166.3 128-2 7.4 5.4 5.5z"/>
+      <path d="m164.3 120.6-7.4 7.4 7.4 7.4 2-7.4zm14.8 29.7 5.5 5.4 7.4-2zm20.3 5.4 10.2 2.7 2.7-10.1-7.4 2z"/>
+      <path d="m204.9 150.3 7.4-2 2-7.4zm-33.2-2 2.7 10.1 10.2-2.7-5.5-5.4zm20.3 5.4 7.4 2 5.5-5.4z"/>
+      <path d="m184.6 155.7 7.4 7.4 7.4-7.4-7.4-2zm-12.9-48-10.1 2.7 2.7 10.2 5.4-5.5zm-2 33.2 2 7.4 7.4 2zm48-12.9 2-7.4-5.4-5.5z"/>
+      <path d="m179.1 105.7-7.4 2-2 7.4zm35.2 9.4-2-7.4-7.4-2zm5.4 20.3 7.4-7.4-7.4-7.4-2 7.4z"/>
+      <path d="m214.3 115.1-9.4-9.4-12.9-3.4-12.9 3.4-9.4 9.4-3.4 12.9 3.4 12.9 9.4 9.4 12.9 3.4 12.9-3.4 9.4-9.4 3.4-12.9z"/>
+      <path d="m214.3 140.9 5.4-5.5-2-7.4zm5.4-20.3 2.7-10.2-10.1-2.7 2 7.4zm-7.4-12.9-2.7-10.1-10.2 2.7 5.5 5.4zm-27.7-7.4-10.2-2.7-2.7 10.1 7.4-2z"/>
+      <path d="m192 102.3-7.4-2-5.5 5.4z"/>
+      <path d="m199.4 100.3-7.4-7.4-7.4 7.4 7.4 2z"/>
+      <path d="m204.9 105.7-5.5-5.4-7.4 2zm-20.3 50-10.2 2.7 4.7 17.6 12.9-12.9zm-5.5 20.3 12.9 48 12.9-48-12.9-12.9zm-7.4-27.7-10.1-2.7-4.7 17.5 17.5-4.7z"/>
+      <path d="m156.9 163.1-12.9 48 35.1-35.1-4.7-17.6zM144 140.9 108.9 176l48-12.9 4.7-17.5z"/>
+      <path d="m164.3 135.4-7.4-7.4-12.9 12.9 17.6 4.7zm0-14.8-2.7-10.2-17.6 4.7 12.9 12.9z"/>
+      <path d="M144 115.1 96 128l48 12.9 12.9-12.9zm96 25.8-17.6 4.7 4.7 17.5 48 12.9z"/>
+      <path d="m212.3 148.3-2.7 10.1 17.5 4.7-4.7-17.5zm-12.9 7.4-7.4 7.4 12.9 12.9 4.7-17.6zm20.3-20.3 2.7 10.2 17.6-4.7-12.9-12.9zM204.9 176l35.1 35.1-12.9-48-17.5-4.7zm7.4-68.3 10.1 2.7 4.7-17.5-17.5 4.7zm27.7 7.4L275.1 80l-48 12.9-4.7 17.5zm-12.9-22.2 12.9-48L204.9 80l4.7 17.6zm12.9 48 48-12.9-48-12.9-12.9 12.9z"/>
+      <path d="m219.7 120.6 7.4 7.4 12.9-12.9-17.6-4.7zM179.1 80 144 44.9l12.9 48 17.5 4.7zm-7.4 27.7 2.7-10.1-17.5-4.7 4.7 17.5z"/>
+      <path d="m156.9 92.9-48-12.9 35.1 35.1 17.6-4.7zm42.5 7.4 10.2-2.7-4.7-17.6L192 92.9z"/>
+      <path d="M204.9 80 192 32l-12.9 48L192 92.9z"/>
+      <path d="m184.6 100.3 7.4-7.4L179.1 80l-4.7 17.6z"/>
+    </g>
+    <circle cx="192" cy="128" r="54.4" fill="#000095"/>
+    <circle cx="192" cy="128" r="48" fill="#fff"/>
+  </g></symbol><symbol id="wm-flag-kr" viewBox="0 0 512 512"><path fill="#fff" fill-rule="evenodd" d="M0 0h512v512H0Z"/>
   <g fill-rule="evenodd" transform="rotate(-56.3 367.2 -111.2)scale(9.375)">
     <g id="kr-b">
       <path id="kr-a" fill="#000001" d="M-6-26H6v2H-6Zm0 3H6v2H-6Zm0 3H6v2H-6Z"/>

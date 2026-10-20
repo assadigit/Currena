@@ -1952,11 +1952,15 @@ html[dir='rtl'] .insights-panel {
    * not as white gaps. */
   --wm-line: color-mix(in srgb, var(--color-text-secondary) 32%, var(--color-surface));
   /* The relative colour ramps (2026-10-20f): one weight per reading drives
-   * a mix of the direction token toward the surface (tint) or the ink
+   * a mix of the direction token toward the land (tint) or the ink
    * (mark/ink) — more down = more red, more up = more saturated green.
+   * 2026-10-20g: the tint mixes over the LAND token (not the surface) so
+   * the tinted country's distance from the neutral land grows strictly
+   * monotonically with the mix in BOTH themes (over the surface the dark
+   * theme's ramp could pass through the land's own luminance).
    * The gradient legend's ends mirror the strongest tints. */
-  --wm-grad-d: color-mix(in srgb, var(--color-status-alert) 66%, var(--color-surface));
-  --wm-grad-u: color-mix(in srgb, var(--color-status-normal) 66%, var(--color-surface));
+  --wm-grad-d: color-mix(in srgb, var(--color-status-alert) 66%, var(--wm-land));
+  --wm-grad-u: color-mix(in srgb, var(--color-status-normal) 66%, var(--wm-land));
 }
 /* The two directions set their token pair; land paths, dots, leader lines,
  * cards and the triplet cells all read them, so a direction can never
@@ -1986,25 +1990,66 @@ html[dir='rtl'] .insights-panel {
 
 /* M3 — quiet land, VISIBLE grey borders (2026-10-20f: a clear grey line
  * between every country instead of the near-white stroke), transparent
- * ocean, no text, no graticule. */
+ * ocean, no text, no graticule. 2026-10-20g: the selected country wears
+ * an ANIMATED moving dash (the owner's "- - - - -") instead of the heavy
+ * solid stroke whose weight read unevenly around complex coastlines —
+ * one steady dash that marches along the border. */
 .wm-c { fill: var(--wm-land); stroke: var(--wm-line); stroke-width: 0.7; transition: stroke-width 0.2s; }
-.wm-c.s-u, .wm-c.s-d { fill: color-mix(in srgb, var(--wm-dir) var(--t, 40%), var(--color-surface)); }
-.wm-c.on { stroke: var(--color-text-primary); stroke-width: 1.4; }
-
-/* M5 — one dot per index: filled when open, hollow ring when closed,
- * its own RELATIVE colour (never the country tint's), ~1.4× on
- * hover/focus. Each dot rides a small SURFACE-coloured halo — the
- * classic cartography disc — so the mark's ≥3:1 contrast floor holds on
- * every backdrop (tinted land included). */
-.wm-halo { fill: var(--color-surface); }
-.wm-dot {
-  stroke: color-mix(in srgb, var(--wm-dir) var(--m, 60%), var(--color-text-primary));
-  fill: color-mix(in srgb, var(--wm-dir) var(--m, 60%), var(--color-text-primary));
-  stroke-width: 2.2;
-  transition: r 0.2s;
+.wm-c.s-u, .wm-c.s-d { fill: color-mix(in srgb, var(--wm-dir) var(--t, 40%), var(--wm-land)); }
+.wm-c.on {
+  stroke: var(--color-text-primary);
+  stroke-width: 1.3;
+  stroke-dasharray: 3.5 2.8;
+  animation: wm-ants 1.05s linear infinite;
 }
-.wm-dot.s-x { stroke: var(--color-text-secondary); fill: var(--color-text-secondary); }
-.wm-dot.closed { fill: var(--color-surface); }
+@keyframes wm-ants {
+  to { stroke-dashoffset: -6.3; } /* one dash period per cycle — a seamless march */
+}
+@media (prefers-reduced-motion: reduce) {
+  .wm-c.on { animation: none; } /* the dash stays, only the march stops */
+}
+
+/* The selected country's NAME (2026-10-20g owner round): its short name
+ * written across the country at 60% ink, one at a time, fading with the
+ * selection. Decorative — the card's accessible name already carries the
+ * full country, so this is emphasis, not information. */
+.wm-clabel {
+  fill: var(--color-text-primary);
+  opacity: 0.6;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* M5 + 2026-10-20g — one 3D PIN per index: a FILLED teardrop in the
+ * direction colour (green rise / red fall, always filled — open or
+ * closed), a rim cut ~22 points hotter than the fill (the ≥3:1 mark
+ * floor), a specular highlight and a ground shadow for the 3D read.
+ * The bulb's inner core keeps the legend's key: solid = open, hollow
+ * (surface-filled, rim-stroked) = closed. */
+.wm-pin-in { transition: transform 0.2s; }
+.wm-pin-b {
+  stroke: color-mix(in srgb, var(--wm-dir) var(--m2, 82%), var(--color-text-primary));
+  stroke-width: 1.1;
+  stroke-linejoin: round;
+  fill: color-mix(in srgb, var(--wm-dir) var(--m, 60%), var(--color-text-primary));
+}
+.wm-pin.s-x .wm-pin-b {
+  stroke: var(--color-text-secondary);
+  fill: color-mix(in srgb, var(--color-text-secondary) 38%, var(--color-surface));
+}
+.wm-pin-hl { fill: var(--color-surface); opacity: 0.35; }
+.wm-pin-sh { fill: var(--color-text-primary); opacity: 0.16; }
+.wm-pin-core { fill: color-mix(in srgb, var(--wm-dir) var(--m2, 82%), var(--color-text-primary)); }
+.wm-pin.closed .wm-pin-core {
+  fill: var(--color-surface);
+  stroke: color-mix(in srgb, var(--wm-dir) var(--m2, 82%), var(--color-text-primary));
+  stroke-width: 0.8;
+}
+.wm-pin.s-x .wm-pin-core { fill: var(--color-surface); stroke: var(--color-text-secondary); stroke-width: 0.8; }
 .wm-hit { fill: transparent; stroke: none; pointer-events: all; }
 
 /* M7 — leader lines: thin, low contrast, emphasised on hover/focus in
@@ -2021,7 +2066,7 @@ html[dir='rtl'] .insights-panel {
 .wm-card {
   position: absolute;
   transform: translate(-50%, -50%);
-  width: 15%;
+  width: 14.5%;
   direction: inherit;
   text-align: start;
   background: var(--color-surface);

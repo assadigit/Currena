@@ -24,6 +24,18 @@
  *         whole payload failed (with and without a last-good copy), all
  *         markets closed, and the loading state.
  *
+ * 2026-10-20g owner round — the map covers ALL SIXTEEN registry indices:
+ *   pins     every index renders a 3D pin (filled red/green by direction,
+ *             rim hotter than fill, highlight + shadow + the open/closed
+ *             core) instead of the old flat dot;
+ *   ants     the selected country wears an ANIMATED moving dash (the
+ *             owner's "- - - - -") — and honours reduced motion;
+ *   label    the selected country writes its short name at 60% ink
+ *             (USA / Brazil / Australia …, Persian in fa);
+ *   aggregate a country hosting several indices (the NY trio) tints by
+ *             its strongest fresh mover — removing one keeps the tint,
+ *             removing all three neutralises the country.
+ *
  * §9.7 (the KV budget) is a vitest on the real job + store
  * (packages/insights/src/markets/markets.test.ts, "MAP §9.7") — the route
  * itself is untouched by the map, so its single cached read is unchanged
@@ -41,8 +53,13 @@ const FIXTURES = path.join(HERE, 'fixtures');
 const AXE = path.join(WEB_ROOT, 'node_modules', 'axe-core', 'axe.min.js');
 const SHOT_DIR = path.resolve(WEB_ROOT, '..', '..', 'docs', 'insights', 'screenshots', 'world-map');
 
-/** §4.1 order = west to east = DOM order = tab order (JSE deferred). */
-const MAP_ORDER = ['sp500', 'ibov', 'ftse', 'dax', 'nifty50', 'ssec', 'kospi', 'n225', 'asx200'] as const;
+/** §4.1 order = west to east = DOM order = tab order (2026-10-20g: ALL
+ * SIXTEEN registry indices — the NY trio, Toronto, Paris, Brussels, Hong
+ * Kong and Taipei join the original nine; JSE stays deferred). */
+const MAP_ORDER = [
+  'dow', 'tsx', 'sp500', 'ndx', 'ibov', 'ftse', 'cac', 'dax', 'stoxx50',
+  'nifty50', 'hsi', 'ssec', 'taiex', 'kospi', 'n225', 'asx200',
+] as const;
 
 const WIDTHS = [1280, 1024, 960, 768, 390] as const;
 const HEIGHT: Record<(typeof WIDTHS)[number], number> = { 1280: 900, 1024: 800, 960: 800, 768: 1024, 390: 844 };
@@ -295,8 +312,8 @@ test('layout §9.2: no card overlap, no line crossing, lines < ¼ map width', as
     return { problems, cardCount: cards.length, lineCount: lines.length, order: cards.map((c) => c.dataset.id), order_: order };
   }, [...MAP_ORDER]);
 
-  expect(result.cardCount).toBe(9);
-  expect(result.lineCount).toBe(9);
+  expect(result.cardCount).toBe(16);
+  expect(result.lineCount).toBe(16);
   expect(result.order).toEqual([...MAP_ORDER]); // §4.1 = DOM order
   expect(result.problems).toEqual([]);
 });
@@ -356,11 +373,13 @@ for (const theme of ['light', 'dark'] as const) {
         });
       }
       out['tinted'] = JSON.stringify(tinted);
-      // Every dot's stroke + class.
-      const dots: Array<{ id: string; stroke: string; cls: string }> = [];
-      for (const d of Array.from(document.querySelectorAll('.wm-dot'))) {
-        const el = d as SVGCircleElement;
-        dots.push({ id: el.getAttribute('data-id') ?? '', stroke: getComputedStyle(el).stroke, cls: el.getAttribute('class') ?? '' });
+      // Every pin's body stroke + fill + class (the 3D pin: the rim is the
+      // contrast mark, the fill is the direction colour).
+      const dots: Array<{ id: string; stroke: string; fill: string; cls: string }> = [];
+      for (const d of Array.from(document.querySelectorAll('.wm-pin'))) {
+        const el = d as SVGGElement;
+        const body = el.querySelector('.wm-pin-b') as SVGPathElement;
+        dots.push({ id: el.getAttribute('data-id') ?? '', stroke: getComputedStyle(body).stroke, fill: getComputedStyle(body).fill, cls: el.getAttribute('class') ?? '' });
       }
       out['dots'] = JSON.stringify(dots);
       // The triplet cells' inks (per period, per direction).
@@ -410,7 +429,7 @@ for (const theme of ['light', 'dark'] as const) {
     const surface = probe['surface'] ?? '#ffffff';
     // Text ≥ 4.5:1 on the card surface — the triplet inks, labels, muted texts.
     const cells = JSON.parse(probe['cells']!) as Array<{ id: string; p: string; color: string; cls: string }>;
-    expect(cells.length).toBe(27); // 9 cards × D/W/M
+    expect(cells.length).toBe(48); // 16 cards × D/W/M
     for (const c of cells) {
       if (c.cls.includes('s-x')) continue; // neutral grey cells: checked below with the muted texts
       const r = ratio(c.color, surface);
@@ -430,15 +449,19 @@ for (const theme of ['light', 'dark'] as const) {
     test.info().annotations.push({ type: 'note', description: `border ${borderVsSurface.toFixed(2)}:1 surface / ${borderVsLand.toFixed(2)}:1 land` });
     expect(borderVsSurface, 'country border vs surface').toBeGreaterThanOrEqual(1.3);
     expect(borderVsLand, 'country border vs land fill').toBeGreaterThanOrEqual(1.15);
-    // Dots ≥ 3:1 against the land they sit on AND the surface (the halo
-    // disc makes the surface the honest backdrop).
-    const dots = JSON.parse(probe['dots']!) as Array<{ id: string; stroke: string; cls: string }>;
+    // Pins ≥ 3:1 against the land they sit on AND the surface — the FILL
+    // is the contrast mark (the teardrop's body); the rim runs hotter for
+    // the 3D read and is checked ≠ fill below.
+    const dots = JSON.parse(probe['dots']!) as Array<{ id: string; stroke: string; fill: string; cls: string }>;
+    expect(dots.length).toBe(16);
     for (const d of dots) {
       if (d.cls.includes('s-x')) continue;
-      const vsLand = ratio(d.stroke, probe['land']!);
-      const vsSurface = ratio(d.stroke, surface);
-      test.info().annotations.push({ type: 'note', description: `dot ${d.id} ${vsLand.toFixed(2)}:1 land / ${vsSurface.toFixed(2)}:1 surface` });
-      expect(Math.min(vsLand, vsSurface), `dot ${d.id}`).toBeGreaterThanOrEqual(3);
+      const vsLand = ratio(d.fill, probe['land']!);
+      const vsSurface = ratio(d.fill, surface);
+      test.info().annotations.push({ type: 'note', description: `pin ${d.id} ${vsLand.toFixed(2)}:1 land / ${vsSurface.toFixed(2)}:1 surface` });
+      expect(Math.min(vsLand, vsSurface), `pin ${d.id}`).toBeGreaterThanOrEqual(3);
+      // The 3D read: the rim runs hotter than the fill (never the same colour).
+      expect(d.fill, `pin ${d.id} fill ≠ rim`).not.toBe(d.stroke);
     }
     // Focus ring ≥ 3:1 on the surface.
     expect(ratio(probe['focus']!, surface), 'focus ring').toBeGreaterThanOrEqual(3);
@@ -447,7 +470,17 @@ for (const theme of ['light', 'dark'] as const) {
     // ≥1.3:1 apart; and within each direction the tint's luminance
     // distance from the land grows monotonically with the inline --t mix.
     const tinted = JSON.parse(probe['tinted']!) as Array<{ iso: string; fill: string; t: string; cls: string }>;
-    expect(tinted.length).toBeGreaterThanOrEqual(6); // the fixture's 1D lens: 8 movers + 1 flat
+    // The fixture's 1D lens, AGGREGATED per country (2026-10-20g): TWELVE
+    // tinted — US (Nasdaq leads the trio), CA, BR, GB, DE, FR, IN, CN, KR,
+    // JP, TW, AU. The UK's +0.1 sits INSIDE the flat band, so it keeps the
+    // sign's direction at the MINIMUM tint (the honest flat-band floor);
+    // Hong Kong / the Eurozone tint nothing (no single country).
+    expect(tinted.length).toBeGreaterThanOrEqual(10);
+    const uk = tinted.find((c) => c.iso === '826');
+    expect(uk).toBeDefined();
+    expect(uk!.t).toBe('34%'); // the flat band's floor — the weakest tint on screen
+    expect(tinted.find((c) => c.iso === '840')).toBeDefined(); // US via the trio
+    expect(tinted.find((c) => c.iso === '076')).toBeDefined(); // Brazil
     const dist = (fill: string) => Math.abs(lum(fill) - lum(probe['land']!));
     for (const c of tinted) {
       const r = ratio(c.fill, probe['land']!);
@@ -522,7 +555,8 @@ test('axe §9.4: zero serious or critical on the map module', async ({ page }) =
 
 test('keyboard §9.5: tab order equals §4.1 and Enter opens the detail view', async ({ page }) => {
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
-  const first = page.locator('.wm-card[data-id="sp500"]');
+  // §4.1 = DOM order — focus the FIRST card (dow), then walk the 15 rest.
+  const first = page.locator('.wm-card').first();
   await first.focus();
   const seen: string[] = [await page.evaluate(() => (document.activeElement as HTMLElement).dataset.id ?? '')];
   for (let i = 1; i < MAP_ORDER.length; i++) {
@@ -578,6 +612,12 @@ test('farsi §9.6: Persian digits, true minus, percent glyph, unmirrored map', a
   await page.setViewportSize({ width: 390, height: 844 });
   await page.waitForTimeout(400);
   expect(await page.evaluate(() => getComputedStyle(document.querySelector('.wm-stage')!).direction)).toBe('ltr');
+  // 2026-10-20g: back at the map layout, the selected country's label
+  // speaks Persian (آمریکا for the US trio's any card).
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.waitForTimeout(500);
+  await page.locator('.wm-card[data-id="sp500"]').hover();
+  await expect(page.locator('.wm-clabel')).toHaveText('آمریکا');
 });
 
 /* ------------------------------------------------------------------ *
@@ -585,8 +625,9 @@ test('farsi §9.6: Persian digits, true minus, percent glyph, unmirrored map', a
  * ------------------------------------------------------------------ */
 
 const mapIds: Record<string, string> = {
-  sp500: 'sp500', ibov: 'ibov', ftse: 'ftse', dax: 'dax', nifty50: 'nifty50',
-  ssec: 'ssec', kospi: 'kospi', n225: 'n225', asx200: 'asx200',
+  dow: 'dow', tsx: 'tsx', sp500: 'sp500', ndx: 'ndx', ibov: 'ibov', ftse: 'ftse',
+  cac: 'cac', dax: 'dax', stoxx50: 'stoxx50', nifty50: 'nifty50', hsi: 'hsi',
+  ssec: 'ssec', taiex: 'taiex', kospi: 'kospi', n225: 'n225', asx200: 'asx200',
 };
 
 test('state §9.8: all up', async ({ page }) => {
@@ -598,14 +639,14 @@ test('state §9.8: all up', async ({ page }) => {
     }
   });
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
-  await expect(page.locator('.wm p')).toContainText('9 of 9 markets up today');
+  await expect(page.locator('.wm p')).toContainText('16 of 16 markets up today');
   const steps = await page.evaluate(() => Array.from(document.querySelectorAll('.wm-card')).map((c) => c.classList.contains('s-u')));
   expect(steps.every(Boolean)).toBe(true);
   // The triplet's triangles all point up.
   const tris = await page.evaluate(() =>
     Array.from(document.querySelectorAll('.wm-card .wm-pv.s-u .wm-ar2 path')).map((p) => (p as SVGPathElement).getAttribute('d')),
   );
-  expect(tris).toHaveLength(27);
+  expect(tris).toHaveLength(48);
   expect(tris.every((d) => d === 'M5 1 9.5 9H.5z')).toBe(true);
 });
 
@@ -618,15 +659,15 @@ test('state §9.8: all down', async ({ page }) => {
     }
   });
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
-  await expect(page.locator('.wm p')).toContainText('0 of 9 markets up today');
-  await expect(page.locator('.wm p')).toContainText('9 down');
+  await expect(page.locator('.wm p')).toContainText('0 of 16 markets up today');
+  await expect(page.locator('.wm p')).toContainText('16 down');
   const steps = await page.evaluate(() => Array.from(document.querySelectorAll('.wm-card')).map((c) => c.classList.contains('s-d')));
   expect(steps.every(Boolean)).toBe(true);
   // The triplet's triangles all point down.
   const tris = await page.evaluate(() =>
     Array.from(document.querySelectorAll('.wm-card .wm-pv.s-d .wm-ar2 path')).map((p) => (p as SVGPathElement).getAttribute('d')),
   );
-  expect(tris).toHaveLength(27);
+  expect(tris).toHaveLength(48);
   expect(tris.every((d) => d === 'M.5 1h9L5 9z')).toBe(true);
 });
 
@@ -640,10 +681,10 @@ test('state §9.8: one index missing → dash + No data + neutral country', asyn
   await expect(dax.locator('.wm-tag')).toContainText('No data');
   const germany = await page.evaluate(() => document.querySelector('[data-iso="276"]')!.getAttribute('class'));
   expect(germany).toBe('wm-c'); // neutral — no direction class
-  const dot = await page.evaluate(() => document.querySelector('.wm-dot[data-id="dax"]')!.getAttribute('class'));
+  const dot = await page.evaluate(() => document.querySelector('.wm-pin[data-id="dax"]')!.getAttribute('class'));
   expect(dot).toContain('s-x');
-  // Summary counts only the 8 carrying data.
-  await expect(page.locator('.wm p')).toContainText('of 8 markets');
+  // Summary counts only the 15 carrying data.
+  await expect(page.locator('.wm p')).toContainText('of 15 markets');
 });
 
 test('state §9.8: one index old → dash + Old data + neutral country', async ({ page }) => {
@@ -693,9 +734,9 @@ test('state §9.8: all markets closed → hollow rings everywhere', async ({ pag
   });
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
   const closed = await page.evaluate(() =>
-    Array.from(document.querySelectorAll('.wm-dot')).map((d) => (d as SVGElement).classList.contains('closed')),
+    Array.from(document.querySelectorAll('.wm-pin')).map((d) => (d as SVGElement).classList.contains('closed')),
   );
-  expect(closed).toHaveLength(9);
+  expect(closed).toHaveLength(16);
   expect(closed.every(Boolean)).toBe(true);
   const tags = await page.evaluate(() => Array.from(document.querySelectorAll('.wm-card .wm-tag')).map((t) => t.textContent));
   expect(tags.every((t) => t === 'Closed')).toBe(true);
@@ -717,14 +758,14 @@ test('state §9.8: loading → grey land, grey hollow dots, no numbers, height r
   // During the delayed fetch: the module's loading shape. The LAND is a
   // static asset — it loads on sight, independent of the data feed.
   await page.waitForSelector('.wm-c', { state: 'attached', timeout: 10_000 });
-  await page.waitForSelector('.wm-dot', { timeout: 5000 });
+  await page.waitForSelector('.wm-pin', { timeout: 5000 });
   const loading = await page.evaluate(() => {
     const stage = document.querySelector('.wm-stage') as HTMLElement;
     const rect = stage.getBoundingClientRect();
     return {
-      dots: document.querySelectorAll('.wm-dot').length,
-      allNeutral: Array.from(document.querySelectorAll('.wm-dot')).every((d) => (d as SVGElement).classList.contains('s-x')),
-      allHollow: Array.from(document.querySelectorAll('.wm-dot')).every((d) => (d as SVGElement).classList.contains('closed')),
+      dots: document.querySelectorAll('.wm-pin').length,
+      allNeutral: Array.from(document.querySelectorAll('.wm-pin')).every((d) => (d as SVGElement).classList.contains('s-x')),
+      allHollow: Array.from(document.querySelectorAll('.wm-pin')).every((d) => (d as SVGElement).classList.contains('closed')),
       cards: document.querySelectorAll('.wm-card').length,
       legend: document.querySelectorAll('.wm-legend').length,
       summary: document.querySelectorAll('.wm > p').length,
@@ -732,7 +773,7 @@ test('state §9.8: loading → grey land, grey hollow dots, no numbers, height r
       landVisible: document.querySelectorAll('.wm-c').length,
     };
   });
-  expect(loading.dots).toBe(9);
+  expect(loading.dots).toBe(16);
   expect(loading.allNeutral).toBe(true);
   expect(loading.allHollow).toBe(true);
   expect(loading.cards).toBe(0);
@@ -746,10 +787,10 @@ test('state §9.8: loading → grey land, grey hollow dots, no numbers, height r
  * M13 — the list layout's dot tap scrolls to the row
  * ------------------------------------------------------------------ */
 
-test('interaction M13: list-layout dot tap scrolls to the market row', async ({ page }) => {
+test('interaction M13: list-layout pin tap scrolls to the market row', async ({ page }) => {
   await gotoInsights(page, { width: 390, lang: 'en', theme: 'light', height: 844 });
-  const dot = page.locator('.wm-dot[data-id="kospi"]');
-  await dot.click({ force: true, position: { x: 0, y: 0 } });
+  const pin = page.locator('.wm-pin[data-id="kospi"]');
+  await pin.click({ force: true });
   await page.waitForTimeout(900);
   const inView = await page.evaluate(() => {
     const tile = document.getElementById('insights-market-tile-kospi')!;
@@ -757,6 +798,181 @@ test('interaction M13: list-layout dot tap scrolls to the market row', async ({ 
     return r.top >= 0 && r.bottom <= window.innerHeight;
   });
   expect(inView).toBe(true);
+});
+
+/* ------------------------------------------------------------------ *
+ * 2026-10-20g owner round — the ants, the label, the pins, the
+ * multi-index country aggregation.
+ * ------------------------------------------------------------------ */
+
+test('selection 2026-10-20g: the selected country wears an animated moving dash', async ({ page }) => {
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  await page.locator('.wm-card[data-id="sp500"]').hover();
+  await page.waitForTimeout(150);
+  // ANY of a country's cards selects the whole country: the US path wears
+  // the dash, not just one index's outline.
+  const on = await page.evaluate(() => {
+    const us = document.querySelector('[data-iso="840"]') as SVGPathElement;
+    const cs = getComputedStyle(us);
+    return { cls: us.getAttribute('class') ?? '', dash: cs.strokeDasharray, anim: cs.animationName, width: cs.strokeWidth };
+  });
+  expect(on.cls).toContain('on');
+  expect(on.dash).not.toBe('none');
+  expect(on.anim).toBe('wm-ants');
+  expect(parseFloat(on.width)).toBeGreaterThan(1); // a visible weight, but a DASH — not the old solid slab
+  // The dash actually MARCHES: two samples of the offset differ.
+  const march = await page.evaluate(async () => {
+    const us = document.querySelector('[data-iso="840"]') as SVGPathElement;
+    const a = getComputedStyle(us).strokeDashoffset;
+    await new Promise((r) => setTimeout(r, 350));
+    const b = getComputedStyle(us).strokeDashoffset;
+    return { a, b };
+  });
+  expect(march.a).not.toBe(march.b);
+  // Moving to another of the country's cards KEEPS the country selected.
+  await page.locator('.wm-card[data-id="dow"]').hover();
+  await page.waitForTimeout(120);
+  expect(await page.evaluate(() => document.querySelector('[data-iso="840"]')!.getAttribute('class'))).toContain('on');
+  // Moving to another country moves the ants.
+  await page.locator('.wm-card[data-id="kospi"]').hover();
+  await page.waitForTimeout(120);
+  const after = await page.evaluate(() => ({
+    us: document.querySelector('[data-iso="840"]')!.getAttribute('class') ?? '',
+    kr: document.querySelector('[data-iso="410"]')!.getAttribute('class') ?? '',
+  }));
+  expect(after.us).not.toContain('on');
+  expect(after.kr).toContain('on');
+  // Rows with no single country select nothing: the Euro Stoxx 50.
+  await page.locator('.wm-card[data-id="stoxx50"]').hover();
+  await page.waitForTimeout(120);
+  expect(await page.evaluate(() => document.querySelector('.wm-c.on'))).toBeNull();
+});
+
+test('selection 2026-10-20g: reduced motion keeps the dash but stops the march', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  await page.locator('.wm-card[data-id="kospi"]').hover();
+  await page.waitForTimeout(150);
+  const probe = await page.evaluate(() => {
+    const kr = document.querySelector('[data-iso="410"]') as SVGPathElement;
+    const cs = getComputedStyle(kr);
+    return { dash: cs.strokeDasharray, anim: cs.animationName };
+  });
+  expect(probe.dash).not.toBe('none');
+  expect(probe.anim).toBe('none');
+});
+
+test('selection 2026-10-20g: the selected country writes its name at 60% ink', async ({ page }) => {
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  await expect(page.locator('.wm-clabel')).toHaveCount(0);
+  await page.locator('.wm-card[data-id="sp500"]').hover();
+  await page.waitForTimeout(150);
+  const usa = await page.evaluate(() => {
+    const t = document.querySelector('.wm-clabel') as SVGTextElement | null;
+    if (t === null) return null;
+    const cs = getComputedStyle(t);
+    return { text: t.textContent ?? '', opacity: cs.opacity, weight: cs.fontWeight, anchor: cs.textAnchor };
+  });
+  expect(usa).not.toBeNull();
+  expect(usa!.text).toBe('USA');
+  expect(Math.round(Number(usa!.opacity) * 100)).toBe(60);
+  expect(usa!.anchor).toBe('middle');
+  // Any of the trio's cards says the same country.
+  await page.locator('.wm-card[data-id="dow"]').hover();
+  await expect(page.locator('.wm-clabel')).toHaveText('USA');
+  // France via CAC, and the big-owner examples render too.
+  await page.locator('.wm-card[data-id="cac"]').hover();
+  await expect(page.locator('.wm-clabel')).toHaveText('France');
+  await page.locator('.wm-card[data-id="ibov"]').hover();
+  await expect(page.locator('.wm-clabel')).toHaveText('Brazil');
+  await page.locator('.wm-card[data-id="asx200"]').hover();
+  await expect(page.locator('.wm-clabel')).toHaveText('Australia');
+  // The path-less rows still name their region: Hong Kong, the Eurozone.
+  await page.locator('.wm-card[data-id="hsi"]').hover();
+  await expect(page.locator('.wm-clabel')).toHaveText('Hong Kong');
+  await page.locator('.wm-card[data-id="stoxx50"]').hover();
+  await expect(page.locator('.wm-clabel')).toHaveText('Eurozone');
+  // Leaving the map retires the label.
+  await page.locator('.wm p').hover();
+  await page.waitForTimeout(150);
+  await expect(page.locator('.wm-clabel')).toHaveCount(0);
+});
+
+test('pins 2026-10-20g: sixteen 3D pins — filled by direction, rim hotter, highlight + shadow + core', async ({ page }) => {
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  const pins = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('.wm-pin')).map((g) => {
+      const el = g as SVGGElement;
+      const body = el.querySelector('.wm-pin-b') as SVGPathElement;
+      const cs = getComputedStyle(body);
+      return {
+        id: el.getAttribute('data-id') ?? '',
+        cls: el.getAttribute('class') ?? '',
+        fill: cs.fill,
+        stroke: cs.stroke,
+        d: body.getAttribute('d') ?? '',
+        hasHl: el.querySelector('.wm-pin-hl') !== null,
+        hasSh: el.querySelector('.wm-pin-sh') !== null,
+        hasCore: el.querySelector('.wm-pin-core') !== null,
+        hasHit: el.querySelector('.wm-hit') !== null,
+      };
+    }),
+  );
+  expect(pins).toHaveLength(16);
+  expect(pins.map((p) => p.id)).toEqual([...MAP_ORDER]);
+  for (const p of pins) {
+    expect(p.hasHl, `${p.id} specular highlight`).toBe(true);
+    expect(p.hasSh, `${p.id} ground shadow`).toBe(true);
+    expect(p.hasCore, `${p.id} open/closed core`).toBe(true);
+    expect(p.hasHit, `${p.id} hit area`).toBe(true);
+    expect(p.d.startsWith('M0 0'), `${p.id} teardrop anchored at the tip`).toBe(true);
+    expect(p.fill, `${p.id} filled`).not.toBe('none');
+    if (p.cls.includes('s-x')) continue;
+    expect(p.fill, `${p.id} rim ≠ fill`).not.toBe(p.stroke);
+  }
+  // The fixture's 1D lens: KOSPI rises → the green class; IBOV falls → red.
+  expect(pins.find((p) => p.id === 'kospi')!.cls).toContain('s-u');
+  expect(pins.find((p) => p.id === 'ibov')!.cls).toContain('s-d');
+  // Closed pins keep the legend's key: a hollow core (surface-filled).
+  const closedCore = await page.evaluate(() => {
+    const g = document.querySelector('.wm-pin.closed') as SVGGElement;
+    const core = g.querySelector('.wm-pin-core') as SVGCircleElement;
+    return getComputedStyle(core).fill;
+  });
+  expect(closedCore).not.toBe('none');
+});
+
+test('aggregation 2026-10-20g: a country hosting several indices tints by its strongest fresh mover', async ({ page }) => {
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  // The fixture's 1D lens: Nasdaq +1.0 leads the US trio → the US reads s-u.
+  const us = await page.evaluate(() => document.querySelector('[data-iso="840"]')!.getAttribute('class'));
+  expect(us).toContain('s-u');
+  // Hong Kong has no path on the 110 m map — the Hang Seng pins but tints
+  // nothing (China's tint stays Shanghai Composite's alone).
+  expect(await page.evaluate(() => document.querySelectorAll('[data-iso="344"]').length)).toBe(0);
+  const cn = await page.evaluate(() => document.querySelector('[data-iso="156"]')!.getAttribute('class'));
+  expect(cn).toContain('s-u');
+});
+
+test('aggregation 2026-10-20g: removing one US index keeps the tint; removing all three neutralises the country', async ({ page }) => {
+  await mockMarkets(page, (snap) => {
+    snap.markets = (snap.markets as Array<Record<string, unknown>>).filter((m) => m.id !== 'ndx');
+  });
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  const stillTinted = await page.evaluate(() => document.querySelector('[data-iso="840"]')!.getAttribute('class'));
+  expect(stillTinted).toContain('s-u'); // via S&P +0.7 / Dow +0.5
+  expect(await page.evaluate(() => document.querySelectorAll('.wm-pin').length)).toBe(16); // the pin still renders
+});
+
+test('aggregation 2026-10-20g: no US indices at all → the honest neutral country', async ({ page }) => {
+  await mockMarkets(page, (snap) => {
+    snap.markets = (snap.markets as Array<Record<string, unknown>>).filter((m) => m.id !== 'ndx' && m.id !== 'sp500' && m.id !== 'dow');
+  });
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  const us = await page.evaluate(() => document.querySelector('[data-iso="840"]')!.getAttribute('class'));
+  expect(us).toBe('wm-c'); // neutral — no data, no tint, no guess
+  const pins = await page.evaluate(() => Array.from(document.querySelectorAll('.wm-pin.s-x')).map((p) => (p as SVGElement).getAttribute('data-id')));
+  expect(pins.sort()).toEqual(['dow', 'ndx', 'sp500']);
 });
 
 /* Keep the map-order map referenced for future probes (§4.1 ids). */

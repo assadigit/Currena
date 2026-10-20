@@ -36,6 +36,8 @@ import {
   MAP_CARD_NAME_KEY,
   MAP_CARD_WIDTH_PCT,
   MAP_INDICES,
+  MAP_LABELS,
+  MAP_LABEL_SIZE_DEFAULT,
   MAP_PERIODS,
   MAP_THRESHOLDS,
   OPEN_MAX_AGE_MIN,
@@ -44,6 +46,7 @@ import {
   mapScaleOf,
   mapWeightOf,
   markMixOf,
+  rimMixOf,
   tintMixOf,
   type MapDir,
   type MapPeriod,
@@ -134,7 +137,7 @@ export interface MapRow {
    * more down = more red, more up = more saturated green). */
   wts: Record<MapPeriod, number>;
   /** The selected period's direction; null = flat / no data / old —
-   * neutral grey country, dot and card (M17's honest rule). */
+   * neutral grey pin and card (M17's honest rule). */
   dir: MapDir | null;
   /** The selected period's percent (the summary + sr words read it). */
   pct: number | null;
@@ -142,6 +145,11 @@ export interface MapRow {
   old: boolean;
   open: boolean;
 }
+
+/** The 3D pin's teardrop in DESIGN units (2026-10-20g owner round): the
+ * TIP sits exactly on the index's location, the bulb is centred
+ * (0,−9.3) with r 5.2, total height 14.5. Scaled per stage width. */
+const PIN_PATH = 'M0 0C-2.3-3.4-5.2-5.6-5.2-9.3A5.2 5.2 0 1 1 5.2-9.3C5.2-5.6 2.3-3.4 0 0Z';
 
 function pctOf(entry: MarketEntry | undefined, period: MapPeriod): number | null {
   if (entry === undefined) return null;
@@ -296,6 +304,42 @@ export function WorldMap({
 
   const summary = useMemo(() => summarizeRows(rows, period), [rows, period]);
 
+  /* 2026-10-20g owner round — COUNTRY TINTS: a country that hosts several
+   * indices (the US trio on New York) tints by its STRONGEST fresh mover
+   * in the selected period: the biggest single-index move on screen, never
+   * an average no index actually made. Rows with no single country (the
+   * Euro Stoxx 50) or no path on the map (Hong Kong) never enter the map. */
+  const countryTints = useMemo(() => {
+    const best = new Map<string, { dir: MapDir; wt: number }>();
+    for (const r of rows) {
+      if (r.cfg.iso === null || r.dir === null) continue;
+      const cur = best.get(r.cfg.iso);
+      if (cur === undefined || r.wts[period] > cur.wt) best.set(r.cfg.iso, { dir: r.dir, wt: r.wts[period] });
+    }
+    return best;
+  }, [rows, period]);
+
+  /* The selected row (hover/focus) drives the country's marching-ants
+   * border and its 60%-opacity name; selecting ANY of a country's indices
+   * selects the whole country (all three US cards say "USA"). */
+  const activeRow = activeId !== null ? rows.find((r) => r.id === activeId) : undefined;
+  const activeIso = activeRow !== undefined && activeRow.cfg.iso !== null ? activeRow.cfg.iso : null;
+
+  /* The selected COUNTRY's name label (2026-10-20g): the config's tuned
+   * anchor + size when present, else the build-time geo centroid (the
+   * largest-polygon one) at the default size. Path-less rows (Hong Kong,
+   * the Eurozone) carry an absolute anchor in the config instead. */
+  const activeLabel = useMemo(() => {
+    if (activeRow === undefined) return null;
+    const spec = MAP_LABELS[activeRow.cfg.cc];
+    if (spec !== undefined) {
+      return { x: (spec.x / 100) * geo.viewBox.width, y: (spec.y / 100) * geo.viewBox.height, size: spec.size, text: mapCopy.countryNames[activeRow.cfg.cc] };
+    }
+    const gl = activeRow.cfg.iso !== null ? geo.labels[activeRow.cfg.iso as keyof typeof geo.labels] : undefined;
+    if (gl === undefined) return null;
+    return { x: (gl.x / 100) * geo.viewBox.width, y: (gl.y / 100) * geo.viewBox.height, size: MAP_LABEL_SIZE_DEFAULT, text: mapCopy.countryNames[activeRow.cfg.cc] };
+  }, [activeRow, mapCopy]);
+
   /* M7: leader lines — from each card's nearest edge to its dot, in the
    * map's own coordinate system, recomputed after every layout change.
    * Drawn imperatively into the <g> layer (a measurement effect — no
@@ -348,11 +392,12 @@ export function WorldMap({
     [mapLayout],
   );
 
-  /* Dot radius: viewBox units chosen so the RENDERED dot stays ~5px —
-   * small maps need proportionally larger unit radii (the phone's list
-   * layout keeps every dot visible and tappable). */
-  const dotR = stageW > 0 ? Math.max(4.2, (stageW >= LAYOUT_SWITCH_PX ? 5.6 : 5) / (stageW / geo.viewBox.width)) : 5.5;
-  const hitR = dotR * 2.4;
+  /* Pin scale (2026-10-20g): the design pin is 14.5 viewBox units tall;
+   * the RENDERED pin targets ~16px in the map layout and ~12.5px on the
+   * phone's list layout (proportionally more units — small maps keep every
+   * pin visible and tappable). The hit circle covers the bulb at ≥12px. */
+  const unitsPerPx = stageW > 0 ? geo.viewBox.width / stageW : 1;
+  const pinK = Math.max(0.55, ((stageW >= LAYOUT_SWITCH_PX ? 16 : 12.5) * unitsPerPx) / 14.5);
 
   const dirWord: Record<'u' | 'd' | 'x', string> = {
     d: mapCopy.stepFall,
@@ -463,25 +508,40 @@ export function WorldMap({
         >
           {/* M3 — the land: one path per country, visible grey borders
            * (2026-10-20f: the near-white stroke retired for a clear grey),
-           * no text. M4 — only the nine registry countries take a tint
-           * (null dir = neutral, honest no-data), its strength relative
-           * to the period's biggest move. */}
+           * no text. M4 + 2026-10-20g — only the covered countries take a
+           * tint (null dir = neutral, honest no-data), its strength
+           * relative to the period's biggest move, and a country hosting
+           * several indices reads its STRONGEST mover. The selected
+           * country wears the marching-ants dash instead of a heavy solid
+           * stroke (2026-10-20g: the uneven-looking weight retires). */}
           <g>
             {(assets?.land ?? []).map((p) => {
-              const row = rows.find((r) => r.cfg.iso === p.iso);
-              const cls = row !== undefined && row.dir !== null ? `wm-c s-${row.dir}` : 'wm-c';
-              const on = row !== undefined && row.id === activeId ? ' on' : '';
-              const t = row !== undefined && row.dir !== null ? `${tintMixOf(row.wts[period])}%` : undefined;
+              const tint = countryTints.get(p.iso);
+              const cls = tint !== undefined ? `wm-c s-${tint.dir}` : 'wm-c';
+              const on = p.iso === activeIso ? ' on' : '';
+              const t = tint !== undefined ? `${tintMixOf(tint.wt)}%` : undefined;
               return <path key={p.iso} data-iso={p.iso} d={p.d} className={`${cls}${on}`} style={t !== undefined ? { ['--t' as string]: t } : undefined} />;
             })}
           </g>
+          {/* The selected country's NAME at 60% ink (2026-10-20g owner
+           * round — "Brazil / USA / Australia"): decorative (aria-hidden —
+           * the card's accessible name already carries the country), one
+           * at a time, fading with the selection. */}
+          {activeLabel !== null ? (
+            <text className="wm-clabel" x={activeLabel.x} y={activeLabel.y} fontSize={activeLabel.size} aria-hidden="true" focusable="false">
+              {activeLabel.text}
+            </text>
+          ) : null}
           {/* M7 — the leader lines (map layout only), drawn imperatively
            * by the measurement effect above (geometry + the active card's
            * emphasis class — hover never triggers a React re-render). */}
           <g ref={linesGRef} className="wm-lines" />
-          {/* M5 — the dots: filled when open, hollow rings when closed,
-           * each in its own relative colour; grey hollow in the loading and
-           * no-data states. The hit circles keep phone taps honest. */}
+          {/* M5 + 2026-10-20g — one 3D PIN per index (the owner's ask):
+           * a FILLED teardrop in the direction colour (green rise / red
+           * fall — filled whether open or closed, like a pin on a map), a
+           * rim cut stronger than the fill, a specular highlight and a
+           * ground shadow for the 3D read. The bulb's inner core keeps
+           * the legend's key: solid = open, hollow = closed. */}
           <g>
             {rows.map((r) => {
               const dot = geo.dots[r.cfg.id as keyof typeof geo.dots];
@@ -490,35 +550,32 @@ export function WorldMap({
               const cy = (dot.y / 100) * geo.viewBox.height;
               const dirCls = loading || r.dir === null ? 's-x' : `s-${r.dir}`;
               const m = loading || r.dir === null ? undefined : `${markMixOf(r.wts[period])}%`;
-              const rUnits = activeId === r.id ? dotR * 1.4 : dotR;
+              const m2 = loading || r.dir === null ? undefined : `${rimMixOf(r.wts[period])}%`;
+              const k = pinK * (activeId === r.id ? 1.15 : 1);
+              const hitR = Math.max(9 * k, 12 * unitsPerPx);
               return (
-                <g key={r.id}>
-                  {/* The surface halo (M5's contrast disc — see index.css):
-                   * the mark's ≥3:1 floor holds on every backdrop. */}
-                  <circle
-                    data-halo={r.id}
-                    className="wm-halo"
-                    cx={cx}
-                    cy={cy}
-                    r={activeId === r.id ? rUnits + 2.6 : dotR + 2.2}
-                    style={{ transition: 'r 0.2s' }}
-                  />
-                  <circle
-                    data-id={r.id}
-                    className={`wm-dot ${dirCls}${r.open ? '' : ' closed'}`}
-                    cx={cx}
-                    cy={cy}
-                    r={rUnits}
-                    style={{ transition: 'r 0.2s', ...(m !== undefined ? { ['--m' as string]: m } : undefined) }}
-                  />
-                  <circle
-                    className="wm-hit"
-                    cx={cx}
-                    cy={cy}
-                    r={hitR}
-                    style={{ cursor: mapLayout ? 'default' : 'pointer' }}
-                    onClick={() => onDotClick(r.id)}
-                  />
+                <g
+                  key={r.id}
+                  data-id={r.id}
+                  className={`wm-pin ${dirCls}${r.open ? '' : ' closed'}`}
+                  transform={`translate(${cx} ${cy})`}
+                  style={{ cursor: mapLayout ? 'default' : 'pointer' }}
+                  onClick={() => onDotClick(r.id)}
+                >
+                  {/* The ground shadow anchors the pin on the map. */}
+                  <ellipse className="wm-pin-sh" cx={0.5} cy={1.3} rx={3.3 * pinK} ry={1.2 * pinK} />
+                  <g className="wm-pin-in" style={{ transform: `scale(${k})`, transformOrigin: '0px 0px' }}>
+                    <path
+                      className="wm-pin-b"
+                      d={PIN_PATH}
+                      style={m !== undefined ? { ['--m' as string]: m, ['--m2' as string]: m2 } : undefined}
+                    />
+                    {/* The specular highlight — the 3D read. */}
+                    <ellipse className="wm-pin-hl" cx={-1.8} cy={-11.2} rx={1.9} ry={1.25} transform="rotate(-35 -1.8 -11.2)" />
+                    {/* The open/closed core (the legend's key). */}
+                    <circle className="wm-pin-core" cx={0} cy={-9.3} r={2} />
+                  </g>
+                  <circle className="wm-hit" cx={0} cy={-9.3 * k} r={hitR} />
                 </g>
               );
             })}
@@ -539,7 +596,7 @@ export function WorldMap({
               // config shortens it (only Shanghai Composite does); the
               // accessible name and the explorer below keep the full name.
               const name =
-                MAP_CARD_NAME_KEY[r.id] !== undefined ? copy.markets.map.cardNameSsec : copy.markets.entries[r.id].name;
+                MAP_CARD_NAME_KEY[r.id] !== undefined ? copy.markets.map[MAP_CARD_NAME_KEY[r.id]!] : copy.markets.entries[r.id].name;
               const country = copy.markets.entries[r.id].country;
               const hasData = r.pct !== null && !r.old;
               const stateWord = !hasData ? (r.old ? mapCopy.oldData : mapCopy.noData) : r.open ? mapCopy.open : mapCopy.closed;
