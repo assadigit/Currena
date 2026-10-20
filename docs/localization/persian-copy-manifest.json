@@ -14361,28 +14361,6 @@
       "note": "Farsi wording verbatim from the world markets map spec §4.4 (open/closed/periods/step words/summary); age + showingFrom lines follow the existing site phrasing (به‌روزرسانی، دقیقه پیش، بدون داده from the existing copy family)"
     },
     {
-      "id": "markets.map.periodWordYear",
-      "source": "apps/web/src/i18n/insights-copy-fa.ts",
-      "status": "processed",
-      "kind": "copy",
-      "text": "امسال",
-      "sha256": "47a77c82628c6a7e9cb260f1008efe8a535236e36ba2b526572ed2fc5c493274",
-      "round": "world-map",
-      "reference": "docs/insights/world-markets-map-spec.md",
-      "note": "Farsi wording verbatim from the world markets map spec §4.4 (open/closed/periods/step words/summary); age + showingFrom lines follow the existing site phrasing (به‌روزرسانی، دقیقه پیش، بدون داده from the existing copy family)"
-    },
-    {
-      "id": "markets.map.periodYear",
-      "source": "apps/web/src/i18n/insights-copy-fa.ts",
-      "status": "processed",
-      "kind": "copy",
-      "text": "۱ سال",
-      "sha256": "e39576d98b328c81bc6dcbd898324c65aa4b465764054d8a8cbd99ea9bee8c3a",
-      "round": "world-map",
-      "reference": "docs/insights/world-markets-map-spec.md",
-      "note": "Farsi wording verbatim from the world markets map spec §4.4 (open/closed/periods/step words/summary); age + showingFrom lines follow the existing site phrasing (به‌روزرسانی، دقیقه پیش، بدون داده from the existing copy family)"
-    },
-    {
       "id": "markets.map.showingFrom",
       "source": "apps/web/src/i18n/insights-copy-fa.ts",
       "status": "processed",
@@ -14400,17 +14378,6 @@
       "kind": "copy",
       "text": "{country}، {step}",
       "sha256": "374a9a728fddac7221db84423886edac3dfb5c7940ca8bed00ab277ca05ea558",
-      "round": "world-map",
-      "reference": "docs/insights/world-markets-map-spec.md",
-      "note": "Screen-only glue phrases for the card's content-derived accessible name (label-in-name)"
-    },
-    {
-      "id": "markets.map.srPeriod",
-      "source": "apps/web/src/i18n/insights-copy-fa.ts",
-      "status": "processed",
-      "kind": "copy",
-      "text": "در بازهٔ {period}، آخرین مقدار",
-      "sha256": "038746bd100cb527e229bf9d3fb8f748137f67729931f8e61346f95560a1f344",
       "round": "world-map",
       "reference": "docs/insights/world-markets-map-spec.md",
       "note": "Screen-only glue phrases for the card's content-derived accessible name (label-in-name)"
@@ -14444,28 +14411,6 @@
       "kind": "copy",
       "text": "رشد",
       "sha256": "ee5c37627c122dfe6933ab8bfe718f1e69a358cfde4c7021d69568e15c0b6b3a",
-      "round": "world-map",
-      "reference": "docs/insights/world-markets-map-spec.md",
-      "note": "Farsi wording verbatim from the world markets map spec §4.4 (open/closed/periods/step words/summary); age + showingFrom lines follow the existing site phrasing (به‌روزرسانی، دقیقه پیش، بدون داده from the existing copy family)"
-    },
-    {
-      "id": "markets.map.stepStrongFall",
-      "source": "apps/web/src/i18n/insights-copy-fa.ts",
-      "status": "processed",
-      "kind": "copy",
-      "text": "افت شدید",
-      "sha256": "984eb506baea56d027f2524974b785afcb56e4ebec2dad23f00163c9ff7bcf5a",
-      "round": "world-map",
-      "reference": "docs/insights/world-markets-map-spec.md",
-      "note": "Farsi wording verbatim from the world markets map spec §4.4 (open/closed/periods/step words/summary); age + showingFrom lines follow the existing site phrasing (به‌روزرسانی، دقیقه پیش، بدون داده from the existing copy family)"
-    },
-    {
-      "id": "markets.map.stepStrongRise",
-      "source": "apps/web/src/i18n/insights-copy-fa.ts",
-      "status": "processed",
-      "kind": "copy",
-      "text": "رشد قوی",
-      "sha256": "d5890a871c65df01569f3cfde7ae766a5e554c5403d01343b036e0dc408fdc14",
       "round": "world-map",
       "reference": "docs/insights/world-markets-map-spec.md",
       "note": "Farsi wording verbatim from the world markets map spec §4.4 (open/closed/periods/step words/summary); age + showingFrom lines follow the existing site phrasing (به‌روزرسانی، دقیقه پیش، بدون داده from the existing copy family)"
@@ -23782,6 +23727,105 @@
       "reference": "persian_site_copy_round2_part3_panels_calendar_polished-translated.md",
       "text": "گزارش اشتغال آمریکا، نوامبر ۲۰۲۶",
       "sha256": "21cf70943b1165c5999304db853c1c5e50ff9283cff26bf33dd8285637be6be6"
+    },
+    {
+      "id": "markets.map.periodWeek",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "text": "۱ هفته",
+      "sha256": "bbfc01ab0fe772b6612392f45b2bb8e3edace4edca18ebc5c8436e3084f92cda",
+      "round": "owner-2026-10-20f-map-relative-colors",
+      "reference": "docs/DEPLOY.md (2026-10-20f)",
+      "note": "Switch label: the map's weekly lens (1 week)."
+    },
+    {
+      "id": "markets.map.periodWordWeek",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "text": "این هفته",
+      "sha256": "b939a4769d19dac0d7528f86baf4056ea2b1e67751faf889c5c4278b350f97d1",
+      "round": "owner-2026-10-20f-map-relative-colors",
+      "reference": "docs/DEPLOY.md (2026-10-20f)",
+      "note": "The summary line's weekly period word (\"markets up this week\")."
+    },
+    {
+      "id": "markets.map.cellD",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "text": "روزانه",
+      "sha256": "8f6356c7fa644359e5d84b744120bc05fe36cc0ad0204d2829091f3eca2812f1",
+      "round": "owner-2026-10-20f-map-relative-colors",
+      "reference": "docs/DEPLOY.md (2026-10-20f)",
+      "note": "Card triplet caption: the daily performance cell (the app's existing daily term, priceChangeDaily)."
+    },
+    {
+      "id": "markets.map.cellW",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "text": "هفتگی",
+      "sha256": "f95cdce37682442634116ef2c7cda457b33d20680aeaf51bf390cb5548421cd5",
+      "round": "owner-2026-10-20f-map-relative-colors",
+      "reference": "docs/DEPLOY.md (2026-10-20f)",
+      "note": "Card triplet caption: the weekly performance cell (priceChangeWeekly)."
+    },
+    {
+      "id": "markets.map.cellM",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "text": "ماهانه",
+      "sha256": "3eae222b1a7ced3a7dfc8ee8f7fd62a15cdb10f34c429bb982a9af12ea1d20b5",
+      "round": "owner-2026-10-20f-map-relative-colors",
+      "reference": "docs/DEPLOY.md (2026-10-20f)",
+      "note": "Card triplet caption: the monthly performance cell (priceChangeMonthly)."
+    },
+    {
+      "id": "markets.map.legendMoreDown",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "text": "افت بیشتر",
+      "sha256": "ae03d377e599268322a1ce3e3df28561538dc38ff842e9079a0be01060fa3721",
+      "round": "owner-2026-10-20f-map-relative-colors",
+      "reference": "docs/DEPLOY.md (2026-10-20f)",
+      "note": "Relative-scale legend end: the redder the colour, the bigger the fall."
+    },
+    {
+      "id": "markets.map.legendMoreUp",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "text": "رشد بیشتر",
+      "sha256": "e3215f06e204cc3979481d8797e1e151e13382abd2ee41d5f7d99dbb12ad2dcb",
+      "round": "owner-2026-10-20f-map-relative-colors",
+      "reference": "docs/DEPLOY.md (2026-10-20f)",
+      "note": "Relative-scale legend end: the greener the colour, the bigger the rise."
+    },
+    {
+      "id": "markets.map.srPerf",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "text": "عملکرد:",
+      "sha256": "f918771e096a4d4301272c3600db1da88f3c1acf215ba6be9f27ea5a38d53f40",
+      "round": "owner-2026-10-20f-map-relative-colors",
+      "reference": "docs/DEPLOY.md (2026-10-20f)",
+      "note": "Screen-only glue before the card's D/W/M triplet in the accessible name."
+    },
+    {
+      "id": "markets.map.srVal",
+      "source": "apps/web/src/i18n/insights-copy-fa.ts",
+      "status": "processed",
+      "kind": "copy",
+      "text": "آخرین مقدار",
+      "sha256": "d8c04fbccef6391581ee7d4dee7a739090e67dcc848bed54e35ecd5305fd744c",
+      "round": "owner-2026-10-20f-map-relative-colors",
+      "reference": "docs/DEPLOY.md (2026-10-20f)",
+      "note": "Screen-only glue before the card's last-close value in the accessible name (same wording as the old srPeriod tail)."
     }
   ]
 }

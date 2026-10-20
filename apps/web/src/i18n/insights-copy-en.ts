@@ -2003,21 +2003,27 @@ export const insightsCopyEn = {
     map: {
       periodSwitchAria: 'Choose the period shown on the map',
       periodToday: 'Today',
+      periodWeek: '1 week',
       periodMonth: '1 month',
-      periodYear: '1 year',
-      /** The summary line's period word ("markets up today / this month…"). */
+      /** The summary line's period word ("markets up today / this week…"). */
       periodWordToday: 'today',
+      periodWordWeek: 'this week',
       periodWordMonth: 'this month',
-      periodWordYear: 'this year',
       open: 'Open',
       closed: 'Closed',
       noData: 'No data',
       oldData: 'Old data',
-      stepStrongFall: 'Strong fall',
       stepFall: 'Fall',
       stepFlat: 'Flat',
       stepRise: 'Rise',
-      stepStrongRise: 'Strong rise',
+      /** The card triplet's three period captions (2026-10-20f owner
+       * round: each card shows Day/Week/Month performance side by side). */
+      cellD: '1D',
+      cellW: '1W',
+      cellM: '1M',
+      /** The relative-scale legend's two ends (colour strength = move size). */
+      legendMoreDown: 'Bigger fall',
+      legendMoreUp: 'Bigger rise',
       summary: '{up} of {n} markets up {period} · {down} down · {flat} flat',
       updated: 'Updated',
       updatedAgoMin: '{n} min ago',
@@ -2026,11 +2032,12 @@ export const insightsCopyEn = {
       /** M17: served from the last good local copy after a failed refresh. */
       showingFrom: 'Showing data from {time}',
       /** M16 + axe's label-in-name rule: the card's accessible name is
-       * derived from its CONTENT — the visible strings plus these two
+       * derived from its CONTENT — the visible strings plus these
        * screen-only glue phrases, so the name reads as one sentence that
        * contains every visible word. */
       srContext: '{country}, {step}',
-      srPeriod: 'over {period}, last close',
+      srPerf: 'performance:',
+      srVal: 'last close',
       /** §M6's one short card name: the Shanghai Composite card uses the
        * short form Iranian stock sites show (the full name is 17 chars and
        * truncates inside the 16%-wide card). */

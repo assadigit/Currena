@@ -147,8 +147,40 @@ test('layout §9.1: the switch follows the container, not the viewport', async (
 });
 
 /* ------------------------------------------------------------------ *
- * §9.2 — the map layout's geometry
+ * §9.2 — the map layout's geometry (2026-10-20f owner round: the map
+ * box is centred at 150–280px under the module's full width — never
+ * full-bleed, never cramped), then the card/line geometry.
  * ------------------------------------------------------------------ */
+
+test('layout §9.2: centred map box ~200–300px under the module, full width in the list layout', async ({ page }) => {
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  const probe = await page.evaluate(() => {
+    const wm = document.querySelector('.wm') as HTMLElement;
+    const stage = document.querySelector('.wm-stage') as HTMLElement;
+    const m = wm.getBoundingClientRect();
+    const s = stage.getBoundingClientRect();
+    return {
+      moduleW: Math.round(m.width),
+      stageW: Math.round(s.width),
+      inset: Math.round(m.width - s.width),
+      centered: Math.round(Math.abs(s.left - m.left - (m.right - s.right))),
+    };
+  });
+  expect(probe.inset).toBeGreaterThanOrEqual(145); // the clamp's 150 floor, sub-pixel grace
+  expect(probe.inset).toBeLessThanOrEqual(285); // the clamp's 280 ceiling
+  expect(probe.centered).toBeLessThanOrEqual(2);
+  test.info().annotations.push({ type: 'note', description: `module ${probe.moduleW}px, stage ${probe.stageW}px, inset ${probe.inset}px` });
+  // The list layout keeps the full width.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(400);
+  const list = await page.evaluate(() => {
+    const wm = document.querySelector('.wm') as HTMLElement;
+    const stage = document.querySelector('.wm-stage') as HTMLElement;
+    return { layout: wm.getAttribute('data-wm-layout'), inset: Math.round(wm.getBoundingClientRect().width - stage.getBoundingClientRect().width) };
+  });
+  expect(list.layout).toBe('list');
+  expect(list.inset).toBeLessThanOrEqual(1);
+});
 
 test('layout §9.2: no card overlap, no line crossing, lines < ¼ map width', async ({ page }) => {
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
@@ -282,38 +314,60 @@ function parseColor(text: string): [number, number, number, number] {
 }
 
 for (const theme of ['light', 'dark'] as const) {
-  test(`contrast §9.3 (${theme}): text ≥4.5, dots/rings/focus ≥3, tint steps ≥1.1`, async ({ page }) => {
+  test(`contrast §9.3 (${theme}): text ≥4.5, dots/rings/focus ≥3, visible borders, relative tints`, async ({ page }) => {
     await gotoInsights(page, { width: 1280, lang: 'en', theme });
     const probe = await page.evaluate(() => {
       const out: Record<string, string> = {};
-      const wm = document.querySelector('.wm') as HTMLElement;
-      // The five steps' three ramps, resolved from probe elements.
-      for (const s of ['sr', 'r', 'f', 'fl', 'sf', 'x']) {
-        const el = document.createElement('span');
-        el.className = `s-${s}`;
-        el.style.color = 'var(--wm-ink)';
-        el.style.background = 'var(--wm-tint)';
-        el.style.outlineColor = 'var(--wm-mark)';
-        wm.appendChild(el);
-        const cs = getComputedStyle(el);
-        out[`ink-${s}`] = cs.color;
-        out[`tint-${s}`] = cs.backgroundColor;
-        out[`mark-${s}`] = cs.outlineColor;
-        el.remove();
-      }
       const css = getComputedStyle(document.documentElement);
       out['surface'] = css.getPropertyValue('--color-surface').trim();
-      out['land'] = getComputedStyle(document.querySelector('.wm-c') as SVGPathElement).fill;
       out['focus'] = css.getPropertyValue('--color-accent-brand').trim();
+      // The neutral land + the visible grey border (2026-10-20f).
+      const neutral = document.querySelector('.wm-c:not(.s-u):not(.s-d)') as SVGPathElement | null;
+      if (neutral !== null) {
+        out['land'] = getComputedStyle(neutral).fill;
+        out['border'] = getComputedStyle(neutral).stroke;
+      }
+      // Every tinted country: its fill, its direction class and its
+      // inline --t mix percentage.
+      const tinted: Array<{ iso: string; fill: string; t: string; cls: string }> = [];
+      for (const p of Array.from(document.querySelectorAll('.wm-c.s-u, .wm-c.s-d'))) {
+        const el = p as SVGPathElement;
+        tinted.push({
+          iso: el.getAttribute('data-iso') ?? '',
+          fill: getComputedStyle(el).fill,
+          t: el.style.getPropertyValue('--t'),
+          cls: el.getAttribute('class') ?? '',
+        });
+      }
+      out['tinted'] = JSON.stringify(tinted);
+      // Every dot's stroke + class.
+      const dots: Array<{ id: string; stroke: string; cls: string }> = [];
+      for (const d of Array.from(document.querySelectorAll('.wm-dot'))) {
+        const el = d as SVGCircleElement;
+        dots.push({ id: el.getAttribute('data-id') ?? '', stroke: getComputedStyle(el).stroke, cls: el.getAttribute('class') ?? '' });
+      }
+      out['dots'] = JSON.stringify(dots);
+      // The triplet cells' inks (per period, per direction).
+      const cells: Array<{ id: string; p: string; color: string; cls: string }> = [];
+      for (const c of Array.from(document.querySelectorAll('.wm-card .wm-pv'))) {
+        const el = c as HTMLElement;
+        cells.push({
+          id: el.closest('.wm-card')?.getAttribute('data-id') ?? '',
+          p: el.closest('.wm-cell')?.getAttribute('data-p') ?? '',
+          color: getComputedStyle(el).color,
+          cls: el.getAttribute('class') ?? '',
+        });
+      }
+      out['cells'] = JSON.stringify(cells);
       // Real text elements on their real surfaces.
-      const chg = document.querySelector('.wm-card-chg') as HTMLElement | null;
-      if (chg !== null) out['card-chg-color'] = getComputedStyle(chg).color;
       const name = document.querySelector('.wm-card-name') as HTMLElement | null;
       if (name !== null) out['card-name-color'] = getComputedStyle(name).color;
       const val = document.querySelector('.wm-card-val') as HTMLElement | null;
       if (val !== null) out['card-val-color'] = getComputedStyle(val).color;
       const tag = document.querySelector('.wm-tag') as HTMLElement | null;
       if (tag !== null) out['tag-color'] = getComputedStyle(tag).color;
+      const pl = document.querySelector('.wm-pl') as HTMLElement | null;
+      if (pl !== null) out['pl-color'] = getComputedStyle(pl).color;
       const leg = document.querySelector('.wm-legend em') as HTMLElement | null;
       if (leg !== null) out['legend-em-color'] = getComputedStyle(leg).color;
       const leg2 = document.querySelector('.wm-legend > span') as HTMLElement | null;
@@ -338,39 +392,67 @@ for (const theme of ['light', 'dark'] as const) {
     };
 
     const surface = probe['surface'] ?? '#ffffff';
-    // Text ≥ 4.5:1 on the card surface, for every step ink + the muted texts.
-    for (const s of ['sr', 'r', 'f', 'fl', 'sf']) {
-      const r = ratio(probe[`ink-${s}`]!, surface);
-      test.info().annotations.push({ type: 'note', description: `ink-${s} ${r.toFixed(2)}:1` });
-      expect(r, `ink-${s} on surface`).toBeGreaterThanOrEqual(4.5);
+    // Text ≥ 4.5:1 on the card surface — the triplet inks, labels, muted texts.
+    const cells = JSON.parse(probe['cells']!) as Array<{ id: string; p: string; color: string; cls: string }>;
+    expect(cells.length).toBe(27); // 9 cards × D/W/M
+    for (const c of cells) {
+      if (c.cls.includes('s-x')) continue; // neutral grey cells: checked below with the muted texts
+      const r = ratio(c.color, surface);
+      test.info().annotations.push({ type: 'note', description: `ink ${c.id}/${c.p} ${r.toFixed(2)}:1` });
+      expect(r, `cell ink ${c.id}/${c.p} on surface`).toBeGreaterThanOrEqual(4.5);
     }
-    for (const key of ['card-chg-color', 'card-name-color', 'card-val-color', 'tag-color', 'legend-em-color', 'legend-text-color']) {
+    for (const key of ['card-name-color', 'card-val-color', 'tag-color', 'pl-color', 'legend-em-color', 'legend-text-color']) {
       if (probe[key] === undefined) continue;
       const r = ratio(probe[key]!, surface);
       test.info().annotations.push({ type: 'note', description: `${key} ${r.toFixed(2)}:1` });
       expect(r, `${key} on surface`).toBeGreaterThanOrEqual(4.5);
     }
-    // Dots and rings ≥ 3:1 against the LAND they sit on (and the surface).
-    for (const s of ['sr', 'r', 'f', 'fl', 'sf']) {
-      const vsLand = ratio(probe[`mark-${s}`]!, probe['land']!);
-      const vsSurface = ratio(probe[`mark-${s}`]!, surface);
-      test.info().annotations.push({ type: 'note', description: `mark-${s} ${vsLand.toFixed(2)}:1 land / ${vsSurface.toFixed(2)}:1 surface` });
-      expect(Math.min(vsLand, vsSurface), `mark-${s}`).toBeGreaterThanOrEqual(3);
+    // The visible grey country borders (2026-10-20f): clearly apart from
+    // BOTH the page surface and the land fill.
+    const borderVsSurface = ratio(probe['border']!, surface);
+    const borderVsLand = ratio(probe['border']!, probe['land']!);
+    test.info().annotations.push({ type: 'note', description: `border ${borderVsSurface.toFixed(2)}:1 surface / ${borderVsLand.toFixed(2)}:1 land` });
+    expect(borderVsSurface, 'country border vs surface').toBeGreaterThanOrEqual(1.3);
+    expect(borderVsLand, 'country border vs land fill').toBeGreaterThanOrEqual(1.15);
+    // Dots ≥ 3:1 against the land they sit on AND the surface (the halo
+    // disc makes the surface the honest backdrop).
+    const dots = JSON.parse(probe['dots']!) as Array<{ id: string; stroke: string; cls: string }>;
+    for (const d of dots) {
+      if (d.cls.includes('s-x')) continue;
+      const vsLand = ratio(d.stroke, probe['land']!);
+      const vsSurface = ratio(d.stroke, surface);
+      test.info().annotations.push({ type: 'note', description: `dot ${d.id} ${vsLand.toFixed(2)}:1 land / ${vsSurface.toFixed(2)}:1 surface` });
+      expect(Math.min(vsLand, vsSurface), `dot ${d.id}`).toBeGreaterThanOrEqual(3);
     }
     // Focus ring ≥ 3:1 on the surface.
     expect(ratio(probe['focus']!, surface), 'focus ring').toBeGreaterThanOrEqual(3);
-    // Adjacent tint steps ≥ 1.1:1 relative luminance.
-    for (const [a, b] of [
-      ['tint-sf', 'tint-fl'],
-      ['tint-fl', 'tint-f'],
-      ['tint-f', 'tint-r'],
-      ['tint-r', 'tint-sr'],
-    ] as const) {
-      const l1 = lum(probe[a]!);
-      const l2 = lum(probe[b]!);
-      const r = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
-      test.info().annotations.push({ type: 'note', description: `${a}↔${b} ${r.toFixed(2)}:1` });
-      expect(r, `${a} vs ${b}`).toBeGreaterThanOrEqual(1.1);
+    // The RELATIVE tints (2026-10-20f): every tinted country stands ≥1.1:1
+    // apart from the neutral land; the biggest mover (ibov, weight 1) is
+    // ≥1.3:1 apart; and within each direction the tint's luminance
+    // distance from the land grows monotonically with the inline --t mix.
+    const tinted = JSON.parse(probe['tinted']!) as Array<{ iso: string; fill: string; t: string; cls: string }>;
+    expect(tinted.length).toBeGreaterThanOrEqual(6); // the fixture's 1D lens: 8 movers + 1 flat
+    const dist = (fill: string) => Math.abs(lum(fill) - lum(probe['land']!));
+    for (const c of tinted) {
+      const r = ratio(c.fill, probe['land']!);
+      expect(r, `tint ${c.iso} vs land`).toBeGreaterThanOrEqual(1.1);
+    }
+    const ibov = tinted.find((c) => c.iso === '076');
+    if (ibov !== undefined) {
+      const r = ratio(ibov.fill, probe['land']!);
+      test.info().annotations.push({ type: 'note', description: `strongest tint (ibov) ${r.toFixed(2)}:1 vs land` });
+      expect(r).toBeGreaterThanOrEqual(1.3);
+    }
+    for (const cls of ['s-u', 's-d'] as const) {
+      const rows = tinted
+        .filter((c) => c.cls.includes(cls))
+        .map((c) => ({ iso: c.iso, t: Number(c.t.replace('%', '')) }))
+        .sort((a, b) => a.t - b.t);
+      for (let i = 1; i < rows.length; i++) {
+        const prev = tinted.find((c) => c.iso === rows[i - 1]!.iso)!;
+        const cur = tinted.find((c) => c.iso === rows[i]!.iso)!;
+        expect(dist(cur.fill), `${cls} tint distance must grow with --t (${rows[i - 1]!.iso} → ${rows[i]!.iso})`).toBeGreaterThan(dist(prev.fill));
+      }
     }
   });
 }
@@ -452,11 +534,17 @@ test('farsi §9.6: Persian digits, true minus, percent glyph, unmirrored map', a
   // DOM order still §4.1 (west to east, never mirrored).
   const order = await page.evaluate(() => Array.from(document.querySelectorAll('.wm-card')).map((c) => (c as HTMLElement).dataset.id));
   expect(order).toEqual([...MAP_ORDER]);
-  // A negative card (Ibovespa −1.80 in the fixture): Persian digits, the
+  // The triplet cells carry the app's own Persian period words
+  // (روزانه / هفتگی / ماهانه — priceChangeDaily & co).
+  const labels = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('.wm-card[data-id="sp500"] .wm-pl')).map((l) => l.textContent),
+  );
+  expect(labels).toEqual(['روزانه', 'هفتگی', 'ماهانه']);
+  // A negative cell (Ibovespa −1.8 in the fixture): Persian digits, the
   // true minus U+2212, the Persian percent glyph — inside an LTR bdi.
   const neg = await page.evaluate(() => {
     const card = document.querySelector('.wm-card[data-id="ibov"]') as HTMLElement;
-    const bdi = card.querySelector('.wm-card-chg bdi')!;
+    const bdi = card.querySelector('.wm-cell[data-p="1D"] .wm-pv bdi')!;
     return { text: bdi.textContent ?? '', dir: bdi.getAttribute('dir') ?? '' };
   });
   expect(neg.dir).toBe('ltr');
@@ -489,14 +577,20 @@ test('state §9.8: all up', async ({ page }) => {
   await mockMarkets(page, (snap) => {
     for (const m of snap.markets as Array<Record<string, unknown>>) {
       m.chg1d = 2.4;
+      m.chg1w = 3.1;
       m.chg1m = 6.5;
-      m.chg1y = 18.2;
     }
   });
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
   await expect(page.locator('.wm p')).toContainText('9 of 9 markets up today');
-  const steps = await page.evaluate(() => Array.from(document.querySelectorAll('.wm-card')).map((c) => c.classList.contains('s-sr')));
+  const steps = await page.evaluate(() => Array.from(document.querySelectorAll('.wm-card')).map((c) => c.classList.contains('s-u')));
   expect(steps.every(Boolean)).toBe(true);
+  // The triplet's triangles all point up.
+  const tris = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('.wm-card .wm-pv.s-u .wm-ar2 path')).map((p) => (p as SVGPathElement).getAttribute('d')),
+  );
+  expect(tris).toHaveLength(27);
+  expect(tris.every((d) => d === 'M5 1 9.5 9H.5z')).toBe(true);
 });
 
 test('state §9.8: all down', async ({ page }) => {
@@ -504,14 +598,20 @@ test('state §9.8: all down', async ({ page }) => {
     for (const m of snap.markets as Array<Record<string, unknown>>) {
       m.chg1d = -2.4;
       m.chg1m = -6.5;
-      m.chg1y = -18.2;
+      m.chg1w = -3.1;
     }
   });
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
   await expect(page.locator('.wm p')).toContainText('0 of 9 markets up today');
   await expect(page.locator('.wm p')).toContainText('9 down');
-  const steps = await page.evaluate(() => Array.from(document.querySelectorAll('.wm-card')).map((c) => c.classList.contains('s-sf')));
+  const steps = await page.evaluate(() => Array.from(document.querySelectorAll('.wm-card')).map((c) => c.classList.contains('s-d')));
   expect(steps.every(Boolean)).toBe(true);
+  // The triplet's triangles all point down.
+  const tris = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('.wm-card .wm-pv.s-d .wm-ar2 path')).map((p) => (p as SVGPathElement).getAttribute('d')),
+  );
+  expect(tris).toHaveLength(27);
+  expect(tris.every((d) => d === 'M.5 1h9L5 9z')).toBe(true);
 });
 
 test('state §9.8: one index missing → dash + No data + neutral country', async ({ page }) => {
@@ -520,10 +620,10 @@ test('state §9.8: one index missing → dash + No data + neutral country', asyn
   });
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
   const dax = page.locator('.wm-card[data-id="dax"]');
-  await expect(dax.locator('.wm-card-chg bdi')).toHaveText('—');
+  await expect(dax.locator('.wm-cell .wm-pv bdi').first()).toHaveText('—');
   await expect(dax.locator('.wm-tag')).toContainText('No data');
   const germany = await page.evaluate(() => document.querySelector('[data-iso="276"]')!.getAttribute('class'));
-  expect(germany).toBe('wm-c'); // neutral — no step class
+  expect(germany).toBe('wm-c'); // neutral — no direction class
   const dot = await page.evaluate(() => document.querySelector('.wm-dot[data-id="dax"]')!.getAttribute('class'));
   expect(dot).toContain('s-x');
   // Summary counts only the 8 carrying data.
@@ -538,7 +638,7 @@ test('state §9.8: one index old → dash + Old data + neutral country', async (
   });
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
   const nifty = page.locator('.wm-card[data-id="nifty50"]');
-  await expect(nifty.locator('.wm-card-chg bdi')).toHaveText('—');
+  await expect(nifty.locator('.wm-cell .wm-pv bdi').first()).toHaveText('—');
   await expect(nifty.locator('.wm-tag')).toContainText('Old data');
   const india = await page.evaluate(() => document.querySelector('[data-iso="356"]')!.getAttribute('class'));
   expect(india).toBe('wm-c');

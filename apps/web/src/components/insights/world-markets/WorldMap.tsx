@@ -37,12 +37,16 @@ import {
   MAP_CARD_WIDTH_PCT,
   MAP_INDICES,
   MAP_PERIODS,
-  MAP_STEPS,
   MAP_THRESHOLDS,
   OPEN_MAX_AGE_MIN,
-  mapStepOf,
+  borderMixOf,
+  inkMixOf,
+  mapScaleOf,
+  mapWeightOf,
+  markMixOf,
+  tintMixOf,
+  type MapDir,
   type MapPeriod,
-  type MapStep,
 } from './world-map-config';
 import { isOld, percentGlyph } from './shared';
 
@@ -108,24 +112,32 @@ function openAtViewTime(entry: MarketEntry, nowMs: number): boolean {
   return Number.isFinite(age) && age >= -60_000 && age <= OPEN_MAX_AGE_MIN * 60_000;
 }
 
-/** M6's signed percentage: two decimals, explicit sign, tabular digits,
- * the locale's percent glyph, wrapped by the caller in a LTR bdi. */
-function signedPct2(pct: number, numberLocale: NumberLocale, locale: Locale): string {
-  const num = formatNumber(Math.abs(pct), numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+/** M6's signed percentage at the triplet's one decimal (the exact values
+ * live in the explorer and the detail view), tabular digits, the locale's
+ * percent glyph, wrapped by the caller in a LTR bdi. */
+function signedPct(pct: number, numberLocale: NumberLocale, locale: Locale): string {
+  const num = formatNumber(Math.abs(pct), numberLocale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   return `${pct > 0 ? '+' : pct < 0 ? MINUS : ''}${num}${percentGlyph(locale)}`;
 }
 
-/** One row of map data, derived purely from the snapshot + period. */
+/** One row of map data, derived purely from the snapshot. */
 export interface MapRow {
   id: MarketId;
   /** The registry config row (iso, cc, band, card position). */
   cfg: (typeof MAP_INDICES)[number];
   /** The stored entry — absent when the market has no row at all. */
   entry: MarketEntry | undefined;
-  /** The selected period's percent change; null = no honest reading. */
+  /** Every period's percent change (the cards show D/W/M side by side);
+   * null = no honest reading for that period. */
+  pcts: Record<MapPeriod, number | null>;
+  /** The RELATIVE colour weight per period, 0…1 (2026-10-20f owner round:
+   * more down = more red, more up = more saturated green). */
+  wts: Record<MapPeriod, number>;
+  /** The selected period's direction; null = flat / no data / old —
+   * neutral grey country, dot and card (M17's honest rule). */
+  dir: MapDir | null;
+  /** The selected period's percent (the summary + sr words read it). */
   pct: number | null;
-  /** null = no data / old data (the country stays neutral, M17). */
-  step: MapStep | null;
   /** Old data (last close older than STALE_AFTER_DAYS). */
   old: boolean;
   open: boolean;
@@ -134,20 +146,21 @@ export interface MapRow {
 function pctOf(entry: MarketEntry | undefined, period: MapPeriod): number | null {
   if (entry === undefined) return null;
   if (period === '1D') return entry.chg1d;
-  if (period === '1M') return entry.chg1m ?? null;
-  return entry.chg1y ?? null;
+  if (period === '1W') return entry.chg1w ?? null;
+  return entry.chg1m ?? null;
 }
 
 /** M10's breadth counts — plain code over the same rows, never a model. */
 function summarizeRows(rows: readonly MapRow[], period: MapPeriod) {
-  const { flatBand } = MAP_THRESHOLDS[period];
+  const flatBand = MAP_THRESHOLDS[period];
   let up = 0;
   let down = 0;
   let flat = 0;
   for (const r of rows) {
-    if (r.pct === null) continue;
-    if (r.pct > flatBand) up++;
-    else if (r.pct < -flatBand) down++;
+    const p = r.pcts[period];
+    if (p === null) continue;
+    if (p > flatBand) up++;
+    else if (p < -flatBand) down++;
     else flat++;
   }
   return { up, down, flat, n: up + down + flat };
@@ -239,19 +252,42 @@ export function WorldMap({
     return () => ro.disconnect();
   }, []);
 
-  /* The rows (§4.1 order = DOM order = tab order), pure derivation. */
+  /* The rows (§4.1 order = DOM order = tab order), pure derivation. The
+   * relative colour scale normalises on the FRESH readings of each period
+   * separately (the strongest D mover and the strongest M mover each read
+   * weight 1 — "relative" is per lens, never across lenses). */
   const rows = useMemo<MapRow[]>(() => {
-    return MAP_INDICES.map((cfg) => {
+    const pctsAll = MAP_INDICES.map((cfg) => {
       const entry = snapshot?.markets.find((m) => m.id === cfg.id);
-      const pct = loading ? null : pctOf(entry, period);
       const old = !loading && entry !== undefined && isOld(entry, todayIso);
-      const noData = pct === null || old;
+      const pcts = {
+        '1D': loading || old ? null : pctOf(entry, '1D'),
+        '1W': loading || old ? null : pctOf(entry, '1W'),
+        '1M': loading || old ? null : pctOf(entry, '1M'),
+      } as Record<MapPeriod, number | null>;
+      return { cfg, entry, old, pcts };
+    });
+    const scales = {
+      '1D': mapScaleOf(pctsAll.map((r) => r.pcts['1D'])),
+      '1W': mapScaleOf(pctsAll.map((r) => r.pcts['1W'])),
+      '1M': mapScaleOf(pctsAll.map((r) => r.pcts['1M'])),
+    } as Record<MapPeriod, number>;
+    return pctsAll.map(({ cfg, entry, old, pcts }) => {
+      const wts = {
+        '1D': pcts['1D'] === null ? 0 : mapWeightOf(pcts['1D'], '1D', scales['1D']),
+        '1W': pcts['1W'] === null ? 0 : mapWeightOf(pcts['1W'], '1W', scales['1W']),
+        '1M': pcts['1M'] === null ? 0 : mapWeightOf(pcts['1M'], '1M', scales['1M']),
+      } as Record<MapPeriod, number>;
+      const pct = pcts[period];
+      const dir: MapDir | null = pct === null || pct === 0 ? null : pct > 0 ? 'u' : 'd';
       return {
         id: cfg.id,
         cfg,
         entry,
+        pcts,
+        wts,
+        dir,
         pct,
-        step: noData ? null : mapStepOf(pct, period),
         old,
         open: !loading && entry !== undefined && openAtViewTime(entry, nowMs),
       };
@@ -293,7 +329,7 @@ export function WorldMap({
       ln.setAttribute('x2', String(dx));
       ln.setAttribute('y2', String(dy));
       ln.setAttribute('data-id', r.id);
-      ln.setAttribute('class', `wm-ln ${r.step !== null ? `s-${r.step}` : 's-x'}${r.id === activeId ? ' on' : ''}`);
+      ln.setAttribute('class', `wm-ln ${r.dir !== null ? `s-${r.dir}` : 's-x'}${r.id === activeId ? ' on' : ''}`);
       g.appendChild(ln);
     }
   }, [mapLayout, loading, rows, assets, stageW, period, activeId]);
@@ -318,22 +354,25 @@ export function WorldMap({
   const dotR = stageW > 0 ? Math.max(4.2, (stageW >= LAYOUT_SWITCH_PX ? 5.6 : 5) / (stageW / geo.viewBox.width)) : 5.5;
   const hitR = dotR * 2.4;
 
-  const stepWord: Record<MapStep, string> = {
-    sf: mapCopy.stepStrongFall,
-    fl: mapCopy.stepFall,
-    f: mapCopy.stepFlat,
-    r: mapCopy.stepRise,
-    sr: mapCopy.stepStrongRise,
+  const dirWord: Record<'u' | 'd' | 'x', string> = {
+    d: mapCopy.stepFall,
+    x: mapCopy.stepFlat,
+    u: mapCopy.stepRise,
   };
   const periodLabel: Record<MapPeriod, string> = {
     '1D': mapCopy.periodToday,
+    '1W': mapCopy.periodWeek,
     '1M': mapCopy.periodMonth,
-    '1Y': mapCopy.periodYear,
   };
   const periodWord: Record<MapPeriod, string> = {
     '1D': mapCopy.periodWordToday,
+    '1W': mapCopy.periodWordWeek,
     '1M': mapCopy.periodWordMonth,
-    '1Y': mapCopy.periodWordYear,
+  };
+  const cellLabel: Record<MapPeriod, string> = {
+    '1D': mapCopy.cellD,
+    '1W': mapCopy.cellW,
+    '1M': mapCopy.cellM,
   };
 
   const n = (v: number) => formatNumber(v, numberLocale, { maximumFractionDigits: 0 });
@@ -422,15 +461,18 @@ export function WorldMap({
           aria-hidden="true"
           focusable="false"
         >
-          {/* M3 — the land: one path per country, quiet neutral fill,
-           * thin borders, no text. M4 — only the nine registry countries
-           * take a tint (null step = neutral, honest no-data). */}
+          {/* M3 — the land: one path per country, visible grey borders
+           * (2026-10-20f: the near-white stroke retired for a clear grey),
+           * no text. M4 — only the nine registry countries take a tint
+           * (null dir = neutral, honest no-data), its strength relative
+           * to the period's biggest move. */}
           <g>
             {(assets?.land ?? []).map((p) => {
               const row = rows.find((r) => r.cfg.iso === p.iso);
-              const cls = row !== undefined && row.step !== null ? `wm-c s-${row.step}` : 'wm-c';
+              const cls = row !== undefined && row.dir !== null ? `wm-c s-${row.dir}` : 'wm-c';
               const on = row !== undefined && row.id === activeId ? ' on' : '';
-              return <path key={p.iso} data-iso={p.iso} d={p.d} className={`${cls}${on}`} />;
+              const t = row !== undefined && row.dir !== null ? `${tintMixOf(row.wts[period])}%` : undefined;
+              return <path key={p.iso} data-iso={p.iso} d={p.d} className={`${cls}${on}`} style={t !== undefined ? { ['--t' as string]: t } : undefined} />;
             })}
           </g>
           {/* M7 — the leader lines (map layout only), drawn imperatively
@@ -438,7 +480,7 @@ export function WorldMap({
            * emphasis class — hover never triggers a React re-render). */}
           <g ref={linesGRef} className="wm-lines" />
           {/* M5 — the dots: filled when open, hollow rings when closed,
-           * each in its own step colour; grey hollow in the loading and
+           * each in its own relative colour; grey hollow in the loading and
            * no-data states. The hit circles keep phone taps honest. */}
           <g>
             {rows.map((r) => {
@@ -446,7 +488,8 @@ export function WorldMap({
               if (dot === undefined) return null;
               const cx = (dot.x / 100) * geo.viewBox.width;
               const cy = (dot.y / 100) * geo.viewBox.height;
-              const stepCls = loading || r.step === null ? 's-x' : `s-${r.step}`;
+              const dirCls = loading || r.dir === null ? 's-x' : `s-${r.dir}`;
+              const m = loading || r.dir === null ? undefined : `${markMixOf(r.wts[period])}%`;
               const rUnits = activeId === r.id ? dotR * 1.4 : dotR;
               return (
                 <g key={r.id}>
@@ -462,11 +505,11 @@ export function WorldMap({
                   />
                   <circle
                     data-id={r.id}
-                    className={`wm-dot ${stepCls}${r.open ? '' : ' closed'}`}
+                    className={`wm-dot ${dirCls}${r.open ? '' : ' closed'}`}
                     cx={cx}
                     cy={cy}
                     r={rUnits}
-                    style={{ transition: 'r 0.2s' }}
+                    style={{ transition: 'r 0.2s', ...(m !== undefined ? { ['--m' as string]: m } : undefined) }}
                   />
                   <circle
                     className="wm-hit"
@@ -482,9 +525,13 @@ export function WorldMap({
           </g>
         </svg>
 
-        {/* M6/M8 — the callout cards, map layout only (the container
-         * query hides them below 960px; JS gates the leader lines on the
-         * same measured width). DOM order = §4.1 order = tab order. */}
+        {/* M6/M8 + the 2026-10-20f owner round — the callout cards, map
+         * layout only (the container query hides them below 960px; JS gates
+         * the leader lines on the same measured width). DOM order = §4.1
+         * order = tab order. Each card carries the Day/Week/Month
+         * performance side by side — a triangle (up = green, down = red,
+         * flat = a dash bar) and the signed percent, the ink's saturation
+         * relative to the biggest move in that same period. */}
         {!loading ? (
           <div className="wm-cards absolute inset-0 hidden @min-[960px]:block">
             {rows.map((r) => {
@@ -496,23 +543,14 @@ export function WorldMap({
               const country = copy.markets.entries[r.id].country;
               const hasData = r.pct !== null && !r.old;
               const stateWord = !hasData ? (r.old ? mapCopy.oldData : mapCopy.noData) : r.open ? mapCopy.open : mapCopy.closed;
-              const arrow =
-                r.step === 'r' || r.step === 'sr' ? (
-                  <path d="M5 1 9.5 9H.5z" />
-                ) : r.step === 'fl' || r.step === 'sf' ? (
-                  <path d="M.5 1h9L5 9z" />
-                ) : (
-                  <rect x="0" y="3.5" width="10" height="3" rx="1" />
-                );
               // M16 + axe's label-in-name rule: NO aria-label — the
               // accessible name derives from the card's CONTENT (the visible
-              // strings plus two screen-only glue phrases), so it reads as
+              // strings plus the screen-only glue phrases), so it reads as
               // one sentence and always contains every visible word.
               const srContext = interpolate(mapCopy.srContext, {
                 country,
-                step: hasData ? stepWord[r.step!] : stateWord,
+                step: hasData ? dirWord[r.dir ?? 'x'] : stateWord,
               });
-              const srPeriod = interpolate(mapCopy.srPeriod, { period: periodLabel[period] });
               return (
                 <button
                   key={r.id}
@@ -522,8 +560,13 @@ export function WorldMap({
                     else cardRefs.current.set(r.id, el);
                   }}
                   type="button"
-                  className={`wm-card insights-focusable ${r.step !== null ? `s-${r.step}` : 's-x'}${activeId === r.id ? ' on' : ''}`}
-                  style={{ left: `${r.cfg.card.x}%`, top: `${r.cfg.card.y}%`, width: `${MAP_CARD_WIDTH_PCT}%` }}
+                  className={`wm-card insights-focusable ${r.dir !== null ? `s-${r.dir}` : 's-x'}${activeId === r.id ? ' on' : ''}`}
+                  style={{
+                    left: `${r.cfg.card.x}%`,
+                    top: `${r.cfg.card.y}%`,
+                    width: `${MAP_CARD_WIDTH_PCT}%`,
+                    ...(r.dir !== null ? { ['--b' as string]: `${borderMixOf(r.wts[period])}%` } : undefined),
+                  }}
                   onMouseEnter={() => setActiveId(r.id)}
                   onMouseLeave={() => setActiveId((cur) => (cur === r.id ? null : cur))}
                   onFocus={() => setActiveId(r.id)}
@@ -541,20 +584,42 @@ export function WorldMap({
                       {stateWord}
                     </span>
                   </span>
-                  <span className="wm-card-chg">
-                    {hasData ? (
-                      <>
-                        <svg className="wm-ar" viewBox="0 0 10 10" aria-hidden="true" focusable="false" width="10" height="10">
-                          {arrow}
-                        </svg>
-                        <bdi dir="ltr">{signedPct2(r.pct!, numberLocale, locale)}</bdi>
-                        <span className="sr-only">{srPeriod}</span>
-                      </>
-                    ) : (
-                      <bdi dir="ltr">—</bdi>
-                    )}
+                  <span className="sr-only">{mapCopy.srPerf}</span>
+                  <span className="wm-tri">
+                    {MAP_PERIODS.map((p) => {
+                      const pct = r.pcts[p];
+                      const missing = pct === null;
+                      const dir: 'u' | 'd' | null = missing || pct === 0 ? null : pct > 0 ? 'u' : 'd';
+                      const tri =
+                        dir === 'u' ? (
+                          <path d="M5 1 9.5 9H.5z" />
+                        ) : dir === 'd' ? (
+                          <path d="M.5 1h9L5 9z" />
+                        ) : (
+                          <rect x="0.5" y="3.5" width="9" height="3" rx="1" />
+                        );
+                      const i = dir !== null ? `${inkMixOf(r.wts[p])}%` : undefined;
+                      return (
+                        <span key={p} data-p={p} className={`wm-cell${p === period ? ' sel' : ''}`}>
+                          <i className="wm-pl">{cellLabel[p]}</i>
+                          <b className={`wm-pv${dir !== null ? ` s-${dir}` : ' s-x'}`} style={i !== undefined ? { ['--i' as string]: i } : undefined}>
+                            {missing ? (
+                              <bdi dir="ltr">—</bdi>
+                            ) : (
+                              <>
+                                <svg className="wm-ar2" viewBox="0 0 10 10" aria-hidden="true" focusable="false" width="9" height="9">
+                                  {tri}
+                                </svg>
+                                <bdi dir="ltr">{signedPct(pct, numberLocale, locale)}</bdi>
+                              </>
+                            )}
+                          </b>
+                        </span>
+                      );
+                    })}
                   </span>
                   <span className="wm-card-val">
+                    <span className="sr-only">{mapCopy.srVal}</span>
                     {hasData && r.entry !== undefined ? <bdi dir="ltr">{fmtValue(r.entry, numberLocale)}</bdi> : null}
                   </span>
                 </button>
@@ -564,17 +629,16 @@ export function WorldMap({
         ) : null}
       </div>
 
-      {/* M12 — one inline legend row: five labelled swatches with the
-       * selected period's thresholds, then the open/closed dot key. */}
+      {/* M12 + the 2026-10-20f owner round — one inline legend row: the
+       * relative-scale key (a red→grey→green gradient: the further from
+       * flat, the stronger the colour), then the open/closed dot key. */}
       {!loading ? (
         <div className="wm-legend">
-          {MAP_STEPS.map((s) => (
-            <span key={s} className={`s-${s}`}>
-              <i className="wm-sw" aria-hidden="true" />
-              <em>{stepWord[s]}</em>{' '}
-              <bdi dir="ltr">{legendThresholds(s, period, numberLocale, locale)}</bdi>
-            </span>
-          ))}
+          <span className="wm-lg">
+            <em>{mapCopy.legendMoreDown}</em>
+            <i className="wm-grad" aria-hidden="true" />
+            <em>{mapCopy.legendMoreUp}</em>
+          </span>
           <span>
             <i className="wm-kdot o" aria-hidden="true" />
             {mapCopy.open}
@@ -596,25 +660,6 @@ export function WorldMap({
 /** The last close, the section's own presentation (no new dialect). */
 function fmtValue(entry: MarketEntry, numberLocale: NumberLocale): string {
   return formatNumber(entry.close, numberLocale, { maximumFractionDigits: entry.close >= 1000 ? 0 : 2 });
-}
-
-/** M12's threshold captions, e.g. "≥ +1.00%" / "−1.00 … −0.10". */
-function legendThresholds(step: MapStep, period: MapPeriod, numberLocale: NumberLocale, locale: Locale): string {
-  const { flatBand, strongFrom } = MAP_THRESHOLDS[period];
-  const t = (v: number) => formatNumber(v, numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const pc = percentGlyph(locale);
-  switch (step) {
-    case 'sf':
-      return `≤ ${MINUS}${t(strongFrom)}${pc}`;
-    case 'fl':
-      return `${MINUS}${t(strongFrom)} … ${MINUS}${t(flatBand)}`;
-    case 'f':
-      return `±${t(flatBand)}${pc}`;
-    case 'r':
-      return `+${t(flatBand)} … +${t(strongFrom)}`;
-    case 'sr':
-      return `≥ +${t(strongFrom)}${pc}`;
-  }
 }
 
 /** M17/M9's relative clock for the "Showing data from {time}" line. */

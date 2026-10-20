@@ -792,26 +792,30 @@ export const insightsCopyFa: InsightsCopy = {
     csvColLow52w: 'پایین‌ترین مقدار یک‌ساله',
     csvDownload: 'دریافت داده‌های بازارهای جهان (CSV)',
     /** بلوک رشته‌های نقشهٔ بازارهای جهان (docs/insights/
-     * world-markets-map-spec.md §4.4): کلید سه‌گانهٔ بازهٔ خودِ نقشه،
-     * خط خلاصهٔ گستره، واژه‌های پنج‌گامی راهنما، برچسب باز/بسته و
-     * واژه‌های صادقانهٔ بدون داده/داده قدیمی. */
+     * world-markets-map-spec.md §4.4 + دورٔهٔ مالک ۲۰۲۶-۱۰-۲۰f):
+     * کلید سه‌گانهٔ بازهٔ خودِ نقشه، خط خلاصهٔ گستره، برچسب‌های
+     * سه‌گانهٔ روزانه/هفتگی/ماهانهٔ کارت‌ها، دو سرِ راهنمای رنگِ
+     * نسبی، برچسب باز/بسته و واژه‌های صادقانهٔ بدون داده/داده قدیمی. */
     map: {
       periodSwitchAria: 'انتخاب بازهٔ نمایش نقشه',
       periodToday: 'امروز',
+      periodWeek: '۱ هفته',
       periodMonth: '۱ ماه',
-      periodYear: '۱ سال',
       periodWordToday: 'امروز',
+      periodWordWeek: 'این هفته',
       periodWordMonth: 'این ماه',
-      periodWordYear: 'امسال',
       open: 'باز',
       closed: 'بسته',
       noData: 'بدون داده',
       oldData: 'داده قدیمی',
-      stepStrongFall: 'افت شدید',
       stepFall: 'افت',
       stepFlat: 'ثابت',
       stepRise: 'رشد',
-      stepStrongRise: 'رشد قوی',
+      cellD: 'روزانه',
+      cellW: 'هفتگی',
+      cellM: 'ماهانه',
+      legendMoreDown: 'افت بیشتر',
+      legendMoreUp: 'رشد بیشتر',
       summary: '{up} از {n} بازار {period} مثبت · {down} منفی · {flat} ثابت',
       updated: 'به‌روزرسانی',
       updatedAgoMin: '{n} دقیقه پیش',
@@ -819,7 +823,8 @@ export const insightsCopyFa: InsightsCopy = {
       updatedAgoDay: '{n} روز پیش',
       showingFrom: 'نمایش داده‌های {time}',
       srContext: '{country}، {step}',
-      srPeriod: 'در بازهٔ {period}، آخرین مقدار',
+      srPerf: 'عملکرد:',
+      srVal: 'آخرین مقدار',
       cardNameSsec: 'شانگهای',
     },
     entries: {

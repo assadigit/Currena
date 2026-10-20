@@ -927,7 +927,7 @@ describe('MAP §9.7 — the map fields change ZERO KV operations', () => {
   it('a Yahoo-sourced refresh writes the open/quoteTime fields into the ONE key', async () => {
     const store = new InMemoryMarketsStore();
     const fetchers: MarketJobFetchers = {
-      fetchEodhd: async (id) => {
+      fetchEodhd: async () => {
         throw new Error('eodhd down');
       },
       fetchYahoo: async (id) => {

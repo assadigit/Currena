@@ -44,44 +44,57 @@ export const DEFAULT_PERIOD = '1D' as const;
 export const STALE_AFTER_DAYS = STALE_DAYS;
 export { OPEN_MAX_AGE_MIN };
 
-/** The map's three lenses (§M11) — the three the stored contract carries
- * a display change for. NOT the section switch's five: the map speaks its
- * own quieter control and never touches the section's lens. */
-export type MapPeriod = '1D' | '1M' | '1Y';
+/** The map's three lenses (§M11 + the 2026-10-20f owner round: the cards
+ * carry Day/Week/Month side by side, so the switch speaks the same three
+ * periods and drives which one colours the map and emphasises the card).
+ * NOT the section switch's five: the map speaks its own quieter control
+ * and never touches the section's lens. */
+export type MapPeriod = '1D' | '1W' | '1M';
 
-export const MAP_PERIODS: readonly MapPeriod[] = ['1D', '1M', '1Y'];
+export const MAP_PERIODS: readonly MapPeriod[] = ['1D', '1W', '1M'];
 
 /* ------------------------------------------------------------------ *
- * §4.2 — the five colour steps per period (percent change, display only)
+ * §4.2 — the flat band per period (percent change, display only)
+ *
+ * 2026-10-20f owner round: the five discrete steps retired in favour of
+ * a RELATIVE continuous scale — "more down = more red, more up = more
+ * saturated green". What survives from the old thresholds is the honest
+ * FLAT band: inside it a market is neutral grey (a ±0.09% day is not a
+ * rise), exactly as before. Beyond it the colour weight grows with the
+ * move's size RELATIVE to the biggest move on screen in that period.
  * ------------------------------------------------------------------ */
 
-export interface MapThresholds {
-  /** Inside this band around zero the step is Flat. */
-  flatBand: number;
-  /** At or beyond this magnitude the step is Strong. */
-  strongFrom: number;
-}
-
-export const MAP_THRESHOLDS: Record<MapPeriod, MapThresholds> = {
-  '1D': { flatBand: 0.1, strongFrom: 1 },
-  '1M': { flatBand: 1, strongFrom: 5 },
-  '1Y': { flatBand: 3, strongFrom: 15 },
+export const MAP_THRESHOLDS: Record<MapPeriod, number> = {
+  '1D': 0.1,
+  '1W': 0.5,
+  '1M': 1,
 };
 
-/** The five display steps, worst to best (§4.2 / §M12's legend order). */
-export type MapStep = 'sf' | 'fl' | 'f' | 'r' | 'sr';
+/** The colour direction of one reading (null = flat / no honest data —
+ * the country, dot and card stay neutral grey). */
+export type MapDir = 'u' | 'd';
 
-export const MAP_STEPS: readonly MapStep[] = ['sf', 'fl', 'f', 'r', 'sr'];
+/** The relative scale's normaliser: the biggest |chg| among the period's
+ * fresh readings (0 when nothing carries data — then every weight is 0). */
+export function mapScaleOf(pcts: readonly (number | null)[]): number {
+  let max = 0;
+  for (const p of pcts) if (p !== null && Math.abs(p) > max) max = Math.abs(p);
+  return max;
+}
 
-/** The five-step scale for one percent change under one period's
- * thresholds (pure, display-only — it never feeds the verdict or hero). */
-export function mapStepOf(pct: number, period: MapPeriod): MapStep {
-  const { flatBand, strongFrom } = MAP_THRESHOLDS[period];
+/**
+ * The RELATIVE colour weight of one percent change, 0…1 (owner round
+ * 2026-10-20f): 0 inside the period's flat band, 1 for the biggest mover
+ * on screen, a 0.75-power curve between so mid-size moves keep visible
+ * colour. Pure display arithmetic — it never feeds the verdict or hero.
+ */
+export function mapWeightOf(pct: number, period: MapPeriod, scaleMax: number): number {
+  const flat = MAP_THRESHOLDS[period];
   const a = Math.abs(pct);
-  if (a <= flatBand) return 'f';
-  const strong = a >= strongFrom;
-  if (pct > 0) return strong ? 'sr' : 'r';
-  return strong ? 'sf' : 'fl';
+  if (a <= flat) return 0;
+  const span = Math.max(scaleMax - flat, flat); // never divide by ~0
+  const w = Math.min((a - flat) / span, 1);
+  return w ** 0.75;
 }
 
 /* ------------------------------------------------------------------ *
@@ -109,15 +122,15 @@ export interface MapIndexConfig {
 }
 
 export const MAP_INDICES: readonly MapIndexConfig[] = [
-  { id: 'sp500', cc: 'us', iso: '840', band: 'top', card: { x: 19, y: 7.5 } },
+  { id: 'sp500', cc: 'us', iso: '840', band: 'top', card: { x: 19, y: 10 } },
   { id: 'ibov', cc: 'br', iso: '076', band: 'left', card: { x: 9, y: 68 } },
-  { id: 'ftse', cc: 'gb', iso: '826', band: 'top', card: { x: 42, y: 7.5 } },
-  { id: 'dax', cc: 'de', iso: '276', band: 'top', card: { x: 58, y: 7.5 } },
-  { id: 'nifty50', cc: 'in', iso: '356', band: 'bottom', card: { x: 69.9, y: 88 } },
-  { id: 'ssec', cc: 'cn', iso: '156', band: 'top', card: { x: 75, y: 7.5 } },
+  { id: 'ftse', cc: 'gb', iso: '826', band: 'top', card: { x: 42, y: 10 } },
+  { id: 'dax', cc: 'de', iso: '276', band: 'top', card: { x: 58, y: 10 } },
+  { id: 'nifty50', cc: 'in', iso: '356', band: 'bottom', card: { x: 69.9, y: 86 } },
+  { id: 'ssec', cc: 'cn', iso: '156', band: 'top', card: { x: 75, y: 10 } },
   { id: 'kospi', cc: 'kr', iso: '410', band: 'right', card: { x: 91.5, y: 50 } },
-  { id: 'n225', cc: 'jp', iso: '392', band: 'top', card: { x: 91, y: 7.5 } },
-  { id: 'asx200', cc: 'au', iso: '036', band: 'bottom', card: { x: 89.6, y: 88 } },
+  { id: 'n225', cc: 'jp', iso: '392', band: 'top', card: { x: 91, y: 10 } },
+  { id: 'asx200', cc: 'au', iso: '036', band: 'bottom', card: { x: 89.6, y: 86 } },
 ];
 
 /**
@@ -131,5 +144,32 @@ export const MAP_CARD_NAME_KEY: Partial<Record<MarketId, 'cardNameSsec'>> = { ss
 
 /** The callout card width, as a percentage of the map box (§M6: every
  * card the same width; 16% keeps five top cards clear of each other at
- * the §M8 positions while the 13px names fit beside the status tag). */
+ * the §M8 positions while the names fit beside the status tag — the
+ * 2026-10-20f D/W/M triplet is sized to the same 16% at 1 decimal). */
 export const MAP_CARD_WIDTH_PCT = 16;
+
+/* ------------------------------------------------------------------ *
+ * 2026-10-20f owner round — the RELATIVE colour ramps. One weight
+ * (0…1, from mapWeightOf) drives three CSS mix percentages; the mix
+ * anchors are theme-agnostic shares of the existing status tokens so a
+ * single set of numbers holds in light AND dark:
+ *   --t  the country tint   (alert/normal vs surface)   34% → 66%
+ *   --m  the dot mark       (alert/normal vs ink)      55% → 100%
+ *   --b  the card border    (alert/normal, alpha)      35% → 75%
+ *   --i  the card cell ink  (chip ink vs ink)          58% → 100%
+ * ------------------------------------------------------------------ */
+export const MAP_TINT_LO = 34;
+export const MAP_TINT_HI = 66;
+export const MAP_MARK_LO = 55;
+export const MAP_MARK_HI = 100;
+export const MAP_BORDER_LO = 35;
+export const MAP_BORDER_HI = 75;
+export const MAP_INK_LO = 58;
+export const MAP_INK_HI = 100;
+
+const ramp = (lo: number, hi: number, w: number) => Math.round((lo + (hi - lo) * w) * 10) / 10;
+
+export const tintMixOf = (w: number) => ramp(MAP_TINT_LO, MAP_TINT_HI, w);
+export const markMixOf = (w: number) => ramp(MAP_MARK_LO, MAP_MARK_HI, w);
+export const borderMixOf = (w: number) => ramp(MAP_BORDER_LO, MAP_BORDER_HI, w);
+export const inkMixOf = (w: number) => ramp(MAP_INK_LO, MAP_INK_HI, w);
