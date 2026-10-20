@@ -83,6 +83,47 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Session record — 2026-10-20d the World card's photo band (the owner's New York picture)
+
+- **Deployed**: currena-api **`fe94fe99-bf15-4042-8064-53a3bf640222`**
+  (SITE_MODE=public untouched; currena-markets untouched `3f245d75`).
+- **Change** (web-only round — no API/markets code changed): the owner's
+  directive "Use this picture, turn it to webP, and use it for the World
+  container. so both containers aus and world now have picture." — the
+  uploaded `new-york-bg-fade.jpg` (1400×248, Sydney's own band format)
+  becomes `apps/web/public/assets/artwork/new-york-bg-faded.webp` (18.7 KB,
+  one recorded normalization: contrast ×1.4 + brightness ×0.97 to Sydney's
+  measured band weight, zero clipping) and the World (Global) region card's
+  `.ei-hero-art--global` band carries it over the same 26% veil family,
+  framed at **72%** (Sydney's own offset — the Empire State / One WTC
+  cluster) with the bottom fade completing at **30% desktop / 34% mobile**
+  instead of 46%: this skyline rides the photo's middle third, and the old
+  fade dipped the whole skyline under a 73-100% surface wash (row-level
+  render measurements showed 0.0 detail where the skyline should be). The
+  "map must stay even quieter than Sydney" sub-rule retires with the map;
+  `global-map-faded.webp` stays in the tree, unreferenced, for the record.
+  VerdictMeter's art-band comments updated to describe both photos. No
+  data, scoring, export or copy change.
+- **Gates pre-deploy**: web 698/698 · typecheck 6/6 · lint 0 errors / 15
+  accepted advisories · copy:audit clean (no strings changed) · visual
+  19/19 (U-01..U-14 on the new band; verified against the committed
+  fixtures directly) · budgets held with NO JS change (entry 295.28/88.81,
+  Insights 697.38/167.88 vs 296/89.5 and 700/169) · the webp rides the PWA
+  precache (113 entries).
+- **Verified live** (currena.ir, agent-browser): `/assets/artwork/
+  new-york-bg-faded.webp` → **200 image/webp**; the live `.ei-hero-art--global`
+  rule carries the new-york URL at `72% 50%`; 2 art bands in the DOM
+  (global + australia); the band photo-half detail on the live EN capture
+  measures **7.6 (World) vs 4.4 (Australia)** — the NYC skyline is at least
+  as present as Sydney's, with the Statue of Liberty · Lower Manhattan ·
+  Brooklyn Bridge readable in the VLM pass ("distinctly visible … easily
+  identify it as a cityscape"); titles/pills/count lines readable over
+  both bands EN + fa; fa RTL shows the band (detail 4.8); mobile 390
+  scrollWidth **390** (zero overflow); console + page errors **zero**;
+  `/api/insights` 200 with 32 readings (the data surface untouched).
+- **Evidence**: `docs/evidence/2026-10-20d-world-card-new-york-art/`
+  (README + 3 live screenshots: EN 1440, fa 1440, EN mobile 390).
+
 ## CURRENT DEPLOYMENT — the yearly lens on the world stock indices: a fifth view (Daily → Yearly), a real chg1y, a 1-year table column (2026-10-19 (yearly lens) owner round 5, workers 96c4a467 + 18cf040e)
 
 Owner round 5 — "add yearly view to the stocks indexes" — is LIVE on
