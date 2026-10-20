@@ -579,9 +579,13 @@ export function WorldMap({
                     </svg>
                     <span className="wm-card-name">{name}</span>
                     <span className="sr-only">{srContext}</span>
-                    <span className={`wm-tag${r.open && hasData ? ' o' : ''}`}>
+                    <span className={`wm-tag${r.open && hasData ? ' o' : ''}`} title={stateWord}>
                       <i aria-hidden="true" />
-                      {stateWord}
+                      {/* 2026-10-20f: the common Open/Closed states speak as the
+                       * legend-keyed dot (the word stays in the accessible
+                       * name); only the abnormal No data / Old data states
+                       * spend the card width on their words. */}
+                      {hasData ? <span className="sr-only">{stateWord}</span> : stateWord}
                     </span>
                   </span>
                   <span className="sr-only">{mapCopy.srPerf}</span>

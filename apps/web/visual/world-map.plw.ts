@@ -152,6 +152,22 @@ test('layout §9.1: the switch follows the container, not the viewport', async (
  * full-bleed, never cramped), then the card/line geometry.
  * ------------------------------------------------------------------ */
 
+test('layout §9.2: no card text clips at the narrower map box', async ({ page }) => {
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  const clips = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('.wm-card')).flatMap((c) => {
+      const id = (c as HTMLElement).dataset.id ?? '';
+      const name = c.querySelector('.wm-card-name') as HTMLElement;
+      const tag = c.querySelector('.wm-tag') as HTMLElement;
+      const out: string[] = [];
+      if (name.scrollWidth > name.clientWidth + 1) out.push(`${id}:name`);
+      if (tag.scrollWidth > tag.clientWidth + 1) out.push(`${id}:tag`);
+      return out;
+    }),
+  );
+  expect(clips, `clipped: ${clips.join(', ')}`).toEqual([]);
+});
+
 test('layout §9.2: centred map box ~200–300px under the module, full width in the list layout', async ({ page }) => {
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
   const probe = await page.evaluate(() => {
