@@ -1128,6 +1128,20 @@ body {
   --color-chip-ink-watch: #7A5D00;     /* bronze — the amber hue as readable text ink */
   --color-chip-ink-context: #245E9F;
   --color-chip-ink-muted: #46505C;
+  /* 2026-10-27 owner round ("write the positive indexes with more clear
+   * and bright green please a triangle showing up for green, and do the
+   * same for red, down and brighter red"): the SIGNED-RETURN vocabulary —
+   * vivid, higher-chroma siblings of the calm status hues, reserved for
+   * index/price return VALUES (tiles, movers, the table's return columns,
+   * the verdict's breadth counts). The status hues above keep every state
+   * word/chip/meter (calm by design); these are the loud numbers. The
+   * light-mode pair is tuned to the BRIGHTEST vivid hues that still clear
+   * 4.5:1 on white — #00873A ≈ 4.7:1 and #E51527 ≈ 4.7:1 — because the
+   * smallest surface (the table's caption-size columns) is normal-size
+   * text; every value also carries its sign AND a triangle (never colour
+   * alone, §6.8). Dark mode takes the properly bright pair. */
+  --color-return-up: #00873A;   /* vivid kelly green — clearer and more saturated than Green 50 */
+  --color-return-down: #E51527; /* vivid scarlet — brighter and more saturated than Carbon Red 60 */
   /* Editorial handoff tokens (2026-10-19, docs/insights/
    * economic-indicators-editorial-spec.md §4): kept through the v3 merge for
    * the world-indices/market-logo surfaces that still consume --ei-* names;
@@ -1180,6 +1194,11 @@ body {
   --color-chip-ink-watch: #f1c21b;
   --color-chip-ink-context: #6FAEEC;
   --color-chip-ink-muted: #9AA8BC;
+  /* 2026-10-27 return vocabulary, dark surfaces: brighter AND lighter so
+   * they pop on the #1A222E cards — #30D96B ≈ 9:1, #FF5963 ≈ 5.6:1
+   * (the light-mode pair would sink on the dark card). */
+  --color-return-up: #30D96B;
+  --color-return-down: #FF5963;
   /* Editorial navy inverts with the theme (the G4 ramp's own rule): on the
    * #1A222E card the deep navy would be invisible, so the light ink
    * speaks (13.1:1 on #1A222E). Kept through the v3 merge for --ei-* consumers. */
@@ -1965,7 +1984,12 @@ html[dir='rtl'] .insights-panel {
 /* The two directions set their token pair; land paths, dots, leader lines,
  * cards and the triplet cells all read them, so a direction can never
  * present two dialects. The mix PERCENTAGE rides each element's inline
- * --t/--m/--b/--i custom property (computed from the relative weight). */
+ * --t/--m/--b/--i custom property (computed from the relative weight).
+ * 2026-10-27 note: the ink pair STAYS on the dark chip tokens — the card
+ * values' relative ramp mixes the direction ink with the primary ink at
+ * 58–100%, and the vivid RETURN tokens (lighter hues) would break the
+ * §9.3 4.5:1 floor at the ramp's low end; the bright return vocabulary
+ * lives at FULL strength on the tiles, movers, table and verdict instead. */
 .wm .s-u { --wm-dir: var(--color-status-normal); --wm-dir-ink: var(--color-chip-ink-normal); }
 .wm .s-d { --wm-dir: var(--color-status-alert); --wm-dir-ink: var(--color-chip-ink-attention); }
 
@@ -2113,6 +2137,10 @@ html[dir='rtl'] .insights-panel {
 .wm-yrow.sel .wm-pl { color: var(--color-text-primary); font-weight: 700; }
 .wm-tri { display: flex; gap: 3px; min-width: 0; }
 .wm-cell { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+/* 2026-10-27: the ORIGINAL compact row (D/W/M) and typography stay — the
+ * two new lenses surface through the hero row (it follows the SELECTED
+ * period now), so the card keeps its tuned height and every value keeps
+ * its cell. */
 .wm-pl { font-size: 11.5px; line-height: 1.1; font-weight: 600; font-style: normal; color: var(--color-text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wm-cell.sel .wm-pl { color: var(--color-text-primary); font-weight: 700; }
 .wm-pv {

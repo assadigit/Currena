@@ -34,7 +34,8 @@ export function marketsCsvFilename(generatedAt: string): string {
  * (the weekly/monthly lenses) APPENDED the 1-week and 1-month columns at the
  * END (after Source) so position-pinned scripts keep reading every existing
  * column at the same index; round 47 (the yearly lens) appended 1-year the
- * same way — the human-facing table orders them by duration instead; the
+ * same way, and the 2026-10-27 "add five year" round appends 5-year
+ * likewise — the human-facing table orders them by duration instead; the
  * table is a page surface, this file is a machine surface. */
 function marketsCsvHeaders(copy: InsightsCopy): string[] {
   return [
@@ -52,6 +53,7 @@ function marketsCsvHeaders(copy: InsightsCopy): string[] {
     copy.markets.csvColWeek,
     copy.markets.csvColMonth,
     copy.markets.csvColYear,
+    copy.markets.csvCol5y,
   ];
 }
 
@@ -86,10 +88,12 @@ export function buildMarketsCsv(snapshot: MarketsSnapshot, copy: InsightsCopy): 
         m.asOf,
         m.source,
         // Round 46: a stored row without the lens yet exports an EMPTY field —
-        // absent is absent, never a guessed zero (round 47's chg1y likewise).
+        // absent is absent, never a guessed zero (round 47's chg1y and the
+        // 2026-10-27 round's chg5y likewise).
         m.chg1w === undefined ? '' : csvNumber(m.chg1w),
         m.chg1m === undefined ? '' : csvNumber(m.chg1m),
         m.chg1y === undefined ? '' : csvNumber(m.chg1y),
+        m.chg5y === undefined ? '' : csvNumber(m.chg5y),
       ].join(','),
     );
   }

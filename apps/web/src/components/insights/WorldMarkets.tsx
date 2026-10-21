@@ -66,10 +66,13 @@ type DisplayMode = 'list' | 'heatmap';
 
 /* 2026-10-21 unification — the static bridge between the section's
  * MarketsView lens and the map module's MapPeriod (both closed sets, so
- * plain lookup tables at module scope; '3m' maps to '1M' defensively but
- * is never a switch lens anymore). */
-const PERIOD_OF_VIEW: Record<MarketsView, MapPeriod> = { today: '1D', '1w': '1W', '1m': '1M', '3m': '1M', '1y': '1Y' };
-const VIEW_OF_PERIOD: Record<MapPeriod, MarketsView> = { '1D': 'today', '1W': '1w', '1M': '1m', '1Y': '1y' };
+ * plain lookup tables at module scope). 2026-10-27 owner round ("add five
+ * year and 3 months to all view points"): the bridge grows to SIX lenses —
+ * '3m' now maps to its own '3M' map period (it mapped defensively to '1M'
+ * when it was never a selectable lens) and '5y' joins from the job's
+ * Yahoo-10y-anchored chg5y. */
+const PERIOD_OF_VIEW: Record<MarketsView, MapPeriod> = { today: '1D', '1w': '1W', '1m': '1M', '3m': '3M', '1y': '1Y', '5y': '5Y' };
+const VIEW_OF_PERIOD: Record<MapPeriod, MarketsView> = { '1D': 'today', '1W': '1w', '1M': '1m', '3M': '3m', '1Y': '1y', '5Y': '5y' };
 
 export function WorldMarkets({
   state,

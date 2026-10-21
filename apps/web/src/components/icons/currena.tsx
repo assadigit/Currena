@@ -126,10 +126,27 @@ export const MARKETS_SECTION_ICON_URL = urlOf('stock-exchange-index');
 
 const MARKET_LOGO_BASE = '/assets/markets';
 
+/* 2026-10-27 owner round — the per-market logo OVERRIDES: the owner pinned
+ * the identity artwork per index ("for taeix taiwan use their logo … for
+ * stokxx 50 use euro flag … for tsx use canada flag … for hangseng use
+ * their logo"). TAIEX and Hang Seng keep their own wordmark JPEGs (the
+ * /assets/markets/{taiex,hsi}.jpg files — the owner's pasted tags); the
+ * Euro Stoxx 50 (an index with no single country — its map row says
+ * "Eurozone") and the S&P/TSX (whose wordmark reads as a plain logotype)
+ * wear their REGION's flag from the /images/flags/ set instead — the same
+ * 300×200 flag artwork the currencies surfaces already use, rendered in
+ * the MarketLogo frame's quiet white chip with object-fit: contain (a
+ * landscape flag letterboxes honestly; the identity text beside it stays
+ * canonical, ASSET-MAP rule 2). */
+const MARKET_LOGO_OVERRIDES: Partial<Record<MarketId, string>> = {
+  stoxx50: '/images/flags/eur.png',
+  tsx: '/images/flags/cad.png',
+};
+
 /** The index wordmark for a market id — decorative (alt=""): the canonical
  * name text beside it carries the identity, never the artwork alone. */
 export function marketLogoUrl(id: MarketId): string {
-  return `${MARKET_LOGO_BASE}/${id}.jpg`;
+  return MARKET_LOGO_OVERRIDES[id] ?? `${MARKET_LOGO_BASE}/${id}.jpg`;
 }
 
 /** The metals' estimation arrows — green up / red down (fixed colours). */

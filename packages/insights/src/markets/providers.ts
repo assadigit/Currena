@@ -245,11 +245,15 @@ export interface YahooFetchOptions {
 }
 
 /** Yahoo chart endpoint — keyless fallback; a browser-like UA avoids 429s.
- * range=2y (round 47): the yearly lens's 350–380-day anchor band needs real
- * closes BEYOND the strict 365-day mark, which Yahoo's range=1y starts
- * exactly at — the two-year ask guarantees the anchor with margin (verified
- * live 2026-10-19: range=1y → 251 points from 2025-10-17, range=2y → 501
- * points from 2024-10-17). */
+ * range=10y (2026-10-27 owner round — "add five year … to all view points"):
+ * the 5-year lens needs closes ~1826 days back, and neither provider's
+ * shorter window reaches them (EODHD free cuts at one year; Yahoo's old
+ * range=2y — round 47's yearly-anchor margin — stops ~730 days back). The
+ * ten-year ask guarantees the 1826-day anchor with wide margin on every
+ * market Yahoo serves, so a Yahoo WINNER carries chg5y directly and only
+ * EODHD winners need the job's long-series supplement. Verified live
+ * 2026-10-19: range=2y → 501 points; range=10y answers the same shape with
+ * ~2,500 — one polite request per market, same 15 s timeout. */
 export async function fetchYahooSeries(
   marketId: MarketId,
   opts: YahooFetchOptions = {},
@@ -261,11 +265,12 @@ export async function fetchYahooSeries(
   const def = marketDefinition(marketId);
   const url =
     `${opts.baseUrl ?? YAHOO_BASE_URL}/${encodeURIComponent(def.yahooSymbol)}` +
-    // range=2y (round 47, kept through the v3 merge): the yearly lens needs
-    // history beyond the strict 365-day mark for its chg1y anchor; the fetch
-    // itself stays ONE polite request under the honest UA (v3 SCRAPING_SPEC
-    // T-25/F-09 via insightsFetch — never a spoofed browser identity).
-    `?range=2y&interval=1d`;
+    // range=10y (2026-10-27, kept from round 47's range=2y growth): the
+    // 5-year lens needs history beyond the strict 1826-day mark for its
+    // chg5y anchor; the fetch itself stays ONE polite request under the
+    // honest UA (v3 SCRAPING_SPEC T-25/F-09 via insightsFetch — never a
+    // spoofed browser identity).
+    `?range=10y&interval=1d`;
   let response: Response;
   try {
     response = await insightsFetch(

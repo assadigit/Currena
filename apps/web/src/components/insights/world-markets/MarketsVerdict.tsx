@@ -92,9 +92,13 @@ export function MarketsVerdictBox({
   // the SELECTED period + the separate below-high count.
   const breadth = marketBreadth(snapshot.markets, view);
   const belowHigh = belowHighCount(snapshot.markets);
+  // 2026-10-27 owner round ("write the positive indexes with more clear and
+  // bright green … do the same for red, down and brighter red"): the up/down
+  // breadth counts speak the BRIGHT return inks — clearer and brighter than
+  // the calm status hues (which stay the verdict vocabulary above).
   const counts: Array<[label: string, count: number, tone: string]> = [
-    [copy.markets.breadthUp, breadth.up, 'text-[var(--color-status-normal)]'],
-    [copy.markets.breadthDown, breadth.down, 'text-[var(--color-status-alert)]'],
+    [copy.markets.breadthUp, breadth.up, 'text-[var(--color-return-up)]'],
+    [copy.markets.breadthDown, breadth.down, 'text-[var(--color-return-down)]'],
     [copy.markets.breadthFlat, breadth.flat, 'text-[var(--color-text-secondary)]'],
   ];
   return (

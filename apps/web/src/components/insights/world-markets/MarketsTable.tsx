@@ -3,33 +3,85 @@
  * <th scope> at ≥900px, a vertical row list below — the same numbers either
  * way (round 46 added the 1-week and 1-month columns beside Today; round 47
  * added the 1-year column beside 3 months, the same lenses the view switch
- * offers). Split from WorldMarkets.tsx; code moved verbatim.
+ * offers; the 2026-10-27 "add five year and 3 months" round adds the 5-year
+ * column from the job's Yahoo-10y-anchored chg5y). Split from
+ * WorldMarkets.tsx; code moved verbatim.
  *
  * OWNER DIRECTIVE (2026-10-20, post-v3-merge): "keep the new data… in the
  * PREVIOUS UI" — this is the PREVIOUS full table, restored verbatim from
- * main@1e39a24 (Today · 1 week · 1 month · 3 months · 1 year · from-high ·
- * Trend · Status · Last close). The v3 UI-27 column cut is retired by that
- * directive; the lens data the columns need never left the payload (the
- * v3 merge kept it for the exports). One v3 honesty addition is KEPT: the
- * local-currency note (UI-27) renders with the table — the owner's "keep
- * the new data… and reliability" covers this caveat, and it changes no
- * column, number or layout.
+ * main@1e39a24 (Today · 1 week · 1 month · 3 months · 1 year · 5 years ·
+ * from-high · Trend · Status · Last close). The v3 UI-27 column cut is
+ * retired by that directive; the lens data the columns need never left the
+ * payload (the v3 merge kept it for the exports). One v3 honesty addition
+ * is KEPT: the local-currency note (UI-27) renders with the table — the
+ * owner's "keep the new data… and reliability" covers this caveat, and it
+ * changes no column, number or layout.
+ *
+ * 2026-10-27 owner round ("write the positive indexes with more clear and
+ * bright green please a triangle showing up for green, and do the same
+ * for red, down and brighter red"): the five RETURN columns render their
+ * signed values in the bright return inks with the crisp filled triangle
+ * (▲ up / ▼ down / the dash bar for an exact zero) — the from-high and
+ * close columns keep their neutral presentation (a distance and a level
+ * are not signed returns). The inks follow each number's OWN sign.
  */
 
 import type { MarketEntry, MarketId, MarketsSnapshot } from '@currena/core';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { formatAsOf } from '../HistoryChart';
 import {
-  DirectionGlyph,
+  DirTriangle,
   fmtClose,
+  NO_READING,
+  returnToneClass,
+  signOf,
   signedPct,
-  signedPctOrDash,
   statusToneOf,
   statusWordKeyOf,
   TREND_WORD_OF,
   tradingDaysBehind,
   trendOf,
 } from './shared';
+
+/* ------------------------------------------------------------------ *
+ * One return cell — the 2026-10-27 bright ink + triangle presentation
+ * shared by the desktop table and the mobile row list: the signed value
+ * in the vivid return tokens with the crisp triangle (the sign, the
+ * triangle and the ink all speak the SAME number — colour is never
+ * alone, §6.8). The ink follows the number's OWN SIGN (a +0.4% month is
+ * a positive number in bright green; the TREND column keeps the honest
+ * ±1% band for its word). A null lens reading keeps the honest neutral
+ * dash.
+ * ------------------------------------------------------------------ */
+function PctCell({
+  pct,
+  numberLocale,
+  locale,
+  label,
+}: {
+  pct: number | null;
+  numberLocale: 'en-US' | 'fa-IR';
+  locale: 'en' | 'fa';
+  /** The column's sr-only name (the mobile list's label glue). */
+  label?: string;
+}) {
+  if (pct === null) {
+    return (
+      <bdi dir="ltr" className="font-semibold text-[var(--color-text-secondary)]">
+        {NO_READING}
+        {label ? <span className="sr-only"> {label}</span> : null}
+      </bdi>
+    );
+  }
+  const dir = signOf(pct);
+  return (
+    <bdi dir="ltr" className={`inline-flex items-center justify-end gap-0.5 font-semibold ${returnToneClass(dir)}`}>
+      <DirTriangle dir={dir} size={8} />
+      {signedPct(pct, numberLocale, locale)}
+      {label ? <span className="sr-only"> {label}</span> : null}
+    </bdi>
+  );
+}
 
 /* ------------------------------------------------------------------ *
  * The full table (§6.4): real <table> with <th scope> at ≥900px; a
@@ -81,6 +133,7 @@ export function MarketsTable({
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thMonth}</th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.th3m}</th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thYear}</th>
+              <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.th5y}</th>
               <th scope="col" className="px-2 py-1.5 text-end font-bold text-[var(--color-text-secondary)]">{copy.markets.thFromHigh}</th>
               <th scope="col" className="px-2 py-1.5 text-start font-bold text-[var(--color-text-secondary)]">{copy.markets.thTrend}</th>
               <th scope="col" className="px-2 py-1.5 text-start font-bold text-[var(--color-text-secondary)]">{copy.markets.thStatus}</th>
@@ -116,26 +169,29 @@ export function MarketsTable({
                   ) : null}
                 </th>
                 <td className="px-2 py-1.5 text-end tabular-nums">
-                  <bdi dir="ltr" className="font-semibold">{signedPct(m.chg1d, numberLocale, locale)}</bdi>
+                  <PctCell pct={m.chg1d} numberLocale={numberLocale} locale={locale} />
                 </td>
                 <td className="px-2 py-1.5 text-end tabular-nums">
-                  <bdi dir="ltr" className="font-semibold">{signedPctOrDash(m.chg1w ?? null, numberLocale, locale)}</bdi>
+                  <PctCell pct={m.chg1w ?? null} numberLocale={numberLocale} locale={locale} />
                 </td>
                 <td className="px-2 py-1.5 text-end tabular-nums">
-                  <bdi dir="ltr" className="font-semibold">{signedPctOrDash(m.chg1m ?? null, numberLocale, locale)}</bdi>
+                  <PctCell pct={m.chg1m ?? null} numberLocale={numberLocale} locale={locale} />
                 </td>
                 <td className="px-2 py-1.5 text-end tabular-nums">
-                  <bdi dir="ltr" className="font-semibold">{signedPct(m.chg3m, numberLocale, locale)}</bdi>
+                  <PctCell pct={m.chg3m} numberLocale={numberLocale} locale={locale} />
                 </td>
                 <td className="px-2 py-1.5 text-end tabular-nums">
-                  <bdi dir="ltr" className="font-semibold">{signedPctOrDash(m.chg1y ?? null, numberLocale, locale)}</bdi>
+                  <PctCell pct={m.chg1y ?? null} numberLocale={numberLocale} locale={locale} />
+                </td>
+                <td className="px-2 py-1.5 text-end tabular-nums">
+                  <PctCell pct={m.chg5y ?? null} numberLocale={numberLocale} locale={locale} />
                 </td>
                 <td className="px-2 py-1.5 text-end tabular-nums">
                   <bdi dir="ltr" className="font-semibold">{signedPct(m.fromHigh, numberLocale, locale)}</bdi>
                 </td>
                 <td className="px-2 py-1.5 whitespace-nowrap text-[var(--color-text-secondary)]">
                   <span aria-hidden="true" className="me-1 inline-flex align-[-2px]">
-                    <DirectionGlyph arrow={arrow(m)} size={13} desktopSize={14} />
+                    <DirTriangle dir={arrow(m)} size={10} />
                   </span>
                   {trendCell(m)}
                 </td>
@@ -169,6 +225,7 @@ export function MarketsTable({
           <span>{copy.markets.thMonth}</span>
           <span>{copy.markets.th3m}</span>
           <span>{copy.markets.thYear}</span>
+          <span>{copy.markets.th5y}</span>
           <span>{copy.markets.thFromHigh}</span>
         </span>
       </p>
@@ -191,26 +248,12 @@ export function MarketsTable({
                 ) : null}
               </span>
               <span className="inline-flex items-baseline gap-3 text-[length:var(--type-caption)] font-semibold tabular-nums">
-                <bdi dir="ltr">
-                  {signedPct(m.chg1d, numberLocale, locale)}
-                  <span className="sr-only"> {copy.markets.thToday}</span>
-                </bdi>
-                <bdi dir="ltr">
-                  {signedPctOrDash(m.chg1w ?? null, numberLocale, locale)}
-                  <span className="sr-only"> {copy.markets.thWeek}</span>
-                </bdi>
-                <bdi dir="ltr">
-                  {signedPctOrDash(m.chg1m ?? null, numberLocale, locale)}
-                  <span className="sr-only"> {copy.markets.thMonth}</span>
-                </bdi>
-                <bdi dir="ltr">
-                  {signedPct(m.chg3m, numberLocale, locale)}
-                  <span className="sr-only"> {copy.markets.th3m}</span>
-                </bdi>
-                <bdi dir="ltr">
-                  {signedPctOrDash(m.chg1y ?? null, numberLocale, locale)}
-                  <span className="sr-only"> {copy.markets.thYear}</span>
-                </bdi>
+                <PctCell pct={m.chg1d} numberLocale={numberLocale} locale={locale} label={copy.markets.thToday} />
+                <PctCell pct={m.chg1w ?? null} numberLocale={numberLocale} locale={locale} label={copy.markets.thWeek} />
+                <PctCell pct={m.chg1m ?? null} numberLocale={numberLocale} locale={locale} label={copy.markets.thMonth} />
+                <PctCell pct={m.chg3m} numberLocale={numberLocale} locale={locale} label={copy.markets.th3m} />
+                <PctCell pct={m.chg1y ?? null} numberLocale={numberLocale} locale={locale} label={copy.markets.thYear} />
+                <PctCell pct={m.chg5y ?? null} numberLocale={numberLocale} locale={locale} label={copy.markets.th5y} />
                 <bdi dir="ltr">
                   {signedPct(m.fromHigh, numberLocale, locale)}
                   <span className="sr-only"> {copy.markets.thFromHigh}</span>

@@ -58,6 +58,18 @@ export const CHG1Y_ANCHOR_DAYS = 365;
 export const CHG1Y_ANCHOR_TOLERANCE_DAYS = 15;
 
 /**
+ * The 5-year lens's anchor (2026-10-27 owner round — "add five year and 3
+ * months to all view points"): the change vs the last close on or before
+ * this many calendar days back (5 years ≈ 1826 days). Same ±15-day
+ * tolerance convention as the yearly anchor: when a long provider window
+ * (the job's Yahoo range=10y supplement) starts inside the band, the
+ * earliest close IS the anchor; a window that starts closer than
+ * (1826 − 15) days to the last close has no honest 5-year reading — the
+ * row omits chg5y (the UI shows a dash, never a guess).
+ */
+export const CHG5Y_ANCHOR_DAYS = 1826;
+
+/**
  * Trend rule band, in percent (up at or above +1, down at or below −1),
  * applied to the SAME window the table's own "3-month" column shows
  * (CHG_WINDOW_DAYS). Defect E-18 (2026-10-16): the Trend label is

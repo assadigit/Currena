@@ -75,13 +75,13 @@ function lensRows(lens: '1w' | '1m' | '1y', values: Array<number | undefined>): 
  * ------------------------------------------------------------------ */
 
 describe('PERIOD_VIEWS — the closed lens list', () => {
-  it('offers exactly the MAP\'s four horizons (2026-10-21 unification), ascending', () => {
-    // The map's segmented control is the section's ONE period switch now;
-    // '3m' stays a valid MarketsView VALUE (the stored contract carries
-    // chg3m; trendOf + the table's Trend column keep reading it) but is
-    // never a switch lens.
-    expect(PERIOD_VIEWS).toEqual(['today', '1w', '1m', '1y']);
-    expect(PERIOD_VIEWS).not.toContain('3m');
+  it('offers exactly the six horizons the map\'s switch speaks (2026-10-21 unification + the 2026-10-27 "add five year and 3 months" round), ascending', () => {
+    // The map's segmented control is the section's ONE period switch; the
+    // 2026-10-27 round brought '3m' back as a selectable lens (the stored
+    // contract always carried chg3m) and added '5y' from the job's
+    // Yahoo-10y-anchored chg5y — the same closed set the prices board
+    // speaks.
+    expect(PERIOD_VIEWS).toEqual(['today', '1w', '1m', '3m', '1y', '5y']);
   });
 
   it('offers no YTD or 52-week-distance lens (the data gap is a gap)', () => {
@@ -94,20 +94,22 @@ describe('PERIOD_VIEWS — the closed lens list', () => {
 });
 
 describe('periodValueOf / viewValue — the lens read the whole section shares', () => {
-  it('reads each lens from its own canonical field', () => {
-    const m = entry({ chg1d: 1.2, chg1w: -5.4, chg1m: 2.2, chg3m: 1.8, chg1y: 12.6 });
+  it('reads each lens from its own canonical field (the 2026-10-27 round adds 5y from chg5y)', () => {
+    const m = entry({ chg1d: 1.2, chg1w: -5.4, chg1m: 2.2, chg3m: 1.8, chg1y: 12.6, chg5y: 82.4 });
     expect(periodValueOf(m, 'today')).toBe(1.2);
     expect(periodValueOf(m, '1w')).toBe(-5.4);
     expect(periodValueOf(m, '1m')).toBe(2.2);
     expect(periodValueOf(m, '3m')).toBe(1.8);
     expect(periodValueOf(m, '1y')).toBe(12.6);
+    expect(periodValueOf(m, '5y')).toBe(82.4);
   });
 
-  it('a pre-lens row without chg1w/chg1m/chg1y reads null — never 0, never fromHigh', () => {
-    const m = entry({ chg1w: undefined, chg1m: undefined, chg1y: undefined });
+  it('a pre-lens row without chg1w/chg1m/chg1y/chg5y reads null — never 0, never fromHigh', () => {
+    const m = entry({ chg1w: undefined, chg1m: undefined, chg1y: undefined, chg5y: undefined });
     expect(periodValueOf(m, '1w')).toBeNull();
     expect(periodValueOf(m, '1m')).toBeNull();
     expect(periodValueOf(m, '1y')).toBeNull();
+    expect(periodValueOf(m, '5y')).toBeNull();
     expect(viewValue(m, '1w').pct).toBeNull();
     // The 52-week distance must NOT leak into a period read.
     expect(periodValueOf(m, 'today')).not.toBe(m.fromHigh);

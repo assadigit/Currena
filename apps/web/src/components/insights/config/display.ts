@@ -305,14 +305,18 @@ export function formatChange(
   return parts.unit === null ? parts.value : `${parts.value} ${parts.unit}`;
 }
 
-/** Owner convention (2026-10-17): signed changes speak in status ink —
- * positive green, negative red, zero/absent stays neutral. The tokens are
- * the owner palette's contrast-documented pair (Carbon Green 50 / Red 60
- * with their dark-surface siblings). */
+/** Owner convention (2026-10-17): signed changes speak in a directional ink —
+ * positive green, negative red, zero/absent stays neutral. 2026-10-27 owner
+ * round ("write the positive indexes with more clear and bright green …
+ * and do the same for red, down and brighter red"): the pair moves to the
+ * vivid RETURN tokens (brighter siblings of the calm status hues) so every
+ * signed value on the page — the prices cards' changes and the world
+ * markets' returns — speaks the SAME loud vocabulary (states and verdict
+ * words keep the status hues). */
 export function changeToneClass(change: number | undefined | null): string {
   if (change === undefined || change === null || !Number.isFinite(change)) return '';
-  if (change > 0) return 'text-[var(--color-status-normal)]';
-  if (change < 0) return 'text-[var(--color-status-alert)]';
+  if (change > 0) return 'text-[var(--color-return-up)]';
+  if (change < 0) return 'text-[var(--color-return-down)]';
   return '';
 }
 

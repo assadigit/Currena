@@ -29,7 +29,7 @@ import { ProviderError, fetchEodhdSeries, fetchYahooSeries } from './providers';
 import type { MarketSeries } from './providers';
 import type { EodhdFetchOptions, YahooFetchOptions } from './providers';
 import type { MarketResolution } from './compute';
-import { resolveMarket } from './compute';
+import { attachChg5y, resolveMarket } from './compute';
 import { MARKETS, MARKET_IDS, MIN_CLOSES } from './definitions';
 
 /* ------------------------------------------------------------------ *
@@ -233,6 +233,33 @@ export async function runMarketsJob(
         : { id, primary: secondary as MarketSeries, secondary: undefined };
     try {
       resolution = resolveMarket(candidate, prevEntry, runDate, runTimeIso);
+      // 4. The 5-year lens supplement (2026-10-27 owner round — "add five
+      //    year and 3 months to all view points"): the EODHD free window
+      //    cuts at one year, so an EODHD winner can never anchor chg5y —
+      //    ONE extra Yahoo call (range=10y since this round) attaches the
+      //    honest 1826-day anchor. A Yahoo winner already carries it
+      //    (buildEntry read the same 10y points), so the supplement only
+      //    fires for EODHD winners. Fault-isolated like every provider
+      //    call: a failure leaves the field absent (the UI's honest dash)
+      //    and a note — never a failed run. Subrequest budget: ~15 extra
+      //    calls on a normal day (15 EODHD winners + FTSE's own Yahoo) ≈ 31
+      //    provider calls + KV ops + the fx job — comfortably under the
+      //    50-subrequest cap, and an EODHD-outage day needs ZERO
+      //    supplements (every winner is the deep Yahoo series already).
+      if (resolution.entry !== undefined && resolution.entry.chg5y === undefined && winner.source === 'eodhd') {
+        try {
+          const longSeries = await fetchOne('yahoo');
+          const entry5y = attachChg5y(resolution.entry, longSeries.points);
+          if (entry5y.chg5y !== undefined) {
+            resolution = { ...resolution, entry: entry5y };
+            notes.push('chg5y: anchored from the Yahoo 10y supplement');
+          } else {
+            notes.push('chg5y: the Yahoo 10y supplement carried no honest 5-year anchor — field omitted');
+          }
+        } catch (err) {
+          notes.push(`chg5y supplement failed: ${providerErrorNote(err)}`);
+        }
+      }
       notes.push(...resolution.notes);
     } catch (err) {
       resolution = { id, held: true, notes: [...notes, `compute failed: ${errMessage(err)}`] };

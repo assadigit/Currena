@@ -65,9 +65,14 @@ const WINDOW_7D = 7;
  * time formats by those toggle"): the board's switchable window lengths,
  * in calendar days — 1 week | 1 month | 1 year, mirroring the world
  * map's lenses (the Today lens rides the 1-day change from
- * price-stats, not a window). The SAME honesty rules as the classic
- * seven-day window apply to every length. */
-export const PRICE_WINDOW_DAYS = { '1w': 7, '1m': 30, '1y': 365 } as const;
+ * price-stats, not a window). 2026-10-27 owner round ("add five year and
+ * 3 months to all view points"): 3 months (90 days) and 5 years (1826
+ * days) join — the SAME six-lens closed set the map switch speaks. The
+ * SAME honesty rules as the classic seven-day window apply to every
+ * length (a 5-year window needs the served history to actually reach
+ * that far back — the route's public window was widened to ~5.2 years
+ * for exactly this lens; a shorter store keeps the honest absence). */
+export const PRICE_WINDOW_DAYS = { '1w': 7, '1m': 30, '3m': 90, '1y': 365, '5y': 1826 } as const;
 
 /** A window whose span is shorter than (days − 1) is flagged incomplete. */
 const minSpanOf = (days: number): number => days - 1;

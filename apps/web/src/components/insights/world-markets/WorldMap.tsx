@@ -116,15 +116,7 @@ function openAtViewTime(entry: MarketEntry, nowMs: number): boolean {
   return Number.isFinite(age) && age >= -60_000 && age <= OPEN_MAX_AGE_MIN * 60_000;
 }
 
-/** M6's signed percentage at the triplet's one decimal (the exact values
- * live in the explorer and the detail view), tabular digits, the locale's
- * percent glyph, wrapped by the caller in a LTR bdi. */
-function signedPct(pct: number, numberLocale: NumberLocale, locale: Locale): string {
-  const num = formatNumber(Math.abs(pct), numberLocale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  return `${pct > 0 ? '+' : pct < 0 ? MINUS : ''}${num}${percentGlyph(locale)}`;
-}
-
-/** 2026-10-20h — the compact D/W/M cells' signed number WITHOUT the
+/** 2026-10-27 owner round — the compact D/W/M cells' signed number WITHOUT the
  * percent glyph (the hero row carries the unit loudly; the glyph was
  * what made the old 12.5px triplet overflow its 35px cells — the values
  * ran into each other). The unit rides along as sr-only text so the
@@ -132,6 +124,18 @@ function signedPct(pct: number, numberLocale: NumberLocale, locale: Locale): str
 function signedNum(pct: number, numberLocale: NumberLocale): string {
   const num = formatNumber(Math.abs(pct), numberLocale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   return `${pct > 0 ? '+' : pct < 0 ? MINUS : ''}${num}`;
+}
+
+/** 2026-10-27 — the HERO row's signed percent (the map's loudest number,
+ * WITH the unit glyph): a |value| ≥ 100 drops the decimal ("+112%", never
+ * "+112.4%") so a five-year return keeps the 14.5%-wide card at every
+ * label length — the same honest-compact rule the old cells learned. */
+function heroPct(pct: number, numberLocale: NumberLocale, locale: Locale): string {
+  const num = formatNumber(Math.abs(pct), numberLocale, {
+    minimumFractionDigits: Math.abs(pct) >= 99.95 ? 0 : 1,
+    maximumFractionDigits: Math.abs(pct) >= 99.95 ? 0 : 1,
+  });
+  return `${pct > 0 ? '+' : pct < 0 ? MINUS : ''}${num}${percentGlyph(locale)}`;
 }
 
 /** One row of map data, derived purely from the snapshot. */
@@ -167,6 +171,8 @@ function pctOf(entry: MarketEntry | undefined, period: MapPeriod): number | null
   if (period === '1D') return entry.chg1d;
   if (period === '1W') return entry.chg1w ?? null;
   if (period === '1M') return entry.chg1m ?? null;
+  if (period === '3M') return entry.chg3m;
+  if (period === '5Y') return entry.chg5y ?? null;
   return entry.chg1y ?? null; // 2026-10-20h: yearly returns to the map
 }
 
@@ -308,7 +314,9 @@ export function WorldMap({
         '1D': loading || old ? null : pctOf(entry, '1D'),
         '1W': loading || old ? null : pctOf(entry, '1W'),
         '1M': loading || old ? null : pctOf(entry, '1M'),
+        '3M': loading || old ? null : pctOf(entry, '3M'),
         '1Y': loading || old ? null : pctOf(entry, '1Y'),
+        '5Y': loading || old ? null : pctOf(entry, '5Y'),
       } as Record<MapPeriod, number | null>;
       return { cfg, entry, old, pcts };
     });
@@ -316,14 +324,18 @@ export function WorldMap({
       '1D': mapScaleOf(pctsAll.map((r) => r.pcts['1D'])),
       '1W': mapScaleOf(pctsAll.map((r) => r.pcts['1W'])),
       '1M': mapScaleOf(pctsAll.map((r) => r.pcts['1M'])),
+      '3M': mapScaleOf(pctsAll.map((r) => r.pcts['3M'])),
       '1Y': mapScaleOf(pctsAll.map((r) => r.pcts['1Y'])),
+      '5Y': mapScaleOf(pctsAll.map((r) => r.pcts['5Y'])),
     } as Record<MapPeriod, number>;
     return pctsAll.map(({ cfg, entry, old, pcts }) => {
       const wts = {
         '1D': pcts['1D'] === null ? 0 : mapWeightOf(pcts['1D'], '1D', scales['1D']),
         '1W': pcts['1W'] === null ? 0 : mapWeightOf(pcts['1W'], '1W', scales['1W']),
         '1M': pcts['1M'] === null ? 0 : mapWeightOf(pcts['1M'], '1M', scales['1M']),
+        '3M': pcts['3M'] === null ? 0 : mapWeightOf(pcts['3M'], '3M', scales['3M']),
         '1Y': pcts['1Y'] === null ? 0 : mapWeightOf(pcts['1Y'], '1Y', scales['1Y']),
+        '5Y': pcts['5Y'] === null ? 0 : mapWeightOf(pcts['5Y'], '5Y', scales['5Y']),
       } as Record<MapPeriod, number>;
       const pct = pcts[period];
       const dir: MapDir | null = pct === null || pct === 0 ? null : pct > 0 ? 'u' : 'd';
@@ -447,19 +459,25 @@ export function WorldMap({
     '1D': mapCopy.periodToday,
     '1W': mapCopy.periodWeek,
     '1M': mapCopy.periodMonth,
+    '3M': mapCopy.period3M,
     '1Y': mapCopy.periodYear,
+    '5Y': mapCopy.period5Y,
   };
   const periodWord: Record<MapPeriod, string> = {
     '1D': mapCopy.periodWordToday,
     '1W': mapCopy.periodWordWeek,
     '1M': mapCopy.periodWordMonth,
+    '3M': mapCopy.periodWord3M,
     '1Y': mapCopy.periodWordYear,
+    '5Y': mapCopy.periodWord5Y,
   };
   const cellLabel: Record<MapPeriod, string> = {
     '1D': mapCopy.cellD,
     '1W': mapCopy.cellW,
     '1M': mapCopy.cellM,
+    '3M': mapCopy.cell3M,
     '1Y': mapCopy.cellY,
+    '5Y': mapCopy.cell5Y,
   };
 
   const n = (v: number) => formatNumber(v, numberLocale, { maximumFractionDigits: 0 });
@@ -490,7 +508,7 @@ export function WorldMap({
               flat: n(summary.flat),
             })}
           </p>
-          {/* M11 — the four-option segmented control + M17's stale-copy line.
+          {/* M11 — the six-option segmented control + M17's stale-copy line.
            * 2026-10-20h owner round: the switch CENTRES under the summary
            * (it hugged the start edge before) and grew ~50% — 48px pills,
            * 18.7px words — because the owner asked for bigger and easier
@@ -502,8 +520,11 @@ export function WorldMap({
            * website" — this switch is now the SECTION's one period
            * control (the old five-option Daily|Weekly|Monthly|Quarterly|
            * Yearly radiogroup below the movers is retired); when the
-           * shell passes onPeriodChange, the same four lenses drive the
-           * verdict, movers, tiles and table. */}
+           * shell passes onPeriodChange, the same lenses drive the
+           * verdict, movers, tiles and table.
+           * 2026-10-27 owner round ("add five year and 3 months to all
+           * view points"): 3M (the stored chg3m) and 5Y (the job's
+           * Yahoo-10y-anchored chg5y) join — six lenses. */}
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
             <div
               role="radiogroup"
@@ -715,44 +736,56 @@ export function WorldMap({
                    * app's NORMAL horizon, 50% bigger than the old numbers
                    * ("add yearly performance and make it 50% bigger and
                    * easier to see"), triangle + signed percent in the
-                   * direction ink, emphasised when the map speaks 1Y. */}
+                   * direction ink. 2026-10-27 owner round ("add five year
+                   * and 3 months to all view points"): the hero FOLLOWS THE
+                   * SELECTED LENS — six horizons can never fit one
+                   * 14.5%-wide card as glyph rows (five cells ≈ 160px vs
+                   * the ~117px inner width), so every lens takes its turn
+                   * as the loud number: the map's tints, pins and summary
+                   * speak the selected period, and now every card's hero
+                   * number agrees. The 1Y directive is honoured exactly
+                   * whenever 1Y is selected; D/W/M keep their classic
+                   * compact cells below. */}
                   {(() => {
-                    const pct = r.pcts['1Y'];
+                    const pct = r.pcts[period];
                     const missing = pct === null;
-                    const yDir: 'u' | 'd' | null = missing || pct === 0 ? null : pct > 0 ? 'u' : 'd';
-                    const yTri =
-                      yDir === 'u' ? (
+                    const dir: 'u' | 'd' | null = missing || pct === 0 ? null : pct > 0 ? 'u' : 'd';
+                    const tri =
+                      dir === 'u' ? (
                         <path d="M5 1 9.5 9H.5z" />
-                      ) : yDir === 'd' ? (
+                      ) : dir === 'd' ? (
                         <path d="M.5 1h9L5 9z" />
                       ) : (
                         <rect x="0.5" y="3.5" width="9" height="3" rx="1" />
                       );
-                    const yi = yDir !== null ? `${inkMixOf(r.wts['1Y'])}%` : undefined;
+                    const yi = dir !== null ? `${inkMixOf(r.wts[period])}%` : undefined;
                     return (
-                      <span data-p="1Y" className={`wm-yrow${period === '1Y' ? ' sel' : ''}`}>
-                        <i className="wm-pl">{cellLabel['1Y']}</i>
-                        <b className={`wm-pv wm-yv${yDir !== null ? ` s-${yDir}` : ' s-x'}`} style={yi !== undefined ? { ['--i' as string]: yi } : undefined}>
+                      <span data-p={period} className="wm-yrow sel">
+                        <i className="wm-pl">{cellLabel[period]}</i>
+                        <b className={`wm-pv wm-yv${dir !== null ? ` s-${dir}` : ' s-x'}`} style={yi !== undefined ? { ['--i' as string]: yi } : undefined}>
                           {missing ? (
                             <bdi dir="ltr">—</bdi>
                           ) : (
                             <>
                               <svg className="wm-ar2" viewBox="0 0 10 10" aria-hidden="true" focusable="false" width="13" height="13">
-                                {yTri}
+                                {tri}
                               </svg>
-                              <bdi dir="ltr">{signedPct(pct, numberLocale, locale)}</bdi>
+                              <bdi dir="ltr">{heroPct(pct, numberLocale, locale)}</bdi>
                             </>
                           )}
                         </b>
                       </span>
                     );
                   })()}
-                  {/* The compact Day/Week/Month cells — the percent glyph
-                   * moved into the hero (and sr-only here): the glyph is
-                   * what made the old 12.5px values overrun their 35px
-                   * cells and run into each other. */}
+                  {/* The classic compact Day/Week/Month cells — the percent
+                   * glyph moved into the hero (and sr-only here): the glyph
+                   * is what made the old 12.5px values overrun their 35px
+                   * cells and run into each other. 2026-10-27: unchanged —
+                   * the 3M/1Y/5Y horizons surface through the hero row
+                   * above (the selected lens), keeping the card at its
+                   * tuned height. */}
                   <span className="wm-tri">
-                    {MAP_PERIODS.filter((p) => p !== '1Y').map((p) => {
+                    {(['1D', '1W', '1M'] as const satisfies readonly MapPeriod[]).map((p) => {
                       const pct = r.pcts[p];
                       const missing = pct === null;
                       const dir: 'u' | 'd' | null = missing || pct === 0 ? null : pct > 0 ? 'u' : 'd';

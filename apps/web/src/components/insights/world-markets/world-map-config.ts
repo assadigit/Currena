@@ -60,15 +60,18 @@ export const DEFAULT_PERIOD = '1D' as const;
 export const STALE_AFTER_DAYS = STALE_DAYS;
 export { OPEN_MAX_AGE_MIN };
 
-/** The map's four lenses (§M11's original Today | 1 month | 1 year trio
+/** The map's lenses (§M11's original Today | 1 month | 1 year trio
  * + the 2026-10-20f week; the 2026-10-20h owner round brings 1Y BACK to
  * the map — "add yearly performance" — so the switch speaks all four
  * horizons the stored contract carries). NOT the section switch's five:
  * the map speaks its own quieter control and never touches the section's
- * lens. */
-export type MapPeriod = '1D' | '1W' | '1M' | '1Y';
+ * lens. 2026-10-27 owner round ("add five year and 3 months to all view
+ * points"): 3M joins from the stored chg3m and 5Y from chg5y (the job's
+ * Yahoo 10y supplement anchors it) — six lenses, the SAME closed set the
+ * section switch and the prices board speak. */
+export type MapPeriod = '1D' | '1W' | '1M' | '3M' | '1Y' | '5Y';
 
-export const MAP_PERIODS: readonly MapPeriod[] = ['1D', '1W', '1M', '1Y'];
+export const MAP_PERIODS: readonly MapPeriod[] = ['1D', '1W', '1M', '3M', '1Y', '5Y'];
 
 /* ------------------------------------------------------------------ *
  * §4.2 — the flat band per period (percent change, display only)
@@ -85,9 +88,13 @@ export const MAP_THRESHOLDS: Record<MapPeriod, number> = {
   '1D': 0.1,
   '1W': 0.5,
   '1M': 1,
+  '3M': 2,
   /** 2026-10-20h: a ±3% year is an honestly flat year for a stock index
-   * (the band scales with the horizon, like the 1D/1W/1M ladder above). */
+   * (the band scales with the horizon, like the 1D/1W/1M ladder above).
+   * 2026-10-27: the ladder grows on — a ±5% five-year window is honest
+   * flatness for a stock index (the band keeps scaling with the horizon). */
   '1Y': 3,
+  '5Y': 5,
 };
 
 /** The colour direction of one reading (null = flat / no honest data —
@@ -170,8 +177,12 @@ export const MAP_INDICES: readonly MapIndexConfig[] = [
   // stoxx50 card above, the taiex/kospi cards right), every pin, label
   // anchor (in/hk/au stay clear) and leader line (the taiex line passes
   // 0.5% right of the Hang Seng card).
+  // 2026-10-27: Hang Seng drops to y 52 — the 84px cards left only a
+  // 4×5px corner intersection with the Stoxx 50 card at wider stages
+  // (environment-sensitive rendering exposed it); the extra 2% clears the
+  // pair vertically at every stage width with the leader line untouched.
   { id: 'nifty50', iso: '356', cc: 'in', band: 'float', card: { x: 60, y: 54 } },
-  { id: 'hsi', iso: '344', cc: 'hk', band: 'float', card: { x: 75, y: 50 } },
+  { id: 'hsi', iso: '344', cc: 'hk', band: 'float', card: { x: 75, y: 52 } },
   { id: 'ssec', iso: '156', cc: 'cn', band: 'top', card: { x: 75.5, y: 8.5 } },
   { id: 'taiex', iso: '158', cc: 'tw', band: 'right', card: { x: 90, y: 60 } },
   { id: 'kospi', iso: '410', cc: 'kr', band: 'right', card: { x: 91.5, y: 40 } },

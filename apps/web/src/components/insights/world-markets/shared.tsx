@@ -36,26 +36,28 @@ export type MarketsLoadState =
  * closed list.
  *
  * 2026-10-21 owner round ("unify the map time views with the other parts
- * of the website"): the SWITCH speaks the map's four lenses —
- * today | 1w | 1m | 1y — and '3m' retires as a SELECTABLE lens (it stays
- * in the type: the stored contract carries chg3m, the table's Trend
- * column and trendOf keep reading it; it is simply never the switch's
- * selection anymore). */
-export type MarketsView = 'today' | '1w' | '1m' | '3m' | '1y';
+ * of the website"): the SWITCH speaks the map's lenses — today | 1w | 1m |
+ * 1y — replacing the retired five-option radiogroup. 2026-10-27 owner
+ * round ("add five year and 3 months to all view points"): '3m' RETURNS
+ * as a selectable lens (the stored contract always carried chg3m) and
+ * '5y' joins from the job's Yahoo-10y-anchored chg5y — six lenses, the
+ * same closed set the map switch and the prices board speak. */
+export type MarketsView = 'today' | '1w' | '1m' | '3m' | '1y' | '5y';
 
 /** The localized period word for a lens — labels, aria sentences and the
  * movers' period caption all read it, so one mapping drives every
- * mention of "which period am I in". 2026-10-21 unification: the four
- * switch lenses speak the MAP's period words (today / this week /
- * this month / this year) so the verdict box, the movers, the tiles and
- * the map's own summary can never disagree; '3m' (never a switch lens
- * now) keeps the quarterly word for type completeness. */
+ * mention of "which period am I in". 2026-10-21 unification: the switch
+ * lenses speak the MAP's period words (today / this week / this month /
+ * this year) so the verdict box, the movers, the tiles and the map's own
+ * summary can never disagree; 2026-10-27: '3m' and '5y' speak the map's
+ * own period words too (every lens has exactly one word). */
 export function periodWord(view: MarketsView, copy: InsightsCopy): string {
   if (view === 'today') return copy.markets.map.periodWordToday;
   if (view === '1w') return copy.markets.map.periodWordWeek;
   if (view === '1m') return copy.markets.map.periodWordMonth;
-  if (view === '1y') return copy.markets.map.periodWordYear;
-  return copy.markets.viewQuarterly;
+  if (view === '3m') return copy.markets.map.periodWord3M;
+  if (view === '5y') return copy.markets.map.periodWord5Y;
+  return copy.markets.map.periodWordYear;
 }
 
 /* ------------------------------------------------------------------ *
@@ -115,6 +117,9 @@ export function viewValue(m: MarketEntry, view: MarketsView): { pct: number | nu
   if (view === '1m') {
     return m.chg1m === undefined ? { pct: null, arrow: 'flat' } : { pct: m.chg1m, arrow: bandedArrow(m.chg1m) };
   }
+  if (view === '5y') {
+    return m.chg5y === undefined ? { pct: null, arrow: 'flat' } : { pct: m.chg5y, arrow: bandedArrow(m.chg5y) };
+  }
   if (view === '1y') {
     return m.chg1y === undefined ? { pct: null, arrow: 'flat' } : { pct: m.chg1y, arrow: bandedArrow(m.chg1y) };
   }
@@ -156,7 +161,11 @@ export function tradingDaysBehind(asOf: string, freshest: string): number {
  * (owner round 44). The flat case keeps a stroke-ish text glyph — there is
  * no "flat" artwork (the same rule as Signals.tsx' estimation strip). The
  * icons are decorative: the signed number beside them carries the meaning,
- * so colour is never alone (§6.8). */
+ * so colour is never alone (§6.8). 2026-10-27 owner round ("write the
+ * positive indexes with more clear and bright green please a triangle
+ * showing up for green, and do the same for red, down and brighter red"):
+ * the index surfaces render the crisp DirTriangle below in the BRIGHT
+ * return inks; this artwork stays for any surface that has not migrated. */
 export function DirectionGlyph({ arrow, size = 14, desktopSize = 16 }: { arrow: 'up' | 'flat' | 'down'; size?: number; desktopSize?: number }) {
   if (arrow === 'up') return <IconImg src={DIRECTION_UP_URL} size={size} desktopSize={desktopSize} />;
   if (arrow === 'down') return <IconImg src={DIRECTION_DOWN_URL} size={size} desktopSize={desktopSize} />;
@@ -164,6 +173,55 @@ export function DirectionGlyph({ arrow, size = 14, desktopSize = 16 }: { arrow: 
     <span aria-hidden="true" className="text-[0.8em] leading-none text-[var(--color-text-secondary)]">
       →
     </span>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * The 2026-10-27 owner round's BRIGHT return inks + triangles
+ *
+ * "write the positive indexes with more clear and bright green please a
+ * triangle showing up for green, and do the same for red, down and
+ * brighter red": every index-return surface (tiles, movers, the table's
+ * period columns, the verdict's breadth counts) renders the signed value
+ * in the vivid dedicated RETURN tokens — brighter and clearer than the
+ * status hues (which stay the calm state vocabulary) — with a crisp
+ * filled triangle: ▲ up-bright-green, ▼ down-bright-red, a dash bar for
+ * an exactly-zero reading. The ink and triangle follow the NUMBER'S OWN
+ * SIGN (the universal financial convention the owner asked for — a
+ * +0.5% day is a positive number in bright green), while the section's
+ * trend WORDS keep the honest ±1% band (audit F2/F3: a +0.3% day is a
+ * "flat" TREND even though its value is green). Direction is NEVER
+ * colour alone (§6.8): the sign and the triangle ride the same number.
+ * ------------------------------------------------------------------ */
+
+/** The sign of a signed reading — the ink/triangle basis (0/absent = flat). */
+export function signOf(pct: number | null): 'up' | 'flat' | 'down' {
+  if (pct === null || pct === 0) return 'flat';
+  return pct > 0 ? 'up' : 'down';
+}
+
+/** The bright return ink class for a signed reading. */
+export function returnToneClass(arrow: 'up' | 'flat' | 'down'): string {
+  if (arrow === 'up') return 'text-[var(--color-return-up)]';
+  if (arrow === 'down') return 'text-[var(--color-return-down)]';
+  return 'text-[var(--color-text-primary)]';
+}
+
+/** The crisp filled triangle — the same shapes the map's cards wear
+ * (wm-ar2), one component for every index surface. CurrentColor: the
+ * caller's ink class colours it. */
+export function DirTriangle({ dir, size = 10 }: { dir: 'up' | 'flat' | 'down'; size?: number }) {
+  if (dir === 'flat') {
+    return (
+      <svg viewBox="0 0 10 10" width={size} height={size} aria-hidden="true" focusable="false" className="shrink-0">
+        <rect x="0.5" y="3.5" width="9" height="3" rx="1" fill="currentColor" opacity="0.55" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 10 10" width={size} height={size} aria-hidden="true" focusable="false" className="shrink-0">
+      <path d={dir === 'up' ? 'M5 1 9.5 9H.5z' : 'M.5 1h9L5 9z'} fill="currentColor" />
+    </svg>
   );
 }
 

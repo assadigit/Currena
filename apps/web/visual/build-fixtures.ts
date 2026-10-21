@@ -680,16 +680,20 @@ const histories: unknown[] = [
   historyFor('vix', 40, 720, 17.8, 6),
   historyFor('au-cpi', 24, 1440, 3.9, 1.5), // quarterly → ~4 years back
   // 2026-10-21 owner round (the prices board's period switch): the four
-  // PRICE assets get DENSE daily series (721 points over 720 days — one
-  // point per calendar day) so every lens the switch speaks computes an
-  // honest window: the 1-day reference (pick(1)'s ±3-day tolerance) and
-  // the 7/30/365-day windows all land exactly on stored observations.
-  // (The old 40-point series spaced ~18 days apart could only answer the
-  // sparse-window honest "unavailable" — the switch deserved real data.)
-  historyFor('gold-usd', 721, 720, 3870.4, 900),
-  historyFor('silver-usd', 721, 720, 47.2, 9),
-  historyFor('brent', 721, 720, 74.5, 12),
-  historyFor('btc-usd', 721, 720, 91500, 24000),
+  // PRICE assets get DENSE daily series (one point per calendar day) so
+  // every lens the switch speaks computes an honest window: the 1-day
+  // reference (pick(1)'s ±3-day tolerance) and the 7/30/90/365-day windows
+  // all land exactly on stored observations. (The old 40-point series
+  // spaced ~18 days apart could only answer the sparse-window honest
+  // "unavailable" — the switch deserved real data.)
+  // 2026-10-27 owner round ("add five year and 3 months to all view
+  // points"): the series grow to 1,901 points over 1,900 days (~5.2
+  // years) — the 1,826-day 5-year window anchors with margin, mirroring
+  // the widened PUBLIC_HISTORY_WINDOW_DAYS the route now serves.
+  historyFor('gold-usd', 1901, 1900, 3870.4, 900),
+  historyFor('silver-usd', 1901, 1900, 47.2, 9),
+  historyFor('brent', 1901, 1900, 74.5, 12),
+  historyFor('btc-usd', 1901, 1900, 91500, 24000),
 ];
 
 /* ------------------------------------------------------------------ *
@@ -795,6 +799,13 @@ function buildMarkets(): { markets: MarketEntry[]; summary: Record<string, unkno
       // never a guess).
       chg1w: Math.round((chg3m / 13) * 100) / 100,
       chg1y: Math.round(chg3m * 3.2 * 10) / 10,
+      // 2026-10-27 owner round ("add five year and 3 months to all view
+      // points"): the synthetic 5-year lens joins (chg3m × 7.5 — a
+      // plausible five-year compounding of the quarterly move) so the
+      // visual page exercises the new switch lens, card cells, table
+      // column and CSV export with numbers, like production rows (the
+      // contract keeps it optional — a missing lens renders a dash).
+      chg5y: Math.round(chg3m * 7.5 * 10) / 10,
       chg3m,
       high52w,
       low52w,

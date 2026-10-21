@@ -115,7 +115,7 @@ const env = (kv: FakeKV): { RATES: KVLike; EODHD_API_TOKEN?: string } => ({
 });
 
 describe('runScheduledMarkets — the 24-hour budget', () => {
-  it('main run: first-ever population writes once, ~16 provider calls, ≤50 subrequests', async () => {
+  it('main run: first-ever population writes once, ~31 provider calls (the chg5y supplements included), ≤50 subrequests', async () => {
     const kv = new FakeKV();
     const world = makeWorld();
     const result = await runScheduledMarkets(env(kv), 'main', {
@@ -124,9 +124,14 @@ describe('runScheduledMarkets — the 24-hour budget', () => {
     });
     expect(result.wroteSnapshot).toBe(true);
     expect(result.nothingToStore).toBe(false);
-    // 15 EODHD markets + FTSE's guaranteed Yahoo fallback.
-    expect(world.calls.length).toBe(16);
+    // 15 EODHD markets + FTSE's guaranteed Yahoo fallback + the 2026-10-27
+    // chg5y supplements: every EODHD winner makes ONE extra Yahoo call for
+    // its 5-year anchor (the one-year EODHD window can never carry it) —
+    // 15 + 1 + 15 = 31 provider calls. FTSE's winner is already Yahoo, so
+    // it needs no supplement.
+    expect(world.calls.length).toBe(31);
     expect(world.calls.filter((c) => c.provider === 'eodhd').length).toBe(15);
+    expect(world.calls.filter((c) => c.provider === 'yahoo').length).toBe(16);
     expect(kv.ops.writes).toBe(1);
     // Subrequest ceiling: every provider call is one subrequest.
     expect(world.calls.length).toBeLessThanOrEqual(50);

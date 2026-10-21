@@ -117,18 +117,21 @@ import { PriceSparkline } from './PriceSparkline';
  * The board's period lenses — 2026-10-21 owner round ("add the same
  * option for prices in the prices section, for example oil silver gold
  * and bitcoin can be seen in different time formats by those toggle"):
- * the SAME four lenses the world map's switch speaks (Today | 1 week |
- * 1 month | 1 year). The trend row, the sparkline, the trend word and
- * the briefing all measure the SELECTED window — never a hardcoded
- * seven-day story beside a switch that says something else. The Today
- * lens rides the 1-day change (vs the previous stored observation,
- * price-stats' c1): a one-day window has no path to draw, so it shows
- * the signed change with its explicit basis instead of a sparkline.
+ * the SAME lenses the world map's switch speaks. The trend row, the
+ * sparkline, the trend word and the briefing all measure the SELECTED
+ * window — never a hardcoded seven-day story beside a switch that says
+ * something else. The Today lens rides the 1-day change (vs the previous
+ * stored observation, price-stats' c1): a one-day window has no path to
+ * draw, so it shows the signed change with its explicit basis instead of
+ * a sparkline.
+ * 2026-10-27 owner round ("add five year and 3 months to all view
+ * points"): '3m' (90 days) and '5y' (1826 days) join — six lenses, the
+ * same closed set the map's switch and the markets section speak.
  * ------------------------------------------------------------------ */
 
-export type PriceLens = 'today' | '1w' | '1m' | '1y';
+export type PriceLens = 'today' | '1w' | '1m' | '3m' | '1y' | '5y';
 
-export const PRICE_LENSES: readonly PriceLens[] = ['today', '1w', '1m', '1y'];
+export const PRICE_LENSES: readonly PriceLens[] = ['today', '1w', '1m', '3m', '1y', '5y'];
 
 /** The lens's own row label (the «X گذشته» family; Today for the daily
  * lens). */
@@ -136,6 +139,8 @@ function lensRowLabel(lens: PriceLens, copy: InsightsCopy): string {
   if (lens === 'today') return copy.ui.pastToday;
   if (lens === '1w') return copy.ui.past7days;
   if (lens === '1m') return copy.ui.change30dLabel;
+  if (lens === '3m') return copy.ui.past90days;
+  if (lens === '5y') return copy.ui.past5y;
   return copy.ui.stat1yChange;
 }
 
@@ -144,6 +149,8 @@ function lensSwitchLabel(lens: PriceLens, copy: InsightsCopy): string {
   if (lens === 'today') return copy.ui.pricePeriodToday;
   if (lens === '1w') return copy.ui.pricePeriodWeek;
   if (lens === '1m') return copy.ui.pricePeriodMonth;
+  if (lens === '3m') return copy.ui.pricePeriod3M;
+  if (lens === '5y') return copy.ui.pricePeriod5Y;
   return copy.ui.pricePeriodYear;
 }
 
@@ -153,6 +160,8 @@ function lensPeriodWord(lens: PriceLens, copy: InsightsCopy): string {
   if (lens === 'today') return copy.ui.sumPeriodToday;
   if (lens === '1w') return copy.ui.sumPeriod7d;
   if (lens === '1m') return copy.ui.sumPeriod30d;
+  if (lens === '3m') return copy.ui.sumPeriod3M;
+  if (lens === '5y') return copy.ui.sumPeriod5Y;
   return copy.ui.sumPeriod1y;
 }
 
@@ -189,10 +198,11 @@ function PriceIconBox({ id }: { id: IndicatorId }) {
 
 /** One tile's client-derived data: the bullet statistics + every lens's
  * window (the 2026-10-21 switch computes 1w/1m/1y from the SAME stored
- * history — the Today lens reads price-stats' c1, no window needed). */
+ * history — the Today lens reads price-stats' c1, no window needed;
+ * the 2026-10-27 round adds the 3m/5y windows from the same series). */
 interface TileData {
   stats: TileStats;
-  trends: { '1w': TrendWindow | null; '1m': TrendWindow | null; '1y': TrendWindow | null };
+  trends: { '1w': TrendWindow | null; '1m': TrendWindow | null; '3m': TrendWindow | null; '1y': TrendWindow | null; '5y': TrendWindow | null };
 }
 
 /**
@@ -217,7 +227,9 @@ function useTileData(ids: readonly IndicatorId[]): Partial<Record<string, TileDa
             trends: {
               '1w': window7d(series),
               '1m': windowFor(series, PRICE_WINDOW_DAYS['1m']),
+              '3m': windowFor(series, PRICE_WINDOW_DAYS['3m']),
               '1y': windowFor(series, PRICE_WINDOW_DAYS['1y']),
+              '5y': windowFor(series, PRICE_WINDOW_DAYS['5y']),
             },
           };
           setDerived((prev) => (prev[id] ? prev : { ...prev, [id]: entry }));

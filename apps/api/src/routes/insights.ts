@@ -132,8 +132,14 @@ interface InsightsRouteDeps {
   now?: () => Date;
 }
 
-/** M-2: the public history window — the most recent 400 calendar days. */
-const PUBLIC_HISTORY_WINDOW_DAYS = 400;
+/** M-2 (RULES.md §3): the public history window — the most recent ~5.2
+ * calendar years. 2026-10-27 owner round ("add five year and 3 months to
+ * all view points"): the prices board's 5-year lens needs a reference
+ * close ~1826 days back, so the window grows from the old 400 days (the
+ * visible chart's default toggles) to 1900 — the anchor lands with ~74
+ * days of margin; the same L2 bounding discipline applies (see the
+ * /:id/history route below). */
+const PUBLIC_HISTORY_WINDOW_DAYS = 1900;
 
 /** M-5: the mode-set body contract. */
 const ModeSetBodySchema = z.object({ mode: z.enum(['public', 'private']) });
@@ -673,10 +679,13 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
     // M-2 (RULES.md §3): PUBLIC mode serves no bulk history for L2 sources —
     // ids whose audit level is L2 while publicDisplayOk is 'yes' (the owner
     // accepted public display: brent, gold-usd, silver-usd, btc-usd) are
-    // bounded to the most recent 400 CALENDAR days of points (the visible
-    // chart's default toggles). The response keeps the SAME shape — the
-    // client slices by range anyway — and the ETag is computed over the
-    // TRUNCATED payload, so a public ETag never matches a private one.
+    // bounded to the most recent ~5.2 CALENDAR years of points
+    // (PUBLIC_HISTORY_WINDOW_DAYS = 1900 — the 2026-10-27 round's 5-year
+    // lens needs the ~1826-day-back reference close; the old 400-day bound
+    // covered only the chart's default toggles). The response keeps the
+    // SAME shape — the client slices by range anyway — and the ETag is
+    // computed over the TRUNCATED payload, so a public ETag never matches
+    // a private one.
     let points = history.points;
     if (mode === 'public' && PUBLIC_BOUNDED_HISTORY_IDS.has(id)) {
       const lastDay = points[points.length - 1]![0];

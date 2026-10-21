@@ -38,6 +38,7 @@ import {
   BEAR_PCT,
   CHG1Y_ANCHOR_DAYS,
   CHG1Y_ANCHOR_TOLERANCE_DAYS,
+  CHG5Y_ANCHOR_DAYS,
   CHG_WINDOW_DAYS,
   CORRECTION_PCT,
   EXIT_BUFFER_PTS,
@@ -114,6 +115,25 @@ export function yearAgoAnchor(points: readonly SeriesPoint[]): SeriesPoint | und
   // earliest close, when it falls inside the tolerance band, is the anchor.
   const earliest = points[0]!;
   const target = epochDay(last.date) - CHG1Y_ANCHOR_DAYS;
+  const distance = epochDay(earliest.date) - target;
+  if (distance >= -CHG1Y_ANCHOR_TOLERANCE_DAYS && distance <= CHG1Y_ANCHOR_TOLERANCE_DAYS) return earliest;
+  return undefined;
+}
+
+/**
+ * The 5-year lens's anchor (2026-10-27 owner round): the latest close on or
+ * before 1826 days back, with the SAME tolerance-band fallback as the
+ * yearly anchor — when the series' first close falls inside the ±15-day band
+ * around the target date, it IS the anchor. A window that starts closer
+ * than (1826 − 15) days to the last close yields undefined → the row omits
+ * chg5y (the honest dash, never a guess).
+ */
+export function fiveYearAgoAnchor(points: readonly SeriesPoint[]): SeriesPoint | undefined {
+  const last = points[points.length - 1]!;
+  const strict = pointAtOrBefore(points, addDays(last.date, -CHG5Y_ANCHOR_DAYS));
+  if (strict !== undefined) return strict;
+  const earliest = points[0]!;
+  const target = epochDay(last.date) - CHG5Y_ANCHOR_DAYS;
   const distance = epochDay(earliest.date) - target;
   if (distance >= -CHG1Y_ANCHOR_TOLERANCE_DAYS && distance <= CHG1Y_ANCHOR_TOLERANCE_DAYS) return earliest;
   return undefined;
@@ -258,6 +278,12 @@ export function buildEntry(
   // omits the field (the honest dash, never a guess).
   const chg1y = pctChange(last.value, yearAgoAnchor(points)?.value);
 
+  // chg5y: vs the 5-year anchor (2026-10-27 owner round) — computed only
+  // when THIS series reaches that far back (a Yahoo range=10y winner does;
+  // the EODHD free window never does — the job's long-series supplement
+  // attaches it afterwards, see attachChg5y).
+  const chg5y = pctChange(last.value, fiveYearAgoAnchor(points)?.value);
+
   // 52-week window: closes within the last 365 calendar days.
   const windowStart = addDays(last.date, -365);
   const window = points.filter((p) => p.date >= windowStart);
@@ -284,6 +310,7 @@ export function buildEntry(
     ...(chg1m !== null ? { chg1m: round2(chg1m) } : {}),
     chg3m: round2(chg3m),
     ...(chg1y !== null ? { chg1y: round2(chg1y) } : {}),
+    ...(chg5y !== null ? { chg5y: round2(chg5y) } : {}),
     high52w: round2(high),
     low52w: round2(low),
     fromHigh: round2(Math.min(0, ((last.value - high) / high) * 100)),
@@ -369,6 +396,38 @@ export function resolveMarket(
   }
 
   return { id, entry: buildEntry(id, primary, prev, runDate, runTimeIso), held: false, notes };
+}
+
+/**
+ * The job's 5-year supplement (2026-10-27 owner round): attach chg5y to a
+ * built entry from a LONG provider series (Yahoo range=10y) when the
+ * winning series could not anchor it (the EODHD free window is one year).
+ * The anchor is resolved against the ROW's asOf — the last close of the
+ * long series on/before (asOf − 1826 days), with the same ±15-day
+ * tolerance fallback — and the change is measured from the row's OWN close
+ * (the value every other field on the row already speaks), so the supplement
+ * can never shift the row's basis. Pure: no anchor → the entry returns
+ * UNCHANGED (the honest absence, never a guess); a failed supplement call
+ * is the job's fault-isolation concern, not this function's.
+ */
+export function attachChg5y(entry: MarketEntry, longPoints: readonly SeriesPoint[]): MarketEntry {
+  if (entry.chg5y !== undefined) return entry;
+  const strict = pointAtOrBefore(longPoints, addDays(entry.asOf, -CHG5Y_ANCHOR_DAYS));
+  let anchor: SeriesPoint | undefined = strict;
+  if (anchor === undefined && longPoints.length > 0) {
+    // The long window starts inside the ±15-day band around the target date:
+    // its earliest close IS the anchor (the yearly-anchor convention).
+    const earliest = longPoints[0]!;
+    const target = epochDay(entry.asOf) - CHG5Y_ANCHOR_DAYS;
+    const distance = epochDay(earliest.date) - target;
+    if (distance >= -CHG1Y_ANCHOR_TOLERANCE_DAYS && distance <= CHG1Y_ANCHOR_TOLERANCE_DAYS) {
+      anchor = earliest;
+    }
+  }
+  if (anchor === undefined) return entry;
+  const chg5y = pctChange(entry.close, anchor.value);
+  if (chg5y === null) return entry;
+  return { ...entry, chg5y: round2(chg5y) };
 }
 
 /* ------------------------------------------------------------------ *

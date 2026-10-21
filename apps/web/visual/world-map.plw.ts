@@ -637,7 +637,10 @@ test('farsi §9.6: Persian digits, true minus, percent glyph, unmirrored map', a
   expect(order).toEqual([...MAP_ORDER]);
   // The card's period captions carry the app's own Persian period words
   // (روزانه / هفتگی / ماهانه — priceChangeDaily & co; 2026-10-20h: the
-  // yearly hero rides FIRST with سالانه).
+  // yearly hero rides FIRST with سالانه. 2026-10-27: the hero follows the
+  // SELECTED lens — the default (today) opens with روزانه as the hero, so
+  // the check selects 1Y first to keep asserting the classic quartet).
+  await page.locator('.wm [role="radiogroup"] button').nth(4).click(); // 1 year
   const labels = await page.evaluate(() =>
     Array.from(document.querySelectorAll('.wm-card[data-id="sp500"] .wm-pl')).map((l) => l.textContent),
   );
@@ -694,11 +697,12 @@ test('farsi §9.6: Persian digits, true minus, percent glyph, unmirrored map', a
 });
 
 /* ------------------------------------------------------------------ *
- * 2026-10-20h owner round — the period switch: centred, four lenses,
- * ~50% bigger, and yearly drives the map like any other lens.
+ * 2026-10-20h owner round — the period switch: centred, ~50% bigger, and
+ * yearly drives the map like any other lens. 2026-10-27 owner round
+ * ("add five year and 3 months to all view points"): SIX lenses.
  * ------------------------------------------------------------------ */
 
-test('switch 2026-10-21: centred under the summary, four options, 15% smaller than the 2026-10-20h round', async ({ page }) => {
+test('switch 2026-10-27: centred under the summary, six options (3M and 5Y join), 15% smaller than the 2026-10-20h round', async ({ page }) => {
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
   const probe = await page.evaluate(() => {
     const wm = document.querySelector('.wm') as HTMLElement;
@@ -719,10 +723,11 @@ test('switch 2026-10-21: centred under the summary, four options, 15% smaller th
       centered: Math.round(Math.abs(gr.left - wr.left - (wr.right - gr.right))),
     };
   });
-  // Four lenses in horizon order, Today checked, one tab stop (roving).
-  expect(probe.labels).toEqual(['Today', '1 week', '1 month', '1 year']);
-  expect(probe.checked).toEqual(['true', 'false', 'false', 'false']);
-  expect(probe.tabbables).toEqual([0, -1, -1, -1]);
+  // Six lenses in horizon order (the 2026-10-27 round inserts 3 months
+  // before 1 year and appends 5 years), Today checked, one tab stop.
+  expect(probe.labels).toEqual(['Today', '1 week', '1 month', '3 months', '1 year', '5 years']);
+  expect(probe.checked).toEqual(['true', 'false', 'false', 'false', 'false', 'false']);
+  expect(probe.tabbables).toEqual([0, -1, -1, -1, -1, -1]);
   // 2026-10-21 owner round ("slightly reduce the size of this … like
   // 15%"): the 48px pills drop to 41px and the ~18.7px words to
   // caption × 1.27 ≈ 15.9px (the phone step: 37px / × 1.06 ≈ 13.3px).
@@ -734,11 +739,12 @@ test('switch 2026-10-21: centred under the summary, four options, 15% smaller th
   expect(probe.centered).toBeLessThanOrEqual(2);
   // 2026-10-21 unification: this switch is the SECTION's ONE period
   // control — the old five-option Daily…Yearly radiogroup is retired,
-  // and every radiogroup in the section is this one or the display switch.
+  // and every radiogroup in the section is this one or the display switch
+  // (2026-10-27: six period lenses now).
   const radios = await page.evaluate(() =>
     Array.from(document.querySelectorAll('#insights-markets [role="radio"]')).map((b) => b.textContent),
   );
-  expect(radios).toEqual(['Today', '1 week', '1 month', '1 year', 'List', 'Performance map']);
+  expect(radios).toEqual(['Today', '1 week', '1 month', '3 months', '1 year', '5 years', 'List', 'Performance map']);
 });
 
 test('switch 2026-10-20h: arrow keys rove focus + selection (the ARIA radiogroup pattern)', async ({ page }) => {
@@ -748,18 +754,24 @@ test('switch 2026-10-20h: arrow keys rove focus + selection (the ARIA radiogroup
   await page.keyboard.press('ArrowRight');
   await expect(grp.locator('button').nth(1)).toBeFocused();
   await expect(grp.locator('button').nth(1)).toHaveAttribute('aria-checked', 'true');
+  // 2026-10-27: the six-lens order — nth(3) is the NEW 3 months lens.
   await page.keyboard.press('ArrowRight');
+  await expect(grp.locator('button').nth(2)).toBeFocused(); // 1 month
   await page.keyboard.press('ArrowRight');
-  await expect(grp.locator('button').nth(3)).toBeFocused(); // 1 year
-  await expect(grp.locator('button').nth(3)).toHaveAttribute('aria-checked', 'true');
-  // Wrap: ArrowRight from the last lands on Today again.
+  await expect(grp.locator('button').nth(3)).toBeFocused(); // 3 months (the new lens)
+  await page.keyboard.press('ArrowRight');
+  await expect(grp.locator('button').nth(4)).toBeFocused(); // 1 year
+  await expect(grp.locator('button').nth(4)).toHaveAttribute('aria-checked', 'true');
+  // Wrap: ArrowRight through 5 years (the last) lands on Today again.
+  await page.keyboard.press('ArrowRight');
+  await expect(grp.locator('button').nth(5)).toBeFocused(); // 5 years (the new lens)
   await page.keyboard.press('ArrowRight');
   await expect(grp.locator('button').first()).toBeFocused();
   await expect(grp.locator('button').first()).toHaveAttribute('aria-checked', 'true');
   // ArrowLeft walks back and keeps the rove symmetric.
   await page.keyboard.press('ArrowLeft');
-  await expect(grp.locator('button').nth(3)).toBeFocused();
-  await expect(page.locator('.wm p')).toContainText('this year');
+  await expect(grp.locator('button').nth(5)).toBeFocused();
+  await expect(page.locator('.wm p')).toContainText(/over the past 5 years/);
 });
 
 test('switch 2026-10-20h: 1 year drives the whole map — summary, tints, pins, hero emphasis', async ({ page }) => {
@@ -767,7 +779,7 @@ test('switch 2026-10-20h: 1 year drives the whole map — summary, tints, pins, 
   // The fixture's 1Y lens: 8 up, 7 down, 1 flat (FTSE −2.9 inside the
   // ±3 flat band); SSEC flips from today's rise to the year's fall.
   await expect(page.locator('.wm p')).toContainText('today');
-  await page.locator('.wm [role="radiogroup"] button').nth(3).click();
+  await page.locator('.wm [role="radiogroup"] button').nth(4).click(); // 1 year (six-lens order)
   await expect(page.locator('.wm p')).toContainText('8 of 16 markets up this year');
   await expect(page.locator('.wm p')).toContainText('7 down');
   await expect(page.locator('.wm p')).toContainText('1 flat');
@@ -794,11 +806,56 @@ test('switch 2026-10-20h: 1 year drives the whole map — summary, tints, pins, 
   expect(heroes.ibov).toContain('−45.4%');
   // The compact cells keep their own lens emphasis OFF (1Y is selected).
   expect(await page.evaluate(() => document.querySelectorAll('.wm-cell.sel').length)).toBe(0);
-  // Back to Today: the summary follows, no reload, no network.
+  // Back to Today: the summary follows, no reload, no network. The hero
+  // (2026-10-27: it follows the SELECTED lens) becomes the daily number
+  // on every card, and the classic D cell regains its sel emphasis.
   await page.locator('.wm [role="radiogroup"] button').first().click();
   await expect(page.locator('.wm p')).toContainText('markets up today');
-  expect(await page.evaluate(() => document.querySelectorAll('.wm-yrow.sel').length)).toBe(0);
+  const heroToday = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('.wm-yrow')).map((h) => (h as HTMLElement).dataset.p),
+  );
+  expect(heroToday.every((p) => p === '1D')).toBe(true);
   expect(await page.evaluate(() => document.querySelectorAll('.wm-cell.sel').length)).toBe(16);
+});
+
+/* ------------------------------------------------------------------ *
+ * 2026-10-27 owner round ("add five year and 3 months to all view
+ * points"): the two NEW lenses drive the map like every other one —
+ * the summary's period word, the card cells and the whole section.
+ * ------------------------------------------------------------------ */
+
+test('switch 2026-10-27: the 3-month and 5-year lenses drive the whole map — summary word, hero, section', async ({ page }) => {
+  await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
+  // 3 months: the summary line speaks the new period word and every
+  // card's HERO becomes the 3M value (the hero follows the selected
+  // lens — the 2026-10-27 design: six horizons take turns as the loud
+  // number; the fixture's chg3m answers).
+  await page.locator('.wm [role="radiogroup"] button').nth(3).click(); // 3 months
+  await expect(page.locator('.wm p')).toContainText(/of 16 markets up over the past 3 months/);
+  const hero3m = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('.wm-yrow')).map((h) => (h as HTMLElement).dataset.p),
+  );
+  expect(hero3m.length).toBe(16);
+  expect(hero3m.every((p) => p === '3M')).toBe(true);
+  // The section's verdict breadth line names the SAME period word.
+  await expect(page.locator('#insights-markets')).toContainText(/over the past 3 months/);
+
+  // 5 years: the fixture's chg5y (chg3m × 7.5) answers; every hero
+  // carries the 5Y value and the honest ≥100 integer rule keeps wide
+  // values inside the 14.5% card ("−107%", never "−107.0%").
+  await page.locator('.wm [role="radiogroup"] button').nth(5).click(); // 5 years
+  await expect(page.locator('.wm p')).toContainText(/of 16 markets up over the past 5 years/);
+  const hero5y = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('.wm-yrow')).map((h) => (h as HTMLElement).dataset.p),
+  );
+  expect(hero5y.length).toBe(16);
+  expect(hero5y.every((p) => p === '5Y')).toBe(true);
+  await expect(page.locator('#insights-markets')).toContainText(/over the past 5 years/);
+  // Ibovespa's fixture 5Y is −107 → the compact integer hero value.
+  const ibovHero = await page.evaluate(
+    () => (document.querySelector('.wm-card[data-id="ibov"] .wm-yv bdi') as HTMLElement).textContent ?? '',
+  );
+  expect(ibovHero).toContain('−107%');
 });
 
 /* ------------------------------------------------------------------ *
@@ -818,13 +875,18 @@ test('state §9.8: all up', async ({ page }) => {
       m.chg1w = 3.1;
       m.chg1m = 6.5;
       m.chg1y = 9.4;
+      // 2026-10-27: the two new lenses join the all-up mock so every
+      // triangle (hero + FIVE cells per card) speaks the same direction.
+      m.chg3m = 4.6;
+      m.chg5y = 18.2;
     }
   });
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
   await expect(page.locator('.wm p')).toContainText('16 of 16 markets up today');
   const steps = await page.evaluate(() => Array.from(document.querySelectorAll('.wm-card')).map((c) => c.classList.contains('s-u')));
   expect(steps.every(Boolean)).toBe(true);
-  // The hero + the cells' triangles all point up.
+  // The hero + the cells' triangles all point up — 4 per card (the
+  // selected-lens hero + the D/W/M triplet, the 2026-10-27 layout).
   const tris = await page.evaluate(() =>
     Array.from(document.querySelectorAll('.wm-card .wm-pv.s-u .wm-ar2 path')).map((p) => (p as SVGPathElement).getAttribute('d')),
   );
@@ -839,6 +901,9 @@ test('state §9.8: all down', async ({ page }) => {
       m.chg1m = -6.5;
       m.chg1w = -3.1;
       m.chg1y = -9.4;
+      // 2026-10-27: the two new lenses join the all-down mock.
+      m.chg3m = -4.6;
+      m.chg5y = -18.2;
     }
   });
   await gotoInsights(page, { width: 1280, lang: 'en', theme: 'light' });
@@ -846,7 +911,7 @@ test('state §9.8: all down', async ({ page }) => {
   await expect(page.locator('.wm p')).toContainText('16 down');
   const steps = await page.evaluate(() => Array.from(document.querySelectorAll('.wm-card')).map((c) => c.classList.contains('s-d')));
   expect(steps.every(Boolean)).toBe(true);
-  // The hero + the cells' triangles all point down.
+  // The hero + the cells' triangles all point down — 4 per card.
   const tris = await page.evaluate(() =>
     Array.from(document.querySelectorAll('.wm-card .wm-pv.s-d .wm-ar2 path')).map((p) => (p as SVGPathElement).getAttribute('d')),
   );
@@ -1233,8 +1298,9 @@ test('unified 2026-10-21: the map\'s switch drives the whole section — verdict
   // period words everywhere: the verdict's breadth line, the movers'
   // caption and the tiles' values all read the 1-day lens.
   await expect(page.locator('#insights-markets')).toContainText('today performance');
-  // Switch to 1 year at the map's control: every surface re-reads chg1y.
-  await page.locator('.wm [role="radiogroup"] button').nth(3).click();
+  // Switch to 1 year at the map's control (six-lens order — nth(4)):
+  // every surface re-reads chg1y.
+  await page.locator('.wm [role="radiogroup"] button').nth(4).click();
   await expect(page.locator('#insights-markets')).toContainText('this year performance');
   // The movers re-rank from chg1y: Ibovespa's −45.4 is the year's
   // biggest fall.

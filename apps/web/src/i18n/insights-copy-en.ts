@@ -1468,12 +1468,21 @@ export const insightsCopyEn = {
     pricePeriodWeek: '1 week',
     pricePeriodMonth: '1 month',
     pricePeriodYear: '1 year',
+    /** 2026-10-27 owner round ("add five year and 3 months to all view
+     * points"): the two new lenses' switch words — the SAME wording the
+     * map's own switch speaks (markets.map.period3M / period5Y). */
+    pricePeriod3M: '3 months',
+    pricePeriod5Y: '5 years',
     // The {period} words the briefing templates and the sparkline aria
     // interpolate (one per lens — "over the past seven days" / "today").
     sumPeriod7d: 'over the past seven days',
     sumPeriod30d: 'over the past 30 days',
     sumPeriod1y: 'over the past year',
     sumPeriodToday: 'today',
+    /** 2026-10-27: the new lenses' briefing phrases (the {period} the
+     * templates interpolate — the SAME wording family as above). */
+    sumPeriod3M: 'over the past 3 months',
+    sumPeriod5Y: 'over the past 5 years',
     trendUp: 'Recent movement has been upward',
     trendDown: 'Recent movement has been downward',
     trendRange: 'Recent movement has been mostly range-bound',
@@ -1499,6 +1508,11 @@ export const insightsCopyEn = {
     moreDetails: 'More details',
     changesLabel: 'Changes',
     change30dLabel: 'Past 30 days',
+    /** 2026-10-27 owner round ("add five year and 3 months to all view
+     * points"): the 3-month and 5-year lenses' own row labels (the
+     * «X گذشته» family the other lenses already speak). */
+    past90days: 'Past 3 months',
+    past5y: 'Past 5 years',
     change90dLabel: 'Past 90 days',
     // 2026-10-25b (asset-cards polish, task §4/§6): the card header's
     // title + measurement-basis subtitle. The unit is VERIFIED against the
@@ -1959,6 +1973,10 @@ export const insightsCopyEn = {
     thMonth: '1 month',
     th3m: '3 months',
     thYear: '1 year',
+    /** 2026-10-27 owner round ("add five year and 3 months to all view
+     * points"): the full table's 5-year column (the job's
+     * Yahoo-10y-anchored chg5y). */
+    th5y: '5 years',
     thFromHigh: 'From 52-week high',
     thTrend: 'Trend',
     // v3 UI_SPEC §7a (2026-10-20, UI-27): the state column's header — the
@@ -2003,6 +2021,10 @@ export const insightsCopyEn = {
     csvColMonth: '1 month %',
     csvColYear: '1 year %',
     csvCol3m: '3 months %',
+    /** 2026-10-27 owner round ("add five year and 3 months to all view
+     * points"): the 5-year export column (appended at the END, after the
+     * 1-year column — see markets-csv.ts's stable-order note). */
+    csvCol5y: '5 years %',
     csvColFromHigh: 'From 52-week high %',
     csvColTrend: 'Trend',
     csvColStatus: 'Status',
@@ -2026,11 +2048,20 @@ export const insightsCopyEn = {
       /** 2026-10-20h owner round: yearly returns to the map's switch (the
        * stored contract's chg1y — the same wording as thYear above). */
       periodYear: '1 year',
+      /** 2026-10-27 owner round ("add five year and 3 months to all view
+       * points"): the two new lenses' switch words — the same wording as
+       * the th3m column and the 5-year column beside them. */
+      period3M: '3 months',
+      period5Y: '5 years',
       /** The summary line's period word ("markets up today / this week…"). */
       periodWordToday: 'today',
       periodWordWeek: 'this week',
       periodWordMonth: 'this month',
       periodWordYear: 'this year',
+      /** 2026-10-27: the new lenses' summary-line period words (the same
+       * "this X" family — a quarter/five-year span reads naturally). */
+      periodWord3M: 'over the past 3 months',
+      periodWord5Y: 'over the past 5 years',
       open: 'Open',
       closed: 'Closed',
       noData: 'No data',
@@ -2039,11 +2070,14 @@ export const insightsCopyEn = {
       stepFlat: 'Flat',
       stepRise: 'Rise',
       /** The card's period captions (2026-10-20f: Day/Week/Month side by
-       * side; 2026-10-20h: the yearly hero row joins above them). */
+       * side; 2026-10-20h: the yearly hero row joins above them;
+       * 2026-10-27: the 3M and 5Y cells join the compact row). */
       cellD: '1D',
       cellW: '1W',
       cellM: '1M',
       cellY: '1Y',
+      cell3M: '3M',
+      cell5Y: '5Y',
       /** The relative-scale legend's two ends (colour strength = move size). */
       legendMoreDown: 'Bigger fall',
       legendMoreUp: 'Bigger rise',

@@ -89,11 +89,22 @@ const snapshot: InsightsSnapshot = {
   ruleVersion: 2,
 };
 
-/** brent: 500 consecutive daily points → the public 400-day bound bites at 400. */
+/** brent: 500 consecutive daily points — under the public 1,900-day
+ * bound (2026-10-27: the window grew from 400 days so the prices board's
+ * 5-year lens can anchor ~1826 days back), so ALL of them serve publicly
+ * (the PRIVATE twin test below keeps using it for the full-series check). */
 const brentHistory: IndicatorHistory = {
   v: 1,
   id: 'brent',
   points: Array.from({ length: 500 }, (_, i) => [19000 + i, 60 + i * 0.1] as [number, number]),
+};
+/** brent's DEEP variant: 2,000 consecutive daily points → the public
+ * 1,900-day bound bites at 1,900 (the 2026-10-27 "add five year" round's
+ * window — the old 400-day fixture could no longer exercise the bound). */
+const brentDeepHistory: IndicatorHistory = {
+  v: 1,
+  id: 'brent',
+  points: Array.from({ length: 2000 }, (_, i) => [19000 + i, 60 + i * 0.1] as [number, number]),
 };
 const us10yHistory: IndicatorHistory = { v: 1, id: 'us10y', points: [[19723, 3.88], [19730, 3.97]] };
 
@@ -668,21 +679,34 @@ describe('M-4 the insights-data token bucket (120 burst / 60 per minute)', () =>
  * ==================================================================== */
 
 describe('M-2 the bounded PUBLIC history (L2-but-public-ok ids)', () => {
-  it('brent (L2 + public-ok) serves at most the most recent 400 calendar days in public mode; the tail matches', async () => {
+  it('brent (L2 + public-ok) serves at most the most recent 1,900 calendar days in public mode; the tail matches', async () => {
     const kv = makeKv();
     const store = new InMemoryInsightsStore();
-    await store.putHistory(brentHistory);
+    await store.putHistory(brentDeepHistory);
     const app = createApp({ makeInsightsReader: () => store });
     const publicEnv: Bindings = { RATES: kv.env, SITE_MODE: 'public' };
 
     const res = await app.request('/api/insights/brent/history', undefined, publicEnv);
     expect(res.status).toBe(200);
     const body = (await res.json()) as IndicatorHistory;
-    expect(body.points.length).toBe(400); // 500 consecutive days → exactly the last 400
-    expect(body.points[body.points.length - 1]).toEqual(brentHistory.points[499]); // the LAST point matches the private tail
-    expect(body.points[0]![0]).toBe(19499 - 399); // the window is calendar-day based
+    expect(body.points.length).toBe(1900); // 2,000 consecutive days → exactly the last 1,900
+    expect(body.points[body.points.length - 1]).toEqual(brentDeepHistory.points[1999]); // the LAST point matches the private tail
+    expect(body.points[0]![0]).toBe(20999 - 1899); // the window is calendar-day based
     // The ETag is computed over the TRUNCATED payload (a public ETag ≠ the private one).
-    expect(res.headers.get('etag')).toBe(`"insights-hist:brent:400:${brentHistory.points[499]![0]}"`);
+    expect(res.headers.get('etag')).toBe(`"insights-hist:brent:1900:${brentDeepHistory.points[1999]![0]}"`);
+  });
+
+  it('a public history SHORTER than the bound serves every point (the 2026-10-27 5-year-lens window never trims a small store)', async () => {
+    const kv = makeKv();
+    const store = new InMemoryInsightsStore();
+    await store.putHistory(brentHistory);
+    const app = createApp({ makeInsightsReader: () => store });
+    const publicEnv: Bindings = { RATES: kv.env, SITE_MODE: 'public' };
+    const res = await app.request('/api/insights/brent/history', undefined, publicEnv);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as IndicatorHistory;
+    expect(body.points.length).toBe(500);
+    expect(res.headers.get('etag')).toBe(`"insights-hist:brent:500:${brentHistory.points[499]![0]}"`);
   });
 
   it('PRIVATE mode keeps the FULL series for the same id (the bound is a public-mode behaviour)', async () => {

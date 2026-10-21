@@ -22,9 +22,10 @@ import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { MarketLogo } from './MarketLogo';
 import { topMovers, periodValueOf } from './briefing';
 import {
-  bandedArrow,
-  DirectionGlyph,
+  DirTriangle,
   periodWord,
+  returnToneClass,
+  signOf,
   signedPct,
   statusToneOf,
   statusWordKeyOf,
@@ -56,7 +57,8 @@ function MoverCard({
 }) {
   const marketCopy = copy.markets.entries[entry.id];
   const pct = periodValueOf(entry, view);
-  const arrow = pct === null ? null : bandedArrow(pct);
+  // 2026-10-27: sign-based bright ink + triangle (see shared.signOf).
+  const dir = signOf(pct);
   // The 52-week distance as quiet secondary context (§3.4): the same
   // status word + tone family every other surface wears.
   const atHigh = entry.fromHigh > -0.5;
@@ -74,7 +76,9 @@ function MoverCard({
       className="flex min-w-0 flex-col gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-4"
       aria-label={aria}
     >
-      <p className="m-0 text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)]">
+      {/* The card's own role label wears the calm valence ink (the value's
+       * ink follows the NUMBER's own direction — see the hero line below). */}
+      <p className={`m-0 text-[length:var(--type-caption)] font-bold uppercase tracking-wide ${toneClass}`}>
         {title}
       </p>
       <div className="flex min-w-0 items-center gap-3">
@@ -98,13 +102,22 @@ function MoverCard({
           </span>
         </span>
       </div>
-      {/* The selected-period signed return — the card's hero number. A
-       * missing lens reading renders the honest dash (never a fake 0). */}
-      <p className={`m-0 inline-flex items-center gap-1.5 text-[length:var(--type-number)] font-bold leading-none ${toneClass}`}>
+      {/* The selected-period signed return — the card's hero number, in
+       * the 2026-10-27 owner round's BRIGHT return ink with the crisp
+       * triangle ("write the positive indexes with more clear and bright
+       * green … a triangle showing up for green, and do the same for red,
+       * down and brighter red") — the ink follows the number's own SIGN.
+       * A missing lens reading renders the honest dash (never a fake 0).
+       * The gainer/decliner VALENCE stays on the card's title label above
+       * — a decliner card can still carry a bright green weekly number
+       * when that week rose. */}
+      <p className={`m-0 inline-flex items-center gap-1.5 text-[length:var(--type-number)] font-bold leading-none ${
+        dir === 'flat' ? 'text-[var(--color-text-primary)]' : returnToneClass(dir)
+      }`}>
         <bdi dir="ltr" className="type-number tabular-nums">
           {pct === null ? '—' : signedPct(pct, numberLocale, locale)}
         </bdi>
-        {arrow === null ? null : <DirectionGlyph arrow={arrow} size={16} desktopSize={18} />}
+        {pct === null ? null : <DirTriangle dir={dir} size={14} />}
       </p>
       {/* The quiet secondary line: the distance from the 52-week high —
        * a SEPARATE metric, never the period's return (§3.3). The signed

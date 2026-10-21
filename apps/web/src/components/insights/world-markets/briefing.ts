@@ -7,13 +7,15 @@
  * means.
  *
  * DATA TRUTH (handoff §"Data truth and scope boundaries", as amended by
- * round 47): the stored contract (MarketEntrySchema) carries FIVE return
- * horizons — chg1d, chg1w (optional), chg1m (optional), chg3m and chg1y
- * (optional, round 47). There is still NO YTD and no year-start date, and
- * the weekly series is chart-rounded, so no other horizon may ever be
- * derived in the frontend. PERIOD_VIEWS is therefore closed at five.
+ * round 47): the stored contract (MarketEntrySchema) carries SIX return
+ * horizons — chg1d, chg1w (optional), chg1m (optional), chg3m, chg1y
+ * (optional, round 47) and chg5y (optional, the 2026-10-27 "add five year
+ * and 3 months" round — anchored by the job's Yahoo 10y supplement).
+ * There is still NO YTD and no year-start date, and the weekly series is
+ * chart-rounded, so no other horizon may ever be derived in the frontend.
+ * PERIOD_VIEWS is therefore closed at six.
  *  - The 52-week-high distance (fromHigh) is a separate context metric,
- *    never a sixth period (02-ui-spec §3.3).
+ *    never a seventh period (02-ui-spec §3.3).
  *  - Every count and ranking reads RAW stored values, never rounded
  *    display strings: a −9.96% distance displays as −10% but is NOT
  *    "at least 10% below" (§3.2's rounding-boundary rule).
@@ -30,17 +32,20 @@ import { bandedArrow, viewValue, type MarketsView } from './shared';
 /**
  * The section's return-period lenses (02-ui-spec §3.3 as amended by round
  * 47). 2026-10-21 owner round ("unify the map time views with the other
- * parts of the website"): the list closes at the MAP's four — today,
+ * parts of the website"): the list closed at the MAP's four — today,
  * 1w, 1m, 1y — matching world-map-config's MAP_PERIODS exactly, because
- * the map's segmented control is now the section's ONE period switch
- * (the old five-option Daily|Weekly|Monthly|Quarterly|Yearly radiogroup
- * is retired). '3m' stays a valid MarketsView VALUE (the stored contract
- * carries chg3m; trendOf and the table's Trend column keep reading it)
- * but is no longer offered as a lens. Adding a horizon here without the
- * matching stored field would still fabricate data — the yearly lens
- * exists because round 47 added chg1y to the stored contract.
+ * the map's segmented control is now the section's ONE period switch (the
+ * old five-option Daily|Weekly|Monthly|Quarterly|Yearly radiogroup is
+ * retired). 2026-10-27 owner round ("add five year and 3 months to all
+ * view points"): '3m' returns as a selectable lens (the stored contract
+ * always carried chg3m — the table's Trend column and trendOf never
+ * stopped reading it) and '5y' joins from the job's Yahoo-10y-anchored
+ * chg5y — the six-lens closed set the map switch and the prices board
+ * speak. Adding a horizon here without the matching stored field would
+ * still fabricate data — the 5-year lens exists because this round added
+ * chg5y to the stored contract.
  */
-export const PERIOD_VIEWS: readonly MarketsView[] = ['today', '1w', '1m', '1y'];
+export const PERIOD_VIEWS: readonly MarketsView[] = ['today', '1w', '1m', '3m', '1y', '5y'];
 
 /** The raw selected-period return of one row, or null when the row does
  * not carry that lens yet (a pre-round-46 stored row without chg1w/chg1m)

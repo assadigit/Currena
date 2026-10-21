@@ -958,6 +958,10 @@ export type InsightsStatus = z.infer<typeof InsightsStatusSchema>;
  *              provider's one-year window starts inside the ±15-day year-ago
  *              anchor band, the earliest close IS the anchor — the repo's
  *              year-on-year rule) — OPTIONAL
+ *   chg5y    — last close vs the last close on/before the same date five
+ *              years earlier, percent (the 5-year lens, 2026-10-27 owner
+ *              round; anchored off the job's Yahoo range=10y supplement) —
+ *              OPTIONAL
  *   fromHigh — last close vs high52w, percent (always ≤ 0)
  *   rangePos — (last − low) ÷ (high − low) × 100
  *   trend    — vs the 50-day average: up > +1%, down < −1%, else flat
@@ -1051,6 +1055,17 @@ export const MarketEntrySchema = z.object({
    * dash. The next markets run rewrites every row with it.
    */
   chg1y: z.number().finite().optional(),
+  /**
+   * Last close vs the last close on/before the same date five years earlier,
+   * percent — the 5-year lens of the view switch (the 2026-10-27 "add 3
+   * months and 5 years to all view points" owner round). The anchor rule
+   * mirrors chg1y's (1826 days back, ±15-day tolerance band). OPTIONAL for
+   * back-compat: neither free provider's DEFAULT window reaches 5 years back
+   * (EODHD free = 1 year), so the field only lands when the job's long
+   * Yahoo range=10y supplement could anchor it — a row without it is a row
+   * without an honest reading, never a guess; the UI shows the dash.
+   */
+  chg5y: z.number().finite().optional(),
   /** Highest daily close in the last 365 days. */
   high52w: z.number().finite().positive(),
   /** Lowest daily close in the last 365 days. */

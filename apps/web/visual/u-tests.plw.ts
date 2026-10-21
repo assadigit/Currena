@@ -1004,11 +1004,13 @@ test('U-14 owner-only export is 401/403 without the owner token', async ({ reque
 
 /* ------------------------------------------------------------------ *
  * U-15 (2026-10-21 owner round) — the prices board's period switch:
- * the SAME four lenses the world map speaks (Today | 1 week | 1 month |
- * 1 year), one selection, every movement surface on every card follows.
+ * the SAME lenses the world map speaks, one selection, every movement
+ * surface on every card follows. 2026-10-27 owner round ("add five year
+ * and 3 months to all view points"): the switch grows to SIX lenses
+ * (Today | 1 week | 1 month | 3 months | 1 year | 5 years).
  * ------------------------------------------------------------------ */
 
-test('U-15 prices: the board\'s four-lens switch re-measures every card (trend, chart, word, briefing)', async ({ page }) => {
+test('U-15 prices: the board\'s six-lens switch re-measures every card (trend, chart, word, briefing)', async ({ page }) => {
   await page.setViewportSize({ width: 1200, height: 900 });
   await gotoInsights(page);
 
@@ -1016,9 +1018,12 @@ test('U-15 prices: the board\'s four-lens switch re-measures every card (trend, 
   // The switch renders centred above the grid, speaking the map's lenses.
   const grp = section.locator('[role="radiogroup"]');
   await expect(grp).toBeVisible();
-  await expect(grp.getByRole('radio')).toHaveCount(4);
+  await expect(grp.getByRole('radio')).toHaveCount(6);
   await expect(grp.getByRole('radio', { name: 'Today' })).toBeVisible();
   await expect(grp.getByRole('radio', { name: '1 year' })).toBeVisible();
+  // The two new lenses (2026-10-27) speak the same pill family.
+  await expect(grp.getByRole('radio', { name: '3 months' })).toBeVisible();
+  await expect(grp.getByRole('radio', { name: '5 years' })).toBeVisible();
   // The classic lens opens the board (the card's established primary story).
   await expect(grp.getByRole('radio', { name: '1 week' })).toHaveAttribute('aria-checked', 'true');
 
@@ -1040,6 +1045,19 @@ test('U-15 prices: the board\'s four-lens switch re-measures every card (trend, 
   await grp.getByRole('radio', { name: '1 year' }).click();
   await expect(section.locator('#insights-card-gold-usd')).toContainText('Past 1 year');
   await expect(section.locator('#insights-card-gold-usd')).toContainText(/over the past year/);
+
+  // 2026-10-27: switch to 3 months — the row label and the briefing's
+  // period phrase follow the 90-day window (fixture series are dense
+  // dailies, so the window anchors exactly).
+  await grp.getByRole('radio', { name: '3 months' }).click();
+  await expect(section.locator('#insights-card-gold-usd')).toContainText('Past 3 months');
+  await expect(section.locator('#insights-card-gold-usd')).toContainText(/over the past 3 months/);
+
+  // 2026-10-27: switch to 5 years — the 1,826-day window anchors on the
+  // deep fixture history (1,901 dense dailies ≈ 5.2 years).
+  await grp.getByRole('radio', { name: '5 years' }).click();
+  await expect(section.locator('#insights-card-gold-usd')).toContainText('Past 5 years');
+  await expect(section.locator('#insights-card-gold-usd')).toContainText(/over the past 5 years/);
 
   // Switch to Today: the row becomes the daily story with its explicit
   // basis, the sparkline and the trend word retire (a one-day window has

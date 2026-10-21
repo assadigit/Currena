@@ -214,7 +214,7 @@ describe('fetchEodhdSeries / fetchYahooSeries', () => {
     await expect(fetchEodhdSeries('ftse', { apiToken: 'k', fetchImpl })).rejects.toThrow(/no EODHD code/);
   });
 
-  it('sends the declared honest User-Agent to Yahoo and encodes the symbol (T-25/F-09; range=2y — round 47, kept through the v3 merge: the yearly anchor needs history beyond the strict 365-day mark)', async () => {
+  it('sends the declared honest User-Agent to Yahoo and encodes the symbol (T-25/F-09; range=10y — the 2026-10-27 "add five year" round: the chg5y anchor needs closes beyond the strict 1826-day mark, and a Yahoo WINNER carries the lens directly)', async () => {
     const calls: Array<{ url: string; headers: HeadersInit }> = [];
     const yahooBody = JSON.stringify({
       chart: { result: [{ timestamp: [1791552600], indicators: { quote: [{ close: [7811.54] }] } }] },
@@ -224,7 +224,7 @@ describe('fetchEodhdSeries / fetchYahooSeries', () => {
       return new Response(yahooBody, { status: 200 });
     }) as typeof fetch;
     await fetchYahooSeries('n225', { fetchImpl, baseUrl: 'https://yahoo.test/chart' });
-    expect(calls[0]!.url).toBe('https://yahoo.test/chart/%5EN225?range=2y&interval=1d');
+    expect(calls[0]!.url).toBe('https://yahoo.test/chart/%5EN225?range=10y&interval=1d');
     expect(new Headers(calls[0]!.headers as HeadersInit).get('user-agent')).toMatch(/CurrenaDashboard\/1\.0/);
   });
 });
@@ -653,32 +653,55 @@ describe('lastExpectedCloseDate / marketsNeedingData / retryRunOptions', () => {
 describe('runMarketsJob — the §3.4 chain with injected fetchers', () => {
   const good = (id: MarketId): MarketSeries => series(id, 'eodhd', '2026-10-12', MIN_CLOSES + 5);
   const goodYahoo = (id: MarketId): MarketSeries => series(id, 'yahoo', '2026-10-12', MIN_CLOSES + 5);
+  /** A deep Yahoo answer (~1,400 weekday closes ≈ 1,960 calendar days) — the
+   * range=10y shape the 2026-10-27 supplement expects: it spans the 5-year
+   * anchor with margin, so attachChg5y can land chg5y. */
+  const deepYahoo = (id: MarketId): MarketSeries => series(id, 'yahoo', '2026-10-12', 1400, (i) => 100 + i * 0.05);
 
-  it('happy path: one EODHD call per market, no Yahoo calls', async () => {
+  it('happy path: one EODHD call per market + the chg5y supplement per EODHD winner (2026-10-27)', async () => {
     const fetchers: MarketJobFetchers = {
       fetchEodhd: async (id) => good(id),
-      fetchYahoo: async (id) => {
-        throw new Error(`yahoo must not be called for ${id}`);
-      },
+      fetchYahoo: async (id) => deepYahoo(id),
     };
     const res = await runMarketsJob(fetchers, { kind: 'main', providerOrder: 'eodhd-first' }, undefined, RUN_DATE);
     expect(res.providerCalls.eodhd).toBe(16);
-    expect(res.providerCalls.yahoo).toBe(0);
+    // The 5-year lens supplement: every EODHD winner (all 16 — the EODHD
+    // window is one year) makes ONE extra Yahoo call for its chg5y anchor.
+    expect(res.providerCalls.yahoo).toBe(16);
     expect(res.resolutions.every((r) => !r.held)).toBe(true);
+    // The supplement actually attached the honest 5-year reading.
+    expect(res.resolutions.every((r) => r.entry?.chg5y !== undefined)).toBe(true);
+    expect(res.reports.every((r) => r.notes.join(' ').includes('chg5y'))).toBe(true);
   });
 
-  it('fallback: EODHD failing for one market is served by Yahoo (R4 too)', async () => {
+  it('fallback: EODHD failing for one market is served by Yahoo (R4 too); the supplement only calls for EODHD winners', async () => {
     const short = series('ftse', 'eodhd', '2026-10-12', 50); // under MIN_CLOSES → R4 rejection
     const fetchers: MarketJobFetchers = {
       fetchEodhd: async (id) => (id === 'ftse' ? short : good(id)),
-      fetchYahoo: async (id) => goodYahoo(id),
+      fetchYahoo: async (id) => (id === 'ftse' ? deepYahoo(id) : goodYahoo(id)),
     };
     const res = await runMarketsJob(fetchers, { kind: 'main', providerOrder: 'eodhd-first' }, undefined, RUN_DATE);
     const ftse = res.reports.find((r) => r.id === 'ftse')!;
     expect(ftse.usedSource).toBe('yahoo');
     expect(ftse.called).toEqual(['eodhd', 'yahoo']);
     expect(res.providerCalls.eodhd).toBe(16);
-    expect(res.providerCalls.yahoo).toBe(1);
+    // 15 supplements (the EODHD winners — whose Yahoo answers here are SHORT,
+    // so the supplement honestly finds no 5-year anchor and the field stays
+    // absent, fault-isolated) + FTSE's own fallback call = 16.
+    expect(res.providerCalls.yahoo).toBe(16);
+  });
+
+  it('a failed chg5y supplement is fault-isolated: the entry survives without the field', async () => {
+    const fetchers: MarketJobFetchers = {
+      fetchEodhd: async (id) => good(id),
+      fetchYahoo: async (id) => {
+        throw new ProviderError('yahoo', id, 'HTTP 429: limit');
+      },
+    };
+    const res = await runMarketsJob(fetchers, { kind: 'main', providerOrder: 'eodhd-first' }, undefined, RUN_DATE);
+    expect(res.resolutions.every((r) => !r.held)).toBe(true);
+    expect(res.resolutions.every((r) => r.entry?.chg5y === undefined)).toBe(true);
+    expect(res.reports.every((r) => r.notes.join(' ').includes('chg5y supplement failed'))).toBe(true);
   });
 
   it('total failure keeps the market held with honest notes (R7)', async () => {

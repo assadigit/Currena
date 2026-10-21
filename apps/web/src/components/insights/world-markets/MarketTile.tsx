@@ -16,10 +16,12 @@ import { formatAsOf } from '../HistoryChart';
 import { MarketLogo } from './MarketLogo';
 
 import {
-  DirectionGlyph,
+  DirTriangle,
   fmtClose,
   isOld,
   periodWord,
+  returnToneClass,
+  signOf,
   signedPct,
   signedPctOrDash,
   statusToneOf,
@@ -62,7 +64,11 @@ export function MarketTile({
   onToggle: (id: MarketId, opener: HTMLElement | null) => void;
 }) {
   const marketCopy = copy.markets.entries[entry.id];
-  const { pct, arrow } = viewValue(entry, view);
+  const { pct } = viewValue(entry, view);
+  // 2026-10-27: the VALUE's ink + triangle follow the number's own SIGN
+  // (the owner's bright-positive/bright-negative ask); the section's trend
+  // WORDS keep the honest ±1% band (audit F2/F3) — see signOf in shared.
+  const dir = signOf(pct);
   const old = isOld(entry, todayIso);
   const delayed = !old && tradingDaysBehind(entry.asOf, freshestIso) > 1;
   // Step-1 F5: EVERY tile shows its distance from the 52-week high
@@ -105,16 +111,20 @@ export function MarketTile({
           </span>
         </span>
       </span>
-      {/* The number + the owner's up/down artwork: the signed number
-       * carries the meaning, the green/red zigzags ride beside it (round
-       * 44) — direction is never colour alone (§6.8). Round 46: a lens the
-       * row does not carry yet shows the honest dash and no artwork —
-       * never a zero, never a guess. */}
-      <span className="inline-flex items-center gap-1 font-semibold text-[var(--color-text-primary)]">
+      {/* The number + the 2026-10-27 owner round's bright return ink and
+       * crisp triangle ("write the positive indexes with more clear and
+       * bright green please a triangle showing up for green, and do the
+       * same for red, down and brighter red"): the signed number carries
+       * the meaning in the vivid dedicated RETURN tokens — brighter than
+       * the calm status hues — with ▲ up / ▼ down / the exactly-zero dash
+       * bar; colour is never alone (§6.8). A lens the row does not carry
+       * yet shows the honest dash and no triangle — never a zero, never a
+       * guess. */}
+      <span className={`inline-flex items-center gap-1 font-semibold ${returnToneClass(dir)}`}>
         <bdi dir="ltr" className="type-number tabular-nums">
           {signedPctOrDash(pct, numberLocale, locale)}
         </bdi>
-        {pct === null ? null : <DirectionGlyph arrow={arrow} />}
+        {pct === null ? null : <DirTriangle dir={dir} size={11} />}
       </span>
       {/* Step-1 F5: the 52-week distance rides EVERY tile — the correcting
        * markets keep their warning tone; a market at its high says so. */}
