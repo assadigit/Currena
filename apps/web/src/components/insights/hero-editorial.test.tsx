@@ -80,7 +80,6 @@ function renderHero(copy: typeof insightsCopyEn | typeof insightsCopyFa, numberL
   return render(
     <HeroBlock
       readings={READINGS}
-      changedThisWeek={[]}
       copy={copy}
       numberLocale={numberLocale}
       onJumpSection={noop}
@@ -391,17 +390,17 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
     expect(rule!.textContent).toBe(insightsCopyEn.ui.verdictRule);
   });
 
-  it('round 4: AUSTRALIA closes with the SAME signals box — one bullet per area, worst first, raised ones with counts that jump to the section', () => {
+  it('round 4 → 2026-10-21c: AUSTRALIA closes with the SAME signals box — one bullet per area, worst first, raised ones NAMING their flagged indicators with live values; the click drills into the first flagged card', () => {
     const onJumpSection = vi.fn();
+    const onFocusCard = vi.fn();
     render(
       <HeroBlock
         readings={READINGS}
-        changedThisWeek={[]}
-        copy={insightsCopyEn}
+          copy={insightsCopyEn}
         numberLocale="en-US"
         onJumpSection={onJumpSection}
         onJumpAbout={noop}
-        onFocusCard={noop}
+        onFocusCard={onFocusCard}
       />,
     );
     const au = regionCards()[1]!;
@@ -414,7 +413,7 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
       insightsCopyEn.ui.australiaSignalsTitle,
     );
     // one bullet per gauge, worst first (the fixture: inflation step 4
-    // with 3 of 3 in warning, households step 3 with 2 of 3, trade step 0)
+    // with 3 flagged, households step 3 with 2, trade step 0)
     const rows = Array.from(panel!.querySelectorAll('[data-ei-area-step]')) as HTMLElement[];
     expect(rows.map((r) => r.getAttribute('data-ei-area-step'))).toEqual(['4', '3', '0']);
     const raised = rows.filter((r) => r.tagName === 'BUTTON');
@@ -422,14 +421,21 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
     expect(raised[0]!.getAttribute('data-ei-area-signal')).toBe('raised');
     expect(raised[0]!.textContent).toContain(insightsCopyEn.groupShort['au-inflation-rates']);
     expect(raised[0]!.textContent).toContain(insightsCopyEn.label.alarmed);
-    expect(raised[0]!.textContent).toContain('3 of 3');
+    // 2026-10-21c: the bullet NAMES the flagged indicators with their
+    // live values (not the n-of-m counts the lane headers repeat) —
+    // the first two flagged members plus an "and 1 more" tail.
+    expect(raised[0]!.textContent).toContain(insightsCopyEn.indicators['au-cpi'].name);
+    expect(raised[0]!.textContent).toContain(insightsCopyEn.indicators['au-trimmed-mean'].name);
+    expect(raised[0]!.textContent).toContain('4.4%');
+    expect(raised[0]!.textContent).toContain('and 1 more');
     expect(raised[1]!.textContent).toContain(insightsCopyEn.groupShort['au-households']);
     expect(raised[1]!.textContent).toContain(insightsCopyEn.label.stressed);
-    expect(raised[1]!.textContent).toContain('2 of 3');
-    // clicking a raised bullet jumps to the Australia section (the
-    // areas' lanes live there)
+    expect(raised[1]!.textContent).toContain(insightsCopyEn.indicators['au-home-loan'].name);
+    expect(raised[1]!.textContent).toContain(insightsCopyEn.indicators['au-wage-growth'].name);
+    // clicking a raised bullet drills into the area's first flagged
+    // card (additional data one tap away)
     fireEvent.click(raised[0]!);
-    expect(onJumpSection).toHaveBeenCalledWith('australia');
+    expect(onFocusCard).toHaveBeenCalledWith('au-cpi', expect.anything());
     // the unreadable area sits in the quiet ink, never a button
     const quiet = rows.filter((r) => r.tagName === 'SPAN');
     expect(quiet).toHaveLength(1);
@@ -443,8 +449,7 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
     render(
       <HeroBlock
         readings={globalOnly}
-        changedThisWeek={[]}
-        copy={insightsCopyEn}
+          copy={insightsCopyEn}
         numberLocale="en-US"
         onJumpSection={noop}
         onJumpAbout={noop}
@@ -465,8 +470,7 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
     render(
       <HeroBlock
         readings={READINGS}
-        changedThisWeek={[]}
-        copy={insightsCopyEn}
+          copy={insightsCopyEn}
         numberLocale="en-US"
         onJumpSection={noop}
         onJumpAbout={noop}
@@ -500,7 +504,7 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
     expect(auPanel!.querySelectorAll('[data-ei-area-step]')).toHaveLength(3);
   });
 
-  it('fa: the Australia signals box speaks Persian (heading, state words, fa digits)', () => {
+  it('fa: the Australia signals box speaks Persian (heading, state words, fa digits, named indicators)', () => {
     renderHero(insightsCopyFa, 'fa-IR');
     const au = regionCards()[1]!;
     const panel = au.querySelector('[data-ei-panel]') as HTMLElement | null;
@@ -511,9 +515,14 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
     expect(raised).toHaveLength(2);
     expect(raised[0]!.textContent).toContain(insightsCopyFa.groupShort['au-inflation-rates']);
     expect(raised[0]!.textContent).toContain(insightsCopyFa.label.alarmed);
-    // R22: fa renders ۳, not 3 — the counts go through num()
-    expect(raised[0]!.textContent).toContain('۳');
+    // R22 + 2026-10-21c: the named indicator and its value render in
+    // Persian (fa digits through num()/formatIndicatorValue), and the
+    // "and {n} more" tail speaks Persian too.
+    expect(raised[0]!.textContent).toContain(insightsCopyFa.indicators['au-cpi'].name);
+    expect(raised[0]!.textContent).toContain('۴٫۴٪');
+    expect(raised[0]!.textContent).toContain('و ۱ شاخص دیگر');
     expect(raised[0]!.textContent).not.toContain('3 of 3');
+    expect(raised[0]!.textContent).not.toContain('4.4%');
   });
 
   it('fa: the rule fallback (Global without feeds) still speaks Persian', () => {

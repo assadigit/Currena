@@ -295,13 +295,13 @@ describe('the merged balance law (UI-39/UI-40 on the v7 machinery)', () => {
     expect(counts.total).toBe(5);
   });
 
-  it('the tilt law: |net|/total × 8° with the 2° floor — superseding the retired 12° helper (owner v1–v7 law)', () => {
-    // 4 supporting vs 1 against of 5 → 3/5 × 8 = 4.8°
+  it('the tilt law (2026-10-21c owner round): |net|/(for+against) × 10° with the 3° floor — the directional-load share', () => {
+    // 4 supporting vs 1 against of 5 → net 3 over 5 directional → 0.6 × 10 = 6°
     const mostly = balanceCounts(
       driversOf(ALL.map((k, i) => [k, i === 4 ? ('against' as const) : ('for' as const)] as [SignalConditionKey, 'for' | 'against'])),
     );
-    expect(balanceTilt(mostly, BALANCE_LH_PX).angleDeg).toBeCloseTo(4.8, 10);
-    // all supporting → the 8-degree maximum, for side heavy (negative sign)
+    expect(balanceTilt(mostly, BALANCE_LH_PX).angleDeg).toBeCloseTo(6, 10);
+    // all supporting → the 10-degree maximum, for side heavy (negative sign)
     const allFor = balanceCounts(driversOf(ALL.map((k) => [k, 'for'] as [SignalConditionKey, 'for'])));
     expect(balanceTilt(allFor, BALANCE_LH_PX).angleDeg).toBe(BALANCE_MAX_ANGLE_DEG);
     expect(signedTiltDeg(balanceTilt(allFor, BALANCE_LH_PX))).toBe(-BALANCE_MAX_ANGLE_DEG);
@@ -319,13 +319,15 @@ describe('the merged balance law (UI-39/UI-40 on the v7 machinery)', () => {
       ]),
     );
     expect(balanceTilt(even, BALANCE_LH_PX)).toEqual({ angleDeg: 0, risePx: 0, endDropPx: 0, heavy: null });
-    // the constants: the v7 scale (8° max, 2° floor) — the 12° helper is retired
-    expect(BALANCE_MAX_ANGLE_DEG).toBe(8);
-    expect(BALANCE_MIN_ANGLE_DEG).toBe(2);
+    // the constants: the 2026-10-21c scale (10° max, 3° floor)
+    expect(BALANCE_MAX_ANGLE_DEG).toBe(10);
+    expect(BALANCE_MIN_ANGLE_DEG).toBe(3);
   });
 
   it('UI-40: fewer than 3 readable conditions keeps the beam LEVEL — the sparse rule rides the component (data-tilt 0 + the not-enough line; pinned in balance.test.tsx §9 and the U-09a visual)', () => {
-    // The pure law still yields the floor angle for a one-driver lean…
+    // The pure law still yields a full one-sided tilt for a one-driver
+    // lean (the 2026-10-21c directional scale: one item on one pan tips
+    // the whole way)…
     const scarce = balanceCounts(
       driversOf([
         ['real-yield', 'for'],
@@ -335,7 +337,7 @@ describe('the merged balance law (UI-39/UI-40 on the v7 machinery)', () => {
       ]),
     );
     expect(scarce.readable).toBe(1);
-    expect(signedTiltDeg(balanceTilt(scarce, BALANCE_LH_PX))).toBe(-BALANCE_MIN_ANGLE_DEG);
+    expect(signedTiltDeg(balanceTilt(scarce, BALANCE_LH_PX))).toBe(-BALANCE_MAX_ANGLE_DEG);
     // …but the COMPONENT refuses to weigh it (UI-40, BalanceScale's sparse
     // rule): readable < 3 → targetDeg 0 — the rendered pin lives in
     // balance.test.tsx §9 (data-tilt '0' + 'Not enough readable conditions

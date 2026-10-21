@@ -36,11 +36,29 @@ describe('the bundled indicator-audit sidecar', () => {
 });
 
 describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
-  it('is exactly the L2 sources the owner accepted for public display', () => {
-    // brent/gold-usd/silver-usd (Yahoo legs), btc-usd + eth-usd (EODHD,
-    // owner-accepted 2026-10-21) — the five L2-but-public ids per the audit
-    // sidecar today.
-    expect([...PUBLIC_BOUNDED_HISTORY_IDS].sort()).toEqual(['brent', 'btc-usd', 'eth-usd', 'gold-usd', 'silver-usd']);
+  it('is exactly the L2 sources that are public today (the 2026-10-21c licence round)', () => {
+    // brent/gold-usd/silver-usd (Yahoo legs), btc-usd (gold-api), the
+    // FRED citation-required set (display-permitted with "publisher via
+    // FRED" attribution — FRED legal read 2026-10-21: STLFSI/NFCI/VIX/
+    // T10Y2Y/T5YIFR/GACDFSA + the OECD bond/rate series), eth-usd retired
+    // 2026-10-21c. Fifteen L2-but-public ids per the audit sidecar today.
+    expect([...PUBLIC_BOUNDED_HISTORY_IDS].sort()).toEqual([
+      'boe-rate',
+      'boj-rate',
+      'breakeven-5y5y',
+      'brent',
+      'btc-usd',
+      'bund-10y',
+      'gilt-10y',
+      'gold-usd',
+      'jgb-10y',
+      'nfci',
+      'philly-fed',
+      'silver-usd',
+      'stress-stlfsi',
+      'vix',
+      'yield-curve-10y2y',
+    ]);
   });
 
   it('an L0 public id (us10y: DGS10, public domain) is never bounded', () => {
@@ -49,10 +67,16 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
     expect(PUBLIC_BOUNDED_HISTORY_IDS.has('us10y')).toBe(false);
   });
 
-  it('an L2 id that is NOT public-ok (vix) never appears publicly at all, so it is not in the bound set either', () => {
+  it('an L2 public id (vix: citation-required FRED, display-permitted 2026-10-21) joins the bounded set — its public history serves only the visible chart window', () => {
     const vix = INDICATOR_AUDIT_BY_ID.get('vix')!;
     expect(vix.level).toBe('L2');
-    expect(vix.publicDisplayOk).toBe('no');
-    expect(PUBLIC_BOUNDED_HISTORY_IDS.has('vix')).toBe(false);
+    expect(vix.publicDisplayOk).toBe('yes');
+    expect(PUBLIC_BOUNDED_HISTORY_IDS.has('vix')).toBe(true);
+    // A still-hidden L2 id (shiller-cape: ownerAccepts false) never
+    // appears publicly at all, so it is not in the bound set either.
+    const cape = INDICATOR_AUDIT_BY_ID.get('shiller-cape')!;
+    expect(cape.level).toBe('L2');
+    expect(cape.publicDisplayOk).toBe('no');
+    expect(PUBLIC_BOUNDED_HISTORY_IDS.has('shiller-cape')).toBe(false);
   });
 });

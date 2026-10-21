@@ -434,7 +434,6 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   // 2026-10-21 data-integrity round — the coverage additions' explicit legs
   // (the FRED-sourced ones resolve their legs from sourceRef tokens).
   platinum: ['world-bank'],
-  'eth-usd': ['eodhd'],
   'nzd-usd': ['frankfurter'],
   'us-nfp': ['fred:PAYEMS'],
   // 2026-10-21 fix: the two FX crosses carried source 'derived' with no

@@ -545,9 +545,9 @@ describe('copy dictionaries', () => {
       expect(insightsCopyFa.indicators[id]).toBeDefined();
       expect(insightsCopyFa.indicators[id]?.name.length).toBeGreaterThan(0);
     }
-    // The 2026-10-21 data-integrity round: the corpus grew to 66 and
-      // fa must carry every one of them.
-      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(66);
+    // The 2026-10-21c owner round: the eth-usd card retired — the
+    // corpus is 65 and fa must carry every one of them.
+      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(65);
   });
 
   // Fix spec T-07 (2026-10-15): the CI-side corpus scan — the ingest's

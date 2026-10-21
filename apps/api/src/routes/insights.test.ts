@@ -758,11 +758,31 @@ describe('PUBLIC mode — the public projection serve path', () => {
     expect(body.error.code).toBe('insights_not_ready');
   });
 
-  it('the fx board (no owner directive) answers 404 hidden_site_mode with zero data', async () => {
+  it('the FX board serves publicly (2026-10-21c owner directive) exactly like the markets twin — and answers 503 fx_not_ready when no snapshot is stored yet', async () => {
+    // The generated overrides file no longer declares 'fx' hidden — the
+    // owner restored the world currencies section (ECB reference rates
+    // via Frankfurter, terms verified 2026-10-21; the same rates the
+    // public converter displays). With no stored snapshot the calm
+    // "being prepared" answer is 503, NOT the licence refusal.
     const res = await makeApp().request('/api/insights/fx', undefined, env);
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(503);
     const body = (await res.json()) as { error: { code: string } };
-    expect(body.error.code).toBe('hidden_site_mode');
+    expect(body.error.code).toBe('fx_not_ready');
+    // With a stored snapshot, public mode serves it exactly like private
+    // mode (the standard cache stamps + the A-8 staleness re-evaluation).
+    const fxStore = new InMemoryFxStore();
+    const snap = await realisticFxSnapshot();
+    await fxStore.putFxIfChanged(snap, undefined);
+    const app = createApp({
+      makeInsightsReader: () => modePublicReader(),
+      makeFxReader: () => fxStore,
+      now: () => new Date('2026-10-13T12:00:00Z'),
+    });
+    const res2 = await app.request('/api/insights/fx', undefined, env);
+    expect(res2.status).toBe(200);
+    expect(res2.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
+    expect(res2.headers.get('etag')).toBe(`"insights-fx:${snap.generatedAt}"`);
+    expect(await res2.json()).toEqual(snap);
   });
 
   it('the MARKETS board serves publicly (2026-10-18b owner directive) with the standard cache stamps', async () => {
@@ -788,9 +808,12 @@ describe('PUBLIC mode — the public projection serve path', () => {
   });
 
   it("a hidden indicator's history is refused before any KV read (LR-02)", async () => {
-    // vix stays licence-hidden (Cboe copyright); brent/gold-usd/silver-usd/
-    // btc-usd are BACK in public mode since the 2026-10-19e owner directive.
-    const res = await makeApp().request('/api/insights/vix/history', undefined, env);
+    // shiller-cape stays owner-refused (ownerAccepts false, source
+    // kill-switched); vix is BACK in public mode since the 2026-10-21c
+    // licence round (citation-required FRED, display-permitted with the
+    // "Cboe via FRED" attribution — its public history is bounded to the
+    // chart window by the M-2 set).
+    const res = await makeApp().request('/api/insights/shiller-cape/history', undefined, env);
     expect(res.status).toBe(404);
     const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('hidden_site_mode');

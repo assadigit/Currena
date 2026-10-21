@@ -394,6 +394,12 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // sentiment scores and the card never presents the index as a signal.
     // The publisher's own description and attribution render beside the
     // data; the 0-100 scale is the publisher's (0 fear, 100 greed).
+    //
+    // 2026-10-21c owner round: the eth-usd context card (2026-10-21
+    // data-integrity round) is RETIRED — the owner's verdict: a second
+    // crypto price is not a market-stress indicator; this area keeps the
+    // FNG card as its only crypto context row (the prices board carries
+    // the crypto asset prices).
     id: 'crypto-fng',
     section: 'global',
     group: 'market-stress',
@@ -405,21 +411,6 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     phase: 'P2',
     rule: { kind: 'info' },
     staleAfterDays: 4,
-  },
-  {
-    // 2026-10-21 data-integrity round: the crypto market's second asset —
-    // a context row beside the FNG card (info rule; never a signal).
-    id: 'eth-usd',
-    section: 'global',
-    group: 'market-stress',
-    name: 'Ethereum price',
-    source: 'eodhd',
-    sourceRef: 'EODHD ETH-USD.CC daily close (the owner’s API key)',
-    cadence: 'daily',
-    changeKind: 'pct',
-    phase: 'P2',
-    rule: { kind: 'info' },
-    staleAfterDays: 3,
   },
   {
     // Step 3 L1-14 / FS-06 (v3, 2026-10-20): the Shiller CAPE — a published

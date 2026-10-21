@@ -85,8 +85,6 @@ export interface IngestRunOptions {
   stageKv?: KVLike;
   /** 'scheduled' (the Worker rung / the GHA cron) or 'manual' (a dispatch). */
   mode: 'scheduled' | 'manual';
-  /** The owner's EODHD token — the ETH leg (server-side only). */
-  eodhdApiToken?: string;
   /** Worker venue: skip the RBA CSV attempts (Akamai 403s them from CF egress). */
   skipRbaCsvTables?: boolean;
   /** Fetch + score, no writes (the manual runner's --dry-run). */
@@ -189,7 +187,6 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
   console.log(`mode=${opts.mode}${dryRun ? ' DRY-RUN (no KV writes)' : ''}\n`);
 
   const { inputs, reports } = await collectAllSources({
-    ...(opts.eodhdApiToken !== undefined ? { eodhdApiToken: opts.eodhdApiToken } : {}),
     ...(opts.skipRbaCsvTables !== undefined ? { skipRbaCsvTables: opts.skipRbaCsvTables } : {}),
   });
 

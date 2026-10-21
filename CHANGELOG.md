@@ -5,6 +5,125 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-21c] — the currencies section returns, the licence-hidden cards are restored on verified terms, and the balance/panel round (owner restoration)
+
+The owner's directive: "currena's insight used to have a full currency and
+pairs section, which was dedicated and detailed… they're all gone during the
+updates and upgrades, please revert and restore that section. but check it
+financially and logically. they must make sense, be real, with updated and
+real data." — plus four follow-up directives (retire the silver balance,
+fix the too-slow gold tilt, replace the count-repeating Australia signals
+bullets with real data, retire the weekly-event line, and restore the
+"Are markets nervous?" indicators — "only crypto/fear greed is relatable
+for this part").
+
+### Why the sections had vanished — and the licence fix
+
+The 2026-10-19 public-mode decree hid 28 indicators + the whole fx board
+behind the fail-closed licence gate. Three of the four blocking licence
+classes were re-verified TODAY (2026-10-21, each read verbatim in a real
+browser — the exact step the old evidence said was pending):
+
+- **ECB** (the Frankfurter FX legs + the DFR rate): the ECB "Disclaimer &
+  Copyright" page permits free use of website information when it appears
+  accurately, the ECB is cited as the source, modifications are stated
+  explicitly, and it is not sold without notice. Currena shows the
+  reference rates verbatim with ECB attribution; every derived number
+  (the dollar basket, gold-AUD) carries its own stated definition; the
+  same rates already power the public converter. → `publicDisplayOk: yes`.
+- **World Bank** (copper, platinum, iron-ore, copper-gold): the World Bank
+  Dataset Terms are CC BY 4.0 ("Unless specifically labeled otherwise…")
+  with the attribution format "The World Bank: Dataset name: Data source"
+  — now rendered on the cards. → `yes`.
+- **FRED citation-required** (STLFSI, NFCI, VIX, T10Y2Y, T5YIFR, the
+  Philadelphia Fed survey, the OECD Bund/JGB/Gilt/BoJ/BoE series): the
+  FRED legal page says of that class "you may use these data series with
+  proper attribution of the source and acknowledgment that you obtained
+  the data from FRED (example, 'Source: BLS via FRED') when displaying or
+  publishing it" — the reading attributions now carry the "publisher via
+  FRED" citation (e.g. "Cboe via FRED (VIXCLS)"). → `yes`.
+- **China PMI stays private** (hand-entered, publisher terms unread) and
+  **the Shiller pair stays owner-refused** (ownerAccepts false, source
+  kill-switched) — the generated hidden set is exactly
+  `[china-pmi, shiller-cape, shiller-ecy]`.
+
+The world-currencies board rides a dated owner directive
+(`OWNER_PUBLIC_BOARD_OVERRIDE.fx`, the 2026-10-18b markets pattern), the
+eth-usd owner override is retired with its card, and the T-15 gate
+(check-site-mode.mjs) now pins BOTH boards public with their evidence
+notes. The registry/audit/overrides files were regenerated: 65 indicators,
+3 hidden, `hiddenBoards: []`.
+
+### What came back
+
+- **The world currencies section** (10 ECB-reference pairs, 7 backtested
+  pattern rules — risk-off, carry, dollar strength, Europe worry, the
+  China link — the dollar-at-a-glance row, the quiet area, the pairs
+  table with per-pair detail panels): `/api/insights/fx` serves it
+  publicly, the SPA section renders (the bundle's own gating reads the
+  regenerated overrides file).
+- **"Are markets nervous?" gets its voters back**: STLFSI, NFCI, VIX,
+  the gold/silver ratio + the FNG context card — and the eth-usd price
+  card is RETIRED (the owner: a second crypto price is not a
+  market-stress indicator; the prices board carries crypto prices). The
+  definition, adapter leg, copy, schema id and owner override all went
+  with it (66 → 65 indicators).
+- **Borrowing costs / growth get their cards back** (the yield curve,
+  the ECB deposit rate, Bund/JGB/Gilt, the BoJ/BoE policy rates, the
+  5y5y breakeven, the Philadelphia Fed survey, copper, platinum,
+  iron-ore) — all with live, fetched data.
+- **The gold balance heals as a side-effect**: 3 of its 5 conditions were
+  reading 'unknown' because their inputs (breakeven, STLFSI/NFCI, the
+  dollar basket) were licence-hidden; with the inputs restored the
+  balance weighs real conditions again.
+
+### The balance round (gold's tilt, silver's retirement)
+
+- **Silver's balance is retired entirely** (the owner: "I dont need
+  balance scale of Silver, remove that section entirely") — the
+  `<BalanceScale metal="silver">` render, the `metal` prop, and the six
+  balanceSilver copy variants are gone; silver keeps its analysis card
+  (VerdictStrip) and its price-footing row.
+- **Gold's tilt reads the DIRECTIONAL load** (the owner: "the tilt of
+  balance for gold is too slow, currently one side has an item, other
+  doesn't have at all, but they are seemingly aligned"): the presentation
+  scale is now `|net| / (for + against) × 10°` clamped to [3°, 10°] — the
+  share of the pan load on the heavy side. A one-sided pan tips the beam
+  the whole way; a 2:1 majority tips ~6.7°; an even split stays level.
+  Neutral/unread conditions never sat on a pan, so they can no longer
+  damp the picture. The verdict words, counts and the UI-40 sparse rule
+  are untouched; the swing envelope, needle arc and stage geometry all
+  derive from the same constants.
+
+### The panel round
+
+- **The Australia signals bullets name the flagged indicators with their
+  live values** (the owner: the count-only bullets "only repeat the
+  fields which are just mentioned on the header") — "Inflation & rates ·
+  Critical — Australian prices vs a year ago 4.4% · Underlying inflation
+  4.4% and 1 more", the click drills into the first flagged card. Farsi
+  renders the same data in Persian digits («… · بحرانی — تغییر
+  قیمت‌ها… ۴٫۴٪ و ۱ شاخص دیگر»). The count sentence stays as the honest
+  fallback when no value is displayable.
+- **The hero's weekly-event line is retired** («رویداد این هفته: …») with
+  its two copy keys and the HeroBlock prop; the week's status changes
+  live on in the full data export + CSV (their own surfaces).
+
+### Gates
+
+- Tests: web 696, insights 533, core 191, api 335, markets 13, scraper
+  67 — all green; typecheck 6/6; lint 0 errors / 15 accepted advisories.
+- Copy: audit CLEAN (137 backfilled triages — the 2026-10-21 data-integrity
+  round's recovered fa copy was never triaged by that session — plus this
+  round's 2 new keys and the 2 shipped map-cell drifts; 8 retired keys
+  dropped from the manifest).
+- Bundle: the Insights lazy chunk is 757.01/182.41 kB — SMALLER than the
+  live deploy (761.20/185.13, itself already past the old 700/169 line
+  the deployed round never re-checked) — budget consciously bumped to
+  765/186 for the restored currencies section + the 12-card corpus.
+- T-15 (SITE_MODE=public): 3 indicators hidden, both world boards public
+  on their directives.
+
 ## [2026-10-20d] — the World card gets its picture: the owner's New York photo joins Sydney's band (owner round)
 
 The owner's directive: "Use this picture, turn it to webP, and use it for

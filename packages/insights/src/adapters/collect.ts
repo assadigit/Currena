@@ -21,7 +21,6 @@ import { providerFetchEnabled } from '../sources';
 import { ABS_SERIES, fetchAbsSeries } from './abs';
 import { fetchBitstampCloses } from './bitstamp';
 import { fetchEcbDfrSeries } from './ecb';
-import { EODHD_CRYPTO_SYMBOLS, fetchEodhdCryptoSeries } from './eodhd';
 import { fetchCryptoFng } from './fng';
 import { fetchFrankfurterSeries } from './frankfurter';
 import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredDecadeFrom } from './fred';
@@ -42,12 +41,6 @@ export interface CollectOptions {
   fxStart?: string;
   /** Bitstamp daily candles for the BTC cross-check. */
   bitstampCandles?: number;
-  /**
-   * EODHD API token (the OWNER's key — server-side only). The eth-usd card
-   * rides it; an absent token skips that fetch honestly (the card holds
-   * stale) rather than burning a doomed request.
-   */
-  eodhdApiToken?: string;
   /**
    * 2026-10-21 (data-integrity round): SKIP the RBA CSV-table attempts on
    * venues whose egress the Akamai edge 403s on those paths (Cloudflare
@@ -277,22 +270,10 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     fetchCryptoFng(),
   );
 
-  // EODHD crypto (2026-10-21 data-integrity round): the ETH daily close
-  // series — the owner's key, one call a day, verified live on the free
-  // plan. An absent token skips the fetch (the card holds stale honestly).
-  const ethSeries = opts.eodhdApiToken
-    ? await fetchLogged('eodhd', `${EODHD_CRYPTO_SYMBOLS.eth} daily closes`, () =>
-        fetchEodhdCryptoSeries(EODHD_CRYPTO_SYMBOLS.eth, opts.eodhdApiToken!),
-      )
-    : undefined;
-  if (!opts.eodhdApiToken) {
-    reports.push({
-      source: 'eodhd',
-      ok: false,
-      kind: 'disabled',
-      detail: `${EODHD_CRYPTO_SYMBOLS.eth}: skipped — no EODHD_API_TOKEN on this venue (the card holds its last good value)`,
-    });
-  }
+  // EODHD crypto (2026-10-21 data-integrity round): RETIRED with the
+  // eth-usd card (2026-10-21c owner round — a second crypto price is not a
+  // market-stress indicator; the prices board carries crypto prices). The
+  // markets worker's EODHD usage is untouched (the world-markets board).
 
   // Cross-checks (03-data-sources.md): independent sources must agree.
   if (bitstamp && btcSpot) {
@@ -334,7 +315,6 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
       hgSpot,
       cryptoFng,
       abs: absSeries,
-      eodhd: { eth: ethSeries },
       rba: {
         // The 2026-10-21 preference chain: the HTML decision table (the
         // Worker venue's reliable source, exact targets + change dates)

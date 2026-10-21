@@ -16,8 +16,9 @@
  *
  * The 2026-10-19 owner decree ("make it public") turned this check into a
  * REAL gate with a pass path: public mode passes only when the overrides
- * file hides exactly the non-'yes' audit set and the fx board — and keeps
- * the markets board public (2026-10-18b owner directive, key-pinned).
+ * file hides exactly the non-'yes' audit set — and keeps BOTH world boards
+ * public on their owner directives (markets 2026-10-18b, fx 2026-10-21c
+ * — the currencies-section restoration; both key-pinned below).
  *
  * Wired into apps/web's build: "build": "node ../../scripts/check-site-mode.mjs && vite build".
  */
@@ -67,10 +68,17 @@ if (!existsSync(overridesPath)) {
         failures.push(`${id} is hidden by site-mode-overrides.json but its audit verdict is 'yes' — the overrides file is stale (re-run the registry generator)`);
       }
     }
-    // The EODHD/Yahoo-backed world board with NO owner directive stays
-    // hidden: today that is the fx board (LR-02 still applies to it).
-    if (!hiddenBoards.has('fx')) {
-      failures.push('the world fx board (EODHD/Yahoo-backed, no owner directive) is not declared hidden in site-mode-overrides.json');
+    // 2026-10-21c owner directive: the world FX board (ECB reference rates
+    // via Frankfurter — the same rates the public converter displays; terms
+    // verified 2026-10-21) is PUBLIC again. It must never be re-hidden by a
+    // generator change without the owner saying so — and its directive note
+    // must ride in the file (the honest trail), exactly like the markets
+    // board's.
+    if (hiddenBoards.has('fx')) {
+      failures.push('the world fx board is hidden by site-mode-overrides.json — the 2026-10-21c owner directive (currencies-section restoration) keeps it PUBLIC; only the owner can re-hide it');
+    }
+    if (typeof boardDirectives.fx !== 'string' || boardDirectives.fx.length === 0) {
+      failures.push('the fx board is public but ownerBoardDirectives.fx is missing — the owner-directive evidence note must ride in the generated file');
     }
     // 2026-10-18b owner directive: the world MARKETS board is public again
     // (the owner's own EODHD key backs it). It must never be re-hidden by a
@@ -93,6 +101,6 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `[site-mode] T-15 passed — ${mustHide.length} indicator(s) + the fx board are hidden by site-mode-overrides.json; the markets board rides the 2026-10-18b owner directive; every displayed source is public-display-ok or owner-directed.`,
+  `[site-mode] T-15 passed — ${mustHide.length} indicator(s) hidden by site-mode-overrides.json; the markets board rides the 2026-10-18b owner directive and the fx board the 2026-10-21c restoration directive; every displayed source is public-display-ok or owner-directed.`,
 );
 process.exit(0);

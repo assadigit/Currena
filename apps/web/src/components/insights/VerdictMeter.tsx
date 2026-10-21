@@ -789,17 +789,46 @@ export function VerdictBlock({
               </>
             );
           }
-          /* Owner round 4: the AUSTRALIA signals box — the SAME
-           * construction as the world-signals panel (always open, the
-           * emphasized 15px bold type, the region's pale tint + step ink
-           * on the heading), but its bullets are the AREAS themselves:
-           * the raised ones speak their n-of-m counts and state word in
-           * their OWN step ink and jump to the section; the calm and
-           * unreadable ones sit in the quiet rows' muted ink. */
+          /* Owner round 4 → 2026-10-21c owner round: the AUSTRALIA signals
+           * box — the SAME construction as the world-signals panel (always
+           * open, the emphasized 15px bold type, the region's pale tint +
+           * step ink on the heading), but its RAISED bullets now carry
+           * ADDITIONAL DATA instead of repeating the area counts the lane
+           * headers below already state: each raised area names its
+           * flagged indicators with their live values ("CPI inflation
+           * 3.97% and 1 more") and drills into the first flagged card on
+           * click. The calm and unreadable areas keep their quiet rows'
+           * muted ink. When an area's warnings carry no displayable
+           * values the honest count sentence remains the fallback. */
           if (section === 'australia') {
             const rows = [...gaugeRows].sort((a, b) => b.step - a.step);
             const wordOf = (s: number) =>
               s === 4 ? copy.label.alarmed : s === 3 ? copy.label.stressed : s === 2 ? copy.label.cautious : copy.label.relaxed;
+            const byId = new Map(readings.map((r) => [r.id as string, r]));
+            const raisedDetailOf = (
+              gaugeId: string,
+            ): { list: string | null; focusId: IndicatorId | null } => {
+              const members = GAUGES.find((g) => g.id === gaugeId)?.members ?? [];
+              const flagged = members
+                .map((id) => byId.get(id))
+                .filter(
+                  (r): r is IndicatorReading & { value: number } =>
+                    r !== undefined && r.status === 'warning' && r.value !== null,
+                );
+              if (flagged.length === 0) return { list: null, focusId: null };
+              const shown = flagged.slice(0, 2);
+              const parts = shown.map((r) => {
+                const entry = copy.indicators[r.id as keyof typeof copy.indicators];
+                return `${entry.name} ${formatIndicatorValue(r.id, r.value, numberLocale, copy.units)}`;
+              });
+              let list = parts.join(' · ');
+              if (flagged.length > shown.length) {
+                list = `${list} ${interpolate(copy.ui.australiaSignalMore, {
+                  n: num(flagged.length - shown.length, numberLocale),
+                })}`;
+              }
+              return { list, focusId: flagged[0]!.id as IndicatorId };
+            };
             return (
               <div
                 className={`ei-panel-accent rounded-[var(--radius-md)] px-3.5 py-3 ring-1 ${tint}`}
@@ -821,27 +850,37 @@ export function VerdictBlock({
                       copy.groupShort[g.gauge as keyof typeof copy.groupShort] ??
                       copy.groups[g.gauge as keyof typeof copy.groups];
                     if (g.step >= 2) {
-                      /* The raised area — the markets bullet's shape:
-                       * "area · word: n of m indicators need attention",
-                       * the area's OWN step ink, clicking jumps to the
-                       * section where its lane lives. */
+                      /* The raised area — 2026-10-21c: the area's word plus
+                       * the NAMED flagged indicators with their live values
+                       * (data the lane headers do not repeat); the click
+                       * drills into the first flagged card. */
+                      const { list, focusId } = raisedDetailOf(g.gauge);
                       return (
                         <li key={g.gauge} className="flex items-start gap-1.5">
                           {BULLET_DOT}
                           <button
                             type="button"
-                            onClick={() => onJumpSection(section)}
+                            onClick={(e) => {
+                              if (focusId !== null) onFocusCard(focusId, e.currentTarget);
+                              else onJumpSection(section);
+                            }}
                             className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[0.9375rem] font-bold leading-relaxed transition-opacity hover:opacity-80 ${stepToneClass(g.step)}`}
                             data-ei-area-signal="raised"
                             data-ei-area-step={g.step}
                           >
                             <bdi>
-                              {interpolate(copy.ui.australiaSignalArea, {
-                                area: areaName,
-                                word: wordOf(g.step),
-                                warnings: num(g.warningCount, numberLocale),
-                                voting: num(g.votingCount, numberLocale),
-                              })}
+                              {list !== null
+                                ? interpolate(copy.ui.australiaSignalNamed, {
+                                    area: areaName,
+                                    word: wordOf(g.step),
+                                    list,
+                                  })
+                                : interpolate(copy.ui.australiaSignalArea, {
+                                    area: areaName,
+                                    word: wordOf(g.step),
+                                    warnings: num(g.warningCount, numberLocale),
+                                    voting: num(g.votingCount, numberLocale),
+                                  })}
                             </bdi>
                           </button>
                         </li>

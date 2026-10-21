@@ -22,9 +22,9 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 29 P1 / 37 P2 (the 2026-10-21 data-integrity round adds 12 context cards to P2)', () => {
+  it('splits 29 P1 / 36 P2 (the 2026-10-21c owner round retires the eth-usd context card)', () => {
     expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(29);
-    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(37);
+    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(36);
   });
 
   it('groups are the question groups (global 5 + prices-board, australia 3)', () => {
@@ -54,7 +54,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('info-only cards never vote: exactly the twenty-nine info rules (the 2026-10-21 data-integrity round adds 12 context cards)', () => {
+  it('info-only cards never vote: exactly the twenty-eight info rules (the 2026-10-21c owner round retires eth-usd)', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
     expect(info).toEqual([
       'au-deposit-rate',
@@ -65,7 +65,6 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'bund-10y',
       'copper-usd',
       'crypto-fng',
-      'eth-usd',
       'eur-usd',
       'gilt-10y',
       'gold-aud',

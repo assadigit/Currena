@@ -414,7 +414,6 @@ export function Insights() {
           <div id="insights-hero" className="scroll-mt-24">
             <HeroBlock
               readings={state.snapshot.readings}
-              changedThisWeek={state.snapshot.changedThisWeek}
               copy={copy}
               numberLocale={numberLocale}
               onJumpSection={jumpToSection}

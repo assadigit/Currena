@@ -113,7 +113,6 @@ function CarouselControls({
 
 export function HeroBlock({
   readings,
-  changedThisWeek,
   copy,
   numberLocale,
   onJumpSection,
@@ -126,7 +125,6 @@ export function HeroBlock({
   sectionIndicators,
 }: {
   readings: readonly IndicatorReading[];
-  changedThisWeek: readonly { id: IndicatorId; to: string }[];
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
   onJumpSection: (section: InsightsSection) => void;
@@ -150,16 +148,10 @@ export function HeroBlock({
   // engine (stale readings never carry a move score — test below pins it).
   const mover = useMemo(() => bigMovers(readings, 1)[0] ?? null, [readings]);
 
-  // H5: one line — the week's status changes, or the calm quiet-week line.
-  const changedLine = useMemo(() => {
-    if (changedThisWeek.length === 0) return copy.ui.quietWeekLine;
-    const names = changedThisWeek
-      .slice(0, 3)
-      .map((e) => `${copy.indicators[e.id].name}${e.to === 'warning' ? ' ↑' : ' ↓'}`)
-      .join(' · ');
-    const suffix = changedThisWeek.length > 3 ? ` +${num(changedThisWeek.length - 3, numberLocale)}` : '';
-    return interpolate(copy.ui.whatChangedLine, { changes: `${names}${suffix}` });
-  }, [changedThisWeek, copy, numberLocale]);
+  // 2026-10-21c owner round: the what-changed one-liner (H5 — «رویداد این
+  // هفته: …») is RETIRED by the owner's directive. The week's status
+  // changes still live in the full data export + CSV (their own surfaces);
+  // the hero keeps the biggest-move card as its closing line.
 
   const moverEntry = mover ? copy.indicators[mover.id] : null;
   const moverReading = mover ? readings.find((r) => r.id === mover.id) : null;
@@ -387,14 +379,9 @@ export function HeroBlock({
         </div>
       ) : null}
 
-      {/* H5: what changed — one line under the hero (or the calm line). */}
-      <p className="mt-3 mb-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
-        <bdi>{changedLine}</bdi>
-      </p>
-
-      {/* N2 retired (owner, 2026-10-17): the short disclaimer + the
-       * about-jump button no longer live under the hero. The full text is
-       * the page-bottom About section; the global footer carries the
+      {/* N2 retired (owner, 2026-10-17); H5 retired (owner, 2026-10-21c —
+       * the what-changed line under the hero): the page-bottom About
+       * section carries the full text and the global footer carries the
        * app-wide non-advice disclaimer. */}
     </section>
   );

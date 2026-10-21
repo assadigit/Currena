@@ -23,7 +23,7 @@
       },
       "source": {
         "provider": "fred",
-        "name": "FRED (T10Y2Y)",
+        "name": "Federal Reserve Bank of St. Louis via FRED (T10Y2Y)",
         "url": "https://fred.stlouisfed.org/series/T10Y2Y",
         "seriesIdOrTable": "FRED:T10Y2Y"
       },
@@ -63,13 +63,13 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
         "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) · Legs (fred:T10Y2Y): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:T10Y2Y): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -129,8 +129,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -202,8 +202,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -264,8 +264,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -327,8 +327,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) · Legs (fred:DGS2, fred:DFEDTARL, fred:DFEDTARU): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:DGS2, fred:DFEDTARL, fred:DFEDTARU): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -400,8 +400,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -456,14 +456,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "ECB Data Portal terms (not verbatim-verified)",
+        "licenceName": "ECB website terms (free use, accurate + cited)",
         "attributionText": "Source: European Central Bank",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "The ECB Data Portal terms page is JS-rendered; the reuse clause could not be quoted on 2026-10-16 — unknown, fail closed in public mode until read in a browser.",
-        "termsUrl": "https://data.ecb.europa.eu/"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): free use of website information when it appears accurately, the ECB is cited as the source, and modifications are stated — official policy rates (DFR) are shown verbatim with ECB attribution.",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
       }
     },
     {
@@ -523,8 +523,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) · Legs (fred:A091RC1Q027SBEA, fred:W006RC1Q027SBEA): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:A091RC1Q027SBEA, fred:W006RC1Q027SBEA): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -539,7 +539,7 @@
       },
       "source": {
         "provider": "fred",
-        "name": "FRED (OECD Main Economic Indicators)",
+        "name": "OECD via FRED (IRLTLT01DEM156N)",
         "url": "https://fred.stlouisfed.org/series/IRLTLT01DEM156N",
         "seriesIdOrTable": "FRED:IRLTLT01DEM156N (long-term government bond yield, monthly)"
       },
@@ -577,13 +577,13 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
         "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -598,7 +598,7 @@
       },
       "source": {
         "provider": "fred",
-        "name": "FRED (OECD Main Economic Indicators)",
+        "name": "OECD via FRED (IRLTLT01JPM156N)",
         "url": "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
         "seriesIdOrTable": "FRED:IRLTLT01JPM156N (long-term government bond yield, monthly)"
       },
@@ -636,13 +636,13 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
         "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -657,7 +657,7 @@
       },
       "source": {
         "provider": "fred",
-        "name": "FRED (OECD Main Economic Indicators)",
+        "name": "OECD via FRED (IRLTLT01GBM156N)",
         "url": "https://fred.stlouisfed.org/series/IRLTLT01GBM156N",
         "seriesIdOrTable": "FRED:IRLTLT01GBM156N (long-term government bond yield, monthly)"
       },
@@ -695,13 +695,13 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
         "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -716,7 +716,7 @@
       },
       "source": {
         "provider": "fred",
-        "name": "FRED (OECD: Japan overnight call rate)",
+        "name": "OECD via FRED (IRSTCI01JPM156N — Japan overnight call rate)",
         "url": "https://fred.stlouisfed.org/series/IRSTCI01JPM156N",
         "seriesIdOrTable": "FRED:IRSTCI01JPM156N (overnight call rate, monthly)"
       },
@@ -754,13 +754,13 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
         "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -775,7 +775,7 @@
       },
       "source": {
         "provider": "fred",
-        "name": "FRED (OECD: UK overnight rate)",
+        "name": "OECD via FRED (IRSTCI01GBM156N — UK overnight rate)",
         "url": "https://fred.stlouisfed.org/series/IRSTCI01GBM156N",
         "seriesIdOrTable": "FRED:IRSTCI01GBM156N (overnight rate, monthly)"
       },
@@ -813,13 +813,13 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
         "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -879,8 +879,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -938,8 +938,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -954,7 +954,7 @@
       },
       "source": {
         "provider": "fred",
-        "name": "FRED (T5YIFR)",
+        "name": "Federal Reserve Bank of St. Louis via FRED (T5YIFR)",
         "url": "https://fred.stlouisfed.org/series/T5YIFR",
         "seriesIdOrTable": "FRED:T5YIFR"
       },
@@ -995,13 +995,13 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
         "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1059,8 +1059,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1118,8 +1118,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1134,7 +1134,7 @@
       },
       "source": {
         "provider": "fred",
-        "name": "FRED (STLFSI4)",
+        "name": "St. Louis Fed via FRED (STLFSI4)",
         "url": "https://fred.stlouisfed.org/series/STLFSI4",
         "seriesIdOrTable": "FRED:STLFSI4"
       },
@@ -1175,13 +1175,13 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
         "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1196,7 +1196,7 @@
       },
       "source": {
         "provider": "fred",
-        "name": "FRED (NFCI)",
+        "name": "Chicago Fed via FRED (NFCI)",
         "url": "https://fred.stlouisfed.org/series/NFCI",
         "seriesIdOrTable": "FRED:NFCI"
       },
@@ -1236,13 +1236,13 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
         "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1257,7 +1257,7 @@
       },
       "source": {
         "provider": "fred",
-        "name": "FRED (VIXCLS), © Cboe",
+        "name": "Cboe via FRED (VIXCLS)",
         "url": "https://fred.stlouisfed.org/series/VIXCLS",
         "seriesIdOrTable": "FRED:VIXCLS (Cboe Volatility Index, close)"
       },
@@ -1297,13 +1297,13 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
         "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyright, 2016, Chicago Board Options Exchange, Inc\" (checked 2026-10-21)",
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyright, 2016, Chicago Board Options Exchange, Inc\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1364,65 +1364,6 @@
         "termsCheckedOn": "2026-10-16",
         "termsEvidence": "alternative.me states the index may be displayed freely when \"attribution is given right next to the display of the data\" (read 2026-10-16). Attribution renders beside the card.",
         "termsUrl": "https://alternative.me/crypto/fear-and-greed-index/"
-      }
-    },
-    {
-      "id": "eth-usd",
-      "title": "Ethereum price",
-      "area": {
-        "section": "global",
-        "group": "market-stress",
-        "gauge": null,
-        "gaugeMembership": "context only — never counts"
-      },
-      "source": {
-        "provider": "eodhd",
-        "name": "EODHD (ETH-USD daily close)",
-        "url": "https://eodhd.com",
-        "seriesIdOrTable": "EODHD ETH-USD.CC daily close (the owner’s API key)"
-      },
-      "publisher": "EODHD (world stock markets)",
-      "publisherUrl": "https://eodhd.com",
-      "methodUrl": "https://eodhd.com",
-      "whatItIs": "The price of one ether in US dollars: quotes from Yahoo Finance and gold-api.com on an end-of-day EODHD backbone (ETH-USD.CC).",
-      "whatItIsnt": "Famously volatile: the price says nothing about value, and this page takes no view on holdings.",
-      "trackRecordNote": "It has followed bitcoin’s booms and crashes with bigger swings: a pattern of risk appetite, nothing steadier.",
-      "definition": null,
-      "failClosedConditions": "No value, data older than 3 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
-      "sourceRisk": {
-        "level": "L2",
-        "ownerAccepts": true,
-        "enabled": true,
-        "method": "M1",
-        "runtime": "worker",
-        "termsLines": "EODHD personal-plan terms (read 2026-10-16): the personal plan covers the owner’s own dashboard use; serving the data to others is redistribution. Public display not licensed — the world boards stay hidden in public mode (T-15) and the API key rides the EODHD_API_TOKEN secret.",
-        "termsReadOn": "2026-10-16",
-        "attributionText": "Data: EODHD",
-        "legs": [
-          "eodhd"
-        ]
-      },
-      "unit": "usd",
-      "changeUnit": "percent",
-      "cadence": "daily",
-      "maxAgeDays": 3,
-      "maxAgeBasis": "per-series override",
-      "scored": false,
-      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
-      "rule": {
-        "kind": "info"
-      },
-      "ruleVersion": 2,
-      "layer": 1,
-      "licence": {
-        "licenceName": "Personal plan — owner only",
-        "attributionText": "",
-        "attributionRequired": false,
-        "privateOk": true,
-        "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Step 3 §2.3: personal plan covers owner-only dashboards; serving to others is redistribution. Never shown in public mode unless a display licence is bought. · Legs (eodhd): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): EODHD personal-plan leg (owner_accepts yes, RISK_REGISTER.md — the same register row that keeps the world-markets board public since 2026-10-15); the owner directive lifts the worst-leg display bar for this single daily-close card.",
-        "termsUrl": "https://eodhd.com/"
       }
     },
     {
@@ -1554,7 +1495,7 @@
       },
       "source": {
         "provider": "derived",
-        "name": "gold-api.com (history: World Bank)",
+        "name": "gold-api.com (history: The World Bank Pink Sheet)",
         "url": "https://www.gold-api.com",
         "seriesIdOrTable": "gold-api.com XAU ÷ XAG (history: World Bank gold ÷ silver)"
       },
@@ -1599,7 +1540,7 @@
         "attributionText": "",
         "attributionRequired": false,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
+        "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
         "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".) · Legs (world-bank, gold-api): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://gold-api.com/terms"
@@ -1668,14 +1609,14 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
         "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless. · Legs (frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
-        "termsUrl": "https://frankfurter.dev/license/"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter. · Legs (frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
       }
     },
     {
@@ -1731,14 +1672,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
         "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless.",
-        "termsUrl": "https://frankfurter.dev/license/"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter.",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
       }
     },
     {
@@ -1790,14 +1731,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
         "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless.",
-        "termsUrl": "https://frankfurter.dev/license/"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter.",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
       }
     },
     {
@@ -1849,14 +1790,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
         "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless. · Legs (frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
-        "termsUrl": "https://frankfurter.dev/license/"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter. · Legs (frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
       }
     },
     {
@@ -1974,8 +1915,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1990,7 +1931,7 @@
       },
       "source": {
         "provider": "fred",
-        "name": "FRED (GACDFSA066MSFRBPHI), Philadelphia Fed",
+        "name": "Philadelphia Fed via FRED (GACDFSA066MSFRBPHI)",
         "url": "https://fred.stlouisfed.org/series/GACDFSA066MSFRBPHI",
         "seriesIdOrTable": "FRED:GACDFSA066MSFRBPHI (Philadelphia Fed manufacturing index, SA)"
       },
@@ -2030,13 +1971,13 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
         "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -2096,8 +2037,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -2157,8 +2098,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -2173,7 +2114,7 @@
       },
       "source": {
         "provider": "derived",
-        "name": "World Bank Pink Sheet",
+        "name": "The World Bank Pink Sheet (copper ÷ gold)",
         "url": "https://www.worldbank.org/en/research/commodity-markets",
         "seriesIdOrTable": "World Bank copper ÷ gold"
       },
@@ -2213,14 +2154,14 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "Unknown (CC BY 4.0 expected, not quoted)",
-        "attributionText": "Source: World Bank",
+        "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+        "attributionText": "The World Bank: Commodity Markets (Pink Sheet)",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "World Bank Open Data terms are commonly CC BY 4.0, but the licence page could not be quoted verbatim on 2026-10-16 (JS-rendered) — marked unknown, fail closed in public mode until read in a browser. · Legs (world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
-        "termsUrl": "https://www.worldbank.org/en/about/legal/terms-of-use"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "World Bank Dataset Terms read verbatim in a browser 2026-10-21 (worldbank.org/ext/en/legal/terms-conditions/datasets): \"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0)\" with the required attribution format \"The World Bank: Dataset name: Data source (if known)\"; use of data derived from the Datasets (tables/charts) follows the same terms. The Pink Sheet commodity series carry no contrary label — CC BY 4.0 applies, attribution rendered on the cards and in About this data. · Legs (world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
       }
     },
     {
@@ -2272,14 +2213,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
         "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless.",
-        "termsUrl": "https://frankfurter.dev/license/"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter.",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
       }
     },
     {
@@ -2336,8 +2277,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -2395,8 +2336,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) · Legs (fred:PAYEMS): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:PAYEMS): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -2411,7 +2352,7 @@
       },
       "source": {
         "provider": "world-bank",
-        "name": "World Bank Pink Sheet",
+        "name": "The World Bank: Commodity Markets (Pink Sheet) — platinum",
         "url": "https://www.worldbank.org/en/research/commodity-markets",
         "seriesIdOrTable": "World Bank Pink Sheet (Platinum, $/troy oz)"
       },
@@ -2449,14 +2390,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "Unknown (CC BY 4.0 expected, not quoted)",
-        "attributionText": "Source: World Bank",
+        "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+        "attributionText": "The World Bank: Commodity Markets (Pink Sheet)",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "World Bank Open Data terms are commonly CC BY 4.0, but the licence page could not be quoted verbatim on 2026-10-16 (JS-rendered) — marked unknown, fail closed in public mode until read in a browser. · Legs (world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
-        "termsUrl": "https://www.worldbank.org/en/about/legal/terms-of-use"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "World Bank Dataset Terms read verbatim in a browser 2026-10-21 (worldbank.org/ext/en/legal/terms-conditions/datasets): \"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0)\" with the required attribution format \"The World Bank: Dataset name: Data source (if known)\"; use of data derived from the Datasets (tables/charts) follows the same terms. The Pink Sheet commodity series carry no contrary label — CC BY 4.0 applies, attribution rendered on the cards and in About this data. · Legs (world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
       }
     },
     {
@@ -2654,7 +2595,7 @@
       },
       "source": {
         "provider": "gold-api",
-        "name": "gold-api.com (HG, history: World Bank)",
+        "name": "gold-api.com (HG, history: The World Bank Pink Sheet)",
         "url": "https://www.gold-api.com",
         "seriesIdOrTable": "gold-api.com HG spot × 2204.62262 (history: World Bank Pink Sheet copper, monthly)"
       },
@@ -2693,14 +2634,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "Unknown (CC BY 4.0 expected, not quoted)",
-        "attributionText": "Source: World Bank",
+        "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+        "attributionText": "The World Bank: Commodity Markets (Pink Sheet)",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "World Bank Open Data terms are commonly CC BY 4.0, but the licence page could not be quoted verbatim on 2026-10-16 (JS-rendered) — marked unknown, fail closed in public mode until read in a browser. · Legs (gold-api:HG, world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
-        "termsUrl": "https://www.worldbank.org/en/about/legal/terms-of-use"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "World Bank Dataset Terms read verbatim in a browser 2026-10-21 (worldbank.org/ext/en/legal/terms-conditions/datasets): \"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0)\" with the required attribution format \"The World Bank: Dataset name: Data source (if known)\"; use of data derived from the Datasets (tables/charts) follows the same terms. The Pink Sheet commodity series carry no contrary label — CC BY 4.0 applies, attribution rendered on the cards and in About this data. · Legs (gold-api:HG, world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
       }
     },
     {
@@ -3185,8 +3126,8 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) · Legs (rba:F2, fred:DGS10): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (rba:F2, fred:DGS10): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -3780,14 +3721,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
         "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless. · Legs (frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
-        "termsUrl": "https://frankfurter.dev/license/"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter. · Legs (frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
       }
     },
     {
@@ -3843,14 +3784,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
         "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless. · Legs (frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
-        "termsUrl": "https://frankfurter.dev/license/"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter. · Legs (frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
       }
     },
     {
@@ -3924,7 +3865,7 @@
       },
       "source": {
         "provider": "world-bank",
-        "name": "World Bank Pink Sheet",
+        "name": "The World Bank Pink Sheet — iron ore",
         "url": "https://www.worldbank.org/en/research/commodity-markets",
         "seriesIdOrTable": "World Bank Pink Sheet iron ore, cfr spot (FRED mirror PIORECRUSDM lags ~2 months)"
       },
@@ -3962,14 +3903,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "Unknown (CC BY 4.0 expected, not quoted)",
-        "attributionText": "Source: World Bank",
+        "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+        "attributionText": "The World Bank: Commodity Markets (Pink Sheet)",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "World Bank Open Data terms are commonly CC BY 4.0, but the licence page could not be quoted verbatim on 2026-10-16 (JS-rendered) — marked unknown, fail closed in public mode until read in a browser.",
-        "termsUrl": "https://www.worldbank.org/en/about/legal/terms-of-use"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "World Bank Dataset Terms read verbatim in a browser 2026-10-21 (worldbank.org/ext/en/legal/terms-conditions/datasets): \"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0)\" with the required attribution format \"The World Bank: Dataset name: Data source (if known)\"; use of data derived from the Datasets (tables/charts) follows the same terms. The Pink Sheet commodity series carry no contrary label — CC BY 4.0 applies, attribution rendered on the cards and in About this data.",
+        "termsUrl": "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
       }
     },
     {
@@ -4022,14 +3963,14 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
         "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "unknown",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless. · Legs (gold-api:XAU, frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
-        "termsUrl": "https://frankfurter.dev/license/"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter. · Legs (gold-api:XAU, frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
       }
     }
   ]

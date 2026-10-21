@@ -69,9 +69,9 @@ const FRED_BASE: SourceLicence = {
   attributionRequired: true,
   privateOk: true,
   publicDisplayOk: 'unknown', // decided per series by the T-16 scan
-  termsCheckedOn: TERMS_CHECKED_ON,
+  termsCheckedOn: '2026-10-21',
   termsEvidence:
-    'FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>) — scanned 2026-10-16, records in data/fred-copyright.json; public-domain series may be public, citation-required series are private-only.',
+    'FRED legal page read verbatim in a browser 2026-10-21 (fred.stlouisfed.org/legal/): series carry a per-series license tag (records in data/fred-copyright.json). Public-domain series are public; citation-required series are display-permitted WITH attribution of the source and acknowledgment the data was obtained from FRED (their example: "Source: BLS via FRED"); pre-approval-required series are private-only (never scanned into the public set).',
   termsUrl: 'https://fred.stlouisfed.org/legal/',
 };
 
@@ -106,43 +106,43 @@ const GOLD_API: SourceLicence = {
 const WORLD_BANK: SourceLicence = {
   provider: 'world-bank',
   label: 'World Bank (Commodity Markets "Pink Sheet")',
-  licenceName: 'Unknown (CC BY 4.0 expected, not quoted)',
-  attributionText: 'Source: World Bank',
+  licenceName: 'CC BY 4.0 (World Bank Dataset Terms)',
+  attributionText: 'The World Bank: Commodity Markets (Pink Sheet)',
   attributionRequired: true,
   privateOk: true,
-  publicDisplayOk: 'unknown',
-  termsCheckedOn: TERMS_CHECKED_ON,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-21',
   termsEvidence:
-    'World Bank Open Data terms are commonly CC BY 4.0, but the licence page could not be quoted verbatim on 2026-10-16 (JS-rendered) — marked unknown, fail closed in public mode until read in a browser.',
-  termsUrl: 'https://www.worldbank.org/en/about/legal/terms-of-use',
+    'World Bank Dataset Terms read verbatim in a browser 2026-10-21 (worldbank.org/ext/en/legal/terms-conditions/datasets): "Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0)" with the required attribution format "The World Bank: Dataset name: Data source (if known)"; use of data derived from the Datasets (tables/charts) follows the same terms. The Pink Sheet commodity series carry no contrary label — CC BY 4.0 applies, attribution rendered on the cards and in About this data.',
+  termsUrl: 'https://www.worldbank.org/ext/en/legal/terms-conditions/datasets',
 };
 
 const FRANKFURTER: SourceLicence = {
   provider: 'frankfurter',
   label: 'Frankfurter (ECB reference rates)',
-  licenceName: 'ECB terms via the Frankfurter project (MIT code)',
+  licenceName: 'ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)',
   attributionText: 'Source: European Central Bank (reference rates via Frankfurter)',
   attributionRequired: true,
   privateOk: true,
-  publicDisplayOk: 'unknown',
-  termsCheckedOn: TERMS_CHECKED_ON,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-21',
   termsEvidence:
-    'frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB\u2019s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless.',
-  termsUrl: 'https://frankfurter.dev/license/',
+    "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter.",
+  termsUrl: 'https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html',
 };
 
 const ECB: SourceLicence = {
   provider: 'ecb',
   label: 'ECB Data Portal',
-  licenceName: 'ECB Data Portal terms (not verbatim-verified)',
+  licenceName: 'ECB website terms (free use, accurate + cited)',
   attributionText: 'Source: European Central Bank',
   attributionRequired: true,
   privateOk: true,
-  publicDisplayOk: 'unknown',
-  termsCheckedOn: TERMS_CHECKED_ON,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-21',
   termsEvidence:
-    'The ECB Data Portal terms page is JS-rendered; the reuse clause could not be quoted on 2026-10-16 — unknown, fail closed in public mode until read in a browser.',
-  termsUrl: 'https://data.ecb.europa.eu/',
+    "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): free use of website information when it appears accurately, the ECB is cited as the source, and modifications are stated — official policy rates (DFR) are shown verbatim with ECB attribution.",
+  termsUrl: 'https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html',
 };
 
 const MANUAL: SourceLicence = {
@@ -276,8 +276,14 @@ export interface FredCopyrightRecord {
 
 /**
  * The FRED licence for ONE series, per the copyright scan. Citation-
- * required series carry the FRED citation line; public-domain series are
- * public-eligible. Unscanned series fail closed (public 'no').
+ * required series are DISPLAY-PERMITTED with the FRED citation line — the
+ * FRED legal page (read verbatim in a browser 2026-10-21) says of that
+ * class: "provided you have not engaged in any prohibited uses, you may
+ * use these data series with proper attribution of the source and
+ * acknowledgment that you obtained the data from FRED (example, 'Source:
+ * BLS via FRED') when displaying or publishing it" — so the reading's
+ * source attribution carries the 'via FRED' acknowledgment. Public-domain
+ * series are public-eligible. Unscanned series fail closed (public 'no').
  */
 export function fredLicenceForSeries(
   seriesId: string,
@@ -300,10 +306,10 @@ export function fredLicenceForSeries(
     licence: {
       ...FRED_BASE,
       licenceName: rec.copyrightNotice
-        ? `FRED license #copyright-${rec.license} (citation required)`
+        ? `FRED license #copyright-${rec.license} (citation required — display permitted with "Source: publisher via FRED" attribution)`
         : `FRED license #copyright-${rec.license} (public domain)`,
-      publicDisplayOk: rec.copyrightNotice ? 'no' : 'yes',
-      termsEvidence: `${rec.evidence} (checked ${rec.checkedOn})`,
+      publicDisplayOk: 'yes',
+      termsEvidence: `${rec.evidence} (checked ${rec.checkedOn}) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.`,
     },
   };
 }

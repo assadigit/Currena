@@ -1229,24 +1229,6 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     cantTell: 'Rarer than gold but far more industrial: its price follows factories as much as fear, and forecasts for it are famously poor.',
     forYou: 'Gold’s industrial sibling: the third pillar of the precious-metals board and an ingredient in catalytic converters.',
   },
-  'eth-usd': {
-    name: 'Ethereum price',
-    ticker: 'ETH',
-    oneLiner: 'The world price of one ether, in US dollars.',
-    lines: {
-      highRising: 'Ethereum is expensive and rising: a mood that tends to accompany easy money and risk appetite.',
-      highEasing: 'Ethereum is expensive but easing off its highs.',
-      typical: 'Ethereum is trading in its usual recent range.',
-      low: 'Ethereum is cheap versus its recent range: a smaller number on a famously jumpy asset.',
-      jumping: 'Ethereum has jumped unusually fast: normal for it; wait before reading a trend into it.',
-    },
-    unitNote: 'US dollars per ether',
-    whatItIs: 'The price of one ether in US dollars: quotes from Yahoo Finance and gold-api.com on an end-of-day EODHD backbone (ETH-USD.CC).',
-    whyItMatters: 'Ethereum is the second flagship of the crypto world: its mood tends to track bitcoin’s, and most of decentralised finance is built on it.',
-    tendedToMean: 'It has followed bitcoin’s booms and crashes with bigger swings: a pattern of risk appetite, nothing steadier.',
-    cantTell: 'Famously volatile: the price says nothing about value, and this page takes no view on holdings.',
-    forYou: 'A second context price for crypto headlines: bitcoin’s cousin moves at least as fast in both directions.',
-  },
   'bund-10y': {
     name: 'What the German government pays to borrow for 10 years',
     ticker: 'Bund',
@@ -1480,6 +1462,11 @@ export const insightsCopyEn = {
     // quiet ink beside them.
     australiaSignalsTitle: 'Australia signals',
     australiaSignalArea: '{area} · {word}: {warnings} of {voting} indicators need attention.',
+    // 2026-10-21c owner round: the raised bullet names the flagged
+    // indicators with their live values (additional data, not the counts
+    // the area headers already carry).
+    australiaSignalNamed: '{area} · {word} — {list}.',
+    australiaSignalMore: 'and {n} more',
     // 2026-10-21 owner round: the ContinueStrip ("Keep reading" — the
     // one-line chevron row under the hero) is RETIRED with its key; the
     // sticky JumpNav pills already carry the same labels and the same
@@ -1597,10 +1584,10 @@ export const insightsCopyEn = {
     movesNextTitle: 'Moves and what is next',
     stripChange7d: '7-day change',
     stripChange30d: '30-day change',
-    // H5: what changed: one line. (Round-2 R16: the hero no longer names
-    // the next scheduled event: “Next up” lives once, below the indicators.)
-    whatChangedLine: 'This week: {changes}',
-    quietWeekLine: 'A quiet week: no indicator changed state.',
+    // H5 retired (owner, 2026-10-21c): the hero's what-changed line is
+    // removed — the week's status changes live in the full data export +
+    // CSV. (Round-2 R16 note kept: “Next up” lives once, below the
+    // indicators.)
     // H6: the next-up strip.
     comingUpTitle: 'Next up',
     noEvents: 'No key dates recorded yet: this calendar is maintained by hand.',
@@ -3385,17 +3372,8 @@ export const insightsCopyEn = {
       listEmptyAgainst: 'None of the factors checked shows a meaningful signal working against gold’s price right now.',
       listEmptyNone: 'Nothing could be read yet, so neither side has been weighed.',
     },
-    // v3 UI-45 (kept through the v3 merge): silver's own balance speaks
-    // the same sentences with silver's metal word — needs review per the
-    // copy workflow alongside the other v3 strings.
-    balanceSilver: {
-      heading: 'The aggregate of factors affecting the price of silver',
-      sideFor: 'Factors supporting silver’s price',
-      sideAgainst: 'Factors pressuring silver’s price',
-      verdictFor: 'Leaning for silver',
-      verdictAgainst: 'Leaning against silver',
-      aria: 'Balance for silver: {summary}. {verdict}.',
-    },
+    // 2026-10-21c owner round: the balanceSilver copy variants are RETIRED
+    // with silver's balance (the merged card renders gold's balance only).
     silverOnly: 'Silver only',
     footingTitle: 'Price footing',
     footingRow: '{metal}: {state}',

@@ -45,11 +45,12 @@ export type Bindings = {
   /** Workers KV namespace (snapshot/status/lock keys — see adapters/kv-store.ts). */
   RATES: KVNamespace;
   /**
-   * 2026-10-21 data-integrity round: the owner's EODHD key — the eth-usd
-   * indicator card's source on the daily ingest rung (the same key the
-   * currena-markets worker already carries for the world-markets board;
-   * server-side only, never in client code). Optional: an unset token
-   * skips the ETH fetch honestly (the card holds its last good value).
+   * 2026-10-21 data-integrity round: the owner's EODHD key — RETIRED from
+   * the insights ingest with the eth-usd card (2026-10-21c owner round:
+   * a second crypto price is not a market-stress indicator). The secret
+   * may still be set on the worker; nothing reads it here anymore. The
+   * currena-markets worker keeps its own EODHD_API_TOKEN for the
+   * world-markets board.
    */
   EODHD_API_TOKEN?: string;
   /** Shared secret for POST /internal/refresh (wrangler secret / .dev.vars). */

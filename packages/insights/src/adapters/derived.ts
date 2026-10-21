@@ -115,11 +115,6 @@ export interface SeriesInputs {
   /** Step 3 L1-18: the Alternative.me crypto Fear and Greed index (context only). */
   cryptoFng?: SeriesPoint[];
   /**
-   * 2026-10-21 data-integrity round: EODHD crypto daily closes — the
-   * eth-usd card's value series (the owner's key; see adapters/eodhd.ts).
-   */
-  eodhd?: { eth?: SeriesPoint[] };
-  /**
    * Step 3 L1-14 / FS-06 (v3, 2026-10-20): the monthly Shiller CAPE and
    * Excess CAPE Yield series, read from the converted bulk file
    * (data/shiller/shiller-cape.json — fetched by the monthly
@@ -376,11 +371,9 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // ONLY (rule info; L3-03 forbids composite sentiment scores, and the
   // card never presents the index as a signal).
   put('crypto-fng', inputs.cryptoFng);
-  // 2026-10-21 data-integrity round: the Ethereum daily-close series — the
-  // crypto market's second asset beside the FNG context card (info rule,
-  // EODHD on the owner's key; public-display-ok under the same owner
-  // directive that governs the world-markets board).
-  put('eth-usd', inputs.eodhd?.eth);
+  // 2026-10-21c owner round: the eth-usd card (EODHD crypto context row,
+  // 2026-10-21 data-integrity round) is RETIRED — the owner's verdict: not
+  // a market-stress indicator. The prices board carries crypto prices.
   // Step 3 L1-14 / FS-06 (v3, 2026-10-20): the Shiller cards read the
   // publisher's own columns from the converted bulk file — never recomputed.
   put('shiller-cape', inputs.shiller?.cape);
@@ -659,7 +652,10 @@ export const AUX_RULE_WIRING: Readonly<
  * §3 + the FRED notice, UI Block N1).
  */
 export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: string; url?: string }>>> = {
-  'yield-curve-10y2y': { name: 'FRED (T10Y2Y)', url: 'https://fred.stlouisfed.org/series/T10Y2Y' },
+  'yield-curve-10y2y': {
+    name: 'Federal Reserve Bank of St. Louis via FRED (T10Y2Y)',
+    url: 'https://fred.stlouisfed.org/series/T10Y2Y',
+  },
   'real-yield-10y': { name: 'FRED (DFII10)', url: 'https://fred.stlouisfed.org/series/DFII10' },
   us10y: { name: 'FRED (DGS10)', url: 'https://fred.stlouisfed.org/series/DGS10' },
   'fed-target': { name: 'FRED (DFEDTARL/U)', url: 'https://fred.stlouisfed.org/series/DFEDTARU' },
@@ -671,16 +667,19 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'fed-expectations': { name: 'FRED (DGS2 − policy-rate midpoint)', url: 'https://fred.stlouisfed.org/series/DGS2' },
   us30y: { name: 'FRED (DGS30)', url: 'https://fred.stlouisfed.org/series/DGS30' },
   'philly-fed': {
-    name: 'FRED (GACDFSA066MSFRBPHI), Philadelphia Fed',
+    name: 'Philadelphia Fed via FRED (GACDFSA066MSFRBPHI)',
     url: 'https://fred.stlouisfed.org/series/GACDFSA066MSFRBPHI',
   },
   'us-cpi-yoy': { name: 'FRED (CPIAUCNS, not seasonally adjusted)', url: 'https://fred.stlouisfed.org/series/CPIAUCNS' },
   'us-cpi-core-yoy': { name: 'FRED (CPILFENS, not seasonally adjusted)', url: 'https://fred.stlouisfed.org/series/CPILFENS' },
-  'breakeven-5y5y': { name: 'FRED (T5YIFR)', url: 'https://fred.stlouisfed.org/series/T5YIFR' },
-  'stress-stlfsi': { name: 'FRED (STLFSI4)', url: 'https://fred.stlouisfed.org/series/STLFSI4' },
-  nfci: { name: 'FRED (NFCI)', url: 'https://fred.stlouisfed.org/series/NFCI' },
+  'breakeven-5y5y': {
+    name: 'Federal Reserve Bank of St. Louis via FRED (T5YIFR)',
+    url: 'https://fred.stlouisfed.org/series/T5YIFR',
+  },
+  'stress-stlfsi': { name: 'St. Louis Fed via FRED (STLFSI4)', url: 'https://fred.stlouisfed.org/series/STLFSI4' },
+  nfci: { name: 'Chicago Fed via FRED (NFCI)', url: 'https://fred.stlouisfed.org/series/NFCI' },
   vix: {
-    name: 'FRED (VIXCLS), © Cboe',
+    name: 'Cboe via FRED (VIXCLS)',
     url: 'https://fred.stlouisfed.org/series/VIXCLS',
   },
   'crypto-fng': {
@@ -695,7 +694,7 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     name: 'Robert Shiller, Irrational Exuberance data (ie_data.xls)',
     url: 'https://shillerdata.com/',
   },
-  'gold-silver': { name: 'gold-api.com (history: World Bank)', url: 'https://www.gold-api.com' },
+  'gold-silver': { name: 'gold-api.com (history: The World Bank Pink Sheet)', url: 'https://www.gold-api.com' },
   'dollar-basket': {
     name: 'Currena basket (ECB rates via Frankfurter)',
     url: 'https://frankfurter.dev',
@@ -706,21 +705,20 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   // 2026-10-21 data-integrity round — the coverage additions' attributions.
   wti: { name: 'FRED (EIA WTI spot)', url: 'https://fred.stlouisfed.org/series/DCOILWTICO' },
   natgas: { name: 'FRED (EIA Henry Hub spot)', url: 'https://fred.stlouisfed.org/series/DHHNGSP' },
-  platinum: { name: 'World Bank Pink Sheet', url: 'https://www.worldbank.org/en/research/commodity-markets' },
-  'bund-10y': { name: 'FRED (OECD Main Economic Indicators)', url: 'https://fred.stlouisfed.org/series/IRLTLT01DEM156N' },
-  'jgb-10y': { name: 'FRED (OECD Main Economic Indicators)', url: 'https://fred.stlouisfed.org/series/IRLTLT01JPM156N' },
-  'gilt-10y': { name: 'FRED (OECD Main Economic Indicators)', url: 'https://fred.stlouisfed.org/series/IRLTLT01GBM156N' },
+  platinum: { name: 'The World Bank: Commodity Markets (Pink Sheet) — platinum', url: 'https://www.worldbank.org/en/research/commodity-markets' },
+  'bund-10y': { name: 'OECD via FRED (IRLTLT01DEM156N)', url: 'https://fred.stlouisfed.org/series/IRLTLT01DEM156N' },
+  'jgb-10y': { name: 'OECD via FRED (IRLTLT01JPM156N)', url: 'https://fred.stlouisfed.org/series/IRLTLT01JPM156N' },
+  'gilt-10y': { name: 'OECD via FRED (IRLTLT01GBM156N)', url: 'https://fred.stlouisfed.org/series/IRLTLT01GBM156N' },
   'boj-rate': {
-    name: 'FRED (OECD: Japan overnight call rate)',
+    name: 'OECD via FRED (IRSTCI01JPM156N — Japan overnight call rate)',
     url: 'https://fred.stlouisfed.org/series/IRSTCI01JPM156N',
   },
   'boe-rate': {
-    name: 'FRED (OECD: UK overnight rate)',
+    name: 'OECD via FRED (IRSTCI01GBM156N — UK overnight rate)',
     url: 'https://fred.stlouisfed.org/series/IRSTCI01GBM156N',
   },
   'us-gdp-growth': { name: 'FRED (BEA real GDP growth)', url: 'https://fred.stlouisfed.org/series/A191RL1Q225SBEA' },
   'us-nfp': { name: 'FRED (BLS PAYEMS, monthly change)', url: 'https://fred.stlouisfed.org/series/PAYEMS' },
-  'eth-usd': { name: 'EODHD (ETH-USD daily close)', url: 'https://eodhd.com' },
   'china-pmi': { name: 'China NBS (manual entry)', url: 'https://www.stats.gov.cn/english/' },
   'm2-us': { name: 'FRED (M2SL)', url: 'https://fred.stlouisfed.org/series/M2SL' },
   'us-unemployment': { name: 'FRED (UNRATE), US BLS', url: 'https://fred.stlouisfed.org/series/UNRATE' },
@@ -728,7 +726,7 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     name: 'FRED (SAHMREALTIME)',
     url: 'https://fred.stlouisfed.org/series/SAHMREALTIME',
   },
-  'copper-gold': { name: 'World Bank Pink Sheet', url: 'https://www.worldbank.org/en/research/commodity-markets' },
+  'copper-gold': { name: 'The World Bank Pink Sheet (copper ÷ gold)', url: 'https://www.worldbank.org/en/research/commodity-markets' },
   usdcny: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   brent: {
     name: 'FRED (EIA Brent) + Yahoo Finance (BZ=F)',
@@ -736,7 +734,7 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   },
   'gold-usd': { name: 'gold-api.com (XAU)', url: 'https://www.gold-api.com' },
   'silver-usd': { name: 'gold-api.com (XAG)', url: 'https://www.gold-api.com' },
-  'copper-usd': { name: 'gold-api.com (HG, history: World Bank)', url: 'https://www.gold-api.com' },
+  'copper-usd': { name: 'gold-api.com (HG, history: The World Bank Pink Sheet)', url: 'https://www.gold-api.com' },
   'btc-usd': { name: 'gold-api.com (BTC)', url: 'https://www.gold-api.com' },
   'gold-btc': { name: 'gold-api.com (XAU ÷ BTC)', url: 'https://www.gold-api.com' },
   'silver-btc': { name: 'gold-api.com (XAG ÷ BTC)', url: 'https://www.gold-api.com' },
@@ -770,7 +768,7 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'rba-expectations': { name: 'RBA F2 (FCMYGBAG3D) − RBA F1', url: 'https://www.rba.gov.au/statistics/tables/' },
   'gold-aud': { name: 'gold-api.com × Frankfurter (ECB)', url: 'https://www.gold-api.com' },
   'iron-ore': {
-    name: 'World Bank Pink Sheet',
+    name: 'The World Bank Pink Sheet — iron ore',
     url: 'https://www.worldbank.org/en/research/commodity-markets',
   },
   'terms-of-trade': { name: 'ABS (ANA_AGG terms of trade)', url: 'https://data.api.abs.gov.au/rest/data/ANA_AGG/M5.TTR.20.AUS.Q' },

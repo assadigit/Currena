@@ -59,9 +59,13 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
     expect(fred!.worstLevel).toBe('L2');
     // 3 distinct licence names across the 16 series (public-domain,
     // citation-required, varies-by-series) — deduped, order of appearance.
+    // 2026-10-21c: the citation-required class is display-permitted with
+    // "publisher via FRED" attribution (FRED legal read 2026-10-21).
     expect(fred!.licences.length).toBe(3);
     expect(fred!.licences).toContain('FRED license #copyright-public-domain (public domain)');
-    expect(fred!.licences).toContain('FRED license #copyright-citation-required (citation required)');
+    expect(fred!.licences).toContain(
+      'FRED license #copyright-citation-required (citation required — display permitted with "Source: publisher via FRED" attribution)',
+    );
     expect(aboutEnabledState(fred!)).toBe('on');
   });
 

@@ -140,9 +140,10 @@ describe('buildInsightsSnapshot', () => {
       calendar: [],
       now: NOW,
     });
-    // Fix spec C (2026-10-14): the four additions grew the set.
-    expect(snap.readings).toHaveLength(66); // the 2026-10-21 data-integrity round adds 12 context cards
-    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(66);
+    // Fix spec C (2026-10-14): the four additions grew the set; the
+    // 2026-10-21c owner round retired eth-usd → 65.
+    expect(snap.readings).toHaveLength(65);
+    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(65);
     expect(snap.readings.find((r) => r.id === 'us10y')!.status).not.toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.status).toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.value).toBeNull();
@@ -416,9 +417,8 @@ describe('projectSnapshotToPublic (2026-10-19 public projection)', () => {
       expect(overrides.hiddenIndicatorIds).not.toContain(reading.id);
     }
     expect(pub.readings).toHaveLength(full52.readings.length - overrides.hiddenIndicatorIds.length);
-    // The boards follow the generated policy (2026-10-18b owner directive):
-    // fx hidden, markets public.
-    expect(overrides.hiddenBoards).toContain('fx');
-    expect(overrides.hiddenBoards).not.toContain('markets');
+    // The boards follow the generated policy (2026-10-18b markets
+    // directive; 2026-10-21c fx restoration directive): both public.
+    expect(overrides.hiddenBoards).toEqual([]);
   });
 });

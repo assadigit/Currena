@@ -365,10 +365,13 @@ export const IndicatorIdSchema = z.enum([
   // Global — Prices board companions (context rows rendered in lanes)
   'wti', // FRED DCOILWTICO (WTI spot, USD/barrel)
   'natgas', // FRED DHHNGSP (Henry Hub spot, USD/MMBtu)
-  // Global — market-stress lane context row (crypto price beside FNG)
-  'eth-usd', // EODHD ETH-USD.CC daily close (owner's key) + gold-api cross-check
-  // Global — sovereign yield coverage (FRED OECD monthly; private-only on
-  // licence: citation-required series stay out of the public projection)
+  // Global — market-stress lane context row (crypto price beside FNG):
+  // the eth-usd id (2026-10-21 data-integrity round) is RETIRED — the
+  // 2026-10-21c owner round removed the card (not a market-stress
+  // indicator; the prices board carries the crypto asset prices).
+  // Global — sovereign yield coverage (FRED OECD monthly; licence note:
+  // citation-required series display with "publisher via FRED" attribution,
+  // per the FRED legal page read 2026-10-21)
   'bund-10y', // FRED IRLTLT01DEM156N
   'jgb-10y', // FRED IRLTLT01JPM156N
   'gilt-10y', // FRED IRLTLT01GBM156N
@@ -460,10 +463,10 @@ export const IndicatorSourceSchema = z.enum([
   'ecb', 'alternative-me',
   // Step 3 L1-14 / FS-06 (v3): the Shiller dataset (converted bulk file).
   'shiller',
-  // 2026-10-21 data-integrity round: EODHD crypto (eth-usd) — the owner's
-  // own API key, the same register row and owner directive that govern the
-  // world-markets board.
-  'eodhd',
+  // 2026-10-21 data-integrity round: EODHD crypto (eth-usd) — RETIRED with
+  // the card (2026-10-21c owner round); the insights ingest no longer calls
+  // EODHD. The id stays OUT of the enum; the markets worker's EODHD usage
+  // (the world-markets board) lives in packages/insights/src/markets/.
 ]);
 export type IndicatorSource = z.infer<typeof IndicatorSourceSchema>;
 

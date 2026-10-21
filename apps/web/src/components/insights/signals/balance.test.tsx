@@ -242,12 +242,12 @@ describe('§4 driver states and counts', () => {
  * ------------------------------------------------------------------ */
 
 describe('§6 beam tilt (the v1 ratio law on the v7 scale)', () => {
-  it('case A (1 against, 3 unread): against side down at the 2° floor', () => {
+  it('case A (1 against, 3 unread): a one-sided directional load tips the beam the WHOLE way (10°)', () => {
     const t = balanceTilt(countsOf(CASE_A), BALANCE_LH_PX);
-    expect(t.angleDeg).toBe(BALANCE_MIN_ANGLE_DEG);
+    expect(t.angleDeg).toBe(BALANCE_MAX_ANGLE_DEG);
     expect(t.heavy).toBe('against');
     // The bead pair differs by Lh × sin; each pan moves by half that.
-    expect(t.endDropPx).toBeCloseTo(Math.sin(radOf(2)) * BALANCE_LH_PX, 10);
+    expect(t.endDropPx).toBeCloseTo(Math.sin(radOf(10)) * BALANCE_LH_PX, 10);
     expect(t.risePx).toBeCloseTo(t.endDropPx / 2, 12);
   });
 
@@ -256,11 +256,11 @@ describe('§6 beam tilt (the v1 ratio law on the v7 scale)', () => {
     expect(t).toEqual({ angleDeg: 0, risePx: 0, endDropPx: 0, heavy: null });
   });
 
-  it('case C (3 for, 1 neutral): for side down at 6° (ratio 0.75 × 8°)', () => {
+  it('case C (3 for, 1 neutral): all directional load on one side → the full 10° tilt', () => {
     const t = balanceTilt(countsOf(CASE_C), BALANCE_LH_PX);
-    expect(t.angleDeg).toBe(6);
+    expect(t.angleDeg).toBe(10);
     expect(t.heavy).toBe('for');
-    expect(t.endDropPx).toBeCloseTo(Math.sin(radOf(6)) * BALANCE_LH_PX, 10);
+    expect(t.endDropPx).toBeCloseTo(Math.sin(radOf(10)) * BALANCE_LH_PX, 10);
   });
 
   it('case D (4 unread): readable 0 → level — no directional implication', () => {
@@ -271,10 +271,10 @@ describe('§6 beam tilt (the v1 ratio law on the v7 scale)', () => {
     expect(balanceTilt(countsOf(CASE_G), BALANCE_LH_PX).heavy).toBeNull();
   });
 
-  it('case E (4 against): the model full range — the 8° maximum', () => {
+  it('case E (4 against): the full directional range — the 10° maximum', () => {
     const t = balanceTilt(countsOf(CASE_E), BALANCE_LH_PX);
     expect(t.angleDeg).toBe(BALANCE_MAX_ANGLE_DEG);
-    expect(t.endDropPx).toBeCloseTo(Math.sin(radOf(8)) * BALANCE_LH_PX, 10);
+    expect(t.endDropPx).toBeCloseTo(Math.sin(radOf(10)) * BALANCE_LH_PX, 10);
   });
 
   it('the picture shows no height difference other than Lh × sin(angle)', () => {
@@ -289,17 +289,27 @@ describe('§6 beam tilt (the v1 ratio law on the v7 scale)', () => {
     }
   });
 
-  it('never dips below the 2° floor when net ≠ 0 (a one-driver lean stays visible)', () => {
-    const oneVsMany: BalanceDriver[] = [...CASE_A, d('x1', 'unread'), d('x2', 'unread'), d('x3', 'unread'), d('x4', 'unread'), d('x5', 'unread'), d('x6', 'unread'), d('x7', 'unread'), d('x8', 'unread'), d('x9', 'unread')];
-    const t = balanceTilt(countsOf(oneVsMany), BALANCE_LH_PX);
-    expect(t.angleDeg).toBeGreaterThanOrEqual(BALANCE_MIN_ANGLE_DEG);
+  it('never dips below the 3° floor when net ≠ 0 (a narrow directional lean stays visible)', () => {
+    // 8 for vs 7 against — net 1 over 15 directional: ratio 0.067 → the 3° floor.
+    const narrow: BalanceDriver[] = [
+      ...CASE_FIVE_VS_FIVE,
+      d('f6', 'for', 'Supportive six'),
+      d('f7', 'for', 'Supportive seven'),
+      d('f8', 'for', 'Supportive eight'),
+    ];
+    const t = balanceTilt(countsOf(narrow), BALANCE_LH_PX);
+    expect(t.angleDeg).toBe(BALANCE_MIN_ANGLE_DEG);
     expect(t.angleDeg).toBeLessThanOrEqual(BALANCE_MAX_ANGLE_DEG);
+    // And a one-driver lean against a wall of unread conditions still
+    // tips the whole way (the owner's case: one item on one pan).
+    const oneVsMany: BalanceDriver[] = [...CASE_A, d('x1', 'unread'), d('x2', 'unread'), d('x3', 'unread'), d('x4', 'unread'), d('x5', 'unread'), d('x6', 'unread'), d('x7', 'unread'), d('x8', 'unread'), d('x9', 'unread')];
+    expect(balanceTilt(countsOf(oneVsMany), BALANCE_LH_PX).angleDeg).toBe(BALANCE_MAX_ANGLE_DEG);
   });
 
   it('addendum-C fixtures: one adverse vs four supportive settles by COUNT (the model has no weights)', () => {
-    // 1 vs 4 → net +3, total 5 → 0.6 × 8° = 4.8°, the FOR pan lower.
+    // 1 vs 4 → net +3 over 5 directional → 0.6 × 10° = 6°, the FOR pan lower.
     const t = balanceTilt(countsOf(CASE_ONE_VS_FOUR), BALANCE_LH_PX);
-    expect(t.angleDeg).toBeCloseTo(4.8, 10);
+    expect(t.angleDeg).toBeCloseTo(6, 10);
     expect(t.heavy).toBe('for');
     // 5 vs 5 → net 0 → exactly level, no directional verdict.
     expect(balanceTilt(countsOf(CASE_FIVE_VS_FIVE), BALANCE_LH_PX).heavy).toBeNull();
@@ -311,16 +321,16 @@ describe('§6 beam tilt (the v1 ratio law on the v7 scale)', () => {
   });
 
   it('signedTiltDeg maps the verdict to the physical sign: against heavy = positive, for = negative, level = 0', () => {
-    expect(signedTiltDeg(balanceTilt(countsOf(CASE_A), BALANCE_LH_PX))).toBe(2);
-    expect(signedTiltDeg(balanceTilt(countsOf(CASE_C), BALANCE_LH_PX))).toBe(-6);
-    expect(signedTiltDeg(balanceTilt(countsOf(CASE_E), BALANCE_LH_PX))).toBe(8);
+    expect(signedTiltDeg(balanceTilt(countsOf(CASE_A), BALANCE_LH_PX))).toBe(10);
+    expect(signedTiltDeg(balanceTilt(countsOf(CASE_C), BALANCE_LH_PX))).toBe(-10);
+    expect(signedTiltDeg(balanceTilt(countsOf(CASE_E), BALANCE_LH_PX))).toBe(10);
     expect(signedTiltDeg(balanceTilt(countsOf(CASE_B), BALANCE_LH_PX))).toBe(0);
     expect(signedTiltDeg(balanceTilt(countsOf(CASE_D), BALANCE_LH_PX))).toBe(0);
   });
 
-  it('the addendum presentation scale: max 8°, floor 2°, capacity 2 — the constants', () => {
-    expect(BALANCE_MAX_ANGLE_DEG).toBe(8);
-    expect(BALANCE_MIN_ANGLE_DEG).toBe(2);
+  it('the 2026-10-21c presentation scale: max 10°, floor 3°, capacity 2 — the constants', () => {
+    expect(BALANCE_MAX_ANGLE_DEG).toBe(10);
+    expect(BALANCE_MIN_ANGLE_DEG).toBe(3);
     expect(BALANCE_PAN_CAPACITY).toBe(2);
   });
 });
@@ -405,12 +415,12 @@ describe('§A stage geometry (one rotating element, plumb pans, redrawn hangers)
   });
 
   it('the vertical travel stays inside the reserved envelope computed from the maximum θ', () => {
-    expect(BALANCE_SWING_PX).toBeCloseTo((BALANCE_LH_PX / 2) * Math.sin(radOf(8)), 10);
+    expect(BALANCE_SWING_PX).toBeCloseTo((BALANCE_LH_PX / 2) * Math.sin(radOf(10)), 10);
     for (const w of [320, 480, 640]) {
-      for (const theta of [-8, -2, 0, 2, 8]) {
+      for (const theta of [-10, -3, 0, 3, 10]) {
         const g = balanceStageGeometry(w, theta, false);
-        expect(Math.abs(g.for.panDrop)).toBeLessThanOrEqual((w / 4) * Math.sin(radOf(8)) + 1e-9);
-        expect(Math.abs(g.against.panDrop)).toBeLessThanOrEqual((w / 4) * Math.sin(radOf(8)) + 1e-9);
+        expect(Math.abs(g.for.panDrop)).toBeLessThanOrEqual((w / 4) * Math.sin(radOf(10)) + 1e-9);
+        expect(Math.abs(g.against.panDrop)).toBeLessThanOrEqual((w / 4) * Math.sin(radOf(10)) + 1e-9);
       }
     }
     // The raised pan's top edge never reaches the beam (no collision),
@@ -510,7 +520,7 @@ describe('§5.1/§13 verdict word and count line', () => {
 
 describe('BalanceScale (rendered v7 balance)', () => {
   it('case A: heading + subtitle + captions + stage + pans with tiles + assessment + lists + panel + trays', () => {
-    render(<BalanceScale metal="gold" drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
+    render(<BalanceScale drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
     // 1. The heading + subtitle.
     expect(screen.getByText('The aggregate of factors affecting the price of gold')).toBeTruthy();
     expect(
@@ -596,7 +606,7 @@ describe('BalanceScale (rendered v7 balance)', () => {
   });
 
   it('addendum §A: ONLY the beam group rotates — every transformed element listed, pans/tiles/text carry nothing beyond translate', () => {
-    render(<BalanceScale metal="gold" drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
+    render(<BalanceScale drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
     const stage = document.querySelector('[data-balance-stage]') as HTMLElement;
     // Walk EVERY descendant: a "transformed" element carries a
     // transform attribute or a style transform.
@@ -628,23 +638,25 @@ describe('BalanceScale (rendered v7 balance)', () => {
     expect(balanceSrc).not.toMatch(/transition-transform/);
   });
 
-  it('case A: the beam rotates by the floored angle and the pans translate by exactly their joints\' drops — one frame, one law', () => {
-    render(<BalanceScale metal="gold" drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
+  it('case A: the beam rotates by the verdict angle and the pans translate by exactly their joints\' drops — one frame, one law', () => {
+    render(<BalanceScale drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
     const beam = document.querySelector('[data-balance-beam]') as SVGElement;
     const asmFor = document.querySelector('[data-balance-assembly="for"]') as HTMLElement;
     const asmAgainst = document.querySelector('[data-balance-assembly="against"]') as HTMLElement;
     // The visual angle (LTR: against-heavy = clockwise = positive) —
-    // rotate(θ, pivotX, pivotY), the ONLY rotation in the drawing.
-    expect(beam.getAttribute('transform')).toBe(`rotate(2 320 ${BALANCE_PIVOT_Y_PX})`);
-    // The pans drop exactly as far as their joints: 160 × sin 2°.
-    const expected = r2(160 * Math.sin(radOf(2)));
+    // rotate(θ, pivotX, pivotY), the ONLY rotation in the drawing. The
+    // dense twin's single against load is the whole directional weight
+    // → the full 10° (2026-10-21c scale).
+    expect(beam.getAttribute('transform')).toBe(`rotate(10 320 ${BALANCE_PIVOT_Y_PX})`);
+    // The pans drop exactly as far as their joints: 160 × sin 10°.
+    const expected = r2(160 * Math.sin(radOf(10)));
     expect(asmAgainst.style.transform).toBe(`translate(0px, ${expected}px)`);
     expect(asmFor.style.transform).toBe(`translate(0px, ${-expected}px)`);
   });
 
   it('the hangers are drawn joint → rim exactly (the SVG lines match the pure geometry)', () => {
-    render(<BalanceScale metal="gold" drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
-    const expected = balanceStageGeometry(640, 2, false);
+    render(<BalanceScale drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
+    const expected = balanceStageGeometry(640, 10, false);
     for (const side of ['for', 'against'] as const) {
       const s = expected[side];
       const start = document.querySelector(`[data-balance-hanger="${side}-start"]`) as SVGLineElement;
@@ -661,13 +673,15 @@ describe('BalanceScale (rendered v7 balance)', () => {
   });
 
   it('a changed verdict lands on the new angle (the one animated value drives the whole frame)', () => {
-    const { rerender } = render(<BalanceScale metal="gold" drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
+    const { rerender } = render(<BalanceScale drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
     const beam = () => document.querySelector('[data-balance-beam]') as SVGElement;
-    expect(beam().getAttribute('transform')).toBe(`rotate(2 320 ${BALANCE_PIVOT_Y_PX})`);
-    // Case E: 4 against → the model's full range, 8°.
-    rerender(<BalanceScale metal="gold" drivers={CASE_E} copy={copy} numberLocale="en-US" />);
-    expect(beam().getAttribute('transform')).toBe(`rotate(8 320 ${BALANCE_PIVOT_Y_PX})`);
-    const drop = r2(160 * Math.sin(radOf(8)));
+    expect(beam().getAttribute('transform')).toBe(`rotate(10 320 ${BALANCE_PIVOT_Y_PX})`);
+    // Case E: 4 against → the full directional range, 10° (same angle
+    // here — but a DIFFERENT drop source: every directional load is
+    // one-sided in both cases; the law is the ratio, not the count).
+    rerender(<BalanceScale drivers={CASE_E} copy={copy} numberLocale="en-US" />);
+    expect(beam().getAttribute('transform')).toBe(`rotate(10 320 ${BALANCE_PIVOT_Y_PX})`);
+    const drop = r2(160 * Math.sin(radOf(10)));
     expect((document.querySelector('[data-balance-assembly="against"]') as HTMLElement).style.transform).toBe(
       `translate(0px, ${drop}px)`,
     );
@@ -676,30 +690,30 @@ describe('BalanceScale (rendered v7 balance)', () => {
     );
     // The hangers track the new joints (they can never detach: one
     // state → one render → every coordinate).
-    const e = balanceStageGeometry(640, 8, false);
+    const e = balanceStageGeometry(640, 10, false);
     const line = document.querySelector('[data-balance-hanger="against-start"]') as SVGLineElement;
     expect(line.getAttribute('x1')).toBe(String(r2(e.against.joint.x)));
     expect(line.getAttribute('y1')).toBe(String(r2(e.against.joint.y)));
   });
 
   it('case C (for heavy): the physical sign is negative; fa flips ONLY the visual rotation', () => {
-    const { rerender } = render(<BalanceScale metal="gold" drivers={CASE_C} copy={copy} numberLocale="en-US" />);
+    const { rerender } = render(<BalanceScale drivers={CASE_C} copy={copy} numberLocale="en-US" />);
     const beamOf = (): SVGElement => document.querySelector('[data-balance-beam]') as SVGElement;
-    expect(beamOf().getAttribute('transform')).toBe(`rotate(-6 320 ${BALANCE_PIVOT_Y_PX})`);
+    expect(beamOf().getAttribute('transform')).toBe(`rotate(-10 320 ${BALANCE_PIVOT_Y_PX})`);
     const dropEn = (document.querySelector('[data-balance-assembly="for"]') as HTMLElement).style.transform;
-    expect(dropEn).toBe(`translate(0px, ${r2(160 * Math.sin(radOf(6)))}px)`);
-    rerender(<BalanceScale metal="gold" drivers={CASE_C} copy={copyFa} numberLocale="fa-IR" />);
+    expect(dropEn).toBe(`translate(0px, ${r2(160 * Math.sin(radOf(10)))}px)`);
+    rerender(<BalanceScale drivers={CASE_C} copy={copyFa} numberLocale="fa-IR" />);
     // The PHYSICAL drop sign never flips (the for pan drops in fa
     // too); only the beam's VISUAL rotation flips so the heavy end
     // dips — in RTL the for pan is the RIGHT column.
-    expect(beamOf().getAttribute('transform')).toBe(`rotate(6 320 ${BALANCE_PIVOT_Y_PX})`);
+    expect(beamOf().getAttribute('transform')).toBe(`rotate(10 320 ${BALANCE_PIVOT_Y_PX})`);
     const dropFa = (document.querySelector('[data-balance-assembly="for"]') as HTMLElement).style.transform;
     expect(dropFa).toBe(dropEn);
   });
 
   it('cases B, D and G render level — no direction, no drop, no needle for the unavailable state', () => {
     for (const drivers of [CASE_B, CASE_G, CASE_D]) {
-      const { unmount } = render(<BalanceScale metal="gold" drivers={drivers} copy={copy} numberLocale="en-US" />);
+      const { unmount } = render(<BalanceScale drivers={drivers} copy={copy} numberLocale="en-US" />);
       const beam = document.querySelector('[data-balance-beam]') as SVGElement;
       expect(beam.getAttribute('transform')).toBe(`rotate(0 320 ${BALANCE_PIVOT_Y_PX})`);
       for (const side of ['for', 'against'] as const) {
@@ -725,26 +739,26 @@ describe('BalanceScale (rendered v7 balance)', () => {
   });
 
   it('the gauge carries its text equivalent (never colour alone): tilt degrees + the verdict word', () => {
-    const { unmount: unmountEn } = render(<BalanceScale metal="gold" drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
+    const { unmount: unmountEn } = render(<BalanceScale drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
     const svg = document.querySelector('[data-balance-mech]') as SVGElement;
     expect(svg.getAttribute('role')).toBe('img');
-    expect(svg.getAttribute('aria-label')).toBe('Beam tilt: 2°, Leaning against gold.');
+    expect(svg.getAttribute('aria-label')).toBe('Beam tilt: 10°, Leaning against gold.');
     unmountEn();
-    const { unmount } = render(<BalanceScale metal="gold" drivers={CASE_A_DENSE} copy={copyFa} numberLocale="fa-IR" />);
+    const { unmount } = render(<BalanceScale drivers={CASE_A_DENSE} copy={copyFa} numberLocale="fa-IR" />);
     const svgFa = document.querySelector('[data-balance-mech]') as SVGElement;
-    expect(svgFa.getAttribute('aria-label')).toBe('شیب تیر: ۲ درجه، تمایل به ضرر طلا.');
+    expect(svgFa.getAttribute('aria-label')).toBe('شیب تیر: ۱۰ درجه، تمایل به ضرر طلا.');
     unmount();
   });
 
   it('case B: both pans carry two tiles and the balance is level', () => {
-    render(<BalanceScale metal="gold" drivers={CASE_B} copy={copy} numberLocale="en-US" />);
+    render(<BalanceScale drivers={CASE_B} copy={copy} numberLocale="en-US" />);
     expect(document.querySelectorAll('[data-balance-pan="for"] [data-balance-tile]').length).toBe(2);
     expect(document.querySelectorAll('[data-balance-pan="against"] [data-balance-tile]').length).toBe(2);
     expect(screen.getByText('Balanced')).toBeTruthy();
   });
 
   it('case D: the none verdict, the DISTINCT "nothing to weigh yet" markers in BOTH pans, the unavailable lines on both sides, level', () => {
-    render(<BalanceScale metal="gold" drivers={CASE_D} copy={copy} numberLocale="en-US" />);
+    render(<BalanceScale drivers={CASE_D} copy={copy} numberLocale="en-US" />);
     expect(screen.getByText("Can't read the conditions right now")).toBeTruthy();
     for (const side of ['for', 'against'] as const) {
       expect(document.querySelector(`[data-balance-empty="${side}"]`)?.textContent).toBe('Nothing to weigh yet');
@@ -757,7 +771,7 @@ describe('BalanceScale (rendered v7 balance)', () => {
   });
 
   it('case H (6 for / 3 against): the pans keep their capacity, the pills count the overflow, the full lists disclose, and the stage geometry never changes', () => {
-    render(<BalanceScale metal="gold" drivers={CASE_H} copy={copy} numberLocale="en-US" />);
+    render(<BalanceScale drivers={CASE_H} copy={copy} numberLocale="en-US" />);
     const stage = document.querySelector('[data-balance-stage]') as HTMLElement;
     const stageClass = stage.className;
     const panFor = document.querySelector('[data-balance-pan="for"]') as HTMLElement;
@@ -786,12 +800,13 @@ describe('BalanceScale (rendered v7 balance)', () => {
     expect(screen.getAllByText('Show fewer').length).toBe(2);
     // The stage's geometry never depended on the count: the same class
     // (fixed heights, same anchors) as the 4-driver case A render, and
-    // the drops still ride the same plumb law (net +3/9 → 8/3°).
-    const dropH = r2(160 * Math.sin(radOf(8 / 3)));
+    // the drops still ride the same plumb law (net +3 over 9 directional
+    // → ratio 1/3 → 10/3° on the 2026-10-21c scale).
+    const dropH = r2(160 * Math.sin(radOf(10 / 3)));
     expect((document.querySelector('[data-balance-assembly="for"]') as HTMLElement).style.transform).toBe(
       `translate(0px, ${dropH}px)`,
     );
-    const { unmount } = render(<BalanceScale metal="gold" drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
+    const { unmount } = render(<BalanceScale drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
     const stageA = document.querySelector('[data-balance-stage]') as HTMLElement;
     expect(stageA.className).toBe(stageClass);
     unmount();
@@ -803,7 +818,7 @@ describe('BalanceScale (rendered v7 balance)', () => {
   });
 
   it('a tile tap opens its explanation in the panel; a second tap closes it (every width)', () => {
-    render(<BalanceScale metal="gold" drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
+    render(<BalanceScale drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
     const tile = document.querySelector('[data-balance-tile="real-yield"]') as HTMLButtonElement;
     const panel = document.getElementById('gold-balance-detail') as HTMLElement;
     expect(panel.hidden).toBe(true);
@@ -816,7 +831,7 @@ describe('BalanceScale (rendered v7 balance)', () => {
   });
 
   it('one panel at a time: opening a tray chip closes the tile\'s panel', () => {
-    render(<BalanceScale metal="gold" drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
+    render(<BalanceScale drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
     fireEvent.click(document.querySelector('[data-balance-tile="real-yield"]')!);
     expect(document.querySelector('[data-balance-detail]')!.getAttribute('data-balance-detail')).toBe('real-yield');
     fireEvent.click(document.querySelector('[data-balance-chip="stress"]')!);
@@ -824,7 +839,7 @@ describe('BalanceScale (rendered v7 balance)', () => {
   });
 
   it('the structure order: heading → subtitle → captions → stage → assessment → lists → panel → trays', () => {
-    render(<BalanceScale metal="gold" drivers={CASE_A} copy={copy} numberLocale="en-US" />);
+    render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
     const chain: Array<Node | null> = [
       document.querySelector('[data-balance-title]'),
       document.querySelector('[data-balance-subtitle]'),
@@ -841,7 +856,7 @@ describe('BalanceScale (rendered v7 balance)', () => {
   });
 
   it('renders Persian digits and captions in fa; the pans carry the Persian empty marker; NOTHING mirrors text', () => {
-    const { unmount: unmountFa } = render(<BalanceScale metal="gold" drivers={CASE_A_DENSE} copy={copyFa} numberLocale="fa-IR" />);
+    const { unmount: unmountFa } = render(<BalanceScale drivers={CASE_A_DENSE} copy={copyFa} numberLocale="fa-IR" />);
     expect(screen.getByText('برآیند عوامل مؤثر بر قیمت طلا')).toBeTruthy();
     expect(screen.getByText('۱ به ضرر · ۳ خنثی')).toBeTruthy();
     // The side label rides TWICE by design: once as the caption over the
@@ -857,22 +872,22 @@ describe('BalanceScale (rendered v7 balance)', () => {
     // The source NEVER mirrors text — no scaleX(-1) anywhere.
     expect(balanceSrc).not.toMatch(/scaleX\(-1\)/);
     unmountFa();
-    const { unmount } = render(<BalanceScale metal="gold" drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
+    const { unmount } = render(<BalanceScale drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
     expect((document.querySelector('[data-balance-beam]') as SVGElement).getAttribute('transform')).toBe(
-      `rotate(2 320 ${BALANCE_PIVOT_Y_PX})`,
+      `rotate(10 320 ${BALANCE_PIVOT_Y_PX})`,
     );
     unmount();
   });
 
   it('chips are at least 44px tall by class and dashed for unread; the empty-side full line rides the list area', () => {
-    render(<BalanceScale metal="gold" drivers={CASE_A} copy={copy} numberLocale="en-US" />);
+    render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
     const chip = document.querySelector('[data-balance-chip="stress"]') as HTMLButtonElement;
     expect(chip.className).toContain('min-h-[44px]');
     expect(chip.className).toContain('border-dashed');
   });
 
   it('the banner sentence rides inside the assessment box where provided', () => {
-    render(<BalanceScale metal="gold" drivers={CASE_A} copy={copy} numberLocale="en-US" banner={<p>the c12 note</p>} />);
+    render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" banner={<p>the c12 note</p>} />);
     const verdict = document.querySelector('[data-balance-verdict]') as HTMLElement;
     expect(verdict.textContent).toContain('the c12 note');
   });
@@ -955,74 +970,57 @@ describe('MergedSignalsCard integration', () => {
     render(
       <MergedSignalsCard gold={gold} silver={silver} readings={readings} copy={copy} numberLocale="en-US" />,
     );
-    // The balance replaced the groups. v3 UI-45 (2026-10-19 merge): TWO
-    // balances render, one per metal; the readable count on this fixture
-    // is 1 (< 3) so BOTH beams stay level with the honest not-enough line
-    // (UI-40) — never a directional word from sparse data.
+    // The balance replaced the groups. 2026-10-21c owner round: ONLY
+    // GOLD's balance renders (silver's is retired — "remove that section
+    // entirely"); the readable count on this fixture is 1 (< 3) so the
+    // beam stays level with the honest not-enough line (UI-40) — never a
+    // directional word from sparse data.
     expect(document.querySelector('[data-balance="gold"]')).not.toBeNull();
-    expect(document.querySelector('[data-balance="silver"]')).not.toBeNull();
+    expect(document.querySelector('[data-balance="silver"]')).toBeNull();
     expect(document.querySelector('[data-balance="gold"] [data-balance-stage]')).not.toBeNull();
-    // Both metals' fixtures are sparse (readable 1) — the honest line
-    // renders once per balance, never a direction from sparse data (UI-40).
-    expect(screen.getAllByText('Not enough readable conditions to weigh').length).toBe(2);
+    // Gold's fixture is sparse (readable 1) — the honest line renders
+    // exactly once, never a direction from sparse data (UI-40).
+    expect(screen.getAllByText('Not enough readable conditions to weigh').length).toBe(1);
     expect(
       document.querySelector('[data-balance="gold"] [data-balance-beam]')?.getAttribute('data-tilt'),
     ).toBe('0');
-    expect(
-      document.querySelector('[data-balance="silver"] [data-balance-beam]')?.getAttribute('data-tilt'),
-    ).toBe('0');
     expect(screen.getByText('The aggregate of factors affecting the price of gold')).toBeTruthy();
-    expect(screen.getByText('The aggregate of factors affecting the price of silver')).toBeTruthy();
+    // The retired SILVER balance copy never renders again.
+    expect(screen.queryByText('The aggregate of factors affecting the price of silver')).toBeNull();
     // The retired group headings never render again.
     expect(screen.queryByText('Works against')).toBeNull();
     expect(screen.queryByText('Sitting neutral')).toBeNull();
     // v6: the against PAN carries the one readable tile; the for side
     // keeps its pan with the evidence-based line below (no dashed slot).
     expect(document.querySelector('[data-balance-tile="real-yield"]')).not.toBeNull();
-    // UI-45: BOTH balances' for sides are empty on this fixture — the
-    // evidence-based line renders once per balance.
+    // Gold's for side is empty on this fixture — the evidence-based line
+    // renders once.
     expect(
       screen.getAllByText('None of the factors checked shows a meaningful signal supporting gold’s price right now.')
         .length,
-    ).toBe(2);
+    ).toBe(1);
     expect(document.querySelector('[data-balance-empty="for"]')?.textContent).toBe('No qualifying signals');
     expect(document.querySelector('[data-balance-slot]')).toBeNull();
     // The unread drivers sit in the tray, off the pans.
     const unreadTray = document.querySelector('[data-balance-tray="unread"]') as HTMLElement;
     expect(unreadTray.querySelectorAll('button').length).toBe(3);
-    // The merged card shares the conditions once; UI-45: the silver-only
-    // industrial condition rides SILVER's balance alone (the separate
-    // short list is retired) — it renders in silver's unread tray here
-    // and NEVER inside gold's balance.
+    // The merged card shares the conditions once; the silver-only
+    // industrial condition retired with silver's balance — it renders
+    // NOWHERE in the merged card now (2026-10-21c).
     expect(mergeSignals(gold, silver).shared.length).toBe(4);
-    const goldBox = document.querySelector('[data-balance="gold"]') as HTMLElement;
-    const silverBox = document.querySelector('[data-balance="silver"]') as HTMLElement;
-    expect(silverBox.querySelector('[data-balance-chip="industrial"]')).not.toBeNull();
-    expect(goldBox.querySelector('[data-balance-chip="industrial"]')).toBeNull();
-    expect(silverBox.querySelector('[data-balance-tray="unread"]')?.querySelectorAll('button').length).toBe(4);
-    // The price footing strip: divider-separated, below the trays (§9).
+    expect(document.querySelector('[data-balance-chip="industrial"]')).toBeNull();
+    // The price footing strip: divider-separated, below the trays (§9)
+    // — and silver KEEPS its footing row.
     const footing = screen.getByText('Price footing') as HTMLElement;
     const footingBox = footing.parentElement as HTMLElement;
     expect(footingBox.className).toContain('border-t');
     expect(footingBox.compareDocumentPosition(unreadTray) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+    expect(document.querySelectorAll('[data-footing-metal]').length).toBe(2);
   });
 
-  it("UI-45: a DENSE silver balance speaks silver's own copy and weighs when readable ≥ 3", async () => {
-    const { BalanceScale } = await import('./BalanceScale');
-    const silverDense: BalanceDriver[] = [
-      d('real-yield', 'for'),
-      d('expectations', 'for'),
-      d('stress', 'for'),
-      d('dollar', 'against'),
-      d('industrial', 'unread'),
-    ];
-    render(<BalanceScale metal="silver" drivers={silverDense} copy={copy} numberLocale="en-US" />);
-    expect(screen.getByText('The aggregate of factors affecting the price of silver')).toBeTruthy();
-    expect(screen.getByText('Leaning for silver')).toBeTruthy();
-    expect(document.querySelector('[data-balance-readable-line]')?.textContent).toContain('4 of 5 conditions readable');
-    expect(document.querySelector('[data-balance-beam]')?.getAttribute('data-tilt')).toBe('-3.2');
-    // silver's aria speaks silver, never gold
-    const stage = document.querySelector('[data-balance-stage]') as HTMLElement;
-    expect(stage.getAttribute('aria-label')).toMatch(/^Balance for silver: /);
-  });
+  // 2026-10-21c owner round: the UI-45 "a DENSE silver balance speaks
+  // silver's own copy" test is RETIRED with silver's balance — the
+  // component renders gold's balance only (the metal prop and the
+  // balanceSilver copy variants are gone). Gold's dense coverage is
+  // pinned by the BalanceScale suites above.
 });

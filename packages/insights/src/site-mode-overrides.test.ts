@@ -27,17 +27,21 @@ describe('data/site-mode-overrides.json (the generated public-mode hidden set)',
     expect(overrides.hiddenIndicatorIds).toEqual(mustHide);
   });
 
-  it('hides the fx board and KEEPS the markets board public (2026-10-18b owner directive)', () => {
-    // The fx board (EODHD/Yahoo-backed, no owner directive) stays hidden —
-    // LR-02 still applies to it. The world MARKETS board is the owner's
-    // 2026-10-18b directive (their own EODHD key backs it): a generator
-    // change must never re-hide it without the owner saying so, and the
-    // directive's evidence note must ride in the generated file.
-    expect(overrides.hiddenBoards).toContain('fx');
-    expect(overrides.hiddenBoards).not.toContain('markets');
-    const note = (overrides as { ownerBoardDirectives?: Record<string, string> }).ownerBoardDirectives?.markets;
-    expect(typeof note).toBe('string');
-    expect((note ?? '').length).toBeGreaterThan(0);
+  it('hides NEITHER world board — markets rides the 2026-10-18b directive, fx the 2026-10-21c restoration directive', () => {
+    // The world MARKETS board is the owner's 2026-10-18b directive (their
+    // own EODHD key backs it) and the world FX board the owner's
+    // 2026-10-21c currencies-restoration directive (ECB reference rates
+    // via Frankfurter — the same rates the public converter displays;
+    // terms verified 2026-10-21): a generator change must never re-hide
+    // either without the owner saying so, and both directives' evidence
+    // notes must ride in the generated file.
+    expect(overrides.hiddenBoards).toEqual([]);
+    const directives = (overrides as { ownerBoardDirectives?: Record<string, string> }).ownerBoardDirectives ?? {};
+    for (const board of ['markets', 'fx']) {
+      const note = directives[board];
+      expect(typeof note).toBe('string');
+      expect((note ?? '').length).toBeGreaterThan(0);
+    }
   });
 
   it('keeps the 2026-10-19e owner-directive prices tiles PUBLIC (gold, silver, bitcoin, brent)', () => {

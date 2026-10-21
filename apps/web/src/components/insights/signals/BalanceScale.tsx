@@ -30,7 +30,7 @@
  *     and rotating with the beam, read against a small FIXED arc
  *     scale with three ticks only (adverse end · centre · supportive
  *     end — no numeric labels, no fabricated thresholds), hidden
- *     when the state is unavailable. The needle is what makes a 2°
+ *     when the state is unavailable. The needle is what makes a 3°
  *     lean legible.
  * Per-side weighted totals and per-factor weights do NOT exist in
  * the model, so the side-load bar and the per-tile weight marker are
@@ -51,14 +51,14 @@
  * — each by translate(0, dy) only, so it hangs plumb. The hangers are
  * recomputed straight lines joint → rim; because the joint also
  * travels a second-order horizontal amount ((L/2)·(cos θ − 1) ≈ 1.5px
- * at 8°) while the pan stays on its column, the two lines' angles
+ * at 10°) while the pan stays on its column, the two lines' angles
  * change slightly — the real-hanging-pan cue the addendum asks for.
  *
  * Rules that survive verbatim from v3/v4/v5/v6:
  *   1. Carefully proportioned vector geometry with controlled weights
  *      (beam 12px > pivot ring 16px > beads 13px > hangers/needle 2px)
  *      and a fixed-height stage (272px mobile / 240px ≥ sm) that
- *      reserves exactly the ±(L/2)·sin 8° swing plus the pan stack —
+ *      reserves exactly the ±(L/2)·sin 10° swing plus the pan stack —
  *      the envelope is computed from the maximum θ (addendum §A).
  *   2. No dashed placeholder rectangles: a side with no qualifying
  *      factors keeps its COMPLETE pan (hangers, rim, floor) with a
@@ -72,13 +72,14 @@
  *      the side's full list. Nothing is silently omitted; the model
  *      still sees every driver; the stage's geometry never depends
  *      on any count.
- *   4. Direction follows the model (v1 §6 steps 3–4 — the ratio law
- *      itself is UNTOUCHED; the v7 addendum supersedes only its
- *      presentation scale): the beam tilts ONLY for a valid
- *      aggregate verdict, angle = |net|/total × 8° clamped to
- *      [2°, 8°]; balanced and unreadable verdicts render level. The
- *      NUMBER of tiles never sets the tilt — only the documented
- *      net/total ratio does.
+ *   4. Direction follows the model (the net sign → the verdict word is
+ *      UNTOUCHED; the 2026-10-21c owner round supersedes only its
+ *      PRESENTATION scale): the beam tilts ONLY for a valid
+ *      aggregate verdict, angle = |net|/(for+against) × 10° clamped to
+ *      [3°, 10°] — the share of the DIRECTIONAL load on the heavy side
+ *      (a one-sided pan tips the whole way). Balanced and unreadable
+ *      verdicts render level. The NUMBER of tiles never sets the
+ *      direction — only the model's net does.
  *   5. Fixed stage geometry: the stage's height is constant per
  *      breakpoint; any number of factors on either side can never
  *      resize, clip or collide with the drawing.
@@ -160,15 +161,24 @@ export function balanceCounts(drivers: readonly BalanceDriver[]): BalanceCounts 
   return { for: f, against: a, neutral: n, unread: u, total: drivers.length, net: f - a, readable: f + a + n };
 }
 
-/** The tilt constants. The RATIO LAW (v1 §6 steps 3–4: net/total) is
- * the owner's scoring model and is byte-identical; the v7 Iteration-5
- * addendum supersedes only its PRESENTATION scale: a clamped linear
- * mapping with a 8° maximum at the model's full range (|net|/total =
- * 1) and a 2° floor so any valid directional result is visibly
- * unlevel (the needle makes even 2° readable). Neutral and
- * unavailable are exactly level. */
-export const BALANCE_MAX_ANGLE_DEG = 8;
-export const BALANCE_MIN_ANGLE_DEG = 2;
+/** The tilt constants. The SCORING (the net sign → the verdict word and
+ * the counts) is the owner's model and is byte-identical. The v7
+ * Iteration-5 addendum's presentation scale (|net|/total × 8°, floor 2°)
+ * is superseded by the 2026-10-21c owner round — the owner's complaint:
+ * "the tilt of balance for gold is too slow, currently one side has an
+ * item, other doesn't have at all, but they are seemingly aligned."
+ * The new presentation scale measures the DIRECTIONAL load only —
+ * |net| / (for + against), the share of the pan load sitting on the heavy
+ * side (neutral and unread conditions never rest on a pan, so they no
+ * longer damp the picture) — on a steeper [3°, 10°] range:
+ *   · a one-sided directional load (the owner's case) tips the beam the
+ *     whole way to 10° — a lone item visibly weighs its side down;
+ *   · a 2:1 directional majority tips ~6.7° — clearly off level;
+ *   · an even directional split stays exactly level (net 0).
+ * Neutral and unavailable are exactly level. The needle + the reserved
+ * envelope are derived from the same constants, so they track. */
+export const BALANCE_MAX_ANGLE_DEG = 10;
+export const BALANCE_MIN_ANGLE_DEG = 3;
 
 /* ------------------------------------------------------------------ *
  * v7 stage metrics — ONE fixed-height stage. The logical design width
@@ -211,7 +221,7 @@ export const BALANCE_HANG_SPREAD_PX = 24;
 export const BALANCE_PAN_TOP_PX = BALANCE_PIVOT_Y_PX + BALANCE_HANG_PX;
 /** The fixed stage heights (mobile / ≥sm) and pan heights: the stage
  * reserves the pan stack, the overflow pill, and the ±(Lh ÷ 2) × sin
- * of the 8° maximum at the 640 design width (the envelope is
+ * of the 10° maximum at the 640 design width (the envelope is
  * computed from the maximum θ — addendum §A). */
 export const BALANCE_STAGE_H_MOBILE = 260;
 export const BALANCE_STAGE_H_DESKTOP = 240;
@@ -219,14 +229,14 @@ export const BALANCE_PAN_H_MOBILE = 118;
 export const BALANCE_PAN_H_DESKTOP = 88;
 /** The beam's pin-to-pin length is half the stage, so the vertical
  * travel of one pan is (stageWidth ÷ 4) × sin θ — at the 640 design
- * width and the 8° maximum this is 160 × sin 8° ≈ 22.27px: the fixed
+ * width and the 10° maximum this is 160 × sin 10° ≈ 27.78px: the fixed
  * reserved envelope every frame must stay inside (tested). */
 export const BALANCE_SWING_PX = (BALANCE_LH_PX / 2) * Math.sin((BALANCE_MAX_ANGLE_DEG * Math.PI) / 180);
 
 /** The needle + arc (addendum §B): the needle hangs from the pivot,
  * 26px long, and reads against a fixed arc of radius 27 with three
  * ticks (r 27 → 32) at straight-down ± the maximum angle — the tip
- * sweeps exactly to the end ticks at ±8°. */
+ * sweeps exactly to the end ticks at ±10°. */
 export const BALANCE_NEEDLE_LEN_PX = 26;
 export const BALANCE_ARC_R_PX = 27;
 export const BALANCE_ARC_TICK_OUT_PX = 32;
@@ -261,17 +271,20 @@ export interface BalanceTilt {
 }
 
 /**
- * The tilt rule (v1 §6 steps 3–4 — the net/total ratio law, kept
- * verbatim; the v7 addendum supersedes the presentation scale): net 0
- * → level; nothing readable → level; otherwise angle =
- * |net|/total × MAX clamped to [MIN, MAX]. `lhPx` is the
- * pin-to-pin distance in the drawing's units (0 → level).
+ * The tilt rule (the scoring's net sign drives everything; the 2026-10-21c
+ * presentation scale maps it onto the beam): net 0 → level; nothing
+ * readable → level; otherwise angle = |net| / (for + against) × MAX
+ * clamped to [MIN, MAX] — the share of the DIRECTIONAL load on the heavy
+ * side, so a one-sided pan tips the beam the whole way while neutral and
+ * unread conditions (never on a pan) cannot damp the picture. `lhPx` is
+ * the pin-to-pin distance in the drawing's units (0 → level).
  */
 export function balanceTilt(counts: BalanceCounts, lhPx: number): BalanceTilt {
   if (counts.readable === 0 || counts.net === 0 || lhPx <= 0) {
     return { angleDeg: 0, risePx: 0, endDropPx: 0, heavy: null };
   }
-  const ratio = Math.abs(counts.net) / counts.total;
+  const directional = counts.for + counts.against;
+  const ratio = directional > 0 ? Math.abs(counts.net) / directional : 0;
   const angleDeg = Math.min(BALANCE_MAX_ANGLE_DEG, Math.max(BALANCE_MIN_ANGLE_DEG, ratio * BALANCE_MAX_ANGLE_DEG));
   const endDropPx = Math.sin(radOf(angleDeg)) * lhPx;
   return { angleDeg, risePx: endDropPx / 2, endDropPx, heavy: counts.net > 0 ? 'for' : 'against' };
@@ -454,7 +467,6 @@ export function BalanceScale({
   copy,
   numberLocale,
   banner,
-  metal,
 }: {
   drivers: readonly BalanceDriver[];
   copy: InsightsCopy;
@@ -462,16 +474,13 @@ export function BalanceScale({
   /** The card's existing verdict banner sentence (spec §5.2 — kept
    * unchanged, rendered inside the aggregate assessment box). */
   banner?: ReactNode;
-  /** v3 UI-45 (kept through the v3 merge): gold and silver each get
-   * their OWN balance — the silver copy variants (balanceSilver)
-   * override the gold-worded strings; the whole mechanical drawing,
-   * counts and honesty rules are shared. */
-  metal: 'gold' | 'silver';
 }): React.JSX.Element | null {
-  const b =
-    metal === 'silver'
-      ? { ...copy.signals.balance, ...copy.signals.balanceSilver }
-      : copy.signals.balance;
+  // 2026-10-21c owner round: silver's balance (and with it the `metal`
+  // prop + the balanceSilver copy variants) is RETIRED — the merged card
+  // renders GOLD's balance only; the drawing, counts and honesty rules
+  // are unchanged.
+  const b = copy.signals.balance;
+  const metal = 'gold' as const;
   const rtl = numberLocale === 'fa-IR';
   const [openKey, setOpenKey] = useState<string | null>(null);
   /** Which side's full factor list is expanded (v6: opened by the
@@ -492,7 +501,7 @@ export function BalanceScale({
   /* v3 UI-40 (2026-10-20, kept through the v3 merge): fewer than 3
    * readable conditions is NOT a reading — the beam stays level, the
    * verdict word becomes the honest "not enough readable conditions"
-   * line and the gauge hides. The v6 2° floor still governs every
+   * line and the gauge hides. The 2026-10-21c 3° floor still governs every
    * non-sparse directional result (readable ≥ 3). */
   const sparse = counts.readable < 3;
   const targetDeg = sparse ? 0 : signedTiltDeg(tilt);

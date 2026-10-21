@@ -27,7 +27,6 @@
  *   CLOUDFLARE_ACCOUNT_ID       (required for writes)
  *   INSIGHTS_KV_NAMESPACE_ID    (required for writes — the RATES namespace)
  *   INSIGHTS_RUN_MODE           scheduled | manual (default manual)
- *   EODHD_API_TOKEN             optional — the eth-usd card's source
  *   RBA_SKIP_CSV_TABLES         '1' to skip the f2 daily path (venue flag)
  */
 
@@ -86,7 +85,6 @@ for (const dictPath of ['apps/web/src/i18n/insights-copy-en.ts', 'apps/web/src/i
   }
 }
 
-const eodhdToken = process.env.EODHD_API_TOKEN || undefined;
 const skipRbaCsvTables = process.env.RBA_SKIP_CSV_TABLES === '1' || undefined;
 
 const result = await runInsightsUpdate({
@@ -95,7 +93,6 @@ const result = await runInsightsUpdate({
   // run — the undefined-vs-store split keeps the env checks honest.
   store: dryRun ? ({ getSnapshot: async () => undefined, getHistory: async () => undefined } as never) : store!,
   mode,
-  ...(eodhdToken !== undefined ? { eodhdApiToken: eodhdToken } : {}),
   ...(skipRbaCsvTables !== undefined ? { skipRbaCsvTables: true } : {}),
   dryRun,
   ...(copyTexts.length > 0 ? { copyTexts } : {}),

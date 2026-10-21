@@ -554,7 +554,24 @@ const BUDGETS = [
   // compressible — the gzip delta is +2.43 kB for the whole restored
   // surface). The entry chunk is untouched at 295.28/88.81 vs 296/89.5.
   // Justified in CHANGELOG §2026-10-20 (owner UI restore).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 700_000, gz: 169_000, label: 'Insights lazy chunk' },
+
+  // 2026-10-21 DATA-INTEGRITY + 2026-10-21c RESTORATION (700.00 → 765.00
+  // raw, 169.00 → 186.00 gz): the deployed-but-unbudgeted data-integrity
+  // round (12 new indicator cards + the EODHD crypto adapter + the FRED
+  // bulk groups + ~135 new fa copy strings — the live deploy measured
+  // 761.20/185.13, already past the 700/169 line) plus the 2026-10-21c
+  // owner round that RESTORES the world-currencies section publicly (the
+  // FX pattern cards, pairs table with its detail panel, reading aids and
+  // dollar row all become load-bearing instead of dead-weighted) and
+  // retires the silver balance + the eth-usd card. Measured 757.01 kB
+  // raw / 182.41 kB gz — SMALLER than the live deploy (the retirements
+  // give back ~4 kB raw) — the raw growth over 700 is the restored
+  // currencies section's components and the 12-card copy corpus × two
+  // locales, the gzip delta is +13.41 kB over the old budget for the
+  // whole restored surface. The entry chunk is untouched at 295.28/88.81
+  // vs 296/89.5 (Insights stays lazy). Justified in CHANGELOG
+  // §2026-10-21c (owner restoration round).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 765_000, gz: 186_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

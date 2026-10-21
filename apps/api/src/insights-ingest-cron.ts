@@ -49,7 +49,6 @@ export async function runScheduledInsightsIngest(env: Bindings): Promise<void> {
     store,
     stageKv: env.RATES,
     mode: 'scheduled',
-    eodhdApiToken: env.EODHD_API_TOKEN,
     // The Worker venue: Akamai 403s the RBA CSV paths from Cloudflare
     // egress (venue-verified 2026-10-21) — skip the doomed attempts and
     // read the cash rate from the HTML decision table instead.

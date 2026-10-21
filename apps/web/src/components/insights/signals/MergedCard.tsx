@@ -1,7 +1,7 @@
 /**
  * signals/MergedCard — the ONE merged gold-and-silver card, carrying the
- * TWO per-metal BALANCE visuals (v3 UI_SPEC §9/UI-45 × the owner's v7
- * BalanceScale machinery, 2026-10-19 v3 merge).
+ * GOLD balance visual (v3 UI_SPEC §9/UI-45 × the owner's v7 BalanceScale
+ * machinery, 2026-10-19 v3 merge).
  *
  * History: R26 merged the two metals' cards into one (shared conditions
  * listed once + per-metal footing rows); round 23's VerdictStrip (the
@@ -11,12 +11,15 @@
  * wireframe iterations (v1 spec → the v7 "rotate the beam only, visualize
  * weight" addendum — pans hung from the beam, SVG mechanical layer,
  * needle + three-tick arc gauge; all of that machinery is KEPT verbatim).
- * The v3 UI_SPEC §9 owner decision supersedes the CARD'S SHAPE only:
- * gold and silver each get their OWN balance (UI-45), the silver-only
- * industrial condition rides SILVER's balance alone (no separate short
- * list), the honesty rules hold on both (UI-40: readable < 3 → level
- * beam + the not-enough line, implemented inside BalanceScale), the
- * readable-count line always states the evidence (UI-39.5), and the
+ * The v3 UI_SPEC §9 owner decision gave gold and silver each their OWN
+ * balance (UI-45) — the 2026-10-21c owner round RETIRES THE SILVER
+ * BALANCE entirely ("I dont need balance scale of Silver, remove that
+ * section entirely"): gold keeps its balance; silver keeps its analysis
+ * card (VerdictStrip) and its footing row — the silver-only industrial
+ * condition no longer needs a pan, so it does not render here at all.
+ * The honesty rules hold on the gold balance (UI-40: readable < 3 →
+ * level beam + the not-enough line, implemented inside BalanceScale);
+ * the readable-count line always states the evidence (UI-39.5); the
  * price-footing strip stays below as the owner's own v1-spec structure
  * (footing is never a driver).
  *
@@ -104,10 +107,8 @@ export function MergedSignalsCard({
         state: driverStateOf(c.state),
       }));
   const balanceDrivers: BalanceDriver[] = driversOf(gold);
-  /* v3 UI-45: silver's own balance — the SAME shared conditions read for
-   * silver, plus the silver-only industrial condition (it lives in
-   * silver.conditions), minus silver's own footing (never a driver). */
-  const silverDrivers: BalanceDriver[] = driversOf(silver);
+  /* 2026-10-21c owner round: silver's balance is RETIRED entirely — only
+   * gold's balance renders below. silverDrivers is gone with it. */
 
   const positionWordOf = (percentile: number | null): string | null => {
     if (percentile === null) return null;
@@ -210,17 +211,16 @@ export function MergedSignalsCard({
         numberLocale={numberLocale}
       />
 
-      {/* UI-45 (2026-10-19 v3 merge): gold and silver each get their OWN
+      {/* UI-45 (2026-10-19 v3 merge; 2026-10-21c owner round): GOLD's
        * balance — the owner's v7 BalanceScale machinery (heading + side
        * captions over the pan columns → the balance with factor tiles
        * resting on real pans hung from the beam → the aggregate
        * assessment box with the verdict word + count line + the v3
-       * readable-count line) rendered per metal. Gold's assessment also
-       * carries the C12 banner. Silver's driver set includes the
-       * silver-only industrial condition (the old separate short list is
-       * gone — the condition rides silver's balance alone, per UI-45). */}
+       * readable-count line). Silver's own balance is RETIRED (the
+       * owner's directive): silver keeps its analysis card above and its
+       * footing row below. Gold's assessment also carries the C12
+       * banner. */}
       <BalanceScale
-        metal="gold"
         drivers={balanceDrivers}
         copy={copy}
         numberLocale={numberLocale}
@@ -248,7 +248,10 @@ export function MergedSignalsCard({
           })()
         }
       />
-      <BalanceScale metal="silver" drivers={silverDrivers} copy={copy} numberLocale={numberLocale} />
+      {/* 2026-10-21c owner round: <BalanceScale metal="silver" …> is RETIRED
+       * here (the owner: "I dont need balance scale of Silver, remove that
+       * section entirely"). Silver keeps its analysis card (VerdictStrip,
+       * above) and its footing row (below); only gold carries a balance. */}
 
       {/* Price footing strip (owner spec §9): the SAME content that used
        * to sit beside the driver groups, now below the trays, separated

@@ -184,12 +184,6 @@ const OWNER_PUBLIC_DISPLAY_OVERRIDE: Readonly<Record<string, string>> = {
     'gold-api leg is public-display-ok (their §9 permits commercial use, read first-hand 2026-10-16); the Yahoo SI=F history leg stays in the engine — the owner directive lifts its worst-leg display bar.',
   'btc-usd':
     'gold-api leg is public-display-ok (their §9 permits commercial use, read first-hand 2026-10-16); the Yahoo BTC-USD history leg stays in the engine — the owner directive lifts its worst-leg display bar.',
-  // 2026-10-21 data-integrity round: the ETH card rides the SAME EODHD
-  // personal-plan register row (owner_accepts yes, the same acceptance that
-  // keeps the world-markets board public) — one crypto daily close, the
-  // owner's own key, attribution shown on the card.
-  'eth-usd':
-    'EODHD personal-plan leg (owner_accepts yes, RISK_REGISTER.md — the same register row that keeps the world-markets board public since 2026-10-15); the owner directive lifts the worst-leg display bar for this single daily-close card.',
 };
 
 /**
@@ -202,13 +196,27 @@ const OWNER_PUBLIC_DISPLAY_OVERRIDE: Readonly<Record<string, string>> = {
  * carries 15/16 EODHD-sourced rows). This lifts ONLY the board's
  * public-display disposition — the underlying licence facts stay verbatim,
  * the Yahoo fallback leg stays in the ENGINE (a missing EODHD answer still
- * degrades to it; the owner accepts that leg on their own site), and the
- * world currencies (fx) board STAYS HIDDEN. NOT a terms re-verification:
- * the quarterly licence review re-confirms this decision.
+ * degrades to it; the owner accepts that leg on their own site). NOT a
+ * terms re-verification: the quarterly licence review re-confirms this
+ * decision.
+ *
+ * OWNER DIRECTIVE (2026-10-21c, credentials chat session): the WORLD
+ * CURRENCIES board is restored too — the owner's ask: "insight used to have
+ * a full currency and pairs section, dedicated and detailed… restore that
+ * section." The board's data is ECB euro reference rates served through the
+ * Frankfurter project — the SAME rates the public converter already
+ * displays on the site's home page. The ECB's display terms (read verbatim
+ * in a browser 2026-10-21 — see licences.ts FRANKFURTER) permit free use
+ * when the data appears accurately, the ECB is cited as the source, and
+ * modifications are stated — the pairs table shows the reference rates
+ * verbatim with ECB attribution, and every derived number (the dollar
+ * basket, gold-AUD) carries its own stated definition. The pattern rules
+ * score only movements of those published rates.
  */
 const OWNER_PUBLIC_BOARD_OVERRIDE: Readonly<Record<string, string>> = {
   markets:
     'The board is EODHD-first on the owner\u2019s own API key (the currena-markets secret); the Yahoo fallback leg stays in the engine \u2014 the owner directive (2026-10-18b) lifts the board\u2019s display bar, exactly the 2026-10-19e pattern the four prices tiles set.',
+  fx: 'ECB euro reference rates via the Frankfurter project (MIT code) — the same rates the public converter displays; the owner directive (2026-10-21c) restores the currencies board, with the ECB display terms verified 2026-10-21 (accurate reproduction + ECB cited as source + stated derivations), exactly the 2026-10-18b markets-board pattern.',
 };
 
 const indicators = DEFINITIONS.map((def) => {
@@ -346,8 +354,8 @@ console.log(`[registry] wrote ${audit.indicators.length} audit entries to ${audi
  * must hide — the fail-closed set of indicators whose licence verdict
  * is anything other than 'yes' ('no' and fail-closed 'unknown' alike),
  * plus the EODHD/Yahoo-backed world boards that carry no owner
- * directive (2026-10-18b lifted the markets board; the fx board stays
- * hidden). Consumers:
+ * directive (2026-10-18b lifted the markets board; 2026-10-21c lifted
+ * the fx board — both now carry directives). Consumers:
  *   - scripts/check-site-mode.mjs   (the T-15 build gate)
  *   - apps/api/src/public-mode.ts   (the Worker's serve-time hidden set)
  *   - packages/insights             (projectSnapshotToPublic — the
@@ -364,10 +372,11 @@ const hiddenIndicatorIds = indicators
   .filter((i) => i.licence.publicDisplayOk !== 'yes' || !i.sourceRisk.enabled)
   .map((i) => i.id)
   .sort();
-// 2026-10-18b: a board named by the OWNER_PUBLIC_BOARD_OVERRIDE is NOT
-// hidden (the owner-directive lift, the 2026-10-19e pattern applied to a
-// whole board). Everything else EODHD/Yahoo-backed stays hidden — today
-// that is the fx board.
+// 2026-10-18b + 2026-10-21c: a board named by the OWNER_PUBLIC_BOARD_OVERRIDE
+// is NOT hidden (the owner-directive lift, the 2026-10-19e pattern applied to a
+// whole board). Everything else EODHD/Yahoo-backed stays hidden — today that
+// is nothing: markets rides the 2026-10-18b directive and fx the 2026-10-21c
+// restoration directive.
 const hiddenBoards = ['markets', 'fx'].filter((b) => OWNER_PUBLIC_BOARD_OVERRIDE[b] === undefined);
 const overridesPath = join(here, '..', 'data', 'site-mode-overrides.json');
 writeFileSync(

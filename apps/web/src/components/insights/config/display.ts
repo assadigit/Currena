@@ -108,7 +108,6 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'wti': { decimals: 2, unit: 'usd' },
   'natgas': { decimals: 2, unit: 'usd' },
   'platinum': { decimals: 2, unit: 'usd' },
-  'eth-usd': { decimals: 0, unit: 'usd' },
   'us-gdp-growth': { decimals: 1, unit: 'percent' },
   'us-nfp': { decimals: 0, unit: 'points' },
   brent: { decimals: 2, unit: 'usd' },
