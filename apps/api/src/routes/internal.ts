@@ -2,12 +2,19 @@
  * POST /internal/refresh (Phase 3 split of the former index.ts monolith):
  * header-secret manual scrape bypassing MIN_SCRAPE_INTERVAL_SEC (still
  * best-effort single-flight).
+ *
+ * POST /internal/insights-ingest (2026-10-21 data-integrity round): the
+ * SAME header-secret surface for the daily insights ingest — runs the
+ * Worker rung's full orchestration on demand (the owner's ops lever when
+ * a rung failed or fresh data is wanted early; the scheduled 04:10 rung
+ * remains the primary). The route is rate-limited like the refresh twin.
  */
 
 import { Hono } from 'hono';
 import { errorResponse, parseSourceParam } from '../http';
 import { clientIp, rateLimitTake, rateLimitRetryAfterSec, secretMatches } from '../security';
 import { RatesService, RatesServiceError } from '../rates-service';
+import { runScheduledInsightsIngest, runScheduledInsightsHistories } from '../insights-ingest-cron';
 import type { Bindings } from '../index';
 
 interface InternalRouteDeps {
@@ -65,6 +72,60 @@ export function createInternalRoutes(deps: InternalRouteDeps): Hono<{ Bindings: 
       }
       throw err;
     }
+  });
+
+  app.post('/internal/insights-ingest', async (c) => {
+    // Rate limit FIRST — same defense-in-depth as POST /admin and the
+    // refresh twin (the ingest is a heavyweight run: one at a time).
+    const rlKey = `${clientIp(c)}#internal`;
+    if (!rateLimitTake(rlKey, Date.now())) {
+      return errorResponse(
+        c,
+        429,
+        'rate_limited',
+        'Too many refresh attempts — wait a minute before trying again.',
+        rateLimitRetryAfterSec(rlKey),
+      );
+    }
+
+    const secret = c.env.REFRESH_SECRET;
+    if (!secret) {
+      return errorResponse(
+        c,
+        501,
+        'refresh_not_configured',
+        'REFRESH_SECRET is not configured for this deployment',
+      );
+    }
+    const provided = c.req.header('X-Refresh-Secret');
+    if (provided === undefined || !secretMatches(provided, secret)) {
+      return errorResponse(c, 401, 'unauthorized', 'Missing or invalid X-Refresh-Secret header');
+    }
+
+    const phase = c.req.query('phase');
+    if (phase === 'daily' || phase === 'periodic') {
+      const result = await runScheduledInsightsHistories(c.env, phase);
+      return c.json(
+        { ok: result.ok, phase, written: result.written, unchanged: result.unchanged, singlePoint: result.singlePoint },
+        200,
+        { 'Cache-Control': 'no-store' },
+      );
+    }
+    if (phase !== undefined) {
+      return errorResponse(
+        c,
+        400,
+        'invalid_phase',
+        `Invalid 'phase' parameter ${JSON.stringify(phase)} — must be 'daily' or 'periodic' (or omitted for the main run)`,
+      );
+    }
+
+    await runScheduledInsightsIngest(c.env);
+    return c.json(
+      { ok: true, ranAt: new Date().toISOString(), note: 'main ingest run complete — see /api/insights/status and the worker logs' },
+      200,
+      { 'Cache-Control': 'no-store' },
+    );
   });
 
   return app;

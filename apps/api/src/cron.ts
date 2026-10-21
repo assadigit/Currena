@@ -19,6 +19,7 @@ import { runPricesUpdate, formatPricesReport, defaultPricesFetchers } from '@cur
 import { KvPricesStore } from '@currena/insights/prices';
 import type { PricesJobFetchers } from '@currena/insights/prices';
 import { runIngestWatchdog, WATCHDOG_MINUTE } from './ingest-watchdog';
+import { insightsIngestRung, runScheduledInsightsIngest, runScheduledInsightsHistories } from './insights-ingest-cron';
 import { recordHistory } from './history';
 import { makeDefaultService } from './default-service';
 import type { SnapshotSource } from '@currena/core';
@@ -56,10 +57,19 @@ export async function runScheduledPricesRefresh(
 
 export async function runScheduled(env: Bindings, scheduledTimeMs: number): Promise<void> {
   const service = makeDefaultService(env);
-  const minute = new Date(scheduledTimeMs).getUTCMinutes();
-  const sources: SnapshotSource[] = minute % FRANKFURTER_CRON_MOD_MIN === 0
-    ? ['tgju', 'frankfurter']
-    : ['tgju'];
+  const date = new Date(scheduledTimeMs);
+  const minute = date.getUTCMinutes();
+  // The ingest rungs (04:10/04:25/04:40) own their invocation's
+  // subrequest budget: the free plan counts EVERY fetch + KV op in the one
+  // invocation, and the 04:10 run alone sits at 47 — the ever-green ladder
+  // idles for those three minutes (its 300s fresh window absorbs a 60s
+  // skip; the next minute's tick re-warms it).
+  const ingestRung = insightsIngestRung(scheduledTimeMs);
+  const sources: SnapshotSource[] = ingestRung !== undefined
+    ? []
+    : minute % FRANKFURTER_CRON_MOD_MIN === 0
+      ? ['tgju', 'frankfurter']
+      : ['tgju'];
   await Promise.all([
     ...sources.map(async (source) => {
       try {
@@ -106,5 +116,25 @@ export async function runScheduled(env: Bindings, scheduledTimeMs: number): Prom
           }),
         ]
       : []),
+    // The daily insights-ingest rungs (2026-10-21 data-integrity round):
+    // the Worker IS the primary ingest venue now — 04:10 collects every
+    // source and writes the snapshot (ALWAYS, even with held P1s — one dead
+    // source no longer freezes the page), 04:25/04:40 land the histories in
+    // two subrequest-budgeted phases. GHA stays as belt-and-braces.
+    ...((): Array<Promise<void>> => {
+      if (ingestRung === undefined) return [];
+      const work: Promise<unknown> =
+        ingestRung.kind === 'main'
+          ? runScheduledInsightsIngest(env)
+          : runScheduledInsightsHistories(env, ingestRung.kind === 'history-daily' ? 'daily' : 'periodic');
+      return [
+        work.then(
+          () => undefined,
+          (err: unknown) => {
+            console.error('[cron] insights ingest rung failed:', err instanceof Error ? err.message : err);
+          },
+        ),
+      ];
+    })(),
   ]);
 }

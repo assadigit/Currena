@@ -354,6 +354,26 @@ export const IndicatorIdSchema = z.enum([
   'sahm-rule',
   'copper-gold',
   'usdcny',
+  // Data-integrity round 2026-10-21 — the coverage additions (all context
+  // rows: group members that never join a gauge's voter list, so the
+  // existing verdict calibration is untouched).
+  'us-gdp-growth', // FRED A191RL1Q225SBEA (real GDP growth, QoQ annualized)
+  'us-nfp', // FRED PAYEMS monthly change (nonfarm payrolls, thousands)
+  'platinum', // World Bank Pink Sheet monthly (USD/troy ounce)
+  // Global — Is the dollar strong? (+NZD/USD, Frankfurter USD→NZD inverted)
+  'nzd-usd',
+  // Global — Prices board companions (context rows rendered in lanes)
+  'wti', // FRED DCOILWTICO (WTI spot, USD/barrel)
+  'natgas', // FRED DHHNGSP (Henry Hub spot, USD/MMBtu)
+  // Global — market-stress lane context row (crypto price beside FNG)
+  'eth-usd', // EODHD ETH-USD.CC daily close (owner's key) + gold-api cross-check
+  // Global — sovereign yield coverage (FRED OECD monthly; private-only on
+  // licence: citation-required series stay out of the public projection)
+  'bund-10y', // FRED IRLTLT01DEM156N
+  'jgb-10y', // FRED IRLTLT01JPM156N
+  'gilt-10y', // FRED IRLTLT01GBM156N
+  'boj-rate', // FRED IRSTCI01JPM156N (overnight call rate ≈ policy)
+  'boe-rate', // FRED IRSTCI01GBM156N (overnight rate ≈ Bank Rate)
   // Global — Prices board (price rows + context ratios; never a gauge member)
   'brent',
   'gold-usd',
@@ -440,6 +460,10 @@ export const IndicatorSourceSchema = z.enum([
   'ecb', 'alternative-me',
   // Step 3 L1-14 / FS-06 (v3): the Shiller dataset (converted bulk file).
   'shiller',
+  // 2026-10-21 data-integrity round: EODHD crypto (eth-usd) — the owner's
+  // own API key, the same register row and owner directive that govern the
+  // world-markets board.
+  'eodhd',
 ]);
 export type IndicatorSource = z.infer<typeof IndicatorSourceSchema>;
 

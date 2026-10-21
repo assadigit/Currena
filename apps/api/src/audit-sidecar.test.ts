@@ -37,9 +37,10 @@ describe('the bundled indicator-audit sidecar', () => {
 
 describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
   it('is exactly the L2 sources the owner accepted for public display', () => {
-    // brent/gold-usd/silver-usd (Yahoo legs), btc-usd — the four L2-but-public
-    // ids per the audit sidecar today.
-    expect([...PUBLIC_BOUNDED_HISTORY_IDS].sort()).toEqual(['brent', 'btc-usd', 'gold-usd', 'silver-usd']);
+    // brent/gold-usd/silver-usd (Yahoo legs), btc-usd + eth-usd (EODHD,
+    // owner-accepted 2026-10-21) — the five L2-but-public ids per the audit
+    // sidecar today.
+    expect([...PUBLIC_BOUNDED_HISTORY_IDS].sort()).toEqual(['brent', 'btc-usd', 'eth-usd', 'gold-usd', 'silver-usd']);
   });
 
   it('an L0 public id (us10y: DGS10, public domain) is never bounded', () => {

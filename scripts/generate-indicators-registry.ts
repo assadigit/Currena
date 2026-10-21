@@ -184,6 +184,12 @@ const OWNER_PUBLIC_DISPLAY_OVERRIDE: Readonly<Record<string, string>> = {
     'gold-api leg is public-display-ok (their §9 permits commercial use, read first-hand 2026-10-16); the Yahoo SI=F history leg stays in the engine — the owner directive lifts its worst-leg display bar.',
   'btc-usd':
     'gold-api leg is public-display-ok (their §9 permits commercial use, read first-hand 2026-10-16); the Yahoo BTC-USD history leg stays in the engine — the owner directive lifts its worst-leg display bar.',
+  // 2026-10-21 data-integrity round: the ETH card rides the SAME EODHD
+  // personal-plan register row (owner_accepts yes, the same acceptance that
+  // keeps the world-markets board public) — one crypto daily close, the
+  // owner's own key, attribution shown on the card.
+  'eth-usd':
+    'EODHD personal-plan leg (owner_accepts yes, RISK_REGISTER.md — the same register row that keeps the world-markets board public since 2026-10-15); the owner directive lifts the worst-leg display bar for this single daily-close card.',
 };
 
 /**

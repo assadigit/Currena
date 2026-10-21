@@ -16,7 +16,8 @@ export const FRANKFURTER_BASE = 'https://api.frankfurter.dev/v1';
  * The currencies the Insights FX indicators need (USD quote side): the
  * original three PLUS the dollar-basket six (I15, data spec §3 — one
  * Frankfurter timeseries request covers every business day's full quote
- * set, so nine currencies ride one fetch).
+ * set, so nine currencies ride one fetch) AND NZD (2026-10-21 data-integrity
+ * round: the nzd-usd card — the agenda's missing pair; still one request).
  */
 export const FRANKFURTER_INSIGHTS_CURRENCIES = [
   'JPY',
@@ -27,6 +28,7 @@ export const FRANKFURTER_INSIGHTS_CURRENCIES = [
   'CAD',
   'SEK',
   'CHF',
+  'NZD',
 ] as const;
 
 /** URL of the USD-base timeseries for `currencies` from `start` (ISO date). */

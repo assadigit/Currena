@@ -26,7 +26,14 @@ function stubFetch(override?: (url: string) => Response | undefined): Stub {
     const custom = override?.(url);
     if (custom) return custom;
     if (url.includes('fredgraph')) {
-      return new Response('observation_date,T10Y2Y\n2026-10-05,0.37\n', { status: 200, headers: { 'content-type': 'text/csv' } });
+      // The bulk-group era: the URL asks for a comma-joined series list —
+      // echo EVERY requested series back as a column so the group parse
+      // finds its members (the 2026-10-21 consolidation).
+      const idParam = new URL(url).searchParams.get('id') ?? 'T10Y2Y';
+      const ids = idParam.split(',').filter(Boolean);
+      const header = ['observation_date', ...ids].join(',');
+      const row = ['2026-10-05', ...ids.map(() => '0.37')].join(',');
+      return new Response(`${header}\n${row}\n`, { status: 200, headers: { 'content-type': 'text/csv' } });
     }
     return new Response('{"ok":1}', { status: 200, headers: { 'content-type': 'application/json' } });
   }) as typeof fetch;

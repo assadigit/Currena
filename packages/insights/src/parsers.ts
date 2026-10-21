@@ -53,6 +53,71 @@ export function parseFredCsv(text: string): SeriesPoint[] {
 }
 
 /* ------------------------------------------------------------------ *
+ * FRED fredgraph.csv MULTI-SERIES — "observation_date,S1,S2,…" with one
+ * wide row per date; each column carries '.' where that series has no
+ * observation (2026-10-21 data-integrity round: the ingest's subrequest
+ * budget on the Worker venue). Pure mirror of parseFredCsv's discipline:
+ * absent requested columns and all-missing series throw loudly.
+ * ------------------------------------------------------------------ */
+
+export function parseFredMultiCsv(text: string, seriesIds: readonly string[]): Record<string, SeriesPoint[]> {
+  const out = parseFredMultiCsvLoose(text, seriesIds);
+  for (const id of seriesIds) {
+    if (out[id] === undefined) {
+      throw new Error(`FRED multi CSV: requested series "${id}" has no column (header: ${text.split(/\r?\n/, 1)[0]})`);
+    }
+  }
+  return out;
+}
+
+/**
+ * The LOOSE multi-CSV parse — one zip member's wide CSV: only the REQUESTED
+ * columns that are PRESENT in this member are extracted (a mixed-frequency
+ * FRED answer splits the ids across members; each member carries only its
+ * own frequency's columns). A member carrying none of the requested ids
+ * still throws (an unrelated file = format drift, never silently ignored).
+ */
+export function parseFredMultiCsvLoose(text: string, seriesIds: readonly string[]): Record<string, SeriesPoint[]> {
+  const lines = text.split(/\r?\n/).filter((l) => l.trim() !== '');
+  if (lines.length < 2 || !lines[0]!.startsWith('observation_date,')) {
+    throw new Error('FRED multi CSV: unexpected header (expected "observation_date,<SERIES>,…")');
+  }
+  const header = lines[0]!.split(',');
+  const columns: { id: string; index: number }[] = [];
+  for (const id of seriesIds) {
+    const index = header.indexOf(id);
+    if (index >= 0) columns.push({ id, index });
+  }
+  if (columns.length === 0) {
+    throw new Error(`FRED multi CSV member carries none of the requested series (header: ${header.join(',')})`);
+  }
+  const out: Record<string, SeriesPoint[]> = {};
+  for (const { id } of columns) out[id] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = lines[i]!.split(',');
+    const date = (cells[0] ?? '').trim();
+    assertIsoDate(date, `FRED multi CSV line ${i + 1}`);
+    for (const { id, index } of columns) {
+      const raw = (cells[index] ?? '').trim();
+      if (isMissing(raw)) continue;
+      out[id]!.push({ date, value: parseNumber(raw, `FRED multi CSV line ${i + 1} (${id})`) });
+    }
+  }
+  for (const { id } of columns) {
+    const series = out[id]!;
+    if (series.length === 0) {
+      // A present-but-empty column: the series exists at this frequency but
+      // has no observations in the window — treat the column as absent (the
+      // caller's strict wrapper decides whether that is fatal).
+      delete out[id];
+      continue;
+    }
+    assertAscending(series);
+  }
+  return out;
+}
+
+/* ------------------------------------------------------------------ *
  * Frankfurter time series JSON — { rates: { "YYYY-MM-DD": { Ccy: n } } }
  * ------------------------------------------------------------------ */
 

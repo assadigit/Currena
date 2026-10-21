@@ -1,12 +1,12 @@
 {
   "_comment": "T-16 FRED copyright scan (scripts/fred-copyright-scan.ts). copyrightNotice=true → public_display_ok must be no. Re-run when a series is added.",
-  "scannedOn": "2026-10-16",
+  "scannedOn": "2026-10-21",
   "records": [
     {
       "seriesId": "T10Y2Y",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/T10Y2Y"
     },
@@ -14,7 +14,7 @@
       "seriesId": "DFII10",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DFII10"
     },
@@ -22,7 +22,7 @@
       "seriesId": "DGS10",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DGS10"
     },
@@ -30,7 +30,7 @@
       "seriesId": "DFEDTARL",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DFEDTARL"
     },
@@ -38,7 +38,7 @@
       "seriesId": "DFEDTARU",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DFEDTARU"
     },
@@ -46,7 +46,7 @@
       "seriesId": "DGS30",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DGS30"
     },
@@ -54,7 +54,7 @@
       "seriesId": "DGS2",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DGS2"
     },
@@ -62,7 +62,7 @@
       "seriesId": "CPIAUCSL",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/CPIAUCSL"
     },
@@ -70,7 +70,7 @@
       "seriesId": "CPIAUCNS",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/CPIAUCNS"
     },
@@ -78,7 +78,7 @@
       "seriesId": "CPILFESL",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/CPILFESL"
     },
@@ -86,7 +86,7 @@
       "seriesId": "CPILFENS",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/CPILFENS"
     },
@@ -94,7 +94,7 @@
       "seriesId": "T5YIFR",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/T5YIFR"
     },
@@ -102,7 +102,7 @@
       "seriesId": "T10YIE",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/T10YIE"
     },
@@ -110,7 +110,7 @@
       "seriesId": "STLFSI4",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/STLFSI4"
     },
@@ -118,7 +118,7 @@
       "seriesId": "NFCI",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/NFCI"
     },
@@ -126,7 +126,7 @@
       "seriesId": "VIXCLS",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyright, 2016, Chicago Board Options Exchange, Inc\"",
       "url": "https://fred.stlouisfed.org/series/VIXCLS"
     },
@@ -134,7 +134,7 @@
       "seriesId": "M2SL",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/M2SL"
     },
@@ -142,7 +142,7 @@
       "seriesId": "GACDFSA066MSFRBPHI",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/GACDFSA066MSFRBPHI"
     },
@@ -150,7 +150,7 @@
       "seriesId": "UNRATE",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/UNRATE"
     },
@@ -158,7 +158,7 @@
       "seriesId": "SAHMREALTIME",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/SAHMREALTIME"
     },
@@ -166,7 +166,7 @@
       "seriesId": "DCOILBRENTEU",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DCOILBRENTEU"
     },
@@ -174,9 +174,97 @@
       "seriesId": "T10Y3M",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-10-16",
+      "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/T10Y3M"
+    },
+    {
+      "seriesId": "DCOILWTICO",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-10-21",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/DCOILWTICO"
+    },
+    {
+      "seriesId": "DHHNGSP",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-10-21",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/DHHNGSP"
+    },
+    {
+      "seriesId": "IRLTLT01DEM156N",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-10-21",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
+      "url": "https://fred.stlouisfed.org/series/IRLTLT01DEM156N"
+    },
+    {
+      "seriesId": "IRLTLT01JPM156N",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-10-21",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
+      "url": "https://fred.stlouisfed.org/series/IRLTLT01JPM156N"
+    },
+    {
+      "seriesId": "IRLTLT01GBM156N",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-10-21",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
+      "url": "https://fred.stlouisfed.org/series/IRLTLT01GBM156N"
+    },
+    {
+      "seriesId": "IRSTCI01JPM156N",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-10-21",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
+      "url": "https://fred.stlouisfed.org/series/IRSTCI01JPM156N"
+    },
+    {
+      "seriesId": "IRSTCI01GBM156N",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-10-21",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
+      "url": "https://fred.stlouisfed.org/series/IRSTCI01GBM156N"
+    },
+    {
+      "seriesId": "PAYEMS",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-10-21",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/PAYEMS"
+    },
+    {
+      "seriesId": "A191RL1Q225SBEA",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-10-21",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/A191RL1Q225SBEA"
+    },
+    {
+      "seriesId": "A091RC1Q027SBEA",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-10-21",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/A091RC1Q027SBEA"
+    },
+    {
+      "seriesId": "W006RC1Q027SBEA",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-10-21",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/W006RC1Q027SBEA"
     }
   ]
 }

@@ -7,17 +7,21 @@
     "enabled": true
   },
   // The world stock markets section (insights-world-markets-spec.md §3.4):
-  // its OWN two cron triggers, separate from every other scheduled job, so
-  // each invocation stays far under the 50-subrequest cap and the account's
-  // 5-cron limit is respected (3 were in use; these are the last 2).
+  // its OWN three cron triggers, separate from every other scheduled job, so
+  // each invocation stays far under the 50-subrequest cap (the account's
+  // 5-cron limit holds: currena-api's minute cron + these three = 4).
   //   main  23:30 UTC Mon–Fri — all 16 markets have closed; EODHD first.
   //   retry 01:30 UTC Tue–Sat — re-fetches failed/old markets; when the
   //         whole snapshot is old (the main run's write bounced off the
   //         saturated daily KV budget ~18:30 UTC), it re-fetches through
   //         Yahoo and lands the day's single write in the fresh
   //         post-midnight budget slice.
+  //   asia  08:50 UTC Tue–Sat — F1 (2026-10-21 session-finality round):
+  //         after the Asian sessions close, the rung re-fetches the held
+  //         intraday rows and lands the day's final closes (the 01:30
+  //         retry holds mid-session points instead of freezing them).
   "triggers": {
-    "crons": ["30 23 * * 1-5", "30 1 * * 2-6"]
+    "crons": ["30 23 * * 1-5", "30 1 * * 2-6", "50 8 * * 2-6"]
   },
   "kv_namespaces": [
     {

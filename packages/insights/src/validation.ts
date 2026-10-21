@@ -655,6 +655,15 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'au-unemployment',
   'au-household-debt-arrears',
   'terms-of-trade',
+  // 2026-10-21 data-integrity round: the sovereign yields, the BoJ/BoE
+  // overnight-rate proxies and the GDP growth rate all speak in percentage
+  // points (rate-family series).
+  'bund-10y',
+  'jgb-10y',
+  'gilt-10y',
+  'boj-rate',
+  'boe-rate',
+  'us-gdp-growth',
 ]);
 
 /** Index/ratio series that speak in points but are not interest rates. */
@@ -672,6 +681,9 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'crypto-fng', // Step 3 L1-18: the publisher's own 0-100 index speaks in index points
   'stress-stlfsi',
   'nfci',
+  // 2026-10-21 data-integrity round: the monthly nonfarm-payrolls change
+  // speaks in thousands of jobs — a count, not a percent.
+  'us-nfp',
 ]);
 
 function t10Units(): ValidationTestResult {

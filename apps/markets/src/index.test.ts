@@ -19,7 +19,7 @@ import type { MarketId, MarketsSnapshot } from '@currena/core';
 import { ProviderError } from '@currena/insights/markets';
 import type { MarketJobFetchers, MarketSeries, KVLike } from '@currena/insights/markets';
 import { runScheduledMarkets } from './index';
-import { MAIN_CRON, RETRY_CRON } from './crons';
+import { MAIN_CRON, RETRY_CRON, ASIA_CRON } from './crons';
 
 // The node surface this TEST file uses, resolved at RUNTIME through a
 // non-literal specifier (vitest runs on Node) so the app's worker program
@@ -232,13 +232,17 @@ describe('runScheduledMarkets — the 24-hour budget', () => {
     const config = JSON.parse(uncommented) as { triggers?: { crons?: string[] } };
     const crons = config.triggers?.crons;
     expect(crons).toBeDefined();
-    expect(crons).toHaveLength(2);
+    expect(crons).toHaveLength(3);
     expect(MAIN_CRON).toBe(crons![0]);
     expect(RETRY_CRON).toBe(crons![1]);
+    expect(ASIA_CRON).toBe(crons![2]);
     // The literal spellings stay pinned too — a wrong expression in BOTH
     // places would otherwise pass silently.
     expect(MAIN_CRON).toBe('30 23 * * 1-5');
     expect(RETRY_CRON).toBe('30 1 * * 2-6');
+    // F1 (2026-10-21 session-finality round): the Asia rung re-fetches the
+    // held intraday rows after the Asian sessions close.
+    expect(ASIA_CRON).toBe('50 8 * * 2-6');
   });
 });
 

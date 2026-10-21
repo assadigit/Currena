@@ -89,15 +89,17 @@ describe('fred adapter', () => {
     expect(Object.values(FRED_SERIES)).toContain('SAHMREALTIME');
     expect(Object.values(FRED_SERIES)).toContain('VIXCLS');
     // Fix spec C-03/C-04/C-05 + T-01 (2026-10-14): DGS2, DGS30, T10YIE and
-    // GACDFSA066MSFRBPHI joined.
-    expect(Object.values(FRED_SERIES)).toHaveLength(21);
+    // GACDFSA066MSFRBPHI joined. The 2026-10-21 data-integrity round adds
+    // WTI, natgas, the OECD bond trio, the BoJ/BoE overnight pair, PAYEMS
+    // and the BEA GDP series → 30.
+    expect(Object.values(FRED_SERIES)).toHaveLength(30);
   });
 });
 
 describe('frankfurter adapter', () => {
   it('builds the open-ended timeseries URL', () => {
     expect(frankfurterTimeseriesUrl('2016-01-04')).toBe(
-      'https://api.frankfurter.dev/v1/2016-01-04..?from=USD&to=JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF',
+      'https://api.frankfurter.dev/v1/2016-01-04..?from=USD&to=JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,NZD',
     );
     // Narrow currency lists still build their own URL.
     expect(frankfurterTimeseriesUrl('2016-01-04', ['JPY'])).toBe(

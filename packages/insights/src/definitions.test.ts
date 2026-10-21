@@ -22,9 +22,9 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 29 P1 / 25 P2 (Step-2 + fix spec C additions; Step 3 L1-18 + L1-14 add the context cards)', () => {
+  it('splits 29 P1 / 37 P2 (the 2026-10-21 data-integrity round adds 12 context cards to P2)', () => {
     expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(29);
-    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(25);
+    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(37);
   });
 
   it('groups are the question groups (global 5 + prices-board, australia 3)', () => {
@@ -54,26 +54,38 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('info-only cards never vote: exactly the seventeen info rules (Step 3 L1-18 + L1-14 add the context cards)', () => {
+  it('info-only cards never vote: exactly the twenty-nine info rules (the 2026-10-21 data-integrity round adds 12 context cards)', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
     expect(info).toEqual([
       'au-deposit-rate',
       'au-petrol-yoy',
+      'boe-rate',
+      'boj-rate',
       'btc-usd',
+      'bund-10y',
       'copper-usd',
       'crypto-fng',
+      'eth-usd',
       'eur-usd',
+      'gilt-10y',
       'gold-aud',
       'gold-btc',
       'gold-usd',
       'iron-ore',
+      'jgb-10y',
+      'natgas',
+      'nzd-usd',
+      'platinum',
       'rba-cash-rate',
       'shiller-cape',
       'shiller-ecy',
       'silver-btc',
       'silver-usd',
       'us-cpi-core-yoy',
+      'us-gdp-growth',
+      'us-nfp',
       'usdcny',
+      'wti',
     ]);
   });
 

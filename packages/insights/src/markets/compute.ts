@@ -210,6 +210,23 @@ export interface MarketResolution {
  * ------------------------------------------------------------------ */
 
 /**
+ * F1 (2026-10-21 session-finality fix): true when the market's session for
+ * the run's own UTC day has fully closed by the run's clock. A winning
+ * series whose latest close is dated TODAY (the run's UTC date) is only an
+ * honest FINAL close when this returns true — before it, the point is an
+ * intraday snapshot, and writing it would freeze a mid-session level as
+ * the day's close (the 2026-10-21 N225 incident: the 01:30 retry wrote
+ * Tokyo's 14:30 JST level, 0.85% off the real 15:00 close, as today's
+ * close and held it for the whole day). Pure: the run's clock is passed
+ * in, never read here.
+ */
+export function sessionClosedForWrite(id: MarketId, runTimeIso: string): boolean {
+  const t = new Date(runTimeIso);
+  const minuteOfDay = t.getUTCHours() * 60 + t.getUTCMinutes();
+  return minuteOfDay >= marketDefinition(id).closeUtcMinute;
+}
+
+/**
  * The map's Open/Closed answer for one winning series (MAP D2). The
  * provider's market-state field wins when present: Yahoo's 'REGULAR' is
  * the only open phase (PRE/POST/CLOSED/COVERED all render Closed).
@@ -343,6 +360,19 @@ export function resolveMarket(
   const newDate = primary.points[primary.points.length - 1]!.date;
   if (prev !== undefined && newDate < prev.asOf) {
     notes.push(`R2: series date ${newDate} older than stored ${prev.asOf} — held`);
+    return { id, held: true, notes };
+  }
+
+  // F1 (session finality): a winning series whose latest close is dated
+  // TODAY (UTC) is only final once the session has closed by the run's
+  // clock. Before that the point is an intraday snapshot — holding the row
+  // (verbatim, R7) leaves yesterday's final close serving until a later
+  // run lands today's real close. This is the fix for the 01:30-retry
+  // freezing Tokyo/Seoul/Sydney mid-session levels as "today's close".
+  if (newDate === runDate && !sessionClosedForWrite(id, runTimeIso ?? `${runDate}T00:00:00Z`)) {
+    notes.push(
+      `F1: today's close (${newDate}) is an intraday snapshot — the session has not closed yet at ${runTimeIso ?? runDate} — held`,
+    );
     return { id, held: true, notes };
   }
 

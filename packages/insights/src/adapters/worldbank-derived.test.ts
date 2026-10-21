@@ -106,6 +106,9 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
       copper: pts([['2026-09-01', 14474]]),
       ironOre: pts([['2026-09-01', 97.7]]),
       brent: pts([['2026-09-01', 116.8]]),
+      // 2026-10-21 data-integrity round: platinum rides the same workbook —
+      // empty here (the tests below never assert on it).
+      platinum: [],
     },
     xauSpot: { symbol: 'XAU', price: 4162.6, updatedAt: '2026-10-06T15:03:10Z' },
     xagSpot: { symbol: 'XAG', price: 61.28, updatedAt: '2026-10-06T15:03:10Z' },

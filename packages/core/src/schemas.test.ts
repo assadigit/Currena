@@ -325,16 +325,16 @@ import {
 } from './schemas';
 
 describe('Insights: IndicatorIdSchema (contract shape is deliberate)', () => {
-  it('pins the exact indicator set — 54 ids (v2 52 + the two Shiller context cards, Step 3 L1-14 v3: shiller-cape/shiller-ecy, L2 source disabled until the owner accepts), blocked/licensed items absent', () => {
+  it('pins the exact indicator set — 66 ids (the 2026-10-21 data-integrity round adds the 12 coverage cards: wti, natgas, platinum, eth-usd, bund/jgb/gilt-10y, boj/boe-rate, nzd-usd, us-gdp-growth, us-nfp), blocked/licensed items absent', () => {
     const ids = IndicatorIdSchema.options;
-    expect(ids).toHaveLength(54);
+    expect(ids).toHaveLength(66);
     // Step-2 add-list §B5: VIX is IN (FRED VIXCLS, licence noted); the rest
     // of the v1 blocked list stays blocked.
     for (const blocked of ['spx-gold', 'breadth', 'cape']) {
       expect(ids).not.toContain(blocked);
     }
     expect(ids).not.toContain('dollar-broad'); // replaced by the Currena dollar basket (I15)
-    for (const expected of ['yield-curve-10y2y', 'stress-stlfsi', 'nfci', 'fed-target', 'ecb-dfr', 'us-cpi-yoy', 'us-cpi-core-yoy', 'dollar-basket', 'au-home-loan', 'au-wage-growth', 'au-rent-yoy', 'au-petrol-yoy', 'btc-usd', 'copper-usd', 'eur-usd', 'gold-usd', 'silver-usd', 'gold-silver', 'china-pmi', 'rba-cash-rate', 'au-us-10y-gap', 'terms-of-trade', 'au-household-debt-arrears', 'au-10y', 'us-unemployment', 'sahm-rule', 'vix', 'au-deposit-rate', 'shiller-cape', 'shiller-ecy']) {
+    for (const expected of ['yield-curve-10y2y', 'stress-stlfsi', 'nfci', 'fed-target', 'ecb-dfr', 'us-cpi-yoy', 'us-cpi-core-yoy', 'dollar-basket', 'au-home-loan', 'au-wage-growth', 'au-rent-yoy', 'au-petrol-yoy', 'btc-usd', 'copper-usd', 'eur-usd', 'gold-usd', 'silver-usd', 'gold-silver', 'china-pmi', 'rba-cash-rate', 'au-us-10y-gap', 'terms-of-trade', 'au-household-debt-arrears', 'au-10y', 'us-unemployment', 'sahm-rule', 'vix', 'au-deposit-rate', 'shiller-cape', 'shiller-ecy', 'wti', 'natgas', 'platinum', 'eth-usd', 'bund-10y', 'jgb-10y', 'gilt-10y', 'boj-rate', 'boe-rate', 'nzd-usd', 'us-gdp-growth', 'us-nfp']) {
       expect(ids).toContain(expected);
     }
   });

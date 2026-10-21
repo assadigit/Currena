@@ -49,6 +49,21 @@ const SERIES = [
   'SAHMREALTIME',
   'DCOILBRENTEU',
   'T10Y3M',
+  // 2026-10-21 data-integrity round — the coverage additions (the ingest's
+  // FRED_BULK_ALL_IDS set, kept in lockstep): WTI + Henry Hub energy spots,
+  // the OECD sovereign-yield trio, the BoJ/BoE overnight pair, payrolls and
+  // the BEA GDP series, plus the two BEA ratio legs the revenue card joins.
+  'DCOILWTICO',
+  'DHHNGSP',
+  'IRLTLT01DEM156N',
+  'IRLTLT01JPM156N',
+  'IRLTLT01GBM156N',
+  'IRSTCI01JPM156N',
+  'IRSTCI01GBM156N',
+  'PAYEMS',
+  'A191RL1Q225SBEA',
+  'A091RC1Q027SBEA',
+  'W006RC1Q027SBEA',
 ] as const;
 
 interface Record {

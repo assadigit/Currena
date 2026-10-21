@@ -173,6 +173,82 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // freshest data that exists). 215 covers it — same ABS discipline.
     staleAfterDays: 215,
   },
+  // ---- 2026-10-21 data-integrity round: sovereign-yield & policy-rate ----
+  // ---- coverage — context cards, private-only (citation-required). ----
+  {
+    // 2026-10-21 data-integrity round: sovereign-yield & policy-rate
+    // coverage — CONTEXT CARDS (info rule: live value, percentile and
+    // asOf render; never a scored vote, so the gauge/verdict calibration
+    // is untouched — T-09's scored⇔gauge-member invariant).
+    id: 'bund-10y',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'German 10-year government bond yield',
+    source: 'fred',
+    sourceRef: 'FRED:IRLTLT01DEM156N (long-term government bond yield, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    id: 'jgb-10y',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'Japan 10-year government bond yield',
+    source: 'fred',
+    sourceRef: 'FRED:IRLTLT01JPM156N (long-term government bond yield, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    id: 'gilt-10y',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'UK 10-year government bond yield',
+    source: 'fred',
+    sourceRef: 'FRED:IRLTLT01GBM156N (long-term government bond yield, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // The overnight call-rate average tracks the BoJ's policy target
+    // (when the target is 1.0%, the uncollateralized overnight average
+    // reads ~1.04%) — the honest monthly proxy while no daily official
+    // series is free (probed 2026-10-21: FRED IRSTCI01JPM156N live, last
+    // 2026-09 = 1.043).
+    id: 'boj-rate',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'Bank of Japan policy rate (overnight)',
+    source: 'fred',
+    sourceRef: 'FRED:IRSTCI01JPM156N (overnight call rate, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    id: 'boe-rate',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'Bank of England policy rate (overnight)',
+    source: 'fred',
+    sourceRef: 'FRED:IRSTCI01GBM156N (overnight rate, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
   /* ---------------- Global — Are prices heating up? ---------------- */
   {
     id: 'us-cpi-yoy',
@@ -229,6 +305,38 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // SUSTAINED 4 weeks — it fired exactly once in the decade (autumn 2023)
     // and never on noise. The card shows the rule verbatim.
     rule: { kind: 'threshold', direction: 'above', value: 2.4, sustainedWeeks: 4 },
+  },
+  {
+    // 2026-10-21 data-integrity round: the two EIA energy spots — context
+    // cards in the prices lane (info rule; never prices-board tiles, the
+    // board's four-tile layout is spec-fixed, and never scored votes —
+    // T-09's invariant). Brent's own scored card carries the energy vote.
+    id: 'wti',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'WTI crude oil',
+    source: 'fred',
+    sourceRef: 'FRED:DCOILWTICO (EIA WTI spot)',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 12,
+  },
+  {
+    // Henry Hub spot: the household utility/heating-cost driver — a
+    // context card; the copy carries the decade-position words.
+    id: 'natgas',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'US natural gas (Henry Hub)',
+    source: 'fred',
+    sourceRef: 'FRED:DHHNGSP (EIA Henry Hub spot)',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 12,
   },
   /* ---------------- Global — Are markets nervous? ---------------- */
   {
@@ -297,6 +405,21 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     phase: 'P2',
     rule: { kind: 'info' },
     staleAfterDays: 4,
+  },
+  {
+    // 2026-10-21 data-integrity round: the crypto market's second asset —
+    // a context row beside the FNG card (info rule; never a signal).
+    id: 'eth-usd',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Ethereum price',
+    source: 'eodhd',
+    sourceRef: 'EODHD ETH-USD.CC daily close (the owner’s API key)',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 3,
   },
   {
     // Step 3 L1-14 / FS-06 (v3, 2026-10-20): the Shiller CAPE — a published
@@ -400,6 +523,22 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     name: 'EUR/USD',
     source: 'frankfurter',
     sourceRef: 'Frankfurter USD→EUR',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 4,
+  },
+  {
+    // 2026-10-21 data-integrity round: the fourth dollar-bloc pair (the
+    // agenda's missing currency) — the same ECB reference-rate source and
+    // invert recipe as AUD/USD.
+    id: 'nzd-usd',
+    section: 'global',
+    group: 'dollar-strength',
+    name: 'NZD/USD',
+    source: 'frankfurter',
+    sourceRef: 'Frankfurter USD→NZD',
     cadence: 'daily',
     changeKind: 'pct',
     phase: 'P2',
@@ -518,6 +657,61 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'pct',
     phase: 'P2',
     rule: { kind: 'info' },
+  },
+  {
+    // 2026-10-21 data-integrity round: growth coverage — the quarterly real
+    // GDP growth rate (QoQ annualized percent) and the monthly nonfarm-
+    // payrolls CHANGE (the NFP print; thousands of jobs). Context cards
+    // (info rules): the unemployment + Sahm voters already carry the
+    // labour-market vote; these add the headline numbers.
+    id: 'us-gdp-growth',
+    section: 'global',
+    group: 'growth-health',
+    name: 'US economic growth (real GDP)',
+    source: 'fred',
+    sourceRef: 'FRED:A191RL1Q225SBEA (real GDP growth, QoQ annualized)',
+    cadence: 'quarterly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    // The advance estimate lands ~30d after quarter end and stays latest
+    // until the next advance — the SAME BEA release cycle as
+    // govt-interest-revenue's 215d (verified live: obs 2026-04-01 is the
+    // freshest print that exists through late October).
+    staleAfterDays: 215,
+  },
+  {
+    id: 'us-nfp',
+    section: 'global',
+    group: 'growth-health',
+    name: 'US jobs added each month',
+    source: 'derived',
+    sourceRef: 'FRED:PAYEMS (monthly change, thousands)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    // BLS reference-week dating: the Sep print (dated Sep-01) publishes
+    // early Oct and is replaced ~Nov-06 — ages up to ~66d. 70 covers it.
+    staleAfterDays: 70,
+  },
+  {
+    // 2026-10-21 data-integrity round: platinum — the precious/industrial
+    // metal from the SAME Pink Sheet workbook the other metals ride
+    // (monthly, zero extra requests). Context card beside copper in the
+    // growth lane (info rule — the copper/gold voter carries the metals
+    // signal).
+    id: 'platinum',
+    section: 'global',
+    group: 'growth-health',
+    name: 'Platinum price',
+    source: 'world-bank',
+    sourceRef: 'World Bank Pink Sheet (Platinum, $/troy oz)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 60,
   },
   /* ------------- Global — Prices board (not a gauge) ------------- */
   {
@@ -678,16 +872,22 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     group: 'au-inflation-rates',
     name: 'Australian 10-year government bond yield',
     source: 'rba',
-    sourceRef: 'RBA F2 FCMYGBAG10D (Australian Government 10 year bond)',
+    sourceRef: 'RBA F2 FCMYGBAG10D (daily) / F2.1 FCMYGBAG10 (monthly fallback)',
     // Defect E-06 (2026-10-16): a DAILY series — the F2 table publishes
     // each business day (with a 2–4 business-day publication lag, the
     // Phase-I2 venue finding), so the max age is the daily default of 4
     // days and an older row wears the stale tag instead of reading fresh.
+    // F3 (2026-10-21 venue round): while the Akamai edge 403s the daily
+    // f2-data.csv path from Cloudflare egress, the series rides the F2.1
+    // MONTHLY table (published the 2nd of each month) — the max age
+    // widens to 40 days so a live monthly print reads fresh with its own
+    // honest asOf date, and the source row explains the granularity.
+    // When the daily path returns, the 4-day discipline re-tightens.
     cadence: 'daily',
     changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
-    staleAfterDays: 4,
+    staleAfterDays: 40,
   },
   {
     // Fix spec C-06 (2026-10-14): "What markets expect from the RBA" — the
@@ -704,11 +904,14 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     sourceRef: 'RBA F2 FCMYGBAG3D (3-year bond) − RBA F1 cash rate target',
     // Defect E-06 (2026-10-16): the 3-year leg is the same daily F2 table —
     // daily cadence, 4-day max age (the lag is publication-side, not cadence).
+    // F3 (2026-10-21 venue round): the monthly-F2.1 fallback widens the
+    // effective age the same way as au-10y (40 days) while the daily path
+    // stays Akamai-blocked.
     cadence: 'daily',
     changeKind: 'points',
     phase: 'P2',
     rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
-    staleAfterDays: 4,
+    staleAfterDays: 40,
   },
   {
     id: 'au-us-10y-gap',
@@ -719,11 +922,14 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     sourceRef: 'RBA F2 10y − FRED:DGS10',
     // Defect E-06 (2026-10-16): the Australian leg is the daily F2 table —
     // daily cadence, 4-day max age. The same-date join (B-10/gapLegs) stays.
+    // F3 (2026-10-21 venue round): the monthly-F2.1 fallback widens the
+    // effective age the same way as au-10y (40 days) while the daily path
+    // stays Akamai-blocked.
     cadence: 'daily',
     changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'threshold', direction: 'below', value: 0 },
-    staleAfterDays: 4,
+    staleAfterDays: 40,
   },
   {
     // An index, not a pump price (data spec §3 note) — context item.

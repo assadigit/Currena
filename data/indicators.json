@@ -69,7 +69,7 @@
         "privateOk": true,
         "publicDisplayOk": "no",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-16) · Legs (fred:T10Y2Y): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) · Legs (fred:T10Y2Y): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -130,7 +130,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -203,7 +203,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -265,7 +265,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -328,7 +328,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16) · Legs (fred:DGS2, fred:DFEDTARL, fred:DFEDTARU): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) · Legs (fred:DGS2, fred:DFEDTARL, fred:DFEDTARU): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -401,7 +401,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -481,7 +481,7 @@
         "url": "https://fred.stlouisfed.org/series/A091RC1Q027SBEA",
         "seriesIdOrTable": "FRED:A091RC1Q027SBEA ÷ FRED:W006RC1Q027SBEA"
       },
-      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
       "publisherUrl": "https://fred.stlouisfed.org/series/A091RC1Q027SBEA",
       "methodUrl": "https://fred.stlouisfed.org/series/A091RC1Q027SBEA",
       "whatItIs": "US government interest payments divided by its total receipts, both quarterly national-accounts figures from FRED.",
@@ -490,14 +490,14 @@
       "definition": "US federal interest payments (BEA series A091RC1Q027SBEA) as a share of federal government receipts (W006RC1Q027SBEA), quarterly, in percent.",
       "failClosedConditions": "No value, data older than 215 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
-        "level": "L2",
-        "ownerAccepts": false,
-        "enabled": false,
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
         "method": "M1",
         "runtime": "github-action",
-        "termsLines": "No T-16 scan record for A091RC1Q027SBEA — fail closed (treated as copyright-required) until scripts/fred-copyright-scan.ts runs. · Worst of legs (fred:A091RC1Q027SBEA, fred:W006RC1Q027SBEA): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown. · Worst of legs (fred:A091RC1Q027SBEA, fred:W006RC1Q027SBEA): the L0 leg decides — the walk mirrors defect E-01/LR-02.",
         "termsReadOn": "2026-10-16",
-        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
         "legs": [
           "fred:A091RC1Q027SBEA",
           "fred:W006RC1Q027SBEA"
@@ -518,13 +518,308 @@
       "ruleVersion": 2,
       "layer": 2,
       "licence": {
-        "licenceName": "Varies by series (FRED license tags)",
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) · Legs (fred:A091RC1Q027SBEA, fred:W006RC1Q027SBEA): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "bund-10y",
+      "title": "German 10-year government bond yield",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (OECD Main Economic Indicators)",
+        "url": "https://fred.stlouisfed.org/series/IRLTLT01DEM156N",
+        "seriesIdOrTable": "FRED:IRLTLT01DEM156N (long-term government bond yield, monthly)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/IRLTLT01DEM156N",
+      "methodUrl": "https://fred.stlouisfed.org/series/IRLTLT01DEM156N",
+      "whatItIs": "The market yield on 10-year German government bonds (Bunds): monthly, from the OECD long-term rate series for Germany via FRED (IRLTLT01DEM156N).",
+      "whatItIsnt": "A market price, not the ECB’s setting: inflation, growth and debt-supply news move it independently of the policy rate.",
+      "trackRecordNote": "The sub-zero settings of 2016–22 lent Germany money for less than nothing; the 2022–23 reset lifted yields to their highest since 2011.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:IRLTLT01DEM156N"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required)",
         "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "no",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>) — scanned 2026-10-16, records in data/fred-copyright.json; public-domain series may be public, citation-required series are private-only. · Legs (fred:A091RC1Q027SBEA, fred:W006RC1Q027SBEA): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "jgb-10y",
+      "title": "Japan 10-year government bond yield",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (OECD Main Economic Indicators)",
+        "url": "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
+        "seriesIdOrTable": "FRED:IRLTLT01JPM156N (long-term government bond yield, monthly)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
+      "methodUrl": "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
+      "whatItIs": "The market yield on 10-year Japanese government bonds (JGBs): monthly, from the OECD long-term rate series for Japan via FRED (IRLTLT01JPM156N).",
+      "whatItIsnt": "The Bank of Japan still leans on this market: the yield reflects policy as much as markets, unlike most government bonds.",
+      "trackRecordNote": "The yield sat at or near zero from 2016 to 2024 under yield-curve control; the breakout since has ended the era of free Japanese money.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:IRLTLT01JPM156N"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "gilt-10y",
+      "title": "UK 10-year government bond yield",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (OECD Main Economic Indicators)",
+        "url": "https://fred.stlouisfed.org/series/IRLTLT01GBM156N",
+        "seriesIdOrTable": "FRED:IRLTLT01GBM156N (long-term government bond yield, monthly)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/IRLTLT01GBM156N",
+      "methodUrl": "https://fred.stlouisfed.org/series/IRLTLT01GBM156N",
+      "whatItIs": "The market yield on 10-year UK government bonds (gilts): monthly, from the OECD long-term rate series for the United Kingdom via FRED (IRLTLT01GBM156N).",
+      "whatItIsnt": "A market price, not the Bank of England’s setting: inflation, growth and fiscal news move it independently of the policy rate.",
+      "trackRecordNote": "Sustained readings above 4.5% have been rare since the 1990s; the 2022 mini-budget spike was the sharpest gilt episode in decades.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:IRLTLT01GBM156N"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "boj-rate",
+      "title": "Bank of Japan policy rate (overnight)",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (OECD: Japan overnight call rate)",
+        "url": "https://fred.stlouisfed.org/series/IRSTCI01JPM156N",
+        "seriesIdOrTable": "FRED:IRSTCI01JPM156N (overnight call rate, monthly)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/IRSTCI01JPM156N",
+      "methodUrl": "https://fred.stlouisfed.org/series/IRSTCI01JPM156N",
+      "whatItIs": "The Bank of Japan’s policy rate, measured as the average overnight call rate: monthly, from FRED (IRSTCI01JPM156N).",
+      "whatItIsnt": "Like every policy rate it works with long, uneven lags, and the setting says nothing about the next decision.",
+      "trackRecordNote": "The rate sat at or near zero from 1999 until the 2024–26 hikes: the longest cheap-money era in modern finance.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:IRSTCI01JPM156N"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "boe-rate",
+      "title": "Bank of England policy rate (overnight)",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (OECD: UK overnight rate)",
+        "url": "https://fred.stlouisfed.org/series/IRSTCI01GBM156N",
+        "seriesIdOrTable": "FRED:IRSTCI01GBM156N (overnight rate, monthly)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/IRSTCI01GBM156N",
+      "methodUrl": "https://fred.stlouisfed.org/series/IRSTCI01GBM156N",
+      "whatItIs": "The Bank of England’s policy rate, measured as the average overnight rate: monthly, from FRED (IRSTCI01GBM156N).",
+      "whatItIsnt": "Like every policy rate it works with long, uneven lags, and the setting says nothing about the next decision.",
+      "trackRecordNote": "The bank cut to 0.1% in 2020, its lowest since 1694, then lifted rates to multi-decade highs by 2023.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:IRSTCI01GBM156N"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -585,7 +880,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -644,7 +939,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -706,7 +1001,125 @@
         "privateOk": true,
         "publicDisplayOk": "no",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "wti",
+      "title": "WTI crude oil",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (EIA WTI spot)",
+        "url": "https://fred.stlouisfed.org/series/DCOILWTICO",
+        "seriesIdOrTable": "FRED:DCOILWTICO (EIA WTI spot)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DCOILWTICO",
+      "methodUrl": "https://fred.stlouisfed.org/series/DCOILWTICO",
+      "whatItIs": "West Texas Intermediate crude: the price of a barrel of US oil, the benchmark for most of the Americas. The series is the spot price from the US Energy Information Administration via FRED (DCOILWTICO), the American twin of the Brent card.",
+      "whatItIsnt": "Supply, demand and geopolitics pull the price at once: the level alone doesn’t separate them, and it can swing far from Brent.",
+      "trackRecordNote": "Like Brent, spikes above roughly $120 usually meant war or supply shocks; crashes below about $40 marked demand collapses.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 12 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DCOILWTICO"
+        ]
+      },
+      "unit": "usd",
+      "changeUnit": "percent",
+      "cadence": "daily",
+      "maxAgeDays": 12,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "natgas",
+      "title": "US natural gas (Henry Hub)",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (EIA Henry Hub spot)",
+        "url": "https://fred.stlouisfed.org/series/DHHNGSP",
+        "seriesIdOrTable": "FRED:DHHNGSP (EIA Henry Hub spot)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DHHNGSP",
+      "methodUrl": "https://fred.stlouisfed.org/series/DHHNGSP",
+      "whatItIs": "The Henry Hub natural gas spot price: the US benchmark, in US dollars per million British thermal units (MMBtu), weekly from the US Energy Information Administration via FRED (DHHNGSP).",
+      "whatItIsnt": "Deeply seasonal and jumpy: one cold snap can move it far, and the US price runs apart from the gas prices Europe and Asia pay.",
+      "trackRecordNote": "Spikes came with cold winters and supply shocks (2005, 2022); long quiet stretches followed as supply caught up.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 12 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DHHNGSP"
+        ]
+      },
+      "unit": "usd",
+      "changeUnit": "percent",
+      "cadence": "daily",
+      "maxAgeDays": 12,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -768,7 +1181,7 @@
         "privateOk": true,
         "publicDisplayOk": "no",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -829,7 +1242,7 @@
         "privateOk": true,
         "publicDisplayOk": "no",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -890,7 +1303,7 @@
         "privateOk": true,
         "publicDisplayOk": "no",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyright, 2016, Chicago Board Options Exchange, Inc\" (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyright, 2016, Chicago Board Options Exchange, Inc\" (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -951,6 +1364,65 @@
         "termsCheckedOn": "2026-10-16",
         "termsEvidence": "alternative.me states the index may be displayed freely when \"attribution is given right next to the display of the data\" (read 2026-10-16). Attribution renders beside the card.",
         "termsUrl": "https://alternative.me/crypto/fear-and-greed-index/"
+      }
+    },
+    {
+      "id": "eth-usd",
+      "title": "Ethereum price",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "eodhd",
+        "name": "EODHD (ETH-USD daily close)",
+        "url": "https://eodhd.com",
+        "seriesIdOrTable": "EODHD ETH-USD.CC daily close (the owner’s API key)"
+      },
+      "publisher": "EODHD (world stock markets)",
+      "publisherUrl": "https://eodhd.com",
+      "methodUrl": "https://eodhd.com",
+      "whatItIs": "The price of one ether in US dollars: quotes from Yahoo Finance and gold-api.com on an end-of-day EODHD backbone (ETH-USD.CC).",
+      "whatItIsnt": "Famously volatile: the price says nothing about value, and this page takes no view on holdings.",
+      "trackRecordNote": "It has followed bitcoin’s booms and crashes with bigger swings: a pattern of risk appetite, nothing steadier.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 3 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "worker",
+        "termsLines": "EODHD personal-plan terms (read 2026-10-16): the personal plan covers the owner’s own dashboard use; serving the data to others is redistribution. Public display not licensed — the world boards stay hidden in public mode (T-15) and the API key rides the EODHD_API_TOKEN secret.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Data: EODHD",
+        "legs": [
+          "eodhd"
+        ]
+      },
+      "unit": "usd",
+      "changeUnit": "percent",
+      "cadence": "daily",
+      "maxAgeDays": 3,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Personal plan — owner only",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 §2.3: personal plan covers owner-only dashboards; serving to others is redistribution. Never shown in public mode unless a display licence is bought. · Legs (eodhd): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): EODHD personal-plan leg (owner_accepts yes, RISK_REGISTER.md — the same register row that keeps the world-markets board public since 2026-10-15); the owner directive lifts the worst-leg display bar for this single daily-close card.",
+        "termsUrl": "https://eodhd.com/"
       }
     },
     {
@@ -1329,6 +1801,65 @@
       }
     },
     {
+      "id": "nzd-usd",
+      "title": "NZD/USD",
+      "area": {
+        "section": "global",
+        "group": "dollar-strength",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "frankfurter",
+        "name": "Frankfurter (ECB)",
+        "url": "https://frankfurter.dev",
+        "seriesIdOrTable": "Frankfurter USD→NZD"
+      },
+      "publisher": "ECB reference rates via the Frankfurter project",
+      "publisherUrl": "https://frankfurter.dev",
+      "methodUrl": "https://frankfurter.dev",
+      "whatItIs": "The NZD/USD exchange rate: how many US dollars one New Zealand dollar buys, from ECB reference rates via Frankfurter.",
+      "whatItIsnt": "It reflects two economies and global risk sentiment at once; direction alone is not a signal.",
+      "trackRecordNote": "Reads below roughly 0.55 came with global panics; strength above 0.75 came with commodity booms.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "frankfurter.dev/license links the ECB disclaimer for the data (read 2026-10-16); the ECB’s reuse terms page is JS-rendered and could not be quoted verbatim in a plain fetch — level L1 (probably fine, terms need the quarterly re-check), fail closed in public mode until then. Frankfurter’s code is MIT.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "legs": [
+          "frankfurter"
+        ]
+      },
+      "unit": "usd",
+      "changeUnit": "percent",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless. · Legs (frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://frankfurter.dev/license/"
+      }
+    },
+    {
       "id": "china-pmi",
       "title": "China manufacturing PMI",
       "area": {
@@ -1444,7 +1975,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1505,7 +2036,7 @@
         "privateOk": true,
         "publicDisplayOk": "no",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1566,7 +2097,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1627,7 +2158,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16)",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1749,6 +2280,183 @@
         "termsCheckedOn": "2026-10-16",
         "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless.",
         "termsUrl": "https://frankfurter.dev/license/"
+      }
+    },
+    {
+      "id": "us-gdp-growth",
+      "title": "US economic growth (real GDP)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (BEA real GDP growth)",
+        "url": "https://fred.stlouisfed.org/series/A191RL1Q225SBEA",
+        "seriesIdOrTable": "FRED:A191RL1Q225SBEA (real GDP growth, QoQ annualized)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/A191RL1Q225SBEA",
+      "methodUrl": "https://fred.stlouisfed.org/series/A191RL1Q225SBEA",
+      "whatItIs": "US real GDP growth for the latest quarter, annualised (FRED’s A191RL1Q225SBEA): the economy’s headline growth number, published quarterly.",
+      "whatItIsnt": "Quarterly, revised for months after release, and an average across a continent-sized economy.",
+      "trackRecordNote": "Readings near 2% are the US cruise speed; two negative quarters in a row is the classic, unofficial recession definition.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 215 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:A191RL1Q225SBEA"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "quarterly",
+      "maxAgeDays": 215,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21)",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "us-nfp",
+      "title": "US jobs added each month",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "derived",
+        "name": "FRED (BLS PAYEMS, monthly change)",
+        "url": "https://fred.stlouisfed.org/series/PAYEMS",
+        "seriesIdOrTable": "FRED:PAYEMS (monthly change, thousands)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/PAYEMS",
+      "methodUrl": "https://fred.stlouisfed.org/series/PAYEMS",
+      "whatItIs": "The monthly change in US nonfarm payrolls (FRED’s PAYEMS), in thousands of jobs: positive means jobs added, negative means jobs lost.",
+      "whatItIsnt": "One month’s number is revised for months and swings with weather and strikes: never a trend alone.",
+      "trackRecordNote": "Roughly 100,000–200,000 new jobs a month marks a healthy US economy; sustained job losses have lined up with every modern US recession.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 70 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:PAYEMS"
+        ]
+      },
+      "unit": "points",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 70,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) · Legs (fred:PAYEMS): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "platinum",
+      "title": "Platinum price",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "world-bank",
+        "name": "World Bank Pink Sheet",
+        "url": "https://www.worldbank.org/en/research/commodity-markets",
+        "seriesIdOrTable": "World Bank Pink Sheet (Platinum, $/troy oz)"
+      },
+      "publisher": "World Bank (Commodity Markets \"Pink Sheet\")",
+      "publisherUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "methodUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "whatItIs": "The price of platinum per troy ounce: monthly World Bank pink-sheet prices carrying the decade of history.",
+      "whatItIsnt": "Rarer than gold but far more industrial: its price follows factories as much as fear, and forecasts for it are famously poor.",
+      "trackRecordNote": "It spent the years after 2008 well below gold; its big runs (the 2000s, 2025–26) came with supply squeezes or demand booms.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "World Bank Open Data terms are commonly CC BY 4.0, but the terms page is JS-rendered and could not be quoted verbatim on 2026-10-16 — level L1 (need checking), fail closed in public mode until the clause is quoted. Attribution shown regardless.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: World Bank",
+        "legs": [
+          "world-bank"
+        ]
+      },
+      "unit": "usd",
+      "changeUnit": "percent",
+      "cadence": "monthly",
+      "maxAgeDays": 60,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Unknown (CC BY 4.0 expected, not quoted)",
+        "attributionText": "Source: World Bank",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "unknown",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "World Bank Open Data terms are commonly CC BY 4.0, but the licence page could not be quoted verbatim on 2026-10-16 (JS-rendered) — marked unknown, fail closed in public mode until read in a browser. · Legs (world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.worldbank.org/en/about/legal/terms-of-use"
       }
     },
     {
@@ -2308,9 +3016,9 @@
       },
       "source": {
         "provider": "rba",
-        "name": "RBA F2 (10-year bond yield)",
+        "name": "RBA F2/F2.1 (10-year bond yield)",
         "url": "https://www.rba.gov.au/statistics/tables/#f2",
-        "seriesIdOrTable": "RBA F2 FCMYGBAG10D (Australian Government 10 year bond)"
+        "seriesIdOrTable": "RBA F2 FCMYGBAG10D (daily) / F2.1 FCMYGBAG10 (monthly fallback)"
       },
       "publisher": "Reserve Bank of Australia (statistical tables)",
       "publisherUrl": "https://www.rba.gov.au/statistics/tables/#f2",
@@ -2319,7 +3027,7 @@
       "whatItIsnt": "It moves with world bond markets (US yields, global growth news), so it can shift with no Australian news at all.",
       "trackRecordNote": "The 2022–24 global rate reset pushed it from near 1% to multi-year highs; through the decade before, and especially after 2020’s emergency setting, it sat far lower.",
       "definition": null,
-      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "failClosedConditions": "No value, data older than 40 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L0",
         "ownerAccepts": null,
@@ -2336,7 +3044,7 @@
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "daily",
-      "maxAgeDays": 4,
+      "maxAgeDays": 40,
       "maxAgeBasis": "per-series override",
       "scored": true,
       "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
@@ -2380,7 +3088,7 @@
       "whatItIsnt": "It describes market pricing, not the RBA’s own intentions, and it moves with world bond markets too.",
       "trackRecordNote": "Positive gaps have appeared when the market priced a rising cash-rate path; negative gaps appeared in the run-ups to past rate-cutting cycles.",
       "definition": "The Australian 3-year government bond yield (RBA F2) minus the RBA cash rate (F1), same date. A rough read — the ASX RBA Rate Tracker carries the market-priced path.",
-      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "failClosedConditions": "No value, data older than 40 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L0",
         "ownerAccepts": null,
@@ -2398,7 +3106,7 @@
       "unit": "points",
       "changeUnit": "percentage points",
       "cadence": "daily",
-      "maxAgeDays": 4,
+      "maxAgeDays": 40,
       "maxAgeBasis": "per-series override",
       "scored": true,
       "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
@@ -2442,7 +3150,7 @@
       "whatItIsnt": "Both legs move: the gap can shift with no Australian news at all.",
       "trackRecordNote": "A negative gap (US yields above Australia’s) has coincided with weaker eras for the AUD.",
       "definition": "The Australian 10-year yield (RBA F2) minus the US 10-year yield (DGS10). When the two data dates differ, both dates are shown and the gap is marked \"dates differ\".",
-      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "failClosedConditions": "No value, data older than 40 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L0",
         "ownerAccepts": null,
@@ -2460,7 +3168,7 @@
       "unit": "points",
       "changeUnit": "percentage points",
       "cadence": "daily",
-      "maxAgeDays": 4,
+      "maxAgeDays": 40,
       "maxAgeBasis": "per-series override",
       "scored": true,
       "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
@@ -2478,7 +3186,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-16) · Legs (rba:F2, fred:DGS10): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) · Legs (rba:F2, fred:DGS10): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -2552,7 +3260,7 @@
       },
       "source": {
         "provider": "rba",
-        "name": "RBA F1 (Cash Rate Target)",
+        "name": "RBA (Cash Rate Target — F1/decision table)",
         "url": "https://www.rba.gov.au/statistics/cash-rate/",
         "seriesIdOrTable": "RBA statistical table F1 (Cash Rate Target, daily)"
       },
@@ -3036,7 +3744,7 @@
         "url": "https://frankfurter.dev",
         "seriesIdOrTable": "1 ÷ Frankfurter USD→AUD"
       },
-      "publisher": "derived",
+      "publisher": "ECB reference rates via the Frankfurter project",
       "publisherUrl": "https://frankfurter.dev",
       "methodUrl": "https://frankfurter.dev",
       "whatItIs": "The AUD/USD exchange rate: how many US dollars one Australian dollar buys, from ECB reference rates via Frankfurter.",
@@ -3045,16 +3753,16 @@
       "definition": null,
       "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
-        "level": "L2",
-        "ownerAccepts": false,
-        "enabled": false,
-        "method": null,
-        "runtime": null,
-        "termsLines": "No register row — fail closed: not fetched, not shown, until the terms are read and the row is recorded.",
-        "termsReadOn": "not verified",
-        "attributionText": "",
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "frankfurter.dev/license links the ECB disclaimer for the data (read 2026-10-16); the ECB’s reuse terms page is JS-rendered and could not be quoted verbatim in a plain fetch — level L1 (probably fine, terms need the quarterly re-check), fail closed in public mode until then. Frankfurter’s code is MIT.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
         "legs": [
-          "derived"
+          "frankfurter"
         ]
       },
       "unit": "usd",
@@ -3072,14 +3780,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "Own computation — inherits the upstream sources’ terms",
-        "attributionText": "",
-        "attributionRequired": false,
+        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "unknown",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
-        "termsUrl": null
+        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless. · Legs (frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://frankfurter.dev/license/"
       }
     },
     {
@@ -3097,7 +3805,7 @@
         "url": "https://frankfurter.dev",
         "seriesIdOrTable": "Frankfurter USD→JPY ÷ USD→AUD"
       },
-      "publisher": "derived",
+      "publisher": "ECB reference rates via the Frankfurter project",
       "publisherUrl": "https://frankfurter.dev",
       "methodUrl": "https://frankfurter.dev",
       "whatItIs": "The AUD/JPY exchange rate: how many yen one Australian dollar buys, derived from ECB reference rates.",
@@ -3106,16 +3814,16 @@
       "definition": null,
       "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
-        "level": "L2",
-        "ownerAccepts": false,
-        "enabled": false,
-        "method": null,
-        "runtime": null,
-        "termsLines": "No register row — fail closed: not fetched, not shown, until the terms are read and the row is recorded.",
-        "termsReadOn": "not verified",
-        "attributionText": "",
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "frankfurter.dev/license links the ECB disclaimer for the data (read 2026-10-16); the ECB’s reuse terms page is JS-rendered and could not be quoted verbatim in a plain fetch — level L1 (probably fine, terms need the quarterly re-check), fail closed in public mode until then. Frankfurter’s code is MIT.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
         "legs": [
-          "derived"
+          "frankfurter"
         ]
       },
       "unit": "jpy",
@@ -3135,14 +3843,14 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "Own computation — inherits the upstream sources’ terms",
-        "attributionText": "",
-        "attributionRequired": false,
+        "licenceName": "ECB terms via the Frankfurter project (MIT code)",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "unknown",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).",
-        "termsUrl": null
+        "termsEvidence": "frankfurter.dev/license links the ECB disclaimer for the DATA; the ECB’s display terms could not be quoted verbatim on 2026-10-16 (JS-rendered pages) — unknown, fail closed in public mode until read in a browser. Attribution shown regardless. · Legs (frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://frankfurter.dev/license/"
       }
     },
     {

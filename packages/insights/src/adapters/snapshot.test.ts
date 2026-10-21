@@ -141,8 +141,8 @@ describe('buildInsightsSnapshot', () => {
       now: NOW,
     });
     // Fix spec C (2026-10-14): the four additions grew the set.
-    expect(snap.readings).toHaveLength(54); // 52 + the two Shiller context cards (Step 3 L1-14)
-    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(54);
+    expect(snap.readings).toHaveLength(66); // the 2026-10-21 data-integrity round adds 12 context cards
+    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(66);
     expect(snap.readings.find((r) => r.id === 'us10y')!.status).not.toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.status).toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.value).toBeNull();

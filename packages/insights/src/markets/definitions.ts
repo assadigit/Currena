@@ -142,28 +142,61 @@ export interface MarketDefinition {
   eodhdCode: string | null;
   /** Yahoo Finance chart symbol (URL-encoded by the fetcher). */
   yahooSymbol: string;
+  /**
+   * F1 (2026-10-21 session-finality fix): the exchange's local closing
+   * TIME, minutes past midnight in the exchange's own timezone (a single
+   * year-round value — every index below trades in a market with no DST
+   * shifts affecting these hours, and the worst case of a one-hour error
+   * is a row held until a later run, never a wrong value). A run whose
+   * winning series carries a close dated TODAY (UTC) may only write that
+   * row once the session has fully closed by the run's clock — otherwise
+   * the row is an intraday snapshot that would freeze as the "final"
+   * close (the 2026-10-21 N225 incident: the 01:30 retry wrote Tokyo's
+   * 14:30 JST level, 0.85% off the real 15:00 close, as today's close).
+   */
+  closeUtcMinute: number;
 }
 
 /** Fixed for v1 (spec §2 + owner round 44: the Dow Jones and CAC 40 joined
  * the original 14 after live provider verification — see
- * docs/specs/insights-world-markets-data-check.md). */
+ * docs/specs/insights-world-markets-data-check.md).
+ *
+ * closeUtcMinute = the session's close converted to UTC (minutes past 00:00
+ * UTC), plus a 30-minute settlement margin baked in. Sources: each
+ * exchange's published trading hours. The list is consulted ONLY when a
+ * winning series' latest close is dated the run's own UTC day (an intraday
+ * print) — see compute.ts sessionClosedForWrite. */
 export const MARKETS: readonly MarketDefinition[] = [
-  { id: 'n225', group: 'asia', eodhdCode: 'N225.INDX', yahooSymbol: '^N225' },
-  { id: 'asx200', group: 'asia', eodhdCode: 'AXJO.INDX', yahooSymbol: '^AXJO' },
-  { id: 'kospi', group: 'asia', eodhdCode: 'KS11.INDX', yahooSymbol: '^KS11' },
-  { id: 'hsi', group: 'asia', eodhdCode: 'HSI.INDX', yahooSymbol: '^HSI' },
-  { id: 'ssec', group: 'asia', eodhdCode: 'SSEC.INDX', yahooSymbol: '000001.SS' },
-  { id: 'taiex', group: 'asia', eodhdCode: 'TWII.INDX', yahooSymbol: '^TWII' },
-  { id: 'nifty50', group: 'asia', eodhdCode: 'NSEI.INDX', yahooSymbol: '^NSEI' },
-  { id: 'stoxx50', group: 'europe', eodhdCode: 'STOXX50E.INDX', yahooSymbol: '^STOXX50E' },
-  { id: 'dax', group: 'europe', eodhdCode: 'GDAXI.INDX', yahooSymbol: '^GDAXI' },
-  { id: 'cac', group: 'europe', eodhdCode: 'FCHI.INDX', yahooSymbol: '^FCHI' },
-  { id: 'ftse', group: 'europe', eodhdCode: null, yahooSymbol: '^FTSE' },
-  { id: 'sp500', group: 'americas', eodhdCode: 'GSPC.INDX', yahooSymbol: '^GSPC' },
-  { id: 'ndx', group: 'americas', eodhdCode: 'NDX.INDX', yahooSymbol: '^NDX' },
-  { id: 'dow', group: 'americas', eodhdCode: 'DJI.INDX', yahooSymbol: '^DJI' },
-  { id: 'tsx', group: 'americas', eodhdCode: 'GSPTSE.INDX', yahooSymbol: '^GSPTSE' },
-  { id: 'ibov', group: 'americas', eodhdCode: 'BVSP.INDX', yahooSymbol: '^BVSP' },
+  // Tokyo 09:00–15:00 JST (UTC+9) → close 06:00 UTC (+30 margin = 06:30).
+  { id: 'n225', group: 'asia', eodhdCode: 'N225.INDX', yahooSymbol: '^N225', closeUtcMinute: 6 * 60 + 30 },
+  // Sydney 10:00–16:00 AEST (UTC+10; the market's own clock, no DST here) → 06:00 UTC (+30 = 06:30).
+  { id: 'asx200', group: 'asia', eodhdCode: 'AXJO.INDX', yahooSymbol: '^AXJO', closeUtcMinute: 6 * 60 + 30 },
+  // Seoul 09:00–15:30 KST (UTC+9) → 06:30 UTC (+30 = 07:00).
+  { id: 'kospi', group: 'asia', eodhdCode: 'KS11.INDX', yahooSymbol: '^KS11', closeUtcMinute: 7 * 60 },
+  // Hong Kong 09:30–16:00 HKT (UTC+8) → 08:00 UTC (+30 = 08:30).
+  { id: 'hsi', group: 'asia', eodhdCode: 'HSI.INDX', yahooSymbol: '^HSI', closeUtcMinute: 8 * 60 + 30 },
+  // Shanghai 09:30–15:00 CST (UTC+8) → 07:00 UTC (+30 = 07:30).
+  { id: 'ssec', group: 'asia', eodhdCode: 'SSEC.INDX', yahooSymbol: '000001.SS', closeUtcMinute: 7 * 60 + 30 },
+  // Taipei 09:00–13:30 TWT (UTC+8) → 05:30 UTC (+30 = 06:00).
+  { id: 'taiex', group: 'asia', eodhdCode: 'TWII.INDX', yahooSymbol: '^TWII', closeUtcMinute: 6 * 60 },
+  // Mumbai 09:15–15:30 IST (UTC+5:30) → 10:00 UTC (+30 = 10:30).
+  { id: 'nifty50', group: 'asia', eodhdCode: 'NSEI.INDX', yahooSymbol: '^NSEI', closeUtcMinute: 10 * 60 + 30 },
+  // Euro Stoxx 50 (NYSE Euronext) 09:00–17:30 CET (UTC+1) → 16:30 UTC (+30 = 17:00).
+  { id: 'stoxx50', group: 'europe', eodhdCode: 'STOXX50E.INDX', yahooSymbol: '^STOXX50E', closeUtcMinute: 17 * 60 },
+  // Xetra 09:00–17:30 CET (UTC+1) → 16:30 UTC (+30 = 17:00).
+  { id: 'dax', group: 'europe', eodhdCode: 'GDAXI.INDX', yahooSymbol: '^GDAXI', closeUtcMinute: 17 * 60 },
+  // Paris 09:00–17:30 CET (UTC+1) → 16:30 UTC (+30 = 17:00).
+  { id: 'cac', group: 'europe', eodhdCode: 'FCHI.INDX', yahooSymbol: '^FCHI', closeUtcMinute: 17 * 60 },
+  // London 08:00–16:30 GMT (UTC+0) → 16:30 UTC (+30 = 17:00).
+  { id: 'ftse', group: 'europe', eodhdCode: null, yahooSymbol: '^FTSE', closeUtcMinute: 17 * 60 },
+  // NYSE/Nasdaq 09:30–16:00 ET (UTC−5) → 21:00 UTC (+30 = 21:30).
+  { id: 'sp500', group: 'americas', eodhdCode: 'GSPC.INDX', yahooSymbol: '^GSPC', closeUtcMinute: 21 * 60 + 30 },
+  { id: 'ndx', group: 'americas', eodhdCode: 'NDX.INDX', yahooSymbol: '^NDX', closeUtcMinute: 21 * 60 + 30 },
+  { id: 'dow', group: 'americas', eodhdCode: 'DJI.INDX', yahooSymbol: '^DJI', closeUtcMinute: 21 * 60 + 30 },
+  // Toronto 09:30–16:00 ET (UTC−5) → 21:00 UTC (+30 = 21:30).
+  { id: 'tsx', group: 'americas', eodhdCode: 'GSPTSE.INDX', yahooSymbol: '^GSPTSE', closeUtcMinute: 21 * 60 + 30 },
+  // São Paulo 10:00–17:00 BRT (UTC−3) → 20:00 UTC (+30 = 20:30).
+  { id: 'ibov', group: 'americas', eodhdCode: 'BVSP.INDX', yahooSymbol: '^BVSP', closeUtcMinute: 20 * 60 + 30 },
 ];
 
 const BY_ID = new Map(MARKETS.map((m) => [m.id as string, m]));

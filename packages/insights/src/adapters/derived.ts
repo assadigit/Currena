@@ -65,6 +65,8 @@ export interface SeriesInputs {
     CAD?: SeriesPoint[];
     SEK?: SeriesPoint[];
     CHF?: SeriesPoint[];
+    /** 2026-10-21: NZD joins the one Frankfurter request (nzd-usd card). */
+    NZD?: SeriesPoint[];
   };
   /** World Bank Pink Sheet monthly series. */
   wb?: WorldBankMonthly;
@@ -93,6 +95,13 @@ export interface SeriesInputs {
     cashRate?: SeriesPoint[];
     /** The F1.1 monthly-average series (kept separately for diagnostics). */
     cashRateMonthly?: SeriesPoint[];
+    /**
+     * 2026-10-21: the cash-rate DECISION table parsed from the
+     * /statistics/cash-rate/ HTML page — the Worker venue's reliable source
+     * while the CSV paths stay Akamai-403'd (collect prefers it in the
+     * cashRate chain when the daily table is unavailable).
+     */
+    cashRateDecisions?: SeriesPoint[];
     au10y?: SeriesPoint[];
     /** Fix spec C-06: F2 FCMYGBAG3D — the 3-year government bond yield. */
     au3y?: SeriesPoint[];
@@ -105,6 +114,11 @@ export interface SeriesInputs {
   chinaPmi?: SeriesPoint[];
   /** Step 3 L1-18: the Alternative.me crypto Fear and Greed index (context only). */
   cryptoFng?: SeriesPoint[];
+  /**
+   * 2026-10-21 data-integrity round: EODHD crypto daily closes — the
+   * eth-usd card's value series (the owner's key; see adapters/eodhd.ts).
+   */
+  eodhd?: { eth?: SeriesPoint[] };
   /**
    * Step 3 L1-14 / FS-06 (v3, 2026-10-20): the monthly Shiller CAPE and
    * Excess CAPE Yield series, read from the converted bulk file
@@ -138,6 +152,33 @@ export interface SeriesInputs {
 /** Inverse of a USD→X quote series (X per USD → USD per X). */
 function invert(series: SeriesPoint[]): SeriesPoint[] {
   return series.map((p) => ({ date: p.date, value: 1 / p.value }));
+}
+
+/**
+ * F4 (2026-10-21 precision round): quantize every value of a derived
+ * POINTS-based series to `dp` decimals — division/subtraction on decimal
+ * quotes manufactures float tails (0.8949999999999996) that render verbatim
+ * and false-positive T-08's frozen-value heuristics. Pure, order-preserving.
+ */
+function quantized(series: SeriesPoint[], dp: number): SeriesPoint[] {
+  const f = 10 ** dp;
+  return series.map((p) => ({ date: p.date, value: Math.round(p.value * f) / f }));
+}
+
+/**
+ * 2026-10-21 data-integrity round: the monthly CHANGE series of a level
+ * series (PAYEMS → nonfarm payrolls print, in the level's own units —
+ * thousands of jobs). Pure: one output point per consecutive input pair,
+ * dated at the LATER observation, ascending preserved, first point dropped.
+ */
+function monthlyChangeSeries(series: SeriesPoint[]): SeriesPoint[] {
+  const out: SeriesPoint[] = [];
+  for (let i = 1; i < series.length; i++) {
+    const prev = series[i - 1]!;
+    const curr = series[i]!;
+    out.push({ date: curr.date, value: curr.value - prev.value });
+  }
+  return out;
 }
 
 /** Union-merge two series by date (later list wins on collision), sorted. */
@@ -259,17 +300,42 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // 2-year yield minus the policy-rate MIDPOINT (L2-08: (DFEDTARL +
   // DFEDTARU)/2) — the lower bound understated the gap by half a step
   // (0.125 pts at the current 25bp corridor).
+  // F4 (2026-10-21 precision round): the derived gap is quantized to 4
+  // decimals — raw IEEE subtraction prints 0.8949999999999996 (4.645 −
+  // 3.875), which the card shows verbatim AND which trips T-08's
+  // frozen-value heuristic (decimalsOf ≥ 3 → cross-day 6-decimal compare).
+  // Rates are quoted at 2–3 decimals in reality; 4dp keeps every honest
+  // digit while collapsing the float-noise class. The same quantization
+  // guards the other points-based derived gaps below.
   if (fred.DGS2 && fred.DFEDTARL && fred.DFEDTARU) {
     const mid = combineSeries(fred.DFEDTARL, fred.DFEDTARU, (lower, upper) => (lower + upper) / 2);
-    put('fed-expectations', combineSeries(fred.DGS2, mid, (two, policy) => two - policy));
+    put('fed-expectations', quantized(combineSeries(fred.DGS2, mid, (two, policy) => two - policy), 4));
   }
   // Fix spec C-04 (2026-10-14): the US 30-year Treasury yield.
   put('us30y', fred.DGS30);
+  // 2026-10-21 data-integrity round: the sovereign-yield + policy-rate
+  // coverage (context rows — never gauge voters). The OECD monthly
+  // benchmarks (Bund/JGB/Gilt) and the overnight-rate averages that track
+  // the BoJ/BoE policy settings (IRSTCI01*: Japan's uncollateralized
+  // overnight call rate ≈ the BoJ target; the UK's ≈ the Bank Rate).
+  // Private-only cards: every IRLTLT01*/IRSTCI01* series carries FRED's
+  // "copyright-citation-required" tag (T-16 scanned 2026-10-21).
+  put('bund-10y', fred.IRLTLT01DEM156N);
+  put('jgb-10y', fred.IRLTLT01JPM156N);
+  put('gilt-10y', fred.IRLTLT01GBM156N);
+  put('boj-rate', fred.IRSTCI01JPM156N);
+  put('boe-rate', fred.IRSTCI01GBM156N);
 
   /* ---------------- Global — Are prices heating up? ---------------- */
   if (fred.CPIAUCNS) put('us-cpi-yoy', yoyPctSeries(fred.CPIAUCNS));
   if (fred.CPILFENS) put('us-cpi-core-yoy', yoyPctSeries(fred.CPILFENS));
   put('breakeven-5y5y', fred.T5YIFR);
+  // 2026-10-21 data-integrity round: the two EIA energy spots ride the
+  // same FRED bulk request as Brent's spot — context rows in the prices
+  // lane beside Brent's own scored card (never prices-board tiles; the
+  // board's four-tile layout is spec-fixed).
+  put('wti', fred.DCOILWTICO);
+  put('natgas', fred.DHHNGSP);
 
   /* ---------------- Global — Are markets nervous? ---------------- */
   put('stress-stlfsi', fred.STLFSI4);
@@ -300,6 +366,9 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   put('dollar-basket', basketSeries(fx));
   put('usdjpy', fx.JPY);
   put('eur-usd', fx.EUR);
+  // 2026-10-21: the fourth dollar-bloc pair (the same invert recipe as
+  // AUD/USD — one more column on the single Frankfurter request).
+  if (fx.NZD) put('nzd-usd', invert(fx.NZD));
 
   /* ---------------- Global — Is growth healthy? ---------------- */
   put('china-pmi', inputs.chinaPmi);
@@ -307,6 +376,11 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // ONLY (rule info; L3-03 forbids composite sentiment scores, and the
   // card never presents the index as a signal).
   put('crypto-fng', inputs.cryptoFng);
+  // 2026-10-21 data-integrity round: the Ethereum daily-close series — the
+  // crypto market's second asset beside the FNG context card (info rule,
+  // EODHD on the owner's key; public-display-ok under the same owner
+  // directive that governs the world-markets board).
+  put('eth-usd', inputs.eodhd?.eth);
   // Step 3 L1-14 / FS-06 (v3, 2026-10-20): the Shiller cards read the
   // publisher's own columns from the converted bulk file — never recomputed.
   put('shiller-cape', inputs.shiller?.cape);
@@ -321,6 +395,15 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   put('philly-fed', fred.GACDFSA066MSFRBPHI);
   if (wb) put('copper-gold', combineSeries(wb.copper, wb.gold, (c, g) => c / g));
   put('usdcny', fx.CNY);
+  // 2026-10-21 data-integrity round: growth coverage — the quarterly real
+  // GDP growth rate straight from FRED (already QoQ annualized percent),
+  // and the monthly nonfarm-payrolls CHANGE derived from the PAYEMS level
+  // (the NFP print the market watches; value in thousands of jobs).
+  put('us-gdp-growth', fred.A191RL1Q225SBEA);
+  put('us-nfp', fred.PAYEMS !== undefined ? monthlyChangeSeries(fred.PAYEMS) : undefined);
+  // Platinum: the precious/industrial metal from the SAME Pink Sheet
+  // workbook the other metals ride (zero extra requests, L1 licence).
+  put('platinum', inputs.wb?.platinum);
 
   /* ------------- Global — Prices board (not a gauge) ------------- */
   // Brent: EIA spot (FRED) extended past its last published date by Yahoo's
@@ -419,11 +502,13 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // the same series the gap card subtracts, now also its own scored card).
   put('au-10y', rba?.au10y);
   // Fix spec C-06 (2026-10-14): the 3-year bond yield minus the cash rate.
+  // F4: quantized (the fed-expectations twin — float tails otherwise trip
+  // T-08 and render as 0.30900000000000016-style noise).
   if (rba?.au3y && rba?.cashRate) {
-    put('rba-expectations', combineSeries(rba.au3y, rba.cashRate, (three, cash) => three - cash));
+    put('rba-expectations', quantized(combineSeries(rba.au3y, rba.cashRate, (three, cash) => three - cash), 4));
   }
   if (rba?.au10y && fred.DGS10) {
-    put('au-us-10y-gap', combineSeries(rba.au10y, fred.DGS10, (au, us) => au - us));
+    put('au-us-10y-gap', quantized(combineSeries(rba.au10y, fred.DGS10, (au, us) => au - us), 4));
   }
   // Step-1 audit item A4: `cashRate` prefers the DAILY F1 target (a
   // decision-day move shows at once — the Sep-2026 hike reads 4.60% from
@@ -617,6 +702,25 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   },
   usdjpy: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   'eur-usd': { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
+  'nzd-usd': { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
+  // 2026-10-21 data-integrity round — the coverage additions' attributions.
+  wti: { name: 'FRED (EIA WTI spot)', url: 'https://fred.stlouisfed.org/series/DCOILWTICO' },
+  natgas: { name: 'FRED (EIA Henry Hub spot)', url: 'https://fred.stlouisfed.org/series/DHHNGSP' },
+  platinum: { name: 'World Bank Pink Sheet', url: 'https://www.worldbank.org/en/research/commodity-markets' },
+  'bund-10y': { name: 'FRED (OECD Main Economic Indicators)', url: 'https://fred.stlouisfed.org/series/IRLTLT01DEM156N' },
+  'jgb-10y': { name: 'FRED (OECD Main Economic Indicators)', url: 'https://fred.stlouisfed.org/series/IRLTLT01JPM156N' },
+  'gilt-10y': { name: 'FRED (OECD Main Economic Indicators)', url: 'https://fred.stlouisfed.org/series/IRLTLT01GBM156N' },
+  'boj-rate': {
+    name: 'FRED (OECD: Japan overnight call rate)',
+    url: 'https://fred.stlouisfed.org/series/IRSTCI01JPM156N',
+  },
+  'boe-rate': {
+    name: 'FRED (OECD: UK overnight rate)',
+    url: 'https://fred.stlouisfed.org/series/IRSTCI01GBM156N',
+  },
+  'us-gdp-growth': { name: 'FRED (BEA real GDP growth)', url: 'https://fred.stlouisfed.org/series/A191RL1Q225SBEA' },
+  'us-nfp': { name: 'FRED (BLS PAYEMS, monthly change)', url: 'https://fred.stlouisfed.org/series/PAYEMS' },
+  'eth-usd': { name: 'EODHD (ETH-USD daily close)', url: 'https://eodhd.com' },
   'china-pmi': { name: 'China NBS (manual entry)', url: 'https://www.stats.gov.cn/english/' },
   'm2-us': { name: 'FRED (M2SL)', url: 'https://fred.stlouisfed.org/series/M2SL' },
   'us-unemployment': { name: 'FRED (UNRATE), US BLS', url: 'https://fred.stlouisfed.org/series/UNRATE' },
@@ -636,9 +740,12 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'btc-usd': { name: 'gold-api.com (BTC)', url: 'https://www.gold-api.com' },
   'gold-btc': { name: 'gold-api.com (XAU ÷ BTC)', url: 'https://www.gold-api.com' },
   'silver-btc': { name: 'gold-api.com (XAG ÷ BTC)', url: 'https://www.gold-api.com' },
-  'rba-cash-rate': { name: 'RBA F1 (Cash Rate Target)', url: 'https://www.rba.gov.au/statistics/cash-rate/' },
+  'rba-cash-rate': {
+    name: 'RBA (Cash Rate Target — F1/decision table)',
+    url: 'https://www.rba.gov.au/statistics/cash-rate/',
+  },
   'au-10y': {
-    name: 'RBA F2 (10-year bond yield)',
+    name: 'RBA F2/F2.1 (10-year bond yield)',
     url: 'https://www.rba.gov.au/statistics/tables/#f2',
   },
   'au-deposit-rate': {

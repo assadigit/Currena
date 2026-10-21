@@ -431,6 +431,19 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   'au-us-10y-gap': ['rba:F2', 'fred:DGS10'],
   'govt-interest-revenue': ['fred:A091RC1Q027SBEA', 'fred:W006RC1Q027SBEA'],
   'yield-curve-10y2y': ['fred:T10Y2Y'],
+  // 2026-10-21 data-integrity round — the coverage additions' explicit legs
+  // (the FRED-sourced ones resolve their legs from sourceRef tokens).
+  platinum: ['world-bank'],
+  'eth-usd': ['eodhd'],
+  'nzd-usd': ['frankfurter'],
+  'us-nfp': ['fred:PAYEMS'],
+  // 2026-10-21 fix: the two FX crosses carried source 'derived' with no
+  // UPSTREAM_LEGS entry, so the phase-3-5 licence walk resolved them to the
+  // fail-closed 'derived' row (L2, disabled) — an accidental kill-switch of
+  // two LIVE cards that the (never-run) next ingest would have applied.
+  // Their honest legs are the Frankfurter quote series they invert/cross.
+  audusd: ['frankfurter'],
+  audjpy: ['frankfurter'],
 };
 
 /* ------------------------------------------------------------------ */

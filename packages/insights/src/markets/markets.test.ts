@@ -98,6 +98,9 @@ function fakeSnapshot(markets: readonly MarketEntry[], generatedAt = '2026-10-10
 }
 
 const RUN_DATE = '2026-10-12';
+/** F1 (2026-10-21 session-finality round): the main-run clock — 23:30 UTC,
+ * after every session has closed (the production main run's own time). */
+const RUN_TIME = '2026-10-12T23:30:00Z';
 
 /* ------------------------------------------------------------------ *
  * Providers — parsers over saved sample responses
@@ -663,7 +666,7 @@ describe('runMarketsJob — the §3.4 chain with injected fetchers', () => {
       fetchEodhd: async (id) => good(id),
       fetchYahoo: async (id) => deepYahoo(id),
     };
-    const res = await runMarketsJob(fetchers, { kind: 'main', providerOrder: 'eodhd-first' }, undefined, RUN_DATE);
+    const res = await runMarketsJob(fetchers, { kind: 'main', providerOrder: 'eodhd-first' }, undefined, RUN_DATE, RUN_TIME);
     expect(res.providerCalls.eodhd).toBe(16);
     // The 5-year lens supplement: every EODHD winner (all 16 — the EODHD
     // window is one year) makes ONE extra Yahoo call for its chg5y anchor.
@@ -680,7 +683,7 @@ describe('runMarketsJob — the §3.4 chain with injected fetchers', () => {
       fetchEodhd: async (id) => (id === 'ftse' ? short : good(id)),
       fetchYahoo: async (id) => (id === 'ftse' ? deepYahoo(id) : goodYahoo(id)),
     };
-    const res = await runMarketsJob(fetchers, { kind: 'main', providerOrder: 'eodhd-first' }, undefined, RUN_DATE);
+    const res = await runMarketsJob(fetchers, { kind: 'main', providerOrder: 'eodhd-first' }, undefined, RUN_DATE, RUN_TIME);
     const ftse = res.reports.find((r) => r.id === 'ftse')!;
     expect(ftse.usedSource).toBe('yahoo');
     expect(ftse.called).toEqual(['eodhd', 'yahoo']);
@@ -698,7 +701,7 @@ describe('runMarketsJob — the §3.4 chain with injected fetchers', () => {
         throw new ProviderError('yahoo', id, 'HTTP 429: limit');
       },
     };
-    const res = await runMarketsJob(fetchers, { kind: 'main', providerOrder: 'eodhd-first' }, undefined, RUN_DATE);
+    const res = await runMarketsJob(fetchers, { kind: 'main', providerOrder: 'eodhd-first' }, undefined, RUN_DATE, RUN_TIME);
     expect(res.resolutions.every((r) => !r.held)).toBe(true);
     expect(res.resolutions.every((r) => r.entry?.chg5y === undefined)).toBe(true);
     expect(res.reports.every((r) => r.notes.join(' ').includes('chg5y supplement failed'))).toBe(true);

@@ -21,11 +21,12 @@ import { providerFetchEnabled } from '../sources';
 import { ABS_SERIES, fetchAbsSeries } from './abs';
 import { fetchBitstampCloses } from './bitstamp';
 import { fetchEcbDfrSeries } from './ecb';
+import { EODHD_CRYPTO_SYMBOLS, fetchEodhdCryptoSeries } from './eodhd';
 import { fetchCryptoFng } from './fng';
 import { fetchFrankfurterSeries } from './frankfurter';
-import { FRED_SERIES, fetchFredSeries } from './fred';
+import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredDecadeFrom } from './fred';
 import { fetchGoldApiSpot } from './goldapi';
-import { fetchRbaTableText, parseRbaSeriesFromText, type RbaTableKey } from './rba';
+import { fetchRbaCashRateDecisions, fetchRbaTableText, parseRbaSeriesFromText, type RbaTableKey } from './rba';
 import { fetchYahooQuote } from './yahoo';
 import { fetchWorldBankMonthly } from './worldbank';
 import type { SeriesInputs } from './derived';
@@ -41,6 +42,21 @@ export interface CollectOptions {
   fxStart?: string;
   /** Bitstamp daily candles for the BTC cross-check. */
   bitstampCandles?: number;
+  /**
+   * EODHD API token (the OWNER's key — server-side only). The eth-usd card
+   * rides it; an absent token skips that fetch honestly (the card holds
+   * stale) rather than burning a doomed request.
+   */
+  eodhdApiToken?: string;
+  /**
+   * 2026-10-21 (data-integrity round): SKIP the RBA CSV-table attempts on
+   * venues whose egress the Akamai edge 403s on those paths (Cloudflare
+   * Workers — venue-verified 2026-10-21). The HTML cash-rate page remains
+   * the Worker's RBA source; each skipped table logs an honest report row
+   * instead of six doomed 403 subrequests (the Worker's 50-subrequest
+   * budget counts every attempt).
+   */
+  skipRbaCsvTables?: boolean;
 }
 
 export interface CollectResult {
@@ -102,11 +118,29 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     }
   }
 
-  // FRED (15 series, keyless fredgraph.csv, full history) — keyed by series id.
+  // FRED — the 2026-10-21 consolidation: FIVE multi-series fredgraph.csv
+  // requests cover the whole register (~31 series; see FRED_BULK_GROUPS in
+  // fred.ts). One failing GROUP fails as a unit (loud row); the individual
+  // series that group carried are then simply absent from `fred`, and the
+  // affected indicators read stale/unavailable — never wrong data. The
+  // 2026-10-21b CPU fix: only the highest-since trio keeps FULL history —
+  // every other group rides the decade window (cosd), halving the parse
+  // and every downstream series (the Worker's CPU limit killed the first
+  // live run at the stage write).
   const fred: Partial<Record<string, SeriesPoint[]>> = {};
-  for (const seriesId of Object.values(FRED_SERIES)) {
-    const series = await fetchLogged('fred', seriesId, () => fetchFredSeries(seriesId));
-    if (series) fred[seriesId] = series;
+  let fredGroupIndex = 0;
+  for (const group of FRED_BULK_GROUPS) {
+    fredGroupIndex += 1;
+    const from = group.window === 'decade' ? fredDecadeFrom() : undefined;
+    const label = `bulk group ${fredGroupIndex} (${group.seriesIds.length} series${from !== undefined ? `, from ${from}` : ''}: ${group.seriesIds.join(', ')})`;
+    const fetched = await fetchLogged('fred', label, () => fetchFredSeriesBulk(group.seriesIds, {}, from));
+    if (fetched) Object.assign(fred, fetched);
+  }
+  // Sanity gate: every registered series must ride exactly one group — a
+  // series added to FRED_SERIES but forgotten in the groups silently never
+  // fetches; this makes that impossible.
+  if (FRED_BULK_ALL_IDS.length !== new Set(FRED_BULK_ALL_IDS).size) {
+    throw new Error('collect: FRED bulk groups carry a duplicate series id');
   }
 
   // Yahoo Brent futures (2026-10-12, the stale-oil fix): EIA's DCOILBRENTEU
@@ -138,8 +172,8 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
   // ECB Data Portal (deposit facility rate, full history).
   const ecbDfr = await fetchLogged('ecb', 'FM/D.U2.EUR.4F.KR.DFR.LEV', () => fetchEcbDfrSeries());
 
-  // Frankfurter (USD→JPY/AUD/CNY + the six basket currencies, 10y window).
-  const fx = await fetchLogged('frankfurter', `USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF since ${fxStart}`, () =>
+  // Frankfurter (USD→JPY/AUD/CNY/NZD + the six basket currencies, 10y window).
+  const fx = await fetchLogged('frankfurter', `USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,NZD since ${fxStart}`, () =>
     fetchFrankfurterSeries(fxStart),
   );
 
@@ -164,34 +198,101 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     fetchBitstampCloses('btcusd', { limit: bitstampCandles }),
   );
 
-  // RBA (venue-dependent: rba.gov.au is Akamai-blocked from the build sandbox
-  // but verified HTTP 200 from the GitHub Actions runner — 03-data-sources.md).
-  // Step-1 audit item A4: the DAILY F1 'Cash Rate Target' is fetched first;
-  // F1.1 (monthly average) stays as the fallback when the daily table fails.
-  // v3 F-08/T-32 (2026-10-20): each RBA TABLE document downloads exactly once
-  // per refresh — the F2 10y/3y pair parses two series out of one CSV via the
-  // per-run memo; the per-series report rows stay (same as before).
+  // RBA (venue-dependent: rba.gov.au's Akamai edge 403s the CSV table
+  // paths from the build sandbox AND — since 2026-10-20 — GitHub Actions
+  // runners and Cloudflare Workers; the HTML pages remain served to
+  // Workers). Step-1 audit item A4: the DAILY F1 'Cash Rate Target' is
+  // fetched first; F1.1 (monthly average) stays as the fallback when the
+  // daily table fails. v3 F-08/T-32 (2026-10-20): each RBA TABLE document
+  // downloads exactly once per refresh.
+  //
+  // 2026-10-21: the HTML cash-rate DECISION TABLE is fetched FIRST — the
+  // one RBA surface the Worker venue can still read (venue-verified live:
+  // 4.60% effective 30 Sep 2026).
+  //
+  // F3 (2026-10-21 venue round): the blanket skipRbaCsvTables is NARROWED
+  // to the f2-data.csv path ONLY — the venue probe (rba-probe worker,
+  // 2026-10-21) showed the Akamai rule 403s f2 but SERVES f1, f1.1, f2.1,
+  // e2, f6 and f4.1 from Cloudflare egress. The daily F1/F1.1/E2/F6/F4.1
+  // tables fetch as before; only the daily-F2 family goes down its
+  // fallback ladder (F2.1 monthly → held stale). Six of the seven tables
+  // come back live: au-10y and its family ride the monthly F2.1 yields
+  // instead of day-stale holds.
+  const rbaCashRateDecisions = await fetchLogged('rba', 'cash-rate page decision table (HTML)', () =>
+    fetchRbaCashRateDecisions(),
+  );
   const rbaTables = new Map<string, Promise<string>>();
   // A rejected table download rejects every series parsed from it — the
   // identical error row on each is honest; the table is fetched ONCE.
   const rbaSeriesVia = (key: RbaTableKey) => () =>
     fetchRbaTableText(key, {}, rbaTables).then((text) => parseRbaSeriesFromText(text, key));
-  const rbaCashRateDaily = await fetchLogged('rba', 'F1 Cash Rate Target (daily', rbaSeriesVia('cashRateDaily'));
-  const rbaCashRate = await fetchLogged('rba', 'F1.1 Cash Rate Target', rbaSeriesVia('cashRate'));
-  const rbaAu10y = await fetchLogged('rba', 'F2 Australian Government 10 year bond', rbaSeriesVia('au10y'));
-  // Fix spec C-06: F2's 3-year series (FCMYGBAG3D) — the RBA-expectations leg.
-  const rbaAu3y = await fetchLogged('rba', 'F2 FCMYGBAG3D Australian Government 3 year bond', rbaSeriesVia('au3y'));
-  const rbaHouseholdDebt = await fetchLogged('rba', 'E2 Household debt to income', rbaSeriesVia('householdDebtToIncome'));
-  const rbaHomeLoan = await fetchLogged('rba', 'F6 FLRHOOTA owner-occupier outstanding home-loan rate', rbaSeriesVia('homeLoanOutstanding'));
-  // Step-2 add-list §B7: F4.1 PDRNTH — the paid rate on new household term
-  // deposits (the "Savings and interest" card's real number).
-  const rbaDepositRate = await fetchLogged('rba', 'F4.1 PDRNTH new household term-deposit rate', rbaSeriesVia('depositRateNewTermHouseholds'));
+  const rbaTablesList: [RbaTableKey, string][] = [
+    ['cashRateDaily', 'F1 Cash Rate Target (daily'],
+    ['cashRate', 'F1.1 Cash Rate Target'],
+    ['householdDebtToIncome', 'E2 Household debt to income'],
+    ['homeLoanOutstanding', 'F6 FLRHOOTA owner-occupier outstanding home-loan rate'],
+    ['depositRateNewTermHouseholds', 'F4.1 PDRNTH new household term-deposit rate'],
+    // F3: the monthly F2.1 yields are fetched FIRST when the daily F2 path
+    // is venue-skipped (the f2 403 would waste a subrequest and poison the
+    // shared table memo) — they are the au10y/au3y fallbacks.
+    ['au10yMonthly', 'F2.1 FCMYGBAG10 10-year bond yield (monthly)'],
+    ['au3yMonthly', 'F2.1 FCMYGBAG3 3-year bond yield (monthly)'],
+  ];
+  const rbaSkipTablesList: [RbaTableKey, string][] = [
+    ['au10y', 'F2 Australian Government 10 year bond'],
+    ['au3y', 'F2 FCMYGBAG3D Australian Government 3 year bond'],
+  ];
+  const rbaSeries: Partial<Record<RbaTableKey, SeriesPoint[]>> = {};
+  if (opts.skipRbaCsvTables === true) {
+    // F3: fetch every SERVED table (the F2.1 monthly pair included), skip
+    // ONLY the f2-data.csv daily pair — one consolidated honest row for the
+    // skipped path (ok:false, kind:'disabled' — not 'blocked': the rba
+    // provider itself serves its other tables this run).
+    for (const [key, label] of rbaTablesList) {
+      const series = await fetchLogged('rba', label, rbaSeriesVia(key));
+      if (series) rbaSeries[key] = series;
+    }
+    reports.push({
+      source: 'rba',
+      ok: false,
+      kind: 'disabled',
+      detail:
+        'F2 (f2-data.csv) daily yields not requested on this venue — the Akamai edge 403s that one path from Cloudflare egress (venue-verified 2026-10-21; f1/f1.1/f2.1/e2/f6/f4.1 all serve). au-10y & rba-expectations ride the F2.1 monthly yields instead (month granularity, own asOf)',
+    });
+  } else {
+    const allTables: [RbaTableKey, string][] = [
+      ...rbaTablesList.slice(0, 5),
+      ...rbaSkipTablesList,
+      ...rbaTablesList.slice(5),
+    ];
+    for (const [key, label] of allTables) {
+      const series = await fetchLogged('rba', label, rbaSeriesVia(key));
+      if (series) rbaSeries[key] = series;
+    }
+  }
 
   // Step 3 L1-18 (2026-10-16): the Alternative.me crypto Fear and Greed
   // index (context card; attribution shown next to the data).
   const cryptoFng = await fetchLogged('alternative-me', 'Crypto Fear and Greed (daily history)', () =>
     fetchCryptoFng(),
   );
+
+  // EODHD crypto (2026-10-21 data-integrity round): the ETH daily close
+  // series — the owner's key, one call a day, verified live on the free
+  // plan. An absent token skips the fetch (the card holds stale honestly).
+  const ethSeries = opts.eodhdApiToken
+    ? await fetchLogged('eodhd', `${EODHD_CRYPTO_SYMBOLS.eth} daily closes`, () =>
+        fetchEodhdCryptoSeries(EODHD_CRYPTO_SYMBOLS.eth, opts.eodhdApiToken!),
+      )
+    : undefined;
+  if (!opts.eodhdApiToken) {
+    reports.push({
+      source: 'eodhd',
+      ok: false,
+      kind: 'disabled',
+      detail: `${EODHD_CRYPTO_SYMBOLS.eth}: skipped — no EODHD_API_TOKEN on this venue (the card holds its last good value)`,
+    });
+  }
 
   // Cross-checks (03-data-sources.md): independent sources must agree.
   if (bitstamp && btcSpot) {
@@ -224,6 +325,7 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
         CAD: fx?.CAD,
         SEK: fx?.SEK,
         CHF: fx?.CHF,
+        NZD: fx?.NZD,
       },
       wb,
       xauSpot,
@@ -232,14 +334,23 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
       hgSpot,
       cryptoFng,
       abs: absSeries,
+      eodhd: { eth: ethSeries },
       rba: {
-        cashRate: rbaCashRateDaily ?? rbaCashRate,
-        cashRateMonthly: rbaCashRate,
-        au10y: rbaAu10y,
-        au3y: rbaAu3y,
-        householdDebtRatio: rbaHouseholdDebt,
-        homeLoanOutstanding: rbaHomeLoan,
-        depositRateNewTermHouseholds: rbaDepositRate,
+        // The 2026-10-21 preference chain: the HTML decision table (the
+        // Worker venue's reliable source, exact targets + change dates)
+        // first, then the daily F1 CSV, then the F1.1 monthly average.
+        cashRate: rbaSeries.cashRateDaily ?? rbaCashRateDecisions ?? rbaSeries.cashRate,
+        cashRateMonthly: rbaSeries.cashRate,
+        cashRateDecisions: rbaCashRateDecisions,
+        // F3 (2026-10-21 venue round): the daily F2 pair when the venue
+        // serves it, else the F2.1 MONTHLY pair — au-10y and the
+        // rba-expectations/au-us-10y-gap legs stay live at month
+        // granularity (own asOf) instead of holding day-stale.
+        au10y: rbaSeries.au10y ?? rbaSeries.au10yMonthly,
+        au3y: rbaSeries.au3y ?? rbaSeries.au3yMonthly,
+        householdDebtRatio: rbaSeries.householdDebtToIncome,
+        homeLoanOutstanding: rbaSeries.homeLoanOutstanding,
+        depositRateNewTermHouseholds: rbaSeries.depositRateNewTermHouseholds,
       },
     },
     reports,

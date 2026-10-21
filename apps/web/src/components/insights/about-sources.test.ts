@@ -54,7 +54,7 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
   it('fred: 16 series, worst level L2 across its L0/L2 mix, deduped licences', () => {
     const fred = rows.find((r) => r.provider === 'fred');
     expect(fred).toBeDefined();
-    expect(fred!.seriesCount).toBe(16);
+    expect(fred!.seriesCount).toBe(24);
     expect(fred!.levels).toEqual(['L0', 'L2']);
     expect(fred!.worstLevel).toBe('L2');
     // 3 distinct licence names across the 16 series (public-domain,
@@ -79,11 +79,11 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
     expect(aboutEnabledState(shiller!)).toBe('off');
   });
 
-  it('derived: a partly-disabled provider aggregates honestly as mixed', () => {
+  it('derived: fully enabled since the 2026-10-21 round un-disabled the crosses', () => {
     const derived = rows.find((r) => r.provider === 'derived');
-    expect(derived!.seriesCount).toBe(12);
-    expect(derived!.enabledCount).toBe(9);
-    expect(aboutEnabledState(derived!)).toBe('mixed');
+    expect(derived!.seriesCount).toBe(13);
+    expect(derived!.enabledCount).toBe(13);
+    expect(aboutEnabledState(derived!)).toBe('on');
     // Own-computation series inherit the upstream terms — the blanket
     // sidecar string (audjpy's) is one of the row's licences (sources.ts
     // riskRowForLeg mirrors the same inheritance).

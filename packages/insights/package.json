@@ -13,7 +13,8 @@
     "./markets/definitions": "./src/markets/definitions.ts",
     "./fx": "./src/fx/index.ts",
     "./fx/definitions": "./src/fx/definitions.ts",
-    "./prices": "./src/prices/index.ts"
+    "./prices": "./src/prices/index.ts",
+    "./ingest": "./src/ingest/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",

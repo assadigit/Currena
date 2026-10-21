@@ -545,9 +545,9 @@ describe('copy dictionaries', () => {
       expect(insightsCopyFa.indicators[id]).toBeDefined();
       expect(insightsCopyFa.indicators[id]?.name.length).toBeGreaterThan(0);
     }
-    // Step-2 + fix spec C (2026-10-14) + Step 3 L1-18 + L1-14 (v3): the
-      // corpus grew to 54 and fa must carry every one of them.
-      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(54);
+    // The 2026-10-21 data-integrity round: the corpus grew to 66 and
+      // fa must carry every one of them.
+      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(66);
   });
 
   // Fix spec T-07 (2026-10-15): the CI-side corpus scan — the ingest's

@@ -30,6 +30,10 @@ const WB_COLUMNS = {
   copper: { header: 'Copper', unit: '($/mt)' },
   gold: { header: 'Gold', unit: '($/troy oz)' },
   silver: { header: 'Silver', unit: '($/troy oz)' },
+  // 2026-10-21 data-integrity round: platinum joins straight from the SAME
+  // workbook (column BS in the live Pink Sheet — no new request, no new
+  // licence surface; the header+unit identity check guards it like the rest).
+  platinum: { header: 'Platinum', unit: '($/troy oz)' },
 } as const;
 
 export interface WorldBankMonthly {
@@ -38,6 +42,7 @@ export interface WorldBankMonthly {
   copper: SeriesPoint[];
   ironOre: SeriesPoint[];
   brent: SeriesPoint[];
+  platinum: SeriesPoint[];
 }
 
 /** Extract the current monthly workbook URL from the commodity-markets page HTML. */
@@ -96,7 +101,7 @@ export function parseWorldBankMonthlySheet(cells: { col: string; row: number; va
   }
 
   const targets: Record<keyof typeof WB_COLUMNS, SeriesPoint[]> = {
-    gold: [], silver: [], copper: [], ironOre: [], brent: [],
+    gold: [], silver: [], copper: [], ironOre: [], brent: [], platinum: [],
   };
   const colOf = new Map<string, keyof typeof WB_COLUMNS>();
   for (const [key, spec] of Object.entries(WB_COLUMNS) as [keyof typeof WB_COLUMNS, (typeof WB_COLUMNS)[keyof typeof WB_COLUMNS]][]) {

@@ -2,13 +2,12 @@
  * @currena/markets — the world stock markets cron Worker
  * (insights-world-markets-spec.md §3.4, §4), and — since 2026-10-13 — the
  * world currencies job too (insights-world-currencies-spec.md §4.4's
- * fallback: the account's 5-cron free limit is full, so the fx job rides
- * this Worker's two existing triggers as a separate function with its own
- * error handling; if a CPU-limit error ever appears, the fx job moves to
- * its own trigger).
+ * fallback: the fx job rides this Worker's triggers as a separate function
+ * with its own error handling; if a CPU-limit error ever appears, the fx
+ * job moves to its own trigger).
  *
  * Surface: scheduled ONLY — this Worker deliberately exposes no fetch
- * handler, so a page request can NEVER reach a provider. The two cron
+ * handler, so a page request can NEVER reach a provider. The three cron
  * triggers are the stock section's own (spec §4 rule 3), keeping each
  * invocation far under the 50-subrequest cap (the combined worst case —
  * every market fetch bouncing to Yahoo AND the fx fallback firing — is
@@ -29,6 +28,16 @@
  *                            the fresh post-midnight budget slice. The fx
  *                            job runs again (its own write gate spends
  *                            nothing when nothing changed).
+ *   "50 8 * * 2-6"   asia  — F1 (2026-10-21 session-finality round): the
+ *                            01:30 retry now HOLDS an intraday Asian
+ *                            point instead of freezing it as the day's
+ *                            close; this rung re-fetches those markets
+ *                            AFTER their sessions have closed (Tokyo
+ *                            06:00, Sydney 06:00, Seoul 06:30, Taipei
+ *                            05:30, Shanghai 07:00, Hong Kong 08:00 UTC)
+ *                            and lands the day's rows. Mumbai (10:00 UTC
+ *                            close) lands on the next rung or the 23:30
+ *                            main. Retry-shaped: only failed/old markets.
  *
  * Both jobs are the SHARED runMarketsUpdate / runFxUpdate orchestrations
  * (the manual runner scripts use the same code paths — they cannot drift).
@@ -45,7 +54,7 @@ import type { RunMarketsUpdateResult } from '@currena/insights/markets';
 import { KvMarketsStore } from '@currena/insights/markets';
 import { defaultFxFetchers, formatFxRunReport, runFxUpdate } from '@currena/insights/fx';
 import { KvFxStore } from '@currena/insights/fx';
-import { MAIN_CRON, RETRY_CRON } from './crons';
+import { MAIN_CRON, RETRY_CRON, ASIA_CRON } from './crons';
 
 /**
  * The Worker's bindings. RATES is typed as the structural KV surface the
@@ -111,13 +120,19 @@ export default {
     // expression logs loudly and skips — never silently treated as 'retry'
     // (the old string-inequality fallback ran ANY unexpected cron as the
     // retry pass, which re-fetches through Yahoo and could burn quota on a
-    // misconfigured trigger).
+    // misconfigured trigger). The Asia rung (F1) is retry-SHAPED: it runs
+    // the same retry orchestration (only failed/old markets), only its
+    // trigger time differs — after the Asian closes.
     const kind: 'main' | 'retry' | undefined =
-      event.cron === MAIN_CRON ? 'main' : event.cron === RETRY_CRON ? 'retry' : undefined;
+      event.cron === MAIN_CRON
+        ? 'main'
+        : event.cron === RETRY_CRON || event.cron === ASIA_CRON
+          ? 'retry'
+          : undefined;
     if (kind === undefined) {
       console.error(
         `[markets] unknown cron expression ${JSON.stringify(event.cron)} — skipping ` +
-          `(expected ${JSON.stringify(MAIN_CRON)} or ${JSON.stringify(RETRY_CRON)})`,
+          `(expected ${JSON.stringify(MAIN_CRON)}, ${JSON.stringify(RETRY_CRON)} or ${JSON.stringify(ASIA_CRON)})`,
       );
       return;
     }

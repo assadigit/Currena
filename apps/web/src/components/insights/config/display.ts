@@ -96,6 +96,21 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'sahm-rule': { decimals: 2, unit: 'points' },
   'copper-gold': { decimals: 2, unit: 'ratio' },
   usdcny: { decimals: 4, unit: 'cny' },
+  // 2026-10-21 data-integrity round — the coverage additions (recovered
+  // verbatim from the deployed round's labels chunk: nfp counts jobs in
+  // whole thousands on the 'points' unit, platinum carries 2 decimals).
+  'nzd-usd': { decimals: 4, unit: 'usd' },
+  'bund-10y': { decimals: 2, unit: 'percent' },
+  'jgb-10y': { decimals: 2, unit: 'percent' },
+  'gilt-10y': { decimals: 2, unit: 'percent' },
+  'boj-rate': { decimals: 2, unit: 'percent' },
+  'boe-rate': { decimals: 2, unit: 'percent' },
+  'wti': { decimals: 2, unit: 'usd' },
+  'natgas': { decimals: 2, unit: 'usd' },
+  'platinum': { decimals: 2, unit: 'usd' },
+  'eth-usd': { decimals: 0, unit: 'usd' },
+  'us-gdp-growth': { decimals: 1, unit: 'percent' },
+  'us-nfp': { decimals: 0, unit: 'points' },
   brent: { decimals: 2, unit: 'usd' },
   'gold-usd': { decimals: 0, unit: 'usd' },
   'silver-usd': { decimals: 2, unit: 'usd' },
