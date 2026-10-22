@@ -40,6 +40,30 @@ export { bitstampOhlcUrl, fetchBitstampCloses } from './bitstamp';
 export type { BitstampWindow } from './bitstamp';
 export { RBA_TABLES, fetchRbaSeries, rbaTableUrl, RBA_CSV_BASE } from './rba';
 export type { RbaTableKey, RbaTableSpec } from './rba';
+export {
+  TREASURY_BASE,
+  TREASURY_CURVE_NOMINAL,
+  TREASURY_CURVE_REAL,
+  TREASURY_TIMEOUT_MS,
+  treasuryCurveUrl,
+  parseTreasuryCurveCsv,
+  fetchTreasuryCurves,
+  treasuryT10y2y,
+} from './treasury';
+export type { TreasuryCurves, TreasuryFetchOptions } from './treasury';
+export {
+  EIA_WTI_URL,
+  EIA_BRENT_URL,
+  EIA_NATGAS_URL,
+  EIA_TIMEOUT_MS,
+  parseEiaSpotXls,
+  fetchEiaWti,
+  fetchEiaBrent,
+  fetchEiaHenryHub,
+} from './eia';
+export type { EiaSpot } from './eia';
+export { readXlsWorkbook, excelSerialToIso } from './biff';
+export type { BiffSheet, BiffWorkbook } from './biff';
 export { ManualSeriesFileSchema, parseManualSeries } from './manual';
 export { fetchCryptoFng, FNG_URL } from './fng';
 export type { ManualSeriesFile } from './manual';

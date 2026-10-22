@@ -42,6 +42,65 @@ export const INGEST_HIST_DAILY_MINUTE = 25;
 /** 04:40 — the periodic (monthly/quarterly) history rung. */
 export const INGEST_HIST_PERIODIC_MINUTE = 40;
 
+/**
+ * 2026-10-22 reliability round — the intra-day SWEEP rungs (10:10 and
+ * 20:10 UTC). The 04:10 collect runs ONCE a day and F-11 keeps every
+ * fetch single-attempt, so one transient edge blip at 04:10 (venue-
+ * verified live 2026-10-22: FRED's Akamai edge served unparseable bodies
+ * to all five bulk groups while serving healthy bodies to other venues
+ * within the hour) used to cost a full day of public staleness. The
+ * sweeps re-run the ingest when — and ONLY when — the last rung recorded
+ * genuine fetch failures, healing the blip within hours at near-zero
+ * cost on healthy days (the gate is one KV read). No new cron trigger:
+ * the minute cron's hour+minute gates do the scheduling (the account's
+ * 5-cron budget is full). Sweep mode trims the write chain for the
+ * subrequest ceiling (see run.ts).
+ */
+export const INGEST_SWEEP_TIMES: readonly { hour: number; minute: number }[] = [
+  { hour: 10, minute: 10 },
+  { hour: 20, minute: 10 },
+];
+
+/** A sweep fires when the last status is older than this (a dead main rung). */
+export const INGEST_SWEEP_STALE_MS = 10 * 3_600_000;
+
+/** The insights:status blob's shape (the fields the gate reads). */
+interface InsightsStatusBlob {
+  generatedAt?: string;
+  sources?: Array<{ source?: string; ok?: boolean; kind?: string }>;
+}
+
+/**
+ * Should the sweep run? True when the last ingest status shows a genuine
+ * fetch failure (kind failed/blocked/format-changed — NOT the honest
+ * 'disabled' rows like the venue-skipped RBA F2 path, and not the
+ * informational 'manual'/'cross-check' rows) or is so old the main rung
+ * likely never landed (worker outage at 04:10 — the sweep then IS the
+ * day's ingest).
+ */
+export function sweepShouldFire(status: InsightsStatusBlob | undefined, now: Date): boolean {
+  if (status === undefined || typeof status.generatedAt !== 'string') return true; // no status at all — run
+  const generated = Date.parse(status.generatedAt);
+  if (!Number.isFinite(generated) || now.getTime() - generated > INGEST_SWEEP_STALE_MS) return true;
+  const rows = Array.isArray(status.sources) ? status.sources : [];
+  return rows.some(
+    (r) =>
+      r.ok === false &&
+      (r.kind === 'failed' || r.kind === 'blocked' || r.kind === 'format-changed'),
+  );
+}
+
+/** Read + parse the insights:status blob (one KV read; malformed → undefined). */
+async function readInsightsStatus(kv: KVNamespace): Promise<InsightsStatusBlob | undefined> {
+  try {
+    const raw = await kv.get('insights:status');
+    if (raw === null) return undefined;
+    return JSON.parse(raw) as InsightsStatusBlob;
+  } catch {
+    return undefined;
+  }
+}
+
 /** The main ingest rung (04:10 UTC daily). */
 export async function runScheduledInsightsIngest(env: Bindings): Promise<void> {
   const store = new KvInsightsStore(env.RATES);
@@ -64,6 +123,33 @@ export async function runScheduledInsightsIngest(env: Bindings): Promise<void> {
   }
 }
 
+/** One sweep rung (10:10 / 20:10 UTC): gated re-run of the full ingest. */
+export async function runScheduledInsightsSweep(env: Bindings): Promise<'skipped' | 'ran'> {
+  const status = await readInsightsStatus(env.RATES);
+  if (!sweepShouldFire(status, new Date())) {
+    console.log('[ingest-sweep] last rung healthy — skipping (1 subrequest)');
+    return 'skipped';
+  }
+  console.log(
+    `[ingest-sweep] ${status === undefined ? 'no status found' : `generatedAt=${status.generatedAt}`} — failures present or stale: re-running the ingest`,
+  );
+  const store = new KvInsightsStore(env.RATES);
+  const result = await runInsightsUpdate({
+    store,
+    stageKv: env.RATES,
+    mode: 'scheduled',
+    skipRbaCsvTables: true,
+    hiddenPublicIds: HIDDEN_PUBLIC_IDS,
+    sweep: true,
+  });
+  if (result.failedSources.length === 0) {
+    console.log('[ingest-sweep] all sources healthy again — snapshot restored');
+  } else {
+    console.warn(`[ingest-sweep] still failing after re-run: ${result.failedSources.join(', ')}`);
+  }
+  return 'ran';
+}
+
 /** One history rung (04:25 daily-cadence / 04:40 periodic). */
 export async function runScheduledInsightsHistories(
   env: Bindings,
@@ -79,16 +165,22 @@ export async function runScheduledInsightsHistories(
 /** True when the scheduled time carries an ingest rung (and which). */
 export function insightsIngestRung(
   scheduledTimeMs: number,
-): { kind: 'main' } | { kind: 'history-daily' } | { kind: 'history-periodic' } | undefined {
+): { kind: 'main' } | { kind: 'history-daily' } | { kind: 'history-periodic' } | { kind: 'sweep' } | undefined {
   const date = new Date(scheduledTimeMs);
   const hour = date.getUTCHours();
   const minute = date.getUTCMinutes();
   // F2 (2026-10-21 stage-write fix): the TEMPORARY 05:10 verification rung
   // (hour === INGEST_CRON_HOUR + 1) is retired — the cosd trim landed and
   // was verified live; the main rung fires once a day at 04:10 again.
-  if (hour !== INGEST_CRON_HOUR) return undefined;
-  if (minute === INGEST_MAIN_MINUTE) return { kind: 'main' };
-  if (minute === INGEST_HIST_DAILY_MINUTE) return { kind: 'history-daily' };
-  if (minute === INGEST_HIST_PERIODIC_MINUTE) return { kind: 'history-periodic' };
+  if (hour === INGEST_CRON_HOUR) {
+    if (minute === INGEST_MAIN_MINUTE) return { kind: 'main' };
+    if (minute === INGEST_HIST_DAILY_MINUTE) return { kind: 'history-daily' };
+    if (minute === INGEST_HIST_PERIODIC_MINUTE) return { kind: 'history-periodic' };
+    return undefined;
+  }
+  // 2026-10-22 reliability round: the failure-gated intra-day sweeps.
+  if (INGEST_SWEEP_TIMES.some((t) => t.hour === hour && t.minute === minute)) {
+    return { kind: 'sweep' };
+  }
   return undefined;
 }

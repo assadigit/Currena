@@ -92,6 +92,15 @@ export interface IngestRunOptions {
   /** Clock injection (tests). */
   now?: Date;
   /**
+   * 2026-10-22 reliability round — SWEEP mode: an intra-day re-run (the
+   * 10:10/20:10 rungs) after a rung with failed sources. Same collect →
+   * derive → validate → write path, trimmed for the subrequest budget:
+   * the day's archives already exist (their checks + writes skip) and the
+   * seed appends skip (the 04:10/04:25 rungs already landed today's
+   * points; the sweep's fresher spots re-land at the next full rung).
+   */
+  sweep?: boolean;
+  /**
    * T-07 forbidden-word corpus (the Node runner scans the copy files from
    * the repo checkout; the Worker venue omits it — the CI corpus tests
    * cover the templates, the same skip the shallow-clone runner takes).
@@ -186,8 +195,16 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
   console.log(`# Insights ingestion run — ${nowIso}`);
   console.log(`mode=${opts.mode}${dryRun ? ' DRY-RUN (no KV writes)' : ''}\n`);
 
-  const { inputs, reports } = await collectAllSources({
+  const { inputs, reports, readingSourceOverrides } = await collectAllSources({
     ...(opts.skipRbaCsvTables !== undefined ? { skipRbaCsvTables: opts.skipRbaCsvTables } : {}),
+    // The fallback fills merge with the STORED histories so the 10-year
+    // percentile base survives a FRED outage (Treasury's current-year
+    // curves alone would shrink the window to months).
+    historyReader: (id: string) =>
+      opts.store
+        .getHistory(id as Parameters<typeof opts.store.getHistory>[0])
+        .then((h) => (h ? historyToSeries(h) : undefined))
+        .catch(() => undefined),
   });
 
   // v3 fail-closed inputs: kill-switched ids + per-provider blocked outcomes.
@@ -280,6 +297,9 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     manualExpires,
     disabledReadings,
     sourceOutcomes,
+    ...(readingSourceOverrides !== undefined && Object.keys(readingSourceOverrides).length > 0
+      ? { sourceOverrides: readingSourceOverrides }
+      : {}),
     now: nowIso,
   });
 
@@ -308,6 +328,9 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     disabledReadings,
     sourceOutcomes,
     flags: outcome.flags,
+    ...(readingSourceOverrides !== undefined && Object.keys(readingSourceOverrides).length > 0
+      ? { sourceOverrides: readingSourceOverrides }
+      : {}),
     now: nowIso,
   });
   const status = buildInsightsStatus({ reports, generatedAt: nowIso, mode: opts.mode, dryRun, validation: outcome.results });
@@ -382,31 +405,44 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
       console.log('  ✍ insights:snapshot');
       await opts.store.putStatus(status);
       console.log('  ✍ insights:status');
-      const archiveDate = today;
-      const alreadyArchived = (await opts.store.getArchive(archiveDate)) !== undefined;
-      if (!alreadyArchived) {
-        await opts.store.putArchive(archiveDate, snapshot);
-        console.log(`  ✍ insights:archive:v1:${archiveDate}`);
+      if (opts.sweep !== true) {
+        // The sweep skips the day's archive pair — the main rung already
+        // wrote them, and the sweep's subrequest budget needs the headroom.
+        const archiveDate = today;
+        const alreadyArchived = (await opts.store.getArchive(archiveDate)) !== undefined;
+        if (!alreadyArchived) {
+          await opts.store.putArchive(archiveDate, snapshot);
+          console.log(`  ✍ insights:archive:v1:${archiveDate}`);
+        } else {
+          console.log(`  · insights:archive:v1:${archiveDate} already written today`);
+        }
+        await opts.store.putPublicSnapshot(projectSnapshotToPublic(snapshot, hiddenIds));
+        console.log('  ✍ insights:snapshot-public');
+        const publicAlreadyArchived = (await opts.store.getPublicArchive(archiveDate)) !== undefined;
+        if (!publicAlreadyArchived) {
+          await opts.store.putPublicArchive(archiveDate, projectSnapshotToPublic(snapshot, hiddenIds));
+          console.log(`  ✍ insights:archive-public:v1:${archiveDate}`);
+        } else {
+          console.log(`  · insights:archive-public:v1:${archiveDate} already written today`);
+        }
       } else {
-        console.log(`  · insights:archive:v1:${archiveDate} already written today`);
+        // SWEEP: the public projection still refreshes (it is the product
+        // surface); only the day's archive pair is skipped.
+        await opts.store.putPublicSnapshot(projectSnapshotToPublic(snapshot, hiddenIds));
+        console.log('  ✍ insights:snapshot-public (sweep)');
       }
-      await opts.store.putPublicSnapshot(projectSnapshotToPublic(snapshot, hiddenIds));
-      console.log('  ✍ insights:snapshot-public');
-      const publicAlreadyArchived = (await opts.store.getPublicArchive(archiveDate)) !== undefined;
-      if (!publicAlreadyArchived) {
-        await opts.store.putPublicArchive(archiveDate, projectSnapshotToPublic(snapshot, hiddenIds));
-        console.log(`  ✍ insights:archive-public:v1:${archiveDate}`);
-      } else {
-        console.log(`  · insights:archive-public:v1:${archiveDate} already written today`);
-      }
-      // The SEED histories (the accumulated-daily rows' own appends).
-      for (const id of SEED_IDS) {
-        const s = series[id];
-        if (!s) continue;
-        const history = buildHistoryFile(id, s, { minPoints: 1 });
-        if (history) {
-          await opts.store.putHistory(history);
-          console.log(`  ✍ insights:hist:${id} (seed append)`);
+      // The SEED histories (the accumulated-daily rows' own appends) —
+      // skipped in sweep mode (the day's points already landed at
+      // 04:10/04:25; the sweep re-derives them from the stored seed anyway).
+      if (opts.sweep !== true) {
+        for (const id of SEED_IDS) {
+          const s = series[id];
+          if (!s) continue;
+          const history = buildHistoryFile(id, s, { minPoints: 1 });
+          if (history) {
+            await opts.store.putHistory(history);
+            console.log(`  ✍ insights:hist:${id} (seed append)`);
+          }
         }
       }
     } catch (err) {

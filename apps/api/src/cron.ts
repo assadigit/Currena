@@ -19,7 +19,12 @@ import { runPricesUpdate, formatPricesReport, defaultPricesFetchers } from '@cur
 import { KvPricesStore } from '@currena/insights/prices';
 import type { PricesJobFetchers } from '@currena/insights/prices';
 import { runIngestWatchdog, WATCHDOG_MINUTE } from './ingest-watchdog';
-import { insightsIngestRung, runScheduledInsightsIngest, runScheduledInsightsHistories } from './insights-ingest-cron';
+import {
+  insightsIngestRung,
+  runScheduledInsightsIngest,
+  runScheduledInsightsHistories,
+  runScheduledInsightsSweep,
+} from './insights-ingest-cron';
 import { recordHistory } from './history';
 import { makeDefaultService } from './default-service';
 import type { SnapshotSource } from '@currena/core';
@@ -121,12 +126,17 @@ export async function runScheduled(env: Bindings, scheduledTimeMs: number): Prom
     // source and writes the snapshot (ALWAYS, even with held P1s — one dead
     // source no longer freezes the page), 04:25/04:40 land the histories in
     // two subrequest-budgeted phases. GHA stays as belt-and-braces.
+    // 2026-10-22 reliability round: + the failure-gated 10:10/20:10 sweeps
+    // (insights-ingest-cron.ts) — one KV read on healthy days, a full
+    // ingest re-run when the last rung recorded fetch failures.
     ...((): Array<Promise<void>> => {
       if (ingestRung === undefined) return [];
       const work: Promise<unknown> =
         ingestRung.kind === 'main'
           ? runScheduledInsightsIngest(env)
-          : runScheduledInsightsHistories(env, ingestRung.kind === 'history-daily' ? 'daily' : 'periodic');
+          : ingestRung.kind === 'sweep'
+            ? runScheduledInsightsSweep(env).then(() => undefined)
+            : runScheduledInsightsHistories(env, ingestRung.kind === 'history-daily' ? 'daily' : 'periodic');
       return [
         work.then(
           () => undefined,

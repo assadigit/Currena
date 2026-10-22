@@ -139,6 +139,44 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     termsUrl: 'https://fred.stlouisfed.org/legal/',
     notes: 'Already live; owner_accepts yes (RISK_REGISTER.md). Public display stays blocked by the T-15 walk regardless of acceptance.',
   },
+  'us-treasury': {
+    id: 'us-treasury',
+    provider: 'treasury',
+    label: 'U.S. Department of the Treasury (daily par + real yield curves)',
+    usedFor: 'FRED-fallback fills for DGS2/DGS10/DGS30/DFII10/T10Y2Y (the daily US yield family) — 2026-10-22 reliability round',
+    method: 'M2',
+    runtime: 'worker',
+    level: 'L0',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The daily yield-curve CSVs are the PRIMARY source of the series FRED republishes (DGS*/DFII10); values cross-checked 2026-10-22 (Treasury 10/21 5.13 vs FRED 10/20 5.12 — same par-yield basis).',
+    termsReadOn: '2026-10-22',
+    attribution: 'Source: U.S. Department of the Treasury',
+    termsUrl: 'https://home.treasury.gov/',
+    notes:
+      'FALLBACK-ONLY (owner round terms): fetched only when a FRED bulk group failed; FRED stays the primary. Venue-verified 2026-10-22 from Cloudflare egress: HTTP 200, 18–21 s latency (45 s timeout).',
+  },
+  'eia-spot': {
+    id: 'eia-spot',
+    provider: 'eia',
+    label: 'U.S. Energy Information Administration (daily spot .xls workbooks)',
+    usedFor: 'FRED-fallback fills for DCOILWTICO/DCOILBRENTEU/DHHNGSP (WTI, Brent, Henry Hub) — 2026-10-22 reliability round',
+    method: 'M2',
+    runtime: 'worker',
+    level: 'L0',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The RWTCd/RBRTEd/RNGWHHDd workbooks are the PRIMARY source of FRED\u2019s EIA spot series; cross-validated 2026-10-22: EIA 2026-10-20 WTI 107.89 == FRED DCOILWTICO 2026-10-20 exactly.',
+    termsReadOn: '2026-10-22',
+    attribution: 'Source: U.S. Energy Information Administration',
+    termsUrl: 'https://www.eia.gov/about/copyrights-and-terms-of-service.php',
+    notes:
+      'FALLBACK-ONLY (owner round terms): fetched only when the FRED EIA commodities group failed. Venue-verified 2026-10-22 from Cloudflare egress: HTTP 200, 28–215 ms.',
+  },
   'ecb-frankfurter': {
     id: 'ecb-frankfurter',
     provider: 'frankfurter',
@@ -501,6 +539,10 @@ export function rowIdForProvider(provider: string): string {
       return 'nbs-china';
     case 'ecb':
       return 'ecb-portal';
+    case 'treasury':
+      return 'us-treasury';
+    case 'eia':
+      return 'eia-spot';
     default:
       return provider;
   }

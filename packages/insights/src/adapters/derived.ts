@@ -177,7 +177,7 @@ function monthlyChangeSeries(series: SeriesPoint[]): SeriesPoint[] {
 }
 
 /** Union-merge two series by date (later list wins on collision), sorted. */
-function mergeSeries(a: SeriesPoint[], b: SeriesPoint[]): SeriesPoint[] {
+export function mergeSeries(a: SeriesPoint[], b: SeriesPoint[]): SeriesPoint[] {
   const byDate = new Map<string, SeriesPoint>();
   for (const p of a) byDate.set(p.date, p);
   for (const p of b) byDate.set(p.date, p);

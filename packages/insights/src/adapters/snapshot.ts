@@ -184,6 +184,13 @@ export interface SnapshotBuildInputs {
    */
   highestSince?: Partial<Record<IndicatorId, number>>;
   /**
+   * 2026-10-22 reliability round: reading-id → honest source attribution
+   * when a FALLBACK source filled the reading's slot this run (e.g. the
+   * US Treasury's own curve when FRED's bulk group failed). Absent → the
+   * static READING_SOURCES line (the healthy-run attribution).
+   */
+  sourceOverrides?: Partial<Record<IndicatorId, { name: string; url: string }>>;
+  /**
    * Fix spec A-06: human-written context notes (data/insights-context-notes.json).
    * Expired notes are filtered out here — they never reach the page.
    */
@@ -338,7 +345,8 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
     if (note.expires >= nowDayIso) notesByIndicator.set(note.id, note);
   }
   for (const def of DEFINITIONS) {
-    const source: ReadingSource = READING_SOURCES[def.id] ?? { name: def.sourceRef };
+    const source: ReadingSource =
+      inputs.sourceOverrides?.[def.id] ?? READING_SOURCES[def.id] ?? { name: def.sourceRef };
     const series = inputs.series[def.id];
     const flag = inputs.flags?.get(def.id);
     // v3 T-27/F-16: the run's honest fetch outcome for this reading's

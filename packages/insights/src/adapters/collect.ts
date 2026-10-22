@@ -15,20 +15,22 @@
  * it; Bitstamp remains the BTC cross-check).
  */
 
-import type { InsightsSourceReport } from '@currena/core';
+import type { InsightsSourceReport, IndicatorId } from '@currena/core';
 import { classifySourceError, contentHash } from './fetch-policy';
 import { providerFetchEnabled } from '../sources';
 import { ABS_SERIES, fetchAbsSeries } from './abs';
 import { fetchBitstampCloses } from './bitstamp';
+import { fetchEiaBrent, fetchEiaHenryHub, fetchEiaWti } from './eia';
 import { fetchEcbDfrSeries } from './ecb';
 import { fetchCryptoFng } from './fng';
 import { fetchFrankfurterSeries } from './frankfurter';
 import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredDecadeFrom } from './fred';
 import { fetchGoldApiSpot } from './goldapi';
 import { fetchRbaCashRateDecisions, fetchRbaTableText, parseRbaSeriesFromText, type RbaTableKey } from './rba';
+import { fetchTreasuryCurves, treasuryT10y2y } from './treasury';
 import { fetchYahooQuote } from './yahoo';
 import { fetchWorldBankMonthly } from './worldbank';
-import type { SeriesInputs } from './derived';
+import { mergeSeries, type SeriesInputs } from './derived';
 import type { SeriesPoint } from '../series';
 
 /** Frankfurter start: 10-year percentile window + buffer (I2 live-run value). */
@@ -50,6 +52,20 @@ export interface CollectOptions {
    * budget counts every attempt).
    */
   skipRbaCsvTables?: boolean;
+  /**
+   * 2026-10-22 (reliability round): the stored-history reader the FALLBACK
+   * fills merge with (Treasury's current-year curves join the stored 10y
+   * windows so percentile10y keeps its true base — the same merge pattern
+   * as the Brent Yahoo extension). Optional: without it the Treasury fills
+   * carry the current year alone.
+   */
+  historyReader?: (id: string) => Promise<SeriesPoint[] | undefined>;
+}
+
+/** A per-reading source-attribution override (a fallback filled the slot). */
+export interface ReadingSourceOverride {
+  name: string;
+  url: string;
 }
 
 export interface CollectResult {
@@ -57,6 +73,13 @@ export interface CollectResult {
   inputs: Omit<SeriesInputs, 'chinaPmi'>;
   /** Per-source fetch outcome rows (source, ok, detail) — the /admin freshness table. */
   reports: InsightsSourceReport[];
+  /**
+   * 2026-10-22 (reliability round): reading-id → honest attribution for
+   * every reading whose FRED slot a fallback source filled this run (the
+   * card's source line switches from "FRED (DGS10)" to the actual source).
+   * Empty on a healthy run.
+   */
+  readingSourceOverrides: Partial<Record<IndicatorId, ReadingSourceOverride>>;
 }
 
 function errMessage(err: unknown): string {
@@ -121,6 +144,7 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
   // and every downstream series (the Worker's CPU limit killed the first
   // live run at the stage write).
   const fred: Partial<Record<string, SeriesPoint[]>> = {};
+  const fredGroupFailed = new Set<number>();
   let fredGroupIndex = 0;
   for (const group of FRED_BULK_GROUPS) {
     fredGroupIndex += 1;
@@ -128,6 +152,148 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     const label = `bulk group ${fredGroupIndex} (${group.seriesIds.length} series${from !== undefined ? `, from ${from}` : ''}: ${group.seriesIds.join(', ')})`;
     const fetched = await fetchLogged('fred', label, () => fetchFredSeriesBulk(group.seriesIds, {}, from));
     if (fetched) Object.assign(fred, fetched);
+    else fredGroupFailed.add(fredGroupIndex);
+  }
+
+  /* ---------------- 2026-10-22 reliability round ----------------
+   * FALLBACK fills (the owner round's terms: the API stays PRIMARY; these
+   * fetches run ONLY when the primary's bulk group failed). Venue evidence
+   * (2026-10-22): FRED's Akamai edge intermittently answers the multi-series
+   * requests with unparseable bodies from the Cloudflare egress — all five
+   * groups failed one 'unexpected header' parse while FRED itself served
+   * healthy bodies to other venues within the hour. The fallbacks:
+   *
+   *   groups 1/2 (the daily US yield family) → the US Treasury's OWN daily
+   *     par + real yield-curve CSVs — the same numbers FRED republishes
+   *     (DGS2/10/30 = "2/10/30 Yr", DFII10 ≈ the real curve's "10 YR"),
+   *     a day FRESHER in practice. T10Y2Y recomputes as 10Y−2Y (FRED's own
+   *     formula). Two subrequests (nominal + real; the real curve only when
+   *     group 1 — the DFII10 carrier — failed). Current-year CSVs; the
+   *     caller's stored-history merge keeps the 10-year percentile base.
+   *
+   *   group 4 (the EIA energy spots) → the U.S. Energy Information
+   *     Administration's own daily-spot .xls workbooks — WTI, Henry Hub and
+   *     Brent, each the FULL history from the primary source (public
+   *     domain). Cross-validated 2026-10-22: EIA 2026-10-20 WTI 107.89 ==
+   *     FRED DCOILWTICO 2026-10-20 exactly. Three subrequests.
+   *
+   * Series with NO licence-safe fallback (VIX, STLFSI4, NFCI, T5YIFR,
+   * T10YIE, the BEA/BLS monthlies, the OECD family) hold their last good
+   * values flagged stale — fail-closed honesty, and the intra-day sweep
+   * rungs (apps/api insights-ingest-cron) re-attempt the primary.
+   */
+  const overrides: Partial<Record<IndicatorId, ReadingSourceOverride>> = {};
+  const readStoredHistory = async (id: string): Promise<SeriesPoint[] | undefined> => {
+    if (opts.historyReader === undefined) return undefined;
+    try {
+      return await opts.historyReader(id);
+    } catch {
+      return undefined; // a poisoned stored key must not sink the fallback
+    }
+  };
+
+  if (fredGroupFailed.has(1) || fredGroupFailed.has(2)) {
+    const needReal = fredGroupFailed.has(1); // group 1 carries DFII10
+    const treasury = await fetchLogged(
+      'treasury',
+      `daily yield curves (${needReal ? 'nominal + real' : 'nominal'}) — FRED fallback`,
+      () => fetchTreasuryCurves(needReal ? { real: true } : {}),
+    );
+    if (treasury !== undefined) {
+      const TREASURY_SRC: ReadingSourceOverride = {
+        name: 'U.S. Department of the Treasury (daily par yield curve)',
+        url: 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve',
+      };
+      // Fill ONLY the slots whose group failed — a successful group's data
+      // is the primary's and is never overridden.
+      const fillTreasury = async (
+        slot: 'DGS10' | 'DGS30' | 'DFII10' | 'DGS2',
+        fetched: SeriesPoint[] | undefined,
+        storedId: string | undefined,
+        override: IndicatorId,
+        source: ReadingSourceOverride,
+      ) => {
+        if (fetched === undefined || fred[slot] !== undefined) return;
+        const stored = storedId !== undefined ? await readStoredHistory(storedId) : undefined;
+        fred[slot] = stored !== undefined ? mergeSeries(stored, fetched) : fetched;
+        overrides[override] = source;
+      };
+      await fillTreasury('DGS10', treasury.dgs10, 'us10y', 'us10y', TREASURY_SRC);
+      await fillTreasury('DGS30', treasury.dgs30, 'us30y', 'us30y', TREASURY_SRC);
+      await fillTreasury(
+        'DFII10',
+        treasury.real10y,
+        'real-yield-10y',
+        'real-yield-10y',
+        {
+          name: 'U.S. Department of the Treasury (daily real yield curve)',
+          url: 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_real_yield_curve',
+        },
+      );
+      // DGS2: no stored raw-2y history exists (fed-expectations' stored key
+      // is the DERIVED gap) — the current-year fill stands alone; the
+      // reading's percentile is not rendered for this card.
+      if (fred.DGS2 === undefined && treasury.dgs2.length > 0) {
+        fred.DGS2 = treasury.dgs2;
+        if (fred.DFEDTARL !== undefined && fred.DFEDTARU !== undefined) {
+          overrides['fed-expectations'] = {
+            name: 'U.S. Treasury (2 Yr par yield) − FRED (DFEDTAR midpoint)',
+            url: TREASURY_SRC.url,
+          };
+        }
+      }
+      // T10Y2Y: recompute from the Treasury legs (FRED's own formula),
+      // merged with the stored curve history so the 10y percentile base
+      // survives.
+      if (fred.T10Y2Y === undefined) {
+        const computed = treasuryT10y2y(treasury);
+        if (computed.length > 0) {
+          const stored = await readStoredHistory('yield-curve-10y2y');
+          fred.T10Y2Y = stored !== undefined ? mergeSeries(stored, computed) : computed;
+          overrides['yield-curve-10y2y'] = {
+            name: 'U.S. Department of the Treasury (10 Yr − 2 Yr par yields)',
+            url: TREASURY_SRC.url,
+          };
+        }
+      }
+      // The AU−US gap's US leg: honest mixed-legs attribution when the
+      // Treasury filled DGS10 and the RBA leg exists.
+      if (overrides.us10y !== undefined) {
+        overrides['au-us-10y-gap'] = {
+          name: 'RBA F2 − U.S. Treasury (10 Yr)',
+          url: 'https://www.rba.gov.au/statistics/tables/',
+        };
+      }
+    }
+  }
+
+  if (fredGroupFailed.has(4)) {
+    const wti = await fetchLogged('eia', 'WTI spot (RWTCd.xls) — FRED fallback', () => fetchEiaWti());
+    const natgas = await fetchLogged('eia', 'Henry Hub spot (RNGWHHDd.xls) — FRED fallback', () => fetchEiaHenryHub());
+    const brentEia = await fetchLogged('eia', 'Brent spot (RBRTEd.xls) — FRED fallback', () => fetchEiaBrent());
+    if (wti !== undefined) {
+      fred.DCOILWTICO = wti.series;
+      overrides.wti = {
+        name: 'U.S. Energy Information Administration (WTI spot, FOB Cushing)',
+        url: 'https://www.eia.gov/dnav/pet/hist/RWTCd.htm',
+      };
+    }
+    if (natgas !== undefined) {
+      fred.DHHNGSP = natgas.series;
+      overrides.natgas = {
+        name: 'U.S. Energy Information Administration (Henry Hub spot)',
+        url: 'https://www.eia.gov/dnav/ng/hist/RNGWHHDd.htm',
+      };
+    }
+    if (brentEia !== undefined) {
+      fred.DCOILBRENTEU = brentEia.series;
+      // derived.ts's fillBrentGap keeps Yahoo's fresher closes past EIA's
+      // last official spot date — the attribution names both legs.
+      overrides.brent = {
+        name: 'U.S. EIA (Brent spot) + Yahoo Finance (BZ=F)',
+        url: 'https://www.eia.gov/dnav/pet/hist/RBRTEd.htm',
+      };
+    }
   }
   // Sanity gate: every registered series must ride exactly one group — a
   // series added to FRED_SERIES but forgotten in the groups silently never
@@ -334,5 +500,6 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
       },
     },
     reports,
+    readingSourceOverrides: overrides,
   };
 }

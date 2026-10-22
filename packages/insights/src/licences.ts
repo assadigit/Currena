@@ -227,6 +227,41 @@ const DERIVED: SourceLicence = {
     'Derived indicators (ratios, gaps, baskets, conversions) compute from the registered sources; their public-mode eligibility is the WORST of the legs (T-15 walks the inputs).',
 };
 
+/**
+ * 2026-10-22 reliability round — the two FRED-fallback sources. Both are
+ * US federal government agencies; works of the US government are not
+ * subject to copyright in the US (17 U.S.C. § 105) — public domain, free
+ * to redistribute with attribution. Each entry records the venue-verified
+ * probe (2026-10-22, currena-venue-probe from Cloudflare egress).
+ */
+const TREASURY: SourceLicence = {
+  provider: 'treasury',
+  label: 'U.S. Department of the Treasury (daily yield curves)',
+  licenceName: 'US government work — public domain (17 U.S.C. § 105)',
+  attributionText: 'Source: U.S. Department of the Treasury',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-22',
+  termsEvidence:
+    'US federal government works carry no copyright (17 U.S.C. § 105); Treasury\u2019s daily par/real yield-curve CSVs are the PRIMARY source of the very series FRED republishes as DGS2/DGS10/DGS30/DFII10. Venue-verified 2026-10-22 from Cloudflare egress (HTTP 200, correct CSV; 18–21 s latency — a 45 s timeout). FALLBACK-ONLY: FRED stays the primary; these fills run when a FRED bulk group fails.',
+  termsUrl: 'https://home.treasury.gov/',
+};
+
+const EIA: SourceLicence = {
+  provider: 'eia',
+  label: 'U.S. Energy Information Administration (daily spot prices)',
+  licenceName: 'US government work — public domain (17 U.S.C. § 105)',
+  attributionText: 'Source: U.S. Energy Information Administration',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-22',
+  termsEvidence:
+    'US federal government works carry no copyright (17 U.S.C. § 105); EIA\u2019s daily spot .xls workbooks (WTI RWTCd, Brent RBRTEd, Henry Hub RNGWHHDd) are the PRIMARY source of FRED\u2019s DCOILWTICO/DCOILBRENTEU/DHHNGSP. Cross-validated 2026-10-22: EIA 2026-10-20 WTI 107.89 == FRED DCOILWTICO 2026-10-20 exactly. FALLBACK-ONLY: FRED stays the primary.',
+  termsUrl: 'https://www.eia.gov/about/copyrights-and-terms-of-service.php',
+};
+
 /** The register. Unknown providers resolve to the fail-closed entry. */
 export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   fred: FRED_BASE,
@@ -243,6 +278,8 @@ export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   'alternative-me': ALTERNATIVE_ME,
   shiller: SHILLER,
   derived: DERIVED,
+  treasury: TREASURY,
+  eia: EIA,
 };
 
 export function licenceForProvider(provider: string): SourceLicence {

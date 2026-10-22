@@ -83,6 +83,92 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Session record — 2026-10-22 the data-source reliability round: TGJU verdict, FRED fallbacks (Treasury + EIA), and the self-healing sweeps
+
+- **Deployed**: currena-api **`b37cf0d9-be61-425e-9b60-87c161662960`** (apps/api +
+  packages/insights; no web/markets changes — the SPA rebuilt from an unchanged
+  tree). currena-markets untouched. GitHub `main` = this commit.
+- **The investigation first** (the owner's mandated order — findings presented
+  before any code):
+  - **TGJU's economics section is DISQUALIFIED on freshness**: the entire
+    /economics/ world section (bonds, stocks, currencies, 157 country-list
+    indicators) is FROZEN at Apr–Jun 2026 — 4–5+ months stale (some series
+    2021/2023), with duplicate-value bugs (GBPUSD = AUDUSD = 0.70739; UK 10Y =
+    Japan 10Y = 2.7210) and values that now deviate from FRED/ECB/EODHD by
+    0.6–2.7% (FX) and −61bp (US 10Y: TGJU 4.54 Jun-08 vs Treasury 5.13 Oct-21).
+    Their upstream (Trading-Economics-style) feed lapsed ~Jun 8, 2026. The
+    Iranian-market ajax.json stays live to the minute (the converter's source —
+    untouched).
+  - **TGJU's licence is prohibitive regardless**: the site footer states
+    «هر گونه کپی برداری از محتوا، تولیدات، شکل و سایر اجزای سایت صرفا با
+    موافقت مکتوب مجاز می باشد» — copying requires written consent. The I15
+    retirement of TGJU from Insights stands; nothing was built on it.
+  - **The real bottleneck was OUR egress, not TGJU**: the live 2026-10-22
+    `insights:status` showed ALL FIVE FRED bulk groups failing
+    `unexpected header (expected "observation_date,…")` — FRED's Akamai edge
+    intermittently serves unparseable bodies to the Cloudflare venue (the same
+    class reproduced from the build sandbox: HTTP/2 INTERNAL_ERROR stream
+    resets 2/4 attempts, then clean 200s). FRED itself was healthy and FRESH
+    (DGS10 5.12 @ Oct-20; Treasury's own curve 5.13 @ Oct-21 — one day ahead).
+    With F-11 single-attempt fetches and the only collect rung at 04:10 UTC,
+    one edge blip = 24h of public staleness: the public face sat at 28 stale
+    readings (us10y @ Oct-19, wti @ Oct-14 missing a $6 move) while every
+    number was fetchable.
+- **The fix — three layers, all venue-verified by the currena-venue-probe
+  worker (deployed, harvested, deleted — Treasury 200 in 18–21 s, EIA 200 in
+  28–215 ms, RBA f2 still 403, Bundesbank 520/404, Cboe 404):**
+  1. **Treasury.gov fallback adapter** (`treasury.ts`): the daily par + real
+     yield-curve CSVs — the PRIMARY source of DGS2/DGS10/DGS30/DFII10, one day
+     fresher than FRED in practice. Fills the yield family when FRED groups
+     1/2 fail (T10Y2Y recomputed as 10Y−2Y at FRED's own formula); current-year
+     CSVs merged with the STORED KV histories so percentile10y keeps its true
+     10-year base (the Brent-Yahoo merge pattern).
+  2. **EIA fallback adapter** (`eia.ts` + `biff.ts`, a dependency-free
+     OLE2+BIFF8 reader): the RWTCd/RBRTEd/RNGWHHDd daily-spot .xls workbooks —
+     the PRIMARY source of FRED's DCOILWTICO/DCOILBRENTEU/DHHNGSP, FULL
+     history each. Cross-validated live: EIA 2026-10-20 WTI 107.89 ==
+     FRED DCOILWTICO exactly (and the April-2020 −36.98 negative close parses).
+  3. **Failure-gated intra-day sweep rungs** (10:10 + 20:10 UTC, no new cron
+     trigger — the minute cron's gates): when the last rung recorded genuine
+     fetch failures (kind failed/blocked/format-changed — the honest 'disabled'
+     venue-skip rows are NOT triggers) or is >10 h stale, the full ingest
+     re-runs in sweep mode (archive writes + seed appends skipped for the
+     subrequest ceiling). Healthy days cost ONE KV read.
+- **Fallback discipline (the owner's terms)**: FRED stays the PRIMARY — the
+  fallbacks fire ONLY on group failure, fill ONLY the failed groups' slots,
+  and every filled reading's sourceName switches to the actual source via the
+  new `readingSourceOverrides` (e.g. us10y → "U.S. Department of the Treasury
+  (daily par yield curve)", wti → "U.S. Energy Information Administration
+  (WTI spot, FOB Cushing)"); mixed-leg derived cards get honest mixed names
+  ("RBA F2 − U.S. Treasury (10 Yr)"). Both sources are US-government public
+  domain (17 U.S.C. § 105) — registered L0 in SOURCE_RISK_REGISTER
+  ('us-treasury', 'eia-spot') + SOURCE_LICENCES with quoted evidence.
+  Series with no licence-safe fallback (VIX, STLFSI4, NFCI, T5YIFR, the
+  monthlies, OECD family) hold stale with honest flags — fail-closed.
+- **Live verification (production, same day)**: a temporary 15:05 sweep rung
+  (deployed, watched via wrangler tail, removed) fired against the morning's
+  FRED failures and HEALED the whole page: staleCount 28 → 1 (only
+  au-wage-growth's normal quarterly cadence), validation suite 14/14 pass
+  (T-05 failed at 04:10), the global voting pool 5 → 22 readings (the outage
+  had gutted it), us10y 5.12 @ Oct-20, wti 107.89 @ Oct-20 (the $6 move
+  captured), vix 16.68 @ Oct-21. FRED served healthy on the sweep's retry —
+  the primary path restored itself, which is exactly the design; the
+  Treasury/EIA layers stand behind it for the days it doesn't.
+- **Also this round**: REFRESH_SECRET rotated again (the sandbox reset lost
+  the 2026-10-21 value — new value in apps/api/.dev.vars, gitignored; the
+  manual /internal/insights-ingest lever still dies at ~22 s CPU / error 1102,
+  re-verified — the scheduled rungs + sweeps are the real ingest path).
+  wrangler CLI's `kv key get` misbehaves with this token (silent "Value not
+  found") — the REST API reads fine.
+- **Tests**: +55 (555 total in insights: treasury parse ×10, EIA/BIFF ×8
+  including the real-workbook-shape fixture, collect fallback wiring ×5 —
+  healthy-run-never-fetches, malformed-body class, merge-with-stored-history
+  + attribution overrides, EIA fills, fallback-failure isolation; + the
+  32 existing suites all green) and +14 in apps/api (344 total: sweepShouldFire
+  ×5, rung minute wiring ×2, the gated runScheduledInsightsSweep ×2). Known
+  pre-existing failures untouched: apps/web's 16 jsdom radio-role tests and 1
+  eslint react-hooks error (verified failing on the clean tree via git stash).
+
 ## Session record — 2026-10-20g the map's owner round: all sixteen indices, marching ants, 60% names, 3D pins
 
 - **Deployed**: currena-api **`49380c2e-a1bd-41be-bd55-1312653f0e8f`** (web-only
