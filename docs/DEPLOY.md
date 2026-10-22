@@ -2965,3 +2965,61 @@ the petrol/transport money row is gone while employment rate appeared.
   Updated gone, both 4-lens switches interactive, the map switch drives
   the verdict "this year performance" + the Nifty tile's −11.4%, no
   console errors, no horizontal overflow) + VLM-confirmed captures.
+
+## Session record — 2026-10-21c: the currencies section and the licence-hidden indicators return live (the restoration round deploys)
+
+- **Deployed**: currena-api **`c610dfde-a663-49d9-b314-396af65bdc00`**
+  (web + api round — the diff touches `apps/web`, `apps/api`,
+  `packages/*`, `data/*`; currena-markets untouched, stays at the
+  data-integrity round's version with the 23:30/01:30/**08:50 Asia**
+  rungs). GitHub `main` = `a64d4c8`.
+- **What went live**: the full owner round — the world-currencies
+  section (10 ECB-reference pairs, 7 backtested pattern rules, the
+  dollar row, the quiet area, the pairs table behind "Show all currency
+  pairs") served by a now-public `/api/insights/fx`; the 28
+  licence-hidden indicators restored on browser-verified terms (hidden
+  set now exactly `[china-pmi, shiller-cape, shiller-ecy]`,
+  `hiddenBoards: []`); the market-stress voters back (STLFSI, NFCI,
+  VIX, gold/silver, FNG) with the eth-usd card RETIRED (66→65
+  indicators); the gold balance reading its directional load (|net|/
+  (for+against) × 10° clamped [3°,10°]); the silver balance retired;
+  the Australia signals bullets naming their flagged indicators with
+  live values; the weekly-event hero line retired.
+- **The deploy hazard this round surfaced (and its fix)**: retiring an
+  id from the `IndicatorId` enum while the STORED KV documents still
+  carry its reading makes the new Worker's Zod parse reject the whole
+  snapshot — `/api/insights` answered `insights_not_ready` until the
+  stored `insights:snapshot` + `insights:archive:v1:2026-10-21` were
+  surgically migrated (strip the eth-usd reading, recompute both
+  section summaries with the current `summarizeSectionByGauges`,
+  validate against the NEW schema, write back) and the
+  public-projection bootstrap re-ran (65 readings → 62 public). The
+  stale `archive-public:v1:2026-10-21` and the orphaned
+  `hist:eth-usd` were deleted. Lesson recorded: **an id retirement is
+  a schema migration for the KV documents too**.
+- **Secrets**: `REFRESH_SECRET` rotated at deploy time (the previous
+  value was not recoverable; no other consumer — the GHA workflow is
+  dead and never read it). The manual `POST /internal/insights-ingest`
+  lever honestly dies at ~22s with error 1102 on the HTTP path (CPU
+  budget below the scheduled rung's) — the 04:10/04:25/04:40 scheduled
+  rungs remain the ingest path.
+- **Verification**: live-verified on currena.ir EN + fa (1280px,
+  browser + VLM): the currencies section end-to-end (verdict "Currency
+  patterns: calm", dollar row +1.3% 1m, the Europe-worry pattern card
+  EUR/CHF −2.4%/m with the rebased Stoxx comparison, the 10-pair table
+  in 3 groups with the bigMove tag, ECB as-of Oct 20; fa in Persian
+  digits + ۲۸ مهر ۱۴۰۵); the stress lane's five voters with no
+  Ethereum card; the gold balance tipping the full 10° with Real
+  yields 2.80% + The US dollar 101.84 on the against pan and "No
+  qualifying signals" on the empty supporting pan (single balance, no
+  silver); the Australia panel reading "Inflation & rates · Critical —
+  Australian prices vs a year ago 4.0% · Underlying inflation 3.6%";
+  no weekly-event line anywhere; zero console/page errors in both
+  languages. The next day's **04:10 UTC rung re-ran the ingest cleanly
+  with the new code** (2026-10-22: snapshot + status + public +
+  archive written; 62 public readings, all fresh) — the self-sustaining
+  pipeline confirmed live.
+- **Known follow-ups (honest)**: the 2026-10-22 status doc shows
+  source-level failures (`fred` partial, `rba` the known f2 403) while
+  the public face stays 62/62 fresh — flagged for the upcoming
+  pipeline-reliability investigation (TGJU scraping + gap analysis).
