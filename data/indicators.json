@@ -1391,12 +1391,12 @@
       "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L2",
-        "ownerAccepts": false,
-        "enabled": false,
+        "ownerAccepts": true,
+        "enabled": true,
         "method": "M2",
-        "runtime": "github-action",
-        "termsLines": "Public Excel file on Robert Shiller’s Yale page (read 2026-10-16): open academic data, attribution expected, no formal reuse terms found — level L2 (unclear) until the owner accepts. Every download must be archived (FS-06).",
-        "termsReadOn": "2026-10-16",
+        "runtime": "manual",
+        "termsLines": "Public Excel file on Robert Shiller’s Yale page (read 2026-10-16): open academic data, attribution expected, no formal reuse terms found — L2 (unclear) until the owner accepts. The owner accepted 2026-10-23 (D-42/OD-1): displayed with the attribution card, every download archived (FS-06), values shown verbatim (never recomputed).",
+        "termsReadOn": "2026-10-23",
         "attributionText": "Data: Robert Shiller, Yale",
         "legs": [
           "shiller"
@@ -1416,13 +1416,13 @@
       "layer": 1,
       "licence": {
         "licenceName": "Open academic data — attribution; no formal reuse terms",
-        "attributionText": "Source: Robert Shiller, Irrational Exuberance data (econ.yale.edu/~shiller)",
+        "attributionText": "Data: Robert Shiller, Yale",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Step 3 §2.3: open academic data, no formal commercial terms found — private mode only, archive every download (L1-14).",
-        "termsUrl": "http://www.econ.yale.edu/~shiller/data.htm"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-23",
+        "termsEvidence": "Open academic data (Yale page, read 2026-10-16; shillerdata.com read 2026-10-23): attribution expected, no formal reuse terms found. Owner accepted 2026-10-23 (D-42/OD-1) — displayed with the attribution card, every download archived (FS-06), values shown verbatim (never recomputed).",
+        "termsUrl": "https://shillerdata.com/"
       }
     },
     {
@@ -1450,12 +1450,12 @@
       "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L2",
-        "ownerAccepts": false,
-        "enabled": false,
+        "ownerAccepts": true,
+        "enabled": true,
         "method": "M2",
-        "runtime": "github-action",
-        "termsLines": "Public Excel file on Robert Shiller’s Yale page (read 2026-10-16): open academic data, attribution expected, no formal reuse terms found — level L2 (unclear) until the owner accepts. Every download must be archived (FS-06).",
-        "termsReadOn": "2026-10-16",
+        "runtime": "manual",
+        "termsLines": "Public Excel file on Robert Shiller’s Yale page (read 2026-10-16): open academic data, attribution expected, no formal reuse terms found — L2 (unclear) until the owner accepts. The owner accepted 2026-10-23 (D-42/OD-1): displayed with the attribution card, every download archived (FS-06), values shown verbatim (never recomputed).",
+        "termsReadOn": "2026-10-23",
         "attributionText": "Data: Robert Shiller, Yale",
         "legs": [
           "shiller"
@@ -1475,13 +1475,13 @@
       "layer": 1,
       "licence": {
         "licenceName": "Open academic data — attribution; no formal reuse terms",
-        "attributionText": "Source: Robert Shiller, Irrational Exuberance data (econ.yale.edu/~shiller)",
+        "attributionText": "Data: Robert Shiller, Yale",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Step 3 §2.3: open academic data, no formal commercial terms found — private mode only, archive every download (L1-14).",
-        "termsUrl": "http://www.econ.yale.edu/~shiller/data.htm"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-23",
+        "termsEvidence": "Open academic data (Yale page, read 2026-10-16; shillerdata.com read 2026-10-23): attribution expected, no formal reuse terms found. Owner accepted 2026-10-23 (D-42/OD-1) — displayed with the attribution card, every download archived (FS-06), values shown verbatim (never recomputed).",
+        "termsUrl": "https://shillerdata.com/"
       }
     },
     {
@@ -1855,10 +1855,10 @@
         "attributionText": "Source: National Bureau of Statistics of China",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Manual entries carry no provider feed; defect E-08 requires entered_on/expiry bookkeeping. Public display blocked until each publisher’s reuse terms are read and recorded.",
-        "termsUrl": null
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-23",
+        "termsEvidence": "Manual entries carry no provider feed; defect E-08 requires entered_on/expiry bookkeeping. NBS English pages read 2026-10-23 (the M1 unhide round): no reuse prohibition found for attributed quotation — china-pmi display-permitted (D-42/OD-2) while fresh.",
+        "termsUrl": "https://www.stats.gov.cn/english/"
       }
     },
     {

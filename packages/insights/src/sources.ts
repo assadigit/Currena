@@ -343,19 +343,24 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     id: 'shiller',
     provider: 'shiller',
     label: 'Robert Shiller dataset (ie_data)',
-    usedFor: 'CAPE, Excess CAPE Yield (planned — Step 3 L1-14 / FS-06)',
+    usedFor: 'CAPE, Excess CAPE Yield (Step 3 L1-14 / FS-06)',
     method: 'M2',
-    runtime: 'github-action',
+    // 2026-10-23 unhide round: the monthly GitHub Action died with the
+    // account's Actions minutes (2026-10-20) — the committed converted file
+    // (data/shiller/shiller-cape.json) is the engine's input, refreshed
+    // out-of-band by packages/insights/scripts/shiller-fetch.ts.
+    runtime: 'manual',
     level: 'L2',
-    ownerAccepts: false, // new source — the owner must flip this in RISK_REGISTER.md himself
+    ownerAccepts: true, // owner directive D-42 (chat, 2026-10-23): OD-1 — "unhide the Shiller pair"
     override: false,
-    enabled: false,
+    enabled: true, // the T-30 flip, recorded in RISK_REGISTER.md the same day
     termsLines:
-      'Public Excel file on Robert Shiller\u2019s Yale page (read 2026-10-16): open academic data, attribution expected, no formal reuse terms found — level L2 (unclear) until the owner accepts. Every download must be archived (FS-06).',
-    termsReadOn: SOURCE_RISK_READ_ON,
+      'Public Excel file on Robert Shiller\u2019s Yale page (read 2026-10-16): open academic data, attribution expected, no formal reuse terms found — L2 (unclear) until the owner accepts. The owner accepted 2026-10-23 (D-42/OD-1): displayed with the attribution card, every download archived (FS-06), values shown verbatim (never recomputed).',
+    termsReadOn: '2026-10-23',
     attribution: 'Data: Robert Shiller, Yale',
     termsUrl: 'https://shillerdata.com/', // verified https 2026-10-20; the Yale mirror (http://www.econ.yale.edu/~shiller/data.htm) stays the recorded fallback
-    notes: 'NEW — disabled until the owner sets owner_accepts to yes in RISK_REGISTER.md (T-30).',
+    notes:
+      'Enabled by the owner\u2019s OD-1/D-42 approval (2026-10-23; RISK_REGISTER.md row + change log updated). The Worker reads the committed converted file (ingest/data.ts), never fetches the source; refresh via scripts/shiller-fetch.ts — NOTE 2026-10-23: shillerdata.com was unreachable from the work venue (the fetch honestly fell back to the stale 2023 Yale mirror and was discarded); the committed file (latestDate 2026-10-01, fetched 2026-10-19) must be refreshed from a venue that can reach the source before the 45-day window closes (~2026-11-15).',
   },
   'cnn-fng': {
     id: 'cnn-fng',

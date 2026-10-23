@@ -67,11 +67,20 @@ describe('the v3 source risk register (T-26 terms gate)', () => {
   it('the register never invents an owner acceptance: every L2 row records owner_accepts, and the agent-side rows for NEW sources stay false', () => {
     // New (not-live-on-15-Oct-2026) sources must stay owner_accepts = false
     // until the owner flips RISK_REGISTER.md himself (runbook hard rule 2).
-    for (const id of ['shiller', 'cnn-fng', 'asx-rate-tracker', 'westpac-mi', 'nab-survey', 'aip-petrol']) {
+    // shiller was flipped 2026-10-23 by the owner's OD-1/D-42 approval and
+    // moved to the accepted set below.
+    for (const id of ['cnn-fng', 'asx-rate-tracker', 'westpac-mi', 'nab-survey', 'aip-petrol']) {
       const row = SOURCE_RISK_REGISTER[id]!;
       expect(row.ownerAccepts, `${id} ownerAccepts`).toBe(false);
       expect(row.enabled, `${id} enabled`).toBe(false); // T-30: disabled by default
     }
+  });
+
+  it('the owner\u2019s D-42/OD-1 flip (2026-10-23): shiller is owner-accepted and enabled', () => {
+    const row = SOURCE_RISK_REGISTER['shiller']!;
+    expect(row.ownerAccepts).toBe(true);
+    expect(row.enabled).toBe(true);
+    expect(row.termsReadOn).toBe('2026-10-23');
   });
 
   it('the already-live L2 sources carry the owner\u2019s recorded acceptance (RISK_REGISTER.md, 2026-10-17)', () => {
@@ -91,7 +100,7 @@ describe('the v3 source risk register (T-26 terms gate)', () => {
 
 describe('T-30 disabled default: a new L2 source with owner_accepts = no is never fetched and never shown', () => {
   it('every not-yet-accepted source row is disabled, so its fetch gate and display gate both fail closed', () => {
-    for (const id of ['shiller', 'cnn-fng', 'asx-rate-tracker', 'westpac-mi', 'nab-survey', 'aip-petrol']) {
+    for (const id of ['cnn-fng', 'asx-rate-tracker', 'westpac-mi', 'nab-survey', 'aip-petrol']) {
       const row = SOURCE_RISK_REGISTER[id]!;
       expect(row.enabled).toBe(false);
       expect(legMayBeFetched(row.id)).toBe(false);
@@ -101,9 +110,17 @@ describe('T-30 disabled default: a new L2 source with owner_accepts = no is neve
   });
 
   it('a card whose legs include a disabled source is itself disabled and not owner-accepted', () => {
-    const summary = riskSummaryForLegs(['shiller'], fredRecords);
+    // westpac-mi stays the unaccepted L2 example since the shiller flip.
+    const summary = riskSummaryForLegs(['westpac-mi'], fredRecords);
     expect(summary.enabled).toBe(false);
     expect(summary.ownerAccepts).toBe(false);
+  });
+
+  it('the shiller pair is displayable under the D-42/OD-1 acceptance (L2, accepted, enabled)', () => {
+    const summary = riskSummaryForLegs(['shiller'], fredRecords);
+    expect(summary.level).toBe('L2');
+    expect(summary.ownerAccepts).toBe(true);
+    expect(summary.enabled).toBe(true);
   });
 });
 
@@ -116,11 +133,12 @@ describe('T-31 L3 gate: an L3 source is never requested', () => {
     expect(legMayBeFetched('asx-rate-tracker')).toBe(false); // L3: the terms prohibit automated access (FS-02)
   });
 
-  it('an un-overridden L3 leg keeps the card at L3 — the walk never upgrades it into displayability', () => {
-    // Simulated: a hypothetical card with one L3 leg.
-    const summary = riskSummaryForLegs(['fred:DGS10', 'shiller']);
-    expect(summary.level).toBe('L2'); // shiller L2 governs over the L0 leg
-    expect(summary.ownerAccepts).toBe(false); // shiller not accepted
+  it('an unaccepted L2 leg keeps the card undisplayable — the walk never upgrades it into displayability', () => {
+    // Simulated: a hypothetical card with one unaccepted L2 leg (westpac-mi
+    // since the shiller flip; an L3 leg behaves the same and worse).
+    const summary = riskSummaryForLegs(['fred:DGS10', 'westpac-mi']);
+    expect(summary.level).toBe('L2'); // westpac-mi L2 governs over the L0 leg
+    expect(summary.ownerAccepts).toBe(false); // westpac-mi not accepted
     expect(summary.enabled).toBe(false);
   });
 });
@@ -174,7 +192,8 @@ describe('provider fetch gates (M-6 kill switch)', () => {
     for (const p of ['fred', 'rba', 'abs', 'yahoo', 'gold-api', 'frankfurter', 'ecb', 'world-bank', 'bitstamp', 'alternative-me']) {
       expect(providerFetchEnabled(p), p).toBe(true);
     }
-    for (const p of ['shiller', 'cnn', 'asx', 'westpac-mi', 'nab', 'aip']) {
+    expect(providerFetchEnabled('shiller'), 'shiller (D-42/OD-1, 2026-10-23)').toBe(true);
+    for (const p of ['cnn', 'asx', 'westpac-mi', 'nab', 'aip']) {
       expect(providerFetchEnabled(p), p).toBe(false);
     }
   });

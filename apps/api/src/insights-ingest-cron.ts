@@ -59,6 +59,15 @@ export const INGEST_HIST_PERIODIC_MINUTE = 40;
 export const INGEST_SWEEP_TIMES: readonly { hour: number; minute: number }[] = [
   { hour: 10, minute: 10 },
   { hour: 20, minute: 10 },
+  // (2026-10-23 M1† note: temporary hourly :05 diagnostic rungs served their
+  // purpose — three exceededCpu deaths captured at exactly 2050 ms
+  // (13:05/14:05/15:05 UTC), the baseReadingCache fix deployed 15:34, and
+  // the 16:05 rung completed healthy at cpu 1831 ms with the snapshot +
+  // stage + public projection all written (tail-captured). Reverted to the
+  // designed 10:10/20:10 pair. The 04:10 MAIN rung carries ~7 more writes
+  // than the sweep shape — the margin is thin (~140–220 ms); if it dies at
+  // the write tail, the 10:10 sweep heals the page (proven today) and the
+  // rung-split refinement is the recorded follow-up.)
 ];
 
 /** A sweep fires when the last status is older than this (a dead main rung). */

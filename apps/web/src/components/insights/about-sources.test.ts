@@ -76,11 +76,11 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
     expect(aboutEnabledState(rba!)).toBe('on');
   });
 
-  it('shiller: the M-6 kill switch shows the whole provider as off', () => {
+  it('shiller: enabled since the owner\u2019s D-42/OD-1 flip (2026-10-23) — both series on', () => {
     const shiller = rows.find((r) => r.provider === 'shiller');
     expect(shiller!.seriesCount).toBe(2);
-    expect(shiller!.enabledCount).toBe(0);
-    expect(aboutEnabledState(shiller!)).toBe('off');
+    expect(shiller!.enabledCount).toBe(2);
+    expect(aboutEnabledState(shiller!)).toBe('on');
   });
 
   it('derived: fully enabled since the 2026-10-21 round un-disabled the crosses', () => {

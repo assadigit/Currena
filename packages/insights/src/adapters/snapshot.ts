@@ -198,8 +198,23 @@ export interface SnapshotBuildInputs {
   /**
    * Fix spec A-03/A-04: the validation suite's safety flags — a flagged
    * reading holds its LAST GOOD value with status `check-pending`.
+   * Applied AFTER the deterministic base (see baseReadingCache) so the
+   * draft and final builds share work.
    */
   flags?: ReadonlyMap<IndicatorId, SafetyFlag>;
+  /**
+   * 2026-10-23 CPU round (the rung exceededCpu fix): memoize the
+   * DETERMINISTIC per-reading base — computeReading plus the release/
+   * peak/period/note enrichments, everything BEFORE the flag/sanity/
+   * outcome steps. runInsightsUpdate builds the snapshot TWICE (the
+   * draft that feeds the validation suite, then the final with the
+   * safety flags); the two calls differ ONLY in `flags`, which applies
+   * after the cache point — so the second build replays instead of
+   * recomputing (the percentile work over 10-year windows was the CPU
+   * that killed the 04:10 rung on the free plan's budget). Clone-on-hit
+   * keeps each build's post-cache reassignments private.
+   */
+  baseReadingCache?: Map<string, IndicatorReading>;
   /**
    * Defect E-08 (2026-10-16): manual-entry expiries (id → the next
    * scheduled release, from each data/manual/<id>.json file's `expires`).
@@ -387,95 +402,107 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
     const auxOf = AUX_RULE_WIRING[def.id];
     const auxSeries = auxOf ? auxOf(inputs.series) : undefined;
     const aux: AuxSeries | undefined = auxSeries ? { series: auxSeries } : undefined;
-    let reading = computeReading(def, series, inputs.now, source, aux);
+    let reading: IndicatorReading;
+    const cachedBase = inputs.baseReadingCache?.get(def.id);
+    if (cachedBase !== undefined) {
+      // 2026-10-23 CPU round: replay the deterministic base (the steps
+      // below only reassign or clone — the clone keeps them private).
+      reading = { ...cachedBase };
+    } else {
+      reading = computeReading(def, series, inputs.now, source, aux);
 
-    // ---- Fix spec B-05: the real release date of the data shown. ----
-    if (reading.asOf !== null && (def.cadence === 'monthly' || def.cadence === 'quarterly')) {
-      const releaseDate = releaseDateOf(def.id, def.cadence, reading.asOf, schedule, nowDayIso);
-      if (releaseDate !== undefined) reading.releaseDate = releaseDate;
-      if (nextReleaseToday(def.id, reading.asOf, schedule, nowDayIso)) {
-        (reading as { nextReleaseToday?: boolean }).nextReleaseToday = true;
-      }
-    }
-
-    // ---- Step 3 L2-02: the price's gap to its 200-day average. ----
-    if (reading.asOf !== null && reading.value !== null && L2_02_IDS.has(def.id)) {
-      const pts = series;
-      if (pts.length >= 200) {
-        const last200 = pts.slice(-200);
-        const avg = last200.reduce((sum, p) => sum + p.value, 0) / last200.length;
-        if (avg > 0) reading.ma200GapPct = ((reading.value - avg) / avg) * 100;
-      }
-    }
-
-    // ---- Defect E-07: quarterly readings carry their period's bounds. ----
-    if (def.cadence === 'quarterly' && reading.asOf !== null) {
-      const q = quarterPeriodOf(reading.asOf);
-      if (q !== undefined) {
-        reading.periodStart = q.start;
-        reading.periodEnd = q.end;
-      }
-    }
-
-    // ---- Defect E-08: an expired manual entry wears the stale tag. ----
-    const manualExpiry = inputs.manualExpires?.[def.id];
-    if (manualExpiry !== undefined && nowDayIso > manualExpiry && reading.status !== 'unavailable') {
-      reading.status = 'stale';
-      reading.flag = {
-        test: 'E-08',
-        reason: `manual entry expired on ${manualExpiry} (next scheduled release) — update data/manual/${def.id}.json`,
-      };
-    }
-
-    // ---- Fix spec B-01: the full-history peak on the price rows. ----
-    const peak = inputs.peaks?.[def.id];
-    if (peak !== undefined && reading.value !== null && peak.value > 0) {
-      reading.peak = { value: peak.value, date: peak.date, basis: peak.basis };
-      reading.fromPeak10y = ((reading.value - peak.value) / peak.value) * 100;
-    }
-
-    // ---- Fix spec B-19: "highest since {year}" for long-history series. ----
-    const sinceYear = inputs.highestSince?.[def.id];
-    if (sinceYear !== undefined) reading.highestSinceYear = sinceYear;
-
-    // ---- Fix spec B-10: the AU−US gap's legs' own dates. ----
-    if (def.id === 'au-us-10y-gap' && reading.asOf !== null) {
-      const au = inputs.series['au-10y'];
-      const us = inputs.series['us10y'];
-      const auLast = au?.[au.length - 1]?.date;
-      const usLast = us?.[us.length - 1]?.date;
-      if (auLast !== undefined && usLast !== undefined) {
-        reading.gapLegs = {
-          a: { id: 'au-10y', asOf: auLast },
-          b: { id: 'us10y', asOf: usLast },
-        };
-      }
-    }
-
-    // ---- Fix spec B-04: the loan reading's change since the RBA decision. ----
-    if (def.id === 'au-home-loan' && reading.asOf !== null && reading.value !== null) {
-      const cash = inputs.series['rba-cash-rate'];
-      const decision = lastStepOf(cash ?? [], reading.asOf);
-      if (decision !== undefined && decision.date <= reading.asOf) {
-        const before = pointAtOrBefore(series, decision.date);
-        if (before !== undefined) {
-          reading.sinceDecision = { decisionDate: decision.date, points: reading.value - before.value };
+      // ---- Fix spec B-05: the real release date of the data shown. ----
+      if (reading.asOf !== null && (def.cadence === 'monthly' || def.cadence === 'quarterly')) {
+        const releaseDate = releaseDateOf(def.id, def.cadence, reading.asOf, schedule, nowDayIso);
+        if (releaseDate !== undefined) reading.releaseDate = releaseDate;
+        if (nextReleaseToday(def.id, reading.asOf, schedule, nowDayIso)) {
+          (reading as { nextReleaseToday?: boolean }).nextReleaseToday = true;
         }
       }
-    }
 
-    // ---- Fix spec B-06: the policy cards' decided + effective dates. ----
-    if (reading.lastChange !== undefined && inputs.policyDecisions !== undefined) {
-      const match = inputs.policyDecisions.find(
-        (d) => d.id === def.id && d.effective === reading.lastChange!.date,
-      );
-      if (match !== undefined) reading.decidedDate = match.decided;
-    }
+      // ---- Step 3 L2-02: the price's gap to its 200-day average. ----
+      if (reading.asOf !== null && reading.value !== null && L2_02_IDS.has(def.id)) {
+        const pts = series;
+        if (pts.length >= 200) {
+          const last200 = pts.slice(-200);
+          const avg = last200.reduce((sum, p) => sum + p.value, 0) / last200.length;
+          if (avg > 0) reading.ma200GapPct = ((reading.value - avg) / avg) * 100;
+        }
+      }
 
-    // ---- Fix spec A-06: an unexpired context note rides its reading. ----
-    const note = notesByIndicator.get(def.id as string);
-    if (note !== undefined) {
-      reading.note = { text: note.text, authored: note.authored, expires: note.expires };
+      // ---- Defect E-07: quarterly readings carry their period's bounds. ----
+      if (def.cadence === 'quarterly' && reading.asOf !== null) {
+        const q = quarterPeriodOf(reading.asOf);
+        if (q !== undefined) {
+          reading.periodStart = q.start;
+          reading.periodEnd = q.end;
+        }
+      }
+
+      // ---- Defect E-08: an expired manual entry wears the stale tag. ----
+      const manualExpiry = inputs.manualExpires?.[def.id];
+      if (manualExpiry !== undefined && nowDayIso > manualExpiry && reading.status !== 'unavailable') {
+        reading.status = 'stale';
+        reading.flag = {
+          test: 'E-08',
+          reason: `manual entry expired on ${manualExpiry} (next scheduled release) — update data/manual/${def.id}.json`,
+        };
+      }
+
+      // ---- Fix spec B-01: the full-history peak on the price rows. ----
+      const peak = inputs.peaks?.[def.id];
+      if (peak !== undefined && reading.value !== null && peak.value > 0) {
+        reading.peak = { value: peak.value, date: peak.date, basis: peak.basis };
+        reading.fromPeak10y = ((reading.value - peak.value) / peak.value) * 100;
+      }
+
+      // ---- Fix spec B-19: "highest since {year}" for long-history series. ----
+      const sinceYear = inputs.highestSince?.[def.id];
+      if (sinceYear !== undefined) reading.highestSinceYear = sinceYear;
+
+      // ---- Fix spec B-10: the AU−US gap's legs' own dates. ----
+      if (def.id === 'au-us-10y-gap' && reading.asOf !== null) {
+        const au = inputs.series['au-10y'];
+        const us = inputs.series['us10y'];
+        const auLast = au?.[au.length - 1]?.date;
+        const usLast = us?.[us.length - 1]?.date;
+        if (auLast !== undefined && usLast !== undefined) {
+          reading.gapLegs = {
+            a: { id: 'au-10y', asOf: auLast },
+            b: { id: 'us10y', asOf: usLast },
+          };
+        }
+      }
+
+      // ---- Fix spec B-04: the loan reading's change since the RBA decision. ----
+      if (def.id === 'au-home-loan' && reading.asOf !== null && reading.value !== null) {
+        const cash = inputs.series['rba-cash-rate'];
+        const decision = lastStepOf(cash ?? [], reading.asOf);
+        if (decision !== undefined && decision.date <= reading.asOf) {
+          const before = pointAtOrBefore(series, decision.date);
+          if (before !== undefined) {
+            reading.sinceDecision = { decisionDate: decision.date, points: reading.value - before.value };
+          }
+        }
+      }
+
+      // ---- Fix spec B-06: the policy cards' decided + effective dates. ----
+      if (reading.lastChange !== undefined && inputs.policyDecisions !== undefined) {
+        const match = inputs.policyDecisions.find(
+          (d) => d.id === def.id && d.effective === reading.lastChange!.date,
+        );
+        if (match !== undefined) reading.decidedDate = match.decided;
+      }
+
+      // ---- Fix spec A-06: an unexpired context note rides its reading. ----
+      const note = notesByIndicator.get(def.id as string);
+      if (note !== undefined) {
+        reading.note = { text: note.text, authored: note.authored, expires: note.expires };
+      }
+
+      // 2026-10-23 CPU round: the deterministic base ends here — cache it
+      // (pre-flag, pre-sanity, pre-outcome; those steps replay per build).
+      inputs.baseReadingCache?.set(def.id, { ...reading });
     }
 
     // ---- Fix spec A-03/A-04: apply the validation safety flags. ----

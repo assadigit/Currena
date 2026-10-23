@@ -5,6 +5,67 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-23] — the Phase-2 open: the unhide round (Shiller pair + china-pmi) and the rung CPU fix (M0+M1 of the D-42 milestones)
+
+The owner approved the review's Wave-0 calls with a sequencing directive
+("Do them in phases. add a milestone for each phase." — D-42): OD-1/OD-2
+(the unhides), OD-5 (the credit-spread licence row, M3), OD-7 (the
+subtraction set, M2) and OD-8 (the five value-ordered waves). This round
+delivered M0 (the decision records + `docs/PHASE2_MILESTONES.md`) and M1 —
+plus the unplanned M1† the rungs forced.
+
+### M1 — the unhide round
+
+- **The Shiller pair serves publicly** (`shiller-cape` 40.71 ratio /
+  `shiller-ecy` 0.56%): the risk-register row flipped owner-accepted +
+  enabled (the T-30 flip, mirrored in `RISK_REGISTER.md` + `LICENCES.md`),
+  the display gate opened in `licences.ts` (publicDisplayOk yes, terms
+  re-read 2026-10-23, attribution "Data: Robert Shiller, Yale"), and the
+  ingest reads the committed converted file
+  (`data/shiller/shiller-cape.json`) — the ECY fraction is scaled ×100 to
+  the registry's percent convention at parse time. Runtime honestly
+  recorded as **manual**: the monthly GitHub Action died with the
+  account's Actions minutes (2026-10-20); `scripts/shiller-fetch.ts` is
+  the documented refresh path. **Open item:** shillerdata.com was
+  unreachable from the work venue (the fetch honestly fell back to the
+  stale 2023 Yale mirror and was discarded) — the committed file
+  (latestDate 2026-10-01) must be refreshed from a reaching venue before
+  the 45-day window closes (~2026-11-15).
+- **`china-pmi` serves publicly** (50.1, Normal, growth gauge now 6
+  members): the NBS English terms pages were read 2026-10-23 — no reuse
+  prohibition found for attributed quotation; the manual licence row
+  flipped display-ok (D-42/OD-2) with the enteredOn/expiry bookkeeping
+  (E-08/T-33) unchanged. The global voting pool went 22→23.
+- **The generated projection**: `hiddenIndicatorIds` is now empty (65
+  public readings); the audit entries for the three ids match the
+  deployed sidecar on all 65 entries after regeneration.
+
+### M1† — the rung CPU fix (exceededCpu at the free plan's ~2 s budget)
+
+The 04:10/10:10 rungs had been dying silently at exactly cpuTime 2050 ms
+(captured live via `wrangler tail` on temporary hourly :05 diagnostic
+rungs, since reverted with an honest note): the rung builds the snapshot
+TWICE — the draft that feeds the validation suite, then the final with
+the safety flags — and the deterministic percentile work over 10-year
+windows is the CPU that killed it. The fix memoizes the deterministic
+per-reading base (`baseReadingCache` in `adapters/snapshot.ts`): the two
+builds differ only in `flags`, which applies after the cache point, so
+the second build replays instead of recomputing (clone-on-hit keeps each
+build's reassignments private). Phase timings surfaced to the run log.
+The fixed 16:05 UTC rung completed healthy at cpu 1831 ms with the
+snapshot + stage + public projection all written.
+
+### The recovery note (recorded honestly)
+
+The M0+M1 working tree was lost to a sandbox reset before its commit —
+the source was reconstructed from the deployed Worker's own sourcemap
+(7 files recovered byte-exact) with the licences display flips and test
+pins re-derived against the recovered audit; the regenerated registry
+matches the deployed audit on all 65 entries. Tests: typecheck 6/6;
+insights 557, api 344, web 680 passed (the 16-failure briefing jsdom
+baseline unchanged); the two date-conditioned prices-cards pins and the
+sweep date-bomb fixed for the new reality (real-clock-relative fixtures).
+
 ## [2026-10-21c] — the currencies section returns, the licence-hidden cards are restored on verified terms, and the balance/panel round (owner restoration)
 
 The owner's directive: "currena's insight used to have a full currency and

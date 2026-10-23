@@ -36,12 +36,13 @@ describe('the bundled indicator-audit sidecar', () => {
 });
 
 describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
-  it('is exactly the L2 sources that are public today (the 2026-10-21c licence round)', () => {
+  it('is exactly the L2 sources that are public today (the 2026-10-21c licence round + the 2026-10-23 unhide)', () => {
     // brent/gold-usd/silver-usd (Yahoo legs), btc-usd (gold-api), the
     // FRED citation-required set (display-permitted with "publisher via
     // FRED" attribution — FRED legal read 2026-10-21: STLFSI/NFCI/VIX/
     // T10Y2Y/T5YIFR/GACDFSA + the OECD bond/rate series), eth-usd retired
-    // 2026-10-21c. Fifteen L2-but-public ids per the audit sidecar today.
+    // 2026-10-21c, and the Shiller pair since the D-42/OD-1 unhide
+    // (2026-10-23). Seventeen L2-but-public ids per the audit sidecar today.
     expect([...PUBLIC_BOUNDED_HISTORY_IDS].sort()).toEqual([
       'boe-rate',
       'boj-rate',
@@ -54,6 +55,8 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       'jgb-10y',
       'nfci',
       'philly-fed',
+      'shiller-cape',
+      'shiller-ecy',
       'silver-usd',
       'stress-stlfsi',
       'vix',
@@ -72,11 +75,12 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
     expect(vix.level).toBe('L2');
     expect(vix.publicDisplayOk).toBe('yes');
     expect(PUBLIC_BOUNDED_HISTORY_IDS.has('vix')).toBe(true);
-    // A still-hidden L2 id (shiller-cape: ownerAccepts false) never
-    // appears publicly at all, so it is not in the bound set either.
+    // The 2026-10-23 unhide (D-42/OD-1): shiller-cape is also L2 but now
+    // owner-accepted and display-ok — it joins the bounded set too (its
+    // public history serves, bounded like every other L2 id).
     const cape = INDICATOR_AUDIT_BY_ID.get('shiller-cape')!;
     expect(cape.level).toBe('L2');
-    expect(cape.publicDisplayOk).toBe('no');
-    expect(PUBLIC_BOUNDED_HISTORY_IDS.has('shiller-cape')).toBe(false);
+    expect(cape.publicDisplayOk).toBe('yes');
+    expect(PUBLIC_BOUNDED_HISTORY_IDS.has('shiller-cape')).toBe(true);
   });
 });

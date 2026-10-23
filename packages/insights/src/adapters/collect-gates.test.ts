@@ -139,8 +139,9 @@ describe('T-30/T-31: disabled sources are never requested (M-6 kill switch)', ()
     }
   }, 30_000);
 
-  it('the new L2 rows (shiller, cnn, asx, westpac-mi, nab, aip) are disabled, so nothing could ever request them', () => {
-    for (const id of ['shiller', 'cnn-fng', 'asx-rate-tracker', 'westpac-mi', 'nab-survey', 'aip-petrol']) {
+  it('the still-unaccepted L2 rows (cnn, asx, westpac-mi, nab, aip) are disabled, so nothing could ever request them', () => {
+    // shiller left this set 2026-10-23 (D-42/OD-1 owner acceptance).
+    for (const id of ['cnn-fng', 'asx-rate-tracker', 'westpac-mi', 'nab-survey', 'aip-petrol']) {
       const row = SOURCE_RISK_REGISTER[id]!;
       expect(row.enabled, id).toBe(false);
       expect(row.ownerAccepts, id).toBe(false); // T-30

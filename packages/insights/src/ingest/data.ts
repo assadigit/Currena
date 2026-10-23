@@ -27,6 +27,7 @@ import type { RegressionEpisode } from '../validation';
 // them (wrangler/esbuild, tsx, vitest) and resolveJsonModule covers tsc.
 import calendarRaw from '../../../../data/insights-calendar.json';
 import chinaPmiRaw from '../../../../data/manual/china-pmi.json';
+import shillerRaw from '../../../../data/shiller/shiller-cape.json';
 import policyDecisionsRaw from '../../../../data/policy-decisions.json';
 import releaseScheduleRaw from '../../../../data/insights-release-schedule.json';
 import contextNotesRaw from '../../../../data/insights-context-notes.json';
@@ -44,6 +45,45 @@ export const CHINA_PMI: SeriesPoint[] | undefined = pmiParsed?.points;
 export const MANUAL_EXPIRES: Readonly<Record<string, string>> = pmiParsed
   ? { 'china-pmi': pmiParsed.expires }
   : {};
+
+/**
+ * The converted Shiller file (FS-06): monthly CAPE + Excess CAPE Yield rows
+ * from data/shiller/shiller-cape.json, refreshed out-of-band by
+ * scripts/shiller-fetch.ts (the Worker never fetches the source). Enabled
+ * 2026-10-23 by the owner's OD-1/D-42 approval — the register row governs
+ * (ingest/run.ts consults providerFetchEnabled('shiller') before passing
+ * these through, so a future register flip still fails closed here).
+ *
+ * Unit note: the converted file stores ECY as a FRACTION (0.0056); every
+ * percent-unit indicator in the registry stores percent-scaled values
+ * (us-cpi-yoy 3.0 = 3%), so the parse scales ECY ×100 — the card then shows
+ * the publisher's own "0.56%" verbatim (display.ts 'percent', 2dp).
+ */
+const ShillerFileSchema = z.object({
+  latestDate: z.string(),
+  rows: z.array(
+    z.object({
+      date: z.string(),
+      cape: z.number().nullable(),
+      ecy: z.number().nullable(),
+    }),
+  ),
+});
+const shillerParsed = ShillerFileSchema.safeParse(shillerRaw);
+export const SHILLER: { cape: SeriesPoint[]; ecy: SeriesPoint[] } | undefined = shillerParsed
+  .success
+  ? {
+      cape: shillerParsed.data.rows
+        .filter((r) => r.cape !== null)
+        .map((r) => ({ date: r.date, value: r.cape as number })),
+      ecy: shillerParsed.data.rows
+        .filter((r) => r.ecy !== null)
+        .map((r) => ({ date: r.date, value: (r.ecy as number) * 100 })),
+    }
+  : undefined;
+export const SHILLER_LATEST_DATE: string | undefined = shillerParsed.success
+  ? shillerParsed.data.latestDate
+  : undefined;
 
 /** Policy decision dates (decided vs effective) for the rate cards. */
 export const POLICY_DECISIONS: readonly PolicyDecision[] | undefined = parsePolicyDecisions(

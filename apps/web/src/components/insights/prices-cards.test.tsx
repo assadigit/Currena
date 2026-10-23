@@ -280,7 +280,10 @@ describe('DetailsPanel 2026-10-26c — the price sections in the side panel', ()
     // C — the 10-year record with its date and basis.
     expect(screen.getByText('Historical price records')).toBeTruthy();
     expect(screen.getByText('10-year high')).toBeTruthy();
-    expect(screen.getByText('Jan 29, 2026')).toBeTruthy();
+    // Date-conditioned (2026-10-23): as the real clock advances the fixture's
+    // record date can render in more than one section — the pin is that it
+    // renders at all (the same getAllByText pattern as 'as of' below).
+    expect(screen.getAllByText('Jan 29, 2026').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('(highest daily high)')).toBeTruthy();
 
     // D — reference levels.
@@ -322,7 +325,10 @@ describe('DetailsPanel 2026-10-26c — the price sections in the side panel', ()
     // The record row: value + Jalali date + basis, structured parts (the
     // date is formatAsOf's own Jalali rendering — asserted via the same
     // formatter, so the test pins the wiring, not the ICU build).
-    expect(screen.getByText(formatJalaliDate('2026-01-29', 'fa-IR'))).toBeTruthy();
+    // getAllByText: the date can legitimately render twice (2026-10-23).
+    expect(
+      screen.getAllByText(formatJalaliDate('2026-01-29', 'fa-IR')).length,
+    ).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('(بالاترین سقف روزانه)')).toBeTruthy();
   });
 

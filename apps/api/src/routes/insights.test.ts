@@ -807,16 +807,17 @@ describe('PUBLIC mode — the public projection serve path', () => {
     expect(await res.json()).toEqual(snap);
   });
 
-  it("a hidden indicator's history is refused before any KV read (LR-02)", async () => {
-    // shiller-cape stays owner-refused (ownerAccepts false, source
-    // kill-switched); vix is BACK in public mode since the 2026-10-21c
-    // licence round (citation-required FRED, display-permitted with the
-    // "Cboe via FRED" attribution — its public history is bounded to the
-    // chart window by the M-2 set).
+  it('the 2026-10-23 unhide (D-42/OD-1): the Shiller pair serves publicly, bounded like every L2 id (LR-02)', async () => {
+    // shiller-cape flipped owner-accepted + enabled (D-42/OD-1, RISK_REGISTER
+    // 2026-10-23) and left the generated hidden set (hiddenIndicatorIds is
+    // now empty); as an L2 publicDisplayOk id its public history serves and
+    // is bounded to the M-2 window. vix keeps the same pattern since the
+    // 2026-10-21c licence round.
+    const capeHistory: IndicatorHistory = { v: 1, id: 'shiller-cape', points: [[19723, 40.5], [19730, 40.71]] };
+    await store.putHistory(capeHistory);
     const res = await makeApp().request('/api/insights/shiller-cape/history', undefined, env);
-    expect(res.status).toBe(404);
-    const body = (await res.json()) as { error: { code: string } };
-    expect(body.error.code).toBe('hidden_site_mode');
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual(capeHistory);
   });
 
   it("a public-ok indicator's history still serves", async () => {

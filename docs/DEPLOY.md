@@ -83,6 +83,63 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Session record — 2026-10-23 the Phase-2 open: the unhide round (Shiller + china-pmi), the rung CPU fix, and the sourcemap recovery
+
+- **Deployed**: currena-api **`34a8e385`** (the unhide wiring + registry +
+  licences), then **`25f613f2`** (the baseReadingCache CPU fix + phase
+  timings + the temporary hourly :05 diagnostic rungs), then **`32c47cad`**
+  (the diagnostic rungs reverted to the designed 10:10/20:10 pair — the
+  final M1 shape). currena-markets untouched. The SPA rebuilt from the
+  changed tree (the About-sources panel now shows shiller on).
+- **The outage the round opened with (root-caused live)**: both the 04:10
+  main rung and the 10:10 sweep had been dying SILENTLY since the
+  2026-10-22 reliability deploy — the page was serving the 15:05 manual
+  heal. Temporary hourly diagnostic rungs + `wrangler tail` captured three
+  identical deaths at exactly **cpuTime 2050 ms** (the free plan's ~2 s
+  budget): the rung's snapshot build ran TWICE (validation draft + final
+  with flags) and the deterministic percentile work over 10-year windows
+  blew the budget during collect. Fix: `baseReadingCache` in
+  `adapters/snapshot.ts` — the deterministic per-reading base is memoized
+  across the two builds (they differ only in `flags`, applied after the
+  cache point); clone-on-hit keeps the builds private. The fixed **16:05
+  UTC rung completed healthy at cpu 1831 ms** (snapshot + stage + public
+  projection all written, 62 series staged). Known thin margin: the main
+  04:10 shape carries ~7 more writes than the sweep (~140–220 ms); the
+  10:10 sweep is the proven self-heal, the rung-split is the recorded
+  follow-up if the main shape ever dies at the write tail.
+- **Live verification (browser, both locales)**: `china-pmi` 50.1 Normal
+  with the honest manual-entry attribution (growth gauge 6 members, global
+  voting pool 22→23); `shiller-cape` 40.71 / `shiller-ecy` 0.56% with the
+  publisher's attribution card; the market-stress lane's "Show all hidden
+  indicators" expansion gone (nothing left to hide); FA renders the same
+  cards with fa-IR digits. Public readings 65/65, `hiddenIndicatorIds`
+  empty.
+- **The sourcemap recovery (honest record)**: the M0+M1 working tree was
+  lost to a sandbox reset before its commit. The deployed Worker's own
+  source map (fetched via the Cloudflare API script-content endpoint)
+  yielded the seven changed files byte-exact (`sources.ts`, `data.ts`,
+  `run.ts`, `adapters/snapshot.ts`, `insights-ingest-cron.ts`,
+  `site-mode-overrides.json`, `indicator-audit.json`); the
+  generate-time-only `licences.ts` display flips, the register/licence doc
+  twins, and the test pins were re-derived against the recovered audit —
+  `registry:generate` output then matched the deployed audit on all 65
+  entries (0 diffs). Two pre-existing test bugs fixed while re-running the
+  gates: the sweep integration fixture was a date bomb (fixed
+  generatedAt → real-clock-relative) and two prices-cards pins were
+  date-conditioned `getByText` collisions (→ `getAllByText ≥ 1`, the
+  file's own pattern).
+- **Gates at close**: typecheck 6/6; core 191, scraper 67, insights 557,
+  markets 13, api 344, web 680 passed + the recorded 16-failure briefing
+  jsdom baseline (unchanged, untouched files); budgets held (entry chunk
+  untouched, Insights lazy 603.9/142.6 vs 604/142.8). EODHD quota
+  untouched (0 requests). The diagnostic rungs' three captured CPU deaths
+  are in the observability query log (query
+  `grep "exceededCpu"`, 2026-10-23 13:00–16:10 UTC window).
+- **Open item carried**: `shillerdata.com` unreachable from the work venue
+  — the committed converted file (latestDate 2026-10-01) must be refreshed
+  from a reaching venue via `packages/insights/scripts/shiller-fetch.ts`
+  before the 45-day freshness window closes (~2026-11-15).
+
 ## Session record — 2026-10-22 the data-source reliability round: TGJU verdict, FRED fallbacks (Treasury + EIA), and the self-healing sweeps
 
 - **Deployed**: currena-api **`b37cf0d9-be61-425e-9b60-87c161662960`** (apps/api +

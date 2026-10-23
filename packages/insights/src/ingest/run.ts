@@ -36,7 +36,7 @@
  */
 
 import { z } from 'zod';
-import type { InsightsSnapshot, InsightsSourceReport, IndicatorId } from '@currena/core';
+import type { InsightsSnapshot, InsightsSourceReport, IndicatorId, IndicatorReading } from '@currena/core';
 import { DEFINITIONS } from '../definitions';
 import {
   buildHistoryFile,
@@ -60,7 +60,10 @@ import {
   POLICY_DECISIONS,
   REGRESSION_EPISODES,
   RELEASE_SCHEDULE,
+  SHILLER,
+  SHILLER_LATEST_DATE,
 } from './data';
+import { providerFetchEnabled } from '../sources';
 import type { KVLike } from './kv-store';
 import { epochDay, fromEpochDay, type SeriesPoint } from '../series';
 
@@ -195,6 +198,7 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
   console.log(`# Insights ingestion run — ${nowIso}`);
   console.log(`mode=${opts.mode}${dryRun ? ' DRY-RUN (no KV writes)' : ''}\n`);
 
+  const tStart = performance.now();
   const { inputs, reports, readingSourceOverrides } = await collectAllSources({
     ...(opts.skipRbaCsvTables !== undefined ? { skipRbaCsvTables: opts.skipRbaCsvTables } : {}),
     // The fallback fills merge with the STORED histories so the 10-year
@@ -206,6 +210,7 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
         .then((h) => (h ? historyToSeries(h) : undefined))
         .catch(() => undefined),
   });
+  const tCollect = performance.now();
 
   // v3 fail-closed inputs: kill-switched ids + per-provider blocked outcomes.
   const disabledReadings: string[] = auditDisabledIds();
@@ -233,10 +238,18 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
       : `[ingest] china-pmi: ${chinaPmi.length} observations (expires ${manualExpires['china-pmi'] ?? '?'})`,
   );
 
-  // The Shiller legs stay kill-switched off (T-30): the register row governs
-  // (the Worker venue does not read the bulk file until the owner flips it
-  // and a redeploy carries the import — the GHA runner still reads its copy).
-  const shiller = undefined;
+  // The Shiller legs — the T-30 flip landed 2026-10-23 (the owner's
+  // OD-1/D-42 approval; licences.ts + sources.ts carry the record). The
+  // register row still governs here: a disabled row passes undefined and
+  // the cards read unavailable, so a future un-flip fails closed.
+  const shiller = providerFetchEnabled('shiller') ? SHILLER : undefined;
+  if (shiller) {
+    console.log(
+      `[ingest] shiller: cape ${shiller.cape.length} · ecy ${shiller.ecy.length} rows (latest ${SHILLER_LATEST_DATE ?? '?'})`,
+    );
+  } else {
+    console.log('[ingest] shiller: register row disabled — reads unavailable');
+  }
 
   // SEED histories: re-read the stored accumulation before deriving so each
   // run's live spot joins the previously accumulated daily points.
@@ -266,6 +279,7 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     seedHistory,
     shiller,
   });
+  const tDerive = performance.now();
 
   // Peaks + "highest since {year}" (the long-history yields need the full
   // fetched series — a 10-year window cannot say 2002).
@@ -284,6 +298,12 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
   }
 
   // The draft → validation → published sequence (Part D + A-03/A-04).
+  // 2026-10-23 CPU round: BOTH builds share the deterministic per-reading
+  // base via the cache — the final build replays instead of recomputing
+  // (the double percentile pass was what pushed the 04:10 rung past the
+  // free plan's CPU budget; the runs died between peaks and the first
+  // write, leaving status frozen at the last good run).
+  const baseReadingCache = new Map<string, IndicatorReading>();
   const draft = buildInsightsSnapshot({
     series,
     previous,
@@ -301,7 +321,9 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
       ? { sourceOverrides: readingSourceOverrides }
       : {}),
     now: nowIso,
+    baseReadingCache,
   });
+  const tDraft = performance.now();
 
   const outcome = runValidationSuite({
     series,
@@ -313,6 +335,7 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     ...(opts.copyTexts !== undefined && opts.copyTexts.length > 0 ? { copyTexts: opts.copyTexts } : {}),
     ...(REGRESSION_EPISODES !== undefined ? { episodes: REGRESSION_EPISODES } : {}),
   });
+  const tValidation = performance.now();
 
   const snapshot = buildInsightsSnapshot({
     series,
@@ -332,7 +355,16 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
       ? { sourceOverrides: readingSourceOverrides }
       : {}),
     now: nowIso,
+    baseReadingCache,
   });
+  const tFinal = performance.now();
+  // 2026-10-23 CPU round: the phase budget, one line per run — the number
+  // the free-plan CPU limit makes existential (wall ≈ CPU for the pure
+  // phases; collect's wall is network-dominated but its parse CPU rides
+  // inside it).
+  console.log(
+    `[ingest] phases — collect ${((tCollect - tStart) / 1000).toFixed(2)}s wall · derive+peaks ${((tDerive - tCollect) / 1000).toFixed(2)}s · draft ${((tDraft - tDerive) / 1000).toFixed(2)}s · validation ${((tValidation - tDraft) / 1000).toFixed(2)}s · final ${((tFinal - tValidation) / 1000).toFixed(2)}s`,
+  );
   const status = buildInsightsStatus({ reports, generatedAt: nowIso, mode: opts.mode, dryRun, validation: outcome.results });
 
   console.log('\n## Validation suite (Part D — runs before every publish)');

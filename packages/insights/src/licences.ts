@@ -152,10 +152,15 @@ const MANUAL: SourceLicence = {
   attributionText: 'Source: National Bureau of Statistics of China',
   attributionRequired: true,
   privateOk: true,
-  publicDisplayOk: 'no',
-  termsCheckedOn: TERMS_CHECKED_ON,
+  // 2026-10-23 unhide round (D-42/OD-2): the NBS English terms/notice pages
+  // were read (stats.gov.cn/english/) — quotation with attribution is not
+  // prohibited; china-pmi serves publicly as a manual-entry card with the
+  // publisher attribution and the enteredOn/expiry bookkeeping (E-08/T-33).
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-23',
   termsEvidence:
-    'Manual entries carry no provider feed; defect E-08 requires entered_on/expiry bookkeeping. Public display blocked until each publisher\u2019s reuse terms are read and recorded.',
+    'Manual entries carry no provider feed; defect E-08 requires entered_on/expiry bookkeeping. NBS English pages read 2026-10-23 (the M1 unhide round): no reuse prohibition found for attributed quotation — china-pmi display-permitted (D-42/OD-2) while fresh.',
+  termsUrl: 'https://www.stats.gov.cn/english/',
 };
 
 const EODHD: SourceLicence = {
@@ -204,14 +209,16 @@ const SHILLER: SourceLicence = {
   provider: 'shiller',
   label: 'Robert Shiller (Yale) dataset',
   licenceName: 'Open academic data — attribution; no formal reuse terms',
-  attributionText: 'Source: Robert Shiller, Irrational Exuberance data (econ.yale.edu/~shiller)',
+  attributionText: 'Data: Robert Shiller, Yale',
   attributionRequired: true,
   privateOk: true,
-  publicDisplayOk: 'no',
-  termsCheckedOn: TERMS_CHECKED_ON,
+  // 2026-10-23 unhide round (D-42/OD-1): the owner accepted the L2 risk;
+  // the pair serves publicly with the attribution card, values verbatim.
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-23',
   termsEvidence:
-    'Step 3 §2.3: open academic data, no formal commercial terms found — private mode only, archive every download (L1-14).',
-  termsUrl: 'http://www.econ.yale.edu/~shiller/data.htm',
+    'Open academic data (Yale page, read 2026-10-16; shillerdata.com read 2026-10-23): attribution expected, no formal reuse terms found. Owner accepted 2026-10-23 (D-42/OD-1) — displayed with the attribution card, every download archived (FS-06), values shown verbatim (never recomputed).',
+  termsUrl: 'https://shillerdata.com/',
 };
 
 const DERIVED: SourceLicence = {

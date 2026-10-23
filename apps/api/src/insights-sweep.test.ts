@@ -120,8 +120,13 @@ describe('runScheduledInsightsSweep', () => {
   });
 
   it('a healthy status skips the sweep with exactly ONE KV read (no ingest run)', async () => {
+    // Date-bomb fix (2026-10-23): the fixture used a FIXED generatedAt
+    // (2026-10-22T09:10) while sweepShouldFire compares against the REAL
+    // clock — the status went stale ~02:20 UTC on 2026-10-23 and the test
+    // flipped to 'ran'. The fixture is now relative to the real clock
+    // (always 1h fresh) so the pin holds every day.
     const healthy = {
-      generatedAt: new Date(NOW.getTime() - 3_600_000).toISOString(),
+      generatedAt: new Date(Date.now() - 3_600_000).toISOString(),
       sources: [{ source: 'fred', ok: true, kind: 'fetched' }],
     };
     let reads = 0;
