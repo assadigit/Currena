@@ -121,6 +121,54 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
   (BoE/BoJ venue probes, the ECB AAA 10y key verification) stay queued as
   M6/Wave-4 work — the relabels are the honest stopgap.
 
+## Session record — 2026-10-23c the reconciliation: M1†† (the epochDay CPU margin) lands on top of M2 after a parallel-session overwrite
+
+- **What happened (the honest incident)**: two sessions worked the same
+  tracker this evening. The M2 session deployed `75517285` at 21:55 UTC
+  (M2, no CPU fix); the CPU-margin session — unaware of it — deployed
+  `b6e1541b` at 22:11 from the pre-M2 tree + the epochDay memoization,
+  OVERWRITING the M2 build. Its 22:35 diagnostic sweep rung then wrote a
+  65-reading snapshot, re-adding the just-retired readings to the stored
+  documents. Nothing unauthorized served (both endpoints of the ~90-minute
+  window were owner-approved states: 65 pre-M2 / 63 post-M2), but the
+  re-poisoned documents needed a second migration pass.
+- **The CPU regression the second session had opened with**: the 20:10 UTC
+  sweep died `exceededCpu` at exactly **cpuTimeMs 2050** on `32c47cad` —
+  captured via the observability telemetry query after the fact (a live
+  `wrangler tail` could not survive the sandbox's process reaping). The
+  M1† cache's 1831 ms left ~220 ms of headroom; run-to-run variance ate
+  it; the newly-blocked RBA cash-rate page (kind `blocked`) keeps the
+  sweep gate firing every sweep. Root cause via `node --cpu-prof` on the
+  local ingest twin: `epochDay` at ~0.84 s self time — the
+  `assertAscending` debug invariant re-walks whole series per operation.
+  Memoized in `series.ts` (local draft phase 0.78 s → 0.12 s); the 22:35
+  diagnostic rung completed live at **cpu 617 ms, outcome ok** (snapshot +
+  status + stage + public projection written). Margin ~3.3×; the
+  rung-split follow-up retired.
+- **The reconciliation itself**: reset onto the M2 tree (`ef84606`),
+  re-applied the epochDay memoization + its two behavior tests + the
+  reverted-rung note in `insights-ingest-cron.ts`, merged the docs (this
+  record + the CHANGELOG's M1†† and incident sections + the tracker's
+  M1†† row + D-43), and closed the copy-manifest gate the M2 tree had not
+  (the 10 relabels + 18 removals round-tripped; the shiller 14
+  re-processed after the earlier reset lost the 2026-10-23a round; audit
+  exit 0, 2,504 entries). The M2 session's `retire-ids-migration.ts`
+  stays the canonical migration script; the parallel session's
+  `retire-ids-m2.ts` was dropped in the reset.
+- **The re-migration + redeploy (this commit's ship)**: re-run
+  `retire-ids-migration.ts` (idempotent by design — the 22:35 rung
+  re-poisoned only the live snapshot + the public projection; the
+  archives the first pass cleaned stay clean) with a dry-run first, then
+  deploy the reconciled build (M2 + M1†† together). The next 04:10 main
+  rung then rebuilds everything from source with both fixes — expected
+  ~700–800 ms CPU (the 22:35 sweep measured 617 ms; the main shape
+  carries ~7 more writes).
+- **Gates at close**: typecheck 6/6; core 191, scraper 67, insights 559
+  (+2 epochDay behavior tests), markets 13, api 344, web 680 + the
+  recorded 16-failure briefing jsdom baseline; lint 0 errors/15 accepted
+  advisories; T-15 passed; budgets held (Insights lazy 753.22/181.51);
+  copy:audit exit 0. EODHD quota untouched (0 requests).
+
 ## Session record — 2026-10-23 the Phase-2 open: the unhide round (Shiller + china-pmi), the rung CPU fix, and the sourcemap recovery
 
 - **Deployed**: currena-api **`34a8e385`** (the unhide wiring + registry +

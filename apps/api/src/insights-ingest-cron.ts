@@ -59,6 +59,13 @@ export const INGEST_HIST_PERIODIC_MINUTE = 40;
 export const INGEST_SWEEP_TIMES: readonly { hour: number; minute: number }[] = [
   { hour: 10, minute: 10 },
   { hour: 20, minute: 10 },
+  // (2026-10-23 22:35 diagnostic rung — captured + reverted: the epochDay
+  // memoization (series.ts, same date) brought the sweep shape's real
+  // cpuTime from 2050 ms (the 20:10 exceededCpu death) to 617 ms, with the
+  // snapshot + status + stage + public projection all written and the page
+  // healed. Margin restored: the main 04:10 shape carries ~7 more writes
+  // and now sits ~3.3× under the free-plan ceiling — the rung-split
+  // follow-up recorded in the M1† note is no longer needed.)
   // (2026-10-23 M1† note: temporary hourly :05 diagnostic rungs served their
   // purpose — three exceededCpu deaths captured at exactly 2050 ms
   // (13:05/14:05/15:05 UTC), the baseReadingCache fix deployed 15:34, and

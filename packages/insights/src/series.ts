@@ -12,11 +12,33 @@ export interface SeriesPoint {
 
 const MS_PER_DAY = 86_400_000;
 
+/**
+ * 2026-10-23 CPU round (the 20:10 UTC sweep died `exceededCpu` at exactly
+ * 2050 ms — the M1† cache left only ~220 ms of headroom and run-to-run
+ * variance ate it): epochDay was the top self-time function of the whole
+ * ingest (~0.84 s + GC pressure, profiled locally). Root cause: the debug
+ * invariant `assertAscending` re-walks an entire series (one epochDay per
+ * point) on EVERY pointAtOrBefore / sliceBetween / combineSeries /
+ * yoyPctSeries call, so a 2,600-point daily series pays thousands of full
+ * O(n) Date.parse+string-concat passes per run. The date domain is tiny —
+ * ISO calendar days, a few thousand distinct strings across the 10-year
+ * window — so a memo turns every walk after the first into Map lookups.
+ * Values are bit-identical to Date.parse's; invalid dates still throw on
+ * every call (nothing caches on the throw path); growth is bounded by the
+ * rolling calendar (~2 k entries/year, trivially small for a long-lived
+ * isolate).
+ */
+const epochDayCache = new Map<string, number>();
+
 /** Epoch-day index of an ISO calendar date — the only date math we need. */
 export function epochDay(date: string): number {
+  const cached = epochDayCache.get(date);
+  if (cached !== undefined) return cached;
   const t = Date.parse(`${date}T00:00:00Z`);
   if (Number.isNaN(t)) throw new Error(`Not an ISO calendar date: ${date}`);
-  return Math.round(t / MS_PER_DAY);
+  const day = Math.round(t / MS_PER_DAY);
+  epochDayCache.set(date, day);
+  return day;
 }
 
 /** Inverse of {@link epochDay}. */

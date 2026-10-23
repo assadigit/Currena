@@ -121,18 +121,71 @@ change verified live in both locales.
   shown as current was actively misleading; the daily-source probes
   remain the recorded follow-up (Wave 4 / M6).
 
+### M1†† — the rung CPU margin restored (the second unplanned round, same date)
+
+The 20:10 UTC sweep died `exceededCpu` at exactly **cpuTimeMs 2050** on
+`32c47cad` (the M1† cache-fix build) — captured after the fact via the
+Workers observability telemetry query (`view: events` carries
+`$workers.outcome`/`cpuTimeMs`); a live `wrangler tail` could not survive
+the sandbox's process reaping that session. The M1†'s 16:05 success at
+1831 ms had left only ~220 ms of headroom and run-to-run CPU variance ate
+it; with the RBA cash-rate page newly Akamai-403 from Cloudflare egress
+(kind `blocked`), the sweep gate fires on every sweep — the page had been
+stale since 16:05 and the heavier 04:10 main shape would have kept dying.
+
+- **Root cause (profiled locally with `node --cpu-prof` on the ingest
+  twin)**: `epochDay` was the top self-time function of the whole ingest
+  (~0.84 s + GC pressure) — the debug invariant `assertAscending` re-walks
+  an entire series (one `Date.parse`+string-concat per point) on EVERY
+  `pointAtOrBefore` / `sliceBetween` / `combineSeries` / `yoyPctSeries`
+  call, thousands of full O(n) passes over 2,600-point daily series.
+- **Fix**: `epochDay` is memoized in `packages/insights/src/series.ts`
+  (module-level `Map<string, number>`; the date domain is a few thousand
+  distinct ISO strings; values bit-identical to `Date.parse`'s; invalid
+  dates still throw every call — nothing caches on the throw path).
+  Local phases: draft 0.78 s → 0.12 s, validation 0.13 s → 0.03 s.
+- **Verified live**: a temporary 22:35 UTC diagnostic sweep rung (the M1
+  pattern — added, captured, reverted with an honest note in
+  `insights-ingest-cron.ts`) completed **`outcome: ok` at cpu 617 ms**
+  with the snapshot + status + stage + public projection all written.
+  Margin restored to ~3.3× under the free-plan ceiling even for the
+  heavier main 04:10 shape; the M1† rung-split follow-up is retired as
+  unnecessary.
+
+### The parallel-session incident (recorded honestly)
+
+Two sessions were working the same tracker simultaneously this evening.
+The M2 session deployed `75517285` (M2, no CPU fix) at 21:55 UTC; the
+CPU-margin session — unaware — deployed `b6e1541b` at 22:11 UTC from the
+pre-M2 tree plus the epochDay fix, which **overwrote the M2 build** and
+briefly re-serving the two retired cards (its 22:35 diagnostic rung wrote
+a 65-reading snapshot, re-adding the retired readings to the stored
+documents the M2 migration had just cleaned). The reconciliation (this
+commit) resets onto the M2 tree, re-applies the epochDay memoization on
+top, re-runs the KV surgery for the two documents the 22:35 rung
+re-poisoned (the live snapshot + the public projection), and redeploys —
+M2 and M1†† land together. The observable window of the overwrite was
+~90 minutes (21:55 → the reconciled deploy); the owner's OD-7 approval
+made both endpoints of the window approved states, so no unauthorized
+content ever served. The tracker's session log records both sessions.
+
 ### Gates + verification
 
-Typecheck 6/6; core 191, scraper 67, insights 557, markets 13, api 344,
-web 680 passed + the recorded 16-failure briefing jsdom baseline; T-15
-public passed (0 hidden); budgets held (entry 295.28/88.81 vs 296/89.5;
-Insights lazy 753.26/181.51 vs 765/186 — the retirement shrank the
-chunk). Deployed as currena-api **`75517285`** after the KV surgery;
-live-verified on currena.ir EN + fa: the hero reads "5 of 22", the M2
-card shows Context with its value and history, both retired ids answer
-400 on their history routes, the 10-22/10-16 archives serve, and the
-Bund details panel carries the relabel in both languages. EODHD quota
-untouched (0 requests).
+Typecheck 6/6; core 191, scraper 67, insights 559 (the two new epochDay
+behavior tests on top), markets 13, api 344, web 680 passed + the
+recorded 16-failure briefing jsdom baseline; lint 0 errors/15 accepted
+advisories; T-15 public passed (0 hidden); budgets held (entry
+295.28/88.81 vs 296/89.5; Insights lazy 753.22/181.51 vs 765/186 — the
+retirement shrank the chunk). The M2 build was deployed as currena-api
+**`75517285`** after its KV surgery and live-verified on currena.ir
+EN + fa (hero "5 of 22", the M2 card Context with value + history, both
+retired ids 400 on their history routes, the archives serving, the Bund
+details panel carrying the relabel in both languages); the reconciled
+build (M2 + M1††) deploys after the re-run migration. The copy manifest
+— a gate the M2 tree had not closed — is processed in this round (the
+relabels + retirements round-tripped through
+`update-persian-copy-manifest.mjs`; audit exit 0, 2,504 entries).
+EODHD quota untouched (0 requests).
 
 ## [2026-10-21c] — the currencies section returns, the licence-hidden cards are restored on verified terms, and the balance/panel round (owner restoration)
 

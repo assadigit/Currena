@@ -15,6 +15,7 @@ D-41).
 | **M0** | Owner decisions recorded | D-42 in `DECISIONS_FOR_ALI.md` + this tracker | **done 2026-10-23** (docs only) |
 | **M1** | The unhide round (OD-1/OD-2) | Shiller pair (`shiller-cape`, `shiller-ecy`) + `china-pmi` public: register/licence flips (owner-accepted, display-ok), ingest wiring (the committed converted file; ECY ×100 to percent), NBS attribution honesty, all test pins moved to the new reality | **done 2026-10-23** — deployed + live-verified (`currena.ir`, voting pool 22→23) |
 | **M1†** | The rung CPU fix (carried by M1) | `baseReadingCache` in `adapters/snapshot.ts` — the draft+final double build collapses to one deterministic pass (the 04:10/10:10/20:10 rungs were dying `exceededCpu` at exactly 2050 ms; the fixed rung completed at 1831 ms), phase timings surfaced to the tail | **done 2026-10-23** — the 16:05 UTC rung healthy, captured via `wrangler tail` |
+| **M1††** | The CPU margin restored (unplanned, landed via the 2026-10-23c reconciliation) | The 20:10 sweep died `exceededCpu` at 2050 ms on the M1† build (~220 ms headroom, variance ate it). `epochDay` memoized in `series.ts` (the profiled top self-time — `assertAscending`'s O(n) re-walks); verified live via a temporary 22:35 diagnostic rung: **cpu 617 ms, outcome ok**. Margin ~3.3× — the rung-split follow-up retired | **done 2026-10-23** — the 22:35 rung healthy (observability-captured); a parallel session's deploy briefly overwrote M2 (the honest incident, D-43) — the reconciliation landed M2 + M1†† together |
 | **M2** | The subtraction set (OD-7) | Retire `nzd-usd` + `silver-btc` (the eth-usd KV-migration pattern — id retirement is a schema migration across the stored snapshot/status/archives), demote `m2-us` scored→context, relabel the five OECD mirrors (`bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate`) to "monthly average, lagged" in both locales | **done 2026-10-23** — `75517285` deployed after the KV surgery (16 writes + 2 deletes); 65→63 indicators, voting 23→22, live-verified EN+fa |
 | **M3** | The credit-spread licence row (OD-5) | The ICE BofA indices via FRED enter the register (the VIXCLS/NFCI citation-required posture) — display permission + attribution rows; enables the Wave-1 spread cards | **pending** |
 | **M4** | Wave 1 — the early-warning pack (OD-8) | `initial-jobless-claims` · `hy-oas` · `sofr` · `recession-probability` · `us-pce-core-yoy` · `michigan-sentiment` + the Tier-0 displays `us-2y`, `breakeven-10y` — one FRED bulk-group edit + one register row; all series live-verified in the review (§10) | **pending** |
@@ -38,12 +39,30 @@ D-41).
   DEPLOY records, and this tracker updated.
 - **The rung CPU budget** (~2 s on the free plan) is a live constraint: every
   milestone that adds collectors or readings re-checks the phase timings via
-  the tail before closing (M1†'s 1831 ms leaves ~220 ms headroom; the main
-  04:10 shape carries ~7 more writes than the sweep shape — if it ever dies
-  at the write tail, the 10:10 sweep heals the page and the rung-split is
-  the recorded follow-up).
+  the tail before closing. M1††'s epochDay memoization brought the sweep
+  shape to **617 ms** (2026-10-23, observability-captured) — ~3.3× headroom
+  even for the heavier main 04:10 shape; the rung-split follow-up is
+  retired. Re-check after Wave-scale additions (M4+) and re-profile with
+  `node --cpu-prof` on the local ingest twin if the tail ever shows >1.5 s.
 
 ## Session log (newest first)
+
+- **2026-10-23c (the reconciliation session):** two parallel sessions had
+  worked the tracker simultaneously — the M2 session shipped `75517285`
+  (21:55 UTC), then the CPU-margin session — unaware — deployed `b6e1541b`
+  (22:11) from the pre-M2 tree + the epochDay memoization, overwriting M2
+  for ~90 minutes (both window endpoints were owner-approved states; the
+  22:35 diagnostic rung re-poisoned the snapshot + public projection the
+  M2 migration had cleaned). The reconciliation reset onto `ef84606`,
+  re-applied the CPU fix (+2 behavior tests, the reverted-rung note),
+  closed the copy-manifest gate the M2 tree had not (audit exit 0, 2,504
+  entries — 28 processed, 18 removals deleted, the shiller 14
+  re-processed), re-ran the idempotent KV surgery, and redeployed M2 +
+  M1†† together. The CPU story: the 20:10 sweep's exceededCpu death at
+  exactly 2050 ms (observability-captured), root-caused to `epochDay`
+  (~0.84 s profiled self time via `node --cpu-prof` — the assertAscending
+  invariant's O(n) re-walks), fixed by memoization, verified live at
+  **cpu 617 ms** by the 22:35 diagnostic rung.
 
 - **2026-10-23 (the M2 session, same day as M1):** the subtraction set
   closed. The two retirements followed the eth-usd pattern end-to-end —

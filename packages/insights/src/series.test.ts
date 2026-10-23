@@ -1,6 +1,28 @@
 import { describe, expect, it } from 'vitest';
 
-import { addDays, combineSeries, yoyPctSeries, type SeriesPoint } from './series';
+import { addDays, combineSeries, epochDay, fromEpochDay, yoyPctSeries, type SeriesPoint } from './series';
+
+describe('epochDay (memoized since the 2026-10-23 CPU round)', () => {
+  it('is stable and Date.parse-identical across repeated calls', () => {
+    const samples = ['1970-01-01', '2000-02-29', '2024-12-31', '2026-10-23', '1999-01-01'];
+    for (const d of samples) {
+      const first = epochDay(d);
+      // Repeated calls (the memo path) must be bit-identical to the first.
+      for (let i = 0; i < 5; i++) expect(epochDay(d)).toBe(first);
+      // And identical to a direct Date.parse of the same calendar date.
+      expect(first).toBe(Math.round(Date.parse(`${d}T00:00:00Z`) / 86_400_000));
+    }
+    // Epoch boundary: day 0 is not treated as a cache miss.
+    expect(epochDay('1970-01-01')).toBe(0);
+    expect(fromEpochDay(epochDay('1970-01-01'))).toBe('1970-01-01');
+  });
+
+  it('still throws on invalid dates — every time (nothing caches on the throw path)', () => {
+    for (let i = 0; i < 3; i++) {
+      expect(() => epochDay('not-a-date')).toThrow(/Not an ISO calendar date/);
+    }
+  });
+});
 
 describe('combineSeries (inner join on common dates)', () => {
   const a: SeriesPoint[] = [
