@@ -154,18 +154,8 @@ export function mergeLivePricesIntoSnapshot(
       }));
     }
   }
-  if (liveSilver !== undefined && liveBtc !== undefined) {
-    const reading = byId.get('silver-btc');
-    if (reading !== undefined) {
-      out.set('silver-btc', patchReading(reading, {
-        value: round6(liveSilver.value / liveBtc.value),
-        asOf: laterDate(liveSilver.asOf, liveBtc.asOf),
-        sourceName: LIVE_RATIO_SOURCE.silverBtc.name,
-        sourceUrl: LIVE_RATIO_SOURCE.silverBtc.url,
-        updatedAt: generatedAt,
-      }));
-    }
-  }
+  // silver-btc's live merge retired with the card (2026-10-23, OD-7, D-42);
+  // liveSilver still feeds the gold-silver ratio below.
 
   // 3. The gold tile's A$ companion — live gold over the snapshot's daily
   //    ECB audusd (gold-aud = gold-usd ÷ audusd; derived.ts uses the

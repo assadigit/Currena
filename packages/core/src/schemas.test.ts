@@ -325,9 +325,9 @@ import {
 } from './schemas';
 
 describe('Insights: IndicatorIdSchema (contract shape is deliberate)', () => {
-  it('pins the exact indicator set — 65 ids (the 2026-10-21c owner round retires eth-usd; the 2026-10-21 coverage cards stay: wti, natgas, platinum, bund/jgb/gilt-10y, boj/boe-rate, nzd-usd, us-gdp-growth, us-nfp), blocked/licensed items absent', () => {
+  it('pins the exact indicator set — 63 ids (the 2026-10-21c owner round retires eth-usd; the 2026-10-23 OD-7 round retires nzd-usd + silver-btc; the 2026-10-21 coverage cards stay: wti, natgas, platinum, bund/jgb/gilt-10y, boj/boe-rate, us-gdp-growth, us-nfp), blocked/licensed items absent', () => {
     const ids = IndicatorIdSchema.options;
-    expect(ids).toHaveLength(65);
+    expect(ids).toHaveLength(63);
     // Step-2 add-list §B5: VIX is IN (FRED VIXCLS, licence noted); the rest
     // of the v1 blocked list stays blocked.
     for (const blocked of ['spx-gold', 'breadth', 'cape']) {
@@ -335,7 +335,9 @@ describe('Insights: IndicatorIdSchema (contract shape is deliberate)', () => {
     }
     expect(ids).not.toContain('dollar-broad'); // replaced by the Currena dollar basket (I15)
     expect(ids).not.toContain('eth-usd'); // retired 2026-10-21c (not a market-stress indicator)
-    for (const expected of ['yield-curve-10y2y', 'stress-stlfsi', 'nfci', 'fed-target', 'ecb-dfr', 'us-cpi-yoy', 'us-cpi-core-yoy', 'dollar-basket', 'au-home-loan', 'au-wage-growth', 'au-rent-yoy', 'au-petrol-yoy', 'btc-usd', 'copper-usd', 'eur-usd', 'gold-usd', 'silver-usd', 'gold-silver', 'china-pmi', 'rba-cash-rate', 'au-us-10y-gap', 'terms-of-trade', 'au-household-debt-arrears', 'au-10y', 'us-unemployment', 'sahm-rule', 'vix', 'au-deposit-rate', 'shiller-cape', 'shiller-ecy', 'wti', 'natgas', 'platinum', 'bund-10y', 'jgb-10y', 'gilt-10y', 'boj-rate', 'boe-rate', 'nzd-usd', 'us-gdp-growth', 'us-nfp']) {
+    expect(ids).not.toContain('nzd-usd'); // retired 2026-10-23 OD-7 (an audience that doesn't exist)
+    expect(ids).not.toContain('silver-btc'); // retired 2026-10-23 OD-7 (the weaker twin of gold-btc)
+    for (const expected of ['yield-curve-10y2y', 'stress-stlfsi', 'nfci', 'fed-target', 'ecb-dfr', 'us-cpi-yoy', 'us-cpi-core-yoy', 'dollar-basket', 'au-home-loan', 'au-wage-growth', 'au-rent-yoy', 'au-petrol-yoy', 'btc-usd', 'copper-usd', 'eur-usd', 'gold-usd', 'silver-usd', 'gold-silver', 'china-pmi', 'rba-cash-rate', 'au-us-10y-gap', 'terms-of-trade', 'au-household-debt-arrears', 'au-10y', 'us-unemployment', 'sahm-rule', 'vix', 'au-deposit-rate', 'shiller-cape', 'shiller-ecy', 'wti', 'natgas', 'platinum', 'bund-10y', 'jgb-10y', 'gilt-10y', 'boj-rate', 'boe-rate', 'us-gdp-growth', 'us-nfp']) {
       expect(ids).toContain(expected);
     }
   });

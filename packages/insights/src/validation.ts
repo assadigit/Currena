@@ -211,9 +211,9 @@ function t02DerivedValues(inputs: ValidationInputs): ValidationTestResult {
   };
 
   // Daily ratios over the same snapshot (tolerance = stored rounding).
+  // silver-btc's ratio check retired with the card (2026-10-23, OD-7).
   ratio('gold-silver', 'gold-usd', 'silver-usd', (g, s) => g / s, 0.15);
   ratio('gold-btc', 'gold-usd', 'btc-usd', (g, b) => g / b, 0.0005);
-  ratio('silver-btc', 'silver-usd', 'btc-usd', (s, b) => s / b, 0.00005);
   // Gold in AUD: gold ÷ the AUD/USD rate (audusd = USD per AUD).
   ratio('gold-aud', 'gold-usd', 'audusd', (g, aud) => g / aud, 0.75);
   // The AU−US gap: same-date subtraction.

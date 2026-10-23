@@ -19,9 +19,10 @@
  *    the runner's accumulated daily snapshots (seedHistory) ∪ today's live
  *    spot — union by date, live wins, so 7/30-day changes are measurable
  *    while the percentile base keeps its decade of monthly history;
- *  - live-point cards (gold-btc, silver-btc, gold-aud) carry exactly one
+ *  - live-point cards (gold-btc, gold-aud) carry exactly one
  *    observation — honest: no daily history exists in the verified
- *    sources, so no change/percentile is invented;
+ *    sources, so no change/percentile is invented (silver-btc retired
+ *    2026-10-23, OD-7);
  *  - TGJU is retired from Insights (unverified licence, data spec §1):
  *    gold comes from gold-api XAU exactly like silver.
  *
@@ -65,8 +66,8 @@ export interface SeriesInputs {
     CAD?: SeriesPoint[];
     SEK?: SeriesPoint[];
     CHF?: SeriesPoint[];
-    /** 2026-10-21: NZD joins the one Frankfurter request (nzd-usd card). */
-    NZD?: SeriesPoint[];
+    /** NZD joined 2026-10-21 for the nzd-usd card — retired 2026-10-23
+     *  (OD-7): the leg stays out of the one Frankfurter request again. */
   };
   /** World Bank Pink Sheet monthly series. */
   wb?: WorldBankMonthly;
@@ -361,9 +362,9 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   put('dollar-basket', basketSeries(fx));
   put('usdjpy', fx.JPY);
   put('eur-usd', fx.EUR);
-  // 2026-10-21: the fourth dollar-bloc pair (the same invert recipe as
-  // AUD/USD — one more column on the single Frankfurter request).
-  if (fx.NZD) put('nzd-usd', invert(fx.NZD));
+  // nzd-usd retired 2026-10-23 (OD-7, D-42): an indicator card for an
+  // audience that doesn't exist — no replacement, the Frankfurter request
+  // drops the NZD leg again.
 
   /* ---------------- Global — Is growth healthy? ---------------- */
   put('china-pmi', inputs.chinaPmi);
@@ -480,12 +481,10 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   }
 
   // Context ratios under the Bitcoin price row (PB2: "context only, not
-  // used in signals").
+  // used in signals"). silver-btc retired 2026-10-23 (OD-7, D-42) — the
+  // weaker twin; gold-btc stays.
   if (inputs.xauSpot && inputs.btcSpot) {
     put('gold-btc', singlePoint(today, inputs.xauSpot.price / inputs.btcSpot.price));
-  }
-  if (inputs.xagSpot && inputs.btcSpot) {
-    put('silver-btc', singlePoint(today, inputs.xagSpot.price / inputs.btcSpot.price));
   }
 
   /* -------- Australia — Are inflation and rates a problem? -------- */
@@ -701,7 +700,6 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   },
   usdjpy: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   'eur-usd': { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
-  'nzd-usd': { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   // 2026-10-21 data-integrity round — the coverage additions' attributions.
   wti: { name: 'FRED (EIA WTI spot)', url: 'https://fred.stlouisfed.org/series/DCOILWTICO' },
   natgas: { name: 'FRED (EIA Henry Hub spot)', url: 'https://fred.stlouisfed.org/series/DHHNGSP' },
@@ -737,7 +735,6 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'copper-usd': { name: 'gold-api.com (HG, history: The World Bank Pink Sheet)', url: 'https://www.gold-api.com' },
   'btc-usd': { name: 'gold-api.com (BTC)', url: 'https://www.gold-api.com' },
   'gold-btc': { name: 'gold-api.com (XAU ÷ BTC)', url: 'https://www.gold-api.com' },
-  'silver-btc': { name: 'gold-api.com (XAG ÷ BTC)', url: 'https://www.gold-api.com' },
   'rba-cash-rate': {
     name: 'RBA (Cash Rate Target — F1/decision table)',
     url: 'https://www.rba.gov.au/statistics/cash-rate/',

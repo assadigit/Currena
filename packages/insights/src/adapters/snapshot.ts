@@ -721,7 +721,7 @@ export function downsampleSeries(series: readonly SeriesPoint[], maxPoints = HIS
 interface BuildHistoryFileOptions {
   /**
    * Minimum observation count that still emits a file — 2 by default
-   * (single-point "live" cards like gold-btc/silver-btc/gold-aud get no
+   * (single-point "live" cards like gold-btc/gold-aud get no
    * history key and the endpoint answers 404, the honest "no chart"
    * state). The ingest runner passes 1 for the accumulated-daily rows:
    * a row with no monthly base (btc-usd) must persist its FIRST daily

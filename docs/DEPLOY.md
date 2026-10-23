@@ -83,6 +83,44 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Session record — 2026-10-23b the subtraction set (M2): two retirements, one demotion, five honest relabels
+
+- **Deployed**: currena-api **`75517285`** (packages/core + insights + the
+  web copy dictionaries; the SPA rebuilt with the relabels and the retired
+  cards' copy removed). currena-markets untouched.
+- **The order that kept the page up**: the KV surgery ran FIRST
+  (`scripts/retire-ids-migration.ts`, 16 writes + 2 deletes, dry-run
+  verified before the real run) — the old code's id enum is a superset, so
+  it served the migrated 63-reading docs unchanged; the new Worker
+  deployed after, and the next 04:10 rung rebuilds everything from source.
+  The eth-usd lesson (2026-10-21c) applied in full: an id retirement is a
+  schema migration for every stored snapshot-family document — the live
+  snapshot, the public projection, all 7 daily archives (10-15 … 10-22)
+  and their public twins (each day's own hidden-set filtering preserved),
+  plus the orphaned `hist:nzd-usd` deleted. Every rewritten doc was
+  validated against the NEW schema before writing.
+- **The m2-us consistency touch**: the migration also sets the stored m2-us
+  reading to `context` (what the new engine produces for an info rule) so
+  the served card and the recomputed 22-voter summary agree in the window
+  before the next rung.
+- **Live verification (browser, both locales)**: hero "5 of 22 indicators
+  need attention" (was 23 voters); the M2 card renders Context with its
+  US$23.3T value and FRED attribution, history still serves; `nzd-usd` and
+  `silver-btc` absent from the page and answering 400 on their history
+  routes; the archives serve (10-22, 10-16 probed); the Bund details panel
+  carries the relabel — EN "…an OECD monthly series via FRED
+  (IRLTLT01DEM156N) — monthly average, lagged, so it can sit behind the
+  day's traded yield", fa «میانگین ماهانهٔ با تأخیر، پس ممکن است از بازده
+  معاملات روز عقب بماند». No console errors.
+- **Gates at close**: typecheck 6/6; core 191, scraper 67, insights 557,
+  markets 13, api 344, web 680 passed + the recorded 16-failure briefing
+  jsdom baseline; T-15 public passed (0 hidden); budgets held and the
+  Insights lazy chunk SHRANK with the retirement (753.26/181.51 vs the
+  765/186 budgets). EODHD quota untouched (0 requests).
+- **Carried follow-ups**: the daily-source probes for the OECD mirrors
+  (BoE/BoJ venue probes, the ECB AAA 10y key verification) stay queued as
+  M6/Wave-4 work — the relabels are the honest stopgap.
+
 ## Session record — 2026-10-23 the Phase-2 open: the unhide round (Shiller + china-pmi), the rung CPU fix, and the sourcemap recovery
 
 - **Deployed**: currena-api **`34a8e385`** (the unhide wiring + registry +

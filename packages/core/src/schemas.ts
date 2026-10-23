@@ -360,8 +360,11 @@ export const IndicatorIdSchema = z.enum([
   'us-gdp-growth', // FRED A191RL1Q225SBEA (real GDP growth, QoQ annualized)
   'us-nfp', // FRED PAYEMS monthly change (nonfarm payrolls, thousands)
   'platinum', // World Bank Pink Sheet monthly (USD/troy ounce)
-  // Global — Is the dollar strong? (+NZD/USD, Frankfurter USD→NZD inverted)
-  'nzd-usd',
+  // Global — Is the dollar strong?
+  // OD-7 retirement (2026-10-23, D-42): the nzd-usd id is RETIRED — an
+  // indicator card for an audience that doesn't exist (no NZ coverage
+  // anywhere; not in the FX module's 10 pairs). The KV documents carrying
+  // its reading were migrated the same deploy (the eth-usd pattern).
   // Global — Prices board companions (context rows rendered in lanes)
   'wti', // FRED DCOILWTICO (WTI spot, USD/barrel)
   'natgas', // FRED DHHNGSP (Henry Hub spot, USD/MMBtu)
@@ -384,7 +387,10 @@ export const IndicatorIdSchema = z.enum([
   'copper-usd',
   'btc-usd',
   'gold-btc',
-  'silver-btc',
+  // OD-7 retirement (2026-10-23, D-42): the silver-btc id is RETIRED —
+  // the weaker twin of gold-btc (the silver leg barely moves; the ratio
+  // mirrored bitcoin). The KV documents carrying its reading were migrated
+  // the same deploy (the eth-usd pattern).
   // Australia — Are inflation and rates a problem?
   'au-cpi',
   'au-trimmed-mean',

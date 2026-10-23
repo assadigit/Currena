@@ -78,7 +78,6 @@ function boardReadings(): IndicatorReading[] {
     reading('silver-usd', { value: 60.73, asOf: '2026-10-12', status: 'context', sourceName: 'gold-api.com (XAG)' }),
     reading('btc-usd', { value: 83268.1, asOf: '2026-10-12', status: 'context', sourceName: 'gold-api.com (BTC)' }),
     reading('gold-btc', { value: 0.0501, asOf: '2026-10-12', status: 'context', sourceName: 'gold-api.com (XAU ÷ BTC)' }),
-    reading('silver-btc', { value: 0.0007, asOf: '2026-10-12', status: 'context', sourceName: 'gold-api.com (XAG ÷ BTC)' }),
     reading('gold-aud', { value: 5972.82, asOf: '2026-10-12', status: 'context', sourceName: 'gold-api.com × Frankfurter (ECB)' }),
     reading('audusd', { value: 0.698129, asOf: '2026-10-09', sourceName: 'Frankfurter (ECB)' }),
     reading('us10y', { value: 5.22 }),
@@ -422,15 +421,11 @@ describe('mergeLivePricesIntoSnapshot', () => {
     expect(brent.asOf).toBe('2026-10-06');
   });
 
-  it('recomputes the companions from the live bases (gold-btc, silver-btc, gold-aud)', () => {
+  it('recomputes the companions from the live bases (gold-btc, gold-aud; silver-btc retired 2026-10-23 OD-7)', () => {
     const merged = mergeLivePricesIntoSnapshot(snapshotFixture(boardReadings()), live);
     const goldBtc = merged.readings.find((r) => r.id === 'gold-btc')!;
     expect(goldBtc.value).toBeCloseTo(4190.6 / 82510.08, 3);
     expect(goldBtc.asOf).toBe('2026-10-12');
-    const silverBtc = merged.readings.find((r) => r.id === 'silver-btc')!;
-    // Fix spec B-16 (2026-10-14): 6-dp precision — the inverted display
-    // (₿ per oz) must match the prices shown: 0.0007353… stays precise.
-    expect(silverBtc.value).toBe(Math.round((60.67 / 82510.08) * 1_000_000) / 1_000_000);
     const goldAud = merged.readings.find((r) => r.id === 'gold-aud')!;
     expect(goldAud.value).toBeCloseTo(4190.6 / 0.698129, 2);
   });
@@ -443,7 +438,6 @@ describe('mergeLivePricesIntoSnapshot', () => {
     });
     const merged = mergeLivePricesIntoSnapshot(snapshotFixture(boardReadings()), noBtc);
     expect(merged.readings.find((r) => r.id === 'gold-btc')!.value).toBe(0.0501); // daily value kept
-    expect(merged.readings.find((r) => r.id === 'silver-btc')!.value).toBe(0.0007);
     // gold-aud still recomputes from live gold alone.
     expect(merged.readings.find((r) => r.id === 'gold-aud')!.value).toBeCloseTo(4190.6 / 0.698129, 2);
   });

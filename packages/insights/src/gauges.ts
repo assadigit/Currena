@@ -68,10 +68,13 @@ export const GAUGES: readonly GaugeDef[] = [
   // Step-2 add-list §B3/§B4: US unemployment and the Sahm rule join the
   // growth-health voters, next to the US macro series already there.
   // Fix spec C-05 (2026-10-14): the Philadelphia Fed survey joins them.
+  // OD-7 demotion (2026-10-23, D-42): m2-us left the voters — it is
+  // context only now (the card keeps its year-on-year percentile; the
+  // gauge counts the five members below — the iron-ore precedent).
   {
     id: 'growth-health',
     section: 'global',
-    members: ['china-pmi', 'philly-fed', 'm2-us', 'us-unemployment', 'sahm-rule', 'copper-gold'],
+    members: ['china-pmi', 'philly-fed', 'us-unemployment', 'sahm-rule', 'copper-gold'],
   },
   {
     id: 'au-inflation-rates',

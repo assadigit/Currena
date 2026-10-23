@@ -181,8 +181,8 @@ function sourceUrlOf(def: Def): string | undefined {
  *                tier stays internal in v3; the chip reads Normal)
  *   delayed tier usdjpy (asOf -4 vs the -1 daily peers — U-04b's word)
  *   normal       most rows
- *   context      rba-expectations, crypto-fng, gold-btc, silver-btc,
- *                iron-ore, shiller-cape, shiller-ecy
+ *   context      rba-expectations, crypto-fng, gold-btc, iron-ore,
+ *                shiller-cape, shiller-ecy
  *   stale        dollar-basket, au-household-debt-arrears
  *   check-pending stress-stlfsi (flag: duplicate held for verification)
  *   no-history   philly-fed (value shows, no verdict yet)
@@ -346,7 +346,6 @@ const ROWS: Record<IndicatorId, RowSpec> = {
     asOfDays: -1,
   },
   'gold-btc': { value: 0.0423, status: 'context', change30d: 2.1 },
-  'silver-btc': { value: 0.000516, status: 'context' },
   /* Global — market-stress context, Phase-5 additions (FS-06): the
    * Shiller cards carry context rows here so the builder covers every
    * definition (in production they stay hidden until the owner flips

@@ -83,10 +83,10 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
     expect(aboutEnabledState(shiller!)).toBe('on');
   });
 
-  it('derived: fully enabled since the 2026-10-21 round un-disabled the crosses', () => {
+  it('derived: fully enabled since the 2026-10-21 round un-disabled the crosses (silver-btc retired 2026-10-23, OD-7)', () => {
     const derived = rows.find((r) => r.provider === 'derived');
-    expect(derived!.seriesCount).toBe(13);
-    expect(derived!.enabledCount).toBe(13);
+    expect(derived!.seriesCount).toBe(12);
+    expect(derived!.enabledCount).toBe(12);
     expect(aboutEnabledState(derived!)).toBe('on');
     // Own-computation series inherit the upstream terms — the blanket
     // sidecar string (audjpy's) is one of the row's licences (sources.ts

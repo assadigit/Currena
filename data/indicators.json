@@ -546,7 +546,7 @@
       "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
       "publisherUrl": "https://fred.stlouisfed.org/series/IRLTLT01DEM156N",
       "methodUrl": "https://fred.stlouisfed.org/series/IRLTLT01DEM156N",
-      "whatItIs": "The market yield on 10-year German government bonds (Bunds): monthly, from the OECD long-term rate series for Germany via FRED (IRLTLT01DEM156N).",
+      "whatItIs": "The average market yield on 10-year German government bonds (Bunds) over the latest full month: an OECD monthly series via FRED (IRLTLT01DEM156N) — monthly average, lagged, so it can sit behind the day’s traded yield.",
       "whatItIsnt": "A market price, not the ECB’s setting: inflation, growth and debt-supply news move it independently of the policy rate.",
       "trackRecordNote": "The sub-zero settings of 2016–22 lent Germany money for less than nothing; the 2022–23 reset lifted yields to their highest since 2011.",
       "definition": null,
@@ -605,7 +605,7 @@
       "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
       "publisherUrl": "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
       "methodUrl": "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
-      "whatItIs": "The market yield on 10-year Japanese government bonds (JGBs): monthly, from the OECD long-term rate series for Japan via FRED (IRLTLT01JPM156N).",
+      "whatItIs": "The average market yield on 10-year Japanese government bonds (JGBs) over the latest full month: an OECD monthly series via FRED (IRLTLT01JPM156N) — monthly average, lagged, so it can sit behind the day’s traded yield.",
       "whatItIsnt": "The Bank of Japan still leans on this market: the yield reflects policy as much as markets, unlike most government bonds.",
       "trackRecordNote": "The yield sat at or near zero from 2016 to 2024 under yield-curve control; the breakout since has ended the era of free Japanese money.",
       "definition": null,
@@ -664,7 +664,7 @@
       "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
       "publisherUrl": "https://fred.stlouisfed.org/series/IRLTLT01GBM156N",
       "methodUrl": "https://fred.stlouisfed.org/series/IRLTLT01GBM156N",
-      "whatItIs": "The market yield on 10-year UK government bonds (gilts): monthly, from the OECD long-term rate series for the United Kingdom via FRED (IRLTLT01GBM156N).",
+      "whatItIs": "The average market yield on 10-year UK government bonds (gilts) over the latest full month: an OECD monthly series via FRED (IRLTLT01GBM156N) — monthly average, lagged, so it can sit behind the day’s traded yield.",
       "whatItIsnt": "A market price, not the Bank of England’s setting: inflation, growth and fiscal news move it independently of the policy rate.",
       "trackRecordNote": "Sustained readings above 4.5% have been rare since the 1990s; the 2022 mini-budget spike was the sharpest gilt episode in decades.",
       "definition": null,
@@ -723,7 +723,7 @@
       "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
       "publisherUrl": "https://fred.stlouisfed.org/series/IRSTCI01JPM156N",
       "methodUrl": "https://fred.stlouisfed.org/series/IRSTCI01JPM156N",
-      "whatItIs": "The Bank of Japan’s policy rate, measured as the average overnight call rate: monthly, from FRED (IRSTCI01JPM156N).",
+      "whatItIs": "The Bank of Japan’s policy rate, measured as the average overnight call rate over the latest full month (FRED IRSTCI01JPM156N) — a monthly average, lagged: it can trail an intra-month policy change.",
       "whatItIsnt": "Like every policy rate it works with long, uneven lags, and the setting says nothing about the next decision.",
       "trackRecordNote": "The rate sat at or near zero from 1999 until the 2024–26 hikes: the longest cheap-money era in modern finance.",
       "definition": null,
@@ -782,7 +782,7 @@
       "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
       "publisherUrl": "https://fred.stlouisfed.org/series/IRSTCI01GBM156N",
       "methodUrl": "https://fred.stlouisfed.org/series/IRSTCI01GBM156N",
-      "whatItIs": "The Bank of England’s policy rate, measured as the average overnight rate: monthly, from FRED (IRSTCI01GBM156N).",
+      "whatItIs": "The Bank of England’s policy rate, measured as the average overnight rate over the latest full month (FRED IRSTCI01GBM156N) — a monthly average, lagged: it can trail an intra-month policy change.",
       "whatItIsnt": "Like every policy rate it works with long, uneven lags, and the setting says nothing about the next decision.",
       "trackRecordNote": "The bank cut to 0.1% in 2020, its lowest since 1694, then lifted rates to multi-decade highs by 2023.",
       "definition": null,
@@ -1742,65 +1742,6 @@
       }
     },
     {
-      "id": "nzd-usd",
-      "title": "NZD/USD",
-      "area": {
-        "section": "global",
-        "group": "dollar-strength",
-        "gauge": null,
-        "gaugeMembership": "context only — never counts"
-      },
-      "source": {
-        "provider": "frankfurter",
-        "name": "Frankfurter (ECB)",
-        "url": "https://frankfurter.dev",
-        "seriesIdOrTable": "Frankfurter USD→NZD"
-      },
-      "publisher": "ECB reference rates via the Frankfurter project",
-      "publisherUrl": "https://frankfurter.dev",
-      "methodUrl": "https://frankfurter.dev",
-      "whatItIs": "The NZD/USD exchange rate: how many US dollars one New Zealand dollar buys, from ECB reference rates via Frankfurter.",
-      "whatItIsnt": "It reflects two economies and global risk sentiment at once; direction alone is not a signal.",
-      "trackRecordNote": "Reads below roughly 0.55 came with global panics; strength above 0.75 came with commodity booms.",
-      "definition": null,
-      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
-      "sourceRisk": {
-        "level": "L1",
-        "ownerAccepts": null,
-        "enabled": true,
-        "method": "M1",
-        "runtime": "github-action",
-        "termsLines": "frankfurter.dev/license links the ECB disclaimer for the data (read 2026-10-16); the ECB’s reuse terms page is JS-rendered and could not be quoted verbatim in a plain fetch — level L1 (probably fine, terms need the quarterly re-check), fail closed in public mode until then. Frankfurter’s code is MIT.",
-        "termsReadOn": "2026-10-16",
-        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
-        "legs": [
-          "frankfurter"
-        ]
-      },
-      "unit": "usd",
-      "changeUnit": "percent",
-      "cadence": "daily",
-      "maxAgeDays": 4,
-      "maxAgeBasis": "per-series override",
-      "scored": false,
-      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
-      "rule": {
-        "kind": "info"
-      },
-      "ruleVersion": 2,
-      "layer": 1,
-      "licence": {
-        "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
-        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
-        "attributionRequired": true,
-        "privateOk": true,
-        "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
-        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter. · Legs (frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
-        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
-      }
-    },
-    {
       "id": "china-pmi",
       "title": "China manufacturing PMI",
       "area": {
@@ -1867,8 +1808,8 @@
       "area": {
         "section": "global",
         "group": "growth-health",
-        "gauge": "growth-health",
-        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
       },
       "source": {
         "provider": "fred",
@@ -1902,10 +1843,10 @@
       "cadence": "monthly",
       "maxAgeDays": 90,
       "maxAgeBasis": "per-series override",
-      "scored": true,
+      "scored": false,
       "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
       "rule": {
-        "kind": "yoy-negative"
+        "kind": "info"
       },
       "ruleVersion": 2,
       "layer": 1,
@@ -2761,66 +2702,6 @@
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
         "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".) · Legs (gold-api:XAU, gold-api:BTC): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
-        "termsUrl": "https://gold-api.com/terms"
-      }
-    },
-    {
-      "id": "silver-btc",
-      "title": "Bitcoin priced in silver (BTC per ounce)",
-      "area": {
-        "section": "global",
-        "group": "prices-board",
-        "gauge": null,
-        "gaugeMembership": "context only — never counts"
-      },
-      "source": {
-        "provider": "derived",
-        "name": "gold-api.com (XAG ÷ BTC)",
-        "url": "https://www.gold-api.com",
-        "seriesIdOrTable": "gold-api.com XAG ÷ BTC (bitcoin per troy ounce)"
-      },
-      "publisher": "gold-api.com",
-      "publisherUrl": "https://www.gold-api.com",
-      "methodUrl": "https://www.gold-api.com",
-      "whatItIs": "The silver price divided by the bitcoin price, both from the same hourly snapshot (Yahoo Finance quotes on the gold-api backbone).",
-      "whatItIsnt": "The silver leg barely moves: this ratio mostly mirrors bitcoin.",
-      "trackRecordNote": "Its history is dominated almost entirely by the bitcoin side of the fraction.",
-      "definition": "The silver price divided by the Bitcoin price: ounces of silver per one bitcoin, same date.",
-      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
-      "sourceRisk": {
-        "level": "L0",
-        "ownerAccepts": null,
-        "enabled": true,
-        "method": "M1",
-        "runtime": "github-action",
-        "termsLines": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found (attribution is shown by Currena’s own choice); service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-read at the quarterly review. · Worst of legs (gold-api:XAG, gold-api:BTC): the L0 leg decides — the walk mirrors defect E-01/LR-02.",
-        "termsReadOn": "2026-10-16",
-        "attributionText": "Data: gold-api.com",
-        "legs": [
-          "gold-api:XAG",
-          "gold-api:BTC"
-        ]
-      },
-      "unit": "ratio",
-      "changeUnit": "percent",
-      "cadence": "daily",
-      "maxAgeDays": 4,
-      "maxAgeBasis": "cadence default (daily)",
-      "scored": false,
-      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
-      "rule": {
-        "kind": "info"
-      },
-      "ruleVersion": 2,
-      "layer": 2,
-      "licence": {
-        "licenceName": "Free API — commercial use permitted (their ToS)",
-        "attributionText": "",
-        "attributionRequired": false,
-        "privateOk": true,
-        "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".) · Legs (gold-api:XAG, gold-api:BTC): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://gold-api.com/terms"
       }
     },

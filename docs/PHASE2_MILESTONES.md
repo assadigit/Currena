@@ -15,7 +15,7 @@ D-41).
 | **M0** | Owner decisions recorded | D-42 in `DECISIONS_FOR_ALI.md` + this tracker | **done 2026-10-23** (docs only) |
 | **M1** | The unhide round (OD-1/OD-2) | Shiller pair (`shiller-cape`, `shiller-ecy`) + `china-pmi` public: register/licence flips (owner-accepted, display-ok), ingest wiring (the committed converted file; ECY ×100 to percent), NBS attribution honesty, all test pins moved to the new reality | **done 2026-10-23** — deployed + live-verified (`currena.ir`, voting pool 22→23) |
 | **M1†** | The rung CPU fix (carried by M1) | `baseReadingCache` in `adapters/snapshot.ts` — the draft+final double build collapses to one deterministic pass (the 04:10/10:10/20:10 rungs were dying `exceededCpu` at exactly 2050 ms; the fixed rung completed at 1831 ms), phase timings surfaced to the tail | **done 2026-10-23** — the 16:05 UTC rung healthy, captured via `wrangler tail` |
-| **M2** | The subtraction set (OD-7) | Retire `nzd-usd` + `silver-btc` (the eth-usd KV-migration pattern — id retirement is a schema migration across the stored snapshot/status/archives), demote `m2-us` scored→context, relabel the five OECD mirrors (`bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate`) to "monthly average, lagged" in both locales | **pending** — the next session's first build |
+| **M2** | The subtraction set (OD-7) | Retire `nzd-usd` + `silver-btc` (the eth-usd KV-migration pattern — id retirement is a schema migration across the stored snapshot/status/archives), demote `m2-us` scored→context, relabel the five OECD mirrors (`bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate`) to "monthly average, lagged" in both locales | **done 2026-10-23** — `75517285` deployed after the KV surgery (16 writes + 2 deletes); 65→63 indicators, voting 23→22, live-verified EN+fa |
 | **M3** | The credit-spread licence row (OD-5) | The ICE BofA indices via FRED enter the register (the VIXCLS/NFCI citation-required posture) — display permission + attribution rows; enables the Wave-1 spread cards | **pending** |
 | **M4** | Wave 1 — the early-warning pack (OD-8) | `initial-jobless-claims` · `hy-oas` · `sofr` · `recession-probability` · `us-pce-core-yoy` · `michigan-sentiment` + the Tier-0 displays `us-2y`, `breakeven-10y` — one FRED bulk-group edit + one register row; all series live-verified in the review (§10) | **pending** |
 | **M5** | Wave 2 — household costs & the euro long end | Pink Sheet `food-index` + wheat/maize · `euro-aaa-10y` (series key verified at build time — the review's honest negative) · `usdtry` (the EM-pressure first member) | **pending** |
@@ -44,6 +44,22 @@ D-41).
   the recorded follow-up).
 
 ## Session log (newest first)
+
+- **2026-10-23 (the M2 session, same day as M1):** the subtraction set
+  closed. The two retirements followed the eth-usd pattern end-to-end —
+  schema/definitions/adapters/copy in both locales, plus the KV surgery
+  (`scripts/retire-ids-migration.ts`, dry-run then real: 16 writes + 2
+  deletes, every rewritten doc validated against the new schema, run
+  BEFORE the deploy so the page never broke). The m2-us demotion kept the
+  series and lost the vote (rule → info, growth-health → 5 members, the
+  migration set the stored reading to context, the regression fixture
+  expectation moved with it). The five OECD mirrors now honestly say
+  "monthly average, lagged" in both locales — the stopgap until the
+  M6/Wave-4 daily-source probes. Gates: typecheck 6/6, insights 557 /
+  api 344 / web 680+baseline, T-15 public, budgets held (the chunk
+  shrank). Live-verified on currena.ir: hero 5-of-22, both retired ids
+  400 on history, archives serve, relabels in the Bund details panel EN
+  + fa. Deployed `75517285`.
 
 - **2026-10-23 (the M0+M1 session, resumed after a sandbox reset):** M0+M1
   closed. The unhide round landed as Worker versions `34a8e385` →

@@ -132,7 +132,7 @@ describe('data/indicators.json — the single indicator registry (A-01)', () => 
 
   it('Layer 2 entries carry their plain-arithmetic definition; Layer 1 entries leave it null', () => {
     const byId = new Map(registry.indicators.map((i) => [i.id, i]));
-    for (const id of ['yield-curve-10y2y', 'gold-silver', 'copper-gold', 'gold-btc', 'silver-btc', 'fed-expectations', 'rba-expectations', 'au-us-10y-gap', 'dollar-basket', 'gold-aud', 'govt-interest-revenue']) {
+    for (const id of ['yield-curve-10y2y', 'gold-silver', 'copper-gold', 'gold-btc', 'fed-expectations', 'rba-expectations', 'au-us-10y-gap', 'dollar-basket', 'gold-aud', 'govt-interest-revenue']) {
       expect(byId.get(id)!.definition, `${id} is Layer 2 — it needs its definition`).toBeTruthy();
       expect(byId.get(id)!.layer).toBe(2);
     }

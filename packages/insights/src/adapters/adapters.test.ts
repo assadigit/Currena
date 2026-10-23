@@ -99,7 +99,7 @@ describe('fred adapter', () => {
 describe('frankfurter adapter', () => {
   it('builds the open-ended timeseries URL', () => {
     expect(frankfurterTimeseriesUrl('2016-01-04')).toBe(
-      'https://api.frankfurter.dev/v1/2016-01-04..?from=USD&to=JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,NZD',
+      'https://api.frankfurter.dev/v1/2016-01-04..?from=USD&to=JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF',
     );
     // Narrow currency lists still build their own URL.
     expect(frankfurterTimeseriesUrl('2016-01-04', ['JPY'])).toBe(

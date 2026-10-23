@@ -367,19 +367,6 @@
       "rule": "{\"kind\":\"info\"}"
     },
     {
-      "id": "nzd-usd",
-      "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
-      "publicDisplayOk": "yes",
-      "privateOk": true,
-      "level": "L1",
-      "ownerAccepts": null,
-      "enabled": true,
-      "method": "M1",
-      "maxAgeDays": 4,
-      "ruleVersion": 2,
-      "rule": "{\"kind\":\"info\"}"
-    },
-    {
       "id": "china-pmi",
       "licenceName": "Publisher terms vary; entered by hand",
       "publicDisplayOk": "yes",
@@ -403,7 +390,7 @@
       "method": "M1",
       "maxAgeDays": 90,
       "ruleVersion": 2,
-      "rule": "{\"kind\":\"yoy-negative\"}"
+      "rule": "{\"kind\":\"info\"}"
     },
     {
       "id": "philly-fed",
@@ -576,19 +563,6 @@
     },
     {
       "id": "gold-btc",
-      "licenceName": "Free API — commercial use permitted (their ToS)",
-      "publicDisplayOk": "yes",
-      "privateOk": true,
-      "level": "L0",
-      "ownerAccepts": null,
-      "enabled": true,
-      "method": "M1",
-      "maxAgeDays": 4,
-      "ruleVersion": 2,
-      "rule": "{\"kind\":\"info\"}"
-    },
-    {
-      "id": "silver-btc",
       "licenceName": "Free API — commercial use permitted (their ToS)",
       "publicDisplayOk": "yes",
       "privateOk": true,

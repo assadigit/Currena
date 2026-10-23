@@ -148,7 +148,6 @@ const NOT_BACKTESTED: Readonly<Partial<Record<IndicatorId, string>>> = {
   'copper-usd': 'info-only: live gold-api HG point over World Bank monthly backfill — never votes (prices-board row)',
   'btc-usd': 'info-only: live gold-api BTC point, no 10y history by design — never votes (prices-board row)',
   'gold-btc': 'context-only ratio under the Bitcoin price row (PB2); never votes',
-  'silver-btc': 'context-only ratio under the Bitcoin price row (PB2); never votes',
   'gold-aud': 'composed from live gold-api XAU + Frankfurter AUD; info-only, never votes',
   'eur-usd': 'info-only context card in the dollar lane; never votes',
   'rba-cash-rate': 'rba.gov.au Akamai-blocked from the sandbox (03-data-sources.md); info-only, never votes',
@@ -359,7 +358,7 @@ for (const w of WINDOWS) {
 emit('## Calibration observations (auto-generated)');
 emit();
 emit('- See the tables above: any indicator that spends ~0% or ~100% of a stress window in warning is a threshold the owner may want to re-tune at this gate.');
-emit('- Info-only/price rows (gold-usd, silver-usd, copper-usd, btc-usd, gold-btc, silver-btc, gold-aud, eur-usd, usdcny, rba-cash-rate, au-petrol-yoy) never vote by construction; Brent votes by rule but is not a gauge member (feeds the big-mover callout).');
+emit('- Info-only/price rows (gold-usd, silver-usd, copper-usd, btc-usd, gold-btc, gold-aud, eur-usd, usdcny, rba-cash-rate, au-petrol-yoy) never vote by construction; Brent votes by rule but is not a gauge member (feeds the big-mover callout).');
 emit();
 
 /* Write -------------------------------------------------------------------- */

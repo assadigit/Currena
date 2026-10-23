@@ -467,7 +467,6 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   'copper-usd': ['gold-api:HG', 'world-bank'],
   'gold-aud': ['gold-api:XAU', 'frankfurter'],
   'gold-btc': ['gold-api:XAU', 'gold-api:BTC'],
-  'silver-btc': ['gold-api:XAG', 'gold-api:BTC'],
   'dollar-basket': ['frankfurter'],
   'fed-expectations': ['fred:DGS2', 'fred:DFEDTARL', 'fred:DFEDTARU'],
   'rba-expectations': ['rba:F2', 'rba:F1'],
@@ -477,7 +476,6 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   // 2026-10-21 data-integrity round — the coverage additions' explicit legs
   // (the FRED-sourced ones resolve their legs from sourceRef tokens).
   platinum: ['world-bank'],
-  'nzd-usd': ['frankfurter'],
   'us-nfp': ['fred:PAYEMS'],
   // 2026-10-21 fix: the two FX crosses carried source 'derived' with no
   // UPSTREAM_LEGS entry, so the phase-3-5 licence walk resolved them to the

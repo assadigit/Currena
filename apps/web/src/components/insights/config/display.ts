@@ -99,7 +99,6 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   // 2026-10-21 data-integrity round — the coverage additions (recovered
   // verbatim from the deployed round's labels chunk: nfp counts jobs in
   // whole thousands on the 'points' unit, platinum carries 2 decimals).
-  'nzd-usd': { decimals: 4, unit: 'usd' },
   'bund-10y': { decimals: 2, unit: 'percent' },
   'jgb-10y': { decimals: 2, unit: 'percent' },
   'gilt-10y': { decimals: 2, unit: 'percent' },
@@ -116,7 +115,6 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'copper-usd': { decimals: 0, unit: 'usd' },
   'btc-usd': { decimals: 0, unit: 'usd' },
   'gold-btc': { decimals: 4, unit: 'ratio' },
-  'silver-btc': { decimals: 5, unit: 'ratio' },
   'au-cpi': { decimals: 1, unit: 'percent' },
   'au-trimmed-mean': { decimals: 1, unit: 'percent' },
   // Step-2 add-list §B2: the AU 10-year yield, rendered like the US one.

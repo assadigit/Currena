@@ -39,8 +39,8 @@ export const PRICE_ROWS: readonly IndicatorId[] = [
   'btc-usd',
 ];
 
-/** The Bitcoin context ratios (Block PB2) + the gold row's AUD companion. */
-export const BTC_RATIO_IDS: readonly IndicatorId[] = ['gold-btc', 'silver-btc'];
+/** The Bitcoin context ratio (Block PB2; silver-btc retired 2026-10-23, OD-7) + the gold row's AUD companion. */
+export const BTC_RATIO_IDS: readonly IndicatorId[] = ['gold-btc'];
 
 /**
  * Step-1 audit item A3: companion-only readings — carried in the payload and

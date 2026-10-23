@@ -331,8 +331,9 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
   // ECB Data Portal (deposit facility rate, full history).
   const ecbDfr = await fetchLogged('ecb', 'FM/D.U2.EUR.4F.KR.DFR.LEV', () => fetchEcbDfrSeries());
 
-  // Frankfurter (USD→JPY/AUD/CNY/NZD + the six basket currencies, 10y window).
-  const fx = await fetchLogged('frankfurter', `USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,NZD since ${fxStart}`, () =>
+  // Frankfurter (USD→JPY/AUD/CNY + the six basket currencies, 10y window;
+  // NZD left the request 2026-10-23 — the nzd-usd card retired, OD-7).
+  const fx = await fetchLogged('frankfurter', `USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF since ${fxStart}`, () =>
     fetchFrankfurterSeries(fxStart),
   );
 
@@ -472,7 +473,6 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
         CAD: fx?.CAD,
         SEK: fx?.SEK,
         CHF: fx?.CHF,
-        NZD: fx?.NZD,
       },
       wb,
       xauSpot,

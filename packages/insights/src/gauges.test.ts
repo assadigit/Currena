@@ -200,8 +200,8 @@ describe('GAUGES table shape (v1 membership, data spec §4)', () => {
     expect(GAUGES.filter((g) => g.section === 'australia')).toHaveLength(3);
   });
 
-  it('23 global scored + 14 australia scored = 37 voting members (fix B-14: +brent in prices-heat; fix spec C: +fed-expectations/us30y/philly-fed global, +rba-expectations australia)', () => {
-    expect(GAUGES.filter((g) => g.section === 'global').flatMap((g) => g.members)).toHaveLength(23);
+  it('22 global scored + 14 australia scored = 36 voting members (fix B-14: +brent in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health)', () => {
+    expect(GAUGES.filter((g) => g.section === 'global').flatMap((g) => g.members)).toHaveLength(22);
     expect(GAUGES.filter((g) => g.section === 'australia').flatMap((g) => g.members)).toHaveLength(14);
   });
 

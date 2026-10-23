@@ -22,9 +22,9 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 29 P1 / 36 P2 (the 2026-10-21c owner round retires the eth-usd context card)', () => {
+  it('splits 29 P1 / 34 P2 (the 2026-10-21c round retires eth-usd; the 2026-10-23 OD-7 round retires nzd-usd + silver-btc, both P2)', () => {
     expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(29);
-    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(36);
+    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(34);
   });
 
   it('groups are the question groups (global 5 + prices-board, australia 3)', () => {
@@ -54,7 +54,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('info-only cards never vote: exactly the twenty-eight info rules (the 2026-10-21c owner round retires eth-usd)', () => {
+  it('info-only cards never vote: exactly the twenty-seven info rules (2026-10-23 OD-7: nzd-usd + silver-btc retire, m2-us demoted to context)', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
     expect(info).toEqual([
       'au-deposit-rate',
@@ -72,13 +72,12 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'gold-usd',
       'iron-ore',
       'jgb-10y',
+      'm2-us',
       'natgas',
-      'nzd-usd',
       'platinum',
       'rba-cash-rate',
       'shiller-cape',
       'shiller-ecy',
-      'silver-btc',
       'silver-usd',
       'us-cpi-core-yoy',
       'us-gdp-growth',
@@ -88,10 +87,10 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     ]);
   });
 
-  it('GAUGE membership is the scored list (37 voters; fix B-14: +brent counts in prices-heat; fix spec C: +fed-expectations/us30y/philly-fed/rba-expectations)', () => {
+  it('GAUGE membership is the scored list (36 voters; fix B-14: +brent counts in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health)', () => {
     const gaugedGroups = new Set(GAUGES.map((g) => g.id));
     const memberIds = new Set(GAUGES.flatMap((g) => g.members));
-    expect(memberIds.size).toBe(37);
+    expect(memberIds.size).toBe(36);
     // Every gauge member is a scored (non-info) definition. B-14's one
     // deliberate exception: brent lives in the prices-board lane group but
     // counts in the prices-heat gauge (the card renders on the Prices
@@ -216,7 +215,9 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(byId.get('au-10y')!.rule).toEqual({ kind: 'percentile', tail: 'high', cutoff: 0.1 });
     expect(byId.get('terms-of-trade')!.rule).toEqual({ kind: 'consecutive-decline', periods: 2 });
     expect(byId.get('au-home-values')!.rule).toEqual({ kind: 'consecutive-decline', periods: 3 });
-    expect(byId.get('m2-us')!.rule).toEqual({ kind: 'yoy-negative' });
+    // OD-7 demotion (2026-10-23, D-42): m2-us keeps the series, loses the
+    // vote — context now (the regression fixture's expectation moved with it).
+    expect(byId.get('m2-us')!.rule).toEqual({ kind: 'info' });
     expect(byId.get('us10y')!.rule).toEqual({
       kind: 'any-of',
       of: [

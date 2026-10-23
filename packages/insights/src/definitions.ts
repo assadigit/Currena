@@ -520,22 +520,6 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     rule: { kind: 'info' },
     staleAfterDays: 4,
   },
-  {
-    // 2026-10-21 data-integrity round: the fourth dollar-bloc pair (the
-    // agenda's missing currency) — the same ECB reference-rate source and
-    // invert recipe as AUD/USD.
-    id: 'nzd-usd',
-    section: 'global',
-    group: 'dollar-strength',
-    name: 'NZD/USD',
-    source: 'frankfurter',
-    sourceRef: 'Frankfurter USD→NZD',
-    cadence: 'daily',
-    changeKind: 'pct',
-    phase: 'P2',
-    rule: { kind: 'info' },
-    staleAfterDays: 4,
-  },
   /* ---------------- Global — Is growth healthy? ---------------- */
   {
     id: 'china-pmi',
@@ -559,7 +543,12 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     cadence: 'monthly',
     changeKind: 'pct',
     phase: 'P2',
-    rule: { kind: 'yoy-negative' },
+    // OD-7 demotion (2026-10-23, D-42): scored → context — "keep the
+    // series, lose the vote" (the monetarist framing was overweighted as
+    // a scored gauge member of a framework the product doesn't otherwise
+    // run; the growth-health gauge drops to 5 voters, the iron-ore
+    // precedent). The card keeps its year-on-year percentile context.
+    rule: { kind: 'info' },
     // Step-1 audit item C10: M2 trends upward — the 10-year position is
     // measured on the year-on-year GROWTH, not the level, so it is not
     // permanently pinned near 100% just for existing.
@@ -798,20 +787,6 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     name: 'Bitcoin priced in gold (BTC per ounce)',
     source: 'derived',
     sourceRef: 'gold-api.com XAU ÷ BTC (bitcoin per troy ounce)',
-    cadence: 'daily',
-    changeKind: 'pct',
-    phase: 'P2',
-    rule: { kind: 'info' },
-  },
-  {
-    // Defect E-12 (2026-10-16): same orientation fix — the value is bitcoin
-    // per ounce of silver (XAG ÷ BTC ≈ 0.0007).
-    id: 'silver-btc',
-    section: 'global',
-    group: 'prices-board',
-    name: 'Bitcoin priced in silver (BTC per ounce)',
-    source: 'derived',
-    sourceRef: 'gold-api.com XAG ÷ BTC (bitcoin per troy ounce)',
     cadence: 'daily',
     changeKind: 'pct',
     phase: 'P2',

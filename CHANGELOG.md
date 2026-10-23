@@ -66,6 +66,74 @@ insights 557, api 344, web 680 passed (the 16-failure briefing jsdom
 baseline unchanged); the two date-conditioned prices-cards pins and the
 sweep date-bomb fixed for the new reality (real-clock-relative fixtures).
 
+## [2026-10-23b] — the subtraction set (M2 of the D-42 milestones): nzd-usd + silver-btc retire, m2-us demoted, the five OECD mirrors honestly relabelled
+
+OD-7 executed in full, a few hours after M1 on the same day. Subtraction
+discipline before the Wave-1 additions (M4): every item reversible, every
+change verified live in both locales.
+
+### The retirements (the eth-usd pattern, twice)
+
+- **`nzd-usd` retired** — an indicator card for an audience that doesn't
+  exist (no NZ coverage anywhere on the product; not in the FX module's 10
+  pairs). The id left the schema enum, the definitions, the derived
+  builder, the upstream-legs map, the display/section configs and both
+  copy dictionaries; the Frankfurter request drops its NZD leg again
+  (nine currencies → eight, still one fetch).
+- **`silver-btc` retired** — the weaker twin of `gold-btc` (the silver
+  leg barely moves; the ratio mostly mirrored bitcoin). The id left the
+  schema, the definitions, the derived builder, the upstream-legs map,
+  the live-ratio sources (prices definitions + merge), the T-13
+  cross-check in the validation suite, and both copy dictionaries;
+  `BTC_RATIO_IDS` is down to `gold-btc`.
+- **The KV surgery (16 writes, 2 deletes, run BEFORE the deploy so the
+  page never broke)**: `scripts/retire-ids-migration.ts` strips the two
+  readings + their changedThisWeek entries from the live snapshot, the
+  public projection, all seven stored daily archives (10-15 … 10-22) and
+  their public twins (each day's own hidden-set filtering preserved),
+  recomputes both section summaries with the current gauges, validates
+  every rewritten doc against the NEW schema, deletes the orphaned
+  `hist:nzd-usd`, and re-runs the public projection exactly as the daily
+  rung writes it (63 public readings + today's archive-public). The
+  migration also sets m2-us's stored reading to `context` so the served
+  card and the recomputed 22-voter summary agree until the next rung.
+- 65 → **63 indicators**; the registry, audit sidecar and
+  site-mode-overrides regenerated (`hiddenIndicatorIds` stays empty).
+
+### The demotion (keep the series, lose the vote)
+
+- **`m2-us` scored → context** — the monetarist framing was overweighted
+  as a scored gauge member of a framework the product doesn't otherwise
+  run. The rule flipped `yoy-negative` → `info` (status `context`, never
+  votes), the growth-health gauge drops to 5 members (china-pmi,
+  philly-fed, us-unemployment, sahm-rule, copper-gold — the iron-ore
+  precedent), and the card keeps its year-on-year percentile context.
+  The global voting pool went **23 → 22**; the regression fixture's
+  inflation-2022/m2-us expectation moved to `context` with it.
+
+### The honest relabels (the cheapest honesty fix on the dashboard)
+
+- The five OECD-mirror rows — `bund-10y`, `jgb-10y`, `gilt-10y`,
+  `boj-rate`, `boe-rate` — now say what they are in both locales: a
+  **monthly average, lagged** ("over the latest full month … so it can
+  sit behind the day's traded yield" / "میانگین ماهانهٔ با تأخیر، پس
+  ممکن است از بازده معاملات روز عقب بماند"). A month-old policy rate
+  shown as current was actively misleading; the daily-source probes
+  remain the recorded follow-up (Wave 4 / M6).
+
+### Gates + verification
+
+Typecheck 6/6; core 191, scraper 67, insights 557, markets 13, api 344,
+web 680 passed + the recorded 16-failure briefing jsdom baseline; T-15
+public passed (0 hidden); budgets held (entry 295.28/88.81 vs 296/89.5;
+Insights lazy 753.26/181.51 vs 765/186 — the retirement shrank the
+chunk). Deployed as currena-api **`75517285`** after the KV surgery;
+live-verified on currena.ir EN + fa: the hero reads "5 of 22", the M2
+card shows Context with its value and history, both retired ids answer
+400 on their history routes, the 10-22/10-16 archives serve, and the
+Bund details panel carries the relabel in both languages. EODHD quota
+untouched (0 requests).
+
 ## [2026-10-21c] — the currencies section returns, the licence-hidden cards are restored on verified terms, and the balance/panel round (owner restoration)
 
 The owner's directive: "currena's insight used to have a full currency and

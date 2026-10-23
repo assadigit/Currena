@@ -108,9 +108,8 @@ export const INTERVAL_SLACK_MINUTES = 2;
  * series is USD per tonne, and a unit-bridging live override is not worth
  * the risk on a context row.
  */
-export const LIVE_RATIO_SOURCES: Readonly<Record<'gold-btc' | 'silver-btc' | 'gold-aud' | 'gold-silver', PriceAssetId[]>> = {
+export const LIVE_RATIO_SOURCES: Readonly<Record<'gold-btc' | 'gold-aud' | 'gold-silver', PriceAssetId[]>> = {
   'gold-btc': ['gold-usd', 'btc-usd'],
-  'silver-btc': ['silver-usd', 'btc-usd'],
   // gold-aud also needs the snapshot's audusd reading — merge.ts handles it.
   'gold-aud': ['gold-usd'],
   'gold-silver': ['gold-usd', 'silver-usd'],
@@ -119,7 +118,6 @@ export const LIVE_RATIO_SOURCES: Readonly<Record<'gold-btc' | 'silver-btc' | 'go
 /** Shared attribution for the recomputed companion ratios. */
 export const LIVE_RATIO_SOURCE = {
   goldBtc: { name: 'Yahoo Finance (live ratio)', url: 'https://finance.yahoo.com' },
-  silverBtc: { name: 'Yahoo Finance (live ratio)', url: 'https://finance.yahoo.com' },
   goldAud: {
     name: 'Yahoo Finance (gold, live) × Frankfurter (AUD)',
     url: 'https://finance.yahoo.com',

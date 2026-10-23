@@ -545,9 +545,10 @@ describe('copy dictionaries', () => {
       expect(insightsCopyFa.indicators[id]).toBeDefined();
       expect(insightsCopyFa.indicators[id]?.name.length).toBeGreaterThan(0);
     }
-    // The 2026-10-21c owner round: the eth-usd card retired — the
-    // corpus is 65 and fa must carry every one of them.
-      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(65);
+    // The 2026-10-21c owner round: the eth-usd card retired; the 2026-10-23
+    // OD-7 round retired nzd-usd + silver-btc — the corpus is 63 and fa must
+    // carry every one of them.
+      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(63);
   });
 
   // Fix spec T-07 (2026-10-15): the CI-side corpus scan — the ingest's

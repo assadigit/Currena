@@ -176,9 +176,8 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
     expect(out['copper-usd']!.at(-1)).toEqual({ date: today, value: 6.66 * 2204.62262 });
     // btc: single live point (no stored history yet)
     expect(out['btc-usd']).toEqual([{ date: today, value: 86625 }]);
-    // live-point info cards
+    // live-point info cards (silver-btc retired 2026-10-23, OD-7)
     expect(out['gold-btc']).toEqual([{ date: today, value: 4162.6 / 86625 }]);
-    expect(out['silver-btc']).toEqual([{ date: today, value: 61.28 / 86625 }]);
     expect(out['gold-aud']).toEqual([{ date: today, value: 4162.6 * 1.4322 }]);
     // ounce price cards: monthly history + today's live point appended
     expect(out['gold-usd']).toHaveLength(3);
