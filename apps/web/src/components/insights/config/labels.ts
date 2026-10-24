@@ -201,6 +201,7 @@ function ruleAtomText(
   units: UnitLabels,
   numberLocale: 'en-US' | 'fa-IR',
   unitToken: UnitToken,
+  scale = 1,
 ): string {
   switch (atom.kind) {
     case 'info':
@@ -210,7 +211,11 @@ function ruleAtomText(
     case 'threshold': {
       const unit =
         unitToken === 'percent' ? units.percent : unitToken === 'points' ? ` ${units.points}` : '';
-      const value = `${fmt(atom.value, numberLocale)}${unit}`;
+      // M4 (2026-10-24): a scaled display's threshold speaks in the READER's
+      // units — recession-probability stores 0.5 (the published fraction)
+      // and displays 62% scaled ×100, so its rule line must read "above
+      // 50%", never "above 0.5%" (the card's own value is the scaled one).
+      const value = `${fmt(atom.value * scale, numberLocale)}${unit}`;
       const template = atom.sustainedWeeks
         ? atom.direction === 'above'
           ? copy.thresholdAboveSustained
@@ -256,13 +261,15 @@ export function formatRuleText(
   units: UnitLabels,
   numberLocale: 'en-US' | 'fa-IR',
 ): string {
-  const unitToken = DISPLAY[id].unit;
+  const cfg = DISPLAY[id];
+  const unitToken = cfg.unit;
+  const scale = cfg.scale ?? 1;
   if (rule.kind === 'any-of') {
     return rule.of
-      .map((atom) => ruleAtomText(atom, copy, units, numberLocale, unitToken))
+      .map((atom) => ruleAtomText(atom, copy, units, numberLocale, unitToken, scale))
       .join(` ${copy.or} `);
   }
-  return ruleAtomText(rule, copy, units, numberLocale, unitToken);
+  return ruleAtomText(rule, copy, units, numberLocale, unitToken, scale);
 }
 
 /* ------------------------------------------------------------------ *

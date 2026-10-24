@@ -83,6 +83,49 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Session record — 2026-10-24 Wave 1 (M3+M4): the early-warning pack, the OD-5 honest no-go, and the rule-text scale fix
+
+- **Deployed**: currena-api **`21d0b040`** (the round: core schemas + the
+  insights engine + the web copy/display configs; the SPA rebuilt with the
+  eight new cards) → **`5924ed4f`** (the temporary 15:40 UTC publish rung,
+  the M1 pattern) → **`c1b36019`** (the rung reverted — the designed
+  04:10/04:25/04:40 + 10:10/20:10 schedule only) → **`160ac6e2`** (the
+  rule-text scale fix the live verification caught). currena-markets
+  untouched. **The D-43 deploy-lock check ran before the first deploy**:
+  the versions API showed the last upload at 2026-10-23T23:01Z (the M2
+  reconciliation) — no parallel session.
+- **The deploy lock's second lesson (a self-near-miss, honestly noted)**:
+  the temporary publish rung was deployed, captured, and reverted by
+  `git checkout` + redeploy — the temporary state never entered a commit.
+  The observability cpuTime query + a mis-pathed `wrangler tail` both
+  missed the 15:40 window; the completed-writes evidence (stage +
+  snapshot + status + archives + public projection all landed at
+  15:40:18Z — the pre-fix exceededCpu mode died *before* any write) is
+  the recorded binary signal, and the exact cpuTime rides the designed
+  20:10/04:10 rungs for the next session's tail.
+- **Additions need no KV surgery** (the M2 contrast): the stored 63-reading
+  snapshot served unchanged behind the new code (the old enum is a subset;
+  the new cards read `unavailable` for the ~10 minutes until the rung), and
+  the 15:40 rung wrote the first 71-reading snapshot family. The new ids'
+  history keys fill at the next 04:25 (daily-cadence: sofr, us-2y,
+  breakeven-10y) / 04:40 (periodic: claims, recession-probability, the
+  Michigan pair, core PCE) rungs from the stage the 15:40 run wrote — the
+  cards show the honest "No chart history for this card yet" until then.
+- **The one live defect**: the rule-text renderer did not apply a card's
+  display scale to its threshold — recession-probability (stored fraction
+  0.5, displayed ×100) read "above 0.5%" instead of "above 50%". Fixed in
+  `labels.ts` (formatRuleText passes `DISPLAY[id].scale` to the threshold
+  atom), redeployed, re-verified in both locales («بیشتر از ۵۰٪»).
+- **Live verification** (evidence under
+  `docs/insights/screenshots/m4-2026-10-24/`): the public API serves 71
+  readings; the hero "7 of 25 indicators need attention"; the growth gauge
+  Cautious 2-of-8 (recession probability 62% · +38.00 pts · warning;
+  Michigan 48.1 bottom-decile warning with its "Expected inflation next
+  year: 4.6%" companion; claims 194,000 normal); SOFR 3.90% context with
+  the "New York Fed via FRED" citation; us-2y 4.65% and breakeven-10y
+  2.34% context; the fa hero «۷ شاخص از ۲۵ شاخص نیازمند توجه‌اند» — zero
+  console errors in either locale. EODHD quota untouched (0 requests).
+
 ## Session record — 2026-10-23b the subtraction set (M2): two retirements, one demotion, five honest relabels
 
 - **Deployed**: currena-api **`75517285`** (packages/core + insights + the

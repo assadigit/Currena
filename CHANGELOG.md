@@ -114,6 +114,33 @@ publisher's licence — recorded as D-44, never silently absorbed.
   warning** · **core PCE 3.01% warning** — three of the four new voters
   warn on day one).
 
+### Live verification + the rule-text scale fix
+
+- Deployed `21d0b040` (the round) → `5924ed4f` (the temporary 15:40 UTC
+  publish rung, the M1 pattern — captured, then reverted in `c1b36019`).
+  The 15:40 main-shape rung completed every write (stage + snapshot +
+  status + archives + public projection at 15:40:18Z — the binary
+  signal: the pre-fix exceededCpu failure mode died *before* any write;
+  the exact cpuTime capture rides the designed 20:10/04:10 rungs).
+- **The live verification found one real defect, fixed in `160ac6e2`:**
+  the rule-text renderer (`labels.ts ruleAtomText`) did not apply a
+  card's display scale to its THRESHOLD — recession-probability stores
+  the published fraction (rule `above 0.5`) but displays scaled ×100,
+  so its line read "above 0.5%" instead of "above 50%". The fix passes
+  `DISPLAY[id].scale` through `formatRuleText` — the threshold now
+  speaks in the reader's units in both locales («بیشتر از ۵۰٪»).
+- Browser-verified on currena.ir (evidence under
+  `docs/insights/screenshots/m4-2026-10-24/`): the hero reads
+  **"7 of 25 indicators need attention"**, the growth gauge
+  **Cautious 2-of-8**, the probability card "62% · +38.00 pts · Needs
+  attention", Michigan 48.1 warning with its "Expected inflation next
+  year: 4.6%" companion, claims "194,000 claims" (details: "Stale after
+  12 days", the honest "No chart history for this card yet" until the
+  04:25/04:40 history rungs fill from the stage), SOFR 3.90% with the
+  "New York Fed via FRED" citation, us-2y 4.65% and breakeven-10y 2.34%
+  context, the fa hero «۷ شاخص از ۲۵ شاخص نیازمند توجه‌اند» — zero
+  console errors in either locale.
+
 ## [2026-10-23] — the Phase-2 open: the unhide round (Shiller pair + china-pmi) and the rung CPU fix (M0+M1 of the D-42 milestones)
 
 The owner approved the review's Wave-0 calls with a sequencing directive
