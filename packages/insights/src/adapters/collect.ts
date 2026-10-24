@@ -21,7 +21,7 @@ import { providerFetchEnabled } from '../sources';
 import { ABS_SERIES, fetchAbsSeries } from './abs';
 import { fetchBitstampCloses } from './bitstamp';
 import { fetchEiaBrent, fetchEiaHenryHub, fetchEiaWti } from './eia';
-import { fetchEcbDfrSeries } from './ecb';
+import { fetchEcbAaa10ySeries, fetchEcbDfrSeries } from './ecb';
 import { fetchCryptoFng } from './fng';
 import { fetchFrankfurterSeries } from './frankfurter';
 import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredDecadeFrom } from './fred';
@@ -330,10 +330,17 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
 
   // ECB Data Portal (deposit facility rate, full history).
   const ecbDfr = await fetchLogged('ecb', 'FM/D.U2.EUR.4F.KR.DFR.LEV', () => fetchEcbDfrSeries());
+  // M5 Wave 2 (2026-10-24): the euro-area AAA 10-year yield — the series
+  // key the review could not find, verified live at build time
+  // (YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y; the G_N_C sibling is ALL-rated).
+  const ecbAaa10y = await fetchLogged('ecb', 'YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y (decade window)', () =>
+    fetchEcbAaa10ySeries(),
+  );
 
-  // Frankfurter (USD→JPY/AUD/CNY + the six basket currencies, 10y window;
-  // NZD left the request 2026-10-23 — the nzd-usd card retired, OD-7).
-  const fx = await fetchLogged('frankfurter', `USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF since ${fxStart}`, () =>
+  // Frankfurter (USD→JPY/AUD/CNY + the six basket currencies + TRY, 10y
+  // window; NZD left the request 2026-10-23 — the nzd-usd card retired,
+  // OD-7; TRY joined 2026-10-24 — the usdtry card, M5 Wave 2).
+  const fx = await fetchLogged('frankfurter', `USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,TRY since ${fxStart}`, () =>
     fetchFrankfurterSeries(fxStart),
   );
 
@@ -463,7 +470,7 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
         'silver-usd': silverYahooQuote,
         'btc-usd': btcYahooQuote,
       },
-      ecb: { dfr: ecbDfr },
+      ecb: { dfr: ecbDfr, aaa10y: ecbAaa10y },
       fx: {
         JPY: fx?.JPY,
         AUD: fx?.AUD,
@@ -473,6 +480,7 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
         CAD: fx?.CAD,
         SEK: fx?.SEK,
         CHF: fx?.CHF,
+        TRY: fx?.TRY,
       },
       wb,
       xauSpot,

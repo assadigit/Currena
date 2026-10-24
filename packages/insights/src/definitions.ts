@@ -177,6 +177,27 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     rule: { kind: 'info' },
   },
   {
+    // M5 Wave 2 (OD-8/D-42, 2026-10-24): the euro-area AAA 10-year yield —
+    // THE daily fix for the structurally stale OECD bund mirror (the
+    // review's "single highest-value rates add"). CONTEXT (info): the
+    // scored euro vote stays with ecb-dfr (the policy rate); this is the
+    // long-end display. The series key the review could not find, verified
+    // live at build time: YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y ("AAA yield
+    // curve - 10-year spot rate"; the G_N_C sibling is the ALL-rated
+    // curve — not the safe-asset leg).
+    id: 'euro-aaa-10y',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'What the safest euro-area governments pay for 10 years',
+    source: 'ecb',
+    sourceRef: 'ECB Data Portal YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y (AAA yield curve, 10-year spot rate)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 7, // the ECB's T+1 publication; the same window as ecb-dfr
+  },
+  {
     id: 'ecb-dfr',
     section: 'global',
     group: 'borrowing-costs',
@@ -408,6 +429,71 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     sourceRef: 'FRED:T10YIE (10-year breakeven inflation rate)',
     cadence: 'daily',
     changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+  },
+  {
+    // M5 Wave 2 (OD-8/D-42, 2026-10-24): the Pink Sheet Food index — the
+    // world food-price gauge (2010=100). CONTEXT (info): groceries are the
+    // most-felt line of household inflation; the energy-vs-food pairing
+    // reads beside Brent's scored card. The series rides the SAME workbook
+    // the metals already download (the Monthly Indices sheet — zero new
+    // requests; verified live 2026-10-24: 124.1 @ 2026M09).
+    id: 'food-index',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'World food prices',
+    source: 'world-bank',
+    sourceRef: 'World Bank Pink Sheet (Monthly Indices, Food; 2010=100)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 60, // B-09: the Pink Sheet publishes month M in the first days of M+1
+  },
+  {
+    // M5 Wave 2: the staple grains from the SAME Monthly Prices sheet
+    // (columns AK + AE in the live workbook) — the grocery-shelf raw
+    // materials. CONTEXT rows (info) beside the Food index.
+    id: 'wheat',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'Wheat price',
+    source: 'world-bank',
+    sourceRef: 'World Bank Pink Sheet (Wheat, US SRW; $/metric ton)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 60,
+  },
+  {
+    id: 'maize',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'Maize price',
+    source: 'world-bank',
+    sourceRef: 'World Bank Pink Sheet (Maize; $/metric ton)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 60,
+  },
+  {
+    // M5 Wave 2 (OD-8/D-42): the EM-pressure first member — the canonical
+    // high-inflation currency as a live case study in the inflation→
+    // devaluation dynamic. CONTEXT (info) in the dollar lane; monitoring
+    // breadth for the allocation reader, not a household decision. The
+    // Frankfurter request gains the TRY leg (zero extra requests).
+    id: 'usdtry',
+    section: 'global',
+    group: 'dollar-strength',
+    name: 'Dollar vs Turkish lira',
+    source: 'frankfurter',
+    sourceRef: 'Frankfurter USD→TRY (ECB reference rates)',
+    cadence: 'daily',
+    changeKind: 'pct',
     phase: 'P2',
     rule: { kind: 'info' },
   },

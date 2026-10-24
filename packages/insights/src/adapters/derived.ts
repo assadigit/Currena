@@ -54,8 +54,8 @@ export interface SeriesInputs {
    * absent/failed fetch simply leaves the FRED series as-is.
    */
   brentYahoo?: SeriesPoint[];
-  /** ECB Data Portal series (I15). */
-  ecb?: { dfr?: SeriesPoint[] };
+  /** ECB Data Portal series (I15; M5 Wave 2 adds the AAA 10y). */
+  ecb?: { dfr?: SeriesPoint[]; aaa10y?: SeriesPoint[] };
   /** Frankfurter USD→currency series (USD quote side, USD base). */
   fx: {
     JPY?: SeriesPoint[];
@@ -67,7 +67,10 @@ export interface SeriesInputs {
     SEK?: SeriesPoint[];
     CHF?: SeriesPoint[];
     /** NZD joined 2026-10-21 for the nzd-usd card — retired 2026-10-23
-     *  (OD-7): the leg stays out of the one Frankfurter request again. */
+     *  (OD-7): the leg stays out of the one Frankfurter request again.
+     *  M5 Wave 2 (2026-10-24): TRY joins as the ninth leg (the usdtry card,
+     *  the EM-pressure first member). */
+    TRY?: SeriesPoint[];
   };
   /** World Bank Pink Sheet monthly series. */
   wb?: WorldBankMonthly;
@@ -287,6 +290,11 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // collected for fed-expectations — the card is a pure surface add).
   put('sofr', fred.SOFR);
   put('us-2y', fred.DGS2);
+  // M5 Wave 2 (2026-10-24): the euro long end's daily fix — the AAA 10y
+  // beside its policy-rate sibling (the OECD bund mirror keeps its honest
+  // "monthly average, lagged" stopgap label until the owner's fix-or-retire
+  // call in M6).
+  put('euro-aaa-10y', ecb?.aaa10y);
   put('ecb-dfr', ecb?.dfr);
   if (fred.A091RC1Q027SBEA && fred.W006RC1Q027SBEA) {
     put(
@@ -333,6 +341,12 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // M4 Wave 1 (OD-8/D-42): the Fed's preferred gauge — core PCE YoY from
   // the PCEPILFE index, the same derived 12-month % change as CPI.
   if (fred.PCEPILFE) put('us-pce-core-yoy', yoyPctSeries(fred.PCEPILFE));
+  // M5 Wave 2 (2026-10-24): the household-cost staples from the SAME
+  // Pink Sheet download (zero new requests) — the Food index from the
+  // Monthly Indices sheet, the grains from the Monthly Prices sheet.
+  put('food-index', inputs.wb?.foodIndex);
+  put('wheat', wb?.wheat);
+  put('maize', wb?.maize);
   put('breakeven-5y5y', fred.T5YIFR);
   // M4 Wave 1 (OD-8/D-42): the 10y breakeven leaves validation-only and
   // becomes a context card (the series was already collected for T-01).
@@ -373,6 +387,10 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   put('dollar-basket', basketSeries(fx));
   put('usdjpy', fx.JPY);
   put('eur-usd', fx.EUR);
+  // M5 Wave 2 (2026-10-24): the EM-pressure first member — the dollar
+  // against the Turkish lira (context; the fx-module EM block may follow
+  // in a later round once TRY proves the slot).
+  put('usdtry', fx.TRY);
   // nzd-usd retired 2026-10-23 (OD-7, D-42): an indicator card for an
   // audience that doesn't exist — no replacement, the Frankfurter request
   // drops the NZD leg again.
@@ -682,6 +700,15 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     name: 'ECB Data Portal (DFR)',
     url: 'https://data.ecb.europa.eu/data/datasets/FM/B.EUR.4F.KR.DFR.LEV',
   },
+  // M5 Wave 2 (2026-10-24) — the euro long end + the household-cost staples.
+  'euro-aaa-10y': {
+    name: 'ECB Data Portal (euro-area AAA 10-year yield)',
+    url: 'https://data.ecb.europa.eu/data/datasets/YC/YC.B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y',
+  },
+  'food-index': { name: 'The World Bank: Commodity Markets (Pink Sheet, Food index)', url: 'https://www.worldbank.org/en/research/commodity-markets' },
+  wheat: { name: 'The World Bank: Commodity Markets (Pink Sheet, Wheat US SRW)', url: 'https://www.worldbank.org/en/research/commodity-markets' },
+  maize: { name: 'The World Bank: Commodity Markets (Pink Sheet, Maize)', url: 'https://www.worldbank.org/en/research/commodity-markets' },
+  usdtry: { name: 'Frankfurter (ECB USD→TRY reference rate)', url: 'https://frankfurter.dev' },
   'govt-interest-revenue': { name: 'FRED (BEA series, derived)', url: 'https://fred.stlouisfed.org/series/A091RC1Q027SBEA' },
   'fed-expectations': { name: 'FRED (DGS2 − policy-rate midpoint)', url: 'https://fred.stlouisfed.org/series/DGS2' },
   us30y: { name: 'FRED (DGS30)', url: 'https://fred.stlouisfed.org/series/DGS30' },

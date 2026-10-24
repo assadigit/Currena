@@ -22,9 +22,9 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 34 P1 / 37 P2 (the 2026-10-23 OD-7 round retires nzd-usd + silver-btc; the 2026-10-24 M4 Wave-1 round adds five P1 cards + three P2 context rows)', () => {
-    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(34);
-    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(37);
+  it('splits 35 P1 / 41 P2 (the 2026-10-24 M4 Wave-1 round adds five P1 cards + three P2 context rows; the M5 Wave-2 round adds one P1 card + four P2 context rows)', () => {
+    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(35);
+    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(41);
   });
 
   it('groups are the question groups (global 5 + prices-board, australia 3)', () => {
@@ -54,7 +54,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('info-only cards never vote: exactly the thirty-one info rules (2026-10-23 OD-7: nzd-usd + silver-btc retire, m2-us demoted to context; 2026-10-24 M4 Wave 1: +sofr, +us-2y, +breakeven-10y, +michigan-1y-expectations as context)', () => {
+  it('info-only cards never vote: exactly the thirty-six info rules (2026-10-24 M4 Wave 1: +sofr, +us-2y, +breakeven-10y, +michigan-1y-expectations; M5 Wave 2: +euro-aaa-10y, +food-index, +wheat, +maize, +usdtry as context)', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
     expect(info).toEqual([
       'au-deposit-rate',
@@ -67,6 +67,8 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'copper-usd',
       'crypto-fng',
       'eur-usd',
+      'euro-aaa-10y',
+      'food-index',
       'gilt-10y',
       'gold-aud',
       'gold-btc',
@@ -74,6 +76,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'iron-ore',
       'jgb-10y',
       'm2-us',
+      'maize',
       'michigan-1y-expectations',
       'natgas',
       'platinum',
@@ -87,6 +90,8 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'us-gdp-growth',
       'us-nfp',
       'usdcny',
+      'usdtry',
+      'wheat',
       'wti',
     ]);
   });

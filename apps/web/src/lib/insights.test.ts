@@ -548,8 +548,9 @@ describe('copy dictionaries', () => {
     // The 2026-10-21c owner round: the eth-usd card retired; the 2026-10-23
     // OD-7 round retired nzd-usd + silver-btc — the corpus is 63; the
     // 2026-10-24 M4 Wave-1 round added the early-warning pack's eight ids
-    // — the corpus is 71 and fa must carry every one of them.
-      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(71);
+    // and the M5 Wave-2 round added five more (euro-aaa-10y, food-index,
+    // wheat, maize, usdtry) — the corpus is 76 and fa must carry every one.
+      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(76);
   });
 
   // Fix spec T-07 (2026-10-15): the CI-side corpus scan — the ingest's

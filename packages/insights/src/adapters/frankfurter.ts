@@ -28,6 +28,10 @@ export const FRANKFURTER_INSIGHTS_CURRENCIES = [
   'CAD',
   'SEK',
   'CHF',
+  // M5 Wave 2 (2026-10-24): TRY rejoins as the ninth leg — the usdtry
+  // card, the EM-pressure first member (the review: both passes probed it
+  // live, 49.63 vs 49.628 the same day). One request covers all legs.
+  'TRY',
 ] as const;
 
 /** URL of the USD-base timeseries for `currencies` from `start` (ISO date). */

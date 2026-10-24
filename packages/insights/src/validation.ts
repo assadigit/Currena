@@ -674,6 +674,9 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'us-pce-core-yoy',
   'recession-probability',
   'michigan-1y-expectations',
+  // M5 Wave 2 (2026-10-24): the euro-area AAA 10-year yield — a rate-family
+  // series in percentage points.
+  'euro-aaa-10y',
 ]);
 
 /** Index/ratio series that speak in points but are not interest rates. */

@@ -26,7 +26,9 @@ export type UnitToken =
   // M4 Wave 1 (2026-10-24): a counted quantity — claims counts people
   // newly filing (a plain grouped number plus the count word; 'none'
   // renders an empty label, which R13 forbids).
-  | 'claims';
+  | 'claims'
+  // M5 Wave 2 (2026-10-24): the Turkish lira (the usdtry pair).
+  | 'try';
 
 /** Locale-dependent unit labels (from the copy dictionaries). */
 export interface UnitLabels {
@@ -43,6 +45,7 @@ export interface UnitLabels {
   cny: string;
   ratio: string;
   claims: string;
+  try: string;
 }
 
 interface DisplayConfig {
@@ -57,7 +60,7 @@ interface DisplayConfig {
 }
 
 /** Units rendered as a prefix in English (suffix everywhere in Farsi). */
-const PREFIXED_UNITS: ReadonlySet<UnitToken> = new Set(['usd', 'aud', 'usd-bn', 'usd-tr', 'eur', 'jpy', 'cny']);
+const PREFIXED_UNITS: ReadonlySet<UnitToken> = new Set(['usd', 'aud', 'usd-bn', 'usd-tr', 'eur', 'jpy', 'cny', 'try']);
 
 export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'yield-curve-10y2y': { decimals: 2, unit: 'points' },
@@ -100,6 +103,16 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   sofr: { decimals: 2, unit: 'percent' },
   'us-2y': { decimals: 2, unit: 'percent' },
   'breakeven-10y': { decimals: 2, unit: 'percent' },
+  // M5 Wave 2 (2026-10-24) — the euro long end + the household-cost staples
+  // + the EM-pressure pair. The Food index is the publisher's own 2010=100
+  // basis (1dp, 'index' like the other publisher indexes); the grains are
+  // $/mt prices (the wti/natgas precedent — the unit word says US$, the
+  // copy says per metric ton); TRY renders with the lira sign in EN.
+  'euro-aaa-10y': { decimals: 2, unit: 'percent' },
+  'food-index': { decimals: 1, unit: 'index' },
+  wheat: { decimals: 1, unit: 'usd' },
+  maize: { decimals: 1, unit: 'usd' },
+  usdtry: { decimals: 2, unit: 'try' },
   'dollar-basket': { decimals: 2, unit: 'index' },
   usdjpy: { decimals: 2, unit: 'jpy' },
   // Step-1 audit item C4: EUR per USD — the € symbol, not "US$".

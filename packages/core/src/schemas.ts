@@ -379,6 +379,12 @@ export const IndicatorIdSchema = z.enum([
   'sofr', // FRED SOFR (daily) — context, borrowing-costs
   'us-2y', // FRED DGS2 (daily) — context display (already collected), borrowing-costs
   'breakeven-10y', // FRED T10YIE (daily) — context display (validation-only today), prices-heat
+  // ---- M5 Wave 2 (OD-8/D-42, 2026-10-24): household costs & the euro long end ----
+  'euro-aaa-10y', // ECB YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y (daily, key verified 2026-10-24) — context, borrowing-costs
+  'food-index', // World Bank Pink Sheet Monthly Indices, Food (2010=100) — context, prices-heat
+  'wheat', // Pink Sheet Monthly Prices, Wheat US SRW ($/mt) — context, prices-heat
+  'maize', // Pink Sheet Monthly Prices, Maize ($/mt) — context, prices-heat
+  'usdtry', // Frankfurter USD→TRY (daily) — context, dollar-strength (the EM-pressure first member)
   // Global — Prices board companions (context rows rendered in lanes)
   'wti', // FRED DCOILWTICO (WTI spot, USD/barrel)
   'natgas', // FRED DHHNGSP (Henry Hub spot, USD/MMBtu)

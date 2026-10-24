@@ -5,6 +5,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-24b] — Wave 2 (M5): household costs & the euro long end
+
+Five more context cards (71→76 indicators), zero new scored votes (the
+gauges stay at 40 voters), and the review's one honest negative RESOLVED.
+
+- **`euro-aaa-10y` — the AAA key the review could not find, verified live
+  at build time**: `YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y` ("AAA yield
+  curve - 10-year spot rate", the ECB's own daily yield-curve dataset;
+  3.38% @ 2026-10-22). The review's four candidate keys all 404'd because
+  they probed dotted/FM forms — the slash-form YC key on
+  `data-api.ecb.europa.eu` answers 200 (the G_N_C sibling is the
+  ALL-rated curve; G_N_A is the AAA one). The decade-window request rides
+  one new subrequest (49/50 on the 04:10 shape). The OECD bund mirror
+  KEEPS its honest "monthly average, lagged" stopgap label beside the new
+  daily card — the fix-or-retire call stays the owner's M6 question.
+- **The Pink Sheet unlock — `food-index`, `wheat`, `maize`**: the Food
+  index (2010=100, the Monthly Indices sheet, header "Food **" verbatim;
+  live 124.1 @ 2026M09 — the top quintile of its decade) plus the two
+  staple grains from the same workbook's Monthly Prices sheet (Wheat US
+  SRW 278.6 $/mt, Maize 239.6 $/mt). ONE workbook download, two sheet
+  reads, zero new requests — the "already downloaded daily, unparsed"
+  unlock the review called for. Groceries are the most-felt line of
+  household inflation; the energy-vs-food pairing now reads beside
+  Brent's scored card.
+- **`usdtry` — the EM-pressure first member**: TRY rejoins the one
+  Frankfurter request as the ninth leg (zero extra requests); the card
+  shows 49.74 — the top of its decade range, the inflation→devaluation
+  case study in real time. The fx-module EM block may follow in a later
+  round once TRY proves the slot.
+- All five are CONTEXT rows (info rules): the borrowing-costs vote stays
+  with ecb-dfr/fed-target, prices-heat with CPI/PCE/brent, dollar-strength
+  with the basket/JPY pair. New `try` unit token (₺ / «لیر ترکیه»).
+  Staleness: euro-aaa 7d (ECB T+1), the Pink Sheet trio 60d (the B-09
+  publication cycle).
+- Gates: typecheck 6/6 · core 191 · scraper 67 · insights 559 · markets
+  13 · api 344 · web 676 + the recorded briefing baseline · lint 0/15 ·
+  copy audit clean (64 new fa strings processed to 2026-10-24b-m5-wave2,
+  2,660 entries) · T-15 public passed (0 hidden) · budgets: entry held,
+  Insights lazy bumped 782/189 → 800/194 (measured 797.18/192.61 — the
+  same bilingual-corpus growth, justified in the script). The local
+  dry-run verified all five values live end-to-end.
+
 ## [2026-10-24] — Wave 1: the early-warning pack (M3+M4 of the D-42 milestones) — and the OD-5 honest no-go
 
 The second Phase-2 round delivers the analytical core the Economist's Review

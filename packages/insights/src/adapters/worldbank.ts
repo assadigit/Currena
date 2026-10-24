@@ -34,6 +34,12 @@ const WB_COLUMNS = {
   // workbook (column BS in the live Pink Sheet — no new request, no new
   // licence surface; the header+unit identity check guards it like the rest).
   platinum: { header: 'Platinum', unit: '($/troy oz)' },
+  // M5 Wave 2 (2026-10-24, the review's "already downloaded daily,
+  // unparsed" unlock): the household-cost staples from the SAME Monthly
+  // Prices sheet (columns AK + AE in the live workbook, verified 2026-10-24:
+  // wheat 278.6 $/mt · maize 239.6 $/mt @ 2026M09) — zero new requests.
+  wheat: { header: 'Wheat, US SRW', unit: '($/mt)' },
+  maize: { header: 'Maize', unit: '($/mt)' },
 } as const;
 
 export interface WorldBankMonthly {
@@ -43,7 +49,25 @@ export interface WorldBankMonthly {
   ironOre: SeriesPoint[];
   brent: SeriesPoint[];
   platinum: SeriesPoint[];
+  /** M5: the grain columns (Monthly Prices sheet, $/mt — same parse as the metals). */
+  wheat: SeriesPoint[];
+  maize: SeriesPoint[];
+  /**
+   * M5: the Food index (Monthly Indices sheet, 2010=100). Optional at the
+   * type level because parseWorldBankMonthlySheet (the pure prices-sheet
+   * parse) cannot fill it — fetchWorldBankMonthly always does (or throws).
+   */
+  foodIndex?: SeriesPoint[];
 }
+
+/**
+ * M5: the Monthly Indices sheet's Food column header, verbatim from the
+ * live workbook (verified 2026-10-24: cell G8 reads "Food **" — the " **"
+ * is the Pink Sheet's own footnote marker, present on every sub-index row;
+ * the index basis is 2010=100 per the workbook's Description sheet).
+ */
+export const WB_FOOD_INDEX_HEADER = 'Food **';
+export const WB_INDICES_SHEET_NAME = 'Monthly Indices';
 
 /** Extract the current monthly workbook URL from the commodity-markets page HTML. */
 export function findPinkSheetMonthlyUrl(pageHtml: string): string {
@@ -62,6 +86,48 @@ export function findPinkSheetMonthlyUrl(pageHtml: string): string {
 function isWbMissing(value: string): boolean {
   const v = value.trim();
   return v === '' || v === '…' || v === '..' || v === '-';
+}
+
+/**
+ * M5 (2026-10-24): parse the Food index out of the Monthly Indices sheet
+ * (pure — fixture-testable). The sheet's headers sit on a two-tier header
+ * block (rows ~6–9 in the live workbook; 'Food **' itself sits on a sub-row)
+ * with NO units row below — the 2010=100 basis lives in the Description
+ * sheet, so the identity check is the exact header cell + the first-value
+ * plausibility (positive, finite), and the data rows are the 'YYYYMnn'
+ * months below the header block in column A.
+ */
+export function parseWorldBankFoodIndexSheet(
+  cells: { col: string; row: number; value: string; sharedString: boolean }[],
+): SeriesPoint[] {
+  // Locate the Food header cell (exact verbatim match — the '**' suffix is
+  // the Pink Sheet's own footnote marker, observed in the live workbook).
+  const headerCell = cells.find((c) => c.value.trim() === WB_FOOD_INDEX_HEADER);
+  if (headerCell === undefined) {
+    throw new AdapterError('world-bank', `Monthly Indices sheet has no "${WB_FOOD_INDEX_HEADER}" header cell (renamed?)`);
+  }
+  const cellByRowCol = new Map<string, string>();
+  for (const c of cells) cellByRowCol.set(`${c.row}:${c.col}`, c.value);
+  const monthRe = /^(\d{4})M(\d{2})$/;
+  const out: SeriesPoint[] = [];
+  for (const c of cells) {
+    if (c.col !== 'A' || c.row <= headerCell.row) continue;
+    const m = monthRe.exec(c.value.trim());
+    if (!m) continue;
+    const value = cellByRowCol.get(`${c.row}:${headerCell.col}`);
+    if (value === undefined || isWbMissing(value)) continue;
+    const num = Number(value);
+    if (!Number.isFinite(num) || num <= 0) {
+      throw new AdapterError('world-bank', `food index ${m[1]}-${m[2]}: value "${value}" is not a positive finite number`);
+    }
+    out.push({ date: `${m[1]}-${m[2]}-01`, value: num });
+  }
+  if (out.length === 0) {
+    throw new AdapterError('world-bank', 'the food index parsed to zero observations');
+  }
+  out.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  assertAscending(out);
+  return out;
 }
 
 /**
@@ -101,7 +167,7 @@ export function parseWorldBankMonthlySheet(cells: { col: string; row: number; va
   }
 
   const targets: Record<keyof typeof WB_COLUMNS, SeriesPoint[]> = {
-    gold: [], silver: [], copper: [], ironOre: [], brent: [], platinum: [],
+    gold: [], silver: [], copper: [], ironOre: [], brent: [], platinum: [], wheat: [], maize: [],
   };
   const colOf = new Map<string, keyof typeof WB_COLUMNS>();
   for (const [key, spec] of Object.entries(WB_COLUMNS) as [keyof typeof WB_COLUMNS, (typeof WB_COLUMNS)[keyof typeof WB_COLUMNS]][]) {
@@ -145,7 +211,9 @@ export function parseWorldBankMonthlySheet(cells: { col: string; row: number; va
 }
 
 /**
- * Fetch the current Pink Sheet monthly workbook and parse the five series.
+ * Fetch the current Pink Sheet monthly workbook and parse the series
+ * (the metals + energy from Monthly Prices; the Food index from Monthly
+ * Indices — ONE workbook download, two sheet reads, zero extra requests).
  * Two network round-trips: the commodity-markets page (link discovery) and
  * the workbook itself.
  */
@@ -157,5 +225,11 @@ export async function fetchWorldBankMonthly(deps: FetchDeps = {}): Promise<World
   const wbRes = await insightsFetch(workbookUrl, {}, { ...deps, timeoutMs: deps.timeoutMs ?? 60_000 });
   const bytes = new Uint8Array(await wbRes.arrayBuffer());
   const cells = await readXlsxSheet(bytes, WB_MONTHLY_SHEET_NAME);
-  return parseWorldBankMonthlySheet(cells);
+  const out = parseWorldBankMonthlySheet(cells);
+  // M5 (2026-10-24): the Food index rides the SAME workbook — a second
+  // sheet read, never a second download. An indices-sheet failure throws
+  // loudly (the workbook shape changed — never guess).
+  const indicesCells = await readXlsxSheet(bytes, WB_INDICES_SHEET_NAME);
+  out.foodIndex = parseWorldBankFoodIndexSheet(indicesCells);
+  return out;
 }

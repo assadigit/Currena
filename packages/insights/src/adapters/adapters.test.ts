@@ -100,7 +100,8 @@ describe('fred adapter', () => {
 describe('frankfurter adapter', () => {
   it('builds the open-ended timeseries URL', () => {
     expect(frankfurterTimeseriesUrl('2016-01-04')).toBe(
-      'https://api.frankfurter.dev/v1/2016-01-04..?from=USD&to=JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF',
+      // M5 Wave 2 (2026-10-24): TRY joins as the ninth leg (the usdtry card).
+      'https://api.frankfurter.dev/v1/2016-01-04..?from=USD&to=JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,TRY',
     );
     // Narrow currency lists still build their own URL.
     expect(frankfurterTimeseriesUrl('2016-01-04', ['JPY'])).toBe(

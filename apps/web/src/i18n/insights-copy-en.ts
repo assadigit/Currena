@@ -246,6 +246,29 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou:
       'The number to glance at before asking whether markets are leaning toward rate cuts.',
   },
+  // ---- M5 Wave 2 (OD-8/D-42, 2026-10-24): the euro long end + household costs + the EM pair ----
+  'euro-aaa-10y': {
+    name: 'What the safest euro-area governments pay for 10 years',
+    ticker: '10-year',
+    oneLiner:
+      'The 10-year borrowing cost of the euro area’s AAA-rated governments: the eurozone’s safe-asset rate, daily.',
+    lines: {
+      highRising: 'The euro area’s safe long-term rate is high for its decade and rising: the setting that tightens borrowing across Europe.',
+      highEasing: 'The euro area’s safe long-term rate is high for its decade but easing.',
+      typical: 'The euro-area safe 10-year rate sits in its usual range for the decade.',
+      low: 'The euro area’s safe long-term rate is low for its decade: the cheap-money setting European borrowers remember.',
+    },
+    whatItIs:
+      'The AAA-rated euro-area 10-year yield from the ECB’s own yield curve (daily). Unlike the monthly Bund mirror on this page, it moves every trading day and covers the whole euro area’s safest borrowers, not only Germany.',
+    whyItMatters:
+      'This is the eurozone’s risk-free long rate — the floor under every European mortgage, corporate loan and government bond yield, and the ECB’s transmission check beside its policy rate.',
+    tendedToMean:
+      'Sustained rises in this rate have lifted European mortgage and corporate borrowing costs; falls have eased them, as in the US 30-year story.',
+    cantTell:
+      'It is a market price, not a policy setting, and AAA borrowing is not every government’s borrowing — stressed euro states pay more.',
+    forYou:
+      'The daily euro-side counterpart to the US 10-year card: what “risk-free” money costs across the euro area right now.',
+  },
   'ecb-dfr': {
     name: 'The euro area’s policy rate',
     oneLiner:
@@ -544,6 +567,29 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'A context card: one pair, information-only, voting in no gauge: and it says nothing about the Australian dollar directly.',
     forYou:
       'Context for European travel and purchases: the Australian dollar moves against the euro on its own, so the AUD rate is the one to check.',
+  },
+  // ---- M5 Wave 2 (2026-10-24): the EM-pressure first member ----
+  usdtry: {
+    name: 'Dollar vs Turkish lira',
+    ticker: 'USD/TRY',
+    oneLiner:
+      'How many Turkish liras one US dollar buys: the live case study of high inflation meeting a sliding currency.',
+    lines: {
+      highRising: 'The dollar is buying more lira than usual and the move continues: the inflation-and-devaluation dynamic in action.',
+      highEasing: 'The lira remains weak for its decade but the slide is easing.',
+      typical: 'The dollar–lira rate sits in its usual range for the decade.',
+      low: 'The lira is stronger than its decade norm: a rare stretch of lira stability.',
+    },
+    whatItIs:
+      'The USD→TRY reference rate (ECB rates via Frankfurter, daily): how many liras one dollar buys in the foreign-exchange market.',
+    whyItMatters:
+      'Turkey is the canonical modern case of persistent high inflation: watching its currency is watching inflation become devaluation in real time — a live illustration of what the inflation cards warn about.',
+    tendedToMean:
+      'The lira has lost most of its dollar value over the past decade through repeated inflation episodes; every step down made imported goods dearer in lira terms.',
+    cantTell:
+      'One pair, one country: it says nothing about other emerging-market currencies, and managed exchange rates can hold levels that fundamentals question.',
+    forYou:
+      'A standing illustration of why the inflation cards on this page matter: high inflation, over years, ends up written in the exchange rate.',
   },
   'china-pmi': {
     name: 'Chinese factory activity',
@@ -888,7 +934,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     name: 'Crypto fear and greed',
     oneLiner: 'A daily 0-to-100 gauge of how fearful or greedy crypto markets feel today.',
     whatItIs:
-      'The Alternative.me Crypto Fear and Greed Index, a daily 0-to-100 scale built from crypto market volatility, momentum, social media and dominance measures (0 = extreme fear, 100 = extreme greed). Shown with the publisher\u2019s own scale; attribution to Alternative.me.',
+      'The Alternative.me Crypto Fear and Greed Index, a daily 0-to-100 scale built from crypto market volatility, momentum, social media and dominance measures (0 = extreme fear, 100 = extreme greed). Shown with the publisher’s own scale; attribution to Alternative.me.',
     whyItMatters:
       'A sentiment backdrop for crypto headlines: the number describes the mood of that market today, nothing more.',
     tendedToMean:
@@ -903,9 +949,9 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     name: 'US share prices versus long-run earnings (Shiller CAPE)',
     oneLiner: 'A long-run measure of how expensive US shares are against their own 10-year average of inflation-adjusted earnings.',
     whatItIs:
-      'The Shiller CAPE ratio from Robert Shiller\u2019s Irrational Exuberance dataset (ie_data.xls, monthly): the S&P 500 price divided by the average of 10 years of inflation-adjusted earnings. Shown with the publisher\u2019s own number; attribution to Robert Shiller, Yale.',
+      'The Shiller CAPE ratio from Robert Shiller’s Irrational Exuberance dataset (ie_data.xls, monthly): the S&P 500 price divided by the average of 10 years of inflation-adjusted earnings. Shown with the publisher’s own number; attribution to Robert Shiller, Yale.',
     whyItMatters:
-      'A way to compare today\u2019s US share prices with more than 150 years of their own history on one consistent basis.',
+      'A way to compare today’s US share prices with more than 150 years of their own history on one consistent basis.',
     tendedToMean:
       'Very high CAPE readings have, historically, come with lower US share returns over the following decade, and very low readings with higher ones — a long-run tendency with wide variation around it.',
     cantTell:
@@ -916,14 +962,14 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     name: 'Excess CAPE Yield (Shiller)',
     oneLiner: 'The earnings yield of US shares minus what inflation-protected US government bonds pay.',
     whatItIs:
-      'The Excess CAPE Yield from Robert Shiller\u2019s ie_data.xls (monthly): the inverse of the CAPE ratio minus the real 10-year Treasury yield, exactly as the publisher computes it.',
+      'The Excess CAPE Yield from Robert Shiller’s ie_data.xls (monthly): the inverse of the CAPE ratio minus the real 10-year Treasury yield, exactly as the publisher computes it.',
     whyItMatters:
-      'It lines up the earnings yield of US shares against the real return on \u201csafe\u201d US government money on one scale.',
+      'It lines up the earnings yield of US shares against the real return on “safe” US government money on one scale.',
     tendedToMean:
-      'When the gap has been negative, the following decade\u2019s US share returns have often been lower; when strongly positive, often higher — a long-run tendency, not a rule.',
+      'When the gap has been negative, the following decade’s US share returns have often been lower; when strongly positive, often higher — a long-run tendency, not a rule.',
     cantTell:
       'Like CAPE, it describes a relationship over long horizons; it says little about the next few months and is never a signal.',
-    forYou: 'The companion reading to the CAPE card, in the publisher\u2019s own units.',
+    forYou: 'The companion reading to the CAPE card, in the publisher’s own units.',
   },
   'gold-btc': {
     name: 'Bitcoin priced in gold (BTC per ounce)',
@@ -1388,6 +1434,72 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     tendedToMean: 'It spent the years after 2008 well below gold; its big runs (the 2000s, 2025–26) came with supply squeezes or demand booms.',
     cantTell: 'Rarer than gold but far more industrial: its price follows factories as much as fear, and forecasts for it are famously poor.',
     forYou: 'Gold’s industrial sibling: the third pillar of the precious-metals board and an ingredient in catalytic converters.',
+  },
+  // ---- M5 Wave 2 (2026-10-24): the household-cost staples (the Pink Sheet unlock) ----
+  'food-index': {
+    name: 'World food prices',
+    ticker: 'Food index',
+    oneLiner:
+      'The World Bank’s index of world food prices: groceries at the wholesale level, where supermarket shelves start.',
+    lines: {
+      highRising: 'World food prices are high for their decade and rising: the pipeline pressure that reaches household grocery bills months later.',
+      highEasing: 'World food prices remain elevated for the decade but are easing.',
+      typical: 'World food prices sit in their usual range for the decade.',
+      low: 'World food prices are low for their decade: the relief setting for household grocery budgets.',
+    },
+    unitNote: 'index, 2010 = 100',
+    whatItIs:
+      'The World Bank Pink Sheet’s Food index (2010 = 100): the world prices of the main food commodities — grains, oils, sugar, meat, fruit — combined into one monthly number.',
+    whyItMatters:
+      'Food is the most-felt line of household inflation everywhere. Wholesale food moves months ahead of the supermarket prices households actually pay, making this an early line on grocery bills.',
+    tendedToMean:
+      'The 2010–12 and 2021–22 food spikes reached household budgets worldwide within months; the 2016–19 calm did the same in reverse.',
+    cantTell:
+      'It measures traded commodities, not local shelf prices: exchange rates, subsidies and freight decide how much reaches any one country’s basket.',
+    forYou:
+      'The early line on grocery bills: read it beside the energy cards — food and fuel move the cost of living more than anything else on this page.',
+  },
+  wheat: {
+    name: 'Wheat price',
+    ticker: 'US SRW wheat',
+    oneLiner: 'The world price of wheat, in US dollars per metric ton.',
+    lines: {
+      highRising: 'Wheat is high for its decade and rising: the input pressure behind flour, bread and feed prices.',
+      highEasing: 'Wheat remains elevated for its decade but is easing.',
+      typical: 'The wheat price sits in its usual range for the decade.',
+      low: 'Wheat is low for its decade: the cheap-input setting for food prices.',
+    },
+    unitNote: 'US dollars per metric ton',
+    whatItIs:
+      'US soft red winter wheat, the Pink Sheet’s benchmark export price, monthly in $/metric ton.',
+    whyItMatters:
+      'Wheat is the world’s staple grain: its price feeds directly into flour, bread and animal-feed costs, and crop failures or export bans move it sharply.',
+    tendedToMean:
+      'The 2010–12 and 2022 spikes followed harvest failures and the war in Ukraine’s grain trade; long calm stretches mark plentiful harvests.',
+    cantTell:
+      'One benchmark grade in one market: local wheat prices diverge on freight, quality and policy.',
+    forYou: 'A ground-truth line under the food index: what the raw grain itself costs.',
+  },
+  maize: {
+    name: 'Maize price',
+    ticker: 'Maize',
+    oneLiner: 'The world price of maize (corn), in US dollars per metric ton.',
+    lines: {
+      highRising: 'Maize is high for its decade and rising: pressure on feed, meat and breakfast-table prices.',
+      highEasing: 'Maize remains elevated for its decade but is easing.',
+      typical: 'The maize price sits in its usual range for the decade.',
+      low: 'Maize is low for its decade: the cheap-feed setting for food prices.',
+    },
+    unitNote: 'US dollars per metric ton',
+    whatItIs:
+      'US maize (corn), the Pink Sheet’s benchmark export price, monthly in $/metric ton.',
+    whyItMatters:
+      'Maize is the largest feed grain: its price passes through to meat, dairy and eggs, and it is the crop most diverted to biofuel when energy is dear.',
+    tendedToMean:
+      'The 2012 US drought and the 2022 supply shock took maize to decade highs; strong harvests bring it back quickly.',
+    cantTell:
+      'One benchmark in one market; local prices diverge on freight, harvests and policy.',
+    forYou: 'The second ground-truth line under the food index: the feed grain behind meat prices.',
   },
   'bund-10y': {
     name: 'What the German government pays to borrow for 10 years',
@@ -3170,6 +3282,8 @@ export const insightsCopyEn = {
     ratio: 'ratio',
     // M4 Wave 1 (2026-10-24): the claims count word — "194,000 claims".
     claims: 'claims',
+    // M5 Wave 2 (2026-10-24): the Turkish lira sign (EN prefix).
+    try: '₺',
   },
 
   rule: {

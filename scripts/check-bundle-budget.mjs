@@ -582,7 +582,13 @@ const BUDGETS = [
   // +2.46 kB over the old budget line for eight new cards of content).
   // The entry chunk is untouched at 295.28/88.80 vs 296/89.5 (Insights
   // stays lazy). Justified in CHANGELOG §2026-10-24 (M4 Wave 1).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 782_000, gz: 189_000, label: 'Insights lazy chunk' },
+  // 2026-10-24b M5 WAVE 2 (782.00 → 800.00 raw, 189.00 → 194.00 gz): five
+  // more context cards (euro-aaa-10y, food-index, wheat, maize, usdtry) —
+  // the same bilingual-corpus growth as M4, plus the new 'try' unit token.
+  // Measured 797.18 kB raw / 192.61 kB gz (+16.70 raw / +4.15 gz over the
+  // M4 tree). The entry chunk is untouched at 295.28/88.80. Justified in
+  // CHANGELOG §2026-10-24 (M5 Wave 2).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 800_000, gz: 194_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

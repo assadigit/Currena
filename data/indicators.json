@@ -524,6 +524,65 @@
       }
     },
     {
+      "id": "euro-aaa-10y",
+      "title": "What the safest euro-area governments pay for 10 years",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "ecb",
+        "name": "ECB Data Portal (euro-area AAA 10-year yield)",
+        "url": "https://data.ecb.europa.eu/data/datasets/YC/YC.B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y",
+        "seriesIdOrTable": "ECB Data Portal YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y (AAA yield curve, 10-year spot rate)"
+      },
+      "publisher": "ECB Data Portal",
+      "publisherUrl": "https://data.ecb.europa.eu/data/datasets/YC/YC.B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y",
+      "methodUrl": "https://data.ecb.europa.eu/data/datasets/YC/YC.B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y",
+      "whatItIs": "The AAA-rated euro-area 10-year yield from the ECB’s own yield curve (daily). Unlike the monthly Bund mirror on this page, it moves every trading day and covers the whole euro area’s safest borrowers, not only Germany.",
+      "whatItIsnt": "It is a market price, not a policy setting, and AAA borrowing is not every government’s borrowing — stressed euro states pay more.",
+      "trackRecordNote": "Sustained rises in this rate have lifted European mortgage and corporate borrowing costs; falls have eased them, as in the US 30-year story.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 7 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ECB Data Portal terms page (read 2026-10-16): JS-rendered, the reuse clause could not be quoted verbatim in a plain fetch — level L1 (need checking), fail closed in public mode until then. Attribution shown regardless.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: European Central Bank",
+        "legs": [
+          "ecb"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 7,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "ECB website terms (free use, accurate + cited)",
+        "attributionText": "Source: European Central Bank",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): free use of website information when it appears accurately, the ECB is cited as the source, and modifications are stated — official policy rates (DFR) are shown verbatim with ECB attribution.",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
+      }
+    },
+    {
       "id": "ecb-dfr",
       "title": "ECB deposit facility rate",
       "area": {
@@ -1359,6 +1418,242 @@
         "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "food-index",
+      "title": "World food prices",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "world-bank",
+        "name": "The World Bank: Commodity Markets (Pink Sheet, Food index)",
+        "url": "https://www.worldbank.org/en/research/commodity-markets",
+        "seriesIdOrTable": "World Bank Pink Sheet (Monthly Indices, Food; 2010=100)"
+      },
+      "publisher": "World Bank (Commodity Markets \"Pink Sheet\")",
+      "publisherUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "methodUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "whatItIs": "The World Bank Pink Sheet’s Food index (2010 = 100): the world prices of the main food commodities — grains, oils, sugar, meat, fruit — combined into one monthly number.",
+      "whatItIsnt": "It measures traded commodities, not local shelf prices: exchange rates, subsidies and freight decide how much reaches any one country’s basket.",
+      "trackRecordNote": "The 2010–12 and 2021–22 food spikes reached household budgets worldwide within months; the 2016–19 calm did the same in reverse.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "World Bank Open Data terms are commonly CC BY 4.0, but the terms page is JS-rendered and could not be quoted verbatim on 2026-10-16 — level L1 (need checking), fail closed in public mode until the clause is quoted. Attribution shown regardless.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: World Bank",
+        "legs": [
+          "world-bank"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percent",
+      "cadence": "monthly",
+      "maxAgeDays": 60,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+        "attributionText": "The World Bank: Commodity Markets (Pink Sheet)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "World Bank Dataset Terms read verbatim in a browser 2026-10-21 (worldbank.org/ext/en/legal/terms-conditions/datasets): \"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0)\" with the required attribution format \"The World Bank: Dataset name: Data source (if known)\"; use of data derived from the Datasets (tables/charts) follows the same terms. The Pink Sheet commodity series carry no contrary label — CC BY 4.0 applies, attribution rendered on the cards and in About this data.",
+        "termsUrl": "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
+      }
+    },
+    {
+      "id": "wheat",
+      "title": "Wheat price",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "world-bank",
+        "name": "The World Bank: Commodity Markets (Pink Sheet, Wheat US SRW)",
+        "url": "https://www.worldbank.org/en/research/commodity-markets",
+        "seriesIdOrTable": "World Bank Pink Sheet (Wheat, US SRW; $/metric ton)"
+      },
+      "publisher": "World Bank (Commodity Markets \"Pink Sheet\")",
+      "publisherUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "methodUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "whatItIs": "US soft red winter wheat, the Pink Sheet’s benchmark export price, monthly in $/metric ton.",
+      "whatItIsnt": "One benchmark grade in one market: local wheat prices diverge on freight, quality and policy.",
+      "trackRecordNote": "The 2010–12 and 2022 spikes followed harvest failures and the war in Ukraine’s grain trade; long calm stretches mark plentiful harvests.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "World Bank Open Data terms are commonly CC BY 4.0, but the terms page is JS-rendered and could not be quoted verbatim on 2026-10-16 — level L1 (need checking), fail closed in public mode until the clause is quoted. Attribution shown regardless.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: World Bank",
+        "legs": [
+          "world-bank"
+        ]
+      },
+      "unit": "usd",
+      "changeUnit": "percent",
+      "cadence": "monthly",
+      "maxAgeDays": 60,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+        "attributionText": "The World Bank: Commodity Markets (Pink Sheet)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "World Bank Dataset Terms read verbatim in a browser 2026-10-21 (worldbank.org/ext/en/legal/terms-conditions/datasets): \"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0)\" with the required attribution format \"The World Bank: Dataset name: Data source (if known)\"; use of data derived from the Datasets (tables/charts) follows the same terms. The Pink Sheet commodity series carry no contrary label — CC BY 4.0 applies, attribution rendered on the cards and in About this data.",
+        "termsUrl": "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
+      }
+    },
+    {
+      "id": "maize",
+      "title": "Maize price",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "world-bank",
+        "name": "The World Bank: Commodity Markets (Pink Sheet, Maize)",
+        "url": "https://www.worldbank.org/en/research/commodity-markets",
+        "seriesIdOrTable": "World Bank Pink Sheet (Maize; $/metric ton)"
+      },
+      "publisher": "World Bank (Commodity Markets \"Pink Sheet\")",
+      "publisherUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "methodUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "whatItIs": "US maize (corn), the Pink Sheet’s benchmark export price, monthly in $/metric ton.",
+      "whatItIsnt": "One benchmark in one market; local prices diverge on freight, harvests and policy.",
+      "trackRecordNote": "The 2012 US drought and the 2022 supply shock took maize to decade highs; strong harvests bring it back quickly.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "World Bank Open Data terms are commonly CC BY 4.0, but the terms page is JS-rendered and could not be quoted verbatim on 2026-10-16 — level L1 (need checking), fail closed in public mode until the clause is quoted. Attribution shown regardless.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: World Bank",
+        "legs": [
+          "world-bank"
+        ]
+      },
+      "unit": "usd",
+      "changeUnit": "percent",
+      "cadence": "monthly",
+      "maxAgeDays": 60,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+        "attributionText": "The World Bank: Commodity Markets (Pink Sheet)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "World Bank Dataset Terms read verbatim in a browser 2026-10-21 (worldbank.org/ext/en/legal/terms-conditions/datasets): \"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0)\" with the required attribution format \"The World Bank: Dataset name: Data source (if known)\"; use of data derived from the Datasets (tables/charts) follows the same terms. The Pink Sheet commodity series carry no contrary label — CC BY 4.0 applies, attribution rendered on the cards and in About this data.",
+        "termsUrl": "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
+      }
+    },
+    {
+      "id": "usdtry",
+      "title": "Dollar vs Turkish lira",
+      "area": {
+        "section": "global",
+        "group": "dollar-strength",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "frankfurter",
+        "name": "Frankfurter (ECB USD→TRY reference rate)",
+        "url": "https://frankfurter.dev",
+        "seriesIdOrTable": "Frankfurter USD→TRY (ECB reference rates)"
+      },
+      "publisher": "ECB reference rates via the Frankfurter project",
+      "publisherUrl": "https://frankfurter.dev",
+      "methodUrl": "https://frankfurter.dev",
+      "whatItIs": "The USD→TRY reference rate (ECB rates via Frankfurter, daily): how many liras one dollar buys in the foreign-exchange market.",
+      "whatItIsnt": "One pair, one country: it says nothing about other emerging-market currencies, and managed exchange rates can hold levels that fundamentals question.",
+      "trackRecordNote": "The lira has lost most of its dollar value over the past decade through repeated inflation episodes; every step down made imported goods dearer in lira terms.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "frankfurter.dev/license links the ECB disclaimer for the data (read 2026-10-16); the ECB’s reuse terms page is JS-rendered and could not be quoted verbatim in a plain fetch — level L1 (probably fine, terms need the quarterly re-check), fail closed in public mode until then. Frankfurter’s code is MIT.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "legs": [
+          "frankfurter"
+        ]
+      },
+      "unit": "try",
+      "changeUnit": "percent",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "cadence default (daily)",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter.",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
       }
     },
     {

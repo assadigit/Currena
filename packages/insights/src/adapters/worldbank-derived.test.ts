@@ -109,6 +109,10 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
       // 2026-10-21 data-integrity round: platinum rides the same workbook —
       // empty here (the tests below never assert on it).
       platinum: [],
+      // M5 Wave 2 (2026-10-24): the grain columns — empty here like platinum
+      // (the wheat/maize assertions live in the workbook-fixture test below).
+      wheat: [],
+      maize: [],
     },
     xauSpot: { symbol: 'XAU', price: 4162.6, updatedAt: '2026-10-06T15:03:10Z' },
     xagSpot: { symbol: 'XAG', price: 61.28, updatedAt: '2026-10-06T15:03:10Z' },
