@@ -33,3 +33,17 @@ history rungs fill from the stage); core PCE 3.01% warning; us-2y 4.65%
 context; breakeven-10y 2.34% context ("FRED (T10YIE)"); the fa hero
 «۷ شاخص از ۲۵ شاخص نیازمند توجه‌اند» with the Michigan card in the fa
 attention tiles; zero console or page errors in either locale.
+
+## M5 Wave-2 evidence (2026-10-24b, after the 479e7835 deploy)
+
+- `m5-euro-aaa-dialog.png` — the AAA 10y card in the borrowing lane
+  ("data for Oct 22, 2026 · ECB Data Portal (euro-area AAA 10-year
+  yield)"), the daily fix beside its policy-rate sibling.
+- `m5-food-wheat-maize-lane.png` — the prices lane's household-cost trio:
+  World food prices (top-quintile state line), Wheat, Maize with the
+  World Bank source links.
+- `m5-usdtry-card.png` — the EM-pressure first member rendering
+  **"₺49.74"** (the new try unit token) with the inflation-devaluation
+  state line and the Frankfurter source link.
+- `m5-fa-food-lane.png` — the fa renders: «قیمت جهانی خوراکی»،
+  «قیمت گندم»، «قیمت ذرت» with the Persian state lines.

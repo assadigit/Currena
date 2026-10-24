@@ -83,6 +83,36 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Session record — 2026-10-24b Wave 2 (M5): the euro long end's daily fix, the Pink Sheet unlock, the EM-pressure first member
+
+- **Deployed**: currena-api **`479e7835`** (final; the chain: the M5 code
+  deployed 16:12:36Z with the TEMPORARY 16:25 publish rung — the M1
+  pattern, captured then reverted — and the final revert-redeploy). The
+  16:25 rung wrote the first 76-reading snapshot family (every write
+  completed, the same binary signal as the M4 rung). currena-markets
+  untouched.
+- **The review's honest negative RESOLVED at the deploy's doorstep**: the
+  AAA 10y series key was live-verified this round —
+  `YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y` ("AAA yield curve - 10-year spot
+  rate") on `data-api.ecb.europa.eu`; the review's four candidates 404'd
+  because they probed dotted/FM forms. The G_N_C sibling is the ALL-rated
+  curve (4.10%) — G_N_A is the AAA one (3.38%).
+- **Subrequest arithmetic**: the M5 round adds ONE fetch (the ECB AAA
+  decade window) — the 04:10 main shape now 49/50. The Pink Sheet trio
+  adds zero (the same workbook, a second sheet read) and TRY adds zero
+  (the ninth leg of the one Frankfurter request).
+- **Live verification** (evidence under
+  `docs/insights/screenshots/m4-2026-10-24/`, the m5-* files): the public
+  API serves 76 readings — euro-aaa-10y 3.3844 @ 2026-10-22 (top 1% of
+  its decade), food-index 124.1 @ 2026M09 (top quintile), wheat 278.6,
+  maize 239.6 $/mt, usdtry 49.738 @ 2026-10-23 (the top of its decade —
+  the inflation→devaluation case study). Browser-verified EN+fa: the
+  usdtry card renders **"₺49.74"** with the new try unit token and its
+  highRising line; the euro-AAA card carries the ECB Data Portal source
+  link beside ecb-dfr; the food trio renders in both locales
+  («قیمت جهانی خوراکی», «قیمت گندم», «قیمت ذرت») with the World Bank
+  source links — zero console errors. EODHD quota untouched.
+
 ## Session record — 2026-10-24 Wave 1 (M3+M4): the early-warning pack, the OD-5 honest no-go, and the rule-text scale fix
 
 - **Deployed**: currena-api **`21d0b040`** (the round: core schemas + the
