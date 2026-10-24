@@ -512,6 +512,21 @@ export function riskRowForLeg(
         enabled: false,
       };
     }
+    // M3 (D-44, 2026-10-24): the pre-approval class fail-closes on BOTH
+    // gates — FRED's legal page (read 2026-10-21) puts these series behind
+    // the PUBLISHER's written permission, which the owner's acceptance
+    // cannot grant. No fetch, no display, until such permission is
+    // recorded here (the recorded scan evidence: the ICE BofA indices
+    // BAMLH0A0HYM2 / BAMLC0A0CM — the OD-5 hy-oas no-go).
+    if (rec.license.includes('pre-approval')) {
+      const base = SOURCE_RISK_REGISTER['fred-copyright']!;
+      return {
+        ...base,
+        termsLines: `${rec.seriesId}: FRED licence class pre-approval-required (T-16 scanned ${rec.checkedOn}) — the publisher's permission is required before any fetch or display; fail closed on both gates.`,
+        ownerAccepts: false,
+        enabled: false,
+      };
+    }
     return rec.copyrightNotice
       ? { ...(row ?? SOURCE_RISK_REGISTER['fred-copyright']!), level: 'L2', ownerAccepts: true } // recorded acceptance covers the live citation-required series
       : (row ?? SOURCE_RISK_REGISTER['fred-public']!);
@@ -690,6 +705,9 @@ export const SANITY_RANGES: Readonly<Record<string, SanityRange>> = {
   'iron-ore': { minExclusive: true },
   vix: { minExclusive: true },
   sahm: { min: -10, max: 10 }, // a 3-month moving average of unemployment-rate changes cannot be ±beyond the rate itself
+  // M4 Wave 1 (2026-10-24): a probability is bounded [0, 1] by construction
+  // (the Chauvet smoothed recession probability — stored as the fraction).
+  'recession-probability': { min: 0, max: 1 },
 };
 
 /** F-14: is the value inside its definitional band? (true when no band is registered) */

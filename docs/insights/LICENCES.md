@@ -22,8 +22,9 @@ blocks are recorded, never circumvented (RULES 4.3).
 
 | Source | Level | Licence (quoted lines + date read) | Required attribution | Private ok | Public display | Terms |
 |---|---|---|---|---|---|---|
-| FRED, series WITHOUT a copyright notice (14 scanned) | L0 | Licence tag #copyright-public-domain per the T-16 scan (2026-10-16) | "Source: FRED, Federal Reserve Bank of St. Louis" | yes | yes | https://fred.stlouisfed.org/legal/ |
-| FRED, series WITH a copyright notice (8 scanned, e.g. VIXCLS © Cboe) | L2 | "Copyrighted: Citation Required" (T-16 scan, 2026-10-16); owner accepted 2026-10-17 | "© Cboe, via FRED" (VIX); "Source: FRED, Federal Reserve Bank of St. Louis" | yes | no | https://fred.stlouisfed.org/legal/ |
+| FRED, series WITHOUT a copyright notice (23 scanned) | L0 | Licence tag #copyright-public-domain per the T-16 scan (2026-10-16; the 2026-10-24 Wave-1 round added ICSA, RECPROUSM156N, PCEPILFE) | "Source: FRED, Federal Reserve Bank of St. Louis" | yes | yes | https://fred.stlouisfed.org/legal/ |
+| FRED, series WITH a copyright notice (16 scanned, e.g. VIXCLS © Cboe) | L2 | "Copyrighted: Citation Required" (T-16 scan, 2026-10-16; the 2026-10-24 Wave-1 round added SOFR © NY Fed, UMCSENT/MICH © U. Michigan). FRED legal page (read verbatim 2026-10-21): this class is display-permitted WITH attribution of the source and acknowledgment the data was obtained from FRED (their example: "Source: BLS via FRED") — the reading's sourceName carries the "publisher via FRED" citation. | "© Cboe, via FRED" (VIX); "New York Fed via FRED" (SOFR); "University of Michigan via FRED" (UMCSENT/MICH); "Source: FRED, Federal Reserve Bank of St. Louis" | yes | yes (display-permitted with the "via FRED" citation — FRED legal read 2026-10-21) | https://fred.stlouisfed.org/legal/ |
+| FRED, the PRE-APPROVAL class (2 scanned: BAMLH0A0HYM2, BAMLC0A0CM — the ICE BofA indices) | L2 — fail-closed on BOTH gates | "Copyrighted: pre-approval required" (T-16 scan 2026-10-24, D-44): FRED's legal page (read 2026-10-21) puts these series behind the PUBLISHER's written permission, which the owner's acceptance cannot grant. No card, no fetch, no display (private or public) until ICE permission is recorded — the OD-5 hy-oas/ig-oas honest no-go. | — (never displayed) | no (no fetch is wired) | never | https://fred.stlouisfed.org/legal/ |
 | Australian Bureau of Statistics | L0 | Owner research 2026-10-16: CC BY 4.0. Re-read 2026-10-20: the copyright URL 404s to a plain fetch (JS-rendered); the site's navigation carries the "Creative commons" item (observed). Verbatim clause to be re-quoted at the quarterly review. | "Source: Australian Bureau of Statistics" | yes | yes | https://www.abs.gov.au/about/copyright-and-disclaimer |
 | Reserve Bank of Australia | L0 | Owner research 2026-10-16: CC BY 4.0 for most material; commercial/personal use allowed if no RBA endorsement is implied. Re-read 2026-10-20: rba.gov.au answers 403 to this venue (Akamai — the GHA runner is the verified venue for RBA). Third-party content inside RBA tables needs that third party's consent. | "Source: Reserve Bank of Australia" | yes | yes | https://www.rba.gov.au/copyright/ |
 | Yahoo Finance (unofficial endpoints) | L2 | No reuse licence offered for the unofficial quote endpoints (2026-10-16) — terms silent on automated reuse; owner accepted 2026-10-17. Every leg fetches with the declared honest UA and fails closed on a refusal (F-09/T-25/T-27). | "Data: Yahoo Finance" | yes | no (owner directive 2026-10-19e lifts the four price tiles only — recorded in the generator, re-confirmed quarterly) | https://finance.yahoo.com/ |
@@ -58,8 +59,12 @@ blocks are recorded, never circumvented (RULES 4.3).
    silver-usd, btc-usd) — NOT a terms re-verification; re-confirmed quarterly.
 2. gold-api.com — commercial use permitted per their quoted §9 (L0);
    re-read at the quarterly review.
-3. FRED series with a copyright notice (VIXCLS © Cboe) — private only;
-   public display needs the upstream's written permission (P-5/T-16).
+3. FRED series with a copyright notice — three classes since the 2026-10-21
+   legal read + the 2026-10-24 scan: citation-required (© Cboe, NY Fed, U.
+   Michigan…) display publicly WITH the "publisher via FRED" citation
+   (T-16/licences.ts); the pre-approval class (the ICE BofA indices,
+   D-44) fail-closes on both gates — no fetch, no display, private or
+   public, until the publisher's permission is recorded.
 4. ECB / World Bank / Frankfurter / Bitstamp — the reuse clauses could not
    be quoted in a plain fetch (JS-rendered or bot-checked; recorded 2026-10-20)
    → `unknown`, fail closed in public mode until read.

@@ -17,10 +17,10 @@ D-41).
 | **M1†** | The rung CPU fix (carried by M1) | `baseReadingCache` in `adapters/snapshot.ts` — the draft+final double build collapses to one deterministic pass (the 04:10/10:10/20:10 rungs were dying `exceededCpu` at exactly 2050 ms; the fixed rung completed at 1831 ms), phase timings surfaced to the tail | **done 2026-10-23** — the 16:05 UTC rung healthy, captured via `wrangler tail` |
 | **M1††** | The CPU margin restored (unplanned, landed via the 2026-10-23c reconciliation) | The 20:10 sweep died `exceededCpu` at 2050 ms on the M1† build (~220 ms headroom, variance ate it). `epochDay` memoized in `series.ts` (the profiled top self-time — `assertAscending`'s O(n) re-walks); verified live via a temporary 22:35 diagnostic rung: **cpu 617 ms, outcome ok**. Margin ~3.3× — the rung-split follow-up retired | **done 2026-10-23** — the 22:35 rung healthy (observability-captured); a parallel session's deploy briefly overwrote M2 (the honest incident, D-43) — the reconciliation landed M2 + M1†† together |
 | **M2** | The subtraction set (OD-7) | Retire `nzd-usd` + `silver-btc` (the eth-usd KV-migration pattern — id retirement is a schema migration across the stored snapshot/status/archives), demote `m2-us` scored→context, relabel the five OECD mirrors (`bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate`) to "monthly average, lagged" in both locales | **done 2026-10-23** — `75517285` deployed after the KV surgery (16 writes + 2 deletes); 65→63 indicators, voting 23→22, live-verified EN+fa |
-| **M3** | The credit-spread licence row (OD-5) | The ICE BofA indices via FRED enter the register (the VIXCLS/NFCI citation-required posture) — display permission + attribution rows; enables the Wave-1 spread cards | **pending** |
-| **M4** | Wave 1 — the early-warning pack (OD-8) | `initial-jobless-claims` · `hy-oas` · `sofr` · `recession-probability` · `us-pce-core-yoy` · `michigan-sentiment` + the Tier-0 displays `us-2y`, `breakeven-10y` — one FRED bulk-group edit + one register row; all series live-verified in the review (§10) | **pending** |
+| **M3** | The credit-spread licence row (OD-5) — **the honest no-go** | The T-16 scan (2026-10-24, live series-page reads) found the ICE BofA indices (`BAMLH0A0HYM2`, `BAMLC0A0CM`) carry FRED's **"copyright: pre-approval required"** tag — NOT the citation-required class OD-5 assumed. The pre-approval class fail-closes on BOTH gates (`sources.ts riskRowForLeg`: no fetch; `licences.ts fredLicenceForSeries`: never public) + the `fred-pre-approval` register row + the T-16 records + D-44: **no hy-oas/ig-oas card ships until the owner secures ICE's written permission** (the owner's "exclude private/unavailable" directive covers the exclusion) | **done 2026-10-24** — the no-go recorded, the register hardened (D-44) |
+| **M4** | Wave 1 — the early-warning pack (OD-8) | `initial-jobless-claims` · `sofr` · `recession-probability` · `us-pce-core-yoy` · `michigan-sentiment` (+ the `michigan-1y-expectations` companion) + the Tier-0 displays `us-2y`, `breakeven-10y` — one FRED bulk-group edit (the new 5-series Wave-1 group + SOFR into the daily group) + the register rows; all series live-verified 2026-10-24; **`hy-oas` excluded by the M3 licence no-go** | **pending verification** — code + gates green, deploying |
 | **M5** | Wave 2 — household costs & the euro long end | Pink Sheet `food-index` + wheat/maize · `euro-aaa-10y` (series key verified at build time — the review's honest negative) · `usdtry` (the EM-pressure first member) | **pending** |
-| **M6** | Wave 3/4 — the leading edge + probes | `mortgage-30y` · `walcl` · `retail-sales` · `housing-permits` · `cfnai` · `ig-oas` · `job-openings` · `t5yie` · `us-wages` · `euro-hicp` · `china-cpi` · platinum-daily · the AU leading-edge trio (`au-housing-finance`, `au-saving-ratio`, `au-job-vacancies`) · the venue-probe afternoon (BoE/BoJ/EODHD au-10y/NBS) — M2's OECD relabels are its stopgap until the probes land | **pending** (probe-conditioned; may split further) |
+| **M6** | Wave 3/4 — the leading edge + probes | `mortgage-30y` · `walcl` · `retail-sales` · `housing-permits` · `cfnai` · ~~`ig-oas`~~ (inherits the M3/D-44 no-go — ICE pre-approval required) · `job-openings` · `t5yie` · `us-wages` · `euro-hicp` · `china-cpi` · platinum-daily · the AU leading-edge trio (`au-housing-finance`, `au-saving-ratio`, `au-job-vacancies`) · the venue-probe afternoon (BoE/BoJ/EODHD au-10y/NBS) — M2's OECD relabels are its stopgap until the probes land | **pending** (probe-conditioned; may split further) |
 
 ## Standing rules (inherited from the review + the repo's own gates)
 
@@ -46,6 +46,40 @@ D-41).
   `node --cpu-prof` on the local ingest twin if the tail ever shows >1.5 s.
 
 ## Session log (newest first)
+
+- **2026-10-24 (the M3+M4 session — Wave 1 lands):** the early-warning pack
+  shipped as ONE code round with the licence prerequisite inside it.
+  **M3's honest finding first:** the T-16 scan of the credit-spread series
+  (live FRED series-page reads from the work venue) found the ICE BofA
+  indices carry the "copyright: **pre-approval required**" tag — not the
+  citation-required class OD-5 assumed. The register fail-closed on both
+  gates (a new `fred-pre-approval` posture in `sources.ts` + `licences.ts`:
+  no fetch, no display, private or public, until ICE's written permission
+  exists) and the no-go is recorded as **D-44** — `hy-oas`/`ig-oas` ship
+  only after the owner secures that permission (the owner's standing
+  "exclude private/unavailable" directive covers the exclusion).
+  **M4 then delivered the rest of the pack:** eight cards — claims (ICSA,
+  scored, percentile-high), the Chauvet recession probability
+  (RECPROUSM156N, scored at the 0.50 line — already reading 0.62 warning
+  at the dry-run), Michigan sentiment (UMCSENT, scored on its 10y low
+  tail — 48.1 reads bottom-decile warning) with its 1y-expectations
+  companion (MICH) inside the card, core PCE (PCEPILFE → 12-month %
+  change, scored against the Fed's 2% — 3.01 warning), plus three
+  context rows: SOFR (the funding leg), us-2y (the Tier-0 display from
+  the already-collected DGS2) and breakeven-10y (T10YIE leaves
+  validation-only). The global voting pool 22→26, growth-health 5→8,
+  prices-heat 3→4; the FRED consolidation grows to six bulk groups
+  (48/50 subrequests on the 04:10 shape). Gates: typecheck 6/6, core 191,
+  scraper 67, insights 559, markets 13, api 344, web 676 + the recorded
+  16-failure briefing jsdom baseline, lint 0/15 advisories, copy audit
+  clean (92 new fa strings processed to 2026-10-24a-m4-wave1, 2596
+  entries), T-15 public passed (0 hidden), budgets: entry 295.28/88.80
+  held, Insights lazy 780.48/188.46 vs the bumped 782/189 (the bump is
+  the eight-card bilingual copy corpus, justified in the script +
+  CHANGELOG); local dry-run verified all 8 values live (194,000 claims /
+  3.90 SOFR / 62% recession probability / 48.1 Michigan / 3.01% core PCE /
+  4.65% us-2y / 2.34% breakeven-10y / 4.6% 1y expectations). EODHD quota
+  untouched (0 requests).
 
 - **2026-10-23c (the reconciliation session):** two parallel sessions had
   worked the tracker simultaneously — the M2 session shipped `75517285`

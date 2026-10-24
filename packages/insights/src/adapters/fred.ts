@@ -6,9 +6,11 @@
  * 2026-10-21 (data-integrity round): MULTI-SERIES consolidation. The ingest
  * moved onto the currena-api Worker's minute cron, where the free plan's
  * 50-subrequest ceiling counts every fetch AND every KV op. fredgraph.csv
- * accepts `?id=SERIES1,SERIES2,…` and answers one wide CSV — so the ~32
- * series the pipeline needs ride FOUR requests (fetchFredSeriesBulk below)
- * instead of 32. The single-series fetch stays (tests, ad-hoc probes).
+ * accepts `?id=SERIES1,SERIES2,…` and answers one wide CSV (or a ZIP of
+ * per-frequency CSVs for mixed-frequency sets) — so the ~37 series the
+ * pipeline needs ride SIX requests (fetchFredSeriesBulk below) instead of
+ * one per series (the 2026-10-24 Wave-1 round added the sixth group). The
+ * single-series fetch stays (tests, ad-hoc probes).
  */
 
 import { insightsFetch } from './fetch-policy';
@@ -159,6 +161,20 @@ export const FRED_SERIES = {
   gilt10y: 'IRLTLT01GBM156N', // gilt-10y: UK 10Y govt yield, monthly OECD
   bojCallRate: 'IRSTCI01JPM156N', // boj-rate: Japan overnight call rate avg, monthly OECD (≈ policy)
   boeCallRate: 'IRSTCI01GBM156N', // boe-rate: UK overnight rate avg, monthly OECD (≈ Bank Rate)
+  // ---- M4 Wave 1 — the early-warning pack (OD-8/D-42, 2026-10-24; each
+  // live-verified on FRED the same day, licence classes T-16-scanned) ----
+  initialClaims: 'ICSA', // initial-jobless-claims: weekly claims level (public domain)
+  sofr: 'SOFR', // sofr: the overnight funding rate (citation-required — NY Fed via FRED)
+  recessionProbability: 'RECPROUSM156N', // recession-probability: smoothed recession probs (public domain)
+  michiganSentiment: 'UMCSENT', // michigan-sentiment: U. Michigan consumer sentiment (citation-required)
+  michigan1yInflation: 'MICH', // michigan-1y-expectations: median expected 1y price change (citation-required)
+  pceCoreIndex: 'PCEPILFE', // us-pce-core-yoy: core PCE price index → 12-month % change (public domain)
+  // NOTE (M3/D-44, 2026-10-24): the ICE BofA credit-spread series
+  // (BAMLH0A0HYM2 / BAMLC0A0CM) are deliberately ABSENT: the T-16 scan
+  // found FRED's "copyright-pre-approval" tag on them — the publisher's
+  // permission is required before any fetch or display, so no hy-oas /
+  // ig-oas card ships (the OD-5 honest no-go; see licences.ts +
+  // data/fred-copyright.json for the recorded evidence).
 } as const;
 
 /**
@@ -182,7 +198,8 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
     seriesIds: [FRED_SERIES.us10y, FRED_SERIES.us30y, FRED_SERIES.realYield10y],
     window: 'full',
   },
-  // Daily rates/stress, decade window (7 series).
+  // Daily rates/stress, decade window (8 series — M4 adds SOFR beside the
+  // yield family it belongs to; all-daily so the request stays one wide CSV).
   {
     seriesIds: [
       FRED_SERIES.yieldCurve10y2y,
@@ -192,6 +209,7 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
       FRED_SERIES.breakeven10y,
       FRED_SERIES.vix,
       FRED_SERIES.nfci,
+      FRED_SERIES.sofr,
     ],
     window: 'decade',
   },
@@ -234,6 +252,22 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
       FRED_SERIES.gilt10y,
       FRED_SERIES.bojCallRate,
       FRED_SERIES.boeCallRate,
+    ],
+    window: 'decade',
+  },
+  // M4 Wave 1 (2026-10-24) — the early-warning pack's monthly/weekly leg:
+  // claims, recession probability, Michigan (sentiment + 1y expectations)
+  // and the core PCE index, in ONE coherent group so a failing request
+  // degrades the pack together (mixed weekly/monthly frequencies answer as
+  // the ZIP path — parseFredMultiCsvLoose; venue-verified 2026-10-24:
+  // weekly,_ending_saturday.csv + monthly.csv members, every id served).
+  {
+    seriesIds: [
+      FRED_SERIES.initialClaims,
+      FRED_SERIES.recessionProbability,
+      FRED_SERIES.michiganSentiment,
+      FRED_SERIES.michigan1yInflation,
+      FRED_SERIES.pceCoreIndex,
     ],
     window: 'decade',
   },

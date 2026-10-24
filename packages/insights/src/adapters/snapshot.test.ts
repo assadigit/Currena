@@ -142,9 +142,10 @@ describe('buildInsightsSnapshot', () => {
     });
     // Fix spec C (2026-10-14): the four additions grew the set; the
     // 2026-10-21c owner round retired eth-usd → 65; the 2026-10-23 OD-7
-    // round retired nzd-usd + silver-btc → 63.
-    expect(snap.readings).toHaveLength(63);
-    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(63);
+    // round retired nzd-usd + silver-btc → 63; the 2026-10-24 M4 Wave-1
+    // round added the early-warning pack's eight ids → 71.
+    expect(snap.readings).toHaveLength(71);
+    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(71);
     expect(snap.readings.find((r) => r.id === 'us10y')!.status).not.toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.status).toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.value).toBeNull();

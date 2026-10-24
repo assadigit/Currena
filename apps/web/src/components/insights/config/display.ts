@@ -22,7 +22,11 @@ export type UnitToken =
   | 'index'
   | 'jpy'
   | 'cny'
-  | 'ratio';
+  | 'ratio'
+  // M4 Wave 1 (2026-10-24): a counted quantity — claims counts people
+  // newly filing (a plain grouped number plus the count word; 'none'
+  // renders an empty label, which R13 forbids).
+  | 'claims';
 
 /** Locale-dependent unit labels (from the copy dictionaries). */
 export interface UnitLabels {
@@ -38,6 +42,7 @@ export interface UnitLabels {
   jpy: string;
   cny: string;
   ratio: string;
+  claims: string;
 }
 
 interface DisplayConfig {
@@ -83,6 +88,18 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'shiller-cape': { decimals: 2, unit: 'ratio' },
   'shiller-ecy': { decimals: 2, unit: 'percent' },
   'gold-silver': { decimals: 1, unit: 'ratio' },
+  // M4 Wave 1 (OD-8/D-42, 2026-10-24) — the early-warning pack: claims
+  // counts people (whole numbers with locale grouping plus the count word),
+  // the recession probability is stored as a fraction and renders scaled
+  // ×100 ('62%'), and the rest render like their lane siblings.
+  'initial-jobless-claims': { decimals: 0, unit: 'claims' },
+  'recession-probability': { decimals: 0, unit: 'percent', scale: 100 },
+  'michigan-sentiment': { decimals: 1, unit: 'index' },
+  'michigan-1y-expectations': { decimals: 1, unit: 'percent' },
+  'us-pce-core-yoy': { decimals: 1, unit: 'percent' },
+  sofr: { decimals: 2, unit: 'percent' },
+  'us-2y': { decimals: 2, unit: 'percent' },
+  'breakeven-10y': { decimals: 2, unit: 'percent' },
   'dollar-basket': { decimals: 2, unit: 'index' },
   usdjpy: { decimals: 2, unit: 'jpy' },
   // Step-1 audit item C4: EUR per USD — the € symbol, not "US$".

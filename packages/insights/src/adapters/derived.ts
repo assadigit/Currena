@@ -282,6 +282,11 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // (DFEDTARL); the snapshot builder attaches the upper bound (DFEDTARU)
   // as `rangeHigh` so the card renders the true "3.75–4.00%" corridor.
   put('fed-target', fred.DFEDTARL);
+  // M4 Wave 1 (OD-8/D-42, 2026-10-24): the funding leg + the 2y display
+  // (the transmission check the rates panel was missing; DGS2 already
+  // collected for fed-expectations — the card is a pure surface add).
+  put('sofr', fred.SOFR);
+  put('us-2y', fred.DGS2);
   put('ecb-dfr', ecb?.dfr);
   if (fred.A091RC1Q027SBEA && fred.W006RC1Q027SBEA) {
     put(
@@ -325,7 +330,13 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   /* ---------------- Global — Are prices heating up? ---------------- */
   if (fred.CPIAUCNS) put('us-cpi-yoy', yoyPctSeries(fred.CPIAUCNS));
   if (fred.CPILFENS) put('us-cpi-core-yoy', yoyPctSeries(fred.CPILFENS));
+  // M4 Wave 1 (OD-8/D-42): the Fed's preferred gauge — core PCE YoY from
+  // the PCEPILFE index, the same derived 12-month % change as CPI.
+  if (fred.PCEPILFE) put('us-pce-core-yoy', yoyPctSeries(fred.PCEPILFE));
   put('breakeven-5y5y', fred.T5YIFR);
+  // M4 Wave 1 (OD-8/D-42): the 10y breakeven leaves validation-only and
+  // becomes a context card (the series was already collected for T-01).
+  put('breakeven-10y', fred.T10YIE);
   // 2026-10-21 data-integrity round: the two EIA energy spots ride the
   // same FRED bulk request as Brent's spot — context rows in the prices
   // lane beside Brent's own scored card (never prices-board tiles; the
@@ -385,6 +396,15 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // full history) so their stored histories cover the 10-year window.
   put('us-unemployment', fred.UNRATE);
   put('sahm-rule', fred.SAHMREALTIME);
+  // M4 Wave 1 (OD-8/D-42, 2026-10-24): the early-warning pack's labor /
+  // probability / sentiment legs — claims (weekly level, raw counts), the
+  // Chauvet recession probability (stored as the published fraction; the
+  // display scales ×100), Michigan sentiment + its 1y-expectations
+  // companion (both rendered on the michigan-sentiment card).
+  put('initial-jobless-claims', fred.ICSA);
+  put('recession-probability', fred.RECPROUSM156N);
+  put('michigan-sentiment', fred.UMCSENT);
+  put('michigan-1y-expectations', fred.MICH);
   // Fix spec C-05 (2026-10-14): the Philadelphia Fed manufacturing index.
   put('philly-fed', fred.GACDFSA066MSFRBPHI);
   if (wb) put('copper-gold', combineSeries(wb.copper, wb.gold, (c, g) => c / g));
@@ -671,6 +691,27 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   },
   'us-cpi-yoy': { name: 'FRED (CPIAUCNS, not seasonally adjusted)', url: 'https://fred.stlouisfed.org/series/CPIAUCNS' },
   'us-cpi-core-yoy': { name: 'FRED (CPILFENS, not seasonally adjusted)', url: 'https://fred.stlouisfed.org/series/CPILFENS' },
+  // M4 Wave 1 (OD-8/D-42, 2026-10-24) — the early-warning pack's sources.
+  'initial-jobless-claims': {
+    name: 'US Department of Labor via FRED (ICSA)',
+    url: 'https://fred.stlouisfed.org/series/ICSA',
+  },
+  sofr: { name: 'New York Fed via FRED (SOFR)', url: 'https://fred.stlouisfed.org/series/SOFR' },
+  'recession-probability': {
+    name: 'FRED (RECPROUSM156N, Marcelle-Chauvet smoothed recession probability)',
+    url: 'https://fred.stlouisfed.org/series/RECPROUSM156N',
+  },
+  'michigan-sentiment': {
+    name: 'University of Michigan via FRED (UMCSENT)',
+    url: 'https://fred.stlouisfed.org/series/UMCSENT',
+  },
+  'michigan-1y-expectations': {
+    name: 'University of Michigan via FRED (MICH)',
+    url: 'https://fred.stlouisfed.org/series/MICH',
+  },
+  'us-pce-core-yoy': { name: 'FRED (PCEPILFE, 12-month % change)', url: 'https://fred.stlouisfed.org/series/PCEPILFE' },
+  'us-2y': { name: 'FRED (DGS2)', url: 'https://fred.stlouisfed.org/series/DGS2' },
+  'breakeven-10y': { name: 'FRED (T10YIE)', url: 'https://fred.stlouisfed.org/series/T10YIE' },
   'breakeven-5y5y': {
     name: 'Federal Reserve Bank of St. Louis via FRED (T5YIFR)',
     url: 'https://fred.stlouisfed.org/series/T5YIFR',

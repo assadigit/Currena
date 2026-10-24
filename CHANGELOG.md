@@ -5,6 +5,115 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-24] — Wave 1: the early-warning pack (M3+M4 of the D-42 milestones) — and the OD-5 honest no-go
+
+The second Phase-2 round delivers the analytical core the Economist's Review
+called for: the dashboard can now **warn**, not only detect. Eight new
+indicator cards ship (63→71), the global voting pool grows 22→26, and the
+FRED consolidation becomes six bulk groups. The round also carries the
+round's one honest negative: the credit-spread cards are excluded by their
+publisher's licence — recorded as D-44, never silently absorbed.
+
+### M3 — the credit-spread licence row: the honest no-go (OD-5, D-44)
+
+- **The T-16 scan found the ICE BofA indices are NOT the citation-required
+  class OD-5 assumed.** Live reads of the FRED series pages (2026-10-24)
+  show `BAMLH0A0HYM2` and `BAMLC0A0CM` carry the
+  **"copyright: pre-approval required"** tag — the licence class FRED's
+  legal page (read verbatim 2026-10-21) puts behind the *publisher's*
+  written permission, which the owner's acceptance cannot grant.
+- **The register now fail-closes that class on BOTH gates**: a new
+  pre-approval branch in `sources.ts riskRowForLeg` (enabled: no — no
+  fetch can be wired) and in `licences.ts fredLicenceForSeries`
+  (publicDisplayOk: no — never public), plus the `fred-pre-approval` rows
+  in `RISK_REGISTER.md` + `LICENCES.md` and the two scan records in
+  `data/fred-copyright.json` carrying the evidence. **No hy-oas / ig-oas
+  card ships** until the owner secures ICE's written permission (the
+  owner's standing directive — "you can exclude information that are
+  private and not available" — covers the exclusion; D-44 records the
+  owner's options). A future session cannot wire these series without
+  confronting the register.
+- The rest of the pack's series landed under the existing rows:
+  ICSA / RECPROUSM156N / PCEPILFE are **public-domain** (the fred-public
+  row, 14→23 series); SOFR (© NY Fed) and UMCSENT / MICH (© University of
+  Michigan) are **citation-required** (the fred-copyright row, 8→16
+  series) — display-permitted with the "publisher via FRED" citation per
+  the 2026-10-21 legal read.
+
+### M4 — the early-warning pack (OD-8)
+
+- **`initial-jobless-claims`** (FRED ICSA, weekly, P1, scored on its
+  10-year high tail like its sibling us-unemployment): the fastest labor
+  read there is — weeks before the monthly data, months before Sahm.
+  First live value 194,000 (bottom decile of the decade — a tight labor
+  market). Displayed with a new `claims` unit token ("194,000 claims" /
+  «۱۹۴٬۰۰۰ مورد») because the R13 gate forbids empty unit labels.
+- **`recession-probability`** (FRED RECPROUSM156N, monthly, P1, scored at
+  the 0.50 line — the classic recession call, mirroring the Sahm rule's
+  own threshold): stored as the published fraction, displayed scaled ×100
+  ("62%"). First live value **0.62 — warning**: the Marcelle-Chauvet model
+  already reads the data as recession-like (up from 0.24 at the review's
+  probe three weeks ago).
+- **`michigan-sentiment`** (FRED UMCSENT, monthly, P1, scored on its
+  10-year low tail) with **`michigan-1y-expectations`** (FRED MICH) riding
+  inside it as a companion-only reading (the us-cpi-core-yoy pattern) —
+  the review's "carries the 1y expectations leg". First live values:
+  sentiment **48.1 — warning** (bottom decile), expectations 4.6%.
+- **`us-pce-core-yoy`** (FRED PCEPILFE → the derived 12-month % change,
+  monthly, P1, scored against the Fed's own 2% target — the same
+  published-goal posture as us-cpi-yoy's 3% line): first live value
+  **3.01% — warning**. The Fed's preferred gauge, absent until now.
+- **`sofr`** (FRED SOFR, daily, P2, context): the overnight funding leg —
+  the "rate set = rate transmitted" check the rates panel was missing
+  (policy ✓ → funding ✗ → long end ✓). 3.90%, sitting inside the Fed's
+  corridor as it should.
+- **`us-2y`** (FRED DGS2, daily, P1, context): the Tier-0 display from
+  the already-collected series — the market's policy path made visible;
+  the scored vote stays with fed-expectations so the lane never
+  double-votes one series. 4.65%.
+- **`breakeven-10y`** (FRED T10YIE, daily, P2, context): the 10-year
+  breakeven leaves its validation-only role and becomes the near leg of
+  the expectations pair beside 5y5y. 2.34%.
+- **The FRED consolidation grows to six bulk groups** (~37 series): SOFR
+  joins the daily rates/stress group (still one wide CSV), and a new
+  Wave-1 group carries ICSA + RECPROUSM156N + UMCSENT + MICH + PCEPILFE
+  (mixed weekly/monthly — the ZIP answer path, venue-verified 2026-10-24:
+  every id served). The 04:10 main rung's subrequest count: 48/50. The
+  history rungs pick up three new daily-cadence ids (sofr, us-2y,
+  breakeven-10y → the 04:25 shape at 39) and five periodic ids (→ ~31).
+- **Gauge membership**: growth-health 5→8 (claims, recession-probability,
+  michigan-sentiment join the voters; china-pmi, philly-fed,
+  us-unemployment, sahm-rule, copper-gold stay), prices-heat 3→4 (core
+  PCE joins us-cpi-yoy, breakeven-5y5y, brent). sofr / us-2y /
+  breakeven-10y / michigan-1y-expectations are context rows — never
+  voters (the iron-ore precedent).
+- **Staleness discipline**: claims 12d (one missed weekly print),
+  recession-probability 100d (the model publishes ~2 months behind),
+  us-pce-core-yoy 95d (BEA's ~30d-after-month-end cycle), the Michigan
+  pair 75d (the us-unemployment precedent). The sanity ranges gain
+  recession-probability's definitional [0, 1] band.
+
+### Gates, copy and budgets
+
+- Typecheck 6/6 · core 191 · scraper 67 · insights 559 · markets 13 ·
+  api 344 · web 676 + the recorded 16-failure briefing jsdom baseline ·
+  lint 0 errors / 15 advisories (the recorded set).
+- The Persian copy manifest processed 92 new fa strings (the eight cards'
+  full corpora + the new units.claims word) to round
+  `2026-10-24a-m4-wave1`; audit clean at 2,596 entries.
+- T-15 public passed (0 hidden ids — the whole pack is display-permitted:
+  public-domain or citation-required-with-attribution).
+- **Bundle budget bump (documented, per the D-16 path)**: the Insights
+  lazy chunk 765.00 → **782.00 kB raw** / 186.00 → **189.00 kB gz** —
+  measured 780.48/188.46; the growth is exactly the eight-card bilingual
+  copy corpus (+27.22 raw / +6.95 gz over the M2 tree). The entry chunk
+  (the money page) is untouched at 295.28/88.80.
+- The local dry-run verified all eight values live end-to-end (the
+  recession radar now reads: claims normal · unemployment 4.2% · Sahm
+  silent · **probability 62% warning** · **Michigan bottom-decile
+  warning** · **core PCE 3.01% warning** — three of the four new voters
+  warn on day one).
+
 ## [2026-10-23] — the Phase-2 open: the unhide round (Shiller pair + china-pmi) and the rung CPU fix (M0+M1 of the D-42 milestones)
 
 The owner approved the review's Wave-0 calls with a sequencing directive

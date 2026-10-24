@@ -36,16 +36,21 @@ describe('the bundled indicator-audit sidecar', () => {
 });
 
 describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
-  it('is exactly the L2 sources that are public today (the 2026-10-21c licence round + the 2026-10-23 unhide)', () => {
+  it('is exactly the L2 sources that are public today (the 2026-10-21c licence round + the 2026-10-23 unhide + the 2026-10-24 M4 Wave-1 additions)', () => {
     // brent/gold-usd/silver-usd (Yahoo legs), btc-usd (gold-api), the
     // FRED citation-required set (display-permitted with "publisher via
     // FRED" attribution — FRED legal read 2026-10-21: STLFSI/NFCI/VIX/
     // T10Y2Y/T5YIFR/GACDFSA + the OECD bond/rate series), eth-usd retired
-    // 2026-10-21c, and the Shiller pair since the D-42/OD-1 unhide
-    // (2026-10-23). Seventeen L2-but-public ids per the audit sidecar today.
+    // 2026-10-21c, the Shiller pair since the D-42/OD-1 unhide (2026-10-23),
+    // and the Wave-1 citation-required set (2026-10-24): SOFR (NY Fed),
+    // the Michigan pair (U. Michigan) and the 10y breakeven (T10YIE,
+    // citation-required since the 2026-10-21 scan — its card left
+    // validation-only status this round). Twenty-one L2-but-public ids per
+    // the audit sidecar today.
     expect([...PUBLIC_BOUNDED_HISTORY_IDS].sort()).toEqual([
       'boe-rate',
       'boj-rate',
+      'breakeven-10y',
       'breakeven-5y5y',
       'brent',
       'btc-usd',
@@ -53,11 +58,14 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       'gilt-10y',
       'gold-usd',
       'jgb-10y',
+      'michigan-1y-expectations',
+      'michigan-sentiment',
       'nfci',
       'philly-fed',
       'shiller-cape',
       'shiller-ecy',
       'silver-usd',
+      'sofr',
       'stress-stlfsi',
       'vix',
       'yield-curve-10y2y',

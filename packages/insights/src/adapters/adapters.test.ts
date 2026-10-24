@@ -91,8 +91,9 @@ describe('fred adapter', () => {
     // Fix spec C-03/C-04/C-05 + T-01 (2026-10-14): DGS2, DGS30, T10YIE and
     // GACDFSA066MSFRBPHI joined. The 2026-10-21 data-integrity round adds
     // WTI, natgas, the OECD bond trio, the BoJ/BoE overnight pair, PAYEMS
-    // and the BEA GDP series → 30.
-    expect(Object.values(FRED_SERIES)).toHaveLength(30);
+    // and the BEA GDP series → 30; the 2026-10-24 M4 Wave-1 round adds
+    // ICSA, SOFR, RECPROUSM156N, UMCSENT, MICH and PCEPILFE → 36.
+    expect(Object.values(FRED_SERIES)).toHaveLength(36);
   });
 });
 

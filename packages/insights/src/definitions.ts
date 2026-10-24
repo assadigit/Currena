@@ -141,6 +141,42 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 4,
   },
   {
+    // M4 Wave 1 (OD-8/D-42, 2026-10-24): the overnight funding rate — the
+    // transmission leg the rates panel was missing (policy set ✓ → funding
+    // ✗ → long end ✓). CONTEXT (info): its warning content is redundant
+    // with fed-target (both track the corridor); the card's value is the
+    // "rate set = rate transmitted" CHECK — SOFR sitting ABOVE the target
+    // range is the repo-stress read, and the copy says so.
+    id: 'sofr',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'The overnight funding rate (SOFR)',
+    source: 'fred',
+    sourceRef: 'FRED:SOFR (Secured Overnight Financing Rate)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+  },
+  {
+    // M4 Wave 1 (OD-8/D-42): the 2-year Treasury yield as its own CONTEXT
+    // display — Tier 0 (the series is already collected for
+    // fed-expectations + the Treasury fallback; the review's §5.1 row:
+    // "completes the Treasury-curve display; makes yield-curve-10y2y
+    // self-explanatory"). The scored vote stays with fed-expectations (the
+    // 2y-gap voter) so the lane never double-votes one series.
+    id: 'us-2y',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'US 2-year Treasury yield',
+    source: 'fred',
+    sourceRef: 'FRED:DGS2',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+  },
+  {
     id: 'ecb-dfr',
     section: 'global',
     group: 'borrowing-costs',
@@ -286,6 +322,27 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 75,
   },
   {
+    // M4 Wave 1 (OD-8/D-42, 2026-10-24): the Fed's preferred inflation
+    // gauge — core PCE, computed as the 12-month % change of the PCEPILFE
+    // index exactly like us-cpi-yoy (the repo's derived-yoy pattern).
+    // SCORED against the Fed's own 2% target (the published goal is the
+    // threshold — the same honest posture as us-cpi-yoy's 3% line).
+    id: 'us-pce-core-yoy',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'US core inflation by the Fed’s gauge (PCE)',
+    source: 'fred',
+    sourceRef: 'FRED:PCEPILFE (12-month % change, core PCE price index)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'threshold', direction: 'above', value: 2 },
+    // BEA publishes ~30d after month end; the obs (M-01) ages ~91d between
+    // releases — 95 covers it without a false stale (the same
+    // publication-cycle discipline as govt-interest-revenue's 215).
+    staleAfterDays: 95,
+  },
+  {
     id: 'breakeven-5y5y',
     section: 'global',
     group: 'prices-heat',
@@ -337,6 +394,22 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     phase: 'P2',
     rule: { kind: 'info' },
     staleAfterDays: 12,
+  },
+  {
+    // M4 Wave 1 (OD-8/D-42): the 10-year breakeven — Tier 0 CONTEXT display
+    // (the series is already collected for the T-01 validation
+    // reconciliation; the review's §5.1 row: "the near/long expectations
+    // pair with 5y5y — both legs of the anchoring story").
+    id: 'breakeven-10y',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'Expected US inflation, ten years ahead',
+    source: 'fred',
+    sourceRef: 'FRED:T10YIE (10-year breakeven inflation rate)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
   },
   /* ---------------- Global — Are markets nervous? ---------------- */
   {
@@ -579,6 +652,29 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 60,
   },
   {
+    // M4 Wave 1 (OD-8/D-42, 2026-10-24): the weekly early-warning layer —
+    // the highest-frequency labor read on the page (Thursday print, weeks
+    // before the monthly data, months before Sahm). SCORED on its 10-year
+    // position like its sibling us-unemployment (top quintile of the
+    // decade = clearly abnormal labor shedding); the level's slow drift is
+    // what the percentile window absorbs, and the sustained-jumps story is
+    // the copy's job, not a second rule.
+    id: 'initial-jobless-claims',
+    section: 'global',
+    group: 'growth-health',
+    name: 'New unemployment claims (US)',
+    source: 'fred',
+    sourceRef: 'FRED:ICSA (initial claims, weekly)',
+    cadence: 'weekly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'percentile', tail: 'high', cutoff: 0.2 },
+    // Weekly Saturday-dated obs publish the following Thursday — one missed
+    // week is 10+ days of obs age; 12 keeps a single missed print from
+    // reading stale the same day the next one lands.
+    staleAfterDays: 12,
+  },
+  {
     // Step-2 add-list §B3: US unemployment (FRED UNRATE, monthly, verified
     // live 2026-10-13: Sep 2026 = 4.2). Scored on its own 10-year level
     // ("high unemployment for the decade") — the "rising fast" signal is
@@ -609,6 +705,64 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'threshold', direction: 'above', value: 0.5 },
+    staleAfterDays: 75,
+  },
+  {
+    // M4 Wave 1 (OD-8/D-42, 2026-10-24): the single-number recession
+    // probability (Marcelle-Chauvet smoothed probabilities) — completes the
+    // Sahm/curve detection toolkit with a model output, beside sahm-rule.
+    // SCORED at the half-way line (0.50 — the classic recession-call
+    // threshold, mirroring the Sahm rule's own 0.50); stored as the
+    // published fraction (0.62), displayed scaled ×100 ("62%").
+    id: 'recession-probability',
+    section: 'global',
+    group: 'growth-health',
+    name: 'US recession probability',
+    source: 'fred',
+    sourceRef: 'FRED:RECPROUSM156N (smoothed US recession probability)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'threshold', direction: 'above', value: 0.5 },
+    // The model block publishes with a ~2-month lag (obs M-01 serves until
+    // the next obs lands ~M+55d) — 100 covers the longest honest gap
+    // (verified live 2026-10-24: the 2026-08 obs 0.62 is the freshest print).
+    staleAfterDays: 100,
+  },
+  {
+    // M4 Wave 1 (OD-8/D-42): US consumer mood (University of Michigan
+    // sentiment). SCORED on its 10-year position, low tail — bottom-quintile
+    // readings have marked recession-era collapses in household mood. The
+    // card carries the survey's 1y inflation-expectations companion
+    // (michigan-1y-expectations) inside it, the us-cpi-core-yoy pattern.
+    id: 'michigan-sentiment',
+    section: 'global',
+    group: 'growth-health',
+    name: 'US consumer mood (Michigan survey)',
+    source: 'fred',
+    sourceRef: 'FRED:UMCSENT (University of Michigan consumer sentiment)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'percentile', tail: 'low', cutoff: 0.2 },
+    staleAfterDays: 75, // monthly survey obs (M-01) ages up to ~73d between releases
+  },
+  {
+    // M4 Wave 1 (OD-8/D-42): COMPANION-ONLY — the Michigan survey's median
+    // expected price change over the next 12 months, rendered INSIDE the
+    // michigan-sentiment card (COMPANION_ONLY_IDS + COMPANIONS), never as
+    // its own row. Context (info): expectations feed the Fed's read on
+    // where inflation psychology sits; the vote belongs to the parent card.
+    id: 'michigan-1y-expectations',
+    section: 'global',
+    group: 'growth-health',
+    name: 'US expected inflation next year (Michigan)',
+    source: 'fred',
+    sourceRef: 'FRED:MICH (median expected price change, next 12 months)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
     staleAfterDays: 75,
   },
   {

@@ -69,9 +69,9 @@ const FRED_BASE: SourceLicence = {
   attributionRequired: true,
   privateOk: true,
   publicDisplayOk: 'unknown', // decided per series by the T-16 scan
-  termsCheckedOn: '2026-10-21',
+  termsCheckedOn: '2026-10-24',
   termsEvidence:
-    'FRED legal page read verbatim in a browser 2026-10-21 (fred.stlouisfed.org/legal/): series carry a per-series license tag (records in data/fred-copyright.json). Public-domain series are public; citation-required series are display-permitted WITH attribution of the source and acknowledgment the data was obtained from FRED (their example: "Source: BLS via FRED"); pre-approval-required series are private-only (never scanned into the public set).',
+    'FRED legal page read verbatim in a browser 2026-10-21 (fred.stlouisfed.org/legal/): series carry a per-series license tag (records in data/fred-copyright.json). Public-domain series are public; citation-required series are display-permitted WITH attribution of the source and acknowledgment the data was obtained from FRED (their example: "Source: BLS via FRED"); pre-approval-required series are private-only (never scanned into the public set — the class verified live 2026-10-24 on the ICE BofA indices, recorded D-44).',
   termsUrl: 'https://fred.stlouisfed.org/legal/',
 };
 
@@ -328,6 +328,15 @@ export interface FredCopyrightRecord {
  * BLS via FRED') when displaying or publishing it" — so the reading's
  * source attribution carries the 'via FRED' acknowledgment. Public-domain
  * series are public-eligible. Unscanned series fail closed (public 'no').
+ *
+ * M3 (D-44, 2026-10-24): the PRE-APPROVAL class is PRIVATE-ONLY — FRED's
+ * legal page puts those series behind the PUBLISHER's written permission,
+ * which no owner acceptance can grant; the licence resolves to public 'no'
+ * AND the risk register fail-closes the fetch (sources.ts riskRowForLeg).
+ * Scan evidence recorded 2026-10-24: the ICE BofA indices
+ * (BAMLH0A0HYM2 / BAMLC0A0CM) carry the "copyrighted: pre-approval
+ * required" tag — the OD-5 credit-spread cards stay out until ICE
+ * permission exists (the honest no-go the tracker + D-44 record).
  */
 export function fredLicenceForSeries(
   seriesId: string,
@@ -342,6 +351,18 @@ export function fredLicenceForSeries(
         licenceName: 'FRED series — copyright not scanned (fail closed)',
         publicDisplayOk: 'no',
         termsEvidence: `No T-16 scan record for ${seriesId} — fail closed. Run scripts/fred-copyright-scan.ts.`,
+      },
+    };
+  }
+  // The pre-approval class: never public, never fetched (D-44, 2026-10-24).
+  if (rec.license.includes('pre-approval')) {
+    return {
+      seriesId,
+      licence: {
+        ...FRED_BASE,
+        licenceName: `FRED license #copyright-${rec.license} (pre-approval required — publisher permission needed; private-only, no fetch wired)`,
+        publicDisplayOk: 'no',
+        termsEvidence: `${rec.evidence} (checked ${rec.checkedOn}) — the pre-approval class requires the PUBLISHER's permission per FRED's legal page (read 2026-10-21); no card serves and no fetch runs until that permission is recorded (D-44).`,
       },
     };
   }

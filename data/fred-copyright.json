@@ -1,6 +1,6 @@
 {
-  "_comment": "T-16 FRED copyright scan (scripts/fred-copyright-scan.ts). copyrightNotice=true → public_display_ok must be no. Re-run when a series is added.",
-  "scannedOn": "2026-10-21",
+  "_comment": "T-16 FRED copyright scan. Three classes (FRED legal, read 2026-10-21): public-domain -> public; citation-required (copyrightNotice=true) -> display-permitted WITH \"Source: publisher via FRED\" attribution; pre-approval (license contains 'pre-approval') -> private-only, no fetch, no display until the publisher's permission is recorded (D-44, 2026-10-24). Re-run the scan when a series is added.",
+  "scannedOn": "2026-10-24",
   "records": [
     {
       "seriesId": "T10Y2Y",
@@ -265,6 +265,70 @@
       "checkedOn": "2026-10-21",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/W006RC1Q027SBEA"
+    },
+    {
+      "seriesId": "ICSA",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-10-24",
+      "evidence": "FRED license tag: #copyright-public-domain (series page read 2026-10-24; US Department of Labor source, no copyright notice)",
+      "url": "https://fred.stlouisfed.org/series/ICSA"
+    },
+    {
+      "seriesId": "SOFR",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-10-24",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (New York Fed source)",
+      "url": "https://fred.stlouisfed.org/series/SOFR"
+    },
+    {
+      "seriesId": "RECPROUSM156N",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-10-24",
+      "evidence": "FRED license tag: #copyright-public-domain (series page read 2026-10-24; Marcelle-Chauvet smoothed recession probabilities)",
+      "url": "https://fred.stlouisfed.org/series/RECPROUSM156N"
+    },
+    {
+      "seriesId": "UMCSENT",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-10-24",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Univ. of Michigan source)",
+      "url": "https://fred.stlouisfed.org/series/UMCSENT"
+    },
+    {
+      "seriesId": "MICH",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-10-24",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Univ. of Michigan source)",
+      "url": "https://fred.stlouisfed.org/series/MICH"
+    },
+    {
+      "seriesId": "PCEPILFE",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-10-24",
+      "evidence": "FRED license tag: #copyright-public-domain (series page read 2026-10-24; BEA core PCE price index)",
+      "url": "https://fred.stlouisfed.org/series/PCEPILFE"
+    },
+    {
+      "seriesId": "BAMLH0A0HYM2",
+      "license": "pre-approval",
+      "copyrightNotice": true,
+      "checkedOn": "2026-10-24",
+      "evidence": "FRED license tag: #copyright-pre-approval · page text: \"Copyrighted: pre-approval required\" (ICE BofA Merrill Lynch source) — publisher permission required before any fetch or display (D-44, 2026-10-24)",
+      "url": "https://fred.stlouisfed.org/series/BAMLH0A0HYM2"
+    },
+    {
+      "seriesId": "BAMLC0A0CM",
+      "license": "pre-approval",
+      "copyrightNotice": true,
+      "checkedOn": "2026-10-24",
+      "evidence": "FRED license tag: #copyright-pre-approval · page text: \"Copyrighted: pre-approval required\" (ICE BofA Merrill Lynch source) — publisher permission required before any fetch or display (D-44, 2026-10-24)",
+      "url": "https://fred.stlouisfed.org/series/BAMLC0A0CM"
     }
   ]
 }

@@ -365,6 +365,20 @@ export const IndicatorIdSchema = z.enum([
   // indicator card for an audience that doesn't exist (no NZ coverage
   // anywhere; not in the FX module's 10 pairs). The KV documents carrying
   // its reading were migrated the same deploy (the eth-usd pattern).
+  // ---- M4 Wave 1 — the early-warning pack (OD-8/D-42, 2026-10-24) ----
+  // All series live-verified 2026-10-24 (fredgraph CSV) + T-16 licence
+  // classes scanned the same day (data/fred-copyright.json). hy-oas is
+  // EXCLUDED from the pack: the ICE BofA indices carry FRED's
+  // "copyright-pre-approval" tag — publisher permission required, never
+  // public (the OD-5 honest no-go, D-44).
+  'initial-jobless-claims', // FRED ICSA (weekly) — scored, growth-health
+  'recession-probability', // FRED RECPROUSM156N (monthly) — scored, growth-health
+  'michigan-sentiment', // FRED UMCSENT (monthly) — scored, growth-health
+  'michigan-1y-expectations', // FRED MICH (monthly) — companion-only inside michigan-sentiment
+  'us-pce-core-yoy', // FRED PCEPILFE (12-month % change) — scored, prices-heat
+  'sofr', // FRED SOFR (daily) — context, borrowing-costs
+  'us-2y', // FRED DGS2 (daily) — context display (already collected), borrowing-costs
+  'breakeven-10y', // FRED T10YIE (daily) — context display (validation-only today), prices-heat
   // Global — Prices board companions (context rows rendered in lanes)
   'wti', // FRED DCOILWTICO (WTI spot, USD/barrel)
   'natgas', // FRED DHHNGSP (Henry Hub spot, USD/MMBtu)

@@ -201,6 +201,51 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'It is a market price, not a policy setting, and it moves with growth, inflation and borrowing-supply news.',
     forYou: 'A benchmark for long-term borrowing costs, including the pricing of long fixed-rate loans.',
   },
+  // ---- M4 Wave 1 (OD-8/D-42, 2026-10-24) — the funding leg + the 2y display ----
+  sofr: {
+    name: 'The overnight funding rate',
+    ticker: 'SOFR',
+    oneLiner:
+      'The actual overnight rate banks pay to borrow cash in the US: the rate the Federal Reserve’s setting is meant to deliver.',
+    lines: {
+      highRising: 'The overnight rate is high for its decade and rising: the setting that raises every floating-rate leg down the chain.',
+      highEasing: 'The overnight rate is high for its decade but easing.',
+      typical: 'The overnight funding rate sits in its usual range for the decade.',
+      low: 'The overnight rate is low for its decade: cheap overnight money, the easy-policy setting.',
+    },
+    whatItIs:
+      'The Secured Overnight Financing Rate (FRED’s SOFR): the cost of overnight borrowing against US Treasury collateral — the base rate that replaced LIBOR for trillions in loans and derivatives.',
+    whyItMatters:
+      'It completes the chain from the policy rate to the rates households and firms actually pay: when SOFR tracks the Fed’s target range, transmission works; when it jumps above it, funding markets are strained.',
+    tendedToMean:
+      'SOFR normally sits a hair under the top of the Fed’s target range. Spikes above it — September 2019 being the modern case — mark funding squeezes the Fed answers with market operations.',
+    cantTell:
+      'One overnight rate says little about next month: it is the plumbing check, not a forecast.',
+    forYou:
+      'When this rate sits inside the Fed’s target corridor, the policy you hear about in the news is the policy being delivered.',
+  },
+  'us-2y': {
+    name: 'What the US pays to borrow for 2 years',
+    ticker: '2-year',
+    oneLiner:
+      'The 2-year Treasury yield: the market’s live read on where the Federal Reserve’s policy rate is heading.',
+    lines: {
+      highRising: 'The 2-year yield is high for its decade and rising: markets price the Fed staying restrictive for longer.',
+      highEasing: 'The 2-year yield is high for its decade but easing.',
+      typical: 'The 2-year yield sits in its usual range for the decade.',
+      low: 'The 2-year yield is low for its decade: markets price easier policy ahead.',
+    },
+    whatItIs:
+      'The market yield on 2-year US Treasury notes, daily from FRED (DGS2) — the same series the Fed-expectations card derives its gap from.',
+    whyItMatters:
+      'Of all Treasury yields, the 2-year moves most with rate expectations; the 10-year-minus-2-year curve card reads best with this leg visible beside it.',
+    tendedToMean:
+      'A 2-year yield sitting far above the policy rate has marked markets pricing hikes; sitting well below, pricing cuts.',
+    cantTell:
+      'It prices the average expected policy path, not a promise — and it carries a small term premium on top.',
+    forYou:
+      'The number to glance at before asking whether markets are leaning toward rate cuts.',
+  },
   'ecb-dfr': {
     name: 'The euro area’s policy rate',
     oneLiner:
@@ -282,6 +327,29 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     cantTell: 'It is still one month of one country’s prices: not a trend on its own.',
     forYou: 'A cross-check on the headline: when the two disagree, energy is usually why.',
   },
+  // ---- M4 Wave 1 (OD-8/D-42, 2026-10-24) — the early-warning pack ----
+  'us-pce-core-yoy': {
+    name: 'The Fed’s preferred inflation gauge',
+    ticker: 'Core PCE',
+    oneLiner:
+      'US prices excluding food and energy, measured the way the Federal Reserve actually targets it — its stated goal is 2%.',
+    lines: {
+      highRising: 'Core PCE is above the Fed’s 2% goal and rising: the setting that keeps rate-cut talk waiting.',
+      highEasing: 'Core PCE sits above the 2% goal but is easing toward it.',
+      typical: 'Core PCE sits near the Fed’s 2% goal: the setting in which past easing cycles began.',
+      low: 'Core PCE is below the 2% goal: unusually soft inflation by the Fed’s own yardstick.',
+    },
+    whatItIs:
+      'The 12-month change in the core personal consumption expenditures price index (FRED’s PCEPILFE): excludes food and energy, and is the measure the Fed’s 2% inflation target is defined on.',
+    whyItMatters:
+      'The Fed’s reaction function runs on this number: how far it sits from 2% is the cleanest guide to how long policy stays restrictive.',
+    tendedToMean:
+      'Sustained runs above 2% marked the 2021–23 overshoot; the Fed has historically not declared victory until this measure is back near goal.',
+    cantTell:
+      'It publishes about a month after the month it describes, and revises: one print is not a trend.',
+    forYou:
+      'When this number closes in on 2%, rate-cut odds improve; far above it, expect the Fed to stay tough.',
+  },
   'breakeven-5y5y': {
     name: 'Expected US inflation, five to ten years ahead',
     oneLiner:
@@ -302,6 +370,28 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'It reflects market prices, which can move on liquidity and hedging: not just on genuine belief.',
     forYou:
       'A gauge of whether markets still trust inflation to stay near target over the long run.',
+  },
+  'breakeven-10y': {
+    name: 'Expected US inflation, ten years ahead',
+    ticker: '10y breakeven',
+    oneLiner:
+      'The yearly inflation rate markets expect, on average, over the next ten years.',
+    lines: {
+      highRising: 'Ten-year inflation expectations are rising above their norm: the pricing that pushes long rates up.',
+      highEasing: 'Ten-year expectations sit above their norm but are easing.',
+      typical: 'Ten-year inflation expectations sit near their usual level.',
+      low: 'Markets price weak inflation a decade ahead: the deflation-fear setting that invites easy policy.',
+    },
+    whatItIs:
+      'The 10-year breakeven inflation rate (FRED’s T10YIE): the gap between ordinary and inflation-protected 10-year Treasury yields — what the bond market prices as average inflation over the decade.',
+    whyItMatters:
+      'The near leg of the anchoring story beside the 5y5y card: together they show whether expected inflation stays pinned while the Fed fights.',
+    tendedToMean:
+      'Sustained moves above roughly 2.5% have historically unsettled central banks; slides toward 1% signal feared deflation.',
+    cantTell:
+      'It is derived from market prices, which move on liquidity and hedging as well as genuine belief.',
+    forYou:
+      'A gauge of long-run inflation trust: the number bond markets actually price every day.',
   },
   'stress-stlfsi': {
     name: 'Stress in US money markets',
@@ -559,6 +649,87 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     cantTell:
       'It lags by construction (it needs a low to rise from) and says nothing about depth or length, only that a downturn has usually begun.',
     forYou: 'A single glance at “is the US in recession territory?” before reading anything else.',
+  },
+  // ---- M4 Wave 1 (OD-8/D-42, 2026-10-24) — the growth lane's early-warning pack ----
+  'initial-jobless-claims': {
+    name: 'New unemployment claims',
+    ticker: 'Jobless claims',
+    oneLiner:
+      'How many Americans newly filed for unemployment benefits last week: the fastest read on the labor market there is.',
+    lines: {
+      highRising: 'New claims are high for the decade and rising: the pattern that has opened past US downturns.',
+      highEasing: 'New claims are elevated for the decade but easing.',
+      typical: 'New claims sit in their usual range for the decade.',
+      low: 'New claims are unusually low: a tight labor market, where layoffs are rare.',
+    },
+    whatItIs:
+      'Initial claims (FRED’s ICSA): the number of people newly registering for unemployment benefits each week, published every Thursday — weeks before the monthly jobs data, months before the Sahm rule can move.',
+    whyItMatters:
+      'Layoffs show up here first. Claims are the most-watched weekly number in US macro precisely because a sustained rise is the earliest public sign the labor market is cracking.',
+    tendedToMean:
+      'Sustained climbs off a cycle low — not one noisy week — have opened the labor turn of every modern US recession.',
+    cantTell:
+      'The series is weekly and noisy (holidays, strikes and weather all distort single weeks), and its level drifts with the workforce’s size: one week is never a trend.',
+    forYou:
+      'The earliest public sign that layoffs are picking up — worth a glance before trusting any “the labor market is fine” take.',
+  },
+  'recession-probability': {
+    name: 'US recession probability',
+    oneLiner:
+      'A model’s estimate of the chance the US economy is in recession right now. Above 50% is the classic recession call.',
+    lines: {
+      highRising: 'The recession probability is above the 50% line: the model reads the current data as recession-like.',
+      highEasing: 'The probability is elevated but easing off its highs.',
+      typical: 'The recession probability sits in its usual low range.',
+      low: 'The recession probability is near zero: the data reads as normal expansion.',
+    },
+    whatItIs:
+      'Smoothed US recession probabilities (FRED’s RECPROUSM156N, the Marcelle-Chauvet model): a statistical model reads several monthly indicators and reports the probability the economy is in recession that month.',
+    whyItMatters:
+      'One number that weighs the same evidence you would otherwise read across five cards — and a model companion to the Sahm alarm beside it.',
+    tendedToMean:
+      'Crossings of the 50% line have coincided with the recognized starts of past US recessions, and fallen back only well into recoveries.',
+    cantTell:
+      'It is a model, not a fact: it publishes a month or two behind the data it reads, and it can briefly mistake noise for signal.',
+    forYou:
+      'A quick “how bad does the data say things are” number before reading the rest of the growth lane.',
+  },
+  'michigan-sentiment': {
+    name: 'US consumer mood',
+    ticker: 'Michigan',
+    oneLiner:
+      'How confident American households feel about their finances and the economy: the survey the news cites.',
+    lines: {
+      low: 'Consumer mood is in the bottom of its decade range: the pessimism that has preceded cutbacks in spending.',
+      highRising: 'Consumer mood is unusually strong and improving.',
+      highEasing: 'Consumer mood remains above its norm, though easing.',
+      typical: 'US consumer mood sits in its usual range for the decade.',
+    },
+    whatItIs:
+      'The University of Michigan consumer sentiment index (FRED’s UMCSENT): a monthly survey of households running since the 1950s. The card carries the survey’s one-year inflation expectations beside it.',
+    whyItMatters:
+      'Consumer spending is most of the US economy, and mood leads it. The Federal Reserve also watches the expectations leg for signs inflation psychology is un-anchoring.',
+    tendedToMean:
+      'Bottom-of-the-range readings clustered around the 1970s stagflation, the 2008–09 crisis and the 2022 inflation shock.',
+    cantTell:
+      'Mood is not spending: American households have kept spending through gloomy surveys before, so the card is a pressure gauge, not a forecast.',
+    forYou:
+      'Context for US consumer headlines — and the expectations number the Fed quotes when it talks about inflation psychology.',
+  },
+  'michigan-1y-expectations': {
+    name: 'Expected inflation next year',
+    ticker: 'Michigan 1y',
+    oneLiner: 'What American households expect prices to do over the next 12 months.',
+    lines: {},
+    whatItIs:
+      'The Michigan survey’s median expected price change over the next 12 months (FRED’s MICH), shown inside the consumer-mood card.',
+    whyItMatters:
+      'Expected inflation feeds wage demands and pricing decisions; the Fed watches it as a gauge of inflation psychology.',
+    tendedToMean:
+      'Expectations above roughly 4–5% marked the 2022 panic; the modern norm is near 2–3%.',
+    cantTell:
+      'Households systematically over-predict inflation: this is psychology, not a forecast.',
+    forYou: 'A quick read on how stressed American households are about prices.',
   },
   'copper-gold': {
     name: 'Copper’s price versus gold',
@@ -2997,6 +3168,8 @@ export const insightsCopyEn = {
     jpy: '¥',
     cny: 'CN¥',
     ratio: 'ratio',
+    // M4 Wave 1 (2026-10-24): the claims count word — "194,000 claims".
+    claims: 'claims',
   },
 
   rule: {

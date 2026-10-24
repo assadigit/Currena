@@ -664,6 +664,16 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'boj-rate',
   'boe-rate',
   'us-gdp-growth',
+  // M4 Wave 1 (OD-8/D-42, 2026-10-24): the early-warning pack's rate /
+  // inflation / probability family — all speak in percentage points (the
+  // recession probability's changes are probability points: 0.24 → 0.62
+  // is +0.38).
+  'sofr',
+  'us-2y',
+  'breakeven-10y',
+  'us-pce-core-yoy',
+  'recession-probability',
+  'michigan-1y-expectations',
 ]);
 
 /** Index/ratio series that speak in points but are not interest rates. */
@@ -675,6 +685,9 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // (like gold-silver); the ECY is a yield-gap measure in points.
   'shiller-cape',
   'shiller-ecy',
+  // M4 Wave 1 (2026-10-24): the Michigan sentiment index — a survey index
+  // in points, like china-pmi (its changes are index points).
+  'michigan-sentiment',
   'copper-gold',
   'terms-of-trade',
   'vix',

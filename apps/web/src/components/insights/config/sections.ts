@@ -47,7 +47,12 @@ export const BTC_RATIO_IDS: readonly IndicatorId[] = ['gold-btc'];
  * rendered INSIDE another card (core CPI on the US inflation card), never as
  * their own row. The question-group filter skips them.
  */
-export const COMPANION_ONLY_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>(['us-cpi-core-yoy']);
+export const COMPANION_ONLY_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
+  'us-cpi-core-yoy',
+  // M4 Wave 1 (OD-8/D-42, 2026-10-24): the Michigan survey's 1y inflation
+  // expectations ride inside the michigan-sentiment card.
+  'michigan-1y-expectations',
+]);
 
 /**
  * Step-2 add-list §B2: companion lines rendered INSIDE a parent card — a
@@ -60,6 +65,10 @@ export const COMPANION_ONLY_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>
 export const COMPANIONS: Readonly<Partial<Record<IndicatorId, readonly IndicatorId[]>>> = {
   'us-cpi-yoy': ['us-cpi-core-yoy'],
   'au-10y': ['us10y'],
+  // M4 Wave 1 (OD-8/D-42, 2026-10-24): the sentiment card carries its
+  // survey's 1y inflation-expectations companion (the review's §5.1 row:
+  // "carries the 1y expectations leg (FRED MICH, verified 4.2%)").
+  'michigan-sentiment': ['michigan-1y-expectations'],
 };
 
 /** The parent card a companion belongs to, or null when it rides nowhere. */

@@ -22,9 +22,9 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 29 P1 / 34 P2 (the 2026-10-21c round retires eth-usd; the 2026-10-23 OD-7 round retires nzd-usd + silver-btc, both P2)', () => {
-    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(29);
-    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(34);
+  it('splits 34 P1 / 37 P2 (the 2026-10-23 OD-7 round retires nzd-usd + silver-btc; the 2026-10-24 M4 Wave-1 round adds five P1 cards + three P2 context rows)', () => {
+    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(34);
+    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(37);
   });
 
   it('groups are the question groups (global 5 + prices-board, australia 3)', () => {
@@ -54,13 +54,14 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('info-only cards never vote: exactly the twenty-seven info rules (2026-10-23 OD-7: nzd-usd + silver-btc retire, m2-us demoted to context)', () => {
+  it('info-only cards never vote: exactly the thirty-one info rules (2026-10-23 OD-7: nzd-usd + silver-btc retire, m2-us demoted to context; 2026-10-24 M4 Wave 1: +sofr, +us-2y, +breakeven-10y, +michigan-1y-expectations as context)', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
     expect(info).toEqual([
       'au-deposit-rate',
       'au-petrol-yoy',
       'boe-rate',
       'boj-rate',
+      'breakeven-10y',
       'btc-usd',
       'bund-10y',
       'copper-usd',
@@ -73,12 +74,15 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'iron-ore',
       'jgb-10y',
       'm2-us',
+      'michigan-1y-expectations',
       'natgas',
       'platinum',
       'rba-cash-rate',
       'shiller-cape',
       'shiller-ecy',
       'silver-usd',
+      'sofr',
+      'us-2y',
       'us-cpi-core-yoy',
       'us-gdp-growth',
       'us-nfp',
@@ -87,10 +91,10 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     ]);
   });
 
-  it('GAUGE membership is the scored list (36 voters; fix B-14: +brent counts in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health)', () => {
+  it('GAUGE membership is the scored list (40 voters; fix B-14: +brent counts in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims, +recession-probability, +michigan-sentiment in growth-health, +us-pce-core-yoy in prices-heat)', () => {
     const gaugedGroups = new Set(GAUGES.map((g) => g.id));
     const memberIds = new Set(GAUGES.flatMap((g) => g.members));
-    expect(memberIds.size).toBe(36);
+    expect(memberIds.size).toBe(40);
     // Every gauge member is a scored (non-info) definition. B-14's one
     // deliberate exception: brent lives in the prices-board lane group but
     // counts in the prices-heat gauge (the card renders on the Prices

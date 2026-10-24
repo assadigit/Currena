@@ -68,7 +68,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:T10Y2Y): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -129,7 +129,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -202,7 +202,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -264,7 +264,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -327,7 +327,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:DGS2, fred:DFEDTARL, fred:DFEDTARU): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -400,7 +400,125 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "sofr",
+      "title": "The overnight funding rate (SOFR)",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "New York Fed via FRED (SOFR)",
+        "url": "https://fred.stlouisfed.org/series/SOFR",
+        "seriesIdOrTable": "FRED:SOFR (Secured Overnight Financing Rate)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/SOFR",
+      "methodUrl": "https://fred.stlouisfed.org/series/SOFR",
+      "whatItIs": "The Secured Overnight Financing Rate (FRED’s SOFR): the cost of overnight borrowing against US Treasury collateral — the base rate that replaced LIBOR for trillions in loans and derivatives.",
+      "whatItIsnt": "One overnight rate says little about next month: it is the plumbing check, not a forecast.",
+      "trackRecordNote": "SOFR normally sits a hair under the top of the Fed’s target range. Spikes above it — September 2019 being the modern case — mark funding squeezes the Fed answers with market operations.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:SOFR"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "cadence default (daily)",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (New York Fed source) (checked 2026-10-24) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "us-2y",
+      "title": "US 2-year Treasury yield",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (DGS2)",
+        "url": "https://fred.stlouisfed.org/series/DGS2",
+        "seriesIdOrTable": "FRED:DGS2"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DGS2",
+      "methodUrl": "https://fred.stlouisfed.org/series/DGS2",
+      "whatItIs": "The market yield on 2-year US Treasury notes, daily from FRED (DGS2) — the same series the Fed-expectations card derives its gap from.",
+      "whatItIsnt": "It prices the average expected policy path, not a promise — and it carries a small term premium on top.",
+      "trackRecordNote": "A 2-year yield sitting far above the policy rate has marked markets pricing hikes; sitting well below, pricing cuts.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DGS2"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "cadence default (daily)",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -523,7 +641,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:A091RC1Q027SBEA, fred:W006RC1Q027SBEA): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -582,7 +700,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -641,7 +759,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -700,7 +818,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -759,7 +877,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -818,7 +936,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -879,7 +997,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -938,8 +1056,69 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "us-pce-core-yoy",
+      "title": "US core inflation by the Fed’s gauge (PCE)",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": "prices-heat",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (PCEPILFE, 12-month % change)",
+        "url": "https://fred.stlouisfed.org/series/PCEPILFE",
+        "seriesIdOrTable": "FRED:PCEPILFE (12-month % change, core PCE price index)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/PCEPILFE",
+      "methodUrl": "https://fred.stlouisfed.org/series/PCEPILFE",
+      "whatItIs": "The 12-month change in the core personal consumption expenditures price index (FRED’s PCEPILFE): excludes food and energy, and is the measure the Fed’s 2% inflation target is defined on.",
+      "whatItIsnt": "It publishes about a month after the month it describes, and revises: one print is not a trend.",
+      "trackRecordNote": "Sustained runs above 2% marked the 2021–23 overshoot; the Fed has historically not declared victory until this measure is back near goal.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 95 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:PCEPILFE"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 95,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "threshold",
+        "direction": "above",
+        "value": 2
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (series page read 2026-10-24; BEA core PCE price index) (checked 2026-10-24) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1000,7 +1179,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -1059,7 +1238,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -1118,8 +1297,67 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "breakeven-10y",
+      "title": "Expected US inflation, ten years ahead",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (T10YIE)",
+        "url": "https://fred.stlouisfed.org/series/T10YIE",
+        "seriesIdOrTable": "FRED:T10YIE (10-year breakeven inflation rate)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/T10YIE",
+      "methodUrl": "https://fred.stlouisfed.org/series/T10YIE",
+      "whatItIs": "The 10-year breakeven inflation rate (FRED’s T10YIE): the gap between ordinary and inflation-protected 10-year Treasury yields — what the bond market prices as average inflation over the decade.",
+      "whatItIsnt": "It is derived from market prices, which move on liquidity and hedging as well as genuine belief.",
+      "trackRecordNote": "Sustained moves above roughly 2.5% have historically unsettled central banks; slides toward 1% signal feared deflation.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:T10YIE"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "cadence default (daily)",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1180,7 +1418,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -1241,7 +1479,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -1302,7 +1540,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyright, 2016, Chicago Board Options Exchange, Inc\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -1856,7 +2094,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -1917,8 +2155,69 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "initial-jobless-claims",
+      "title": "New unemployment claims (US)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": "growth-health",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "US Department of Labor via FRED (ICSA)",
+        "url": "https://fred.stlouisfed.org/series/ICSA",
+        "seriesIdOrTable": "FRED:ICSA (initial claims, weekly)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/ICSA",
+      "methodUrl": "https://fred.stlouisfed.org/series/ICSA",
+      "whatItIs": "Initial claims (FRED’s ICSA): the number of people newly registering for unemployment benefits each week, published every Thursday — weeks before the monthly jobs data, months before the Sahm rule can move.",
+      "whatItIsnt": "The series is weekly and noisy (holidays, strikes and weather all distort single weeks), and its level drifts with the workforce’s size: one week is never a trend.",
+      "trackRecordNote": "Sustained climbs off a cycle low — not one noisy week — have opened the labor turn of every modern US recession.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 12 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:ICSA"
+        ]
+      },
+      "unit": "claims",
+      "changeUnit": "percent",
+      "cadence": "weekly",
+      "maxAgeDays": 12,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "percentile",
+        "tail": "high",
+        "cutoff": 0.2
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (series page read 2026-10-24; US Department of Labor source, no copyright notice) (checked 2026-10-24) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1978,7 +2277,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -2039,8 +2338,189 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "recession-probability",
+      "title": "US recession probability",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": "growth-health",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (RECPROUSM156N, Marcelle-Chauvet smoothed recession probability)",
+        "url": "https://fred.stlouisfed.org/series/RECPROUSM156N",
+        "seriesIdOrTable": "FRED:RECPROUSM156N (smoothed US recession probability)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/RECPROUSM156N",
+      "methodUrl": "https://fred.stlouisfed.org/series/RECPROUSM156N",
+      "whatItIs": "Smoothed US recession probabilities (FRED’s RECPROUSM156N, the Marcelle-Chauvet model): a statistical model reads several monthly indicators and reports the probability the economy is in recession that month.",
+      "whatItIsnt": "It is a model, not a fact: it publishes a month or two behind the data it reads, and it can briefly mistake noise for signal.",
+      "trackRecordNote": "Crossings of the 50% line have coincided with the recognized starts of past US recessions, and fallen back only well into recoveries.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 100 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:RECPROUSM156N"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 100,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "threshold",
+        "direction": "above",
+        "value": 0.5
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (series page read 2026-10-24; Marcelle-Chauvet smoothed recession probabilities) (checked 2026-10-24) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "michigan-sentiment",
+      "title": "US consumer mood (Michigan survey)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": "growth-health",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "University of Michigan via FRED (UMCSENT)",
+        "url": "https://fred.stlouisfed.org/series/UMCSENT",
+        "seriesIdOrTable": "FRED:UMCSENT (University of Michigan consumer sentiment)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/UMCSENT",
+      "methodUrl": "https://fred.stlouisfed.org/series/UMCSENT",
+      "whatItIs": "The University of Michigan consumer sentiment index (FRED’s UMCSENT): a monthly survey of households running since the 1950s. The card carries the survey’s one-year inflation expectations beside it.",
+      "whatItIsnt": "Mood is not spending: American households have kept spending through gloomy surveys before, so the card is a pressure gauge, not a forecast.",
+      "trackRecordNote": "Bottom-of-the-range readings clustered around the 1970s stagflation, the 2008–09 crisis and the 2022 inflation shock.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:UMCSENT"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "percentile",
+        "tail": "low",
+        "cutoff": 0.2
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Univ. of Michigan source) (checked 2026-10-24) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "michigan-1y-expectations",
+      "title": "US expected inflation next year (Michigan)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "University of Michigan via FRED (MICH)",
+        "url": "https://fred.stlouisfed.org/series/MICH",
+        "seriesIdOrTable": "FRED:MICH (median expected price change, next 12 months)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/MICH",
+      "methodUrl": "https://fred.stlouisfed.org/series/MICH",
+      "whatItIs": "The Michigan survey’s median expected price change over the next 12 months (FRED’s MICH), shown inside the consumer-mood card.",
+      "whatItIsnt": "Households systematically over-predict inflation: this is psychology, not a forecast.",
+      "trackRecordNote": "Expectations above roughly 4–5% marked the 2022 panic; the modern norm is near 2–3%.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:MICH"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Univ. of Michigan source) (checked 2026-10-24) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -2218,7 +2698,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -2277,7 +2757,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:PAYEMS): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
@@ -3007,7 +3487,7 @@
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-21",
+        "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (rba:F2, fred:DGS10): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }

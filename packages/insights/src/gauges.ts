@@ -57,9 +57,11 @@ export const GAUGES: readonly GaugeDef[] = [
     // now sits in the prices area it belongs to — the hero count, the area
     // count and the prices strip all count the same scored list. The card
     // still renders on the Prices board; only the count membership moved.
+    // M4 Wave 1 (OD-8/D-42, 2026-10-24): core PCE joins the voters — the
+    // Fed's own target gauge, scored against its published 2% goal.
     id: 'prices-heat',
     section: 'global',
-    members: ['us-cpi-yoy', 'breakeven-5y5y', 'brent'],
+    members: ['us-cpi-yoy', 'us-pce-core-yoy', 'breakeven-5y5y', 'brent'],
   },
   // Step-2 add-list §B5: VIX joins the market-stress voters (scored on its
   // 10-year position; the calm/nervous word thresholds arrive with Step 3).
@@ -70,11 +72,26 @@ export const GAUGES: readonly GaugeDef[] = [
   // Fix spec C-05 (2026-10-14): the Philadelphia Fed survey joins them.
   // OD-7 demotion (2026-10-23, D-42): m2-us left the voters — it is
   // context only now (the card keeps its year-on-year percentile; the
-  // gauge counts the five members below — the iron-ore precedent).
+  // gauge counts the members below — the iron-ore precedent).
+  // M4 Wave 1 (OD-8/D-42, 2026-10-24): the early-warning trio joins the
+  // voters — weekly claims (the fastest labor read), the Chauvet recession
+  // probability (scored at the 0.50 line) and Michigan sentiment (scored
+  // on its 10-year low tail). sofr / us-2y / breakeven-10y stay context
+  // (info rules — never voters; the iron-ore precedent), and
+  // michigan-1y-expectations is companion-only.
   {
     id: 'growth-health',
     section: 'global',
-    members: ['china-pmi', 'philly-fed', 'us-unemployment', 'sahm-rule', 'copper-gold'],
+    members: [
+      'china-pmi',
+      'philly-fed',
+      'initial-jobless-claims',
+      'us-unemployment',
+      'sahm-rule',
+      'recession-probability',
+      'michigan-sentiment',
+      'copper-gold',
+    ],
   },
   {
     id: 'au-inflation-rates',

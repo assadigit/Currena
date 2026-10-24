@@ -571,7 +571,18 @@ const BUDGETS = [
   // whole restored surface. The entry chunk is untouched at 295.28/88.81
   // vs 296/89.5 (Insights stays lazy). Justified in CHANGELOG
   // §2026-10-21c (owner restoration round).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 765_000, gz: 186_000, label: 'Insights lazy chunk' },
+
+  // 2026-10-24 M4 WAVE 1 (765.00 → 782.00 raw, 186.00 → 189.00 gz): the
+  // early-warning pack (OD-8/D-42) — eight new indicator cards whose FULL
+  // copy corpus rides in both locales (~11 fields × 8 ids × en+fa, the
+  // michigan-1y-expectations companion included) plus the new 'claims'
+  // unit token and the companions wiring. Measured 780.48 kB raw /
+  // 188.46 kB gz — +27.22 raw / +6.95 gz over the M2 tree (753.26/181.51);
+  // the growth is exactly the bilingual copy corpus (the gzip delta is
+  // +2.46 kB over the old budget line for eight new cards of content).
+  // The entry chunk is untouched at 295.28/88.80 vs 296/89.5 (Insights
+  // stays lazy). Justified in CHANGELOG §2026-10-24 (M4 Wave 1).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 782_000, gz: 189_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {
