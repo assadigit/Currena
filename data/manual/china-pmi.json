@@ -1,9 +1,9 @@
 {
   "id": "china-pmi",
   "sourceName": "China NBS official manufacturing PMI",
-  "sourceUrl": "https://www.stats.gov.cn/english/",
-  "enteredOn": "2026-10-15",
-  "expires": "2026-10-31",
+  "sourceUrl": "https://www.stats.gov.cn/english/PressRelease/",
+  "enteredOn": "2026-10-26",
+  "expires": "2026-11-03",
   "observations": [
     { "date": "2025-12-31", "value": 50.1 },
     { "date": "2026-01-31", "value": 49.3 },

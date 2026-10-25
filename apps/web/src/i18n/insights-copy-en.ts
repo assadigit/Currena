@@ -885,7 +885,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       low: 'Chinese factories are contracting: the reading that tends to pressure commodity prices and the AUD.',
     },
     whatItIs:
-      'China’s official manufacturing Purchasing Managers’ Index, from the national statistics bureau’s monthly survey of factory managers, hand-entered here from official releases. Above 50 means expansion; below 50, contraction.',
+      'China’s official manufacturing Purchasing Managers’ Index, from the national statistics bureau’s monthly survey of factory managers, read here from the bureau’s own English press releases. Above 50 means expansion; below 50, contraction.',
     whyItMatters:
       'China is the world’s factory and Australia’s biggest export customer; PMI is one of the first indicators to turn in any cycle.',
     tendedToMean:
@@ -893,6 +893,30 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     cantTell:
       'It measures breadth (how many firms grew), not size: one month’s dip is not a trend.',
     forYou: 'A key early indicator of demand for Australian exports.',
+  },
+  'china-cpi': {
+    name: 'China inflation (yearly)',
+    ticker: 'China CPI',
+    oneLiner:
+      'How fast Chinese consumer prices are rising, compared with a year ago: the gauge against the government’s own around-3% target.',
+    band: { min: 3, label: 'the government’s ~3% goal' },
+    lines: {
+      highRising: 'Chinese consumer prices are rising faster than usual: overheating pressure in the world’s factory.',
+      highEasing: 'Chinese inflation is above target but easing toward it.',
+      typical: 'Chinese inflation sits in its usual range for the past decade.',
+      low:
+        'Chinese prices are barely rising or falling: the weak-demand reading that haunts global trade and commodity prices.',
+    },
+    whatItIs:
+      'The year-on-year growth in China’s official Consumer Price Index, published monthly by the national statistics bureau and read here from its own English press releases.',
+    whyItMatters:
+      'China is the world’s factory and Australia’s biggest export customer: when its consumers and factories stop paying up, commodity prices and the AUD feel it. This is the demand temperature beside the factory PMI.',
+    tendedToMean:
+      'China spent 2023-25 flirting with deflation as property slumped and households saved; the long-run history spans deflationary dips to 8%+ overheating in the mid-1990s and 2008-11.',
+    cantTell:
+      'A national average over a vast economy: it says nothing about any one province, and food and energy swings can mask the underlying trend for months.',
+    forYou:
+      'The China pair’s second card: read it with the factory PMI to judge whether Chinese demand is heating, cooling or stalling.',
   },
   'm2-us': {
     name: 'The amount of money in the US economy',

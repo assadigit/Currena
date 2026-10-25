@@ -177,6 +177,20 @@ const MANUAL: SourceLicence = {
   termsUrl: 'https://www.stats.gov.cn/english/',
 };
 
+const NBS: SourceLicence = {
+  provider: 'nbs',
+  label: 'China NBS (English press releases)',
+  licenceName: 'NBS Terms of Service — attributed quotation + data download granted',
+  attributionText: 'Source: National Bureau of Statistics of China',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-26',
+  termsEvidence:
+    'NBS Terms of Service (read 2026-10-26, stats.gov.cn/english/nbs/200701/t20070104_59236.html): "Welcome to reprint or quote the contents of this website" with the attribution line ("Reprinted from (or quoted from) the website of the National Bureau of Statistics"), and — Section III Use of data item 1 — "You are allowed to download and use the statistical data on this website." The M7 automation (adapters/nbs.ts) reads the English press releases, shows the values verbatim with attribution, and keeps the good-faith/no-distortion condition; the M1 display permission (2026-10-23, no reuse prohibition found) is superseded by these affirmative quotes. data.stats.gov.cn easy-query is WAF-blocked (403, probed 2026-10-26) — the press releases are the only machine-readable path.',
+  termsUrl: 'https://www.stats.gov.cn/english/nbs/200701/t20070104_59236.html',
+};
+
 const EODHD: SourceLicence = {
   provider: 'eodhd',
   label: 'EODHD (world stock markets)',
@@ -295,6 +309,7 @@ export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   ecb: ECB,
   boe: BOE,
   manual: MANUAL,
+  nbs: NBS,
   eodhd: EODHD,
   bitstamp: BITSTAMP,
   'alternative-me': ALTERNATIVE_ME,

@@ -154,7 +154,7 @@ describe('ABOUT_PROVIDER_META — the risk-register mirror', () => {
       ['world-bank'],
       ['gold-api'],
       ['alternative-me'],
-      ['manual'],
+      ['nbs'],
       ['shiller'],
     ];
     for (const [provider] of pinned) {

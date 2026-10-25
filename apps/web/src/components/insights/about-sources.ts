@@ -125,10 +125,19 @@ export const ABOUT_PROVIDER_META: Readonly<
     url: 'https://alternative.me/crypto/fear-and-greed-index/',
   },
   manual: {
-    // register row 'nbs-china'
+    // register row 'nbs-china' (the M5 manual-entry era, superseded by the
+    // 'nbs' fetch row below — kept for the committed seed files' provenance)
     name: 'China NBS (manual entry)',
     attribution: 'Source: National Bureau of Statistics of China',
     url: 'https://www.stats.gov.cn/english/',
+  },
+  nbs: {
+    // register row 'nbs-china' (M7, 2026-10-26: the English press-release
+    // automation) — the About row links the publisher's terms page (the
+    // register row's termsUrl, mirrored verbatim per the test below).
+    name: 'China NBS (English press releases)',
+    attribution: 'Source: National Bureau of Statistics of China',
+    url: 'https://www.stats.gov.cn/english/nbs/200701/t20070104_59236.html',
   },
   shiller: {
     // register row 'shiller'

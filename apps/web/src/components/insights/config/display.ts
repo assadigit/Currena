@@ -149,6 +149,8 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   // Step-1 audit item C4: EUR per USD — the € symbol, not "US$".
   'eur-usd': { decimals: 4, unit: 'eur' },
   'china-pmi': { decimals: 1, unit: 'index' },
+  // M7 (2026-10-26): the NBS CPI card — the us-cpi-yoy percent convention.
+  'china-cpi': { decimals: 1, unit: 'percent' },
   // Step-1 audit item C7: "US$23.3 trillion", not "bn23,343".
   'm2-us': { decimals: 1, unit: 'usd-tr', scale: 0.001 },
   // Step-2 add-list §B3/§B4: the US labour-market pair (both in percentage

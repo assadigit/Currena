@@ -83,6 +83,78 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Session record — 2026-10-26 M7: the NBS automation lands, china-cpi ships, the BoJ retires
+
+- **Deployed**: currena-api **`366a91de-2ab9-488b-b7b5-3dd58730414b`** at
+  17:16 UTC (the M7 code) → `179c3397` (a first temporary 17:45 entry in
+  the GATED sweep list — honestly SKIPPED by the gate itself: the last
+  status was healthy and only 7.6h old, the failure-gate working exactly
+  as designed) → `7655b152` (the ungated temporary publish rungs: an
+  18:05 main-shaped run + an 18:07 periodic-history run, the M4 15:40
+  pattern) → **`0ce6fa8d-9e76-44d4-8554-b9f68a26bd06`** at 18:10 (the
+  rungs reverted — the final state). Web + api round (the diff touches
+  `apps/web`, `apps/api`, `packages/core`, `packages/insights`,
+  `data/*`); currena-markets untouched.
+- **What went live**: the NBS English press-release automation
+  (`packages/insights/src/adapters/nbs.ts`) — the index scan (page 2 only
+  when a release link is missing) + the PMI release's Table-1 13-month
+  parse + the CPI release's YoY parse (the summary-table Y/Y cell
+  cross-checked against the headline sentence). `china-pmi` leaves the
+  M5 manual-entry regime (source `nbs`, cadence `monthly`; the E-08
+  manual expiry leaves the card — the committed seed
+  `data/manual/china-pmi.json` becomes the fetch-failure fallback
+  history, all 10 observations re-verified identical against the NBS's
+  own Table 1 this session). `china-cpi` ships as the 89th indicator —
+  SCORED (the 43rd voter) against China's own "around 3%" target, in the
+  growth-health lane beside the factory PMI, seeded with 13 verified
+  observations (Sep 2025 −0.3 → Sep 2026 +0.9, each from its own
+  release page — the provenance table in data/manual/README.md) and
+  grown monthly by the stored accumulation. The register row flips
+  (`nbs-china`: provider `nbs`, method M2, runtime worker) with the ToS
+  quotes recorded.
+- **The licence evidence (fetch granted, not assumed)**: the NBS Terms
+  of Service (read 2026-10-26,
+  stats.gov.cn/english/nbs/200701/t20070104_59236.html) — "Welcome to
+  reprint or quote the contents of this website" + the attribution line,
+  and Section III "Use of data" item 1: "You are allowed to download and
+  use the statistical data on this website." Venue probes: all four NBS
+  pages (index, PMI release, CPI release, ToS) answer HTTP 200 from BOTH
+  the sandbox and the Cloudflare egress (via the rba-probe worker);
+  data.stats.gov.cn easy-query is WAF-blocked (403 UrlACL) and no RSS
+  feed exists (404) — the press releases are the only machine-readable
+  path.
+- **The BoJ fix-or-retire → RETIRE**: stat-search.boj.or.jp is dead
+  from BOTH venues (DNS from the work venue; HTTP 530 via the Worker
+  venue probe), and www.boj.or.jp's rate decisions live only in PDF
+  releases — the OECD mirror's "monthly average, lagged" relabel stays
+  boj-rate's permanent source, recorded with the probe evidence.
+- **No KV surgery needed**: adding an id is safe for the serve path
+  (the stored 88-reading snapshot parses fine — every stored id is
+  still valid; the eth-usd lesson applies to REMOVALS only). The
+  17:45 publish rung writes the first 89-reading snapshot family and
+  the public projection; from then on the 04:10 main rung owns it.
+- **Fetch budget**: +3 subrequests typical / +4 worst case (index 1 +
+  index 2 + the two release pages) on the 04:10 shape → ~46/50 — the
+  free-plan ceiling holds (KV ops don't consume the fetch budget, the
+  M6 empirical note).
+- **Verification**: local dry-run (sandbox venue, NBS reachable) — the
+  index page-2 fallback fired for the PMI link, the Table-1 parsed 13
+  months, `china-pmi 50.1 @ 2026-09-30 normal` and `china-cpi 0.9 @
+  2026-09-30 normal` computed, the growth lane 28 voters; Worker-venue
+  probes 200 on all four pages. The 18:05 publish rung then ran the REAL
+  Worker-venue collect and its outcome is captured from the KV state:
+  status `generatedAt 18:05:18Z`, 89 readings on the live page, all 4
+  NBS fetch rows ok (the index page-2 fallback fired from Cloudflare
+  egress), zero genuine source failures; the 18:07 periodic-history
+  rung wrote `insights:hist:china-cpi` (13 points, −0.3@2025-09-30 →
+  +0.9@2026-09-30) and GREW `insights:hist:china-pmi` 10 → 13 points
+  (the fetched Table-1's Sep-Nov 2025 rows) — both history endpoints
+  serve 13 points; the public archive 200. The writes' completion is the
+  CPU-margin evidence (an exceededCpu death kills the run BEFORE any
+  write — the M1† lesson; the run finished and wrote the whole family in
+  18.4 s of wall time). The 20:10 designed sweep then read the fresh
+  status and skipped — exactly as designed.
+
 ## Session record — 2026-10-25 Wave 3 + the Wave-4 probe fix (M6): the leading edge, the BoE's own Bank Rate, and the third recovery
 
 **Context.** A session deployed the Wave-3 bulk overnight (2026-10-25

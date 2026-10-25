@@ -599,7 +599,14 @@ const BUDGETS = [
   // +11.38 gz over the M5 tree — twelve cards of bilingual content). The
   // entry chunk is untouched at 295.28/88.80. Justified in CHANGELOG
   // §2026-10-25 (M6 Wave 3, the D-16 path).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 845_000, gz: 205_000, label: 'Insights lazy chunk' },
+  // 2026-10-26 M7 (845.00 → 850.00 raw, 205.00 → 206.00 gz): ONE more card —
+  // china-cpi, the NBS automation's second card, a full nine-field bilingual
+  // entry (13 EN + 13 fa strings + the band + the display row + the ticker),
+  // plus the china-pmi source-honesty reword in both locales. Measured
+  // 846.29 kB raw / 205.01 kB gz (+4.45 raw / +1.02 gz over the M6 tree).
+  // The entry chunk is untouched at 295.28/88.81. Justified in CHANGELOG
+  // §2026-10-26 (M7, the D-16 path).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 850_000, gz: 206_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

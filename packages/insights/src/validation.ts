@@ -732,6 +732,9 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'us-wages',
   'euro-hicp',
   'au-saving-ratio',
+  // M7 (2026-10-26): the China CPI yearly rate — an inflation series in
+  // percentage points, the us-cpi-yoy family.
+  'china-cpi',
 ]);
 
 /** Index/ratio series that speak in points but are not interest rates. */

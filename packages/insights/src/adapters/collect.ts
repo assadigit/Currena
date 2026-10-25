@@ -23,6 +23,15 @@ import { fetchBitstampCloses } from './bitstamp';
 import { fetchEiaBrent, fetchEiaHenryHub, fetchEiaWti } from './eia';
 import { fetchEcbAaa10ySeries, fetchEcbDfrSeries, fetchEcbHicpSeries } from './ecb';
 import { fetchBoeBankRateDecisions } from './boe';
+import {
+  NBS_PRESS_INDEX_URL,
+  fetchNbsCpiRelease,
+  fetchNbsIndexPage,
+  fetchNbsPmiRelease,
+  latestCpiRelease,
+  latestPmiRelease,
+  parseNbsPressIndex,
+} from './nbs';
 import { fetchCryptoFng } from './fng';
 import { fetchFrankfurterSeries } from './frankfurter';
 import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredDecadeFrom } from './fred';
@@ -70,8 +79,12 @@ export interface ReadingSourceOverride {
 }
 
 export interface CollectResult {
-  /** Everything buildIndicatorSeries accepts, EXCEPT chinaPmi (caller loads the manual file). */
-  inputs: Omit<SeriesInputs, 'chinaPmi'>;
+  /**
+   * Everything buildIndicatorSeries accepts, EXCEPT the committed manual
+   * seeds + the stored NBS accumulations (the caller loads those —
+   * data/manual/china-*.json + the store's hist keys; see ingest/run.ts).
+   */
+  inputs: Omit<SeriesInputs, 'chinaPmi' | 'chinaCpi' | 'nbsStored'>;
   /** Per-source fetch outcome rows (source, ok, detail) — the /admin freshness table. */
   reports: InsightsSourceReport[];
   /**
@@ -353,6 +366,48 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     fetchBoeBankRateDecisions(),
   );
 
+  // M7 (2026-10-26): the NBS English press-release automation for the two
+  // China cards — the index scan finds the latest PMI + CPI release links
+  // (page 2 only when a link is missing: the PMI publishes on the 1st, so it
+  // usually sits ~15–25 rows back), then each release page fetches once.
+  // 3 subrequests typical, 4 worst case. Fail-soft: a failed NBS fetch
+  // leaves the committed seed series (verified against the NBS's own
+  // Table 1 this session) to age under the monthly cadence's 45-day grace
+  // — the card goes stale, never wrong.
+  const nbs: NonNullable<SeriesInputs['nbs']> = {};
+  if (providerFetchEnabled('nbs')) {
+    const index1 = await fetchLogged('nbs', 'press-release index page 1', () => fetchNbsIndexPage(1));
+    let links = index1 !== undefined ? parseNbsPressIndex(index1, NBS_PRESS_INDEX_URL) : [];
+    let pmiLink = latestPmiRelease(links);
+    let cpiLink = latestCpiRelease(links);
+    if ((pmiLink === undefined || cpiLink === undefined) && index1 !== undefined) {
+      const index2 = await fetchLogged('nbs', 'press-release index page 2', () => fetchNbsIndexPage(2));
+      if (index2 !== undefined) {
+        links = [...links, ...parseNbsPressIndex(index2, NBS_PRESS_INDEX_URL)];
+        pmiLink = pmiLink ?? latestPmiRelease(links);
+        cpiLink = cpiLink ?? latestCpiRelease(links);
+      }
+    }
+    if (pmiLink !== undefined) {
+      const pmi = await fetchLogged('nbs', `PMI release: ${pmiLink.title} (${pmiLink.published})`, () =>
+        fetchNbsPmiRelease(pmiLink.url),
+      );
+      if (pmi) nbs.pmi = pmi;
+    } else if (index1 !== undefined) {
+      report('nbs', false, 'PMI release link not found in the index pages (layout changed?)', 'format-changed');
+    }
+    if (cpiLink !== undefined) {
+      const cpi = await fetchLogged('nbs', `CPI release: ${cpiLink.title} (${cpiLink.published})`, () =>
+        fetchNbsCpiRelease(cpiLink.url),
+      );
+      if (cpi) nbs.cpi = cpi;
+    } else if (index1 !== undefined) {
+      report('nbs', false, 'CPI release link not found in the index pages (layout changed?)', 'format-changed');
+    }
+  } else {
+    report('nbs', false, 'NBS press releases skipped — source disabled (kill switch M-6)', 'disabled');
+  }
+
   // Frankfurter (USD→JPY/AUD/CNY + the six basket currencies + TRY, 10y
   // window; NZD left the request 2026-10-23 — the nzd-usd card retired,
   // OD-7; TRY joined 2026-10-24 — the usdtry card, M5 Wave 2).
@@ -490,6 +545,7 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
       },
       ecb: { dfr: ecbDfr, aaa10y: ecbAaa10y, hicp: ecbHicp },
       boe: { bankRateDecisions: boeBankRateDecisions },
+      nbs,
       fx: {
         JPY: fx?.JPY,
         AUD: fx?.AUD,

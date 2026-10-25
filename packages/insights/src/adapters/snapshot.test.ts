@@ -146,12 +146,15 @@ describe('buildInsightsSnapshot', () => {
     // round added the early-warning pack's eight ids → 71; the 2026-10-24
     // M5 Wave-2 round added five more (euro-aaa-10y, food-index, wheat,
     // maize, usdtry) → 76; the 2026-10-25 M6 Wave-3 round added the
-    // leading-edge batch's twelve ids → 88.
-    expect(snap.readings).toHaveLength(88);
-    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(88);
+    // leading-edge batch's twelve ids → 88; the 2026-10-26 M7 round
+    // added china-cpi (the NBS automation's second card) → 89.
+    expect(snap.readings).toHaveLength(89);
+    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(89);
     expect(snap.readings.find((r) => r.id === 'us10y')!.status).not.toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.status).toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.value).toBeNull();
+    expect(snap.readings.find((r) => r.id === 'china-cpi')!.status).toBe('unavailable');
+    expect(snap.readings.find((r) => r.id === 'china-cpi')!.value).toBeNull();
     expect(snap.generatedAt).toBe(NOW);
     expect(snap.calendar).toEqual([]);
   });

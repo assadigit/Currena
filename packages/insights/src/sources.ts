@@ -342,21 +342,21 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
   },
   'nbs-china': {
     id: 'nbs-china',
-    provider: 'manual',
-    label: 'China NBS (manual entry)',
-    usedFor: 'china-pmi (China factory activity)',
-    method: 'M5',
-    runtime: 'manual',
+    provider: 'nbs',
+    label: 'China NBS (English press releases)',
+    usedFor: 'china-pmi (China factory activity), china-cpi (China consumer prices)',
+    method: 'M2',
+    runtime: 'worker',
     level: 'L1',
     ownerAccepts: null,
     override: false,
     enabled: true,
     termsLines:
-      'Manual entry (M5): the owner reads the NBS monthly manufacturing PMI release and enters the value by hand (data/manual/china-pmi.json, enteredOn/expires per defect E-08). The publisher\u2019s own reuse terms are not quoted — level L1, manual-entry display only while the value is fresh (T-33).',
-    termsReadOn: SOURCE_RISK_READ_ON,
+      'NBS Terms of Service (read 2026-10-26, stats.gov.cn/english/nbs/200701/t20070104_59236.html): "When reprinting or quoting the contents of this website, be sure to indicate the words \u201cReprinted from (or quoted from) the website of the National Bureau of Statistics\u201d" + Section III Use of data item 1: "You are allowed to download and use the statistical data on this website." — the publisher\u2019s own affirmative permissions for attributed quotation and data download. Conditions kept: reasonable good-faith quoting for news/free-public-information purposes, no distortion of the original intention (values shown verbatim), attribution displayed on the cards. M7 (2026-10-26) flips the row from the M5 manual-entry regime to the automated fetch the ToS grants.',
+    termsReadOn: '2026-10-26',
     attribution: 'Source: National Bureau of Statistics of China',
-    termsUrl: 'https://www.stats.gov.cn/english/',
-    notes: 'RISK_REGISTER.md row nbs-china: L1, needs the expiry mechanism (E-08) — implemented.',
+    termsUrl: 'https://www.stats.gov.cn/english/nbs/200701/t20070104_59236.html',
+    notes: 'RISK_REGISTER.md row nbs-china: the 2026-10-23 M1 read (no reuse prohibition for attributed quotation) is superseded by the affirmative ToS quotes. The press-release scan is the only machine-readable path: data.stats.gov.cn easy-query is WAF-blocked (403 UrlACL, probed 2026-10-26) and no RSS feed exists (404).',
   },
   shiller: {
     id: 'shiller',
@@ -573,6 +573,7 @@ export function rowIdForProvider(provider: string): string {
     case 'frankfurter':
       return 'ecb-frankfurter';
     case 'manual':
+    case 'nbs': // M7 (2026-10-26): the NBS press-release fetch (the manual row's successor)
       return 'nbs-china';
     case 'ecb':
       return 'ecb-portal';
@@ -714,6 +715,10 @@ export const SANITY_RANGES: Readonly<Record<string, SanityRange>> = {
   // Publisher-defined 0..100 gauges.
   'crypto-fng': { min: 0, max: 100 },
   'china-pmi': { min: 0, max: 100 },
+  // M7 (2026-10-26): China CPI YoY — the honest bounds catch gross parse
+  // errors without false alarms (the observed history spans −2%…+8%; the
+  // adapter's own parse range is −10…+20 and the builder re-checks here).
+  'china-cpi': { min: -10, max: 20 },
   // Shares of a workforce — bounded by definition.
   'us-unemployment': { min: 0, max: 100 },
   'au-unemployment': { min: 0, max: 100 },

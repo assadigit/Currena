@@ -59,6 +59,19 @@ export const INGEST_HIST_PERIODIC_MINUTE = 40;
 export const INGEST_SWEEP_TIMES: readonly { hour: number; minute: number }[] = [
   { hour: 10, minute: 10 },
   { hour: 20, minute: 10 },
+  // (2026-10-26 M7 publish rungs — captured + reverted, the M4 15:40
+  // pattern: the 18:05 main-shaped rung + the 18:07 periodic-history rung
+  // landed the first 89-reading snapshot family + the china pair's stored
+  // accumulations from the Worker venue, all verified live (status
+  // generatedAt 18:05:18Z, 89 readings, the 4 NBS fetch rows all ok —
+  // the index page-2 fallback fired — insights:hist:china-cpi 13 points
+  // -0.3@2025-09-30 → +0.9@2026-09-30, insights:hist:china-pmi 10 → 13
+  // points with the fetched Table-1's Sep-Nov 2025 rows. The first M7
+  // attempt in this GATED list honestly SKIPPED — the status was healthy
+  // and only 7.6h old, the gate working as designed — so the publish rode
+  // the UNGATED main-shaped rungs instead, both now reverted. The 20:10
+  // designed sweep then found the fresh 18:05 status and skipped, exactly
+  // as designed; the 04:10 main rung owns the day from here.)
   // (2026-10-23 22:35 diagnostic rung — captured + reverted: the epochDay
   // memoization (series.ts, same date) brought the sweep shape's real
   // cpuTime from 2050 ms (the 20:10 exceededCpu death) to 617 ms, with the

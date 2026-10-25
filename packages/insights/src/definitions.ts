@@ -783,16 +783,49 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
   },
   /* ---------------- Global — Is growth healthy? ---------------- */
   {
+    // M7 (2026-10-26): the manual hand-entry era ends — the NBS English
+    // press-release automation owns the card (adapters/nbs.ts; the M6
+    // probe + this session's ToS read made the fetch licence-evidenced:
+    // "Welcome to reprint or quote… You are allowed to download and use
+    // the statistical data on this website"). The committed file stays
+    // as the seed history (data/manual/china-pmi.json, all 10
+    // observations verified identical against the NBS's own Table 1
+    // this session); the fetched 13-month table wins on collisions and
+    // the monthly cadence's 45-day grace replaces the E-08 manual
+    // expiry (the Sep obs publishes on the 1st of Oct → max age ~33d).
     id: 'china-pmi',
     section: 'global',
     group: 'growth-health',
     name: 'China manufacturing PMI',
-    source: 'manual',
-    sourceRef: 'data/manual/china-pmi.json (NBS official releases, hand-entered)',
-    cadence: 'manual',
+    source: 'nbs',
+    sourceRef: 'NBS English press release (Purchasing Managers Index, Table 1; seed data/manual/china-pmi.json)',
+    cadence: 'monthly',
     changeKind: 'points',
     phase: 'P2',
     rule: { kind: 'threshold', direction: 'below', value: 50 },
+  },
+  {
+    // M7 (2026-10-26): the China consumer-prices leg — the review's
+    // growth-health "China leg" beside the factory PMI (China's
+    // inflation matters to the AU trade story and global demand).
+    // SCORED against China's own published "around 3%" annual target —
+    // the same posture as us-cpi-yoy's 3% and euro-hicp's 2%: the
+    // government's own goal line is the threshold, never an invented
+    // one. The deflation nuance (Sep 2025 read −0.3) lives in the card
+    // copy + trend, not in an unofficial below-zero rule.
+    id: 'china-cpi',
+    section: 'global',
+    group: 'growth-health',
+    name: 'China inflation (yearly)',
+    source: 'nbs',
+    sourceRef: 'NBS English press release (Consumer Price Index, YoY; seed data/manual/china-cpi.json)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'threshold', direction: 'above', value: 3 },
+    // The month-end obs publishes ~T+10 (verified: Sep-2026 CPI out
+    // 2026-10-15) → the obs ages ~41 days between releases — the monthly
+    // cadence's 45-day grace covers it without a false stale.
   },
   {
     id: 'm2-us',

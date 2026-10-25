@@ -550,16 +550,29 @@
     },
     {
       "id": "china-pmi",
-      "licenceName": "Publisher terms vary; entered by hand",
+      "licenceName": "NBS Terms of Service — attributed quotation + data download granted",
       "publicDisplayOk": "yes",
       "privateOk": true,
       "level": "L1",
       "ownerAccepts": null,
       "enabled": true,
-      "method": "M5",
+      "method": "M2",
       "maxAgeDays": 45,
       "ruleVersion": 2,
       "rule": "{\"kind\":\"threshold\",\"direction\":\"below\",\"value\":50}"
+    },
+    {
+      "id": "china-cpi",
+      "licenceName": "NBS Terms of Service — attributed quotation + data download granted",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L1",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M2",
+      "maxAgeDays": 45,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"threshold\",\"direction\":\"above\",\"value\":3}"
     },
     {
       "id": "m2-us",

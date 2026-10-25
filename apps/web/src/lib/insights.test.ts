@@ -551,8 +551,8 @@ describe('copy dictionaries', () => {
     // and the M5 Wave-2 round added five more (euro-aaa-10y, food-index,
     // wheat, maize, usdtry); the 2026-10-25 M6 Wave-3 round added the
     // leading-edge batch's twelve ids — the corpus is 88 and fa must carry
-    // every one.
-      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(88);
+    // every one; the 2026-10-26 M7 round adds china-cpi → 89.
+      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(89);
   });
 
   // Fix spec T-07 (2026-10-15): the CI-side corpus scan — the ingest's

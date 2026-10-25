@@ -62,12 +62,14 @@ import {
   computePeaks,
   historyToSeries,
   projectSnapshotToPublic,
+  type SeriesInputs,
 } from '../adapters/index';
 import { runValidationSuite } from '../validation';
 import type { InsightsStore } from '../store';
 import {
   auditDisabledIds,
   CALENDAR,
+  CHINA_CPI,
   CHINA_PMI,
   CONTEXT_NOTES,
   MANUAL_EXPIRES,
@@ -245,21 +247,34 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     else if (row.kind === 'format-changed') sourceOutcomes[row.source] = 'format-changed';
   }
 
-  // Manual data + the bundle's bookkeeping (see ingest/data.ts).
+  // M7 (2026-10-26): the committed China SEED histories + the manual-expiry
+  // bookkeeping. The NBS fetches (inputs.nbs) come from collectAllSources;
+  // the STORED accumulations below join them so the china-cpi series grows
+  // monthly (each CPI release carries only its own month).
   const chinaPmi: SeriesPoint[] | undefined = CHINA_PMI;
+  const chinaCpi: SeriesPoint[] | undefined = CHINA_CPI;
   const manualExpires: Readonly<Record<string, string>> = MANUAL_EXPIRES;
+  const nbsStored: NonNullable<SeriesInputs['nbsStored']> = {};
+  for (const id of ['china-pmi', 'china-cpi'] as const) {
+    try {
+      const stored = await opts.store.getHistory(id);
+      if (stored) nbsStored[id] = historyToSeries(stored);
+    } catch {
+      // a poisoned stored key must not sink the run — the seed + fetch carry the card
+    }
+  }
   reports.push({
     source: 'manual',
     ok: true,
-    detail:
-      chinaPmi === undefined
-        ? 'no data files yet (Phase I5 content work)'
-        : `china-pmi: ${chinaPmi.length} observations (expires ${manualExpires['china-pmi'] ?? '?'})`,
+    detail: `committed seeds: china-pmi ${chinaPmi?.length ?? 0} obs · china-cpi ${chinaCpi?.length ?? 0} obs (data/manual/, the M7 NBS automation merges over them; stored accumulation ${Object.keys(nbsStored).length || 'empty'})`,
   });
   console.log(
-    chinaPmi === undefined
-      ? '[ingest] china-pmi: absent — reads unavailable'
-      : `[ingest] china-pmi: ${chinaPmi.length} observations (expires ${manualExpires['china-pmi'] ?? '?'})`,
+    `[ingest] nbs: seeds china-pmi ${chinaPmi?.length ?? 0} · china-cpi ${chinaCpi?.length ?? 0} obs` +
+      (Object.keys(nbsStored).length > 0
+        ? ` · stored ${Object.entries(nbsStored)
+            .map(([k, v]) => `${k} ${v.length}`)
+            .join(' · ')}`
+        : ''),
   );
 
   // The Shiller legs — the T-30 flip landed 2026-10-23 (the owner's
@@ -300,6 +315,8 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
   const series = buildIndicatorSeries({
     ...inputs,
     chinaPmi,
+    chinaCpi,
+    nbsStored,
     seedHistory,
     shiller,
   });

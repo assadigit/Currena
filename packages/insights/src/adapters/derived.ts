@@ -131,8 +131,26 @@ export interface SeriesInputs {
     /** Step-2 §B7: F4.1 PDRNTH — the paid rate on new household term deposits. */
     depositRateNewTermHouseholds?: SeriesPoint[];
   };
-  /** Manual china-pmi observations (data/manual/china-pmi.json). */
+  /** The committed china-pmi SEED history (data/manual/china-pmi.json —
+   *  the M5 manual file, kept as the fetch-failure fallback history; all
+   *  10 observations verified identical against the NBS's own Table 1,
+   *  2026-10-26; the fetched series wins on collisions). */
   chinaPmi?: SeriesPoint[];
+  /** M7 (2026-10-26): the committed china-cpi SEED history
+   *  (data/manual/china-cpi.json — 13 YoY observations, Sep 2025 → Sep
+   *  2026, each month's value read from that month's own NBS release page;
+   *  the fetch appends new months, the stored accumulation keeps them). */
+  chinaCpi?: SeriesPoint[];
+  /** M7 (2026-10-26): the NBS English press-release fetches — the PMI
+   *  Table-1 history (13 months, rebuilt every rung) + the CPI release's
+   *  own YoY month. Union-merged over the seeds + the stored
+   *  accumulation in buildIndicatorSeries (fetched wins on collision). */
+  nbs?: { pmi?: SeriesPoint[]; cpi?: SeriesPoint[] };
+  /** M7 (2026-10-26): the previously-STORED monthly accumulations — the
+   *  union of every observation the automation has ever collected (the CPI
+   *  release carries only its own month; the committed seeds are static,
+   *  so this is what grows the china-cpi series over time). */
+  nbsStored?: { 'china-pmi'?: SeriesPoint[]; 'china-cpi'?: SeriesPoint[] };
   /** Step 3 L1-18: the Alternative.me crypto Fear and Greed index (context only). */
   cryptoFng?: SeriesPoint[];
   /**
@@ -203,6 +221,26 @@ export function mergeSeries(a: SeriesPoint[], b: SeriesPoint[]): SeriesPoint[] {
   for (const p of a) byDate.set(p.date, p);
   for (const p of b) byDate.set(p.date, p);
   return [...byDate.values()].sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
+}
+
+/**
+ * M7 (2026-10-26): the NBS series union — committed seed, then stored
+ * accumulation, then the fetched release(s), each layer winning date
+ * collisions over the last (the fetched value is the publisher's freshest
+ * print; the layers below it carry the history the release tables no
+ * longer do). undefined when every layer is absent (the card reads
+ * unavailable — never a partial guess).
+ */
+export function nbsUnionSeries(
+  seed: SeriesPoint[] | undefined,
+  stored: SeriesPoint[] | undefined,
+  fetched: SeriesPoint[] | undefined,
+): SeriesPoint[] | undefined {
+  let out: SeriesPoint[] = [];
+  for (const layer of [seed, stored, fetched]) {
+    if (layer !== undefined && layer.length > 0) out = mergeSeries(out, layer);
+  }
+  return out.length > 0 ? out : undefined;
 }
 
 /**
@@ -424,7 +462,8 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // drops the NZD leg again.
 
   /* ---------------- Global — Is growth healthy? ---------------- */
-  put('china-pmi', inputs.chinaPmi);
+  put('china-pmi', nbsUnionSeries(inputs.chinaPmi, inputs.nbsStored?.['china-pmi'], inputs.nbs?.pmi));
+  put('china-cpi', nbsUnionSeries(inputs.chinaCpi, inputs.nbsStored?.['china-cpi'], inputs.nbs?.cpi));
   // Step 3 L1-18 (2026-10-16): the crypto Fear and Greed index — CONTEXT
   // ONLY (rule info; L3-03 forbids composite sentiment scores, and the
   // card never presents the index as a signal).
@@ -884,7 +923,14 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   },
   'us-gdp-growth': { name: 'FRED (BEA real GDP growth)', url: 'https://fred.stlouisfed.org/series/A191RL1Q225SBEA' },
   'us-nfp': { name: 'FRED (BLS PAYEMS, monthly change)', url: 'https://fred.stlouisfed.org/series/PAYEMS' },
-  'china-pmi': { name: 'China NBS (manual entry)', url: 'https://www.stats.gov.cn/english/' },
+  'china-pmi': {
+    name: 'National Bureau of Statistics of China (Purchasing Managers Index)',
+    url: 'https://www.stats.gov.cn/english/PressRelease/',
+  },
+  'china-cpi': {
+    name: 'National Bureau of Statistics of China (Consumer Price Index)',
+    url: 'https://www.stats.gov.cn/english/PressRelease/',
+  },
   'm2-us': { name: 'FRED (M2SL)', url: 'https://fred.stlouisfed.org/series/M2SL' },
   'us-unemployment': { name: 'FRED (UNRATE), US BLS', url: 'https://fred.stlouisfed.org/series/UNRATE' },
   'sahm-rule': {

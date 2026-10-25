@@ -2581,37 +2581,37 @@
         "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
       },
       "source": {
-        "provider": "manual",
-        "name": "China NBS (manual entry)",
-        "url": "https://www.stats.gov.cn/english/",
-        "seriesIdOrTable": "data/manual/china-pmi.json (NBS official releases, hand-entered)"
+        "provider": "nbs",
+        "name": "National Bureau of Statistics of China (Purchasing Managers Index)",
+        "url": "https://www.stats.gov.cn/english/PressRelease/",
+        "seriesIdOrTable": "NBS English press release (Purchasing Managers Index, Table 1; seed data/manual/china-pmi.json)"
       },
-      "publisher": "China NBS (manual entry)",
-      "publisherUrl": "https://www.stats.gov.cn/english/",
-      "methodUrl": "https://www.stats.gov.cn/english/",
-      "whatItIs": "China’s official manufacturing Purchasing Managers’ Index, from the national statistics bureau’s monthly survey of factory managers, hand-entered here from official releases. Above 50 means expansion; below 50, contraction.",
+      "publisher": "China NBS (English press releases)",
+      "publisherUrl": "https://www.stats.gov.cn/english/PressRelease/",
+      "methodUrl": "https://www.stats.gov.cn/english/PressRelease/",
+      "whatItIs": "China’s official manufacturing Purchasing Managers’ Index, from the national statistics bureau’s monthly survey of factory managers, read here from the bureau’s own English press releases. Above 50 means expansion; below 50, contraction.",
       "whatItIsnt": "It measures breadth (how many firms grew), not size: one month’s dip is not a trend.",
       "trackRecordNote": "Runs below 50 have marked Chinese slowdowns that fed through to commodity prices and the Australian dollar.",
       "definition": null,
-      "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its manual cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L1",
         "ownerAccepts": null,
         "enabled": true,
-        "method": "M5",
-        "runtime": "manual",
-        "termsLines": "Manual entry (M5): the owner reads the NBS monthly manufacturing PMI release and enters the value by hand (data/manual/china-pmi.json, enteredOn/expires per defect E-08). The publisher’s own reuse terms are not quoted — level L1, manual-entry display only while the value is fresh (T-33).",
-        "termsReadOn": "2026-10-16",
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "NBS Terms of Service (read 2026-10-26, stats.gov.cn/english/nbs/200701/t20070104_59236.html): \"When reprinting or quoting the contents of this website, be sure to indicate the words “Reprinted from (or quoted from) the website of the National Bureau of Statistics”\" + Section III Use of data item 1: \"You are allowed to download and use the statistical data on this website.\" — the publisher’s own affirmative permissions for attributed quotation and data download. Conditions kept: reasonable good-faith quoting for news/free-public-information purposes, no distortion of the original intention (values shown verbatim), attribution displayed on the cards. M7 (2026-10-26) flips the row from the M5 manual-entry regime to the automated fetch the ToS grants.",
+        "termsReadOn": "2026-10-26",
         "attributionText": "Source: National Bureau of Statistics of China",
         "legs": [
-          "manual"
+          "nbs"
         ]
       },
       "unit": "index",
       "changeUnit": "percentage points",
-      "cadence": "manual",
+      "cadence": "monthly",
       "maxAgeDays": 45,
-      "maxAgeBasis": "cadence default (manual)",
+      "maxAgeBasis": "cadence default (monthly)",
       "scored": true,
       "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
       "rule": {
@@ -2622,14 +2622,75 @@
       "ruleVersion": 2,
       "layer": 1,
       "licence": {
-        "licenceName": "Publisher terms vary; entered by hand",
+        "licenceName": "NBS Terms of Service — attributed quotation + data download granted",
         "attributionText": "Source: National Bureau of Statistics of China",
         "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-23",
-        "termsEvidence": "Manual entries carry no provider feed; defect E-08 requires entered_on/expiry bookkeeping. NBS English pages read 2026-10-23 (the M1 unhide round): no reuse prohibition found for attributed quotation — china-pmi display-permitted (D-42/OD-2) while fresh.",
-        "termsUrl": "https://www.stats.gov.cn/english/"
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "NBS Terms of Service (read 2026-10-26, stats.gov.cn/english/nbs/200701/t20070104_59236.html): \"Welcome to reprint or quote the contents of this website\" with the attribution line (\"Reprinted from (or quoted from) the website of the National Bureau of Statistics\"), and — Section III Use of data item 1 — \"You are allowed to download and use the statistical data on this website.\" The M7 automation (adapters/nbs.ts) reads the English press releases, shows the values verbatim with attribution, and keeps the good-faith/no-distortion condition; the M1 display permission (2026-10-23, no reuse prohibition found) is superseded by these affirmative quotes. data.stats.gov.cn easy-query is WAF-blocked (403, probed 2026-10-26) — the press releases are the only machine-readable path.",
+        "termsUrl": "https://www.stats.gov.cn/english/nbs/200701/t20070104_59236.html"
+      }
+    },
+    {
+      "id": "china-cpi",
+      "title": "China inflation (yearly)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": "growth-health",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "nbs",
+        "name": "National Bureau of Statistics of China (Consumer Price Index)",
+        "url": "https://www.stats.gov.cn/english/PressRelease/",
+        "seriesIdOrTable": "NBS English press release (Consumer Price Index, YoY; seed data/manual/china-cpi.json)"
+      },
+      "publisher": "China NBS (English press releases)",
+      "publisherUrl": "https://www.stats.gov.cn/english/PressRelease/",
+      "methodUrl": "https://www.stats.gov.cn/english/PressRelease/",
+      "whatItIs": "The year-on-year growth in China’s official Consumer Price Index, published monthly by the national statistics bureau and read here from its own English press releases.",
+      "whatItIsnt": "A national average over a vast economy: it says nothing about any one province, and food and energy swings can mask the underlying trend for months.",
+      "trackRecordNote": "China spent 2023-25 flirting with deflation as property slumped and households saved; the long-run history spans deflationary dips to 8%+ overheating in the mid-1990s and 2008-11.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "NBS Terms of Service (read 2026-10-26, stats.gov.cn/english/nbs/200701/t20070104_59236.html): \"When reprinting or quoting the contents of this website, be sure to indicate the words “Reprinted from (or quoted from) the website of the National Bureau of Statistics”\" + Section III Use of data item 1: \"You are allowed to download and use the statistical data on this website.\" — the publisher’s own affirmative permissions for attributed quotation and data download. Conditions kept: reasonable good-faith quoting for news/free-public-information purposes, no distortion of the original intention (values shown verbatim), attribution displayed on the cards. M7 (2026-10-26) flips the row from the M5 manual-entry regime to the automated fetch the ToS grants.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: National Bureau of Statistics of China",
+        "legs": [
+          "nbs"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 45,
+      "maxAgeBasis": "cadence default (monthly)",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "threshold",
+        "direction": "above",
+        "value": 3
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "NBS Terms of Service — attributed quotation + data download granted",
+        "attributionText": "Source: National Bureau of Statistics of China",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "NBS Terms of Service (read 2026-10-26, stats.gov.cn/english/nbs/200701/t20070104_59236.html): \"Welcome to reprint or quote the contents of this website\" with the attribution line (\"Reprinted from (or quoted from) the website of the National Bureau of Statistics\"), and — Section III Use of data item 1 — \"You are allowed to download and use the statistical data on this website.\" The M7 automation (adapters/nbs.ts) reads the English press releases, shows the values verbatim with attribution, and keeps the good-faith/no-distortion condition; the M1 display permission (2026-10-23, no reuse prohibition found) is superseded by these affirmative quotes. data.stats.gov.cn easy-query is WAF-blocked (403, probed 2026-10-26) — the press releases are the only machine-readable path.",
+        "termsUrl": "https://www.stats.gov.cn/english/nbs/200701/t20070104_59236.html"
       }
     },
     {

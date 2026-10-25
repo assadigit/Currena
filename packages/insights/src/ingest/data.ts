@@ -27,6 +27,7 @@ import type { RegressionEpisode } from '../validation';
 // them (wrangler/esbuild, tsx, vitest) and resolveJsonModule covers tsc.
 import calendarRaw from '../../../../data/insights-calendar.json';
 import chinaPmiRaw from '../../../../data/manual/china-pmi.json';
+import chinaCpiRaw from '../../../../data/manual/china-cpi.json';
 import shillerRaw from '../../../../data/shiller/shiller-cape.json';
 import policyDecisionsRaw from '../../../../data/policy-decisions.json';
 import releaseScheduleRaw from '../../../../data/insights-release-schedule.json';
@@ -38,13 +39,26 @@ import regressionEpisodesRaw from '../../fixtures/regression-episodes.json';
 /** The calendar (release dates feed the NextUpStrip + T-03 date checks). */
 export const CALENDAR: readonly CalendarEvent[] = z.array(CalendarEventSchema).parse(calendarRaw);
 
-/** The hand-entered China PMI observations (enteredOn/expires bookkeeping). */
+/**
+ * The committed China SEED histories (M7, 2026-10-26). The NBS press-release
+ * automation (adapters/nbs.ts) owns the freshness now; these files are the
+ * fetch-failure fallback history + the pre-table observations the release
+ * pages no longer carry. All 10 PMI observations were re-verified against
+ * the NBS's own Sep-2026 Table 1 and all 13 CPI values against each month's
+ * own release page (2026-10-26, data/manual/README.md carries the tables).
+ */
 const pmiParsed = parseManualSeries(chinaPmiRaw, 'china-pmi');
 export const CHINA_PMI: SeriesPoint[] | undefined = pmiParsed?.points;
-/** The manual file's expiry — an entry older than its next release reads stale. */
-export const MANUAL_EXPIRES: Readonly<Record<string, string>> = pmiParsed
-  ? { 'china-pmi': pmiParsed.expires }
-  : {};
+const cpiParsed = parseManualSeries(chinaCpiRaw, 'china-cpi');
+export const CHINA_CPI: SeriesPoint[] | undefined = cpiParsed?.points;
+/**
+ * E-08 manual-expiry bookkeeping. M7 (2026-10-26): china-pmi LEFT the
+ * manual-expiry regime — the NBS automation owns its freshness (monthly
+ * cadence, the 45-day grace), so a live fetch must never be staled by the
+ * seed file's expiry. The map stays empty for the NBS-sourced cards and
+ * keeps the plumbing for the next true manual entry (T-33).
+ */
+export const MANUAL_EXPIRES: Readonly<Record<string, string>> = {};
 
 /**
  * The converted Shiller file (FS-06): monthly CAPE + Excess CAPE Yield rows

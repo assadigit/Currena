@@ -5,6 +5,84 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-26] — M7: the NBS automation + china-cpi, the BoJ retire
+
+The manual hand-entry era for China data ends, the review's china-cpi ships
+on the same automation, and the BoJ fix-or-retire resolves to retire with
+fresh evidence (88→89 indicators, voting 42→43).
+
+- **The NBS press-release automation (`adapters/nbs.ts`)**: the English
+  PressRelease index scan finds the latest PMI + CPI release links (page 2
+  only when a link is missing — the PMI publishes on the 1st, so it sits
+  ~15–25 rows back), then each release page fetches once — 3 subrequests
+  typical, 4 worst case (~46/50 on the 04:10 shape). The PMI release's
+  "Table 1" carries a full 13-month history per fetch (month-end dated,
+  the year inferred across the December→January boundary); the CPI release
+  carries its own month's YoY (the summary table's Y/Y cell cross-checked
+  against the headline sentence — a disagreement beyond 0.05 throws
+  FormatChangedError). `china-pmi` leaves the M5 manual-entry regime
+  (source `manual`→`nbs`, cadence `manual`→`monthly`): the fetched table
+  wins on collisions, the committed seed stays as the fetch-failure
+  fallback, and the E-08 manual-expiry bookkeeping leaves the card (the
+  45-day monthly grace owns freshness — the Oct PMI would have staled the
+  manual file on 2026-10-31). All 10 seed observations re-verified
+  identical against the NBS's own Table 1 this session.
+- **The licence evidence (the fetch is now granted, not assumed)**: the
+  NBS Terms of Service (read 2026-10-26,
+  stats.gov.cn/english/nbs/200701/t20070104_59236.html) — "Welcome to
+  reprint or quote the contents of this website" with the attribution
+  line, and Section III "Use of data" item 1: "You are allowed to
+  download and use the statistical data on this website." The register
+  row flips (provider `nbs`, method M2, runtime worker) with both quotes
+  recorded; the M1 display-permission reading (no prohibition found) is
+  superseded by the affirmative grant. The venue probes: all four NBS
+  pages answer HTTP 200 from BOTH the sandbox and the Cloudflare
+  egress (via the rba-probe worker); data.stats.gov.cn easy-query is
+  WAF-blocked (403 UrlACL) and no RSS feed exists — the press releases
+  are the only machine-readable path.
+- **`china-cpi` — the review's growth-health "China leg"** (SCORED, the
+  43rd voter): the year-on-year CPI growth scored against China's own
+  published "around 3%" annual target — the us-cpi-yoy/euro-hicp posture
+  (the government's own goal line, never an invented threshold). The
+  deflation nuance (Sep 2025 read −0.3) lives in the card copy + trend,
+  not an unofficial below-zero rule. Seed history: 13 observations (Sep
+  2025 −0.3 → Sep 2026 +0.9), each month's value read from THAT month's
+  own release page (the provenance table in data/manual/README.md); the
+  stored accumulation (`insights:hist:china-cpi`) grows the series
+  monthly from here (each CPI release carries only its own month).
+- **The BoJ fix-or-retire → RETIRE, with fresh evidence**: the M7 probe
+  (both venues, this session) found stat-search.boj.or.jp DEAD from the
+  work venue (DNS) AND the Worker venue (HTTP 530 via the rba-probe
+  worker) — the machine-readable time-series portal has no path from
+  either runtime. www.boj.or.jp itself serves from the Worker venue, but
+  the rate decisions live only in PDF releases (k260918a.pdf etc.) — no
+  HTML/CSV decision table exists on the current site (the old
+  mprf_e.htm Bank-Rate-style table 404s). The OECD mirror's honest
+  "monthly average, lagged" relabel stays boj-rate's permanent source;
+  recorded in the tracker with the probe evidence.
+- **Gates**: typecheck 6/6; core 191, scraper 67, insights 582 (567 +
+  15 new nbs-adapter tests), markets 13, api 344, web 680 + the recorded
+  16-failure briefing jsdom baseline; lint 0 errors/15 advisories; copy
+  audit clean (14 new/changed fa strings processed to
+  2026-10-26-m7-nbs, manifest 2821 entries); registry regenerated (89
+  indicators, 0 hidden); T-15 public passed (0 hidden); budgets: entry
+  295.28/88.81 held, Insights lazy bumped 845/205 → 850/206 (measured
+  846.29/205.01 — one card of bilingual content + the china-pmi
+  source-honesty reword, the D-16 path). The local dry-run verified the
+  full flow live from the sandbox: index page 2 fallback fired (the PMI
+  link), the PMI Table-1 parsed 13 months, china-pmi 50.1 normal +
+  china-cpi 0.9 normal computed, the growth lane 28 voters. Deployed as
+  `366a91de` → `179c3397` (a first temporary 17:45 sweep-list entry —
+  honestly SKIPPED by the failure-gate itself: the status was healthy
+  and only 7.6h old, the gate working as designed) → `7655b152` (the
+  ungated temporary publish rungs — an 18:05 main-shaped run + an 18:07
+  periodic-history run, the M4 15:40 pattern) → `0ce6fa8d` (reverted;
+  the final state). The 18:05 rung's live capture: 89 readings, all 4
+  NBS fetch rows ok from the Worker venue (the index page-2 fallback
+  fired), zero genuine failures, the whole snapshot family written in
+  18.4 s wall — and the 18:07 rung grew `insights:hist:china-pmi`
+  10 → 13 points + wrote `insights:hist:china-cpi` (13 points).
+
 ## [2026-10-25] — Wave 3 + the Wave-4 probe fix (M6): the leading edge
 
 Twelve new cards (76→88 indicators), two new scored voters (40→42), the

@@ -87,6 +87,10 @@ export const GAUGES: readonly GaugeDef[] = [
     section: 'global',
     members: [
       'china-pmi',
+      // M7 (2026-10-26): the China consumer-prices leg joins the voters —
+      // scored at China's own "around 3%" target, the review's growth-health
+      // China pair with the factory PMI.
+      'china-cpi',
       'philly-fed',
       'initial-jobless-claims',
       'us-unemployment',

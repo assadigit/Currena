@@ -349,6 +349,10 @@ export const IndicatorIdSchema = z.enum([
   'eur-usd',
   // Global — Is growth healthy?
   'china-pmi',
+  // M7 (2026-10-26): the China consumer-prices leg rides the same NBS
+  // press-release automation as china-pmi (both FRED OECD mirrors died
+  // upstream 2025-04 — the card is NBS-sourced from birth).
+  'china-cpi',
   'm2-us',
   'us-unemployment',
   'sahm-rule',
@@ -510,6 +514,11 @@ export const IndicatorSourceSchema = z.enum([
   // M6 Wave-4 probe fix (2026-10-25): the Bank of England's own Bank Rate
   // history page — the boe-rate card left the FRED OECD monthly mirror.
   'boe',
+  // M7 (2026-10-26): the NBS English press releases — china-pmi left the
+  // manual-entry regime and the new china-cpi card is NBS-sourced (the
+  // row's ToS grants the automated download; the manual seeds remain as
+  // the fetch-failure fallback history in data/manual/).
+  'nbs',
   // 2026-10-21 data-integrity round: EODHD crypto (eth-usd) — RETIRED with
   // the card (2026-10-21c owner round); the insights ingest no longer calls
   // EODHD. The id stays OUT of the enum; the markets worker's EODHD usage
