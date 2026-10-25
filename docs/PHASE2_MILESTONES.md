@@ -48,6 +48,23 @@ D-41).
 
 ## Session log (newest first)
 
+- **2026-10-26b (the M7 reconciliation round):** two sessions built M7
+  concurrently — the deploy-lock check (the D-43 lesson, applied BEFORE
+  deploying this time) surfaced the parallel versions and the pushed
+  6785ec7, so NO overwrite happened; the parallel implementation is
+  preserved on a local branch (never pushed). The reconciliation lands
+  the surviving artifact — the KV history enrichment (china-pmi 41
+  months, china-cpi 30 months, every value from the NBS's own pages,
+  zero mismatches vs the committed seeds) — which the canonical
+  nbsUnionSeries consumes at the next rung (china-pmi's position bar
+  renders, pct10y=70% at the dry-run), plus the ingest dry-run
+  read-only-store fix, the Shiller deadline clearance (the committed
+  file IS the publisher's latest, hash-identical), and the era-variant +
+  WZWS knowledge in the DEPLOY record. The CI-red observation (every
+  push since 2026-10-20, docs-only commits included) is recorded as
+  owner-side. See the DEPLOY 2026-10-26b session record for the full
+  story.
+
 - **2026-10-26 (the M7 session — the NBS automation + the BoJ retire):**
   the tracker's last pending milestone closed. The NBS English
   press-release automation (`packages/insights/src/adapters/nbs.ts` +

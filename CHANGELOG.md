@@ -5,6 +5,50 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-26b] — the M7 reconciliation: the parallel session, the enriched histories
+
+Two sessions built M7 concurrently (the second D-43-class incident —
+caught by the deploy-lock check BEFORE any deploy this time, so no
+overwrite happened). The canonical M7 is `6785ec7` (the other session's:
+pushed, deployed `0ce6fa8d`, live-verified); this session's parallel
+implementation is preserved on a local branch, never pushed. The
+reconciliation lands what the parallel work uniquely contributed:
+
+- **The enriched stored histories (already live in KV)**: the RSS-driven
+  archive backfill seeded `insights:hist:china-pmi` with **41 months**
+  (2023-05 → 2026-09) and `insights:hist:china-cpi` with **30 months**
+  (2024-04 → 2026-09) — every value from the NBS's own release pages,
+  zero mismatches against the committed seeds on every overlap month.
+  The canonical `nbsUnionSeries` consumes them directly: china-pmi's
+  10-year position bar renders at the next rung (pct10y=70% at the
+  dry-run) instead of after years of monthly growth; china-cpi's joins
+  at the November release (29/30 against the floor — honest, not
+  padded). T-08 re-verified on the union (trailing runs of 1 — the
+  mid-series 2025 -0.1×3 stretch is not a trailing run).
+- **The ingest dry-run read-only-store fix**: the dry-run now reads the
+  real KV histories when credentials exist (the no-op store misreported
+  "stored accumulation empty" and held cards as unavailable — a
+  diagnostic that lies is worse than none).
+- **The Shiller deadline cleared**: shillerdata.com reachable from this
+  venue; the fresh download is hash-identical to the committed file
+  (5d176a41, latestDate 2026-10-01) — the committed data IS the
+  publisher's latest; only the fetchedAt bookkeeping moved.
+- **The era-variant + WZWS knowledge recorded** (the DEPLOY 2026-10-26b
+  session record): the pre-2025-07 NBS page phrasings any future
+  backfill needs, and the rate-triggered WZWS wall (never seen at the
+  ingest's 3-4 fetches/day; 2s pacing fixed it for the one-time archive
+  read).
+- The CI observation (owner-side): the workflow has failed every push
+  since 2026-10-20 (docs-only commits included) while every session's
+  local gates ran green — systemic, predates M7, logs no longer
+  retrievable; the local-gates discipline stays the honest substitute.
+
+Gates: typecheck 6/6; core 191, scraper 67, insights 582, markets 13,
+api 344, web 680 + the recorded briefing baseline; lint 0/15; copy audit
+clean; budgets held. No deploy needed (the live `0ce6fa8d` is the M7
+implementation; this round's changes are Node-venue script + docs +
+data-identical bookkeeping).
+
 ## [2026-10-26] — M7: the NBS automation + china-cpi, the BoJ retire
 
 The manual hand-entry era for China data ends, the review's china-cpi ships

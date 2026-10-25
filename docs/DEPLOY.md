@@ -83,6 +83,101 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Session record — 2026-10-26b the M7 reconciliation: the parallel session, the enriched histories, the honest no-overwrite
+
+**Context.** Two sessions worked the M7 milestone concurrently (the second
+D-43-class incident): this session cloned the repo at `e7786f4`, read the
+tracker's pending M7 row, probed the venues (a temporary m7-venue-probe
+Worker — the rba-probe precedent — deleted after the round), and built a
+complete parallel implementation; the other session's M7 landed as
+`6785ec7` (pushed, deployed `0ce6fa8d`, live-verified) while this session
+ran its gates. The deploy-lock check — the D-43 lesson, applied BEFORE any
+deploy this time — surfaced the parallel versions (216-219, the last at
+18:09:57Z) and the 89-reading live snapshot, and `git fetch` showed
+origin/main already at `6785ec7`. **No overwrite happened**: this session
+preserved its implementation on a local branch
+(`m7-parallel-session-implementation`, never pushed), reset to the
+canonical `6785ec7`, and reconciled the one live artifact it had already
+applied — the KV history enrichment — into the record.
+
+**The KV enrichment (the surviving contribution, already live).** This
+session's backfill migration (run 2026-10-25 ~18:37 UTC, before the
+parallel deployment was discovered) seeded the stored NBS histories from
+the NBS's own RSS-discovered article archive:
+
+- `insights:hist:china-pmi` — **41 months** (2023-05-31 → 2026-09-30):
+  the union of every PMI release's Table 1 (29 articles, each a rolling
+  13-month window; the union's oldest row is 2023-05 = 48.8).
+- `insights:hist:china-cpi` — **30 months** (2024-04-30 → 2026-09-30):
+  one YoY observation per CPI release article (30 articles), every value
+  from the article's own "Consumer Price Index" table row.
+
+Verification before writing: the retired manual file's ten hand-entered
+PMI values were checked identical against the parsed archive; after the
+reset, the committed seeds (`data/manual/china-pmi.json` 10 obs +
+`china-cpi.json` 13 obs) were re-checked against the stored KV — **zero
+mismatches on every overlap month** (the seeds are strict subsets). The
+canonical code's `nbsUnionSeries(seed ∪ stored ∪ fetched)` consumes the
+enriched histories directly: the next 04:10 rung builds china-pmi from a
+41-point base — **its 10-year position bar renders (pct10y=70% at the
+post-fix dry-run)** instead of waiting years of monthly growth — and
+china-cpi from 30 points (its bar joins at the November release: the
+percentile base excludes the current print, 29 of 30 — honest, not
+padded). T-08 re-verified on the full union: the trailing runs are 1 and
+1 (the mid-series Mar-May 2025 -0.1×3 run is not a trailing run — the
+check reads the series tail), no flags.
+
+**The era-variant knowledge (why the archive parses — recorded for any
+future backfill).** The NBS English pages changed phrasing across the
+archive; the current parsers match the modern forms, and the pre-2025-07
+pages need: titles "Consumer Price Index FOR <Month>" (not "in"), the
+lead "the national consumer price index (CPI) ... by X PERCENT
+year-ON-year" (not "China's ... X% year on year"), the flat form
+"remained flat year on year", and the PMI Table 1 caption WITHOUT the
+"Table 1" prefix (the pre-2026-04 pages). The RSS feed
+(`stats.gov.cn/english/PressRelease/rss.xml`, 500 items back to 2024-05,
+5.6 MB — a one-time sandbox read, never a Worker rung) is the archive
+discovery surface. The WZWS wall rate-flags rapid sequential fetches
+(venue-verified: 44 articles parsed clean, a faster pass drew JavaScript
+challenge pages; 2s pacing fixed it) — the ingest's 3-4-requests-a-day
+cadence never triggered it; a challenge is an honest bot-check (T-27).
+
+**The reconciliation round's fixes (this commit).**
+
+1. `packages/insights/scripts/ingest.ts` — the dry-run now uses a REAL
+   READ-ONLY store when credentials exist (the no-op store made the
+   dry-run misreport "stored accumulation empty" while the KV carried
+   the 41/30-point histories, and held cards as unavailable — a
+   diagnostic that lies is worse than no diagnostic). Verified live: the
+   dry-run now reports "seeds 10/13 · stored 41/30" and china-pmi
+   pct10y=70%.
+2. `data/shiller/shiller-cape.json` — the refresh cleared the M1 note's
+   ~2026-11-15 deadline: shillerdata.com was reachable from this venue,
+   the fresh download is hash-identical to the committed file
+   (5d176a41, latestDate 2026-10-01, CAPE 40.71 / ECY 0.56%) — the
+   publisher has not updated since 2026-10-19; the committed data IS the
+   latest that exists. Only the fetchedAt bookkeeping moved.
+3. This record + the CHANGELOG §2026-10-26b addendum + the tracker
+   session-log entry + the data/manual/README notes.
+
+**The CI observation (owner-side).** The `ci` workflow has failed on
+EVERY push since 2026-10-20 (last green: `f72e1a0`, 2026-10-18) —
+including pure-docs commits — while every session's local gates ran
+green; the failures predate M7 and are systemic (the account's
+Actions-minute/runner problems the repo has documented since 2026-10-20).
+The logs are no longer retrievable via the API (empty archive). The
+local-gates discipline (typecheck/lint/tests/build/budget/copy-audit,
+this round all green on the canonical tree) remains the honest
+substitute; the CI repair is owner-side.
+
+**Gates this round (the canonical tree + this commit).** typecheck 6/6;
+core 191, scraper 67, insights 582, markets 13, api 344, web 680 + the
+recorded 16-failure briefing jsdom baseline; lint 0 errors/15 advisories;
+copy audit clean; budgets held (entry 295.28/88.81; Insights lazy
+846.29/205.01 vs 850/206). No Worker deploy needed: the live `0ce6fa8d`
+IS the M7 implementation, the script fix is Node-venue-only, and the
+shiller change is data-identical bookkeeping that rides the next deploy.
+
 ## Session record — 2026-10-26 M7: the NBS automation lands, china-cpi ships, the BoJ retires
 
 - **Deployed**: currena-api **`366a91de-2ab9-488b-b7b5-3dd58730414b`** at

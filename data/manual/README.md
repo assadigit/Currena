@@ -80,3 +80,16 @@ table's Y/Y column agree in every month):
 The `expires` bookkeeping points at the next CPI release (~2026-11-10);
 as with china-pmi, the automation now owns the freshness and this file is
 the seed history the fetch merges over.
+
+
+## The stored histories are DEEPER than the seeds (2026-10-26b)
+
+The KV accumulations (`insights:hist:china-pmi` / `insights:hist:china-cpi`)
+were enriched beyond the committed seeds by the reconciliation round's
+RSS-driven archive backfill (2026-10-25/26): **41 PMI months**
+(2023-05 → 2026-09) and **30 CPI months** (2024-04 → 2026-09), every
+value parsed from the NBS's own release pages, zero mismatches against
+the seeds on every overlap month (the seeds are strict subsets — the
+union semantics consume both). The era-variant phrasings the pre-2025-07
+pages need (and the WZWS rate-wall observation) are recorded in the
+DEPLOY 2026-10-26b session record.

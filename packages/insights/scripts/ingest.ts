@@ -54,19 +54,25 @@ const apiToken = process.env.CLOUDFLARE_API_TOKEN;
 const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
 const namespaceId = process.env.INSIGHTS_KV_NAMESPACE_ID;
 
-if (!dryRun && (!apiToken || !accountId || !namespaceId)) {
-  fail(
-    'missing environment — a real run needs CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID and INSIGHTS_KV_NAMESPACE_ID (or pass --dry-run)',
-  );
-}
-
 /* ------------------------------------------------------------------ *
  * The run (the shared orchestration — collect, derive, validate, write)
  * ------------------------------------------------------------------ */
 
-const store = dryRun
-  ? undefined
-  : new RestInsightsStore({ apiToken: apiToken!, accountId: accountId!, namespaceId: namespaceId! });
+// 2026-10-26b (the reconciliation round): the dry-run uses a REAL READ-ONLY
+// store whenever the credentials exist — the stored-history legs (the NBS
+// seed∪stored∪fetched union, the Treasury fallback fills) must read the
+// true KV state or the dry-run misreports what the next rung will build
+// ("stored accumulation empty" while the KV carries 41/30-point histories,
+// held cards as unavailable). Only a credential-less dry-run falls back to
+// the no-op store.
+const store = apiToken && accountId && namespaceId
+  ? new RestInsightsStore({ apiToken, accountId, namespaceId })
+  : undefined;
+if (!dryRun && store === undefined) {
+  fail(
+    'missing environment — a real run needs CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID and INSIGHTS_KV_NAMESPACE_ID (or pass --dry-run)',
+  );
+}
 
 // Fix spec T-07: the Node venue scans the copy corpus from its checkout
 // (the Worker omits it — the CI corpus tests cover the templates there).
@@ -88,10 +94,10 @@ for (const dictPath of ['apps/web/src/i18n/insights-copy-en.ts', 'apps/web/src/i
 const skipRbaCsvTables = process.env.RBA_SKIP_CSV_TABLES === '1' || undefined;
 
 const result = await runInsightsUpdate({
-  // The dry-run path passes a no-op store: runInsightsUpdate skips every
-  // write when dryRun is set, so the store is only dereferenced on a real
-  // run — the undefined-vs-store split keeps the env checks honest.
-  store: dryRun ? ({ getSnapshot: async () => undefined, getHistory: async () => undefined } as never) : store!,
+  // A dry-run without credentials takes the no-op store: runInsightsUpdate
+  // skips every write when dryRun is set, and only the real store's READS
+  // (previous snapshot, stored histories) matter for fidelity.
+  store: store ?? ({ getSnapshot: async () => undefined, getHistory: async () => undefined } as never),
   mode,
   ...(skipRbaCsvTables !== undefined ? { skipRbaCsvTables: true } : {}),
   dryRun,
