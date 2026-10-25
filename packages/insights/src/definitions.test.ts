@@ -22,8 +22,8 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 35 P1 / 41 P2 (the 2026-10-24 M4 Wave-1 round adds five P1 cards + three P2 context rows; the M5 Wave-2 round adds one P1 card + four P2 context rows)', () => {
-    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(35);
+  it('splits 47 P1 / 41 P2 (the 2026-10-25 M6 Wave-3 round adds twelve P1 cards — the leading-edge batch; china-cpi stays out, both OECD mirrors died upstream 2025-04)', () => {
+    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(47);
     expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(41);
   });
 
@@ -54,16 +54,19 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('info-only cards never vote: exactly the thirty-six info rules (2026-10-24 M4 Wave 1: +sofr, +us-2y, +breakeven-10y, +michigan-1y-expectations; M5 Wave 2: +euro-aaa-10y, +food-index, +wheat, +maize, +usdtry as context)', () => {
+  it('info-only cards never vote: exactly the forty-six info rules (2026-10-24 M4 Wave 1: +sofr, +us-2y, +breakeven-10y, +michigan-1y-expectations; M5 Wave 2: +euro-aaa-10y, +food-index, +wheat, +maize, +usdtry as context; 2026-10-25 M6 Wave 3: +mortgage-30y, +walcl, +retail-sales, +housing-permits, +cfnai, +job-openings, +t5yie, +us-wages, +au-saving-ratio, +au-job-vacancies as context — euro-hicp and au-housing-finance are the scored pair)', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
     expect(info).toEqual([
       'au-deposit-rate',
+      'au-job-vacancies',
       'au-petrol-yoy',
+      'au-saving-ratio',
       'boe-rate',
       'boj-rate',
       'breakeven-10y',
       'btc-usd',
       'bund-10y',
+      'cfnai',
       'copper-usd',
       'crypto-fng',
       'eur-usd',
@@ -73,33 +76,40 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'gold-aud',
       'gold-btc',
       'gold-usd',
+      'housing-permits',
       'iron-ore',
       'jgb-10y',
+      'job-openings',
       'm2-us',
       'maize',
       'michigan-1y-expectations',
+      'mortgage-30y',
       'natgas',
       'platinum',
       'rba-cash-rate',
+      'retail-sales',
       'shiller-cape',
       'shiller-ecy',
       'silver-usd',
       'sofr',
+      't5yie',
       'us-2y',
       'us-cpi-core-yoy',
       'us-gdp-growth',
       'us-nfp',
+      'us-wages',
       'usdcny',
       'usdtry',
+      'walcl',
       'wheat',
       'wti',
     ]);
   });
 
-  it('GAUGE membership is the scored list (40 voters; fix B-14: +brent counts in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims, +recession-probability, +michigan-sentiment in growth-health, +us-pce-core-yoy in prices-heat)', () => {
+  it('GAUGE membership is the scored list (42 voters; fix B-14: +brent counts in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims, +recession-probability, +michigan-sentiment in growth-health, +us-pce-core-yoy in prices-heat; 2026-10-25 M6 Wave 3: +euro-hicp in prices-heat, +au-housing-finance in au-households)', () => {
     const gaugedGroups = new Set(GAUGES.map((g) => g.id));
     const memberIds = new Set(GAUGES.flatMap((g) => g.members));
-    expect(memberIds.size).toBe(40);
+    expect(memberIds.size).toBe(42);
     // Every gauge member is a scored (non-info) definition. B-14's one
     // deliberate exception: brent lives in the prices-board lane group but
     // counts in the prices-heat gauge (the card renders on the Prices
@@ -133,10 +143,18 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expectStale('dollar-basket', 4);
     expectStale('nfci', 14);
     expectStale('au-home-loan', 70);
-    expectStale('au-wage-growth', 200);
+    expectStale('au-wage-growth', 230);
     expectStale('au-rent-yoy', 95);
     expectStale('au-petrol-yoy', 95);
     expectStale('brent', 12);
+    // M6 calibration fix (2026-10-25): the quarterly obs-to-next-release
+    // arithmetic — WPI 224d, RPPI 219d, LEND_HOUSING 220d, JV 232d,
+    // ANA 245d. The old 200/215 values false-staled the cards between
+    // the quarter boundaries (au-wage-growth went live-stale 2026-10-17).
+    expectStale('au-home-values', 225);
+    expectStale('au-housing-finance', 230);
+    expectStale('au-saving-ratio', 250);
+    expectStale('au-job-vacancies', 240);
     // Fix B-09 (2026-10-14): the release-cycle overrides that keep the
     // tightened cadence defaults (4/10/45/120) honest.
     expectStale('m2-us', 90);
@@ -162,7 +180,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expectStale('au-cpi', 95);
     expectStale('au-trimmed-mean', 95);
     expectStale('terms-of-trade', 215);
-    expectStale('au-home-values', 215);
+    expectStale('au-home-values', 225);
     // I19: the BEA NIPA ratio shares the quarter-start dating — 215, not the
     // 190d quarterly grace (which false-alarmed Oct 8–30 in the live I18
     // snapshot while FRED confirmed the Q2 obs was the freshest that exists).

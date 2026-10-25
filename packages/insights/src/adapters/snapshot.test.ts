@@ -145,9 +145,10 @@ describe('buildInsightsSnapshot', () => {
     // round retired nzd-usd + silver-btc → 63; the 2026-10-24 M4 Wave-1
     // round added the early-warning pack's eight ids → 71; the 2026-10-24
     // M5 Wave-2 round added five more (euro-aaa-10y, food-index, wheat,
-    // maize, usdtry) → 76.
-    expect(snap.readings).toHaveLength(76);
-    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(76);
+    // maize, usdtry) → 76; the 2026-10-25 M6 Wave-3 round added the
+    // leading-edge batch's twelve ids → 88.
+    expect(snap.readings).toHaveLength(88);
+    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(88);
     expect(snap.readings.find((r) => r.id === 'us10y')!.status).not.toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.status).toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.value).toBeNull();

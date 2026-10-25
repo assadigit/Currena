@@ -123,6 +123,7 @@ function evaluateAtom(
   series: readonly SeriesPoint[],
   asOf: string,
   aux?: AuxSeries,
+  percentileBasis?: 'level' | 'yoy',
 ): RuleVerdict {
   switch (rule.kind) {
     case 'info':
@@ -153,11 +154,22 @@ function evaluateAtom(
     case 'percentile': {
       const current = pointAtOrBefore(series, asOf);
       if (!current) return { status: 'unevaluable', reason: 'no observation at or before asOf' };
-      const base = percentileBase(series, asOf);
+      // M6 Wave 3 (2026-10-25): the RULE now honours percentileBasis 'yoy'
+      // exactly like the displayed percentile10y does (audit item C10) — a
+      // trending total (au-housing-finance is the first percentile+yoy card)
+      // would otherwise sit permanently near the top of its LEVEL
+      // distribution and vote warning forever. The yoy basis measures the
+      // GROWTH percentile: "lending is unusually strong for the decade".
+      const basis = percentileBasis === 'yoy' ? yoyPctSeries(series) : series;
+      const basisCurrent = percentileBasis === 'yoy' ? pointAtOrBefore(basis, asOf) : current;
+      if (!basisCurrent) {
+        return { status: 'unevaluable', reason: 'no year-on-year observation at or before asOf' };
+      }
+      const base = percentileBase(basis, asOf);
       if (base.length < MIN_PERCENTILE_OBS) {
         return { status: 'unevaluable', reason: `percentile base has ${base.length} observations, needs ${MIN_PERCENTILE_OBS}` };
       }
-      const p = percentileOf(base.map((pt) => pt.value), current.value);
+      const p = percentileOf(base.map((pt) => pt.value), basisCurrent.value);
       const warning = rule.tail === 'high' ? p >= 1 - rule.cutoff : p <= rule.cutoff;
       return warning ? { status: 'warning' } : { status: 'normal' };
     }
@@ -254,13 +266,13 @@ export function evaluateRule(
   if (rule.kind === 'any-of') {
     let sawNormal = false;
     for (const atom of rule.of) {
-      const v = evaluateAtom(atom, series, asOf, aux);
+      const v = evaluateAtom(atom, series, asOf, aux, def.percentileBasis);
       if (v.status === 'warning') return { status: 'warning' };
       if (v.status === 'normal') sawNormal = true;
     }
     return sawNormal ? { status: 'normal' } : { status: 'unevaluable', reason: 'no composite arm could be evaluated' };
   }
-  return evaluateAtom(rule, series, asOf, aux);
+  return evaluateAtom(rule, series, asOf, aux, def.percentileBasis);
 }
 
 /* ------------------------------------------------------------------ *

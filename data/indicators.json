@@ -951,19 +951,78 @@
         "gaugeMembership": "context only — never counts"
       },
       "source": {
-        "provider": "fred",
-        "name": "OECD via FRED (IRSTCI01GBM156N — UK overnight rate)",
-        "url": "https://fred.stlouisfed.org/series/IRSTCI01GBM156N",
-        "seriesIdOrTable": "FRED:IRSTCI01GBM156N (overnight rate, monthly)"
+        "provider": "boe",
+        "name": "Bank of England (official Bank Rate history)",
+        "url": "https://www.bankofengland.co.uk/boeapps/database/Bank-Rate.asp",
+        "seriesIdOrTable": "Bank of England official Bank Rate history (decision table)"
       },
-      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
-      "publisherUrl": "https://fred.stlouisfed.org/series/IRSTCI01GBM156N",
-      "methodUrl": "https://fred.stlouisfed.org/series/IRSTCI01GBM156N",
-      "whatItIs": "The Bank of England’s policy rate, measured as the average overnight rate over the latest full month (FRED IRSTCI01GBM156N) — a monthly average, lagged: it can trail an intra-month policy change.",
+      "publisher": "Bank of England (Bank Rate history page)",
+      "publisherUrl": "https://www.bankofengland.co.uk/boeapps/database/Bank-Rate.asp",
+      "methodUrl": "https://www.bankofengland.co.uk/boeapps/database/Bank-Rate.asp",
+      "whatItIs": "The Bank of England’s official Bank Rate, straight from the central bank’s own rate history (daily, stepping at each decision): no averaging, no lag — it moves the day the Bank decides.",
       "whatItIsnt": "Like every policy rate it works with long, uneven lags, and the setting says nothing about the next decision.",
       "trackRecordNote": "The bank cut to 0.1% in 2020, its lowest since 1694, then lifted rates to multi-decade highs by 2023.",
       "definition": null,
-      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "failClosedConditions": "No value, data older than its allowed age, an exact repeat beyond its per-change cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "Bank of England legal page (read 2026-10-25): the Database’s data is “subject to the terms of the UK Open Government Licence, allowing and encouraging free and flexible data reuse” — attribution class, like CC BY. Bank Rate is the Bank’s own series (not a third-party-licensed one; only selected exchange-rate series are excluded from the licence).",
+        "termsReadOn": "2026-10-25",
+        "attributionText": "Source: Bank of England (Bank Rate history)",
+        "legs": [
+          "boe"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "per-change",
+      "maxAgeDays": null,
+      "maxAgeBasis": "cadence default (per-change)",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "UK Open Government Licence v3.0 (free reuse, attributed)",
+        "attributionText": "Source: Bank of England",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-25",
+        "termsEvidence": "Bank of England legal page read 2026-10-25 (bankofengland.co.uk/legal): the Database's data is 'subject to the terms of the UK Open Government Licence, allowing and encouraging free and flexible data reuse' — Bank Rate is the Bank's own series (only selected third-party-licensed exchange-rate series are excluded). The M6 Wave-4 probe fix rides D-42's OD-8 approval.",
+        "termsUrl": "https://www.bankofengland.co.uk/legal"
+      }
+    },
+    {
+      "id": "mortgage-30y",
+      "title": "The US 30-year home-loan rate",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Freddie Mac via FRED (MORTGAGE30US)",
+        "url": "https://fred.stlouisfed.org/series/MORTGAGE30US",
+        "seriesIdOrTable": "FRED:MORTGAGE30US (30-Year Fixed Rate Mortgage Average, weekly)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/MORTGAGE30US",
+      "methodUrl": "https://fred.stlouisfed.org/series/MORTGAGE30US",
+      "whatItIs": "Freddie Mac’s weekly survey of the average 30-year fixed-rate mortgage (via FRED, published Thursdays): the reference rate quoted across the US housing market.",
+      "whatItIsnt": "It is a survey average of new loans only: actual offers vary by credit and region, and existing fixed loans from cheaper years are untouched by it.",
+      "trackRecordNote": "Each percentage point on this rate cuts roughly ten percent from what a buyer can borrow; the 2021-23 climb from under 3% to near 8% halved US affordability and froze existing owners in place.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 14 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L2",
         "ownerAccepts": true,
@@ -974,13 +1033,13 @@
         "termsReadOn": "2026-10-16",
         "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
         "legs": [
-          "fred:IRSTCI01GBM156N"
+          "fred:MORTGAGE30US"
         ]
       },
       "unit": "percent",
       "changeUnit": "percentage points",
-      "cadence": "monthly",
-      "maxAgeDays": 75,
+      "cadence": "weekly",
+      "maxAgeDays": 14,
       "maxAgeBasis": "per-series override",
       "scored": false,
       "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
@@ -996,7 +1055,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Freddie Mac weekly PMMS survey; series page read live 2026-10-25, matching the deploying session's scan) (checked 2026-10-25) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1178,6 +1237,185 @@
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (series page read 2026-10-24; BEA core PCE price index) (checked 2026-10-24) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "euro-hicp",
+      "title": "Euro-area inflation (yearly)",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": "prices-heat",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "ecb",
+        "name": "ECB Data Portal / Eurostat (HICP annual rate)",
+        "url": "https://data.ecb.europa.eu/data/datasets/ICP/ICP.M.U2.N.000000.4.ANR",
+        "seriesIdOrTable": "ECB Data Portal HICP/M.U2.N.000000.4D0.ANR (euro-area HICP all-items, annual rate of change, monthly)"
+      },
+      "publisher": "ECB Data Portal",
+      "publisherUrl": "https://data.ecb.europa.eu/data/datasets/ICP/ICP.M.U2.N.000000.4.ANR",
+      "methodUrl": "https://data.ecb.europa.eu/data/datasets/ICP/ICP.M.U2.N.000000.4.ANR",
+      "whatItIs": "The euro-area Harmonised Index of Consumer Prices, annual rate (Eurostat via the ECB Data Portal): the comparable inflation measure across all euro-area countries.",
+      "whatItIsnt": "A weighted average of twenty countries: national experiences differ widely around it, and the harmonised method differs from any single country’s CPI.",
+      "trackRecordNote": "The euro area spent the 2010s below target, overshoot to above 10% in 2022-23, and ground back down as the ECB hiked; the target line is the anchor for all of it.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ECB Data Portal terms page (read 2026-10-16): JS-rendered, the reuse clause could not be quoted verbatim in a plain fetch — level L1 (need checking), fail closed in public mode until then. Attribution shown regardless.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: European Central Bank",
+        "legs": [
+          "ecb"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 60,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "threshold",
+        "direction": "above",
+        "value": 2
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "ECB website terms (free use, accurate + cited)",
+        "attributionText": "Source: European Central Bank",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): free use of website information when it appears accurately, the ECB is cited as the source, and modifications are stated — official policy rates (DFR) are shown verbatim with ECB attribution.",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
+      }
+    },
+    {
+      "id": "us-wages",
+      "title": "US wage growth (yearly)",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "US Bureau of Labor Statistics via FRED (AHETPI, 12-month % change)",
+        "url": "https://fred.stlouisfed.org/series/AHETPI",
+        "seriesIdOrTable": "FRED:AHETPI (average hourly earnings, all employees → 12-month % change)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/AHETPI",
+      "methodUrl": "https://fred.stlouisfed.org/series/AHETPI",
+      "whatItIs": "The 12-month change in average hourly earnings of all US employees (the BLS via FRED): the pace of American pay growth.",
+      "whatItIsnt": "Average pay mixes who is working with what they earn: a shrinking workforce can lift the average while nobody gets a raise, and composition shifts distort it.",
+      "trackRecordNote": "Wage growth near 4% proved compatible with 2% inflation in the decade before the pandemic; the 2021-23 climb above 5% fed the inflation the Fed then fought.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:AHETPI"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · page text: \"Public Domain: Citation Requested\" (BLS average hourly earnings; series page read live 2026-10-25, matching the deploying session's scan) (checked 2026-10-25) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "t5yie",
+      "title": "Expected US inflation, five years ahead",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Federal Reserve Bank of St. Louis via FRED (T5YIE)",
+        "url": "https://fred.stlouisfed.org/series/T5YIE",
+        "seriesIdOrTable": "FRED:T5YIE (5-Year Breakeven Inflation Rate, daily)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/T5YIE",
+      "methodUrl": "https://fred.stlouisfed.org/series/T5YIE",
+      "whatItIs": "The five-year breakeven inflation rate (via FRED): the gap between ordinary and inflation-protected Treasury yields, which is what the bond market pays to hedge inflation over the next five years.",
+      "whatItIsnt": "The breakeven mixes inflation expectations with compensation for risk and liquidity: it can move without anyone truly changing their forecast.",
+      "trackRecordNote": "Breakevens tracked the actual inflation surge of 2021-22 and settled back with it; sustained moves above their range preceded policy responses.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 5 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:T5YIE"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 5,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (5-year breakeven inflation; series page read live 2026-10-25, matching the deploying session's scan) (checked 2026-10-25) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1654,6 +1892,65 @@
         "termsCheckedOn": "2026-10-21",
         "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter.",
         "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
+      }
+    },
+    {
+      "id": "walcl",
+      "title": "The Fed’s balance sheet",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Federal Reserve via FRED (WALCL, H.41 table)",
+        "url": "https://fred.stlouisfed.org/series/WALCL",
+        "seriesIdOrTable": "FRED:WALCL (Total Assets of the Federal Reserve, weekly, $ millions)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/WALCL",
+      "methodUrl": "https://fred.stlouisfed.org/series/WALCL",
+      "whatItIs": "Total assets on the Federal Reserve’s balance sheet (the H.41 weekly report via FRED): the cumulative result of every bond the Fed has bought and holds.",
+      "whatItIsnt": "Size alone says little about stance: a growing balance sheet can mean crisis response or routine operations, and the composition of what is held matters as much as the total.",
+      "trackRecordNote": "QE rounds lifted the balance sheet in steps from under $1tn to nearly $9tn; the tightening since 2022 has been the largest run-off in the Fed’s history, watched for the liquidity squeezes it can create.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 21 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:WALCL"
+        ]
+      },
+      "unit": "usd-tr",
+      "changeUnit": "percent",
+      "cadence": "weekly",
+      "maxAgeDays": 21,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · page text: \"Public Domain: Citation Requested\" (Federal Reserve H.41 release; series page read live 2026-10-25, matching the deploying session's scan) (checked 2026-10-25) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
     {
@@ -2820,6 +3117,242 @@
       }
     },
     {
+      "id": "retail-sales",
+      "title": "US retail sales (monthly)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "US Census Bureau via FRED (RSAFS)",
+        "url": "https://fred.stlouisfed.org/series/RSAFS",
+        "seriesIdOrTable": "FRED:RSAFS (Advance Retail Sales: Retail Trade, monthly, $ millions)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/RSAFS",
+      "methodUrl": "https://fred.stlouisfed.org/series/RSAFS",
+      "whatItIs": "Advance retail sales for the US retail trade sector (the Census Bureau’s monthly survey via FRED): the dollar value of what stores sell.",
+      "whatItIsnt": "The nominal figure mixes volume and price: high inflation makes weak volumes look like growth, and the series is revised as the month’s data completes.",
+      "trackRecordNote": "Retail sales grow with prices and population most of the time; genuine declines are rare outside recessions, which is exactly why they are watched.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:RSAFS"
+        ]
+      },
+      "unit": "usd-bn",
+      "changeUnit": "percent",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · page text: \"Public Domain: Citation Requested\" (US Census advance retail sales; series page read live 2026-10-25, matching the deploying session's scan) (checked 2026-10-25) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "housing-permits",
+      "title": "US building permits",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "US Census Bureau via FRED (PERMIT)",
+        "url": "https://fred.stlouisfed.org/series/PERMIT",
+        "seriesIdOrTable": "FRED:PERMIT (New Private Housing Units Authorized by Building Permits, monthly, thousands, seasonally adjusted annual rate)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/PERMIT",
+      "methodUrl": "https://fred.stlouisfed.org/series/PERMIT",
+      "whatItIs": "New privately-owned housing units authorized by building permits (the Census Bureau via FRED), seasonally adjusted at an annual rate: the front of the housing pipeline.",
+      "whatItIsnt": "A permit is an intention, not a home: some are never built, and multi-unit projects can move the number in bursts.",
+      "trackRecordNote": "Permits collapsed before each of the past US recessions and recovered with rate cuts; the 2022-23 mortgage spike cut them by roughly a third.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:PERMIT"
+        ]
+      },
+      "unit": "permits",
+      "changeUnit": "percent",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · page text: \"Public Domain: Citation Requested\" (US Census building permits; series page read live 2026-10-25, matching the deploying session's scan) (checked 2026-10-25) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "cfnai",
+      "title": "US economic activity scorecard (Chicago Fed)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Chicago Fed via FRED (CFNAI)",
+        "url": "https://fred.stlouisfed.org/series/CFNAI",
+        "seriesIdOrTable": "FRED:CFNAI (Chicago Fed National Activity Index, monthly)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/CFNAI",
+      "methodUrl": "https://fred.stlouisfed.org/series/CFNAI",
+      "whatItIs": "The Chicago Fed National Activity Index (via FRED): a weighted average of 85 monthly indicators of production, income, employment and sales. Zero is trend growth.",
+      "whatItIsnt": "A weighted blend smooths the parts away: it cannot say which sector moved, and it is revised as its inputs are.",
+      "trackRecordNote": "Sustained readings below -0.70 have accompanied every US recession of the past half-century; the index is built to be read as a level, month by month.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 95 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:CFNAI"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 95,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Chicago Fed national activity index; series page read live 2026-10-25, matching the deploying session's scan) (checked 2026-10-25) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "job-openings",
+      "title": "US job openings (JOLTS)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "US Bureau of Labor Statistics via FRED (JTSJOL)",
+        "url": "https://fred.stlouisfed.org/series/JTSJOL",
+        "seriesIdOrTable": "FRED:JTSJOL (Job Openings: Total Nonfarm, monthly, thousands)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/JTSJOL",
+      "methodUrl": "https://fred.stlouisfed.org/series/JTSJOL",
+      "whatItIs": "Total nonfarm job openings from the JOLTS survey (the BLS via FRED): positions employers are actively trying to fill.",
+      "whatItIsnt": "An opening is not a hire: postings can linger unfilled, and the survey lags the month by about six weeks.",
+      "trackRecordNote": "Openings roughly halved from their 2022 record as the tightening bit, without unemployment rising much: the soft landing’s signature.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 110 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:JTSJOL"
+        ]
+      },
+      "unit": "openings",
+      "changeUnit": "percent",
+      "cadence": "monthly",
+      "maxAgeDays": 110,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · page text: \"Public Domain: Citation Requested\" (BLS JOLTS job openings; series page read live 2026-10-25, matching the deploying session's scan) (checked 2026-10-25) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
       "id": "copper-gold",
       "title": "Copper / Gold",
       "area": {
@@ -3059,27 +3592,27 @@
     },
     {
       "id": "platinum",
-      "title": "Platinum price",
+      "title": "Platinum price (ounce)",
       "area": {
         "section": "global",
-        "group": "growth-health",
+        "group": "prices-heat",
         "gauge": null,
         "gaugeMembership": "context only — never counts"
       },
       "source": {
-        "provider": "world-bank",
-        "name": "The World Bank: Commodity Markets (Pink Sheet) — platinum",
-        "url": "https://www.worldbank.org/en/research/commodity-markets",
-        "seriesIdOrTable": "World Bank Pink Sheet (Platinum, $/troy oz)"
+        "provider": "gold-api",
+        "name": "gold-api.com (XPT spot; history: World Bank Pink Sheet)",
+        "url": "https://www.gold-api.com",
+        "seriesIdOrTable": "gold-api.com XPT spot (history: World Bank Pink Sheet platinum, monthly + daily accumulation)"
       },
       "publisher": "World Bank (Commodity Markets \"Pink Sheet\")",
-      "publisherUrl": "https://www.worldbank.org/en/research/commodity-markets",
-      "methodUrl": "https://www.worldbank.org/en/research/commodity-markets",
-      "whatItIs": "The price of platinum per troy ounce: monthly World Bank pink-sheet prices carrying the decade of history.",
+      "publisherUrl": "https://www.gold-api.com",
+      "methodUrl": "https://www.gold-api.com",
+      "whatItIs": "The price of platinum per troy ounce: the live gold-api spot, moving daily, with the World Bank pink-sheet monthly prices carrying the decade of history.",
       "whatItIsnt": "Rarer than gold but far more industrial: its price follows factories as much as fear, and forecasts for it are famously poor.",
       "trackRecordNote": "It spent the years after 2008 well below gold; its big runs (the 2000s, 2025–26) came with supply squeezes or demand booms.",
       "definition": null,
-      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "failClosedConditions": "No value, data older than 2 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L1",
         "ownerAccepts": null,
@@ -3095,8 +3628,8 @@
       },
       "unit": "usd",
       "changeUnit": "percent",
-      "cadence": "monthly",
-      "maxAgeDays": 60,
+      "cadence": "daily",
+      "maxAgeDays": 2,
       "maxAgeBasis": "per-series override",
       "scored": false,
       "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
@@ -4047,7 +4580,7 @@
       "whatItIsnt": "An average across all jobs: your own pay can move very differently, and bonuses are excluded.",
       "trackRecordNote": "Wage growth above inflation marked the strong 2023–24 stretch; the long flat 2010s matched weak pay and weak prices together.",
       "definition": null,
-      "failClosedConditions": "No value, data older than 200 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "failClosedConditions": "No value, data older than 230 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L0",
         "ownerAccepts": null,
@@ -4064,7 +4597,7 @@
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "quarterly",
-      "maxAgeDays": 200,
+      "maxAgeDays": 230,
       "maxAgeBasis": "per-series override",
       "scored": true,
       "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
@@ -4227,7 +4760,7 @@
       "whatItIsnt": "A national average hides big city differences, and values lag actual transactions.",
       "trackRecordNote": "Falls have been rare and mostly brief: 2008, pockets of 2017–19, and 2022–23 with rate hikes.",
       "definition": null,
-      "failClosedConditions": "No value, data older than 215 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "failClosedConditions": "No value, data older than 225 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L0",
         "ownerAccepts": null,
@@ -4244,7 +4777,7 @@
       "unit": "index",
       "changeUnit": "percent",
       "cadence": "quarterly",
-      "maxAgeDays": 215,
+      "maxAgeDays": 225,
       "maxAgeBasis": "per-series override",
       "scored": true,
       "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
@@ -4324,6 +4857,185 @@
         "termsCheckedOn": "2026-10-16",
         "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0 for most material; commercial/personal use allowed if RBA endorsement is not implied. Third-party content INSIDE RBA tables needs that third party’s consent — re-check each table’s source notes at the quarterly review.",
         "termsUrl": "https://www.rba.gov.au/copyright/"
+      }
+    },
+    {
+      "id": "au-housing-finance",
+      "title": "New Australian home loans (quarterly)",
+      "area": {
+        "section": "australia",
+        "group": "au-households",
+        "gauge": "au-households",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "abs",
+        "name": "Australian Bureau of Statistics (LEND_HOUSING, new housing loan commitments)",
+        "url": "https://data.api.abs.gov.au/rest/data/LEND_HOUSING/FIN_VAL.NEWCOMMITS.DV8368.TOTDWELL.TOT.TOT.20.AUS.Q",
+        "seriesIdOrTable": "ABS LEND_HOUSING/FIN_VAL.NEWCOMMITS.DV8368.TOTDWELL.TOT.TOT.20.AUS.Q (new housing loan commitments, total dwellings, SA, $ millions)"
+      },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/LEND_HOUSING/FIN_VAL.NEWCOMMITS.DV8368.TOTDWELL.TOT.TOT.20.AUS.Q",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/LEND_HOUSING/FIN_VAL.NEWCOMMITS.DV8368.TOTDWELL.TOT.TOT.20.AUS.Q",
+      "whatItIs": "The value of new housing loan commitments across Australia (the ABS lending indicators, quarterly, seasonally adjusted): all lenders, owner-occupier and investor together.",
+      "whatItIsnt": "A commitment is not a settled loan, and the total mixes investors with owner-occupiers: the investor share can swing for tax settings rather than the economy.",
+      "trackRecordNote": "Lending collapsed with each rate-hike cycle and recovered with each cut; the 2022-23 tightening cut new commitments by roughly a third before values followed.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 230 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
+      "unit": "aud-bn",
+      "changeUnit": "percent",
+      "cadence": "quarterly",
+      "maxAgeDays": 230,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "percentile",
+        "tail": "high",
+        "cutoff": 0.2
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
+    },
+    {
+      "id": "au-saving-ratio",
+      "title": "The Australian household saving rate",
+      "area": {
+        "section": "australia",
+        "group": "au-households",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "abs",
+        "name": "Australian Bureau of Statistics (ANA_AGG, household saving ratio)",
+        "url": "https://data.api.abs.gov.au/rest/data/ANA_AGG/M7.HSR.20.AUS.Q",
+        "seriesIdOrTable": "ABS ANA_AGG/M7.HSR.20.AUS.Q (household saving ratio, seasonally adjusted, % of disposable income)"
+      },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/ANA_AGG/M7.HSR.20.AUS.Q",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/ANA_AGG/M7.HSR.20.AUS.Q",
+      "whatItIs": "The ratio of household net saving to disposable income (the ABS national accounts, quarterly, seasonally adjusted): what remains after consumption.",
+      "whatItIsnt": "An aggregate ratio says nothing about distribution: the average household may be saving well while the bottom half saves nothing.",
+      "trackRecordNote": "The ratio spiked to unprecedented levels in 2020, then drained for three years as buffers funded spending; unusually low readings preceded past consumption slowdowns.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 250 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "quarterly",
+      "maxAgeDays": 250,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
+    },
+    {
+      "id": "au-job-vacancies",
+      "title": "Australian job vacancies",
+      "area": {
+        "section": "australia",
+        "group": "au-households",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "abs",
+        "name": "Australian Bureau of Statistics (JV, job vacancies)",
+        "url": "https://data.api.abs.gov.au/rest/data/JV/M1.7.TOT.20.AUS.Q",
+        "seriesIdOrTable": "ABS JV/M1.7.TOT.20.AUS.Q (job vacancies, all sectors, seasonally adjusted, thousands)"
+      },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/JV/M1.7.TOT.20.AUS.Q",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/JV/M1.7.TOT.20.AUS.Q",
+      "whatItIs": "Total job vacancies across Australia (the ABS survey, quarterly, seasonally adjusted): positions employers are actively seeking to fill.",
+      "whatItIsnt": "A vacancy is not a hire: postings linger, and skill mismatches can leave jobs unfilled beside unemployed workers.",
+      "trackRecordNote": "Vacancies hit a record in 2022 and have fallen steadily since, while unemployment barely moved: the same soft-landing pattern the US card shows.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 240 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
+      "unit": "vacancies",
+      "changeUnit": "percent",
+      "cadence": "quarterly",
+      "maxAgeDays": 240,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
       }
     },
     {

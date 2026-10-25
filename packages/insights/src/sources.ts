@@ -103,6 +103,25 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     termsUrl: 'https://www.abs.gov.au/about/copyright-and-disclaimer',
     notes: 'Keyless SDMX data API (M1); quarterly series labelled by quarter name (E-07).',
   },
+  'boe-database': {
+    id: 'boe-database',
+    provider: 'boe',
+    label: 'Bank of England (Bank Rate history page)',
+    usedFor: 'boe-rate (the UK policy rate)',
+    method: 'M2',
+    runtime: 'worker',
+    level: 'L2',
+    ownerAccepts: true,
+    override: false,
+    enabled: true,
+    termsLines:
+      'Bank of England legal page (read 2026-10-25): the Database\u2019s data is \u201csubject to the terms of the UK Open Government Licence, allowing and encouraging free and flexible data reuse\u201d \u2014 attribution class, like CC BY. Bank Rate is the Bank\u2019s own series (not a third-party-licensed one; only selected exchange-rate series are excluded from the licence).',
+    termsReadOn: '2026-10-25',
+    attribution: 'Source: Bank of England (Bank Rate history)',
+    termsUrl: 'https://www.bankofengland.co.uk/legal',
+    notes:
+      'M6 Wave-4 probe fix (2026-10-25): the decision table replaces the FRED OECD monthly mirror IRSTCI01GBM156N — current at every decision, complete history back to 1975. Same HTML-decision-table shape as the RBA cash-rate page.',
+  },
   'fred-public': {
     id: 'fred-public',
     provider: 'fred',
@@ -557,6 +576,8 @@ export function rowIdForProvider(provider: string): string {
       return 'nbs-china';
     case 'ecb':
       return 'ecb-portal';
+    case 'boe':
+      return 'boe-database';
     case 'treasury':
       return 'us-treasury';
     case 'eia':

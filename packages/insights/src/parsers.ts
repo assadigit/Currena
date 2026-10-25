@@ -295,6 +295,42 @@ export function parseEcbDfrCsv(text: string): SeriesPoint[] {
   return out;
 }
 
+/*
+ * M6 Wave 3 (2026-10-25): the ECB MONTHLY series (HICP) — the same wide
+ * SDMX CSV as the DFR, but TIME_PERIOD carries YYYY-MM periods (and the
+ * occasional unquoted-comma hazard is absent from these flows). Dates
+ * normalize to the month START (M-01, the FRED monthly convention).
+ */
+export function parseEcbMonthlyCsv(text: string): SeriesPoint[] {
+  const lines = text.split(/\r?\n/).filter((l) => l.trim() !== '');
+  if (lines.length < 2) throw new Error('ECB monthly CSV: fewer than 2 lines — not a data response');
+  const header = (lines[0] ?? '').split(',').map((h) => h.trim());
+  const dateCol = header.indexOf('TIME_PERIOD');
+  const valueCol = header.indexOf('OBS_VALUE');
+  if (dateCol < 0 || valueCol < 0) {
+    throw new Error(
+      `ECB monthly CSV: header has no TIME_PERIOD/OBS_VALUE (found ${header.slice(0, 8).join(',')}…) — format change?`,
+    );
+  }
+  const out: SeriesPoint[] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = lines[i]!.split(',');
+    const period = (cells[dateCol] ?? '').trim();
+    const raw = (cells[valueCol] ?? '').trim();
+    if (period === '' || raw === '') continue;
+    const mo = /^(\d{4})-(\d{2})$/.exec(period);
+    if (!mo) {
+      throw new Error(`ECB monthly CSV line ${i + 1}: period "${period}" is not YYYY-MM (format change?)`);
+    }
+    if (isMissing(raw)) continue;
+    out.push({ date: `${mo[1]!}-${mo[2]!}-01`, value: parseNumber(raw, `ECB monthly CSV line ${i + 1}`) });
+  }
+  if (out.length === 0) throw new Error('ECB monthly CSV: zero observations parsed (series key wrong?)');
+  out.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  assertAscending(out);
+  return out;
+}
+
 /* ------------------------------------------------------------------ *
  * RBA statistical-table CSV — the format verified from the ingestion
  * venue 2026-10-06 (GitHub Actions runner; the sandbox is Akamai-blocked,

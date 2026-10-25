@@ -28,7 +28,14 @@ export type UnitToken =
   // renders an empty label, which R13 forbids).
   | 'claims'
   // M5 Wave 2 (2026-10-24): the Turkish lira (the usdtry pair).
-  | 'try';
+  | 'try'
+  // M6 Wave 3 (2026-10-25): the leading-edge batch — Australian billions
+  // ("A$97.6bn" EN), US permits and job openings scaled to millions
+  // ("1.40m permits a year"), AU vacancies in thousands ("325k").
+  | 'aud-bn'
+  | 'permits'
+  | 'openings'
+  | 'vacancies';
 
 /** Locale-dependent unit labels (from the copy dictionaries). */
 export interface UnitLabels {
@@ -46,6 +53,10 @@ export interface UnitLabels {
   ratio: string;
   claims: string;
   try: string;
+  'aud-bn': string;
+  permits: string;
+  openings: string;
+  vacancies: string;
 }
 
 interface DisplayConfig {
@@ -113,6 +124,26 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   wheat: { decimals: 1, unit: 'usd' },
   maize: { decimals: 1, unit: 'usd' },
   usdtry: { decimals: 2, unit: 'try' },
+  // M6 Wave 3 (OD-8/D-42, 2026-10-25) — the leading-edge batch: the
+  // mortgage/liquidity/spending family. WALCL is $ millions → 'usd-tr'
+  // ×1e-6 ("US$6.8 trillion"); retail sales $ millions → 'usd-bn' ×1e-3
+  // ("US$745.0bn"); permits SAAR thousands → 'permits' ×1e-3 ("1.40m
+  // permits a year"); JOLTS thousands → 'openings' ×1e-3; the AU trio
+  // reads $ millions → 'aud-bn' ×1e-3 ("A$97.6bn") for housing finance,
+  // percent for the saving ratio, and whole thousands for vacancies
+  // ("325k vacancies", 0dp — the raw unit is already thousand).
+  'mortgage-30y': { decimals: 2, unit: 'percent' },
+  walcl: { decimals: 2, unit: 'usd-tr', scale: 1e-6 },
+  'retail-sales': { decimals: 1, unit: 'usd-bn', scale: 0.001 },
+  'housing-permits': { decimals: 2, unit: 'permits', scale: 0.001 },
+  cfnai: { decimals: 2, unit: 'index' },
+  'job-openings': { decimals: 2, unit: 'openings', scale: 0.001 },
+  t5yie: { decimals: 2, unit: 'percent' },
+  'us-wages': { decimals: 1, unit: 'percent' },
+  'euro-hicp': { decimals: 1, unit: 'percent' },
+  'au-housing-finance': { decimals: 1, unit: 'aud-bn', scale: 0.001 },
+  'au-saving-ratio': { decimals: 1, unit: 'percent' },
+  'au-job-vacancies': { decimals: 0, unit: 'vacancies' },
   'dollar-basket': { decimals: 2, unit: 'index' },
   usdjpy: { decimals: 2, unit: 'jpy' },
   // Step-1 audit item C4: EUR per USD — the € symbol, not "US$".
@@ -229,6 +260,17 @@ export function indicatorValueParts(
   // suffixes the magnitude word; fa keeps its suffix-only form.
   if (cfg.unit === 'usd-tr') {
     if (numberLocale === 'en-US') return { value: `${units.usd}${num} ${unit}`, unit: null };
+    return { value: num, unit };
+  }
+  // M6 Wave 3 (2026-10-25): the billion-scale money rows — EN prefixes the
+  // currency and suffixes the magnitude word ("US$745.0bn" / "A$97.6bn",
+  // the usd-tr pattern minus the space); fa keeps its suffix word
+  // ("۹۷٫۶ میلیارد دلار استرالیا").
+  if (cfg.unit === 'usd-bn' || cfg.unit === 'aud-bn') {
+    if (numberLocale === 'en-US') {
+      const prefix = cfg.unit === 'aud-bn' ? units.aud : units.usd;
+      return { value: `${prefix}${num}${unit}`, unit: null };
+    }
     return { value: num, unit };
   }
   if (numberLocale === 'en-US' && PREFIXED_UNITS.has(cfg.unit)) return { value: `${unit}${num}`, unit: null }; // 'US$113.96'

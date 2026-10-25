@@ -199,6 +199,19 @@
     },
     {
       "id": "boe-rate",
+      "licenceName": "UK Open Government Licence v3.0 (free reuse, attributed)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": true,
+      "enabled": true,
+      "method": "M2",
+      "maxAgeDays": null,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "mortgage-30y",
       "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
       "publicDisplayOk": "yes",
       "privateOk": true,
@@ -206,7 +219,7 @@
       "ownerAccepts": true,
       "enabled": true,
       "method": "M1",
-      "maxAgeDays": 75,
+      "maxAgeDays": 14,
       "ruleVersion": 2,
       "rule": "{\"kind\":\"info\"}"
     },
@@ -248,6 +261,45 @@
       "maxAgeDays": 95,
       "ruleVersion": 2,
       "rule": "{\"kind\":\"threshold\",\"direction\":\"above\",\"value\":2}"
+    },
+    {
+      "id": "euro-hicp",
+      "licenceName": "ECB website terms (free use, accurate + cited)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L1",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 60,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"threshold\",\"direction\":\"above\",\"value\":2}"
+    },
+    {
+      "id": "us-wages",
+      "licenceName": "FRED license #copyright-public-domain (public domain)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 75,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "t5yie",
+      "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": true,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 5,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
     },
     {
       "id": "breakeven-5y5y",
@@ -350,6 +402,19 @@
       "enabled": true,
       "method": "M1",
       "maxAgeDays": 4,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "walcl",
+      "licenceName": "FRED license #copyright-public-domain (public domain)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 21,
       "ruleVersion": 2,
       "rule": "{\"kind\":\"info\"}"
     },
@@ -601,6 +666,58 @@
       "rule": "{\"kind\":\"info\"}"
     },
     {
+      "id": "retail-sales",
+      "licenceName": "FRED license #copyright-public-domain (public domain)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 75,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "housing-permits",
+      "licenceName": "FRED license #copyright-public-domain (public domain)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 75,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "cfnai",
+      "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": true,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 95,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "job-openings",
+      "licenceName": "FRED license #copyright-public-domain (public domain)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 110,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
       "id": "copper-gold",
       "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
       "publicDisplayOk": "yes",
@@ -661,7 +778,7 @@
       "ownerAccepts": null,
       "enabled": true,
       "method": "M1",
-      "maxAgeDays": 60,
+      "maxAgeDays": 2,
       "ruleVersion": 2,
       "rule": "{\"kind\":\"info\"}"
     },
@@ -869,7 +986,7 @@
       "ownerAccepts": null,
       "enabled": true,
       "method": "M1",
-      "maxAgeDays": 200,
+      "maxAgeDays": 230,
       "ruleVersion": 2,
       "rule": "{\"kind\":\"below-aux\"}"
     },
@@ -908,7 +1025,7 @@
       "ownerAccepts": null,
       "enabled": true,
       "method": "M1",
-      "maxAgeDays": 215,
+      "maxAgeDays": 225,
       "ruleVersion": 2,
       "rule": "{\"kind\":\"consecutive-decline\",\"periods\":3}"
     },
@@ -924,6 +1041,45 @@
       "maxAgeDays": 190,
       "ruleVersion": 2,
       "rule": "{\"kind\":\"percentile\",\"tail\":\"high\",\"cutoff\":0.2}"
+    },
+    {
+      "id": "au-housing-finance",
+      "licenceName": "CC BY 4.0",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 230,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"percentile\",\"tail\":\"high\",\"cutoff\":0.2}"
+    },
+    {
+      "id": "au-saving-ratio",
+      "licenceName": "CC BY 4.0",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 250,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "au-job-vacancies",
+      "licenceName": "CC BY 4.0",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 240,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
     },
     {
       "id": "audusd",

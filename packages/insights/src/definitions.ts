@@ -294,17 +294,41 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 75,
   },
   {
+    // M6 Wave-4 probe fix (2026-10-25): the BoE's own Bank Rate history —
+    // the decision table (258 rows back to 1975, expanded to the F1-shaped
+    // daily step series) replaces the FRED OECD monthly mirror. Current at
+    // every decision, never stale by age (the rba-cash-rate pattern).
     id: 'boe-rate',
     section: 'global',
     group: 'borrowing-costs',
     name: 'Bank of England policy rate (overnight)',
-    source: 'fred',
-    sourceRef: 'FRED:IRSTCI01GBM156N (overnight rate, monthly)',
-    cadence: 'monthly',
+    source: 'boe',
+    sourceRef: 'Bank of England official Bank Rate history (decision table)',
+    cadence: 'per-change',
     changeKind: 'points',
     phase: 'P2',
     rule: { kind: 'info' },
-    staleAfterDays: 75,
+  },
+  {
+    // M6 Wave 3 (OD-8/D-42, 2026-10-25): the US household's own borrowing
+    // cost — the mortgage leg of the transmission chain (policy → funding
+    // → long end → THE 30-YEAR HOME LOAN → housing demand), the US twin of
+    // au-home-loan for the two-audience household story. CONTEXT: the
+    // scored borrowing vote stays with the market-rate family.
+    id: 'mortgage-30y',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'The US 30-year home-loan rate',
+    source: 'fred',
+    sourceRef: 'FRED:MORTGAGE30US (30-Year Fixed Rate Mortgage Average, weekly)',
+    cadence: 'weekly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // Freddie Mac's PMMS survey publishes Thursdays for the week's
+    // Wednesday — one missed print reads ~10d of obs age; 14 keeps a
+    // single miss from false-alarming before the next lands.
+    staleAfterDays: 14,
   },
   /* ---------------- Global — Are prices heating up? ---------------- */
   {
@@ -362,6 +386,64 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // releases — 95 covers it without a false stale (the same
     // publication-cycle discipline as govt-interest-revenue's 215).
     staleAfterDays: 95,
+  },
+  {
+    // M6 Wave 3 (OD-8/D-42, 2026-10-25): the euro area's inflation — the
+    // P0/P1 review's "thinnest major economy" fix (the euro area had only
+    // a policy rate). SCORED against the ECB's own 2% symmetric target
+    // (the us-pce-core-yoy posture: the central bank's published goal is
+    // the threshold). The series key is the NEW post-Feb-2026 HICP dataset
+    // (the old ICP flow died 2025-12 upstream; verified live 2026-10-25:
+    // 4D0 provider, history back-filled to the full decade).
+    id: 'euro-hicp',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'Euro-area inflation (yearly)',
+    source: 'ecb',
+    sourceRef:
+      'ECB Data Portal HICP/M.U2.N.000000.4D0.ANR (euro-area HICP all-items, annual rate of change, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'threshold', direction: 'above', value: 2 },
+    // Eurostat publishes the flash ~2d and the final ~2-3 weeks after
+    // month end; the obs (M-01) ages ~50d between releases — 60 covers it.
+    staleAfterDays: 60,
+  },
+  {
+    // M6 Wave 3 (OD-8/D-42, 2026-10-25): the wage leg of the wage-price
+    // loop — AU has one, the US didn't. CONTEXT (info): the inflation vote
+    // belongs to the CPI/PCE/HICP family; the wage card is the loop's
+    // second leg, read beside them.
+    id: 'us-wages',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'US wage growth (yearly)',
+    source: 'fred',
+    sourceRef: 'FRED:AHETPI (average hourly earnings, all employees → 12-month % change)',
+    cadence: 'monthly',
+    // A yearly RATE — its changes speak in percentage points.
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // M6 Wave 3 (OD-8/D-42, 2026-10-25): the 5-year spot breakeven — the
+    // missing middle leg between Michigan's 1y survey expectation and the
+    // 5y5y forward (which strips the near-term term). CONTEXT (info):
+    // T5YIFR's own card carries the market-expectations vote.
+    id: 't5yie',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'Expected US inflation, five years ahead',
+    source: 'fred',
+    sourceRef: 'FRED:T5YIE (5-Year Breakeven Inflation Rate, daily)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 5,
   },
   {
     id: 'breakeven-5y5y',
@@ -498,6 +580,26 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     rule: { kind: 'info' },
   },
   /* ---------------- Global — Are markets nervous? ---------------- */
+  {
+    // M6 Wave 3 (OD-8/D-42, 2026-10-25): the Fed's balance sheet — the
+    // liquidity driver of 2020–26 (QE→QT), pairs with m2-us as the money
+    // side of the story. CONTEXT (info): never a stress voter — the
+    // plumbing gauges (STLFSI/NFCI) carry that vote; this is the level
+    // the reader watches beside them.
+    id: 'walcl',
+    section: 'global',
+    group: 'market-stress',
+    name: 'The Fed’s balance sheet',
+    source: 'fred',
+    sourceRef: 'FRED:WALCL (Total Assets of the Federal Reserve, weekly, $ millions)',
+    cadence: 'weekly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The H.41 release publishes Thursday for the Wednesday as-of —
+    // one missed print reads ~10d of obs age; 21 covers two.
+    staleAfterDays: 21,
+  },
   {
     id: 'stress-stlfsi',
     section: 'global',
@@ -852,6 +954,81 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 75,
   },
   {
+    // M6 Wave 3 (OD-8/D-42, 2026-10-25): the consumption pulse (~68% of US
+    // GDP) — the real-economy link the transmission chain was missing
+    // (policy → rates → BORROWING → SPENDING). CONTEXT (info): the growth
+    // vote stays with the labor/leading family.
+    id: 'retail-sales',
+    section: 'global',
+    group: 'growth-health',
+    name: 'US retail sales (monthly)',
+    source: 'fred',
+    sourceRef: 'FRED:RSAFS (Advance Retail Sales: Retail Trade, monthly, $ millions)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // M6 Wave 3 (OD-8/D-42, 2026-10-25): building permits — the classic
+    // long-leading, most rate-sensitive sector; completes the
+    // rates→housing narrative beside mortgage-30y (the two ends of the
+    // same pipe). CONTEXT (info).
+    id: 'housing-permits',
+    section: 'global',
+    group: 'growth-health',
+    name: 'US building permits',
+    source: 'fred',
+    sourceRef: 'FRED:PERMIT (New Private Housing Units Authorized by Building Permits, monthly, thousands, seasonally adjusted annual rate)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // M6 Wave 3 (OD-8/D-42, 2026-10-25): the Chicago Fed's composite
+    // activity gauge — 85 monthly indicators in one weighted index (zero =
+    // trend growth); the free ISM substitute the review called for (the
+    // ISM paywall hold stands). CONTEXT (info): an index in points.
+    id: 'cfnai',
+    section: 'global',
+    group: 'growth-health',
+    name: 'US economic activity scorecard (Chicago Fed)',
+    source: 'fred',
+    sourceRef: 'FRED:CFNAI (Chicago Fed National Activity Index, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // CFNAI publishes month M's index ~4 weeks into M+1 — just before a
+    // release the freshest obs is ~85-90d old (venue-verified 2026-10-25:
+    // the Aug obs at 84d while Sept publishes ~Oct 28). 95 keeps the
+    // rhythm honest.
+    staleAfterDays: 95,
+  },
+  {
+    // M6 Wave 3 (OD-8/D-42, 2026-10-25): JOLTS job openings — openings roll
+    // over before unemployment rises (the Powell-era dashboard's leading
+    // edge, the ratio the Fed watched in 2021-22). CONTEXT (info).
+    id: 'job-openings',
+    section: 'global',
+    group: 'growth-health',
+    name: 'US job openings (JOLTS)',
+    source: 'fred',
+    sourceRef: 'FRED:JTSJOL (Job Openings: Total Nonfarm, monthly, thousands)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // JOLTS publishes mid-month for the month TWO PRIOR — the freshest
+    // obs is ~6-7 weeks old on release day and ages to ~105d just before
+    // the next print. 110 keeps the cadence honest (the ABS-215
+    // publication-cycle discipline, scaled to the JOLTS rhythm).
+    staleAfterDays: 110,
+  },
+  {
     id: 'copper-gold',
     section: 'global',
     group: 'growth-health',
@@ -921,17 +1098,27 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // (monthly, zero extra requests). Context card beside copper in the
     // growth lane (info rule — the copper/gold voter carries the metals
     // signal).
+    // M6 Wave 3 (OD-8/D-42, 2026-10-25) — the CADENCE FIX: platinum goes
+    // DAILY on gold-api XPT (verified live 2026-10-25: $1,558), the exact
+    // gold-usd pattern — the Pink Sheet monthly history stays as the
+    // percentile base, the live XPT spot rides the day's point, and the
+    // card moves beside the other metals in the PRICES LANE — the
+    // wti/natgas precedent (the four-tile Prices board itself is
+    // spec-fixed: PRICE_ROWS gold/silver/oil/bitcoin, so non-tile metals
+    // render as the prices lane's context rows, exactly where wti/natgas
+    // and copper render; gold-api row, one new subrequest, the SEED_ID
+    // appends ride the 04:25 phase).
     id: 'platinum',
     section: 'global',
-    group: 'growth-health',
-    name: 'Platinum price',
-    source: 'world-bank',
-    sourceRef: 'World Bank Pink Sheet (Platinum, $/troy oz)',
-    cadence: 'monthly',
+    group: 'prices-heat',
+    name: 'Platinum price (ounce)',
+    source: 'gold-api',
+    sourceRef: 'gold-api.com XPT spot (history: World Bank Pink Sheet platinum, monthly + daily accumulation)',
+    cadence: 'daily',
     changeKind: 'pct',
     phase: 'P2',
     rule: { kind: 'info' },
-    staleAfterDays: 60,
+    staleAfterDays: 2,
   },
   /* ------------- Global — Prices board (not a gauge) ------------- */
   {
@@ -1227,7 +1414,8 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     rule: { kind: 'below-aux' },
     // Spec said 130 (release-date aging); ABS WPI obs (Q-01) ages up to
     // ~197d between quarterly releases — 200 keeps it honest.
-    staleAfterDays: 200,
+    // M6 calibration fix (2026-10-25): ABS WPI: the Q2 obs (Apr 1) meets the Q3 release ~Nov 11 = 224d — 200 false-staled it on 2026-10-17 (the live stale card this fixes).
+    staleAfterDays: 230,
   },
   {
     id: 'au-rent-yoy',
@@ -1273,7 +1461,8 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // Step-1 audit item C10: home values trend upward — the 10-year
     // position is measured on year-on-year growth, not the index level.
     percentileBasis: 'yoy',
-    staleAfterDays: 215, // ABS quarter-start dating
+    // M6 calibration fix (2026-10-25): ABS RPPI: obs quarter-start to next release ~6 weeks after quarter end = ~219d — 215 left a false-stale week.
+    staleAfterDays: 225, // ABS quarter-start dating
   },
   {
     id: 'au-household-debt-arrears',
@@ -1290,6 +1479,73 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // (quarter dating + release lag) — the documented override that keeps
     // the 120-day quarterly default honest for the rest.
     staleAfterDays: 190,
+  },
+  {
+    // M6 Wave 3 (OD-8/D-42, 2026-10-25): the AU LEADING EDGE — new housing
+    // loan commitments lead home values and housing demand (the mortgage
+    // pipeline the review's AU-household journey was missing). SCORED on
+    // year-on-year growth (the au-home-values discipline — nominal levels
+    // trend, so the 10-year position measures the YoY, not the level).
+    // Series verified live 2026-10-25: ABS LEND_HOUSING went QUARTERLY in
+    // the SDMX API (the review's "monthly" assumption corrected at
+    // build time — 28 quarterly obs since 2019-09 in the published table,
+    // the SDMX series carries 2002-Q3 onward); SA, $ millions, all
+    // lenders, total dwellings. 2026-Q2 = AU$97.6bn.
+    id: 'au-housing-finance',
+    section: 'australia',
+    group: 'au-households',
+    name: 'New Australian home loans (quarterly)',
+    source: 'abs',
+    sourceRef:
+      'ABS LEND_HOUSING/FIN_VAL.NEWCOMMITS.DV8368.TOTDWELL.TOT.TOT.20.AUS.Q (new housing loan commitments, total dwellings, SA, $ millions)',
+    cadence: 'quarterly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'percentile', tail: 'high', cutoff: 0.2 },
+    // The level's changes speak in percent; the percentile measures YoY.
+    percentileBasis: 'yoy',
+    // ABS quarterly obs (Q-01) first appears ~5-6 weeks after quarter end
+    // and ages up to ~215d between releases — the au-home-values window.
+    // M6 calibration fix (2026-10-25): ABS LEND_HOUSING quarterly: obs-to-next-release ~220d — 215 left a false-stale week at the Q3 boundary.
+    staleAfterDays: 230,
+  },
+  {
+    // M6 Wave 3 (OD-8/D-42, 2026-10-25): the hunkering-down gauge — the
+    // household saving ratio, the same ANA_AGG national-accounts flow as
+    // terms-of-trade (M7 measure, HSR item, SA, quarterly). CONTEXT
+    // (info): the pulse beside the scored pipeline card. Verified live
+    // 2026-10-25: 6.5% @ 2026-Q2.
+    id: 'au-saving-ratio',
+    section: 'australia',
+    group: 'au-households',
+    name: 'The Australian household saving rate',
+    source: 'abs',
+    sourceRef: 'ABS ANA_AGG/M7.HSR.20.AUS.Q (household saving ratio, seasonally adjusted, % of disposable income)',
+    cadence: 'quarterly',
+    // A share of income — its changes speak in percentage points.
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // M6 calibration fix (2026-10-25): ABS ANA: the slowest quarterly cycle — Q2 obs (Apr 1) meets the Q3 release ~Dec 2 = 245d; 215 would false-stale the whole month of November.
+    staleAfterDays: 250,
+  },
+  {
+    // M6 Wave 3 (OD-8/D-42, 2026-10-25): leading labor for the AU jobs
+    // card — vacancies roll over before unemployment rises (the JOLTS
+    // logic, Australian edition). CONTEXT (info). Verified live
+    // 2026-10-25: 325.0k @ 2026-Q3, SA, all sectors, thousands.
+    id: 'au-job-vacancies',
+    section: 'australia',
+    group: 'au-households',
+    name: 'Australian job vacancies',
+    source: 'abs',
+    sourceRef: 'ABS JV/M1.7.TOT.20.AUS.Q (job vacancies, all sectors, seasonally adjusted, thousands)',
+    cadence: 'quarterly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // M6 calibration fix (2026-10-25): ABS JV: obs quarter-start to next release ~Feb = ~232d across the year-end quarter — 215 false-staled mid-February otherwise.
+    staleAfterDays: 240,
   },
   /* -------- Australia — How is trade and the currency? -------- */
   {

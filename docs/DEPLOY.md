@@ -83,6 +83,82 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Session record — 2026-10-25 Wave 3 + the Wave-4 probe fix (M6): the leading edge, the BoE's own Bank Rate, and the third recovery
+
+**Context.** A session deployed the Wave-3 bulk overnight (2026-10-25
+00:05–00:26 UTC, Worker versions 211 → 214: the code, the temporary
+00:15 publish rung that wrote the first 88-reading snapshot family, the
+revert) but was cut off before committing — the third sandbox reset to
+destroy an uncommitted tree. This session picked up with the live site
+already serving all twelve Wave-3 cards + platinum-daily and the git HEAD
+still at M5 (53898cc).
+
+**The recovery.** The 14 changed API files came back byte-exact from the
+deployed Worker's sourcemap (the 2026-10-23 fac13df precedent — `GET
+/workers/scripts/currena-api` returns the esbuild bundle + map with full
+`sourcesContent`). The web side was NOT in the bundle (static assets):
+the 12 cards' bilingual copy, the display configs and the four new unit
+tokens were extracted from the live SPA chunks (Insights-BrnmE1za.js +
+labels-BaU8Z0er.js — the minified dictionaries parsed back to typed
+source). Two latent defects surfaced and were fixed on recovery: the
+scoring.ts `percentileBasis` parameter type (`'level' | 'yoy'` — esbuild
+never typechecks, so the deployed Worker ran with a type error that only
+`tsc` catches) and three R14 code-like tickers (CFNAI, JOLTS — the
+deploying session never ran the web gates).
+
+**The Wave-4 probe fix (the BoE).** The probe afternoon: the Bank of
+England's Bank-Rate.asp page answers HTTP 200 from both probe venues
+with the complete decision table (258 rows back to 1975, latest 3.75
+since 18 Dec 2025) — so `boe-rate` left the FRED OECD monthly mirror
+(IRSTCI01GBM156N retired from the enum + bulk group) for the BoE's own
+page, under the **UK Open Government Licence v3.0** (the legal page,
+quoted 2026-10-25: the Database's data is "subject to the terms of the
+UK Open Government Licence, allowing and encouraging free and flexible
+data reuse"). New `boe.ts` adapter (the RBA cash-rate-page parse
+pattern), expanded to the F1-shaped daily step series over the decade
+window, `per-change` cadence (never stale by age, T-08-exempt), a
+policy-decisions row for the Dec-2025 cut, the register + licence rows
+(sources.ts, licences.ts, RISK_REGISTER.md, LICENCES.md). The other
+probes: EODHD au-10y — "not available for your subscription plan" (the
+honest no-go); BoJ — stat-search.boj.or.jp fails DNS from the work
+venue (the relabel stays the stopgap, carried to M7); NBS — readable
+and machine-parseable (the china-cpi follow-up, M7).
+
+**The quality fixes.** The AU quarterly staleness recalibration
+(au-wage-growth had false-staled live 2026-10-17: the WPI's
+obs-to-release gap is 224d, not 200; now wage 230 / home-values 225 /
+housing-finance 230 / saving-ratio 250 / vacancies 240, each documented
+with its cycle arithmetic). The weekend T-03/T-08 metals carve-out:
+gold-api serves weekend-dated spots that legitimately repeat Friday's
+close — four flags every weekend since the seeds began (10-18 and 10-25
+archives), zero real freezes; `gold-silver` left TRADING_DATE_IDS (its
+legs are gold-api spots) and `spanIncludesWeekend` gates the three T-08
+halves for the spot family (BTC deliberately absent — it trades
+weekends). The internal archive 2026-10-23 (missing since the D-43
+incident) reconstructed from its public twin — identity that day
+(0 hidden, 63 readings), schema-validated before the KV write.
+
+**Gates.** typecheck 6/6; core 191, scraper 67, insights 567 (559 + 8
+new boe/weekend tests), markets 13, api 344, web 680 + the recorded
+16-failure briefing jsdom baseline; lint 0 errors/15 advisories; copy
+audit clean (148 new fa strings processed to 2026-10-25-m6-wave3,
+manifest 2808 entries); registry regenerated (88 indicators, 0 hidden);
+T-15 public passed; budgets held (entry 295.28/88.80; Insights lazy
+841.84/203.99 vs the bumped 845/205 — the twelve-card bilingual corpus,
+the D-16 path).
+
+**Deploy.** `a4d6ef37` (version 215) uploaded 2026-10-25T03:37:48Z —
+33 minutes ahead of the 04:10 main rung, which then ran the recovered
+code as its first designed-rung verification (boe-rate's first BoE-
+sourced reading + the au-wage-growth staleness heal land in that rung's
+snapshot; the exact cpuTime rides the rung's observability).
+
+**Subrequest note (the accounting correction).** The 00:15 publish rung
+completed with 41 fetched rows + 6 KV writes — KV operations do not
+consume the fetch-subrequest budget on this account, so the working
+headroom is the fetch count alone (~42/50 after the BoE addition; the
+run.ts accounting comment now records this empirically).
+
 ## Session record — 2026-10-24b Wave 2 (M5): the euro long end's daily fix, the Pink Sheet unlock, the EM-pressure first member
 
 - **Deployed**: currena-api **`479e7835`** (final; the chain: the M5 code

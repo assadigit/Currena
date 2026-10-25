@@ -92,8 +92,11 @@ describe('fred adapter', () => {
     // GACDFSA066MSFRBPHI joined. The 2026-10-21 data-integrity round adds
     // WTI, natgas, the OECD bond trio, the BoJ/BoE overnight pair, PAYEMS
     // and the BEA GDP series → 30; the 2026-10-24 M4 Wave-1 round adds
-    // ICSA, SOFR, RECPROUSM156N, UMCSENT, MICH and PCEPILFE → 36.
-    expect(Object.values(FRED_SERIES)).toHaveLength(36);
+    // ICSA, SOFR, RECPROUSM156N, UMCSENT, MICH and PCEPILFE → 36; the
+    // 2026-10-25 M6 Wave-3 round adds MORTGAGE30US, WALCL, RSAFS, PERMIT,
+    // CFNAI, JTSJOL, T5YIE and AHETPI → 44, and the Wave-4 BoE fix
+    // RETIRES IRSTCI01GBM156N (boe-rate moved to the BoE's own page) → 43.
+    expect(Object.values(FRED_SERIES)).toHaveLength(43);
   });
 });
 

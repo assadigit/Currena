@@ -36,7 +36,7 @@ describe('the bundled indicator-audit sidecar', () => {
 });
 
 describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
-  it('is exactly the L2 sources that are public today (the 2026-10-21c licence round + the 2026-10-23 unhide + the 2026-10-24 M4 Wave-1 additions)', () => {
+  it('is exactly the L2 sources that are public today (the 2026-10-21c licence round + the 2026-10-23 unhide + the 2026-10-24 M4 Wave-1 + the 2026-10-25 M6 Wave-3 additions)', () => {
     // brent/gold-usd/silver-usd (Yahoo legs), btc-usd (gold-api), the
     // FRED citation-required set (display-permitted with "publisher via
     // FRED" attribution — FRED legal read 2026-10-21: STLFSI/NFCI/VIX/
@@ -45,8 +45,10 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
     // and the Wave-1 citation-required set (2026-10-24): SOFR (NY Fed),
     // the Michigan pair (U. Michigan) and the 10y breakeven (T10YIE,
     // citation-required since the 2026-10-21 scan — its card left
-    // validation-only status this round). Twenty-one L2-but-public ids per
-    // the audit sidecar today.
+    // validation-only status this round). Twenty-four L2-but-public ids per
+    // the audit sidecar today (M6 Wave 3: +cfnai, +mortgage-30y, +t5yie — the
+    // citation-required FRED additions; the BoE fix keeps boe-rate here but
+    // under the OGL-attribution licence).
     expect([...PUBLIC_BOUNDED_HISTORY_IDS].sort()).toEqual([
       'boe-rate',
       'boj-rate',
@@ -55,11 +57,13 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       'brent',
       'btc-usd',
       'bund-10y',
+      'cfnai',
       'gilt-10y',
       'gold-usd',
       'jgb-10y',
       'michigan-1y-expectations',
       'michigan-sentiment',
+      'mortgage-30y',
       'nfci',
       'philly-fed',
       'shiller-cape',
@@ -67,6 +71,7 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       'silver-usd',
       'sofr',
       'stress-stlfsi',
+      't5yie',
       'vix',
       'yield-curve-10y2y',
     ]);

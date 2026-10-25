@@ -591,6 +591,289 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou:
       'A standing illustration of why the inflation cards on this page matter: high inflation, over years, ends up written in the exchange rate.',
   },
+  // ---- M6 Wave 3 (2026-10-25): the leading-edge batch (recovered from the deployed bundle) ----
+  'mortgage-30y': {
+    name: 'The US 30-year home-loan rate',
+    ticker: '30-year fixed',
+    oneLiner:
+      'The average rate on a new 30-year fixed US mortgage: the borrowing cost that reaches straight into the household budget.',
+    lines: {
+      highRising:
+        'US mortgage rates are high for their decade and rising: each step prices more buyers out of the market.',
+      highEasing:
+        'US mortgage rates are high for their decade but easing: the first relief for housing demand.',
+      typical: 'The 30-year mortgage rate sits in its usual range for the decade.',
+      low:
+        'Mortgage rates are low for their decade: the cheap-money setting that reignited US housing booms.',
+    },
+    whatItIs:
+      'Freddie Mac’s weekly survey of the average 30-year fixed-rate mortgage (via FRED, published Thursdays): the reference rate quoted across the US housing market.',
+    whyItMatters:
+      'This is where monetary policy becomes a household bill: the policy rate moves the long end, the long end moves the mortgage, and the mortgage decides what a family can borrow. It is the transmission chain’s last stop before the real economy.',
+    tendedToMean:
+      'Each percentage point on this rate cuts roughly ten percent from what a buyer can borrow; the 2021-23 climb from under 3% to near 8% halved US affordability and froze existing owners in place.',
+    cantTell:
+      'It is a survey average of new loans only: actual offers vary by credit and region, and existing fixed loans from cheaper years are untouched by it.',
+    forYou:
+      'The US twin of the Australian home-loan card: together they show the two audiences’ single biggest borrowing cost moving with the same global long end.',
+  },
+  walcl: {
+    name: 'The Fed’s balance sheet',
+    ticker: 'Fed assets',
+    oneLiner:
+      'The total size of the Federal Reserve’s balance sheet: the money the central bank created to buy bonds, and is now letting run off.',
+    lines: {
+      highRising:
+        'The Fed’s balance sheet is expanding again: the emergency setting that floods the system with liquidity.',
+      highEasing:
+        'The balance sheet remains large but is shrinking: quantitative tightening, draining liquidity at a steady pace.',
+      typical: 'The balance sheet sits in its usual range for the decade.',
+      low:
+        'The balance sheet has fallen back toward its pre-pandemic trend: the tightening cycle largely done.',
+    },
+    whatItIs:
+      'Total assets on the Federal Reserve’s balance sheet (the H.41 weekly report via FRED): the cumulative result of every bond the Fed has bought and holds.',
+    whyItMatters:
+      'This is the liquidity side of money: the Fed sets the price of money with its policy rate, and the quantity with this balance sheet. The 2020-26 round of creation and then run-off drove asset prices, bank reserves and the plumbing beneath markets.',
+    tendedToMean:
+      'QE rounds lifted the balance sheet in steps from under $1tn to nearly $9tn; the tightening since 2022 has been the largest run-off in the Fed’s history, watched for the liquidity squeezes it can create.',
+    cantTell:
+      'Size alone says little about stance: a growing balance sheet can mean crisis response or routine operations, and the composition of what is held matters as much as the total.',
+    forYou:
+      'Read it beside m2-us: one is the central bank’s own creation of money, the other the banking system’s. Together they frame the money story the rates cards tell the price of.',
+  },
+  'retail-sales': {
+    name: 'US retail sales',
+    ticker: 'Retail',
+    oneLiner:
+      'What American shops sell each month: the consumption pulse that drives roughly two-thirds of the US economy.',
+    lines: {
+      highRising:
+        'US retail sales are strong for their decade and rising: consumption carrying the economy.',
+      highEasing: 'Retail sales remain strong for their decade but are levelling off.',
+      typical: 'US retail sales sit in their usual range for the decade.',
+      low:
+        'Retail sales are unusually weak: the consumption pullback that opens the door to recession talk.',
+    },
+    whatItIs:
+      'Advance retail sales for the US retail trade sector (the Census Bureau’s monthly survey via FRED): the dollar value of what stores sell.',
+    whyItMatters:
+      'The missing real-economy link of the transmission chain: policy tightens, borrowing costs rise, and this is where the answer eventually shows up. Consumption is about two-thirds of US GDP, so its pulse is the economy’s pulse.',
+    tendedToMean:
+      'Retail sales grow with prices and population most of the time; genuine declines are rare outside recessions, which is exactly why they are watched.',
+    cantTell:
+      'The nominal figure mixes volume and price: high inflation makes weak volumes look like growth, and the series is revised as the month’s data completes.',
+    forYou:
+      'The spending pulse behind the labor cards: jobs feed it, inflation eats it, and the gap between the two is the household story.',
+  },
+  'housing-permits': {
+    name: 'US building permits',
+    ticker: 'Permits',
+    oneLiner:
+      'How many new US homes were authorized this month: the long-leading indicator that turns first when rates move.',
+    lines: {
+      highRising: 'US homebuilding is expanding: builders reading demand and cheaper money ahead.',
+      highEasing: 'Homebuilding remains elevated for its decade but is cooling.',
+      typical: 'US building permits sit in their usual range for the decade.',
+      low:
+        'Permits are unusually weak: builders shelving projects, the classic early response to expensive money.',
+    },
+    whatItIs:
+      'New privately-owned housing units authorized by building permits (the Census Bureau via FRED), seasonally adjusted at an annual rate: the front of the housing pipeline.',
+    whyItMatters:
+      'Housing is the most rate-sensitive sector of the economy, and permits are its earliest signal: a builder files paperwork months before a home exists. Turning points here lead the wider economy by quarters.',
+    tendedToMean:
+      'Permits collapsed before each of the past US recessions and recovered with rate cuts; the 2022-23 mortgage spike cut them by roughly a third.',
+    cantTell:
+      'A permit is an intention, not a home: some are never built, and multi-unit projects can move the number in bursts.',
+    forYou:
+      'Read it beside the mortgage-rate card: one is the cost of the loan, the other the market’s answer to it.',
+  },
+  cfnai: {
+    name: 'US economic activity (Chicago Fed)',
+    // R14: 'CFNAI' is the source code — the readable publisher tag ships.
+    ticker: 'Chicago Fed',
+    oneLiner:
+      'One number for the whole US economy: 85 indicators blended into a single activity score.',
+    lines: {
+      highRising: 'US activity is running above trend and accelerating.',
+      highEasing: 'Activity is above trend but cooling.',
+      typical: 'US economic activity sits in its usual range for the decade.',
+      low:
+        'Activity is below trend: values this low have historically clustered around recessions.',
+    },
+    whatItIs:
+      'The Chicago Fed National Activity Index (via FRED): a weighted average of 85 monthly indicators of production, income, employment and sales. Zero is trend growth.',
+    whyItMatters:
+      'It is the free composite gauge the dashboard was missing: instead of reading jobs, spending and output separately, one index says whether the whole economy is above or below its trend, and by how much.',
+    tendedToMean:
+      'Sustained readings below -0.70 have accompanied every US recession of the past half-century; the index is built to be read as a level, month by month.',
+    cantTell:
+      'A weighted blend smooths the parts away: it cannot say which sector moved, and it is revised as its inputs are.',
+    forYou:
+      'The single-glance answer to the growth lane’s question: is the whole economy above or below its own trend line.',
+  },
+  'job-openings': {
+    name: 'US job openings',
+    // R14: 'JOLTS' is the survey's source code — the readable tag ships.
+    ticker: 'Open jobs',
+    oneLiner:
+      'How many unfilled jobs America has: the labor-market gauge that turned first in past cycles.',
+    lines: {
+      highRising:
+        'Employers are advertising more jobs than usual and hiring more: demand for labor still strong.',
+      highEasing: 'Openings remain elevated for their decade but are coming down.',
+      typical: 'US job openings sit in their usual range for the decade.',
+      low:
+        'Openings have fallen back: the labor market’s leading edge rolling over before unemployment rises.',
+    },
+    whatItIs:
+      'Total nonfarm job openings from the JOLTS survey (the BLS via FRED): positions employers are actively trying to fill.',
+    whyItMatters:
+      'This is the Powell-era dashboard’s leading edge: openings rolled over months before unemployment rose in past cycles, because cutting a posting is easier than cutting a person. The Fed watched this number closely.',
+    tendedToMean:
+      'Openings roughly halved from their 2022 record as the tightening bit, without unemployment rising much: the soft landing’s signature.',
+    cantTell:
+      'An opening is not a hire: postings can linger unfilled, and the survey lags the month by about six weeks.',
+    forYou:
+      'Read it beside the claims card: one counts employers pulling back, the other workers being let go. The two ends of the labor market turning.',
+  },
+  t5yie: {
+    name: 'Expected US inflation, five years ahead',
+    ticker: '5-year breakeven',
+    oneLiner:
+      'What markets expect US inflation to average over the next five years: the middle leg of the expectations ladder.',
+    lines: {
+      highRising: 'The market’s five-year inflation expectation is high for its decade and rising.',
+      highEasing: 'The five-year expectation is elevated for its decade but easing.',
+      typical: 'The five-year inflation expectation sits in its usual range for the decade.',
+      low: 'The five-year expectation is unusually low: markets pricing deflationary conditions.',
+    },
+    whatItIs:
+      'The five-year breakeven inflation rate (via FRED): the gap between ordinary and inflation-protected Treasury yields, which is what the bond market pays to hedge inflation over the next five years.',
+    whyItMatters:
+      'The middle rung of the expectations ladder: the Michigan card asks households, the 5y5y card asks the long run, and this one is the market’s medium-term view. The Fed watches it because expectations can become self-fulfilling.',
+    tendedToMean:
+      'Breakevens tracked the actual inflation surge of 2021-22 and settled back with it; sustained moves above their range preceded policy responses.',
+    cantTell:
+      'The breakeven mixes inflation expectations with compensation for risk and liquidity: it can move without anyone truly changing their forecast.',
+    forYou:
+      'The market’s own five-year answer to the question the Michigan card asks households: together they show whether belief in rising prices is shared.',
+  },
+  'us-wages': {
+    name: 'US wage growth',
+    ticker: 'Wages',
+    oneLiner: 'How fast American paychecks are growing: the wage leg of the wage-price loop.',
+    lines: {
+      highRising:
+        'US wages are growing faster than their decade norm and accelerating: the loop’s fuel.',
+      highEasing: 'Wage growth is elevated for its decade but easing.',
+      typical: 'US wage growth sits in its usual range for the decade.',
+      low: 'Wage growth is unusually weak: pay failing to keep up is the household squeeze.',
+    },
+    whatItIs:
+      'The 12-month change in average hourly earnings of all US employees (the BLS via FRED): the pace of American pay growth.',
+    whyItMatters:
+      'Wages are both a cost and an income: rising pay sustains spending but pressures prices, which is why central banks watch the loop. This was the number the Fed cited when calling inflation persistent.',
+    tendedToMean:
+      'Wage growth near 4% proved compatible with 2% inflation in the decade before the pandemic; the 2021-23 climb above 5% fed the inflation the Fed then fought.',
+    cantTell:
+      'Average pay mixes who is working with what they earn: a shrinking workforce can lift the average while nobody gets a raise, and composition shifts distort it.',
+    forYou:
+      'Read it beside the inflation cards: when pay grows faster than prices, households gain ground; when it lags, the squeeze is on.',
+  },
+  'euro-hicp': {
+    name: 'Euro-area inflation (yearly)',
+    ticker: 'HICP',
+    oneLiner:
+      'How fast prices are rising across the euro area: the ECB’s own inflation gauge against its 2% target.',
+    lines: {
+      highRising: 'Euro-area inflation is above the ECB’s target and rising.',
+      highEasing: 'Inflation is above target but easing toward it.',
+      typical: 'Euro-area inflation sits in its usual range for the decade.',
+      low:
+        'Euro-area inflation is unusually low: the deflationary stretch that once forced the ECB into negative rates.',
+    },
+    whatItIs:
+      'The euro-area Harmonised Index of Consumer Prices, annual rate (Eurostat via the ECB Data Portal): the comparable inflation measure across all euro-area countries.',
+    whyItMatters:
+      'The euro area finally has its inflation card: until now the region showed only a policy rate responding to a number the reader could not see. This is that number, scored against the ECB’s own published 2% target.',
+    tendedToMean:
+      'The euro area spent the 2010s below target, overshoot to above 10% in 2022-23, and ground back down as the ECB hiked; the target line is the anchor for all of it.',
+    cantTell:
+      'A weighted average of twenty countries: national experiences differ widely around it, and the harmonised method differs from any single country’s CPI.',
+    forYou:
+      'The missing half of the euro story on this page: the policy-rate card shows the ECB’s response, this shows what it is responding to.',
+  },
+  'au-housing-finance': {
+    name: 'New Australian home loans',
+    ticker: 'Housing finance',
+    oneLiner:
+      'How much Australians are borrowing for homes: the mortgage pipeline that leads the housing market.',
+    lines: {
+      highRising:
+        'New home lending is strong for its decade and rising: households committing, demand ahead.',
+      highEasing: 'New lending is strong for its decade but cooling.',
+      typical: 'New home lending sits in its usual range for the decade.',
+      low:
+        'New lending is unusually weak: households stepping back, the leading edge of a housing slowdown.',
+    },
+    whatItIs:
+      'The value of new housing loan commitments across Australia (the ABS lending indicators, quarterly, seasonally adjusted): all lenders, owner-occupier and investor together.',
+    whyItMatters:
+      'This is the AU leading edge: a loan commitment is signed months before it shows in home values, so it turns first. It is also a direct confidence reading: borrowing to buy a home is the biggest financial commitment a household makes.',
+    tendedToMean:
+      'Lending collapsed with each rate-hike cycle and recovered with each cut; the 2022-23 tightening cut new commitments by roughly a third before values followed.',
+    cantTell:
+      'A commitment is not a settled loan, and the total mixes investors with owner-occupiers: the investor share can swing for tax settings rather than the economy.',
+    forYou:
+      'The pipeline card beside home values: when lending turns, values follow. Read the pair and you are reading the Australian housing cycle in order.',
+  },
+  'au-saving-ratio': {
+    name: 'The Australian household saving rate',
+    ticker: 'Saving rate',
+    oneLiner: 'The share of income Australian households save: the hunkering-down gauge.',
+    lines: {
+      highRising:
+        'Australian households are saving unusually much and cutting back further: caution in force.',
+      highEasing:
+        'The saving rate is high for its decade but households are easing back into spending.',
+      typical: 'The household saving rate sits in its usual range for the decade.',
+      low: 'Saving is unusually thin: households stretched, or confident enough to spend it all.',
+    },
+    whatItIs:
+      'The ratio of household net saving to disposable income (the ABS national accounts, quarterly, seasonally adjusted): what remains after consumption.',
+    whyItMatters:
+      'The hunkering-down gauge: when uncertainty rises, households save more and spending falls before any income does. The pandemic’s forced saving and its slow release shaped the whole 2020s Australian consumer story.',
+    tendedToMean:
+      'The ratio spiked to unprecedented levels in 2020, then drained for three years as buffers funded spending; unusually low readings preceded past consumption slowdowns.',
+    cantTell:
+      'An aggregate ratio says nothing about distribution: the average household may be saving well while the bottom half saves nothing.',
+    forYou:
+      'The confidence gauge of the AU households lane: read it beside the lending card to see whether caution is rising or fading.',
+  },
+  'au-job-vacancies': {
+    name: 'Australian job vacancies',
+    ticker: 'Vacancies',
+    oneLiner:
+      'How many jobs Australian employers are trying to fill: the leading edge of the labor market.',
+    lines: {
+      highRising: 'Australian employers are advertising more jobs than usual and hiring more.',
+      highEasing: 'Vacancies remain elevated for their decade but are coming down.',
+      typical: 'Australian job vacancies sit in their usual range for the decade.',
+      low: 'Vacancies have fallen sharply: employers pulling back before unemployment rises.',
+    },
+    whatItIs:
+      'Total job vacancies across Australia (the ABS survey, quarterly, seasonally adjusted): positions employers are actively seeking to fill.',
+    whyItMatters:
+      'The JOLTS logic, Australian edition: vacancies roll over before unemployment rises, because a posting costs nothing to cut while a person costs everything. This is the labor market’s early-warning line for the AU audience.',
+    tendedToMean:
+      'Vacancies hit a record in 2022 and have fallen steadily since, while unemployment barely moved: the same soft-landing pattern the US card shows.',
+    cantTell:
+      'A vacancy is not a hire: postings linger, and skill mismatches can leave jobs unfilled beside unemployed workers.',
+    forYou:
+      'Read it beside the AU unemployment card: one leads, one lags. Both together tell you where the cycle is.',
+  },
   'china-pmi': {
     name: 'Chinese factory activity',
     oneLiner:
@@ -1429,11 +1712,13 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       jumping: 'Platinum has jumped unusually fast: often supply news from South Africa; wait before reading a trend.',
     },
     unitNote: 'US dollars per troy ounce',
-    whatItIs: 'The price of platinum per troy ounce: monthly World Bank pink-sheet prices carrying the decade of history.',
+    whatItIs:
+      'The price of platinum per troy ounce: the live gold-api spot, moving daily, with the World Bank pink-sheet monthly prices carrying the decade of history.',
     whyItMatters: 'Platinum is half precious metal, half industrial input: catalytic converters, jewellery and hydrogen equipment all pull on the same price.',
     tendedToMean: 'It spent the years after 2008 well below gold; its big runs (the 2000s, 2025–26) came with supply squeezes or demand booms.',
     cantTell: 'Rarer than gold but far more industrial: its price follows factories as much as fear, and forecasts for it are famously poor.',
-    forYou: 'Gold’s industrial sibling: the third pillar of the precious-metals board and an ingredient in catalytic converters.',
+    forYou:
+      'Gold’s industrial sibling: the third pillar of the precious-metals board and an ingredient in catalytic converters — now priced like the other metals, every day.',
   },
   // ---- M5 Wave 2 (2026-10-24): the household-cost staples (the Pink Sheet unlock) ----
   'food-index': {
@@ -1568,14 +1853,14 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   'boe-rate': {
     name: 'The UK central bank’s policy rate',
     ticker: 'BoE',
-    oneLiner: 'The Bank of England’s policy rate: the base of UK borrowing costs — a monthly average, lagged.',
+    oneLiner: 'The Bank of England’s policy rate: the base of UK borrowing costs — current at every decision.',
     lines: {
       highRising: 'UK policy is tight and tightening: borrowing, jobs and prices usually cool with a lag.',
       highEasing: 'UK policy is tight but easing: the first stage of relief for borrowers, when it lasts.',
       typical: 'The Bank of England’s rate sits in its usual range for the decade.',
       low: 'UK policy is loose by recent standards: usually supportive for borrowing and asset prices.',
     },
-    whatItIs: 'The Bank of England’s policy rate, measured as the average overnight rate over the latest full month (FRED IRSTCI01GBM156N) — a monthly average, lagged: it can trail an intra-month policy change.',
+    whatItIs: 'The Bank of England’s official Bank Rate, straight from the central bank’s own rate history (daily, stepping at each decision): no averaging, no lag — it moves the day the Bank decides.',
     whyItMatters: 'It anchors UK mortgages, savings and business borrowing, and it moves the pound: one of the world’s oldest policy dials.',
     tendedToMean: 'The bank cut to 0.1% in 2020, its lowest since 1694, then lifted rates to multi-decade highs by 2023.',
     cantTell: 'Like every policy rate it works with long, uneven lags, and the setting says nothing about the next decision.',
@@ -3284,6 +3569,14 @@ export const insightsCopyEn = {
     claims: 'claims',
     // M5 Wave 2 (2026-10-24): the Turkish lira sign (EN prefix).
     try: '₺',
+    // M6 Wave 3 (2026-10-25): the leading-edge batch — the AU
+    // billions ("A$97.6bn" EN, suffix in fa), permits and
+    // openings scaled to millions ("1.40m permits a year"),
+    // vacancies in thousands ("325k vacancies" — 0 decimals).
+    'aud-bn': 'bn',
+    permits: 'm permits a year',
+    openings: 'm job openings',
+    vacancies: 'k vacancies',
   },
 
   rule: {

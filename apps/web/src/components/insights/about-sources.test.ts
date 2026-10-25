@@ -51,10 +51,10 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
     expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
   });
 
-  it('fred: 32 series, worst level L2 across its L0/L2 mix, deduped licences', () => {
+  it('fred: 39 series, worst level L2 across its L0/L2 mix, deduped licences (2026-10-25 M6: +8 Wave-3 series, -boe-rate to the BoE row)', () => {
     const fred = rows.find((r) => r.provider === 'fred');
     expect(fred).toBeDefined();
-    expect(fred!.seriesCount).toBe(32);
+    expect(fred!.seriesCount).toBe(39);
     expect(fred!.levels).toEqual(['L0', 'L2']);
     expect(fred!.worstLevel).toBe('L2');
     // 3 distinct licence names across the 16 series (public-domain,

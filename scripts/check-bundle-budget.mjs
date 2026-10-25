@@ -588,7 +588,18 @@ const BUDGETS = [
   // Measured 797.18 kB raw / 192.61 kB gz (+16.70 raw / +4.15 gz over the
   // M4 tree). The entry chunk is untouched at 295.28/88.80. Justified in
   // CHANGELOG §2026-10-24 (M5 Wave 2).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 800_000, gz: 194_000, label: 'Insights lazy chunk' },
+  // 2026-10-25c M6 WAVE 3 (800.00 → 845.00 raw, 194.00 → 205.00 gz): TWELVE
+  // new cards — the largest single-wave copy addition (the leading-edge
+  // batch: mortgage-30y, walcl, retail-sales, housing-permits, cfnai,
+  // job-openings, t5yie, us-wages, euro-hicp, au-housing-finance,
+  // au-saving-ratio, au-job-vacancies) — each a full nine-field bilingual
+  // entry, plus four new unit tokens (aud-bn, permits, openings,
+  // vacancies), the boe-rate own-source relabel and the platinum
+  // daily-cadence note. Measured 841.84 kB raw / 203.99 kB gz (+44.66 raw /
+  // +11.38 gz over the M5 tree — twelve cards of bilingual content). The
+  // entry chunk is untouched at 295.28/88.80. Justified in CHANGELOG
+  // §2026-10-25 (M6 Wave 3, the D-16 path).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 845_000, gz: 205_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

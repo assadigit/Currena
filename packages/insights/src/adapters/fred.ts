@@ -160,7 +160,9 @@ export const FRED_SERIES = {
   jgb10y: 'IRLTLT01JPM156N', // jgb-10y: Japan 10Y govt yield, monthly OECD
   gilt10y: 'IRLTLT01GBM156N', // gilt-10y: UK 10Y govt yield, monthly OECD
   bojCallRate: 'IRSTCI01JPM156N', // boj-rate: Japan overnight call rate avg, monthly OECD (≈ policy)
-  boeCallRate: 'IRSTCI01GBM156N', // boe-rate: UK overnight rate avg, monthly OECD (≈ Bank Rate)
+  // boe-rate left this mirror 2026-10-25 (M6 Wave-4 probe fix): the BoE's
+  // own Bank Rate history page serves the current rate at every decision —
+  // IRSTCI01GBM156N retired from the enum and its bulk group.
   // ---- M4 Wave 1 — the early-warning pack (OD-8/D-42, 2026-10-24; each
   // live-verified on FRED the same day, licence classes T-16-scanned) ----
   initialClaims: 'ICSA', // initial-jobless-claims: weekly claims level (public domain)
@@ -169,6 +171,17 @@ export const FRED_SERIES = {
   michiganSentiment: 'UMCSENT', // michigan-sentiment: U. Michigan consumer sentiment (citation-required)
   michigan1yInflation: 'MICH', // michigan-1y-expectations: median expected 1y price change (citation-required)
   pceCoreIndex: 'PCEPILFE', // us-pce-core-yoy: core PCE price index → 12-month % change (public domain)
+  // ---- M6 Wave 3 — the leading-edge batch (OD-8/D-42, 2026-10-25; each
+  // live-verified on FRED the same day + T-16-scanned, see
+  // data/fred-copyright.json) ----
+  mortgage30y: 'MORTGAGE30US', // mortgage-30y: 30y fixed mortgage average, weekly (citation-required — Freddie Mac)
+  walcl: 'WALCL', // walcl: Fed total assets, weekly $m (public domain)
+  retailSales: 'RSAFS', // retail-sales: advance retail sales, monthly $m (public domain)
+  housingPermits: 'PERMIT', // housing-permits: new units authorized, monthly k SAAR (public domain)
+  cfnai: 'CFNAI', // cfnai: Chicago Fed National Activity Index, monthly (citation-required)
+  jobOpenings: 'JTSJOL', // job-openings: JOLTS total nonfarm, monthly k (public domain)
+  t5yie: 'T5YIE', // t5yie: 5-year breakeven inflation, daily (citation-required)
+  averageHourlyEarnings: 'AHETPI', // us-wages: avg hourly earnings → 12-month % change (public domain)
   // NOTE (M3/D-44, 2026-10-24): the ICE BofA credit-spread series
   // (BAMLH0A0HYM2 / BAMLC0A0CM) are deliberately ABSENT: the T-16 scan
   // found FRED's "copyright-pre-approval" tag on them — the publisher's
@@ -198,8 +211,15 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
     seriesIds: [FRED_SERIES.us10y, FRED_SERIES.us30y, FRED_SERIES.realYield10y],
     window: 'full',
   },
-  // Daily rates/stress, decade window (8 series — M4 adds SOFR beside the
-  // yield family it belongs to; all-daily so the request stays one wide CSV).
+  // Daily rates/stress, decade window (9 series — M6 adds the 5-year
+  // breakeven beside the 5y5y forward it belongs to; all-daily set).
+  // NOTE (M6, probed 2026-10-25): fredgraph answers 9+ ids as a ZIP
+  // organized by sub-cadence (daily / weekly,_ending_friday / daily,_close)
+  // — parseFredMultiCsvLoose serves every member shape. The 15-id probe
+  // showed the request TRUNCATES past ~12 ids (the last 3 silently
+  // absent) — the groups below stay at 12 or fewer, and
+  // fetchFredSeriesBulk still fails loudly if any requested id comes back
+  // absent, so a future cap change can never read as "no data".
   {
     seriesIds: [
       FRED_SERIES.yieldCurve10y2y,
@@ -210,10 +230,13 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
       FRED_SERIES.vix,
       FRED_SERIES.nfci,
       FRED_SERIES.sofr,
+      FRED_SERIES.t5yie,
     ],
     window: 'decade',
   },
-  // Monthly US macro, decade window (10 series).
+  // Monthly US macro, decade window (12 series — M6 adds retail sales
+  // and building permits beside the labor/CPI family they ride with;
+  // the fed-target pair answers from its own daily,_7-day zip member).
   {
     seriesIds: [
       FRED_SERIES.m2Us,
@@ -226,6 +249,8 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
       FRED_SERIES.phillyFed,
       FRED_SERIES.payrolls,
       FRED_SERIES.usGdpGrowth,
+      FRED_SERIES.retailSales,
+      FRED_SERIES.housingPermits,
     ],
     window: 'decade',
   },
@@ -240,27 +265,34 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
     ],
     window: 'decade',
   },
-  // OECD international yields/rates (5 series, all citation-required → the
+  // OECD international yields/rates (4 series, all citation-required → the
   // sovereign-yield cards they feed are private-only by the licence walk).
   // NOTE: au-10y deliberately stays RBA-F2-sourced (public, held stale with
   // an honest flag during the Akamai outage) — an OECD AU fallback would
   // flip the card's licence level and remove it from the public site.
+  // NOTE (M6 probes, 2026-10-25): boe-rate LEFT this group — the BoE's own
+  // Bank Rate page serves the current rate at every decision (the Wave-4
+  // probe fix). china-cpi rides NO group — BOTH OECD mirrors
+  // (CHNCPIALLMINMEI / CPALTT01CHM659N) died upstream at 2025-04; the NBS
+  // automation carries the follow-up (M7).
   {
     seriesIds: [
       FRED_SERIES.bund10y,
       FRED_SERIES.jgb10y,
       FRED_SERIES.gilt10y,
       FRED_SERIES.bojCallRate,
-      FRED_SERIES.boeCallRate,
     ],
     window: 'decade',
   },
-  // M4 Wave 1 (2026-10-24) — the early-warning pack's monthly/weekly leg:
-  // claims, recession probability, Michigan (sentiment + 1y expectations)
-  // and the core PCE index, in ONE coherent group so a failing request
-  // degrades the pack together (mixed weekly/monthly frequencies answer as
-  // the ZIP path — parseFredMultiCsvLoose; venue-verified 2026-10-24:
-  // weekly,_ending_saturday.csv + monthly.csv members, every id served).
+  // M4 Wave 1 (2026-10-24) + M6 Wave 3 (2026-10-25) — the early-warning
+  // pack's weekly/monthly leg, now ALSO the mortgage/balance-sheet/wage/
+  // activity family: claims, recession probability, Michigan (sentiment +
+  // 1y), core PCE, the 30y mortgage, the Fed's balance sheet, CFNAI, JOLTS
+  // and average hourly earnings — ONE coherent mixed-frequency group so a
+  // failing request degrades the pack together (the ZIP path serves four
+  // members: weekly,_ending_saturday + weekly,_ending_thursday +
+  // weekly,_as_of_wednesday + monthly; venue-verified 2026-10-25, every
+  // id served).
   {
     seriesIds: [
       FRED_SERIES.initialClaims,
@@ -268,6 +300,11 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
       FRED_SERIES.michiganSentiment,
       FRED_SERIES.michigan1yInflation,
       FRED_SERIES.pceCoreIndex,
+      FRED_SERIES.mortgage30y,
+      FRED_SERIES.walcl,
+      FRED_SERIES.cfnai,
+      FRED_SERIES.jobOpenings,
+      FRED_SERIES.averageHourlyEarnings,
     ],
     window: 'decade',
   },

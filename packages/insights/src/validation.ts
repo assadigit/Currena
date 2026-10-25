@@ -252,7 +252,11 @@ const TRADING_DATE_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'us10y',
   'breakeven-5y5y',
   'vix',
-  'gold-silver',
+  // 'gold-silver' left this set 2026-10-25 (the M6 weekend-noise fix): the
+  // ratio's legs are gold-api spots, which serve weekend-dated rows — its
+  // asOf legitimately falls on a Saturday/Sunday (every weekend since the
+  // seeds began). The Frankfurter legs and FRED dailies around it are
+  // business-day dated and stay guarded.
   'dollar-basket',
   'usdjpy',
   'eur-usd',
@@ -506,6 +510,42 @@ const UNCHANGED_NORMAL_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'au-deposit-rate',
 ]);
 
+/**
+ * M6 weekend-noise fix (2026-10-25): the gold-api spot family serves a
+ * quoted price for EVERY calendar day — weekends included — and the
+ * metals markets are closed Sat/Sun, so a weekend print legitimately
+ * repeats the last weekday's spot to full precision. That repeat tripped
+ * T-08 (a)/(b)/(c) every weekend since the seeds began (live evidence:
+ * the 2026-10-18 and 2026-10-25 archives — four flags, zero real freezes)
+ * while the WEEKDAY checks still guard the frozen-cache class. A span
+ * that includes a Saturday or Sunday is the market being closed, not a
+ * failed fetch. (BTC is deliberately absent: it trades weekends, so its
+ * weekend prints genuinely must differ.)
+ */
+const WEEKEND_MARKET_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
+  'gold-usd',
+  'silver-usd',
+  'copper-usd',
+  'platinum',
+  'gold-silver',
+  'gold-aud',
+  'gold-btc',
+]);
+
+/** True when ANY day in the INCLUSIVE span [from, to] is a Saturday or
+ * Sunday (inclusive both ends: a Sunday→Monday repeat is still the
+ * weekend quote carrying forward into Monday's early session). */
+function spanIncludesWeekend(from: string, to: string): boolean {
+  const start = Date.parse(`${from}T00:00:00Z`);
+  const end = Date.parse(`${to}T00:00:00Z`);
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return false;
+  for (let t = start; t <= end; t += 86_400_000) {
+    const dow = new Date(t).getUTCDay();
+    if (dow === 0 || dow === 6) return true;
+  }
+  return false;
+}
+
 function t08SuspiciousValues(inputs: ValidationInputs): ValidationTestResult {
   const failures: string[] = [];
   const flagged: IndicatorId[] = [];
@@ -526,7 +566,9 @@ function t08SuspiciousValues(inputs: ValidationInputs): ValidationTestResult {
     // plausible market close, not a frozen cache).
     if (idx > 0 && !(def.cadence === 'daily' && decimalsOf(current.value) <= 2)) {
       const prev = series[idx - 1]!;
-      if (prev.value === current.value) {
+      const weekendClosed =
+        WEEKEND_MARKET_IDS.has(def.id) && spanIncludesWeekend(prev.date, current.date);
+      if (!weekendClosed && prev.value === current.value) {
         failures.push(
           `${def.id}: ${def.cadence} series repeated ${current.value} on ${current.date} (previous print ${prev.date}) — possible duplicate or failed fetch`,
         );
@@ -541,7 +583,10 @@ function t08SuspiciousValues(inputs: ValidationInputs): ValidationTestResult {
       else break;
     }
     const effectiveRun = def.cadence === 'daily' ? dailyUnchangedTolerance(current.value) : maxRun;
-    if (run - 1 > effectiveRun) {
+    const runStartDate = series[series.length - run]!.date;
+    const runSpansWeekend =
+      WEEKEND_MARKET_IDS.has(def.id) && spanIncludesWeekend(runStartDate, current.date);
+    if (!runSpansWeekend && run - 1 > effectiveRun) {
       failures.push(`${def.id}: last ${run} observations unchanged (cadence tolerates ${maxRun})`);
       flagged.push(def.id);
       continue;
@@ -557,7 +602,8 @@ function t08SuspiciousValues(inputs: ValidationInputs): ValidationTestResult {
       prevReading.asOf !== null &&
       decimalsOf(current.value) >= 3 && // v3: 2dp quotes repeat legitimately; high precision does not
       current.value.toFixed(6) === prevReading.value.toFixed(6) &&
-      prevReading.asOf < current.date
+      prevReading.asOf < current.date &&
+      !(WEEKEND_MARKET_IDS.has(def.id) && spanIncludesWeekend(prevReading.asOf, current.date))
     ) {
       failures.push(
         `${def.id}: daily value identical to 6 decimals across days (${current.value} on ${current.date}, previous snapshot ${prevReading.asOf}) — frozen value shown as fresh`,
@@ -677,6 +723,15 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // M5 Wave 2 (2026-10-24): the euro-area AAA 10-year yield — a rate-family
   // series in percentage points.
   'euro-aaa-10y',
+  // M6 Wave 3 (2026-10-25): the leading-edge batch's rate/inflation
+  // family — the mortgage rate, the 5y breakeven, the wage and HICP
+  // yearly rates, and the saving-ratio share all speak in percentage
+  // points.
+  'mortgage-30y',
+  't5yie',
+  'us-wages',
+  'euro-hicp',
+  'au-saving-ratio',
 ]);
 
 /** Index/ratio series that speak in points but are not interest rates. */
@@ -691,6 +746,9 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // M4 Wave 1 (2026-10-24): the Michigan sentiment index — a survey index
   // in points, like china-pmi (its changes are index points).
   'michigan-sentiment',
+  // M6 Wave 3 (2026-10-25): the Chicago Fed composite — a weighted
+  // activity index in points (zero = trend growth), like china-pmi.
+  'cfnai',
   'copper-gold',
   'terms-of-trade',
   'vix',

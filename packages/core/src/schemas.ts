@@ -385,7 +385,25 @@ export const IndicatorIdSchema = z.enum([
   'wheat', // Pink Sheet Monthly Prices, Wheat US SRW ($/mt) — context, prices-heat
   'maize', // Pink Sheet Monthly Prices, Maize ($/mt) — context, prices-heat
   'usdtry', // Frankfurter USD→TRY (daily) — context, dollar-strength (the EM-pressure first member)
-  // Global — Prices board companions (context rows rendered in lanes)
+  // ---- M6 Wave 3 (OD-8/D-42, 2026-10-25): the leading-edge batch ----
+  // All series live-verified 2026-10-25 + T-16 licence classes scanned the
+  // same day (data/fred-copyright.json). ig-oas inherits the D-44 no-go.
+  // china-cpi does NOT ship: BOTH FRED OECD mirrors (CHNCPIALLMINMEI,
+  // CPALTT01CHM659N) died at 2025-04 upstream — the NBS automation probe
+  // succeeded and carries the follow-up (M7).
+  'mortgage-30y', // FRED MORTGAGE30US (weekly) — context, borrowing-costs
+  'walcl', // FRED WALCL (weekly) — context, market-stress
+  'retail-sales', // FRED RSAFS (monthly) — context, growth-health
+  'housing-permits', // FRED PERMIT (monthly SAAR) — context, growth-health
+  'cfnai', // FRED CFNAI (monthly index) — context, growth-health
+  'job-openings', // FRED JTSJOL (monthly) — context, growth-health
+  't5yie', // FRED T5YIE (daily) — context, prices-heat
+  'us-wages', // FRED AHETPI (monthly → 12-month % change) — context, prices-heat
+  'euro-hicp', // ECB HICP/M.U2.N.000000.4D0.ANR (monthly, key verified 2026-10-25) — SCORED, prices-heat
+  'au-housing-finance', // ABS LEND_HOUSING quarterly — SCORED, au-households
+  'au-saving-ratio', // ABS ANA_AGG M7.HSR.20.AUS.Q (quarterly) — context, au-households
+  'au-job-vacancies', // ABS JV/M1.7.TOT.20.AUS.Q (quarterly) — context, au-households
+  // Global — Prices lane companions (context rows rendered in lanes)
   'wti', // FRED DCOILWTICO (WTI spot, USD/barrel)
   'natgas', // FRED DHHNGSP (Henry Hub spot, USD/MMBtu)
   // Global — market-stress lane context row (crypto price beside FNG):
@@ -489,6 +507,9 @@ export const IndicatorSourceSchema = z.enum([
   'ecb', 'alternative-me',
   // Step 3 L1-14 / FS-06 (v3): the Shiller dataset (converted bulk file).
   'shiller',
+  // M6 Wave-4 probe fix (2026-10-25): the Bank of England's own Bank Rate
+  // history page — the boe-rate card left the FRED OECD monthly mirror.
+  'boe',
   // 2026-10-21 data-integrity round: EODHD crypto (eth-usd) — RETIRED with
   // the card (2026-10-21c owner round); the insights ingest no longer calls
   // EODHD. The id stays OUT of the enum; the markets worker's EODHD usage

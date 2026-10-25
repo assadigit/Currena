@@ -145,6 +145,20 @@ const ECB: SourceLicence = {
   termsUrl: 'https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html',
 };
 
+const BOE: SourceLicence = {
+  provider: 'boe',
+  label: 'Bank of England (Bank Rate history)',
+  licenceName: 'UK Open Government Licence v3.0 (free reuse, attributed)',
+  attributionText: 'Source: Bank of England',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-25',
+  termsEvidence:
+    "Bank of England legal page read 2026-10-25 (bankofengland.co.uk/legal): the Database's data is 'subject to the terms of the UK Open Government Licence, allowing and encouraging free and flexible data reuse' — Bank Rate is the Bank's own series (only selected third-party-licensed exchange-rate series are excluded). The M6 Wave-4 probe fix rides D-42's OD-8 approval.",
+  termsUrl: 'https://www.bankofengland.co.uk/legal',
+};
+
 const MANUAL: SourceLicence = {
   provider: 'manual',
   label: 'Manual entries (China NBS and others)',
@@ -279,6 +293,7 @@ export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   'world-bank': WORLD_BANK,
   frankfurter: FRANKFURTER,
   ecb: ECB,
+  boe: BOE,
   manual: MANUAL,
   eodhd: EODHD,
   bitstamp: BITSTAMP,

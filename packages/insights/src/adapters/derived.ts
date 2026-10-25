@@ -33,6 +33,7 @@
 
 import type { IndicatorId } from '@currena/core';
 import { combineSeries, yoyPctSeries, addDays, type SeriesPoint } from '../series';
+import { boeBankRateDailySeries } from './boe';
 import { BASKET_CURRENCIES, computeBasketValue } from '../basket';
 import { PERCENTILE_WINDOW_DAYS } from '../scoring';
 import type { SpotPrice } from './types';
@@ -54,8 +55,12 @@ export interface SeriesInputs {
    * absent/failed fetch simply leaves the FRED series as-is.
    */
   brentYahoo?: SeriesPoint[];
-  /** ECB Data Portal series (I15; M5 Wave 2 adds the AAA 10y). */
-  ecb?: { dfr?: SeriesPoint[]; aaa10y?: SeriesPoint[] };
+  /** ECB Data Portal series (I15; M5 Wave 2 adds the AAA 10y; M6 Wave 3
+   * 2026-10-25 adds the HICP annual rate — the new post-Feb-2026 dataset). */
+  ecb?: { dfr?: SeriesPoint[]; aaa10y?: SeriesPoint[]; hicp?: SeriesPoint[] };
+  /** Bank of England Bank Rate decisions (M6 Wave-4 probe fix,
+   * 2026-10-25 — the full decision-table history from the BoE's own page). */
+  boe?: { bankRateDecisions?: SeriesPoint[] };
   /** Frankfurter USD→currency series (USD quote side, USD base). */
   fx: {
     JPY?: SeriesPoint[];
@@ -82,6 +87,9 @@ export interface SeriesInputs {
   btcSpot?: SpotPrice;
   /** gold-api.com copper spot (USD per pound — converted to USD/mt). */
   hgSpot?: SpotPrice;
+  /** gold-api.com platinum spot (USD per troy ounce — M6 Wave 3 2026-10-25:
+   *  the platinum card's daily cadence fix, the gold-usd pattern). */
+  xptSpot?: SpotPrice;
   /** ABS series outputs. */
   abs?: {
     cpiIndex?: SeriesPoint[];
@@ -92,6 +100,15 @@ export interface SeriesInputs {
     rentIndex?: SeriesPoint[];
     automotiveFuelIndex?: SeriesPoint[];
     wageIndex?: SeriesPoint[];
+    /** M6 Wave 3 (2026-10-25): new housing loan commitments, total
+     * dwellings, SA, quarterly $ millions (LEND_HOUSING). */
+    housingFinance?: SeriesPoint[];
+    /** M6 Wave 3 (2026-10-25): household saving ratio, SA, quarterly %
+     * (ANA_AGG M7.HSR). */
+    savingRatio?: SeriesPoint[];
+    /** M6 Wave 3 (2026-10-25): job vacancies, all sectors, SA, quarterly
+     * thousands (JV M1.7.TOT). */
+    jobVacancies?: SeriesPoint[];
   };
   /** RBA series outputs (venue-dependent — see docs/insights/03-data-sources.md). */
   rba?: {
@@ -270,7 +287,7 @@ function basketSeries(fx: SeriesInputs['fx']): SeriesPoint[] | undefined {
 
 /** Compose every possible indicator series from the fetched inputs. */
 export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<IndicatorId, SeriesPoint[]>> {
-  const { fred, ecb, fx, wb, abs, rba, today } = inputs;
+  const { fred, ecb, boe, fx, wb, abs, rba, today } = inputs;
   const out: Partial<Record<IndicatorId, SeriesPoint[]>> = {};
 
   const put = (id: IndicatorId, series: SeriesPoint[] | undefined) => {
@@ -289,6 +306,9 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // (the transmission check the rates panel was missing; DGS2 already
   // collected for fed-expectations — the card is a pure surface add).
   put('sofr', fred.SOFR);
+  // M6 Wave 3 (2026-10-25): the mortgage leg of the transmission chain —
+  // the US household's own borrowing cost (the au-home-loan US twin).
+  put('mortgage-30y', fred.MORTGAGE30US);
   put('us-2y', fred.DGS2);
   // M5 Wave 2 (2026-10-24): the euro long end's daily fix — the AAA 10y
   // beside its policy-rate sibling (the OECD bund mirror keeps its honest
@@ -333,7 +353,7 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   put('jgb-10y', fred.IRLTLT01JPM156N);
   put('gilt-10y', fred.IRLTLT01GBM156N);
   put('boj-rate', fred.IRSTCI01JPM156N);
-  put('boe-rate', fred.IRSTCI01GBM156N);
+  put('boe-rate', boe === undefined ? undefined : boeBankRateDaily(boe.bankRateDecisions));
 
   /* ---------------- Global — Are prices heating up? ---------------- */
   if (fred.CPIAUCNS) put('us-cpi-yoy', yoyPctSeries(fred.CPIAUCNS));
@@ -341,6 +361,12 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // M4 Wave 1 (OD-8/D-42): the Fed's preferred gauge — core PCE YoY from
   // the PCEPILFE index, the same derived 12-month % change as CPI.
   if (fred.PCEPILFE) put('us-pce-core-yoy', yoyPctSeries(fred.PCEPILFE));
+  // M6 Wave 3 (2026-10-25): the euro area's inflation — the annual rate
+  // direct from the new ECB HICP dataset (no derivation; the ANR obs IS
+  // the yearly change) + the 5y spot breakeven and the wage leg.
+  put('euro-hicp', ecb?.hicp);
+  put('t5yie', fred.T5YIE);
+  if (fred.AHETPI) put('us-wages', yoyPctSeries(fred.AHETPI));
   // M5 Wave 2 (2026-10-24): the household-cost staples from the SAME
   // Pink Sheet download (zero new requests) — the Food index from the
   // Monthly Indices sheet, the grains from the Monthly Prices sheet.
@@ -360,6 +386,8 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
 
   /* ---------------- Global — Are markets nervous? ---------------- */
   put('stress-stlfsi', fred.STLFSI4);
+  // M6 Wave 3 (2026-10-25): the liquidity level beside the plumbing gauges.
+  put('walcl', fred.WALCL);
   put('nfci', fred.NFCI);
   // Step-2 add-list §B5: the Cboe VIX close (daily, full history — the
   // stored history keeps the 10-year daily window the Step-3 verdicts
@@ -422,6 +450,13 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   put('initial-jobless-claims', fred.ICSA);
   put('recession-probability', fred.RECPROUSM156N);
   put('michigan-sentiment', fred.UMCSENT);
+  // M6 Wave 3 (2026-10-25): the leading-edge batch — the consumption pulse,
+  // the long-leading housing signal, the composite activity gauge and the
+  // Powell-era labor leading edge.
+  put('retail-sales', fred.RSAFS);
+  put('housing-permits', fred.PERMIT);
+  put('cfnai', fred.CFNAI);
+  put('job-openings', fred.JTSJOL);
   put('michigan-1y-expectations', fred.MICH);
   // Fix spec C-05 (2026-10-14): the Philadelphia Fed manufacturing index.
   put('philly-fed', fred.GACDFSA066MSFRBPHI);
@@ -435,7 +470,22 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   put('us-nfp', fred.PAYEMS !== undefined ? monthlyChangeSeries(fred.PAYEMS) : undefined);
   // Platinum: the precious/industrial metal from the SAME Pink Sheet
   // workbook the other metals ride (zero extra requests, L1 licence).
-  put('platinum', inputs.wb?.platinum);
+  // M6 Wave 3 (2026-10-25): the platinum CADENCE FIX — the gold-usd
+  // recipe on XPT (USD per troy ounce, no unit conversion needed): the
+  // Pink Sheet monthly history stays the percentile base, the live spot
+  // rides today's point, and the accumulated seeds (SEED_IDS) make the
+  // 7/30-day changes measurable between monthly prints.
+  if (inputs.xptSpot) {
+    const base = wb
+      ? mergeSeries(wb.platinum, inputs.seedHistory?.['platinum'] ?? [])
+      : (inputs.seedHistory?.['platinum'] ?? []);
+    put(
+      'platinum',
+      base.length > 0 ? withLivePoint(base, today, inputs.xptSpot.price) : singlePoint(today, inputs.xptSpot.price),
+    );
+  } else if (wb) {
+    put('platinum', mergeSeries(wb.platinum, inputs.seedHistory?.['platinum'] ?? []));
+  }
 
   /* ------------- Global — Prices board (not a gauge) ------------- */
   // Brent: EIA spot (FRED) extended past its last published date by Yahoo's
@@ -554,6 +604,11 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   if (abs?.wageIndex) put('au-wage-growth', yoyPctSeries(abs.wageIndex));
   if (abs?.rentIndex) put('au-rent-yoy', yoyPctSeries(abs.rentIndex));
   put('au-unemployment', abs?.unemployment);
+  // M6 Wave 3 (2026-10-25): the AU leading-edge trio — the mortgage
+  // pipeline (scored on YoY), the hunkering-down gauge and the vacancies.
+  put('au-housing-finance', abs?.housingFinance);
+  put('au-saving-ratio', abs?.savingRatio);
+  put('au-job-vacancies', abs?.jobVacancies);
   put('au-home-values', abs?.resDwellMeanPrice);
   put('au-household-debt-arrears', rba?.householdDebtRatio);
 
@@ -682,6 +737,16 @@ export const AUX_RULE_WIRING: Readonly<
 };
 
 /**
+ * The BoE decision rows expanded to the daily F1-shaped step series
+ * (undefined when the page fetch failed — the slot then reads the stored
+ * history like every other failed source).
+ */
+function boeBankRateDaily(decisions: readonly SeriesPoint[] | undefined): SeriesPoint[] | undefined {
+  if (decisions === undefined || decisions.length === 0) return undefined;
+  return boeBankRateDailySeries(decisions);
+}
+
+/**
  * Card source attribution (name + URL) per indicator — what computeReading
  * stamps onto every reading ("Updated [date] · Source [name]"). Providers
  * requiring attribution (ABS, RBA, World Bank, ECB — CC BY / attribution
@@ -739,6 +804,40 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'us-pce-core-yoy': { name: 'FRED (PCEPILFE, 12-month % change)', url: 'https://fred.stlouisfed.org/series/PCEPILFE' },
   'us-2y': { name: 'FRED (DGS2)', url: 'https://fred.stlouisfed.org/series/DGS2' },
   'breakeven-10y': { name: 'FRED (T10YIE)', url: 'https://fred.stlouisfed.org/series/T10YIE' },
+  // M6 Wave 3 (OD-8/D-42, 2026-10-25) — the leading-edge batch's sources.
+  'mortgage-30y': {
+    name: 'Freddie Mac via FRED (MORTGAGE30US)',
+    url: 'https://fred.stlouisfed.org/series/MORTGAGE30US',
+  },
+  walcl: { name: 'Federal Reserve via FRED (WALCL, H.41 table)', url: 'https://fred.stlouisfed.org/series/WALCL' },
+  'retail-sales': {
+    name: 'US Census Bureau via FRED (RSAFS)',
+    url: 'https://fred.stlouisfed.org/series/RSAFS',
+  },
+  'housing-permits': {
+    name: 'US Census Bureau via FRED (PERMIT)',
+    url: 'https://fred.stlouisfed.org/series/PERMIT',
+  },
+  cfnai: { name: 'Chicago Fed via FRED (CFNAI)', url: 'https://fred.stlouisfed.org/series/CFNAI' },
+  'job-openings': { name: 'US Bureau of Labor Statistics via FRED (JTSJOL)', url: 'https://fred.stlouisfed.org/series/JTSJOL' },
+  t5yie: { name: 'Federal Reserve Bank of St. Louis via FRED (T5YIE)', url: 'https://fred.stlouisfed.org/series/T5YIE' },
+  'us-wages': { name: 'US Bureau of Labor Statistics via FRED (AHETPI, 12-month % change)', url: 'https://fred.stlouisfed.org/series/AHETPI' },
+  'euro-hicp': {
+    name: 'ECB Data Portal / Eurostat (HICP annual rate)',
+    url: 'https://data.ecb.europa.eu/data/datasets/ICP/ICP.M.U2.N.000000.4.ANR',
+  },
+  'au-housing-finance': {
+    name: 'Australian Bureau of Statistics (LEND_HOUSING, new housing loan commitments)',
+    url: 'https://data.api.abs.gov.au/rest/data/LEND_HOUSING/FIN_VAL.NEWCOMMITS.DV8368.TOTDWELL.TOT.TOT.20.AUS.Q',
+  },
+  'au-saving-ratio': {
+    name: 'Australian Bureau of Statistics (ANA_AGG, household saving ratio)',
+    url: 'https://data.api.abs.gov.au/rest/data/ANA_AGG/M7.HSR.20.AUS.Q',
+  },
+  'au-job-vacancies': {
+    name: 'Australian Bureau of Statistics (JV, job vacancies)',
+    url: 'https://data.api.abs.gov.au/rest/data/JV/M1.7.TOT.20.AUS.Q',
+  },
   'breakeven-5y5y': {
     name: 'Federal Reserve Bank of St. Louis via FRED (T5YIFR)',
     url: 'https://fred.stlouisfed.org/series/T5YIFR',
@@ -771,7 +870,7 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   // 2026-10-21 data-integrity round — the coverage additions' attributions.
   wti: { name: 'FRED (EIA WTI spot)', url: 'https://fred.stlouisfed.org/series/DCOILWTICO' },
   natgas: { name: 'FRED (EIA Henry Hub spot)', url: 'https://fred.stlouisfed.org/series/DHHNGSP' },
-  platinum: { name: 'The World Bank: Commodity Markets (Pink Sheet) — platinum', url: 'https://www.worldbank.org/en/research/commodity-markets' },
+  platinum: { name: 'gold-api.com (XPT spot; history: World Bank Pink Sheet)', url: 'https://www.gold-api.com' },
   'bund-10y': { name: 'OECD via FRED (IRLTLT01DEM156N)', url: 'https://fred.stlouisfed.org/series/IRLTLT01DEM156N' },
   'jgb-10y': { name: 'OECD via FRED (IRLTLT01JPM156N)', url: 'https://fred.stlouisfed.org/series/IRLTLT01JPM156N' },
   'gilt-10y': { name: 'OECD via FRED (IRLTLT01GBM156N)', url: 'https://fred.stlouisfed.org/series/IRLTLT01GBM156N' },
@@ -780,8 +879,8 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     url: 'https://fred.stlouisfed.org/series/IRSTCI01JPM156N',
   },
   'boe-rate': {
-    name: 'OECD via FRED (IRSTCI01GBM156N — UK overnight rate)',
-    url: 'https://fred.stlouisfed.org/series/IRSTCI01GBM156N',
+    name: 'Bank of England (official Bank Rate history)',
+    url: 'https://www.bankofengland.co.uk/boeapps/database/Bank-Rate.asp',
   },
   'us-gdp-growth': { name: 'FRED (BEA real GDP growth)', url: 'https://fred.stlouisfed.org/series/A191RL1Q225SBEA' },
   'us-nfp': { name: 'FRED (BLS PAYEMS, monthly change)', url: 'https://fred.stlouisfed.org/series/PAYEMS' },

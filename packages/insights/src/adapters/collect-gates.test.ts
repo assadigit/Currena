@@ -127,7 +127,7 @@ describe('T-30/T-31: disabled sources are never requested (M-6 kill switch)', ()
         expect(url, 'a disabled source is never requested').not.toContain('gold-api');
       }
       const gaRows = result.reports.filter((r) => r.source === 'gold-api');
-      expect(gaRows.length).toBe(4); // XAU, XAG, BTC, HG — all skipped
+      expect(gaRows.length).toBe(5); // XAU, XAG, BTC, HG, XPT (platinum, M6 Wave 3) — all skipped
       for (const r of gaRows) {
         expect(r.ok).toBe(false);
         expect(r.kind).toBe('disabled');

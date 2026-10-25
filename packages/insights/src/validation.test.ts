@@ -248,6 +248,52 @@ describe('runValidationSuite — the Part D tests', () => {
     expect(t08.flagged).not.toContain('au-home-loan');
   });
 
+  it('M6 weekend fix: a weekend-spanning metal repeat is the market being closed, not a freeze (2026-10-25)', () => {
+    // The gold-api spot family serves rows every calendar day; Sat/Sun
+    // quotes repeat Friday's spot — the 2026-10-18/25 live-archive shape.
+    const SUNDAY_NOW = '2026-10-25T04:20:00.000Z';
+    const weekend: SeriesPoint[] = [];
+    let d = new Date('2026-10-25T00:00:00Z'); // Sunday
+    let back = 0;
+    while (weekend.length < 32) {
+      const dow = d.getUTCDay();
+      const value = dow === 0 || dow === 6 ? 3996.899902 : 3996.899902 + (back % 7) * 1.3;
+      weekend.push({ date: d.toISOString().slice(0, 10), value });
+      back++;
+      d = new Date(d.getTime() - 86_400_000);
+    }
+    weekend.reverse();
+    const out = runValidationSuite(suiteInput({ 'gold-usd': weekend }, { now: SUNDAY_NOW }));
+    const t08 = out.results.find((r) => r.test === 'T-08')!;
+    expect(t08.flagged).not.toContain('gold-usd');
+    expect(t08.failures.join(' ')).not.toContain('gold-usd');
+  });
+
+  it('M6 weekend fix: the SAME family repeating on WEEKDAYS is still the frozen-cache class — flagged', () => {
+    // Same metal, but the repeat is Tue-after-Mon: the carve-out must not
+    // blunt the guard that caught the 15 Oct copper row.
+    const weekday = dailySeries('2026-10-13', 30, () => 3996.899902);
+    const out = runValidationSuite(suiteInput({ 'gold-usd': weekday }));
+    const t08 = out.results.find((r) => r.test === 'T-08')!;
+    expect(t08.flagged).toContain('gold-usd');
+  });
+
+  it('M6 weekend fix: gold-silver observation dates legitimately fall on weekends (gold-api legs)', () => {
+    // The ratio's legs are gold-api spots serving weekend-dated rows —
+    // gold-silver left TRADING_DATE_IDS on 2026-10-25.
+    const SUNDAY_NOW = '2026-10-25T04:20:00.000Z';
+    const ratio: SeriesPoint[] = [];
+    let d = new Date('2026-10-25T00:00:00Z'); // Sunday
+    while (ratio.length < 32) {
+      ratio.push({ date: d.toISOString().slice(0, 10), value: 73.95366591507853 });
+      d = new Date(d.getTime() - 86_400_000);
+    }
+    ratio.reverse();
+    const out = runValidationSuite(suiteInput({ 'gold-silver': ratio }, { now: SUNDAY_NOW }));
+    const t03 = out.results.find((r) => r.test === 'T-03')!;
+    expect(t03.failures.join(' ')).not.toContain('gold-silver');
+  });
+
   it('T-09 records a count mismatch when a scored reading sits outside every area', () => {
     // brent is in the prices-heat gauge (B-14) — remove it to simulate the
     // audited misconfiguration and the test must catch the mismatch.

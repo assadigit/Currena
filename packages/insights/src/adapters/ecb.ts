@@ -10,7 +10,7 @@
  */
 
 import { insightsFetch } from './fetch-policy';
-import { parseEcbDfrCsv } from '../parsers';
+import { parseEcbDfrCsv, parseEcbMonthlyCsv } from '../parsers';
 import type { SeriesPoint } from '../series';
 import type { FetchDeps } from './types';
 
@@ -30,6 +30,18 @@ export const ECB_DFR_SERIES_KEY = 'FM/D.U2.EUR.4F.KR.DFR.LEV';
  */
 export const ECB_AAA_10Y_SERIES_KEY = 'YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y';
 
+/**
+ * M6 Wave 3 (2026-10-25): the euro-area HICP annual rate — the euro
+ * area's inflation, from the NEW post-Feb-2026 HICP dataset. The OLD
+ * ICP flow (ICP.M.U2.N.000000.4.ANR — the review's candidate) DIED at
+ * 2025-12 upstream (Eurostat's methodological change of 4 February 2026
+ * discontinued it, per the series' own OBS_COM note); the replacement,
+ * verified live at build time (2026-10-25, this sandbox): HICP flow,
+ * DATA_PROVIDER 4D0 — full decade history back-filled, latest 3.8 @
+ * 2026-09.
+ */
+export const ECB_HICP_SERIES_KEY = 'HICP/M.U2.N.000000.4D0.ANR';
+
 /** URL of the DFR series (full history CSV). */
 export function ecbDfrUrl(): string {
   return `${ECB_DATA_BASE}/${ECB_DFR_SERIES_KEY}?format=csvdata`;
@@ -46,11 +58,33 @@ export function ecbAaa10yUrl(from: string = ecbAaaFrom()): string {
   return `${ECB_DATA_BASE}/${ECB_AAA_10Y_SERIES_KEY}?format=csvdata&startPeriod=${from}`;
 }
 
+/** The decade window's start for the HICP request (the FRED decade-window discipline). */
+export function ecbHicpFrom(now: Date = new Date()): string {
+  return new Date(now.getTime() - (3_650 + 90) * 86_400_000).toISOString().slice(0, 10);
+}
+
+/** URL of the HICP annual-rate series (decade window CSV). */
+export function ecbHicpUrl(from: string = ecbHicpFrom()): string {
+  return `${ECB_DATA_BASE}/${ECB_HICP_SERIES_KEY}?format=csvdata&startPeriod=${from}`;
+}
+
 /** Fetch and parse the ECB deposit facility rate series (full history). */
 export async function fetchEcbDfrSeries(deps: FetchDeps = {}): Promise<SeriesPoint[]> {
   const res = await insightsFetch(ecbDfrUrl(), {}, deps);
   const text = await res.text();
   return parseEcbDfrCsv(text);
+}
+
+/**
+ * Fetch and parse the euro-area HICP annual rate series (decade window;
+ * the same SDMX wide CSV shape as the DFR but with MONTHLY YYYY-MM
+ * periods — parseEcbMonthlyCsv normalizes to the month start; the ANR
+ * obs is the annual rate of change itself, no derivation needed).
+ */
+export async function fetchEcbHicpSeries(deps: FetchDeps = {}): Promise<SeriesPoint[]> {
+  const res = await insightsFetch(ecbHicpUrl(), {}, deps);
+  const text = await res.text();
+  return parseEcbMonthlyCsv(text);
 }
 
 /**

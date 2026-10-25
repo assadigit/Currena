@@ -549,8 +549,10 @@ describe('copy dictionaries', () => {
     // OD-7 round retired nzd-usd + silver-btc — the corpus is 63; the
     // 2026-10-24 M4 Wave-1 round added the early-warning pack's eight ids
     // and the M5 Wave-2 round added five more (euro-aaa-10y, food-index,
-    // wheat, maize, usdtry) — the corpus is 76 and fa must carry every one.
-      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(76);
+    // wheat, maize, usdtry); the 2026-10-25 M6 Wave-3 round added the
+    // leading-edge batch's twelve ids — the corpus is 88 and fa must carry
+    // every one.
+      expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(88);
   });
 
   // Fix spec T-07 (2026-10-15): the CI-side corpus scan — the ingest's

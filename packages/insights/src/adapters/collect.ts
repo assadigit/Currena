@@ -21,7 +21,8 @@ import { providerFetchEnabled } from '../sources';
 import { ABS_SERIES, fetchAbsSeries } from './abs';
 import { fetchBitstampCloses } from './bitstamp';
 import { fetchEiaBrent, fetchEiaHenryHub, fetchEiaWti } from './eia';
-import { fetchEcbAaa10ySeries, fetchEcbDfrSeries } from './ecb';
+import { fetchEcbAaa10ySeries, fetchEcbDfrSeries, fetchEcbHicpSeries } from './ecb';
+import { fetchBoeBankRateDecisions } from './boe';
 import { fetchCryptoFng } from './fng';
 import { fetchFrankfurterSeries } from './frankfurter';
 import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredDecadeFrom } from './fred';
@@ -336,6 +337,21 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
   const ecbAaa10y = await fetchLogged('ecb', 'YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y (decade window)', () =>
     fetchEcbAaa10ySeries(),
   );
+  // M6 Wave 3 (2026-10-25): the euro-area HICP annual rate — from the NEW
+  // post-Feb-2026 HICP dataset (the old ICP flow died 2025-12 upstream;
+  // HICP/M.U2.N.000000.4D0.ANR verified live at build time, history
+  // back-filled to the full decade).
+  const ecbHicp = await fetchLogged('ecb', 'HICP/M.U2.N.000000.4D0.ANR (decade window)', () =>
+    fetchEcbHicpSeries(),
+  );
+
+  // M6 Wave-4 probe fix (2026-10-25): the Bank of England's own Bank Rate
+  // history page — the decision table replaces the FRED OECD monthly
+  // mirror (IRSTCI01GBM156N, the M2 "monthly average, lagged" relabel).
+  // Expanded to the F1-shaped daily step series in derived.ts.
+  const boeBankRateDecisions = await fetchLogged('boe', 'Bank Rate history page (decision table, HTML)', () =>
+    fetchBoeBankRateDecisions(),
+  );
 
   // Frankfurter (USD→JPY/AUD/CNY + the six basket currencies + TRY, 10y
   // window; NZD left the request 2026-10-23 — the nzd-usd card retired,
@@ -347,13 +363,15 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
   // World Bank Pink Sheet monthly.
   const wb = await fetchLogged('world-bank', 'Pink Sheet monthly workbook', () => fetchWorldBankMonthly());
 
-  // gold-api.com spots (XAU is the primary gold source — TGJU retired I15).
+  // gold-api.com spots (XAU is the primary gold source — TGJU retired I15;
+  // M6 Wave 3 2026-10-25 adds XPT — the platinum card's daily cadence fix).
   const xauSpot = await fetchLogged('gold-api', 'XAU spot', () => fetchGoldApiSpot('XAU'));
   const xagSpot = await fetchLogged('gold-api', 'XAG spot', () => fetchGoldApiSpot('XAG'));
   const btcSpot = await fetchLogged('gold-api', 'BTC spot', () => fetchGoldApiSpot('BTC'));
   const hgSpot = await fetchLogged('gold-api', 'HG (copper) spot', () => fetchGoldApiSpot('HG'));
+  const xptSpot = await fetchLogged('gold-api', 'XPT (platinum) spot', () => fetchGoldApiSpot('XPT'));
 
-  // ABS (8 series, keyless SDMX CSV).
+  // ABS (11 series, keyless SDMX CSV — M6 Wave 3 adds the leading-edge trio).
   const absSeries: NonNullable<SeriesInputs['abs']> = {};
   for (const [name, key] of Object.entries(ABS_SERIES) as [keyof typeof ABS_SERIES, string][]) {
     const series = await fetchLogged('abs', key, () => fetchAbsSeries(key));
@@ -470,7 +488,8 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
         'silver-usd': silverYahooQuote,
         'btc-usd': btcYahooQuote,
       },
-      ecb: { dfr: ecbDfr, aaa10y: ecbAaa10y },
+      ecb: { dfr: ecbDfr, aaa10y: ecbAaa10y, hicp: ecbHicp },
+      boe: { bankRateDecisions: boeBankRateDecisions },
       fx: {
         JPY: fx?.JPY,
         AUD: fx?.AUD,
@@ -487,6 +506,7 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
       xagSpot,
       btcSpot,
       hgSpot,
+      xptSpot,
       cryptoFng,
       abs: absSeries,
       rba: {

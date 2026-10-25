@@ -20,7 +20,8 @@ D-41).
 | **M3** | The credit-spread licence row (OD-5) — **the honest no-go** | The T-16 scan (2026-10-24, live series-page reads) found the ICE BofA indices (`BAMLH0A0HYM2`, `BAMLC0A0CM`) carry FRED's **"copyright: pre-approval required"** tag — NOT the citation-required class OD-5 assumed. The pre-approval class fail-closes on BOTH gates (`sources.ts riskRowForLeg`: no fetch; `licences.ts fredLicenceForSeries`: never public) + the `fred-pre-approval` register row + the T-16 records + D-44: **no hy-oas/ig-oas card ships until the owner secures ICE's written permission** (the owner's "exclude private/unavailable" directive covers the exclusion) | **done 2026-10-24** — the no-go recorded, the register hardened (D-44) |
 | **M4** | Wave 1 — the early-warning pack (OD-8) | `initial-jobless-claims` · `sofr` · `recession-probability` · `us-pce-core-yoy` · `michigan-sentiment` (+ the `michigan-1y-expectations` companion) + the Tier-0 displays `us-2y`, `breakeven-10y` — one FRED bulk-group edit (the new 5-series Wave-1 group + SOFR into the daily group) + the register rows; all series live-verified 2026-10-24; **`hy-oas` excluded by the M3 licence no-go** | **done 2026-10-24** — deployed `21d0b040` → `5924ed4f` (the temporary 15:40 publish rung, reverted) → `c1b36019` → `160ac6e2` (the rule-text scale fix found in live verification); the 15:40 rung wrote the first 71-reading snapshot (all writes completed — the pre-fix failure mode died before any write; the exact cpuTime capture rides the designed rungs), live-verified on currena.ir EN+fa: hero 7-of-25, growth lane Cautious 2-of-8, recession probability 62% warning, Michigan bottom-decile warning with its 1y companion, claims 194,000 normal, SOFR/us-2y/breakeven-10y context with the honest citations; evidence under `docs/insights/screenshots/m4-2026-10-24/` |
 | **M5** | Wave 2 — household costs & the euro long end | Pink Sheet `food-index` + wheat/maize · `euro-aaa-10y` (series key verified at build time — the review's honest negative) · `usdtry` (the EM-pressure first member) | **done 2026-10-24** — the AAA key found + live-verified (`YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y`, "AAA yield curve - 10-year spot rate", 3.38 @ 2026-10-22; the review's four dotted/FM candidates 404'd — the slash-form YC key answers 200); the food trio rides the SAME Pink Sheet download (the Monthly Indices sheet read — zero new requests; live: food 124.1 / wheat 278.6 / maize 239.6 @ 2026M09); TRY joins the Frankfurter request as the ninth leg (usdtry 49.74, top of its decade — the inflation→devaluation case study); all context rows, voting stays 40; deployed + live-verified (see the DEPLOY 2026-10-24b record) |
-| **M6** | Wave 3/4 — the leading edge + probes | `mortgage-30y` · `walcl` · `retail-sales` · `housing-permits` · `cfnai` · ~~`ig-oas`~~ (inherits the M3/D-44 no-go — ICE pre-approval required) · `job-openings` · `t5yie` · `us-wages` · `euro-hicp` · `china-cpi` · platinum-daily · the AU leading-edge trio (`au-housing-finance`, `au-saving-ratio`, `au-job-vacancies`) · the venue-probe afternoon (BoE/BoJ/EODHD au-10y/NBS) — M2's OECD relabels are its stopgap until the probes land | **pending** (probe-conditioned; may split further) |
+| **M6** | Wave 3/4 — the leading edge + probes | `mortgage-30y` · `walcl` · `retail-sales` · `housing-permits` · `cfnai` · ~~`ig-oas`~~ (inherits the M3/D-44 no-go — ICE pre-approval required) · `job-openings` · `t5yie` · `us-wages` · `euro-hicp` · ~~`china-cpi`~~ (BOTH FRED OECD mirrors died upstream 2025-04 — carried to M7 via the NBS automation) · platinum-daily · the AU leading-edge trio (`au-housing-finance`, `au-saving-ratio`, `au-job-vacancies`) · the venue-probe afternoon (BoE/BoJ/EODHD au-10y/NBS) — M2's OECD relabels are its stopgap until the probes land | **done 2026-10-25/26** — 76→88 indicators, voting 40→42 (`euro-hicp` prices-heat scored at the ECB's 2%, `au-housing-finance` au-households scored percentile-yoy — audit item C10's rule fix); the probes: **BoE succeeded** (the Bank-Rate.asp decision table — boe-rate left the OECD mirror for the BoE's own current rate under OGL v3.0, the Wave-4 probe fix, +1 fetch/50), **EODHD au-10y no-go** ("not available for your subscription plan" — au-10y stays RBA F2.1 monthly), **BoJ DNS-blocked** from the work venue (the relabel stays boj-rate's stopgap — carried to M7), **NBS automation probed OK** (the china-cpi follow-up, M7). The session that deployed Wave 3 (2026-10-25 00:05–00:26 UTC, versions 211–214) was cut off before committing — this session recovered all 14 API files byte-exact from the deployed Worker's sourcemap + the 12 bilingual copy entries from the live Insights chunk, then landed the BoE fix, the quarterly staleness recalibration (au-wage-growth false-staled live 2026-10-17; WPI 224d/RPPI 219d/LEND 220d/JV 232d/ANA 245d arithmetic), the weekend T-03/T-08 metals carve-out (the 10-18/25 archive noise), R14 ticker fixes on recovery, and the internal archive 10-23 reconstruction (the D-43 incident's missing twin — schema-validated from its public twin, identity that day) |
+| **M7** | The NBS automation + china-cpi | Automate the china-pmi fetch from the NBS english releases (the probe succeeded 2026-10-25 — the pages are readable and machine-parseable); `china-cpi` (both FRED OECD mirrors CHNCPIALLMINMEI/CPALTT01CHM659N died upstream 2025-04) rides the same automation as a second NBS card; the BoJ fix-or-retire (stat-search.boj.or.jp fails DNS from the work venue — re-probe from the Worker venue) | **pending** (probe-conditioned) |
 
 ## Standing rules (inherited from the review + the repo's own gates)
 
@@ -46,6 +47,40 @@ D-41).
   `node --cpu-prof` on the local ingest twin if the tail ever shows >1.5 s.
 
 ## Session log (newest first)
+
+- **2026-10-25/26 (the M6 recovery + Wave-4 session):** the session that
+  deployed Wave 3 overnight (versions 211-214, 00:05-00:26 UTC) was cut
+  off before committing - a THIRD sandbox reset destroyed its tree. This
+  session recovered everything: the 14 API-side files byte-exact from the
+  deployed Worker's sourcemap (the fac13df precedent), the 12 new cards'
+  bilingual copy from the live Insights chunk (the deployed bundle's
+  minified dictionaries parsed back to source), the display configs +
+  the four new unit tokens (aud-bn, permits, openings, vacancies) from
+  the labels chunk. On top of the recovery it landed: the Wave-4 BoE
+  probe fix (the Bank-Rate.asp decision table replaces the FRED OECD
+  monthly mirror - boe-rate now the BoE's own current rate under OGL
+  v3.0, per-change cadence, +1 fetch at ~42/50 with the KV-ops-don't-
+  consume-fetch-subrequests empirical note), the T-16 scans re-verified
+  LIVE for all 8 new FRED series (matching the deployed session's
+  classes), the quarterly staleness recalibration (five AU cards -
+  au-wage-growth had false-staled live on 2026-10-17), the weekend
+  T-03/T-08 metals carve-out (the every-weekend archive noise since the
+  seeds began), the R14 ticker fixes (CFNAI/JOLTS were code-like - the
+  deploying session never ran the web gates), the internal archive
+  2026-10-23 reconstruction (the D-43 incident's missing twin,
+  schema-validated), and the latent typecheck fix in scoring.ts
+  (percentileBasis 'level'|'yoy' - esbuild never typechecks). Gates:
+  typecheck 6/6, core 191, scraper 67, insights 567 (559 + 8 new boe/
+  weekend tests), markets 13, api 344, web 680 + the recorded 16-failure
+  briefing jsdom baseline, lint 0 errors/15 advisories, copy audit
+  clean (148 new fa strings processed to 2026-10-25-m6-wave3, manifest
+  2808 entries), T-15 public passed (0 hidden), budgets: entry 295.28/
+  88.80 held, Insights lazy bumped 800/194 -> 845/205 (measured 841.84/
+  203.99 - twelve cards of bilingual content, the D-16 path). Deployed
+  as a4d6ef37 at 03:37 UTC - 33 minutes AHEAD of the 04:10 main rung,
+  which then ran the recovered code as its first designed-rung
+  verification. EODHD quota untouched (the au-10y probe answered
+  no-plan, 0 data requests).
 
 - **2026-10-24 (the M3+M4 session — Wave 1 lands):** the early-warning pack
   shipped as ONE code round with the licence prerequisite inside it.

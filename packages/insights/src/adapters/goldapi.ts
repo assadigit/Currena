@@ -19,12 +19,15 @@ const GoldApiPriceSchema = z.object({
   updatedAt: z.iso.datetime(),
 });
 
-/** Symbols the Insights indicators consume (I15: + HG copper per pound). */
+/** Symbols the Insights indicators consume (I15: + HG copper per pound; M6
+ * Wave 3 2026-10-25: + XPT platinum — the daily cadence fix, verified live
+ * $1,558 the same day). */
 export const GOLDAPI_SYMBOLS = {
   silver: 'XAG',
   bitcoin: 'BTC',
   gold: 'XAU',
   copper: 'HG',
+  platinum: 'XPT',
 } as const;
 
 export function goldApiPriceUrl(symbol: string): string {

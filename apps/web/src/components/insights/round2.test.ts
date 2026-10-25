@@ -367,7 +367,10 @@ describe('R14 code-pattern scan (names + tags, both locales)', () => {
   // 'USD/JPY' (the slash keeps FX pairs out of the code shape).
   // M4 Wave 1 (2026-10-24): SOFR joins the exemption list — it is the
   // rate's universal name (like CPI), not a source code.
-  const CODE_LIKE = /^(?!CPI$|BTC$|SOFR$)([A-Z]\d{1,3}|[A-Z][A-Z0-9&.-]{3,})$/;
+  // M6 Wave 3 (2026-10-25): +HICP — the euro area's CPI is a universal
+  // acronym in the CPI/BTC/SOFR class (the ECB's own headline word), not a
+  // source code.
+  const CODE_LIKE = /^(?!CPI$|BTC$|SOFR$|HICP$)([A-Z]\d{1,3}|[A-Z][A-Z0-9&.-]{3,})$/;
 
   const entries = (copy: InsightsCopy): { id: string; name: string; ticker?: string }[] =>
     (Object.entries(copy.indicators) as [string, { name: string; ticker?: string }][]).map(

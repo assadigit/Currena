@@ -5,6 +5,85 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-25] — Wave 3 + the Wave-4 probe fix (M6): the leading edge
+
+Twelve new cards (76→88 indicators), two new scored voters (40→42), the
+BoE's own Bank Rate replaces an OECD mirror, and a recovery: the session
+that deployed the bulk of this wave overnight (2026-10-25 00:05–00:26 UTC,
+Worker versions 211–214) was cut off before committing — this round
+recovered its tree from the deployed artifacts and finished the milestone.
+
+- **The recovery (the honest story)**: all 14 API-side files came back
+  byte-exact from the deployed Worker's sourcemap (the fac13df precedent);
+  the 12 cards' bilingual copy came back from the live Insights chunk
+  (the deployed minified dictionaries parsed to source); the display
+  configs + four new unit tokens (`aud-bn`, `permits`, `openings`,
+  `vacancies`) from the labels chunk. Two latent defects fixed on
+  recovery: the scoring.ts `percentileBasis` type mismatch (esbuild never
+  typechecks — `'level' | 'yoy'`) and three R14 code-like tickers
+  (CFNAI/JOLTS — the deploying session never ran the web gates; they now
+  read 'Chicago Fed'/'Open jobs'; HICP joined the CPI/BTC/SOFR universal-
+  acronym class).
+- **The Wave-3 batch (the review's leading edge)**: `mortgage-30y`
+  (MORTGAGE30US, the transmission chain's last stop before the real
+  economy), `walcl` (the Fed's balance sheet — the funding/liquidity pair
+  with SOFR), `retail-sales` (RSAFS, the consumption pulse), `housing-
+  permits` (PERMIT, the classic long-leading), `cfnai` (the composite
+  activity gauge — the free ISM substitute), `job-openings` (JOLTS, the
+  Powell-era labor leading edge), `t5yie` (the missing middle leg between
+  1y Michigan and 5y5y), `us-wages` (AHETPI → 12-month % change, the wage
+  leg of the wage-price loop) — all CONTEXT; `euro-hicp` (the NEW
+  post-Feb-2026 ECB dataset `HICP/M.U2.N.000000.4D0.ANR` — the old ICP
+  flow died 2025-12 upstream; SCORED against the ECB's own 2% target,
+  the prices lane's second central-bank goal line), and the AU leading-
+  edge trio `au-housing-finance` (LEND_HOUSING, SCORED on YoY growth via
+  the C10 rule fix — percentileBasis 'yoy' now honoured by the RULE, not
+  just the display), `au-saving-ratio` (ANA_AGG) and `au-job-vacancies`
+  (JV) as context. `china-cpi` did NOT ship: BOTH OECD mirrors died
+  upstream 2025-04 — the NBS automation carries it as M7.
+- **Platinum goes daily**: XPT joins the gold-api spot family (verified
+  $1,558 on the probe day); the Pink Sheet monthly stays as the history
+  — the cadence inconsistency the review flagged is closed.
+- **The Wave-4 probe fix — `boe-rate` on the Bank of England's own
+  page**: the Bank-Rate.asp decision table (258 rows back to 1975,
+  latest 3.75 since 18 Dec 2025) replaces the FRED OECD monthly mirror
+  — the card goes from "monthly average, lagged" to the central bank's
+  own current rate at every decision (per-change cadence, the
+  rba-cash-rate pattern, expanded to the F1-shaped daily step series).
+  Licence: the BoE legal page puts the Database under the **UK Open
+  Government Licence v3.0** (quoted 2026-10-25). +1 fetch on the 04:10
+  shape (~42/50) with the empirical note that KV ops don't consume the
+  fetch-subrequest budget.
+- **The probes' honest outcomes**: EODHD au-10y — "not available for
+  your subscription plan" (au-10y stays RBA F2.1 monthly); BoJ —
+  stat-search.boj.or.jp fails DNS from the work venue (the OECD relabel
+  stays boj-rate's stopgap; re-probe from the Worker venue in M7); NBS —
+  probed readable and machine-parseable (the china-cpi follow-up).
+- **Two quality fixes surfaced by the live state**: the AU quarterly
+  staleness recalibration (au-wage-growth had false-staled live on
+  2026-10-17 — the WPI's obs-to-release gap is 224d, not 200; the set is
+  now wage 230 / home-values 225 / housing-finance 230 / saving-ratio 250
+  / vacancies 240, each documented with its cycle arithmetic), and the
+  weekend T-03/T-08 metals carve-out (gold-api serves weekend-dated spots
+  that legitimately repeat Friday's close — four flags every weekend
+  since the seeds began, zero real freezes; the weekday guard is intact
+  and tested).
+- **The internal archive 2026-10-23 reconstructed**: the D-43
+  parallel-session incident left the day's internal twin missing (the
+  public twin survived); rebuilt from it — identity that day (0 hidden,
+  63 readings), schema-validated before the KV write.
+- T-16 re-verified LIVE for all 8 new FRED series (matching the
+  deploying session's classes): citation-required — MORTGAGE30US, CFNAI,
+  T5YIE; public-domain — WALCL, RSAFS, PERMIT, JTSJOL, AHETPI.
+- Gates: typecheck 6/6; core 191, scraper 67, insights 567 (+8 new
+  boe/weekend tests), markets 13, api 344, web 680 + the recorded
+  16-failure briefing jsdom baseline; lint 0/15 advisories; copy audit
+  clean (148 new fa strings processed to 2026-10-25-m6-wave3, manifest
+  2808 entries); T-15 public passed (0 hidden); budgets held (entry
+  295.28/88.80; Insights lazy 841.84/203.99 vs the bumped 845/205 —
+  twelve cards of bilingual content, the D-16 path). Deployed as
+  `a4d6ef37` 33 minutes ahead of the 04:10 main rung.
+
 ## [2026-10-24b] — Wave 2 (M5): household costs & the euro long end
 
 Five more context cards (71→76 indicators), zero new scored votes (the

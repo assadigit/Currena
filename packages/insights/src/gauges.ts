@@ -57,11 +57,14 @@ export const GAUGES: readonly GaugeDef[] = [
     // now sits in the prices area it belongs to — the hero count, the area
     // count and the prices strip all count the same scored list. The card
     // still renders on the Prices board; only the count membership moved.
-    // M4 Wave 1 (OD-8/D-42, 2026-10-24): core PCE joins the voters — the
+    // M4 Wave 1 (2026-10-24): core PCE joins the voters — the
     // Fed's own target gauge, scored against its published 2% goal.
+    // M6 Wave 3 (2026-10-25): euro-hicp joins the voters — the euro
+    // area's inflation scored against the ECB's own 2% symmetric target
+    // (the prices lane's second central-bank goal line beside the Fed's).
     id: 'prices-heat',
     section: 'global',
-    members: ['us-cpi-yoy', 'us-pce-core-yoy', 'breakeven-5y5y', 'brent'],
+    members: ['us-cpi-yoy', 'us-pce-core-yoy', 'euro-hicp', 'breakeven-5y5y', 'brent'],
   },
   // Step-2 add-list §B5: VIX joins the market-stress voters (scored on its
   // 10-year position; the calm/nervous word thresholds arrive with Step 3).
@@ -104,6 +107,10 @@ export const GAUGES: readonly GaugeDef[] = [
   {
     id: 'au-households',
     section: 'australia',
+    // M6 Wave 3 (OD-8/D-42, 2026-10-25): au-housing-finance joins the
+    // voters — the mortgage pipeline, scored on year-on-year growth (the
+    // au-home-values discipline). au-saving-ratio / au-job-vacancies stay
+    // context (info rules — never voters; the iron-ore precedent).
     members: [
       'au-home-loan',
       'au-wage-growth',
@@ -111,6 +118,7 @@ export const GAUGES: readonly GaugeDef[] = [
       'au-household-debt-arrears',
       'au-unemployment',
       'au-home-values',
+      'au-housing-finance',
     ],
   },
   {

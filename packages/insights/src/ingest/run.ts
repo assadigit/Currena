@@ -16,13 +16,27 @@
  * secret (the ETH leg) and a KV binding (no REST write ladder).
  *
  * SUBREQUEST BUDGET (free plan: 50 per invocation, KV ops counted):
- *   04:10 rung 1 (runInsightsUpdate) — 28 fetches + 8 reads + 11 writes =
- *   47 ✓. The RBA CSV attempts are SKIPPED on the Worker
+ *   04:10 rung 1 (runInsightsUpdate) — ~35 fetches + 9 reads + 6 writes =
+ *   50 ✓ (AT the fetch-subrequest ceiling — the M6 Wave-4 accounting,
+ *   2026-10-25b: the Wave-3 round added 5 fetches — the ECB HICP, the
+ *   gold-api XPT and the ABS leading-edge trio — and paid for them by
+ *   REMOVING the 5 redundant seed-append writes (the 04:25 phase writes
+ *   the identical content from the stage); the BoE fix then swapped the
+ *   FRED OECD mirror group member for the BoE Bank-Rate page fetch (+1
+ *   fetch, the group still one request). Empirical note: the 00:15 UTC
+ *   publish rung completed with 41 fetch-rows + 6 writes — KV operations
+ *   do not consume the fetch-subrequest budget, so the working headroom
+ *   is the fetch count alone (~42/50). The recorded follow-up if a future
+ *   wave needs headroom: consolidate the 6 seed HISTORY reads into one
+ *   stage-blob read (−4) or pre-stage the slow monthly/quarterly families
+ *   on a 04:05 rung.)
+ *   The RBA CSV attempts are SKIPPED on the Worker
  *   (skipRbaCsvTables) — six doomed 403s would burn the budget.
  *   04:25 rung 2 (runInsightsHistoryPhase 'daily') — 1 stage read + the
- *   day-cadence history writes (unconditional: ~35) = 36 ✓.
- *   04:40 rung 3 (runInsightsHistoryPhase 'periodic') — 1 stage read + ~24
- *   read-compares + rare writes = ~26 ✓.
+ *   day-cadence history writes (unconditional: ~39, the M6 daily/weekly
+ *   additions included) = 40 ✓.
+ *   04:40 rung 3 (runInsightsHistoryPhase 'periodic') — 1 stage read + ~33
+ *   read-compares + rare writes = ~34 ✓.
  *   The Node/GHA venue needs no staging: it writes every history inline
  *   (read-compared) in its own process — no subrequest ceiling applies.
  *
@@ -67,8 +81,18 @@ import { providerFetchEnabled } from '../sources';
 import type { KVLike } from './kv-store';
 import { epochDay, fromEpochDay, type SeriesPoint } from '../series';
 
-/** The accumulated-daily rows (data spec §3) — see the SEED note below. */
-export const SEED_IDS: IndicatorId[] = ['gold-usd', 'silver-usd', 'copper-usd', 'btc-usd', 'gold-silver'];
+/**
+ * The live-priced rows whose value series accumulate one observation per
+ * run (the seed appends). M6 Wave 3 (2026-10-25): platinum joins (the daily
+ * XPT cadence fix — the gold-usd pattern). NOTE the same round REMOVED the
+ * main rung's seed-append writes: the 04:25 daily-history phase writes the
+ * identical content from the stage 15 minutes later (verified — the phase
+ * covers every daily/weekly cadence id and the seeds are all daily), so the
+ * main rung no longer burns 5 of its 50-subrequest budget on redundant
+ * appends. The Node/GHA venue's writeAllHistoriesInline still writes every
+ * seed inline (no ceiling there).
+ */
+export const SEED_IDS: IndicatorId[] = ['gold-usd', 'silver-usd', 'copper-usd', 'btc-usd', 'gold-silver', 'platinum'];
 
 /** The staged-series KV key (the Worker's history-rung hand-off). */
 export const INSIGHTS_STAGE_KEY = 'insights:ingest-stage:v1';
@@ -463,20 +487,14 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
         await opts.store.putPublicSnapshot(projectSnapshotToPublic(snapshot, hiddenIds));
         console.log('  ✍ insights:snapshot-public (sweep)');
       }
-      // The SEED histories (the accumulated-daily rows' own appends) —
-      // skipped in sweep mode (the day's points already landed at
-      // 04:10/04:25; the sweep re-derives them from the stored seed anyway).
-      if (opts.sweep !== true) {
-        for (const id of SEED_IDS) {
-          const s = series[id];
-          if (!s) continue;
-          const history = buildHistoryFile(id, s, { minPoints: 1 });
-          if (history) {
-            await opts.store.putHistory(history);
-            console.log(`  ✍ insights:hist:${id} (seed append)`);
-          }
-        }
-      }
+      // M6 Wave 3 (2026-10-25) — the SEED APPENDS LEFT THE MAIN RUNG: the
+      // 04:25 daily-history phase writes the identical content from the
+      // stage (buildHistoryFile over the same series), so the main rung's
+      // five seed writes were pure budget burn under the free plan's
+      // 50-subrequest ceiling — the M6 additions (ECB HICP + gold-api XPT
+      // + the ABS trio) needed the headroom. The GHA/Node venue is
+      // unaffected (writeAllHistoriesInline writes every history inline,
+      // seeds included, in its own ceiling-free process).
     } catch (err) {
       ok = false;
       console.error(`[ingest] CRITICAL — a write failed: ${errMessage(err)}`);
