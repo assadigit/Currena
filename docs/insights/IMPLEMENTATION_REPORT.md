@@ -182,3 +182,16 @@ export verified all 100 cards pre-deploy).
   refresh (the bootstrap already fetched everything once).
 - **2026-11-09**: the earliest honest MOF-mirror retirement (two clean
   weeks from the upgrade).
+
+## Security note (surfaced by this session's secrets scan)
+
+The pre-deploy full-tree credential scan found ONE tracked file carrying
+a live credential: `context.txt` (the owner's own "Add files via upload"
+in `d3f64bb`) contained the raw **Cloudflare Workers API token** twice —
+the GitHub token line had been redacted by the upload pipeline, the
+Cloudflare one had not. Removed from the tree in `5b74dde`; **the token
+remains in git history, so removal is not remediation — the owner should
+rotate the Cloudflare API token** (dash → My Profile → API Tokens →
+roll). No other tracked file carries a credential. Nothing this session
+committed contains one (the working copy's own `context.txt` was never
+staged; the full diff was scanned before every commit).
