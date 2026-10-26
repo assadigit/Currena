@@ -5,6 +5,58 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-26c] — the A-1..A-10 gap-audit build: 89 → 100 indicators, 43 → 48 voting
+
+The ten approved additions of `docs/insights/INSIGHTS_DATA_SPEC.md`, all
+shipped and live (`78bfc0df`; the full per-item log, budget arithmetic and
+Assumptions in `docs/insights/IMPLEMENTATION_REPORT.md`):
+
+- **P1**: the 10y−3m curve leg (T10Y3M on the existing FRED bundle), the
+  JGB daily upgrade on the MOF's own CSVs (the 04:20 rung-2 phase's first
+  resident; the OECD mirror stays as the labelled outage fallback), the
+  US−Japan carry gap (derived, fail-closed, both legs' dates carried) and
+  the RBA−Fed policy gap.
+- **P2**: the gold/oil ratio (context, percentile-based exactly as the
+  spec directs), the keyless EIA crude stocks (Saturday rung) and the
+  CFTC gold COT — 49.68% of open interest net long, **needs attention on
+  day one** (the crowded-long zone above 45%).
+- **P3 (the monthly trio, first-of-month rung)**: the OECD leading
+  indicators — one filtered SDMX request for USA + CHN + DEU (the
+  dataflow carries no EA19; Germany is the honest euro substitute), the
+  US card the growth lane's 48th voter with the OECD's own
+  turning-point rule (a new `growth` warning atom: the annualised
+  N-month rate); the Geopolitical Risk index (the 2.7 MB legacy .xls
+  parsed by the repo's own biff reader — the spec's expected BLOCKED
+  never materialised) and the US policy-uncertainty index (the licence
+  quoted from inside the workbook itself). A-9/A-10's SD regimes ride a
+  new `sd10y` enrichment (the rolling 10-year z-score, recomputed on
+  every write — never hardcoded numbers).
+
+**The four defects the build's own verification caught and fixed**:
+the OECD parser's jumbled-live-export order (the fixture is
+byte-identical to the live file — sort, then assert); the A-6 barrels
+display scale (1000× off — caught by the local render before deploy);
+the A-7 CFTC stage-accumulation deadlock (the `> 1` stage gate dropped
+the first weekly point — the two-Saturday accumulation is now pinned by
+test); and the 04:25 daily-history rung's exceededCpu death (zero
+writes once the gap-audit ids grew it past the free plan's per-invocation
+CPU ceiling — the recorded M1† rung-split at last applied: 04:25 half a
++ 04:27 half b, both halves verified live with every history key then
+confirmed in KV). Also: the selfcheck's T-19 (advice wording) — failing
+since the M5 round on six pre-existing strings — is green again, and
+the inline rung-2 series contract is consumed at last so the
+Node/selfcheck builds carry real values for every rung-2 id.
+
+Gates: typecheck 6/6; core 191, scraper 67, insights 644, markets 13,
+api 344, web 680 + the recorded 16-failure briefing baseline; lint
+0 errors/15 advisories; copy:audit clean (manifest 2958); registry
+regenerated (100, 0 hidden); selfcheck ALL-GREEN with live values for
+all 100 cards. Budgets: entry 295.28/89.64 kB (raw held); Insights lazy
+886.44/214.99 kB (the new documented ceiling 890/215). Serve path
+unchanged: one KV read per request. Live-verified on currena.ir EN + fa
+(zero console errors; the 89-baseline invariance: zero status changes)
+— evidence under `docs/insights/screenshots/a8-a10-2026-10-26/`.
+
 ## [2026-10-26b] — the M7 reconciliation: the parallel session, the enriched histories
 
 Two sessions built M7 concurrently (the second D-43-class incident —

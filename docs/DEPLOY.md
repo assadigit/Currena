@@ -83,6 +83,68 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Session record — 2026-10-26c the A-1..A-10 gap-audit build: the ten additions, the 89→100 hop, the two deploy-verification catches
+
+- **Deployed**: `3fc36820-618d-4adf-9772-2c87fddf26c8` (the A-1..A-10
+  build, 04:03 UTC — the deploy-lock check first: the versions API
+  showed the last upload at 2026-10-25T18:09:57Z, the M7 final, no
+  parallel session) → `8ce18f9d` (the 05:03 diagnostic rung) →
+  `31fee390` (the rung-split fix + the 05:12/05:14 verification rungs) →
+  **`78bfc0df-a796-4d7a-8594-109e140a9779`** (the final state, temporary
+  rungs reverted, 05:16 UTC — the designed schedule only). Web + api +
+  core + insights round; currena-markets untouched.
+- **What went live**: the whole gap-audit family at once — A-1 the
+  10y−3m curve leg (the 48th→49th voter), A-2 the JGB daily upgrade on
+  the MOF's own CSVs, A-3 the US−Japan carry gap, A-4 the gold/oil
+  ratio, A-5 the RBA−Fed gap, A-6 the keyless EIA crude stocks, A-7 the
+  CFTC gold COT (49.68% — needs attention on day one, the crowded-long
+  zone), A-8 the OECD CLI trio (one filtered SDMX request; the US card
+  the 48th voter), A-9 the GPR index (the legacy .xls through the repo's
+  own biff reader — not blocked) and A-10 the EPU index. 89 → **100
+  indicators, 43 → 48 voting, 0 hidden**. The full per-item log, the
+  budget arithmetic and the Assumptions: `docs/insights/IMPLEMENTATION_REPORT.md`.
+- **The natural rungs landed it** (no publish rung needed — the deploy
+  at 04:03 preceded the 04:10 main): 04:10 main wrote the 100-reading
+  snapshot; 04:20 rung-2's bootstrap fired all six feeds (MOF + the
+  weekly pair + the monthly trio — a Monday) and patched every rung-2
+  reading; 04:40 periodic wrote the monthly history keys.
+- **The two deploy-verification catches** (both fixed + verified the
+  same morning, the M1† discipline):
+  1. The **04:25 daily-history phase died exceededCpu with zero writes**
+     — the gap-audit ids grew it past the free plan's per-invocation CPU
+     ceiling (proof: brent's stored history still ended 2026-10-23 while
+     its stage carried 2026-10-26; a 05:03 diagnostic re-fire vanished
+     from the tail with zero log lines — the M1† shape). Fix: the
+     recorded rung-split at last applied — 04:25 half a + 04:27 half b.
+     Verified live 05:13:10Z ("daily-a — 24 ids → 23 written · 1
+     no-series/point") and 05:14:19Z ("daily-b — 23 ids → 21 written ·
+     2 no-series/point"); every history key then verified in KV (brent
+     @ 2026-10-26 109.53, the T10Y3M decade, the MOF daily tail 135 pts,
+     the stocks 1982→2026; cftc honestly unwritten — the single-point
+     floor until next Saturday's file).
+  2. The **A-6 barrels scale** — caught pre-deploy by the local render
+     (the card read "0.7m barrels", 1000× off; fixed to 1e-3 →
+     "695.2m barrels"), plus two build-time catches: the OECD parser's
+     jumbled-live-export order (the fixture is byte-identical to the
+     live file — sort, then assert) and the A-7 stage-accumulation
+     deadlock (the `> 1` stage gate dropped the COT file's first point).
+- **Live verification** (currena.ir, EN + fa, zero console errors on
+  both): all ten new cards with live values — CLI 101.0/97.4/101.0, GPR
+  146.2, EPU 218.9, COT 49.7%, stocks 695.2m barrels, the gap 2.05, the
+  curve 0.78; the fa cards carry RTL, Persian digits (۱۰۱٫۰, ۱۴۶٫۲) and
+  the Persian month stamps; the hero reads "9 of 32 indicators need
+  attention" / «۹ شاخص از ۳۲ شاخص نیازمند توجه‌اند». The 89-baseline
+  invariance: 75/89 readings byte-identical, the 14 moves all genuine
+  market-data updates, **zero status changes**. Evidence:
+  `docs/insights/screenshots/a8-a10-2026-10-26/` (local EN/fa + live
+  EN hero/full + fa full).
+- **Gates**: typecheck 6/6; core 191, scraper 67, insights 644, markets
+  13, api 344, web 680 + the recorded 16-failure briefing baseline; lint
+  0/15; copy:audit clean (manifest 2958); selfcheck ALL-GREEN with live
+  values for all 100 cards. Budgets: entry 295.28/89.64 (raw held);
+  Insights lazy 886.44/214.99 — the new documented ceiling 890/215 (the
+  D-16 path). EODHD quota untouched (0 requests).
+
 ## Session record — 2026-10-26b the M7 reconciliation: the parallel session, the enriched histories, the honest no-overwrite
 
 **Context.** Two sessions worked the M7 milestone concurrently (the second
