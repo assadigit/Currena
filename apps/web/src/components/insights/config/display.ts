@@ -149,6 +149,8 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'au-job-vacancies': { decimals: 0, unit: 'vacancies' },
   'dollar-basket': { decimals: 2, unit: 'index' },
   usdjpy: { decimals: 2, unit: 'jpy' },
+  // 2026-10-26 gap-audit build, A-3: the yield gap, points 2dp.
+  'us-japan-10y-gap': { decimals: 2, unit: 'points' },
   // Step-1 audit item C4: EUR per USD — the € symbol, not "US$".
   'eur-usd': { decimals: 4, unit: 'eur' },
   'china-pmi': { decimals: 1, unit: 'index' },

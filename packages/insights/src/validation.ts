@@ -674,6 +674,9 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // 2026-10-26 gap-audit build, A-1: the 10y−3m curve leg — a yield gap in
   // percentage points, like its 10y−2y sibling.
   'yield-curve-10y3m',
+  // 2026-10-26 gap-audit build, A-3: the US−Japan 10-year gap — a
+  // yield gap in percentage points, the au-us-10y-gap family.
+  'us-japan-10y-gap',
   // 2026-10-26 gap-audit build, A-5: the RBA−Fed policy-rate gap — a
   // rate gap in percentage points, the au-us-10y-gap family.
   'rba-fed-gap',

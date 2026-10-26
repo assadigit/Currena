@@ -2529,6 +2529,79 @@
       }
     },
     {
+      "id": "us-japan-10y-gap",
+      "title": "US−Japan 10Y yield gap",
+      "area": {
+        "section": "global",
+        "group": "dollar-strength",
+        "gauge": "dollar-strength",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "derived",
+        "name": "FRED (DGS10) − Japan Ministry of Finance (jgbcme 10Y)",
+        "url": "https://fred.stlouisfed.org/series/DGS10",
+        "seriesIdOrTable": "FRED:DGS10 − MOF jgbcme 10Y (daily)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DGS10",
+      "methodUrl": "https://fred.stlouisfed.org/series/DGS10",
+      "whatItIs": "The US 10-year Treasury yield minus Japan’s 10-year government bond yield (4.96 − 2.914 ≈ 2.05 today): computed from the two published series on their common dates.",
+      "whatItIsnt": "The gap explains the trade’s reward, not its crowding: positioning can unwind even while the gap stays wide.",
+      "trackRecordNote": "The August-2024 carry unwind came after years of a wide gap; narrow gaps have historically coincided with JPY-short squeezes.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 5 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15). · Worst of legs (fred:DGS10, mof:jgbcme, fred:IRLTLT01JPM156N): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DGS10",
+          "mof:jgbcme",
+          "fred:IRLTLT01JPM156N"
+        ]
+      },
+      "unit": "points",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 5,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "any-of",
+        "of": [
+          {
+            "kind": "threshold",
+            "direction": "below",
+            "value": 2
+          },
+          {
+            "kind": "threshold",
+            "direction": "above",
+            "value": 4
+          }
+        ]
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:DGS10, mof:jgbcme, fred:IRLTLT01JPM156N): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
       "id": "usdjpy",
       "title": "USD/JPY",
       "area": {

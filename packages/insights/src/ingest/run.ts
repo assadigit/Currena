@@ -87,7 +87,7 @@ import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS, type Rung2FetchPlan 
 import type { ReadingSourceOverride } from '../adapters/collect';
 import { computeReading, type ReadingSource } from '../scoring';
 import type { KVLike } from './kv-store';
-import { epochDay, fromEpochDay, type SeriesPoint } from '../series';
+import { combineSeries, epochDay, fromEpochDay, type SeriesPoint } from '../series';
 
 /**
  * The live-priced rows whose value series accumulate one observation per
@@ -647,6 +647,13 @@ export interface Rung2PhaseOptions {
   plan?: Rung2FetchPlan;
 }
 
+/** The derived US−Japan gap: inner join on common dates, 4dp quantized. */
+function quantizedGap(us: SeriesPoint[], jp: SeriesPoint[]): SeriesPoint[] {
+  const gap = combineSeries(us, jp, (a, b) => a - b);
+  const f = 10_000;
+  return gap.map((p) => ({ date: p.date, value: Math.round(p.value * f) / f }));
+}
+
 /** Read a stored history as series, poison-tolerant (the collect pattern). */
 async function storedSeriesOf(store: InsightsStore, id: IndicatorId): Promise<SeriesPoint[] | undefined> {
   try {
@@ -693,6 +700,8 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
   // readingSourceOverrides discipline).
   const series: Record<string, SeriesPoint[]> = {};
   const sourceOverrides: Partial<Record<IndicatorId, ReadingSource>> = {};
+  // A-3: the gap card's legs' own dates, captured at derivation time.
+  const gapLegDates: Partial<Record<'us-japan-10y-gap', { us: string; jp: string }>> = {};
   const defOf = (id: IndicatorId) => DEFINITIONS.find((d) => d.id === id)!;
 
   if (plan.mof) {
@@ -720,6 +729,34 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
       series['jgb-10y'] = stored;
       console.log('  · jgb-10y: MOF and the mirror both unavailable — holding the stored tail');
     }
+
+    // A-3 (2026-10-26 gap-audit build): the US−Japan 10-year gap — the
+    // staged us10y (DGS10, the 04:10 build's own series) minus the jgb
+    // series this phase just resolved. Inner join on common dates, 4dp
+    // quantized (F4), fail closed on either parent missing (never a
+    // stale gap — the au-us-10y-gap discipline).
+    const stagedUs10y = stage?.series['us10y']?.map(([day, value]) => ({ date: fromEpochDay(day), value }));
+    const jgbSeries = series['jgb-10y'];
+    if (stagedUs10y !== undefined && jgbSeries !== undefined) {
+      const gap = quantizedGap(stagedUs10y, jgbSeries);
+      if (gap.length > 0) {
+        series['us-japan-10y-gap'] = gap;
+        console.log(`  · us-japan-10y-gap: ${gap.at(-1)!.value} @ ${gap.at(-1)!.date}`);
+      } else {
+        // No common dates (a desynchronised stage) — fail closed, never a
+        // stale gap: the reading carries, the next rung re-derives.
+        console.log('  · us-japan-10y-gap: the parents share no dates — holding (fail closed)');
+      }
+    } else {
+      console.log('  · us-japan-10y-gap: a parent is missing — holding (fail closed)');
+    }
+    // The gap card's legs' own dates (the B-10 pattern): the staged US leg
+    // and this phase's jgb series.
+    const us10yLegLast = stagedUs10y?.at(-1)?.date;
+    const jgbLegLast = jgbSeries?.at(-1)?.date;
+    if (us10yLegLast !== undefined && jgbLegLast !== undefined) {
+      gapLegDates['us-japan-10y-gap'] = { us: us10yLegLast, jp: jgbLegLast };
+    }
   }
 
   if (Object.keys(series).length === 0) {
@@ -740,6 +777,15 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
     const def = defOf(id);
     const source: ReadingSource = sourceOverrides[id] ?? READING_SOURCES[id] ?? { name: def.sourceRef };
     let reading = computeReading(def, idSeries, nowIso, source);
+    // A-3: the gap card's legs' own dates (the B-10 gapLegs pattern — the
+    // us10y leg rides the 04:10 stage, the jgb leg this phase's series).
+    const legs = gapLegDates['us-japan-10y-gap'];
+    if (id === 'us-japan-10y-gap' && reading.asOf !== null && legs !== undefined) {
+      reading = {
+        ...reading,
+        gapLegs: { a: { id: 'us10y', asOf: legs.us }, b: { id: 'jgb-10y', asOf: legs.jp } },
+      };
+    }
     // The definitional sanity range (T-28/F-14) — the same gate the main
     // build applies after the deterministic base.
     const sanityBand = SANITY_RANGES[id as string];

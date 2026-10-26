@@ -22,8 +22,8 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 50 P1 / 41 P2 (the 2026-10-25 M6 Wave-3 round adds twelve P1 cards — the leading-edge batch; the 2026-10-26 M7 round adds china-cpi as a P1 card on the NBS press-release automation; the 2026-10-26 gap-audit build adds yield-curve-10y3m and rba-fed-gap as P1 voters, A-1/A-5)', () => {
-    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(50);
+  it('splits 51 P1 / 41 P2 (the 2026-10-25 M6 Wave-3 round adds twelve P1 cards — the leading-edge batch; the 2026-10-26 M7 round adds china-cpi as a P1 card on the NBS press-release automation; the 2026-10-26 gap-audit build adds yield-curve-10y3m, rba-fed-gap and us-japan-10y-gap as P1 voters, A-1/A-5/A-3)', () => {
+    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(51);
     expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(41);
   });
 
@@ -109,7 +109,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
   it('GAUGE membership is the scored list (43 voters; fix B-14: +brent counts in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims, +recession-probability, +michigan-sentiment in growth-health, +us-pce-core-yoy in prices-heat; 2026-10-25 M6 Wave 3: +euro-hicp in prices-heat, +au-housing-finance in au-households; 2026-10-26 M7: +china-cpi in growth-health)', () => {
     const gaugedGroups = new Set(GAUGES.map((g) => g.id));
     const memberIds = new Set(GAUGES.flatMap((g) => g.members));
-    expect(memberIds.size).toBe(45); // +yield-curve-10y3m (A-1, borrowing-costs) +rba-fed-gap (A-5, au-trade-currency)
+    expect(memberIds.size).toBe(46); // +yield-curve-10y3m (A-1, borrowing-costs) +rba-fed-gap (A-5, au-trade-currency) +us-japan-10y-gap (A-3, dollar-strength)
     // Every gauge member is a scored (non-info) definition. B-14's one
     // deliberate exception: brent lives in the prices-board lane group but
     // counts in the prices-heat gauge (the card renders on the Prices

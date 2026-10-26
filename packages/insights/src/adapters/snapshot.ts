@@ -491,7 +491,7 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
       const sinceYear = inputs.highestSince?.[def.id];
       if (sinceYear !== undefined) reading.highestSinceYear = sinceYear;
 
-      // ---- Fix spec B-10: the AU−US gap's legs' own dates. ----
+      // ---- Fix spec B-10: the gap cards' legs' own dates. ----
       if (def.id === 'au-us-10y-gap' && reading.asOf !== null) {
         const au = inputs.series['au-10y'];
         const us = inputs.series['us10y'];
@@ -501,6 +501,19 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
           reading.gapLegs = {
             a: { id: 'au-10y', asOf: auLast },
             b: { id: 'us10y', asOf: usLast },
+          };
+        }
+      }
+      // 2026-10-26 gap-audit build, A-3: the US−Japan gap's legs.
+      if (def.id === 'us-japan-10y-gap' && reading.asOf !== null) {
+        const us = inputs.series['us10y'];
+        const jp = inputs.series['jgb-10y'];
+        const usLast = us?.[us.length - 1]?.date;
+        const jpLast = jp?.[jp.length - 1]?.date;
+        if (usLast !== undefined && jpLast !== undefined) {
+          reading.gapLegs = {
+            a: { id: 'us10y', asOf: usLast },
+            b: { id: 'jgb-10y', asOf: jpLast },
           };
         }
       }

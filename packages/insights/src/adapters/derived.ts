@@ -469,6 +469,18 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   /* ---------------- Global — Is the dollar strong? ---------------- */
   put('dollar-basket', basketSeries(fx));
   put('usdjpy', fx.JPY);
+  // 2026-10-26 gap-audit build, A-3: the US−Japan 10-year yield gap —
+  // DGS10 − the MOF daily 10Y (both parents collected; inner join on
+  // common dates, quantized 4dp). Only derivable when the rung-2 inputs
+  // carry a jgb series (the Node venue's inline collection / a future
+  // armed context); the Worker's 04:20 phase derives its own copy from
+  // the stage + MOF fetch.
+  if (fred.DGS10 && inputs.rung2?.jgb10y !== undefined) {
+    put(
+      'us-japan-10y-gap',
+      quantized(combineSeries(fred.DGS10, inputs.rung2.jgb10y, (us, jp) => us - jp), 4),
+    );
+  }
   put('eur-usd', fx.EUR);
   // M5 Wave 2 (2026-10-24): the EM-pressure first member — the dollar
   // against the Turkish lira (context; the fx-module EM block may follow
@@ -937,6 +949,11 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     url: 'https://frankfurter.dev',
   },
   usdjpy: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
+  // 2026-10-26 gap-audit build, A-3.
+  'us-japan-10y-gap': {
+    name: 'FRED (DGS10) − Japan Ministry of Finance (jgbcme 10Y)',
+    url: 'https://fred.stlouisfed.org/series/DGS10',
+  },
   'eur-usd': { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   // 2026-10-21 data-integrity round — the coverage additions' attributions.
   wti: { name: 'FRED (EIA WTI spot)', url: 'https://fred.stlouisfed.org/series/DCOILWTICO' },

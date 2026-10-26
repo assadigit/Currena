@@ -72,7 +72,13 @@ export const GAUGES: readonly GaugeDef[] = [
   // Step-2 add-list §B5: VIX joins the market-stress voters (scored on its
   // 10-year position; the calm/nervous word thresholds arrive with Step 3).
   { id: 'market-stress', section: 'global', members: ['stress-stlfsi', 'nfci', 'vix', 'gold-silver'] },
-  { id: 'dollar-strength', section: 'global', members: ['dollar-basket', 'usdjpy'] },
+  // 2026-10-26 gap-audit build, A-3: the US−Japan 10y gap joins the
+  // voters — the carry trade's fuel line beside USD/JPY.
+  {
+    id: 'dollar-strength',
+    section: 'global',
+    members: ['dollar-basket', 'usdjpy', 'us-japan-10y-gap'],
+  },
   // Step-2 add-list §B3/§B4: US unemployment and the Sahm rule join the
   // growth-health voters, next to the US macro series already there.
   // Fix spec C-05 (2026-10-14): the Philadelphia Fed survey joins them.

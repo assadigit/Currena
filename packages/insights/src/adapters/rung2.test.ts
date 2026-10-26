@@ -246,7 +246,12 @@ describe('runInsightsRung2Phase (the 04:20 orchestration)', () => {
         v: 1,
         writtenAt: '2026-10-27T04:10:00.000Z',
         series: {
-          us10y: [[19000, 4.96]],
+          // epoch day 20747 = 2026-10-21 (inside the MOF fixture's month).
+          us10y: [
+            [20731, 4.9],
+            [20747, 4.96],
+            [20748, 4.95],
+          ],
           'jgb-mirror': [[19000, 2.8]],
         },
       });
@@ -271,6 +276,16 @@ describe('runInsightsRung2Phase (the 04:20 orchestration)', () => {
       const stage = JSON.parse(kv.value!) as { series: Record<string, unknown> };
       expect(stage.series['jgb-10y']).toBeDefined();
       expect(stage.series['jgb-mirror']).toBeDefined(); // preserved
+      // A-3: the US−Japan gap derived from the staged us10y + the MOF jgb
+      // series — the stage's us10y (4.96 @ 2026-10-26) joins the MOF file's
+      // newest common date (2026-10-22 → the stage series is date-mapped by
+      // epoch day; the gap's value must be a true difference, never stale).
+      const gap = store.snapshot!.readings.find((r) => r.id === 'us-japan-10y-gap')!;
+      expect(gap).toBeDefined();
+      expect(gap.value).not.toBeNull();
+      expect(gap.gapLegs).toBeDefined();
+      expect(gap.gapLegs!.a.id).toBe('us10y');
+      expect(gap.gapLegs!.b.id).toBe('jgb-10y');
       // the report rows appended
       expect(result.reports.some((r) => r.source === 'mof' && r.ok)).toBe(true);
     } finally {

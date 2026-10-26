@@ -40,7 +40,8 @@ import { fetchMofJgb10y } from './mof';
  */
 export const RUNG2_IDS: readonly IndicatorId[] = [
   'jgb-10y', // A-2: the MOF daily upgrade (the OECD mirror stays the labelled fallback)
-  // A-3 + A-6..A-10 join this list as their additions land (one commit each).
+  'us-japan-10y-gap', // A-3: derived at 04:20 from the staged us10y + MOF
+  // A-6..A-10 join this list as their additions land (one commit each).
 ];
 
 /** Which feeds a rung-2 execution fetches. */

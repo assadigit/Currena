@@ -789,6 +789,36 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 4,
   },
   {
+    // 2026-10-26 gap-audit build, A-3 (INSIGHTS_DATA_SPEC.md): the
+    // US−Japan 10-year yield gap — DGS10 − the MOF's daily 10Y. The
+    // carry trade's fuel line: unwinds historically accelerate as the gap
+    // compresses toward the funding-cost line (the Aug-2024 pattern).
+    // Derived at the 04:20 rung-2 phase after both parents land (the
+    // main rung carries it); fails closed on missing parents (the
+    // au-us-10y-gap discipline — never a stale gap).
+    id: 'us-japan-10y-gap',
+    section: 'global',
+    group: 'dollar-strength',
+    name: 'US−Japan 10Y yield gap',
+    source: 'derived',
+    sourceRef: 'FRED:DGS10 − MOF jgbcme 10Y (daily)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: {
+      kind: 'any-of',
+      of: [
+        // Needs attention: below 2.00 (carry unwinds accelerate; the
+        // trade's risk-reward inverts). Unusual: below 1.50 (the historic
+        // JPY-short squeeze zone — strictly inside below-2.00 for the
+        // vote) or above 4.00 (blow-off-top extremes).
+        { kind: 'threshold', direction: 'below', value: 2 },
+        { kind: 'threshold', direction: 'above', value: 4 },
+      ],
+    },
+    staleAfterDays: 5,
+  },
+  {
     id: 'usdjpy',
     section: 'global',
     group: 'dollar-strength',

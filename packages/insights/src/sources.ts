@@ -516,6 +516,9 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   'yield-curve-10y2y': ['fred:T10Y2Y'],
   // 2026-10-26 gap-audit build, A-1.
   'yield-curve-10y3m': ['fred:T10Y3M'],
+  // 2026-10-26 gap-audit build, A-3: both parents — the US 10-year and the
+  // MOF daily (the OECD mirror leg rides as jgb-10y's own fallback).
+  'us-japan-10y-gap': ['fred:DGS10', 'mof:jgbcme', 'fred:IRLTLT01JPM156N'],
   // 2026-10-26 gap-audit build, A-2: the MOF daily primary + the OECD
   // mirror fallback leg (the mirror fills during MOF outages, labelled).
   'jgb-10y': ['mof:jgbcme', 'fred:IRLTLT01JPM156N'],

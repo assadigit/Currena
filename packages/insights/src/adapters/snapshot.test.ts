@@ -148,10 +148,10 @@ describe('buildInsightsSnapshot', () => {
     // maize, usdtry) → 76; the 2026-10-25 M6 Wave-3 round added the
     // leading-edge batch's twelve ids → 88; the 2026-10-26 M7 round
     // added china-cpi (the NBS automation's second card) → 89; the
-    // 2026-10-26 gap-audit build adds yield-curve-10y3m (A-1) and
-    // rba-fed-gap (A-5) → 91.
-    expect(snap.readings).toHaveLength(91);
-    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(91);
+    // 2026-10-26 gap-audit build adds yield-curve-10y3m (A-1),
+    // rba-fed-gap (A-5) and us-japan-10y-gap (A-3) → 92.
+    expect(snap.readings).toHaveLength(92);
+    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(92);
     expect(snap.readings.find((r) => r.id === 'us10y')!.status).not.toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.status).toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.value).toBeNull();

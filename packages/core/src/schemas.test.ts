@@ -327,7 +327,7 @@ import {
 describe('Insights: IndicatorIdSchema (contract shape is deliberate)', () => {
   it('pins the exact indicator set — 89 ids (the 2026-10-25 M6 Wave-3 round adds the leading-edge batch: mortgage-30y, walcl, retail-sales, housing-permits, cfnai, job-openings, t5yie, us-wages, euro-hicp, au-housing-finance, au-saving-ratio, au-job-vacancies; the 2026-10-26 M7 round adds china-cpi on the NBS press-release automation — both OECD mirrors died upstream 2025-04), blocked/licensed items absent', () => {
     const ids = IndicatorIdSchema.options;
-    expect(ids).toHaveLength(91); // the 2026-10-26 gap-audit build adds yield-curve-10y3m (A-1) + rba-fed-gap (A-5)
+    expect(ids).toHaveLength(92); // the 2026-10-26 gap-audit build adds yield-curve-10y3m (A-1), rba-fed-gap (A-5) + us-japan-10y-gap (A-3)
     // Step-2 add-list §B5: VIX is IN (FRED VIXCLS, licence noted); the rest
     // of the v1 blocked list stays blocked.
     for (const blocked of ['spx-gold', 'breadth', 'cape']) {

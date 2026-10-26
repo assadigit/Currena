@@ -228,6 +228,32 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
     expect(out2['rba-fed-gap']).toBeUndefined();
   });
 
+  it('A-3: the US−Japan gap derives from DGS10 and the rung-2 jgb series (inner join, 4dp)', () => {
+    // With a rung-2 jgb series supplied (the Node venue's inline
+    // collection), the gap composes on common dates.
+    const withJgb = {
+      ...inputs,
+      rung2: {
+        jgb10y: pts([
+          ['2026-10-05', 2.5],
+          ['2026-10-06', 2.52],
+        ]),
+      },
+    };
+    const out = buildIndicatorSeries(withJgb);
+    // DGS10 exists only on 2026-10-05 in the fixture → one common date.
+    expect(out['us-japan-10y-gap']).toEqual([{ date: '2026-10-05', value: 1.6 }]);
+    // No jgb series (the Worker's 04:10 main rung) → no gap (the reading
+    // carries; the 04:20 phase derives it).
+    expect(buildIndicatorSeries(inputs)['us-japan-10y-gap']).toBeUndefined();
+    // Disjoint dates → nothing (fail closed, never a stale gap).
+    const disjoint = {
+      ...inputs,
+      rung2: { jgb10y: pts([['2026-06-01', 2.1]]) },
+    };
+    expect(buildIndicatorSeries(disjoint)['us-japan-10y-gap']).toBeUndefined();
+  });
+
   it('A-5: the RBA−Fed gap needs BOTH parents and never subtracts across unmatched dates', () => {
     // No Fed corridor → no gap.
     const noFed = {

@@ -322,6 +322,9 @@ export const IndicatorIdSchema = z.enum([
   // Fed's own preferred recession lens, riding the same FRED bulk group
   // as T10Y2Y (zero new fetches).
   'yield-curve-10y3m',
+  // 2026-10-26 gap-audit build (A-3): the US−Japan 10-year yield gap —
+  // the carry trade's fuel line, derived DGS10 − MOF.
+  'us-japan-10y-gap',
   'real-yield-10y',
   'us10y',
   'fed-target',

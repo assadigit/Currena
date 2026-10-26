@@ -570,6 +570,30 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou:
       'A watched proxy for global risk appetite: yen strength usually means investors are de-risking.',
   },
+  'us-japan-10y-gap': {
+    // 2026-10-26 gap-audit build, A-3 (INSIGHTS_DATA_SPEC.md): the carry
+    // trade's fuel line, derived at the 04:20 rung from DGS10 + the MOF 10Y.
+    name: 'The gap between US and Japanese 10-year rates',
+    ticker: '10Y gap',
+    oneLiner:
+      'How much more the US pays to borrow for ten years than Japan: the reward that keeps the yen carry trade alive.',
+    lines: {
+      highRising: 'The gap is wide and widening: the carry trade pays well — a setting that usually comes with calm markets.',
+      highEasing: 'The gap remains wide but is narrowing: the carry trade’s reward is shrinking.',
+      typical: 'The gap sits in its usual range for the decade.',
+      low: 'The gap has narrowed toward the funding-cost line: the zone where carry unwinds have historically accelerated.',
+    },
+    whatItIs:
+      'The US 10-year Treasury yield minus Japan’s 10-year government bond yield (4.96 − 2.914 ≈ 2.05 today): computed from the two published series on their common dates.',
+    whyItMatters:
+      'The interest gap between the US and Japan powers the yen carry trade — when it narrows, borrowed yen can rush home fast and world markets wobble.',
+    tendedToMean:
+      'The August-2024 carry unwind came after years of a wide gap; narrow gaps have historically coincided with JPY-short squeezes.',
+    cantTell:
+      'The gap explains the trade’s reward, not its crowding: positioning can unwind even while the gap stays wide.',
+    forYou:
+      'Read it beside the USD/JPY card: the pair is the trade, the gap is its fuel line.',
+  },
   'eur-usd': {
     name: 'Euro per US dollar',
     ticker: 'EUR/USD',
