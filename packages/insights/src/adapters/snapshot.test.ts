@@ -147,9 +147,10 @@ describe('buildInsightsSnapshot', () => {
     // M5 Wave-2 round added five more (euro-aaa-10y, food-index, wheat,
     // maize, usdtry) → 76; the 2026-10-25 M6 Wave-3 round added the
     // leading-edge batch's twelve ids → 88; the 2026-10-26 M7 round
-    // added china-cpi (the NBS automation's second card) → 89.
-    expect(snap.readings).toHaveLength(89);
-    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(89);
+    // added china-cpi (the NBS automation's second card) → 89; the
+    // 2026-10-26 gap-audit build adds yield-curve-10y3m (A-1) → 90.
+    expect(snap.readings).toHaveLength(90);
+    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(90);
     expect(snap.readings.find((r) => r.id === 'us10y')!.status).not.toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.status).toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.value).toBeNull();

@@ -71,6 +71,30 @@ export interface IndicatorCopyEntry {
 }
 
 const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
+  'yield-curve-10y3m': {
+    // 2026-10-26 gap-audit build, A-1 (INSIGHTS_DATA_SPEC.md): the 3-month
+    // leg of the curve — the one the Fed itself watches.
+    name: 'The gap between 10-year and 3-month US borrowing',
+    ticker: '10Y−3M',
+    oneLiner:
+      'The gap between 10-year and 3-month US rates: the Federal Reserve’s own preferred recession gauge.',
+    lines: {
+      highRising: 'The gap is wide and widening: a steep curve usually comes with growth or inflation pressure.',
+      highEasing: 'The gap is wide but narrowing: still the shape of normal, healthy conditions.',
+      typical: 'The gap sits in its usual range for the decade: no unusual signal either way.',
+      low: 'Short-term rates are above long-term ones — the “inverted” shape that has preceded every modern US recession.',
+    },
+    whatItIs:
+      'The 10-year minus 3-month Treasury yield difference from FRED (T10Y3M): the shape of the US yield curve the Federal Reserve itself watches most closely.',
+    whyItMatters:
+      'When short-term rates top long-term rates, banks earn less on lending and the US economy has usually slowed within 6 to 24 months — a cue to be careful with big purchases and new debts.',
+    tendedToMean:
+      'Deep inversions of this leg preceded every modern US recession, usually by 6 to 24 months; the historic end-of-cycle steepening can arrive fast.',
+    cantTell:
+      'It says nothing about timing or size, and a few false alarms exist — it is a warning light, not a calendar.',
+    forYou:
+      'Read it beside its 10-year-minus-2-year sibling and the recession-probability card: two curve legs and one model telling the same story from different angles.',
+  },
   'yield-curve-10y2y': {
     name: 'The gap between 10-year and 2-year US borrowing',
     oneLiner:

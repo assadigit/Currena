@@ -318,6 +318,10 @@ export const CACHE_HARD_TTL_SEC = 7 * 24 * 3600;
 export const IndicatorIdSchema = z.enum([
   // Global — Is borrowing getting costlier?
   'yield-curve-10y2y',
+  // 2026-10-26 gap-audit build (A-1): the 10y−3m leg of the curve — the
+  // Fed's own preferred recession lens, riding the same FRED bulk group
+  // as T10Y2Y (zero new fetches).
+  'yield-curve-10y3m',
   'real-yield-10y',
   'us10y',
   'fed-target',

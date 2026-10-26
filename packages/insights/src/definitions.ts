@@ -51,6 +51,31 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     rule: { kind: 'threshold', direction: 'below', value: 0 },
   },
   {
+    // 2026-10-26 gap-audit build, A-1 (INSIGHTS_DATA_SPEC.md): the US
+    // 10-year minus 3-month Treasury yield — the 3-month leg the Fed itself
+    // watches (deep 3m inversions preceded every modern US recession with
+    // 6–24 months of lead). Rides the SAME FRED bulk group as T10Y2Y (zero
+    // new fetches); SCORED beside its 10y−2y sibling so the borrowing lane
+    // carries both classic curve legs.
+    id: 'yield-curve-10y3m',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'US 10Y minus 3M yield',
+    source: 'fred',
+    sourceRef: 'FRED:T10Y3M',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: {
+      kind: 'any-of',
+      of: [
+        { kind: 'threshold', direction: 'below', value: 0 },
+        { kind: 'threshold', direction: 'below', value: -0.5 },
+        { kind: 'change', mode: 'points', direction: 'rise', magnitude: 1, windowWeeks: 4 },
+      ],
+    },
+  },
+  {
     id: 'real-yield-10y',
     section: 'global',
     group: 'borrowing-costs',

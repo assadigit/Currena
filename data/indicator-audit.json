@@ -16,6 +16,19 @@
       "rule": "{\"kind\":\"threshold\",\"direction\":\"below\",\"value\":0}"
     },
     {
+      "id": "yield-curve-10y3m",
+      "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": true,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 4,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"any-of\",\"of\":[{\"kind\":\"threshold\",\"direction\":\"below\",\"value\":0},{\"kind\":\"threshold\",\"direction\":\"below\",\"value\":-0.5},{\"kind\":\"change\",\"mode\":\"points\",\"direction\":\"rise\",\"magnitude\":1,\"windowWeeks\":4}]}"
+    },
+    {
       "id": "real-yield-10y",
       "licenceName": "FRED license #copyright-public-domain (public domain)",
       "publicDisplayOk": "yes",

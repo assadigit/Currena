@@ -492,6 +492,8 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   'au-us-10y-gap': ['rba:F2', 'fred:DGS10'],
   'govt-interest-revenue': ['fred:A091RC1Q027SBEA', 'fred:W006RC1Q027SBEA'],
   'yield-curve-10y2y': ['fred:T10Y2Y'],
+  // 2026-10-26 gap-audit build, A-1.
+  'yield-curve-10y3m': ['fred:T10Y3M'],
   // 2026-10-21 data-integrity round — the coverage additions' explicit legs
   // (the FRED-sourced ones resolve their legs from sourceRef tokens).
   platinum: ['world-bank'],

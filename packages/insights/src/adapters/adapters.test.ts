@@ -95,8 +95,22 @@ describe('fred adapter', () => {
     // ICSA, SOFR, RECPROUSM156N, UMCSENT, MICH and PCEPILFE → 36; the
     // 2026-10-25 M6 Wave-3 round adds MORTGAGE30US, WALCL, RSAFS, PERMIT,
     // CFNAI, JTSJOL, T5YIE and AHETPI → 44, and the Wave-4 BoE fix
-    // RETIRES IRSTCI01GBM156N (boe-rate moved to the BoE's own page) → 43.
-    expect(Object.values(FRED_SERIES)).toHaveLength(43);
+    // RETIRES IRSTCI01GBM156N (boe-rate moved to the BoE's own page) → 43;
+    // the 2026-10-26 gap-audit build adds T10Y3M (A-1) → 44.
+    expect(Object.values(FRED_SERIES)).toHaveLength(44);
+  });
+
+  it('parses the 10y−3m curve leg from the recorded T10Y3M capture (A-1, 2026-10-26)', async () => {
+    const fetchImpl = fixtureFetch({
+      'https://fred.stlouisfed.org/graph/fredgraph.csv?id=T10Y3M': () => fixtureText('fred-T10Y3M.csv'),
+    });
+    const series = await fetchFredSeries('T10Y3M', { fetchImpl });
+    expect(series.length).toBeGreaterThan(2000);
+    expect(series.at(-1)).toEqual({ date: '2026-10-23', value: 0.78 });
+    // The spec's verified live reading: 0.78 @ 2026-10-23 (0.31 was T10Y2Y's
+    // same-day print — the two legs must stay distinct series).
+    expect(series.at(-2)!.date).toBe('2026-10-22');
+    expect(series[0]!.date).toBe('2016-01-04');
   });
 });
 

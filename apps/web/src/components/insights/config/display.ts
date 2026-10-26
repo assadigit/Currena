@@ -75,6 +75,9 @@ const PREFIXED_UNITS: ReadonlySet<UnitToken> = new Set(['usd', 'aud', 'usd-bn', 
 
 export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'yield-curve-10y2y': { decimals: 2, unit: 'points' },
+  // 2026-10-26 gap-audit build, A-1: the 10y−3m curve leg, rendered like
+  // its 10y−2y sibling.
+  'yield-curve-10y3m': { decimals: 2, unit: 'points' },
   'fed-expectations': { decimals: 2, unit: 'points' },
   us30y: { decimals: 2, unit: 'percent' },
   'philly-fed': { decimals: 1, unit: 'points' },

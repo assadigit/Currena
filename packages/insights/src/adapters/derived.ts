@@ -334,6 +334,9 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
 
   /* ------------- Global — Is borrowing getting costlier? ------------- */
   put('yield-curve-10y2y', fred.T10Y2Y);
+  // 2026-10-26 gap-audit build, A-1: the 10y−3m leg (T10Y3M rides the same
+  // daily bulk group as T10Y2Y — zero new fetches).
+  put('yield-curve-10y3m', fred.T10Y3M);
   put('real-yield-10y', fred.DFII10);
   put('us10y', fred.DGS10);
   // Step-1 audit item A1: the fed-target series is the range's LOWER bound
@@ -796,6 +799,11 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'yield-curve-10y2y': {
     name: 'Federal Reserve Bank of St. Louis via FRED (T10Y2Y)',
     url: 'https://fred.stlouisfed.org/series/T10Y2Y',
+  },
+  // 2026-10-26 gap-audit build, A-1.
+  'yield-curve-10y3m': {
+    name: 'Federal Reserve Bank of St. Louis via FRED (T10Y3M)',
+    url: 'https://fred.stlouisfed.org/series/T10Y3M',
   },
   'real-yield-10y': { name: 'FRED (DFII10)', url: 'https://fred.stlouisfed.org/series/DFII10' },
   us10y: { name: 'FRED (DGS10)', url: 'https://fred.stlouisfed.org/series/DGS10' },

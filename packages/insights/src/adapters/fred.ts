@@ -120,6 +120,9 @@ export async function fetchFredSeriesBulk(
 /** The FRED series ids the Insights indicators consume (I2 route + I15 additions, keyless). */
 export const FRED_SERIES = {
   yieldCurve10y2y: 'T10Y2Y',
+  // 2026-10-26 gap-audit build, A-1: the 10y−3m curve leg (the Fed's own
+  // preferred recession lens; rides the same daily bulk group as T10Y2Y).
+  yieldCurve10y3m: 'T10Y3M',
   stressStlfsi: 'STLFSI4',
   realYield10y: 'DFII10',
   us10y: 'DGS10',
@@ -223,6 +226,7 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
   {
     seriesIds: [
       FRED_SERIES.yieldCurve10y2y,
+      FRED_SERIES.yieldCurve10y3m,
       FRED_SERIES.stressStlfsi,
       FRED_SERIES.breakeven5y5y,
       FRED_SERIES.us2y,

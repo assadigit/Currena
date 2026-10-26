@@ -671,6 +671,9 @@ function t09Counts(inputs: ValidationInputs): ValidationTestResult {
  */
 const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'yield-curve-10y2y',
+  // 2026-10-26 gap-audit build, A-1: the 10y−3m curve leg — a yield gap in
+  // percentage points, like its 10y−2y sibling.
+  'yield-curve-10y3m',
   // Fix spec C-03/C-04/C-05/C-06 (2026-10-14): the four additions all speak
   // in points — two yield gaps, one yield, one diffusion index.
   'fed-expectations',

@@ -43,6 +43,9 @@ export const GAUGES: readonly GaugeDef[] = [
     // 30-year yield join the voters (both scored rate series).
     members: [
       'yield-curve-10y2y',
+      // 2026-10-26 gap-audit build, A-1: the 10y−3m leg joins the voters —
+      // the Fed's own preferred recession lens beside its 10y−2y sibling.
+      'yield-curve-10y3m',
       'fed-expectations',
       'real-yield-10y',
       'us10y',

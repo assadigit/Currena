@@ -74,6 +74,84 @@
       }
     },
     {
+      "id": "yield-curve-10y3m",
+      "title": "US 10Y minus 3M yield",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": "borrowing-costs",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Federal Reserve Bank of St. Louis via FRED (T10Y3M)",
+        "url": "https://fred.stlouisfed.org/series/T10Y3M",
+        "seriesIdOrTable": "FRED:T10Y3M"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/T10Y3M",
+      "methodUrl": "https://fred.stlouisfed.org/series/T10Y3M",
+      "whatItIs": "The 10-year minus 3-month Treasury yield difference from FRED (T10Y3M): the shape of the US yield curve the Federal Reserve itself watches most closely.",
+      "whatItIsnt": "It says nothing about timing or size, and a few false alarms exist — it is a warning light, not a calendar.",
+      "trackRecordNote": "Deep inversions of this leg preceded every modern US recession, usually by 6 to 24 months; the historic end-of-cycle steepening can arrive fast.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:T10Y3M"
+        ]
+      },
+      "unit": "points",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "cadence default (daily)",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "any-of",
+        "of": [
+          {
+            "kind": "threshold",
+            "direction": "below",
+            "value": 0
+          },
+          {
+            "kind": "threshold",
+            "direction": "below",
+            "value": -0.5
+          },
+          {
+            "kind": "change",
+            "mode": "points",
+            "direction": "rise",
+            "magnitude": 1,
+            "windowWeeks": 4
+          }
+        ]
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:T10Y3M): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
       "id": "real-yield-10y",
       "title": "US 10-year real yield",
       "area": {
