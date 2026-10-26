@@ -54,7 +54,7 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
   it('fred: 40 series, worst level L2 across its L0/L2 mix, deduped licences (2026-10-25 M6: +8 Wave-3 series, -boe-rate to the BoE row; the 2026-10-26 gap-audit build adds T10Y3M, A-1)', () => {
     const fred = rows.find((r) => r.provider === 'fred');
     expect(fred).toBeDefined();
-    expect(fred!.seriesCount).toBe(40);
+    expect(fred!.seriesCount).toBe(39); // A-2 moves jgb-10y to the mof row
     expect(fred!.levels).toEqual(['L0', 'L2']);
     expect(fred!.worstLevel).toBe('L2');
     // 3 distinct licence names across the 16 series (public-domain,
@@ -85,8 +85,8 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
 
   it('derived: fully enabled since the 2026-10-21 round un-disabled the crosses (silver-btc retired 2026-10-23, OD-7)', () => {
     const derived = rows.find((r) => r.provider === 'derived');
-    expect(derived!.seriesCount).toBe(12);
-    expect(derived!.enabledCount).toBe(12);
+    expect(derived!.seriesCount).toBe(13); // A-5 adds rba-fed-gap
+    expect(derived!.enabledCount).toBe(13);
     expect(aboutEnabledState(derived!)).toBe('on');
     // Own-computation series inherit the upstream terms — the blanket
     // sidecar string (audjpy's) is one of the row's licences (sources.ts

@@ -527,6 +527,19 @@ export const IndicatorSourceSchema = z.enum([
   // row's ToS grants the automated download; the manual seeds remain as
   // the fetch-failure fallback history in data/manual/).
   'nbs',
+  // 2026-10-26 gap-audit build, A-2: the Japan Ministry of Finance's own
+  // daily JGB yield CSVs (the jgb-10y upgrade; the OECD mirror becomes
+  // the labelled fallback).
+  'mof',
+  // 2026-10-26 gap-audit build, A-6..A-10: the rung-2 feeds — the EIA
+  // weekly stocks page (the existing eia provider gains a second use),
+  // the CFTC's COT file, the OECD SDMX CLI, Iacoviello's GPR export and
+  // Baker-Bloom-Davis's EPU workbook.
+  'eia',
+  'cftc',
+  'oecd',
+  'gpr',
+  'epu',
   // 2026-10-21 data-integrity round: EODHD crypto (eth-usd) — RETIRED with
   // the card (2026-10-21c owner round); the insights ingest no longer calls
   // EODHD. The id stays OUT of the enum; the markets worker's EODHD usage

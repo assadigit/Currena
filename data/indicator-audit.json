@@ -179,8 +179,8 @@
       "level": "L2",
       "ownerAccepts": true,
       "enabled": true,
-      "method": "M1",
-      "maxAgeDays": 75,
+      "method": "M2",
+      "maxAgeDays": 4,
       "ruleVersion": 2,
       "rule": "{\"kind\":\"info\"}"
     },

@@ -28,6 +28,7 @@
 import {
   runInsightsUpdate,
   runInsightsHistoryPhase,
+  runInsightsRung2Phase,
   KvInsightsStore,
   HIDDEN_PUBLIC_IDS,
 } from '@currena/insights/ingest';
@@ -37,6 +38,16 @@ import type { Bindings } from './index';
 export const INGEST_CRON_HOUR = 4;
 /** 04:10 — the main run (collect + snapshot + stage). */
 export const INGEST_MAIN_MINUTE = 10;
+/**
+ * 04:20 — the rung-2 phase (2026-10-26 gap-audit build): the additions
+ * whose fetches must not ride the 04:10 main rung (the audit's subrequest
+ * arithmetic — the main rung sits at its fetch ceiling). MOF daily; the
+ * EIA/CFTC weekly pair on Saturdays; the OECD/GPR/EPU monthly trio on the
+ * first of the month; anything missing = bootstrap. Patches the snapshot +
+ * public projection and updates the stage BEFORE the 04:25/04:40 history
+ * phases consume it.
+ */
+export const INGEST_RUNG2_MINUTE = 20;
 /** 04:25 — the daily-cadence history rung. */
 export const INGEST_HIST_DAILY_MINUTE = 25;
 /** 04:40 — the periodic (monthly/quarterly) history rung. */
@@ -152,6 +163,19 @@ export async function runScheduledInsightsIngest(env: Bindings): Promise<void> {
   }
 }
 
+/** One rung-2 phase (04:20 UTC): fetch the rung-2 feeds, patch, re-stage. */
+export async function runScheduledInsightsRung2(
+  env: Bindings,
+): Promise<import('@currena/insights/ingest').Rung2PhaseResult> {
+  const store = new KvInsightsStore(env.RATES);
+  return runInsightsRung2Phase({
+    store,
+    stageKv: env.RATES,
+    mode: 'scheduled',
+    hiddenPublicIds: HIDDEN_PUBLIC_IDS,
+  });
+}
+
 /** One sweep rung (10:10 / 20:10 UTC): gated re-run of the full ingest. */
 export async function runScheduledInsightsSweep(env: Bindings): Promise<'skipped' | 'ran'> {
   const status = await readInsightsStatus(env.RATES);
@@ -170,6 +194,10 @@ export async function runScheduledInsightsSweep(env: Bindings): Promise<'skipped
     skipRbaCsvTables: true,
     hiddenPublicIds: HIDDEN_PUBLIC_IDS,
     sweep: true,
+    // 2026-10-26 gap-audit build: the sweep must NOT overwrite the stage —
+    // the morning's 04:20-updated blob (with the rung-2 series) stands for
+    // the 04:25/04:40 history phases.
+    skipStageWrite: true,
   });
   if (result.failedSources.length === 0) {
     console.log('[ingest-sweep] all sources healthy again — snapshot restored');
@@ -194,7 +222,7 @@ export async function runScheduledInsightsHistories(
 /** True when the scheduled time carries an ingest rung (and which). */
 export function insightsIngestRung(
   scheduledTimeMs: number,
-): { kind: 'main' } | { kind: 'history-daily' } | { kind: 'history-periodic' } | { kind: 'sweep' } | undefined {
+): { kind: 'main' } | { kind: 'rung2' } | { kind: 'history-daily' } | { kind: 'history-periodic' } | { kind: 'sweep' } | undefined {
   const date = new Date(scheduledTimeMs);
   const hour = date.getUTCHours();
   const minute = date.getUTCMinutes();
@@ -203,6 +231,7 @@ export function insightsIngestRung(
   // was verified live; the main rung fires once a day at 04:10 again.
   if (hour === INGEST_CRON_HOUR) {
     if (minute === INGEST_MAIN_MINUTE) return { kind: 'main' };
+    if (minute === INGEST_RUNG2_MINUTE) return { kind: 'rung2' };
     if (minute === INGEST_HIST_DAILY_MINUTE) return { kind: 'history-daily' };
     if (minute === INGEST_HIST_PERIODIC_MINUTE) return { kind: 'history-periodic' };
     return undefined;

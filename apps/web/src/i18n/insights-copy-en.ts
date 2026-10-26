@@ -1875,17 +1875,21 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou: 'Europe’s counterpart to the US 10-year: a rough dial for borrowing costs across the euro area.',
   },
   'jgb-10y': {
+    // A-2 (2026-10-26 gap-audit build): the DAILY upgrade — the Ministry of
+    // Finance's own jgbcme.csv (next-business-day) replaces the OECD
+    // monthly mirror; the mirror stays as the labelled outage fallback.
     name: 'What the Japanese government pays to borrow for 10 years',
     ticker: 'JGB',
-    oneLiner: 'The interest rate on 10-year Japanese government debt: the benchmark of the world’s most-indebted rich economy — a monthly average that lags the live market.',
+    oneLiner: 'The interest rate on 10-year Japanese government debt: the benchmark of the world’s most-indebted rich economy, now read daily from the ministry’s own data.',
     lines: {
       highRising: 'Japanese borrowing costs are high and rising: a rare setting that tends to tighten money worldwide.',
       highEasing: 'Japanese borrowing costs are high for the decade but easing.',
       typical: 'Japanese borrowing costs are in their usual range for the decade.',
       low: 'Japanese borrowing costs are near zero: their setting for most of the past 25 years.',
     },
-    whatItIs: 'The average market yield on 10-year Japanese government bonds (JGBs) over the latest full month: an OECD monthly series via FRED (IRLTLT01JPM156N) — monthly average, lagged, so it can sit behind the day’s traded yield.',
-    whyItMatters: 'Japan held the world’s cheapest money for decades: moves in this yield steer the yen, and the huge pool of Japanese savings invested abroad.',
+    whatItIs: 'The daily market yield on 10-year Japanese government bonds (JGBs), published by Japan’s Ministry of Finance each business day (the jgbcme file’s own 10-year column; during a ministry outage the card falls back to a labelled OECD monthly average).',
+    whyItMatters:
+      'What Japan pays to borrow for ten years: the anchor of one of the world’s biggest saver economies, and the other half of the yen carry trade.',
     tendedToMean: 'The yield sat at or near zero from 2016 to 2024 under yield-curve control; the breakout since has ended the era of free Japanese money.',
     cantTell: 'The Bank of Japan still leans on this market: the yield reflects policy as much as markets, unlike most government bonds.',
     forYou: 'The sleeper of world bond markets: when Japanese yields move, world markets usually notice.',

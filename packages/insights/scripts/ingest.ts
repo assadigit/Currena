@@ -36,6 +36,9 @@ import { z } from 'zod';
 import { RestInsightsStore } from '../src/store';
 import { runInsightsUpdate, writeAllHistoriesInline } from '../src/ingest/run';
 import { HIDDEN_PUBLIC_IDS } from '../src/ingest/data';
+import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS } from '../src/adapters/rung2';
+import type { IndicatorId } from '@currena/core';
+import type { SeriesPoint } from '../src/series';
 
 const dryRun = process.argv.includes('--dry-run');
 
@@ -93,6 +96,36 @@ for (const dictPath of ['apps/web/src/i18n/insights-copy-en.ts', 'apps/web/src/i
 
 const skipRbaCsvTables = process.env.RBA_SKIP_CSV_TABLES === '1' || undefined;
 
+
+/* ------------------------------------------------------------------ *
+ * The inline rung-2 collection (2026-10-26 gap-audit build) - the Node
+ * venue has no subrequest ceiling, so the MOF/weekly/monthly feeds ride
+ * THIS run directly (one snapshot, no patching): the same collect the
+ * Worker's 04:20 phase performs, shared code. The plan is date-gated with
+ * the same bootstrap rule (anything missing from the store fetches now).
+ * ------------------------------------------------------------------ */
+
+const rung2Missing = new Set<string>();
+if (store !== undefined) {
+  for (const id of RUNG2_IDS) {
+    try {
+      const stored = await store.getHistory(id);
+      if (stored === undefined) rung2Missing.add(id);
+    } catch {
+      rung2Missing.add(id); // a poisoned key counts as missing (bootstrap)
+    }
+  }
+} else {
+  for (const id of RUNG2_IDS) rung2Missing.add(id);
+}
+const rung2Plan = rung2FetchPlanFor(new Date(), rung2Missing);
+console.log(
+  `[ingest] rung-2 inline plan - mof=${rung2Plan.mof} eiaWeekly=${rung2Plan.eiaWeekly} cftcWeekly=${rung2Plan.cftcWeekly} monthly=${rung2Plan.monthly}`,
+);
+const rung2 = await collectRung2Sources(rung2Plan);
+for (const row of rung2.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row.source} - ${row.detail}`);
+const rung2Series = rung2.series as Partial<Record<IndicatorId, SeriesPoint[]>>;
+
 const result = await runInsightsUpdate({
   // A dry-run without credentials takes the no-op store: runInsightsUpdate
   // skips every write when dryRun is set, and only the real store's READS
@@ -103,6 +136,9 @@ const result = await runInsightsUpdate({
   dryRun,
   ...(copyTexts.length > 0 ? { copyTexts } : {}),
   hiddenPublicIds: HIDDEN_PUBLIC_IDS,
+  // The inline rung-2 series (the 04:20 phase's twin; the mirror arms
+  // itself inside when the MOF fetch failed).
+  rung2Series,
 });
 
 /* ------------------------------------------------------------------ *
@@ -110,7 +146,13 @@ const result = await runInsightsUpdate({
  * ------------------------------------------------------------------ */
 
 if (!dryRun) {
-  const history = await writeAllHistoriesInline(store!, result.series);
+  // The rung-2 series join the inline history writes (the main build's
+  // series map already carries them when the inline collection ran).
+  const mergedSeries: Record<string, SeriesPoint[]> = {
+    ...Object.fromEntries(Object.entries(rung2Series).filter(([, v]) => v !== undefined)),
+    ...result.series,
+  };
+  const history = await writeAllHistoriesInline(store!, mergedSeries);
   const { reads, writes, retriedWrites } = store!.ops;
   console.log(
     `  KV ops this run: ${reads} reads, ${writes} writes (${retriedWrites} retried after the daily cap) — free limits: 100,000 reads / 1,000 writes per day.`,

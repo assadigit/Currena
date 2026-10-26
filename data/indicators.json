@@ -852,36 +852,37 @@
         "gaugeMembership": "context only — never counts"
       },
       "source": {
-        "provider": "fred",
-        "name": "OECD via FRED (IRLTLT01JPM156N)",
-        "url": "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
-        "seriesIdOrTable": "FRED:IRLTLT01JPM156N (long-term government bond yield, monthly)"
+        "provider": "mof",
+        "name": "Japan Ministry of Finance (JGB interest rates, daily)",
+        "url": "https://www.mof.go.jp/english/policy/jgbs/reference/interest_rate/jgbcme.csv",
+        "seriesIdOrTable": "Japan Ministry of Finance jgbcme.csv (10Y column, daily)"
       },
       "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
-      "publisherUrl": "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
-      "methodUrl": "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
-      "whatItIs": "The average market yield on 10-year Japanese government bonds (JGBs) over the latest full month: an OECD monthly series via FRED (IRLTLT01JPM156N) — monthly average, lagged, so it can sit behind the day’s traded yield.",
+      "publisherUrl": "https://www.mof.go.jp/english/policy/jgbs/reference/interest_rate/jgbcme.csv",
+      "methodUrl": "https://www.mof.go.jp/english/policy/jgbs/reference/interest_rate/jgbcme.csv",
+      "whatItIs": "The daily market yield on 10-year Japanese government bonds (JGBs), published by Japan’s Ministry of Finance each business day (the jgbcme file’s own 10-year column; during a ministry outage the card falls back to a labelled OECD monthly average).",
       "whatItIsnt": "The Bank of Japan still leans on this market: the yield reflects policy as much as markets, unlike most government bonds.",
       "trackRecordNote": "The yield sat at or near zero from 2016 to 2024 under yield-curve control; the breakout since has ended the era of free Japanese money.",
       "definition": null,
-      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L2",
         "ownerAccepts": true,
         "enabled": true,
-        "method": "M1",
-        "runtime": "github-action",
-        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15). · Worst of legs (mof:jgbcme, fred:IRLTLT01JPM156N): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
         "termsReadOn": "2026-10-16",
         "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
         "legs": [
+          "mof:jgbcme",
           "fred:IRLTLT01JPM156N"
         ]
       },
       "unit": "percent",
       "changeUnit": "percentage points",
-      "cadence": "monthly",
-      "maxAgeDays": 75,
+      "cadence": "daily",
+      "maxAgeDays": 4,
       "maxAgeBasis": "per-series override",
       "scored": false,
       "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
@@ -897,7 +898,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (mof:jgbcme, fred:IRLTLT01JPM156N): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },

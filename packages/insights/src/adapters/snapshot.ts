@@ -237,6 +237,17 @@ export interface SnapshotBuildInputs {
   sourceOutcomes?: Readonly<Record<string, 'blocked' | 'format-changed'>>;
   /** The run's clock (ISO 8601 UTC) — generatedAt and every reading's updatedAt. */
   now: string;
+  /**
+   * 2026-10-26 gap-audit build (the rung-2 split): ids owned by the 04:20
+   * phase (adapters/rung2.ts). At the 04:10 MAIN build their series are
+   * absent BY DESIGN (the subrequest budget keeps their fetches off the
+   * main rung) — instead of the generic H3 stale-hold, the previous
+   * reading carries VERBATIM (status, value, asOf): the phase owns their
+   * refresh 10 minutes later, and their own cadences (daily-T+1, weekly,
+   * monthly) tolerate the carry. Absent carry set / no previous reading →
+   * the honest unavailable path, unchanged.
+   */
+  carryForwardIds?: ReadonlySet<string>;
 }
 
 /* ------------------------------------------------------------------ *
@@ -369,6 +380,26 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
     const outcomeFlag = outcomeFlagFor(def, inputs.sourceOutcomes);
 
     if (!series) {
+      // 2026-10-26 gap-audit build: the rung-2 ids carry forward VERBATIM at
+      // the main build (their fetches live on the 04:20 phase; see
+      // carryForwardIds). The kill switch still wins — a disabled source's
+      // card goes dark, carried or not.
+      const carried = inputs.carryForwardIds?.has(def.id) === true;
+      const carriedReading = inputs.previous?.readings.find((r) => r.id === def.id);
+      if (
+        carried &&
+        !(inputs.disabledReadings ?? []).includes(def.id as string) &&
+        carriedReading !== undefined &&
+        carriedReading.value !== null &&
+        carriedReading.asOf !== null
+      ) {
+        readings.push({
+          ...carriedReading,
+          updatedAt: inputs.now,
+          ...(outcomeFlag !== undefined && carriedReading.flag === undefined ? { flag: outcomeFlag } : {}),
+        });
+        continue;
+      }
       // Step-1 audit item H3: a failed fetch HOLDS the last good value —
       // carried forward with its ORIGINAL asOf (never today's date) and
       // status `stale` (visible honesty, excluded from every count).
@@ -608,6 +639,46 @@ function lastStepOf(series: readonly SeriesPoint[], asOf: string): { date: strin
 /* ------------------------------------------------------------------ *
  * The PUBLIC projection (2026-10-19 owner decree; Step 3 §2.2 AC-08)
  * ------------------------------------------------------------------ */
+
+/**
+ * 2026-10-26 gap-audit build (the rung-2 split): patch a stored snapshot
+ * with re-derived readings — the 04:20 phase's pure core. Replaces each
+ * id's row (kept in DEFINITIONS order), recomputes the gauge summaries and
+ * the changed-this-week diff against the STORED readings (the 04:10 main
+ * build's flips already recorded themselves; the patch layers its own),
+ * and validates the result through the same schema the store's read side
+ * enforces. Pure — the phase orchestrates the reads/writes around it.
+ */
+export function patchInsightsSnapshot(
+  stored: InsightsSnapshot,
+  patchedReadings: readonly IndicatorReading[],
+  now: string,
+): InsightsSnapshot {
+  const byId = new Map(patchedReadings.map((r) => [r.id as string, r]));
+  const readings = stored.readings.map((r) => byId.get(r.id as string) ?? r);
+  // "What changed this week": the patch's own flips merge with the events
+  // the stored snapshot had accumulated (today's flip wins per id — the
+  // same merge buildInsightsSnapshot performs).
+  const flipsNow = changedSince(stored.readings, readings, now);
+  const windowDays = 7;
+  const nowDay = epochDay(now.slice(0, 10));
+  const carried = (stored.changedThisWeek ?? []).filter((e) => nowDay - epochDay(e.asOf) <= windowDays);
+  const byEventId = new Map<string, (typeof carried)[number]>();
+  for (const event of carried) byEventId.set(event.id, event);
+  for (const event of flipsNow) byEventId.set(event.id, event);
+  const changedThisWeek = [...byEventId.values()].sort((a, b) =>
+    a.asOf < b.asOf ? -1 : a.asOf > b.asOf ? 1 : a.id.localeCompare(b.id),
+  );
+  return InsightsSnapshotSchema.parse({
+    generatedAt: now,
+    summary: summarizeByGauges(readings),
+    readings,
+    changedThisWeek,
+    // The stored calendar rides untouched (the hand-maintained file's copy).
+    calendar: stored.calendar,
+    ruleVersion: RULE_VERSION,
+  });
+}
 
 /**
  * Project a validated snapshot onto the PUBLIC-DISPLAY-OK subset: drop every

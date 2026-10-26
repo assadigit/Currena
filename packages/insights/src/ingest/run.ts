@@ -62,6 +62,9 @@ import {
   computePeaks,
   historyToSeries,
   projectSnapshotToPublic,
+  patchInsightsSnapshot,
+  READING_SOURCES,
+  mergeSeries,
   type SeriesInputs,
 } from '../adapters/index';
 import { runValidationSuite } from '../validation';
@@ -79,7 +82,10 @@ import {
   SHILLER,
   SHILLER_LATEST_DATE,
 } from './data';
-import { providerFetchEnabled } from '../sources';
+import { providerFetchEnabled, SANITY_RANGES, withinSanityRange } from '../sources';
+import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS, type Rung2FetchPlan } from '../adapters/rung2';
+import type { ReadingSourceOverride } from '../adapters/collect';
+import { computeReading, type ReadingSource } from '../scoring';
 import type { KVLike } from './kv-store';
 import { epochDay, fromEpochDay, type SeriesPoint } from '../series';
 
@@ -141,6 +147,27 @@ export interface IngestRunOptions {
    * bundle's copy; the default hides nothing and is only used by tests).
    */
   hiddenPublicIds?: ReadonlySet<string>;
+  /**
+   * 2026-10-26 gap-audit build (the rung-2 split): fetched rung-2 series,
+   * merged into the build's inputs so the NODE venue and the selfcheck
+   * derive everything in ONE run (no subrequest ceiling there). The
+   * Worker's 04:10 main rung passes nothing — its rung-2 ids carry
+   * forward (carryForwardIds) until the 04:20 phase patches them.
+   */
+  rung2Series?: Partial<Record<IndicatorId, SeriesPoint[]>>;
+  /**
+   * The OECD mirror armed as the jgb-10y fallback (the Node venue passes
+   * the FRED mirror it already collected; the 04:20 phase reads it from
+   * the stage helper the main rung writes).
+   */
+  jgbMirrorFallback?: SeriesPoint[];
+  /**
+   * 2026-10-22 reliability round, refined 2026-10-26: the SWEEP rungs skip
+   * the stage write — the morning's real stage (04:20-updated) must stand
+   * for the 04:25/04:40 history phases; a sweep's stage blob would lack
+   * the rung-2 entries (its build carries them) and starve the phases.
+   */
+  skipStageWrite?: boolean;
 }
 
 export interface IngestRunResult {
@@ -225,7 +252,7 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
   console.log(`mode=${opts.mode}${dryRun ? ' DRY-RUN (no KV writes)' : ''}\n`);
 
   const tStart = performance.now();
-  const { inputs, reports, readingSourceOverrides } = await collectAllSources({
+  const collected = await collectAllSources({
     ...(opts.skipRbaCsvTables !== undefined ? { skipRbaCsvTables: opts.skipRbaCsvTables } : {}),
     // The fallback fills merge with the STORED histories so the 10-year
     // percentile base survives a FRED outage (Treasury's current-year
@@ -236,6 +263,9 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
         .then((h) => (h ? historyToSeries(h) : undefined))
         .catch(() => undefined),
   });
+  const { inputs, reports } = collected;
+  // Mutable: the inline rung-2 mirror fallback adds its honest attribution.
+  const readingSourceOverrides: Partial<Record<IndicatorId, ReadingSourceOverride>> = { ...collected.readingSourceOverrides };
   const tCollect = performance.now();
 
   // v3 fail-closed inputs: kill-switched ids + per-provider blocked outcomes.
@@ -312,8 +342,33 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     console.log('\n[ingest] no previous snapshot — first run (changedThisWeek starts empty)');
   }
 
+  // The Node venue / selfcheck pass rung2Series (the inline collection).
+  // When their MOF fetch failed, the OECD mirror the main collect ALREADY
+  // fetched arms itself as the labelled fallback (the 04:20 Worker phase
+  // reads the same mirror from the stage helper instead).
+  const mirrorArmsItself =
+    opts.rung2Series !== undefined &&
+    opts.rung2Series['jgb-10y'] === undefined &&
+    inputs.fred.IRLTLT01JPM156N !== undefined &&
+    inputs.fred.IRLTLT01JPM156N.length > 0;
+  const rung2Inputs = opts.rung2Series !== undefined || opts.jgbMirrorFallback !== undefined
+    ? {
+        jgb10y: opts.rung2Series?.['jgb-10y'],
+        jgbMirror: opts.jgbMirrorFallback ?? (mirrorArmsItself ? inputs.fred.IRLTLT01JPM156N : undefined),
+      }
+    : undefined;
+  if (mirrorArmsItself) {
+    // The honest attribution when the mirror fills (the readingSourceOverrides
+    // discipline — the same line the 04:20 phase stamps on a MOF outage).
+    console.log('[ingest] jgb-10y: the inline MOF fetch failed — the OECD mirror fills, labelled');
+    readingSourceOverrides['jgb-10y'] = {
+      name: 'OECD via FRED (IRLTLT01JPM156N, monthly average — MOF outage fallback)',
+      url: 'https://fred.stlouisfed.org/series/IRLTLT01JPM156N',
+    };
+  }
   const series = buildIndicatorSeries({
     ...inputs,
+    ...(rung2Inputs !== undefined ? { rung2: rung2Inputs } : {}),
     chinaPmi,
     chinaCpi,
     nbsStored,
@@ -363,6 +418,7 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
       : {}),
     now: nowIso,
     baseReadingCache,
+    carryForwardIds: new Set(RUNG2_IDS as readonly string[]),
   });
   const tDraft = performance.now();
 
@@ -397,6 +453,7 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
       : {}),
     now: nowIso,
     baseReadingCache,
+    carryForwardIds: new Set(RUNG2_IDS as readonly string[]),
   });
   const tFinal = performance.now();
   // 2026-10-23 CPU round: the phase budget, one line per run — the number
@@ -458,13 +515,22 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     // but the page stays fresh); (c) a stage failure still marks the run
     // degraded (ok=false stays informational only for the snapshot family —
     // the alert surfaces via `staged:false` in the result + this log line).
-    if (opts.stageKv !== undefined) {
+    if (opts.stageKv !== undefined && opts.skipStageWrite === true) {
+      console.log('  · stage write SKIPPED (sweep mode — the morning rung-2-updated stage stands)');
+    } else if (opts.stageKv !== undefined) {
       try {
         const todayMs = Date.parse(`${today}T00:00:00Z`);
         const blob: StageBlob = { v: STAGE_VERSION, writtenAt: nowIso, series: {} };
         for (const def of DEFINITIONS) {
           const s = series[def.id];
           if (s && s.length > 1) blob.series[def.id] = trimForStage(s, todayMs);
+        }
+        // 2026-10-26 gap-audit build: HELPER series the 04:20 rung-2 phase
+        // needs — the OECD mirror armed as the jgb-10y outage fallback (the
+        // phase cannot read the FRED group's raw output, only the stage).
+        const mirror = inputs.fred.IRLTLT01JPM156N;
+        if (mirror !== undefined && mirror.length > 1) {
+          blob.series['jgb-mirror'] = trimForStage(mirror, todayMs);
         }
         await putStage(opts.stageKv, blob);
         staged = true;
@@ -541,6 +607,196 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
   console.log(`\n[ingest] ${dryRun ? 'dry-run complete' : 'run complete'} — snapshot ${ok ? 'written' : 'WRITE FAILED'}.`);
 
   return { ok, snapshot, series, p1Unavailable, heldP1, failedSources, reports, staged };
+}
+
+/* ------------------------------------------------------------------ *
+ * The rung-2 phase (2026-10-26 gap-audit build) — the 04:20 UTC rung that
+ * owns the additions whose fetches must not ride the 04:10 main rung (the
+ * audit's subrequest arithmetic). Fetches the planned feeds (MOF daily;
+ * the weekly pair on Saturdays; the monthly trio on the first of the
+ * month; anything missing = bootstrap), re-derives the affected series
+ * against the stored accumulations, PATCHES the snapshot + the public
+ * projection, and updates the stage so the 04:25/04:40 history phases
+ * write the fresh data. The Node venue runs the same collection INLINE
+ * (rung2Series on runInsightsUpdate) — no ceiling there.
+ * ------------------------------------------------------------------ */
+
+export interface Rung2PhaseResult {
+  /** The re-derived series (the ids the phase refreshed this run). */
+  series: Record<string, SeriesPoint[]>;
+  /** Per-source report rows (appended to insights:status). */
+  reports: InsightsSourceReport[];
+  /** The fetch plan that ran. */
+  plan: Rung2FetchPlan;
+  /** Whether the snapshot + public projection were patched and written. */
+  patched: boolean;
+}
+
+export interface Rung2PhaseOptions {
+  /** The KV or REST store (snapshot read + stored-history reads + writes). */
+  store: InsightsStore;
+  /** The Worker venue's RATES binding (stage read/update). The Node venue omits it. */
+  stageKv?: KVLike;
+  /** 'scheduled' (the Worker rung) or 'manual' (a dispatch). */
+  mode: 'scheduled' | 'manual';
+  /** Clock injection (tests). */
+  now?: Date;
+  /** The ids the PUBLIC projection hides. */
+  hiddenPublicIds?: ReadonlySet<string>;
+  /** Force a plan (tests / the manual runner); default: the date + stage contents. */
+  plan?: Rung2FetchPlan;
+}
+
+/** Read a stored history as series, poison-tolerant (the collect pattern). */
+async function storedSeriesOf(store: InsightsStore, id: IndicatorId): Promise<SeriesPoint[] | undefined> {
+  try {
+    const stored = await store.getHistory(id);
+    return stored ? historyToSeries(stored) : undefined;
+  } catch {
+    return undefined; // a poisoned stored key must not sink the phase
+  }
+}
+
+/**
+ * THE rung-2 phase. Subrequest budget at 04:20: 1 stage read + 1 snapshot
+ * read + 1 status read + the stored-history reads (one per refreshed id) +
+ * the planned fetches (1 daily / 3 Saturday / 4 first-of-month max) + 4
+ * writes (snapshot, public, stage, status) — comfortably inside 50.
+ */
+export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Rung2PhaseResult> {
+  const now = opts.now ?? new Date();
+  const nowIso = now.toISOString();
+  const today = nowIso.slice(0, 10);
+  const todayMs = Date.parse(`${today}T00:00:00Z`);
+  console.log(`# Insights rung-2 phase — ${nowIso}`);
+
+  // The stage: the parents the phase re-derives from (us10y for the gap —
+  // A-3) + the jgb-mirror helper (the labelled MOF-outage fallback) + the
+  // missing-id check that arms the bootstrap fetches.
+  const stage = opts.stageKv !== undefined ? await readStage(opts.stageKv) : undefined;
+  const missing = new Set<string>(RUNG2_IDS.filter((id) => (stage ? stage.series[id] === undefined : true)));
+  const plan = opts.plan ?? rung2FetchPlanFor(now, missing);
+  console.log(
+    `[rung2] plan — mof=${plan.mof} eiaWeekly=${plan.eiaWeekly} cftcWeekly=${plan.cftcWeekly} monthly=${plan.monthly}` +
+      (stage === undefined ? ' (no stage — the Node/manual venue)' : ` (bootstrap-missing: ${[...missing].join(', ') || 'none'})`),
+  );
+
+  // 1. Fetch the planned feeds (fail-soft per source; honest report rows).
+  const collected = await collectRung2Sources(plan, { now });
+  for (const row of collected.reports) console.log(`  ${row.ok ? '✅' : '❌'} ${row.source} — ${row.detail}`);
+
+  // 2. Merge with the stored accumulations + re-derive. A-2 (jgb-10y): the
+  // MOF fetch wins; the stored history extends it backwards (the daily
+  // tail the phase itself has written since the upgrade + the OECD
+  // mirror's monthly tail from before it); on a MOF outage the mirror
+  // helper fills, LABELLED (the reading's source line switches — the
+  // readingSourceOverrides discipline).
+  const series: Record<string, SeriesPoint[]> = {};
+  const sourceOverrides: Partial<Record<IndicatorId, ReadingSource>> = {};
+  const defOf = (id: IndicatorId) => DEFINITIONS.find((d) => d.id === id)!;
+
+  if (plan.mof) {
+    const stored = await storedSeriesOf(opts.store, 'jgb-10y');
+    const fetched = collected.series['jgb-10y'];
+    const mirror = stage?.series['jgb-mirror']?.map(([day, value]) => ({ date: fromEpochDay(day), value }));
+    if (fetched !== undefined) {
+      // MOF day: the fetched file carries the full month (+ the all-file
+      // on monthly rungs); the stored accumulation extends the daily tail
+      // backwards between all-file refreshes (fetched wins on collision).
+      series['jgb-10y'] = stored !== undefined ? mergeSeries(stored, fetched) : fetched;
+    } else if (mirror !== undefined && mirror.length > 0) {
+      // MOF outage: the OECD mirror fills, LABELLED (the spec's fallback
+      // terms — the stored daily tail stays the fresher truth on its own
+      // dates, the mirror's monthly stamps carry the base).
+      series['jgb-10y'] = stored !== undefined ? mergeSeries(mirror, stored) : mirror;
+      sourceOverrides['jgb-10y'] = {
+        name: 'OECD via FRED (IRLTLT01JPM156N, monthly average — MOF outage fallback)',
+        url: 'https://fred.stlouisfed.org/series/IRLTLT01JPM156N',
+      };
+      console.log('  · jgb-10y: MOF unavailable — the OECD mirror fills, labelled');
+    } else if (stored !== undefined) {
+      // Neither fetch worked: hold the stored accumulation (the reading
+      // ages under its own cadence grace — honest staleness in a few days).
+      series['jgb-10y'] = stored;
+      console.log('  · jgb-10y: MOF and the mirror both unavailable — holding the stored tail');
+    }
+  }
+
+  if (Object.keys(series).length === 0) {
+    console.log('[rung2] nothing to patch (no fetch succeeded and no fallback filled)');
+    return { series, reports: collected.reports, plan, patched: false };
+  }
+
+  // 3. Rebuild the affected readings (computeReading + the sanity gates —
+  // the same engine the main build uses; the enrichments that apply:
+  // jgb-10y carries none of the special ones).
+  const storedSnapshot = await opts.store.getSnapshot();
+  if (storedSnapshot === undefined) {
+    console.warn('[rung2] no stored snapshot to patch — the next main rung builds from scratch');
+    return { series, reports: collected.reports, plan, patched: false };
+  }
+  const patchedReadings: IndicatorReading[] = [];
+  for (const [id, idSeries] of Object.entries(series) as [IndicatorId, SeriesPoint[]][]) {
+    const def = defOf(id);
+    const source: ReadingSource = sourceOverrides[id] ?? READING_SOURCES[id] ?? { name: def.sourceRef };
+    let reading = computeReading(def, idSeries, nowIso, source);
+    // The definitional sanity range (T-28/F-14) — the same gate the main
+    // build applies after the deterministic base.
+    const sanityBand = SANITY_RANGES[id as string];
+    if (sanityBand !== undefined && reading.value !== null && !withinSanityRange(id as string, reading.value)) {
+      const bandText = sanityBand.minExclusive
+        ? 'must be greater than zero'
+        : `must sit in ${sanityBand.min ?? '-∞'} to ${sanityBand.max ?? '∞'}`;
+      reading = {
+        ...reading,
+        value: null,
+        asOf: null,
+        status: 'unavailable',
+        flag: { test: 'T-28', reason: `value outside its allowed range (${bandText}) — rejected, can't tell right now` },
+      };
+    }
+    patchedReadings.push(reading);
+    console.log(
+      `  🔄 ${id}: ${reading.value ?? '—'} @ ${reading.asOf ?? '—'} [${reading.status}]${reading.percentile10y !== undefined ? ` pct10y=${(reading.percentile10y * 100).toFixed(0)}%` : ''}`,
+    );
+  }
+
+  // 4. Patch + write the snapshot family (the main rung wrote the day's
+  // archive 10 minutes ago — the patch touches only the live keys).
+  const patched = patchInsightsSnapshot(storedSnapshot, patchedReadings, nowIso);
+  await opts.store.putSnapshot(patched);
+  console.log('  ✍ insights:snapshot (patched)');
+  const hiddenIds = opts.hiddenPublicIds ?? new Set<string>();
+  await opts.store.putPublicSnapshot(projectSnapshotToPublic(patched, hiddenIds));
+  console.log('  ✍ insights:snapshot-public (patched)');
+
+  // 5. Update the stage so the 04:25/04:40 history phases write the fresh
+  // series (the phases read the stage, never the snapshot).
+  if (opts.stageKv !== undefined) {
+    const base = (await readStage(opts.stageKv)) ?? { v: STAGE_VERSION, writtenAt: nowIso, series: {} };
+    for (const [id, idSeries] of Object.entries(series)) {
+      const trimmed = trimForStage(idSeries, todayMs);
+      if (trimmed.length > 1) base.series[id] = trimmed;
+    }
+    base.writtenAt = nowIso;
+    await putStage(opts.stageKv, base);
+    console.log(`  ✍ ${INSIGHTS_STAGE_KEY} (updated ${Object.keys(series).join(', ')})`);
+  }
+
+  // 6. Append the rung's report rows to insights:status (the /admin panel
+  // + the sweep gate see the honest fetch outcomes).
+  try {
+    const status = await opts.store.getStatus();
+    if (status !== undefined) {
+      const merged = [...status.sources, ...collected.reports];
+      await opts.store.putStatus({ ...status, sources: merged, generatedAt: nowIso });
+      console.log(`  ✍ insights:status (+${collected.reports.length} rung-2 rows)`);
+    }
+  } catch (err) {
+    console.warn(`  ⚠ insights:status append failed: ${errMessage(err)}`);
+  }
+
+  return { series, reports: collected.reports, plan, patched: true };
 }
 
 /* ------------------------------------------------------------------ *

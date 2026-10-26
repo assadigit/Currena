@@ -30,6 +30,9 @@ import {
   buildIndicatorSeries,
   buildInsightsSnapshot,
   collectAllSources,
+  collectRung2Sources,
+  rung2FetchPlanFor,
+  RUNG2_IDS,
   computeHighestSinceYear,
   computePeaks,
   parseContextNotes,
@@ -86,7 +89,26 @@ const policyDecisions = decisionsRaw === undefined ? undefined : parsePolicyDeci
 const notesRaw = loadJsonFile(resolve(REPO, 'data', 'insights-context-notes.json'));
 const contextNotes = notesRaw === undefined ? undefined : parseContextNotes(notesRaw);
 
-const series = buildIndicatorSeries({ ...inputs, chinaPmi: pmiParsed?.points });
+/* 2026-10-26 gap-audit build: the rung-2 collection rides the self-check
+ * too (the bootstrap rule — no store means every rung-2 id is "missing",
+ * so the plan fetches everything: MOF + the weekly pair + the monthly
+ * trio; the same code the Worker's 04:20 phase runs). */
+const rung2Plan = rung2FetchPlanFor(new Date(), new Set(RUNG2_IDS as readonly string[]));
+console.log(
+  `[selfcheck] rung-2 plan - mof=${rung2Plan.mof} eiaWeekly=${rung2Plan.eiaWeekly} cftcWeekly=${rung2Plan.cftcWeekly} monthly=${rung2Plan.monthly}`,
+);
+const rung2 = await collectRung2Sources(rung2Plan);
+for (const row of rung2.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row.source} - ${row.detail}`);
+reports.push(...rung2.reports);
+
+const rung2Inputs = {
+  jgb10y: rung2.series['jgb-10y'],
+  // The mirror arms itself when the MOF fetch failed (the labelled
+  // fallback the spec keeps for outages).
+  jgbMirror: rung2.series['jgb-10y'] === undefined ? inputs.fred.IRLTLT01JPM156N : undefined,
+};
+
+const series = buildIndicatorSeries({ ...inputs, ...(rung2Inputs.jgb10y !== undefined || rung2Inputs.jgbMirror !== undefined ? { rung2: rung2Inputs } : {}), chinaPmi: pmiParsed?.points });
 
 const peaks = computePeaks(inputs, series.brent);
 const HIGHEST_SINCE_IDS = ['us10y', 'us30y', 'real-yield-10y', 'au-10y'] as const;

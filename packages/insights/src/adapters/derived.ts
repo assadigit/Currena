@@ -36,6 +36,7 @@ import { combineSeries, yoyPctSeries, addDays, type SeriesPoint } from '../serie
 import { boeBankRateDailySeries } from './boe';
 import { BASKET_CURRENCIES, computeBasketValue } from '../basket';
 import { PERCENTILE_WINDOW_DAYS } from '../scoring';
+import type { Rung2SeriesInputs } from './rung2-inputs';
 import type { SpotPrice } from './types';
 import type { WorldBankMonthly } from './worldbank';
 import type { YahooQuote } from './yahoo';
@@ -61,6 +62,15 @@ export interface SeriesInputs {
   /** Bank of England Bank Rate decisions (M6 Wave-4 probe fix,
    * 2026-10-25 — the full decision-table history from the BoE's own page). */
   boe?: { bankRateDecisions?: SeriesPoint[] };
+  /**
+   * 2026-10-26 gap-audit build: the second-rung feeds (the 04:20 phase —
+   * MOF daily + the weekly/monthly additions) whose subrequest cost must
+   * not ride the 04:10 main rung. The MAIN rung passes undefined (the
+   * rung-2 ids' readings carry forward from the previous snapshot); the
+   * Node venue + selfcheck pass the fetched series so one build derives
+   * everything. See adapters/rung2.ts.
+   */
+  rung2?: Rung2SeriesInputs;
   /** Frankfurter USD→currency series (USD quote side, USD base). */
   fx: {
     JPY?: SeriesPoint[];
@@ -391,7 +401,11 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // Private-only cards: every IRLTLT01*/IRSTCI01* series carries FRED's
   // "copyright-citation-required" tag (T-16 scanned 2026-10-21).
   put('bund-10y', fred.IRLTLT01DEM156N);
-  put('jgb-10y', fred.IRLTLT01JPM156N);
+  // A-2 (2026-10-26 gap-audit build): jgb-10y upgrades to the MOF's own
+  // DAILY file — the OECD mirror (IRLTLT01JPM156N) retires to the labelled
+  // fallback it always was (rung2.jgbMirror; the main rung passes nothing
+  // and the reading carries forward until the 04:20 phase refreshes it).
+  put('jgb-10y', inputs.rung2?.jgb10y ?? inputs.rung2?.jgbMirror);
   put('gilt-10y', fred.IRLTLT01GBM156N);
   put('boj-rate', fred.IRSTCI01JPM156N);
   put('boe-rate', boe === undefined ? undefined : boeBankRateDaily(boe.bankRateDecisions));
@@ -929,7 +943,13 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   natgas: { name: 'FRED (EIA Henry Hub spot)', url: 'https://fred.stlouisfed.org/series/DHHNGSP' },
   platinum: { name: 'gold-api.com (XPT spot; history: World Bank Pink Sheet)', url: 'https://www.gold-api.com' },
   'bund-10y': { name: 'OECD via FRED (IRLTLT01DEM156N)', url: 'https://fred.stlouisfed.org/series/IRLTLT01DEM156N' },
-  'jgb-10y': { name: 'OECD via FRED (IRLTLT01JPM156N)', url: 'https://fred.stlouisfed.org/series/IRLTLT01JPM156N' },
+  // A-2 (2026-10-26 gap-audit build): the MOF's own daily file is the
+  // primary; the mirror attribution appears only when the fallback fills
+  // (the readingSourceOverrides mechanism, the 04:20 phase).
+  'jgb-10y': {
+    name: 'Japan Ministry of Finance (JGB interest rates, daily)',
+    url: 'https://www.mof.go.jp/english/policy/jgbs/reference/interest_rate/jgbcme.csv',
+  },
   'gilt-10y': { name: 'OECD via FRED (IRLTLT01GBM156N)', url: 'https://fred.stlouisfed.org/series/IRLTLT01GBM156N' },
   'boj-rate': {
     name: 'OECD via FRED (IRSTCI01JPM156N — Japan overnight call rate)',

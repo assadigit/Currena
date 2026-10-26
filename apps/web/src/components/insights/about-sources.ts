@@ -139,6 +139,15 @@ export const ABOUT_PROVIDER_META: Readonly<
     attribution: 'Source: National Bureau of Statistics of China',
     url: 'https://www.stats.gov.cn/english/nbs/200701/t20070104_59236.html',
   },
+  mof: {
+    // register row 'mof-japan' (A-2, 2026-10-26 gap-audit build): the MOF
+    // notice page puts the site's content under Japan's Public Data Use
+    // License v1.0 (PDL 1.0) absent a rights notice — the About row links
+    // the notice page (the register row's termsUrl, mirrored verbatim).
+    name: 'Japan Ministry of Finance (JGB interest rates, daily)',
+    attribution: 'Source: Ministry of Finance, Japan',
+    url: 'https://www.mof.go.jp/about_mof/notice/index.html',
+  },
   shiller: {
     // register row 'shiller'
     name: 'Robert Shiller dataset (ie_data)',

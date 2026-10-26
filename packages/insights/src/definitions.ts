@@ -275,17 +275,24 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 75,
   },
   {
+    // A-2 (2026-10-26 gap-audit build): the DAILY upgrade — the Ministry of
+    // Finance's own jgbcme.csv (next-business-day publication, 15 maturity
+    // columns, the header row asserted) replaces the OECD monthly mirror as
+    // the primary. The mirror stays as the LABELLED fallback for MOF
+    // outages (the 04:20 rung-2 phase arms it from the stage helper);
+    // retire it after two clean weeks per the fix-or-retire discipline.
+    // Context card as before (never a gauge vote).
     id: 'jgb-10y',
     section: 'global',
     group: 'borrowing-costs',
     name: 'Japan 10-year government bond yield',
-    source: 'fred',
-    sourceRef: 'FRED:IRLTLT01JPM156N (long-term government bond yield, monthly)',
-    cadence: 'monthly',
+    source: 'mof',
+    sourceRef: 'Japan Ministry of Finance jgbcme.csv (10Y column, daily)',
+    cadence: 'daily',
     changeKind: 'points',
     phase: 'P2',
     rule: { kind: 'info' },
-    staleAfterDays: 75,
+    staleAfterDays: 4,
   },
   {
     id: 'gilt-10y',

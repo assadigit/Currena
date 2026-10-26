@@ -23,6 +23,7 @@ import {
   insightsIngestRung,
   runScheduledInsightsIngest,
   runScheduledInsightsHistories,
+  runScheduledInsightsRung2,
   runScheduledInsightsSweep,
 } from './insights-ingest-cron';
 import { recordHistory } from './history';
@@ -136,7 +137,9 @@ export async function runScheduled(env: Bindings, scheduledTimeMs: number): Prom
           ? runScheduledInsightsIngest(env)
           : ingestRung.kind === 'sweep'
             ? runScheduledInsightsSweep(env).then(() => undefined)
-            : runScheduledInsightsHistories(env, ingestRung.kind === 'history-daily' ? 'daily' : 'periodic');
+            : ingestRung.kind === 'rung2'
+              ? runScheduledInsightsRung2(env).then(() => undefined)
+              : runScheduledInsightsHistories(env, ingestRung.kind === 'history-daily' ? 'daily' : 'periodic');
       return [
         work.then(
           () => undefined,

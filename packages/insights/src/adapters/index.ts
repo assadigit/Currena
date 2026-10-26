@@ -67,10 +67,13 @@ export type { BiffSheet, BiffWorkbook } from './biff';
 export { ManualSeriesFileSchema, parseManualSeries } from './manual';
 export { fetchCryptoFng, FNG_URL } from './fng';
 export type { ManualSeriesFile } from './manual';
-export { buildIndicatorSeries, computeHighestSinceYear, computePeaks, READING_SOURCES } from './derived';
+export { buildIndicatorSeries, computeHighestSinceYear, computePeaks, READING_SOURCES, mergeSeries } from './derived';
 export type { SeriesInputs } from './derived';
 export { readXlsxSheet } from './xlsx';
 export type { XlsxCell } from './xlsx';
+export { RUNG2_IDS, rung2FetchPlanFor, collectRung2Sources } from './rung2';
+export type { Rung2FetchPlan, Rung2CollectResult } from './rung2';
+export type { Rung2SeriesInputs } from './rung2-inputs';
 export { collectAllSources, DEFAULT_BITSTAMP_CANDLES, DEFAULT_FX_START } from './collect';
 export type { CollectOptions, CollectResult } from './collect';
 export {
@@ -83,6 +86,7 @@ export {
   parsePolicyDecisions,
   parseContextNotes,
   projectSnapshotToPublic,
+  patchInsightsSnapshot,
   HISTORY_MAX_POINTS,
   HISTORY_WINDOW_DAYS,
 } from './snapshot';

@@ -358,6 +358,25 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     termsUrl: 'https://www.stats.gov.cn/english/nbs/200701/t20070104_59236.html',
     notes: 'RISK_REGISTER.md row nbs-china: the 2026-10-23 M1 read (no reuse prohibition for attributed quotation) is superseded by the affirmative ToS quotes. The press-release scan is the only machine-readable path: data.stats.gov.cn easy-query is WAF-blocked (403 UrlACL, probed 2026-10-26) and no RSS feed exists (404).',
   },
+  'mof-japan': {
+    id: 'mof-japan',
+    provider: 'mof',
+    label: 'Japan Ministry of Finance (JGB interest rates, daily)',
+    usedFor: 'jgb-10y (the A-2 daily upgrade; the OECD mirror IRLTLT01JPM156N stays the labelled fallback)',
+    method: 'M2',
+    runtime: 'worker',
+    level: 'L0',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'MOF notice page (read live 2026-10-26, in Japanese, with the honest UA): 「本サイト及び財務省のソーシャルメディアアカウント…で掲載・発信している情報の著作権は、特記されていない限り財務省に帰属し、権利表記の記載がない限り「公共データ利用規約（第1.0版）」(PDL1.0)【デジタル庁ホームページ】が適用されています。」 — copyright belongs to the Ministry of Finance and, absent a rights notice, the Public Data Use License v1.0 (PDL1.0 — the Digital Agency\u2019s CC-BY-style open licence, commercial and non-commercial reuse permitted with attribution) applies. The jgbcme files carry no rights notice. Link policy on the same page: 「原則リンクフリー」 (linking free as a rule).',
+    termsReadOn: '2026-10-26',
+    attribution: 'Source: Ministry of Finance, Japan',
+    termsUrl: 'https://www.mof.go.jp/about_mof/notice/index.html',
+    notes:
+      'A-2 (2026-10-26 gap-audit build): the jgbcme.csv current-month file (redirects from /english/jgbs/ to /english/policy/jgbs/ — the final URL is used) + the historical/jgbcme_all.csv full history (monthly rungs only; it changes once a month). Probed live both 200 with the honest UA. Runtime: the Worker\u2019s 04:20 rung-2 phase (the 04:10 main rung is at its fetch ceiling — the audit\u2019s budget arithmetic).',
+  },
   shiller: {
     id: 'shiller',
     provider: 'shiller',
@@ -497,6 +516,9 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   'yield-curve-10y2y': ['fred:T10Y2Y'],
   // 2026-10-26 gap-audit build, A-1.
   'yield-curve-10y3m': ['fred:T10Y3M'],
+  // 2026-10-26 gap-audit build, A-2: the MOF daily primary + the OECD
+  // mirror fallback leg (the mirror fills during MOF outages, labelled).
+  'jgb-10y': ['mof:jgbcme', 'fred:IRLTLT01JPM156N'],
   // 2026-10-21 data-integrity round — the coverage additions' explicit legs
   // (the FRED-sourced ones resolve their legs from sourceRef tokens).
   platinum: ['world-bank'],
@@ -584,6 +606,8 @@ export function rowIdForProvider(provider: string): string {
       return 'ecb-portal';
     case 'boe':
       return 'boe-database';
+    case 'mof':
+      return 'mof-japan';
     case 'treasury':
       return 'us-treasury';
     case 'eia':

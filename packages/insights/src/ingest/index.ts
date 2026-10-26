@@ -11,6 +11,7 @@
 export {
   runInsightsUpdate,
   runInsightsHistoryPhase,
+  runInsightsRung2Phase,
   writeAllHistoriesInline,
   historyPhaseIds,
   SEED_IDS,
@@ -18,7 +19,15 @@ export {
   putStage,
   readStage,
 } from './run';
-export type { IngestRunOptions, IngestRunResult, HistoryPhaseOptions, HistoryPhaseResult, InlineHistoryResult } from './run';
+export type {
+  IngestRunOptions,
+  IngestRunResult,
+  HistoryPhaseOptions,
+  HistoryPhaseResult,
+  InlineHistoryResult,
+  Rung2PhaseOptions,
+  Rung2PhaseResult,
+} from './run';
 
 export { KvInsightsStore } from './kv-store';
 export type { KVLike } from './kv-store';

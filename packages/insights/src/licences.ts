@@ -297,6 +297,26 @@ const EIA: SourceLicence = {
   termsUrl: 'https://www.eia.gov/about/copyrights-and-terms-of-service.php',
 };
 
+/**
+ * 2026-10-26 gap-audit build, A-2: the Japan Ministry of Finance — the MOF
+ * notice page (read live 2026-10-26, in Japanese, with the honest UA) puts
+ * the site's content under Japan's Public Data Use License when no rights
+ * notice is present — the Digital Agency's CC-BY-style open licence.
+ */
+const MOF: SourceLicence = {
+  provider: 'mof',
+  label: 'Japan Ministry of Finance (JGB interest rates)',
+  licenceName: 'Japan Public Data Use License v1.0 (PDL 1.0)',
+  attributionText: 'Source: Ministry of Finance, Japan',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-26',
+  termsEvidence:
+    'MOF notice page (read live 2026-10-26, https://www.mof.go.jp/about_mof/notice/index.html): 「本サイト及び財務省のソーシャルメディアアカウント…で掲載・発信している情報の著作権は、特記されていない限り財務省に帰属し、権利表記の記載がない限り「公共データ利用規約（第1.0版）」(PDL1.0)【デジタル庁ホームページ】が適用されています。」 — copyright belongs to the Ministry of Finance and, absent a rights notice, the Public Data Use License v1.0 (PDL1.0, the Digital Agency open licence: commercial and non-commercial reuse permitted with attribution) applies. The jgbcme CSVs carry no rights notice.',
+  termsUrl: 'https://www.mof.go.jp/about_mof/notice/index.html',
+};
+
 /** The register. Unknown providers resolve to the fail-closed entry. */
 export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   fred: FRED_BASE,
@@ -317,6 +337,7 @@ export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   derived: DERIVED,
   treasury: TREASURY,
   eia: EIA,
+  mof: MOF,
 };
 
 export function licenceForProvider(provider: string): SourceLicence {
