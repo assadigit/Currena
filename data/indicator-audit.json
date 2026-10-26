@@ -328,6 +328,19 @@
       "rule": "{\"kind\":\"threshold\",\"direction\":\"above\",\"value\":2.4,\"sustainedWeeks\":4}"
     },
     {
+      "id": "gold-oil-ratio",
+      "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": true,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 3,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
       "id": "wti",
       "licenceName": "FRED license #copyright-public-domain (public domain)",
       "publicDisplayOk": "yes",

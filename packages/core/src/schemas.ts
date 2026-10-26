@@ -415,6 +415,9 @@ export const IndicatorIdSchema = z.enum([
   'au-saving-ratio', // ABS ANA_AGG M7.HSR.20.AUS.Q (quarterly) — context, au-households
   'au-job-vacancies', // ABS JV/M1.7.TOT.20.AUS.Q (quarterly) — context, au-households
   // Global — Prices lane companions (context rows rendered in lanes)
+  // 2026-10-26 gap-audit build (A-4): gold measured in oil — the classic
+  // long-run relative-value ratio, derived gold-usd ÷ brent.
+  'gold-oil-ratio',
   'wti', // FRED DCOILWTICO (WTI spot, USD/barrel)
   'natgas', // FRED DHHNGSP (Henry Hub spot, USD/MMBtu)
   // Global — market-stress lane context row (crypto price beside FNG):

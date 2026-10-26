@@ -617,6 +617,17 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
     put('copper-usd', mergeSeries(wb.copper, inputs.seedHistory?.['copper-usd'] ?? []));
   }
 
+  // 2026-10-26 gap-audit build, A-4: gold measured in oil — the value
+  // ratio on the two assembled price series' common dates (gold-usd's
+  // daily closes ∪ brent's EIA+Yahoo dailies). 2dp quantized; CONTEXT.
+  if (out['gold-usd'] !== undefined && out.brent !== undefined) {
+    const f = 100;
+    put(
+      'gold-oil-ratio',
+      combineSeries(out['gold-usd'], out.brent, (g, o) => Math.round((g / o) * f) / f),
+    );
+  }
+
   // Bitcoin (fix B-01): the Yahoo 10-year daily closes are the value
   // history; the gold-api spot stamps today's point; accumulated seeds only
   // cover a Yahoo outage. (The 10-year position now EXISTS — the data spec's
@@ -996,6 +1007,11 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   usdcny: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   brent: {
     name: 'FRED (EIA Brent) + Yahoo Finance (BZ=F)',
+    url: 'https://fred.stlouisfed.org/series/DCOILBRENTEU',
+  },
+  // 2026-10-26 gap-audit build, A-4.
+  'gold-oil-ratio': {
+    name: 'gold-api.com (XAU) ÷ FRED/EIA Brent (both collected)',
     url: 'https://fred.stlouisfed.org/series/DCOILBRENTEU',
   },
   'gold-usd': { name: 'gold-api.com (XAU)', url: 'https://www.gold-api.com' },

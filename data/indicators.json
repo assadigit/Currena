@@ -1561,6 +1561,69 @@
       }
     },
     {
+      "id": "gold-oil-ratio",
+      "title": "Gold measured in oil",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "derived",
+        "name": "gold-api.com (XAU) ÷ FRED/EIA Brent (both collected)",
+        "url": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
+        "seriesIdOrTable": "gold-usd ÷ brent (both collected; barrels of Brent per troy ounce of gold)"
+      },
+      "publisher": "Yahoo Finance (unofficial endpoints)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
+      "methodUrl": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
+      "whatItIs": "The gold price in US dollars divided by the Brent oil price on the same dates (≈ 3,997 ÷ 111.7 ≈ 35.8 barrels per ounce today): a ratio with no units of its own, best read against its own history.",
+      "whatItIsnt": "A low ratio can mean cheap gold, dear oil, or both at once: the ratio alone does not say which side moved.",
+      "trackRecordNote": "The ratio’s range shifts across eras — around 30 in the 1970s, near 20 in the mid-2010s, very wide in the 2020s — which is why the card reads percentiles, not fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 3 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "Yahoo offers no reuse licence for these unofficial quote endpoints (read 2026-10-16) — the terms are silent on automated reuse, which makes the source L2 under the owner’s recorded acceptance. Unofficial endpoints can break or be blocked at any time: every Yahoo leg fails closed (a block is a block — SCRAPING_SPEC F-09, no identity change). · Worst of legs (gold-api:XAU, yahoo:GC=F, fred:DCOILBRENTEU, yahoo:BZ=F, world-bank): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Data: Yahoo Finance",
+        "legs": [
+          "gold-api:XAU",
+          "yahoo:GC=F",
+          "fred:DCOILBRENTEU",
+          "yahoo:BZ=F",
+          "world-bank"
+        ]
+      },
+      "unit": "ratio",
+      "changeUnit": "percent",
+      "cadence": "daily",
+      "maxAgeDays": 3,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+        "attributionText": "The World Bank: Commodity Markets (Pink Sheet)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "World Bank Dataset Terms read verbatim in a browser 2026-10-21 (worldbank.org/ext/en/legal/terms-conditions/datasets): \"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0)\" with the required attribution format \"The World Bank: Dataset name: Data source (if known)\"; use of data derived from the Datasets (tables/charts) follows the same terms. The Pink Sheet commodity series carry no contrary label — CC BY 4.0 applies, attribution rendered on the cards and in About this data. · Legs (gold-api:XAU, yahoo:GC=F, fred:DCOILBRENTEU, yahoo:BZ=F, world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): The ratio derives from the gold-usd and brent series whose display bars the standing owner directives (2026-10-19e) already lifted; the Yahoo history legs stay in the engine — the directives cover the ratio’s worst leg exactly as they cover its parents’.",
+        "termsUrl": "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
+      }
+    },
+    {
       "id": "wti",
       "title": "WTI crude oil",
       "area": {

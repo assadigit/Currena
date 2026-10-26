@@ -519,6 +519,10 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   // 2026-10-26 gap-audit build, A-3: both parents — the US 10-year and the
   // MOF daily (the OECD mirror leg rides as jgb-10y's own fallback).
   'us-japan-10y-gap': ['fred:DGS10', 'mof:jgbcme', 'fred:IRLTLT01JPM156N'],
+  // 2026-10-26 gap-audit build, A-4: the value ratio's legs — exactly
+  // gold-usd's and brent's (the display bar lifts on the standing owner
+  // directives that cover those two tiles).
+  'gold-oil-ratio': ['gold-api:XAU', 'yahoo:GC=F', 'fred:DCOILBRENTEU', 'yahoo:BZ=F', 'world-bank'],
   // 2026-10-26 gap-audit build, A-2: the MOF daily primary + the OECD
   // mirror fallback leg (the mirror fills during MOF outages, labelled).
   'jgb-10y': ['mof:jgbcme', 'fred:IRLTLT01JPM156N'],
@@ -757,6 +761,8 @@ export const SANITY_RANGES: Readonly<Record<string, SanityRange>> = {
   // Prices / non-negative indexes — strictly positive.
   brent: { minExclusive: true },
   'gold-usd': { minExclusive: true },
+  // 2026-10-26 gap-audit build, A-4: a positive ratio by construction.
+  'gold-oil-ratio': { minExclusive: true },
   'silver-usd': { minExclusive: true },
   'btc-usd': { minExclusive: true },
   'copper-usd': { minExclusive: true },

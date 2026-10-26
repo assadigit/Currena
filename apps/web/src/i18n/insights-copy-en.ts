@@ -1762,6 +1762,30 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   // natural gas, platinum, ETH, Bund/JGB/Gilt, BoJ/BoE rates, NZD/USD,
   // US GDP growth and nonfarm payrolls): recovered verbatim from the
   // deployed SPA bundle the round shipped with.
+  'gold-oil-ratio': {
+    // 2026-10-26 gap-audit build, A-4 (INSIGHTS_DATA_SPEC.md): gold
+    // measured in oil — the long-run relative-value check, context only.
+    name: 'Gold measured in oil',
+    ticker: 'Gold/Oil',
+    oneLiner:
+      'How many barrels of oil one ounce of gold buys: the long-run value check between the world’s two biggest commodities.',
+    lines: {
+      highRising: 'Gold is unusually rich against oil: the setting that has historically favoured holding gold.',
+      highEasing: 'Gold remains rich against oil but the ratio is easing back.',
+      typical: 'The ratio sits in its usual range of the past decade.',
+      low: 'Gold is unusually cheap against oil: the inflation-era pattern of energy dominance.',
+    },
+    whatItIs:
+      'The gold price in US dollars divided by the Brent oil price on the same dates (≈ 3,997 ÷ 111.7 ≈ 35.8 barrels per ounce today): a ratio with no units of its own, best read against its own history.',
+    whyItMatters:
+      'How many barrels of oil one ounce of gold buys — a long-run value check between the two biggest commodities in the world.',
+    tendedToMean:
+      'The ratio’s range shifts across eras — around 30 in the 1970s, near 20 in the mid-2010s, very wide in the 2020s — which is why the card reads percentiles, not fixed numbers.',
+    cantTell:
+      'A low ratio can mean cheap gold, dear oil, or both at once: the ratio alone does not say which side moved.',
+    forYou:
+      'A neutral context line for the gold story: read it beside the gold price and the oil cards, never alone.',
+  },
   'wti': {
     name: 'Oil price (WTI)',
     ticker: 'WTI',

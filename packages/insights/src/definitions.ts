@@ -499,6 +499,27 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     rule: { kind: 'threshold', direction: 'above', value: 2.4, sustainedWeeks: 4 },
   },
   {
+    // 2026-10-26 gap-audit build, A-4 (INSIGHTS_DATA_SPEC.md): gold
+    // measured in oil — the classic long-run relative-value ratio between
+    // the two biggest commodities, derived gold-usd ÷ brent on their
+    // common dates. CONTEXT per the spec's gauge table (the gold beam's
+    // neutral factor; never a scored vote). Percentile-based reading
+    // bands (the spec's threshold regime: the ratio's range shifts across
+    // regimes — 1970s ~30, 2015 ~20, 2020s wide — so fixed numbers age
+    // badly); the percentile bar renders from the 10-year history.
+    id: 'gold-oil-ratio',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'Gold measured in oil',
+    source: 'derived',
+    sourceRef: 'gold-usd ÷ brent (both collected; barrels of Brent per troy ounce of gold)',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 3,
+  },
+  {
     // 2026-10-21 data-integrity round: the two EIA energy spots — context
     // cards in the prices lane (info rule; never prices-board tiles, the
     // board's four-tile layout is spec-fixed, and never scored votes —

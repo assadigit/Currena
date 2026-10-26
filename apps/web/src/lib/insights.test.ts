@@ -553,8 +553,9 @@ describe('copy dictionaries', () => {
     // leading-edge batch's twelve ids — the corpus is 88 and fa must carry
     // every one; the 2026-10-26 M7 round adds china-cpi → 89; the
     // 2026-10-26 gap-audit build adds yield-curve-10y3m (A-1),
-    // rba-fed-gap (A-5) and us-japan-10y-gap (A-3) → 92.
-    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(92);
+    // rba-fed-gap (A-5), us-japan-10y-gap (A-3) and gold-oil-ratio
+    // (A-4) → 93.
+    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(93);
   });
 
   // Fix spec T-07 (2026-10-15): the CI-side corpus scan — the ingest's

@@ -184,6 +184,12 @@ const OWNER_PUBLIC_DISPLAY_OVERRIDE: Readonly<Record<string, string>> = {
     'gold-api leg is public-display-ok (their §9 permits commercial use, read first-hand 2026-10-16); the Yahoo SI=F history leg stays in the engine — the owner directive lifts its worst-leg display bar.',
   'btc-usd':
     'gold-api leg is public-display-ok (their §9 permits commercial use, read first-hand 2026-10-16); the Yahoo BTC-USD history leg stays in the engine — the owner directive lifts its worst-leg display bar.',
+  // 2026-10-26 gap-audit build, A-4: the gold/oil ratio's legs are exactly
+  // gold-usd's and brent's — both tiles' display bars are already lifted
+  // by the standing 2026-10-19e directives; the derived ratio inherits the
+  // same legs, so the same directives govern it.
+  'gold-oil-ratio':
+    'The ratio derives from the gold-usd and brent series whose display bars the standing owner directives (2026-10-19e) already lifted; the Yahoo history legs stay in the engine — the directives cover the ratio’s worst leg exactly as they cover its parents’.',
 };
 
 /**

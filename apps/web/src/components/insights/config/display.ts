@@ -172,6 +172,8 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'gilt-10y': { decimals: 2, unit: 'percent' },
   'boj-rate': { decimals: 2, unit: 'percent' },
   'boe-rate': { decimals: 2, unit: 'percent' },
+  // 2026-10-26 gap-audit build, A-4: barrels of Brent per ounce of gold.
+  'gold-oil-ratio': { decimals: 1, unit: 'ratio' },
   'wti': { decimals: 2, unit: 'usd' },
   'natgas': { decimals: 2, unit: 'usd' },
   'platinum': { decimals: 2, unit: 'usd' },

@@ -22,8 +22,8 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 51 P1 / 41 P2 (the 2026-10-25 M6 Wave-3 round adds twelve P1 cards — the leading-edge batch; the 2026-10-26 M7 round adds china-cpi as a P1 card on the NBS press-release automation; the 2026-10-26 gap-audit build adds yield-curve-10y3m, rba-fed-gap and us-japan-10y-gap as P1 voters, A-1/A-5/A-3)', () => {
-    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(51);
+  it('splits 52 P1 / 41 P2 (the 2026-10-25 M6 Wave-3 round adds twelve P1 cards — the leading-edge batch; the 2026-10-26 M7 round adds china-cpi as a P1 card on the NBS press-release automation; the 2026-10-26 gap-audit build adds yield-curve-10y3m, rba-fed-gap, us-japan-10y-gap (voters, A-1/A-5/A-3) and gold-oil-ratio (context, A-4) as P1 cards)', () => {
+    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(52);
     expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(41);
   });
 
@@ -54,7 +54,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('info-only cards never vote: exactly the forty-six info rules (2026-10-24 M4 Wave 1: +sofr, +us-2y, +breakeven-10y, +michigan-1y-expectations; M5 Wave 2: +euro-aaa-10y, +food-index, +wheat, +maize, +usdtry as context; 2026-10-25 M6 Wave 3: +mortgage-30y, +walcl, +retail-sales, +housing-permits, +cfnai, +job-openings, +t5yie, +us-wages, +au-saving-ratio, +au-job-vacancies as context — euro-hicp and au-housing-finance are the scored pair)', () => {
+  it('info-only cards never vote: exactly the forty-seven info rules (2026-10-24 M4 Wave 1: +sofr, +us-2y, +breakeven-10y, +michigan-1y-expectations; M5 Wave 2: +euro-aaa-10y, +food-index, +wheat, +maize, +usdtry as context; 2026-10-25 M6 Wave 3: +mortgage-30y, +walcl, +retail-sales, +housing-permits, +cfnai, +job-openings, +t5yie, +us-wages, +au-saving-ratio, +au-job-vacancies as context — euro-hicp and au-housing-finance are the scored pair)', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
     expect(info).toEqual([
       'au-deposit-rate',
@@ -75,6 +75,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'gilt-10y',
       'gold-aud',
       'gold-btc',
+      'gold-oil-ratio',
       'gold-usd',
       'housing-permits',
       'iron-ore',

@@ -228,6 +228,37 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
     expect(out2['rba-fed-gap']).toBeUndefined();
   });
 
+  it('A-4: the gold/oil ratio derives from the assembled gold and brent series (common dates)', () => {
+    // The fixture's gold-usd = [WB 2026-08-01 4411, WB 2026-09-01 4319,
+    // live today 4162.6]; brent = FRED [2026-10-05 82.5] — no common date
+    // with the WB monthly gold points, so the ratio joins only where both
+    // series carry the same date... which is none here. Give gold a
+    // matching daily date to prove the join + the 2dp quantization.
+    const withDailyGold = {
+      ...inputs,
+      fred: { ...inputs.fred, DCOILBRENTEU: pts([['2026-10-05', 82.5]]) },
+      yahooHistories: {
+        'gold-usd': { points: pts([['2026-09-01', 4319], ['2026-10-05', 4125]]) },
+      },
+    };
+    const out = buildIndicatorSeries(withDailyGold);
+    // gold-usd rides the Yahoo dailies + the live point; brent is the FRED
+    // daily → one common date: 2026-10-05 → 4125 / 82.5 = 50.
+    expect(out['gold-oil-ratio']).toContainEqual({ date: '2026-10-05', value: 50 });
+    // The WB monthly fallback ALSO feeds the ratio (brent falls back to
+    // the Pink Sheet when FRED is down — the join still works, 4319/116.8).
+    const fredDown = { ...inputs, fred: { ...inputs.fred, DCOILBRENTEU: undefined } };
+    const fallbackOut = buildIndicatorSeries(fredDown);
+    expect(fallbackOut['gold-oil-ratio']).toContainEqual({ date: '2026-09-01', value: 36.98 });
+    // NO brent of any kind → no ratio (fail closed).
+    const noBrent = {
+      ...inputs,
+      fred: { ...inputs.fred, DCOILBRENTEU: undefined },
+      wb: { ...inputs.wb, brent: [] },
+    };
+    expect(buildIndicatorSeries(noBrent)['gold-oil-ratio']).toBeUndefined();
+  });
+
   it('A-3: the US−Japan gap derives from DGS10 and the rung-2 jgb series (inner join, 4dp)', () => {
     // With a rung-2 jgb series supplied (the Node venue's inline
     // collection), the gap composes on common dates.
