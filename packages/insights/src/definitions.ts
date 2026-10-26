@@ -570,6 +570,116 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 12,
   },
   {
+    // 2026-10-26 gap-audit build, A-8 (INSIGHTS_DATA_SPEC.md): the OECD's
+    // amplitude-adjusted Composite Leading Indicator, US leg — the
+    // licensed-PMI replacement the spec names ("the growth lane gains its
+    // leading edge without ISM/S&P data"), so this card is the SCORED
+    // voter of the CLI trio. One filtered SDMX fetch carries all three
+    // countries (REF_AREA USA+CHN+DEU on the first-of-month rung-2 phase;
+    // the spec's EA19 does not exist in the dataflow — probed live
+    // 2026-10-26 — Germany is the honest euro substitute, recorded in the
+    // implementation report's Assumptions). The rule folds the spec's two
+    // tiers into one any-of (the A-1 pattern): 6-month annualised growth
+    // below −1 (turning down) or below −2 (the recession-approach zone) or
+    // three consecutive monthly falls; the rare V-turn reads as a 3-month
+    // annualised rise above +2. maxAgeDays 75 (a ~5-week publication lag).
+    id: 'oecd-cli-us',
+    section: 'global',
+    group: 'growth-health',
+    name: 'OECD leading indicator (US)',
+    source: 'oecd',
+    sourceRef: 'OECD Composite leading indicator (amplitude-adjusted), United States',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: {
+      kind: 'any-of',
+      of: [
+        { kind: 'growth', direction: 'below', value: -1, months: 6 },
+        { kind: 'growth', direction: 'below', value: -2, months: 6 },
+        { kind: 'consecutive-decline', periods: 3 },
+        { kind: 'growth', direction: 'above', value: 2, months: 3 },
+      ],
+    },
+    staleAfterDays: 75,
+  },
+  {
+    // A-8's China companion: the same one-fetch CLI, CONTEXT per the
+    // m2-us/iron-ore discipline (one signal family, one vote — the US leg
+    // carries it; the China card displays beside china-pmi as the factory
+    // gauge's leading companion).
+    id: 'oecd-cli-cn',
+    section: 'global',
+    group: 'growth-health',
+    name: 'OECD leading indicator (China)',
+    source: 'oecd',
+    sourceRef: 'OECD Composite leading indicator (amplitude-adjusted), China',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // A-8's euro companion (DEU — the EA19 substitute, see oecd-cli-us):
+    // CONTEXT beside the euro cards in the growth lane.
+    id: 'oecd-cli-de',
+    section: 'global',
+    group: 'growth-health',
+    name: 'OECD leading indicator (Germany)',
+    source: 'oecd',
+    sourceRef: 'OECD Composite leading indicator (amplitude-adjusted), Germany',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // 2026-10-26 gap-audit build, A-9 (INSIGHTS_DATA_SPEC.md): the
+    // Geopolitical Risk Index (Iacoviello), monthly. CONTEXT per the
+    // spec's gauge table — the market-stress lane's shock gauge beside
+    // VIX/COT, never a scored vote. The threshold regime is SD-based (the
+    // spec's own): the reading carries sd10y (the rolling 10-year z-score
+    // recomputed on write) and the card's lines speak the zones — above
+    // +1 SD the war-scare zone, above +2 SD the 2001/2022-03/2023-10
+    // class. The legacy .xls parses through the repo's own biff reader
+    // (the EIA-workbook path — the spec's honest-build note expected a
+    // BLOCKED outcome; the live file proved otherwise, probed live
+    // 2026-10-26: 501 GPR points 1985-01 → 2026-09).
+    id: 'gpr-index',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Geopolitical Risk Index',
+    source: 'gpr',
+    sourceRef: 'Caldara-Iacoviello Geopolitical Risk Index (monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // 2026-10-26 gap-audit build, A-10 (INSIGHTS_DATA_SPEC.md): Baker-
+    // Bloom-Davis US Economic Policy Uncertainty, monthly headline index.
+    // CONTEXT per the spec's gauge table — the confidence leg beside
+    // michigan-sentiment in the growth lane. Same SD regime as A-9 (the
+    // reading's sd10y + the card's zone lines: above +1 SD the elections/
+    // tariff-fight episodes, above +2 SD the 2016-11/2018-12/2020-03
+    // spikes). OOXML — the Pink Sheet reader path directly.
+    id: 'epu-us',
+    section: 'global',
+    group: 'growth-health',
+    name: 'US policy uncertainty (EPU)',
+    source: 'epu',
+    sourceRef: 'Baker-Bloom-Davis US Economic Policy Uncertainty index (monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
     // 2026-10-21 data-integrity round: the two EIA energy spots — context
     // cards in the prices lane (info rule; never prices-board tiles, the
     // board's four-tile layout is spec-fixed, and never scored votes —

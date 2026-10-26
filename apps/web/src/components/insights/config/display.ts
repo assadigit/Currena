@@ -182,6 +182,13 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'eia-crude-stocks': { decimals: 1, unit: 'barrels', scale: 1e-6 },
   // A-7: the net non-commercial share of open interest, in percent.
   'cftc-gold-positioning': { decimals: 1, unit: 'percent' },
+  // 2026-10-26 gap-audit build, A-8..A-10: the monthly trio — the CLI is
+  // an index normalised around 100; GPR and EPU are news-based indexes.
+  'oecd-cli-us': { decimals: 1, unit: 'index' },
+  'oecd-cli-cn': { decimals: 1, unit: 'index' },
+  'oecd-cli-de': { decimals: 1, unit: 'index' },
+  'gpr-index': { decimals: 1, unit: 'index' },
+  'epu-us': { decimals: 1, unit: 'index' },
   'wti': { decimals: 2, unit: 'usd' },
   'natgas': { decimals: 2, unit: 'usd' },
   'platinum': { decimals: 2, unit: 'usd' },

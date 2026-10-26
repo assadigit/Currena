@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import type { InsightsSnapshot, IndicatorHistory, IndicatorId, InsightsStatus } from '@currena/core';
 import { buildInsightsSnapshot, patchInsightsSnapshot } from './snapshot';
 import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS } from './rung2';
-import { runInsightsRung2Phase } from '../ingest/run';
+import { runInsightsRung2Phase, runInsightsHistoryPhase } from '../ingest/run';
 import { DEFINITIONS } from '../definitions';
 import type { InsightsStore } from '../store';
 import type { SeriesPoint } from '../series';
@@ -21,6 +21,10 @@ import type { SeriesPoint } from '../series';
 const here = dirname(fileURLToPath(import.meta.url));
 const fixtures = join(here, '..', '..', 'fixtures');
 const mofCurrentCsv = readFileSync(join(fixtures, 'mof-jgbcme-current.csv'), 'utf8');
+// 2026-10-26 gap-audit build, A-8..A-10: the monthly trio's captures.
+const cliCsv = readFileSync(join(fixtures, 'oecd-cli.csv'), 'utf8');
+const gprBuf = readFileSync(join(fixtures, 'gpr-export.xls')).buffer;
+const epuBuf = readFileSync(join(fixtures, 'epu-main-news-index.xlsx')).buffer;
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -396,6 +400,202 @@ describe('collectRung2Sources (the shared collect)', () => {
       expect(out.reports.some((r) => r.source === 'mof' && r.kind === 'disabled')).toBe(true);
     } finally {
       register.SOURCE_RISK_REGISTER['mof-japan']!.enabled = before;
+      globalThis.fetch = original;
+    }
+  });
+
+  it('A-8..A-10: the monthly plan fetches the trio — three CLI series + GPR + EPU from their captures', async () => {
+    const original = globalThis.fetch;
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes('sdmx.oecd.org')) return new Response(cliCsv, { status: 200 });
+      if (url.includes('matteoiacoviello.com')) return new Response(gprBuf, { status: 200 });
+      if (url.includes('policyuncertainty.com')) return new Response(epuBuf, { status: 200 });
+      throw new Error(`unexpected fetch: ${url}`);
+    }) as typeof fetch;
+    try {
+      const out = await collectRung2Sources({ mof: false, eiaWeekly: false, cftcWeekly: false, monthly: true });
+      expect(out.series['oecd-cli-us']!.at(-1)).toEqual({ date: '2026-09-01', value: 100.9993 });
+      expect(out.series['oecd-cli-cn']!.at(-1)).toEqual({ date: '2026-09-01', value: 97.41035 });
+      expect(out.series['oecd-cli-de']!.at(-1)).toEqual({ date: '2026-09-01', value: 101.0066 });
+      expect(out.series['gpr-index']!.at(-1)!.value).toBeCloseTo(146.2099, 3);
+      expect(out.series['epu-us']!.at(-1)).toEqual({ date: '2026-09-01', value: 218.94095727491293 });
+      // One OECD fetch served all three countries (the one-request design).
+      expect(out.reports.filter((r) => r.source === 'oecd')).toHaveLength(1);
+      expect(out.reports.filter((r) => r.source === 'gpr' && r.ok)).toHaveLength(1);
+      expect(out.reports.filter((r) => r.source === 'epu' && r.ok)).toHaveLength(1);
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * The monthly trio at the phase (2026-10-26 gap-audit build, A-8..A-10)
+ * ------------------------------------------------------------------ */
+
+describe('runInsightsRung2Phase — the first-of-month monthly trio', () => {
+  it('patches the five monthly readings + stages their series (one OECD fetch, three countries)', async () => {
+    const original = globalThis.fetch;
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes('jgbcme')) return new Response(mofCurrentCsv, { status: 200 });
+      if (url.includes('sdmx.oecd.org')) return new Response(cliCsv, { status: 200 });
+      if (url.includes('matteoiacoviello.com')) return new Response(gprBuf, { status: 200 });
+      if (url.includes('policyuncertainty.com')) return new Response(epuBuf, { status: 200 });
+      throw new Error(`unexpected fetch: ${url}`);
+    }) as typeof fetch;
+    try {
+      const series: Partial<Record<IndicatorId, SeriesPoint[]>> = {};
+      for (const def of DEFINITIONS) {
+        if ((RUNG2_IDS as readonly string[]).includes(def.id)) continue;
+        series[def.id] = [{ date: '2026-10-31', value: 1 }];
+      }
+      series.us10y = [{ date: '2026-10-30', value: 4.96 }];
+      const store = new MemoryStore();
+      store.snapshot = buildInsightsSnapshot({
+        series,
+        calendar: [],
+        now: '2026-11-01T04:10:00.000Z',
+        carryForwardIds: new Set(RUNG2_IDS as readonly string[]),
+      });
+      const kv = new MemoryKv();
+      kv.value = JSON.stringify({
+        v: 1,
+        writtenAt: '2026-11-01T04:10:00.000Z',
+        series: { us10y: [[20750, 4.96]], 'jgb-mirror': [[19000, 2.8]] },
+      });
+
+      const result = await runInsightsRung2Phase({
+        store: store as unknown as InsightsStore,
+        stageKv: kv as unknown as Parameters<typeof runInsightsRung2Phase>[0]['stageKv'],
+        mode: 'scheduled',
+        now: new Date('2026-11-01T04:20:00Z'), // the first of the month
+      });
+
+      expect(result.plan.monthly).toBe(true);
+      expect(result.patched).toBe(true);
+      const byId = new Map(store.snapshot!.readings.map((r) => [r.id as string, r]));
+      // The CLI trio: live values @ 2026-09; the US card's rule evaluated
+      // (the rising 2026 tail reads Normal — 6-month annualised ≈ +1.1,
+          // below the +2 V-turn line, no declines).
+      const us = byId.get('oecd-cli-us')!;
+      expect(us.value).toBe(100.9993);
+      expect(us.asOf).toBe('2026-09-01');
+      expect(us.status).toBe('normal');
+      expect(us.percentile10y).toBeDefined(); // the 141-point decade base
+      const cn = byId.get('oecd-cli-cn')!;
+      expect(cn.value).toBe(97.41035);
+      expect(cn.status).toBe('context'); // info rule — never a vote
+      expect(byId.get('oecd-cli-de')!.value).toBe(101.0066);
+      // The GPR + EPU context cards carry their SD-regime z-scores (the
+      // rolling decade recomputed on write; both sit in the typical zone
+      // on the capture day).
+      const gpr = byId.get('gpr-index')!;
+      expect(gpr.value).toBeCloseTo(146.2099, 3);
+      expect(gpr.asOf).toBe('2026-09-01');
+      expect(gpr.status).toBe('context');
+      // z vs the decade trailing the phase's clock (2026-11-01): both
+      // indexes sit in their typical zone on the capture day.
+      expect(gpr.sd10y).toBeCloseTo(0.619, 2);
+      const epu = byId.get('epu-us')!;
+      expect(epu.value).toBeCloseTo(218.941, 2);
+      expect(epu.status).toBe('context');
+      expect(epu.sd10y).toBeCloseTo(0.066, 2);
+      // The stage carries all five (the 04:40 periodic phase's input).
+      const stage = JSON.parse(kv.value!) as { series: Record<string, unknown> };
+      for (const id of ['oecd-cli-us', 'oecd-cli-cn', 'oecd-cli-de', 'gpr-index', 'epu-us']) {
+        expect(stage.series[id]).toBeDefined();
+      }
+      // The periodic history phase then writes them (monthly cadence →
+      // the periodic read-compare phase).
+      const hist = await runInsightsHistoryPhase({
+        kv: kv as unknown as Parameters<typeof runInsightsHistoryPhase>[0]['kv'],
+        phase: 'periodic',
+        now: new Date('2026-11-01T04:40:00Z'),
+      });
+      expect(hist.written).toBeGreaterThan(0);
+      expect(store.snapshot!.readings).toHaveLength(100); // 95 + the five
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * The CFTC accumulation across two Saturdays (the wave-3 stage fix —
+ * the A-7 commit's first-point deadlock: a single-point fetch must
+ * reach the stage so week 2 JOINS week 1 instead of replacing it)
+ * ------------------------------------------------------------------ */
+
+describe('runInsightsRung2Phase — the CFTC single-point accumulation (the A-7 fix)', () => {
+  it('week 1 stages its lone point; week 2 merges onto it and the history phase writes the pair', async () => {
+    const original = globalThis.fetch;
+    const deafutWeek1 = readFileSync(join(fixtures, 'cftc-deafut.txt'), 'utf8');
+    // Week 2's file: the same shape, one week later (2026-10-27).
+    const deafutWeek2 = deafutWeek1.replaceAll('2026-10-20', '2026-10-27');
+
+    const series: Partial<Record<IndicatorId, SeriesPoint[]>> = {};
+    for (const def of DEFINITIONS) {
+      if ((RUNG2_IDS as readonly string[]).includes(def.id)) continue;
+      series[def.id] = [{ date: '2026-10-24', value: 1 }];
+    }
+    const store = new MemoryStore();
+    store.snapshot = buildInsightsSnapshot({
+      series,
+      calendar: [],
+      now: '2026-10-24T04:10:00.000Z',
+      carryForwardIds: new Set(RUNG2_IDS as readonly string[]),
+    });
+    const kv = new MemoryKv();
+
+    try {
+      // Week 1 (Saturday 2026-10-24): the gold COT file's lone point.
+      globalThis.fetch = (async () => new Response(deafutWeek1, { status: 200 })) as typeof fetch;
+      const week1 = await runInsightsRung2Phase({
+        store: store as unknown as InsightsStore,
+        stageKv: kv as unknown as Parameters<typeof runInsightsRung2Phase>[0]['stageKv'],
+        mode: 'scheduled',
+        now: new Date('2026-10-24T04:20:00Z'),
+      });
+      expect(week1.patched).toBe(true);
+      expect(store.snapshot!.readings.find((r) => r.id === 'cftc-gold-positioning')!.value).toBeCloseTo(49.68, 1);
+      let stage = JSON.parse(kv.value!) as { series: Record<string, Array<[number, number]>> };
+      // THE FIX: the single point stages (the old > 1 gate dropped it —
+      // the accumulation could never start).
+      expect(stage.series['cftc-gold-positioning']).toHaveLength(1);
+      // The daily history phase floors at 2 points: nothing written yet.
+      const hist1 = await runInsightsHistoryPhase({
+        kv: kv as unknown as Parameters<typeof runInsightsHistoryPhase>[0]['kv'],
+        phase: 'daily',
+        now: new Date('2026-10-24T04:25:00Z'),
+      });
+      expect(hist1.written).toBe(0);
+
+      // Week 2 (Saturday 2026-10-31): a NEW lone point — it must JOIN
+      // the staged week-1 point (the stage arms the accumulation base
+      // while the stored history key does not exist yet).
+      globalThis.fetch = (async () => new Response(deafutWeek2, { status: 200 })) as typeof fetch;
+      const week2 = await runInsightsRung2Phase({
+        store: store as unknown as InsightsStore,
+        stageKv: kv as unknown as Parameters<typeof runInsightsRung2Phase>[0]['stageKv'],
+        mode: 'scheduled',
+        now: new Date('2026-10-31T04:20:00Z'),
+      });
+      expect(week2.patched).toBe(true);
+      const cftc = store.snapshot!.readings.find((r) => r.id === 'cftc-gold-positioning')!;
+      expect(cftc.value).toBeCloseTo(49.68, 1); // the same share, one week later
+      expect(cftc.asOf).toBe('2026-10-27');
+      stage = JSON.parse(kv.value!) as { series: Record<string, Array<[number, number]>> };
+      expect(stage.series['cftc-gold-positioning']).toHaveLength(2); // joined, not replaced
+      // And now the daily history phase writes the accumulated pair.
+      const hist2 = await runInsightsHistoryPhase({
+        kv: kv as unknown as Parameters<typeof runInsightsHistoryPhase>[0]['kv'],
+        phase: 'daily',
+        now: new Date('2026-10-31T04:25:00Z'),
+      });
+      expect(hist2.written).toBeGreaterThan(0);
+    } finally {
       globalThis.fetch = original;
     }
   });

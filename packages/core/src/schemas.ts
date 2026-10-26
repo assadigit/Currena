@@ -424,6 +424,19 @@ export const IndicatorIdSchema = z.enum([
   // 2026-10-26 gap-audit build (A-7): trader positioning in gold (COT) —
   // the CFTC's weekly futures-only file, Saturday rung.
   'cftc-gold-positioning',
+  // 2026-10-26 gap-audit build (A-8): the OECD's amplitude-adjusted
+  // Composite Leading Indicators — one fetch, three rows (USA, CHN, and
+  // DEU — the euro-area substitute; EA19 does not exist in the dataflow,
+  // probed live 2026-10-26).
+  'oecd-cli-us',
+  'oecd-cli-cn',
+  'oecd-cli-de',
+  // 2026-10-26 gap-audit build (A-9): the Geopolitical Risk Index —
+  // Iacoviello's monthly .xls via the repo's own biff reader.
+  'gpr-index',
+  // 2026-10-26 gap-audit build (A-10): US Economic Policy Uncertainty —
+  // Baker-Bloom-Davis's monthly headline index.
+  'epu-us',
   'wti', // FRED DCOILWTICO (WTI spot, USD/barrel)
   'natgas', // FRED DHHNGSP (Henry Hub spot, USD/MMBtu)
   // Global — market-stress lane context row (crypto price beside FNG):
@@ -596,6 +609,19 @@ export const WarningRuleAtomSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('yoy-negative') }),
   /** N period-over-period declines in a row ending at the current value. */
   z.object({ kind: z.literal('consecutive-decline'), periods: z.number().int().positive() }),
+  /**
+   * 2026-10-26 gap-audit build (A-8, the OECD CLI): the ANNUALISED
+   * percent growth over the last `months` months (the CLI's own
+   * convention — "6-month annualised growth below −1 means turning
+   * down"). The engine finds the point ~months back (tolerance for
+   * monthly dating) and annualises (v_t/v_then − 1) × 100 × (12/months).
+   */
+  z.object({
+    kind: z.literal('growth'),
+    direction: z.enum(['above', 'below']),
+    value: z.number().finite(),
+    months: z.number().int().positive(),
+  }),
   /** Rise of at least `rise` points from the lowest value of the last 12 months. */
   z.object({ kind: z.literal('above-low'), rise: z.number().positive().finite() }),
   /**
@@ -709,6 +735,15 @@ export const IndicatorReadingSchema = z
     change30d: z.number().finite().optional(),
     /** Share of the last 10 years' readings strictly below the current one (0–1); absent when the base is too short. */
     percentile10y: z.number().min(0).max(1).optional(),
+    /**
+     * 2026-10-26 gap-audit build (A-9/A-10): the current value's SIGNED
+     * z-score against the trailing 10-year window's mean and standard
+     * deviation — the spec's "rolling 10-year mean/SD recomputed on write"
+     * regime (the GPR war-scare zones: above +1 SD needs attention, above
+     * +2 SD the historic spikes). Absent when the base is too short or its
+     * SD is zero; only the A-9/A-10 cards' copy reads it today.
+     */
+    sd10y: z.number().finite().optional(),
     /**
      * I15 big-mover score (2026-10-08 data spec §4): (latest change − mean)
      * ÷ std of the same change over the 10-year window — the 30-day change

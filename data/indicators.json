@@ -1764,6 +1764,325 @@
       }
     },
     {
+      "id": "oecd-cli-us",
+      "title": "OECD leading indicator (US)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": "growth-health",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "oecd",
+        "name": "OECD (Composite leading indicator, amplitude-adjusted)",
+        "url": "https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm",
+        "seriesIdOrTable": "OECD Composite leading indicator (amplitude-adjusted), United States"
+      },
+      "publisher": "OECD (Composite Leading Indicators via SDMX)",
+      "publisherUrl": "https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm",
+      "methodUrl": "https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm",
+      "whatItIs": "The OECD’s amplitude-adjusted Composite Leading Indicator for the United States: a single index built from orders, construction, consumer sentiment, financial and labour components, published monthly with roughly a five-week lag.",
+      "whatItIsnt": "A leading indicator sees turns, not their size: false turns have happened, and the five-week publication lag means fast shocks arrive late to this card.",
+      "trackRecordNote": "The OECD’s own turning-point convention: 6-month annualised growth below −1 means “turning down”, three consecutive monthly falls mark a slowdown, and drops below −2 have clustered around recessions — while rare 3-month surges above +2 mark policy-driven V-turns.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The OECD’s standard reuse terms, quoted verbatim from the OECD’s own publication copyright pages (read 2026-10-26): “You can copy, download or print OECD content for your own use, and you can include excerpts from OECD publications, databases and multimedia products in your own documents, presentations, blogs, websites and teaching materials, provided that suitable acknowledgment of OECD as source and copyright owner is given.” The oecd.org terms-and-conditions page itself is JS-rendered (no verbatim quote from a plain fetch); the publication-page line is the OECD’s own material. Commercial-use requests go to rights@oecd.org — this site is an attribution-with-quote display, the FRED citation-required class.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: OECD (Composite leading indicators)",
+        "legs": [
+          "oecd"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "any-of",
+        "of": [
+          {
+            "kind": "growth",
+            "direction": "below",
+            "value": -1,
+            "months": 6
+          },
+          {
+            "kind": "growth",
+            "direction": "below",
+            "value": -2,
+            "months": 6
+          },
+          {
+            "kind": "consecutive-decline",
+            "periods": 3
+          },
+          {
+            "kind": "growth",
+            "direction": "above",
+            "value": 2,
+            "months": 3
+          }
+        ]
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "OECD reuse terms — free with suitable acknowledgment",
+        "attributionText": "Source: OECD (Composite leading indicators)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The OECD’s standard reuse terms, quoted verbatim from the OECD’s own publication copyright pages (read 2026-10-26): “You can copy, download or print OECD content for your own use, and you can include excerpts from OECD publications, databases and multimedia products in your own documents, presentations, blogs, websites and teaching materials, provided that suitable acknowledgment of OECD as source and copyright owner is given.” The oecd.org terms-and-conditions page itself is JS-rendered (a plain fetch returns the app shell — no verbatim quote from there); the publication-page line is the OECD’s own material, and this site’s use (own cards, attribution, source link) sits inside it. Commercial-use and translation requests are directed to rights@oecd.org by the same terms. · Legs (oecd): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.oecd.org/en/about/legal/terms-conditions.html"
+      }
+    },
+    {
+      "id": "oecd-cli-cn",
+      "title": "OECD leading indicator (China)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "oecd",
+        "name": "OECD (Composite leading indicator, amplitude-adjusted)",
+        "url": "https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm",
+        "seriesIdOrTable": "OECD Composite leading indicator (amplitude-adjusted), China"
+      },
+      "publisher": "OECD (Composite Leading Indicators via SDMX)",
+      "publisherUrl": "https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm",
+      "methodUrl": "https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm",
+      "whatItIs": "The OECD’s amplitude-adjusted Composite Leading Indicator for China: the same component framework as the US card, published monthly with roughly a five-week lag.",
+      "whatItIsnt": "China’s turning points have been policy-shaped and sharp: the indicator lags the decisions more than the economy.",
+      "trackRecordNote": "The same convention as the US card: 6-month annualised growth below −1 means “turning down”; three consecutive monthly falls mark a slowdown.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The OECD’s standard reuse terms, quoted verbatim from the OECD’s own publication copyright pages (read 2026-10-26): “You can copy, download or print OECD content for your own use, and you can include excerpts from OECD publications, databases and multimedia products in your own documents, presentations, blogs, websites and teaching materials, provided that suitable acknowledgment of OECD as source and copyright owner is given.” The oecd.org terms-and-conditions page itself is JS-rendered (no verbatim quote from a plain fetch); the publication-page line is the OECD’s own material. Commercial-use requests go to rights@oecd.org — this site is an attribution-with-quote display, the FRED citation-required class.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: OECD (Composite leading indicators)",
+        "legs": [
+          "oecd"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "OECD reuse terms — free with suitable acknowledgment",
+        "attributionText": "Source: OECD (Composite leading indicators)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The OECD’s standard reuse terms, quoted verbatim from the OECD’s own publication copyright pages (read 2026-10-26): “You can copy, download or print OECD content for your own use, and you can include excerpts from OECD publications, databases and multimedia products in your own documents, presentations, blogs, websites and teaching materials, provided that suitable acknowledgment of OECD as source and copyright owner is given.” The oecd.org terms-and-conditions page itself is JS-rendered (a plain fetch returns the app shell — no verbatim quote from there); the publication-page line is the OECD’s own material, and this site’s use (own cards, attribution, source link) sits inside it. Commercial-use and translation requests are directed to rights@oecd.org by the same terms. · Legs (oecd): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.oecd.org/en/about/legal/terms-conditions.html"
+      }
+    },
+    {
+      "id": "oecd-cli-de",
+      "title": "OECD leading indicator (Germany)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "oecd",
+        "name": "OECD (Composite leading indicator, amplitude-adjusted)",
+        "url": "https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm",
+        "seriesIdOrTable": "OECD Composite leading indicator (amplitude-adjusted), Germany"
+      },
+      "publisher": "OECD (Composite Leading Indicators via SDMX)",
+      "publisherUrl": "https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm",
+      "methodUrl": "https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm",
+      "whatItIs": "The OECD’s amplitude-adjusted Composite Leading Indicator for Germany — the euro-area substitute (the OECD’s CLI dataflow publishes member countries, not the EA19 aggregate; Germany is the area’s largest economy), monthly with roughly a five-week lag.",
+      "whatItIsnt": "Germany is one economy, not the whole euro area: export-heavy turns can mislabel the region.",
+      "trackRecordNote": "The same convention as the US card: 6-month annualised growth below −1 means “turning down”; three consecutive monthly falls mark a slowdown.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The OECD’s standard reuse terms, quoted verbatim from the OECD’s own publication copyright pages (read 2026-10-26): “You can copy, download or print OECD content for your own use, and you can include excerpts from OECD publications, databases and multimedia products in your own documents, presentations, blogs, websites and teaching materials, provided that suitable acknowledgment of OECD as source and copyright owner is given.” The oecd.org terms-and-conditions page itself is JS-rendered (no verbatim quote from a plain fetch); the publication-page line is the OECD’s own material. Commercial-use requests go to rights@oecd.org — this site is an attribution-with-quote display, the FRED citation-required class.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: OECD (Composite leading indicators)",
+        "legs": [
+          "oecd"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "OECD reuse terms — free with suitable acknowledgment",
+        "attributionText": "Source: OECD (Composite leading indicators)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The OECD’s standard reuse terms, quoted verbatim from the OECD’s own publication copyright pages (read 2026-10-26): “You can copy, download or print OECD content for your own use, and you can include excerpts from OECD publications, databases and multimedia products in your own documents, presentations, blogs, websites and teaching materials, provided that suitable acknowledgment of OECD as source and copyright owner is given.” The oecd.org terms-and-conditions page itself is JS-rendered (a plain fetch returns the app shell — no verbatim quote from there); the publication-page line is the OECD’s own material, and this site’s use (own cards, attribution, source link) sits inside it. Commercial-use and translation requests are directed to rights@oecd.org by the same terms. · Legs (oecd): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.oecd.org/en/about/legal/terms-conditions.html"
+      }
+    },
+    {
+      "id": "gpr-index",
+      "title": "Geopolitical Risk Index",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "gpr",
+        "name": "Caldara-Iacoviello Geopolitical Risk Index (Federal Reserve Board)",
+        "url": "https://www.matteoiacoviello.com/gpr.htm",
+        "seriesIdOrTable": "Caldara-Iacoviello Geopolitical Risk Index (monthly)"
+      },
+      "publisher": "Caldara-Iacoviello Geopolitical Risk Index",
+      "publisherUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "methodUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "whatItIs": "The Geopolitical Risk Index of Caldara and Iacoviello: a monthly measure of war, terrorism and tension terms across major newspapers, from 1985 to today.",
+      "whatItIsnt": "The index counts mentions, not severity: a loud stalemate can outscore a quiet escalation, and markets habituate to chronic tension.",
+      "trackRecordNote": "The zones are measured against the index’s own trailing decade: above 1 standard deviation is the historic war-scare zone, above 2 the 2001 / 2022-03 / 2023-10 class of episodes — both recomputed on every write, never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The author’s own page, quoted verbatim (read live 2026-10-26): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” Citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "legs": [
+          "gpr"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Creative Commons BY 4.0 (the author’s own grant)",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The author’s own page, quoted verbatim (read live 2026-10-26, matteoiacoviello.com/gpr.htm): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” The requested citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225. · Legs (gpr): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.matteoiacoviello.com/gpr.htm"
+      }
+    },
+    {
+      "id": "epu-us",
+      "title": "US policy uncertainty (EPU)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "epu",
+        "name": "Baker-Bloom-Davis, US Economic Policy Uncertainty",
+        "url": "https://www.policyuncertainty.com/us_monthly.html",
+        "seriesIdOrTable": "Baker-Bloom-Davis US Economic Policy Uncertainty index (monthly)"
+      },
+      "publisher": "Baker-Bloom-Davis, US Economic Policy Uncertainty",
+      "publisherUrl": "https://www.policyuncertainty.com/us_monthly.html",
+      "methodUrl": "https://www.policyuncertainty.com/us_monthly.html",
+      "whatItIs": "Baker, Bloom and Davis’s US Economic Policy Uncertainty index: a monthly count of policy-related uncertainty terms in major US newspapers, from 1900 to today.",
+      "whatItIsnt": "Uncertainty is not direction: a spike says decisions are being delayed, not which way the decisions go.",
+      "trackRecordNote": "The zones are measured against the index’s own trailing decade: above 1 standard deviation are the elections, tariff fights and debt-ceiling episodes; above 2 the historic spikes — recomputed on every write, never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The licence rides IN the workbook itself (Main News Index sheet, row 1523, read from the committed fixture 2026-10-26): “Source: ‘Measuring Economic Policy Uncertainty’ by Scott Baker, Nicholas Bloom and Steven J. Davis at www.PolicyUncertainty.com. These data can be used freely with attribution to the authors, the paper, and the website.”",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: Baker, Bloom and Davis, PolicyUncertainty.com",
+        "legs": [
+          "epu"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Free use with attribution (the workbook’s own licence line)",
+        "attributionText": "Source: Baker, Bloom and Davis, PolicyUncertainty.com",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The licence is embedded in the data file itself (US_Policy_Uncertainty_Data.xlsx, Main News Index sheet, row 1523 — read from the committed fixture 2026-10-26): “Source: ‘Measuring Economic Policy Uncertainty’ by Scott Baker, Nicholas Bloom and Steven J. Davis at www.PolicyUncertainty.com. These data can be used freely with attribution to the authors, the paper, and the website.” · Legs (epu): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.policyuncertainty.com/us_monthly.html"
+      }
+    },
+    {
       "id": "wti",
       "title": "WTI crude oil",
       "area": {

@@ -215,6 +215,63 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     notes:
       'A-7 (2026-10-26 gap-audit build): one weekly point per fetch (the file carries only the latest week); the series accumulates in insights:hist:cftc-gold-positioning. Saturday rung-2 phase.',
   },
+  oecd: {
+    id: 'oecd',
+    provider: 'oecd',
+    label: 'OECD (Composite Leading Indicators via SDMX)',
+    usedFor: 'oecd-cli-us / oecd-cli-cn / oecd-cli-de — one filtered SDMX request carries all three countries',
+    method: 'M2',
+    runtime: 'worker',
+    level: 'L0',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'The OECD’s standard reuse terms, quoted verbatim from the OECD’s own publication copyright pages (read 2026-10-26): “You can copy, download or print OECD content for your own use, and you can include excerpts from OECD publications, databases and multimedia products in your own documents, presentations, blogs, websites and teaching materials, provided that suitable acknowledgment of OECD as source and copyright owner is given.” The oecd.org terms-and-conditions page itself is JS-rendered (no verbatim quote from a plain fetch); the publication-page line is the OECD’s own material. Commercial-use requests go to rights@oecd.org — this site is an attribution-with-quote display, the FRED citation-required class.',
+    termsReadOn: '2026-10-26',
+    attribution: 'Source: OECD (Composite leading indicators)',
+    termsUrl: 'https://www.oecd.org/en/about/legal/terms-conditions.html',
+    notes:
+      'A-8 (2026-10-26 gap-audit build): the filtered dataflow request OECD.SDD.STES,DSD_STES@DF_CLI,4.1 with REF_AREA=USA+CHN+DEU, MEASURE=LI, ADJUSTMENT=AA (amplitude-adjusted — the series the spec names) and startPeriod=2015-01 (the decade window the percentile/SD bases need; the spec’s startPeriod=2026-01 would leave the bases empty). The spec’s EA19 does not exist in the dataflow (probed live: member countries + G7/G20 aggregates only) — DEU is the honest euro substitute. First-of-month rung-2 phase + bootstrap; the live export arrives JUMBLED (row order is not chronological — the parser sorts, then asserts).',
+  },
+  gpr: {
+    id: 'gpr',
+    provider: 'gpr',
+    label: 'Caldara-Iacoviello Geopolitical Risk Index',
+    usedFor: 'gpr-index (the monthly GPR card)',
+    method: 'M2',
+    runtime: 'worker',
+    level: 'L0',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'The author’s own page, quoted verbatim (read live 2026-10-26): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” Citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.',
+    termsReadOn: '2026-10-26',
+    attribution: 'Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)',
+    termsUrl: 'https://www.matteoiacoviello.com/gpr.htm',
+    notes:
+      'A-9 (2026-10-26 gap-audit build): the 2.7 MB legacy .xls (CDFV2) parses through the repo’s own dependency-free biff reader (the EIA-workbook path) — the spec’s honest-build note expected a possible BLOCKED outcome; the live file proved otherwise (501 GPR points, 1985-01 → 2026-09, verified live). Never a hand-entered value. First-of-month rung-2 phase + bootstrap.',
+  },
+  epu: {
+    id: 'epu',
+    provider: 'epu',
+    label: 'Baker-Bloom-Davis, US Economic Policy Uncertainty',
+    usedFor: 'epu-us (the monthly EPU card)',
+    method: 'M2',
+    runtime: 'worker',
+    level: 'L0',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'The licence rides IN the workbook itself (Main News Index sheet, row 1523, read from the committed fixture 2026-10-26): “Source: ‘Measuring Economic Policy Uncertainty’ by Scott Baker, Nicholas Bloom and Steven J. Davis at www.PolicyUncertainty.com. These data can be used freely with attribution to the authors, the paper, and the website.”',
+    termsReadOn: '2026-10-26',
+    attribution: 'Source: Baker, Bloom and Davis, PolicyUncertainty.com',
+    termsUrl: 'https://www.policyuncertainty.com/us_monthly.html',
+    notes:
+      'A-10 (2026-10-26 gap-audit build): the 71 KB OOXML workbook reads through the repo’s Pink Sheet parser path directly (readXlsxSheet); the Main News Index header row (Year/Month/News_Based_Policy_Uncert_Index) is asserted verbatim. First-of-month rung-2 phase + bootstrap.',
+  },
   'ecb-frankfurter': {
     id: 'ecb-frankfurter',
     provider: 'frankfurter',
@@ -545,6 +602,12 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   // 2026-10-26 gap-audit build, A-6/A-7.
   'eia-crude-stocks': ['eia'],
   'cftc-gold-positioning': ['cftc'],
+  // 2026-10-26 gap-audit build, A-8..A-10 (the monthly trio).
+  'oecd-cli-us': ['oecd'],
+  'oecd-cli-cn': ['oecd'],
+  'oecd-cli-de': ['oecd'],
+  'gpr-index': ['gpr'],
+  'epu-us': ['epu'],
   // 2026-10-26 gap-audit build, A-2: the MOF daily primary + the OECD
   // mirror fallback leg (the mirror fills during MOF outages, labelled).
   'jgb-10y': ['mof:jgbcme', 'fred:IRLTLT01JPM156N'],
@@ -792,6 +855,15 @@ export const SANITY_RANGES: Readonly<Record<string, SanityRange>> = {
   'eia-crude-stocks': { minExclusive: true, max: 5_000_000 },
   // A-7: a share of open interest is bounded [-100, 100] by construction.
   'cftc-gold-positioning': { min: -100, max: 100 },
+  // 2026-10-26 gap-audit build, A-8..A-10: the CLI is an index
+  // normalised around 100 (the parser band 50–150); the news-based
+  // indexes are positive with an impossibility ceiling far above any
+  // printed value (GPR's 140-year max ≈ 550, EPU's ≈ 800).
+  'oecd-cli-us': { min: 50, max: 150 },
+  'oecd-cli-cn': { min: 50, max: 150 },
+  'oecd-cli-de': { min: 50, max: 150 },
+  'gpr-index': { minExclusive: true, max: 2_000 },
+  'epu-us': { minExclusive: true, max: 2_000 },
   'silver-usd': { minExclusive: true },
   'btc-usd': { minExclusive: true },
   'copper-usd': { minExclusive: true },

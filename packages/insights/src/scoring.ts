@@ -212,6 +212,31 @@ function evaluateAtom(
         : { status: 'normal' };
     }
 
+    case 'growth': {
+      // 2026-10-26 gap-audit build, A-8: the annualised N-month growth —
+      // the OECD CLI's own turning-point convention. The anchor point is
+      // searched `months` months back (±25 days: monthly series stamp
+      // month-starts, so a 6-month anchor lands within days of exact).
+      const current = pointAtOrBefore(series, asOf);
+      if (!current) return { status: 'unevaluable', reason: 'no observation at or before asOf' };
+      const targetMs = Date.parse(`${current.date}T00:00:00Z`) - rule.months * 30.44 * 86_400_000;
+      const target = new Date(targetMs).toISOString().slice(0, 10);
+      let then: SeriesPoint | undefined;
+      for (const p of series) {
+        if (p.date <= target) then = p;
+        else break;
+      }
+      if (then === undefined || then.date === current.date) {
+        return { status: 'unevaluable', reason: `no observation ~${rule.months} months back` };
+      }
+      if (Math.abs(Date.parse(`${then.date}T00:00:00Z`) - targetMs) > 25 * 86_400_000) {
+        return { status: 'unevaluable', reason: `growth anchor is ${then.date} (tolerance 25 days around ${target})` };
+      }
+      if (then.value <= 0) return { status: 'unevaluable', reason: 'growth on non-positive base' };
+      const annualised = ((current.value / then.value - 1) * 100) * (12 / rule.months);
+      const warning = rule.direction === 'below' ? annualised < rule.value : annualised > rule.value;
+      return warning ? { status: 'warning' } : { status: 'normal' };
+    }
     case 'consecutive-decline': {
       const recent = sliceBetween(series, '0001-01-01', asOf).slice(-(rule.periods + 1));
       if (recent.length < rule.periods + 1) {
@@ -487,6 +512,19 @@ export function computeReading(
   if (pBase.length >= MIN_PERCENTILE_OBS) {
     const pCurrent = pointAtOrBefore(percentileSeries, nowDay);
     if (pCurrent) reading.percentile10y = percentileOf(pBase.map((p) => p.value), pCurrent.value);
+  }
+
+  // 2026-10-26 gap-audit build, A-9/A-10: the SD regime — the current
+  // value's z-score against the SAME trailing base window as the
+  // percentile (the level series for every card that reads it today; a
+  // percentileBasis 'yoy' card would carry its growth z-score). Rolling
+  // mean + sample SD recomputed on every write, never hardcoded.
+  if (pBase.length >= MIN_PERCENTILE_OBS) {
+    const values = pBase.map((p) => p.value);
+    const mean = values.reduce((a, b) => a + b, 0) / values.length;
+    const variance = values.reduce((a, b) => a + (b - mean) ** 2, 0) / (values.length - 1);
+    const sd = Math.sqrt(variance);
+    if (sd > 0) reading.sd10y = (current.value - mean) / sd;
   }
 
   // Step-1 audit item C9: distance from the 10-year peak, in percent

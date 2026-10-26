@@ -186,6 +186,8 @@ interface RuleCopy {
   changeFallPoints: string;
   yoyNegative: string;
   consecutiveDecline: string;
+  growthAbove: string;
+  growthBelow: string;
   aboveLow: string;
   belowAux: string;
   or: string;
@@ -248,6 +250,20 @@ function ruleAtomText(
       return copy.yoyNegative;
     case 'consecutive-decline':
       return interpolate(copy.consecutiveDecline, { periods: fmt(atom.periods, numberLocale) });
+    case 'growth': {
+      // 2026-10-26 gap-audit build, A-8: the annualised N-month growth line
+      // ("annualised growth over the past 6 months below −1%"). The
+      // magnitude is a PERCENT RATE (the OECD's own convention — a derived
+      // growth figure), never the card's index level: the percent token
+      // rides it directly, the display scale never applies (the CLI card
+      // stores ~101 and displays 101.0 — the rule speaks its own units).
+      const mag = `${fmt(atom.value, numberLocale)}${units.percent}`;
+      const months = fmt(atom.months, numberLocale);
+      return interpolate(
+        atom.direction === 'below' ? copy.growthBelow : copy.growthAbove,
+        { magnitude: mag, months },
+      );
+    }
     case 'above-low':
       return interpolate(copy.aboveLow, { rise: `${fmt(atom.rise, numberLocale)} ${units.points}` });
   }

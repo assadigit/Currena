@@ -1,8 +1,8 @@
 # SELF_AUDIT.md — the automatic self-check
 
-Generated: 2026-10-19T23:59:34.295Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-19.md`
+Generated: 2026-10-26T03:42:13.204Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-26.md`
 
-Result: **ALL TESTS PASS** (25 of 25 pass)
+Result: **ALL TESTS PASS** (24 of 24 pass)
 
 ## Every test, pass or fail
 
@@ -29,15 +29,14 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 | E-18 | Trend labels reproducible from the stated 3-month rule | pass | the export + CSV recompute from chg3m (markets/compute.ts trendOf); pinned by markets + full-export tests |
 | SUITE:packages/core | Unit suite — packages/core | pass | 191 tests |
 | SUITE:packages/scraper | Unit suite — packages/scraper | pass | 67 tests |
-| SUITE:packages/insights | Unit suite — packages/insights | pass | 521 tests |
+| SUITE:packages/insights | Unit suite — packages/insights | pass | 643 tests |
 | SUITE:apps/markets | Unit suite — apps/markets | pass | 13 tests |
-| SUITE:apps/api | Unit suite — apps/api | pass | 334 tests |
-| SUITE:apps/web | Unit suite — apps/web | pass | 698 tests |
+| SUITE:apps/api | Unit suite — apps/api | pass | 344 tests |
 
 ## Stale or "can't tell" cards
 
-| Indicator | Status | As of | Reason |
-| au-wage-growth | stale | 2026-04-01 | stale |
+None — every card reads current or carries its own honest tag.
+
 
 ## Unavailable cards
 
@@ -50,41 +49,35 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 - au-home-loan
 - au-deposit-rate
 - au-household-debt-arrears
+- rba-fed-gap
 
 ## Source report
 
-- ✅ fred — T10Y2Y
-- ✅ fred — STLFSI4
-- ✅ fred — DFII10
-- ✅ fred — DGS10
-- ✅ fred — T5YIFR
-- ✅ fred — A091RC1Q027SBEA
-- ✅ fred — W006RC1Q027SBEA
-- ✅ fred — DCOILBRENTEU
-- ✅ fred — M2SL
-- ✅ fred — CPIAUCNS
-- ✅ fred — CPILFENS
-- ✅ fred — DFEDTARL
-- ✅ fred — DFEDTARU
-- ✅ fred — NFCI
-- ✅ fred — UNRATE
-- ✅ fred — SAHMREALTIME
-- ✅ fred — VIXCLS
-- ✅ fred — DGS2
-- ✅ fred — DGS30
-- ✅ fred — T10YIE
-- ✅ fred — GACDFSA066MSFRBPHI
+- ✅ fred — bulk group 1 (3 series: DGS10, DGS30, DFII10)
+- ✅ fred — bulk group 2 (10 series, from 2016-07-30: T10Y2Y, T10Y3M, STLFSI4, T5YIFR, DGS2, T10YIE, VIXCLS, NFCI, SOFR, T5YIE)
+- ✅ fred — bulk group 3 (12 series, from 2016-07-30: M2SL, CPIAUCNS, CPILFENS, DFEDTARL, DFEDTARU, UNRATE, SAHMREALTIME, GACDFSA066MSFRBPHI, PAYEMS, A191RL1Q225SBEA, RSAFS, PERMIT)
+- ✅ fred — bulk group 4 (5 series, from 2016-07-30: A091RC1Q027SBEA, W006RC1Q027SBEA, DCOILBRENTEU, DCOILWTICO, DHHNGSP)
+- ✅ fred — bulk group 5 (4 series, from 2016-07-30: IRLTLT01DEM156N, IRLTLT01JPM156N, IRLTLT01GBM156N, IRSTCI01JPM156N)
+- ✅ fred — bulk group 6 (10 series, from 2016-07-30: ICSA, RECPROUSM156N, UMCSENT, MICH, PCEPILFE, MORTGAGE30US, WALCL, CFNAI, JTSJOL, AHETPI)
 - ✅ yahoo — BZ=F daily closes (Brent gap-fill)
 - ✅ yahoo — GC=F daily quotes (10-year record history)
 - ✅ yahoo — SI=F daily quotes (10-year record history)
 - ✅ yahoo — BTC-USD daily quotes (10-year record history)
 - ✅ ecb — FM/D.U2.EUR.4F.KR.DFR.LEV
-- ✅ frankfurter — USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF since 2016-01-04
+- ✅ ecb — YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y (decade window)
+- ✅ ecb — HICP/M.U2.N.000000.4D0.ANR (decade window)
+- ✅ boe — Bank Rate history page (decision table, HTML)
+- ✅ nbs — press-release index page 1
+- ✅ nbs — press-release index page 2
+- ✅ nbs — PMI release: Purchasing Managers' Index for September 2026 (2026-10-01)
+- ✅ nbs — CPI release: Consumer Price Index in September 2026 (2026-10-15)
+- ✅ frankfurter — USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,TRY since 2016-01-04
 - ✅ world-bank — Pink Sheet monthly workbook
 - ✅ gold-api — XAU spot
 - ✅ gold-api — XAG spot
 - ✅ gold-api — BTC spot
 - ✅ gold-api — HG (copper) spot
+- ✅ gold-api — XPT (platinum) spot
 - ✅ abs — CPI/1.10001.10.50.M
 - ✅ abs — CPI/1.999902.20.50.M
 - ✅ abs — LF/M13.3.1599.20.AUS.M
@@ -93,16 +86,28 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 - ✅ abs — CPI/1.115522.10.50.M
 - ✅ abs — CPI/1.40081.10.50.M
 - ✅ abs — WPI/1.OHRPEB.7.TOT.10.AUS.Q
+- ✅ abs — LEND_HOUSING/FIN_VAL.NEWCOMMITS.DV8368.TOTDWELL.TOT.TOT.20.AUS.Q
+- ✅ abs — ANA_AGG/M7.HSR.20.AUS.Q
+- ✅ abs — JV/M1.7.TOT.20.AUS.Q
 - ✅ bitstamp — btcusd last 10 daily candles
+- ❌ rba — cash-rate page decision table (HTML): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ❌ rba — F1 Cash Rate Target (daily: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ❌ rba — F1.1 Cash Rate Target: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
-- ❌ rba — F2 Australian Government 10 year bond: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
-- ❌ rba — F2 FCMYGBAG3D Australian Government 3 year bond: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ❌ rba — E2 Household debt to income: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ❌ rba — F6 FLRHOOTA owner-occupier outstanding home-loan rate: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ❌ rba — F4.1 PDRNTH new household term-deposit rate: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
+- ❌ rba — F2 Australian Government 10 year bond: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
+- ❌ rba — F2 FCMYGBAG3D Australian Government 3 year bond: blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
+- ❌ rba — F2.1 FCMYGBAG10 10-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
+- ❌ rba — F2.1 FCMYGBAG3 3-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ✅ alternative-me — Crypto Fear and Greed (daily history)
-- ✅ cross-check — gold-api BTC 81874 vs Bitstamp close 81840 (2026-10-19) → 0.04%
+- ✅ cross-check — gold-api BTC 79584 vs Bitstamp close 79523 (2026-10-26) → 0.08%
+- ✅ mof — jgbcme.csv daily 10Y
+- ✅ eia — crude oil ending stocks WCRSTUS1 (weekly, keyless website route)
+- ✅ cftc — Commitments of Traders, futures-only (gold row)
+- ✅ oecd — Composite leading indicators, amplitude-adjusted (USA, CHN, DEU)
+- ✅ gpr — Geopolitical Risk Index (monthly export)
+- ✅ epu — US Economic Policy Uncertainty (Main News Index workbook)
 
 ## Scope notes
 

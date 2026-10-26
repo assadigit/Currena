@@ -108,6 +108,10 @@ export const GAUGES: readonly GaugeDef[] = [
       'china-cpi',
       'philly-fed',
       'initial-jobless-claims',
+      // 2026-10-26 gap-audit build, A-8: the OECD CLI joins the voters —
+      // the licensed-PMI replacement, the growth lane's leading edge
+      // (the CN/DE companions stay context, one vote per family).
+      'oecd-cli-us',
       'us-unemployment',
       'sahm-rule',
       'recession-probability',

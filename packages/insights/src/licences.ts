@@ -335,6 +335,61 @@ const CFTC: SourceLicence = {
   termsUrl: 'https://www.cftc.gov/About/TheCFTC/index.htm',
 };
 
+/**
+ * 2026-10-26 gap-audit build, A-8: the OECD’s Composite Leading
+ * Indicators — attribution-required reuse (the citation class), read
+ * from the OECD’s own publication copyright pages.
+ */
+const OECD: SourceLicence = {
+  provider: 'oecd',
+  label: 'OECD (Composite Leading Indicators via SDMX)',
+  licenceName: 'OECD reuse terms — free with suitable acknowledgment',
+  attributionText: 'Source: OECD (Composite leading indicators)',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-26',
+  termsEvidence:
+    'The OECD’s standard reuse terms, quoted verbatim from the OECD’s own publication copyright pages (read 2026-10-26): “You can copy, download or print OECD content for your own use, and you can include excerpts from OECD publications, databases and multimedia products in your own documents, presentations, blogs, websites and teaching materials, provided that suitable acknowledgment of OECD as source and copyright owner is given.” The oecd.org terms-and-conditions page itself is JS-rendered (a plain fetch returns the app shell — no verbatim quote from there); the publication-page line is the OECD’s own material, and this site’s use (own cards, attribution, source link) sits inside it. Commercial-use and translation requests are directed to rights@oecd.org by the same terms.',
+  termsUrl: 'https://www.oecd.org/en/about/legal/terms-conditions.html',
+};
+
+/**
+ * 2026-10-26 gap-audit build, A-9: the Caldara-Iacoviello Geopolitical
+ * Risk Index — the author’s own CC BY grant, quoted from the GPR page.
+ */
+const GPR: SourceLicence = {
+  provider: 'gpr',
+  label: 'Caldara-Iacoviello Geopolitical Risk Index',
+  licenceName: 'Creative Commons BY 4.0 (the author’s own grant)',
+  attributionText: 'Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-26',
+  termsEvidence:
+    'The author’s own page, quoted verbatim (read live 2026-10-26, matteoiacoviello.com/gpr.htm): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” The requested citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.',
+  termsUrl: 'https://www.matteoiacoviello.com/gpr.htm',
+};
+
+/**
+ * 2026-10-26 gap-audit build, A-10: Baker-Bloom-Davis’s US Economic
+ * Policy Uncertainty — the licence rides INSIDE the workbook itself.
+ */
+const EPU: SourceLicence = {
+  provider: 'epu',
+  label: 'Baker-Bloom-Davis, US Economic Policy Uncertainty',
+  licenceName: 'Free use with attribution (the workbook’s own licence line)',
+  attributionText: 'Source: Baker, Bloom and Davis, PolicyUncertainty.com',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-26',
+  termsEvidence:
+    'The licence is embedded in the data file itself (US_Policy_Uncertainty_Data.xlsx, Main News Index sheet, row 1523 — read from the committed fixture 2026-10-26): “Source: ‘Measuring Economic Policy Uncertainty’ by Scott Baker, Nicholas Bloom and Steven J. Davis at www.PolicyUncertainty.com. These data can be used freely with attribution to the authors, the paper, and the website.”',
+  termsUrl: 'https://www.policyuncertainty.com/us_monthly.html',
+};
+
 /** The register. Unknown providers resolve to the fail-closed entry. */
 export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   fred: FRED_BASE,
@@ -357,6 +412,9 @@ export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   eia: EIA,
   mof: MOF,
   cftc: CFTC,
+  oecd: OECD,
+  gpr: GPR,
+  epu: EPU,
 };
 
 export function licenceForProvider(provider: string): SourceLicence {

@@ -150,9 +150,11 @@ describe('buildInsightsSnapshot', () => {
     // added china-cpi (the NBS automation's second card) → 89; the
     // 2026-10-26 gap-audit build adds yield-curve-10y3m (A-1),
     // rba-fed-gap (A-5), us-japan-10y-gap (A-3), gold-oil-ratio (A-4),
-    // eia-crude-stocks (A-6) and cftc-gold-positioning (A-7) → 95.
-    expect(snap.readings).toHaveLength(95);
-    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(95);
+    // eia-crude-stocks (A-6), cftc-gold-positioning (A-7) → 95; the
+    // monthly trio oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10)
+    // → 100.
+    expect(snap.readings).toHaveLength(100);
+    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(100);
     expect(snap.readings.find((r) => r.id === 'us10y')!.status).not.toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.status).toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.value).toBeNull();

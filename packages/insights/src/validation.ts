@@ -761,6 +761,14 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // M4 Wave 1 (2026-10-24): the Michigan sentiment index — a survey index
   // in points, like china-pmi (its changes are index points).
   'michigan-sentiment',
+  // 2026-10-26 gap-audit build, A-8..A-10: the monthly trio — the OECD CLI
+  // (an index normalised around 100, like china-pmi), the GPR and the EPU
+  // (news-based indexes; their changes are index points).
+  'oecd-cli-us',
+  'oecd-cli-cn',
+  'oecd-cli-de',
+  'gpr-index',
+  'epu-us',
   // M6 Wave 3 (2026-10-25): the Chicago Fed composite — a weighted
   // activity index in points (zero = trend growth), like china-pmi.
   'cfnai',

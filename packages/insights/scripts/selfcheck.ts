@@ -106,9 +106,20 @@ const rung2Inputs = {
   // The mirror arms itself when the MOF fetch failed (the labelled
   // fallback the spec keeps for outages).
   jgbMirror: rung2.series['jgb-10y'] === undefined ? inputs.fred.IRLTLT01JPM156N : undefined,
+  // 2026-10-26 wave-3: the weekly/monthly additions ride the selfcheck's
+  // build too (no store here — the raw fetched series, honest about the
+  // single-point CFTC file and the full-history monthly files), so the
+  // export + validation see real values for every rung-2 id.
+  series: rung2.series,
 };
 
-const series = buildIndicatorSeries({ ...inputs, ...(rung2Inputs.jgb10y !== undefined || rung2Inputs.jgbMirror !== undefined ? { rung2: rung2Inputs } : {}), chinaPmi: pmiParsed?.points });
+const series = buildIndicatorSeries({
+  ...inputs,
+  ...(rung2Inputs.jgb10y !== undefined || rung2Inputs.jgbMirror !== undefined || Object.keys(rung2.series).length > 0
+    ? { rung2: rung2Inputs }
+    : {}),
+  chinaPmi: pmiParsed?.points,
+});
 
 const peaks = computePeaks(inputs, series.brent);
 const HIGHEST_SINCE_IDS = ['us10y', 'us30y', 'real-yield-10y', 'au-10y'] as const;

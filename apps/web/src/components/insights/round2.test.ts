@@ -370,7 +370,9 @@ describe('R14 code-pattern scan (names + tags, both locales)', () => {
   // M6 Wave 3 (2026-10-25): +HICP — the euro area's CPI is a universal
   // acronym in the CPI/BTC/SOFR class (the ECB's own headline word), not a
   // source code.
-  const CODE_LIKE = /^(?!CPI$|BTC$|SOFR$|HICP$)([A-Z]\d{1,3}|[A-Z][A-Z0-9&.-]{3,})$/;
+  // 2026-10-26 gap-audit build, A-8: +OECD — the institution's universal
+  // name (the CLI trio's ticker), the same household-acronym class.
+  const CODE_LIKE = /^(?!CPI$|BTC$|SOFR$|HICP$|OECD$)([A-Z]\d{1,3}|[A-Z][A-Z0-9&.-]{3,})$/;
 
   const entries = (copy: InsightsCopy): { id: string; name: string; ticker?: string }[] =>
     (Object.entries(copy.indicators) as [string, { name: string; ticker?: string }][]).map(

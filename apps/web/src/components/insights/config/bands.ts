@@ -101,8 +101,22 @@ export function attentionToneClass(warnings: number): string {
 type ConsequenceState = keyof ConsequenceLines; // 'highRising' | 'highEasing' | 'typical' | 'low' | 'jumping'
 
 /**
+ * 2026-10-26 gap-audit build (A-9/A-10): the SD-regime cards — the GPR and
+ * EPU indexes read their bands from the reading's sd10y (the rolling
+ * 10-year z-score, recomputed on write) instead of the percentile, exactly
+ * as the spec's thresholds direct: above +1 SD the attention zone, above
+ * +2 SD the historic-spike class. The cards' copy carries the zone words;
+ * the percentile bar keeps rendering the decade position (an independent,
+ * honest measure on its own terms).
+ */
+export const SD_BAND_IDS: ReadonlySet<string> = new Set(['gpr-index', 'epu-us']);
+
+/**
  * Pick the consequence-line state for one reading:
  *  - price rows (PB ids) with |moveScore| ≥ threshold → 'jumping'
+ *  - SD-regime cards (SD_BAND_IDS) with sd10y: z ≥ 2 → 'jumping' (the
+ *    historic-spike zone), z ≥ 1 the high band with the D2 direction
+ *    discipline, z ≤ −1 'low', else 'typical'
  *  - high band + 30d rise → 'highRising'; high band + 30d fall → 'highEasing'
  *  - Step-1 audit item D2: a high band with NO measurable change never
  *    claims a direction — the line falls back to the oneLiner (the old
@@ -114,6 +128,19 @@ type ConsequenceState = keyof ConsequenceLines; // 'highRising' | 'highEasing' |
 export const MOVE_SCORE_THRESHOLD = 2.0;
 
 export function consequenceState(reading: IndicatorReading, isPriceRow: boolean): ConsequenceState | null {
+  // A-9/A-10: the SD regime wins for its own cards (the spec's thresholds
+  // are SD-based; the percentile line below never applies to them).
+  if (SD_BAND_IDS.has(reading.id as string) && reading.sd10y !== undefined) {
+    const z = reading.sd10y;
+    if (z >= 2) return 'jumping'; // the historic-spike class (2001, 2022-03…)
+    if (z <= -1) return 'low';
+    if (z >= 1) {
+      if (reading.change30d !== undefined && reading.change30d > 0) return 'highRising';
+      if (reading.change30d !== undefined && reading.change30d < 0) return 'highEasing';
+      return null; // elevated, but no measurable move — no direction claim (D2)
+    }
+    return 'typical';
+  }
   if (reading.percentile10y === undefined) return null;
   if (isPriceRow && reading.moveScore !== undefined && Math.abs(reading.moveScore) >= MOVE_SCORE_THRESHOLD) {
     return 'jumping';

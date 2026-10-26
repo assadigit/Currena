@@ -490,6 +490,19 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // audience that doesn't exist — no replacement, the Frankfurter request
   // drops the NZD leg again.
 
+  // 2026-10-26 gap-audit build, wave 3: the fetched rung-2 additions —
+  // the weekly pair (A-6/A-7) and the monthly trio (A-8..A-10) ride the
+  // INLINE builds (Node venue + selfcheck) through the rung2.series
+  // contract, already merged with their stored accumulations by the
+  // caller. The Worker's 04:10 main rung passes no rung2 at all (the ids
+  // carry forward; the 04:20 phase owns their refresh), so this loop is
+  // inert there by construction. jgb-10y (its mirror-aware put above) and
+  // us-japan-10y-gap (derived from the legs) keep their own ownership.
+  for (const [id, s] of Object.entries(inputs.rung2?.series ?? {}) as [IndicatorId, SeriesPoint[]][]) {
+    if (id === 'jgb-10y' || id === 'us-japan-10y-gap') continue;
+    if (s !== undefined && s.length > 0) put(id, s);
+  }
+
   /* ---------------- Global — Is growth healthy? ---------------- */
   put('china-pmi', nbsUnionSeries(inputs.chinaPmi, inputs.nbsStored?.['china-pmi'], inputs.nbs?.pmi));
   put('china-cpi', nbsUnionSeries(inputs.chinaCpi, inputs.nbsStored?.['china-cpi'], inputs.nbs?.cpi));
@@ -976,6 +989,27 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'cftc-gold-positioning': {
     name: 'U.S. Commodity Futures Trading Commission (Commitments of Traders, gold)',
     url: 'https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm',
+  },
+  // 2026-10-26 gap-audit build, A-8..A-10 (the monthly trio).
+  'oecd-cli-us': {
+    name: 'OECD (Composite leading indicator, amplitude-adjusted)',
+    url: 'https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm',
+  },
+  'oecd-cli-cn': {
+    name: 'OECD (Composite leading indicator, amplitude-adjusted)',
+    url: 'https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm',
+  },
+  'oecd-cli-de': {
+    name: 'OECD (Composite leading indicator, amplitude-adjusted)',
+    url: 'https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm',
+  },
+  'gpr-index': {
+    name: 'Caldara-Iacoviello Geopolitical Risk Index (Federal Reserve Board)',
+    url: 'https://www.matteoiacoviello.com/gpr.htm',
+  },
+  'epu-us': {
+    name: 'Baker-Bloom-Davis, US Economic Policy Uncertainty',
+    url: 'https://www.policyuncertainty.com/us_monthly.html',
   },
   natgas: { name: 'FRED (EIA Henry Hub spot)', url: 'https://fred.stlouisfed.org/series/DHHNGSP' },
   platinum: { name: 'gold-api.com (XPT spot; history: World Bank Pink Sheet)', url: 'https://www.gold-api.com' },

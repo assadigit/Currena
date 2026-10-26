@@ -623,7 +623,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     oneLiner:
       'How many Turkish liras one US dollar buys: the live case study of high inflation meeting a sliding currency.',
     lines: {
-      highRising: 'The dollar is buying more lira than usual and the move continues: the inflation-and-devaluation dynamic in action.',
+      highRising: 'The dollar fetches more lira than usual and the move continues: the inflation-and-devaluation dynamic in action.',
       highEasing: 'The lira remains weak for its decade but the slide is easing.',
       typical: 'The dollar–lira rate sits in its usual range for the decade.',
       low: 'The lira is stronger than its decade norm: a rare stretch of lira stability.',
@@ -635,7 +635,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     tendedToMean:
       'The lira has lost most of its dollar value over the past decade through repeated inflation episodes; every step down made imported goods dearer in lira terms.',
     cantTell:
-      'One pair, one country: it says nothing about other emerging-market currencies, and managed exchange rates can hold levels that fundamentals question.',
+      'One pair, one country: it says nothing about other emerging-market currencies, and managed exchange rates can keep levels that fundamentals question.',
     forYou:
       'A standing illustration of why the inflation cards on this page matter: high inflation, over years, ends up written in the exchange rate.',
   },
@@ -669,7 +669,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     name: 'The Fed’s balance sheet',
     ticker: 'Fed assets',
     oneLiner:
-      'The total size of the Federal Reserve’s balance sheet: the money the central bank created to buy bonds, and is now letting run off.',
+      'The total size of the Federal Reserve’s balance sheet: the money the central bank created for bond purchases, and is now letting run off.',
     lines: {
       highRising:
         'The Fed’s balance sheet is expanding again: the emergency setting that floods the system with liquidity.',
@@ -694,7 +694,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     name: 'US retail sales',
     ticker: 'Retail',
     oneLiner:
-      'What American shops sell each month: the consumption pulse that drives roughly two-thirds of the US economy.',
+      'The monthly value of what American shops ring up: the consumption pulse that drives roughly two-thirds of the US economy.',
     lines: {
       highRising:
         'US retail sales are strong for their decade and rising: consumption carrying the economy.',
@@ -704,7 +704,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
         'Retail sales are unusually weak: the consumption pullback that opens the door to recession talk.',
     },
     whatItIs:
-      'Advance retail sales for the US retail trade sector (the Census Bureau’s monthly survey via FRED): the dollar value of what stores sell.',
+      'Advance retail sales for the US retail trade sector (the Census Bureau’s monthly survey via FRED): the dollar value of the sector’s monthly turnover.',
     whyItMatters:
       'The missing real-economy link of the transmission chain: policy tightens, borrowing costs rise, and this is where the answer eventually shows up. Consumption is about two-thirds of US GDP, so its pulse is the economy’s pulse.',
     tendedToMean:
@@ -869,7 +869,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whatItIs:
       'The value of new housing loan commitments across Australia (the ABS lending indicators, quarterly, seasonally adjusted): all lenders, owner-occupier and investor together.',
     whyItMatters:
-      'This is the AU leading edge: a loan commitment is signed months before it shows in home values, so it turns first. It is also a direct confidence reading: borrowing to buy a home is the biggest financial commitment a household makes.',
+      'This is the AU leading edge: a loan commitment is signed months before it shows in home values, so it turns first. It is also a direct confidence reading: a home loan is the biggest financial commitment a household makes.',
     tendedToMean:
       'Lending collapsed with each rate-hike cycle and recovered with each cut; the 2022-23 tightening cut new commitments by roughly a third before values followed.',
     cantTell:
@@ -1833,6 +1833,126 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'Positioning says how crowded the boat is, not which way the wind blows: crowded books can stay crowded for months.',
     forYou:
       'The gold market’s crowd gauge: read it beside VIX — stress plus crowding is the combination that unwinds hardest.',
+  },
+  'oecd-cli-us': {
+    // 2026-10-26 gap-audit build, A-8 (INSIGHTS_DATA_SPEC.md): the OECD's
+    // leading indicator, US leg — the growth lane's leading edge (scored:
+    // the licensed-PMI replacement); the CN/DE companions follow.
+    name: 'OECD leading indicator (US)',
+    ticker: 'OECD',
+    oneLiner:
+      'A leading gauge of the US economy’s direction about six months ahead: the card to watch for turns before recessions and recoveries.',
+    lines: {
+      highRising: 'The leading indicator is rising away from its recent range: recoveries have historically begun this way.',
+      highEasing: 'The leading indicator remains high but is easing back.',
+      typical: 'The leading indicator sits in its usual range: no clear turn in either direction.',
+      low: 'The leading indicator is low: the zone that has historically preceded recessions.',
+    },
+    whatItIs:
+      'The OECD’s amplitude-adjusted Composite Leading Indicator for the United States: a single index built from orders, construction, consumer sentiment, financial and labour components, published monthly with roughly a five-week lag.',
+    whyItMatters:
+      'A leading gauge of the world economy’s direction about six months ahead; it has turned down before recessions and up before recoveries.',
+    tendedToMean:
+      'The OECD’s own turning-point convention: 6-month annualised growth below −1 means “turning down”, three consecutive monthly falls mark a slowdown, and drops below −2 have clustered around recessions — while rare 3-month surges above +2 mark policy-driven V-turns.',
+    cantTell:
+      'A leading indicator sees turns, not their size: false turns have happened, and the five-week publication lag means fast shocks arrive late to this card.',
+    forYou:
+      'The growth lane’s early-warning companion: read it beside the recession probability and the jobless claims, never alone.',
+  },
+  'oecd-cli-cn': {
+    // A-8's China companion: context beside china-pmi.
+    name: 'OECD leading indicator (China)',
+    ticker: 'OECD',
+    oneLiner:
+      'A leading gauge of China’s economy about six months ahead: the factory gauge’s leading companion beside the PMI.',
+    lines: {
+      highRising: 'China’s leading indicator is rising: the early shape of a turnaround.',
+      highEasing: 'China’s leading indicator remains high but is easing back.',
+      typical: 'China’s leading indicator sits in its usual range.',
+      low: 'China’s leading indicator is low: the zone that has preceded the country’s slowdowns.',
+    },
+    whatItIs:
+      'The OECD’s amplitude-adjusted Composite Leading Indicator for China: the same component framework as the US card, published monthly with roughly a five-week lag.',
+    whyItMatters:
+      'A leading gauge of the world economy’s direction about six months ahead; it has turned down before recessions and up before recoveries.',
+    tendedToMean:
+      'The same convention as the US card: 6-month annualised growth below −1 means “turning down”; three consecutive monthly falls mark a slowdown.',
+    cantTell:
+      'China’s turning points have been policy-shaped and sharp: the indicator lags the decisions more than the economy.',
+    forYou: 'The China pair’s leading half: read it beside the factory PMI for the direction of the world’s second economy.',
+  },
+  'oecd-cli-de': {
+    // A-8's euro companion (DEU — the EA19 substitute, probed live:
+    // the CLI dataflow carries no EA19).
+    name: 'OECD leading indicator (Germany)',
+    ticker: 'OECD',
+    oneLiner:
+      'A leading gauge of Europe’s largest economy about six months ahead: the euro area’s proxy reading.',
+    lines: {
+      highRising: 'Germany’s leading indicator is rising: the early shape of a European turnaround.',
+      highEasing: 'Germany’s leading indicator remains high but is easing back.',
+      typical: 'Germany’s leading indicator sits in its usual range.',
+      low: 'Germany’s leading indicator is low: the zone that has preceded European slowdowns.',
+    },
+    whatItIs:
+      'The OECD’s amplitude-adjusted Composite Leading Indicator for Germany — the euro-area substitute (the OECD’s CLI dataflow publishes member countries, not the EA19 aggregate; Germany is the area’s largest economy), monthly with roughly a five-week lag.',
+    whyItMatters:
+      'A leading gauge of the world economy’s direction about six months ahead; it has turned down before recessions and up before recoveries.',
+    tendedToMean:
+      'The same convention as the US card: 6-month annualised growth below −1 means “turning down”; three consecutive monthly falls mark a slowdown.',
+    cantTell:
+      'Germany is one economy, not the whole euro area: export-heavy turns can mislabel the region.',
+    forYou: 'The euro leg of the leading-indicator family: read it beside the euro cards in the growth lane.',
+  },
+  'gpr-index': {
+    // 2026-10-26 gap-audit build, A-9: the war-and-tension gauge, context
+    // beside VIX/COT — the SD zones speak through the state lines.
+    name: 'Geopolitical Risk Index',
+    ticker: 'Geopolitics',
+    oneLiner:
+      'How much war and tension fills the news: the shock gauge behind the oil, gold and share moves that follow.',
+    lines: {
+      jumping:
+        'A historic-spike-class reading (more than 2 standard deviations above its decade average — the 2001, 2022-03 and 2023-10 class).',
+      highRising: 'The war-scare zone (more than 1 SD above the decade average) and still rising.',
+      highEasing: 'Geopolitical tension remains elevated but is easing from its scare zone.',
+      typical: 'Geopolitical tension sits in its usual range for the past decade.',
+      low: 'An unusually calm stretch of geopolitical news — rare, and historically no reason to relax for long.',
+    },
+    whatItIs:
+      'The Geopolitical Risk Index of Caldara and Iacoviello: a monthly measure of war, terrorism and tension terms across major newspapers, from 1985 to today.',
+    whyItMatters:
+      'A measure of war and tension in the news; spikes have usually pushed oil and gold up and shares down.',
+    tendedToMean:
+      'The zones are measured against the index’s own trailing decade: above 1 standard deviation is the historic war-scare zone, above 2 the 2001 / 2022-03 / 2023-10 class of episodes — both recomputed on every write, never fixed numbers.',
+    cantTell:
+      'The index counts mentions, not severity: a loud stalemate can outscore a quiet escalation, and markets habituate to chronic tension.',
+    forYou: 'The shock input to the dollar-gold-oil story: read it beside VIX and the gold cards when the news turns hot.',
+  },
+  'epu-us': {
+    // 2026-10-26 gap-audit build, A-10: the policy-noise gauge, context
+    // beside michigan-sentiment — the confidence leg.
+    name: 'US policy uncertainty (EPU)',
+    ticker: 'Policy uncertainty',
+    oneLiner:
+      'How uncertain economic-policy news is in the US: the noise level around taxes, tariffs and the Fed’s path.',
+    lines: {
+      jumping:
+        'A historic-spike-class reading (more than 2 standard deviations above its decade average — the 2016-11, 2018-12 and 2020-03 class).',
+      highRising: 'The elevated-uncertainty zone (more than 1 SD above the decade average) and still rising.',
+      highEasing: 'Policy uncertainty remains elevated but is easing.',
+      typical: 'Policy uncertainty sits in its usual range for the past decade.',
+      low: 'An unusually quiet stretch of policy news.',
+    },
+    whatItIs:
+      'Baker, Bloom and Davis’s US Economic Policy Uncertainty index: a monthly count of policy-related uncertainty terms in major US newspapers, from 1900 to today.',
+    whyItMatters:
+      'How uncertain economic-policy news is in the US; high uncertainty has historically slowed business investment and hiring.',
+    tendedToMean:
+      'The zones are measured against the index’s own trailing decade: above 1 standard deviation are the elections, tariff fights and debt-ceiling episodes; above 2 the historic spikes — recomputed on every write, never fixed numbers.',
+    cantTell:
+      'Uncertainty is not direction: a spike says decisions are being delayed, not which way the decisions go.',
+    forYou: 'The confidence pair’s policy leg: read it beside Michigan sentiment for the mood under the growth numbers.',
   },
   'wti': {
     name: 'Oil price (WTI)',
@@ -3767,6 +3887,9 @@ export const insightsCopyEn = {
     changeFallPoints: 'down more than {magnitude} within {weeks} weeks',
     yoyNegative: 'falling year-on-year',
     consecutiveDecline: '{periods} declines in a row',
+    // 2026-10-26 gap-audit build, A-8: the annualised N-month growth line.
+    growthAbove: 'annualised growth over the past {months} months above {magnitude}',
+    growthBelow: 'annualised growth over the past {months} months below {magnitude}',
     aboveLow: 'up {rise} from its 12-month low',
     belowAux: 'below its paired comparison (wage growth below inflation)',
     or: 'or',

@@ -351,10 +351,24 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     opts.rung2Series['jgb-10y'] === undefined &&
     inputs.fred.IRLTLT01JPM156N !== undefined &&
     inputs.fred.IRLTLT01JPM156N.length > 0;
+  // 2026-10-26 wave-3: the weekly/monthly additions ride the inline build
+  // too (the Rung2SeriesInputs.series contract, at last consumed) — each
+  // fetched series first merges with its STORED accumulation (the same
+  // merge the 04:20 phase performs) so the CFTC single-point file and the
+  // monthly files accumulate on this venue exactly as they do on the
+  // Worker. A dry-run's no-op store simply skips the merge (raw fetched).
+  const inlineRung2Series: Partial<Record<IndicatorId, SeriesPoint[]>> = {};
+  for (const [id, fetched] of Object.entries(opts.rung2Series ?? {}) as [IndicatorId, SeriesPoint[]][]) {
+    if (fetched === undefined) continue;
+    if (id === 'jgb-10y') continue; // its merge path is the mirror-aware one below
+    const stored = await storedSeriesOf(opts.store, id);
+    inlineRung2Series[id] = stored !== undefined ? mergeSeries(stored, fetched) : fetched;
+  }
   const rung2Inputs = opts.rung2Series !== undefined || opts.jgbMirrorFallback !== undefined
     ? {
         jgb10y: opts.rung2Series?.['jgb-10y'],
         jgbMirror: opts.jgbMirrorFallback ?? (mirrorArmsItself ? inputs.fred.IRLTLT01JPM156N : undefined),
+        ...(Object.keys(inlineRung2Series).length > 0 ? { series: inlineRung2Series } : {}),
       }
     : undefined;
   if (mirrorArmsItself) {
@@ -763,11 +777,33 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
   // series merge with the stored accumulations (the CFTC file carries
   // only the latest week; the EIA page its full history — fetched wins on
   // date collisions either way, and the stored tail carries the weeks a
-  // missed Saturday would otherwise lose).
+  // missed Saturday would otherwise lose). 2026-10-26 wave-3 fix: the
+  // accumulation base also arms from the STAGE entry when the stored
+  // history key does not exist yet — the CFTC file's FIRST point lives
+  // only in the stage until the 04:25 daily phase writes the 2-point
+  // history (buildHistoryFile's floor), and without the stage base the
+  // second week's fetch would replace rather than join the first (the
+  // accumulation deadlock the A-7 commit shipped with).
   for (const id of ['eia-crude-stocks', 'cftc-gold-positioning'] as const) {
     const fetched = collected.series[id];
     if (fetched === undefined) continue;
-    const stored = await storedSeriesOf(opts.store, id);
+    const stored =
+      (await storedSeriesOf(opts.store, id)) ??
+      stage?.series[id]?.map(([day, value]) => ({ date: fromEpochDay(day), value }));
+    series[id] = stored !== undefined ? mergeSeries(stored, fetched) : fetched;
+  }
+
+  // A-8..A-10 (2026-10-26 gap-audit build): the monthly trio — the CLI
+  // family, the GPR export and the EPU workbook (first-of-month +
+  // bootstrap). Each fetch carries its full history, so the stored merge
+  // is belt-and-braces (fetched wins on collision); the stage base arms
+  // the same bootstrap the weekly pair uses.
+  for (const id of ['oecd-cli-us', 'oecd-cli-cn', 'oecd-cli-de', 'gpr-index', 'epu-us'] as const) {
+    const fetched = collected.series[id];
+    if (fetched === undefined) continue;
+    const stored =
+      (await storedSeriesOf(opts.store, id)) ??
+      stage?.series[id]?.map(([day, value]) => ({ date: fromEpochDay(day), value }));
     series[id] = stored !== undefined ? mergeSeries(stored, fetched) : fetched;
   }
 
@@ -829,12 +865,17 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
   console.log('  ✍ insights:snapshot-public (patched)');
 
   // 5. Update the stage so the 04:25/04:40 history phases write the fresh
-  // series (the phases read the stage, never the snapshot).
+  // series (the phases read the stage, never the snapshot). 2026-10-26
+  // wave-3 fix: a SINGLE-point series stages too (the gate was > 1) — the
+  // CFTC file's first weekly point must reach the stage so (a) the
+  // bootstrap-missing check clears and (b) next week's merge has a base;
+  // buildHistoryFile's own minPoints floor still keeps a 1-point history
+  // from being written.
   if (opts.stageKv !== undefined) {
     const base = (await readStage(opts.stageKv)) ?? { v: STAGE_VERSION, writtenAt: nowIso, series: {} };
     for (const [id, idSeries] of Object.entries(series)) {
       const trimmed = trimForStage(idSeries, todayMs);
-      if (trimmed.length > 1) base.series[id] = trimmed;
+      if (trimmed.length > 0) base.series[id] = trimmed;
     }
     base.writtenAt = nowIso;
     await putStage(opts.stageKv, base);

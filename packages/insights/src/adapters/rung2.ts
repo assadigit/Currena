@@ -34,6 +34,8 @@ import type { SeriesPoint } from '../series';
 import { fetchMofJgb10y } from './mof';
 import { fetchEiaCrudeStocks } from './eia-stocks';
 import { fetchCftcGoldPositioning } from './cftc';
+import { fetchOecdCli } from './oecd';
+import { fetchEpuSeries, fetchGprSeries } from './monthly-indexes';
 
 /**
  * The ids this phase owns (grows with each gap-audit addition). The main
@@ -45,7 +47,11 @@ export const RUNG2_IDS: readonly IndicatorId[] = [
   'us-japan-10y-gap', // A-3: derived at 04:20 from the staged us10y + MOF
   'eia-crude-stocks', // A-6: the EIA keyless weekly stocks page, Saturday
   'cftc-gold-positioning', // A-7: the CFTC weekly COT file, Saturday
-  // A-8..A-10 join this list as their additions land (one commit each).
+  'oecd-cli-us', // A-8: the OECD CLI trio — one filtered fetch, first-of-month
+  'oecd-cli-cn',
+  'oecd-cli-de',
+  'gpr-index', // A-9: Iacoviello's monthly GPR export, first-of-month
+  'epu-us', // A-10: Baker-Bloom-Davis's monthly EPU workbook, first-of-month
 ];
 
 /** Which feeds a rung-2 execution fetches. */
@@ -173,6 +179,32 @@ export async function collectRung2Sources(
     if (gold !== undefined) {
       series['cftc-gold-positioning'] = [{ date: gold.date, value: gold.netSharePct }];
     }
+  }
+
+  // A-8 (2026-10-26 gap-audit build): the OECD's amplitude-adjusted CLI —
+  // ONE filtered SDMX request carrying all three countries (USA + CHN +
+  // DEU, the EA19 substitute), first-of-month + bootstrap.
+  if (plan.monthly) {
+    const cli = await fetchLogged('oecd', 'Composite leading indicators, amplitude-adjusted (USA, CHN, DEU)', () =>
+      fetchOecdCli(),
+    );
+    if (cli !== undefined) {
+      series['oecd-cli-us'] = cli.usa;
+      series['oecd-cli-cn'] = cli.chn;
+      series['oecd-cli-de'] = cli.deu;
+    }
+
+    // A-9: Iacoviello's monthly GPR export (the legacy .xls via the
+    // repo's own biff reader). Full history per fetch.
+    const gpr = await fetchLogged('gpr', 'Geopolitical Risk Index (monthly export)', () => fetchGprSeries());
+    if (gpr !== undefined) series['gpr-index'] = gpr;
+
+    // A-10: Baker-Bloom-Davis's monthly EPU workbook (OOXML, the Pink
+    // Sheet reader path). Full history per fetch.
+    const epu = await fetchLogged('epu', 'US Economic Policy Uncertainty (Main News Index workbook)', () =>
+      fetchEpuSeries(),
+    );
+    if (epu !== undefined) series['epu-us'] = epu;
   }
 
   return { series, reports };

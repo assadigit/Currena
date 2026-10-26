@@ -268,6 +268,176 @@ describe('rule: consecutive-decline', () => {
 });
 
 /* ------------------------------------------------------------------ *
+ * Rule: growth (2026-10-26 gap-audit build, A-8 — the OECD CLI's
+ * annualised N-month turning-point convention)
+ * ------------------------------------------------------------------ */
+
+describe('rule: growth (annualised N-month)', () => {
+  /** Monthly points: [value, monthsAgo] pairs → a dated ascending series. */
+  const monthly = (pairs: Array<[number, number]>, anchor = '2026-09-01'): SeriesPoint[] =>
+    pairs
+      .map(([value, monthsAgo]) => {
+        const d = new Date(Date.parse(`${anchor}T00:00:00Z`));
+        d.setUTCMonth(d.getUTCMonth() - monthsAgo);
+        return { date: d.toISOString().slice(0, 10), value };
+      })
+      .sort((a, b) => (a.date < b.date ? -1 : 1));
+
+  it('6-month annualised below −1 (turning down) → warning', () => {
+    // 103 → 100 over six months: (100/103 − 1) × 100 × 2 ≈ −5.83 annualised.
+    const s = monthly([
+      [100, 0],
+      [101, 1],
+      [102, 2],
+      [102, 3],
+      [103, 4],
+      [102.5, 5],
+      [103, 6],
+    ]);
+    expect(verdictOf({ kind: 'growth', direction: 'below', value: -1, months: 6 }, s, '2026-09-30').status).toBe('warning');
+  });
+
+  it('a mild six-month drift stays normal', () => {
+    // 100.2 → 100: (100/100.2 − 1) × 100 × 2 ≈ −0.4 annualised.
+    const s = monthly([
+      [100, 0],
+      [100.1, 1],
+      [100.15, 2],
+      [100.2, 3],
+      [100.1, 4],
+      [100.2, 5],
+      [100.2, 6],
+    ]);
+    expect(verdictOf({ kind: 'growth', direction: 'below', value: -1, months: 6 }, s, '2026-09-30').status).toBe('normal');
+  });
+
+  it('the exact −1 boundary is a warning (strict <)', () => {
+    // 100 → 99.5: (99.5/100 − 1) × 100 × 2 = −1.0 exactly → warning.
+    const s = monthly([
+      [99.5, 0],
+      [99.6, 1],
+      [99.7, 2],
+      [99.8, 3],
+      [99.9, 4],
+      [100, 5],
+      [100, 6],
+    ]);
+    expect(verdictOf({ kind: 'growth', direction: 'below', value: -1, months: 6 }, s, '2026-09-30').status).toBe('warning');
+  });
+
+  it('the 3-month V-turn above +2 → warning (the direction above case)', () => {
+    // 100.3 → 101 in three months: (101/100.3 − 1) × 100 × 4 ≈ +2.79 annualised.
+    const s = monthly([
+      [101, 0],
+      [100.7, 1],
+      [100.5, 2],
+      [100.3, 3],
+      [100.2, 4],
+      [100.2, 5],
+      [100.3, 6],
+    ]);
+    expect(verdictOf({ kind: 'growth', direction: 'above', value: 2, months: 3 }, s, '2026-09-30').status).toBe('warning');
+  });
+
+  it('monthly stamps land inside the ±25-day anchor tolerance (the CLI dating)', () => {
+    // Six calendar months = 181–184 days; the tolerance centres on
+    // 6 × 30.44 = 182.6 — an exactly-6-month anchor evaluates.
+    const s = monthly([
+      [100, 0],
+      [101, 1],
+      [102, 2],
+      [102, 3],
+      [103, 4],
+      [102.5, 5],
+      [110, 6],
+    ]);
+    // 110 → 100: (100/110 − 1) × 100 × 2 ≈ −18 annualised → warning.
+    expect(verdictOf({ kind: 'growth', direction: 'below', value: -1, months: 6 }, s, '2026-09-30').status).toBe('warning');
+  });
+
+  it('no anchor within the ±25-day tolerance → unevaluable, never a mislabelled window', () => {
+    // A 10-month gap where the rule wants 6: the anchor is ~121 days off.
+    const s = monthly([
+      [100, 0],
+      [101, 1],
+      [102, 2],
+      [103, 10],
+    ]);
+    expect(verdictOf({ kind: 'growth', direction: 'below', value: -1, months: 6 }, s, '2026-09-30').status).toBe('unevaluable');
+  });
+
+  it('a non-positive base refuses the ratio (unevaluable)', () => {
+    const s = monthly([
+      [100, 0],
+      [101, 1],
+      [102, 2],
+      [103, 3],
+      [104, 4],
+      [105, 5],
+      [-103, 6],
+    ]);
+    expect(verdictOf({ kind: 'growth', direction: 'below', value: -1, months: 6 }, s, '2026-09-30').status).toBe('unevaluable');
+  });
+
+  it('no observation ~months back at all → unevaluable', () => {
+    const s = monthly([
+      [100, 0],
+      [101, 1],
+    ]);
+    expect(verdictOf({ kind: 'growth', direction: 'below', value: -1, months: 6 }, s, '2026-09-30').status).toBe('unevaluable');
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * sd10y (2026-10-26 gap-audit build, A-9/A-10 — the rolling 10-year
+ * z-score the GPR/EPU cards' zones read)
+ * ------------------------------------------------------------------ */
+
+describe('sd10y (the rolling 10-year z-score)', () => {
+  const def = makeDef({ rule: { kind: 'info' } });
+
+  it('a base of 30+ observations carries the z-score of the current value', () => {
+    // 40 monthly observations: 39 at 100/101 alternating, then 120 now.
+    const s: SeriesPoint[] = [];
+    for (let i = 40; i >= 1; i--) {
+      const d = new Date(Date.parse('2026-09-01T00:00:00Z'));
+      d.setUTCMonth(d.getUTCMonth() - i);
+      s.push({ date: d.toISOString().slice(0, 10), value: i % 2 === 0 ? 100 : 101 });
+    }
+    s.push({ date: '2026-09-01', value: 120 });
+    const reading = readingOf(def, s, '2026-09-30T02:00:00.000Z');
+    expect(reading.sd10y).toBeDefined();
+    // base = 40 alternating points → mean 100.5, sample sd = sqrt(40×0.25/39)
+    // ≈ 0.5064 → z = (120 − 100.5)/0.5064 ≈ 38.51.
+    expect(reading.sd10y).toBeCloseTo(38.509, 2);
+    // The percentile rides the same base (both are decade-position measures).
+    expect(reading.percentile10y).toBe(1);
+  });
+
+  it('a base below MIN_PERCENTILE_OBS carries no z (never a guess)', () => {
+    const s: SeriesPoint[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(Date.parse('2026-09-01T00:00:00Z'));
+      d.setUTCMonth(d.getUTCMonth() - i);
+      s.push({ date: d.toISOString().slice(0, 10), value: 100 + (i % 3) });
+    }
+    const reading = readingOf(def, s, '2026-09-30T02:00:00.000Z');
+    expect(reading.sd10y).toBeUndefined();
+  });
+
+  it('a zero-variance base (every value identical) carries no z', () => {
+    const s: SeriesPoint[] = [];
+    for (let i = 40; i >= 0; i--) {
+      const d = new Date(Date.parse('2026-09-01T00:00:00Z'));
+      d.setUTCMonth(d.getUTCMonth() - i);
+      s.push({ date: d.toISOString().slice(0, 10), value: 100 });
+    }
+    const reading = readingOf(def, s, '2026-09-30T02:00:00.000Z');
+    expect(reading.sd10y).toBeUndefined();
+  });
+});
+
+/* ------------------------------------------------------------------ *
  * Rule: above-low
  * ------------------------------------------------------------------ */
 
