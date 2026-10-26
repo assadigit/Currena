@@ -1,6 +1,6 @@
 # SELF_AUDIT.md — the automatic self-check
 
-Generated: 2026-10-26T03:42:13.204Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-26.md`
+Generated: 2026-10-26T12:23:47.068Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-26.md`
 
 Result: **ALL TESTS PASS** (24 of 24 pass)
 
@@ -29,7 +29,7 @@ Result: **ALL TESTS PASS** (24 of 24 pass)
 | E-18 | Trend labels reproducible from the stated 3-month rule | pass | the export + CSV recompute from chg3m (markets/compute.ts trendOf); pinned by markets + full-export tests |
 | SUITE:packages/core | Unit suite — packages/core | pass | 191 tests |
 | SUITE:packages/scraper | Unit suite — packages/scraper | pass | 67 tests |
-| SUITE:packages/insights | Unit suite — packages/insights | pass | 643 tests |
+| SUITE:packages/insights | Unit suite — packages/insights | pass | 644 tests |
 | SUITE:apps/markets | Unit suite — apps/markets | pass | 13 tests |
 | SUITE:apps/api | Unit suite — apps/api | pass | 344 tests |
 
@@ -101,7 +101,7 @@ None — every card reads current or carries its own honest tag.
 - ❌ rba — F2.1 FCMYGBAG10 10-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ❌ rba — F2.1 FCMYGBAG3 3-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ✅ alternative-me — Crypto Fear and Greed (daily history)
-- ✅ cross-check — gold-api BTC 79584 vs Bitstamp close 79523 (2026-10-26) → 0.08%
+- ✅ cross-check — gold-api BTC 80149 vs Bitstamp close 80230 (2026-10-26) → -0.10%
 - ✅ mof — jgbcme.csv daily 10Y
 - ✅ eia — crude oil ending stocks WCRSTUS1 (weekly, keyless website route)
 - ✅ cftc — Commitments of Traders, futures-only (gold row)

@@ -606,7 +606,21 @@ const BUDGETS = [
   // 846.29 kB raw / 205.01 kB gz (+4.45 raw / +1.02 gz over the M6 tree).
   // The entry chunk is untouched at 295.28/88.81. Justified in CHANGELOG
   // §2026-10-26 (M7, the D-16 path).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 850_000, gz: 206_000, label: 'Insights lazy chunk' },
+  // 2026-10-26 M8 (850.00 → 890.00 raw, 206.00 → 215.00 gz): the A-1..A-10
+  // gap-audit build adds ELEVEN new ids (yield-curve-10y3m, us-japan-10y-gap,
+  // rba-fed-gap, gold-oil-ratio, eia-crude-stocks, cftc-gold-positioning,
+  // oecd-cli-us/cn/de, gpr-index, epu-us) plus the jgb-10y MOF-daily upgrade,
+  // the new sd10y reading enrichment (every reading carries a trailing
+  // 10-year z-score field), the new 'barrels' unit token, the new cftc/eia/
+  // oecd/gpr/epu/mof providers in the source-risk sidecar and the licences
+  // register, and the new 04:20 rung-2 phase in the cron constants. Measured
+  // 886.44 kB raw / 214.99 kB gz (+40.15 raw / +8.98 gz over the M7 tree —
+  // eleven cards of bilingual content + the new sd10y field on every
+  // reading + five new providers in the audit sidecar). The entry chunk
+  // stays at 295.28/88.80 (the enum's five new ids add 0.83 kB gz — under
+  // the entry's 89.50 kB ceiling). Justified in CHANGELOG §2026-10-26
+  // (M8, the D-16 path).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 890_000, gz: 215_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {
