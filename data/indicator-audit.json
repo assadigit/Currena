@@ -341,6 +341,32 @@
       "rule": "{\"kind\":\"info\"}"
     },
     {
+      "id": "eia-crude-stocks",
+      "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M2",
+      "maxAgeDays": 12,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "cftc-gold-positioning",
+      "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M2",
+      "maxAgeDays": 12,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"any-of\",\"of\":[{\"kind\":\"threshold\",\"direction\":\"above\",\"value\":45},{\"kind\":\"threshold\",\"direction\":\"below\",\"value\":0},{\"kind\":\"percentile\",\"tail\":\"high\",\"cutoff\":0.02},{\"kind\":\"percentile\",\"tail\":\"low\",\"cutoff\":0.02}]}"
+    },
+    {
       "id": "wti",
       "licenceName": "FRED license #copyright-public-domain (public domain)",
       "publicDisplayOk": "yes",

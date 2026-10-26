@@ -317,6 +317,24 @@ const MOF: SourceLicence = {
   termsUrl: 'https://www.mof.go.jp/about_mof/notice/index.html',
 };
 
+/**
+ * 2026-10-26 gap-audit build, A-7: the U.S. Commodity Futures Trading
+ * Commission — U.S. federal government work, public domain.
+ */
+const CFTC: SourceLicence = {
+  provider: 'cftc',
+  label: 'U.S. Commodity Futures Trading Commission (Commitments of Traders)',
+  licenceName: 'US government work — public domain (17 U.S.C. § 105)',
+  attributionText: 'Source: U.S. Commodity Futures Trading Commission',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-26',
+  termsEvidence:
+    'US federal government works carry no copyright (17 U.S.C. § 105). The weekly futures-only Commitments of Traders file (dea/newcot/deafut.txt, verified live 200 with the honest UA 2026-10-26) is the agency’s own published data.',
+  termsUrl: 'https://www.cftc.gov/About/TheCFTC/index.htm',
+};
+
 /** The register. Unknown providers resolve to the fail-closed entry. */
 export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   fred: FRED_BASE,
@@ -338,6 +356,7 @@ export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   treasury: TREASURY,
   eia: EIA,
   mof: MOF,
+  cftc: CFTC,
 };
 
 export function licenceForProvider(provider: string): SourceLicence {

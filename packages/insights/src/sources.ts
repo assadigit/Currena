@@ -194,7 +194,26 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     attribution: 'Source: U.S. Energy Information Administration',
     termsUrl: 'https://www.eia.gov/about/copyrights-and-terms-of-service.php',
     notes:
-      'FALLBACK-ONLY (owner round terms): fetched only when the FRED EIA commodities group failed. Venue-verified 2026-10-22 from Cloudflare egress: HTTP 200, 28–215 ms.',
+      'FALLBACK-ONLY for the DAILY SPOTS (owner round terms): fetched only when the FRED EIA commodities group failed. Venue-verified 2026-10-22 from Cloudflare egress: HTTP 200, 28–215 ms. A-6 (2026-10-26 gap-audit build) adds the row’s SECOND use — the keyless weekly crude-stocks page (WCRSTUS1, LeafHandler), a PRIMARY fetch on the Saturday rung-2 phase (the v2 API’s free registered key stays unregistered per the owner’s terms).',
+  },
+  cftc: {
+    id: 'cftc',
+    provider: 'cftc',
+    label: 'U.S. Commodity Futures Trading Commission (Commitments of Traders)',
+    usedFor: 'cftc-gold-positioning (the gold COT card; the same file can later serve oil and dollar legs at zero extra fetch cost)',
+    method: 'M2',
+    runtime: 'worker',
+    level: 'L0',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The weekly futures-only COT file (dea/newcot/deafut.txt) is the agency’s own published data; verified live 200 with the honest UA 2026-10-26 (the gold row 2026-10-20: open interest 402,279, net non-commercial share 49.68%).',
+    termsReadOn: '2026-10-26',
+    attribution: 'Source: U.S. Commodity Futures Trading Commission',
+    termsUrl: 'https://www.cftc.gov/About/TheCFTC/index.htm',
+    notes:
+      'A-7 (2026-10-26 gap-audit build): one weekly point per fetch (the file carries only the latest week); the series accumulates in insights:hist:cftc-gold-positioning. Saturday rung-2 phase.',
   },
   'ecb-frankfurter': {
     id: 'ecb-frankfurter',
@@ -523,6 +542,9 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   // gold-usd's and brent's (the display bar lifts on the standing owner
   // directives that cover those two tiles).
   'gold-oil-ratio': ['gold-api:XAU', 'yahoo:GC=F', 'fred:DCOILBRENTEU', 'yahoo:BZ=F', 'world-bank'],
+  // 2026-10-26 gap-audit build, A-6/A-7.
+  'eia-crude-stocks': ['eia'],
+  'cftc-gold-positioning': ['cftc'],
   // 2026-10-26 gap-audit build, A-2: the MOF daily primary + the OECD
   // mirror fallback leg (the mirror fills during MOF outages, labelled).
   'jgb-10y': ['mof:jgbcme', 'fred:IRLTLT01JPM156N'],
@@ -763,6 +785,13 @@ export const SANITY_RANGES: Readonly<Record<string, SanityRange>> = {
   'gold-usd': { minExclusive: true },
   // 2026-10-26 gap-audit build, A-4: a positive ratio by construction.
   'gold-oil-ratio': { minExclusive: true },
+  // 2026-10-26 gap-audit build, A-6: stocks levels are positive and
+  // bounded by physical reality (the observed history spans ~300k–800k
+  // thousand-barrels; 5,000,000 = 5 billion barrels is an impossibility
+  // ceiling that still catches gross parse errors).
+  'eia-crude-stocks': { minExclusive: true, max: 5_000_000 },
+  // A-7: a share of open interest is bounded [-100, 100] by construction.
+  'cftc-gold-positioning': { min: -100, max: 100 },
   'silver-usd': { minExclusive: true },
   'btc-usd': { minExclusive: true },
   'copper-usd': { minExclusive: true },

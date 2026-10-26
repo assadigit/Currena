@@ -35,7 +35,10 @@ export type UnitToken =
   | 'aud-bn'
   | 'permits'
   | 'openings'
-  | 'vacancies';
+  | 'vacancies'
+  // 2026-10-26 gap-audit build, A-6: crude stocks scaled to millions of
+  // barrels ("416.7m barrels" EN — the raw unit is thousands of barrels).
+  | 'barrels';
 
 /** Locale-dependent unit labels (from the copy dictionaries). */
 export interface UnitLabels {
@@ -57,6 +60,7 @@ export interface UnitLabels {
   permits: string;
   openings: string;
   vacancies: string;
+  barrels: string;
 }
 
 interface DisplayConfig {
@@ -174,6 +178,10 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'boe-rate': { decimals: 2, unit: 'percent' },
   // 2026-10-26 gap-audit build, A-4: barrels of Brent per ounce of gold.
   'gold-oil-ratio': { decimals: 1, unit: 'ratio' },
+  // 2026-10-26 gap-audit build, A-6: thousands of barrels → millions.
+  'eia-crude-stocks': { decimals: 1, unit: 'barrels', scale: 1e-6 },
+  // A-7: the net non-commercial share of open interest, in percent.
+  'cftc-gold-positioning': { decimals: 1, unit: 'percent' },
   'wti': { decimals: 2, unit: 'usd' },
   'natgas': { decimals: 2, unit: 'usd' },
   'platinum': { decimals: 2, unit: 'usd' },

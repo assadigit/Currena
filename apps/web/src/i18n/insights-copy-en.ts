@@ -1786,6 +1786,54 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou:
       'A neutral context line for the gold story: read it beside the gold price and the oil cards, never alone.',
   },
+  'eia-crude-stocks': {
+    // 2026-10-26 gap-audit build, A-6 (INSIGHTS_DATA_SPEC.md): the weekly
+    // petroleum-tanks gauge, context beside the oil prices.
+    name: 'US crude oil inventories',
+    ticker: 'Crude stocks',
+    oneLiner:
+      'How much crude oil sits in America’s storage tanks: the weekly supply gauge behind the petrol-price story.',
+    lines: {
+      highRising: 'Oil is piling into storage: the glut setting that has historically dragged crude and pump prices down.',
+      highEasing: 'Stocks remain high but are being drawn down.',
+      typical: 'Inventories sit in their usual range for the time of year.',
+      low: 'Storage is draining fast: the supply-squeeze setting that can push petrol prices up.',
+    },
+    whatItIs:
+      'U.S. ending stocks of crude oil, in millions of barrels, from the Energy Information Administration’s weekly Petroleum Status Report (thousand-barrel series WCRSTUS1, published Wednesdays).',
+    whyItMatters:
+      'America’s oil tank levels: more oil in storage usually points to cheaper petrol ahead, while fast drains can signal supply squeezes.',
+    tendedToMean:
+      'The 2020 glut filled storage to its walls; the 2022 drawdown emptied it near five-decade lows — both moved pump prices within months.',
+    cantTell:
+      'One week’s build or draw is noise; the market reads the trend, the five-year average and the season together.',
+    forYou:
+      'The oil-price context card: read it beside Brent and WTI — the tanks explain what the prices are reacting to.',
+  },
+  'cftc-gold-positioning': {
+    // 2026-10-26 gap-audit build, A-7 (INSIGHTS_DATA_SPEC.md): the crowded
+    // book gauge, scored beside VIX in the market-stress lane.
+    name: 'Trader positioning in gold',
+    ticker: 'Gold COT',
+    oneLiner:
+      'What big speculators are betting on gold right now: how crowded the trade has become.',
+    lines: {
+      highRising: 'Speculators are more crowded into gold than usual and still adding: the squeeze-then-slump zone.',
+      highEasing: 'Speculative positioning remains rich but is being trimmed.',
+      typical: 'Speculative positioning sits in its usual range.',
+      low: 'Speculators are net short gold — rare, and historically seen near price floors.',
+    },
+    whatItIs:
+      'The net non-commercial position in gold futures (big speculators’ bets minus their shorts) as a share of all open interest, from the CFTC’s weekly Commitments of Traders report (Tuesday data, published Fridays).',
+    whyItMatters:
+      'What big speculators are betting on gold right now; crowded bets have historically unwound violently.',
+    tendedToMean:
+      'Reads above 45% of open interest have marked the crowded-long zone; net-short prints are rare and have clustered near price floors.',
+    cantTell:
+      'Positioning says how crowded the boat is, not which way the wind blows: crowded books can stay crowded for months.',
+    forYou:
+      'The gold market’s crowd gauge: read it beside VIX — stress plus crowding is the combination that unwinds hardest.',
+  },
   'wti': {
     name: 'Oil price (WTI)',
     ticker: 'WTI',
@@ -3701,6 +3749,8 @@ export const insightsCopyEn = {
     permits: 'm permits a year',
     openings: 'm job openings',
     vacancies: 'k vacancies',
+    // 2026-10-26 gap-audit build, A-6: crude stocks in millions of barrels.
+    barrels: 'm barrels',
   },
 
   rule: {

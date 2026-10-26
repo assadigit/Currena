@@ -677,6 +677,9 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // 2026-10-26 gap-audit build, A-3: the US−Japan 10-year gap — a
   // yield gap in percentage points, the au-us-10y-gap family.
   'us-japan-10y-gap',
+  // 2026-10-26 gap-audit build, A-7: the COT share — its changes are
+  // POINTS of open-interest share (45% → 40% is −5 pts).
+  'cftc-gold-positioning',
   // 2026-10-26 gap-audit build, A-5: the RBA−Fed policy-rate gap — a
   // rate gap in percentage points, the au-us-10y-gap family.
   'rba-fed-gap',

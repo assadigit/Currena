@@ -71,7 +71,13 @@ export const GAUGES: readonly GaugeDef[] = [
   },
   // Step-2 add-list §B5: VIX joins the market-stress voters (scored on its
   // 10-year position; the calm/nervous word thresholds arrive with Step 3).
-  { id: 'market-stress', section: 'global', members: ['stress-stlfsi', 'nfci', 'vix', 'gold-silver'] },
+  // 2026-10-26 gap-audit build, A-7: gold COT positioning joins the
+  // voters — the crowded-book gauge beside VIX and the stress pair.
+  {
+    id: 'market-stress',
+    section: 'global',
+    members: ['stress-stlfsi', 'nfci', 'vix', 'gold-silver', 'cftc-gold-positioning'],
+  },
   // 2026-10-26 gap-audit build, A-3: the US−Japan 10y gap joins the
   // voters — the carry trade's fuel line beside USD/JPY.
   {

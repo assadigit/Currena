@@ -238,7 +238,14 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
       ...inputs,
       fred: { ...inputs.fred, DCOILBRENTEU: pts([['2026-10-05', 82.5]]) },
       yahooHistories: {
-        'gold-usd': { points: pts([['2026-09-01', 4319], ['2026-10-05', 4125]]) },
+        'gold-usd': {
+          symbol: 'GC=F',
+          livePrice: 4125,
+          points: pts([
+            ['2026-09-01', 4319],
+            ['2026-10-05', 4125],
+          ]),
+        },
       },
     };
     const out = buildIndicatorSeries(withDailyGold);

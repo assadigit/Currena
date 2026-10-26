@@ -32,6 +32,8 @@ import { classifySourceError, contentHash } from './fetch-policy';
 import { providerFetchEnabled } from '../sources';
 import type { SeriesPoint } from '../series';
 import { fetchMofJgb10y } from './mof';
+import { fetchEiaCrudeStocks } from './eia-stocks';
+import { fetchCftcGoldPositioning } from './cftc';
 
 /**
  * The ids this phase owns (grows with each gap-audit addition). The main
@@ -41,7 +43,9 @@ import { fetchMofJgb10y } from './mof';
 export const RUNG2_IDS: readonly IndicatorId[] = [
   'jgb-10y', // A-2: the MOF daily upgrade (the OECD mirror stays the labelled fallback)
   'us-japan-10y-gap', // A-3: derived at 04:20 from the staged us10y + MOF
-  // A-6..A-10 join this list as their additions land (one commit each).
+  'eia-crude-stocks', // A-6: the EIA keyless weekly stocks page, Saturday
+  'cftc-gold-positioning', // A-7: the CFTC weekly COT file, Saturday
+  // A-8..A-10 join this list as their additions land (one commit each).
 ];
 
 /** Which feeds a rung-2 execution fetches. */
@@ -150,6 +154,25 @@ export async function collectRung2Sources(
       () => fetchMofJgb10y({ includeHistory: monthlyAllFile, now }),
     );
     if (jgb !== undefined) series['jgb-10y'] = jgb;
+  }
+
+  // A-6: the EIA keyless weekly stocks page (Saturday + bootstrap).
+  if (plan.eiaWeekly) {
+    const stocks = await fetchLogged('eia', 'crude oil ending stocks WCRSTUS1 (weekly, keyless website route)', () =>
+      fetchEiaCrudeStocks(),
+    );
+    if (stocks !== undefined) series['eia-crude-stocks'] = stocks;
+  }
+
+  // A-7: the CFTC's weekly futures-only COT file (Saturday + bootstrap).
+  // One point per file — the series accumulates in the stored history.
+  if (plan.cftcWeekly) {
+    const gold = await fetchLogged('cftc', 'Commitments of Traders, futures-only (gold row)', () =>
+      fetchCftcGoldPositioning(),
+    );
+    if (gold !== undefined) {
+      series['cftc-gold-positioning'] = [{ date: gold.date, value: gold.netSharePct }];
+    }
   }
 
   return { series, reports };

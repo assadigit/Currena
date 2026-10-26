@@ -418,6 +418,12 @@ export const IndicatorIdSchema = z.enum([
   // 2026-10-26 gap-audit build (A-4): gold measured in oil — the classic
   // long-run relative-value ratio, derived gold-usd ÷ brent.
   'gold-oil-ratio',
+  // 2026-10-26 gap-audit build (A-6): US crude-oil inventories — the EIA's
+  // keyless weekly stocks page, Saturday rung.
+  'eia-crude-stocks',
+  // 2026-10-26 gap-audit build (A-7): trader positioning in gold (COT) —
+  // the CFTC's weekly futures-only file, Saturday rung.
+  'cftc-gold-positioning',
   'wti', // FRED DCOILWTICO (WTI spot, USD/barrel)
   'natgas', // FRED DHHNGSP (Henry Hub spot, USD/MMBtu)
   // Global — market-stress lane context row (crypto price beside FNG):

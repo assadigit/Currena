@@ -968,6 +968,15 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'eur-usd': { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   // 2026-10-21 data-integrity round — the coverage additions' attributions.
   wti: { name: 'FRED (EIA WTI spot)', url: 'https://fred.stlouisfed.org/series/DCOILWTICO' },
+  // 2026-10-26 gap-audit build, A-6/A-7.
+  'eia-crude-stocks': {
+    name: 'U.S. Energy Information Administration (crude oil ending stocks, WCRSTUS1)',
+    url: 'https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCRSTUS1&f=W',
+  },
+  'cftc-gold-positioning': {
+    name: 'U.S. Commodity Futures Trading Commission (Commitments of Traders, gold)',
+    url: 'https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm',
+  },
   natgas: { name: 'FRED (EIA Henry Hub spot)', url: 'https://fred.stlouisfed.org/series/DHHNGSP' },
   platinum: { name: 'gold-api.com (XPT spot; history: World Bank Pink Sheet)', url: 'https://www.gold-api.com' },
   'bund-10y': { name: 'OECD via FRED (IRLTLT01DEM156N)', url: 'https://fred.stlouisfed.org/series/IRLTLT01DEM156N' },

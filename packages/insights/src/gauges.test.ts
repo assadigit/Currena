@@ -200,8 +200,8 @@ describe('GAUGES table shape (v1 membership, data spec §4)', () => {
     expect(GAUGES.filter((g) => g.section === 'australia')).toHaveLength(3);
   });
 
-  it('30 global scored + 16 australia scored = 46 voting members (fix B-14: +brent in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims +recession-probability +michigan-sentiment +us-pce-core-yoy; 2026-10-25 M6 Wave 3: +euro-hicp in prices-heat, +au-housing-finance in au-households; 2026-10-26 M7: +china-cpi in growth-health; the 2026-10-26 gap-audit build adds yield-curve-10y3m in borrowing-costs, A-1)', () => {
-    expect(GAUGES.filter((g) => g.section === 'global').flatMap((g) => g.members)).toHaveLength(30);
+  it('31 global scored + 16 australia scored = 47 voting members (fix B-14: +brent in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims +recession-probability +michigan-sentiment +us-pce-core-yoy; 2026-10-25 M6 Wave 3: +euro-hicp in prices-heat, +au-housing-finance in au-households; 2026-10-26 M7: +china-cpi in growth-health; the 2026-10-26 gap-audit build adds yield-curve-10y3m in borrowing-costs, A-1)', () => {
+    expect(GAUGES.filter((g) => g.section === 'global').flatMap((g) => g.members)).toHaveLength(31);
     expect(GAUGES.filter((g) => g.section === 'australia').flatMap((g) => g.members)).toHaveLength(16);
   });
 

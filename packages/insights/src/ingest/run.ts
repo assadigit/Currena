@@ -759,6 +759,18 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
     }
   }
 
+  // A-6/A-7 (2026-10-26 gap-audit build): the weekly pair — the fetched
+  // series merge with the stored accumulations (the CFTC file carries
+  // only the latest week; the EIA page its full history — fetched wins on
+  // date collisions either way, and the stored tail carries the weeks a
+  // missed Saturday would otherwise lose).
+  for (const id of ['eia-crude-stocks', 'cftc-gold-positioning'] as const) {
+    const fetched = collected.series[id];
+    if (fetched === undefined) continue;
+    const stored = await storedSeriesOf(opts.store, id);
+    series[id] = stored !== undefined ? mergeSeries(stored, fetched) : fetched;
+  }
+
   if (Object.keys(series).length === 0) {
     console.log('[rung2] nothing to patch (no fetch succeeded and no fallback filled)');
     return { series, reports: collected.reports, plan, patched: false };

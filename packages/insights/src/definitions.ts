@@ -520,6 +520,56 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 3,
   },
   {
+    // 2026-10-26 gap-audit build, A-6 (INSIGHTS_DATA_SPEC.md): US crude-oil
+    // inventories (ending stocks, thousands of barrels) from the EIA's
+    // KEYLESS website route (the v2 API needs a registered key — the
+    // owner's terms forbid registering one). Weekly with the Wednesday
+    // Petroleum Status Report; fetched on the Saturday rung-2 phase.
+    // CONTEXT per the spec's gauge table (the oil-price context beside
+    // brent/wti; the scored energy vote stays with brent).
+    id: 'eia-crude-stocks',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'US crude oil inventories',
+    source: 'eia',
+    sourceRef: 'EIA WCRSTUS1 (U.S. ending stocks of crude oil, weekly, thousand barrels)',
+    cadence: 'weekly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 12,
+  },
+  {
+    // 2026-10-26 gap-audit build, A-7 (INSIGHTS_DATA_SPEC.md): trader
+    // positioning in gold — the CFTC's futures-only COT, net
+    // non-commercial as a share of open interest (percent). Weekly
+    // (Tuesday data, Friday 17:30 ET publish); fetched on the Saturday
+    // rung-2 phase; one weekly point per file, the series accumulates in
+    // the stored history. SCORED with the spec's thresholds (net long
+    // above 45% of OI — the crowded-long squeeze-then-slump zone — or
+    // below 0, the rare net-short floor signal; plus the 10-year
+    // percentile tails at 2%, unevaluable until the base fills).
+    id: 'cftc-gold-positioning',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Trader positioning in gold (COT)',
+    source: 'cftc',
+    sourceRef: 'CFTC Commitments of Traders (futures-only, GOLD - COMMODITY EXCHANGE INC.)',
+    cadence: 'weekly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: {
+      kind: 'any-of',
+      of: [
+        { kind: 'threshold', direction: 'above', value: 45 },
+        { kind: 'threshold', direction: 'below', value: 0 },
+        { kind: 'percentile', tail: 'high', cutoff: 0.02 },
+        { kind: 'percentile', tail: 'low', cutoff: 0.02 },
+      ],
+    },
+    staleAfterDays: 12,
+  },
+  {
     // 2026-10-21 data-integrity round: the two EIA energy spots — context
     // cards in the prices lane (info rule; never prices-board tiles, the
     // board's four-tile layout is spec-fixed, and never scored votes —

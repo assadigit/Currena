@@ -1624,6 +1624,146 @@
       }
     },
     {
+      "id": "eia-crude-stocks",
+      "title": "US crude oil inventories",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "eia",
+        "name": "U.S. Energy Information Administration (crude oil ending stocks, WCRSTUS1)",
+        "url": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCRSTUS1&f=W",
+        "seriesIdOrTable": "EIA WCRSTUS1 (U.S. ending stocks of crude oil, weekly, thousand barrels)"
+      },
+      "publisher": "U.S. Energy Information Administration (daily spot .xls workbooks)",
+      "publisherUrl": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCRSTUS1&f=W",
+      "methodUrl": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCRSTUS1&f=W",
+      "whatItIs": "U.S. ending stocks of crude oil, in millions of barrels, from the Energy Information Administration’s weekly Petroleum Status Report (thousand-barrel series WCRSTUS1, published Wednesdays).",
+      "whatItIsnt": "One week’s build or draw is noise; the market reads the trend, the five-year average and the season together.",
+      "trackRecordNote": "The 2020 glut filled storage to its walls; the 2022 drawdown emptied it near five-decade lows — both moved pump prices within months.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 12 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The RWTCd/RBRTEd/RNGWHHDd workbooks are the PRIMARY source of FRED’s EIA spot series; cross-validated 2026-10-22: EIA 2026-10-20 WTI 107.89 == FRED DCOILWTICO 2026-10-20 exactly.",
+        "termsReadOn": "2026-10-22",
+        "attributionText": "Source: U.S. Energy Information Administration",
+        "legs": [
+          "eia"
+        ]
+      },
+      "unit": "barrels",
+      "changeUnit": "percent",
+      "cadence": "weekly",
+      "maxAgeDays": 12,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+        "attributionText": "Source: U.S. Energy Information Administration",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-22",
+        "termsEvidence": "US federal government works carry no copyright (17 U.S.C. § 105); EIA’s daily spot .xls workbooks (WTI RWTCd, Brent RBRTEd, Henry Hub RNGWHHDd) are the PRIMARY source of FRED’s DCOILWTICO/DCOILBRENTEU/DHHNGSP. Cross-validated 2026-10-22: EIA 2026-10-20 WTI 107.89 == FRED DCOILWTICO 2026-10-20 exactly. FALLBACK-ONLY: FRED stays the primary. · Legs (eia): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.eia.gov/about/copyrights-and-terms-of-service.php"
+      }
+    },
+    {
+      "id": "cftc-gold-positioning",
+      "title": "Trader positioning in gold (COT)",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": "market-stress",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "cftc",
+        "name": "U.S. Commodity Futures Trading Commission (Commitments of Traders, gold)",
+        "url": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm",
+        "seriesIdOrTable": "CFTC Commitments of Traders (futures-only, GOLD - COMMODITY EXCHANGE INC.)"
+      },
+      "publisher": "U.S. Commodity Futures Trading Commission (Commitments of Traders)",
+      "publisherUrl": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm",
+      "methodUrl": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm",
+      "whatItIs": "The net non-commercial position in gold futures (big speculators’ bets minus their shorts) as a share of all open interest, from the CFTC’s weekly Commitments of Traders report (Tuesday data, published Fridays).",
+      "whatItIsnt": "Positioning says how crowded the boat is, not which way the wind blows: crowded books can stay crowded for months.",
+      "trackRecordNote": "Reads above 45% of open interest have marked the crowded-long zone; net-short prints are rare and have clustered near price floors.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 12 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The weekly futures-only COT file (dea/newcot/deafut.txt) is the agency’s own published data; verified live 200 with the honest UA 2026-10-26 (the gold row 2026-10-20: open interest 402,279, net non-commercial share 49.68%).",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: U.S. Commodity Futures Trading Commission",
+        "legs": [
+          "cftc"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "weekly",
+      "maxAgeDays": 12,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "any-of",
+        "of": [
+          {
+            "kind": "threshold",
+            "direction": "above",
+            "value": 45
+          },
+          {
+            "kind": "threshold",
+            "direction": "below",
+            "value": 0
+          },
+          {
+            "kind": "percentile",
+            "tail": "high",
+            "cutoff": 0.02
+          },
+          {
+            "kind": "percentile",
+            "tail": "low",
+            "cutoff": 0.02
+          }
+        ]
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+        "attributionText": "Source: U.S. Commodity Futures Trading Commission",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "US federal government works carry no copyright (17 U.S.C. § 105). The weekly futures-only Commitments of Traders file (dea/newcot/deafut.txt, verified live 200 with the honest UA 2026-10-26) is the agency’s own published data. · Legs (cftc): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.cftc.gov/About/TheCFTC/index.htm"
+      }
+    },
+    {
       "id": "wti",
       "title": "WTI crude oil",
       "area": {
