@@ -1,7 +1,8 @@
 /**
  * English dictionary: SOURCE OF TRUTH.
  * Every string extracted verbatim from the legacy Django templates
- * (Phase 1, docs/FEATURE_MAP.md §9). fa.ts must satisfy this shape.
+ * (Phase 1; the historical feature inventory now lives under
+ * docs/archive/migration/). fa.ts must satisfy this shape.
  * New strings are added HERE first, then translated.
  */
 export const en = {

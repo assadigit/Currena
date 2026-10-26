@@ -1,7 +1,8 @@
 /**
  * @currena/scraper — source modules + normalizers (TGJU, Frankfurter).
  *
- * Phase 4 implements the real extraction (docs/FEATURE_MAP.md §4):
+ * Phase 4 implements the real extraction (the historical feature
+ * inventory now lives under docs/archive/migration/):
  *   - tgju.ts        — ajax.json primary + profile-page fallback, Rial→Toman
  *   - frankfurter.ts — ECB reference rates, base USD
  *   - http.ts        — fetchWithRetry (Chrome UA, timeout, quick retries)

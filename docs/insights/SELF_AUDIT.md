@@ -1,6 +1,6 @@
 # SELF_AUDIT.md — the automatic self-check
 
-Generated: 2026-10-26T12:23:47.068Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-26.md`
+Generated: 2026-10-26T12:52:52.833Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-26.md`
 
 Result: **ALL TESTS PASS** (24 of 24 pass)
 
@@ -40,6 +40,9 @@ None — every card reads current or carries its own honest tag.
 
 ## Unavailable cards
 
+- oecd-cli-us
+- oecd-cli-cn
+- oecd-cli-de
 - shiller-cape
 - shiller-ecy
 - au-10y
@@ -101,11 +104,11 @@ None — every card reads current or carries its own honest tag.
 - ❌ rba — F2.1 FCMYGBAG10 10-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ❌ rba — F2.1 FCMYGBAG3 3-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ✅ alternative-me — Crypto Fear and Greed (daily history)
-- ✅ cross-check — gold-api BTC 80149 vs Bitstamp close 80230 (2026-10-26) → -0.10%
+- ✅ cross-check — gold-api BTC 80262 vs Bitstamp close 80263 (2026-10-26) → -0.00%
 - ✅ mof — jgbcme.csv daily 10Y
 - ✅ eia — crude oil ending stocks WCRSTUS1 (weekly, keyless website route)
 - ✅ cftc — Commitments of Traders, futures-only (gold row)
-- ✅ oecd — Composite leading indicators, amplitude-adjusted (USA, CHN, DEU)
+- ❌ oecd — Composite leading indicators, amplitude-adjusted (USA, CHN, DEU): HTTP 500 from sdmx.oecd.org — single attempt, no retry (F-11)
 - ✅ gpr — Geopolitical Risk Index (monthly export)
 - ✅ epu — US Economic Policy Uncertainty (Main News Index workbook)
 
