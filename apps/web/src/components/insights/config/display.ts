@@ -178,8 +178,10 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'boe-rate': { decimals: 2, unit: 'percent' },
   // 2026-10-26 gap-audit build, A-4: barrels of Brent per ounce of gold.
   'gold-oil-ratio': { decimals: 1, unit: 'ratio' },
-  // 2026-10-26 gap-audit build, A-6: thousands of barrels → millions.
-  'eia-crude-stocks': { decimals: 1, unit: 'barrels', scale: 1e-6 },
+  // 2026-10-26 gap-audit build, A-6: thousands of barrels → millions
+  // (695,200 thousand barrels = 695.2 million — the wave-3 self-audit
+  // fixed the committed scale: 1e-6 rendered "0.7m barrels", 1000× off).
+  'eia-crude-stocks': { decimals: 1, unit: 'barrels', scale: 1e-3 },
   // A-7: the net non-commercial share of open interest, in percent.
   'cftc-gold-positioning': { decimals: 1, unit: 'percent' },
   // 2026-10-26 gap-audit build, A-8..A-10: the monthly trio — the CLI is
