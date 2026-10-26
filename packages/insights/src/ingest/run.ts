@@ -972,26 +972,35 @@ export interface HistoryPhaseResult {
 export interface HistoryPhaseOptions {
   /** The Worker's RATES binding (stage read + history writes). */
   kv: KVLike;
-  /** 'daily' — the day/week-cadence ids (unconditional writes); 'periodic' — monthly/quarterly (read-compare). */
-  phase: 'daily' | 'periodic';
+  /** 'daily' — every day/week-cadence id (the Node venue / one-shot shape);
+   * 'daily-a'/'daily-b' — the Worker's SPLIT daily rungs (2026-10-26 wave-3:
+   * the gap-audit ids grew the daily set past the free plan's per-invocation
+   * CPU ceiling — the 04:25 rung died exceededCpu with zero writes, the
+   * M1† rung-split follow-up at last applied; each half ≈ half the builds
+   * + stringifies + writes); 'periodic' — monthly/quarterly (read-compare). */
+  phase: 'daily' | 'daily-a' | 'daily-b' | 'periodic';
   /** Clock injection (tests). */
   now?: Date;
 }
 
 /** The ids a phase covers — derived FROM the definitions (self-maintaining). */
-export function historyPhaseIds(phase: 'daily' | 'periodic'): IndicatorId[] {
-  return DEFINITIONS.filter((d) =>
-    phase === 'daily'
-      ? d.cadence === 'daily' || d.cadence === 'weekly'
-      : d.cadence === 'monthly' || d.cadence === 'quarterly' || d.cadence === 'per-change' || d.cadence === 'manual',
+export function historyPhaseIds(phase: 'daily' | 'daily-a' | 'daily-b' | 'periodic'): IndicatorId[] {
+  const daily = DEFINITIONS.filter((d) => d.cadence === 'daily' || d.cadence === 'weekly').map((d) => d.id);
+  if (phase === 'daily-a') return daily.slice(0, Math.ceil(daily.length / 2));
+  if (phase === 'daily-b') return daily.slice(Math.ceil(daily.length / 2));
+  if (phase === 'daily') return daily;
+  return DEFINITIONS.filter(
+    (d) => d.cadence === 'monthly' || d.cadence === 'quarterly' || d.cadence === 'per-change' || d.cadence === 'manual',
   ).map((d) => d.id);
 }
 
 /**
  * One history rung: read the stage, rebuild the history files for the
  * phase's ids, write them. The DAILY phase writes unconditionally (the
- * subrequest budget: ~35 writes, no reads — content is idempotent); the
- * PERIODIC phase read-compares (reads are cheap, writes stay rare).
+ * subrequest budget: ~35 writes, no reads — content is idempotent — and,
+ * on the Worker, SPLIT across two minutes so each invocation stays under
+ * the CPU ceiling); the PERIODIC phase read-compares (reads are cheap,
+ * writes stay rare).
  */
 export async function runInsightsHistoryPhase(opts: HistoryPhaseOptions): Promise<HistoryPhaseResult> {
   const now = opts.now ?? new Date();

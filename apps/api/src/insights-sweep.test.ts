@@ -97,10 +97,13 @@ describe('sweepShouldFire', () => {
 
 describe('insightsIngestRung (the minute wiring)', () => {
   const at = (iso: string) => new Date(iso).getTime();
-  it('the 04:xx rungs are unchanged', () => {
+  it('the 04:xx rungs are unchanged (2026-10-26 wave-3: the daily history rung is SPLIT — 04:25 half a, 04:27 half b, the exceededCpu fix)', () => {
     expect(insightsIngestRung(at('2026-10-22T04:10:00Z'))).toEqual({ kind: 'main' });
-    expect(insightsIngestRung(at('2026-10-22T04:25:00Z'))).toEqual({ kind: 'history-daily' });
+    expect(insightsIngestRung(at('2026-10-22T04:20:00Z'))).toEqual({ kind: 'rung2' });
+    expect(insightsIngestRung(at('2026-10-22T04:25:00Z'))).toEqual({ kind: 'history-daily-a' });
+    expect(insightsIngestRung(at('2026-10-22T04:27:00Z'))).toEqual({ kind: 'history-daily-b' });
     expect(insightsIngestRung(at('2026-10-22T04:40:00Z'))).toEqual({ kind: 'history-periodic' });
+    expect(insightsIngestRung(at('2026-10-22T04:26:00Z'))).toBeUndefined();
     expect(insightsIngestRung(at('2026-10-22T04:59:00Z'))).toBeUndefined();
   });
   it('the sweep rungs fire at 10:10 and 20:10 UTC', () => {

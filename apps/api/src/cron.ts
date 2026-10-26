@@ -139,7 +139,16 @@ export async function runScheduled(env: Bindings, scheduledTimeMs: number): Prom
             ? runScheduledInsightsSweep(env).then(() => undefined)
             : ingestRung.kind === 'rung2'
               ? runScheduledInsightsRung2(env).then(() => undefined)
-              : runScheduledInsightsHistories(env, ingestRung.kind === 'history-daily' ? 'daily' : 'periodic');
+              : runScheduledInsightsHistories(
+                  env,
+                  ingestRung.kind === 'history-periodic'
+                    ? 'periodic'
+                    : ingestRung.kind === 'history-daily-a'
+                      ? 'daily-a'
+                      : ingestRung.kind === 'history-daily-b'
+                        ? 'daily-b'
+                        : 'daily',
+                );
       return [
         work.then(
           () => undefined,

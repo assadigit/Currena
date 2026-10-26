@@ -103,7 +103,7 @@ export function createInternalRoutes(deps: InternalRouteDeps): Hono<{ Bindings: 
     }
 
     const phase = c.req.query('phase');
-    if (phase === 'daily' || phase === 'periodic') {
+    if (phase === 'daily' || phase === 'daily-a' || phase === 'daily-b' || phase === 'periodic') {
       const result = await runScheduledInsightsHistories(c.env, phase);
       return c.json(
         { ok: result.ok, phase, written: result.written, unchanged: result.unchanged, singlePoint: result.singlePoint },
@@ -116,7 +116,7 @@ export function createInternalRoutes(deps: InternalRouteDeps): Hono<{ Bindings: 
         c,
         400,
         'invalid_phase',
-        `Invalid 'phase' parameter ${JSON.stringify(phase)} — must be 'daily' or 'periodic' (or omitted for the main run)`,
+        `Invalid 'phase' parameter ${JSON.stringify(phase)} — must be 'daily', 'daily-a', 'daily-b' or 'periodic' (or omitted for the main run)`,
       );
     }
 

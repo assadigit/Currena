@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import type { InsightsSnapshot, IndicatorHistory, IndicatorId, InsightsStatus } from '@currena/core';
 import { buildInsightsSnapshot, patchInsightsSnapshot } from './snapshot';
 import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS } from './rung2';
-import { runInsightsRung2Phase, runInsightsHistoryPhase } from '../ingest/run';
+import { runInsightsRung2Phase, runInsightsHistoryPhase, historyPhaseIds } from '../ingest/run';
 import { DEFINITIONS } from '../definitions';
 import type { InsightsStore } from '../store';
 import type { SeriesPoint } from '../series';
@@ -431,8 +431,24 @@ describe('collectRung2Sources (the shared collect)', () => {
 });
 
 /* ------------------------------------------------------------------ *
- * The monthly trio at the phase (2026-10-26 gap-audit build, A-8..A-10)
+ * The split daily-history rungs (2026-10-26 wave-3 — the exceededCpu fix:
+ * the whole-set 04:25 rung died with zero writes once the gap-audit ids
+ * grew it past the free plan's per-invocation CPU ceiling)
  * ------------------------------------------------------------------ */
+
+describe('historyPhaseIds (the daily split)', () => {
+  it('the a/b halves partition the daily set exactly — no id lost, no id twice', () => {
+    const whole = historyPhaseIds('daily');
+    const a = historyPhaseIds('daily-a');
+    const b = historyPhaseIds('daily-b');
+    expect(a).toEqual(whole.slice(0, Math.ceil(whole.length / 2)));
+    expect(b).toEqual(whole.slice(Math.ceil(whole.length / 2)));
+    expect([...a, ...b]).toEqual(whole);
+    expect(new Set([...a, ...b]).size).toBe(whole.length);
+    // The periodic set is untouched by the split.
+    expect(historyPhaseIds('periodic')).not.toContain(a[0]);
+  });
+});
 
 describe('runInsightsRung2Phase — the first-of-month monthly trio', () => {
   it('patches the five monthly readings + stages their series (one OECD fetch, three countries)', async () => {

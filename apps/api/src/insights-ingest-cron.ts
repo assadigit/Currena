@@ -48,8 +48,14 @@ export const INGEST_MAIN_MINUTE = 10;
  * phases consume it.
  */
 export const INGEST_RUNG2_MINUTE = 20;
-/** 04:25 — the daily-cadence history rung. */
+/** 04:25 — the daily-cadence history rung, FIRST HALF (the 2026-10-26
+ * wave-3 split: the gap-audit ids grew the daily set past the free plan's
+ * per-invocation CPU ceiling — the whole-set 04:25 rung died exceededCpu
+ * with zero writes, verified live 2026-10-26; the M1† rung-split follow-up
+ * at last applied). */
 export const INGEST_HIST_DAILY_MINUTE = 25;
+/** 04:27 — the daily-cadence history rung, SECOND HALF. */
+export const INGEST_HIST_DAILY_B_MINUTE = 27;
 /** 04:40 — the periodic (monthly/quarterly) history rung. */
 export const INGEST_HIST_PERIODIC_MINUTE = 40;
 
@@ -210,7 +216,7 @@ export async function runScheduledInsightsSweep(env: Bindings): Promise<'skipped
 /** One history rung (04:25 daily-cadence / 04:40 periodic). */
 export async function runScheduledInsightsHistories(
   env: Bindings,
-  phase: 'daily' | 'periodic',
+  phase: 'daily' | 'daily-a' | 'daily-b' | 'periodic',
 ): Promise<import('@currena/insights/ingest').HistoryPhaseResult> {
   const result = await runInsightsHistoryPhase({ kv: env.RATES, phase });
   if (!result.ok) {
@@ -220,9 +226,15 @@ export async function runScheduledInsightsHistories(
 }
 
 /** True when the scheduled time carries an ingest rung (and which). */
-export function insightsIngestRung(
-  scheduledTimeMs: number,
-): { kind: 'main' } | { kind: 'rung2' } | { kind: 'history-daily' } | { kind: 'history-periodic' } | { kind: 'sweep' } | undefined {
+export type InsightsIngestRung =
+  | { kind: 'main' }
+  | { kind: 'rung2' }
+  | { kind: 'history-daily-a' }
+  | { kind: 'history-daily-b' }
+  | { kind: 'history-periodic' }
+  | { kind: 'sweep' };
+
+export function insightsIngestRung(scheduledTimeMs: number): InsightsIngestRung | undefined {
   const date = new Date(scheduledTimeMs);
   const hour = date.getUTCHours();
   const minute = date.getUTCMinutes();
@@ -232,7 +244,8 @@ export function insightsIngestRung(
   if (hour === INGEST_CRON_HOUR) {
     if (minute === INGEST_MAIN_MINUTE) return { kind: 'main' };
     if (minute === INGEST_RUNG2_MINUTE) return { kind: 'rung2' };
-    if (minute === INGEST_HIST_DAILY_MINUTE) return { kind: 'history-daily' };
+    if (minute === INGEST_HIST_DAILY_MINUTE) return { kind: 'history-daily-a' };
+    if (minute === INGEST_HIST_DAILY_B_MINUTE) return { kind: 'history-daily-b' };
     if (minute === INGEST_HIST_PERIODIC_MINUTE) return { kind: 'history-periodic' };
     return undefined;
   }
@@ -240,5 +253,19 @@ export function insightsIngestRung(
   if (INGEST_SWEEP_TIMES.some((t) => t.hour === hour && t.minute === minute)) {
     return { kind: 'sweep' };
   }
+  // (2026-10-26 wave-3: the TEMPORARY 05:12/05:14 verification rungs —
+  // fired ONCE, captured, and reverted the same morning, the M4 pattern.
+  // The split halves both completed live under observation: daily-a
+  // "24 ids → 23 written · 1 no-series/point" at 05:13:10Z, daily-b
+  // "23 ids → 21 written · 2 no-series/point" at 05:14:19Z — the
+  // exceededCpu death of the whole-set 04:25 rung (twice: the scheduled
+  // 04:25 and the 05:03 diagnostic re-fire, zero writes both times,
+  // brent's stored history still ending 2026-10-23 while its stage
+  // carried 2026-10-26 — the evidence) is fixed; every history key
+  // verified written after the halves (brent @ 2026-10-26 109.53, the
+  // T10Y3M decade, the MOF daily tail 135 pts, the stocks 1982→2026;
+  // cftc-gold-positioning honestly unwritten — the single-point floor
+  // until next Saturday's file joins this week's staged point). The
+  // designed 04:25/04:27 pair owns the days from here.)
   return undefined;
 }
