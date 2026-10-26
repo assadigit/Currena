@@ -1626,6 +1626,30 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou:
       'A weaker dollar makes travel and imports dearer and exports cheaper; the reverse when it strengthens.',
   },
+  'rba-fed-gap': {
+    // 2026-10-26 gap-audit build, A-5 (INSIGHTS_DATA_SPEC.md): the
+    // short-rate carry leg — the policy-rate twin of au-us-10y-gap.
+    name: 'The gap between Australian and US interest rates',
+    ticker: 'RBA−Fed',
+    oneLiner:
+      'How far Australia’s central-bank rate sits above or below the Federal Reserve’s: the short-term money-flow pull between the two dollars.',
+    lines: {
+      highRising: 'Australian rates are far above US rates and the gap is widening: carry money tends to flow in, supporting the Australian dollar.',
+      highEasing: 'Australian rates remain above US rates, but the gap is narrowing.',
+      typical: 'The rate gap sits in its usual range for recent history.',
+      low: 'Australian rates sit below US rates: money tends to leave for the higher yield, weighing on the Australian dollar.',
+    },
+    whatItIs:
+      'The RBA’s cash rate target minus the midpoint of the Federal Reserve’s target range (4.60 − 3.875 = +0.725 today): the policy-setting gap that drives short-term carry flows.',
+    whyItMatters:
+      'When Australian rates fall far below US rates, money tends to leave for the higher yield — the Australian dollar weakens and imports cost more.',
+    tendedToMean:
+      'The 2022–23 hiking cycle sent the gap from deep negative to strongly positive; both tails have historically moved the Australian dollar.',
+    cantTell:
+      'The gap is one input among many: commodity prices and global risk appetite can overwhelm it for months at a time.',
+    forYou:
+      'Read it beside the AUD/USD card and the 10-year gap in the rates lane: together they tell the whole carry story.',
+  },
   audjpy: {
     name: 'Australian dollar vs yen',
     ticker: 'AUD/JPY',

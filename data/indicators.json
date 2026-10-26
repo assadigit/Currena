@@ -5239,6 +5239,79 @@
       }
     },
     {
+      "id": "rba-fed-gap",
+      "title": "RBA−Fed policy rate gap",
+      "area": {
+        "section": "australia",
+        "group": "au-trade-currency",
+        "gauge": "au-trade-currency",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "derived",
+        "name": "RBA Cash Rate Target − Fed target midpoint (FRED DFEDTARL/U)",
+        "url": "https://www.rba.gov.au/statistics/cash-rate/",
+        "seriesIdOrTable": "RBA Cash Rate Target (F1/decision table) − FRED:DFEDTARL/DFEDTARU midpoint"
+      },
+      "publisher": "Reserve Bank of Australia (statistical tables)",
+      "publisherUrl": "https://www.rba.gov.au/statistics/cash-rate/",
+      "methodUrl": "https://www.rba.gov.au/statistics/cash-rate/",
+      "whatItIs": "The RBA’s cash rate target minus the midpoint of the Federal Reserve’s target range (4.60 − 3.875 = +0.725 today): the policy-setting gap that drives short-term carry flows.",
+      "whatItIsnt": "The gap is one input among many: commodity prices and global risk appetite can overwhelm it for months at a time.",
+      "trackRecordNote": "The 2022–23 hiking cycle sent the gap from deep negative to strongly positive; both tails have historically moved the Australian dollar.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than its allowed age, an exact repeat beyond its per-change cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "github-action",
+        "termsLines": "RBA copyright page (read 2026-10-16): most RBA material is CC BY 4.0; RBA terms allow commercial and personal use provided no RBA endorsement is implied. The page is JS-heavy — the verbatim licence line could not be captured in a plain fetch; re-quote at the quarterly licence review. Third-party content inside an RBA table needs that third party’s consent (re-check each table’s source notes). · Worst of legs (rba:F1, fred:DFEDTARL, fred:DFEDTARU): the L0 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Reserve Bank of Australia",
+        "legs": [
+          "rba:F1",
+          "fred:DFEDTARL",
+          "fred:DFEDTARU"
+        ]
+      },
+      "unit": "points",
+      "changeUnit": "percentage points",
+      "cadence": "per-change",
+      "maxAgeDays": null,
+      "maxAgeBasis": "cadence default (per-change)",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "any-of",
+        "of": [
+          {
+            "kind": "threshold",
+            "direction": "below",
+            "value": -1
+          },
+          {
+            "kind": "threshold",
+            "direction": "above",
+            "value": 1.5
+          }
+        ]
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (rba:F1, fred:DFEDTARL, fred:DFEDTARU): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
       "id": "audjpy",
       "title": "AUD/JPY",
       "area": {

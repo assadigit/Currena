@@ -1121,6 +1121,19 @@
       "rule": "{\"kind\":\"percentile\",\"tail\":\"low\",\"cutoff\":0.2}"
     },
     {
+      "id": "rba-fed-gap",
+      "licenceName": "FRED license #copyright-public-domain (public domain)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M2",
+      "maxAgeDays": null,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"any-of\",\"of\":[{\"kind\":\"threshold\",\"direction\":\"below\",\"value\":-1},{\"kind\":\"threshold\",\"direction\":\"above\",\"value\":1.5}]}"
+    },
+    {
       "id": "audjpy",
       "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
       "publicDisplayOk": "yes",

@@ -632,6 +632,16 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   if (rba?.au10y && fred.DGS10) {
     put('au-us-10y-gap', quantized(combineSeries(rba.au10y, fred.DGS10, (au, us) => au - us), 4));
   }
+  // 2026-10-26 gap-audit build, A-5: the RBA−Fed POLICY-rate gap — the
+  // cash-rate target minus the Fed corridor midpoint (the E-15 basis:
+  // (DFEDTARL + DFEDTARU)/2, the same mid fed-expectations subtracts).
+  // Per-change: the series steps only on decisions, like rba-cash-rate.
+  // F4 quantization: raw subtraction manufactures float tails
+  // (4.60 − 3.875 = 0.7249999999999996) that render verbatim and trip T-08.
+  if (rba?.cashRate && fred.DFEDTARL && fred.DFEDTARU) {
+    const fedMid = combineSeries(fred.DFEDTARL, fred.DFEDTARU, (lower, upper) => (lower + upper) / 2);
+    put('rba-fed-gap', quantized(combineSeries(rba.cashRate, fedMid, (rba, fed) => rba - fed), 4));
+  }
   // Step-1 audit item A4: `cashRate` prefers the DAILY F1 target (a
   // decision-day move shows at once — the Sep-2026 hike reads 4.60% from
   // its effective date); collect.ts already falls back to the F1.1 monthly
@@ -983,6 +993,11 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   audusd: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   audjpy: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   'au-us-10y-gap': { name: 'RBA F2 − FRED (DGS10)', url: 'https://www.rba.gov.au/statistics/tables/' },
+  // 2026-10-26 gap-audit build, A-5.
+  'rba-fed-gap': {
+    name: 'RBA Cash Rate Target − Fed target midpoint (FRED DFEDTARL/U)',
+    url: 'https://www.rba.gov.au/statistics/cash-rate/',
+  },
   'rba-expectations': { name: 'RBA F2 (FCMYGBAG3D) − RBA F1', url: 'https://www.rba.gov.au/statistics/tables/' },
   'gold-aud': { name: 'gold-api.com × Frankfurter (ECB)', url: 'https://www.gold-api.com' },
   'iron-ore': {

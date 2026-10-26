@@ -74,6 +74,9 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       't5yie',
       'vix',
       'yield-curve-10y2y',
+      // 2026-10-26 gap-audit build, A-1: the 10y−3m curve leg (T10Y3M,
+      // citation-required — display-permitted with attribution).
+      'yield-curve-10y3m',
     ]);
   });
 

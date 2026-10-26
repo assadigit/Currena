@@ -1619,6 +1619,34 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     rule: { kind: 'percentile', tail: 'low', cutoff: 0.2 },
   },
   {
+    // 2026-10-26 gap-audit build, A-5 (INSIGHTS_DATA_SPEC.md): the
+    // RBA−Fed policy-rate gap — rba-cash-rate minus the Fed target-range
+    // MIDPOINT (the E-15 (DFEDTARL+DFEDTARU)/2 basis). Zero new fetches:
+    // both parents are decision-table feeds collected by the main rung.
+    // Per-change cadence (the rba-cash-rate pattern): the gap moves only
+    // on decisions, so it never goes stale by age. Completes the AU rate
+    // story au-us-10y-gap (−0.01) tells for the long end.
+    id: 'rba-fed-gap',
+    section: 'australia',
+    group: 'au-trade-currency',
+    name: 'RBA−Fed policy rate gap',
+    source: 'derived',
+    sourceRef: 'RBA Cash Rate Target (F1/decision table) − FRED:DFEDTARL/DFEDTARU midpoint',
+    cadence: 'per-change',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: {
+      kind: 'any-of',
+      of: [
+        // Needs attention: RBA cuts far below the Fed (historic
+        // AUD-carry-outflow setting, import inflation pressure) or the
+        // gap above +1.50.
+        { kind: 'threshold', direction: 'below', value: -1 },
+        { kind: 'threshold', direction: 'above', value: 1.5 },
+      ],
+    },
+  },
+  {
     id: 'audjpy',
     section: 'australia',
     group: 'au-trade-currency',

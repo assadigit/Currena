@@ -83,8 +83,14 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
       DCOILBRENTEU: pts([['2026-10-05', 82.5]]),
       M2SL: pts([['2026-08-01', 23342]]),
       CPIAUCNS: pts([['2025-09-01', 300], ['2026-09-01', 309]]),
-      DFEDTARL: pts([['2026-10-05', 3.5]]),
-      DFEDTARU: pts([['2026-10-05', 3.75]]),
+      DFEDTARL: pts([
+        ['2026-09-29', 3.5],
+        ['2026-10-05', 3.5],
+      ]),
+      DFEDTARU: pts([
+        ['2026-09-29', 3.75],
+        ['2026-10-05', 3.75],
+      ]),
       NFCI: pts([['2026-10-02', -0.4]]),
     },
     ecb: {
@@ -154,10 +160,17 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
     expect(out['au-us-10y-gap']).toHaveLength(1);
     expect(out['au-us-10y-gap']![0]!.date).toBe('2026-10-05');
     expect(out['au-us-10y-gap']![0]!.value).toBeCloseTo(0.2, 10);
+    // 2026-10-26 gap-audit build, A-5: the policy-rate gap — RBA cash rate
+    // 4.60 − the Fed corridor midpoint (3.5+3.75)/2 = 0.975, quantized 4dp
+    // (F4: no float tails), inner-joined on the common decision date.
+    expect(out['rba-fed-gap']).toEqual([{ date: '2026-09-29', value: 0.975 }]);
     // I15 new compositions:
     // Step-1 A1: fed-target = the range's LOWER bound (DFEDTARL) — the
     // snapshot builder attaches DFEDTARU as rangeHigh.
-    expect(out['fed-target']).toEqual([{ date: '2026-10-05', value: 3.5 }]);
+    expect(out['fed-target']).toEqual([
+      { date: '2026-09-29', value: 3.5 },
+      { date: '2026-10-05', value: 3.5 },
+    ]);
     // ecb-dfr passes through
     expect(out['ecb-dfr']).toEqual(inputs.ecb.dfr);
     // us-cpi-yoy = 12-month pct change of the CPI index
@@ -211,6 +224,37 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
     expect(out2.brent).toBeUndefined();
     expect(out2.usdjpy).toBeUndefined();
     expect(out2['au-us-10y-gap']).toBeUndefined();
+    // A-5: the policy gap fails closed on missing parents — never a stale gap.
+    expect(out2['rba-fed-gap']).toBeUndefined();
+  });
+
+  it('A-5: the RBA−Fed gap needs BOTH parents and never subtracts across unmatched dates', () => {
+    // No Fed corridor → no gap.
+    const noFed = {
+      ...inputs,
+      fred: { ...inputs.fred, DFEDTARL: undefined, DFEDTARU: undefined },
+    };
+    expect(buildIndicatorSeries(noFed)['rba-fed-gap']).toBeUndefined();
+    // No cash-rate series → no gap.
+    const noRba = { ...inputs, rba: { ...inputs.rba, cashRate: undefined } };
+    expect(buildIndicatorSeries(noRba)['rba-fed-gap']).toBeUndefined();
+    // Disjoint dates → the inner join produces nothing (dates-differ
+    // honesty, the au-us-10y-gap discipline).
+    const disjoint = {
+      ...inputs,
+      rba: { ...inputs.rba, cashRate: pts([['2026-06-01', 4.35]]) },
+    };
+    expect(buildIndicatorSeries(disjoint)['rba-fed-gap']).toBeUndefined();
+    // A pre-2008 point-style Fed target (L == U == mid) joins honestly.
+    const pointEra = {
+      ...inputs,
+      fred: {
+        ...inputs.fred,
+        DFEDTARL: pts([['2026-09-29', 5.25], ['2026-10-05', 5.25]]),
+        DFEDTARU: pts([['2026-09-29', 5.25], ['2026-10-05', 5.25]]),
+      },
+    };
+    expect(buildIndicatorSeries(pointEra)['rba-fed-gap']).toEqual([{ date: '2026-09-29', value: -0.65 }]);
   });
 
   it('keeps history intact when the live source is strictly behind the last observation', () => {

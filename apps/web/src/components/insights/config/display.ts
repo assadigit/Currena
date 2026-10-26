@@ -186,6 +186,9 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   // Step-2 add-list §B2: the AU 10-year yield, rendered like the US one.
   'au-10y': { decimals: 2, unit: 'percent' },
   'au-us-10y-gap': { decimals: 2, unit: 'points' },
+  // 2026-10-26 gap-audit build, A-5: the policy-rate gap, rendered like
+  // the 10y gap (points, 2dp).
+  'rba-fed-gap': { decimals: 2, unit: 'points' },
   'rba-cash-rate': { decimals: 2, unit: 'percent' },
   // Step-2 add-list §B7: the real savings rate (new household term deposits).
   'au-deposit-rate': { decimals: 2, unit: 'percent' },

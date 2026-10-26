@@ -452,6 +452,10 @@ export const IndicatorIdSchema = z.enum([
   'au-unemployment',
   'au-home-values',
   'au-household-debt-arrears',
+  // 2026-10-26 gap-audit build (A-5): the RBA−Fed policy-rate gap — the
+  // short-rate carry leg beside audusd (the 10y version au-us-10y-gap
+  // already exists in au-inflation-rates).
+  'rba-fed-gap',
   // Australia — How is trade and the currency?
   'audusd',
   'audjpy',

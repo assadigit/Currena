@@ -490,6 +490,9 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   'fed-expectations': ['fred:DGS2', 'fred:DFEDTARL', 'fred:DFEDTARU'],
   'rba-expectations': ['rba:F2', 'rba:F1'],
   'au-us-10y-gap': ['rba:F2', 'fred:DGS10'],
+  // 2026-10-26 gap-audit build, A-5: the policy-rate gap's legs — the RBA
+  // decision table (via the cash-rate chain) and the Fed corridor pair.
+  'rba-fed-gap': ['rba:F1', 'fred:DFEDTARL', 'fred:DFEDTARU'],
   'govt-interest-revenue': ['fred:A091RC1Q027SBEA', 'fred:W006RC1Q027SBEA'],
   'yield-curve-10y2y': ['fred:T10Y2Y'],
   // 2026-10-26 gap-audit build, A-1.

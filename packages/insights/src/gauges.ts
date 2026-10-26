@@ -134,7 +134,9 @@ export const GAUGES: readonly GaugeDef[] = [
     // Step-2 add-list §B6: iron ore left the voters — it is context only
     // now (the card says so; the au-trade gauge counts only the FX and
     // terms-of-trade members).
-    members: ['audusd', 'audjpy', 'terms-of-trade'],
+    // 2026-10-26 gap-audit build, A-5: the RBA−Fed policy-rate gap joins
+    // the voters — the short-rate carry leg beside audusd.
+    members: ['audusd', 'rba-fed-gap', 'audjpy', 'terms-of-trade'],
   },
 ];
 
