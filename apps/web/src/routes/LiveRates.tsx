@@ -292,6 +292,13 @@ export function LiveRates() {
         }
       }
       if (Object.keys(nextFlash).length > 0) {
+        // R10-5: setFlash drives the green/red flash animation when a
+        // board rate changes between rendered generations. This is the
+        // documented "sync with external store" pattern — the cards
+        // array is the external input, the flash state is the local
+        // side-effect. The setTimeout cleanup clears the flash after
+        // FLASH_MS.
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store sync: cards array → flash animation
         setFlash(nextFlash);
         const timer = window.setTimeout(() => setFlash({}), FLASH_MS);
         lastRatesRef.current = new Map(

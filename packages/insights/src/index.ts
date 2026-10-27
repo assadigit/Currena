@@ -117,3 +117,34 @@ export type {
 
 export { RULE_VERSION, RULE_CHANGELOG } from './ruleVersion';
 export type { RuleChangeLogEntry } from './ruleVersion';
+
+// R10-3 (2026-10-28) — the global companies table behind a feature flag.
+// The config + the adapter STUB ship with the flag OFF; the UI renders
+// the empty state, the cron rung is NOT wired, no live calls fire.
+// See packages/insights/src/companies/definitions.ts + adapter.ts and
+// ROUND10_REPORT.md R10-3 for the flip procedure (one-line change).
+export {
+  COMPANIES,
+  COMPANIES_COUNT,
+  COMPANY_EXCHANGE_LABELS,
+  COMPANY_EXCHANGES_USED,
+  companyByTicker,
+} from './companies/definitions';
+export type {
+  CompanyDefinition,
+  CompanyExchangeId,
+} from './companies/definitions';
+export {
+  CompanyEodResponseSchema,
+  CompanyEodRowSchema,
+  CompanyAdapterError,
+  deriveCompanyReading,
+  fetchCompanyEod,
+  parseCompanyEodResponse,
+} from './companies/adapter';
+export type {
+  CompanyEodRow,
+  CompanyFetchOptions,
+  CompanyReading,
+  CompanySeriesPoint,
+} from './companies/adapter';

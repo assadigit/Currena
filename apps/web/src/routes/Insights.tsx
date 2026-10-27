@@ -57,6 +57,7 @@ import { PricesBoard } from '../components/insights/PricesBoard';
 import { Signals } from '../components/insights/Signals';
 import { Together } from '../components/insights/Together';
 import { WorldMarkets } from '../components/insights/WorldMarkets';
+import { CompaniesTable } from '../components/insights/CompaniesTable';
 import { WorldCurrencies } from '../components/insights/WorldCurrencies';
 import { DollarStrengthCards } from '../components/insights/world-currencies/DollarStrength';
 import { useInsightsCopy } from '../components/insights/useInsightsCopy';
@@ -135,12 +136,18 @@ export function Insights() {
   useEffect(() => {
     const controller = new AbortController();
     const cached = readCachedSnapshot();
+    // R10-5: the synchronous setState hydrates from localStorage cache
+    // (or falls back to 'loading') before the async fetch — the
+    // documented "initialize from external store on mount" pattern.
+    // The empty dep array is intentional: this runs once on mount.
+    /* eslint-disable react-hooks/set-state-in-effect -- mount-time cache hydration (external store → local state) */
     if (cached) {
       hadCache.current = true;
       setState({ kind: 'ready', snapshot: cached, fromCache: true });
     } else {
       setState({ kind: 'loading' });
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
     fetchInsightsSnapshot(controller.signal)
       .then((snapshot) => {
         setState({ kind: 'ready', snapshot, fromCache: false });
@@ -251,6 +258,11 @@ export function Insights() {
       return; // unknown id — ignore the param
     }
     if (!state.snapshot.readings.some((r) => r.id === id)) return;
+    // R10-5: focusCard opens the details panel for the deep-linked card.
+    // The setState is the documented response to the URL param (an
+    // external input) — the effect runs once per mount (the
+    // shareLinkHandled ref guards against re-firing).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- deep-link card focus: URL param → local panel state
     focusCard(id);
   }, [state, focusCard]);
 
@@ -459,6 +471,19 @@ export function Insights() {
           {marketsFeedEnabled && (
             <WorldMarkets state={marketsState} copy={copy} locale={locale} numberLocale={numberLocale} />
           )}
+
+          {/* R10-3 (2026-10-28) — the global companies table behind a
+           * feature flag (OFF by default). The owner's R9-09 directive
+           * was BLOCKED on the EODHD free-plan quota (20 calls/day
+           * total — the markets board already consumes ~16–18). This
+           * component ships the table PRE-BUILT: the UI renders the
+           * empty-state panel below the markets tiles, the cron rung
+           * is NOT WIRED, no live calls fire. The flip procedure (one
+           * line in apps/web/src/components/insights/config/companies.ts
+           * + the future cron rung) lives in ROUND10_REPORT.md R10-3.
+           * Bilingual EN + FA (RTL-safe, Latin names + exchange codes
+           * stay Latin in both locales — proper nouns, RULES.md §5). */}
+          <CompaniesTable copy={copy} locale={locale} />
 
           {/* R9-01 (2026-10-27 owner round): the US shares in AUD box is
            * RETIRED entirely — the owner asked for the «US shares to

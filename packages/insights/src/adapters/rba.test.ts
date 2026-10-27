@@ -3,7 +3,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-import { fetchRbaSeries, RBA_TABLES, rbaTableUrl } from './rba';
+import { fetchRbaSeries, parseRbaCashRateHtml, RBA_TABLES, rbaTableUrl } from './rba';
+import { FormatChangedError } from './fetch-policy';
 import { parseRbaTableCsv } from '../parsers';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -122,5 +123,77 @@ describe('rba adapter', () => {
   it('fails loudly on a 403 (the sandbox-venue behaviour)', async () => {
     const fetchImpl = (async () => new Response('Forbidden', { status: 403 })) as typeof fetch;
     await expect(fetchRbaSeries('cashRate', { fetchImpl })).rejects.toThrow(/HTTP 403/);
+  });
+});
+
+describe('parseRbaCashRateHtml — the HTML decision table (R10-1 regression)', () => {
+  // The R10-1 fixture pins the CURRENT shape of the RBA cash-rate page
+  // (venue-verified 2026-10-27 via WebFetch's egress — the build sandbox
+  // and the Cloudflare Worker egress are both Akamai-blocked on every
+  // rba.gov.au path this round; the parser itself handles the page
+  // correctly, the production defect is purely venue-level blocking).
+  // The header gained "%"-suffixed column titles since the original
+  // parser was written; the substring match still accepts them. This
+  // test pins the shape so a future RBA redesign that renames
+  // "Effective Date" or drops "cash rate target" fails loudly.
+  const html = fixtureText('rba-cash-rate-page.html');
+
+  it('parses the current page shape — the latest decision (30 Sep 2026 +0.25 -> 4.60) is the live value', () => {
+    const series = parseRbaCashRateHtml(html);
+    expect(series.at(-1)).toEqual({ date: '2026-09-30', value: 4.6 });
+    // The 12 Aug 2026 no-change decision and the 20 May 2026 -0.25 cut
+    // pin the +/0/- change-points cases and the date-stability contract.
+    const dates = series.map((p) => p.date);
+    expect(dates).toContain('2026-08-12');
+    expect(dates).toContain('2026-05-20');
+  });
+
+  it('handles pre-1990 range rows by taking the LOWER bound (the corridor convention)', () => {
+    const series = parseRbaCashRateHtml(html);
+    const range = series.find((p) => p.date === '1987-03-02');
+    expect(range).toEqual({ date: '1987-03-02', value: 15.0 });
+  });
+
+  it('sorts ascending by date regardless of the page row order', () => {
+    const series = parseRbaCashRateHtml(html);
+    for (let i = 1; i < series.length; i += 1) {
+      expect(series[i]!.date >= series[i - 1]!.date).toBe(true);
+    }
+  });
+
+  it('stops at the next table (does not bleed "release" rows from an adjacent table)', () => {
+    const series = parseRbaCashRateHtml(html);
+    // The fixture's second table carries an "effective date" header
+    // (lowercase) — the parser's header-end detection closes the
+    // decision-table block, so no 2026-09-30 release row doubles in.
+    const count = series.filter((p) => p.date === '2026-09-30').length;
+    expect(count).toBe(1);
+  });
+
+  it('throws FormatChangedError when the decision-table header is missing', () => {
+    // Replace the actual <th> cell (the comment at the top of the fixture
+    // also mentions "Effective Date" — String.replace only hits the first
+    // occurrence, so target the cell precisely).
+    const broken = html.replace(
+      '<th scope="col">Effective Date</th>',
+      '<th scope="col">Date Effective</th>',
+    );
+    expect(() => parseRbaCashRateHtml(broken)).toThrow(FormatChangedError);
+    expect(() => parseRbaCashRateHtml(broken)).toThrow(/header not found/);
+  });
+
+  it('throws FormatChangedError when the header is present but no rows carry a parseable target', () => {
+    // Strip every numeric target cell out of the data rows: the parser
+    // must fail loudly with "carried no rows" rather than return an
+    // empty series.
+    const broken = html
+      .replace('>4.60<', '>—<')
+      .replace('>4.35<', '>—<')
+      .replace('>4.35<', '>—<')
+      .replace('>4.35<', '>—<')
+      .replace('>4.60<', '>—<')
+      .replace('>15.00 to 15.50<', '>—<')
+      .replace('>10.50<', '>—<');
+    expect(() => parseRbaCashRateHtml(broken)).toThrow(FormatChangedError);
   });
 });

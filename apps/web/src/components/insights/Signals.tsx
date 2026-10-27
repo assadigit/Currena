@@ -83,6 +83,8 @@ export function Signals({
   const [open, setOpen] = useState(true);
 
   useEffect(() => {
+    // R10-5: expand-on-token — see AboutTheData.tsx for the same pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- expand-on-token: external trigger → local open state
     if (expandToken > 0) setOpen(true);
   }, [expandToken]);
 

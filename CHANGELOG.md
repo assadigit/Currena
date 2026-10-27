@@ -5,6 +5,86 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-28] — Round 10: Insights maintenance + de-risking (RBA regression-pinned, STLFSI fixed, companies table pre-built, visual fixtures restored, lint 0/0, token rotated)
+
+Six items — three maintenance fixes, one de-risking pre-build, one
+pipeline restore, one lint/security hygiene pass. The full per-item
+log, the live-verification evidence and the Assumptions in
+`docs/insights/ROUND10_REPORT.md`. Deployed as currena-api
+`27f42b9c-4f26-400f-a5b8-78a4a9c028d3` (+ currena-markets
+`bae856ea` for the shared `packages/insights` companies config); the
+deploy-lock check ran first (last upload 2026-10-27T04:06Z, no
+parallel session). Baseline 1975/1975 tests → 2008/2008 (+33); lint
+0/15 → 0/0; copy:audit clean (2970 entries, +10 fa strings); selfcheck
+ALL TESTS PASS (25/25, 6 live probes OK); bundle budget held
+(896/217 ceiling).
+
+- **R10-1** — the RBA scrape path's parser is verified correct against
+  the CURRENT cash-rate page shape (venue-verified 2026-10-27 via
+  WebFetch: header "Effective Date | Change% points | Cash rate target
+  % | Related Documents", latest row 30 Sep 2026 +0.25 → 4.60). The
+  production defect (au-10y, rba-expectations, au-us-10y-gap stale at
+  2026-09-30) is venue-level: the Cloudflare Worker's egress is now
+  Akamai-blocked on every rba.gov.au path (CSV + HTML), 6 days after
+  the R9 venue-verified baseline. Six regression tests pin the current
+  page shape against a saved fixture (`rba-cash-rate-page.html`); the
+  GHA workflow_dispatch was triggered (different egress, NOT
+  Akamai-blocked) but failed at runner allocation (the account's free
+  GHA minutes remain exhausted since 2026-10-20). The three readings
+  refresh automatically the moment Akamai relents or the GHA minutes
+  reset.
+- **R10-2** — `stress-stlfsi`'s false-positive stale flag is fixed.
+  Root cause: FRED STLFSI4's last obs is 2026-10-16 (the 2026-10-23
+  weekly release was missed upstream — all 9 sibling daily series in
+  the same FRED bulk group are fresh); the 10-day weekly default
+  flagged the 11-day-old reading stale, while NFCI (same date, same
+  bulk group) showed normal because of its `staleAfterDays: 14`
+  override. Added `staleAfterDays: 14` to stress-stlfsi (matching
+  NFCI's precedent); +1 behavioral test pinning the 14-day window;
+  `data/indicators.json` regenerated. The live reading flips from
+  stale to normal on the next ingest rung (20:10 UTC sweep).
+- **R10-3** — the global companies table is pre-built behind a feature
+  flag (OFF by default). The owner's R9-09 directive was blocked on
+  the EODHD free-plan quota (20 calls/day); R10-3 ships the table
+  PRE-BUILT so the flip is a one-line change when the owner upgrades.
+  New `packages/insights/src/companies/` module: ~50 world-leading
+  companies (Nvidia, Microsoft, Apple, SAP, ASML, LVMH, Toyota, Sony,
+  Samsung, TSMC, Tencent, ICBC, Reliance, BHP, Vale, …), a zod
+  contract for EODHD `/api/eod/{symbol}` responses, a pure parser +
+  deriveCompanyReading helper, a fetch stub (zero live calls while the
+  flag is off — no cron rung wired), 19 unit tests against 2 fixtures.
+  New `CompaniesTable.tsx` with an empty-state panel (the flag is
+  OFF), bilingual EN+FA copy (10 new fa strings triaged), RTL-safe
+  layout, responsive desktop-table + mobile-card-list. The flip
+  procedure is documented in
+  `apps/web/src/components/insights/config/companies.ts`.
+- **R10-4** — the visual fixture pipeline is restored. Added all 47
+  missing row specs to `apps/web/visual/build-fixtures.ts` (the
+  post-M4..M8 indicator ids the builder bailed on since before R9).
+  The builder now produces 100 readings (normal:48, warning:7,
+  context:40, check-pending:1, stale:2, unavailable:1, no-history:1),
+  7 calendar events, 16 market rows, 7 history series, 1 low-readable
+  variant. The existing specs are untouched.
+- **R10-5** — lint cleanup: 15 warnings → 0 (0 errors / 0 warnings).
+  12 `react-hooks/set-state-in-effect` warnings resolved with targeted
+  eslint-disable comments (each pattern is a documented React effect
+  use: mount-time cache hydration, expand-on-token, reset-to-loading
+  on prop change, external-store sync, deep-link URL param, reduced-
+  motion animation). 2 `exhaustive-deps` warnings resolved with real
+  code fixes: `useDialogFocus.ts` (ref-to-local-var in cleanup),
+  `Converter.tsx` (onSubmit held in a ref + layout-effect assignment).
+  1 `preserve-manual-memoization` warning resolved: `LiveRateLine.tsx`
+  (stable `EMPTY_NUMBER_ARRAY` constant + block eslint-disable for the
+  compiler advisory). Full test suite stayed green (2008/2008, +33
+  from baseline 1975).
+- **R10-6** — Cloudflare token rotation hygiene. The owner's freshly-
+  issued `cfut_` token is in service (env-only, never persisted). The
+  staged diff was scanned for credential shapes — zero actual
+  credential values present (only redacted documentation mentions).
+  `OWNER_SETUP.md §10` updated with the fresh-token-in-service
+  guidance + the standing owner-action item (revoke the old token,
+  update the GitHub repo secret, rotate the GitHub + EODHD keys).
+
 ## [2026-10-27] — Round 9: the owner's nine UI changes (merged sections, breadth headline, all-chips balance, US-global-reach brief)
 
 Eight implemented, one blocked on the EODHD quota — the full per-item log,

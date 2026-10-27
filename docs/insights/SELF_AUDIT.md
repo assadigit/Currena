@@ -1,6 +1,6 @@
 # SELF_AUDIT.md — the automatic self-check
 
-Generated: 2026-10-27T04:03:36.589Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-27.md`
+Generated: 2026-10-27T18:28:25.541Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-27.md`
 
 Result: **ALL TESTS PASS** (25 of 25 pass)
 
@@ -29,15 +29,15 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 | E-18 | Trend labels reproducible from the stated 3-month rule | pass | the export + CSV recompute from chg3m (markets/compute.ts trendOf); pinned by markets + full-export tests |
 | SUITE:packages/core | Unit suite — packages/core | pass | 191 tests |
 | SUITE:packages/scraper | Unit suite — packages/scraper | pass | 67 tests |
-| SUITE:packages/insights | Unit suite — packages/insights | pass | 644 tests |
+| SUITE:packages/insights | Unit suite — packages/insights | pass | 677 tests |
 | SUITE:apps/markets | Unit suite — apps/markets | pass | 13 tests |
 | SUITE:apps/api | Unit suite — apps/api | pass | 344 tests |
 | SUITE:apps/web | Unit suite — apps/web | pass | 716 tests |
 
 ## Stale or "can't tell" cards
 
-| Indicator | Status | As of | Reason |
-| stress-stlfsi | stale | 2026-10-16 | stale |
+None — every card reads current or carries its own honest tag.
+
 
 ## Unavailable cards
 
@@ -102,7 +102,7 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 - ❌ rba — F2.1 FCMYGBAG10 10-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ❌ rba — F2.1 FCMYGBAG3 3-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ✅ alternative-me — Crypto Fear and Greed (daily history)
-- ✅ cross-check — gold-api BTC 79696 vs Bitstamp close 79697 (2026-10-27) → -0.00%
+- ✅ cross-check — gold-api BTC 80555 vs Bitstamp close 80505 (2026-10-27) → 0.06%
 - ✅ mof — jgbcme.csv daily 10Y
 - ✅ eia — crude oil ending stocks WCRSTUS1 (weekly, keyless website route)
 - ✅ cftc — Commitments of Traders, futures-only (gold row)

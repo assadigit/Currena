@@ -90,6 +90,12 @@ function useRunStatus(open: boolean): RunStatusState {
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
+    // R10-5: the synchronous setState resets the panel to "loading" on
+    // every open toggle — the async fetch then replaces it. This is the
+    // documented "reset state on prop change" pattern (React docs:
+    // "adjust state when a prop changes"). The alternative — a `key`
+    // prop remount — would lose the panel's mount-time scroll position.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset-to-loading on open toggle (React docs: adjusting state when a prop changes)
     setState({ kind: 'loading' });
     fetch('/api/insights/status')
       .then(async (res) => {
@@ -170,6 +176,13 @@ export function AboutTheData({
   });
 
   useEffect(() => {
+    // R10-5: the expandToken is a parent-controlled counter — a non-zero
+    // value signals "expand now". setOpen(true) is the documented
+    // response (the token is the external trigger; the open state is
+    // the component's own). The dep array is intentional: only the
+    // token's value matters, not setOpen's identity (stable from
+    // useState).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- expand-on-token: external trigger → local open state
     if (expandToken > 0) setOpen(true);
   }, [expandToken]);
 

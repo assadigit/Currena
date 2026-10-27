@@ -85,13 +85,17 @@ export function useDialogFocus(opts: UseDialogFocusOptions) {
     focusTarget?.focus();
     const previousOverflow = document.body.style.overflow;
     if (lockScroll) document.body.style.overflow = 'hidden'; // scroll lock while open
+    // R10-5: copy the ref's current value into a local variable here, so
+    // the cleanup function reads the snapshot taken at effect-run time
+    // (the ref may have changed by the time cleanup runs — React's
+    // exhaustive-deps rule flags this exact pattern).
+    const openerAtOpen = returnFocusToRef?.current ?? null;
     return () => {
       if (lockScroll) document.body.style.overflow = previousOverflow;
       // Focus returns to the control that opened the dialog (the ref is
       // read HERE, in the effect — never during render).
-      const opener = returnFocusToRef?.current;
-      if (opener && document.contains(opener)) {
-        opener.focus({ preventScroll: true });
+      if (openerAtOpen && document.contains(openerAtOpen)) {
+        openerAtOpen.focus({ preventScroll: true });
       }
     };
     // Deliberately NOT re-running on returnFocusTo identity changes: the

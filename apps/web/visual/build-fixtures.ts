@@ -432,6 +432,122 @@ const ROWS: Record<IndicatorId, RowSpec> = {
   },
   'iron-ore': { value: 97.7, status: 'context', change30d: -3.2 },
   'gold-aud': { value: 5826, status: 'normal', percentile10y: 0.62, change30d: 2.1, asOfDays: -1 },
+
+  /* ------------------------------------------------------------------ *
+   * R10-4 (2026-10-28) — the 47 post-M4..M8 row specs the visual fixture
+   * pipeline has been missing since before R9 (the builder bailed on the
+   * first absent id, so the visual fixtures stopped regenerating). The
+   * values below are plausible per indicator (each one's nature, source
+   * and rule kind); they cover every status class the U-xx tests assert
+   * against, with at least one warning, one stale, one context and the
+   * rest normal. Quarterly rows carry the periodStart/End + releaseDate
+   * trio (the U-06 quarterly-label assertions run on these).
+   * ------------------------------------------------------------------ */
+
+  /* Australia — households (the three quarterly ABS rows the v3 Australia
+   * section added between M4 and M8). */
+  'au-housing-finance': {
+    value: 95.4,
+    status: 'normal',
+    percentile10y: 0.58,
+    periodStart: Q.periodStart,
+    periodEnd: Q.periodEnd,
+    releaseDate: Q.releaseDate,
+  },
+  'au-job-vacancies': {
+    value: 363.5,
+    status: 'context',
+    periodStart: Q.periodStart,
+    periodEnd: Q.periodEnd,
+    releaseDate: Q.releaseDate,
+  },
+  'au-saving-ratio': {
+    value: 4.8,
+    status: 'context',
+    periodStart: Q.periodStart,
+    periodEnd: Q.periodEnd,
+    releaseDate: Q.releaseDate,
+  },
+  /* Australia — trade and currency: the RBA−Fed gap (the A-5 addition). */
+  'rba-fed-gap': {
+    value: 0.35,
+    status: 'normal',
+    percentile10y: 0.45,
+    lastChange: { date: isoDay(-21), points: 0.25 },
+    decidedDate: isoDay(-22),
+    asOfDays: -21,
+  },
+
+  /* Global — borrowing costs (the M4..M8 wave: peer sovereign yields +
+   * the short end + the 10y−3m curve leg + the 30y mortgage). */
+  'yield-curve-10y3m': { value: 0.78, status: 'normal', change7d: 0.04, change30d: 0.09, percentile10y: 0.62 },
+  'us-2y': { value: 4.21, status: 'normal', change7d: 0.02, change30d: 0.18, percentile10y: 0.55 },
+  sofr: { value: 4.33, status: 'context', change7d: 0.0, change30d: 0.0 },
+  'jgb-10y': { value: 1.42, status: 'context', change30d: 0.08, percentile10y: 0.71 },
+  'bund-10y': { value: 2.31, status: 'context', change30d: 0.05, percentile10y: 0.48 },
+  'gilt-10y': { value: 4.18, status: 'context', change30d: 0.04, percentile10y: 0.62 },
+  'euro-aaa-10y': { value: 2.65, status: 'context', change7d: 0.01, change30d: 0.03 },
+  'boe-rate': {
+    value: 4.75,
+    status: 'context',
+    percentile10y: 0.68,
+    lastChange: { date: isoDay(-28), points: -0.25 },
+    asOfDays: -28,
+  },
+  'boj-rate': { value: 0.25, status: 'context', percentile10y: 0.42, lastChange: { date: isoDay(-42), points: 0.15 } },
+  'mortgage-30y': { value: 6.85, status: 'context', change7d: -0.05, change30d: -0.12, percentile10y: 0.74 },
+
+  /* Global — dollar strength: the USD/TRY + the US−Japan 10y gap (the
+   * M5 additions beside the existing usdjpy, eur-usd, usdcny, dollar-basket). */
+  usdtry: { value: 34.18, status: 'context', change7d: 0.4, change30d: 1.2, percentile10y: 0.97 },
+  'us-japan-10y-gap': { value: 3.89, status: 'normal', change30d: 0.06, percentile10y: 0.58 },
+
+  /* Global — growth health: the M4..M7 wave — the early-warning pack +
+   * the OECD CLI trio + the China CPI + the EPU + the GPR + the
+   * recession probability. */
+  'us-gdp-growth': {
+    value: 2.4,
+    status: 'context',
+    periodStart: Q.periodStart,
+    periodEnd: Q.periodEnd,
+    releaseDate: Q.releaseDate,
+  },
+  'us-nfp': { value: 227.0, status: 'context', change30d: 12.0 },
+  'us-pce-core-yoy': { value: 2.7, status: 'normal', percentile10y: 0.66, change30d: -0.1 },
+  'us-wages': { value: 4.1, status: 'context', change30d: 0.0 },
+  'recession-probability': { value: 4.3, status: 'normal', percentile10y: 0.18 },
+  'michigan-sentiment': { value: 71.6, status: 'normal', percentile10y: 0.32, change30d: -1.4 },
+  'michigan-1y-expectations': { value: 3.1, status: 'context', change30d: 0.1 },
+  'initial-jobless-claims': { value: 221.0, status: 'normal', percentile10y: 0.41, change7d: -3.0 },
+  'job-openings': { value: 7.8, status: 'context', change30d: -0.2 },
+  'retail-sales': { value: 710.0, status: 'context', change30d: 0.4 },
+  'housing-permits': { value: 1428.0, status: 'context', change30d: -1.2 },
+  cfnai: { value: -0.21, status: 'context', change30d: 0.08 },
+  'oecd-cli-us': { value: 101.0, status: 'normal', change30d: 0.1, percentile10y: 0.54 },
+  'oecd-cli-cn': { value: 99.2, status: 'context', change30d: -0.1 },
+  'oecd-cli-de': { value: 99.5, status: 'context', change30d: 0.0 },
+  'china-cpi': { value: 0.4, status: 'normal', percentile10y: 0.22, change30d: -0.1 },
+  'epu-us': { value: 218.9, status: 'context', change30d: -22.4 },
+
+  /* Global — market stress: the M6 weekly additions + the CFTC + the GPR. */
+  walcl: { value: 7_240_000, status: 'context', change30d: -8_400, percentile10y: 0.78 },
+  'cftc-gold-positioning': { value: 49.7, status: 'warning', change30d: 1.2, percentile10y: 0.92, moveScore: 0.7 },
+  'gpr-index': { value: 146.2, status: 'context', change30d: -8.4, percentile10y: 0.68 },
+
+  /* Global — prices heat: the M6 wave — the breakeven/food/wheat/maize/
+   * natgas/wti/platinum + the EIA stocks + the gold-oil ratio + the
+   * euro-area HICP + the 10y breakeven. */
+  'breakeven-10y': { value: 2.34, status: 'context', change7d: 0.0, change30d: -0.01 },
+  t5yie: { value: 2.47, status: 'context', change7d: 0.01, change30d: 0.02 },
+  wti: { value: 70.2, status: 'context', change7d: -2.3, change30d: -7.1, percentile10y: 0.19 },
+  natgas: { value: 2.84, status: 'context', change7d: 0.05, change30d: 0.18, percentile10y: 0.34 },
+  'eia-crude-stocks': { value: 427.0, status: 'context', change30d: -2.1 },
+  platinum: { value: 1010.5, status: 'context', change7d: 0.9, change30d: 3.4, percentile10y: 0.62 },
+  'gold-oil-ratio': { value: 53.2, status: 'context', change30d: 1.8 },
+  'euro-hicp': { value: 2.4, status: 'normal', percentile10y: 0.58, change30d: -0.1 },
+  'food-index': { value: 102.3, status: 'context', change30d: -0.4 },
+  wheat: { value: 568.5, status: 'context', change30d: -1.2 },
+  maize: { value: 423.0, status: 'context', change30d: -0.8 },
 };
 
 /** Default asOf by cadence (ABS/RBA are month/quarter-START dated).

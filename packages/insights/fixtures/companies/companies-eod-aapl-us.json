@@ -1,0 +1,11 @@
+[
+  {"date":"2026-10-13","open":341.5,"high":343.2,"low":339.8,"close":342.05,"adjusted_close":342.05,"volume":12456700},
+  {"date":"2026-10-14","open":342.0,"high":345.6,"low":341.4,"close":345.12,"adjusted_close":345.12,"volume":14230000},
+  {"date":"2026-10-15","open":345.0,"high":347.0,"low":344.0,"close":346.78,"adjusted_close":346.78,"volume":11890000},
+  {"date":"2026-10-16","open":346.5,"high":348.2,"low":345.5,"close":347.7,"adjusted_close":347.7,"volume":10230000},
+  {"date":"2026-10-20","open":347.0,"high":348.5,"low":346.0,"close":348.0,"adjusted_close":348.0,"volume":9980000},
+  {"date":"2026-10-21","open":348.0,"high":349.0,"low":346.8,"close":347.9,"adjusted_close":347.9,"volume":11240000},
+  {"date":"2026-10-22","open":347.5,"high":348.4,"low":346.5,"close":347.725,"adjusted_close":347.725,"volume":10180000},
+  {"date":"2026-10-23","open":347.7,"high":348.8,"low":346.9,"close":347.725,"adjusted_close":347.725,"volume":9450000},
+  {"warning":"Data is limited by one year on the free plan. Upgrade your plan to get historical data for up to 30 years."}
+]

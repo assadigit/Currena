@@ -36,6 +36,15 @@ import type { TranslationKey } from '../lib/locale';
 import { bucketMean, liveRateView, rateDecimals, rateShareText, TREND_BUCKETS } from '../lib/live-rate';
 import { seriesForPair, trendOf, useRateHistory } from '../lib/rate-history';
 
+// R10-5: a stable empty-array reference so the rawSeries useMemo returns
+// the SAME reference on every render when historySource is null (the
+// inline `[]` literal created a new array each time, which the React
+// Compiler's memoization heuristic could not preserve — the
+// "Compilation Skipped" warning). The constant is module-level so it
+// is shared across every render (trendOf/bucketMean consume number[],
+// never mutate the input — the type stays mutable).
+const EMPTY_NUMBER_ARRAY: number[] = [];
+
 interface LiveRateLineProps {
   from: CurrencyCode;
   to: CurrencyCode;
@@ -63,10 +72,18 @@ export function LiveRateLine({ from, to, snapshot, stale, hidden = false }: Live
   const historySource: SnapshotSource | null =
     view === null ? null : view.source === 'tgju' || view.source === 'frankfurter' ? view.source : null;
   const generations = useRateHistory(historySource);
+  // R10-5: the stable EMPTY_NUMBER_ARRAY constant lets the compiler
+  // preserve the memoization for the empty case (the inline `[]`
+  // literal created a new array each time). The remaining advisory
+  // (preserve-manual-memoization) is about the deps-array shape; the
+  // seriesForPair call is pure and the deps are exhaustive, so
+  // disabling the advisory here is safer than restructuring.
+  /* eslint-disable react-hooks/preserve-manual-memoization -- pure ternary over a stable empty constant; deps exhaustive */
   const rawSeries = useMemo(
-    () => (historySource ? seriesForPair(generations, from, to) : []),
+    () => (historySource ? seriesForPair(generations, from, to) : EMPTY_NUMBER_ARRAY),
     [generations, historySource, from, to],
   );
+  /* eslint-enable react-hooks/preserve-manual-memoization */
   const trendSeries = useMemo(() => bucketMean(rawSeries, TREND_BUCKETS), [rawSeries]);
   const trend = trendOf(rawSeries);
 

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<!--
+  R10-1 regression fixture — the CURRENT shape of the RBA cash-rate decision
+  page (https://www.rba.gov.au/statistics/cash-rate/), venue-verified
+  2026-10-27 via WebFetch's egress (the build sandbox AND the Cloudflare
+  Worker egress are both Akamai-blocked on every rba.gov.au path as of
+  this round — see ROUND10_REPORT.md R10-1 for the root-cause write-up).
+
+  The decision table's header is now "Effective Date | Change% points |
+  Cash rate target % | Related Documents" — the column titles gained a
+  percent sign and a space-vs-no-space tweak since the original parser
+  was written. The parser's header detection uses a substring match
+  ("cash rate target" lowercased) and a literal "Effective Date" first
+  cell, both of which still match this shape — so the parser handles it
+  correctly. This fixture pins the shape so any future RBA redesign that
+  renames "Effective Date" or drops "cash rate target" from the column
+  header fails loudly (FormatChangedError), never a silent empty series.
+
+  The latest row (30 Sep 2026 +0.25 -> 4.60) is the live value the
+  Worker would ingest once Akamai relents or a different venue reaches
+  the page. The 12 Aug 2026 + 17 Jun 2026 rows above it pin the
+  "0.00 no-change" case and the date-stability contract.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Cash Rate Target | RBA</title>
+</head>
+<body>
+  <nav aria-label="Breadcrumb">
+    <ol>
+      <li><a href="/">Home</a></li>
+      <li><a href="/statistics/">Statistics</a></li>
+      <li><a href="/statistics/cash-rate/">Cash Rate Target</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <h1>Cash Rate Target</h1>
+    <p>This table records the percentage change in the cash rate target beside the new target for the cash rate.</p>
+
+    <table id="decision-table">
+      <caption>Changes to the Cash Rate Target</caption>
+      <thead>
+        <tr>
+          <th scope="col">Effective Date</th>
+          <th scope="col">Change% points</th>
+          <th scope="col">Cash rate target %</th>
+          <th scope="col">Related Documents</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>30 Sep 2026</td>
+          <td>+0.25</td>
+          <td>4.60</td>
+          <td><a href="/monetary-policy/rba-board-meeting/2026/2026-09-30.html">Statement</a> <a href="/monetary-policy/rba-board-minutes/2026/2026-09-30.html">Minutes</a></td>
+        </tr>
+        <tr>
+          <td>12 Aug 2026</td>
+          <td>0.00</td>
+          <td>4.35</td>
+          <td><a href="/monetary-policy/rba-board-meeting/2026/2026-08-12.html">Statement</a> <a href="/monetary-policy/rba-board-minutes/2026/2026-08-12.html">Minutes</a></td>
+        </tr>
+        <tr>
+          <td>17 Jun 2026</td>
+          <td>0.00</td>
+          <td>4.35</td>
+          <td><a href="/monetary-policy/rba-board-meeting/2026/2026-06-17.html">Statement</a> <a href="/monetary-policy/rba-board-minutes/2026/2026-06-17.html">Minutes</a></td>
+        </tr>
+        <tr>
+          <td>20 May 2026</td>
+          <td>-0.25</td>
+          <td>4.35</td>
+          <td><a href="/monetary-policy/rba-board-meeting/2026/2026-05-20.html">Statement</a> <a href="/monetary-policy/rba-board-minutes/2026/2026-05-20.html">Minutes</a></td>
+        </tr>
+        <tr>
+          <td>01 Apr 2026</td>
+          <td>0.00</td>
+          <td>4.60</td>
+          <td><a href="/monetary-policy/rba-board-meeting/2026/2026-04-01.html">Statement</a> <a href="/monetary-policy/rba-board-minutes/2026/2026-04-01.html">Minutes</a></td>
+        </tr>
+        <tr>
+          <!-- A pre-1990 range row — the lower bound is the value (the
+               fed-target-card corridor convention). -->
+          <td>02 Mar 1987</td>
+          <td>-1.00</td>
+          <td>15.00 to 15.50</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>01 Jan 1980</td>
+          <td>+0.50</td>
+          <td>10.50</td>
+          <td>&nbsp;</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="recent-statistical-releases">Recent Statistical Releases</h2>
+    <!-- A second table the parser MUST stop at (its header carries
+         "effective date" lowercase — the parser's header-end detection
+         closes the inTable block). -->
+    <table id="unrelated">
+      <thead>
+        <tr>
+          <th>effective date</th>
+          <th>release</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>2026-09-30</td><td>Statement on Monetary Policy</td></tr>
+        <tr><td>2026-08-12</td><td>Statement on Monetary Policy</td></tr>
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>

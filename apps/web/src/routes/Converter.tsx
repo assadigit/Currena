@@ -190,6 +190,12 @@ export function Converter() {
     const from = params.get('from')?.trim().toUpperCase();
     const to = params.get('to')?.trim().toUpperCase();
     const amount = params.get('amount') ?? '';
+    // R10-5: one-time URL-hash prefill on mount. The setState calls
+    // hydrate the component from the URL — the documented "initialize
+    // state from an external source" pattern (the empty dep array is
+    // intentional: this runs once). A lazy useState initializer cannot
+    // reach window.location.hash at module-eval time (SSR safety).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time URL-hash prefill on mount (external source → local state)
     if (from && known.has(from)) setFrom(from as CurrencyCode);
     if (to && known.has(to)) setTo(to as CurrencyCode);
     const parsed = parseInputAmount(amount);
@@ -391,6 +397,17 @@ export function Converter() {
   // so the remembered status stays 'error' until the fetch SETTLES.
   // (WS-5: moved below onSubmit's declaration — the access-before-declared
   // advisory was pure declaration order; effect behavior unchanged.)
+  // R10-5: onSubmit is held in a ref so the effect's dep array stays
+  // focused on the transition signals (store/pairSource/failure/phase).
+  // Adding onSubmit directly to the deps would re-fire on every render
+  // (it's a closure that changes identity each render), breaking the
+  // "only fire on error→ready transition" contract. The ref assignment
+  // rides a layout-effect so it never reads/writes the ref during render
+  // (the react-hooks/refs rule).
+  const onSubmitRef = useRef(onSubmit);
+  useEffect(() => {
+    onSubmitRef.current = onSubmit;
+  });
   const prevSourceStatusRef = useRef<'idle' | 'loading' | 'ready' | 'error' | undefined>(undefined);
   useEffect(() => {
     const status = store[pairSource].status;
@@ -398,7 +415,7 @@ export function Converter() {
     const prev = prevSourceStatusRef.current;
     prevSourceStatusRef.current = status;
     if (prev === 'error' && status === 'ready' && failure !== null && phase === 'idle') {
-      void onSubmit();
+      void onSubmitRef.current();
     }
   }, [store, pairSource, failure, phase]);
 

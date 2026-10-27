@@ -70,6 +70,13 @@ export function useAlertEvaluation(): { firedToast: string | null } {
     const first = fired[fired.length - 1];
     if (!first) return;
     const extra = fired.length - 1;
+    // R10-5: setToast here derives the toast text from the fired array
+    // (an external-store snapshot). The toast is a side-effect of the
+    // fired array changing — not a derivation from props/state. The
+    // separate effect below owns the toast's lifetime (clear after
+    // TOAST_MS). Refactoring to useMemo would break the clear-after-
+    // timeout contract.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store sync: fired array → toast text
     setToast(extra > 0 ? `${line(first)}\n${t('alerts.firedMore', { count: extra })}` : line(first));
   }, [fired, t, numberLocale]);
 

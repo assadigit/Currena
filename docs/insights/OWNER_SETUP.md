@@ -139,6 +139,42 @@ pnpm --filter @currena/insights selfcheck             # SELF_AUDIT.md + the date
 - EODHD: your dashboard → API key.
 - Set the new `INSIGHTS_OWNER_TOKEN` (§2) as part of this pass.
 
+**UPDATE (R10, 2026-10-28): a FRESH Cloudflare Workers API token is now in
+service.** The owner issued `cfut_29Aaz…` (redacted here — the full value
+lives only in the session handover) for this round's deploys. The old
+token (the one that leaked into git history in `d3f64bb`, removed from the
+tree in `5b74dde` but still present in history) MUST be revoked by the
+owner at https://dash.cloudflare.com/profile/api-tokens → find the token
+that starts with `cfut_` → **Roll** (or Delete + Create a new one with
+the same permissions: "Edit Cloudflare Workers" scoped to account
+`5f123468027e4b2094167df1d2f2e852`). The new token is passed via
+environment ONLY at deploy time (`CLOUDFLARE_API_TOKEN=… wrangler deploy`)
+— it is NEVER written to any file in the repo, NEVER committed, NEVER
+echoed in logs. The R10 deploy session (STEP 11) used it once; the
+GitHub repo secret `CLOUDFLARE_API_TOKEN` should be updated to the new
+value so the `insights-ingest.yml` GitHub Actions workflow can write to
+KV on its next run:
+
+```sh
+# Update the GitHub repo secret with the new token (one-time, by the owner):
+gh secret set CLOUDFLARE_API_TOKEN --repo assadigit/Currena
+# (paste the new cfut_… value when prompted; it is stored encrypted on GitHub's side)
+```
+
+**The old token remains the standing security item**: even though a fresh
+token is now in service, the old one is NOT automatically revoked. The
+owner must roll/delete it from the Cloudflare dashboard. Until that
+happens, the old token (present in git history) is still valid and must
+be treated as compromised. The R10 staged diff was scanned for any
+credential shapes (`cfut_`, `ghp_`, `6acc3a501a3b65`, the account ID)
+before the commit — the scan was clean (no credentials in the diff).
+
+The same rotation pass applies to the GitHub token (`ghp_…`) and the
+EODHD key (`6acc3a501a3b65.…`) — both crossed session handovers in chat.
+Rotate them at their respective dashboards, then update the Worker
+secrets if values change (`cd apps/markets && npx wrangler secret put
+EODHD_API_TOKEN`).
+
 ## 11. The fa copy review (a human step the repo's own workflow requires)
 
 `pnpm copy:audit` lists the new Persian strings queued `needs-review`

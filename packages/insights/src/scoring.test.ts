@@ -535,6 +535,30 @@ describe('computeReading', () => {
     expect(r2.status).toBe('stale');
   });
 
+  it('R10-2: a weekly series with staleAfterDays:14 absorbs one missed weekly release (STLFSI4, FRED 2026-10-27)', () => {
+    // The live incident this pins: FRED STLFSI4's last observation was
+    // 2026-10-16 (the 2026-10-23 Thursday release never landed). With the
+    // 10-day weekly default the 11-day-old reading would flag stale at
+    // 2026-10-27; the 14-day override — matching NFCI's documented
+    // precedent — keeps it fresh until the second consecutive missed week.
+    const def = makeDef({
+      cadence: 'weekly',
+      rule: { kind: 'threshold', direction: 'above', value: 0, sustainedWeeks: 4 },
+      staleAfterDays: 14,
+    });
+    expect(staleAfterDaysFor(def)).toBe(14);
+    // 11 days old (one missed Thursday) — fresh.
+    const r11 = readingOf(def, [{ date: addDays(NOW_DAY, -11), value: -0.63 }]);
+    expect(r11.status).not.toBe('stale');
+    // 14 days old (still inside the window) — fresh.
+    const r14 = readingOf(def, [{ date: addDays(NOW_DAY, -14), value: -0.63 }]);
+    expect(r14.status).not.toBe('stale');
+    // 15 days old (past the limit) — stale. The second missed Thursday
+    // would put the observation 18 days old, well past 14.
+    const r15 = readingOf(def, [{ date: addDays(NOW_DAY, -15), value: -0.63 }]);
+    expect(r15.status).toBe('stale');
+  });
+
   it('per-change cadence never goes stale (cash rate is a level)', () => {
     const def = makeDef({ cadence: 'per-change', rule: { kind: 'info' } });
     const r = readingOf(def, [{ date: '2019-06-05', value: 1.5 }], NOW);

@@ -824,6 +824,17 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'threshold', direction: 'above', value: 0, sustainedWeeks: 4 },
+    // R10-2 (2026-10-28): the St. Louis Fed occasionally misses a weekly
+    // STLFSI publication (verified live 2026-10-27: FRED's latest obs is
+    // 2026-10-16 — the 2026-10-23 Thursday release never landed; the
+    // 04:10 main rung's FRED bulk fetch succeeded, all 9 sibling daily
+    // series in the same bulk group are fresh). The 10-day weekly default
+    // (RULES.md §6) flagged 11-day-old data stale; NFCI — the Chicago Fed's
+    // weekly twin in the same bulk group — already carries staleAfterDays:14
+    // for exactly this reason. Pin STLFSI to the same 14-day window so one
+    // missed weekly release reads fresh with its honest asOf date, and the
+    // next Thursday's release re-tightens it inside the same week.
+    staleAfterDays: 14,
   },
   {
     // Zero is average; above zero = tighter than average (data spec §4).

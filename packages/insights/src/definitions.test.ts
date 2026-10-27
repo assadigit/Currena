@@ -148,6 +148,12 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expectStale('ecb-dfr', 7);
     expectStale('dollar-basket', 4);
     expectStale('nfci', 14);
+    // R10-2 (2026-10-28): STLFSI4 rides the same 14-day weekly window as
+    // NFCI — the St. Louis Fed occasionally misses a Thursday publication
+    // (verified live 2026-10-27: FRED's latest obs is 2026-10-16; the
+    // 2026-10-23 release never landed). The 10-day weekly default would
+    // false-flag the missed release stale at 11 days; 14 absorbs one miss.
+    expectStale('stress-stlfsi', 14);
     expectStale('au-home-loan', 70);
     expectStale('au-wage-growth', 230);
     expectStale('au-rent-yoy', 95);

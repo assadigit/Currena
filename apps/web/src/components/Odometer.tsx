@@ -25,7 +25,13 @@ export function Odometer({ value, format, durationMs = 800 }: OdometerProps) {
 
   useEffect(() => {
     // Reduced motion: no count-up — the answer simply IS the result.
+    // R10-5: the synchronous setDisplay is the documented way to land
+    // the final value under prefers-reduced-motion (the rAF branch
+    // below never fires). Refactoring to derive-at-render would change
+    // the animation's start point (display would lose its tween-from
+    // memory across value changes).
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reduced-motion lands the value immediately (WCAG 2.3.3)
       setDisplay(value);
       return;
     }

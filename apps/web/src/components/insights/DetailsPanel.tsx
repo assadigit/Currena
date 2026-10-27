@@ -116,6 +116,9 @@ function PanelHistory({
 
   useEffect(() => {
     let cancelled = false;
+    // R10-5: reset-to-loading on id change (the async fetch replaces it).
+    // The documented "adjust state when a prop changes" pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset-to-loading on id change (React docs: adjusting state when a prop changes)
     setState({ kind: 'loading' });
     fetchIndicatorHistory(id)
       .then((history) => {

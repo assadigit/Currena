@@ -544,7 +544,7 @@
       "ownerAccepts": true,
       "enabled": true,
       "method": "M1",
-      "maxAgeDays": 10,
+      "maxAgeDays": 14,
       "ruleVersion": 2,
       "rule": "{\"kind\":\"threshold\",\"direction\":\"above\",\"value\":0,\"sustainedWeeks\":4}"
     },

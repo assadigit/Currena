@@ -3285,6 +3285,50 @@ export const insightsCopyEn = {
     heroIndicatorNormal: 'Stock markets: calm',
   },
 
+  /* ------------------------------------------------------------------ *
+   * R10-3 (2026-10-28) — the global companies table behind a feature
+   * flag. OFF by default; the UI renders the empty-state panel below
+   * the markets tiles. The fa mirror sits in insights-copy-fa.ts;
+   * both blocks carry the same key shape (the copy-audit gate enforces
+   * parity). When the flag flips on (the owner's future paid EODHD
+   * plan — see ROUND10_REPORT.md R10-3), the table renders the live
+   * rows; the column headers below stay verbatim.
+   * ------------------------------------------------------------------ */
+  companies: {
+    /** The editorial header (the 2026-10-28 R10-3 ask): the title sits
+     * below the markets tiles as its own question — "what are the
+     * world's leading companies doing today?". "Companies", never
+     * "stocks" or "shares" (the section's naming discipline). */
+    title: 'World-leading companies',
+    sectionLabel: 'Coming soon',
+    /** The empty-state line (shown while the feature flag is off —
+     * R10-3 ships the table pre-built, the live data feed is the
+     * owner's future EODHD plan upgrade). Names the R9-09 sample so a
+     * visitor can see what the table carries; never a fake loading
+     * spinner. RULES.md §5: no forecast wording — present tense, the
+     * condition names when the live data appears. */
+    emptyState:
+      'This table is being prepared. About 50 world-leading companies (Nvidia, Microsoft, Apple, SAP, ASML, LVMH, Toyota, Sony and more) appear here with their daily prices once the data feed is enabled.',
+    /** The column headers — Latin-script in both locales (the data
+     * itself is Latin: company names are proper nouns, exchange codes
+     * are Latin abbreviations, numbers stay LTR inside the RTL flow).
+     * The fa dictionary carries localized headers; these English
+     * strings are the source of truth. */
+    colCompany: 'Company',
+    colExchange: 'Exchange',
+    colPrice: 'Price',
+    colDailyChange: 'Daily change',
+    colSparkline: 'Last 7 days',
+    /** The attribution line — EODHD is the planned source (R9-09
+     * audit); the line shows the publisher's name honestly, never
+     * "live" or "real time". */
+    attribution: 'Planned data source: EODHD',
+    /** The planned-data note (small print under the table) — explains
+     * WHY the table is empty without implying a missing feature. */
+    plannedNote:
+      'The data feed for this table is not yet connected. The list of companies and the table layout are already in place.',
+  },
+
   fx: {
     /** §10.2 — the section's own wording, spec-verbatim. */
     title: 'World currencies',
