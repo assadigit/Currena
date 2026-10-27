@@ -101,6 +101,19 @@ After the US CPI release, compare the page's headline number with the BLS
 publication (the NSA basis, `CPIAUCNS`). A mismatch means the series or the
 release-date schedule needs attention — record it and re-run the tests.
 
+## The global companies table (R10-3, 2026-10-28 — flag OFF)
+
+The companies table below the markets tiles is pre-built behind a feature
+flag. While the flag is OFF (the shipped default), the UI renders the
+empty-state panel; no live calls fire; no cron rung is wired. The flag
+lives in `apps/web/src/components/insights/config/companies.ts`
+(`COMPANIES_TABLE_ENABLED = false`). When the owner upgrades the EODHD
+plan (the free plan's 20 calls/day quota is the blocker), the flip is a
+one-line change + wiring the `companies` fetch rung on the markets worker
+(the procedure is in the config file's header comment +
+`docs/insights/ROUND10_REPORT.md` R10-3). Until then: nothing to do — the
+empty-state panel is the honest "this feature is not yet enabled" surface.
+
 ## The daily machinery (for reference — nothing to do)
 
 - 04:20 UTC `insights-ingest` (fetch → validate → publish); the Worker's

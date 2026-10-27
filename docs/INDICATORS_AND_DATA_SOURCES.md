@@ -141,7 +141,7 @@ public-display-ok · scored voter? · short description.
 | `shiller-ecy` | shiller | monthly | 45 | L2 | yes | – | Excess CAPE Yield (Shiller) |
 | `silver-usd` | gold-api | daily | 2 | L2 | yes | – | Silver price (ounce) |
 | `sofr` | fred | daily | 4 | L2 | yes | – | The overnight funding rate (SOFR) |
-| `stress-stlfsi` | fred | weekly | 10 | L2 | yes | ✓ | St. Louis Fed Financial Stress Index |
+| `stress-stlfsi` | fred | weekly | 14 | L2 | yes | ✓ | St. Louis Fed Financial Stress Index (R10-2: 10→14, absorbs one missed weekly release — matches NFCI) |
 | `t5yie` | fred | daily | 5 | L2 | yes | – | Expected US inflation, five years ahead |
 | `terms-of-trade` | abs | quarterly | 215 | L0 | yes | ✓ | Australia's terms of trade |
 | `us-2y` | fred | daily | 4 | L0 | yes | – | US 2-year Treasury yield |
@@ -378,7 +378,7 @@ so a future owner can revisit if a source revives.
 | **Silver/Bitcoin ratio** | Fails the classic-indicator criteria (silver-btc was retired 2026-10-23 as the weaker twin of gold-btc). |
 | **Silver/Bitcoin stays unbuilt; Gold/Bitcoin stays context-only** | Per the spec's standing rule: gold-btc is context-only, never voting. |
 
-### Known operational gaps — status after the 2026-10-27 fix round
+### Known operational gaps — status after the 2026-10-28 R10 round
 
 1. **GitHub Actions runner exhaustion** (since 2026-10-20): the
    `insights-ingest.yml` workflow fails at runner allocation (free
@@ -388,20 +388,47 @@ so a future owner can revisit if a source revives.
    (documented inline with a `RUNNER EXHAUSTION` note in the workflow
    header). **Status**: documented; no code fix possible (billing).
    **Owner action**: none required — the Worker venue is the primary.
-2. **The Cloudflare API token in git history** (surfaced 2026-10-26):
-   `context.txt` carried a live Cloudflare Workers API token. Removed
-   from the tree in `5b74dde`; the token remains in git history. The
-   exact rotation steps are now documented in `docs/insights/OWNER_SETUP.md`
-   §10 (6-step procedure: dashboard roll → Worker secret update → GitHub
-   repo secret update → GitHub token rotation). **Status**: documented;
-   **owner action required: rotate the token** at
-   https://dash.cloudflare.com/profile/api-tokens.
-3. **The jgb-10y OECD mirror's retirement clock**: the spec retires the
+2. **The Cloudflare API token in git history** (surfaced 2026-10-26,
+   R10-6 rotated the deploy token 2026-10-28): `context.txt` carried a
+   live Cloudflare Workers API token. Removed from the tree in
+   `5b74dde`; the token remains in git history. R10-6 put a FRESH
+   token (`cfut_29Aaz…`, env-only) in service for deploys; the old
+   token MUST still be revoked by the owner at
+   https://dash.cloudflare.com/profile/api-tokens. The exact rotation
+   steps are in `docs/insights/OWNER_SETUP.md` §10. **Status**: fresh
+   token in service; **owner action required: revoke the old token +
+   update the GitHub repo secret**.
+3. **RBA venue block — all rba.gov.au paths now Akamai-blocked from
+   the Worker** (R10-1, 2026-10-28): the R9 venue-verified baseline
+   (2026-10-21: "the HTML cash-rate page is still served to Cloudflare
+   Workers") is no longer true. As of 2026-10-27, Akamai 403s every
+   rba.gov.au path (CSV tables AND the HTML cash-rate page) from the
+   Worker's egress. The parser itself is verified correct against the
+   current page shape (6 regression tests pin it against a saved
+   fixture, `packages/insights/fixtures/rba-cash-rate-page.html`).
+   The three RBA readings (au-10y, rba-expectations, au-us-10y-gap)
+   stay stale at 2026-09-30 until either (a) Akamai relents, (b) the
+   GHA minutes reset (monthly) so the GHA workflow_dispatch can re-
+   fetch from GitHub Actions' different egress, or (c) the owner sets
+   up a different ingestion venue. **Status**: parser regression-
+   pinned; venue block is operational. **Owner action**: none until
+   the block clears; the readings refresh automatically on the next
+   successful RBA fetch.
+4. **The jgb-10y OECD mirror's retirement clock**: the spec retires the
    FRED OECD jgb-10y mirror after two clean MOF weeks. The MOF upgrade
    went live 2026-10-26; the earliest honest retirement date is
    2026-11-09. The mirror stays as the labelled fallback until then.
    **Status**: time-dependent; no action possible until 2026-11-09.
-4. **~~The 16-failure briefing jsdom baseline~~** — **FIXED (2026-10-27)**.
+5. **~~STLFSI false-positive stale flag~~** — **FIXED (R10-2,
+   2026-10-28)**. Root cause: FRED STLFSI4's 2026-10-23 weekly release
+   was missed upstream (the last obs is 2026-10-16); the 10-day weekly
+   default flagged the 11-day-old reading stale, while NFCI (same
+   date, same FRED bulk group) showed normal because of its
+   `staleAfterDays: 14` override. Fix: added `staleAfterDays: 14` to
+   `stress-stlfsi` (matching NFCI's precedent); +1 behavioral test
+   pins the 14-day window. The live reading flips from stale to
+   normal on the next ingest rung.
+6. **~~The 16-failure briefing jsdom baseline~~** — **FIXED (2026-10-27)**.
    Root cause: the test fixture used a hardcoded `asOf: '2026-10-16'`
    which became stale (>5 days old per `STALE_DAYS = 5`) as real time
    passed. When all markets were stale, the component returned the
@@ -412,11 +439,25 @@ so a future owner can revisit if a source revives.
    are always 1 day old (never stale) and the staleSnapshot's 2026-09-01
    dates are always >5 days old (always stale). **All 696 web tests pass
    (was 680 pass + 16 fail). Full suite: 1955/1955 green.**
-5. **The `insights:hist:cftc-gold-positioning` accumulation**: the COT
+7. **The `insights:hist:cftc-gold-positioning` accumulation**: the COT
    file's first weekly point seeded the history on 2026-10-26; the second
    point joins on the next Saturday (2026-11-07). The single-point floor
    is the designed shape — no action needed. **Status**: time-dependent;
    no action possible until 2026-11-07.
+8. **The global companies table (R10-3, 2026-10-28)**: the owner's R9-09
+   directive (~50 world-leading companies below the markets tiles) is
+   pre-built behind a feature flag (`COMPANIES_TABLE_ENABLED = false` in
+   `apps/web/src/components/insights/config/companies.ts`). The typed
+   ticker config (`packages/insights/src/companies/definitions.ts`), the
+   EODHD adapter stub with zod contract (`adapter.ts`), 19 unit tests
+   against fixtures, and the bilingual empty-state UI
+   (`CompaniesTable.tsx`) are all in place. Zero live calls fire while
+   the flag is off; no cron rung is wired. The flip is a one-line change
+   when the owner upgrades the EODHD plan (the free plan's 20 calls/day
+   quota is the blocker). **Status**: pre-built, flag OFF. **Owner
+   action**: decide whether to upgrade the EODHD plan (~US$19.99/month
+   entry tier), then flip the flag + wire the cron rung (the procedure
+   is in the config file's header comment + `ROUND10_REPORT.md` R10-3).
 
 ### Quarterly review checklist (the spec's standing rule)
 
