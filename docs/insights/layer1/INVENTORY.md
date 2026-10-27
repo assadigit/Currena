@@ -70,13 +70,13 @@ inventory and enforced by gate G1.
 | ✓ | `job-openings` | US job openings (JOLTS) | The number of open US jobs (JOLTS survey). |
 | ✓ | `us-gdp-growth` | US economic growth (real GDP) | US real gross-domestic-product growth. |
 | ✓ | `us-nfp` | US jobs added each month | US nonfarm payrolls (monthly change in employment). |
-| · | `usdcny` | USD/CNY | The US dollar in Chinese yuan. |
-| · | `michigan-1y-expectations` | US expected inflation next year (Michigan) | The Michigan survey's 1-year-ahead US inflation expectation. |
-| · | `cfnai` | US economic activity scorecard (Chicago Fed) | The Chicago Fed National Activity Index. |
-| · | `oecd-cli-cn` | OECD leading indicator (China) | The OECD composite leading indicator for China. |
-| · | `oecd-cli-de` | OECD leading indicator (Germany) | The OECD composite leading indicator for Germany. |
-| · | `epu-us` | US policy uncertainty (EPU) | The US Economic Policy Uncertainty index. |
-| · | `copper-usd` | Copper price | The copper spot price (USD). |
+| ✓ | `usdcny` | USD/CNY | The US dollar in Chinese yuan. |
+| ✓ | `michigan-1y-expectations` | US expected inflation next year (Michigan) | The Michigan survey's 1-year-ahead US inflation expectation. |
+| ✓ | `cfnai` | US economic activity scorecard (Chicago Fed) | The Chicago Fed National Activity Index. |
+| ✓ | `oecd-cli-cn` | OECD leading indicator (China) | The OECD composite leading indicator for China. |
+| ✓ | `oecd-cli-de` | OECD leading indicator (Germany) | The OECD composite leading indicator for Germany. |
+| ✓ | `epu-us` | US policy uncertainty (EPU) | The US Economic Policy Uncertainty index. |
+| ✓ | `copper-usd` | Copper price | The copper spot price (USD). |
 
 #### `market-stress` gauge (10)
 | L1 | id | official name | what it measures |

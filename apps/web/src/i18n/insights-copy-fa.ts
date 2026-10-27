@@ -4690,6 +4690,84 @@ export const insightsCopyFa: InsightsCopy = {
         ],
         glossaryTerms: ['interest-rate', 'recession'],
       },
+
+      /* ----- دستهٔ ۶ — سلامت رشد C (۷) ----- */
+      usdcny: {
+        plainName: 'دلار در برابر یوان چین',
+        oneLine: 'هر دلار آمریکا چند یوان چین می‌خرد.',
+        ifRising: 'کالاهای چینی معمولاً بیرون از چین ارزان‌تر می‌شوند و سیاست تجاری تندتر می‌شود.',
+        ifFalling: 'نرم شدن دلار در برابر یوان معمولاً تنش تجاری را آرام می‌کند.',
+        connections: [
+          { with: 'china-pmi', text: 'یوان ضعیف‌تر اغلب وقتی دیده می‌شود که کارخانه‌های چین کند شده‌اند.', strength: 'sometimes' },
+        ],
+        australiaAngle: 'یوان ضعیف‌تر اغلب از مسیر تجارت با چین بر دلار استرالیا فشار می‌آورد.',
+        glossaryTerms: [],
+      },
+      'michigan-1y-expectations': {
+        plainName: 'نگرانی قیمت سال آینده',
+        oneLine: 'خانوارهای آمریکایی از قیمت‌ها در سال پیش رو چه انتظاری دارند.',
+        ifRising: 'خانوارها برای تورم بالاتر آماده می‌شوند و این می‌تواند مطالبات دستمزد را تغذیه کند.',
+        ifFalling: 'آمریکایی‌ها معمولاً از قیمت‌های پیش رو آسوده‌تر می‌شوند.',
+        connections: [
+          { with: 'michigan-sentiment', text: 'این عدد درون نظرسنجی حال و هوا جا دارد.', strength: 'reliable' },
+          { with: 'us-cpi-yoy', text: 'نگرانی اغلب از قیمت‌هایی می‌آید که از پیش اتفاق افتاده‌اند.', strength: 'usually' },
+        ],
+        glossaryTerms: ['inflation'],
+      },
+      cfnai: {
+        plainName: 'فعالیت آمریکا در یک عدد',
+        oneLine: 'امتیازی که خوانش‌های زیادی از اقتصاد آمریکا را در هم می‌آمیزد.',
+        ifRising: 'اقتصاد آمریکا معمولاً بالاتر از آهنگ معمول خود کار می‌کند.',
+        ifFalling: 'قرائت‌های زیر حد نرمال در گذشته حوالی افت‌ها جمع شده‌اند.',
+        connections: [
+          { with: 'us-gdp-growth', text: 'هر دو یک اقتصاد را می‌سنجند؛ این یکی ماهانه به‌روز می‌شود.', strength: 'reliable' },
+          { with: 'recession-probability', text: 'دوره‌های کم‌ارزش اینجا معمولاً با مدل رکود هم‌خط‌اند.', strength: 'usually' },
+        ],
+        glossaryTerms: ['recession'],
+      },
+      'oecd-cli-cn': {
+        plainName: 'سیگنال زودهنگام چین',
+        oneLine: 'معیاری که معمولاً پیش از کل اقتصاد چین تغییر جهت می‌دهد.',
+        ifRising: 'جهت چین معمولاً چند ماه بعد بهتر می‌شود.',
+        ifFalling: 'معمولاً کند شدن چین چند ماه پیش روست.',
+        connections: [
+          { with: 'china-pmi', text: 'نبض ماهانهٔ کارخانه‌ها آنچه این نشانگر جلوتر می‌بیند را تأیید می‌کند.', strength: 'usually' },
+          { with: 'oecd-cli-us', text: 'نشانگرهای آمریکا و چین با هم تصویر صنعت جهان را می‌سازند.', strength: 'usually' },
+        ],
+        glossaryTerms: ['leading-indicator'],
+      },
+      'oecd-cli-de': {
+        plainName: 'سیگنال زودهنگام آلمان',
+        oneLine: 'معیاری که معمولاً پیش از کل اقتصاد آلمان تغییر جهت می‌دهد.',
+        ifRising: 'بزرگ‌ترین اقتصاد اروپا معمولاً چند ماه بعد بهتر می‌شود.',
+        ifFalling: 'معمولاً کند شدن اروپا چند ماه پیش روست.',
+        connections: [
+          { with: 'oecd-cli-us', text: 'اعضای یک خانواده از شاخص‌های پیشرو.', strength: 'reliable' },
+          { with: 'bund-10y', text: 'هزینهٔ استقراض آلمان اغلب تصویر رشدی را که این جلوتر می‌بیند بازتاب می‌دهد.', strength: 'usually' },
+        ],
+        glossaryTerms: ['leading-indicator'],
+      },
+      'epu-us': {
+        plainName: 'عدم قطعیت سیاست آمریکا',
+        oneLine: 'خبرهای سیاست اقتصادی آمریکا الان چقدر نامطمئن‌اند.',
+        ifRising: 'کسب‌وکارها معمولاً تصمیم‌های سرمایه‌گذاری و استخدام را به تعویق می‌اندازند.',
+        ifFalling: 'پس‌زمینهٔ آرام‌تر سیاستی معمولاً راه برنامه‌ها را باز می‌کند.',
+        connections: [
+          { with: 'michigan-sentiment', text: 'جفت خلق‌وخو: نویز سیاست در کنار حال و هوای خانوار.', strength: 'usually' },
+        ],
+        glossaryTerms: [],
+      },
+      'copper-usd': {
+        plainName: 'قیمت جهانی مس',
+        oneLine: 'قیمت جهانی فلزی که خانه‌ها و شبکه‌های برق را سیم‌کشی می‌کند.',
+        ifRising: 'هزینهٔ سیم‌کشی، لوازم خانگی و ساختمان معمولاً بالا می‌رود.',
+        ifFalling: 'برای سازندگان، تولیدکنندگان و بودجهٔ بازسازی معمولاً خبر خوبی است.',
+        connections: [
+          { with: 'china-pmi', text: 'مس اغلب با قدرت کارخانه‌های چین حرکت می‌کند.', strength: 'usually' },
+          { with: 'copper-gold', text: 'مس ضلع رشد آن معیار فلزی است.', strength: 'reliable' },
+        ],
+        glossaryTerms: ['commodity'],
+      },
     },
   },
 };

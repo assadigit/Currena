@@ -689,6 +689,84 @@ const LAYER1 = {
       ],
       glossaryTerms: ['interest-rate', 'recession'],
     },
+
+    /* ----- Batch 6 — growth-health C (7) ----- */
+    usdcny: {
+      plainName: 'Dollar versus Chinese yuan',
+      oneLine: 'How many Chinese yuan one US dollar buys.',
+      ifRising: 'Chinese goods usually get cheaper abroad, and trade politics usually sharpen.',
+      ifFalling: 'A softer dollar-yuan mix usually calms trade politics.',
+      connections: [
+        { with: 'china-pmi', text: 'A weaker yuan often appears when Chinese factories slow.', strength: 'sometimes' },
+      ],
+      australiaAngle: 'A weaker yuan often drags on the Australian dollar through the China trade channel.',
+      glossaryTerms: [],
+    },
+    'michigan-1y-expectations': {
+      plainName: 'US price worry, next year',
+      oneLine: 'What American households expect prices to do this coming year.',
+      ifRising: 'Households brace for higher inflation, which can feed wage demands.',
+      ifFalling: 'Americans usually feel calmer about prices ahead.',
+      connections: [
+        { with: 'michigan-sentiment', text: 'This number rides inside the mood survey.', strength: 'reliable' },
+        { with: 'us-cpi-yoy', text: 'Worry tends to track what prices already did.', strength: 'usually' },
+      ],
+      glossaryTerms: ['inflation'],
+    },
+    cfnai: {
+      plainName: 'US activity in one number',
+      oneLine: 'One score blending many US economic readings.',
+      ifRising: 'The US economy is usually running above its normal pace.',
+      ifFalling: 'Below-normal readings have historically clustered around downturns.',
+      connections: [
+        { with: 'us-gdp-growth', text: 'Both measure the same economy; this one updates monthly.', strength: 'reliable' },
+        { with: 'recession-probability', text: 'Low stretches here usually line up with the recession model.', strength: 'usually' },
+      ],
+      glossaryTerms: ['recession'],
+    },
+    'oecd-cli-cn': {
+      plainName: 'China’s early-turn gauge',
+      oneLine: 'A gauge that usually turns before China’s whole economy does.',
+      ifRising: 'China’s direction is usually improving several months out.',
+      ifFalling: 'A Chinese slowdown usually sits several months ahead.',
+      connections: [
+        { with: 'china-pmi', text: 'The monthly factory pulse confirms what this leads.', strength: 'usually' },
+        { with: 'oecd-cli-us', text: 'The US and China gauges frame world industry together.', strength: 'usually' },
+      ],
+      glossaryTerms: ['leading-indicator'],
+    },
+    'oecd-cli-de': {
+      plainName: 'Germany’s early-turn gauge',
+      oneLine: 'A gauge that usually turns before Germany’s whole economy does.',
+      ifRising: 'Europe’s largest economy is usually improving several months out.',
+      ifFalling: 'A European slowdown usually sits several months ahead.',
+      connections: [
+        { with: 'oecd-cli-us', text: 'Siblings in the same leading-indicator family.', strength: 'reliable' },
+        { with: 'bund-10y', text: 'German borrowing costs often echo the growth picture this leads.', strength: 'usually' },
+      ],
+      glossaryTerms: ['leading-indicator'],
+    },
+    'epu-us': {
+      plainName: 'US policy-noise gauge',
+      oneLine: 'How uncertain US policy news is right now.',
+      ifRising: 'Businesses usually delay investment and hiring decisions.',
+      ifFalling: 'A quieter policy backdrop usually lets plans proceed.',
+      connections: [
+        { with: 'michigan-sentiment', text: 'The mood pair: policy noise beside household mood.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'copper-usd': {
+      plainName: 'The world copper price',
+      oneLine: 'The world price of the metal that wires homes and grids.',
+      ifRising: 'Wiring, appliances and building costs tend to climb.',
+      ifFalling: 'A friend to builders, manufacturers and renovation budgets.',
+      connections: [
+        { with: 'china-pmi', text: 'Copper often moves with Chinese factory strength.', strength: 'usually' },
+        { with: 'copper-gold', text: 'Copper is the growth leg of that metal measure.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['commodity'],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 

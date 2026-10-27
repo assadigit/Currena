@@ -258,8 +258,53 @@ _Indicators: recession-probability, oecd-cli-us, m2-us, retail-sales, housing-pe
 
 ---
 
-## Batch 6 — (pending)
+## Batch 6 — growth-health C (7 indicators)
 
 _Indicators: usdcny, michigan-1y-expectations, cfnai, oecd-cli-cn, oecd-cli-de, epu-us, copper-usd_
+_(growth-health is now complete at 23/23)_
 
-— pending — fill in when batch 6 copy is written.
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `usdcny` | ifRising | A firmer dollar-yuan makes Chinese goods cheaper abroad; trade politics sharpen. | — | widely-taught: the managed rate's trade channel | widely-taught |
+| `usdcny` | ifFalling | A softer dollar-yuan calms trade politics. | — | widely-taught (inverse) | widely-taught |
+| `michigan-1y-expectations` | ifRising | Households bracing for inflation can feed wage demands. | — | widely-taught: expectations → wage-price dynamics (the Fed's stated concern) | widely-taught |
+| `michigan-1y-expectations` | ifFalling | Calmer price expectations. | — | widely-taught (inverse) | widely-taught |
+| `cfnai` | ifRising | Above-normal US activity. | — | widely-taught (index construction: zero = trend) | widely-taught |
+| `cfnai` | ifFalling | Below-normal readings cluster around downturns. | — | widely-taught (approved copy) | widely-taught |
+| `oecd-cli-cn` | ifRising | China's direction improves several months out. | — | widely-taught: CLI lead (OECD) | widely-taught |
+| `oecd-cli-cn` | ifFalling | A Chinese slowdown sits months ahead. | — | widely-taught (inverse) | widely-taught |
+| `oecd-cli-de` | ifRising | Europe's largest economy improving months out. | — | widely-taught: CLI lead | widely-taught |
+| `oecd-cli-de` | ifFalling | A European slowdown sits months ahead. | — | widely-taught (inverse) | widely-taught |
+| `epu-us` | ifRising | Businesses delay investment and hiring under policy uncertainty. | — | widely-taught: Baker-Bloom-Davis's own finding | widely-taught |
+| `epu-us` | ifFalling | Quieter policy backdrop lets plans proceed. | — | widely-taught (inverse) | widely-taught |
+| `copper-usd` | ifRising | Dearer copper lifts wiring, appliance and building costs. | — | widely-taught (approved copy) | widely-taught |
+| `copper-usd` | ifFalling | Cheaper copper helps builders, manufacturers, renovations. | — | widely-taught (inverse) | widely-taught |
+
+### Connections (batch 6)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `usdcny` | `china-pmi` | A weaker yuan often appears when Chinese factories slow. | sometimes | less-certain: managed rate; policy often drives it independently | less-certain |
+| `michigan-1y-expectations` | `michigan-sentiment` | The number rides inside the mood survey. | reliable | definitional | widely-taught |
+| `michigan-1y-expectations` | `us-cpi-yoy` | Worry tends to track what prices already did. | usually | widely-taught: backward-looking household expectations | widely-taught |
+| `cfnai` | `us-gdp-growth` | Same economy; this one updates monthly. | reliable | definitional (CFNAI is a monthly activity blend) | widely-taught |
+| `cfnai` | `recession-probability` | Low stretches line up with the recession model. | usually | widely-taught: both are activity-based nowcasters | widely-taught |
+| `oecd-cli-cn` | `china-pmi` | The factory pulse confirms what the CLI leads. | usually | widely-taught: lead-lag between the two | widely-taught |
+| `oecd-cli-cn` | `oecd-cli-us` | The US and China gauges frame world industry. | usually | widely-taught: the two largest economies | widely-taught |
+| `oecd-cli-de` | `oecd-cli-us` | Siblings in the same leading-indicator family. | reliable | definitional (same OECD framework) | widely-taught |
+| `oecd-cli-de` | `bund-10y` | German borrowing costs echo the growth picture. | usually | widely-taught: growth → yields | widely-taught |
+| `epu-us` | `michigan-sentiment` | The mood pair: policy noise beside household mood. | usually | widely-taught (approved forYou pairing) | widely-taught |
+| `copper-usd` | `china-pmi` | Copper often moves with Chinese factory strength. | usually | widely-taught: China is the biggest copper consumer | widely-taught |
+| `copper-usd` | `copper-gold` | Copper is the growth leg of the metal measure. | reliable | definitional | widely-taught |
+
+### Australia angle (batch 6)
+| id | claim | basis | status |
+|---|---|---|---|
+| `usdcny` | A weaker yuan often drags on the AUD through the China trade channel. | australia-specific: AUD/CNY competitive channel | needs-expert-check |
+
+---
+
+## Batch 7 — (pending)
+
+_Indicators: stress-stlfsi, nfci, vix, gold-silver, cftc-gold-positioning, walcl_
+
+— pending — fill in when batch 7 copy is written.
