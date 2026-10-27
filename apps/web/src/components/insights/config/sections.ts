@@ -25,6 +25,75 @@ export const GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGro
   australia: ['au-inflation-rates', 'au-households', 'au-trade-currency'],
 };
 
+/**
+ * R9-04 (2026-10-27 owner round — "merge 'Is the dollar strong?' into the
+ * currencies section"): the LANE presentation order. The dollar-strength
+ * question group no longer renders its own lane — its six cards join the
+ * world currencies section (WorldCurrencies) as additional cards under a
+ * sub-heading. GROUP_ORDER above stays the FULL gauge order (the R18
+ * counting invariant + the hero's gauge names ride it); only the lane's
+ * render follows LANE_GROUP_ORDER. The dollar-strength GAUGE itself is
+ * untouched (packages/insights/src/gauges.ts): the hero count and every
+ * step computation are unchanged.
+ */
+export const LANE_GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGroupId[]>> = {
+  global: ['borrowing-costs', 'prices-heat', 'market-stress', 'growth-health'],
+  australia: ['au-inflation-rates', 'au-households', 'au-trade-currency'],
+};
+
+/**
+ * R9-04: the dollar-strength ids that render inside the world currencies
+ * section (3 voters + 3 context rows, definition order = snapshot order).
+ */
+export const DOLLAR_STRENGTH_IDS: readonly IndicatorId[] = [
+  'dollar-basket',
+  'usdjpy',
+  'us-japan-10y-gap',
+  'eur-usd',
+  'usdtry',
+  'usdcny',
+];
+
+/**
+ * R9-07 (2026-10-27 owner round — "special container for US-based
+ * indicators that affect global markets"): the nine US-based (plus the
+ * euro-area mirror) indicators pulled out of their lanes into ONE
+ * dedicated container inside the Global section, with an analytical brief
+ * generated from the live values. Their GAUGE memberships are untouched —
+ * the borrowing-costs / prices-heat / market-stress steps still count
+ * them; only the lane render moves.
+ */
+export const US_GLOBAL_REACH_IDS: readonly IndicatorId[] = [
+  'real-yield-10y',
+  'us10y',
+  'us30y',
+  'euro-hicp',
+  'us-cpi-yoy',
+  'us-pce-core-yoy',
+  'walcl',
+  'stress-stlfsi',
+  'nfci',
+];
+
+/**
+ * R9-04 + R9-07: ids rendered in a special container instead of their
+ * lane group — the QuestionGroup filter skips them so no card renders
+ * twice. (Companion-ONLY ids are separate — they always ride a parent.)
+ */
+export const HIDDEN_FROM_LANE_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
+  ...DOLLAR_STRENGTH_IDS,
+  ...US_GLOBAL_REACH_IDS,
+]);
+
+/**
+ * R9-05 (2026-10-27 owner round — "consolidate ALL Australian indicators
+ * into one container"): the Australia section's three lane groups render
+ * as SUB-headed card groups inside the one Australia mother container
+ * (the section heading + the hero's Australia verdict stay as-is). The
+ * Global groups keep their full question headings.
+ */
+export const SUBHEADING_SECTIONS: ReadonlySet<InsightsSection> = new Set<InsightsSection>(['australia']);
+
 /** The prices strip (round-2 R10): FOUR tiles. Order (financial-asset-cards
  * spec pack 02 §10): Gold → Silver → Oil → Bitcoin — the spec's default;
  * no user-configurable ordering exists in the app (verified 2026-10-17:

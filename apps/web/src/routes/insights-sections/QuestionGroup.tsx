@@ -16,6 +16,7 @@ import { AlertCard } from '../../components/insights/AlertCard';
 import { CompactRow } from '../../components/insights/CompactRow';
 import {
   COMPANION_ONLY_IDS,
+  HIDDEN_FROM_LANE_IDS,
   attentionToneClass,
   companionParentOf,
   dailyPeersOf,
@@ -47,6 +48,15 @@ function gaugesForSectionCached(
  * items hides behind "See all {n} indicators" (needs-attention is never
  * hidden). Deep links, tile clicks and Tools search reveal hidden items
  * (revealIds / searchActive).
+ *
+ * R9-04: readings whose id sits in HIDDEN_FROM_LANE_IDS never render here —
+ * they live in a special container (the currencies section's dollar block,
+ * the Global section's US-global-reach group).
+ *
+ * R9-05: `subheading` renders the group as a SUB-headed card group (the
+ * Australia consolidation) — the question becomes a compact bold label and
+ * the meta line keeps the gauge reading + count, so the gauge stays visible
+ * while the three groups read as ONE section's card groups.
  */
 export function QuestionGroup({
   group,
@@ -59,6 +69,7 @@ export function QuestionGroup({
   renderableIds,
   revealIds,
   searchActive,
+  subheading = false,
 }: {
   group: IndicatorGroupId;
   section: InsightsSection;
@@ -72,6 +83,9 @@ export function QuestionGroup({
   revealIds: ReadonlySet<IndicatorId>;
   /** R7: while the Tools search is active, nothing collapses. */
   searchActive: boolean;
+  /** R9-05: render as a compact sub-headed card group (the Australia
+   * consolidation) instead of a full question heading. */
+  subheading?: boolean;
 }) {
   const [showAll, setShowAll] = useState(false);
   // v3 §4 Delayed (2026-10-20): the snapshot's daily peers, computed once
@@ -87,6 +101,10 @@ export function QuestionGroup({
         // Step-1 A3: companion-only readings (core CPI) render INSIDE their
         // parent card, never as their own row.
         !COMPANION_ONLY_IDS.has(r.id) &&
+        // R9-04/R9-07: ids owned by a special container (the currencies
+        // section's dollar block, the US-global-reach group) never render
+        // in the lane — one reading, one surface.
+        !HIDDEN_FROM_LANE_IDS.has(r.id) &&
         (renderableIds === null || renderableIds.has(r.id)),
     );
   }, [snapshot, section, group, renderableIds]);
@@ -179,7 +197,17 @@ export function QuestionGroup({
   return (
     <section id={`insights-group-${group}`} aria-labelledby={`insights-group-${group}-title`} className="scroll-mt-24">
       <header className="mb-2.5">
-        <h3 id={`insights-group-${group}-title`} className="type-question m-0 text-[var(--color-text-primary)]">
+        {/* R9-05: a sub-headed group (the Australia consolidation) keeps the
+         * same question text + gauge reading, but wears the compact label
+         * scale so the three groups read as card groups of ONE section. */}
+        <h3
+          id={`insights-group-${group}-title`}
+          className={
+            subheading
+              ? 'm-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]'
+              : 'type-question m-0 text-[var(--color-text-primary)]'
+          }
+        >
           {question}
         </h3>
         <p className="m-0 mt-0.5 flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">

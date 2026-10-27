@@ -2843,12 +2843,8 @@ export const insightsCopyEn = {
     // Step 3 L2-02: the price row's 200-day average line.
     ma200Above: '{pct} above its 200-day average',
     ma200Below: '{pct} below its 200-day average',
-    // Step 3 L2-03: the US shares in Australian dollars box.
-    usAudTitle: 'US shares in Australian dollars',
-    usAudLevel: '{name}: {usd} · {aud} in AUD',
-    usAudSameDate: 'both prices from the same date',
-    usAudDatesDiffer: 'dates differ — the AUD view needs the same date',
-    usAudChange: '1 month: {usd} in USD · {aud} in AUD · exchange-rate effect {fx}',
+    // R9-01 (2026-10-27): the Step 3 L2-03 US-shares-in-AUD box was retired
+    // at the owner's request — its usAud* copy entries went with it.
     // Step 3 §2.2 AC-03: the private gate's neutral state + sign-in form.
     privateTitle: 'Private page',
     privateBody:
@@ -3841,6 +3837,43 @@ export const insightsCopyEn = {
     alarmed: 'Critical',
   },
 
+  /**
+   * R9-07 (2026-10-27 owner round — "special container for US-based
+   * indicators that affect global markets"): the dedicated container's
+   * heading, its static analytical frame, and the three-sentence brief's
+   * FIXED template table. The WORDS are chosen and the VALUES
+   * interpolated from the live readings at render time
+   * (config/us-global-reach.ts) — the same discipline as the
+   * consequence-line machinery, so the brief can never contradict the
+   * cards it sits beside.
+   */
+  usGlobalReach: {
+    heading: 'US indicators with global reach',
+    intro:
+      'These United States numbers move the world: they steer borrowing costs, currencies and risk appetite far beyond the US border.',
+    /** The borrowing-costs sentence (bands: high / mid / low — the most
+     * binding of the three yields' 10-year percentiles, any
+     * needs-attention status counting as high). */
+    briefCostsHigh:
+      'US borrowing costs sit high in their ten-year range (10-year at {us10y}, 30-year at {us30y}, real yield at {real}), which tends to tighten financial conditions worldwide, pressure emerging-market currencies and weigh on risk assets.',
+    briefCostsMid:
+      'US borrowing costs sit mid-range for the decade (10-year at {us10y}, 30-year at {us30y}, real yield at {real}), a broadly neutral setting for global credit and asset prices.',
+    briefCostsLow:
+      'US borrowing costs sit low in their ten-year range (10-year at {us10y}, 30-year at {us30y}, real yield at {real}), which tends to ease financial conditions worldwide and support risk assets.',
+    /** The inflation sentence (any needs-attention inflation reading =
+     * above; otherwise near). */
+    briefInflationAbove:
+      "Inflation is still above the central banks' goals (US CPI at {cpi}, core PCE at {pce}, euro-area HICP at {hicp}), keeping the Fed and the ECB restrictive for longer and holding global rates up.",
+    briefInflationNear:
+      "Inflation is close to the central banks' goals (US CPI at {cpi}, core PCE at {pce}, euro-area HICP at {hicp}), leaving room for the Fed and the ECB to ease and for global rates to fall.",
+    /** The stress/liquidity sentence (any needs-attention stress reading
+     * = strained; otherwise calm). */
+    briefStressStrained:
+      'US money markets show strain (STLFSI at {stlfsi}, NFCI at {nfci}, Fed balance sheet {walcl}), a combination that usually tightens credit worldwide and softens world exchanges.',
+    briefStressCalm:
+      'US money markets are calm (STLFSI at {stlfsi}, NFCI at {nfci}, Fed balance sheet {walcl}), supporting credit and risk appetite worldwide.',
+  },
+
   units: {
     none: '',
     percent: '%',
@@ -4206,13 +4239,11 @@ export const insightsCopyEn = {
       countNeutral: '{n} neutral',
       countUnread: "{n} couldn't be read",
       aria: 'Balance for gold: {summary}. {verdict}.',
-      // 2026-10-26 (owner Iteration-4 directive): the pans' own minimal
-      // empty markers — panEmpty when the evaluation ran but this side
-      // has no qualifying factors, panUnreadable when nothing could be
-      // read at all (the full evidence-based lines still render in the
-      // list area below). Round-51.
-      panEmpty: 'No qualifying signals',
-      panUnreadable: 'Nothing to weigh yet',
+      // R9-08 (2026-10-27 owner round): the v6 panEmpty/panUnreadable
+      // minimal markers are RETIRED — an empty pan now carries its FULL
+      // evidence-based sentence inside the balance box itself
+      // (listEmptyFor/listEmptyAgainst/listEmptyNone below). Round-51's
+      // keys went with them.
       // 2026-10-26 (owner Iteration-5 addendum): the needle gauge's
       // text equivalent — the whole mechanical drawing is one
       // role="img" whose label states the beam tilt and the verdict

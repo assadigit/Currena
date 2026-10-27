@@ -41,13 +41,20 @@
  * no cycles) and module-private helpers (DisplayConfig, PREFIXED_UNITS,
  * FED_CORRIDOR_HALF, fmt, ruleAtomText, WORD_TONE_CLASS, spacedNorm,
  * RANGE_DAYS, TOGETHER_STATE_ORDER, UP_IS_RELIEF_AREAS) stay private to
- * their domain. The re-export list below is EXACTLY the former config.ts
- * export list — nothing new joins the public surface.
+ * their domain. The re-export list below is the former config.ts export
+ * list plus the R9 round's lane-presentation surface
+ * (LANE_GROUP_ORDER, DOLLAR_STRENGTH_IDS, US_GLOBAL_REACH_IDS,
+ * HIDDEN_FROM_LANE_IDS, SUBHEADING_SECTIONS).
  */
 
 export {
   SECTION_ORDER,
   GROUP_ORDER,
+  LANE_GROUP_ORDER,
+  DOLLAR_STRENGTH_IDS,
+  US_GLOBAL_REACH_IDS,
+  HIDDEN_FROM_LANE_IDS,
+  SUBHEADING_SECTIONS,
   PRICE_ROWS,
   BTC_RATIO_IDS,
   COMPANION_ONLY_IDS,

@@ -58,6 +58,7 @@ import { Signals } from '../components/insights/Signals';
 import { Together } from '../components/insights/Together';
 import { WorldMarkets } from '../components/insights/WorldMarkets';
 import { WorldCurrencies } from '../components/insights/WorldCurrencies';
+import { DollarStrengthCards } from '../components/insights/world-currencies/DollarStrength';
 import { useInsightsCopy } from '../components/insights/useInsightsCopy';
 import {
   PINNED_STORAGE_KEY,
@@ -76,7 +77,6 @@ import {
   type LoadState,
 } from './insights-sections/InsightsStatusBlocks';
 import { SectionLane } from './insights-sections/SectionLane';
-import { UsSharesAudBox } from './insights-sections/UsSharesNotes';
 import {
   useWorldCurrenciesSection,
   useWorldMarketsSection,
@@ -460,16 +460,13 @@ export function Insights() {
             <WorldMarkets state={marketsState} copy={copy} locale={locale} numberLocale={numberLocale} />
           )}
 
-          {/* Step 3 L2-03 (runbook Phase 4): the US shares in AUD view
-           * (same-date arithmetic, refused when the feeds mismatch). It
-           * needs BOTH world feeds, so it rides the stricter gate — in
-           * public mode the fx board stays hidden and this view stays
-           * hidden with it. (The §7.1 "Know before you buy US shares"
-           * notes box was removed at the owner's direct request,
-           * 2026-10-20.) */}
-          {marketsFeedEnabled && fxFeedEnabled && (
-            <UsSharesAudBox marketsState={marketsState} fxState={fxState} copy={copy} numberLocale={numberLocale} />
-          )}
+          {/* R9-01 (2026-10-27 owner round): the US shares in AUD box is
+           * RETIRED entirely — the owner asked for the «US shares to
+           * Australian dollars» section to be removed from the page. It
+           * answered a question the prices board and the world sections now
+           * carry between them; no data or copy survives it (the usAud*
+           * dictionary entries and their manifest fingerprints went with
+           * it). The §7.1 notes box was already gone (owner, 2026-10-20). */}
 
           {/* World currencies (insights-world-currencies-spec.md §9.2):
            * right after the world stock markets — the two sections explain
@@ -478,9 +475,27 @@ export function Insights() {
            * read as one contradiction. Self-contained feed: its own
            * loading/empty states, never an error surface for the page.
            * PUBLIC MODE: licence-hidden entirely (no render, no fetch) —
-           * the fx board carries no owner directive. */}
+           * the fx board carries no owner directive.
+           *
+           * R9-04 (2026-10-27 owner round — "merge 'Is the dollar strong?'
+           * into the currencies section"): the dollar-strength question
+           * group's six cards render INSIDE this container (composed from
+           * the insights snapshot, not the fx feed, so they ride every
+           * section state); the standalone lane group is retired
+           * (LANE_GROUP_ORDER). The gauge computation is untouched. */}
           {fxFeedEnabled && (
-            <WorldCurrencies state={fxState} copy={copy} locale={locale} numberLocale={numberLocale} />
+            <WorldCurrencies state={fxState} copy={copy} locale={locale} numberLocale={numberLocale}
+              dollarStrength={
+                <DollarStrengthCards
+                  snapshot={state.snapshot}
+                  copy={copy}
+                  numberLocale={numberLocale}
+                  onOpenDetails={openDetails}
+                  pinned={pinned}
+                  renderableIds={sectionIds}
+                />
+              }
+            />
           )}
 
           {/* R11: "What it means for my money" — at most 4 lines. */}

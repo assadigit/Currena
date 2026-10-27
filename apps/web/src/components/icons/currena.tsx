@@ -28,6 +28,7 @@
 
 import type { CSSProperties } from 'react';
 import type { InsightsSection, MarketId } from '@currena/core';
+import { marketDefinition } from '@currena/insights/markets/definitions';
 
 const BASE = '/assets/icons';
 
@@ -126,27 +127,32 @@ export const MARKETS_SECTION_ICON_URL = urlOf('stock-exchange-index');
 
 const MARKET_LOGO_BASE = '/assets/markets';
 
-/* 2026-10-27 owner round — the per-market logo OVERRIDES: the owner pinned
- * the identity artwork per index ("for taeix taiwan use their logo … for
- * stokxx 50 use euro flag … for tsx use canada flag … for hangseng use
- * their logo"). TAIEX and Hang Seng keep their own wordmark JPEGs (the
- * /assets/markets/{taiex,hsi}.jpg files — the owner's pasted tags); the
- * Euro Stoxx 50 (an index with no single country — its map row says
- * "Eurozone") and the S&P/TSX (whose wordmark reads as a plain logotype)
- * wear their REGION's flag from the /images/flags/ set instead — the same
- * 300×200 flag artwork the currencies surfaces already use, rendered in
- * the MarketLogo frame's quiet white chip with object-fit: contain (a
- * landscape flag letterboxes honestly; the identity text beside it stays
- * canonical, ASSET-MAP rule 2). */
-const MARKET_LOGO_OVERRIDES: Partial<Record<MarketId, string>> = {
-  stoxx50: '/images/flags/eur.png',
-  tsx: '/images/flags/cad.png',
+/* R9-02 (2026-10-27 owner round — "use exchange logos instead of country
+ * flags for STOXX and TSX in the exchange cards, NOT the world map"): the
+ * same morning's earlier flag round is REVERSED — the Euro Stoxx 50 and
+ * the S&P/TSX now wear their OWN logo artwork (the /assets/markets/
+ * stoxx50.jpg Euronext/STOXX wordmark and tsx.jpg TSX mark). The decision
+ * lives in the market DEFINITIONS
+ * (packages/insights/src/markets/definitions.ts, `useExchangeLogo`), so
+ * the data file — not this display map — owns the per-market choice. The
+ * map below stays as the documented "wants a country/region flag instead"
+ * extension point; it is EMPTY today (both former entries moved to the
+ * definitions' useExchangeLogo pins). The world MAP never reads this: it
+ * colours countries by tint and stays as-is. */
+const MARKET_FLAG_OVERRIDES: Partial<Record<MarketId, string>> = {
+  // (empty since R9-02 — stoxx50 and tsx pin useExchangeLogo upstream)
 };
 
-/** The index wordmark for a market id — decorative (alt=""): the canonical
- * name text beside it carries the identity, never the artwork alone. */
+/** The index logo for a market id — decorative (alt=""): the canonical
+ * name text beside it carries the identity, never the artwork alone. When
+ * the definition pins `useExchangeLogo`, the exchange's own artwork is
+ * served (the .jpg wordmark); otherwise a flag override applies if one is
+ * pinned, and every other market uses its default wordmark file. */
 export function marketLogoUrl(id: MarketId): string {
-  return MARKET_LOGO_OVERRIDES[id] ?? `${MARKET_LOGO_BASE}/${id}.jpg`;
+  if (marketDefinition(id).useExchangeLogo === true) {
+    return `${MARKET_LOGO_BASE}/${id}.jpg`;
+  }
+  return MARKET_FLAG_OVERRIDES[id] ?? `${MARKET_LOGO_BASE}/${id}.jpg`;
 }
 
 /** The metals' estimation arrows — green up / red down (fixed colours). */

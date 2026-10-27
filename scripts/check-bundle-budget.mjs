@@ -620,7 +620,18 @@ const BUDGETS = [
   // stays at 295.28/88.80 (the enum's five new ids add 0.83 kB gz — under
   // the entry's 89.50 kB ceiling). Justified in CHANGELOG §2026-10-26
   // (M8, the D-16 path).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 890_000, gz: 215_000, label: 'Insights lazy chunk' },
+  // 2026-10-27 R9 (890.00 → 896.00 raw, 215.00 → 217.00 gz): the round-9
+  // owner round adds the US-global-reach container (two new components +
+  // the pure brief generator + nine bilingual copy blocks + the lane
+  // presentation config), the dollar-strength card group inside the world
+  // currencies section, the markets breadth headline (large numbers + the
+  // proportional bar) and the balance's all-chips pans (dynamic stage
+  // sizing); the retired UsSharesNotes box and its lib left the chunk with
+  // it. Measured 892.44 kB raw / 215.72 kB gz (+2.44 raw / +0.72 gz over
+  // the M8 tree — the two new section components and the bilingual brief
+  // templates outweigh the removed AUD box). The entry chunk is untouched
+  // at 295.28/88.81. Justified in CHANGELOG §2026-10-27 (R9).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 896_000, gz: 217_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

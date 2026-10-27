@@ -1,6 +1,6 @@
 # SELF_AUDIT.md — the automatic self-check
 
-Generated: 2026-10-27T00:55:14.804Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-27.md`
+Generated: 2026-10-27T04:03:36.589Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-27.md`
 
 Result: **ALL TESTS PASS** (25 of 25 pass)
 
@@ -32,7 +32,7 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 | SUITE:packages/insights | Unit suite — packages/insights | pass | 644 tests |
 | SUITE:apps/markets | Unit suite — apps/markets | pass | 13 tests |
 | SUITE:apps/api | Unit suite — apps/api | pass | 344 tests |
-| SUITE:apps/web | Unit suite — apps/web | pass | 696 tests |
+| SUITE:apps/web | Unit suite — apps/web | pass | 716 tests |
 
 ## Stale or "can't tell" cards
 
@@ -102,7 +102,7 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 - ❌ rba — F2.1 FCMYGBAG10 10-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ❌ rba — F2.1 FCMYGBAG3 3-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ✅ alternative-me — Crypto Fear and Greed (daily history)
-- ✅ cross-check — gold-api BTC 80096 vs Bitstamp close 80141 (2026-10-27) → -0.06%
+- ✅ cross-check — gold-api BTC 79696 vs Bitstamp close 79697 (2026-10-27) → -0.00%
 - ✅ mof — jgbcme.csv daily 10Y
 - ✅ eia — crude oil ending stocks WCRSTUS1 (weekly, keyless website route)
 - ✅ cftc — Commitments of Traders, futures-only (gold row)

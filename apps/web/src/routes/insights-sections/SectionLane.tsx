@@ -14,14 +14,16 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { CompactRow } from '../../components/insights/CompactRow';
 import { IconImg, sectionIconUrl } from '../../components/icons/currena';
 import {
-  GROUP_ORDER,
+  LANE_GROUP_ORDER,
   SECTION_ORDER,
+  SUBHEADING_SECTIONS,
   attentionToneClass,
   dailyPeersOf,
   type DailyPeers,
   type StatusFilter,
 } from '../../components/insights/config';
 import { num, QuestionGroup } from './QuestionGroup';
+import { UsGlobalReachGroup } from './UsGlobalReachGroup';
 
 /** The I10 watchlist strip (pinned items, snapshot order) — inside the lane. */
 function PinnedSection({
@@ -165,7 +167,15 @@ export function SectionLane({
                * containers by structure — the map renders one <section>
                * per region, so global and australia can never share
                * or fuse their boxes. The anchors, aria and scroll
-               * margins are untouched. */
+               * margins are untouched.
+               *
+               * R9-05 (2026-10-27 owner round — "consolidate ALL
+               * Australian indicators into one container"): the one
+               * Australia mother container now carries its three lane
+               * groups as SUB-headed card groups (the section heading
+               * and the hero's Australia verdict stay unchanged); the
+               * Global section keeps its full question headings and
+               * gains the R9-07 US-global-reach container below them. */
               className="scroll-mt-24 flex flex-col gap-6 rounded-[var(--radius-lg)] bg-currena-soft/60 p-4 shadow-[0_10px_34px_rgba(15,23,42,0.07)] ring-1 ring-[var(--color-border)] sm:p-6 dark:shadow-[0_14px_44px_rgba(0,0,0,0.4)]"
             >
               <h2
@@ -175,7 +185,11 @@ export function SectionLane({
                 <IconImg src={sectionIconUrl(sec)} size={96} desktopSize={128} className="shrink-0" />
                 <span className="min-w-0">{copy.sections[sec]}</span>
               </h2>
-              {GROUP_ORDER[sec].map((group: IndicatorGroupId) => (
+              {/* R9-04: the lane renders LANE_GROUP_ORDER — the
+               * dollar-strength group's cards moved into the world
+               * currencies section (GROUP_ORDER above stays the full
+               * gauge order the counting invariant rides). */}
+              {LANE_GROUP_ORDER[sec].map((group: IndicatorGroupId) => (
                 <QuestionGroup
                   key={group}
                   group={group}
@@ -188,8 +202,22 @@ export function SectionLane({
                   renderableIds={sectionIds}
                   revealIds={revealIds}
                   searchActive={searchActive}
+                  subheading={SUBHEADING_SECTIONS.has(sec)}
                 />
               ))}
+              {/* R9-07: the US-global-reach container — the nine US-based
+               * indicators that move world markets, with their generated
+               * analytical brief — closes the Global section. */}
+              {sec === 'global' ? (
+                <UsGlobalReachGroup
+                  snapshot={snapshot}
+                  copy={copy}
+                  numberLocale={numberLocale}
+                  onOpenDetails={openDetails}
+                  pinned={pinned}
+                  renderableIds={sectionIds}
+                />
+              ) : null}
             </section>
           ))}
         </>

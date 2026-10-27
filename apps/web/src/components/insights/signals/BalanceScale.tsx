@@ -1,12 +1,35 @@
 /**
  * signals/BalanceScale — the gold card's balance visual (owner spec
  * docs/insights/gold-balance-card-spec.md, the v2 seesaw patch, v3, v4,
- * v5, the v6 PANS directive, and now the v7 Iteration-5 addendum,
- * 2026-10-26 — "Rotate the beam only, and visualize weight").
+ * v5, the v6 PANS directive, the v7 Iteration-5 addendum 2026-10-26, and
+ * the R9-03/R9-08 owner round 2026-10-27 — "show ALL with/against
+ * reasons on the balance itself" + "the empty state's full sentence
+ * INSIDE the balance box").
  *
- * v7 supersedes v6's motion rules (addendum §A): EXACTLY ONE element
- * rotates — the beam group (beam bar + pivot ring + needle), by
- * rotate(θ, pivotX, pivotY) about the pivot. The pans, their rim ends,
+ * R9-03 (v8) supersedes v6's capacity rule: EVERY supporting and
+ * pressuring driver renders ON ITS PAN as a compact chip — there is no
+ * "show only 2, hide the rest behind see-more" limitation anymore, no
+ * "+{n} more" pill, and no separate full-list section. The pans keep
+ * their geometry (a shallow tray hung from the beam ends) but their
+ * height is now the LOAD's height: the pan grows with its chip stack
+ * and the stage reserves the taller stack plus the swing envelope, so
+ * any number of factors renders without overflow or clipping (tested
+ * 360px and 1280px). The v6 fixed-stage-height constant (capacity-bound)
+ * is retired with it — the drawing's MECHANICS (one rotating beam group,
+ * plumb pan translations, per-frame hangers, needle + arc) are kept
+ * verbatim from v7.
+ *
+ * R9-08: an empty side's evidence-based FULL sentence ("None of the
+ * factors checked shows a meaningful signal supporting gold's price
+ * right now.") renders INSIDE the pan itself, centred and muted —
+ * replacing the v6 small pill ("No qualifying signals") and the
+ * separate list-area card that carried the same sentence. When nothing
+ * could be read at all, BOTH pans carry the shared "nothing could be
+ * read" sentence inside the drawing.
+ *
+ * v7 (kept verbatim) supersedes v6's motion rules (addendum §A): EXACTLY
+ * ONE element rotates — the beam group (beam bar + pivot ring + needle),
+ * by rotate(θ, pivotX, pivotY) about the pivot. The pans, their rim ends,
  * tiles, text, icons, headings and overflow pills are NEVER rotated,
  * skewed or scaled: a pan moves ONLY by translate(x, y) so it hangs
  * plumb from its beam-end joint, and the hanger lines are redrawn
@@ -16,10 +39,9 @@
  * positions, pan translations, hanger endpoints — derives from ONE
  * animated value θ in the SAME frame (one React state → one render;
  * no element carries its own CSS transition, so nothing can desync
- * and detach). The vertical travel stays inside the fixed reserved
- * envelope computed from the maximum θ, so no layout shift occurs.
+ * and detach).
  *
- * v7 also adds the weight read-outs the addendum §B allows WITHOUT
+ * v7 also keeps the weight read-outs the addendum §B allows WITHOUT
  * inventing data (the scoring model is untouched — counts only):
  *   · the beam angle itself: θ ∝ the signed net score on a clamped
  *     linear presentation scale — max 8° at the model's full range
@@ -36,13 +58,13 @@
  * the model, so the side-load bar and the per-tile weight marker are
  * deliberately NOT implemented (addendum §B: never fabricate).
  *
- * Composition (v6, kept): the heading + subtitle; the two side
- * captions over the pan columns; THE BALANCE — a beam + pivot + bead
- * + hanger + pan assembly per side in one fixed-height stage, with
- * the compact factor tiles resting INSIDE the pans (the loads); the
- * aggregate assessment box; the full per-side factor lists opened by
- * each pan's "+{n} more" pill; the shared detail panel; the Neutral /
- * Couldn't-read trays.
+ * Composition (v8): the heading + subtitle; the two side captions over
+ * the pan columns; THE BALANCE — a beam + pivot + needle + hanger + pan
+ * assembly per side in one stage whose height RESERVES the taller pan
+ * stack + the swing, with ALL the compact factor chips resting INSIDE
+ * the pans (the loads), an empty pan carrying its full evidence-based
+ * sentence; the aggregate assessment box; the shared detail panel; the
+ * Neutral / Couldn't-read trays.
  *
  * Physical coherence (v7's whole point): the beam group rotates by θ
  * about the pivot, so each beam end (joint) lands at
@@ -203,10 +225,57 @@ export function signedTiltDeg(tilt: Pick<BalanceTilt, 'angleDeg' | 'heavy'>): nu
  * angle is untouched. */
 export const BALANCE_LH_PX = 320;
 
-/** v6 capacity: the compact tiles a pan shows before its "+{n} more"
- * pill — 2 (two full-width rows, legible full labels at every
- * viewport; the rest stay one tap away in the side's full list). */
-export const BALANCE_PAN_CAPACITY = 2;
+/* ------------------------------------------------------------------ *
+ * R9-03 (v8) pan sizing — the pan is the LOAD's height. Every chip
+ * renders on its pan, so a pan's height grows with its chip stack and
+ * the stage reserves the taller stack plus the swing envelope. The
+ * chips' compact metrics (mobile / ≥sm) and the pan padding/floor are
+ * the arithmetic the stage uses to RESERVE space before the pans are
+ * measured; the pans themselves size naturally (min-height floor), and
+ * a ResizeObserver keeps the stage's reserve tracking the measured
+ * truth — a wrapped label can never clip, because the reserve grows
+ * with the real height.
+ * ------------------------------------------------------------------ */
+
+/** One compact factor chip's height: 40px mobile / 32px ≥sm. */
+export const BALANCE_CHIP_H_MOBILE = 40;
+export const BALANCE_CHIP_H_DESKTOP = 32;
+/** The vertical gap between a pan's chips. */
+export const BALANCE_CHIP_GAP_PX = 6;
+/** The pan's own vertical padding (p-2 → 8px top + 8px bottom). */
+export const BALANCE_PAN_PAD_Y_PX = 16;
+/** An empty pan's minimum height — keeps the drawing's shape when a
+ * side carries only its evidence-based sentence (R9-08). */
+export const BALANCE_PAN_MIN_H_MOBILE = 118;
+export const BALANCE_PAN_MIN_H_DESKTOP = 88;
+/** Quiet breathing room under the dropped pan inside the stage. */
+export const BALANCE_STAGE_BOTTOM_PAD_PX = 8;
+
+/** The ≥sm breakpoint in stage pixels: the stage's max width IS 640
+ * (Tailwind's sm threshold) — a measured stage of 640 means the
+ * viewport is at or above sm. */
+export const BALANCE_SM_STAGE_W_PX = 640;
+
+/** A pan's reserved height for `chips` resting chips — the arithmetic
+ * RESERVE (the real pan sizes naturally and the stage tracks the
+ * measurement). Empty pans keep the minimum so the drawing keeps its
+ * shape with the full sentence inside (R9-08). Pure. */
+export function balancePanHeightPx(chips: number, isSm: boolean): number {
+  const minH = isSm ? BALANCE_PAN_MIN_H_DESKTOP : BALANCE_PAN_MIN_H_MOBILE;
+  const chipH = isSm ? BALANCE_CHIP_H_DESKTOP : BALANCE_CHIP_H_MOBILE;
+  const n = Math.max(0, Math.floor(chips));
+  if (n === 0) return minH;
+  return Math.max(minH, BALANCE_PAN_PAD_Y_PX + n * chipH + (n - 1) * BALANCE_CHIP_GAP_PX);
+}
+
+/** The stage's reserved height: the pan-grid offset + the TALLER pan +
+ * the maximum swing + the bottom pad (the envelope computed from the
+ * maximum θ at the 640 design width — the stage is never wider).
+ * Pure. */
+export function balanceStageHeightPx(forChips: number, againstChips: number, isSm: boolean): number {
+  const panH = Math.max(balancePanHeightPx(forChips, isSm), balancePanHeightPx(againstChips, isSm));
+  return Math.ceil(BALANCE_PAN_TOP_PX + panH + BALANCE_SWING_PX + BALANCE_STAGE_BOTTOM_PAD_PX);
+}
 
 /** The pivot's y in stage pixels (the beam's rotation centre; the
  * dotted level reference runs through it). */
@@ -219,18 +288,13 @@ export const BALANCE_HANG_PX = 36;
 export const BALANCE_HANG_SPREAD_PX = 24;
 /** The pan tops' y = pivot + hang: the stage's fixed pan-grid offset. */
 export const BALANCE_PAN_TOP_PX = BALANCE_PIVOT_Y_PX + BALANCE_HANG_PX;
-/** The fixed stage heights (mobile / ≥sm) and pan heights: the stage
- * reserves the pan stack, the overflow pill, and the ±(Lh ÷ 2) × sin
- * of the 10° maximum at the 640 design width (the envelope is
- * computed from the maximum θ — addendum §A). */
-export const BALANCE_STAGE_H_MOBILE = 260;
-export const BALANCE_STAGE_H_DESKTOP = 240;
-export const BALANCE_PAN_H_MOBILE = 118;
-export const BALANCE_PAN_H_DESKTOP = 88;
 /** The beam's pin-to-pin length is half the stage, so the vertical
  * travel of one pan is (stageWidth ÷ 4) × sin θ — at the 640 design
  * width and the 10° maximum this is 160 × sin 10° ≈ 27.78px: the fixed
- * reserved envelope every frame must stay inside (tested). */
+ * reserved envelope every frame must stay inside (tested). R9-03 (v8):
+ * the stage's own HEIGHT is no longer a fixed constant — the stage
+ * reserves the taller pan stack + this swing via balanceStageHeightPx
+ * (the pans grow with their chip stacks now). */
 export const BALANCE_SWING_PX = (BALANCE_LH_PX / 2) * Math.sin((BALANCE_MAX_ANGLE_DEG * Math.PI) / 180);
 
 /** The needle + arc (addendum §B): the needle hangs from the pivot,
@@ -483,14 +547,20 @@ export function BalanceScale({
   const metal = 'gold' as const;
   const rtl = numberLocale === 'fa-IR';
   const [openKey, setOpenKey] = useState<string | null>(null);
-  /** Which side's full factor list is expanded (v6: opened by the
-   * pan's "+{n} more" pill — one independent toggle per side). */
-  const [openLists, setOpenLists] = useState<{ for: boolean; against: boolean }>({ for: false, against: false });
+  /* R9-03 (v8): the v6 "+{n} more" list-expansion state is RETIRED —
+   * every factor chip renders on its pan; there is nothing to expand. */
 
   /* Model-level reads (pure — an empty driver list yields the level
    * balance, so every hook below keeps its call order unconditional). */
   const counts = balanceCounts(drivers);
   const verdict = balanceVerdictOf(counts);
+  /* The side loads (R9-03: EVERY chip renders on its pan — no capacity
+   * slice, no overflow pill). Computed before the hooks so the pan-height
+   * measurement can depend on the counts. */
+  const forBlocks = drivers.filter((d) => d.state === 'for');
+  const againstBlocks = drivers.filter((d) => d.state === 'against');
+  const neutralChips = drivers.filter((d) => d.state === 'neutral');
+  const unreadChips = drivers.filter((d) => d.state === 'unread');
   /* The tilt from the fixed design-width arm (rule 5: the model math
    * never depends on anything measured at runtime; the rendered
    * geometry scales with the measured stage width below). */
@@ -543,6 +613,38 @@ export function BalanceScale({
     return () => ro.disconnect();
   }, []);
 
+  /* R9-03 (v8): the pans' MEASURED heights. The chips' compact metrics
+   * give the arithmetic RESERVE (balancePanHeightPx — chip rows are
+   * fixed-height), but a wrapped label or the full empty-state sentence
+   * can render taller than the arithmetic, so the stage tracks the REAL
+   * measured pan heights (one ResizeObserver per pan) and reserves the
+   * taller of the two plus the swing — nothing can ever clip, whatever
+   * the load. The reserve is the FLOOR: it renders even before the
+   * measurement lands (and in ResizeObserver-less environments). */
+  const isSm = stageWidth >= BALANCE_SM_STAGE_W_PX;
+  const reserveStageH = balanceStageHeightPx(forBlocks.length, againstBlocks.length, isSm);
+  const [measuredPanH, setMeasuredPanH] = useState<{ for: number; against: number }>({ for: 0, against: 0 });
+  const panForEl = useRef<HTMLDivElement | null>(null);
+  const panAgainstEl = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const measure = (): void => {
+      const hFor = panForEl.current?.offsetHeight ?? 0;
+      const hAgainst = panAgainstEl.current?.offsetHeight ?? 0;
+      setMeasuredPanH((prev) => (prev.for === hFor && prev.against === hAgainst ? prev : { for: hFor, against: hAgainst }));
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(measure);
+    if (panForEl.current) ro.observe(panForEl.current);
+    if (panAgainstEl.current) ro.observe(panAgainstEl.current);
+    return () => ro.disconnect();
+  }, [forBlocks.length, againstBlocks.length]);
+  const measuredMaxPanH = Math.max(measuredPanH.for, measuredPanH.against);
+  const stageHeightPx = Math.max(
+    reserveStageH,
+    Math.ceil(BALANCE_PAN_TOP_PX + measuredMaxPanH + BALANCE_SWING_PX + BALANCE_STAGE_BOTTOM_PAD_PX),
+  );
+
   useEffect(() => {
     const from = thetaRef.current;
     if (from === targetDeg) return undefined;
@@ -578,11 +680,6 @@ export function BalanceScale({
   useEffect(() => () => cancelAnimationFrame(frame.current), []);
 
   if (drivers.length === 0) return null;
-
-  const forBlocks = drivers.filter((d) => d.state === 'for');
-  const againstBlocks = drivers.filter((d) => d.state === 'against');
-  const neutralChips = drivers.filter((d) => d.state === 'neutral');
-  const unreadChips = drivers.filter((d) => d.state === 'unread');
 
   /* THE FRAME: every mechanical coordinate derives from the one θ in
    * this single render — beam rotation, joints, plumb pan drops,
@@ -644,15 +741,18 @@ export function BalanceScale({
   const toggle = (key: string): void => setOpenKey((prev) => (prev === key ? null : key));
   const openDriver = drivers.find((d) => d.key === openKey) ?? null;
 
-  /** One compact factor tile RESTING ON THE PAN (v6's load): icon +
-   * full short name (never truncated) + the value where space permits
+  /** One compact factor chip RESTING ON THE PAN (v6's load, kept;
+   * v8/R9-03: EVERY chip renders — there is no capacity anymore): icon
+   * + full short name (never truncated) + the value where space permits
    * (hidden below `sm` so mobile rows stay single-line legible). A
    * real button — its tap opens the shared detail panel with the
    * factor's full explanation. Bottom of the pan = the floor, so the
-   * loads sit ON the surface (contact shadow included). v7: the tile
+   * loads sit ON the surface (contact shadow included). v7: the chip
    * is NEVER rotated, skewed or scaled — it only rides its pan's
    * plumb translation, so its text stays horizontal at every angle
-   * (the 12.48px caption floor holds at every viewport). */
+   * (the 12.48px caption floor holds at every viewport). Its height
+   * follows the compact metrics (min 40px mobile / 32px ≥sm) so the
+   * arithmetic reserve and the measured truth stay in lockstep. */
   const tile = (d: BalanceDriver, side: 'for' | 'against'): React.JSX.Element => (
     <button
       key={d.key}
@@ -678,36 +778,6 @@ export function BalanceScale({
     </button>
   );
 
-  /** One full factor row (v2 §5.5, the list item under the expansion):
-   * icon ~20px + the short name + the current value, 56px tall — a
-   * real button whose tap opens the shared detail panel. */
-  const block = (d: BalanceDriver, side: 'for' | 'against'): React.JSX.Element => (
-    <button
-      key={d.key}
-      type="button"
-      aria-expanded={openKey === d.key}
-      aria-controls={`${metal}-balance-detail`}
-      onClick={() => toggle(d.key)}
-      data-balance-block={d.key}
-      className="insights-focusable flex h-[56px] w-full cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2.5 py-1 text-start ring-1 ring-[var(--color-border)]"
-    >
-      <IconImg src={side === 'for' ? DIRECTION_UP_URL : DIRECTION_DOWN_URL} size={20} className="shrink-0" />
-      <span className="flex min-w-0 flex-col justify-center">
-        <span className="text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">
-          {d.label}
-        </span>
-        {d.valueText !== null ? (
-          <bdi
-            dir="ltr"
-            className="text-[length:var(--type-label)] font-semibold leading-tight tabular-nums text-[var(--color-text-secondary)]"
-          >
-            {d.valueText}
-          </bdi>
-        ) : null}
-      </span>
-    </button>
-  );
-
   /** The empty-side line (v4 semantics, kept verbatim): when the
    * evaluation ran, the side with no qualifying factors carries the
    * evidence-based line; when NOTHING could be read (readable 0),
@@ -716,66 +786,19 @@ export function BalanceScale({
   const emptyLineOf = (side: 'for' | 'against'): string =>
     counts.readable === 0 ? b.listEmptyNone : side === 'for' ? b.listEmptyFor : b.listEmptyAgainst;
 
-  /** The side's full-list section (below the assessment): all rows
-   * when the pan's "+{n} more" pill expanded it; the full empty line
-   * whenever the side has no qualifying factors (visible WITHOUT any
-   * disclosure — the explanatory message is never hidden behind a
-   * click). Always in the DOM so the pill's aria-controls is valid. */
-  const listSection = (side: 'for' | 'against', blocks: readonly BalanceDriver[]): React.JSX.Element => {
-    const expanded = openLists[side];
-    const show = blocks.length === 0 || expanded;
-    return (
-      <div className="flex min-w-0 flex-col gap-1.5" data-balance-list={side} id={`${metal}-balance-list-${side}`} hidden={!show}>
-        <h5
-          className={`m-0 inline-flex items-center gap-1.5 text-[length:var(--type-label)] font-bold ${
-            side === 'for' ? 'text-[var(--color-status-normal)]' : 'text-[var(--color-status-alert)]'
-          }`}
-        >
-          <IconImg src={side === 'for' ? DIRECTION_UP_URL : DIRECTION_DOWN_URL} size={16} className="shrink-0" />
-          {side === 'for' ? b.sideFor : b.sideAgainst}
-        </h5>
-        {blocks.length > 0 ? (
-          <span className="flex min-w-0 flex-col gap-1.5">
-            {blocks.map((d) => block(d, side))}
-            {expanded && blocks.length > 0 ? (
-              <button
-                type="button"
-                onClick={() => setOpenLists((prev) => ({ ...prev, [side]: false }))}
-                aria-expanded="true"
-                aria-controls={`${metal}-balance-list-${side}`}
-                data-balance-fewer={side}
-                className="insights-focusable mt-1 inline-flex min-h-[24px] cursor-pointer items-center self-start rounded-full bg-currena-muted/15 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
-              >
-                {copy.ui.showFewer}
-              </button>
-            ) : null}
-          </span>
-        ) : (
-          <p
-            data-balance-empty-line={side}
-            className="m-0 rounded-[var(--radius-sm)] bg-currena-soft/60 px-2.5 py-2.5 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-secondary)]"
-          >
-            {emptyLineOf(side)}
-          </p>
-        )}
-      </div>
-    );
-  };
-
-  /** One side's PAN ASSEMBLY (v7: translate ONLY): the junction ring
-   * dots on the pan's top rim, the shallow rimmed pan (a heavier
-   * floor edge), the factor tiles resting on that floor, and the
-   * "+{n} more" pill hanging just under the pan. The assembly moves
+  /** One side's PAN ASSEMBLY (v7: translate ONLY; v8/R9-03: the LOAD
+   * IS THE LIST): the junction ring dots on the pan's top rim, the
+   * shallow rimmed pan (a heavier floor edge), and EVERY factor chip of
+   * that side resting on the floor — there is no capacity slice and no
+   * "+{n} more" pill anymore; the pan simply grows with its stack (the
+   * stage reserves the taller stack plus the swing). The assembly moves
    * by translate(0, dy) — EXACTLY its joint's vertical displacement —
-   * so it hangs plumb; it NEVER rotates, skews or scales. The
-   * hangers themselves live in the SVG layer below and are redrawn
-   * every frame from the joint to these rim points. Geometry is
-   * FIXED: capacity-bound tiles, fixed pan height, nothing about the
-   * count can resize the drawing. */
+   * so it hangs plumb; it NEVER rotates, skews or scales. The hangers
+   * themselves live in the SVG layer below and are redrawn every frame
+   * from the joint to these rim points. R9-08: an EMPTY pan carries its
+   * side's full evidence-based sentence INSIDE the tray (centred,
+   * muted) instead of the v6 small pill. */
   const panAssembly = (side: 'for' | 'against', blocks: readonly BalanceDriver[]): React.JSX.Element => {
-    const visible = blocks.slice(0, BALANCE_PAN_CAPACITY);
-    const hiddenCount = blocks.length - visible.length;
-    const expanded = openLists[side];
     const drop = side === 'for' ? geo.for.panDrop : geo.against.panDrop;
     return (
       <div
@@ -802,52 +825,34 @@ export function BalanceScale({
          * edge in the darker ink (the "supporting edge" that carries
          * the loads), a light inner wall line just above it (tray
          * thickness), a solid surface tint and a subtle drop shadow
-         * underneath. Fixed height per breakpoint; the tiles rest on
-         * the floor (justify-end, gapped, contact-shadowed). An empty
-         * side keeps the COMPLETE pan with a minimal muted marker. */}
+         * underneath. v8: the height is the LOAD's height (the min-height
+         * keeps the empty drawing's shape); the chips rest on the floor
+         * (justify-end, gapped, contact-shadowed). The measured-height
+         * observer (above) keeps the stage's reserve tracking this pan. */}
         <div
+          ref={side === 'for' ? panForEl : panAgainstEl}
           data-balance-pan={side}
-          className="relative mx-auto flex h-[118px] w-[92%] flex-col justify-end gap-1.5 rounded-[10px] border-[1.5px] border-b-[3px] border-[var(--color-border)] border-b-[var(--color-text-secondary)] bg-currena-soft/70 p-2 shadow-[0_12px_16px_-14px_rgb(15_23_42/0.5)] dark:bg-currena-soft/90 sm:h-[88px]"
+          className="relative mx-auto flex min-h-[118px] w-[92%] flex-col justify-end gap-1.5 rounded-[10px] border-[1.5px] border-b-[3px] border-[var(--color-border)] border-b-[var(--color-text-secondary)] bg-currena-soft/70 p-2 shadow-[0_12px_16px_-14px_rgb(15_23_42/0.5)] dark:bg-currena-soft/90 sm:min-h-[88px]"
         >
           <span
             aria-hidden="true"
             data-balance-pan-floor={side}
             className="pointer-events-none absolute inset-x-[6px] bottom-[5px] h-[1.5px] rounded-full bg-[var(--color-surface)]/60"
           />
-          {visible.length > 0 ? (
-            visible.map((d) => tile(d, side))
+          {blocks.length > 0 ? (
+            blocks.map((d) => tile(d, side))
           ) : (
+            /* R9-08: the FULL evidence-based sentence rides inside the
+             * pan — the v6 small pill («نشانهٔ معتبری نیست») and the
+             * separate list-area card are retired with it. */
             <p
               data-balance-empty={side}
-              className="m-auto inline-flex items-center gap-1.5 rounded-full bg-[var(--color-surface)]/70 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]"
+              className="m-auto my-auto max-w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)]/70 px-2.5 py-2 text-center text-[length:var(--type-caption)] font-semibold leading-relaxed text-[var(--color-text-secondary)]"
             >
-              {counts.readable === 0 ? b.panUnreadable : b.panEmpty}
+              {emptyLineOf(side)}
             </p>
           )}
         </div>
-        {/* The capacity overflow pill: "+{n} more" collapsed, "Show
-         * fewer" expanded — the site's attention-tile convention. It
-         * hangs just BELOW the pan (inside the translating assembly,
-         * clearly attached to its side, deliberately NOT on the pan
-         * surface so it can never read as another load or a fabricated
-         * weight). It expands the side's full list below. */}
-        {hiddenCount > 0 ? (
-          <button
-            type="button"
-            onClick={() => setOpenLists((prev) => ({ ...prev, [side]: !expanded }))}
-            aria-expanded={expanded ? 'true' : 'false'}
-            aria-controls={`${metal}-balance-list-${side}`}
-            data-balance-more={expanded ? undefined : side}
-            data-balance-fewer={expanded ? side : undefined}
-            className="insights-focusable mx-auto mt-1 flex min-h-[26px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
-          >
-            {expanded
-              ? copy.ui.showFewer
-              : interpolate(copy.ui.attentionTileMore, {
-                  n: formatNumber(hiddenCount, numberLocale, { maximumFractionDigits: 0 }),
-                })}
-          </button>
-        ) : null}
       </div>
     );
   };
@@ -917,7 +922,8 @@ export function BalanceScale({
         ))}
       </div>
 
-      {/* 3. THE BALANCE STAGE: one fixed-height relative box. Inside,
+      {/* 3. THE BALANCE STAGE: one relative box whose height reserves the
+       * taller pan stack plus the swing (v8). Inside,
        * in paint order: the dotted level reference (behind
        * everything), the MECHANICAL LAYER — one SVG holding the
        * hanger lines, the fixed gauge (arc + three ticks), and THE
@@ -932,7 +938,12 @@ export function BalanceScale({
         data-balance-stage
         role="group"
         aria-label={ariaLabel}
-        className="relative mx-auto h-[260px] w-full max-w-[640px] text-[var(--color-text-secondary)] sm:h-[240px]"
+        /* R9-03 (v8): the stage's height RESERVES the taller pan stack
+         * plus the swing envelope (arithmetic floor via
+         * balanceStageHeightPx; the measured pan heights can only raise
+         * it — a wrapped label or the long empty sentence never clips). */
+        style={{ height: `${stageHeightPx}px` }}
+        className="relative mx-auto w-full max-w-[640px] text-[var(--color-text-secondary)]"
       >
         {/* The dotted level reference through the pivot (v2 §5.3,
          * kept): behind everything, spanning WIDER than the beam —
@@ -1081,17 +1092,6 @@ export function BalanceScale({
           {readableLine}
         </span>
         {banner}
-      </div>
-
-      {/* 5. THE FULL FACTOR LISTS: the side's complete rows (full
-       * labels + values, every one a button into the shared detail
-       * panel) as controlled expansions — the pan's "+{n} more" pill
-       * opens them; an empty side's evidence-based line renders
-       * WITHOUT any disclosure. Side by side from `sm:`, stacked on
-       * the narrowest screens. */}
-      <div className="mx-auto grid w-full max-w-[640px] grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3" data-balance-lists>
-        {listSection('for', forBlocks)}
-        {listSection('against', againstBlocks)}
       </div>
 
       {/* The shared detail panel (v2 §5.5.6 — every width): one open

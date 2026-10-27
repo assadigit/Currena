@@ -134,6 +134,15 @@ export interface MarketDefinition {
   id: MarketId;
   group: MarketGroupId;
   /**
+   * R9-02 (2026-10-27 owner round — "use exchange logos instead of country
+   * flags for STOXX and TSX"): when true, the card / tile / table surfaces
+   * render the index's OWN logo artwork from /assets/markets/{id}.jpg (the
+   * Euronext/STOXX wordmark for stoxx50, the TSX mark for tsx) instead of
+   * any country/region flag. The world MAP is unaffected — it colours by
+   * country tint and never reads this flag.
+   */
+  useExchangeLogo?: boolean;
+  /**
    * EODHD INDX code, or null when the provider cannot serve this market on
    * the free key (verified live in the step-0 data check — see
    * docs/specs/insights-world-markets-data-check.md; FTSE on 2026-10-12:
@@ -182,7 +191,8 @@ export const MARKETS: readonly MarketDefinition[] = [
   // Mumbai 09:15–15:30 IST (UTC+5:30) → 10:00 UTC (+30 = 10:30).
   { id: 'nifty50', group: 'asia', eodhdCode: 'NSEI.INDX', yahooSymbol: '^NSEI', closeUtcMinute: 10 * 60 + 30 },
   // Euro Stoxx 50 (NYSE Euronext) 09:00–17:30 CET (UTC+1) → 16:30 UTC (+30 = 17:00).
-  { id: 'stoxx50', group: 'europe', eodhdCode: 'STOXX50E.INDX', yahooSymbol: '^STOXX50E', closeUtcMinute: 17 * 60 },
+  // R9-02: the Euronext/STOXX logo (stoxx50.jpg), NOT the EU flag.
+  { id: 'stoxx50', group: 'europe', eodhdCode: 'STOXX50E.INDX', yahooSymbol: '^STOXX50E', closeUtcMinute: 17 * 60, useExchangeLogo: true },
   // Xetra 09:00–17:30 CET (UTC+1) → 16:30 UTC (+30 = 17:00).
   { id: 'dax', group: 'europe', eodhdCode: 'GDAXI.INDX', yahooSymbol: '^GDAXI', closeUtcMinute: 17 * 60 },
   // Paris 09:00–17:30 CET (UTC+1) → 16:30 UTC (+30 = 17:00).
@@ -194,7 +204,8 @@ export const MARKETS: readonly MarketDefinition[] = [
   { id: 'ndx', group: 'americas', eodhdCode: 'NDX.INDX', yahooSymbol: '^NDX', closeUtcMinute: 21 * 60 + 30 },
   { id: 'dow', group: 'americas', eodhdCode: 'DJI.INDX', yahooSymbol: '^DJI', closeUtcMinute: 21 * 60 + 30 },
   // Toronto 09:30–16:00 ET (UTC−5) → 21:00 UTC (+30 = 21:30).
-  { id: 'tsx', group: 'americas', eodhdCode: 'GSPTSE.INDX', yahooSymbol: '^GSPTSE', closeUtcMinute: 21 * 60 + 30 },
+  // R9-02: the TSX logo (tsx.jpg), NOT the Canada flag.
+  { id: 'tsx', group: 'americas', eodhdCode: 'GSPTSE.INDX', yahooSymbol: '^GSPTSE', closeUtcMinute: 21 * 60 + 30, useExchangeLogo: true },
   // São Paulo 10:00–17:00 BRT (UTC−3) → 20:00 UTC (+30 = 20:30).
   { id: 'ibov', group: 'americas', eodhdCode: 'BVSP.INDX', yahooSymbol: '^BVSP', closeUtcMinute: 20 * 60 + 30 },
 ];

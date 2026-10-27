@@ -30,11 +30,14 @@
  *       role="group" aria label on the stage
  *   v7 structure  heading → subtitle → captions → stage (reference,
  *       hangers, gauge, THE ROTATING BEAM GROUP, pans) → assessment →
- *       lists → panel → trays; the ONLY transformed elements are the
+ *       panel → trays; the ONLY transformed elements are the
  *       beam group (rotate) and the two assemblies (translate) —
- *       pans, tiles, text and pills carry NOTHING beyond translate
- *   v6 rules 1–5  fixed stage geometry; capacity + "+{n} more";
- *       complete empty pans; distinct empty/unreadable markers
+ *       pans, chips, text carry NOTHING beyond translate
+ *   v8 (R9-03/R9-08, 2026-10-27 owner round)  EVERY with/against
+ *       reason renders ON ITS PAN (no capacity, no "+{n} more" pill,
+ *       no separate full lists); the pan is the LOAD's height and the
+ *       stage reserves the taller stack + the swing; an empty pan
+ *       carries its FULL evidence-based sentence inside the tray
  *   §7/§8/§12  tiles/rows/chips are real buttons with aria-expanded
  *       opening the shared detail panel
  *   §9  (integration) the merged card renders the balance between the
@@ -55,17 +58,14 @@ import {
   BALANCE_MAX_ANGLE_DEG,
   BALANCE_MIN_ANGLE_DEG,
   BALANCE_NEEDLE_LEN_PX,
-  BALANCE_PAN_CAPACITY,
-  BALANCE_PAN_H_DESKTOP,
-  BALANCE_PAN_H_MOBILE,
   BALANCE_PAN_TOP_PX,
   BALANCE_PIVOT_Y_PX,
-  BALANCE_STAGE_H_DESKTOP,
-  BALANCE_STAGE_H_MOBILE,
   BALANCE_SWING_PX,
   balanceCounts,
   balanceGaugeGeometry,
+  balancePanHeightPx,
   balanceStageGeometry,
+  balanceStageHeightPx,
   balanceTilt,
   balanceVerdictOf,
   countLineParts,
@@ -328,10 +328,30 @@ describe('§6 beam tilt (the v1 ratio law on the v7 scale)', () => {
     expect(signedTiltDeg(balanceTilt(countsOf(CASE_D), BALANCE_LH_PX))).toBe(0);
   });
 
-  it('the 2026-10-21c presentation scale: max 10°, floor 3°, capacity 2 — the constants', () => {
+  it('the 2026-10-21c presentation scale: max 10°, floor 3° — the constants', () => {
     expect(BALANCE_MAX_ANGLE_DEG).toBe(10);
     expect(BALANCE_MIN_ANGLE_DEG).toBe(3);
-    expect(BALANCE_PAN_CAPACITY).toBe(2);
+  });
+
+  it("v8 (R9-03) pan sizing: no capacity — the pan is the load's height, and the stage reserves the taller stack + the swing", () => {
+    // An empty pan keeps the drawing's shape (the R9-08 sentence's floor).
+    expect(balancePanHeightPx(0, false)).toBe(118);
+    expect(balancePanHeightPx(0, true)).toBe(88);
+    // Chips stack: mobile 40px + 6px gaps, ≥sm 32px + 6px gaps, over the pad.
+    expect(balancePanHeightPx(1, false)).toBe(118); // 16 + 40 = 56 < the 118 floor
+    expect(balancePanHeightPx(4, false)).toBe(16 + 4 * 40 + 3 * 6);
+    expect(balancePanHeightPx(6, true)).toBe(16 + 6 * 32 + 5 * 6);
+    // The stage reserves the pan-grid offset + the TALLER pan + the swing
+    // + the bottom pad — for every load shape and both breakpoints.
+    for (const isSm of [false, true]) {
+      for (let n = 0; n <= 12; n += 1) {
+        const forChips = n;
+        const againstChips = Math.max(0, 8 - n);
+        const h = balanceStageHeightPx(forChips, againstChips, isSm);
+        const panH = Math.max(balancePanHeightPx(forChips, isSm), balancePanHeightPx(againstChips, isSm));
+        expect(h).toBeGreaterThanOrEqual(BALANCE_PAN_TOP_PX + panH + BALANCE_SWING_PX);
+      }
+    }
   });
 });
 
@@ -427,9 +447,16 @@ describe('§A stage geometry (one rotating element, plumb pans, redrawn hangers)
     // at the widest stage and the maximum angle.
     const worst = BALANCE_PAN_TOP_PX - BALANCE_SWING_PX;
     expect(worst).toBeGreaterThan(BALANCE_PIVOT_Y_PX + 6); // beam bottom = 50
-    // The fixed stage heights reserve the pan stack + the swing.
-    expect(BALANCE_STAGE_H_DESKTOP).toBeGreaterThanOrEqual(BALANCE_PAN_TOP_PX + BALANCE_PAN_H_DESKTOP + 30 + BALANCE_SWING_PX);
-    expect(BALANCE_STAGE_H_MOBILE).toBeGreaterThanOrEqual(BALANCE_PAN_TOP_PX + BALANCE_PAN_H_MOBILE + 30 + BALANCE_SWING_PX);
+    // v8: the stage's DYNAMIC reserved height (no fixed constant anymore)
+    // always covers the pan-grid offset + the taller pan + the swing,
+    // whatever the load — the arithmetic floor the component renders.
+    for (const isSm of [false, true]) {
+      for (let n = 0; n <= 12; n += 1) {
+        const h = balanceStageHeightPx(n, 12 - n, isSm);
+        const panH = Math.max(balancePanHeightPx(n, isSm), balancePanHeightPx(12 - n, isSm));
+        expect(h).toBeGreaterThanOrEqual(BALANCE_PAN_TOP_PX + panH + BALANCE_SWING_PX);
+      }
+    }
   });
 
   it('the geometry scales with the measured stage width as one piece (the arm tracks the columns)', () => {
@@ -519,7 +546,7 @@ describe('§5.1/§13 verdict word and count line', () => {
  * ------------------------------------------------------------------ */
 
 describe('BalanceScale (rendered v7 balance)', () => {
-  it('case A: heading + subtitle + captions + stage + pans with tiles + assessment + lists + panel + trays', () => {
+  it('case A: heading + subtitle + captions + stage + pans with chips + assessment + panel + trays', () => {
     render(<BalanceScale drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
     // 1. The heading + subtitle.
     expect(screen.getByText('The aggregate of factors affecting the price of gold')).toBeTruthy();
@@ -574,28 +601,30 @@ describe('BalanceScale (rendered v7 balance)', () => {
     expect(tile.getAttribute('aria-controls')).toBe('gold-balance-detail');
     expect(tile.textContent).toContain('Real yields');
     expect(tile.textContent).toContain('2.84%');
-    expect(panFor.querySelector('[data-balance-empty="for"]')?.textContent).toBe('No qualifying signals');
-    // The pans are fixed-height trays with a heavier floor edge.
+    // R9-08: the empty side's FULL evidence-based sentence rides INSIDE
+    // the pan (the v6 small pill and the separate list card are retired).
+    expect(panFor.querySelector('[data-balance-empty="for"]')?.textContent).toBe(
+      'None of the factors checked shows a meaningful signal supporting gold’s price right now.',
+    );
+    // The pans are trays with a heavier floor edge; v8: the min-height
+    // keeps the empty drawing's shape and the stack grows the pan.
     for (const pan of [panFor, panAgainst]) {
-      expect(pan.className).toContain('h-[118px]');
-      expect(pan.className).toContain('sm:h-[88px]');
+      expect(pan.className).toContain('min-h-[118px]');
+      expect(pan.className).toContain('sm:min-h-[88px]');
       expect(pan.className).toContain('border-b-[3px]');
     }
-    // No overflow on either side → no "+n more" pills.
+    // v8: there are no overflow pills ANYMORE — every chip is on its pan.
     expect(document.querySelector('[data-balance-more]')).toBeNull();
+    expect(document.querySelector('[data-balance-fewer]')).toBeNull();
+    // The stage carries its computed height reserve (v8).
+    expect(stage.style.height).toMatch(/^\d+px$/);
     // 5. The assessment box: verdict word + count line.
     expect(screen.getByText('Leaning against gold')).toBeTruthy();
     expect(screen.getByText('1 against · 3 neutral')).toBeTruthy();
-    // 6. The lists: the for side's evidence-based line is visible
-    // WITHOUT any disclosure; the against side's full list is hidden
-    // until disclosed (its single factor already rests on the pan).
-    const listFor = document.getElementById('gold-balance-list-for') as HTMLElement;
-    const listAgainst = document.getElementById('gold-balance-list-against') as HTMLElement;
-    expect(listFor.hidden).toBe(false);
-    expect(listFor.textContent).toContain(
-      'None of the factors checked shows a meaningful signal supporting gold’s price right now.',
-    );
-    expect(listAgainst.hidden).toBe(true);
+    // 6. (v8) The separate full-list sections are RETIRED — every
+    // reason rides its pan; nothing hides behind a disclosure.
+    expect(document.getElementById('gold-balance-list-for')).toBeNull();
+    expect(document.getElementById('gold-balance-list-against')).toBeNull();
     // 7. The panel exists, hidden, with every aria-controls valid.
     const panel = document.getElementById('gold-balance-detail') as HTMLElement;
     expect(panel.hidden).toBe(true);
@@ -757,64 +786,56 @@ describe('BalanceScale (rendered v7 balance)', () => {
     expect(screen.getByText('Balanced')).toBeTruthy();
   });
 
-  it('case D: the none verdict, the DISTINCT "nothing to weigh yet" markers in BOTH pans, the unavailable lines on both sides, level', () => {
+  it('case D: the none verdict, the shared "nothing could be read" sentence INSIDE both pans, level', () => {
     render(<BalanceScale drivers={CASE_D} copy={copy} numberLocale="en-US" />);
     expect(screen.getByText("Can't read the conditions right now")).toBeTruthy();
     for (const side of ['for', 'against'] as const) {
-      expect(document.querySelector(`[data-balance-empty="${side}"]`)?.textContent).toBe('Nothing to weigh yet');
-      const list = document.getElementById(`gold-balance-list-${side}`) as HTMLElement;
-      expect(list.hidden).toBe(false);
-      expect(list.textContent).toContain('Nothing could be read yet, so neither side has been weighed.');
+      // R9-08: the FULL unavailable sentence rides inside the pan (the
+      // v6 "Nothing to weigh yet" pill is retired with the lists).
+      expect(document.querySelector(`[data-balance-empty="${side}"]`)?.textContent).toBe(
+        'Nothing could be read yet, so neither side has been weighed.',
+      );
+      expect(document.getElementById(`gold-balance-list-${side}`)).toBeNull();
     }
     // Everything sits in the unread tray, off the pans.
     expect(document.querySelector('[data-balance-tray="unread"]')!.querySelectorAll('button').length).toBe(4);
   });
 
-  it('case H (6 for / 3 against): the pans keep their capacity, the pills count the overflow, the full lists disclose, and the stage geometry never changes', () => {
-    render(<BalanceScale drivers={CASE_H} copy={copy} numberLocale="en-US" />);
-    const stage = document.querySelector('[data-balance-stage]') as HTMLElement;
-    const stageClass = stage.className;
+  it('case H (6 for / 3 against): EVERY chip rests on its pan — no capacity, no pills, no hidden lists; the stage reserves the taller stack', () => {
+    const { unmount: unmountH } = render(<BalanceScale drivers={CASE_H} copy={copy} numberLocale="en-US" />);
     const panFor = document.querySelector('[data-balance-pan="for"]') as HTMLElement;
     const panAgainst = document.querySelector('[data-balance-pan="against"]') as HTMLElement;
-    // Capacity: exactly 2 tiles per pan, no more.
-    expect(panFor.querySelectorAll('[data-balance-tile]').length).toBe(BALANCE_PAN_CAPACITY);
-    expect(panAgainst.querySelectorAll('[data-balance-tile]').length).toBe(BALANCE_PAN_CAPACITY);
-    // The overflow pills hang UNDER their pans (inside the translating
-    // assemblies — clearly attached, never ON the pan surface).
-    const moreFor = document.querySelector('[data-balance-more="for"]') as HTMLButtonElement;
-    const moreAgainst = document.querySelector('[data-balance-more="against"]') as HTMLButtonElement;
-    expect(moreFor.textContent).toBe('+4 more');
-    expect(moreAgainst.textContent).toBe('+1 more');
-    expect(panFor.contains(moreFor)).toBe(false);
-    expect(document.querySelector('[data-balance-assembly="for"]')!.contains(moreFor)).toBe(true);
-    expect(moreFor.getAttribute('aria-controls')).toBe('gold-balance-list-for');
-    expect(moreFor.getAttribute('aria-expanded')).toBe('false');
-    // The full lists stay accessible: hidden until the pill expands them.
-    const listFor = document.getElementById('gold-balance-list-for') as HTMLElement;
-    expect(listFor.hidden).toBe(true);
-    fireEvent.click(moreFor);
-    expect(listFor.hidden).toBe(false);
-    expect(listFor.querySelectorAll('[data-balance-block]').length).toBe(6);
-    // TWO "Show fewer" controls stay reachable: the pan's own pill
-    // (now flipped) and the section's collapse button under the rows.
-    expect(screen.getAllByText('Show fewer').length).toBe(2);
-    // The stage's geometry never depended on the count: the same class
-    // (fixed heights, same anchors) as the 4-driver case A render, and
-    // the drops still ride the same plumb law (net +3 over 9 directional
-    // → ratio 1/3 → 10/3° on the 2026-10-21c scale).
+    // R9-03: ALL the side's reasons render as chips ON the pan.
+    expect(panFor.querySelectorAll('[data-balance-tile]').length).toBe(6);
+    expect(panAgainst.querySelectorAll('[data-balance-tile]').length).toBe(3);
+    // No capacity machinery survives: no pills, no list sections.
+    expect(document.querySelector('[data-balance-more]')).toBeNull();
+    expect(document.querySelector('[data-balance-fewer]')).toBeNull();
+    expect(document.getElementById('gold-balance-list-for')).toBeNull();
+    expect(document.getElementById('gold-balance-list-against')).toBeNull();
+    expect(screen.queryByText('Show fewer')).toBeNull();
+    // The drops still ride the same plumb law (net +3 over 9 directional
+    // → ratio 1/3 → 10/3° on the 2026-10-21c scale, design-width arm).
     const dropH = r2(160 * Math.sin(radOf(10 / 3)));
     expect((document.querySelector('[data-balance-assembly="for"]') as HTMLElement).style.transform).toBe(
       `translate(0px, ${dropH}px)`,
     );
+    // v8: the stage's height is the computed reserve — the 9-chip load
+    // reserves MORE stage than the 4-driver case A stack, and the pure
+    // helper is exactly what renders (the jsdom pans measure 0, so the
+    // arithmetic floor IS the rendered height — deterministic).
+    const stageH = Number(
+      (document.querySelector('[data-balance-stage]') as HTMLElement).style.height.replace('px', ''),
+    );
+    expect(stageH).toBe(balanceStageHeightPx(6, 3, true));
+    unmountH();
     const { unmount } = render(<BalanceScale drivers={CASE_A_DENSE} copy={copy} numberLocale="en-US" />);
-    const stageA = document.querySelector('[data-balance-stage]') as HTMLElement;
-    expect(stageA.className).toBe(stageClass);
+    const stageA = Number(
+      (document.querySelector('[data-balance-stage]') as HTMLElement).style.height.replace('px', ''),
+    );
+    expect(stageA).toBe(balanceStageHeightPx(0, 1, true));
+    expect(stageH).toBeGreaterThan(stageA);
     unmount();
-    // "Show fewer" collapses the list again.
-    const fewer = document.querySelector('[data-balance-fewer="for"]') as HTMLButtonElement;
-    fireEvent.click(fewer);
-    const listForAgain = document.getElementById('gold-balance-list-for') as HTMLElement;
-    expect(listForAgain.hidden).toBe(true);
   });
 
   it('a tile tap opens its explanation in the panel; a second tap closes it (every width)', () => {
@@ -838,7 +859,7 @@ describe('BalanceScale (rendered v7 balance)', () => {
     expect(document.querySelector('[data-balance-detail]')!.getAttribute('data-balance-detail')).toBe('stress');
   });
 
-  it('the structure order: heading → subtitle → captions → stage → assessment → lists → panel → trays', () => {
+  it('the structure order: heading → subtitle → captions → stage → assessment → panel → trays', () => {
     render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
     const chain: Array<Node | null> = [
       document.querySelector('[data-balance-title]'),
@@ -846,7 +867,6 @@ describe('BalanceScale (rendered v7 balance)', () => {
       document.querySelector('[data-balance-captions]'),
       document.querySelector('[data-balance-stage]'),
       document.querySelector('[data-balance-verdict]'),
-      document.querySelector('[data-balance-lists]'),
       document.querySelector('#gold-balance-detail'),
       document.querySelector('[data-balance-tray="unread"]'),
     ];
@@ -855,18 +875,24 @@ describe('BalanceScale (rendered v7 balance)', () => {
     }
   });
 
-  it('renders Persian digits and captions in fa; the pans carry the Persian empty marker; NOTHING mirrors text', () => {
+  it('renders Persian digits and captions in fa; the empty pan carries the FULL fa sentence inside the balance; NOTHING mirrors text', () => {
     const { unmount: unmountFa } = render(<BalanceScale drivers={CASE_A_DENSE} copy={copyFa} numberLocale="fa-IR" />);
     expect(screen.getByText('برآیند عوامل مؤثر بر قیمت طلا')).toBeTruthy();
     expect(screen.getByText('۱ به ضرر · ۳ خنثی')).toBeTruthy();
-    // The side label rides TWICE by design: once as the caption over the
-    // pan, once as the (empty) side's list-section header below.
-    expect(screen.getAllByText('عوامل حمایتی از قیمت طلا').length).toBe(2);
-    expect(screen.getAllByText('عوامل فشارآور بر قیمت طلا').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('نشانهٔ معتبری نیست')).toBeTruthy();
+    // v8: the side label rides ONCE — the caption over the pan column
+    // (the list-section header is retired with the lists).
+    expect(screen.getAllByText('عوامل حمایتی از قیمت طلا').length).toBe(1);
+    expect(screen.getAllByText('عوامل فشارآور بر قیمت طلا').length).toBe(1);
+    // R9-08: the retired v6 pill («نشانهٔ معتبری نیست») NEVER renders; the
+    // FULL evidence-based sentence rides INSIDE the for pan instead.
+    expect(screen.queryByText('نشانهٔ معتبری نیست')).toBeNull();
+    expect(screen.queryByText('هنوز چیزی برای سنجیدن نیست')).toBeNull();
     expect(
       screen.getByText('در حال حاضر، نشانهٔ معناداری از حمایت عوامل بررسی‌شده از رشد قیمت طلا دیده نمی‌شود.'),
     ).toBeTruthy();
+    expect(document.querySelector('[data-balance-empty="for"]')?.textContent).toBe(
+      'در حال حاضر، نشانهٔ معناداری از حمایت عوامل بررسی‌شده از رشد قیمت طلا دیده نمی‌شود.',
+    );
     const stage = document.querySelector('[data-balance-stage]') as HTMLElement;
     expect(stage.getAttribute('aria-label')).toBe('ترازوی طلا: ۱ به ضرر · ۳ خنثی. تمایل به ضرر طلا.');
     // The source NEVER mirrors text — no scaleX(-1) anywhere.
@@ -879,7 +905,7 @@ describe('BalanceScale (rendered v7 balance)', () => {
     unmount();
   });
 
-  it('chips are at least 44px tall by class and dashed for unread; the empty-side full line rides the list area', () => {
+  it('chips are at least 44px tall by class and dashed for unread (the off-pan trays)', () => {
     render(<BalanceScale drivers={CASE_A} copy={copy} numberLocale="en-US" />);
     const chip = document.querySelector('[data-balance-chip="stress"]') as HTMLButtonElement;
     expect(chip.className).toContain('min-h-[44px]');
@@ -999,7 +1025,9 @@ describe('MergedSignalsCard integration', () => {
       screen.getAllByText('None of the factors checked shows a meaningful signal supporting gold’s price right now.')
         .length,
     ).toBe(1);
-    expect(document.querySelector('[data-balance-empty="for"]')?.textContent).toBe('No qualifying signals');
+    expect(document.querySelector('[data-balance-empty="for"]')?.textContent).toBe(
+      'None of the factors checked shows a meaningful signal supporting gold’s price right now.',
+    );
     expect(document.querySelector('[data-balance-slot]')).toBeNull();
     // The unread drivers sit in the tray, off the pans.
     const unreadTray = document.querySelector('[data-balance-tray="unread"]') as HTMLElement;

@@ -31,6 +31,7 @@
  */
 
 import { useCallback, useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
 import { formatNumber } from '@currena/core';
 import type { FxPairId, FxRuleState, FxSnapshot } from '@currena/core';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
@@ -60,11 +61,19 @@ export function WorldCurrencies({
   copy,
   locale,
   numberLocale,
+  dollarStrength,
 }: {
   state: FxLoadState;
   copy: InsightsCopy;
   locale: 'en' | 'fa';
   numberLocale: 'en-US' | 'fa-IR';
+  /** R9-04 (2026-10-27 owner round — "merge 'Is the dollar strong?' into
+   * the currencies section"): the dollar-strength question group's card
+   * block, composed by the route from the INSIGHTS snapshot (not the fx
+   * feed) and rendered INSIDE this container in every section state —
+   * the merged "Is the dollar strong?" cards join the pairs table and
+   * the dollar row as one section. */
+  dollarStrength?: ReactNode;
 }) {
   const [openRuleId, setOpenRuleId] = useState<FxRuleState['id'] | null>(null);
   const [tableOpen, setTableOpen] = useState(false);
@@ -136,6 +145,9 @@ export function WorldCurrencies({
         <Skeleton className="h-24 rounded-[var(--radius-md)]" />
         <Skeleton className="h-14 rounded-[var(--radius-md)]" />
         <Skeleton className="h-12 rounded-[var(--radius-md)]" />
+        {/* R9-04: the merged dollar-strength block rides the container in
+         * EVERY state — it reads the insights snapshot, not this feed. */}
+        {dollarStrength}
       </section>
     );
   }
@@ -149,6 +161,7 @@ export function WorldCurrencies({
         <p className="m-0 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-4 py-3 text-[length:var(--type-label)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
           {copy.fx.empty}
         </p>
+        {dollarStrength}
       </section>
     );
   }
@@ -169,6 +182,7 @@ export function WorldCurrencies({
             date: formatDateShort(snapshot.generatedAt.slice(0, 10), locale),
           })}
         </p>
+        {dollarStrength}
       </section>
     );
   }
@@ -246,6 +260,13 @@ export function WorldCurrencies({
           />
         </div>
       ) : null}
+
+      {/* R9-04: the merged dollar-strength question group — the six
+       * "Is the dollar strong?" cards join the pairs table and the dollar
+       * row INSIDE the container (sub-headed card group, gauge reading
+       * kept). Rendered above the table disclosure so the section reads:
+       * verdict → patterns → dollar row → THE DOLLAR CARDS → pairs table. */}
+      {dollarStrength}
 
       {/* "Show all currency pairs" (§9.3 item 6, closed by default). */}
       <div>

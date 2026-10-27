@@ -5,6 +5,72 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-27] — Round 9: the owner's nine UI changes (merged sections, breadth headline, all-chips balance, US-global-reach brief)
+
+Eight implemented, one blocked on the EODHD quota — the full per-item log,
+the live-verification evidence and the Assumptions in
+`docs/insights/ROUND9_REPORT.md`. Deployed as currena-api
+`babce831-c52e-400e-a410-166d888e1bb5` (+ currena-markets
+`fd842cc4` for the shared definitions sync); the deploy-lock check ran
+first (last upload 2026-10-27T00:57Z, no parallel session).
+
+- **R9-01** — the "US shares in Australian dollars" box is RETIRED
+  entirely (component + lib + the five `usAud*` copy entries in both
+  dictionaries + their manifest fingerprints; `copy:audit` stayed clean).
+- **R9-02** — the Euro Stoxx 50 and the S&P/TSX wear their OWN logo
+  artwork (`stoxx50.jpg` / `tsx.jpg`) in the exchange cards, pinned by a
+  new `useExchangeLogo` flag in the market DEFINITIONS (the morning
+  round's flag overrides are retired; the world map's country tints are
+  untouched).
+- **R9-03** — the gold balance shows ALL with/against reasons on the
+  balance itself (BalanceScale v8): no capacity, no "+{n} more" pill, no
+  separate lists — every chip rests on its pan, the pan grows with its
+  stack and the stage reserves the taller stack + the swing (pure sizing
+  helpers + measured heights; the v7 beam mechanics kept verbatim).
+- **R9-04** — "Is the dollar strong?" is MERGED into the world currencies
+  section: the six cards render inside the container under a sub-heading
+  with the gauge reading; the standalone lane group is retired
+  (`LANE_GROUP_ORDER`). The GAUGES membership is untouched — the hero
+  count and every gauge step are unchanged (live: global still 32 voting).
+- **R9-05** — the three Australian lane groups render as SUB-headed card
+  groups inside the ONE Australia mother container (the section heading
+  and the hero's Australia verdict unchanged; the three gauges stay
+  separate with their own meters).
+- **R9-06** — the markets breadth summary is now a prominent headline box:
+  THREE LARGE up/down/flat numbers over a PROPORTIONAL green/red/grey
+  breadth bar, under the selected period's own label — first thing after
+  the section heading, above the map and tiles, Persian digits in fa.
+- **R9-07** — a dedicated "US indicators with global reach" container
+  closes the Global section: the nine US-based indicators (plus the
+  euro-area mirror) in one card group with an ANALYTICAL BRIEF generated
+  from the live values (the consequenceLine discipline — words by
+  percentile/status band, values interpolated from the cards' own
+  numbers; 14 unit tests; bilingual, manifest-triaged).
+- **R9-08** — the balance's empty state renders the FULL evidence-based
+  sentence INSIDE the pan (the v6 small pill and the separate card are
+  retired; `panEmpty`/`panUnreadable` left the dictionaries).
+- **R9-09 — BLOCKED (quota)**: the owner's EODHD plan DOES serve
+  stock-level EOD (probed live: AAPL.US, SAP.XETRA return real bars) but
+  the free tier's 20-calls/day budget is ~14–18 spent on the markets
+  board, and `bulk-last-day` answers with the plan-upgrade page — a
+  ~50-company table needs a paid tier (any plan lifting the daily quota
+  above ~70 calls or unlocking the Bulk API). Documented in
+  ROUND9_REPORT.md with the probe evidence; no half-feature shipped.
+- **Gates**: typecheck 6/6 · tests **1975/1975** (web 696→716: the new
+  brief + lane-presentation suites, the v8 balance rewrite, −3 retired
+  us-shares-aud) · lint 0 errors · copy:audit clean (2960 entries) ·
+  selfcheck all-green · **bundle budget bumped 890→896 raw / 215→217 gz**
+  with this note (the two new section components + the bilingual brief
+  templates outweigh the removed AUD box: measured 892.44/215.72) ·
+  live-verified on currena.ir in both locales (zero console errors, zero
+  overflow at 360/1280, VLM-inspected screenshots in
+  `docs/insights/screenshots-r9/`).
+- **Known pre-existing (not this round's doing, recorded honestly)**: the
+  visual fixture pipeline (`visual/build-fixtures.ts`) has lacked row
+  specs for the 47 M4→M8 ids since before Round 9 — the local + live
+  browser verification covered the render gates; restoring the harness is
+  recommended as its own work item.
+
 ## [2026-10-26c] — the A-1..A-10 gap-audit build: 89 → 100 indicators, 43 → 48 voting
 
 The ten approved additions of `docs/insights/INSIGHTS_DATA_SPEC.md`, all

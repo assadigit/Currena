@@ -23,6 +23,11 @@ import type { GaugeReading } from '@currena/insights';
 import { formatDateWords, formatJalaliDate } from '@currena/core';
 import {
   GROUP_ORDER,
+  LANE_GROUP_ORDER,
+  DOLLAR_STRENGTH_IDS,
+  US_GLOBAL_REACH_IDS,
+  HIDDEN_FROM_LANE_IDS,
+  SUBHEADING_SECTIONS,
   attentionTiles,
   bandPositionOf,
   bandWordsOf,
@@ -786,5 +791,72 @@ describe('v3 Delayed tier (§4: ≥1 trading day behind the snapshot’s daily p
     ]);
     expect(counts.normal).toBe(1);
     expect(counts.context).toBe(1);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * R9 (2026-10-27 owner round) — the lane presentation surface:
+ * the dollar-strength group merged into the currencies section, the
+ * US-global-reach container, the Australia sub-heading consolidation.
+ * The COUNTING surface (GROUP_ORDER) is unchanged — the hero's gauge
+ * names and the R18 counting invariant still ride the FULL order.
+ * ------------------------------------------------------------------ */
+
+describe('R9 lane presentation (special containers, unchanged gauges)', () => {
+  it('GROUP_ORDER stays the FULL gauge order — the counting surface is unchanged by the merge', () => {
+    expect(GROUP_ORDER.global).toEqual(['borrowing-costs', 'prices-heat', 'market-stress', 'dollar-strength', 'growth-health']);
+    expect(GROUP_ORDER.australia).toEqual(['au-inflation-rates', 'au-households', 'au-trade-currency']);
+  });
+
+  it('R9-04: the LANE drops the dollar-strength group — its cards render in the currencies section', () => {
+    expect(LANE_GROUP_ORDER.global).toEqual(['borrowing-costs', 'prices-heat', 'market-stress', 'growth-health']);
+    expect(LANE_GROUP_ORDER.global).not.toContain('dollar-strength');
+    // The Australia lane keeps all three groups (R9-05 renders them as
+    // sub-headed card groups INSIDE the one container — no group is lost).
+    expect(LANE_GROUP_ORDER.australia).toEqual(GROUP_ORDER.australia);
+  });
+
+  it('R9-04: the dollar-strength ids are exactly the six cards that moved', () => {
+    expect([...DOLLAR_STRENGTH_IDS].sort()).toEqual(
+      ['dollar-basket', 'usdjpy', 'us-japan-10y-gap', 'eur-usd', 'usdtry', 'usdcny'].sort(),
+    );
+  });
+
+  it('R9-07: the US-global-reach ids are exactly the nine the owner listed', () => {
+    expect([...US_GLOBAL_REACH_IDS].sort()).toEqual(
+      ['real-yield-10y', 'us10y', 'us30y', 'euro-hicp', 'us-cpi-yoy', 'us-pce-core-yoy', 'walcl', 'stress-stlfsi', 'nfci'].sort(),
+    );
+  });
+
+  it('the hidden-from-lane set is exactly the two special containers\' members — one reading, one surface', () => {
+    expect(HIDDEN_FROM_LANE_IDS.size).toBe(DOLLAR_STRENGTH_IDS.length + US_GLOBAL_REACH_IDS.length);
+    for (const id of [...DOLLAR_STRENGTH_IDS, ...US_GLOBAL_REACH_IDS]) {
+      expect(HIDDEN_FROM_LANE_IDS.has(id)).toBe(true);
+    }
+    // No lane-only reading accidentally joined the hidden set.
+    expect(HIDDEN_FROM_LANE_IDS.has('vix')).toBe(false);
+    expect(HIDDEN_FROM_LANE_IDS.has('gold-silver')).toBe(false);
+    expect(HIDDEN_FROM_LANE_IDS.has('au-cpi')).toBe(false);
+  });
+
+  it('R9-04 + R9-07: every hidden id is a REAL definition whose section is global (no phantom ids)', () => {
+    for (const id of [...DOLLAR_STRENGTH_IDS, ...US_GLOBAL_REACH_IDS]) {
+      const def = definitionFor(id);
+      expect(def.section).toBe('global');
+    }
+  });
+
+  it('R9-05: the Australia section is the sub-heading section (the Global groups keep question headings)', () => {
+    expect(SUBHEADING_SECTIONS.has('australia')).toBe(true);
+    expect(SUBHEADING_SECTIONS.has('global')).toBe(false);
+  });
+
+  it('R9-04/R9-07: the full GROUP_ORDER counting invariant still covers every gauge group (R18 stays honest)', () => {
+    // The union of the lane groups and the special containers covers every
+    // global GAUGE group exactly once (dollar-strength's six ids live in
+    // the currencies section; the nine US ids still count in their gauges).
+    const laneGroups = new Set(LANE_GROUP_ORDER.global);
+    const allGroups = new Set(GROUP_ORDER.global);
+    expect(allGroups.size).toBe(laneGroups.size + 1); // + dollar-strength
   });
 });
