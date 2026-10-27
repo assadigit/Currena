@@ -70,6 +70,262 @@ export interface IndicatorCopyEntry {
   forYou: string;
 }
 
+/* ------------------------------------------------------------------ *
+ * Layer 1 — plain-language copy (docs/insights/layer1/PLAIN-LANGUAGE-SPEC.md).
+ *
+ * Layer 1 adds fixed, hand-quality plain-language writing to EVERY
+ * indicator on the Insights page, in EN + FA, so each card answers
+ * "what is this, and what does it mean for my everyday life?" NO AI at
+ * runtime — the copy is static, bundled, identical for every visitor.
+ *
+ * The NEW Layer-1 fields live here (a new top-level `layer1` object on
+ * `insightsCopyEn`/`insightsCopyFa`). The approved `whatItIs` /
+ * `whyItMatters` from `IndicatorCopyEntry` are REUSED (decision D-02 in
+ * docs/insights/layer1/DECISIONS.md — approved wording wins over the
+ * style guide); the accessor `getIndicatorCopy(id, lang)` merges them.
+ *
+ * G1–G8 (spec §9) are enforced by the vitest test at
+ * apps/web/src/components/insights/layer1/layer1.test.ts.
+ * ------------------------------------------------------------------ */
+
+/** A Layer-1 connection between two indicators (spec §4 `connections`). */
+export interface Layer1Connection {
+  /** The target indicator id (must exist in the Layer-1 inventory). */
+  with: string;
+  /** One plain sentence describing the relationship. */
+  text: string;
+  /** How reliable the relationship is (spec §4: reliable / usually / sometimes). */
+  strength: 'reliable' | 'usually' | 'sometimes';
+}
+
+/** A glossary entry (spec §7): `{ term, plain (≤ 2 sentences), example? }`. */
+export interface Layer1GlossaryEntry {
+  /** The term itself (the word the copy uses). */
+  term: string;
+  /** A plain definition, ≤ 2 sentences. */
+  plain: string;
+  /** An optional example. May contain digits (G6-exempt). Clearly an example. */
+  example?: string;
+}
+
+/**
+ * The NEW Layer-1 fields for one indicator (spec §4). `whatItIs` /
+ * `whyItMatters` are intentionally NOT here — they are reused from
+ * `IndicatorCopyEntry` (decision D-02).
+ */
+export interface Layer1Entry {
+  /** Friendly label ≤ 6 words, shown beside the official name (D-03). */
+  plainName: string;
+  /** ALWAYS-TRUE everyday effect; direction-neutral; state-independent. ≤ 16 words, 1 sentence. */
+  oneLine: string;
+  /** What a rise usually means for ordinary people. 1 sentence, ≤ 22 words. null when direction is meaningless (skipReason set). */
+  ifRising: string | null;
+  /** What a fall usually means. 1 sentence, ≤ 22 words. null when direction is meaningless (skipReason set). */
+  ifFalling: string | null;
+  /** Present only when ifRising/ifFalling is null: the reason direction is skipped (spec §4). */
+  skipReason?: string;
+  /** 0–3 connections to other indicators. */
+  connections: Layer1Connection[];
+  /** Australia-specific angle (only for AU + AUD/RBA/petrol/home-loan global indicators; D-08). */
+  australiaAngle?: string;
+  /** Glossary term ids used in this indicator's copy. */
+  glossaryTerms: string[];
+}
+
+/** The Layer-1 UI labels for the expanded DetailsPanel block. whatItIs/whyItMatters are reused from the top-level `ui`. */
+export interface Layer1Ui {
+  /** Section header for the ifRising line. */
+  ifRising: string;
+  /** Section header for the ifFalling line. */
+  ifFalling: string;
+  /** Section header for the connections list. */
+  connections: string;
+  /** Section header for the australiaAngle line. */
+  australiaAngle: string;
+  /** The block title for the whole Layer-1 section in the expanded panel. */
+  plainWords: string;
+  /** Shown when ifRising/ifFalling are both null (patterns; D-09). */
+  noDirection: string;
+}
+
+/**
+ * Layer 1 — the EN source of truth. The FA mirror lives in
+ * `insights-copy-fa.ts` and is shape-checked at compile time (the repo's
+ * existing dictionary pattern). IDs are the existing stable indicator ids
+ * (IndicatorId) plus the markets (MarketId) and FX pairs/patterns.
+ *
+ * BATCHED: copy is written in batches of 5–8 (spec §7). An id present in
+ * the code inventory but not yet here is caught by gate G1 (the validator
+ * lists it). Until an id's entry lands, the UI renders nothing extra for it
+ * (graceful). See docs/insights/layer1/INVENTORY.md for progress.
+ */
+const LAYER1 = {
+  ui: {
+    ifRising: 'If it rises',
+    ifFalling: 'If it falls',
+    connections: 'How it connects',
+    australiaAngle: 'The Australia angle',
+    plainWords: 'Plain words',
+    noDirection: 'Direction does not give a clear signal here',
+  } satisfies Layer1Ui,
+
+  glossary: {
+    inflation: {
+      term: 'inflation',
+      plain: 'How fast prices are rising. Higher inflation means the same money buys less over time.',
+      example: 'If inflation is 3%, something that cost $100 last year costs about $103 now.',
+    },
+    deflation: {
+      term: 'deflation',
+      plain: 'When prices are falling on average. It sounds good but can stall an economy and wages.',
+    },
+    'interest-rate': {
+      term: 'interest rate',
+      plain: 'The price of borrowing money. Higher rates make loans cost more and make saving pay more.',
+    },
+    'policy-rate': {
+      term: 'policy rate',
+      plain: 'The central bank’s main interest rate. It steers savings, loan and bond rates across the economy.',
+    },
+    bond: {
+      term: 'bond',
+      plain: 'A loan you give to a government or a company. They pay you interest and give the money back later.',
+    },
+    yield: {
+      term: 'yield',
+      plain: 'The yearly return you get from lending money through a bond.',
+    },
+    'real-yield': {
+      term: 'real yield',
+      plain: 'A bond yield after taking out expected inflation. It shows the real return a lender keeps.',
+    },
+    'yield-curve': {
+      term: 'yield curve',
+      plain: 'The shape of interest rates from short to long borrowing times. A flat or inverted curve is a classic warning.',
+    },
+    breakeven: {
+      term: 'breakeven inflation',
+      plain: 'The inflation rate markets are pricing, from the gap between a normal bond and an inflation-linked bond of the same length.',
+    },
+    'central-bank': {
+      term: 'central bank',
+      plain: 'The institution that controls a country’s interest rates and money supply, like the Reserve Bank of Australia or the US Fed.',
+    },
+    recession: {
+      term: 'recession',
+      plain: 'A period when a country’s economy shrinks and more people lose jobs.',
+    },
+    volatility: {
+      term: 'volatility',
+      plain: 'How wildly prices jump around. High volatility means big, fast swings.',
+    },
+    'safe-haven': {
+      term: 'safe haven',
+      plain: 'Something people tend to move money into when they are worried, like gold.',
+    },
+    commodity: {
+      term: 'commodity',
+      plain: 'A raw material bought and sold in bulk, like oil, gold or wheat.',
+    },
+    'stock-index': {
+      term: 'stock index',
+      plain: 'One number that tracks how a group of big companies’ shares is doing overall.',
+    },
+    mortgage: {
+      term: 'mortgage',
+      plain: 'A loan used to purchase a home, paid back with interest over many years.',
+    },
+  } satisfies Record<string, Layer1GlossaryEntry>,
+
+  indicators: {
+    /* ----- Batch 1 — borrowing-costs (8) ----- */
+    'yield-curve-10y2y': {
+      plainName: 'US borrowing gap (10y–2y)',
+      oneLine: 'The gap between long and short-term US government borrowing.',
+      ifRising: 'A widening gap usually comes with growth or inflation pressure.',
+      ifFalling: 'A small or negative gap has preceded most US recessions.',
+      connections: [
+        { with: 'recession-probability', text: 'Both read the same recession signal from different angles.', strength: 'usually' },
+      ],
+      glossaryTerms: ['yield-curve', 'bond', 'recession', 'inflation'],
+    },
+    'yield-curve-10y3m': {
+      plainName: 'US borrowing gap (10y–3m)',
+      oneLine: 'The gap the Federal Reserve itself watches most closely.',
+      ifRising: 'A steep gap usually comes with growth or inflation pressure.',
+      ifFalling: 'Deep inversions of this leg have preceded every modern US recession.',
+      connections: [
+        { with: 'recession-probability', text: 'The 3-month leg and the recession model tell the same story.', strength: 'usually' },
+      ],
+      glossaryTerms: ['yield-curve', 'bond', 'recession', 'inflation'],
+    },
+    'real-yield-10y': {
+      plainName: 'US lending return after inflation',
+      oneLine: 'What lending to the US government pays after inflation is taken out.',
+      ifRising: 'Safe savings pay more, so assets that pay no interest, like gold, often get less attractive.',
+      ifFalling: 'Holding safe money earns little after inflation, which often helps non-interest assets.',
+      connections: [
+        { with: 'gold-usd', text: 'Higher real yields tend to weigh on gold.', strength: 'usually' },
+      ],
+      australiaAngle: 'High US real yields tend to pressure the Australian dollar and gold prices.',
+      glossaryTerms: ['real-yield', 'bond', 'yield', 'inflation'],
+    },
+    us10y: {
+      plainName: 'US 10-year borrowing cost',
+      oneLine: 'The interest rate on 10-year US government debt.',
+      ifRising: 'Home loans and business credit usually follow, with a lag.',
+      ifFalling: 'Cheaper borrowing usually helps loans and asset prices.',
+      connections: [
+        { with: 'mortgage-30y', text: 'The 30-year US mortgage follows the 10-year Treasury.', strength: 'reliable' },
+        { with: 'real-yield-10y', text: 'The nominal yield is roughly the real yield plus expected inflation.', strength: 'reliable' },
+      ],
+      australiaAngle: 'Australian long-term rates and the Australian dollar usually move with US long yields.',
+      glossaryTerms: ['yield', 'bond', 'interest-rate', 'mortgage', 'real-yield', 'inflation'],
+    },
+    us30y: {
+      plainName: 'US 30-year borrowing cost',
+      oneLine: 'The interest rate on 30-year US government debt.',
+      ifRising: 'Mortgages and long-dated borrowing usually cost more.',
+      ifFalling: 'Long borrowing usually gets cheaper.',
+      connections: [
+        { with: 'mortgage-30y', text: 'The 30-year Treasury is the longest anchor for US mortgage pricing.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['yield', 'bond', 'interest-rate', 'mortgage'],
+    },
+    'fed-target': {
+      plainName: 'The Fed’s main rate',
+      oneLine: 'The Federal Reserve’s main interest rate.',
+      ifRising: 'Loans and mortgages usually cost more, and saving pays more.',
+      ifFalling: 'Loans and mortgages usually ease, and saving pays less.',
+      connections: [
+        { with: 'us10y', text: 'The policy rate anchors the short end; the 10-year carries the long expectation.', strength: 'reliable' },
+      ],
+      australiaAngle: 'The Fed’s moves set the tone for global rates, including the path the RBA can credibly take.',
+      glossaryTerms: ['policy-rate', 'central-bank', 'interest-rate', 'mortgage'],
+    },
+    'ecb-dfr': {
+      plainName: 'The ECB’s main rate',
+      oneLine: 'The rate banks earn on deposits at the European Central Bank.',
+      ifRising: 'Euro-area loans usually cost more, and saving pays more.',
+      ifFalling: 'Euro-area loans usually ease, and saving pays less.',
+      connections: [
+        { with: 'euro-aaa-10y', text: 'The deposit rate anchors the short end of the euro-area curve.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['policy-rate', 'central-bank', 'interest-rate'],
+    },
+    'fed-expectations': {
+      plainName: 'Where markets think the Fed goes',
+      oneLine: 'What the 2-year Treasury implies about the Fed’s next moves.',
+      ifRising: 'When markets price higher Fed rates, borrowing usually rises before the move.',
+      ifFalling: 'When markets price lower Fed rates, borrowing usually eases before the move.',
+      connections: [
+        { with: 'fed-target', text: 'The 2-year-implied path is the market’s reading of where the Fed goes.', strength: 'usually' },
+      ],
+      glossaryTerms: ['yield', 'interest-rate', 'central-bank'],
+    },
+  } satisfies Record<string, Layer1Entry>,
+};
+
 const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   'yield-curve-10y3m': {
     // 2026-10-26 gap-audit build, A-1 (INSIGHTS_DATA_SPEC.md): the 3-month
@@ -4448,6 +4704,12 @@ export const insightsCopyEn = {
   },
 
   indicators: INDICATORS,
+
+  // Layer 1 — plain-language copy (docs/insights/layer1/PLAIN-LANGUAGE-SPEC.md).
+  // EN source of truth; the fa mirror in insights-copy-fa.ts is shape-checked
+  // against this at compile time. Accessors: getIndicatorCopy / getGlossary in
+  // apps/web/src/components/insights/layer1/index.ts.
+  layer1: LAYER1,
 };
 
 export type InsightsCopy = typeof insightsCopyEn;

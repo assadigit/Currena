@@ -24,16 +24,115 @@ import { HistoryChart, formatAsOf } from './HistoryChart';
 import { PRICE_ROWS, definitionFor, formatRuleText, formatUtcHm } from './config';
 import { PriceDetailsSections } from './PriceDetails';
 import { staleAfterDaysFor, RULE_CHANGELOG, RULE_VERSION } from '@currena/insights';
+import { getIndicatorCopy, getGlossary, getLayer1Ui } from './layer1';
 
-function Section({ title, body }: { title: string; body: string }) {
+function Section({ title, body, emphasis }: { title: string; body: string; emphasis?: boolean }) {
   return (
     <div>
       <h4 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
         {title}
       </h4>
-      <p className="mt-1 mb-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
+      <p className={`mt-1 mb-0 text-[length:var(--type-label)] leading-relaxed ${emphasis ? 'font-bold text-[var(--color-text-primary)]' : 'text-[var(--color-text-primary)]/90'}`}>
         {body}
       </p>
+    </div>
+  );
+}
+
+/**
+ * Layer 1 — the plain-language block for the expanded panel
+ * (docs/insights/layer1/PLAIN-LANGUAGE-SPEC.md §6 + DECISIONS D-05/D-06).
+ * A new grouped block placed AFTER the approved F5 sections (whatItIs is
+ * last) and BEFORE the chart. Contains, in spec order: ifRising, ifFalling,
+ * connections, australiaAngle (if present), and the glossary-term list.
+ * When the reading carries a 30-day direction, the matching ifRising/
+ * ifFalling line is emphasised (D-06, CSS only — no new wording). Renders
+ * nothing when no Layer-1 copy exists for the id (graceful roll-out).
+ */
+function Layer1Block({
+  reading,
+  copy,
+  locale,
+}: {
+  reading: IndicatorReading;
+  copy: InsightsCopy;
+  locale: 'en' | 'fa';
+}) {
+  const l1 = getIndicatorCopy(reading.id, locale);
+  const ui = getLayer1Ui(locale);
+  const glossary = getGlossary(locale);
+  if (!l1) return null;
+  const dir = reading.change30d;
+  const rising = dir !== undefined && dir > 0;
+  const falling = dir !== undefined && dir < 0;
+  const bothNull = l1.ifRising === null && l1.ifFalling === null;
+  return (
+    <div className="mt-4 flex flex-col gap-4 border-t border-[var(--color-border)] pt-4" data-layer1-block>
+      {l1.ifRising !== null ? (
+        <Section title={ui.ifRising} body={l1.ifRising} emphasis={rising} />
+      ) : null}
+      {l1.ifFalling !== null ? (
+        <Section title={ui.ifFalling} body={l1.ifFalling} emphasis={falling} />
+      ) : null}
+      {bothNull && l1.skipReason !== undefined ? (
+        <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+          {l1.skipReason}
+        </p>
+      ) : null}
+      {bothNull ? (
+        <p className="m-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{ui.noDirection}</p>
+      ) : null}
+      {l1.connections.length > 0 ? (
+        <div>
+          <h4 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
+            {ui.connections}
+          </h4>
+          <ul className="m-0 mt-1 list-none p-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
+            {l1.connections.map((c, i) => {
+              const name =
+                getIndicatorCopy(c.with, locale)?.plainName ??
+                (copy.indicators[c.with as keyof typeof copy.indicators]?.name) ??
+                c.with;
+              return (
+                <li key={i} className="mb-1">
+                  <span className="font-semibold">{name}</span>
+                  <span aria-hidden="true"> — </span>
+                  <span>{c.text}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ) : null}
+      {l1.australiaAngle !== undefined ? (
+        <Section title={ui.australiaAngle} body={l1.australiaAngle} />
+      ) : null}
+      {l1.glossaryTerms.length > 0 ? (
+        <div>
+          <h4 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
+            {ui.plainWords}
+          </h4>
+          <dl className="m-0 mt-1 grid gap-1.5 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
+            {l1.glossaryTerms.map((termId) => {
+              const g = glossary[termId];
+              if (!g) return null;
+              return (
+                <div key={termId}>
+                  <dt className="font-semibold">{g.term}</dt>
+                  <dd className="m-0 ms-0 text-[var(--color-text-secondary)]">
+                    {g.plain}
+                    {g.example !== undefined ? (
+                      <span className="mt-0.5 block text-[length:var(--type-caption)] italic text-[var(--color-text-tertiary)]">
+                        {g.example}
+                      </span>
+                    ) : null}
+                  </dd>
+                </div>
+              );
+            })}
+          </dl>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -267,6 +366,13 @@ export function DetailsPanel({
                   {entry.ticker}
                 </span>
               ) : null}
+              {/* Layer 1 (D-03): the short friendly label beside the official
+               * name, shown only when Layer-1 copy exists for this id. */}
+              {getIndicatorCopy(reading.id, locale)?.plainName ? (
+                <span className="ms-1.5 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]" data-layer1-plainname>
+                  {getIndicatorCopy(reading.id, locale)!.plainName}
+                </span>
+              ) : null}
               </span>
             </h3>
           </div>
@@ -358,6 +464,11 @@ export function DetailsPanel({
             <Section title={copy.ui.cantTell} body={entry.cantTell} />
             <Section title={copy.ui.whatItIs} body={entry.whatItIs} />
           </div>
+
+          {/* Layer 1 — the plain-language block (D-05): ifRising / ifFalling /
+           * connections / australiaAngle / glossary terms. Renders nothing
+           * when no Layer-1 copy exists for this id (graceful roll-out). */}
+          <Layer1Block reading={reading} copy={copy} locale={locale} />
 
           {/* The large chart (labels ≥ caption size — the HistoryChart
            * renders its ticks at caption size). v3 UI-17 (2026-10-20): the

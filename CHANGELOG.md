@@ -5,6 +5,54 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-28b] — Insights Layer 1 (batch 1): the plain-language foundation + borrowing-costs copy
+
+The first batch of the Layer-1 plain-language copy work
+(`docs/insights/layer1/PLAIN-LANGUAGE-SPEC.md`): fixed, hand-quality
+plain-language writing for every indicator on the Insights page, in Farsi
+and English, so each card answers "what is this, and what does it mean for
+my everyday life?" No AI at runtime — the copy is static, bundled, identical
+for every visitor. This batch ships the foundation + 8/134 indicators.
+
+- The two spec files moved into `docs/insights/layer1/` (PLAIN-LANGUAGE-SPEC.md,
+  STYLE-GUIDE.md) beside the new DECISIONS / INVENTORY / COPY-REVIEW / README.
+- The Layer-1 copy lives as a new top-level `layer1` object on the existing
+  `apps/web/src/i18n/insights-copy-{en,fa}.ts` dictionaries (EN source of truth,
+  FA shape-checked at compile time — the repo's established pattern, zero
+  audit-infrastructure change). Only the NEW Layer-1 fields live here
+  (`plainName`, `oneLine`, `ifRising`, `ifFalling`, `connections`,
+  `australiaAngle?`, `glossaryTerms`); the approved `whatItIs` / `whyItMatters`
+  are reused (decision D-02: approved wording wins). Typed accessors
+  `getIndicatorCopy` / `getGlossary` / `getLayer1Ui` live in
+  `apps/web/src/components/insights/layer1/` (the contract Layer 2 will import).
+- Batch 1: the 8 borrowing-costs indicators (yield-curve-10y2y, -10y3m,
+  real-yield-10y, us10y, us30y, fed-target, ecb-dfr, fed-expectations) + a
+  16-term seed glossary (inflation, deflation, interest-rate, policy-rate,
+  bond, yield, real-yield, yield-curve, breakeven, central-bank, recession,
+  volatility, safe-haven, commodity, stock-index, mortgage). EN written first
+  from meaning; FA written natively (not translated) in the style of a clear
+  Iranian finance explainer.
+- The validation gate `apps/web/src/components/insights/layer1/layer1.test.ts`
+  enforces G1–G8 (spec §9) on every `pnpm -r test`: completeness (no orphans +
+  full-completeness advisory unless `LAYER1_STRICT=1`), length limits, jargon
+  must be a listed glossary term, banned advice/certainty words, Farsi hygiene
+  (Persian digits/ی-ک/no em-dash/Latin allow-list), no digits except tenor
+  names + glossary examples, readability, and en↔fa shape parity. 647 tests.
+- Minimal display (spec §6): the collapsed AlertCard shows a tiny muted
+  `oneLine` under the meta row (renders only when Layer-1 copy exists —
+  graceful during the roll-out); the expanded DetailsPanel adds a `Layer1Block`
+  (ifRising / ifFalling with direction emphasis / connections / australiaAngle
+  / glossary terms) after the approved F5 sections, plus a `plainName` beside
+  the ticker in the header. Existing card hierarchy + wording untouched.
+- Gates: typecheck 6/6, web 1363 (+647 Layer-1), cross-package 2655 green,
+  lint 0 errors, copy:audit clean (133 fa strings triaged → manifest 2970→3103),
+  bundle budget bumped 896/217 → 940/228 (Insights lazy 914.48/221.13; the D-16
+  bilingual-content path), browser-verified EN+FA @ 1280+360 (5 screenshots
+  under `docs/insights/screenshots/layer1-2026-10-28/`). Free-tier safety holds:
+  Layer 1 adds zero KV operations and zero external calls. NOT deployed — the
+  roll-out is incomplete (8/134); the final session sets `LAYER1_STRICT=1`,
+  fills the last batch until green, then deploys per `docs/DEPLOY.md`.
+
 ## [2026-10-28] — Round 10: Insights maintenance + de-risking (RBA regression-pinned, STLFSI fixed, companies table pre-built, visual fixtures restored, lint 0/0, token rotated)
 
 Six items — three maintenance fixes, one de-risking pre-build, one

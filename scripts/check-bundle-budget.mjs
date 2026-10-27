@@ -631,7 +631,18 @@ const BUDGETS = [
   // the M8 tree — the two new section components and the bilingual brief
   // templates outweigh the removed AUD box). The entry chunk is untouched
   // at 295.28/88.81. Justified in CHANGELOG §2026-10-27 (R9).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 896_000, gz: 217_000, label: 'Insights lazy chunk' },
+  // Layer 1 bump (2026-10-28, batch 1): the plain-language copy module —
+  // a new top-level `layer1` object on insights-copy-{en,fa}.ts (8
+  // borrowing-costs indicators × 5 new fields + a 16-term seed glossary,
+  // both languages) + the typed accessors + the Layer1Block in
+  // DetailsPanel + the oneLine line in AlertCard. EN source-of-truth,
+  // FA shape-checked. Measured 914.48 kB raw / 221.13 kB gz (+22.04 raw /
+  // +5.41 gz over R9). The growth is the bundled bilingual Layer-1 copy
+  // (spec §5: bundled, no KV/external calls — D-16 path). The full 134-
+  // indicator roll-out will grow this further; each batch re-measures and
+  // bumps consciously. The entry chunk is untouched at 295.37/88.84.
+  // See docs/insights/layer1/PLAIN-LANGUAGE-SPEC.md + DECISIONS D-01.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 940_000, gz: 228_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

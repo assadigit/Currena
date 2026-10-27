@@ -48,6 +48,7 @@ import { CardMetaRow, ChangeText, faceReasonOf } from './CardMeta';
 import { PositionBar } from './PositionBar';
 import { StatusChip } from './StatusChip';
 import { formatAsOf } from './HistoryChart';
+import { getIndicatorCopy } from './layer1';
 import type { IndicatorReading as Reading } from '@currena/core';
 
 export function AlertCard({
@@ -82,6 +83,12 @@ export function AlertCard({
   const def = definitionFor(reading.id);
   const entry = copy.indicators[reading.id];
   const locale = numberLocale === 'fa-IR' ? 'fa' : 'en';
+  // Layer 1 (docs/insights/layer1/PLAIN-LANGUAGE-SPEC.md §6): the
+  // ALWAYS-TRUE one-line plain effect, shown as small muted text on the
+  // collapsed card face. Renders only when Layer-1 copy exists for this id
+  // (graceful during the batched roll-out — D-04). State-independent, so it
+  // never contradicts a live gauge or alert.
+  const l1 = getIndicatorCopy(reading.id, locale);
   const tier: IndicatorTier = tierOf(reading, peers);
   const isNeedsAttention = tier === 'needs-attention';
   // v3 §4 (UI-17): a reading that cannot be told hides its value AND its
@@ -313,6 +320,15 @@ export function AlertCard({
       {/* 6. Meta row (wraps — U-02's fix): data period · released · updated
        * UTC · source link. */}
       <CardMetaRow reading={reading} copy={copy} numberLocale={numberLocale} />
+
+      {/* Layer 1 — the always-true one-line plain effect (D-04): a single
+       * caption-sized muted line on the collapsed card. Rendered only when
+       * Layer-1 copy exists for this id; never contradicts a live gauge. */}
+      {l1 ? (
+        <p className="m-0 mt-1 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]" data-layer1-oneline>
+          <bdi>{l1.oneLine}</bdi>
+        </p>
+      ) : null}
 
       {/* 7. Details control — the explicit, always-labelled details trigger
        * (UI-54); the face above is the same action with a bigger zone. */}

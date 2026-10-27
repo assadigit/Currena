@@ -1,0 +1,241 @@
+# Layer 1 — Decisions log
+
+Every ambiguity the spec left open is recorded here as: assumption + reason +
+the conservative option chosen. The owner/style-guide rule order is:
+**already-approved site wording > style guide > this log's conservative choice**.
+
+## D-01 — Where the Layer 1 copy lives
+
+**Assumption.** The spec (§5) says "One typed content source keyed by the
+indicator's existing stable id (follow the repo's language and conventions:
+TS modules or JSON, agent's choice)."
+
+**Decision.** Add a new top-level `layer1` object to the EXISTING
+`apps/web/src/i18n/insights-copy-en.ts` and `insights-copy-fa.ts` dictionaries
+(en source of truth, fa shape-checked at compile time — the repo's established
+pattern). Shape:
+
+```ts
+layer1: {
+  ui: { whatItIs, whyItMatters, ifRising, ifFalling, connections, australiaAngle, plainWords, noDirection },
+  indicators: { [id]: Layer1Entry },   // only the NEW Layer-1 fields
+  glossary:   { [termId]: GlossaryEntry },
+}
+```
+
+**Reason.** (a) Zero audit-infrastructure change — the Persian-copy audit
+already extracts the fa dictionary by walking the exported object literal, so
+every fa string gets a stable manifest id like `layer1.indicators.<id>.oneLine`
+and is triaged the documented way (`pnpm copy:audit` + `pnpm copy:audit:update`).
+A separate TS file would be swept as "hardcoded Persian literals" with fragile
+sha-derived ids, complicating the manifest by the hundreds. (b) Shape-checked:
+fa missing a key fails typecheck (the repo's existing guarantee). (c) Loads
+lazily with the `/insights` route chunk (the existing bundle-budget discipline
+applies — bump the budget consciously when measured, the documented D-16 path).
+(d) The spec's "one typed content source keyed by the indicator's existing
+stable id" is satisfied (the id IS the existing `IndicatorId`).
+
+## D-02 — Reuse approved `whatItIs` / `whyItMatters`, do not re-write them
+
+**Assumption.** Spec §4 lists `whatItIs` (≤ 35 words) and `whyItMatters`
+(≤ 55 words) as required per indicator. The repo ALREADY has approved,
+audit-manifested `whatItIs` / `whyItMatters` for every indicator in
+`copy.indicators[id]` (some carry digits like "6 to 24 months", which the
+spec's G6 would otherwise ban).
+
+**Decision.** The Layer 1 `Layer1Entry` carries ONLY the NEW fields:
+`plainName`, `oneLine`, `ifRising`, `ifFalling`, `connections`,
+`australiaAngle?`, `glossaryTerms`. The accessor `getIndicatorCopy(id, lang)`
+returns a MERGED object that pulls `whatItIs` / `whyItMatters` from the
+existing approved `copy.indicators[id]` entry, so the consumer (and Layer 2)
+gets the full spec §4 shape in one call. The validator's G2 (length), G3
+(jargon), G6 (no digits) and G7 (readability) apply ONLY to the new Layer-1
+fields (`plainName`, `oneLine`, `ifRising`, `ifFalling`, `connections`,
+`australiaAngle`) and the glossary — NOT to the approved `whatItIs` /
+`whyItMatters` (approved wording wins over the style guide; re-validating
+approved copy would either force re-writing approved wording or fail).
+
+**Reason.** "Already-approved site wording always wins over the style guide"
+(spec rule). Re-writing approved copy would either duplicate it or contradict
+it; both violate the rule. The new fields are where Layer 1 adds value.
+
+## D-03 — `plainName` is written but not rendered on the collapsed card face
+
+**Assumption.** Spec §4 says `plainName` (≤ 6 words) is "friendly label shown
+beside the official name (the official name stays)." Spec §6 (display) lists
+what to show on the collapsed card (`oneLine`) and in the expanded view
+(`whatItIs`, `whyItMatters`, `ifRising`, `ifFalling`, `connections`,
+`australiaAngle`, glossary) — but does NOT mention `plainName` anywhere in the
+display section.
+
+**Decision.** Write `plainName` for every indicator (it is a required field and
+Layer 2 needs it). Render it minimally ONLY in the expanded DetailsPanel header,
+as a small muted line beside the existing `name` + `ticker` (the "official
+name" pair). Do NOT render it on the collapsed card face (§6 does not list it
+there, and adding it would enlarge the card, which §6 forbids).
+
+**Reason.** Conservative reading of §6 ("Card (collapsed): show `oneLine` …
+Keep the card's existing hierarchy; do not enlarge cards"). `plainName` still
+ships (required by §4, needed by Layer 2) and has a small, spec-consistent
+display spot in the expanded panel.
+
+## D-04 — `oneLine` on the collapsed card: a new tiny muted line, below the existing meaning line
+
+**Assumption.** §6 says collapsed card shows `oneLine` as "small, muted text
+under the value/label … Keep the card's existing hierarchy; do not enlarge
+cards." The `AlertCard` already has a state-keyed meaning line (the
+`consequenceLine`) — `oneLine` is ALWAYS-TRUE/state-independent, so it is a
+different sentence.
+
+**Decision.** Add `oneLine` as a new, single, caption-sized, muted (`color-text-
+tertiary`) line at the bottom of the card face (after the existing meta + extra
+lines, before the details control). It renders ONLY when a Layer-1 entry exists
+for the id (graceful during the batch roll-out). It is NOT a replacement for the
+existing consequence line.
+
+**Reason.** §6 explicitly requires `oneLine` on the collapsed card. Putting it
+at caption size + muted + at the bottom keeps the card's hierarchy (title →
+value → change → chip → meaning → meta → details) intact and is the smallest
+addition that still honours "do not enlarge cards."
+
+## D-05 — Expanded DetailsPanel: a NEW grouped block, no reordering of existing sections
+
+**Assumption.** §6 says the expanded view adds, in order: `whatItIs`,
+`whyItMatters`, `ifRising`, `ifFalling`, `connections`, `australiaAngle`,
+glossary. The existing DetailsPanel shows (F5 order): `forYou`, `whyItMatters`,
+`tendedToMean`, `cantTell`, `whatItIs` — approved wording and order.
+
+**Decision.** ADD a new grouped block titled with the Layer-1 ui label
+(`plainWords` / «معنی واژه‌ها») containing, in the spec's order: `ifRising`,
+`ifFalling`, `connections`, `australiaAngle` (if present), glossary term list.
+`whatItIs` and `whyItMatters` are NOT re-added (they are already shown from
+the approved copy, per D-02). The new block is placed AFTER the existing
+`whatItIs` section and BEFORE the chart. Existing section order is untouched.
+
+**Reason.** "Do not change the visual design system" + "approved wording wins."
+Reordering approved sections would change the approved UX; the spec's "in
+order" applies to the new Layer-1 block's internal order, which we follow.
+
+## D-06 — Direction emphasis in the expanded view: CSS only, no new wording
+
+**Assumption.** §6: "If the card already knows its direction, visually emphasise
+the matching ifRising/ifFalling line."
+
+**Decision.** When the reading carries a 30-day direction (`change30d` sign) or
+a position band, emphasise the matching line (`ifRising` for a rise, `ifFalling`
+for a fall) by rendering it with `font-semibold` + the primary text colour,
+while the other line stays muted. No new words; CSS only.
+
+## D-07 — Validator scope (G1–G8) and exemptions
+
+**Decision.** The validation test `apps/web/src/components/insights/layer1/
+layer1.test.ts` enforces:
+
+- **G1 Completeness.** Every indicator id in the code inventory (100 indicators
+  + 16 markets + 10 FX pairs + 7 FX patterns = 134 — see INVENTORY.md) has a
+  Layer-1 entry with `plainName`, `oneLine`, `ifRising`|null+skipReason,
+  `ifFalling`|null+skipReason, `connections` (0–3), `glossaryTerms` in BOTH
+  en and fa; AND the existing approved copy has `whatItIs` + `whyItMatters`
+  for that id (the reuse check, D-02). No Layer-1 entry exists for an id that
+  is no longer in the code inventory.
+- **G2 Length.** New fields only: `plainName` ≤ 6 words, `oneLine` ≤ 16 words
+  & 1 sentence, `ifRising`/`ifFalling` ≤ 22 words & 1 sentence (when non-null),
+  glossary `plain` ≤ 2 sentences. (Approved `whatItIs`/`whyItMatters` exempt,
+  D-02.)
+- **G3 Jargon.** The jargon seed (style guide §6, extended here) must not appear
+  in the NEW Layer-1 copy unless the term is listed in that indicator's
+  `glossaryTerms`. Glossary `term`/`plain` may use the jargon word (that is
+  the point of a glossary).
+- **G4 Banned advice/certainty words** (style guide §5, extended) appear
+  nowhere in the NEW Layer-1 copy or glossary (case-insensitive, word-boundary).
+- **G5 Farsi hygiene.** fa copy uses Persian digits ۰–۹ only (no ASCII digits);
+  Persian ی/ک (not Arabic ي/ك); no double spaces; no em dash (repo rule); the
+  Latin allow-list (VIX S&P ASX ECB RBA USD AUD EUR JPY CNY BTC PMI + the
+  market tickers) is the only Latin allowed inside fa sentences.
+- **G6 No digits** in the NEW Layer-1 copy except glossary `example?` fields.
+  Digits that are part of an instrument's established **tenor / proper name**
+  (`10-year`, `30-year`, `2-year`, `3-month`, `5y5y`, `10y2y`, `10y3m` …) are
+  NOT "invented numbers or thresholds" (spec §8) — they are the instrument's
+  name, used verbatim by the existing approved copy ("the 10-year US Treasury
+  note"). The validator whitelists tenor-name digit tokens (ASCII and Persian
+  digits) and only flags digit sequences that remain after stripping them
+  (e.g. `3%`, `$100`, `80`). Glossary `example?` fields are fully exempt.
+- **G7 Readability.** EN sentences avg ≤ 20 words, max 28; FA avg ≤ 22, max 28.
+- **G8 No regressions.** `pnpm -r typecheck`, `pnpm -r test`, `pnpm lint`,
+  `pnpm copy:audit`, and the bundle-budget gate still pass.
+
+G9 (headless render) and G10 (free-tier) are reported in the final report
+(session N). The validator runs as a vitest test so `pnpm -r test` enforces it
+every commit.
+
+**Strict mode (the roll-out vs. final distinction).** The full-completeness
+half of G1 ("every indicator id found in code has a Layer-1 entry") would make
+`pnpm -r test` RED during the batched roll-out (only some ids have copy yet),
+which violates the repo's "tests green at every commit" convention. So the
+validator enforces, on EVERY run: (a) every Layer-1 entry that EXISTS is valid
+(G2–G7); (b) no Layer-1 entry exists for an id NOT in the code inventory
+(orphan check — the future-protection). The full-completeness check (all 134
+present) is advisory (console output of missing ids) UNLESS `LAYER1_STRICT=1`
+is set, in which case it hard-fails. The FINAL session sets `LAYER1_STRICT=1`,
+fills the last batch until green, then deploys.
+
+## D-08 — `australiaAngle` present only for AU indicators + AUD/RBA/petrol/home-loan global ones
+
+**Assumption.** §4: `australiaAngle` is OPTIONAL, "only when it clearly affects
+people in Australia (RBA, home loans, rent, petrol, AUD)."
+
+**Decision.** Write `australiaAngle` for: every indicator in `section: 'australia'`
+(23), plus global indicators whose effect on Australian households is direct
+and widely taught (US 10y, real-yield, fed-target, brent, gold-usd, dollar-
+basket, audusd/audjpy/usdjpy/usdcny already-AU, rba-fed-gap, us-japan-10y-gap
+carry leg). Omit `australiaAngle` for the rest (most global indicators speak to
+"people"/"households" globally per §8 region honesty).
+
+## D-09 — `ifRising`/`ifFalling` null + `skipReason` cases
+
+**Decision.** Set `ifRising` and/or `ifFalling` to `null` with a `skipReason`
+ONLY where direction is genuinely meaningless. The only known case in the
+inventory is the **pattern cards** (r1_risk_mood … r7_dollar_or_euro) which
+describe a *relationship* between two series, not a level that "rises" or
+"falls" — for those, `ifRising`/`ifFalling` are null and `skipReason` explains
+it. For ratios/spreads (gold-oil-ratio, yield-curve legs, gaps, gold-silver,
+copper-gold) direction IS meaningful (a widening/narrowing has everyday
+meaning) so they get real `ifRising`/`ifFalling`.
+
+## D-10 — Glossary term id scheme
+
+**Decision.** Glossary term ids are kebab-case English concept slugs
+(`inflation`, `yield`, `real-yield`, `interest-rate`, `central-bank`,
+`volatility`, `safe-haven`, `commodity`, `recession`, `stock-index`, `bond`,
+`breakeven-inflation`, `yield-curve`, `policy-rate`, `bear-market`,
+`correction`, `vix`, `sahm-rule`, `cape`, `trimmed-mean`, `terms-of-trade`,
+`term-deposit`, `real-return-savings`, `pmi`, `dollar-index`, `liquidity`,
+`momentum`, `drawdown`, `spread`, `basis-points`, `headline-vs-core`,
+`hawkish`, `dovish`, `tightening`, `easing`, `risk-on`, `risk-off`,
+`inflation-expectations`, `quantitative-easing`, `futures`, `benchmark`,
+`equities`, `ratio`, `bear-bull-market` …). The fa `term` field carries the
+Persian term Iranians know; en `term` carries the English. `plain` is ≤ 2
+sentences; `example?` may contain digits (exempt from G6) and must be clearly
+an example.
+
+## D-11 — Markets (16) and FX pairs/patterns are in scope
+
+**Assumption.** §2 scope: "every indicator on the Insights page (all sections:
+global indicators, Australia indicators, prices, world stock markets,
+currencies/pairs, any gauges/patterns that have their own name)."
+
+**Decision.** The 16 world-stock indices (n225…ibov), the 10 FX pairs
+(eurusd…audcny — incl. the 4 that are ALSO indicators), and the 7 FX pattern
+cards (r1_risk_mood…r7_dollar_or_euro) all get Layer-1 copy. The shared
+indicator ids (usdjpy, audusd, usdcny, audjpy) get ONE Layer-1 entry each
+(reused whether the card renders from the indicators snapshot or the FX
+board) — no duplication. Total inventory = 134 (see INVENTORY.md).
+
+## D-12 — Commit + deploy convention for this task
+
+**Decision.** Land on `main` (the repo's branch — git log shows every round
+commits to `main`). Commit message prefix: `insights(L1): …` following the
+repo's descriptive-round style. Do NOT deploy until the FINAL session when
+every gate (incl. G9/G10) is green; the owner's deploy-lock check
+(`docs/DEPLOY.md`) runs first. Each batch is its own commit; the CHANGELOG
+gets one entry at the end of the final session.
