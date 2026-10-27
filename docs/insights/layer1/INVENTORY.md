@@ -38,18 +38,18 @@ inventory and enforced by gate G1.
 | ✓ | `jgb-10y` | Japan 10-year government bond yield | The 10-year Japanese government bond yield. |
 | ✓ | `bund-10y` | German 10-year government bond yield | The 10-year German government bond yield (euro-area benchmark). |
 | ✓ | `gilt-10y` | UK 10-year government bond yield | The 10-year UK government bond yield. |
-| · | `euro-aaa-10y` | What the safest euro-area governments pay for 10 years | The 10-year AAA euro-area government bond yield. |
-| · | `boe-rate` | Bank of England policy rate (overnight) | The Bank of England's main policy rate (Bank Rate). |
-| · | `boj-rate` | Bank of Japan policy rate (overnight) | The Bank of Japan's main policy rate. |
+| ✓ | `euro-aaa-10y` | What the safest euro-area governments pay for 10 years | The 10-year AAA euro-area government bond yield. |
+| ✓ | `boe-rate` | Bank of England policy rate (overnight) | The Bank of England's main policy rate (Bank Rate). |
+| ✓ | `boj-rate` | Bank of Japan policy rate (overnight) | The Bank of Japan's main policy rate. |
 
 #### `dollar-strength` gauge (5)
 | L1 | id | official name | what it measures |
 |---|---|---|---|
-| · | `dollar-basket` | Currena dollar basket | A weighted basket of 7 currencies vs the US dollar (DXY-style). |
-| · | `usdjpy` | USD/JPY | The US dollar in Japanese yen. |
-| · | `us-japan-10y-gap` | US−Japan 10Y yield gap | The gap between 10-year US and Japanese yields (the carry trade's fuel). |
-| · | `eur-usd` | EUR/USD | The euro in US dollars. |
-| · | `usdtry` | Dollar vs Turkish lira | The US dollar in Turkish lira (an emerging-market pressure gauge). |
+| ✓ | `dollar-basket` | Currena dollar basket | A weighted basket of 7 currencies vs the US dollar (DXY-style). |
+| ✓ | `usdjpy` | USD/JPY | The US dollar in Japanese yen. |
+| ✓ | `us-japan-10y-gap` | US−Japan 10Y yield gap | The gap between 10-year US and Japanese yields (the carry trade's fuel). |
+| ✓ | `eur-usd` | EUR/USD | The euro in US dollars. |
+| ✓ | `usdtry` | Dollar vs Turkish lira | The US dollar in Turkish lira (an emerging-market pressure gauge). |
 
 #### `growth-health` gauge (23)
 | L1 | id | official name | what it measures |

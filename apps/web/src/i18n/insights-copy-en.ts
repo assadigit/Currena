@@ -235,6 +235,27 @@ const LAYER1 = {
       term: 'mortgage',
       plain: 'A loan used to purchase a home, paid back with interest over many years.',
     },
+    'carry-trade': {
+      term: 'carry trade',
+      plain: 'Borrowing money where it is cheap, like Japan, and putting it to work where it pays more. When the interest gap between the two sides shrinks, these trades usually unwind fast.',
+    },
+    pmi: {
+      term: 'PMI',
+      plain: 'A monthly survey of factory purchasing managers. Readings above the halfway line mean factories are getting busier; below means quieter.',
+      example: 'The halfway mark is 50: a reading of 52 means factories are growing a little, 48 means shrinking a little.',
+    },
+    vix: {
+      term: 'VIX',
+      plain: 'A number the market prices from the size of the swings it sees coming in America’s main share index. It usually jumps when worry spreads.',
+    },
+    'money-supply': {
+      term: 'money supply',
+      plain: 'The total amount of money sitting in bank accounts and circulating in an economy. It grows when banks lend a lot.',
+    },
+    'leading-indicator': {
+      term: 'leading indicator',
+      plain: 'A measure that usually turns before the whole economy does. It is watched for early hints, never promises.',
+    },
   } satisfies Record<string, Layer1GlossaryEntry>,
 
   indicators: {
@@ -398,6 +419,98 @@ const LAYER1 = {
         { with: 'boe-rate', text: 'The Bank of England sets the short base; this is the market’s long rate.', strength: 'usually' },
       ],
       glossaryTerms: ['yield', 'bond', 'interest-rate', 'mortgage', 'central-bank'],
+    },
+
+    /* ----- Batch 3 — borrowing-costs B + dollar-strength (8) ----- */
+    'euro-aaa-10y': {
+      plainName: 'Europe’s safest 10-year rate',
+      oneLine: 'The 10-year borrowing cost of the euro area’s safest governments.',
+      ifRising: 'Safe long-term rates in Europe usually rise with it, making loans dearer.',
+      ifFalling: 'Cheap safe money in Europe usually eases loans and asset prices.',
+      connections: [
+        { with: 'ecb-dfr', text: 'The ECB’s policy rate anchors the short end; this is the safe long end.', strength: 'reliable' },
+        { with: 'bund-10y', text: 'The German mirror tells the same story with a monthly delay.', strength: 'usually' },
+      ],
+      glossaryTerms: ['yield', 'bond', 'interest-rate', 'policy-rate', 'central-bank'],
+    },
+    'boe-rate': {
+      plainName: 'The Bank of England’s rate',
+      oneLine: 'The Bank of England’s main interest rate.',
+      ifRising: 'UK loans and mortgages usually cost more, and saving pays more.',
+      ifFalling: 'UK borrowing usually eases and saving pays less.',
+      connections: [
+        { with: 'gilt-10y', text: 'The Bank sets the short rate; gilts carry the long one.', strength: 'usually' },
+      ],
+      glossaryTerms: ['policy-rate', 'central-bank', 'interest-rate', 'mortgage'],
+    },
+    'boj-rate': {
+      plainName: 'The Bank of Japan’s rate',
+      oneLine: 'The Bank of Japan’s main interest rate.',
+      ifRising: 'Cheap Japanese money usually pulls back home, shaking world markets at times.',
+      ifFalling: 'Cheap Japanese money usually stays easy fuel for world borrowing.',
+      connections: [
+        { with: 'jgb-10y', text: 'The Bank of Japan’s setting steers the 10-year bond market heavily.', strength: 'usually' },
+        { with: 'usdjpy', text: 'The yen’s value moves with what Japan’s central bank does.', strength: 'usually' },
+      ],
+      glossaryTerms: ['policy-rate', 'central-bank', 'interest-rate', 'bond'],
+    },
+    'dollar-basket': {
+      plainName: 'The dollar’s overall strength',
+      oneLine: 'The US dollar measured against a group of six big currencies.',
+      ifRising: 'A stronger dollar often pressures world prices, debts and other currencies.',
+      ifFalling: 'A weaker dollar usually eases pressure on world trade and debts.',
+      connections: [
+        { with: 'gold-usd', text: 'A stronger dollar often weighs on gold prices.', strength: 'usually' },
+        { with: 'eur-usd', text: 'The euro is the biggest weight inside the basket.', strength: 'reliable' },
+      ],
+      australiaAngle: 'A stronger US dollar usually weighs on the Australian dollar and on commodity prices.',
+      glossaryTerms: ['commodity'],
+    },
+    usdjpy: {
+      plainName: 'Dollar versus Japanese yen',
+      oneLine: 'How many Japanese yen one US dollar buys.',
+      ifRising: 'Japanese goods and travel usually get cheaper for people paying in other currencies.',
+      ifFalling: 'A rising yen often means worry, as money borrowed in yen moves home fast.',
+      connections: [
+        { with: 'us-japan-10y-gap', text: 'The US-Japan rate gap is the reward that keeps the yen carry trade alive.', strength: 'reliable' },
+        { with: 'boj-rate', text: 'The Bank of Japan’s rate is the yen’s home base.', strength: 'usually' },
+      ],
+      australiaAngle: 'When the yen surges on worry, the Australian dollar often sags with other risk currencies.',
+      glossaryTerms: ['carry-trade', 'central-bank'],
+    },
+    'us-japan-10y-gap': {
+      plainName: 'The US-Japan rate gap',
+      oneLine: 'How much more the US pays to borrow for 10 years than Japan.',
+      ifRising: 'The reward for borrowing cheap Japanese money to earn US rates usually grows.',
+      ifFalling: 'The cheap-yen trade pays less, and its retreat can shake world markets.',
+      connections: [
+        { with: 'usdjpy', text: 'Dollar-yen is the trade; this gap is its fuel line.', strength: 'reliable' },
+        { with: 'us10y', text: 'The US side of the gap is the 10-year Treasury rate.', strength: 'reliable' },
+        { with: 'jgb-10y', text: 'The Japan side is the 10-year Japanese government bond.', strength: 'reliable' },
+      ],
+      australiaAngle: 'When this gap narrows fast, the Australian dollar often weakens with other carry favorites.',
+      glossaryTerms: ['carry-trade', 'bond'],
+    },
+    'eur-usd': {
+      plainName: 'Dollar versus the euro',
+      oneLine: 'How many euros one US dollar buys.',
+      ifRising: 'A stronger dollar against the euro often pressures world prices.',
+      ifFalling: 'A weaker dollar usually eases pressure on world prices and trade.',
+      connections: [
+        { with: 'dollar-basket', text: 'The euro is the biggest single weight in the dollar basket.', strength: 'reliable' },
+        { with: 'fed-target', text: 'The Fed steers the dollar’s side; the ECB steers the euro’s.', strength: 'usually' },
+      ],
+      glossaryTerms: ['central-bank'],
+    },
+    usdtry: {
+      plainName: 'Dollar versus Turkish lira',
+      oneLine: 'How many Turkish liras one US dollar buys.',
+      ifRising: 'Imported goods in Turkey usually get dearer as the lira slides.',
+      ifFalling: 'A firmer lira usually means calmer inflation and a rare stretch of stability.',
+      connections: [
+        { with: 'dollar-basket', text: 'Turkey sits outside the big-currency basket, but lira trouble often comes with a strong dollar.', strength: 'sometimes' },
+      ],
+      glossaryTerms: ['inflation'],
     },
   } satisfies Record<string, Layer1Entry>,
 };

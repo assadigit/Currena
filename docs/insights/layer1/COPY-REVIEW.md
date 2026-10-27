@@ -109,8 +109,60 @@ _(the remaining borrowing-costs ids — euro-aaa-10y, boe-rate, boj-rate — lan
 
 ---
 
-## Batch 3 — (pending)
+## Batch 3 — borrowing-costs B + dollar-strength (8 indicators)
 
 _Indicators: euro-aaa-10y, boe-rate, boj-rate, dollar-basket, usdjpy, us-japan-10y-gap, eur-usd, usdtry_
+_(borrowing-costs is now complete at 18/18; dollar-strength complete at 5/5)_
 
-— pending — fill in when batch 3 copy is written.
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `euro-aaa-10y` | ifRising | Rising safe euro long rates make European loans dearer. | — | widely-taught: the AAA long rate floors euro lending | widely-taught |
+| `euro-aaa-10y` | ifFalling | Cheap safe money eases European loans and asset prices. | — | widely-taught (inverse) | widely-taught |
+| `boe-rate` | ifRising | A higher Bank Rate makes UK loans/mortgages dearer, saving pays more. | — | widely-taught | widely-taught |
+| `boe-rate` | ifFalling | A lower Bank Rate eases UK borrowing; saving pays less. | — | widely-taught (inverse) | widely-taught |
+| `boj-rate` | ifRising | Tightening BoJ pulls cheap Japanese money home; world markets shake at times. | — | widely-taught (2024–26 hikes episode) | widely-taught |
+| `boj-rate` | ifFalling | Near-zero BoJ policy stays easy fuel for world borrowing. | — | widely-taught (1999–2024 era) | widely-taught |
+| `dollar-basket` | ifRising | A stronger dollar pressures world prices, debts, other currencies. | — | widely-taught: dollar pricing of trade/commodities/debt | widely-taught |
+| `dollar-basket` | ifFalling | A weaker dollar eases world trade and debt pressure. | — | widely-taught (inverse) | widely-taught |
+| `usdjpy` | ifRising | Japanese goods/travel get cheaper for other-currency holders. | — | widely-taught (mechanical purchasing-power effect) | widely-taught |
+| `usdjpy` | ifFalling | A rising yen often means worry; borrowed yen moves home fast. | — | widely-taught: yen-strength = de-risking/carry unwind (2008, Aug 2024) | widely-taught |
+| `us-japan-10y-gap` | ifRising | A wider gap grows the reward for the cheap-yen trade. | — | widely-taught: the gap is the carry trade's fuel | widely-taught |
+| `us-japan-10y-gap` | ifFalling | A narrow gap pays the trade less; its retreat can shake markets. | — | widely-taught (Aug 2024 unwind) | widely-taught |
+| `eur-usd` | ifRising | A stronger dollar vs the euro often pressures world prices. | — | widely-taught (same dollar-strength channel) | widely-taught |
+| `eur-usd` | ifFalling | A weaker dollar eases world price/trade pressure. | — | widely-taught (inverse) | widely-taught |
+| `usdtry` | ifRising | Lira slides make Turkish imports dearer. | — | widely-taught: pass-through of depreciation | widely-taught |
+| `usdtry` | ifFalling | A firmer lira means calmer inflation, rare stability. | — | widely-taught (inverse) | widely-taught |
+
+### Connections (batch 3)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `euro-aaa-10y` | `ecb-dfr` | The ECB policy rate anchors the short end; this is the safe long end. | reliable | widely-taught: term structure | widely-taught |
+| `euro-aaa-10y` | `bund-10y` | The German monthly mirror tells the same story with a delay. | usually | widely-taught (approved copy documents the monthly lag) | widely-taught |
+| `boe-rate` | `gilt-10y` | Bank sets the short rate; gilts carry the long one. | usually | widely-taught: term structure | widely-taught |
+| `boj-rate` | `jgb-10y` | The BoJ steers the 10-year bond market heavily. | usually | widely-taught: YCC history, BoJ holdings | widely-taught |
+| `boj-rate` | `usdjpy` | The yen moves with what the BoJ does. | usually | widely-taught | widely-taught |
+| `dollar-basket` | `gold-usd` | A stronger dollar often weighs on gold. | usually | widely-taught (inverse dollar-gold relationship) | widely-taught |
+| `dollar-basket` | `eur-usd` | The euro is the biggest weight in the basket. | reliable | definitional (basket construction) | widely-taught |
+| `usdjpy` | `us-japan-10y-gap` | The rate gap is the reward keeping the yen carry trade alive. | reliable | widely-taught (approved wording) | widely-taught |
+| `usdjpy` | `boj-rate` | The BoJ's rate is the yen's home base. | usually | widely-taught | widely-taught |
+| `us-japan-10y-gap` | `usdjpy` | Dollar-yen is the trade; the gap is its fuel line. | reliable | widely-taught (approved wording) | widely-taught |
+| `us-japan-10y-gap` | `us10y` | The US side of the gap is the 10y Treasury. | reliable | definitional | widely-taught |
+| `us-japan-10y-gap` | `jgb-10y` | The Japan side is the 10y JGB. | reliable | definitional | widely-taught |
+| `eur-usd` | `dollar-basket` | The euro is the biggest single basket weight. | reliable | definitional | widely-taught |
+| `eur-usd` | `fed-target` | The Fed steers the dollar side; the ECB the euro's. | usually | widely-taught: policy differentials move FX | widely-taught |
+| `usdtry` | `dollar-basket` | Turkey is outside the big-currency basket; lira trouble often comes with a strong dollar. | sometimes | less-certain: EM stress often coincides with dollar strength but not always | less-certain |
+
+### Australia angle (batch 3)
+| id | claim | basis | status |
+|---|---|---|---|
+| `dollar-basket` | A stronger US dollar usually weighs on the AUD and commodity prices. | australia-specific: AUD vs USD inverse; USD commodity pricing | needs-expert-check |
+| `usdjpy` | Yen surges on worry usually sag the AUD with other risk currencies. | australia-specific: AUD as a risk currency; AUD/JPY risk barometer | needs-expert-check |
+| `us-japan-10y-gap` | A fast-narrowing gap often weakens the AUD with other carry favorites. | australia-specific: AUD is a classic carry target vs JPY | needs-expert-check |
+
+---
+
+## Batch 4 — (pending)
+
+_Indicators: us-unemployment, sahm-rule, china-pmi, china-cpi, copper-gold, michigan-sentiment, initial-jobless-claims, philly-fed_
+
+— pending — fill in when batch 4 copy is written.
