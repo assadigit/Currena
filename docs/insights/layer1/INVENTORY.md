@@ -62,14 +62,14 @@ inventory and enforced by gate G1.
 | ✓ | `michigan-sentiment` | US consumer mood (Michigan survey) | The University of Michigan consumer sentiment index. |
 | ✓ | `initial-jobless-claims` | New unemployment claims (US) | Weekly new US claims for unemployment benefits. |
 | ✓ | `philly-fed` | Philadelphia Fed manufacturing index | The Philly Fed's monthly factory-activity gauge. |
-| · | `recession-probability` | US recession probability | A model-based 12-month US recession probability. |
-| · | `oecd-cli-us` | OECD leading indicator (US) | The OECD composite leading indicator for the US. |
-| · | `m2-us` | US M2 money supply | The US broad money supply. |
-| · | `retail-sales` | US retail sales (monthly) | US retail and food-services sales. |
-| · | `housing-permits` | US building permits | New US residential building permits authorized. |
-| · | `job-openings` | US job openings (JOLTS) | The number of open US jobs (JOLTS survey). |
-| · | `us-gdp-growth` | US economic growth (real GDP) | US real gross-domestic-product growth. |
-| · | `us-nfp` | US jobs added each month | US nonfarm payrolls (monthly change in employment). |
+| ✓ | `recession-probability` | US recession probability | A model-based 12-month US recession probability. |
+| ✓ | `oecd-cli-us` | OECD leading indicator (US) | The OECD composite leading indicator for the US. |
+| ✓ | `m2-us` | US M2 money supply | The US broad money supply. |
+| ✓ | `retail-sales` | US retail sales (monthly) | US retail and food-services sales. |
+| ✓ | `housing-permits` | US building permits | New US residential building permits authorized. |
+| ✓ | `job-openings` | US job openings (JOLTS) | The number of open US jobs (JOLTS survey). |
+| ✓ | `us-gdp-growth` | US economic growth (real GDP) | US real gross-domestic-product growth. |
+| ✓ | `us-nfp` | US jobs added each month | US nonfarm payrolls (monthly change in employment). |
 | · | `usdcny` | USD/CNY | The US dollar in Chinese yuan. |
 | · | `michigan-1y-expectations` | US expected inflation next year (Michigan) | The Michigan survey's 1-year-ahead US inflation expectation. |
 | · | `cfnai` | US economic activity scorecard (Chicago Fed) | The Chicago Fed National Activity Index. |

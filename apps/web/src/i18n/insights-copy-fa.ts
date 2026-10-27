@@ -4601,6 +4601,95 @@ export const insightsCopyFa: InsightsCopy = {
         ],
         glossaryTerms: [],
       },
+
+      /* ----- دستهٔ ۵ — سلامت رشد B (۸) ----- */
+      'recession-probability': {
+        plainName: 'شانس رکود آمریکا',
+        oneLine: 'برآورد یک مدل از احتمال در رکود بودن اقتصاد آمریکا.',
+        ifRising: 'داده‌ها بیشتر و بیشتر شبیه رکودهای گذشته خوانده می‌شوند؛ هرچند مدل از اقتصاد واقعی عقب‌تر است.',
+        ifFalling: 'داده‌ها اغلب مانند رونق عادی خوانده می‌شوند.',
+        connections: [
+          { with: 'sahm-rule', text: 'هشدار و مدل، یک رکود را از دو زاویه می‌خوانند.', strength: 'usually' },
+          { with: 'us-gdp-growth', text: 'مدل ورودی‌های زیادی را می‌سنجد، از جمله رشد، و با تأخیر منتشر می‌شود.', strength: 'usually' },
+        ],
+        glossaryTerms: ['recession'],
+      },
+      'oecd-cli-us': {
+        plainName: 'سیگنال زودهنگام آمریکا',
+        oneLine: 'معیاری که معمولاً پیش از کل اقتصاد آمریکا تغییر جهت می‌دهد.',
+        ifRising: 'جهت اقتصاد آمریکا معمولاً چند ماه بعد بهتر می‌شود.',
+        ifFalling: 'معمولاً کند شدن اقتصاد آمریکا چند ماه پیش روست.',
+        connections: [
+          { with: 'recession-probability', text: 'این معیار زودهنگام را کنار شانس رکود بخوانید.', strength: 'usually' },
+          { with: 'initial-jobless-claims', text: 'عدد درخواست‌های بیمهٔ بیکاری چرخش‌ها را خیلی سریع‌تر تأیید می‌کند.', strength: 'usually' },
+        ],
+        glossaryTerms: ['leading-indicator', 'recession'],
+      },
+      'm2-us': {
+        plainName: 'حجم پول آمریکا',
+        oneLine: 'کل پولی که در حساب‌های بانکی و جیب‌های آمریکایی‌ها نشسته است.',
+        ifRising: 'قدرت خرید معمولاً انباشته می‌شود و می‌تواند بعدها تورم را تغذیه کند.',
+        ifFalling: 'کوچک شدن آن کمیاب است و در گذشته حوالی افت‌های آمریکا دیده شده است.',
+        connections: [
+          { with: 'us-cpi-yoy', text: 'رشد پول یکی از ورودی‌های بحث تورم است.', strength: 'sometimes' },
+          { with: 'walcl', text: 'ترازنامهٔ خود بانک مرکزی یکی از موتورهای پشت آن است.', strength: 'usually' },
+        ],
+        glossaryTerms: ['money-supply', 'inflation', 'central-bank'],
+      },
+      'retail-sales': {
+        plainName: 'میزان خرید آمریکایی‌ها',
+        oneLine: 'ارزش ماهانهٔ فروش فروشگاه‌های آمریکا.',
+        ifRising: 'مصرف معمولاً اقتصاد را بر دوش می‌کشد.',
+        ifFalling: 'عقب‌نشینی مصرف معمولاً بحث رکود را باب می‌کند.',
+        connections: [
+          { with: 'michigan-sentiment', text: 'حال و هوا اغلب جلوتر از این عدد خرج حرکت می‌کند.', strength: 'usually' },
+          { with: 'us-gdp-growth', text: 'مصرف بخش عمدهٔ اقتصاد آمریکا را می‌سازد.', strength: 'reliable' },
+        ],
+        glossaryTerms: ['recession'],
+      },
+      'housing-permits': {
+        plainName: 'قصد ساخت خانه در آمریکا',
+        oneLine: 'این ماه چند خانهٔ جدید در آمریکا مجوز ساخت گرفته‌اند.',
+        ifRising: 'سازندگان معمولاً تقاضای کافی برای خانه‌های جدید می‌بینند.',
+        ifFalling: 'سازندگان معمولاً پروژه‌ها را به تعویق می‌اندازند؛ پاسخ کلاسیک به استقراض گران.',
+        connections: [
+          { with: 'mortgage-30y', text: 'مجوزها پاسخ بازار به نرخ وام مسکن‌اند.', strength: 'usually' },
+        ],
+        glossaryTerms: ['mortgage'],
+      },
+      'job-openings': {
+        plainName: 'شغل‌های خالی آمریکا',
+        oneLine: 'کارفرمایان آمریکایی در پی پر کردن چند شغل خالی‌اند.',
+        ifRising: 'کارفرمایان معمولاً هنوز دنبال نیرو هستند؛ نشانهٔ تقاضای کار.',
+        ifFalling: 'اشتها به استخدام معمولاً پیش از بالا رفتن بیکاری کم می‌شود.',
+        connections: [
+          { with: 'us-unemployment', text: 'شغل‌های خالی معمولاً پیش از نرخ بیکاری تغییر جهت می‌دهند.', strength: 'usually' },
+          { with: 'initial-jobless-claims', text: 'یکی عقب‌نشینی کارفرما را می‌شمارد و دیگری بیکار شدن نیروها را.', strength: 'usually' },
+        ],
+        glossaryTerms: [],
+      },
+      'us-gdp-growth': {
+        plainName: 'سرعت رشد آمریکا',
+        oneLine: 'اقتصاد آمریکا فصل گذشته چقدر بزرگ‌تر شده است.',
+        ifRising: 'اقتصاد سریع‌تر آمریکا معمولاً نرخ‌های جهانی را مدت بیشتری بالا نگه می‌دارد.',
+        ifFalling: 'رشد ضعیف آمریکا معمولاً امید کاهش نرخ و بحث رکود را می‌آورد.',
+        connections: [
+          { with: 'retail-sales', text: 'مصرف بخش عمدهٔ اقتصادی است که این عدد می‌سنجد.', strength: 'reliable' },
+          { with: 'us-nfp', text: 'اشتغال و رشد معمولاً با هم حرکت می‌کنند.', strength: 'usually' },
+        ],
+        glossaryTerms: ['recession'],
+      },
+      'us-nfp': {
+        plainName: 'شغل‌های ماهانهٔ آمریکا',
+        oneLine: 'آمریکا ماه گذشته چند شغل افزود یا از دست داد.',
+        ifRising: 'استخدام قوی معمولاً نرخ بهرهٔ جهانی را بالا نگه می‌دارد.',
+        ifFalling: 'از دست رفتن شغل‌ها معمولاً بحث رکود و امید کاهش نرخ را می‌آورد.',
+        connections: [
+          { with: 'us-unemployment', text: 'هر دو از یک گزارش ماهانهٔ اشتغال می‌آیند.', strength: 'reliable' },
+          { with: 'fed-target', text: 'فدرال رزرو این عدد را از نزدیک می‌خواند.', strength: 'reliable' },
+        ],
+        glossaryTerms: ['interest-rate', 'recession'],
+      },
     },
   },
 };

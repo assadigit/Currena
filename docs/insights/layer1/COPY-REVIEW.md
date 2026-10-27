@@ -209,8 +209,57 @@ _Indicators: us-unemployment, sahm-rule, china-pmi, china-cpi, copper-gold, mich
 
 ---
 
-## Batch 5 — (pending)
+## Batch 5 — growth-health B (8 indicators)
 
 _Indicators: recession-probability, oecd-cli-us, m2-us, retail-sales, housing-permits, job-openings, us-gdp-growth, us-nfp_
 
-— pending — fill in when batch 5 copy is written.
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `recession-probability` | ifRising | Rising odds mean the data looks like past downturns; models trail. | — | widely-taught: the model's design (approved copy: publishes a month or two behind) | widely-taught |
+| `recession-probability` | ifFalling | Falling odds read like normal expansion. | — | widely-taught (inverse) | widely-taught |
+| `oecd-cli-us` | ifRising | A rising early gauge usually means improvement several months out. | — | widely-taught: the CLI's ~6-month lead (OECD convention) | widely-taught |
+| `oecd-cli-us` | ifFalling | A falling gauge usually means a slowdown ahead. | — | widely-taught (inverse) | widely-taught |
+| `m2-us` | ifRising | Money growth builds spending power, which can feed inflation later. | — | widely-taught with a lag caveat (monetarist long-run) | widely-taught |
+| `m2-us` | ifFalling | Shrinking money has clustered around US downturns. | — | widely-taught: historical record (2022–23) | widely-taught |
+| `retail-sales` | ifRising | Spending usually carries the economy. | — | widely-taught: consumption ~2/3 of GDP | widely-taught |
+| `retail-sales` | ifFalling | A pullback opens the door to recession talk. | — | widely-taught | widely-taught |
+| `housing-permits` | ifRising | Rising permits mean builders see enough demand. | — | widely-taught: permits = housing pipeline front | widely-taught |
+| `housing-permits` | ifFalling | Shelves projects: the classic early response to expensive money. | — | widely-taught: housing is the most rate-sensitive sector | widely-taught |
+| `job-openings` | ifRising | Rising openings mean employers still want workers. | — | widely-taught | widely-taught |
+| `job-openings` | ifFalling | Fading openings usually lead rising joblessness. | — | widely-taught: the Powell-era leading edge (approved copy) | widely-taught |
+| `us-gdp-growth` | ifRising | Faster US growth usually keeps world rates higher for longer. | — | widely-taught: growth → policy reaction function | widely-taught |
+| `us-gdp-growth` | ifFalling | Weak growth brings rate-cut hopes and recession talk. | — | widely-taught (inverse) | widely-taught |
+| `us-nfp` | ifRising | Strong hiring usually keeps world interest rates higher. | — | widely-taught: the jobs report moves the Fed | widely-taught |
+| `us-nfp` | ifFalling | Job losses bring recession talk and rate-cut hopes. | — | widely-taught (inverse) | widely-taught |
+
+### Connections (batch 5)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `recession-probability` | `sahm-rule` | The alarm and the model read the same downturn from different angles. | usually | widely-taught: both are recession nowcasters | widely-taught |
+| `recession-probability` | `us-gdp-growth` | The model weighs many inputs (growth among them) and publishes with a lag. | usually | widely-taught: the Chauvet model's multi-indicator design + lag | widely-taught |
+| `oecd-cli-us` | `recession-probability` | Read the early gauge beside the recession odds. | usually | widely-taught: complementary horizons | widely-taught |
+| `oecd-cli-us` | `initial-jobless-claims` | Claims confirm turns much faster. | usually | widely-taught: weekly vs monthly-with-lag cadence | widely-taught |
+| `m2-us` | `us-cpi-yoy` | Money growth is one input in inflation debates. | sometimes | less-certain: money→inflation is a long-run, debated relationship | less-certain |
+| `m2-us` | `walcl` | The central bank's balance sheet is one engine behind the money pool. | usually | widely-taught: QE expanded both (2020–22) | widely-taught |
+| `retail-sales` | `michigan-sentiment` | Mood often leads this spending number. | usually | widely-taught (caveat in approved copy: mood ≠ spending) | widely-taught |
+| `retail-sales` | `us-gdp-growth` | Spending is most of the US economy. | reliable | definitional (consumption share) | widely-taught |
+| `housing-permits` | `mortgage-30y` | Permits are the market's answer to the mortgage rate. | usually | widely-taught: housing demand vs financing cost | widely-taught |
+| `job-openings` | `us-unemployment` | Openings usually turn before the jobless rate. | usually | widely-taught (2022–24 soft-landing episode) | widely-taught |
+| `job-openings` | `initial-jobless-claims` | One counts employers pulling back, the other workers let go. | usually | widely-taught (approved forYou wording) | widely-taught |
+| `us-gdp-growth` | `retail-sales` | Spending is most of what GDP measures. | reliable | definitional | widely-taught |
+| `us-gdp-growth` | `us-nfp` | Jobs and growth usually move together. | usually | widely-taught: Okun's law | widely-taught |
+| `us-nfp` | `us-unemployment` | Both come from the same monthly jobs report. | reliable | definitional (BLS) | widely-taught |
+| `us-nfp` | `fed-target` | The Fed reads this number closely. | reliable | widely-taught (the dual mandate) | widely-taught |
+
+### Australia angle (batch 5)
+| id | claim | basis | status |
+|---|---|---|---|
+| (none — US growth/labour indicators; no D-08 AU link.) | — | — | — |
+
+---
+
+## Batch 6 — (pending)
+
+_Indicators: usdcny, michigan-1y-expectations, cfnai, oecd-cli-cn, oecd-cli-de, epu-us, copper-usd_
+
+— pending — fill in when batch 6 copy is written.

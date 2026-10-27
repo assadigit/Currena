@@ -600,6 +600,95 @@ const LAYER1 = {
       ],
       glossaryTerms: [],
     },
+
+    /* ----- Batch 5 — growth-health B (8) ----- */
+    'recession-probability': {
+      plainName: 'US recession odds',
+      oneLine: 'A model’s estimate of the chance the US economy is in a downturn.',
+      ifRising: 'The data looks more and more like past downturns, though models trail the real economy.',
+      ifFalling: 'The data reads more and more like normal expansion.',
+      connections: [
+        { with: 'sahm-rule', text: 'The alarm and the model read the same downturn from different angles.', strength: 'usually' },
+        { with: 'us-gdp-growth', text: 'The model weighs many inputs, growth among them, and publishes with a lag.', strength: 'usually' },
+      ],
+      glossaryTerms: ['recession'],
+    },
+    'oecd-cli-us': {
+      plainName: 'The US early-turn gauge',
+      oneLine: 'A gauge that usually turns before the whole US economy does.',
+      ifRising: 'The US economy’s direction is usually improving several months out.',
+      ifFalling: 'A US slowdown usually sits several months ahead.',
+      connections: [
+        { with: 'recession-probability', text: 'Read the early gauge beside the recession odds.', strength: 'usually' },
+        { with: 'initial-jobless-claims', text: 'The claims number confirms turns much faster.', strength: 'usually' },
+      ],
+      glossaryTerms: ['leading-indicator', 'recession'],
+    },
+    'm2-us': {
+      plainName: 'The US money pool',
+      oneLine: 'The total money sitting in US bank accounts and wallets.',
+      ifRising: 'Spending power usually builds, which can feed inflation later.',
+      ifFalling: 'Rare shrinkage that has historically clustered around US downturns.',
+      connections: [
+        { with: 'us-cpi-yoy', text: 'Money growth is one input in inflation debates.', strength: 'sometimes' },
+        { with: 'walcl', text: 'The central bank’s own balance sheet is one engine behind it.', strength: 'usually' },
+      ],
+      glossaryTerms: ['money-supply', 'inflation', 'central-bank'],
+    },
+    'retail-sales': {
+      plainName: 'America’s shopping tally',
+      oneLine: 'The monthly value of what American shops ring up.',
+      ifRising: 'Consumer spending is usually carrying the economy.',
+      ifFalling: 'A spending pullback usually opens the door to recession talk.',
+      connections: [
+        { with: 'michigan-sentiment', text: 'Mood often leads this spending number.', strength: 'usually' },
+        { with: 'us-gdp-growth', text: 'Spending is most of the US economy.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['recession'],
+    },
+    'housing-permits': {
+      plainName: 'US homebuilding intentions',
+      oneLine: 'How many new US homes were cleared to start this month.',
+      ifRising: 'Builders usually expect enough demand to justify new homes.',
+      ifFalling: 'Builders usually shelve projects, a classic early response to expensive borrowing.',
+      connections: [
+        { with: 'mortgage-30y', text: 'Permits are the market’s answer to the mortgage rate.', strength: 'usually' },
+      ],
+      glossaryTerms: ['mortgage'],
+    },
+    'job-openings': {
+      plainName: 'America’s open jobs',
+      oneLine: 'How many unfilled jobs US employers are trying to fill.',
+      ifRising: 'Employers usually still want workers, a sign of labour demand.',
+      ifFalling: 'Hiring appetite usually fades before joblessness rises.',
+      connections: [
+        { with: 'us-unemployment', text: 'Openings usually turn before the jobless rate does.', strength: 'usually' },
+        { with: 'initial-jobless-claims', text: 'One counts employers pulling back; the other workers being let go.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'us-gdp-growth': {
+      plainName: 'America’s growth pace',
+      oneLine: 'How much bigger the US economy got last quarter.',
+      ifRising: 'A faster US economy usually keeps world rates higher for longer.',
+      ifFalling: 'Weak US growth usually brings rate-cut hopes and recession talk.',
+      connections: [
+        { with: 'retail-sales', text: 'Spending is most of the economy this number measures.', strength: 'reliable' },
+        { with: 'us-nfp', text: 'Jobs and growth usually move together.', strength: 'usually' },
+      ],
+      glossaryTerms: ['recession'],
+    },
+    'us-nfp': {
+      plainName: 'Monthly US jobs added',
+      oneLine: 'How many jobs America added or lost last month.',
+      ifRising: 'Strong hiring usually keeps world interest rates higher.',
+      ifFalling: 'Job losses usually bring recession talk and rate-cut hopes.',
+      connections: [
+        { with: 'us-unemployment', text: 'Both come from the same monthly jobs report.', strength: 'reliable' },
+        { with: 'fed-target', text: 'The Fed reads this number closely.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['interest-rate', 'recession'],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 
