@@ -8,6 +8,14 @@
 # 04:20 lands inside the fresh post-midnight slice with ~750 writes of
 # headroom (see docs/insights/03-data-sources.md, Phase I3 record).
 #
+# RUNNER EXHAUSTION (since 2026-10-20): this account's free GitHub Actions
+# minutes exhausted — the job fails at runner allocation. The Worker's own
+# minute-cron (apps/api/src/insights-ingest-cron.ts) owns the ingest as the
+# PRIMARY venue since then (verified live through the 04:10/04:20/04:25+
+# 04:27/04:40 rungs). This workflow stays as belt-and-braces: if GHA
+# recovers, both venues write the same bytes (idempotent content). No paid
+# plan is needed for either path.
+#
 # The job exits non-zero when any P1 indicator is unavailable (product
 # degraded). Failure signals (Phase I7 alerting): this red run (GitHub's
 # own Actions notification email), the /admin Insights staleness pill

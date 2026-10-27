@@ -1,8 +1,8 @@
 # SELF_AUDIT.md — the automatic self-check
 
-Generated: 2026-10-26T12:52:52.833Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-26.md`
+Generated: 2026-10-27T00:55:14.804Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-27.md`
 
-Result: **ALL TESTS PASS** (24 of 24 pass)
+Result: **ALL TESTS PASS** (25 of 25 pass)
 
 ## Every test, pass or fail
 
@@ -32,17 +32,15 @@ Result: **ALL TESTS PASS** (24 of 24 pass)
 | SUITE:packages/insights | Unit suite — packages/insights | pass | 644 tests |
 | SUITE:apps/markets | Unit suite — apps/markets | pass | 13 tests |
 | SUITE:apps/api | Unit suite — apps/api | pass | 344 tests |
+| SUITE:apps/web | Unit suite — apps/web | pass | 696 tests |
 
 ## Stale or "can't tell" cards
 
-None — every card reads current or carries its own honest tag.
-
+| Indicator | Status | As of | Reason |
+| stress-stlfsi | stale | 2026-10-16 | stale |
 
 ## Unavailable cards
 
-- oecd-cli-us
-- oecd-cli-cn
-- oecd-cli-de
 - shiller-cape
 - shiller-ecy
 - au-10y
@@ -57,11 +55,11 @@ None — every card reads current or carries its own honest tag.
 ## Source report
 
 - ✅ fred — bulk group 1 (3 series: DGS10, DGS30, DFII10)
-- ✅ fred — bulk group 2 (10 series, from 2016-07-30: T10Y2Y, T10Y3M, STLFSI4, T5YIFR, DGS2, T10YIE, VIXCLS, NFCI, SOFR, T5YIE)
-- ✅ fred — bulk group 3 (12 series, from 2016-07-30: M2SL, CPIAUCNS, CPILFENS, DFEDTARL, DFEDTARU, UNRATE, SAHMREALTIME, GACDFSA066MSFRBPHI, PAYEMS, A191RL1Q225SBEA, RSAFS, PERMIT)
-- ✅ fred — bulk group 4 (5 series, from 2016-07-30: A091RC1Q027SBEA, W006RC1Q027SBEA, DCOILBRENTEU, DCOILWTICO, DHHNGSP)
-- ✅ fred — bulk group 5 (4 series, from 2016-07-30: IRLTLT01DEM156N, IRLTLT01JPM156N, IRLTLT01GBM156N, IRSTCI01JPM156N)
-- ✅ fred — bulk group 6 (10 series, from 2016-07-30: ICSA, RECPROUSM156N, UMCSENT, MICH, PCEPILFE, MORTGAGE30US, WALCL, CFNAI, JTSJOL, AHETPI)
+- ✅ fred — bulk group 2 (10 series, from 2016-07-31: T10Y2Y, T10Y3M, STLFSI4, T5YIFR, DGS2, T10YIE, VIXCLS, NFCI, SOFR, T5YIE)
+- ✅ fred — bulk group 3 (12 series, from 2016-07-31: M2SL, CPIAUCNS, CPILFENS, DFEDTARL, DFEDTARU, UNRATE, SAHMREALTIME, GACDFSA066MSFRBPHI, PAYEMS, A191RL1Q225SBEA, RSAFS, PERMIT)
+- ✅ fred — bulk group 4 (5 series, from 2016-07-31: A091RC1Q027SBEA, W006RC1Q027SBEA, DCOILBRENTEU, DCOILWTICO, DHHNGSP)
+- ✅ fred — bulk group 5 (4 series, from 2016-07-31: IRLTLT01DEM156N, IRLTLT01JPM156N, IRLTLT01GBM156N, IRSTCI01JPM156N)
+- ✅ fred — bulk group 6 (10 series, from 2016-07-31: ICSA, RECPROUSM156N, UMCSENT, MICH, PCEPILFE, MORTGAGE30US, WALCL, CFNAI, JTSJOL, AHETPI)
 - ✅ yahoo — BZ=F daily closes (Brent gap-fill)
 - ✅ yahoo — GC=F daily quotes (10-year record history)
 - ✅ yahoo — SI=F daily quotes (10-year record history)
@@ -104,11 +102,11 @@ None — every card reads current or carries its own honest tag.
 - ❌ rba — F2.1 FCMYGBAG10 10-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ❌ rba — F2.1 FCMYGBAG3 3-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ✅ alternative-me — Crypto Fear and Greed (daily history)
-- ✅ cross-check — gold-api BTC 80262 vs Bitstamp close 80263 (2026-10-26) → -0.00%
+- ✅ cross-check — gold-api BTC 80096 vs Bitstamp close 80141 (2026-10-27) → -0.06%
 - ✅ mof — jgbcme.csv daily 10Y
 - ✅ eia — crude oil ending stocks WCRSTUS1 (weekly, keyless website route)
 - ✅ cftc — Commitments of Traders, futures-only (gold row)
-- ❌ oecd — Composite leading indicators, amplitude-adjusted (USA, CHN, DEU): HTTP 500 from sdmx.oecd.org — single attempt, no retry (F-11)
+- ✅ oecd — Composite leading indicators, amplitude-adjusted (USA, CHN, DEU)
 - ✅ gpr — Geopolitical Risk Index (monthly export)
 - ✅ epu — US Economic Policy Uncertainty (Main News Index workbook)
 

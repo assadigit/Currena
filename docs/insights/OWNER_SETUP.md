@@ -171,6 +171,26 @@ PR #1 is closed as merged-by-directive.
    crossed session handovers in chat; rotate them, then update the
    Worker secrets if values change (`cd apps/markets && npx wrangler
    secret put EODHD_API_TOKEN`, etc.).
+   **CRITICAL (2026-10-26)**: `context.txt` (the owner's own upload in
+   `d3f64bb`) carried the raw Cloudflare Workers API token in plain text.
+   Removed from the tree in `5b74dde`, but **the token remains in git
+   history — removal is NOT remediation.** Rotate it NOW:
+   1. Go to https://dash.cloudflare.com/profile/api-tokens
+   2. Find the token that starts with `cfut_` (the Workers API token)
+   3. Click **Roll** (or Delete + Create a new one with the same
+      permissions: "Edit Cloudflare Workers" scoped to account
+      `5f123468027e4b2094167df1d2f2e852`)
+   4. Update the Worker secrets with the new token:
+      `cd apps/api && npx wrangler secret put CLOUDFLARE_API_TOKEN`
+      (needed for the GHA `insights-ingest.yml` workflow — the Worker
+      minute-cron doesn't use this token, it uses the KV binding directly)
+   5. Update the GitHub repo secret:
+      `gh secret set CLOUDFLARE_API_TOKEN --repo assadigit/Currena`
+   6. Also rotate the GitHub token (`ghp_…`) at
+      https://github.com/settings/tokens — it also crossed session handovers.
+   **The token in git history cannot be purged without a force-push
+   rewrite of the entire history (git filter-repo); the rotation above
+   is the practical remediation.**
 3. **§11 — the fa copy review** — the queued needs-review strings now
    include the v3 + merge rounds (the hero, the balance silver twins,
    the owner tools, the About rework); view فارسی and record approvals.

@@ -378,33 +378,45 @@ so a future owner can revisit if a source revives.
 | **Silver/Bitcoin ratio** | Fails the classic-indicator criteria (silver-btc was retired 2026-10-23 as the weaker twin of gold-btc). |
 | **Silver/Bitcoin stays unbuilt; Gold/Bitcoin stays context-only** | Per the spec's standing rule: gold-btc is context-only, never voting. |
 
-### Known operational gaps (not indicator gaps — process gaps)
+### Known operational gaps — status after the 2026-10-27 fix round
 
 1. **GitHub Actions runner exhaustion** (since 2026-10-20): the
-   `insights-ingest.yml` workflow fails at runner allocation. The Worker's
-   own minute-cron owns the ingest (verified live through the 04:10/04:20/
-   04:25+04:27/04:40 rungs); the GHA workflow stays as belt-and-braces.
+   `insights-ingest.yml` workflow fails at runner allocation (free
+   Actions minutes exhausted). The Worker's own minute-cron owns the
+   ingest as the PRIMARY venue (verified live through the 04:10/04:20/
+   04:25+04:27/04:40 rungs); the GHA workflow stays as belt-and-braces
+   (documented inline with a `RUNNER EXHAUSTION` note in the workflow
+   header). **Status**: documented; no code fix possible (billing).
    **Owner action**: none required — the Worker venue is the primary.
 2. **The Cloudflare API token in git history** (surfaced 2026-10-26):
-   `context.txt` (the owner's own upload) carried a live Cloudflare Workers
-   API token. Removed from the tree in `5b74dde`; **the token remains in
-   git history so removal is not remediation** — the owner should rotate
-   the Cloudflare API token (dash → My Profile → API Tokens → roll).
+   `context.txt` carried a live Cloudflare Workers API token. Removed
+   from the tree in `5b74dde`; the token remains in git history. The
+   exact rotation steps are now documented in `docs/insights/OWNER_SETUP.md`
+   §10 (6-step procedure: dashboard roll → Worker secret update → GitHub
+   repo secret update → GitHub token rotation). **Status**: documented;
+   **owner action required: rotate the token** at
+   https://dash.cloudflare.com/profile/api-tokens.
 3. **The jgb-10y OECD mirror's retirement clock**: the spec retires the
    FRED OECD jgb-10y mirror after two clean MOF weeks. The MOF upgrade
    went live 2026-10-26; the earliest honest retirement date is
    2026-11-09. The mirror stays as the labelled fallback until then.
-4. **The 16-failure briefing jsdom baseline** (`apps/web/src/components/
-   insights/world-markets/briefing.test.tsx`): 16 tests fail under jsdom
-   since the world-markets briefing's v3 rebuild (every changelog entry
-   since M4 carries the "recorded 16-failure briefing jsdom baseline"
-   note). The same suite passes under Playwright's real browser. **Owner
-   action**: none — the jsdom failures are a known environment mismatch;
-   the Playwright suite is the visual-truth gate.
+   **Status**: time-dependent; no action possible until 2026-11-09.
+4. **~~The 16-failure briefing jsdom baseline~~** — **FIXED (2026-10-27)**.
+   Root cause: the test fixture used a hardcoded `asOf: '2026-10-16'`
+   which became stale (>5 days old per `STALE_DAYS = 5`) as real time
+   passed. When all markets were stale, the component returned the
+   collapsed stale shell (heading + "old; last update" message only),
+   never rendering the radio buttons, movers, tiles, etc. that the 16
+   failing tests expected. Fix: `vi.setSystemTime(new Date('2026-10-17T12:00:00Z'))`
+   in `beforeEach` — freezes the clock so the fixture's 2026-10-16 dates
+   are always 1 day old (never stale) and the staleSnapshot's 2026-09-01
+   dates are always >5 days old (always stale). **All 696 web tests pass
+   (was 680 pass + 16 fail). Full suite: 1955/1955 green.**
 5. **The `insights:hist:cftc-gold-positioning` accumulation**: the COT
    file's first weekly point seeded the history on 2026-10-26; the second
    point joins on the next Saturday (2026-11-07). The single-point floor
-   is the designed shape — no action needed.
+   is the designed shape — no action needed. **Status**: time-dependent;
+   no action possible until 2026-11-07.
 
 ### Quarterly review checklist (the spec's standing rule)
 

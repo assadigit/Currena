@@ -14,12 +14,28 @@
  * shape; no live site, no provider (AGENTS.md rule 7).
  */
 
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import type { MarketEntry, MarketsSnapshot } from '@currena/core';
 import { WorldMarkets } from '../WorldMarkets';
 import { insightsCopyEn } from '../../../i18n/insights-copy-en';
 import { insightsCopyFa } from '../../../i18n/insights-copy-fa';
+
+/* ------------------------------------------------------------------ *
+ * Deterministic clock — freeze to 2026-10-17T12:00:00Z so the fixture's
+ * asOf dates (2026-10-16) are always 1 day old (never stale), and the
+ * staleSnapshot's (2026-09-01) is always >5 days old (always stale).
+ * Without this, the 16 body-rendering tests fail once real time passes
+ * the 5-day STALE_DAYS threshold (the everythingOld early-return fires
+ * and the component renders only the collapsed stale shell).
+ * ------------------------------------------------------------------ */
+beforeEach(() => {
+  vi.setSystemTime(new Date('2026-10-17T12:00:00Z'));
+});
+afterEach(() => {
+  vi.useRealTimers();
+  cleanup();
+});
 
 /* ------------------------------------------------------------------ *
  * Fixtures
@@ -81,8 +97,6 @@ const findPeriodRadio = (name: string): HTMLElement => {
   expect(radio).toBeTruthy();
   return radio;
 };
-
-afterEach(cleanup);
 
 /* ------------------------------------------------------------------ *
  * The section shell
