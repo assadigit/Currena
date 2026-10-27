@@ -5,9 +5,11 @@ Built directly from `packages/insights/src/definitions.ts` (100 indicators),
 `packages/insights/src/markets/definitions.ts` (16 world stock indices) and
 `packages/insights/src/fx/definitions.ts` (10 FX pairs + 7 FX pattern cards).
 
-**Total: 134 items.** The four ids that appear both as an FX pair AND an
-indicator (`usdjpy`, `audusd`, `usdcny`, `audjpy`) get ONE Layer-1 entry each
-(shared by both surfaces). The dollar-basket is one of the 100 indicators.
+**Total: 133 table rows → 129 unique Layer-1 entries** (100 indicators +
+16 markets + 17 FX rows; the four ids that appear both as an FX pair AND an
+indicator — `usdjpy`, `audusd`, `usdcny`, `audjpy` — get ONE Layer-1 entry
+each, shared by both surfaces; the dollar-basket is one of the 100
+indicators). Counting method: unique ids written / 129 (see D-13).
 
 The `L1` column tracks Layer-1 copy status: `✓` written, `·` pending.
 The accessor list `LAYER1_INDICATOR_IDS` in
@@ -25,16 +27,17 @@ inventory and enforced by gate G1.
 | ✓ | `yield-curve-10y3m` | US 10Y minus 3M yield | The gap between 10-year and 3-month US Treasury yields (the Fed's preferred curve leg). |
 | ✓ | `real-yield-10y` | US 10-year real yield | The yield on 10-year inflation-protected US Treasuries (return after inflation). |
 | ✓ | `us10y` | US 10-year Treasury yield | The market interest rate on 10-year US government debt. |
+| ✓ | `us30y` | US 30-year Treasury yield | The 30-year US Treasury yield (the long end of the US curve). |
 | ✓ | `fed-target` | Federal funds target rate | The Fed's main policy rate (the target-range midpoint). |
 | ✓ | `ecb-dfr` | ECB deposit facility rate | The ECB's main policy rate (the rate banks earn on deposits at the ECB). |
 | ✓ | `fed-expectations` | What markets expect from the Fed (2-year gap) | The 2-year Treasury-implied path of Fed rates vs the target. |
-| · | `govt-interest-revenue` | US government interest payments / receipts | US federal interest cost as a share of receipts. |
-| · | `us-2y` | US 2-year Treasury yield | The 2-year US Treasury yield (near-term rate expectations). |
-| · | `sofr` | The overnight funding rate (SOFR) | The overnight borrowing rate that replaced LIBOR in US markets. |
-| · | `mortgage-30y` | The US 30-year home-loan rate | The average US 30-year fixed mortgage rate. |
-| · | `jgb-10y` | Japan 10-year government bond yield | The 10-year Japanese government bond yield. |
-| · | `bund-10y` | German 10-year government bond yield | The 10-year German government bond yield (euro-area benchmark). |
-| · | `gilt-10y` | UK 10-year government bond yield | The 10-year UK government bond yield. |
+| ✓ | `govt-interest-revenue` | US government interest payments / receipts | US federal interest cost as a share of receipts. |
+| ✓ | `us-2y` | US 2-year Treasury yield | The 2-year US Treasury yield (near-term rate expectations). |
+| ✓ | `sofr` | The overnight funding rate (SOFR) | The overnight borrowing rate that replaced LIBOR in US markets. |
+| ✓ | `mortgage-30y` | The US 30-year home-loan rate | The average US 30-year fixed mortgage rate. |
+| ✓ | `jgb-10y` | Japan 10-year government bond yield | The 10-year Japanese government bond yield. |
+| ✓ | `bund-10y` | German 10-year government bond yield | The 10-year German government bond yield (euro-area benchmark). |
+| ✓ | `gilt-10y` | UK 10-year government bond yield | The 10-year UK government bond yield. |
 | · | `euro-aaa-10y` | What the safest euro-area governments pay for 10 years | The 10-year AAA euro-area government bond yield. |
 | · | `boe-rate` | Bank of England policy rate (overnight) | The Bank of England's main policy rate (Bank Rate). |
 | · | `boj-rate` | Bank of Japan policy rate (overnight) | The Bank of Japan's main policy rate. |
@@ -48,7 +51,7 @@ inventory and enforced by gate G1.
 | · | `eur-usd` | EUR/USD | The euro in US dollars. |
 | · | `usdtry` | Dollar vs Turkish lira | The US dollar in Turkish lira (an emerging-market pressure gauge). |
 
-#### `growth-health` gauge (24)
+#### `growth-health` gauge (23)
 | L1 | id | official name | what it measures |
 |---|---|---|---|
 | · | `us-unemployment` | US unemployment rate | The share of the US labour force without a job. |
@@ -130,7 +133,7 @@ inventory and enforced by gate G1.
 | · | `au-us-10y-gap` | Australia vs US 10-year yield gap | The gap between 10-year Australian and US yields. |
 | · | `au-petrol-yoy` | Petrol prices vs a year ago | Australian petrol prices, year-on-year. |
 
-#### `au-households` gauge (10)
+#### `au-households` gauge (11)
 | L1 | id | official name | what it measures |
 |---|---|---|---|
 | · | `au-unemployment` | Australian unemployment rate | The share of Australia's labour force without a job. |

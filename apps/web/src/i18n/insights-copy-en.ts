@@ -323,6 +323,82 @@ const LAYER1 = {
       ],
       glossaryTerms: ['yield', 'interest-rate', 'central-bank'],
     },
+
+    /* ----- Batch 2 — borrowing-costs rest A (7) ----- */
+    'govt-interest-revenue': {
+      plainName: 'America’s interest bill vs income',
+      oneLine: 'How big the US government’s interest bill on its debt is, versus its income.',
+      ifRising: 'More tax money usually goes to interest payments, sharpening fights over the US budget.',
+      ifFalling: 'A smaller interest slice usually leaves more room for other government spending.',
+      connections: [
+        { with: 'us10y', text: 'Higher long-term rates raise the interest the government pays over time.', strength: 'usually' },
+      ],
+      glossaryTerms: ['bond', 'interest-rate'],
+    },
+    'us-2y': {
+      plainName: 'US 2-year borrowing cost',
+      oneLine: 'The interest rate on 2-year US government debt.',
+      ifRising: 'Markets usually expect higher Fed rates, and near-term borrowing costs often follow.',
+      ifFalling: 'Markets usually expect lower Fed rates, bringing earlier relief for borrowers.',
+      connections: [
+        { with: 'fed-expectations', text: 'The market-expectations card is built from this 2-year rate.', strength: 'reliable' },
+        { with: 'yield-curve-10y2y', text: 'This is the short leg of the 10-year-minus-2-year gap.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['interest-rate', 'yield', 'bond'],
+    },
+    sofr: {
+      plainName: 'The overnight bank cash rate',
+      oneLine: 'What banks actually pay to borrow cash overnight in the US.',
+      ifRising: 'Loans whose rate moves daily usually get more expensive.',
+      ifFalling: 'Short-term borrowing usually gets cheaper, taking pressure off borrowers.',
+      connections: [
+        { with: 'fed-target', text: 'SOFR normally sits just under the top of the Fed’s target range.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['interest-rate', 'policy-rate', 'central-bank'],
+    },
+    'mortgage-30y': {
+      plainName: 'The typical US home-loan rate',
+      oneLine: 'The average rate on a new 30-year US home loan.',
+      ifRising: 'Monthly payments on new home loans usually rise, and fewer buyers can afford them.',
+      ifFalling: 'New home loans usually get cheaper, letting buyers borrow a little more.',
+      connections: [
+        { with: 'us10y', text: 'The 30-year mortgage follows the 10-year Treasury rate.', strength: 'reliable' },
+        { with: 'fed-target', text: 'Policy moves reach this rate through the long end, with a delay.', strength: 'usually' },
+      ],
+      glossaryTerms: ['mortgage', 'interest-rate'],
+    },
+    'jgb-10y': {
+      plainName: 'Japan’s 10-year borrowing cost',
+      oneLine: 'The interest rate on 10-year Japanese government debt.',
+      ifRising: 'Japanese money usually gets tighter at home, and world markets often feel it.',
+      ifFalling: 'Cheap Japanese money usually stays available for borrowers and world markets.',
+      connections: [
+        { with: 'us-japan-10y-gap', text: 'The US-Japan 10-year gap card is built from this rate.', strength: 'reliable' },
+        { with: 'boj-rate', text: 'The Bank of Japan still leans heavily on this market.', strength: 'usually' },
+      ],
+      glossaryTerms: ['yield', 'bond', 'interest-rate', 'central-bank'],
+    },
+    'bund-10y': {
+      plainName: 'Germany’s 10-year borrowing cost',
+      oneLine: 'The interest rate on 10-year German government debt.',
+      ifRising: 'Borrowing across Europe usually gets more expensive, from mortgages to business loans.',
+      ifFalling: 'Borrowing across Europe usually eases, from home loans to business credit.',
+      connections: [
+        { with: 'euro-aaa-10y', text: 'The daily euro safe-rate and this monthly German mirror tell one story.', strength: 'usually' },
+        { with: 'ecb-dfr', text: 'The ECB’s policy rate anchors the base this long-term rate floats above.', strength: 'usually' },
+      ],
+      glossaryTerms: ['yield', 'bond', 'interest-rate', 'mortgage', 'policy-rate', 'central-bank'],
+    },
+    'gilt-10y': {
+      plainName: 'Britain’s 10-year borrowing cost',
+      oneLine: 'The interest rate on 10-year UK government debt.',
+      ifRising: 'UK mortgages and business loans usually get more expensive.',
+      ifFalling: 'UK borrowing usually gets cheaper, helping loans and house prices.',
+      connections: [
+        { with: 'boe-rate', text: 'The Bank of England sets the short base; this is the market’s long rate.', strength: 'usually' },
+      ],
+      glossaryTerms: ['yield', 'bond', 'interest-rate', 'mortgage', 'central-bank'],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 

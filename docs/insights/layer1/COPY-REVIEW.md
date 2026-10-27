@@ -65,14 +65,52 @@ textbook (e.g. Mankiw, Mishkin) or the RBA's own statements.
 
 ---
 
-## Batch 2 — (pending)
+## Batch 2 — borrowing-costs rest A (7 indicators)
 
-_Indicators: us-2y, sofr, mortgage-30y, jgb-10y, bund-10y, gilt-10y, euro-aaa-10y, boe-rate, boj-rate, govt-interest-revenue_
+_Indicators: govt-interest-revenue, us-2y, sofr, mortgage-30y, jgb-10y, bund-10y, gilt-10y_
+_(the remaining borrowing-costs ids — euro-aaa-10y, boe-rate, boj-rate — land in batch 3)_
 
-— pending — fill in when batch 2 copy is written.
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `govt-interest-revenue` | ifRising | A bigger interest slice usually sharpens US budget fights. | — | widely-taught: interest crowding-out of other spending is standard public-finance | widely-taught |
+| `govt-interest-revenue` | ifFalling | A smaller slice usually leaves more room for other spending. | — | widely-taught (inverse) | widely-taught |
+| `us-2y` | ifRising | A rising 2y usually means markets price higher Fed rates; near-term borrowing follows. | — | widely-taught: the 2y Treasury embeds policy expectations (expectations hypothesis) | widely-taught |
+| `us-2y` | ifFalling | A falling 2y usually means markets price lower Fed rates, earlier borrower relief. | — | widely-taught (inverse) | widely-taught |
+| `sofr` | ifRising | Daily-reset (floating) loans usually get more expensive when overnight money rises. | — | widely-taught: SOFR is the base rate for floating-rate lending | widely-taught |
+| `sofr` | ifFalling | Cheaper overnight money usually eases short-term borrowing. | — | widely-taught (inverse) | widely-taught |
+| `mortgage-30y` | ifRising | Higher mortgage rates raise new-loan payments and price buyers out. | — | widely-taught: payment-vs-rate arithmetic; approved copy says each point cuts borrowing power roughly 10% | widely-taught |
+| `mortgage-30y` | ifFalling | Cheaper mortgages let buyers borrow more. | — | widely-taught (inverse) | widely-taught |
+| `jgb-10y` | ifRising | Rising Japanese yields usually pull cheap Japanese money home; world markets feel it. | — | widely-taught: Japan's saver scale + the carry trade's funding leg | widely-taught |
+| `jgb-10y` | ifFalling | Cheap Japanese money usually stays available to world borrowers. | — | widely-taught (inverse; three decades of near-zero JGBs) | widely-taught |
+| `bund-10y` | ifRising | German yields usually raise borrowing costs across Europe. | — | widely-taught: the Bund is the euro-area benchmark | widely-taught |
+| `bund-10y` | ifFalling | Falling Bunds usually ease European borrowing. | — | widely-taught (inverse) | widely-taught |
+| `gilt-10y` | ifRising | UK mortgages and business loans usually get dearer with gilts. | — | widely-taught: gilts steer UK fixed-rate mortgage pricing | widely-taught |
+| `gilt-10y` | ifFalling | Cheaper gilts usually help UK loans and house prices. | — | widely-taught (inverse; 2022 mini-budget episode) | widely-taught |
+
+### Connections (batch 2)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `govt-interest-revenue` | `us10y` | Higher long rates raise the government's interest bill over time. | usually | widely-taught: debt rolls over at prevailing rates | widely-taught |
+| `us-2y` | `fed-expectations` | The Fed-expectations card is built from the 2y rate. | reliable | definitional (approved copy: DGS2 minus the policy midpoint) | widely-taught |
+| `us-2y` | `yield-curve-10y2y` | The 2y is the short leg of the 10y−2y gap. | reliable | definitional | widely-taught |
+| `sofr` | `fed-target` | SOFR normally sits just under the top of the Fed's target range. | reliable | widely-taught: SOFR's normal corridor behaviour (Sept 2019 the famous exception) | widely-taught |
+| `mortgage-30y` | `us10y` | The 30y mortgage follows the 10y Treasury. | reliable | widely-taught: mortgage pricing anchored to the 10y | widely-taught |
+| `mortgage-30y` | `fed-target` | Policy reaches the mortgage through the long end, with a delay. | usually | widely-taught: transmission chain | widely-taught |
+| `jgb-10y` | `us-japan-10y-gap` | The US-Japan gap card is built from the JGB rate. | reliable | definitional | widely-taught |
+| `jgb-10y` | `boj-rate` | The BoJ still leans heavily on the JGB market. | usually | widely-taught: yield-curve-control history, BoJ holdings | widely-taught |
+| `bund-10y` | `euro-aaa-10y` | The daily euro AAA rate and the monthly Bund mirror tell one story. | usually | widely-taught: both are the euro safe long rate (approved copy notes the monthly lag) | widely-taught |
+| `bund-10y` | `ecb-dfr` | The ECB's policy rate is the base the Bund floats above. | usually | widely-taught: term structure | widely-taught |
+| `gilt-10y` | `boe-rate` | The BoE sets the short base; the gilt is the market's long rate. | usually | widely-taught: term structure | widely-taught |
+
+### Australia angle (batch 2)
+| id | claim | basis | status |
+|---|---|---|---|
+| (none — batch 2 ids are US/EA/JP/UK borrowing costs with no direct AU household link per D-08.) | — | — | — |
 
 ---
 
-## Batches 3..N
+## Batch 3 — (pending)
 
-— pending — one section per batch as the copy lands.
+_Indicators: euro-aaa-10y, boe-rate, boj-rate, dollar-basket, usdjpy, us-japan-10y-gap, eur-usd, usdtry_
+
+— pending — fill in when batch 3 copy is written.

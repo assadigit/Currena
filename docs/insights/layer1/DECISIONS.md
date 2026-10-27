@@ -239,3 +239,55 @@ repo's descriptive-round style. Do NOT deploy until the FINAL session when
 every gate (incl. G9/G10) is green; the owner's deploy-lock check
 (`docs/DEPLOY.md`) runs first. Each batch is its own commit; the CHANGELOG
 gets one entry at the end of the final session.
+
+## D-13 — Session-2 bookkeeping: inventory count reconciliation + session-1 slips
+
+**Assumption.** INVENTORY.md's session-1 headers said "Total: 134 items",
+`growth-health` (24), `au-households` (10), and the borrowing-costs table
+listed 17 rows under an "(18)" header — none matching the code.
+
+**Decision.** Reconciled against `packages/insights/src/definitions.ts`
+(source of truth): 100 indicators (borrowing-costs 18 incl. the missing
+`us30y` row — added with ✓ since its copy exists; dollar-strength 5;
+growth-health 23; market-stress 10; prices-board 5; prices-heat 16;
+au-inflation-rates 6; au-households 11; au-trade-currency 6). Totals in
+INVENTORY.md corrected to **133 table rows → 129 unique Layer-1 entries**
+(16 markets + 17 FX rows, with the 4 shared FX ids counted once). Progress
+is reported as "unique ids written / 129" from session 2 on; the validator
+console line counts the 133-entry array (with the 4 duplicates). Also fixed
+a session-1 FA glossary typo («کمتر می‌خرزد» → «کمتر می‌خرد» in
+`layer1.glossary.inflation.plain`), re-triaged through the copy-audit
+manifest (round `layer1`, reference COPY-REVIEW.md).
+
+**Reason.** The spec makes the inventory the single source of truth for G1;
+wrong arithmetic in the doc propagates into every progress report. Counting
+unique ids is the honest denominator for "copy written" (the array counts
+4 shared ids twice).
+
+## D-14 — Writing around jargon-null terms; two validator-map extensions (PMI, VIX)
+
+**Assumption.** The G3 JARGON map (D-07) marks some terms `termId: null`
+(= must be replaced with a plain word): spread, basis points, liquidity,
+equities, ratio, easing, tightening, futures, momentum, correction, dollar
+index, inflation expectations (EN phrase), etc. M1 cards (china-pmi, vix,
+walcl, m2-us…) naturally want some of these words.
+
+**Decision.** (a) Write around every jargon-null term with plain wording
+(e.g. "how easily money moves" instead of liquidity; "the dollar measured
+against a group of currencies" instead of dollar index; no "increasing" in
+EN copy — it contains the substring "easing"). (b) The two terms that are
+genuinely unavoidable because they ARE the instrument's name — PMI (the
+china-pmi card) and VIX (the vix card) — get glossary entries (`pmi`,
+`vix`) and their JARGON-map rows now point at them (`termId: 'pmi'`,
+`termId: 'vix'`), the style-guide-sanctioned "explain it or list it" path.
+(c) `carry trade` is added to the JARGON map pointing at a new
+`carry-trade` glossary entry (the approved site copy already uses
+«کری ترید»; the validator now enforces listing it). (d) `money supply`
+and `leading indicator` are added the same way (`money-supply`,
+`leading-indicator` glossary terms) for the m2-us and OECD-CLI cards.
+
+**Reason.** G3's substring matching makes some innocent words land on
+jargon (EN "increasing" ⊃ "easing"); the only safe policy is plain wording
+for everything except the tiny list of unavoidable instrument names, each
+of which must then be a listed glossary term. Extending the map is
+explicitly allowed (spec §9 G3: "a jargon list … extend it").
