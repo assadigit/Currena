@@ -81,12 +81,12 @@ inventory and enforced by gate G1.
 #### `market-stress` gauge (10)
 | L1 | id | official name | what it measures |
 |---|---|---|---|
-| · | `stress-stlfsi` | St. Louis Fed Financial Stress Index | The St. Louis Fed's financial-stress index. |
-| · | `nfci` | Chicago Fed National Financial Conditions Index | The Chicago Fed's financial-conditions index. |
-| · | `vix` | Market fear gauge (VIX) | The Cboe Volatility Index (S&P 500 option-implied volatility). |
-| · | `gold-silver` | Gold / Silver | The gold price divided by the silver price. |
-| · | `cftc-gold-positioning` | Trader positioning in gold (COT) | Net non-commercial positioning in US gold futures (CFTC COT). |
-| · | `walcl` | The Fed's balance sheet | The size of the US Federal Reserve's balance sheet. |
+| ✓ | `stress-stlfsi` | St. Louis Fed Financial Stress Index | The St. Louis Fed's financial-stress index. |
+| ✓ | `nfci` | Chicago Fed National Financial Conditions Index | The Chicago Fed's financial-conditions index. |
+| ✓ | `vix` | Market fear gauge (VIX) | The Cboe Volatility Index (S&P 500 option-implied volatility). |
+| ✓ | `gold-silver` | Gold / Silver | The gold price divided by the silver price. |
+| ✓ | `cftc-gold-positioning` | Trader positioning in gold (COT) | Net non-commercial positioning in US gold futures (CFTC COT). |
+| ✓ | `walcl` | The Fed's balance sheet | The size of the US Federal Reserve's balance sheet. |
 | · | `crypto-fng` | Crypto Fear and Greed Index | A sentiment gauge for crypto markets. |
 | · | `shiller-cape` | US share prices versus long-run earnings (Shiller CAPE) | The Shiller cyclically-adjusted price/earnings ratio for the S&P 500. |
 | · | `shiller-ecy` | Excess CAPE Yield (Shiller) | The earnings yield of CAPE minus the real 10-year Treasury yield. |

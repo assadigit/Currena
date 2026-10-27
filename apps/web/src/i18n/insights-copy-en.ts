@@ -767,6 +767,73 @@ const LAYER1 = {
       ],
       glossaryTerms: ['commodity'],
     },
+
+    /* ----- Batch 7 — market-stress A (6) ----- */
+    'stress-stlfsi': {
+      plainName: 'US money-market stress',
+      oneLine: 'One weekly number for stress across US money and credit markets.',
+      ifRising: 'Lending conditions usually tighten, in the US and often worldwide.',
+      ifFalling: 'Market plumbing usually calms, which often eases lending.',
+      connections: [
+        { with: 'nfci', text: 'The Chicago cousin reads the same stress with a wider lens.', strength: 'reliable' },
+        { with: 'vix', text: 'Market fear usually rises with money-market stress.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    nfci: {
+      plainName: 'How easily US money moves',
+      oneLine: 'How easily money moves through the US financial system.',
+      ifRising: 'Money usually gets harder to move, which slows lending.',
+      ifFalling: 'Easy money usually supports credit and spending.',
+      connections: [
+        { with: 'stress-stlfsi', text: 'The sister gauge from the St Louis Fed reads the same stress differently.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
+    vix: {
+      plainName: 'The market fear gauge',
+      oneLine: 'How nervous US share investors are right now.',
+      ifRising: 'Big, fast swings in world share markets usually loom.',
+      ifFalling: 'Calm usually settles over world share markets.',
+      connections: [
+        { with: 'gpr-index', text: 'War and tension news often lifts this gauge.', strength: 'usually' },
+        { with: 'stress-stlfsi', text: 'Fear and money-market stress usually move together.', strength: 'usually' },
+      ],
+      glossaryTerms: ['vix', 'volatility'],
+    },
+    'gold-silver': {
+      plainName: 'Gold priced in silver',
+      oneLine: 'How many silver ounces one gold ounce buys.',
+      ifRising: 'Fear usually leads, with gold the preferred safe haven.',
+      ifFalling: 'Industrial strength usually shows, with silver running dearer.',
+      connections: [
+        { with: 'gold-usd', text: 'Gold is the fear leg of this measure.', strength: 'reliable' },
+        { with: 'silver-usd', text: 'Silver is the half-industrial leg.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['safe-haven'],
+    },
+    'cftc-gold-positioning': {
+      plainName: 'The gold crowd gauge',
+      oneLine: 'How crowded big traders’ gold bets have become.',
+      ifRising: 'The gold trade usually gets crowded, the zone that unwinds hardest.',
+      ifFalling: 'Crowding usually thins; rare net-short stretches have sat near price floors.',
+      connections: [
+        { with: 'vix', text: 'Stress plus crowding is the mix that unwinds hardest.', strength: 'usually' },
+        { with: 'gold-usd', text: 'The bets being gauged are on this metal.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
+    walcl: {
+      plainName: 'The Fed’s balance sheet',
+      oneLine: 'The total size of what the US central bank owns.',
+      ifRising: 'The system usually gets flooded with money, an emergency-style setting.',
+      ifFalling: 'The Fed usually drains money steadily from the system.',
+      connections: [
+        { with: 'm2-us', text: 'One is the central bank’s own creation of money; the other the banking system’s.', strength: 'reliable' },
+        { with: 'fed-target', text: 'The Fed’s two levers: the price of money and the quantity.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['central-bank', 'money-supply'],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 

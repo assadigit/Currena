@@ -303,8 +303,49 @@ _(growth-health is now complete at 23/23)_
 
 ---
 
-## Batch 7 — (pending)
+## Batch 7 — market-stress A (6 indicators)
 
 _Indicators: stress-stlfsi, nfci, vix, gold-silver, cftc-gold-positioning, walcl_
 
-— pending — fill in when batch 7 copy is written.
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `stress-stlfsi` | ifRising | Rising stress tightens lending in the US and often worldwide. | — | widely-taught: stress indices track funding conditions | widely-taught |
+| `stress-stlfsi` | ifFalling | Calm plumbing eases lending. | — | widely-taught (inverse) | widely-taught |
+| `nfci` | ifRising | Tighter conditions slow lending. | — | widely-taught (the Chicago Fed's own framing) | widely-taught |
+| `nfci` | ifFalling | Easier conditions support credit and spending. | — | widely-taught (inverse) | widely-taught |
+| `vix` | ifRising | A rising gauge usually means big, fast world share swings loom. | — | widely-taught: the VIX is the fear thermometer (approved copy) | widely-taught |
+| `vix` | ifFalling | Calm settles over share markets. | — | widely-taught (inverse) | widely-taught |
+| `gold-silver` | ifRising | Gold favoured over silver = fear leads. | — | widely-taught: the classic hard-asset ratio (approved copy) | widely-taught |
+| `gold-silver` | ifFalling | Silver dearer = industrial strength shows. | — | widely-taught (inverse) | widely-taught |
+| `cftc-gold-positioning` | ifRising | Crowded gold bets unwind hardest. | — | widely-taught: crowded-book risk (approved copy) | widely-taught |
+| `cftc-gold-positioning` | ifFalling | Thinning crowds; rare net-short stretches near price floors. | — | widely-taught (approved copy) | widely-taught |
+| `walcl` | ifRising | A growing balance sheet floods the system, emergency-style. | — | widely-taught: QE mechanics | widely-taught |
+| `walcl` | ifFalling | Steady draining of money from the system. | — | widely-taught: quantitative tightening | widely-taught |
+
+### Connections (batch 7)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `stress-stlfsi` | `nfci` | The Chicago cousin reads the same stress with a wider lens. | reliable | definitional: two Fed stress indices over overlapping inputs | widely-taught |
+| `stress-stlfsi` | `vix` | Market fear rises with money-market stress. | usually | widely-taught: co-movement in stress episodes | widely-taught |
+| `nfci` | `stress-stlfsi` | The sister gauge from the St Louis Fed reads it differently. | reliable | definitional | widely-taught |
+| `vix` | `gpr-index` | War and tension news often lifts the fear gauge. | usually | widely-taught: geopolitics → risk-off | widely-taught |
+| `vix` | `stress-stlfsi` | Fear and money-market stress move together. | usually | widely-taught | widely-taught |
+| `gold-silver` | `gold-usd` | Gold is the fear leg of the measure. | reliable | definitional | widely-taught |
+| `gold-silver` | `silver-usd` | Silver is the half-industrial leg. | reliable | definitional | widely-taught |
+| `cftc-gold-positioning` | `vix` | Stress plus crowding unwinds hardest. | usually | widely-taught (approved forYou wording) | widely-taught |
+| `cftc-gold-positioning` | `gold-usd` | The bets gauged are on this metal. | reliable | definitional | widely-taught |
+| `walcl` | `m2-us` | One is the central bank's money creation; the other the banking system's. | reliable | definitional/widely-taught (approved forYou wording) | widely-taught |
+| `walcl` | `fed-target` | The Fed's two levers: the price and the quantity of money. | reliable | widely-taught: policy toolkit | widely-taught |
+
+### Australia angle (batch 7)
+| id | claim | basis | status |
+|---|---|---|---|
+| (none — the nfci approved copy notes offshore-funding relevance for AU banks, but D-08's australiaAngle list does not include nfci/walcl, so no australiaAngle is written.) | — | — | — |
+
+---
+
+## Batch 8 — (pending)
+
+_Indicators: crypto-fng, shiller-cape, shiller-ecy, gpr-index_
+
+— pending — fill in when batch 8 copy is written.

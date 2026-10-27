@@ -4768,6 +4768,73 @@ export const insightsCopyFa: InsightsCopy = {
         ],
         glossaryTerms: ['commodity'],
       },
+
+      /* ----- دستهٔ ۷ — تنش بازار A (۶) ----- */
+      'stress-stlfsi': {
+        plainName: 'تنش بازار پول آمریکا',
+        oneLine: 'عدد هفتگی برای تنش در بازارهای پول و اعتبار آمریکا.',
+        ifRising: 'شرایط وام‌دهی معمولاً تنگ‌تر می‌شود، در آمریکا و اغلب در جهان.',
+        ifFalling: 'زیرساخت بازار معمولاً آرام می‌گیرد و وام‌دهی آسان‌تر می‌شود.',
+        connections: [
+          { with: 'nfci', text: 'همتای شیکاگو همین تنش را با دیدی بازتر می‌خواند.', strength: 'reliable' },
+          { with: 'vix', text: 'ترس بازار معمولاً با تنش بازار پول بالا می‌رود.', strength: 'usually' },
+        ],
+        glossaryTerms: [],
+      },
+      nfci: {
+        plainName: 'آسانی جابه‌جایی پول آمریکا',
+        oneLine: 'پول چقدر آسان در نظام مالی آمریکا جابه‌جا می‌شود.',
+        ifRising: 'جابه‌جایی پول معمولاً سخت‌تر می‌شود و وام‌دهی کند می‌شود.',
+        ifFalling: 'پول آسان معمولاً اعتبار و خرج کردن را پشتیبانی می‌کند.',
+        connections: [
+          { with: 'stress-stlfsi', text: 'شاخص سنت لوییس همین تنش را از راهی دیگر می‌خواند.', strength: 'reliable' },
+        ],
+        glossaryTerms: [],
+      },
+      vix: {
+        plainName: 'فشارسنج ترس بازار',
+        oneLine: 'سرمایه‌گذاران بورس آمریکا الان چقدر عصبی‌اند.',
+        ifRising: 'نوسان‌های بزرگ و سریع معمولاً در بورس‌های جهان در راه‌اند.',
+        ifFalling: 'آرامش معمولاً بر بورس‌های جهان می‌نشیند.',
+        connections: [
+          { with: 'gpr-index', text: 'خبر جنگ و تنش اغلب این فشارسنج را بالا می‌برد.', strength: 'usually' },
+          { with: 'stress-stlfsi', text: 'ترس و تنش بازار پول معمولاً با هم حرکت می‌کنند.', strength: 'usually' },
+        ],
+        glossaryTerms: ['vix', 'volatility'],
+      },
+      'gold-silver': {
+        plainName: 'طلا به نقره',
+        oneLine: 'هر اونس طلا چند اونس نقره می‌خرد.',
+        ifRising: 'ترس معمولاً پیشتاز است و طلا پناهگاه امن پسندیده می‌شود.',
+        ifFalling: 'قدرت صنعتی معمولاً خود را نشان می‌دهد و نقره گران‌تر می‌شود.',
+        connections: [
+          { with: 'gold-usd', text: 'طلا ضلع ترس این معیار است.', strength: 'reliable' },
+          { with: 'silver-usd', text: 'نقره ضلع نیمه‌صنعتی آن است.', strength: 'reliable' },
+        ],
+        glossaryTerms: ['safe-haven'],
+      },
+      'cftc-gold-positioning': {
+        plainName: 'فشارسنج شلوغی طلا',
+        oneLine: 'شرط‌بندی‌های بزرگ معامله‌گران روی طلا چقدر شلوغ شده است.',
+        ifRising: 'معاملهٔ طلا معمولاً شلوغ می‌شود؛ همان محدوده‌ای که سخت‌ترین برچیده‌شدن را دارد.',
+        ifFalling: 'شلوغی معمولاً کم می‌شود؛ خالص‌فروشی‌های کمیاب نزدیک کف‌های قیمت دیده شده‌اند.',
+        connections: [
+          { with: 'vix', text: 'تنش به‌علاوهٔ شلوغی همان ترکیبی است که سخت‌ترین برچیده‌شدن را دارد.', strength: 'usually' },
+          { with: 'gold-usd', text: 'شرط‌هایی که سنجیده می‌شوند روی همین فلزند.', strength: 'reliable' },
+        ],
+        glossaryTerms: [],
+      },
+      walcl: {
+        plainName: 'کل دارایی‌های فدرال رزرو',
+        oneLine: 'اندازهٔ کل آنچه بانک مرکزی آمریکا در دست دارد.',
+        ifRising: 'سیستم معمولاً سرشار از پول می‌شود؛ وضعیتی در سبک شرایط اضطراری.',
+        ifFalling: 'فدرال رزرو معمولاً پول را پیوسته و آرام از سیستم بیرون می‌کشد.',
+        connections: [
+          { with: 'm2-us', text: 'یکی آفرینش پول از سوی خود بانک مرکزی است و دیگری پول نظام بانکی.', strength: 'reliable' },
+          { with: 'fed-target', text: 'دو اهرم فدرال رزرو: قیمت پول و مقدار آن.', strength: 'reliable' },
+        ],
+        glossaryTerms: ['central-bank', 'money-supply'],
+      },
     },
   },
 };
