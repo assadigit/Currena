@@ -11,15 +11,27 @@ Repository: assadigit/Currena (Cloudflare Workers, free KV). Owner: Ali.
 | `AGENT_RUNBOOK.md` | This file: the procedure. |
 | `RULES.md` | Hard rules, source risk levels, public-mode mitigations, wording and data display rules. |
 | `RISK_REGISTER.md` | Source levels and the owner's recorded acceptance. |
+| `LICENCES.md` | The licence register — every source's terms quote + date read. |
 | `UI_SPEC.md` | All visual and interaction changes, with acceptance tests U-01 to U-14. |
 | `SCRAPING_SPEC.md` | The only allowed ways to fetch data, per-source method cards, tests T-25 to T-34. |
-| `INSIGHTS_STEP3_SPEC.md` | Indicators, definitions, relationship rules, coverage, tests T-15 to T-24 and T-35. |
-| `INSIGHTS_DEFECTS_2026-10-15.md` | 24 defects found in the latest export (E-01 to E-24). |
-| `INSIGHTS_FIX_SPEC.md` | Foundation, fixes, additions and tests (A-xx, B-xx, C-xx, T-01 to T-14). |
+| `MAINTENANCE.md` | The owner's weekly routine + the manual-entry update steps. |
+| `OWNER_SETUP.md` | The owner's hand-setup steps (secrets, deploy, rollback, panic switch). |
 | `GLOSSARY.md` | One vocabulary for page text and specs. |
-| `baseline/currena-insights-full-2026-10-15.md` | The page export the defects were found in. Evidence and test fixtures. |
+| `BACKTEST.md` | The backtest discipline. |
+| `01-indicator-spec.md` | The indicators, their warning rules, and how the summary line is calculated. |
+| `02-page-design-spec.md` | How the page should look and behave. |
+| `03-data-sources.md` | Per-source data notes (endpoint, series, access, cadence, fallback). |
+| `ROUND9_REPORT.md` | The R9 session record (the owner's nine UI changes). |
+| `ROUND10_REPORT.md` | The R10 session record (maintenance + de-risking). |
 
-If two files disagree: `RULES.md` wins, then `UI_SPEC.md` for anything visual, `SCRAPING_SPEC.md` for anything about fetching, then `INSIGHTS_STEP3_SPEC.md`, then `INSIGHTS_DEFECTS_2026-10-15.md`, then `INSIGHTS_FIX_SPEC.md`. This runbook decides the order of work.
+If two files disagree: `RULES.md` wins, then `UI_SPEC.md` for anything visual, `SCRAPING_SPEC.md` for anything about fetching, then `01-indicator-spec.md`. This runbook decides the order of work.
+
+**Note (2026-10-28 tidy-up):** the v3 rebuild's `INSIGHTS_STEP3_SPEC.md`,
+`INSIGHTS_DEFECTS_2026-10-15.md`, `INSIGHTS_FIX_SPEC.md`, and the
+baseline export were removed (the rebuild is complete — all phases
+checked off below; git history is the backup). The round reports
+(R9, R10) and `INDICATORS_AND_DATA_SOURCES.md` carry the current
+session records + the consolidated reference.
 
 ## 1. Mission
 

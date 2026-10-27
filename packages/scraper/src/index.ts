@@ -2,7 +2,8 @@
  * @currena/scraper — source modules + normalizers (TGJU, Frankfurter).
  *
  * Phase 4 implements the real extraction (the historical feature
- * inventory now lives under docs/archive/migration/):
+ * inventory was removed in the 2026-10-28 tidy-up — git history is
+ * the backup):
  *   - tgju.ts        — ajax.json primary + profile-page fallback, Rial→Toman
  *   - frankfurter.ts — ECB reference rates, base USD
  *   - http.ts        — fetchWithRetry (Chrome UA, timeout, quick retries)

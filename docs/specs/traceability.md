@@ -4,10 +4,15 @@ Every requirement from the two governing documents, mapped to where it lives in
 the code and the test that proves it. Audited 2026-10-14 after the v1.3 change
 request was implemented.
 
+> **Note (2026-10-28 tidy-up):** the v1.3 change-request file and the
+> one-time evidence/data-check artifacts were removed (git history is the
+> backup). The base spec `docs/specs/insights-world-currencies.md` stays
+> the governing document; this traceability map stays as the historical
+> v1.3 audit record.
+
 **Documents:**
-- Base spec: `docs/specs/insights-world-currencies.md` (v1.2)
-- Change request: `docs/specs/insights-world-currencies-v1.3-change-request.md`
-  (v1.3 — **wins where the two disagree**)
+- Base spec: `docs/specs/insights-world-currencies.md` (v1.2 + the v1.3
+  changes, now merged into the live spec)
 
 **Verification stack:** 1,058 tests pass workspace-wide (core 183, scraper 67,
 insights 339, markets 7, api 136, web 326) · typecheck clean in all 6 packages ·

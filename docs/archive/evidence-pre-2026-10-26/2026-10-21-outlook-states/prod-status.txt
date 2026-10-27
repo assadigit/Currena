@@ -1,7 +1,0 @@
-chunk: Insights-DlDkQ-3K.js
-sha256: 1d0778c50aa8004ed94dad6b2f84dcf373aca6c3878aa9973871ffb1643fbdf7 (local == served, curl 200)
-deploy version: d0d28c3f-f0a9-4619-b269-8f7337d9daa9 (prev: a5d2f793-358c-4f67-b597-c63de36e79bf)
-old fa sentence occurrences in served chunk: 0
-owner sentences present: fa bearish-gold 1, en bearish-gold 1, 7/7 en gold sentences
-/api/insights: 32 readings; price tiles gold-usd + silver-usd present
-browser: en/fa x 1280/375 all render bearish with owner sentences; collapsed 'Outlook: Bearish' / 'چشم‌انداز: نزولی'; scrollWidth 375==375; zero errors

@@ -356,7 +356,7 @@ lines.push('The spec §6.3 starting values (verbatim above, in src/fx/definition
 lines.push('');
 lines.push('## The v1.3 decision rule (change request §3.1/§4)');
 lines.push('');
-lines.push('Keep the starting thresholds unless a rule fires on more than 25% of days or never fires despite known episodes. The M1/M3 and dollar-led/euro-led splits above are the evidence for the two new behaviours; any change is recorded in docs/archive/migration/DECISIONS_FOR_ALI.md (historical).');
+lines.push('Keep the starting thresholds unless a rule fires on more than 25% of days or never fires despite known episodes. The M1/M3 and dollar-led/euro-led splits above are the evidence for the two new behaviours; any change is recorded in the round reports (historical).');
 lines.push('');
 
 writeFileSync(outPath, lines.join('\n'));

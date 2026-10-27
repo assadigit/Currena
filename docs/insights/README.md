@@ -55,10 +55,10 @@ worker, which is owner-personal-plan).
 4. No "buy", "sell" or personal-advice wording anywhere in the UI or copy
    (the T-19 forbidden-words scan enforces this — see `validation-step3.ts`).
 
-## Historical material (preserved, not deleted)
+## Historical material
 
-`docs/insights/archive/` carries the now-completed rebuild's spec/fix/
-defect/baseline docs (Phase 0–9, the gold-balance iteration, the A-1..A-10
-build cycle's audit/spec/prompt/report). `docs/insights/archive/screenshots-pre-2026-10-26/`
-carries the historical deploy/verification screenshots. Git history is
-the ultimate backup; the on-disk archive keeps the working tree navigable.
+The now-completed rebuild's spec/fix/defect/baseline docs and the
+pre-2026-10-26 screenshots/evidence were removed in the 2026-10-28
+tidy-up. Git history is the ultimate backup; the on-disk tree stays
+navigable. The round reports (`ROUND9_REPORT.md`, `ROUND10_REPORT.md`)
+carry the recent session records.

@@ -1,6 +1,0 @@
-home=200
-assets/index-DMIAshTW.js
-entry-sha256: d33ca2bfa0223b980cd92f06f499e09dd3c27b3d17cdff8faaf1ac5b10f28517
-chunk bytes: 592611
-usSharesBoxTitle|'Know before you buy US shares' occurrences: 0
-prices-board map present (brent/gold-usd/btc-usd): 2

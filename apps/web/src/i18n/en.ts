@@ -1,9 +1,9 @@
 /**
  * English dictionary: SOURCE OF TRUTH.
  * Every string extracted verbatim from the legacy Django templates
- * (Phase 1; the historical feature inventory now lives under
- * docs/archive/migration/). fa.ts must satisfy this shape.
- * New strings are added HERE first, then translated.
+ * (Phase 1; the historical feature inventory was removed in the
+ * 2026-10-28 tidy-up — git history is the backup). fa.ts must satisfy
+ * this shape. New strings are added HERE first, then translated.
  */
 export const en = {
   app: {

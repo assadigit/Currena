@@ -8,8 +8,8 @@ This document is the **single consolidated reference** for: (1) the
 indicators Currena carries, (2) where each one is fetched from and how
 often, (3) the public JSON API and its "free forever?" status, and (4)
 the gaps the audit found. It supersedes the older `INDICATOR_INVENTORY.md`
-(now in `docs/archive/migration/`) and the per-round specs that drove
-each wave (now in `docs/insights/archive/`).
+and the per-round specs that drove each wave (both removed in the
+2026-10-28 tidy-up — git history is the backup).
 
 ---
 
@@ -339,8 +339,7 @@ Insights page's serve path performs **exactly ONE KV read per request**
 
 ## 4. Possible gaps — the audit's findings (2026-10-26)
 
-The 2026-10-26 gap audit (`docs/insights/archive/a1-a10-build-2026-10-26/
-INSIGHTS_GAP_AUDIT.md`) reviewed every existing and proposed source. It
+The 2026-10-26 gap audit reviewed every existing and proposed source. It
 approved ten additions (all now live as A-1..A-10) and **rejected** the
 rest with evidence. The rejected set is the standing "do not rebuild
 unless a source revives" list — revisit quarterly.
@@ -501,20 +500,23 @@ docs/
 │   ├── 09-live-prices.md           — the live prices spec (active)
 │   ├── exports/                    — the latest self-check export (active)
 │   ├── screenshots/                — the latest deploy's verification screenshots
-│   └── archive/                    — historical (rebuild-2026-10, gold-balance, etc.)
+│   ├── screenshots-r9/             — the R9 round's verification screenshots
+│   └── screenshots-r10/            — the R10 round's verification screenshots
 ├── localization/                   — the Persian copy workflow (active)
 │   ├── persian-copy-manifest.json  — the canonical fa-string fingerprints (active)
 │   ├── persian-copy-workflow.md    — the workflow (active)
-│   ├── persian-terminology.md      — the terminology (active)
-│   └── archive-reviews-2026-10/    — historical review rounds
+│   └── persian-terminology.md      — the terminology (active)
 ├── specs/                          — the feature specs (active)
 │   ├── insights-world-currencies.md
 │   ├── insights-world-markets.md
-│   ├── world-markets/              — the world-markets map spec + reference
-│   └── archive/                    — historical spec drafts
+│   ├── traceability.md             — the requirement → code → test map
+│   └── world-markets/              — the world-markets map spec + reference
 └── ui-reference/                   — the UI wireframe references (active)
 ```
 
-The archived material is preserved (not deleted) under `docs/archive/` and
-`docs/insights/archive/` — git history is the ultimate backup, but the
-on-disk tidy keeps the working tree navigable for the next session.
+Historical archive directories (`docs/archive/`, `docs/insights/archive/`,
+`docs/localization/archive-reviews-2026-10/`, `docs/specs/archive/`, and
+the pre-2026-10-26 screenshots/evidence) were removed in the 2026-10-28
+tidy-up — git history is the ultimate backup. The on-disk tree now
+carries only the active specs, the current screenshots, and the recent
+round reports (R9, R10).

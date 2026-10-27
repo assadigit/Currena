@@ -144,9 +144,9 @@ export interface MarketDefinition {
   useExchangeLogo?: boolean;
   /**
    * EODHD INDX code, or null when the provider cannot serve this market on
-   * the free key (verified live in the step-0 data check — see
-   * docs/specs/insights-world-markets-data-check.md; FTSE on 2026-10-12:
-   * no FTSE 100 index exists in the INDX symbol list, only LSE ETFs).
+   * the free key (verified live in the step-0 data check — FTSE on
+   * 2026-10-12: no FTSE 100 index exists in the INDX symbol list, only
+   * LSE ETFs).
    */
   eodhdCode: string | null;
   /** Yahoo Finance chart symbol (URL-encoded by the fetcher). */
@@ -167,8 +167,7 @@ export interface MarketDefinition {
 }
 
 /** Fixed for v1 (spec §2 + owner round 44: the Dow Jones and CAC 40 joined
- * the original 14 after live provider verification — see
- * docs/specs/insights-world-markets-data-check.md).
+ * the original 14 after live provider verification).
  *
  * closeUtcMinute = the session's close converted to UTC (minutes past 00:00
  * UTC), plus a 30-minute settlement margin baked in. Sources: each
