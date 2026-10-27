@@ -161,8 +161,56 @@ _(borrowing-costs is now complete at 18/18; dollar-strength complete at 5/5)_
 
 ---
 
-## Batch 4 — (pending)
+## Batch 4 — growth-health A (8 indicators)
 
 _Indicators: us-unemployment, sahm-rule, china-pmi, china-cpi, copper-gold, michigan-sentiment, initial-jobless-claims, philly-fed_
 
-— pending — fill in when batch 4 copy is written.
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `us-unemployment` | ifRising | A steady climb usually means a cooling US economy and softer pay rises. | — | widely-taught: Okun's law territory | widely-taught |
+| `us-unemployment` | ifFalling | Falling joblessness usually means a strong jobs market, steadier pay growth. | — | widely-taught (inverse) | widely-taught |
+| `sahm-rule` | ifRising | A fast rise usually means a downturn has already started. | — | widely-taught: the Sahm rule's documented record since 1970 | widely-taught |
+| `sahm-rule` | ifFalling | A falling reading usually means the jobs market is out of alarm territory. | — | widely-taught (inverse; construction) | widely-taught |
+| `china-pmi` | ifRising | Busier Chinese factories are often good news for world trade. | — | widely-taught: China's weight in world manufacturing | widely-taught |
+| `china-pmi` | ifFalling | Slowing Chinese factories often weigh on world trade and commodity prices. | — | widely-taught | widely-taught |
+| `china-cpi` | ifRising | Overheating in the world's factory often ripples into world goods prices. | — | widely-taught: export-price pass-through | widely-taught |
+| `china-cpi` | ifFalling | Weak Chinese demand usually drags world trade and commodity prices. | — | widely-taught (2023–25 episode) | widely-taught |
+| `copper-gold` | ifRising | A rising copper/gold measure usually means markets pay up for growth. | — | widely-taught: "Dr Copper" vs the fear hedge | widely-taught |
+| `copper-gold` | ifFalling | A falling measure usually means money shifts to safe havens, often with slowdowns. | — | widely-taught (inverse) | widely-taught |
+| `michigan-sentiment` | ifRising | Confident households usually keep spending, supporting the economy. | — | widely-taught: consumption ~2/3 of US GDP | widely-taught |
+| `michigan-sentiment` | ifFalling | Gloomy households usually cut back first. | — | widely-taught (approved copy's caveat: mood is not spending) | widely-taught |
+| `initial-jobless-claims` | ifRising | Rising claims usually mean layoffs are picking up — the earliest jobs-market sign. | — | widely-taught: claims are the classic high-frequency labor signal | widely-taught |
+| `initial-jobless-claims` | ifFalling | Rare layoffs usually mean a tight jobs market. | — | widely-taught (inverse) | widely-taught |
+| `philly-fed` | ifRising | More growing manufacturers is an early sign of US strength. | — | widely-taught: early-month diffusion survey | widely-taught |
+| `philly-fed` | ifFalling | More shrinking manufacturers is an early sign of US weakness. | — | widely-taught (inverse) | widely-taught |
+
+### Connections (batch 4)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `us-unemployment` | `sahm-rule` | The Sahm alarm is built from the jobless rate. | reliable | definitional (approved copy: 3-month average vs 12-month low) | widely-taught |
+| `us-unemployment` | `us-nfp` | Jobs added and the jobless rate come from the same monthly report. | reliable | definitional (BLS Employment Situation) | widely-taught |
+| `sahm-rule` | `us-unemployment` | The alarm watches the rate's climb from its recent low. | reliable | definitional | widely-taught |
+| `sahm-rule` | `recession-probability` | The model and the alarm read the same downturn from different angles. | usually | widely-taught: both are recession nowcasters | widely-taught |
+| `china-pmi` | `china-cpi` | The factory pulse plus the price gauge judge Chinese demand. | usually | widely-taught: activity + prices = demand picture | widely-taught |
+| `china-pmi` | `copper-usd` | Copper often moves with Chinese factory strength. | usually | widely-taught: China is the biggest copper consumer | widely-taught |
+| `china-cpi` | `china-pmi` | Same pairing, from the price side. | usually | widely-taught | widely-taught |
+| `copper-gold` | `copper-usd` | Copper is the growth leg of the measure. | reliable | definitional | widely-taught |
+| `copper-gold` | `gold-usd` | Gold is the safety leg. | reliable | definitional | widely-taught |
+| `michigan-sentiment` | `michigan-1y-expectations` | The price-worry number rides inside this survey. | reliable | definitional (approved copy) | widely-taught |
+| `michigan-sentiment` | `retail-sales` | Mood often leads actual spending. | usually | widely-taught (with the approved caveat that mood ≠ spending) | widely-taught |
+| `initial-jobless-claims` | `us-unemployment` | Weekly claims feed the monthly jobless rate. | reliable | widely-taught: claims flow into the unemployment stock | widely-taught |
+| `initial-jobless-claims` | `sahm-rule` | Claim surges arrive long before the alarm can ring. | usually | widely-taught: the claims lead (approved copy: "weeks before monthly, months before Sahm") | widely-taught |
+| `philly-fed` | `us-gdp-growth` | Factory surveys often turn before the headline growth number. | usually | widely-taught: leading behavior of diffusion surveys | widely-taught |
+
+### Australia angle (batch 4)
+| id | claim | basis | status |
+|---|---|---|---|
+| (none — batch 4 ids are US/China global indicators; the china-pmi/china-cpi AU relevance stays in the approved copy, and D-08's australiaAngle list does not include them.) | — | — | — |
+
+---
+
+## Batch 5 — (pending)
+
+_Indicators: recession-probability, oecd-cli-us, m2-us, retail-sales, housing-permits, job-openings, us-gdp-growth, us-nfp_
+
+— pending — fill in when batch 5 copy is written.

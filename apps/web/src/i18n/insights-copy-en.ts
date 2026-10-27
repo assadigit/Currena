@@ -512,6 +512,94 @@ const LAYER1 = {
       ],
       glossaryTerms: ['inflation'],
     },
+
+    /* ----- Batch 4 — growth-health A (8) ----- */
+    'us-unemployment': {
+      plainName: 'The US jobless rate',
+      oneLine: 'The share of the US workforce without a job.',
+      ifRising: 'A steady climb usually means the US economy is cooling, and pay rises soften.',
+      ifFalling: 'Falling joblessness usually comes with a strong jobs market and steadier pay growth.',
+      connections: [
+        { with: 'sahm-rule', text: 'The recession alarm beside this card is built from this rate.', strength: 'reliable' },
+        { with: 'us-nfp', text: 'Jobs added and the jobless rate come from the same monthly report.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['recession'],
+    },
+    'sahm-rule': {
+      plainName: 'The US recession alarm',
+      oneLine: 'An alarm built from US joblessness that rings when a downturn has usually begun.',
+      ifRising: 'A fast rise in joblessness usually means a downturn has already started.',
+      ifFalling: 'A falling reading usually means the jobs market is out of alarm territory.',
+      connections: [
+        { with: 'us-unemployment', text: 'The alarm watches this rate’s climb from its recent low.', strength: 'reliable' },
+        { with: 'recession-probability', text: 'The model and the alarm read the same downturn from different angles.', strength: 'usually' },
+      ],
+      glossaryTerms: ['recession'],
+    },
+    'china-pmi': {
+      plainName: 'Chinese factory pulse',
+      oneLine: 'A monthly survey of factory managers in China.',
+      ifRising: 'Chinese factories are usually getting busier, often good news for world trade.',
+      ifFalling: 'Chinese factories are usually slowing, which often weighs on world trade and commodity prices.',
+      connections: [
+        { with: 'china-cpi', text: 'Read the factory pulse beside China’s price gauge to judge its demand.', strength: 'usually' },
+        { with: 'copper-usd', text: 'Copper often moves with Chinese factory strength.', strength: 'usually' },
+      ],
+      glossaryTerms: ['pmi', 'commodity'],
+    },
+    'china-cpi': {
+      plainName: 'China’s inflation rate',
+      oneLine: 'How fast consumer prices in China are rising, versus a year ago.',
+      ifRising: 'Overheating pressure in the world’s factory often builds, rippling into world goods prices.',
+      ifFalling: 'Weak Chinese demand usually drags on world trade and commodity prices.',
+      connections: [
+        { with: 'china-pmi', text: 'The factory pulse and the price gauge together judge Chinese demand.', strength: 'usually' },
+      ],
+      glossaryTerms: ['inflation', 'commodity'],
+    },
+    'copper-gold': {
+      plainName: 'Growth versus fear in metals',
+      oneLine: 'Copper’s price measured against gold’s.',
+      ifRising: 'Markets are usually paying up for growth signals, like factory building.',
+      ifFalling: 'Money usually shifts toward safe havens, a mix that often comes with world slowdowns.',
+      connections: [
+        { with: 'copper-usd', text: 'Copper is the growth leg of this measure.', strength: 'reliable' },
+        { with: 'gold-usd', text: 'Gold is the safety leg.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['safe-haven'],
+    },
+    'michigan-sentiment': {
+      plainName: 'US consumer mood',
+      oneLine: 'How confident American households feel about their money.',
+      ifRising: 'Confident households usually keep spending, which supports the economy.',
+      ifFalling: 'Gloomy households usually cut back on spending first.',
+      connections: [
+        { with: 'michigan-1y-expectations', text: 'The price-worry number rides inside this survey.', strength: 'reliable' },
+        { with: 'retail-sales', text: 'Mood often leads actual spending.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'initial-jobless-claims': {
+      plainName: 'New US jobless claims',
+      oneLine: 'How many Americans newly filed for jobless benefits last week.',
+      ifRising: 'Layoffs are usually picking up, the earliest sign of a softening jobs market.',
+      ifFalling: 'Layoffs are usually rare, a sign of a tight jobs market.',
+      connections: [
+        { with: 'us-unemployment', text: 'Weekly claims feed the monthly jobless rate.', strength: 'reliable' },
+        { with: 'sahm-rule', text: 'Claim surges arrive long before this alarm can ring.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'philly-fed': {
+      plainName: 'Early US factory survey',
+      oneLine: 'An early monthly read on US factory activity.',
+      ifRising: 'More US manufacturers are usually growing, an early sign of strength.',
+      ifFalling: 'More US manufacturers are usually shrinking, an early sign of weakness.',
+      connections: [
+        { with: 'us-gdp-growth', text: 'Factory surveys often turn before the headline growth number.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 

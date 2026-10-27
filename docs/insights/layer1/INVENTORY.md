@@ -54,14 +54,14 @@ inventory and enforced by gate G1.
 #### `growth-health` gauge (23)
 | L1 | id | official name | what it measures |
 |---|---|---|---|
-| · | `us-unemployment` | US unemployment rate | The share of the US labour force without a job. |
-| · | `sahm-rule` | US recession alarm (Sahm rule) | A recession trigger based on the rise in US unemployment. |
-| · | `china-pmi` | China manufacturing PMI | China's manufacturing purchasing-managers index (expansion/contraction). |
-| · | `china-cpi` | China inflation (yearly) | China's consumer-price inflation, year-on-year. |
-| · | `copper-gold` | Copper / Gold | The copper price divided by the gold price (a growth-vs-fear ratio). |
-| · | `michigan-sentiment` | US consumer mood (Michigan survey) | The University of Michigan consumer sentiment index. |
-| · | `initial-jobless-claims` | New unemployment claims (US) | Weekly new US claims for unemployment benefits. |
-| · | `philly-fed` | Philadelphia Fed manufacturing index | The Philly Fed's monthly factory-activity gauge. |
+| ✓ | `us-unemployment` | US unemployment rate | The share of the US labour force without a job. |
+| ✓ | `sahm-rule` | US recession alarm (Sahm rule) | A recession trigger based on the rise in US unemployment. |
+| ✓ | `china-pmi` | China manufacturing PMI | China's manufacturing purchasing-managers index (expansion/contraction). |
+| ✓ | `china-cpi` | China inflation (yearly) | China's consumer-price inflation, year-on-year. |
+| ✓ | `copper-gold` | Copper / Gold | The copper price divided by the gold price (a growth-vs-fear ratio). |
+| ✓ | `michigan-sentiment` | US consumer mood (Michigan survey) | The University of Michigan consumer sentiment index. |
+| ✓ | `initial-jobless-claims` | New unemployment claims (US) | Weekly new US claims for unemployment benefits. |
+| ✓ | `philly-fed` | Philadelphia Fed manufacturing index | The Philly Fed's monthly factory-activity gauge. |
 | · | `recession-probability` | US recession probability | A model-based 12-month US recession probability. |
 | · | `oecd-cli-us` | OECD leading indicator (US) | The OECD composite leading indicator for the US. |
 | · | `m2-us` | US M2 money supply | The US broad money supply. |

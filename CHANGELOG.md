@@ -5,6 +5,43 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-28c] — Insights Layer 1 (session 2, batches 2–4): borrowing-costs completed, dollar-strength, growth-health A
+
+Milestone 1 of the Layer-1 plain-language roll-out
+(`docs/insights/layer1/PLAIN-LANGUAGE-SPEC.md`): 23 more indicators get
+hand-quality EN+FA plain-language copy (plainName, oneLine, ifRising,
+ifFalling, connections, glossaryTerms), written EN-first from meaning and
+Farsi natively (Persian digits, ی/ک, half-spaces, the Latin allow-list
+only, hedged wording; no advice or certainty words).
+
+- **Batch 2** (7): govt-interest-revenue, us-2y, sofr, mortgage-30y,
+  jgb-10y, bund-10y, gilt-10y.
+- **Batch 3** (8): euro-aaa-10y, boe-rate, boj-rate, dollar-basket,
+  usdjpy, us-japan-10y-gap, eur-usd, usdtry — borrowing-costs and
+  dollar-strength are now complete (18/18 and 5/5). First australiaAngle
+  entries for the dollar globals (dollar-basket, usdjpy,
+  us-japan-10y-gap) per D-08.
+- **Batch 4** (8): us-unemployment, sahm-rule, china-pmi, china-cpi,
+  copper-gold, michigan-sentiment, initial-jobless-claims, philly-fed.
+- Glossary grows 16 → 21 terms (carry-trade, pmi, vix, money-supply,
+  leading-indicator, both languages); the G3 jargon map is extended to
+  point PMI/VIX at their glossary terms and to cover carry trade, money
+  supply and leading indicator (DECISIONS D-14). Jargon-null terms are
+  written around with plain wording everywhere else.
+- Bookkeeping (DECISIONS D-13): INVENTORY.md counts reconciled with the
+  code (133 table rows → 129 unique Layer-1 entries; the missing us30y
+  row added; growth-health 23, au-households 11), a session-1 Farsi
+  glossary typo fixed (می‌خرزد → می‌خرد), all re-triaged through the
+  Persian-copy audit manifest.
+- Budget: the Insights lazy ceiling bumps 940/228 → 975/234 kB (measured
+  947.80/227.90 after batch 4; ceiling covers the rest of M1; the D-16
+  path — bundled static copy, zero KV/external calls; entry chunk
+  untouched at 295.37/88.84).
+- Gates: layer1 vitest 1976 green, full suite green (packages 677,
+  markets 13, api 344, web 2692), typecheck, lint, copy:audit clean,
+  bundle budget held, render-checked EN+FA at 1280/360px (screenshots in
+  docs/insights/screenshots/layer1-m1-batch2/).
+
 ## [2026-10-28b] — Insights Layer 1 (batch 1): the plain-language foundation + borrowing-costs copy
 
 The first batch of the Layer-1 plain-language copy work

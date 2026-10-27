@@ -642,7 +642,18 @@ const BUDGETS = [
   // indicator roll-out will grow this further; each batch re-measures and
   // bumps consciously. The entry chunk is untouched at 295.37/88.84.
   // See docs/insights/layer1/PLAIN-LANGUAGE-SPEC.md + DECISIONS D-01.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 940_000, gz: 228_000, label: 'Insights lazy chunk' },
+  // Layer 1 bump (2026-10-28, session 2 batches 2–4): the M1 copy roll-out
+  // — batches 2–4 add 23 more indicator entries × 5 new fields × 2
+  // languages + 5 glossary terms (carry-trade, pmi, vix, money-supply,
+  // leading-indicator). Measured 947.80 kB raw / 227.90 kB gz after batch
+  // 4 (+7.80 raw / +0.47 gz over the batch-1 ceiling — the bilingual copy
+  // is highly compressible, so gzip grows ~2 kB per 8 indicators while raw
+  // grows ~10). Ceiling set to 975/234 to cover the remaining M1 batches
+  // (~17 ids, projected ~+21 raw / +5 gz → ~969/233 at M1 end); the final
+  // session re-measures before LAYER1_STRICT=1. Same D-16 path: bundled
+  // static copy, zero KV/external calls. Entry chunk untouched at
+  // 295.37/88.84.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 975_000, gz: 234_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

@@ -4513,6 +4513,94 @@ export const insightsCopyFa: InsightsCopy = {
         ],
         glossaryTerms: ['inflation'],
       },
+
+      /* ----- دستهٔ ۴ — سلامت رشد A (۸) ----- */
+      'us-unemployment': {
+        plainName: 'بیکاری در آمریکا',
+        oneLine: 'درصد نیروی کار آمریکا که شغل ندارد.',
+        ifRising: 'رشد پیوستهٔ آن معمولاً یعنی سرد شدن اقتصاد آمریکا و نرم شدن رشد دستمزدها.',
+        ifFalling: 'کاهش بیکاری معمولاً با بازار کار قوی و رشد پایدارتر دستمزد همراه است.',
+        connections: [
+          { with: 'sahm-rule', text: 'هشدار رکود کنار این کارت از همین نرخ ساخته می‌شود.', strength: 'reliable' },
+          { with: 'us-nfp', text: 'شغل‌های افزوده‌شده و نرخ بیکاری از یک گزارش ماهانه می‌آیند.', strength: 'reliable' },
+        ],
+        glossaryTerms: ['recession'],
+      },
+      'sahm-rule': {
+        plainName: 'هشدار رکود آمریکا',
+        oneLine: 'هشداری ساخته‌شده از بیکاری آمریکا که با شروع افت اقتصادی معمولاً به صدا درمی‌آید.',
+        ifRising: 'بالا رفتن سریع بیکاری معمولاً یعنی افت اقتصادی از پیش آغاز شده است.',
+        ifFalling: 'پایین آمدن آن معمولاً یعنی بازار کار از محدودهٔ هشدار بیرون آمده است.',
+        connections: [
+          { with: 'us-unemployment', text: 'این هشدار صعود همین نرخ از کف اخیرش را زیر نظر دارد.', strength: 'reliable' },
+          { with: 'recession-probability', text: 'مدل و هشدار، یک افت را از دو زاویه می‌خوانند.', strength: 'usually' },
+        ],
+        glossaryTerms: ['recession'],
+      },
+      'china-pmi': {
+        plainName: 'نبض کارخانه‌های چین',
+        oneLine: 'نظرسنجی ماهانه از مدیران کارخانه‌های چین.',
+        ifRising: 'کارخانه‌های چین معمولاً پرکارتر می‌شوند؛ اغلب خبر خوبی برای تجارت جهان.',
+        ifFalling: 'کند شدن کارخانه‌های چین معمولاً بر تجارت جهان و قیمت کالاهای خام فشار می‌آورد.',
+        connections: [
+          { with: 'china-cpi', text: 'نبض کارخانه‌ها را کنار دماسنج قیمت چین بخوانید تا تقاضایش را بسنجید.', strength: 'usually' },
+          { with: 'copper-usd', text: 'مس اغلب با قدرت کارخانه‌های چین حرکت می‌کند.', strength: 'usually' },
+        ],
+        glossaryTerms: ['pmi', 'commodity'],
+      },
+      'china-cpi': {
+        plainName: 'نرخ تورم چین',
+        oneLine: 'سرعت گران شدن قیمت مصرفی در چین از سال گذشته.',
+        ifRising: 'گرمای بیش از حد در کارخانهٔ جهان معمولاً به قیمت کالاهای جهان سرایت می‌کند.',
+        ifFalling: 'تقاضای ضعیف چین معمولاً بر تجارت جهان و قیمت کالاها فشار می‌آورد.',
+        connections: [
+          { with: 'china-pmi', text: 'نبض کارخانه و دماسنج قیمت با هم تقاضای چین را می‌سنجند.', strength: 'usually' },
+        ],
+        glossaryTerms: ['inflation', 'commodity'],
+      },
+      'copper-gold': {
+        plainName: 'رشد در برابر امنیت',
+        oneLine: 'قیمت مس در برابر قیمت طلا.',
+        ifRising: 'بازار معمولاً برای نشانه‌های رشد، مانند ساخت کارخانه، گران‌تر می‌پردازد.',
+        ifFalling: 'پول معمولاً به پناهگاه امن می‌رود؛ ترکیبی که اغلب با کندی جهان می‌آید.',
+        connections: [
+          { with: 'copper-usd', text: 'مس ضلع رشد این مقایسه است.', strength: 'reliable' },
+          { with: 'gold-usd', text: 'طلا ضلع امنیت آن است.', strength: 'reliable' },
+        ],
+        glossaryTerms: ['safe-haven'],
+      },
+      'michigan-sentiment': {
+        plainName: 'حال و هوای مصرف‌کنندهٔ آمریکا',
+        oneLine: 'خانوارهای آمریکایی چقدر به وضعیت مالی خود اعتماد دارند.',
+        ifRising: 'خانوارهای خوش‌حال معمولاً خرج کردن را ادامه می‌دهند و اقتصاد را نگه می‌دارند.',
+        ifFalling: 'خانوارهای نگران معمولاً اول از خرج کردن می‌کاهند.',
+        connections: [
+          { with: 'michigan-1y-expectations', text: 'عدد نگرانی از قیمت‌ها درون همین نظرسنجی جا گرفته است.', strength: 'reliable' },
+          { with: 'retail-sales', text: 'حال و هوا اغلب جلوتر از خرج واقعی حرکت می‌کند.', strength: 'usually' },
+        ],
+        glossaryTerms: [],
+      },
+      'initial-jobless-claims': {
+        plainName: 'بیکاران تازهٔ آمریکا',
+        oneLine: 'چند آمریکایی هفتهٔ گذشته تازه بیمهٔ بیکاری گرفته‌اند.',
+        ifRising: 'اخراج‌ها معمولاً بیشتر می‌شوند؛ زودترین نشانهٔ نرم شدن بازار کار.',
+        ifFalling: 'اخراج‌ها معمولاً کمیاب‌اند؛ نشانهٔ بازار کار تنگ.',
+        connections: [
+          { with: 'us-unemployment', text: 'درخواست‌های هفتگی به نرخ بیکاری ماهانه خوراک می‌دهند.', strength: 'reliable' },
+          { with: 'sahm-rule', text: 'موج درخواست‌ها معمولاً پیش از به صدا درآمدن این هشدار می‌رسد.', strength: 'usually' },
+        ],
+        glossaryTerms: [],
+      },
+      'philly-fed': {
+        plainName: 'نظرسنجی زودهنگام کارخانه‌های آمریکا',
+        oneLine: 'قرائت زودهنگام ماهانه از فعالیت کارخانه‌های آمریکا.',
+        ifRising: 'تولیدکنندگان بیشتری در آمریکا معمولاً در حال رشدند؛ نشانهٔ زودهنگام قدرت.',
+        ifFalling: 'تولیدکنندگان بیشتری معمولاً در حال کوچک‌شدنند؛ نشانهٔ زودهنگام ضعف.',
+        connections: [
+          { with: 'us-gdp-growth', text: 'نظرسنجی کارخانه‌ها اغلب پیش از عدد اصلی رشد تغییر جهت می‌دهد.', strength: 'usually' },
+        ],
+        glossaryTerms: [],
+      },
     },
   },
 };
