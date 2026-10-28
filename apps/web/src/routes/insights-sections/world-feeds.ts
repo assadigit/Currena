@@ -19,6 +19,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchMarketsSnapshot, readCachedMarkets } from '../../lib/markets';
 import { fetchFxSnapshot, readCachedFx } from '../../lib/fx';
+import { fetchNarrativeDoc, readCachedNarrative } from '../../lib/narrative';
+import type { NarrativeDoc } from '../../lib/narrative';
 import type { MarketsLoadState } from '../../components/insights/WorldMarkets';
 import type { FxLoadState } from '../../components/insights/WorldCurrencies';
 import type { FxAlert, MarketsAlert, SectionIndicatorState } from '../../components/insights/VerdictMeter';
@@ -203,4 +205,78 @@ export function useWorldSectionIndicators(
   }, [marketsState, fxState, copy, jumpToMarkets, jumpToFxCurrencies]);
 
   return sectionIndicators;
+}
+
+/**
+ * useNarrative — the Layer-2 narrator document feed (M5, spec §9 + §11).
+ *
+ * Mirrors the markets/fx discipline: own last-good cache (the cached doc
+ * may carry a different `visible` flag than the live fetch — the live
+ * value wins on every refresh, the cached value paints instantly from
+ * localStorage on a slow connection). NEVER surfaces an error — the spec
+ * §11 rule is "Missing/failed fetch → render nothing; nothing breaks", so
+ * null resolves to "no NarrativeBlock anywhere" and the page keeps working.
+ *
+ * The hook DOES NOT decide whether to render — that gate lives in the
+ * Insights route (the `?narrative=preview` URL marker OR `doc.visible`).
+ * The hook only fetches and stores. The route reads `previewMode` (from
+ * the URL once at boot) AND `doc?.visible === true` to decide.
+ *
+ * @param enabled Always TRUE today (the route unconditionally fetches the
+ *                doc; the staged rollout is the display gate, not a fetch
+ *                gate — the owner wants the texts ready for the flip).
+ */
+export function useNarrative(enabled = true) {
+  const [narrative, setNarrative] = useState<NarrativeDoc | null>(() => {
+    if (!enabled) return null;
+    try {
+      return readCachedNarrative();
+    } catch {
+      return null;
+    }
+  });
+  useEffect(() => {
+    if (!enabled) return;
+    const controller = new AbortController();
+    void fetchNarrativeDoc(controller.signal).then((doc) => {
+      if (controller.signal.aborted) return;
+      // The cached doc's `visible` flag is STALE (it was set when the cache
+      // was written). The fresh fetch carries the route's current env
+      // value — that wins. A null fetch keeps the cached doc on screen
+      // (the spec's "show the last good copy" pattern from the markets feed),
+      // but the cached doc's `visible` is treated as false by the route's
+      // gate (`doc?.visible === true` — the cached value is whatever it was
+      // when cached; the preview marker is the only safe way to read text
+      // from a cached doc).
+      if (doc !== null) {
+        setNarrative(doc);
+      }
+    });
+    return () => controller.abort();
+  }, [enabled]);
+
+  return narrative;
+}
+
+/**
+ * Reads `?narrative=preview` from BOTH `window.location.search` (the
+ * canonical URL form `currena.ir/?narrative=preview#/insights`, per D-34)
+ * AND the hash-router's query params (the share-link form
+ * `currena.ir/#/insights?narrative=preview`). The canonical form lives
+ * BEFORE the hash, so the hash router's `routeQuery()` does NOT see it —
+ * this hook checks both sources once at mount (the URL marker is a one-shot
+ * read; the spec says "read once at app boot, never persisted").
+ *
+ * Returns `true` when the preview marker is present in either location.
+ */
+export function useNarrativePreview(): boolean {
+  return useMemo(() => {
+    try {
+      const fromSearch = new URLSearchParams(window.location.search).get('narrative') === 'preview';
+      const fromHash = new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('narrative') === 'preview';
+      return fromSearch || fromHash;
+    } catch {
+      return false;
+    }
+  }, []);
 }

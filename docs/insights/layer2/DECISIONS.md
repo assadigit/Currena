@@ -746,9 +746,139 @@ narrator build):
    wrote the initial document; no key exists on the worker, so zero
    model calls are possible until the owner sets one.
 
-## D-39+ — Reserved: per-implementation decisions (M5 onward)
+## D-39 — M5 implementation decisions (display + live eval + kill criteria + final report)
 
-**Reserved** — the final milestone records: the display-block bundle
-impact + any D-16 path; the preview marker's exact mechanics; the live
-eval outputs; the kill criteria doc; and the final report's deploy-time
-findings (the currena-api version IDs, the live-verification evidence).
+The per-implementation decisions of Milestone 5 (the final milestone of
+the Layer-2 narrator build):
+
+1. **The `visible` flag is additive to the route response, not to the
+   stored doc.** The route spreads `{ ...doc, visible: env.NARRATOR_VISIBLE
+   === 'true' }` into the response — the KV document at
+   `insights:narrative:v1` carries NO `visible` field (the doc stays
+   display-stable across deploys; the flag is a runtime/env signal, never
+   a stored value). The web reads `doc.visible` from the response (and
+   treats the cached value as stale — the live fetch wins on every
+   refresh). The `?narrative=preview` URL marker overrides `visible`
+   locally so the owner can read the texts for a week before the public
+   flip (D-34). The M4 unit test (`serves the stored document verbatim`)
+   was reshaped to destructure `visible` before comparing the doc fields
+   — the doc fields still ride through verbatim.
+
+2. **The preview marker is read from BOTH `window.location.search` (the
+   canonical `currena.ir/?narrative=preview#/insights` form) AND the hash-
+   router's query params (the share-link form
+   `currena.ir/#/insights?narrative=preview`)** — the canonical form lives
+   BEFORE the hash, so the hash router's `routeQuery()` does NOT see it.
+   `useNarrativePreview` checks both sources once at mount (the spec §11
+   "read once at app boot, never persisted"). Either form works.
+
+3. **The display gate is `narrativeDoc !== null && (narrativeDoc.visible
+   || narrativePreview)`** — the doc must be present (the fetch succeeded
+   or the cache had a copy) AND either the runtime `visible` flag is true
+   OR the URL marker is set. When the gate is closed, NarrativeBlock
+   returns null and the page renders exactly as it did before Layer 2 (no
+   new divs, no new shells, no console warnings). The spec §11 "render
+   nothing; nothing breaks" rule.
+
+4. **The fetch is unconditional; the gate is display-only.** The
+   `useNarrative` hook fetches `/api/insights/narrative` on every Insights
+   mount, regardless of the gate — the texts must be ready in the cache
+   when the owner flips `NARRATOR_VISIBLE=true` (the spec §11 staged
+   rollout: "narratives are generated and stored but shown only in
+   preview"). The fetch is best-effort (null on any failure → no block);
+   the localStorage last-good copy paints instantly (the markets/fx feed
+   discipline verbatim).
+
+5. **The NarrativeBlock component mirrors the Layer1Block idiom.** Same
+   global CSS tokens (`--type-label`, `--type-caption`, `--color-text-*`,
+   `--color-border`, `--color-status-context`), same `<bdi>` wrapping for
+   RTL safety, same `data-*` attributes for testability
+   (`data-narrative-block` + `data-narrative-source={unit.source}`). The
+   block lives INSIDE the section's existing mother container — no new
+   shell, no new ring — so it reads as "the next line under the heading".
+   The `ai` disclaimer («نوشته‌شده با هوش مصنوعی، نه توصیهٔ مالی» /
+   "AI-written, not financial advice") sits beside the label ONLY when
+   `source === 'ai'`; templates carry no disclaimer (the spec's "template
+   → no AI label" rule). The "Updated {time}" line uses the house
+   `formatRelativeShort` (Jalali in FA, words in EN); same-day generations
+   collapse to the localized "today" / «امروز» word (never a live clock).
+
+6. **The InTheNews component is visually separate.** A
+   `currena-warning`-tinted card (the section's "this is different"
+   signal) with a hairline `currena-warning/30` ring, sitting as a sibling
+   immediately after the NarrativeBlock (NOT inside it). The sources
+   render as `<a target="_blank" rel="noopener noreferrer">` (the spec's
+   exact safety requirements). Google's required display element
+   (`requiredDisplay`, the search-suggestions HTML) renders via
+   `dangerouslySetInnerHTML` beside the note — only present when grounding
+   metadata returned one (W1). A `safeUrl` guard drops anything that's not
+   `http(s):` (the parent W1 check should have already filtered sourceless
+   news out; this is the display-time guard).
+
+7. **The M5 UI strings are 6, not 2–3.** The spec said "2-3 new UI
+   strings" — M5 ships 6: `narrativeLabel`, `narrativeUpdated`,
+   `narrativeUpdatedToday` (the same-day form of `{time}`), the
+   `narrativeAiDisclaimer`, `inTheNewsLabel`, `inTheNewsDisclaimer`. The
+   4 extras (`narrativeUpdatedToday`, the disclaimer, the in-the-news
+   pair) are unavoidable per the spec §11 wording (the spec EXPLICITLY
+   names both disclaimers verbatim + the "Updated <time>" line). All 6
+   triaged through `docs/localization/persian-copy-manifest.json` under
+   round `2026-10-28-l2-m5`, reference `docs/insights/layer2/DECISIONS.md`.
+
+8. **The D-16 bundle-bump path: 1100 → 1110 raw, gz unchanged.** M5's
+   additions (NarrativeBlock + InTheNews + lib/narrative.ts + the
+   useNarrative/useNarrativePreview hooks + the wiring in
+   Insights.tsx/SectionLane/WorldMarkets/WorldCurrencies/world-feeds + 6
+   new UI strings × 2 locales) measured 1100.49 kB raw / 258.36 kB gz —
+   over the 1100 raw ceiling by 0.49 kB, well inside the 260 gz ceiling
+   (1.64 kB headroom). The entry chunk is untouched at 295.37/88.84. The
+   D-16 path is unavoidable (the spec's M5 display scope); the bump
+   carries 10 kB of raw headroom for the next small Layer-2 tweak, the gz
+   ceiling is unchanged. `scripts/check-bundle-budget.mjs` line 693
+   documents the bump; the comment block traces the rationale.
+
+9. **The live eval harness (`pnpm narrator:eval:live`) skips cleanly when
+   `GEMINI_API_KEY` is unset** (exit 0 with one line — the spec §12
+   "skipped cleanly if absent" rule). The owner runs it in their own
+   terminal after `pnpm narrator:set-key` (M3); the script reads the key
+   from the env (`export GEMINI_API_KEY=…`), never from argv. The 7
+   section/overall fixtures run through the real model (call type A) with
+   the production retry ladder (first-failure → regenerate-with-check-
+   names → template fallback); 1 fixture (world-currencies) runs through
+   the grounded news call (call type B). The output writes to
+   `docs/insights/layer2/EVAL-OUTPUTS.md` for the owner to read in their
+   editor (never the terminal — the file carries EN + FA + the validation
+   verdict + the source + the model + the timing per fixture).
+
+10. **The kill-criteria doc (`docs/insights/layer2/KILL-CRITERIA.md`) is
+    the operator's runbook**, not a spec recital. The spec §13 thresholds
+    are translated into the 4 narrator-off + 4 news-off + 1 full-kill
+    cases, each with the exact `wrangler versions upload --var …` command
+    (the deploy-lock protocol stays intact). The stats-read command +
+    the 7-day rolling ratio formula is spelled out (the owner reads
+    `insights:narrator:stats` from KV via `wrangler kv:key get`). The
+    first-week discipline (the staged rollout: set-key → flip
+    `NARRATOR_ENABLED=true` → read at preview URL for ~7 days → flip
+    `NARRATOR_VISIBLE=true`) closes the doc.
+
+11. **The final report (`docs/insights/layer2/LAYER2-REPORT.md`) is the
+    spec §14 deliverable**, with the exact copy-paste owner commands
+    (`pnpm narrator:set-key`, the preview URL, the visibility flip) +
+    the gate numbers from this milestone + the free-tier numbers (D-28)
+    + the Cloudflare limits (D-30) + the grounding-terms decision (D-29:
+    Part 3 ships DISABLED) + the region-risk findings (D-31) + the
+    decisions D-28..D-39. The live-verification evidence (the deployed
+    version ID, the EN+FA screenshots at 360px and 1280px) lands in the
+    DEPLOY.md session record per the existing pattern.
+
+## D-40+ — Reserved: post-M5 (the owner's first live week)
+
+**Reserved** — after M5 ships + the owner sets the key + reads a week of
+real text at the preview URL, the next session records: the
+`NARRATOR_ENABLED=true` flip (templates → AI), the first live stats
+buckets, the first kill-criterion review, and (if green) the
+`NARRATOR_VISIBLE=true` flip (preview → public). The D-29 grounding-terms
+gate stays closed until the owner reads the current Google terms in full
++ confirms each display requirement is implementable (the
+`requiredDisplay` rendering path in InTheNews is built; the gate is the
+terms review, not the code).

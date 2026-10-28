@@ -16,6 +16,15 @@
  * the gate anyway — this endpoint simply keeps answering public-derived
  * text.
  *
+ * M5 (spec §11 staged rollout): the response is `{ ...doc, visible }`
+ * — the stored KV document VERBATIM, plus ONE additive boolean flag
+ * `visible` derived from `env.NARRATOR_VISIBLE === 'true'` (D-34 + D-39).
+ * The web reads `visible` to decide whether the narrative blocks render
+ * on the public URL or only at `?narrative=preview` — the preview marker
+ * works REGARDLESS of `visible` (the owner's "read real text for a week
+ * before flipping" path). `visible` is a runtime/env signal, never part
+ * of the stored doc (the doc stays display-only-stable across deploys).
+ *
  * Absent document (a fresh deploy before the first :50 rung): 404 with
  * the clean RatesError envelope — the display renders nothing (spec §11:
  * "Missing/failed fetch → render nothing; nothing breaks").
@@ -35,7 +44,10 @@ export function createNarrativeRoutes(): Hono<{ Bindings: Bindings }> {
     if (doc === null) {
       return errorResponse(c, 404, 'narrative_not_ready', 'The plain-language narratives are not generated yet — the narrator runs hourly.');
     }
-    return c.json(doc, 200, {
+    // M5: spread the doc verbatim and add the additive `visible` flag from
+    // the runtime env (D-34: NARRATOR_VISIBLE is display-only — the texts
+    // always live in KV; the flag just gates the public URL path).
+    return c.json({ ...doc, visible: c.env.NARRATOR_VISIBLE === 'true' }, 200, {
       'Cache-Control': 'public, max-age=300, s-maxage=600',
     });
   });

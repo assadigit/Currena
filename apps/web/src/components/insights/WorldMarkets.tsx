@@ -55,6 +55,9 @@ import { MarketsHeatmap } from './world-markets/MarketsHeatmap';
 import { WorldMap } from './world-markets/WorldMap';
 import type { MapPeriod } from './world-markets/world-map-config';
 import { formatDateShort, formatRelativeShort, isOld, type MarketsLoadState, type MarketsView } from './world-markets/shared';
+import { NarrativeBlock } from './NarrativeBlock';
+import { InTheNews } from './InTheNews';
+import type { NarrativeUnit } from '../../lib/narrative';
 
 // Stable external surface (the pre-split importers keep working):
 export type { MarketsLoadState } from './world-markets/shared';
@@ -79,11 +82,18 @@ export function WorldMarkets({
   copy,
   locale,
   numberLocale,
+  narrativeUnit,
+  narrativeVisible = false,
 }: {
   state: MarketsLoadState;
   copy: InsightsCopy;
   locale: 'en' | 'fa';
   numberLocale: 'en-US' | 'fa-IR';
+  /** Layer-2 narrator (M5): the world-markets narrative unit, when the
+   * doc is present and the staged-rollout gate is open. undefined → no
+   * NarrativeBlock renders (the spec §11 "render nothing" rule). */
+  narrativeUnit?: NarrativeUnit;
+  narrativeVisible?: boolean;
 }) {
   // 2026-10-21 owner round ("unify the map time views with the other
   // parts of the website … I want the current map view time for
@@ -249,6 +259,17 @@ export function WorldMarkets({
     <section id="insights-markets" aria-labelledby="insights-markets-title" className={shell}>
       {heading}
       {descriptor}
+
+      {/* Layer-2 narrator (M5, spec §11): the world-markets plain-language
+       * narrative, immediately under the heading + descriptor — same place
+       * the Layer-1 oneLine rides on the indicator cards. Hidden until the
+       * staged rollout opens (the parent passes narrativeVisible). */}
+      {narrativeVisible ? (
+        <NarrativeBlock unit={narrativeUnit} copy={copy} locale={locale} />
+      ) : null}
+      {narrativeVisible && narrativeUnit?.news ? (
+        <InTheNews news={narrativeUnit.news} copy={copy} locale={locale} />
+      ) : null}
 
       {/* 1 — the focal summary card (§3.2): verdict word + measure label +
        * takeaway + the selected-period breadth counts and the separate

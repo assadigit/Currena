@@ -690,7 +690,18 @@ const BUDGETS = [
   // component rides the chunk. Ceiling moves to 1100/260 (measured end
   // + margin); the final strict-mode session re-measures before
   // LAYER1_STRICT=1. Same D-16 path. Entry chunk untouched at 295.37/88.84.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1100_000, gz: 260_000, label: 'Insights lazy chunk' },
+  //
+  // M5 (Layer-2 narrator display, spec §11): the NarrativeBlock + InTheNews
+  // components + lib/narrative.ts (the fetch client + the defensive parser)
+  // + the useNarrative/useNarrativePreview hooks + the wiring in
+  // Insights.tsx/SectionLane/WorldMarkets/WorldCurrencies/world-feeds +
+  // 5 new UI strings × 2 locales. M5-end measurement 1100.43 kB raw /
+  // 258.37 kB gz — over the 1100 raw ceiling by 0.43 kB, well inside the
+  // 260 gz ceiling (1.63 kB headroom). The D-16 path: the additions are
+  // unavoidable (the spec's M5 display scope), the gz headroom is healthy,
+  // and the entry chunk is untouched at 295.37/88.84. Bump 1100 → 1110
+  // raw (10 kB headroom for the next small Layer-2 tweak); gz unchanged.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1110_000, gz: 260_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

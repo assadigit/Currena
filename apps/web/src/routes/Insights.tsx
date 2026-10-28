@@ -79,11 +79,15 @@ import {
 } from './insights-sections/InsightsStatusBlocks';
 import { SectionLane } from './insights-sections/SectionLane';
 import {
+  useNarrative,
+  useNarrativePreview,
   useWorldCurrenciesSection,
   useWorldMarketsSection,
   useWorldSectionIndicators,
 } from './insights-sections/world-feeds';
 import { useInsightsToolsNav } from './insights-sections/useInsightsToolsNav';
+import { NarrativeBlock } from '../components/insights/NarrativeBlock';
+import { InTheNews } from '../components/insights/InTheNews';
 
 /**
  * The calendar's event-kind → indicator mapping (H6: link events to the
@@ -191,6 +195,16 @@ export function Insights() {
   const { marketsState, marketsAlert, jumpToMarkets, downloadMarketsCsv } = useWorldMarketsSection(copy, marketsFeedEnabled);
   const { fxState, fxAlert, jumpToFxCurrencies, downloadFxCsv } = useWorldCurrenciesSection(copy, fxFeedEnabled);
   const sectionIndicators = useWorldSectionIndicators(marketsState, fxState, copy, jumpToMarkets, jumpToFxCurrencies);
+
+  // Layer-2 narrator (M5, spec §11): the narrative document feed + the
+  // staged-rollout visibility gate. The hook fetches the doc unconditionally
+  // (the texts must be ready when the owner flips `NARRATOR_VISIBLE=true`);
+  // the gate decides whether to RENDER. The preview marker works regardless
+  // of `visible` (the owner's "read real text for a week before flipping"
+  // path). D-34 + D-39.
+  const narrativeDoc = useNarrative();
+  const narrativePreview = useNarrativePreview();
+  const narrativeVisible = narrativeDoc !== null && (narrativeDoc.visible || narrativePreview);
 
   const togglePin = useCallback((id: IndicatorId, next: boolean): void => {
     setPinned((prev) => {
@@ -439,6 +453,27 @@ export function Insights() {
             />
           </div>
 
+          {/* Layer-2 narrator (M5, spec §11): the overall plain-language
+           * narrative, anchored to the page's existing top verdict(s). The
+           * gate is the staged rollout: `?narrative=preview` OR
+           * `NARRATOR_VISIBLE=true` (D-34 + D-39). When the doc is absent
+           * or the gate is closed, NarrativeBlock returns null and the
+           * page renders exactly as before. */}
+          {narrativeVisible ? (
+            <NarrativeBlock
+              unit={narrativeDoc?.overall}
+              copy={copy}
+              locale={locale}
+            />
+          ) : null}
+          {narrativeVisible && narrativeDoc?.overall.news ? (
+            <InTheNews
+              news={narrativeDoc.overall.news}
+              copy={copy}
+              locale={locale}
+            />
+          ) : null}
+
           {/* 2026-10-21 owner round: the ContinueStrip (the one-line
            * «ادامهٔ صفحه» chevron row that named the sections below the
            * hero) is RETIRED — the sticky JumpNav pills one breath below
@@ -469,7 +504,14 @@ export function Insights() {
            * owner's own EODHD key backs it); the fx twin below stays
            * licence-hidden. */}
           {marketsFeedEnabled && (
-            <WorldMarkets state={marketsState} copy={copy} locale={locale} numberLocale={numberLocale} />
+            <WorldMarkets
+              state={marketsState}
+              copy={copy}
+              locale={locale}
+              numberLocale={numberLocale}
+              narrativeUnit={narrativeDoc?.sections['world-markets']}
+              narrativeVisible={narrativeVisible}
+            />
           )}
 
           {/* R10-3 (2026-10-28) — the global companies table behind a
@@ -520,6 +562,8 @@ export function Insights() {
                   renderableIds={sectionIds}
                 />
               }
+              narrativeUnit={narrativeDoc?.sections['world-currencies']}
+              narrativeVisible={narrativeVisible}
             />
           )}
 
@@ -571,6 +615,9 @@ export function Insights() {
             searchActive={searchActive}
             setStatusFilter={setStatusFilter}
             setQuery={setQuery}
+            narrativeBySection={narrativeDoc?.sections}
+            narrativeVisible={narrativeVisible}
+            locale={locale}
           />
 
           {/* R16: the calendar — once, below the indicators, before About. */}

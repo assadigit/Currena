@@ -4613,6 +4613,23 @@ export const insightsCopyEn = {
     keyboardSearch: 'search',
     keyboardNext: 'next card',
     keyboardPrev: 'previous card',
+    // Layer-2 narrator (M5, spec §11): the plain-language block's UI
+    // strings. Rendered ONLY when a NarrativeUnit is present AND the
+    // staged-rollout gate is open (`?narrative=preview` OR
+    // `NARRATOR_VISIBLE=true`). The `ai` disclaimer sits beside the
+    // label only when `source === 'ai'` (templates carry no disclaimer —
+    // the spec's "template → no AI label" rule).
+    narrativeLabel: 'Plain-language summary',
+    narrativeUpdated: 'Updated {time}',
+    // The same-day form of `narrativeUpdated`'s {time} token — "today"
+    // collapses the relative-time formatter (the spec's "Updated <time>"
+    // line never claims a live clock; same-day generations are recent).
+    narrativeUpdatedToday: 'today',
+    narrativeAiDisclaimer: 'AI-written, not financial advice',
+    // Part 3 ("In the news", spec §11): the visually separate block,
+    // rendered only when `unit.news` is present.
+    inTheNewsLabel: 'In the news',
+    inTheNewsDisclaimer: 'Summarized by AI from web reports; not verified; not financial advice',
   },
 
   /* ------------------------------------------------------------------ *

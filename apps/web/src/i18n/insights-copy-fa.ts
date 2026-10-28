@@ -697,6 +697,19 @@ export const insightsCopyFa: InsightsCopy = {
     keyboardSearch: 'جست‌وجو',
     keyboardNext: 'کارت بعدی',
     keyboardPrev: 'کارت قبلی',
+    // Layer-2 narrator (M5, spec §11): رشته‌های بلوک خلاصهٔ ساده.
+    // فقط وقتی NarrativeUnit هست و دروازهٔ انتشار باز است
+    // (`?narrative=preview` یا `NARRATOR_VISIBLE=true`) نمایش داده می‌شود.
+    // هشدار «نوشته‌شده با هوش مصنوعی» فقط وقتی `source === 'ai'` است
+    // کنار برچسب می‌نشیند (الگوی آماده → بدون هشدار — قاعدهٔ مشخصات).
+    narrativeLabel: 'خلاصهٔ ساده',
+    narrativeUpdated: 'به‌روزرسانی‌شده {time}',
+    narrativeUpdatedToday: 'امروز',
+    narrativeAiDisclaimer: 'نوشته‌شده با هوش مصنوعی، نه توصیهٔ مالی',
+    // بخش سوم («در خبرها»، مشخصات §11): بلوکِ از نظر دیداری جدا،
+    // فقط وقتی `unit.news` وجود دارد نمایش داده می‌شود.
+    inTheNewsLabel: 'در خبرها',
+    inTheNewsDisclaimer: 'از گزارش‌های وب، خلاصه‌شده با هوش مصنوعی؛ تأییدنشده و نه توصیهٔ مالی',
   },
 
   /* ------------------------------------------------------------------ *

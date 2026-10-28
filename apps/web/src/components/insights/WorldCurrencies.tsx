@@ -45,6 +45,9 @@ import { PairDetail, PairsTable } from './world-currencies/PairsTable';
 import { PatternCard } from './world-currencies/PatternCard';
 import { QuietArea } from './world-currencies/QuietArea';
 import { formatDateShort, isOld } from './world-currencies/display';
+import { NarrativeBlock } from './NarrativeBlock';
+import { InTheNews } from './InTheNews';
+import type { NarrativeUnit } from '../../lib/narrative';
 
 /** The page-level feed state (owned by Insights.tsx, passed down). */
 export type FxLoadState =
@@ -62,6 +65,8 @@ export function WorldCurrencies({
   locale,
   numberLocale,
   dollarStrength,
+  narrativeUnit,
+  narrativeVisible = false,
 }: {
   state: FxLoadState;
   copy: InsightsCopy;
@@ -74,6 +79,11 @@ export function WorldCurrencies({
    * the merged "Is the dollar strong?" cards join the pairs table and
    * the dollar row as one section. */
   dollarStrength?: ReactNode;
+  /** Layer-2 narrator (M5): the world-currencies narrative unit, when the
+   * doc is present and the staged-rollout gate is open. undefined → no
+   * NarrativeBlock renders (the spec §11 "render nothing" rule). */
+  narrativeUnit?: NarrativeUnit;
+  narrativeVisible?: boolean;
 }) {
   const [openRuleId, setOpenRuleId] = useState<FxRuleState['id'] | null>(null);
   const [tableOpen, setTableOpen] = useState(false);
@@ -195,6 +205,16 @@ export function WorldCurrencies({
     <section id="insights-fx" aria-labelledby="insights-fx-title" className={shell}>
       {heading}
       <p className="m-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.fx.subtitle}</p>
+
+      {/* Layer-2 narrator (M5, spec §11): the world-currencies plain-language
+       * narrative, immediately under the heading + subtitle. Hidden until
+       * the staged rollout opens (the parent passes narrativeVisible). */}
+      {narrativeVisible ? (
+        <NarrativeBlock unit={narrativeUnit} copy={copy} locale={locale} />
+      ) : null}
+      {narrativeVisible && narrativeUnit?.news ? (
+        <InTheNews news={narrativeUnit.news} copy={copy} locale={locale} />
+      ) : null}
 
       {/* The verdict line (§9.3 item 2): the §9.10 measure label + the
        * page's severity chip + one short headline sentence (§10.3). No

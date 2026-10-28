@@ -1,7 +1,12 @@
 /**
- * insights-narrative.test.ts — M4 gates: the cached narrative endpoint.
- * Serves the stored doc verbatim with the edge-cache headers; the clean
+ * insights-narrative.test.ts — M4 + M5 gates: the cached narrative endpoint.
+ *
+ * M4: serves the stored doc verbatim with the edge-cache headers; the clean
  * 404 envelope when nothing is generated yet; ungated by design (D-38).
+ *
+ * M5: the response is `{ ...doc, visible }` — the stored doc VERBATIM plus
+ * the additive `visible` flag from `env.NARRATOR_VISIBLE === 'true'` (D-34 +
+ * D-39). The flag is a runtime/env signal — the KV doc never carries it.
  */
 
 import { describe, expect, it } from 'vitest';
@@ -40,8 +45,11 @@ describe('M4 GET /api/insights/narrative', () => {
     const response = await app.request('/api/insights/narrative', {}, env);
     expect(response.status).toBe(200);
     expect(response.headers.get('Cache-Control')).toBe('public, max-age=300, s-maxage=600');
-    const body = (await response.json()) as NarrativeDoc;
-    expect(body).toEqual(DOC);
+    const body = (await response.json()) as NarrativeDoc & { visible: boolean };
+    // The stored doc fields ride through verbatim — `visible` is the only
+    // M5 additive field (asserted by its own describe block below).
+    const { visible: _visible, ...docFields } = body;
+    expect(docFields).toEqual(DOC);
   });
 
   it('answers the clean 404 envelope before the first generation (nothing breaks)', async () => {
@@ -58,5 +66,43 @@ describe('M4 GET /api/insights/narrative', () => {
     const env = { RATES: makeKv({ [NARRATIVE_KV_KEY]: 'not json' }) } as unknown as Bindings;
     const response = await app.request('/api/insights/narrative', {}, env);
     expect(response.status).toBe(404);
+  });
+});
+
+describe('M5 GET /api/insights/narrative — the additive `visible` flag', () => {
+  it('adds visible:false when NARRATOR_VISIBLE is unset (the staged-rollout default)', async () => {
+    const app = createNarrativeRoutes();
+    const env = { RATES: makeKv({ [NARRATIVE_KV_KEY]: JSON.stringify(DOC) }) } as unknown as Bindings;
+    const response = await app.request('/api/insights/narrative', {}, env);
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as NarrativeDoc & { visible: boolean };
+    expect(body.visible).toBe(false);
+    // The stored doc fields ride through verbatim — only `visible` is added.
+    expect(body.overall).toEqual(DOC.overall);
+    expect(body.sections).toEqual(DOC.sections);
+    expect(body.promptVersion).toBe(DOC.promptVersion);
+  });
+
+  it('adds visible:true when NARRATOR_VISIBLE==="true" (the owner\'s one-line flip)', async () => {
+    const app = createNarrativeRoutes();
+    const env = {
+      RATES: makeKv({ [NARRATIVE_KV_KEY]: JSON.stringify(DOC) }),
+      NARRATOR_VISIBLE: 'true',
+    } as unknown as Bindings;
+    const response = await app.request('/api/insights/narrative', {}, env);
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as NarrativeDoc & { visible: boolean };
+    expect(body.visible).toBe(true);
+  });
+
+  it('treats any non-"true" value as false (the conservative default)', async () => {
+    const app = createNarrativeRoutes();
+    const env = {
+      RATES: makeKv({ [NARRATIVE_KV_KEY]: JSON.stringify(DOC) }),
+      NARRATOR_VISIBLE: '1',
+    } as unknown as Bindings;
+    const response = await app.request('/api/insights/narrative', {}, env);
+    const body = (await response.json()) as NarrativeDoc & { visible: boolean };
+    expect(body.visible).toBe(false);
   });
 });

@@ -24,6 +24,9 @@ import {
 } from '../../components/insights/config';
 import { num, QuestionGroup } from './QuestionGroup';
 import { UsGlobalReachGroup } from './UsGlobalReachGroup';
+import { NarrativeBlock } from '../../components/insights/NarrativeBlock';
+import { InTheNews } from '../../components/insights/InTheNews';
+import type { NarrativeUnit } from '../../lib/narrative';
 
 /** The I10 watchlist strip (pinned items, snapshot order) — inside the lane. */
 function PinnedSection({
@@ -92,6 +95,9 @@ export function SectionLane({
   searchActive,
   setStatusFilter,
   setQuery,
+  narrativeBySection,
+  narrativeVisible = false,
+  locale,
 }: {
   snapshot: InsightsSnapshot;
   copy: InsightsCopy;
@@ -112,6 +118,19 @@ export function SectionLane({
   /** The search-miss box's "clear" button resets both Tools filters. */
   setStatusFilter: (status: StatusFilter) => void;
   setQuery: (query: string) => void;
+  /** Layer-2 narrator (M5): the per-section narrative units (global +
+   * australia), keyed by section id. The parent (Insights route) builds
+   * this map from the narrative doc and gates the whole lane with
+   * `narrativeVisible`. */
+  narrativeBySection?: Readonly<Record<string, NarrativeUnit>>;
+  /** Layer-2 narrator (M5): the staged-rollout visibility gate. False →
+   * no NarrativeBlock renders anywhere in the lane (the spec §11 "render
+   * nothing" rule). */
+  narrativeVisible?: boolean;
+  /** The active UI locale (M5): the lane needs it to pick the narrative
+   * unit's EN or FA text. The Insights route owns this; the lane never
+   * reads the URL or i18n store itself. */
+  locale?: 'en' | 'fa';
 }) {
   return (
     <div id="insights-section-lane" className="scroll-mt-24 flex flex-col gap-10">
@@ -149,7 +168,9 @@ export function SectionLane({
               pinned={pinned}
             />
           ) : null}
-          {SECTION_ORDER.map((sec) => (
+          {SECTION_ORDER.map((sec) => {
+            const narrativeUnit = narrativeBySection?.[sec];
+            return (
             <section
               key={sec}
               id={`insights-section-${sec}`}
@@ -185,6 +206,18 @@ export function SectionLane({
                 <IconImg src={sectionIconUrl(sec)} size={96} desktopSize={128} className="shrink-0" />
                 <span className="min-w-0">{copy.sections[sec]}</span>
               </h2>
+              {/* Layer-2 narrator (M5, spec §11): the section's plain-language
+               * narrative, immediately under the section heading. Hidden
+               * until the staged rollout opens (the parent passes
+               * narrativeVisible). The block sits INSIDE the section's
+               * existing mother container — no new shell, no new ring — so
+               * it reads as "the next line under the heading". */}
+              {narrativeVisible && locale !== undefined ? (
+                <NarrativeBlock unit={narrativeUnit} copy={copy} locale={locale} />
+              ) : null}
+              {narrativeVisible && locale !== undefined && narrativeUnit?.news ? (
+                <InTheNews news={narrativeUnit.news} copy={copy} locale={locale} />
+              ) : null}
               {/* R9-04: the lane renders LANE_GROUP_ORDER — the
                * dollar-strength group's cards moved into the world
                * currencies section (GROUP_ORDER above stays the full
@@ -219,7 +252,8 @@ export function SectionLane({
                 />
               ) : null}
             </section>
-          ))}
+            );
+          })}
         </>
       )}
     </div>
