@@ -5,6 +5,86 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-28b] — Insights Layer-2 PREP (P1–P5): freshness, the AU truth, the narrator vocabulary + state contract, `pnpm gates` — no AI, no data changes
+
+The Layer-2 preparation session (docs/insights/layer2/
+INSIGHTS-L2-PREP-SPEC.md, moved into the repo under
+docs/insights/layer2/): readies the codebase for a future AI narrator
+WITHOUT building any AI feature — no model calls, no keys, no prompts.
+Zero changes to Layer-1 copy, verdict math, thresholds, alert behaviour,
+KV topology or the ingest's request budget. All Layer-1 gate numbers
+hold; the strict validator stays at exactly 7,809 assertions.
+
+- **P1 — freshness for every reading**
+  (`packages/insights/src/freshness.ts` + 21 tests): the pure
+  `freshnessOf(def, asOf, now)` → `{ asOf, ageHours, cadence, freshness
+  }` tri-state, keyed on the spec's conservative cadence defaults
+  (4/10/45/120 — deliberately equal to the status engine's GRACE_DAYS,
+  test-pinned) with each definition's documented `staleAfterDays`
+  override imported as the per-indicator refinement (D-20). The AU trio
+  is REPORTED at its real served cadence (monthly — the live F2.1
+  fallback) while its threshold stays the definition's own 40-day
+  override, so freshness and the status engine share one tripwire
+  (D-21). Page honesty (spec §3.4): `FreshnessAsOfLine` in
+  CardMeta.tsx renders "Data as of {date}" / «آخرین داده: {date}» ONLY
+  where a reading's freshness is stale/unavailable AND its card does not
+  already say so (status-stale cards flag + age; every card's meta row
+  dates its data) — a tested safety net that renders nothing today
+  (D-22). One new UI string pair, triaged in the copy manifest
+  (round 2026-10-28-l2-prep; audit clean, 4,547 fingerprints).
+- **P2 — the Australia data source truth**
+  (docs/insights/layer2/AU-DATA-OPTIONS.md + D-26/D-27): the live
+  investigation re-verified the venue TODAY — f2-data.csv (the DAILY
+  yields) is still Akamai-403 from Cloudflare egress (re-probed via the
+  rba-probe worker), but F2.1 monthly + F1 + F1.1 + E2 + F6 + F4.1 + the
+  cash-rate HTML page ALL serve (this morning's ingest status blob is
+  the evidence), so the trio rides official RBA monthly data that is
+  CURRENT (September published 02-Oct), not frozen — Round 10's
+  "every rba.gov.au path blocked" claim is corrected with evidence. The
+  fix-order walk found no legitimate DAILY alternative (AOFM 520 from
+  Worker egress; data.gov.au reachable but no daily AGS yield dataset;
+  FRED's AU series is OECD monthly — no granularity gain; ASX L3
+  terms-prohibited; Yahoo no AU-10y ticker). Free-tier impact: zero new
+  KV operations, zero new external calls. No data-pipeline code changed.
+- **P3 — the vocabulary usable from the Worker**
+  (`packages/insights/src/narrator/`): the web dictionaries stay the one
+  hand-edited source; `pnpm narrator:vocabulary` generates a
+  deterministic snapshot (129 indicators + 23 glossary terms × 2
+  languages, sha256-stamped, no timestamps) that only the Worker-side
+  accessor imports — the web app is untouched exactly as today (D-23).
+  `getNarratorVocabulary(ids, lang)` returns ONLY the requested ids'
+  compact fields (plainName, oneLine, ifRising, ifFalling, connections
+  BETWEEN the requested ids, australiaAngle, glossaryTerms) plus only
+  the glossary terms those entries use; en↔fa parity enforced at
+  generation time + by 12 tests. Drift gate:
+  `pnpm narrator:vocabulary:check` (byte-compare; runs inside pnpm
+  gates).
+- **P4 — the narration input contract**
+  (`packages/insights/src/narrator/state.ts` + 17 tests +
+  docs/insights/layer2/NARRATION-STATE.md): the pure
+  `buildNarrationState(snapshot, now)` projects the ALREADY-COMPUTED
+  page state (summary lines verbatim, alerts with plain magnitudes,
+  active fx patterns, per-item freshness, stale/unavailable data under a
+  separate `excluded` array, dataAsOf over fresh items — D-24). Three
+  golden fixtures pin the contract: a STRESSED day taken from LIVE data
+  (2026-10-28), a calm day, and a stale-excluded day — plus
+  shape-freeze tests that fail on unnoticed contract changes.
+- **P5 — `pnpm gates`** (scripts/gates.mjs): ONE command, seven gates in
+  order — typecheck, lint, copy:audit, the narrator-vocabulary drift
+  check, `LAYER1_STRICT=1` validator, the full suite, build + bundle
+  budget — one-screen summary, non-zero exit on any failure (D-25). The
+  5-line owner-side "Repairing CI" note landed in docs/DEPLOY.md.
+- Gates: strict validator **7809/7809 unchanged**; typecheck 6/6; lint
+  0 errors; copy:audit clean (manifest 4,546 → 4,547, the one new
+  string triaged); full suite green with the new tests (core 191,
+  scraper 67, insights **727** (+50), markets 13, api 344, web **8533**
+  (+8) = **9,875**); bundle budgets HELD without a bump — entry
+  295.37/88.84 (unchanged), Insights lazy 1094.09/256.83 vs the
+  documented 1100/260 ceiling (+1.53 kB raw / +0.52 kB gz: the
+  freshness line + the new copy string). G10 free-tier safety holds.
+- DECISIONS D-20…D-27 appended in docs/insights/layer2/DECISIONS.md
+  (continuing the Layer-1 numbering).
+
 ## [2026-10-29] — Insights Layer 1 (session 4, Milestone 3): markets, currencies and patterns complete — 129/129
 
 Milestone 3 of the Layer-1 plain-language roll-out: the LAST 29 ids get

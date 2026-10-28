@@ -3911,6 +3911,13 @@ export const insightsCopyEn = {
     // I15 H4: "Data as of {date}": a daily snapshot, no seconds, honest.
     dataAsOf: 'Data as of {date}',
     dataAsOfTooltip: 'Daily snapshot, refreshed once a day.',
+    // Layer-2 prep P1 (docs/insights/layer2/INSIGHTS-L2-PREP-SPEC.md §3.4): the
+    // per-card honesty line — rendered ONLY on a card whose P1 freshness is
+    // stale/unavailable AND that does not already say so (the status-stale
+    // cards carry the grey flag + age segment; every card's meta row carries
+    // its data date). A safety net, wording deliberately unlike the header's
+    // dataAsOf (that one claims currency; this one dates the data).
+    cardDataAsOf: 'Data as of {date}',
     /* ----------------------------------------------------------------
      * v3 UI_SPEC §10 (2026-10-20, UI-50) — the header's data-health chip,
      * computed from the page's own readings. Worst wins: an unavailable

@@ -34,6 +34,7 @@ import type { ReactNode } from 'react';
 import { Fragment } from 'react';
 import type { IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
+import { freshnessOf } from '@currena/insights';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { formatAsOf } from './HistoryChart';
@@ -161,16 +162,72 @@ export function CardMetaRow({
   );
 
   return (
+    <Fragment>
+      <p
+        data-meta-row
+        className="m-0 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]"
+      >
+        {segments.map((segment, i) => (
+          <Fragment key={i}>
+            {i > 0 ? DOT : null}
+            {segment}
+          </Fragment>
+        ))}
+      </p>
+      {/* Layer-2 prep P1 — the data-age honesty line (INSIGHTS-L2-PREP-SPEC
+       * §3.4): rendered ONLY when the reading's P1 freshness is stale or
+       * unavailable AND the card does not already say so. "Already says
+       * so" = the status-stale cards (grey flag + "stale, N days old"
+       * segment above) and every card's meta "Data for {date}" segment —
+       * so this line is a SAFETY NET for readings that go stale in
+       * freshness terms while their status stays presentable (and for
+       * future surfaces without the meta row). Today it renders nowhere;
+       * the invariant is pinned by freshness-line.test.tsx. The clock is
+       * the visitor's (the same clock ageInDays above uses). */}
+      <FreshnessAsOfLine reading={reading} copy={copy} locale={locale} />
+    </Fragment>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Layer-2 prep P1 — the per-card "Data as of {date}" honesty line.
+ * ------------------------------------------------------------------ */
+
+/**
+ * The P1 freshness line for one reading, or null when the card already
+ * communicates its data age (status-stale cards: flag + age segment) or
+ * has no date to date (unavailable readings show their reason instead).
+ * Pure display logic — the freshness math lives in
+ * @currena/insights freshness.ts (thresholds shared with the status
+ * engine, D-20/D-21).
+ */
+export function freshnessAsOfLineOf(
+  reading: IndicatorReading,
+  now: string,
+): { freshness: 'fresh' | 'stale' | 'unavailable' } | null {
+  if (reading.asOf === null) return null; // no date to show; the face reason owns the unavailable case
+  if (reading.status === 'stale') return null; // already flagged + aged on the meta row
+  const info = freshnessOf(definitionFor(reading.id), reading.asOf, now);
+  return info.freshness === 'fresh' ? null : { freshness: info.freshness };
+}
+
+function FreshnessAsOfLine({
+  reading,
+  copy,
+  locale,
+}: {
+  reading: IndicatorReading;
+  copy: InsightsCopy;
+  locale: 'en' | 'fa';
+}) {
+  const line = freshnessAsOfLineOf(reading, new Date().toISOString());
+  if (line === null) return null;
+  return (
     <p
-      data-meta-row
-      className="m-0 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]"
+      data-freshness-asof={line.freshness}
+      className="m-0 mt-0.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]"
     >
-      {segments.map((segment, i) => (
-        <Fragment key={i}>
-          {i > 0 ? DOT : null}
-          {segment}
-        </Fragment>
-      ))}
+      <bdi>{interpolate(copy.ui.cardDataAsOf, { date: formatAsOf(reading.asOf!, locale) })}</bdi>
     </p>
   );
 }

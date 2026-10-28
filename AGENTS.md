@@ -35,6 +35,9 @@ live at https://aliassadi1993.pythonanywhere.com/ until an explicit human cutove
 - **docs/insights/** — the Insights doc set (AGENT_RUNBOOK, RULES, RISK_REGISTER,
   LICENCES, SCRAPING_SPEC, UI_SPEC, MAINTENANCE, OWNER_SETUP, GLOSSARY,
   BACKTEST, SELF_AUDIT, the numbered specs 01–09, + the round reports R9/R10).
+  `docs/insights/layer1/` is the Layer-1 (plain-language copy) doc set;
+  `docs/insights/layer2/` is the Layer-2 prep set (the prep spec, DECISIONS
+  D-20+, AU-DATA-OPTIONS, NARRATION-STATE — the narrator's contracts).
 - **docs/specs/** — the governing feature specs (world currencies, world markets,
   the world-markets map spec) + `traceability.md` (the requirement → code → test map).
 - **docs/localization/** — Persian copy workflow, terminology, and the manifest.
@@ -46,6 +49,10 @@ live at https://aliassadi1993.pythonanywhere.com/ until an explicit human cutove
 Package manager is **pnpm** (Node ≥ 20).
 
     pnpm install
+    pnpm gates                                   # ALL gates in one command (typecheck, lint,
+                                                 # copy:audit, narrator-vocabulary drift, the strict
+                                                 # Layer-1 validator, full suite, build + budget) —
+                                                 # run this before deploying; CI is red (owner-side)
     pnpm -r typecheck
     pnpm lint                                     # eslint (flat config; 0 errors in CI)
     pnpm -r test                                  # vitest — never hits live sites

@@ -118,6 +118,20 @@ export type {
 export { RULE_VERSION, RULE_CHANGELOG } from './ruleVersion';
 export type { RuleChangeLogEntry } from './ruleVersion';
 
+// Layer-2 prep P1 (docs/insights/layer2/INSIGHTS-L2-PREP-SPEC.md §3) —
+// per-reading data freshness for the narrator and the page honesty line.
+// Pure, zero I/O; shares the status engine's thresholds so the two
+// disciplines can never drift apart (D-20/D-21).
+export {
+  FRESHNESS_CADENCE_REFINEMENTS,
+  FRESHNESS_STALE_DAYS,
+  freshnessCadenceOf,
+  freshnessOf,
+  freshnessOfReading,
+  freshnessStaleDaysFor,
+} from './freshness';
+export type { Freshness, FreshnessInfo } from './freshness';
+
 // R10-3 (2026-10-28) — the global companies table behind a feature flag.
 // The config + the adapter STUB ship with the flag OFF; the UI renders
 // the empty state, the cron rung is NOT wired, no live calls fire.

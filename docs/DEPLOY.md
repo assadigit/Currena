@@ -83,6 +83,26 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Repairing CI (the red GitHub Actions — what is OWNER-SIDE)
+
+GitHub Actions has been red since 2026-10-20 (last green `f72e1a0`,
+2026-10-18): the account's free Actions minutes are exhausted and runner
+allocation fails. Until it is repaired, `pnpm gates` (added 2026-10-28,
+the Layer-2 prep P5) is the full local equivalent — every session must
+run it (or the individual gates) before deploying. Repair is owner-side:
+
+1. Check usage/billing at github.com/settings/billing (Actions minutes)
+   and the repo's Actions → "insights-ingest" runs (runner allocation
+   errors).
+2. Free minutes reset monthly; otherwise upgrade the plan or register a
+   self-hosted runner (a small always-on box suffices).
+3. After minutes are available: manually re-run the latest failed
+   `insights-ingest` run and confirm it goes green.
+4. Update the GitHub repo secret `CLOUDFLARE_API_TOKEN` if it was rotated
+   meanwhile (`gh secret set CLOUDFLARE_API_TOKEN --repo assadigit/Currena`).
+5. Keep the local-gate discipline regardless: `pnpm gates` green before
+   every deploy is the runbook rule, CI or not.
+
 ## Session record — 2026-10-28 the Insights Layer-1 plain-language layer ships: 129/129 ids live, zero data changes (final L1 session, worker c02d736a)
 
 - **Deploy-lock check first** (the D-43 lesson): the versions API showed the
