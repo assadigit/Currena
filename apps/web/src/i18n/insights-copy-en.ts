@@ -1210,6 +1210,84 @@ const LAYER1 = {
       australiaAngle: 'The bowser is Australia’s most visible weekly price; it feeds headline inflation and the RBA’s mood.',
       glossaryTerms: ['inflation'],
     },
+
+    /* ----- Batch 13 — au-households A (6) ----- */
+    'rba-cash-rate': {
+      plainName: 'Australia’s main rate',
+      oneLine: 'Australia’s main interest rate, set by the Reserve Bank.',
+      ifRising: 'Variable home loans and savings rates usually follow within weeks.',
+      ifFalling: 'Borrowers usually get relief and savers earn less, with a lag.',
+      connections: [
+        { with: 'fed-target', text: 'The Fed sets the US twin of this dial.', strength: 'reliable' },
+        { with: 'au-home-loan', text: 'Home-loan rates follow this dial with a lag.', strength: 'reliable' },
+        { with: 'au-deposit-rate', text: 'Savings rates ride on it too.', strength: 'reliable' },
+      ],
+      australiaAngle: 'Every variable mortgage in Australia reprices with this dial; savings accounts follow.',
+      glossaryTerms: ['interest-rate', 'central-bank', 'mortgage'],
+    },
+    'au-unemployment': {
+      plainName: 'The Australian jobless rate',
+      oneLine: 'The share of Australians looking for work who cannot find it.',
+      ifRising: 'Job hunting usually gets harder and household spending softer.',
+      ifFalling: 'Plentiful jobs usually support wages and confidence.',
+      connections: [
+        { with: 'au-job-vacancies', text: 'Vacancies usually turn before the jobless rate does.', strength: 'reliable' },
+        { with: 'rba-cash-rate', text: 'The RBA watches the jobs market when setting rates.', strength: 'usually' },
+      ],
+      australiaAngle: 'A half-point rise off a low has often marked the start of an Australian slowdown.',
+      glossaryTerms: [],
+    },
+    'au-wage-growth': {
+      plainName: 'Australian pay growth',
+      oneLine: 'How fast Australian wages are rising, versus a year ago.',
+      ifRising: 'Pay packets usually catch up, though fast pay can feed prices.',
+      ifFalling: 'An hour’s pay usually covers less when prices keep rising.',
+      connections: [
+        { with: 'au-cpi', text: 'The gap between this and price growth shows whether pay is winning.', strength: 'usually' },
+        { with: 'au-unemployment', text: 'A strong jobs market usually keeps pay rising.', strength: 'usually' },
+      ],
+      australiaAngle: 'The wage-and-price scoreboard: through much of Australia’s inflation era, pay lagged prices, squeezing real budgets.',
+      glossaryTerms: ['inflation'],
+    },
+    'au-rent-yoy': {
+      plainName: 'Australian rent growth',
+      oneLine: 'How fast Australian rents are rising, versus a year ago.',
+      ifRising: 'Renters’ budgets usually squeeze harder at renewal time.',
+      ifFalling: 'Weak rent growth is the rare relief for renters’ budgets.',
+      connections: [
+        { with: 'au-cpi', text: 'Rent is a big weight inside the inflation basket.', strength: 'reliable' },
+        { with: 'au-home-values', text: 'Rent and house prices often move together, but not always.', strength: 'sometimes' },
+        { with: 'rba-cash-rate', text: 'Rate moves usually cool the housing market with a delay.', strength: 'usually' },
+      ],
+      australiaAngle: 'Rent is the biggest weekly bill for roughly a third of Australian households.',
+      glossaryTerms: ['inflation'],
+    },
+    'au-home-loan': {
+      plainName: 'The mortgage rate people pay',
+      oneLine: 'The average rate on outstanding Australian home loans.',
+      ifRising: 'Monthly repayments usually rise, squeezing household budgets.',
+      ifFalling: 'Relief usually reaches variable loans first, with a lag.',
+      connections: [
+        { with: 'rba-cash-rate', text: 'Each cash-rate move flows into this rate with a lag.', strength: 'reliable' },
+        { with: 'au-deposit-rate', text: 'The savings twin: what the crowd pays versus earns.', strength: 'reliable' },
+        { with: 'mortgage-30y', text: 'The US twin shows the American home-loan story.', strength: 'reliable' },
+      ],
+      australiaAngle: 'Home loans are the biggest debt of most Australian households; this is the rate they actually pay.',
+      glossaryTerms: ['mortgage'],
+    },
+    'au-deposit-rate': {
+      plainName: 'The savings rate on offer',
+      oneLine: 'What banks pay on new household term deposits.',
+      ifRising: 'Savers shopping today usually find more interest on offer.',
+      ifFalling: 'Cash savings usually earn less, and locking money away pays less too.',
+      connections: [
+        { with: 'rba-cash-rate', text: 'Term-deposit rates usually track the cash rate with a short lag.', strength: 'reliable' },
+        { with: 'au-home-loan', text: 'The borrowing twin of this savings rate.', strength: 'reliable' },
+        { with: 'au-cpi', text: 'Real saving power depends on the gap to inflation.', strength: 'usually' },
+      ],
+      australiaAngle: 'The twin of the mortgage card: what the crowd earns on savings while borrowers pay the loan rate.',
+      glossaryTerms: ['inflation', 'mortgage'],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 

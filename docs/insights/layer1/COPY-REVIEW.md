@@ -566,6 +566,55 @@ _(market-stress is now complete at 10/10; M1 ends at 56/129 unique ids)_
 
 ---
 
+## Batch 13 — au-households A (6 indicators)
+
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `rba-cash-rate` | ifRising | RBA hikes usually flow into variable home loans and savings rates within weeks. | — | widely-taught (approved copy same claim) | widely-taught |
+| `rba-cash-rate` | ifFalling | Cuts usually bring borrower relief and thinner savings pay, with a lag. | — | widely-taught (inverse) | widely-taught |
+| `au-unemployment` | ifRising | Rising joblessness usually means harder job hunting and softer spending. | — | widely-taught (approved copy same claim) | widely-taught |
+| `au-unemployment` | ifFalling | Plentiful jobs usually support wages and confidence. | — | widely-taught (approved copy: "usually good news for wages and confidence") | widely-taught |
+| `au-wage-growth` | ifRising | Faster pay usually catches up, though it can feed prices. | — | widely-taught: the wage-price loop, AU edition (approved copy) | widely-taught |
+| `au-wage-growth` | ifFalling | Pay growing slower than prices covers less each hour. | — | widely-taught (approved copy same claim) | widely-taught |
+| `au-rent-yoy` | ifRising | Fast rent growth usually squeezes renters hardest at renewal. | — | widely-taught (approved copy same claim) | widely-taught |
+| `au-rent-yoy` | ifFalling | Weak rent growth is the rare renters' relief. | — | widely-taught (inverse) | widely-taught |
+| `au-home-loan` | ifRising | Rising average mortgage rates squeeze monthly budgets. | — | widely-taught (approved copy same claim) | widely-taught |
+| `au-home-loan` | ifFalling | Relief usually reaches variable loans first, with a lag. | — | widely-taught (approved copy same claim) | widely-taught |
+| `au-deposit-rate` | ifRising | Higher term-deposit rates usually mean more interest on offer for savers. | — | widely-taught (approved copy same claim) | widely-taught |
+| `au-deposit-rate` | ifFalling | Lower deposit rates mean cash savings earn less. | — | widely-taught (inverse) | widely-taught |
+
+### Connections (batch 13)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `rba-cash-rate` | `fed-target` | The Fed sets the US twin of this dial. | reliable | definitional | widely-taught |
+| `rba-cash-rate` | `au-home-loan` | Home-loan rates follow this dial with a lag. | reliable | widely-taught (approved copy: within weeks) | widely-taught |
+| `rba-cash-rate` | `au-deposit-rate` | Savings rates ride on it too. | reliable | widely-taught (approved copy: term deposits track the cash rate) | widely-taught |
+| `au-unemployment` | `au-job-vacancies` | Vacancies usually turn before the jobless rate. | reliable | widely-taught (approved copy: vacancies roll over first) | widely-taught |
+| `au-unemployment` | `rba-cash-rate` | The RBA watches the jobs market when setting rates. | usually | widely-taught (approved copy: jobs drive rate decisions) | widely-taught |
+| `au-wage-growth` | `au-cpi` | The pay-vs-price gap shows whether pay is winning. | usually | widely-taught: real-wage logic (approved copy same claim) | widely-taught |
+| `au-wage-growth` | `au-unemployment` | A strong jobs market usually keeps pay rising. | usually | widely-taught: Phillips-curve logic, softened | widely-taught |
+| `au-rent-yoy` | `au-cpi` | Rent is a big weight inside the inflation basket. | reliable | definitional (CPI rents component) | widely-taught |
+| `au-rent-yoy` | `au-home-values` | Rent and house prices often move together, but not always. | sometimes | widely-taught, marked sometimes | widely-taught |
+| `au-rent-yoy` | `rba-cash-rate` | Rate moves usually cool the housing market with a delay. | usually | widely-taught | widely-taught |
+| `au-home-loan` | `rba-cash-rate` | Each cash-rate move flows in with a lag. | reliable | widely-taught (approved copy: moves with each RBA decision) | widely-taught |
+| `au-home-loan` | `au-deposit-rate` | The savings twin: pays versus earns. | reliable | definitional pairing (approved copy: "the savings twin of the home-loan card") | widely-taught |
+| `au-home-loan` | `mortgage-30y` | The US twin shows the American story. | reliable | definitional pairing | widely-taught |
+| `au-deposit-rate` | `rba-cash-rate` | Term-deposit rates track the cash rate with a short lag. | reliable | widely-taught (approved copy same claim) | widely-taught |
+| `au-deposit-rate` | `au-home-loan` | The borrowing twin of this savings rate. | reliable | definitional pairing | widely-taught |
+| `au-deposit-rate` | `au-cpi` | Real saving power depends on the gap to inflation. | usually | widely-taught: real-return logic (approved copy: the real-rate row) | widely-taught |
+
+### Australia angle (batch 13)
+| id | claim | basis | status |
+|---|---|---|---|
+| `rba-cash-rate` | Every variable mortgage in Australia reprices with this dial; savings follow. | widely-taught (approved copy: flows directly into mortgage, deposit and business costs) | widely-taught |
+| `au-unemployment` | A half-point rise off a low has often marked the start of an AU slowdown. | widely-taught (approved copy: "rises of half a point off a low have often marked turning points") | widely-taught |
+| `au-wage-growth` | Through much of the inflation era, pay lagged prices, squeezing real budgets. | widely-taught (approved copy: wages vs inflation comparison) | widely-taught |
+| `au-rent-yoy` | Rent is the biggest weekly bill for roughly a third of Australian households. | approved copy verbatim | widely-taught |
+| `au-home-loan` | Home loans are the biggest debt of most AU households; this is the rate they pay. | approved copy verbatim | widely-taught |
+| `au-deposit-rate` | The twin of the mortgage card: earns-on-savings vs pays-on-loans. | approved copy ("the savings twin of the home-loan card") | widely-taught |
+
+---
+
 ## Remaining batches (M2+)
 
 — pending — prices-board (5), prices-heat (16), AU indicators (23), 16 world
