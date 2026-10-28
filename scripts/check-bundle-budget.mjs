@@ -653,7 +653,15 @@ const BUDGETS = [
   // session re-measures before LAYER1_STRICT=1. Same D-16 path: bundled
   // static copy, zero KV/external calls. Entry chunk untouched at
   // 295.37/88.84.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 975_000, gz: 234_000, label: 'Insights lazy chunk' },
+  // Layer 1 bump (2026-10-28, M1 final): batches 5–8 complete Milestone 1
+  // (56/129 unique ids: borrowing-costs, dollar-strength, growth-health and
+  // market-stress all done). Measured at the M1 end: 978.09 kB raw /
+  // 233.68 kB gz — the batch-4 projection (~969/233) ran ~9 kB light
+  // because batches 6–8 carried glossary-term additions and longer
+  // connection texts. Ceiling moves to 985/236 (M1 final + margin); M2
+  // (prices + AU, ~34 ids) re-measures and bumps again the same way.
+  // Entry chunk untouched at 295.37/88.84.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 985_000, gz: 236_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

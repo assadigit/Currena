@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
-## [2026-10-28c] — Insights Layer 1 (session 2, batches 2–4): borrowing-costs completed, dollar-strength, growth-health A
+## [2026-10-28c] — Insights Layer 1 (session 2, Milestone 1): borrowing-costs, dollar-strength, growth-health and market-stress completed
 
 Milestone 1 of the Layer-1 plain-language roll-out
 (`docs/insights/layer1/PLAIN-LANGUAGE-SPEC.md`): 23 more indicators get
@@ -23,6 +23,16 @@ only, hedged wording; no advice or certainty words).
   us-japan-10y-gap) per D-08.
 - **Batch 4** (8): us-unemployment, sahm-rule, china-pmi, china-cpi,
   copper-gold, michigan-sentiment, initial-jobless-claims, philly-fed.
+- **Batch 5** (8): recession-probability, oecd-cli-us, m2-us,
+  retail-sales, housing-permits, job-openings, us-gdp-growth, us-nfp.
+- **Batch 6** (7): usdcny (shared FX id, + australiaAngle),
+  michigan-1y-expectations, cfnai, oecd-cli-cn, oecd-cli-de, epu-us,
+  copper-usd — growth-health complete (23/23).
+- **Batch 7** (6): stress-stlfsi, nfci, vix, gold-silver,
+  cftc-gold-positioning, walcl.
+- **Batch 8** (4): crypto-fng, shiller-cape, shiller-ecy, gpr-index —
+  market-stress complete (10/10). **Milestone 1 ends at 56/129 unique
+  ids**; the four global gauges are done.
 - Glossary grows 16 → 21 terms (carry-trade, pmi, vix, money-supply,
   leading-indicator, both languages); the G3 jargon map is extended to
   point PMI/VIX at their glossary terms and to cover carry trade, money
@@ -33,14 +43,15 @@ only, hedged wording; no advice or certainty words).
   row added; growth-health 23, au-households 11), a session-1 Farsi
   glossary typo fixed (می‌خرزد → می‌خرد), all re-triaged through the
   Persian-copy audit manifest.
-- Budget: the Insights lazy ceiling bumps 940/228 → 975/234 kB (measured
-  947.80/227.90 after batch 4; ceiling covers the rest of M1; the D-16
-  path — bundled static copy, zero KV/external calls; entry chunk
-  untouched at 295.37/88.84).
-- Gates: layer1 vitest 1976 green, full suite green (packages 677,
-  markets 13, api 344, web 2692), typecheck, lint, copy:audit clean,
-  bundle budget held, render-checked EN+FA at 1280/360px (screenshots in
-  docs/insights/screenshots/layer1-m1-batch2/).
+- Budget: the Insights lazy ceiling bumps 940/228 → 985/236 kB across
+  the session (measured 978.09/233.68 at the M1 end; the D-16 path —
+  bundled static copy, zero KV/external calls; entry chunk untouched at
+  295.37/88.84; M2 re-measures and bumps the same documented way).
+- Gates (every batch): layer1 vitest green (3338 tests at the M1 end),
+  full suite green (packages 677, markets 13, api 344, web 4054),
+  typecheck, lint, copy:audit clean (manifest grown to 3643 entries, all
+  layer1 round), bundle budget held, render-checked EN+FA at 1280/360px
+  (screenshots in docs/insights/screenshots/layer1-m1-batch2/).
 
 ## [2026-10-28b] — Insights Layer 1 (batch 1): the plain-language foundation + borrowing-costs copy
 

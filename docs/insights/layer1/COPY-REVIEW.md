@@ -344,8 +344,42 @@ _Indicators: stress-stlfsi, nfci, vix, gold-silver, cftc-gold-positioning, walcl
 
 ---
 
-## Batch 8 — (pending)
+## Batch 8 — market-stress B (4 indicators) — Milestone 1 complete
 
 _Indicators: crypto-fng, shiller-cape, shiller-ecy, gpr-index_
+_(market-stress is now complete at 10/10; M1 ends at 56/129 unique ids)_
 
-— pending — fill in when batch 8 copy is written.
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `crypto-fng` | ifRising | Building greed; extreme greed has often appeared near sharp turns. | — | widely-taught (approved copy's own "tendency, not a rule" framing) | widely-taught |
+| `crypto-fng` | ifFalling | Deepening fear; extreme fear has often sat near rebounds. | — | widely-taught (contrarian tendency, hedged) | widely-taught |
+| `shiller-cape` | ifRising | Dearer shares vs earnings have often meant weaker decade-ahead returns. | — | widely-taught: Shiller's own long-run finding (wide variation) | widely-taught |
+| `shiller-cape` | ifFalling | Cheaper shares have often come with better decade-ahead returns. | — | widely-taught (inverse) | widely-taught |
+| `shiller-ecy` | ifRising | A fatter cushion for shares over safe money. | — | widely-taught (ECY construction) | widely-taught |
+| `shiller-ecy` | ifFalling | Safe money competing harder has weighed on decade-ahead returns. | — | widely-taught (Shiller's ECY paper) | widely-taught |
+| `gpr-index` | ifRising | War and tension usually lift oil and gold, and shares often slip. | — | widely-taught: the canonical geopolitics reaction (approved copy) | widely-taught |
+| `gpr-index` | ifFalling | A calmer news backdrop usually supports risk-taking. | — | widely-taught (inverse) | widely-taught |
+
+### Connections (batch 8)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `crypto-fng` | `btc-usd` | The mood gauge and the Bitcoin price read the same market. | usually | definitional-ish: the index is built partly from BTC measures | widely-taught |
+| `shiller-cape` | `shiller-ecy` | The companion reading puts shares against safe government money. | reliable | definitional (Shiller's two published series) | widely-taught |
+| `shiller-cape` | `real-yield-10y` | The safe-money leg of the companion reading is the real return. | reliable | definitional (ECY = earnings yield − real 10y) | widely-taught |
+| `shiller-ecy` | `shiller-cape` | Both read the same share prices; this one subtracts safe money. | reliable | definitional | widely-taught |
+| `gpr-index` | `vix` | The fear gauge often rises with war news. | usually | widely-taught: geopolitics → risk-off | widely-taught |
+| `gpr-index` | `brent` | Oil often jumps on war and supply scares. | usually | widely-taught (approved copy) | widely-taught |
+| `gpr-index` | `gold-usd` | Gold often rises on worry. | usually | widely-taught: gold's safe-haven role | widely-taught |
+
+### Australia angle (batch 8)
+| id | claim | basis | status |
+|---|---|---|---|
+| (none — sentiment/valuation/geopolitics context cards; no D-08 AU link.) | — | — | — |
+
+---
+
+## Remaining batches (M2+)
+
+— pending — prices-board (5), prices-heat (16), AU indicators (23), 16 world
+stock markets, the remaining FX pairs + the 7 pattern cards (null-direction
+per D-09). Fill in as each batch's copy is written.

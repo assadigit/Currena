@@ -834,6 +834,51 @@ const LAYER1 = {
       ],
       glossaryTerms: ['central-bank', 'money-supply'],
     },
+
+    /* ----- Batch 8 — market-stress B (4) ----- */
+    'crypto-fng': {
+      plainName: 'Crypto mood today',
+      oneLine: 'A daily gauge of how fearful or greedy crypto markets feel.',
+      ifRising: 'Greed usually builds, and extreme greed has often appeared near sharp turns.',
+      ifFalling: 'Fear usually deepens; extreme fear has often sat near rebounds.',
+      connections: [
+        { with: 'btc-usd', text: 'The mood gauge and the Bitcoin price read the same market.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'shiller-cape': {
+      plainName: 'US shares vs long-run earnings',
+      oneLine: 'How expensive US shares look against their own long-run earnings power.',
+      ifRising: 'Shares get dearer against their earnings, which has often meant weaker decade-ahead returns.',
+      ifFalling: 'Cheaper shares, a mix that has often come with better decade-ahead returns.',
+      connections: [
+        { with: 'shiller-ecy', text: 'The companion reading puts shares against safe government money instead.', strength: 'reliable' },
+        { with: 'real-yield-10y', text: 'The safe-money leg of the companion reading is this real return.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['stock-index', 'real-yield', 'yield'],
+    },
+    'shiller-ecy': {
+      plainName: 'Shares versus safe money',
+      oneLine: 'What US shares earn versus what safe US government money pays.',
+      ifRising: 'Shares usually offer a fatter cushion over safe money.',
+      ifFalling: 'Safe money usually competes harder, a mix that has weighed on decade-ahead returns.',
+      connections: [
+        { with: 'shiller-cape', text: 'Both read the same share prices; this one subtracts safe money.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['real-yield', 'yield'],
+    },
+    'gpr-index': {
+      plainName: 'War and tension gauge',
+      oneLine: 'How much war and tension fills the world’s news.',
+      ifRising: 'Oil and gold usually climb, and shares often slip.',
+      ifFalling: 'A calmer news backdrop usually supports risk-taking.',
+      connections: [
+        { with: 'vix', text: 'The fear gauge often rises with war news.', strength: 'usually' },
+        { with: 'brent', text: 'Oil often jumps on war and supply scares.', strength: 'usually' },
+        { with: 'gold-usd', text: 'Gold often rises on worry.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 

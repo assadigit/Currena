@@ -87,10 +87,10 @@ inventory and enforced by gate G1.
 | ✓ | `gold-silver` | Gold / Silver | The gold price divided by the silver price. |
 | ✓ | `cftc-gold-positioning` | Trader positioning in gold (COT) | Net non-commercial positioning in US gold futures (CFTC COT). |
 | ✓ | `walcl` | The Fed's balance sheet | The size of the US Federal Reserve's balance sheet. |
-| · | `crypto-fng` | Crypto Fear and Greed Index | A sentiment gauge for crypto markets. |
-| · | `shiller-cape` | US share prices versus long-run earnings (Shiller CAPE) | The Shiller cyclically-adjusted price/earnings ratio for the S&P 500. |
-| · | `shiller-ecy` | Excess CAPE Yield (Shiller) | The earnings yield of CAPE minus the real 10-year Treasury yield. |
-| · | `gpr-index` | Geopolitical Risk Index | The Caldara-Iacoviello geopolitical-risk index. |
+| ✓ | `crypto-fng` | Crypto Fear and Greed Index | A sentiment gauge for crypto markets. |
+| ✓ | `shiller-cape` | US share prices versus long-run earnings (Shiller CAPE) | The Shiller cyclically-adjusted price/earnings ratio for the S&P 500. |
+| ✓ | `shiller-ecy` | Excess CAPE Yield (Shiller) | The earnings yield of CAPE minus the real 10-year Treasury yield. |
+| ✓ | `gpr-index` | Geopolitical Risk Index | The Caldara-Iacoviello geopolitical-risk index. |
 
 #### `prices-board` strip (5)
 | L1 | id | official name | what it measures |
@@ -182,10 +182,10 @@ inventory and enforced by gate G1.
 | L1 | id | what it is |
 |---|---|---|
 | · | `eurusd` | EUR/USD pair (dollar-world group) |
-| · | `usdjpy` | USD/JPY pair (shared with indicators) |
+| ✓ | `usdjpy` | USD/JPY pair (shared with indicators) |
 | · | `gbpusd` | GBP/USD pair |
 | · | `usdchf` | USD/CHF pair |
-| · | `usdcny` | USD/CNY pair (shared with indicators) |
+| ✓ | `usdcny` | USD/CNY pair (shared with indicators) |
 | · | `audusd` | AUD/USD pair (shared with indicators) |
 | · | `audjpy` | AUD/JPY pair (warning-lights group) |
 | · | `eurjpy` | EUR/JPY pair (warning-lights group) |

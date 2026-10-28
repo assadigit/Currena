@@ -4835,6 +4835,51 @@ export const insightsCopyFa: InsightsCopy = {
         ],
         glossaryTerms: ['central-bank', 'money-supply'],
       },
+
+      /* ----- دستهٔ ۸ — تنش بازار B (۴) ----- */
+      'crypto-fng': {
+        plainName: 'خلق‌وخوی رمزارزها',
+        oneLine: 'فشارسنج روزانهٔ میزان ترس یا طمع بازار رمزارزها.',
+        ifRising: 'طمع معمولاً انباشته می‌شود و طمع شدید اغلب نزدیک چرخش‌های تند دیده شده است.',
+        ifFalling: 'ترس معمولاً عمیق‌تر می‌شود؛ ترس شدید اغلب نزدیک بازگشت‌ها نشسته است.',
+        connections: [
+          { with: 'btc-usd', text: 'فشارسنج خلق‌وخو و قیمت بیت‌کوین یک بازار را می‌خوانند.', strength: 'usually' },
+        ],
+        glossaryTerms: [],
+      },
+      'shiller-cape': {
+        plainName: 'گرانی بورس آمریکا',
+        oneLine: 'شاخص بورس آمریکا در برابر قدرت سود بلندمدتش چقدر گران است.',
+        ifRising: 'گرانی بورس در برابر سودها معمولاً با بازده ضعیف‌تر ده سال پیش رو همراه بوده است.',
+        ifFalling: 'ارزانی بورس معمولاً با بازده بهتر ده سال پیش رو همراه بوده است.',
+        connections: [
+          { with: 'shiller-ecy', text: 'قرائت همراه، بورس را در برابر پول امن دولتی می‌گذارد.', strength: 'reliable' },
+          { with: 'real-yield-10y', text: 'ضلع پول امنِ قرائت همراه، همین بازده واقعی است.', strength: 'reliable' },
+        ],
+        glossaryTerms: ['stock-index', 'real-yield', 'yield'],
+      },
+      'shiller-ecy': {
+        plainName: 'بورس در برابر پول امن',
+        oneLine: 'سود بورس آمریکا در برابر سود پول امن دولت آمریکا.',
+        ifRising: 'بورس معمولاً پوشش بیشتری روی پول امن پیشنهاد می‌کند.',
+        ifFalling: 'پول امن معمولاً رقابت تندتری می‌کند؛ ترکیبی که بر بازده ده سال بعد فشار آورده است.',
+        connections: [
+          { with: 'shiller-cape', text: 'هر دو قیمت‌های یک بورس را می‌خوانند؛ این یکی پول امن را از آن کم می‌کند.', strength: 'reliable' },
+        ],
+        glossaryTerms: ['real-yield', 'yield'],
+      },
+      'gpr-index': {
+        plainName: 'فشارسنج جنگ و تنش',
+        oneLine: 'خبرهای جهان چقدر پر از جنگ و تنش است.',
+        ifRising: 'نفت و طلا معمولاً بالا می‌روند و بورس‌ها اغلب می‌لغزند.',
+        ifFalling: 'پس‌زمینهٔ خبری آرام‌تر معمولاً به بازارهای پرریسک نفس می‌دهد.',
+        connections: [
+          { with: 'vix', text: 'فشارسنج ترس اغلب با خبر جنگ بالا می‌رود.', strength: 'usually' },
+          { with: 'brent', text: 'نفت اغلب با ترس جنگ و اختلال عرضه می‌جهد.', strength: 'usually' },
+          { with: 'gold-usd', text: 'طلا اغلب با نگرانی بالا می‌رود.', strength: 'usually' },
+        ],
+        glossaryTerms: [],
+      },
     },
   },
 };
