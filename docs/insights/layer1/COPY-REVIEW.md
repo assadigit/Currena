@@ -902,3 +902,13 @@ r6_europe_worry, carry-trade on r2_carry_trade). The full strict gate
 (LAYER1_STRICT=1) + the whole per-batch gate list re-run from a clean
 state are the final session's first job (per D-07/D-12), followed by the
 owner's deploy-lock check (docs/DEPLOY.md) and the deploy itself.
+
+**Final-session addendum (2026-10-28):** all of the above completed — the
+strict gate re-verified green from a clean state (7809/7809), the
+deploy-lock check ran clear (last prior upload `27f42b9c`,
+2026-10-27T18:31Z, the R10 deploy), currena-api `c02d736a` deployed and
+live-verified (both locales, 1280/360px, all four surfaces + the D-11
+shared ids). The complete verification handoff for the checking agent —
+including the independent re-audit of this file's claims and the honest
+caveats (the 10 `needs-expert-check` rows above are itemized there) — is
+**`FINAL-REPORT.md`** in this folder.

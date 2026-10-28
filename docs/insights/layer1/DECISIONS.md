@@ -292,6 +292,38 @@ for everything except the tiny list of unavoidable instrument names, each
 of which must then be a listed glossary term. Extending the map is
 explicitly allowed (spec §9 G3: "a jargon list … extend it").
 
+## D-16 — Bundle-budget bumps for the bilingual Layer-1 content (backfilled in the final session; see D-19)
+
+**Assumption.** The Layer-1 copy is 3,152 hand-written strings (1,576 per
+language — the exact count the final session's audit script derived from
+the dictionaries) riding the already-budget-conscious Insights lazy chunk
+(`scripts/check-bundle-budget.mjs` gates it). The repo rule: budgets are
+documented numbers — bump with a changelog note, never silently.
+
+**Decision.** Every budget ceiling move happens ONLY with a measured number
+in the same commit's CHANGELOG note — the "D-16 path". Applied six times
+across the roll-out (Insights lazy chunk, raw/gz kB):
+
+| move | ceiling | measured at the bump |
+|---|---|---|
+| session 1 (foundation batch) | 896/217 → 940/228 | 914.48/221.13 |
+| batch 4 (mid-M1 growth step) | 940/228 → 975/234 | — (no number recorded in that commit; the M1 session note records the session-end 978.09/233.68) |
+| batch 8 (M1 end) | 975/234 → 985/236 | 978.09/233.68 |
+| batch 9 | 985/236 → 1045/248 | 985.55/235.25 (M2 projection) |
+| batch 15 (M2 end) | 1045/248 → 1090/258 | 1047.65/248.08 |
+| batch 19 (M3 end) | 1090/258 → 1100/260 | 1092.56/256.31 |
+
+The entry chunk (the money page) was never touched by Layer 1 (295.37/88.84
+vs 296/89.50 at the end). Layer 2 must follow the same path — the remaining
+headroom is ~0.7% raw / ~1.4% gz, so its first content commit will need a
+conscious bump.
+
+**Reason.** The bundle budget is the repo's performance contract; bilingual
+content is the one thing Layer 1 legitimately adds. Measuring + noting every
+bump keeps the ceiling honest and auditable (the numbers above are the
+CHANGELOG's own record — this section backfills the decision text that was
+previously only implicit in those notes; see D-19).
+
 ## D-17 — M3 display hooks: a shared generic Layer-1 block for markets, FX pairs and FX patterns
 
 **Assumption.** Spec §6 says the expanded view adds the Layer-1 block and
@@ -351,3 +383,33 @@ apply to approved copy).
 the target reader — so dropping them from the plain-language layer is
 both the only gate-clean option and the plainer one. The official name
 remains one glance away on the same tile/panel.
+
+## D-19 — Final-session reconciliation: the decision-log completeness pass (the D-15 gap, the D-16 backfill, the final report)
+
+**Assumption.** Preparing the verification handoff
+(`docs/insights/layer1/FINAL-REPORT.md`) for an independent checking agent,
+the final session audited DECISIONS.md against every D-nn citation in the
+repo and found two numbering gaps: **D-15 has no record anywhere** (the
+number was reserved in the M1-era numbering and the session that introduced
+D-16 — batch 4 — evidently skipped past it), and **D-16 was cited without
+ever having a section here** (six times in the CHANGELOG, in five batch
+commit messages, and self-referenced in D-01's reason).
+
+**Decision.** (a) D-16 is backfilled above from its own CHANGELOG record
+(the six budget bumps, five of them with recorded measurements — the
+numbers are quoted verbatim from the session notes; nothing new is
+invented). (b) D-15 is recorded as a
+PERMANENT GAP — no content is retro-fitted for it because no record of its
+intended content survives; inventing one would corrupt the log. (c) The
+CHANGELOG's Layer-1 M2/M3 section headers carry the date label 2026-10-29
+while the underlying commits landed 2026-10-27/28 UTC — noted here as a
+known label quirk, left as-is (the headers are historical records; the git
+timestamps are the source of truth). (d) The final report
+(`FINAL-REPORT.md`) is the single verification surface for the checking
+agent: scope, file map, gate numbers, deployment record, independent
+re-audit results, and the honest caveats.
+
+**Reason.** The task rule is "log anything ambiguous as D-19+" — a decision
+log that cites a decision it never wrote, and a checking agent that cannot
+see the gaps, are both worse than an honest hole. The gap does not affect
+any shipped behavior (D-15 was never cited by any code, test, or copy).
