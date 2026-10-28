@@ -241,6 +241,31 @@ copy-paste commands in `docs/insights/layer2/LAYER2-REPORT.md` §8.
   criteria + final report, deployed disabled) is done. The owner takes
   it live.
 
+- **14:50 UTC follow-up — the two-tick populate confirmed live (D-38 §3)**:
+  the record above was verified at the 13:50 first tick (3 units:
+  overall + global + australia — the 3/tick capped batch). The 14:50 UTC
+  tick then found those 3 unchanged (skipped) + processed the 2 pending
+  units (world-markets + world-currencies — 2 ≤ 3 cap, so both in one
+  tick), completing the document. The endpoint at 14:52 UTC serves
+  `generatedAt: 2026-10-28T14:50:18.868Z` with
+  `sections: [global, australia, world-markets, world-currencies]` +
+  overall — every unit `source: "template"`, no `news` (Part 3 disabled).
+  The world-markets template reads "The pulse of world markets read Needs
+  attention today: 6 of 16 indices have slipped into a correction, and 1
+  in a bear market… 11 of 16 indices rose at their latest close." (FA:
+  Persian digits ۶ شاخص از ۱۶، ۱۱ شاخص از ۱۶). The world-currencies
+  template reads "World currencies read Needs attention today: 1 pattern
+  counted in warning. The active pattern is Europe's worry meter… the
+  euro usually slips against the franc." (FA: ۱ الگو). The pending-
+  continuation design works exactly as specified (spec §4 + D-38 §3).
+  The updated stats bucket (`insights:narrator:stats`): `runs: 2`,
+  `skippedUnchanged: 3`, `templateUsed: 5`, `aiValid: 0`, `apiErrors: {}`,
+  `newsAttempted: 0`. The normal-URL "shows nothing new" check is
+  captured in `docs/insights/screenshots/layer2-m5/normal-en-1280.png`
+  (zero narrative labels, zero narrative text — the staged-rollout gate
+  is closed). The LAYER2-REPORT.md §10 live-verification evidence is
+  updated with the actual version ID + the confirmed endpoint state.
+
 ## Session record — 2026-10-28d the Insights Layer-2 narrator M4: the generation rung + KV + the cached endpoint (worker 2de8f566, DEPLOYED DISABLED)
 
 The first deploy of the narrator build (M4 of 5, spec §4 + §9). The

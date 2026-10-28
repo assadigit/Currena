@@ -272,12 +272,38 @@ Part 3 are in `KILL-CRITERIA.md` §2.
 
 ## 10. Live-verification evidence (the M5 deploy)
 
-See `docs/DEPLOY.md`'s M5 session record (the deployed currena-api
-version ID, the live-verification at `https://currena.ir/?narrative=preview#/insights`
-in EN + FA at 360px and 1280px, the absence of console errors, the
-normal-URL "shows nothing new" check). The session record follows the
-existing pattern (every prior milestone recorded its deploy version +
-live-verification in DEPLOY.md).
+**Deployed**: currena-api **`4f4db8d6-780a-4a09-a01f-4c5d964101cb`**
+(landed 2026-10-28T13:47:48Z, one minute after the M5 commit). The full
+session record is in `docs/DEPLOY.md` ("Session record — 2026-10-28e").
+
+**Verified live (13:55–14:52 UTC):**
+- The narrative endpoint serves the M5 response shape `{ ...doc, visible:
+  false }` (the M5-added `visible` flag confirms the M5 code is live; M4
+  served the doc without it). `Cache-Control: public, max-age=300,
+  s-maxage=600` (edge-cached).
+- The insights document is byte-identical (`generatedAt:
+  2026-10-28T04:20:18.253Z`, 100 readings — zero data changes).
+- **Preview URL** (`?narrative=preview`): the NarrativeBlock renders
+  under the top verdict + under every section header, with the «خلاصهٔ
+  ساده» / "Plain-language summary" label + "Updated today". Verified in
+  EN + FA at 1280px and 360px — FA reads natively with Persian digits +
+  RTL. No AI disclaimer (templates), no "In the news" block (Part 3
+  disabled). The hash-router form works too (D-39 §2). Zero console
+  errors across every variant.
+- **Normal URL** (no marker): renders NOTHING new — zero narrative
+  labels, zero narrative text, zero console errors. The staged rollout
+  gate is closed (`NARRATOR_VISIBLE=false`).
+- **The two-tick populate** (D-38 §3 confirmed live): the 13:50 rung
+  templated 3 units (overall + global + australia); the 14:50 rung
+  completed the document to all 4 sections + overall. The endpoint at
+  14:52 UTC serves all 4 sections + overall, every unit `source:
+  "template"`.
+- **Stats** (`insights:narrator:stats`): `runs: 2`, `skippedUnchanged: 3`,
+  `templateUsed: 5`, `aiValid: 0`, `apiErrors: {}`, `newsAttempted: 0`.
+
+**Evidence**: `docs/insights/screenshots/layer2-m5/` — `preview-en-1280.png`,
+`preview-fa-1280.png`, `preview-fa-360.png`, `preview-en-360.png`,
+`normal-en-1280.png`.
 
 ---
 
