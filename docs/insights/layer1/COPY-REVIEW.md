@@ -848,10 +848,57 @@ batches and are reused by the FX board — not duplicated here (D-11).
 
 ---
 
-## Remaining batches (M3+)
+## Batch 19 — the 7 FX pattern cards (129/129 complete)
 
-— pending — the 7 pattern cards (r1_risk_mood, r2_carry_trade,
-r3_dollar_strength, r4_money_hiding, r5_china_link, r6_europe_worry,
-r7_dollar_or_euro — null-direction per D-09). Then the final
-strict-mode + deploy session (LAYER1_STRICT=1). (Milestone 3 is at
-122/129 unique ids after batch 18.)
+Per D-09: `ifRising`/`ifFalling` are null + `skipReason` on every pattern
+card (they describe a RELATIONSHIP between two/three moving lines, not a
+level). Connections follow the "the legs + one related card" shape (≤3).
+No `australiaAngle` (D-08).
+
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `r1_risk_mood` | oneLine | In calm times the Australian dollar and US stocks usually move together. | — | widely-taught (approved R1 copy: risk currencies and stocks rise together in calm moods) | widely-taught |
+| `r2_carry_trade` | oneLine | A sudden yen surge usually shakes the carry trade and world markets. | — | widely-taught (approved R2 copy: "the carry trade... can hit stock markets worldwide"; term listed: carry-trade) | widely-taught |
+| `r3_dollar_strength` | oneLine | The US dollar and gold usually move in opposite directions. | — | widely-taught (the classic dollar-gold seesaw; approved R3 copy: "a strong dollar usually pressures gold") | widely-taught |
+| `r4_money_hiding` | oneLine | In a scare money usually runs to the US dollar; if it leaves the dollar, gold often shines. | — | widely-taught (approved R4 copy: "when even the dollar is sold, trust is shaky, and gold often rises") | widely-taught |
+| `r5_china_link` | oneLine | China's demand usually moves the Australian dollar and the yuan in mirror-image ways. | — | widely-taught (approved R5 copy: AUD and CNY often weaken together vs the dollar — stated in the pattern's own opposite-direction terms) | widely-taught |
+| `r6_europe_worry` | oneLine | When Europe worries, the euro usually slips against the franc and European companies fall. | — | widely-taught (approved R6 copy: nervous Europeans buy francs, so the euro-franc pair falls; European shares follow) | widely-taught |
+| `r7_dollar_or_euro` | oneLine | EUR/USD moves are either a dollar story or a euro story; this card tells which. | — | definitional (approved R7 copy: "This card tells you which") | widely-taught |
+
+### Connections (batch 19)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `r1_risk_mood` | `audjpy` | The mood leg: a growth currency priced in yen. | reliable | definitional (R1's series) | widely-taught |
+| `r1_risk_mood` | `sp500` | The mood's other leg: America's main company list. | reliable | definitional (R1's series) | widely-taught |
+| `r1_risk_mood` | `eurjpy` | A second yen pair often confirms the same mood. | usually | widely-taught (approved R1 confirmLine: "Confirmed by the euro against the yen") | widely-taught |
+| `r2_carry_trade` | `usdjpy` | The pair this alarm reads. | reliable | definitional (R2's series) | widely-taught |
+| `r2_carry_trade` | `n225` | The stock leg: Japan's main company list. | reliable | definitional (R2's series) | widely-taught |
+| `r2_carry_trade` | `us-japan-10y-gap` | The rate gap that keeps this trade alive. | reliable | widely-taught (approved copy: the carry trade's fuel) | widely-taught |
+| `r3_dollar_strength` | `dollar-basket` | The dollar leg: the dollar against six big currencies. | reliable | definitional (R3's series) | widely-taught |
+| `r3_dollar_strength` | `gold-usd` | The gold leg: the world price of an ounce. | reliable | definitional (R3's series) | widely-taught |
+| `r3_dollar_strength` | `real-yield-10y` | Higher US lending returns often lift the dollar and weigh on gold. | usually | widely-taught (higher real yields raise the opportunity cost of gold) | widely-taught |
+| `r4_money_hiding` | `sp500` | The risk leg: America's main company list. | reliable | definitional (R4's series) | widely-taught |
+| `r4_money_hiding` | `dollar-basket` | The safety leg: the dollar against six currencies. | reliable | definitional (R4's series) | widely-taught |
+| `r4_money_hiding` | `gold-usd` | The second safety leg: the world gold price. | reliable | definitional (R4's series) | widely-taught |
+| `r5_china_link` | `audusd` | One leg: Australia's key pair. | reliable | definitional (R5's series) | widely-taught |
+| `r5_china_link` | `usdcny` | The other leg: the yuan against the dollar. | reliable | definitional (R5's series) | widely-taught |
+| `r5_china_link` | `iron-ore` | The trade behind the link: iron ore, China's biggest import from Australia. | usually | widely-taught (approved R5 copy: China is the biggest buyer of Australia's iron ore) | widely-taught |
+| `r6_europe_worry` | `eurchf` | The money leg: the euro against Switzerland's franc. | reliable | definitional (R6's series) | widely-taught |
+| `r6_europe_worry` | `stoxx50` | The company leg: Europe's main company list. | reliable | definitional (R6's series) | widely-taught |
+| `r6_europe_worry` | `ecb-dfr` | The European Central Bank's rate often steers Europe's mood. | usually | widely-taught (policy rate → growth/mood; term listed: central-bank) | widely-taught |
+| `r7_dollar_or_euro` | `eurusd` | The pair being explained. | reliable | definitional (R7's series) | widely-taught |
+| `r7_dollar_or_euro` | `dollar-basket` | The yardstick that separates the two stories. | reliable | definitional (R7's series) | widely-taught |
+| `r7_dollar_or_euro` | `stoxx50` | A weak-euro story often shows here too. | sometimes | softened co-movement claim | needs-expert-check |
+
+---
+
+## Final status — Milestone 3 complete (129/129)
+
+All 129 unique ids have complete EN+FA Layer-1 copy (133 inventory table
+rows; the 4 shared FX ids counted once). Glossary holds 23 terms in both
+languages (no new terms were needed in M3 — the reused terms:
+leading-indicator on dax, central-bank on eurusd/gbpusd/eurjpy/
+r6_europe_worry, carry-trade on r2_carry_trade). The full strict gate
+(LAYER1_STRICT=1) + the whole per-batch gate list re-run from a clean
+state are the final session's first job (per D-07/D-12), followed by the
+owner's deploy-lock check (docs/DEPLOY.md) and the deploy itself.

@@ -680,7 +680,17 @@ const BUDGETS = [
   // ceiling moves to 1090/258 (projected end + margin). The final
   // strict-mode session re-measures before LAYER1_STRICT=1. Same D-16
   // path. Entry chunk untouched at 295.37/88.84.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1090_000, gz: 258_000, label: 'Insights lazy chunk' },
+  // Layer 1 bump (2026-10-28, M3 batch 19 — the 7 FX pattern cards): the
+  // LAST 29 Layer-1 ids are written (batches 16–19: 16 markets, 6 FX
+  // pairs, 7 null-direction pattern cards + the shared Layer1Block
+  // component + the MarketDetail/PairDetail/PatternCard hooks, D-17).
+  // M3-end measurement 1092.56 kB raw / 256.31 kB gz — the M2 projection
+  // (~1088/257) ran ~4 kB raw light because every pattern card also
+  // carries a skipReason string and 3 connections, and the shared block
+  // component rides the chunk. Ceiling moves to 1100/260 (measured end
+  // + margin); the final strict-mode session re-measures before
+  // LAYER1_STRICT=1. Same D-16 path. Entry chunk untouched at 295.37/88.84.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1100_000, gz: 260_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

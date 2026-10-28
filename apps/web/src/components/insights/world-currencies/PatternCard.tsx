@@ -18,6 +18,7 @@ import {
 } from '../../../lib/fx-presentation';
 import { signedPct } from './display';
 import { Dots13, RebasedChart } from './PatternVisuals';
+import { Layer1Block } from '../layer1/Layer1Block';
 
 /* ------------------------------------------------------------------ *
  * One pattern card (§9.3 item 3): Level 1 row → Level 2 opened → Level 3
@@ -150,6 +151,14 @@ export function PatternCard({
               <bdi>{copy.fx.downgradeCaution}</bdi>
             </p>
           ) : null}
+
+          {/* Layer 1 — the plain-language block for this pattern card (spec
+           * §6, DECISIONS D-17/D-09): oneLine lead + skipReason + the
+           * "no direction" note (ifRising/ifFalling are null — a pattern
+           * describes a relationship, not a level) + connections (the
+           * legs + related cards) + the glossary list. Renders nothing
+           * until the pattern's Layer-1 copy exists (graceful roll-out). */}
+          <Layer1Block id={rule.id} locale={locale} copy={copy} />
 
           {/* Level 3 — one tap deeper (§9.3 item 4): the three meaning lines + the pairs table. */}
           <button

@@ -186,18 +186,18 @@ inventory and enforced by gate G1.
 | ✓ | `gbpusd` | GBP/USD pair |
 | ✓ | `usdchf` | USD/CHF pair |
 | ✓ | `usdcny` | USD/CNY pair (shared with indicators) |
-| · | `audusd` | AUD/USD pair (shared with indicators) |
-| · | `audjpy` | AUD/JPY pair (warning-lights group) |
+| ✓ | `audusd` | AUD/USD pair (shared with indicators) |
+| ✓ | `audjpy` | AUD/JPY pair (warning-lights group) |
 | ✓ | `eurjpy` | EUR/JPY pair (warning-lights group) |
 | ✓ | `eurchf` | EUR/CHF pair (warning-lights group) |
 | ✓ | `audcny` | AUD/CNY pair (china-link group) |
-| · | `r1_risk_mood` | Pattern: AUD/JPY and S&P 500 together (risk mood) |
-| · | `r2_carry_trade` | Pattern: USD/JPY and Nikkei together (carry trade) |
-| · | `r3_dollar_strength` | Pattern: dollar vs gold opposite |
-| · | `r4_money_hiding` | Pattern: S&P 500 vs dollar+gold opposite |
-| · | `r5_china_link` | Pattern: AUD/USD vs USD/CNY opposite |
-| · | `r6_europe_worry` | Pattern: EUR/CHF vs Euro Stoxx 50 together |
-| · | `r7_dollar_or_euro` | Pattern: EUR/USD vs dollar opposite |
+| ✓ | `r1_risk_mood` | Pattern: AUD/JPY and S&P 500 together (risk mood) |
+| ✓ | `r2_carry_trade` | Pattern: USD/JPY and Nikkei together (carry trade) |
+| ✓ | `r3_dollar_strength` | Pattern: dollar vs gold opposite |
+| ✓ | `r4_money_hiding` | Pattern: S&P 500 vs dollar+gold opposite |
+| ✓ | `r5_china_link` | Pattern: AUD/USD vs USD/CNY opposite |
+| ✓ | `r6_europe_worry` | Pattern: EUR/CHF vs Euro Stoxx 50 together |
+| ✓ | `r7_dollar_or_euro` | Pattern: EUR/USD vs dollar opposite |
 
 ## Maintenance
 
