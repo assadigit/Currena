@@ -5,6 +5,53 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-29] — Insights Layer 1 (session 3, Milestone 2): prices and Australia completed
+
+Milestone 2 of the Layer-1 plain-language roll-out: 44 more indicators get
+hand-quality EN+FA plain-language copy (plainName, oneLine, ifRising,
+ifFalling, connections, glossaryTerms; australiaAngle per D-08), written
+EN-first from meaning and Farsi natively. **Milestone 2 ends at 100/129
+unique ids**; the remaining 29 (16 markets + 6 FX pairs + 7 pattern cards)
+are M3, then the strict-mode + deploy session.
+
+- **Batch 9** (5): brent, gold-usd, silver-usd, btc-usd, gold-btc — the
+  prices-board strip; australiaAngle on brent (fuel imports) and gold-usd
+  (AUD conversion), none on the other three per D-08.
+- **Batch 10** (8): us-cpi-yoy, us-pce-core-yoy, euro-hicp,
+  breakeven-5y5y, us-cpi-core-yoy, us-wages, breakeven-10y, t5yie — the
+  inflation half of prices-heat. New glossary term `core-inflation`
+  (تورم هسته‌ای).
+- **Batch 11** (8): wti, natgas, eia-crude-stocks, platinum,
+  gold-oil-ratio, food-index, wheat, maize — prices-heat complete
+  (16/16).
+- **Batch 12** (6): au-cpi, au-trimmed-mean, au-10y, rba-expectations,
+  au-us-10y-gap, au-petrol-yoy — au-inflation-rates complete. New
+  glossary term `trimmed-mean` (میانگین برش‌خورده).
+- **Batch 13** (6): rba-cash-rate, au-unemployment, au-wage-growth,
+  au-rent-yoy, au-home-loan, au-deposit-rate.
+- **Batch 14** (5): au-home-values, au-household-debt-arrears,
+  au-housing-finance, au-job-vacancies, au-saving-ratio — au-households
+  complete (11/11).
+- **Batch 15** (6): audusd, audjpy (both shared FX ids — one entry each,
+  reused by the FX board), terms-of-trade, rba-fed-gap, gold-aud,
+  iron-ore — au-trade-currency complete (6/6), and all 23 AU indicators
+  carry australiaAngle (D-08).
+- Glossary grows 21 → 23 terms (core-inflation, trimmed-mean, both
+  languages). Jargon-null terms written around: no "CPI"/"PCE"/"HICP"
+  acronyms in Layer-1 copy, "inventories" → "oil in America's tanks",
+  "terms of trade" → "export prices versus import prices" (the FA term
+  نسبت مبادله contains the banned نسبت substring; the approved card
+  name is used instead).
+- Budget: the Insights lazy ceiling bumps 985/236 → 1090/258 kB across
+  the session (measured at the M2 end: 1047.65/248.08; the D-16 path —
+  bundled static copy, zero KV/external calls; entry chunk untouched at
+  295.37/88.85; the M3/final session re-measures the same documented
+  way).
+- Gates (every batch): layer1 vitest green (6167 tests at the M2 end),
+  typecheck, lint, copy:audit clean (manifest grown to 4209 entries, all
+  layer1 round), bundle budget held, render-checked EN+FA at 1280/360px
+  (screenshots in docs/insights/screenshots/layer1-m2-batch*/).
+
 ## [2026-10-28c] — Insights Layer 1 (session 2, Milestone 1): borrowing-costs, dollar-strength, growth-health and market-stress completed
 
 Milestone 1 of the Layer-1 plain-language roll-out

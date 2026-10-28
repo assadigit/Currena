@@ -655,7 +655,63 @@ _(market-stress is now complete at 10/10; M1 ends at 56/129 unique ids)_
 
 ---
 
-## Remaining batches (M2+)
+## Batch 15 — au-trade-currency (6 indicators) — Milestone 2 complete
+
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `audusd` | ifRising | A stronger AUD usually means cheaper imports and overseas travel for Australians. | — | widely-taught (approved copy same claim) | widely-taught |
+| `audusd` | ifFalling | A weaker AUD usually means dearer imports and travel, cheaper exports abroad. | — | widely-taught (approved copy same claim) | widely-taught |
+| `audjpy` | ifRising | A firm AUD vs yen usually means cheaper Japan travel; risk appetite builds. | — | widely-taught (approved copy: travel + carry logic) | widely-taught |
+| `audjpy` | ifFalling | A fast fall is the classic world de-risking signal as borrowed yen rushes home. | — | widely-taught (approved copy: "the classic world de-risking signal") | widely-taught |
+| `terms-of-trade` | ifRising | Export prices beating import prices make the country richer without shipping more. | — | widely-taught (approved copy verbatim) | widely-taught |
+| `terms-of-trade` | ifFalling | Import prices winning squeezes national income, budgets and the dollar. | — | widely-taught (approved copy same claim) | widely-taught |
+| `rba-fed-gap` | ifRising | A wider AU-premium gap usually draws carry money toward the AUD. | — | widely-taught (approved copy: carry money tends to flow in) | widely-taught |
+| `rba-fed-gap` | ifFalling | AU rates below US rates usually push money toward the higher US yield, weakening the AUD. | — | widely-taught (approved copy: money tends to leave for the higher yield) | widely-taught |
+| `gold-aud` | ifRising | Gold priced dearer in AUD usually means dearer coins, jewellery and local metal. | — | widely-taught (approved copy same claim) | widely-taught |
+| `gold-aud` | ifFalling | Gold cheaper in AUD is the rare local discount. | — | widely-taught (approved copy: "the local metal at a rare discount") | widely-taught |
+| `iron-ore` | ifRising | Dearer iron ore usually fattens mining jobs, profits and government budgets. | — | widely-taught (approved copy same claim) | widely-taught |
+| `iron-ore` | ifFalling | Cheaper iron ore pressures mining profits, budgets and the dollar. | — | widely-taught (approved copy same claim) | widely-taught |
+
+### Connections (batch 15)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `audusd` | `rba-fed-gap` | The rate gap between the two central banks pulls this pair. | reliable | widely-taught: the policy-gap channel (approved copy) | widely-taught |
+| `audusd` | `iron-ore` | Commodity booms usually lift the Australian dollar. | usually | widely-taught (approved copy: sustained AUD strength with commodity booms) | widely-taught |
+| `audusd` | `dollar-basket` | This pair is one thread in the dollar's overall strength. | usually | definitional-adjacent (the AUD is one of the basket's reference currencies) | widely-taught |
+| `audjpy` | `us-japan-10y-gap` | The US-Japan rate gap keeps the carry trade alive behind this pair. | reliable | widely-taught (approved copy: "Australian dollars are held for their yield while the yen funds that carry") | widely-taught |
+| `audjpy` | `audusd` | The dollar's own strength often shows up here too. | usually | widely-taught | widely-taught |
+| `audjpy` | `boj-rate` | The Bank of Japan anchors the yen side. | usually | widely-taught (approved copy: both central banks' policies move it) | widely-taught |
+| `terms-of-trade` | `iron-ore` | Iron ore is the biggest export weight in this measure. | reliable | definitional (approved copy: Australia's single biggest export) | widely-taught |
+| `terms-of-trade` | `audusd` | Export-vs-import strength usually steers the dollar over the years. | usually | widely-taught (approved copy: the gap steers the Australian dollar) | widely-taught |
+| `rba-fed-gap` | `audusd` | This gap is a key pull on the key pair. | reliable | widely-taught (approved copy: read beside the AUD/USD card) | widely-taught |
+| `rba-fed-gap` | `rba-cash-rate` | The RBA side of the gap. | reliable | definitional | widely-taught |
+| `rba-fed-gap` | `fed-target` | The Fed side. | reliable | definitional | widely-taught |
+| `gold-aud` | `gold-usd` | The world price is the main ingredient of the local one. | reliable | definitional (approved copy: live ounce × AUD rate) | widely-taught |
+| `gold-aud` | `audusd` | A weaker local dollar usually makes gold dearer in Australia. | reliable | definitional (approved copy: either can move it) | widely-taught |
+| `iron-ore` | `terms-of-trade` | Iron ore is the biggest weight in Australia's export prices. | reliable | definitional | widely-taught |
+| `iron-ore` | `china-pmi` | Chinese factory strength usually drives this demand. | usually | widely-taught (approved copy: China's cycle dominates) | widely-taught |
+| `iron-ore` | `audusd` | The dollar often rides on iron-ore fortunes. | usually | widely-taught (approved copy: a big swing factor in the AUD) | widely-taught |
+
+### Australia angle (batch 15)
+| id | claim | basis | status |
+|---|---|---|---|
+| `audusd` | Australia's key pair: prices imports, exports and travel in one number. | approved copy verbatim | widely-taught |
+| `audjpy` | A watched world risk barometer, and the rate for Australian travel and shopping in Japan. | approved copy ("a watched risk barometer"; "the rate that matters for Australian travel and shopping in Japan") | widely-taught |
+| `terms-of-trade` | Mining booms lift Australian budgets, jobs and the dollar together. | approved copy (mining booms sent it soaring) | widely-taught |
+| `rba-fed-gap` | The short-term money pull between the two dollars; a wide gap either way usually moves the AUD. | approved copy (the policy-setting gap that drives short-term carry flows) | widely-taught |
+| `gold-aud` | For coins, jewellery and metal funds priced in Australia, this is the real price, not the US-dollar one. | approved copy verbatim | widely-taught |
+| `iron-ore` | Iron ore funds miners, budgets and the export-price story; China's building cycle dominates demand. | approved copy ("funds Australian miners, budgets and the broader terms of trade"; "China's property and stimulus cycle dominates") | widely-taught |
+
+---
+
+## Remaining batches (M3+)
+
+— pending — the 16 world stock markets, the remaining 6 FX pairs (eurusd,
+gbpusd, usdchf, eurjpy, eurchf, audcny; usdjpy/usdcny/audusd/audjpy are
+already done as shared ids), and the 7 pattern cards (null-direction per
+D-09). Then the final strict-mode + deploy session (LAYER1_STRICT=1).
+(Milestone 2 ended at 100/129 unique ids.)
+
 
 — pending — prices-board (5), prices-heat (16), AU indicators (23), 16 world
 stock markets, the remaining FX pairs + the 7 pattern cards (null-direction

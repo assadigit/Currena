@@ -1350,6 +1350,84 @@ const LAYER1 = {
       australiaAngle: 'The hunkering-down gauge: when uncertainty rises, Australian households save more and spend less first.',
       glossaryTerms: [],
     },
+
+    /* ----- Batch 15 — au-trade-currency (6) ----- */
+    audusd: {
+      plainName: 'The Australian dollar rate',
+      oneLine: 'How many US dollars one Australian dollar buys.',
+      ifRising: 'Imports and overseas travel usually get cheaper for Australians.',
+      ifFalling: 'Imports and travel usually get dearer, while exports earn more abroad.',
+      connections: [
+        { with: 'rba-fed-gap', text: 'The rate gap between the two central banks pulls this pair.', strength: 'reliable' },
+        { with: 'iron-ore', text: 'Commodity booms usually lift the Australian dollar.', strength: 'usually' },
+        { with: 'dollar-basket', text: 'This pair is one thread in the dollar’s overall strength.', strength: 'usually' },
+      ],
+      australiaAngle: 'Australia’s key pair: it prices imports, exports and overseas travel in one number.',
+      glossaryTerms: ['central-bank', 'commodity'],
+    },
+    audjpy: {
+      plainName: 'The Australian dollar in yen',
+      oneLine: 'How many Japanese yen one Australian dollar buys.',
+      ifRising: 'Travel to Japan usually gets cheaper for Australians, and risk appetite usually builds.',
+      ifFalling: 'A fast fall is the classic world de-risking signal, as borrowed yen rushes home.',
+      connections: [
+        { with: 'us-japan-10y-gap', text: 'The US-Japan rate gap keeps the carry trade alive behind this pair.', strength: 'reliable' },
+        { with: 'audusd', text: 'The dollar’s own strength often shows up here too.', strength: 'usually' },
+        { with: 'boj-rate', text: 'The Bank of Japan anchors the yen side.', strength: 'usually' },
+      ],
+      australiaAngle: 'A watched world risk barometer, and the rate that matters for Australian travel and shopping in Japan.',
+      glossaryTerms: ['carry-trade', 'central-bank'],
+    },
+    'terms-of-trade': {
+      plainName: 'Export prices versus import prices',
+      oneLine: 'Whether Australia’s export prices beat its import prices.',
+      ifRising: 'The country usually gets richer without shipping anything more.',
+      ifFalling: 'National income usually squeezes, along with budgets and the dollar.',
+      connections: [
+        { with: 'iron-ore', text: 'Iron ore is the biggest export weight in this measure.', strength: 'reliable' },
+        { with: 'audusd', text: 'Export-versus-import strength usually steers the dollar over the years.', strength: 'usually' },
+      ],
+      australiaAngle: 'Mining booms send it soaring and lift Australian budgets, jobs and the dollar together.',
+      glossaryTerms: [],
+    },
+    'rba-fed-gap': {
+      plainName: 'The RBA-Fed rate gap',
+      oneLine: 'How far Australia’s main rate sits above or below America’s.',
+      ifRising: 'The carry trade usually earns more here, drawing money toward the Australian dollar.',
+      ifFalling: 'Money usually leaves for the higher US yield, weighing on the Australian dollar.',
+      connections: [
+        { with: 'audusd', text: 'This gap is a key pull on the key pair.', strength: 'reliable' },
+        { with: 'rba-cash-rate', text: 'The RBA side of the gap.', strength: 'reliable' },
+        { with: 'fed-target', text: 'The Fed side.', strength: 'reliable' },
+      ],
+      australiaAngle: 'The short-term money pull between the two dollars: a wide gap either way usually moves the AUD.',
+      glossaryTerms: ['carry-trade', 'yield'],
+    },
+    'gold-aud': {
+      plainName: 'Gold in Australian dollars',
+      oneLine: 'The world gold price, converted into Australian dollars.',
+      ifRising: 'Coins, jewellery and local metal usually cost more in Australia.',
+      ifFalling: 'Local buyers usually get the rare discount on the metal.',
+      connections: [
+        { with: 'gold-usd', text: 'The world price is the main ingredient of the local one.', strength: 'reliable' },
+        { with: 'audusd', text: 'A weaker local dollar usually makes gold dearer in Australia.', strength: 'reliable' },
+      ],
+      australiaAngle: 'For coins, jewellery and metal funds priced in Australia, this is the real price, not the US-dollar one.',
+      glossaryTerms: [],
+    },
+    'iron-ore': {
+      plainName: 'Australia’s biggest export',
+      oneLine: 'The world price of iron ore, Australia’s single biggest export.',
+      ifRising: 'Mining jobs, company profits and government budgets usually fatten.',
+      ifFalling: 'Pressure usually builds on mining profits, budgets and the dollar.',
+      connections: [
+        { with: 'terms-of-trade', text: 'Iron ore is the biggest weight in Australia’s export prices.', strength: 'reliable' },
+        { with: 'china-pmi', text: 'Chinese factory strength usually drives this demand.', strength: 'usually' },
+        { with: 'audusd', text: 'The dollar often rides on iron-ore fortunes.', strength: 'usually' },
+      ],
+      australiaAngle: 'Iron ore funds Australian miners, budgets and the broader export-price story, and China’s building cycle dominates its demand.',
+      glossaryTerms: [],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 

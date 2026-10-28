@@ -669,7 +669,18 @@ const BUDGETS = [
   // the M2 end; ceiling moves to 1045/248 (M2 projected end + margin).
   // Same D-16 path: bundled static copy, zero KV/external calls. Entry
   // chunk untouched at 295.37/88.84.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1045_000, gz: 248_000, label: 'Insights lazy chunk' },
+  // Layer 1 bump (2026-10-29, M2 final — au-trade-currency): Milestone 2
+  // complete (100/129 unique ids: prices-board, prices-heat and all three
+  // AU gauges done; batches 9–15). M2-final measurement 1047.65 kB raw /
+  // 248.08 kB gz — the batch-9 projection (~1043/247) ran ~4 kB raw light
+  // because the AU cards carry australiaAngle lines and 2–3 connections
+  // each. M3 remains: 16 markets + 6 FX pairs + 7 pattern cards (29 ids,
+  // mostly lighter entries — no australiaAngle, several null-direction
+  // patterns) projecting ~+40 raw / +9 gz → ~1088/257 at the L1 end;
+  // ceiling moves to 1090/258 (projected end + margin). The final
+  // strict-mode session re-measures before LAYER1_STRICT=1. Same D-16
+  // path. Entry chunk untouched at 295.37/88.84.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1090_000, gz: 258_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

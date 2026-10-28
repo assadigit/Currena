@@ -151,12 +151,12 @@ inventory and enforced by gate G1.
 #### `au-trade-currency` gauge (6)
 | L1 | id | official name | what it measures |
 |---|---|---|---|
-| · | `audusd` | AUD/USD | The Australian dollar in US dollars. |
-| · | `audjpy` | AUD/JPY | The Australian dollar in Japanese yen. |
-| · | `terms-of-trade` | Terms of trade | Australia's export prices divided by import prices. |
-| · | `rba-fed-gap` | RBA−Fed policy rate gap | The gap between the RBA cash rate and the Fed target rate. |
-| · | `gold-aud` | Gold price in AUD | The gold spot price in Australian dollars. |
-| · | `iron-ore` | Iron ore price | The iron-ore price (a key Australian export). |
+| ✓ | `audusd` | AUD/USD | The Australian dollar in US dollars. |
+| ✓ | `audjpy` | AUD/JPY | The Australian dollar in Japanese yen. |
+| ✓ | `terms-of-trade` | Terms of trade | Australia's export prices divided by import prices. |
+| ✓ | `rba-fed-gap` | RBA−Fed policy rate gap | The gap between the RBA cash rate and the Fed target rate. |
+| ✓ | `gold-aud` | Gold price in AUD | The gold spot price in Australian dollars. |
+| ✓ | `iron-ore` | Iron ore price | The iron-ore price (a key Australian export). |
 
 ## B. The 16 world stock indices (markets board)
 | L1 | id | name | group |
