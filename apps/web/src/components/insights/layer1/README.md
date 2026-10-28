@@ -50,6 +50,18 @@ full-completeness half of G1 is advisory during the batched roll-out and
 hard-fails only when `LAYER1_STRICT=1` (set in the final session — see
 DECISIONS D-07).
 
+## Rendering (D-17)
+
+- Indicator cards: the DetailsPanel block (D-04/D-05) — `oneLine` on the
+  collapsed face, the grouped block in the expanded panel.
+- Markets, FX pairs, FX pattern cards: the shared generic `Layer1Block`
+  component in this folder — oneLine lead, ifRising/ifFalling (emphasis =
+  the surface's own normal-lens change sign: `chg3m` for markets, `chg.m1`
+  for pairs), skipReason + the `noDirection` note for the null-direction
+  pattern cards (D-09), connections (names resolved across surfaces),
+  optional australiaAngle, the glossary list. Renders nothing for an id
+  with no copy yet.
+
 ## Leave-behind for Layer 2
 
 > Layer 2 will pass the model the computed indicator state plus the glossary

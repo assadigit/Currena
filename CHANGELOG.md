@@ -5,6 +5,60 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-29] — Insights Layer 1 (session 4, Milestone 3): markets, currencies and patterns complete — 129/129
+
+Milestone 3 of the Layer-1 plain-language roll-out: the LAST 29 ids get
+hand-quality EN+FA plain-language copy, written EN-first from meaning
+and Farsi natively. **The Layer-1 roll-out is COMPLETE at 129/129 unique
+ids** (133 inventory rows; the 4 shared FX ids counted once, reused by
+the FX board). The final session runs `LAYER1_STRICT=1` + the whole
+gate list + the owner's deploy-lock check (docs/DEPLOY.md) and deploys.
+
+- **Batch 16** (7): n225, asx200, kospi, hsi, ssec, taiex, nifty50 —
+  the Asia-Pacific markets. New shared display hook: the generic
+  `layer1/Layer1Block.tsx` (D-17) renders the Layer-1 block in the
+  market detail panels (after the approved what/why/you, before the
+  chart; direction emphasis = the 3-month change, the section's own
+  normal lens).
+- **Batch 17** (8): stoxx50, dax, cac, ftse, sp500, ndx, dow, tsx —
+  Europe + Americas A. dax lists the existing `leading-indicator`
+  glossary term (EN "leading indicator" / FA «شاخص پیشرو»).
+- **Batch 18** (7): ibov, eurusd, gbpusd, usdchf, eurjpy, eurchf,
+  audcny — the last market + the 6 remaining FX pairs. The
+  `Layer1Block` rides the FX pair detail panels too (direction
+  emphasis = the 1-month change, the rules' alarm lens). Shared-id
+  reuse verified live (the AUD/JPY pair row renders the batch-15
+  entry — one entry per id across surfaces, D-11).
+- **Batch 19** (7): r1_risk_mood, r2_carry_trade, r3_dollar_strength,
+  r4_money_hiding, r5_china_link, r6_europe_worry, r7_dollar_or_euro —
+  the pattern cards: ifRising/ifFalling null + skipReason per D-09
+  (a pattern is a relationship, not a level); the block renders in
+  the cards' Level-2 panel with the "no direction" note.
+- No new glossary terms were needed (23 terms in both languages
+  unchanged); M3 entries reuse existing entries only: leading-indicator
+  (dax), central-bank (eurusd, gbpusd, eurjpy, r6_europe_worry — the
+  FA «بانک مرکزی ...» phrase triggers the term), carry-trade (r2).
+- Market plain names drop the membership digits in the NEW copy only
+  (Nikkei 225 → "Japan's biggest companies" / «نیکی»; D-18) — G6 bans
+  digits in new fields and the counts are jargon to the target reader;
+  the official names stay on the tiles/tables/panels (approved copy).
+- DECISIONS: D-17 (the shared Layer1Block + the per-surface direction
+  lens + oneLine/plainName rendering choices), D-18 (digit-free plain
+  names) appended.
+- Budget: the Insights lazy ceiling bumps 1090/258 → 1100/260 kB (the
+  D-16 path; measured at the M3 end 1092.56/256.31 — every pattern
+  card also carries a skipReason + 3 connections, and the shared block
+  component rides the chunk; entry chunk untouched at 295.37/88.84).
+- Gates (every batch + the final clean-state strict run):
+  `LAYER1_STRICT=1` layer1 vitest green (7809 tests), full suite
+  green (core 191, scraper 67, insights 677, markets 13, api 344, web
+  8525), typecheck, lint, copy:audit clean (manifest grown to 4546
+  entries, all layer1 round), bundle budget held, render-checked EN+FA
+  at 1280/360px on all four surfaces (indicator card, market tile
+  detail, FX pair panel, pattern card; screenshots noted in the
+  session worklog). Free-tier safety holds: zero KV operations, zero
+  external calls added (G10).
+
 ## [2026-10-29] — Insights Layer 1 (session 3, Milestone 2): prices and Australia completed
 
 Milestone 2 of the Layer-1 plain-language roll-out: 44 more indicators get

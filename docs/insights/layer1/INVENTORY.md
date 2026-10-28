@@ -206,3 +206,9 @@ When an indicator is added/removed/renamed in
 this table, `LAYER1_INDICATOR_IDS`, and the Layer-1 copy must all move
 together (gate G1 fails otherwise — by design, so a new indicator can
 never ship without its plain-language copy).
+
+**Status: COMPLETE (2026-10-28, Milestone 3).** All 133 table rows carry
+✓ — all 129 unique ids have EN+FA Layer-1 copy. `LAYER1_STRICT=1` passes
+(the full-completeness gate is now hard-enforced by the final session's
+run). The roll-out is finished; from here on G1 protects the inventory
+on every commit.
