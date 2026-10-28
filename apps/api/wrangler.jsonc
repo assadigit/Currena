@@ -44,27 +44,34 @@
   "vars": {
     "SITE_MODE": "public",
     // ---- The Layer-2 narrator (M4, spec §9) ----
-    // The kill switch: 'false' = template narratives only (no model calls
-    // at all — also the behaviour whenever GEMINI_API_KEY is unset).
-    // The staged rollout (D-34): 'false' = generated + stored, shown only
-    // at ?narrative=preview until the owner flips it (one command, see
-    // docs/DEPLOY.md "The Gemini key").
-    // Part 3 (news) ships DISABLED (D-29: the grounding terms' display
-    // requirements are not implemented; the flag exists so a later
-    // session can enable it after reading the current ToS in full).
-    // GEMINI_API_KEY is a SECRET — set with `pnpm narrator:set-key`,
-    // NEVER a var here (spec §10).
-    "NARRATOR_ENABLED": "false",
-    "NARRATOR_VISIBLE": "false",
+    // D-42 + follow-up — the narrator is ENABLED in production on the
+    // Cloudflare Workers AI binding (no token, no secret, no region risk
+    // — auth is implicit via the `ai` binding below). The owner's "much
+    // much much weaker than my worst imagination" complaint traced to
+    // NARRATOR_ENABLED=false → the cron never wrote the narrative doc →
+    // the page showed nothing (or a stale localStorage cache of the
+    // pre-D-42 template). With the binding + D-42's enriched STATE
+    // (value/delta/context on every SectionAlert) + the D-42 prompts that
+    // instruct the model to weave those facts into cohesive paragraphs,
+    // the hourly :50 rung now produces real AI narrative, validated by
+    // V1–V10, falling back to the (also D-42-enriched) template only on
+    // two validation failures. Part 3 (news) stays DISABLED on the
+    // cloudflare path (workers-ai has no google-search grounding).
+    "NARRATOR_ENABLED": "true",
+    "NARRATOR_VISIBLE": "true",
     "NARRATOR_WEB_CONTEXT": "false",
     "NARRATOR_WEB_DAILY_CAP": "20",
-    "NARRATOR_MODEL": "gemini-3.5-flash-lite",
-    // D-41 — the model provider. Default 'gemini' (the M3 REST client + the
-    // GEMINI_API_KEY secret). Flip to 'cloudflare' to use the Workers AI
-    // binding below (no token, no secret, no region risk — auth is implicit).
-    // The cloudflare path clamps NARRATOR_WEB_CONTEXT to false (workers-ai
-    // has no google-search grounding → Part 3 stays disabled).
-    "NARRATOR_PROVIDER": "gemini"
+    // D-41 §3 — the re-verified Workers AI pick: clean native Farsi, 0%
+    // Latin, correct half-spaces, ~4s, ~50 neurons/call. The cron's
+    // narratorFlagsOf honours an explicit '@cf/...' override; pinning it
+    // here keeps the deploy self-documenting.
+    "NARRATOR_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    // D-41 — 'cloudflare' = the Workers AI binding (env.AI). The binding
+    // authenticates implicitly via the Cloudflare account; NO API token
+    // is stored anywhere. The cloudflare path clamps NARRATOR_WEB_CONTEXT
+    // to false (workers-ai has no google-search grounding → Part 3 stays
+    // disabled).
+    "NARRATOR_PROVIDER": "cloudflare"
   },
   // D-41 — the Workers AI binding (active only when NARRATOR_PROVIDER=cloudflare).
   // Authenticates IMPLICITLY via the Cloudflare account; NO API token is stored

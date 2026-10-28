@@ -293,7 +293,7 @@ for (const bad of BAD_NEWS) {
  *     tests pin the texts)
  * ------------------------------------------------------------------ */
 
-check('prompt version is pinned', PROMPT_VERSION === 2);
+check('prompt version is pinned', PROMPT_VERSION === 4);
 check('section/overall prompts compose the base rules', sectionSystemPrompt().includes('Hard rules:') && overallSystemPrompt().includes('Hard rules:'));
 check('news prompt is standalone (no JSON-only rule)', !newsSystemPrompt().includes('Output only JSON'));
 check('systemPromptFor routes units', systemPromptFor({ kind: 'overall' }) === overallSystemPrompt());

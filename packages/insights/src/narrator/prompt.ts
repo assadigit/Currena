@@ -26,8 +26,27 @@ import type { OverallNarrationState } from './overall-state';
 import type { NarratorVocabulary } from './vocabulary';
 import type { NarratorUnit } from './validate';
 
-/** The prompt version (spec §6: versioned). Bump on ANY prompt change. */
-export const PROMPT_VERSION = 2;
+/** The prompt version (spec §6: versioned). Bump on ANY prompt change.
+ *
+ * v3 (D-42 follow-up): rule 6 now explicit about `STATE.excluded.length`
+ * (empty → NEVER mention out-of-date data; non-empty → exactly one short
+ * clause) — the v2 phrasing let the model always say "some data is out
+ * of date" even when the section had no excluded items, failing V10 on
+ * every section. Rule 7 adds the per-sentence 28-word cap (the validator
+ * already enforced it; the prompt now tells the model). Rule 8 requires
+ * the Persian decimal separator ٫ (write ۵٫۲۸, never ۵.۲۸ — the ASCII
+ * period between Persian digits tripped V2's sentence splitter) and
+ * expands the Latin allow-list with the market index names the model
+ * naturally reaches for (Kospi, Cac, Hsi, Nikkei, Dax, FTSE, Dow,
+ * Nasdaq, etc.) so the FA side can name them without a V6 hit.
+ * v4 (D-42 follow-up 2): rule 8 now EXPLICITLY scopes Persian digits to
+ * the FARSI output and ASCII digits to the ENGLISH output — the v3
+ * phrasing let the model use Persian digits (۰-۹) in English too,
+ * failing V9 ("Persian script in the English text"). Same idea, clearer
+ * boundary. Also adds a CJK-script ban to V9 (the model occasionally
+ * hallucinated a Chinese character 借 in the Farsi output; V9's
+ * Persian-vs-Latin count was blind to it). */
+export const PROMPT_VERSION = 4;
 
 /* ------------------------------------------------------------------ *
  * §6.1 — the shared base rules (included in A-section and A-overall)
@@ -41,9 +60,9 @@ Hard rules:
 3. Never advise. Never say buy, sell, invest, should or must. Never predict. Use hedged words: usually, often, tends to.
 4. Any verdict label in STATE is given. Do not contradict, soften or exaggerate it. Describe it calmly in everyday words. No alarm, no drama.
 5. Use plain words and the plain names from VOCABULARY. If you must use a term from GLOSSARY, explain it in the same sentence with its plain definition. Never use other finance jargon.
-6. If STATE lists excluded items, say once, in one short clause, that some data is out of date and left out. Never state values of excluded items. For monthly items, say "latest monthly reading".
-7. Short sentences, one idea each. Never name an indicator that is not in STATE.
-8. Write the Farsi natively, as a clear Iranian finance explainer would for ordinary readers: spoken-formal register, Persian digits, correct half-spaces, no Latin letters except allowed symbols (VIX, S&P, ASX, ECB, RBA, USD, AUD, EUR, JPY, CNY, BTC, PMI). It must say the same thing as the English, not mirror its sentences.
+6. Count the items in STATE.excluded. If the array is empty, NEVER mention out-of-date data. If it is non-empty, include exactly ONE short clause saying some data is out of date and was left out — never state the values of excluded items. For monthly items, say "latest monthly reading".
+7. Short sentences, one idea each, at most 28 words per sentence. Never name an indicator that is not in STATE.
+8. Write the Farsi natively, as a clear Iranian finance explainer would for ordinary readers: spoken-formal register, correct half-spaces, no em dash, no double spaces. In the FARSI output use Persian digits (۰-۹) with the Persian decimal separator ٫ (write ۵٫۲۸, never 5.28 or ۵.۲۸), and no Latin letters except allowed symbols (VIX, S&P, ASX, Nikkei, Kospi, HSI, SSE, Taiex, Nifty, Stoxx, Dax, CAC, FTSE, Nasdaq, Dow, TSX, Bovespa, ECB, RBA, USD, AUD, EUR, JPY, CNY, BTC, PMI, GDP, CPI, NFP, HICP, CAPE, SOFR, WPI, DXY, EPU, GPR, NBS, EIA, CFTC, OECD, MOF, BOJ, BOE, FRED). In the ENGLISH output use ASCII digits with the ASCII decimal point (write 5.28, never ۵٫۲۸). The Farsi must say the same thing as the English, not mirror its sentences.
 9. Output only JSON matching {"en": string, "fa": string}. No markdown, no extra text.`;
 
 /* ------------------------------------------------------------------ *
@@ -54,7 +73,7 @@ export const SECTION_TASK = `TASK: Explain what this one section shows today as 
 
 Open with the big picture of the section in everyday words (calm, mixed or under pressure, from the tier counts and any verdict label in STATE). Then weave in the readings the section actually flags — name at most two or three, and for each that carries one, use its level (STATE alerts carry value, valueUnit, delta, context; e.g. "US 10-year yield sits at 5.0 percent, down 0.17 points over 30 days", or "the Kospi is 38 percent below its yearly high"). When two or more related ids share the section and VOCABULARY carries a connection (ifRising, ifFalling, connections), draw that connection in the same paragraph — never invent a relationship VOCABULARY does not state.
 
-Use plain words and the plain names from VOCABULARY. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. End with one short clause if STATE lists excluded items. Weave the numbers into the prose — do not list them.`;
+Use plain words and the plain names from VOCABULARY. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. Mention out-of-date data only when STATE.excluded is non-empty (one short clause). Weave the numbers into the prose — do not list them.`;
 
 /* ------------------------------------------------------------------ *
  * §6.3 — the overall task (A-overall = base rules + this)
@@ -64,7 +83,7 @@ export const OVERALL_TASK = `TASK: Write the overall summary of the whole page a
 
 Open by stating the page's verdicts in everyday words (each section's verdict label rides in STATE with its counts; e.g. "Global reads Stressed, with 9 of 32 scored indicators in warning"). Then name one or two themes that stand out across sections, using only STATE and VOCABULARY — when an alert in one section carries a level (value, delta, context), use its actual number to anchor the theme (e.g. "the US 10-year yield sits at 5.0 percent, down 0.17 points over 30 days", "the Kospi is 38 percent below its yearly high", or "EUR/CHF moved 2.2 percent in a month"). Draw a connection between two sections only when VOCABULARY states one (ifRising, ifFalling, connections) — never invent one.
 
-End with one sentence reminding the reader this explains data and is not a recommendation. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. Weave the verdicts and the numbers into the prose — do not list them.`;
+End with one sentence reminding the reader this explains data and is not a recommendation. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. Mention out-of-date data only when STATE.excluded is non-empty (one short clause). Weave the verdicts and the numbers into the prose — do not list them.`;
 
 /* ------------------------------------------------------------------ *
  * §6.4 — the news-context prompt (call type B; standalone — no base

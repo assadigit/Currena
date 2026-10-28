@@ -298,8 +298,18 @@ function toneViolations(text: string, lang: 'en' | 'fa', tone: Tone): string[] {
 
 const PERSIAN_LETTER = /[\u0600-\u06FF]/g;
 const LATIN_LETTER = /[A-Za-z]/g;
+// CJK + Hiragana/Katakana + Hangul — the Workers AI model occasionally
+// hallucinates a Chinese character (e.g. 借 for "قرض"/borrow) in the Farsi
+// output. V9's Persian-vs-Latin count is blind to it (Chinese is neither),
+// so a broken Farsi text like "هزینه ی 借ری ۱۰ ساله" passed V9. This ban
+// catches any CJK/Hangul/kana code-point in either language's text.
+const CJK_SCRIPT = /[\u4E00-\u9FFF\u3040-\u30FF\uAC00-\uD7AF\u3400-\u4DBF]/g;
 
 function languageViolations(text: string, lang: 'en' | 'fa'): string | null {
+  const cjk = text.match(CJK_SCRIPT) ?? [];
+  if (cjk.length > 0) {
+    return `CJK characters in the ${lang === 'fa' ? 'Farsi' : 'English'} text (${cjk.length}: ${cjk.slice(0, 5).join(' ')})`;
+  }
   const persian = (text.match(PERSIAN_LETTER) ?? []).length;
   const latin = (text.match(LATIN_LETTER) ?? []).length;
   if (lang === 'en') {

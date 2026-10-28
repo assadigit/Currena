@@ -42,7 +42,7 @@ function loadState(scenario: string): { unit: NarratorUnit; state: PromptState }
 
 describe('M2 prompt — the pinned texts', () => {
   it('PROMPT_VERSION is a positive integer (bump on ANY prompt change)', () => {
-    expect(PROMPT_VERSION).toBe(2);
+    expect(PROMPT_VERSION).toBe(4);
   });
 
   it('the base rules carry the spec\u2019s nine hard rules verbatim', () => {
@@ -52,8 +52,8 @@ describe('M2 prompt — the pinned texts', () => {
     expect(BASE_RULES).toContain('3. Never advise. Never say buy, sell, invest, should or must.');
     expect(BASE_RULES).toContain('4. Any verdict label in STATE is given.');
     expect(BASE_RULES).toContain('5. Use plain words and the plain names from VOCABULARY.');
-    expect(BASE_RULES).toContain('6. If STATE lists excluded items, say once, in one short clause');
-    expect(BASE_RULES).toContain('7. Short sentences, one idea each.');
+    expect(BASE_RULES).toContain('6. Count the items in STATE.excluded.');
+    expect(BASE_RULES).toContain('7. Short sentences, one idea each, at most 28 words per sentence');
     expect(BASE_RULES).toContain('8. Write the Farsi natively');
     expect(BASE_RULES).toContain('9. Output only JSON matching {"en": string, "fa": string}.');
     // the full pinned text (spec §6.1 verbatim)
@@ -66,9 +66,9 @@ describe('M2 prompt — the pinned texts', () => {
       3. Never advise. Never say buy, sell, invest, should or must. Never predict. Use hedged words: usually, often, tends to.
       4. Any verdict label in STATE is given. Do not contradict, soften or exaggerate it. Describe it calmly in everyday words. No alarm, no drama.
       5. Use plain words and the plain names from VOCABULARY. If you must use a term from GLOSSARY, explain it in the same sentence with its plain definition. Never use other finance jargon.
-      6. If STATE lists excluded items, say once, in one short clause, that some data is out of date and left out. Never state values of excluded items. For monthly items, say "latest monthly reading".
-      7. Short sentences, one idea each. Never name an indicator that is not in STATE.
-      8. Write the Farsi natively, as a clear Iranian finance explainer would for ordinary readers: spoken-formal register, Persian digits, correct half-spaces, no Latin letters except allowed symbols (VIX, S&P, ASX, ECB, RBA, USD, AUD, EUR, JPY, CNY, BTC, PMI). It must say the same thing as the English, not mirror its sentences.
+      6. Count the items in STATE.excluded. If the array is empty, NEVER mention out-of-date data. If it is non-empty, include exactly ONE short clause saying some data is out of date and was left out — never state the values of excluded items. For monthly items, say "latest monthly reading".
+      7. Short sentences, one idea each, at most 28 words per sentence. Never name an indicator that is not in STATE.
+      8. Write the Farsi natively, as a clear Iranian finance explainer would for ordinary readers: spoken-formal register, correct half-spaces, no em dash, no double spaces. In the FARSI output use Persian digits (۰-۹) with the Persian decimal separator ٫ (write ۵٫۲۸, never 5.28 or ۵.۲۸), and no Latin letters except allowed symbols (VIX, S&P, ASX, Nikkei, Kospi, HSI, SSE, Taiex, Nifty, Stoxx, Dax, CAC, FTSE, Nasdaq, Dow, TSX, Bovespa, ECB, RBA, USD, AUD, EUR, JPY, CNY, BTC, PMI, GDP, CPI, NFP, HICP, CAPE, SOFR, WPI, DXY, EPU, GPR, NBS, EIA, CFTC, OECD, MOF, BOJ, BOE, FRED). In the ENGLISH output use ASCII digits with the ASCII decimal point (write 5.28, never ۵٫۲۸). The Farsi must say the same thing as the English, not mirror its sentences.
       9. Output only JSON matching {"en": string, "fa": string}. No markdown, no extra text."
     `);
   });
@@ -80,7 +80,7 @@ describe('M2 prompt — the pinned texts', () => {
 
       Open with the big picture of the section in everyday words (calm, mixed or under pressure, from the tier counts and any verdict label in STATE). Then weave in the readings the section actually flags — name at most two or three, and for each that carries one, use its level (STATE alerts carry value, valueUnit, delta, context; e.g. "US 10-year yield sits at 5.0 percent, down 0.17 points over 30 days", or "the Kospi is 38 percent below its yearly high"). When two or more related ids share the section and VOCABULARY carries a connection (ifRising, ifFalling, connections), draw that connection in the same paragraph — never invent a relationship VOCABULARY does not state.
 
-      Use plain words and the plain names from VOCABULARY. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. End with one short clause if STATE lists excluded items. Weave the numbers into the prose — do not list them."
+      Use plain words and the plain names from VOCABULARY. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. Mention out-of-date data only when STATE.excluded is non-empty (one short clause). Weave the numbers into the prose — do not list them."
     `,
     );
   });
@@ -92,7 +92,7 @@ describe('M2 prompt — the pinned texts', () => {
 
       Open by stating the page's verdicts in everyday words (each section's verdict label rides in STATE with its counts; e.g. "Global reads Stressed, with 9 of 32 scored indicators in warning"). Then name one or two themes that stand out across sections, using only STATE and VOCABULARY — when an alert in one section carries a level (value, delta, context), use its actual number to anchor the theme (e.g. "the US 10-year yield sits at 5.0 percent, down 0.17 points over 30 days", "the Kospi is 38 percent below its yearly high", or "EUR/CHF moved 2.2 percent in a month"). Draw a connection between two sections only when VOCABULARY states one (ifRising, ifFalling, connections) — never invent one.
 
-      End with one sentence reminding the reader this explains data and is not a recommendation. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. Weave the verdicts and the numbers into the prose — do not list them."
+      End with one sentence reminding the reader this explains data and is not a recommendation. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. Mention out-of-date data only when STATE.excluded is non-empty (one short clause). Weave the verdicts and the numbers into the prose — do not list them."
     `,
     );
   });

@@ -44,10 +44,17 @@ export function wordCount(s: string): number {
  * sentence terminator — it is the decimal point of a number (PROMPT_VERSION
  * 2, D-42: the enriched indicator template weaves values like "5.283" into
  * the prose; without this guard V2 over-counts sentences and falls back to
- * the template for every indicator section). */
+ * the template for every indicator section).
+ * PROMPT_VERSION 3 (D-42 follow-up): the negative lookahead now also covers
+ * Persian digits (۰-۹, U+06F0-U+06F9) and Arabic-Indic digits (٠-٩,
+ * U+0660-U+0669). The model sometimes writes "۵.۲۸" (Persian digits with an
+ * ASCII period) instead of "۵٫۲۸" (Persian decimal separator ٫); the v2
+ * regex `(?![0-9])` did not recognise ۲ as a digit, so it split "۵.۲۸" into
+ * two fake sentences and V2 fell back to the template for every FA section
+ * the model wrote that way. */
 export function sentences(s: string): string[] {
   return s
-    .split(/[.!?۔؟]+(?![0-9])/)
+    .split(/[.!?۔؟]+(?![0-9\u06F0-\u06F9\u0660-\u0669])/)
     .map((p) => p.trim())
     .filter((p) => p.length > 0);
 }
@@ -154,7 +161,7 @@ export const ARABIC_KAF = /\u0643/; // ك (Arabic) — must be Persian ک \u06A9
 export const EM_DASH = /\u2014/; // —
 export const ASCII_DIGIT = /[0-9]/;
 export const FA_LATIN_ALLOW =
-  /\b(VIX|S&P|ASX|ECB|RBA|USD|AUD|EUR|JPY|CNY|BTC|PMI|GDP|CPI|NFP|HICP|CAPE|SOFR|WPI|DXY|EPU|GPR|NBS|EIA|CFTC|OECD|MOF|BOJ|BOE|FRED|PAYEMS|T10Y|DGS|DFED|T5Y)\b/g;
+  /\b(VIX|S&P|ASX|Nikkei|Kospi|HSI|SSE|Taiex|Nifty|Stoxx|Dax|CAC|FTSE|Nasdaq|Dow|TSX|Bovespa|ECB|RBA|USD|AUD|EUR|JPY|CNY|BTC|PMI|GDP|CPI|NFP|HICP|CAPE|SOFR|WPI|DXY|EPU|GPR|NBS|EIA|CFTC|OECD|MOF|BOJ|BOE|FRED|PAYEMS|T10Y|DGS|DFED|T5Y)\b/gi;
 export const DOUBLE_SPACE = /\s{2,}/;
 
 /** Latin letter runs that are not on the Layer-1 allow-list. */

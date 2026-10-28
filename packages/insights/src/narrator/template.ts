@@ -426,7 +426,15 @@ function overallText(state: OverallNarrationState, lang: 'en' | 'fa'): string {
   }
 
   // S3 — the first standout alert (section order, then the section's own
-  // alert order), with its oneLine.
+  // alert order), with its oneLine. Enriched (D-42 follow-up): when the
+  // alert carries a `value` AND a `delta` (the indicator-section case —
+  // e.g. the euro-hicp 3.8 % at +0.6 pts since previous release), the
+  // clause weaves both into the sentence, mirroring the indicator
+  // template's `indicatorValueDeltaClause`. Alerts without a delta (an
+  // FX rule pattern, or cftc-gold-positioning whose `delta` is null)
+  // fall back to the bare plainName: oneLine form — the value alone
+  // (a percentile, a rate) has no plain unit, so naming it without the
+  // delta would read as a bare number with no anchor.
   const firstAlert = state.alerts[0];
   const firstEntry = firstAlert !== undefined ? entryOf(firstAlert.id, lang) : null;
   const secondAlert = state.alerts[1];
@@ -436,10 +444,11 @@ function overallText(state: OverallNarrationState, lang: 'en' | 'fa'): string {
     sentences.push(lang === 'fa' ? `${signalClauses.join('؛ ')}` : `${signalClauses.join('; ')}`);
   } else if (secondAlert !== undefined && entryOf(secondAlert.id, lang) !== null) {
     const second = entryOf(secondAlert.id, lang)!;
+    const secondClause = indicatorValueDeltaClause(secondAlert, lang);
     sentences.push(
-      lang === 'fa'
-        ? `مورد دیگر، ${second.plainName} است: ${second.oneLine}`
-        : `Another standout is ${second.plainName}: ${second.oneLine}`,
+      secondClause === ''
+        ? (lang === 'fa' ? `مورد دیگر، ${second.plainName} است: ${second.oneLine}` : `Another standout is ${second.plainName}: ${second.oneLine}`)
+        : (lang === 'fa' ? `مورد دیگر، ${second.plainName} ${secondClause} است: ${second.oneLine}` : `Another standout is ${second.plainName} ${secondClause}: ${second.oneLine}`),
     );
   } else {
     sentences.push(
@@ -449,11 +458,12 @@ function overallText(state: OverallNarrationState, lang: 'en' | 'fa'): string {
     );
   }
 
-  if (firstEntry !== null) {
+  if (firstAlert !== undefined && firstEntry !== null) {
+    const firstClause = indicatorValueDeltaClause(firstAlert, lang);
     sentences.push(
-      lang === 'fa'
-        ? `یکی از موارد برجستهٔ صفحه، ${firstEntry.plainName} است: ${firstEntry.oneLine}`
-        : `One standout reading is ${firstEntry.plainName}: ${firstEntry.oneLine}`,
+      firstClause === ''
+        ? (lang === 'fa' ? `یکی از موارد برجستهٔ صفحه، ${firstEntry.plainName} است: ${firstEntry.oneLine}` : `One standout reading is ${firstEntry.plainName}: ${firstEntry.oneLine}`)
+        : (lang === 'fa' ? `یکی از موارد برجستهٔ صفحه، ${firstEntry.plainName} ${firstClause} است: ${firstEntry.oneLine}` : `One standout reading is ${firstEntry.plainName} ${firstClause}: ${firstEntry.oneLine}`),
     );
   } else {
     sentences.push(
