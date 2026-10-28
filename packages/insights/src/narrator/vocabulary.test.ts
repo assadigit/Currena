@@ -7,6 +7,7 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  getNarratorSectionLabels,
   getNarratorUi,
   getNarratorVocabulary,
   VOCABULARY_IDS,
@@ -149,5 +150,53 @@ describe('P3 — the generated snapshot integrity', () => {
     expect(payload.source.enSha256).toMatch(/^[0-9a-f]{64}$/);
     expect(payload.source.faSha256).toMatch(/^[0-9a-f]{64}$/);
     expect(VOCABULARY_SOURCE.indicatorCount).toBe(129);
+  });
+});
+
+describe('M1 — the section-labels block (the narrator states\u2019 approved words)', () => {
+  it('returns the four section labels per language (existing UI strings)', () => {
+    const en = getNarratorSectionLabels('en');
+    const fa = getNarratorSectionLabels('fa');
+    expect(en.label).toEqual({
+      global: 'Global',
+      australia: 'Australia',
+      'world-markets': 'The pulse of world markets',
+      'world-currencies': 'World currencies',
+    });
+    expect(fa.label['world-markets']).toBe('نبض بازارهای جهان');
+    expect(fa.label['world-currencies']).toBe('ارزهای مهم جهان');
+  });
+
+  it('returns the four verdict words + three signal words, matching the page\u2019s own', () => {
+    const en = getNarratorSectionLabels('en');
+    const fa = getNarratorSectionLabels('fa');
+    expect(en.verdictWord).toEqual({ relaxed: 'Stable', cautious: 'Cautious', stressed: 'Stressed', alarmed: 'Critical' });
+    expect(fa.verdictWord.stressed).toBe('پرتنش');
+    expect(en.signalWord).toEqual({ normal: 'Normal', attention: 'Needs attention', unusual: 'Unusual' });
+    expect(fa.signalWord.attention).toBe('نیازمند توجه');
+  });
+
+  it('the FA labels are Persian script with no ASCII digits and no em dash', () => {
+    const fa = getNarratorSectionLabels('fa');
+    const all = [
+      ...Object.values(fa.label),
+      ...Object.values(fa.verdictWord),
+      ...Object.values(fa.signalWord),
+      ...Object.values(fa.marketGroup),
+      ...Object.values(fa.marketStatus),
+    ];
+    for (const s of all) {
+      expect(s, s).toMatch(/[\u0600-\u06FF]/);
+      expect(s, s).not.toMatch(/[0-9]/);
+      expect(s, s).not.toMatch(/\u2014/);
+    }
+  });
+
+  it('en\u2194fa key parity across every sub-block', () => {
+    const en = getNarratorSectionLabels('en');
+    const fa = getNarratorSectionLabels('fa');
+    for (const key of Object.keys(en) as (keyof typeof en)[]) {
+      expect(Object.keys(en[key]).sort(), key).toEqual(Object.keys(fa[key]).sort());
+    }
   });
 });

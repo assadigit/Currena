@@ -293,62 +293,221 @@ premise, and gives the owner the precise watch-item (the f2 path, not
 
 ---
 
-# Layer 2 Narrator — Reserved decisions (D-28…D-36+)
+# Layer 2 Narrator — Decisions (D-28…)
 
-The next session (the AI narrator build per
-`docs/insights/layer2/INSIGHTS-L2-NARRATOR-SPEC.md`) populates these.
-Research findings are pre-recorded in `docs/insights/layer2/
-RESEARCH-STARTER.md`; the next session RE-VERIFIES each finding in the
-official docs before writing the decision text.
+The AI narrator build (per `docs/insights/layer2/
+INSIGHTS-L2-NARRATOR-SPEC.md`) logs every ambiguity here, resolved
+conservatively. D-28..D-31 record the research findings RE-VERIFIED in
+the official docs on 2026-10-28 (the session that built M1); D-32 the
+section enumeration; D-33..D-35 are reserved for M2–M4; D-36 records
+M1's implementation decisions; D-37+ are reserved for the later
+milestones. The research starter's pre-recorded findings live in
+`docs/insights/layer2/RESEARCH-STARTER.md` (superseded where the
+decisions say so).
 
-## D-28 — Reserved: Gemini model + free-tier limits
+## D-28 — The Gemini model + free-tier limits (re-verified in the official docs, 2026-10-28)
 
-**Reserved** — the next session records: the current Gemini Flash-class
-model name (likely `gemini-3.1-flash-lite` or `gemini-3.8-flash` per
-2026-10-28 research; re-verify in https://ai.google.dev/gemini-api/docs/
-rate-limits + https://ai.google.dev/pricing), the free-tier rate limits
-(RPM/RPD/TPM; ~10-15 RPM, ~1500 RPD for Flash per the 2026-10-28
-research), and the `NARRATOR_MODEL` env var default.
+**Assumption.** The spec (§5) requires looking up the CURRENT Flash-class
+model, the free-tier rate limits and grounding availability in Google's
+official docs before recording decisions; the research starter's
+2026-10-28 findings guessed `gemini-3.1-flash-lite` / `gemini-3.8-flash`.
 
-## D-29 — Reserved: Google Search grounding — terms + display requirements
+**Re-verification (fetched live from ai.google.dev, 2026-10-28).**
+- The canonical REST surface is now the **Interactions API**:
+  `POST https://generativelanguage.googleapis.com/v1beta/interactions`
+  with `{model, system_instruction, input, generation_config, response_format,
+  tools}` and the `x-goog-api-key` header. `generateContent` still exists
+  (the docs carry a toggle), but Interactions is the documented default —
+  M3's client speaks Interactions.
+- Current catalog: Gemini 4 Argon (**not** free-tier eligible), 3.1 Pro
+  Preview, **3.5 Flash-Lite**, 3.8 Flash, 3.1 Flash Lite, 3.6 Flash; the
+  2.5 family is access-limited: “For any new projects, use our latest
+  models: 3.5 Flash-Lite or 3.8 Flash.”
+- Structured output: `response_format: {type: 'text', mime_type:
+  'application/json', schema}` (JSON Schema subset) — schema-constrained
+  output IS supported on the current API (the spec's call type A).
+- Temperature: “Gemini 4 and Gemini 3.6+ models ignore custom values for
+  temperature, top_p, and top_k.” 3.5 Flash-Lite is pre-3.6, so the
+  spec's temperature 0.2 still applies to the default model; if the owner
+  bumps NARRATOR_MODEL to 3.6+/4 the API ignores it (a deprecation
+  warning header, harmless) — the deterministic validators (V1–V10), not
+  the temperature, are the safety net.
+- Free tier: text generation “Free of charge” (paid $0.30/1M input on
+  3.5 Flash-Lite); the spend-based rate limit table says **Free = N/A**
+  (a project without billing can never be charged — the spec §10
+  guarantee holds structurally). RPD resets at midnight Pacific; limits
+  apply per project, not per API key. The static docs no longer publish
+  per-model RPM/RPD tables (“View your active rate limits in AI Studio”)
+  — the design therefore does not depend on the exact numbers.
 
-**Reserved** — the next session records: the grounding-terms decision
-(required display elements e.g. `searchEntryPoint.renderedContent`,
-storage/redistribution permissions, free-tier eligibility per
-https://ai.google.dev/gemini-api/docs/grounding). Conservative default
-until the next session has read the current terms in full: SHIP PART 3
-DISABLED (`NARRATOR_WEB_CONTEXT=false`); the base A-section +
-A-overall narratives work without grounding and ship first.
+**Decision.** `NARRATOR_MODEL` env var default = **`gemini-3.5-flash-lite`**
+(Google's explicit new-project recommendation; free tier; Flash-Lite
+class — adequate for ≤120 words of plain explanation). The research
+starter's 3.1-flash-lite guess is superseded by the models doc's own
+recommendation. Rate design: at most 3 model calls per cron tick (spaced
+≥60 s by the minute cron — trivially inside any reported RPM), ~6–11
+calls/day total — far inside even the most conservative reported
+Flash-class free limits. The set-key tool (M3) makes one minimal live
+call, which is also the definitive per-project limit check.
 
-## D-30 — Reserved: Cloudflare Worker limits + the cron-rung design
+**Reason.** Conservative on every axis: the newest recommended
+free-tier model, a request rate the free tier cannot plausibly refuse, a
+billing-ineligible project so charges are structurally impossible, and a
+design whose correctness does not depend on unpublished per-model
+numbers.
 
-**Reserved** — the next session records: the free-plan subrequest limit
-(50/invocation — verify in Cloudflare's docs), the cron-trigger count
-limit (5/Worker — the existing currena-api uses ONE: the minute cron;
-no new cron trigger needed; the narrator runs as a new hour+minute-gated
-rung), the CPU time per invocation, the free-tier KV ops/day (100k reads,
-1k writes), and the design that stays within them (per-tick batch ≤3
-model calls; pending list in KV; edge-cached endpoint so visitors do
-not become KV reads).
+## D-29 — Google Search grounding — terms + display requirements (re-verified 2026-10-28; SHIP DISABLED)
 
-## D-31 — Reserved: Region risk + the template-fallback default
+**Assumption.** Spec §5's grounding-terms gate: read the CURRENT terms,
+decide the display elements, storage/redistribution and free-tier
+eligibility; if any requirement cannot be met or is unclear, ship part 3
+disabled. The research starter's findings described the OLD response
+shape (`groundingMetadata` / `webSearchQueries` / `groundingChunks` /
+`searchEntryPoint.renderedContent`).
 
-**Reserved** — the next session records: the Cloudflare Worker egress
-region for Google's Gemini API, the documented 403 "location not
-supported" risk, the mitigations (`placement: { mode: "smart" }` hint
-in wrangler.jsonc; Cloudflare AI Gateway; template fallback), and the
-default (template fallback for the first week; switch to smart
-placement if region errors exceed 1 in 5 A-generations).
+**Re-verification (fetched live, 2026-10-28).** The grounding doc has
+CHANGED shape: responses now carry `google_search_call` (the executed
+queries), `google_search_result` (with **`search_suggestions`** — “an
+HTML snippet for rendering search suggestions in your UI. Full usage
+requirements are detailed in the Terms of Service.”) and `model_output`
+with inline **`url_citation`** annotations (start/end index + url +
+title). The old field names appear nowhere in the current doc. Free-tier
+eligibility: YES — the pricing page shows “Grounding with Google Search:
+Free tier **1,500 RPD (free)**, then $35 / 1,000 grounded prompts”, and
+the grounding doc bills per executed search query with **5,000 free
+search requests/month** shared across Gemini 3+ models ($14/1,000
+after). Both numbers are recorded: the binding daily cap is 1,500
+grounded requests/day; the monthly query budget is 5,000.
 
-## D-32 — Reserved: Section-list enumeration
+**Decision.** **SHIP PART 3 DISABLED** (`NARRATOR_WEB_CONTEXT=false`),
+exactly as the research starter's conservative default prescribed — now
+with evidence: (a) the Terms of Service that govern the required display
+elements were not fetched and read in full this session; (b) the display
+obligations (rendering Google's `search_suggestions` HTML snippet + the
+inline citation annotations) are implementable but NOT yet implemented;
+(c) the base A-section + A-overall narratives work without grounding and
+ship first. Part 3 is enabled only after a later session reads the
+current ToS in full, implements the required display elements exactly,
+and passes the eval; the env flip is one variable. `NARRATOR_WEB_DAILY_CAP`
+default 20 grounded calls/day — under the 1,500-RPD free cap by 75× and
+a small slice of the 5,000/month query budget (≤600/month at the cap).
 
-**Reserved** — the next session records: the section list the narrator
-generates for. Conservative plan (from `docs/insights/layer2/
-RESEARCH-STARTER.md` §5): 4 sections + 1 overall = `['global',
-'australia', 'world-markets', 'world-currencies']`. The `prices-board`
-group is part of the `global` section (its indicators are already in
-`section: 'global'`). The Markets snapshot feeds `world-markets`; the
-FX snapshot feeds `world-currencies`.
+**Reason.** The spec's own rule: unclear or unimplemented requirements →
+disabled, and say so. The re-verification also protects M3/M5 from
+building against the retired response shape.
+
+## D-30 — Cloudflare Worker limits (re-verified 2026-10-28) + the cron-rung design
+
+**Assumption.** Spec §2: check the CURRENT Cloudflare limits (subrequests
+per invocation, CPU time, cron triggers, KV ops/day) and design within
+them; the research starter's 2026-10-28 numbers needed re-verification.
+
+**Re-verification (developers.cloudflare.com, pages updated Oct 8–12,
+2026).**
+- **Subrequests:** 50/invocation (Free) · 10,000 (Paid). Each subrequest
+  in a redirect chain counts.
+- **CPU time per Cron Trigger:** 10 ms (Free) · **30 s (Paid, <1 h
+  interval)** · 15 min (≥1 h interval). **Wall-clock duration for a cron
+  invocation: 15 minutes.** (The starter's “30 s wall / 10 ms CPU”
+  reading is corrected: 30 s is the PAID CPU allowance for sub-hourly
+  crons; waiting on fetches never counts toward CPU.)
+- **Cron Triggers: 5 per ACCOUNT** (Free) · 250 (Paid) — the starter said
+  per Worker; the docs say per account. The account runs 8 Workers
+  (currena-api, currena-markets, two probes, four others); currena-api
+  uses ONE trigger (the minute cron) — **no new trigger is needed**; the
+  narrator is a new hour+minute-gated RUNG inside it.
+- **KV (Free):** 100,000 reads/day · 1,000 writes/day (different keys) ·
+  same-key writes 1/second — unchanged. A NEW row in the Oct-2026 docs:
+  “Operations/Worker invocation: 1 (Free) / 1,000 (Paid)”. The account's
+  existing minute cron demonstrably performs several KV operations per
+  tick (keep-warm, watchdog, ingest rungs), so the account either runs
+  Workers Paid or the row does not constrain the existing topology; the
+  narrator design keeps to ≤2 reads + ≤1 write per tick regardless and
+  the first live day's actuals are reported (M4).
+
+**Decision.** The design from the research starter, now verified against
+the current numbers: the narrator runs as a new rung in the existing
+minute cron (hour+minute-gated, e.g. :50 UTC — never sharing an
+invocation with the ingest/history rungs), **≤3 model calls per tick**,
+stateHash per unit, pending units carried in KV, ONE KV write per cycle
+that changed something. Daily totals at steady state: ~24 ticks/day ×
+≤2 KV reads = ≤48 cron reads/day (visitors add ZERO — the endpoint is
+edge-cached `s-maxage=600`), ~1–3 writes/day, ~6–11 model calls/day —
+inside every limit on both plans with two orders of magnitude of
+headroom.
+
+**Reason.** The per-tick cap is the binding conservative choice: it
+keeps the narrator's worst tick (3 sequential 15 s-timeout model calls +
+KV + JSON parsing) inside the 15-minute wall clock, the 30 s paid CPU
+allowance with room, and the 50-subrequest free envelope even if the
+account turned out to be Free.
+
+## D-31 — Region risk + the template-fallback default (re-verified 2026-10-28)
+
+**Assumption.** Spec §5: calls from some Cloudflare locations can be
+refused (“location not supported”); handle explicitly and check current
+mitigations.
+
+**Re-verification.** The risk stands as documented (the Gemini API
+publishes an available-regions list; 403 location refusals are a
+documented behaviour for unsupported caller regions). The Cloudflare
+egress region that serves `generativelanguage.googleapis.com` for THIS
+account cannot be verified without an API key — and no key exists in
+this session by design (the owner enters it via `pnpm narrator:set-key`,
+M3). Mitigations confirmed as current options: `placement: { mode:
+'smart' }` in wrangler.jsonc, Cloudflare AI Gateway, and the always-safe
+fallback.
+
+**Decision.** The template fallback (M1's `templateNarrative` — pure,
+zero network, passes V1–V10) is the DEFAULT path whenever the API is
+unreachable, refused, invalid or failing: no key → templates; kill
+switch → templates; two validation failures → templates. Region
+refusals are counted in the stats buckets (M4). After the owner sets the
+key, the first live week decides: if region errors exceed 1 in 5
+A-generations, switch to `placement: { mode: 'smart' }` and re-test; if
+still failing, `NARRATOR_ENABLED=false` and document. A one-off probe
+(the set-key tool's validation call, M3) records the actual behaviour
+the moment a key exists.
+
+**Reason.** The fallback makes the worst case a slightly plainer text,
+never an error or an outage — the conservative ordering the spec's kill
+criteria (§13) assume.
+
+## D-32 — The section list + the overall state's alert policy (M1, built)
+
+**Assumption.** Spec §3: “discover the sections from the code”; the
+research starter's conservative plan (4 sections + 1 overall) needed
+confirming against the code, and the overall state's “top few alerts
+across sections” needed an interpretation.
+
+**Decision.** Section list = `['global', 'australia', 'world-markets',
+'world-currencies']` + the `overall` unit — confirmed against the page:
+the four mother containers (the two indicator lanes + WorldMarkets +
+WorldCurrencies). The prices-board group is part of `global` (its
+indicators are `section: 'global'`); the dollar-strength cards ride
+global's electorate even though they RENDER inside the currencies
+container (R9-04) — the currencies section state is the fx document
+itself (10 pairs + the dollar measure + the 7 rules), and the fx dollar
+measure rides as the `dollar-basket` item (the vocabulary entry that
+names it).
+
+The overall state carries **every** firing alert across sections, each
+tagged with its section — NO cap and NO invented severity ordering:
+“the top few” is the PROMPT's instruction to the model (name one or two
+themes), not a state truncation; the choice is the model's, from facts.
+Markets alerts sort bear-before-correction (the section's own tier
+order), fx alerts warning-rule-first — the sections' own orderings, not
+new arithmetic. The markets section's verdict is the engine's own
+summary (signal + counts + worstGroup, verbatim); the page's 4-step
+editorial word (Bullish/Mixed/…) is a UI composition over those fields
+(breadth split) and is NOT re-derived in the package — no duplicate
+logic to drift.
+
+**Reason.** Every boundary follows an existing page structure or an
+existing computed value; where the spec's wording was open (“top few”),
+the reading that adds no new math and removes no facts was chosen.
+SECTION-STATE.md documents the full contract; the golden fixtures pin
+it.
 
 ## D-33 — Reserved: The secret-scan addition to `pnpm gates`
 
@@ -379,12 +538,67 @@ inaccurate or stale on a spot check; any item gives advice; Google's
 terms change in a way we cannot meet; >1 in 3 grounded outputs omitted
 by checks.
 
-## D-36+ — Reserved: per-implementation decisions
+## D-36 — M1 implementation decisions (the pure foundation)
 
-**Reserved** — the next session records: the `PROMPT_VERSION` initial
-value (likely 1); the validation check seed word lists (EN + FA banned
-advice/certainty, jargon, attribution phrases); the per-fixture
-assertions; any bundle-budget notes (D-16 path if the new web display
-block pushes the Insights lazy chunk past 1100.00/260.00); and any
-deploy-time findings (the currena-api version ID, the live-verification
-screenshots path, etc.).
+The per-implementation decisions of Milestone 1 (each resolved
+conservatively, pinned by tests):
+
+1. **The Layer-1 word canon moved into the insights package.** JARGON,
+   BANNED_EN/FA, the G5 patterns and TENOR_TOKEN moved VERBATIM from
+   `apps/web/.../layer1/layer1.test.ts` into
+   `packages/insights/src/narrator/wordlists.ts`; the Layer-1 gate now
+   imports them from `@currena/insights/narrator`. One source of truth
+   for G3/G4/G5/G6 and V4/V5/V6 (+W3/W5/W6); the 7,809-test count is
+   unchanged (verified). The narrator's own seed lists (predictions,
+   tone words, attribution phrases, out-of-date markers) live beside
+   the canon, clearly separated — the Layer-1 gate never reads them.
+2. **V5's state-verbatim exemption.** The page's own status words
+   ("Correction", "Bear market" — jargon-listed with NO glossary term,
+   because Layer-1 copy never needed them) are carried IN the markets
+   state (`statusWords`) and may be restated: a jargon phrase that
+   appears verbatim in the unit's state is a fact, not invented jargon.
+   The provided vocabulary's own text is already G3-clean, so its
+   glossary covers its own terms (getNarratorVocabulary returns the
+   used terms).
+3. **V3's allowed numbers include the provided vocabulary's own
+   numbers** (tenor names like "10-year" inside plainName/oneLine) plus
+   the state's numbers (with roundings, signs, abs, day-ages and date
+   parts) — the model was given that text verbatim, so restating it is
+   never an invented number. Without this, a template quoting a
+   vocabulary oneLine could fail V3 whenever the state's dates
+   coincidentally lacked the tenor digit.
+4. **The template composition guarantees.** §8's "2–4 sentences" and
+   V2's prompt limits (3–5 section / 4–6 overall) are reconciled via
+   the intersection: section templates emit 3–5 sentences (a 3-sentence
+   floor by construction: verdict + content + honest fillers; 5
+   ceiling), the overall exactly 4 (its out-of-date clause merges with
+   the not-advice reminder into one sentence). Vocabulary oneLines
+   carry their own trailing period; `finish()` terminates every
+   sentence exactly once.
+5. **The template's FA copy** is hand-written template copy (Persian
+   digits via the shared mapper, Persian decimal separator ٫, correct
+   half-spaces, no em dash, no Latin) — triaged in the Persian copy
+   manifest like every other fa string in the packages (the
+   `technical.*` precedent).
+6. **stateHash** = sha256 (a pure in-package implementation, FIPS
+   vectors pinned — AGENTS.md rule 2 forbids node:crypto in packages)
+   over the stable serialization with `generatedAt` and every
+   `ageHours` stripped; freshness flips and asOf changes are CONTENT
+   and regenerate.
+7. **The section fixtures' provenance:** global/australia reuse the
+   committed prep fixtures' inputs verbatim (stressed-live, calm,
+   stale-excluded); world-markets/world-currencies/overall were
+   captured LIVE from currena.ir on 2026-10-28 (the real
+   attention day: 6 corrections + 1 bear; the r6 warning + the EUR/CHF
+   unusual move). The builder script is committed for regeneration on
+   intentional contract changes only.
+
+## D-37+ — Reserved: per-implementation decisions (M2 onward)
+
+**Reserved** — the next milestones record: the `PROMPT_VERSION` initial
+value (M2); the secret-scan patterns + gate placement (M2); the
+Gemini-client call shapes for the Interactions API (M3); the
+narrator-cron rung minute, the KV value layout and the stats buckets
+(M4); the display-block bundle impact + any D-16 path (M5); and
+deploy-time findings (the currena-api version IDs, the
+live-verification screenshots path, etc.).

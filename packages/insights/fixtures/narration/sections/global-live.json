@@ -1,0 +1,2976 @@
+{
+  "scenario": "global-live",
+  "section": "global",
+  "description": "Global from the live stressed day: verdict stressed, 9 of 32 voting indicators in warning.",
+  "provenance": "GET https://currena.ir/api/insights + /api/insights/fx + /api/insights/markets, captured 2026-10-28 (real data, unedited). Insights input reused verbatim from the committed stressed-live prep fixture.",
+  "now": "2026-10-28T04:20:18.253Z",
+  "input": {
+    "insights": {
+      "generatedAt": "2026-10-28T04:20:18.253Z",
+      "summary": {
+        "global": {
+          "section": "global",
+          "label": "stressed",
+          "warningCount": 9,
+          "votingCount": 32,
+          "excludedCount": 0
+        },
+        "australia": {
+          "section": "australia",
+          "label": "stressed",
+          "warningCount": 7,
+          "votingCount": 16,
+          "excludedCount": 0
+        }
+      },
+      "readings": [
+        {
+          "id": "yield-curve-10y2y",
+          "value": 0.29,
+          "asOf": "2026-10-27",
+          "change7d": -0.040000000000000036,
+          "change30d": -0.07,
+          "percentile10y": 0.4354967948717949,
+          "sd10y": -0.09632091971042236,
+          "moveScore": -1.8958608029369608,
+          "fromPeak10y": -81.76100628930818,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": -0.030000000000000027
+          },
+          "change90d": -0.16000000000000003,
+          "status": "normal",
+          "sourceName": "Federal Reserve Bank of St. Louis via FRED (T10Y2Y)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/T10Y2Y",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "yield-curve-10y3m",
+          "value": 0.77,
+          "asOf": "2026-10-27",
+          "change7d": -0.08999999999999997,
+          "change30d": -0.16000000000000003,
+          "percentile10y": 0.6033653846153846,
+          "sd10y": 0.39693879033908347,
+          "moveScore": -2.918599071869585,
+          "fromPeak10y": -66.07929515418502,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": -0.010000000000000009
+          },
+          "change90d": -0.06999999999999995,
+          "status": "normal",
+          "sourceName": "Federal Reserve Bank of St. Louis via FRED (T10Y3M)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/T10Y3M",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "real-yield-10y",
+          "value": 2.66,
+          "asOf": "2026-10-26",
+          "change7d": -0.13999999999999968,
+          "change30d": -0.16999999999999993,
+          "percentile10y": 0.9907815631262525,
+          "sd10y": 1.722811926740309,
+          "moveScore": -3.5019447738147775,
+          "fromPeak10y": -9.830508474576272,
+          "lastChange": {
+            "date": "2026-10-23",
+            "points": 0.020000000000000018
+          },
+          "change90d": 0.25,
+          "status": "warning",
+          "sourceName": "FRED (DFII10)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DFII10",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "us10y",
+          "value": 5,
+          "asOf": "2026-10-26",
+          "change7d": -0.15000000000000036,
+          "change30d": -0.16999999999999993,
+          "percentile10y": 0.9903807615230461,
+          "sd10y": 1.6784819954362435,
+          "moveScore": -3.1925439897389416,
+          "fromPeak10y": -5.838041431261763,
+          "lastChange": {
+            "date": "2026-10-23",
+            "points": 0.040000000000000036
+          },
+          "change90d": 0.3899999999999997,
+          "status": "warning",
+          "sourceName": "FRED (DGS10)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "fed-target",
+          "value": 3.75,
+          "asOf": "2026-10-27",
+          "change7d": 0,
+          "change30d": 0,
+          "percentile10y": 0.6782680186352426,
+          "sd10y": 0.744985269636706,
+          "moveScore": -0.024433740021636913,
+          "fromPeak10y": -28.57142857142857,
+          "rangeLow": 3.75,
+          "rangeHigh": 4,
+          "lastChange": {
+            "date": "2026-09-17",
+            "points": 0.25
+          },
+          "change90d": 0.25,
+          "decidedDate": "2026-09-16",
+          "status": "normal",
+          "sourceName": "FRED (DFEDTARL/U)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DFEDTARU",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "fed-expectations",
+          "value": 0.805,
+          "asOf": "2026-10-26",
+          "change7d": -0.08999999999999997,
+          "change30d": -0.13,
+          "percentile10y": 0.8765531062124249,
+          "sd10y": 1.0463302193331627,
+          "moveScore": -1.8287828166917188,
+          "fromPeak10y": -68.7378640776699,
+          "lastChange": {
+            "date": "2026-10-26",
+            "points": -0.009999999999999898
+          },
+          "change90d": 0.17000000000000004,
+          "status": "normal",
+          "sourceName": "FRED (DGS2 − policy-rate midpoint)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "us30y",
+          "value": 5.31,
+          "asOf": "2026-10-26",
+          "change7d": -0.17000000000000082,
+          "change30d": -0.1800000000000006,
+          "percentile10y": 0.9887775551102205,
+          "sd10y": 1.750685867558387,
+          "moveScore": -3.567368988162494,
+          "fromPeak10y": -6.349206349206354,
+          "lastChange": {
+            "date": "2026-10-26",
+            "points": -0.020000000000000462
+          },
+          "change90d": 0.21999999999999975,
+          "status": "warning",
+          "sourceName": "FRED (DGS30)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS30",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "sofr",
+          "value": 3.93,
+          "asOf": "2026-10-26",
+          "change7d": 0.06000000000000005,
+          "change30d": 0.03000000000000025,
+          "percentile10y": 0.6538821328344246,
+          "sd10y": 0.6428140625792312,
+          "fromPeak10y": -27.222222222222225,
+          "lastChange": {
+            "date": "2026-10-26",
+            "points": 0.010000000000000231
+          },
+          "change90d": 0.28000000000000025,
+          "status": "context",
+          "sourceName": "New York Fed via FRED (SOFR)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/SOFR",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "us-2y",
+          "value": 4.68,
+          "asOf": "2026-10-26",
+          "change7d": -0.08999999999999986,
+          "change30d": -0.1299999999999999,
+          "percentile10y": 0.9106212424849699,
+          "sd10y": 1.3212684662793703,
+          "fromPeak10y": -9.826589595375735,
+          "lastChange": {
+            "date": "2026-10-26",
+            "points": -0.010000000000000675
+          },
+          "change90d": 0.41999999999999993,
+          "status": "context",
+          "sourceName": "FRED (DGS2)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "euro-aaa-10y",
+          "value": 3.3735503672,
+          "asOf": "2026-10-26",
+          "change7d": -0.09553244120000004,
+          "change30d": -0.2411504968,
+          "percentile10y": 0.9862583431488026,
+          "sd10y": 1.67958977214028,
+          "fromPeak10y": -7.098476131552903,
+          "lastChange": {
+            "date": "2026-10-26",
+            "points": 0.004144534299999947
+          },
+          "change90d": 0.21558701689999982,
+          "status": "context",
+          "sourceName": "ECB Data Portal (euro-area AAA 10-year yield)",
+          "sourceUrl": "https://data.ecb.europa.eu/data/datasets/YC/YC.B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "ecb-dfr",
+          "value": 2.5,
+          "asOf": "2026-10-28",
+          "change7d": 0,
+          "change30d": 0,
+          "percentile10y": 0.7679452054794521,
+          "sd10y": 0.9596698937398033,
+          "moveScore": -0.027677993593247255,
+          "fromPeak10y": -37.5,
+          "lastChange": {
+            "date": "2026-09-16",
+            "points": 0.25
+          },
+          "change90d": 0.25,
+          "decidedDate": "2026-09-10",
+          "status": "normal",
+          "sourceName": "ECB Data Portal (DFR)",
+          "sourceUrl": "https://data.ecb.europa.eu/data/datasets/FM/B.EUR.4F.KR.DFR.LEV",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "govt-interest-revenue",
+          "value": 33.55393513462776,
+          "asOf": "2026-04-01",
+          "periodStart": "2026-04-01",
+          "periodEnd": "2026-06-30",
+          "change30d": -0.16168644011059286,
+          "percentile10y": 0.7297297297297297,
+          "sd10y": 1.1245630511987432,
+          "moveScore": -0.357259729367434,
+          "fromPeak10y": -7.944544139622469,
+          "lastChange": {
+            "date": "2026-04-01",
+            "points": -0.16168644011059286
+          },
+          "status": "normal",
+          "sourceName": "FRED (BEA series, derived)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/A091RC1Q027SBEA",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "bund-10y",
+          "value": 3.46952380952381,
+          "asOf": "2026-09-01",
+          "change30d": 0.28380952380951996,
+          "percentile10y": 1,
+          "sd10y": 1.8831443718412944,
+          "fromPeak10y": 0,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.28380952380951996
+          },
+          "status": "context",
+          "sourceName": "OECD via FRED (IRLTLT01DEM156N)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/IRLTLT01DEM156N",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "jgb-10y",
+          "value": 2.829,
+          "asOf": "2026-10-27",
+          "change7d": -0.09799999999999986,
+          "percentile10y": 0.8676470588235294,
+          "sd10y": 1.8107773288186775,
+          "fromPeak10y": -9.064609450337514,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": 0.0050000000000003375
+          },
+          "status": "context",
+          "sourceName": "Japan Ministry of Finance (JGB interest rates, daily)",
+          "sourceUrl": "https://www.mof.go.jp/english/policy/jgbs/reference/interest_rate/jgbcme.csv",
+          "updatedAt": "2026-10-28T04:20:18.253Z"
+        },
+        {
+          "id": "gilt-10y",
+          "value": 5.2421,
+          "asOf": "2026-09-01",
+          "change30d": 0.25349999999999984,
+          "percentile10y": 1,
+          "sd10y": 1.7278717872827956,
+          "fromPeak10y": 0,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.25349999999999984
+          },
+          "status": "context",
+          "sourceName": "OECD via FRED (IRLTLT01GBM156N)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/IRLTLT01GBM156N",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "boj-rate",
+          "value": 1.043,
+          "asOf": "2026-09-01",
+          "change30d": 0.06599999999999995,
+          "percentile10y": 1,
+          "sd10y": 3.7733838243386475,
+          "fromPeak10y": 0,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.06599999999999995
+          },
+          "status": "context",
+          "sourceName": "OECD via FRED (IRSTCI01JPM156N — Japan overnight call rate)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/IRSTCI01JPM156N",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "boe-rate",
+          "value": 3.75,
+          "asOf": "2026-10-28",
+          "change7d": 0,
+          "change30d": 0,
+          "percentile10y": 0.6263013698630137,
+          "sd10y": 0.8454464175426508,
+          "fromPeak10y": -28.57142857142857,
+          "lastChange": {
+            "date": "2025-12-18",
+            "points": -0.25
+          },
+          "decidedDate": "2025-12-18",
+          "status": "context",
+          "sourceName": "Bank of England (official Bank Rate history)",
+          "sourceUrl": "https://www.bankofengland.co.uk/boeapps/database/Bank-Rate.asp",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "mortgage-30y",
+          "value": 7.32,
+          "asOf": "2026-10-22",
+          "change7d": -0.08000000000000007,
+          "change30d": 0.3700000000000001,
+          "percentile10y": 0.9826923076923076,
+          "sd10y": 1.5321213979295343,
+          "fromPeak10y": -6.0333761232349135,
+          "lastChange": {
+            "date": "2026-10-22",
+            "points": -0.08000000000000007
+          },
+          "status": "context",
+          "sourceName": "Freddie Mac via FRED (MORTGAGE30US)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/MORTGAGE30US",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "us-cpi-yoy",
+          "value": 3.737684729064035,
+          "asOf": "2026-09-01",
+          "change30d": 0.34113683662755223,
+          "percentile10y": 0.7606837606837606,
+          "sd10y": 0.20358708358972394,
+          "moveScore": 0.7967623653523644,
+          "fromPeak10y": -58.744099526801364,
+          "releaseDate": "2026-10-14",
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.34113683662755223
+          },
+          "status": "warning",
+          "sourceName": "FRED (CPIAUCNS, not seasonally adjusted)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/CPIAUCNS",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "us-cpi-core-yoy",
+          "value": 2.5643583511686696,
+          "asOf": "2026-09-01",
+          "change30d": 0.11837841359859658,
+          "percentile10y": 0.48717948717948717,
+          "sd10y": -0.39097715886973183,
+          "fromPeak10y": -61.32541907756804,
+          "releaseDate": "2026-10-14",
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.11837841359859658
+          },
+          "status": "context",
+          "sourceName": "FRED (CPILFENS, not seasonally adjusted)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/CPILFENS",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "us-pce-core-yoy",
+          "value": 3.0075959761855975,
+          "asOf": "2026-08-01",
+          "change30d": 0.024127714115204757,
+          "percentile10y": 0.6495726495726496,
+          "sd10y": 0.1538030258878113,
+          "moveScore": 0.072782908016494,
+          "fromPeak10y": -46.67808318511414,
+          "lastChange": {
+            "date": "2026-08-01",
+            "points": 0.024127714115204757
+          },
+          "status": "warning",
+          "sourceName": "FRED (PCEPILFE, 12-month % change)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/PCEPILFE",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "euro-hicp",
+          "value": 3.8,
+          "asOf": "2026-09-01",
+          "change30d": 0.5999999999999996,
+          "percentile10y": 0.7966101694915254,
+          "sd10y": 0.3998904847545429,
+          "moveScore": 1.2839963516205868,
+          "fromPeak10y": -64.15094339622641,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.5999999999999996
+          },
+          "status": "warning",
+          "sourceName": "ECB Data Portal / Eurostat (HICP annual rate)",
+          "sourceUrl": "https://data.ecb.europa.eu/data/datasets/ICP/ICP.M.U2.N.000000.4.ANR",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "us-wages",
+          "value": 3.295310519645129,
+          "asOf": "2026-09-01",
+          "change30d": -0.00732523773817606,
+          "percentile10y": 0.23728813559322035,
+          "sd10y": -0.6720638117819308,
+          "fromPeak10y": -57.52508595396644,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": -0.00732523773817606
+          },
+          "status": "context",
+          "sourceName": "US Bureau of Labor Statistics via FRED (AHETPI, 12-month % change)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/AHETPI",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "t5yie",
+          "value": 2.45,
+          "asOf": "2026-10-27",
+          "change7d": 0.06000000000000005,
+          "change30d": 0.11000000000000032,
+          "percentile10y": 0.7620192307692307,
+          "sd10y": 0.680290472654604,
+          "fromPeak10y": -31.754874651810578,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": -0.020000000000000018
+          },
+          "change90d": 0.20999999999999996,
+          "status": "context",
+          "sourceName": "Federal Reserve Bank of St. Louis via FRED (T5YIE)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/T5YIE",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "breakeven-5y5y",
+          "value": 2.25,
+          "asOf": "2026-10-27",
+          "change7d": -0.06000000000000005,
+          "change30d": -0.08999999999999986,
+          "percentile10y": 0.6578525641025641,
+          "sd10y": 0.5574695998424681,
+          "moveScore": -2.542104145486061,
+          "fromPeak10y": -15.730337078651683,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": 0.040000000000000036
+          },
+          "change90d": -0.029999999999999805,
+          "status": "normal",
+          "sourceName": "Federal Reserve Bank of St. Louis via FRED (T5YIFR)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/T5YIFR",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "gold-oil-ratio",
+          "value": 35.78,
+          "asOf": "2026-10-27",
+          "change7d": -0.47287899860918414,
+          "change30d": -3.9463087248322113,
+          "percentile10y": 0.7340339531123686,
+          "sd10y": 0.35636360705650144,
+          "fromPeak10y": -80.55540459757621,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": 0.9100000000000037
+          },
+          "change90d": -18.496583143507966,
+          "status": "context",
+          "sourceName": "gold-api.com (XAU) ÷ FRED/EIA Brent (both collected)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "eia-crude-stocks",
+          "value": 695200,
+          "asOf": "2026-10-16",
+          "change7d": -0.48098946404031157,
+          "change30d": -1.8614145395307078,
+          "percentile10y": 0,
+          "sd10y": -1.862304378660244,
+          "fromPeak10y": -43.372773642600094,
+          "lastChange": {
+            "date": "2026-10-16",
+            "points": -3360
+          },
+          "status": "context",
+          "sourceName": "U.S. Energy Information Administration (crude oil ending stocks, WCRSTUS1)",
+          "sourceUrl": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCRSTUS1&f=W",
+          "updatedAt": "2026-10-28T04:20:18.253Z"
+        },
+        {
+          "id": "cftc-gold-positioning",
+          "value": 49.6832,
+          "asOf": "2026-10-20",
+          "fromPeak10y": 0,
+          "status": "warning",
+          "sourceName": "U.S. Commodity Futures Trading Commission (Commitments of Traders, gold)",
+          "sourceUrl": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm",
+          "updatedAt": "2026-10-28T04:20:18.253Z"
+        },
+        {
+          "id": "oecd-cli-us",
+          "value": 100.9993,
+          "asOf": "2026-09-01",
+          "change30d": 0.05290000000000816,
+          "percentile10y": 0.9067796610169492,
+          "sd10y": 1.1099543503136173,
+          "moveScore": 0.07076225440004646,
+          "fromPeak10y": -0.40577532176059117,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.05290000000000816
+          },
+          "status": "normal",
+          "sourceName": "OECD (Composite leading indicator, amplitude-adjusted)",
+          "sourceUrl": "https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm",
+          "updatedAt": "2026-10-28T04:20:18.253Z"
+        },
+        {
+          "id": "oecd-cli-cn",
+          "value": 97.41035,
+          "asOf": "2026-09-01",
+          "change30d": -0.2251499999999993,
+          "percentile10y": 0.0423728813559322,
+          "sd10y": -0.9388149713493107,
+          "fromPeak10y": -4.988778357689972,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": -0.2251499999999993
+          },
+          "status": "context",
+          "sourceName": "OECD (Composite leading indicator, amplitude-adjusted)",
+          "sourceUrl": "https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm",
+          "updatedAt": "2026-10-28T04:20:18.253Z"
+        },
+        {
+          "id": "oecd-cli-de",
+          "value": 101.0066,
+          "asOf": "2026-09-01",
+          "change30d": 0.10320000000000107,
+          "percentile10y": 0.7796610169491526,
+          "sd10y": 0.6279373752927114,
+          "fromPeak10y": -1.7729313612701354,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.10320000000000107
+          },
+          "status": "context",
+          "sourceName": "OECD (Composite leading indicator, amplitude-adjusted)",
+          "sourceUrl": "https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm",
+          "updatedAt": "2026-10-28T04:20:18.253Z"
+        },
+        {
+          "id": "gpr-index",
+          "value": 146.20989990234375,
+          "asOf": "2026-09-01",
+          "change30d": 20.588516235351562,
+          "percentile10y": 0.847457627118644,
+          "sd10y": 0.6271036201733702,
+          "fromPeak10y": -55.71769683509942,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 20.588516235351562
+          },
+          "status": "context",
+          "sourceName": "Caldara-Iacoviello Geopolitical Risk Index (Federal Reserve Board)",
+          "sourceUrl": "https://www.matteoiacoviello.com/gpr.htm",
+          "updatedAt": "2026-10-28T04:20:18.253Z"
+        },
+        {
+          "id": "epu-us",
+          "value": 218.94095727491293,
+          "asOf": "2026-09-01",
+          "change30d": 3.1252753373674977,
+          "percentile10y": 0.6864406779661016,
+          "sd10y": 0.06268292317227582,
+          "fromPeak10y": -69.79858478234867,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 3.1252753373674977
+          },
+          "status": "context",
+          "sourceName": "Baker-Bloom-Davis, US Economic Policy Uncertainty",
+          "sourceUrl": "https://www.policyuncertainty.com/us_monthly.html",
+          "updatedAt": "2026-10-28T04:20:18.253Z"
+        },
+        {
+          "id": "wti",
+          "value": 107.89,
+          "asOf": "2026-10-20",
+          "change7d": 13.10409896215536,
+          "change30d": 6.35843848580442,
+          "percentile10y": 0.9775280898876404,
+          "sd10y": 2.2609925915021707,
+          "fromPeak10y": -12.738595923649305,
+          "lastChange": {
+            "date": "2026-10-20",
+            "points": -2.1200000000000045
+          },
+          "change90d": 23.077800593201008,
+          "status": "context",
+          "sourceName": "FRED (EIA WTI spot)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DCOILWTICO",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "natgas",
+          "value": 3.1,
+          "asOf": "2026-10-20",
+          "change7d": -1.2738853503184724,
+          "change30d": 4.377104377104373,
+          "percentile10y": 0.64828137490008,
+          "sd10y": -0.0993554893487978,
+          "fromPeak10y": -89.90885416666666,
+          "lastChange": {
+            "date": "2026-10-20",
+            "points": -0.17999999999999972
+          },
+          "change90d": 5.802047781569963,
+          "status": "context",
+          "sourceName": "FRED (EIA Henry Hub spot)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DHHNGSP",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "breakeven-10y",
+          "value": 2.35,
+          "asOf": "2026-10-27",
+          "change7d": 0,
+          "change30d": 0.010000000000000231,
+          "percentile10y": 0.7524038461538461,
+          "sd10y": 0.6698049222352752,
+          "fromPeak10y": -22.185430463576157,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": 0.010000000000000231
+          },
+          "change90d": 0.0900000000000003,
+          "status": "context",
+          "sourceName": "FRED (T10YIE)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/T10YIE",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "food-index",
+          "value": 124.1,
+          "asOf": "2026-09-01",
+          "change30d": 3.7625418060200673,
+          "percentile10y": 0.8389830508474576,
+          "sd10y": 0.9035699739439205,
+          "fromPeak10y": -18.941868060091444,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 4.5
+          },
+          "status": "context",
+          "sourceName": "The World Bank: Commodity Markets (Pink Sheet, Food index)",
+          "sourceUrl": "https://www.worldbank.org/en/research/commodity-markets",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "wheat",
+          "value": 278.6,
+          "asOf": "2026-09-01",
+          "change30d": 5.851063829787248,
+          "percentile10y": 0.847457627118644,
+          "sd10y": 0.5581604306897169,
+          "fromPeak10y": -37.63152003581822,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 15.400000000000034
+          },
+          "status": "context",
+          "sourceName": "The World Bank: Commodity Markets (Pink Sheet, Wheat US SRW)",
+          "sourceUrl": "https://www.worldbank.org/en/research/commodity-markets",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "maize",
+          "value": 239.6,
+          "asOf": "2026-09-01",
+          "change30d": 6.964285714285712,
+          "percentile10y": 0.7542372881355932,
+          "sd10y": 0.5814315115197449,
+          "fromPeak10y": -31.1889718552556,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 15.599999999999994
+          },
+          "status": "context",
+          "sourceName": "The World Bank: Commodity Markets (Pink Sheet, Maize)",
+          "sourceUrl": "https://www.worldbank.org/en/research/commodity-markets",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "usdtry",
+          "value": 49.787,
+          "asOf": "2026-10-27",
+          "change7d": 0.42358351655001486,
+          "change30d": 1.7452434962091008,
+          "percentile10y": 1,
+          "sd10y": 2.147561557628561,
+          "fromPeak10y": 0,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": 0.02400000000000091
+          },
+          "change90d": 5.040297058947626,
+          "status": "context",
+          "sourceName": "Frankfurter (ECB USD→TRY reference rate)",
+          "sourceUrl": "https://frankfurter.dev",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "walcl",
+          "value": 6753604,
+          "asOf": "2026-10-21",
+          "change7d": -0.030122983184862305,
+          "change30d": 0.10458681980770018,
+          "percentile10y": 0.5076923076923077,
+          "sd10y": 0.1805135003090264,
+          "fromPeak10y": -24.671085909778242,
+          "lastChange": {
+            "date": "2026-10-21",
+            "points": -2035
+          },
+          "status": "context",
+          "sourceName": "Federal Reserve via FRED (WALCL, H.41 table)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/WALCL",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "stress-stlfsi",
+          "value": -0.6328,
+          "asOf": "2026-10-16",
+          "change7d": 0.0877,
+          "change30d": 0.21629999999999994,
+          "percentile10y": 0.31213872832369943,
+          "sd10y": -0.47667129407182535,
+          "moveScore": 0.32639945002936,
+          "lastChange": {
+            "date": "2026-10-16",
+            "points": 0.0877
+          },
+          "status": "normal",
+          "sourceName": "St. Louis Fed via FRED (STLFSI4)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/STLFSI4",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "nfci",
+          "value": -0.496,
+          "asOf": "2026-10-16",
+          "change7d": 0.006000000000000005,
+          "change30d": 0.041000000000000036,
+          "percentile10y": 0.5375722543352601,
+          "sd10y": -0.21837590230518808,
+          "moveScore": 0.299113653009459,
+          "lastChange": {
+            "date": "2026-10-16",
+            "points": 0.006000000000000005
+          },
+          "status": "normal",
+          "sourceName": "Chicago Fed via FRED (NFCI)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/NFCI",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "vix",
+          "value": 18.39,
+          "asOf": "2026-10-26",
+          "change7d": -0.05000000000000071,
+          "change30d": 3.5200000000000014,
+          "percentile10y": 0.5948072383949646,
+          "sd10y": -0.03520491479548582,
+          "moveScore": 1.7957209278486577,
+          "fromPeak10y": -77.76030959003506,
+          "lastChange": {
+            "date": "2026-10-26",
+            "points": -1.0599999999999987
+          },
+          "change90d": 0.17999999999999972,
+          "status": "normal",
+          "sourceName": "Cboe via FRED (VIXCLS)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/VIXCLS",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "crypto-fng",
+          "value": 51,
+          "asOf": "2026-10-28",
+          "change7d": -12,
+          "change30d": -23,
+          "percentile10y": 0.8070175438596491,
+          "sd10y": 0.9791342494311666,
+          "fromPeak10y": -34.61538461538461,
+          "lastChange": {
+            "date": "2026-10-28",
+            "points": 3
+          },
+          "change90d": 23,
+          "status": "context",
+          "sourceName": "Alternative.me (Crypto Fear and Greed Index)",
+          "sourceUrl": "https://alternative.me/crypto/fear-and-greed-index/",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "shiller-cape",
+          "value": 40.71,
+          "asOf": "2026-10-01",
+          "change30d": 0.13000000000000256,
+          "percentile10y": 0.9915966386554622,
+          "sd10y": 2.0444188508370336,
+          "fromPeak10y": -0.6830934374237646,
+          "lastChange": {
+            "date": "2026-10-01",
+            "points": 0.13000000000000256
+          },
+          "status": "context",
+          "sourceName": "Robert Shiller, Irrational Exuberance data (ie_data.xls)",
+          "sourceUrl": "https://shillerdata.com/",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "shiller-ecy",
+          "value": 0.5599999999999999,
+          "asOf": "2026-10-01",
+          "change30d": -0.2600000000000001,
+          "percentile10y": 0,
+          "sd10y": -2.0937069339945285,
+          "fromPeak10y": -88.52459016393443,
+          "lastChange": {
+            "date": "2026-10-01",
+            "points": -0.2600000000000001
+          },
+          "status": "context",
+          "sourceName": "Robert Shiller, Irrational Exuberance data (ie_data.xls)",
+          "sourceUrl": "https://shillerdata.com/",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "gold-silver",
+          "value": 74.71683092290749,
+          "asOf": "2026-10-28",
+          "change7d": 3.040971922907488,
+          "percentile10y": 0.3357664233576642,
+          "sd10y": -0.495864037292885,
+          "moveScore": 1.956337678395394,
+          "fromPeak10y": -32.96350901271939,
+          "lastChange": {
+            "date": "2026-10-28",
+            "points": 0.018104922907497212
+          },
+          "status": "normal",
+          "sourceName": "gold-api.com (history: The World Bank Pink Sheet)",
+          "sourceUrl": "https://www.gold-api.com",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "dollar-basket",
+          "value": 102.18669758996153,
+          "asOf": "2026-10-27",
+          "change7d": 0.3431963701795411,
+          "change30d": 1.2024004522216671,
+          "percentile10y": 0.735133020344288,
+          "sd10y": 0.6772700156299925,
+          "moveScore": 2.895626730571968,
+          "fromPeak10y": -10.788282394131253,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": 0.2500864058759902
+          },
+          "change90d": 0.7390008365388638,
+          "status": "normal",
+          "sourceName": "Currena basket (ECB rates via Frankfurter)",
+          "sourceUrl": "https://frankfurter.dev",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "us-japan-10y-gap",
+          "value": 2.176,
+          "asOf": "2026-10-26",
+          "change7d": -0.0389999999999997,
+          "percentile10y": 0.41935483870967744,
+          "sd10y": -0.16436993566977928,
+          "moveScore": 1.4067057038113377,
+          "fromPeak10y": -47.05596107055961,
+          "lastChange": {
+            "date": "2026-10-26",
+            "points": 0.013000000000000345
+          },
+          "gapLegs": {
+            "a": {
+              "id": "us10y",
+              "asOf": "2026-10-26"
+            },
+            "b": {
+              "id": "jgb-10y",
+              "asOf": "2026-10-27"
+            }
+          },
+          "status": "normal",
+          "sourceName": "FRED (DGS10) − Japan Ministry of Finance (jgbcme 10Y)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+          "updatedAt": "2026-10-28T04:20:18.253Z"
+        },
+        {
+          "id": "usdjpy",
+          "value": 157.82,
+          "asOf": "2026-10-27",
+          "change7d": -0.19604123189780703,
+          "change30d": 0.1459483469763245,
+          "percentile10y": 0.9366197183098591,
+          "sd10y": 1.5482036614781827,
+          "moveScore": 0.2272117051025827,
+          "fromPeak10y": -3.7154536025867877,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": 0.37000000000000455
+          },
+          "change90d": -3.580156402737056,
+          "status": "normal",
+          "sourceName": "Frankfurter (ECB)",
+          "sourceUrl": "https://frankfurter.dev",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "eur-usd",
+          "value": 0.89686,
+          "asOf": "2026-10-27",
+          "change7d": 0.5831819303321873,
+          "change30d": 2.2692027002371864,
+          "percentile10y": 0.5614241001564946,
+          "sd10y": 0.12117887825414485,
+          "fromPeak10y": -14.217120994739368,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": 0.003049999999999997
+          },
+          "change90d": 2.0632048524575217,
+          "status": "context",
+          "sourceName": "Frankfurter (ECB)",
+          "sourceUrl": "https://frankfurter.dev",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "china-pmi",
+          "value": 50.1,
+          "asOf": "2026-09-30",
+          "change30d": 0.30000000000000426,
+          "percentile10y": 0.7,
+          "sd10y": 0.8872475500124652,
+          "moveScore": 0.40999177983496177,
+          "fromPeak10y": -1.3779527559055034,
+          "lastChange": {
+            "date": "2026-09-30",
+            "points": 0.30000000000000426
+          },
+          "status": "normal",
+          "sourceName": "National Bureau of Statistics of China (Purchasing Managers Index)",
+          "sourceUrl": "https://www.stats.gov.cn/english/PressRelease/",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "china-cpi",
+          "value": 0.9,
+          "asOf": "2026-09-30",
+          "change30d": 0.09999999999999998,
+          "fromPeak10y": -30.76923076923077,
+          "lastChange": {
+            "date": "2026-09-30",
+            "points": 0.09999999999999998
+          },
+          "status": "normal",
+          "sourceName": "National Bureau of Statistics of China (Consumer Price Index)",
+          "sourceUrl": "https://www.stats.gov.cn/english/PressRelease/",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "m2-us",
+          "value": 23413.9,
+          "asOf": "2026-09-01",
+          "change30d": 0.48495980841941727,
+          "percentile10y": 0.7064220183486238,
+          "sd10y": 3155.515989704966,
+          "fromPeak10y": 0,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 113
+          },
+          "status": "context",
+          "sourceName": "FRED (M2SL)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/M2SL",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "philly-fed",
+          "value": 20.9,
+          "asOf": "2026-10-01",
+          "change30d": -16.9,
+          "percentile10y": 0.6722689075630253,
+          "sd10y": 0.5138924149173857,
+          "moveScore": -1.1103130152193805,
+          "fromPeak10y": -57.17213114754098,
+          "lastChange": {
+            "date": "2026-10-01",
+            "points": -16.9
+          },
+          "status": "normal",
+          "sourceName": "Philadelphia Fed via FRED (GACDFSA066MSFRBPHI)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/GACDFSA066MSFRBPHI",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "initial-jobless-claims",
+          "value": 194000,
+          "asOf": "2026-10-17",
+          "change7d": -3,
+          "change30d": -2.0202020202020203,
+          "percentile10y": 0.005780346820809248,
+          "sd10y": -0.30199935801119676,
+          "moveScore": -0.10606417848373356,
+          "fromPeak10y": -96.83884634186084,
+          "lastChange": {
+            "date": "2026-10-17",
+            "points": -6000
+          },
+          "status": "normal",
+          "sourceName": "US Department of Labor via FRED (ICSA)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/ICSA",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "us-unemployment",
+          "value": 4.2,
+          "asOf": "2026-09-01",
+          "change30d": 0.10000000000000053,
+          "percentile10y": 0.5641025641025641,
+          "sd10y": -0.1910552081908756,
+          "moveScore": 0.10351893213646657,
+          "fromPeak10y": -71.62162162162163,
+          "releaseDate": "2026-10-02",
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.10000000000000053
+          },
+          "status": "normal",
+          "sourceName": "FRED (UNRATE), US BLS",
+          "sourceUrl": "https://fred.stlouisfed.org/series/UNRATE",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "sahm-rule",
+          "value": 0,
+          "asOf": "2026-09-01",
+          "change30d": 0.07,
+          "percentile10y": 0.3247863247863248,
+          "sd10y": -0.3440834734847648,
+          "moveScore": 0.11629853778255612,
+          "releaseDate": "2026-10-02",
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.07
+          },
+          "status": "normal",
+          "sourceName": "FRED (SAHMREALTIME)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/SAHMREALTIME",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "recession-probability",
+          "value": 0.62,
+          "asOf": "2026-08-01",
+          "change30d": 0.38,
+          "percentile10y": 0.7863247863247863,
+          "sd10y": -0.11514346357390907,
+          "moveScore": 0.02904638031392392,
+          "fromPeak10y": -99.38,
+          "lastChange": {
+            "date": "2026-08-01",
+            "points": 0.38
+          },
+          "status": "warning",
+          "sourceName": "FRED (RECPROUSM156N, Marcelle-Chauvet smoothed recession probability)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/RECPROUSM156N",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "michigan-sentiment",
+          "value": 48.1,
+          "asOf": "2026-09-01",
+          "change30d": -3.6000000000000014,
+          "percentile10y": 0.00847457627118644,
+          "sd10y": -1.6919682757422672,
+          "moveScore": -0.738727764872589,
+          "fromPeak10y": -52.56410256410257,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": -3.6000000000000014
+          },
+          "status": "warning",
+          "sourceName": "University of Michigan via FRED (UMCSENT)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/UMCSENT",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "michigan-1y-expectations",
+          "value": 4.6,
+          "asOf": "2026-09-01",
+          "change30d": 0.5999999999999996,
+          "percentile10y": 0.7542372881355932,
+          "sd10y": 1.0535424436823726,
+          "fromPeak10y": -30.303030303030305,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.5999999999999996
+          },
+          "status": "context",
+          "sourceName": "University of Michigan via FRED (MICH)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/MICH",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "retail-sales",
+          "value": 745021,
+          "asOf": "2026-09-01",
+          "change30d": 0.7708413925190919,
+          "percentile10y": 1,
+          "sd10y": 1.6489274110730494,
+          "fromPeak10y": 0,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 5699
+          },
+          "status": "context",
+          "sourceName": "US Census Bureau via FRED (RSAFS)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/RSAFS",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "housing-permits",
+          "value": 1398,
+          "asOf": "2026-09-01",
+          "change30d": -0.3563791874554526,
+          "percentile10y": 0.3474576271186441,
+          "sd10y": -0.4332411282267671,
+          "fromPeak10y": -27.301092043681745,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": -5
+          },
+          "status": "context",
+          "sourceName": "US Census Bureau via FRED (PERMIT)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/PERMIT",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "cfnai",
+          "value": 0.07,
+          "asOf": "2026-09-01",
+          "change30d": 0.15000000000000002,
+          "percentile10y": 0.6101694915254238,
+          "sd10y": 0.0706411317686949,
+          "fromPeak10y": -98.89415481832543,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.15000000000000002
+          },
+          "status": "context",
+          "sourceName": "Chicago Fed via FRED (CFNAI)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/CFNAI",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "job-openings",
+          "value": 7079,
+          "asOf": "2026-08-01",
+          "change30d": -3.49011588275392,
+          "percentile10y": 0.3504273504273504,
+          "sd10y": -0.48018304333099143,
+          "fromPeak10y": -42.45183318429396,
+          "lastChange": {
+            "date": "2026-08-01",
+            "points": -256
+          },
+          "status": "context",
+          "sourceName": "US Bureau of Labor Statistics via FRED (JTSJOL)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/JTSJOL",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "copper-gold",
+          "value": 3.3512387126649688,
+          "asOf": "2026-09-01",
+          "change30d": 0.10344909579804495,
+          "percentile10y": 0.211864406779661,
+          "sd10y": -1.0516832694105218,
+          "moveScore": 0.5438895396520224,
+          "fromPeak10y": -39.41244081386051,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.10344909579804495
+          },
+          "status": "normal",
+          "sourceName": "The World Bank Pink Sheet (copper ÷ gold)",
+          "sourceUrl": "https://www.worldbank.org/en/research/commodity-markets",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "usdcny",
+          "value": 6.6675,
+          "asOf": "2026-10-27",
+          "change7d": -0.1572327044025084,
+          "change30d": -0.6807483763331822,
+          "percentile10y": 0.24256651017214398,
+          "sd10y": -0.6931560054043335,
+          "fromPeak10y": -9.283245802606869,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": -0.0005999999999994898
+          },
+          "change90d": -1.4601776450940658,
+          "status": "context",
+          "sourceName": "Frankfurter (ECB)",
+          "sourceUrl": "https://frankfurter.dev",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "us-gdp-growth",
+          "value": 2.2,
+          "asOf": "2026-04-01",
+          "periodStart": "2026-04-01",
+          "periodEnd": "2026-06-30",
+          "change30d": -0.2999999999999998,
+          "percentile10y": 0.2702702702702703,
+          "sd10y": -0.0779862464048475,
+          "fromPeak10y": -93.69627507163322,
+          "lastChange": {
+            "date": "2026-04-01",
+            "points": -0.2999999999999998
+          },
+          "status": "context",
+          "sourceName": "FRED (BEA real GDP growth)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/A191RL1Q225SBEA",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "us-nfp",
+          "value": 29,
+          "asOf": "2026-09-01",
+          "change30d": -104,
+          "percentile10y": 0.11864406779661017,
+          "sd10y": -0.04481843846624649,
+          "fromPeak10y": -99.37378535953357,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": -104
+          },
+          "status": "context",
+          "sourceName": "FRED (BLS PAYEMS, monthly change)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/PAYEMS",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "platinum",
+          "value": 1538,
+          "asOf": "2026-10-28",
+          "percentile10y": 0.8852459016393442,
+          "sd10y": 1.4906338347165293,
+          "fromPeak10y": -36.81183237469187,
+          "lastChange": {
+            "date": "2026-10-28",
+            "points": 16
+          },
+          "status": "context",
+          "sourceName": "gold-api.com (XPT spot; history: World Bank Pink Sheet)",
+          "sourceUrl": "https://www.gold-api.com",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "brent",
+          "value": 113.87999725341797,
+          "asOf": "2026-10-27",
+          "ma200GapPct": 17.321627223832873,
+          "change7d": -1.1629949197899931,
+          "change30d": -1.836050984037614,
+          "percentile10y": 0.957757599684169,
+          "sd10y": 2.1412811052266174,
+          "moveScore": -0.6077788996765414,
+          "fromPeak10y": -17.603648611954302,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": -1.9300003051757812
+          },
+          "change90d": 23.84991544689284,
+          "peak": {
+            "value": 138.21,
+            "date": "2026-04-07",
+            "basis": "daily-close"
+          },
+          "status": "normal",
+          "sourceName": "FRED (EIA Brent) + Yahoo Finance (BZ=F)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "gold-usd",
+          "value": 4043.600098,
+          "asOf": "2026-10-28",
+          "ma200GapPct": -10.65446773854107,
+          "change7d": -2.563853060240967,
+          "change30d": -2.993949891265937,
+          "percentile10y": 0.9036624203821656,
+          "sd10y": 1.9795849279158013,
+          "fromPeak10y": -27.61447931291343,
+          "lastChange": {
+            "date": "2026-10-28",
+            "points": -30.99999965625011
+          },
+          "change90d": -1.378015129156172,
+          "peak": {
+            "value": 5586.2001953125,
+            "date": "2026-01-29",
+            "basis": "daily-high"
+          },
+          "status": "context",
+          "sourceName": "gold-api.com (XAU)",
+          "sourceUrl": "https://www.gold-api.com",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "silver-usd",
+          "value": 54.118999,
+          "asOf": "2026-10-28",
+          "ma200GapPct": -24.056780117931766,
+          "change7d": -5.752153937693984,
+          "change30d": -11.599154000509454,
+          "percentile10y": 0.9095977698128236,
+          "sd10y": 1.7132596281677506,
+          "fromPeak10y": -55.38417342256139,
+          "lastChange": {
+            "date": "2026-10-28",
+            "points": -0.1740002675781227
+          },
+          "change90d": -7.984357283613777,
+          "peak": {
+            "value": 121.30000305175781,
+            "date": "2026-01-29",
+            "basis": "daily-high"
+          },
+          "status": "context",
+          "sourceName": "gold-api.com (XAG)",
+          "sourceUrl": "https://www.gold-api.com",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "copper-usd",
+          "value": 14609.50058406596,
+          "asOf": "2026-10-28",
+          "change7d": 0.9605850830466265,
+          "percentile10y": 0.9562043795620438,
+          "sd10y": 1.8785239859775211,
+          "fromPeak10y": -1.106743552900938,
+          "lastChange": {
+            "date": "2026-10-28",
+            "points": 106.16801106595994
+          },
+          "status": "context",
+          "sourceName": "gold-api.com (HG, history: The World Bank Pink Sheet)",
+          "sourceUrl": "https://www.gold-api.com",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "btc-usd",
+          "value": 80948.117188,
+          "asOf": "2026-10-28",
+          "ma200GapPct": 10.847770509374286,
+          "change7d": -3.6469227034987157,
+          "change30d": -3.059176480974486,
+          "percentile10y": 0.8684571115374075,
+          "sd10y": 1.3565696541014571,
+          "fromPeak10y": -35.856295593465944,
+          "lastChange": {
+            "date": "2026-10-28",
+            "points": 941.4609380000038
+          },
+          "change90d": 25.064088448110557,
+          "peak": {
+            "value": 126198.0703125,
+            "date": "2025-10-06",
+            "basis": "daily-high"
+          },
+          "status": "context",
+          "sourceName": "gold-api.com (BTC)",
+          "sourceUrl": "https://www.gold-api.com",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "gold-btc",
+          "value": 0.04995298517702195,
+          "asOf": "2026-10-28",
+          "fromPeak10y": 0,
+          "status": "context",
+          "sourceName": "gold-api.com (XAU ÷ BTC)",
+          "sourceUrl": "https://www.gold-api.com",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-cpi",
+          "value": 4.340000000000003,
+          "asOf": "2026-09-01",
+          "change30d": 0.3721446509291817,
+          "fromPeak10y": -5.101250000000019,
+          "releaseDate": "2026-10-28",
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.3721446509291817
+          },
+          "status": "warning",
+          "sourceName": "ABS (monthly CPI All groups)",
+          "sourceUrl": "https://data.api.abs.gov.au/rest/data/CPI/1.10001.10.50.M",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-trimmed-mean",
+          "value": 3.5886276342485965,
+          "asOf": "2026-09-01",
+          "change30d": 0.04633145323578747,
+          "fromPeak10y": -0.32208043107735823,
+          "releaseDate": "2026-10-28",
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.04633145323578747
+          },
+          "status": "warning",
+          "sourceName": "ABS (monthly CPI Trimmed Mean)",
+          "sourceUrl": "https://data.api.abs.gov.au/rest/data/CPI/1.999902.20.50.M",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-10y",
+          "value": 5.283,
+          "asOf": "2026-09-30",
+          "change30d": 0.2680000000000007,
+          "percentile10y": 1,
+          "sd10y": 1.8245316389270387,
+          "moveScore": 1.3067814554080215,
+          "fromPeak10y": 0,
+          "lastChange": {
+            "date": "2026-09-30",
+            "points": 0.2680000000000007
+          },
+          "change90d": 0.45199999999999996,
+          "highestSinceYear": 2013,
+          "status": "warning",
+          "sourceName": "RBA F2/F2.1 (10-year bond yield)",
+          "sourceUrl": "https://www.rba.gov.au/statistics/tables/#f2",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "rba-expectations",
+          "value": 0.31,
+          "asOf": "2026-09-30",
+          "change30d": 0.10600000000000001,
+          "percentile10y": 0.6470588235294118,
+          "sd10y": 0.18110691082802471,
+          "moveScore": 0.39222491184541824,
+          "fromPeak10y": -87.78565799842394,
+          "lastChange": {
+            "date": "2026-09-30",
+            "points": 0.10600000000000001
+          },
+          "change90d": 0.20700000000000002,
+          "status": "normal",
+          "sourceName": "RBA F2 (FCMYGBAG3D) − RBA F1",
+          "sourceUrl": "https://www.rba.gov.au/statistics/tables/",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-us-10y-gap",
+          "value": -0.007,
+          "asOf": "2026-09-30",
+          "change30d": -0.272,
+          "percentile10y": 0.40476190476190477,
+          "sd10y": -0.10716073336413659,
+          "moveScore": -1.234864886615239,
+          "lastChange": {
+            "date": "2026-09-30",
+            "points": -0.272
+          },
+          "change90d": -0.398,
+          "gapLegs": {
+            "a": {
+              "id": "au-10y",
+              "asOf": "2026-09-30"
+            },
+            "b": {
+              "id": "us10y",
+              "asOf": "2026-10-26"
+            }
+          },
+          "status": "warning",
+          "sourceName": "RBA F2 − FRED (DGS10)",
+          "sourceUrl": "https://www.rba.gov.au/statistics/tables/",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-petrol-yoy",
+          "value": 23.58,
+          "asOf": "2026-09-01",
+          "change30d": 10.05100211076489,
+          "percentile10y": 0.8541666666666666,
+          "sd10y": 1.2106229786865712,
+          "fromPeak10y": -45.48642541924095,
+          "releaseDate": "2026-10-28",
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 10.05100211076489
+          },
+          "status": "context",
+          "sourceName": "ABS (CPI Automotive fuel)",
+          "sourceUrl": "https://data.api.abs.gov.au/rest/data/CPI/1.40081.10.50.M",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "rba-cash-rate",
+          "value": 4.6,
+          "asOf": "2026-10-27",
+          "change7d": 0,
+          "change30d": 0.25,
+          "percentile10y": 0.9924841772151899,
+          "sd10y": 1.5040827906305854,
+          "fromPeak10y": 0,
+          "lastChange": {
+            "date": "2026-09-30",
+            "points": 0.25
+          },
+          "decidedDate": "2026-09-29",
+          "status": "context",
+          "sourceName": "RBA (Cash Rate Target — F1/decision table)",
+          "sourceUrl": "https://www.rba.gov.au/statistics/cash-rate/",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-home-loan",
+          "value": 6.2,
+          "asOf": "2026-08-31",
+          "change30d": 0,
+          "percentile10y": 0.9529411764705882,
+          "sd10y": 1.2737105856461899,
+          "moveScore": -0.24043316991025837,
+          "fromPeak10y": 0,
+          "lastChange": {
+            "date": "2026-05-31",
+            "points": 0.20000000000000018
+          },
+          "sinceDecision": {
+            "decisionDate": "2026-05-06",
+            "points": 0.20000000000000018
+          },
+          "status": "warning",
+          "sourceName": "RBA F6 (owner-occupier outstanding)",
+          "sourceUrl": "https://www.rba.gov.au/statistics/tables/",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-deposit-rate",
+          "value": 4.8,
+          "asOf": "2026-08-31",
+          "change30d": 0,
+          "percentile10y": 0.9882352941176471,
+          "sd10y": 1.341785955637913,
+          "fromPeak10y": 0,
+          "releaseDate": "2026-10-08",
+          "lastChange": {
+            "date": "2026-07-31",
+            "points": 0.09999999999999964
+          },
+          "status": "context",
+          "sourceName": "RBA F4.1 (new term deposits)",
+          "sourceUrl": "https://www.rba.gov.au/statistics/tables/#f4-1",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-wage-growth",
+          "value": 3.2030749519538757,
+          "asOf": "2026-04-01",
+          "periodStart": "2026-04-01",
+          "periodEnd": "2026-06-30",
+          "change30d": -0.018574532582207315,
+          "percentile10y": 0.6216216216216216,
+          "sd10y": 0.6318396088106194,
+          "moveScore": -0.22119391780378536,
+          "fromPeak10y": -23.553277813367515,
+          "lastChange": {
+            "date": "2026-04-01",
+            "points": -0.018574532582207315
+          },
+          "status": "warning",
+          "sourceName": "ABS (Wage Price Index)",
+          "sourceUrl": "https://data.api.abs.gov.au/rest/data/WPI/1.OHRPEB.7.TOT.10.AUS.Q",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-rent-yoy",
+          "value": 3.5499999999999967,
+          "asOf": "2026-09-01",
+          "change30d": -0.02822992883633413,
+          "percentile10y": 0.02631578947368421,
+          "sd10y": -1.2358551650189455,
+          "moveScore": 0.31445488827245516,
+          "fromPeak10y": -54.534992343032194,
+          "releaseDate": "2026-10-28",
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": -0.02822992883633413
+          },
+          "status": "normal",
+          "sourceName": "ABS (CPI Rents)",
+          "sourceUrl": "https://data.api.abs.gov.au/rest/data/CPI/1.115522.10.50.M",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-unemployment",
+          "value": 4.71834873,
+          "asOf": "2026-09-01",
+          "change30d": 0.06674087999999934,
+          "percentile10y": 0.5084745762711864,
+          "sd10y": -0.09099744640697284,
+          "moveScore": 0.35079557888254176,
+          "fromPeak10y": -36.63615728410982,
+          "releaseDate": "2026-10-15",
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 0.06674087999999934
+          },
+          "status": "warning",
+          "sourceName": "ABS (Labour Force)",
+          "sourceUrl": "https://data.api.abs.gov.au/rest/data/LF/M13.3.1599.20.AUS.M",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-home-values",
+          "value": 1100.4,
+          "asOf": "2026-04-01",
+          "periodStart": "2026-04-01",
+          "periodEnd": "2026-06-30",
+          "change30d": -0.7396716579469438,
+          "percentile10y": 0.5675675675675675,
+          "sd10y": 154.13107053073767,
+          "moveScore": -1.0000970813009291,
+          "fromPeak10y": -0.7396716579469438,
+          "lastChange": {
+            "date": "2026-04-01",
+            "points": -8.199999999999818
+          },
+          "status": "normal",
+          "sourceName": "ABS (RES_DWELL_ST)",
+          "sourceUrl": "https://data.api.abs.gov.au/rest/data/RES_DWELL_ST/5.AUS.Q",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-household-debt-arrears",
+          "value": 178.4,
+          "asOf": "2026-06-30",
+          "periodStart": "2026-04-01",
+          "periodEnd": "2026-06-30",
+          "change30d": 1.200000000000017,
+          "percentile10y": 0.15789473684210525,
+          "sd10y": -1.190716121778971,
+          "moveScore": 1.0861481031879698,
+          "fromPeak10y": -4.85333333333333,
+          "lastChange": {
+            "date": "2026-06-30",
+            "points": 1.200000000000017
+          },
+          "status": "normal",
+          "sourceName": "RBA E2 (household ratios)",
+          "sourceUrl": "https://www.rba.gov.au/statistics/tables/",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-housing-finance",
+          "value": 97647.9,
+          "asOf": "2026-04-01",
+          "periodStart": "2026-04-01",
+          "periodEnd": "2026-06-30",
+          "change30d": -5.222162475904659,
+          "percentile10y": 0.40540540540540543,
+          "sd10y": 4217.519830164585,
+          "moveScore": -0.8751388795843262,
+          "fromPeak10y": -8.423872013864734,
+          "lastChange": {
+            "date": "2026-04-01",
+            "points": -5380.300000000003
+          },
+          "status": "normal",
+          "sourceName": "Australian Bureau of Statistics (LEND_HOUSING, new housing loan commitments)",
+          "sourceUrl": "https://data.api.abs.gov.au/rest/data/LEND_HOUSING/FIN_VAL.NEWCOMMITS.DV8368.TOTDWELL.TOT.TOT.20.AUS.Q",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-saving-ratio",
+          "value": 6.5,
+          "asOf": "2026-04-01",
+          "periodStart": "2026-04-01",
+          "periodEnd": "2026-06-30",
+          "change30d": 0.09999999999999964,
+          "percentile10y": 0.6216216216216216,
+          "sd10y": -0.1808261017116578,
+          "fromPeak10y": -72.1030042918455,
+          "lastChange": {
+            "date": "2026-04-01",
+            "points": 0.09999999999999964
+          },
+          "status": "context",
+          "sourceName": "Australian Bureau of Statistics (ANA_AGG, household saving ratio)",
+          "sourceUrl": "https://data.api.abs.gov.au/rest/data/ANA_AGG/M7.HSR.20.AUS.Q",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "au-job-vacancies",
+          "value": 325,
+          "asOf": "2026-07-01",
+          "periodStart": "2026-07-01",
+          "periodEnd": "2026-09-30",
+          "change30d": -0.9146341463414633,
+          "percentile10y": 0.47368421052631576,
+          "sd10y": 0.2085453916864369,
+          "fromPeak10y": -31.246033425005287,
+          "lastChange": {
+            "date": "2026-07-01",
+            "points": -3
+          },
+          "status": "context",
+          "sourceName": "Australian Bureau of Statistics (JV, job vacancies)",
+          "sourceUrl": "https://data.api.abs.gov.au/rest/data/JV/M1.7.TOT.20.AUS.Q",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "audusd",
+          "value": 0.7031854299978905,
+          "asOf": "2026-10-27",
+          "change7d": 0.6750580127979777,
+          "change30d": 0.021095562899952756,
+          "percentile10y": 0.5168231611893583,
+          "sd10y": 0.01164575416277406,
+          "moveScore": 0.03590224882007454,
+          "fromPeak10y": -13.31130018986007,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": 0.0007409231139342554
+          },
+          "change90d": 1.3219886083960457,
+          "status": "normal",
+          "sourceName": "Frankfurter (ECB)",
+          "sourceUrl": "https://frankfurter.dev",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "rba-fed-gap",
+          "value": 0.725,
+          "asOf": "2026-10-27",
+          "change7d": 0,
+          "change30d": 0.25,
+          "percentile10y": 0.9177215189873418,
+          "sd10y": 1.653182298942345,
+          "moveScore": 0.0028651413339956908,
+          "fromPeak10y": -35.55555555555556,
+          "lastChange": {
+            "date": "2026-09-30",
+            "points": 0.25
+          },
+          "status": "normal",
+          "sourceName": "RBA Cash Rate Target − Fed target midpoint (FRED DFEDTARL/U)",
+          "sourceUrl": "https://www.rba.gov.au/statistics/cash-rate/",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "audjpy",
+          "value": 110.97672456226707,
+          "asOf": "2026-10-27",
+          "change7d": 0.4776933888558585,
+          "change30d": 0.16707469850161036,
+          "percentile10y": 0.9495305164319249,
+          "sd10y": 2.0225644271105576,
+          "moveScore": 0.21736924538886718,
+          "fromPeak10y": -3.4027120058272957,
+          "lastChange": {
+            "date": "2026-10-27",
+            "points": 0.37683695338817813
+          },
+          "change90d": -2.305497054147967,
+          "status": "normal",
+          "sourceName": "Frankfurter (ECB)",
+          "sourceUrl": "https://frankfurter.dev",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "terms-of-trade",
+          "value": 94.8,
+          "asOf": "2026-04-01",
+          "periodStart": "2026-04-01",
+          "periodEnd": "2026-06-30",
+          "change30d": -1.5,
+          "percentile10y": 0.43243243243243246,
+          "sd10y": 0.06252379208923561,
+          "moveScore": -0.5232662105525354,
+          "fromPeak10y": -18.134715025906736,
+          "lastChange": {
+            "date": "2026-04-01",
+            "points": -1.5
+          },
+          "status": "normal",
+          "sourceName": "ABS (ANA_AGG terms of trade)",
+          "sourceUrl": "https://data.api.abs.gov.au/rest/data/ANA_AGG/M5.TTR.20.AUS.Q",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "iron-ore",
+          "value": 97.7,
+          "asOf": "2026-09-01",
+          "change30d": 1.4537902388369737,
+          "percentile10y": 0.4152542372881356,
+          "sd10y": -0.25861396062311254,
+          "fromPeak10y": -54.43097014925373,
+          "lastChange": {
+            "date": "2026-09-01",
+            "points": 1.4000000000000057
+          },
+          "status": "context",
+          "sourceName": "The World Bank Pink Sheet — iron ore",
+          "sourceUrl": "https://www.worldbank.org/en/research/commodity-markets",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        },
+        {
+          "id": "gold-aud",
+          "value": 5750.403699365799,
+          "asOf": "2026-10-28",
+          "fromPeak10y": 0,
+          "status": "context",
+          "sourceName": "gold-api.com × Frankfurter (ECB)",
+          "sourceUrl": "https://www.gold-api.com",
+          "updatedAt": "2026-10-28T04:10:18.741Z"
+        }
+      ],
+      "changedThisWeek": [
+        {
+          "id": "fed-expectations",
+          "from": "warning",
+          "to": "normal",
+          "asOf": "2026-10-22"
+        },
+        {
+          "id": "brent",
+          "from": "warning",
+          "to": "normal",
+          "asOf": "2026-10-27"
+        }
+      ],
+      "calendar": [
+        {
+          "id": "abs-cpi-2026-09",
+          "date": "2026-10-28",
+          "titleEn": "ABS monthly CPI: September 2026",
+          "titleFa": "شاخص ماهانهٔ قیمت مصرف‌کنندهٔ استرالیا، سپتامبر ۲۰۲۶",
+          "kind": "abs-cpi",
+          "tz": "Australia/Sydney"
+        },
+        {
+          "id": "fomc-2026-10",
+          "date": "2026-10-28",
+          "titleEn": "US Fed interest rate decision (FOMC)",
+          "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
+          "kind": "fed",
+          "tz": "America/New_York"
+        },
+        {
+          "id": "ecb-2026-10",
+          "date": "2026-10-29",
+          "titleEn": "ECB interest rate decision",
+          "titleFa": "تصمیم بانک مرکزی اروپا دربارهٔ نرخ بهره",
+          "kind": "ecb",
+          "tz": "Europe/Frankfurt"
+        },
+        {
+          "id": "rba-2026-11",
+          "date": "2026-11-03",
+          "titleEn": "RBA cash rate decision",
+          "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
+          "kind": "rba",
+          "tz": "Australia/Sydney"
+        },
+        {
+          "id": "us-jobs-2026-10",
+          "date": "2026-11-06",
+          "titleEn": "US jobs report (Employment Situation): October 2026",
+          "titleFa": "گزارش اشتغال آمریکا، اکتبر ۲۰۲۶",
+          "kind": "us-jobs",
+          "tz": "America/New_York"
+        },
+        {
+          "id": "us-cpi-2026-10",
+          "date": "2026-11-10",
+          "titleEn": "US consumer price index: October 2026",
+          "titleFa": "شاخص قیمت مصرف‌کنندهٔ آمریکا، اکتبر ۲۰۲۶",
+          "kind": "us-cpi",
+          "tz": "America/New_York"
+        },
+        {
+          "id": "abs-jobs-2026-10",
+          "date": "2026-11-19",
+          "titleEn": "ABS jobs report (Labour Force): October 2026",
+          "titleFa": "گزارش وضعیت بازار کار استرالیا: اکتبر ۲۰۲۶",
+          "kind": "abs-jobs",
+          "tz": "Australia/Sydney"
+        },
+        {
+          "id": "abs-cpi-2026-10",
+          "date": "2026-11-25",
+          "titleEn": "ABS monthly CPI: October 2026",
+          "titleFa": "شاخص ماهانهٔ قیمت مصرف‌کنندهٔ استرالیا، اکتبر ۲۰۲۶",
+          "kind": "abs-cpi",
+          "tz": "Australia/Sydney"
+        },
+        {
+          "id": "us-jobs-2026-11",
+          "date": "2026-12-04",
+          "titleEn": "US jobs report (Employment Situation): November 2026",
+          "titleFa": "گزارش اشتغال آمریکا، نوامبر ۲۰۲۶",
+          "kind": "us-jobs",
+          "tz": "America/New_York"
+        },
+        {
+          "id": "rba-2026-12",
+          "date": "2026-12-08",
+          "titleEn": "RBA cash rate decision",
+          "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
+          "kind": "rba",
+          "tz": "Australia/Sydney"
+        },
+        {
+          "id": "fomc-2026-12",
+          "date": "2026-12-09",
+          "titleEn": "US Fed interest rate decision (FOMC)",
+          "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
+          "kind": "fed",
+          "tz": "America/New_York"
+        },
+        {
+          "id": "us-cpi-2026-11",
+          "date": "2026-12-10",
+          "titleEn": "US consumer price index: November 2026",
+          "titleFa": "شاخص قیمت مصرف‌کنندهٔ آمریکا، نوامبر ۲۰۲۶",
+          "kind": "us-cpi",
+          "tz": "America/New_York"
+        },
+        {
+          "id": "abs-jobs-2026-11",
+          "date": "2026-12-17",
+          "titleEn": "ABS jobs report (Labour Force): November 2026",
+          "titleFa": "گزارش وضعیت بازار کار استرالیا: نوامبر ۲۰۲۶",
+          "kind": "abs-jobs",
+          "tz": "Australia/Sydney"
+        },
+        {
+          "id": "abs-cpi-2026-12",
+          "date": "2027-01-27",
+          "titleEn": "ABS monthly CPI: December 2026",
+          "titleFa": "شاخص ماهانهٔ قیمت مصرف‌کنندهٔ استرالیا، دسامبر ۲۰۲۶",
+          "kind": "abs-cpi",
+          "tz": "Australia/Sydney"
+        },
+        {
+          "id": "fomc-2027-01",
+          "date": "2027-01-27",
+          "titleEn": "US Fed interest rate decision (FOMC)",
+          "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
+          "kind": "fed",
+          "tz": "America/New_York"
+        },
+        {
+          "id": "rba-2027-02",
+          "date": "2027-02-09",
+          "titleEn": "RBA cash rate decision",
+          "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
+          "kind": "rba",
+          "tz": "Australia/Sydney"
+        },
+        {
+          "id": "abs-cpi-2027-01",
+          "date": "2027-02-24",
+          "titleEn": "ABS monthly CPI: January 2027",
+          "titleFa": "شاخص ماهانهٔ قیمت مصرف‌کنندهٔ استرالیا، ژانویهٔ ۲۰۲۷",
+          "kind": "abs-cpi",
+          "tz": "Australia/Sydney"
+        },
+        {
+          "id": "fomc-2027-03",
+          "date": "2027-03-17",
+          "titleEn": "US Fed interest rate decision (FOMC)",
+          "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
+          "kind": "fed",
+          "tz": "America/New_York"
+        },
+        {
+          "id": "rba-2027-03",
+          "date": "2027-03-23",
+          "titleEn": "RBA cash rate decision",
+          "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
+          "kind": "rba",
+          "tz": "Australia/Sydney"
+        },
+        {
+          "id": "fomc-2027-04",
+          "date": "2027-04-28",
+          "titleEn": "US Fed interest rate decision (FOMC)",
+          "titleFa": "تصمیم فدرال رزرو آمریکا درباره نرخ بهره",
+          "kind": "fed",
+          "tz": "America/New_York"
+        },
+        {
+          "id": "rba-2027-05",
+          "date": "2027-05-04",
+          "titleEn": "RBA cash rate decision",
+          "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
+          "kind": "rba",
+          "tz": "Australia/Sydney"
+        }
+      ],
+      "ruleVersion": 2,
+      "displayMode": "public"
+    }
+  },
+  "output": {
+    "section": "global",
+    "label": {
+      "en": "Global",
+      "fa": "جهانی"
+    },
+    "generatedAt": "2026-10-28T04:20:18.253Z",
+    "dataAsOf": {
+      "oldest": "2026-04-01",
+      "newest": "2026-10-28"
+    },
+    "verdict": {
+      "label": "stressed",
+      "word": {
+        "en": "Stressed",
+        "fa": "پرتنش"
+      },
+      "counts": {
+        "warningCount": 9,
+        "votingCount": 32,
+        "excludedCount": 0
+      }
+    },
+    "tiers": {
+      "warning": 9,
+      "normal": 23,
+      "context": 45,
+      "no-history": 0,
+      "check-pending": 0
+    },
+    "alerts": [
+      {
+        "id": "cftc-gold-positioning",
+        "tier": "needs-attention",
+        "direction": "flat",
+        "magnitude": null
+      },
+      {
+        "id": "euro-hicp",
+        "tier": "needs-attention",
+        "direction": "rising",
+        "magnitude": {
+          "value": 0.6,
+          "unit": "points",
+          "window": "since-previous-release"
+        }
+      },
+      {
+        "id": "michigan-sentiment",
+        "tier": "needs-attention",
+        "direction": "falling",
+        "magnitude": {
+          "value": -3.6,
+          "unit": "points",
+          "window": "since-previous-release"
+        }
+      },
+      {
+        "id": "real-yield-10y",
+        "tier": "needs-attention",
+        "direction": "falling",
+        "magnitude": {
+          "value": -0.17,
+          "unit": "points",
+          "window": "30d"
+        }
+      },
+      {
+        "id": "recession-probability",
+        "tier": "needs-attention",
+        "direction": "rising",
+        "magnitude": {
+          "value": 0.38,
+          "unit": "points",
+          "window": "since-previous-release"
+        }
+      },
+      {
+        "id": "us-cpi-yoy",
+        "tier": "needs-attention",
+        "direction": "rising",
+        "magnitude": {
+          "value": 0.34,
+          "unit": "points",
+          "window": "since-previous-release"
+        }
+      },
+      {
+        "id": "us-pce-core-yoy",
+        "tier": "needs-attention",
+        "direction": "rising",
+        "magnitude": {
+          "value": 0.02,
+          "unit": "points",
+          "window": "since-previous-release"
+        }
+      },
+      {
+        "id": "us10y",
+        "tier": "needs-attention",
+        "direction": "falling",
+        "magnitude": {
+          "value": -0.17,
+          "unit": "points",
+          "window": "30d"
+        }
+      },
+      {
+        "id": "us30y",
+        "tier": "needs-attention",
+        "direction": "falling",
+        "magnitude": {
+          "value": -0.18,
+          "unit": "points",
+          "window": "30d"
+        }
+      }
+    ],
+    "patterns": [],
+    "excluded": [],
+    "items": [
+      {
+        "id": "boe-rate",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 3.75,
+        "asOf": "2026-10-28",
+        "ageHours": 4,
+        "cadence": "per-change"
+      },
+      {
+        "id": "boj-rate",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 1.043,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "breakeven-10y",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 2.35,
+        "asOf": "2026-10-27",
+        "ageHours": 28,
+        "cadence": "daily"
+      },
+      {
+        "id": "breakeven-5y5y",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 2.25,
+        "asOf": "2026-10-27",
+        "ageHours": 28,
+        "cadence": "daily"
+      },
+      {
+        "id": "brent",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 113.87999725341797,
+        "asOf": "2026-10-27",
+        "ageHours": 28,
+        "cadence": "daily"
+      },
+      {
+        "id": "btc-usd",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 80948.117188,
+        "asOf": "2026-10-28",
+        "ageHours": 4,
+        "cadence": "daily"
+      },
+      {
+        "id": "bund-10y",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 3.46952380952381,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "cfnai",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 0.07,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "cftc-gold-positioning",
+        "status": "warning",
+        "section": "global",
+        "voting": true,
+        "value": 49.6832,
+        "asOf": "2026-10-20",
+        "ageHours": 196,
+        "cadence": "weekly"
+      },
+      {
+        "id": "china-cpi",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 0.9,
+        "asOf": "2026-09-30",
+        "ageHours": 676,
+        "cadence": "monthly"
+      },
+      {
+        "id": "china-pmi",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 50.1,
+        "asOf": "2026-09-30",
+        "ageHours": 676,
+        "cadence": "monthly"
+      },
+      {
+        "id": "copper-gold",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 3.3512387126649688,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "copper-usd",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 14609.50058406596,
+        "asOf": "2026-10-28",
+        "ageHours": 4,
+        "cadence": "daily"
+      },
+      {
+        "id": "crypto-fng",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 51,
+        "asOf": "2026-10-28",
+        "ageHours": 4,
+        "cadence": "daily"
+      },
+      {
+        "id": "dollar-basket",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 102.18669758996153,
+        "asOf": "2026-10-27",
+        "ageHours": 28,
+        "cadence": "daily"
+      },
+      {
+        "id": "ecb-dfr",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 2.5,
+        "asOf": "2026-10-28",
+        "ageHours": 4,
+        "cadence": "daily"
+      },
+      {
+        "id": "eia-crude-stocks",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 695200,
+        "asOf": "2026-10-16",
+        "ageHours": 292,
+        "cadence": "weekly"
+      },
+      {
+        "id": "epu-us",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 218.94095727491293,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "eur-usd",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 0.89686,
+        "asOf": "2026-10-27",
+        "ageHours": 28,
+        "cadence": "daily"
+      },
+      {
+        "id": "euro-aaa-10y",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 3.3735503672,
+        "asOf": "2026-10-26",
+        "ageHours": 52,
+        "cadence": "daily"
+      },
+      {
+        "id": "euro-hicp",
+        "status": "warning",
+        "section": "global",
+        "voting": true,
+        "value": 3.8,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "fed-expectations",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 0.805,
+        "asOf": "2026-10-26",
+        "ageHours": 52,
+        "cadence": "daily"
+      },
+      {
+        "id": "fed-target",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 3.75,
+        "asOf": "2026-10-27",
+        "ageHours": 28,
+        "cadence": "daily"
+      },
+      {
+        "id": "food-index",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 124.1,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "gilt-10y",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 5.2421,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "gold-btc",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 0.04995298517702195,
+        "asOf": "2026-10-28",
+        "ageHours": 4,
+        "cadence": "daily"
+      },
+      {
+        "id": "gold-oil-ratio",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 35.78,
+        "asOf": "2026-10-27",
+        "ageHours": 28,
+        "cadence": "daily"
+      },
+      {
+        "id": "gold-silver",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 74.71683092290749,
+        "asOf": "2026-10-28",
+        "ageHours": 4,
+        "cadence": "daily"
+      },
+      {
+        "id": "gold-usd",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 4043.600098,
+        "asOf": "2026-10-28",
+        "ageHours": 4,
+        "cadence": "daily"
+      },
+      {
+        "id": "govt-interest-revenue",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 33.55393513462776,
+        "asOf": "2026-04-01",
+        "ageHours": 5044,
+        "cadence": "quarterly"
+      },
+      {
+        "id": "gpr-index",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 146.20989990234375,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "housing-permits",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 1398,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "initial-jobless-claims",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 194000,
+        "asOf": "2026-10-17",
+        "ageHours": 268,
+        "cadence": "weekly"
+      },
+      {
+        "id": "jgb-10y",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 2.829,
+        "asOf": "2026-10-27",
+        "ageHours": 28,
+        "cadence": "daily"
+      },
+      {
+        "id": "job-openings",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 7079,
+        "asOf": "2026-08-01",
+        "ageHours": 2116,
+        "cadence": "monthly"
+      },
+      {
+        "id": "m2-us",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 23413.9,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "maize",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 239.6,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "michigan-1y-expectations",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 4.6,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "michigan-sentiment",
+        "status": "warning",
+        "section": "global",
+        "voting": true,
+        "value": 48.1,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "mortgage-30y",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 7.32,
+        "asOf": "2026-10-22",
+        "ageHours": 148,
+        "cadence": "weekly"
+      },
+      {
+        "id": "natgas",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 3.1,
+        "asOf": "2026-10-20",
+        "ageHours": 196,
+        "cadence": "daily"
+      },
+      {
+        "id": "nfci",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": -0.496,
+        "asOf": "2026-10-16",
+        "ageHours": 292,
+        "cadence": "weekly"
+      },
+      {
+        "id": "oecd-cli-cn",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 97.41035,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "oecd-cli-de",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 101.0066,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "oecd-cli-us",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 100.9993,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "philly-fed",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 20.9,
+        "asOf": "2026-10-01",
+        "ageHours": 652,
+        "cadence": "monthly"
+      },
+      {
+        "id": "platinum",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 1538,
+        "asOf": "2026-10-28",
+        "ageHours": 4,
+        "cadence": "daily"
+      },
+      {
+        "id": "real-yield-10y",
+        "status": "warning",
+        "section": "global",
+        "voting": true,
+        "value": 2.66,
+        "asOf": "2026-10-26",
+        "ageHours": 52,
+        "cadence": "daily"
+      },
+      {
+        "id": "recession-probability",
+        "status": "warning",
+        "section": "global",
+        "voting": true,
+        "value": 0.62,
+        "asOf": "2026-08-01",
+        "ageHours": 2116,
+        "cadence": "monthly"
+      },
+      {
+        "id": "retail-sales",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 745021,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "sahm-rule",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 0,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "shiller-cape",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 40.71,
+        "asOf": "2026-10-01",
+        "ageHours": 652,
+        "cadence": "monthly"
+      },
+      {
+        "id": "shiller-ecy",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 0.5599999999999999,
+        "asOf": "2026-10-01",
+        "ageHours": 652,
+        "cadence": "monthly"
+      },
+      {
+        "id": "silver-usd",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 54.118999,
+        "asOf": "2026-10-28",
+        "ageHours": 4,
+        "cadence": "daily"
+      },
+      {
+        "id": "sofr",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 3.93,
+        "asOf": "2026-10-26",
+        "ageHours": 52,
+        "cadence": "daily"
+      },
+      {
+        "id": "stress-stlfsi",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": -0.6328,
+        "asOf": "2026-10-16",
+        "ageHours": 292,
+        "cadence": "weekly"
+      },
+      {
+        "id": "t5yie",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 2.45,
+        "asOf": "2026-10-27",
+        "ageHours": 28,
+        "cadence": "daily"
+      },
+      {
+        "id": "us-2y",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 4.68,
+        "asOf": "2026-10-26",
+        "ageHours": 52,
+        "cadence": "daily"
+      },
+      {
+        "id": "us-cpi-core-yoy",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 2.5643583511686696,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "us-cpi-yoy",
+        "status": "warning",
+        "section": "global",
+        "voting": true,
+        "value": 3.737684729064035,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "us-gdp-growth",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 2.2,
+        "asOf": "2026-04-01",
+        "ageHours": 5044,
+        "cadence": "quarterly"
+      },
+      {
+        "id": "us-japan-10y-gap",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 2.176,
+        "asOf": "2026-10-26",
+        "ageHours": 52,
+        "cadence": "daily"
+      },
+      {
+        "id": "us-nfp",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 29,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "us-pce-core-yoy",
+        "status": "warning",
+        "section": "global",
+        "voting": true,
+        "value": 3.0075959761855975,
+        "asOf": "2026-08-01",
+        "ageHours": 2116,
+        "cadence": "monthly"
+      },
+      {
+        "id": "us-unemployment",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 4.2,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "us-wages",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 3.295310519645129,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "us10y",
+        "status": "warning",
+        "section": "global",
+        "voting": true,
+        "value": 5,
+        "asOf": "2026-10-26",
+        "ageHours": 52,
+        "cadence": "daily"
+      },
+      {
+        "id": "us30y",
+        "status": "warning",
+        "section": "global",
+        "voting": true,
+        "value": 5.31,
+        "asOf": "2026-10-26",
+        "ageHours": 52,
+        "cadence": "daily"
+      },
+      {
+        "id": "usdcny",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 6.6675,
+        "asOf": "2026-10-27",
+        "ageHours": 28,
+        "cadence": "daily"
+      },
+      {
+        "id": "usdjpy",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 157.82,
+        "asOf": "2026-10-27",
+        "ageHours": 28,
+        "cadence": "daily"
+      },
+      {
+        "id": "usdtry",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 49.787,
+        "asOf": "2026-10-27",
+        "ageHours": 28,
+        "cadence": "daily"
+      },
+      {
+        "id": "vix",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 18.39,
+        "asOf": "2026-10-26",
+        "ageHours": 52,
+        "cadence": "daily"
+      },
+      {
+        "id": "walcl",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 6753604,
+        "asOf": "2026-10-21",
+        "ageHours": 172,
+        "cadence": "weekly"
+      },
+      {
+        "id": "wheat",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 278.6,
+        "asOf": "2026-09-01",
+        "ageHours": 1372,
+        "cadence": "monthly"
+      },
+      {
+        "id": "wti",
+        "status": "context",
+        "section": "global",
+        "voting": false,
+        "value": 107.89,
+        "asOf": "2026-10-20",
+        "ageHours": 196,
+        "cadence": "daily"
+      },
+      {
+        "id": "yield-curve-10y2y",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 0.29,
+        "asOf": "2026-10-27",
+        "ageHours": 28,
+        "cadence": "daily"
+      },
+      {
+        "id": "yield-curve-10y3m",
+        "status": "normal",
+        "section": "global",
+        "voting": true,
+        "value": 0.77,
+        "asOf": "2026-10-27",
+        "ageHours": 28,
+        "cadence": "daily"
+      }
+    ]
+  }
+}

@@ -2919,6 +2919,34 @@
       "australiaAngle": "The Australia angle",
       "plainWords": "Plain words",
       "noDirection": "Direction does not give a clear signal here"
+    },
+    "sections": {
+      "label": {
+        "global": "Global",
+        "australia": "Australia",
+        "world-markets": "The pulse of world markets",
+        "world-currencies": "World currencies"
+      },
+      "verdictWord": {
+        "relaxed": "Stable",
+        "cautious": "Cautious",
+        "stressed": "Stressed",
+        "alarmed": "Critical"
+      },
+      "signalWord": {
+        "normal": "Normal",
+        "attention": "Needs attention",
+        "unusual": "Unusual"
+      },
+      "marketGroup": {
+        "asia": "Asia-Pacific",
+        "europe": "Europe",
+        "americas": "Americas"
+      },
+      "marketStatus": {
+        "correction": "Correction",
+        "bear": "Bear market"
+      }
     }
   },
   "fa": {
@@ -5832,6 +5860,34 @@
       "australiaAngle": "نگاه استرالیا",
       "plainWords": "معنی واژه‌ها",
       "noDirection": "جهت در اینجا سیگنال روشنی نمی‌دهد"
+    },
+    "sections": {
+      "label": {
+        "global": "جهانی",
+        "australia": "استرالیا",
+        "world-markets": "نبض بازارهای جهان",
+        "world-currencies": "ارزهای مهم جهان"
+      },
+      "verdictWord": {
+        "relaxed": "پایدار",
+        "cautious": "احتیاط",
+        "stressed": "پرتنش",
+        "alarmed": "بحرانی"
+      },
+      "signalWord": {
+        "normal": "عادی",
+        "attention": "نیازمند توجه",
+        "unusual": "غیرعادی"
+      },
+      "marketGroup": {
+        "asia": "آسیا و اقیانوسیه",
+        "europe": "اروپا",
+        "americas": "قارهٔ آمریکا"
+      },
+      "marketStatus": {
+        "correction": "اصلاح قیمتی",
+        "bear": "بازار خرسی"
+      }
     }
   }
 }

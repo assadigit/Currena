@@ -18,28 +18,32 @@ import {
   LAYER1_GLOSSARY_IDS,
   LAYER1_INVENTORY_IDS,
 } from './index';
+// The Layer-1 word canon (G3/G4/G5/G6) lives in ONE place — the insights
+// package — so the Layer-2 narrator's validators (V4/V5/V6 + W3/W5/W6)
+// and this gate read identical lists, bit for bit (moved verbatim from
+// this file; behaviour and test count unchanged).
+import {
+  ARABIC_KAF,
+  ARABIC_YEH,
+  ASCII_DIGIT,
+  DOUBLE_SPACE,
+  EM_DASH,
+  JARGON,
+  bannedHits,
+  faLatinViolations,
+  residualDigits,
+  sentences,
+  wordCount,
+} from '@currena/insights/narrator';
 
 type Lang = 'en' | 'fa';
 const LANGS: Lang[] = ['en', 'fa'];
 const STRICT = process.env.LAYER1_STRICT === '1';
 
 /* ------------------------------------------------------------------ *
- * Word / sentence helpers
+ * Word / sentence helpers (shared with the narrator's validators)
  * ------------------------------------------------------------------ */
 
-function words(s: string): string[] {
-  return s.split(/\s+/).filter((w) => w.length > 0);
-}
-function wordCount(s: string): number {
-  return words(s).length;
-}
-/** Split prose into sentences on EN . ! ? and FA ۔ ؟ (U+06D4, U+061F). */
-function sentences(s: string): string[] {
-  return s
-    .split(/[.!?۔؟]+/)
-    .map((p) => p.trim())
-    .filter((p) => p.length > 0);
-}
 function isOneSentence(s: string): boolean {
   return sentences(s).length <= 1;
 }
@@ -48,123 +52,22 @@ function isOneSentence(s: string): boolean {
  * G3 — jargon list (style guide §6, extended). Each entry maps a jargon
  * phrase to the glossary termId that covers it (or null = must be replaced
  * with a plain word; using it without a glossary term fails G3).
+ * The list itself is imported from @currena/insights/narrator/wordlists
+ * (the one canonical copy, shared with the Layer-2 narrator's V5/W5).
  * ------------------------------------------------------------------ */
-
-type JargonSpec = { en: string; fa: string; termId: string | null }[];
-
-const JARGON: JargonSpec = [
-  { en: 'yield', fa: 'بازده', termId: 'yield' },
-  { en: 'real yield', fa: 'بازده واقعی', termId: 'real-yield' },
-  { en: 'breakeven inflation', fa: 'تورم ضمنی بازار', termId: 'breakeven' },
-  { en: 'breakeven', fa: 'تورم ضمنی', termId: 'breakeven' },
-  { en: 'inflation expectations', fa: 'انتظار تورم', termId: null },
-  { en: 'spread', fa: 'اسپرد', termId: null },
-  { en: 'basis points', fa: 'نقطه پایه', termId: null },
-  { en: 'volatility', fa: 'نوسان', termId: 'volatility' },
-  { en: 'VIX', fa: 'VIX', termId: 'vix' },
-  { en: 'PMI', fa: 'PMI', termId: 'pmi' },
-  { en: 'carry trade', fa: 'کری ترید', termId: 'carry-trade' },
-  { en: 'money supply', fa: 'پول در گردش', termId: 'money-supply' },
-  { en: 'leading indicator', fa: 'شاخص پیشرو', termId: 'leading-indicator' },
-  { en: 'hawkish', fa: 'شاه‌باز', termId: null },
-  { en: 'dovish', fa: 'قمری', termId: null },
-  { en: 'tightening', fa: 'انقباض', termId: null },
-  { en: 'easing', fa: 'انبساط', termId: null },
-  { en: 'quantitative easing', fa: 'تسهیم کمّی', termId: null },
-  { en: 'risk-on', fa: 'ریسک‌پذیری', termId: null },
-  { en: 'risk-off', fa: 'گریز از ریسک', termId: null },
-  { en: 'safe haven', fa: 'پناهگاه امن', termId: 'safe-haven' },
-  { en: 'correction', fa: 'اصلاح بازار', termId: null },
-  { en: 'bear market', fa: 'بازار نزولی', termId: null },
-  { en: 'bull market', fa: 'بازار صعودی', termId: null },
-  { en: 'drawdown', fa: 'افت از اوج', termId: null },
-  { en: 'momentum', fa: 'مومنتوم', termId: null },
-  { en: 'overbought', fa: 'خرید بیش‌ازحد', termId: null },
-  { en: 'oversold', fa: 'فروش بیش‌ازحد', termId: null },
-  { en: 'benchmark', fa: 'سنجه', termId: null },
-  { en: 'commodity', fa: 'کالای خام', termId: 'commodity' },
-  { en: 'futures', fa: 'قرارداد آینده', termId: null },
-  { en: 'curve inversion', fa: 'معکوس شدن منحنی', termId: null },
-  { en: 'inverted curve', fa: 'منحنی معکوس', termId: null },
-  { en: 'yield curve', fa: 'منحنی بازده', termId: 'yield-curve' },
-  { en: 'CPI', fa: 'CPI', termId: null },
-  { en: 'GDP', fa: 'GDP', termId: null },
-  { en: 'central bank', fa: 'بانک مرکزی', termId: 'central-bank' },
-  { en: 'policy rate', fa: 'نرخ سیاستی', termId: 'policy-rate' },
-  { en: 'ratio', fa: 'نسبت', termId: null },
-  { en: 'dollar index', fa: 'شاخص دلار', termId: null },
-  { en: 'equities', fa: 'سهام', termId: null },
-  { en: 'bond', fa: 'اوراق قرضه', termId: 'bond' },
-  { en: 'bonds', fa: 'اوراق قرضه', termId: 'bond' },
-  { en: 'liquidity', fa: 'نقدینگی', termId: null },
-  { en: 'recession', fa: 'رکود', termId: 'recession' },
-  { en: 'inflation', fa: 'تورم', termId: 'inflation' },
-  { en: 'mortgage', fa: 'وام مسکن', termId: 'mortgage' },
-  { en: 'stock index', fa: 'شاخص بورس', termId: 'stock-index' },
-  { en: 'interest rate', fa: 'نرخ بهره', termId: 'interest-rate' },
-  { en: 'deflation', fa: 'ریزش قیمت', termId: 'deflation' },
-];
 
 /* ------------------------------------------------------------------ *
  * G4 — banned advice/certainty words (style guide §5, extended).
+ * The lists + bannedHits are imported from the shared wordlists module
+ * (shared with the narrator's V4/W3).
  * ------------------------------------------------------------------ */
-
-const BANNED_EN = [
-  'buy', 'sell', 'invest now', 'should', 'must', 'guaranteed', 'certainly',
-  'definitely', 'will crash', 'will rise', 'will fall', 'sure thing',
-  'good time to', 'bad time to', 'get rich', 'risk-free',
-];
-const BANNED_FA = [
-  'بخرید', 'بفروشید', 'سرمایه‌گذاری کنید', 'حتماً', 'قطعاً', 'تضمین',
-  'بدون ریسک', 'زمان خوب برای', 'زمان بد برای',
-];
-function bannedHits(text: string, lang: Lang): string[] {
-  const list = lang === 'fa' ? BANNED_FA : BANNED_EN;
-  const hits: string[] = [];
-  for (const w of list) {
-    if (lang === 'fa') {
-      if (text.includes(w)) hits.push(w);
-    } else {
-      const re = new RegExp(`\\b${w.replace(/\s+/g, '\\s+')}\\b`, 'i');
-      if (re.test(text)) hits.push(w);
-    }
-  }
-  return hits;
-}
 
 /* ------------------------------------------------------------------ *
- * G5 — Farsi hygiene.
+ * G5 — Farsi hygiene + G6 digits — the patterns and matchers
+ * (ARABIC_YEH/KAF, EM_DASH, ASCII_DIGIT, FA_LATIN_ALLOW, DOUBLE_SPACE,
+ * faLatinViolations, TENOR_TOKEN, residualDigits) are imported from the
+ * shared wordlists module.
  * ------------------------------------------------------------------ */
-
-const ARABIC_YEH = /\u064A/; // ي (Arabic) — must be Persian ی \u06CC
-const ARABIC_KAF = /\u0643/; // ك (Arabic) — must be Persian ک \u06A9
-const EM_DASH = /\u2014/; // —
-const ASCII_DIGIT = /[0-9]/;
-const FA_LATIN_ALLOW =
-  /\b(VIX|S&P|ASX|ECB|RBA|USD|AUD|EUR|JPY|CNY|BTC|PMI|GDP|CPI|NFP|HICP|CAPE|SOFR|WPI|DXY|EPU|GPR|NBS|EIA|CFTC|OECD|MOF|BOJ|BOE|FRED|PAYEMS|T10Y|DGS|DFED|T5Y)\b/g;
-const DOUBLE_SPACE = /\s{2,}/;
-
-function faLatinViolations(text: string): string[] {
-  const stripped = text.replace(FA_LATIN_ALLOW, '');
-  const match = stripped.match(/[A-Za-z]+/g);
-  return match ?? [];
-}
-
-/* ------------------------------------------------------------------ *
- * G6 — digits. Allow tenor/proper-name digit tokens; flag the rest.
- * ------------------------------------------------------------------ */
-
-// Tenor-name tokens that may carry digits:
-//   ASCII:  10-year, 2-year, 3-month, 10y, 2y, 3m, 5y5y, 10y2y, 10y3m, 30-year
-//   Persian: ۱۰ ساله, ۲ ساله, ۳ ماه, ۱۰–۲ سال (range), ۳۰ سالهٔ
-const TENOR_TOKEN =
-  /\b\d+[-\s]?(?:year|month)s?\b|\b\d+[ym]\b|\b\d+y\d+[ym]\b|[\u06F0-\u06F9]+(?:\s*[-–]\s*[\u06F0-\u06F9]+)*\s*(?:سال|ساله|ماه)/gi;
-
-function residualDigits(text: string): string[] {
-  const stripped = text.replace(TENOR_TOKEN, '');
-  const matches = stripped.match(/[0-9\u06F0-\u06F9]+/g);
-  return matches ?? [];
-}
 
 /* ------------------------------------------------------------------ *
  * Collect every prose field of an entry (for cross-field checks).

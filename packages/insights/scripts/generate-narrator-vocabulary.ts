@@ -49,8 +49,45 @@ export interface GeneratedVocabulary {
     indicatorCount: number;
     glossaryCount: number;
   };
-  en: { indicators: unknown; glossary: unknown; ui: unknown };
-  fa: { indicators: unknown; glossary: unknown; ui: unknown };
+  en: { indicators: unknown; glossary: unknown; ui: unknown; sections: unknown };
+  fa: { indicators: unknown; glossary: unknown; ui: unknown; sections: unknown };
+}
+
+/**
+ * The section-label block the narrator's section states read (M1 of the
+ * narrator build, spec §3: "the section id and plain label (both languages
+ * from existing UI strings)"). Curated keys over EXISTING dictionary
+ * strings — never new copy; the en↔fa parity guard below covers it.
+ */
+export function sectionLabelsOf(copy: typeof insightsCopyEn | typeof insightsCopyFa) {
+  return {
+    label: {
+      global: copy.sections.global,
+      australia: copy.sections.australia,
+      'world-markets': copy.markets.title,
+      'world-currencies': copy.fx.title,
+    },
+    verdictWord: {
+      relaxed: copy.label.relaxed,
+      cautious: copy.label.cautious,
+      stressed: copy.label.stressed,
+      alarmed: copy.label.alarmed,
+    },
+    signalWord: {
+      normal: copy.fx.chipNormal,
+      attention: copy.fx.chipAttention,
+      unusual: copy.fx.chipUnusual,
+    },
+    marketGroup: {
+      asia: copy.markets.groups.asia,
+      europe: copy.markets.groups.europe,
+      americas: copy.markets.groups.americas,
+    },
+    marketStatus: {
+      correction: copy.markets.statusCorrection,
+      bear: copy.markets.statusBear,
+    },
+  };
 }
 
 /** Build the deterministic payload from the live dictionaries (pure). */
@@ -71,6 +108,12 @@ export function buildVocabularyPayload(): GeneratedVocabulary {
   if (glossaryEn.length !== glossaryFa.length || glossaryEn.some((g) => !(g in insightsCopyFa.layer1.glossary))) {
     throw new Error('layer1 glossary parity broken (en↔fa)');
   }
+  const sectionsEn = sectionLabelsOf(insightsCopyEn);
+  const sectionsFa = sectionLabelsOf(insightsCopyFa);
+  const sectionsParity = JSON.stringify(Object.keys(sectionsEn).sort()) === JSON.stringify(Object.keys(sectionsFa).sort());
+  if (!sectionsParity) {
+    throw new Error('section-label parity broken (en↔fa)');
+  }
   return {
     v: 1,
     source: {
@@ -85,11 +128,13 @@ export function buildVocabularyPayload(): GeneratedVocabulary {
       indicators: insightsCopyEn.layer1.indicators,
       glossary: insightsCopyEn.layer1.glossary,
       ui: insightsCopyEn.layer1.ui,
+      sections: sectionsEn,
     },
     fa: {
       indicators: insightsCopyFa.layer1.indicators,
       glossary: insightsCopyFa.layer1.glossary,
       ui: insightsCopyFa.layer1.ui,
+      sections: sectionsFa,
     },
   };
 }

@@ -5,6 +5,77 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-28d] — Insights Layer-2 narrator M1: the pure foundation (section states + template fallback + V1–V10/W1–W10 validators)
+
+Milestone 1 of the 5-milestone narrator build
+(`docs/insights/layer2/INSIGHTS-L2-NARRATOR-SPEC.md`): the pure, tested,
+zero-AI foundation every later milestone rides on. No model calls, no
+keys, no Worker code changed, no deploy.
+
+- **`packages/insights/src/narrator/section-state.ts`** —
+  `buildSectionNarrationState(snapshot, sectionId, now)`: one section's
+  narration state for the four narrated sections (global, australia,
+  world-markets, world-currencies — D-32; the prices-board group rides
+  global). Every verdict/signal/tier is the document's own computed
+  value verbatim; stale/unavailable items land in `excluded`, never in
+  the facts; the fx dollar measure rides as the `dollar-basket` item.
+  Plus `stateHashOf` (spec §4): a pure sha256 over the stable
+  serialization (run clock + age hours stripped) so the generation cycle
+  regenerates only changed units.
+- **`packages/insights/src/narrator/overall-state.ts`** —
+  `buildOverallNarrationState(snapshot, now)`: the whole-page state
+  (all four verdicts with counts, every firing alert across sections
+  tagged with its section, the currencies patterns, the exclusions
+  union). The AI never reads AI output: the overall narrative generates
+  from this state, never from section texts.
+- **`packages/insights/src/narrator/validate.ts`** — the deterministic
+  validators: `validateStateNarrative` (V1–V10) and `validateNewsNote`
+  (W1–W10). V3's allowed numbers derive from the unit's own state +
+  provided vocabulary; V5 carries the state-verbatim exemption (the
+  page's own status words); V7 rejects names outside the unit's state;
+  V8 checks tone against the verdict; V10 tracks the out-of-date clause.
+- **`packages/insights/src/narrator/template.ts`** — the deterministic
+  template fallback (spec §8): 3–5 sentences per section, exactly 4 for
+  the overall, EN + FA (Persian digits, half-spaces, no em dash). Passes
+  V1–V10 for every fixture in both languages — pinned by tests.
+- **`packages/insights/src/narrator/wordlists.ts`** — the Layer-1 word
+  canon (JARGON, banned lists, G5 patterns, tenor tokens) moved VERBATIM
+  from `layer1.test.ts` (which now imports it — one source of truth; the
+  strict validator's 7,809-test count unchanged, verified) plus the
+  narrator's own seed lists (predictions, tone words, attribution
+  phrases, out-of-date markers).
+- **`packages/insights/src/narrator/hash.ts`** — a pure, FIPS-vector-
+  pinned sha256 (AGENTS.md rule 2 forbids node:crypto in packages).
+- **`packages/insights/src/narrator/vocabulary.ts` + the generator** —
+  the generated snapshot gains a `sections` block (the four section
+  labels + the approved verdict/signal/market-status words, both
+  languages, from existing UI strings; en↔fa parity enforced;
+  drift-gated). Regenerated; the web app remains untouched.
+- **Golden fixtures** — `packages/insights/fixtures/narration/sections/`:
+  global-live, australia-live, australia-calm, australia-excluded (the
+  prep fixtures' inputs reused), world-markets-live,
+  world-currencies-live, overall-live (captured LIVE from currena.ir on
+  2026-10-28: the real attention day — 6 corrections + 1 bear market;
+  the r6 warning + the EUR/CHF unusual move). Builder script committed.
+- **`docs/insights/layer2/SECTION-STATE.md`** — the contract, field by
+  field. **DECISIONS.md** — D-28..D-32 (the four research items
+  RE-VERIFIED in the official docs: the Interactions API +
+  `gemini-3.5-flash-lite` as the model default; grounding's CHANGED
+  response shape + 1,500 RPD free / 5,000 searches-month → part 3 ships
+  DISABLED; CF limits corrected — cron triggers are per ACCOUNT, cron
+  wall duration 15 min, KV ops/invocation row noted; region risk +
+  template-fallback default) + D-36 (M1's implementation calls).
+- Copy manifest +156 triaged entries (the template's fa copy + the
+  word-list phrases) — audit clean (4,703).
+
+Gates (clean run, `pnpm gates`): typecheck 6/6 · lint 0/0 · copy:audit
+clean (manifest 4,703, +156 triaged) · narrator vocabulary in sync
+(129×2 + 23×2) · **layer1 strict 7,809/7,809 unchanged** · full suite
+**9,973 passed (+98: insights 727→825)** · build + budget held — entry
+295.37/88.84, Insights lazy 1094.09/256.83 (byte-identical to the prep
+record; the web bundle is untouched). No deploy (no Worker code
+changed).
+
 ## [2026-10-28c] — Insights Layer-2 narrator: spec + research starter + reserved decisions (session 0 of N; the build itself starts in the next session)
 
 The planning session for the Layer-2 AI narrator

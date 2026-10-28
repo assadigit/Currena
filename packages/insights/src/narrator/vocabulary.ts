@@ -98,9 +98,30 @@ interface GeneratedVocabularyFile {
     indicatorCount: number;
     glossaryCount: number;
   };
-  en: { indicators: Record<string, GeneratedLayer1Entry>; glossary: Record<string, NarratorGlossaryTerm>; ui: Record<string, string> };
-  fa: { indicators: Record<string, GeneratedLayer1Entry>; glossary: Record<string, NarratorGlossaryTerm>; ui: Record<string, string> };
+  en: { indicators: Record<string, GeneratedLayer1Entry>; glossary: Record<string, NarratorGlossaryTerm>; ui: Record<string, string>; sections: GeneratedSectionLabels };
+  fa: { indicators: Record<string, GeneratedLayer1Entry>; glossary: Record<string, NarratorGlossaryTerm>; ui: Record<string, string>; sections: GeneratedSectionLabels };
 }
+
+/**
+ * The section-label block (M1 of the narrator build, spec §3): the plain
+ * labels + the approved verdict/signal/status words, per language, from
+ * the existing UI strings (never new copy — the generator curates them
+ * from the web dictionaries and the drift gate pins them).
+ */
+export interface NarratorSectionLabels {
+  /** The four narrated sections' plain labels. */
+  label: Record<'global' | 'australia' | 'world-markets' | 'world-currencies', string>;
+  /** The indicator verdicts' approved words (copy.label). */
+  verdictWord: Record<'relaxed' | 'cautious' | 'stressed' | 'alarmed', string>;
+  /** The markets/fx signals' approved words (copy.fx.chip*). */
+  signalWord: Record<'normal' | 'attention' | 'unusual', string>;
+  /** The markets groups' approved words, east to west. */
+  marketGroup: Record<'asia' | 'europe' | 'americas', string>;
+  /** The alerting market statuses' approved words. */
+  marketStatus: Record<'correction' | 'bear', string>;
+}
+
+type GeneratedSectionLabels = NarratorSectionLabels;
 
 const VOCABULARY = raw as GeneratedVocabularyFile;
 
@@ -113,6 +134,11 @@ export const VOCABULARY_IDS: readonly string[] = Object.keys(VOCABULARY.en.indic
 /** The Layer-1 UI labels for a language (block labels incl. noDirection). */
 export function getNarratorUi(lang: NarratorLang): Record<string, string> {
   return VOCABULARY[lang].ui;
+}
+
+/** The section labels + approved verdict/signal words for a language (M1). */
+export function getNarratorSectionLabels(lang: NarratorLang): NarratorSectionLabels {
+  return VOCABULARY[lang].sections;
 }
 
 /**
