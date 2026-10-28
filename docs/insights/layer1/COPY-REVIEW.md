@@ -704,15 +704,57 @@ _(market-stress is now complete at 10/10; M1 ends at 56/129 unique ids)_
 
 ---
 
+## Batch 16 — world stock markets: Asia-Pacific (7)
+
+Per D-11/D-17: markets carry NO `australiaAngle` (D-08 scope) and the
+approved per-market `what`/`why`/`you` copy is reused untouched (D-02).
+New Layer-1 fields only. Index names in the new copy drop the digit
+suffixes (Nikkei 225 → Japan's biggest companies; D-18 — G6 bans digits
+in new fields; the official name with its number stays on the tile).
+
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `n225` | ifRising | Big Japanese firms faring well is often a sign of healthy world trade. | — | widely-taught (Japan's exporters as a trade bellwether; approved copy: many are exporters) | widely-taught |
+| `n225` | ifFalling | A strong yen or weak world demand is often behind a Nikkei fall. | — | widely-taught (approved copy: "a weak yen usually helps exporters, and a sudden yen jump can hit this index hard") | widely-taught |
+| `asx200` | ifRising | ASX gains often come with firm iron-ore and metal prices. | — | widely-taught (approved copy: "It follows iron ore, China's demand and the big banks") | widely-taught |
+| `asx200` | ifFalling | ASX pressure usually comes from weaker iron ore or soft Chinese demand. | — | widely-taught (same basis) | widely-taught |
+| `kospi` | ifRising | Korean chipmakers/exporters doing well = strong world electronics demand. | — | widely-taught (approved copy: "bellwether for the world's computer-chip cycle") | widely-taught |
+| `kospi` | ifFalling | Korea's exporters struggle on weaker phone/car/chip demand. | — | widely-taught (same basis) | widely-taught |
+| `hsi` | ifRising | Rising Hang Seng = investors feel better about Chinese business. | — | widely-taught (approved copy: the main door foreign investors use for China) | widely-taught |
+| `hsi` | ifFalling | Falling Hang Seng = worry about China's economy or politics. | — | widely-taught (approved copy: reacts fast to China news) | widely-taught |
+| `ssec` | ifRising | A stronger mainland market usually means stronger Chinese shoppers and demand for oil/metals. | — | widely-taught (approved copy: a read on China's domestic economy driving oil, iron ore, copper) | widely-taught |
+| `ssec` | ifFalling | A cold mainland market usually cools China's demand for oil, metals, imports. | — | widely-taught (same basis) | widely-taught |
+| `taiex` | ifRising | A strong TAIEX usually means strong world appetite for advanced chips. | — | widely-taught (approved copy: TSMC carries a huge weight; AI-chip supply chain) | widely-taught |
+| `taiex` | ifFalling | A falling TAIEX often means chip demand cooling or Taiwan trouble being priced. | — | widely-taught (approved copy: geopolitical risk around Taiwan) | widely-taught |
+| `nifty50` | ifRising | A rising Nifty usually means investor confidence in India's fast growth. | — | widely-taught (approved copy: one of the fastest-growing big economies) | widely-taught |
+| `nifty50` | ifFalling | Foreign money often leaves India on growth or world-risk worries. | — | widely-taught (approved copy: money moving into or out of India shifts emerging-market funds) | widely-taught |
+
+### Connections (batch 16)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `n225` | `usdjpy` | Japan's market usually moves with the yen; a cheaper yen helps exporters. | usually | widely-taught (approved copy: "It moves with the yen") | widely-taught |
+| `n225` | `r2_carry_trade` | The yen-jump alarm reads this market beside USD/JPY. | reliable | definitional (FX rule R2's chart series = usdjpy + n225) | widely-taught |
+| `asx200` | `iron-ore` | The home market follows iron ore closely. | usually | widely-taught (approved copy) | widely-taught |
+| `asx200` | `china-pmi` | Chinese factory strength usually steers Australian company fortunes. | usually | widely-taught (approved copy: follows China's demand) | widely-taught |
+| `asx200` | `audusd` | A firm home market and a firm local dollar sometimes move together. | sometimes | empirically loose correlation — softened + `sometimes` | needs-expert-check |
+| `kospi` | `sp500` | Korea's market usually follows America's lead. | usually | widely-taught (US leads global risk appetite) | widely-taught |
+| `kospi` | `hsi` | The two Asian hubs often share the same regional mood. | usually | widely-taught (regional risk sentiment) | widely-taught |
+| `hsi` | `ssec` | Both read China's mood from different doors. | usually | widely-taught (onshore vs offshore China doors) | widely-taught |
+| `hsi` | `china-pmi` | China's factory strength often lifts both doors. | usually | widely-taught | widely-taught |
+| `ssec` | `china-pmi` | Factory strength usually leads the home market's mood. | usually | widely-taught (real economy leads equities) | widely-taught |
+| `ssec` | `iron-ore` | China buys much of Australia's iron ore; the mood reaches Australian exports. | usually | widely-taught (approved copy: China buys a large share of Australia's iron ore) | widely-taught |
+| `taiex` | `kospi` | Both ride the world's chip cycle. | reliable | widely-taught (the two chip-cycle bourses) | widely-taught |
+| `taiex` | `ndx` | America's technology mood usually washes over Taiwan's. | usually | widely-taught | widely-taught |
+| `nifty50` | `hsi` | India and China sometimes compete for the same global investor money. | sometimes | widely-taught (approved copy: competes with China for global investor money) — softened | widely-taught |
+| `nifty50` | `sp500` | Falls in America often pull money out of emerging markets like India. | usually | widely-taught (US risk-off pulls EM flows) | widely-taught |
+
+---
+
 ## Remaining batches (M3+)
 
-— pending — the 16 world stock markets, the remaining 6 FX pairs (eurusd,
+— pending — the remaining 9 world stock markets (stoxx50, dax, cac,
+ftse, sp500, ndx, dow, tsx, ibov), the remaining 6 FX pairs (eurusd,
 gbpusd, usdchf, eurjpy, eurchf, audcny; usdjpy/usdcny/audusd/audjpy are
 already done as shared ids), and the 7 pattern cards (null-direction per
 D-09). Then the final strict-mode + deploy session (LAYER1_STRICT=1).
-(Milestone 2 ended at 100/129 unique ids.)
-
-
-— pending — prices-board (5), prices-heat (16), AU indicators (23), 16 world
-stock markets, the remaining FX pairs + the 7 pattern cards (null-direction
-per D-09). Fill in as each batch's copy is written.
+(Milestone 3 is at 107/129 unique ids after batch 16.)

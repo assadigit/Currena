@@ -1428,6 +1428,86 @@ const LAYER1 = {
       australiaAngle: 'Iron ore funds Australian miners, budgets and the broader export-price story, and China’s building cycle dominates its demand.',
       glossaryTerms: [],
     },
+
+    /* ----- Batch 16 — world stock markets: Asia-Pacific (7) ----- */
+    n225: {
+      plainName: 'Japan’s biggest companies',
+      oneLine: 'One number for how Japan’s largest companies are doing.',
+      ifRising: 'Big Japanese firms are faring well, often a sign of healthy world trade.',
+      ifFalling: 'Japan’s big firms are struggling; a strong yen or weak world demand is often behind it.',
+      connections: [
+        { with: 'usdjpy', text: 'Japan’s market usually moves with the yen; a cheaper yen helps its exporters.', strength: 'usually' },
+        { with: 'r2_carry_trade', text: 'The yen-jump alarm reads this market beside the dollar-yen pair.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
+    asx200: {
+      plainName: 'Australia’s biggest companies',
+      oneLine: 'One number for how Australia’s largest listed companies are doing.',
+      ifRising: 'Australian companies are doing well, often with firm iron-ore and metal prices.',
+      ifFalling: 'Australian companies are under pressure, usually from weaker iron-ore prices or soft Chinese demand.',
+      connections: [
+        { with: 'iron-ore', text: 'The home market follows iron ore closely.', strength: 'usually' },
+        { with: 'china-pmi', text: 'Chinese factory strength usually steers Australian company fortunes.', strength: 'usually' },
+        { with: 'audusd', text: 'A firm home market and a firm local dollar sometimes move together.', strength: 'sometimes' },
+      ],
+      glossaryTerms: [],
+    },
+    kospi: {
+      plainName: 'South Korea’s biggest companies',
+      oneLine: 'One number for how South Korea’s largest companies are doing.',
+      ifRising: 'Korean chipmakers and exporters are doing well, often a sign of strong world electronics demand.',
+      ifFalling: 'Korea’s exporters are struggling, usually on weaker demand for phones, cars and chips.',
+      connections: [
+        { with: 'sp500', text: 'Korea’s market usually follows America’s lead.', strength: 'usually' },
+        { with: 'hsi', text: 'The two Asian hubs often share the same regional mood.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    hsi: {
+      plainName: 'Hong Kong’s biggest companies',
+      oneLine: 'One number for how Hong Kong’s largest companies are doing.',
+      ifRising: 'Investors often feel better about Chinese business, and money is flowing into Hong Kong.',
+      ifFalling: 'Investors are often worried about China’s economy or politics, and money is leaving Hong Kong.',
+      connections: [
+        { with: 'ssec', text: 'Both read China’s mood from different doors.', strength: 'usually' },
+        { with: 'china-pmi', text: 'China’s factory strength often lifts both doors.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    ssec: {
+      plainName: 'China’s mainland market',
+      oneLine: 'One number for how companies listed in Shanghai are doing.',
+      ifRising: 'China’s home economy and its shoppers often look stronger, lifting demand for oil and metals.',
+      ifFalling: 'China’s home market is struggling; its demand for oil, metals and many imports often cools too.',
+      connections: [
+        { with: 'china-pmi', text: 'Factory strength usually leads the home market’s mood.', strength: 'usually' },
+        { with: 'iron-ore', text: 'China buys much of Australia’s iron ore, so this mood reaches Australian exports.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    taiex: {
+      plainName: 'Taiwan’s biggest companies',
+      oneLine: 'One number for how Taiwan’s largest companies are doing.',
+      ifRising: 'The world’s appetite for advanced chips is usually strong, a healthy sign for technology everywhere.',
+      ifFalling: 'Chip demand is often cooling, or investors are pricing trouble around Taiwan.',
+      connections: [
+        { with: 'kospi', text: 'Both ride the world’s chip cycle.', strength: 'reliable' },
+        { with: 'ndx', text: 'America’s technology mood usually washes over Taiwan’s.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    nifty50: {
+      plainName: 'India’s biggest companies',
+      oneLine: 'One number for how India’s largest companies are doing.',
+      ifRising: 'Investors usually feel confident about India’s fast-growing economy and are putting money in.',
+      ifFalling: 'Foreign money is often leaving India, usually on worries about its growth or world risk appetite.',
+      connections: [
+        { with: 'hsi', text: 'India and China sometimes compete for the same global investor money.', strength: 'sometimes' },
+        { with: 'sp500', text: 'Falls in America often pull money out of emerging markets like India.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 

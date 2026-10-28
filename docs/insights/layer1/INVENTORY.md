@@ -161,13 +161,13 @@ inventory and enforced by gate G1.
 ## B. The 16 world stock indices (markets board)
 | L1 | id | name | group |
 |---|---|---|---|
-| · | `n225` | Nikkei 225 | asia |
-| · | `asx200` | ASX 200 | asia |
-| · | `kospi` | KOSPI | asia |
-| · | `hsi` | Hang Seng | asia |
-| · | `ssec` | Shanghai Composite | asia |
-| · | `taiex` | TAIEX | asia |
-| · | `nifty50` | Nifty 50 | asia |
+| ✓ | `n225` | Nikkei 225 | asia |
+| ✓ | `asx200` | ASX 200 | asia |
+| ✓ | `kospi` | KOSPI | asia |
+| ✓ | `hsi` | Hang Seng | asia |
+| ✓ | `ssec` | Shanghai Composite | asia |
+| ✓ | `taiex` | TAIEX | asia |
+| ✓ | `nifty50` | Nifty 50 | asia |
 | · | `stoxx50` | Euro Stoxx 50 | europe |
 | · | `dax` | DAX | europe |
 | · | `cac` | CAC 40 | europe |

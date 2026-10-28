@@ -291,3 +291,63 @@ jargon (EN "increasing" ⊃ "easing"); the only safe policy is plain wording
 for everything except the tiny list of unavoidable instrument names, each
 of which must then be a listed glossary term. Extending the map is
 explicitly allowed (spec §9 G3: "a jargon list … extend it").
+
+## D-17 — M3 display hooks: a shared generic Layer-1 block for markets, FX pairs and FX patterns
+
+**Assumption.** Spec §6 says the expanded view adds the Layer-1 block and
+the collapsed card shows `oneLine`. The indicator surfaces already render
+this (D-04/D-05: the AlertCard face + the DetailsPanel block). The three
+remaining surfaces (world-market detail panels, FX pair detail panels, FX
+pattern cards) have their own approved panel layouts (MarketDetail,
+PairDetail, PatternCard) that cannot reuse the reading-shaped
+DetailsPanel block.
+
+**Decision.** (a) A NEW shared component
+`apps/web/src/components/insights/layer1/Layer1Block.tsx` renders the
+Layer-1 block for these surfaces: `oneLine` as a small muted lead, then
+`ifRising`/`ifFalling` (labelled), `skipReason` + the `noDirection` note
+when both are null (pattern cards, D-09), `connections` (names resolved
+across indicators/markets/pairs/rules), `australiaAngle` if ever present,
+and the glossary list. (b) Placement mirrors D-05: AFTER the approved
+what/why/you block, BEFORE the chart (markets, pairs) / before the
+Level-3 toggle (pattern cards, Level-2 panel). (c) D-06 emphasis uses the
+surface's OWN normal-lens change sign: markets `chg3m` (the section's
+normal timeframe, CHG_WINDOW_DAYS=90), FX pairs `chg.m1` (the rules'
+alarm lens); pattern cards pass no direction. (d) The collapsed market
+tiles, pattern rows and pair table rows are NOT enlarged — `oneLine`
+rides at the top of the expanded block on these surfaces instead (the
+tile/row hierarchy + status chips stay untouched, the conservative
+reading of §6's "do not enlarge cards"). (e) `plainName` renders only in
+the indicator DetailsPanel header (D-03); on these surfaces it ships as
+data for Layer 2 (the market/pair panels already carry the approved
+name + latin + country identity row).
+
+**Reason.** Spec §6 + "only add copy and the smallest possible display
+hook". Reusing the exact DetailsPanel markup family (same Section
+classes, same order) keeps the visual design system untouched while
+giving every surface one consistent Layer-1 block. The per-surface
+direction choice reuses each section's own documented "normal" lens
+rather than inventing a new one.
+
+## D-18 — Market/pair plain names in new Layer-1 copy drop the digit suffixes
+
+**Assumption.** G6 flags digits in the NEW Layer-1 fields (only
+tenor-name tokens are whitelisted). "Nikkei 225", "S&P 500", "Nifty 50",
+"ASX 200", "Euro Stoxx 50", "CAC 40", "FTSE 100", "Nasdaq 100" all
+carry member-count digits that are NOT tenor names — and the FA Latin
+allow-list has no market tickers (N225/DAX are not in FA_LATIN_ALLOW).
+
+**Decision.** The new plain-language fields never carry the numeric
+suffix: EN writes around it (Japan's biggest companies; America's main
+company list; the S&P without the 500), FA uses the established Persian
+names without their Persian-digit counts (نیکی، اس‌اندپی، ای‌اس‌ایکس،
+یورو استوکس، داکس، کاک، فوتسی، نزدک، داو جونز، تی‌اس‌ایکس، نیفتی).
+The OFFICIAL names (with digits, on tiles/table/panel headers) are
+approved copy rendered from `copy.markets.entries`/`copy.fx.entries`
+and stay exactly as they are (D-02: approved wording wins; G5/G6 never
+apply to approved copy).
+
+**Reason.** The digits are the index's membership count — pure jargon to
+the target reader — so dropping them from the plain-language layer is
+both the only gate-clean option and the plainer one. The official name
+remains one glance away on the same tile/panel.

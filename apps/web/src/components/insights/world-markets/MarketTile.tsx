@@ -14,6 +14,7 @@ import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { formatAsOf } from '../HistoryChart';
 import { MarketLogo } from './MarketLogo';
+import { Layer1Block } from '../layer1/Layer1Block';
 
 import {
   DirTriangle,
@@ -241,6 +242,12 @@ export function MarketDetail({
           </dd>
         </div>
       </dl>
+      {/* Layer 1 — the plain-language block for this market (spec §6,
+       * DECISIONS D-17): oneLine lead + ifRising/ifFalling, emphasised by
+       * the sign of the 3-month change (the section's normal timeframe),
+       * + connections + the glossary list. Renders nothing until the
+       * market's Layer-1 copy exists (graceful batch roll-out). */}
+      <Layer1Block id={entry.id} locale={locale} copy={copy} changeDir={entry.chg3m} />
       {/* §6.5: time runs left to right on the chart in Farsi too. */}
       <div dir="ltr" className="not-prose">
         <MarketsChart
