@@ -692,9 +692,63 @@ The per-implementation decisions of Milestone 3:
    out-of-date clause V10, news digits W2 / quotes W8 / no sources W1 /
    no attribution W4). 50 checks total.
 
-## D-38+ — Reserved: per-implementation decisions (M4 onward)
+## D-38 — M4 implementation decisions (the rung + KV + the endpoint; DEPLOYED disabled)
 
-**Reserved** — the next milestones record: the narrator-cron rung minute,
-the KV value layout and the stats buckets (M4); the display-block bundle
-impact + any D-16 path (M5); and deploy-time findings (the currena-api
-version IDs, the live-verification screenshots path, etc.).
+The per-implementation decisions of Milestone 4 (the first deploy of the
+narrator build):
+
+1. **The rung**: `NARRATOR_CRON_MINUTE = 50` — hourly, inside the
+   existing minute cron (no new trigger), clear of every other rung
+   (:10 sweeps, :13 prices, :15 Frankfurter, 04:10–04:40 ingest, :40
+   watchdog). Budget verified against D-30's re-read limits: 4 doc reads
+   + 1 stats read + ≤2 writes per ACTIVE tick; ~24 ticks/day → ~120
+   reads + ≤50 writes/day — inside every free-plan envelope with orders
+   of magnitude of headroom. Visitors add ZERO reads (the endpoint is
+   edge-cached).
+2. **The input is the PUBLIC PROJECTION snapshot** (`insights:snapshot-public`)
+   + the markets/fx documents — deliberately NOT the private snapshot:
+   whatever the site mode, the narrative can never name a private-only
+   reading. The public projection is written unconditionally by the
+   daily ingest, so the narrator keeps its input in every mode. A
+   missing projection (fresh deploy) logs honestly and skips.
+3. **The pending list IS the stored doc**: each unit's `stateHash` +
+   `generatedAt` in `insights:narrative:v1` (spec §9's shape) — a unit
+   works when its hash changed, its text is >24 h old, or the prompt
+   version moved. No extra KV key; the capped batch (3/tick, page
+   order) continues next hour. ONE write per tick that changed
+   something.
+4. **The kill switch semantics**: `NARRATOR_ENABLED=false` (the deployed
+   default) still RUNS the rung and stores TEMPLATE narratives (the
+   spec's "templates only"); model calls happen only when enabled AND
+   the key exists. Without a key the rung is a no-model-call template
+   writer (the spec §10 safe-without-key rule).
+5. **The endpoint** (`GET /api/insights/narrative`) serves the stored
+   doc verbatim with `Cache-Control: public, max-age=300, s-maxage=600`
+   — NOT gated and NOT rate-limited, deliberately: the doc is derived
+   exclusively from public-projection + public-board data (it can never
+   leak a private reading), it is Layer-1-copy-grade content, and the
+   edge cache makes visitor traffic free. A missing/poisoned doc answers
+   the clean 404 envelope (`narrative_not_ready`) — the display renders
+   nothing (spec §11). In private mode the page's display block sits
+   behind the gate anyway.
+6. **The stats buckets** (spec §9) live under `insights:narrator:stats`
+   (14 daily buckets, pruned on write): runs · skippedUnchanged ·
+   aiValid · aiFailedByCheck (per check id) · apiErrors (per error kind,
+   region included) · templateUsed · newsAttempted/Valid/OmittedByCheck/
+   OverCap. The kill criteria (§13) read exactly these.
+7. **The env vars** landed in `apps/api/wrangler.jsonc`:
+   NARRATOR_ENABLED=false · NARRATOR_VISIBLE=false (D-34) ·
+   NARRATOR_WEB_CONTEXT=false (D-29) · NARRATOR_WEB_DAILY_CAP=20 ·
+   NARRATOR_MODEL=gemini-3.5-flash-lite (D-28). GEMINI_API_KEY is a
+   SECRET (set via `pnpm narrator:set-key`), never a var.
+8. **Deployed disabled** (see docs/DEPLOY.md's session record): the
+   endpoint serves template narratives; the first :50 rung after deploy
+   wrote the initial document; no key exists on the worker, so zero
+   model calls are possible until the owner sets one.
+
+## D-39+ — Reserved: per-implementation decisions (M5 onward)
+
+**Reserved** — the final milestone records: the display-block bundle
+impact + any D-16 path; the preview marker's exact mechanics; the live
+eval outputs; the kill criteria doc; and the final report's deploy-time
+findings (the currena-api version IDs, the live-verification evidence).

@@ -118,6 +118,7 @@ export {
   OVERALL_LIMITS,
   SECTION_LIMITS,
   narrativeLimitsFor,
+  stateIdsOf,
   validateNewsNote,
   validateStateNarrative,
 } from './validate';
@@ -132,6 +133,10 @@ export type {
 // ---- M1: the template fallback (spec §8) ----
 export { templateNarrative } from './template';
 export type { TemplateState } from './template';
+
+// ---- M3: the Gemini REST client (spec §5; the Interactions API) ----
+export { GeminiClient, STATE_NARRATIVE_SCHEMA, classifyHttpError, extractGrounding, extractOutputText } from './gemini-client';
+export type { GeminiClientOptions, GeminiError, GeminiErrorKind, GeminiOutcome, NewsNoteText, StateNarrativeText } from './gemini-client';
 
 // ---- M2: the prompts (spec §6, versioned) ----
 export {

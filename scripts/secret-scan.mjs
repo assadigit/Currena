@@ -68,6 +68,10 @@ const ALLOWED_VALUES = new Set([
   // apps/api/src/routes/insights-mitigations.test.ts — fake fixtures:
   'mitigations-test-password',
   'mitigations-test-owner-token',
+  // packages/insights/src/narrator/gemini-client.test.ts — the mocked
+  // client's fake key (34 chars after AIza: deliberately NOT the real
+  // 35-char shape, so only the assignment pattern sees it):
+  'AIzaTestKeyNotReal00000000000000000000',
 ]);
 
 /** Files never scanned (with the reason — kept honest and short). */

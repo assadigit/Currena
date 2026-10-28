@@ -5,6 +5,60 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-28g] — Insights Layer-2 narrator M4: the generation rung + KV storage + the cached endpoint (DEPLOYED, disabled by default)
+
+Milestone 4 of the narrator build (spec §4 + §9) — the FIRST DEPLOY of
+the narrator. Live as worker `2de8f566` with `NARRATOR_ENABLED=false` +
+`NARRATOR_VISIBLE=false` + `NARRATOR_WEB_CONTEXT=false`; no
+GEMINI_API_KEY on the worker (the owner sets it with
+`pnpm narrator:set-key`), so zero model calls are possible — the rung
+writes TEMPLATE narratives only, exactly as the spec's "templates only"
+deploys demand.
+
+- **`apps/api/src/narrator-cron.ts`** — the hourly :50 rung inside the
+  existing minute cron (no new trigger; clear of every other rung).
+  Builds the M1 states from the PUBLIC PROJECTION snapshot + the
+  markets/fx documents (whatever the site mode, the narrative can never
+  name a private-only reading — D-38); stateHash per unit; regenerates
+  only changed/older-than-24 h/prompt-version-moved units; ≤3 model
+  calls per tick with the pending list carried in the stored doc itself;
+  the model→validate→retry-once-with-failed-checks→template ladder;
+  part 3 (news) behind NARRATOR_WEB_CONTEXT + the daily cap, omitted on
+  any W-check failure.
+- **`apps/api/src/narrator-stats.ts`** — the daily buckets (14 days):
+  runs, skippedUnchanged, aiValid, aiFailedByCheck (per check),
+  apiErrors (per kind, region included), templateUsed, news counters —
+  the kill criteria's numbers.
+- **`apps/api/src/routes/insights-narrative.ts`** — `GET
+  /api/insights/narrative`: the stored doc verbatim, edge-cached
+  (`public, max-age=300, s-maxage=600` — visitors cost zero KV reads),
+  ungated (public-derived data only), the clean 404 envelope before the
+  first rung.
+- **Wiring**: the route mounted in the composition root; the rung in
+  cron.ts; the Bindings type + `wrangler.jsonc` vars
+  (NARRATOR_ENABLED/VISIBLE/WEB_CONTEXT/WEB_DAILY_CAP/MODEL; the KEY is
+  a SECRET). Tests: 15 new (the rung's capped batches, the 24 h rule,
+  the template/ai/error ladders against a mocked fetch, the flags, the
+  endpoint's cache/404/poisoned-KV paths).
+- **Free-tier impact (D-38)**: ~120 KV reads + ≤50 writes/day from the
+  rung; ZERO visitor reads (edge cache); ZERO external calls without a
+  key. The ingest's budget untouched.
+- **Deploy + live verification**: deploy-lock re-checked (the versions
+  API: last modify 10:16Z = the prep session's deploy; origin/main =
+  this session's own M3 push); gates ALL GREEN; deployed; health ok;
+  the 404 envelope before the first rung; the insights document
+  byte-identical (100 readings, global stressed 9 — zero data changes);
+  markets/fx/status 200 unchanged; the first natural :50 rung wrote the
+  template document (verified in docs/DEPLOY.md's session record).
+- **DECISIONS.md** — D-38 (the M4 implementation decisions + the
+  verified budget).
+
+Gates (clean run, `pnpm gates`): secret scan clean (8 patterns · 634
+files) · typecheck 6/6 · lint 0/0 · copy:audit clean (4,703) · narrator
+vocabulary in sync · narrator eval 50 checks · **layer1 strict
+7,809/7,809 unchanged** · full suite **10,018 passed (+15: api
+344→359)** · budget held 295.37/88.84 + 1094.09/256.83.
+
 ## [2026-10-28f] — Insights Layer-2 narrator M3: the Gemini client + the set-key tool + the offline eval harness
 
 Milestone 3 of the narrator build (spec §5 + §10 + §12): the model

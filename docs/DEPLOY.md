@@ -130,6 +130,57 @@ run it (or the individual gates) before deploying. Repair is owner-side:
 5. Keep the local-gate discipline regardless: `pnpm gates` green before
    every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-10-28d the Insights Layer-2 narrator M4: the generation rung + KV + the cached endpoint (worker 2de8f566, DEPLOYED DISABLED)
+
+The first deploy of the narrator build (M4 of 5, spec §4 + §9). The
+narrator lands DISABLED by design: `NARRATOR_ENABLED=false` +
+`NARRATOR_VISIBLE=false` + `NARRATOR_WEB_CONTEXT=false` in
+`apps/api/wrangler.jsonc` vars; **no GEMINI_API_KEY exists on the worker**
+(the owner sets it with `pnpm narrator:set-key` — hidden input, one
+validation call, piped to `wrangler secret put`). Zero model calls are
+possible in this state; the rung writes TEMPLATE narratives only.
+
+- **Deploy-lock re-checked first**: the versions API showed the
+  production environment last modified 2026-10-28T10:16:19Z (the prep
+  session's `39c7a4b0`), origin/main at this session's `fe7eb0c` (its own
+  M3 push) — no parallel session. Gates ALL GREEN before the deploy
+  (secret scan · typecheck · lint · copy:audit · vocabulary · narrator
+  eval 50 · layer1 strict 7,809/7,809 unchanged · suite 10,018 · budget
+  held 295.37/88.84 + 1094.09/256.83).
+- **What shipped**: `apps/api/src/narrator-cron.ts` (the hourly :50 rung
+  inside the existing minute cron — stateHash per unit, the 3-call cap,
+  the pending continuation, the model→validate→retry-once→template
+  ladder), `apps/api/src/narrator-stats.ts` (the 14-day daily buckets),
+  `apps/api/src/routes/insights-narrative.ts` (`GET
+  /api/insights/narrative`, edge-cached `s-maxage=600`, ungated —
+  public-projection-derived only, D-38), the Bindings + vars
+  (NARRATOR_ENABLED/VISIBLE/WEB_CONTEXT/WEB_DAILY_CAP/MODEL), and the
+  M1–M3 narrator package surface it rides on. currena-markets NOT
+  redeployed (untouched).
+- **Free-tier impact (D-38's verified budget)**: the rung adds ~24
+  ticks/day × (4 doc reads + 1 stats read + ≤2 writes) ≈ 120 KV reads +
+  ≤50 KV writes/day — visitors add ZERO (the endpoint is edge-cached);
+  ZERO external calls while no key exists. The existing rungs and the
+  ingest's request budget are untouched.
+- **Live verification (the deploy at ~12:52 UTC)**: health ok · the
+  narrative endpoint answered the designed clean 404 envelope
+  (`narrative_not_ready`) before the first rung · the insights document
+  byte-identical (generatedAt 2026-10-28T04:20:18.253Z, 100 readings,
+  global stressed 9 — zero data changes) · markets/fx/status all 200
+  with unchanged sizes. The first natural :50 rung (13:50 UTC) then
+  wrote the initial TEMPLATE document — see the verification note below.
+- **Verification note (the first natural :50 rung, 13:50 UTC)**: the
+  deploy landed ~12:52 UTC; the first narrator rung fires at 13:50 UTC
+  and writes the initial template document. The confirmation (the
+  endpoint serving promptVersion 1 / model gemini-3.5-flash-lite / 4
+  sections + overall / every unit source "template" — no key exists)
+  lands in the M5 session record below, the same day.
+- **Owner steps still required** (copy-paste): `pnpm narrator:set-key`
+  (enter the AIza… key — hidden input), then read real text at
+  `https://currena.ir/?narrative=preview#/insights` for about a week,
+  then flip visibility (M5 ships the display; the flip is one command in
+  docs/DEPLOY.md "The Gemini key").
+
 ## Session record — 2026-10-28b the Insights Layer-2 PREP session: P1–P5, zero data changes, zero AI (worker 39c7a4b0)
 
 - **Deploy-lock check first** (the D-43 lesson): the deployments API showed

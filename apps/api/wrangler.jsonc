@@ -42,7 +42,23 @@
   // Flipping back to 'private' re-arms the password gate (the
   // INSIGHTS_PASSWORD secret stays set on the Worker).
   "vars": {
-    "SITE_MODE": "public"
+    "SITE_MODE": "public",
+    // ---- The Layer-2 narrator (M4, spec §9) ----
+    // The kill switch: 'false' = template narratives only (no model calls
+    // at all — also the behaviour whenever GEMINI_API_KEY is unset).
+    // The staged rollout (D-34): 'false' = generated + stored, shown only
+    // at ?narrative=preview until the owner flips it (one command, see
+    // docs/DEPLOY.md "The Gemini key").
+    // Part 3 (news) ships DISABLED (D-29: the grounding terms' display
+    // requirements are not implemented; the flag exists so a later
+    // session can enable it after reading the current ToS in full).
+    // GEMINI_API_KEY is a SECRET — set with `pnpm narrator:set-key`,
+    // NEVER a var here (spec §10).
+    "NARRATOR_ENABLED": "false",
+    "NARRATOR_VISIBLE": "false",
+    "NARRATOR_WEB_CONTEXT": "false",
+    "NARRATOR_WEB_DAILY_CAP": "20",
+    "NARRATOR_MODEL": "gemini-3.5-flash-lite"
   },
   "assets": {
     "directory": "../web/dist",

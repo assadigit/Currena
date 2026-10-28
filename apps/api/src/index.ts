@@ -9,6 +9,7 @@
  *   GET  /api/meta                    — currency asset list           (routes/ops)
  *   GET  /api/status                  — per-source status + cache age (routes/ops)
  *   GET  /api/insights(/…)            — precomputed Insights sections (routes/insights)
+ *   GET  /api/insights/narrative      — the AI narrator's cached doc  (routes/insights-narrative)
  *   GET/POST /admin                   — zero-JS ops console           (routes/admin)
  *   POST /internal/refresh?source=    — header-secret manual scrape   (routes/internal)
  *   cron  * * * * *                   — keep-warm + :13 prices rung   (cron.ts)
@@ -31,6 +32,7 @@ import { KvInsightsReader, KvMarketsReader, KvFxReader, KvPricesReader } from '.
 import { resolveAccessModeForRequest, type AccessMode } from './access-mode';
 import { KvAccessModeStore, type AccessModeKvStore } from './adapters/access-mode-store';
 import { createInsightsRoutes } from './routes/insights';
+import { createNarrativeRoutes } from './routes/insights-narrative';
 import { createRatesRoutes } from './routes/rates';
 import { createOpsRoutes } from './routes/ops';
 import { createAdminRoutes } from './routes/admin';
@@ -106,6 +108,24 @@ export type Bindings = {
   GH_INGEST_DISPATCH_TOKEN?: string;
   /** Static-assets binding (implicit when wrangler.jsonc has `assets`); serves the SPA. */
   ASSETS?: Fetcher;
+  /**
+   * The Layer-2 narrator (M4, spec §10): the Gemini key — a Worker SECRET
+   * the OWNER sets with `pnpm narrator:set-key` (hidden input, one
+   * validation call, piped to `wrangler secret put GEMINI_API_KEY`).
+   * NEVER in wrangler.jsonc vars, never in chat, never logged. UNSET =
+   * the narrator runs in template-only mode (no model calls, no errors).
+   */
+  GEMINI_API_KEY?: string;
+  /** The narrator's kill switch: 'true' enables MODEL calls (templates otherwise). Default 'false'. */
+  NARRATOR_ENABLED?: string;
+  /** The staged rollout: 'true' shows narratives publicly (the preview URL marker works regardless). Default 'false'. */
+  NARRATOR_VISIBLE?: string;
+  /** Part 3 (news, call type B): 'true' generates grounded notes (D-29: ships DISABLED). Default 'false'. */
+  NARRATOR_WEB_CONTEXT?: string;
+  /** Part 3's daily cap (grounded calls/day; default '20' — under the 1,500-RPD free cap by 75×). */
+  NARRATOR_WEB_DAILY_CAP?: string;
+  /** The model id (default 'gemini-3.5-flash-lite' — D-28's re-verified default). */
+  NARRATOR_MODEL?: string;
 };
 
 export interface AppDeps {
@@ -233,6 +253,12 @@ export function createApp(deps: AppDeps = {}) {
   app.route('/', createRatesRoutes({ makeService }));
   app.route('/', createAdminRoutes({ makeService, getInsightsReader: getAdminInsightsReader }));
   app.route('/', createInternalRoutes({ makeService }));
+
+  /* ------------------------ the narrator (M4) --------------------------- *
+   * GET /api/insights/narrative — the cached narrative document (spec §9):
+   * public-projection-derived text only (D-38), edge-cached s-maxage=600,
+   * ungated by design (see routes/insights-narrative.ts). */
+  app.route('/', createNarrativeRoutes());
 
   /* ----------------------------- insights ------------------------------- */
 

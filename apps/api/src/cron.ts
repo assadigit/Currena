@@ -19,6 +19,7 @@ import { runPricesUpdate, formatPricesReport, defaultPricesFetchers } from '@cur
 import { KvPricesStore } from '@currena/insights/prices';
 import type { PricesJobFetchers } from '@currena/insights/prices';
 import { runIngestWatchdog, WATCHDOG_MINUTE } from './ingest-watchdog';
+import { runScheduledNarrator, NARRATOR_CRON_MINUTE } from './narrator-cron';
 import {
   insightsIngestRung,
   runScheduledInsightsIngest,
@@ -119,6 +120,20 @@ export async function runScheduled(env: Bindings, scheduledTimeMs: number): Prom
       ? [
           runIngestWatchdog(env).catch((err: unknown) => {
             console.warn('[cron] ingest watchdog failed:', err instanceof Error ? err.message : err);
+          }),
+        ]
+      : []),
+    // The hourly narrator rung (M4 of the Layer-2 narrator build, spec
+    // §4/§9): :50 UTC — clear of every other rung. Builds the M1 states
+    // from the PUBLIC PROJECTION + the markets/fx documents, regenerates
+    // only units whose stateHash changed (or text older than 24 h), at
+    // most 3 model calls per tick, ONE KV write when something changed.
+    // Templates whenever the flag is off, the key is absent, or the model
+    // fails — never an error, never a thrown rung.
+    ...(minute === NARRATOR_CRON_MINUTE
+      ? [
+          runScheduledNarrator(env).catch((err: unknown) => {
+            console.warn('[cron] narrator rung failed:', err instanceof Error ? err.message : err);
           }),
         ]
       : []),
