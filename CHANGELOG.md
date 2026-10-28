@@ -55,9 +55,9 @@ gate list + the owner's deploy-lock check (docs/DEPLOY.md) and deploys.
   8525), typecheck, lint, copy:audit clean (manifest grown to 4546
   entries, all layer1 round), bundle budget held, render-checked EN+FA
   at 1280/360px on all four surfaces (indicator card, market tile
-  detail, FX pair panel, pattern card; screenshots noted in the
-  session worklog). Free-tier safety holds: zero KV operations, zero
-  external calls added (G10).
+  detail, FX pair panel, pattern card; screenshots in
+  `docs/insights/screenshots/layer1-m3/`). Free-tier safety holds:
+  zero KV operations, zero external calls added (G10).
 
 ## [2026-10-29] — Insights Layer 1 (session 3, Milestone 2): prices and Australia completed
 
