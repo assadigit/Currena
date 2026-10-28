@@ -126,12 +126,12 @@ inventory and enforced by gate G1.
 #### `au-inflation-rates` gauge (6)
 | L1 | id | official name | what it measures |
 |---|---|---|---|
-| · | `au-cpi` | Australian CPI (annual change) | Australian consumer-price inflation, year-on-year. |
-| · | `au-trimmed-mean` | Australian trimmed-mean inflation | Australia's "underlying" inflation (CPI trimmed mean), year-on-year. |
-| · | `au-10y` | Australian 10-year government bond yield | The 10-year Australian government bond yield. |
-| · | `rba-expectations` | What markets expect from the RBA (3-year gap) | The 3-year bond-implied path of RBA rates. |
-| · | `au-us-10y-gap` | Australia vs US 10-year yield gap | The gap between 10-year Australian and US yields. |
-| · | `au-petrol-yoy` | Petrol prices vs a year ago | Australian petrol prices, year-on-year. |
+| ✓ | `au-cpi` | Australian CPI (annual change) | Australian consumer-price inflation, year-on-year. |
+| ✓ | `au-trimmed-mean` | Australian trimmed-mean inflation | Australia's "underlying" inflation (CPI trimmed mean), year-on-year. |
+| ✓ | `au-10y` | Australian 10-year government bond yield | The 10-year Australian government bond yield. |
+| ✓ | `rba-expectations` | What markets expect from the RBA (3-year gap) | The 3-year bond-implied path of RBA rates. |
+| ✓ | `au-us-10y-gap` | Australia vs US 10-year yield gap | The gap between 10-year Australian and US yields. |
+| ✓ | `au-petrol-yoy` | Petrol prices vs a year ago | Australian petrol prices, year-on-year. |
 
 #### `au-households` gauge (11)
 | L1 | id | official name | what it measures |

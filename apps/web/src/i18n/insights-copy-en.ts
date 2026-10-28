@@ -179,6 +179,10 @@ const LAYER1 = {
       term: 'core inflation',
       plain: 'Inflation with food and energy prices taken out. It shows the steadier direction underneath the noisy monthly moves.',
     },
+    'trimmed-mean': {
+      term: 'trimmed mean',
+      plain: 'An inflation reading that drops the wildest price rises and falls each month before averaging. It shows the steady middle of price changes.',
+    },
     deflation: {
       term: 'deflation',
       plain: 'When prices are falling on average. It sounds good but can stall an economy and wages.',
@@ -1129,6 +1133,82 @@ const LAYER1 = {
         { with: 'wheat', text: 'The two grains swap in feed and food demand at times.', strength: 'sometimes' },
       ],
       glossaryTerms: [],
+    },
+
+    /* ----- Batch 12 — au-inflation-rates (6) ----- */
+    'au-cpi': {
+      plainName: 'Australian inflation',
+      oneLine: 'How fast Australian consumer prices are rising, versus a year ago.',
+      ifRising: 'The RBA usually keeps rates higher, making loans dearer and saving pay more.',
+      ifFalling: 'Cooling inflation usually opens the door to RBA rate cuts.',
+      connections: [
+        { with: 'rba-cash-rate', text: 'The RBA moves its main rate in answer to this scoreboard.', strength: 'usually' },
+        { with: 'au-trimmed-mean', text: 'The steadier companion shows the underlying direction.', strength: 'reliable' },
+        { with: 'au-petrol-yoy', text: 'Petrol is one of the jumpy items inside this basket.', strength: 'reliable' },
+      ],
+      australiaAngle: 'This is Australia’s own cost-of-living gauge: the number behind nearly every home-loan rate move.',
+      glossaryTerms: ['inflation', 'mortgage'],
+    },
+    'au-trimmed-mean': {
+      plainName: 'Australia’s steady inflation',
+      oneLine: 'The steadier middle of Australian price changes that the RBA targets.',
+      ifRising: 'A rising underlying reading usually keeps the RBA tough on rates.',
+      ifFalling: 'Cooling underlying inflation usually opens the door to RBA cuts.',
+      connections: [
+        { with: 'au-cpi', text: 'The headline reading swings more; this one shows the steady core.', strength: 'reliable' },
+        { with: 'rba-cash-rate', text: 'The RBA steers the cash rate by this reading first.', strength: 'reliable' },
+      ],
+      australiaAngle: 'The RBA’s preferred gauge: when it sits outside the target band, mortgage relief usually waits.',
+      glossaryTerms: ['inflation', 'trimmed-mean', 'mortgage'],
+    },
+    'au-10y': {
+      plainName: 'Australia’s 10-year borrowing cost',
+      oneLine: 'What the Australian government pays to borrow for ten years.',
+      ifRising: 'Fixed home-loan rates and term-deposit rates usually climb.',
+      ifFalling: 'Fixed home loans usually get cheaper and long savings pay less.',
+      connections: [
+        { with: 'rba-cash-rate', text: 'The cash rate anchors the short end; this is the market’s long rate.', strength: 'reliable' },
+        { with: 'au-us-10y-gap', text: 'The gap card compares this yield with the US one.', strength: 'reliable' },
+      ],
+      australiaAngle: 'This long rate, not just the cash rate, prices Australia’s multi-year money: fixed loans and term deposits follow it.',
+      glossaryTerms: ['yield', 'mortgage'],
+    },
+    'rba-expectations': {
+      plainName: 'Where markets think the RBA goes',
+      oneLine: 'Whether the market’s three-year rate sits above or below today’s cash rate.',
+      ifRising: 'Markets usually price a rising cash-rate path ahead.',
+      ifFalling: 'Markets usually price rate cuts ahead, the pattern that has opened past cutting cycles.',
+      connections: [
+        { with: 'rba-cash-rate', text: 'The gap is measured against today’s cash rate.', strength: 'reliable' },
+        { with: 'au-10y', text: 'The long-rate companion shows the ten-year window.', strength: 'reliable' },
+      ],
+      australiaAngle: 'A positive gap usually means money is priced dearer ahead; a negative one has usually come before rate-cut cycles.',
+      glossaryTerms: [],
+    },
+    'au-us-10y-gap': {
+      plainName: 'The Australia-US long-rate gap',
+      oneLine: 'Whether Australia pays more or less than the US to borrow for ten years.',
+      ifRising: 'Global money usually finds Australian bonds more rewarding, supporting the local dollar.',
+      ifFalling: 'US rates pulling above Australia’s have usually weighed on the local dollar.',
+      connections: [
+        { with: 'au-10y', text: 'The Australian leg of the gap.', strength: 'reliable' },
+        { with: 'us10y', text: 'The US leg.', strength: 'reliable' },
+        { with: 'audusd', text: 'The dollar often follows this pull of money across the Pacific.', strength: 'usually' },
+      ],
+      australiaAngle: 'This gap is one of the quiet levers on the Australian dollar: when the US pays clearly more, the AUD usually sags.',
+      glossaryTerms: ['bond'],
+    },
+    'au-petrol-yoy': {
+      plainName: 'Australian petrol vs last year',
+      oneLine: 'How much more or less Australian fuel costs than a year ago.',
+      ifRising: 'Family budgets and freight costs usually feel the squeeze first.',
+      ifFalling: 'Cheaper fuel is the rare reading that eases household budgets.',
+      connections: [
+        { with: 'au-cpi', text: 'Fuel is a jumpy item inside the inflation basket.', strength: 'reliable' },
+        { with: 'brent', text: 'World oil and the local dollar usually drive the pump together.', strength: 'reliable' },
+      ],
+      australiaAngle: 'The bowser is Australia’s most visible weekly price; it feeds headline inflation and the RBA’s mood.',
+      glossaryTerms: ['inflation'],
     },
   } satisfies Record<string, Layer1Entry>,
 };

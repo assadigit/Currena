@@ -519,6 +519,53 @@ _(market-stress is now complete at 10/10; M1 ends at 56/129 unique ids)_
 
 ---
 
+## Batch 12 — au-inflation-rates (6 indicators)
+
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `au-cpi` | ifRising | Higher Australian inflation usually means the RBA keeps rates higher: dearer loans, better saving pay. | — | widely-taught: the RBA's 2-3% target (approved copy) | widely-taught |
+| `au-cpi` | ifFalling | Cooling inflation usually opens the door to RBA rate cuts. | — | widely-taught (inverse) | widely-taught |
+| `au-trimmed-mean` | ifRising | A rising underlying reading usually keeps the RBA tough on rates. | — | widely-taught: the RBA targets the trimmed mean (approved copy) | widely-taught |
+| `au-trimmed-mean` | ifFalling | Cooling underlying inflation usually opens the door to RBA cuts. | — | widely-taught (inverse) | widely-taught |
+| `au-10y` | ifRising | Rising Australian 10-year borrowing usually lifts fixed home-loan and term-deposit rates. | — | widely-taught (approved copy: "fixed home-loan rates and term deposits price off this curve") | widely-taught |
+| `au-10y` | ifFalling | Falling long rates usually mean cheaper fixed home loans and thinner long savings pay. | — | widely-taught (inverse) | widely-taught |
+| `rba-expectations` | ifRising | A widening positive gap usually means markets price a rising cash-rate path. | — | widely-taught (approved copy: positive gaps appeared when the market priced a rising path) | widely-taught |
+| `rba-expectations` | ifFalling | A negative gap usually means markets price cuts ahead, the run-up pattern of past cut cycles. | — | widely-taught (approved copy: negative gaps preceded past cutting cycles) | widely-taught |
+| `au-us-10y-gap` | ifRising | Australia paying clearly more than the US usually draws global money and supports the AUD. | — | widely-taught: the yield-gap carry channel (approved copy: "a mix that tends to support the AUD") | widely-taught |
+| `au-us-10y-gap` | ifFalling | US rates above Australia's have usually weighed on the AUD. | — | widely-taught (approved copy: "the setting that has usually weighed on the AUD") | widely-taught |
+| `au-petrol-yoy` | ifRising | Rising fuel inflation usually squeezes family budgets and freight costs first. | — | widely-taught (approved copy same claim) | widely-taught |
+| `au-petrol-yoy` | ifFalling | Cheaper fuel is the rare reading that eases household budgets. | — | widely-taught (approved copy same claim) | widely-taught |
+
+### Connections (batch 12)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `au-cpi` | `rba-cash-rate` | The RBA moves its main rate in answer to this scoreboard. | usually | widely-taught: the RBA mandate | widely-taught |
+| `au-cpi` | `au-trimmed-mean` | The steadier companion shows the underlying direction. | reliable | definitional (same ABS CPI family) | widely-taught |
+| `au-cpi` | `au-petrol-yoy` | Petrol is one of the jumpy items inside the CPI basket. | reliable | definitional (automotive fuel is a CPI component) | widely-taught |
+| `au-trimmed-mean` | `au-cpi` | The headline swings more; the trimmed mean shows the steady core. | reliable | definitional | widely-taught |
+| `au-trimmed-mean` | `rba-cash-rate` | The RBA steers the cash rate by this reading first. | reliable | widely-taught: the RBA's preferred target measure | widely-taught |
+| `au-10y` | `rba-cash-rate` | The cash rate anchors the short end; the 10-year is the market long rate. | reliable | widely-taught: the curve structure | widely-taught |
+| `au-10y` | `au-us-10y-gap` | The gap card compares this yield with the US one. | reliable | definitional | widely-taught |
+| `rba-expectations` | `rba-cash-rate` | The gap is measured against today's cash rate. | reliable | definitional | widely-taught |
+| `rba-expectations` | `au-10y` | The long-rate companion shows the ten-year window. | reliable | definitional | widely-taught |
+| `au-us-10y-gap` | `au-10y` | The Australian leg of the gap. | reliable | definitional | widely-taught |
+| `au-us-10y-gap` | `us10y` | The US leg. | reliable | definitional | widely-taught |
+| `au-us-10y-gap` | `audusd` | The dollar often follows this pull of money across the Pacific. | usually | widely-taught: rate-gap flows into the AUD | widely-taught |
+| `au-petrol-yoy` | `au-cpi` | Fuel is a jumpy item inside the inflation basket. | reliable | definitional | widely-taught |
+| `au-petrol-yoy` | `brent` | World oil and the local dollar usually drive the pump together. | reliable | widely-taught: pump price = world oil × AUD | widely-taught |
+
+### Australia angle (batch 12)
+| id | claim | basis | status |
+|---|---|---|---|
+| `au-cpi` | Australia's own cost-of-living gauge; the number behind nearly every home-loan rate move. | widely-taught (approved copy: the RBA target drives rate decisions) | widely-taught |
+| `au-trimmed-mean` | The RBA's preferred gauge; outside the target band, mortgage relief usually waits. | widely-taught (approved copy: "the reading that usually keeps rates high") | widely-taught |
+| `au-10y` | This long rate, not just the cash rate, prices Australia's multi-year money: fixed loans and term deposits follow it. | widely-taught (approved copy same claim) | widely-taught |
+| `rba-expectations` | A positive gap means money priced dearer ahead; a negative one has usually come before rate-cut cycles. | widely-taught (approved copy same claim) | widely-taught |
+| `au-us-10y-gap` | A quiet lever on the AUD: when the US pays clearly more, the AUD usually sags. | widely-taught (approved copy same claim) | widely-taught |
+| `au-petrol-yoy` | The bowser is Australia's most visible weekly price; it feeds headline inflation and the RBA's mood. | widely-taught (approved copy: fuel feeds headline CPI; "petrol usually leads headline CPI's turning points") | widely-taught |
+
+---
+
 ## Remaining batches (M2+)
 
 — pending — prices-board (5), prices-heat (16), AU indicators (23), 16 world
