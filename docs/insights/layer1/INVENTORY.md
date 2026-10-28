@@ -168,14 +168,14 @@ inventory and enforced by gate G1.
 | ✓ | `ssec` | Shanghai Composite | asia |
 | ✓ | `taiex` | TAIEX | asia |
 | ✓ | `nifty50` | Nifty 50 | asia |
-| · | `stoxx50` | Euro Stoxx 50 | europe |
-| · | `dax` | DAX | europe |
-| · | `cac` | CAC 40 | europe |
-| · | `ftse` | FTSE 100 | europe |
-| · | `sp500` | S&P 500 | americas |
-| · | `ndx` | Nasdaq 100 | americas |
-| · | `dow` | Dow Jones | americas |
-| · | `tsx` | S&P/TSX | americas |
+| ✓ | `stoxx50` | Euro Stoxx 50 | europe |
+| ✓ | `dax` | DAX | europe |
+| ✓ | `cac` | CAC 40 | europe |
+| ✓ | `ftse` | FTSE 100 | europe |
+| ✓ | `sp500` | S&P 500 | americas |
+| ✓ | `ndx` | Nasdaq 100 | americas |
+| ✓ | `dow` | Dow Jones | americas |
+| ✓ | `tsx` | S&P/TSX | americas |
 | · | `ibov` | Bovespa | americas |
 
 ## C. The FX board (10 pairs + 7 pattern cards)

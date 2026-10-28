@@ -1508,6 +1508,101 @@ const LAYER1 = {
       ],
       glossaryTerms: [],
     },
+
+    /* ----- Batch 17 — world stock markets: Europe + Americas A (8) ----- */
+    stoxx50: {
+      plainName: 'Europe’s biggest companies',
+      oneLine: 'One number for how the euro area’s largest companies are doing.',
+      ifRising: 'European business is doing well, often a sign of healthy world trade and steady European demand.',
+      ifFalling: 'European business is struggling, often with worry about the euro area’s economy.',
+      connections: [
+        { with: 'dax', text: 'The German and euro-wide lists usually tell one European story.', strength: 'usually' },
+        { with: 'eurusd', text: 'Europe’s health often shows in its money too.', strength: 'usually' },
+        { with: 'r6_europe_worry', text: 'The Europe-worry alarm reads this list beside the euro-franc pair.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
+    dax: {
+      plainName: 'Germany’s biggest companies',
+      oneLine: 'One number for how Germany’s largest companies are doing.',
+      ifRising: 'German factories and exporters are usually busy, a good sign for world trade.',
+      ifFalling: 'German industry is struggling, often an early sign of slowing world trade.',
+      connections: [
+        { with: 'oecd-cli-de', text: 'The German leading indicator usually turns with this market.', strength: 'usually' },
+        { with: 'stoxx50', text: 'Germany is the euro area’s biggest economy; its list usually leads Europe’s.', strength: 'usually' },
+        { with: 'ssec', text: 'China’s demand pulls hard on German exports.', strength: 'usually' },
+      ],
+      glossaryTerms: ['leading-indicator'],
+    },
+    cac: {
+      plainName: 'France’s biggest companies',
+      oneLine: 'One number for how France’s largest companies are doing.',
+      ifRising: 'French business is doing well, often with luxury brands, banks and energy firms in demand.',
+      ifFalling: 'French business is under pressure, often with soft spending at home or weaker world demand.',
+      connections: [
+        { with: 'dax', text: 'France and Germany usually tell one European story.', strength: 'usually' },
+        { with: 'stoxx50', text: 'France’s list is a big slice of Europe’s widest one.', strength: 'usually' },
+        { with: 'eurusd', text: 'France’s list usually moves with the euro too.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    ftse: {
+      plainName: 'Britain’s biggest companies',
+      oneLine: 'One number for how the biggest London-listed companies are doing.',
+      ifRising: 'The global mining, oil and banking giants usually earn well, since most make their money abroad.',
+      ifFalling: 'The world-facing giants usually struggle, often with oil and metal prices down too.',
+      connections: [
+        { with: 'brent', text: 'A big slice of this list sells oil, so Brent often moves it.', strength: 'usually' },
+        { with: 'gbpusd', text: 'The pound usually tells a UK story beside this world-facing list.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    sp500: {
+      plainName: 'America’s main company list',
+      oneLine: 'One number for how the largest US companies are doing.',
+      ifRising: 'US business is confident, and world markets usually follow America’s lead higher.',
+      ifFalling: 'US companies are under pressure, and markets almost everywhere often follow it down.',
+      connections: [
+        { with: 'vix', text: 'The market fear gauge usually climbs when this list falls.', strength: 'usually' },
+        { with: 'dow', text: 'The two most-quoted US lists usually tell one story; this one is the broader.', strength: 'usually' },
+        { with: 'r4_money_hiding', text: 'The money-hiding alarm reads this list beside the dollar and gold.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
+    ndx: {
+      plainName: 'America’s technology giants',
+      oneLine: 'One number for how big US technology and growth companies are doing.',
+      ifRising: 'Investors usually want technology and growth stories, and are comfortable taking risk.',
+      ifFalling: 'Investors are often pulling back from technology and pricier growth stories.',
+      connections: [
+        { with: 'sp500', text: 'This list usually swings harder than the broad one.', strength: 'usually' },
+        { with: 'btc-usd', text: 'Falls here often ripple into crypto.', strength: 'usually' },
+        { with: 'taiex', text: 'The chip chain links Taiwan’s list to this one.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    dow: {
+      plainName: 'America’s headline market number',
+      oneLine: 'The most-quoted number for US company shares.',
+      ifRising: 'America’s best-known companies are doing well, often lifting the mood of markets that open next.',
+      ifFalling: 'America’s best-known companies are falling, often souring the mood of markets that open after New York.',
+      connections: [
+        { with: 'sp500', text: 'Both tell the US story; the broad list is the better measure.', strength: 'reliable' },
+        { with: 'ndx', text: 'The technology list reads the same country, louder.', strength: 'sometimes' },
+      ],
+      glossaryTerms: [],
+    },
+    tsx: {
+      plainName: 'Canada’s biggest companies',
+      oneLine: 'One number for how Canada’s largest companies are doing.',
+      ifRising: 'Canadian energy, banking and mining firms usually earn well, often with firm oil and metal prices.',
+      ifFalling: 'Canadian firms usually struggle, often with oil and metal prices down too.',
+      connections: [
+        { with: 'brent', text: 'Canada sells a lot of oil, so Brent often moves this list.', strength: 'usually' },
+        { with: 'sp500', text: 'Canada’s market usually follows its giant next-door neighbour.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 

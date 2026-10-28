@@ -750,11 +750,62 @@ in new fields; the official name with its number stays on the tile).
 
 ---
 
+## Batch 17 — world stock markets: Europe + Americas A (8)
+
+Same rules as batch 16 (D-08: no australiaAngle; D-02: approved
+what/why/you reused; D-18: digit-free plain names).
+
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `stoxx50` | ifRising | Euro-area blue chips doing well = healthy world trade + steady European demand. | — | widely-taught (approved copy: one number for the health of the euro area) | widely-taught |
+| `stoxx50` | ifFalling | Euro-area business struggling = worry about the euro-area economy. | — | widely-taught (same basis) | widely-taught |
+| `dax` | ifRising | Busy German factories/exporters = a good sign for world trade. | — | widely-taught (approved copy: Germany sells goods worldwide) | widely-taught |
+| `dax` | ifFalling | Struggling German industry = an early sign of slowing world trade. | — | widely-taught (approved copy: weakness can signal slowing world trade) | widely-taught |
+| `cac` | ifRising | French business doing well, often with luxury/banks/energy in demand. | — | widely-taught (approved copy names the sectors) | widely-taught |
+| `cac` | ifFalling | French business pressured by soft home spending or weaker world demand. | — | widely-taught | widely-taught |
+| `ftse` | ifRising | The global mining/oil/banking giants earn well (most earn abroad). | — | widely-taught (approved copy: works like a gauge of commodities and world growth) | widely-taught |
+| `ftse` | ifFalling | World-facing giants struggle, often with oil and metals down. | — | widely-taught (same basis) | widely-taught |
+| `sp500` | ifRising | Confident US business; world markets usually follow America higher. | — | widely-taught (approved copy: "when it falls sharply, markets almost everywhere follow") | widely-taught |
+| `sp500` | ifFalling | US pressure often drags markets almost everywhere down. | — | widely-taught (approved copy same claim, hedged) | widely-taught |
+| `ndx` | ifRising | Investors want technology/growth stories and accept risk. | — | widely-taught (approved copy: shows the mood for technology and growth stocks) | widely-taught |
+| `ndx` | ifFalling | Investors pulling back from technology and pricier growth stories. | — | widely-taught (approved copy: falls mean investors are pulling back from risk) | widely-taught |
+| `dow` | ifRising | A rising Dow often lifts the mood of markets that open next. | — | widely-taught (approved copy: "can set the mood for every market that opens after New York") | widely-taught |
+| `dow` | ifFalling | A falling Dow often sours the mood of later-opening markets. | — | widely-taught (same basis) | widely-taught |
+| `tsx` | ifRising | Canadian energy/banking/mining earn well, often with firm oil and metals. | — | widely-taught (approved copy: heavy in energy, banks and mining; moves with oil) | widely-taught |
+| `tsx` | ifFalling | Canadian firms struggle, often with oil and metals down. | — | widely-taught (same basis) | widely-taught |
+
+### Connections (batch 17)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `stoxx50` | `dax` | The German and euro-wide lists usually tell one European story. | usually | widely-taught (core-europe correlation) | widely-taught |
+| `stoxx50` | `eurusd` | Europe's health often shows in its money too. | usually | widely-taught (growth ↔ currency channel) | widely-taught |
+| `stoxx50` | `r6_europe_worry` | The Europe-worry alarm reads this list beside EUR/CHF. | reliable | definitional (FX rule R6's chart series = eurchf + stoxx50) | widely-taught |
+| `dax` | `oecd-cli-de` | The German leading indicator usually turns with this market. | usually | widely-taught (the OECD CLI is built to lead the cycle) — term listed in glossaryTerms | widely-taught |
+| `dax` | `stoxx50` | Germany's list usually leads Europe's. | usually | widely-taught (biggest euro-area economy) | widely-taught |
+| `dax` | `ssec` | China's demand pulls hard on German exports. | usually | widely-taught (approved copy: a good read on demand from China) | widely-taught |
+| `cac` | `dax` | France and Germany usually tell one European story. | usually | widely-taught (approved copy: alongside the DAX and Euro Stoxx 50) | widely-taught |
+| `cac` | `stoxx50` | France's list is a big slice of Europe's widest one. | usually | definitional-adjacent (CAC members are Stoxx constituents) | widely-taught |
+| `cac` | `eurusd` | France's list usually moves with the euro too. | usually | widely-taught (approved copy: moves with the euro and European rates) | widely-taught |
+| `ftse` | `brent` | A big slice of this list sells oil, so Brent often moves it. | usually | widely-taught (approved copy: full of global miners and oil companies; often rises with oil) | widely-taught |
+| `ftse` | `gbpusd` | The pound usually tells a UK story beside this world-facing list. | usually | widely-taught (approved gbpusd copy: a pound-only move is usually a UK story) | widely-taught |
+| `sp500` | `vix` | The market fear gauge usually climbs when this list falls. | usually | definitional (the VIX is priced from S&P option swings) | widely-taught |
+| `sp500` | `dow` | The two most-quoted US lists usually tell one story; this one is the broader. | usually | widely-taught (approved copy: the S&P is the better measure) | widely-taught |
+| `sp500` | `r4_money_hiding` | The money-hiding alarm reads this list beside the dollar and gold. | reliable | definitional (FX rule R4's series = sp500 + dollar + gold) | widely-taught |
+| `ndx` | `sp500` | This list usually swings harder than the broad one. | usually | widely-taught (approved copy: "It usually swings harder than the S&P 500") | widely-taught |
+| `ndx` | `btc-usd` | Falls here often ripple into crypto. | usually | widely-taught (approved copy: "can ripple into crypto and growth funds") — softened to `usually` | widely-taught |
+| `ndx` | `taiex` | The chip chain links Taiwan's list to this one. | usually | widely-taught (the AI-chip supply chain spans both) | widely-taught |
+| `dow` | `sp500` | Both tell the US story; the broad list is the better measure. | reliable | widely-taught (approved copy: "the S&P 500 above is the better measure") | widely-taught |
+| `dow` | `ndx` | The technology list reads the same country, louder. | sometimes | softened co-movement claim | needs-expert-check |
+| `tsx` | `brent` | Canada sells a lot of oil, so Brent often moves this list. | usually | widely-taught (approved copy: a read on oil and metal prices) | widely-taught |
+| `tsx` | `sp500` | Canada's market usually follows its giant next-door neighbour. | usually | widely-taught (approved copy: Canada is the US's closest trading partner) | widely-taught |
+
+---
+
 ## Remaining batches (M3+)
 
-— pending — the remaining 9 world stock markets (stoxx50, dax, cac,
-ftse, sp500, ndx, dow, tsx, ibov), the remaining 6 FX pairs (eurusd,
-gbpusd, usdchf, eurjpy, eurchf, audcny; usdjpy/usdcny/audusd/audjpy are
-already done as shared ids), and the 7 pattern cards (null-direction per
-D-09). Then the final strict-mode + deploy session (LAYER1_STRICT=1).
-(Milestone 3 is at 107/129 unique ids after batch 16.)
+— pending — the remaining 1 world stock market (ibov), the remaining 6
+FX pairs (eurusd, gbpusd, usdchf, eurjpy, eurchf, audcny; usdjpy/
+usdcny/audusd/audjpy are already done as shared ids), and the 7 pattern
+cards (null-direction per D-09). Then the final strict-mode + deploy
+session (LAYER1_STRICT=1). (Milestone 3 is at 115/129 unique ids after
+batch 17.)
