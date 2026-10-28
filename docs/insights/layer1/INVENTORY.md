@@ -95,11 +95,11 @@ inventory and enforced by gate G1.
 #### `prices-board` strip (5)
 | L1 | id | official name | what it measures |
 |---|---|---|---|
-| · | `brent` | Brent oil | The Brent crude oil price. |
-| · | `gold-usd` | Gold price (ounce) | The gold spot price in US dollars per troy ounce. |
-| · | `silver-usd` | Silver price (ounce) | The silver spot price in US dollars per troy ounce. |
-| · | `btc-usd` | Bitcoin price | The Bitcoin price in US dollars. |
-| · | `gold-btc` | Bitcoin priced in gold (BTC per ounce) | The gold price of one Bitcoin (gold ounces per BTC). |
+| ✓ | `brent` | Brent oil | The Brent crude oil price. |
+| ✓ | `gold-usd` | Gold price (ounce) | The gold spot price in US dollars per troy ounce. |
+| ✓ | `silver-usd` | Silver price (ounce) | The silver spot price in US dollars per troy ounce. |
+| ✓ | `btc-usd` | Bitcoin price | The Bitcoin price in US dollars. |
+| ✓ | `gold-btc` | Bitcoin priced in gold (BTC per ounce) | The gold price of one Bitcoin (gold ounces per BTC). |
 
 #### `prices-heat` gauge (16)
 | L1 | id | official name | what it measures |

@@ -661,7 +661,15 @@ const BUDGETS = [
   // connection texts. Ceiling moves to 985/236 (M1 final + margin); M2
   // (prices + AU, ~34 ids) re-measures and bumps again the same way.
   // Entry chunk untouched at 295.37/88.84.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 985_000, gz: 236_000, label: 'Insights lazy chunk' },
+  // Layer 1 bump (2026-10-29, M2 batch 9 — prices-board): batch 9 adds the
+  // first 5 M2 ids (brent, gold-usd, silver-usd, btc-usd, gold-btc, with
+  // longer connection texts than the average M1 card). Measured 985.55 kB
+  // raw / 235.25 kB gz — +7.46 raw / +1.57 gz for 5 ids (~1.5/~0.31 per
+  // id). The remaining 39 M2 ids project ~+58 raw / +12 gz → ~1043/247 at
+  // the M2 end; ceiling moves to 1045/248 (M2 projected end + margin).
+  // Same D-16 path: bundled static copy, zero KV/external calls. Entry
+  // chunk untouched at 295.37/88.84.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1045_000, gz: 248_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

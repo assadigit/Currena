@@ -378,6 +378,45 @@ _(market-stress is now complete at 10/10; M1 ends at 56/129 unique ids)_
 
 ---
 
+## Batch 9 — prices-board (5 indicators)
+
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `brent` | ifRising | Costlier Brent usually means petrol, heating and delivery prices climb, feeding inflation nearly everywhere. | — | widely-taught: oil is the canonical cost-push inflation channel (approved copy: "Oil feeds fuel, transport and electricity costs everywhere") | widely-taught |
+| `brent` | ifFalling | Cheaper oil usually eases household budgets and inflation pressure. | — | widely-taught (inverse) | widely-taught |
+| `gold-usd` | ifRising | Rising gold usually means jewellery and coins cost more; often driven by safe-haven seeking. | — | widely-taught: gold's safe-haven + jewellery demand role (approved copy: "the classic fear + inflation asset") | widely-taught |
+| `gold-usd` | ifFalling | Falling gold usually means cheaper coins and jewellery, often while worry fades. | — | widely-taught (inverse) | widely-taught |
+| `silver-usd` | ifRising | Rising silver usually means dearer jewellery and electronics; silver often swings harder than gold. | — | widely-taught: silver's dual precious/industrial role (approved copy: "half precious metal, half industrial input") | widely-taught |
+| `silver-usd` | ifFalling | Cheaper silver usually eases metal costs for electronics, solar-panel and jewellery makers. | — | widely-taught (inverse) | widely-taught |
+| `btc-usd` | ifRising | A rising bitcoin usually brightens crypto mood across digital assets. | — | widely-taught: bitcoin as the crypto flagship (approved copy) | widely-taught |
+| `btc-usd` | ifFalling | A falling bitcoin usually darkens crypto mood and can fall fast (famously jumpy). | — | widely-taught (approved copy: "Famously volatile") | widely-taught |
+| `gold-btc` | ifRising | A rising reading means the market values the new digital money over old metal money. | — | definitional: the ratio's construction (gold oz per BTC) | widely-taught |
+| `gold-btc` | ifFalling | A falling reading means gold holds its worth while bitcoin falls out of favour. | — | definitional (inverse) | widely-taught |
+
+### Connections (batch 9)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `brent` | `wti` | The American oil twin tracks this world price closely. | reliable | widely-taught: Brent/WTI move together (same global crude market; approved copy calls WTI "the American twin") | widely-taught |
+| `brent` | `eia-crude-stocks` | The storage-tanks card explains what oil prices react to. | usually | widely-taught: inventory builds/draws are a standard oil-price input | widely-taught |
+| `brent` | `us-cpi-yoy` | Costlier oil usually feeds into US inflation readings with a lag. | usually | widely-taught: energy weight in CPI | widely-taught |
+| `gold-usd` | `dollar-basket` | A stronger US dollar often weighs on the gold price. | usually | widely-taught: gold is priced in USD (approved copy same claim) | widely-taught |
+| `gold-usd` | `real-yield-10y` | Higher real yields tend to pull money away from gold. | usually | widely-taught: opportunity-cost channel (approved copy same claim) | widely-taught |
+| `gold-usd` | `silver-usd` | Silver usually follows gold, only with bigger swings. | usually | widely-taught: silver's higher volatility beta to gold | widely-taught |
+| `silver-usd` | `gold-usd` | Silver usually follows its bigger sibling, only harder. | usually | widely-taught (same as above, mirrored) | widely-taught |
+| `silver-usd` | `gold-silver` | Silver is one leg of the gold-versus-silver reading. | reliable | definitional | widely-taught |
+| `btc-usd` | `crypto-fng` | The daily mood gauge reads the same market. | usually | widely-taught (approved copy same claim) | widely-taught |
+| `btc-usd` | `gold-btc` | The bitcoin price is the new-money leg of the gold reading. | reliable | definitional | widely-taught |
+| `gold-btc` | `btc-usd` | Bitcoin is the new-money leg. | reliable | definitional | widely-taught |
+| `gold-btc` | `gold-usd` | Gold is the old-money leg. | reliable | definitional | widely-taught |
+
+### Australia angle (batch 9)
+| id | claim | basis | status |
+|---|---|---|---|
+| `brent` | Australia imports much of its fuel, so local petrol prices usually track world oil with a delay. | widely-taught: Australia imports the bulk of its refined fuel (AU government energy statistics); feeds au-petrol-yoy | widely-taught |
+| `gold-usd` | Australians pay this price through the local dollar: a weaker AUD makes each ounce dearer locally. | definitional + widely-taught (feeds the gold-aud card) | widely-taught |
+
+---
+
 ## Remaining batches (M2+)
 
 — pending — prices-board (5), prices-heat (16), AU indicators (23), 16 world

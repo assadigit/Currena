@@ -879,6 +879,67 @@ const LAYER1 = {
       ],
       glossaryTerms: [],
     },
+
+    /* ----- Batch 9 — prices-board (5) ----- */
+    brent: {
+      plainName: 'The world oil price',
+      oneLine: 'The world’s main oil price: what a barrel of crude costs.',
+      ifRising: 'Petrol, heating and delivery prices usually climb, feeding inflation nearly everywhere.',
+      ifFalling: 'Cheaper fuel usually eases household budgets and takes pressure off inflation.',
+      connections: [
+        { with: 'wti', text: 'The American oil twin tracks this world price closely.', strength: 'reliable' },
+        { with: 'eia-crude-stocks', text: 'The storage-tanks card explains what oil prices are reacting to.', strength: 'usually' },
+        { with: 'us-cpi-yoy', text: 'Costlier oil usually feeds into US inflation readings with a lag.', strength: 'usually' },
+      ],
+      australiaAngle: 'Australia imports much of its fuel, so local petrol prices usually track this oil price with a delay.',
+      glossaryTerms: ['inflation'],
+    },
+    'gold-usd': {
+      plainName: 'The world gold price',
+      oneLine: 'The world price of one ounce of gold, in US dollars.',
+      ifRising: 'Jewellery and coins usually cost more, often because money is seeking a safe haven.',
+      ifFalling: 'Coins and jewellery usually get cheaper, often while worry fades.',
+      connections: [
+        { with: 'dollar-basket', text: 'A stronger US dollar often weighs on this price.', strength: 'usually' },
+        { with: 'real-yield-10y', text: 'Higher real yields tend to pull money away from gold.', strength: 'usually' },
+        { with: 'silver-usd', text: 'Silver usually follows gold, only with bigger swings.', strength: 'usually' },
+      ],
+      australiaAngle: 'Australians pay this price through the local dollar: a weaker AUD makes each ounce dearer locally.',
+      glossaryTerms: ['safe-haven', 'real-yield', 'yield'],
+    },
+    'silver-usd': {
+      plainName: 'The world silver price',
+      oneLine: 'The world price of one ounce of silver, in US dollars.',
+      ifRising: 'Jewellery and electronics usually cost more, and silver often swings harder than gold.',
+      ifFalling: 'Metal costs usually ease for makers of electronics, solar panels and jewellery.',
+      connections: [
+        { with: 'gold-usd', text: 'Silver usually follows its bigger sibling, only harder.', strength: 'usually' },
+        { with: 'gold-silver', text: 'This is one leg of the gold-versus-silver reading.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
+    'btc-usd': {
+      plainName: 'The bitcoin price',
+      oneLine: 'The world price of one bitcoin, in US dollars.',
+      ifRising: 'Crypto mood usually brightens across the whole family of digital assets.',
+      ifFalling: 'Crypto mood usually darkens, and this famously jumpy asset can fall fast.',
+      connections: [
+        { with: 'crypto-fng', text: 'The daily mood gauge reads the same market.', strength: 'usually' },
+        { with: 'gold-btc', text: 'This price is the new-money leg of the bitcoin-versus-gold reading.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
+    'gold-btc': {
+      plainName: 'Bitcoin measured in gold',
+      oneLine: 'How much gold one bitcoin buys.',
+      ifRising: 'The market usually values the new digital money over the old metal money.',
+      ifFalling: 'Gold usually holds its worth while bitcoin falls out of favour.',
+      connections: [
+        { with: 'btc-usd', text: 'Bitcoin is the new-money leg of this reading.', strength: 'reliable' },
+        { with: 'gold-usd', text: 'Gold is the old-money leg.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 
