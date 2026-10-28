@@ -103,6 +103,54 @@ run it (or the individual gates) before deploying. Repair is owner-side:
 5. Keep the local-gate discipline regardless: `pnpm gates` green before
    every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-10-28b the Insights Layer-2 PREP session: P1–P5, zero data changes, zero AI (worker 39c7a4b0)
+
+- **Deploy-lock check first** (the D-43 lesson): the deployments API showed
+  the newest currena-api deployment still at **2026-10-28T09:03:18Z**
+  (version `c6d1a13f` — the Layer-1 final session's docs-pin redeploy,
+  ~75 minutes before this session's deploy), currena-markets unchanged
+  since 2026-10-27T18:31Z (the R10 deploy), and `git fetch` confirmed
+  origin/main at this session's own push `f56bfaa` (tree clean, no newer
+  commits) → no parallel session. Lock CLEAR.
+- **Deployed**: `pnpm --filter @currena/web build` → `pnpm --filter
+  @currena/api exec wrangler deploy` (the owner's `cfut_` token via env,
+  never persisted): currena-api **`39c7a4b0-4563-4121-83e4-9ce953ad689b`**
+  (2026-10-28 ~10:16 UTC). currena-markets NOT redeployed: neither worker
+  imports the new modules (freshness/narrator are additive-only; the
+  markets worker's imports are untouched → functionally identical), per
+  the Layer-1 precedent.
+- **What went live**: the Layer-2 PREP work (docs/insights/layer2/):
+  P1 the per-reading freshness module + the data-age honesty SAFETY NET
+  (renders nowhere today by design — every card already dates its data;
+  invariant-tested), P3's generated narrator vocabulary (Worker-side
+  only — the web bundle's only change is the safety net + one UI string
+  pair), P4's narration-state contract (Worker-side only), P5's
+  `pnpm gates`. **Zero data changes**: the 100-reading snapshot served
+  after the deploy is byte-identical in shape and source (generatedAt
+  2026-10-28T04:20:18Z, au-10y 5.283 @ 2026-09-30 — the pre-deploy
+  values), zero new KV operations, zero new external calls, no AI calls,
+  no keys, no prompts.
+- **Gates re-verified before the deploy** (`pnpm gates`, all green):
+  typecheck 6/6 · lint 0/0 · copy:audit clean (manifest 4,547, the one
+  new string triaged round 2026-10-28-l2-prep) · narrator vocabulary in
+  sync (129×2 + 23×2) · `LAYER1_STRICT=1` validator **7809/7809
+  unchanged** · full suite **9,875** (core 191 · scraper 67 · insights
+  727 (+50) · markets 13 · api 344 · web 8533 (+8)) · budgets HELD
+  without a bump — entry 295.37/88.84 (unchanged), Insights lazy
+  1094.09/256.83 vs the documented 1100/260 ceiling (+1.53 kB raw /
+  +0.52 kB gz — the freshness line + the new copy string).
+- **Live verification** (https://currena.ir, agent-browser): `/api/health`
+  200 (`ok:true, kv:ok`), `/api/insights` 100 readings, `/api/insights/
+  markets|fx|status` all 200. The page verified EN + FA at 1280px AND
+  360px: zero console errors, zero page errors, zero horizontal overflow
+  at 360px, the Layer-1 blocks render (the expanded au-10y + brent
+  details dialogs both carry `[data-layer1-block]`), the au-10y card's
+  meta row shows its data date in both languages («داده‌های ۳۰ سپتامبر
+  ۲۰۲۶ · …» / "data for Sep 30, 2026 · …") and the P1 freshness line
+  count is exactly **0 everywhere** (the designed safety-net state).
+  Screenshots: `docs/insights/screenshots/layer2-prep/` (5).
+- **No rollback needed**; no live-verification catches.
+
 ## Session record — 2026-10-28 the Insights Layer-1 plain-language layer ships: 129/129 ids live, zero data changes (final L1 session, worker c02d736a)
 
 - **Deploy-lock check first** (the D-43 lesson): the versions API showed the
