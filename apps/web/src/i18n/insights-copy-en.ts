@@ -1038,6 +1038,98 @@ const LAYER1 = {
       ],
       glossaryTerms: ['inflation'],
     },
+
+    /* ----- Batch 11 — prices-heat B (8) ----- */
+    wti: {
+      plainName: 'The American oil price',
+      oneLine: 'What America pays for a barrel of its own crude.',
+      ifRising: 'US petrol and delivery prices usually climb, feeding into US inflation.',
+      ifFalling: 'Cheaper US oil usually eases American fuel costs and inflation pressure.',
+      connections: [
+        { with: 'brent', text: 'The world twin usually trades close to this price.', strength: 'reliable' },
+        { with: 'eia-crude-stocks', text: 'The tanks gauge explains the supply side of this price.', strength: 'usually' },
+        { with: 'natgas', text: 'Oil and gas together steer US household energy bills.', strength: 'usually' },
+      ],
+      glossaryTerms: ['inflation'],
+    },
+    natgas: {
+      plainName: 'The US natural gas price',
+      oneLine: 'The price of the gas that heats US homes and powers its grids.',
+      ifRising: 'Winter heating and power bills in the US usually climb.',
+      ifFalling: 'Cheaper gas usually eases heating and electricity bills for US households.',
+      connections: [
+        { with: 'brent', text: 'Oil and gas together steer the energy line of household budgets.', strength: 'usually' },
+        { with: 'us-cpi-yoy', text: 'Gas moves the energy line of US inflation readings.', strength: 'usually' },
+      ],
+      glossaryTerms: ['inflation'],
+    },
+    'eia-crude-stocks': {
+      plainName: 'Oil in America’s tanks',
+      oneLine: 'How much crude oil sits in America’s storage tanks.',
+      ifRising: 'A glut usually builds, which has often dragged crude and pump prices down.',
+      ifFalling: 'Draining tanks can signal a supply squeeze that pushes petrol prices up.',
+      connections: [
+        { with: 'brent', text: 'Prices react to how full or empty the tanks run.', strength: 'usually' },
+        { with: 'wti', text: 'The American price reads these tanks closely.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    platinum: {
+      plainName: 'The world platinum price',
+      oneLine: 'The world price of one ounce of platinum, in US dollars.',
+      ifRising: 'Jewellery and the metal parts of cars usually cost more.',
+      ifFalling: 'Cheaper platinum usually helps jewellers and car-part makers.',
+      connections: [
+        { with: 'gold-usd', text: 'The precious-metal cousin usually moves with gold, only harder.', strength: 'usually' },
+        { with: 'silver-usd', text: 'Both metals straddle jewellery and factory demand.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'gold-oil-ratio': {
+      plainName: 'Gold priced in barrels',
+      oneLine: 'How many barrels of oil one ounce of gold buys.',
+      ifRising: 'Gold usually buys more barrels, the mix that often marks fear-rich eras.',
+      ifFalling: 'Each ounce usually buys fewer barrels, the mix that often marks energy-dominant eras.',
+      connections: [
+        { with: 'gold-usd', text: 'Gold is one leg of this reading.', strength: 'reliable' },
+        { with: 'brent', text: 'Oil is the other leg.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
+    'food-index': {
+      plainName: 'The world grocery gauge',
+      oneLine: 'World food prices at the wholesale level, before they reach shelves.',
+      ifRising: 'Grocery bills usually climb months later, hitting poorer households hardest.',
+      ifFalling: 'Cheaper wholesale food usually brings relief to grocery budgets months ahead.',
+      connections: [
+        { with: 'wheat', text: 'Wheat is one ground-truth grain inside this basket.', strength: 'reliable' },
+        { with: 'maize', text: 'Maize is the feed grain behind meat prices in the basket.', strength: 'reliable' },
+        { with: 'brent', text: 'Food and fuel together move the household cost of living.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    wheat: {
+      plainName: 'The world wheat price',
+      oneLine: 'What the world pays for a tonne of wheat.',
+      ifRising: 'Flour, bread and animal-feed costs usually climb.',
+      ifFalling: 'Cheaper wheat usually eases bread and feed budgets.',
+      connections: [
+        { with: 'food-index', text: 'The food basket leans on this staple grain.', strength: 'reliable' },
+        { with: 'maize', text: 'The two grains swap in feed and food demand at times.', strength: 'sometimes' },
+      ],
+      glossaryTerms: [],
+    },
+    maize: {
+      plainName: 'The world maize price',
+      oneLine: 'What the world pays for a tonne of maize.',
+      ifRising: 'Feed, meat and egg prices usually climb in its wake.',
+      ifFalling: 'Cheap feed usually eases meat and dairy budgets.',
+      connections: [
+        { with: 'food-index', text: 'The feed grain inside the food basket.', strength: 'reliable' },
+        { with: 'wheat', text: 'The two grains swap in feed and food demand at times.', strength: 'sometimes' },
+      ],
+      glossaryTerms: [],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 

@@ -112,14 +112,14 @@ inventory and enforced by gate G1.
 | ✓ | `us-wages` | US wage growth (yearly) | US average hourly earnings, year-on-year. |
 | ✓ | `breakeven-10y` | Expected US inflation, ten years ahead | The 10-year US inflation breakeven (expected inflation). |
 | ✓ | `t5yie` | Expected US inflation, five years ahead | The 5-year US inflation breakeven. |
-| · | `wti` | WTI crude oil | The WTI crude oil price. |
-| · | `natgas` | US natural gas (Henry Hub) | The US natural-gas price (Henry Hub). |
-| · | `eia-crude-stocks` | US crude oil inventories | US weekly commercial crude-oil stocks. |
-| · | `platinum` | Platinum price (ounce) | The platinum spot price in US dollars per troy ounce. |
-| · | `gold-oil-ratio` | Gold measured in oil | The gold price divided by the oil price (ounces per barrel). |
-| · | `food-index` | World food prices | The World Bank food price index. |
-| · | `wheat` | Wheat price | The wheat price (US SRW, $/mt). |
-| · | `maize` | Maize price | The maize price ($/mt). |
+| ✓ | `wti` | WTI crude oil | The WTI crude oil price. |
+| ✓ | `natgas` | US natural gas (Henry Hub) | The US natural-gas price (Henry Hub). |
+| ✓ | `eia-crude-stocks` | US crude oil inventories | US weekly commercial crude-oil stocks. |
+| ✓ | `platinum` | Platinum price (ounce) | The platinum spot price in US dollars per troy ounce. |
+| ✓ | `gold-oil-ratio` | Gold measured in oil | The gold price divided by the oil price (ounces per barrel). |
+| ✓ | `food-index` | World food prices | The World Bank food price index. |
+| ✓ | `wheat` | Wheat price | The wheat price (US SRW, $/mt). |
+| ✓ | `maize` | Maize price | The maize price ($/mt). |
 
 ### AUSTRALIA (23 indicators, 16 voting) — section: `australia`
 

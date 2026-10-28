@@ -469,6 +469,56 @@ _(market-stress is now complete at 10/10; M1 ends at 56/129 unique ids)_
 
 ---
 
+## Batch 11 — prices-heat B (8 indicators)
+
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `wti` | ifRising | Costlier WTI usually means dearer US petrol and delivery, feeding US inflation. | — | widely-taught (approved copy same claim) | widely-taught |
+| `wti` | ifFalling | Cheaper WTI usually eases US fuel costs and inflation pressure. | — | widely-taught (inverse) | widely-taught |
+| `natgas` | ifRising | Costlier US gas usually means higher winter heating and power bills. | — | widely-taught (approved copy same claim) | widely-taught |
+| `natgas` | ifFalling | Cheaper gas usually eases heating and electricity bills. | — | widely-taught (inverse) | widely-taught |
+| `eia-crude-stocks` | ifRising | Building inventories (a glut) have often dragged crude and pump prices down. | — | widely-taught: inventory levels vs price (approved copy same claim) | widely-taught |
+| `eia-crude-stocks` | ifFalling | Fast-draining tanks can signal a supply squeeze that pushes petrol up. | — | widely-taught (approved copy same claim) | widely-taught |
+| `platinum` | ifRising | Costlier platinum usually means dearer jewellery and car metal parts. | — | widely-taught: platinum's jewellery + industrial use (approved copy) | widely-taught |
+| `platinum` | ifFalling | Cheaper platinum usually helps jewellers and car-part makers. | — | widely-taught (inverse) | widely-taught |
+| `gold-oil-ratio` | ifRising | Gold buying more barrels is the mix that has often marked fear-rich eras. | — | widely-taught: the long-run relative-value check (approved copy: "the setting that has historically favoured holding gold") | widely-taught |
+| `gold-oil-ratio` | ifFalling | Fewer barrels per ounce is the mix of energy-dominant eras. | — | widely-taught (approved copy: "the inflation-era pattern of energy dominance") | widely-taught |
+| `food-index` | ifRising | Wholesale food spikes usually reach grocery bills months later, hardest on poorer households. | — | widely-taught (approved copy same claim) | widely-taught |
+| `food-index` | ifFalling | Cheaper wholesale food usually brings grocery relief months ahead. | — | widely-taught (inverse) | widely-taught |
+| `wheat` | ifRising | Costlier wheat usually means dearer flour, bread and animal feed. | — | widely-taught (approved copy same claim) | widely-taught |
+| `wheat` | ifFalling | Cheaper wheat usually eases bread and feed budgets. | — | widely-taught (inverse) | widely-taught |
+| `maize` | ifRising | Costlier maize usually means dearer feed, meat and eggs. | — | widely-taught: the feed-grain pass-through (approved copy same claim) | widely-taught |
+| `maize` | ifFalling | Cheap feed usually eases meat and dairy budgets. | — | widely-taught (inverse) | widely-taught |
+
+### Connections (batch 11)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `wti` | `brent` | The world twin usually trades close to WTI. | reliable | widely-taught: the two crude benchmarks track each other | widely-taught |
+| `wti` | `eia-crude-stocks` | The tanks gauge explains the supply side of the price. | usually | widely-taught | widely-taught |
+| `wti` | `natgas` | Oil and gas together steer US household energy bills. | usually | widely-taught | widely-taught |
+| `natgas` | `brent` | Oil and gas together steer the energy line of budgets. | usually | widely-taught | widely-taught |
+| `natgas` | `us-cpi-yoy` | Gas moves the energy line of US inflation readings. | usually | widely-taught (approved copy: "the price feeds US household energy bills and inflation readings") | widely-taught |
+| `eia-crude-stocks` | `brent` | Prices react to how full or empty the tanks run. | usually | widely-taught (approved copy: "the tanks explain what the prices are reacting to") | widely-taught |
+| `eia-crude-stocks` | `wti` | The American price reads these tanks closely. | usually | widely-taught | widely-taught |
+| `platinum` | `gold-usd` | The precious-metal cousin usually moves with gold, only harder. | usually | widely-taught (precious-metals family) | widely-taught |
+| `platinum` | `silver-usd` | Both metals straddle jewellery and factory demand. | usually | widely-taught (approved copy: "half precious, half industrial") | widely-taught |
+| `gold-oil-ratio` | `gold-usd` | Gold is one leg of the reading. | reliable | definitional | widely-taught |
+| `gold-oil-ratio` | `brent` | Oil is the other leg. | reliable | definitional | widely-taught |
+| `food-index` | `wheat` | Wheat is a ground-truth grain inside the basket. | reliable | definitional (Pink Sheet composition) | widely-taught |
+| `food-index` | `maize` | Maize is the feed grain behind meat prices in the basket. | reliable | definitional + widely-taught pass-through | widely-taught |
+| `food-index` | `brent` | Food and fuel together move the household cost of living. | usually | widely-taught (approved copy: "read it beside the energy cards") | widely-taught |
+| `wheat` | `food-index` | The food basket leans on this staple grain. | reliable | definitional | widely-taught |
+| `wheat` | `maize` | The two grains swap in feed and food demand at times. | sometimes | widely-taught substitution in feed demand, marked sometimes | widely-taught |
+| `maize` | `food-index` | The feed grain inside the food basket. | reliable | definitional | widely-taught |
+| `maize` | `wheat` | The two grains swap in feed and food demand at times. | sometimes | same as above, mirrored | widely-taught |
+
+### Australia angle (batch 11)
+| id | claim | basis | status |
+|---|---|---|---|
+| (none — global energy/metals/food context cards; not in the D-08 AU-required set.) | — | — | — |
+
+---
+
 ## Remaining batches (M2+)
 
 — pending — prices-board (5), prices-heat (16), AU indicators (23), 16 world
