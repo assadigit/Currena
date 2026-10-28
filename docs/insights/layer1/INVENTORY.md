@@ -140,13 +140,13 @@ inventory and enforced by gate G1.
 | ✓ | `au-wage-growth` | Wage growth (yearly) | Australian wage-price-index growth, year-on-year. |
 | ✓ | `au-rent-yoy` | Rent inflation (yearly) | Australian rent inflation, year-on-year. |
 | ✓ | `au-home-loan` | Home-loan rate people actually pay | The average outstanding owner-occupier mortgage rate. |
-| · | `au-home-values` | Australian residential property price index | The ABS residential property price index. |
-| · | `au-household-debt-arrears` | Australian household finances (debt ratios / arrears) | The RBA household arrears ratio. |
-| · | `au-housing-finance` | New Australian home loans (quarterly) | The value of new Australian housing-finance commitments. |
+| ✓ | `au-home-values` | Australian residential property price index | The ABS residential property price index. |
+| ✓ | `au-household-debt-arrears` | Australian household finances (debt ratios / arrears) | The RBA household arrears ratio. |
+| ✓ | `au-housing-finance` | New Australian home loans (quarterly) | The value of new Australian housing-finance commitments. |
 | ✓ | `au-deposit-rate` | Savings rates (new term deposits) | The average new term-deposit rate. |
 | ✓ | `rba-cash-rate` | RBA cash rate | The Reserve Bank of Australia's main policy rate. |
-| · | `au-job-vacancies` | Australian job vacancies | The number of open Australian jobs. |
-| · | `au-saving-ratio` | The Australian household saving ratio | The share of disposable income Australian households save. |
+| ✓ | `au-job-vacancies` | Australian job vacancies | The number of open Australian jobs. |
+| ✓ | `au-saving-ratio` | The Australian household saving ratio | The share of disposable income Australian households save. |
 
 #### `au-trade-currency` gauge (6)
 | L1 | id | official name | what it measures |

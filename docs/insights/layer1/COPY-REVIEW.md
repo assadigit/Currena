@@ -615,6 +615,46 @@ _(market-stress is now complete at 10/10; M1 ends at 56/129 unique ids)_
 
 ---
 
+## Batch 14 — au-households B (5 indicators)
+
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `au-home-values` | ifRising | Rising home prices usually mean richer owners, harder entry for first-home buyers. | — | widely-taught (approved copy same claim) | widely-taught |
+| `au-home-values` | ifFalling | Cheaper homes ease entry, but falls are rare and brief in Australia. | — | widely-taught (approved copy: falls rare, mostly brief) | widely-taught |
+| `au-household-debt-arrears` | ifRising | With heavy debt, every rate rise bites harder; arrears follow with a lag. | — | widely-taught (approved copy: trouble shows up in arrears with a lag after rate rises) | widely-taught |
+| `au-household-debt-arrears` | ifFalling | Balance sheets mending softens the blow of rate moves. | — | widely-taught (inverse) | widely-taught |
+| `au-housing-finance` | ifRising | Strong new lending usually means households committing, demand ahead. | — | widely-taught (approved copy same claim) | widely-taught |
+| `au-housing-finance` | ifFalling | Weak lending is the leading edge of a housing slowdown. | — | widely-taught (approved copy: "the leading edge of a housing slowdown") | widely-taught |
+| `au-job-vacancies` | ifRising | More vacancies usually mean employers still hungry to hire. | — | widely-taught (approved copy same claim) | widely-taught |
+| `au-job-vacancies` | ifFalling | Employers pull back postings before unemployment rises. | — | widely-taught (approved copy: "employers pulling back before unemployment rises") | widely-taught |
+| `au-saving-ratio` | ifRising | Rising saving usually means caution; spending softens before income does. | — | widely-taught (approved copy: "households save more and spending falls before any income does") | widely-taught |
+| `au-saving-ratio` | ifFalling | Thin saving means households stretched, or confident enough to spend it all. | — | widely-taught (approved copy same claim) | widely-taught |
+
+### Connections (batch 14)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `au-home-values` | `au-housing-finance` | New lending usually turns before home values. | reliable | widely-taught (approved copy: a commitment is signed months before it shows in values) | widely-taught |
+| `au-home-values` | `rba-cash-rate` | Rate rises usually cool the market with a delay. | usually | widely-taught (approved copy: 2022-23 with rate hikes) | widely-taught |
+| `au-household-debt-arrears` | `rba-cash-rate` | High debt is why RBA moves dominate household budgets. | reliable | widely-taught (approved copy: a key sensitivity the RBA weighs) | widely-taught |
+| `au-household-debt-arrears` | `au-home-loan` | Home loans are the biggest slice of household debt. | reliable | definitional | widely-taught |
+| `au-housing-finance` | `au-home-values` | Loans are signed months before they show in values. | reliable | widely-taught (approved copy verbatim) | widely-taught |
+| `au-housing-finance` | `rba-cash-rate` | Lending cools after rises, warms after cuts. | reliable | widely-taught (approved copy: collapsed with each hike cycle, recovered with each cut) | widely-taught |
+| `au-job-vacancies` | `au-unemployment` | Vacancies lead, joblessness lags. | reliable | widely-taught (approved copy: "one leads, one lags") | widely-taught |
+| `au-job-vacancies` | `rba-cash-rate` | Hiring strength is one input the RBA reads. | usually | widely-taught | widely-taught |
+| `au-saving-ratio` | `au-housing-finance` | Caution and borrowing usually move in opposite directions. | usually | widely-taught (approved copy: read beside the lending card) | widely-taught |
+| `au-saving-ratio` | `au-cpi` | A saving cushion softens the sting of price rises. | usually | widely-taught: buffer logic (approved copy: buffers funded spending) | widely-taught |
+
+### Australia angle (batch 14)
+| id | claim | basis | status |
+|---|---|---|---|
+| `au-home-values` | Housing is the biggest asset and debt source for AU households; prices feed wealth and confidence. | approved copy verbatim | widely-taught |
+| `au-household-debt-arrears` | AU households carry among the world's heaviest debt loads; rate moves dominate the national mood. | approved copy ("among the world's highest"; "rate moves dominate Australian household finances") | widely-taught |
+| `au-housing-finance` | The AU leading edge: loan commitments turn first, home values follow. | approved copy ("This is the AU leading edge") | widely-taught |
+| `au-job-vacancies` | Vacancies roll over long before joblessness; the early-warning line for Australia. | approved copy ("the labor market's early-warning line for the AU audience") | widely-taught |
+| `au-saving-ratio` | The hunkering-down gauge: with uncertainty, households save more and spend less first. | approved copy verbatim ("the hunkering-down gauge") | widely-taught |
+
+---
+
 ## Remaining batches (M2+)
 
 — pending — prices-board (5), prices-heat (16), AU indicators (23), 16 world

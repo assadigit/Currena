@@ -1288,6 +1288,68 @@ const LAYER1 = {
       australiaAngle: 'The twin of the mortgage card: what the crowd earns on savings while borrowers pay the loan rate.',
       glossaryTerms: ['inflation', 'mortgage'],
     },
+
+    /* ----- Batch 14 — au-households B (5) ----- */
+    'au-home-values': {
+      plainName: 'Australian home prices',
+      oneLine: 'The average price of Australian homes, as an index.',
+      ifRising: 'Owners feel richer and first-home buyers usually face a harder climb.',
+      ifFalling: 'Cheaper homes usually make entering easier, but rarely last long in Australia.',
+      connections: [
+        { with: 'au-housing-finance', text: 'New lending usually turns before home values do.', strength: 'reliable' },
+        { with: 'rba-cash-rate', text: 'Rate rises have usually cooled the market, with a delay.', strength: 'usually' },
+      ],
+      australiaAngle: 'Housing is the biggest asset and debt source for Australian households; prices feed wealth and confidence.',
+      glossaryTerms: [],
+    },
+    'au-household-debt-arrears': {
+      plainName: 'The household debt load',
+      oneLine: 'How large Australian household debt sits against income.',
+      ifRising: 'Every rate rise usually bites harder, and arrears tend to follow with a lag.',
+      ifFalling: 'Household balance sheets usually mend, softening the blow of rate moves.',
+      connections: [
+        { with: 'rba-cash-rate', text: 'High debt is why RBA moves dominate Australian household budgets.', strength: 'reliable' },
+        { with: 'au-home-loan', text: 'Home loans are the biggest slice of this debt.', strength: 'reliable' },
+      ],
+      australiaAngle: 'Australian households carry among the world’s heaviest debt loads, so rate moves dominate the national mood.',
+      glossaryTerms: [],
+    },
+    'au-housing-finance': {
+      plainName: 'New Australian home lending',
+      oneLine: 'How much Australians are borrowing for homes right now.',
+      ifRising: 'Households are committing; housing demand usually builds ahead.',
+      ifFalling: 'Households stepping back is usually the leading edge of a housing slowdown.',
+      connections: [
+        { with: 'au-home-values', text: 'Loans are signed months before they show up in home values.', strength: 'reliable' },
+        { with: 'rba-cash-rate', text: 'Lending usually cools after rate rises and warms after cuts.', strength: 'reliable' },
+      ],
+      australiaAngle: 'The Australian leading edge: a loan commitment turns first, home values follow.',
+      glossaryTerms: [],
+    },
+    'au-job-vacancies': {
+      plainName: 'Australian job openings',
+      oneLine: 'How many jobs Australian employers are trying to fill.',
+      ifRising: 'Employers are usually still hungry to hire; a strong jobs market.',
+      ifFalling: 'Employers usually pull back here before unemployment rises.',
+      connections: [
+        { with: 'au-unemployment', text: 'One leads, one lags: vacancies first, joblessness second.', strength: 'reliable' },
+        { with: 'rba-cash-rate', text: 'Hiring strength is one input the RBA reads.', strength: 'usually' },
+      ],
+      australiaAngle: 'Vacancies usually roll over long before joblessness does, the early-warning line for Australia.',
+      glossaryTerms: [],
+    },
+    'au-saving-ratio': {
+      plainName: 'The Australian saving rate',
+      oneLine: 'The share of income Australian households save.',
+      ifRising: 'Caution is usually rising, and spending often softens before income does.',
+      ifFalling: 'Households are usually either stretched or confident enough to spend it all.',
+      connections: [
+        { with: 'au-housing-finance', text: 'Caution and borrowing usually move in opposite directions.', strength: 'usually' },
+        { with: 'au-cpi', text: 'A saving cushion softens the sting of price rises.', strength: 'usually' },
+      ],
+      australiaAngle: 'The hunkering-down gauge: when uncertainty rises, Australian households save more and spend less first.',
+      glossaryTerms: [],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 
