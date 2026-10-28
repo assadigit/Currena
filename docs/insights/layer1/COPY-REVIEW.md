@@ -801,11 +801,57 @@ what/why/you reused; D-18: digit-free plain names).
 
 ---
 
+## Batch 18 — world stock markets rest + the remaining FX pairs (7)
+
+Same rules (D-08: no australiaAngle on markets/pairs; D-02: approved
+`what`/`you` reused; pairs carry the FX-board entries' approved names).
+The shared-id pairs (usdjpy/usdcny/audusd/audjpy) were done in earlier
+batches and are reused by the FX board — not duplicated here (D-11).
+
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `ibov` | ifRising | A rising Bovespa usually means investors are fine with riskier emerging markets and raw-material exporters. | — | widely-taught (approved copy: stand-in for emerging markets and commodity exporters) | widely-taught |
+| `ibov` | ifFalling | Investors fleeing riskier markets usually comes with a stronger US dollar nearby. | — | widely-taught (approved copy: "A sharp fall often goes with a stronger US dollar and weaker emerging-market currencies") | widely-taught |
+| `eurusd` | ifRising | A stronger euro usually makes dollar-priced goods cheaper for euro earners. | — | widely-taught (purchasing-power mechanics) | widely-taught |
+| `eurusd` | ifFalling | A weaker euro usually makes imports and travel dearer for euro earners. | — | widely-taught (inverse) | widely-taught |
+| `gbpusd` | ifRising | A stronger pound usually makes dollar-priced goods and travel cheaper for Britons. | — | widely-taught (same mechanics) | widely-taught |
+| `gbpusd` | ifFalling | A weaker pound usually makes imports and US travel dearer for Britons. | — | widely-taught (inverse) | widely-taught |
+| `usdchf` | ifRising | The dollar gains on the franc through broad strength or as world worry fades. | — | widely-taught (the franc weakens in calm; the dollar's broad moves dominate crosses) | widely-taught |
+| `usdchf` | ifFalling | The franc gaining on the dollar is often a sign of world worry. | — | widely-taught (approved copy: the franc is a classic safe haven) | widely-taught |
+| `eurjpy` | ifRising | A stronger euro against the yen often goes with calm world moods; cheaper Japan trips for Europeans. | — | widely-taught (yen weakens in calm / risk appetite) | widely-taught |
+| `eurjpy` | ifFalling | A falling euro against the yen usually means worried investors rushing back into the yen. | — | widely-taught (approved copy: a second opinion on world mood, Europe's money vs the safe-haven yen) | widely-taught |
+| `eurchf` | ifRising | The euro gaining on the franc often means worry about Europe is fading. | — | widely-taught (approved copy: it falls when worry about Europe rises) | widely-taught |
+| `eurchf` | ifFalling | The franc gains when investors worry about Europe; a fast fall is a classic warning. | — | widely-taught (approved copy: "Europe's safe-haven pair") | widely-taught |
+| `audcny` | ifRising | The AUD usually gains on the yuan when China's demand looks healthy. | — | widely-taught (AUD as the China-demand currency) | widely-taught |
+| `audcny` | ifFalling | The AUD usually sags against the yuan when China's economy cools. | — | widely-taught (inverse) | widely-taught |
+
+### Connections (batch 18)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `ibov` | `dollar-basket` | Emerging-market falls usually go with broad dollar strength. | usually | widely-taught (approved copy same claim) | widely-taught |
+| `ibov` | `brent` | Brazil's oil and mining giants ride world raw-material prices. | usually | widely-taught (approved copy: large oil, mining and bank companies) | widely-taught |
+| `eurusd` | `dollar-basket` | The euro is the biggest single weight in the dollar basket. | reliable | definitional (the reused basket's weights) | widely-taught |
+| `eurusd` | `ecb-dfr` | The European Central Bank steers the euro's side. | usually | widely-taught (policy rate → currency) — term listed: central-bank | widely-taught |
+| `eurusd` | `r7_dollar_or_euro` | The dollar-or-euro pattern explains this pair's moves. | reliable | definitional (FX rule R7's series = eurusd + dollar) | widely-taught |
+| `gbpusd` | `boe-rate` | The Bank of England steers the pound's side. | usually | widely-taught — term listed: central-bank | widely-taught |
+| `gbpusd` | `dollar-basket` | The pound is one thread in the dollar's overall strength. | usually | definitional (GBP is one of the basket's seven reference currencies) | widely-taught |
+| `usdchf` | `dollar-basket` | The franc is one thread in the dollar's overall strength. | usually | definitional (CHF is one of the basket's reference currencies) | widely-taught |
+| `usdchf` | `eurchf` | Europe's worry pair reads this same franc. | reliable | definitional (same quote currency) | widely-taught |
+| `eurjpy` | `audjpy` | The Australian-dollar pair reads the same mood; a shared fall is the stronger signal. | reliable | widely-taught (approved R1 copy: "Confirmed by the euro against the yen") | widely-taught |
+| `eurjpy` | `eurusd` | The euro's own health shows in both pairs. | usually | widely-taught (common base currency) | widely-taught |
+| `eurjpy` | `boj-rate` | The Bank of Japan anchors the yen side. | usually | widely-taught — term listed: central-bank | widely-taught |
+| `eurchf` | `stoxx50` | The Europe-worry alarm reads this pair beside Europe's main company list. | reliable | definitional (FX rule R6's series = eurchf + stoxx50) | widely-taught |
+| `eurchf` | `r6_europe_worry` | This pattern card is built around this pair. | reliable | definitional | widely-taught |
+| `audcny` | `iron-ore` | Iron ore is the biggest trade behind the link. | usually | widely-taught (approved copy: Australia's biggest customer) | widely-taught |
+| `audcny` | `usdcny` | The yuan against the US dollar is this pair's other half. | reliable | definitional (the cross's quote-side leg) | widely-taught |
+| `audcny` | `r5_china_link` | The China-link pattern watches exactly these two legs. | reliable | definitional (FX rule R5's series = audusd + usdcny) | widely-taught |
+
+---
+
 ## Remaining batches (M3+)
 
-— pending — the remaining 1 world stock market (ibov), the remaining 6
-FX pairs (eurusd, gbpusd, usdchf, eurjpy, eurchf, audcny; usdjpy/
-usdcny/audusd/audjpy are already done as shared ids), and the 7 pattern
-cards (null-direction per D-09). Then the final strict-mode + deploy
-session (LAYER1_STRICT=1). (Milestone 3 is at 115/129 unique ids after
-batch 17.)
+— pending — the 7 pattern cards (r1_risk_mood, r2_carry_trade,
+r3_dollar_strength, r4_money_hiding, r5_china_link, r6_europe_worry,
+r7_dollar_or_euro — null-direction per D-09). Then the final
+strict-mode + deploy session (LAYER1_STRICT=1). (Milestone 3 is at
+122/129 unique ids after batch 18.)

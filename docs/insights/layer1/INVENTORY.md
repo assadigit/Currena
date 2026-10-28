@@ -176,21 +176,21 @@ inventory and enforced by gate G1.
 | ✓ | `ndx` | Nasdaq 100 | americas |
 | ✓ | `dow` | Dow Jones | americas |
 | ✓ | `tsx` | S&P/TSX | americas |
-| · | `ibov` | Bovespa | americas |
+| ✓ | `ibov` | Bovespa | americas |
 
 ## C. The FX board (10 pairs + 7 pattern cards)
 | L1 | id | what it is |
 |---|---|---|
-| · | `eurusd` | EUR/USD pair (dollar-world group) |
+| ✓ | `eurusd` | EUR/USD pair (dollar-world group) |
 | ✓ | `usdjpy` | USD/JPY pair (shared with indicators) |
-| · | `gbpusd` | GBP/USD pair |
-| · | `usdchf` | USD/CHF pair |
+| ✓ | `gbpusd` | GBP/USD pair |
+| ✓ | `usdchf` | USD/CHF pair |
 | ✓ | `usdcny` | USD/CNY pair (shared with indicators) |
 | · | `audusd` | AUD/USD pair (shared with indicators) |
 | · | `audjpy` | AUD/JPY pair (warning-lights group) |
-| · | `eurjpy` | EUR/JPY pair (warning-lights group) |
-| · | `eurchf` | EUR/CHF pair (warning-lights group) |
-| · | `audcny` | AUD/CNY pair (china-link group) |
+| ✓ | `eurjpy` | EUR/JPY pair (warning-lights group) |
+| ✓ | `eurchf` | EUR/CHF pair (warning-lights group) |
+| ✓ | `audcny` | AUD/CNY pair (china-link group) |
 | · | `r1_risk_mood` | Pattern: AUD/JPY and S&P 500 together (risk mood) |
 | · | `r2_carry_trade` | Pattern: USD/JPY and Nikkei together (carry trade) |
 | · | `r3_dollar_strength` | Pattern: dollar vs gold opposite |

@@ -1603,6 +1603,88 @@ const LAYER1 = {
       ],
       glossaryTerms: [],
     },
+
+    /* ----- Batch 18 — world stock markets rest + FX pairs (7) ----- */
+    ibov: {
+      plainName: 'Brazil’s biggest companies',
+      oneLine: 'One number for how Brazil’s largest companies are doing.',
+      ifRising: 'Investors usually feel fine about riskier emerging markets and raw-material exporters.',
+      ifFalling: 'Investors are often fleeing riskier markets, usually with a stronger US dollar nearby.',
+      connections: [
+        { with: 'dollar-basket', text: 'Emerging-market falls usually go with broad dollar strength.', strength: 'usually' },
+        { with: 'brent', text: 'Brazil’s oil and mining giants ride world raw-material prices.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    eurusd: {
+      plainName: 'The euro in dollars',
+      oneLine: 'How many US dollars one euro buys.',
+      ifRising: 'A stronger euro usually makes dollar-priced goods cheaper for people earning euros.',
+      ifFalling: 'A weaker euro usually makes imports and travel dearer for people earning euros.',
+      connections: [
+        { with: 'dollar-basket', text: 'The euro is the biggest single weight in the dollar basket.', strength: 'reliable' },
+        { with: 'ecb-dfr', text: 'The European Central Bank steers the euro’s side.', strength: 'usually' },
+        { with: 'r7_dollar_or_euro', text: 'The dollar-or-euro pattern explains this pair’s moves.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['central-bank'],
+    },
+    gbpusd: {
+      plainName: 'The pound in dollars',
+      oneLine: 'How many US dollars one British pound buys.',
+      ifRising: 'A stronger pound usually makes dollar-priced goods and travel cheaper for Britons.',
+      ifFalling: 'A weaker pound usually makes imports and US travel dearer for Britons.',
+      connections: [
+        { with: 'boe-rate', text: 'The Bank of England steers the pound’s side.', strength: 'usually' },
+        { with: 'dollar-basket', text: 'The pound is one thread in the dollar’s overall strength.', strength: 'usually' },
+      ],
+      glossaryTerms: ['central-bank'],
+    },
+    usdchf: {
+      plainName: 'The dollar versus the franc',
+      oneLine: 'How many Swiss francs one US dollar buys.',
+      ifRising: 'The dollar usually gains on the franc through broad strength or as world worry fades.',
+      ifFalling: 'The franc usually gains on the dollar, often a sign of worry somewhere in the world.',
+      connections: [
+        { with: 'dollar-basket', text: 'The franc is one thread in the dollar’s overall strength.', strength: 'usually' },
+        { with: 'eurchf', text: 'Europe’s worry pair reads this same franc.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
+    eurjpy: {
+      plainName: 'The euro versus the yen',
+      oneLine: 'How many Japanese yen one euro buys.',
+      ifRising: 'A stronger euro against the yen often goes with calm world moods and cheaper Japan trips for Europeans.',
+      ifFalling: 'A falling euro against the yen usually means worried investors are rushing back into the yen.',
+      connections: [
+        { with: 'audjpy', text: 'The Australian-dollar pair reads the same mood; a shared fall is the stronger signal.', strength: 'reliable' },
+        { with: 'eurusd', text: 'The euro’s own health shows in both pairs.', strength: 'usually' },
+        { with: 'boj-rate', text: 'The Bank of Japan anchors the yen side.', strength: 'usually' },
+      ],
+      glossaryTerms: ['central-bank'],
+    },
+    eurchf: {
+      plainName: 'The euro versus the franc',
+      oneLine: 'How many Swiss francs one euro buys.',
+      ifRising: 'The euro gaining on the franc often means worry about Europe is fading.',
+      ifFalling: 'The franc usually gains when investors worry about Europe; a fast fall is a classic warning.',
+      connections: [
+        { with: 'stoxx50', text: 'The Europe-worry alarm reads this pair beside Europe’s main company list.', strength: 'reliable' },
+        { with: 'r6_europe_worry', text: 'This pattern card is built around this pair.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
+    audcny: {
+      plainName: 'The Australian dollar in yuan',
+      oneLine: 'How many Chinese yuan one Australian dollar buys.',
+      ifRising: 'The Australian dollar usually gains on the yuan when China’s demand looks healthy.',
+      ifFalling: 'The Australian dollar usually sags against the yuan when China’s economy cools.',
+      connections: [
+        { with: 'iron-ore', text: 'Iron ore is the biggest trade behind the link.', strength: 'usually' },
+        { with: 'usdcny', text: 'The yuan against the US dollar is this pair’s other half.', strength: 'reliable' },
+        { with: 'r5_china_link', text: 'The China-link pattern watches exactly these two legs.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 

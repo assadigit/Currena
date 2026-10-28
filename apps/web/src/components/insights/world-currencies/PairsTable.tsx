@@ -18,6 +18,7 @@ import { fxMoneyLine, fxPairRows, fxRuleCopyKey, fxTrendOf } from '../../../lib/
 import { formatAsOf } from '../HistoryChart';
 import { GlossaryTip } from './GlossaryTip';
 import { isOld, signedPct } from './display';
+import { Layer1Block } from '../layer1/Layer1Block';
 
 /* ------------------------------------------------------------------ *
  * The pairs table (§9.3 item 6) + the pair detail panel (§9.4)
@@ -86,6 +87,12 @@ export function PairDetail({
           </div>
         ) : null}
       </dl>
+      {/* Layer 1 — the plain-language block for this pair (spec §6,
+       * DECISIONS D-17): oneLine lead + ifRising/ifFalling, emphasised by
+       * the sign of the 1-month change (the FX rules' alarm lens), +
+       * connections + the glossary list. Renders nothing until the pair's
+       * Layer-1 copy exists (graceful batch roll-out). */}
+      <Layer1Block id={entry.id} locale={locale} copy={copy} changeDir={entry.chg.m1} />
       {/* §9.4/§9.6: the 1-year line chart, time left to right even in Farsi. */}
       <div dir="ltr" className="not-prose">
         <PairYearChart weekly={weekly} copy={copy} />
