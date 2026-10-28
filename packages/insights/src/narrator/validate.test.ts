@@ -88,7 +88,7 @@ describe('M1 validateStateNarrative — the deliberately bad fixtures', () => {
     expect(checks).toContain('V2');
   });
 
-  it('V2: a sentence over 28 words fails', () => {
+  it('V2: a sentence over 35 words fails', () => {
     const long = 'This is a very long sentence that keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going.';
     const checks = checksFor(globalLive, globalUnit, (b) => ({ ...b, en: long }));
     expect(checks).toContain('V2');
@@ -180,8 +180,8 @@ describe('M1 validateStateNarrative — the deliberately bad fixtures', () => {
   });
 
   it('the overall limits differ from the section limits (4\u20136 vs 3\u20135; 120 vs 90 words)', () => {
-    expect(narrativeLimitsFor({ kind: 'overall' })).toEqual({ minSentences: 4, maxSentences: 6, maxWords: 120, maxSentenceWords: 28 });
-    expect(narrativeLimitsFor({ kind: 'section', section: 'global' })).toEqual({ minSentences: 3, maxSentences: 5, maxWords: 90, maxSentenceWords: 28 });
+    expect(narrativeLimitsFor({ kind: 'overall' })).toEqual({ minSentences: 4, maxSentences: 11, maxWords: 240, maxSentenceWords: 35 });
+    expect(narrativeLimitsFor({ kind: 'section', section: 'global' })).toEqual({ minSentences: 3, maxSentences: 9, maxWords: 190, maxSentenceWords: 35 });
   });
 });
 

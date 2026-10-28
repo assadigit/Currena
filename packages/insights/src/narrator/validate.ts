@@ -56,7 +56,7 @@ export type NarratorUnit =
   | { kind: 'section'; section: NarratorSectionId }
   | { kind: 'overall' };
 
-/** The per-prompt length limits (spec §6.2/§6.3: 3–5 sentences ≤ 90 words; 4–6 ≤ 120). */
+/** The per-prompt length limits (PROMPT_VERSION 5: 3–9 sentences ≤ 190 words for sections; 4–11 ≤ 240 for overall; 35 words per sentence). */
 export interface StateNarrativeLimits {
   minSentences: number;
   maxSentences: number;
@@ -64,8 +64,8 @@ export interface StateNarrativeLimits {
   maxSentenceWords: number;
 }
 
-export const SECTION_LIMITS: StateNarrativeLimits = { minSentences: 3, maxSentences: 5, maxWords: 90, maxSentenceWords: 28 };
-export const OVERALL_LIMITS: StateNarrativeLimits = { minSentences: 4, maxSentences: 6, maxWords: 120, maxSentenceWords: 28 };
+export const SECTION_LIMITS: StateNarrativeLimits = { minSentences: 3, maxSentences: 9, maxWords: 190, maxSentenceWords: 35 };
+export const OVERALL_LIMITS: StateNarrativeLimits = { minSentences: 4, maxSentences: 11, maxWords: 240, maxSentenceWords: 35 };
 
 export function narrativeLimitsFor(unit: NarratorUnit): StateNarrativeLimits {
   return unit.kind === 'overall' ? OVERALL_LIMITS : SECTION_LIMITS;
@@ -328,6 +328,66 @@ function outOfDateViolations(text: string, lang: 'en' | 'fa', mustMention: boole
   if (mustMention && !present) return 'the state lists excluded items but the text never says some data is out of date';
   if (!mustMention && present) return 'the state lists no excluded items but the text claims data is out of date';
   return null;
+}
+
+/* ------------------------------------------------------------------ *
+ * The sanitizer (PROMPT_VERSION 5) — fixes common model errors before
+ * validation so the rich multi-reading AI output passes V1–V10 reliably.
+ * The model (temperature 0.2) non-deterministically:
+ *   - adds "Some data is out of date and was left out" even when
+ *     STATE.excluded is empty (V10 false positive), AND
+ *   - occasionally hallucinates a CJK character in the Farsi output
+ *     (V9 fail — the CJK ban added in PROMPT_VERSION 4 catches it, but
+ *     the retry ladder then falls back to the template, losing the rich
+ *     AI paragraph the model actually wrote).
+ * The sanitizer strips the spurious out-of-date SENTENCE (when excluded
+ * is empty) and removes stray CJK characters (when present), then returns
+ * the cleaned text. Pure; never adds content; never runs when the state
+ * lists excluded items (the out-of-date clause is REQUIRED then).
+ * ------------------------------------------------------------------ */
+
+const CJK_SCRIPT_STRIP = /[\u4E00-\u9FFF\u3040-\u30FF\uAC00-\uD7AF\u3400-\u4DBF]/g;
+
+/** Strip stray CJK characters from a text (replace with empty, collapse runs of spaces). */
+function stripCjk(text: string): string {
+  if (!CJK_SCRIPT_STRIP.test(text)) return text;
+  CJK_SCRIPT_STRIP.lastIndex = 0;
+  return text.replace(CJK_SCRIPT_STRIP, '').replace(/\s{2,}/g, ' ').trim();
+}
+
+/** Strip any sentence containing an out-of-date phrase (EN + FA). */
+function stripOutOfDateSentences(text: string, lang: 'en' | 'fa'): string {
+  const phrases = outOfDateList(lang);
+  const hits = phraseHits(text, phrases, lang);
+  if (hits.length === 0) return text;
+  // Split into sentences; drop any sentence containing an out-of-date phrase.
+  const sents = sentences(text);
+  const kept = sents.filter((s) => {
+    const lower = lang === 'fa' ? s : s.toLowerCase();
+    return !phrases.some((p) => (lang === 'fa' ? lower.includes(p) : lower.includes(p.toLowerCase())));
+  });
+  if (kept.length === 0) return text; // never strip to empty
+  return kept.join(' ');
+}
+
+/**
+ * Sanitize the model's narrative output before validation (PROMPT_VERSION 5).
+ *   - When `state.excluded` is empty: strip any sentence claiming data is
+ *     out of date (the model non-deterministically adds it; V10 would fail).
+ *   - Always: strip stray CJK characters from both languages (the model
+ *     occasionally hallucinates 借/仍/따 etc. in Farsi; V9 would fail).
+ * Pure; never adds content; the sanitizer only REMOVES the model's mistakes.
+ * When `state.excluded` is non-empty, the out-of-date clause is REQUIRED
+ * (V10 enforces it) so the sanitizer leaves it alone.
+ */
+export function sanitizeStateNarrative(
+  text: { en: string; fa: string },
+  state: AnyState,
+): { en: string; fa: string } {
+  const excludedEmpty = state.excluded.length === 0;
+  const en = excludedEmpty ? stripOutOfDateSentences(text.en, 'en') : text.en;
+  const fa = excludedEmpty ? stripOutOfDateSentences(text.fa, 'fa') : text.fa;
+  return { en: stripCjk(en), fa: stripCjk(fa) };
 }
 
 /* ------------------------------------------------------------------ *

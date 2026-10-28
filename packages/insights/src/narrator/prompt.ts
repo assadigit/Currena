@@ -45,8 +45,20 @@ import type { NarratorUnit } from './validate';
  * failing V9 ("Persian script in the English text"). Same idea, clearer
  * boundary. Also adds a CJK-script ban to V9 (the model occasionally
  * hallucinated a Chinese character 借 in the Farsi output; V9's
- * Persian-vs-Latin count was blind to it). */
-export const PROMPT_VERSION = 4;
+ * Persian-vs-Latin count was blind to it).
+ * v5 (the owner's "this level of being bad doesnt need any intelligence"
+ * fix): the v4 SECTION_TASK said "name at most two or three" alerts and
+ * the V2 limits were 3-5 sentences / 90 words (sections) and 4-6 / 120
+ * (overall) — so the model named 1-2 readings and stopped, even though
+ * STATE carries every fresh reading's value and VOCABULARY carries every
+ * reading's oneLine. The owner wanted 5-7 household-facing facts (home
+ * loan 6.20%, term deposits 4.80%, inflation 4.34%, jobs, wages) woven
+ * into ONE cohesive paragraph. v5 raises the V2 limits (sections 3-9
+ * sentences / 190 words / 35 per-sentence; overall 4-11 / 240 / 35) and
+ * rewrites SECTION_TASK + OVERALL_TASK to weave FIVE to SEVEN readings
+ * drawn from BOTH alerts AND items, prioritising household-facing facts
+ * and drawing VOCABULARY connections. */
+export const PROMPT_VERSION = 5;
 
 /* ------------------------------------------------------------------ *
  * §6.1 — the shared base rules (included in A-section and A-overall)
@@ -69,9 +81,9 @@ Hard rules:
  * §6.2 — the section task (A-section = base rules + this)
  * ------------------------------------------------------------------ */
 
-export const SECTION_TASK = `TASK: Explain what this one section shows today as ONE cohesive paragraph (never a stitched list of indicator names). 3 to 5 sentences, at most 90 words per language.
+export const SECTION_TASK = `TASK: Explain what this one section shows today as ONE or TWO cohesive paragraphs (never a stitched list of indicator names). 3 to 9 sentences, at most 190 words per language.
 
-Open with the big picture of the section in everyday words (calm, mixed or under pressure, from the tier counts and any verdict label in STATE). Then weave in the readings the section actually flags — name at most two or three, and for each that carries one, use its level (STATE alerts carry value, valueUnit, delta, context; e.g. "US 10-year yield sits at 5.0 percent, down 0.17 points over 30 days", or "the Kospi is 38 percent below its yearly high"). When two or more related ids share the section and VOCABULARY carries a connection (ifRising, ifFalling, connections), draw that connection in the same paragraph — never invent a relationship VOCABULARY does not state.
+Open with the big picture of the section in everyday words (calm, mixed or under pressure, from the tier counts and any verdict label in STATE). Then weave in FIVE to SEVEN readings the section actually carries — draw from BOTH the alerts (warning-status readings, which carry value + delta + context) AND the items (every fresh reading, which carries value + cadence). For each reading: name its plainName from VOCABULARY, state its actual value from STATE, and weave its oneLine description from VOCABULARY into the prose. When a section has household-facing readings (home loans, rents, savings, deposit rates, inflation, jobs, wages, pay growth), prioritise those — they are what ordinary readers feel. When two or more related ids share the section and VOCABULARY carries a connection (ifRising, ifFalling, connections), draw that connection in the same paragraph — never invent a relationship VOCABULARY does not state. Write the readings into fluent sentences, not a list: "The mortgage rate people pay sits at 6.2 percent and Australian rent growth is 3.55 percent over the past year, so housing stays expensive. New term deposits pay 4.8 percent while Australian inflation is 4.34 percent, so savers barely keep up before tax."
 
 Use plain words and the plain names from VOCABULARY. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. Mention out-of-date data only when STATE.excluded is non-empty (one short clause). Weave the numbers into the prose — do not list them.`;
 
@@ -79,9 +91,9 @@ Use plain words and the plain names from VOCABULARY. Never advise, never predict
  * §6.3 — the overall task (A-overall = base rules + this)
  * ------------------------------------------------------------------ */
 
-export const OVERALL_TASK = `TASK: Write the overall summary of the whole page as ONE cohesive paragraph (never a stitched list of verdicts). 4 to 6 sentences, at most 120 words per language.
+export const OVERALL_TASK = `TASK: Write the overall summary of the whole page as ONE or TWO cohesive paragraphs (never a stitched list of verdicts). 4 to 11 sentences, at most 240 words per language.
 
-Open by stating the page's verdicts in everyday words (each section's verdict label rides in STATE with its counts; e.g. "Global reads Stressed, with 9 of 32 scored indicators in warning"). Then name one or two themes that stand out across sections, using only STATE and VOCABULARY — when an alert in one section carries a level (value, delta, context), use its actual number to anchor the theme (e.g. "the US 10-year yield sits at 5.0 percent, down 0.17 points over 30 days", "the Kospi is 38 percent below its yearly high", or "EUR/CHF moved 2.2 percent in a month"). Draw a connection between two sections only when VOCABULARY states one (ifRising, ifFalling, connections) — never invent one.
+Open by stating the page's verdicts in everyday words (each section's verdict label rides in STATE with its counts; e.g. "Global reads Stressed, with 9 of 32 scored indicators in warning"). Then weave in FIVE to SEVEN readings from ACROSS the page's sections — do NOT stop at one alert. The STATE's alerts array carries every firing warning across sections (each with value + delta + context); the STATE's items array (per section) carries every fresh reading's value. For each reading you name: use its plainName from VOCABULARY, state its actual value from STATE, and weave its oneLine description. Prioritise readings that affect ordinary households (home loans, rents, savings, deposit rates, inflation, jobs, wages, pay growth) and readings that anchor a theme across sections — e.g. "the US 10-year yield sits at 5.0 percent, down 0.17 points over 30 days", "the mortgage rate people pay sits at 6.2 percent", "new term deposits pay 4.8 percent while Australian inflation is 4.34 percent". Draw a connection between two sections only when VOCABULARY states one (ifRising, ifFalling, connections) — never invent one. Write the readings into fluent sentences, not a list.
 
 End with one sentence reminding the reader this explains data and is not a recommendation. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. Mention out-of-date data only when STATE.excluded is non-empty (one short clause). Weave the verdicts and the numbers into the prose — do not list them.`;
 

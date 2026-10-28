@@ -58,7 +58,7 @@ describe('D-41 CloudflareAiClient.callStateNarrative — the success path', () =
     expect(calls[0]!.model).toBe('@cf/meta/llama-3.3-70b-instruct-fp8-fast');
     const input = calls[0]!.input;
     expect(input['temperature']).toBe(0.2);
-    expect(input['max_tokens']).toBe(600);
+    expect(input["max_tokens"]).toBe(900);
     expect((input['response_format'] as Record<string, unknown>)['type']).toBe('json_schema');
     const messages = input['messages'] as Array<{ role: string; content: string }>;
     expect(messages[0]!.role).toBe('system');
@@ -204,7 +204,7 @@ describe('D-41 extractBindingText — the shape parser', () => {
 });
 
 describe('D-41 CloudflareAiClient — the spy confirms the json_schema request body', () => {
-  it('sends temperature 0.2 + max_tokens 600 + the json_schema format', async () => {
+  it('sends temperature 0.2 + max_tokens 900 + the json_schema format', async () => {
     const run = vi.fn(async (sourceModel: string, sourceInput: Record<string, unknown>) => {
       void sourceModel;
       void sourceInput;

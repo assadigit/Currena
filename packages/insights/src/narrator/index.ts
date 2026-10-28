@@ -118,6 +118,7 @@ export {
   OVERALL_LIMITS,
   SECTION_LIMITS,
   narrativeLimitsFor,
+  sanitizeStateNarrative,
   stateIdsOf,
   validateNewsNote,
   validateStateNarrative,

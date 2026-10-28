@@ -41,6 +41,7 @@ import {
   buildSectionNarrationState,
   getNarratorVocabulary,
   newsSystemPrompt,
+  sanitizeStateNarrative,
   stateHashOf,
   systemPromptFor,
   templateNarrative,
@@ -435,7 +436,14 @@ async function generateUnit(args: {
       result.apiErrors += 1;
       break;
     }
-    const failures = validateStateNarrative({ text: outcome.value, unit: work.unit, state: work.state });
+    // PROMPT_VERSION 5: sanitize the model's output before validation —
+    // strip the spurious "some data is out of date" clause when the state
+    // lists no excluded items (V10 false positive), and remove stray CJK
+    // characters the model occasionally hallucinates in Farsi (V9 fail).
+    // Pure; never adds content; only fixes the model's non-deterministic
+    // mistakes so the rich multi-reading AI paragraph passes V1–V10.
+    const sanitized = sanitizeStateNarrative(outcome.value, work.state);
+    const failures = validateStateNarrative({ text: sanitized, unit: work.unit, state: work.state });
     if (failures.length === 0) {
       stats.aiValid = (stats.aiValid ?? 0) + 1;
       result.aiValid += 1;
@@ -449,8 +457,8 @@ async function generateUnit(args: {
       return {
         unit: {
           stateHash: work.hash,
-          en: outcome.value.en,
-          fa: outcome.value.fa,
+          en: sanitized.en,
+          fa: sanitized.fa,
           source: 'ai',
           generatedAt: now.toISOString(),
         },

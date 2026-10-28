@@ -141,7 +141,7 @@ describe('M4 runScheduledNarrator — the template-only deployments (the M4 defa
     expect(tick1.wrote).toBe(true);
 
     const doc1 = parseNarrativeDoc(map.get(NARRATIVE_KV_KEY)!)!;
-    expect(doc1.promptVersion).toBe(4);
+    expect(doc1.promptVersion).toBe(5);
     // page order: the overall + the first two sections; the rest pending
     expect(Object.keys(doc1.sections).sort()).toEqual(['australia', 'global']);
     expect(doc1.overall.source).toBe('template');
