@@ -152,9 +152,18 @@ export function narratorFlagsOf(env: Bindings): NarratorFlags {
   // defensively, but this avoids the stats noise + the daily-cap read).
   const webContext =
     provider === 'cloudflare' ? false : env.NARRATOR_WEB_CONTEXT === 'true';
+  // D-41 §3: on the cloudflare path, a NARRATOR_MODEL that is unset OR still
+  // the inherited gemini default ('gemini-3.5-flash-lite') is NOT a valid
+  // Workers AI model id — fall back to CLOUDFLARE_DEFAULT_MODEL. An explicit
+  // '@cf/...' override is honoured. (Without this, flipping provider=cloudflare
+  // while NARRATOR_MODEL still carries the gemini default would call
+  // env.AI.run('gemini-3.5-flash-lite', …) — an invalid model id → every call
+  // fails + the template fallback kicks in for every unit.)
   const model =
     provider === 'cloudflare'
-      ? env.NARRATOR_MODEL || CLOUDFLARE_DEFAULT_MODEL
+      ? !env.NARRATOR_MODEL || env.NARRATOR_MODEL === 'gemini-3.5-flash-lite'
+        ? CLOUDFLARE_DEFAULT_MODEL
+        : env.NARRATOR_MODEL
       : env.NARRATOR_MODEL || 'gemini-3.5-flash-lite';
   return {
     enabled: env.NARRATOR_ENABLED === 'true',

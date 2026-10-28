@@ -311,6 +311,15 @@ describe('D-41 narratorFlagsOf — the cloudflare provider path', () => {
     expect(flags.model).toBe('@cf/qwen/qwen3-30b-a3b-fp8');
   });
 
+  it('provider=cloudflare with the inherited gemini default model → falls back to the cloudflare default (the live-deploy scenario)', () => {
+    // This is exactly the live state after flipping provider=cloudflare while
+    // NARRATOR_MODEL still carries the gemini default from wrangler.jsonc.
+    const flags = narratorFlagsOf(
+      env({ NARRATOR_PROVIDER: 'cloudflare', NARRATOR_MODEL: 'gemini-3.5-flash-lite' }),
+    );
+    expect(flags.model).toBe('@cf/meta/llama-3.3-70b-instruct-fp8-fast');
+  });
+
   it('an unknown provider falls back to gemini', () => {
     const flags = narratorFlagsOf(env({ NARRATOR_PROVIDER: 'mistral' }));
     expect(flags.provider).toBe('gemini');
