@@ -4205,3 +4205,44 @@ the petrol/transport money row is gone while employment rate appeared.
   source-level failures (`fred` partial, `rba` the known f2 403) while
   the public face stays 62/62 fresh — flagged for the upcoming
   pipeline-reliability investigation (TGJU scraping + gap analysis).
+
+## Session record — 2026-10-28i the Insights Layer-2 narrator — D-42 enriched STATE deployed LIVE (worker 8565d768 at 100%; v2 prompt + real numbers in the AI text)
+
+The owner reviewed the live Cloudflare-AI output and found it "much much much
+weaker than my worst imagination… just placed some automated sentences, which
+could also be done by python instead of AI." Root cause (D-42): the STATE the
+model received was thin (alerts carried only plainName + oneLine + a rule
+magnitude) + a Persian/Arabic decimal-separator bug in V3 silently rejected
+every FA decimal the model produced. Fix: enrich SectionAlert with the
+reading's actual value/delta/context, bump PROMPT_VERSION 1→2 (forces
+regeneration), make V3 recursive + fix the U+066B (٫) normalisation, enrich the
+prompts to weave values/connections into ONE cohesive paragraph.
+
+- **Deployed** version `8565d768` at 100% (NARRATOR_PROVIDER=cloudflare +
+  NARRATOR_ENABLED=true + NARRATOR_VISIBLE=true; the committed wrangler.jsonc
+  default stays gemini/false). Triggered immediate generation by temporarily
+  nudging the narrator rung to minute=1 (the 18:01 UTC rung regenerated
+  overall+global+australia with the v2 prompt), then restored to :50.
+- **The 18:01 rung output** (promptVersion 2, model @cf/meta/llama-3.3-70b):
+  - **overall: source `ai`** — "The global economy is stressed, with 9 of 32
+    indicators in warning. Australia is also stressed, with 7 of 16 indicators
+    in warning. The US 10-year yield has fallen 0.17 points over 30 days, to
+    5.0 percent. This explains the current data and is not a recommendation."
+    (FA: "اقتصاد جهانی پرتنش است… نرخ ۱۰ ساله آمریکا ۰٫۱۷ واحد در ۳۰ روز
+    گذشته کاهش یافته و به ۵٫۰ درصد رسیده است…") — real numbers, cohesive
+    paragraph, Persian digits + the U+066B decimal separator now accepted by V3.
+  - global + australia: fell back to template, but the template ITSELF is now
+    richer ("Euro-area inflation (at 3.8, up 0.6 points since previous release)",
+    "Australia's 10-year borrowing cost (at 5.28, up 0.27 points over 30 days)").
+  - world-markets + world-currencies: pending the 19:50 UTC rung (the
+    3-unit-per-tick cap; the first tick did overall+global+australia).
+- **Browser-verified**: the public URL `https://currena.ir/#/insights` renders
+  3 NarrativeBlocks (sources `[ai, template, template]`) — the overall block
+  carries real AI text with the AI disclaimer, 0 console errors.
+- **Gates ALL GREEN** (commit 89d1248): secret scan · typecheck (6) · lint (0/0)
+  · copy:audit · narrator vocab · narrator eval (50) · **layer1 strict
+  7809/7809 UNCHANGED** · full suite 10,051 · budget held.
+- **The owner can see the improvement now** at `https://currena.ir/#/insights`
+  (the overall summary, top of the page, is real AI with actual numbers). The
+  remaining 2 sections + a prompt-tuning pass to push more sections past V2/V10
+  are the next iteration.
