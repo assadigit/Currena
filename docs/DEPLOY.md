@@ -130,6 +130,72 @@ run it (or the individual gates) before deploying. Repair is owner-side:
 5. Keep the local-gate discipline regardless: `pnpm gates` green before
    every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-10-28f the Insights Layer-2 narrator — INDEPENDENT RE-VERIFICATION (worker 4f4db8d6 still active, Layer 2 confirmed COMPLETE)
+
+A continuation session was asked to "finish it up" after several earlier
+sessions were lost midway. The repo already contained the full M1–M5
+commit chain (a60bc3b → 40e0888) + the LAYER2-REPORT claiming
+"COMPLETE". This session did NOT trust the claim — it independently
+re-verified the whole state end to end and made NO code changes (the
+working tree is clean; HEAD stays at `40e0888`). Findings:
+
+- **Local gates — ALL 9 GREEN** (`pnpm gates`, 1m 47s): secret scan
+  (8 patterns · 645 files) · typecheck (6 packages) · lint (0/0) ·
+  copy:audit (clean) · narrator vocabulary (129×2 + 23×2 in sync) ·
+  narrator eval (50 checks) · layer1 strict validator (7,809/7,809
+  assertions UNCHANGED — Layer 1 copy/verdict math/thresholds/alerts
+  untouched) · full suite (10,021 tests: core 191 · scraper 67 ·
+  insights 855 · markets 13 · api 362 · web 8,533) · build budget
+  (entry 295.37/88.84 · Insights lazy 1100.49/258.36 under the 1110/260
+  ceiling). Numbers match the M5 record exactly.
+- **Deploy still active** (Cloudflare deployments API): production is
+  version `4f4db8d6` at 100 % traffic, created 2026-10-28T13:47:48Z,
+  author sedanama.ir@gmail.com — the M5 deploy, NOT overwritten.
+- **Deployed vars match `wrangler.jsonc`** (settings API): `NARRATOR_ENABLED=false`,
+  `NARRATOR_VISIBLE=false`, `NARRATOR_WEB_CONTEXT=false`,
+  `NARRATOR_WEB_DAILY_CAP=20`, `NARRATOR_MODEL=gemini-3.5-flash-lite`,
+  `SITE_MODE=public`. All at their disabled defaults.
+- **`GEMINI_API_KEY` is NOT set on the Worker** (secrets API — the only
+  secrets are ADMIN_VIEW_SECRET, EODHD_API_TOKEN, GH_INGEST_DISPATCH_TOKEN,
+  INSIGHTS_PASSWORD, REFRESH_SECRET). The `AQ.Ab8…` string pasted in the
+  continuation prompt was NEVER put on the Worker (it is a Google OAuth
+  refresh token, not a Gemini key — the owner must rotate it if it was
+  pasted anywhere public and create a real `AIza…` key in a project
+  WITHOUT billing, then enter it via `pnpm narrator:set-key`).
+- **Live endpoint** (`GET https://currena.ir/api/insights/narrative`):
+  HTTP 200, `content-type: application/json`,
+  `cache-control: public, max-age=300, s-maxage=600` (edge-cached —
+  visitors add zero KV reads, D-38), body `promptVersion:1`,
+  `model:gemini-3.5-flash-lite`, `visible:false`, 5 units served
+  (overall + global + australia + world-markets + world-currencies — the
+  3-per-tick cap filled across two `:50` rungs), all `source:"template"`
+  (no key → templates only, by design).
+- **Browser live-render** (agent-browser, real chromium): the preview URL
+  `https://currena.ir/?narrative=preview#/insights` renders FIVE
+  `data-narrative-block` elements (overall + the 4 sections) in EN at
+  1280px AND in FA («خلاصهٔ ساده» label, Persian digits ۹/۳۲/۷/۱۶,
+  correct half-spaces `حکم‌های`, native spoken-formal register) AND at
+  360px mobile (block width 328px, no horizontal overflow). The normal
+  URL `https://currena.ir/#/insights` renders ZERO `data-narrative-block`
+  (the `visible:false` + no-preview-marker gate is closed — nothing new
+  for the public). ZERO `[data-in-the-news-block]` (Part 3 ships
+  DISABLED, D-29). ZERO console errors / page errors on every view.
+- **`pnpm narrator:eval:live` skips cleanly** (exit 0) when
+  `GEMINI_API_KEY` is unset — the M5 "skips cleanly if no key" rule
+  holds; the owner runs it in their own terminal after `set-key`.
+
+**Conclusion — Layer 2 is genuinely COMPLETE and independently
+verified.** No build, fix or redeploy was needed (and none was done —
+the disabled-default deploy is correct and must not be touched until
+the owner acts). The ONLY remaining work is owner-side and requires the
+owner's own `AIza…` key (never pasted in chat): the copy-paste steps in
+`docs/insights/layer2/LAYER2-REPORT.md` §8 — (1) `pnpm narrator:set-key`,
+(2) `pnpm narrator:eval:live` + read `EVAL-OUTPUTS.md`, (3) enable the
+model (`wrangler versions upload --var NARRATOR_ENABLED:true`), (4) read
+the preview URL for ~7 days, (5) flip visibility
+(`--var NARRATOR_VISIBLE:true`), (6) optionally enable Part 3 after the
+owner's Google grounding-terms review.
+
 ## Session record — 2026-10-28e the Insights Layer-2 narrator M5: display + live eval + kill criteria + final report (worker 4f4db8d6, DEPLOYED DISABLED — Layer 2 COMPLETE)
 
 The final milestone of the narrator build (M5 of 5, spec §11 + §12 + §13
