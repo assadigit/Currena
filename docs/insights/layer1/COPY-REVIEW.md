@@ -417,6 +417,58 @@ _(market-stress is now complete at 10/10; M1 ends at 56/129 unique ids)_
 
 ---
 
+## Batch 10 — prices-heat A (8 indicators)
+
+| id | field | claim (paraphrased) | strength | basis | status |
+|---|---|---|---|---|---|
+| `us-cpi-yoy` | ifRising | Higher US inflation usually keeps world rates high for longer. | — | widely-taught: US inflation drives the Fed, the world rate anchor (approved copy same claim) | widely-taught |
+| `us-cpi-yoy` | ifFalling | Cooling US inflation usually opens the door to cheaper borrowing worldwide. | — | widely-taught (inverse) | widely-taught |
+| `us-pce-core-yoy` | ifRising | A sticky high core-PCE usually keeps the Fed tough and world borrowing dearer. | — | widely-taught: the Fed's reaction function runs on this number (approved copy) | widely-taught |
+| `us-pce-core-yoy` | ifFalling | Cooling toward the Fed goal usually brings cheaper-money talk closer. | — | widely-taught (inverse) | widely-taught |
+| `euro-hicp` | ifRising | Higher euro-area inflation usually means a higher ECB rate and dearer euro loans. | — | widely-taught: ECB's 2% target (approved copy) | widely-taught |
+| `euro-hicp` | ifFalling | Calmer euro-area inflation usually lets cheaper money return. | — | widely-taught (inverse) | widely-taught |
+| `breakeven-5y5y` | ifRising | Markets pricing more future inflation usually keeps long rates high. | — | widely-taught: expected inflation is a component of nominal long rates (approved copy same claim) | widely-taught |
+| `breakeven-5y5y` | ifFalling | Weak future-inflation pricing is the setting that invites easy money. | — | widely-taught: deflation fear → easing bias (approved copy) | widely-taught |
+| `us-cpi-core-yoy` | ifRising | A rising core usually keeps the Fed tough for longer. | — | widely-taught: core is the Fed's steadier read (approved copy) | widely-taught |
+| `us-cpi-core-yoy` | ifFalling | A cooling core usually signals inflation fading at its roots. | — | widely-taught (inverse) | widely-taught |
+| `us-wages` | ifRising | Faster pay sustains spending but can feed inflation, the loop central banks watch. | — | widely-taught: the wage-price loop (approved copy cites the Fed's persistence argument) | widely-taught |
+| `us-wages` | ifFalling | Pay growing slower than prices usually squeezes household budgets. | — | widely-taught (approved copy same claim) | widely-taught |
+| `breakeven-10y` | ifRising | Bond markets pricing more future inflation usually lifts long-term rates. | — | widely-taught: nominal = real + expected inflation (approved copy same claim) | widely-taught |
+| `breakeven-10y` | ifFalling | Weak inflation pricing ahead invites easy money. | — | widely-taught (inverse) | widely-taught |
+| `t5yie` | ifRising | More medium-term inflation pricing usually lifts long rates. | — | widely-taught (same construction as 10y) | widely-taught |
+| `t5yie` | ifFalling | Soft inflation pricing ahead invites easy money. | — | widely-taught (inverse) | widely-taught |
+
+### Connections (batch 10)
+| id | connection.with | claim | strength | basis | status |
+|---|---|---|---|---|---|
+| `us-cpi-yoy` | `fed-target` | The Fed reacts to this number when moving its main rate. | usually | widely-taught: the Fed's price-stability mandate | widely-taught |
+| `us-cpi-yoy` | `us-cpi-core-yoy` | The core companion strips the food and energy swings. | reliable | definitional (CPILFENS excludes food/energy) | widely-taught |
+| `us-cpi-yoy` | `michigan-1y-expectations` | Household expectations tend to follow actual prices. | usually | widely-taught (approved copy same claim) | widely-taught |
+| `us-pce-core-yoy` | `fed-target` | The Fed's stated inflation goal is defined on this measure. | reliable | definitional (the 2% target is on core PCE) | widely-taught |
+| `us-pce-core-yoy` | `us-cpi-yoy` | Both read US prices; this is the Fed's own yardstick. | reliable | definitional | widely-taught |
+| `us-pce-core-yoy` | `us-cpi-core-yoy` | The other US core gauge reads the same stripped-out prices. | reliable | definitional (two core measures of the same prices) | widely-taught |
+| `euro-hicp` | `ecb-dfr` | The ECB's policy rate answers this number. | reliable | widely-taught: the ECB targets HICP (approved copy) | widely-taught |
+| `euro-hicp` | `us-cpi-yoy` | US and euro readings frame world inflation. | usually | widely-taught | widely-taught |
+| `breakeven-5y5y` | `breakeven-10y` | The ten-year companion reads the nearer window. | reliable | definitional (both from the Treasury gap family) | widely-taught |
+| `breakeven-5y5y` | `us10y` | Expected inflation is one building block of long-term rates. | reliable | widely-taught: nominal-rate decomposition | widely-taught |
+| `breakeven-5y5y` | `fed-target` | Central banks watch it to judge their credibility. | usually | widely-taught (approved copy: "the thing central banks watch to keep their credibility") | widely-taught |
+| `us-cpi-core-yoy` | `us-cpi-yoy` | Both come from the same monthly price report. | reliable | definitional (CPIAUCNS/CPILFENS, same BLS survey) | widely-taught |
+| `us-cpi-core-yoy` | `us-pce-core-yoy` | The Fed's core gauge reads the same underlying direction. | usually | widely-taught | widely-taught |
+| `us-wages` | `us-cpi-yoy` | The gap between pay and price growth decides whether households gain ground. | usually | widely-taught: real-wage logic (approved copy same claim) | widely-taught |
+| `us-wages` | `fed-target` | The Fed watches the pay-and-price loop when setting rates. | usually | widely-taught (approved copy cites the Fed citing wages) | widely-taught |
+| `breakeven-10y` | `breakeven-5y5y` | The far-ahead companion reads the window beyond five years. | reliable | definitional | widely-taught |
+| `breakeven-10y` | `t5yie` | The five-year companion reads the nearer window. | reliable | definitional | widely-taught |
+| `breakeven-10y` | `us10y` | Expected inflation is one building block of the ten-year rate. | reliable | widely-taught: nominal-rate decomposition | widely-taught |
+| `t5yie` | `breakeven-10y` | The ten-year companion reads the wider window. | reliable | definitional | widely-taught |
+| `t5yie` | `breakeven-5y5y` | The far-ahead companion reads beyond it. | reliable | definitional | widely-taught |
+
+### Australia angle (batch 10)
+| id | claim | basis | status |
+|---|---|---|---|
+| (none — global inflation/prices context cards; not in the D-08 AU-required set.) | — | — | — |
+
+---
+
 ## Remaining batches (M2+)
 
 — pending — prices-board (5), prices-heat (16), AU indicators (23), 16 world

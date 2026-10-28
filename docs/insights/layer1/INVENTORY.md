@@ -104,14 +104,14 @@ inventory and enforced by gate G1.
 #### `prices-heat` gauge (16)
 | L1 | id | official name | what it measures |
 |---|---|---|---|
-| · | `us-cpi-yoy` | US inflation (yearly) | US consumer-price inflation, year-on-year. |
-| · | `us-pce-core-yoy` | US core inflation by the Fed's gauge (PCE) | US core PCE inflation, year-on-year (the Fed's preferred gauge). |
-| · | `euro-hicp` | Euro-area inflation (yearly) | Euro-area HICP inflation, year-on-year. |
-| · | `breakeven-5y5y` | Inflation expectations (5y5y forward) | The 5-year/5-year-forward inflation breakeven (expected inflation). |
-| · | `us-cpi-core-yoy` | US core inflation (yearly) | US core CPI inflation (ex food and energy), year-on-year. |
-| · | `us-wages` | US wage growth (yearly) | US average hourly earnings, year-on-year. |
-| · | `breakeven-10y` | Expected US inflation, ten years ahead | The 10-year US inflation breakeven (expected inflation). |
-| · | `t5yie` | Expected US inflation, five years ahead | The 5-year US inflation breakeven. |
+| ✓ | `us-cpi-yoy` | US inflation (yearly) | US consumer-price inflation, year-on-year. |
+| ✓ | `us-pce-core-yoy` | US core inflation by the Fed's gauge (PCE) | US core PCE inflation, year-on-year (the Fed's preferred gauge). |
+| ✓ | `euro-hicp` | Euro-area inflation (yearly) | Euro-area HICP inflation, year-on-year. |
+| ✓ | `breakeven-5y5y` | Inflation expectations (5y5y forward) | The 5-year/5-year-forward inflation breakeven (expected inflation). |
+| ✓ | `us-cpi-core-yoy` | US core inflation (yearly) | US core CPI inflation (ex food and energy), year-on-year. |
+| ✓ | `us-wages` | US wage growth (yearly) | US average hourly earnings, year-on-year. |
+| ✓ | `breakeven-10y` | Expected US inflation, ten years ahead | The 10-year US inflation breakeven (expected inflation). |
+| ✓ | `t5yie` | Expected US inflation, five years ahead | The 5-year US inflation breakeven. |
 | · | `wti` | WTI crude oil | The WTI crude oil price. |
 | · | `natgas` | US natural gas (Henry Hub) | The US natural-gas price (Henry Hub). |
 | · | `eia-crude-stocks` | US crude oil inventories | US weekly commercial crude-oil stocks. |

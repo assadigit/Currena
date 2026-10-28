@@ -175,6 +175,10 @@ const LAYER1 = {
       plain: 'How fast prices are rising. Higher inflation means the same money buys less over time.',
       example: 'If inflation is 3%, something that cost $100 last year costs about $103 now.',
     },
+    'core-inflation': {
+      term: 'core inflation',
+      plain: 'Inflation with food and energy prices taken out. It shows the steadier direction underneath the noisy monthly moves.',
+    },
     deflation: {
       term: 'deflation',
       plain: 'When prices are falling on average. It sounds good but can stall an economy and wages.',
@@ -939,6 +943,100 @@ const LAYER1 = {
         { with: 'gold-usd', text: 'Gold is the old-money leg.', strength: 'reliable' },
       ],
       glossaryTerms: [],
+    },
+
+    /* ----- Batch 10 — prices-heat A (8) ----- */
+    'us-cpi-yoy': {
+      plainName: 'US inflation',
+      oneLine: 'How fast US consumer prices are rising, versus a year ago.',
+      ifRising: 'Higher US inflation usually keeps world interest rates high for longer.',
+      ifFalling: 'Cooling US inflation usually opens the door to cheaper borrowing worldwide.',
+      connections: [
+        { with: 'fed-target', text: 'The Fed reacts to this number when moving its main rate.', strength: 'usually' },
+        { with: 'us-cpi-core-yoy', text: 'The core companion strips the food and energy swings.', strength: 'reliable' },
+        { with: 'michigan-1y-expectations', text: 'What households expect next year tends to follow this.', strength: 'usually' },
+      ],
+      glossaryTerms: ['inflation', 'interest-rate'],
+    },
+    'us-pce-core-yoy': {
+      plainName: 'The Fed’s inflation gauge',
+      oneLine: 'US inflation without food and energy, measured the Fed’s way.',
+      ifRising: 'The Fed usually stays tougher for longer, keeping world borrowing dearer.',
+      ifFalling: 'Cooling toward the Fed’s goal usually brings talk of cheaper money closer.',
+      connections: [
+        { with: 'fed-target', text: 'The Fed’s stated inflation goal is defined on this measure.', strength: 'reliable' },
+        { with: 'us-cpi-yoy', text: 'Both read US prices; this one is the Fed’s own yardstick.', strength: 'reliable' },
+        { with: 'us-cpi-core-yoy', text: 'The other US core gauge reads the same stripped-out prices.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['inflation'],
+    },
+    'euro-hicp': {
+      plainName: 'Euro-area inflation',
+      oneLine: 'How fast prices are rising across the euro area.',
+      ifRising: 'The ECB usually keeps rates higher and euro loans dearer.',
+      ifFalling: 'Calmer euro-area inflation usually lets cheaper money return.',
+      connections: [
+        { with: 'ecb-dfr', text: 'The ECB’s policy rate answers this number.', strength: 'reliable' },
+        { with: 'us-cpi-yoy', text: 'The US and euro readings together frame world inflation.', strength: 'usually' },
+      ],
+      glossaryTerms: ['inflation', 'policy-rate'],
+    },
+    'breakeven-5y5y': {
+      plainName: 'US inflation far ahead',
+      oneLine: 'The US inflation rate markets expect five to ten years out.',
+      ifRising: 'Markets are pricing more future inflation, the mood that keeps long rates high.',
+      ifFalling: 'Markets fear weak future inflation, the setting that invites easy money.',
+      connections: [
+        { with: 'breakeven-10y', text: 'The ten-year companion reads the nearer window.', strength: 'reliable' },
+        { with: 'us10y', text: 'Expected inflation is one building block of long-term rates.', strength: 'reliable' },
+        { with: 'fed-target', text: 'Central banks watch it to judge their credibility.', strength: 'usually' },
+      ],
+      glossaryTerms: ['inflation', 'central-bank'],
+    },
+    'us-cpi-core-yoy': {
+      plainName: 'US core inflation',
+      oneLine: 'US inflation with the jumpy food and energy prices taken out.',
+      ifRising: 'A rising core usually keeps the Fed tough for longer.',
+      ifFalling: 'A cooling core usually signals inflation fading at its roots.',
+      connections: [
+        { with: 'us-cpi-yoy', text: 'Both come from the same monthly price report.', strength: 'reliable' },
+        { with: 'us-pce-core-yoy', text: 'The Fed’s core gauge reads the same underlying direction.', strength: 'usually' },
+      ],
+      glossaryTerms: ['inflation', 'core-inflation'],
+    },
+    'us-wages': {
+      plainName: 'US pay growth',
+      oneLine: 'How fast American paychecks are growing, versus a year ago.',
+      ifRising: 'Faster pay sustains spending, but can feed inflation, the loop central banks watch.',
+      ifFalling: 'Pay growing slower than prices usually squeezes household budgets.',
+      connections: [
+        { with: 'us-cpi-yoy', text: 'The gap between this and price growth decides whether households gain ground.', strength: 'usually' },
+        { with: 'fed-target', text: 'The Fed watches the pay-and-price loop when setting rates.', strength: 'usually' },
+      ],
+      glossaryTerms: ['inflation', 'central-bank'],
+    },
+    'breakeven-10y': {
+      plainName: 'US inflation, ten years ahead',
+      oneLine: 'The US inflation rate markets expect over the next ten years.',
+      ifRising: 'Bond markets are pricing more future inflation, which usually lifts long-term rates.',
+      ifFalling: 'Markets fear weak inflation ahead, the setting that invites easy money.',
+      connections: [
+        { with: 'breakeven-5y5y', text: 'The far-ahead companion reads the window beyond five years.', strength: 'reliable' },
+        { with: 't5yie', text: 'The five-year companion reads the nearer window.', strength: 'reliable' },
+        { with: 'us10y', text: 'Expected inflation is one building block of the ten-year rate.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['inflation', 'bond'],
+    },
+    't5yie': {
+      plainName: 'US inflation, five years ahead',
+      oneLine: 'The US inflation rate markets expect over the next five years.',
+      ifRising: 'Markets are pricing more inflation over the medium term, usually lifting long rates.',
+      ifFalling: 'Markets fear soft inflation ahead, the setting that invites easy money.',
+      connections: [
+        { with: 'breakeven-10y', text: 'The ten-year companion reads the wider window.', strength: 'reliable' },
+        { with: 'breakeven-5y5y', text: 'The far-ahead companion reads beyond it.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['inflation'],
     },
   } satisfies Record<string, Layer1Entry>,
 };
