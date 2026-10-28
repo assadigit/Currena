@@ -126,6 +126,20 @@ export type Bindings = {
   NARRATOR_WEB_DAILY_CAP?: string;
   /** The model id (default 'gemini-3.5-flash-lite' — D-28's re-verified default). */
   NARRATOR_MODEL?: string;
+  /**
+   * D-41 — the model provider: 'gemini' (default, the M3 REST client + the
+   * GEMINI_API_KEY secret) OR 'cloudflare' (the Workers AI BINDING below —
+   * no token, no secret, no region risk). The cloudflare path clamps
+   * NARRATOR_WEB_CONTEXT to false (workers-ai has no google-search grounding).
+   */
+  NARRATOR_PROVIDER?: string;
+  /**
+   * D-41 — the Workers AI binding (active only when NARRATOR_PROVIDER=cloudflare).
+   * Authenticates IMPLICITLY via the Cloudflare account — NO API token is
+   * stored anywhere (the binding is the auth). Set in wrangler.jsonc as
+   * `"ai": { "binding": "AI" }`.
+   */
+  AI?: import('@currena/insights/narrator').AiBinding;
 };
 
 export interface AppDeps {

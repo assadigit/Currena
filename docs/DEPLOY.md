@@ -130,6 +130,74 @@ run it (or the individual gates) before deploying. Repair is owner-side:
 5. Keep the local-gate discipline regardless: `pnpm gates` green before
    every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-10-28g the Insights Layer-2 narrator — the Cloudflare Workers AI provider (D-41; additive, non-breaking; NO deploy)
+
+The owner asked to "try using cloudflare models" instead of Gemini. This
+session re-verified Workers AI access on the account, found a suitable
+model, and built the **provider-agnostic** client as an ADDITIVE path —
+the Gemini default is unchanged; the Cloudflare path is opt-in via one
+env flag. Full findings + the architecture in
+`docs/insights/layer2/DECISIONS.md` D-41.
+
+- **Workers AI access — re-verified live (read-only).** A probe of the
+  account's model catalog (the owner's token, used ONCE, NEVER stored)
+  returned 39 text-generation models. Three multilingual candidates were
+  tested against the REAL narrator base rules + section task + a
+  stressed global-section STATE, with the `response_format: json_schema`
+  path: `@cf/meta/llama-3.3-70b-instruct-fp8-fast` (WINNER — valid JSON,
+  23w EN / 26w FA, 100% Persian script, correct half-spaces, ~4.2s,
+  50.6 neurons/call), `@cf/zai-org/glm-4.7-flash` (reasoning model —
+  `content:null`, incompatible), `@cf/qwen/qwen3-30b-a3b-fp8` (same).
+- **The architecture — the Workers AI BINDING (no token at runtime).**
+  The Cloudflare path uses `env.AI.run(model, input)` — the binding
+  authenticates IMPLICITLY via the Cloudflare account. NO API token, NO
+  secret, NO `wrangler secret put`. This is strictly safer than the
+  Gemini path (which needs `GEMINI_API_KEY` as a secret) and ELIMINATES
+  D-31's region risk (the call never leaves Cloudflare's network → the
+  403 "location not supported" failure is impossible).
+- **Files (additive, non-breaking):**
+  `packages/insights/src/narrator/model-client.ts` (the
+  `NarratorModelClient` interface — `GeminiClient` + the new
+  `CloudflareAiClient` both implement it; the cron talks to the
+  interface), `packages/insights/src/narrator/cloudflare-ai-client.ts`
+  (the client — call type A via the binding + json_schema; 15s timeout;
+  one retry; the same {en,fa} parse discipline; call type B returns the
+  not-available outcome — Part 3 has no grounding on this path),
+  `packages/insights/src/narrator/cloudflare-ai-client.test.ts` (21
+  mocked-binding tests), `apps/api/src/narrator-cron.ts` (`narratorFlagsOf`
+  adds `provider`; the factory picks the client; `client` widens to
+  `NarratorModelClient | null`), `apps/api/wrangler.jsonc` (the `ai`
+  binding + `NARRATOR_PROVIDER=gemini` default), `apps/api/src/index.ts`
+  (the `AI` + `NARRATOR_PROVIDER` bindings).
+- **Part 3 ("In the news") — DISABLED on the Cloudflare path.** Workers
+  AI has no Google Search grounding. `narratorFlagsOf` clamps
+  `webContext=false` when `provider==='cloudflare'`. D-29's
+  Part-3-disabled default is preserved. (The Gemini path retains Part 3,
+  still disabled by default.)
+- **Gates ALL GREEN** (no deploy): secret scan (8 patterns · 645 files) ·
+  typecheck (6 packages) · lint (0/0) · copy:audit (clean) · narrator
+  vocabulary (129×2 + 23×2) · narrator eval (50 checks) · **layer1
+  strict 7809/7809 UNCHANGED** · full suite **10,050 tests** (+29: 21 new
+  CloudflareAiClient + 8 new narrator-cron D-41) · build budget (entry
+  295.37/88.84 · Insights lazy 1100.49/258.36 — the new code is in the
+  insights/api packages, NOT the web bundle).
+- **NO deploy.** The default stays `NARRATOR_PROVIDER=gemini` (the live
+  worker `4f4db8d6` is untouched). The owner deploys the new `ai`
+  binding + flips the provider when ready (copy-paste in DECISIONS.md
+  D-41 §5):
+  ```sh
+  cd apps/api && pnpm exec wrangler deploy        # adds the ai binding
+  cd apps/api && pnpm exec wrangler versions upload --var NARRATOR_PROVIDER:cloudflare --var NARRATOR_ENABLED:true
+  # read https://currena.ir/?narrative=preview#/insights (the :50 rung makes the first AI calls)
+  ```
+- **The token the owner pasted in chat** (`cfut_S4…`) was used ONLY for
+  the read-only verification probe (listing models + one test
+  generation). It is NOT stored in the repo, the Worker, or any env
+  file. The runtime Cloudflare path needs NO token (the binding is the
+  auth). The owner should rotate the token if the chat transcript is
+  stored/transmitted anywhere public (it is a Cloudflare API token with
+  account scope).
+
 ## Session record — 2026-10-28f the Insights Layer-2 narrator — INDEPENDENT RE-VERIFICATION (worker 4f4db8d6 still active, Layer 2 confirmed COMPLETE)
 
 A continuation session was asked to "finish it up" after several earlier

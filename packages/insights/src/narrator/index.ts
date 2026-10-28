@@ -138,6 +138,16 @@ export type { TemplateState } from './template';
 export { GeminiClient, STATE_NARRATIVE_SCHEMA, classifyHttpError, extractGrounding, extractOutputText } from './gemini-client';
 export type { GeminiClientOptions, GeminiError, GeminiErrorKind, GeminiOutcome, NewsNoteText, StateNarrativeText } from './gemini-client';
 
+// ---- D-41: the provider-agnostic client + the Cloudflare Workers AI path ----
+// The narrator picks a model client from NARRATOR_PROVIDER (default 'gemini'
+// → unchanged behaviour). The Cloudflare path uses a Workers AI BINDING
+// (env.AI) — no token, no secret, no region risk. Part 3 stays disabled on
+// the cloudflare path (workers-ai has no google-search grounding).
+export { CLOUDFLARE_DEFAULT_MODEL } from './model-client';
+export type { NarratorError, NarratorModelClient, NarratorOutcome, NarratorProvider } from './model-client';
+export { CloudflareAiClient, extractBindingText } from './cloudflare-ai-client';
+export type { AiBinding, CloudflareAiClientOptions } from './cloudflare-ai-client';
+
 // ---- M2: the prompts (spec §6, versioned) ----
 export {
   BASE_RULES,

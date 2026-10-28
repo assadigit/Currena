@@ -871,14 +871,146 @@ the Layer-2 narrator build):
     version ID, the EN+FA screenshots at 360px and 1280px) lands in the
     DEPLOY.md session record per the existing pattern.
 
-## D-40+ — Reserved: post-M5 (the owner's first live week)
+## D-41 — The Cloudflare Workers AI provider (the owner's pivot; additive, non-breaking)
 
-**Reserved** — after M5 ships + the owner sets the key + reads a week of
-real text at the preview URL, the next session records: the
-`NARRATOR_ENABLED=true` flip (templates → AI), the first live stats
-buckets, the first kill-criterion review, and (if green) the
-`NARRATOR_VISIBLE=true` flip (preview → public). The D-29 grounding-terms
-gate stays closed until the owner reads the current Google terms in full
-+ confirms each display requirement is implementable (the
-`requiredDisplay` rendering path in InTheNews is built; the gate is the
-terms review, not the code).
+**Context.** After Layer 2 shipped COMPLETE (M1–M5, disabled by default),
+the owner asked to "try using cloudflare models" instead of Gemini. The
+spec (§5, §10) was written for Gemini (free-tier key, schema-constrained
+JSON, Google Search grounding for Part 3). This decision records the
+re-verified findings + the additive, non-breaking implementation that
+lets the owner switch providers with one env flag. The Gemini path stays
+the default (unchanged behaviour); the Cloudflare path is opt-in.
+
+### 1. Workers AI access — re-verified live (read-only API probe)
+
+A read-only probe of the account's Workers AI model catalog (the owner's
+token, used ONCE for verification, never stored) returned 39
+text-generation models. Three multilingual candidates were tested against
+the REAL narrator base rules + section task (verbatim from `prompt.ts`)
++ a realistic stressed global-section STATE, with the `response_format:
+json_schema` path for `{en, fa}`:
+
+| model | result | Farsi quality |
+|---|---|---|
+| `@cf/meta/llama-3.3-70b-instruct-fp8-fast` | **WINNER** — valid JSON, 23w EN / 26w FA, ~4.2s, 50.6 neurons | 100% Persian script, 0% Latin, correct half-spaces (`شاخص‌های`, `نشان‌دهندهٔ`), native spoken-formal register |
+| `@cf/zai-org/glm-4.7-flash` | reasoning model — `content:null`, output in `reasoning` field; conflicts with the json_schema path | n/a (not extracted) |
+| `@cf/qwen/qwen3-30b-a3b-fp8` | reasoning model — same `content:null` issue | n/a (not extracted) |
+
+**Pick:** `@cf/meta/llama-3.3-70b-instruct-fp8-fast` (`CLOUDFLARE_DEFAULT_MODEL`).
+The reasoning models (GLM-4.7-flash, Qwen3) put their output in a
+`reasoning` field instead of `content`, which is incompatible with the
+json_schema structured-output path the narrator needs; they are also
+slower + use more neurons. Llama 3.3 70B honours the schema, produces
+clean native Farsi, and is the documented general-purpose instruct pick.
+
+### 2. The architecture — the Workers AI binding (NO token at runtime)
+
+The Cloudflare path uses a Workers AI **binding** (`env.AI.run(model,
+input)`), configured in `wrangler.jsonc` as `"ai": { "binding": "AI" }`.
+The binding authenticates IMPLICITLY via the Cloudflare account — **no
+API token, no secret, no `wrangler secret put`**. This is strictly safer
+than the Gemini path (which needs `GEMINI_API_KEY` as a Worker secret).
+
+**The win over D-31 (region risk):** the call never leaves Cloudflare's
+network → the 403 "location not supported" failure mode is IMPOSSIBLE.
+D-31's open risk (the template-fallback default + the
+`placement: { mode: 'smart' }` mitigation) is closed for the Cloudflare
+path. The Gemini path retains its region risk (unchanged).
+
+**Files (additive, non-breaking):**
+- `packages/insights/src/narrator/model-client.ts` — the
+  `NarratorModelClient` interface + neutral type aliases. `GeminiClient`
+  and the new `CloudflareAiClient` both implement it (the cron talks to
+  the interface, not a concrete class).
+- `packages/insights/src/narrator/cloudflare-ai-client.ts` — the
+  `CloudflareAiClient` (call type A via `env.AI.run` + json_schema; 15s
+  timeout; one retry on network/timeout; the same {en,fa} parse +
+  schema discipline as the Gemini client). Call type B returns the
+  not-available outcome (Part 3 has no grounding — see §4).
+- `packages/insights/src/narrator/cloudflare-ai-client.test.ts` — 21
+  mocked-binding tests (success, retry ladder, quota/invalid-key/timeout/
+  empty/schema, the OpenAI-compatible shape, the spy on the request body).
+- `apps/api/src/narrator-cron.ts` — `narratorFlagsOf` adds `provider`
+  ('gemini' default | 'cloudflare'); the client factory picks
+  `CloudflareAiClient` when `provider==='cloudflare'`; the
+  `client` type widens from `GeminiClient | null` to
+  `NarratorModelClient | null` (the call sites `generateUnit` +
+  `generateNews` are unchanged in behaviour).
+- `apps/api/wrangler.jsonc` — the `ai` binding + the `NARRATOR_PROVIDER`
+  var (default 'gemini').
+- `apps/api/src/index.ts` — `NARRATOR_PROVIDER` + `AI` binding on the
+  `Bindings` type.
+
+### 3. Free-tier numbers (re-verified via the live probe)
+
+- **Neurons per call type A:** ~50.6 (Llama 3.3 70B, ~1243 tokens for a
+  realistic section prompt + a 90-word bilingual answer). The narrator's
+  daily budget (~5 sections + 1 overall + regenerations ≈ 10–20 calls/day)
+  → ~500–1000 neurons/day — well under the free-tier 10,000 neurons/day.
+- **Rate limits:** Workers AI free tier = 10,000 neurons/day (re-verify
+  in https://developers.cloudflare.com/workers-ai/platform/limits/ before
+  the owner enables). The narrator's ~24 hourly ticks × ≤3 calls/tick
+  is capped well inside this.
+- **No secret to rotate:** the binding is the auth; the token the owner
+  pasted in chat was used ONLY for this read-only verification probe
+  (listing models + one test generation) and is NOT stored in the repo,
+  the Worker, or any env file. The owner should still rotate the token
+  if the chat transcript is stored/transmitted anywhere public (it is a
+  Cloudflare API token with account scope).
+
+### 4. Part 3 ("In the news") — DISABLED on the Cloudflare path
+
+Workers AI has NO Google Search grounding. Part 3 (call type B, the
+grounded "In the news" note) is unavailable on the Cloudflare path.
+`narratorFlagsOf` clamps `webContext=false` when
+`provider==='cloudflare'`, so `generateNews` is never called. The
+`CloudflareAiClient.callNewsNote` returns the not-available outcome
+defensively (kind 'region', honest detail). D-29's Part 3-disabled
+default is preserved; the Gemini path retains Part 3 (still disabled by
+default, available when the owner enables it after the grounding-terms
+review). To ship Part 3 on the Cloudflare path would need a separate
+web-search + summarization pipeline — out of scope for this decision.
+
+### 5. The rollout (owner-side, copy-paste)
+
+The default stays `NARRATOR_PROVIDER=gemini`. To try the Cloudflare path
+(the binding must be deployed first — M4-style deploy with the new
+`wrangler.jsonc`):
+
+```sh
+# 1. Deploy with the new ai binding (the provider var stays 'gemini' by default):
+cd apps/api && pnpm exec wrangler deploy
+
+# 2. Flip to the Cloudflare provider (no key, no secret needed):
+cd apps/api && pnpm exec wrangler versions upload --var NARRATOR_PROVIDER:cloudflare --var NARRATOR_ENABLED:true
+
+# 3. Read the preview URL (templates → AI via the binding):
+#    https://currena.ir/?narrative=preview#/insights
+#    (the narrator rung fires at :50 UTC; the first AI texts land within the hour)
+
+# 4. To switch back to Gemini (or templates):
+cd apps/api && pnpm exec wrangler versions upload --var NARRATOR_PROVIDER:gemini
+```
+
+### 6. Gates (this decision)
+
+All 9 gates green: secret scan (8 patterns · 645 files) · typecheck (6
+packages) · lint (0/0) · copy:audit (clean) · narrator vocabulary
+(129×2 + 23×2) · narrator eval (50 checks) · **layer1 strict
+7809/7809 UNCHANGED** · full suite **10,050 tests** (+29: 21 new
+CloudflareAiClient + 8 new narrator-cron D-41) · build budget (entry
+295.37/88.84 · Insights lazy 1100.49/258.36 — the new code is in the
+insights/api packages, NOT the web bundle). No deploy in this decision
+(the owner deploys when ready to try the Cloudflare path).
+
+## D-42+ — Reserved: post-D-41 (the owner's first Cloudflare-path week)
+
+**Reserved** — after the owner deploys the `ai` binding + flips
+`NARRATOR_PROVIDER=cloudflare` + `NARRATOR_ENABLED=true`, the next
+session records: the first live binding calls (the `:50` rung), the
+first stats buckets on the Cloudflare path (aiValid / apiErrors /
+neurons-implied), the Farsi-quality spot check against the Gemini path
+(if the owner A/B tests both), and the kill-criterion review. If the
+Cloudflare path is green for a week, the owner may flip
+`NARRATOR_VISIBLE=true` (preview → public). D-31's region-risk note is
+CLOSED for the Cloudflare path (impossible by design).

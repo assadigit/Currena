@@ -58,7 +58,21 @@
     "NARRATOR_VISIBLE": "false",
     "NARRATOR_WEB_CONTEXT": "false",
     "NARRATOR_WEB_DAILY_CAP": "20",
-    "NARRATOR_MODEL": "gemini-3.5-flash-lite"
+    "NARRATOR_MODEL": "gemini-3.5-flash-lite",
+    // D-41 — the model provider. Default 'gemini' (the M3 REST client + the
+    // GEMINI_API_KEY secret). Flip to 'cloudflare' to use the Workers AI
+    // binding below (no token, no secret, no region risk — auth is implicit).
+    // The cloudflare path clamps NARRATOR_WEB_CONTEXT to false (workers-ai
+    // has no google-search grounding → Part 3 stays disabled).
+    "NARRATOR_PROVIDER": "gemini"
+  },
+  // D-41 — the Workers AI binding (active only when NARRATOR_PROVIDER=cloudflare).
+  // Authenticates IMPLICITLY via the Cloudflare account; NO API token is stored
+  // anywhere (the binding is the auth). Default model:
+  // @cf/meta/llama-3.3-70b-instruct-fp8-fast (D-41 §3 — re-verified live:
+  // clean native Farsi, 0% Latin, correct half-spaces, ~4s, ~50 neurons/call).
+  "ai": {
+    "binding": "AI"
   },
   "assets": {
     "directory": "../web/dist",

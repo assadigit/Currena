@@ -89,7 +89,7 @@ const AI_GOOD = JSON.stringify({
 });
 
 describe('M4 narratorFlagsOf — the env flag resolution', () => {
-  it('defaults: disabled, invisible, no web context, cap 20, gemini-3.5-flash-lite, no key', () => {
+  it('defaults: disabled, invisible, no web context, cap 20, gemini-3.5-flash-lite, no key, provider gemini', () => {
     const flags = narratorFlagsOf(env({}));
     expect(flags).toEqual({
       enabled: false,
@@ -97,6 +97,7 @@ describe('M4 narratorFlagsOf — the env flag resolution', () => {
       webDailyCap: 20,
       model: 'gemini-3.5-flash-lite',
       hasKey: false,
+      provider: 'gemini',
     });
   });
 
@@ -115,6 +116,7 @@ describe('M4 narratorFlagsOf — the env flag resolution', () => {
     expect(flags.webDailyCap).toBe(5);
     expect(flags.model).toBe('gemini-3.8-flash');
     expect(flags.hasKey).toBe(true);
+    expect(flags.provider).toBe('gemini');
   });
 });
 
@@ -275,6 +277,122 @@ describe('M4 runScheduledNarrator — the enabled path (mocked fetch)', () => {
     });
     // every fetch was a call-type-A interactions POST (no google_search tool)
     expect(fetchImpl).toHaveBeenCalled();
+    const stats = parseStatsDoc(map.get(NARRATOR_STATS_KEY)!)!;
+    expect(stats.days['2026-10-28']!.newsAttempted).toBe(0);
+  });
+});
+
+describe('D-41 narratorFlagsOf — the cloudflare provider path', () => {
+  it('provider=cloudflare: hasKey follows the AI binding, webContext is clamped false', () => {
+    const flagsWithBinding = narratorFlagsOf(
+      env({
+        NARRATOR_ENABLED: 'true',
+        NARRATOR_PROVIDER: 'cloudflare',
+        NARRATOR_WEB_CONTEXT: 'true', // ignored on the cloudflare path
+        AI: { async run() { return { response: '' }; } },
+      }),
+    );
+    expect(flagsWithBinding.provider).toBe('cloudflare');
+    expect(flagsWithBinding.hasKey).toBe(true); // the binding exists
+    expect(flagsWithBinding.webContext).toBe(false); // clamped (no grounding)
+    expect(flagsWithBinding.model).toBe('@cf/meta/llama-3.3-70b-instruct-fp8-fast');
+  });
+
+  it('provider=cloudflare but NO binding: hasKey false → templates (the safe-without-binding rule)', () => {
+    const flags = narratorFlagsOf(env({ NARRATOR_PROVIDER: 'cloudflare' }));
+    expect(flags.provider).toBe('cloudflare');
+    expect(flags.hasKey).toBe(false);
+  });
+
+  it('provider=cloudflare honours NARRATOR_MODEL override', () => {
+    const flags = narratorFlagsOf(
+      env({ NARRATOR_PROVIDER: 'cloudflare', NARRATOR_MODEL: '@cf/qwen/qwen3-30b-a3b-fp8' }),
+    );
+    expect(flags.model).toBe('@cf/qwen/qwen3-30b-a3b-fp8');
+  });
+
+  it('an unknown provider falls back to gemini', () => {
+    const flags = narratorFlagsOf(env({ NARRATOR_PROVIDER: 'mistral' }));
+    expect(flags.provider).toBe('gemini');
+  });
+});
+
+describe('D-41 runScheduledNarrator — the cloudflare provider path (mocked AI binding)', () => {
+  it('enabled + cloudflare provider + a valid binding answer: source "ai", no fetch used', async () => {
+    const { kv, map } = makeKv();
+    seedDocuments(map);
+    const fetchImpl = vi.fn() as unknown as typeof fetch; // must NOT be called
+    const ai = {
+      run: vi.fn(async () => ({
+        response: AI_GOOD,
+        usage: { prompt_tokens: 100, completion_tokens: 80, total_tokens: 180 },
+      })),
+    };
+    const result = await runScheduledNarrator(
+      env({ RATES: kv, NARRATOR_ENABLED: 'true', NARRATOR_PROVIDER: 'cloudflare', AI: ai }),
+      { now: NOW, fetchImpl },
+    );
+    expect(result.aiValid).toBe(3);
+    expect(result.templateUsed).toBe(0);
+    expect(fetchImpl).not.toHaveBeenCalled();
+    expect(ai.run).toHaveBeenCalledTimes(3); // 3 units × 1 attempt (passed validators)
+    const doc = parseNarrativeDoc(map.get(NARRATIVE_KV_KEY)!)!;
+    expect(doc.sections['global']!.source).toBe('ai');
+    expect(doc.model).toBe('@cf/meta/llama-3.3-70b-instruct-fp8-fast');
+    const stats = parseStatsDoc(map.get(NARRATOR_STATS_KEY)!)!;
+    expect(stats.days['2026-10-28']!.aiValid).toBe(3);
+  });
+
+  it('enabled + cloudflare provider but NO binding: templates, zero binding calls', async () => {
+    const { kv, map } = makeKv();
+    seedDocuments(map);
+    const result = await runScheduledNarrator(
+      env({ RATES: kv, NARRATOR_ENABLED: 'true', NARRATOR_PROVIDER: 'cloudflare' }),
+      { now: NOW },
+    );
+    expect(result.templateUsed).toBe(3);
+    expect(result.aiValid).toBe(0);
+    const doc = parseNarrativeDoc(map.get(NARRATIVE_KV_KEY)!)!;
+    expect(doc.sections['global']!.source).toBe('template');
+  });
+
+  it('a validation failure retries ONCE via the binding, then falls back to template', async () => {
+    const { kv, map } = makeKv();
+    seedDocuments(map);
+    const ai = {
+      run: vi.fn(async () => ({
+        // deliberately bad both times: banned advice word (V4)
+        response: JSON.stringify({ en: 'You should buy gold now.', fa: 'حتماً طلا بخرید.' }),
+      })),
+    };
+    const result = await runScheduledNarrator(
+      env({ RATES: kv, NARRATOR_ENABLED: 'true', NARRATOR_PROVIDER: 'cloudflare', AI: ai }),
+      { now: NOW },
+    );
+    expect(ai.run).toHaveBeenCalledTimes(6); // 3 units × 2 attempts
+    expect(result.templateUsed).toBe(3);
+    const doc = parseNarrativeDoc(map.get(NARRATIVE_KV_KEY)!)!;
+    expect(doc.sections['global']!.source).toBe('template');
+    const stats = parseStatsDoc(map.get(NARRATOR_STATS_KEY)!)!;
+    expect(stats.days['2026-10-28']!.aiFailedByCheck['V4']).toBeGreaterThanOrEqual(3);
+  });
+
+  it('webContext=true is ignored on the cloudflare path (Part 3 stays disabled)', async () => {
+    const { kv, map } = makeKv();
+    seedDocuments(map);
+    const ai = {
+      run: vi.fn(async () => ({ response: AI_GOOD, usage: {} })),
+    };
+    await runScheduledNarrator(
+      env({
+        RATES: kv,
+        NARRATOR_ENABLED: 'true',
+        NARRATOR_PROVIDER: 'cloudflare',
+        NARRATOR_WEB_CONTEXT: 'true', // must be clamped to false
+        AI: ai,
+      }),
+      { now: NOW },
+    );
     const stats = parseStatsDoc(map.get(NARRATOR_STATS_KEY)!)!;
     expect(stats.days['2026-10-28']!.newsAttempted).toBe(0);
   });

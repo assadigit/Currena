@@ -32,6 +32,8 @@
 
 import {
   GeminiClient,
+  CloudflareAiClient,
+  CLOUDFLARE_DEFAULT_MODEL,
   PROMPT_VERSION,
   buildNarratorUserMessage,
   buildNewsUserMessage,
@@ -44,6 +46,8 @@ import {
   templateNarrative,
   validateNewsNote,
   validateStateNarrative,
+  type NarratorModelClient,
+  type NarratorProvider,
   type NarratorSectionId,
   type NarratorUnit,
   type NarratorVocabulary,
@@ -131,15 +135,34 @@ export interface NarratorFlags {
   webDailyCap: number;
   model: string;
   hasKey: boolean;
+  /** D-41 — the model provider ('gemini' default | 'cloudflare'). */
+  provider: NarratorProvider;
 }
 
 export function narratorFlagsOf(env: Bindings): NarratorFlags {
+  const provider: NarratorProvider =
+    env.NARRATOR_PROVIDER === 'cloudflare' ? 'cloudflare' : 'gemini';
+  const hasKey =
+    provider === 'cloudflare'
+      ? env.AI !== undefined
+      : typeof env.GEMINI_API_KEY === 'string' && env.GEMINI_API_KEY !== '';
+  // D-41 §5: workers-ai has no google-search grounding → Part 3 is unavailable
+  // on the cloudflare path. Clamp webContext to false so generateNews is never
+  // called (the client's callNewsNote also returns the not-available outcome
+  // defensively, but this avoids the stats noise + the daily-cap read).
+  const webContext =
+    provider === 'cloudflare' ? false : env.NARRATOR_WEB_CONTEXT === 'true';
+  const model =
+    provider === 'cloudflare'
+      ? env.NARRATOR_MODEL || CLOUDFLARE_DEFAULT_MODEL
+      : env.NARRATOR_MODEL || 'gemini-3.5-flash-lite';
   return {
     enabled: env.NARRATOR_ENABLED === 'true',
-    webContext: env.NARRATOR_WEB_CONTEXT === 'true',
+    webContext,
     webDailyCap: Number(env.NARRATOR_WEB_DAILY_CAP ?? '20') || 20,
-    model: env.NARRATOR_MODEL || 'gemini-3.5-flash-lite',
-    hasKey: typeof env.GEMINI_API_KEY === 'string' && env.GEMINI_API_KEY !== '',
+    model,
+    hasKey,
+    provider,
   };
 }
 
@@ -252,13 +275,16 @@ export async function runScheduledNarrator(
 
   // 3. The capped batch (page order; the rest continue next tick).
   const batch = pending.slice(0, NARRATOR_MAX_CALLS_PER_TICK);
-  const client =
+  const client: NarratorModelClient | null =
     flags.enabled && flags.hasKey
-      ? new GeminiClient({
-          apiKey: env.GEMINI_API_KEY!,
-          model: flags.model,
-          ...(deps.fetchImpl !== undefined ? { fetchImpl: deps.fetchImpl } : {}),
-        })
+      ? flags.provider === 'cloudflare'
+        ? // D-41: the Workers AI binding — no token, no fetch, no region risk.
+          new CloudflareAiClient({ ai: env.AI!, model: flags.model })
+        : new GeminiClient({
+            apiKey: env.GEMINI_API_KEY!,
+            model: flags.model,
+            ...(deps.fetchImpl !== undefined ? { fetchImpl: deps.fetchImpl } : {}),
+          })
       : null;
 
   // The doc being written: start from the stored one (unchanged units keep
@@ -347,7 +373,7 @@ function vocabularyForState(state: SectionNarrationState | OverallNarrationState
 }
 
 async function generateUnit(args: {
-  client: GeminiClient | null;
+  client: NarratorModelClient | null;
   flags: NarratorFlags;
   env: Bindings;
   work: UnitWork;
@@ -430,7 +456,7 @@ async function generateUnit(args: {
 
 /** The news note (call type B): generate, W-check, omit on any failure (no retry). */
 async function generateNews(args: {
-  client: GeminiClient;
+  client: NarratorModelClient;
   flags: NarratorFlags;
   env: Bindings;
   work: UnitWork;
