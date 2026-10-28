@@ -83,6 +83,67 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## Session record — 2026-10-28 the Insights Layer-1 plain-language layer ships: 129/129 ids live, zero data changes (final L1 session, worker c02d736a)
+
+- **Deploy-lock check first** (the D-43 lesson): the versions API showed the
+  last currena-api upload at **2026-10-27T18:31:05Z** (version `27f42b9c` —
+  the R10 session's deploy, recorded in `docs/insights/ROUND10_REPORT.md`
+  STEP 11 + CHANGELOG §Round 10), ~14 hours BEFORE the M3 pushes
+  (f3ad520..2f884a1, 2026-10-28 06:45–08:11 UTC) → no parallel session
+  deployed while M3 ran. The two intermediate versions newer than
+  DEPLOY.md's prior newest record (`78bfc0df`, the 2026-10-26c final) are
+  both accounted for in the repo's own records: `f489a69a`
+  (2026-10-27T00:57Z, the previous session's 16-failure fix) and
+  `babce831` (2026-10-27T04:06Z, the R9 deploy) — R9/R10 are ancestors of
+  the deployed HEAD. `git fetch` confirmed origin/main still at `2f884a1`
+  (tree clean, no newer commits). Deploy-lock CLEAR.
+- **Deployed**: `pnpm --filter @currena/web build` → `pnpm --filter
+  @currena/api exec wrangler deploy`: currena-api
+  **`c02d736a-c0f8-45bf-89bb-f0629ab3ecaf`** (2026-10-28 ~08:31 UTC —
+  18 new assets uploaded, the Insights chunk `Insights-p-JnCvcS.js` among
+  them). currena-markets NOT redeployed: the Layer-1 work touches
+  `apps/web` + docs only; the only packages/ delta since R10 is
+  comment-only (the 051be75 tidy-up's doc-reference removals) — the
+  deployed markets worker is functionally identical to HEAD.
+- **What went live**: the complete Layer-1 plain-language layer (M1+M2+M3,
+  129/129 unique ids — 100 indicators + 16 market indices + 17 FX
+  rows/patterns, the 4 shared FX ids counted once, D-11): every Insights
+  card carries a plain oneLine on its face and, when expanded, the
+  Layer-1 block (ifRising/ifFalling with D-06 direction emphasis,
+  connections, australiaAngle where applicable, the 23-term EN+FA
+  glossary); market detail panels, FX pair panels and the 7 FX pattern
+  cards render the same block through the shared `Layer1Block` (D-17,
+  pattern cards with the D-09 no-direction note). **Zero data changes**:
+  data fetching, thresholds, verdict math, KV usage and the visual design
+  system untouched; G10 free-tier safety holds (zero added KV operations,
+  zero added external calls).
+- **Gates re-verified from a clean state before the deploy** (the D-07
+  final-session protocol): `LAYER1_STRICT=1` layer1 vitest **7809/7809**;
+  typecheck 6/6; copy:audit **✓ clean** (manifest 4546, all layer1
+  round); build + budget — entry 295.37/88.84 kB (budgets 296/89.50),
+  Insights lazy 1092.56/256.31 kB (budgets 1100/260, the D-16 ceiling);
+  lint 0 errors; full suite green (core 191, scraper 67, insights 677,
+  markets 13, api 344, web 8525 — every count identical to the M3
+  record); local render-check on all four surfaces (indicator card, market
+  tile, FX pair panel, pattern card) EN+FA at 1280px AND 360px, zero
+  console errors, zero horizontal overflow.
+- **Live verification** (https://currena.ir, both locales, 1280px + 360px):
+  `/api/health` 200 (`ok:true, kv:ok`), `/api/insights` serves the
+  100-reading snapshot (generatedAt 2026-10-28T04:20Z — Layer 1 adds zero
+  data changes), `/api/insights/markets|fx|status` all 200. All four
+  surfaces expanded and verified in EN and FA, desktop and mobile: brent
+  (indicator card + details dialog), Nikkei 225 (market tile detail),
+  EUR/USD (pair panel), r6 Europe-worry (pattern card, open at Level 2 by
+  default) — the Layer-1 block renders on each, no horizontal overflow at
+  360px, zero console errors, FA fully RTL with Persian digits. The D-11
+  shared-id contract spot-checked live on USD/JPY and AUD/JPY: the SAME
+  entry renders on the FX pair panel and the indicator card details —
+  one entry per id across surfaces. Evidence: 17 screenshots in
+  `docs/insights/screenshots/layer1-final/` (all four surfaces × EN/FA ×
+  1280/360 + the shared-id catch).
+- **No rollback needed**; no live-verification catches (nothing to fix
+  post-deploy).
+
 ## Session record — 2026-10-26c the A-1..A-10 gap-audit build: the ten additions, the 89→100 hop, the two deploy-verification catches
 
 - **Deployed**: `3fc36820-618d-4adf-9772-2c87fddf26c8` (the A-1..A-10

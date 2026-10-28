@@ -58,6 +58,20 @@ gate list + the owner's deploy-lock check (docs/DEPLOY.md) and deploys.
   detail, FX pair panel, pattern card; screenshots in
   `docs/insights/screenshots/layer1-m3/`). Free-tier safety holds:
   zero KV operations, zero external calls added (G10).
+- **Deployed (the final L1 session, 2026-10-28)**: currena-api
+  `c02d736a-c0f8-45bf-89bb-f0629ab3ecaf` — the deploy-lock check ran
+  first (last prior upload `27f42b9c` at 2026-10-27T18:31Z, the R10
+  deploy, predating the M3 pushes; no parallel session), every gate
+  re-verified green from a clean state (LAYER1_STRICT=1 7809/7809,
+  typecheck, copy:audit clean 4546, budget 1100/260 held at
+  1092.56/256.31, lint, full suite 9817 across packages), and
+  live-verified on https://currena.ir in BOTH locales at 1280px and
+  360px: all four surfaces render the Layer-1 block, zero console
+  errors, zero overflow, the 100-reading snapshot untouched, the D-11
+  shared ids (USD/JPY, AUD/JPY spot-checked) render one entry per id on
+  both surfaces. 17 screenshots in
+  `docs/insights/screenshots/layer1-final/`; the full session record in
+  `docs/DEPLOY.md`. **Layer 1 is live: 129/129.**
 
 ## [2026-10-29] — Insights Layer 1 (session 3, Milestone 2): prices and Australia completed
 
