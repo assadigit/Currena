@@ -5,6 +5,57 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-28f] — Insights Layer-2 narrator M3: the Gemini client + the set-key tool + the offline eval harness
+
+Milestone 3 of the narrator build (spec §5 + §10 + §12): the model
+client, the owner-only key path, and the offline evaluation harness. No
+key exists in the repo (by design); no Worker code changed; no deploy.
+
+- **`packages/insights/src/narrator/gemini-client.ts`** — the Gemini
+  REST client on the CURRENT canonical surface (the Interactions API,
+  re-verified in D-28): call type A (schema-constrained `{en, fa}` JSON,
+  temperature 0.2, short max tokens, 15 s timeout, ONE retry on
+  network/5xx/timeout — never on 4xx) and call type B (the grounded news
+  note: plain text, `EN:`/`FA:` block or the single word NONE, the
+  url_citation sources + Google's search-suggestions display element
+  extracted). Every failure is a typed VALUE (invalid-key · quota ·
+  region · http · network · timeout · schema · empty) with redacted
+  details — never a throw, never the key/prompts/raw output. The
+  response shape is parsed defensively (output_text, the output blocks,
+  generateContent-style fallback).
+- **`gemini-client.test.ts`** (17 tests) — the mocked-fetch ladder:
+  success both call types, the retry rules, region refusal, invalid
+  key, quota, schema-invalid/empty, code-fence stripping, the pure
+  parsers (both the current and the legacy grounding shapes).
+- **`scripts/narrator-set-key.mjs`** (`pnpm narrator:set-key`) — the
+  OWNER-ONLY key path: hidden input, refuses argument/env values, warns
+  on the non-AIza shape (the OAuth "AQ." confusion), validates with ONE
+  minimal call (the models list — zero generation tokens), pipes to
+  `wrangler secret put GEMINI_API_KEY` via stdin; wrangler-auth failures
+  print the single fix command; success prints "Key saved. Nothing else
+  to do."
+- **`scripts/narrator-eval.mjs`** (`pnpm narrator:eval`, gate 6): the
+  offline eval — 3 prep fixtures re-derived, 7 section/overall fixtures
+  through the templates (V1–V10, both languages), the prompt assembly
+  (deterministic, no key shape), 4 good mocked model outputs accepted
+  and 10 deliberately bad ones rejected by their intended checks
+  (invented number/cause, advice, wrong tone, English digits in Farsi,
+  missing out-of-date clause; news digits/quotes/no-sources/
+  no-attribution). 50 checks, one screen.
+- **`scripts/gates.mjs`** — the narrator eval joins as gate 6 (after
+  the vocabulary drift check); the secret scan skips the scanner's own
+  file (its samples are fake by construction — planted-key detection
+  re-verified).
+- **DECISIONS.md** — D-34 (the staged-rollout visibility flag: default
+  false, `?narrative=preview` before the hash, the one-line flip) +
+  D-37 (M3's implementation decisions).
+
+Gates (clean run, `pnpm gates`): secret scan clean (8 patterns · 630
+files) · typecheck 6/6 · lint 0/0 · copy:audit clean (4,703) · narrator
+vocabulary in sync · **narrator eval 50 checks** · **layer1 strict
+7,809/7,809 unchanged** · full suite **10,003 passed (+17)** · budget
+held 295.37/88.84 + 1094.09/256.83. No deploy.
+
 ## [2026-10-28e] — Insights Layer-2 narrator M2: the four prompts (versioned) + the secret-scan gate
 
 Milestone 2 of the narrator build (spec §6 + §10's secret scan): the

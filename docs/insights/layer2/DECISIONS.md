@@ -550,13 +550,37 @@ section, per spec §10).
 deploy — is unreachable while a credential is in the tree, and the
 self-test keeps the patterns from rotting silently.
 
-## D-34 — Reserved: The staged-rollout visibility flag
+## D-34 — The staged-rollout visibility flag (decided in M3; implemented in M4–M5)
 
-**Reserved** — the next session records: `NARRATOR_VISIBLE` env var
-default = `false`. Narratives are generated + stored but shown only in
-preview (URL marker `?narrative=preview` works with the hash router).
-The owner reads real text on the real page for ~1 week, then flips
-visibility (one `wrangler vars` or `wrangler secret` update).
+**Assumption.** Spec §11: "STAGED ROLLOUT: while `NARRATOR_VISIBLE=false`
+the narratives are generated and stored but shown only in preview (URL
+marker that works with the hash router, e.g. `?narrative=preview`). The
+owner reads real text on the real page for about a week, then flips
+visibility."
+
+**Decision.** `NARRATOR_VISIBLE` defaults to **`false`** in
+`apps/api/wrangler.jsonc` vars. The generation cycle (M4) runs and stores
+narratives regardless (the flag is DISPLAY-only — the KV always carries
+the texts, so flipping visibility never waits for a generation cycle).
+The preview marker is `?narrative=preview` BEFORE the hash (the SPA is a
+hash router: `currena.ir/?narrative=preview#/insights` — a query the
+Worker's asset serving passes through untouched, read once at app boot,
+never persisted). The flip is one owner command:
+
+```sh
+# flip visibility ON (or back OFF) — a vars update + redeploy:
+cd apps/api && pnpm exec wrangler versions upload --var NARRATOR_VISIBLE:true
+```
+
+(or edit `wrangler.jsonc` and redeploy the normal way — the command form
+keeps it one copy-paste line). The owner reads real text at the preview
+URL for about a week, then flips; the kill criteria (D-35/M5) flip it
+back off the same way.
+
+**Reason.** The default-off + one-line flip keeps the rollout reversible
+to the second: nothing user-facing changes until the owner has read a
+week of real output in both languages, and the KV-backed texts mean the
+flip is instant.
 
 ## D-35 — Reserved: The kill criteria defaults
 
@@ -625,12 +649,52 @@ conservatively, pinned by tests):
    unusual move). The builder script is committed for regeneration on
    intentional contract changes only.
 
-## D-37+ — Reserved: per-implementation decisions (M2 onward)
+## D-37 — M3 implementation decisions (the client + the tools)
 
-**Reserved** — the next milestones record: the `PROMPT_VERSION` initial
-value (M2); the secret-scan patterns + gate placement (M2); the
-Gemini-client call shapes for the Interactions API (M3); the
-narrator-cron rung minute, the KV value layout and the stats buckets
-(M4); the display-block bundle impact + any D-16 path (M5); and
-deploy-time findings (the currena-api version IDs, the
-live-verification screenshots path, etc.).
+The per-implementation decisions of Milestone 3:
+
+1. **The client speaks the Interactions API** (D-28's re-verification):
+   `POST /v1beta/interactions` with `system_instruction` + `input` +
+   `generation_config` (temperature 0.2, short max_output_tokens) +
+   `response_format` (the `{en, fa}` JSON schema, call type A) or
+   `tools: [{type: 'google_search'}]` (call type B). The key rides ONLY
+   in the `x-goog-api-key` header.
+2. **The response shape is parsed defensively.** The static docs publish
+   SDK helpers (`output_text`) but not the raw REST JSON;
+   `extractOutputText` reads `output_text`, the outputs/output content
+   blocks, and the generateContent-style candidates as a compatibility
+   fallback. The set-key tool's one validation call (the models list) is
+   the live check on the key; M4's first live generation confirms the
+   response shape, and the client reports a typed `schema` error (never
+   a crash) if Google moves it.
+3. **Every failure is a value, never a throw**: the typed error taxonomy
+   (invalid-key · quota · region · http · network · timeout · schema ·
+   empty) is what M4's stats buckets count. Details are redacted (≤120
+   chars, one line) — never the key, a full prompt or raw output (spec
+   §5's logging rule).
+4. **The retry ladder**: exactly ONE retry on network/timeout/5xx;
+   never on 4xx (an invalid key or a region refusal must not burn a
+   second call). 15 s timeout per attempt via AbortSignal.
+5. **The set-key tool** (`pnpm narrator:set-key`) reads the key with
+   hidden input only, refuses it as an argument/env value, warns on the
+   non-AIza shape (the OAuth "AQ." confusion), validates with ONE
+   minimal call (the models list — zero generation tokens), then pipes
+   it to `wrangler secret put GEMINI_API_KEY` via stdin in apps/api;
+   wrangler auth failures print the single fix command. Success prints
+   exactly "Key saved. Nothing else to do."
+6. **The offline eval** (`pnpm narrator:eval`, gate 5): 3 prep fixtures
+   re-derived + 7 section/overall fixtures through the templates (V1–V10
+   both languages) + the prompt assembly (deterministic, no key shape) +
+   4 good mocked model outputs accepted + 10 deliberately bad ones
+   rejected by their intended checks (invented number V3, invented cause
+   V7 — the sample names an out-of-state indicator by its plainName,
+   advice V4, wrong tone V8, English digits in Farsi V6, missing
+   out-of-date clause V10, news digits W2 / quotes W8 / no sources W1 /
+   no attribution W4). 50 checks total.
+
+## D-38+ — Reserved: per-implementation decisions (M4 onward)
+
+**Reserved** — the next milestones record: the narrator-cron rung minute,
+the KV value layout and the stats buckets (M4); the display-block bundle
+impact + any D-16 path (M5); and deploy-time findings (the currena-api
+version IDs, the live-verification screenshots path, etc.).

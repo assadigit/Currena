@@ -74,6 +74,10 @@ const ALLOWED_VALUES = new Set([
 const SKIPPED_FILES = new Set([
   // integrity hashes are 100% base64 noise; no credential lives here
   'pnpm-lock.yaml',
+  // the scanner itself: its pattern sources and its in-memory self-test
+  // samples are fake by construction (a real key pasted into the scanner
+  // would be caught by every OTHER run of the scan in review diffs)
+  'scripts/secret-scan.mjs',
 ]);
 
 /** Text-ish extensions worth scanning (everything else is skipped as binary). */
@@ -117,7 +121,6 @@ function scanAll() {
     } catch {
       continue; // unreadable (removed between ls-files and read) — skip
     }
-    const lines = content.split('\n');
     for (const { name, re } of PATTERNS) {
       for (const match of content.matchAll(re)) {
         // the allowlist matches the VALUE (the captured group when there is
@@ -126,9 +129,6 @@ function scanAll() {
         if (ALLOWED_VALUES.has(match[0]) || (match[1] !== undefined && ALLOWED_VALUES.has(match[1]))) continue;
         const upto = content.slice(0, match.index);
         const line = upto.split('\n').length;
-        const lineText = lines[line - 1] ?? '';
-        // skip the pattern's own documentation inside this scanner's comments
-        if (file === 'scripts/secret-scan.mjs' && lineText.includes('never real values')) continue;
         findings.push({ file, line, name, value: redact(match[0]) });
       }
     }

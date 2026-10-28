@@ -19,7 +19,9 @@
     "registry:generate": "tsx scripts/generate-indicators-registry.ts",
     "narrator:vocabulary": "pnpm --filter @currena/insights run narrator:vocabulary",
     "narrator:vocabulary:check": "pnpm --filter @currena/insights run narrator:vocabulary:check",
-    "gates": "node scripts/gates.mjs"
+    "gates": "node scripts/gates.mjs",
+    "narrator:set-key": "pnpm --filter @currena/insights exec tsx ../../scripts/narrator-set-key.mjs",
+    "narrator:eval": "pnpm --filter @currena/insights exec tsx ../../scripts/narrator-eval.mjs"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

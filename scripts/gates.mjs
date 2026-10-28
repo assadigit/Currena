@@ -16,11 +16,14 @@
  *   2. lint             — pnpm lint (0 errors, 0 warnings)
  *   3. copy:audit       — the Persian copy manifest audit (✓ clean)
  *   4. narrator vocab   — the generated Worker vocabulary drift check (P3)
- *   5. layer1 strict    — LAYER1_STRICT=1 vitest on layer1.test.ts
+ *   5. narrator eval    — the offline eval harness (M3: fixtures ×
+ *                         templates × mocked model outputs, incl. the
+ *                         deliberately bad ones)
+ *   6. layer1 strict    — LAYER1_STRICT=1 vitest on layer1.test.ts
  *                         (the 7,809-assertion validator — its count must
  *                         not change silently)
- *   6. full suite       — pnpm -r run test (every package, never live)
- *   7. build + budget   — pnpm -r run build + check-bundle-budget.mjs
+ *   7. full suite       — pnpm -r run test (every package, never live)
+ *   8. build + budget   — pnpm -r run build + check-bundle-budget.mjs
  *
  * Every step runs even when an earlier one fails (the summary shows the
  * complete picture; the exit code is non-zero on ANY failure).
@@ -78,6 +81,17 @@ const GATES = [
     parse: (out) => {
       const m = out.match(/(\d+) indicators \+ (\d+) glossary terms × 2 languages/);
       return m !== null ? `in sync (${m[1]}×2 + ${m[2]}×2)` : null;
+    },
+  },
+  {
+    id: 'narrator-eval',
+    label: 'narrator eval',
+    cmd: 'pnpm narrator:eval',
+    parse: (out) => {
+      const m = out.match(/(\d+) checks passed — eval clean/);
+      if (m === null) return null;
+      const fixtures = out.match(/(\d+) prep \+ (\d+) section\/overall/);
+      return fixtures !== null ? `${m[1]} checks (${fixtures[1]} prep + ${fixtures[2]} section fixtures)` : `${m[1]} checks`;
     },
   },
   {
