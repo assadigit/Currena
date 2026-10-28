@@ -130,6 +130,84 @@ run it (or the individual gates) before deploying. Repair is owner-side:
 5. Keep the local-gate discipline regardless: `pnpm gates` green before
    every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-10-28h the Insights Layer-2 narrator — Cloudflare Workers AI DEPLOYED LIVE (worker 4b21428e at 100%; NARRATOR_PROVIDER=cloudflare + NARRATOR_ENABLED=true; preview-only; first real AI text on currena.ir)
+
+The owner asked to "push merge commit deploy on live site so i can see." The
+D-41 code was already on `main` (`0207f73`, then `39cd314` for the model-default
+fix caught during this deploy). This session did the deploy + the flag flip +
+the live verification. **The Cloudflare Workers AI narrator is now generating
+real AI text on currena.ir** (preview-only; the public URL is unchanged).
+
+- **Deploy-lock check first**: the deployments API showed production at
+  `4f4db8d6` (the M5 deploy, 13:47 UTC), no parallel session. Clear.
+- **Gates green before deploy**: secret scan (8 · 648) · typecheck (6) · lint
+  (0/0) · copy:audit · narrator vocab · narrator eval (50) · layer1 strict
+  7809/7809 · full suite 10,051 tests · budget (entry 295.37/88.84 · Insights
+  lazy 1100.49/258.36).
+- **The deploy** (3 steps):
+  1. `pnpm --filter @currena/api exec wrangler deploy` → version `0ff1b592`
+     (adds the `env.AI` Workers AI binding to the live worker; default vars
+     stay gemini/false).
+  2. `wrangler versions upload --var NARRATOR_PROVIDER:cloudflare --var
+     NARRATOR_ENABLED:true` → version `a860b141` (the overrides).
+  3. Rolled out via the deployments API (POST strategy=percentage 100%) →
+     deployment `149e8d65`.
+- **The bug caught mid-deploy** (`39cd314`): the live `NARRATOR_MODEL` var
+  carried the wrangler.jsonc default `gemini-3.5-flash-lite`. The original
+  `narratorFlagsOf` returned that string as the cloudflare-path model →
+  `env.AI.run('gemini-3.5-flash-lite', …)` is an invalid Workers AI model
+  id → every call would fail. Fix: on the cloudflare path, treat an unset OR
+  gemini-default `NARRATOR_MODEL` as "not set" → fall back to
+  `CLOUDFLARE_DEFAULT_MODEL` (`@cf/meta/llama-3.3-70b-instruct-fp8-fast`).
+  Regression test added. Redeployed as version `4b21428e` → deployment
+  `cf858d06` at 100%.
+- **Forced AI regeneration**: cleared `insights:narrative:v1` in KV (the
+  stored template units had fresh hashes + <24h age → would NOT regenerate
+  on the flag flip alone). The next `:50` rung regenerated all units through
+  the Cloudflare binding.
+- **The 16:50 UTC rung fired** (`generatedAt: 2026-10-28T16:50:17Z`,
+  `model: @cf/meta/llama-3.3-70b-instruct-fp8-fast`):
+  - **`global` section: `source: "ai"`** — real Cloudflare-AI text, EN + FA.
+    EN: "The global section is stressed. The US inflation rate and the Bank
+    of England's main interest rate are two important readings. A rising US
+    inflation rate usually keeps world interest rates high for longer…"
+    FA: "بخش جهانی تحت فشار است. نرخ تورم ایالات متحده و نرخ اصلی بانک
+    انگلستان دو خوانش مهم هستند…" (native Persian, correct half-spaces,
+    hedged language).
+  - `overall` + `australia`: fell back to `template` (V2 length + V10
+    exclusion-clause failures — the validators doing their job; NOT a binding
+    error). `apiErrors: {}` — **zero API errors** (D-31's region risk is
+    CLOSED: the binding never leaves Cloudflare's network).
+  - `world-markets` + `world-currencies`: pending the 17:50 UTC rung (the
+    3-unit-per-tick cap; the first tick did overall+global+australia).
+- **Browser live-verification** (agent-browser, real chromium):
+  - The preview URL `https://currena.ir/?narrative=preview#/insights` renders
+    THREE `data-narrative-block` elements (`sources: ["template","ai","template"]`)
+    in EN AND FA (label «خلاصهٔ ساده», Persian digits, correct half-spaces) at
+    1280px AND 360px mobile (block width 328px, no overflow). **ZERO console
+    errors.** Screenshot: `docs/insights/screenshots/layer2-m5/cloudflare-ai-fa-360.png`.
+  - The normal URL `https://currena.ir/#/insights` renders ZERO narrative
+    blocks (the `visible:false` + no-preview-marker gate is closed — public
+    visitors see nothing new). ZERO console errors.
+- **Stats** (`insights:narrator:stats`): runs 4, aiValid 1, templateUsed 7,
+  apiErrors `{}` (zero), aiFailedByCheck `{V2: 8, V10: 2}`. The V2/V10
+  failures are prompt/model-tuning items (some outputs slightly over the
+  90-word limit or missing the out-of-date clause) — the validators catch
+  them + the template fallback ensures the page never breaks. This is the
+  spec's safety design working as intended.
+- **What the owner sees now**: open `https://currena.ir/?narrative=preview#/insights`
+  — the Global section's block is real Cloudflare AI text (EN + FA, with the
+  "AI-written, not financial advice" / «نوشته‌شده با هوش مصنوعی، نه توصیهٔ مالی»
+  disclaimer that only appears on `source:"ai"` units). The other sections
+  (overall, australia) are templates until their next regeneration; world-markets
+  + world-currencies land at the 17:50 UTC rung.
+- **The flags are LIVE-runtime only** (the committed `wrangler.jsonc`
+  default stays `gemini`/`false` — the conservative default). To switch back:
+  `cd apps/api && pnpm exec wrangler versions upload --var
+  NARRATOR_PROVIDER:gemini --var NARRATOR_ENABLED:false` + roll out.
+- **To go public** (after the owner reads a week of preview): `cd apps/api &&
+  pnpm exec wrangler versions upload --var NARRATOR_VISIBLE:true` + roll out.
+
 ## Session record — 2026-10-28g the Insights Layer-2 narrator — the Cloudflare Workers AI provider (D-41; additive, non-breaking; NO deploy)
 
 The owner asked to "try using cloudflare models" instead of Gemini. This
