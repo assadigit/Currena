@@ -27,7 +27,7 @@ import type { NarratorVocabulary } from './vocabulary';
 import type { NarratorUnit } from './validate';
 
 /** The prompt version (spec §6: versioned). Bump on ANY prompt change. */
-export const PROMPT_VERSION = 1;
+export const PROMPT_VERSION = 2;
 
 /* ------------------------------------------------------------------ *
  * §6.1 — the shared base rules (included in A-section and A-overall)
@@ -50,13 +50,21 @@ Hard rules:
  * §6.2 — the section task (A-section = base rules + this)
  * ------------------------------------------------------------------ */
 
-export const SECTION_TASK = `TASK: Explain what this one section shows today. 3 to 5 sentences, at most 90 words per language. Start with the big picture of the section (calm, mixed or under pressure, according to the tier counts and any verdict label in STATE), then name at most the two most important readings and what each usually means for everyday life, using VOCABULARY.`;
+export const SECTION_TASK = `TASK: Explain what this one section shows today as ONE cohesive paragraph (never a stitched list of indicator names). 3 to 5 sentences, at most 90 words per language.
+
+Open with the big picture of the section in everyday words (calm, mixed or under pressure, from the tier counts and any verdict label in STATE). Then weave in the readings the section actually flags — name at most two or three, and for each that carries one, use its level (STATE alerts carry value, valueUnit, delta, context; e.g. "US 10-year yield sits at 5.0 percent, down 0.17 points over 30 days", or "the Kospi is 38 percent below its yearly high"). When two or more related ids share the section and VOCABULARY carries a connection (ifRising, ifFalling, connections), draw that connection in the same paragraph — never invent a relationship VOCABULARY does not state.
+
+Use plain words and the plain names from VOCABULARY. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. End with one short clause if STATE lists excluded items. Weave the numbers into the prose — do not list them.`;
 
 /* ------------------------------------------------------------------ *
  * §6.3 — the overall task (A-overall = base rules + this)
  * ------------------------------------------------------------------ */
 
-export const OVERALL_TASK = `TASK: Write the overall summary of the whole page. 4 to 6 sentences, at most 120 words per language. State the overall verdict(s) given in STATE in everyday words, then the one or two themes that stand out across sections, using only STATE and VOCABULARY. End with one sentence reminding the reader this explains data and is not a recommendation.`;
+export const OVERALL_TASK = `TASK: Write the overall summary of the whole page as ONE cohesive paragraph (never a stitched list of verdicts). 4 to 6 sentences, at most 120 words per language.
+
+Open by stating the page's verdicts in everyday words (each section's verdict label rides in STATE with its counts; e.g. "Global reads Stressed, with 9 of 32 scored indicators in warning"). Then name one or two themes that stand out across sections, using only STATE and VOCABULARY — when an alert in one section carries a level (value, delta, context), use its actual number to anchor the theme (e.g. "the US 10-year yield sits at 5.0 percent, down 0.17 points over 30 days", "the Kospi is 38 percent below its yearly high", or "EUR/CHF moved 2.2 percent in a month"). Draw a connection between two sections only when VOCABULARY states one (ifRising, ifFalling, connections) — never invent one.
+
+End with one sentence reminding the reader this explains data and is not a recommendation. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. Weave the verdicts and the numbers into the prose — do not list them.`;
 
 /* ------------------------------------------------------------------ *
  * §6.4 — the news-context prompt (call type B; standalone — no base

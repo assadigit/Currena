@@ -1003,7 +1003,127 @@ CloudflareAiClient + 8 new narrator-cron D-41) · build budget (entry
 insights/api packages, NOT the web bundle). No deploy in this decision
 (the owner deploys when ready to try the Cloudflare path).
 
-## D-42+ — Reserved: post-D-41 (the owner's first Cloudflare-path week)
+## D-42 — Enrich the narrator STATE so the model can weave a cohesive narrative (PROMPT_VERSION 2)
+
+**Problem.** The owner reviewed the first week of live Cloudflare-path
+output and called it "much much much weaker than my worst imagination":
+mechanical stitched sentences ("One reading in warning is X: oneLine.
+Another is Y: oneLine.") instead of a fluent, cohesive narrative. The
+root cause is structural, not prompt-only:
+
+- `SectionAlert` carried only `{ id, tier, direction, magnitude }`. The
+  actual reading value (the 4.3 % yield, the $4,050 gold price, the
+  S&P 500 at 5,800), the delta vs the prior period, and the trend
+  context the dashboard already computes (distance from the 52-week
+  high, the 3-month change) were NOT in STATE.
+- Base rule 1 ("Use only facts in STATE. Never add numbers... not in
+  STATE") and validator V3 (every number in the output must come from
+  the unit's own STATE) together meant the model had almost no raw
+  material — it could only parrot plainName + oneLine + the ifRising /
+  ifFalling phrase. Result: stitched, mechanical.
+- A latent V3 bug made this worse on the FA side: `numberTokensOf`
+  normalised Persian/Arabic digits but NOT the Persian/Arabic decimal
+  separator U+066B (٫). So a correct model output like "تورم ۴٫۳ درصد"
+  parsed as TWO numbers (4 and 3) instead of 4.3 — and 4 alone is rarely
+  in the allowed set, so V3 rejected the model output and the template
+  fell back in its place. Every decimal in the FA model output tripped
+  V3 and silently downgraded to template.
+
+**Fix (this decision).** Enrich `SectionAlert` additively with the four
+facts the dashboard already has but the model never saw:
+
+```
+value: number | null            // the reading's own level (5.0, 5800, 1.12)
+valueUnit: string | null         // plain unit ('index points', 'rate'); null for indicators
+delta: { value, unit, window } | null   // the recent change (30d / since-previous-release / 3m / 1m)
+context: { fromHigh?, chg3m? } | null   // trend context where available
+```
+
+The legacy `magnitude` (the rule's own plain one-rounded-number
+summary) stays verbatim — nothing existing breaks. Populated in all
+three builder branches:
+
+- indicator (global / australia): `value` = the item's reading (already
+  on `NarrationItem.value`, now also on the alert so the model does not
+  have to cross-reference); `delta` = the magnitude (same shape);
+  `valueUnit` and `context` are null (the per-series unit varies wildly
+  and `NarrationItem` carries no trend context today — exposing
+  `fromPeak10y` would widen NarrationItem, out of scope here).
+- world-markets: `value` = `row.close`, `valueUnit` = 'index points',
+  `delta` = the 3-month change (the section's normal timeframe, the
+  view switch's default), `context` = `{ fromHigh }`.
+- world-currencies: `value` = `pair.rate`, `valueUnit` = 'rate',
+  `delta` = the 1-month change (the fx section's alerting leg). FX rule
+  patterns have no level — `value`/`valueUnit`/`context` are null.
+
+V3 already walks the state recursively and field-name-agnostically, so
+the new alert fields' numbers are automatically in the allowed set
+(with their roundings + signs). The Persian/Arabic decimal separator
+bug is fixed in `numberTokensOf` (U+066B → '.' before parsing) so
+"۴٫۳" parses as 4.3, not 4 and 3.
+
+The prompts are bumped (PROMPT_VERSION 1 → 2 — the cron regenerates
+every stored narrative on the next rung). The new SECTION_TASK and
+OVERALL_TASK instruct the model to weave the actual values + deltas
+into ONE cohesive paragraph, name at most 2–3 readings WITH their
+actual numbers, and draw the connections the VOCABULARY permits
+(ifRising / ifFalling / connections) when 2+ related ids share the
+section — never inventing a relationship. Base rules unchanged: still
+no invention, no advice, no prediction, Persian digits, half-spaces,
+the JSON-only output rule.
+
+The template (template.ts) is enriched too — the indicator template's
+alert sentences now weave the value + delta into a parenthesised
+clause: "Another is Euro-area inflation (at 3.8, up 0.6 points since
+previous release): <oneLine>." in EN, mirrored in FA with natural
+Persian word order: "مورد دیگر، تورم منطقهٔ یورو (در ۳٫۸، ۰٫۶ نقطه
+بالاتر از انتشار قبلی): <oneLine>." Markets and currencies templates
+are unchanged (their S1 already names the counts; the indicator
+section's value was the missing piece). The template still passes
+V1–V10 for every fixture in both langs (verified by template.test.ts).
+
+**Conservative choices (this decision):**
+
+1. `valueUnit = null` for indicators — the per-series unit varies wildly
+   (yields, scores, balances, prices, probabilities), and there is no
+   per-indicator unit field today. Letting the model phrase the value
+   based on plainName + oneLine is safer than guessing 'percent' for a
+   non-percent reading.
+2. `context = null` for indicators — `NarrationItem` carries no trend
+   context (only the raw value). Exposing `fromPeak10y` would widen
+   `NarrationItem` and require a new P4 contract; out of scope here.
+3. `context = null` for currencies — `moveRank`/`bigMove` don't fit the
+   spec's `context` shape `{ fromHigh?, chg3m? }`, and they're already
+   encoded in the alert's `tier: 'unusual-move'` + the item's own
+   fields. Adding them under new keys would widen the type beyond spec.
+4. `delta = magnitude` for indicators and currencies — the alert's
+   magnitude IS the recent change for these sections; duplicating it
+   as `delta` makes the field explicit and matches the spec's intent.
+5. The Persian decimal-separator fix in `numberTokensOf` is minimal
+   (U+066B → '.') and does NOT touch `normalizeDigits` (which the
+   Layer-1 strict test shares) — the Layer-1 strict count stays 7,809.
+6. The `sentences()` helper's split regex gains a negative lookahead
+   `(?![0-9])` so a decimal like "5.283" no longer splits as "5." and
+   "283" (V2 was over-counting sentences for the enriched template).
+   The Layer-1 copy carries no decimals, so its sentence counts are
+   unchanged.
+
+**Files changed.** `packages/insights/src/narrator/{section-state.ts,
+prompt.ts, validate.ts, template.ts, wordlists.ts}` ·
+`packages/insights/src/narrator/prompt.test.ts` (inline snapshots
+re-pinned, PROMPT_VERSION expect bumped to 2) ·
+`packages/insights/fixtures/narration/sections/*.json` (re-derived:
+the enriched SectionAlert shape lands in every golden fixture) ·
+`scripts/narrator-eval.mjs` (expects PROMPT_VERSION === 2) ·
+`packages/insights/scripts/regenerate-section-fixtures.mts` (the
+one-off re-deriver, kept for future re-runs).
+
+**No deploy in this decision.** The owner reviews the code + gate
+output, then deploys when ready. The next `:50` rung regenerates every
+stored narrative (the cron compares `promptVersion`); the first AI
+texts with the richer STATE land within the hour after the deploy.
+
+## D-43+ — Reserved: post-D-42 (the owner's first Cloudflare-path week)
 
 **Reserved** — after the owner deploys the `ai` binding + flips
 `NARRATOR_PROVIDER=cloudflare` + `NARRATOR_ENABLED=true`, the next

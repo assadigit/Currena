@@ -123,6 +123,14 @@ function allowedNumbersOf(state: AnyState, vocab: { en: NarratorVocabulary; fa: 
       allowed.add(Math.abs(v));
     }
   };
+  // The walk is RECURSIVE and field-name agnostic — it picks up every number
+  // anywhere in the state, including the PROMPT_VERSION-2 enrichments on
+  // SectionAlert (`value`, `valueUnit` carries no number, `delta.value`,
+  // `context.fromHigh`, `context.chg3m`) and every number on the items
+  // themselves. The VOCABULARY walk below adds the model-provided text's
+  // own numbers (tenor tokens etc.). The Persian/Arabic decimal-separator
+  // normalization for the OUTPUT side lives in `numberTokensOf` (V3's
+  // consumer): "۴٫۳" → 4.3 there, and 4.3 (with its roundings) is here.
   const walk = (value: unknown, key: string): void => {
     if (typeof value === 'number') {
       add(value);
@@ -161,9 +169,18 @@ function allowedNumbersOf(state: AnyState, vocab: { en: NarratorVocabulary; fa: 
   return allowed;
 }
 
-/** The number tokens a text carries (Persian/Arabic digits normalised, thousands unseparated). */
+/** The number tokens a text carries (Persian/Arabic digits normalised, the Persian/Arabic decimal separator U+066B treated as '.', thousands unseparated). */
 function numberTokensOf(text: string): number[] {
-  const normalized = normalizeDigits(text).replace(/(\d),(\d{3})\b/g, '$1$2');
+  const normalized = normalizeDigits(text)
+    // PROMPT_VERSION 2 (D-42): the Persian/Arabic decimal separator (U+066B
+    // ٫) MUST be normalised to the ASCII dot — otherwise "۴٫۳" parses as
+    // two separate numbers (4 and 3) and a correct model output ("۴٫۳ درصد")
+    // fails V3 because 4 and 3 alone are not both in the allowed set. The
+    // owner's "much much much weaker than my worst imagination" complaint
+    // traces partly to this: every decimal in the FA model output tripped V3
+    // and the template fell back in its place.
+    .replace(/\u066B/g, '.')
+    .replace(/(\d),(\d{3})\b/g, '$1$2');
   const out: number[] = [];
   for (const m of normalized.matchAll(/\d+(?:[.]\d+)?/g)) {
     const n = Number(m[0]);

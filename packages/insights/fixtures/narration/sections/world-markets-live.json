@@ -9106,6 +9106,16 @@
           "value": -38.14,
           "unit": "percent",
           "window": "from-52w-high"
+        },
+        "value": 5638.34,
+        "valueUnit": "index points",
+        "delta": {
+          "value": -0.44,
+          "unit": "percent",
+          "window": "3m"
+        },
+        "context": {
+          "fromHigh": -38.14
         }
       },
       {
@@ -9116,6 +9126,16 @@
           "value": -9.61,
           "unit": "percent",
           "window": "from-52w-high"
+        },
+        "value": 7887.14,
+        "valueUnit": "index points",
+        "delta": {
+          "value": -6.2,
+          "unit": "percent",
+          "window": "3m"
+        },
+        "context": {
+          "fromHigh": -9.61
         }
       },
       {
@@ -9126,6 +9146,16 @@
           "value": -17.62,
           "unit": "percent",
           "window": "from-52w-high"
+        },
+        "value": 23041.32,
+        "valueUnit": "index points",
+        "delta": {
+          "value": -10.72,
+          "unit": "percent",
+          "window": "3m"
+        },
+        "context": {
+          "fromHigh": -17.62
         }
       },
       {
@@ -9136,6 +9166,16 @@
           "value": -15.96,
           "unit": "percent",
           "window": "from-52w-high"
+        },
+        "value": 175710.05,
+        "valueUnit": "index points",
+        "delta": {
+          "value": 1.05,
+          "unit": "percent",
+          "window": "3m"
+        },
+        "context": {
+          "fromHigh": -15.96
         }
       },
       {
@@ -9146,6 +9186,16 @@
           "value": -12.57,
           "unit": "percent",
           "window": "from-52w-high"
+        },
+        "value": 63268.37,
+        "valueUnit": "index points",
+        "delta": {
+          "value": 2.99,
+          "unit": "percent",
+          "window": "3m"
+        },
+        "context": {
+          "fromHigh": -12.57
         }
       },
       {
@@ -9156,6 +9206,16 @@
           "value": -13.59,
           "unit": "percent",
           "window": "from-52w-high"
+        },
+        "value": 22749.75,
+        "valueUnit": "index points",
+        "delta": {
+          "value": -6.19,
+          "unit": "percent",
+          "window": "3m"
+        },
+        "context": {
+          "fromHigh": -13.59
         }
       },
       {
@@ -9166,6 +9226,16 @@
           "value": -14.01,
           "unit": "percent",
           "window": "from-52w-high"
+        },
+        "value": 3648.3,
+        "valueUnit": "index points",
+        "delta": {
+          "value": -4.71,
+          "unit": "percent",
+          "window": "3m"
+        },
+        "context": {
+          "fromHigh": -14.01
         }
       }
     ],

@@ -2115,7 +2115,11 @@
         "id": "cftc-gold-positioning",
         "tier": "needs-attention",
         "direction": "flat",
-        "magnitude": null
+        "magnitude": null,
+        "value": 49.6832,
+        "valueUnit": null,
+        "delta": null,
+        "context": null
       },
       {
         "id": "euro-hicp",
@@ -2125,7 +2129,15 @@
           "value": 0.6,
           "unit": "points",
           "window": "since-previous-release"
-        }
+        },
+        "value": 3.8,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.6,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null
       },
       {
         "id": "michigan-sentiment",
@@ -2135,7 +2147,15 @@
           "value": -3.6,
           "unit": "points",
           "window": "since-previous-release"
-        }
+        },
+        "value": 48.1,
+        "valueUnit": null,
+        "delta": {
+          "value": -3.6,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null
       },
       {
         "id": "real-yield-10y",
@@ -2145,7 +2165,15 @@
           "value": -0.17,
           "unit": "points",
           "window": "30d"
-        }
+        },
+        "value": 2.66,
+        "valueUnit": null,
+        "delta": {
+          "value": -0.17,
+          "unit": "points",
+          "window": "30d"
+        },
+        "context": null
       },
       {
         "id": "recession-probability",
@@ -2155,7 +2183,15 @@
           "value": 0.38,
           "unit": "points",
           "window": "since-previous-release"
-        }
+        },
+        "value": 0.62,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.38,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null
       },
       {
         "id": "us-cpi-yoy",
@@ -2165,7 +2201,15 @@
           "value": 0.34,
           "unit": "points",
           "window": "since-previous-release"
-        }
+        },
+        "value": 3.737684729064035,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.34,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null
       },
       {
         "id": "us-pce-core-yoy",
@@ -2175,7 +2219,15 @@
           "value": 0.02,
           "unit": "points",
           "window": "since-previous-release"
-        }
+        },
+        "value": 3.0075959761855975,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.02,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null
       },
       {
         "id": "us10y",
@@ -2185,7 +2237,15 @@
           "value": -0.17,
           "unit": "points",
           "window": "30d"
-        }
+        },
+        "value": 5,
+        "valueUnit": null,
+        "delta": {
+          "value": -0.17,
+          "unit": "points",
+          "window": "30d"
+        },
+        "context": null
       },
       {
         "id": "us30y",
@@ -2195,7 +2255,15 @@
           "value": -0.18,
           "unit": "points",
           "window": "30d"
-        }
+        },
+        "value": 5.31,
+        "valueUnit": null,
+        "delta": {
+          "value": -0.18,
+          "unit": "points",
+          "window": "30d"
+        },
+        "context": null
       }
     ],
     "patterns": [],

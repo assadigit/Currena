@@ -9100,7 +9100,15 @@
           "value": -2.18,
           "unit": "percent",
           "window": "m1"
-        }
+        },
+        "value": null,
+        "valueUnit": null,
+        "delta": {
+          "value": -2.18,
+          "unit": "percent",
+          "window": "m1"
+        },
+        "context": null
       },
       {
         "id": "eurchf",
@@ -9110,7 +9118,15 @@
           "value": -2.18,
           "unit": "percent",
           "window": "1m"
-        }
+        },
+        "value": 0.92,
+        "valueUnit": "rate",
+        "delta": {
+          "value": -2.18,
+          "unit": "percent",
+          "window": "1m"
+        },
+        "context": null
       }
     ],
     "patterns": [

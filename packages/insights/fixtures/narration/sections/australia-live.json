@@ -2119,7 +2119,15 @@
           "value": 0.27,
           "unit": "points",
           "window": "30d"
-        }
+        },
+        "value": 5.283,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.27,
+          "unit": "points",
+          "window": "30d"
+        },
+        "context": null
       },
       {
         "id": "au-cpi",
@@ -2129,7 +2137,15 @@
           "value": 0.37,
           "unit": "points",
           "window": "since-previous-release"
-        }
+        },
+        "value": 4.340000000000003,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.37,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null
       },
       {
         "id": "au-home-loan",
@@ -2139,7 +2155,15 @@
           "value": 0,
           "unit": "points",
           "window": "since-previous-release"
-        }
+        },
+        "value": 6.2,
+        "valueUnit": null,
+        "delta": {
+          "value": 0,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null
       },
       {
         "id": "au-trimmed-mean",
@@ -2149,7 +2173,15 @@
           "value": 0.05,
           "unit": "points",
           "window": "since-previous-release"
-        }
+        },
+        "value": 3.5886276342485965,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.05,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null
       },
       {
         "id": "au-unemployment",
@@ -2159,7 +2191,15 @@
           "value": 0.07,
           "unit": "points",
           "window": "since-previous-release"
-        }
+        },
+        "value": 4.71834873,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.07,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null
       },
       {
         "id": "au-us-10y-gap",
@@ -2169,7 +2209,15 @@
           "value": -0.27,
           "unit": "points",
           "window": "30d"
-        }
+        },
+        "value": -0.007,
+        "valueUnit": null,
+        "delta": {
+          "value": -0.27,
+          "unit": "points",
+          "window": "30d"
+        },
+        "context": null
       },
       {
         "id": "au-wage-growth",
@@ -2179,7 +2227,15 @@
           "value": -0.02,
           "unit": "points",
           "window": "since-previous-release"
-        }
+        },
+        "value": 3.2030749519538757,
+        "valueUnit": null,
+        "delta": {
+          "value": -0.02,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null
       }
     ],
     "patterns": [],

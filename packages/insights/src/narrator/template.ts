@@ -28,7 +28,7 @@
 
 import { getNarratorVocabulary } from './vocabulary';
 import { toPersianDigits } from './wordlists';
-import type { SectionNarrationState } from './section-state';
+import type { SectionAlert, SectionNarrationState } from './section-state';
 import type { OverallNarrationState } from './overall-state';
 import type { NarratorUnit } from './validate';
 
@@ -77,22 +77,89 @@ const NOT_ADVICE = {
   fa: 'این صفحه داده‌ها را ساده می‌کند و توصیهٔ مالی نیست.',
 } as const;
 
-/** The up-to-two-top-alerts block (name + oneLine), shared by the section kinds. */
+/**
+ * The up-to-two-top-alerts block (name + oneLine), shared by the section
+ * kinds. Enriched (PROMPT_VERSION 2, D-42): when an alert carries a `value`
+ * AND a `delta` (the indicator-section case), the clause weaves both into
+ * the sentence — "Another is Euro-area inflation (at 3.8, up 0.6 points
+ * since the previous release): <oneLine>." Markets and currencies pass
+ * `formatClause: undefined` to keep their existing plain form (their S1
+ * already names the counts; the bonus enrichment is the indicator section's
+ * where the value is the missing piece).
+ */
 function alertSentences(
-  alerts: ReadonlyArray<{ id: string }>,
+  alerts: ReadonlyArray<SectionAlert>,
   lang: 'en' | 'fa',
   firstLead: string,
   secondLead: string,
+  /** Optional value+delta clause weaver (the indicator template uses it; markets/currencies pass undefined). */
+  formatClause?: (alert: SectionAlert, lang: 'en' | 'fa') => string,
 ): string[] {
   const out: string[] = [];
   const entries = alerts
     .slice(0, 2)
-    .map((a) => entryOf(a.id, lang))
-    .filter((e): e is { plainName: string; oneLine: string } => e !== null);
-  for (const [i, entry] of entries.entries()) {
-    out.push(i === 0 ? `${firstLead}${entry.plainName}: ${entry.oneLine}` : `${secondLead}${entry.plainName}: ${entry.oneLine}`);
+    .map((a) => ({ alert: a, entry: entryOf(a.id, lang) }))
+    .filter((e): e is { alert: SectionAlert; entry: { plainName: string; oneLine: string } } => e.entry !== null);
+  for (const [i, { alert, entry }] of entries.entries()) {
+    const clause = formatClause !== undefined ? formatClause(alert, lang) : '';
+    const lead = i === 0 ? firstLead : secondLead;
+    out.push(clause === '' ? `${lead}${entry.plainName}: ${entry.oneLine}` : `${lead}${entry.plainName} ${clause}: ${entry.oneLine}`);
   }
   return out;
+}
+
+/**
+ * The indicator template's value+delta clause (D-42). Returns '' (no
+ * enrichment) when either value or delta is missing — the alert then falls
+ * back to the bare plainName: oneLine form. Otherwise produces a parenthesised
+ * clause:
+ *   EN: "(at V, up D points over W)"  / "(at V, down D points over W)"
+ *   FA: "(در V، D نقطه بالاتر W)"     / "(در V، D نقطه پایین‌تر W)"
+ * Values are rounded to 2 decimals for display (the raw reading may
+ * carry float artefacts like 4.340000000000003 — V3 allows the rounded form
+ * via the `add` function's roundings). Persian digits + the Arabic decimal
+ * separator (U+066B) render correctly via `faNum`; V3's numberTokensOf
+ * normalises U+066B → '.' before parsing. The clause is sized to keep the
+ * alert sentence under the V2 28-word cap (the longest plainName + oneLine
+ * pair in the live fixture still fits with the clause appended). FA uses the
+ * Arabic comma U+060C (،) and natural Persian word order (number+unit before
+ * the direction word).
+ */
+function indicatorValueDeltaClause(alert: SectionAlert, lang: 'en' | 'fa'): string {
+  if (alert.value === null || alert.delta === null) return '';
+  const n = lang === 'fa' ? faNum : String;
+  // Round the displayed values to 2 decimals (matches V3's allowed-set rounding).
+  const valueRounded = Math.round(alert.value * 100) / 100;
+  const deltaAbs = Math.abs(Math.round(alert.delta.value * 100) / 100);
+  const rising = alert.delta.value >= 0;
+  const valuePart = lang === 'fa' ? `در ${n(valueRounded)}` : `at ${n(valueRounded)}`;
+  const unitWord = alert.delta.unit === 'percent'
+    ? (lang === 'fa' ? 'درصد' : 'percent')
+    : (lang === 'fa' ? 'نقطه' : 'points');
+  const windowWord = deltaWindowWord(alert.delta.window, lang);
+  if (lang === 'fa') {
+    const dirWord = rising ? 'بالاتر' : 'پایین‌تر';
+    return `(${valuePart}، ${n(deltaAbs)} ${unitWord} ${dirWord} ${windowWord})`;
+  }
+  const dirWord = rising ? 'up' : 'down';
+  return `(${valuePart}, ${dirWord} ${n(deltaAbs)} ${unitWord} ${windowWord})`;
+}
+
+/** The plain-language phrase for one delta window code (EN + FA). */
+function deltaWindowWord(window: string, lang: 'en' | 'fa'): string {
+  switch (window) {
+    case 'since-previous-release':
+      return lang === 'fa' ? 'از انتشار قبلی' : 'since previous release';
+    case '30d':
+      return lang === 'fa' ? 'طی ۳۰ روز' : 'over 30 days';
+    case '3m':
+      return lang === 'fa' ? 'طی ۳ ماه' : 'over 3 months';
+    case '1m':
+    case 'm1':
+      return lang === 'fa' ? 'طی ۱ ماه' : 'over 1 month';
+    default:
+      return lang === 'fa' ? `طی ${window}` : `over ${window}`;
+  }
 }
 
 /* ------------------------------------------------------------------ *
@@ -119,12 +186,16 @@ function indicatorSectionText(state: SectionNarrationState, lang: 'en' | 'fa'): 
   const sentences: string[] = [s1];
 
   // S2/S3 — up to two top alerts' plainName + oneLine (the state's own
-  // alert order, which is id-sorted).
+  // alert order, which is id-sorted). Enriched (D-42): the indicator
+  // template weaves the alert's value + delta into the sentence when both
+  // are present, so the template itself can read "Euro-area inflation
+  // (at 3.8, up 0.6 points since the previous release): <oneLine>".
   const alertSentencesOut = alertSentences(
     state.alerts,
     lang,
     lang === 'fa' ? 'یکی از موارد هشدار، ' : 'One reading in warning is ',
     lang === 'fa' ? 'مورد دیگر، ' : 'Another is ',
+    indicatorValueDeltaClause,
   );
   sentences.push(...alertSentencesOut);
 

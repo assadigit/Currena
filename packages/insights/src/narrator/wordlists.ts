@@ -39,10 +39,15 @@ export function wordCount(s: string): number {
   return words(s).length;
 }
 
-/** Split prose into sentences on EN . ! ? and FA ۔ ؟ (U+06D4, U+061F). */
+/** Split prose into sentences on EN . ! ? and FA ۔ ؟ (U+06D4, U+061F).
+ * A `.` (or other terminator) immediately followed by a digit is NOT a
+ * sentence terminator — it is the decimal point of a number (PROMPT_VERSION
+ * 2, D-42: the enriched indicator template weaves values like "5.283" into
+ * the prose; without this guard V2 over-counts sentences and falls back to
+ * the template for every indicator section). */
 export function sentences(s: string): string[] {
   return s
-    .split(/[.!?۔؟]+/)
+    .split(/[.!?۔؟]+(?![0-9])/)
     .map((p) => p.trim())
     .filter((p) => p.length > 0);
 }

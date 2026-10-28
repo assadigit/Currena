@@ -71,12 +71,32 @@ export interface SectionNarrationSnapshot {
  * The output
  * ------------------------------------------------------------------ */
 
-/** One firing alert inside a section (spec §3: id, tier, direction, plain magnitude). */
+/**
+ * One firing alert inside a section (spec §3: id, tier, direction, plain
+ * magnitude). Enriched (PROMPT_VERSION 2, D-42) to also carry the reading's
+ * own level (`value` + `valueUnit`), its recent change (`delta`) and the
+ * trend `context` the dashboard already computed (distance from a recent
+ * high, the 3-month change). All four new fields are optional on a per-section
+ * basis — a kind that has no level (an FX rule pattern) carries nulls — and
+ * the legacy `magnitude` (the rule's own plain magnitude, retained verbatim
+ * for back-compat) stays the canonical one-rounded-number summary. The model
+ * may now NAME the value + delta in its prose because they are facts in
+ * STATE (rule 1 still holds); V3's allowed-number walk picks them up
+ * automatically (it walks every number in the state, recursively).
+ */
 export interface SectionAlert {
   id: string;
   tier: 'needs-attention' | 'correction' | 'bear' | 'unusual-move';
   direction: 'rising' | 'falling' | 'flat';
   magnitude: { value: number; unit: 'points' | 'percent'; window: string } | null;
+  /** The reading's own level (e.g. 5.0 for the US 10Y yield, 5800 for the S&P 500, 1.12 for EUR/USD). null when this alert's id has no level (an FX rule pattern). */
+  value: number | null;
+  /** The unit of `value`, in plain words the page already uses ('index points', 'rate'); null when none applies (indicator levels vary by series — the vocabulary's plainName + oneLine phrase the value). */
+  valueUnit: string | null;
+  /** The recent change in the reading (one rounded number + unit + window). For indicator sections this is the same shape as `magnitude` (the 30d or since-previous-release change); for markets it is the 3-month change. null when the section kind carries no change. */
+  delta: { value: number; unit: 'percent' | 'points'; window: string } | null;
+  /** Trend context the dashboard already computed, where available (markets: distance from the 52-week high). null otherwise. */
+  context: { fromHigh?: number; chg3m?: number } | null;
 }
 
 /** One active FX pattern (world-currencies only; the alerting rule outcomes). */
@@ -259,14 +279,34 @@ function buildIndicatorSection(
 
   const items = base.items.filter((i) => i.section === section);
   const itemIds = new Set(items.map((i) => i.id));
+  const itemById = new Map(items.map((i) => [i.id, i]));
+  // Enriched (D-42): the alert also carries the reading's own value (already
+  // in the section's items) and the magnitude as `delta` (the same shape —
+  // the recent 30d / since-previous-release change). Indicator sections have
+  // no `valueUnit` (the per-series unit varies wildly — yields, scores,
+  // balances, prices — and the vocabulary's plainName + oneLine phrase the
+  // level) and no `context` (NarrationItem carries no trend context today;
+  // exposing fromPeak10y would widen NarrationItem, out of scope for D-42).
   const alerts: SectionAlert[] = base.alerts
     .filter((a) => itemIds.has(a.id))
-    .map((a: NarrationAlert) => ({
-      id: a.id,
-      tier: 'needs-attention' as const,
-      direction: a.direction,
-      magnitude: a.magnitude === null ? null : { ...a.magnitude },
-    }));
+    .map((a: NarrationAlert) => {
+      const item = itemById.get(a.id);
+      const value = item?.value ?? null;
+      const delta =
+        a.magnitude === null
+          ? null
+          : { value: a.magnitude.value, unit: a.magnitude.unit, window: a.magnitude.window };
+      return {
+        id: a.id,
+        tier: 'needs-attention' as const,
+        direction: a.direction,
+        magnitude: a.magnitude === null ? null : { ...a.magnitude },
+        value,
+        valueUnit: null,
+        delta,
+        context: null,
+      };
+    });
   const excluded: SectionExcluded[] = base.excluded
     .filter((e) => excludedInSection(e, section))
     .map((e: NarrationExcluded) => ({
@@ -352,11 +392,20 @@ function buildMarketsSection(
       fromHigh: round2(row.fromHigh),
     });
     if (row.status === 'correction' || row.status === 'bear') {
+      // Enriched (D-42): carry the level (`close` in plain 'index points'),
+      // the 3-month change as `delta` (the section's normal timeframe — the
+      // page's view switch defaults to it), and `context.fromHigh` so the
+      // model can speak "X% below its yearly high". The legacy `magnitude`
+      // (the from-52w-high %) stays verbatim.
       alerts.push({
         id: row.id,
         tier: row.status,
         direction: row.trend === 'up' ? 'rising' : row.trend === 'down' ? 'falling' : 'flat',
         magnitude: { value: round2(row.fromHigh), unit: 'percent', window: 'from-52w-high' },
+        value: round2(row.close),
+        valueUnit: 'index points',
+        delta: { value: round2(row.chg3m), unit: 'percent', window: '3m' },
+        context: { fromHigh: round2(row.fromHigh) },
       });
     }
   }
@@ -463,11 +512,23 @@ function buildCurrenciesSection(
       bigMove: pair.bigMove,
     });
     if (pair.bigMove) {
+      // Enriched (D-42): carry the pair's `rate` (a plain 'rate' unit — the
+      // quote units per 1 base; the vocabulary's plainName phrases it as
+      // "euro versus the franc" etc.), and the 1-month change as `delta`
+      // (the fx section's alerting leg). The legacy `magnitude` (the 1m %)
+      // stays verbatim. `context` is null here — moveRank/bigMove are
+      // already encoded in the alert's `tier: 'unusual-move'` and the
+      // item's own fields; the spec's `context` shape (fromHigh/chg3m)
+      // does not apply to a pair row.
       alerts.push({
         id: pair.id,
         tier: 'unusual-move',
         direction: directionOfNumber(pair.chg.m1),
         magnitude: { value: round2(pair.chg.m1), unit: 'percent', window: '1m' },
+        value: round2(pair.rate),
+        valueUnit: 'rate',
+        delta: { value: round2(pair.chg.m1), unit: 'percent', window: '1m' },
+        context: null,
       });
     }
   }
@@ -491,6 +552,11 @@ function buildCurrenciesSection(
       line: metLeg === null ? null : metLeg.line,
     });
     if (rule.outcome === 'warning') {
+      // Enriched (D-42): an FX rule pattern has no level of its own (it is
+      // a relationship, not a reading) — `value`/`valueUnit`/`context` are
+      // null. The rule's `magnitude` rides as `delta` so the model can name
+      // the leg's percent move + its window (e.g. the EUR/CHF 1m move that
+      // met the warning line).
       alerts.push({
         id: rule.id,
         tier: 'needs-attention',
@@ -499,6 +565,13 @@ function buildCurrenciesSection(
           metLeg === null
             ? null
             : { value: round2(metLeg.value), unit: 'percent', window: legWindow(metLeg.name) },
+        value: null,
+        valueUnit: null,
+        delta:
+          metLeg === null
+            ? null
+            : { value: round2(metLeg.value), unit: 'percent', window: legWindow(metLeg.name) },
+        context: null,
       });
     }
   }

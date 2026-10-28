@@ -9170,6 +9170,10 @@
         "tier": "needs-attention",
         "direction": "flat",
         "magnitude": null,
+        "value": 49.6832,
+        "valueUnit": null,
+        "delta": null,
+        "context": null,
         "section": "global"
       },
       {
@@ -9181,6 +9185,14 @@
           "unit": "points",
           "window": "since-previous-release"
         },
+        "value": 3.8,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.6,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null,
         "section": "global"
       },
       {
@@ -9192,6 +9204,14 @@
           "unit": "points",
           "window": "since-previous-release"
         },
+        "value": 48.1,
+        "valueUnit": null,
+        "delta": {
+          "value": -3.6,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null,
         "section": "global"
       },
       {
@@ -9203,6 +9223,14 @@
           "unit": "points",
           "window": "30d"
         },
+        "value": 2.66,
+        "valueUnit": null,
+        "delta": {
+          "value": -0.17,
+          "unit": "points",
+          "window": "30d"
+        },
+        "context": null,
         "section": "global"
       },
       {
@@ -9214,6 +9242,14 @@
           "unit": "points",
           "window": "since-previous-release"
         },
+        "value": 0.62,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.38,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null,
         "section": "global"
       },
       {
@@ -9225,6 +9261,14 @@
           "unit": "points",
           "window": "since-previous-release"
         },
+        "value": 3.737684729064035,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.34,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null,
         "section": "global"
       },
       {
@@ -9236,6 +9280,14 @@
           "unit": "points",
           "window": "since-previous-release"
         },
+        "value": 3.0075959761855975,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.02,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null,
         "section": "global"
       },
       {
@@ -9247,6 +9299,14 @@
           "unit": "points",
           "window": "30d"
         },
+        "value": 5,
+        "valueUnit": null,
+        "delta": {
+          "value": -0.17,
+          "unit": "points",
+          "window": "30d"
+        },
+        "context": null,
         "section": "global"
       },
       {
@@ -9258,6 +9318,14 @@
           "unit": "points",
           "window": "30d"
         },
+        "value": 5.31,
+        "valueUnit": null,
+        "delta": {
+          "value": -0.18,
+          "unit": "points",
+          "window": "30d"
+        },
+        "context": null,
         "section": "global"
       },
       {
@@ -9269,6 +9337,14 @@
           "unit": "points",
           "window": "30d"
         },
+        "value": 5.283,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.27,
+          "unit": "points",
+          "window": "30d"
+        },
+        "context": null,
         "section": "australia"
       },
       {
@@ -9280,6 +9356,14 @@
           "unit": "points",
           "window": "since-previous-release"
         },
+        "value": 4.340000000000003,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.37,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null,
         "section": "australia"
       },
       {
@@ -9291,6 +9375,14 @@
           "unit": "points",
           "window": "since-previous-release"
         },
+        "value": 6.2,
+        "valueUnit": null,
+        "delta": {
+          "value": 0,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null,
         "section": "australia"
       },
       {
@@ -9302,6 +9394,14 @@
           "unit": "points",
           "window": "since-previous-release"
         },
+        "value": 3.5886276342485965,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.05,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null,
         "section": "australia"
       },
       {
@@ -9313,6 +9413,14 @@
           "unit": "points",
           "window": "since-previous-release"
         },
+        "value": 4.71834873,
+        "valueUnit": null,
+        "delta": {
+          "value": 0.07,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null,
         "section": "australia"
       },
       {
@@ -9324,6 +9432,14 @@
           "unit": "points",
           "window": "30d"
         },
+        "value": -0.007,
+        "valueUnit": null,
+        "delta": {
+          "value": -0.27,
+          "unit": "points",
+          "window": "30d"
+        },
+        "context": null,
         "section": "australia"
       },
       {
@@ -9335,6 +9451,14 @@
           "unit": "points",
           "window": "since-previous-release"
         },
+        "value": 3.2030749519538757,
+        "valueUnit": null,
+        "delta": {
+          "value": -0.02,
+          "unit": "points",
+          "window": "since-previous-release"
+        },
+        "context": null,
         "section": "australia"
       },
       {
@@ -9345,6 +9469,16 @@
           "value": -38.14,
           "unit": "percent",
           "window": "from-52w-high"
+        },
+        "value": 5638.34,
+        "valueUnit": "index points",
+        "delta": {
+          "value": -0.44,
+          "unit": "percent",
+          "window": "3m"
+        },
+        "context": {
+          "fromHigh": -38.14
         },
         "section": "world-markets"
       },
@@ -9357,6 +9491,16 @@
           "unit": "percent",
           "window": "from-52w-high"
         },
+        "value": 7887.14,
+        "valueUnit": "index points",
+        "delta": {
+          "value": -6.2,
+          "unit": "percent",
+          "window": "3m"
+        },
+        "context": {
+          "fromHigh": -9.61
+        },
         "section": "world-markets"
       },
       {
@@ -9367,6 +9511,16 @@
           "value": -17.62,
           "unit": "percent",
           "window": "from-52w-high"
+        },
+        "value": 23041.32,
+        "valueUnit": "index points",
+        "delta": {
+          "value": -10.72,
+          "unit": "percent",
+          "window": "3m"
+        },
+        "context": {
+          "fromHigh": -17.62
         },
         "section": "world-markets"
       },
@@ -9379,6 +9533,16 @@
           "unit": "percent",
           "window": "from-52w-high"
         },
+        "value": 175710.05,
+        "valueUnit": "index points",
+        "delta": {
+          "value": 1.05,
+          "unit": "percent",
+          "window": "3m"
+        },
+        "context": {
+          "fromHigh": -15.96
+        },
         "section": "world-markets"
       },
       {
@@ -9389,6 +9553,16 @@
           "value": -12.57,
           "unit": "percent",
           "window": "from-52w-high"
+        },
+        "value": 63268.37,
+        "valueUnit": "index points",
+        "delta": {
+          "value": 2.99,
+          "unit": "percent",
+          "window": "3m"
+        },
+        "context": {
+          "fromHigh": -12.57
         },
         "section": "world-markets"
       },
@@ -9401,6 +9575,16 @@
           "unit": "percent",
           "window": "from-52w-high"
         },
+        "value": 22749.75,
+        "valueUnit": "index points",
+        "delta": {
+          "value": -6.19,
+          "unit": "percent",
+          "window": "3m"
+        },
+        "context": {
+          "fromHigh": -13.59
+        },
         "section": "world-markets"
       },
       {
@@ -9411,6 +9595,16 @@
           "value": -14.01,
           "unit": "percent",
           "window": "from-52w-high"
+        },
+        "value": 3648.3,
+        "valueUnit": "index points",
+        "delta": {
+          "value": -4.71,
+          "unit": "percent",
+          "window": "3m"
+        },
+        "context": {
+          "fromHigh": -14.01
         },
         "section": "world-markets"
       },
@@ -9423,6 +9617,14 @@
           "unit": "percent",
           "window": "m1"
         },
+        "value": null,
+        "valueUnit": null,
+        "delta": {
+          "value": -2.18,
+          "unit": "percent",
+          "window": "m1"
+        },
+        "context": null,
         "section": "world-currencies"
       },
       {
@@ -9434,6 +9636,14 @@
           "unit": "percent",
           "window": "1m"
         },
+        "value": 0.92,
+        "valueUnit": "rate",
+        "delta": {
+          "value": -2.18,
+          "unit": "percent",
+          "window": "1m"
+        },
+        "context": null,
         "section": "world-currencies"
       }
     ],
