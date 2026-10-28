@@ -290,3 +290,101 @@ they say the block is path-scoped (f2-data.csv only), not site-scoped.
 Recording this protects Layer 2 from excluding current data on a stale
 premise, and gives the owner the precise watch-item (the f2 path, not
 "RBA").
+
+---
+
+# Layer 2 Narrator — Reserved decisions (D-28…D-36+)
+
+The next session (the AI narrator build per
+`docs/insights/layer2/INSIGHTS-L2-NARRATOR-SPEC.md`) populates these.
+Research findings are pre-recorded in `docs/insights/layer2/
+RESEARCH-STARTER.md`; the next session RE-VERIFIES each finding in the
+official docs before writing the decision text.
+
+## D-28 — Reserved: Gemini model + free-tier limits
+
+**Reserved** — the next session records: the current Gemini Flash-class
+model name (likely `gemini-3.1-flash-lite` or `gemini-3.8-flash` per
+2026-10-28 research; re-verify in https://ai.google.dev/gemini-api/docs/
+rate-limits + https://ai.google.dev/pricing), the free-tier rate limits
+(RPM/RPD/TPM; ~10-15 RPM, ~1500 RPD for Flash per the 2026-10-28
+research), and the `NARRATOR_MODEL` env var default.
+
+## D-29 — Reserved: Google Search grounding — terms + display requirements
+
+**Reserved** — the next session records: the grounding-terms decision
+(required display elements e.g. `searchEntryPoint.renderedContent`,
+storage/redistribution permissions, free-tier eligibility per
+https://ai.google.dev/gemini-api/docs/grounding). Conservative default
+until the next session has read the current terms in full: SHIP PART 3
+DISABLED (`NARRATOR_WEB_CONTEXT=false`); the base A-section +
+A-overall narratives work without grounding and ship first.
+
+## D-30 — Reserved: Cloudflare Worker limits + the cron-rung design
+
+**Reserved** — the next session records: the free-plan subrequest limit
+(50/invocation — verify in Cloudflare's docs), the cron-trigger count
+limit (5/Worker — the existing currena-api uses ONE: the minute cron;
+no new cron trigger needed; the narrator runs as a new hour+minute-gated
+rung), the CPU time per invocation, the free-tier KV ops/day (100k reads,
+1k writes), and the design that stays within them (per-tick batch ≤3
+model calls; pending list in KV; edge-cached endpoint so visitors do
+not become KV reads).
+
+## D-31 — Reserved: Region risk + the template-fallback default
+
+**Reserved** — the next session records: the Cloudflare Worker egress
+region for Google's Gemini API, the documented 403 "location not
+supported" risk, the mitigations (`placement: { mode: "smart" }` hint
+in wrangler.jsonc; Cloudflare AI Gateway; template fallback), and the
+default (template fallback for the first week; switch to smart
+placement if region errors exceed 1 in 5 A-generations).
+
+## D-32 — Reserved: Section-list enumeration
+
+**Reserved** — the next session records: the section list the narrator
+generates for. Conservative plan (from `docs/insights/layer2/
+RESEARCH-STARTER.md` §5): 4 sections + 1 overall = `['global',
+'australia', 'world-markets', 'world-currencies']`. The `prices-board`
+group is part of the `global` section (its indicators are already in
+`section: 'global'`). The Markets snapshot feeds `world-markets`; the
+FX snapshot feeds `world-currencies`.
+
+## D-33 — Reserved: The secret-scan addition to `pnpm gates`
+
+**Reserved** — the next session records: the secret-scan gate added as
+gate 0 in `scripts/gates.mjs` (before typecheck). Scans the whole repo
++ tracked files for the Google key pattern `AIza[0-9A-Za-z_-]{35}` and
+generic long secrets. Ensures `.dev.vars` and similar are git-ignored.
+Fails `pnpm gates` on any hit. Documented in `docs/DEPLOY.md` per
+spec §10.
+
+## D-34 — Reserved: The staged-rollout visibility flag
+
+**Reserved** — the next session records: `NARRATOR_VISIBLE` env var
+default = `false`. Narratives are generated + stored but shown only in
+preview (URL marker `?narrative=preview` works with the hash router).
+The owner reads real text on the real page for ~1 week, then flips
+visibility (one `wrangler vars` or `wrangler secret` update).
+
+## D-35 — Reserved: The kill criteria defaults
+
+**Reserved** — the next session records: the kill-criteria thresholds
+(spec §13) and the one-line switch-off instructions in
+`docs/insights/layer2/KILL-CRITERIA.md`. Narrator off (templates only)
+if: >1 in 5 A-generations fail validation; any published text
+contradicts a gauge/verdict; API/region errors make it unreliable.
+News context off (`NARRATOR_WEB_CONTEXT=false`) if: any item is found
+inaccurate or stale on a spot check; any item gives advice; Google's
+terms change in a way we cannot meet; >1 in 3 grounded outputs omitted
+by checks.
+
+## D-36+ — Reserved: per-implementation decisions
+
+**Reserved** — the next session records: the `PROMPT_VERSION` initial
+value (likely 1); the validation check seed word lists (EN + FA banned
+advice/certainty, jargon, attribution phrases); the per-fixture
+assertions; any bundle-budget notes (D-16 path if the new web display
+block pushes the Insights lazy chunk past 1100.00/260.00); and any
+deploy-time findings (the currena-api version ID, the live-verification
+screenshots path, etc.).

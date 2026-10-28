@@ -5,6 +5,60 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-28c] — Insights Layer-2 narrator: spec + research starter + reserved decisions (session 0 of N; the build itself starts in the next session)
+
+The planning session for the Layer-2 AI narrator
+(`docs/insights/layer2/INSIGHTS-L2-NARRATOR-SPEC.md`). Saves the spec
+into the repo as ground truth; pre-records the four research findings
+the spec requires (Gemini model + free-tier limits, Google Search
+grounding terms, Cloudflare Worker limits, region risk) in
+`docs/insights/layer2/RESEARCH-STARTER.md` for the next session to
+re-verify in the official docs; reserves decision numbers D-28..D-36
+in `docs/insights/layer2/DECISIONS.md` with the conservative plans;
+defines a 5-milestone split (each independently shippable; each ends
+with commit + push so a stopped session never loses more than one
+milestone of work); writes the continuation prompt at
+`docs/insights/layer2/SESSION-STARTER.md` for the next autonomous
+session. No AI calls; no model keys stored; no Worker code changed;
+no deploy.
+
+- `docs/insights/layer2/INSIGHTS-L2-NARRATOR-SPEC.md` — the spec,
+  moved from the repo root per the task instructions (166 lines).
+- `docs/insights/layer2/RESEARCH-STARTER.md` — the four research
+  findings (Gemini 3.1 Flash-Lite / 3.8 Flash as the likely default
+  `NARRATOR_MODEL`; ~1500 RPD / ~15 RPM free-tier; 5,000 grounded
+  searches/month free; CF Worker free plan 50 subrequests/invocation
+  + 5 crons/Worker + 100k KV reads/day + 1k KV writes/day; region
+  risk + template-fallback default). Each finding marked
+  RE-VERIFY-IN-OFFICIAL-DOCS.
+- `docs/insights/layer2/DECISIONS.md` — D-28..D-36 reserved with the
+  conservative plans (D-28 Gemini model; D-29 grounding terms —
+  default SHIP PART 3 DISABLED; D-30 CF limits + cron-rung design;
+  D-31 region risk + template-fallback default; D-32 section list =
+  4 sections + 1 overall; D-33 secret-scan gate; D-34 staged-rollout
+  visibility flag; D-35 kill criteria; D-36+ per-implementation).
+- `docs/insights/layer2/SESSION-STARTER.md` — the continuation prompt
+  for the next session + the owner notes (the Gemini key the user
+  pasted is NOT a standard AIza key; rotate it; create a real one in
+  AI Studio with NO billing enabled; enter it via
+  `pnpm narrator:set-key` in M3).
+- The 5-milestone split:
+  - **M1** pure foundation (section state + overall state + template +
+    V1–V10 + W1–W10 validators + golden fixtures + SECTION-STATE.md).
+    No AI, no deploy.
+  - **M2** prompts + secret-scan gate. No AI, no deploy.
+  - **M3** Gemini client + `pnpm narrator:set-key` + offline eval
+    harness. No deploy.
+  - **M4** generation rung + KV storage + the cached endpoint (deploy,
+    disabled by default). First deploy.
+  - **M5** display + live eval + kill criteria + final report. Final
+    deploy.
+
+Gate results (session 0): no code changed; `pnpm gates` unchanged
+from the L2 prep final state (LAYER1_STRICT 7809/7809; 9,875 tests;
+copy:audit clean; bundle held). Free-tier impact: zero (no Worker code
+changed).
+
 ## [2026-10-28b] — Insights Layer-2 PREP (P1–P5): freshness, the AU truth, the narrator vocabulary + state contract, `pnpm gates` — no AI, no data changes
 
 The Layer-2 preparation session (docs/insights/layer2/
