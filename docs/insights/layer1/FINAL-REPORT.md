@@ -2,8 +2,8 @@
 
 **Audience:** an independent checking agent, engaged by the owner to verify
 the Layer-1 implementation before Layer 2 starts.
-**Written by:** the final Layer-1 session (2026-10-28, commit `1f2b83a` +
-this report commit; deployed worker `c02d736a`).
+**Written by:** the final Layer-1 session (2026-10-28; Layer-1 content
+deploy `c02d736a`, final HEAD pin `c6d1a13f` — see §6).
 **Status: Layer 1 is COMPLETE and LIVE — 129/129 unique ids, both locales,
 zero data changes.**
 
@@ -223,9 +223,16 @@ on the clean tree while writing this report).
   identical to HEAD.
 - **Rollback path** (not needed): `pnpm --filter @currena/api exec
   wrangler rollback` (docs/DEPLOY.md §Rollback).
-- The docs-only commit that carries this report is deployed after the fact
-  per the runbook's "Redeploy the latest HEAD" note (runtime-identical);
-  the deployment id lands in DEPLOY.md's session record and the CHANGELOG.
+- **Docs-pin redeploy** (same session, ~09:02 UTC): after the handoff
+  report commit, the worker was redeployed to pin the version marker to
+  the final HEAD — currena-api **`c6d1a13f-8ec3-43dc-b42d-897810efa0dc`**
+  (runtime-identical to `c02d736a`: the intervening commits are docs-only;
+  the asset hashes are unchanged). The deploy-lock was re-checked first
+  (the newest version was still this session's own `c02d736a`). Live
+  re-verified after: health ok, 100 readings, the brent Layer-1 block
+  rendering, zero console errors. **This `c6d1a13f` is the version serving
+  https://currena.ir now; `c02d736a` is the Layer-1 content deploy of
+  record.**
 
 ---
 

@@ -143,6 +143,26 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
   1280/360 + the shared-id catch).
 - **No rollback needed**; no live-verification catches (nothing to fix
   post-deploy).
+- **Same-session addendum (~09:02 UTC) — the handoff-report commit + the
+  docs-pin redeploy**: at the owner's request the session then wrote the
+  verification handoff for an independent checking agent
+  (`docs/insights/layer1/FINAL-REPORT.md`: scope, file map, gate numbers,
+  deployment record, an independent re-audit of the headline claims
+  machine-counted from the dictionaries — 129/129 EN+FA entries, 23-term
+  glossary parity, 3,152 hand-written strings, 0 banned-word hits in
+  indicator copy, all display hooks — and the honest caveats: the 10
+  needs-expert-check rows, the D-15 decision-log gap now recorded as
+  D-19 with the D-16 backfill, the CI-red note, the pre-existing AU data
+  staleness, the thin budget headroom for Layer 2). DECISIONS.md gained
+  the backfilled D-16 section + D-19; COPY-REVIEW gained the final
+  addendum pointing at the report. Deploy-lock re-checked before the
+  redeploy (newest version still this session's `c02d736a` — no parallel
+  session), then `pnpm --filter @currena/web build` + `wrangler deploy`
+  pinned the version marker to the final HEAD: currena-api
+  **`c6d1a13f-8ec3-43dc-b42d-897810efa0dc`** — runtime-identical to
+  `c02d736a` (docs-only commits between; asset hashes unchanged),
+  re-verified live (health ok, 100 readings, the brent Layer-1 block
+  rendering, zero console errors).
 
 ## Session record — 2026-10-26c the A-1..A-10 gap-audit build: the ten additions, the 89→100 hop, the two deploy-verification catches
 
