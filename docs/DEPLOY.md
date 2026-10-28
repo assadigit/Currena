@@ -130,6 +130,117 @@ run it (or the individual gates) before deploying. Repair is owner-side:
 5. Keep the local-gate discipline regardless: `pnpm gates` green before
    every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-10-28e the Insights Layer-2 narrator M5: display + live eval + kill criteria + final report (worker 4f4db8d6, DEPLOYED DISABLED — Layer 2 COMPLETE)
+
+The final milestone of the narrator build (M5 of 5, spec §11 + §12 + §13
++ §14). The display ships DISABLED by design (same defaults as M4:
+`NARRATOR_ENABLED=false` + `NARRATOR_VISIBLE=false` +
+`NARRATOR_WEB_CONTEXT=false`; no `GEMINI_API_KEY` on the worker —
+templates only). The owner takes it live in their own terminal via the
+copy-paste commands in `docs/insights/layer2/LAYER2-REPORT.md` §8.
+
+- **Deploy-lock check first** (the D-43 lesson): the deployments API
+  showed the production environment last deployed 2026-10-28T13:04:58Z
+  (version `d4c8d417`, undocumented — likely a parallel-session or
+  owner-initiated redeploy of the M4 code at `148c3cd`), origin/main at
+  this session's `3e9dc5b` (the M5 push, ~45 minutes after `d4c8d417`).
+  No newer deployment during this session's code-writing window
+  (~13:21–13:45 UTC). Deploy-lock CLEAR.
+- **What shipped**: `apps/web/src/components/insights/{NarrativeBlock,
+  InTheNews}.tsx` (the muted plain-language block + the visually
+  separate Part 3 block), `apps/web/src/lib/narrative.ts` (the fetch
+  client — mirrors lib/markets.ts: own localStorage cache, 20s timeout,
+  null on any failure → the spec §11 "render nothing; nothing breaks"
+  rule), `apps/web/src/routes/Insights.tsx` + `SectionLane.tsx` +
+  `world-feeds.ts` wiring (the `useNarrative` + `useNarrativePreview`
+  hooks + the `narrativeVisible` gate), `WorldMarkets.tsx` +
+  `WorldCurrencies.tsx` props (narrativeUnit + narrativeVisible),
+  `apps/web/src/i18n/insights-copy-{en,fa}.ts` (6 new UI strings:
+  narrativeLabel, narrativeUpdated, narrativeUpdatedToday,
+  narrativeAiDisclaimer, inTheNewsLabel, inTheNewsDisclaimer),
+  `apps/api/src/routes/insights-narrative.ts` (the route now spreads
+  `{ ...doc, visible: env.NARRATOR_VISIBLE === 'true' }` into the
+  response — the stored KV doc carries NO `visible` field; the flag is
+  a runtime/env signal, D-39 §1), `apps/api/src/insights-narrative.test.ts`
+  (+3 tests for the additive visible flag),
+  `scripts/narrator-eval-live.mjs` (`pnpm narrator:eval:live` — skips
+  cleanly when GEMINI_API_KEY is unset; writes
+  `docs/insights/layer2/EVAL-OUTPUTS.md`), `scripts/check-bundle-budget.mjs`
+  (the D-16 bump 1100 → 1110 raw, gz unchanged), the Persian copy
+  manifest (6 new entries triaged, round `2026-10-28-l2-m5`),
+  `docs/insights/layer2/{KILL-CRITERIA,LAYER2-REPORT}.md` (the spec §13
+  + §14 deliverables), `docs/insights/layer2/DECISIONS.md` (D-39 +
+  D-40+ reserved).
+- **Gates ALL GREEN before the deploy** (the runbook rule): secret scan
+  (8 patterns · 639 files) · typecheck (6 packages) · lint (0/0) ·
+  copy:audit (clean, 4,709 manifest entries) · narrator vocabulary
+  (129×2 + 23×2 in sync) · narrator eval (50 checks) · layer1 strict
+  (7,809/7,809 assertions UNCHANGED — Layer 1 copy, verdict math,
+  thresholds, alert behaviour all untouched) · full suite (10,021
+  tests, +3 vs M4 — the 3 new visible-flag API tests) · build budget
+  (entry 295.37/88.84 unchanged; Insights lazy 1100.49/258.36, under
+  the bumped 1110/260 ceiling — D-39 §8).
+- **The deploy** (~13:48 UTC, version `4f4db8d6`): `pnpm --filter
+  @currena/web build` + `pnpm --filter @currena/api exec wrangler
+  deploy`. 18 new assets uploaded (the rebuilt Insights chunk
+  `Insights-BJ7e92AJ.js` carries the NarrativeBlock + InTheNews +
+  lib/narrative.ts code). Bindings unchanged: RATES KV + ASSETS + the
+  `* * * * *` cron + SITE_MODE public + the 5 NARRATOR_* vars (all at
+  their disabled defaults). No `GEMINI_API_KEY` set (the owner enters
+  it via `pnpm narrator:set-key`).
+- **Live verification** (the 13:50 UTC narrator rung + the preview URL):
+  - The endpoint `GET /api/insights/narrative` answered HTTP 200 with
+    `promptVersion: 1`, `model: gemini-3.5-flash-lite`, `visible: false`
+    (the M5 additive flag from `env.NARRATOR_VISIBLE === 'true'`),
+    `overall.source: template`, `sections: { global, australia }` (the
+    first 3 units in page order — the 3-unit cap per tick; world-markets
+    + world-currencies will land at the next :50 rung).
+  - The normal URL `https://currena.ir/#/insights` renders NOTHING new
+    (no `data-narrative-block` elements — the gate is closed:
+    `doc.visible === false` AND no `?narrative=preview` marker).
+  - The preview URL `https://currena.ir/?narrative=preview#/insights`
+    renders THREE NarrativeBlock components (overall + global +
+    australia) in both EN ("PLAIN-LANGUAGE SUMMARY") and FA
+    («خلاصهٔ ساده») at 1280px and 360px. The blocks sit immediately
+    under the hero (overall) and under each section heading (global +
+    australia), inside the existing mother containers — no new shells.
+    No `data-in-the-news-block` (Part 3 ships DISABLED, D-29).
+    Screenshots in `docs/insights/screenshots/layer2-m5/`:
+    `preview-en-1280.png`, `preview-en-360.png`, `preview-fa-1280.png`,
+    `preview-fa-360.png`. Zero console errors.
+  - The stats doc `insights:narrator:stats` recorded the first rung:
+    `runs: 1`, `templateUsed: 3`, `aiValid: 0` (no key — templates
+    only), `apiErrors: {}` (no errors), `newsAttempted: 0` (Part 3
+    disabled).
+- **Free-tier impact (unchanged from M4's D-38 budget)**: the rung adds
+  ~24 ticks/day × (4 doc reads + 1 stats read + ≤2 writes) ≈ 120 KV
+  reads + ≤50 KV writes/day; visitors add ZERO (the endpoint is
+  edge-cached `s-maxage=600`); ZERO external calls while no key exists.
+  The M5 display adds ONE new visitor-side fetch per Insights mount
+  (`GET /api/insights/narrative`, edge-cached — zero KV reads from
+  visitors).
+- **Owner steps still required** (copy-paste, in this order — full
+  details in `docs/insights/layer2/LAYER2-REPORT.md` §8):
+  1. `pnpm narrator:set-key` (enter the `AIza…` key — hidden input)
+  2. `export GEMINI_API_KEY=AIza… && pnpm narrator:eval:live` (read
+     `docs/insights/layer2/EVAL-OUTPUTS.md`)
+  3. `cd apps/api && pnpm exec wrangler versions upload --var
+     NARRATOR_ENABLED:true` (templates → AI; preview-only still)
+  4. Read `https://currena.ir/?narrative=preview#/insights` for ~7 days
+     (EN + FA, 360px + 1280px) + spot-check the kill criteria in
+     `docs/insights/layer2/KILL-CRITERIA.md`
+  5. `cd apps/api && pnpm exec wrangler versions upload --var
+     NARRATOR_VISIBLE:true` (preview → public)
+  6. (Optional, after the owner's Google grounding-terms review)
+     `cd apps/api && pnpm exec wrangler versions upload --var
+     NARRATOR_WEB_CONTEXT:true` (Part 3 — "In the news")
+- **Layer 2 is COMPLETE.** The five-milestone build (M1: pure foundation
+  + validators + templates; M2: prompts + secret-scan gate; M3: Gemini
+  client + set-key tool + offline eval; M4: generation rung + KV +
+  cached endpoint, deployed disabled; M5: display + live eval + kill
+  criteria + final report, deployed disabled) is done. The owner takes
+  it live.
+
 ## Session record — 2026-10-28d the Insights Layer-2 narrator M4: the generation rung + KV + the cached endpoint (worker 2de8f566, DEPLOYED DISABLED)
 
 The first deploy of the narrator build (M4 of 5, spec §4 + §9). The
