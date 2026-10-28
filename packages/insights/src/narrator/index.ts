@@ -132,3 +132,19 @@ export type {
 // ---- M1: the template fallback (spec §8) ----
 export { templateNarrative } from './template';
 export type { TemplateState } from './template';
+
+// ---- M2: the prompts (spec §6, versioned) ----
+export {
+  BASE_RULES,
+  NEWS_PROMPT,
+  OVERALL_TASK,
+  PROMPT_VERSION,
+  SECTION_TASK,
+  buildNarratorUserMessage,
+  buildNewsUserMessage,
+  newsSystemPrompt,
+  overallSystemPrompt,
+  sectionSystemPrompt,
+  systemPromptFor,
+} from './prompt';
+export type { NarratorUserMessageInput, PromptState } from './prompt';

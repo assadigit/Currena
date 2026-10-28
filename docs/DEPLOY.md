@@ -83,6 +83,33 @@ pnpm --filter @currena/api exec wrangler deploy   # 2. Worker + assets + binding
 > `pnpm --filter @currena/api deploy` collides with pnpm's built-in `deploy`
 > command — always use `exec wrangler deploy`.
 
+## The Gemini key (Layer-2 narrator) — OWNER-ONLY, never in chat or the repo
+
+The narrator's model key is a Cloudflare Worker SECRET (`GEMINI_API_KEY`),
+entered by the owner with `pnpm narrator:set-key` (hidden input, one
+validation call, piped to `wrangler secret put` — never a command-line
+argument, never printed, never committed). The rules:
+
+1. **Create the key in Google AI Studio**
+   (https://aistudio.google.com/app/apikey) inside a Cloud project with
+   **NO billing enabled** — the free tier's spend-based rate limit is
+   "N/A", so an unbilled project can never be charged (re-verified
+   2026-10-28, D-28). The key starts with `AIza…`.
+2. **Never paste it anywhere** — not in chat, not in issues, not in
+   code. The repo's secret scan (`pnpm gates` gate 0, D-33) fails the
+   build on the `AIza…` shape (plus GitHub/AWS/Slack/EODHD shapes and
+   generic credential assignments) in any tracked file.
+3. **Rotate immediately** if a key was ever pasted anywhere public:
+   delete it in AI Studio, create a fresh one, re-run
+   `pnpm narrator:set-key`.
+4. **Free-tier terms** (re-verified 2026-10-28, D-28): on the free tier,
+   Google may use submitted content to improve its products ("Used to
+   improve our products: Free tier Yes / Paid No"). The narrator only
+   ever submits PUBLIC market data (the computed page state + the
+   approved vocabulary) — no personal or confidential data exists in its
+   inputs. Grounding (part 3, if ever enabled) has the same terms plus
+   display requirements (D-29).
+
 ## Repairing CI (the red GitHub Actions — what is OWNER-SIDE)
 
 GitHub Actions has been red since 2026-10-20 (last green `f72e1a0`,

@@ -5,6 +5,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-28e] — Insights Layer-2 narrator M2: the four prompts (versioned) + the secret-scan gate
+
+Milestone 2 of the narrator build (spec §6 + §10's secret scan): the
+prompt layer and the repo's credential tripwire. No AI calls, no keys,
+no Worker code changed, no deploy.
+
+- **`packages/insights/src/narrator/prompt.ts`** — the four prompts,
+  `PROMPT_VERSION = 1`: the shared base rules (§6.1, nine hard rules),
+  the section task (§6.2), the overall task (§6.3) and the standalone
+  news-context prompt (§6.4, call type B — no base rules: that call may
+  see the internet). All texts VERBATIM from the spec. The user-message
+  builder (`buildNarratorUserMessage`): `SCOPE` / `STATE` /
+  `VOCABULARY` / `GLOSSARY` — four labelled lines, deterministic, the
+  SCOPE line naming the section + its labels both languages (the news
+  prompt's SECTION input rides the same shape).
+- **`prompt.test.ts`** — snapshot tests pinning every prompt text
+  (drift = failure; any change must bump PROMPT_VERSION), plus the
+  user-message shape/round-trip/determinism and a no-secrets assertion.
+- **`scripts/secret-scan.mjs`** — the credential tripwire (D-33): 8
+  patterns (Google `AIza…`, GitHub PATs, OpenAI `sk-…`, AWS `AKIA…`,
+  Slack, the EODHD `hex.hex` shape, generic credential assignments)
+  over every tracked text file + the `.dev.vars`/`.env` ignore check +
+  an in-memory `--self-test` (9 positives + 8 negatives; no fake-key
+  fixture file exists, by design). Findings are redacted (file:line +
+  pattern + first 6 chars). Verified by planting a realistic key: the
+  scan fails with the exact location.
+- **`scripts/gates.mjs`** — the secret scan is GATE 0, before typecheck:
+  a leaked key fails the build before anything else runs.
+- **`docs/DEPLOY.md`** — "The Gemini key" section (spec §10): create the
+  key in AI Studio inside a project WITHOUT billing (the free tier's
+  spend limit is N/A — an unbilled project can never be charged),
+  never paste it anywhere, rotate immediately if it ever was; the
+  free-tier terms note (inputs used to improve products on the free
+  tier; the narrator submits only public market data).
+- **DECISIONS.md** — D-33 (the secret scan's design + the planted-key
+  verification).
+
+Gates (clean run, `pnpm gates`): secret scan clean (8 patterns · 629
+files) · typecheck 6/6 · lint 0/0 · copy:audit clean (4,703) · narrator
+vocabulary in sync · **layer1 strict 7,809/7,809 unchanged** · full
+suite **9,986 passed (+13: insights 825→838)** · budget held
+295.37/88.84 + 1094.09/256.83. No deploy.
+
 ## [2026-10-28d] — Insights Layer-2 narrator M1: the pure foundation (section states + template fallback + V1–V10/W1–W10 validators)
 
 Milestone 1 of the 5-milestone narrator build

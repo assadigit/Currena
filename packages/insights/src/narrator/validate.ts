@@ -84,8 +84,8 @@ export interface NarratorValidationFailure {
 
 type AnyState = SectionNarrationState | OverallNarrationState;
 
-/** Every id the unit's state carries (items, alerts, patterns, excluded). */
-function stateIdsOf(state: AnyState): string[] {
+/** Every id the unit's state carries (items, alerts, patterns, excluded). Exported: the prompt builder + tests share the one derivation. */
+export function stateIdsOf(state: AnyState): string[] {
   const ids = new Set<string>();
   const walk = (value: unknown, key: string): void => {
     if (value === null || typeof value !== 'object') return;

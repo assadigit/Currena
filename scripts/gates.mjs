@@ -6,7 +6,12 @@
  * any failure (CI-red equivalence while GitHub Actions is down — see
  * docs/DEPLOY.md's "Repairing CI" note for the owner-side fix).
  *
- * The gates, in order (spec §7.1 + the Layer-1 discipline):
+ * The gates, in order (spec §7.1 + the Layer-1 discipline + M2's secret
+ * scan):
+ *   0. secret scan       — the AIza/GitHub/AWS/EODHD/generic-credential
+ *                          patterns over every tracked text file (D-33:
+ *                          a leaked key fails the build FIRST, before
+ *                          anything else runs)
  *   1. typecheck        — pnpm -r run typecheck
  *   2. lint             — pnpm lint (0 errors, 0 warnings)
  *   3. copy:audit       — the Persian copy manifest audit (✓ clean)
@@ -29,6 +34,17 @@ const START = Date.now();
 
 /** One gate: id, label, command, env additions, and a key-number parser. */
 const GATES = [
+  {
+    id: 'secret-scan',
+    label: 'secret scan',
+    cmd: 'node scripts/secret-scan.mjs && node scripts/secret-scan.mjs --self-test',
+    parse: (out) => {
+      const clean = out.includes('secret scan clean');
+      if (!clean) return null;
+      const m = out.match(/(\d+) patterns over ([\d,]+) tracked text files/);
+      return m !== null ? `clean (${m[1]} patterns · ${m[2]} files)` : 'clean';
+    },
+  },
   {
     id: 'typecheck',
     label: 'typecheck',

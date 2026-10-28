@@ -509,14 +509,46 @@ the reading that adds no new math and removes no facts was chosen.
 SECTION-STATE.md documents the full contract; the golden fixtures pin
 it.
 
-## D-33 — Reserved: The secret-scan addition to `pnpm gates`
+## D-33 — The secret-scan addition to `pnpm gates` (M2, built)
 
-**Reserved** — the next session records: the secret-scan gate added as
-gate 0 in `scripts/gates.mjs` (before typecheck). Scans the whole repo
-+ tracked files for the Google key pattern `AIza[0-9A-Za-z_-]{35}` and
-generic long secrets. Ensures `.dev.vars` and similar are git-ignored.
-Fails `pnpm gates` on any hit. Documented in `docs/DEPLOY.md` per
-spec §10.
+**Assumption.** Spec §10: "Add to `pnpm gates` a secret scan (Google key
+pattern `AIza[0-9A-Za-z_-]{35}` and generic long secrets) over the whole
+repo and its tracked files; also ensure `.dev.vars` and similar are
+git-ignored."
+
+**Decision.** `scripts/secret-scan.mjs` runs as **gate 0** of
+`scripts/gates.mjs` (before typecheck — a leaked key fails the build
+FIRST) and in two modes:
+
+- **The scan**: 8 patterns over every GIT-TRACKED text file (628 today):
+  the Google `AIza…` shape, GitHub PATs (`ghp_`/`github_pat_`), OpenAI
+  `sk-…`, AWS `AKIA…`, Slack `xox?-…`, the EODHD key shape
+  (`hex.hex` — this repo's other live credential), and a generic
+  credential-assignment pattern (`api_key|secret|token|password =
+  "…24+ chars…"`, case-insensitive, deliberately WITHOUT a leading word
+  boundary so `GEMINI_API_KEY` matches). Findings print file:line + the
+  pattern name + a REDACTED value (first 6 chars + length) — the scan
+  reports WHERE, never the secret itself. `pnpm-lock.yaml` is the one
+  documented skip (integrity hashes). An explicit allowlist carries the
+  six deliberate test-fixture credentials (each naming its file); test
+  files stay scanned — "let me test with the real key" is a classic leak
+  vector.
+- **The ignore check**: `.dev.vars`, `.dev.vars.local`, `.env`,
+  `.env.local` must be git-ignored (root + apps/api) and none tracked
+  (all true today).
+- **`--self-test`**: the patterns are verified in memory against 9
+  known-positives and 8 known-negatives (no fixture file with fake keys
+  exists in the repo, by design). The gate runs the scan AND the
+  self-test.
+
+Verified by planting a realistic `AIza…` key in a tracked file: the scan
+fails with the file, line and redacted value. The free-tier key-creation
++ rotation documentation landed in `docs/DEPLOY.md` ("The Gemini key"
+section, per spec §10).
+
+**Reason.** Gate 0 ordering is the point: every later gate — and every
+deploy — is unreachable while a credential is in the tree, and the
+self-test keeps the patterns from rotting silently.
 
 ## D-34 — Reserved: The staged-rollout visibility flag
 
