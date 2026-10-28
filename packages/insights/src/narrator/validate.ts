@@ -361,13 +361,19 @@ function stripOutOfDateSentences(text: string, lang: 'en' | 'fa'): string {
   const hits = phraseHits(text, phrases, lang);
   if (hits.length === 0) return text;
   // Split into sentences; drop any sentence containing an out-of-date phrase.
+  // sentences() consumes the terminators (. ! ? ۔ ؟), so re-add a period when
+  // joining — otherwise the next sentences() call sees one run-on sentence
+  // and V2 fails ("1 sentences").
   const sents = sentences(text);
   const kept = sents.filter((s) => {
     const lower = lang === 'fa' ? s : s.toLowerCase();
     return !phrases.some((p) => (lang === 'fa' ? lower.includes(p) : lower.includes(p.toLowerCase())));
   });
   if (kept.length === 0) return text; // never strip to empty
-  return kept.join(' ');
+  return kept.map((s) => {
+    const t = s.trim();
+    return /[.!?۔؟]$/.test(t) ? t : `${t}.`;
+  }).join(' ');
 }
 
 /**
