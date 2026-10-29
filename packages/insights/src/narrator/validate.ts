@@ -3,7 +3,7 @@
  * deterministic validation every narrative must pass before it is stored,
  * and every news note must pass before it is shown. Pure, unit-tested.
  *
- *   validateStateNarrative — V1..V10 (a failed check = one regeneration
+ *   validateStateNarrative — V1..V11 (a failed check = one regeneration
  *                            attempt with the failed check names appended;
  *                            a second failure = the template for that unit)
  *   validateNewsNote       — W1..W10 (any failure = part 3 omitted for that
@@ -332,7 +332,7 @@ function outOfDateViolations(text: string, lang: 'en' | 'fa', mustMention: boole
 
 /* ------------------------------------------------------------------ *
  * The sanitizer (PROMPT_VERSION 5) — fixes common model errors before
- * validation so the rich multi-reading AI output passes V1–V10 reliably.
+ * validation so the rich multi-reading AI output passes V1–V11 reliably.
  * The model (temperature 0.2) non-deterministically:
  *   - adds "Some data is out of date and was left out" even when
  *     STATE.excluded is empty (V10 false positive), AND
@@ -407,6 +407,12 @@ interface LangCheckContext {
   stateSerialized: string;
   tone: Tone;
   excludedNonEmpty: boolean;
+  /** V11 — the ids of the unit's alerts (warning readings); the AI must mention enough of them by plainName. */
+  alertIds: readonly string[];
+  /** V11 — the unit kind ('overall' has a higher coverage threshold + multi-section requirement). */
+  unitKind: NarratorUnit['kind'];
+  /** V11 — when true (the template fallback), skip the coverage check. */
+  skipCoverage: boolean;
 }
 
 function langChecks(text: string, lang: 'en' | 'fa', ctx: LangCheckContext): NarratorValidationFailure[] {
@@ -462,25 +468,61 @@ function langChecks(text: string, lang: 'en' | 'fa', ctx: LangCheckContext): Nar
   const exclusion = outOfDateViolations(text, lang, ctx.excludedNonEmpty);
   if (exclusion !== null) add('V10', exclusion);
 
+  // V11 — coverage: the AI must mention enough of the unit's flagged readings
+  // (the alerts) by their plainName. V7 checks the AI didn't INVENT names;
+  // V11 checks the AI DID name the readings the section actually flags. This
+  // closes the gap the owner identified: the v4 model could pass V1–V11 while
+  // mentioning only 1 reading + "Australia is also Stressed" (no Australian
+  // facts). V11 forces consolidation — mention ≥min(3, alerts.length) of the
+  // alerts (≥5 for the overall), or fail + retry with the missed names listed.
+  // ctx.vocab is already the per-language subset (EN entries for 'en', FA
+  // entries for 'fa'), so entry.plainName is the right name to match.
+  // The template fallback (skipCoverage=true) is exempt — it names a FIXED
+  // set of alerts by design; V11 is the AI-completeness check.
+  if (!ctx.skipCoverage && ctx.alertIds.length > 0) {
+    const threshold = Math.min(ctx.unitKind === 'overall' ? 5 : 3, ctx.alertIds.length);
+    const mentioned: string[] = [];
+    const missed: string[] = [];
+    for (const id of ctx.alertIds) {
+      const entry = ctx.vocab.entries[id];
+      const name = entry?.plainName ?? '';
+      if (name.length >= 2 && nameInText(name, text)) {
+        mentioned.push(id);
+      } else {
+        missed.push(name || id);
+      }
+    }
+    if (mentioned.length < threshold) {
+      add('V11', `only ${mentioned.length} of ${ctx.alertIds.length} flagged readings mentioned (need ${threshold}); missed: ${missed.slice(0, 6).join(', ')}`);
+    }
+  }
+
   return failures;
 }
 
 /* ------------------------------------------------------------------ *
- * validateStateNarrative — V1..V10
+ * validateStateNarrative — V1..V11
  * ------------------------------------------------------------------ */
 
 export interface StateNarrativeInput {
   text: { en: string; fa: string };
   unit: NarratorUnit;
   state: AnyState;
+  /** V11 (coverage) is the AI-completeness check — the AI must mention enough of
+   * the unit's alerts by plainName. The deterministic template fallback names
+   * a FIXED set of alerts by design (it's the safe fallback, not a consolidation);
+   * pass `true` here to skip V11 for the template (the template.test.ts bar is
+   * V1–V10 + the V11 exemption). AI output (the narrator-cron generateUnit path)
+   * leaves this unset so V11 runs. */
+  skipCoverage?: boolean;
 }
 
 /**
  * Validate one state narrative (spec §7). Pure; returns every failed check
- * (empty = the narrative passes V1–V10 and may be stored).
+ * (empty = the narrative passes V1–V11 and may be stored).
  */
 export function validateStateNarrative(input: StateNarrativeInput): NarratorValidationFailure[] {
-  const { text, unit, state } = input;
+  const { text, unit, state, skipCoverage = false } = input;
   const failures: NarratorValidationFailure[] = [];
 
   // V1 — schema valid, both languages non-empty
@@ -495,6 +537,7 @@ export function validateStateNarrative(input: StateNarrativeInput): NarratorVali
   const vocab = vocabularyOf(state);
   const stateIds = new Set(vocab.ids);
   const stateSerialized = JSON.stringify(state);
+  const alertIds = state.alerts.map((a) => a.id);
   const ctx: LangCheckContext = {
     limits,
     vocab: vocab.en, // the glossary is language-paired; checked per language below
@@ -502,6 +545,9 @@ export function validateStateNarrative(input: StateNarrativeInput): NarratorVali
     stateSerialized,
     tone: toneOf(state),
     excludedNonEmpty: state.excluded.length > 0,
+    alertIds,
+    unitKind: unit.kind,
+    skipCoverage,
   };
 
   // V3 — every number must come from this unit's state or its provided vocabulary

@@ -86,7 +86,7 @@ describe('M3 GeminiClient — call type A (schema-constrained JSON)', () => {
       schema: STATE_NARRATIVE_SCHEMA,
     });
     const config = calls[0]!.body['generation_config'] as Record<string, unknown>;
-    expect(config['temperature']).toBe(0.2);
+    expect(config['temperature']).toBe(0.1);
     expect(typeof config['max_output_tokens']).toBe('number');
   });
 

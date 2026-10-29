@@ -17,7 +17,7 @@
  *   3. Process at most 3 units per tick (D-30's cap); the rest continue on
  *      the next hour's tick.
  *   4. A unit's text: the model (call type A) when NARRATOR_ENABLED=true
- *      AND the key exists — validate (V1–V10), ONE regeneration with the
+ *      AND the key exists — validate (V1–V11), ONE regeneration with the
  *      failed check names appended, then the template (spec §7) — else the
  *      template directly (no key / kill switch / api failure). Part 3
  *      (news, call type B) only when NARRATOR_WEB_CONTEXT=true and under
@@ -441,7 +441,7 @@ async function generateUnit(args: {
     // lists no excluded items (V10 false positive), and remove stray CJK
     // characters the model occasionally hallucinates in Farsi (V9 fail).
     // Pure; never adds content; only fixes the model's non-deterministic
-    // mistakes so the rich multi-reading AI paragraph passes V1–V10.
+    // mistakes so the rich multi-reading AI paragraph passes V1–V11.
     const sanitized = sanitizeStateNarrative(outcome.value, work.state);
     const failures = validateStateNarrative({ text: sanitized, unit: work.unit, state: work.state });
     if (failures.length === 0) {

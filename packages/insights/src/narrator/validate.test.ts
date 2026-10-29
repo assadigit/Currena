@@ -1,5 +1,5 @@
 /**
- * validate.test.ts — M1 gates (spec §7): every check V1–V10 and W1–W10
+ * validate.test.ts — M1 gates (spec §7): every check V1–V11 and W1–W10
  * rejects its deliberately bad fixture and accepts its good one. The good
  * baselines are the template outputs (already pinned by template.test.ts);
  * the bad ones are hand-mutated to trip exactly one intended check.
@@ -11,6 +11,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { templateNarrative, type TemplateState } from './template';
 import { narrativeLimitsFor, validateNewsNote, validateStateNarrative, type NarratorUnit } from './validate';
+import { getNarratorVocabulary } from './vocabulary';
 import type { SectionNarrationState } from './section-state';
 
 const FIXTURES_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../fixtures/narration/sections');
@@ -53,7 +54,9 @@ const currenciesFx = loadFixture('world-currencies-live');
 /** Mutate one language of the baseline; validate; return the failure checks. */
 function checksFor(fixture: FixtureFile, unit: NarratorUnit, mutate: (baselineText: { en: string; fa: string }) => { en: string; fa: string }): string[] {
   const text = mutate(baseline(fixture));
-  return validateStateNarrative({ text, unit, state: fixture.output }).map((f) => f.check);
+  // The baseline IS the template (deterministic, names a fixed set of alerts);
+  // V11 (AI-completeness) is exempt for the template — pass skipCoverage.
+  return validateStateNarrative({ text, unit, state: fixture.output, skipCoverage: true }).map((f) => f.check);
 }
 
 /* ------------------------------------------------------------------ *
@@ -64,14 +67,14 @@ describe('M1 validateStateNarrative — the good baselines pass', () => {
   for (const scenario of ['global-live', 'australia-live', 'australia-calm', 'australia-excluded', 'world-markets-live', 'world-currencies-live', 'overall-live'] as const) {
     it(`${scenario}: the template output passes with zero failures`, () => {
       const fixture = loadFixture(scenario);
-      const failures = validateStateNarrative({ text: baseline(fixture), unit: unitOf(fixture), state: fixture.output });
+      const failures = validateStateNarrative({ text: baseline(fixture), unit: unitOf(fixture), state: fixture.output, skipCoverage: true });
       expect(failures, JSON.stringify(failures, null, 2)).toEqual([]);
     });
   }
 });
 
 /* ------------------------------------------------------------------ *
- * V1–V10 — each bad fixture trips its intended check
+ * V1–V11 — each bad fixture trips its intended check
  * ------------------------------------------------------------------ */
 
 describe('M1 validateStateNarrative — the deliberately bad fixtures', () => {
@@ -108,6 +111,7 @@ describe('M1 validateStateNarrative — the deliberately bad fixtures', () => {
       },
       unit: globalUnit,
       state: globalLive.output,
+      skipCoverage: true,
     });
     expect(ok.map((f) => f.check)).not.toContain('V3');
   });
@@ -179,7 +183,23 @@ describe('M1 validateStateNarrative — the deliberately bad fixtures', () => {
     expect(invented).toContain('V10');
   });
 
-  it('the overall limits differ from the section limits (4\u20136 vs 3\u20135; 120 vs 90 words)', () => {
+  it('V11: an AI output that mentions too few of the section\u2019s alerts fails; one that mentions enough passes', () => {
+    // global-live has multiple alerts; a text that names only ONE of them
+    // (the first alert's plainName) trips V11 (need ≥min(3, alerts.length)).
+    const firstAlert = globalLive.output.alerts[0]!;
+    const firstEntry = getNarratorVocabulary([firstAlert.id], 'en').entries[firstAlert.id]!;
+    const tooFew = {
+      en: `${firstEntry.plainName} is in warning today. The section is stressed. Some context applies. This is not advice.`,
+      fa: 'بخش جهانی امروز پرتنش است. هیچ مورد خاصی برجسته نیست. این توصیه‌ای نیست.',
+    };
+    const tooFewChecks = validateStateNarrative({ text: tooFew, unit: globalUnit, state: globalLive.output }).map((f) => f.check);
+    expect(tooFewChecks).toContain('V11');
+    // skipCoverage=true exempts the template; V11 does not fire on the same text.
+    const exempt = validateStateNarrative({ text: tooFew, unit: globalUnit, state: globalLive.output, skipCoverage: true }).map((f) => f.check);
+    expect(exempt).not.toContain('V11');
+  });
+
+  it('the overall limits differ from the section limits (4\u201311 vs 3\u20139; 240 vs 190 words)', () => {
     expect(narrativeLimitsFor({ kind: 'overall' })).toEqual({ minSentences: 4, maxSentences: 11, maxWords: 240, maxSentenceWords: 35 });
     expect(narrativeLimitsFor({ kind: 'section', section: 'global' })).toEqual({ minSentences: 3, maxSentences: 9, maxWords: 190, maxSentenceWords: 35 });
   });

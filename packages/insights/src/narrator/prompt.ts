@@ -57,8 +57,17 @@ import type { NarratorUnit } from './validate';
  * sentences / 190 words / 35 per-sentence; overall 4-11 / 240 / 35) and
  * rewrites SECTION_TASK + OVERALL_TASK to weave FIVE to SEVEN readings
  * drawn from BOTH alerts AND items, prioritising household-facing facts
- * and drawing VOCABULARY connections. */
-export const PROMPT_VERSION = 5;
+ * and drawing VOCABULARY connections.
+ *
+ * v6 (the owner's "make sure AI didn't miss anything" fix): adds V11 —
+ * the COVERAGE check. V7 already rejected names NOT in the state
+ * (hallucination); V11 rejects outputs that DON'T name enough of the
+ * unit's alerts (completeness). The AI must mention ≥min(3, alerts.length)
+ * of the alerts by plainName (≥5 for the overall), or fail + retry with
+ * the missed names listed. This forces the model to actually consolidate
+ * the section's flagged readings instead of picking 1-2 safe ones. Also
+ * lowers the model temperature 0.2 → 0.1 for more determinism. */
+export const PROMPT_VERSION = 6;
 
 /* ------------------------------------------------------------------ *
  * §6.1 — the shared base rules (included in A-section and A-overall)

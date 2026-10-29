@@ -53,11 +53,11 @@ describe('D-41 CloudflareAiClient.callStateNarrative — the success path', () =
       expect(outcome.value.en).toBe(GOOD_EN);
       expect(outcome.value.fa).toBe(GOOD_FA);
     }
-    // The call carried the json_schema response_format + temperature 0.2.
+    // The call carried the json_schema response_format + temperature 0.1.
     expect(calls).toHaveLength(1);
     expect(calls[0]!.model).toBe('@cf/meta/llama-3.3-70b-instruct-fp8-fast');
     const input = calls[0]!.input;
-    expect(input['temperature']).toBe(0.2);
+    expect(input["temperature"]).toBe(0.1);
     expect(input["max_tokens"]).toBe(900);
     expect((input['response_format'] as Record<string, unknown>)['type']).toBe('json_schema');
     const messages = input['messages'] as Array<{ role: string; content: string }>;
@@ -204,7 +204,7 @@ describe('D-41 extractBindingText — the shape parser', () => {
 });
 
 describe('D-41 CloudflareAiClient — the spy confirms the json_schema request body', () => {
-  it('sends temperature 0.2 + max_tokens 900 + the json_schema format', async () => {
+  it('sends temperature 0.1 + max_tokens 900 + the json_schema format', async () => {
     const run = vi.fn(async (sourceModel: string, sourceInput: Record<string, unknown>) => {
       void sourceModel;
       void sourceInput;
@@ -212,11 +212,11 @@ describe('D-41 CloudflareAiClient — the spy confirms the json_schema request b
     });
     const ai: AiBinding = { run };
     const client = new CloudflareAiClient({ ai, model: '@cf/meta/llama-3.3-70b-instruct-fp8-fast' });
-    await client.callStateNarrative({ systemInstruction: 's', userMessage: 'u', temperature: 0.2 });
+    await client.callStateNarrative({ systemInstruction: 's', userMessage: 'u' });
     expect(run).toHaveBeenCalledTimes(1);
     const calls = run.mock.calls as Array<[string, Record<string, unknown>]>;
     const [, input] = calls[0]!;
-    expect(input['temperature']).toBe(0.2);
+    expect(input["temperature"]).toBe(0.1);
     const rf = input['response_format'] as Record<string, unknown>;
     expect(rf['type']).toBe('json_schema');
     expect((rf['json_schema'] as Record<string, unknown>)['strict']).toBe(true);

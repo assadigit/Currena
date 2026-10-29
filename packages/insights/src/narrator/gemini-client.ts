@@ -136,7 +136,7 @@ export class GeminiClient {
       system_instruction: params.systemInstruction,
       input: params.userMessage,
       generation_config: {
-        temperature: params.temperature ?? 0.2,
+        temperature: params.temperature ?? 0.1,
         max_output_tokens: params.maxOutputTokens ?? 600,
       },
       response_format: {

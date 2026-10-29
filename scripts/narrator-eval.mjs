@@ -95,9 +95,9 @@ for (const scenario of SECTION_SCENARIOS) {
     en: templateNarrative(fixture.output, unit, 'en'),
     fa: templateNarrative(fixture.output, unit, 'fa'),
   };
-  const failuresForFixture = validateStateNarrative({ text, unit, state: fixture.output });
+  const failuresForFixture = validateStateNarrative({ text, unit, state: fixture.output, skipCoverage: true });
   check(
-    `${scenario}: template passes V1–V10 (both languages)`,
+    `${scenario}: template passes V1–V11 (both languages, V11 coverage exempt for the deterministic template)`,
     failuresForFixture.length === 0,
     JSON.stringify(failuresForFixture.map((f) => `${f.check}/${f.lang}`)),
   );
@@ -127,32 +127,32 @@ const GOOD_MOCKED = [
     scenario: 'global-live',
     intended: 'accepted',
     text: {
-      en: "The global picture is under pressure today: 9 of 32 scored indicators are in warning. One of them, The gold crowd gauge, says big traders' gold bets have become unusually crowded. Another, Euro-area inflation, shows prices climbing across the euro area.",
-      fa: 'تصویر جهانی امروز تحت فشار است: ۹ شاخص از ۳۲ شاخص مؤثر در وضعیت هشدار هستند. یکی از آنها فشارسنج شلوغی طلا است: شرط‌بندی‌های بزرگ معامله‌گران روی طلا شلوغ شده است. مورد دیگر، تورم منطقهٔ یورو است: قیمت‌ها در منطقهٔ یورو بالا می‌روند.',
+      en: "The global picture is under pressure today: 9 of 32 scored indicators are in warning. The gold crowd gauge says big traders' gold bets have become unusually crowded. Euro-area inflation shows prices climbing across the euro area. US inflation is also elevated. This is not financial advice.",
+      fa: 'تصویر جهانی امروز تحت فشار است: ۹ شاخص از ۳۲ شاخص مؤثر در وضعیت هشدار هستند. فشارسنج شلوغی طلا نشان می‌دهد که شرط‌بندی‌های بزرگ معامله‌گران روی طلا شلوغ شده است. تورم منطقهٔ یورو نشان می‌دهد که قیمت‌ها در منطقهٔ یورو بالا می‌روند. تورم آمریکا نیز بالا است. این توصیهٔ مالی نیست.',
     },
   },
   {
     scenario: 'world-markets-live',
     intended: 'accepted',
     text: {
-      en: "World markets need attention today: 6 of 16 indices have slipped into a correction and 1 is in a bear market. The Asia-Pacific group holds the most pressured markets. South Korea's biggest companies are the furthest below their yearly high.",
-      fa: 'بازارهای جهان امروز نیازمند توجه است: ۶ شاخص از ۱۶ شاخص در اصلاح قیمتی است و ۱ شاخص در بازار خرسی. گروه آسیا و اقیانوسیه بیشترین بازارهای تحت فشار را دارد. شرکت‌های بزرگ کرهٔ جنوبی بیشترین فاصله را از اوج سالانهٔ خود دارند.',
+      en: "World markets need attention today: 6 of 16 indices have slipped into a correction and 1 is in a bear market. South Korea’s biggest companies are the furthest below their yearly high. France’s biggest companies and Hong Kong’s biggest companies are also under pressure. This is not financial advice.",
+      fa: 'بازارهای جهان امروز نیازمند توجه است: ۶ شاخص از ۱۶ شاخص در اصلاح قیمتی است و ۱ شاخص در بازار خرسی. شرکت‌های بزرگ کرهٔ جنوبی بیشترین فاصله را از اوج سالانهٔ خود دارند. شرکت‌های بزرگ فرانسه و شرکت‌های بزرگ هنگ‌کنگ نیز تحت فشار هستند. این توصیهٔ مالی نیست.',
     },
   },
   {
     scenario: 'world-currencies-live',
     intended: 'accepted',
     text: {
-      en: "World currencies need attention today: one pattern is counted in warning. Europe's worry meter says the euro usually slips against the franc when Europe worries. An unusually large move sits on the euro versus the franc.",
-      fa: 'ارزهای مهم جهان امروز نیازمند توجه است: یک الگو در وضعیت هشدار است. دماسنج نگرانی اروپا می‌گوید وقتی اروپا نگران می‌شود، یورو معمولاً در برابر فرانک پایین می‌آید. حرکت غیرعادی بزرگی در یورو در برابر فرانک سوئیس دیده می‌شود.',
+      en: "World currencies need attention today: one pattern is counted in warning. Europe’s worry meter says the euro usually slips against the franc when Europe worries. An unusually large move sits on the euro versus the franc. This is not financial advice.",
+      fa: 'ارزهای مهم جهان امروز نیازمند توجه است: یک الگو در وضعیت هشدار است. دماسنج نگرانی اروپا می‌گوید وقتی اروپا نگران می‌شود، یورو معمولاً در برابر فرانک پایین می‌آید. حرکت غیرعادی بزرگی در یورو در برابر فرانک سوئیس دیده می‌شود. این توصیهٔ مالی نیست.',
     },
   },
   {
     scenario: 'overall-live',
     intended: 'accepted',
     text: {
-      en: "Today's verdicts: Global reads Stressed and Australia reads Stressed. World markets and world currencies both need attention. One standout is The gold crowd gauge: big traders' gold bets have become crowded. This page explains the data and is not financial advice.",
-      fa: 'حکم‌های امروز: جهانی پرتنش است و استرالیا پرتنش است. بازارهای جهان و ارزهای مهم جهان هر دو نیازمند توجه هستند. یکی از موارد برجسته فشارسنج شلوغی طلا است: شرط‌بندی‌های بزرگ معامله‌گران روی طلا شلوغ شده است. این صفحه داده‌ها را ساده می‌کند و توصیهٔ مالی نیست.',
+      en: "Today's verdicts: Global reads Stressed and Australia reads Stressed. World markets and world currencies both need attention. The gold crowd gauge and Euro-area inflation and US inflation are in warning. The Australian jobless rate and the mortgage rate people pay are also elevated. This page explains the data and is not financial advice.",
+      fa: 'حکم‌های امروز: جهانی پرتنش است و استرالیا پرتنش است. بازارهای جهان و ارزهای مهم جهان هر دو نیازمند توجه هستند. فشارسنج شلوغی طلا و تورم منطقهٔ یورو و تورم آمریکا در هشدار هستند. نرخ بیکاری استرالیا و نرخ وامی که مردم می‌پردازند نیز بالا است. این صفحه داده‌ها را ساده می‌کند و توصیهٔ مالی نیست.',
     },
   },
 ];
@@ -293,7 +293,7 @@ for (const bad of BAD_NEWS) {
  *     tests pin the texts)
  * ------------------------------------------------------------------ */
 
-check('prompt version is pinned', PROMPT_VERSION === 5);
+check('prompt version is pinned', PROMPT_VERSION === 6);
 check('section/overall prompts compose the base rules', sectionSystemPrompt().includes('Hard rules:') && overallSystemPrompt().includes('Hard rules:'));
 check('news prompt is standalone (no JSON-only rule)', !newsSystemPrompt().includes('Output only JSON'));
 check('systemPromptFor routes units', systemPromptFor({ kind: 'overall' }) === overallSystemPrompt());

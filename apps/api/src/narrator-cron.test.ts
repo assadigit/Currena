@@ -79,14 +79,56 @@ function fetchAnswering(respond: (body: Record<string, unknown>) => Response): t
 }
 
 /**
- * A mocked model answer that passes V1–V10 for every unit in the fixture
- * set: 4 sentences (inside both the section 3–5 and the overall 4–6
- * windows), no digits, no names, no tone words, no banned words.
+ * A mocked model answer that passes V1–V11 for the GIVEN unit. V7 (no
+ * invented names) + V11 (coverage) together require the text to mention
+ * ONLY the current unit's alerts AND enough of them (≥3 for sections, ≥5
+ * for the overall). A single generic text can't pass both checks for all
+ * units at once — it would either trip V7 (mentioning another section's
+ * alerts) or V11 (mentioning too few). So the mock parses the SCOPE line
+ * from the request's user message and returns a per-unit answer naming
+ * that unit's own alerts (plainNames from the generated vocabulary).
  */
-const AI_GOOD = JSON.stringify({
-  en: 'A plain-language summary sits here. It explains the day in simple words. The wording stays short and clear. This is not financial advice.',
-  fa: 'یک خلاصهٔ ساده اینجاست. روز را با کلمات ساده توضیح می‌دهد. متن کوتاه و روشن است. این یک توصیهٔ مالی نیست.',
-});
+function aiGoodForScope(userMessage: string): { en: string; fa: string } {
+  // The user message's first line is `SCOPE: "global (Global / جهانی)"` (sections)
+  // or `SCOPE: "overall"` (the overall). Parse the unit id from it.
+  const scopeMatch = userMessage.match(/SCOPE:\s*"([a-z-]+)/);
+  const unit = scopeMatch?.[1] ?? 'overall';
+  switch (unit) {
+    case 'global':
+      return {
+        en: 'The gold crowd gauge and Euro-area inflation and US inflation are in warning today. The section reads stressed across the board. The wording stays short and clear. This is not financial advice.',
+        fa: 'فشارسنج شلوغی طلا و تورم منطقهٔ یورو و تورم آمریکا امروز در هشدار است. بخش در مجموع پرتنش است. متن کوتاه و روشن است. این توصیهٔ مالی نیست.',
+      };
+    case 'australia':
+      return {
+        en: 'Australia’s 10-year borrowing cost and Australian inflation and the mortgage rate people pay are in warning today. The section reads stressed across the board. The wording stays short and clear. This is not financial advice.',
+        fa: 'هزینهٔ استقراض ۱۰سالهٔ استرالیا و تورم استرالیا و نرخ وامی که مردم می‌پردازند امروز در هشدار است. بخش در مجموع پرتنش است. متن کوتاه و روشن است. این توصیهٔ مالی نیست.',
+      };
+    default: // overall — mention 5 alerts that are all in the overall's state (global + australia ids)
+      return {
+        en: 'The gold crowd gauge and Euro-area inflation and US inflation and Australia’s 10-year borrowing cost and Australian inflation are in warning today. The page reads stressed across sections. The wording stays short and clear. This is not financial advice.',
+        fa: 'فشارسنج شلوغی طلا و تورم منطقهٔ یورو و تورم آمریکا و هزینهٔ استقراض ۱۰سالهٔ استرالیا و تورم استرالیا امروز در هشدار است. صفحه در مجموع پرتنش است. متن کوتاه و روشن است. این توصیهٔ مالی نیست.',
+      };
+  }
+}
+
+/** The mocked fetch (Gemini path): parse the user message from the request body, return the per-unit AI_GOOD. */
+function fetchAnsweringPerUnit(): typeof fetch {
+  return (async (_url: RequestInfo | URL, init?: RequestInit) => {
+    // The Gemini Interactions request body is `{ system_instruction, input: userMessage }`
+    // (gemini-client.ts line 137). The `input` field IS the user message string
+    // (SCOPE + STATE + VOCABULARY + GLOSSARY). Parse the body, extract `input`.
+    const bodyStr = String(init?.body ?? '');
+    let userMessage = bodyStr;
+    try {
+      const parsed = JSON.parse(bodyStr) as { input?: string; contents?: Array<{ parts?: Array<{ text?: string }> }> };
+      userMessage = String(parsed.input ?? parsed.contents?.[0]?.parts?.[0]?.text ?? bodyStr);
+    } catch {
+      // not JSON — search the raw body
+    }
+    return new Response(JSON.stringify({ output_text: JSON.stringify(aiGoodForScope(userMessage)) }), { status: 200 });
+  }) as typeof fetch;
+}
 
 describe('M4 narratorFlagsOf — the env flag resolution', () => {
   it('defaults: disabled, invisible, no web context, cap 20, gemini-3.5-flash-lite, no key, provider gemini', () => {
@@ -141,7 +183,7 @@ describe('M4 runScheduledNarrator — the template-only deployments (the M4 defa
     expect(tick1.wrote).toBe(true);
 
     const doc1 = parseNarrativeDoc(map.get(NARRATIVE_KV_KEY)!)!;
-    expect(doc1.promptVersion).toBe(5);
+    expect(doc1.promptVersion).toBe(6);
     // page order: the overall + the first two sections; the rest pending
     expect(Object.keys(doc1.sections).sort()).toEqual(['australia', 'global']);
     expect(doc1.overall.source).toBe('template');
@@ -200,7 +242,7 @@ describe('M4 runScheduledNarrator — the enabled path (mocked fetch)', () => {
   it('enabled + a valid model answer: the units carry source "ai" and pass the validators', async () => {
     const { kv, map } = makeKv();
     seedDocuments(map);
-    const fetchImpl = fetchAnswering(() => new Response(JSON.stringify({ output_text: AI_GOOD }), { status: 200 }));
+    const fetchImpl = fetchAnsweringPerUnit();
     const result = await runScheduledNarrator(env({ RATES: kv, NARRATOR_ENABLED: 'true', GEMINI_API_KEY: KEY }), {
       now: NOW,
       fetchImpl,
@@ -209,7 +251,7 @@ describe('M4 runScheduledNarrator — the enabled path (mocked fetch)', () => {
     expect(result.templateUsed).toBe(0);
     const doc = parseNarrativeDoc(map.get(NARRATIVE_KV_KEY)!)!;
     expect(doc.sections['global']!.source).toBe('ai');
-    expect(doc.sections['global']!.en).toContain('A plain-language summary sits here.');
+    expect(doc.sections['global']!.en).toContain('The gold crowd gauge');
     const stats = parseStatsDoc(map.get(NARRATOR_STATS_KEY)!)!;
     expect(stats.days['2026-10-28']!.aiValid).toBe(3);
   });
@@ -268,9 +310,7 @@ describe('M4 runScheduledNarrator — the enabled path (mocked fetch)', () => {
   it('part 3 (news) never runs while NARRATOR_WEB_CONTEXT=false (the D-29 default)', async () => {
     const { kv, map } = makeKv();
     seedDocuments(map);
-    const fetchImpl = vi.fn(
-      async () => new Response(JSON.stringify({ output_text: AI_GOOD }), { status: 200 }),
-    ) as unknown as typeof fetch;
+    const fetchImpl = vi.fn(fetchAnsweringPerUnit()) as unknown as typeof fetch;
     await runScheduledNarrator(env({ RATES: kv, NARRATOR_ENABLED: 'true', GEMINI_API_KEY: KEY }), {
       now: NOW,
       fetchImpl,
@@ -332,10 +372,11 @@ describe('D-41 runScheduledNarrator — the cloudflare provider path (mocked AI 
     seedDocuments(map);
     const fetchImpl = vi.fn() as unknown as typeof fetch; // must NOT be called
     const ai = {
-      run: vi.fn(async () => ({
-        response: AI_GOOD,
-        usage: { prompt_tokens: 100, completion_tokens: 80, total_tokens: 180 },
-      })),
+      run: vi.fn(async (_model: string, input: Record<string, unknown>) => {
+        const messages = input.messages as Array<{ role: string; content: string }> | undefined;
+        const userMessage = messages?.[1]?.content ?? '';
+        return { response: JSON.stringify(aiGoodForScope(userMessage)), usage: { prompt_tokens: 100, completion_tokens: 80, total_tokens: 180 } };
+      }),
     };
     const result = await runScheduledNarrator(
       env({ RATES: kv, NARRATOR_ENABLED: 'true', NARRATOR_PROVIDER: 'cloudflare', AI: ai }),
@@ -390,7 +431,11 @@ describe('D-41 runScheduledNarrator — the cloudflare provider path (mocked AI 
     const { kv, map } = makeKv();
     seedDocuments(map);
     const ai = {
-      run: vi.fn(async () => ({ response: AI_GOOD, usage: {} })),
+      run: vi.fn(async (_model: string, input: Record<string, unknown>) => {
+        const messages = input.messages as Array<{ role: string; content: string }> | undefined;
+        const userMessage = messages?.[1]?.content ?? '';
+        return { response: JSON.stringify(aiGoodForScope(userMessage)), usage: {} };
+      }),
     };
     await runScheduledNarrator(
       env({

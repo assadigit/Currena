@@ -88,7 +88,7 @@ export class CloudflareAiClient implements NarratorModelClient {
         { role: 'system', content: params.systemInstruction },
         { role: 'user', content: params.userMessage },
       ],
-      temperature: params.temperature ?? 0.2,
+      temperature: params.temperature ?? 0.1,
       max_tokens: params.maxOutputTokens ?? 900,
       response_format: JSON_SCHEMA_RESPONSE_FORMAT,
     };

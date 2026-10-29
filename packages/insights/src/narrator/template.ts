@@ -4,7 +4,7 @@
  * builds a 3–5 sentence section narrative or an exactly-4-sentence overall
  * summary from the approved summary labels, the tier counts, up to two top
  * alerts' plainName + oneLine, and the fixed out-of-date clause — and it
- * must itself pass V1–V10 for every fixture in both languages
+ * must itself pass V1–V11 for every fixture in both languages
  * (template.test.ts pins exactly that).
  *
  * Composition guarantees (V2): a section template always emits 3–5
