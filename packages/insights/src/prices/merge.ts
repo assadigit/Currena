@@ -124,7 +124,15 @@ export function mergeLivePricesIntoSnapshot(
       value: entry.value,
       asOf: entry.asOf,
       ...mergedChanges(reading, entry),
-      sourceName: LIVE_PRICE_ASSETS[assetId].sourceName,
+      // 2026-10-29 (the Brent wrong-contract fix): Brent's attribution
+      // names the WINNING month contract from the stored entry's
+      // sourceSymbol (e.g. "…futures (BZZ26.NYM)") — the details panel
+      // shows exactly which price the board carries. The other assets
+      // keep their config's fixed attribution.
+      sourceName:
+        assetId === 'brent'
+          ? `${LIVE_PRICE_ASSETS[assetId].sourceName} (${entry.sourceSymbol})`
+          : LIVE_PRICE_ASSETS[assetId].sourceName,
       sourceUrl: LIVE_PRICE_ASSETS[assetId].sourceUrl,
       updatedAt: generatedAt,
     });

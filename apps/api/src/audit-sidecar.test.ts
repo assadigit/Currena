@@ -76,6 +76,10 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       // A-3: the US−Japan gap (DGS10 public-domain + MOF PDL1.0 + the OECD
     // mirror's citation-required leg, display-permitted).
     'us-japan-10y-gap',
+    // 2026-10-29 owner round ("add dollar against UAE currency"): the
+    // dirham card — Yahoo L2 (ownerAccepts, the register row the Brent
+    // gap-fill already rides) + the owner's own display directive.
+    'usdaed',
     'vix',
       'yield-curve-10y2y',
       // 2026-10-26 gap-audit build, A-1: the 10y−3m curve leg (T10Y3M,

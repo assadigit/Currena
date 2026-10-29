@@ -190,6 +190,16 @@ const OWNER_PUBLIC_DISPLAY_OVERRIDE: Readonly<Record<string, string>> = {
   // same legs, so the same directives govern it.
   'gold-oil-ratio':
     'The ratio derives from the gold-usd and brent series whose display bars the standing owner directives (2026-10-19e) already lifted; the Yahoo history legs stay in the engine — the directives cover the ratio’s worst leg exactly as they cover its parents’.',
+  // 2026-10-29 owner round (credentials chat session): the usdaed card —
+  // the owner's own ask: "Add dollar against UAE currency". The ECB
+  // publishes no AED reference rate, so the card's single leg is Yahoo's
+  // USD/AED daily closes — the same unofficial-but-accepted provider the
+  // Brent gap-fill and the metals history legs already ride (register row
+  // yahoo: L2, ownerAccepts, recorded 2026-10-16). The owner explicitly
+  // requested this card knowing its source, accepting that leg on their
+  // own site — the same display-bar lift the four prices tiles carry.
+  usdaed:
+    'Owner-requested card (2026-10-29: "add dollar against UAE currency"); the ECB publishes no AED reference rate, so the single leg is Yahoo USD/AED daily closes — the register row the owner already accepts (L2, ownerAccepts, 2026-10-16, the same provider the Brent gap-fill and metals history legs ride). The owner directive lifts its worst-leg display bar.',
 };
 
 /**

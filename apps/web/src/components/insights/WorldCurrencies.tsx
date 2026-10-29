@@ -218,14 +218,43 @@ export function WorldCurrencies({
 
       {/* The verdict line (§9.3 item 2): the §9.10 measure label + the
        * page's severity chip + one short headline sentence (§10.3). No
-       * chips naming the patterns — the cards below already do. */}
-      <div className="flex flex-col gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)]">
+       * chips naming the patterns — the cards below already do.
+       *
+       * 2026-10-29 owner round ("when a currency pattern is active, make
+       * it more prominent with visual weight, easy to be seen"): an ACTIVE
+       * pattern turns the box into the section's ALARM — the warning
+       * field, the amber ring, a severity accent bar on the reading-start
+       * edge and the verdict-scale label (SectionVerdictLine size="lg").
+       * A calm day keeps the quiet neutral card (the contrast IS the
+       * signal — a permanently loud box is a box nobody sees). */}
+      <div
+        className={`relative flex flex-col gap-2 overflow-hidden rounded-[var(--radius-md)] p-3.5 ring-1 shadow-[0_2px_10px_rgba(15,23,42,0.05)] ${
+          summary.signal === 'attention' || summary.signal === 'unusual'
+            ? 'bg-currena-warning/[0.09] ring-currena-warning/45'
+            : 'bg-[var(--color-surface)] ring-[var(--color-border)]'
+        }`}
+        data-fx-verdict
+        data-fx-signal={summary.signal}
+      >
+        {(summary.signal === 'attention' || summary.signal === 'unusual') && (
+          <span
+            aria-hidden="true"
+            className="absolute inset-y-0 start-0 w-1.5 bg-[var(--color-status-alert)]"
+          />
+        )}
         <SectionVerdictLine
           label={copy.fx[measureKey]}
           chip={summary.signal === 'normal' ? null : summary.signal}
           copy={copy}
+          size={summary.signal === 'normal' ? 'md' : 'lg'}
         />
-        <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+        <p
+          className={`m-0 leading-relaxed ${
+            summary.signal === 'attention' || summary.signal === 'unusual'
+              ? 'text-[length:var(--type-label)] font-semibold text-[var(--color-text-primary)]'
+              : 'text-[length:var(--type-label)] text-[var(--color-text-secondary)]'
+          }`}
+        >
           <bdi>{fxHeadline(snapshot, copy.fx, numberLocale)}</bdi>
         </p>
       </div>

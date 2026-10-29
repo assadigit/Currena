@@ -37,7 +37,8 @@
     "safety-demo": "tsx scripts/safety-demo.ts",
     "regression:generate": "tsx scripts/generate-regression-episodes.ts",
     "narrator:vocabulary": "tsx scripts/generate-narrator-vocabulary.ts",
-    "narrator:vocabulary:check": "tsx scripts/check-narrator-vocabulary.ts"
+    "narrator:vocabulary:check": "tsx scripts/check-narrator-vocabulary.ts",
+    "local-export": "tsx scripts/local-export.ts"
   },
   "dependencies": {
     "@currena/core": "workspace:*",

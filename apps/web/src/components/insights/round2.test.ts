@@ -816,9 +816,9 @@ describe('R9 lane presentation (special containers, unchanged gauges)', () => {
     expect(LANE_GROUP_ORDER.australia).toEqual(GROUP_ORDER.australia);
   });
 
-  it('R9-04: the dollar-strength ids are exactly the six cards that moved', () => {
+  it('R9-04: the dollar-strength ids are exactly the cards that moved (2026-10-29 owner round: +usdaed — the UAE dirham context row)', () => {
     expect([...DOLLAR_STRENGTH_IDS].sort()).toEqual(
-      ['dollar-basket', 'usdjpy', 'us-japan-10y-gap', 'eur-usd', 'usdtry', 'usdcny'].sort(),
+      ['dollar-basket', 'usdjpy', 'us-japan-10y-gap', 'eur-usd', 'usdtry', 'usdaed', 'usdcny'].sort(),
     );
   });
 

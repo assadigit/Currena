@@ -523,6 +523,19 @@
       "rule": "{\"kind\":\"info\"}"
     },
     {
+      "id": "usdaed",
+      "licenceName": "No reuse licence offered (unofficial endpoints)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": true,
+      "enabled": true,
+      "method": "M3",
+      "maxAgeDays": 4,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
       "id": "walcl",
       "licenceName": "FRED license #copyright-public-domain (public domain)",
       "publicDisplayOk": "yes",

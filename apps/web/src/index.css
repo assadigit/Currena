@@ -1269,6 +1269,15 @@ html:not(:lang(fa)) .type-kicker {
     top: calc(56px + env(safe-area-inset-top, 0px));
   }
 }
+/* 2026-10-29 owner round: the sticky nav grew — the pills WRAP (44px
+ * targets) and the top-movers strip rides under them — so every insights
+ * anchor target must clear a taller bar (~230px below the viewport top)
+ * when a jump-nav pill, a deep link or a card focus scrolls to it. The
+ * scope is the insights page only; scroll-mt-24 stays the default
+ * elsewhere. */
+.insights-page .scroll-mt-24 {
+  scroll-margin-top: 15rem;
+}
 
 /* Verdict meter (H1): four segments + a marker on the current step.
  * R30: segment inks mirror the FOUR-STEP word scale exactly (the word
@@ -1489,7 +1498,13 @@ html:not(:lang(fa)) .type-kicker {
     font-size: calc(var(--icon-size-sm, var(--icon-size, 24px)) * 0.34);
   }
 }
+/* 2026-10-29 owner round ("all cards must have a background"): the
+ * alert-card face sat directly on the page field beside surface-backed
+ * cards — it now carries the same raised surface every other card face
+ * wears, so the needs-attention top border reads as a card accent, not
+ * the page itself. */
 .alert-card {
+  background: var(--color-surface);
   border-block-start: 2px solid var(--color-status-alert);
 }
 .alert-card[data-tier='unusual'] {

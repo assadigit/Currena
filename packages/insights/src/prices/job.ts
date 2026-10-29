@@ -26,13 +26,13 @@ import { livePricesContentEqual } from './store';
 import { providerFetchEnabled } from '../sources';
 
 export interface PricesJobFetchers {
-  fetchAsset: (assetId: PriceAssetId) => Promise<LivePriceEntry>;
+  fetchAsset: (assetId: PriceAssetId, rememberedSymbol?: string) => Promise<LivePriceEntry>;
 }
 
 /** Default fetchers over the real provider (tests inject fakes). */
 export function defaultPricesFetchers(opts: YahooQuoteOptions = {}): PricesJobFetchers {
   return {
-    fetchAsset: (assetId) => fetchLivePriceEntry(assetId, opts),
+    fetchAsset: (assetId, rememberedSymbol) => fetchLivePriceEntry(assetId, opts, new Date(), rememberedSymbol),
   };
 }
 
@@ -106,7 +106,10 @@ export async function runPricesUpdate(deps: RunPricesUpdateDeps): Promise<RunPri
       continue;
     }
     try {
-      const entry = await deps.fetchers.fetchAsset(assetId);
+      // 2026-10-29 (the Brent wrong-contract fix): the previous entry's
+      // sourceSymbol rides along — Brent's front-month probe re-tries the
+      // remembered contract FIRST (one call in the steady state).
+      const entry = await deps.fetchers.fetchAsset(assetId, prevEntry?.sourceSymbol);
       assets[assetId] = entry;
       reportsList.push({ assetId, outcome: 'fetched' });
     } catch (err) {

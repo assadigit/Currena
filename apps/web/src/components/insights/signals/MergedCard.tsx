@@ -131,7 +131,7 @@ export function MergedSignalsCard({
     return (
       <li
         key={metal}
-        className="flex flex-col gap-0.5 rounded-[var(--radius-sm)] px-2.5 py-2 ring-1 ring-[var(--color-border)]"
+        className="flex flex-col gap-0.5 rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2.5 py-2 ring-1 ring-[var(--color-border)]"
         data-footing-metal={metal}
         data-footing-state={state}
       >

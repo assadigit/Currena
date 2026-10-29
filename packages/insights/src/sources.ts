@@ -622,6 +622,11 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   // Their honest legs are the Frankfurter quote series they invert/cross.
   audusd: ['frankfurter'],
   audjpy: ['frankfurter'],
+  // 2026-10-29 owner round (the usdaed card): the Gulf petro-currency
+  // member's single leg — Yahoo's USD/AED daily closes. The register row
+  // (yahoo: L2, ownerAccepts — the same acceptance the Brent gap-fill and
+  // the metals histories ride) gates its display bar.
+  usdaed: ['yahoo:AED=X'],
 };
 
 /* ------------------------------------------------------------------ */
@@ -873,6 +878,12 @@ export const SANITY_RANGES: Readonly<Record<string, SanityRange>> = {
   // M4 Wave 1 (2026-10-24): a probability is bounded [0, 1] by construction
   // (the Chauvet smoothed recession probability — stored as the fraction).
   'recession-probability': { min: 0, max: 1 },
+  // 2026-10-29 owner round (the usdaed card): the dirham is PEGGED — the
+  // pair's decade band is famously tight (≈3.65–3.70 AED per dollar; the
+  // observed Yahoo history sits inside 3.60–3.75). 3.0–4.5 catches a gross
+  // parse error (a wrong symbol, a percentage misread) without ever false-
+  // alarming on a real revaluation, which would itself be historic news.
+  usdaed: { min: 3.0, max: 4.5 },
 };
 
 /** F-14: is the value inside its definitional band? (true when no band is registered) */

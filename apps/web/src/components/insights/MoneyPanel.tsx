@@ -206,8 +206,18 @@ export function MoneyPanel({
       <h2 id="insights-money-title" className="type-section m-0 mb-1">
         {copy.money.title}
       </h2>
-      <p className="m-0 mb-3 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">
+      <p className="m-0 mb-2 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">
         {copy.money.subtitle}
+      </p>
+      {/* 2026-10-29 owner round: the AU-scope notice — the panel's costs and
+       * rates are Australian households' (petrol in cents/litre, RBA rates,
+       * ABS wages). One quiet, clearly-labelled line directly under the
+       * subtitle; the panel itself also moved inside the Australia section
+       * (SectionLane's australiaSlot), so its home answers the question
+       * before the notice does. */}
+      <p className="m-0 mb-3 inline-flex w-fit flex-wrap items-center gap-1.5 rounded-full bg-[var(--color-surface)] px-3 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
+        <span aria-hidden="true">🇦🇺</span>
+        <bdi>{copy.money.scopeNote}</bdi>
       </p>
 
       {rows.length === 0 ? (

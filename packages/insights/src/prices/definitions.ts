@@ -39,9 +39,15 @@ export const LIVE_PRICE_YAHOO_RANGE = '40d';
  * Owner-editable CONFIG (the §5.3 pattern): per-asset Yahoo symbol, refresh
  * interval in minutes, and the honest serve-time attribution.
  *
- *   brent     BZ=F    front-month Brent futures — THE live Brent reference;
- *                     the FRED spot series stays the EOD backbone and the
- *                     ingestion gap-fills its holes from this same symbol.
+ *   brent     FIRST ACTIVE MONTH — the specific front-month contract
+ *                     (BZ{month}{yy}.NYM, e.g. BZZ26.NYM), selected by
+ *                     brent-front-month.ts (2026-10-29): the continuous
+ *                     BZ=F had silently rolled onto January while December
+ *                     still traded (110.51 vs the true 114.34 — the owner's
+ *                     "wrong oil price" report). BZ=F stays the engine's
+ *                     last-resort fallback; the FRED spot series stays the
+ *                     EOD backbone and the ingestion gap-fill extends from
+ *                     the SAME front-month symbol the live refresh quotes.
  *   gold-usd  GC=F    COMEX front-month gold (per troy ounce — same unit as
  *                     the GoldAPI XAU spot it refreshes; the futures basis
  *                     is typically < 1 %).
@@ -61,12 +67,17 @@ export interface LivePriceAssetConfig {
 
 export const LIVE_PRICE_ASSETS: Readonly<Record<PriceAssetId, LivePriceAssetConfig>> = {
   brent: {
+    // 2026-10-29: NOT the continuous — the FIRST ACTIVE specific month
+    // (brent-front-month.ts probes BZ{month}{yy}.NYM forward from today;
+    // BZ=F is only the last-resort fallback). The stored entry's
+    // sourceSymbol remembers the winner.
     yahooSymbol: 'BZ=F',
     intervalMinutes: 60,
     // Step-1 audit item A9: the attribution names the CONTRACT, not just the
-    // venue — the details panel (owner request: sources off the card faces)
-    // shows exactly which price the board carries.
-    sourceName: 'Yahoo Finance: Brent front-month futures (BZ=F)',
+    // venue — merge.ts substitutes the stored entry's sourceSymbol so the
+    // details panel shows exactly which month contract the board carries
+    // (e.g. "Brent front-month futures (BZZ26.NYM)").
+    sourceName: 'Yahoo Finance: Brent front-month futures',
     sourceUrl: 'https://finance.yahoo.com/quote/BZ=F',
   },
   'gold-usd': {

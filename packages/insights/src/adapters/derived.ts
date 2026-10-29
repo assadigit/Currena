@@ -84,8 +84,13 @@ export interface SeriesInputs {
     /** NZD joined 2026-10-21 for the nzd-usd card — retired 2026-10-23
      *  (OD-7): the leg stays out of the one Frankfurter request again.
      *  M5 Wave 2 (2026-10-24): TRY joins as the ninth leg (the usdtry card,
-     *  the EM-pressure first member). */
+     *  the EM-pressure first member).
+     *  2026-10-29 owner round: AED joins as the tenth leg — NOT from
+     *  Frankfurter (ECB reference rates do not serve the dirham) but from
+     *  Yahoo's USD/AED daily closes (AED=X), fetched by collect.ts as its
+     *  own subrequest and handed in here alongside the Frankfurter set. */
     TRY?: SeriesPoint[];
+    AED?: SeriesPoint[];
   };
   /** World Bank Pink Sheet monthly series. */
   wb?: WorldBankMonthly;
@@ -486,6 +491,11 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // against the Turkish lira (context; the fx-module EM block may follow
   // in a later round once TRY proves the slot).
   put('usdtry', fx.TRY);
+  // 2026-10-29 owner round ("add dollar against UAE currency"): the Gulf
+  // petro-currency member — Yahoo's USD/AED daily closes (AED=X), the one
+  // fx leg that does not ride the Frankfurter request (ECB serves no AED
+  // reference rate). Context info card in the dollar lane beside usdtry.
+  put('usdaed', fx.AED);
   // nzd-usd retired 2026-10-23 (OD-7, D-42): an indicator card for an
   // audience that doesn't exist — no replacement, the Frankfurter request
   // drops the NZD leg again.
@@ -881,6 +891,7 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   wheat: { name: 'The World Bank: Commodity Markets (Pink Sheet, Wheat US SRW)', url: 'https://www.worldbank.org/en/research/commodity-markets' },
   maize: { name: 'The World Bank: Commodity Markets (Pink Sheet, Maize)', url: 'https://www.worldbank.org/en/research/commodity-markets' },
   usdtry: { name: 'Frankfurter (ECB USD→TRY reference rate)', url: 'https://frankfurter.dev' },
+  usdaed: { name: 'Yahoo Finance (USD/AED daily closes)', url: 'https://finance.yahoo.com/quote/AED=X' },
   'govt-interest-revenue': { name: 'FRED (BEA series, derived)', url: 'https://fred.stlouisfed.org/series/A091RC1Q027SBEA' },
   'fed-expectations': { name: 'FRED (DGS2 − policy-rate midpoint)', url: 'https://fred.stlouisfed.org/series/DGS2' },
   us30y: { name: 'FRED (DGS30)', url: 'https://fred.stlouisfed.org/series/DGS30' },
@@ -1049,7 +1060,9 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'copper-gold': { name: 'The World Bank Pink Sheet (copper ÷ gold)', url: 'https://www.worldbank.org/en/research/commodity-markets' },
   usdcny: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   brent: {
-    name: 'FRED (EIA Brent) + Yahoo Finance (BZ=F)',
+    // 2026-10-29: the Yahoo gap-fill leg quotes the first active month
+    // contract (brent-front-month.ts), not the continuous BZ=F.
+    name: 'FRED (EIA Brent) + Yahoo Finance (front-month futures)',
     url: 'https://fred.stlouisfed.org/series/DCOILBRENTEU',
   },
   // 2026-10-26 gap-audit build, A-4.

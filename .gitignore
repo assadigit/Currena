@@ -59,3 +59,9 @@ tmp/
 # never re-spend the 20-calls/day EODHD free quota. Never committed: they
 # are provider data refreshes, not fixtures.
 packages/insights/fixtures/markets-live/
+
+# --- local preview data (2026-10-29) ---
+# Output of pnpm --filter @currena/insights local-export: live-scraped
+# JSON served by the sandbox Next.js preview host's currena-data service.
+# Regenerable provider data, never committed (same rule as markets-live).
+data/local-preview/

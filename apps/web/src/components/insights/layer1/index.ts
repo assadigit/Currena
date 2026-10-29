@@ -68,11 +68,13 @@ export const LAYER1_GLOSSARY_IDS: readonly string[] = Object.keys(insightsCopyEn
  * otherwise — by design).
  */
 export const LAYER1_INVENTORY_IDS: readonly string[] = [
-  // ----- 100 indicators (packages/insights/src/definitions.ts) -----
+  // ----- 101 indicators (packages/insights/src/definitions.ts) -----
   'yield-curve-10y2y', 'yield-curve-10y3m', 'real-yield-10y', 'us10y', 'us30y', 'fed-target',
   'ecb-dfr', 'fed-expectations', 'govt-interest-revenue', 'us-2y', 'sofr',
   'mortgage-30y', 'jgb-10y', 'bund-10y', 'gilt-10y', 'euro-aaa-10y', 'boe-rate',
   'boj-rate', 'dollar-basket', 'usdjpy', 'us-japan-10y-gap', 'eur-usd', 'usdtry',
+  // 2026-10-29 owner round ("add dollar against UAE currency") → 101.
+  'usdaed',
   'us-unemployment', 'sahm-rule', 'china-pmi', 'china-cpi', 'copper-gold',
   'michigan-sentiment', 'initial-jobless-claims', 'philly-fed', 'recession-probability',
   'oecd-cli-us', 'm2-us', 'retail-sales', 'housing-permits', 'job-openings',

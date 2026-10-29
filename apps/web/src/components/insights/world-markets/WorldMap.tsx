@@ -39,7 +39,6 @@ import {
   MAP_LABELS,
   MAP_LABEL_SIZE_DEFAULT,
   MAP_PERIODS,
-  MAP_THRESHOLDS,
   MAP_TINT_COUNTRY_DAMP,
   OPEN_MAX_AGE_MIN,
   borderMixOf,
@@ -53,6 +52,8 @@ import {
   type MapPeriod,
 } from './world-map-config';
 import { isOld, percentGlyph } from './shared';
+import { sessionOpen } from './session';
+import { marketDefinition } from '@currena/insights/markets/definitions';
 
 /* ------------------------------------------------------------------ *
  * The static assets (B3) — one shared in-flight promise, fetched when
@@ -176,21 +177,9 @@ function pctOf(entry: MarketEntry | undefined, period: MapPeriod): number | null
   return entry.chg1y ?? null; // 2026-10-20h: yearly returns to the map
 }
 
-/** M10's breadth counts — plain code over the same rows, never a model. */
-function summarizeRows(rows: readonly MapRow[], period: MapPeriod) {
-  const flatBand = MAP_THRESHOLDS[period];
-  let up = 0;
-  let down = 0;
-  let flat = 0;
-  for (const r of rows) {
-    const p = r.pcts[period];
-    if (p === null) continue;
-    if (p > flatBand) up++;
-    else if (p < -flatBand) down++;
-    else flat++;
-  }
-  return { up, down, flat, n: up + down + flat };
-}
+/** M10's breadth counts — RETIRED with the map's one-glance breadth line
+ * (2026-10-29 owner round); the MarketsVerdict box keeps the section's
+ * own selected-period breadth counts. */
 
 /* ------------------------------------------------------------------ *
  * The module
@@ -348,12 +337,19 @@ export function WorldMap({
         dir,
         pct,
         old,
-        open: !loading && entry !== undefined && openAtViewTime(entry, nowMs),
+        // 2026-10-29 owner round: the CALENDAR gates the pin too — a stored
+        // "open" flag written before the weekend must never read "open"
+        // on a Saturday (the quote-flow flag tracks the last refresh, not
+        // the exchange's own clock; sessionOpen reads the definitions'
+        // IANA timezone + session + holiday calendar).
+        open:
+          !loading &&
+          entry !== undefined &&
+          openAtViewTime(entry, nowMs) &&
+          sessionOpen(marketDefinition(entry.id), new Date(nowMs)),
       };
     });
   }, [snapshot, period, loading, todayIso, nowMs]);
-
-  const summary = useMemo(() => summarizeRows(rows, period), [rows, period]);
 
   /* 2026-10-20g owner round — COUNTRY TINTS: a country that hosts several
    * indices (the US trio on New York) tints by its STRONGEST fresh mover
@@ -463,14 +459,6 @@ export function WorldMap({
     '1Y': mapCopy.periodYear,
     '5Y': mapCopy.period5Y,
   };
-  const periodWord: Record<MapPeriod, string> = {
-    '1D': mapCopy.periodWordToday,
-    '1W': mapCopy.periodWordWeek,
-    '1M': mapCopy.periodWordMonth,
-    '3M': mapCopy.periodWord3M,
-    '1Y': mapCopy.periodWordYear,
-    '5Y': mapCopy.periodWord5Y,
-  };
   const cellLabel: Record<MapPeriod, string> = {
     '1D': mapCopy.cellD,
     '1W': mapCopy.cellW,
@@ -479,8 +467,6 @@ export function WorldMap({
     '1Y': mapCopy.cellY,
     '5Y': mapCopy.cell5Y,
   };
-
-  const n = (v: number) => formatNumber(v, numberLocale, { maximumFractionDigits: 0 });
 
   /* M17: "Showing data from {time}" when the refresh failed and the
    * last good local copy is on screen. */
@@ -498,16 +484,10 @@ export function WorldMap({
 
       {!loading ? (
         <>
-          {/* M10 — the one-glance breadth line (NOT the section verdict). */}
-          <p className="m-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">
-            {interpolate(mapCopy.summary, {
-              up: n(summary.up),
-              n: n(summary.n),
-              period: periodWord[period],
-              down: n(summary.down),
-              flat: n(summary.flat),
-            })}
-          </p>
+          {/* M10 — the one-glance breadth line — RETIRED (2026-10-29 owner
+           * round: the «۱۰ از ۱۶ بازار امروز مثبت · ۴ منفی · ۲ ثابت» line
+           * under the map goes away; the verdict box's own selected-period
+           * breadth counts remain the section's one breadth surface). */}
           {/* M11 — the six-option segmented control + M17's stale-copy line.
            * 2026-10-20h owner round: the switch CENTRES under the summary
            * (it hugged the start edge before) and grew ~50% — 48px pills,

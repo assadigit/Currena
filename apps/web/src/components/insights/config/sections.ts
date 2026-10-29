@@ -43,7 +43,9 @@ export const LANE_GROUP_ORDER: Readonly<Record<InsightsSection, readonly Indicat
 
 /**
  * R9-04: the dollar-strength ids that render inside the world currencies
- * section (3 voters + 3 context rows, definition order = snapshot order).
+ * section (3 voters + context rows, definition order = snapshot order).
+ * 2026-10-29 owner round ("add dollar against UAE currency"): usdaed —
+ * the pegged Gulf petro-currency — joins as a context row after usdtry.
  */
 export const DOLLAR_STRENGTH_IDS: readonly IndicatorId[] = [
   'dollar-basket',
@@ -51,6 +53,7 @@ export const DOLLAR_STRENGTH_IDS: readonly IndicatorId[] = [
   'us-japan-10y-gap',
   'eur-usd',
   'usdtry',
+  'usdaed',
   'usdcny',
 ];
 

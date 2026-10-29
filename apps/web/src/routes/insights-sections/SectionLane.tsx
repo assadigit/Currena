@@ -27,6 +27,7 @@ import { UsGlobalReachGroup } from './UsGlobalReachGroup';
 import { NarrativeBlock } from '../../components/insights/NarrativeBlock';
 import { InTheNews } from '../../components/insights/InTheNews';
 import type { NarrativeUnit } from '../../lib/narrative';
+import type { ReactNode } from 'react';
 
 /** The I10 watchlist strip (pinned items, snapshot order) — inside the lane. */
 function PinnedSection({
@@ -98,6 +99,7 @@ export function SectionLane({
   narrativeBySection,
   narrativeVisible = false,
   locale,
+  australiaSlot,
 }: {
   snapshot: InsightsSnapshot;
   copy: InsightsCopy;
@@ -131,6 +133,13 @@ export function SectionLane({
    * unit's EN or FA text. The Insights route owns this; the lane never
    * reads the URL or i18n store itself. */
   locale?: 'en' | 'fa';
+  /** 2026-10-29 owner round (the money panel is Australian-household
+   * data): a slot rendered at the END of the AUSTRALIA section, inside
+   * its mother container — the "what it means for my money" panel moved
+   * here from its old standalone spot between the world sections and
+   * Together, so its home answers the scope question before its notice
+   * does. undefined → nothing extra renders. */
+  australiaSlot?: ReactNode;
 }) {
   return (
     <div id="insights-section-lane" className="scroll-mt-24 flex flex-col gap-10">
@@ -251,6 +260,10 @@ export function SectionLane({
                   renderableIds={sectionIds}
                 />
               ) : null}
+              {/* 2026-10-29 owner round: the AUSTRALIA section's closing
+               * slot — the "what it means for my money" panel (Australian
+               * household costs) lives INSIDE its region's container now. */}
+              {sec === 'australia' && australiaSlot !== undefined ? australiaSlot : null}
             </section>
             );
           })}

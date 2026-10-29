@@ -51,6 +51,7 @@ import { AboutTheData } from '../components/insights/AboutTheData';
 import { DetailsPanel } from '../components/insights/DetailsPanel';
 import { HeroBlock } from '../components/insights/HeroBlock';
 import { JumpNav, type JumpTarget } from '../components/insights/JumpNav';
+import { TopMoversStrip } from '../components/insights/TopMoversStrip';
 import { MoneyPanel } from '../components/insights/MoneyPanel';
 import { NextUpStrip } from '../components/insights/NextUpStrip';
 import { PricesBoard } from '../components/insights/PricesBoard';
@@ -443,7 +444,6 @@ export function Insights() {
               copy={copy}
               numberLocale={numberLocale}
               onJumpSection={jumpToSection}
-              onJumpAbout={jumpAbout}
               onFocusCard={focusCard}
               marketsAlert={marketsAlert}
               onJumpMarkets={jumpToMarkets}
@@ -483,8 +483,18 @@ export function Insights() {
            * owner's own words: "it's redundant because already another
            * set have this same buttons"). */}
 
-          {/* P1/R19: the sticky section pills. */}
-          <JumpNav targets={jumpTargets} copy={copy} onWillNavigate={onWillNavigate} />
+          {/* P1/R19: the sticky section pills — 2026-10-29 owner round: the
+           * pills grew and WRAP, and the TOP-5 CHANGES strip rides inside
+           * the sticky bar under them (the page's fastest "what is moving"
+           * answer, never scrolled away). */}
+          <JumpNav targets={jumpTargets} copy={copy} onWillNavigate={onWillNavigate}>
+            <TopMoversStrip
+              readings={state.snapshot.readings}
+              copy={copy}
+              numberLocale={numberLocale}
+              onFocusCard={focusCard}
+            />
+          </JumpNav>
 
           {/* R10: the prices strip — four identical tiles. */}
           <PricesBoard
@@ -567,13 +577,11 @@ export function Insights() {
             />
           )}
 
-          {/* R11: "What it means for my money" — at most 4 lines. */}
-          <MoneyPanel
-            readings={state.snapshot.readings}
-            copy={copy}
-            numberLocale={numberLocale}
-            onFocusCard={focusCard}
-          />
+          {/* R11: "What it means for my money" — 2026-10-29 owner round
+           * ("because it's related to Aussie living, relocate it to the
+           * Australia section"): the panel MOVED into the Australia
+           * section (SectionLane's australiaSlot) with its new AU-scope
+           * notice; its old standalone spot here is retired. */}
 
           {/* T1 + R7b: the "Together" connection cards — collapsed default. */}
           <Together
@@ -618,6 +626,14 @@ export function Insights() {
             narrativeBySection={narrativeDoc?.sections}
             narrativeVisible={narrativeVisible}
             locale={locale}
+            australiaSlot={
+              <MoneyPanel
+                readings={state.snapshot.readings}
+                copy={copy}
+                numberLocale={numberLocale}
+                onFocusCard={focusCard}
+              />
+            }
           />
 
           {/* R16: the calendar — once, below the indicators, before About. */}

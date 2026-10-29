@@ -116,7 +116,6 @@ export function HeroBlock({
   copy,
   numberLocale,
   onJumpSection,
-  onJumpAbout,
   onFocusCard,
   marketsAlert,
   onJumpMarkets,
@@ -128,7 +127,6 @@ export function HeroBlock({
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
   onJumpSection: (section: InsightsSection) => void;
-  onJumpAbout: () => void;
   onFocusCard: (id: IndicatorId, opener?: HTMLElement | null) => void;
   /** §5.3 (build step 9): the world-markets signal when raised — joins the
    * GLOBAL verdict's attention module; undefined when calm or unpopulated. */
@@ -315,7 +313,6 @@ export function HeroBlock({
             copy={copy}
             numberLocale={numberLocale}
             onJumpSection={onJumpSection}
-            onJumpAbout={onJumpAbout}
             onFocusCard={onFocusCard}
             marketsAlert={marketsAlert}
             onJumpMarkets={onJumpMarkets}
@@ -332,7 +329,6 @@ export function HeroBlock({
             copy={copy}
             numberLocale={numberLocale}
             onJumpSection={onJumpSection}
-            onJumpAbout={onJumpAbout}
             onFocusCard={onFocusCard}
           />
         </div>

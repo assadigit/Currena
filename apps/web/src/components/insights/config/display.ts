@@ -29,6 +29,8 @@ export type UnitToken =
   | 'claims'
   // M5 Wave 2 (2026-10-24): the Turkish lira (the usdtry pair).
   | 'try'
+  // 2026-10-29 owner round: the UAE dirham (the usdaed pair).
+  | 'aed'
   // M6 Wave 3 (2026-10-25): the leading-edge batch — Australian billions
   // ("A$97.6bn" EN), US permits and job openings scaled to millions
   // ("1.40m permits a year"), AU vacancies in thousands ("325k").
@@ -56,6 +58,8 @@ export interface UnitLabels {
   ratio: string;
   claims: string;
   try: string;
+  // 2026-10-29 owner round (the usdaed card): the UAE dirham unit.
+  aed: string;
   'aud-bn': string;
   permits: string;
   openings: string;
@@ -131,6 +135,9 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   wheat: { decimals: 1, unit: 'usd' },
   maize: { decimals: 1, unit: 'usd' },
   usdtry: { decimals: 2, unit: 'try' },
+  // 2026-10-29 owner round ("add dollar against UAE currency"): the
+  // pegged pair — 2dp reads the dirham's tight band honestly (3.67).
+  usdaed: { decimals: 2, unit: 'aed' },
   // M6 Wave 3 (OD-8/D-42, 2026-10-25) — the leading-edge batch: the
   // mortgage/liquidity/spending family. WALCL is $ millions → 'usd-tr'
   // ×1e-6 ("US$6.8 trillion"); retail sales $ millions → 'usd-bn' ×1e-3

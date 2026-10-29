@@ -52,6 +52,12 @@ export interface TrendWindow {
   trend: TrendState;
   /** True when the window is short or sparse — disclosed, never hidden. */
   incomplete: boolean;
+  /** 2026-10-29 owner round (the timeframe reference price): the WINDOW'S
+   * OWN REFERENCE VALUE — the first observation inside the window, the
+   * price the net percentage measures from. The tile shows it beside the
+   * current price ("(1 year start: US$82.4)") so a switched lens never
+   * leaves the reader wondering what the percentage is measured against. */
+  refValue: number;
 }
 
 /** How far the reference point may sit from its target day (same as the API). */
@@ -165,6 +171,7 @@ export function windowFor(points: readonly TrendPoint[], days: number): TrendWin
     netPct,
     trend: classifyTrend(inWindow, netPct),
     incomplete: span < minSpanOf(days) || inWindow.length < MIN_TREND_POINTS,
+    refValue: ref.value,
   };
 }
 

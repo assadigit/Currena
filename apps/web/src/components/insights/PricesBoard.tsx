@@ -326,6 +326,29 @@ function PriceTile({
   // feed has no 1-day field, so this usually derives from the history).
   const c1 = stats?.c1;
 
+  // 2026-10-29 owner round (the timeframe reference price): the selected
+  // window's own STARTING PRICE, formatted through the same parts builder
+  // as the main price — "when the user clicks another timeframe like 1
+  // year, the main price must also update … or show that old price in a
+  // parenthesis". The current price stays THE price; the window's basis
+  // rides beside it in a muted parenthetical, so the net percentage's
+  // denominator is on the card. Only for a real window (the Today lens
+  // measures against the previous close — its own explicit-basis line
+  // already says so).
+  const lensRefPrice =
+    lens !== 'today' && trend !== null && trend.trend !== 'insufficient'
+      ? priceValueParts(id, trend.refValue, numberLocale, copy.units)
+      : null;
+  const lensRefText =
+    lensRefPrice !== null
+      ? interpolate(copy.ui.priceAtWindowStart, {
+          period: lensRowLabel(lens, copy),
+          // The parts join with the house spacing: prefix tight to the
+          // number, the suffix word separated («۱۲۵٫۳۹ دلار»).
+          value: `${lensRefPrice.prefix ?? ''}${lensRefPrice.number}${lensRefPrice.suffix !== null ? ` ${lensRefPrice.suffix}` : ''}`,
+        })
+      : null;
+
   /* ---------------------------- render ---------------------------- */
 
   // The card header's title + measurement-basis subtitle (2026-10-25b):
@@ -385,7 +408,11 @@ function PriceTile({
              * grouped as a single semantic value. The parts ride in the
              * document's own direction (fa: «۴٬۱۶۶ دلار»; en: "US$4,166")
              * — each fragment isolated so a direction change can never
-             * split or reorder them. */}
+             * split or reorder them.
+             *
+             * 2026-10-29 owner round: when a period lens is selected, the
+             * window's own STARTING price rides in a muted parenthetical
+             * on the same row — the percentage's basis, on the card. */}
             <span className="mt-3 flex w-full flex-wrap items-baseline gap-x-1">
               {price !== null ? (
                 <>
@@ -404,6 +431,11 @@ function PriceTile({
                   {price.suffix !== null ? (
                     <bdi className="whitespace-nowrap text-[14px] font-semibold leading-none text-[var(--color-text-secondary)]">
                       {price.suffix}
+                    </bdi>
+                  ) : null}
+                  {lensRefText !== null ? (
+                    <bdi className="ms-1.5 whitespace-nowrap text-[12.5px] font-semibold leading-none text-[var(--color-text-tertiary)]">
+                      ({lensRefText})
                     </bdi>
                   ) : null}
                 </>

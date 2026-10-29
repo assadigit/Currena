@@ -83,7 +83,6 @@ function renderHero(copy: typeof insightsCopyEn | typeof insightsCopyFa, numberL
       copy={copy}
       numberLocale={numberLocale}
       onJumpSection={noop}
-      onJumpAbout={noop}
       onFocusCard={noop}
     />,
   );
@@ -399,7 +398,6 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
           copy={insightsCopyEn}
         numberLocale="en-US"
         onJumpSection={onJumpSection}
-        onJumpAbout={noop}
         onFocusCard={onFocusCard}
       />,
     );
@@ -452,7 +450,6 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
           copy={insightsCopyEn}
         numberLocale="en-US"
         onJumpSection={noop}
-        onJumpAbout={noop}
         onFocusCard={noop}
       />,
     );
@@ -473,7 +470,6 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
           copy={insightsCopyEn}
         numberLocale="en-US"
         onJumpSection={noop}
-        onJumpAbout={noop}
         onFocusCard={noop}
         marketsAlert={{ signal: 'attention', n: 4, count: 16 }}
         onJumpMarkets={noop}

@@ -250,7 +250,6 @@ export function VerdictBlock({
   copy,
   numberLocale,
   onJumpSection,
-  onJumpAbout,
   onFocusCard,
   marketsAlert,
   onJumpMarkets,
@@ -264,7 +263,6 @@ export function VerdictBlock({
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
   onJumpSection: (section: InsightsSection) => void;
-  onJumpAbout: () => void;
   onFocusCard: (id: IndicatorId, opener?: HTMLElement | null) => void;
   /** §5.3: the raised world-markets signal (Global block only). */
   marketsAlert?: MarketsAlert;
@@ -373,13 +371,18 @@ export function VerdictBlock({
         </header>
 
         {/* Real spec §4.3: a concise "Why" summary directly below the card
-         * heading, with the optional information control (the existing
-         * how-computed tip, round 43). The count line is the existing copy
-         * (no new strings); UI-fidelity round (2026-10-19, brief §5) — the
-         * count ink follows the REGION'S OWN verdict step (stepToneClass),
-         * so a Stressed Australia counts its warnings in the same amber
-         * accent its rows carry, and only a Critical region speaks red.
-         * The data attributes are unchanged. */}
+         * heading. The count line is the existing copy (no new strings);
+         * UI-fidelity round (2026-10-19, brief §5) — the count ink follows
+         * the REGION'S OWN verdict step (stepToneClass), so a Stressed
+         * Australia counts its warnings in the same amber accent its rows
+         * carry, and only a Critical region speaks red. The data attributes
+         * are unchanged.
+         *
+         * 2026-10-29 owner round: the "?" how-calculated tip button is
+         * RETIRED from the verdict card (the owner quoted the button
+         * directly). The count line stands alone; the full explainer keeps
+         * its two remaining homes — the header's dive-deeper link and the
+         * page-bottom About section. */}
         <div className="relative flex flex-wrap items-center gap-x-2 gap-y-1">
           <p
             className={`m-0 text-[length:var(--type-label)] font-semibold leading-relaxed ${stepToneClass(
@@ -394,16 +397,6 @@ export function VerdictBlock({
               voting: num(voting, numberLocale),
             })}
           </p>
-          <GlossaryTip srLabel={copy.ui.howCalculated} panelClassName="w-full basis-full">
-            <bdi>{copy.ui.explainerIntro}</bdi>
-            <button
-              type="button"
-              onClick={onJumpAbout}
-              className="insights-focusable mt-1 inline-flex w-fit cursor-pointer items-center rounded-lg border-0 bg-transparent p-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] underline decoration-[var(--color-border)] underline-offset-2 transition-colors hover:decoration-[var(--color-text-secondary)]"
-            >
-              {copy.ui.explainerFullLink} ↧
-            </button>
-          </GlossaryTip>
         </div>
       </div>
 

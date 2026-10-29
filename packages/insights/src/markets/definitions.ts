@@ -164,6 +164,30 @@ export interface MarketDefinition {
    * 14:30 JST level, 0.85% off the real 15:00 close, as today's close).
    */
   closeUtcMinute: number;
+  /**
+   * 2026-10-29 owner round ("when the market is shut down — holidays,
+   * weekends — it must show the exchanges are not working right now"):
+   * the exchange's trading CALENDAR for the public session-state banner.
+   * `timezone` is the IANA zone (DST-true through Intl); `openLocalMinute`
+   * and `closeLocalMinute` bound the regular session in LOCAL time (the
+   * pre-open auction and the closing auction fade are ignored — the banner
+   * speaks in whole sessions); `closedWeekdays` is 0-based JS day (0=Sun,
+   * 6=Sat), default Sat+Sun; `holidays` carries recurring 'MM-DD' dates
+   * and one-off 'YYYY-MM-DD' dates (fixed-date public holidays only —
+   * floating religious/lunar holidays are NOT modelled; the honest
+   * fallback on an unmodelled holiday is the map's own per-market state,
+   * which tracks the quote flow). Read by the SPA's session helper
+   * (world-markets/session.ts) — platform-free, no clock reads here.
+   */
+  timezone: string;
+  /** Regular-session open, minutes past LOCAL midnight. */
+  openLocalMinute: number;
+  /** Regular-session close, minutes past LOCAL midnight. */
+  closeLocalMinute: number;
+  /** Closed weekdays (0=Sunday … 6=Saturday); default [6, 0]. */
+  closedWeekdays?: readonly number[];
+  /** Fixed-date holidays: recurring 'MM-DD' and one-off 'YYYY-MM-DD'. */
+  holidays?: readonly string[];
 }
 
 /** Fixed for v1 (spec §2 + owner round 44: the Dow Jones and CAC 40 joined
@@ -176,37 +200,69 @@ export interface MarketDefinition {
  * print) — see compute.ts sessionClosedForWrite. */
 export const MARKETS: readonly MarketDefinition[] = [
   // Tokyo 09:00–15:00 JST (UTC+9) → close 06:00 UTC (+30 margin = 06:30).
-  { id: 'n225', group: 'asia', eodhdCode: 'N225.INDX', yahooSymbol: '^N225', closeUtcMinute: 6 * 60 + 30 },
+  { id: 'n225', group: 'asia', eodhdCode: 'N225.INDX', yahooSymbol: '^N225', closeUtcMinute: 6 * 60 + 30,
+    timezone: 'Asia/Tokyo', openLocalMinute: 540, closeLocalMinute: 900,
+    holidays: ['01-01','01-02','01-03','12-31'],},
   // Sydney 10:00–16:00 AEST (UTC+10; the market's own clock, no DST here) → 06:00 UTC (+30 = 06:30).
-  { id: 'asx200', group: 'asia', eodhdCode: 'AXJO.INDX', yahooSymbol: '^AXJO', closeUtcMinute: 6 * 60 + 30 },
+  { id: 'asx200', group: 'asia', eodhdCode: 'AXJO.INDX', yahooSymbol: '^AXJO', closeUtcMinute: 6 * 60 + 30,
+    timezone: 'Australia/Sydney', openLocalMinute: 600, closeLocalMinute: 960,
+    holidays: ['01-01','12-25','12-26','04-25'],},
   // Seoul 09:00–15:30 KST (UTC+9) → 06:30 UTC (+30 = 07:00).
-  { id: 'kospi', group: 'asia', eodhdCode: 'KS11.INDX', yahooSymbol: '^KS11', closeUtcMinute: 7 * 60 },
+  { id: 'kospi', group: 'asia', eodhdCode: 'KS11.INDX', yahooSymbol: '^KS11', closeUtcMinute: 7 * 60,
+    timezone: 'Asia/Seoul', openLocalMinute: 540, closeLocalMinute: 930,
+    holidays: ['01-01','01-02','03-01','05-05','06-06','08-15','10-03','10-09','12-25'],},
   // Hong Kong 09:30–16:00 HKT (UTC+8) → 08:00 UTC (+30 = 08:30).
-  { id: 'hsi', group: 'asia', eodhdCode: 'HSI.INDX', yahooSymbol: '^HSI', closeUtcMinute: 8 * 60 + 30 },
+  { id: 'hsi', group: 'asia', eodhdCode: 'HSI.INDX', yahooSymbol: '^HSI', closeUtcMinute: 8 * 60 + 30,
+    timezone: 'Asia/Hong_Kong', openLocalMinute: 570, closeLocalMinute: 960,
+    holidays: ['01-01','05-01','07-01','10-01','12-25','12-26'],},
   // Shanghai 09:30–15:00 CST (UTC+8) → 07:00 UTC (+30 = 07:30).
-  { id: 'ssec', group: 'asia', eodhdCode: 'SSEC.INDX', yahooSymbol: '000001.SS', closeUtcMinute: 7 * 60 + 30 },
+  { id: 'ssec', group: 'asia', eodhdCode: 'SSEC.INDX', yahooSymbol: '000001.SS', closeUtcMinute: 7 * 60 + 30,
+    timezone: 'Asia/Shanghai', openLocalMinute: 570, closeLocalMinute: 900,
+    holidays: ['01-01','05-01','05-02','05-03','10-01','10-02','10-03','10-04','10-05','10-06','10-07'],},
   // Taipei 09:00–13:30 TWT (UTC+8) → 05:30 UTC (+30 = 06:00).
-  { id: 'taiex', group: 'asia', eodhdCode: 'TWII.INDX', yahooSymbol: '^TWII', closeUtcMinute: 6 * 60 },
+  { id: 'taiex', group: 'asia', eodhdCode: 'TWII.INDX', yahooSymbol: '^TWII', closeUtcMinute: 6 * 60,
+    timezone: 'Asia/Taipei', openLocalMinute: 540, closeLocalMinute: 810,
+    holidays: ['01-01','02-28','04-04','06-06','10-10'],},
   // Mumbai 09:15–15:30 IST (UTC+5:30) → 10:00 UTC (+30 = 10:30).
-  { id: 'nifty50', group: 'asia', eodhdCode: 'NSEI.INDX', yahooSymbol: '^NSEI', closeUtcMinute: 10 * 60 + 30 },
+  { id: 'nifty50', group: 'asia', eodhdCode: 'NSEI.INDX', yahooSymbol: '^NSEI', closeUtcMinute: 10 * 60 + 30,
+    timezone: 'Asia/Kolkata', openLocalMinute: 555, closeLocalMinute: 930,
+    holidays: ['01-26','08-15','10-02'],},
   // Euro Stoxx 50 (NYSE Euronext) 09:00–17:30 CET (UTC+1) → 16:30 UTC (+30 = 17:00).
   // R9-02: the Euronext/STOXX logo (stoxx50.jpg), NOT the EU flag.
-  { id: 'stoxx50', group: 'europe', eodhdCode: 'STOXX50E.INDX', yahooSymbol: '^STOXX50E', closeUtcMinute: 17 * 60, useExchangeLogo: true },
+  { id: 'stoxx50', group: 'europe', eodhdCode: 'STOXX50E.INDX', yahooSymbol: '^STOXX50E', closeUtcMinute: 17 * 60,
+    timezone: 'Europe/Paris', openLocalMinute: 540, closeLocalMinute: 1050,
+    holidays: ['01-01','05-01','12-25','12-26'], useExchangeLogo: true },
   // Xetra 09:00–17:30 CET (UTC+1) → 16:30 UTC (+30 = 17:00).
-  { id: 'dax', group: 'europe', eodhdCode: 'GDAXI.INDX', yahooSymbol: '^GDAXI', closeUtcMinute: 17 * 60 },
+  { id: 'dax', group: 'europe', eodhdCode: 'GDAXI.INDX', yahooSymbol: '^GDAXI', closeUtcMinute: 17 * 60,
+    timezone: 'Europe/Berlin', openLocalMinute: 540, closeLocalMinute: 1050,
+    holidays: ['01-01','05-01','10-03','12-25','12-26'],},
   // Paris 09:00–17:30 CET (UTC+1) → 16:30 UTC (+30 = 17:00).
-  { id: 'cac', group: 'europe', eodhdCode: 'FCHI.INDX', yahooSymbol: '^FCHI', closeUtcMinute: 17 * 60 },
+  { id: 'cac', group: 'europe', eodhdCode: 'FCHI.INDX', yahooSymbol: '^FCHI', closeUtcMinute: 17 * 60,
+    timezone: 'Europe/Paris', openLocalMinute: 540, closeLocalMinute: 1050,
+    holidays: ['01-01','05-01','12-25','12-26'],},
   // London 08:00–16:30 GMT (UTC+0) → 16:30 UTC (+30 = 17:00).
-  { id: 'ftse', group: 'europe', eodhdCode: null, yahooSymbol: '^FTSE', closeUtcMinute: 17 * 60 },
+  { id: 'ftse', group: 'europe', eodhdCode: null, yahooSymbol: '^FTSE', closeUtcMinute: 17 * 60,
+    timezone: 'Europe/London', openLocalMinute: 480, closeLocalMinute: 990,
+    holidays: ['01-01','12-25','12-26'],},
   // NYSE/Nasdaq 09:30–16:00 ET (UTC−5) → 21:00 UTC (+30 = 21:30).
-  { id: 'sp500', group: 'americas', eodhdCode: 'GSPC.INDX', yahooSymbol: '^GSPC', closeUtcMinute: 21 * 60 + 30 },
-  { id: 'ndx', group: 'americas', eodhdCode: 'NDX.INDX', yahooSymbol: '^NDX', closeUtcMinute: 21 * 60 + 30 },
-  { id: 'dow', group: 'americas', eodhdCode: 'DJI.INDX', yahooSymbol: '^DJI', closeUtcMinute: 21 * 60 + 30 },
+  { id: 'sp500', group: 'americas', eodhdCode: 'GSPC.INDX', yahooSymbol: '^GSPC', closeUtcMinute: 21 * 60 + 30,
+    timezone: 'America/New_York', openLocalMinute: 570, closeLocalMinute: 960,
+    holidays: ['01-01','06-19','07-04','11-27','12-25'],},
+  { id: 'ndx', group: 'americas', eodhdCode: 'NDX.INDX', yahooSymbol: '^NDX', closeUtcMinute: 21 * 60 + 30,
+    timezone: 'America/New_York', openLocalMinute: 570, closeLocalMinute: 960,
+    holidays: ['01-01','06-19','07-04','11-27','12-25'],},
+  { id: 'dow', group: 'americas', eodhdCode: 'DJI.INDX', yahooSymbol: '^DJI', closeUtcMinute: 21 * 60 + 30,
+    timezone: 'America/New_York', openLocalMinute: 570, closeLocalMinute: 960,
+    holidays: ['01-01','06-19','07-04','11-27','12-25'],},
   // Toronto 09:30–16:00 ET (UTC−5) → 21:00 UTC (+30 = 21:30).
   // R9-02: the TSX logo (tsx.jpg), NOT the Canada flag.
-  { id: 'tsx', group: 'americas', eodhdCode: 'GSPTSE.INDX', yahooSymbol: '^GSPTSE', closeUtcMinute: 21 * 60 + 30, useExchangeLogo: true },
+  { id: 'tsx', group: 'americas', eodhdCode: 'GSPTSE.INDX', yahooSymbol: '^GSPTSE', closeUtcMinute: 21 * 60 + 30,
+    timezone: 'America/Toronto', openLocalMinute: 570, closeLocalMinute: 960,
+    holidays: ['01-01','07-01','12-25','12-26'], useExchangeLogo: true },
   // São Paulo 10:00–17:00 BRT (UTC−3) → 20:00 UTC (+30 = 20:30).
-  { id: 'ibov', group: 'americas', eodhdCode: 'BVSP.INDX', yahooSymbol: '^BVSP', closeUtcMinute: 20 * 60 + 30 },
+  { id: 'ibov', group: 'americas', eodhdCode: 'BVSP.INDX', yahooSymbol: '^BVSP', closeUtcMinute: 20 * 60 + 30,
+    timezone: 'America/Sao_Paulo', openLocalMinute: 600, closeLocalMinute: 1020,
+    holidays: ['01-01','04-21','09-07','11-02','11-15','11-20','12-25'],},
 ];
 
 const BY_ID = new Map(MARKETS.map((m) => [m.id as string, m]));

@@ -4,9 +4,19 @@
  * width (the old full-bleed negative margins are gone), scroll-spy kept,
  * targets ≥44px. Selecting a pill also EXPANDS its section when it is
  * collapsed (R19/R7b) — the route does that via onWillNavigate.
+ *
+ * 2026-10-29 owner round ("this section is too small and not really
+ * emphasized, it only shows one item — it can show top 5 changes"): the
+ * pills GREW (44px min-height, label-size words, wider padding) and now
+ * WRAP instead of scrolling — on a phone every section is visible at once,
+ * no hidden overflow; a TOP-5 MOVERS strip (children) rides under the
+ * pills inside the sticky bar. The scroll-spy probe moved down to clear
+ * the taller bar, and the insights page's anchor scroll-margins follow it
+ * (index.css).
  */
 
 import { useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 
 export interface JumpTarget {
@@ -21,9 +31,10 @@ function useActiveTarget(targets: readonly JumpTarget[]): string | null {
   useEffect(() => {
     const measure = () => {
       raf.current = 0;
-      // The sticky bar occupies the first ~110px below the site header —
-      // the section under that line is the one being read.
-      const probe = window.scrollY + 140;
+      // The sticky bar occupies the first ~230px below the site header —
+      // the section under that line is the one being read (2026-10-29: the
+      // bar grew a movers strip; the probe follows it).
+      const probe = window.scrollY + 230;
       let current: string | null = null;
       for (const t of targets) {
         const el = document.getElementById(t.id);
@@ -51,12 +62,17 @@ export function JumpNav({
   targets,
   copy,
   onWillNavigate,
+  children,
 }: {
   targets: readonly JumpTarget[];
   copy: InsightsCopy;
   /** R19: fires BEFORE the scroll so the route can expand collapsed
    *  sections (Together/Signals/About) first. */
   onWillNavigate?: (id: string) => void;
+  /** 2026-10-29: the top-movers strip (or nothing) — rendered INSIDE the
+   *  sticky bar under the pills, so the page's fastest answer to "what is
+   *  moving" never scrolls away. */
+  children?: ReactNode;
 }) {
   const active = useActiveTarget(targets);
   if (targets.length === 0) return null;
@@ -75,11 +91,11 @@ export function JumpNav({
     <nav aria-label={copy.ui.navLabel} className="insights-sticky-nav mt-4">
       {/* Plain container (no role="list"): ARIA lists require listitem
           children, but these are buttons — the labeled <nav> carries the
-          semantics (audit D minor). */}
-      <span
-        className="no-print flex list-none items-center gap-1.5 overflow-x-auto py-2"
-        style={{ scrollbarWidth: 'thin' }}
-      >
+          semantics (audit D minor).
+          2026-10-29 owner round: the pills WRAP (flex-wrap, no horizontal
+          scroll) — on a phone every section pill is visible at once — and
+          grew to the label type role with 44px targets. */}
+      <span className="no-print flex list-none flex-wrap items-center gap-2 py-2">
         {targets.map((t) => {
           const isActive = t.id === active;
           return (
@@ -88,10 +104,10 @@ export function JumpNav({
               type="button"
               onClick={() => jump(t.id)}
               aria-current={isActive ? 'true' : undefined}
-              className={`insights-focusable inline-flex min-h-[36px] shrink-0 cursor-pointer items-center rounded-full px-3.5 text-[length:var(--type-caption)] font-bold transition-colors duration-200 ${
+              className={`insights-focusable inline-flex min-h-[44px] shrink-0 cursor-pointer items-center rounded-full px-4 text-[length:var(--type-label)] font-bold transition-colors duration-200 ${
                 isActive
                   ? 'bg-[var(--color-accent-gold)] text-[var(--color-accent-gold-ink)] shadow-sm ring-1 ring-[var(--color-accent-gold)]/40'
-                  : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] hover:text-[var(--color-status-context)]'
+                  : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] hover:text-[var(--color-status-context)] hover:ring-[var(--color-text-secondary)]/35'
               }`}
             >
               {t.label}
@@ -99,6 +115,7 @@ export function JumpNav({
           );
         })}
       </span>
+      {children}
     </nav>
   );
 }

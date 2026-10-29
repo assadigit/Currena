@@ -396,6 +396,12 @@ export const IndicatorIdSchema = z.enum([
   'wheat', // Pink Sheet Monthly Prices, Wheat US SRW ($/mt) — context, prices-heat
   'maize', // Pink Sheet Monthly Prices, Maize ($/mt) — context, prices-heat
   'usdtry', // Frankfurter USD→TRY (daily) — context, dollar-strength (the EM-pressure first member)
+  // 2026-10-29 owner round ("add dollar against UAE currency"): the UAE
+  // dirham — a pegged petro-currency the owner's audience watches for Gulf
+  // exposure. Frankfurter/ECB does not serve AED, so the series rides
+  // Yahoo's USD/AED daily closes (AED=X) — the same unofficial-but-accepted
+  // provider the Brent gap-fill and the metals histories already use.
+  'usdaed', // Yahoo USD/AED daily closes (AED=X) — context, dollar-strength
   // ---- M6 Wave 3 (OD-8/D-42, 2026-10-25): the leading-edge batch ----
   // All series live-verified 2026-10-25 + T-16 licence classes scanned the
   // same day (data/fred-copyright.json). ig-oas inherits the D-44 no-go.
@@ -565,6 +571,11 @@ export const IndicatorSourceSchema = z.enum([
   'oecd',
   'gpr',
   'epu',
+  // 2026-10-29 owner round (the usdaed card): Yahoo Finance joins the
+  // indicator sources — the same unofficial-but-accepted provider the
+  // Brent gap-fill, the metals 10-year histories and the live-prices
+  // refresh already use (sources.ts register row: L2, ownerAccepts).
+  'yahoo',
   // 2026-10-21 data-integrity round: EODHD crypto (eth-usd) — RETIRED with
   // the card (2026-10-21c owner round); the insights ingest no longer calls
   // EODHD. The id stays OUT of the enum; the markets worker's EODHD usage

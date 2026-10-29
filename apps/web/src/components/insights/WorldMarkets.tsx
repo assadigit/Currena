@@ -39,7 +39,7 @@
  * a stored copy only; a page request can never reach a provider.
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { MarketEntry, MarketId } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { MARKETS, MARKET_GROUP_ORDER } from '@currena/insights/markets/definitions';
@@ -55,6 +55,7 @@ import { MarketsHeatmap } from './world-markets/MarketsHeatmap';
 import { WorldMap } from './world-markets/WorldMap';
 import type { MapPeriod } from './world-markets/world-map-config';
 import { formatDateShort, formatRelativeShort, isOld, type MarketsLoadState, type MarketsView } from './world-markets/shared';
+import { allMarketsClosed } from './world-markets/session';
 import { NarrativeBlock } from './NarrativeBlock';
 import { InTheNews } from './InTheNews';
 import type { NarrativeUnit } from '../../lib/narrative';
@@ -113,6 +114,19 @@ export function WorldMarkets({
   const [tableOpen, setTableOpen] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>('list');
   const todayIso = new Date().toISOString().slice(0, 10);
+
+  // 2026-10-29 owner round ("when the market is shut down — holidays,
+  // weekends — it must show these exchanges are not working right now"):
+  // the calendar-true session state. Re-evaluated every minute so the
+  // banner appears exactly when the last exchange closes for the weekend
+  // (and disappears when Tokyo opens Monday morning); allMarketsClosed is
+  // pure over the definitions + a ticking clock.
+  const [nowMs, setNowMs] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNowMs(Date.now()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const everythingClosed = useMemo(() => allMarketsClosed(new Date(nowMs)), [nowMs]);
 
   // The as-of date: the freshest close any market carries (§6.3 header row;
   // Jalali in Farsi via the house formatter). Each market keeps its own
@@ -184,11 +198,31 @@ export function WorldMarkets({
     <p className="m-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.markets.subtitle}</p>
   );
 
+  /* 2026-10-29 owner round: the CLOSED-MARKETS BANNER — when the calendar
+   * says EVERY exchange is outside its session (weekend, global holiday),
+   * the section says so plainly, once, under the descriptor: the numbers
+   * on screen are the LAST COMPLETED SESSION's closes, never "live". A
+   * normal mid-week night (some markets open, some closed) is NOT a
+   * banner event — that is every day's rhythm, and the map pins already
+   * carry per-market state. */
+  const closedBanner = everythingClosed ? (
+    <p
+      className="m-0 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-[var(--radius-md)] bg-currena-warning/10 px-3.5 py-2.5 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)] ring-1 ring-currena-warning/25"
+      role="status"
+      data-markets-closed-banner
+    >
+      <span aria-hidden="true" className="text-base leading-none">🌙</span>
+      <span className="font-bold text-[var(--color-text-primary)]">{copy.markets.closedTitle}</span>
+      <span>{copy.markets.closedBody}</span>
+    </p>
+  ) : null;
+
   if (state.kind === 'loading') {
     return (
       <section id="insights-markets" aria-labelledby="insights-markets-title" className={shell}>
         {heading}
         {descriptor}
+        {closedBanner}
         {/* MAP M17's loading state: grey land, grey hollow dots, no
          * numbers, the final height reserved — never a blank rectangle. */}
         <WorldMap loading copy={copy} locale={locale} numberLocale={numberLocale} onOpenMarket={() => undefined} />
@@ -221,6 +255,7 @@ export function WorldMarkets({
       <section id="insights-markets" aria-labelledby="insights-markets-title" className={shell}>
         {heading}
         {descriptor}
+        {closedBanner}
         {/* §6.6 Never populated: ONE calm line — no zeros, no empty tiles. */}
         <p className="m-0 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-4 py-3 text-[length:var(--type-label)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
           {copy.markets.empty}
@@ -259,6 +294,7 @@ export function WorldMarkets({
     <section id="insights-markets" aria-labelledby="insights-markets-title" className={shell}>
       {heading}
       {descriptor}
+      {closedBanner}
 
       {/* Layer-2 narrator (M5, spec §11): the world-markets plain-language
        * narrative, immediately under the heading + descriptor — same place

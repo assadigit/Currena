@@ -66,7 +66,14 @@ function titleKeyFor(route: string): TranslationKey {
 
 function RouteFallback(): React.JSX.Element {
   return (
-    <div className="flex min-h-[60vh] items-center justify-center" role="status">
+    // 2026-10-29 owner round ("the three circles must sit dead centre"):
+    // the box fills the content area BELOW the fixed header (main's pt-16 /
+    // lg:pt-20) and centres on BOTH axes — 60vh left the dots sitting above
+    // the true middle on tall screens. dvh tracks mobile dynamic viewports.
+    <div
+      className="flex min-h-[calc(100dvh-4rem)] items-center justify-center lg:min-h-[calc(100dvh-5rem)]"
+      role="status"
+    >
       <div className="rounded-[25px] bg-currena-soft/60 px-10 py-8">
         <div className="flex justify-center gap-2.5">
           <span className="loader-dot" />

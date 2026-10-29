@@ -792,6 +792,26 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     phase: 'P2',
     rule: { kind: 'info' },
   },
+  {
+    // 2026-10-29 owner round ("add dollar against UAE currency"): the
+    // dollar against the UAE dirham — the pegged petro-currency lens for
+    // the owner's Gulf-exposure audience. CONTEXT (info) in the dollar
+    // lane beside usdtry; the peg keeps the pair in a famously tight
+    // band, which is exactly what makes a BREAK of the band newsworthy.
+    // Frankfurter (ECB reference rates) does not serve AED, so the series
+    // rides Yahoo's USD/AED daily closes (AED=X) — one extra subrequest on
+    // the daily run, the same provider the Brent gap-fill already uses.
+    id: 'usdaed',
+    section: 'global',
+    group: 'dollar-strength',
+    name: 'Dollar vs UAE dirham',
+    source: 'yahoo',
+    sourceRef: 'Yahoo Finance USD/AED daily closes (AED=X)',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+  },
   /* ---------------- Global — Are markets nervous? ---------------- */
   {
     // M6 Wave 3 (OD-8/D-42, 2026-10-25): the Fed's balance sheet — the

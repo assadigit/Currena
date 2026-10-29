@@ -12,7 +12,8 @@ import type { LivePriceEntry, PriceAssetId } from '@currena/core';
 import { DEFINITIONS } from '../definitions';
 import { addDays, daysBetween } from '../series';
 import type { SeriesPoint } from '../series';
-import { fetchYahooQuote, type YahooQuoteOptions } from '../adapters/yahoo';
+import { fetchYahooQuote, type YahooQuote, type YahooQuoteOptions } from '../adapters/yahoo';
+import { fetchBrentFrontMonthQuote } from './brent-front-month';
 import { LIVE_PRICE_ASSETS, LIVE_PRICE_YAHOO_RANGE } from './definitions';
 
 /** Display-precision rounding — keeps KV content-equality stable (no float noise writes). */
@@ -51,11 +52,14 @@ function pctChange(live: number, then: SeriesPoint | null): number | undefined {
 
 /**
  * Build the stored entry from a parsed Yahoo answer (pure — tests inject the
- * quote). `now` stamps updatedAt.
+ * quote). `now` stamps updatedAt. The entry's sourceSymbol is the QUOTE'S
+ * OWN symbol (2026-10-29: Brent quotes the first active specific month —
+ * e.g. BZZ26.NYM — so the stored entry remembers which contract won and
+ * the details panel can name it honestly).
  */
 export function buildLivePriceEntry(
   assetId: PriceAssetId,
-  quote: { livePrice: number; points: SeriesPoint[] },
+  quote: { livePrice: number; points: SeriesPoint[]; symbol?: string },
   now: Date,
 ): LivePriceEntry {
   const points = quote.points;
@@ -75,17 +79,32 @@ export function buildLivePriceEntry(
     asOf: last.date,
     change7d: pctChange(live, pointDaysBack(points, last.date, 7)),
     change30d: pctChange(live, pointDaysBack(points, last.date, 30)),
-    sourceSymbol: LIVE_PRICE_ASSETS[assetId].yahooSymbol,
+    // 2026-10-29: the quote's OWN symbol when it carries one (Brent names
+    // the winning month contract); the definition's symbol otherwise.
+    sourceSymbol: quote.symbol ?? LIVE_PRICE_ASSETS[assetId].yahooSymbol,
     updatedAt: now.toISOString(),
   };
 }
 
-/** Fetch one asset's live entry from Yahoo (the production fetcher). */
+/**
+ * Fetch one asset's live entry from Yahoo (the production fetcher).
+ *
+ * 2026-10-29 (the wrong-contract fix): Brent does NOT quote the continuous
+ * BZ=F — it quotes the FIRST ACTIVE specific month via
+ * brent-front-month.ts (the continuous had silently rolled onto January
+ * while December still traded: 110.51 vs the true 114.34, the owner's
+ * "wrong oil price" report). `rememberedSymbol` (the stored entry's
+ * sourceSymbol) re-probes the winner first — one call in the steady state.
+ */
 export async function fetchLivePriceEntry(
   assetId: PriceAssetId,
   opts: YahooQuoteOptions = {},
   now: Date = new Date(),
+  rememberedSymbol?: string,
 ): Promise<LivePriceEntry> {
-  const quote = await fetchYahooQuote(LIVE_PRICE_ASSETS[assetId].yahooSymbol, LIVE_PRICE_YAHOO_RANGE, opts);
+  const quote: YahooQuote =
+    assetId === 'brent'
+      ? await fetchBrentFrontMonthQuote(opts, now, rememberedSymbol)
+      : await fetchYahooQuote(LIVE_PRICE_ASSETS[assetId].yahooSymbol, LIVE_PRICE_YAHOO_RANGE, opts);
   return buildLivePriceEntry(assetId, quote, now);
 }

@@ -39,6 +39,7 @@ import { fetchGoldApiSpot } from './goldapi';
 import { fetchRbaCashRateDecisions, fetchRbaTableText, parseRbaSeriesFromText, type RbaTableKey } from './rba';
 import { fetchTreasuryCurves, treasuryT10y2y } from './treasury';
 import { fetchYahooQuote } from './yahoo';
+import { fetchBrentFrontMonthQuote } from '../prices/brent-front-month';
 import { fetchWorldBankMonthly } from './worldbank';
 import { mergeSeries, type SeriesInputs } from './derived';
 import type { SeriesPoint } from '../series';
@@ -304,7 +305,9 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
       // derived.ts's fillBrentGap keeps Yahoo's fresher closes past EIA's
       // last official spot date — the attribution names both legs.
       overrides.brent = {
-        name: 'U.S. EIA (Brent spot) + Yahoo Finance (BZ=F)',
+        // 2026-10-29: the Yahoo leg is the FIRST ACTIVE month contract
+        // (brent-front-month.ts), not the continuous BZ=F.
+        name: 'U.S. EIA (Brent spot) + Yahoo Finance (front-month futures)',
         url: 'https://www.eia.gov/dnav/pet/hist/RBRTEd.htm',
       };
     }
@@ -318,12 +321,19 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
 
   // Yahoo Brent futures (2026-10-12, the stale-oil fix): EIA's DCOILBRENTEU
   // stopped publishing on 2026-10-06 while the market kept moving — Yahoo's
-  // BZ=F daily closes extend the Brent series past FRED's last date so the
+  // daily closes extend the Brent series past FRED's last date so the
   // stored history, percentiles and 7/30-day changes never rot (derived.ts
   // keeps FRED authoritative on every overlapping date, so the series
   // self-corrects back to pure EIA spot when FRED catches up).
-  const brentYahooQuote = await fetchLogged('yahoo', 'BZ=F daily closes (Brent gap-fill)', () =>
-    fetchYahooQuote('BZ=F', '40d'),
+  //
+  // 2026-10-29 (the wrong-contract fix): the gap-fill no longer quotes the
+  // continuous BZ=F (Yahoo's own roll had drifted onto January while
+  // December still traded — a $3.83 error that flowed straight into the
+  // stored history). It quotes the SAME first-active specific month the
+  // live refresh uses (brent-front-month.ts), so the backbone's newest
+  // bars and the board's live value can never disagree by a whole contract.
+  const brentYahooQuote = await fetchLogged('yahoo', 'Brent front-month daily closes (the gap-fill, first active contract)', () =>
+    fetchBrentFrontMonthQuote({ timeoutMs: 15_000 }),
   );
 
   // Fix spec B-01 (2026-10-14): the record-history backfill for the price
@@ -413,6 +423,16 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
   // OD-7; TRY joined 2026-10-24 — the usdtry card, M5 Wave 2).
   const fx = await fetchLogged('frankfurter', `USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,TRY since ${fxStart}`, () =>
     fetchFrankfurterSeries(fxStart),
+  );
+
+  // 2026-10-29 owner round (the usdaed card): the AED leg — Yahoo's USD/AED
+  // daily closes (AED=X). The ECB publishes no dirham reference rate, so
+  // Frankfurter cannot serve this leg; the card rides Yahoo directly, the
+  // same provider the Brent gap-fill and the metals histories already
+  // use. One extra subrequest; fails honestly (a failed fetch leaves the
+  // usdaed card unavailable — the Frankfurter legs are untouched).
+  const aedQuote = await fetchLogged('yahoo', 'AED=X daily closes (USD/AED, the usdaed card)', () =>
+    fetchYahooQuote('AED=X', '10y'),
   );
 
   // World Bank Pink Sheet monthly.
@@ -556,6 +576,9 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
         SEK: fx?.SEK,
         CHF: fx?.CHF,
         TRY: fx?.TRY,
+        // The Yahoo-sourced leg (2026-10-29): the dirham the ECB never
+        // published. Absent on a failed fetch — an honest unavailable card.
+        AED: aedQuote?.points,
       },
       wb,
       xauSpot,

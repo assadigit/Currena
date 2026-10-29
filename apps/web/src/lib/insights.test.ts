@@ -555,8 +555,9 @@ describe('copy dictionaries', () => {
     // 2026-10-26 gap-audit build adds yield-curve-10y3m (A-1),
     // rba-fed-gap (A-5), us-japan-10y-gap (A-3), gold-oil-ratio (A-4),
     // eia-crude-stocks (A-6) and cftc-gold-positioning (A-7) → 95; the
-    // monthly trio oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10) → 100.
-    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(100);
+    // monthly trio oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10) → 100;
+    // the 2026-10-29 owner round adds usdaed (the UAE dirham card) → 101.
+    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(101);
   });
 
   // Fix spec T-07 (2026-10-15): the CI-side corpus scan — the ingest's

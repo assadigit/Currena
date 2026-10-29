@@ -2496,6 +2496,65 @@
       }
     },
     {
+      "id": "usdaed",
+      "title": "Dollar vs UAE dirham",
+      "area": {
+        "section": "global",
+        "group": "dollar-strength",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "yahoo",
+        "name": "Yahoo Finance (USD/AED daily closes)",
+        "url": "https://finance.yahoo.com/quote/AED=X",
+        "seriesIdOrTable": "Yahoo Finance USD/AED daily closes (AED=X)"
+      },
+      "publisher": "Yahoo Finance (unofficial endpoints)",
+      "publisherUrl": "https://finance.yahoo.com/quote/AED=X",
+      "methodUrl": "https://finance.yahoo.com/quote/AED=X",
+      "whatItIs": "The USD/AED exchange rate (Yahoo Finance daily closes): how many UAE dirhams one dollar buys in the foreign-exchange market.",
+      "whatItIsnt": "A pegged pair carries no market judgement: the central bank sets the level, so the usual trend-reading does not apply.",
+      "trackRecordNote": "The dirham has held its dollar peg through oil booms and busts for decades; the pair’s ten-year range is one of the narrowest in world finance.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M3",
+        "runtime": "worker",
+        "termsLines": "Yahoo offers no reuse licence for these unofficial quote endpoints (read 2026-10-16) — the terms are silent on automated reuse, which makes the source L2 under the owner’s recorded acceptance. Unofficial endpoints can break or be blocked at any time: every Yahoo leg fails closed (a block is a block — SCRAPING_SPEC F-09, no identity change).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Data: Yahoo Finance",
+        "legs": [
+          "yahoo:AED=X"
+        ]
+      },
+      "unit": "aed",
+      "changeUnit": "percent",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "cadence default (daily)",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "No reuse licence offered (unofficial endpoints)",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (yahoo:AED=X): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): Owner-requested card (2026-10-29: \"add dollar against UAE currency\"); the ECB publishes no AED reference rate, so the single leg is Yahoo USD/AED daily closes — the register row the owner already accepts (L2, ownerAccepts, 2026-10-16, the same provider the Brent gap-fill and metals history legs ride). The owner directive lifts its worst-leg display bar.",
+        "termsUrl": "https://finance.yahoo.com/"
+      }
+    },
+    {
       "id": "walcl",
       "title": "The Fed’s balance sheet",
       "area": {

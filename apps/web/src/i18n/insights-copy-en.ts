@@ -520,6 +520,17 @@ const LAYER1 = {
       ],
       glossaryTerms: ['inflation'],
     },
+    usdaed: {
+      plainName: 'Dollar versus UAE dirham',
+      oneLine: 'How many UAE dirhams one US dollar buys.',
+      ifRising: 'The dirham\u2019s dollar peg usually absorbs this: the pair barely moves by design.',
+      ifFalling: 'A meaningful drop would be an exceptional event: the peg has held for decades.',
+      connections: [
+        { with: 'dollar-basket', text: 'The dirham is pegged TO the dollar, so it moves with it against every other currency.', strength: 'reliable' },
+        { with: 'brent', text: 'Gulf economies ride oil income; the peg keeps that income dollar-linked.', strength: 'sometimes' },
+      ],
+      glossaryTerms: ['central-bank'],
+    },
 
     /* ----- Batch 4 — growth-health A (8) ----- */
     'us-unemployment': {
@@ -2349,6 +2360,29 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'One pair, one country: it says nothing about other emerging-market currencies, and managed exchange rates can keep levels that fundamentals question.',
     forYou:
       'A standing illustration of why the inflation cards on this page matter: high inflation, over years, ends up written in the exchange rate.',
+  },
+  // ---- 2026-10-29 owner round ("add dollar against UAE currency") ----
+  usdaed: {
+    name: 'Dollar vs UAE dirham',
+    ticker: 'USD/AED',
+    oneLiner:
+      'How many UAE dirhams one US dollar buys: a petro-currency pegged to the dollar, so one of the calmest pairs in world finance.',
+    lines: {
+      highRising: 'The pair sits at the top of its famously tight band: a rare nudge in the peg.',
+      highEasing: 'The dirham remains near the top of its band but the pressure is easing.',
+      typical: 'The peg holds: the pair sits in its usual narrow range (around 3.67 dirhams per dollar).',
+      low: 'The dirham reads stronger than its usual peg level: an exceptional print.',
+    },
+    whatItIs:
+      'The USD/AED exchange rate (Yahoo Finance daily closes): how many UAE dirhams one dollar buys in the foreign-exchange market.',
+    whyItMatters:
+      'The UAE pegs the dirham to the dollar, which makes this pair the Gulf\u2019s financial anchor: it barely moves by design, and that is exactly why a meaningful break would be historic news for Gulf trade, remittances and oil pricing.',
+    tendedToMean:
+      'The dirham has held its dollar peg through oil booms and busts for decades; the pair\u2019s ten-year range is one of the narrowest in world finance.',
+    cantTell:
+      'A pegged pair carries no market judgement: the central bank sets the level, so the usual trend-reading does not apply.',
+    forYou:
+      'Anyone who earns dirhams but spends in another currency effectively rides the dollar; the peg makes this the quietest number on the page.',
   },
   // ---- M6 Wave 3 (2026-10-25): the leading-edge batch (recovered from the deployed bundle) ----
   'mortgage-30y': {
@@ -4253,6 +4287,14 @@ export const insightsCopyEn = {
      * «X گذشته» family the other lenses already speak). */
     past90days: 'Past 3 months',
     past5y: 'Past 5 years',
+    /** 2026-10-29 owner round ("it can show top 5 changes"): the sticky
+     * nav's top-movers strip label. */
+    moversTitle: 'Biggest changes · 30 days',
+    /** 2026-10-29 owner round (the timeframe reference price): the
+     * parenthetical beside the main price when a period lens is selected —
+     * the window's own starting price, so the percentage's basis is on the
+     * card ("(1 year start: US$82.4)"). */
+    priceAtWindowStart: '{period} start: {value}',
     change90dLabel: 'Past 90 days',
     // 2026-10-25b (asset-cards polish, task §4/§6): the card header's
     // title + measurement-basis subtitle. The unit is VERIFIED against the
@@ -4645,6 +4687,13 @@ export const insightsCopyEn = {
     subtitle: 'How selected stock indices performed to the last trading close',
     lastCloseBadge: 'Latest data · end of trading day',
     asOf: 'as of {date}',
+    /** 2026-10-29 owner round ("when the market is shut down it must show
+     * the exchanges are not working right now"): the all-closed banner —
+     * shown only when EVERY exchange's calendar says out-of-session
+     * (weekend / global holiday), directly under the section descriptor. */
+    closedTitle: 'The exchanges are closed right now.',
+    closedBody:
+      'All world stock exchanges are outside their trading sessions (weekend or public holiday) — the numbers below are the last completed session’s closes.',
     /** Regional groups, east to west (the trading day's order). */
     groups: { asia: 'Asia-Pacific', europe: 'Europe', americas: 'Americas' },
     /** The period lenses — 2026-10-21 owner round ("unify the map time
@@ -4834,7 +4883,9 @@ export const insightsCopyEn = {
       /** The relative-scale legend's two ends (colour strength = move size). */
       legendMoreDown: 'Bigger fall',
       legendMoreUp: 'Bigger rise',
-      summary: '{up} of {n} markets up {period} · {down} down · {flat} flat',
+      // 2026-10-29 owner round: the M10 one-glance breadth line under the
+      // map is RETIRED (the verdict box's selected-period breadth counts
+      // stay the section's one breadth surface) — the summary key went with it.
       // 2026-10-21 owner round: the M9 "Updated {time} · {age}" header
       // line and its keys are RETIRED — the KV snapshot's write time is
       // fixed by the nightly cron, so the line always read as a stale,
@@ -5673,6 +5724,8 @@ export const insightsCopyEn = {
     claims: 'claims',
     // M5 Wave 2 (2026-10-24): the Turkish lira sign (EN prefix).
     try: '₺',
+    // 2026-10-29 owner round (the usdaed card): the UAE dirham (EN prefix).
+    aed: 'AED',
     // M6 Wave 3 (2026-10-25): the leading-edge batch — the AU
     // billions ("A$97.6bn" EN, suffix in fa), permits and
     // openings scaled to millions ("1.40m permits a year"),
@@ -6130,6 +6183,12 @@ export const insightsCopyEn = {
   money: {
     title: 'What it means for my money',
     subtitle: 'The day-to-day areas the indicators usually touch.',
+    /** 2026-10-29 owner round: the AU-scope disclaimer — the panel's costs,
+     * rates and wages are AUSTRALIAN households' (petrol prices in cents
+     * per litre, RBA rates, ABS wages). Stated once, directly under the
+     * panel title; the panel also moved inside the Australia section. */
+    scopeNote:
+      'About Australia: the costs, rates and wages this panel follows are those of Australian households.',
     calmLine: 'No money area is standing out right now: a calm background for household budgets.',
     direction: {
       cost: { up: 'Becoming more expensive', down: 'Getting cheaper', flat: 'No clear direction' },
