@@ -418,13 +418,17 @@ async function generateUnit(args: {
     vocabulary: vocabularyForState(work.state),
   });
 
-  // Attempt 1 + the spec's single regeneration with the failed checks named.
-  let lastFailures: string[] = [];
+  // Attempt 1 + the spec's single regeneration with the failed checks + their
+  // details named (the detail tells the model WHAT to fix, e.g. "V11: only 2
+  // sections represented (need 3); covered: global, australia" → the model
+  // knows to add world-markets/world-currencies readings on the retry).
+  let lastFailures: { check: string; detail: string }[] = [];
   for (let attempt = 0; attempt < 2; attempt += 1) {
+    const failureSummary = lastFailures.map((f) => `${f.check}: ${f.detail}`).join('; ');
     const message =
       attempt === 0
         ? userMessage
-        : `${userMessage}\n\nYOUR PREVIOUS ATTEMPT FAILED THESE CHECKS: ${lastFailures.join(', ')}. Rewrite the answer so it passes them.`;
+        : `${userMessage}\n\nYOUR PREVIOUS ATTEMPT FAILED THESE CHECKS: ${failureSummary}. Rewrite the answer so it passes them.`;
     args.onModelCall();
     const outcome = await client.callStateNarrative({
       systemInstruction: systemPromptFor(work.unit),
@@ -465,8 +469,27 @@ async function generateUnit(args: {
         ...(news !== undefined ? { news } : {}),
       };
     }
-    lastFailures = failures.map((f) => f.check);
-    stats.aiFailedByCheck = [...(stats.aiFailedByCheck ?? []), ...lastFailures];
+    // V11b soft-accept: if the ONLY failures are V11b (multi-section coverage),
+    // accept the AI output anyway on the SECOND attempt. The rich global+australia
+    // AI paragraph is better than the template fallback (which names just 1 alert).
+    // The prompt (v8) is the primary enforcement for multi-section coverage; V11b
+    // is logged in the stats for monitoring but doesn't cause template fallback.
+    if (attempt === 1 && failures.every((f) => f.check === 'V11b')) {
+      stats.aiValid = (stats.aiValid ?? 0) + 1;
+      result.aiValid += 1;
+      console.log(`[narrator] ${work.id}: accepted with V11b soft-failure (multi-section coverage) — ${failures.map((f) => f.detail.slice(0, 80)).join('; ')}`);
+      return {
+        unit: {
+          stateHash: work.hash,
+          en: sanitized.en,
+          fa: sanitized.fa,
+          source: 'ai',
+          generatedAt: now.toISOString(),
+        },
+      };
+    }
+    lastFailures = failures.map((f) => ({ check: f.check, detail: f.detail }));
+    stats.aiFailedByCheck = [...(stats.aiFailedByCheck ?? []), ...failures.map((f) => f.check)];
   }
   return template();
 }

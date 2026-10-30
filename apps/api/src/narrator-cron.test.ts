@@ -104,10 +104,13 @@ function aiGoodForScope(userMessage: string): { en: string; fa: string } {
         en: 'Australia’s 10-year borrowing cost and Australian inflation and the mortgage rate people pay are in warning today. The section reads stressed across the board. The wording stays short and clear. This is not financial advice.',
         fa: 'هزینهٔ استقراض ۱۰سالهٔ استرالیا و تورم استرالیا و نرخ وامی که مردم می‌پردازند امروز در هشدار است. بخش در مجموع پرتنش است. متن کوتاه و روشن است. این توصیهٔ مالی نیست.',
       };
-    default: // overall — mention 5 alerts that are all in the overall's state (global + australia ids)
+    default: // overall — mention alerts from ≥3 sections (V11b multi-section coverage):
+      // global (gold crowd gauge, euro-area inflation) + australia (10-year borrowing cost,
+      // Australian inflation) + world-markets (South Korea's biggest companies) + world-currencies
+      // (the euro versus the franc). All these ids are in the overall-live fixture's alerts.
       return {
-        en: 'The gold crowd gauge and Euro-area inflation and US inflation and Australia’s 10-year borrowing cost and Australian inflation are in warning today. The page reads stressed across sections. The wording stays short and clear. This is not financial advice.',
-        fa: 'فشارسنج شلوغی طلا و تورم منطقهٔ یورو و تورم آمریکا و هزینهٔ استقراض ۱۰سالهٔ استرالیا و تورم استرالیا امروز در هشدار است. صفحه در مجموع پرتنش است. متن کوتاه و روشن است. این توصیهٔ مالی نیست.',
+        en: 'The gold crowd gauge and Euro-area inflation and Australia’s 10-year borrowing cost and Australian inflation are in warning today. South Korea’s biggest companies and the euro versus the franc also signal stress. The page reads stressed across sections. This is not financial advice.',
+        fa: 'فشارسنج شلوغی طلا و تورم منطقهٔ یورو و هزینهٔ استقراض ۱۰سالهٔ استرالیا و تورم استرالیا امروز در هشدار است. شرکت‌های بزرگ کرهٔ جنوبی و یورو در برابر فرانک نیز نشانگر فشار هستند. صفحه در مجموع پرتنش است. این توصیهٔ مالی نیست.',
       };
   }
 }
@@ -183,7 +186,7 @@ describe('M4 runScheduledNarrator — the template-only deployments (the M4 defa
     expect(tick1.wrote).toBe(true);
 
     const doc1 = parseNarrativeDoc(map.get(NARRATIVE_KV_KEY)!)!;
-    expect(doc1.promptVersion).toBe(7);
+    expect(doc1.promptVersion).toBe(8);
     // page order: the overall + the first two sections; the rest pending
     expect(Object.keys(doc1.sections).sort()).toEqual(['australia', 'global']);
     expect(doc1.overall.source).toBe('template');

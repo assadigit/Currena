@@ -45,7 +45,7 @@ import {
   type JargonSpec,
 } from './wordlists';
 import type { NarratorSectionId, SectionNarrationState } from './section-state';
-import type { OverallNarrationState } from './overall-state';
+import type { OverallAlert, OverallNarrationState } from './overall-state';
 
 /* ------------------------------------------------------------------ *
  * The units + limits
@@ -418,8 +418,8 @@ interface LangCheckContext {
   excludedNonEmpty: boolean;
   /** V11 — the ids of the unit's alerts (warning readings); the AI must mention enough of them by plainName or value. */
   alertIds: readonly string[];
-  /** V11 — the alerts keyed by id (to look up each alert's value for the value-mention check). */
-  alertsById: ReadonlyMap<string, { value: number | null }>;
+  /** V11 — the alerts keyed by id (to look up each alert's value/delta/context for the mention check). */
+  alertsById: ReadonlyMap<string, { value: number | null; section: string | null; deltaValue: number | null; fromHigh: number | null; chg3m: number | null }>;
   /** V11 — the unit kind ('overall' has a higher coverage threshold). */
   unitKind: NarratorUnit['kind'];
   /** V11 — when true (the template fallback), skip the coverage check. */
@@ -505,9 +505,19 @@ function langChecks(text: string, lang: 'en' | 'fa', ctx: LangCheckContext): Nar
       const entry = ctx.vocab.entries[id];
       const name = entry?.plainName ?? '';
       const alert = ctx.alertsById.get(id);
-      const value = alert?.value ?? null;
       const nameHit = name.length >= 2 && nameInText(name, text);
-      const valueHit = value !== null && Number.isFinite(value) && valueRoundings(value).some((r) => tokens.has(r));
+      // Value-mention: the model may mention the reading by its raw value, its
+      // delta (e.g. "fell 11 percent" → delta -11.3), its distance from the 52-week
+      // high (e.g. "38 percent below its yearly high" → fromHigh -38), or its 3-month
+      // change. Check ALL of these — the raw value (index close) is rarely spoken,
+      // but the delta % is how the model naturally describes a market move.
+      const candidateNumbers = [
+        alert?.value,
+        alert?.deltaValue,
+        alert?.fromHigh,
+        alert?.chg3m,
+      ].filter((n): n is number => n !== null && Number.isFinite(n));
+      const valueHit = candidateNumbers.some((n) => valueRoundings(n).some((r) => tokens.has(r)));
       if (nameHit || valueHit) {
         mentioned.push(id);
       } else {
@@ -516,6 +526,22 @@ function langChecks(text: string, lang: 'en' | 'fa', ctx: LangCheckContext): Nar
     }
     if (mentioned.length < threshold) {
       add('V11', `only ${mentioned.length} of ${ctx.alertIds.length} flagged readings mentioned (need ${threshold}); missed: ${missed.slice(0, 6).join(', ')}`);
+    }
+    // V11b (overall only) — multi-section coverage: the overall narrative should
+    // draw readings from ≥3 of the 4 sections. This is a SOFT check: it's logged
+    // as V11b (so the retry message tells the model to add world-markets/currencies),
+    // but the narrator-cron generateUnit accepts the output if V11b is the ONLY
+    // failure (the rich global+australia AI paragraph is better than the template
+    // fallback which names just 1 alert). The prompt (v8) is the primary enforcement.
+    if (ctx.unitKind === 'overall') {
+      const sectionsMentioned = new Set<string>();
+      for (const id of mentioned) {
+        const sec = ctx.alertsById.get(id)?.section;
+        if (sec !== null && sec !== undefined) sectionsMentioned.add(sec);
+      }
+      if (sectionsMentioned.size < 3) {
+        add('V11b', `only ${sectionsMentioned.size} section(s) represented in the mentioned readings (aim for 3: global + australia + world-markets or world-currencies); covered: ${[...sectionsMentioned].join(', ') || 'none'} — add a world-markets reading (e.g. Japan, Hong Kong, South Korea) or a world-currencies reading (e.g. the euro versus the franc)`);
+      }
     }
   }
 
@@ -560,7 +586,18 @@ export function validateStateNarrative(input: StateNarrativeInput): NarratorVali
   const stateIds = new Set(vocab.ids);
   const stateSerialized = JSON.stringify(state);
   const alertIds = state.alerts.map((a) => a.id);
-  const alertsById = new Map<string, { value: number | null }>(state.alerts.map((a) => [a.id, { value: a.value }]));
+  // For the overall state, alerts carry their source `section` (OverallAlert extends SectionAlert with section).
+  // For section states, all alerts belong to that unit's section — set section to null (the multi-section
+  // check only applies to the overall).
+  const alertsById = new Map<string, { value: number | null; section: string | null; deltaValue: number | null; fromHigh: number | null; chg3m: number | null }>(
+    state.alerts.map((a) => [a.id, {
+      value: a.value,
+      section: 'section' in a ? (a as OverallAlert).section : null,
+      deltaValue: a.delta?.value ?? null,
+      fromHigh: a.context?.fromHigh ?? null,
+      chg3m: a.context?.chg3m ?? null,
+    }]),
+  );
   const ctx: LangCheckContext = {
     limits,
     vocab: vocab.en, // the glossary is language-paired; checked per language below

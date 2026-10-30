@@ -42,7 +42,7 @@ function loadState(scenario: string): { unit: NarratorUnit; state: PromptState }
 
 describe('M2 prompt — the pinned texts', () => {
   it('PROMPT_VERSION is a positive integer (bump on ANY prompt change)', () => {
-    expect(PROMPT_VERSION).toBe(7);
+    expect(PROMPT_VERSION).toBe(8);
   });
 
   it('the base rules carry the spec\u2019s nine hard rules verbatim', () => {
@@ -88,9 +88,11 @@ describe('M2 prompt — the pinned texts', () => {
   it('the overall task is pinned (spec §6.3 verbatim)', () => {
     expect(OVERALL_TASK).toMatchInlineSnapshot(
       `
-      "TASK: Write the overall summary of the whole page as ONE or TWO cohesive paragraphs (never a stitched list of verdicts). 4 to 11 sentences, at most 240 words per language.
+      "TASK: Write the overall summary of the whole page as ONE or TWO cohesive paragraphs (never a stitched list of verdicts or readings). 4 to 11 sentences, at most 240 words per language.
 
-      Open by stating the page's verdicts in everyday words (each section's verdict label rides in STATE with its counts; e.g. "Global reads Stressed, with 9 of 32 scored indicators in warning"). Then weave in FIVE to SEVEN readings from ACROSS the page's sections — do NOT stop at one alert. The STATE's alerts array carries every firing warning across sections (each with value + delta + context); the STATE's items array (per section) carries every fresh reading's value. For each reading you name: use its plainName from VOCABULARY, state its actual value from STATE, and weave its oneLine description. Prioritise readings that affect ordinary households (home loans, rents, savings, deposit rates, inflation, jobs, wages, pay growth) and readings that anchor a theme across sections — e.g. "the US 10-year yield sits at 5.0 percent, down 0.17 points over 30 days", "the mortgage rate people pay sits at 6.2 percent", "new term deposits pay 4.8 percent while Australian inflation is 4.34 percent". Draw a connection between two sections only when VOCABULARY states one (ifRising, ifFalling, connections) — never invent one. Write the readings into fluent sentences, not a list.
+      Open by stating the page's verdicts in everyday words (each section's verdict label rides in STATE with its counts; e.g. "Global reads Stressed, with 9 of 32 scored indicators in warning"). Then weave a GLOBAL story that draws readings from ALL FOUR sections of the page — not just global macro + Australia. The STATE's alerts array carries every firing warning across sections, each tagged with its source section. You MUST mention at least one reading from EACH of: (a) global macro (yields, inflation, sentiment, recession odds), (b) Australia (household-facing: home loans, rents, savings, inflation, jobs, wages), (c) world markets (stock indices across regions — e.g. "Japan's biggest companies rose 0.5 percent while Hong Kong's fell 11 percent and South Korea's slipped 10 percent"), and (d) world currencies (e.g. "the euro slipped 2.5 percent against the franc"). This is a GLOBAL page — name readings from multiple regions (Japan, Hong Kong, South Korea, France, Brazil, the euro area, the US, Australia), not just the US and Australia.
+
+      For each reading: use its plainName from VOCABULARY, state its actual value from STATE, and weave its oneLine description. DRAW CONNECTIONS between readings — when VOCABULARY states a connection (ifRising, ifFalling, connections), weave it into the prose: e.g. "With US 10-year yields falling, the Australia-US long-rate gap narrowed, pressuring the Australian dollar" or "East Asian markets fell while North American markets rose, and the euro weakened against the franc." Write fluent sentences that CONNECT the facts across regions and sections — never a list of separate readings each in their own sentence.
 
       End with one sentence reminding the reader this explains data and is not a recommendation. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. Mention out-of-date data only when STATE.excluded is non-empty (one short clause). Weave the verdicts and the numbers into the prose — do not list them."
     `,

@@ -151,8 +151,8 @@ const GOOD_MOCKED = [
     scenario: 'overall-live',
     intended: 'accepted',
     text: {
-      en: "Today's verdicts: Global reads Stressed and Australia reads Stressed. World markets and world currencies both need attention. The gold crowd gauge and Euro-area inflation and US inflation are in warning. The Australian jobless rate and the mortgage rate people pay are also elevated. This page explains the data and is not financial advice.",
-      fa: 'حکم‌های امروز: جهانی پرتنش است و استرالیا پرتنش است. بازارهای جهان و ارزهای مهم جهان هر دو نیازمند توجه هستند. فشارسنج شلوغی طلا و تورم منطقهٔ یورو و تورم آمریکا در هشدار هستند. نرخ بیکاری استرالیا و نرخ وامی که مردم می‌پردازند نیز بالا است. این صفحه داده‌ها را ساده می‌کند و توصیهٔ مالی نیست.',
+      en: "Today's verdicts: Global reads Stressed and Australia reads Stressed. World markets and world currencies both need attention. The gold crowd gauge and Euro-area inflation are in warning. The mortgage rate people pay and Australian inflation are also elevated. South Korea’s biggest companies and the euro versus the franc signal stress across regions. This page explains the data and is not financial advice.",
+      fa: 'حکم‌های امروز: جهانی پرتنش است و استرالیا پرتنش است. بازارهای جهان و ارزهای مهم جهان هر دو نیازمند توجه هستند. فشارسنج شلوغی طلا و تورم منطقهٔ یورو در هشدار هستند. نرخ وامی که مردم می‌پردازند و تورم استرالیا نیز بالا هستند. شرکت‌های بزرگ کرهٔ جنوبی و یورو در برابر فرانک نشانگر فشار در مناطق مختلف هستند. این صفحه داده‌ها را ساده می‌کند و توصیهٔ مالی نیست.',
     },
   },
 ];
@@ -293,7 +293,7 @@ for (const bad of BAD_NEWS) {
  *     tests pin the texts)
  * ------------------------------------------------------------------ */
 
-check('prompt version is pinned', PROMPT_VERSION === 7);
+check('prompt version is pinned', PROMPT_VERSION === 8);
 check('section/overall prompts compose the base rules', sectionSystemPrompt().includes('Hard rules:') && overallSystemPrompt().includes('Hard rules:'));
 check('news prompt is standalone (no JSON-only rule)', !newsSystemPrompt().includes('Output only JSON'));
 check('systemPromptFor routes units', systemPromptFor({ kind: 'overall' }) === overallSystemPrompt());
