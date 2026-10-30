@@ -5,6 +5,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31c] — Gold Program session close: the Session-3 FRED gap-fill spec + the wrap-up verification (docs-only)
+
+The S2/S2.1 ship closed out. Nothing runtime-changing in this commit —
+documentation and verification only:
+
+- **Session-3 spec authored** — `docs/insights/GOLD_FRED_GAPFILL_SPEC.md`
+  (reconstruction-flagged; the original brief died with the Session-1
+  sandbox). Scope: G1 real-yield history depth (the DFII10 hole audit +
+  the bounded `DGS10 − T10YIE` cross-fill for scoring-input continuity +
+  the trio freshness fix; the 2003 wall accepted by default, GSW
+  extension parked as open decision D-3) and G2 breakeven interplay
+  (new derived context indicator `breakeven-tilt` = `T5YIFR − T5YIE`,
+  zero new fetches, EN + fa copy behind the round-54 audit gate; the
+  21st-voter promotion parked as D-5).
+- **Deploy verification at close** — currena.ir serves the S2.1 build
+  from `main` @ `53b2215` (entry `index-5xHey672.js`, Insights chunk
+  `Insights-_VabTYqd.js`, both HTTP 200); the served snapshot at close
+  was still `2026-10-30T20:10Z` (pre-field) — the stored `goldSummary`
+  lands at the 04:10 UTC rung (~4.5 h later), panels derive
+  client-side meanwhile (the designed pre-field path, verified in S2.1).
+- **Known, recorded** — the full-history FRED trio (`DGS10`/`DGS30`/
+  `DFII10`) lagged the decade group by a day at close (asOf 2026-10-28
+  vs 2026-10-29) — handed to Session 3 as G1d with live evidence.
+
 ## [2026-10-31b] — Insights Gold Program S2.1: the gold panels go bilingual + move under the balance (the owner's two-problem review)
 
 The owner reviewed the deployed S2 panels on currena.ir and named two

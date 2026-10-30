@@ -250,7 +250,9 @@ panels read the existing scored voters through the pure engine at
 the SPA re-derives the voter list client-side. BILINGUAL since S2.1: the
 copy lives in the web dictionaries (`signals.goldScore` /
 `signals.goldModelVsReality`, EN + fa — Persian-copy round-53), and this
-prices strip is the four price tiles again.*
+prices strip is the four price tiles again. NEXT: Session 3, the FRED
+gap-fillers — spec at docs/insights/GOLD_FRED_GAPFILL_SPEC.md (G1
+real-yield history depth · G2 breakeven-tilt; not yet implemented).*
 
 **Prices heat** (`prices-heat` gauge):
 | | id | cadence | maxAge | rule | source |
