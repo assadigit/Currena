@@ -21,6 +21,10 @@
  *   - signals.ts     — the "What the signals say" cards (I17, UI spec S1–S3):
  *                      five/six-condition checklists + lean, purely
  *                      descriptive, never advice.
+ *   - gold-score.ts  — the Gold Program's directional re-cut of the gauge
+ *                      voters for gold (GOLD_SCORE_SPEC.md): the tailwind
+ *                      score, the four lanes, model-vs-reality, the compact
+ *                      snapshot writer + the EN copy blocks.
  */
 
 export {
@@ -114,6 +118,40 @@ export type {
   SignalMetal,
   SignalReading,
 } from './signals';
+
+// The Gold Program (docs/insights/GOLD_SCORE_SPEC.md): the directional
+// re-cut of the gauge voters for gold — S1's pure engine + EN copy, S2's
+// compact snapshot writer. The SPA re-derives the full reading (voters
+// included) through the SAME functions; only goldSummaryOf's compact
+// output rides the KV write.
+export {
+  GOLD_LANE_VOTERS,
+  GOLD_LANES,
+  GOLD_PANEL_COPY_EN,
+  GOLD_REALITY_SPEED_PCT,
+  GOLD_STRONG_MIN_FIRING,
+  GOLD_STRONG_SHARE,
+  MODEL_VS_REALITY_COPY_EN,
+  goldSummaryOf,
+  goldTailwindScore,
+  modelVsReality,
+  modelVsRealityExplainerKey,
+} from './gold-score';
+export type {
+  GoldLane,
+  GoldLaneVoter,
+  GoldModelDirection,
+  GoldRealityDirection,
+  GoldSubGaugeReading,
+  GoldSubGaugeWord,
+  GoldTailwindLabel,
+  GoldTailwindReading,
+  GoldVoter,
+  GoldVoterEvidence,
+  GoldVoterImpact,
+  ModelVsRealityChip,
+  ModelVsRealityReading,
+} from './gold-score';
 
 export { RULE_VERSION, RULE_CHANGELOG } from './ruleVersion';
 export type { RuleChangeLogEntry } from './ruleVersion';

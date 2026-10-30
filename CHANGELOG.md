@@ -5,6 +5,77 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31] — Insights Gold Program S1+S2: the gold-directional scoring engine + the API/UI wiring (the gold panels ship)
+
+The Gold Program's first two sessions (spec: docs/insights/GOLD_SCORE_SPEC.md):
+S1 built the pure engine that re-cuts the EXISTING gauge voters into one
+directional score for gold; S2 wired it end-to-end — snapshot field, ingest
+stamp, API ride-along, and the two prices-board panels. Zero new fetches,
+zero new KV ops, zero new indicator ids, zero new votes; `ruleVersion`
+untouched (the engine derives from the unchanged scored readings).
+
+- **`packages/insights/src/gold-score.ts`** (S1) — the pure engine: a
+  20-voter / 4-lane polarity table (borrowing costs tight/relief · dollar
+  strong/under stress · market stress elevated/calm · inflation hot/cool),
+  firing through the shared `evalLeg` lean (30-day direction beyond the
+  per-leg threshold, else the decade position); the net score with the
+  5-step share-based label (the "strong" bar needs ≥3 firing drivers AND
+  ≥50% of them on one side); `modelVsReality` (the score's direction vs
+  gold's own 30-day move at the outlook classifier's ±2% bar, with the
+  `ma200GapPct` fallback and the six aligned/diverging/neutral/no-read
+  chips); `goldSummaryOf` (the compact wire writer); the EN copy blocks
+  (`GOLD_PANEL_COPY_EN` / `MODEL_VS_REALITY_COPY_EN` — deliberately in the
+  package, NOT the web dictionaries, so the Persian-copy audit stays
+  closed until the S5 fa round). 36 tests in `gold-score.test.ts`.
+- **`packages/core/src/schemas.ts`** (S2 §4.1) — `GoldSummarySchema` +
+  the OPTIONAL `goldSummary` field on `InsightsSnapshotSchema`: additive,
+  zero breaking change (every stored snapshot and archive stays valid;
+  old readers ignore it). Exported with its leaf schemas. +4 tests.
+- **`packages/insights/src/adapters/snapshot.ts`** (S2 §4.2) — the three
+  builders stamp/recompute the compact summary beside the section
+  summaries: `buildInsightsSnapshot` (the 04:10 main build),
+  `patchInsightsSnapshot` (the 04:20 re-derivation phase — the summary
+  must describe the readings it ships with) and `projectSnapshotToPublic`
+  (recomputed over the surviving readings — the R2 invariant). +4 tests.
+- **`GET /api/insights`** (S2 §4.3) — serves the stored snapshot whole,
+  so `goldSummary` rides along automatically (no route change; the
+  live-prices overlay spreads it through untouched — the spec's §2.4
+  documents the honest one-tick skew). The shape example in
+  `docs/INDICATORS_AND_DATA_SOURCES.md` §3 gains the block.
+- **The web panels** (S2 §4.4) — `GoldTailwindPanel.tsx` (net score,
+  label, lane counts, the four lane readings, the firing-driver list
+  re-derived client-side through the same pure engine, the
+  conditions-not-advice footnote) and `ModelVsRealityPanel.tsx` (the
+  chip + the explainer with the reality's own number and basis), mounted
+  BESIDE the gold-usd tile on the prices-board strip in
+  `PricesBoard.tsx` (further grid items in the same tile anatomy);
+  `Insights.tsx` passes `snapshot.goldSummary` down. Old snapshots
+  without the field: the panels derive the reading client-side.
+  8 tests in `gold-panels.test.tsx` (fixture snapshot with a known
+  goldSummary, the label + counts assertions, the fallback derivation,
+  the board integration).
+- **Docs** — `docs/insights/GOLD_SCORE_SPEC.md` (the full spec: model,
+  thresholds, integration points, validation record); `AGENTS.md` §A's
+  prices-board note; this entry.
+
+FA copy is deliberately deferred to Session 5 (the Persian-copy audit
+gate) — the panels render EN in both locales until the reviewed fa lands.
+
+**Bundle budget (the D-16 path, never silent):** the Insights lazy chunk
+grew +3.69 kB raw / +2.30 kB gz (measured 1123.69 kB / 264.30 kB gz) with
+the two panels and the engine/copy they import from `@currena/insights`;
+the budget bumps 1120/262 → **1126/266** in `scripts/check-bundle-budget.mjs`
+(justified: the owner-facing gold score on the prices strip is the Gold
+Program's whole point — GOLD_SCORE_SPEC.md §4.4; the entry chunk is
+untouched at 294.45/88.48).
+
+Gates: `pnpm gates` ALL GREEN — secret scan clean (8 patterns · 654
+files) · typecheck 6 packages · lint 0/0 · copy:audit clean · narrator
+vocabulary in sync · narrator eval 50 checks · layer1 strict 7,865/7,865 ·
+full suite **10,165 passed** (10,113 baseline + 52 new: insights 884→924,
+core 191→195, web 8,587→8,595) · build + bundle budget held after the
+justified bump.
+
 ## [2026-10-28g] — Insights Layer-2 narrator M4: the generation rung + KV storage + the cached endpoint (DEPLOYED, disabled by default)
 
 Milestone 4 of the narrator build (spec §4 + §9) — the FIRST DEPLOY of

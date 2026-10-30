@@ -8,6 +8,7 @@ import {
   downsampleSeries,
   HISTORY_MAX_POINTS,
   HISTORY_WINDOW_DAYS,
+  patchInsightsSnapshot,
   projectSnapshotToPublic,
   quarterPeriodOf,
 } from './snapshot';
@@ -378,6 +379,92 @@ describe('buildInsightsStatus', () => {
     expect(status.mode).toBe('scheduled');
     expect(status.sources).toHaveLength(2);
     expect(status.sources[1]!.ok).toBe(false);
+  });
+});
+
+describe('goldSummary on the snapshot (Gold Program S2 — GOLD_SCORE_SPEC.md §4.2)', () => {
+  it('the main build stamps the compact summary beside the section summaries (degenerate: nothing readable)', () => {
+    const snap = buildInsightsSnapshot({ series: {}, calendar: [], now: NOW });
+    expect(snap.goldSummary).toBeDefined();
+    expect(snap.goldSummary!.label).toBeNull(); // nothing could fire — never a guess
+    expect(snap.goldSummary!.firingVoters).toBe(0);
+    expect(snap.goldSummary!.netScore).toBe(0);
+    expect(snap.goldSummary!.laneCounts).toEqual({ tailwind: 0, headwind: 0, mixed: 0 });
+    expect(snap.goldSummary!.subGauges.map((g) => g.reading)).toEqual([
+      'unreadable', 'unreadable', 'unreadable', 'unreadable',
+    ]);
+    expect(snap.goldSummary!.modelVsReality.chip).toBe('no-read'); // no readable gold price either
+  });
+
+  it('a rising-30d yield series fires as a gold HEADWIND through the built reading', () => {
+    // 40 daily points climbing 3.00 → 3.78: the built reading carries
+    // change30d ≈ +0.58 (beyond the 0.15 leg threshold) → the shared
+    // evaluator leans rising → polarity −1 → headwind for gold.
+    const snap = buildInsightsSnapshot({
+      series: { us10y: daily('2026-08-29', 40, 3, (i) => i * 0.02) },
+      calendar: [],
+      now: NOW,
+    });
+    const g = snap.goldSummary!;
+    expect(g.firingVoters).toBe(1);
+    expect(g.headwindVoters).toBe(1);
+    expect(g.netScore).toBe(-1);
+    expect(g.label).toBe('headwind');
+    expect(g.subGauges.find((s) => s.lane === 'borrowing-costs')).toMatchObject({
+      reading: 'tight',
+      tailwindVoters: 0,
+      headwindVoters: 1,
+    });
+    expect(g.laneCounts).toEqual({ tailwind: 0, headwind: 1, mixed: 0 });
+    // gold-usd has no series → reality unreadable → the comparison stays no-read.
+    expect(g.modelVsReality.chip).toBe('no-read');
+  });
+
+  it('the 04:20 patch re-derives the summary with the patched readings', () => {
+    const stored = buildInsightsSnapshot({ series: {}, calendar: [], now: NOW });
+    expect(stored.goldSummary!.label).toBeNull();
+    const patchedReading: import('@currena/core').IndicatorReading = {
+      id: 'real-yield-10y',
+      value: 1.2,
+      asOf: '2026-10-06',
+      status: 'normal',
+      change30d: -0.3, // beyond the ±0.1 leg threshold, falling
+      percentile10y: 0.9,
+      sourceName: 't',
+      updatedAt: NOW,
+    };
+    const patched = patchInsightsSnapshot(stored, [patchedReading], NOW);
+    expect(patched.goldSummary).toMatchObject({
+      firingVoters: 1,
+      tailwindVoters: 1,
+      headwindVoters: 0,
+      netScore: 1,
+      label: 'tailwind',
+    });
+    expect(patched.goldSummary!.subGauges.find((s) => s.lane === 'borrowing-costs')!.reading).toBe('relief');
+  });
+
+  it('the public projection recomputes the summary over the survivors (the R2 invariant)', () => {
+    const stored = buildInsightsSnapshot({ series: {}, calendar: [], now: NOW });
+    const firing: import('@currena/core').IndicatorReading = {
+      id: 'real-yield-10y',
+      value: 1.2,
+      asOf: '2026-10-06',
+      status: 'normal',
+      change30d: -0.3,
+      percentile10y: 0.9,
+      sourceName: 't',
+      updatedAt: NOW,
+    };
+    const withFiring = patchInsightsSnapshot(stored, [firing], NOW);
+    expect(withFiring.goldSummary!.firingVoters).toBe(1);
+    // Hiding the firing voter's id: the public summary must not count a
+    // reading its own readings array no longer carries.
+    const pub = projectSnapshotToPublic(withFiring, new Set(['real-yield-10y']));
+    expect(pub.readings.find((r) => r.id === 'real-yield-10y')).toBeUndefined();
+    expect(pub.goldSummary!.firingVoters).toBe(0);
+    expect(pub.goldSummary!.label).toBeNull();
+    expect(pub.goldSummary!.subGauges.find((s) => s.lane === 'borrowing-costs')!.reading).toBe('unreadable');
   });
 });
 
