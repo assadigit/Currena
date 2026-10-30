@@ -718,7 +718,15 @@ const BUDGETS = [
   // Gold Program's whole point (GOLD_SCORE_SPEC.md §4.4); the panel code
   // is irreducible without dropping the firing-driver list. Justified in
   // CHANGELOG §2026-10-31. Same D-16 path.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1126_000, gz: 266_000, label: 'Insights lazy chunk' },
+  //
+  // 2026-10-31b Gold Program S2.1 bump (measured 1128.26/265.32 → budget
+  // 1130/267): the owner's bilingual directive — the fa copy (55+18 keys)
+  // joined the EN copy in the dictionaries, both riding this chunk. The
+  // package-level EN copy constants left with the same move (net of the
+  // EN swap ≈ 0), so the growth IS the reviewed Persian. Panels also
+  // moved to the signals card (same chunk). Justified in CHANGELOG
+  // §2026-10-31b. Entry chunk untouched at 294.45/88.48.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1130_000, gz: 267_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

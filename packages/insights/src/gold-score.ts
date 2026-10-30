@@ -30,9 +30,13 @@
  * reading client-side through this SAME module (the gauges.ts contract:
  * one pure function, both sides, no drift).
  *
- * Session S1 deliberately ships EN copy only (GOLD_PANEL_COPY_EN /
- * MODEL_VS_REALITY_COPY_EN here, NOT the web i18n dictionaries — the
- * Persian-copy audit gate stays closed until the S5 translation round).
+ * Copy note (S2.1, owner round 2026-10-31 — "must be bilingual"): the
+ * panel copy NO LONGER lives in this package. It moved to the web i18n
+ * dictionaries (apps/web/src/i18n/insights-copy-{en,fa}.ts under
+ * signals.goldScore / signals.goldModelVsReality) so both locales render
+ * through the same reviewed-copy path as every other insights panel,
+ * behind the Persian-copy audit gate. This module keeps ONLY the pure
+ * engine + the explainer-key selection.
  */
 
 import type { GoldSummary, IndicatorId, IndicatorReading } from '@currena/core';
@@ -397,115 +401,3 @@ export function goldSummaryOf(readings: readonly IndicatorReading[]): GoldSummar
   };
 }
 
-/* ------------------------------------------------------------------ *
- * EN copy (S1 ships English only — the fa translation is S5's audit-
- * gated round; it lives HERE, not in the web dictionaries, so the
- * Persian-copy audit stays closed until the reviewed fa lands)
- * ------------------------------------------------------------------ */
-
-/** The GoldTailwindPanel's English copy. */
-export const GOLD_PANEL_COPY_EN = {
-  title: 'Gold tailwind score',
-  subtitle: 'The macro drivers, re-cut for gold direction',
-  netScoreLabel: 'Net score',
-  /** null label (nothing firing) — never a made-up word. */
-  noReadWord: 'Cannot read yet',
-  labels: {
-    'strong-tailwind': 'Strong tailwind',
-    tailwind: 'Tailwind',
-    balanced: 'Balanced',
-    headwind: 'Headwind',
-    'strong-headwind': 'Strong headwind',
-  } as Record<GoldTailwindLabel, string>,
-  firingLine: '{firing} of {total} drivers firing',
-  firingNone: 'No driver is firing right now',
-  laneCountsLabel: 'Lanes',
-  laneCountsLine: '{tailwind} tailwind · {headwind} headwind · {mixed} mixed',
-  lanesTitle: 'The four lanes',
-  laneNames: {
-    'borrowing-costs': 'Borrowing costs',
-    dollar: 'Dollar',
-    stress: 'Market stress',
-    inflation: 'Inflation',
-  } as Record<GoldLane, string>,
-  /** The lane word's display form ('stress' reads better as "under stress"). */
-  subGaugeWords: {
-    tight: 'tight',
-    relief: 'relief',
-    strong: 'strong',
-    stress: 'under stress',
-    elevated: 'elevated',
-    calm: 'calm',
-    hot: 'running hot',
-    cool: 'cooling',
-    mixed: 'mixed',
-    unreadable: 'no read',
-  } as Record<GoldSubGaugeWord, string>,
-  votersTitle: 'Firing drivers',
-  votersNone: 'None firing',
-  voterNames: {
-    'real-yield-10y': 'Real yields',
-    us10y: 'US 10-year yield',
-    us30y: 'US 30-year yield',
-    'fed-target': 'Fed funds target',
-    'fed-expectations': 'Fed expectations',
-    'ecb-dfr': 'ECB deposit rate',
-    'yield-curve-10y2y': '10y−2y curve',
-    'yield-curve-10y3m': '10y−3m curve',
-    'dollar-basket': 'Dollar basket',
-    usdjpy: 'USD/JPY',
-    'us-japan-10y-gap': 'US−Japan 10y gap',
-    'stress-stlfsi': 'STLFSI',
-    nfci: 'NFCI',
-    vix: 'VIX',
-    'gold-silver': 'Gold/silver ratio',
-    'cftc-gold-positioning': 'Gold positioning (COT)',
-    'us-cpi-yoy': 'US CPI',
-    'us-pce-core-yoy': 'US core PCE',
-    'euro-hicp': 'Euro HICP',
-    'breakeven-5y5y': '5y5y breakeven',
-  } as Record<(typeof GOLD_LANE_VOTERS)[number]['id'], string>,
-  evidenceWords: {
-    rising: 'rising',
-    falling: 'falling',
-    high: 'high in its decade',
-    low: 'low in its decade',
-  } as Record<GoldVoterEvidence, string>,
-  impactWords: {
-    tailwind: 'tailwind',
-    headwind: 'headwind',
-  } as Record<GoldVoterImpact, string>,
-  footnote: 'A descriptive score of the classic driver relationships — conditions, not advice.',
-};
-
-/** The ModelVsRealityPanel's English copy. */
-export const MODEL_VS_REALITY_COPY_EN = {
-  title: 'Model vs reality',
-  subtitle: 'Does the macro score agree with what gold actually did?',
-  chips: {
-    'aligned-tailwind': 'Aligned — tailwind',
-    'aligned-headwind': 'Aligned — headwind',
-    'diverging-up': 'Diverging — gold rising anyway',
-    'diverging-down': 'Diverging — gold falling anyway',
-    neutral: 'No gap to read',
-    'no-read': 'Not enough data',
-  } as Record<ModelVsRealityChip, string>,
-  explainers: {
-    'aligned-tailwind':
-      'The macro drivers lean supportive and gold has moved {value} {basis} — the move has company.',
-    'aligned-headwind':
-      'The macro drivers lean against gold and the price has moved {value} {basis} — the weakness has company.',
-    'diverging-up':
-      'The macro drivers lean against gold, yet the price has moved {value} {basis} — the market is fighting the model.',
-    'diverging-down':
-      'The macro drivers lean supportive, yet the price has moved {value} {basis} — the market is not following the drivers.',
-    'model-neutral': 'The macro drivers show no clear lean for gold right now.',
-    'reality-flat': 'Gold has held roughly flat ({value} {basis}) — no model-vs-market gap to read.',
-    'no-read': 'Not enough fresh data to compare the model with the market.',
-  } as Record<ReturnType<typeof modelVsRealityExplainerKey>, string>,
-  basisPhrases: {
-    change30d: 'over the past 30 days',
-    ma200GapPct: 'vs its 200-day average',
-  } as Record<'change30d' | 'ma200GapPct', string>,
-  footnote: 'The model reads the drivers; reality reads the price. Both can be wrong.',
-};

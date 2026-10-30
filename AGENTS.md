@@ -236,8 +236,10 @@ markets table):
 | [C] | `btc-usd` | daily | 2 | info | gold-api |
 | [C] | `gold-btc` | daily | 4 | info | derived |
 
-*Gold Program (2026-10-31, S1+S2 — docs/insights/GOLD_SCORE_SPEC.md): two
-derived panels render on this strip BESIDE the gold-usd tile — the
+*Gold Program (2026-10-31, S1+S2+S2.1 — docs/insights/GOLD_SCORE_SPEC.md):
+two derived panels render in the SIGNALS card, directly under the gold
+balance visual («برآیند عوامل مؤثر بر قیمت طلا» — the owner's 2026-10-31
+placement directive; they sat on this strip for one day in S2) — the
 **gold tailwind score** (the macro voters re-cut for gold direction: net
 score, 5-step label, lane counts, the four lane readings, the firing
 drivers) and **model vs reality** (the score's direction vs gold's actual
@@ -245,8 +247,10 @@ drivers) and **model vs reality** (the score's direction vs gold's actual
 panels read the existing scored voters through the pure engine at
 `packages/insights/src/gold-score.ts`; the ingest stamps the compact
 `goldSummary` (optional snapshot field) beside the section summaries, and
-the SPA re-derives the voter list client-side. EN copy only until the S5
-Persian-copy audit round.*
+the SPA re-derives the voter list client-side. BILINGUAL since S2.1: the
+copy lives in the web dictionaries (`signals.goldScore` /
+`signals.goldModelVsReality`, EN + fa — Persian-copy round-53), and this
+prices strip is the four price tiles again.*
 
 **Prices heat** (`prices-heat` gauge):
 | | id | cadence | maxAge | rule | source |

@@ -6165,6 +6165,112 @@ export const insightsCopyEn = {
     // full information; this labels the graphic for screen readers).
     beamAria:
       'Balance of conditions for {metal}: {supporting} supporting, {pressuring} pressuring, {neutral} neutral, {unreadable} unreadable, {total} conditions in total.',
+    // Gold Program S2.1 (owner round 2026-10-31 — "must be bilingual"):
+    // the two gold panels' copy, moved from the @currena/insights package
+    // into the dictionaries so both locales render through the same
+    // reviewed-copy path (the fa mirror below, triaged through the
+    // Persian-copy audit). The panels render INSIDE the merged gold
+    // card, under the balance visual.
+    goldScore: {
+      title: 'Gold tailwind score',
+      subtitle: 'The macro drivers, re-cut for gold direction',
+      /** null label (nothing firing) — never a made-up word. */
+      noReadWord: 'Cannot read yet',
+      labels: {
+        'strong-tailwind': 'Strong tailwind',
+        tailwind: 'Tailwind',
+        balanced: 'Balanced',
+        headwind: 'Headwind',
+        'strong-headwind': 'Strong headwind',
+      },
+      netFiringLine: 'Net score — {firing} of {total} drivers firing',
+      netFiringNone: 'Net score — no driver is firing right now',
+      laneCountsLabel: 'Lanes',
+      laneCountsLine: '{tailwind} tailwind · {headwind} headwind · {mixed} mixed',
+      laneNames: {
+        'borrowing-costs': 'Borrowing costs',
+        dollar: 'Dollar',
+        stress: 'Market stress',
+        inflation: 'Inflation',
+      },
+      subGaugeWords: {
+        tight: 'tight',
+        relief: 'relief',
+        strong: 'strong',
+        stress: 'under stress',
+        elevated: 'elevated',
+        calm: 'calm',
+        hot: 'running hot',
+        cool: 'cooling',
+        mixed: 'mixed',
+        unreadable: 'no read',
+      },
+      votersTitle: 'Firing drivers',
+      votersNone: 'None firing',
+      voterNames: {
+        'real-yield-10y': 'Real yields',
+        us10y: 'US 10-year yield',
+        us30y: 'US 30-year yield',
+        'fed-target': 'Fed funds target',
+        'fed-expectations': 'Fed expectations',
+        'ecb-dfr': 'ECB deposit rate',
+        'yield-curve-10y2y': '10y−2y curve',
+        'yield-curve-10y3m': '10y−3m curve',
+        'dollar-basket': 'Dollar basket',
+        usdjpy: 'USD/JPY',
+        'us-japan-10y-gap': 'US−Japan 10y gap',
+        'stress-stlfsi': 'STLFSI',
+        nfci: 'NFCI',
+        vix: 'VIX',
+        'gold-silver': 'Gold/silver ratio',
+        'cftc-gold-positioning': 'Gold positioning (COT)',
+        'us-cpi-yoy': 'US CPI',
+        'us-pce-core-yoy': 'US core PCE',
+        'euro-hicp': 'Euro HICP',
+        'breakeven-5y5y': '5y5y breakeven',
+      },
+      evidenceWords: {
+        rising: 'rising',
+        falling: 'falling',
+        high: 'high in its decade',
+        low: 'low in its decade',
+      },
+      impactWords: {
+        tailwind: 'tailwind',
+        headwind: 'headwind',
+      },
+      footnote: 'A descriptive score of the classic driver relationships — conditions, not advice.',
+    },
+    goldModelVsReality: {
+      title: 'Model vs reality',
+      subtitle: 'Does the macro score agree with what gold actually did?',
+      chips: {
+        'aligned-tailwind': 'Aligned — tailwind',
+        'aligned-headwind': 'Aligned — headwind',
+        'diverging-up': 'Diverging — gold rising anyway',
+        'diverging-down': 'Diverging — gold falling anyway',
+        neutral: 'No gap to read',
+        'no-read': 'Not enough data',
+      },
+      explainers: {
+        'aligned-tailwind':
+          'The macro drivers lean supportive and gold has moved {value} {basis} — the move has company.',
+        'aligned-headwind':
+          'The macro drivers lean against gold and the price has moved {value} {basis} — the weakness has company.',
+        'diverging-up':
+          'The macro drivers lean against gold, yet the price has moved {value} {basis} — the market is fighting the model.',
+        'diverging-down':
+          'The macro drivers lean supportive, yet the price has moved {value} {basis} — the market is not following the drivers.',
+        'model-neutral': 'The macro drivers show no clear lean for gold right now.',
+        'reality-flat': 'Gold has held roughly flat ({value} {basis}) — no model-vs-market gap to read.',
+        'no-read': 'Not enough fresh data to compare the model with the market.',
+      },
+      basisPhrases: {
+        change30d: 'over the past 30 days',
+        ma200GapPct: 'vs its 200-day average',
+      },
+      footnote: 'The model reads the drivers; reality reads the price. Both can be wrong.',
+    },
   },
 
   /* ---------------------------------------------------------------- *

@@ -5,6 +5,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31b] — Insights Gold Program S2.1: the gold panels go bilingual + move under the balance (the owner's two-problem review)
+
+The owner reviewed the deployed S2 panels on currena.ir and named two
+problems: "1. they're only latin, while must be bilingual. 2. it's placed
+on the wrong section of the site … it must place here: برآیند عوامل مؤثر
+بر قیمت طلا" (the gold balance block). This round fixes both — the S5
+fa-copy deferral is retired EARLY, behind the Persian-copy audit gate.
+
+- **Bilingual (EN + fa)** — the panels' copy moved OUT of
+  `@currena/insights` (`GOLD_PANEL_COPY_EN` / `MODEL_VS_REALITY_COPY_EN`
+  RETIRED) into the web i18n dictionaries: `signals.goldScore` (55 keys)
+  + `signals.goldModelVsReality` (18 keys) in both `insights-copy-en.ts`
+  and `insights-copy-fa.ts`. The Persian follows the terminology glossary
+  and reuses the site's fixed vocabulary (فعلاً قابل ارزیابی نیست ·
+  متعادل · به نفع/به ضرر طلا · the balance's lane condition names); the
+  tailwind/headwind metaphor reads باد موافق/باد مخالف; no em dashes in
+  fa (؛ / ، per the glossary); ٪ with fa-IR digits (the PriceDetails
+  precedent). Trialed as Persian-copy round-53 —
+  `docs/localization/persian-copy-round-53-gold-panels.md`; the audit is
+  clean (4,819 entries).
+- **Placement** — the panels moved from the prices strip (where S2 had
+  mounted them beside the gold-usd tile) INTO the merged gold card
+  (`signals/MergedCard.tsx`), DIRECTLY UNDER the BalanceScale visual and
+  before the price-footing strip; two columns beside the balance's
+  max-width column, stacked on mobile. `PricesBoard` is reverted to the
+  four price tiles; `goldSummary` now threads
+  `Insights.tsx → Signals.tsx → MergedSignalsCard`.
+- **Files** — `signals/GoldTailwindPanel.tsx` + `signals/ModelVsRealityPanel.tsx`
+  (moved + restyled as card-inner blocks, `copy` prop, h4 titles);
+  `packages/insights/src/gold-score.ts` (pure engine only; the three
+  copy-completeness tests moved to the web with the copy — 36 → 33
+  tests); `signals/gold-panels.test.tsx` (16 tests: the panel renders,
+  the fallback, both dictionaries' coverage, the fa rendering, the
+  MergedCard mount order, the prices-strip move-back).
+- No data/ingest/API change: the `goldSummary` snapshot field, the ingest
+  stamp and the API ride-along are untouched (S2's work).
+- **Bundle budget**: the Insights lazy chunk measured 1128.26 kB raw /
+  265.32 kB gz vs the 1126/266 budgets → bumped to **1130/267** in
+  `scripts/check-bundle-budget.mjs` (the growth IS the reviewed Persian
+  copy — the package-level EN constants left with the same move, so the
+  EN swap nets ≈ 0). The entry chunk is untouched at 294.45/88.48.
+
 ## [2026-10-31] — Insights Gold Program S1+S2: the gold-directional scoring engine + the API/UI wiring (the gold panels ship)
 
 The Gold Program's first two sessions (spec: docs/insights/GOLD_SCORE_SPEC.md):

@@ -496,13 +496,12 @@ export function Insights() {
             />
           </JumpNav>
 
-          {/* R10: the prices strip — four identical tiles. Gold Program S2:
-           * the snapshot's compact goldSummary rides down to the board so
-           * the two gold panels beside the gold-usd tile render the
-           * ingest's stamp (they derive it client-side when absent). */}
+          {/* R10: the prices strip — four identical tiles. Gold Program
+           * S2.1: the gold panels MOVED to the signals card (under the
+           * balance — the owner's placement directive); the strip is the
+           * four price tiles again. */}
           <PricesBoard
             readings={state.snapshot.readings}
-            goldSummary={state.snapshot.goldSummary}
             copy={copy}
             locale={locale}
             numberLocale={numberLocale}
@@ -600,8 +599,13 @@ export function Insights() {
            * default. */}
           {SIGNALS_ENABLED ? (
             <section id="insights-signals-wrap" className="scroll-mt-24">
+              {/* Gold Program S2.1: the snapshot's compact goldSummary
+               * rides down to the signals card so the two gold panels
+               * under the balance render the ingest's stamp (they derive
+               * it client-side when absent). */}
               <Signals
                 readings={state.snapshot.readings}
+                goldSummary={state.snapshot.goldSummary}
                 copy={copy}
                 numberLocale={numberLocale}
                 expandToken={signalsToken}
