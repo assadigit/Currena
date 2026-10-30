@@ -340,16 +340,16 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
     // them into the four Prices-board tiles + companions. A missing,
     // poisoned or unreadable key degrades CALMLY to the plain snapshot —
     // the daily EOD backbone answers alone, never an error.
-    // PUBLIC MODE (2026-10-19, LR-02 / M-2): the quotes are Yahoo-sourced —
-    // the merge is skipped entirely and the projection's EOD backbone
-    // answers alone (its price rows are hidden by the overrides anyway).
+    // 2026-10-30 owner round: the PUBLIC-MODE skip is removed — the price
+    // rows ARE visible on the public page now, so the live Yahoo quotes
+    // must merge so the tiles show the freshest price (was serving the
+    // daily EOD snapshot → "the app shows 109 but brent is 114"). The
+    // EOD backbone stays the fallback when the live KV is absent/stale.
     let live: LivePricesSnapshot | undefined;
-    if ((await accessModeOf(c)) !== 'public') {
-      try {
-        live = await deps.getPricesReader(c.env).getLivePrices();
-      } catch (err) {
-        console.warn('[insights] live-prices read failed — serving the EOD snapshot:', err instanceof Error ? err.message : err);
-      }
+    try {
+      live = await deps.getPricesReader(c.env).getLivePrices();
+    } catch (err) {
+      console.warn('[insights] live-prices read failed — serving the EOD snapshot:', err instanceof Error ? err.message : err);
     }
     const served = live !== undefined ? mergeLivePricesIntoSnapshot(snapshot, live) : snapshot;
     // The ETag covers BOTH generations — a new hourly quote busts caches the
