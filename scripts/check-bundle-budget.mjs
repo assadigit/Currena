@@ -701,7 +701,13 @@ const BUDGETS = [
   // unavoidable (the spec's M5 display scope), the gz headroom is healthy,
   // and the entry chunk is untouched at 295.37/88.84. Bump 1100 → 1110
   // raw (10 kB headroom for the next small Layer-2 tweak); gz unchanged.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1110_000, gz: 260_000, label: 'Insights lazy chunk' },
+  // 2026-10-30 V11 value-mention bump (1110.47/261.03 → budget 1120/262):
+  // the V11 coverage check now also matches each alert's VALUE (not just
+  // its plainName) — added valueRoundings() + alertsById map + the
+  // value-token check in langChecks. ~0.5 kB raw / 1 kB gz; the entry
+  // chunk is untouched. Justified by the owner's "make sure AI didn't
+  // miss anything" fix landing in the validator.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1120_000, gz: 262_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

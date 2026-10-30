@@ -3,9 +3,9 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "4a16889b8774bf00e1a86d5dc976df8e998a6b41f0f5ab23187d2dfb5b93f17a",
-    "faSha256": "8d8623d2bbe8774b951739b3a7d201ac92c2527e4d1e61471d28d35be4a99e73",
-    "indicatorCount": 129,
+    "enSha256": "a9a52ce864e931cc19a1d56216269dda8dedbd22d2dc8dabe83dd3a694576ae6",
+    "faSha256": "936d218298c89ed2ceaf98ec1cc45ce48b44a1c05966234456cadfd849600e39",
+    "indicatorCount": 130,
     "glossaryCount": 23
   },
   "en": {
@@ -496,6 +496,27 @@
         ],
         "glossaryTerms": [
           "inflation"
+        ]
+      },
+      "usdaed": {
+        "plainName": "Dollar versus UAE dirham",
+        "oneLine": "How many UAE dirhams one US dollar buys.",
+        "ifRising": "The dirham’s dollar peg usually absorbs this: the pair barely moves by design.",
+        "ifFalling": "A meaningful drop would be an exceptional event: the peg has held for decades.",
+        "connections": [
+          {
+            "with": "dollar-basket",
+            "text": "The dirham is pegged TO the dollar, so it moves with it against every other currency.",
+            "strength": "reliable"
+          },
+          {
+            "with": "brent",
+            "text": "Gulf economies ride oil income; the peg keeps that income dollar-linked.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "central-bank"
         ]
       },
       "us-unemployment": {
@@ -3437,6 +3458,27 @@
         ],
         "glossaryTerms": [
           "inflation"
+        ]
+      },
+      "usdaed": {
+        "plainName": "دلار در برابر درهم امارات",
+        "oneLine": "هر دلار آمریکا چند درهم امارات می‌خرد.",
+        "ifRising": "اتصال دلاری درهم معمولاً این حرکت را جذب می‌کند: جفت‌ارز بر اساس طراحی تقریباً بی‌حرکت است.",
+        "ifFalling": "افت معنادار در آن رویدادی استثنایی خواهد بود: این اتصال دهه‌هاست برقرار است.",
+        "connections": [
+          {
+            "with": "dollar-basket",
+            "text": "درهم به دلار گره خورده است، پس در برابر هر ارز دیگری همراه دلار حرکت می‌کند.",
+            "strength": "reliable"
+          },
+          {
+            "with": "brent",
+            "text": "اقتصادهای خلیج فارس به درآمد نفت وابسته‌اند؛ این اتصال، درآمدشان را دلاری نگه می‌دارد.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "central-bank"
         ]
       },
       "us-unemployment": {

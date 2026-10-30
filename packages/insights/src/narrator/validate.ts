@@ -400,6 +400,15 @@ export function sanitizeStateNarrative(
  * The shared per-language checks (V2/V4/V5/V6/V7/V8/V9)
  * ------------------------------------------------------------------ */
 
+/** The roundings of a number a plain sentence may use (matches allowedNumbersOf's `add`). */
+function valueRoundings(n: number): number[] {
+  const out: number[] = [];
+  for (const v of [n, Math.round(n), Math.round(n * 10) / 10, Math.round(n * 100) / 100]) {
+    out.push(v, -v, Math.abs(v));
+  }
+  return out;
+}
+
 interface LangCheckContext {
   limits: StateNarrativeLimits;
   vocab: NarratorVocabulary;
@@ -407,9 +416,11 @@ interface LangCheckContext {
   stateSerialized: string;
   tone: Tone;
   excludedNonEmpty: boolean;
-  /** V11 — the ids of the unit's alerts (warning readings); the AI must mention enough of them by plainName. */
+  /** V11 — the ids of the unit's alerts (warning readings); the AI must mention enough of them by plainName or value. */
   alertIds: readonly string[];
-  /** V11 — the unit kind ('overall' has a higher coverage threshold + multi-section requirement). */
+  /** V11 — the alerts keyed by id (to look up each alert's value for the value-mention check). */
+  alertsById: ReadonlyMap<string, { value: number | null }>;
+  /** V11 — the unit kind ('overall' has a higher coverage threshold). */
   unitKind: NarratorUnit['kind'];
   /** V11 — when true (the template fallback), skip the coverage check. */
   skipCoverage: boolean;
@@ -469,24 +480,35 @@ function langChecks(text: string, lang: 'en' | 'fa', ctx: LangCheckContext): Nar
   if (exclusion !== null) add('V10', exclusion);
 
   // V11 — coverage: the AI must mention enough of the unit's flagged readings
-  // (the alerts) by their plainName. V7 checks the AI didn't INVENT names;
-  // V11 checks the AI DID name the readings the section actually flags. This
-  // closes the gap the owner identified: the v4 model could pass V1–V11 while
-  // mentioning only 1 reading + "Australia is also Stressed" (no Australian
-  // facts). V11 forces consolidation — mention ≥min(3, alerts.length) of the
-  // alerts (≥5 for the overall), or fail + retry with the missed names listed.
+  // (the alerts) — by EITHER their plainName OR their actual value. V7 checks
+  // the AI didn't INVENT names; V11 checks the AI DID name the readings the
+  // section actually flags. This closes the gap the owner identified: the v4
+  // model could pass V1–V10 while mentioning only 1 reading + "Australia is
+  // also Stressed" (no Australian facts). V11 forces consolidation — mention
+  // ≥min(3, alerts.length) of the alerts (≥5 for the overall), or fail + retry.
+  //
+  // The match is name-OR-value: the model often paraphrases the plainName
+  // (e.g. "US 10-year yield" instead of the exact "US 10-year borrowing cost")
+  // but ALWAYS mentions the reading's value (5.05, 4.34, 6.2). Counting a
+  // mention when EITHER the plainName OR the value appears keeps V11 robust
+  // against paraphrase while still enforcing that the reading's FACT landed.
   // ctx.vocab is already the per-language subset (EN entries for 'en', FA
   // entries for 'fa'), so entry.plainName is the right name to match.
   // The template fallback (skipCoverage=true) is exempt — it names a FIXED
   // set of alerts by design; V11 is the AI-completeness check.
   if (!ctx.skipCoverage && ctx.alertIds.length > 0) {
     const threshold = Math.min(ctx.unitKind === 'overall' ? 5 : 3, ctx.alertIds.length);
+    const tokens = new Set(numberTokensOf(text));
     const mentioned: string[] = [];
     const missed: string[] = [];
     for (const id of ctx.alertIds) {
       const entry = ctx.vocab.entries[id];
       const name = entry?.plainName ?? '';
-      if (name.length >= 2 && nameInText(name, text)) {
+      const alert = ctx.alertsById.get(id);
+      const value = alert?.value ?? null;
+      const nameHit = name.length >= 2 && nameInText(name, text);
+      const valueHit = value !== null && Number.isFinite(value) && valueRoundings(value).some((r) => tokens.has(r));
+      if (nameHit || valueHit) {
         mentioned.push(id);
       } else {
         missed.push(name || id);
@@ -538,6 +560,7 @@ export function validateStateNarrative(input: StateNarrativeInput): NarratorVali
   const stateIds = new Set(vocab.ids);
   const stateSerialized = JSON.stringify(state);
   const alertIds = state.alerts.map((a) => a.id);
+  const alertsById = new Map<string, { value: number | null }>(state.alerts.map((a) => [a.id, { value: a.value }]));
   const ctx: LangCheckContext = {
     limits,
     vocab: vocab.en, // the glossary is language-paired; checked per language below
@@ -546,6 +569,7 @@ export function validateStateNarrative(input: StateNarrativeInput): NarratorVali
     tone: toneOf(state),
     excludedNonEmpty: state.excluded.length > 0,
     alertIds,
+    alertsById,
     unitKind: unit.kind,
     skipCoverage,
   };

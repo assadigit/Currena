@@ -42,7 +42,7 @@ function loadState(scenario: string): { unit: NarratorUnit; state: PromptState }
 
 describe('M2 prompt — the pinned texts', () => {
   it('PROMPT_VERSION is a positive integer (bump on ANY prompt change)', () => {
-    expect(PROMPT_VERSION).toBe(6);
+    expect(PROMPT_VERSION).toBe(7);
   });
 
   it('the base rules carry the spec\u2019s nine hard rules verbatim', () => {

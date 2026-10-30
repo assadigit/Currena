@@ -67,7 +67,7 @@ import type { NarratorUnit } from './validate';
  * the missed names listed. This forces the model to actually consolidate
  * the section's flagged readings instead of picking 1-2 safe ones. Also
  * lowers the model temperature 0.2 → 0.1 for more determinism. */
-export const PROMPT_VERSION = 6;
+export const PROMPT_VERSION = 7;
 
 /* ------------------------------------------------------------------ *
  * §6.1 — the shared base rules (included in A-section and A-overall)
