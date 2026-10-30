@@ -259,22 +259,19 @@ export function useNarrative(enabled = true) {
 }
 
 /**
- * Reads `?narrative=preview` from BOTH `window.location.search` (the
- * canonical URL form `currena.ir/?narrative=preview#/insights`, per D-34)
- * AND the hash-router's query params (the share-link form
- * `currena.ir/#/insights?narrative=preview`). The canonical form lives
- * BEFORE the hash, so the hash router's `routeQuery()` does NOT see it —
- * this hook checks both sources once at mount (the URL marker is a one-shot
- * read; the spec says "read once at app boot, never persisted").
+ * Reads `?narrative=preview` from `window.location.search` (the
+ * canonical URL form `currena.ir/insights?narrative=preview`, per D-34
+ * + the path-router migration). The marker lives on the path URL's
+ * query string, so `routeQuery()` (or `window.location.search` directly)
+ * is the single source — read once at mount (the spec says "read once
+ * at app boot, never persisted").
  *
- * Returns `true` when the preview marker is present in either location.
+ * Returns `true` when the preview marker is present.
  */
 export function useNarrativePreview(): boolean {
   return useMemo(() => {
     try {
-      const fromSearch = new URLSearchParams(window.location.search).get('narrative') === 'preview';
-      const fromHash = new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('narrative') === 'preview';
-      return fromSearch || fromHash;
+      return new URLSearchParams(window.location.search).get('narrative') === 'preview';
     } catch {
       return false;
     }

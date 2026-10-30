@@ -140,7 +140,7 @@ beforeEach(() => {
     },
   );
   window.localStorage.clear();
-  window.location.hash = '';
+  window.history.pushState({}, '', '/');
 });
 
 afterEach(() => {

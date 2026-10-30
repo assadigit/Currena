@@ -1,10 +1,19 @@
 /**
- * Tiny hash router — zero deps, Capacitor/file:// friendly (mission §8).
+ * Tiny PATH router — zero deps, history API.
  *
- * Hash routing keeps the SPA runnable from any origin (Workers static assets,
- * file:// in a WebView, offline precache) with no server rewrites. The SPA
- * fallback in wrangler.jsonc (`single-page-application`) still covers the rare
- * path-navigations, but everything internal stays on `#/`.
+ * Path routing uses `window.location.pathname` directly: the SPA
+ * fallback in wrangler.jsonc (`not_found_handling: single-page-application`)
+ * serves index.html for any non-asset navigation request, so every
+ * internal route is a clean https://currena.ir/insights URL (no `#/`).
+ * `run_worker_first` pins `/api/*`, `/admin/*`, `/internal/*` to the
+ * Worker; every other navigation request resolves to the SPA shell,
+ * which reads its route from `window.location.pathname` on boot. Deep
+ * links (`/insights?card=us10y`, `/?from=EUR&to=GBP&amount=500`) ride
+ * on `window.location.search`.
+ *
+ * `history.pushState` does NOT fire `popstate`, so `navigate()` notifies
+ * subscribers manually after each push; `popstate` (browser Back/Forward)
+ * is also wired so the store re-renders on history navigation.
  *
  * Routes (Phase 5a): converter + live-rates are live; 3–9 are stubs until 5b.
  */
@@ -31,83 +40,85 @@ export function isRoutePath(path: string): path is RoutePath {
   return (ROUTES as readonly string[]).includes(path);
 }
 
-function parseHash(hash: string): RoutePath {
-  // '#/live-rates' → '/live-rates'; '', '#', '#' → '/'
-  return parseRouteAndQuery(hash).path;
-}
-
 /**
- * Pure core of the path-visit canonicalisation (2026-10-13): the hash URL a
- * hash-less visit should adopt. People type and share PATH urls —
- * https://currena.ir/insights, https://currena.ir/insights?card=us10y — and
- * crawlers (firecrawl et al.) request them without ever adding a hash. A
- * known route is adopted verbatim (with its query, so Insights share links
- * and Converter deep links work from the address bar); anything else lands
- * on the converter. Trailing slashes are tolerated ('/insights/' →
- * '/insights').
+ * Parse a pathname (optionally with a `?search`) into its route + query
+ * params. Query-tolerant since the per-indicator share links (spec §10,
+ * I7 #50): `/insights?card=us10y` is the /insights route with
+ * `params.card === 'us10y'`. Trailing slashes tolerated
+ * (`/insights/` → `/insights`); unknown paths normalize to `/`. Pure —
+ * unit-tested without a DOM. A leading `#` (a stray hash from a stale
+ * bookmark) is stripped so `#/insights?card=us10y` parses the same as
+ * `/insights?card=us10y` — the boot guard then replaces the URL with
+ * the canonical path form.
+ *
+ * The FIRST `?` splits the route from the query — a `?` inside a value
+ * stays data (URLSearchParams keeps it verbatim).
  */
-export function canonicalHashFor(pathname: string, search: string): string {
-  const trimmed = pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
-  const route = trimmed !== '/' && isRoutePath(trimmed) ? trimmed : '/';
-  const query = search === '' ? '' : search.startsWith('?') ? search : `?${search}`;
-  return `#${route}${query}`;
-}
-
-/**
- * Boot-time canonicalisation for hash-less PATH visits. The old boot forced
- * navigate('/'): visiting https://currena.ir/insights APPENDED a stray '#/'
- * (URL '/insights#/' rendering the converter — the wrong page under an
- * insights-looking address). Now the visit is rewritten IN PLACE — no reload,
- * no history entry — to the canonical hash url ('/#/insights'), and the
- * router is woken manually (replaceState fires no hashchange). No-ops when a
- * hash is already present (every internal navigation).
- */
-export function canonicalizePathVisit(): void {
-  if (window.location.hash) return;
-  const target = canonicalHashFor(window.location.pathname, window.location.search);
-  history.replaceState(null, '', `/${target}`);
-  window.dispatchEvent(new HashChangeEvent('hashchange'));
-}
-
-/**
- * Parse a hash URL into its route + query params. Query-tolerant since the
- * per-indicator share links (spec §10, I7 #50): '#/insights?card=us10y' is
- * the /insights route with params.card === 'us10y'. Unknown paths still
- * normalize to '/'. Pure — unit-tested without a DOM.
- */
-export function parseRouteAndQuery(hash: string): { path: RoutePath; params: URLSearchParams } {
-  const raw = hash.replace(/^#/, '');
-  const qAt = raw.indexOf('?');
-  const pathPart = qAt === -1 ? raw : raw.slice(0, qAt);
-  const queryPart = qAt === -1 ? '' : raw.slice(qAt + 1);
+export function parseRouteAndQuery(url: string): { path: RoutePath; params: URLSearchParams } {
+  const stripped = url.replace(/^#/, '');
+  const qAt = stripped.indexOf('?');
+  const pathPart = qAt === -1 ? stripped : stripped.slice(0, qAt);
+  const queryPart = qAt === -1 ? '' : stripped.slice(qAt + 1);
+  const trimmed = pathPart.length > 1 && pathPart.endsWith('/') ? pathPart.slice(0, -1) : pathPart;
   const path: RoutePath =
-    pathPart === '' || pathPart === '/' ? '/' : isRoutePath(pathPart) ? pathPart : '/';
+    trimmed === '' || trimmed === '/' ? '/' : isRoutePath(trimmed) ? trimmed : '/';
   return { path, params: new URLSearchParams(queryPart) };
 }
 
 function currentRoute(): RoutePath {
-  return parseHash(window.location.hash);
+  return parseRouteAndQuery(window.location.pathname + window.location.search).path;
 }
 
-/** Query params of the current hash URL (I7 #50 share links read `card`). */
+/** Query params of the current URL (Insights share links read `card`). */
 export function routeQuery(): URLSearchParams {
-  return parseRouteAndQuery(window.location.hash).params;
+  return parseRouteAndQuery(window.location.pathname + window.location.search).params;
 }
 
-/** Programmatic navigation. Same-path navigation is a no-op. */
-export function navigate(path: string): void {
-  const next = `#${path.startsWith('/') ? path : `/${path}`}`;
-  if (window.location.hash !== next) {
-    window.location.hash = next;
+/**
+ * Boot-time guard: if the user lands on an unknown path (a stale
+ * bookmark to a removed page, or a typo), silently rewrite the URL to
+ * `/` via `history.replaceState` — no reload, no history entry, the
+ * Converter renders under a clean address. Known routes pass through
+ * untouched. Runs once on the first `useRoute` subscribe.
+ */
+let booted = false;
+function ensureBooted(): void {
+  if (booted) return;
+  booted = true;
+  const { path } = parseRouteAndQuery(window.location.pathname);
+  if (path === '/' && window.location.pathname !== '/') {
+    history.replaceState(null, '', '/');
   }
 }
 
-function subscribe(onChange: () => void): () => void {
-  window.addEventListener('hashchange', onChange);
-  return () => window.removeEventListener('hashchange', onChange);
+/** Programmatic navigation. Same-path navigation is a no-op.
+ *  `pushState` does NOT fire `popstate`, so subscribers are notified
+ *  directly after each push. */
+export function navigate(path: string): void {
+  const next = path.startsWith('/') ? path : `/${path}`;
+  if (window.location.pathname + window.location.search !== next) {
+    history.pushState(null, '', next);
+    notify();
+  }
 }
 
-/** React hook: the active route, re-rendered on hashchange. */
+const listeners = new Set<() => void>();
+
+function notify(): void {
+  for (const l of listeners) l();
+}
+
+function subscribe(onChange: () => void): () => void {
+  ensureBooted();
+  listeners.add(onChange);
+  window.addEventListener('popstate', onChange);
+  return () => {
+    listeners.delete(onChange);
+    window.removeEventListener('popstate', onChange);
+  };
+}
+
+/** React hook: the active route, re-rendered on popstate + navigate. */
 export function useRoute(): RoutePath {
   return useSyncExternalStore(subscribe, currentRoute);
 }

@@ -11,7 +11,7 @@
  *     selects, swap, CTA, quick amounts);
  *   - recent-pairs hydration from localStorage (the set-state-in-effect
  *     pattern WS-5 will restructure — visible behavior must not move);
- *   - deep-link prefill `#/?from=EUR&to=GBP&amount=500` + the
+ *   - deep-link prefill `/?from=EUR&to=GBP&amount=500` + the
  *     drop-unknown-values rule + URL cleanup;
  *   - the stale banner's presence/absence per snapshot-store state
  *     (fresh live data → no banner; degraded last-good → banner);
@@ -147,7 +147,7 @@ beforeEach(() => {
     },
   );
   window.localStorage.clear();
-  window.location.hash = '';
+  window.history.pushState({}, '', '/');
 });
 
 afterEach(() => {
@@ -219,7 +219,7 @@ describe('Converter — the money page form (characterization for WS-5)', () => 
 
   it('deep-link prefill applies known from/to/amount and cleans the URL', async () => {
     stubApi();
-    window.location.hash = '/?from=EUR&to=GBP&amount=500';
+    window.history.pushState({}, '', '/?from=EUR&to=GBP&amount=500');
     const { Converter, snapshotStore } = await loadConverter();
     await act(async () => {
       snapshotStore.boot();
@@ -229,12 +229,12 @@ describe('Converter — the money page form (characterization for WS-5)', () => 
     expect((screen.getByLabelText('To') as HTMLSelectElement).value).toBe('GBP');
     expect((document.getElementById('amount') as HTMLInputElement).value).toBe('500');
     // The URL is cleaned so a remount never re-applies the prefill.
-    expect(window.location.hash).toBe('#/');
+    expect(window.location.pathname + window.location.search).toBe('/');
   });
 
   it('deep-link garbage is dropped silently (unknown codes, non-positive amounts)', async () => {
     stubApi();
-    window.location.hash = '/?from=XXX&to=GBP&amount=-5';
+    window.history.pushState({}, '', '/?from=XXX&to=GBP&amount=-5');
     const { Converter, snapshotStore } = await loadConverter();
     await act(async () => {
       snapshotStore.boot();

@@ -1,5 +1,5 @@
 /**
- * App shell — providers, hash router, per-route titles.
+ * App shell — providers, path router, per-route titles.
  * Sticky-footer layout: min-h-screen flex column with the footer pushed to
  * the bottom on short pages (converter) and below long content otherwise.
  *
@@ -17,7 +17,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { Toast } from './components/ui';
 import { Converter } from './routes/Converter';
 import { LiveRates } from './routes/LiveRates';
-import { useRoute, canonicalizePathVisit } from './router';
+import { useRoute } from './router';
 import { useI18n } from './lib/locale';
 import { snapshotStore } from './lib/snapshot-store';
 import { hydrateServerHistory } from './lib/rate-history';
@@ -143,22 +143,12 @@ export function App() {
     document.title = key === 'converter.title' || key === 'app.name' ? base : `${base} - Currena`;
   }, [route, t, locale]);
 
-  // Path visits (owner report 2026-10-13: "why does /insights#/ happen?"):
-  // a hash-less visit to a PATH url — /insights, /insights?card=us10y,
-  // /live-rates — adopts that route in place (URL becomes /#/insights, the
-  // Insights page renders, no reload, no history entry, no stray '#/'
-  // appended). Unknown paths still land on the converter. No-op once a
-  // hash exists (every internal navigation).
-  useEffect(() => {
-    canonicalizePathVisit();
-  }, []);
-
   return (
     <div className="flex min-h-screen flex-col bg-currena-bg-light text-currena-dark transition-colors duration-300">
       {/* Skip-to-content link (QA audit D-1): keyboard users otherwise tab
           through the brand + 10 nav pills + 4 utility buttons on every
-          route. Rendered as a button, not <a href="#…"> — this is a
-          hash-router SPA and a hash link would navigate away. */}
+          route. Rendered as a button, not <a href="#…"> — a hash anchor
+          would muddle the path-router's clean URL. */}
       <button
         type="button"
         onClick={() => {

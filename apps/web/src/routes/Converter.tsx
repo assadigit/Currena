@@ -1,5 +1,5 @@
 /**
- * Converter route (`#/`) — THE flagship (mission §8 state machine).
+ * Converter route (`/`) — THE flagship (mission §8 state machine).
  *
  *   idle → fetching (loader ≥700ms, even on an instant cache hit)
  *        → result (popup + ~800ms odometer)
@@ -63,6 +63,7 @@ import { saveHistoryEntry } from '../lib/history';
 import { useI18n } from '../lib/locale';
 import { addRecentPair, readRecentPairs } from '../lib/recent-pairs';
 import type { RecentPair } from '../lib/recent-pairs';
+import { routeQuery } from '../router';
 import { isConfirmedStale, snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
 import { AlertsSectionRow } from './converter/AlertsSectionRow';
 import { ConvertForm } from './converter/ConvertForm';
@@ -178,29 +179,27 @@ export function Converter() {
   const waitingCount = alerts.filter((a) => a.triggeredAt === undefined).length;
   const triggeredCount = alerts.length - waitingCount;
 
-  // Deep-link prefill: #/?from=EUR&to=IRR&amount=500 — powers History's
+  // Deep-link prefill: /?from=EUR&to=IRR&amount=500 — powers History's
   // "Repeat" action AND shareable conversion links. Unknown values are
   // dropped silently; the URL is cleaned so a later remount never re-applies.
   useEffect(() => {
-    const hash = window.location.hash.replace(/^#/, '');
-    const queryStart = hash.indexOf('?');
-    if (queryStart === -1) return;
-    const params = new URLSearchParams(hash.slice(queryStart + 1));
+    const params = routeQuery();
+    if ([...params.keys()].length === 0) return;
     const known = new Set<string>(CURRENCIES.map((c) => c.code));
     const from = params.get('from')?.trim().toUpperCase();
     const to = params.get('to')?.trim().toUpperCase();
     const amount = params.get('amount') ?? '';
-    // R10-5: one-time URL-hash prefill on mount. The setState calls
-    // hydrate the component from the URL — the documented "initialize
-    // state from an external source" pattern (the empty dep array is
-    // intentional: this runs once). A lazy useState initializer cannot
-    // reach window.location.hash at module-eval time (SSR safety).
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time URL-hash prefill on mount (external source → local state)
+    // R10-5: one-time URL prefill on mount. The setState calls hydrate
+    // the component from the URL — the documented "initialize state from
+    // an external source" pattern (the empty dep array is intentional:
+    // this runs once). A lazy useState initializer cannot reach
+    // window.location.search at module-eval time (SSR safety).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time URL prefill on mount (external source → local state)
     if (from && known.has(from)) setFrom(from as CurrencyCode);
     if (to && known.has(to)) setTo(to as CurrencyCode);
     const parsed = parseInputAmount(amount);
     if (parsed !== null && parsed > 0) setAmount(thousandSeparateInput(amount));
-    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#/`);
+    window.history.replaceState(null, '', '/');
   }, []);
 
   const parsedAmount = parseInputAmount(amount);

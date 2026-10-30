@@ -16,7 +16,7 @@
  */
 
 import { useRef, useState } from 'react';
-import { useRoute } from '../router';
+import { navigate, useRoute } from '../router';
 import { useTheme } from '../lib/theme';
 import { useI18n } from '../lib/locale';
 import { InstallButton } from './InstallButton';
@@ -69,10 +69,15 @@ export function Header() {
       <header className="fixed inset-x-0 top-0 z-[1000] flex h-16 items-center justify-between gap-2 px-5 shadow-[0_2px_15px_rgba(0,0,0,0.05)] backdrop-blur-[20px] lg:h-20 lg:px-6 xl:px-10 bg-white/95 dark:bg-[#161D28]/95">
         {/* Brand (legacy: logo image, 50px mobile; slimmer on desktop so the
             inline nav fits at exactly lg=1024 without wrapping). A REAL
-            anchor (audit WS-3 #6): hash navigation is the browser's own —
-            the router already listens to hashchange, no double-navigation. */}
+            anchor (audit WS-3 #6): href semantics for AT + the browser's
+            own Enter/Space activation; onClick preventDefault routes
+            through the path router's navigate() (no full reload). */}
         <a
-          href="#/"
+          href="/"
+          onClick={(e) => {
+            e.preventDefault();
+            navigate('/');
+          }}
           aria-label={t('nav.home')}
           className="shrink-0"
         >
@@ -90,10 +95,15 @@ export function Header() {
                 <li key={path}>
                   {/* REAL links (audit WS-3 #6): AT users get href semantics
                       (open-in-new-tab, link lists, status bar) and the
-                      browser's own Enter/Space activation; the hash router
-                      picks the change up natively. */}
+                      browser's own Enter/Space activation; onClick
+                      preventDefault routes through the path router's
+                      navigate() so the SPA doesn't reload. */}
                   <a
-                    href={`#${path}`}
+                    href={path}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate(path);
+                    }}
                     aria-current={active ? 'page' : undefined}
                     className={`whitespace-nowrap rounded-[10px] px-2.5 py-2 text-[0.8rem] font-semibold no-underline transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue xl:px-3 xl:text-[0.85rem] ${
                       active
@@ -183,11 +193,15 @@ export function Header() {
           {MENU_ITEMS.map(({ path, emoji, labelKey }) => (
             <li key={path}>
               {/* REAL links (audit WS-3 #6): href semantics + native
-                  activation; the click just closes the drawer — the hash
-                  change IS the navigation, exactly once. */}
+                  activation; the click closes the drawer and routes the
+                  path router's navigate() — exactly once, no reload. */}
               <a
-                href={`#${path}`}
-                onClick={() => setMenuOpen(false)}
+                href={path}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setMenuOpen(false);
+                  navigate(path);
+                }}
                 aria-current={route === path ? 'page' : undefined}
                 className={`mb-2 flex w-full items-center gap-3 rounded-xl px-3.5 py-3.5 text-[0.95rem] font-medium no-underline transition-all duration-300 ${
                   route === path

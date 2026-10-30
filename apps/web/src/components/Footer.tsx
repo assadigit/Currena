@@ -3,14 +3,15 @@
  * (owner request 2026-09-20): Privacy Policy · Terms of Service · Contact
  * alongside the credit line — baseline trust signals for a financial
  * utility. Privacy/Terms deep-link to their sections on the About route
- * (the hash router can't carry #anchors, so the target section is staged
- * in sessionStorage and About scrolls to it after mount); Contact opens
- * the developer's GitHub profile (the owner's public contact channel).
- * Sticky to the viewport bottom on short pages via the app's min-h-screen
- * flex column layout.
+ * (the path router serves one route per pathname; the target section is
+ * staged in sessionStorage and About scrolls to it after mount); Contact
+ * opens the developer's GitHub profile (the owner's public contact
+ * channel). Sticky to the viewport bottom on short pages via the app's
+ * min-h-screen flex column layout.
  */
 
 import { useI18n } from '../lib/locale';
+import { navigate } from '../router';
 
 /** SessionStorage key staging the About section to scroll to. */
 export const ABOUT_SCROLL_TARGET = 'currena:about-scroll';
@@ -41,13 +42,29 @@ export function Footer() {
           credibility; owner request 2026-09-20). */}
       <nav aria-label={t('nav.about')} className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1">
         {/* REAL links (audit WS-3 #6): href semantics for AT; the click
-            stages About's scroll target and the hash change IS the
-            navigation (the router listens to hashchange — exactly once). */}
-        <a href="#/about" onClick={() => stageAboutSection('privacy')} className={linkClass}>
+            stages About's scroll target and routes the path router's
+            navigate() — exactly once, no reload. */}
+        <a
+          href="/about"
+          onClick={(e) => {
+            e.preventDefault();
+            stageAboutSection('privacy');
+            navigate('/about');
+          }}
+          className={linkClass}
+        >
           {t('footer.privacy')}
         </a>
         <span aria-hidden="true">·</span>
-        <a href="#/about" onClick={() => stageAboutSection('terms')} className={linkClass}>
+        <a
+          href="/about"
+          onClick={(e) => {
+            e.preventDefault();
+            stageAboutSection('terms');
+            navigate('/about');
+          }}
+          className={linkClass}
+        >
           {t('footer.terms')}
         </a>
         <span aria-hidden="true">·</span>
@@ -60,7 +77,14 @@ export function Footer() {
           {t('footer.contact')}
         </a>
         <span aria-hidden="true">·</span>
-        <a href="#/about" className={linkClass}>
+        <a
+          href="/about"
+          onClick={(e) => {
+            e.preventDefault();
+            navigate('/about');
+          }}
+          className={linkClass}
+        >
           {t('nav.about')}
         </a>
       </nav>
