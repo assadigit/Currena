@@ -496,9 +496,13 @@ export function Insights() {
             />
           </JumpNav>
 
-          {/* R10: the prices strip — four identical tiles. */}
+          {/* R10: the prices strip — four identical tiles. Gold Program S2:
+           * the snapshot's compact goldSummary rides down to the board so
+           * the two gold panels beside the gold-usd tile render the
+           * ingest's stamp (they derive it client-side when absent). */}
           <PricesBoard
             readings={state.snapshot.readings}
+            goldSummary={state.snapshot.goldSummary}
             copy={copy}
             locale={locale}
             numberLocale={numberLocale}

@@ -320,6 +320,7 @@ import {
   InsightsSnapshotSchema,
   InsightsSourceReportSchema,
   InsightsStatusSchema,
+  GoldSummarySchema,
   SummaryLineSchema,
   WarningRuleSchema,
 } from './schemas';
@@ -536,6 +537,93 @@ describe('Insights: InsightsSnapshotSchema', () => {
   it('strips unknown keys (same pollution defence as the other envelopes)', () => {
     const parsed = InsightsSnapshotSchema.parse({ ...snap, injected: 'pollutant' });
     expect(parsed).not.toHaveProperty('injected');
+  });
+
+  it('Gold Program S2: goldSummary is OPTIONAL — a snapshot without it stays valid', () => {
+    expect(InsightsSnapshotSchema.safeParse(snap).success).toBe(true);
+    expect(InsightsSnapshotSchema.parse(snap).goldSummary).toBeUndefined();
+  });
+});
+
+describe('Insights: GoldSummarySchema (the Gold Program wire shape)', () => {
+  const reading = (id: string) => ({
+    id,
+    value: 1,
+    asOf: '2026-10-05',
+    status: 'normal',
+    sourceName: 'Test source',
+    updatedAt: '2026-10-06T02:00:00.000Z',
+  });
+  const snap = {
+    generatedAt: '2026-10-06T02:00:00.000Z',
+    summary: {
+      global: { section: 'global', label: 'relaxed', warningCount: 0, votingCount: 2, excludedCount: 0 },
+      australia: { section: 'australia', label: null, warningCount: 0, votingCount: 0, excludedCount: 0 },
+    },
+    readings: [reading('usdjpy'), reading('us10y')],
+    changedThisWeek: [],
+    calendar: [],
+  };
+
+  const sub = (lane: 'borrowing-costs' | 'dollar' | 'stress' | 'inflation', reading: string) => ({
+    lane,
+    reading,
+    tailwindVoters: 1,
+    headwindVoters: 0,
+  });
+
+  const gold = {
+    netScore: 1,
+    label: 'tailwind' as const,
+    firingVoters: 3,
+    tailwindVoters: 2,
+    headwindVoters: 1,
+    laneCounts: { tailwind: 1, headwind: 1, mixed: 1 },
+    subGauges: [
+      sub('borrowing-costs', 'relief'),
+      sub('dollar', 'strong'),
+      sub('stress', 'mixed'),
+      sub('inflation', 'unreadable'),
+    ],
+    modelVsReality: {
+      chip: 'diverging-down' as const,
+      modelDirection: 'tailwind' as const,
+      realityDirection: 'falling' as const,
+      realityBasis: 'change30d' as const,
+      realityValue: -4.2,
+    },
+  };
+
+  it('accepts a coherent summary and stamps onto the snapshot beside the section summaries', () => {
+    expect(GoldSummarySchema.safeParse(gold).success).toBe(true);
+    const withGold = InsightsSnapshotSchema.safeParse({ ...snap, goldSummary: gold });
+    expect(withGold.success).toBe(true);
+    if (withGold.success) expect(withGold.data.goldSummary?.label).toBe('tailwind');
+  });
+
+  it('rejects a three-lane subGauge set, an unknown lane word and a fractional net score', () => {
+    expect(GoldSummarySchema.safeParse({ ...gold, subGauges: gold.subGauges.slice(0, 3) }).success).toBe(false);
+    expect(
+      GoldSummarySchema.safeParse({ ...gold, subGauges: [...gold.subGauges.slice(0, 3), sub('inflation', 'windy')] })
+        .success,
+    ).toBe(false);
+    expect(GoldSummarySchema.safeParse({ ...gold, netScore: 1.5 }).success).toBe(false);
+    expect(GoldSummarySchema.safeParse({ ...gold, label: 'gale-force' }).success).toBe(false);
+    expect(GoldSummarySchema.safeParse({ ...gold, modelVsReality: { ...gold.modelVsReality, chip: 'aligned-sideways' } }).success).toBe(false);
+  });
+
+  it('the null labels are legal (cannot-read is a state, never an error)', () => {
+    expect(
+      GoldSummarySchema.safeParse({
+        ...gold,
+        netScore: 0,
+        label: null,
+        firingVoters: 0,
+        tailwindVoters: 0,
+        headwindVoters: 0,
+        modelVsReality: { chip: 'no-read', modelDirection: null, realityDirection: null, realityBasis: null, realityValue: null },
+      }).success,
+    ).toBe(true);
   });
 });
 

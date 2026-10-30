@@ -954,6 +954,99 @@ export const CalendarEventSchema = z.object({
 });
 export type CalendarEvent = z.infer<typeof CalendarEventSchema>;
 
+/* ------------------------------------------------------------------ *
+ * The gold directional summary (Gold Program, S1 engine + S2 wiring —
+ * docs/insights/GOLD_SCORE_SPEC.md §4.1). ADDITIVE and OPTIONAL on the
+ * snapshot: stored snapshots without it and old readers are unaffected;
+ * the SPA re-derives the full reading (voters included) client-side, so
+ * only the COMPACT numbers ride the KV write (~0.5 KB).
+ * ------------------------------------------------------------------ */
+
+/** The four driver lanes the gold score re-cuts the gauge voters into. */
+export const GoldLaneSchema = z.enum(['borrowing-costs', 'dollar', 'stress', 'inflation']);
+export type GoldLane = z.infer<typeof GoldLaneSchema>;
+
+/**
+ * A lane's word. The four directional pairs are lane-specific
+ * (borrowing-costs tight/relief, dollar strong/stress, market-stress
+ * elevated/calm, inflation hot/cool); 'mixed' = the lane's firing
+ * voters disagree; 'unreadable' = nothing in the lane could fire.
+ */
+export const GoldSubGaugeWordSchema = z.enum([
+  'tight',
+  'relief',
+  'strong',
+  'stress',
+  'elevated',
+  'calm',
+  'hot',
+  'cool',
+  'mixed',
+  'unreadable',
+]);
+export type GoldSubGaugeWord = z.infer<typeof GoldSubGaugeWordSchema>;
+
+/** One lane's compact reading (the lane's own firing counts). */
+export const GoldSubGaugeSummarySchema = z.object({
+  lane: GoldLaneSchema,
+  reading: GoldSubGaugeWordSchema,
+  tailwindVoters: z.number().int().nonnegative(),
+  headwindVoters: z.number().int().nonnegative(),
+});
+export type GoldSubGaugeSummary = z.infer<typeof GoldSubGaugeSummarySchema>;
+
+/** The 5-step directional label (null when no voter could fire). */
+export const GoldTailwindLabelSchema = z.enum([
+  'strong-tailwind',
+  'tailwind',
+  'balanced',
+  'headwind',
+  'strong-headwind',
+]);
+export type GoldTailwindLabel = z.infer<typeof GoldTailwindLabelSchema>;
+
+/** The model-vs-reality comparison chip. */
+export const ModelVsRealityChipSchema = z.enum([
+  'aligned-tailwind',
+  'aligned-headwind',
+  'diverging-up',
+  'diverging-down',
+  'neutral',
+  'no-read',
+]);
+export type ModelVsRealityChip = z.infer<typeof ModelVsRealityChipSchema>;
+
+/**
+ * The compact gold summary stamped by the ingest (goldSummaryOf in
+ * @currena/insights) — the numbers only; the firing voter LIST never
+ * rides the snapshot (the SPA re-derives it through the same pure
+ * engine, the gauges.ts contract).
+ */
+export const GoldSummarySchema = z.object({
+  /** tailwind voters − headwind voters (signed). */
+  netScore: z.number().int(),
+  label: GoldTailwindLabelSchema.nullable(),
+  firingVoters: z.number().int().nonnegative(),
+  tailwindVoters: z.number().int().nonnegative(),
+  headwindVoters: z.number().int().nonnegative(),
+  /** How many of the four LANES read tailwind / headwind / mixed. */
+  laneCounts: z.object({
+    tailwind: z.number().int().nonnegative(),
+    headwind: z.number().int().nonnegative(),
+    mixed: z.number().int().nonnegative(),
+  }),
+  /** The four lane readings, in lane order — exactly four. */
+  subGauges: z.array(GoldSubGaugeSummarySchema).length(4),
+  modelVsReality: z.object({
+    chip: ModelVsRealityChipSchema,
+    modelDirection: z.enum(['tailwind', 'headwind', 'neutral']).nullable(),
+    realityDirection: z.enum(['rising', 'falling', 'flat']).nullable(),
+    realityBasis: z.enum(['change30d', 'ma200GapPct']).nullable(),
+    realityValue: z.number().nullable(),
+  }),
+});
+export type GoldSummary = z.infer<typeof GoldSummarySchema>;
+
 /** The precomputed snapshot the runner writes and `GET /api/insights` serves. */
 export const InsightsSnapshotSchema = z
   .object({
@@ -985,6 +1078,16 @@ export const InsightsSnapshotSchema = z
      * are unaffected.
      */
     displayMode: z.literal('public').optional(),
+    /**
+     * Gold Program S2 (docs/insights/GOLD_SCORE_SPEC.md §4.1): the
+     * compact gold directional summary (tailwind score + model-vs-
+     * reality), stamped by the ingest beside the section summaries and
+     * recomputed by the public projection over its surviving readings.
+     * OPTIONAL → zero breaking change: snapshots written before the
+     * field (and every stored archive) stay valid, and the SPA derives
+     * the reading client-side when it is absent.
+     */
+    goldSummary: GoldSummarySchema.optional(),
   })
   .refine(
     (snap) => new Set(snap.readings.map((r) => r.id)).size === snap.readings.length,

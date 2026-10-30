@@ -707,7 +707,18 @@ const BUDGETS = [
   // value-token check in langChecks. ~0.5 kB raw / 1 kB gz; the entry
   // chunk is untouched. Justified by the owner's "make sure AI didn't
   // miss anything" fix landing in the validator.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1120_000, gz: 262_000, label: 'Insights lazy chunk' },
+  //
+  // 2026-10-31 Gold Program S1+S2 bump (measured 1123.69/264.30 → budget
+  // 1126/266): the two prices-board panels (GoldTailwindPanel +
+  // ModelVsRealityPanel) and the gold-engine/copy imports they pull from
+  // @currena/insights (the pure engine + the EN copy blocks + the schema
+  // types — the voter table and both copy dictionaries are the bulk).
+  // +3.69 kB raw / +2.30 kB gz; the entry chunk is untouched at
+  // 294.45/88.48. The owner-facing gold score on the prices strip is the
+  // Gold Program's whole point (GOLD_SCORE_SPEC.md §4.4); the panel code
+  // is irreducible without dropping the firing-driver list. Justified in
+  // CHANGELOG §2026-10-31. Same D-16 path.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1126_000, gz: 266_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

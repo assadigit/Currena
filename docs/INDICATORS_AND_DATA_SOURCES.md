@@ -276,6 +276,29 @@ Insights page's serve path performs **exactly ONE KV read per request**
     "global":     { "section": "global",     "label": "stressed", "warningCount": 9, "votingCount": 32, "excludedCount": 0 },
     "australia":  { "section": "australia",  "label": "stressed", "warningCount": 7, "votingCount": 16, "excludedCount": 0 }
   },
+  // Gold Program (optional field — absent on snapshots written before it):
+  // the gold-directional re-cut of the same voters (GOLD_SCORE_SPEC.md).
+  // Compact numbers only; the SPA re-derives the firing-driver list
+  // client-side through the same pure engine.
+  "goldSummary": {
+    "netScore": -1,                        // tailwind voters − headwind voters
+    "label": "headwind",                   // strong-tailwind | tailwind | balanced | headwind | strong-headwind | null
+    "firingVoters": 3, "tailwindVoters": 1, "headwindVoters": 2,
+    "laneCounts": { "tailwind": 1, "headwind": 2, "mixed": 0 },   // of the four lanes
+    "subGauges": [                         // exactly four, in lane order
+      { "lane": "borrowing-costs", "reading": "tight", "tailwindVoters": 0, "headwindVoters": 2 },
+      { "lane": "dollar",          "reading": "strong", "tailwindVoters": 0, "headwindVoters": 0 },
+      { "lane": "stress",          "reading": "mixed",  "tailwindVoters": 1, "headwindVoters": 0 },
+      { "lane": "inflation",       "reading": "hot",    "tailwindVoters": 0, "headwindVoters": 0 }
+    ],
+    "modelVsReality": {                    // the score vs gold's actual 30-day move
+      "chip": "diverging-up",              // aligned-tailwind | aligned-headwind | diverging-up | diverging-down | neutral | no-read
+      "modelDirection": "headwind",
+      "realityDirection": "rising",
+      "realityBasis": "change30d",         // or ma200GapPct (the fallback) / null
+      "realityValue": 5.2                  // the signed percent the reality read
+    }
+  },
   "readings": [
     {
       "id": "yield-curve-10y3m",

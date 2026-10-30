@@ -37,6 +37,11 @@ import type { CalendarEvent, IndicatorHistory, IndicatorId, InsightsSnapshot, In
 import { InsightsSnapshotSchema, IndicatorHistorySchema, InsightsStatusSchema } from '@currena/core';
 import { changedSince, computeReading, PERCENTILE_WINDOW_DAYS, type AuxSeries, type ReadingSource } from '../scoring';
 import { summarizeByGauges } from '../gauges';
+// Gold Program S2 (docs/insights/GOLD_SCORE_SPEC.md §4.2): the compact gold
+// directional summary, written beside the section summaries at every
+// snapshot build/patch/projection — the same pure engine the SPA re-derives
+// from, zero new fetches, ~0.5 KB on the KV write.
+import { goldSummaryOf } from '../gold-score';
 import { DEFINITIONS } from '../definitions';
 import { RULE_VERSION } from '../ruleVersion';
 import type { SafetyFlag } from '../validation';
@@ -624,6 +629,9 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
   return InsightsSnapshotSchema.parse({
     generatedAt: inputs.now,
     summary,
+    // Gold Program S2: the tailwind score + model-vs-reality over the SAME
+    // readings the summaries above counted (one pure call, no new fetches).
+    goldSummary: goldSummaryOf(readings),
     readings,
     changedThisWeek,
     // Defect E-09 (2026-10-16): released events (their date has passed) are
@@ -685,6 +693,9 @@ export function patchInsightsSnapshot(
   return InsightsSnapshotSchema.parse({
     generatedAt: now,
     summary: summarizeByGauges(readings),
+    // Gold Program S2: re-derived with the patch — the gold summary must
+    // describe the readings it ships with, never the pre-patch set.
+    goldSummary: goldSummaryOf(readings),
     readings,
     changedThisWeek,
     // The stored calendar rides untouched (the hand-maintained file's copy).
@@ -717,6 +728,10 @@ export function projectSnapshotToPublic(
     generatedAt: snapshot.generatedAt,
     displayMode: 'public',
     summary: summarizeByGauges(readings),
+    // Gold Program S2: RECOMPUTED over the surviving readings — a public
+    // gold summary can never contradict its own readings (the R2
+    // invariant the section summaries above already follow).
+    goldSummary: goldSummaryOf(readings),
     readings,
     changedThisWeek: snapshot.changedThisWeek.filter((e) => !hiddenIds.has(e.id)),
     calendar: snapshot.calendar,
