@@ -29,13 +29,15 @@
  * construction.
  */
 
-import type { IndicatorId, IndicatorReading } from '@currena/core';
+import type { GoldSummary, IndicatorId, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import type { SignalConditionReading, SignalReading } from '@currena/insights';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { formatChange, formatIndicatorValue, mergeSignals } from '../config';
 import { BalanceScale, driverStateOf, type BalanceDriver } from './BalanceScale';
+import { GoldTailwindPanel } from './GoldTailwindPanel';
+import { ModelVsRealityPanel } from './ModelVsRealityPanel';
 import { ConditionIcon, LeanIcon, stateToneClass } from './icons';
 import { MetalIcon, VerdictStrip } from './verdict';
 
@@ -43,12 +45,17 @@ export function MergedSignalsCard({
   gold,
   silver,
   readings,
+  goldSummary,
   copy,
   numberLocale,
 }: {
   gold: SignalReading;
   silver: SignalReading;
   readings: readonly IndicatorReading[];
+  /** Gold Program S2.1: the served snapshot's compact gold summary
+   * (absent on pre-S2 snapshots — the panels then derive it client-side
+   * through the same pure engine). */
+  goldSummary?: GoldSummary | undefined;
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
 }) {
@@ -252,6 +259,28 @@ export function MergedSignalsCard({
        * here (the owner: "I dont need balance scale of Silver, remove that
        * section entirely"). Silver keeps its analysis card (VerdictStrip,
        * above) and its footing row (below); only gold carries a balance. */}
+
+      {/* Gold Program S2.1 (owner round 2026-10-31 — "it's placed on the
+       * wrong section … it must place here"): the two gold panels mount
+       * DIRECTLY UNDER the balance visual («برآیند عوامل مؤثر بر قیمت
+       * طلا»), inside this card — the 20-voter tailwind score + the
+       * model-vs-reality comparison, the finer cut of the same question
+       * the balance answers with its four broad conditions. Two columns
+       * beside the balance's max-width column, stacked on mobile. */}
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2" data-gold-panels>
+        <GoldTailwindPanel
+          goldSummary={goldSummary}
+          readings={readings}
+          copy={copy}
+          numberLocale={numberLocale}
+        />
+        <ModelVsRealityPanel
+          goldSummary={goldSummary}
+          readings={readings}
+          copy={copy}
+          numberLocale={numberLocale}
+        />
+      </div>
 
       {/* Price footing strip (owner spec §9): the SAME content that used
        * to sit beside the driver groups, now below the trays, separated

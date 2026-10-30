@@ -23,16 +23,13 @@ import { GoldSummarySchema, type IndicatorId, type IndicatorReading } from '@cur
 import {
   GOLD_LANE_VOTERS,
   GOLD_LANES,
-  GOLD_PANEL_COPY_EN,
   GOLD_STRONG_MIN_FIRING,
   GOLD_STRONG_SHARE,
   GOLD_REALITY_SPEED_PCT,
-  MODEL_VS_REALITY_COPY_EN,
   goldSummaryOf,
   goldTailwindScore,
   modelVsReality,
   modelVsRealityExplainerKey,
-  type GoldSubGaugeWord,
 } from './gold-score';
 
 const NOW = '2026-10-30T04:20:00.000Z';
@@ -354,45 +351,12 @@ describe('the compact wire shape + the EN copy blocks', () => {
   });
 
   it('the label copy covers all five steps, non-empty', () => {
-    const labels = GOLD_PANEL_COPY_EN.labels;
-    for (const label of ['strong-tailwind', 'tailwind', 'balanced', 'headwind', 'strong-headwind'] as const) {
-      expect(labels[label], label).toBeTruthy();
-    }
-    expect(GOLD_PANEL_COPY_EN.noReadWord).toBeTruthy();
-  });
-
-  it('the voter-name copy covers EXACTLY the voter table, all non-empty', () => {
-    const names = GOLD_PANEL_COPY_EN.voterNames;
-    const tableIds = GOLD_LANE_VOTERS.map((v) => v.id as string);
-    expect(Object.keys(names).sort()).toEqual([...new Set(tableIds)].sort());
-    for (const id of tableIds) expect(names[id as keyof typeof names], id).toBeTruthy();
-  });
-
-  it('the lane/word/evidence/impact copy is complete', () => {
-    for (const lane of GOLD_LANES) expect(GOLD_PANEL_COPY_EN.laneNames[lane], lane).toBeTruthy();
-    const words: GoldSubGaugeWord[] = [
-      'tight', 'relief', 'strong', 'stress', 'elevated', 'calm', 'hot', 'cool', 'mixed', 'unreadable',
-    ];
-    for (const w of words) expect(GOLD_PANEL_COPY_EN.subGaugeWords[w], w).toBeTruthy();
-    for (const e of ['rising', 'falling', 'high', 'low'] as const) {
-      expect(GOLD_PANEL_COPY_EN.evidenceWords[e], e).toBeTruthy();
-    }
-    expect(GOLD_PANEL_COPY_EN.impactWords.tailwind).toBeTruthy();
-    expect(GOLD_PANEL_COPY_EN.impactWords.headwind).toBeTruthy();
-  });
-
-  it('the chip + explainer copy covers all six chips and all seven explainer keys', () => {
-    const chips = [
-      'aligned-tailwind', 'aligned-headwind', 'diverging-up', 'diverging-down', 'neutral', 'no-read',
-    ] as const;
-    for (const c of chips) expect(MODEL_VS_REALITY_COPY_EN.chips[c], c).toBeTruthy();
-    for (const k of [
-      'aligned-tailwind', 'aligned-headwind', 'diverging-up', 'diverging-down', 'model-neutral', 'reality-flat', 'no-read',
-    ] as const) {
-      expect(MODEL_VS_REALITY_COPY_EN.explainers[k], k).toBeTruthy();
-    }
-    expect(MODEL_VS_REALITY_COPY_EN.basisPhrases.change30d).toBeTruthy();
-    expect(MODEL_VS_REALITY_COPY_EN.basisPhrases.ma200GapPct).toBeTruthy();
+    // S2.1: the copy moved to the web dictionaries — its coverage is
+    // asserted there (gold-panels.test.tsx). This package keeps only the
+    // pure engine, so the remaining assertions here are the compact
+    // writer's shape above and the pure key-mapping below.
+    expect(GOLD_LANES).toHaveLength(4);
+    expect(GOLD_LANE_VOTERS.length).toBeGreaterThanOrEqual(20);
   });
 
   it('the explainer keys map every chip (never an undefined lookup)', () => {

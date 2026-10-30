@@ -1,9 +1,12 @@
 # GOLD_SCORE_SPEC — the gold-directional scoring engine (the Gold Program)
 
-**Status:** S1 (engine) + S2 (API + UI integration) shipped. FA copy deferred to S5.
-**Modules:** `packages/insights/src/gold-score.ts` (pure engine + EN copy) ·
+**Status:** S1 (engine) + S2 (API + UI integration) + S2.1 (bilingual +
+placement round) shipped. FA copy shipped in S2.1 (round-53).
+**Modules:** `packages/insights/src/gold-score.ts` (pure engine — copy
+moved to the web dictionaries in S2.1) ·
 `packages/core/src/schemas.ts` (`GoldSummarySchema`, the optional snapshot field) ·
-`apps/web/src/components/insights/GoldTailwindPanel.tsx` + `ModelVsRealityPanel.tsx`.
+`apps/web/src/components/insights/signals/GoldTailwindPanel.tsx` + `ModelVsRealityPanel.tsx`
+(mounted INSIDE the merged gold card, under the balance — the owner's S2.1 directive).
 **Discipline:** pure, additive, zero new fetches, zero new KV ops. Descriptive,
 hedged, never advice (the signals-card contract — words and counts, no green/red).
 
@@ -109,7 +112,7 @@ current readings, and the skew is documented here rather than hidden.
 | `goldSummaryOf(readings)` | pure fn | The COMPACT wire shape (what the ingest writes; `GoldSummary` from `@currena/core`) |
 | `GOLD_LANE_VOTERS` / `GOLD_LANES` | const | The voter table / lane order |
 | `GOLD_STRONG_SHARE` / `GOLD_STRONG_MIN_FIRING` / `GOLD_REALITY_SPEED_PCT` | const | The thresholds (documented above) |
-| `GOLD_PANEL_COPY_EN` / `MODEL_VS_REALITY_COPY_EN` | const | The EN copy blocks (see §4.4 for the FA deferral) |
+| `GOLD_PANEL_COPY_EN` / `MODEL_VS_REALITY_COPY_EN` | const | RETIRED in S2.1 — the copy moved to the web dictionaries (`signals.goldScore` / `signals.goldModelVsReality`, EN + fa) |
 | types `GoldVoter`, `GoldSubGaugeReading`, `GoldTailwindReading`, `ModelVsRealityReading`, … | types | The engine's vocabulary |
 
 `GoldSummary` (core, zod-validated) is the compact shape: `netScore`,
@@ -169,48 +172,57 @@ through untouched (§2.4 for the one-tick skew).
 The `/api/insights` shape example gains the `goldSummary` block (optional
 field, shown with a comment saying so).
 
-### 4.4 The UI — `apps/web/src/components/insights/`
+### 4.4 The UI — `apps/web/src/components/insights/signals/` (S2.1)
 
 - **`GoldTailwindPanel.tsx`** — the net score, the 5-step label, the
   tailwind/headwind/mixed lane counts, the four sub-gauge readings, the
   firing voters list (re-derived client-side via `goldTailwindScore`), the
-  "conditions, not advice" footnote. Reads `snapshot.goldSummary` +
-  `GOLD_PANEL_COPY_EN`.
+  "conditions, not advice" footnote. Reads `snapshot.goldSummary` + the
+  dictionary copy `copy.signals.goldScore`.
 - **`ModelVsRealityPanel.tsx`** — the chip, the explainer
-  (`modelVsRealityExplainerKey` + `MODEL_VS_REALITY_COPY_EN`), the reality
-  value with its basis phrase.
-- Both mount **beside the gold-usd tile on the prices-board strip**
-  (`PricesBoard.tsx` grid, right after the gold card), matching the tile
-  anatomy (`article` + `rounded-[var(--radius-lg)] bg-[var(--color-surface)]
-  p-4 ring-1 ring-[var(--color-border)]`, lucide icon box, `data-*` hooks).
-- **FA copy is deliberately deferred to S5** (the Persian-copy audit gate):
-  the EN copy blocks live in the insights package, NOT the web i18n
-  dictionaries, so `pnpm copy:audit` stays clean; the panels render EN in
-  both locales until the reviewed fa lands.
+  (`modelVsRealityExplainerKey` + `copy.signals.goldModelVsReality`), the
+  reality value with its basis phrase (٪ in fa, % in EN).
+- **Placement (the owner's 2026-10-31 directive, superseding S2's
+  prices-strip mount):** both panels render INSIDE the merged gold
+  card (`signals/MergedCard.tsx`), DIRECTLY UNDER the balance visual
+  («برآیند عوامل مؤثر بر قیمت طلا») and before the price-footing strip —
+  two columns beside the balance's max-width column, stacked on mobile.
+  The prices strip is the four price tiles again.
+- **BILINGUAL since S2.1** (the owner's "must be bilingual"): the copy
+  lives in the web i18n dictionaries — `signals.goldScore` /
+  `signals.goldModelVsReality` in both `insights-copy-en.ts` and
+  `insights-copy-fa.ts` — behind the Persian-copy audit gate
+  (round-53, `docs/localization/persian-copy-round-53-gold-panels.md`).
+  The package-level `*_COPY_EN` constants are RETIRED.
 - Old snapshots without `goldSummary`: the panels derive the reading
   client-side from the readings they already hold (the same pure function).
 
-### 4.5 What S2 does NOT do
+### 4.5 What S2/S2.1 do NOT do
 
 No FRED gap-fillers (S3: real-yield history depth, breakeven interplay) ·
-no FA copy (S5, the audit gate) · no backtest harness (S4) · no
-`ruleVersion` bump (the gold score derives FROM the unchanged scored
-readings; the rules themselves did not move).
+no backtest harness (S4) · no `ruleVersion` bump (the gold score derives
+FROM the unchanged scored readings; the rules themselves did not move).
+(The S5 FA-copy round happened EARLY, in S2.1 — the owner's bilingual
+directive.)
 
-## 5. Validation record (S1 + S2, 2026-10-31)
+## 5. Validation record (S1 + S2 + S2.1, 2026-10-31)
 
-- `packages/insights/src/gold-score.test.ts` — **36 tests** (firing rules,
-  lane words, label mapping, chips, compact round-trip, copy completeness).
+- `packages/insights/src/gold-score.test.ts` — **33 tests** (firing rules,
+  lane words, label mapping, chips, compact round-trip; the three
+  copy-completeness tests moved to the web with the copy in S2.1).
 - `packages/core/src/schemas.test.ts` — the `goldSummary` field block
   (optional acceptance, pollution stripping, shape rejection).
-- `apps/web/src/components/insights/gold-panels.test.tsx` — the panel
-  render tests (fixture snapshot with a known `goldSummary`).
+- `apps/web/src/components/insights/signals/gold-panels.test.tsx` — **16
+  tests** (the panel renders for a known `goldSummary`, the client-side
+  fallback, the honest no-read state, BOTH dictionaries' coverage of the
+  engine vocabulary, the fa locale's Persian rendering, the MergedCard
+  mount order under the balance, the prices-strip move-back).
 - `packages/insights/src/adapters/snapshot.test.ts` — the three builders
   write/recompute the field; the public projection recomputes over
   survivors.
-- Gates: `pnpm -r test` green (10,113 + the new tests), typecheck 6/6,
-  lint clean on every new file, `copy:audit` untouched (EN copy lives in
-  the package, not the dictionaries).
+- Gates: `pnpm -r test` green, typecheck 6/6, lint clean on every touched
+  file, `copy:audit` **clean after the round-53 triage** (74 entries — 73
+  dictionary strings + the ٪ technical glyph).
 
 **Honest note (the sandbox loss):** S1's original working tree was lost in
 a sandbox recycle before it was committed or pushed. The engine, its 36

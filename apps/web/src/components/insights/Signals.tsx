@@ -34,7 +34,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import type { IndicatorReading } from '@currena/core';
+import type { GoldSummary, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { evaluateSignal, type SignalReading } from '@currena/insights';
 import { Activity, ChevronDown } from 'lucide-react';
@@ -65,11 +65,16 @@ function CollapsedVerdict({ reading, copy }: { reading: SignalReading; copy: Ins
 
 export function Signals({
   readings,
+  goldSummary,
   copy,
   numberLocale,
   expandToken,
 }: {
   readings: readonly IndicatorReading[];
+  /** Gold Program S2.1: the served snapshot's compact gold summary —
+   * passed down to the merged card's two gold panels (derived
+   * client-side when absent). */
+  goldSummary?: GoldSummary | undefined;
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
   /** Bumped by the route when a pill/hash/hero link targets this section. */
@@ -152,7 +157,14 @@ export function Signals({
 
       <div id="insights-signals-body">
         {open ? (
-          <MergedSignalsCard gold={gold} silver={silver} readings={readings} copy={copy} numberLocale={numberLocale} />
+          <MergedSignalsCard
+            gold={gold}
+            silver={silver}
+            readings={readings}
+            goldSummary={goldSummary}
+            copy={copy}
+            numberLocale={numberLocale}
+          />
         ) : (
           /* Collapsed: one line per metal (spec R7b). */
           <ul className="m-0 flex list-none flex-col gap-1 p-0" data-signals-summary>

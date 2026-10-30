@@ -87,8 +87,8 @@
  * never a flat line.
  */
 
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
-import type { GoldSummary, IndicatorId, IndicatorReading } from '@currena/core';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { Coins, PanelLeft, PanelRight } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
@@ -102,11 +102,6 @@ import {
 } from './config';
 import { formatAsOf } from './HistoryChart';
 import { ChangeValue } from './PriceDetails';
-// Gold Program S2 (GOLD_SCORE_SPEC.md §4.4): the two gold panels mount
-// BESIDE the gold-usd tile on this strip — the tailwind score + the
-// model-vs-reality comparison, EN copy until the S5 fa round.
-import { GoldTailwindPanel } from './GoldTailwindPanel';
-import { ModelVsRealityPanel } from './ModelVsRealityPanel';
 import { deriveTileStats, type TileStats } from './price-stats';
 import {
   briefingText,
@@ -593,17 +588,12 @@ function PriceTile({
 
 export function PricesBoard({
   readings,
-  goldSummary,
   copy,
   locale,
   numberLocale,
   onFocusCard,
 }: {
   readings: readonly IndicatorReading[];
-  /** Gold Program S2: the served snapshot's compact gold summary (absent
-   * on pre-S2 snapshots — the panels then derive it client-side through
-   * the same pure engine). */
-  goldSummary?: GoldSummary;
   copy: InsightsCopy;
   locale: 'en' | 'fa';
   numberLocale: 'en-US' | 'fa-IR';
@@ -647,32 +637,22 @@ export function PricesBoard({
        * grid, a real radiogroup with roving tabindex + arrow keys. */}
       <PricePeriodSwitch lens={lens} copy={copy} onChange={setLens} />
       {/* Four tiles, one grid, ONE anatomy (spec default order: Gold →
-       * Silver → Oil → Bitcoin — PRICE_ROWS) — plus the Gold Program's
-       * two panels BESIDE the gold-usd tile (S2): the tailwind score and
-       * the model-vs-reality comparison render as further grid items in
-       * the same strip, matching the tile anatomy. Default stretch so the
+       * Silver → Oil → Bitcoin — PRICE_ROWS). Default stretch so the four
        * containers are the SAME height — the details no longer expand the
        * tile (they live in the side panel now), so the grid is stable. */}
       <div className="grid grid-cols-1 gap-2.5 pt-2 sm:grid-cols-2 xl:grid-cols-4">
         {rows.map(({ id, reading }) => (
-          <Fragment key={id}>
-            <PriceTile
-              id={id}
-              reading={reading}
-              copy={copy}
-              locale={locale}
-              numberLocale={numberLocale}
-              data={derived[id]}
-              lens={lens}
-              onFocusCard={onFocusCard}
-            />
-            {id === 'gold-usd' ? (
-              <>
-                <GoldTailwindPanel goldSummary={goldSummary} readings={readings} numberLocale={numberLocale} />
-                <ModelVsRealityPanel goldSummary={goldSummary} readings={readings} numberLocale={numberLocale} />
-              </>
-            ) : null}
-          </Fragment>
+          <PriceTile
+            key={id}
+            id={id}
+            reading={reading}
+            copy={copy}
+            locale={locale}
+            numberLocale={numberLocale}
+            data={derived[id]}
+            lens={lens}
+            onFocusCard={onFocusCard}
+          />
         ))}
       </div>
     </section>
