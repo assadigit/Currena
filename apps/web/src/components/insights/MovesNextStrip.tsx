@@ -71,7 +71,10 @@ export function MovesNextStrip({
   const items = useMemo<StripItem[]>(() => {
     const out: StripItem[] = [];
     // UI-18/19: the biggest moves first, |moveScore| ranked, period stated.
-    for (const mover of bigMovers(readings, 3)) {
+    // 2026-10-30 owner round: show up to 5 movers (was 3) — the owner wants
+    // "top 5 changes" not 3 movers + 2 events. Events still fill remaining
+    // slots when fewer than 5 movers clear the threshold.
+    for (const mover of bigMovers(readings, 5)) {
       const reading = readings.find((r) => r.id === mover.id);
       const change =
         mover.change7d !== undefined ? mover.change7d : mover.change30d;
