@@ -11,13 +11,13 @@ file at the end of every milestone (tick the box, add evidence) and every sessio
 
 | Session | Theme | Milestones done | % |
 |---|---|---|---|
-| S1 | Foundation and trust | 6 / 7 | 86% |
+| S1 | Foundation and trust | 7 / 7 | 100% |
 | S2 | Foreign holdings of US Treasuries (priority feature) | 0 / 6 | 0% |
 | S3 | US credit, liquidity, fiscal and growth nowcast | 0 / 6 | 0% |
 | S4 | Geopolitics, supply chain and energy | 0 / 6 | 0% |
 | S5 | Australia deep-dive and Australian markets | 0 / 6 | 0% |
 | S6 | New Zealand link, China and world links, promotion and polish | 0 / 6 | 0% |
-| **Total** | | **6 / 37** | **16%** |
+| **Total** | | **7 / 37** | **19%** |
 <!-- gap-progress:end -->
 
 Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in production):
@@ -76,7 +76,14 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
   - **#5 GPR:** verified **context-only by design** — the card rides the SD regime (`SD_BAND_IDS`): z = +0.62 IS mid-range, so "usual range" is the honest level reading; the +20.6-point monthly move is a SPEED fact the S4 geopolitics gauge is designed to score (percentile 0.846 vs z 0.62 is exactly the non-stationarity that made SD the right regime). No code change, nothing tuned louder — noted for S4 in the S2 prompt carry-over list.
   - **Tests:** 7 new (peg exemption, raw correction count, banded takeaway, banded roseToday ×2, speed phrase ×3 assertions); one pre-existing takeaway test updated to the new banded semantics (its fixture rows now carry banded chg1d). Gates ALL GREEN — **10,321 tests**. Copy round-59 (2 new keys + 2 renamed headers + the ٪ technical glyph claim, the round-52 precedent). Insights lazy budget 1139/268.5 → 1140/268.5 (measured 1139.36/268.36; justified).
   - **Deploy + verify:** BOTH workers — api `d40d187c` + markets `0266f168` (19:04 UTC; the markets worker's summary changed). `/api/health` ok, `/api/insights` 200, browser EN+fa 1200/360 zero console errors; the flat-band note renders live; no bare "Trend" header remains (the markets table renders behind the section's view toggle in headless checks — the "3m trend" header is bundle-verified and pinned by the copy-parity tests).
-- [ ] M1.7 Capacity scaffolding
+- [x] M1.7 Capacity scaffolding
+  - **Rungs:** the generic **rung3 (04:30 UTC)** + **rung4 (04:35 UTC)** — slots verified free (neighbours 29/31/34/36 stay ungated). Pluggable `EXTRA_SOURCES` registry (`apps/api/src/insights-extra-rungs.ts`), each source with an id, day gate, declared subrequest budget and run body; the rung enforces the 50-subrequest ceiling with a LOUD recorded refusal; own status record `insights:extra-status:rung{3,4}`; per-source failure isolation (a throwing source never sinks the rung, the others, or the cron). Day-gate helpers mirror the rung2 discipline (`firstOfMonthGate` / `weekdayGate(6)` / `dailyGate`). **Registry EMPTY — the S1 landing state; S2 registers the TIC tables** (the recipe is in RUNGS.md + the checklist).
+  - **Sweep heal:** the 10:10/20:10 sweeps now also read the two extra statuses (healthy-day cost 1 → 3 KV reads; the pin test updated) and re-run sources whose last row is failed/blocked/format-changed with the day gate BYPASSED (a monthly source that failed retries within hours, not next month).
+  - **RUNGS.md (new):** every rung documented — time, purpose, subrequests, KV writes (04:10 main ~47/50 FULL; rung2; the history halves; :13 prices; :50 narrator; watchdog; sweeps; the new rungs) + the registration recipe.
+  - **NEW-INDICATOR-CHECKLIST.md (new):** the §7 recipe as a PR checklist. The Layer-1 EN/fa coverage check REUSES the existing strict validator (gate 7 of `pnpm gates` — 7,930 assertions, fails the build when a new id lacks copy in either language), as the spec allowed.
+  - **Tests:** 10 new (gate mapping + free-slot proof, day gates, the empty-rung live-contract, due/gated-out ordering, failure isolation, budget refusal, heal-mode day-gate bypass, heal arming, poisoned-status tolerance). Gates ALL GREEN — **10,331 tests**. No new cron trigger anywhere.
+  - **Live proof (the captured-and-reverted pattern):** a TEMPORARY 19:47 UTC gate deployed (version `9570e538`), `wrangler tail` captured `[extra-rung3] 0 source(s) ran · budget 1/50 · status written`, and the CF REST API read the key back verbatim: `insights:extra-status:rung3 = {"generatedAt":"2026-10-31T19:47:18.317Z","rung":3,"rows":[],"budget":{"ceiling":50,"used":1,"refused":[]}}` — the empty registry ran live and wrote its status. The temp gate was then reverted and the committed code redeployed as **`d1da6f53`** (identical to `56e5621`); `/api/health` ok; browser EN+fa 1200/360 zero console errors. (Note: `wrangler kv key get` CLI reports "Value not found" for this key while the REST API returns it — a CLI quirk recorded here; the REST read is authoritative.)
+  - **Numbers:** rung3/rung4 empty = 1 subrequest + 1 KV write each per day; sweeps +2 KV reads on healthy days; the rung budget ceiling 50 enforced declaratively.
 
 ### S2 Foreign holdings of US Treasuries (`S2-treasury-foreign-holders.md`)
 - [ ] M2.1 Source verification and fixtures

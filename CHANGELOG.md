@@ -5,6 +5,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31s] — gap-closure S1-M1.7: capacity scaffolding — the generic rung3/rung4 (04:30/04:35 UTC, pluggable, budget-capped, sweep-healed) verified LIVE; RUNGS.md + the new-indicator checklist
+
+The S2–S6 sessions can now add data sources without touching the FULL
+04:10 main rung (47/50 subrequests — the free-tier budget's hard rule).
+
+- **`apps/api/src/insights-extra-rungs.ts` (new):** rung3 at 04:30 UTC and
+  rung4 at 04:35 (slots verified free). A pluggable `EXTRA_SOURCES`
+  registry — each source declares an id, a day gate
+  (`firstOfMonthGate` / `weekdayGate` / `dailyGate`, the rung2 discipline),
+  a subrequest budget and a run body. The rung enforces the 50-subrequest
+  ceiling with a LOUD recorded refusal, writes its own status record
+  (`insights:extra-status:rung{3,4}`), and isolates every failure (a
+  throwing source never sinks the rung, its neighbours, or the cron).
+  The registry ships EMPTY — the S1 landing state.
+- **Sweep heal:** the 10:10/20:10 sweeps read the extra statuses too
+  (healthy-day cost 1 → 3 KV reads) and re-run failed/blocked/
+  format-changed sources with the day gate BYPASSED — a monthly source
+  that fails retries within hours, not next month.
+- **`docs/gap-closure/RUNGS.md` (new):** the full rung map — every
+  rung's time, purpose, subrequests and KV writes, plus the source
+  registration recipe. **`docs/gap-closure/NEW-INDICATOR-CHECKLIST.md`
+  (new):** the §7 recipe as a PR checklist (the Layer-1 EN/fa coverage
+  check reuses the existing strict validator — gate 7 of `pnpm gates`).
+- **Live proof (the captured-and-reverted pattern):** a temporary 19:47 UTC
+  gate deployed once; `wrangler tail` captured
+  `[extra-rung3] 0 source(s) ran · budget 1/50 · status written`, and the
+  Cloudflare REST API read the key back verbatim — the empty registry ran
+  live and wrote its status. The temp gate was reverted and the committed
+  code redeployed (`d1da6f53`). 10 new tests (10,331 total green); no new
+  cron trigger.
+
 ## [2026-10-31r] — gap-closure S1-M1.6: the five live-page audit fixes — the pegged pair exempted, ONE shared markets count (±1% band stated), the trend column names its window, percentile flags carry the 30-day speed, GPR verified context-by-design
 
 - **#1 usdaed:** a pegged pair's full-precision daily repeat is the peg
