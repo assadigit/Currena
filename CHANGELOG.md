@@ -5,6 +5,45 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31l] — Gold Program S6 wrap-up: the reminder spec (GOLD_RECHECK_SPEC.md) — the procedure home for every later re-check + re-backtest; the session fully closed (everything pushed, merged, deployed)
+
+The owner's wrap-up round. State verified end-to-end first: `main` =
+`4e480b9` = origin (CI green on it), zero open PRs, production at
+`21ca25ab` (100%, healthy — `/api/health` ok, the 21-voter table
+computing). Then the durable piece the owner asked for:
+
+- **`docs/insights/GOLD_RECHECK_SPEC.md` (new)** — the owner's
+  reminder: a self-contained procedure spec so a future session
+  ("after a while" — a week, a month, a quarter) can re-check and
+  re-backtest the gold table without reconstructing context. It
+  carries: §0 a paste-able session starter · §1 the state-of-record
+  (updated on every re-run) · §2 the armed 2026-11-02 04:30 UTC
+  one-shot + what to do if it fired early or never fired · §3 the
+  seven-step procedure (the live check → the read-only-KV credential
+  gate with the REAL-read test → `gold-corpus-dump` → `gold-backtest`
+  → the baseline comparison with the which-engine-stamped-what rule →
+  the watch step → record + ship with the gates) · §4 the asOf-watch
+  verdict rules (lockstep → validated-by-watch, still not "proven";
+  divergence → escalate, no silent code change; weekends are not
+  divergence) · §5 the comparison-baseline table (S4 51.7/46.9/43.9 ·
+  S6 52.1/47.6/43.9, the tilt 46.7%, the mature-base nuance) + the
+  standing round-55 honest note no re-run may soften · §6 the
+  escalation rules (the stated-in-advance edge rule, watch
+  divergence, tilt fire-rate band, missing archives, KV ceiling —
+  re-checks REPORT, they never decide; voter-table changes open
+  their own gated session, the D-5 pattern) · §7 security + what
+  NOT to do (read-only KV, credentials in env only, no edge claims)
+  · §8 the re-arm recipe for future one-shots (~04:30 UTC past that
+  day's ingest rung).
+- **Indexed:** the insights README's reading-order table +
+  GOLD_BACKTEST_SPEC's known-gaps item 7 (the "re-run as the archive
+  grows" item now points at the spec) + the AGENTS.md NEXT pointer.
+- **The standing honest note, restated:** the re-check exists to
+  measure, not to hunt — the round-55 note ("no positive association
+  with the next 5–60 days — conditions, not direction") stays the
+  operative description until a re-run's stated-in-advance rule says
+  otherwise.
+
 ## [2026-10-31k] — Gold Program S6 deploy: LANDED LIVE (21ca25ab) — the 21-voter table rides production; the Insights chunk byte-identical; goldSummary −2/headwind exactly as predicted
 
 The fifth credential round closed the last open S6 item. The owner's

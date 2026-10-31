@@ -300,7 +300,10 @@ exactly as predicted, the Insights lazy chunk byte-identical to the
 local build with the 21-voter table EN + fa). NEXT: the 2026-11-02
 automated re-check (asOf-watch days 2–3 verdict + the grown-corpus
 refresh with the 11-01/11-02 archive days, now over the promoted
-table). The S5 close-out
+table) — the procedure home for it and every later re-check +
+re-backtest is `docs/insights/GOLD_RECHECK_SPEC.md` (the owner's
+reminder spec: commands, baselines, watch verdict rules, escalation
+rules, the re-arm recipe). The S5 close-out
 was FULLY LANDED as of 2026-10-31 ~15:15 UTC (the fourth credential
 round): PR #9 merged as 758298d (+ the postscript b4ac1ab, CI
 365/366 green), DEPLOYED live as worker version d77e9139 (the

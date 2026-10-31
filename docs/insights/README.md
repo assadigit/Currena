@@ -34,6 +34,7 @@ worker, which is owner-personal-plan).
 | `OWNER_SETUP.md` | The owner's hand-setup steps (secrets, deploy, rollback, panic switch) |
 | `GLOSSARY.md` | The vocabulary |
 | `BACKTEST.md` | The backtest discipline |
+| `GOLD_RECHECK_SPEC.md` | The owner's reminder: how to re-check + re-backtest the gold table later (the procedure home for every re-run) |
 | `01-indicator-spec.md` | The indicators, their warning rules, and how the summary line is calculated |
 | `02-page-design-spec.md` | How the page should look and behave |
 | `03-data-sources.md` | Per-source data notes (endpoint, series, access, cadence, fallback) |

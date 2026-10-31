@@ -455,7 +455,9 @@ prescribed; all four gates plus the fresh run, measured:
 6. The asOf-watch days 2–3 pending (above).
 7. The harness's corpus is a snapshot — re-run `gold-corpus-dump` then
    `gold-backtest` as the archive grows (the report regenerates; the
-   recordedAt line carries the lineage).
+   recordedAt line carries the lineage). The procedure home for every
+   such re-run (commands, baselines, watch verdict rules, escalation
+   rules, the re-arm recipe): **`GOLD_RECHECK_SPEC.md`**.
 
 ## Decision log
 
