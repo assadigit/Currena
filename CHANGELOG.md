@@ -5,6 +5,66 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31y] — gap-closure S2-M2.4 completion: the weekly custody card (FRED WSEFINTL1) — the 103rd indicator, context-only, closing the Who-holds-US-government-debt section
+
+The S2 spec's M2.4 item 6 — "**Weekly custody card** (FRED `WSEFINTL1` once
+verified in S3-M3.1, otherwise add the series here following the recipe) …
+standard indicator card with 10-year position" — the series was VERIFIED
+during S2 itself (2026-10-31 22:20 UTC, recorded in VERIFIED-SOURCES), so
+the spec's own conditional fired: the card ships in S2, superseding the
+"ships with S3-M3.1" deferral recorded in [2026-10-31w] (recorded in
+PROGRESS; the S3 session no longer needs to wire it).
+
+- **The indicator** (`nyfed-custody`, the 103rd, context-only by spec G-5):
+  Treasuries held in custody at the New York Fed for foreign official
+  accounts — the WEEKLY freshness bridge beside the monthly TIC country
+  table that lags ~6–7 weeks. `borrowing-costs` group membership (gauge
+  electorate untouched — context never votes), cadence weekly,
+  `staleAfterDays: 21` (the walcl precedent: one missed H.4.1-family print
+  reads ~10d of obs age; 21 covers two).
+- **Zero new fetches:** `WSEFINTL1` rides the SAME mixed-frequency FRED bulk
+  group as `WALCL` (both Fed H.4.1-family Wednesday-level weeklies) — the
+  live 11-id probe (2026-10-31 22:55 UTC, honest UA) answered the ZIP member
+  `weekly,_as_of_wednesday.csv` carrying BOTH columns, latest 2026-10-28
+  ($2,838,071 M). One more id inside an existing request: the 04:10 main
+  rung's subrequest count is UNCHANGED (~47/50); the group stays at 11/12
+  ids (the fredgraph ZIP truncates past ~12 — pinned by test). RUNGS.md's
+  main-rung row records the distinction (a series id inside an existing
+  request is NOT a new fetch).
+- **Licence:** T-16 record added (public domain — the series page's own
+  schema.org Dataset license field reads
+  `fred.stlouisfed.org/legal/#copyright-public-domain`, read live
+  2026-10-31); the fail-closed licence machinery resolves it public. The
+  display is the walcl convention ($ millions ×1e-6 → "US$2.84 trillion").
+- **The card** (`TicCustodyCard` in TicSection.tsx): the standard
+  `CompactRow` anatomy rendered in the SectionLane's ticSlot directly below
+  the TicSection — one reading, one surface (`HIDDEN_FROM_LANE_IDS` keeps it
+  out of the borrowing-costs lane, the US-global-reach/dollar-strength
+  pattern). `ALWAYS_POSITION_IDS` gains the id (the VIX precedent — the
+  spec's "with 10-year position"). null reading → nothing renders (the
+  section's own loading/empty states are independent); the search filter
+  honours it like every card.
+- **Copy (Persian round-61):** the full bilingual card copy (13 keys ×2) +
+  the layer1 entry, referencing the M2.5 glossary terms that were already on
+  main (`treasury-securities`, `foreign-official-holdings`, `central-bank` —
+  the parallel M2.5 session's round-60 wording wins the two shared terms by
+  landing first; this card consumes them). Terminology follows the
+  established «اوراق خزانه‌داری آمریکا» family; no em dash; 24 fa strings
+  triaged in the manifest.
+- **Narrator:** the custody reading joins the state's fresh items
+  automatically (a standard reading) — the vocabulary regenerated at
+  132 indicators + 28 glossary terms ×2.
+- **Bundle:** Insights lazy chunk 1175/277 → **1179/278** (measured
+  1178.46/277.97 at the merged tree — the M2.5 glossary/narrator growth
+  from [2026-10-31x] + this card's wrapper and copy; justified in
+  `check-bundle-budget.mjs` §2026-10-31y). Entry chunk untouched.
+- **Tests:** +7 (the bulk-group membership/≤12-cap/one-group pin; the
+  custody card renders name + trillion display + the 10-year position bar,
+  the fa twin with Persian digits; null renders nothing; the one-surface
+  invariant) + the updated pins (45 FRED series, 103 ids, 60 P1, the
+  55-entry info list, 132+28 vocabulary, the merged-manifest counts). Gates
+  ALL GREEN at the merged tree.
+
 ## [2026-10-31x] — gap-closure S2-M2.5: the foreign-holders glossary terms, the narrator's TIC facts (PROMPT_VERSION 9), the About-source row
 
 The bilingual/licence close of the owner's top-priority feature.

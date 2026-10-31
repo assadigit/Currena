@@ -362,6 +362,34 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // single miss from false-alarming before the next lands.
     staleAfterDays: 14,
   },
+  {
+    // gap-closure S2-M2.4 (2026-10-31, the S2 spec's weekly custody card):
+    // Treasuries held in custody at the New York Fed for foreign official
+    // accounts — the WEEKLY pulse of foreign official demand for US
+    // government debt, beside the monthly TIC country table that lags
+    // ~6–7 weeks. CONTEXT (info): never a vote — it is the level the
+    // reader watches beside the "Who holds US government debt" section
+    // (the card renders there via HIDDEN_FROM_LANE_IDS, the
+    // US-global-reach/dollar-strength one-surface pattern). The walcl
+    // twin: same Fed H.4.1-family Wednesday-level weekly series, same
+    // $-millions unit (displayed ×1e-6 as trillions), same public-domain
+    // licence class (data/fred-copyright.json, verified 2026-10-31 from
+    // the series page's own schema.org license field).
+    id: 'nyfed-custody',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'Foreign official holdings at the New York Fed (weekly)',
+    source: 'fred',
+    sourceRef: 'FRED:WSEFINTL1 (Treasuries held in custody for foreign official accounts, Wednesday level, $ millions)',
+    cadence: 'weekly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The H.4.1-family release publishes Thursday for the Wednesday
+    // level — the walcl precedent: one missed print reads ~10d of obs
+    // age; 21 covers two.
+    staleAfterDays: 21,
+  },
   /* ---------------- Global — Are prices heating up? ---------------- */
   {
     id: 'us-cpi-yoy',

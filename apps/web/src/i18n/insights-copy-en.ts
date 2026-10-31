@@ -1827,6 +1827,16 @@ const LAYER1 = {
       ],
       glossaryTerms: [],
     },
+    // gap-closure S2-M2.4 — the weekly custody card that closes the
+    // "Who holds US government debt" section (FRED WSEFINTL1).
+    'nyfed-custody': {
+      plainName: 'Foreign official holdings, New York Fed',
+      oneLine: 'The US government debt that foreign central banks and governments keep at the New York Fed.',
+      ifRising: 'Foreign central banks and governments are usually adding to their US Treasury holdings.',
+      ifFalling: 'Foreign central banks and governments are usually reducing them.',
+      connections: [],
+      glossaryTerms: ['treasury-securities', 'foreign-official-holdings', 'central-bank'],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 
@@ -2497,6 +2507,31 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'Size alone says little about stance: a growing balance sheet can mean crisis response or routine operations, and the composition of what is held matters as much as the total.',
     forYou:
       'Read it beside m2-us: one is the central bank’s own creation of money, the other the banking system’s. Together they frame the money story the rates cards tell the price of.',
+  },
+  'nyfed-custody': {
+    name: 'Foreign official holdings at the New York Fed (weekly)',
+    ticker: 'NY Fed custody',
+    oneLiner:
+      'The Treasuries foreign central banks and governments keep at the New York Fed: the weekly pulse of foreign official ownership of US government debt.',
+    lines: {
+      highRising:
+        'Foreign official custody holdings are high for their decade and rising: foreign central banks and governments adding to their US Treasury holdings.',
+      highEasing:
+        'Custody holdings remain high for the decade but are easing lower.',
+      typical: 'Custody holdings sit in their usual range for the decade.',
+      low:
+        'Custody holdings have fallen toward the low end of their decade range.',
+    },
+    whatItIs:
+      'Securities held in custody at the Federal Reserve Bank of New York for foreign official accounts (the H.4.1 memorandum item via FRED): Treasury securities kept at the Fed on behalf of foreign central banks and governments. Weekly, Wednesday level.',
+    whyItMatters:
+      'This is the part of foreign holdings of US government debt that foreign central banks and governments keep at the New York Fed itself. It moves weekly, well before the monthly country table publishes, so it is the freshest reading of foreign official demand for US Treasuries.',
+    tendedToMean:
+      'The series climbed with foreign reserve growth for two decades and has stepped lower in the 2022-24 tightening round.',
+    cantTell:
+      'The custody total has no country split: it cannot say which country is buying or selling (the monthly Treasury TIC table carries that, with its own six-to-seven-week lag), and some official holders keep securities somewhere other than the Fed.',
+    forYou:
+      'Read it beside the country table in the Who holds US government debt section above: the weekly custody level is the same story told with a shorter delay and no country detail.',
   },
   'retail-sales': {
     name: 'US retail sales',

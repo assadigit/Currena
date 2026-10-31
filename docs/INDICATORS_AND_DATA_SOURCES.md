@@ -13,16 +13,16 @@ and the per-round specs that drove each wave (both removed in the
 
 ---
 
-## 1. What indicators Currena has — the 102-indicator dashboard
+## 1. What indicators Currena has — the 103-indicator dashboard
 
-The Insights page renders **102 indicators** across **2 sections** (Global
-79, Australia 23 — see the
+The Insights page renders **103 indicators** across **2 sections** (Global
+80, Australia 23 — see the
 breakdown below), grouped under **9 question gauges** (5 global + 3
 australia + the prices-board strip). Of those, **48 are scored voters**
-(contribute to a gauge's verdict) and **54 are context rows** (live value +
+(contribute to a gauge's verdict) and **55 are context rows** (live value +
 10-year position bar, never vote).
 
-The live snapshot is served at `GET /api/insights` — 102 `readings` plus
+The live snapshot is served at `GET /api/insights` — 103 `readings` plus
 the two summary lines (Global and Australia). Each reading carries its
 current value, the data date (`asOf`), the 7-day and 30-day changes, the
 **10-year percentile position** (`percentile10y`), the **10-year z-score**
@@ -34,7 +34,7 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 
 | gauge | section | members (voters in **bold**, context in plain) | voting count |
 |---|---|---|---|
-| **borrowing-costs** | global | **yield-curve-10y2y**, **yield-curve-10y3m**, **fed-expectations**, **real-yield-10y**, **us10y**, **us30y**, **fed-target**, **ecb-dfr**, **govt-interest-revenue** + context: ecb-dfr-twin `euro-aaa-10y`, `sofr`, `us-2y`, `mortgage-30y`, `bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate` | 9 |
+| **borrowing-costs** | global | **yield-curve-10y2y**, **yield-curve-10y3m**, **fed-expectations**, **real-yield-10y**, **us10y**, **us30y**, **fed-target**, **ecb-dfr**, **govt-interest-revenue** + context: ecb-dfr-twin `euro-aaa-10y`, `sofr`, `us-2y`, `mortgage-30y`, `bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate`, `nyfed-custody` (renders inside the TIC section) | 9 |
 | **prices-heat** | global | **us-cpi-yoy**, **us-pce-core-yoy**, **euro-hicp**, **breakeven-5y5y**, **brent** + context: `us-cpi-core-yoy`, `t5yie`, `us-wages`, `breakeven-tilt`, `breakeven-10y`, `wti`, `natgas`, `eia-crude-stocks`, `platinum`, `food-index`, `wheat`, `maize`, `gold-oil-ratio` | 5 |
 | **market-stress** | global | **stress-stlfsi**, **nfci**, **vix**, **gold-silver**, **cftc-gold-positioning** + context: `walcl`, `crypto-fng`, `shiller-cape`, `shiller-ecy`, `gpr-index` | 5 |
 | **dollar-strength** | global | **dollar-basket**, **usdjpy**, **us-japan-10y-gap** + context: `eur-usd`, `usdtry`, `usdaed` | 3 |
@@ -48,7 +48,7 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 the A-7 cftc-gold-positioning card; the growth-health tenth is the A-8
 oecd-cli-us voter — see §4).
 
-### The complete indicator inventory (102 ids, alphabetical)
+### The complete indicator inventory (103 ids, alphabetical)
 
 Each row: **id** · provider · cadence · max-age-days · licence level ·
 public-display-ok · scored voter? · short description.
@@ -129,6 +129,7 @@ public-display-ok · scored voter? · short description.
 | `mortgage-30y` | fred | weekly | 14 | L2 | yes | – | The US 30-year home-loan rate |
 | `natgas` | fred | daily | 12 | L0 | yes | – | US natural gas (Henry Hub) |
 | `nfci` | fred | weekly | 14 | L2 | yes | ✓ | Chicago Fed National Financial Conditions Index |
+| `nyfed-custody` | fred | weekly | 21 | L0 | yes | – | Foreign official holdings at the New York Fed (WSEFINTL1; renders inside the TIC section) |
 | `oecd-cli-cn` | oecd | monthly | 75 | L0 | yes | – | OECD leading indicator (China) |
 | `oecd-cli-de` | oecd | monthly | 75 | L0 | yes | – | OECD leading indicator (Germany) |
 | `oecd-cli-us` | oecd | monthly | 75 | L0 | yes | ✓ | OECD leading indicator (US) |

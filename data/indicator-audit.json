@@ -237,6 +237,19 @@
       "rule": "{\"kind\":\"info\"}"
     },
     {
+      "id": "nyfed-custody",
+      "licenceName": "FRED license #copyright-public-domain (public domain)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 21,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
       "id": "us-cpi-yoy",
       "licenceName": "FRED license #copyright-public-domain (public domain)",
       "publicDisplayOk": "yes",

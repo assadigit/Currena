@@ -145,14 +145,14 @@ removed, renamed, or its rule/cadence/maxAge/source changes, you MUST:
 A pull request that changes an indicator without updating this section is
 incomplete and will be rejected at review.
 
-### A. The 102 indicators (48 voting [V] + 54 context [C])
+### A. The 103 indicators (48 voting [V] + 55 context [C])
 
 Every indicator below renders as a card on `#/insights`. `[V]` = scored
 (contributes to its gauge's verdict); `[C]` = context (value + 10-year
 position bar, never votes). `maxAge` = staleAfterDays (days before the
 "stale" tag fires; `—` = per-change/manual, never stale by age).
 
-#### GLOBAL (79 indicators, 32 voting)
+#### GLOBAL (80 indicators, 32 voting)
 
 **Borrowing costs** (`borrowing-costs` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -175,6 +175,14 @@ position bar, never votes). `maxAge` = staleAfterDays (days before the
 | [C] | `euro-aaa-10y` | daily | 7 | info | ecb |
 | [C] | `boe-rate` | per-change | — | info | boe |
 | [C] | `boj-rate` | monthly | 75 | info | fred |
+| [C] | `nyfed-custody` | weekly | 21 | info | fred |
+
+*(gap-closure S2-M2.4, 2026-10-31: `nyfed-custody` — Treasuries held in
+custody at the New York Fed for foreign official accounts, FRED
+`WSEFINTL1`, public domain, riding the WALCL mixed-frequency bulk group
+with ZERO new fetches. Context-only; renders INSIDE the "Who holds US
+government debt" TIC section (HIDDEN_FROM_LANE_IDS — one reading, one
+surface), not in the borrowing-costs lane.)*
 
 **Dollar strength** (`dollar-strength` gauge — rendered inside the World
 currencies container per R9-04):

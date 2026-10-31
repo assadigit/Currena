@@ -21,10 +21,12 @@
 import { describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import type { TicSnapshot } from '@currena/core';
+import type { IndicatorReading } from '@currena/core';
 import { TicSnapshotSchema } from '@currena/core';
 import { insightsCopyEn } from '../../i18n/insights-copy-en';
 import { insightsCopyFa } from '../../i18n/insights-copy-fa';
-import { TicSection, type TicLoadState } from './TicSection';
+import { TicSection, TicCustodyCard, type TicLoadState } from './TicSection';
+import { ALWAYS_POSITION_IDS, HIDDEN_FROM_LANE_IDS } from './config/sections';
 
 /** The fresh "now" (the fixture's dataMonth 2026-08 is 61 days old). */
 const FRESH_NOW = () => new Date('2026-10-31T12:00:00Z');
@@ -282,5 +284,81 @@ describe('TicSection', () => {
     );
     expect(screen.getByText(/real transactions \(what investors actually bought or sold\)/)).toBeTruthy();
     cleanup();
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * TicCustodyCard — the weekly custody card (S2-M2.4's spec item 6,
+ * FRED WSEFINTL1: "standard indicator card with 10-year position").
+ * The reading below is the provider's own latest verified observation
+ * (2026-10-28 Wednesday level, 2,838,071 $M — the live fredgraph.csv
+ * read 2026-10-31 22:55 UTC).
+ * ------------------------------------------------------------------ */
+
+describe('TicCustodyCard (the weekly custody card)', () => {
+  const CUSTODY: IndicatorReading = {
+    id: 'nyfed-custody',
+    value: 2838071,
+    asOf: '2026-10-28',
+    status: 'context',
+    sourceName: 'Federal Reserve via FRED (WSEFINTL1, H.4.1 memorandum item)',
+    sourceUrl: 'https://fred.stlouisfed.org/series/WSEFINTL1',
+    change30d: -0.21,
+    percentile10y: 0.9,
+  } as IndicatorReading;
+
+  const noop = () => {};
+
+  it('renders the standard row: name, the walcl-twin trillion display, the 10-year position', () => {
+    render(
+      <TicCustodyCard
+        reading={CUSTODY}
+        copy={insightsCopyEn}
+        numberLocale="en-US"
+        onOpenDetails={noop}
+        pinned={false}
+      />,
+    );
+    // The card's own name (the spec's title).
+    expect(screen.getByText('Foreign official holdings at the New York Fed (weekly)')).toBeTruthy();
+    // $ millions → the walcl display: "US$2.84 trillion".
+    expect(screen.getByText(/US\$2\.84/)).toBeTruthy();
+    // ALWAYS_POSITION_IDS: the row carries its 10-year position bar.
+    expect(ALWAYS_POSITION_IDS.has('nyfed-custody')).toBe(true);
+    expect(screen.getByRole('meter', { name: insightsCopyEn.ui.position10y })).toBeTruthy();
+    cleanup();
+  });
+
+  it('renders the fa twin (Persian digits, the suffix-only trillion form)', () => {
+    render(
+      <TicCustodyCard
+        reading={CUSTODY}
+        copy={insightsCopyFa}
+        numberLocale="fa-IR"
+        onOpenDetails={noop}
+        pinned={false}
+      />,
+    );
+    expect(screen.getByText('دارایی‌های رسمی خارجی در فدرال رزرو نیویورک (هفتگی)')).toBeTruthy();
+    // 2838071 × 1e-6 → ۲٫۸۴ (Persian digits) with the «تریلیون دلار» suffix word.
+    expect(screen.getByText('۲٫۸۴')).toBeTruthy();
+    expect(screen.getByText('تریلیون دلار')).toBeTruthy();
+    cleanup();
+  });
+
+  it('renders nothing when the reading is absent (loading/held — never a made-up row)', () => {
+    const { container } = render(
+      <TicCustodyCard reading={null} copy={insightsCopyEn} numberLocale="en-US" onOpenDetails={noop} pinned={false} />,
+    );
+    expect(container.querySelector('[data-tic-custody]')).toBeNull();
+    expect(container.textContent).toBe('');
+    cleanup();
+  });
+
+  it('is the one-surface rule member: hidden from the borrowing-costs lane (renders only in the TIC slot)', () => {
+    expect(HIDDEN_FROM_LANE_IDS.has('nyfed-custody')).toBe(true);
+    // Its definition still belongs to the borrowing-costs group (the gauge
+    // membership is untouched — context, never a vote).
+    expect(ALWAYS_POSITION_IDS.has('nyfed-custody')).toBe(true);
   });
 });

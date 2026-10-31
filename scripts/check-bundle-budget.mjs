@@ -782,7 +782,16 @@ const BUDGETS = [
   // glossary terms (the spec's required list) riding BOTH layer-1
   // dictionaries. Measured 1172.03/276.21; raw bumps 1170 → 1175, gz stays.
   // Justified in CHANGELOG §2026-10-31x.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1175_000, gz: 277_000, label: 'Insights lazy chunk' },
+  // 2026-10-31y (gap-closure S2-M2.4 completion): 1179/278 — the weekly
+  // custody card (FRED WSEFINTL1, the spec's item 6) on TOP of the M2.5
+  // glossary/narrator growth: the TicCustodyCard wrapper + the CompactRow
+  // import path into TicSection.tsx + the full bilingual indicator copy
+  // (2 dictionaries × 13 card keys + the layer1 entry, round-61). Measured
+  // 1178.46/277.97 at the MERGED tree (the M2.5 session's 1172.03 baseline
+  // + this card's copy + wiring). The spec-mandated card; the walcl-twin
+  // rides existing machinery only.
+  // Justified in CHANGELOG §2026-10-31y.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1179_000, gz: 278_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

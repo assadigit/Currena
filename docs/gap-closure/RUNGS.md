@@ -13,7 +13,7 @@ update this table in the same commit.**
 | hourly `:13` | live prices | Yahoo quotes for the Prices board → `insights:prices-live:v1` (write-only-if-changed) | 4 fetches | 0–1 |
 | hourly `:50` | narrator | Layer-2 states from the public projection; ≤3 model calls; one write when a hash changed | ~5 reads + ≤3 AI calls | 0–1 |
 | hourly (watchdog minute) | ingest watchdog | re-dispatches the GHA ingest when it silently stops | 1–2 | 0 |
-| `04:10` | **main ingest** | collect every source, write snapshot + public projection + stage + status. **FULL — never add fetches** (the free-tier budget table) | **~47/50** | ~5 |
+| `04:10` | **main ingest** | collect every source, write snapshot + public projection + stage + status. **FULL — never add fetches** (the free-tier budget table). *(S2-M2.4 completion, 2026-10-31: the weekly custody series `WSEFINTL1` joined the existing mixed-frequency FRED bulk group beside `WALCL` — one more id inside an EXISTING request, so the subrequest count is UNCHANGED (~47/50); the group stays 11/12 ids. Not a new fetch — but do not add more ids to this path casually; the ZIP truncates past ~12.)* | **~47/50** | ~5 |
 | `04:20` | rung 2 | the gap-audit additions (MOF daily; CFTC Saturdays; the monthly trio first-of-month; bootstraps) — fetch, patch, re-stage | ~10–36 | ~4 |
 | `04:25` | history daily-a | daily-cadence histories, first half (the exceededCpu split) | ~26 | ~24 |
 | `04:27` | history daily-b | daily-cadence histories, second half | ~26 | ~23 |

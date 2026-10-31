@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-import { fetchFredSeries, FRED_SERIES, fredSeriesUrl } from './fred';
+import { FRED_BULK_ALL_IDS, FRED_BULK_GROUPS, fetchFredSeries, FRED_SERIES, fredSeriesUrl } from './fred';
 import { fetchFrankfurterSeries, frankfurterTimeseriesUrl } from './frankfurter';
 import { absDataUrl, ABS_SERIES, fetchAbsSeries } from './abs';
 import { fetchGoldApiSpot, goldApiPriceUrl } from './goldapi';
@@ -96,8 +96,32 @@ describe('fred adapter', () => {
     // 2026-10-25 M6 Wave-3 round adds MORTGAGE30US, WALCL, RSAFS, PERMIT,
     // CFNAI, JTSJOL, T5YIE and AHETPI → 44, and the Wave-4 BoE fix
     // RETIRES IRSTCI01GBM156N (boe-rate moved to the BoE's own page) → 43;
-    // the 2026-10-26 gap-audit build adds T10Y3M (A-1) → 44.
-    expect(Object.values(FRED_SERIES)).toHaveLength(44);
+    // the 2026-10-26 gap-audit build adds T10Y3M (A-1) → 44; the 2026-10-31
+    // gap-closure S2-M2.4 round adds WSEFINTL1 (the weekly custody card) → 45.
+    expect(Object.values(FRED_SERIES)).toHaveLength(45);
+  });
+
+  it('rides WSEFINTL1 in the mixed-frequency bulk group beside WALCL (S2-M2.4: zero new subrequests)', () => {
+    // The custody series must join its WALCL twin in the mixed-frequency
+    // group (both Fed H.4.1-family Wednesday-level weeklies — the live
+    // 11-id probe 2026-10-31 verified the ZIP member weekly,_as_of_wednesday
+    // carries both columns). It must appear in exactly one group, and every
+    // group must stay at ≤ 12 ids (the fredgraph ZIP truncates past ~12).
+    const groupsWithCustody = FRED_BULK_GROUPS.filter((g) =>
+      g.seriesIds.includes(FRED_SERIES.custodyHoldings),
+    );
+    expect(groupsWithCustody).toHaveLength(1);
+    expect(groupsWithCustody[0]!.seriesIds).toContain(FRED_SERIES.walcl);
+    expect(
+      FRED_BULK_GROUPS.filter((g) => g.seriesIds.includes(FRED_SERIES.walcl)),
+    ).toHaveLength(1);
+    for (const g of FRED_BULK_GROUPS) {
+      expect(g.seriesIds.length).toBeLessThanOrEqual(12);
+    }
+    // The bulk registry covers every series exactly once (no orphans, no
+    // double registration — the collect layer asserts coverage).
+    expect(new Set(FRED_BULK_ALL_IDS).size).toBe(FRED_BULK_ALL_IDS.length);
+    expect(FRED_BULK_ALL_IDS).toContain(FRED_SERIES.custodyHoldings);
   });
 
   it('parses the 10y−3m curve leg from the recorded T10Y3M capture (A-1, 2026-10-26)', async () => {

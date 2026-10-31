@@ -50,10 +50,14 @@ describe('Step-2 §B2: COMPANIONS (comparison lines inside parent cards)', () =>
 });
 
 describe('Step-2 §B5: ALWAYS_POSITION_IDS (the VIX card always shows its 10-year position)', () => {
-  it('only the VIX rides the always-position set', () => {
+  it('the VIX and the weekly custody card ride the always-position set', () => {
     expect(ALWAYS_POSITION_IDS.has('vix')).toBe(true);
+    // gap-closure S2-M2.4: the spec's "standard indicator card with 10-year
+    // position" — the custody row carries its position bar (the VIX
+    // precedent, Step-2 §B5).
+    expect(ALWAYS_POSITION_IDS.has('nyfed-custody')).toBe(true);
     expect(ALWAYS_POSITION_IDS.has('us-unemployment')).toBe(false);
-    expect(ALWAYS_POSITION_IDS.size).toBe(1);
+    expect(ALWAYS_POSITION_IDS.size).toBe(2);
   });
 
   it('the new cards have display configs (units: percent/points, never percent-of-percent)', () => {

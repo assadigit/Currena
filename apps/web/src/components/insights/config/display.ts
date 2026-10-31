@@ -151,6 +151,9 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   // ("325k vacancies", 0dp — the raw unit is already thousand).
   'mortgage-30y': { decimals: 2, unit: 'percent' },
   walcl: { decimals: 2, unit: 'usd-tr', scale: 1e-6 },
+  // gap-closure S2-M2.4: the custody card — the walcl convention ($ millions
+  // → "US$2.84 trillion", 2dp).
+  'nyfed-custody': { decimals: 2, unit: 'usd-tr', scale: 1e-6 },
   'retail-sales': { decimals: 1, unit: 'usd-bn', scale: 0.001 },
   'housing-permits': { decimals: 2, unit: 'permits', scale: 0.001 },
   cfnai: { decimals: 2, unit: 'index' },

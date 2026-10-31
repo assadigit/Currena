@@ -498,6 +498,13 @@ export const IndicatorIdSchema = z.enum([
   'terms-of-trade',
   'iron-ore',
   'gold-aud',
+  // gap-closure S2-M2.4 (2026-10-31): Treasuries held in custody at the
+  // New York Fed for foreign official accounts — the WEEKLY freshness
+  // bridge beside the monthly TIC country table (no country split; the
+  // card's own caveat says so). FRED WSEFINTL1 (public domain per the
+  // series page's own license tag) — context, borrowing-costs; renders
+  // inside the "Who holds US government debt" section (HIDDEN_FROM_LANE).
+  'nyfed-custody',
 ]);
 export type IndicatorId = z.infer<typeof IndicatorIdSchema>;
 

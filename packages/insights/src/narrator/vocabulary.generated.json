@@ -3,9 +3,9 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "4c42c7a886adbcdb625b2383da07059406852b9968d62b71adc640f4a81d1fa2",
-    "faSha256": "3028a013fa9022ec852db99be01f3133f524b1a5264a1a9c9fcbca18f96a5ec3",
-    "indicatorCount": 131,
+    "enSha256": "352a3540f64728444cbc00b58a1415b9c56d07b45420d8e58a0779bfba5d24d6",
+    "faSha256": "e30c1a047d57de2798a46982789628a682f96962a95557714fad3ed5cff8e6f5",
+    "indicatorCount": 132,
     "glossaryCount": 28
   },
   "en": {
@@ -2862,6 +2862,18 @@
           }
         ],
         "glossaryTerms": []
+      },
+      "nyfed-custody": {
+        "plainName": "Foreign official holdings, New York Fed",
+        "oneLine": "The US government debt that foreign central banks and governments keep at the New York Fed.",
+        "ifRising": "Foreign central banks and governments are usually adding to their US Treasury holdings.",
+        "ifFalling": "Foreign central banks and governments are usually reducing them.",
+        "connections": [],
+        "glossaryTerms": [
+          "treasury-securities",
+          "foreign-official-holdings",
+          "central-bank"
+        ]
       }
     },
     "glossary": {
@@ -5871,6 +5883,18 @@
           }
         ],
         "glossaryTerms": []
+      },
+      "nyfed-custody": {
+        "plainName": "دارایی‌های رسمی خارجی در فدرال نیویورک",
+        "oneLine": "بدهی دولت آمریکا که بانک‌های مرکزی و دولت‌های خارجی در فدرال رزرو نیویورک نگه می‌دارند.",
+        "ifRising": "بانک‌های مرکزی و دولت‌های خارجی معمولاً به اوراق خزانه‌داری آمریکا می‌افزایند.",
+        "ifFalling": "بانک‌های مرکزی و دولت‌های خارجی معمولاً آن را کم می‌کنند.",
+        "connections": [],
+        "glossaryTerms": [
+          "treasury-securities",
+          "foreign-official-holdings",
+          "central-bank"
+        ]
       }
     },
     "glossary": {

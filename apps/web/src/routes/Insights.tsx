@@ -60,12 +60,13 @@ import { Together } from '../components/insights/Together';
 import { WorldMarkets } from '../components/insights/WorldMarkets';
 import { CompaniesTable } from '../components/insights/CompaniesTable';
 import { WorldCurrencies } from '../components/insights/WorldCurrencies';
-import { TicSection } from '../components/insights/TicSection';
+import { TicSection, TicCustodyCard } from '../components/insights/TicSection';
 import { DollarStrengthCards } from '../components/insights/world-currencies/DollarStrength';
 import { useInsightsCopy } from '../components/insights/useInsightsCopy';
 import {
   PINNED_STORAGE_KEY,
   SIGNALS_ENABLED,
+  dailyPeersOf,
   definitionFor,
   formatPinnedStorage,
   parsePinnedIds,
@@ -347,6 +348,24 @@ export function Insights() {
     if (state.kind !== 'ready') return [];
     return state.snapshot.readings.filter((r) => pinned.has(r.id) && (visibleIds === null || visibleIds.has(r.id)));
   }, [state, pinned, visibleIds]);
+
+  // gap-closure S2-M2.4 (the spec's weekly custody card): the FRED
+  // WSEFINTL1 reading that closes the "Who holds US government debt"
+  // section — the timely weekly companion to the monthly TIC country
+  // table. Renders as a standard CompactRow (with its 10-year position
+  // bar, ALWAYS_POSITION_IDS) directly below the TicSection inside the
+  // same ticSlot; absent while the snapshot loads or the series is held
+  // (the one-surface rule — HIDDEN_FROM_LANE_IDS keeps it out of the
+  // borrowing-costs lane); honours the search filter like every card.
+  const custodyReading = useMemo<IndicatorReading | null>(() => {
+    if (state.kind !== 'ready') return null;
+    if (visibleIds !== null && !visibleIds.has('nyfed-custody')) return null;
+    return state.snapshot.readings.find((r) => r.id === 'nyfed-custody') ?? null;
+  }, [state, visibleIds]);
+  const dailyPeers = useMemo(() => {
+    if (state.kind !== 'ready') return undefined;
+    return dailyPeersOf(state.snapshot.readings);
+  }, [state]);
 
   // P1/R19: the sticky section nav — the Signals pill joins the row (the
   // built page had the section but no pill) and every pill expands its
@@ -643,12 +662,27 @@ export function Insights() {
             narrativeVisible={narrativeVisible}
             locale={locale}
             ticSlot={
-              <TicSection
-                state={ticState}
-                copy={copy}
-                locale={locale}
-                numberLocale={numberLocale}
-              />
+              <>
+                <TicSection
+                  state={ticState}
+                  copy={copy}
+                  locale={locale}
+                  numberLocale={numberLocale}
+                />
+                {/* gap-closure S2-M2.4: the weekly custody card (FRED
+                 * WSEFINTL1) — the standard indicator card that closes the
+                 * TIC section: weekly and current beside the ~6–7-week-lag
+                 * country table, no country split (the card's own copy says
+                 * so). One row, the lane's own anatomy. */}
+                <TicCustodyCard
+                  reading={custodyReading}
+                  copy={copy}
+                  numberLocale={numberLocale}
+                  onOpenDetails={openDetails}
+                  pinned={pinned.has('nyfed-custody')}
+                  peers={dailyPeers}
+                />
+              </>
             }
             australiaSlot={
               <MoneyPanel

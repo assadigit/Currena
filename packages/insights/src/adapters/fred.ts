@@ -196,6 +196,13 @@ export const FRED_SERIES = {
   // data/fred-copyright.json) ----
   mortgage30y: 'MORTGAGE30US', // mortgage-30y: 30y fixed mortgage average, weekly (citation-required — Freddie Mac)
   walcl: 'WALCL', // walcl: Fed total assets, weekly $m (public domain)
+  // gap-closure S2-M2.4 (2026-10-31): the weekly custody card — rides the
+  // SAME mixed-frequency bulk group as WALCL (both Fed H.4.1-family
+  // Wednesday-level weeklies; the live 11-id probe 2026-10-31 22:55 UTC
+  // answered the ZIP member weekly,_as_of_wednesday.csv carrying BOTH
+  // columns). ZERO new subrequests — one more id inside an existing
+  // request.
+  custodyHoldings: 'WSEFINTL1', // nyfed-custody: NY Fed custody holdings for foreign official accounts, weekly $m (public domain)
   retailSales: 'RSAFS', // retail-sales: advance retail sales, monthly $m (public domain)
   housingPermits: 'PERMIT', // housing-permits: new units authorized, monthly k SAAR (public domain)
   cfnai: 'CFNAI', // cfnai: Chicago Fed National Activity Index, monthly (citation-required)
@@ -356,6 +363,11 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
       FRED_SERIES.pceCoreIndex,
       FRED_SERIES.mortgage30y,
       FRED_SERIES.walcl,
+      // gap-closure S2-M2.4: the custody series joins its WALCL twin in
+      // this group (11/12 — the ZIP truncates past ~12 ids). The live
+      // 11-id probe (2026-10-31): the weekly,_as_of_wednesday member
+      // carries WALCL and WSEFINTL1 side by side, latest 2026-10-28.
+      FRED_SERIES.custodyHoldings,
       FRED_SERIES.cfnai,
       FRED_SERIES.jobOpenings,
       FRED_SERIES.averageHourlyEarnings,

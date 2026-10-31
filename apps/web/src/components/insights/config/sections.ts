@@ -82,10 +82,14 @@ export const US_GLOBAL_REACH_IDS: readonly IndicatorId[] = [
  * R9-04 + R9-07: ids rendered in a special container instead of their
  * lane group — the QuestionGroup filter skips them so no card renders
  * twice. (Companion-ONLY ids are separate — they always ride a parent.)
+ * gap-closure S2-M2.4: nyfed-custody renders inside the "Who holds US
+ * government debt" section (the ticSlot composition in Insights.tsx),
+ * not in the borrowing-costs lane — one reading, one surface.
  */
 export const HIDDEN_FROM_LANE_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   ...DOLLAR_STRENGTH_IDS,
   ...US_GLOBAL_REACH_IDS,
+  'nyfed-custody',
 ]);
 
 /**
@@ -155,8 +159,13 @@ export function companionParentOf(id: IndicatorId): IndicatorId | null {
  * Step-2 add-list §B5: ids whose card ALWAYS shows the 10-year position bar
  * (the VIX card's interim presentation — "the value and its 10-year
  * position" — before the Step-3 verdict rules fix the calm/nervous words).
+ * gap-closure S2-M2.4: the weekly custody card joins — the spec's
+ * "standard indicator card with 10-year position".
  */
-export const ALWAYS_POSITION_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>(['vix']);
+export const ALWAYS_POSITION_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
+  'vix',
+  'nyfed-custody',
+]);
 
 export function definitionsForGroup(
   section: InsightsSection,

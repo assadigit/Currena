@@ -558,8 +558,9 @@ describe('copy dictionaries', () => {
     // monthly trio oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10) → 100;
     // the 2026-10-29 owner round adds usdaed (the UAE dirham card) → 101;
     // the 2026-10-31 Session-3 round adds breakeven-tilt (the G2 interplay
-    // card) → 102.
-    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(102);
+    // card) → 102; the 2026-10-31 gap-closure S2-M2.4 round adds
+    // nyfed-custody (the weekly custody card) → 103.
+    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(103);
   });
 
   // Fix spec T-07 (2026-10-15): the CI-side corpus scan — the ingest's

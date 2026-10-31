@@ -1139,6 +1139,65 @@
       }
     },
     {
+      "id": "nyfed-custody",
+      "title": "Foreign official holdings at the New York Fed (weekly)",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Federal Reserve via FRED (WSEFINTL1, H.4.1 memorandum item)",
+        "url": "https://fred.stlouisfed.org/series/WSEFINTL1",
+        "seriesIdOrTable": "FRED:WSEFINTL1 (Treasuries held in custody for foreign official accounts, Wednesday level, $ millions)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/WSEFINTL1",
+      "methodUrl": "https://fred.stlouisfed.org/series/WSEFINTL1",
+      "whatItIs": "Securities held in custody at the Federal Reserve Bank of New York for foreign official accounts (the H.4.1 memorandum item via FRED): Treasury securities kept at the Fed on behalf of foreign central banks and governments. Weekly, Wednesday level.",
+      "whatItIsnt": "The custody total has no country split: it cannot say which country is buying or selling (the monthly Treasury TIC table carries that, with its own six-to-seven-week lag), and some official holders keep securities somewhere other than the Fed.",
+      "trackRecordNote": "The series climbed with foreign reserve growth for two decades and has stepped lower in the 2022-24 tightening round.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 21 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:WSEFINTL1"
+        ]
+      },
+      "unit": "usd-tr",
+      "changeUnit": "percent",
+      "cadence": "weekly",
+      "maxAgeDays": 21,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field reads https://fred.stlouisfed.org/legal/#copyright-public-domain (Federal Reserve Board H.4.1 memorandum item: securities in custody for foreign and international accounts; series page read live 2026-10-31, the S2-M2.4 custody-card scan) (checked 2026-10-31) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
       "id": "us-cpi-yoy",
       "title": "US inflation (yearly)",
       "area": {

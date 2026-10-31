@@ -51,10 +51,10 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
     expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
   });
 
-  it('fred: 40 series, worst level L2 across its L0/L2 mix, deduped licences (2026-10-25 M6: +8 Wave-3 series, -boe-rate to the BoE row; the 2026-10-26 gap-audit build adds T10Y3M, A-1)', () => {
+  it('fred: 41 series, worst level L2 across its L0/L2 mix, deduped licences (2026-10-25 M6: +8 Wave-3 series, -boe-rate to the BoE row; the 2026-10-26 gap-audit build adds T10Y3M, A-1; the 2026-10-31 gap-closure S2-M2.4 round adds WSEFINTL1, the weekly custody card)', () => {
     const fred = rows.find((r) => r.provider === 'fred');
     expect(fred).toBeDefined();
-    expect(fred!.seriesCount).toBe(39); // A-2 moves jgb-10y to the mof row
+    expect(fred!.seriesCount).toBe(40); // A-2 moves jgb-10y to the mof row; S2-M2.4 adds WSEFINTL1
     expect(fred!.levels).toEqual(['L0', 'L2']);
     expect(fred!.worstLevel).toBe('L2');
     // 3 distinct licence names across the 16 series (public-domain,

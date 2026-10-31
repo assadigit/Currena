@@ -1,6 +1,6 @@
 {
   "_comment": "T-16 FRED copyright scan. Three classes (FRED legal, read 2026-10-21): public-domain -> public; citation-required (copyrightNotice=true) -> display-permitted WITH \"Source: publisher via FRED\" attribution; pre-approval (license contains 'pre-approval') -> private-only, no fetch, no display until the publisher's permission is recorded (D-44, 2026-10-24). Re-run the scan when a series is added.",
-  "scannedOn": "2026-10-24",
+  "scannedOn": "2026-10-31",
   "records": [
     {
       "seriesId": "T10Y2Y",
@@ -393,6 +393,14 @@
       "checkedOn": "2026-10-25",
       "evidence": "FRED license tag: #copyright-public-domain \u00b7 page text: \"Public Domain: Citation Requested\" (BLS average hourly earnings; series page read live 2026-10-25, matching the deploying session's scan)",
       "url": "https://fred.stlouisfed.org/series/AHETPI"
+    },
+    {
+      "seriesId": "WSEFINTL1",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-10-31",
+      "evidence": "FRED license tag: #copyright-public-domain \u00b7 the series page's own schema.org Dataset license field reads https://fred.stlouisfed.org/legal/#copyright-public-domain (Federal Reserve Board H.4.1 memorandum item: securities in custody for foreign and international accounts; series page read live 2026-10-31, the S2-M2.4 custody-card scan)",
+      "url": "https://fred.stlouisfed.org/series/WSEFINTL1"
     }
   ]
 }

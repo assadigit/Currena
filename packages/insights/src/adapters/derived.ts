@@ -365,6 +365,11 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // M6 Wave 3 (2026-10-25): the mortgage leg of the transmission chain —
   // the US household's own borrowing cost (the au-home-loan US twin).
   put('mortgage-30y', fred.MORTGAGE30US);
+  // gap-closure S2-M2.4 (2026-10-31): the weekly custody card — rides the
+  // same mixed-frequency FRED bulk request as WALCL (zero new fetches);
+  // renders inside the TIC section as the weekly freshness bridge beside
+  // the monthly country table.
+  put('nyfed-custody', fred.WSEFINTL1);
   put('us-2y', fred.DGS2);
   // M5 Wave 2 (2026-10-24): the euro long end's daily fix — the AAA 10y
   // beside its policy-rate sibling (the OECD bund mirror keeps its honest
@@ -945,6 +950,12 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     url: 'https://fred.stlouisfed.org/series/MORTGAGE30US',
   },
   walcl: { name: 'Federal Reserve via FRED (WALCL, H.41 table)', url: 'https://fred.stlouisfed.org/series/WALCL' },
+  // gap-closure S2-M2.4 — the custody card's source line (the FRB H.4.1
+  // memorandum item via FRED).
+  'nyfed-custody': {
+    name: 'Federal Reserve via FRED (WSEFINTL1, H.4.1 memorandum item)',
+    url: 'https://fred.stlouisfed.org/series/WSEFINTL1',
+  },
   'retail-sales': {
     name: 'US Census Bureau via FRED (RSAFS)',
     url: 'https://fred.stlouisfed.org/series/RSAFS',
