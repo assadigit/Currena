@@ -58,6 +58,13 @@ The owner's "go" opened the session S5's decision log prescribed
   lives only in the repo Actions secret; the GitHub side is fully
   unblocked). The moment it lands: `pnpm gates` → deploy-lock check
   → `wrangler deploy` → live-verify, per DEPLOY.md.
+- **Landed (postscript):** branch pushed, **PR #10 opened + merged as
+  `ca4be2e`** (CI run 368 green — the full gates on the runner, 1m37s
+  class); main pulled and verified at the merge tip. The built Insights
+  chunk carries the promoted table (EN + fa names + the table entry,
+  byte-checked). The deploy + the grown-corpus refresh remain the two
+  open items, both waiting on a Cloudflare token (the scheduled
+  2026-11-02 04:30 UTC re-check is armed for the corpus side).
 
 ## [2026-10-31i] — Gold Program S5: the fourth credential round CLOSED everything — deployed live (d77e9139, the honest note on currena.ir), C5 validated (content-identical), Actions secret rotated
 
