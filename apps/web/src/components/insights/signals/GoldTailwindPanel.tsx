@@ -37,7 +37,7 @@
 import { useMemo } from 'react';
 import type { GoldSummary, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { GOLD_LANE_VOTERS, goldTailwindScore, type GoldTailwindLabel } from '@currena/insights';
+import { GOLD_LANE_VOTERS, breakevenTiltLean, goldTailwindScore, type GoldTailwindLabel } from '@currena/insights';
 import { Wind } from 'lucide-react';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
@@ -66,6 +66,14 @@ export function GoldTailwindPanel({
   // (includes the live-prices overlay's refresh); the headline numbers
   // prefer the served goldSummary and fall back to the same derivation.
   const derived = useMemo(() => goldTailwindScore(readings), [readings]);
+  // Session 3 (G2): the inflation lane's context phrase — the breakeven
+  // tilt reading's lean (pure selection in the insights package; the panel
+  // never chooses copy). Absent/stale tilt reading → no phrase, never a
+  // guess (old snapshots render exactly as before).
+  const tiltLean = useMemo(
+    () => breakevenTiltLean(readings.find((r) => r.id === 'breakeven-tilt')),
+    [readings],
+  );
   const s = goldSummary ?? {
     netScore: derived.netScore,
     label: derived.label,
@@ -146,6 +154,7 @@ export function GoldTailwindPanel({
               {g.tailwindVoters + g.headwindVoters > 0
                 ? ` (${formatNumber(g.tailwindVoters + g.headwindVoters, numberLocale, { maximumFractionDigits: 0 })})`
                 : ''}
+              {g.lane === 'inflation' && tiltLean !== null ? ` · ${C.tiltWords[tiltLean]}` : ''}
             </bdi>
           </li>
         ))}

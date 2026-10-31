@@ -726,7 +726,15 @@ const BUDGETS = [
   // EN swap ≈ 0), so the growth IS the reviewed Persian. Panels also
   // moved to the signals card (same chunk). Justified in CHANGELOG
   // §2026-10-31b. Entry chunk untouched at 294.45/88.48.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1130_000, gz: 267_000, label: 'Insights lazy chunk' },
+  //
+  // 2026-10-31d Gold Program S3 bump (measured 1134.64/266.84 → budget
+  // 1136/267.5): the G2 breakeven-tilt card's audited copy growth — the
+  // full EN+fa card copy (12 fields × 2) + the Layer-1 entries (15 × 2)
+  // + the gold panel's tiltWords (3 × 2) + the tiltLean wiring, all
+  // riding this chunk (round-54, the audited Persian-copy growth the
+  // spec's §4 D-16 rule names). gz stays inside 267. Justified in
+  // CHANGELOG §2026-10-31d.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1136_000, gz: 267_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {

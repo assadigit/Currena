@@ -1042,6 +1042,21 @@ const LAYER1 = {
       ],
       glossaryTerms: ['inflation', 'bond'],
     },
+    // Session 3 (GOLD_FRED_GAPFILL_SPEC G2, 2026-10-31): the interplay
+    // card's plain-language entry — the market's priced acceleration of
+    // inflation (forward minus spot). Context only; never a gold voter.
+    'breakeven-tilt': {
+      plainName: 'The inflation tilt, near vs far',
+      oneLine: 'Whether markets price inflation building or fading into the far five years.',
+      ifRising: 'Markets lean toward inflation building into the far window, a mood that tends to lift long-run hedging.',
+      ifFalling: 'Markets lean toward inflation fading after the near window, reading today’s pressure as temporary.',
+      connections: [
+        { with: 't5yie', text: 'The near leg of the tilt: what markets price for the first five years.', strength: 'reliable' },
+        { with: 'breakeven-5y5y', text: 'The far leg of the tilt: the window beyond it.', strength: 'reliable' },
+        { with: 'breakeven-10y', text: 'The ten-year read blends both windows the tilt separates.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['inflation', 'breakeven'],
+    },
     't5yie': {
       plainName: 'US inflation, five years ahead',
       oneLine: 'The US inflation rate markets expect over the next five years.',
@@ -2161,6 +2176,31 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'It is derived from market prices, which move on liquidity and hedging as well as genuine belief.',
     forYou:
       'A gauge of long-run inflation trust: the number bond markets actually price every day.',
+  },
+  // Session 3 (GOLD_FRED_GAPFILL_SPEC G2, 2026-10-31): the interplay card —
+  // the 5y5y forward minus the 5y spot. Context beside the family's other
+  // two cards; the gold panel's inflation lane carries its phrase.
+  'breakeven-tilt': {
+    name: 'The market’s inflation tilt',
+    ticker: '5y5y − 5y',
+    oneLiner:
+      'Whether markets price inflation building or fading between the near five years and the far five years.',
+    lines: {
+      highRising: 'Markets lean toward inflation building into the far window, and the tilt is widening.',
+      highEasing: 'The tilt still prices more inflation in the far window, but the gap is closing.',
+      typical: 'The tilt between near and far inflation pricing sits near zero: no priced acceleration either way.',
+      low: 'Markets lean toward inflation fading after the near window: today’s pressure priced as temporary.',
+    },
+    whatItIs:
+      'The 5y5y forward breakeven minus the 5-year spot breakeven (FRED’s T5YIFR − T5YIE, both already collected): positive means the market prices more inflation in years five to ten than in years one to five.',
+    whyItMatters:
+      'The inflation lane’s scored card reads one point of a three-point family; the tilt shows whether the market expects the pressure to build or fade further out — the interplay the lane’s word alone cannot say.',
+    tendedToMean:
+      'A widening tilt has often accompanied reflation narratives; a deeply negative tilt reads as the market pricing today’s pressure as temporary.',
+    cantTell:
+      'It is a small difference of two market prices: liquidity and hedging can move it without any real change in belief.',
+    forYou:
+      'Context for the gold panel’s inflation lane: building expectations tend to feed hedge demand; fading ones tend to remove it.',
   },
   'stress-stlfsi': {
     name: 'Stress in US money markets',
@@ -6204,6 +6244,14 @@ export const insightsCopyEn = {
         cool: 'cooling',
         mixed: 'mixed',
         unreadable: 'no read',
+      },
+      // Session 3 (G2): the inflation lane's context phrase, fed by the
+      // breakeven-tilt reading (breakevenTiltLean — pure, the panel never
+      // chooses copy). Rendered beside the lane's hot/cool word.
+      tiltWords: {
+        building: 'expectations building',
+        fading: 'expectations fading',
+        steady: 'expectations steady',
       },
       votersTitle: 'Firing drivers',
       votersNone: 'None firing',

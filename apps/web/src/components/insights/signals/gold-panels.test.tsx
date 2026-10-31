@@ -120,6 +120,10 @@ describe('gold panel copy — both dictionaries cover the whole engine vocabular
       }
       expect(g.impactWords.tailwind).toBeTruthy();
       expect(g.impactWords.headwind).toBeTruthy();
+      // Session 3 (G2): the inflation lane's tilt phrase keys — both locales.
+      for (const t of ['building', 'fading', 'steady'] as const) {
+        expect(g.tiltWords[t], `${name} tilt ${t}`).toBeTruthy();
+      }
       // the voter names cover EXACTLY the 20-voter table
       const tableIds = GOLD_LANE_VOTERS.map((v) => v.id as string);
       expect(Object.keys(g.voterNames).sort()).toEqual([...new Set(tableIds)].sort());
@@ -234,6 +238,108 @@ describe('GoldTailwindPanel — the fa locale renders the reviewed Persian copy'
     expect(screen.getByText('فعلاً قابل ارزیابی نیست')).toBeTruthy();
     expect(screen.getByText(/نمرهٔ خالص؛ در حال حاضر هیچ عاملی فعال نیست/)).toBeTruthy();
     expect(screen.getByText('۰ موافق · ۰ مخالف · ۰ مختلط')).toBeTruthy();
+  });
+});
+
+describe('GoldTailwindPanel — Session 3 (G2): the inflation lane tilt phrase', () => {
+  // A tilt reading like the live snapshot's (T5YIFR 2.23 − T5YIE 2.47).
+  const TILT_READING = reading('breakeven-tilt', { value: -0.24 });
+
+  it('EN: a fading tilt renders beside the lane word', () => {
+    render(
+      <GoldTailwindPanel
+        goldSummary={GOLD_SUMMARY}
+        readings={[...READINGS, TILT_READING]}
+        copy={copy}
+        numberLocale="en-US"
+      />,
+    );
+    expect(screen.getByText('no read · expectations fading')).toBeTruthy();
+  });
+
+  it('EN: a steady tilt (inside the deadband) renders its own word', () => {
+    render(
+      <GoldTailwindPanel
+        goldSummary={GOLD_SUMMARY}
+        readings={[...READINGS, reading('breakeven-tilt', { value: 0.05 })]}
+        copy={copy}
+        numberLocale="en-US"
+      />,
+    );
+    expect(screen.getByText('no read · expectations steady')).toBeTruthy();
+  });
+
+  it('EN: a building tilt renders beside a firing lane word too', () => {
+    const hotSummary: GoldSummary = {
+      ...GOLD_SUMMARY,
+      subGauges: GOLD_SUMMARY.subGauges.map((g) =>
+        g.lane === 'inflation' ? { ...g, reading: 'hot', tailwindVoters: 1, headwindVoters: 0 } : g,
+      ),
+    };
+    render(
+      <GoldTailwindPanel
+        goldSummary={hotSummary}
+        readings={[...READINGS, reading('breakeven-tilt', { value: 0.24 })]}
+        copy={copy}
+        numberLocale="en-US"
+      />,
+    );
+    expect(screen.getByText('running hot (1) · expectations building')).toBeTruthy();
+  });
+
+  it('an S2-era snapshot (no tilt reading) renders the lane EXACTLY as before', () => {
+    const { container } = render(
+      <GoldTailwindPanel goldSummary={GOLD_SUMMARY} readings={READINGS} copy={copy} numberLocale="en-US" />,
+    );
+    const inflation = container.querySelector<HTMLElement>('[data-gold-lane="inflation"]')!;
+    expect(inflation.textContent).toContain('no read');
+    expect(inflation.textContent).not.toContain('·');
+  });
+
+  it('a stale tilt reading renders NO phrase (never a guess)', () => {
+    const { container } = render(
+      <GoldTailwindPanel
+        goldSummary={GOLD_SUMMARY}
+        readings={[...READINGS, reading('breakeven-tilt', { value: -0.24, status: 'stale' })]}
+        copy={copy}
+        numberLocale="en-US"
+      />,
+    );
+    const inflation = container.querySelector<HTMLElement>('[data-gold-lane="inflation"]')!;
+    expect(inflation.textContent).toContain('no read');
+    expect(inflation.textContent).not.toContain('·');
+  });
+
+  it('fa: the Persian tilt phrase renders beside the Persian lane word', () => {
+    render(
+      <GoldTailwindPanel
+        goldSummary={GOLD_SUMMARY}
+        readings={[...READINGS, TILT_READING]}
+        copy={copyFa}
+        numberLocale="fa-IR"
+      />,
+    );
+    const inflation = screen.getByText(/انتظارات در حال فروکش/);
+    expect(inflation.textContent).toContain('قابل ارزیابی نیست');
+  });
+
+  it('fa: a building tilt renders beside the hot lane word', () => {
+    const hotSummary: GoldSummary = {
+      ...GOLD_SUMMARY,
+      subGauges: GOLD_SUMMARY.subGauges.map((g) =>
+        g.lane === 'inflation' ? { ...g, reading: 'hot', tailwindVoters: 1, headwindVoters: 0 } : g,
+      ),
+    };
+    render(
+      <GoldTailwindPanel
+        goldSummary={hotSummary}
+        readings={[...READINGS, reading('breakeven-tilt', { value: 0.24 })]}
+        copy={copyFa}
+        numberLocale="fa-IR"
+      />,
+    );
+    const inflation = screen.getByText(/انتظارات در حال شدت‌گیری/);
+    expect(inflation.textContent).toContain('داغ');
   });
 });
 

@@ -125,6 +125,9 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   sofr: { decimals: 2, unit: 'percent' },
   'us-2y': { decimals: 2, unit: 'percent' },
   'breakeven-10y': { decimals: 2, unit: 'percent' },
+  // Session 3 (G2, 2026-10-31): the breakeven tilt — points, 2dp, like the
+  // other derived points gaps (us-japan-10y-gap's convention).
+  'breakeven-tilt': { decimals: 2, unit: 'points' },
   // M5 Wave 2 (2026-10-24) — the euro long end + the household-cost staples
   // + the EM-pressure pair. The Food index is the publisher's own 2010=100
   // basis (1dp, 'index' like the other publisher indexes); the grains are

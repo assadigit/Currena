@@ -34,7 +34,7 @@ import {
 } from './nbs';
 import { fetchCryptoFng } from './fng';
 import { fetchFrankfurterSeries } from './frankfurter';
-import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredDecadeFrom } from './fred';
+import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredGroupFrom } from './fred';
 import { fetchGoldApiSpot } from './goldapi';
 import { fetchRbaCashRateDecisions, fetchRbaTableText, parseRbaSeriesFromText, type RbaTableKey } from './rba';
 import { fetchTreasuryCurves, treasuryT10y2y } from './treasury';
@@ -149,44 +149,50 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     }
   }
 
-  // FRED — the 2026-10-21 consolidation: FIVE multi-series fredgraph.csv
+  // FRED — the 2026-10-21 consolidation: the multi-series fredgraph.csv
   // requests cover the whole register (~31 series; see FRED_BULK_GROUPS in
   // fred.ts). One failing GROUP fails as a unit (loud row); the individual
   // series that group carried are then simply absent from `fred`, and the
   // affected indicators read stale/unavailable — never wrong data. The
-  // 2026-10-21b CPU fix: only the highest-since trio keeps FULL history —
+  // 2026-10-21b CPU fix: only the highest-since yields keep FULL history —
   // every other group rides the decade window (cosd), halving the parse
   // and every downstream series (the Worker's CPU limit killed the first
   // live run at the stage write).
+  // Session 3 (D-4, GOLD_FRED_GAPFILL_SPEC §2 G1d): the trio SPLIT — the
+  // nominal pair (DGS10/DGS30) keeps the no-cosd full request, DFII10
+  // rides its own cosd=2003-01-02 request (fredGroupFrom). One extra
+  // subrequest per rung; the fallback triggers below are CONTENT-BASED
+  // (absent slots, not group ordinals) so the split cannot shift them.
   const fred: Partial<Record<string, SeriesPoint[]>> = {};
-  const fredGroupFailed = new Set<number>();
   let fredGroupIndex = 0;
   for (const group of FRED_BULK_GROUPS) {
     fredGroupIndex += 1;
-    const from = group.window === 'decade' ? fredDecadeFrom() : undefined;
+    const from = fredGroupFrom(group);
     const label = `bulk group ${fredGroupIndex} (${group.seriesIds.length} series${from !== undefined ? `, from ${from}` : ''}: ${group.seriesIds.join(', ')})`;
     const fetched = await fetchLogged('fred', label, () => fetchFredSeriesBulk(group.seriesIds, {}, from));
     if (fetched) Object.assign(fred, fetched);
-    else fredGroupFailed.add(fredGroupIndex);
   }
 
   /* ---------------- 2026-10-22 reliability round ----------------
    * FALLBACK fills (the owner round's terms: the API stays PRIMARY; these
-   * fetches run ONLY when the primary's bulk group failed). Venue evidence
-   * (2026-10-22): FRED's Akamai edge intermittently answers the multi-series
-   * requests with unparseable bodies from the Cloudflare egress — all five
-   * groups failed one 'unexpected header' parse while FRED itself served
-   * healthy bodies to other venues within the hour. The fallbacks:
+   * fetches run ONLY when the primary's bulk group failed — the content-
+   * based slot checks below, not group ordinals, since the Session-3 trio
+   * split). Venue evidence (2026-10-22): FRED's Akamai edge intermittently
+   * answers the multi-series requests with unparseable bodies from the
+   * Cloudflare egress — all five groups failed one 'unexpected header'
+   * parse while FRED itself served healthy bodies to other venues within
+   * the hour. The fallbacks:
    *
-   *   groups 1/2 (the daily US yield family) → the US Treasury's OWN daily
-   *     par + real yield-curve CSVs — the same numbers FRED republishes
-   *     (DGS2/10/30 = "2/10/30 Yr", DFII10 ≈ the real curve's "10 YR"),
-   *     a day FRESHER in practice. T10Y2Y recomputes as 10Y−2Y (FRED's own
-   *     formula). Two subrequests (nominal + real; the real curve only when
-   *     group 1 — the DFII10 carrier — failed). Current-year CSVs; the
-   *     caller's stored-history merge keeps the 10-year percentile base.
+   *   the US yield family (DGS10/DGS30/DFII10/DGS2/T10Y2Y slots absent) →
+   *     the US Treasury's OWN daily par + real yield-curve CSVs — the same
+   *     numbers FRED republishes (DGS2/10/30 = "2/10/30 Yr", DFII10 ≈ the
+   *     real curve's "10 YR"), a day FRESHER in practice. T10Y2Y recomputes
+   *     as 10Y−2Y (FRED's own formula). Two subrequests (nominal + real;
+   *     the real curve only when the DFII10 slot is empty). Current-year
+   *     CSVs; the caller's stored-history merge keeps the 10-year
+   *     percentile base.
    *
-   *   group 4 (the EIA energy spots) → the U.S. Energy Information
+   *   the EIA energy spots (all three absent) → the U.S. Energy Information
    *     Administration's own daily-spot .xls workbooks — WTI, Henry Hub and
    *     Brent, each the FULL history from the primary source (public
    *     domain). Cross-validated 2026-10-22: EIA 2026-10-20 WTI 107.89 ==
@@ -207,8 +213,11 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     }
   };
 
-  if (fredGroupFailed.has(1) || fredGroupFailed.has(2)) {
-    const needReal = fredGroupFailed.has(1); // group 1 carries DFII10
+  if (fred.DGS10 === undefined || fred.DFII10 === undefined || fred.T10Y2Y === undefined) {
+    // Content-based triggers (the trio split made ordinals fragile): the
+    // nominal pair's group failed (DGS10 absent), DFII10's own group failed
+    // (DFII10 absent), or the daily decade group failed (T10Y2Y absent).
+    const needReal = fred.DFII10 === undefined; // DFII10's own group failed
     const treasury = await fetchLogged(
       'treasury',
       `daily yield curves (${needReal ? 'nominal + real' : 'nominal'}) — FRED fallback`,
@@ -282,7 +291,8 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     }
   }
 
-  if (fredGroupFailed.has(4)) {
+  if (fred.DCOILBRENTEU === undefined && fred.DCOILWTICO === undefined && fred.DHHNGSP === undefined) {
+    // The EIA-commodities group failed as a unit (all three spots absent).
     const wti = await fetchLogged('eia', 'WTI spot (RWTCd.xls) — FRED fallback', () => fetchEiaWti());
     const natgas = await fetchLogged('eia', 'Henry Hub spot (RNGWHHDd.xls) — FRED fallback', () => fetchEiaHenryHub());
     const brentEia = await fetchLogged('eia', 'Brent spot (RBRTEd.xls) — FRED fallback', () => fetchEiaBrent());

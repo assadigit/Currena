@@ -144,14 +144,14 @@ removed, renamed, or its rule/cadence/maxAge/source changes, you MUST:
 A pull request that changes an indicator without updating this section is
 incomplete and will be rejected at review.
 
-### A. The 100 indicators (48 voting [V] + 52 context [C])
+### A. The 102 indicators (48 voting [V] + 54 context [C])
 
 Every indicator below renders as a card on `#/insights`. `[V]` = scored
 (contributes to its gauge's verdict); `[C]` = context (value + 10-year
 position bar, never votes). `maxAge` = staleAfterDays (days before the
 "stale" tag fires; `—` = per-change/manual, never stale by age).
 
-#### GLOBAL (77 indicators, 32 voting)
+#### GLOBAL (79 indicators, 32 voting)
 
 **Borrowing costs** (`borrowing-costs` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -184,6 +184,7 @@ currencies container per R9-04):
 | [V] | `us-japan-10y-gap` | daily | 5 | any-of | derived |
 | [C] | `eur-usd` | daily | 4 | info | frankfurter |
 | [C] | `usdtry` | daily | 4 | info | frankfurter |
+| [C] | `usdaed` | daily | 4 | info | yahoo |
 
 **Growth health** (`growth-health` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -236,23 +237,31 @@ markets table):
 | [C] | `btc-usd` | daily | 2 | info | gold-api |
 | [C] | `gold-btc` | daily | 4 | info | derived |
 
-*Gold Program (2026-10-31, S1+S2+S2.1 — docs/insights/GOLD_SCORE_SPEC.md):
-two derived panels render in the SIGNALS card, directly under the gold
-balance visual («برآیند عوامل مؤثر بر قیمت طلا» — the owner's 2026-10-31
-placement directive; they sat on this strip for one day in S2) — the
-**gold tailwind score** (the macro voters re-cut for gold direction: net
-score, 5-step label, lane counts, the four lane readings, the firing
-drivers) and **model vs reality** (the score's direction vs gold's actual
-30-day move). No new indicator ids, no new votes, no new fetches: the
-panels read the existing scored voters through the pure engine at
-`packages/insights/src/gold-score.ts`; the ingest stamps the compact
-`goldSummary` (optional snapshot field) beside the section summaries, and
-the SPA re-derives the voter list client-side. BILINGUAL since S2.1: the
-copy lives in the web dictionaries (`signals.goldScore` /
+*Gold Program (2026-10-31, S1+S2+S2.1+S3 — docs/insights/GOLD_SCORE_SPEC.md +
+docs/insights/GOLD_FRED_GAPFILL_SPEC.md): two derived panels render in the
+SIGNALS card, directly under the gold balance visual («برآیند عوامل مؤثر بر
+قیمت طلا» — the owner's 2026-10-31 placement directive; they sat on this
+strip for one day in S2) — the **gold tailwind score** (the macro voters
+re-cut for gold direction: net score, 5-step label, lane counts, the four
+lane readings, the firing drivers) and **model vs reality** (the score's
+direction vs gold's actual 30-day move). No new indicator ids, no new
+votes, no new fetches: the panels read the existing scored voters through
+the pure engine at `packages/insights/src/gold-score.ts`; the ingest stamps
+the compact `goldSummary` (optional snapshot field) beside the section
+summaries, and the SPA re-derives the voter list client-side. BILINGUAL
+since S2.1: the copy lives in the web dictionaries (`signals.goldScore` /
 `signals.goldModelVsReality`, EN + fa — Persian-copy round-53), and this
-prices strip is the four price tiles again. NEXT: Session 3, the FRED
-gap-fillers — spec at docs/insights/GOLD_FRED_GAPFILL_SPEC.md (G1
-real-yield history depth · G2 breakeven-tilt; not yet implemented).*
+prices strip is the four price tiles again. S3 (2026-10-31, the FRED
+gap-fillers) added: the FRED trio SPLIT (DGS10/DGS30 keep the no-cosd full
+request for highest-since; DFII10 rides its own cosd=2003-01-02 request —
+the no-cosd answer lagged at rung time on 10 of 10 archived days), the
+bounded DGS10−T10YIE cross-fill for the real-yield SCORING INPUT only
+(counted in the ingest report; the stored history stays pure DFII10 —
+D-6), and the `breakeven-tilt` context card (T5YIFR−T5YIE, zero new
+fetches) whose lean phrase rides the gold panel's inflation lane
+(«انتظارات در حال شدت‌گیری/فروکش» — round-54; D-5 keeps it OUT of the
+voter table). NEXT: Session 4, the backtest harness (reads the frozen
+20-voter table).*
 
 **Prices heat** (`prices-heat` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -265,6 +274,7 @@ real-yield history depth · G2 breakeven-tilt; not yet implemented).*
 | [C] | `us-wages` | monthly | 75 | info | fred |
 | [C] | `breakeven-10y` | daily | 4 | info | fred |
 | [C] | `t5yie` | daily | 5 | info | fred |
+| [C] | `breakeven-tilt` | daily | 5 | info | derived |
 | [C] | `wti` | daily | 12 | info | fred |
 | [C] | `natgas` | daily | 12 | info | fred |
 | [C] | `eia-crude-stocks` | weekly | 12 | info | eia |

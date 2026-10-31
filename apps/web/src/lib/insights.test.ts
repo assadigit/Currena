@@ -556,8 +556,10 @@ describe('copy dictionaries', () => {
     // rba-fed-gap (A-5), us-japan-10y-gap (A-3), gold-oil-ratio (A-4),
     // eia-crude-stocks (A-6) and cftc-gold-positioning (A-7) → 95; the
     // monthly trio oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10) → 100;
-    // the 2026-10-29 owner round adds usdaed (the UAE dirham card) → 101.
-    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(101);
+    // the 2026-10-29 owner round adds usdaed (the UAE dirham card) → 101;
+    // the 2026-10-31 Session-3 round adds breakeven-tilt (the G2 interplay
+    // card) → 102.
+    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(102);
   });
 
   // Fix spec T-07 (2026-10-15): the CI-side corpus scan — the ingest's

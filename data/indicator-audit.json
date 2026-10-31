@@ -471,6 +471,19 @@
       "rule": "{\"kind\":\"info\"}"
     },
     {
+      "id": "breakeven-tilt",
+      "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": true,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 5,
+      "ruleVersion": 2,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
       "id": "food-index",
       "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
       "publicDisplayOk": "yes",

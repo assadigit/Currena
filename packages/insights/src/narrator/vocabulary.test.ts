@@ -111,8 +111,8 @@ describe('P3 getNarratorVocabulary — both languages, one shape', () => {
     expect(en.entries['vix']!.plainName).not.toMatch(/[\u0600-\u06FF]/);
   });
 
-  it('the full catalogue answers identically in both languages (130 ids)', () => {
-    expect(VOCABULARY_IDS).toHaveLength(130);
+  it('the full catalogue answers identically in both languages (131 ids)', () => {
+    expect(VOCABULARY_IDS).toHaveLength(131); // Session 3 (G2, 2026-10-31): +breakeven-tilt
     const en = getNarratorVocabulary(VOCABULARY_IDS, 'en');
     const fa = getNarratorVocabulary(VOCABULARY_IDS, 'fa');
     expect(en.ids).toEqual(fa.ids);
@@ -137,11 +137,11 @@ describe('P3 — the generated snapshot integrity', () => {
     fa: { indicators: Record<string, unknown>; glossary: Record<string, unknown> };
   };
 
-  it('counts match the Layer-1 record (130 indicators, 23 glossary terms)', () => {
-    expect(payload.source.indicatorCount).toBe(130);
+  it('counts match the Layer-1 record (131 indicators, 23 glossary terms)', () => {
+    expect(payload.source.indicatorCount).toBe(131); // Session 3 (G2, 2026-10-31): +breakeven-tilt
     expect(payload.source.glossaryCount).toBe(23);
-    expect(Object.keys(payload.en.indicators)).toHaveLength(130);
-    expect(Object.keys(payload.fa.indicators)).toHaveLength(130);
+    expect(Object.keys(payload.en.indicators)).toHaveLength(131);
+    expect(Object.keys(payload.fa.indicators)).toHaveLength(131);
     expect(Object.keys(payload.en.glossary)).toHaveLength(23);
     expect(Object.keys(payload.fa.glossary)).toHaveLength(23);
   });
@@ -149,7 +149,7 @@ describe('P3 — the generated snapshot integrity', () => {
   it("records its source provenance (the dictionaries' sha256)", () => {
     expect(payload.source.enSha256).toMatch(/^[0-9a-f]{64}$/);
     expect(payload.source.faSha256).toMatch(/^[0-9a-f]{64}$/);
-    expect(VOCABULARY_SOURCE.indicatorCount).toBe(130);
+    expect(VOCABULARY_SOURCE.indicatorCount).toBe(131);
   });
 });
 

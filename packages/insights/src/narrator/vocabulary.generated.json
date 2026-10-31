@@ -3,9 +3,9 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "7c63555b79796056f9202ff9317a93ca2a13cdc3d5cc2de27153a9afa361e3ea",
-    "faSha256": "a707c7948eaa39f21caace6c53a3ab29603c838e4985e999653ca89b6504e58e",
-    "indicatorCount": 130,
+    "enSha256": "f7488c4f8c74886e656a0d564bc19146650374f4112d67539aa910a66bbf37b7",
+    "faSha256": "22baba640057468672c442e3b9022dc2dfd644b62a73e25314ce8097f3f27e0a",
+    "indicatorCount": 131,
     "glossaryCount": 23
   },
   "en": {
@@ -1451,6 +1451,33 @@
         "glossaryTerms": [
           "inflation",
           "bond"
+        ]
+      },
+      "breakeven-tilt": {
+        "plainName": "The inflation tilt, near vs far",
+        "oneLine": "Whether markets price inflation building or fading into the far five years.",
+        "ifRising": "Markets lean toward inflation building into the far window, a mood that tends to lift long-run hedging.",
+        "ifFalling": "Markets lean toward inflation fading after the near window, reading today’s pressure as temporary.",
+        "connections": [
+          {
+            "with": "t5yie",
+            "text": "The near leg of the tilt: what markets price for the first five years.",
+            "strength": "reliable"
+          },
+          {
+            "with": "breakeven-5y5y",
+            "text": "The far leg of the tilt: the window beyond it.",
+            "strength": "reliable"
+          },
+          {
+            "with": "breakeven-10y",
+            "text": "The ten-year read blends both windows the tilt separates.",
+            "strength": "reliable"
+          }
+        ],
+        "glossaryTerms": [
+          "inflation",
+          "breakeven"
         ]
       },
       "t5yie": {
@@ -4413,6 +4440,33 @@
         "glossaryTerms": [
           "inflation",
           "bond"
+        ]
+      },
+      "breakeven-tilt": {
+        "plainName": "شیب انتظارات تورمی، نزدیک و دور",
+        "oneLine": "بازار تورم را برای پنج سال دوم در حال شدت‌گیری می‌داند یا فروکش.",
+        "ifRising": "بازار به شدت‌گیری تورم در پنجرهٔ دورتر متمایل است؛ حال‌وهوایی که معمولاً پوشش‌گیری بلندمدت را تقویت می‌کند.",
+        "ifFalling": "بازار به فروکش تورم پس از پنجرهٔ نزدیک متمایل است؛ فشار امروز را موقتی می‌داند.",
+        "connections": [
+          {
+            "with": "t5yie",
+            "text": "پایهٔ نزدیک شیب: آنچه بازار برای پنج سال اول قیمت‌گذاری می‌کند.",
+            "strength": "reliable"
+          },
+          {
+            "with": "breakeven-5y5y",
+            "text": "پایهٔ دور شیب: پنجرهٔ فراتر از آن.",
+            "strength": "reliable"
+          },
+          {
+            "with": "breakeven-10y",
+            "text": "خوانش ده‌ساله هر دو پنجره‌ای را که شیب جدا می‌کند با هم می‌آمیزد.",
+            "strength": "reliable"
+          }
+        ],
+        "glossaryTerms": [
+          "inflation",
+          "breakeven"
         ]
       },
       "t5yie": {

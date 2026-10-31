@@ -1,11 +1,14 @@
 # GOLD_FRED_GAPFILL_SPEC — Session 3: the FRED gap-fillers for the Gold Program
 
-**Status:** SPEC (authored 2026-10-31 at session close, ahead of Session 3 —
-not yet implemented). Session 3's contract, in the gap-audit tradition of
-the 2026-10-26c A-1..A-10 build.
-**Parent spec:** `docs/insights/GOLD_SCORE_SPEC.md` (S1+S2+S2.1 shipped;
-§4.5 names this round: "No FRED gap-fillers (S3: real-yield history depth,
-breakeven interplay)").
+**Status:** IMPLEMENTED (Session 3, 2026-10-31) — see §5's validation
+record + the decision log below. G1a's audit, G1b's bounded cross-fill
+(D-6), G1d's trio split (D-4), G2's breakeven-tilt card + the gold
+panel's inflation-lane phrase (D-5: context only) — merged, deployed,
+verified live. Originally authored 2026-10-31 at session close, ahead of
+Session 3 — in the gap-audit tradition of the 2026-10-26c A-1..A-10
+build. **Parent spec:** `docs/insights/GOLD_SCORE_SPEC.md` (S1+S2+S2.1
+shipped; §4.5 names this round: "No FRED gap-fillers (S3: real-yield
+history depth, breakeven interplay)").
 **Discipline:** zero new upstream sources by default, zero new KV keys,
 zero snapshot-shape changes beyond what the register already allows; every
 number auditable; every decision logged (D-x) rather than silently made.
@@ -181,23 +184,179 @@ regeneration, which the gates force anyway.
 - No bundle-budget creep beyond the audited copy growth (bump with a
   justification comment, never silent — the D-16 rule).
 
-## 5. Validation record (Session 3 fills this in)
+## 5. Validation record (Session 3, 2026-10-31 — the honest numbers)
 
-- G1a audit table: (holes / fillable / longest gap / trio-freshness
-  counts) — recorded here.
-- `pnpm -r test` / typecheck / lint / `copy:audit` (round-54) /
-  `pnpm gates` — the standard block, real numbers.
-- The `goldSummary` on-the-wire confirmation (§0's first action).
-- Post-deploy: the live panel check on currena.ir (EN + fa), the
-  inflation-lane context phrase visible, zero page errors.
+**Status: IMPLEMENTED, MERGED, DEPLOYED.** All three gaps shipped; every
+number below was measured, not estimated.
+
+### G1a — the audit (ran FIRST, before any code; the numbers that decided D-3/D-4/D-6)
+
+Source: the live `insights:ingest-stage:v1` KV blob (written 2026-10-30
+04:20 UTC, the exact series feeding the scoring math) + the 10 archived
+public snapshots 2026-10-21→10-30, read via the Cloudflare KV REST API
+2026-10-30 ~23:55 UTC.
+
+**DFII10 hole audit (the last 10 years, 2016-09-22 → the blob's tail):**
+
+| metric | value |
+|---|---|
+| DFII10 observations | 2,524 |
+| DGS10 observations | 2,524 (same dates — zero difference in the date sets) |
+| T10YIE observations | 2,525 |
+| days DGS10 present, DFII10 absent | **0** |
+| days FILLABLE (both legs present, DFII10 absent, inside the window) | **0** |
+| longest consecutive DGS10-trading stretch without DFII10 | **0 days** |
+| cross-measurement agreement DFII10 vs DGS10−T10YIE (common days) | n=2,524 · mean 0.0000 · median 0.0000 · p05 0.0000 · p95 0.0000 · **max \|err\| 0.0000 pts** |
+
+Reading: **the hole problem does not exist inside the decade window.**
+DFII10 and DGS10 publish identical date sets, and DGS10 − T10YIE equals
+DFII10 exactly (FRED derives the series that way) — the cross-fill's
+0-fill healthy day is the audited expectation, not a defect. The fill
+earns its keep on DEGRADED days (the trio split's DFII10 group failing
+while both legs' groups succeed — the rung logs `realYieldFill: N`
+aloud) and the spec's ~5% cap keeps a broken series from being
+half-filled. Per §2 G1a's own escape hatch: with the holes negligible,
+G1b's weight shifted to the freshness fix + the honest record.
+
+**Trio-freshness audit (the 10 archived public snapshots, 2026-10-21→10-30):**
+
+| archive day | trio asOf (us10y/us30y/real-yield-10y) | decade group asOf (T5YIFR) | lag | trio statuses |
+|---|---|---|---|---|
+| 2026-10-21 | 2026-10-19 | 2026-10-20 | LAG | warning ×3 |
+| 2026-10-22 | 2026-10-19 | 2026-10-20 | LAG | **stale ×3** |
+| 2026-10-23 | 2026-10-22 | 2026-10-23 | LAG | warning ×3 |
+| 2026-10-24 | 2026-10-22 | 2026-10-23 | LAG | warning ×3 |
+| 2026-10-25 | 2026-10-22 | 2026-10-23 | LAG | warning ×3 |
+| 2026-10-26 | 2026-10-22 | 2026-10-23 | LAG | warning ×3 |
+| 2026-10-27 | 2026-10-23 | 2026-10-26 | LAG | warning ×3 |
+| 2026-10-28 | 2026-10-26 | 2026-10-27 | LAG | warning ×3 |
+| 2026-10-29 | 2026-10-27 | 2026-10-28 | LAG | warning ×3 |
+| 2026-10-30 | 2026-10-28 | 2026-10-29 | LAG | warning ×3 |
+
+**The trio lagged the decade group on 10 of 10 archived days** (1–3
+calendar days), and every one of those 04:10/20:10 rungs recorded all six
+FRED bulk groups `ok=True [fetched]` — the lag is NOT a fetch failure a
+retry could heal (that kills D-4 option 1); the no-cosd full-history
+answer path itself serves rung-time-stale bodies while every cosd request
+(negotiated windows) serves same-morning data. A direct venue probe at
+23:55 UTC showed both paths agreeing RIGHT NOW — consistent with a
+CDN-cache fill pattern around the 04:10 rung window. Additionally, the
+2026-10-22 archive shows the trio at `stale` ×3 — three of the gold
+engine's 20 voters went silent for a day (the `readable()` gate mutes
+stale readings), which is the concrete engine-level harm G1d fixes.
+
+### G1b — the cross-fill (D-6, as implemented)
+
+`packages/insights/src/real-yield-fill.ts` (pure) + the wiring in
+`ingest/run.ts`: fills are applied ONLY to the scoring-input series
+(`scoringSeries`) — the stage write, the stored histories, the peaks and
+the highest-since math all keep the PURE DFII10 series; the ingest report
+carries `realYieldFill: N` (or the capped variant) on every run. Bounds:
+exact-date inner join of the legs, decade window + 2003-01-02 floor,
+4dp quantization (F4), 5%-of-window cap → degraded, no fill. Tests:
+`real-yield-fill.test.ts`, 10 tests (healthy-day zero-fill, the
+trio-split tail-fill, window bounds, the 2003 floor, no-overwrite,
+ascending merge, the cap, the under-cap fill).
+
+### G1d — the freshness fix (D-4: SPLIT, not retry)
+
+`fred.ts`: `FRED_BULK_GROUPS` now carries SEVEN groups — the nominal pair
+(DGS10/DGS30, no-cosd full history: the highest-since math needs pre-2003
+decades) and DFII10's OWN group (window 'since', cosd=2003-01-02 — its
+whole available history, on the fresh-at-rung-time cosd answer path). One
+extra subrequest per rung (~49/50 fetch budget, recorded in run.ts's
+header). `collect.ts`'s Treasury/EIA fallback triggers moved from group
+ordinals to CONTENT-BASED slot checks (an ordinal shift would have
+silently broken them). The malformed-body test pins 7 rows; the healthy
+run still never fetches a fallback.
+
+### G2 — breakeven-tilt (D-5: context only)
+
+The derived card (`T5YIFR − T5YIE`, exact-date join, 4dp) + the pure lean
+helper `breakeven-tilt.ts` (±0.1pt deadband → building/fading/steady;
+null on absent/stale — never a guess) + the gold panel's inflation-lane
+phrase (`signals.goldScore.tiltWords`, EN + fa, round-54) + the full card
+copy + Layer-1 entry in both dictionaries. ZERO new fetches (both legs
+ride the existing decade group). The voter table is UNCHANGED (20 voters,
+pinned by test); `GOLD_LANE_VOTERS` does not contain `breakeven-tilt`.
+
+### The standard block
+
+- `corepack pnpm -r test` — **10,262 passed** (core 195 · scraper 67 ·
+  insights 941 · markets 13 · api 371 · web 8,675), 0 failed.
+- `corepack pnpm -r typecheck` — 6/6 packages clean.
+- `eslint` on every touched file — 0 errors, 0 warnings.
+- `pnpm copy:audit` — **clean after the round-54 triage** (30 entries:
+  the tilt card 12 · its Layer-1 entry 15 · the panel's tiltWords 3;
+  manifest 4,849 entries).
+- `corepack pnpm gates` — all green (secret scan, narrator vocabulary
+  sync post-regeneration [131 indicators], Layer-1 strict, build +
+  bundle budget inside the audited copy growth).
+
+### §0's first action — the goldSummary rung diagnosis
+
+At session start (2026-10-30 ~23:53 UTC) the served snapshot
+(`generatedAt 2026-10-30T20:10Z`, the pre-deploy sweep) did NOT carry
+`goldSummary` — diagnosed as the EXPECTED pre-rung state, not a failure:
+the S2.1 deploy (Worker version 837fe2dd) landed 2026-10-30T23:47:28Z,
+~35 min AFTER the 20:10 sweep built the served snapshot, and the next
+ingest rung (the 04:10 UTC main) was ~4 h away. The minute cron is armed
+(`* * * * *`, schedules API verified), and all three snapshot builders on
+deployed main stamp the field (source-verified). The field landed on the
+wire with the 2026-10-31 04:10 UTC rung — the post-deploy live check
+below confirms it.
+
+### Post-deploy — the live verification (currena.ir)
+
+- The 2026-10-31 04:10 UTC main rung (S3 code) stamped `goldSummary` on
+  the wire; the 04:20/04:25/04:27/04:40 rungs completed after it.
+- `/api/insights` post-rung: `goldSummary` PRESENT; `breakeven-tilt`
+  present among the readings (value −0.24, asOf 2026-10-29 —
+  T5YIFR 2.23 − T5YIE 2.47); the trio's asOf moved WITH the decade group
+  (the D-4 split's effect); the ingest report's `realYieldFill: 0` row
+  visible in `/admin`.
+- The panel check on currena.ir (EN + fa): the gold panels render under
+  the balance; the inflation lane carries the tilt phrase
+  («انتظارات در حال فروکش» — the live tilt is negative); zero page errors
+  in both locales.
+
+### Known gaps (honest)
+
+- The trio-split's freshness win is CAUSAL-INFERRED from the 10/10 lag
+evidence + the cosd/no-cosd path difference, not yet OBSERVED over
+multiple rungs — the worklog's next-steps row asks for a 3-day
+`asOf`-watch before calling it fully proven.
+- The cross-fill's degraded-day path is tested by fixture but has not
+  fired live (all groups healthy at deploy time — by design it stays
+  quiet on healthy days).
+- DFII10's pre-2003 depth stays at the FRED wall (D-3, open — the GSW
+  dataset remains the only real extension, an owner decision).
 
 ## Decision log
 
 - **D-3 (open)** — extend real-yield depth to 1999 via GSW, or accept
-  the 2003 wall. Default: accept.
-- **D-4 (open)** — trio freshness fix: retry / split / cache-fallback.
-  Default: retry-once.
-- **D-5 (open)** — promote `breakeven-tilt` to a 21st gold voter in a
-  future round. Default: no.
-- **D-6 (recorded)** — the stored history stays pure DFII10; fills exist
-  only in the scoring-input assembly and are counted in the run report.
+  the 2003 wall. Default: accept. (Session 3 re-confirmed: the audit
+  found the decade window DENSE — zero holes — so the depth question is
+  cosmetic until an owner round wants 1999–2002; no new source was
+  added.)
+- **D-4 (decided 2026-10-31, Session 3: SPLIT)** — trio freshness fix.
+  The audit killed the default: retry-once cannot heal a lag that shows
+  up with all six groups `ok=True [fetched]` on 10 of 10 archived days —
+  the no-cosd full-history answer path itself serves rung-time-stale
+  bodies while every cosd request serves same-morning data. Option 2
+  implemented: DGS10/DGS30 keep the no-cosd full request (highest-since
+  needs pre-2003), DFII10 rides its own cosd=2003-01-02 request (its
+  whole history — "full" and "2003-start" cover the same days). Option 3
+  (cache-and-fallback) stays unused — the sweep rungs already provide
+  the heal; the split removes the lag's cause.
+- **D-5 (open — re-confirmed NO this session)** — promote
+  `breakeven-tilt` to a 21st gold voter in a future round. Session 3
+  shipped it as context (the inflation lane's phrase + its own card);
+  the voter table is frozen at 20 by design and a test pins it. The
+  promotion remains the owner's call — the S4 backtest harness (reading
+  the frozen table) is the natural venue to evaluate it.
+- **D-6 (recorded, implemented)** — the stored history stays pure
+  DFII10; fills exist only in the scoring-input assembly and are counted
+  in the run report. The audit's exact-agreement finding (max |err|
+  0.0000 on 2,524 common days) is the recorded basis for trusting the
+  fill's values on the days it does fire.

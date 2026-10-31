@@ -5,6 +5,64 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31d] — Gold Program S3: the FRED gap-fillers (the real-yield audit + the bounded cross-fill + the trio split + breakeven-tilt)
+
+Session 3 of the Gold Program, implementing
+`docs/insights/GOLD_FRED_GAPFILL_SPEC.md` (its §5 validation record + the
+decision log are filled in with the session's measured numbers). The audit
+ran FIRST and reshaped the round honestly:
+
+- **G1a — the audit (numbers, not vibes)** — the last 10 years of the
+  stored stage series: DFII10 carries **zero holes** vs DGS10 (identical
+  2,524-day date sets) and `DGS10 − T10YIE` equals DFII10 **exactly**
+  (max |err| 0.0000 pts on all common days — FRED derives the series
+  that way). The hole problem does not exist inside the decade window;
+  the fill's healthy-day count is 0 BY EVIDENCE. The trio-freshness
+  audit: the full-history trio lagged the decade group on **10 of 10
+  archived days** (1–3 days) with every FRED group `ok=True` — a
+  source-side answer-path lag, not a fetch failure (the 2026-10-22
+  archive even shows the trio `stale` ×3, muting 3 of the gold engine's
+  20 voters for a day).
+- **G1b — the bounded cross-fill (D-6)** — `real-yield-fill.ts` (pure):
+  fills the real-yield-10y SCORING INPUT ONLY from `DGS10 − T10YIE` on
+  exact-date leg joins inside the decade window (2003-01-02 floor, 4dp
+  quantization, 5%-of-window cap → degraded, no fill). The stored
+  history, the stage, the peaks and highest-since keep the PURE DFII10
+  series; the ingest report counts `realYieldFill: N` aloud every run.
+  10 tests.
+- **G1d — the trio split (D-4: split, not retry — the audit killed the
+  retry default)** — `FRED_BULK_GROUPS` now seven: DGS10/DGS30 keep the
+  no-cosd full history (highest-since needs pre-2003) while DFII10 rides
+  its OWN `cosd=2003-01-02` request (its whole history, on the
+  fresh-at-rung-time negotiated-window answer path). One extra
+  subrequest (~49/50). `collect.ts`'s Treasury/EIA fallback triggers
+  moved from group ordinals to CONTENT-BASED slot checks.
+- **G2 — breakeven-tilt (D-5: context only)** — the derived context card
+  `breakeven-tilt` = `T5YIFR − T5YIE` (zero new fetches; both legs
+  already ride the decade group), registered [C]/L2 with the legs'
+  licence walk, full EN + fa card copy + Layer-1 entries, and the gold
+  panel's inflation lane gains its context phrase
+  (`breakevenTiltLean`: building/fading/steady with a ±0.1pt deadband,
+  copy-keyed both locales — Persian-copy round-54,
+  `docs/localization/persian-copy-round-54-breakeven-tilt.md`, 30
+  entries, manifest 4,849). The 20-voter table is UNCHANGED — pinned by
+  test.
+- **The full maintenance chain** — core `IndicatorIdSchema` (102 ids) ·
+  the definition (P2, prices-heat, daily/info) · T-10's points-kind set ·
+  `UPSTREAM_LEGS` + the derived source line · display config (points,
+  2dp) · the Layer-1 inventory (102 indicators + boards = 135) · the
+  registry regenerated (`pnpm registry:generate` → 102) · the narrator
+  vocabulary regenerated (131 indicators) · AGENTS.md §A + the
+  INDICATORS_AND_DATA_SOURCES.md §1/§2 inventory tables (also fixes the
+  usdaed row missing from both since 2026-10-29).
+- **Validation** — `pnpm -r test` 10,262 passed (0 failed) · typecheck
+  6/6 · lint clean on every touched file · `copy:audit` clean ·
+  `pnpm gates` green (secret scan, narrator vocab sync, Layer-1 strict,
+  build + bundle budget). The `goldSummary` field's absence at session
+  start was diagnosed as the expected pre-rung state (the S2.1 deploy
+  landed 35 min after the last sweep build; the 04:10 UTC main rung is
+  the first with the field) — confirmed on the wire post-deploy.
+
 ## [2026-10-31c] — Gold Program session close: the Session-3 FRED gap-fill spec + the wrap-up verification (docs-only)
 
 The S2/S2.1 ship closed out. Nothing runtime-changing in this commit —

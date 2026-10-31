@@ -437,6 +437,17 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // M4 Wave 1 (OD-8/D-42): the 10y breakeven leaves validation-only and
   // becomes a context card (the series was already collected for T-01).
   put('breakeven-10y', fred.T10YIE);
+  // Session 3 (GOLD_FRED_GAPFILL_SPEC G2): the breakeven interplay — the
+  // 5y5y forward minus the 5y spot, on their common dates (both legs ride
+  // the SAME FRED decade group, so the join is exact-date by construction;
+  // 4dp quantized, the F4 discipline). Zero new fetches; context only —
+  // the 20-voter gold table is frozen (D-5).
+  if (fred.T5YIFR && fred.T5YIE) {
+    put(
+      'breakeven-tilt',
+      quantized(combineSeries(fred.T5YIFR, fred.T5YIE, (forward, spot) => forward - spot), 4),
+    );
+  }
   // 2026-10-21 data-integrity round: the two EIA energy spots ride the
   // same FRED bulk request as Brent's spot — context rows in the prices
   // lane beside Brent's own scored card (never prices-board tiles; the
@@ -922,6 +933,11 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'us-pce-core-yoy': { name: 'FRED (PCEPILFE, 12-month % change)', url: 'https://fred.stlouisfed.org/series/PCEPILFE' },
   'us-2y': { name: 'FRED (DGS2)', url: 'https://fred.stlouisfed.org/series/DGS2' },
   'breakeven-10y': { name: 'FRED (T10YIE)', url: 'https://fred.stlouisfed.org/series/T10YIE' },
+  // Session 3 (G2, 2026-10-31): the interplay pair's derived source line.
+  'breakeven-tilt': {
+    name: 'FRED (T5YIFR − T5YIE, derived)',
+    url: 'https://fred.stlouisfed.org/series/T5YIFR',
+  },
   // M6 Wave 3 (OD-8/D-42, 2026-10-25) — the leading-edge batch's sources.
   'mortgage-30y': {
     name: 'Freddie Mac via FRED (MORTGAGE30US)',
