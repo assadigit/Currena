@@ -471,6 +471,29 @@ the SAME indicators listed in §A above (the prices-board + market-
 stress groups); the hourly refresh keeps their `asOf` current between
 the daily ingest rungs.
 
+### G. The Treasury TIC composite dataset (gap-closure S2, 2026-10-31)
+
+The "Who holds US government debt" section is a COMPOSITE dataset, not
+103 separate indicators. One KV key `insights:tic:v1` (written by the
+rung3 `tic-slt` source — the two SLT tables fetched from
+`ticdata.treasury.gov` with a 30 s single-attempt timeout, ~6–7 week
+publication lag, release-aware day gate) carries: the data month, the
+release date, the foreign total + official/private split, and 21 holders
+(top-20 + Australia from Table 3) × 24 months of holdings PLUS the Table 3
+transactions (net buying/selling) and valuation-change series. The parser
+fails closed on shape (`packages/insights/src/tic/`; the fixtures live
+under `packages/insights/fixtures/tic/`). It serves at
+`GET /api/insights/tic` (one KV read, ETag/304 — the markets/fx twin).
+The design rule baked into the UI: net TRANSACTIONS are shown SEPARATELY
+from the price (valuation) effect, and the custody-hub caveat
+(Belgium/Luxembourg/Cayman/Ireland/UK/Switzerland/Bermuda hold much that
+belongs to others — Treasury's own warning) rides the ◆ row markers and
+the section footnote. The `nyfed-custody` indicator (§A, the 103rd) is
+this section's weekly freshness bridge: the NY Fed custody holdings level
+(FRED `WSEFINTL1`, riding the WALCL bulk group — zero extra subrequests),
+rendered as a standard context card below the table. The old `mfh.txt`
+feed is DEAD (frozen 2023) — never re-add it.
+
 ## Phase discipline
 
 This migration runs phase-by-phase with hard gates (✋). Do not start work
