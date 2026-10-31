@@ -283,6 +283,27 @@ const TREASURY: SourceLicence = {
   termsUrl: 'https://home.treasury.gov/',
 };
 
+/**
+ * Gap-closure S2-M2.1 (2026-10-31) — the Treasury TIC SLT tables (foreign
+ * holdings of US Treasuries). Same public-domain class as TREASURY above,
+ * different host (ticdata.treasury.gov) and different purpose (the
+ * owner's top-priority foreign-holders table, a PRIMARY source — not a
+ * fallback).
+ */
+const TIC: SourceLicence = {
+  provider: 'tic',
+  label: 'U.S. Treasury TIC (SLT tables — foreign holdings of Treasuries)',
+  licenceName: 'US government work — public domain (17 U.S.C. § 105)',
+  attributionText: 'Source: U.S. Department of the Treasury, Treasury International Capital (TIC) System',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-10-31',
+  termsEvidence:
+    'US federal government works carry no copyright (17 U.S.C. § 105) — the TIC SLT tables (slt_table5.txt, slt_table3.txt on ticdata.treasury.gov) are Treasury\u2019s own published data. Worker-egress probe 2026-10-31 (gap-closure S1-M1.1): HTTP 200 for both files, 8–10 s latency — slow but reachable, fetched with the honest UA under the 12 s single-attempt policy. Custody caveat is Treasury\u2019s own wording (Table 3 footer): holdings are recorded where they are HELD (U.S.-based custodians), so custody hubs (Belgium, Luxembourg, Cayman Islands, Ireland, UK, Switzerland, Bermuda) hold much that belongs to others.',
+  termsUrl: 'https://home.treasury.gov/data/treasury-international-capital-tic-system',
+};
+
 const EIA: SourceLicence = {
   provider: 'eia',
   label: 'U.S. Energy Information Administration (daily spot prices)',
@@ -409,6 +430,7 @@ export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   shiller: SHILLER,
   derived: DERIVED,
   treasury: TREASURY,
+  tic: TIC,
   eia: EIA,
   mof: MOF,
   cftc: CFTC,

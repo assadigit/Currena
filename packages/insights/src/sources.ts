@@ -177,6 +177,26 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     notes:
       'FALLBACK-ONLY (owner round terms): fetched only when a FRED bulk group failed; FRED stays the primary. Venue-verified 2026-10-22 from Cloudflare egress: HTTP 200, 18–21 s latency (45 s timeout).',
   },
+  'us-tic': {
+    id: 'us-tic',
+    provider: 'tic',
+    label: 'U.S. Treasury TIC (SLT tables — foreign holdings of US Treasuries)',
+    usedFor:
+      'The "Who holds US government debt" section (gap-closure S2): Table 5 top holders (billions, 13 rolling months) + Table 3 all countries holdings / net U.S. sales / valuation change (millions, 2020-01 →)',
+    method: 'M2',
+    runtime: 'worker',
+    level: 'L0',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The SLT tables are Treasury\u2019s own published data (ticdata.treasury.gov, tab-delimited). Table 3\u2019s own footer carries the custody caveat: "The data in this table are collected primarily from U.S.-based custodians. Since U.S. securities held in overseas custody accounts may not be attributed to the actual owners, the data may not provide a precise accounting of individual country ownership of Treasury securities."',
+    termsReadOn: '2026-10-31',
+    attribution: 'Source: U.S. Department of the Treasury, Treasury International Capital (TIC) System',
+    termsUrl: 'https://home.treasury.gov/data/treasury-international-capital-tic-system',
+    notes:
+      'Gap-closure S2-M2.1. Worker-egress verified 2026-10-31 (S1-M1.1 probe): both files 200, 8–10 s each — the rung3 fetch keeps the 12 s single-attempt policy (F-11), no retries; the 10:10/20:10 sweeps heal a failed fetch within hours. Composite dataset (not 100 indicators): one KV key insights:tic:v1. The dead mfh.txt / slt3d.txt (frozen 2023-01) are NEVER used.',
+  },
   'eia-spot': {
     id: 'eia-spot',
     provider: 'eia',
@@ -712,6 +732,8 @@ export function rowIdForProvider(provider: string): string {
       return 'mof-japan';
     case 'treasury':
       return 'us-treasury';
+    case 'tic':
+      return 'us-tic';
     case 'eia':
       return 'eia-spot';
     default:
