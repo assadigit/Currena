@@ -38,6 +38,7 @@ live at https://aliassadi1993.pythonanywhere.com/ until an explicit human cutove
   `docs/insights/layer1/` is the Layer-1 (plain-language copy) doc set;
   `docs/insights/layer2/` is the Layer-2 prep set (the prep spec, DECISIONS
   D-20+, AU-DATA-OPTIONS, NARRATION-STATE — the narrator's contracts).
+- **docs/gap-closure/** — the 6-session gap-closure program (specs S1–S6, operating rules, `PROGRESS.md`, session kickoff prompts). Read `docs/gap-closure/README.md` before starting any session of that program; its `00-OPERATING-RULES.md` overrides older rules for that program only.
 - **docs/specs/** — the governing feature specs (world currencies, world markets,
   the world-markets map spec) + `traceability.md` (the requirement → code → test map).
 - **docs/localization/** — Persian copy workflow, terminology, and the manifest.
