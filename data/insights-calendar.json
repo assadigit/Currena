@@ -120,12 +120,28 @@
     "tz": "America/New_York"
   },
   {
+    "id": "tic-2026-10",
+    "date": "2026-12-15",
+    "titleEn": "Treasury TIC foreign-holders data: October 2026",
+    "titleFa": "داده‌های خزانه‌داری آمریکا دربارهٔ دارندگان خارجی: اکتبر ۲۰۲۶",
+    "kind": "tic",
+    "tz": "America/New_York"
+  },
+  {
     "id": "abs-jobs-2026-11",
     "date": "2026-12-17",
     "titleEn": "ABS jobs report (Labour Force): November 2026",
     "titleFa": "گزارش وضعیت بازار کار استرالیا: نوامبر ۲۰۲۶",
     "kind": "abs-jobs",
     "tz": "Australia/Sydney"
+  },
+  {
+    "id": "tic-2026-11",
+    "date": "2027-01-19",
+    "titleEn": "Treasury TIC foreign-holders data: November 2026",
+    "titleFa": "داده‌های خزانه‌داری آمریکا دربارهٔ دارندگان خارجی: نوامبر ۲۰۲۶",
+    "kind": "tic",
+    "tz": "America/New_York"
   },
   {
     "id": "abs-cpi-2026-12",
@@ -152,6 +168,14 @@
     "tz": "Australia/Sydney"
   },
   {
+    "id": "tic-2026-12",
+    "date": "2027-02-18",
+    "titleEn": "Treasury TIC foreign-holders data: December 2026",
+    "titleFa": "داده‌های خزانه‌داری آمریکا دربارهٔ دارندگان خارجی: دسامبر ۲۰۲۶",
+    "kind": "tic",
+    "tz": "America/New_York"
+  },
+  {
     "id": "abs-cpi-2027-01",
     "date": "2027-02-24",
     "titleEn": "ABS monthly CPI: January 2027",
@@ -168,12 +192,28 @@
     "tz": "America/New_York"
   },
   {
+    "id": "tic-2027-01",
+    "date": "2027-03-18",
+    "titleEn": "Treasury TIC foreign-holders data: January 2027",
+    "titleFa": "داده‌های خزانه‌داری آمریکا دربارهٔ دارندگان خارجی: ژانویه ۲۰۲۷",
+    "kind": "tic",
+    "tz": "America/New_York"
+  },
+  {
     "id": "rba-2027-03",
     "date": "2027-03-23",
     "titleEn": "RBA cash rate decision",
     "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
     "kind": "rba",
     "tz": "Australia/Sydney"
+  },
+  {
+    "id": "tic-2027-02",
+    "date": "2027-04-15",
+    "titleEn": "Treasury TIC foreign-holders data: February 2027",
+    "titleFa": "داده‌های خزانه‌داری آمریکا دربارهٔ دارندگان خارجی: فوریه ۲۰۲۷",
+    "kind": "tic",
+    "tz": "America/New_York"
   },
   {
     "id": "fomc-2027-04",
@@ -190,5 +230,21 @@
     "titleFa": "تصمیم بانک مرکزی استرالیا دربارهٔ نرخ رسمی بهره",
     "kind": "rba",
     "tz": "Australia/Sydney"
+  },
+  {
+    "id": "tic-2027-03",
+    "date": "2027-05-18",
+    "titleEn": "Treasury TIC foreign-holders data: March 2027",
+    "titleFa": "داده‌های خزانه‌داری آمریکا دربارهٔ دارندگان خارجی: مارس ۲۰۲۷",
+    "kind": "tic",
+    "tz": "America/New_York"
+  },
+  {
+    "id": "tic-2027-04",
+    "date": "2027-06-16",
+    "titleEn": "Treasury TIC foreign-holders data: April 2027",
+    "titleFa": "داده‌های خزانه‌داری آمریکا دربارهٔ دارندگان خارجی: آوریل ۲۰۲۷",
+    "kind": "tic",
+    "tz": "America/New_York"
   }
 ]
