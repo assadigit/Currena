@@ -263,7 +263,7 @@ export function MergedSignalsCard({
       {/* Gold Program S2.1 (owner round 2026-10-31 — "it's placed on the
        * wrong section … it must place here"): the two gold panels mount
        * DIRECTLY UNDER the balance visual («برآیند عوامل مؤثر بر قیمت
-       * طلا»), inside this card — the 20-voter tailwind score + the
+       * طلا»), inside this card — the 21-voter tailwind score (the D-5 promotion, Session 6) + the
        * model-vs-reality comparison, the finer cut of the same question
        * the balance answers with its four broad conditions. Two columns
        * beside the balance's max-width column, stacked on mobile. */}

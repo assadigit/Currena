@@ -2,9 +2,12 @@
  * breakeven-tilt.test.ts — the G2 interplay (Session 3,
  * GOLD_FRED_GAPFILL_SPEC §3): the derived series (T5YIFR − T5YIE on common
  * dates, zero new fetches) and the pure lean selection the gold panel's
- * inflation-lane phrase reads. The card is CONTEXT ONLY — the 20-voter
- * gold table is frozen (D-5), asserted here so a future edit cannot
- * accidentally promote it.
+ * inflation-lane phrase reads. The card stayed context-only through S3–S5
+ * (the 20-voter freeze); Session 6 (the D-5 promotion, the owner's "we can
+ * have 21") promoted it to the 21st GOLD VOTER — the phrase feature below
+ * is UNCHANGED (it still renders beside the lane word), and this file's
+ * D-5 block now pins the PROMOTED membership so a future edit cannot
+ * silently drop or duplicate it.
  */
 
 import { describe, expect, it } from 'vitest';
@@ -104,9 +107,21 @@ describe('breakevenTiltLean — the pure phrase selection', () => {
   });
 });
 
-describe('D-5 — the voter table stays frozen', () => {
-  it('breakeven-tilt is NOT in the 20-voter gold table (context only)', () => {
-    expect(GOLD_LANE_VOTERS.map((v) => v.id)).not.toContain('breakeven-tilt');
-    expect(GOLD_LANE_VOTERS).toHaveLength(20);
+describe('D-5 — the promotion pinned (Session 6)', () => {
+  it('breakeven-tilt IS the 21st gold voter: exactly one entry, inflation lane, polarity +1, the last seat', () => {
+    expect(GOLD_LANE_VOTERS).toHaveLength(21);
+    const tilt = GOLD_LANE_VOTERS.filter((v) => v.id === 'breakeven-tilt');
+    expect(tilt).toHaveLength(1);
+    expect(tilt[0]).toEqual({ lane: 'inflation', id: 'breakeven-tilt', polarity: 1 });
+    expect(GOLD_LANE_VOTERS[GOLD_LANE_VOTERS.length - 1]!.id).toBe('breakeven-tilt'); // the B4-measured shape: the frozen 20 + the tilt at the end
+  });
+
+  it('the phrase selector stays the level-deadband read it always was (context phrase, not the voter lean)', () => {
+    // The panel phrase (building/fading/steady at the 0.1pt deadband) and
+    // the voter lean (the shared evaluator's decade position) are DIFFERENT
+    // reads of the same card — both kept, neither aliased to the other.
+    expect(breakevenTiltLean(reading({ value: 0.24 }))).toBe('building');
+    expect(breakevenTiltLean(reading({ value: -0.24 }))).toBe('fading');
+    expect(breakevenTiltLean(reading({ value: 0 }))).toBe('steady');
   });
 });

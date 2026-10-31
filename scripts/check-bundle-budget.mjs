@@ -734,7 +734,15 @@ const BUDGETS = [
   // riding this chunk (round-54, the audited Persian-copy growth the
   // spec's §4 D-16 rule names). gz stays inside 267. Justified in
   // CHANGELOG §2026-10-31d.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1136_000, gz: 267_500, label: 'Insights lazy chunk' },
+  //
+  // 2026-10-31j Gold Program S6 bump (measured 1136.01/267.29 → budget
+  // 1136.1/267.5): the D-5 promotion — the 21st voter's name in BOTH
+  // dictionaries ("Inflation tilt" / «شیب انتظارات تورمی»,
+  // round-56) + the one table entry in the engine import riding this
+  // chunk. +0.01 kB raw over the old ceiling (10 bytes); gz stays inside
+  // 267.5 (measured 267.29). Entry chunk untouched at 294.45/88.48.
+  // Justified in CHANGELOG §2026-10-31j.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1136_100, gz: 267_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {

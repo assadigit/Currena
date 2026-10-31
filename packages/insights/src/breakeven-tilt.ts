@@ -11,7 +11,11 @@
  * stays PURE here (the modelVsRealityExplainerKey precedent: the panel
  * never chooses copy).
  *
- * NOT a voter (D-5, open: no promotion this session) — context only.
+ * Since Session 6 (the D-5 promotion) the card is ALSO the 21st gold
+ * VOTER — but through the shared evaluator's own lean (the decade
+ * position), NOT this phrase: the panel phrase (the ±0.1pt level
+ * deadband) and the voter lean (percentile10y) are two different reads
+ * of the same card, both kept. This module's selection is unchanged.
  *
  * Pure, platform-free (AGENTS.md rule 2). Tested in breakeven-tilt.test.ts.
  */

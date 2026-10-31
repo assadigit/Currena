@@ -734,10 +734,12 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // the market prices inflation BUILDING into the second five years;
     // negative = FADING. CONTEXT beside the family's other two cards, and
     // the gold panel's inflation lane carries its phrase (GoldTailwindPanel,
-    // copy-keyed both locales). Deliberately NOT a voter — the 20-voter
-    // table is frozen (D-5, open; promotion is an owner decision for a
-    // future round). Phase P2 like breakeven-10y (its closest sibling): a
-    // derived context card whose legs' own alerts carry the outage signal.
+    // copy-keyed both locales). The 21st GOLD VOTER since Session 6 (the
+    // D-5 promotion, the owner's "we can have 21") — level-leg only, the
+    // S4-B4-measured variant; still an info card for its own gauge (the
+    // gauges and the gold engine are separate votes). Phase P2 like
+    // breakeven-10y (its closest sibling): a derived card whose legs' own
+    // alerts carry the outage signal.
     id: 'breakeven-tilt',
     section: 'global',
     group: 'prices-heat',

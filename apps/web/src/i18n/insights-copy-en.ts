@@ -6276,6 +6276,10 @@ export const insightsCopyEn = {
         'us-pce-core-yoy': 'US core PCE',
         'euro-hicp': 'Euro HICP',
         'breakeven-5y5y': '5y5y breakeven',
+        // Session 6 (the D-5 promotion): the 21st voter — the compact form
+        // of the context card's own plainName ("The inflation tilt, near
+        // vs far"). Same series, same name family, one seat in the lane.
+        'breakeven-tilt': 'Inflation tilt',
       },
       evidenceWords: {
         rising: 'rising',

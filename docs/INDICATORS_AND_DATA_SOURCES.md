@@ -283,9 +283,11 @@ Insights page's serve path performs **exactly ONE KV read per request**
     "australia":  { "section": "australia",  "label": "stressed", "warningCount": 7, "votingCount": 16, "excludedCount": 0 }
   },
   // Gold Program (optional field — absent on snapshots written before it):
-  // the gold-directional re-cut of the same voters (GOLD_SCORE_SPEC.md).
-  // Compact numbers only; the SPA re-derives the firing-driver list
-  // client-side through the same pure engine.
+  // the gold-directional re-cut of the voters (GOLD_SCORE_SPEC.md — 21
+  // voters since the D-5 promotion: breakeven-tilt votes for gold while
+  // staying a context card for its own gauge). Compact numbers only; the
+  // SPA re-derives the firing-driver list client-side through the same
+  // pure engine.
   "goldSummary": {
     "netScore": -1,                        // tailwind voters − headwind voters
     "label": "headwind",                   // strong-tailwind | tailwind | balanced | headwind | strong-headwind | null

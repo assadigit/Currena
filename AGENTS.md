@@ -260,8 +260,8 @@ bounded DGS10−T10YIE cross-fill for the real-yield SCORING INPUT only
 (counted in the ingest report; the stored history stays pure DFII10 —
 D-6), and the `breakeven-tilt` context card (T5YIFR−T5YIE, zero new
 fetches) whose lean phrase rides the gold panel's inflation lane
-(«انتظارات در حال شدت‌گیری/فروکش» — round-54; D-5 keeps it OUT of the
-voter table). S4 (2026-10-31, the backtest harness —
+(«انتظارات در حال شدت‌گیری/فروکش» — round-54; promoted to the 21st voter in
+Session 6, D-5 decided-YES — the phrase stays beside the lane word). S4 (2026-10-31, the backtest harness —
 `docs/insights/BACKTEST-GOLD.md`, the measured report) re-ran the FROZEN
 20-voter table over the stored histories at a frozen clock (2,514
 windows, 2016-11 → 2026-10, zero cross-fills, zero lookahead —
@@ -281,12 +281,22 @@ report, bilingual, Persian-copy round-55) under the "conditions, not
 advice" footnote, which remains the operative description. The asOf-watch
 days 2–3 re-check is scheduled 2026-11-02 ~04:30 UTC (day 1 lockstep
 re-confirmed from the archive pair; verdict → GOLD_BACKTEST_SPEC §5).
-NEXT: the 21-voter promotion session (D-5's implementation — the
-20→21 pin-test, the 21st voter's bilingual naming + copy round, the
-harness-local table + equality pin, the GOLD_SCORE_SPEC bump) + the
-2026-11-02 automated re-check (asOf-watch days 2–3 verdict + the real
-C5 refresh with the 11-01/11-02 archive days). The S5 close-out is
-FULLY LANDED as of 2026-10-31 ~15:15 UTC (the fourth credential
+S6 (2026-10-31 ~15:30 UTC, the D-5 promotion — the owner's "go"):
+the production voter table is 21 — `breakeven-tilt` joined the inflation
+lane (polarity +1, level-leg only, exactly the S4-B4-measured variant);
+the 20→21 pin tests, the bilingual naming (Persian-copy round-56:
+"Inflation tilt" / «شیب انتظارات تورمی»), the harness equality pin
+(`HARNESS_GOLD_VOTERS_21` = production; `HARNESS_GOLD_VOTERS_20` keeps
+the S4-frozen table for lineage) and the GOLD_SCORE_SPEC bump (§2.1 +
+§5.1) all landed; the backtest re-ran the promoted table over the
+corpus-of-record (sign-agreements 52.1/47.6/43.9% vs the baseline's
+51.7/46.9/43.9 — no material difference; the mature-base 5td nuance is
+recorded in GOLD_BACKTEST_SPEC §5 Session 6). NEXT: the 2026-11-02
+automated re-check (asOf-watch days 2–3 verdict + the grown-corpus
+refresh with the 11-01/11-02 archive days, now over the promoted
+table) + the S6 deploy (pending a Cloudflare token in-session — the
+round-4 token lives only in the repo Actions secret). The S5 close-out
+was FULLY LANDED as of 2026-10-31 ~15:15 UTC (the fourth credential
 round): PR #9 merged as 758298d (+ the postscript b4ac1ab, CI
 365/366 green), DEPLOYED live as worker version d77e9139 (the
 round-55 honest note serves on currena.ir — the Insights chunk

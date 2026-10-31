@@ -127,7 +127,8 @@ describe('gold panel copy — both dictionaries cover the whole engine vocabular
       // Session 5 (C4a): the measured-reality note + its link word — both locales.
       expect(g.measuredNote, `${name} measuredNote`).toBeTruthy();
       expect(g.measuredNoteLink, `${name} measuredNoteLink`).toBeTruthy();
-      // the voter names cover EXACTLY the 20-voter table
+      // the voter names cover EXACTLY the 21-voter table (Session 6:
+      // the D-5 promotion added breakeven-tilt to both dictionaries)
       const tableIds = GOLD_LANE_VOTERS.map((v) => v.id as string);
       expect(Object.keys(g.voterNames).sort()).toEqual([...new Set(tableIds)].sort());
       for (const id of tableIds) expect(g.voterNames[id as keyof typeof g.voterNames], `${name} ${id}`).toBeTruthy();
@@ -162,7 +163,7 @@ describe('GoldTailwindPanel — the served goldSummary renders (EN)', () => {
     expect(screen.getByText('Headwind')).toBeTruthy();
     expect(screen.getByText('1 tailwind · 1 headwind · 1 mixed')).toBeTruthy();
     // the net-firing line speaks the 20-driver table
-    expect(screen.getByText(/Net score — 5 of 20 drivers firing/)).toBeTruthy();
+    expect(screen.getByText(/Net score — 5 of 21 drivers firing/)).toBeTruthy();
   });
 
   it('the four sub-gauge readings render with their lane words and firing counts', () => {
@@ -225,7 +226,7 @@ describe('GoldTailwindPanel — the fa locale renders the reviewed Persian copy'
     // firing list, so the label word is one of several honest matches.
     expect(screen.getAllByText('باد مخالف').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('۱ موافق · ۱ مخالف · ۱ مختلط')).toBeTruthy();
-    expect(screen.getByText(/نمرهٔ خالص؛ ۵ مورد از ۲۰ عامل فعال است/)).toBeTruthy();
+    expect(screen.getByText(/نمرهٔ خالص؛ ۵ مورد از ۲۱ عامل فعال است/)).toBeTruthy();
     // the lane names + words render in Persian
     expect(screen.getByText('هزینهٔ استقراض')).toBeTruthy();
     expect(screen.getByText('گران (۲)')).toBeTruthy();

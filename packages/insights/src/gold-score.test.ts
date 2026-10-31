@@ -356,7 +356,43 @@ describe('the compact wire shape + the EN copy blocks', () => {
     // pure engine, so the remaining assertions here are the compact
     // writer's shape above and the pure key-mapping below.
     expect(GOLD_LANES).toHaveLength(4);
-    expect(GOLD_LANE_VOTERS.length).toBeGreaterThanOrEqual(20);
+  });
+
+  it('the 20→21 pin (the D-5 promotion, Session 6): 21 voters, lane counts 8/3/5/5, the tilt exactly once, no duplicates', () => {
+    // The promoted table's exact shape — the pin a future edit cannot
+    // drift past silently. Pre-promotion this asserted ≥ 20 loosely plus
+    // the 20-voter pin in breakeven-tilt.test.ts; the promotion session
+    // tightens it to the promoted shape (the owner's "we can have 21").
+    expect(GOLD_LANE_VOTERS).toHaveLength(21);
+    const byLane = { 'borrowing-costs': 0, dollar: 0, stress: 0, inflation: 0 } as Record<string, number>;
+    const ids = new Set<string>();
+    for (const v of GOLD_LANE_VOTERS) {
+      byLane[v.lane] = (byLane[v.lane] ?? 0) + 1;
+      expect(ids.has(v.id as string), `duplicate voter ${v.id}`).toBe(false);
+      ids.add(v.id as string);
+    }
+    expect(byLane).toEqual({ 'borrowing-costs': 8, dollar: 3, stress: 5, inflation: 5 });
+    const tilt = GOLD_LANE_VOTERS.filter((v) => v.id === 'breakeven-tilt');
+    expect(tilt).toHaveLength(1);
+    expect(tilt[0]).toEqual({ lane: 'inflation', id: 'breakeven-tilt', polarity: 1 });
+    expect(tilt[0]!.lane === 'inflation' && GOLD_LANE_VOTERS.indexOf(tilt[0]!) === 20).toBe(true); // the last seat — the B4-measured shape
+  });
+
+  it('the promoted 21st voter fires like every level-only voter: decade-HIGH tilt → tailwind, LOW → headwind, steady-mid → silent', () => {
+    // The tilt carries no 30-day move threshold in the shared evaluator
+    // (SIGNAL_LEG_MOVE has no entry) — exactly the variant S4's B4
+    // measured, now the production semantics.
+    const high = goldTailwindScore([reading('breakeven-tilt', HIGH)]);
+    expect(high.voters).toEqual([
+      { id: 'breakeven-tilt', lane: 'inflation', impact: 'tailwind', evidence: 'high' },
+    ]);
+    expect(high.subGauges.find((g) => g.lane === 'inflation')!.reading).toBe('hot');
+    const low = goldTailwindScore([reading('breakeven-tilt', LOW)]);
+    expect(low.voters[0]).toMatchObject({ impact: 'headwind', evidence: 'low' });
+    expect(low.netScore).toBe(-1);
+    const silent = goldTailwindScore([reading('breakeven-tilt', { percentile10y: 0.5, change30d: 0.2 })]);
+    expect(silent.voters).toEqual([]); // the change30d is IGNORED (no threshold) and the level is typical — honestly absent
+    expect(silent.label).toBeNull();
   });
 
   it('the explainer keys map every chip (never an undefined lookup)', () => {

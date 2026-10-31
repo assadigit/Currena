@@ -15,7 +15,11 @@ real-KV-read test, the deploy landed live as `d77e9139` (the round-55
 note now serves on currena.ir, byte-verified), C5 re-ran as a
 validation pass (content-identical to S4 — recordedAt refreshed), and
 the repo Actions secret rotated to the working token — §5's retry +
-third/fourth-round bullets). **Parent specs:** `docs/insights/GOLD_SCORE_SPEC.md` (S1+S2+
+third/fourth-round bullets). **Session 6 (2026-10-31 ~15:30 UTC, the D-5
+promotion): the production table is 21 — the harness re-ran the promoted
+table over the corpus-of-record the same hour** (§5's Session-6
+subsection; the report regenerates with the promoted primary + a
+promotion-delta lineage section). **Parent specs:** `docs/insights/GOLD_SCORE_SPEC.md` (S1+S2+
 S2.1 shipped — the 20-voter directional score) and
 `docs/insights/GOLD_FRED_GAPFILL_SPEC.md` (S3 shipped — D-5 names this
 harness as the venue to evaluate the tilt promotion). `AGENTS.md` §A
@@ -364,6 +368,58 @@ session's verification + decisions, all measured or owner-quoted:
   Nothing credential-blocked remains; the next owner round is the
   D-5 21-voter promotion session.
 
+### Session 6 (2026-10-31 ~15:30–16:00 UTC) — the D-5 promotion, implemented
+
+The owner's "go" opened the gated session the S5 decision log
+prescribed; all four gates plus the fresh run, measured:
+
+- **The corpus at S6 open:** the live API carries `goldSummary` (netScore
+  −2, headwind, 6 firing — the 04:20 rung, stamped by the pre-promotion
+  engine) + `breakeven-tilt` (−0.24, asOf 2026-10-30, percentile10y
+  0.217 — mid-range, so the tilt is SILENT today: the promotion changes
+  nothing about the current live reading; the stamped −2/headwind stands
+  under both tables). The corpus fixture is the S5 C5 validation dump
+  (recordedAt 15:17:40Z, 16 archive days 10-15 → 10-31 — content-identical
+  to S4); the 11-01/11-02 rungs land after this session, so the
+  grown-corpus refresh stays with the scheduled 2026-11-02 re-check
+  (updated to carry the promoted-table comparison baselines).
+- **The promotion:** `GOLD_LANE_VOTERS` = 21 — the tilt appended as the
+  inflation lane's 5th seat, polarity +1, level-leg only, exactly the
+  B4-measured variant. The pin gates flipped with it: gold-score.test.ts
+  pins the promoted shape (35 tests), breakeven-tilt.test.ts pins the
+  membership + the phrase/voter-lean distinction (11),
+  gold-backtest-core.test.ts pins `HARNESS_GOLD_VOTERS_21` EQUAL to
+  production and `HARNESS_GOLD_VOTERS_20` (the S4-frozen table, kept
+  verbatim) equal to production-minus-the-tilt (29). The bilingual
+  naming rode Persian-copy round-56; `gold-panels.test.tsx` 25/25.
+- **The fresh run (the promoted primary over the corpus-of-record):**
+  2,514 windows · the tilt fired 1,174 (46.7%) · label distribution
+  tailwind ×907 · strong-tailwind ×226 · balanced ×236 · headwind ×741 ·
+  strong-headwind ×404. Sign-agreements 5/20/60td: **52.1% / 47.6% /
+  43.9%** (the S4-frozen baseline: 51.7 / 46.9 / 43.9). The promotion
+  delta: net-score −1 ×910 · +0 ×1340 · +1 ×264; label-bucket flips 256
+  (10.2%) — the same numbers B4 measured in S4, now the official
+  lineage. **The honest nuance (stated, not softened):** on the
+  mature-base subsample the promoted table reads 46.9 / 42.3 / 32.6%
+  with spreads +0.02 / −0.22 / −1.94% — the 5td agreement moves from
+  46.8% (S4: just OUTSIDE the ±3.2% 2-SE band) to 46.9% (just INSIDE),
+  and its spread flips sign (−0.10 → +0.02%), so the S4 conclusion's
+  strong wording ("the measurable association runs the OTHER way") no
+  longer strictly holds for the promoted table — the same stated-in-
+  advance rule now reads "no measurable edge" (20td/60td still depart
+  below 50%; 5td sits inside the band). No edge claim is made in either
+  direction; the panel's round-55 measured-reality note remains the
+  operative description, and BACKTEST-GOLD.md carries every table.
+- **The archive-era check:** the 10-31 archive's stamped `goldSummary`
+  (−2/headwind) agrees with the S4-frozen re-derivation (the no-drift
+  contract holds — the stamping engine WAS the frozen table), and the
+  promoted table reads the same −2/headwind that day (the tilt silent at
+  its 21.7th percentile); every rung after the deploy stamps the
+  promoted numbers.
+- **Gates:** insights 973/973 · web gold panels 25/25 · typecheck 6/6
+  clean · copy:audit clean (round-56, manifest 4,852) · secret scan
+  clean.
+
 ### The standard block (S4)
 
 - `corepack pnpm -r test` — green (the insights package gains
@@ -403,21 +459,26 @@ session's verification + decisions, all measured or owner-quoted:
 
 ## Decision log
 
-- **D-5 (decided-YES 2026-10-31, Session 5 — implementation deferred to
-  its own session)** — promote `breakeven-tilt` to a 21st gold voter. The
+- **D-5 (decided-YES 2026-10-31, Session 5 — IMPLEMENTED 2026-10-31,
+  Session 6)** — promote `breakeven-tilt` to a 21st gold voter. The
   owner's call on S4's B4 evidence: **"we can have 21."** The S4
   measurement stands as the context (the tilt fired in 46.7% of windows,
   moved the label bucket in 10.2%, shifted sign-agreements
   +0.4/+0.7/+0.0pp — no material difference): the promotion is a scope
   choice the owner is entitled to make, NOT an edge claim the harness
   supports. Because it changes score semantics (the 5-step label's
-  shares, the strong-crowd minimum, the backtest contract), it ships in
-  a dedicated session with its own gates: the 20→21 pin-test update, the
-  21st voter's name in both dictionaries behind a Persian-copy round,
-  the harness-local `HARNESS_GOLD_VOTERS_21` + its equality pin, the
-  GOLD_SCORE_SPEC contract bump, and a fresh backtest run on the grown
-  corpus. S5 changed nothing in production (`GOLD_LANE_VOTERS` untouched,
-  the 20-voter pin test green).
+  shares, the strong-crowd minimum, the backtest contract), it shipped
+  in a dedicated session with its own gates — ALL LANDED in Session 6:
+  the 20→21 pin-test update (gold-score 35 · breakeven-tilt 11 ·
+  gold-backtest-core 29), the 21st voter's name in both dictionaries
+  behind Persian-copy round-56, the harness-local
+  `HARNESS_GOLD_VOTERS_21` pinned EQUAL to production (with
+  `HARNESS_GOLD_VOTERS_20` keeping the S4-frozen table verbatim for
+  lineage), the GOLD_SCORE_SPEC contract bump (§2.1 + §5.1), and the
+  fresh backtest run (the promoted primary + the promotion delta —
+  §5's Session-6 subsection for the measured record, including the
+  mature-base 5td nuance). The grown-corpus refresh rides the scheduled
+  2026-11-02 re-check.
 - **D-7 (decided-NO 2026-10-31, Session 5)** — EODHD as an alternative
   gold-price history source. The owner: **"No, EODHD api is very limited
   and problematic in free mode."** Default confirmed as the outcome: the

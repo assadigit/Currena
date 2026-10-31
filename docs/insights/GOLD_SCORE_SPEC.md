@@ -1,7 +1,11 @@
 # GOLD_SCORE_SPEC — the gold-directional scoring engine (the Gold Program)
 
 **Status:** S1 (engine) + S2 (API + UI integration) + S2.1 (bilingual +
-placement round) shipped. FA copy shipped in S2.1 (round-53).
+placement round) shipped. FA copy shipped in S2.1 (round-53). **Session 6
+(2026-10-31, the D-5 promotion): the voter table is 21 — `breakeven-tilt`
+joined the inflation lane** (§2.1, the contract bump this session owes
+GOLD_BACKTEST_SPEC's decision log; the panel's round-55 measured-reality
+note stays the operative description).
 **Modules:** `packages/insights/src/gold-score.ts` (pure engine — copy
 moved to the web dictionaries in S2.1) ·
 `packages/core/src/schemas.ts` (`GoldSummarySchema`, the optional snapshot field) ·
@@ -29,7 +33,7 @@ new KV key: the snapshot gains one optional ~0.5 KB field.
 
 ## 2. The model
 
-### 2.1 The voter table (20 voters, 4 lanes)
+### 2.1 The voter table (21 voters, 4 lanes — the D-5 promotion, Session 6)
 
 A voter fires when the **shared signals evaluator** (`connections.ts
 evalLeg` — the S1–S2 cards' own leg vocabulary) leans ±1:
@@ -48,19 +52,31 @@ lean × polarity):
 | `borrowing-costs` | real-yield-10y (−) · us10y (−) · us30y (−) · fed-target (−) · fed-expectations (−) · ecb-dfr (−) · yield-curve-10y2y (−) · yield-curve-10y3m (−) | **relief** | **tight** |
 | `dollar` | dollar-basket (−) · usdjpy (−) · us-japan-10y-gap (−) | **stress** | **strong** |
 | `stress` | stress-stlfsi (+) · nfci (+) · vix (+) · gold-silver (+) · cftc-gold-positioning (−, contrarian) | **elevated** | **calm** |
-| `inflation` | us-cpi-yoy (+) · us-pce-core-yoy (+) · euro-hicp (+) · breakeven-5y5y (+) | **hot** | **cool** |
+| `inflation` | us-cpi-yoy (+) · us-pce-core-yoy (+) · euro-hicp (+) · breakeven-5y5y (+) · breakeven-tilt (+, level-only — the Session-6 promotion) | **hot** | **cool** |
 
 Rationale notes (the classic relationships, hedged): tight real rates are
 gold's opportunity cost (−); a strong dollar is the headwind of a USD-priced
 metal (−); elevated stress usually brings the safe-haven bid (+); crowded
 COT longs are fragile — the squeeze-then-slump zone (−, contrarian); hot
-inflation supports hedge demand (+).
+inflation supports hedge demand (+). **The 21st seat (Session 6, D-5
+decided-YES):** `breakeven-tilt` (T5YIFR − T5YIE, the priced ACCELERATION
+of inflation) rides the inflation lane with polarity +1 — a building tilt
+is the tailwind side, like the lane's own hot-inflation reading — and
+fires on the DECADE POSITION alone (the shared evaluator carries no
+30-day move threshold for it: exactly the variant S4's B4 measured — it
+fired in 46.7% of the re-run windows, moved the label bucket in 10.2%,
+and shifted the sign-agreements +0.4/+0.7/+0.0pp: no material difference).
+The promotion is a scope choice the owner is entitled to make, NOT an
+edge claim the harness supports; the S6 re-run's measured record is
+`BACKTEST-GOLD.md`.
 
 **Deliberately excluded:** `govt-interest-revenue` (a fiscal share whose
 gold signal is contested — high interest costs argue both ways), the whole
 growth-health lane (weak or two-sided for gold; copper-gold is already a
 ratio ABOUT gold), and `brent` (supply shocks are not the hedge-demand
-channel). Stale / check-pending / unavailable readings never fire.
+channel). The 21st seat went to `breakeven-tilt` on the owner's D-5 call
+(Session 6) — the expectations tilt the panel already reads beside the
+lane's word. Stale / check-pending / unavailable readings never fire.
 
 ### 2.2 The arithmetic
 
@@ -229,3 +245,43 @@ a sandbox recycle before it was committed or pushed. The engine, its 36
 tests and this spec were REBUILT for S2 against the same contract
 described in the program brief; the rebuild is recorded in
 `/home/z/my-project/worklog.md` under `gold-program-s2`.
+
+### 5.1 Session 6 (2026-10-31, the D-5 promotion) — the validation record
+
+The gated session the S5 decision log prescribed, all four gates plus the
+fresh run:
+
+- **The table change:** `GOLD_LANE_VOTERS` = 21 — `{ lane: 'inflation',
+  id: 'breakeven-tilt', polarity: 1 }` appended as the last seat (the
+  B4-measured shape: the frozen 20 + the tilt). No threshold, label,
+  lane-word, or evaluator change; the tilt stays level-leg only.
+- **The 20→21 pin-test update:** `gold-score.test.ts` now pins the exact
+  promoted shape (21 voters, lane counts 8/3/5/5, the tilt exactly once,
+  no duplicates, the last seat — **35 tests**); `breakeven-tilt.test.ts`'s
+  D-5 block flipped from the freeze pin to the promotion pin + the
+  phrase-selector-is-not-the-voter-lean pin (**11 tests**).
+- **The bilingual naming (round-56):** `voterNames['breakeven-tilt']` =
+  "Inflation tilt" (EN) / «شیب انتظارات تورمی» (fa — the compact form of
+  the context card's own round-54 name) behind
+  `docs/localization/persian-copy-round-56-gold-21st-voter.md`;
+  `gold-panels.test.tsx` **25 tests** green in both locales (the
+  dictionary-coverage test enforces the exact-match rule).
+- **The harness flip:** `HARNESS_GOLD_VOTERS_21` is now PINNED EQUAL to
+  production (the equality test), and `HARNESS_GOLD_VOTERS_20` keeps the
+  S4-frozen table verbatim for lineage (pinned to production-minus-the-
+  tilt); `gold-backtest-core.test.ts` **29 tests**. The runner
+  (`gold-backtest.ts`) re-ran the promoted table over the corpus-of-record
+  (the S5 C5 validation dump, recordedAt 15:17:40Z — content-identical to
+  S4; the 11-01/11-02 rungs land after, carried by the scheduled
+  2026-11-02 re-check): the promoted primary tables + the promotion-delta
+  section are `docs/insights/BACKTEST-GOLD.md`. The measured promotion
+  effect: sign-agreements 52.1/47.6/43.9% (baseline 51.7/46.9/43.9%) —
+  the mature-base 5td moves 46.8→46.9%, from just-outside to
+  just-inside the 2-SE band, so the S4 "runs the OTHER way" verdict
+  softens to "no measurable edge" under the same stated-in-advance rule
+  (20td/60td still depart below; the 5td spread flips −0.10 → +0.02%).
+  No edge claim is made either way — the panel's measured-reality note
+  stays the operative description.
+- **Gates:** insights 973/973 · web gold panels 25/25 · typecheck clean
+  (main + scripts tsconfigs) · copy:audit clean after round-56 · secret
+  scan clean.

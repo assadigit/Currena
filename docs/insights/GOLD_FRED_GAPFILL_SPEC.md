@@ -3,8 +3,9 @@
 **Status:** IMPLEMENTED (Session 3, 2026-10-31) — see §5's validation
 record + the decision log below. G1a's audit, G1b's bounded cross-fill
 (D-6), G1d's trio split (D-4), G2's breakeven-tilt card + the gold
-panel's inflation-lane phrase (D-5: context only) — merged, deployed,
-verified live. Originally authored 2026-10-31 at session close, ahead of
+panel's inflation-lane phrase (D-5: context only at S3; the tilt was
+PROMOTED to the 21st gold voter in Session 6 — GOLD_SCORE_SPEC §2.1,
+the phrase feature unchanged) — merged, deployed, verified live. Originally authored 2026-10-31 at session close, ahead of
 Session 3 — in the gap-audit tradition of the 2026-10-26c A-1..A-10
 build. **Parent spec:** `docs/insights/GOLD_SCORE_SPEC.md` (S1+S2+S2.1
 shipped; §4.5 names this round: "No FRED gap-fillers (S3: real-yield
