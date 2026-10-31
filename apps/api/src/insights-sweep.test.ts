@@ -136,14 +136,17 @@ describe('runScheduledInsightsSweep', () => {
     const kv = {
       get: async (key: string) => {
         reads += 1;
-        expect(key).toBe('insights:status');
-        return JSON.stringify(healthy);
+        // S1-M1.7: a healthy sweep reads the main status + the two
+        // extra-rung statuses (the heal gate) — 3 reads, still no ingest.
+        expect(['insights:status', 'insights:extra-status:rung3', 'insights:extra-status:rung4']).toContain(key);
+        if (key === 'insights:status') return JSON.stringify(healthy);
+        return null; // the extra rungs never ran (empty registry era)
       },
       put: async () => {},
     } as unknown as KVNamespace;
     const outcome = await runScheduledInsightsSweep({ RATES: kv } as never);
     expect(outcome).toBe('skipped');
-    expect(reads).toBe(1);
+    expect(reads).toBe(3);
     expect(runInsightsUpdate).not.toHaveBeenCalled();
   });
 

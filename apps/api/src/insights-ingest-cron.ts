@@ -32,6 +32,7 @@ import {
   KvInsightsStore,
   HIDDEN_PUBLIC_IDS,
 } from '@currena/insights/ingest';
+import { EXTRA_RUNG3_MINUTE, EXTRA_RUNG4_MINUTE, extraRungsNeedHealing, runExtraRung } from './insights-extra-rungs';
 import type { Bindings } from './index';
 
 /** The hour (UTC) whose minutes carry the ingest rungs. */
@@ -182,33 +183,48 @@ export async function runScheduledInsightsRung2(
   });
 }
 
-/** One sweep rung (10:10 / 20:10 UTC): gated re-run of the full ingest. */
+/** One sweep rung (10:10 / 20:10 UTC): gated re-run of the full ingest +
+ * the S1-M1.7 extra-rung heal (a failed rung3/rung4 source retries within
+ * hours instead of waiting for its next day gate). */
 export async function runScheduledInsightsSweep(env: Bindings): Promise<'skipped' | 'ran'> {
   const status = await readInsightsStatus(env.RATES);
-  if (!sweepShouldFire(status, new Date())) {
+  const fireMain = sweepShouldFire(status, new Date());
+  const extraHeal = await extraRungsNeedHealing(env.RATES);
+  if (!fireMain && !extraHeal) {
     console.log('[ingest-sweep] last rung healthy — skipping (1 subrequest)');
     return 'skipped';
   }
-  console.log(
-    `[ingest-sweep] ${status === undefined ? 'no status found' : `generatedAt=${status.generatedAt}`} — failures present or stale: re-running the ingest`,
-  );
-  const store = new KvInsightsStore(env.RATES);
-  const result = await runInsightsUpdate({
-    store,
-    stageKv: env.RATES,
-    mode: 'scheduled',
-    skipRbaCsvTables: true,
-    hiddenPublicIds: HIDDEN_PUBLIC_IDS,
-    sweep: true,
-    // 2026-10-26 gap-audit build: the sweep must NOT overwrite the stage —
-    // the morning's 04:20-updated blob (with the rung-2 series) stands for
-    // the 04:25/04:40 history phases.
-    skipStageWrite: true,
-  });
-  if (result.failedSources.length === 0) {
-    console.log('[ingest-sweep] all sources healthy again — snapshot restored');
-  } else {
-    console.warn(`[ingest-sweep] still failing after re-run: ${result.failedSources.join(', ')}`);
+  if (fireMain) {
+    console.log(
+      `[ingest-sweep] ${status === undefined ? 'no status found' : `generatedAt=${status.generatedAt}`} — failures present or stale: re-running the ingest`,
+    );
+    const store = new KvInsightsStore(env.RATES);
+    const result = await runInsightsUpdate({
+      store,
+      stageKv: env.RATES,
+      mode: 'scheduled',
+      skipRbaCsvTables: true,
+      hiddenPublicIds: HIDDEN_PUBLIC_IDS,
+      sweep: true,
+      // 2026-10-26 gap-audit build: the sweep must NOT overwrite the stage —
+      // the morning's 04:20-updated blob (with the rung-2 series) stands for
+      // the 04:25/04:40 history phases.
+      skipStageWrite: true,
+    });
+    if (result.failedSources.length === 0) {
+      console.log('[ingest-sweep] all sources healthy again — snapshot restored');
+    } else {
+      console.warn(`[ingest-sweep] still failing after re-run: ${result.failedSources.join(', ')}`);
+    }
+  }
+  if (extraHeal) {
+    console.log('[ingest-sweep] extra-rung failures recorded — healing rung3/rung4 sources');
+    await runExtraRung(env, 3, { heal: true }).catch((err: unknown) => {
+      console.error('[ingest-sweep] rung3 heal failed:', err instanceof Error ? err.message : err);
+    });
+    await runExtraRung(env, 4, { heal: true }).catch((err: unknown) => {
+      console.error('[ingest-sweep] rung4 heal failed:', err instanceof Error ? err.message : err);
+    });
   }
   return 'ran';
 }
@@ -232,6 +248,8 @@ export type InsightsIngestRung =
   | { kind: 'history-daily-a' }
   | { kind: 'history-daily-b' }
   | { kind: 'history-periodic' }
+  | { kind: 'extra-3' }
+  | { kind: 'extra-4' }
   | { kind: 'sweep' };
 
 export function insightsIngestRung(scheduledTimeMs: number): InsightsIngestRung | undefined {
@@ -247,6 +265,11 @@ export function insightsIngestRung(scheduledTimeMs: number): InsightsIngestRung 
     if (minute === INGEST_HIST_DAILY_MINUTE) return { kind: 'history-daily-a' };
     if (minute === INGEST_HIST_DAILY_B_MINUTE) return { kind: 'history-daily-b' };
     if (minute === INGEST_HIST_PERIODIC_MINUTE) return { kind: 'history-periodic' };
+    // S1-M1.7 (2026-10-31): the generic extra-source rungs — 04:30/04:35
+    // were free slots (verified: the neighbours 29/31/34/36 stay ungated).
+    // Their machinery, budget and status live in insights-extra-rungs.ts.
+    if (minute === EXTRA_RUNG3_MINUTE) return { kind: 'extra-3' };
+    if (minute === EXTRA_RUNG4_MINUTE) return { kind: 'extra-4' };
     return undefined;
   }
   // 2026-10-22 reliability round: the failure-gated intra-day sweeps.

@@ -27,6 +27,7 @@ import {
   runScheduledInsightsRung2,
   runScheduledInsightsSweep,
 } from './insights-ingest-cron';
+import { runExtraRung } from './insights-extra-rungs';
 import { recordHistory } from './history';
 import { makeDefaultService } from './default-service';
 import type { SnapshotSource } from '@currena/core';
@@ -154,16 +155,20 @@ export async function runScheduled(env: Bindings, scheduledTimeMs: number): Prom
             ? runScheduledInsightsSweep(env).then(() => undefined)
             : ingestRung.kind === 'rung2'
               ? runScheduledInsightsRung2(env).then(() => undefined)
-              : runScheduledInsightsHistories(
-                  env,
-                  ingestRung.kind === 'history-periodic'
-                    ? 'periodic'
-                    : ingestRung.kind === 'history-daily-a'
-                      ? 'daily-a'
-                      : ingestRung.kind === 'history-daily-b'
-                        ? 'daily-b'
-                        : 'daily',
-                );
+              : ingestRung.kind === 'extra-3'
+                ? runExtraRung(env, 3).then(() => undefined)
+                : ingestRung.kind === 'extra-4'
+                  ? runExtraRung(env, 4).then(() => undefined)
+                  : runScheduledInsightsHistories(
+                      env,
+                      ingestRung.kind === 'history-periodic'
+                        ? 'periodic'
+                        : ingestRung.kind === 'history-daily-a'
+                          ? 'daily-a'
+                          : ingestRung.kind === 'history-daily-b'
+                            ? 'daily-b'
+                            : 'daily',
+                    );
       return [
         work.then(
           () => undefined,
