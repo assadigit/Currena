@@ -27,6 +27,10 @@ const KIND_CLASS: Record<CalendarEvent['kind'], string> = {
   ecb: 'bg-currena-blue/15 text-[var(--color-status-context)]',
   'us-cpi': 'bg-currena-blue/15 text-[var(--color-status-context)]',
   'us-jobs': 'bg-currena-blue/15 text-[var(--color-status-context)]',
+  // gap-closure S2-M2.3: the monthly TIC release (the foreign-holders
+  // table's own publication day — the section it feeds is the owner's
+  // top-priority feature).
+  tic: 'bg-currena-blue/15 text-[var(--color-status-context)]',
   other: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
 };
 
@@ -38,6 +42,7 @@ const KIND_BADGE: Record<CalendarEvent['kind'], string> = {
   ecb: 'ECB',
   'us-cpi': 'CPI',
   'us-jobs': 'JOBS',
+  tic: 'TIC',
   other: '',
 };
 

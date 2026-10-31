@@ -233,6 +233,13 @@ const OWNER_PUBLIC_BOARD_OVERRIDE: Readonly<Record<string, string>> = {
   markets:
     'The board is EODHD-first on the owner\u2019s own API key (the currena-markets secret); the Yahoo fallback leg stays in the engine \u2014 the owner directive (2026-10-18b) lifts the board\u2019s display bar, exactly the 2026-10-19e pattern the four prices tiles set.',
   fx: 'ECB euro reference rates via the Frankfurter project (MIT code) — the same rates the public converter displays; the owner directive (2026-10-21c) restores the currencies board, with the ECB display terms verified 2026-10-21 (accurate reproduction + ECB cited as source + stated derivations), exactly the 2026-10-18b markets-board pattern.',
+  // gap-closure S2-M2.3 (2026-10-31): the Treasury TIC foreign-holders
+  // board — US government work, public domain (L0, 17 U.S.C. § 105;
+  // LICENCES.md provider `tic`). No licence hide applies, so the board
+  // serves public from day one; naming it here arms the per-source kill
+  // switch (a generator run without this entry hides it, exactly the
+  // markets/fx discipline) while keeping it visible today.
+  tic: 'Treasury TIC SLT tables (slt_table5.txt + slt_table3.txt) — US government work, public domain (L0, 17 U.S.C. § 105, verified 2026-10-31; provider `tic` in licences.ts): no licence hide applies, so the foreign-holders board serves in public mode from day one. The owner\u2019s top-priority feature (gap-closure G-10/S2); the entry exists so the hide machinery covers it like markets/fx.',
 };
 
 const indicators = DEFINITIONS.map((def) => {
@@ -393,7 +400,7 @@ const hiddenIndicatorIds = indicators
 // whole board). Everything else EODHD/Yahoo-backed stays hidden — today that
 // is nothing: markets rides the 2026-10-18b directive and fx the 2026-10-21c
 // restoration directive.
-const hiddenBoards = ['markets', 'fx'].filter((b) => OWNER_PUBLIC_BOARD_OVERRIDE[b] === undefined);
+const hiddenBoards = ['markets', 'fx', 'tic'].filter((b) => OWNER_PUBLIC_BOARD_OVERRIDE[b] === undefined);
 const overridesPath = join(here, '..', 'data', 'site-mode-overrides.json');
 writeFileSync(
   overridesPath,

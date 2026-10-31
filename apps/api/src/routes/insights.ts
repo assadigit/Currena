@@ -55,6 +55,8 @@ import { reStaleMarketsSnapshot } from '@currena/insights/markets';
 import type { MarketsReader } from '@currena/insights/markets';
 import { reStaleFxSnapshot } from '@currena/insights/fx';
 import type { FxReader } from '@currena/insights/fx';
+import type { TicReader } from '@currena/insights/tic';
+import type { TicSnapshot } from '@currena/core';
 import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
 import { z } from 'zod';
@@ -117,6 +119,8 @@ interface InsightsRouteDeps {
   getMarketsReader: (env: Bindings) => MarketsReader;
   /** Fx store construction (route tests inject the in-memory fake). */
   getFxReader: (env: Bindings) => FxReader;
+  /** TIC store construction (route tests inject the in-memory fake). */
+  getTicReader: (env: Bindings) => TicReader;
   /** Live-prices store construction (route tests inject the in-memory fake). */
   getPricesReader: (env: Bindings) => PricesReader;
   /**
@@ -483,6 +487,74 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
     const response = c.json(snapshot, 200, {
       'Cache-Control': 'public, max-age=300, s-maxage=300',
       ETag: etag,
+    });
+    if (typeof caches !== 'undefined') {
+      // Best-effort warm of the Worker's edge cache; the response is
+      // already on its way to the client.
+      try {
+        await caches.default.put(c.req.raw, response.clone());
+      } catch {
+        /* cache warm failures never fail the request */
+      }
+    }
+    return response;
+  });
+
+  // Foreign holders of US Treasuries (gap-closure S2-M2.3): the ONE-key
+  // snapshot, the markets/fx twin. Registered BEFORE /:id/history so the
+  // literal path wins over the parameterised one. Staleness is NOT a
+  // stored flag on this document (freshness is dataMonth, derived at
+  // render time by the shared pure ticIsStale) — there is nothing to
+  // re-stale at serve time, unlike the markets/fx A-8 re-evaluations.
+  app.get('/tic', async (c) => {
+    // The per-source kill switch (the boards pattern): public mode + a
+    // hiddenBoards entry refuses 404 with zero data BEFORE any KV read.
+    // TIC is L0 public domain (17 U.S.C. § 105) — the generated overrides
+    // file carries the owner directive that keeps it PUBLIC; a future
+    // generator run that drops the override arms this refusal.
+    if ((await accessModeOf(c)) === 'public' && HIDDEN_BOARDS.has('tic')) {
+      return errorResponse(c, 404, 'hidden_site_mode', 'This section is not published on the public site.');
+    }
+    // The Worker's own edge cache — absent in plain test runtimes.
+    if (typeof caches !== 'undefined') {
+      const edgeCached = await caches.default.match(c.req.raw);
+      if (edgeCached !== undefined) return edgeCached;
+    }
+    // KV-failure honesty (QA audit A-2) — same calm 503, distinct code.
+    let snapshot: TicSnapshot | undefined;
+    try {
+      snapshot = await deps.getTicReader(c.env).getTic();
+    } catch (err) {
+      console.warn('[insights] tic read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'tic_unavailable',
+        'Foreign-holdings data is temporarily unavailable — please retry shortly.',
+      );
+    }
+    if (!snapshot) {
+      // The calm "being prepared" answer: the key has never been written
+      // (fresh deploy, or the rung3 TIC step has not landed yet).
+      return errorResponse(
+        c,
+        503,
+        'tic_not_ready',
+        'No foreign-holdings snapshot stored yet — the scheduled job has not completed.',
+      );
+    }
+    const etag = `"insights-tic:${snapshot.dataMonth}:${snapshot.fetchedAt}"`;
+    if (c.req.header('if-none-match') === etag) {
+      return c.body(null, 304, {
+        'Cache-Control': 'public, max-age=300, s-maxage=300',
+        ETag: etag,
+        'X-Robots-Tag': 'noindex',
+      });
+    }
+    const response = c.json(snapshot, 200, {
+      'Cache-Control': 'public, max-age=300, s-maxage=300',
+      ETag: etag,
+      'X-Robots-Tag': 'noindex',
     });
     if (typeof caches !== 'undefined') {
       // Best-effort warm of the Worker's edge cache; the response is

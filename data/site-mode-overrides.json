@@ -5,6 +5,7 @@
   "hiddenBoards": [],
   "ownerBoardDirectives": {
     "markets": "The board is EODHD-first on the owner’s own API key (the currena-markets secret); the Yahoo fallback leg stays in the engine — the owner directive (2026-10-18b) lifts the board’s display bar, exactly the 2026-10-19e pattern the four prices tiles set.",
-    "fx": "ECB euro reference rates via the Frankfurter project (MIT code) — the same rates the public converter displays; the owner directive (2026-10-21c) restores the currencies board, with the ECB display terms verified 2026-10-21 (accurate reproduction + ECB cited as source + stated derivations), exactly the 2026-10-18b markets-board pattern."
+    "fx": "ECB euro reference rates via the Frankfurter project (MIT code) — the same rates the public converter displays; the owner directive (2026-10-21c) restores the currencies board, with the ECB display terms verified 2026-10-21 (accurate reproduction + ECB cited as source + stated derivations), exactly the 2026-10-18b markets-board pattern.",
+    "tic": "Treasury TIC SLT tables (slt_table5.txt + slt_table3.txt) — US government work, public domain (L0, 17 U.S.C. § 105, verified 2026-10-31; provider `tic` in licences.ts): no licence hide applies, so the foreign-holders board serves in public mode from day one. The owner’s top-priority feature (gap-closure G-10/S2); the entry exists so the hide machinery covers it like markets/fx."
   }
 }

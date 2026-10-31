@@ -623,6 +623,181 @@ describe('GET /api/insights/fx', () => {
 });
 
 /* ------------------------------------------------------------------ *
+ * Foreign holders of US Treasuries route (gap-closure S2-M2.3 — the
+ * markets/fx twin; one KV read, ETag, the calm 503s).
+ * ------------------------------------------------------------------ */
+
+import { InMemoryTicStore } from '@currena/insights/tic';
+import { ticIsStale } from '@currena/insights/tic';
+import type { TicSnapshot, TicHolder } from '@currena/core';
+
+/** A schema-valid snapshot whose every number is the provider's own
+ * (2026-08 row of the committed fixtures — Japan/China/Australia). */
+function ticHolder(
+  id: string,
+  name: string,
+  months: [string, number][],
+  net: [string, number][],
+  isCustodyHub: boolean,
+): TicHolder {
+  const holder: TicHolder = {
+    id,
+    name,
+    holdingsBn: months.at(-1)![1],
+    months: months.map(([ym, v]) => ({ ym, v })),
+    netSalesBn: net.map(([ym, v]) => ({ ym, v })),
+    isCustodyHub,
+  };
+  return holder;
+}
+
+const ticSnapshot: TicSnapshot = {
+  v: 1,
+  dataMonth: '2026-08',
+  releasedAt: '2026-10-16T20:07:27.000Z',
+  fetchedAt: '2026-10-31T21:40:20.370Z',
+  totalBn: 9331.7,
+  officialBn: 3755.6,
+  privateBn: 5576.1,
+  holders: [
+    ticHolder('japan', 'Japan', [
+      ['2026-06', 1116.683],
+      ['2026-07', 1103.943],
+      ['2026-08', 1068.283],
+    ], [
+      ['2026-06', -26.858],
+      ['2026-07', 0.891],
+      ['2026-08', -37.02],
+    ], false),
+    ticHolder('china-mainland', 'China, Mainland', [
+      ['2026-06', 622.537],
+      ['2026-07', 606.845],
+      ['2026-08', 590.729],
+    ], [
+      ['2026-06', -16.968],
+      ['2026-07', -9.732],
+      ['2026-08', -10.449],
+    ], false),
+    ticHolder('australia', 'Australia', [
+      ['2026-06', 80.113],
+      ['2026-07', 80.556],
+      ['2026-08', 79.912],
+    ], [
+      ['2026-06', 0.421],
+      ['2026-07', 1.276],
+      ['2026-08', -0.338],
+    ], false),
+  ],
+  sourceUrls: [
+    'https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table5.txt',
+    'https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table3.txt',
+  ],
+};
+
+describe('GET /api/insights/tic', () => {
+  let store: InMemoryTicStore;
+
+  beforeEach(() => {
+    store = new InMemoryTicStore();
+  });
+
+  function makeApp() {
+    return createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeTicReader: () => store,
+    });
+  }
+
+  it('serves the stored snapshot verbatim with ETag + the public cache stamp (PUBLIC mode)', async () => {
+    await store.putTic(ticSnapshot);
+    const res = await makeApp().request('/api/insights/tic', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('etag')).toBe('"insights-tic:2026-08:2026-10-31T21:40:20.370Z"');
+    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
+    expect(res.headers.get('x-robots-tag')).toBe('noindex');
+    expect(await res.json()).toEqual(ticSnapshot);
+  });
+
+  it('answers 304 on a matching If-None-Match', async () => {
+    await store.putTic(ticSnapshot);
+    const res = await makeApp().request(
+      '/api/insights/tic',
+      { headers: { 'if-none-match': '"insights-tic:2026-08:2026-10-31T21:40:20.370Z"' } },
+      env,
+    );
+    expect(res.status).toBe(304);
+  });
+
+  it('answers 503 tic_not_ready (calm) when KV is empty', async () => {
+    const res = await makeApp().request('/api/insights/tic', undefined, env);
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { error: { code: string; message: string } };
+    expect(body.error.code).toBe('tic_not_ready');
+    expect(body.error.message).toContain('scheduled job has not completed');
+  });
+
+  it('a POISONED stored value degrades calmly to the not-ready 503 (the validation failure path)', async () => {
+    // parseStoredTic swallows the validation failure and answers undefined —
+    // the route must surface the calm 503, never render garbage.
+    const poisoned: { getTic(): Promise<TicSnapshot | undefined> } = {
+      getTic: async () => undefined,
+    };
+    const app = createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeTicReader: () => poisoned,
+    });
+    const res = await app.request('/api/insights/tic', undefined, env);
+    expect(res.status).toBe(503);
+    expect(((await res.json()) as { error: { code: string } }).error.code).toBe('tic_not_ready');
+  });
+
+  it('the stale path: a >70-day-old data month still serves 200 VERBATIM (the UI derives staleness, never the endpoint hiding data)', async () => {
+    // dataMonth 2026-01: month-end + 70 days passed long before the pinned
+    // clock — ticIsStale flips true, the honest "out of date" badge fires in
+    // the UI, but the endpoint never silently drops the table.
+    const aged: TicSnapshot = {
+      ...ticSnapshot,
+      dataMonth: '2026-01',
+      fetchedAt: '2026-02-18T04:30:00.000Z',
+      holders: ticSnapshot.holders.map((h) => {
+        // Re-anchor the same values onto the four months ending 2026-01.
+        const yms = ['2025-10', '2025-11', '2025-12', '2026-01'];
+        const months = yms.map((ym, i) => ({ ym, v: h.months[Math.min(i, h.months.length - 1)]!.v }));
+        return {
+          ...h,
+          months,
+          holdingsBn: months.at(-1)!.v,
+          netSalesBn: h.netSalesBn?.map((m, i) => ({ ym: yms[Math.min(i + 1, yms.length - 1)]!, v: m.v })),
+        };
+      }),
+    };
+    const now = new Date('2026-10-31T12:00:00Z');
+    expect(ticIsStale(aged, now)).toBe(true); // the shared pure gate — the UI's source of truth
+    await store.putTic(aged);
+    const res = await makeApp().request('/api/insights/tic', undefined, env);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as TicSnapshot;
+    expect(body.dataMonth).toBe('2026-01');
+    expect(body).toEqual(aged);
+  });
+
+  it('one KV read per request (the store counts its own ops)', async () => {
+    await store.putTic(ticSnapshot);
+    const readsBefore = store.ops.reads;
+    await makeApp().request('/api/insights/tic', undefined, env);
+    expect(store.ops.reads - readsBefore).toBe(1);
+  });
+
+  it('authed private mode: the gate stamps private, no-store (AC-05) and the body still serves', async () => {
+    await store.putTic(ticSnapshot);
+    const res = await authed(makeApp()).request('/api/insights/tic', undefined, authedEnv);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('private, no-store');
+    expect(await res.json()).toEqual(ticSnapshot);
+  });
+});
+
+/* ------------------------------------------------------------------ *
  * KV-failure honesty (QA audit A-2): a reader rejection surfaces as   *
  * the calm 503 with a distinct machine code — never a raw 500         *
  * internal_error. (The prices-reader twin was already covered.)       *
@@ -672,6 +847,18 @@ describe('KV-failure honesty (audit A-2 — reader throws, route stays calm)', (
     expect(res.headers.get('cache-control')).toBe('private, no-store');
     const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('fx_unavailable');
+  });
+
+  it('GET /api/insights/tic → 503 tic_unavailable when the reader rejects', async () => {
+    const app = authed(createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeTicReader: () => ({ getTic: () => Promise.reject(kvFailure) }),
+    }));
+    const res = await app.request('/api/insights/tic', undefined, authedEnv);
+    expect(res.status).toBe(503);
+    expect(res.headers.get('cache-control')).toBe('private, no-store');
+    const body = (await res.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('tic_unavailable');
   });
 
   it('GET /api/insights/:id/history → 503 indicator_history_unavailable when the reader rejects', async () => {

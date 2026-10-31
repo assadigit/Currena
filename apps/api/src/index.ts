@@ -29,6 +29,7 @@ import { Hono } from 'hono';
 import type { MarketsReader } from '@currena/insights/markets';
 import type { InsightsReader } from '@currena/insights/store';
 import { KvInsightsReader, KvMarketsReader, KvFxReader, KvPricesReader } from './adapters/insights-store';
+import { KvTicStore } from '@currena/insights/tic';
 import { resolveAccessModeForRequest, type AccessMode } from './access-mode';
 import { KvAccessModeStore, type AccessModeKvStore } from './adapters/access-mode-store';
 import { createInsightsRoutes } from './routes/insights';
@@ -156,6 +157,8 @@ export interface AppDeps {
   makeMarketsReader?: (env: Bindings) => MarketsReader;
   /** Override the world-currencies store (route tests inject the in-memory fake). */
   makeFxReader?: (env: Bindings) => import('@currena/insights/fx').FxReader;
+  /** Override the TIC store (route tests inject the in-memory fake). */
+  makeTicReader?: (env: Bindings) => import('@currena/insights/tic').TicReader;
   /** Override the live-prices store (route tests inject the in-memory fake). */
   makePricesReader?: (env: Bindings) => import('@currena/insights/prices').PricesReader;
   /**
@@ -246,6 +249,16 @@ export function createApp(deps: AppDeps = {}) {
     return pricesReader;
   };
 
+  // Foreign holders of US Treasuries serve path (gap-closure S2-M2.3): the
+  // section's ONE key (KvTicReader — same lazy-singleton pattern; the KV
+  // binding's own cache serves the 5-minute window between the route's
+  // edge-cache misses).
+  let ticReader: import('@currena/insights/tic').TicReader | undefined;
+  const getTicReader = (env: Bindings): import('@currena/insights/tic').TicReader => {
+    ticReader ??= deps.makeTicReader ? deps.makeTicReader(env) : new KvTicStore(env.RATES);
+    return ticReader;
+  };
+
   const app = new Hono<{ Bindings: Bindings }>();
 
   // Security headers on every Worker-answered response (SWOT hardening
@@ -285,6 +298,7 @@ export function createApp(deps: AppDeps = {}) {
       getExportReader,
       getMarketsReader,
       getFxReader,
+      getTicReader,
       getPricesReader,
       getAccessModeKv,
       // A-8: the serve-time staleness re-evaluation needs a clock; tests

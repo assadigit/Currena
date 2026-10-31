@@ -64,6 +64,14 @@
     "tz": "America/New_York"
   },
   {
+    "id": "tic-2026-09",
+    "date": "2026-11-18",
+    "titleEn": "Treasury TIC foreign-holders data: September 2026",
+    "titleFa": "داده‌های خزانه‌داری آمریکا دربارهٔ دارندگان خارجی: سپتامبر ۲۰۲۶",
+    "kind": "tic",
+    "tz": "America/New_York"
+  },
+  {
     "id": "abs-jobs-2026-10",
     "date": "2026-11-19",
     "titleEn": "ABS jobs report (Labour Force): October 2026",

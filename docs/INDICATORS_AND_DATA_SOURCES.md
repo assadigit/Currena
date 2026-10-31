@@ -263,6 +263,7 @@ Insights page's serve path performs **exactly ONE KV read per request**
 | `GET` | `/api/insights/:id/history` | One card's history (downsampled to ≤2700 points) | public (the L2 sources are bounded to the visible chart window) | none |
 | `GET` | `/api/insights/markets` | The world stock markets board (16 indices, EODHD-first) | public (owner directive 2026-10-18b) | none |
 | `GET` | `/api/insights/fx` | The world currencies board (10 pairs + 7 patterns, ECB rates) | public (owner directive 2026-10-21c) | none |
+| `GET` | `/api/insights/tic` | Foreign holders of US Treasuries — the top-20 + Australia, holdings/net-transactions/valuation series, 24 months (gap-closure S2) | public (L0 US-government data; generator directive 2026-10-31) | none |
 | `GET` | `/api/insights/status` | The Insights ingest status (last fetch row results, generatedAt) | public | none |
 | `GET` | `/api/insights/archive/:date` | One historical archive (the `insights:archive:v1:<date>` family) | public (read-only) | none |
 | `POST` | `/api/insights/login` | Owner login — sets the HMAC cookie session | n/a | 5/min/IP |
@@ -344,6 +345,7 @@ Insights page's serve path performs **exactly ONE KV read per request**
    tier. **No Insights indicator depends on a paid source.**
 2. **The API surface**: every public Insights endpoint (`/api/insights`,
    `/api/insights/:id/history`, `/api/insights/markets`, `/api/insights/fx`,
+   `/api/insights/tic`,
    `/api/insights/status`, `/api/insights/archive/:date`) is **free and
    unauthenticated** for any reader. The owner-only routes (`/export`,
    `/mode`, `/login`) sit behind the owner cookie + `INSIGHTS_OWNER_TOKEN`.

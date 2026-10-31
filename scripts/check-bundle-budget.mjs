@@ -766,7 +766,12 @@ const BUDGETS = [
   // (round-59, the label now names its measure). gz stays inside 268.5.
   // Entry chunk untouched at 294.45/88.49.
   // Justified in CHANGELOG §2026-10-31r.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1140_000, gz: 268_500, label: 'Insights lazy chunk' },
+  // 2026-10-31v (gap-closure S2-M2.3): 1140/269 — the TIC API client
+  // (lib/tic.ts, the markets.ts twin) + the core TicSnapshot zod contract
+  // riding the lazy chunk. Measured 1139.82/268.54 (the client is ~1.3 kB
+  // raw); raw stays inside 1140, gz bumps 268.5 → 269.0.
+  // Justified in CHANGELOG §2026-10-31v.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1140_000, gz: 269_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {
