@@ -33,8 +33,8 @@ two slow hosts (17:35 UTC). No retries, no circumvention (T-27).
 
 | Host | URL probed | Result | ms (run1/run2) | Verdict for the program |
 |---|---|---|---|---|
-| `ticdata.treasury.gov` | `…/tic/Documents/slt_table5.txt` | 200 `text/plain`, 3,804 B | 8,220 / 10,185 | **OK, slow** — S2's main table works from Workers but leaves <4s margin under the 12s policy; keep the timeout honest, do not retry |
-| `ticdata.treasury.gov` | `…/tic/Documents/slt_table3.txt` | 200 `text/plain`, 450,924 B | 9,295 / 8,020 | **OK, slow** — same margin note |
+| `ticdata.treasury.gov` | `…/tic/Documents/slt_table5.txt` | 200 `text/plain`, 3,804 B | 8,220 / 10,185 | **OK, slow — the 12 s default KILLS it intermittently** (the first live rung3 firing, 2026-10-31 21:31 UTC, died "aborted due to timeout" at 12 s; the S2-M2.2 job pins TIC_TIMEOUT_MS = 30 s — still ONE attempt, no retries, F-11) |
+| `ticdata.treasury.gov` | `…/tic/Documents/slt_table3.txt` | 200 `text/plain`, 450,924 B | 9,295 / 8,020 | **OK, slow — same 30 s prescription** (the 450 KB file rides the same TIC_TIMEOUT_MS) |
 | `www.federalreserve.gov` | `…/feds-notes/ebp_csv.csv` | 200 `application/octet-stream`, 44,606 B | 267 / 260 | **OK** — byte count matches the planning-machine probe exactly (same file); S3 can build the EBP card |
 | `www.newyorkfed.org` | GSCPI `gscpi_data.xlsx` | 200 `application/vnd.ms-excel`, 105,984 B | 528 / 483 | **OK — the Akamai bot-manager fear did NOT materialize from Worker egress** (unlike RBA). S4 can fetch GSCPI from the Worker |
 | `services9.arcgis.com` | PortWatch FeatureServer query | 200 `application/json`, 151 B | timeout ×2 @12s; **12,523 ms @30s** | **SLOW** — reachable but first byte >12s; the 12s fetch-policy default will intermittently kill it. S4 must pass a longer `timeoutMs` (fetch-policy allows it) or use the GHA venue |

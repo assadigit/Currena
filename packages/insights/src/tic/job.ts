@@ -23,10 +23,21 @@ import type { TicStore } from './store';
 
 export { TIC_TABLE5_URL, TIC_TABLE3_URL };
 
+/** The honest single-attempt timeout for the TIC files. The S1-M1.1
+ *  probe measured 8–10 s per file from Worker egress, but the first live
+ *  rung3 firing (2026-10-31 21:31 UTC) died at the fetch-policy DEFAULT
+ *  12 s ("The operation was aborted due to timeout" — the status record
+ *  evidence) — the exact slow-host case VERIFIED-SOURCES prescribes a
+ *  longer timeoutMs for (the ArcGIS note; the treasury yield-curve adapter
+ *  uses 45 s for the same host family). Still ONE attempt, no retries
+ *  (F-11); the rung is alone in its invocation, so 2×30 s wall is safe. */
+export const TIC_TIMEOUT_MS = 30_000;
+
 export interface TicJobDeps {
   /** Injectable fetch (tests replay fixtures — never live sites). */
   fetchImpl?: typeof fetch;
-  /** Per-attempt timeout. Default: the fetch-policy 12 s (F-11: single attempt, honest timeout). */
+  /** Per-attempt timeout. Default: TIC_TIMEOUT_MS (30 s — the slow-host
+   *  prescription, still a single honest attempt, F-11). */
   timeoutMs?: number;
   /** Clock (tests). */
   now?: Date;
@@ -55,8 +66,8 @@ export async function runTicIngest(store: TicStore, deps: TicJobDeps = {}): Prom
   const now = deps.now ?? new Date();
   const kvAccounting = { reads: 0, writes: 0 };
   try {
-    const res5 = await insightsFetch(TIC_TABLE5_URL, {}, { fetchImpl: deps.fetchImpl, timeoutMs: deps.timeoutMs });
-    const res3 = await insightsFetch(TIC_TABLE3_URL, {}, { fetchImpl: deps.fetchImpl, timeoutMs: deps.timeoutMs });
+    const res5 = await insightsFetch(TIC_TABLE5_URL, {}, { fetchImpl: deps.fetchImpl, timeoutMs: deps.timeoutMs ?? TIC_TIMEOUT_MS });
+    const res3 = await insightsFetch(TIC_TABLE3_URL, {}, { fetchImpl: deps.fetchImpl, timeoutMs: deps.timeoutMs ?? TIC_TIMEOUT_MS });
     const t5 = parseTicTable5(await res5.text());
     const t3 = parseTicTable3(await res3.text());
 

@@ -33,7 +33,7 @@ import {
   TIC_STALE_AFTER_DAYS,
 } from './compute';
 import { InMemoryTicStore, parseStoredTic } from './store';
-import { runTicIngest, TIC_TABLE3_URL, TIC_TABLE5_URL } from './job';
+import { runTicIngest, TIC_TIMEOUT_MS, TIC_TABLE3_URL, TIC_TABLE5_URL } from './job';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const FIXTURES = join(HERE, '..', '..', 'fixtures', 'tic');
@@ -476,7 +476,7 @@ describe('runTicIngest (the rung3 run body)', () => {
     expect(res.snapshot?.releasedAt).toBe('2026-10-16T20:07:27.000Z');
   });
 
-  it('uses the honest 12s single-attempt timeout by default (no retry policy)', async () => {
+  it('uses the honest single-attempt timeout — the 30s slow-host prescription (no retry policy)', async () => {
     let seenSignal = false;
     const probe = (async (_url: unknown, init?: RequestInit) => {
       seenSignal = init?.signal !== undefined;
@@ -485,5 +485,9 @@ describe('runTicIngest (the rung3 run body)', () => {
     await runTicIngest(new InMemoryTicStore(), { fetchImpl: probe });
     expect(seenSignal).toBe(true);
     expect(new BlockedError('x', 'blocked').name).toBe('BlockedError'); // the taxonomy import stays pinned
+    // The first live rung firing (2026-10-31 21:31 UTC) died at the 12 s
+    // fetch-policy default — the TIC job pins its own 30 s (still ONE
+    // attempt, F-11; the rung is alone in its invocation).
+    expect(TIC_TIMEOUT_MS).toBe(30_000);
   });
 });
