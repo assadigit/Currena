@@ -11,13 +11,13 @@ file at the end of every milestone (tick the box, add evidence) and every sessio
 
 | Session | Theme | Milestones done | % |
 |---|---|---|---|
-| S1 | Foundation and trust | 4 / 7 | 57% |
+| S1 | Foundation and trust | 5 / 7 | 71% |
 | S2 | Foreign holdings of US Treasuries (priority feature) | 0 / 6 | 0% |
 | S3 | US credit, liquidity, fiscal and growth nowcast | 0 / 6 | 0% |
 | S4 | Geopolitics, supply chain and energy | 0 / 6 | 0% |
 | S5 | Australia deep-dive and Australian markets | 0 / 6 | 0% |
 | S6 | New Zealand link, China and world links, promotion and polish | 0 / 6 | 0% |
-| **Total** | | **4 / 37** | **11%** |
+| **Total** | | **5 / 37** | **14%** |
 <!-- gap-progress:end -->
 
 Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in production):
@@ -61,7 +61,13 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
   - **Tests:** 6 new engine tests + 4 new web tests; 10,306 total green (gates ALL GREEN 1m51s). The severity-monotonicity cases: calm→stale never raises the step; warning→stale only lowers it; the section verdict never rises end-to-end.
   - **Deploy + verify:** worker `d672a562` (18:20 UTC); `/api/health` ok, `/api/insights` 200, browser EN+fa at 1200/360 zero console errors. **Honest production record:** the live snapshot has NO status-stale members today — the RBA trio (asOf 2026-09-30) sits at 31 of its 40-day monthly window (the D-21 refinement), so verdicts are UNCHANGED today (Global stressed 9/32, Australia stressed 7/16 before and after) and the badge fires naturally when the trio crosses 40 days (~2026-11-09 without fresh data). Fixture evidence (live page + API response with the trio forced stale): hero badge “3 of 16 readings out of date” + gauge header “3 of 5”, fa «۳ مورد از ۱۶ قرائت قدیمی است», AU gauge 4→3, section verdict stays 3 (`evidence/M1.4/en-badge-fixture.png` + fa twin). The stored summary’s new fields first ride tomorrow’s 04:20 ingest (the served snapshot from 04:20 today still shows ruleVersion 2 by design — snapshots carry the version that produced them).
   - Budget: Insights lazy chunk 1136.1/267.5 → **1138/268** (measured 1137.37/267.78; the audited badge copy + wiring; justified in `check-bundle-budget.mjs` + CHANGELOG). Registry + narrator vocabulary regenerated (ruleVersion 3).
-- [ ] M1.5 Australian data continuity (RBA)
+- [x] M1.5 Australian data continuity (RBA)
+  - **State found:** the trio already rides the monthly F2.1 table (the 2026-10-21 F3 venue round) — fetched successfully from Worker egress every ingest, asOf 2026-09-30 (the freshest the monthly series offers), inside the labelled 40-day window. The gap card already served `gapLegs` + the "dates differ" tag (B-10), but the reading still VOTED on the mismatched pair — the audit's Sep-30-vs-Oct-29 case, live in production today.
+  - **Fix (commit `6b765fe`, RULE_VERSION 4):** the **gap-leg date guard** — any leg-date inequality is marked `datesDiffer` (the T-20 field, now in the core schema; T-20 was designed-but-unwired like the UI-06 copy); a divergence beyond `GAP_LEG_MAX_DIVERGENCE_DAYS = 7` flips a voting status to `'stale'` — the monthly AU leg can never silently colour a verdict against the marching daily US leg. Applied at all three stamping sites (main build ×2 gaps + the rung2 patch path). The value stays a true same-date join; both dates stay visible; nothing hidden; the M1.4 badge counts the guard's stale reading on the AU inflation gauge.
+  - **Labels (spec task 1, the bund-10y precedent):** the trio's Layer-1 `whatItIs` copy now states the monthly-average, lagged reality (EN + fa, copy round-58) — the old copy claimed the blocked daily F2 file. **FRED mirror verified but not wired** (the "first that works reliably" is the live F2.1 path): `IRLTLT01AUM156N` (OECD AU LT govt bond yield, monthly, 1969-07 → 2026-09, latest 5.283 @ Sep — byte-consistent with F2.1's September value) exists on FRED's keyless fredgraph.csv; licence verified from the series page: **Copyrighted: Citation Required** (same class as the DE sibling the bund card uses). Recorded in VERIFIED-SOURCES as the fallback if the F2.1 venue ever fails.
+  - **Tests:** 8 new (window boundaries, the audit case, the within-window mark, equal dates, no-legs pass-through, unavailable untouched). Gates ALL GREEN — **10,314 tests**. Registry + vocabulary regenerated (ruleVersion 4). Insights lazy budget 1138/268 → 1139/268.5 (measured 1138.69/268.19; the corrected Layer-1 copy; justified).
+  - **Deploy + verify:** worker `61097a6a` (18:39 UTC); `/api/health` ok, `/api/insights` 200, browser EN+fa 1200/360 zero console errors. **Live production evidence** (`evidence/M1.5/en-dates-differ-live.png`): the gap card shows "dates differ · What Australia pays to borrow for 10 years (Sep 30, 2026) minus What the US government pays to borrow for 10 years (Oct 29, 2026)". The vote-stopper first rides tomorrow's 04:20 ingest (the guard lives in the ingest's reading assembly); the AU inflation gauge will then show the trio as out-of-date via the M1.4 badge until the October monthly publishes (~Nov 1–3) and the legs realign.
+  - **Watch item:** `rba-fed-gap` (cash rate − Fed target) joins per-change series on common decision dates — the same divergence hazard in principle; not in the S1 spec, noted for a later session.
 - [ ] M1.6 Audit bug fixes
 - [ ] M1.7 Capacity scaffolding
 

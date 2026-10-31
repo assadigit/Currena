@@ -5,6 +5,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31q] — gap-closure S1-M1.5: the gap-leg date guard (RULE_VERSION 4) — a spread whose legs sit more than 7 days apart is marked and stops voting; the RBA trio's copy states the monthly average it serves; FRED AU mirror verified as the unwired fallback
+
+The 2026-10-31 audit found the AU/US 10-year gap voting on a month-mismatched
+pair: the monthly F2.1 leg at Sep 30 silently paired with the daily US leg at
+Oct 29. The B-10 machinery (gapLegs + the "dates differ" tag) already showed
+both dates on the card — but the reading still voted.
+
+- **The guard (`packages/insights/src/adapters/snapshot.ts`):** any leg-date
+  inequality now stamps `datesDiffer` (the T-20 field, added to the core
+  schema — T-20 was designed-but-unwired); a divergence beyond
+  `GAP_LEG_MAX_DIVERGENCE_DAYS = 7` flips a voting status to 'stale'. The
+  value stays a true same-date join, both legs' dates stay visible, the card
+  is never hidden — and the M1.4 badge counts the guarded reading on its
+  gauge. Applied at all three stamping sites (both gaps in the main build +
+  the rung2 patch path). 8 new tests (window boundaries, the audit case,
+  within-window marking, pass-throughs).
+- **Labels (the bund-10y precedent):** the RBA trio's Layer-1 `whatItIs`
+  copy now states the monthly-average, lagged series the cards actually
+  serve (EN + fa, Persian-copy round-58) — the old copy claimed the blocked
+  daily F2 file ("daily… 2–4 business-day lag" / "published weekly").
+- **FRED fallback verified, not wired** (the live F2.1 path is the "first
+  that works reliably"): `IRLTLT01AUM156N` — OECD AU long-term yield,
+  monthly, latest 5.283 @ 2026-09-01 (the same September value F2.1 serves),
+  licence "Copyrighted: Citation Required" read from the series page.
+  Recorded in VERIFIED-SOURCES for the day the F2.1 venue fails.
+- Gates ALL GREEN — **10,314 tests**; registry + narrator vocabulary
+  regenerated (ruleVersion 4); Insights lazy budget 1138/268 → 1139/268.5
+  (the corrected copy; justified). Deployed as worker `61097a6a`. Live
+  production evidence: the gap card reads "dates differ · What Australia
+  pays to borrow for 10 years (Sep 30, 2026) minus What the US government
+  pays to borrow for 10 years (Oct 29, 2026)" — the vote-stopper first
+  rides tomorrow's 04:20 ingest, and the legs realign when the October
+  monthly publishes.
+
 ## [2026-10-31p] — gap-closure S1-M1.4: stale-voter honesty — a stale gauge member can never make its gauge look worse (RULE_VERSION 3); the summary names the out-of-date voters; the calm out-of-date badge ships in EN + fa
 
 The gap analysis's core honesty defect, fixed at the arithmetic level: a
