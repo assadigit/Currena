@@ -264,6 +264,29 @@ const LAYER1 = {
       term: 'leading indicator',
       plain: 'A measure that usually turns before the whole economy does. It is watched for early hints, never promises.',
     },
+    /* gap-closure S2-M2.5: the foreign-holders section's terms (the
+     * owner's top-priority feature). Plain words, Treasury's own
+     * concepts. */
+    'treasury-securities': {
+      term: 'Treasury securities',
+      plain: 'Loans to the US government: Treasury bills, notes and bonds. Foreign governments and investors hold trillions of dollars of them.',
+    },
+    'foreign-official-holdings': {
+      term: 'foreign official holdings',
+      plain: 'The part held by foreign central banks and governments, as opposed to private investors abroad.',
+    },
+    'net-purchases': {
+      term: 'net purchases',
+      plain: 'What investors actually bought minus what they sold over a period. It measures real buying or selling, not price changes.',
+    },
+    'valuation-change': {
+      term: 'valuation change',
+      plain: 'The change in what existing holdings are worth as market prices move. When yields rise, bond values fall, so holdings can shrink with no selling at all.',
+    },
+    'custody-hub': {
+      term: 'custody hub',
+      plain: 'A country whose reported holdings include much that belongs to investors elsewhere, because the securities are simply held there. Belgium, Luxembourg, the Cayman Islands, Ireland, the UK, Switzerland and Bermuda are the big ones.',
+    },
   } satisfies Record<string, Layer1GlossaryEntry>,
 
   indicators: {

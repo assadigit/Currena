@@ -137,13 +137,13 @@ describe('P3 — the generated snapshot integrity', () => {
     fa: { indicators: Record<string, unknown>; glossary: Record<string, unknown> };
   };
 
-  it('counts match the Layer-1 record (131 indicators, 23 glossary terms)', () => {
+  it('counts match the Layer-1 record (131 indicators, 28 glossary terms)', () => {
     expect(payload.source.indicatorCount).toBe(131); // Session 3 (G2, 2026-10-31): +breakeven-tilt
-    expect(payload.source.glossaryCount).toBe(23);
+    expect(payload.source.glossaryCount).toBe(28); // gap-closure S2-M2.5: +the 5 foreign-holders terms
     expect(Object.keys(payload.en.indicators)).toHaveLength(131);
     expect(Object.keys(payload.fa.indicators)).toHaveLength(131);
-    expect(Object.keys(payload.en.glossary)).toHaveLength(23);
-    expect(Object.keys(payload.fa.glossary)).toHaveLength(23);
+    expect(Object.keys(payload.en.glossary)).toHaveLength(28);
+    expect(Object.keys(payload.fa.glossary)).toHaveLength(28);
   });
 
   it("records its source provenance (the dictionaries' sha256)", () => {

@@ -3,10 +3,10 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "ab351a35dae847f67e3a6289bd551662c9b5e1ffa1725d471cdaa5906c6c6dcc",
-    "faSha256": "2151ad8fceb324f94645e4250fd2a0efaa7ccc5f3c4ab772db0e413a8f16f291",
+    "enSha256": "4c42c7a886adbcdb625b2383da07059406852b9968d62b71adc640f4a81d1fa2",
+    "faSha256": "3028a013fa9022ec852db99be01f3133f524b1a5264a1a9c9fcbca18f96a5ec3",
     "indicatorCount": 131,
-    "glossaryCount": 23
+    "glossaryCount": 28
   },
   "en": {
     "indicators": {
@@ -2958,6 +2958,26 @@
       "leading-indicator": {
         "term": "leading indicator",
         "plain": "A measure that usually turns before the whole economy does. It is watched for early hints, never promises."
+      },
+      "treasury-securities": {
+        "term": "Treasury securities",
+        "plain": "Loans to the US government: Treasury bills, notes and bonds. Foreign governments and investors hold trillions of dollars of them."
+      },
+      "foreign-official-holdings": {
+        "term": "foreign official holdings",
+        "plain": "The part held by foreign central banks and governments, as opposed to private investors abroad."
+      },
+      "net-purchases": {
+        "term": "net purchases",
+        "plain": "What investors actually bought minus what they sold over a period. It measures real buying or selling, not price changes."
+      },
+      "valuation-change": {
+        "term": "valuation change",
+        "plain": "The change in what existing holdings are worth as market prices move. When yields rise, bond values fall, so holdings can shrink with no selling at all."
+      },
+      "custody-hub": {
+        "term": "custody hub",
+        "plain": "A country whose reported holdings include much that belongs to investors elsewhere, because the securities are simply held there. Belgium, Luxembourg, the Cayman Islands, Ireland, the UK, Switzerland and Bermuda are the big ones."
       }
     },
     "ui": {
@@ -5947,6 +5967,26 @@
       "leading-indicator": {
         "term": "شاخص پیشرو",
         "plain": "معیاری که معمولاً پیش از کل اقتصاد تغییر جهت می‌دهد. برای دیدن سیگنال‌های زودهنگام است، نه وعده‌ای برای آینده."
+      },
+      "treasury-securities": {
+        "term": "اوراق خزانه‌داری آمریکا",
+        "plain": "وام‌هایی به دولت آمریکا: اسناد خزانه با سررسیدهای کوتاه و بلند. دولت‌ها و سرمایه‌گذاران خارجی تریلیون‌ها دلار از آن را نگه می‌دارند."
+      },
+      "foreign-official-holdings": {
+        "term": "نگهداری نهادهای رسمی خارجی",
+        "plain": "بخشی که بانک‌های مرکزی و دولت‌های خارجی نگه می‌دارند، در برابر سرمایه‌گذاران خصوصی خارج از کشور."
+      },
+      "net-purchases": {
+        "term": "خرید خالص",
+        "plain": "آنچه سرمایه‌گذاران واقعاً خریدند منهای آنچه فروختند در یک بازه. خرید و فروش واقعی را می‌سنجد، نه تغییر قیمت‌ها را."
+      },
+      "valuation-change": {
+        "term": "تغییر ارزش",
+        "plain": "تغییر ارزش دارایی‌های موجود وقتی قیمت‌های بازار تکان می‌خورند. وقتی بازدهی بالا می‌رود ارزش اوراق پایین می‌آید و نگهداری بدون هیچ فروشی هم می‌تواند کوچک‌تر شود."
+      },
+      "custody-hub": {
+        "term": "مرکز امانت‌داری",
+        "plain": "کشوری که رقم نگهداری‌اش بخش زیادی دارایی سرمایه‌گذاران کشورهای دیگر را هم شامل می‌شود، چون اوراق صرفاً آنجا نگهداری می‌شوند. بلژیک، لوکزامبورگ، جزایر کیمن، ایرلند، بریتانیا، سوئیس و برمودا بزرگ‌ترین‌ها هستند."
       }
     },
     "ui": {

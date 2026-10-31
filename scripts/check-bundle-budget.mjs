@@ -778,7 +778,11 @@ const BUDGETS = [
   // incl. 21 country names each). Measured 1168.81/276.14. The owner's
   // top-priority feature (G-10).
   // Justified in CHANGELOG §2026-10-31w.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1170_000, gz: 277_000, label: 'Insights lazy chunk' },
+  // 2026-10-31x (gap-closure S2-M2.5): 1175/277 — the five foreign-holders
+  // glossary terms (the spec's required list) riding BOTH layer-1
+  // dictionaries. Measured 1172.03/276.21; raw bumps 1170 → 1175, gz stays.
+  // Justified in CHANGELOG §2026-10-31x.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1175_000, gz: 277_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

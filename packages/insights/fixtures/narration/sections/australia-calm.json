@@ -2344,6 +2344,7 @@
         "ageHours": 5044,
         "cadence": "quarterly"
       }
-    ]
+    ],
+    "tic": null
   }
 }

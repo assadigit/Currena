@@ -39,6 +39,19 @@ interface NarrationSnapshot {
 `now` is a separate parameter (ISO datetime): the narrator's own clock.
 Layer 2 will pass its run time; the fixtures pass frozen clocks.
 
+**gap-closure S2-M2.5 (PROMPT_VERSION 9):** the section-state builder's
+input (`SectionNarrationSnapshot`) also accepts `tic?: TicSnapshot` —
+the `/api/insights/tic` document as served. When present, the GLOBAL
+section's state carries a compact `tic` block (the page's OWN derived
+numbers: `dataMonth`, `totalTn`, the Japan/China six-month changes and
+12-month net TRANSACTIONS sums, the top-3 12-month buyers/sellers, and
+the `custodyNote` the model must keep). The narrator cron reads
+`insights:tic:v1` beside the other documents (one more KV read on the
+:50 rung); a missing key degrades calmly to `tic: null` — the narrative
+renders without the facts. Australia and the world sections always
+carry `tic: null`. The template fallback renders the total + the two
+headline holders' six-month changes (conditions only, both languages).
+
 ## The output — field by field
 
 ```ts

@@ -156,6 +156,7 @@ describe('ABOUT_PROVIDER_META — the risk-register mirror', () => {
       ['alternative-me'],
       ['nbs'],
       ['shiller'],
+      ['tic'],
     ];
     for (const [provider] of pinned) {
       const meta = ABOUT_PROVIDER_META[provider]!;

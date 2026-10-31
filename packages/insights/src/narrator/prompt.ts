@@ -82,7 +82,7 @@ import type { NarratorUnit } from './validate';
  * explicitly requires all 4 sections + gives regional examples + demands
  * connection-weaving ("East Asian markets fell while North American markets
  * rose, and the euro weakened against the franc"). */
-export const PROMPT_VERSION = 8;
+export const PROMPT_VERSION = 9;
 
 /* ------------------------------------------------------------------ *
  * §6.1 — the shared base rules (included in A-section and A-overall)
@@ -109,7 +109,9 @@ export const SECTION_TASK = `TASK: Explain what this one section shows today as 
 
 Open with the big picture of the section in everyday words (calm, mixed or under pressure, from the tier counts and any verdict label in STATE). Then weave in FIVE to SEVEN readings the section actually carries — draw from BOTH the alerts (warning-status readings, which carry value + delta + context) AND the items (every fresh reading, which carries value + cadence). For each reading: name its plainName from VOCABULARY, state its actual value from STATE, and weave its oneLine description from VOCABULARY into the prose. When a section has household-facing readings (home loans, rents, savings, deposit rates, inflation, jobs, wages, pay growth), prioritise those — they are what ordinary readers feel. When two or more related ids share the section and VOCABULARY carries a connection (ifRising, ifFalling, connections), draw that connection in the same paragraph — never invent a relationship VOCABULARY does not state. Write the readings into fluent sentences, not a list: "The mortgage rate people pay sits at 6.2 percent and Australian rent growth is 3.55 percent over the past year, so housing stays expensive. New term deposits pay 4.8 percent while Australian inflation is 4.34 percent, so savers barely keep up before tax."
 
-Use plain words and the plain names from VOCABULARY. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. Mention out-of-date data only when STATE.excluded is non-empty (one short clause). Weave the numbers into the prose — do not list them.`;
+Use plain words and the plain names from VOCABULARY. Never advise, never predict, never add numbers, dates or causes that are not in STATE or VOCABULARY. Mention out-of-date data only when STATE.excluded is non-empty (one short clause). Weave the numbers into the prose — do not list them.
+
+When STATE carries a non-null "tic" block (foreign holdings of US government debt, GLOBAL only), weave ONE or TWO of its facts into the paragraph: the total (totalTn, trillion dollars), Japan's or China's six-month change (headline[].chg6mBn, billion dollars), or the largest 12-month net buyers/sellers (largestBuyers12m/largestSellers12m — these are TRANSACTIONS, real buying and selling, never just holdings changes). Name the data month exactly as STATE carries it (dataMonth). Keep the block's custodyNote honest: if you mention a custody-hub country (Belgium, Luxembourg, the Cayman Islands, Ireland, the UK, Switzerland, Bermuda), its holdings include much that belongs to investors elsewhere — holdings are recorded where securities are held, not who owns them. Never say WHY any country bought or sold — the reasons are not in STATE.`;
 
 /* ------------------------------------------------------------------ *
  * §6.3 — the overall task (A-overall = base rules + this)

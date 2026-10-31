@@ -28,12 +28,13 @@
  * parameter), no KV, no fetch, no model calls.
  */
 
-import type { MarketsSnapshot, MarketEntry, FxSnapshot } from '@currena/core';
+import type { MarketsSnapshot, MarketEntry, FxSnapshot, TicSnapshot } from '@currena/core';
 import { buildNarrationState, type NarrationAlert, type NarrationExcluded, type NarrationItem } from './state';
 import { getNarratorSectionLabels, type NarratorLang } from './vocabulary';
 import { marketDefinition } from '../markets/definitions';
 import { DEFINITIONS } from '../definitions';
 import { FX_STALE_DAYS } from '../fx/definitions';
+import { ticHolderDerived, ticTopMovers } from '../tic';
 import { daysBetween } from '../series';
 import { sha256Hex } from './hash';
 
@@ -65,6 +66,10 @@ export interface SectionNarrationSnapshot {
   insights: Parameters<typeof buildNarrationState>[0]['insights'];
   fx?: FxSnapshot;
   markets?: MarketsSnapshot;
+  /** gap-closure S2-M2.5: the foreign-holders document (as served by
+   * `/api/insights/tic`) — the GLOBAL section's `tic` facts project from
+   * it (the already-computed derived numbers, never re-derived verdicts). */
+  tic?: TicSnapshot;
 }
 
 /* ------------------------------------------------------------------ *
@@ -192,6 +197,39 @@ export interface IndicatorSectionState extends SectionNarrationStateBase {
   section: 'global' | 'australia';
   /** Fresh readings of this section (the P4 item shape). */
   items: NarrationItem[];
+  /** gap-closure S2-M2.5 (GLOBAL only): the foreign-holders facts — the
+   * dashboard's own derived numbers (the total, Japan/China six-month
+   * changes, the largest 12-month net buyers/sellers by TRANSACTIONS),
+   * projected for the model to weave. null when the tic document was not
+   * provided (the no-tic-yet deploy state). The math decides; the AI only
+   * explains — the custody caveat rides as a plain instruction the model
+   * must keep (holdings are recorded where held, not who owns them). */
+  tic: NarrationTicFacts | null;
+}
+
+/** The compact foreign-holders projection (the global section's `tic`).
+ * Every number is one the page itself already computed and displays —
+ * rounded, plain, never a raw dump (the P4 discipline). */
+export interface NarrationTicFacts {
+  /** The data month, as published ("2026-08"). */
+  dataMonth: string;
+  /** Total foreign holdings, trillions (one decimal — e.g. 9.3). */
+  totalTn: number;
+  /** The two holders the section headlines, with their already-computed
+   * 6-month holdings change and 12-month net TRANSACTIONS sum (bn). */
+  headline: {
+    id: 'japan' | 'china-mainland';
+    name: string;
+    holdingsTn: number;
+    chg6mBn: number | null;
+    net12mBn: number | null;
+  }[];
+  /** The top 3 net buyers/sellers over 12 months (transactions, bn). */
+  largestBuyers12m: { id: string; name: string; net12mBn: number }[];
+  largestSellers12m: { id: string; name: string; net12mBn: number }[];
+  /** The custody caveat, as plain instruction (both languages not needed
+   * here — the model reads the EN fact and writes in its own language). */
+  custodyNote: string;
 }
 
 /** world-markets — the markets document's rows. */
@@ -337,6 +375,13 @@ function buildIndicatorSection(
           },
         };
 
+  // gap-closure S2-M2.5 (GLOBAL only): the foreign-holders projection —
+  // the page's OWN derived numbers (ticHolderDerived / ticTopMovers),
+  // rounded to the display precision, never re-derived. Australia carries
+  // null (the TIC section lives in Global).
+  const tic: NarrationTicFacts | null =
+    section === 'global' && snapshot.tic !== undefined ? ticFactsOf(snapshot.tic) : null;
+
   return {
     section,
     label: sectionLabel(section),
@@ -348,6 +393,41 @@ function buildIndicatorSection(
     patterns: [],
     excluded: excluded.sort(byId),
     items,
+    tic,
+  };
+}
+
+/** The custody caveat the model must keep (Treasury's own warning,
+ * paraphrased — the section UI's own wording family). */
+const TIC_CUSTODY_NOTE =
+  'Holdings are recorded where securities are held, not who owns them: Belgium, Luxembourg, the Cayman Islands, Ireland, the UK, Switzerland and Bermuda hold much that belongs to investors elsewhere.';
+
+/** Project the compact foreign-holders facts (the display precision —
+ * one decimal for trillions, whole billions for changes). */
+function ticFactsOf(tic: TicSnapshot): NarrationTicFacts {
+  const byId = new Map(tic.holders.map((h) => [h.id, h]));
+  const roundBn = (v: number): number => Math.round(v * 10) / 10;
+  const headline: NarrationTicFacts['headline'] = [];
+  for (const id of ['japan', 'china-mainland'] as const) {
+    const h = byId.get(id);
+    if (h === undefined) continue;
+    const d = ticHolderDerived(h, tic);
+    headline.push({
+      id,
+      name: h.name,
+      holdingsTn: Math.round((h.holdingsBn / 1000) * 10) / 10,
+      chg6mBn: d.chg6mBn === null ? null : roundBn(d.chg6mBn),
+      net12mBn: d.net12mBn === null ? null : roundBn(d.net12mBn),
+    });
+  }
+  const { buyers, sellers } = ticTopMovers(tic, 3);
+  return {
+    dataMonth: tic.dataMonth,
+    totalTn: Math.round((tic.totalBn / 1000) * 10) / 10,
+    headline,
+    largestBuyers12m: buyers.map((b) => ({ ...b, net12mBn: roundBn(b.net12mBn) })),
+    largestSellers12m: sellers.map((s) => ({ ...s, net12mBn: roundBn(s.net12mBn) })),
+    custodyNote: TIC_CUSTODY_NOTE,
   };
 }
 

@@ -50,6 +50,7 @@ import {
   aboutEnabledState,
   aboutSidecarEntriesOf,
   aboutSourceRows,
+  COMPOSITE_SOURCE_ROWS,
   type AboutSourceRow,
 } from './about-sources';
 
@@ -231,7 +232,10 @@ export function AboutTheData({
             return id; // unknown to the definitions — render no provider guess
           }
         });
-        if (!cancelled && rows.length > 0) setSourceRows(rows);
+        // gap-closure S2-M2.5: the composite datasets (the TIC board) ride
+        // after the provider rows, name-merged for the stable table order.
+        const merged = [...rows, ...COMPOSITE_SOURCE_ROWS].sort((a, b) => a.name.localeCompare(b.name));
+        if (!cancelled && merged.length > 0) setSourceRows(merged);
       })
       .catch(() => {
         /* the sidecar chunk failed to load — the table stays absent */

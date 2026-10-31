@@ -57,10 +57,11 @@ import {
   type SectionNarrationState,
 } from '@currena/insights/narrator';
 import { stateIdsOf } from '@currena/insights/narrator';
-import type { FxSnapshot, InsightsSnapshot, MarketsSnapshot } from '@currena/core';
+import type { FxSnapshot, InsightsSnapshot, MarketsSnapshot, TicSnapshot } from '@currena/core';
 import { INSIGHTS_SNAPSHOT_PUBLIC_KEY } from '@currena/insights/store';
 import { FX_KV_KEY } from '@currena/insights/fx';
 import { MARKETS_KV_KEY } from '@currena/insights/markets';
+import { TIC_KV_KEY } from '@currena/insights/tic';
 import type { Bindings } from './index';
 import { readNarratorStatsDay, recordNarratorStats, type StatsDelta } from './narrator-stats';
 
@@ -226,11 +227,15 @@ export async function runScheduledNarrator(
 
   // 1. The four documents. The PUBLIC PROJECTION is the input by design
   //    (D-38): the narrative can never name a private-only reading.
-  const [snapshotRaw, marketsRaw, fxRaw, narrativeRaw] = await Promise.all([
+  const [snapshotRaw, marketsRaw, fxRaw, narrativeRaw, ticRaw] = await Promise.all([
     env.RATES.get(INSIGHTS_SNAPSHOT_PUBLIC_KEY),
     env.RATES.get(MARKETS_KV_KEY),
     env.RATES.get(FX_KV_KEY),
     env.RATES.get(NARRATIVE_KV_KEY),
+    // gap-closure S2-M2.5: the foreign-holders document (the GLOBAL
+    // section's tic facts). A missing/poisoned key degrades calmly to
+    // no-tic-facts — the narrative renders without them.
+    env.RATES.get(TIC_KV_KEY),
   ]);
   if (snapshotRaw === null) {
     // No public projection yet (a fresh deploy before the first ingest
@@ -242,10 +247,15 @@ export async function runScheduledNarrator(
   const insights = JSON.parse(snapshotRaw) as InsightsSnapshot;
   const markets = marketsRaw === null ? null : (JSON.parse(marketsRaw) as MarketsSnapshot);
   const fx = fxRaw === null ? null : (JSON.parse(fxRaw) as FxSnapshot);
+  // The tic document is zod-validated on ingest; the narrator trusts the
+  // stored shape (the same trust it extends to the snapshot/markets/fx) —
+  // a poisoned key would fail JSON.parse and land in the catch below.
+  const tic = ticRaw === null ? null : (JSON.parse(ticRaw) as TicSnapshot);
   const snapshot: SectionNarrationSnapshot = {
     insights,
     ...(fx !== null ? { fx } : {}),
     ...(markets !== null ? { markets } : {}),
+    ...(tic !== null ? { tic } : {}),
   };
   const stored = parseNarrativeDoc(narrativeRaw);
 

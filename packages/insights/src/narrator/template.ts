@@ -222,6 +222,50 @@ function indicatorSectionText(state: SectionNarrationState, lang: 'en' | 'fa'): 
     );
   }
 
+  // gap-closure S2-M2.5: the foreign-holders sentence (GLOBAL only, when
+  // the tic document was provided). Conditions only — the total, the two
+  // headline holders' six-month changes, never a cause. The custody
+  // nuance rides the section UI itself; the template keeps to the facts.
+  // The headline names are OUR display words (the provider's strings
+  // would mix Latin into the fa text — the validator's allow-list bans it).
+  const TIC_HEADLINE_NAMES: Record<string, { en: string; fa: string }> = {
+    japan: { en: 'Japan', fa: 'ژاپن' },
+    'china-mainland': { en: 'China', fa: 'چین' },
+  };
+  if (state.section === 'global' && state.tic != null) {
+    const tic = state.tic;
+    const n = lang === 'fa' ? faNum : String;
+    const month = lang === 'fa' ? toPersianDigits(tic.dataMonth) : tic.dataMonth;
+    const holderClause = (h: { id: string; chg6mBn: number | null }): string | null => {
+      if (h.chg6mBn === null) return null;
+      const name = TIC_HEADLINE_NAMES[h.id]?.[lang] ?? h.id;
+      const dir =
+        h.chg6mBn < 0
+          ? lang === 'fa'
+            ? 'کمتر'
+            : 'less'
+          : lang === 'fa'
+            ? 'بیشتر'
+            : 'more';
+      const abs = Math.abs(h.chg6mBn);
+      return lang === 'fa'
+        ? `نگهداری ${name} ${n(abs)} میلیارد دلار ${dir} از شش ماه پیش است`
+        : `${name} holds $${n(abs)} billion ${dir} than six months earlier`;
+    };
+    const clauses = tic.headline.map(holderClause).filter((c): c is string => c !== null);
+    // Two sentences (V2's 35-word cap): the total, then the holders.
+    sentences.push(
+      lang === 'fa'
+        ? `خارجی‌ها در ${month} در مجموع ${n(tic.totalTn)} تریلیون دلار اوراق خزانه‌داری آمریکا نگه می‌داشتند`
+        : `Foreign holders owned $${n(tic.totalTn)} trillion of US Treasuries in ${month}`,
+    );
+    if (clauses.length > 0) {
+      sentences.push(
+        lang === 'fa' ? clauses.join(' و ') : clauses.join(' and '),
+      );
+    }
+  }
+
   // The out-of-date clause when the state lists excluded items.
   if (state.excluded.length > 0) sentences.push(OUT_OF_DATE[lang]);
 

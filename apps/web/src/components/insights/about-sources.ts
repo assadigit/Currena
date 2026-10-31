@@ -161,7 +161,37 @@ export const ABOUT_PROVIDER_META: Readonly<
     attribution: 'Computed by Currena from the upstream sources in this table; their terms apply.',
     url: null,
   },
+  tic: {
+    // register row 'us-tic' (gap-closure S2-M2.5 — the composite dataset
+    // behind "Who holds US government debt"; no indicator ids, so the
+    // sidecar never lists it — the COMPOSITE_SOURCE_ROWS constant below
+    // carries it into the table).
+    name: 'U.S. Treasury TIC (SLT tables — foreign holdings of US Treasuries)',
+    attribution: 'Source: U.S. Department of the Treasury, Treasury International Capital (TIC) System',
+    url: 'https://home.treasury.gov/data/treasury-international-capital-tic-system',
+  },
 };
+
+/**
+ * gap-closure S2-M2.5: the COMPOSITE DATASETS — boards that are whole
+ * datasets, not indicator collections, so the sidecar (one entry per
+ * indicator) never lists them. The About table appends these after the
+ * provider rows, exactly as honest: same licence/level/kill-switch facts,
+ * seriesCount = the files the ingest fetches.
+ */
+export const COMPOSITE_SOURCE_ROWS: readonly AboutSourceRow[] = [
+  {
+    provider: 'tic',
+    name: ABOUT_PROVIDER_META.tic!.name,
+    url: ABOUT_PROVIDER_META.tic!.url,
+    attribution: ABOUT_PROVIDER_META.tic!.attribution,
+    licences: ['17 U.S.C. § 105 — public domain (US government work)'],
+    levels: ['L0'],
+    worstLevel: 'L0',
+    enabledCount: 1,
+    seriesCount: 2, // the two SLT tables (slt_table5.txt + slt_table3.txt)
+  },
+];
 
 /**
  * Parse the sidecar's raw JSON into the per-indicator facts, failing
