@@ -11,13 +11,13 @@ file at the end of every milestone (tick the box, add evidence) and every sessio
 
 | Session | Theme | Milestones done | % |
 |---|---|---|---|
-| S1 | Foundation and trust | 5 / 7 | 71% |
+| S1 | Foundation and trust | 6 / 7 | 86% |
 | S2 | Foreign holdings of US Treasuries (priority feature) | 0 / 6 | 0% |
 | S3 | US credit, liquidity, fiscal and growth nowcast | 0 / 6 | 0% |
 | S4 | Geopolitics, supply chain and energy | 0 / 6 | 0% |
 | S5 | Australia deep-dive and Australian markets | 0 / 6 | 0% |
 | S6 | New Zealand link, China and world links, promotion and polish | 0 / 6 | 0% |
-| **Total** | | **5 / 37** | **14%** |
+| **Total** | | **6 / 37** | **16%** |
 <!-- gap-progress:end -->
 
 Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in production):
@@ -68,7 +68,14 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
   - **Tests:** 8 new (window boundaries, the audit case, the within-window mark, equal dates, no-legs pass-through, unavailable untouched). Gates ALL GREEN — **10,314 tests**. Registry + vocabulary regenerated (ruleVersion 4). Insights lazy budget 1138/268 → 1139/268.5 (measured 1138.69/268.19; the corrected Layer-1 copy; justified).
   - **Deploy + verify:** worker `61097a6a` (18:39 UTC); `/api/health` ok, `/api/insights` 200, browser EN+fa 1200/360 zero console errors. **Live production evidence** (`evidence/M1.5/en-dates-differ-live.png`): the gap card shows "dates differ · What Australia pays to borrow for 10 years (Sep 30, 2026) minus What the US government pays to borrow for 10 years (Oct 29, 2026)". The vote-stopper first rides tomorrow's 04:20 ingest (the guard lives in the ingest's reading assembly); the AU inflation gauge will then show the trio as out-of-date via the M1.4 badge until the October monthly publishes (~Nov 1–3) and the legs realign.
   - **Watch item:** `rba-fed-gap` (cash rate − Fed target) joins per-change series on common decision dates — the same divergence hazard in principle; not in the S1 spec, noted for a later session.
-- [ ] M1.6 Audit bug fixes
+- [x] M1.6 Audit bug fixes
+  - **#1 usdaed (pegged pair):** `usdaed` joins `UNCHANGED_NORMAL_IDS` — a peg's full-precision daily repeat is the peg working, not the frozen-cache class (T-08 (a)/(b)/(c) all misread it; the card sat check-pending on 2026-10-30). Test-first (fails before, passes after). The stored check-pending clears at the next ingest; a genuinely broken AED feed is still caught by the source report.
+  - **#2 markets counts (one shared value):** the "n of m in correction" sentence now reads the RAW ≥10%-below-high rule (`marketsInCorrectionCount` ≡ `belowHighCount` — the number the cards' distances and the below-high line show); the per-card status tags keep their exit-buffer memory but no summary count cites it. The takeaway's up-count is the ±1%-banded today breadth (`marketBreadth(markets, 'today').up`), and the markets worker's `roseToday` reads the same `TREND_BAND_PCT` (the narrator now agrees with the box). The flat threshold is STATED on the breadth box: "A move within ±1% reads as flat." (EN + fa, round-59). The audit's 7-vs-6 case: a −9.2% market wearing the buffered "Correcting" tag no longer pads the sentence.
+  - **#3 trend labels:** the column headers now name their measure — "3m trend" (the markets table + the FX pairs table, EN + fa «روند ۳ ماهه»); the word+arrow already came from the same 3-month number (the earlier F2 fix), so TAIEX −1.4% today beside "Up" now says WHICH window is Up. Data unchanged.
+  - **#4 price footing:** a percentile-zone warning's generated attention line now carries the 30-day speed — "Now 88.1 — in the zone its rule watches: in the highest 20% of its 10-year range (-7.8% over the last 30 days)." — so a high level that is fast unwinding never reads as fresh stress (the gold/silver audit case). Conditions-only wording; sub-1% moves add nothing (no noise).
+  - **#5 GPR:** verified **context-only by design** — the card rides the SD regime (`SD_BAND_IDS`): z = +0.62 IS mid-range, so "usual range" is the honest level reading; the +20.6-point monthly move is a SPEED fact the S4 geopolitics gauge is designed to score (percentile 0.846 vs z 0.62 is exactly the non-stationarity that made SD the right regime). No code change, nothing tuned louder — noted for S4 in the S2 prompt carry-over list.
+  - **Tests:** 7 new (peg exemption, raw correction count, banded takeaway, banded roseToday ×2, speed phrase ×3 assertions); one pre-existing takeaway test updated to the new banded semantics (its fixture rows now carry banded chg1d). Gates ALL GREEN — **10,321 tests**. Copy round-59 (2 new keys + 2 renamed headers + the ٪ technical glyph claim, the round-52 precedent). Insights lazy budget 1139/268.5 → 1140/268.5 (measured 1139.36/268.36; justified).
+  - **Deploy + verify:** BOTH workers — api `d40d187c` + markets `0266f168` (19:04 UTC; the markets worker's summary changed). `/api/health` ok, `/api/insights` 200, browser EN+fa 1200/360 zero console errors; the flat-band note renders live; no bare "Trend" header remains (the markets table renders behind the section's view toggle in headless checks — the "3m trend" header is bundle-verified and pinned by the copy-parity tests).
 - [ ] M1.7 Capacity scaffolding
 
 ### S2 Foreign holdings of US Treasuries (`S2-treasury-foreign-holders.md`)

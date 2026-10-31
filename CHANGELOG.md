@@ -5,6 +5,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31r] — gap-closure S1-M1.6: the five live-page audit fixes — the pegged pair exempted, ONE shared markets count (±1% band stated), the trend column names its window, percentile flags carry the 30-day speed, GPR verified context-by-design
+
+- **#1 usdaed:** a pegged pair's full-precision daily repeat is the peg
+  working — `usdaed` joins T-08's unchanged-normal set (the card sat in
+  check-pending on 2026-10-30 while the AED peg did its job; a broken feed
+  is still caught by the source report). Test-first.
+- **#2 markets counts:** every sentence and the stat box now read ONE
+  value — the "n of m in correction" line counts the RAW ≥10%-below-high
+  rule (the number the cards' distances and the below-high line show; the
+  buffered status tags stay per-card memory but no longer pad the
+  sentence); the takeaway's up-count is the ±1%-banded today breadth; the
+  markets worker's `roseToday` reads the same `TREND_BAND_PCT` (the
+  narrator agrees with the box); the flat threshold is stated on the
+  breadth box ("A move within ±1% reads as flat.", EN + fa).
+- **#3 trend labels:** the markets and FX-pairs column headers now read
+  "3m trend" («روند ۳ ماهه») — the label names the window its word
+  measures (TAIEX −1.4% today beside "Up" says WHICH Up). Data unchanged.
+- **#4 price footing:** a percentile-zone warning's generated line carries
+  the 30-day speed — "in the highest 20% of its 10-year range (-7.8% over
+  the last 30 days)" — a high level fast unwinding no longer reads as
+  fresh stress (the gold/silver audit case). Conditions only; sub-1%
+  moves add nothing.
+- **#5 GPR:** verified context-only BY DESIGN (the SD regime: z = +0.62 is
+  mid-range, so "usual range" is the honest LEVEL; the +20.6-point monthly
+  move is the SPEED fact S4's geopolitics gauge is built to score) —
+  documented for S4, no code change, nothing tuned louder.
+- 7 new tests (10,321 total green); Persian-copy round-59; Insights lazy
+  budget 1139/268.5 → 1140/268.5 (measured 1139.36/268.36, justified).
+  Deployed BOTH workers: api `d40d187c` + markets `0266f168` (the summary
+  computation changed in the markets worker).
+
 ## [2026-10-31q] — gap-closure S1-M1.5: the gap-leg date guard (RULE_VERSION 4) — a spread whose legs sit more than 7 days apart is marked and stops voting; the RBA trio's copy states the monthly average it serves; FRED AU mirror verified as the unwired fallback
 
 The 2026-10-31 audit found the AU/US 10-year gap voting on a month-mismatched
