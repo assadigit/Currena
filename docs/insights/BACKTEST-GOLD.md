@@ -1,6 +1,6 @@
 # Gold-score backtest — Session 4
 
-Generated from the recorded KV corpus (`packages/insights/fixtures/gold-backtest-corpus.json`, recorded 2026-10-31T12:34:24.654Z read-only via `pnpm --filter @currena/insights gold-corpus-dump`; the stage blob it froze was written 2026-10-31T04:20:18.220Z). No live sites are touched; the harness reads recorded data only, at a frozen clock (no wall-clock reads anywhere). The voter table, thresholds and labels are the frozen S1–S3 production values — NOTHING here changes them. This report is the D-5 evidence the owner reads; every cell carries its n.
+Generated from the recorded KV corpus (`packages/insights/fixtures/gold-backtest-corpus.json`, recorded 2026-10-31T15:17:40.663Z read-only via `pnpm --filter @currena/insights gold-corpus-dump`; the stage blob it froze was written 2026-10-31T04:20:18.220Z). No live sites are touched; the harness reads recorded data only, at a frozen clock (no wall-clock reads anywhere). The voter table, thresholds and labels are the frozen S1–S3 production values — NOTHING here changes them. This report is the D-5 evidence the owner reads; every cell carries its n.
 
 ## Method
 

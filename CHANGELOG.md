@@ -5,6 +5,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31i] — Gold Program S5: the fourth credential round CLOSED everything — deployed live (d77e9139, the honest note on currena.ir), C5 validated (content-identical), Actions secret rotated
+
+The owner's fourth token ("Try this") verified active and passed the
+real tests: a live KV read (16 archive days) and a throwaway
+PUT+DELETE probe (Workers KV Storage: Edit). With scope finally in
+hand, the runbook ran in order:
+
+- **Gates first:** `pnpm gates` ALL GREEN (10,292 tests · secret scan
+  8·686 · layer1 strict 7930/7930 · budget 294.45/88.48 — 1m53s),
+  then the deploy-lock check (production at 3bc30ccc since 10-30 —
+  no parallel session).
+- **DEPLOY:** `wrangler deploy` → **currena-api version
+  `d77e9139-c258-49f2-9542-8892c7efa9f2`** (17 new files; RATES KV +
+  AI + ASSETS + narrator vars intact). Live-verified end-to-end:
+  `/api/health` ok, `goldSummary` serving, and the lazy Insights
+  chunk byte-identical to the local build — the round-55 honest note
+  (EN + fa) and its backtest link now serve on currena.ir.
+- **C5 (validation pass):** `gold-corpus-dump` re-ran read-only
+  (0 writes; the same 16 days as S4) and `gold-backtest` reproduced
+  every S4 number exactly (2,514 windows; sign-agreements
+  51.7/46.9/43.9%; 60td headwind +5.16% vs tailwind +2.19%). The
+  only artifact diff is the recordedAt lineage (12:34:24Z →
+  15:17:40Z) — the predicted data no-op, now measured. The 11-01 and
+  11-02 archive days land with the next rungs; the scheduled Nov-2
+  04:30 UTC re-check carries the real refresh + the asOf-watch days
+  2–3 verdict (the newest dump already re-shows the constant
+  1-trade-date trio offset — no widening).
+- **Housekeeping:** the repo Actions secret `CLOUDFLARE_API_TOKEN`
+  rotated to the working token (DEPLOY.md §Repairing CI step 4 —
+  the KV-Edit scope the ingest's REST writes need). Nothing
+  credential-blocked remains; the next owner round is the D-5
+  21-voter promotion session.
+
 ## [2026-10-31h] — Gold Program S5 post-merge: PR #9 landed (CI green, merge 758298d); the deploy + C5 remain blocked — the third credential round, measured
 
 The owner re-supplied the credential set ("COMMIT MERGE PUSH DEPLOY.

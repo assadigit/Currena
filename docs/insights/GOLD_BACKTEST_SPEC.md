@@ -9,8 +9,13 @@ re-check scheduled 2026-11-02, the C5 refresh blocked-pending-credential
 (the read-only KV token was revoked mid-session; the ~14:36 UTC
 credential retry failed identically; the ~15:00 UTC third round landed
 the GitHub side — PR #9 merged as 758298d, CI run 364 green — but the
-Cloudflare tokens are unchanged, so the round-55 note is MERGED but
-NOT DEPLOYED and C5 stays blocked — §5's retry + third-round bullets). **Parent specs:** `docs/insights/GOLD_SCORE_SPEC.md` (S1+S2+
+Cloudflare tokens failed a third time; the **~15:15 UTC FOURTH round
+closed everything**: the owner's fresh token verified + passed the
+real-KV-read test, the deploy landed live as `d77e9139` (the round-55
+note now serves on currena.ir, byte-verified), C5 re-ran as a
+validation pass (content-identical to S4 — recordedAt refreshed), and
+the repo Actions secret rotated to the working token — §5's retry +
+third/fourth-round bullets). **Parent specs:** `docs/insights/GOLD_SCORE_SPEC.md` (S1+S2+
 S2.1 shipped — the 20-voter directional score) and
 `docs/insights/GOLD_FRED_GAPFILL_SPEC.md` (S3 shipped — D-5 names this
 harness as the venue to evaluate the tilt promotion). `AGENTS.md` §A
@@ -327,6 +332,37 @@ session's verification + decisions, all measured or owner-quoted:
   token scoped `Workers KV Storage: Read` + `Workers Scripts: Edit`
   closes the deploy, C5, and the repo Actions secret in a single
   pass.
+- **The fourth round (~15:10–15:25 UTC): CLOSED — every blocker.**
+  The owner's fresh token verified active AND passed the round-3
+  lesson — a REAL KV read (16 archive days listed, 10-15 → 10-31
+  with 10-20 absent) plus a throwaway PUT+DELETE probe (Workers KV
+  Storage: Edit confirmed; probe key cleaned up). The runbook then
+  ran in order: **`pnpm gates` ALL GREEN** (10,292 tests · secret scan
+  8·686 · layer1 strict 7930/7930 · budget 294.45/88.48 — 1m53s),
+  the deploy-lock check (production had sat at 3bc30ccc since
+  10-30 16:31 UTC — no parallel session), `wrangler deploy` →
+  **currena-api version `d77e9139-c258-49f2-9542-8892c7efa9f2`**
+  (17 new files; RATES KV + AI + ASSETS + every narrator var intact),
+  live-verified end-to-end: `/api/health` ok, `goldSummary` serving
+  (netScore −2, headwind), and the lazy Insights chunk
+  `/assets/Insights-B2n4A1Mq.js` **byte-identical to the local
+  build** (sha256 550f7c4d…) carrying all four round-55 keys (EN+fa
+  measuredNote + backtest link). **C5 — the validation pass,
+  content-identical:** `gold-corpus-dump` re-ran read-only (0 writes;
+  the same 16 days as S4) and `gold-backtest` reproduced every S4
+  number exactly (2,514 windows · sign-agreements 51.7/46.9/43.9% ·
+  60td headwind +5.16% vs tailwind +2.19%) — the only diff in the
+  committed artifacts is the recordedAt lineage (12:34:24Z →
+  15:17:40Z); the §5 prediction ("a refresh before the 11-01 rung
+  would be a data no-op") held, now measured. The dump's watch table
+  also re-shows the newest archive (10-31) at the constant
+  1-trade-date trio offset (trio asOf 10-29, decade group 10-30) — no
+  widening; the formal days 2–3 verdict stays with the Nov-2 run. Per
+  DEPLOY.md §Repairing CI step 4, the repo Actions secret
+  `CLOUDFLARE_API_TOKEN` was rotated to this working token (the
+  ingest's REST writes need exactly the verified KV-Edit scope).
+  Nothing credential-blocked remains; the next owner round is the
+  D-5 21-voter promotion session.
 
 ### The standard block (S4)
 

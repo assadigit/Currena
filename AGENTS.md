@@ -281,17 +281,18 @@ report, bilingual, Persian-copy round-55) under the "conditions, not
 advice" footnote, which remains the operative description. The asOf-watch
 days 2–3 re-check is scheduled 2026-11-02 ~04:30 UTC (day 1 lockstep
 re-confirmed from the archive pair; verdict → GOLD_BACKTEST_SPEC §5).
-NEXT: the 21-voter promotion session (D-5's implementation) + the
-asOf-watch verdict + the C5 corpus refresh (2026-11-02, automated — the
-scheduled 04:30 UTC re-check carries both; one KV-scoped read-only
-token closes them) + DEPLOYING the landed S5 close-out: merged as
-758298d (PR #9, CI run 364 green — the ~15:00 UTC third credential
-round landed the GitHub side) but production still serves the pre-S5
-bundle — the Workers-API token verifies Invalid, the AI-WORKERS token
-is Workers-AI-scoped (`wrangler deploy` answers Authentication error
-[code 10000] on /workers/services/currena-api); one token scoped
-Workers KV Storage:Read + Workers Scripts:Edit closes the deploy, C5,
-and the repo Actions secret in a single pass.*
+NEXT: the 21-voter promotion session (D-5's implementation — the
+20→21 pin-test, the 21st voter's bilingual naming + copy round, the
+harness-local table + equality pin, the GOLD_SCORE_SPEC bump) + the
+2026-11-02 automated re-check (asOf-watch days 2–3 verdict + the real
+C5 refresh with the 11-01/11-02 archive days). The S5 close-out is
+FULLY LANDED as of 2026-10-31 ~15:15 UTC (the fourth credential
+round): PR #9 merged as 758298d (+ the postscript b4ac1ab, CI
+365/366 green), DEPLOYED live as worker version d77e9139 (the
+round-55 honest note serves on currena.ir — the Insights chunk
+byte-verified), C5 validated (corpus content-identical to S4,
+recordedAt refreshed), and the repo Actions secret rotated to the
+working KV-Edit token.*
 
 **Prices heat** (`prices-heat` gauge):
 | | id | cadence | maxAge | rule | source |
