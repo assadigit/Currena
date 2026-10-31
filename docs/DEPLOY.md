@@ -112,23 +112,25 @@ argument, never printed, never committed). The rules:
 
 ## Repairing CI (the red GitHub Actions — what is OWNER-SIDE)
 
-GitHub Actions has been red since 2026-10-20 (last green `f72e1a0`,
-2026-10-18): the account's free Actions minutes are exhausted and runner
-allocation fails. Until it is repaired, `pnpm gates` (added 2026-10-28,
-the Layer-2 prep P5) is the full local equivalent — every session must
-run it (or the individual gates) before deploying. Repair is owner-side:
+**RESOLVED 2026-10-31 (gap-closure S1-M1.2).** The 2026-10-20 → 2026-10-31
+outage had two causes, both verified with evidence:
 
-1. Check usage/billing at github.com/settings/billing (Actions minutes)
-   and the repo's Actions → "insights-ingest" runs (runner allocation
-   errors).
-2. Free minutes reset monthly; otherwise upgrade the plan or register a
-   self-hosted runner (a small always-on box suffices).
-3. After minutes are available: manually re-run the latest failed
-   `insights-ingest` run and confirm it goes green.
-4. Update the GitHub repo secret `CLOUDFLARE_API_TOKEN` if it was rotated
-   meanwhile (`gh secret set CLOUDFLARE_API_TOKEN --repo assadigit/Currena`).
-5. Keep the local-gate discipline regardless: `pnpm gates` green before
-   every deploy is the runbook rule, CI or not.
+1. **Owner-side billing hold** — GitHub's own job annotation read "The job was
+   not started because recent account payments have failed or your spending
+   limit needs to be increased." Every run (push and scheduled) failed in ~2s
+   with no runner allocated. The hold lifted 2026-10-31 ~14:34 UTC (first
+   green CI run #363); push/PR runs green since, and a `workflow_dispatch`
+   `dry_run=true` ingest (#56) went green the same day.
+2. **Repo-side invalid workflow file** — `shiller-fetch.yml` had a top-level
+   `timeout-minutes` (invalid syntax), so GitHub rejected the file and every
+   push produced a zero-job instant failure. Fixed in `3f1ef72` (key moved to
+   job level); run #141 was the workflow's first-ever green execution.
+
+If Actions goes red again with ~2s no-runner failures: check the job
+annotation via the API or the run page — if it names payments/spending limit,
+the fix is owner-side at github.com/settings/billing (payment method /
+spending limit). Keep the local-gate discipline regardless: `pnpm gates`
+green before every deploy is the runbook rule, CI or not.
 
 ## Session record — 2026-10-31k the Gold Program S6 deploy — the 21-voter table rides production (worker 21ca25ab at 100%; the Insights chunk byte-identical; goldSummary −2/headwind as predicted)
 

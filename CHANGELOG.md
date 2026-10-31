@@ -5,6 +5,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31n] — gap-closure S1-M1.2: GitHub Actions diagnosed AND repaired — the billing hold (owner-side, lifted 14:34 UTC) + the invalid shiller-fetch workflow (repo-side, fixed); first-ever green shiller run, dry-run ingest green, CI green
+
+Two verified causes behind the "Actions red since 2026-10-20" premise:
+
+- **Billing hold (owner-side, now lifted).** GitHub's own job annotation on
+  the failed scheduled runs read: *"The job was not started because recent
+  account payments have failed or your spending limit needs to be increased.
+  Please check the 'Billing & plans' section in your settings."* Every
+  scheduled `insights-ingest`/`insights-selfcheck` run failed in ~2s with no
+  runner allocated, from 2026-10-19 23:25 UTC. The hold lifted 2026-10-31
+  ~14:34 UTC (first green CI run #363) — push/PR runs green since, and a
+  `workflow_dispatch` `dry_run=true` ingest (#56) completed green, proving
+  the GHA venue is fully functional again without touching KV.
+- **Invalid workflow file (repo-side, fixed in `3f1ef72`).**
+  `shiller-fetch.yml` carried a top-level `timeout-minutes` — invalid GitHub
+  workflow syntax — so GitHub rejected the whole file: every push since
+  2026-10-19 produced a zero-job instant "failure" pseudo-run (the file has
+  no push trigger at all; the runs were parser-rejection artifacts) and the
+  workflow had **never executed once**. The key now lives at job level (the
+  `insights-ingest` pattern). **Run #141 — its first-ever execution — went
+  green end-to-end and pushed its designed monthly archive commit
+  (`3625afa`, data/shiller refreshed).**
+- Stale comments corrected (`insights-ingest.yml` minutes-exhaustion note →
+  the verified billing timeline; "the repo is private" → public) and
+  `docs/DEPLOY.md` "Repairing CI" rewritten as a RESOLVED record with the
+  recurrence playbook. `docs/gap-closure/PROGRESS.md` M1.2 ticked with the
+  watch item: the 04:20/04:50 scheduled runs should resume 2026-11-01 — if
+  the annotation returns, it is the billing hold again (owner-side).
+
 ## [2026-10-31m] — gap-closure S1-M1.1: the session opens — baseline re-verified (10,296 tests green) + the Worker-egress probe table (13 hosts; NY Fed fine, ArcGIS slow, FiscalData blocked, RBA 403 re-confirmed)
 
 The gap-closure program's first session (docs/gap-closure/S1-foundation-and-trust.md).
