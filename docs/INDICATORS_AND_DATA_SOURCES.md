@@ -34,18 +34,19 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 
 | gauge | section | members (voters in **bold**, context in plain) | voting count |
 |---|---|---|---|
-| **borrowing-costs** | global | **yield-curve-10y2y**, **yield-curve-10y3m**, **fed-expectations**, **real-yield-10y**, **us10y**, **us30y**, **fed-target**, **ecb-dfr**, **govt-interest-revenue** + context: ecb-dfr-twin `euro-aaa-10y`, `sofr`, `us-2y`, `mortgage-30y`, `bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate`, `breakeven-10y` | 9 |
-| **prices-heat** | global | **us-cpi-yoy**, **us-pce-core-yoy**, **euro-hicp**, **breakeven-5y5y**, **brent** + context: `us-cpi-core-yoy`, `t5yie`, `us-wages`, `breakeven-tilt`, `wti`, `natgas`, `food-index`, `wheat`, `maize`, `gold-oil-ratio` | 5 |
-| **market-stress** | global | **stress-stlfsi**, **nfci**, **vix**, **gold-silver** + context: `walcl`, `crypto-fng`, `platinum` | 4 |
-| **dollar-strength** | global | **dollar-basket**, **usdjpy**, **us-japan-10y-gap** + context: `eur-usd`, `usdtry`, `usdcny`, `usdaed` | 3 |
-| **growth-health** | global | **china-pmi**, **china-cpi**, **philly-fed**, **initial-jobless-claims**, **us-unemployment**, **sahm-rule**, **recession-probability**, **michigan-sentiment**, **copper-gold** + context: `m2-us`, `retail-sales`, `housing-permits`, `cfnai`, `job-openings`, `us-gdp-growth`, `us-nfp`, `shiller-cape`, `shiller-ecy`, `oecd-cli-cn`, `oecd-cli-de` | 9 |
+| **borrowing-costs** | global | **yield-curve-10y2y**, **yield-curve-10y3m**, **fed-expectations**, **real-yield-10y**, **us10y**, **us30y**, **fed-target**, **ecb-dfr**, **govt-interest-revenue** + context: ecb-dfr-twin `euro-aaa-10y`, `sofr`, `us-2y`, `mortgage-30y`, `bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate` | 9 |
+| **prices-heat** | global | **us-cpi-yoy**, **us-pce-core-yoy**, **euro-hicp**, **breakeven-5y5y**, **brent** + context: `us-cpi-core-yoy`, `t5yie`, `us-wages`, `breakeven-tilt`, `breakeven-10y`, `wti`, `natgas`, `eia-crude-stocks`, `platinum`, `food-index`, `wheat`, `maize`, `gold-oil-ratio` | 5 |
+| **market-stress** | global | **stress-stlfsi**, **nfci**, **vix**, **gold-silver**, **cftc-gold-positioning** + context: `walcl`, `crypto-fng`, `shiller-cape`, `shiller-ecy`, `gpr-index` | 5 |
+| **dollar-strength** | global | **dollar-basket**, **usdjpy**, **us-japan-10y-gap** + context: `eur-usd`, `usdtry`, `usdaed` | 3 |
+| **growth-health** | global | **china-pmi**, **china-cpi**, **philly-fed**, **initial-jobless-claims**, **us-unemployment**, **sahm-rule**, **recession-probability**, **michigan-sentiment**, **copper-gold**, **oecd-cli-us** + context: `m2-us`, `retail-sales`, `housing-permits`, `cfnai`, `job-openings`, `us-gdp-growth`, `us-nfp`, `usdcny`, `michigan-1y-expectations`, `epu-us`, `copper-usd`, `oecd-cli-cn`, `oecd-cli-de` | 10 |
 | prices-board (not a gauge) | global | `brent`, `gold-usd`, `silver-usd`, `copper-usd`, `btc-usd`, `gold-btc`, `platinum` (some also count in their own gauge above) | 0 |
-| **au-inflation-rates** | australia | **au-cpi**, **au-trimmed-mean**, **rba-expectations**, **au-10y**, **au-us-10y-gap** | 5 |
-| **au-households** | australia | **au-home-loan**, **au-wage-growth**, **au-rent-yoy**, **au-household-debt-arrears**, **au-unemployment**, **au-home-values**, **au-housing-finance** + context: `au-deposit-rate`, `au-saving-ratio`, `au-job-vacancies` | 7 |
+| **au-inflation-rates** | australia | **au-cpi**, **au-trimmed-mean**, **rba-expectations**, **au-10y**, **au-us-10y-gap** + context: `au-petrol-yoy` | 5 |
+| **au-households** | australia | **au-home-loan**, **au-wage-growth**, **au-rent-yoy**, **au-household-debt-arrears**, **au-unemployment**, **au-home-values**, **au-housing-finance** + context: `au-deposit-rate`, `rba-cash-rate`, `au-saving-ratio`, `au-job-vacancies` | 7 |
 | **au-trade-currency** | australia | **audusd**, **audjpy**, **terms-of-trade**, **rba-fed-gap** + context: `iron-ore`, `gold-aud` | 4 |
 
-**Voter total:** 9+5+4+3+9 + 5+7+4 = **46** (the 47th and 48th voters
-arrived with the A-8 trio and the A-7 CFTC card respectively — see §4).
+**Voter total:** 9+5+5+3+10 + 5+7+4 = **48** (the market-stress fifth is
+the A-7 cftc-gold-positioning card; the growth-health tenth is the A-8
+oecd-cli-us voter — see §4).
 
 ### The complete indicator inventory (102 ids, alphabetical)
 
@@ -80,6 +81,7 @@ public-display-ok · scored voter? · short description.
 | `au-trimmed-mean` | abs | monthly | 95 | L0 | yes | ✓ | Australian trimmed-mean inflation |
 | `au-unemployment` | abs | monthly | 60 | L0 | yes | ✓ | Australian unemployment rate |
 | `au-us-10y-gap` | derived | daily | 40 | L0 | yes | ✓ | Australia vs US 10-year yield gap |
+| `au-wage-growth` | abs | quarterly | 230 | L0 | yes | ✓ | Australian wage growth (Wage Price Index, yearly) |
 | `audjpy` | derived | daily | 4 | L1 | yes | ✓ | AUD/JPY cross-rate |
 | `audusd` | derived | daily | 4 | L1 | yes | ✓ | AUD/USD |
 | `boe-rate` | boe | per-change | – | L2 | yes | – | Bank of England policy rate |
@@ -114,6 +116,7 @@ public-display-ok · scored voter? · short description.
 | `gold-silver` | derived | daily | 2 | L1 | yes | ✓ | Gold / Silver ratio |
 | `gold-usd` | gold-api | daily | 2 | L2 | yes | – | Gold price (ounce) |
 | `gpr-index` | gpr | monthly | 75 | L0 | yes | – | Geopolitical Risk Index (Caldara-Iacoviello) |
+| `govt-interest-revenue` | derived | quarterly | 215 | L0 | yes | ✓ | US government interest payments / receipts (BEA via FRED) |
 | `housing-permits` | fred | monthly | 75 | L0 | yes | – | US building permits |
 | `initial-jobless-claims` | fred | weekly | 12 | L0 | yes | ✓ | New unemployment claims (US) |
 | `iron-ore` | world-bank | monthly | 60 | L1 | yes | – | Iron ore price (Pink Sheet) |
@@ -152,9 +155,11 @@ public-display-ok · scored voter? · short description.
 | `us-japan-10y-gap` | derived | daily | 5 | L2 | yes | ✓ | US−Japan 10Y yield gap (carry-trade fuel) |
 | `us-nfp` | derived | monthly | 70 | L0 | yes | – | US jobs added each month |
 | `us-pce-core-yoy` | derived | monthly | 95 | L0 | yes | ✓ | US core inflation by the Fed's gauge (PCE) |
+| `us-unemployment` | fred | monthly | 75 | L0 | yes | ✓ | US unemployment rate (BLS) |
 | `us-wages` | derived | monthly | 75 | L0 | yes | – | US wage growth (yearly) |
 | `us10y` | fred | daily | 4 | L0 | yes | ✓ | US 10-year Treasury yield |
 | `us30y` | fred | daily | 4 | L0 | yes | ✓ | US 30-year Treasury yield |
+| `usdaed` | yahoo | daily | 4 | L2 | yes | – | USD/AED (UAE dirham, the pegged pair) |
 | `usdcny` | frankfurter | daily | 4 | L1 | yes | – | USD/CNY |
 | `usdjpy` | frankfurter | daily | 4 | L1 | yes | ✓ | USD/JPY |
 | `usdtry` | frankfurter | daily | 4 | L1 | yes | – | USD/TRY (Turkey, EM-pressure case study) |
@@ -165,10 +170,10 @@ public-display-ok · scored voter? · short description.
 | `yield-curve-10y2y` | fred | daily | 4 | L2 | yes | ✓ | US 10Y minus 2Y yield |
 | `yield-curve-10y3m` | fred | daily | 4 | L2 | yes | ✓ | US 10Y minus 3M yield (the Fed's recession lens) |
 
-**Counts:** 100 ids total. Voters: 48 (the 8 gauges minus brent — wait, brent
-DOES vote in prices-heat per the B-14 fix; the count is 9+5+4+3+9 + 5+7+4
-= 46, plus the **A-7 cftc-gold-positioning** voter in market-stress → 47,
-plus the **A-8 oecd-cli-us** voter in growth-health → 48). Context: 52.
+**Counts:** 102 ids total. Voters: 48 (brent votes in prices-heat per the
+B-14 fix; the count is 9+5+5+3+10 + 5+7+4 = 48, which includes the
+**A-7 cftc-gold-positioning** voter in market-stress and the **A-8
+oecd-cli-us** voter in growth-health). Context: 54.
 
 ---
 
@@ -254,7 +259,7 @@ Insights page's serve path performs **exactly ONE KV read per request**
 | `GET` | `/api/rates?source=tgju\|frankfurter` | The fallback ladder — the converter's source rates | none | 60/min/IP |
 | `GET` | `/api/convert?from=USD&to=IRR&amount=100` | Server-side conversion math (via `@currena/core`) | none | 60/min/IP |
 | `GET` | `/api/status` | Per-source status + cache age (the `/admin` pill reads this) | none | none |
-| `GET` | `/api/insights` | The 100-indicator Insights snapshot (the canonical call) | **public by owner decree** (2026-10-19) — see below | none |
+| `GET` | `/api/insights` | The 102-indicator Insights snapshot (the canonical call) | **public by owner decree** (2026-10-19) — see below | none |
 | `GET` | `/api/insights/:id/history` | One card's history (downsampled to ≤2700 points) | public (the L2 sources are bounded to the visible chart window) | none |
 | `GET` | `/api/insights/markets` | The world stock markets board (16 indices, EODHD-first) | public (owner directive 2026-10-18b) | none |
 | `GET` | `/api/insights/fx` | The world currencies board (10 pairs + 7 patterns, ECB rates) | public (owner directive 2026-10-21c) | none |
@@ -317,7 +322,7 @@ Insights page's serve path performs **exactly ONE KV read per request**
       "sourceUrl": "https://fred.stlouisfed.org/series/T10Y3M",
       "updatedAt": "2026-10-26T04:20:17.883Z"
     },
-    // ... 99 more readings, in lane order
+    // ... 101 more readings, in lane order
   ],
   "calendar": [ /* the release-schedule events */ ],
   "notes": [ /* the live context notes (off by default) */ ]

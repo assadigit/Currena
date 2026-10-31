@@ -121,7 +121,7 @@ Package manager is **pnpm** (Node ≥ 20).
 
 **This section is the canonical on-disk record of every indicator and every
 data point the Insights page shows.** It is sourced from
-`packages/insights/src/definitions.ts` (the 100 indicators), `packages/
+`packages/insights/src/definitions.ts` (the 102 indicators), `packages/
 insights/src/markets/definitions.ts` (the 16 market indices), and
 `packages/insights/src/fx/definitions.ts` (the 10 FX pairs + the dollar
 basket + the 7 FX patterns). `data/indicators.json` is the generated

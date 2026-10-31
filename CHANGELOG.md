@@ -5,6 +5,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31f] — docs: the consolidated indicator reference corrected (the four missing rows + the counts)
+
+A documentation-accuracy pass over the two files that list the indicator
+inventory, prompted by an external audit that compared every doc listing
+against `data/indicators.json` (the generated registry — itself unchanged
+and correct at 102 ids; no code changes in this round):
+
+- **`docs/INDICATORS_AND_DATA_SOURCES.md` §1 — the four missing inventory
+  rows restored**: `au-wage-growth`, `govt-interest-revenue`,
+  `us-unemployment`, `usdaed` (all attributes copied from the registry:
+  provider, cadence, maxAge, sourceRisk level, publicDisplayOk, voter
+  flag). The "complete indicator inventory" table is 98 → 102 rows, now
+  matching the 102 `DEFINITIONS` ids exactly.
+- **Same file — the counts corrected**: the Counts line said "100 ids /
+  Context: 52" (now 102 / 54; the voter arithmetic reads
+  9+5+5+3+10 + 5+7+4 = 48); the `/api/insights` endpoint row said "the
+  100-indicator snapshot" (now 102); the JSON example said "99 more
+  readings" (now 101).
+- **Same file — the §1 gauge table re-aligned to the registry groups**:
+  the two missing voters restored where they vote (market-stress 4 → 5
+  with **cftc-gold-positioning**; growth-health 9 → 10 with
+  **oecd-cli-us**); the misattributed context ids moved to their true
+  groups (`breakeven-10y`, `platinum` → prices-heat; `shiller-cape`,
+  `shiller-ecy` → market-stress; `usdcny` → growth-health); the missing
+  context ids added (`au-petrol-yoy`, `rba-cash-rate`, `eia-crude-stocks`,
+  `gpr-index`, `michigan-1y-expectations`, `epu-us`, `copper-usd`); the
+  voter-total paragraph rewritten accordingly.
+- **`AGENTS.md`**: the inventory section's sourcing note still said
+  "(the 100 indicators)" — corrected to "(the 102 indicators)". The §A
+  listing itself was already correct (102/102, 0 attribute errors) and
+  is untouched.
+
 ## [2026-10-31e] — Gold Program S4: the backtest harness (B1–B4 — the measured D-5 evidence, and the honest no-edge verdict)
 
 Session 4 of the Gold Program, implementing
