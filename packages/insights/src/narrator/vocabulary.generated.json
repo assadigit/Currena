@@ -3,8 +3,8 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "f7488c4f8c74886e656a0d564bc19146650374f4112d67539aa910a66bbf37b7",
-    "faSha256": "22baba640057468672c442e3b9022dc2dfd644b62a73e25314ce8097f3f27e0a",
+    "enSha256": "0210ddd658fa8528bc329f3a2a1b0fe60e4b14f46433a32229561c002cc21259",
+    "faSha256": "6d26211427c08bbf18fde3f7222d51e2978069dfc79c9c469d69fbbe1996643e",
     "indicatorCount": 131,
     "glossaryCount": 23
   },

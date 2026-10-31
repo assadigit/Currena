@@ -350,7 +350,14 @@ evidence + the cosd/no-cosd path difference, not yet OBSERVED over
 multiple rungs — the worklog's next-steps row asks for a 3-day
 `asOf`-watch before calling it fully proven. (Day 1 observed
 2026-10-31: the trio moved WITH the decade group at the same rung;
-days 2–3 remain.)
+re-confirmed from the archive pair at the S5 open — the trio 10-28 →
+10-29 (us10y 5.05 → 4.98) while the decade group 10-29 → 10-30, both
++1 trading day at the same rung. Days 2–3 remain: the S5 session ran
+before the 11-01/11-02 rungs; an automated re-check is scheduled
+2026-11-02 ~04:30 UTC, its verdict to be recorded in
+GOLD_BACKTEST_SPEC.md §5 — lockstep closes the watch as
+validated-by-watch (still not "proven"), divergence escalates to the
+owner per this spec's remedy path.)
 - The cross-fill's degraded-day path is tested by fixture but has not
   fired live (all groups healthy at deploy time — by design it stays
   quiet on healthy days).
@@ -374,12 +381,14 @@ days 2–3 remain.)
   whole history — "full" and "2003-start" cover the same days). Option 3
   (cache-and-fallback) stays unused — the sweep rungs already provide
   the heal; the split removes the lag's cause.
-- **D-5 (open — re-confirmed NO this session)** — promote
-  `breakeven-tilt` to a 21st gold voter in a future round. Session 3
+- **D-5 (decided-YES 2026-10-31, Session 5 — implementation in its own
+  session)** — promote `breakeven-tilt` to a 21st gold voter. Session 3
   shipped it as context (the inflation lane's phrase + its own card);
-  the voter table is frozen at 20 by design and a test pins it. The
-  promotion remains the owner's call — the S4 backtest harness (reading
-  the frozen table) is the natural venue to evaluate it.
+  Session 4's harness measured the 21-voter variant (no material
+  difference — BACKTEST-GOLD.md §B4); the owner's Session-5 call on
+  that evidence: "we can have 21." The production voter table stays
+  frozen at 20 (pinned by test) until the promotion's own session ships
+  it with its own gates.
 - **D-6 (recorded, implemented)** — the stored history stays pure
   DFII10; fills exist only in the scoring-input assembly and are counted
   in the run report. The audit's exact-agreement finding (max |err|

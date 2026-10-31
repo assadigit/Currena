@@ -5,6 +5,81 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31g] — Gold Program S5: the close-out (D-5 decided-YES for its own session, D-7 NO, the honest note on the panel, the watch re-check scheduled)
+
+Session 5 of the Gold Program — the close-out round
+(`docs/insights/GOLD_BACKTEST_SPEC.md` §5's Session-5 subsection carries
+the full record). No new engines, no new voters, no threshold changes:
+three decisions closed, one honest question answered, and the session's
+real numbers recorded. All four owner calls landed in one message:
+D-5 "we can have 21" · D-7 NO · C4(a) · C5 re-run.
+
+- **D-5 — decided-YES, implementation deferred to its own session.** The
+  owner's call on S4's B4 evidence (the tilt fired in 46.7% of 2,514
+  windows, moved the label bucket in 10.2%, shifted sign-agreements
+  +0.4/+0.7/+0.0pp — no material difference): "we can have 21."
+  Promoting `breakeven-tilt` changes score semantics, so it ships in a
+  dedicated session with its own gates (the 20→21 pin-test update, the
+  21st voter's name in both dictionaries behind a Persian-copy round,
+  the harness-local table + its equality pin, the GOLD_SCORE_SPEC
+  contract bump). S5 left `GOLD_LANE_VOTERS` untouched — the 20-voter
+  pin test stays green.
+- **D-7 — decided-NO.** The owner: "No, EODHD api is very limited and
+  problematic in free mode." The Yahoo GC=F record + gold-api points
+  remain the realized-move venues; nothing fetched, nothing committed,
+  the key (if ever revisited) rides env/secrets only.
+- **C4(a) — the honest note SHIPPED on the gold tailwind panel.** The
+  S4 verdict is now public copy: under the panel's "conditions, not
+  advice" footnote, a bilingual measured-reality note
+  (`signals.goldScore.measuredNote` + `measuredNoteLink`, EN + fa,
+  Persian-copy round-55 —
+  `docs/localization/persian-copy-round-55-gold-honest-note.md`;
+  copy:audit clean, manifest 4,851 entries) states that over 2016–2026
+  the table's lean showed no positive association with gold's next
+  5–60 days — if anything, headwind readings came before larger rises —
+  "it reads conditions, not direction", with the link word pointing at
+  the public backtest report
+  (`docs/insights/BACKTEST-GOLD.md` in the public repository — the same
+  surface the About section already links for contact). Two new render
+  tests in `gold-panels.test.tsx` (25 total). No engine, voter-table,
+  threshold, or label change.
+- **The asOf-watch — days 2–3 scheduled, not yet observable.** The
+  session ran ~13:35–15:00 UTC, before the 11-01/11-02 rungs; day 1
+  was re-confirmed from the archive pair itself (10-30 → 10-31: the
+  trio 10-28 → 10-29, us10y 5.05 → 4.98, all `warning`, while the
+  decade group moved 10-29 → 10-30 — same rung, lag zero). An automated
+  one-shot re-check is scheduled for 2026-11-02 ~04:30 UTC; its verdict
+  goes to GOLD_BACKTEST_SPEC.md §5 (lockstep → validated-by-watch, still
+  not "proven"; divergence → escalate to the owner with the measured
+  days — the cross-fill never silently extends to the trio).
+- **C5 — blocked-pending-credential (honest).** The read-only KV token
+  that authenticated the session-open verification (16 archives listed,
+  values read, newest carries `goldSummary` ✓, live API carries
+  `goldSummary` + `breakeven-tilt` ✓) was REVOKED mid-session (~14:05
+  UTC: every Cloudflare REST call "Invalid API Token"; the second
+  provided token is active but KV-unscoped; the GitHub token died in
+  the same window). `gold-corpus-dump` was NOT run; the S4 corpus
+  (recorded 2026-10-31T12:34Z) stands as the session-of-record until a
+  fresh read-only token allows the dump → backtest refresh. The ~14:36
+  UTC retry with the re-supplied credentials failed identically
+  (Workers-API token revoked; AI-WORKERS token active but KV-denied;
+  GitHub token 401 on REST, `Invalid username or token` on push) — and
+  a pre-11-01 refresh would be a data no-op (the stage blob was
+  written 04:20Z, the 10-31 archive already recorded), so the
+  scheduled 2026-11-02 re-check now carries the refresh: one working
+  KV-scoped token closes both the watch and C5.
+- **Docs:** GOLD_BACKTEST_SPEC.md (the Session-5 record + both decision
+  logs), GOLD_FRED_GAPFILL_SPEC.md (the watch's known-gap + D-5), the
+  AGENTS.md Gold Program paragraph, this entry. Gates: test / typecheck
+  / eslint / copy:audit / gates all green locally (CI stays red
+  account-wide, owner-known); the branch → PR → merge → push flow
+  carries the same credential blocker as C5 — the ~14:36 UTC retry
+  found the re-supplied GitHub token also invalid (401 / `Invalid
+  username or token`), so the S5 commit sits complete on the LOCAL
+  branch `feat/gold-program-s5-closeout` (re-verified post-retry:
+  gold-panels 25/25, gold core + score 61/61, copy:audit + secret scan
+  clean), pushed the moment a valid token lands.
+
 ## [2026-10-31f] — docs: the consolidated indicator reference corrected (the four missing rows + the counts)
 
 A documentation-accuracy pass over the two files that list the indicator

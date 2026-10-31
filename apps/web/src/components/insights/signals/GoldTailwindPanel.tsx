@@ -20,8 +20,10 @@
  *   5. the FIRING VOTERS list — re-derived client-side through the SAME
  *      pure engine the ingest used (the gauges.ts contract: one
  *      function, server and SPA, no drift);
- *   6. the "conditions, not advice" footnote (the signals-card
- *      discipline — words and counts, never a recommendation).
+ *   6. the honesty footnotes (the signals-card discipline — words and
+ *      counts, never a recommendation): the S2.1 "conditions, not advice"
+ *      line, then the S5 (C4a) measured-reality note — the 2016–2026
+ *      backtest's verdict with the public link to the full report.
  *
  * Data: `snapshot.goldSummary` (the ingest's compact stamp) when the
  * served snapshot carries it; otherwise the panel DERIVES the reading
@@ -41,6 +43,14 @@ import { GOLD_LANE_VOTERS, breakevenTiltLean, goldTailwindScore, type GoldTailwi
 import { Wind } from 'lucide-react';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
+
+/**
+ * Gold Program S5 (C4a): the public home of the full backtest report —
+ * docs/insights/BACKTEST-GOLD.md in THIS repository (the repo is public,
+ * the same surface as AboutTheData's DATA_CONTACT_URL). The panel's
+ * measured-reality note links straight to the measured document.
+ */
+const GOLD_BACKTEST_URL = 'https://github.com/assadigit/Currena/blob/main/docs/insights/BACKTEST-GOLD.md';
 
 /** The signed net score, localized digits with an explicit + for wins. */
 function signedNet(netScore: number, numberLocale: 'en-US' | 'fa-IR'): string {
@@ -187,8 +197,25 @@ export function GoldTailwindPanel({
         </ul>
       )}
 
-      {/* 6. the honesty footnote. */}
-      <span className="mt-auto block pt-2 text-[11px] leading-4 text-[var(--color-text-tertiary)]">{C.footnote}</span>
+      {/* 6. the honesty footnotes — the S2.1 "conditions, not advice" line,
+       * then the S5 (C4a) measured-reality note: the 2016–2026 backtest's
+       * verdict stated on the panel itself, with the link word pointing at
+       * the full public report (the anchor mirrors AboutTheData's contact
+       * link styling). */}
+      <span className="mt-auto block pt-2 text-[11px] leading-4 text-[var(--color-text-tertiary)]" data-gold-footnotes>
+        {C.footnote}
+        <span className="mt-1 block" data-gold-measured-note>
+          {C.measuredNote}{' '}
+          <a
+            href={GOLD_BACKTEST_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="insights-focusable text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
+          >
+            {C.measuredNoteLink}
+          </a>
+        </span>
+      </span>
     </article>
   );
 }
