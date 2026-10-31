@@ -7,7 +7,10 @@ decided-YES (a 21st voter — its own session, not S5), D-7 decided-NO,
 the C4 honest note shipped on the panel (round-55), the asOf-watch
 re-check scheduled 2026-11-02, the C5 refresh blocked-pending-credential
 (the read-only KV token was revoked mid-session; the ~14:36 UTC
-credential retry failed identically — §5's retry bullet). **Parent specs:** `docs/insights/GOLD_SCORE_SPEC.md` (S1+S2+
+credential retry failed identically; the ~15:00 UTC third round landed
+the GitHub side — PR #9 merged as 758298d, CI run 364 green — but the
+Cloudflare tokens are unchanged, so the round-55 note is MERGED but
+NOT DEPLOYED and C5 stays blocked — §5's retry + third-round bullets). **Parent specs:** `docs/insights/GOLD_SCORE_SPEC.md` (S1+S2+
 S2.1 shipped — the 20-voter directional score) and
 `docs/insights/GOLD_FRED_GAPFILL_SPEC.md` (S3 shipped — D-5 names this
 harness as the venue to evaluate the tilt promotion). `AGENTS.md` §A
@@ -305,6 +308,25 @@ session's verification + decisions, all measured or owner-quoted:
   was written 04:20Z and the 10-31 archive is already in the S4
   corpus) — the scheduled 2026-11-02 re-check now carries the C5
   refresh too, so ONE working KV-scoped token closes both.
+- **The third round (~14:50–15:00 UTC, post-close-out): the GitHub
+  side LANDED; the Cloudflare side is unchanged — measured again.**
+  The re-supplied GitHub token authenticated (login assadigit, admin
+  on the repo): the branch pushed, PR #9 opened, CI run 364 ran the
+  full gates green (typecheck, lint, the vitest suite, the SPA build,
+  the bundle budget, the copy audit — 1m37s), and the merge landed as
+  758298d. The Cloudflare pair re-measured identically to the ~14:36
+  round: the "Workers API" token still verifies Invalid; the "AI
+  WORKERS" token is active but Workers-AI-scoped — KV REST answers
+  `Authentication error`, and `wrangler deploy` (run from the merged
+  main, the SPA freshly built from 758298d) answers `Authentication
+  error [code: 10000]` on /workers/services/currena-api. Production
+  is therefore untouched and healthy (currena.ir /api/health ok, KV
+  ok; the insights snapshot fresh at 04:20 UTC via the Worker's own
+  minute-cron) — the round-55 note is MERGED but NOT DEPLOYED, and C5
+  stays blocked (the S4 corpus stands as the session-of-record). ONE
+  token scoped `Workers KV Storage: Read` + `Workers Scripts: Edit`
+  closes the deploy, C5, and the repo Actions secret in a single
+  pass.
 
 ### The standard block (S4)
 

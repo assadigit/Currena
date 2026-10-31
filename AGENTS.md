@@ -284,12 +284,14 @@ re-confirmed from the archive pair; verdict → GOLD_BACKTEST_SPEC §5).
 NEXT: the 21-voter promotion session (D-5's implementation) + the
 asOf-watch verdict + the C5 corpus refresh (2026-11-02, automated — the
 scheduled 04:30 UTC re-check carries both; one KV-scoped read-only
-token closes them) + LANDING THE S5 CLOSE-OUT COMMIT: it sits complete
-and gates-green on the LOCAL branch feat/gold-program-s5-closeout —
-both credential rounds failed (the ~14:05 UTC revocations; the ~14:36
-UTC re-supplied set: Workers-API revoked, AI-WORKERS KV-denied, GitHub
-invalid) — push it the moment a valid GitHub token arrives; the S4
-corpus stands as the session-of-record until then.*
+token closes them) + DEPLOYING the landed S5 close-out: merged as
+758298d (PR #9, CI run 364 green — the ~15:00 UTC third credential
+round landed the GitHub side) but production still serves the pre-S5
+bundle — the Workers-API token verifies Invalid, the AI-WORKERS token
+is Workers-AI-scoped (`wrangler deploy` answers Authentication error
+[code 10000] on /workers/services/currena-api); one token scoped
+Workers KV Storage:Read + Workers Scripts:Edit closes the deploy, C5,
+and the repo Actions secret in a single pass.*
 
 **Prices heat** (`prices-heat` gauge):
 | | id | cadence | maxAge | rule | source |

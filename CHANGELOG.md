@@ -5,6 +5,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31h] — Gold Program S5 post-merge: PR #9 landed (CI green, merge 758298d); the deploy + C5 remain blocked — the third credential round, measured
+
+The owner re-supplied the credential set ("COMMIT MERGE PUSH DEPLOY.
+Try once more."). The GitHub token authenticated this time (assadigit,
+admin): the S5 branch pushed, PR #9 opened, CI run 364 ran the full
+gates green (typecheck, lint, the vitest suite, the SPA build, the
+bundle budget, the Persian copy audit — 1m37s), and the merge landed
+as 758298d ("merge feat/gold-program-s5-closeout: the Gold Program S5
+close-out — the D-5/D-7 verdicts, the round-55 honest note on the
+panel, the 2026-11-02 watch re-check, C5 blocked-pending-credential").
+
+- **The Cloudflare pair is unchanged, measured a third time.** The
+  "Workers API" token verifies Invalid at /user/tokens/verify; the
+  "AI WORKERS" token is active but Workers-AI-scoped — KV REST answers
+  `Authentication error`, and `wrangler deploy` (run from the merged
+  main with the SPA freshly built) answers `Authentication error
+  [code: 10000]` on /workers/services/currena-api. The round-55 honest
+  note is therefore MERGED but NOT DEPLOYED; C5 stays blocked (the S4
+  corpus stands as the session-of-record; the scheduled 2026-11-02
+  re-check carries the refresh). ONE token scoped `Workers KV Storage:
+  Read` + `Workers Scripts: Edit` closes the deploy, C5, and the repo
+  Actions secret in a single pass. EODHD untouched per D-7.
+- **Production untouched and healthy through all of it** (currena.ir
+  /api/health ok, KV ok; the insights snapshot fresh at 04:20 UTC via
+  the Worker's own minute-cron). The scheduled Actions ingest run
+  failed 10:27 UTC inside the documented runner-minutes era — the ci
+  runs recovered green from 14:34 UTC, so the next 04:20 UTC rung will
+  show whether the belt-and-braces path recovered with them. The
+  shiller workflow additionally fails instantly on every push today
+  (GitHub lists it by path — a parse-level signature); the source is
+  disabled and its archive current, so the site is unaffected.
+
 ## [2026-10-31g] — Gold Program S5: the close-out (D-5 decided-YES for its own session, D-7 NO, the honest note on the panel, the watch re-check scheduled)
 
 Session 5 of the Gold Program — the close-out round
