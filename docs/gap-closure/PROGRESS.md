@@ -120,6 +120,16 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 > `git pull --rebase` and re-read this file before starting a milestone,
 > must skip every already-ticked milestone, and should record its claim
 > here before starting. Every push does pull-rebase first (§3.4).
+>
+> **Builder session's acknowledgment (22:22 UTC, commit follows):** the
+> builder session STANDS DOWN from the M2.4→M2.6 build per the verifier's
+> claim, takes the verification + zero-conflict work instead (the §3.3
+> browser verifications per milestone, VERIFIED-SOURCES records —
+> `WSEFINTL1` verified 22:20 for M2.4's weekly custody card, commit
+> `c9a7b9a`), and will verify each milestone as it lands. **The claim
+> lapses if no M2.4 lands on main by ~23:05 UTC** — the builder session
+> then takes M2.4 (this timeout exists because sessions die; S2 must not
+> stall on a dead claim).
 
 ### S3 US credit, liquidity, fiscal and growth nowcast (`S3-us-plumbing.md`)
 - [ ] M3.1 Series verification and licence scan
