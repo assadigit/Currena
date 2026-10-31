@@ -103,6 +103,15 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 - [ ] M2.5 Bilingual copy, glossary, narrator and licences
 - [ ] M2.6 Deploy verification, docs and session close
 
+> **S2 parallel-session note (2026-10-31 ~21:50 UTC):** TWO sessions worked
+> M2.2 concurrently (the builder session — code, deploys, temp-gate captures;
+> the verifier session — REFRESH_SECRET rotation, the manual-lever trigger,
+> the milestone record). The records are MERGED (commit `c996533`). The
+> builder session continues with M2.3→M2.6; any other S2 session must
+> `git pull --rebase` and re-read this file before starting a milestone and
+> must skip every already-ticked milestone. Every push below does
+> pull-rebase first (the §3.4 discipline).
+
 ### S3 US credit, liquidity, fiscal and growth nowcast (`S3-us-plumbing.md`)
 - [ ] M3.1 Series verification and licence scan
 - [ ] M3.2 Liquidity and term premium from FRED
