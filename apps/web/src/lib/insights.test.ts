@@ -18,6 +18,7 @@ import {
 import { ApiError } from './api';
 import {
   bigMovers,
+  changeScaleOf,
   epochDayToIso,
   formatChange,
   formatIndicatorValue,
@@ -249,6 +250,29 @@ describe('formatChange', () => {
     expect(formatChange(0.11, 'points', 'en-US', insightsCopyEn.units)).toBe('+0.11 pts');
     // Persian percentage points read «واحد درصد» (the standard financial term).
     expect(formatChange(-0.11, 'points', 'fa-IR', insightsCopyFa.units)).toBe('−۰٫۱۱ واحد درصد');
+  });
+});
+
+describe('changeScaleOf (the gap-closure S2 honesty fix, 2026-10-31)', () => {
+  it('NEVER scales a pct-kind change: the $-level cards show their true percent move', () => {
+    // Found live while verifying the weekly custody card: the walcl row
+    // showed "−0.00% 30-day" for a real −0.03% move — changeScaleOf was
+    // applying the VALUE display scale (1e-6 for $M→$T) to an already-
+    // unit-independent PERCENT change. The pct kind must always read scale 1.
+    expect(changeScaleOf('nyfed-custody', 'pct')).toBe(1);
+    expect(changeScaleOf('walcl', 'pct')).toBe(1);
+    expect(changeScaleOf('m2-us', 'pct')).toBe(1);
+    expect(changeScaleOf('retail-sales', 'pct')).toBe(1);
+    // The C5 behavior is unchanged for POINTS-kind changes (fraction-valued
+    // series render their point changes in displayed units).
+    expect(changeScaleOf('recession-probability', 'points')).toBe(100);
+    expect(changeScaleOf('us10y', 'points')).toBe(1);
+  });
+
+  it('the custody card renders its true 30-day percent (the end-to-end proof)', () => {
+    // change30d −1.12 with kind 'pct' + scale 1 → "−1.12%", never "−0.00%".
+    expect(formatChange(-1.12, definitionFor('nyfed-custody').changeKind, 'en-US', insightsCopyEn.units, changeScaleOf('nyfed-custody', 'pct'))).toBe('−1.12%');
+    expect(formatChange(-0.03, definitionFor('walcl').changeKind, 'en-US', insightsCopyEn.units, changeScaleOf('walcl', 'pct'))).toBe('−0.03%');
   });
 });
 

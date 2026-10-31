@@ -119,7 +119,7 @@ export function AlertCard({
             def.changeKind,
             numberLocale,
             copy.units,
-            changeScaleOf(reading.id),
+            changeScaleOf(reading.id, def.changeKind),
           ),
           date: formatAsOf(lastChange.date, locale),
         })

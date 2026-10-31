@@ -58,12 +58,23 @@ PROGRESS; the S3 session no longer needs to wire it).
   1178.46/277.97 at the merged tree — the M2.5 glossary/narrator growth
   from [2026-10-31x] + this card's wrapper and copy; justified in
   `check-bundle-budget.mjs` §2026-10-31y). Entry chunk untouched.
-- **Tests:** +7 (the bulk-group membership/≤12-cap/one-group pin; the
+- **The change-scale honesty fix (found during the live verification):**
+  `changeScaleOf` was applying the VALUE display scale (e.g. $M→$T ×1e-6)
+  to PCT-kind changes — which are already unit-independent percentages —
+  so every $-level pct card squashed real moves to "±0.00%" (the live
+  walcl row read "−0.00% 30-day" for a −0.03% move; m2-us, retail-sales,
+  housing-permits, job-openings and au-housing-finance carried the same
+  defect). The scale now converts POINTS-kind changes only (the C5
+  behavior unchanged); all four call sites pass the definition's
+  changeKind. Pinned by test (the custody card renders "−1.12%", walcl
+  "−0.03%", recession-probability keeps ×100).
+- **Tests:** +9 (the bulk-group membership/≤12-cap/one-group pin; the
   custody card renders name + trillion display + the 10-year position bar,
   the fa twin with Persian digits; null renders nothing; the one-surface
-  invariant) + the updated pins (45 FRED series, 103 ids, 60 P1, the
-  55-entry info list, 132+28 vocabulary, the merged-manifest counts). Gates
-  ALL GREEN at the merged tree.
+  invariant; the changeScaleOf honesty pair) + the updated pins (45 FRED
+  series, 103 ids, 60 P1, the 55-entry info list, 132+28 vocabulary, the
+  merged-manifest counts). Gates ALL GREEN at the merged tree —
+  **10,526 tests**.
 
 ## [2026-10-31x] — gap-closure S2-M2.5: the foreign-holders glossary terms, the narrator's TIC facts (PROMPT_VERSION 9), the About-source row
 

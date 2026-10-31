@@ -93,7 +93,7 @@ export function CompactRow({
   const lastChangeText =
     lastChange !== null
       ? interpolate(copy.ui.lastChangeLine, {
-          change: formatChange(lastChange.points, def.changeKind, numberLocale, copy.units, changeScaleOf(reading.id)),
+          change: formatChange(lastChange.points, def.changeKind, numberLocale, copy.units, changeScaleOf(reading.id, def.changeKind)),
           date: formatAsOf(lastChange.date, locale),
         })
       : null;

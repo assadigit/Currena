@@ -123,7 +123,7 @@ export function MovesNextStrip({
                     <span aria-hidden="true" className="me-0.5">
                       {item.change > 0 ? '↑' : item.change < 0 ? '↓' : '→'}
                     </span>
-                    {formatChange(item.change, def.changeKind, numberLocale, copy.units, changeScaleOf(item.id))}
+                    {formatChange(item.change, def.changeKind, numberLocale, copy.units, changeScaleOf(item.id, def.changeKind))}
                   </bdi>
                   {/* UI-19: the period is stated on the face. */}
                   <span className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">

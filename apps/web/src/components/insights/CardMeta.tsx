@@ -79,7 +79,7 @@ export function ChangeText({
         <span aria-hidden="true" className="me-0.5">
           {change > 0 ? '↑' : change < 0 ? '↓' : '→'}
         </span>
-        {formatChange(change, def.changeKind, numberLocale, copy.units, changeScaleOf(reading.id))}
+        {formatChange(change, def.changeKind, numberLocale, copy.units, changeScaleOf(reading.id, def.changeKind))}
       </bdi>
       <span aria-hidden="true" className="opacity-80">
         {label}

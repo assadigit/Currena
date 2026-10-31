@@ -446,7 +446,15 @@ export function changeToneClass(change: number | undefined | null): string {
   return '';
 }
 
-/** The display scale of one indicator's changes (fraction series ×100). */
-export function changeScaleOf(id: IndicatorId): number {
-  return DISPLAY[id].scale ?? 1;
+/** The display scale of one indicator's changes (fraction series ×100).
+ * gap-closure S2 amendment (2026-10-31): the scale converts a POINTS-kind
+ * change into the series' displayed units ONLY (the C5 behavior). A
+ * PCT-kind change is already a percentage — unit-independent — and scaling
+ * it by the value display factor squashed real moves to "±0.00%" (walcl,
+ * m2-us, retail-sales, housing-permits, job-openings, au-housing-finance
+ * and nyfed-custody all carry $-level scales; the live walcl row showed
+ * "−0.00% 30-day" for a −0.03% move — found while verifying the custody
+ * card). Callers pass the definition's changeKind. */
+export function changeScaleOf(id: IndicatorId, changeKind: 'pct' | 'points'): number {
+  return changeKind === 'pct' ? 1 : (DISPLAY[id].scale ?? 1);
 }
