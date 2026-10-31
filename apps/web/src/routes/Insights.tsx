@@ -60,6 +60,7 @@ import { Together } from '../components/insights/Together';
 import { WorldMarkets } from '../components/insights/WorldMarkets';
 import { CompaniesTable } from '../components/insights/CompaniesTable';
 import { WorldCurrencies } from '../components/insights/WorldCurrencies';
+import { TicSection } from '../components/insights/TicSection';
 import { DollarStrengthCards } from '../components/insights/world-currencies/DollarStrength';
 import { useInsightsCopy } from '../components/insights/useInsightsCopy';
 import {
@@ -82,6 +83,7 @@ import { SectionLane } from './insights-sections/SectionLane';
 import {
   useNarrative,
   useNarrativePreview,
+  useTicSection,
   useWorldCurrenciesSection,
   useWorldMarketsSection,
   useWorldSectionIndicators,
@@ -190,11 +192,17 @@ export function Insights() {
   // of the two.
   const publicMarketsBoard = !(siteModeOverrides.hiddenBoards as readonly string[]).includes('markets');
   const publicFxBoard = !(siteModeOverrides.hiddenBoards as readonly string[]).includes('fx');
+  const publicTicBoard = !(siteModeOverrides.hiddenBoards as readonly string[]).includes('tic');
   const isPublicProjection = state.kind === 'ready' && state.snapshot.displayMode === 'public';
   const marketsFeedEnabled = !isPublicProjection || publicMarketsBoard;
   const fxFeedEnabled = !isPublicProjection || publicFxBoard;
+  // gap-closure S2-M2.4: the foreign-holders section's feed gate (the L0
+  // public-domain board serves public from day one; the hiddenBoards
+  // entry is the per-source kill switch the generator arms).
+  const ticFeedEnabled = !isPublicProjection || publicTicBoard;
   const { marketsState, marketsAlert, jumpToMarkets, downloadMarketsCsv } = useWorldMarketsSection(copy, marketsFeedEnabled);
   const { fxState, fxAlert, jumpToFxCurrencies, downloadFxCsv } = useWorldCurrenciesSection(copy, fxFeedEnabled);
+  const ticState = useTicSection(ticFeedEnabled);
   const sectionIndicators = useWorldSectionIndicators(marketsState, fxState, copy, jumpToMarkets, jumpToFxCurrencies);
 
   // Layer-2 narrator (M5, spec §11): the narrative document feed + the
@@ -634,6 +642,14 @@ export function Insights() {
             narrativeBySection={narrativeDoc?.sections}
             narrativeVisible={narrativeVisible}
             locale={locale}
+            ticSlot={
+              <TicSection
+                state={ticState}
+                copy={copy}
+                locale={locale}
+                numberLocale={numberLocale}
+              />
+            }
             australiaSlot={
               <MoneyPanel
                 readings={state.snapshot.readings}

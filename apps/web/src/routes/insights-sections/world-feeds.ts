@@ -21,8 +21,10 @@ import { fetchMarketsSnapshot, readCachedMarkets } from '../../lib/markets';
 import { fetchFxSnapshot, readCachedFx } from '../../lib/fx';
 import { fetchNarrativeDoc, readCachedNarrative } from '../../lib/narrative';
 import type { NarrativeDoc } from '../../lib/narrative';
+import { fetchTicSnapshot, readCachedTic } from '../../lib/tic';
 import type { MarketsLoadState } from '../../components/insights/WorldMarkets';
 import type { FxLoadState } from '../../components/insights/WorldCurrencies';
+import type { TicLoadState } from '../../components/insights/TicSection';
 import type { FxAlert, MarketsAlert, SectionIndicatorState } from '../../components/insights/VerdictMeter';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 
@@ -205,6 +207,40 @@ export function useWorldSectionIndicators(
   }, [marketsState, fxState, copy, jumpToMarkets, jumpToFxCurrencies]);
 
   return sectionIndicators;
+}
+
+/**
+ * useTicSection — the foreign-holders feed (gap-closure S2-M2.4): the
+ * markets/fx discipline for "Who holds US government debt". Own last-good
+ * cache (readCachedTic), never an error surface (loading + the calm
+ * "being prepared" line are the designed fallbacks), and a failed refresh
+ * keeps the last good copy on screen flagged fromCache (the M17 pattern).
+ */
+export function useTicSection(enabled = true): TicLoadState {
+  const [ticState, setTicState] = useState<TicLoadState>(() => {
+    if (!enabled) return { kind: 'empty' };
+    try {
+      const cachedTic = readCachedTic();
+      return cachedTic ? { kind: 'ready', snapshot: cachedTic } : { kind: 'loading' };
+    } catch {
+      return { kind: 'loading' };
+    }
+  });
+  useEffect(() => {
+    if (!enabled) return;
+    const controller = new AbortController();
+    void fetchTicSnapshot(controller.signal).then((snapshot) => {
+      if (controller.signal.aborted) return;
+      setTicState((prev) => {
+        if (snapshot !== null) return { kind: 'ready', snapshot };
+        const cached = prev.kind === 'ready' ? prev.snapshot : null;
+        if (cached !== null) return { kind: 'ready', snapshot: cached, fromCache: true };
+        return { kind: 'empty' };
+      });
+    });
+    return () => controller.abort();
+  }, [enabled]);
+  return ticState;
 }
 
 /**

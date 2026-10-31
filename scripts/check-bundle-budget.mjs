@@ -771,7 +771,14 @@ const BUDGETS = [
   // riding the lazy chunk. Measured 1139.82/268.54 (the client is ~1.3 kB
   // raw); raw stays inside 1140, gz bumps 268.5 → 269.0.
   // Justified in CHANGELOG §2026-10-31v.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1140_000, gz: 269_000, label: 'Insights lazy chunk' },
+  // 2026-10-31w (gap-closure S2-M2.4): 1170/277 — the "Who holds US
+  // government debt" SECTION (TicSection.tsx: the headline, split bar,
+  // movers chips, the Japan+China chart, the sortable table + mobile card
+  // list) + the full bilingual tic copy block (2 dictionaries × ~35 keys
+  // incl. 21 country names each). Measured 1168.81/276.14. The owner's
+  // top-priority feature (G-10).
+  // Justified in CHANGELOG §2026-10-31w.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1170_000, gz: 277_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

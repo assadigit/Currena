@@ -5163,6 +5163,103 @@ export const insightsCopyEn = {
       'The data feed for this table is not yet connected. The list of companies and the table layout are already in place.',
   },
 
+  tic: {
+    /** gap-closure S2-M2.4 — "Who holds US government debt" (the owner's
+     * top-priority feature). Every string generated from Treasury TIC
+     * data describes CONDITIONS ONLY: who holds, who bought, who sold —
+     * never causes, never forecasts. */
+    title: 'Who holds US government debt',
+    subtitle: 'Foreign holdings of US Treasuries — who holds them, and who has been buying or selling',
+    /** The provenance line: the data month + the release date (the ~6–7
+     * week lag is the TIC's own publication schedule). */
+    provenance: 'Data for {month}, released {date}',
+    /** The calm out-of-date badge (the >70-day gate; the M1.4 wording
+     * family — never alarmist, never hides the table). */
+    staleBadge: 'Data is more than 70 days old',
+    /** The "being prepared" line (the markets/fx §6.6 family). */
+    empty: 'Foreign-holdings data is being prepared. Check back after the next daily update.',
+    /** The data-generated headline (conditions only): the total, then
+     * Japan and China with their 6-month changes. */
+    headline:
+      'Foreign holders owned {total} of US Treasuries in {month}. Japan held {japan}, {japanPhrase}. China held {china}, {chinaPhrase}.',
+    phraseDown: '{amount} less than six months earlier',
+    phraseUp: '{amount} more than six months earlier',
+    /** Unit phrases (the number rides {n}; the $ lives in the EN string,
+     * the «دلار» in the fa string). */
+    phraseTrillion: '${n} trillion',
+    phraseBillion: '${n} billion',
+    /** The official/private split bar (Table 5's "Of Which: Foreign
+     * Official" row; the remainder is private). */
+    splitTitle: 'Foreign official vs private holders',
+    officialWord: 'Foreign official (central banks and governments)',
+    privateWord: 'Private investors',
+    /** The buyers/sellers chips — TRANSACTIONS over 12 months (Table 3's
+     * "Net U.S. Sales"), never holdings changes. */
+    buyersTitle: 'Largest net buyers, 12 months',
+    sellersTitle: 'Largest net sellers, 12 months',
+    netBuyingWord: 'net buying',
+    netSellingWord: 'net selling',
+    /** The Japan + China trend chart (24 months). */
+    chartTitle: 'Japan and China, 24 months',
+    chartSummary:
+      'Japan went from {from} to {to} over the 24 months to {month} ({phrase}). China went from {cFrom} to {cTo} ({cPhrase}).',
+    /** The table (desktop ≥900px; below that the card list). */
+    tableCaption: 'Top foreign holders of US Treasuries, {month}',
+    colCountry: 'Country',
+    colHoldings: 'Holdings ($bn)',
+    colShare: 'Share',
+    col1m: '1-month change',
+    col12m: '12-month change',
+    colNet: 'Net buying/selling, 12m',
+    colVal: 'Price effect, 12m',
+    colTrend: 'Trend, 24 months',
+    sortAria: 'Sort by {column}',
+    /** The custody-hub marker on a row (the ◆ glyph carries the title). */
+    custodyBadge: 'Custody hub',
+    /** The honest-difference note: net transactions vs the price effect. */
+    netVsValueNote:
+      'Net buying/selling is real transactions (what investors actually bought or sold). The price effect is holdings changing value as market prices move. The two can point in different directions.',
+    /** The custody caveat (plain-language paraphrase of Treasury's own
+     * wording; the "?" tooltip carries the fuller version). */
+    custodyCaveat:
+      'Belgium, Luxembourg, the Cayman Islands, Ireland, the UK, Switzerland and Bermuda hold much that belongs to investors elsewhere: holdings are recorded where the securities are held, not who owns them.',
+    custodyTooltip:
+      'The US Treasury itself warns that these data are collected primarily from US-based custodians and cannot attribute ownership with complete accuracy: a security bought by a foreign resident but held in a custodial account in a third country is counted under that country, not the buyer.',
+    /** A flagged month (the plausibility gate) — shown as a row note. */
+    flaggedNote: 'Includes a month with an unusually large move — under review',
+    /** When fewer than 12 months carry transactions data (the 2023-02
+     * series break), the cell's title explains the partial window. */
+    netMonthsNote: '{n} of the last 12 months carry transactions data',
+    /** The mobile card list's disclosure (first 6 + show all). */
+    showAllRows: 'Show all {n} holders',
+    showFewerRows: 'Show fewer',
+    /** Country display names (keyed by OUR stable slugs; a new entrant
+     * without copy falls back to the provider's own published name). */
+    countries: {
+      japan: 'Japan',
+      'united-kingdom': 'United Kingdom',
+      'china-mainland': 'China',
+      belgium: 'Belgium',
+      canada: 'Canada',
+      'cayman-islands': 'Cayman Islands',
+      luxembourg: 'Luxembourg',
+      france: 'France',
+      ireland: 'Ireland',
+      taiwan: 'Taiwan',
+      switzerland: 'Switzerland',
+      singapore: 'Singapore',
+      'hong-kong': 'Hong Kong',
+      india: 'India',
+      norway: 'Norway',
+      brazil: 'Brazil',
+      'saudi-arabia': 'Saudi Arabia',
+      'korea-south': 'South Korea',
+      'united-arab-emirates': 'United Arab Emirates',
+      bermuda: 'Bermuda',
+      australia: 'Australia',
+    },
+  },
+
   fx: {
     /** §10.2 — the section's own wording, spec-verbatim. */
     title: 'World currencies',

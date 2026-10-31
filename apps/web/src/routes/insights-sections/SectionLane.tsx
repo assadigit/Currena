@@ -27,6 +27,7 @@ import { UsGlobalReachGroup } from './UsGlobalReachGroup';
 import { NarrativeBlock } from '../../components/insights/NarrativeBlock';
 import { InTheNews } from '../../components/insights/InTheNews';
 import type { NarrativeUnit } from '../../lib/narrative';
+import { Fragment } from 'react';
 import type { ReactNode } from 'react';
 
 /** The I10 watchlist strip (pinned items, snapshot order) — inside the lane. */
@@ -99,6 +100,7 @@ export function SectionLane({
   narrativeBySection,
   narrativeVisible = false,
   locale,
+  ticSlot,
   australiaSlot,
 }: {
   snapshot: InsightsSnapshot;
@@ -133,6 +135,11 @@ export function SectionLane({
    * unit's EN or FA text. The Insights route owns this; the lane never
    * reads the URL or i18n store itself. */
   locale?: 'en' | 'fa';
+  /** gap-closure S2-M2.4: the "Who holds US government debt" section —
+   * rendered INSIDE the GLOBAL mother container, directly after the
+   * borrowing-costs gauge group (the owner's top-priority feature; the
+   * australiaSlot pattern). undefined → nothing renders. */
+  ticSlot?: ReactNode;
   /** 2026-10-29 owner round (the money panel is Australian-household
    * data): a slot rendered at the END of the AUSTRALIA section, inside
    * its mother container — the "what it means for my money" panel moved
@@ -232,20 +239,25 @@ export function SectionLane({
                * currencies section (GROUP_ORDER above stays the full
                * gauge order the counting invariant rides). */}
               {LANE_GROUP_ORDER[sec].map((group: IndicatorGroupId) => (
-                <QuestionGroup
-                  key={group}
-                  group={group}
-                  section={sec}
-                  snapshot={snapshot}
-                  copy={copy}
-                  numberLocale={numberLocale}
-                  onOpenDetails={openDetails}
-                  pinned={pinned}
-                  renderableIds={sectionIds}
-                  revealIds={revealIds}
-                  searchActive={searchActive}
-                  subheading={SUBHEADING_SECTIONS.has(sec)}
-                />
+                <Fragment key={group}>
+                  <QuestionGroup
+                    group={group}
+                    section={sec}
+                    snapshot={snapshot}
+                    copy={copy}
+                    numberLocale={numberLocale}
+                    onOpenDetails={openDetails}
+                    pinned={pinned}
+                    renderableIds={sectionIds}
+                    revealIds={revealIds}
+                    searchActive={searchActive}
+                    subheading={SUBHEADING_SECTIONS.has(sec)}
+                  />
+                  {/* gap-closure S2-M2.4: the foreign-holders section sits
+                   * directly after the borrowing-costs gauge group — the
+                   * spec's placement (the owner's top-priority feature). */}
+                  {sec === 'global' && group === 'borrowing-costs' && ticSlot !== undefined ? ticSlot : null}
+                </Fragment>
               ))}
               {/* R9-07: the US-global-reach container — the nine US-based
                * indicators that move world markets, with their generated
