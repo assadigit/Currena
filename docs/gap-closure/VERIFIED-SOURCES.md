@@ -86,5 +86,6 @@ No free, licence-clean feed exists for: MOVE index, Baltic Dry Index, cross-curr
 
 | Date | Session | Finding |
 |---|---|---|
+| 2026-10-31 | S1 close | S1 complete (7/7). Learned: RBA data continuity rides the F2.1 monthly table (the working venue — the FRED OECD mirror `IRLTLT01AUM156N` verified as the unwired fallback, citation-required); the AU/US gap's Sep-30/Oct-29 date mixing fixed by the 7-day leg guard (RULE_VERSION 4); GPR is context-by-design under the SD regime (its monthly SPEED is S4's to score); GitHub Actions' outage was a billing hold (lifted 10-31 14:34 UTC) + the invalid shiller-fetch.yml (fixed, run #141 green — the workflow's first-ever execution); the GHA venue works again (dry-run ingest #56 green); rung3/rung4 live at 04:30/04:35 UTC with the TIC registration recipe in docs/gap-closure/RUNGS.md. |
 | 2026-10-31 | S1 | Worker-egress probe table added (13 hosts, temp Worker `currena-probe`, deleted after). NY Fed GSCPI reachable from Workers (Akamai fear unfounded); ArcGIS slow (>12s first byte); FiscalData API blocked from Workers (timeout ×3, normal client fine); RBA 403 re-confirmed; everything else 200. |
 | 2026-10-31 | planning | Initial register created from a planning-machine probe. |

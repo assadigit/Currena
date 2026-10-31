@@ -22,7 +22,7 @@ file at the end of every milestone (tick the box, add evidence) and every sessio
 
 Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in production):
 
-- [ ] G1 Stale Australian voters made honest (S1)
+- [x] G1 Stale Australian voters made honest (S1 — M1.4's dilution arithmetic + the out-of-date badge; M1.5's gap-leg date guard + the honest monthly-average labels; the RBA trio's 40-day window crossing ~2026-11-09 will now present honestly instead of voting on mismatched dates)
 - [ ] G2 Treasury foreign-holder table incl. Japan and China (S2)
 - [ ] G3 Credit and funding stress (S3)
 - [ ] G4 Fiscal and Treasury supply (S3)
@@ -129,13 +129,15 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 
 | Item | Status | What failed, what was tried, what is needed | Date |
 |---|---|---|---|
-| (none yet) | | | |
+| (nothing blocked in S1 — every milestone landed) | | | |
+| FiscalData API from Worker egress | recorded source constraint (not a session block) | Times out at 12s/12s/30s from Workers while a normal client gets 200 JSON in <1s. S3's fiscal/auction work must use the GHA venue (like RBA). See VERIFIED-SOURCES "Worker egress". | 2026-10-31 |
+| `rba-fed-gap` leg-date divergence | watch item for a later session | The per-change legs join on common decision dates — the same hazard M1.5 fixed for au-us-10y-gap, in principle; not in the S1 spec. | 2026-10-31 |
 
 ## Session log
 
 | Session | Date | Agent | Commits (first..last) | Deployed worker version ids | KV writes/day (after) | Notes |
 |---|---|---|---|---|---|---|
-| S1 | | | | | | |
+| S1 | 2026-10-31 | gap-closure agent (Z.ai) | `7491e56..54cfba1` (13 commits) | api `d524ff1e` → `d672a562` → `61097a6a` → `d40d187c` → `d1da6f53` (+ temp `9570e538` captured/reverted) · markets `0266f168` | ~57 (+2 for the empty rung3/rung4 statuses; sweeps +4 reads/day) | **7/7 milestones.** Baseline 10,296 tests → **10,331 green**. RULE_VERSION 2→4. Actions repaired (billing hold lifted + shiller-fetch.yml fixed; first-ever green shiller run #141). Egress probe: 13 hosts. M1.4 dilution + badge (round-57), M1.5 gap-leg guard + labels (round-58), M1.6 five audit fixes (round-59), M1.7 rung3/rung4 verified live. Budgets: Insights lazy 1136.1/267.5 → 1140/268.5 (3 justified bumps). GHA scheduled runs (04:20/04:50) should resume green 2026-11-01 — the billing hold lifted 14:34 UTC 10-31. |
 | S2 | | | | | | |
 | S3 | | | | | | |
 | S4 | | | | | | |
@@ -144,7 +146,7 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 
 ## Owner action items (open)
 
-- [ ] Rotate every credential pasted into the 2026-10-31 planning chat (Cloudflare API token(s), GitHub token, EODHD key) and revoke the old Cloudflare token still in git history (see `docs/INDICATORS_AND_DATA_SOURCES.md` §4 item 2).
-- [ ] Export `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in the shell before each session (never paste into chat).
-- [ ] Review and flip any `owner_accepts` flags listed by a session.
+- [ ] **TOP: rotate every credential pasted into chat.** The 2026-10-31 planning-chat set (the `cfut_dGmEj…` "Workers API" token is still the live deploy token per DEPLOY.md's own record) AND the tokens re-pasted into the 2026-11-01 S1 session chat (identical values — the owner instructed their use; rotation was NOT done). Rotate: both Cloudflare tokens, the GitHub token, the EODHD key; also revoke the old Cloudflare token still in git history (docs/INDICATORS_AND_DATA_SOURCES.md §4 item 2). After rotating the Cloudflare token, update the GitHub repo secret `CLOUDFLARE_API_TOKEN` (the GHA ingest uses it) and re-run one `insights-ingest` dispatch to confirm green.
+- [ ] Check github.com/settings/billing if Actions scheduled runs fail again with "recent account payments have failed or your spending limit needs to be increased" (the 2026-10-20→10-31 hold lifted 10-31 14:34 UTC; the 04:20/04:50 scheduled runs should be green from 2026-11-01 — a green run is the confirmation).
+- [ ] Review and flip any `owner_accepts` flags listed by a session (none listed in S1 — no new L2 source went live).
 - [ ] Approve the promotion list in S6-M6.4.
