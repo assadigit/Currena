@@ -34,8 +34,11 @@ rung untouched.
   `POST /internal/insights-ingest?phase=extra` runs it with the day
   gate bypassed (force mode) — the post-deploy verification path.
 - **Live proof (production):** first manual trigger 21:31 UTC timed
-  out honestly (ticdata >12 s; `failed` recorded, no in-invocation
-  retry — F-11); the 21:40 UTC re-trigger wrote the snapshot —
+  out honestly (ticdata >12 s at the fetch-policy 12 s default;
+  `failed` recorded, no in-invocation retry — F-11) — the fix is
+  `TIC_TIMEOUT_MS = 30 s` (commit `ad64b94`, still ONE attempt; the
+  slow-host prescription the treasury yield-curve adapter set), after
+  which the 21:40 UTC re-trigger wrote the snapshot —
   `data month 2026-08, 21 holders`, rung budget 5/50, releasedAt
   2026-10-16 (the provider's own Last-Modified). Read back via the CF
   REST API: total 9,331.7 bn (official 3,755.6 / private 5,576.1),
@@ -46,6 +49,9 @@ rung untouched.
 - **REFRESH_SECRET rotated** (the documented unrecoverable-value
   pattern; new value in `apps/api/.dev.vars`, gitignored) — the manual
   levers needed it and the prior session's sandbox held the old value.
+- **Final state:** the temporary verification gates were reverted and
+  the committed code is live as worker version `1613fa5c` (21:45:53
+  UTC, confirmed via the deployments API).
   Api worker `db71eb3a` (deployed 21:17:32 UTC, verified 100%).
 
 ## [2026-10-31t] — gap-closure S2-M2.1: TIC source verification — fixtures, layouts, the L0 licence records
