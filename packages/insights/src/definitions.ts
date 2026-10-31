@@ -728,6 +728,29 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     rule: { kind: 'info' },
   },
   {
+    // Session 3 (2026-10-31, GOLD_FRED_GAPFILL_SPEC G2): the breakeven
+    // interplay — the 5y5y forward MINUS the 5y spot (T5YIFR − T5YIE, both
+    // already collected on the decade group; ZERO new fetches). Positive =
+    // the market prices inflation BUILDING into the second five years;
+    // negative = FADING. CONTEXT beside the family's other two cards, and
+    // the gold panel's inflation lane carries its phrase (GoldTailwindPanel,
+    // copy-keyed both locales). Deliberately NOT a voter — the 20-voter
+    // table is frozen (D-5, open; promotion is an owner decision for a
+    // future round). Phase P2 like breakeven-10y (its closest sibling): a
+    // derived context card whose legs' own alerts carry the outage signal.
+    id: 'breakeven-tilt',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'Breakeven tilt (forward minus spot)',
+    source: 'derived',
+    sourceRef: 'FRED:T5YIFR − FRED:T5YIE (both collected; points)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 5, // the t5yie grace — the fresher leg's own family cadence
+  },
+  {
     // M5 Wave 2 (OD-8/D-42, 2026-10-24): the Pink Sheet Food index — the
     // world food-price gauge (2010=100). CONTEXT (info): groceries are the
     // most-felt line of household inflation; the energy-vs-food pairing

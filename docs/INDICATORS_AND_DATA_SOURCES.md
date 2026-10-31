@@ -13,16 +13,16 @@ and the per-round specs that drove each wave (both removed in the
 
 ---
 
-## 1. What indicators Currena has — the 100-indicator dashboard
+## 1. What indicators Currena has — the 102-indicator dashboard
 
-The Insights page renders **100 indicators** across **2 sections** (Global
-74, Australia 16 — wait, actually Global + Australia, not 74/16; see the
+The Insights page renders **102 indicators** across **2 sections** (Global
+79, Australia 23 — see the
 breakdown below), grouped under **9 question gauges** (5 global + 3
 australia + the prices-board strip). Of those, **48 are scored voters**
-(contribute to a gauge's verdict) and **52 are context rows** (live value +
+(contribute to a gauge's verdict) and **54 are context rows** (live value +
 10-year position bar, never vote).
 
-The live snapshot is served at `GET /api/insights` — 100 `readings` plus
+The live snapshot is served at `GET /api/insights` — 102 `readings` plus
 the two summary lines (Global and Australia). Each reading carries its
 current value, the data date (`asOf`), the 7-day and 30-day changes, the
 **10-year percentile position** (`percentile10y`), the **10-year z-score**
@@ -35,9 +35,9 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 | gauge | section | members (voters in **bold**, context in plain) | voting count |
 |---|---|---|---|
 | **borrowing-costs** | global | **yield-curve-10y2y**, **yield-curve-10y3m**, **fed-expectations**, **real-yield-10y**, **us10y**, **us30y**, **fed-target**, **ecb-dfr**, **govt-interest-revenue** + context: ecb-dfr-twin `euro-aaa-10y`, `sofr`, `us-2y`, `mortgage-30y`, `bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate`, `breakeven-10y` | 9 |
-| **prices-heat** | global | **us-cpi-yoy**, **us-pce-core-yoy**, **euro-hicp**, **breakeven-5y5y**, **brent** + context: `us-cpi-core-yoy`, `t5yie`, `us-wages`, `wti`, `natgas`, `food-index`, `wheat`, `maize`, `gold-oil-ratio` | 5 |
+| **prices-heat** | global | **us-cpi-yoy**, **us-pce-core-yoy**, **euro-hicp**, **breakeven-5y5y**, **brent** + context: `us-cpi-core-yoy`, `t5yie`, `us-wages`, `breakeven-tilt`, `wti`, `natgas`, `food-index`, `wheat`, `maize`, `gold-oil-ratio` | 5 |
 | **market-stress** | global | **stress-stlfsi**, **nfci**, **vix**, **gold-silver** + context: `walcl`, `crypto-fng`, `platinum` | 4 |
-| **dollar-strength** | global | **dollar-basket**, **usdjpy**, **us-japan-10y-gap** + context: `eur-usd`, `usdtry`, `usdcny` | 3 |
+| **dollar-strength** | global | **dollar-basket**, **usdjpy**, **us-japan-10y-gap** + context: `eur-usd`, `usdtry`, `usdcny`, `usdaed` | 3 |
 | **growth-health** | global | **china-pmi**, **china-cpi**, **philly-fed**, **initial-jobless-claims**, **us-unemployment**, **sahm-rule**, **recession-probability**, **michigan-sentiment**, **copper-gold** + context: `m2-us`, `retail-sales`, `housing-permits`, `cfnai`, `job-openings`, `us-gdp-growth`, `us-nfp`, `shiller-cape`, `shiller-ecy`, `oecd-cli-cn`, `oecd-cli-de` | 9 |
 | prices-board (not a gauge) | global | `brent`, `gold-usd`, `silver-usd`, `copper-usd`, `btc-usd`, `gold-btc`, `platinum` (some also count in their own gauge above) | 0 |
 | **au-inflation-rates** | australia | **au-cpi**, **au-trimmed-mean**, **rba-expectations**, **au-10y**, **au-us-10y-gap** | 5 |
@@ -47,7 +47,7 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 **Voter total:** 9+5+4+3+9 + 5+7+4 = **46** (the 47th and 48th voters
 arrived with the A-8 trio and the A-7 CFTC card respectively — see §4).
 
-### The complete indicator inventory (100 ids, alphabetical)
+### The complete indicator inventory (102 ids, alphabetical)
 
 Each row: **id** · provider · cadence · max-age-days · licence level ·
 public-display-ok · scored voter? · short description.
@@ -85,6 +85,7 @@ public-display-ok · scored voter? · short description.
 | `boe-rate` | boe | per-change | – | L2 | yes | – | Bank of England policy rate |
 | `boj-rate` | fred | monthly | 75 | L2 | yes | – | Bank of Japan policy rate (OECD mirror) |
 | `breakeven-10y` | fred | daily | 4 | L2 | yes | – | Expected US inflation, ten years ahead |
+| `breakeven-tilt` | derived | daily | 5 | L2 | yes | – | Breakeven tilt (5y5y forward − 5y spot; the market's priced acceleration) |
 | `breakeven-5y5y` | fred | daily | 4 | L2 | yes | ✓ | Inflation expectations (5y5y forward) |
 | `brent` | fred | daily | 12 | L2 | yes | ✓ | Brent oil (EIA via FRED + Yahoo BZ=F gap-fill) |
 | `btc-usd` | gold-api | daily | 2 | L2 | yes | – | Bitcoin price |
@@ -186,7 +187,7 @@ plus the **A-8 oecd-cli-us** voter in growth-health → 48). Context: 52.
 
 | UTC time | rung | what runs | subrequest budget |
 |---|---|---|---|
-| **04:10** | `main` | collect every source (FRED bulk groups + ECB + BoE + NBS + Frankfurter + World Bank + gold-api + Yahoo + ABS + RBA + Bitstamp + Alternative.me), derive, validate, write the snapshot + status + public projection + archives + stage | ~48/50 |
+| **04:10** | `main` | collect every source (FRED bulk groups — SEVEN since the Session-3 trio split: the nominal full-history pair, DFII10's own cosd=2003-01-02 request, and the five decade-window groups — + ECB + BoE + NBS + Frankfurter + World Bank + gold-api + Yahoo + ABS + RBA + Bitstamp + Alternative.me), derive, validate, write the snapshot + status + public projection + archives + stage. The real-yield scoring input carries the counted DGS10−T10YIE cross-fill (realYieldFill in the report; the stored history stays pure DFII10). | ~49/50 |
 | **04:20** | `rung2` | The rung-2 phase — MOF jgbcme.csv (jgb-10y daily) + the daily-history-ALPHA phase (the 04:25 split, see below). One subrequest (MOF) + the stage read + ~4 writes. | ~8 |
 | **04:25** | `history-daily-a` | Daily-cadence history writes (half A — the wave-3 split fixed the exceededCpu death). ~24 ids × 1 unconditional write each. | ~25 |
 | **04:27** | `history-daily-b` | Daily-cadence history writes (half B). ~23 ids × 1 unconditional write each. | ~24 |
@@ -222,7 +223,7 @@ L3 never used), the verbatim terms-lines quote, and the date read.
 | **alternative-me** | L0 | Free API — attribution next to the data | crypto-fng (Crypto Fear and Greed) | **free forever**, keyless | no |
 | **shiller** (Robert Shiller, Yale) | L2 (owner-accepted) | Open academic data, attribution expected | shiller-cape, shiller-ecy (CAPE, Excess CAPE Yield) | free, owner-accepted | no |
 | **treasury** (U.S. Department of the Treasury) | L0 | US government work — public domain | FRED-fallback fills for DGS2/DGS10/DGS30/DFII10/T10Y2Y (fetched only when a FRED bulk group fails) | **free forever**, keyless | no |
-| **derived** (Currena's own arithmetic) | inherits | Own computation — inherits upstream legs' terms | fed-expectations, rba-expectations, au-us-10y-gap, us-japan-10y-gap, rba-fed-gap, dollar-basket, gold-silver, gold-oil-ratio, gold-btc, gold-aud, copper-gold, govt-interest-revenue, audusd, audjpy, us-nfp, us-cpi-yoy, us-cpi-core-yoy, us-pce-core-yoy, us-wages | n/a (computed) | no |
+| **derived** (Currena's own arithmetic) | inherits | Own computation — inherits upstream legs' terms | fed-expectations, rba-expectations, au-us-10y-gap, us-japan-10y-gap, rba-fed-gap, dollar-basket, gold-silver, gold-oil-ratio, gold-btc, gold-aud, copper-gold, govt-interest-revenue, audusd, audjpy, us-nfp, us-cpi-yoy, us-cpi-core-yoy, us-pce-core-yoy, us-wages, breakeven-tilt | n/a (computed) | no |
 | **eodhd** (markets worker only — NOT in Insights) | L2 (owner-accepted) | Personal plan — owner only | The world stock markets board (16 indices, the currena-markets worker) | free personal plan, owner-accepted | yes (`EODHD_API_TOKEN` secret) |
 
 ### KV writes — the free-tier budget

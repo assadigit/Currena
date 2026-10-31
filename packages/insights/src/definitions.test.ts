@@ -24,7 +24,8 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
 
   it('splits 59 P1 / 42 P2 (the 2026-10-25 M6 Wave-3 round adds twelve P1 cards — the leading-edge batch; the 2026-10-26 M7 round adds china-cpi as a P1 card on the NBS press-release automation; the 2026-10-26 gap-audit build adds yield-curve-10y3m, rba-fed-gap, us-japan-10y-gap, cftc-gold-positioning (voters, A-1/A-5/A-3/A-7), gold-oil-ratio, eia-crude-stocks (context, A-4/A-6) and the monthly trio oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10) as P1 cards; the 2026-10-29 owner round adds usdaed — the UAE dirham context card, P2)', () => {
     expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(59);
-    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(42);
+    // Session 3 (G2): +breakeven-tilt (P2, the breakeven-10y sibling).
+    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(43);
   });
 
   it('groups are the question groups (global 5 + prices-board, australia 3)', () => {
@@ -54,7 +55,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('info-only cards never vote: exactly the fifty-three info rules (2026-10-24 M4 Wave 1: +sofr, +us-2y, +breakeven-10y, +michigan-1y-expectations; M5 Wave 2: +euro-aaa-10y, +food-index, +wheat, +maize, +usdtry as context; 2026-10-25 M6 Wave 3: +mortgage-30y, +walcl, +retail-sales, +housing-permits, +cfnai, +job-openings, +t5yie, +us-wages, +au-saving-ratio, +au-job-vacancies as context — euro-hicp and au-housing-finance are the scored pair; 2026-10-26 gap-audit: +gold-oil-ratio, +eia-crude-stocks (A-4/A-6), +oecd-cli-cn, +oecd-cli-de, +gpr-index, +epu-us (the A-8 companions and the A-9/A-10 context pair — the CLI US leg is the trio’s voter); 2026-10-29 owner round: +usdaed — the UAE dirham context card)', () => {
+  it('info-only cards never vote: exactly the fifty-four info rules (2026-10-24 M4 Wave 1: +sofr, +us-2y, +breakeven-10y, +michigan-1y-expectations; M5 Wave 2: +euro-aaa-10y, +food-index, +wheat, +maize, +usdtry as context; 2026-10-25 M6 Wave 3: +mortgage-30y, +walcl, +retail-sales, +housing-permits, +cfnai, +job-openings, +t5yie, +us-wages, +au-saving-ratio, +au-job-vacancies as context — euro-hicp and au-housing-finance are the scored pair; 2026-10-26 gap-audit: +gold-oil-ratio, +eia-crude-stocks (A-4/A-6), +oecd-cli-cn, +oecd-cli-de, +gpr-index, +epu-us (the A-8 companions and the A-9/A-10 context pair — the CLI US leg is the trio’s voter); 2026-10-29 owner round: +usdaed — the UAE dirham context card; 2026-10-31 Session-3 round: +breakeven-tilt — the G2 interplay context card, D-5 keeps it out of the voter table)', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
     expect(info).toEqual([
       'au-deposit-rate',
@@ -64,6 +65,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'boe-rate',
       'boj-rate',
       'breakeven-10y',
+      'breakeven-tilt',
       'btc-usd',
       'bund-10y',
       'cfnai',

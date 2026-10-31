@@ -2260,6 +2260,66 @@
       }
     },
     {
+      "id": "breakeven-tilt",
+      "title": "Breakeven tilt (forward minus spot)",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "derived",
+        "name": "FRED (T5YIFR − T5YIE, derived)",
+        "url": "https://fred.stlouisfed.org/series/T5YIFR",
+        "seriesIdOrTable": "FRED:T5YIFR − FRED:T5YIE (both collected; points)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/T5YIFR",
+      "methodUrl": "https://fred.stlouisfed.org/series/T5YIFR",
+      "whatItIs": "The 5y5y forward breakeven minus the 5-year spot breakeven (FRED’s T5YIFR − T5YIE, both already collected): positive means the market prices more inflation in years five to ten than in years one to five.",
+      "whatItIsnt": "It is a small difference of two market prices: liquidity and hedging can move it without any real change in belief.",
+      "trackRecordNote": "A widening tilt has often accompanied reflation narratives; a deeply negative tilt reads as the market pricing today’s pressure as temporary.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 5 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15). · Worst of legs (fred:T5YIFR, fred:T5YIE): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:T5YIFR",
+          "fred:T5YIE"
+        ]
+      },
+      "unit": "points",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 5,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 2,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (5-year breakeven inflation; series page read live 2026-10-25, matching the deploying session's scan) (checked 2026-10-25) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:T5YIFR, fred:T5YIE): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
       "id": "food-index",
       "title": "World food prices",
       "area": {
@@ -4454,7 +4514,7 @@
       },
       "source": {
         "provider": "fred",
-        "name": "FRED (EIA Brent) + Yahoo Finance (BZ=F)",
+        "name": "FRED (EIA Brent) + Yahoo Finance (front-month futures)",
         "url": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
         "seriesIdOrTable": "FRED:DCOILBRENTEU + Yahoo Finance BZ=F (gap-fill + live refresh)"
       },

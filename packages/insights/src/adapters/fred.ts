@@ -47,12 +47,17 @@ export function fredMultiSeriesUrl(seriesIds: readonly string[], from?: string):
 }
 
 /** The window a bulk group requests: 'full' keeps the whole history (the
- * highest-since trio + the long-yield cards' "since {year}" math); 'decade'
+ * highest-since pair + the long-yield cards' "since {year}" math); 'decade'
  * trims to the 10-year percentile/history window + margin — the ingest's
  * CPU budget on the Worker venue (2026-10-21: the first live run hit
  * exceededCpu at the stage stringify; the decade window halves the parse
- * and every downstream series). */
-export type FredBulkWindow = 'full' | 'decade';
+ * and every downstream series); 'since' pins the group's own cosd anchor
+ * (Session 3 / D-4: DFII10 rides cosd=2003-01-02 — its whole available
+ * history — because the no-cosd full-history answer lagged the cosd answers
+ * at rung time on 10 of 10 archived days, 2026-10-21→10-30, while the
+ * decade-window groups served same-morning data every time; the evidence
+ * is recorded in GOLD_FRED_GAPFILL_SPEC.md §5). */
+export type FredBulkWindow = 'full' | 'decade' | 'since';
 
 /** The decade window's margin beyond the 10-year percentile/history window. */
 export const FRED_DECADE_MARGIN_DAYS = 90;
@@ -61,6 +66,18 @@ export const FRED_DECADE_MARGIN_DAYS = 90;
 export function fredDecadeFrom(now: Date = new Date()): string {
   return new Date(now.getTime() - (3_650 + FRED_DECADE_MARGIN_DAYS) * 86_400_000).toISOString().slice(0, 10);
 }
+
+/**
+ * DFII10's own cosd anchor (D-4, Session 3): the series' whole available
+ * history starts 2003-01-02 on FRED — "full" and "2003-start" cover the
+ * same days, but the EXPLICIT cosd request rides the same fresh-at-rung-time
+ * answer path the decade groups do, while the no-cosd full-history request
+ * served bodies a day (sometimes three) behind at 04:10/20:10 UTC on every
+ * archived day of the audit window. The nominal pair (DGS10/DGS30) keeps
+ * the no-cosd full request: their highest-since math needs the pre-2003
+ * decades a cosd trim would cut.
+ */
+export const FRED_DFII10_COSD = '2003-01-02';
 
 /**
  * Fetch and parse one FRED series (full history). Throws loudly on any
@@ -195,24 +212,57 @@ export const FRED_SERIES = {
 
 /**
  * The multi-series request groups (2026-10-21): every FRED_SERIES id rides
- * exactly one group; four requests cover the whole register. Grouped by
- * cadence/source so a single failing group degrades coherent families.
- * The 2026-10-21b CPU fix: only the highest-since trio (DGS10/DGS30/DFII10 —
- * the "highest since {year}" math needs decades) keeps FULL history; every
- * other group rides the decade window (the 10-year percentile/history
- * basis + margin) — the Worker venue's CPU budget killed the first live
- * run at the stage write, and the parse + downstream halve with the trim.
+ * exactly one group; seven requests cover the whole register (six before
+ * the Session-3 trio split). Grouped by cadence/source so a single failing
+ * group degrades coherent families. The 2026-10-21b CPU fix: only the
+ * highest-since yields (DGS10/DGS30 — the "highest since {year}" math needs
+ * decades) keep FULL history; DFII10 rides its own whole-history 'since'
+ * window (D-4, Session 3); every other group rides the decade window (the
+ * 10-year percentile/history basis + margin) — the Worker venue's CPU
+ * budget killed the first live run at the stage write, and the parse +
+ * downstream halve with the trim.
  */
 export interface FredBulkGroup {
   seriesIds: readonly string[];
   window: FredBulkWindow;
+  /**
+   * The cosd anchor for window 'since' groups (the group's whole-history
+   * start, pinned by the series it carries — see FRED_DFII10_COSD).
+   */
+  since?: string;
+}
+
+/** The cosd a group requests, or undefined for the no-cosd full history. */
+export function fredGroupFrom(group: FredBulkGroup, now: Date = new Date()): string | undefined {
+  if (group.window === 'decade') return fredDecadeFrom(now);
+  if (group.window === 'since') {
+    if (group.since === undefined) {
+      throw new Error("FRED bulk group window 'since' needs a since anchor (missing on its definition)");
+    }
+    return group.since;
+  }
+  return undefined;
 }
 
 export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
-  // FULL history — the highest-since trio (us10y/us30y/real-yield-10y).
+  // FULL history — the nominal highest-since pair (us10y/us30y). Session 3
+  // (D-4, GOLD_FRED_GAPFILL_SPEC §2 G1d): the trio SPLIT — DGS10/DGS30 keep
+  // the no-cosd full request (the "highest since {year}" math needs their
+  // pre-2003 decades), while DFII10 moved to its own 'since' group below.
+  // One extra subrequest per rung (7 FRED groups total; the main rung sits
+  // at ~43/50 fetches — the budget note in ingest/run.ts's header).
   {
-    seriesIds: [FRED_SERIES.us10y, FRED_SERIES.us30y, FRED_SERIES.realYield10y],
+    seriesIds: [FRED_SERIES.us10y, FRED_SERIES.us30y],
     window: 'full',
+  },
+  // The real 10-year, whole history, on the cosd path (D-4): 2003-01-02 IS
+  // DFII10's first observation date, so this trims nothing — it only picks
+  // the fresher answer path. The cross-fill + the Treasury real-curve
+  // fallback (collect.ts) cover this group's own failure days.
+  {
+    seriesIds: [FRED_SERIES.realYield10y],
+    window: 'since',
+    since: FRED_DFII10_COSD,
   },
   // Daily rates/stress, decade window (9 series — M6 adds the 5-year
   // breakeven beside the 5y5y forward it belongs to; all-daily set).

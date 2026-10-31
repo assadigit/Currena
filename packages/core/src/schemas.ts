@@ -390,6 +390,11 @@ export const IndicatorIdSchema = z.enum([
   'sofr', // FRED SOFR (daily) — context, borrowing-costs
   'us-2y', // FRED DGS2 (daily) — context display (already collected), borrowing-costs
   'breakeven-10y', // FRED T10YIE (daily) — context display (validation-only today), prices-heat
+  // Session 3 (2026-10-31, GOLD_FRED_GAPFILL_SPEC G2): the breakeven
+  // interplay — T5YIFR − T5YIE, the market's priced acceleration of
+  // inflation. Derived from two already-collected legs (zero new fetches);
+  // context, prices-heat. NOT a gold voter (D-5 stays open).
+  'breakeven-tilt',
   // ---- M5 Wave 2 (OD-8/D-42, 2026-10-24): household costs & the euro long end ----
   'euro-aaa-10y', // ECB YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y (daily, key verified 2026-10-24) — context, borrowing-costs
   'food-index', // World Bank Pink Sheet Monthly Indices, Food (2010=100) — context, prices-heat

@@ -747,6 +747,10 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // M7 (2026-10-26): the China CPI yearly rate — an inflation series in
   // percentage points, the us-cpi-yoy family.
   'china-cpi',
+  // Session 3 (GOLD_FRED_GAPFILL_SPEC G2, 2026-10-31): the breakeven
+  // tilt — a breakeven-rate gap in percentage points (T5YIFR − T5YIE),
+  // the t5yie/us-japan-10y-gap family.
+  'breakeven-tilt',
 ]);
 
 /** Index/ratio series that speak in points but are not interest rates. */

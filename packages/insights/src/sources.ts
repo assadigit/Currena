@@ -627,6 +627,11 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   // (yahoo: L2, ownerAccepts — the same acceptance the Brent gap-fill and
   // the metals histories ride) gates its display bar.
   usdaed: ['yahoo:AED=X'],
+  // Session 3 (GOLD_FRED_GAPFILL_SPEC G2, 2026-10-31): the breakeven
+  // interplay's legs — both FRED series already collected on the decade
+  // group (T-16 scanned: citation-required, the recorded acceptance the
+  // breakeven family already rides). Derived subtraction, worst-leg walk.
+  'breakeven-tilt': ['fred:T5YIFR', 'fred:T5YIE'],
 };
 
 /* ------------------------------------------------------------------ */

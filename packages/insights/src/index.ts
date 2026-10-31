@@ -153,6 +153,21 @@ export type {
   ModelVsRealityReading,
 } from './gold-score';
 
+// Session 3 (docs/insights/GOLD_FRED_GAPFILL_SPEC.md): the FRED gap-fillers.
+// real-yield-fill.ts — the bounded DGS10 − T10YIE cross-fill for the
+// real-yield-10y scoring input (decision D-6: fills never reach the stored
+// history; the ingest counts them aloud). breakeven-tilt.ts — the G2
+// interplay card's pure lean selection for the gold panel's inflation-lane
+// context phrase (D-5: context only, never a voter).
+export {
+  REAL_YIELD_FILL_CAP,
+  REAL_YIELD_FILL_NOT_BEFORE,
+  realYieldScoringSeries,
+} from './real-yield-fill';
+export type { RealYieldFillResult } from './real-yield-fill';
+export { BREAKEVEN_TILT_DEADBAND_PT, breakevenTiltLean } from './breakeven-tilt';
+export type { BreakevenTiltLean } from './breakeven-tilt';
+
 export { RULE_VERSION, RULE_CHANGELOG } from './ruleVersion';
 export type { RuleChangeLogEntry } from './ruleVersion';
 

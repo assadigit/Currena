@@ -531,7 +531,7 @@ describe('runInsightsRung2Phase — the first-of-month monthly trio', () => {
         now: new Date('2026-11-01T04:40:00Z'),
       });
       expect(hist.written).toBeGreaterThan(0);
-      expect(store.snapshot!.readings).toHaveLength(101); // 96 + the five (2026-10-29 owner round: +usdaed)
+      expect(store.snapshot!.readings).toHaveLength(102); // 96 + the five (2026-10-29 owner round: +usdaed) + the Session-3 breakeven-tilt (G2)
     } finally {
       globalThis.fetch = original;
     }

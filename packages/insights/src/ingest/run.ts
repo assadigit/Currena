@@ -26,7 +26,9 @@
  *   fetch, the group still one request). Empirical note: the 00:15 UTC
  *   publish rung completed with 41 fetch-rows + 6 writes — KV operations
  *   do not consume the fetch-subrequest budget, so the working headroom
- *   is the fetch count alone (~42/50). The recorded follow-up if a future
+ *   is the fetch count alone (~42/50). Session 3 (2026-10-31, D-4): the
+ *   FRED trio split adds ONE fetch (DFII10's own cosd group; 7 groups) —
+ *   ~43/50, still inside the ceiling. The recorded follow-up if a future
  *   wave needs headroom: consolidate the 6 seed HISTORY reads into one
  *   stage-blob read (−4) or pre-stage the slow monthly/quarterly families
  *   on a 04:05 rung.)
@@ -88,6 +90,7 @@ import type { ReadingSourceOverride } from '../adapters/collect';
 import { computeReading, type ReadingSource } from '../scoring';
 import type { KVLike } from './kv-store';
 import { combineSeries, epochDay, fromEpochDay, type SeriesPoint } from '../series';
+import { REAL_YIELD_FILL_CAP, realYieldScoringSeries } from '../real-yield-fill';
 
 /**
  * The live-priced rows whose value series accumulate one observation per
@@ -391,6 +394,35 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
   });
   const tDerive = performance.now();
 
+  // Session 3 (GOLD_FRED_GAPFILL_SPEC G1b, decision D-6): the bounded
+  // DGS10 − T10YIE cross-fill for the real-yield-10y SCORING INPUT ONLY.
+  // The pure series (`series`) keeps feeding the stage write, the stored
+  // histories, the peaks and the highest-since math — fills exist ONLY in
+  // the reading assembly below and are counted aloud in the report (never
+  // silent, never stored). The audit's healthy-day finding: 0 fillable
+  // days (DFII10 == DGS10 − T10YIE exactly, same dates); the fill earns
+  // its keep on degraded days — the trio split's DFII10 group failing
+  // while the nominal pair's group and the breakevens' decade group both
+  // succeeded.
+  const realYieldFill = realYieldScoringSeries(
+    series['real-yield-10y'],
+    inputs.fred.DGS10,
+    inputs.fred.T10YIE,
+    nowIso,
+  );
+  const scoringSeries =
+    realYieldFill.series !== undefined && realYieldFill.fills > 0
+      ? { ...series, 'real-yield-10y': realYieldFill.series }
+      : series;
+  reports.push({
+    source: 'derived',
+    ok: true,
+    detail: realYieldFill.capped
+      ? `realYieldFill: capped — ${realYieldFill.fillable} fillable days exceeded the ${REAL_YIELD_FILL_CAP * 100}% window cap; DFII10 treated as degraded, no cross-fill applied (the reading ages through the normal stale path)`
+      : `realYieldFill: ${realYieldFill.fills} (DGS10 − T10YIE cross-fill, decade-window bounded, scoring input only — the stored history stays pure DFII10)`,
+  });
+  console.log(`[ingest] real-yield scoring input: ${realYieldFill.fills} cross-filled day(s)${realYieldFill.capped ? ' — CAPPED (degraded series, no fill)' : ''}`);
+
   // Peaks + "highest since {year}" (the long-history yields need the full
   // fetched series — a 10-year window cannot say 2002).
   const peaks = computePeaks(inputs, series.brent);
@@ -415,7 +447,7 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
   // write, leaving status frozen at the last good run).
   const baseReadingCache = new Map<string, IndicatorReading>();
   const draft = buildInsightsSnapshot({
-    series,
+    series: scoringSeries,
     previous,
     calendar: CALENDAR,
     releaseSchedule: RELEASE_SCHEDULE,
@@ -437,7 +469,7 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
   const tDraft = performance.now();
 
   const outcome = runValidationSuite({
-    series,
+    series: scoringSeries,
     readings: draft.readings,
     calendar: CALENDAR,
     now: nowIso,
@@ -449,7 +481,7 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
   const tValidation = performance.now();
 
   const snapshot = buildInsightsSnapshot({
-    series,
+    series: scoringSeries,
     previous,
     calendar: CALENDAR,
     releaseSchedule: RELEASE_SCHEDULE,

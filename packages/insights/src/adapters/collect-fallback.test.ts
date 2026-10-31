@@ -136,7 +136,7 @@ describe('the 2026-10-22 reliability round: FRED fallback fills', () => {
         expect(url).not.toContain('eia.gov');
       }
       const fredRows = result.reports.filter((r) => r.source === 'fred');
-      expect(fredRows.length).toBe(6); // the six bulk groups (2026-10-24 M4: +the Wave-1 group)
+      expect(fredRows.length).toBe(7); // the seven bulk groups (Session-3 D-4: the trio split adds DFII10's own cosd group)
       for (const row of fredRows) expect(row.ok, row.detail).toBe(true);
       expect(Object.keys(result.readingSourceOverrides)).toHaveLength(0);
     } finally {
@@ -149,7 +149,7 @@ describe('the 2026-10-22 reliability round: FRED fallback fills', () => {
     try {
       const result = await collectAllSources({ bitstampCandles: 2 });
       const fredRows = result.reports.filter((r) => r.source === 'fred');
-      expect(fredRows).toHaveLength(6);
+      expect(fredRows).toHaveLength(7);
       for (const row of fredRows) {
         expect(row.ok, row.detail).toBe(false);
         expect(row.kind).toBe('failed');

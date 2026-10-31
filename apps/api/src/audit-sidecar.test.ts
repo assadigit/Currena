@@ -54,6 +54,10 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       'boj-rate',
       'breakeven-10y',
       'breakeven-5y5y',
+      // Session 3 (G2, 2026-10-31): the interplay card — derived from the
+      // two citation-required FRED legs (T5YIFR + T5YIE), both already in
+      // this list's licence class (display-permitted with attribution).
+      'breakeven-tilt',
       'brent',
       'btc-usd',
       'bund-10y',

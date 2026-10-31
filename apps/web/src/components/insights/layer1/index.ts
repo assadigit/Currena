@@ -61,14 +61,14 @@ export const LAYER1_GLOSSARY_IDS: readonly string[] = Object.keys(insightsCopyEn
 
 /**
  * The FULL inventory the validator (G1) checks against — every indicator id
- * found in code (100 indicators + 16 markets + 10 FX pairs + 7 FX patterns =
- * 134). Sourced from the code definitions (see INVENTORY.md); kept in this
+ * found in code (102 indicators + 16 markets + 10 FX pairs + 7 FX patterns =
+ * 135). Sourced from the code definitions (see INVENTORY.md); kept in this
  * module so the validator and any Layer-2 caller share one list. When an id
  * is added/removed in the code, this list MUST move with it (G1 fails
  * otherwise — by design).
  */
 export const LAYER1_INVENTORY_IDS: readonly string[] = [
-  // ----- 101 indicators (packages/insights/src/definitions.ts) -----
+  // ----- 102 indicators (packages/insights/src/definitions.ts) -----
   'yield-curve-10y2y', 'yield-curve-10y3m', 'real-yield-10y', 'us10y', 'us30y', 'fed-target',
   'ecb-dfr', 'fed-expectations', 'govt-interest-revenue', 'us-2y', 'sofr',
   'mortgage-30y', 'jgb-10y', 'bund-10y', 'gilt-10y', 'euro-aaa-10y', 'boe-rate',
@@ -89,6 +89,9 @@ export const LAYER1_INVENTORY_IDS: readonly string[] = [
   'au-deposit-rate', 'au-wage-growth', 'au-rent-yoy', 'au-unemployment', 'au-home-values',
   'au-household-debt-arrears', 'au-housing-finance', 'au-saving-ratio', 'au-job-vacancies',
   'audusd', 'rba-fed-gap', 'audjpy', 'terms-of-trade', 'iron-ore', 'gold-aud',
+  // Session 3 (GOLD_FRED_GAPFILL_SPEC G2, 2026-10-31): the breakeven
+  // interplay context card → 102.
+  'breakeven-tilt',
   // ----- 16 markets (packages/insights/src/markets/definitions.ts) -----
   'n225', 'asx200', 'kospi', 'hsi', 'ssec', 'taiex', 'nifty50', 'stoxx50', 'dax',
   'cac', 'ftse', 'sp500', 'ndx', 'dow', 'tsx', 'ibov',
