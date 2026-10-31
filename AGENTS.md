@@ -260,8 +260,9 @@ bounded DGS10−T10YIE cross-fill for the real-yield SCORING INPUT only
 D-6), and the `breakeven-tilt` context card (T5YIFR−T5YIE, zero new
 fetches) whose lean phrase rides the gold panel's inflation lane
 («انتظارات در حال شدت‌گیری/فروکش» — round-54; D-5 keeps it OUT of the
-voter table). NEXT: Session 4, the backtest harness (reads the frozen
-20-voter table).*
+voter table). NEXT: Session 4, the backtest harness — the contract is
+`docs/insights/GOLD_BACKTEST_SPEC.md` (reads the frozen 20-voter table
+over the stored histories + the daily archive corpus; evaluates D-5).*
 
 **Prices heat** (`prices-heat` gauge):
 | | id | cadence | maxAge | rule | source |
