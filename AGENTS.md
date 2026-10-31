@@ -237,8 +237,8 @@ markets table):
 | [C] | `btc-usd` | daily | 2 | info | gold-api |
 | [C] | `gold-btc` | daily | 4 | info | derived |
 
-*Gold Program (2026-10-31, S1+S2+S2.1+S3 — docs/insights/GOLD_SCORE_SPEC.md +
-docs/insights/GOLD_FRED_GAPFILL_SPEC.md): two derived panels render in the
+*Gold Program (2026-10-31, S1+S2+S2.1+S3+S4 — docs/insights/GOLD_SCORE_SPEC.md +
+GOLD_FRED_GAPFILL_SPEC.md + GOLD_BACKTEST_SPEC.md): two derived panels render in the
 SIGNALS card, directly under the gold balance visual («برآیند عوامل مؤثر بر
 قیمت طلا» — the owner's 2026-10-31 placement directive; they sat on this
 strip for one day in S2) — the **gold tailwind score** (the macro voters
@@ -260,9 +260,21 @@ bounded DGS10−T10YIE cross-fill for the real-yield SCORING INPUT only
 D-6), and the `breakeven-tilt` context card (T5YIFR−T5YIE, zero new
 fetches) whose lean phrase rides the gold panel's inflation lane
 («انتظارات در حال شدت‌گیری/فروکش» — round-54; D-5 keeps it OUT of the
-voter table). NEXT: Session 4, the backtest harness — the contract is
-`docs/insights/GOLD_BACKTEST_SPEC.md` (reads the frozen 20-voter table
-over the stored histories + the daily archive corpus; evaluates D-5).*
+voter table). S4 (2026-10-31, the backtest harness —
+`docs/insights/BACKTEST-GOLD.md`, the measured report) re-ran the FROZEN
+20-voter table over the stored histories at a frozen clock (2,514
+windows, 2016-11 → 2026-10, zero cross-fills, zero lookahead —
+`packages/insights/scripts/gold-backtest.ts` + `gold-corpus-dump.ts` +
+`src/gold-backtest-core.ts`, 28 tests) and joined realized forward gold
+returns: **no edge in the table's own direction — the mature-base
+sign-agreements depart BELOW the coin at 5/20/60td and headwind labels
+preceded LARGER forward rises** (60td spread −3.09%); the tilt-augmented
+21-voter variant (harness-local, D-5's evidence) made no material
+difference. The table stays frozen; the panel's "conditions, not advice"
+caption is the operative description. NEXT: the owner's D-5 read (the
+evidence is in; the promotion is their call) + the asOf-watch days 2–3
+(pending the 11-01/11-02 rungs) + re-running the harness as the corpus
+grows.*
 
 **Prices heat** (`prices-heat` gauge):
 | | id | cadence | maxAge | rule | source |
