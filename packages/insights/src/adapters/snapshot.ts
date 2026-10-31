@@ -49,6 +49,54 @@ import { addDays, epochDay, fromEpochDay, pointAtOrBefore, type SeriesPoint } fr
 import { AUX_RULE_WIRING, READING_SOURCES } from './derived';
 import { SANITY_RANGES, withinSanityRange, upstreamLegsFor } from '../sources';
 
+/* ------------------------------------------------------------------ *
+ * Gap-closure S1-M1.5 (2026-10-31): the gap-leg date guard.
+ *
+ * A spread reading (au-us-10y-gap, us-japan-10y-gap) is only meaningful
+ * while its two legs are CONTEMPORANEOUS. The value is always a true
+ * same-date join (combineSeries), but the legs' freshest dates can drift
+ * apart — the 2026-10-31 audit found the AU monthly F2.1 leg at Sep 30
+ * silently paired with the US daily leg at Oct 29, the card still voting.
+ * The guard: any leg-date inequality is marked (T-20's datesDiffer), and a
+ * divergence past the window below stops the vote (status 'stale' — the
+ * non-votable, greyed state the M1.4 badge counts). The value and both
+ * dates stay visible; nothing is hidden.
+ * ------------------------------------------------------------------ */
+
+/**
+ * The allowed window between a gap's two legs' freshest dates. 7 days
+ * covers the honest daily-pair skews (weekends, holidays, a day of
+ * publication lag); a monthly leg vs a daily leg (≥ 28 days) always fails
+ * it. When the daily RBA F2 path returns, the AU/US pair naturally sits
+ * back inside the window and the gap votes daily again.
+ */
+export const GAP_LEG_MAX_DIVERGENCE_DAYS = 7;
+
+/** Do the two legs' dates sit further apart than the allowed window? */
+export function gapLegDatesDiverge(aDate: string, bDate: string): boolean {
+  return Math.abs(epochDay(aDate) - epochDay(bDate)) > GAP_LEG_MAX_DIVERGENCE_DAYS;
+}
+
+/**
+ * Apply the guard to a built spread reading (pure). Marks `datesDiffer`
+ * whenever the legs' dates differ (T-20's letter); flips a VOTING status
+ * ('warning' | 'normal') to 'stale' when the divergence exceeds the
+ * window. Readings without gapLegs pass through untouched.
+ */
+export function applyGapLegDateGuard(reading: IndicatorReading): IndicatorReading {
+  const legs = reading.gapLegs;
+  if (legs === undefined) return reading;
+  if (legs.a.asOf === legs.b.asOf) return reading;
+  const diverged = gapLegDatesDiverge(legs.a.asOf, legs.b.asOf);
+  const voting = reading.status === 'warning' || reading.status === 'normal';
+  return {
+    ...reading,
+    datesDiffer: true,
+    status: diverged && voting ? 'stale' : reading.status,
+  };
+}
+
+
 /**
  * Step-1 audit items A2/A3 + fix spec B-05 (2026-10-14): a hand-maintained
  * release event (official publication dates for the monthly/quarterly
@@ -507,6 +555,10 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
             a: { id: 'au-10y', asOf: auLast },
             b: { id: 'us10y', asOf: usLast },
           };
+          // S1-M1.5: the vote guard — the AU monthly leg must never silently
+          // pair with a weeks-newer US daily leg (the 2026-10-31 audit found
+          // Sep 30 vs Oct 29 being compared).
+          reading = applyGapLegDateGuard(reading);
         }
       }
       // 2026-10-26 gap-audit build, A-3: the US−Japan gap's legs.
@@ -520,6 +572,9 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
             a: { id: 'us10y', asOf: usLast },
             b: { id: 'jgb-10y', asOf: jpLast },
           };
+          // S1-M1.5: the same guard — a MoF outage must not leave the US leg
+          // marching weeks ahead of a frozen JGB leg while the gap still votes.
+          reading = applyGapLegDateGuard(reading);
         }
       }
 

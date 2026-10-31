@@ -861,6 +861,14 @@ export const IndicatorReadingSchema = z
       })
       .optional(),
     /**
+     * S1-M1.5 (2026-10-31): the T-20 marker — the gap's legs carry different
+     * freshest dates. Stamped by the ingest whenever the legs' dates differ
+     * (any inequality); when the divergence exceeds the allowed window the
+     * reading also stops voting (status 'stale') — a monthly leg silently
+     * paired with a daily leg must never colour a verdict.
+     */
+    datesDiffer: z.boolean().optional(),
+    /**
      * Fix spec B-04 (2026-10-14): the home-loan reading's change since the
      * LATEST RBA cash-rate decision — the pass-through card compares the
      * decision (rba-cash-rate.lastChange) with the loan move 1–3 months

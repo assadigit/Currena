@@ -750,7 +750,15 @@ const BUDGETS = [
   // gauge engine's staleCount arithmetic riding this chunk. gz +0.28 kB
   // over the old ceiling. Entry chunk untouched at 294.45/88.48.
   // Justified in CHANGELOG §2026-10-31p.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1138_000, gz: 268_000, label: 'Insights lazy chunk' },
+  //
+  // 2026-10-31q gap-closure S1-M1.5 bump (measured 1138.69/268.19 →
+  // budget 1139/268.5): the corrected Layer-1 whatItIs copy for the RBA
+  // trio (round-58 — the honest "monthly average, lagged" wording now
+  // that the cards ride the F2.1 monthly table; the old copy claimed the
+  // blocked daily F2 file) riding this chunk. gz +0.19 kB over the old
+  // ceiling. Entry chunk untouched at 294.45/88.48.
+  // Justified in CHANGELOG §2026-10-31q.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1139_000, gz: 268_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {

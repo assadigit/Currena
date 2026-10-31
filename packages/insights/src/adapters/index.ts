@@ -87,6 +87,9 @@ export {
   parseContextNotes,
   projectSnapshotToPublic,
   patchInsightsSnapshot,
+  GAP_LEG_MAX_DIVERGENCE_DAYS,
+  applyGapLegDateGuard,
+  gapLegDatesDiverge,
   HISTORY_MAX_POINTS,
   HISTORY_WINDOW_DAYS,
 } from './snapshot';

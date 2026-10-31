@@ -65,6 +65,7 @@ import {
   historyToSeries,
   projectSnapshotToPublic,
   patchInsightsSnapshot,
+  applyGapLegDateGuard,
   READING_SOURCES,
   mergeSeries,
   type SeriesInputs,
@@ -865,6 +866,9 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
         ...reading,
         gapLegs: { a: { id: 'us10y', asOf: legs.us }, b: { id: 'jgb-10y', asOf: legs.jp } },
       };
+      // S1-M1.5: the same date guard the main build applies — a diverged
+      // pair is marked and never votes.
+      reading = applyGapLegDateGuard(reading);
     }
     // The definitional sanity range (T-28/F-14) — the same gate the main
     // build applies after the deterministic base.

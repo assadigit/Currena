@@ -1650,6 +1650,11 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // F3 (2026-10-21 venue round): the monthly-F2.1 fallback widens the
     // effective age the same way as au-10y (40 days) while the daily path
     // stays Akamai-blocked.
+    // S1-M1.5 (2026-10-31): the gap-leg date GUARD — the legs carry their
+    // own dates (gapLegs), any inequality is marked (datesDiffer, T-20), and
+    // a divergence beyond GAP_LEG_MAX_DIVERGENCE_DAYS (7) stops the vote
+    // (status 'stale'): the monthly AU leg must never silently colour a
+    // verdict against the marching daily US leg.
     cadence: 'daily',
     changeKind: 'points',
     phase: 'P1',

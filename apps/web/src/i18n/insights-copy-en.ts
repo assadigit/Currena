@@ -3177,7 +3177,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       low: 'Australian 10-year borrowing costs are low: the setting that usually means cheaper fixed home-loan rates.',
     },
     whatItIs:
-      'The yield on Australian Government 10-year bonds, daily from the RBA’s F2 statistical table (published with a 2–4 business-day lag). The US 10-year rides beside it for comparison.',
+      'The average market yield on 10-year Australian Government bonds over the latest full month: the RBA’s F2.1 monthly series (the daily F2 file is currently unreachable from this app’s servers, so the served series is the monthly average — lagged, refreshed in the first days of each month, so it can sit behind the day’s traded yield). The US 10-year rides beside it for comparison.',
     whyItMatters:
       'Long-term rates set the price of multi-year money: fixed-rate home loans, term deposits and business borrowing price off this curve, not just the RBA’s cash rate.',
     tendedToMean:
@@ -3200,7 +3200,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       low: 'The 3-year rate sits below the cash rate: the market’s own pricing sits below today’s setting.',
     },
     whatItIs:
-      'The RBA’s 3-year Australian Government bond yield (statistical table F2, series FCMYGBAG3D) minus the cash rate target (table F1), from the RBA.',
+      'The RBA’s 3-year Australian Government bond yield (monthly F2.1 series) minus the cash rate target (table F1), from the RBA. The 3-year leg is a monthly average, so it can lag the day’s traded rate.',
     whyItMatters:
       'This gap is the market’s lean relative to today’s cash rate — the same measure the financial press quotes as what the market prices for the RBA.',
     tendedToMean:
@@ -3220,7 +3220,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       low: 'US 10-year rates sit above Australia’s: the setting that has usually weighed on the AUD.',
     },
     whatItIs:
-      'Australia’s 10-year government bond yield (RBA table F2) minus the US 10-year yield (FRED), published weekly with a short lag.',
+      'Australia’s 10-year government bond yield (RBA F2.1, monthly average) minus the US 10-year yield (FRED, daily). Both legs carry their own dates; while they sit more than a week apart the card shows “dates differ” and does not vote.',
     whyItMatters:
       'The gap steers the Australian dollar: global investors compare the two when placing money.',
     tendedToMean:
