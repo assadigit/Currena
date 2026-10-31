@@ -5,6 +5,60 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31j] — Gold Program S6: the D-5 promotion LANDED — the voter table is 21 (breakeven-tilt, inflation lane), all four gated-session gates + the fresh backtest re-run
+
+The owner's "go" opened the session S5's decision log prescribed
+(D-5 decided-YES: "we can have 21"). Everything it required, measured:
+
+- **The table:** `GOLD_LANE_VOTERS` = 21 — `{ lane: 'inflation', id:
+  'breakeven-tilt', polarity: 1 }` as the last seat, exactly the
+  variant S4's B4 measured (level-leg only: the shared evaluator
+  carries no 30-day move threshold for the tilt). No threshold, label,
+  or lane-word change anywhere else.
+- **The pins:** gold-score.test.ts 35 tests (the promoted shape pinned:
+  21 voters, 8/3/5/5 lanes, the tilt once, the last seat) ·
+  breakeven-tilt.test.ts 11 (the promotion pin + the
+  phrase-selector-is-not-the-voter-lean pin) ·
+  gold-backtest-core.test.ts 29 (the equality pin:
+  `HARNESS_GOLD_VOTERS_21` = production; `HARNESS_GOLD_VOTERS_20` =
+  the S4-frozen table, kept verbatim for lineage, pinned to
+  production-minus-the-tilt) · gold-panels.test.tsx 25 (both
+  dictionaries cover the 21-voter table exactly).
+- **The naming (round-56):** "Inflation tilt" (EN) / «شیب
+  انتظارات تورمی» (fa — the compact form of the context card's
+  own round-54 name), behind
+  `docs/localization/persian-copy-round-56-gold-21st-voter.md`;
+  copy:audit clean.
+- **The fresh run:** the promoted table over the corpus-of-record
+  (the S5 C5 dump, recordedAt 15:17:40Z — the 11-01/11-02 rungs land
+  after; the scheduled Nov-2 re-check carries the grown-corpus
+  refresh). Sign-agreements 5/20/60td 52.1/47.6/43.9% (baseline
+  51.7/46.9/43.9) · the tilt fired 1,174/2,514 (46.7%) · label-bucket
+  flips 256 (10.2%) — the B4 delta, now the official lineage. The
+  honest nuance, stated in GOLD_BACKTEST_SPEC §5 Session 6: the
+  mature-base 5td moves 46.8 → 46.9%, from just-outside to
+  just-inside the 2-SE band (its spread flips −0.10 → +0.02%), so
+  the S4 "runs the OTHER way" wording softens to "no measurable edge"
+  under the same stated-in-advance rule (20td/60td still depart
+  below). No edge claim either way; the panel's round-55
+  measured-reality note stays the operative description.
+- **Live today:** the tilt reads −0.24 at its 21.7th percentile —
+  mid-range, SILENT — so the promotion changes nothing about the
+  current live reading (the stamped −2/headwind stands under both
+  tables); the promoted numbers ride every rung from the S6 deploy.
+- **Specs:** GOLD_SCORE_SPEC §2.1 (the 21-voter contract) + §5.1
+  (the S6 validation record) · GOLD_BACKTEST_SPEC §5 Session 6 +
+  the D-5 decision log closed (IMPLEMENTED) · AGENTS.md §A + NEXT.
+- **Bundle budget:** the Insights lazy chunk grew +0.01 kB raw (10
+  bytes — the 21st voter's name in both dictionaries + the one table
+  entry; measured 1136.01/267.29) — budget bumped 1136.00 → 1136.10
+  raw, gz unchanged, justified here per the I7 rule. Entry chunk
+  untouched at 294.45/88.48.
+- **Deploy:** pending a Cloudflare token in-session (the round-4 token
+  lives only in the repo Actions secret; the GitHub side is fully
+  unblocked). The moment it lands: `pnpm gates` → deploy-lock check
+  → `wrangler deploy` → live-verify, per DEPLOY.md.
+
 ## [2026-10-31i] — Gold Program S5: the fourth credential round CLOSED everything — deployed live (d77e9139, the honest note on currena.ir), C5 validated (content-identical), Actions secret rotated
 
 The owner's fourth token ("Try this") verified active and passed the

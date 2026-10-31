@@ -8,7 +8,8 @@
  *   - 4 LANES (sub-gauges): borrowing costs (tight/relief), the dollar
  *     (strong/under stress), market stress (elevated/calm) and inflation
  *     (running hot/cooling). Each lane's reading comes from its firing
- *     voters, never from a new fetch;
+ *     voters, never from a new fetch; the inflation lane carries five
+ *     voters since the D-5 promotion (Session 6 — breakeven-tilt);
  *   - FIRING VOTERS: a voter fires when the shared signals evaluator
  *     (connections.ts evalLeg — direction over 30 days with a per-leg
  *     minimum move, else the 10-year position) leans ±1, and its lean is
@@ -127,7 +128,9 @@ export interface GoldTailwindReading {
  * the growth-health lane stays out entirely (its members' gold relation
  * is weak or two-sided; copper-gold is already a ratio ABOUT gold).
  * Brent stays out of the inflation lane (supply shocks are not the
- * hedge-demand channel the lane measures).
+ * hedge-demand channel the lane measures). The 21st seat went to
+ * breakeven-tilt (D-5, Session 6) — the expectations tilt the panel
+ * already reads beside the lane's word, promoted on the owner's call.
  */
 export interface GoldLaneVoter {
   lane: GoldLane;
@@ -135,7 +138,20 @@ export interface GoldLaneVoter {
   polarity: 1 | -1;
 }
 
-/** The 20 voters (8 borrowing costs · 3 dollar · 5 stress · 4 inflation). */
+/**
+ * The 21 voters (8 borrowing costs · 3 dollar · 5 stress · 5 inflation).
+ *
+ * Session 6 (2026-10-31, the D-5 promotion — the owner's "we can have 21"
+ * on S4's B4 evidence): `breakeven-tilt` joined the inflation lane as the
+ * 21st voter, EXACTLY the variant B4 measured — polarity +1 (a building
+ * tilt is the tailwind side, like the lane's own hot-inflation reading) and
+ * LEVEL-LEG ONLY (the shared evaluator carries no 30-day move threshold for
+ * it, so it fires on the decade position alone). The promotion is a scope
+ * choice the owner is entitled to make, not an edge claim the harness
+ * supports (the B4 delta: sign-agreements moved +0.4/+0.7/+0.0pp — no
+ * material difference); the panel's measured-reality note (S5, C4a) stays
+ * the operative description.
+ */
 export const GOLD_LANE_VOTERS: readonly GoldLaneVoter[] = [
   // ——— Borrowing costs: TIGHT is the classic gold headwind (real rates
   // ——— are gold's opportunity cost); RELIEF (falling/low rates) the tailwind.
@@ -164,6 +180,7 @@ export const GOLD_LANE_VOTERS: readonly GoldLaneVoter[] = [
   { lane: 'inflation', id: 'us-pce-core-yoy', polarity: 1 },
   { lane: 'inflation', id: 'euro-hicp', polarity: 1 },
   { lane: 'inflation', id: 'breakeven-5y5y', polarity: 1 }, // rising inflation expectations
+  { lane: 'inflation', id: 'breakeven-tilt', polarity: 1 }, // the D-5 promotion (Session 6): the priced ACCELERATION of inflation — building = tailwind; level-leg only (no move threshold), exactly the B4-measured variant
 ];
 
 /* ------------------------------------------------------------------ *

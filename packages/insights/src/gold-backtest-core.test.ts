@@ -1,14 +1,16 @@
 /**
- * gold-backtest-core.test.ts — the Session-4 harness's pure-part contract
- * tests (GOLD_BACKTEST_SPEC.md §3 deliverables: the window joins, the
- * no-lookahead percentile, the flat band, and the B4 pin).
+ * gold-backtest-core.test.ts — the harness's pure-part contract tests
+ * (GOLD_BACKTEST_SPEC.md §3 deliverables: the window joins, the
+ * no-lookahead percentile, the flat band, and the table pins).
  *
  *   - the EQUIVALENCE PIN: scoreOverVoters(r, GOLD_LANE_VOTERS) must equal
  *     the production goldTailwindScore(r) on every synthetic battery — the
  *     harness-local parameterized copy cannot drift from the engine;
- *   - the 21-voter table is the frozen table PLUS exactly one tilt entry
- *     in the inflation lane, and GOLD_LANE_VOTERS itself stays untouched
- *     (D-5 discipline);
+ *   - the TABLE PINS (Session 6, the D-5 promotion): HARNESS_GOLD_VOTERS_21
+ *     EQUALS the production 21-voter table (the tilt promoted into the
+ *     inflation lane), and HARNESS_GOLD_VOTERS_20 is the S4-frozen
+ *     pre-promotion table kept verbatim for lineage — production minus
+ *     exactly the tilt;
  *   - seriesUpTo is the no-lookahead guarantee, and computeReading's own
  *     percentile/change math is invariant to (a) truncation at the as-of
  *     date and (b) ANY mutation of the data after it;
@@ -27,6 +29,7 @@ import { DEFINITIONS, computeReading } from './index';
 import { GOLD_LANE_VOTERS, goldTailwindScore } from './gold-score';
 import {
   HARNESS_GOLD_VOTERS_21,
+  HARNESS_GOLD_VOTERS_20,
   GOLD_BACKTEST_HORIZONS,
   bucketModelLabel,
   classifyReturn,
@@ -118,37 +121,47 @@ describe('scoreOverVoters — the parameterized copy equals the production engin
 });
 
 /* ------------------------------------------------------------------ *
- * The 21-voter table (B4)
+ * The harness tables after the promotion (Session 6 — D-5)
  * ------------------------------------------------------------------ */
 
-describe('HARNESS_GOLD_VOTERS_21 — the tilt-augmented harness-local copy', () => {
-  it('is the frozen 20-voter table plus EXACTLY one breakeven-tilt entry in the inflation lane, polarity +1', () => {
-    expect(HARNESS_GOLD_VOTERS_21).toHaveLength(GOLD_LANE_VOTERS.length + 1);
-    expect(HARNESS_GOLD_VOTERS_21.slice(0, GOLD_LANE_VOTERS.length)).toEqual(GOLD_LANE_VOTERS);
-    expect(HARNESS_GOLD_VOTERS_21[HARNESS_GOLD_VOTERS_21.length - 1]).toEqual({
-      lane: 'inflation',
-      id: 'breakeven-tilt',
-      polarity: 1,
-    });
+describe('the harness tables — post-promotion (Session 6)', () => {
+  it('the EQUALITY PIN: HARNESS_GOLD_VOTERS_21 IS the production table (the harness cannot drift from the engine)', () => {
+    expect(HARNESS_GOLD_VOTERS_21).toEqual(GOLD_LANE_VOTERS);
+    expect(HARNESS_GOLD_VOTERS_21).toHaveLength(21);
   });
 
-  it('leaves the production table untouched: 20 voters, no tilt, no reordering', () => {
-    expect(GOLD_LANE_VOTERS).toHaveLength(20);
-    expect(GOLD_LANE_VOTERS.some((v) => v.id === 'breakeven-tilt')).toBe(false);
+  it('production is the promoted table: 21 voters, the tilt in the inflation lane, polarity +1, the last seat', () => {
+    expect(GOLD_LANE_VOTERS).toHaveLength(21);
+    const tilt = GOLD_LANE_VOTERS.filter((v) => v.id === 'breakeven-tilt');
+    expect(tilt).toHaveLength(1);
+    expect(tilt[0]).toEqual({ lane: 'inflation', id: 'breakeven-tilt', polarity: 1 });
+    expect(GOLD_LANE_VOTERS[GOLD_LANE_VOTERS.length - 1]!.id).toBe('breakeven-tilt'); // the B4-measured shape
   });
 
-  it('the tilt voter behaves like every other level-only voter: high → tailwind, low → headwind, steady-mid → silent', () => {
+  it('the S4 frozen 20-voter table is the production table minus EXACTLY the tilt — the promotion is the only change', () => {
+    expect(HARNESS_GOLD_VOTERS_20).toHaveLength(20);
+    expect(HARNESS_GOLD_VOTERS_20.some((v) => v.id === 'breakeven-tilt')).toBe(false);
+    expect(GOLD_LANE_VOTERS.filter((v) => v.id !== 'breakeven-tilt')).toEqual(HARNESS_GOLD_VOTERS_20);
+  });
+
+  it('the tilt voter behaves like every other level-only voter: high → tailwind, low → headwind, steady-mid → silent (production semantics)', () => {
     const base = [reading('us-cpi-yoy', HIGH)];
-    const withTiltHigh = scoreOverVoters([...base, reading('breakeven-tilt', HIGH)], HARNESS_GOLD_VOTERS_21);
-    const withTiltLow = scoreOverVoters([...base, reading('breakeven-tilt', LOW)], HARNESS_GOLD_VOTERS_21);
-    const withTiltSilent = scoreOverVoters([...base, reading('breakeven-tilt', { percentile10y: 0.5, change30d: 0.01 })], HARNESS_GOLD_VOTERS_21);
-    const without = scoreOverVoters(base, GOLD_LANE_VOTERS);
+    const withTiltHigh = scoreOverVoters([...base, reading('breakeven-tilt', HIGH)], GOLD_LANE_VOTERS);
+    const withTiltLow = scoreOverVoters([...base, reading('breakeven-tilt', LOW)], GOLD_LANE_VOTERS);
+    const withTiltSilent = scoreOverVoters(
+      [...base, reading('breakeven-tilt', { percentile10y: 0.5, change30d: 0.01 })],
+      GOLD_LANE_VOTERS,
+    );
+    const without = scoreOverVoters(base, HARNESS_GOLD_VOTERS_20); // the S4-frozen baseline
     expect(withTiltHigh.netScore).toBe(without.netScore + 1);
     expect(withTiltHigh.voters.at(-1)).toMatchObject({ id: 'breakeven-tilt', impact: 'tailwind', evidence: 'high' });
     expect(withTiltLow.netScore).toBe(without.netScore - 1);
     expect(withTiltLow.voters.at(-1)).toMatchObject({ id: 'breakeven-tilt', impact: 'headwind', evidence: 'low' });
     expect(withTiltSilent.voters.some((v) => v.id === 'breakeven-tilt')).toBe(false);
     expect(withTiltSilent.netScore).toBe(without.netScore);
+    // and the production engine itself produces the promoted reading (one
+    // pure function, both sides — the gauges.ts contract):
+    expect(goldTailwindScore([...base, reading('breakeven-tilt', HIGH)]).netScore).toBe(withTiltHigh.netScore);
   });
 });
 

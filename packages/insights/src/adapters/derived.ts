@@ -440,8 +440,9 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // Session 3 (GOLD_FRED_GAPFILL_SPEC G2): the breakeven interplay — the
   // 5y5y forward minus the 5y spot, on their common dates (both legs ride
   // the SAME FRED decade group, so the join is exact-date by construction;
-  // 4dp quantized, the F4 discipline). Zero new fetches; context only —
-  // the 20-voter gold table is frozen (D-5).
+  // 4dp quantized, the F4 discipline). Zero new fetches; the derivation
+  // is UNCHANGED by the Session-6 promotion (D-5) — the tilt became the
+  // 21st gold voter downstream; the series itself is the same.
   if (fred.T5YIFR && fred.T5YIE) {
     put(
       'breakeven-tilt',

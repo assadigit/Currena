@@ -1,10 +1,13 @@
 /**
- * Gold Program S4 — the backtest harness (GOLD_BACKTEST_SPEC.md §3).
+ * Gold Program — the backtest harness (GOLD_BACKTEST_SPEC.md §3; S4
+ * built it, Session 6 re-ran it over the PROMOTED table).
  *
- * Re-runs the FROZEN 20-voter gold table (B1) over the recorded KV corpus
- * at a frozen clock, joins realized forward gold returns (B2), and
- * evaluates the tilt-augmented 21-voter variant (B4 — the D-5 evidence)
- * through a HARNESS-LOCAL copy of the table. Writes
+ * Re-runs the PRODUCTION 21-voter gold table (B1 — the D-5 promotion,
+ * Session 6: breakeven-tilt joined the inflation lane, exactly the variant
+ * S4's B4 measured) over the recorded KV corpus at a frozen clock, joins
+ * realized forward gold returns (B2), and carries the S4-frozen 20-voter
+ * table as the lineage baseline (the promotion-delta tables: did the
+ * promotion change the measured story?). Writes
  * docs/insights/BACKTEST-GOLD.md in BACKTEST.md's format.
  *
  * HONESTY RULES (B3), enforced by construction:
@@ -41,7 +44,7 @@ import { realYieldScoringSeries } from '../src/real-yield-fill';
 import { fromEpochDay, type SeriesPoint } from '../src/series';
 import {
   GOLD_BACKTEST_HORIZONS,
-  HARNESS_GOLD_VOTERS_21,
+  HARNESS_GOLD_VOTERS_20,
   bucketModelLabel,
   classifyReturn,
   flatBandPct,
@@ -96,13 +99,16 @@ for (const [id, pairs] of Object.entries(corpus.series)) SERIES[id] = asPairs(pa
 const GOLD: SeriesPoint[] = asPairs(corpus.goldHist.points);
 
 const defById = new Map<string, IndicatorDefinition>(DEFINITIONS.map((d) => [d.id as string, d]));
+/** The PRODUCTION voter ids — 21 since the D-5 promotion (the tilt included). */
 const VOTER_IDS = GOLD_LANE_VOTERS.map((v) => v.id as string);
+/** The S4-frozen lineage baseline's ids — 20 (the tilt's absence IS the promotion). */
+const LEGACY_IDS = HARNESS_GOLD_VOTERS_20.map((v) => v.id as string);
 const TILT_ID = 'breakeven-tilt';
 const REAL_YIELD_ID = 'real-yield-10y';
 /** The D-6 cross-fill legs (derived.ts passthroughs: us10y = DGS10, breakeven-10y = T10YIE). */
 const FILL_LEGS = { nominal: 'us10y', breakeven: 'breakeven-10y' } as const;
 
-const missing = [...VOTER_IDS, TILT_ID].filter((id) => SERIES[id] === undefined);
+const missing = [...new Set([...VOTER_IDS, ...LEGACY_IDS])].filter((id) => SERIES[id] === undefined);
 if (missing.length > 0) throw new Error(`Corpus is missing series: ${missing.join(', ')}`);
 
 /** The frozen clock anchor of a window (the production main rung's time-of-day; day-boundary only). */
@@ -123,10 +129,11 @@ interface VoterState {
 interface WindowResult {
   date: string;
   goldIndex: number;
-  score20: ReturnType<typeof scoreOverVoters>;
-  score21: ReturnType<typeof scoreOverVoters>;
+  /** The PRODUCTION 21-voter reading (the promoted table). */
+  scoreProd: ReturnType<typeof scoreOverVoters>;
+  /** The S4-frozen 20-voter reading (the lineage baseline). */
+  scoreLegacy: ReturnType<typeof scoreOverVoters>;
   voterState: Map<string, VoterState>;
-  tiltState: VoterState;
   realYieldFills: number;
   realYieldCapped: boolean;
 }
@@ -146,8 +153,6 @@ function voterStateOf(reading: IndicatorReading, def: { lane: 'borrowing-costs' 
 let crossFillTotal = 0;
 let crossFillCappedWindows = 0;
 const windows: WindowResult[] = [];
-
-const tiltDefEntry = HARNESS_GOLD_VOTERS_21[HARNESS_GOLD_VOTERS_21.length - 1]!;
 
 for (const day of gridDates) {
   const now = frozenNow(day);
@@ -176,19 +181,18 @@ for (const day of gridDates) {
     voterState.set(id, voterStateOf(reading, tableEntry));
   }
 
-  // B4's 21st voter (evaluated exactly as production would: the shared
-  // evaluator, level-leg only, like every voter without a move threshold).
-  const tiltDef = defById.get(TILT_ID)!;
-  const tiltReading = computeReading(tiltDef, seriesUpTo(SERIES[TILT_ID]!, day), now, { name: 'stored history (stage blob)' });
-  const tiltState = voterStateOf(tiltReading, tiltDefEntry);
+  // The promoted 21st voter rides the SAME loop as every voter (its
+  // reading is already among `readings` — the shared evaluator, level-leg
+  // only, like every voter without a move threshold). The lineage baseline
+  // re-scores the 20 pre-promotion readings over the S4-frozen table.
+  const legacyReadings = readings.filter((r) => (r.id as string) !== TILT_ID);
 
   windows.push({
     date: day,
     goldIndex: goldIndexOf.get(day)!,
-    score20: scoreOverVoters(readings, GOLD_LANE_VOTERS),
-    score21: scoreOverVoters([...readings, tiltReading], HARNESS_GOLD_VOTERS_21),
+    scoreProd: scoreOverVoters(readings, GOLD_LANE_VOTERS),
+    scoreLegacy: scoreOverVoters(legacyReadings, HARNESS_GOLD_VOTERS_20),
     voterState,
-    tiltState,
     realYieldFills: fill.fills,
     realYieldCapped: fill.capped,
   });
@@ -227,7 +231,7 @@ function median(values: number[]): number | null {
 function joinStats(
   selected: readonly WindowResult[],
   horizon: GoldBacktestHorizon,
-  model: 'score20' | 'score21',
+  model: 'scoreProd' | 'scoreLegacy',
 ): JoinResult {
   const band = flatBandPct(horizon);
   const emptyRow = (): BucketStats => ({ n: 0, up: 0, flat: 0, down: 0, mean: null, median: null });
@@ -269,7 +273,7 @@ function joinStats(
 }
 
 /** Label-conditional returns (the full 5-step vocabulary + the null row, every row kept). */
-function labelConditional(selected: readonly WindowResult[], horizon: GoldBacktestHorizon, model: 'score20' | 'score21') {
+function labelConditional(selected: readonly WindowResult[], horizon: GoldBacktestHorizon, model: 'scoreProd' | 'scoreLegacy') {
   const labels = ['strong-tailwind', 'tailwind', 'balanced', 'headwind', 'strong-headwind', 'null'] as const;
   return labels.map((label) => {
     const rets = selected
@@ -304,9 +308,12 @@ function monthEndWindows(selected: readonly WindowResult[]): WindowResult[] {
 const archiveDays = Object.keys(corpus.archives).sort();
 const archiveGoldSummaryDays = archiveDays.filter((d) => corpus.archives[d]!.goldSummary.present);
 
-function archiveScore(day: string, model: 'score20' | 'score21'): { netScore: number; label: string | null } {
+function archiveScore(day: string, model: 'scoreProd' | 'scoreLegacy'): { netScore: number; label: string | null } {
   const a = corpus.archives[day]!;
-  const ids = model === 'score20' ? VOTER_IDS : [...VOTER_IDS, TILT_ID];
+  // The production ids include the tilt; the pre-S3 archives simply lack
+  // its reading, so it stays silent there (readable() on undefined — the
+  // honest as-rung state, stated in the report below).
+  const ids = model === 'scoreProd' ? VOTER_IDS : LEGACY_IDS;
   const readings: IndicatorReading[] = a.readings
     .filter((r) => ids.includes(r.id))
     .map((r) => ({
@@ -319,7 +326,7 @@ function archiveScore(day: string, model: 'score20' | 'score21'): { netScore: nu
       ...(r.percentile10y !== undefined ? { percentile10y: r.percentile10y } : {}),
       ...(r.change30d !== undefined ? { change30d: r.change30d } : {}),
     }));
-  const score = scoreOverVoters(readings, model === 'score20' ? GOLD_LANE_VOTERS : HARNESS_GOLD_VOTERS_21);
+  const score = scoreOverVoters(readings, model === 'scoreProd' ? GOLD_LANE_VOTERS : HARNESS_GOLD_VOTERS_20);
   return { netScore: score.netScore, label: score.label };
 }
 
@@ -358,15 +365,15 @@ function confusionTable(t: JoinResult): void {
  * Report
  * ------------------------------------------------------------------ */
 
-emit('# Gold-score backtest — Session 4');
+emit('# Gold-score backtest — Session 6 (the D-5 promotion re-run)');
 emit();
 emit(
-  `Generated from the recorded KV corpus (\`packages/insights/fixtures/gold-backtest-corpus.json\`, recorded ${corpus.recordedAt} read-only via \`pnpm --filter @currena/insights gold-corpus-dump\`; the stage blob it froze was written ${corpus.venues.stage.writtenAt}). No live sites are touched; the harness reads recorded data only, at a frozen clock (no wall-clock reads anywhere). The voter table, thresholds and labels are the frozen S1–S3 production values — NOTHING here changes them. This report is the D-5 evidence the owner reads; every cell carries its n.`,
+  `Generated from the recorded KV corpus (\`packages/insights/fixtures/gold-backtest-corpus.json\`, recorded ${corpus.recordedAt} read-only via \`pnpm --filter @currena/insights gold-corpus-dump\` — the S5 C5 validation pass, content-identical to S4's dump; the stage blob it froze was written ${corpus.venues.stage.writtenAt}). No live sites are touched; the harness reads recorded data only, at a frozen clock (no wall-clock reads anywhere). The voter table re-run here is the PROMOTED production table (Session 6, D-5: 21 voters — the S4-frozen 20 carried beside it as the lineage baseline); the thresholds and labels are unchanged from S1. NOTHING here changes production. The 11-01/11-02 rungs land after this run — the scheduled 2026-11-02 re-check carries the grown-corpus refresh. Every cell carries its n.`,
 );
 emit();
 emit('## Method');
 emit();
-emit('- Engine: the FROZEN 20-voter table (`gold-score.ts` `GOLD_LANE_VOTERS`) evaluated through the shared signals evaluator (`connections.ts` `evalLeg` — a 30-day direction beyond the per-leg minimum move, else the decade-extreme level), the same `computeReading` percentile/change/stale math the ingest runs, and `scoreOverVoters` — a harness-local parameterized copy of the score arithmetic **pinned equal to the production engine by test** (`gold-backtest-core.test.ts`).');
+emit('- Engine: the PRODUCTION 21-voter table (`gold-score.ts` `GOLD_LANE_VOTERS` — the D-5 promotion, Session 6: `breakeven-tilt` in the inflation lane, polarity +1, level-leg only) evaluated through the shared signals evaluator (`connections.ts` `evalLeg` — a 30-day direction beyond the per-leg minimum move, else the decade-extreme level), the same `computeReading` percentile/change/stale math the ingest runs, and `scoreOverVoters` — a harness-local parameterized copy of the score arithmetic **pinned equal to the production engine by test** (`gold-backtest-core.test.ts`); the S4-frozen 20-voter table (`HARNESS_GOLD_VOTERS_20`, pinned to production-minus-the-tilt) rides beside it as the lineage baseline.');
 emit('- Frozen clock: every window passes its own date (`<window-day>T04:10:00.000Z`, the main rung\u2019s time-of-day); nothing reads the wall clock.');
 emit('- No lookahead: every series is truncated at the window day BEFORE any scoring math (`seriesUpTo`); percentiles are computed strictly from observations at or before the as-of date. Truncated-vs-full equality and a future-spike mutation test pin this.');
 emit('- The D-6 cross-fill is applied to the real-yield-10y SCORING INPUT exactly as in production (`realYieldScoringSeries` over the truncated pure DFII10 + the DGS10/T10YIE legs, the same decade window, 2003 floor, 4dp quantization and 5% cap), and the fill count is reported aloud below.');
@@ -391,7 +398,7 @@ emit();
 /* --- The corpus verification (spec §0) --- */
 emit('## The corpus (the §0 verification, at harness run time)');
 emit();
-emit('- Live API `https://currena.ir/api/insights` (checked at session start, 2026-10-31 ~12:15 UTC): `goldSummary` PRESENT (netScore −2, label `headwind`, the 04:20 rung) and `breakeven-tilt` present among the 102 readings — the S2.1+S3 state stands.');
+emit('- Live API `https://currena.ir/api/insights` (checked at session start, 2026-10-31 ~15:35 UTC): `goldSummary` PRESENT (netScore −2, label `headwind`, 6 firing — the 04:20 rung, stamped by the PRE-promotion engine) and `breakeven-tilt` present among the 102 readings (−0.24, asOf 2026-10-30, percentile10y 0.217 — mid-range, SILENT today: the promotion changes nothing about the current live reading); the promoted numbers ride every rung from the next deploy.');
 emit(
   `- Read-only KV: **${archiveDays.length} full archive days** (\`insights:archive:v1:*\`, ${archiveDays[0]} → ${archiveDays[archiveDays.length - 1]}; 2026-10-20 absent — a rung outage day, the only gap). The newest (${archiveDays[archiveDays.length - 1]}) carries \`goldSummary\` (present on: ${archiveGoldSummaryDays.join(', ')} — the field shipped with S2.1/S3 and the 10-31 rung was the first to stamp it).`,
 );
@@ -418,13 +425,13 @@ emit();
   const decadeNewest = newestArch.readings.find((r) => r.id === 'breakeven-5y5y')?.asOf ?? '—';
   const decadePrev = prevArch.readings.find((r) => r.id === 'breakeven-5y5y')?.asOf ?? '—';
   emit(
-    `**Verdict:** day 1 (the ${newest} archive — the first S3 rung) shows the trio and the decade group advancing in lockstep, both +1 trading day at the same rung (trio ${trioPrev} → ${trioNewest}, decade group ${decadePrev} → ${decadeNewest}; values moved too: us10y ${prevArch.readings.find((r) => r.id === 'us10y')?.value} → ${newestArch.readings.find((r) => r.id === 'us10y')?.value}). Days 2–3 are NOT YET OBSERVABLE: the corpus ends ${newest} at the S4 run time (2026-10-31 ~12:20 UTC — the 11-01/11-02 rungs have not fired). The watch stays open; nothing here claims it proven.`,
+    `**Verdict:** day 1 (the ${newest} archive — the first S3 rung) shows the trio and the decade group advancing in lockstep, both +1 trading day at the same rung (trio ${trioPrev} → ${trioNewest}, decade group ${decadePrev} → ${decadeNewest}; values moved too: us10y ${prevArch.readings.find((r) => r.id === 'us10y')?.value} → ${newestArch.readings.find((r) => r.id === 'us10y')?.value}). Days 2–3 are NOT YET OBSERVABLE: the corpus ends ${newest} at the harness run time (2026-10-31 — the 11-01/11-02 rungs have not fired; the scheduled 2026-11-02 re-check carries them). The watch stays open; nothing here claims it proven.`,
   );
 }
 emit();
 
 /* --- Coverage --- */
-emit('## Coverage — the 20 voters over the stored histories (+ the tilt under evaluation)');
+emit('## Coverage — the 21 voters over the stored histories');
 emit();
 emit('| Voter | Cadence | Span | Obs | Readable windows | Firing windows | Tailwind | Headwind | First firing | Gap notes |');
 emit('|---|---|---|---|---|---|---|---|---|---|');
@@ -438,18 +445,19 @@ emit('|---|---|---|---|---|---|---|---|---|---|');
       'percentile history is the World Bank monthly backfill; daily seed points only since 2026-10-08 — a daily-cadence reading over a monthly-density series is stale most windows',
     'ecb-dfr': 'forward-filled daily series (per-decision levels) — the percentile base weights long-held rates by calendar days; production semantics inherited',
     'fed-target': 'forward-filled daily series (per-decision levels) — production semantics inherited',
+    'breakeven-tilt':
+      'derived series (T5YIFR − T5YIE inner join on common dates) — dense full-depth re-run; the 21st voter since the D-5 promotion (Session 6), level-leg only',
   };
-  for (const id of [...VOTER_IDS, TILT_ID]) {
+  for (const id of VOTER_IDS) {
     const s = SERIES[id]!;
     const def = defById.get(id)!;
-    const isVoter = VOTER_IDS.includes(id);
     let readableN = 0;
     let firingN = 0;
     let tailwindN = 0;
     let headwindN = 0;
     let firstFire: string | null = null;
     for (const w of windows) {
-      const st = isVoter ? w.voterState.get(id)! : w.tiltState;
+      const st = w.voterState.get(id)!;
       if (st.readable) readableN++;
       if (st.impact !== null) {
         firingN++;
@@ -460,15 +468,15 @@ emit('|---|---|---|---|---|---|---|---|---|---|');
     }
     const note = gapNotes[id] ?? 'dense series — full-depth re-run';
     emit(
-      `| \`${id}\`${isVoter ? '' : ' (B4)'} | ${def.cadence} | ${s[0]!.date} → ${s[s.length - 1]!.date} | ${s.length} | ${readableN} | ${firingN} | ${tailwindN} | ${headwindN} | ${firstFire ?? '—'} | ${note} |`,
+      `| \`${id}\` | ${def.cadence} | ${s[0]!.date} → ${s[s.length - 1]!.date} | ${s.length} | ${readableN} | ${firingN} | ${tailwindN} | ${headwindN} | ${firstFire ?? '—'} | ${note} |`,
     );
   }
 }
 emit();
 {
-  const avgFiring = windows.reduce((s, w) => s + w.score20.firingVoters, 0) / windows.length;
+  const avgFiring = windows.reduce((s, w) => s + w.scoreProd.firingVoters, 0) / windows.length;
   emit(
-    `**The effective table:** cftc-gold-positioning never fires, and us-japan-10y-gap / gold-silver fire only near their sparse observation dates — the re-run era's real voter pool averaged **${avgFiring.toFixed(1)} firing voters per window** (of 20). Every denominator is stated; nothing is silently interpolated.`,
+    `**The effective table:** cftc-gold-positioning never fires, and us-japan-10y-gap / gold-silver fire only near their sparse observation dates — the re-run era's real voter pool averaged **${avgFiring.toFixed(1)} firing voters per window** (of 21). Every denominator is stated; nothing is silently interpolated.`,
   );
 }
 emit();
@@ -479,13 +487,13 @@ emit();
 {
   const labelDist = new Map<string, number>();
   for (const w of windows) {
-    const l = w.score20.label ?? 'null';
+    const l = w.scoreProd.label ?? 'null';
     labelDist.set(l, (labelDist.get(l) ?? 0) + 1);
   }
-  const avgFiring = windows.reduce((s, w) => s + w.score20.firingVoters, 0) / windows.length;
-  const avgNet = windows.reduce((s, w) => s + w.score20.netScore, 0) / windows.length;
-  const netMin = Math.min(...windows.map((w) => w.score20.netScore));
-  const netMax = Math.max(...windows.map((w) => w.score20.netScore));
+  const avgFiring = windows.reduce((s, w) => s + w.scoreProd.firingVoters, 0) / windows.length;
+  const avgNet = windows.reduce((s, w) => s + w.scoreProd.netScore, 0) / windows.length;
+  const netMin = Math.min(...windows.map((w) => w.scoreProd.netScore));
+  const netMax = Math.max(...windows.map((w) => w.scoreProd.netScore));
   emit(
     `Windows: **${windows.length}** (${gridDates[0]} → ${gridDates[gridDates.length - 1]}, every gold trading day). Label distribution: ${[...labelDist.entries()].map(([l, n]) => `${l} ×${n}`).join(', ')}.`,
   );
@@ -500,8 +508,8 @@ emit();
   emit('| Window day | Label | Net | Firing (T/H) | Lane readings |');
   emit('|---|---|---|---|---|');
   for (const w of monthEndWindows(windows)) {
-    const lanes = w.score20.subGauges.map((g) => `${g.lane}:${g.reading}`).join(' · ');
-    emit(`| ${w.date} | ${w.score20.label ?? '—'} | ${w.score20.netScore >= 0 ? '+' : ''}${w.score20.netScore} | ${w.score20.firingVoters} (${w.score20.tailwindVoters}/${w.score20.headwindVoters}) | ${lanes} |`);
+    const lanes = w.scoreProd.subGauges.map((g) => `${g.lane}:${g.reading}`).join(' · ');
+    emit(`| ${w.date} | ${w.scoreProd.label ?? '—'} | ${w.scoreProd.netScore >= 0 ? '+' : ''}${w.scoreProd.netScore} | ${w.scoreProd.firingVoters} (${w.scoreProd.tailwindVoters}/${w.scoreProd.headwindVoters}) | ${lanes} |`);
   }
   emit();
 }
@@ -513,8 +521,8 @@ emit();
 const b2Stats: Record<number, { full: JoinResult; mature: JoinResult }> = {};
 for (const horizon of GOLD_BACKTEST_HORIZONS) {
   const band = flatBandPct(horizon);
-  const full = joinStats(windows, horizon, 'score20');
-  const mature = joinStats(windows.filter((w) => isMature(w.date)), horizon, 'score20');
+  const full = joinStats(windows, horizon, 'scoreProd');
+  const mature = joinStats(windows.filter((w) => isMature(w.date)), horizon, 'scoreProd');
   b2Stats[horizon] = { full, mature };
   emit(`### Horizon ${horizon} trading days (flat band ±${band.toFixed(2)}%; ≈ ${((horizon * 7) / 5).toFixed(0)} calendar days)`);
   emit();
@@ -538,7 +546,7 @@ for (const horizon of GOLD_BACKTEST_HORIZONS) {
   emit();
   emit('| Label | n | mean | median |');
   emit('|---|---|---|---|');
-  for (const row of labelConditional(windows, horizon, 'score20')) {
+  for (const row of labelConditional(windows, horizon, 'scoreProd')) {
     emit(`| ${row.label} | ${row.n} | ${fmtNum(row.mean)}% | ${fmtNum(row.median)}% |`);
   }
   emit();
@@ -556,14 +564,14 @@ emit('|---|---|---|---|---|');
 {
   const band = flatBandPct(5);
   for (const day of archiveDays) {
-    const s = archiveScore(day, 'score20');
+    const s = archiveScore(day, 'scoreProd');
     const ret = archiveForwardReturn(day, 5);
     emit(
       `| ${day} | ${s.netScore >= 0 ? '+' : ''}${s.netScore} | ${s.label ?? '—'} | ${ret === undefined ? '— (past the series end)' : `${fmtNum(ret)}%`} | ${ret === undefined ? '—' : classifyReturn(ret, band)} |`,
     );
   }
   const joined = archiveDays
-    .map((day) => ({ day, s: archiveScore(day, 'score20'), ret: archiveForwardReturn(day, 5) }))
+    .map((day) => ({ day, s: archiveScore(day, 'scoreProd'), ret: archiveForwardReturn(day, 5) }))
     .filter((x) => x.ret !== undefined);
   const testable = joined.filter((x) => signAgreement(x.s.netScore, x.ret!, band) !== undefined);
   const agree = testable.filter((x) => signAgreement(x.s.netScore, x.ret!, band) === true).length;
@@ -573,59 +581,64 @@ emit('|---|---|---|---|---|');
   );
   const gsDay = archiveGoldSummaryDays[0];
   if (gsDay !== undefined) {
-    const rederived = archiveScore(gsDay, 'score20');
+    // The stamped summary was written by the PRE-promotion engine, so the
+    // no-drift check compares against the S4-frozen (legacy) table; the
+    // promoted table's reading on the same day is then stated as the
+    // promotion's effect on the live record — a measured delta, not drift.
+    const rederived = archiveScore(gsDay, 'scoreLegacy');
+    const promoted = archiveScore(gsDay, 'scoreProd');
     const stamped = corpus.archives[gsDay]!.goldSummary;
     emit();
     emit(
-      `\`goldSummary\` as the rungs stamped it (the wire field) exists on ${gsDay} — netScore ${stamped.netScore}, label ${stamped.label}; the re-derivation above produces netScore ${rederived.netScore}, label ${rederived.label}. The two agree${rederived.netScore === stamped.netScore ? '' : ' — DIFFERS, investigate'}, as the S1 contract (one pure function, ingest and SPA, no drift) requires.`,
+      `\`goldSummary\` as the rungs stamped it (the wire field) exists on ${gsDay} — netScore ${stamped.netScore}, label ${stamped.label}; the S4-frozen table's re-derivation produces netScore ${rederived.netScore}, label ${rederived.label}. The two agree${rederived.netScore === stamped.netScore ? '' : ' — DIFFERS, investigate'}, as the S1 contract (one pure function, ingest and SPA, no drift) requires. The PROMOTED 21-voter table reads netScore ${promoted.netScore}, label ${promoted.label} on the same day${promoted.netScore === stamped.netScore ? ' — the tilt is silent there, the promotion changed nothing' : ' — the promotion\'s measured effect on the live record'} (the tilt's decade position decides; every future rung stamps the promoted numbers).`,
     );
   }
 }
 emit();
 
-/* --- B4 --- */
-emit('## B4 — the tilt-augmented 21-voter variant (the D-5 evidence)');
+/* --- B4: the promotion delta (Session 6) --- */
+emit('## B4 — the promotion delta (the S4-frozen 20-voter baseline vs the promoted production 21)');
 emit();
 {
-  const tiltFired = windows.filter((w) => w.tiltState.impact !== null);
-  const tiltTail = windows.filter((w) => w.tiltState.impact === 'tailwind').length;
-  const tiltHead = windows.filter((w) => w.tiltState.impact === 'headwind').length;
-  const flips = windows.filter((w) => bucketModelLabel(w.score20.label) !== bucketModelLabel(w.score21.label));
+  const tiltFired = windows.filter((w) => w.voterState.get(TILT_ID)!.impact !== null);
+  const tiltTail = windows.filter((w) => w.voterState.get(TILT_ID)!.impact === 'tailwind').length;
+  const tiltHead = windows.filter((w) => w.voterState.get(TILT_ID)!.impact === 'headwind').length;
+  const flips = windows.filter((w) => bucketModelLabel(w.scoreLegacy.label) !== bucketModelLabel(w.scoreProd.label));
   const netDeltas = new Map<number, number>();
   for (const w of windows) {
-    const d = w.score21.netScore - w.score20.netScore;
+    const d = w.scoreProd.netScore - w.scoreLegacy.netScore;
     netDeltas.set(d, (netDeltas.get(d) ?? 0) + 1);
   }
-  const labelDist21 = new Map<string, number>();
+  const labelDistLegacy = new Map<string, number>();
   for (const w of windows) {
-    const l = w.score21.label ?? 'null';
-    labelDist21.set(l, (labelDist21.get(l) ?? 0) + 1);
+    const l = w.scoreLegacy.label ?? 'null';
+    labelDistLegacy.set(l, (labelDistLegacy.get(l) ?? 0) + 1);
   }
   emit(
-    `The 21-voter table (\`HARNESS_GOLD_VOTERS_21\` — the frozen 20 + \`breakeven-tilt\` in the inflation lane, polarity +1, evaluated by the SAME shared evaluator: level-leg only, like every voter without a 30-day move threshold) over the same ${windows.length} windows:`,
+    `The S4-frozen 20-voter baseline (\`HARNESS_GOLD_VOTERS_20\` — the pre-promotion production table, kept verbatim for lineage) over the same ${windows.length} windows:`,
   );
   emit();
-  emit(`- The tilt voter fired in **${tiltFired.length}** of ${windows.length} windows (${fmtPct(tiltFired.length / windows.length)}): tailwind ${tiltTail} · headwind ${tiltHead}.`);
-  emit(`- Label distribution: ${[...labelDist21.entries()].map(([l, n]) => `${l} ×${n}`).join(', ')}.`);
-  emit(`- Net-score delta (21-voter − 20-voter): ${[...netDeltas.entries()].sort((a, b) => a[0] - b[0]).map(([d, n]) => `${d >= 0 ? '+' : ''}${d} ×${n}`).join(', ')}.`);
+  emit(`- Label distribution: ${[...labelDistLegacy.entries()].map(([l, n]) => `${l} ×${n}`).join(', ')}.`);
+  emit(`- The promoted voter itself — \`breakeven-tilt\` (the shared evaluator, level-leg only, like every voter without a 30-day move threshold) — fired in **${tiltFired.length}** of ${windows.length} windows (${fmtPct(tiltFired.length / windows.length)}): tailwind ${tiltTail} · headwind ${tiltHead}.`);
+  emit(`- Net-score delta (promoted − baseline): ${[...netDeltas.entries()].sort((a, b) => a[0] - b[0]).map(([d, n]) => `${d >= 0 ? '+' : ''}${d} ×${n}`).join(', ')}.`);
   emit(`- Label-bucket flips (tailwind/mixed/headwind changing side): **${flips.length}** windows (${fmtPct(flips.length / windows.length)}).`);
   emit();
   for (const horizon of GOLD_BACKTEST_HORIZONS) {
-    const t20 = b2Stats[horizon]!.full;
-    const t21 = joinStats(windows, horizon, 'score21');
+    const t20 = joinStats(windows, horizon, 'scoreLegacy');
+    const t21 = joinStats(windows, horizon, 'scoreProd');
     emit(
-      `- Horizon ${horizon}td: sign-agreement ${t21.signAgree.agree}/${t21.signAgree.n} = ${t21.signAgree.n > 0 ? ((t21.signAgree.agree / t21.signAgree.n) * 100).toFixed(1) : '—'}% (20-voter: ${t20.signAgree.agree}/${t20.signAgree.n} = ${t20.signAgree.n > 0 ? ((t20.signAgree.agree / t20.signAgree.n) * 100).toFixed(1) : '—'}%) · tailwind mean return ${fmtNum(t21.rows.tailwind.mean)}% vs ${fmtNum(t20.rows.tailwind.mean)}% · headwind mean return ${fmtNum(t21.rows.headwind.mean)}% vs ${fmtNum(t20.rows.headwind.mean)}% (n: ${t21.rows.tailwind.n}/${t20.rows.tailwind.n} tailwind, ${t21.rows.headwind.n}/${t20.rows.headwind.n} headwind).`,
+      `- Horizon ${horizon}td: sign-agreement ${t21.signAgree.agree}/${t21.signAgree.n} = ${t21.signAgree.n > 0 ? ((t21.signAgree.agree / t21.signAgree.n) * 100).toFixed(1) : '—'}% (baseline: ${t20.signAgree.agree}/${t20.signAgree.n} = ${t20.signAgree.n > 0 ? ((t20.signAgree.agree / t20.signAgree.n) * 100).toFixed(1) : '—'}%) · tailwind mean return ${fmtNum(t21.rows.tailwind.mean)}% vs ${fmtNum(t20.rows.tailwind.mean)}% · headwind mean return ${fmtNum(t21.rows.headwind.mean)}% vs ${fmtNum(t20.rows.headwind.mean)}% (n: ${t21.rows.tailwind.n}/${t20.rows.tailwind.n} tailwind, ${t21.rows.headwind.n}/${t20.rows.headwind.n} headwind).`,
     );
   }
   emit();
   for (const horizon of GOLD_BACKTEST_HORIZONS) {
-    const t21 = joinStats(windows, horizon, 'score21');
-    emit(`**${horizon}td, 21-voter confusion table (±${flatBandPct(horizon).toFixed(2)}% band):**`);
+    const t20 = joinStats(windows, horizon, 'scoreLegacy');
+    emit(`**${horizon}td, the S4-frozen baseline's confusion table (±${flatBandPct(horizon).toFixed(2)}% band) — the tables the S4 report carried as its primary:**`);
     emit();
     emit('| Model ↓ / Move → | up | flat | down | n |');
     emit('|---|---|---|---|---|');
     for (const bucket of ['tailwind', 'mixed', 'headwind'] as const) {
-      const r = t21.rows[bucket];
+      const r = t20.rows[bucket];
       emit(`| **${bucket}** | ${r.up} | ${r.flat} | ${r.down} | ${r.n} |`);
     }
     emit();
@@ -633,29 +646,29 @@ emit();
   emit(
     `**The honest delta:** the tilt fired in ${fmtPct(tiltFired.length / windows.length)} of windows (mostly headwind: ${tiltHead} of ${tiltFired.length} — the tilt sat at decade lows, i.e. fading, for most of the corpus) and moved the label bucket in ${fmtPct(flips.length / windows.length)}${flips.length === 0 ? ' — the label buckets NEVER flipped' : ''}. The measured associations barely moved: ` +
       GOLD_BACKTEST_HORIZONS.map((h) => {
-        const t20 = b2Stats[h]!.full;
-        const t21 = joinStats(windows, h, 'score21');
+        const t20 = joinStats(windows, h, 'scoreLegacy');
+        const t21 = joinStats(windows, h, 'scoreProd');
         const d = t20.signAgree.n > 0 && t21.signAgree.n > 0 ? (t21.signAgree.agree / t21.signAgree.n - t20.signAgree.agree / t20.signAgree.n) * 100 : null;
         return `${h}td ${d === null ? '—' : `${d >= 0 ? '+' : ''}${d.toFixed(1)}pp`}`;
       }).join(' · ') +
       ` — ` +
       (() => {
         const deltas = GOLD_BACKTEST_HORIZONS.map((h) => {
-          const t20 = b2Stats[h]!.full;
-          const t21 = joinStats(windows, h, 'score21');
+          const t20 = joinStats(windows, h, 'scoreLegacy');
+          const t21 = joinStats(windows, h, 'scoreProd');
           return t20.signAgree.n > 0 && t21.signAgree.n > 0
             ? Math.abs(t21.signAgree.agree / t21.signAgree.n - t20.signAgree.agree / t20.signAgree.n)
             : 0;
         });
         return Math.max(...deltas) < 0.02
-          ? '**no material difference in the measured association** — the 21-voter variant is not better or worse on this corpus, only noisier in its label vocabulary'
+          ? '**no material difference in the measured association** — the promoted table is not better or worse on this corpus, only noisier in its label vocabulary'
           : 'the sign-agreements moved by more than noise — read the per-horizon lines above';
       })() +
-      `. Whether promotion is worth it is the owner's D-5 call; the evidence here is the delta, not a recommendation.`,
+      `. The promotion is the owner's MADE call (D-5, decided-YES on this evidence in S4's B4); this section is its measured record — the delta, not a recommendation. The no-edge conclusion of the S4 report carries into the promoted primary tables above unchanged in substance.`,
   );
   emit();
   emit(
-    `Archive era: the tilt's reading exists only from the ${archiveGoldSummaryDays[0] ?? '—'} archive (it shipped in S3) — the 21-voter archive slice has n ≤ 1 and is NOT a meaningful table; stated rather than computed into significance.`,
+    `Archive era: the tilt's reading exists only from the ${archiveGoldSummaryDays[0] ?? '—'} archive (it shipped in S3) — earlier archives score the promoted table with the tilt SILENT (the reading is absent, readable() mutes it), so the two models agree there by construction; the one day that differs is stated in the archive table above, never averaged into significance.`,
   );
 }
 emit();
@@ -670,7 +683,7 @@ emit(`4. **The cross-fill cannot be replayed historically** (${crossFillTotal} f
 emit(`5. **The realized series is one venue, two provenances:** the backfill is the Yahoo GC=F ~10-year daily record; the tail points are the accumulated live-price seed appends (gold-api spot at append time). The join treats them identically; the mix is recorded here.`);
 emit(`6. **Multiple testing:** 3 horizons × 3 buckets × 2 table-sets × 2 models + the archive slice is ~110 reported numbers; with these n's, ±2–3 percentage-point wobbles are noise. The conclusion below only claims what a stated-in-advance rule can see — the tables themselves make no claim.`);
 emit(`7. **The archive era is plumbing, not power:** ${archiveDays.length} days, ${archiveDays.filter((d) => archiveForwardReturn(d, 5) !== undefined).length} joinable at 5td, 0 at 20td/60td. It verifies the live path's shape; it cannot verify an edge.`);
-emit(`8. **The asOf-watch (S3's known gap):** day 1 in lockstep; days 2–3 pending the 11-01/11-02 rungs — the corpus ends ${archiveDays[archiveDays.length - 1]} at the S4 run time. Carried to spec §5.`);
+emit(`8. **The asOf-watch (S3's known gap):** day 1 in lockstep; days 2–3 pending the 11-01/11-02 rungs — the corpus ends ${archiveDays[archiveDays.length - 1]} at the harness run time. Carried to spec §5.`);
 emit();
 
 /* --- Conclusion: MECHANICAL, stated in advance --- */
@@ -686,7 +699,7 @@ emit();
   let allDepartAbove = true;
   let allDepartBelow = true;
   for (const horizon of GOLD_BACKTEST_HORIZONS) {
-    const m = joinStats(mature, horizon, 'score20');
+    const m = joinStats(mature, horizon, 'scoreProd');
     const p = m.signAgree.n > 0 ? m.signAgree.agree / m.signAgree.n : null;
     const se = m.signAgree.n > 0 ? Math.sqrt(0.25 / m.signAgree.n) : null;
     const spread =
@@ -706,7 +719,7 @@ emit();
   const spreadsKeepSign = (() => {
     const signs: boolean[] = [];
     for (const horizon of GOLD_BACKTEST_HORIZONS) {
-      const m = joinStats(mature, horizon, 'score20');
+      const m = joinStats(mature, horizon, 'scoreProd');
       if (m.rows.tailwind.mean === null || m.rows.headwind.mean === null) return false;
       signs.push(m.rows.tailwind.mean - m.rows.headwind.mean > 0);
     }
@@ -717,29 +730,29 @@ emit();
       `By the stated rule: the departures hold ABOVE 50% at every horizon and the tailwind-minus-headwind spread keeps its positive sign — the frozen table's net direction showed a measurable POSITIVE association with forward gold moves over this corpus. The association's SIZE is in the tables above; it is evidence about the PAST decade, not a promise.`,
     );
   } else if (allDepartBelow && spreadsKeepSign) {
-    const m60 = joinStats(mature, 60, 'score20');
+    const m60 = joinStats(mature, 60, 'scoreProd');
     emit(
       `By the stated rule: **no edge in the table's own direction — the measurable association runs the OTHER way over this corpus.** Every horizon's sign-agreement departs BELOW 50% and the tailwind-minus-headwind mean spread is negative at every horizon: over ${MATURE_FROM} → ${gridDates[gridDates.length - 1]}, headwind labels preceded LARGER forward rises than tailwind labels did (the 60td spread is ${m60.rows.tailwind.mean !== null && m60.rows.headwind.mean !== null ? (m60.rows.tailwind.mean - m60.rows.headwind.mean).toFixed(2) : '—'}%: headwind windows rose ${fmtNum(m60.rows.headwind.mean)}% on average against tailwind's ${fmtNum(m60.rows.tailwind.mean)}%, mature base). This decade's gold advance ran THROUGH tight real rates and a strong dollar — the classical headwinds — so a conditions-reading table built on those relationships reads persistently against the move it lived through. The panel's caption ("conditions, not advice") is not just a disclaimer here; it is the operative description: the table reads the macro regime, and in this regime the regime's direction and gold's direction diverged.`,
     );
   } else {
     emit(
-      `By the stated rule: **no measurable edge at these horizons over this corpus** — the sign-agreements sit within (or straddle) the 2-SE band and/or the mean spread flips sign across horizons. The frozen table remains what its caption says — a reading of conditions, not advice — and D-5's promotion question is answered by the B4 delta above on operational grounds, not by any backtest power.`,
+      `By the stated rule: **no measurable edge at these horizons over this corpus** — the sign-agreements sit within (or straddle) the 2-SE band and/or the mean spread flips sign across horizons. The frozen table remains what its caption says — a reading of conditions, not advice — and the promotion (D-5, made) is recorded by the delta section above, not by any backtest power.`,
     );
   }
   emit();
   emit(
-    `The ex-ante test, answered honestly: the 20-voter table and its thresholds were authored from classical driver relationships BEFORE this harness computed anything (S1, 2026-10-31; zero threshold changes since), so the numbers above are what an observer with the same table and the same stored histories would have measured at each window — no fitted parameters, no selection. The honest caveat runs the other way: the FLAT BAND, the three horizons and the bucket folds were chosen by the harness author in this session; the stated-in-advance rule above is the guard against that freedom, and the mature-base/all-windows split is reported so the short-base effect is visible, not hidden.`,
+    `The ex-ante test, answered honestly: the voter table and its thresholds were authored from classical driver relationships BEFORE this harness computed anything (S1, 2026-10-31; the single change since — the 21st seat — was the owner's scope call on S4's B4 delta, not a parameter this harness tuned, and its measured effect is the promotion-delta section above), so the numbers are what an observer with the same table and the same stored histories would have measured at each window — no fitted parameters, no selection. The honest caveat runs the other way: the FLAT BAND, the three horizons and the bucket folds were chosen by the harness author in this session; the stated-in-advance rule above is the guard against that freedom, and the mature-base/all-windows split is reported so the short-base effect is visible, not hidden.`,
   );
 }
 emit();
 
 writeFileSync(OUT_PATH, `${LINES.join('\n')}\n`, 'utf-8');
 console.log(`Wrote ${OUT_PATH} (${LINES.length} lines)`);
-console.log(`Windows: ${windows.length} · cross-fill days: ${crossFillTotal} · tilt fired: ${windows.filter((w) => w.tiltState.impact !== null).length}`);
+console.log(`Windows: ${windows.length} · cross-fill days: ${crossFillTotal} · tilt fired: ${windows.filter((w) => w.voterState.get(TILT_ID)!.impact !== null).length}`);
 for (const horizon of GOLD_BACKTEST_HORIZONS) {
-  const t = joinStats(windows, horizon, 'score20');
-  const t21 = joinStats(windows, horizon, 'score21');
+  const t = joinStats(windows, horizon, 'scoreProd');
+  const t20 = joinStats(windows, horizon, 'scoreLegacy');
   console.log(
-    `  ${horizon}td: sign-agree ${t.signAgree.agree}/${t.signAgree.n} (${t.signAgree.n > 0 ? ((t.signAgree.agree / t.signAgree.n) * 100).toFixed(1) : '—'}%) · tailwind mean ${fmtNum(t.rows.tailwind.mean)}% (n=${t.rows.tailwind.n}) · headwind mean ${fmtNum(t.rows.headwind.mean)}% (n=${t.rows.headwind.n}) · all mean ${fmtNum(t.all.mean)}% · 21v sign-agree ${t21.signAgree.agree}/${t21.signAgree.n}`,
+    `  ${horizon}td: sign-agree ${t.signAgree.agree}/${t.signAgree.n} (${t.signAgree.n > 0 ? ((t.signAgree.agree / t.signAgree.n) * 100).toFixed(1) : '—'}%) · tailwind mean ${fmtNum(t.rows.tailwind.mean)}% (n=${t.rows.tailwind.n}) · headwind mean ${fmtNum(t.rows.headwind.mean)}% (n=${t.rows.headwind.n}) · all mean ${fmtNum(t.all.mean)}% · S4-frozen baseline sign-agree ${t20.signAgree.agree}/${t20.signAgree.n}`,
   );
 }

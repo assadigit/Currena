@@ -1,10 +1,10 @@
-# Gold-score backtest — Session 4
+# Gold-score backtest — Session 6 (the D-5 promotion re-run)
 
-Generated from the recorded KV corpus (`packages/insights/fixtures/gold-backtest-corpus.json`, recorded 2026-10-31T15:17:40.663Z read-only via `pnpm --filter @currena/insights gold-corpus-dump`; the stage blob it froze was written 2026-10-31T04:20:18.220Z). No live sites are touched; the harness reads recorded data only, at a frozen clock (no wall-clock reads anywhere). The voter table, thresholds and labels are the frozen S1–S3 production values — NOTHING here changes them. This report is the D-5 evidence the owner reads; every cell carries its n.
+Generated from the recorded KV corpus (`packages/insights/fixtures/gold-backtest-corpus.json`, recorded 2026-10-31T15:17:40.663Z read-only via `pnpm --filter @currena/insights gold-corpus-dump` — the S5 C5 validation pass, content-identical to S4's dump; the stage blob it froze was written 2026-10-31T04:20:18.220Z). No live sites are touched; the harness reads recorded data only, at a frozen clock (no wall-clock reads anywhere). The voter table re-run here is the PROMOTED production table (Session 6, D-5: 21 voters — the S4-frozen 20 carried beside it as the lineage baseline); the thresholds and labels are unchanged from S1. NOTHING here changes production. The 11-01/11-02 rungs land after this run — the scheduled 2026-11-02 re-check carries the grown-corpus refresh. Every cell carries its n.
 
 ## Method
 
-- Engine: the FROZEN 20-voter table (`gold-score.ts` `GOLD_LANE_VOTERS`) evaluated through the shared signals evaluator (`connections.ts` `evalLeg` — a 30-day direction beyond the per-leg minimum move, else the decade-extreme level), the same `computeReading` percentile/change/stale math the ingest runs, and `scoreOverVoters` — a harness-local parameterized copy of the score arithmetic **pinned equal to the production engine by test** (`gold-backtest-core.test.ts`).
+- Engine: the PRODUCTION 21-voter table (`gold-score.ts` `GOLD_LANE_VOTERS` — the D-5 promotion, Session 6: `breakeven-tilt` in the inflation lane, polarity +1, level-leg only) evaluated through the shared signals evaluator (`connections.ts` `evalLeg` — a 30-day direction beyond the per-leg minimum move, else the decade-extreme level), the same `computeReading` percentile/change/stale math the ingest runs, and `scoreOverVoters` — a harness-local parameterized copy of the score arithmetic **pinned equal to the production engine by test** (`gold-backtest-core.test.ts`); the S4-frozen 20-voter table (`HARNESS_GOLD_VOTERS_20`, pinned to production-minus-the-tilt) rides beside it as the lineage baseline.
 - Frozen clock: every window passes its own date (`<window-day>T04:10:00.000Z`, the main rung’s time-of-day); nothing reads the wall clock.
 - No lookahead: every series is truncated at the window day BEFORE any scoring math (`seriesUpTo`); percentiles are computed strictly from observations at or before the as-of date. Truncated-vs-full equality and a future-spike mutation test pin this.
 - The D-6 cross-fill is applied to the real-yield-10y SCORING INPUT exactly as in production (`realYieldScoringSeries` over the truncated pure DFII10 + the DGS10/T10YIE legs, the same decade window, 2003 floor, 4dp quantization and 5% cap), and the fill count is reported aloud below.
@@ -17,7 +17,7 @@ Generated from the recorded KV corpus (`packages/insights/fixtures/gold-backtest
 
 ## The corpus (the §0 verification, at harness run time)
 
-- Live API `https://currena.ir/api/insights` (checked at session start, 2026-10-31 ~12:15 UTC): `goldSummary` PRESENT (netScore −2, label `headwind`, the 04:20 rung) and `breakeven-tilt` present among the 102 readings — the S2.1+S3 state stands.
+- Live API `https://currena.ir/api/insights` (checked at session start, 2026-10-31 ~15:35 UTC): `goldSummary` PRESENT (netScore −2, label `headwind`, 6 firing — the 04:20 rung, stamped by the PRE-promotion engine) and `breakeven-tilt` present among the 102 readings (−0.24, asOf 2026-10-30, percentile10y 0.217 — mid-range, SILENT today: the promotion changes nothing about the current live reading); the promoted numbers ride every rung from the next deploy.
 - Read-only KV: **16 full archive days** (`insights:archive:v1:*`, 2026-10-15 → 2026-10-31; 2026-10-20 absent — a rung outage day, the only gap). The newest (2026-10-31) carries `goldSummary` (present on: 2026-10-31 — the field shipped with S2.1/S3 and the 10-31 rung was the first to stamp it).
 - The stored-history span: the daily FRED family's stage series start 2016-09-23 — the harness's depth is ~10.1 years, exactly the depth production's percentile window sees.
 - Venue note: the stage blob's gold-usd copy carries 2516 points; the realized-move series (`insights:hist:gold-usd`, the spec's venue) carries 2514 — 2 points fewer at the head (2016-11-02 vs 2016-10-31); both end 2026-10-31. The join uses the hist key; the difference is recorded, not silently reconciled.
@@ -33,9 +33,9 @@ The asOf-watch (the S3 known-gap — did the trio keep moving WITH the decade gr
 | 2026-10-30 | 2026-10-28 | 2026-10-28 | 2026-10-28 | 2026-10-29 | 2026-10-29 | warning ×3 |
 | 2026-10-31 | 2026-10-29 | 2026-10-29 | 2026-10-29 | 2026-10-30 | 2026-10-30 | warning ×3 |
 
-**Verdict:** day 1 (the 2026-10-31 archive — the first S3 rung) shows the trio and the decade group advancing in lockstep, both +1 trading day at the same rung (trio 2026-10-28 → 2026-10-29, decade group 2026-10-29 → 2026-10-30; values moved too: us10y 5.05 → 4.98). Days 2–3 are NOT YET OBSERVABLE: the corpus ends 2026-10-31 at the S4 run time (2026-10-31 ~12:20 UTC — the 11-01/11-02 rungs have not fired). The watch stays open; nothing here claims it proven.
+**Verdict:** day 1 (the 2026-10-31 archive — the first S3 rung) shows the trio and the decade group advancing in lockstep, both +1 trading day at the same rung (trio 2026-10-28 → 2026-10-29, decade group 2026-10-29 → 2026-10-30; values moved too: us10y 5.05 → 4.98). Days 2–3 are NOT YET OBSERVABLE: the corpus ends 2026-10-31 at the harness run time (2026-10-31 — the 11-01/11-02 rungs have not fired; the scheduled 2026-11-02 re-check carries them). The watch stays open; nothing here claims it proven.
 
-## Coverage — the 20 voters over the stored histories (+ the tilt under evaluation)
+## Coverage — the 21 voters over the stored histories
 
 | Voter | Cadence | Span | Obs | Readable windows | Firing windows | Tailwind | Headwind | First firing | Gap notes |
 |---|---|---|---|---|---|---|---|---|---|
@@ -59,14 +59,14 @@ The asOf-watch (the S3 known-gap — did the trio keep moving WITH the decade gr
 | `us-pce-core-yoy` | monthly | 2016-10-01 → 2026-09-01 | 120 | 2514 | 781 | 527 | 254 | 2019-05-01 | dense series — full-depth re-run |
 | `euro-hicp` | monthly | 2016-10-01 → 2026-09-01 | 120 | 2514 | 886 | 524 | 362 | 2019-05-01 | dense series — full-depth re-run |
 | `breakeven-5y5y` | daily | 2016-09-23 → 2026-10-30 | 2525 | 2514 | 1690 | 1089 | 601 | 2016-11-07 | dense series — full-depth re-run |
-| `breakeven-tilt` (B4) | daily | 2016-09-23 → 2026-10-30 | 2525 | 2514 | 1174 | 264 | 910 | 2016-11-08 | dense series — full-depth re-run |
+| `breakeven-tilt` | daily | 2016-09-23 → 2026-10-30 | 2525 | 2514 | 1174 | 264 | 910 | 2016-11-08 | derived series (T5YIFR − T5YIE inner join on common dates) — dense full-depth re-run; the 21st voter since the D-5 promotion (Session 6), level-leg only |
 
-**The effective table:** cftc-gold-positioning never fires, and us-japan-10y-gap / gold-silver fire only near their sparse observation dates — the re-run era's real voter pool averaged **10.0 firing voters per window** (of 20). Every denominator is stated; nothing is silently interpolated.
+**The effective table:** cftc-gold-positioning never fires, and us-japan-10y-gap / gold-silver fire only near their sparse observation dates — the re-run era's real voter pool averaged **10.4 firing voters per window** (of 21). Every denominator is stated; nothing is silently interpolated.
 
 ## B1 — the historical re-run (frozen clock)
 
-Windows: **2514** (2016-11-02 → 2026-10-31, every gold trading day). Label distribution: headwind ×634, tailwind ×966, strong-tailwind ×274, balanced ×244, strong-headwind ×396.
-Average firing voters 10.0 · average netScore +0.42 · netScore range -8 to 9.
+Windows: **2514** (2016-11-02 → 2026-10-31, every gold trading day). Label distribution: headwind ×741, tailwind ×907, strong-tailwind ×226, balanced ×236, strong-headwind ×404.
+Average firing voters 10.4 · average netScore +0.16 · netScore range -9 to 10.
 
 **The D-6 cross-fill, counted aloud:** 0 fill day(s) applied across all 2514 windows. The stored series are dense (each healthy rung re-fetches the full decade window), so the historical re-run sees ~0 fills — the audit's healthy-day expectation (GOLD_FRED_GAPFILL_SPEC §5 G1a). The fill's production value is freshness-rescue on TRANSIENT degraded days, which a dense stored corpus cannot replay — stated, not hidden.
 
@@ -74,82 +74,82 @@ Month-end traces (the label + firing counts the frozen table produced):
 
 | Window day | Label | Net | Firing (T/H) | Lane readings |
 |---|---|---|---|---|
-| 2016-11-30 | headwind | -5 | 11 (3/8) | borrowing-costs:mixed · dollar:strong · stress:unreadable · inflation:hot |
-| 2016-12-30 | strong-headwind | -2 | 4 (1/3) | borrowing-costs:mixed · dollar:strong · stress:unreadable · inflation:unreadable |
-| 2017-01-31 | strong-tailwind | +3 | 3 (3/0) | borrowing-costs:relief · dollar:stress · stress:unreadable · inflation:hot |
+| 2016-11-30 | headwind | -4 | 12 (4/8) | borrowing-costs:mixed · dollar:strong · stress:unreadable · inflation:hot |
+| 2016-12-30 | strong-headwind | -3 | 5 (1/4) | borrowing-costs:mixed · dollar:strong · stress:unreadable · inflation:cool |
+| 2017-01-31 | strong-tailwind | +2 | 4 (3/1) | borrowing-costs:relief · dollar:stress · stress:unreadable · inflation:mixed |
 | 2017-02-28 | tailwind | +2 | 2 (2/0) | borrowing-costs:relief · dollar:unreadable · stress:unreadable · inflation:hot |
-| 2017-03-31 | strong-tailwind | +3 | 5 (4/1) | borrowing-costs:mixed · dollar:stress · stress:unreadable · inflation:hot |
-| 2017-04-28 | headwind | -2 | 8 (3/5) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:cool |
-| 2017-05-31 | tailwind | +2 | 10 (6/4) | borrowing-costs:relief · dollar:stress · stress:calm · inflation:cool |
-| 2017-06-30 | balanced | +0 | 10 (5/5) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:cool |
+| 2017-03-31 | strong-tailwind | +4 | 6 (5/1) | borrowing-costs:mixed · dollar:stress · stress:unreadable · inflation:hot |
+| 2017-04-28 | headwind | -3 | 9 (3/6) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:cool |
+| 2017-05-31 | tailwind | +1 | 11 (6/5) | borrowing-costs:relief · dollar:stress · stress:calm · inflation:cool |
+| 2017-06-30 | headwind | -1 | 11 (5/6) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:cool |
 | 2017-07-31 | tailwind | +1 | 9 (5/4) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:hot |
-| 2017-08-31 | strong-tailwind | +7 | 9 (8/1) | borrowing-costs:relief · dollar:stress · stress:calm · inflation:unreadable |
+| 2017-08-31 | strong-tailwind | +8 | 10 (9/1) | borrowing-costs:relief · dollar:stress · stress:calm · inflation:hot |
 | 2017-09-29 | headwind | -1 | 7 (3/4) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:unreadable |
-| 2017-10-31 | headwind | -2 | 6 (2/4) | borrowing-costs:relief · dollar:strong · stress:calm · inflation:unreadable |
+| 2017-10-31 | headwind | -3 | 7 (2/5) | borrowing-costs:relief · dollar:strong · stress:calm · inflation:cool |
 | 2017-11-30 | balanced | +0 | 8 (4/4) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:unreadable |
-| 2017-12-29 | tailwind | +3 | 7 (5/2) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:unreadable |
+| 2017-12-29 | tailwind | +2 | 8 (5/3) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:cool |
 | 2018-01-31 | tailwind | +1 | 11 (6/5) | borrowing-costs:mixed · dollar:stress · stress:mixed · inflation:hot |
-| 2018-02-28 | headwind | -1 | 11 (5/6) | borrowing-costs:mixed · dollar:mixed · stress:elevated · inflation:hot |
+| 2018-02-28 | headwind | -2 | 12 (5/7) | borrowing-costs:mixed · dollar:mixed · stress:elevated · inflation:mixed |
 | 2018-03-29 | strong-tailwind | +7 | 11 (9/2) | borrowing-costs:mixed · dollar:stress · stress:elevated · inflation:hot |
-| 2018-04-30 | balanced | +0 | 12 (6/6) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:hot |
-| 2018-05-31 | headwind | -2 | 10 (4/6) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:cool |
-| 2018-06-29 | tailwind | +1 | 7 (4/3) | borrowing-costs:mixed · dollar:unreadable · stress:elevated · inflation:unreadable |
+| 2018-04-30 | headwind | -1 | 13 (6/7) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:mixed |
+| 2018-05-31 | headwind | -3 | 11 (4/7) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:cool |
+| 2018-06-29 | balanced | +0 | 8 (4/4) | borrowing-costs:mixed · dollar:unreadable · stress:elevated · inflation:cool |
 | 2018-07-31 | balanced | +0 | 8 (4/4) | borrowing-costs:mixed · dollar:unreadable · stress:unreadable · inflation:hot |
 | 2018-08-31 | headwind | -2 | 8 (3/5) | borrowing-costs:mixed · dollar:unreadable · stress:calm · inflation:unreadable |
 | 2018-09-28 | headwind | -3 | 11 (4/7) | borrowing-costs:mixed · dollar:strong · stress:calm · inflation:hot |
 | 2018-10-31 | headwind | -1 | 9 (4/5) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:unreadable |
-| 2018-11-30 | balanced | +0 | 10 (5/5) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:unreadable |
-| 2018-12-31 | tailwind | +5 | 11 (8/3) | borrowing-costs:mixed · dollar:unreadable · stress:elevated · inflation:cool |
+| 2018-11-30 | tailwind | +1 | 11 (6/5) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:hot |
+| 2018-12-31 | strong-tailwind | +6 | 12 (9/3) | borrowing-costs:mixed · dollar:unreadable · stress:elevated · inflation:mixed |
 | 2019-01-31 | strong-tailwind | +5 | 7 (6/1) | borrowing-costs:mixed · dollar:stress · stress:unreadable · inflation:unreadable |
 | 2019-02-28 | strong-tailwind | +4 | 8 (6/2) | borrowing-costs:mixed · dollar:unreadable · stress:calm · inflation:hot |
 | 2019-03-29 | tailwind | +4 | 10 (7/3) | borrowing-costs:mixed · dollar:strong · stress:calm · inflation:unreadable |
 | 2019-04-30 | tailwind | +2 | 6 (4/2) | borrowing-costs:mixed · dollar:unreadable · stress:calm · inflation:unreadable |
 | 2019-05-31 | tailwind | +4 | 14 (9/5) | borrowing-costs:mixed · dollar:stress · stress:elevated · inflation:cool |
 | 2019-06-28 | tailwind | +4 | 12 (8/4) | borrowing-costs:mixed · dollar:stress · stress:unreadable · inflation:cool |
-| 2019-07-31 | strong-tailwind | +7 | 11 (9/2) | borrowing-costs:relief · dollar:mixed · stress:unreadable · inflation:mixed |
-| 2019-08-30 | strong-tailwind | +7 | 13 (10/3) | borrowing-costs:relief · dollar:mixed · stress:elevated · inflation:cool |
-| 2019-09-30 | tailwind | +1 | 13 (7/6) | borrowing-costs:mixed · dollar:mixed · stress:elevated · inflation:cool |
+| 2019-07-31 | strong-tailwind | +8 | 12 (10/2) | borrowing-costs:relief · dollar:mixed · stress:unreadable · inflation:mixed |
+| 2019-08-30 | strong-tailwind | +8 | 14 (11/3) | borrowing-costs:relief · dollar:mixed · stress:elevated · inflation:mixed |
+| 2019-09-30 | tailwind | +2 | 14 (8/6) | borrowing-costs:mixed · dollar:mixed · stress:elevated · inflation:mixed |
 | 2019-10-31 | strong-tailwind | +6 | 10 (8/2) | borrowing-costs:relief · dollar:stress · stress:unreadable · inflation:cool |
 | 2019-11-29 | tailwind | +2 | 10 (6/4) | borrowing-costs:relief · dollar:strong · stress:unreadable · inflation:cool |
-| 2019-12-31 | strong-tailwind | +6 | 8 (7/1) | borrowing-costs:relief · dollar:stress · stress:unreadable · inflation:mixed |
-| 2020-01-31 | strong-tailwind | +6 | 12 (9/3) | borrowing-costs:relief · dollar:strong · stress:mixed · inflation:mixed |
-| 2020-02-28 | strong-tailwind | +7 | 11 (9/2) | borrowing-costs:relief · dollar:strong · stress:elevated · inflation:cool |
-| 2020-03-31 | tailwind | +1 | 13 (7/6) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:cool |
-| 2020-04-30 | tailwind | +6 | 14 (10/4) | borrowing-costs:relief · dollar:mixed · stress:elevated · inflation:mixed |
-| 2020-05-29 | tailwind | +6 | 14 (10/4) | borrowing-costs:relief · dollar:stress · stress:elevated · inflation:cool |
+| 2019-12-31 | strong-tailwind | +5 | 9 (7/2) | borrowing-costs:relief · dollar:stress · stress:unreadable · inflation:mixed |
+| 2020-01-31 | tailwind | +5 | 13 (9/4) | borrowing-costs:relief · dollar:strong · stress:mixed · inflation:mixed |
+| 2020-02-28 | strong-tailwind | +6 | 12 (9/3) | borrowing-costs:relief · dollar:strong · stress:elevated · inflation:cool |
+| 2020-03-31 | tailwind | +2 | 14 (8/6) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:mixed |
+| 2020-04-30 | tailwind | +7 | 15 (11/4) | borrowing-costs:relief · dollar:mixed · stress:elevated · inflation:mixed |
+| 2020-05-29 | tailwind | +7 | 15 (11/4) | borrowing-costs:relief · dollar:stress · stress:elevated · inflation:mixed |
 | 2020-06-30 | tailwind | +4 | 12 (8/4) | borrowing-costs:relief · dollar:unreadable · stress:elevated · inflation:cool |
 | 2020-07-31 | strong-tailwind | +6 | 12 (9/3) | borrowing-costs:relief · dollar:stress · stress:elevated · inflation:mixed |
 | 2020-08-31 | tailwind | +4 | 12 (8/4) | borrowing-costs:mixed · dollar:stress · stress:elevated · inflation:mixed |
 | 2020-09-30 | tailwind | +1 | 13 (7/6) | borrowing-costs:mixed · dollar:mixed · stress:elevated · inflation:cool |
 | 2020-10-30 | tailwind | +1 | 11 (6/5) | borrowing-costs:mixed · dollar:stress · stress:elevated · inflation:cool |
-| 2020-11-30 | tailwind | +4 | 10 (7/3) | borrowing-costs:relief · dollar:stress · stress:unreadable · inflation:cool |
-| 2020-12-31 | tailwind | +5 | 11 (8/3) | borrowing-costs:relief · dollar:stress · stress:calm · inflation:mixed |
-| 2021-01-29 | tailwind | +3 | 11 (7/4) | borrowing-costs:mixed · dollar:stress · stress:mixed · inflation:cool |
-| 2021-02-26 | balanced | +0 | 10 (5/5) | borrowing-costs:mixed · dollar:stress · stress:mixed · inflation:unreadable |
-| 2021-03-31 | balanced | +0 | 12 (6/6) | borrowing-costs:mixed · dollar:strong · stress:calm · inflation:hot |
-| 2021-04-30 | tailwind | +3 | 11 (7/4) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:hot |
-| 2021-05-28 | tailwind | +4 | 12 (8/4) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:hot |
-| 2021-06-30 | tailwind | +1 | 11 (6/5) | borrowing-costs:mixed · dollar:strong · stress:calm · inflation:mixed |
-| 2021-07-30 | strong-tailwind | +7 | 13 (10/3) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:hot |
-| 2021-08-31 | tailwind | +2 | 10 (6/4) | borrowing-costs:mixed · dollar:unreadable · stress:calm · inflation:hot |
-| 2021-09-30 | balanced | +0 | 14 (7/7) | borrowing-costs:mixed · dollar:strong · stress:mixed · inflation:hot |
-| 2021-10-29 | tailwind | +2 | 10 (6/4) | borrowing-costs:mixed · dollar:strong · stress:calm · inflation:hot |
-| 2021-11-30 | strong-tailwind | +7 | 11 (9/2) | borrowing-costs:relief · dollar:strong · stress:elevated · inflation:hot |
-| 2021-12-31 | tailwind | +4 | 10 (7/3) | borrowing-costs:mixed · dollar:strong · stress:calm · inflation:hot |
-| 2022-01-31 | headwind | -1 | 13 (6/7) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:mixed |
-| 2022-02-28 | strong-tailwind | +6 | 12 (9/3) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:hot |
-| 2022-03-31 | tailwind | +1 | 13 (7/6) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:hot |
-| 2022-04-29 | tailwind | +3 | 15 (9/6) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:hot |
-| 2022-05-31 | tailwind | +1 | 15 (8/7) | borrowing-costs:mixed · dollar:mixed · stress:elevated · inflation:mixed |
-| 2022-06-30 | tailwind | +1 | 15 (8/7) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:mixed |
-| 2022-07-29 | tailwind | +5 | 13 (9/4) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:hot |
+| 2020-11-30 | tailwind | +3 | 11 (7/4) | borrowing-costs:relief · dollar:stress · stress:unreadable · inflation:cool |
+| 2020-12-31 | tailwind | +4 | 12 (8/4) | borrowing-costs:relief · dollar:stress · stress:calm · inflation:mixed |
+| 2021-01-29 | tailwind | +2 | 12 (7/5) | borrowing-costs:mixed · dollar:stress · stress:mixed · inflation:cool |
+| 2021-02-26 | headwind | -1 | 11 (5/6) | borrowing-costs:mixed · dollar:stress · stress:mixed · inflation:cool |
+| 2021-03-31 | headwind | -1 | 13 (6/7) | borrowing-costs:mixed · dollar:strong · stress:calm · inflation:mixed |
+| 2021-04-30 | tailwind | +2 | 12 (7/5) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:mixed |
+| 2021-05-28 | tailwind | +3 | 13 (8/5) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:mixed |
+| 2021-06-30 | balanced | +0 | 12 (6/6) | borrowing-costs:mixed · dollar:strong · stress:calm · inflation:mixed |
+| 2021-07-30 | tailwind | +6 | 14 (10/4) | borrowing-costs:mixed · dollar:stress · stress:calm · inflation:mixed |
+| 2021-08-31 | tailwind | +1 | 11 (6/5) | borrowing-costs:mixed · dollar:unreadable · stress:calm · inflation:mixed |
+| 2021-09-30 | headwind | -1 | 15 (7/8) | borrowing-costs:mixed · dollar:strong · stress:mixed · inflation:mixed |
+| 2021-10-29 | tailwind | +1 | 11 (6/5) | borrowing-costs:mixed · dollar:strong · stress:calm · inflation:mixed |
+| 2021-11-30 | strong-tailwind | +6 | 12 (9/3) | borrowing-costs:relief · dollar:strong · stress:elevated · inflation:mixed |
+| 2021-12-31 | tailwind | +3 | 11 (7/4) | borrowing-costs:mixed · dollar:strong · stress:calm · inflation:mixed |
+| 2022-01-31 | headwind | -2 | 14 (6/8) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:mixed |
+| 2022-02-28 | tailwind | +5 | 13 (9/4) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:mixed |
+| 2022-03-31 | balanced | +0 | 14 (7/7) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:mixed |
+| 2022-04-29 | tailwind | +2 | 16 (9/7) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:mixed |
+| 2022-05-31 | balanced | +0 | 16 (8/8) | borrowing-costs:mixed · dollar:mixed · stress:elevated · inflation:mixed |
+| 2022-06-30 | balanced | +0 | 16 (8/8) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:mixed |
+| 2022-07-29 | tailwind | +4 | 14 (9/5) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:mixed |
 | 2022-08-31 | balanced | +0 | 16 (8/8) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:hot |
 | 2022-09-30 | headwind | -2 | 16 (7/9) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:mixed |
 | 2022-10-31 | tailwind | +2 | 16 (9/7) | borrowing-costs:mixed · dollar:mixed · stress:elevated · inflation:hot |
 | 2022-11-30 | tailwind | +4 | 14 (9/5) | borrowing-costs:mixed · dollar:mixed · stress:elevated · inflation:mixed |
 | 2022-12-30 | tailwind | +2 | 14 (8/6) | borrowing-costs:mixed · dollar:mixed · stress:elevated · inflation:hot |
 | 2023-01-31 | tailwind | +6 | 14 (10/4) | borrowing-costs:mixed · dollar:mixed · stress:elevated · inflation:hot |
-| 2023-02-28 | headwind | -1 | 13 (6/7) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:hot |
+| 2023-02-28 | headwind | -2 | 14 (6/8) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:mixed |
 | 2023-03-31 | tailwind | +6 | 14 (10/4) | borrowing-costs:mixed · dollar:mixed · stress:elevated · inflation:hot |
 | 2023-04-28 | headwind | -3 | 13 (5/8) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:mixed |
 | 2023-05-31 | headwind | -1 | 13 (6/7) | borrowing-costs:mixed · dollar:strong · stress:elevated · inflation:hot |
@@ -172,9 +172,9 @@ Month-end traces (the label + firing counts the frozen table produced):
 | 2024-10-31 | strong-headwind | -6 | 8 (1/7) | borrowing-costs:mixed · dollar:strong · stress:unreadable · inflation:unreadable |
 | 2024-11-29 | strong-headwind | -6 | 8 (1/7) | borrowing-costs:mixed · dollar:strong · stress:unreadable · inflation:cool |
 | 2024-12-31 | strong-headwind | -4 | 6 (1/5) | borrowing-costs:tight · dollar:strong · stress:unreadable · inflation:hot |
-| 2025-01-31 | strong-headwind | -5 | 7 (1/6) | borrowing-costs:tight · dollar:strong · stress:calm · inflation:hot |
-| 2025-02-28 | headwind | -1 | 5 (2/3) | borrowing-costs:mixed · dollar:strong · stress:unreadable · inflation:unreadable |
-| 2025-03-31 | headwind | -2 | 6 (2/4) | borrowing-costs:mixed · dollar:mixed · stress:unreadable · inflation:unreadable |
+| 2025-01-31 | strong-headwind | -6 | 8 (1/7) | borrowing-costs:tight · dollar:strong · stress:calm · inflation:mixed |
+| 2025-02-28 | headwind | -2 | 6 (2/4) | borrowing-costs:mixed · dollar:strong · stress:unreadable · inflation:cool |
+| 2025-03-31 | headwind | -3 | 7 (2/5) | borrowing-costs:mixed · dollar:mixed · stress:unreadable · inflation:cool |
 | 2025-04-30 | balanced | +0 | 6 (3/3) | borrowing-costs:mixed · dollar:stress · stress:elevated · inflation:unreadable |
 | 2025-05-30 | headwind | -1 | 5 (2/3) | borrowing-costs:mixed · dollar:unreadable · stress:unreadable · inflation:hot |
 | 2025-06-30 | strong-tailwind | +3 | 5 (4/1) | borrowing-costs:mixed · dollar:stress · stress:unreadable · inflation:unreadable |
@@ -184,11 +184,11 @@ Month-end traces (the label + firing counts the frozen table produced):
 | 2025-10-31 | strong-headwind | -6 | 6 (0/6) | borrowing-costs:tight · dollar:strong · stress:unreadable · inflation:cool |
 | 2025-11-28 | headwind | -2 | 2 (0/2) | borrowing-costs:tight · dollar:strong · stress:unreadable · inflation:unreadable |
 | 2025-12-31 | strong-headwind | -4 | 4 (0/4) | borrowing-costs:tight · dollar:strong · stress:unreadable · inflation:unreadable |
-| 2026-01-30 | strong-headwind | -3 | 5 (1/4) | borrowing-costs:tight · dollar:mixed · stress:unreadable · inflation:unreadable |
-| 2026-02-27 | headwind | -2 | 6 (2/4) | borrowing-costs:mixed · dollar:strong · stress:unreadable · inflation:cool |
-| 2026-03-31 | strong-headwind | -4 | 6 (1/5) | borrowing-costs:tight · dollar:strong · stress:elevated · inflation:unreadable |
-| 2026-04-30 | headwind | -2 | 6 (2/4) | borrowing-costs:tight · dollar:mixed · stress:unreadable · inflation:hot |
-| 2026-05-29 | strong-headwind | -4 | 4 (0/4) | borrowing-costs:tight · dollar:strong · stress:unreadable · inflation:unreadable |
+| 2026-01-30 | strong-headwind | -4 | 6 (1/5) | borrowing-costs:tight · dollar:mixed · stress:unreadable · inflation:cool |
+| 2026-02-27 | headwind | -3 | 7 (2/5) | borrowing-costs:mixed · dollar:strong · stress:unreadable · inflation:cool |
+| 2026-03-31 | strong-headwind | -5 | 7 (1/6) | borrowing-costs:tight · dollar:strong · stress:elevated · inflation:cool |
+| 2026-04-30 | headwind | -3 | 7 (2/5) | borrowing-costs:tight · dollar:mixed · stress:unreadable · inflation:mixed |
+| 2026-05-29 | strong-headwind | -5 | 5 (0/5) | borrowing-costs:tight · dollar:strong · stress:unreadable · inflation:cool |
 | 2026-06-30 | strong-headwind | -5 | 5 (0/5) | borrowing-costs:tight · dollar:strong · stress:unreadable · inflation:unreadable |
 | 2026-07-31 | headwind | -3 | 7 (2/5) | borrowing-costs:tight · dollar:mixed · stress:unreadable · inflation:hot |
 | 2026-08-31 | strong-headwind | -5 | 7 (1/6) | borrowing-costs:tight · dollar:strong · stress:calm · inflation:hot |
@@ -202,105 +202,105 @@ Month-end traces (the label + firing counts the frozen table produced):
 
 Windows with a joinable forward return: **2509** of 2514 (the last 5 trading days have no forward observation — excluded, n stated). Mature-base subsample (≥ 2021-09-23): **1281** windows.
 
-Sign-agreement (netScore sign vs forward-return sign, both readable — a model lean AND a move beyond the band): **952/1842 = 51.7%** (mature base: 456/975 = 46.8%). A coin is 50%; the ALL-windows move split is up 45.7% · flat 19.3% · down 35.1%.
+Sign-agreement (netScore sign vs forward-return sign, both readable — a model lean AND a move beyond the band): **958/1840 = 52.1%** (mature base: 454/968 = 46.9%). A coin is 50%; the ALL-windows move split is up 45.7% · flat 19.3% · down 35.1%.
 
 Confusion table — all windows (n per cell; row share in brackets):
 
 | Model ↓ / Move → | up | flat | down | n | mean ret | median ret |
 |---|---|---|---|---|---|---|
-| **tailwind** | 583 [47%] | 242 [20%] | 415 [33%] | 1240 | 0.26% | 0.35% |
-| **mixed** | 88 [36%] | 60 [25%] | 96 [39%] | 244 | 0.04% | 0.09% |
-| **headwind** | 475 [46%] | 181 [18%] | 369 [36%] | 1025 | 0.29% | 0.28% |
+| **tailwind** | 542 [48%] | 224 [20%] | 367 [32%] | 1133 | 0.30% | 0.37% |
+| **mixed** | 89 [38%] | 50 [21%] | 97 [41%] | 236 | -0.01% | 0.01% |
+| **headwind** | 515 [45%] | 209 [18%] | 416 [36%] | 1140 | 0.26% | 0.25% |
 | *all windows* | 1146 | 483 | 880 | 2509 | 0.25% | 0.28% |
 
 Confusion table — mature-base windows (≥ 5 years of percentile base):
 
 | Model ↓ / Move → | up | flat | down | n | mean ret | median ret |
 |---|---|---|---|---|---|---|
-| **tailwind** | 180 [47%] | 67 [17%] | 139 [36%] | 386 | 0.30% | 0.32% |
-| **mixed** | 53 [43%] | 22 [18%] | 49 [40%] | 124 | 0.23% | 0.21% |
-| **headwind** | 380 [49%] | 115 [15%] | 276 [36%] | 771 | 0.40% | 0.39% |
+| **tailwind** | 154 [48%] | 58 [18%] | 108 [34%] | 320 | 0.41% | 0.38% |
+| **mixed** | 53 [41%] | 20 [16%] | 56 [43%] | 129 | 0.01% | 0.03% |
+| **headwind** | 406 [49%] | 126 [15%] | 300 [36%] | 832 | 0.39% | 0.38% |
 | *all windows* | 613 | 204 | 464 | 1281 | 0.36% | 0.35% |
 
 Label-conditional forward returns (the full 5-step vocabulary, every row kept):
 
 | Label | n | mean | median |
 |---|---|---|---|
-| strong-tailwind | 274 | 0.32% | 0.36% |
-| tailwind | 966 | 0.24% | 0.34% |
-| balanced | 244 | 0.04% | 0.09% |
-| headwind | 629 | 0.30% | 0.22% |
-| strong-headwind | 396 | 0.28% | 0.45% |
+| strong-tailwind | 226 | 0.20% | 0.26% |
+| tailwind | 907 | 0.33% | 0.42% |
+| balanced | 236 | -0.01% | 0.01% |
+| headwind | 736 | 0.23% | 0.15% |
+| strong-headwind | 404 | 0.31% | 0.49% |
 | null | 0 | —% | —% |
 
 ### Horizon 20 trading days (flat band ±1.87%; ≈ 28 calendar days)
 
 Windows with a joinable forward return: **2494** of 2514 (the last 20 trading days have no forward observation — excluded, n stated). Mature-base subsample (≥ 2021-09-23): **1266** windows.
 
-Sign-agreement (netScore sign vs forward-return sign, both readable — a model lean AND a move beyond the band): **663/1415 = 46.9%** (mature base: 330/776 = 42.5%). A coin is 50%; the ALL-windows move split is up 39.5% · flat 37.1% · down 23.5%.
+Sign-agreement (netScore sign vs forward-return sign, both readable — a model lean AND a move beyond the band): **680/1429 = 47.6%** (mature base: 330/780 = 42.3%). A coin is 50%; the ALL-windows move split is up 39.5% · flat 37.1% · down 23.5%.
 
 Confusion table — all windows (n per cell; row share in brackets):
 
 | Model ↓ / Move → | up | flat | down | n | mean ret | median ret |
 |---|---|---|---|---|---|---|
-| **tailwind** | 452 [36%] | 474 [38%] | 314 [25%] | 1240 | 0.84% | 0.55% |
-| **mixed** | 94 [39%] | 90 [37%] | 60 [25%] | 244 | 0.65% | 0.44% |
-| **headwind** | 438 [43%] | 361 [36%] | 211 [21%] | 1010 | 1.44% | 1.06% |
+| **tailwind** | 430 [38%] | 436 [38%] | 267 [24%] | 1133 | 1.02% | 0.64% |
+| **mixed** | 72 [31%] | 96 [41%] | 68 [29%] | 236 | 0.15% | -0.07% |
+| **headwind** | 482 [43%] | 393 [35%] | 250 [22%] | 1125 | 1.30% | 1.03% |
 | *all windows* | 984 | 925 | 585 | 2494 | 1.06% | 0.69% |
 
 Confusion table — mature-base windows (≥ 5 years of percentile base):
 
 | Model ↓ / Move → | up | flat | down | n | mean ret | median ret |
 |---|---|---|---|---|---|---|
-| **tailwind** | 159 [41%] | 129 [33%] | 98 [25%] | 386 | 1.09% | 1.30% |
-| **mixed** | 58 [47%] | 38 [31%] | 28 [23%] | 124 | 1.07% | 1.52% |
-| **headwind** | 348 [46%] | 237 [31%] | 171 [23%] | 756 | 1.72% | 1.35% |
+| **tailwind** | 141 [44%] | 106 [33%] | 73 [23%] | 320 | 1.41% | 1.58% |
+| **mixed** | 47 [36%] | 47 [36%] | 35 [27%] | 129 | 0.57% | 0.43% |
+| **headwind** | 377 [46%] | 251 [31%] | 189 [23%] | 817 | 1.63% | 1.36% |
 | *all windows* | 565 | 404 | 297 | 1266 | 1.46% | 1.35% |
 
 Label-conditional forward returns (the full 5-step vocabulary, every row kept):
 
 | Label | n | mean | median |
 |---|---|---|---|
-| strong-tailwind | 274 | 0.27% | 0.17% |
-| tailwind | 966 | 1.00% | 0.70% |
-| balanced | 244 | 0.65% | 0.44% |
-| headwind | 628 | 1.36% | 0.93% |
-| strong-headwind | 382 | 1.58% | 1.77% |
+| strong-tailwind | 226 | 0.33% | 0.22% |
+| tailwind | 907 | 1.19% | 0.76% |
+| balanced | 236 | 0.15% | -0.07% |
+| headwind | 735 | 1.13% | 0.87% |
+| strong-headwind | 390 | 1.64% | 1.82% |
 | null | 0 | —% | —% |
 
 ### Horizon 60 trading days (flat band ±5.60%; ≈ 84 calendar days)
 
 Windows with a joinable forward return: **2454** of 2514 (the last 60 trading days have no forward observation — excluded, n stated). Mature-base subsample (≥ 2021-09-23): **1226** windows.
 
-Sign-agreement (netScore sign vs forward-return sign, both readable — a model lean AND a move beyond the band): **446/1016 = 43.9%** (mature base: 203/620 = 32.7%). A coin is 50%; the ALL-windows move split is up 35.0% · flat 54.5% · down 10.5%.
+Sign-agreement (netScore sign vs forward-return sign, both readable — a model lean AND a move beyond the band): **452/1029 = 43.9%** (mature base: 201/617 = 32.6%). A coin is 50%; the ALL-windows move split is up 35.0% · flat 54.5% · down 10.5%.
 
 Confusion table — all windows (n per cell; row share in brackets):
 
 | Model ↓ / Move → | up | flat | down | n | mean ret | median ret |
 |---|---|---|---|---|---|---|
-| **tailwind** | 350 [28%] | 748 [60%] | 142 [11%] | 1240 | 2.19% | 1.60% |
-| **mixed** | 80 [33%] | 144 [59%] | 20 [8%] | 244 | 3.25% | 2.98% |
-| **headwind** | 428 [44%] | 446 [46%] | 96 [10%] | 970 | 5.16% | 4.54% |
+| **tailwind** | 336 [30%] | 677 [60%] | 120 [11%] | 1133 | 2.50% | 2.01% |
+| **mixed** | 65 [28%] | 149 [63%] | 22 [9%] | 236 | 2.27% | 1.44% |
+| **headwind** | 457 [42%] | 512 [47%] | 116 [11%] | 1085 | 4.74% | 4.25% |
 | *all windows* | 858 | 1338 | 258 | 2454 | 3.47% | 2.94% |
 
 Confusion table — mature-base windows (≥ 5 years of percentile base):
 
 | Model ↓ / Move → | up | flat | down | n | mean ret | median ret |
 |---|---|---|---|---|---|---|
-| **tailwind** | 137 [35%] | 187 [48%] | 62 [16%] | 386 | 2.85% | 2.82% |
-| **mixed** | 45 [36%] | 68 [55%] | 11 [9%] | 124 | 3.89% | 3.28% |
-| **headwind** | 355 [50%] | 295 [41%] | 66 [9%] | 716 | 5.94% | 5.52% |
+| **tailwind** | 124 [39%] | 153 [48%] | 43 [13%] | 320 | 3.63% | 4.13% |
+| **mixed** | 40 [31%] | 70 [54%] | 19 [15%] | 129 | 2.67% | 1.71% |
+| **headwind** | 373 [48%] | 327 [42%] | 77 [10%] | 777 | 5.57% | 5.22% |
 | *all windows* | 537 | 550 | 139 | 1226 | 4.76% | 4.40% |
 
 Label-conditional forward returns (the full 5-step vocabulary, every row kept):
 
 | Label | n | mean | median |
 |---|---|---|---|
-| strong-tailwind | 274 | 1.36% | 0.71% |
-| tailwind | 966 | 2.42% | 1.77% |
-| balanced | 244 | 3.25% | 2.98% |
-| headwind | 616 | 4.97% | 4.52% |
-| strong-headwind | 354 | 5.50% | 4.63% |
+| strong-tailwind | 226 | 1.05% | 0.21% |
+| tailwind | 907 | 2.87% | 2.46% |
+| balanced | 236 | 2.27% | 1.44% |
+| headwind | 723 | 4.32% | 3.97% |
+| strong-headwind | 362 | 5.58% | 4.88% |
 | null | 0 | —% | —% |
 
 ## B2 (archive era) — the live out-of-sample slice, tiny-n, stated as such
@@ -328,48 +328,48 @@ The 16 archived days re-scored from the readings the rungs actually stamped (the
 
 Joinable at 5td: **11** of 16 days (the last 5 trading days of the corpus have no forward observation). Sign-agreement: 11/11 = 100%. At 20td and 60td: **0 joinable days** (the archive era began 2026-10-15 — no archive day has 20 trading days of forward gold inside a corpus ending 2026-10-31). **n is too small for any claim — this slice verifies the live path produces the same shape as the re-run, nothing more.**
 
-`goldSummary` as the rungs stamped it (the wire field) exists on 2026-10-31 — netScore -2, label headwind; the re-derivation above produces netScore -2, label headwind. The two agree, as the S1 contract (one pure function, ingest and SPA, no drift) requires.
+`goldSummary` as the rungs stamped it (the wire field) exists on 2026-10-31 — netScore -2, label headwind; the S4-frozen table's re-derivation produces netScore -2, label headwind. The two agree, as the S1 contract (one pure function, ingest and SPA, no drift) requires. The PROMOTED 21-voter table reads netScore -2, label headwind on the same day — the tilt is silent there, the promotion changed nothing (the tilt's decade position decides; every future rung stamps the promoted numbers).
 
-## B4 — the tilt-augmented 21-voter variant (the D-5 evidence)
+## B4 — the promotion delta (the S4-frozen 20-voter baseline vs the promoted production 21)
 
-The 21-voter table (`HARNESS_GOLD_VOTERS_21` — the frozen 20 + `breakeven-tilt` in the inflation lane, polarity +1, evaluated by the SAME shared evaluator: level-leg only, like every voter without a 30-day move threshold) over the same 2514 windows:
+The S4-frozen 20-voter baseline (`HARNESS_GOLD_VOTERS_20` — the pre-promotion production table, kept verbatim for lineage) over the same 2514 windows:
 
-- The tilt voter fired in **1174** of 2514 windows (46.7%): tailwind 264 · headwind 910.
-- Label distribution: headwind ×741, tailwind ×907, strong-tailwind ×226, balanced ×236, strong-headwind ×404.
-- Net-score delta (21-voter − 20-voter): -1 ×910, +0 ×1340, +1 ×264.
+- Label distribution: headwind ×634, tailwind ×966, strong-tailwind ×274, balanced ×244, strong-headwind ×396.
+- The promoted voter itself — `breakeven-tilt` (the shared evaluator, level-leg only, like every voter without a 30-day move threshold) — fired in **1174** of 2514 windows (46.7%): tailwind 264 · headwind 910.
+- Net-score delta (promoted − baseline): -1 ×910, +0 ×1340, +1 ×264.
 - Label-bucket flips (tailwind/mixed/headwind changing side): **256** windows (10.2%).
 
-- Horizon 5td: sign-agreement 958/1840 = 52.1% (20-voter: 952/1842 = 51.7%) · tailwind mean return 0.30% vs 0.26% · headwind mean return 0.26% vs 0.29% (n: 1133/1240 tailwind, 1140/1025 headwind).
-- Horizon 20td: sign-agreement 680/1429 = 47.6% (20-voter: 663/1415 = 46.9%) · tailwind mean return 1.02% vs 0.84% · headwind mean return 1.30% vs 1.44% (n: 1133/1240 tailwind, 1125/1010 headwind).
-- Horizon 60td: sign-agreement 452/1029 = 43.9% (20-voter: 446/1016 = 43.9%) · tailwind mean return 2.50% vs 2.19% · headwind mean return 4.74% vs 5.16% (n: 1133/1240 tailwind, 1085/970 headwind).
+- Horizon 5td: sign-agreement 958/1840 = 52.1% (baseline: 952/1842 = 51.7%) · tailwind mean return 0.30% vs 0.26% · headwind mean return 0.26% vs 0.29% (n: 1133/1240 tailwind, 1140/1025 headwind).
+- Horizon 20td: sign-agreement 680/1429 = 47.6% (baseline: 663/1415 = 46.9%) · tailwind mean return 1.02% vs 0.84% · headwind mean return 1.30% vs 1.44% (n: 1133/1240 tailwind, 1125/1010 headwind).
+- Horizon 60td: sign-agreement 452/1029 = 43.9% (baseline: 446/1016 = 43.9%) · tailwind mean return 2.50% vs 2.19% · headwind mean return 4.74% vs 5.16% (n: 1133/1240 tailwind, 1085/970 headwind).
 
-**5td, 21-voter confusion table (±0.47% band):**
-
-| Model ↓ / Move → | up | flat | down | n |
-|---|---|---|---|---|
-| **tailwind** | 542 | 224 | 367 | 1133 |
-| **mixed** | 89 | 50 | 97 | 236 |
-| **headwind** | 515 | 209 | 416 | 1140 |
-
-**20td, 21-voter confusion table (±1.87% band):**
+**5td, the S4-frozen baseline's confusion table (±0.47% band) — the tables the S4 report carried as its primary:**
 
 | Model ↓ / Move → | up | flat | down | n |
 |---|---|---|---|---|
-| **tailwind** | 430 | 436 | 267 | 1133 |
-| **mixed** | 72 | 96 | 68 | 236 |
-| **headwind** | 482 | 393 | 250 | 1125 |
+| **tailwind** | 583 | 242 | 415 | 1240 |
+| **mixed** | 88 | 60 | 96 | 244 |
+| **headwind** | 475 | 181 | 369 | 1025 |
 
-**60td, 21-voter confusion table (±5.60% band):**
+**20td, the S4-frozen baseline's confusion table (±1.87% band) — the tables the S4 report carried as its primary:**
 
 | Model ↓ / Move → | up | flat | down | n |
 |---|---|---|---|---|
-| **tailwind** | 336 | 677 | 120 | 1133 |
-| **mixed** | 65 | 149 | 22 | 236 |
-| **headwind** | 457 | 512 | 116 | 1085 |
+| **tailwind** | 452 | 474 | 314 | 1240 |
+| **mixed** | 94 | 90 | 60 | 244 |
+| **headwind** | 438 | 361 | 211 | 1010 |
 
-**The honest delta:** the tilt fired in 46.7% of windows (mostly headwind: 910 of 1174 — the tilt sat at decade lows, i.e. fading, for most of the corpus) and moved the label bucket in 10.2%. The measured associations barely moved: 5td +0.4pp · 20td +0.7pp · 60td +0.0pp — **no material difference in the measured association** — the 21-voter variant is not better or worse on this corpus, only noisier in its label vocabulary. Whether promotion is worth it is the owner's D-5 call; the evidence here is the delta, not a recommendation.
+**60td, the S4-frozen baseline's confusion table (±5.60% band) — the tables the S4 report carried as its primary:**
 
-Archive era: the tilt's reading exists only from the 2026-10-31 archive (it shipped in S3) — the 21-voter archive slice has n ≤ 1 and is NOT a meaningful table; stated rather than computed into significance.
+| Model ↓ / Move → | up | flat | down | n |
+|---|---|---|---|---|
+| **tailwind** | 350 | 748 | 142 | 1240 |
+| **mixed** | 80 | 144 | 20 | 244 |
+| **headwind** | 428 | 446 | 96 | 970 |
+
+**The honest delta:** the tilt fired in 46.7% of windows (mostly headwind: 910 of 1174 — the tilt sat at decade lows, i.e. fading, for most of the corpus) and moved the label bucket in 10.2%. The measured associations barely moved: 5td +0.4pp · 20td +0.7pp · 60td +0.0pp — **no material difference in the measured association** — the promoted table is not better or worse on this corpus, only noisier in its label vocabulary. The promotion is the owner's MADE call (D-5, decided-YES on this evidence in S4's B4); this section is its measured record — the delta, not a recommendation. The no-edge conclusion of the S4 report carries into the promoted primary tables above unchanged in substance.
+
+Archive era: the tilt's reading exists only from the 2026-10-31 archive (it shipped in S3) — earlier archives score the promoted table with the tilt SILENT (the reading is absent, readable() mutes it), so the two models agree there by construction; the one day that differs is stated in the archive table above, never averaged into significance.
 
 ## Honesty rules (B3) — the known gaps, stated
 
@@ -380,7 +380,7 @@ Archive era: the tilt's reading exists only from the 2026-10-31 archive (it ship
 5. **The realized series is one venue, two provenances:** the backfill is the Yahoo GC=F ~10-year daily record; the tail points are the accumulated live-price seed appends (gold-api spot at append time). The join treats them identically; the mix is recorded here.
 6. **Multiple testing:** 3 horizons × 3 buckets × 2 table-sets × 2 models + the archive slice is ~110 reported numbers; with these n's, ±2–3 percentage-point wobbles are noise. The conclusion below only claims what a stated-in-advance rule can see — the tables themselves make no claim.
 7. **The archive era is plumbing, not power:** 16 days, 11 joinable at 5td, 0 at 20td/60td. It verifies the live path's shape; it cannot verify an edge.
-8. **The asOf-watch (S3's known gap):** day 1 in lockstep; days 2–3 pending the 11-01/11-02 rungs — the corpus ends 2026-10-31 at the S4 run time. Carried to spec §5.
+8. **The asOf-watch (S3's known gap):** day 1 in lockstep; days 2–3 pending the 11-01/11-02 rungs — the corpus ends 2026-10-31 at the harness run time. Carried to spec §5.
 
 ## Conclusion — would this have been visible ex-ante?
 
@@ -388,11 +388,11 @@ The rule was fixed before the run: a directional edge is claimed ONLY if, on the
 
 The mature-base measurements (2021-09-23 → 2026-10-31):
 
-- 5td: sign-agreement 456/975 = 46.8% (2-SE band around 50%: ±3.2% — DEPARTS BELOW 50%) · tailwind−headwind mean spread -0.10%
-- 20td: sign-agreement 330/776 = 42.5% (2-SE band around 50%: ±3.6% — DEPARTS BELOW 50%) · tailwind−headwind mean spread -0.63%
-- 60td: sign-agreement 203/620 = 32.7% (2-SE band around 50%: ±4.0% — DEPARTS BELOW 50%) · tailwind−headwind mean spread -3.09%
+- 5td: sign-agreement 454/968 = 46.9% (2-SE band around 50%: ±3.2% — within the band) · tailwind−headwind mean spread +0.02%
+- 20td: sign-agreement 330/780 = 42.3% (2-SE band around 50%: ±3.6% — DEPARTS BELOW 50%) · tailwind−headwind mean spread -0.22%
+- 60td: sign-agreement 201/617 = 32.6% (2-SE band around 50%: ±4.0% — DEPARTS BELOW 50%) · tailwind−headwind mean spread -1.94%
 
-By the stated rule: **no edge in the table's own direction — the measurable association runs the OTHER way over this corpus.** Every horizon's sign-agreement departs BELOW 50% and the tailwind-minus-headwind mean spread is negative at every horizon: over 2021-09-23 → 2026-10-31, headwind labels preceded LARGER forward rises than tailwind labels did (the 60td spread is -3.09%: headwind windows rose 5.94% on average against tailwind's 2.85%, mature base). This decade's gold advance ran THROUGH tight real rates and a strong dollar — the classical headwinds — so a conditions-reading table built on those relationships reads persistently against the move it lived through. The panel's caption ("conditions, not advice") is not just a disclaimer here; it is the operative description: the table reads the macro regime, and in this regime the regime's direction and gold's direction diverged.
+By the stated rule: **no measurable edge at these horizons over this corpus** — the sign-agreements sit within (or straddle) the 2-SE band and/or the mean spread flips sign across horizons. The frozen table remains what its caption says — a reading of conditions, not advice — and the promotion (D-5, made) is recorded by the delta section above, not by any backtest power.
 
-The ex-ante test, answered honestly: the 20-voter table and its thresholds were authored from classical driver relationships BEFORE this harness computed anything (S1, 2026-10-31; zero threshold changes since), so the numbers above are what an observer with the same table and the same stored histories would have measured at each window — no fitted parameters, no selection. The honest caveat runs the other way: the FLAT BAND, the three horizons and the bucket folds were chosen by the harness author in this session; the stated-in-advance rule above is the guard against that freedom, and the mature-base/all-windows split is reported so the short-base effect is visible, not hidden.
+The ex-ante test, answered honestly: the voter table and its thresholds were authored from classical driver relationships BEFORE this harness computed anything (S1, 2026-10-31; the single change since — the 21st seat — was the owner's scope call on S4's B4 delta, not a parameter this harness tuned, and its measured effect is the promotion-delta section above), so the numbers are what an observer with the same table and the same stored histories would have measured at each window — no fitted parameters, no selection. The honest caveat runs the other way: the FLAT BAND, the three horizons and the bucket folds were chosen by the harness author in this session; the stated-in-advance rule above is the guard against that freedom, and the mature-base/all-windows split is reported so the short-base effect is visible, not hidden.
 

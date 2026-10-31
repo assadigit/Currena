@@ -11,7 +11,7 @@
  *      and tabular like a price;
  *   2. the 5-STEP LABEL — "Strong tailwind" … "Strong headwind", or the
  *      honest "Cannot read yet" when no voter fired;
- *   3. the firing line + the LANE COUNTS — "3 of 20 drivers firing ·
+ *   3. the firing line + the LANE COUNTS — "3 of 21 drivers firing ·
  *      1 tailwind · 2 headwind · 0 mixed" (the counts describe the four
  *      LANES, the spec's own vocabulary);
  *   4. the FOUR SUB-GAUGE READINGS — borrowing costs tight/relief, the

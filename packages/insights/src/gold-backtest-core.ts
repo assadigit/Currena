@@ -25,7 +25,7 @@
  * percentile, the flat band, the pin). Platform-free (AGENTS.md rule 2).
  */
 
-import type { IndicatorId, IndicatorReading } from '@currena/core';
+import type { IndicatorReading } from '@currena/core';
 import type { GoldLane, GoldLaneVoter, GoldSubGaugeWord, GoldTailwindLabel, GoldTailwindReading, GoldVoter } from './gold-score';
 import {
   GOLD_LANE_VOTERS,
@@ -38,20 +38,49 @@ import { evalLeg } from './connections';
 import type { SeriesPoint } from './series';
 
 /* ------------------------------------------------------------------ *
- * B4 — the tilt-augmented 21-voter table (HARNESS-LOCAL copy)
+ * The voter tables the harness re-runs (B4, post-promotion)
  * ------------------------------------------------------------------ */
 
 /**
- * The D-5 evaluation table: the FROZEN 20 voters plus `breakeven-tilt`
- * (T5YIFR − T5YIE) as a 5th member of the inflation lane, polarity +1 —
- * a building tilt (rising/high) is the tailwind side, matching the lane's
- * hot-inflation-supports-hedge-demand reading. This copy exists ONLY in
- * the harness: production's GOLD_LANE_VOTERS is untouched and stays
- * pinned at 20 by its own test.
+ * The PROMOTED production table (D-5, Session 6): the harness's 21-voter
+ * table IS the production `GOLD_LANE_VOTERS` since the promotion landed —
+ * `breakeven-tilt` (T5YIFR − T5YIE) as the 5th member of the inflation
+ * lane, polarity +1, level-leg only (the shared evaluator carries no
+ * 30-day move threshold for it — exactly the variant S4's B4 measured).
+ * The EQUALITY is pinned by test (gold-backtest-core.test.ts): this alias
+ * exists so the harness's own references stay named, and can never drift
+ * from the engine.
  */
-export const HARNESS_GOLD_VOTERS_21: readonly GoldLaneVoter[] = [
-  ...GOLD_LANE_VOTERS,
-  { lane: 'inflation' as const, id: 'breakeven-tilt' as IndicatorId, polarity: 1 as const },
+export const HARNESS_GOLD_VOTERS_21: readonly GoldLaneVoter[] = GOLD_LANE_VOTERS;
+
+/**
+ * The S4 FROZEN 20-voter table — the pre-promotion production table, kept
+ * VERBATIM for lineage (the promotion-delta tables need the table the S4
+ * report measured). Do not edit: it is a historical snapshot, not a living
+ * config; the promotion (Session 6) is the only change between it and
+ * production, which its own pin asserts.
+ */
+export const HARNESS_GOLD_VOTERS_20: readonly GoldLaneVoter[] = [
+  { lane: 'borrowing-costs', id: 'real-yield-10y', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'us10y', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'us30y', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'fed-target', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'fed-expectations', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'ecb-dfr', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'yield-curve-10y2y', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'yield-curve-10y3m', polarity: -1 },
+  { lane: 'dollar', id: 'dollar-basket', polarity: -1 },
+  { lane: 'dollar', id: 'usdjpy', polarity: -1 },
+  { lane: 'dollar', id: 'us-japan-10y-gap', polarity: -1 },
+  { lane: 'stress', id: 'stress-stlfsi', polarity: 1 },
+  { lane: 'stress', id: 'nfci', polarity: 1 },
+  { lane: 'stress', id: 'vix', polarity: 1 },
+  { lane: 'stress', id: 'gold-silver', polarity: 1 },
+  { lane: 'stress', id: 'cftc-gold-positioning', polarity: -1 },
+  { lane: 'inflation', id: 'us-cpi-yoy', polarity: 1 },
+  { lane: 'inflation', id: 'us-pce-core-yoy', polarity: 1 },
+  { lane: 'inflation', id: 'euro-hicp', polarity: 1 },
+  { lane: 'inflation', id: 'breakeven-5y5y', polarity: 1 },
 ];
 
 /* ------------------------------------------------------------------ *
