@@ -5,6 +5,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31x] — gap-closure S2-M2.5: the foreign-holders glossary terms, the narrator's TIC facts (PROMPT_VERSION 9), the About-source row
+
+The bilingual/licence close of the owner's top-priority feature.
+
+- **Glossary (the spec's five, both languages, round-60):** Treasury
+  securities («اوراق خزانه‌داری آمریکا»), foreign official holdings,
+  net purchases («خرید خالص»), valuation change («تغییر ارزش»),
+  custody hub («مرکز امانت‌داری») — plain one-sentence definitions;
+  the narrator vocabulary grows 23 → 28 terms ×2.
+- **The narrator now knows who holds US debt:** the GLOBAL section's
+  state carries a compact `tic` block (dataMonth, totalTn, the
+  Japan/China six-month changes + 12-month net TRANSACTIONS sums, the
+  top-3 buyers/sellers, the custodyNote) — the page's OWN derived
+  numbers; the AI only explains. The cron reads `insights:tic:v1`
+  (+1 KV read on the :50 rung); a missing key degrades calmly. The
+  prompt weaves one-or-two facts with the no-causes rule intact; the
+  template fallback renders the total + the headline holders (two
+  sentences — V2's 35-word cap; Persian holder names + the digit
+  mapper, pinned by the V1–V11 validators). Golden fixtures updated
+  (global-live gains a REAL tic input + the expected projection).
+  Stored narratives regenerate on the next :50 rung.
+- **About this data:** the TIC provider row (the register's `us-tic`
+  mirrored; the pin test extended) + `COMPOSITE_SOURCE_ROWS` — the
+  composite datasets the per-indicator sidecar never lists, honestly
+  in the table. Live-verified: "U.S. Treasury TIC (SLT tables —
+  foreign holdings of US Treasuries) · 2 series · L0".
+- **Tests:** gates ALL GREEN — **10,481** (the layer1 validator
+  7,930 → 8,000 assertions). Bundle: Insights lazy raw 1170 → 1175
+  (the 10 glossary strings ×2 dictionaries; justified).
+- **Live:** api worker `3e6dbb2d`; health/tic/insights all 200.
+
 ## [2026-10-31w] — gap-closure S2-M2.4: "Who holds US government debt" — the section is LIVE (headline, split bar, movers chips, Japan+China chart, the sortable table, the custody caveat; EN + fa; browser-verified at 360/1200)
 
 The owner's top-priority feature is now on the page: a full section
