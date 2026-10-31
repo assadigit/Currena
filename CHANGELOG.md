@@ -5,6 +5,88 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31e] — Gold Program S4: the backtest harness (B1–B4 — the measured D-5 evidence, and the honest no-edge verdict)
+
+Session 4 of the Gold Program, implementing
+`docs/insights/GOLD_BACKTEST_SPEC.md` (its §5 validation record is filled
+with the session's measured numbers). The first test of the ENGINE'S
+HYPOTHESIS — that the 20-voter table's net direction relates to where gold
+actually goes — not just its mechanism:
+
+- **The corpus recorder** — `scripts/gold-corpus-dump.ts`
+  (`pnpm --filter @currena/insights gold-corpus-dump`): a read-only KV
+  REST dump of exactly what the harness needs — the stage blob's series
+  for the 20 voters + breakeven-tilt + gold-usd + the D-6 cross-fill legs
+  (us10y = DGS10, breakeven-10y = T10YIE, t5yie), the verbatim
+  `insights:hist:gold-usd` realized-move series, and the 16 archived days'
+  readings (each zod-validated with the production
+  `InsightsSnapshotSchema` before extraction). Recorded to
+  `fixtures/gold-backtest-corpus.json` (688 KB, committed static evidence —
+  the fixtures discipline; credentials from the environment only, never
+  recorded). Zero KV writes.
+- **The pure core** — `src/gold-backtest-core.ts` + 28 tests
+  (`src/gold-backtest-core.test.ts`): the harness-local parameterized copy
+  of the score arithmetic (`scoreOverVoters`) **pinned deep-equal to the
+  production `goldTailwindScore`** on synthetic batteries; the
+  tilt-augmented `HARNESS_GOLD_VOTERS_21` (the frozen 20 + breakeven-tilt
+  in the inflation lane, polarity +1 — production's `GOLD_LANE_VOTERS`
+  untouched, the 20-voter pin test stays green); the no-lookahead
+  truncation (`seriesUpTo`, with truncated-vs-full equality and a
+  future-spike mutation test over `computeReading`); the exact
+  N-observation forward-return join; the flat band (the engine's own
+  ±2%/30-day `GOLD_REALITY_SPEED_PCT` bar, linearly scaled to each
+  horizon's calendar length — ±0.47% / ±1.87% / ±5.60%); the bucket folds
+  and the sign-agreement rule.
+- **The harness** — `scripts/gold-backtest.ts`
+  (`gold-backtest`): re-runs the FROZEN table at a frozen clock over
+  **2,514 windows** (every gold trading day 2016-11-02 → 2026-10-31; no
+  wall-clock reads anywhere), applies the D-6 cross-fill to the real-yield
+  scoring input exactly as in production (**0 fills across all windows** —
+  the dense stored series, the S3 audit's expectation, counted aloud),
+  joins 5/20/60-trading-day forward returns, re-scores the 16 archive days
+  from the readings the rungs actually stamped (the live out-of-sample
+  slice), evaluates the 21-voter variant, and writes
+  `docs/insights/BACKTEST-GOLD.md` (BACKTEST.md's format; every cell
+  carries n; all 9+ confusion cells per table reported).
+- **The honest findings** (all measured, none narrated — the conclusion
+  follows a stated-in-advance rule: 2-SE binomial departure + sign-
+  consistent spread, direction stated): over the stored-history corpus
+  the table's net direction shows **no edge in its own direction — the
+  measurable association runs the OTHER way at the longer horizons**.
+  Mature-base sign-agreements (≥ 2021-09-23): 46.8% / 42.5% / 32.7% at
+  5/20/60td, each departing BELOW the 50% coin; headwind labels preceded
+  LARGER forward rises (the 60td tailwind−headwind mean spread is
+  −3.09%: headwind windows +5.94% vs tailwind +2.85%). This decade's gold
+  advance ran through tight real rates and a strong dollar — the
+  classical headwinds — so the conditions-reading table reads against the
+  move it lived through; the panel's "conditions, not advice" caption is
+  the operative description. **B4 (D-5's evidence):** the tilt fires in
+  46.7% of windows, moves the label bucket in 10.2%, and shifts the
+  sign-agreements by +0.4/+0.7/+0.0pp — **no material difference**; the
+  promotion remains the owner's call. The archive era (16 days, 11
+  joinable at 5td, 0 at 20/60td) is plumbing, not power — stated.
+- **The asOf-watch (§0's first action):** the corpus verified live
+  (`goldSummary` + `breakeven-tilt` present; 16 archive days; the newest
+  carries goldSummary); day 1 of the trio watch stands in lockstep (both
+  the trio and the decade group +1 trading day at the same rung), **days
+  2–3 are not yet observable** — the corpus ends 2026-10-31 at the S4 run
+  time; the watch carries forward (spec §5).
+- **The docs chain** — `GOLD_BACKTEST_SPEC.md` §5 filled + the decision
+  log's D-5 entry updated (evidence delivered, the owner's call) ·
+  `BACKTEST-GOLD.md` (the report) · `AGENTS.md` §A's Gold Program
+  paragraph updated to the S4 state · the fixtures README's corpus row ·
+  this entry. No production code touched (script-side + docs + one new
+  pure module with its tests); no voter-table changes; no new upstream
+  sources (D-7 stays NO — the EODHD key never touched disk); no bundle
+  changes; no archive pruning (D-8).
+- **Validation** — `corepack pnpm -r test` green (insights gains the 28
+  harness tests) · `corepack pnpm -r typecheck` 6/6 · eslint clean on
+  every touched file · `pnpm copy:audit` clean (no copy moved) ·
+  `corepack pnpm gates` green (secret scan clean). CI stays red
+  account-wide (the GHA-minutes exhaustion, owner-known).
+
+
+
 ## [2026-10-31d] — Gold Program S3: the FRED gap-fillers (the real-yield audit + the bounded cross-fill + the trio split + breakeven-tilt)
 
 Session 3 of the Gold Program, implementing

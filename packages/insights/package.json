@@ -38,7 +38,9 @@
     "regression:generate": "tsx scripts/generate-regression-episodes.ts",
     "narrator:vocabulary": "tsx scripts/generate-narrator-vocabulary.ts",
     "narrator:vocabulary:check": "tsx scripts/check-narrator-vocabulary.ts",
-    "local-export": "tsx scripts/local-export.ts"
+    "local-export": "tsx scripts/local-export.ts",
+    "gold-corpus-dump": "tsx scripts/gold-corpus-dump.ts",
+    "gold-backtest": "tsx scripts/gold-backtest.ts"
   },
   "dependencies": {
     "@currena/core": "workspace:*",
