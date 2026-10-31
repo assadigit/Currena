@@ -11,13 +11,13 @@ file at the end of every milestone (tick the box, add evidence) and every sessio
 
 | Session | Theme | Milestones done | % |
 |---|---|---|---|
-| S1 | Foundation and trust | 3 / 7 | 43% |
+| S1 | Foundation and trust | 4 / 7 | 57% |
 | S2 | Foreign holdings of US Treasuries (priority feature) | 0 / 6 | 0% |
 | S3 | US credit, liquidity, fiscal and growth nowcast | 0 / 6 | 0% |
 | S4 | Geopolitics, supply chain and energy | 0 / 6 | 0% |
 | S5 | Australia deep-dive and Australian markets | 0 / 6 | 0% |
 | S6 | New Zealand link, China and world links, promotion and polish | 0 / 6 | 0% |
-| **Total** | | **3 / 37** | **8%** |
+| **Total** | | **4 / 37** | **11%** |
 <!-- gap-progress:end -->
 
 Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in production):
@@ -55,7 +55,12 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
   - `scripts/gap-progress.mjs` (Node ESM, zero deps): counts `- [x]`/`- [ ]` per `### S<n>` session section (indented evidence bullets and G-gap items never match) and rewrites the Summary table + last-updated line between `<!-- gap-progress:begin/end -->` markers; fails loudly if the markers or sections are missing. `pnpm gap:progress` + `pnpm gap:progress:test` wired into the root package.json.
   - Tests: `scripts/gap-progress.test.mjs` (node:test, 6 tests — counts, theme preservation, regeneration, **idempotency**, loud failures) against `tests/fixtures/gap-progress-sample.md`. 6/6 pass. First run caught one test-authoring slip (asserted `[ ]` where the fixture has `[x]`) — fixed; the tool itself was correct.
   - Verified live on the real file: 2/37 → S1 2/7 29%, second run byte-identical (idempotent), `--check` exits 0. `pnpm gates` green (10,296 tests; eslint accepts the script).
-- [ ] M1.4 Stale-voter honesty
+- [x] M1.4 Stale-voter honesty
+  - **Current behaviour found (documented per spec task 1):** a `stale`-status member was already excluded from voting (`votable()` in `gauges.ts`), and statuses are computed at INGEST time (scoring.ts, `staleAfterDays ?? GRACE_DAYS[cadence]`); the summary carried only an undifferentiated `excludedCount`; the UI-06 badge copy existed in both dictionaries but rendered **nowhere**. **The defect:** exclusion shrank the warning-share denominator, so a CALM member going stale could RAISE the gauge step — 1 fresh warning + 1 stale member read 1/1 = 100% → step 4 “alarmed” (pinned by an old test, now rewritten).
+  - **Fix (commit `d43725e`, RULE_VERSION 3):** a stale member never votes and never shrinks the base — share = warnings / (fresh voters + stale) — so a reading going out of date can only make its gauge MILDER, never more severe; unavailable members stay fully excluded (no reading exists to dilute with); an all-stale gauge stays step 0 (cannot read). The summary now names the out-of-date voters (`staleCount` + `staleVoters`, additive optional zod fields — old snapshots still parse). The hero verdict cards and gauge headers show a calm “n of m readings out of date” badge (EN + fa, copy round-57: «{n} مورد از {total} قرائت قدیمی است», terminology consistent with `healthStaleChip`); the card is never hidden.
+  - **Tests:** 6 new engine tests + 4 new web tests; 10,306 total green (gates ALL GREEN 1m51s). The severity-monotonicity cases: calm→stale never raises the step; warning→stale only lowers it; the section verdict never rises end-to-end.
+  - **Deploy + verify:** worker `d672a562` (18:20 UTC); `/api/health` ok, `/api/insights` 200, browser EN+fa at 1200/360 zero console errors. **Honest production record:** the live snapshot has NO status-stale members today — the RBA trio (asOf 2026-09-30) sits at 31 of its 40-day monthly window (the D-21 refinement), so verdicts are UNCHANGED today (Global stressed 9/32, Australia stressed 7/16 before and after) and the badge fires naturally when the trio crosses 40 days (~2026-11-09 without fresh data). Fixture evidence (live page + API response with the trio forced stale): hero badge “3 of 16 readings out of date” + gauge header “3 of 5”, fa «۳ مورد از ۱۶ قرائت قدیمی است», AU gauge 4→3, section verdict stays 3 (`evidence/M1.4/en-badge-fixture.png` + fa twin). The stored summary’s new fields first ride tomorrow’s 04:20 ingest (the served snapshot from 04:20 today still shows ruleVersion 2 by design — snapshots carry the version that produced them).
+  - Budget: Insights lazy chunk 1136.1/267.5 → **1138/268** (measured 1137.37/267.78; the audited badge copy + wiring; justified in `check-bundle-budget.mjs` + CHANGELOG). Registry + narrator vocabulary regenerated (ruleVersion 3).
 - [ ] M1.5 Australian data continuity (RBA)
 - [ ] M1.6 Audit bug fixes
 - [ ] M1.7 Capacity scaffolding

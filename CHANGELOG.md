@@ -5,6 +5,50 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31p] — gap-closure S1-M1.4: stale-voter honesty — a stale gauge member can never make its gauge look worse (RULE_VERSION 3); the summary names the out-of-date voters; the calm out-of-date badge ships in EN + fa
+
+The gap analysis's core honesty defect, fixed at the arithmetic level: a
+stale member was already excluded from voting, but the exclusion SHRANK the
+warning-share's denominator — so a calm member's reading going out of date
+could RAISE its gauge's step (1 fresh warning + 1 stale member read 1/1 =
+100% → "alarmed"; the old test that pinned exactly that is rewritten).
+
+- **Engine (`packages/insights/src/gauges.ts`, RULE_VERSION 3):** the share
+  is now warnings over fresh voters PLUS stale members — a stale member
+  never votes and never shrinks the base, so staleness can only make a
+  gauge MILDER (a warning member going stale lowers the share; a calm one
+  leaves it). Unavailable members stay fully excluded (no reading exists to
+  dilute with); an all-stale gauge stays step 0, cannot-read. 6 new engine
+  tests pin the monotonicity both directions, the all-stale case, the
+  unavailable scope guard, and the end-to-end section-verdict guard.
+- **Contract:** `SummaryLine` gains additive optional `staleCount` +
+  `staleVoters` (zod in `packages/core`) — the ingest's summary now NAMES
+  the out-of-date voters; old stored snapshots still parse (the fields are
+  optional), and tomorrow's 04:20 ingest is the first to carry them.
+- **UI:** the hero verdict cards and the gauge headers show a calm
+  "n of m readings out of date" badge (`data-stale-badge`), counted from
+  the same pure readings the verdicts come from — the card is never
+  hidden. EN `'{n} of {total} readings out of date'` + fa
+  «{n} مورد از {total} قرائت قدیمی است» (Persian-copy round-57, recorded
+  in the manifest; terminology consistent with `healthStaleChip` /
+  `heroStaleSuffix`). 4 new web tests cover presence, counts, the
+  unavailable-doesn't-trigger guard and the fa rendering with fa-IR digits.
+- **Honest production record:** the live snapshot has NO status-stale
+  members today — the RBA trio sits at 31 of its 40-day monthly window
+  (the D-21 refinement), so today's verdicts are unchanged (Global
+  stressed 9/32 · Australia stressed 7/16, before and after). The badge
+  fires naturally when a member actually crosses its window (~2026-11-09
+  for the RBA trio absent fresh data). Fixture evidence (the live page
+  with the API response's trio forced stale): EN "3 of 16 readings out of
+  date" + the gauge header's "3 of 5", fa «۳ مورد از ۱۶ قرائت قدیمی است»,
+  the AU inflation gauge 4→3, section verdict steady at 3
+  (`docs/gap-closure/evidence/M1.4/`).
+- **Budget:** Insights lazy chunk 1136.1/267.5 → 1138/268 (measured
+  1137.37/267.78 — the audited badge copy + wiring; justified per the
+  gate's rule). Registry (`data/indicators.json` ruleVersion 3) and the
+  narrator vocabulary regenerated. Gates ALL GREEN, **10,306 tests**
+  (insights 973→979 · web 8677→8681). Deployed as worker `d672a562`.
+
 ## [2026-10-31o] — gap-closure S1-M1.3: progress tooling — `pnpm gap:progress` regenerates the PROGRESS.md Summary deterministically (6/6 tests, idempotent)
 
 - **`scripts/gap-progress.mjs`** (new, Node ESM, zero dependencies): parses
