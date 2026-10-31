@@ -5,6 +5,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31u] — gap-closure S2-M2.2: the TIC parser, data model and rung3 registration — `insights:tic:v1` written LIVE via the manual lever (data month 2026-08, 21 holders)
+
+The owner's top-priority feature's ingest layer, live in production. The
+two verified SLT tables now flow through a fail-closed parser + builder
+into ONE KV key, on the S1-built rung3 (04:30 UTC) — the 04:10 main
+rung untouched.
+
+- **`packages/insights/src/tic/` (new):** parse.ts fails closed on every
+  spec case (column counts, the units line, the machine field-id row,
+  `YYYY-MM` headers, month contiguity, sum-of-parts, plausible
+  magnitudes); model.ts merges Table 5 + Table 3 by the explicit
+  21-name slug map with the same-vintage guard (both tables must carry
+  the same data month — vintages are never mixed), the ≤$0.06bn
+  per-country cross-check and the Grand-Total check; `n.a.` transaction
+  months are ABSENT, never zeroed (the 2023-02 series break);
+  implausible month-over-month jumps (>$50bn AND >60%) are FLAGGED
+  (`flaggedMonths`), never dropped. compute.ts derives the honest
+  split the section is built on: 12-month net TRANSACTIONS sums
+  (Table 3 "Net U.S. Sales" — real buying/selling) vs 12-month
+  VALUATION sums (the price effect), plus share/1m/6m/12m changes,
+  ranks and the top movers. store.ts: the one-key `insights:tic:v1`
+  contract, zod-validated on write AND read, poisoned-key defense.
+- **Rung3 registration:** `EXTRA_SOURCES` lands `tic-slt` — budget 4
+  (2 fetches + 1 idempotence read + ≤1 write), the release-aware gate
+  (daily on the 15th–25th until the new data month appears, otherwise
+  Saturdays), sweep-healed within hours on failure. The manual lever
+  `POST /internal/insights-ingest?phase=extra` runs it with the day
+  gate bypassed (force mode) — the post-deploy verification path.
+- **Live proof (production):** first manual trigger 21:31 UTC timed
+  out honestly (ticdata >12 s; `failed` recorded, no in-invocation
+  retry — F-11); the 21:40 UTC re-trigger wrote the snapshot —
+  `data month 2026-08, 21 holders`, rung budget 5/50, releasedAt
+  2026-10-16 (the provider's own Last-Modified). Read back via the CF
+  REST API: total 9,331.7 bn (official 3,755.6 / private 5,576.1),
+  Japan 1,068.3 bn trending down (−37.0 bn net sales in 2026-08 alone),
+  China 590.7 bn, Australia 79.9 bn.
+- **Tests:** +49 (45 against the real fixtures with expected values
+  cross-checked by awk sums; 4 api-side). Gates ALL GREEN — 10,380.
+- **REFRESH_SECRET rotated** (the documented unrecoverable-value
+  pattern; new value in `apps/api/.dev.vars`, gitignored) — the manual
+  levers needed it and the prior session's sandbox held the old value.
+  Api worker `db71eb3a` (deployed 21:17:32 UTC, verified 100%).
+
 ## [2026-10-31t] — gap-closure S2-M2.1: TIC source verification — fixtures, layouts, the L0 licence records
 
 The owner's top-priority feature's data source, verified and pinned before

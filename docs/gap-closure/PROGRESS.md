@@ -12,12 +12,12 @@ file at the end of every milestone (tick the box, add evidence) and every sessio
 | Session | Theme | Milestones done | % |
 |---|---|---|---|
 | S1 | Foundation and trust | 7 / 7 | 100% |
-| S2 | Foreign holdings of US Treasuries (priority feature) | 1 / 6 | 17% |
+| S2 | Foreign holdings of US Treasuries (priority feature) | 2 / 6 | 33% |
 | S3 | US credit, liquidity, fiscal and growth nowcast | 0 / 6 | 0% |
 | S4 | Geopolitics, supply chain and energy | 0 / 6 | 0% |
 | S5 | Australia deep-dive and Australian markets | 0 / 6 | 0% |
 | S6 | New Zealand link, China and world links, promotion and polish | 0 / 6 | 0% |
-| **Total** | | **8 / 37** | **22%** |
+| **Total** | | **9 / 37** | **24%** |
 <!-- gap-progress:end -->
 
 Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in production):
@@ -91,7 +91,12 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
   - **Hex-dump verdict:** real TABs throughout Table 5 — the planning-chat "merged numbers" (`862.5901.3`) was a chat-preview artifact (UK 2025-09 `862.5` + TAB + `901.3`).
   - Table 3 layout fully mapped (was "partial"): 10 columns, millions, 2020-01 → 2026-08, ~106 rows incl. **Australia (code 60089)**, `Of Which: Foreign Official/Non-Official` + Memo rows, custody caveat verbatim in the footer, **`n.a.` transactions before 2023-02** (holdings go back to 2020-01) — 12-month sums must skip `n.a.`, never zero them. Sign: positive net = foreigners bought. Cross-check T3↔T5 passed (Japan 1068283 M = 1068.3 B; Grand Total 9331654 M = 9331.7 B).
   - Docs: method card SCRAPING_SPEC FS-08; VERIFIED-SOURCES T3 partial→verified + log row; LICENCES.md + RISK_REGISTER.md rows; licences.ts provider `tic` + sources.ts `us-tic` (L0, 17 U.S.C. § 105, quoted custody caveat). No indicator ids yet → no registry/audit change → **no deploy** (docs + fixtures + register rows only; gates green 10,331). Commit `d720dd9`.
-- [ ] M2.2 Parser, data model and ingest rung
+- [x] M2.2 Parser, data model and ingest rung
+  - **The fail-closed merge (commit `876e4d0`):** `packages/insights/src/tic/` — parse.ts (column counts, the units line, the machine field-id row, `YYYY-MM` headers, month contiguity, sum-of-parts, plausible magnitudes — every spec rejection case), model.ts (the 21-name slug map, custody hubs, the same-vintage guard, the ≤$0.06bn T5↔T3 cross-check, flaggedMonths — implausible jumps FLAGGED never dropped), compute.ts (share/1m/6m/12m changes, net-12m TRANSACTIONS sums vs valuation-12m price effect, ranks, top movers, the 70-day stale gate — all pure), store.ts (`insights:tic:v1` one-key reader/writer ports, poisoned-key defense), job.ts (2 fetches, honest 12 s single attempt, idempotent same-month skip, blocked/format-changed/failed taxonomy).
+  - **Rung3 registration:** `EXTRA_SOURCES` carries `tic-slt` — budget 4 (2 fetches + 1 read + ≤1 write), the release-aware gate (daily on the 15th–25th until the new data month appears, else Saturdays), force mode on the manual lever. RUNGS.md row updated. Nothing added to the 04:10 main rung; no new cron trigger.
+  - **Tests:** 49 new (45 tic-suite against the real fixtures — expected values cross-checked by awk sums of the fixtures themselves; 4 api-side: gate boundaries, registration shape, force mode, phase validation). Gates ALL GREEN — **10,380 tests** (core 195 · scraper 67 · insights 1034 · markets 13 · api 385 · web 8686).
+  - **Deploy + the manual trigger (the acceptance):** api worker **`db71eb3a`** (deployed 21:17:32 UTC by the prior session; verified live this session). Manual lever `POST /internal/insights-ingest?phase=extra` (force mode): first attempt 21:31 UTC **timed out honestly** (ticdata answered >12 s; recorded `failed` — no retry inside the invocation, F-11), re-trigger 21:40:20 UTC **succeeded**: `tic-slt ok — "written — data month 2026-08, 21 holders"`, budget **5/50** (status write + the declared 4). `insights:tic:v1` read back via the CF REST API and validates: dataMonth 2026-08, releasedAt 2026-10-16, total 9331.7 bn, official 3755.6 / private 5576.1, 21 holders × 24 months, Australia 79.912 bn (Table 3), Japan 1116.7→1103.9→1068.3 bn with net sales −37.0 bn (2026-08). `/api/health` ok, `/api/insights` 200. **KV writes for the rung: 2** (tic + status); daily steady-state 1–2.
+  - **REFRESH_SECRET rotated** at 21:39 UTC (the documented unrecoverable-value pattern — DEPLOY.md 2026-10-21/10-28 precedents; the prior session's sandbox held the value): new value in `apps/api/.dev.vars` (gitignored) + `wrangler secret put`. Scheduled rungs never read it; only the manual levers do. Owner can re-rotate anytime.
 - [ ] M2.3 Public endpoint, store and calendar
 - [ ] M2.4 UI: holders table, trend chart, weekly custody card
 - [ ] M2.5 Bilingual copy, glossary, narrator and licences
