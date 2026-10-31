@@ -130,6 +130,64 @@ run it (or the individual gates) before deploying. Repair is owner-side:
 5. Keep the local-gate discipline regardless: `pnpm gates` green before
    every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-10-31k the Gold Program S6 deploy — the 21-voter table rides production (worker 21ca25ab at 100%; the Insights chunk byte-identical; goldSummary −2/headwind as predicted)
+
+The owner's fifth credential round ("continue your work" with a fresh
+pair). The "Workers API" token (`cfut_dGmEj…`) verified ACTIVE at
+/user/tokens/verify and passed the real scope tests: Workers services
+list (`currena-api`, last modified 15:16:35Z — the S5 deploy) and the KV
+namespaces list (RATES), plus the S5-style throwaway KV write probe
+(PUT→GET→DELETE `probe:round5:*` — Workers KV Storage: Edit, the
+ingest's REST scope). The "AI WORKERS" token answered Invalid (the
+S5-rounds Workers-AI-scoped one — not needed; the narrator runs on the
+account-bound `env.AI` binding). With scope in hand, the runbook ran in
+order:
+
+- **Gates first**: `pnpm gates` ALL GREEN (1m56s) — secret scan 8·687 ·
+  typecheck 6 · lint 0/0 · copy:audit · narrator vocabulary 131×2+23×2 ·
+  narrator eval 50 · layer1 strict 7930/7930 · full suite 10,296 tests ·
+  budget entry 294.45/88.48 · Insights lazy 1136.01/267.29 (ceiling
+  1136.10).
+- **Deploy-lock check**: `wrangler deployments list` — production at
+  `d77e9139` since 15:16:34 UTC (the S5 deploy), no parallel session.
+  Clear.
+- **DEPLOY**: `pnpm --filter @currena/api exec wrangler deploy` (the SPA
+  freshly built by the gates' build step) → **currena-api version
+  `21ca25ab-295f-40f6-83ee-4fb2ca6ad210` at 100%** (17 new files, 103
+  already uploaded; RATES KV + AI + ASSETS + the narrator vars +
+  SITE_MODE=public intact; cron `* * * * *`).
+- **Post-deploy smoke (all green)**: `/api/health` ok on both
+  `currena-api.sedanama-ir.workers.dev` and `currena.ir` (kv ok) ·
+  `/api/rates?source=tgju` a fresh snapshot (fetchedAt 16:06:19Z — the
+  ever-green cron) · parity math 100 USD → 27,050,000 IRR @ 270,500 ·
+  AED→EUR correctly rejected on the unsupported-currency path (the
+  2026-09 smoke's 503 shape now answers 400 JSON) · `/admin`
+  Worker-first (401 text/html — the ADMIN_VIEW_SECRET sign-in gate
+  armed; the Worker answered, not the SPA shell) · `robots.txt`
+  correct · `/receipt` SPA shell 200.
+- **The S6-specific live verification**:
+  - `goldSummary` serving: **netScore −2 / headwind / 6 firing** —
+    exactly the S6 prediction (the tilt reads −0.24 at its 21.7th
+    percentile, mid-range, SILENT; the stamped reading stands unchanged
+    under both the 20- and 21-voter tables). The promoted table
+    computes every rung from the deploy forward.
+  - The lazy Insights chunk **byte-identical** to the local build
+    (1,136,013 bytes, `Insights-ZaWxnIwP.js`) — the 21-voter table (the
+    `breakeven-tilt` entries + "Inflation tilt" EN + «شیب انتظارات
+    تورمی» fa) now serves on currena.ir.
+- **The Actions-secret rotation, attempted and recorded**: the round-5
+  token would be the natural rotation for the repo secret, but
+  `/actions/public-key` answers 404 for the session's GitHub token
+  (full scopes shown, admin on the repo — a grant quirk; the secrets
+  LIST works, the public-key fetch does not). The secret still holds
+  S5's round-4 rotation from 15:19:16 UTC the same day (verified working
+  when it deployed `d77e9139`), so the 04:20 UTC ingest belt path
+  stands. Rotation remains owner-side (`gh secret set …`) only if the
+  ingest ever fails on auth.
+- **What remains**: the grown-corpus refresh + the asOf-watch days 2–3
+  verdict ride the scheduled 2026-11-02 04:30 UTC re-check (now over
+  the promoted table). Nothing credential-blocked remains.
+
 ## Session record — 2026-10-28h the Insights Layer-2 narrator — Cloudflare Workers AI DEPLOYED LIVE (worker 4b21428e at 100%; NARRATOR_PROVIDER=cloudflare + NARRATOR_ENABLED=true; preview-only; first real AI text on currena.ir)
 
 The owner asked to "push merge commit deploy on live site so i can see." The

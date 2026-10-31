@@ -291,11 +291,16 @@ the S4-frozen table for lineage) and the GOLD_SCORE_SPEC bump (§2.1 +
 §5.1) all landed; the backtest re-ran the promoted table over the
 corpus-of-record (sign-agreements 52.1/47.6/43.9% vs the baseline's
 51.7/46.9/43.9 — no material difference; the mature-base 5td nuance is
-recorded in GOLD_BACKTEST_SPEC §5 Session 6). NEXT: the 2026-11-02
+recorded in GOLD_BACKTEST_SPEC §5 Session 6). The S6 DEPLOY landed
+live 2026-10-31 16:07 UTC (the fifth credential round — the owner's
+"Workers API" token active with the deploy + KV scopes; gates ALL
+GREEN 10,296 tests in 1m56s; deploy-lock clear at d77e9139; worker
+version 21ca25ab at 100%; live-verified: goldSummary −2/headwind
+exactly as predicted, the Insights lazy chunk byte-identical to the
+local build with the 21-voter table EN + fa). NEXT: the 2026-11-02
 automated re-check (asOf-watch days 2–3 verdict + the grown-corpus
 refresh with the 11-01/11-02 archive days, now over the promoted
-table) + the S6 deploy (pending a Cloudflare token in-session — the
-round-4 token lives only in the repo Actions secret). The S5 close-out
+table). The S5 close-out
 was FULLY LANDED as of 2026-10-31 ~15:15 UTC (the fourth credential
 round): PR #9 merged as 758298d (+ the postscript b4ac1ab, CI
 365/366 green), DEPLOYED live as worker version d77e9139 (the

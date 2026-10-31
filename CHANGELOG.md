@@ -5,6 +5,58 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31k] — Gold Program S6 deploy: LANDED LIVE (21ca25ab) — the 21-voter table rides production; the Insights chunk byte-identical; goldSummary −2/headwind exactly as predicted
+
+The fifth credential round closed the last open S6 item. The owner's
+"Workers API" token (`cfut_dGmEj…`) verified ACTIVE at
+/user/tokens/verify and passed the real scope tests (Workers services
+list · KV namespaces list), the runbook ran in order, and the promoted
+21-voter table now computes in production:
+
+- **Gates first:** `pnpm gates` ALL GREEN (1m56s) — 10,296 tests · secret
+  scan 8·687 · typecheck 6 · lint 0/0 · copy:audit · narrator vocabulary
+  131×2+23×2 · narrator eval 50 · layer1 strict 7930/7930 · budget entry
+  294.45/88.48 · Insights lazy 1136.01/267.29 (ceiling 1136.10). Then the
+  deploy-lock check: production at `d77e9139` since 15:16:34 UTC (the S5
+  deploy) — no parallel session. Clear.
+- **DEPLOY:** `pnpm --filter @currena/api exec wrangler deploy` (SPA freshly
+  built by the gates' build step) → **currena-api version
+  `21ca25ab-295f-40f6-83ee-4fb2ca6ad210` at 100%** (17 new files, 103
+  already uploaded; RATES KV + AI + ASSETS + the narrator vars +
+  SITE_MODE=public intact; cron `* * * * *`).
+- **Live-verified end-to-end:** `/api/health` ok on both
+  `currena-api.sedanama-ir.workers.dev` and `currena.ir` (kv ok) ·
+  `/api/rates?source=tgju` a fresh snapshot (fetchedAt 16:06:19Z — the
+  ever-green cron) · parity 100 USD → 27,050,000 IRR @ 270,500 · the
+  smoke set green (AED→EUR correctly rejected on the unsupported-currency
+  path — the 2026-09 smoke's 503 shape now answers 400 JSON; `/admin`
+  Worker-first behind its ADMIN_VIEW_SECRET sign-in gate, 401 text/html
+  from the Worker, not the SPA shell; robots.txt correct; `/receipt` SPA
+  shell 200) · `goldSummary` serving **netScore −2 / headwind / 6 firing
+  — exactly the S6 prediction** (the tilt reads −0.24 at its 21.7th
+  percentile, mid-range, SILENT; the stamped reading stands unchanged
+  under both the 20- and 21-voter tables) · the lazy Insights chunk
+  **byte-identical to the local build** (1,136,013 bytes,
+  `Insights-ZaWxnIwP.js`) — `breakeven-tilt` ×2 + "Inflation tilt" (EN) +
+  «شیب انتظارات تورمی» (fa ×3) serve on currena.ir. The promoted numbers
+  ride every rung from the deploy forward.
+- **Credential notes, measured:** the "AI WORKERS" token (`cfut_S4S0…`)
+  now answers Invalid at verify — not needed: the narrator runs on the
+  account-bound `env.AI` binding, no token stored anywhere. The round-5
+  token additionally passed the S5-style throwaway KV write probe
+  (PUT→GET→DELETE on `probe:round5:*`, all success — Workers KV Storage:
+  Edit, the ingest's REST scope). The repo Actions-secret rotation was
+  attempted but `/actions/public-key` answers 404 for this GitHub token
+  (full scopes shown, admin on the repo — a grant quirk); the secret
+  still holds S5's round-4 rotation from 15:19:16 UTC today (verified
+  working when it deployed d77e9139), so the 04:20 UTC ingest belt path
+  stands — rotation remains owner-side only if the ingest ever fails
+  on auth.
+- **What remains:** only the scheduled 2026-11-02 04:30 UTC re-check
+  (asOf-watch days 2–3 verdict + the grown-corpus refresh with the
+  11-01/11-02 archive days, now over the promoted table). Nothing
+  credential-blocked remains.
+
 ## [2026-10-31j] — Gold Program S6: the D-5 promotion LANDED — the voter table is 21 (breakeven-tilt, inflation lane), all four gated-session gates + the fresh backtest re-run
 
 The owner's "go" opened the session S5's decision log prescribed
