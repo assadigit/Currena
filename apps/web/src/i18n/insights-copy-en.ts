@@ -6288,6 +6288,15 @@ export const insightsCopyEn = {
         headwind: 'headwind',
       },
       footnote: 'A descriptive score of the classic driver relationships — conditions, not advice.',
+      // Gold Program S5 (C4a, 2026-10-31): the measured-reality note — the
+      // S4 backtest's verdict, stated on the panel itself. The table reads
+      // conditions; over 2016–2026 its lean showed no positive association
+      // with gold's next 5–60 days (BACKTEST-GOLD.md). The link word beside
+      // it points at the full public report (GoldTailwindPanel's
+      // GOLD_BACKTEST_URL).
+      measuredNote:
+        'Measured against gold’s actual moves over 2016–2026: the table’s lean showed no positive association with the next 5–60 days — if anything, headwind readings came before larger rises. It reads conditions, not direction.',
+      measuredNoteLink: 'Read the full backtest',
     },
     goldModelVsReality: {
       title: 'Model vs reality',

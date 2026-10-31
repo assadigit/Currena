@@ -1,7 +1,13 @@
 # GOLD_BACKTEST_SPEC — Session 4: the gold-score backtest harness
 
 **Status:** IMPLEMENTED (Session 4, 2026-10-31) — §5 carries the
-measured numbers. **Parent specs:** `docs/insights/GOLD_SCORE_SPEC.md` (S1+S2+
+measured numbers; **Session 5 (2026-10-31, the close-out)** recorded its
+verdicts in §5's Session-5 subsection + the decision log below: D-5
+decided-YES (a 21st voter — its own session, not S5), D-7 decided-NO,
+the C4 honest note shipped on the panel (round-55), the asOf-watch
+re-check scheduled 2026-11-02, the C5 refresh blocked-pending-credential
+(the read-only KV token was revoked mid-session; the ~14:36 UTC
+credential retry failed identically — §5's retry bullet). **Parent specs:** `docs/insights/GOLD_SCORE_SPEC.md` (S1+S2+
 S2.1 shipped — the 20-voter directional score) and
 `docs/insights/GOLD_FRED_GAPFILL_SPEC.md` (S3 shipped — D-5 names this
 harness as the venue to evaluate the tilt promotion). `AGENTS.md` §A
@@ -229,7 +235,78 @@ the S4 close:** the corpus ends 2026-10-31 (the session ran ~12:20 UTC,
 before the 11-01/11-02 rungs). The watch stays open — carried to the
 next session/owner round; nothing here claims the D-4 split proven.
 
-### The standard block
+### Session 5 (2026-10-31, the close-out round) — the decisions, the watch disposition, the C5 blocker
+
+Ran ~13:35–15:00 UTC (before the 11-01/11-02 rungs — the watch's days
+2–3 were NOT observable at session time, per the timing note). The
+session's verification + decisions, all measured or owner-quoted:
+
+- **The corpus at S5 open:** live `/api/insights` carries `goldSummary`
+  (netScore −2, headwind) + `breakeven-tilt` (−0.24, asOf 2026-10-30) ✓;
+  read-only KV counted **16 full archives** (2026-10-15 → 10-31; 10-20
+  absent, the known outage day; the public pair starts 10-16 — recorded,
+  pre-existing); the newest (10-31) carries `goldSummary` ✓. **Day 1 of
+  the asOf-watch re-confirmed from the archive pair itself:** 10-30 →
+  10-31 moved the trio 10-28 → 10-29 (us10y 5.05 → 4.98, us30y 5.37 →
+  5.32, real-yield-10y 2.67 → 2.63, all `warning`) while the decade group
+  moved 10-29 → 10-30 (t5yie 2.47 → 2.46, T5YIFR 2.23 → 2.22) — same
+  rung, both +1 trading day, lag zero. **Days 2–3 stay pending** (the
+  11-01/11-02 rungs); an automated one-shot re-check is scheduled for
+  2026-11-02 ~04:30 UTC to pull both rungs and record the verdict here
+  whichever way it falls (lockstep → validated-by-watch, still not
+  "proven"; divergence → escalate to the owner with the measured days —
+  the cross-fill does NOT silently extend to the trio).
+- **D-5 — decided-YES** (the owner, on S4's B4 evidence: "we can have
+  21"). The promotion is a production voter-table change and therefore
+  NOT S5 work: it opens as its own session with its own gates (the
+  20→21 pin-test update, the 21st voter's name in both dictionaries
+  behind a Persian-copy round, the harness-local table + its pin, the
+  GOLD_SCORE_SPEC contract bump). S5 left `GOLD_LANE_VOTERS` untouched —
+  the 20-voter pin test stays green.
+- **D-7 — decided-NO** (the owner: "EODHD api is very limited and
+  problematic in free mode"). The Yahoo GC=F record + gold-api points
+  remain the realized-move venues; the offered key, if ever revisited,
+  lives in env/secrets only (secret scan stays clean; nothing committed).
+- **C4 — the honest note SHIPPED (the owner's (a) pick):** the gold
+  tailwind panel now states the measured reality under its S2.1 footnote
+  — EN + fa (`signals.goldScore.measuredNote` + `measuredNoteLink`,
+  Persian-copy round-55,
+  `docs/localization/persian-copy-round-55-gold-honest-note.md`;
+  copy:audit clean, manifest 4,851 entries) — "no positive association
+  with the next 5–60 days… conditions, not direction", with the link
+  word pointing at the public report (this file's home in the public
+  repository). No engine, voter-table, threshold, or label change; 2 new
+  render tests (gold-panels.test.tsx, 25 total).
+- **C5 — blocked-pending-credential (honest):** the corpus re-dump could
+  not run. The read-only KV token that authenticated the §0 verification
+  reads at ~13:35 UTC (16 keys listed, values read) was REVOKED
+  mid-session: by ~14:05 UTC every Cloudflare REST call answered
+  `Invalid API Token` (the second provided token is active but
+  KV-unscoped; the GitHub token died in the same window — the push/PR
+  carry the same blocker). `gold-corpus-dump` was NOT run; the S4 corpus
+  (recorded 2026-10-31T12:34Z, stage blob 04:20Z) stands as the
+  session-of-record until a fresh read-only token allows the refresh
+  (dump → backtest; the report regenerates with its `recordedAt`
+  lineage). Nothing was guessed at.
+- **The credential retry (~14:29–14:37 UTC, the owner re-supplied all
+  three): BLOCKED AGAIN, measured.** The "Workers API" Cloudflare token
+  verifies Invalid (revoked); the "AI WORKERS" token verifies active
+  but is Workers-AI-scoped — KV REST answers `Authentication error` on
+  the insights namespace; the GitHub token answers 401 `Bad
+  credentials` on REST and `Invalid username or token` on a push
+  dry-run (the session's earlier ls-remote "success" was an anonymous
+  public-repo read — it validated nothing). No stored credentials
+  exist in the sandbox (no helper, no netrc, no env). C5 and the
+  push/PR therefore stay blocked; the S5 commit sits complete and
+  gates-green on the LOCAL branch (re-verified post-retry:
+  gold-panels 25/25, gold core + score 61/61, copy:audit clean, secret
+  scan clean), pushed the moment a valid GitHub token lands. A refresh
+  before the 11-01 rung would be a data no-op anyway (the stage blob
+  was written 04:20Z and the 10-31 archive is already in the S4
+  corpus) — the scheduled 2026-11-02 re-check now carries the C5
+  refresh too, so ONE working KV-scoped token closes both.
+
+### The standard block (S4)
 
 - `corepack pnpm -r test` — green (the insights package gains
   `gold-backtest-core.test.ts`, 28 tests: the equivalence pin against
@@ -268,19 +345,28 @@ next session/owner round; nothing here claims the D-4 split proven.
 
 ## Decision log
 
-- **D-5 (open — S4's evidence delivered, the owner's call)** — promote
-  `breakeven-tilt` to a 21st gold voter. S4's B4 measured the variant
-  over 2,514 windows: the tilt fires in 46.7% of them (mostly headwind
-  — the tilt sat at decade lows), moves the label bucket in 10.2%, and
-  shifts the sign-agreements by +0.4/+0.7/+0.0pp — **no material
-  difference** (BACKTEST-GOLD.md §B4). The promotion would not have
-  changed the measured story; it remains an owner decision in a later
-  round.
-- **D-7 (open — authored 2026-10-31, default NO)** — EODHD as an
-  alternative gold-price history source (owner offered a key at the S3
-  close). Default: not needed for B1–B4; revisiting only if the owner
-  wants intraday or pre-Yahoo-record depth, which no current question
-  requires.
+- **D-5 (decided-YES 2026-10-31, Session 5 — implementation deferred to
+  its own session)** — promote `breakeven-tilt` to a 21st gold voter. The
+  owner's call on S4's B4 evidence: **"we can have 21."** The S4
+  measurement stands as the context (the tilt fired in 46.7% of windows,
+  moved the label bucket in 10.2%, shifted sign-agreements
+  +0.4/+0.7/+0.0pp — no material difference): the promotion is a scope
+  choice the owner is entitled to make, NOT an edge claim the harness
+  supports. Because it changes score semantics (the 5-step label's
+  shares, the strong-crowd minimum, the backtest contract), it ships in
+  a dedicated session with its own gates: the 20→21 pin-test update, the
+  21st voter's name in both dictionaries behind a Persian-copy round,
+  the harness-local `HARNESS_GOLD_VOTERS_21` + its equality pin, the
+  GOLD_SCORE_SPEC contract bump, and a fresh backtest run on the grown
+  corpus. S5 changed nothing in production (`GOLD_LANE_VOTERS` untouched,
+  the 20-voter pin test green).
+- **D-7 (decided-NO 2026-10-31, Session 5)** — EODHD as an alternative
+  gold-price history source. The owner: **"No, EODHD api is very limited
+  and problematic in free mode."** Default confirmed as the outcome: the
+  Yahoo GC=F ~10-year record + the gold-api live points remain the
+  realized-move venues; nothing was fetched, nothing was committed. If
+  the question ever reopens (intraday or pre-Yahoo-record depth), the
+  key rides env/secrets only and the secret scan stays clean.
 - **D-8 (recorded 2026-10-31)** — the daily archive pair retains
   indefinitely (no pruning code exists; ~18.8 MB/year against the 1 GB
   KV free tier). The backtest corpus is allowed to grow unbounded by

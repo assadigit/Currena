@@ -271,11 +271,25 @@ returns: **no edge in the table's own direction — the mature-base
 sign-agreements depart BELOW the coin at 5/20/60td and headwind labels
 preceded LARGER forward rises** (60td spread −3.09%); the tilt-augmented
 21-voter variant (harness-local, D-5's evidence) made no material
-difference. The table stays frozen; the panel's "conditions, not advice"
-caption is the operative description. NEXT: the owner's D-5 read (the
-evidence is in; the promotion is their call) + the asOf-watch days 2–3
-(pending the 11-01/11-02 rungs) + re-running the harness as the corpus
-grows.*
+difference. S5 (2026-10-31, the close-out) decided the round: **D-5
+decided-YES ("we can have 21") — the promotion is a production
+voter-table change and ships in its OWN session with its own gates
+(the table stays frozen at 20 until then)**; D-7 decided-NO (EODHD);
+the panel now carries the measured reality — the S5 honest note
+(`signals.goldScore.measuredNote` + its link to the public backtest
+report, bilingual, Persian-copy round-55) under the "conditions, not
+advice" footnote, which remains the operative description. The asOf-watch
+days 2–3 re-check is scheduled 2026-11-02 ~04:30 UTC (day 1 lockstep
+re-confirmed from the archive pair; verdict → GOLD_BACKTEST_SPEC §5).
+NEXT: the 21-voter promotion session (D-5's implementation) + the
+asOf-watch verdict + the C5 corpus refresh (2026-11-02, automated — the
+scheduled 04:30 UTC re-check carries both; one KV-scoped read-only
+token closes them) + LANDING THE S5 CLOSE-OUT COMMIT: it sits complete
+and gates-green on the LOCAL branch feat/gold-program-s5-closeout —
+both credential rounds failed (the ~14:05 UTC revocations; the ~14:36
+UTC re-supplied set: Workers-API revoked, AI-WORKERS KV-denied, GitHub
+invalid) — push it the moment a valid GitHub token arrives; the S4
+corpus stands as the session-of-record until then.*
 
 **Prices heat** (`prices-heat` gauge):
 | | id | cadence | maxAge | rule | source |

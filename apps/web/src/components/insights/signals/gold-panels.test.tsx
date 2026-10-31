@@ -124,6 +124,9 @@ describe('gold panel copy — both dictionaries cover the whole engine vocabular
       for (const t of ['building', 'fading', 'steady'] as const) {
         expect(g.tiltWords[t], `${name} tilt ${t}`).toBeTruthy();
       }
+      // Session 5 (C4a): the measured-reality note + its link word — both locales.
+      expect(g.measuredNote, `${name} measuredNote`).toBeTruthy();
+      expect(g.measuredNoteLink, `${name} measuredNoteLink`).toBeTruthy();
       // the voter names cover EXACTLY the 20-voter table
       const tableIds = GOLD_LANE_VOTERS.map((v) => v.id as string);
       expect(Object.keys(g.voterNames).sort()).toEqual([...new Set(tableIds)].sort());
@@ -340,6 +343,46 @@ describe('GoldTailwindPanel — Session 3 (G2): the inflation lane tilt phrase',
     );
     const inflation = screen.getByText(/انتظارات در حال شدت‌گیری/);
     expect(inflation.textContent).toContain('داغ');
+  });
+});
+
+describe('GoldTailwindPanel — Session 5 (C4a): the measured-reality note', () => {
+  // The S4 backtest's verdict, stated on the panel itself (the owner's
+  // C4(a) pick): the note renders UNDER the "conditions, not advice"
+  // footnote, and the link word points at the full public report in the
+  // repository (the repo is public — the same surface the About section
+  // already links for contact).
+  const NOTE_URL = 'https://github.com/assadigit/Currena/blob/main/docs/insights/BACKTEST-GOLD.md';
+
+  it('EN: the note renders under the footnote with the link to the public report', () => {
+    const { container } = render(
+      <GoldTailwindPanel goldSummary={GOLD_SUMMARY} readings={READINGS} copy={copy} numberLocale="en-US" />,
+    );
+    // the S2.1 footnote still renders, now inside the footnotes block
+    const footnotes = container.querySelector<HTMLElement>('[data-gold-footnotes]')!;
+    expect(footnotes.textContent).toContain('A descriptive score of the classic driver relationships');
+    // the measured-reality note + its link
+    const note = container.querySelector<HTMLElement>('[data-gold-measured-note]')!;
+    expect(note.textContent).toContain('no positive association with the next 5–60 days');
+    expect(note.textContent).toContain('conditions, not direction');
+    const link = note.querySelector<HTMLAnchorElement>('a');
+    expect(link).not.toBeNull();
+    expect(link!.getAttribute('href')).toBe(NOTE_URL);
+    expect(link!.getAttribute('target')).toBe('_blank');
+    expect(link!.textContent).toBe('Read the full backtest');
+  });
+
+  it('fa: the Persian note renders with the Persian link word (same public URL)', () => {
+    const { container } = render(
+      <GoldTailwindPanel goldSummary={GOLD_SUMMARY} readings={READINGS} copy={copyFa} numberLocale="fa-IR" />,
+    );
+    const note = container.querySelector<HTMLElement>('[data-gold-measured-note]')!;
+    expect(note.textContent).toContain('ارتباط مثبتی نداشت');
+    expect(note.textContent).toContain('این جدول شرایط را می‌خواند، نه جهت را');
+    const link = note.querySelector<HTMLAnchorElement>('a');
+    expect(link).not.toBeNull();
+    expect(link!.getAttribute('href')).toBe(NOTE_URL);
+    expect(link!.textContent).toBe('گزارش کامل این سنجش');
   });
 });
 
