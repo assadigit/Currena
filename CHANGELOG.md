@@ -5,6 +5,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31t] — gap-closure S2-M2.1: TIC source verification — fixtures, layouts, the L0 licence records
+
+The owner's top-priority feature's data source, verified and pinned before
+any parsing code exists (never invent a column name — read the provider's
+own response).
+
+- **Fixtures committed** (`packages/insights/fixtures/tic/`): both SLT
+  tables recorded 2026-10-31 20:24 UTC — `slt_table5-2026-10-31.txt`
+  (top-20 foreign holders, BILLIONS, 13 rolling months 2025-08 → 2026-08)
+  and `slt_table3-2026-10-31.txt` (ALL countries, MILLIONS, 2020-01 →
+  2026-08, ~80 months per country).
+- **The hex-dump verdict:** Table 5 carries real TABs throughout — the
+  planning chat's "merged numbers" (`862.5901.3`) was a chat-preview
+  artifact, not the file's truth (UK 2025-09 `862.5` + TAB + 2025-08
+  `901.3`).
+- **Table 3's layout mapped in full** (was "partial"): 10 tab-delimited
+  columns (`country, country_code, date, for_treas_pos, for_treas_net,
+  for_lt_treas_pos, for_lt_treas_net, for_lt_treas_valchg,
+  for_st_treas_pos, for_st_treas_net`), ~106 rows incl. Australia (code
+  60089) and the official/private aggregates, Treasury's own custody
+  caveat verbatim in the footer, and the **2023-02 series break** — the
+  three transactions columns are `n.a.` before it while holdings go back
+  to 2020-01. Sign convention pinned: a positive "net U.S. sales" number
+  means foreigners NET BOUGHT.
+- **Cross-verified T3↔T5** (same provider, independent tables): Japan
+  2026-08 `1,068,283 M` = `1,068.3 B`; Grand Total `9,331,654 M` =
+  `9,331.7 B`.
+- **Licence records:** provider `tic` (licences.ts) + `us-tic`
+  (sources.ts) — L0 public domain (17 U.S.C. § 105), the custody caveat
+  quoted; LICENCES.md + RISK_REGISTER.md rows; method card
+  SCRAPING_SPEC FS-08; VERIFIED-SOURCES.md T3 row partial → verified.
+- No runtime change (no indicator ids yet, no generated-file change) —
+  no deploy for this milestone. Gates green 10,331.
+
 ## [2026-10-31s] — gap-closure S1-M1.7: capacity scaffolding — the generic rung3/rung4 (04:30/04:35 UTC, pluggable, budget-capped, sweep-healed) verified LIVE; RUNGS.md + the new-indicator checklist
 
 The S2–S6 sessions can now add data sources without touching the FULL

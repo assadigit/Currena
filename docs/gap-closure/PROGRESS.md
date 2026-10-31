@@ -12,12 +12,12 @@ file at the end of every milestone (tick the box, add evidence) and every sessio
 | Session | Theme | Milestones done | % |
 |---|---|---|---|
 | S1 | Foundation and trust | 7 / 7 | 100% |
-| S2 | Foreign holdings of US Treasuries (priority feature) | 0 / 6 | 0% |
+| S2 | Foreign holdings of US Treasuries (priority feature) | 1 / 6 | 17% |
 | S3 | US credit, liquidity, fiscal and growth nowcast | 0 / 6 | 0% |
 | S4 | Geopolitics, supply chain and energy | 0 / 6 | 0% |
 | S5 | Australia deep-dive and Australian markets | 0 / 6 | 0% |
 | S6 | New Zealand link, China and world links, promotion and polish | 0 / 6 | 0% |
-| **Total** | | **7 / 37** | **19%** |
+| **Total** | | **8 / 37** | **22%** |
 <!-- gap-progress:end -->
 
 Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in production):
@@ -86,7 +86,11 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
   - **Numbers:** rung3/rung4 empty = 1 subrequest + 1 KV write each per day; sweeps +2 KV reads on healthy days; the rung budget ceiling 50 enforced declaratively.
 
 ### S2 Foreign holdings of US Treasuries (`S2-treasury-foreign-holders.md`)
-- [ ] M2.1 Source verification and fixtures
+- [x] M2.1 Source verification and fixtures
+  - Both SLT tables fetched 2026-10-31 20:24 UTC (work venue, honest UA; Worker egress already proven by the S1-M1.1 probe — both 200, 8–10 s). Fixtures committed: `packages/insights/fixtures/tic/slt_table5-2026-10-31.txt` (3.8 KB) + `slt_table3-2026-10-31.txt` (451 KB).
+  - **Hex-dump verdict:** real TABs throughout Table 5 — the planning-chat "merged numbers" (`862.5901.3`) was a chat-preview artifact (UK 2025-09 `862.5` + TAB + `901.3`).
+  - Table 3 layout fully mapped (was "partial"): 10 columns, millions, 2020-01 → 2026-08, ~106 rows incl. **Australia (code 60089)**, `Of Which: Foreign Official/Non-Official` + Memo rows, custody caveat verbatim in the footer, **`n.a.` transactions before 2023-02** (holdings go back to 2020-01) — 12-month sums must skip `n.a.`, never zero them. Sign: positive net = foreigners bought. Cross-check T3↔T5 passed (Japan 1068283 M = 1068.3 B; Grand Total 9331654 M = 9331.7 B).
+  - Docs: method card SCRAPING_SPEC FS-08; VERIFIED-SOURCES T3 partial→verified + log row; LICENCES.md + RISK_REGISTER.md rows; licences.ts provider `tic` + sources.ts `us-tic` (L0, 17 U.S.C. § 105, quoted custody caveat). No indicator ids yet → no registry/audit change → **no deploy** (docs + fixtures + register rows only; gates green 10,331). Commit `d720dd9`.
 - [ ] M2.2 Parser, data model and ingest rung
 - [ ] M2.3 Public endpoint, store and calendar
 - [ ] M2.4 UI: holders table, trend chart, weekly custody card
