@@ -5,6 +5,52 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31w] — gap-closure S2-M2.4: "Who holds US government debt" — the section is LIVE (headline, split bar, movers chips, Japan+China chart, the sortable table, the custody caveat; EN + fa; browser-verified at 360/1200)
+
+The owner's top-priority feature is now on the page: a full section
+inside the Global container, directly after the borrowing-costs gauge.
+
+- **The design rule, everywhere:** real net buying/selling (Table 3
+  TRANSACTIONS — "Net U.S. Sales") is shown SEPARATELY from the price
+  effect (valuation change), and the custody-hub caveat rides the rows
+  (the ◆ marker + the "?" tooltip with Treasury's own wording
+  paraphrased) plus the section footnote. The netVsValueNote states
+  the difference in plain language.
+- **Live content (production, data month 2026-08):** the headline
+  "Foreign holders owned $9.3 trillion of US Treasuries in August
+  2026. Japan held $1,068.3 billion, $171.0 billion less than six
+  months earlier; China held $590.7 billion…" (the spec's own verified
+  example numbers); the official/private split 40.2%/59.8%; the chips
+  — buyers UK/Cayman/Hong Kong vs sellers Japan/China/France (12-month
+  transactions); Japan 1,068.3 | −103.6 net | −18.7 price effect in the
+  table's first row.
+- **The table:** real `<table>` with `th scope` and sortable button
+  headers carrying `aria-sort`; top-15 + Australia always visible;
+  24-month sparklines (aria-hidden decoration — the row's numbers are
+  the text path); the mobile twin is the card list (first 6 + "Show
+  all 16 holders"). Sort + Show-all exercised live in the browser.
+- **States:** loading skeleton, the calm "being prepared" line, and
+  the >70-day stale badge derived at RENDER time from `dataMonth` (the
+  shared pure `ticIsStale`) — the endpoint never hides data, the UI
+  never presents a stale table as current.
+- **Copy:** the full bilingual tic block (~37 keys + 21 country names
+  per dictionary; fa **round-60**). Bundle: Insights lazy 1140/269 →
+  **1170/277** (measured 1168.82/275.08 — the section + both copy
+  blocks; justified).
+- **Tests:** +10 (the transactions-not-holdings chips, the stale badge
+  both sides of 70 days, sort both directions, the mobile disclosure,
+  EN/fa headline, the custody markers, the calm states). Gates ALL
+  GREEN — **10,411**.
+- **Live + verified:** api worker `33cf5dbe`; EN + fa at 360/1200 px,
+  zero console errors, VLM visual pass (evidence/M2.4/, six
+  screenshots). The parallel-session merge (the builder's 7 verified
+  calendar dates + the manifest union) landed via rebase in `ee4e4dc`.
+- **WSEFINTL1 (the weekly custody card's series): VERIFIED** — weekly
+  2002-12-18 → 2026-10-28, latest 2,838,071 $M; licence public domain
+  (the FRED series page's own tag, read 2026-10-31). The card ships
+  with S3-M3.1 (the FRED-family fetch plumbing); the verification is
+  recorded so S3 only wires the ingest.
+
 ## [2026-10-31v] — gap-closure S2-M2.3: `GET /api/insights/tic` live — one KV read, ETag/304, the kill switch armed; the typed web client; the Treasury-verified calendar entry (round-60)
 
 The owner's top-priority feature now has its public read path: the
